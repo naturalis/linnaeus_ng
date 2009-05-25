@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" creationComplete="init()" xmlns:display="flash.display.*" viewSourceURL="srcview/index.html" backgroundColor="#FFFFFF" minHeight="550" minWidth="960" backgroundGradientAlphas="#FFFFFF" backgroundGradientColors="#FFFFFF">
+	<mx:Script source="main.as" />
+	<mx:Style source="stylesheet.css" />
+	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="system" id="system">
+		<mx:method name="connect" result="onSystemConnect(event)"  fault="onFault(event)" />
+	</mx:RemoteObject>	
+	<!-- remote object to use views method from amfphp service in Drupal -->
+	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="views" id="speciesview">
+		<mx:method name="get" result="onSpeciesViewResult(event)" fault="onFault(event)" />
+	</mx:RemoteObject>	
+	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="views" id="settingsview">
+		<mx:method name="get" result="onSettingsViewResult(event)" fault="onFault(event)" />
+	</mx:RemoteObject>	
+	<!-- remote object to use node methods to be able to save or delete a changed record -->
+	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="node" id="node" >
+		<mx:method name="save" result="onSaved(event)" fault="onFault(event)" />
+		<mx:method name="deleteNode" result="onDeleted(event)" fault="onFault(event)" />
+	</mx:RemoteObject>
+	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="file" id="file">
+  		<mx:method name="save" result="fileSaveResult(event)" fault="onFault(event)" />
+  		<mx:method name="get" result="onFileResult(event)" fault="onFault(event)" />
+	</mx:RemoteObject>	
+	
+	<mx:Panel width="960" height="550" layout="absolute" id="mainpanel" horizontalCenter="0" verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<mx:Label id="user"   textAlign="right" width="240" x="690" y="10"/>
+	<mx:HRule x="0" y="67" width="930" height="3" strokeColor="#424545"/>
+
+	<mx:HBox id="modules" x="0" y="-2" width="930" height="87" horizontalScrollPolicy="off" verticalScrollPolicy="off" horizontalGap="0">
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/introduction.png" buttonMode="true" toolTip="Introduction" click="changeView('moduleIntroduction')"/>
+			<mx:Label text="Introduction"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/glossary.png" buttonMode="true" toolTip="Glossary"/>
+			<mx:Label text="Glossary"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/index.png" buttonMode="true" toolTip="Index"/>
+			<mx:Label text="Index"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/classification.png" buttonMode="true" toolTip="Classification"/>
+			<mx:Label text="Classification"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/object.png" buttonMode="true" toolTip="Species" click="changeView('moduleSpecies')"/>
+			<mx:Label text="Species"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/key.png" buttonMode="true" toolTip="Classic Key"/>
+			<mx:Label text="Classic Key"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/distributionmap.png" buttonMode="true" toolTip="Distribution"/>
+			<mx:Label text="Matrix Key"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">		
+			<mx:Image source="icons/identifyit.png" buttonMode="true" toolTip="Matrix Key"/>	
+			<mx:Label text="Distribution"/>
+		</mx:VBox>
+		<mx:VBox verticalGap="-5" horizontalAlign="center" width="80">
+			<mx:Image source="icons/literature.png" buttonMode="true" toolTip="Literature"/>
+			<mx:Label text="Literature"/>
+		</mx:VBox>		
+	</mx:HBox>	
+	<mx:ViewStack x="0" y="0" id="mainContainer" width="100%" height="100%">
+		<mx:Canvas id="moduleSpecies" horizontalScrollPolicy="off" verticalScrollPolicy="off" >		
+			<mx:TabBar x="774" y="48" dataProvider="speciesView" id="view_edit_tab" visible="false"/>
+			<mx:TabNavigator x="10" y="95" width="331" height="356">
+			<mx:Canvas label="List view" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:DataGrid x="0" y="0" width="329" id="species_select" dataProvider="{speciesnodes}" selectedIndex="0" height="323" >
+				<mx:columns>				
+					<mx:DataGridColumn headerText="Species" dataField="title"/>
+				</mx:columns>
+				</mx:DataGrid>
+			</mx:Canvas>
+			<mx:Canvas label="Tile view" width="100%" height="100%">
+				<mx:TileList x="0" y="0" width="329" height="323"></mx:TileList>
+			</mx:Canvas>
+			<mx:Canvas label="Classification" width="100%" height="100%">
+			</mx:Canvas>
+		</mx:TabNavigator>
+		<mx:Panel x="349" y="86" width="602" height="433" layout="absolute" title="{species_select.selectedItem.title}" id="species_name" >
+			<mx:Panel id="imagepanel" y="9" right="10" height="283" width="243" borderStyle="solid" borderThickness="1" borderColor="#000000" cornerRadius="0" visible="false"/>
+			<mx:Image id="species_image" y="10" right="11" height="281" width="241"/>
+		</mx:Panel>
+		
+		<mx:ViewStack id="speciesView" width="100%" height="100%">	
+		<mx:Canvas id="speciesViewContainer" label="View">
+			<mx:Text x="367" y="117" width="301" height="323" id="view_species_description" htmlText="{species_select.selectedItem.body}"/>		
+		</mx:Canvas>
+		<mx:Canvas id="speciesEditContainer" label="Edit">	
+			<mx:Label x="358.5" y="111" text="Species name"/>
+			<mx:TextInput x="358.5" y="128" width="186" id="edit_species_name" text="{species_select.selectedItem.title}"/>
+			<mx:RichTextEditor x="358.5" y="158" width="323.5" height="292" 
+				id="edit_species_description" 
+				htmlText="{species_select.selectedItem.body}" 
+				title="Species description"
+				creationComplete="removeEditorButtons('edit_species_description')"/>
+			<mx:Button x="543" y="470" label="Save" click="saveSpecies()"/>
+			<mx:Button x="605" y="470" label="Delete" click="deleteSpecies()"/>
+			<mx:Button id="buttonDeleteImage" x="825" y="128" label="Delete image" click="deleteImage()"/>
+			<mx:Button x="734" y="128" label="New image" click="fileRef.browse()"/>
+		</mx:Canvas>
+		
+	    <mx:Canvas id="speciesNewContainer" label="New">
+	    	<mx:Label x="358.5" y="102" text="Species name"/>
+			<mx:TextInput x="358.5" y="118" width="186" id="new_species_name" text=""/>
+			<mx:RichTextEditor x="358.5" y="158" width="323.5" height="292" 
+				id="new_species_description" 
+				htmlText="" 
+				title="Species description"
+				creationComplete="removeEditorButtons('new_species_description')"/>
+			<mx:Button x="543" y="470" label="Save" click="saveSpecies()"/>		
+			<mx:Button x="840" y="128" label="New image" click="fileRef.browse()"/>
+	    </mx:Canvas>
+		</mx:ViewStack>	
+	</mx:Canvas>
+	<mx:Canvas id="moduleIntroduction">			
+		<mx:ViewStack id="introductionView" width="100%" height="100%" creationComplete="initIntroduction()">		
+			<mx:Canvas id="introductionViewContainer" label="View" >
+				<mx:Text id="projectDescription" width="600" height="158" horizontalCenter="0" fontSize="20" top="130"/>
+				<mx:Text id="projectAuthors" width="600" height="122" top="330" horizontalCenter="0"/>
+				<mx:Label x="170" y="304" text="Authors" width="64"/>
+				<mx:Label x="170" y="104" text="Introduction"/>
+			</mx:Canvas>		
+		</mx:ViewStack>
+		
+		</mx:Canvas>
+</mx:ViewStack>		
+	</mx:Panel>
+	<mx:Label id="header" fontSize="20" verticalCenter="-263" width="940" horizontalCenter="10"/>
+</mx:Application>

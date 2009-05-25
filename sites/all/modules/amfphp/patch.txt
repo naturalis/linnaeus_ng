@@ -1,0 +1,2 @@
+Wouter:
+Patched to return utf8 and not decode to latin1

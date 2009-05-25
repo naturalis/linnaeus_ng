@@ -1,0 +1,259 @@
+<?php
+/* $Id: batax.module,v 1.8 2009/01/23 12:27:13 sdrycroft Exp $*/
+/* $HeadURL$*/
+
+/** 
+ * @file batax.module
+ * 
+ * Allows a user to specify that a taxonomy field should use the
+ * autocomplete text field and not the drop down/select boxes
+ */
+
+/***********************************************************************************
+ * HOOKS
+ ***********************************************************************************/
+/**
+ * hook_form_alter
+ * 
+ * This function does most of the hard work for this module.
+ */
+function batax_form_alter(&$form, &$form_state, $form_id){
+  if($form_id == 'taxonomy_form_term' && !$form_state['submitted']){
+    // If this taxonomy has loadsa terms, use batax, else use normal select
+    if(batax_use_batax($form['#vocabulary']['vid'])){
+      $form['advanced']['parent'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Parents'),
+        '#default_value' => batax_text_field_from_tids($form['#term']['parent']),
+        '#autocomplete_path' => 'batax/autocomplete/'.$form['#vocabulary']['vid']
+      );
+      $form['advanced']['relations'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Related terms'),
+        '#default_value' => batax_text_field_from_tids($form['#term']['relations']),
+        '#autocomplete_path' => 'batax/autocomplete/'.$form['#vocabulary']['vid']  
+      );
+      // Ensure our submit is executed first
+      $form['#submit'] = array_merge(array('batax_form_term_submit'),$form['#submit']);
+    } else {
+      $parent = array_keys(taxonomy_get_parents($form['#term']['tid']));
+      $children = taxonomy_get_tree($form['#vocabulary']['vid'], $form['#term']['tid']);
+  
+      // A term can't be the child of itself, nor of its children.
+      foreach ($children as $child) {
+        $exclude[] = $child->tid;
+      }
+      $exclude[] = $form['#term']['tid'];
+  
+      $form['advanced']['parent'] = _taxonomy_term_select(t('Parents'), 'parent', $parent, $form['#vocabulary']['vid'], t('Parent terms') .'.', 1, '<'. t('root') .'>', $exclude);
+      $form['advanced']['relations'] = _taxonomy_term_select(t('Related terms'), 'relations', array_keys(taxonomy_get_related($edit['tid'])), $form['#vocabulary']['vid'], NULL, 1, '<'. t('none') .'>', array($form['#term']['tid']));
+    }
+  } elseif ($form['#id'] == 'node-form'){
+    if(isset($form['taxonomy'])){
+      // Check for autotag module
+      $ignore_vids = array();
+      if(function_exists('_autotag_get_vids_for_type')){
+        $ignore_vids = _autotag_get_vids_for_type($form['type']['#value']);
+      }
+      $were_using_batax = false;
+      foreach($form['taxonomy'] as $vid => $taxonomy_element){
+        if(is_array($taxonomy_element)){
+          if(isset($taxonomy_element['#type']) && $taxonomy_element['#type'] == 'select' && !in_array($vid, $ignore_vids)){
+            // We have a select taxonomy, lets check if it should use batax
+            if(batax_use_batax($vid)){
+              // Set the following to true so that we know to add an extra submit
+              // function
+              $were_using_batax = true;
+              // Store the vid for use later
+              $form_state['storage']['batax'][$vid] = $vid;
+              // It should, lets replace the field
+              $form['taxonomy'][$vid] = array(
+                '#type' => 'textfield',
+                '#maxlength' => 10000,
+                '#title' => $form['taxonomy'][$vid]['#title'],
+                '#description' => $form['taxonomy'][$vid]['#description'],
+                '#default_value' => batax_text_field_from_tids($form['taxonomy'][$vid]['#default_value']),
+                '#autocomplete_path' => 'batax/autocomplete/'.$vid
+              );
+            }
+          }
+        }
+      }
+      if($were_using_batax){
+        // Add an additional submit
+        $form['#submit'] = array_merge(array('batax_node_submit'),$form['#submit']);      
+      }
+    }
+  }
+  elseif($form_id == 'taxonomy_form_vocabulary' && $form['module']['#value']=='taxonomy'){
+    // Here we can add the extra field
+    $disable_vids = variable_get('batax_disable_vids', array());
+    $form['settings']['disablebatax'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Disable Batax'),
+      '#default_value' => isset($disable_vids[$form['vid']['#value']]) ? $disable_vids[$form['vid']['#value']] : 0,  
+      '#description' => t('If checked, this Vocabulary will not use Batax for selecting terms on a node form')
+    );
+    // Finally we need a submit function
+    $form['#submit'][] = 'batax_vocabulary_form_submit';
+  }
+}
+
+/**
+ * Simply save what was entered in the checkbox
+ */
+function batax_vocabulary_form_submit($form, $form_values){
+  // Merge the array with what is already there.
+  $disable_vids = variable_get('batax_disable_vids', array());
+  $disable_vids[$form_values['vid']] = $form_values['values']['disablebatax'];
+  variable_set('batax_disable_vids', $disable_vids);
+}
+
+function batax_form_term_submit($form, &$form_state){
+  // At this point we need to change our text fields into arrays
+  $form_state['values']['parent'] = batax_split_field($form_state['values']['parent'], $form_state['values']['vid']); 
+  $form_state['values']['relations'] = batax_split_field($form_state['values']['relations'], $form_state['values']['vid']);  
+}
+
+function batax_node_submit($form, &$form_state){
+  // At this point we need to change our text fields into arrays
+  foreach($form_state['storage']['batax'] as $vid){
+    $form_state['values']['taxonomy'][$vid] = batax_split_field($form_state['values']['taxonomy'][$vid], $vid);
+  }
+  unset($form_state['storage']['batax']);
+}
+
+/**
+ * hook_menu
+ */
+function batax_menu(){
+	$items = array();
+  $items['admin/settings/batax'] = array(
+    'title' => 'Batax settings',
+    'description' => 'Change the number of terms required to force the use of taxonomy autocomplete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('batax_admin_settings'),
+    'access arguments' => array('administer site configuration')
+  );
+  $items['batax/autocomplete'] = array(
+    'title' => 'Batax autocomplete',
+    'page callback' => 'batax_autocomplete',
+    'access arguments' => array('create node content'),
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+/*******************************************************************************
+ * SETTINGS FORM
+ ******************************************************************************/
+/**
+ * Settings form
+ */
+function batax_admin_settings() {
+  $form['batax_max_options'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Batax term number'),
+    '#default_value' => variable_get('batax_max_options', 100),
+    '#size' => 5,
+    '#maxlength' => 5,
+    '#description' => t('Maximum number of terms allowed before the BATAX field is used'),
+    '#required' => TRUE,
+  );  
+  return system_settings_form($form);
+}
+
+/*******************************************************************************
+ * AUTOCOMPLETE FUNCTION
+ ******************************************************************************/
+function batax_autocomplete($vid, $string = '') {
+  // The user enters a comma-separated list of tags. We only autocomplete the last tag.
+  // This regexp allows the following types of user input:
+  // this, "somecmpany, llc", "and ""this"" w,o.rks", foo bar
+  $regexp = '%(?:^|,\ *)("(?>[^"]*)(?>""[^"]* )*"|(?: [^",]*))%x';
+  preg_match_all($regexp, $string, $matches);
+  $array = $matches[1];
+
+  // Fetch last tag
+  $last_string = trim(array_pop($array));
+  $matches = array();
+  if ($last_string != '') {
+    $result = db_query_range(db_rewrite_sql("SELECT t.tid, CONCAT(t.name,':',t.tid) AS name FROM {term_data} t , {term_lowername} l WHERE t.vid = %d AND l.tid = t.tid AND lowername LIKE LOWER('%s%%')", 't', 'tid'), $vid, $last_string, 0, 10);
+    $prefix = count($array) ? implode(', ', $array) .', ' : '';
+    while ($tag = db_fetch_object($result)) {
+      $n = $tag->name;
+      $parents = taxonomy_get_parents_all($tag->tid);
+      // Commas and quotes in terms are special cases, so encode 'em.
+      if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
+        $n = '"'. str_replace('"', '""', check_plain($tag->name)) .'"';
+      }
+      if(count($parents)>1){
+        $parent_array = array();
+        $parents = array_reverse($parents);
+        array_pop($parents);
+        foreach($parents as $parent){
+          $parent_array[] = check_plain($parent->name);
+        }
+        $matches[$prefix . $n] = check_plain($tag->name) ." (".implode(" &raquo; ",$parent_array).")";
+      } else {
+        $matches[$prefix . $n] = check_plain($tag->name);
+      }
+    }
+  }
+  print drupal_to_js($matches);
+  exit;
+}
+/*******************************************************************************
+ * HELPER FUNCTIONS
+ ******************************************************************************/
+/**
+ * Check to see whether a vocabulary should use batax
+ */
+function batax_use_batax($vid){
+  $vids = variable_get('batax_disable_vids', array());
+  if(isset($vids[$vid]) && $vids[$vid]){
+    return false;
+  }
+  $num_terms = array_pop(db_fetch_array(db_query("SELECT COUNT(tid) FROM {term_data} WHERE vid = %d", $vid)));
+  return $num_terms > variable_get('batax_max_options', 100);
+}
+/**
+ * Simple helper function which returns an array of tids
+ */
+function batax_split_field($string, $vid){
+  // Add slashes first
+  $string = addslashes($string);
+  $regexp = '%(?:^|,\ *)("(?>[^"]*)(?>""[^"]* )*"|(?: [^",]*))%x';
+  preg_match_all($regexp, $string, $matches);
+  $string_array = $matches[1];
+  if(count($string_array)){
+    $tids = array();
+    foreach($string_array as $term){
+      $tids[] = array_pop(explode(":",$term));
+      $place_holder[] = "'%s'";
+    }
+    // For sanity sake we'll make sure these TIDs could have been added
+    $tids[] = $vid;
+    $results = db_query("SELECT tid FROM {term_data} WHERE tid IN (".implode(",",$place_holder).") AND vid = %d", $tids);
+    $return_array = array();
+    while($row = db_fetch_array($results)){
+      $return_array[$row['tid']] = $row['tid'];
+    }
+    if(count($return_array)<2){
+      return array_pop($return_array);
+    }
+    return $return_array;
+  }
+  return array();
+}
+
+function batax_text_field_from_tids($tids = array()){
+  $field_terms = array();
+  if(!is_array($tids)){
+    return '';
+  }
+  foreach($tids as $tid){
+    $term = taxonomy_get_term($tid);
+    $field_terms[] = check_plain($term->name).':'.$term->tid;
+  }
+  return implode(", ",$field_terms);
+}

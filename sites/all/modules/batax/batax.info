@@ -1,0 +1,13 @@
+; $Id: batax.info,v 1.3 2009/01/23 12:06:07 sdrycroft Exp $
+name = "Big Autocomplete TAXonomy (batax)"
+description = "Allows a user to specify that large taxonomies (over a defined number of terms) should use the taxonomy autocomplete field"
+package = "EDIT"
+dependencies[] = taxonomy
+dependencies[] = lowername
+core = 6.x
+; Information added by drupal.org packaging script on 2009-01-23
+version = "6.x-1.5"
+core = "6.x"
+project = "batax"
+datestamp = "1232713806"
+

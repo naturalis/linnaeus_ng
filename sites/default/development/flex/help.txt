@@ -1,0 +1,1 @@
+Flex source code can be found in directory 'Linnaeus Next Generation'. Compiled code (SWF file) integrated with Drupal in sites/all/flex/
