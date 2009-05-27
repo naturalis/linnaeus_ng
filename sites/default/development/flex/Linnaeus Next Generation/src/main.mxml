@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
-	layout="absolute" creationComplete="init()" xmlns:display="flash.display.*" viewSourceURL="srcview/index.html" backgroundColor="#FFFFFF" minHeight="550" minWidth="960" backgroundGradientAlphas="#FFFFFF" backgroundGradientColors="#FFFFFF">
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:c="com.flexblocks.imagecropper.*"
+	xmlns:display="flash.display.*"
+	xmlns:flexlib="flexlib.containers.*"
+	layout="absolute" creationComplete="init()" viewSourceURL="srcview/index.html" backgroundColor="#FFFFFF" minHeight="550" minWidth="960" backgroundGradientAlphas="#FFFFFF" backgroundGradientColors="#FFFFFF">
 	<mx:Script source="main.as" />
+	<mx:Script source="ImageCrop.as" />
 	<mx:Style source="stylesheet.css" />
 	<mx:RemoteObject showBusyCursor="true" destination="amfphp" source="system" id="system">
 		<mx:method name="connect" result="onSystemConnect(event)"  fault="onFault(event)" />
@@ -68,7 +73,7 @@
 	<mx:ViewStack x="0" y="0" id="mainContainer" width="100%" height="100%">
 		<mx:Canvas id="moduleSpecies" horizontalScrollPolicy="off" verticalScrollPolicy="off" >		
 			<mx:TabBar x="774" y="48" dataProvider="speciesView" id="view_edit_tab" visible="false"/>
-			<mx:TabNavigator x="10" y="95" width="331" height="356">
+			<mx:TabNavigator x="10" y="95" width="331" height="356" >
 			<mx:Canvas label="List view" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
 				<mx:DataGrid x="0" y="0" width="329" id="species_select" dataProvider="{speciesnodes}" selectedIndex="0" height="323" >
 				<mx:columns>				
@@ -76,8 +81,15 @@
 				</mx:columns>
 				</mx:DataGrid>
 			</mx:Canvas>
-			<mx:Canvas label="Tile view" width="100%" height="100%">
-				<mx:TileList x="0" y="0" width="329" height="323"></mx:TileList>
+			<mx:Canvas label="Tile view" width="100%" height="100%" >
+				<mx:TileList id="tilelist" creationComplete="initTileList()" columnWidth="107" width="100%" height="100%" direction="horizontal" columnCount="3">
+				 <mx:itemRenderer>
+		    	<mx:Component>
+		    		<mx:Image height="100" horizontalAlign="center">		    			
+		    		</mx:Image>		    		
+		    	</mx:Component>
+		    </mx:itemRenderer>
+				</mx:TileList>
 			</mx:Canvas>
 			<mx:Canvas label="Classification" width="100%" height="100%">
 			</mx:Canvas>
@@ -86,7 +98,15 @@
 			<mx:Panel id="imagepanel" y="9" right="10" height="283" width="243" borderStyle="solid" borderThickness="1" borderColor="#000000" cornerRadius="0" visible="false"/>
 			<mx:Image id="species_image" y="10" right="11" height="281" width="241"/>
 		</mx:Panel>
-		
+		<mx:HorizontalList id="imagesBar" x="690" y="416" width="240" height="88" change="showImagesBarImage()" columnWidth="60">
+		    <mx:itemRenderer>
+		    	<mx:Component>
+		    		<mx:Image buttonMode="true" height="65" scaleContent="true" verticalAlign="middle" horizontalAlign="center">		    			
+		    		</mx:Image>
+		    		
+		    	</mx:Component>
+		    </mx:itemRenderer>
+        </mx:HorizontalList>
 		<mx:ViewStack id="speciesView" width="100%" height="100%">	
 		<mx:Canvas id="speciesViewContainer" label="View">
 			<mx:Text x="367" y="117" width="301" height="323" id="view_species_description" htmlText="{species_select.selectedItem.body}"/>		
@@ -115,6 +135,7 @@
 				creationComplete="removeEditorButtons('new_species_description')"/>
 			<mx:Button x="543" y="470" label="Save" click="saveSpecies()"/>		
 			<mx:Button x="840" y="128" label="New image" click="fileRef.browse()"/>
+			
 	    </mx:Canvas>
 		</mx:ViewStack>	
 	</mx:Canvas>
@@ -127,8 +148,35 @@
 				<mx:Label x="170" y="104" text="Introduction"/>
 			</mx:Canvas>		
 		</mx:ViewStack>
+	</mx:Canvas>
+	<mx:Canvas id="moduleImageCrop"  >		
+		<mx:Label x="43" y="71" text="Original Image" fontWeight="bold" /> 
+		<c:ImageCropper id="imageCropper" y="95" left="43" width="380" height="282" enabled="true" 
+			handleColor="#FF00FF" 
+			maskColor="#660066" maskAlpha="0.3"
+			
+			            sourceImageReady="imageReady()"  sourceImageLoadError="Alert.show('Error while loading image')" cropRectChanged="doCrop()" cropConstraintDisabled="true"
+			            cropConstraintChanged="trace('Crop constraint changed'); doCrop()" cropDimensionsChanged="trace('Crop dimensions changed'); doCrop()" cropPositionChanged="trace('Crop position changed'); doCrop()" 
+			            outlineColor ="#FFFFFF"
+			            outlineAlpha=".5"		           
+						handleAlpha=".5"					
+						backgroundColor="#FFFFFF"
+						backgroundAlpha="1"
+						constrainToAspectRatio="true"
+						handleSize="10"
+						
+			            />			
+	
+		<mx:Label x="443" y="71" text="New Image" fontWeight="bold" />
+		<mx:Canvas y="94" width="241" height="281" backgroundColor="#FFFFFF" x="443">
+			<mx:Image id="croppedImage" scaleContent="true" />
+		</mx:Canvas>	
+		<mx:Label  id="imageCropperRect" x="38" y="374" />
+		<mx:Label id="sourceImageRect" x="443" y="374" />
 		
-		</mx:Canvas>
+		<mx:Button x="415" y="401" label="Done" click="imageSelected()"/>
+		
+	</mx:Canvas>
 </mx:ViewStack>		
 	</mx:Panel>
 	<mx:Label id="header" fontSize="20" verticalCenter="-263" width="940" horizontalCenter="10"/>
