@@ -393,7 +393,9 @@
 						<a href="http://www.eol.org"/><img src="<?php print base_path().$theme_path ?>/images/eol_small.png" alt="Encyclopedia Of Life" /></a>
 			<a href="http://e-taxonomy.eu/"><img src="<?php print base_path().$theme_path ?>/images/edit_small.png" alt="EDIT" /></a>
 			<a href="http://scratchpads.eu"/><img src="<?php print base_path().$theme_path ?>/images/scratchpads.png" alt="Scratchpads"/></a>
-			<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img  
+<a href="http://www.gbif.org"><img src="<?php print base_path().$theme_path ?>/images/gbif.png" alt="Global Biodiversity Information Facility" /></a>	
+<a href="http://www.tdwg.org"><img src="<?php print base_path().$theme_path ?>/images/tdwg.png" alt="TDWG Biodiversity Information Standards" /></a>		
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img  
  src="<?php print base_path().$theme_path ?>/images/cc.logo.1.png" alt="Creative Commons License" /> </a>
 <a href="http://drupal.org/"><img src="<?php print base_path().$theme_path ?>/images/drupal_small.png" alt="drupal logo"  /></a>
 <!--/Creative Commons License-->
