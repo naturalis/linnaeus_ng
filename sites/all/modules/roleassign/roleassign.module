@@ -1,6 +1,6 @@
 <?php
 
-// $Id: roleassign.module,v 1.19.2.2 2008/12/01 16:13:33 tobiassjosten Exp $
+// $Id: roleassign.module,v 1.19.2.3 2009/04/21 19:22:43 tobiassjosten Exp $
 
 /**
  * @file
@@ -296,7 +296,7 @@ function _roleassign_assignable_roles($roles) {
  * Store and retrive sticky roles.
  */
 function _roleassign_sticky_roles($new_sticky_roles = null) {
-  static $sticky_roles;
+  static $sticky_roles = array();
   if (isset($new_sticky_roles)) {
     $sticky_roles = $new_sticky_roles;
   }
@@ -318,8 +318,8 @@ function _roleassign_settings_help() {
  * Returns full help text.
  */
 function _roleassign_help_help() {
-  $version = str_replace(array('$Re'.'vision:', ' $'), array('', ''), '$Revision: 1.19.2.2 $');
-  $year = substr('$Date: 2008/12/01 16:13:33 $', 7, 4);
+  $version = str_replace(array('$Re'.'vision:', ' $'), array('', ''), '$Revision: 1.19.2.3 $');
+  $year = substr('$Date: 2009/04/21 19:22:43 $', 7, 4);
   drupal_add_css(drupal_get_path('module', 'roleassign') .'/roleassign.css', 'module', 'all', false);
   return t
   (
