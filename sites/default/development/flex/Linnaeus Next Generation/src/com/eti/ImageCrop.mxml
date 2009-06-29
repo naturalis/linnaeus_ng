@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:flexblocks="com.flexblocks.imagecropper.*" 
+	>
+	<mx:Script source="ImageCropAs.as" />
+	<mx:Label x="43" y="71" text="Original Image" fontWeight="bold" /> 
+	<flexblocks:ImageCropper id="imageCropper" y="95" left="43" width="380" height="282" enabled="true" 
+		handleColor="#FF00FF" 
+		maskColor="#660066" maskAlpha="0.3"		
+        sourceImageReady="imageReady()"  sourceImageLoadError="Alert.show('Error while loading image')" cropRectChanged="doCrop()" cropConstraintDisabled="true"
+        cropConstraintChanged="trace('Crop constraint changed'); doCrop()" cropDimensionsChanged="trace('Crop dimensions changed'); doCrop()" cropPositionChanged="trace('Crop position changed'); doCrop()" 
+        outlineColor ="#FFFFFF"
+        outlineAlpha=".5"		           
+		handleAlpha=".5"					
+		backgroundColor="#FFFFFF"
+		backgroundAlpha="1"
+		constrainToAspectRatio="true"
+		handleSize="10"		
+        />			
+
+	<mx:Label x="443" y="71" text="New Image" fontWeight="bold" />
+	<mx:Canvas y="94" width="241" height="281" backgroundColor="#FFFFFF" x="443">
+		<mx:Image id="croppedImage" scaleContent="true" />
+	</mx:Canvas>	
+	<mx:Label  id="imageCropperRect" x="38" y="374" />
+	<mx:Label id="sourceImageRect" x="443" y="374" />
+	
+	<mx:Button x="415" y="401" label="Done" click="parentDocument.imageSelected()"/>
+	
+</mx:Canvas>

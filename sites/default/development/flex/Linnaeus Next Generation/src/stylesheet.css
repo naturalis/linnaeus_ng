@@ -1,6 +1,12 @@
+
 global{
-	fontSize: 10;	
+	fontSize: 10;		
 }
 Application{	
+	backgroundColor:#FFFFFF;
+	minHeight:550;
+	minWidth:960; 	
 }
-
+HRule{
+	strokeColor:#424545;
+}

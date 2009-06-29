@@ -1,4 +1,5 @@
 // ActionScript file
+import mx.controls.*;
 
 // Index of last image selected using the selectImage ComboBox			
 private var lastSelectedImage:uint = 0;
