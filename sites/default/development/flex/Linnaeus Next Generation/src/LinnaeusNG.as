@@ -10,8 +10,10 @@ import flash.net.FileReference;
 
 import mx.collections.ArrayCollection;
 import mx.controls.*;
+import mx.collections.XMLListCollection;
 import mx.events.ItemClickEvent;
 import mx.events.ListEvent;
+import mx.events.MenuEvent;
 import mx.graphics.ImageSnapshot;
 import mx.graphics.codec.*;
 import mx.rpc.events.*;
@@ -33,21 +35,25 @@ private var fileRef:FileReference;
 private var pathToSpeciesFiles:String="species/images/";
 private var basePath:String="http://localhost/linnaeus_ng/";
 private var htmlTextField:String;
-private var previousSelectedItem:Object;
+
 private var previousSelectedIndex:Number=0;
 private var fidOverviewImageRemove:Number=0;
 private var barImageId:Array=new Array;
 private var currentImageId:Number;
 
-[Bindable]
-public var speciesnodes:Array;
 public var projectSettings:Array;
 public var filedata:Array;
 public var currentUser:String;
 public var fileOriginalBase64:String;
 public var newFileName:String;
 public var localImage:ByteArray;
+
+[Bindable]
+public var speciesnodes:Array;
+[Bindable]
 public var tileItems:ArrayCollection;
+[Bindable]
+public var menuBarCollection:XMLListCollection;
 
 public function init():void
 {
@@ -55,11 +61,9 @@ public function init():void
 	
 	fileRef = new FileReference();
     fileRef.addEventListener(Event.SELECT, selectEvent);
-    fileRef.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+    fileRef.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);   
     
-    species_select.addEventListener(ListEvent.CHANGE,specieslistEvent);
-    view_edit_tab.addEventListener(ItemClickEvent.ITEM_CLICK,viewEditNewClickEvent);
-    imagepanel.visible=false;
+    menuBarCollection = new XMLListCollection(menubarXML);       
 }
 
 public function onSystemConnect(event:ResultEvent):void{
@@ -68,7 +72,7 @@ public function onSystemConnect(event:ResultEvent):void{
 	//Alert.show(currentUser,"User");	
 	user.text="Not logged in";
 	if(currentUser!=null){
-		view_edit_tab.visible=true;
+		moduleSpecies.view_edit_tab.visible=true;
 		user.text="Logged in as: " + currentUser;
 	}
 	getSettings();
@@ -79,34 +83,12 @@ public function onFault(event:FaultEvent):void
 {
 	Alert.show(event.fault.faultString, "Error");
 }
-public function viewEditNewClickEvent(event:ItemClickEvent):void {
-	//Tab "View" or "Edit" clicked? Make sure there is still a species selected 
-	//was unselected if tab New was clicked before
-	if (event.index==0||event.index==1){
-      	restoreSpecies();
-      }
-	
-	//Tab "New" clicked?
-      if (event.index==2){
-      	newSpecies();
-      }
-}
-public function restoreSpecies():void{
-	if(!species_select.selectedItem){
-		species_select.selectedItem=previousSelectedItem;	
-		if(species_select.selectedItem.field_image[0]){
-			getFile(species_select.selectedItem.field_image[0].fid);
-		}
-	}
-	
-}
 
 //file from desktop selected
 public function selectEvent(event:Event):void{		
 	//fileRef.addEventListener(ProgressEvent.PROGRESS, onFileLoadProgress);
 	fileRef.addEventListener(Event.COMPLETE, onFileLoadComplete);
-	fileRef.load();			
-				
+	fileRef.load();							
 }
 
 //load local file
@@ -117,11 +99,12 @@ public function onFileLoadComplete(event:Event):void{
 	base64Enc = new Base64Encoder();
 	base64Enc.encodeBytes(byteArr);
 	fileOriginalBase64=base64Enc.toString();
-	species_image.load(byteArr);	
-	 imagepanel.visible=true;
+	moduleSpecies.species_image.load(byteArr);	
+	moduleSpecies.imagepanel.visible=true;
 	 //switch to ImageCrop view
 	 changeView('moduleImageCrop');	 
 }
+
 public function initImage():void
 {
 	var loader:Loader = new Loader();	
@@ -134,27 +117,19 @@ public function loaderCompleteHandler(event:Event):void
 {
 	var bd:BitmapData = new BitmapData( event.currentTarget.loader.width, event.currentTarget.loader.height );
     bd.draw( event.currentTarget.loader) ;
-	imageCropper.sourceImage=bd;	
+	moduleImageCrop.imageCropper.sourceImage=bd;	
 	//Alert.show("completeHandler: " + event);
 
 }
+
 public function imageSelected():void
 {
-	species_image.load(croppedImage.source);
+	moduleSpecies.species_image.load(moduleImageCrop.croppedImage.source);
 	changeView('moduleSpecies');
 }
+
 public function ioErrorHandler(event:IOErrorEvent):void {
 	Alert.show("ioErrorHandler: " + event);
-}
-
-public function imagesBarInit(items:Array):void
-{
-	var im:ArrayCollection = new ArrayCollection(items);	
-    imagesBar.dataProvider = im;
-}
-public function initTileList():void
-{	
-   tilelist.dataProvider = tileItems;
 }
 
 //load file from server
@@ -165,11 +140,10 @@ public function onFileResult(event:ResultEvent):void
     base64Dec = new Base64Decoder();
     base64Dec.decode(filedata[0].file);
     byteArr = base64Dec.toByteArray();    
-    species_image.load(byteArr);
-   	imagepanel.visible=true;
-   	if(view_edit_tab.selectedIndex==1)buttonDeleteImage.visible=true;
+     moduleSpecies.species_image.load(byteArr);
+   	moduleSpecies.imagepanel.visible=true;
+   	if( moduleSpecies.view_edit_tab.selectedIndex==1)moduleSpecies.buttonDeleteImage.visible=true;
 }
-
 
 //initial loaded specieslist
 public function onSpeciesViewResult(event:ResultEvent):void
@@ -180,7 +154,7 @@ public function onSpeciesViewResult(event:ResultEvent):void
 		nid=0;
 		previousSelectedIndex=0;
 	}
-	species_select.selectedIndex=previousSelectedIndex;
+	 moduleSpecies.navigator.species_select.selectedIndex=previousSelectedIndex;
 	//get file of first species or previous species from the specieslist the the list is loaded
 	if(speciesnodes[previousSelectedIndex].field_image[0]){
 		fid=speciesnodes[previousSelectedIndex].field_image[0].fid;	
@@ -196,7 +170,7 @@ public function onSpeciesViewResult(event:ResultEvent):void
 			}
 			i++;
 		}
-		imagesBarInit(barImages);
+		moduleSpecies.imagesBarInit(barImages);
 	}	
 	
 	//initialize tilelist
@@ -210,12 +184,11 @@ public function onSpeciesViewResult(event:ResultEvent):void
 	//tileListInit(tileImages);
 }
 
-
 public function showImagesBarImage():void
 {
-	var id:Number=barImageId[imagesBar.selectedIndex];
+	var id:Number=barImageId[ moduleSpecies.imagesBar.selectedIndex];
 	currentImageId=id;
-	getFile(species_select.selectedItem.field_image[id].fid);
+	getFile( moduleSpecies.navigator.species_select.selectedItem.field_image[id].fid);
 }
 
 public function onSettingsViewResult(event:ResultEvent):void
@@ -227,25 +200,27 @@ public function onSettingsViewResult(event:ResultEvent):void
 // a species was selected from list
 public function specieslistEvent(event:Event):void
 {
+	
 	//if tab="new", change to tab="view" if a species is selected
-	if(view_edit_tab.selectedIndex==2){
-		view_edit_tab.selectedIndex=0;
+	if( moduleSpecies.view_edit_tab.selectedIndex==2){
+		 moduleSpecies.view_edit_tab.selectedIndex=0;
 	};
-	if(view_edit_tab.selectedIndex==1){
-	buttonDeleteImage.visible=false;
+	if( moduleSpecies.view_edit_tab.selectedIndex==1){
+	moduleSpecies.buttonDeleteImage.visible=false;
 	}
 	
-	species_image.source="";
-	imagepanel.visible=false;
+	moduleSpecies.species_image.source="";
+	moduleSpecies.imagepanel.visible=false;
 	
 	var barImages:Array=new Array;
-	if(species_select.selectedItem.field_image[0]){
-		fid=species_select.selectedItem.field_image[0].fid;	
+	if( moduleSpecies.navigator.species_select.selectedItem.field_image[0]){
+		fid= moduleSpecies.navigator.species_select.selectedItem.field_image[0].fid;
+		;	
 		currentImageId=0;
 		getFile(fid);
 		
 		var i:Number=0;
-		for each (var img:Object in species_select.selectedItem.field_image){			
+		for each (var img:Object in  moduleSpecies.navigator.species_select.selectedItem.field_image){			
 			if (img.filepath.substr(0,40)=="sites/all/files/species/images/overview/"){		
 				//add thumbnail to array		
 				barImages.push(basePath+"sites/all/files/imagefield_thumbs/species/images/overview/"+img.filename);
@@ -254,8 +229,9 @@ public function specieslistEvent(event:Event):void
 			i++;
 		}				
 	}
-	imagesBarInit(barImages);
+	moduleSpecies.imagesBarInit(barImages);
 }
+
 public function changeView(newView:String):void
 {	
 	if(newView=='moduleSpecies'){
@@ -268,12 +244,6 @@ public function changeView(newView:String):void
 		mainContainer.selectedChild=moduleImageCrop;
 		initImage();
 	}
-}
-
-public function initIntroduction():void
-{
-	projectDescription.text=projectSettings[0].field_project_description[0]['value'];	
-	projectAuthors.text=projectSettings[0].field_project_authors[0]['value'];
 }
 
 public function getSettings():void
@@ -290,7 +260,7 @@ public function getSpecies():void
 
 public function getFile(fid:int):void
 {		
-	imagepanel.visible=false;
+	moduleSpecies.imagepanel.visible=false;
 	var hashedArray:Array = hashKey("file.get");	
 	file.get(hashedArray[0],hashedArray[1],hashedArray[2],hashedArray[3],sessionID,fid);	
 }
@@ -299,14 +269,14 @@ public function saveNode():void
 {
 	var edit:Object;
 	previousSelectedIndex=0;
-	if (species_select.selectedItem) {
-		previousSelectedIndex=species_select.selectedIndex;
-		edit = species_select.selectedItem;
+	if (moduleSpecies.navigator.species_select.selectedItem) {
+		previousSelectedIndex=moduleSpecies.navigator.species_select.selectedIndex;
+		edit = moduleSpecies.navigator.species_select.selectedItem;
 		var curr_date:Date = new Date();
 		edit.changed = curr_date.getTime(); //Upon update, node object must include both "nid" and "changed".
 		edit.type="species";
-		edit.title=edit_species_name.text;
-		edit.body=edit_species_description.htmlText;
+		edit.title=moduleSpecies.edit_species_name.text;
+		edit.body=moduleSpecies.edit_species_description.htmlText;
 		if(fidOverviewImage>0){//add new images to images array
 			edit.field_image.push({fid:fidOverviewImage});
 			edit.field_image.push({fid:fidOriginalImage});
@@ -322,27 +292,23 @@ public function saveNode():void
 	else {
 		edit = new Object;	
 		edit.type="species";
-		edit.title=new_species_name.text;
-		edit.body=new_species_description.htmlText;
+		edit.title= moduleSpecies.new_species_name.text;
+		edit.body= moduleSpecies.new_species_description.htmlText;
 		//image 0=overview image, 1=original image
 		edit.field_image = new Array({ fid:fidOverviewImage },{ fid:fidOriginalImage });
 		fidOriginalImage=0;
 		fidOverviewImage=0;
 	}
-		
-
 	
 	if (edit.title == "" || edit.body == ""){
 		Alert.show("Enter a name and description", "Error");		
 	}else{	   
 		var hashedArray:Array = hashKey("node.save");
 		node.save(hashedArray[0],hashedArray[1],hashedArray[2],hashedArray[3],sessionID,edit);
-		view_edit_tab.selectedIndex=0;
+		moduleSpecies.view_edit_tab.selectedIndex=0;
 		getSpecies();				
-	}
-	
+	}	
 }
-
 
 public function fileSaveResult(event:ResultEvent):void{
 	
@@ -359,7 +325,7 @@ public function fileSaveResult(event:ResultEvent):void{
 public function saveSpecies():void{
 	
 	//if there is a new image,first save image, than save node with resulting fid
-	if(species_image.source!="" && newFileName){	
+	if(moduleSpecies.species_image.source!="" && newFileName){	
 		/*	
 		var jpgEnc:JPEGEncoder = new JPEGEncoder(100);
 		var ohSnap:ImageSnapshot;		
@@ -379,7 +345,7 @@ public function saveSpecies():void{
 		//save overview image
 		var jpgEnc:JPEGEncoder = new JPEGEncoder(100);
 		var Snap:ImageSnapshot;		
-	  	Snap = ImageSnapshot.captureImage(species_image, 0, jpgEnc); // capture image file. 
+	  	Snap = ImageSnapshot.captureImage(moduleSpecies.species_image, 0, jpgEnc); // capture image file. 
 		var fileOverviewBase64:String = ImageSnapshot.encodeImageAsBase64(Snap);
 		  fileObj = {
 	     	file:fileOverviewBase64,
@@ -397,38 +363,11 @@ public function saveSpecies():void{
 	}
 }
 
-
-public function onSaved(event:ResultEvent):void
-{
-	//nid=event.result.toString();
-	Alert.show("Species was saved", "Saved");
-	previousSelectedItem=event.result.toString();
-	
-}
-
-public function onDeleted(event:ResultEvent):void
-{
-	Alert.show("Species was deleted", "Deleted");
-}
-
-public function newSpecies():void
-{
-	previousSelectedItem=species_select.selectedItem;
-	species_select.selectedItem = undefined;
-	var barImages:Array;
-	imagesBarInit(barImages);
-	species_name.title = "";	
-	species_image.source="";	
-	imagepanel.visible=false;
-	if(new_species_name) new_species_name.text="";
-	if (new_species_description)new_species_description.htmlText="";
-}
-
 public function deleteSpecies():void
 {
 	var edit:Object;
-	if (species_select.selectedItem) {
-		edit = species_select.selectedItem;		
+	if ( moduleSpecies.navigator.species_select.selectedItem) {
+		edit =  moduleSpecies.navigator.species_select.selectedItem;		
 		var hashedArray:Array = hashKey("node.deleteNode");
 		node.deleteNode(hashedArray[0],hashedArray[1],hashedArray[2],hashedArray[3],sessionID,edit.nid);
 		previousSelectedIndex=0;
@@ -442,11 +381,11 @@ public function deleteSpecies():void
 public function deleteImage():void
 {
 	
-	fidOverviewImageRemove=species_select.selectedItem.field_image[currentImageId].fid;
+	fidOverviewImageRemove=moduleSpecies.navigator.species_select.selectedItem.field_image[currentImageId].fid;
 	saveNode();
-	species_image.source="";	
-	imagepanel.visible=false;
-	buttonDeleteImage.visible=false;
+	moduleSpecies.species_image.source="";	
+	moduleSpecies.imagepanel.visible=false;
+	moduleSpecies.buttonDeleteImage.visible=false;
 }
 public function hashKey(serviceMethod:String):Array{
 	var captureTime:String = (Math.round((new Date().getTime())/1000)).toString();
@@ -470,39 +409,31 @@ private function randomString(Stringlength:Number):String{
 
 public function removeEditorButtons(htmlTextField:String):void {
 	if(htmlTextField=='edit_species_description'){
-          edit_species_description.toolbar.removeChild(edit_species_description.fontFamilyCombo);
-          edit_species_description.toolbar.removeChild(edit_species_description.fontSizeCombo);
-          edit_species_description.toolbar.removeChild(edit_species_description.colorPicker);  
+          moduleSpecies.edit_species_description.toolbar.removeChild(moduleSpecies.edit_species_description.fontFamilyCombo);
+          //moduleSpecies.edit_species_description.toolbar.removeChild(moduleSpecies.edit_species_description.fontSizeCombo);
+          //moduleSpecies.edit_species_description.toolbar.removeChild(moduleSpecies.edit_species_description.colorPicker);  
  	}
  	if(htmlTextField=='new_species_description'){
- 		  new_species_description.toolbar.removeChild(new_species_description.fontFamilyCombo);
-          new_species_description.toolbar.removeChild(new_species_description.fontSizeCombo);
-          new_species_description.toolbar.removeChild(new_species_description.colorPicker);  
+ 		  moduleSpecies.new_species_description.toolbar.removeChild(moduleSpecies.new_species_description.fontFamilyCombo);
+          //moduleSpecies.new_species_description.toolbar.removeChild(moduleSpecies.new_species_description.fontSizeCombo);
+          //moduleSpecies.new_species_description.toolbar.removeChild(moduleSpecies.new_species_description.colorPicker);  
  	}
 }
 
-/*
-*  function to print out the contents of an array similar to the PHP print_r() function
-*  usage: print_r(some_array);
-*/
-public function print_r(obj:*, level:int = 0, output:String = ""):* {
-    var tabs:String = "";
-    for(var i:int = 0; i < level; i++, tabs += "\t");
-   
-    for(var child:* in obj){
-        output += tabs +"["+ child +"] => "+ obj[child];
-       
-        var childOutput:String = print_r(obj[child], level+1);
-        if(childOutput != '') output += ' {\n'+ childOutput + tabs +'}';
-       
-        output += "\n";
-    }
-   
-    if(level == 0){
-    	 Alert.show(output);
-    	 trace(output);
-    }
-    else return output;
+public function openFileBrowser():void 
+{	
+	fileRef.browse();
+}
+
+
+// Event handler for the MenuBar control's itemClick event.
+private function menuHandler(event:MenuEvent):void  {
+    // Don't open the Alert for a menu bar item that 
+    // opens a popup submenu.
+    if (event.item.@data != "top") {
+        Alert.show("Label: " + event.item.@label + "\n" + 
+            "Data: " + event.item.@data, "Clicked menu item");
+    }        
 }
 
 

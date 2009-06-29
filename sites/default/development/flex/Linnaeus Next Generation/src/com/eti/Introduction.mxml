@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Script source="IntroductionAs.as"/>
+	<mx:ViewStack id="introductionView" width="100%" height="100%" creationComplete="initIntroduction()">		
+		<mx:Canvas id="introductionViewContainer" label="View" >
+			<mx:Text id="projectDescription" width="600" height="158" horizontalCenter="0" fontSize="20" top="130"/>
+			<mx:Text id="projectAuthors" width="600" height="122" top="330" horizontalCenter="0"/>
+			<mx:Label x="170" y="304" text="Authors" width="64"/>
+			<mx:Label x="170" y="104" text="Introduction"/>
+		</mx:Canvas>		
+	</mx:ViewStack>
+</mx:Canvas>

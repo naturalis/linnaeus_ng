@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TabNavigator 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 	 
+	width="330" height="100%"
+	creationPolicy="all" 
+	>
+	<mx:Script source="NavigatorAs.as"/>
+	
+	<mx:Canvas label="List view" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+		<mx:DataGrid width="100%" height="100%" borderStyle="none" id="species_select" dataProvider="{parentDocument.parentDocument.speciesnodes}" selectedIndex="0">
+		<mx:columns>				
+			<mx:DataGridColumn headerText="Species" dataField="title"/>
+		</mx:columns>
+		</mx:DataGrid>
+	</mx:Canvas>
+	<mx:Canvas label="Tile view" width="100%" height="100%" >
+		<mx:TileList id="tilelist" borderStyle="none" dataProvider="{parentDocument.parentDocument.tileItems}" columnWidth="107" width="100%" height="100%" direction="horizontal" columnCount="3">
+		 <mx:itemRenderer>
+    	<mx:Component>
+    		<mx:Image height="100" horizontalAlign="center">		    			
+    		</mx:Image>		    		
+    	</mx:Component>
+    </mx:itemRenderer>
+		</mx:TileList>
+	</mx:Canvas>
+	<mx:Canvas label="Classification" width="100%" height="100%">
+	</mx:Canvas>
+</mx:TabNavigator>

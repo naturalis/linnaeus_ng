@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:eti="com.eti.*"	
+	horizontalScrollPolicy="off" 
+	verticalScrollPolicy="off" 
+	creationComplete="initSpeciesPage()">	
+	<mx:Script source="SpeciesPageAs.as"/>	
+	 	<mx:TabBar y="53" dataProvider="speciesView" id="view_edit_tab" visible="false" right="10"/>
+		<eti:Navigator id="navigator" x="10" top="95" bottom="10"/>			
+	<mx:Panel layout="absolute" title="{navigator.species_select.selectedItem.title}" id="species_name"  right="0" bottom="0" top="71" left="350">
+		<mx:Panel id="imagepanel" y="9" right="10" height="283" width="243" borderStyle="solid" borderThickness="1" borderColor="#000000" cornerRadius="0" visible="false"/>
+		<mx:Image id="species_image" y="10" right="11" height="281" width="241"/>
+	</mx:Panel>
+	<mx:HorizontalList id="imagesBar" width="241" height="88" change="parentDocument.showImagesBarImage()" columnWidth="60" right="20" y="400">
+	    <mx:itemRenderer>
+	    	<mx:Component>
+	    		<mx:Image buttonMode="true" height="65" scaleContent="true" verticalAlign="middle" horizontalAlign="center"/>		    			
+	    	</mx:Component>
+	    </mx:itemRenderer>
+    </mx:HorizontalList>
+	<mx:ViewStack id="speciesView" width="100%" height="100%">	
+	<mx:Canvas id="speciesViewContainer" label="View">
+		<mx:TextArea id="view_species_description" htmlText="{navigator.species_select.selectedItem.body}" bottom="48" top="117" left="367" right="300" editable="false" borderStyle="none"/>		
+	</mx:Canvas>
+	<mx:Canvas id="speciesEditContainer" label="Edit" >	
+		<mx:Label x="370" y="111" text="Species name"/>
+		<mx:TextInput x="370" y="128" width="300" id="edit_species_name" text="{navigator.species_select.selectedItem.title}"/>
+		<mx:RichTextEditor 
+			id="edit_species_description" 
+			htmlText="{navigator.species_select.selectedItem.body}" 
+			title="Species description"
+			creationComplete="parentDocument.removeEditorButtons('edit_species_description')" right="280" bottom="50" top="158" left="360"/>
+		<mx:Button x="370" width="120" label="Save" click="parentDocument.saveSpecies()" bottom="20"/>
+		<mx:Button x="495" y="470" width="120" label="Delete" click="parentDocument.deleteSpecies()" bottom="20"/>
+		<mx:Button y="120" label="Add image" width="110" right="25" click="parentDocument.openFileBrowser()" />
+		<mx:Button id="buttonDeleteImage" y="120" width="110" right="140" label="Delete image" click="parentDocument.deleteImage()"/>
+	</mx:Canvas>
+	
+    <mx:Canvas id="speciesNewContainer" label="New" >
+    	<mx:Label x="370" y="111" text="Species name"/>
+		<mx:TextInput x="370" y="128" width="300" id="new_species_name" text=""/>
+		<mx:RichTextEditor right="280" bottom="50" top="158" left="360"
+			id="new_species_description" 
+			htmlText="" 
+			title="Species description"
+			creationComplete="parentDocument.removeEditorButtons('new_species_description')"/>
+		<mx:Button x="370" y="470" width="120" label="Save" click="parentDocument.saveSpecies()" bottom="20"/>		
+		<mx:Button y="120" width="110" right="25" label="Add image" click="parentDocument.openFileBrowser()"/>
+		
+    </mx:Canvas>
+	</mx:ViewStack>	
+</mx:Canvas>
