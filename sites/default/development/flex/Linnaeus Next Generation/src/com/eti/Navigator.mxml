@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:TabNavigator 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 	 
-	width="330" height="100%"
+	left="0" height="100%"
 	creationPolicy="all" 
 	>
 	<mx:Script source="NavigatorAs.as"/>
