@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:components="com.components.*">
+<mx:Script source="ClassicAs.as"/>
+	<mx:ViewStack id="classicView" width="100%" height="100%" creationComplete="initClassic()">		
+		<mx:Canvas id="classicViewContainer" label="View" >
+			<mx:Text x="132" y="21" text="My classic key" width="136" fontSize="14"/>
+			<mx:Text x="22" y="65" width="708" height="159" id="drupal_text" fontSize="14"/>
+			<mx:DataGrid variableRowHeight="true" wordWrap="true" x="22" y="232" width="708" height="319" dataProvider="{parentDocument.classicNodes}">
+				<mx:columns>
+
+					<!-- This is a link to a custom field in Drupal: -->
+					<mx:DataGridColumn width="30" headerText="Couplet ID">
+						<mx:itemRenderer>
+							<mx:Component>
+								<mx:Label text="{data.field_couplet[0]['value']}"/>
+							</mx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					
+					<!-- These are links to basic fields in Drupal: -->
+					<mx:DataGridColumn width="20" headerText="Node ID" dataField="nid"/>							
+					<mx:DataGridColumn width="40" headerText="Character" dataField="title"/>
+					<mx:DataGridColumn width="60" headerText="State" dataField="body"/>
+					
+					<mx:DataGridColumn width="25" headerText="Child ID">
+						<mx:itemRenderer>
+							<mx:Component>
+								<mx:Label text="{data.field_child[0]['value']}"/>
+							</mx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					
+					<!-- This is a link to a node reference in Drupal: -->
+					<mx:DataGridColumn width="40" headerText="Species node ID">
+						<mx:itemRenderer>
+							<mx:Component>
+								<mx:Label text="{data.field_species[0].nid}"/>
+							</mx:Component>
+						</mx:itemRenderer>
+					</mx:DataGridColumn>
+					
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:Canvas>		
+	</mx:ViewStack>
+</mx:Canvas>

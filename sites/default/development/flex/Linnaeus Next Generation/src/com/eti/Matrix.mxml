@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Script source="MatrixAs.as"/>
+	<mx:ViewStack id="matrixView" width="100%" height="100%" creationComplete="initMatrix()">		
+		<mx:Canvas id="matrixViewContainer" label="matrixView">
+			<mx:Text x="145" y="135" text="My matrix key" width="136" fontSize="14"/>
+		</mx:Canvas>		
+	</mx:ViewStack>
+</mx:Canvas>
