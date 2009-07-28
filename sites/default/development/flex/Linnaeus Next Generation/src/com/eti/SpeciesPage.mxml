@@ -28,7 +28,7 @@
 			<mx:ViewStack id="speciesView" width="100%" height="100%" >	
 				<mx:Canvas id="speciesViewContainer" label="View" >
 					<mx:TextArea id="view_species_description" htmlText="{navigator.species_select.selectedItem.body}" 
-						bottom="50" top="20" left="30" right="300" editable="false" borderStyle="none"/>		
+						bottom="50" top="20" left="30" right="300" editable="false" borderStyle="solid"/>		
 			
 				</mx:Canvas>
 				<mx:Canvas id="speciesEditContainer" label="Edit" >	
