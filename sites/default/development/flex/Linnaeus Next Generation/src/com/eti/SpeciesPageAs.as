@@ -11,27 +11,27 @@ private var previousSelectedItem:Object;
 public function initSpeciesPage():void
 {
 	view_edit_tab.addEventListener(ItemClickEvent.ITEM_CLICK,viewEditNewClickEvent);
-    imagepanel.visible=false;
-    navigator.initNavigator();
+	imagepanel.visible=false;
+	navigator.initNavigator();
 }
 private function viewEditNewClickEvent(event:ItemClickEvent):void {
 	//Tab "View" or "Edit" clicked? Make sure there is still a species selected 
 	//was unselected if tab New was clicked before
 	if (event.index==0||event.index==1){
-      	restoreSpecies();
-      }
+		restoreSpecies();
+	}
 	
 	//Tab "New" clicked?
-      if (event.index==2){
-      	newSpecies();
-      }
+	if (event.index==2){
+		newSpecies();
+	}
 }
 
 private function restoreSpecies():void{
 	if(! navigator.species_select.selectedItem){
 		 navigator.species_select.selectedItem=previousSelectedItem;	
 		if( navigator.species_select.selectedItem.field_image[0]){
-			parentDocument.getFile( navigator.species_select.selectedItem.field_image[0].fid);
+			parentDocument.getFile(navigator.species_select.selectedItem.field_image[0].fid);
 		}
 	}
 }
@@ -39,7 +39,7 @@ private function restoreSpecies():void{
 private function newSpecies():void
 {
 	previousSelectedItem= navigator.species_select.selectedItem;
-	 navigator.species_select.selectedItem = undefined;
+	navigator.species_select.selectedItem = undefined;
 	var barImages:Array;
 	imagesBarInit(barImages);
 	species_name.title = "";	

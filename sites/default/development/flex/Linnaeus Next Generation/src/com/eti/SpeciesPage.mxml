@@ -8,7 +8,7 @@
 	creationComplete="initSpeciesPage()" y="300">				
 		
 	<mx:Script source="SpeciesPageAs.as"/>	
-	<mx:Canvas width="300" height="100%"  >	
+	<mx:Canvas width="300" height="100%">
 		<eti:Navigator id="navigator" x="10" top="5" bottom="20" right="0"/>	
 	</mx:Canvas>
 	<mx:Canvas width="100%" height="100%" minWidth="600">
@@ -25,12 +25,12 @@
 			    	</mx:Component>
 			    </mx:itemRenderer>
 		    </mx:HorizontalList>
-			<mx:ViewStack id="speciesView" width="100%" height="100%" >	
-				<mx:Canvas id="speciesViewContainer" label="View" >
-					<mx:TextArea id="view_species_description" htmlText="{navigator.species_select.selectedItem.body}" 
+			<mx:ViewStack id="speciesView" width="100%" height="100%">
+				<mx:Canvas id="speciesViewContainer" label="View">
+					<mx:TextArea id="view_species_description" htmlText="{navigator.species_select.selectedItem.body}"
 						bottom="50" top="20" left="30" right="300" editable="false" borderStyle="solid"/>		
-			
 				</mx:Canvas>
+				
 				<mx:Canvas id="speciesEditContainer" label="Edit" >	
 					<mx:Label left="20" top="10" text="Species name"/>
 					<mx:TextInput left="20" top="28" width="200" id="edit_species_name" text="{navigator.species_select.selectedItem.title}"/>

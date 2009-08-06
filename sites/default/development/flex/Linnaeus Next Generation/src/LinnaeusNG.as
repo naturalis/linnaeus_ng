@@ -46,7 +46,10 @@ public var fileOriginalBase64:String;
 public var newFileName:String;
 public var localImage:ByteArray;
 public var classicNodes:Array;
+public var the_couplet:Number=1;
 
+[Bindable]
+public var questions:Array;
 [Bindable]
 public var speciesnodes:Array;
 [Bindable]
@@ -108,6 +111,11 @@ public function initImage():void{
 	loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler);
 	loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
 	loader.loadBytes(localImage);
+}
+
+public function initKey():void{
+	the_couplet = 1;
+	moduleClassic.my_questions.refresh();
 }
 
 public function loaderCompleteHandler(event:Event):void{
@@ -192,8 +200,13 @@ public function onSettingsViewResult(event:ResultEvent):void{
 	header.text=projectSettings[0].field_project_title[0]['value'];	
 }
 
-// a species was selected from list
+// a species was selected from the list with the mouse
 public function specieslistEvent(event:Event):void{
+	specieslistChange();
+}
+
+// a species was selected
+public function specieslistChange():void{
 	//if tab="new", change to tab="view" if a species is selected
 	if(moduleSpecies.view_edit_tab.selectedIndex==2){
 		moduleSpecies.view_edit_tab.selectedIndex=0;
@@ -211,7 +224,7 @@ public function specieslistEvent(event:Event):void{
 		currentImageId = 0;
 		getFile(fid);
 		var i:Number=0;
-		for each (var img:Object in  moduleSpecies.navigator.species_select.selectedItem.field_image){
+		for each (var img:Object in moduleSpecies.navigator.species_select.selectedItem.field_image){
 			if (img.filepath.substr(0,40)=="sites/all/files/species/images/overview/"){
 				//add thumbnail to array
 				barImages.push(basePath+"sites/all/files/imagefield_thumbs/species/images/overview/"+img.filename);
@@ -223,6 +236,24 @@ public function specieslistEvent(event:Event):void{
 	moduleSpecies.imagesBarInit(barImages);
 }
 
+// compare the nid of the species from the key to the nid's of the navigator list and jump to it when there is a match:
+public function selectKeySpeciesOnGrid():void{
+	var key_result_nid:int = moduleClassic.the_questions.selectedItem.field_species[0].nid;
+//	Alert.show("My item: " + key_result_nid);
+	var gridData:Object = moduleSpecies.navigator.species_select.dataProvider;
+	for(var i:Number=0; i < gridData.length; i++){
+		var thisObj:Object = gridData.getItemAt(i);
+		if(thisObj.nid == key_result_nid){	// there is a match
+			moduleSpecies.navigator.species_select.selectedIndex = i;
+			//sometimes scrollToIndex doesn't work without validateNow()
+			moduleSpecies.navigator.species_select.validateNow();
+			moduleSpecies.navigator.species_select.scrollToIndex(i);
+			// now show the right pictures:
+			specieslistChange();
+		}
+	}
+}
+
 public function changeView(newView:String):void{
 	if(newView=='moduleSpecies'){
 		mainContainer.selectedChild=moduleSpecies;
@@ -232,6 +263,7 @@ public function changeView(newView:String):void{
 	}
 	if(newView=='moduleClassic'){
 		mainContainer.selectedChild=moduleClassic;
+		initKey();
 	}
 	if(newView=='moduleMatrix'){
 		mainContainer.selectedChild=moduleMatrix;
