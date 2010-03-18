@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
-	creationComplete="initClassicPage()">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" left="10" top="10" creationComplete="initClassicPage()">
 	<mx:Script source="ClassicAs.as"/>
 	<mx:ArrayCollection id="my_questions" source="{parentDocument.classicNodes}" filterFunction="key_filter"/>
+	<mx:ArrayCollection id="my_species" source="{parentDocument.parentDocument.speciesnodes}" filterFunction="species_filter"/>
+
 	<mx:ViewStack id="classicView" width="100%" height="100%">
-		<mx:Panel title="Classic polytomous key" 
-			id="dummy" right="20" bottom="20" top="20" left="20" horizontalScrollPolicy="off">
+	<mx:TabNavigator horizontalAlign="right">
+		<mx:Panel id="dummy" label="View" right="20" bottom="20" top="20" left="20" horizontalScrollPolicy="off">
 			<mx:Canvas id="classicViewContainer" label="View" >
-				<mx:DataGrid variableRowHeight="true" wordWrap="true" x="30" y="30" width="580" height="310" id="the_questions" dataProvider="{my_questions}">
+			<mx:HDividedBox width="910">
+				
+				<mx:DataGrid editable="false" variableRowHeight="true" wordWrap="true" width="550" height="310" id="the_questions" dataProvider="{my_questions}">
 					<mx:columns>
 	
 						<!-- This is a link to a custom field in Drupal: -->
-						<mx:DataGridColumn width="55" headerText=" ">
+						<mx:DataGridColumn width="60" headerText=" ">
 							<mx:itemRenderer>
 								<mx:Component>
 									<mx:Label text="{data.field_couplet[0]['value']}"/>
@@ -20,21 +23,80 @@
 						</mx:DataGridColumn>
 	
 						<!-- These are links to basic fields in Drupal: -->							
-						<mx:DataGridColumn headerText="Options" dataField="body"/>
+						<mx:DataGridColumn width="250" headerText="Options" dataField="body"/>
 	
 						<!-- Another link to a custom field in Drupal: -->
-						<mx:DataGridColumn width="55" headerText="Next">
+						<mx:DataGridColumn width="60" headerText="Next">
 							<mx:itemRenderer>
 								<mx:Component>
 									<mx:Label text="{data.field_child[0]['value']}"/>
 								</mx:Component>
 							</mx:itemRenderer>
 						</mx:DataGridColumn>
+						
+						<mx:DataGridColumn width="100" headerText="Soort">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.field_species[0].nid}"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+					</mx:columns>
+				</mx:DataGrid>			
+				<mx:DataGrid width="310" height="311" id="remaining_species" dataProvider="{my_species}">
+					<mx:columns>
+						<mx:DataGridColumn width="200" headerText="Remaining species" dataField="title"/>
+						<mx:DataGridColumn width="100" headerText="NID" dataField="nid"/>
+					</mx:columns>
+				</mx:DataGrid>
+			</mx:HDividedBox>
+			</mx:Canvas>
+			<mx:HBox width="90%" height="245">
+				<mx:Text width="354" height="170" id="drupal_text"/>
+				<mx:Text width="416" height="225" id="my_dummy_text"/>
+			</mx:HBox>
+		</mx:Panel>
+		
+		<mx:Panel id="EditPanel" label="Edit" right="20" bottom="20" top="20" left="20" horizontalScrollPolicy="off">
+			<mx:Canvas id="classicViewContainer_edit" label="Edit">
+		
+				<mx:DataGrid editable="true" variableRowHeight="true" wordWrap="true" width="550" height="310" id="the_questions_edit" dataProvider="{my_questions}">
+					<mx:columns>
+	
+						<!-- This is a link to a custom field in Drupal: -->
+						<mx:DataGridColumn width="60" headerText=" ">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.field_couplet[0]['value']}"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+	
+						<!-- These are links to basic fields in Drupal: -->							
+						<mx:DataGridColumn width="250" headerText="Options" dataField="body"/>
+	
+						<!-- Another link to a custom field in Drupal: -->
+						<mx:DataGridColumn width="60" headerText="Next">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.field_child[0]['value']}"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
+						
+						<mx:DataGridColumn width="100" headerText="Soort">
+							<mx:itemRenderer>
+								<mx:Component>
+									<mx:Label text="{data.field_species[0].nid}"/>
+								</mx:Component>
+							</mx:itemRenderer>
+						</mx:DataGridColumn>
 	
 					</mx:columns>
 				</mx:DataGrid>
-	
+			
 			</mx:Canvas>
-		</mx:Panel>		
+		</mx:Panel>
+	</mx:TabNavigator>
 	</mx:ViewStack>
 </mx:Canvas>

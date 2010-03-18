@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:LinkButton useHandCursor="false" width="100%" height="100%" id="myLabel" label="{XML(data).Representation.Label}" />	
+</mx:HBox>

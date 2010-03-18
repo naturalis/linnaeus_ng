@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Script>
+	<![CDATA[
+		override public function set data( value:Object ):void 
+			{
+			super.data = value;
+			if (value.parent().parent().@enabled==true)
+			{
+			linkButton.setStyle("color", 0x0b333c);
+			
+			}
+			if (value.parent().parent().@enabled==false)
+			{
+			linkButton.setStyle("color", 0xCCCCCC);		
+			}
+			else
+			{
+			linkButton.setStyle("color", 0x0b333c);	
+			}
+			}
+	]]>
+</mx:Script>
+<mx:Label width="100%" textAlign="left" id="linkButton" text="{XML(data)}" fontWeight="bold"/>
+</mx:HBox>

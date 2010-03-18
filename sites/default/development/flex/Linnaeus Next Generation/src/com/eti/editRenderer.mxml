@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalScrollPolicy="off">
+<mx:Script>
+	<![CDATA[
+		 import mx.controls.Image;
+         import mx.managers.PopUpManager;
+		 override public function set data( value:Object ):void 
+			{
+			 super.data = value;
+			if (value.parent().parent().@TFstate==true)
+			{
+			afirmative.selected=true;
+			}
+			if (value.parent().parent().@TFstate==false)
+			{
+			negative.selected=true;			
+			}
+			else
+			{
+			afirmative.selected=false;
+			negative.selected=false;	
+			} 
+			}
+			
+		public function imageCheck():void
+		{
+		//trace((XML(data).parent().*.@ref)==void)
+				
+			if ((XML(data).parent().*.@ref)!=void)
+			{
+				image.source=XML(data).parent().*.@ref;
+			}
+			else
+			{
+				image.enabled=false;
+			}  
+		//trace (XML(data).parent().*.@ref)
+		}
+            public function popIt():void {
+                var img:Image = new Image();
+                img.source = image.source;
+                img.addEventListener(MouseEvent.CLICK, img_click);
+                img.addEventListener(Event.COMPLETE, img_complete);
+                PopUpManager.addPopUp(img,this,true);
+            }
+            public function img_complete(evt:Event):void {
+                var img:Image = evt.currentTarget as Image;
+                //img.width = 400;
+                //img.height = 300;
+                PopUpManager.centerPopUp(img);
+            }
+             public function img_click(evt:MouseEvent):void {
+                var img:Image = evt.currentTarget as Image;
+                PopUpManager.removePopUp(img);
+            }
+
+	]]>
+</mx:Script>
+
+<mx:RadioButton id="afirmative" selected="false" label="is"  groupName="radioButtonz"  change="XML(data).parent().parent().@TFstate=true"/>
+<mx:RadioButton id="negative"   selected="false" label="not" groupName="radioButtonz"  change="XML(data).parent().parent().@TFstate=false"/>
+<mx:Label width="100%" textAlign="left" fontWeight="bold" id="linkButton" text="{XML(data)}" useHandCursor="false"/>
+<mx:Image id="image" creationComplete="imageCheck()" showBusyCursor="true" width="60" height="80" click="{popIt()}" />	
+</mx:HBox>

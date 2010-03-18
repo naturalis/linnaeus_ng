@@ -1,9 +1,408 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
-<mx:Script source="MatrixAs.as"/>
-	<mx:ViewStack id="matrixView" width="100%" height="100%" creationComplete="initMatrix()">		
-		<mx:Canvas id="matrixViewContainer" label="matrixView">
-			<mx:Text x="145" y="135" text="My matrix key" width="136" fontSize="14"/>
-		</mx:Canvas>		
-	</mx:ViewStack>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="request.send()">
+<mx:Script>
+	<![CDATA[
+		import mx.effects.*;
+		import mx.messaging.AbstractConsumer;
+		import mx.collections.XMLListCollection;
+		import mx.collections.ArrayCollection;
+		import mx.rpc.events.ResultEvent;
+		namespace sdd = "http://rs.tdwg.org/UBIF/2006/";
+		use namespace sdd;
+		
+		[Bindable]
+		private var characterList:XMLList;
+		[Bindable]
+		private var labelz:XMLList;
+		[Bindable]
+		private var characterLabelz:XMLList;
+		[Bindable]
+		private var editLabelz:XMLList;
+		[Bindable]
+		private var selectedFeaturesLabelz:XMLList;
+		[Bindable]
+		private var currentOptions:XMLList;
+		[Bindable]
+		private var currentEdit:XMLList;
+		[Bindable]
+		private var selectedFeatures:XML;
+		[Bindable]
+		private var selectedFeaturesList:XMLList;
+		[Bindable]
+		private var temp:XMLList;
+		[Bindable]
+		private var codedDescriptions:XMLList
+		[Bindable]
+		private var allCodedDescriptions:XMLList
+		[Bindable]
+		private var mediaObjects:XMLList
+		[Bindable]
+		private var resultList:XMLList;
+		[Bindable]
+		private var results:XML;
+		[Bindable]
+		private var moreResults:XMLList;
+		[Bindable]
+		private var eliminatedTaxa:XMLList;
+		[Bindable]
+		private var tempFeaturesList:XMLList;
+		
+		private function buttonEnable(event:Event):void
+		{
+			if (event.target.constructor=="[class RadioButton]")
+			{
+				button.enabled=true;
+			}
+		}
+		private function resultHandler(event:ResultEvent):void
+		{
+			relevant.enabled=false;
+			// le.text=event.result.Dataset.Representation.Label[0].*;
+			labelz=new XMLList;
+			characterList = event.result..CategoricalCharacter;
+	 		for each (var Representation:XML in characterList.Representation)
+			{
+				labelz+=Representation.Label[0];
+			}
+		// title.text = mx.core.Application.application.parameters.query;
+			codedDescriptions = event.result..CodedDescriptions;
+			allCodedDescriptions = codedDescriptions;
+			moreResults = codedDescriptions..CodedDescription..Label.*;
+		    mediaObjects = event.result..MediaObjects;
+		}
+		public function reset():void
+		{
+			relevant.enabled=false;
+			selectedFeatures=null;
+			selectedFeaturesLabelz=null;
+			eliminatedTaxa = null;
+			request.send();
+			
+		}
+
+		private function labelFunction(item:Object, column:DataGridColumn):String
+		{
+			return item.Label;
+		}
+		private function labelFunction2(item:Object, column:DataGridColumn):String
+		{
+			return item+"\n";
+		}
+		//-----------------------------SHOW RELEVANT---------------------------------------------
+		private function showRelevant(event:Event):void
+		{
+			if (event.target.selected==true)
+			{
+			labelz=characterList.(@enabled==true).Representation.Label;
+			}
+			if (event.target.selected==false)
+			{
+			labelz = characterList.Representation.Label;
+			}
+		}
+		//-----------------------------SHOW EDIT---------------------------------------------
+		private function showEdit(event:Event):void
+		{
+			currentState='editState';
+			editGrid.itemRenderer=null;
+			currentEdit = event.target.selectedItem.parent().parent()..StateDefinition;	
+			editLabelz = currentEdit.Representation.Label;
+		}
+		
+		//-----------------------------SHOW OPTIONS---------------------------------------------
+		public function showOptions(event:Event):void
+		{
+		    currentState='optionState';
+		    optionsGrid.itemRenderer=null;
+		    button.enabled=false;
+		  	if (relevant.selected==true)
+		  	{
+		  	currentOptions=event.target.selectedItem.parent().parent()..StateDefinition.(@enabled==true);	
+		  	}
+		  	else
+		  	{
+		  	currentOptions=event.target.selectedItem.parent().parent()..StateDefinition;	
+		  	}
+		   	for each (var MediaObject:XML in currentOptions..MediaObject)
+		   	{
+				temp = mediaObjects..MediaObject.(@id==MediaObject.@ref);
+		   		MediaObject.@ref = temp..Source.@href;
+		  	}
+		  	for each (var StateDefinition:XML in currentOptions)
+		  	{
+		  		StateDefinition.@TFstate=null;
+		  	}
+		  	//trace (currentOptions)
+		    characterLabelz = currentOptions.Representation.Label;
+		   
+		}
+//-----------------------------REMOVE OPTION---------------------------------------------
+		private function removeOption():void
+		{
+			editGrid.itemRenderer=null;
+			var selectedID:String = currentEdit.parent().parent().@id;
+			
+			temp = null;
+			temp=selectedFeaturesList.(@id==selectedID);
+			selectedFeaturesList = selectedFeaturesList.(@id!=selectedID);
+			selectedFeatures = new XML(<Characters></Characters>);
+			selectedFeatures.appendChild(selectedFeaturesList);	
+			characterList += temp;
+			if (relevant.enabled==true)
+			{
+			labelz=characterList.(@enabled==true).Representation.Label;
+			}
+			else
+			{
+			labelz=characterList.Representation.Label;	
+			}
+			
+			updateOptions();
+		}
+//-----------------------------UPDATE OPTIONS---------------------------------------------
+		private function updateOptions():void
+		{
+			editGrid.itemRenderer=null;
+			codedDescriptions = allCodedDescriptions;
+
+			tempFeaturesList = new XMLList;
+			if ((selectedFeaturesList.length())==0)
+			{
+			reset();	
+			}
+			tempFeaturesList = selectedFeaturesList;
+			selectedFeaturesList = new XMLList;
+	
+			for each (var CategoricalCharacter:XML in tempFeaturesList)
+			{
+				var currentCatID:String = CategoricalCharacter.@id;
+				selectedFeaturesList += tempFeaturesList.(@id==currentCatID);
+				store();
+			}
+			selectedFeaturesLabelz = selectedFeaturesList.Representation.Label;
+			if (relevant.enabled==true)
+			{
+			labelz=characterList.(@enabled==true).Representation.Label;
+			}
+			else
+			{
+			labelz=characterList.Representation.Label;	
+			}
+			//labelz=characterList.Representation.Label;
+			filter();
+
+			
+		}
+//-----------------------------STORE OPTIONS--------------------------------------------
+		private function storeOptions():void
+		{
+		    button.enabled=false;
+			optionsGrid.itemRenderer=null;
+			var selectedID:String = currentOptions.parent().parent().@id;
+			temp=characterList.(@id==selectedID);
+			characterList=characterList.(@id!=selectedID);
+			if (relevant.enabled==true)
+			{
+			
+			labelz=characterList.(@enabled==true).Representation.Label;
+			}
+			else
+			{
+			labelz=characterList.Representation.Label;
+			}
+			//allCharacters = characterList;
+			
+			
+			if (selectedFeatures==null)
+			{
+			selectedFeatures = new XML(<Characters></Characters>);
+			selectedFeatures.appendChild(temp);
+			selectedFeaturesList = selectedFeatures.children();
+			}
+			else
+			{
+			selectedFeatures.appendChild(temp);
+			selectedFeaturesList = selectedFeatures.children();
+			}
+			selectedFeaturesLabelz = selectedFeaturesList.Representation.Label;
+			store();
+			filter();
+			
+		}
+//-----------------------------STORE--------------------------------------------
+		private function store():void
+		{
+		for each (var StateDefinition:XML in selectedFeaturesList..StateDefinition)
+			{
+				var currentStateDefinitionID:String=StateDefinition.@id;
+				var currentCharacterListID:String=StateDefinition.parent().parent().@id;
+					if (StateDefinition.@TFstate==true)
+						{
+						resultList = (codedDescriptions..Categorical.(@ref==currentCharacterListID).State.(@ref==currentStateDefinitionID));
+						}
+					if (StateDefinition.@TFstate==false)
+						{
+						resultList = (codedDescriptions..Categorical.(@ref==currentCharacterListID).State.(@ref!=currentStateDefinitionID));
+						}					
+			}
+				results=new XML(<Results></Results>);
+				for each (var State:XML in resultList)
+				{
+				results.appendChild(State.parent().parent().parent());
+				}//end for each		
+			if (results=="")
+			{
+				//matchColumn.headerText=">>>Sorry, no matches found!<<<";
+				moreResults=new XMLList;
+				eliminatedTaxa = allCodedDescriptions..Representation;
+			   // trace (eliminatedTaxa)
+			}
+			else
+			{
+			moreResults=results..Label.*;	
+			eliminatedTaxa = allCodedDescriptions..CodedDescription;
+			for each (var CodedDescription:XML in results..CodedDescription)
+			{
+			var codedDescID:String=CodedDescription.@id;
+			eliminatedTaxa = eliminatedTaxa.(@id!=codedDescID);
+			}
+			}//end else	
+			
+			eliminatedTaxa = eliminatedTaxa..Representation;
+			//----------------very important!!!!!----------------------
+			codedDescriptions=results.children();
+		}
+		
+//-----------------------------FILTER---------------------------------
+		private function filter():void
+		{
+			  for each (StateDefinition in characterList..StateDefinition)
+				{	
+					StateDefinition.@enabled=false;
+					StateDefinition.parent().parent().@enabled=false;
+						
+				}
+				//trace (resultList.length())
+				if ((resultList.length())!=1)
+				{
+				for each (var StateDefinition:XML in characterList..StateDefinition)
+				{
+				var currentStateDefinitionID:String=StateDefinition.@id;
+				var currentCharacterListID:String=StateDefinition.parent().parent().@id;
+				if ((results..Categorical.(@ref==currentCharacterListID).State.(@ref==currentStateDefinitionID))=="")
+					{
+					StateDefinition.parent().parent().@enabled=true;
+					StateDefinition.@enabled=true;
+					}
+				}
+	 			}
+	 	relevant.enabled=true;
+	 	resetButton.enabled=true;	
+		//trace (characterList)
+		}
+
+					
+			
+
+	]]>
+</mx:Script>
+
+<mx:states>
+		<mx:State name="optionState">
+			<mx:AddChild relativeTo="{matches}" position="before">
+				<mx:VBox width="100%" height="100%" verticalScrollPolicy="off">
+						<mx:DataGrid id="optionsGrid" width="100%" height="100%" x="0" y="0"  dataProvider="{characterLabelz}" click="buttonEnable(event)" variableRowHeight="true" horizontalScrollPolicy="on">
+						<mx:columns>
+							<mx:DataGridColumn width="100" id="leftColumn" itemRenderer="com.eti.itemRenderer" rendererIsEditor="true" editable="true">
+								<mx:headerRenderer>
+									<mx:Component>
+									<mx:Label text = "States" toolTip="Select the states matching your object, click OK to add to the Description"/>
+									</mx:Component>
+								</mx:headerRenderer>
+							</mx:DataGridColumn>
+						</mx:columns>
+					</mx:DataGrid>
+					<mx:Button id="button" enabled="false" label="OK" click="storeOptions();currentState=''" width="68"/>
+				</mx:VBox>
+			</mx:AddChild>
+			<mx:RemoveChild target="{eliminated}"/>
+		</mx:State>
+		<mx:State name="editState">
+				<mx:AddChild relativeTo="{eliminated}" position="after">
+				<mx:VBox width="100%" height="100%" verticalScrollPolicy="off">
+						<mx:DataGrid id="editGrid" width="100%" height="100%" dataProvider="{editLabelz}" variableRowHeight="true" horizontalScrollPolicy="on">
+						<mx:columns>
+							<mx:DataGridColumn width="100" headerText="Is/Not" id="leftColumn0" itemRenderer="com.eti.itemRenderer"  rendererIsEditor="true" editable="true"/>
+						</mx:columns>
+						</mx:DataGrid>
+						<mx:HBox>
+						<mx:Button label="Update" click="updateOptions();currentState=''" width="68"/>
+						<mx:Button label="Remove" click="removeOption();currentState=''" width="91" enabled="false"/>
+						<mx:Button label="Cancel" click="{currentState='';editGrid.itemRenderer=null;}" width="68"/>
+						</mx:HBox>
+						
+						
+				</mx:VBox>
+				</mx:AddChild>
+				<mx:RemoveChild target="{matches}"/>
+				<mx:SetProperty target="{resetButton}" name="width" value="97"/>
+		</mx:State>
+</mx:states>
+
+<mx:HTTPService
+	showBusyCursor="true"
+	id="request"
+    url="SDD.xml"
+    resultFormat="e4x"
+    result="resultHandler(event)"/>	
+    
+<mx:Panel title="Matrix key" id="matrix_key" right="20" bottom="20" top="20" left="20" horizontalScrollPolicy="off" borderColor="#E2E2E2">   
+    
+<!-- <mx:HDividedBox width="100%" height="1%" horizontalCenter="0" top="0" horizontalAlign="center">
+	 <mx:Label id="title" fontWeight="bold" color="white" x="0" y="10" width="100%" height="100%" fontSize="14" textAlign="center"/>
+	 </mx:HDividedBox>	-->
+<mx:HDividedBox width="100%" height="100%" bottom="0" horizontalCenter="0" id="hdividedbox1" backgroundColor="#F3F3F3">
+<mx:VDividedBox id="left" width="100%" height="100%">
+<mx:DataGrid id="categoricalCharacters" variableRowHeight="true" dataProvider="{labelz}" width="100%" height="100%" itemClick="showOptions(event);">
+		<mx:columns>
+			<mx:DataGridColumn id="characterColumn" headerText="Available Features" itemRenderer="com.eti.featureRenderer" sortable="false">
+				<mx:headerRenderer>
+					<mx:Component>
+						<mx:Label text = "Available Features" toolTip="Features available for identification; select a feature to see available values"/>
+					</mx:Component>
+				</mx:headerRenderer>
+			</mx:DataGridColumn>
+		</mx:columns>
+</mx:DataGrid>
+<mx:HBox width="100%">
+<mx:CheckBox id="relevant" label="Show Relevant Options Only" change="showRelevant(event)"/>
+<mx:Spacer width="100%"/>
+<mx:Button id="resetButton" label="Reset All" click="reset()" enabled="false"/>
+</mx:HBox>
+<mx:DataGrid id="featuresSelected" dataProvider="{selectedFeaturesLabelz}" width="100%" height="100%"  variableRowHeight="true" itemClick="{showEdit(event)}">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Features selected so far" itemRenderer="com.eti.selectedRenderer" fontWeight="bold" sortable="false">
+				<mx:headerRenderer>
+					<mx:Component>
+						<mx:Label text = "Description" toolTip="Description of object being identified"/>
+					</mx:Component>
+				</mx:headerRenderer>
+			</mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+</mx:VDividedBox>
+<mx:VDividedBox width="100%" height="100%" id="upperRight">
+	<mx:DataGrid id="eliminated" dataProvider="{eliminatedTaxa}" fontWeight="bold" width="100%" height="100%">
+			<mx:columns>
+				<mx:DataGridColumn  headerText="Eliminated Taxa" labelFunction="labelFunction" sortable="false"/>
+			</mx:columns>
+		</mx:DataGrid>
+		<mx:DataGrid id="matches" dataProvider="{moreResults}" width="100%" height="100%" fontWeight="bold">
+			<mx:columns>
+				<mx:DataGridColumn id="matchColumn" headerText="Remaining Taxa" labelFunction="labelFunction2" sortable="false"/>
+			</mx:columns>
+		</mx:DataGrid>
+</mx:VDividedBox>
+</mx:HDividedBox>
+</mx:Panel>
 </mx:Canvas>
