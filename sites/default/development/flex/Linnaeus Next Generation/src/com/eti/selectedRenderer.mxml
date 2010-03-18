@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Script>
+	<![CDATA[
+		import mx.managers.ToolTipManager; 
+		override public function set data( value:Object ):void 
+			{
+			super.data = value;
+			}
+ 		public function showData(event:Event):void
+		{
+			var states:XMLList = (XML(data).parent().parent()).children();
+			var myVar:String;
+			myVar="";
+			for each (var StateDefinition:XML in states.*)
+			{
+				if (StateDefinition.@TFstate==true)
+				{
+					//trace (CategoricalCharacter)
+					myVar+="- "+StateDefinition.*.*.*+"\n";
+				}
+				if (StateDefinition.@TFstate==false)
+				{
+					//trace (CategoricalCharacter)
+					myVar+="- not "+StateDefinition.*.*.*+"\n";
+				}
+			}
+			ToolTipManager.hideDelay=5000;
+			//linkButton.label = myVar;
+			linkButton.toolTip = myVar;
+		} 
+/* 		private function showData():void
+		{
+		var states:XMLList = (XML(data).parent().parent()).children();
+			var myVar:String;
+			myVar=XML(data)+":\n ";
+			for each (var StateDefinition:XML in states.*)
+			{
+				if (StateDefinition.@TFstate==true)
+				{
+					//trace (CategoricalCharacter)
+					myVar+="- has "+StateDefinition.*.*.*+"\n";
+				}
+				if (StateDefinition.@TFstate==false)
+				{
+					//trace (CategoricalCharacter)
+					myVar+="- hasn't "+StateDefinition.*.*.*+"\n";
+				}
+			}	
+			linkButton.text = myVar;
+		} */
+		
+	]]>
+</mx:Script>
+<mx:Label width="100%" text="{XML(data)}" mouseOver="{showData(event)}" id="linkButton"/>	
+</mx:HBox>

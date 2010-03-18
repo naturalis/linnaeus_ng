@@ -155,7 +155,7 @@ public function onSpeciesViewResult(event:ResultEvent):void{
 		previousSelectedIndex=0;
 	}
 	moduleSpecies.navigator.species_select.selectedIndex=previousSelectedIndex;
-	//get file of first species or previous species from the specieslist the the list is loaded
+	//get file of first species or previous species from the specieslist the list is loaded
 	if(speciesnodes[previousSelectedIndex].field_image[0]){
 		fid=speciesnodes[previousSelectedIndex].field_image[0].fid;
 		currentImageId=0;
@@ -192,7 +192,7 @@ public function onClassicViewResult(event:ResultEvent):void{
 public function showImagesBarImage():void{
 	var id:Number=barImageId[ moduleSpecies.imagesBar.selectedIndex];
 	currentImageId=id;
-	getFile( moduleSpecies.navigator.species_select.selectedItem.field_image[id].fid);
+	getFile(moduleSpecies.navigator.species_select.selectedItem.field_image[id].fid);
 }
 
 public function onSettingsViewResult(event:ResultEvent):void{
@@ -252,6 +252,11 @@ public function selectKeySpeciesOnGrid():void{
 			specieslistChange();
 		}
 	}
+}
+
+// test
+public function selectSpeciesFromRemaining(the_species:String):void{
+	Alert.show("You clicked: " + the_species);
 }
 
 public function changeView(newView:String):void{
