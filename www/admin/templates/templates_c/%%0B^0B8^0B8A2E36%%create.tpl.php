@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-23 15:20:12
+<?php /* Smarty version 2.6.26, created on 2010-08-23 17:14:37
          compiled from create.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -12,6 +12,9 @@ unset($_smarty_tpl_vars);
 </div>
 
 <div id="admin-main">
+<?php if ($this->_tpl_vars['check'] == true): ?>
+Please verify the data below. Click 'Save' to save the user data; or 'Back' to return to the previous screen.
+<?php endif; ?>
 <form method="post" action="" name="theForm" id="theForm">
 <input name="id" value="-1" type="hidden" />
 <?php if ($this->_tpl_vars['check'] == true): ?>
@@ -30,38 +33,70 @@ unset($_smarty_tpl_vars);
 		</td>
 	</tr>
 	<tr>
-		<td>password</td><td><input type="text" name="password" value="<?php echo $this->_tpl_vars['data']['password']; ?>
+		<td>password</td><td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+			<?php echo $this->_tpl_vars['data']['password']; ?>
+
+		<?php else: ?>
+			<input type="text" name="password" value="<?php echo $this->_tpl_vars['data']['password']; ?>
 " maxlength="16" /></td>
 	</tr>
 	<tr>
 		<td>password (repeat)</td><td><input type="text" name="password_2" value="<?php echo $this->_tpl_vars['data']['password_2']; ?>
-" maxlength="16" /></td>
+" maxlength="16" />
+		<?php endif; ?>
+		</td>
 	</tr>
 	<tr>
-		<td>first_name</td><td><input type="text" name="first_name" value="<?php echo $this->_tpl_vars['data']['first_name']; ?>
-" maxlength="16" /></td>
+		<td>first_name</td><td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+			<?php echo $this->_tpl_vars['data']['first_name']; ?>
+
+		<?php else: ?>
+			<input type="text" name="first_name" value="<?php echo $this->_tpl_vars['data']['first_name']; ?>
+" maxlength="16" />
+		<?php endif; ?>
+		</td>
 	</tr>
 	<tr>
-		<td>last_name</td><td><input type="text" name="last_name" value="<?php echo $this->_tpl_vars['data']['last_name']; ?>
-" maxlength="16" /></td>
+		<td>last_name</td><td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+			<?php echo $this->_tpl_vars['data']['last_name']; ?>
+
+		<?php else: ?>
+			<input type="text" name="last_name" value="<?php echo $this->_tpl_vars['data']['last_name']; ?>
+" maxlength="16" />
+		<?php endif; ?>
+		</td>
 	</tr>
 	<tr>
 		<td>gender</td>
 		<td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+			<?php echo $this->_tpl_vars['data']['gender']; ?>
+
+		<?php else: ?>
 			<label for="gender-f"><input type="radio" id="gender-f" name="gender" value="f" <?php if ($this->_tpl_vars['data']['gender'] != 'm'): ?>checked<?php endif; ?>/>f</label>
 			<label for="gender-m"><input type="radio" id="gender-m" name="gender" value="m" <?php if ($this->_tpl_vars['data']['gender'] == 'm'): ?>checked<?php endif; ?> />m</label>
+		<?php endif; ?>
 		</td>
 	</tr>
 	<tr>
-		<td>email_address</td><td><input type="text" name="email_address" value="<?php echo $this->_tpl_vars['data']['email_address']; ?>
+		<td>email_address</td><td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+			<?php echo $this->_tpl_vars['data']['email_address']; ?>
+
+		<?php else: ?>
+			<input type="text" name="email_address" value="<?php echo $this->_tpl_vars['data']['email_address']; ?>
 " maxlength="64" /></td>
+		<?php endif; ?>
 	</tr>
 	<tr>
 		<td colspan="2">
 		<?php if ($this->_tpl_vars['check'] == true): ?>
-			<input type="button" value="back" onclick="document.getElementById('checked').value='0';document.getElementById('theForm').submit()" />
+			<input type="button" value="Back" onclick="document.getElementById('checked').value='-1';document.getElementById('theForm').submit()" />
 		<?php endif; ?>
-			<input type="submit" value="save" />
+			<input type="submit" value="Save" />
 		</td>
 	</tr>
 </table>
