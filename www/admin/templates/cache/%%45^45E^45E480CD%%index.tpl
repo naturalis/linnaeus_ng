@@ -1,5 +1,5 @@
 244
-a:4:{s:8:"template";a:4:{s:9:"index.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-bottom.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1282569595;s:7:"expires";i:1282573195;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:9:"index.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-bottom.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1282576414;s:7:"expires";i:1282580014;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -39,68 +39,29 @@ a:4:{s:8:"template";a:4:{s:9:"index.tpl";b:1;s:26:"../shared/admin-header.tpl";b
 <span onclick="var a=document.getElementById('debug'); if(a.style.visibility=='visible') {a.style.visibility='collapse';} else {a.style.visibility='visible';} " style="cursor:pointer">&nbsp;&Delta;&nbsp;</span>
 
 <div id="debug" style="visibility:collapse;">
-array(5) {
+array(6) {
   ["login_start_page"]=>
   string(28) "/admin/views/users/index.php"
   ["_current_project_id"]=>
   string(1) "1"
   ["_current_project_name"]=>
   string(24) "Polar Bears of Amsterdam"
+  ["data"]=>
+  array(0) {
+  }
   ["history"]=>
-  array(8) {
+  array(2) {
     [0]=>
     array(2) {
       ["time"]=>
-      int(1282563556)
+      int(1282576414)
       ["url"]=>
       string(28) "/admin/views/users/login.php"
     }
     [1]=>
     array(2) {
       ["time"]=>
-      int(1282563556)
-      ["url"]=>
-      string(28) "/admin/views/users/index.php"
-    }
-    [2]=>
-    array(2) {
-      ["time"]=>
-      int(1282566144)
-      ["url"]=>
-      string(29) "/admin/views/users/create.php"
-    }
-    [3]=>
-    array(2) {
-      ["time"]=>
-      int(1282566171)
-      ["url"]=>
-      string(28) "/admin/views/users/index.php"
-    }
-    [4]=>
-    array(2) {
-      ["time"]=>
-      int(1282566578)
-      ["url"]=>
-      string(29) "/admin/views/users/create.php"
-    }
-    [5]=>
-    array(2) {
-      ["time"]=>
-      int(1282566579)
-      ["url"]=>
-      string(28) "/admin/views/users/index.php"
-    }
-    [6]=>
-    array(2) {
-      ["time"]=>
-      int(1282569594)
-      ["url"]=>
-      string(29) "/admin/views/users/create.php"
-    }
-    [7]=>
-    array(2) {
-      ["time"]=>
-      int(1282569595)
+      int(1282576414)
       ["url"]=>
       string(28) "/admin/views/users/index.php"
     }
@@ -124,19 +85,19 @@ array(5) {
     ["active"]=>
     string(1) "1"
     ["last_login"]=>
-    string(19) "2010-08-23 13:39:13"
+    string(19) "2010-08-23 13:39:16"
     ["logins"]=>
-    string(3) "203"
+    string(3) "204"
     ["password_changed"]=>
     NULL
     ["last_change"]=>
-    string(19) "2010-08-23 13:39:13"
+    string(19) "2010-08-23 13:39:16"
     ["created"]=>
     string(19) "2010-08-18 16:36:56"
     ["_login"]=>
     array(2) {
       ["time"]=>
-      int(1282563556)
+      int(1282576414)
       ["remember"]=>
       bool(false)
     }
