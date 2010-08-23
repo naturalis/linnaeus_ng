@@ -56,29 +56,32 @@
 				(isset($data['active']) ? "active," : "" ).
 				(isset($data['last_login']) ? "last_login," : "" ).
 				(isset($data['logins']) ? "logins," : "" ).
-				(isset($data['password_changed']) ? "password_changed," : "" );
+				(isset($data['password_changed']) ? "password_changed," : "" ).
+				"created";
 
 			$values = 
-				(isset($data['username']) ? "username = '".$data['username']."', " : "" ).
-				(isset($data['password']) ? "password = '".$data['password']."', " : "" ).
-				(isset($data['first_name']) ? "first_name = '".$data['first_name']."', " : "" ).
-				(isset($data['last_name']) ? "last_name = '".$data['last_name']."', " : "" ).
-				(isset($data['gender']) ? "gender = '".$data['gender']."', " : "" ).
-				(isset($data['email_address']) ? "email_address = '".$data['email_address']."', " : "" ).
-				(isset($data['active']) ? "active = ".$data['active'].", " : "" ).
-				(isset($data['last_login']) ? "last_login = ".$data['last_login'].", " : "" ).
-				(isset($data['logins']) ? "logins = ".$data['logins'].", " : "" ).
-				(isset($data['password_changed']) ? "password_changed = ".$data['password_changed'].", " : "" );
+				(isset($data['username']) ? "'".$data['username']."'," : "" ).
+				(isset($data['password']) ? "'".$data['password']."'," : "" ).
+				(isset($data['first_name']) ? "'".$data['first_name']."', " : "" ).
+				(isset($data['last_name']) ? "'".$data['last_name']."'," : "" ).
+				(isset($data['gender']) ? "'".$data['gender']."'," : "" ).
+				(isset($data['email_address']) ? "'".$data['email_address']."'," : "" ).
+				(isset($data['active']) ? $data['active']."," : "" ).
+				(isset($data['last_login']) ? $data['last_login']."," : "" ).
+				(isset($data['logins']) ? $data['logins']."," : "" ).
+				(isset($data['password_changed']) ? $data['password_changed']."," : "" ).
+				"now()";
 
 			$query =
 				"insert into ".$this->tableName." (".trim($fields,',').") values (".trim($values,',').")";
-echo $query;
-return;
+
 			if (!mysql_query($query)) {
 
 				return mysql_error($this->databaseConnection);
 
 			} else {
+
+				$this->newId = mysql_insert_id($this->databaseConnection);
 
 				return true;
 

@@ -346,9 +346,60 @@
 
 				if ($this->requestData['checked']=='1') {
 
+					$this->requestData = $_SESSION['data']['new_user'];
+
+					$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
+
+					$this->requestData['active'] = '1';
+
+					$r = $this->models->User->save($this->requestData);
+					
+					if ($r!==true) {
+
+						$this->error[] = _('Failed to save user');
+
+						$this->smarty->assign('check', false);
+	
+						$this->smarty->assign('data', $_SESSION['data']['new_user']);				
+
+					} else {
+
+						$newUserId = $this->models->User->getNewId();
+
+						// insert login right, which is the basic connection to the project
+						$this->models->ProjectRightUser->save(
+								array(
+									'id' => '-1',
+									'project_id' => $this->getCurrentProjectId(),
+									'user_id' => $newUserId,
+									'right_id' => 5
+								)
+							);
+
+						unset($_SESSION['data']['new_user']);
+
+						$this->redirect('rights.php');
+
+					}
+
+
+				} elseif ($this->requestData['checked']=='-1') {
+				
+					// user verified data and clicked 'back'
+
+					$this->smarty->assign('check', false);
+
+					$this->smarty->assign('data', $_SESSION['data']['new_user']);				
+
+				} else {
+
+					// user submitted data, is shown non-editable data to verify
+
 					$saveUser = true;
 				
 					$this->requestData = $this->models->User->sanatizeData($this->requestData);
+
+					$_SESSION['data']['new_user'] = $this->requestData;
 	
 					if (!$this->isUserDataComplete()) $saveUser = false;
 	
@@ -358,23 +409,18 @@
 	
 					if ($saveUser) {
 		
-						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
-	
-						$this->models->User->save($this->requestData);
+						$this->smarty->assign('check', true);
 
-//INSERT INTO dev_rights VALUES (NULL , 'Login', 'n', '/admin/views/users/login.php',CURRENT_TIMESTAMP);
 					}
-
-				} else {
-
-					$this->smarty->assign('check', true);
 
 					$this->smarty->assign('data', $this->requestData);				
 
 				}
-				
+			
 
 			} else {
+			
+				// input form, shows empty. or with data when user clicked 'save' but data contained errors
 
 				$this->smarty->assign('check', false);
 
