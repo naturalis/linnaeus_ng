@@ -6239,5 +6239,3 @@ window.jQuery = window.$ = jQuery;
 
 })(window);
 
-
-alert('booh');
