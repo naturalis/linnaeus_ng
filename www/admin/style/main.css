@@ -11,6 +11,7 @@ td {
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
 	font-size:12px;
 	padding:0px;
+	padding-right:5px;
 }
 
 input[type="text"] {
