@@ -4,6 +4,14 @@
 
 		const smartyRoot = 'C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/admin/templates/';
 
+		public function getGeneralSettings() {
+
+			return array(
+				'maxSessionHistorySteps' => 10
+			);
+
+		}
+
 		public function getDatabaseSettings() {
 
 			return array(
