@@ -5,13 +5,13 @@
 
 	class BaseClass {
 
-		public $config = false;
+		public $config;
 
 		public function __construct() {
 
 			$this->loadConfiguration();
-			
-			$this->startSession();
+
+			$this->setGeneralSettings();			
 
 		}
 
@@ -19,12 +19,6 @@
 
 		}
 		
-		private function startSession() {
-		
-			session_start();
-		
-		}
-
 		private function loadConfiguration() {
 
 			if (class_exists('configuration')) {
@@ -36,6 +30,12 @@
 				die(_('FATAL: cannot load configuration'));
 
 			}
+
+		}
+
+		private function setGeneralSettings() {
+
+			$this->generalSettings = $this->config->getGeneralSettings();
 
 		}
 
