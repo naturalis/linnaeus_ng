@@ -5,10 +5,11 @@
 	abstract class Model extends BaseClass {
 
 		private $databaseSettings;
-		private $databaseConnection;
+		public $databaseConnection;
 		private $data;
 		public $tableName;
 		private $id;
+		public $newId;
 
 		abstract function update($data=false);
 		abstract function insert($data=false);
@@ -100,11 +101,11 @@
 			
 			if (!$this->data) {
 
-				$this->insert($data);
+				return $this->insert($data);
 
 			} else {
 
-				$this->update($data);
+				return $this->update($data);
 
 			}
 
@@ -158,6 +159,12 @@
 			$this->set($id ? $id : $this->id);
 
 			return $this->data;
+
+		}
+
+		public function getNewId() {
+
+			return $this->newId;
 
 		}
 
