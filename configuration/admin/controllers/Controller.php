@@ -1,7 +1,7 @@
 <?php
 
-	include_once(__DIR__."/../BaseClass.php");
-	include_once(__DIR__."/../../../smarty/Smarty.class.php");
+	include_once(dirname(__FILE__)."/../BaseClass.php");
+	include_once(dirname(__FILE__)."/../../../smarty/Smarty.class.php");
 
 	class Controller extends BaseClass {
 	
@@ -113,7 +113,7 @@
 
 			foreach((array)$d as $key) {
 
-				require_once(__DIR__.'/../models/'.$key.'.php');
+				require_once(dirname(__FILE__).'/../models/'.$key.'.php');
 
 				$d = str_replace(' ','',ucwords(str_replace('_',' ',$key)));
 
