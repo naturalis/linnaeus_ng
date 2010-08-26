@@ -6,6 +6,7 @@
 	class BaseClass {
 
 		public $config;
+		public $generalSettings;
 
 		public function __construct() {
 
