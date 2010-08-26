@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-26 12:04:09
+<?php /* Smarty version 2.6.26, created on 2010-08-26 13:29:38
          compiled from ../shared/admin-footer.tpl */ ?>
 </div ends="admin-page-container">
 <div id="admin-footer-container">
@@ -7,7 +7,7 @@
 		<a href="index.php">User management index</a>
 		<a href="/admin/admin-index.php">Main index</a>
 		<a href="choose_project.php">Switch projects</a>
-		<a href="logout.php">Logout</a>
+		<a href="logout.php">Log out</a>
 	</div>
 <?php endif; ?>
 </div ends="admin-footer-container">

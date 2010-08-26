@@ -5,7 +5,7 @@
 		<a href="index.php">User management index</a>
 		<a href="/admin/admin-index.php">Main index</a>
 		<a href="choose_project.php">Switch projects</a>
-		<a href="logout.php">Logout</a>
+		<a href="logout.php">Log out</a>
 	</div>
 {/if}
 </div ends="admin-footer-container">
