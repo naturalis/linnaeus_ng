@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-26 14:20:02
+<?php /* Smarty version 2.6.26, created on 2010-08-26 15:00:05
          compiled from ../shared/admin-header.tpl */ ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -8,18 +8,14 @@
 <?php if ($this->_tpl_vars['session']['_current_project_name'] != ''): ?> - <?php endif; ?><?php echo $this->_tpl_vars['pageName']; ?>
 </title>
 <style type="text/css" media="all">
-  @import url("<?php echo $this->_tpl_vars['webroot']; ?>
-/admin/style/main.css");
-  @import url("<?php echo $this->_tpl_vars['webroot']; ?>
-/admin/style/admin.css");
+  @import url("../../style/main.css");
+  @import url("../../style/admin.css");
 </style>
-<script type="text/javascript" src="<?php echo $this->_tpl_vars['webroot']; ?>
-/admin/javascript/main.js"></script>
+<script type="text/javascript" src="../../javascript/main.js"></script>
 </head>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="<?php echo $this->_tpl_vars['webroot']; ?>
-/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+	<img src="../../images/system/eti-logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 

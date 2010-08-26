@@ -4,20 +4,20 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Login</title>
 <style type="text/css" media="all">
-  @import url("/admin/style/main.css");
-  @import url("/admin/style/admin.css");
+  @import url("style/main.css");
+  @import url("style/admin.css");
 </style>
-<script type="text/javascript" src="/admin/javascript/main.js"></script>
+<script type="text/javascript" src="javascript/main.js"></script>
 </head>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+	<img src="images/system/eti-logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 
 <div id="admin-titles">
 	<span id="admin-title">Linnaeus NG</span><br />
-	<span id="admin-subtitle">administration root</span><br />
+	<span id="admin-subtitle">Administration root</span><br />
 </div>
 
 <div id="admin-main">
