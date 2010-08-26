@@ -1,9 +1,9 @@
 216
-a:4:{s:8:"template";a:3:{s:18:"choose_project.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1282827596;s:7:"expires";i:1282831196;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:18:"choose_project.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1282827660;s:7:"expires";i:1282831260;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Polar Bears of Amsterdam - Choose a project</title>
+<title>Imaginary Beings - Choose a project</title>
 <style type="text/css" media="all">
   @import url("../../style/main.css");
   @import url("../../style/admin.css");
@@ -18,7 +18,7 @@ a:4:{s:8:"template";a:3:{s:18:"choose_project.tpl";b:1;s:26:"../shared/admin-hea
 
 <div id="admin-titles">
 	<span id="admin-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="admin-project-title">Polar Bears of Amsterdam</span><br />	<span id="admin-subtitle">Choose a project</span>
+	<span id="admin-project-title">Imaginary Beings</span><br />	<span id="admin-subtitle">Choose a project</span>
 </div>
 
 
@@ -27,10 +27,10 @@ a:4:{s:8:"template";a:3:{s:18:"choose_project.tpl";b:1;s:26:"../shared/admin-hea
 <ul class="admin-list">
 <li>
 	<a href="?project_id=1">Polar Bears of Amsterdam</a>
-<span title="current active project">*</span></li>
+</li>
 <li>
 	<a href="?project_id=2">Imaginary Beings</a>
-</li>
+<span title="current active project">*</span></li>
 
 </ul>
 </div>
