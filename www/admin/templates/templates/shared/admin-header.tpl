@@ -4,14 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>{$session._current_project_name}{if $session._current_project_name!=''} - {/if}{$pageName}</title>
 <style type="text/css" media="all">
-  @import url("{$webroot}/admin/style/main.css");
-  @import url("{$webroot}/admin/style/admin.css");
+  @import url("../../style/main.css");
+  @import url("../../style/admin.css");
 </style>
-<script type="text/javascript" src="{$webroot}/admin/javascript/main.js"></script>
+<script type="text/javascript" src="../../javascript/main.js"></script>
 </head>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="{$webroot}/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+	<img src="../../images/system/eti-logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 
