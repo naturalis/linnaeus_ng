@@ -1,15 +1,10 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-23 17:14:37
+<?php /* Smarty version 2.6.26, created on 2010-08-26 12:03:57
          compiled from create.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
 $this->_tpl_vars = $_smarty_tpl_vars;
 unset($_smarty_tpl_vars);
  ?>
-
-<div id="admin-titles">
-<span id="admin-title">Administration menu</span><br />
-<span id="admin-subtitle">User management: create user</span>
-</div>
 
 <div id="admin-main">
 <?php if ($this->_tpl_vars['check'] == true): ?>
@@ -22,7 +17,7 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 <?php endif; ?>
 <table>
 	<tr>
-		<td>username</td><td>
+		<td>username:</td><td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['username']; ?>
 
@@ -33,22 +28,22 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 		</td>
 	</tr>
 	<tr>
-		<td>password</td><td>
+		<td>password:</td><td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['password']; ?>
 
 		<?php else: ?>
-			<input type="text" name="password" value="<?php echo $this->_tpl_vars['data']['password']; ?>
+			<input type="password" name="password" value="<?php echo $this->_tpl_vars['data']['password']; ?>
 " maxlength="16" /></td>
 	</tr>
 	<tr>
-		<td>password (repeat)</td><td><input type="text" name="password_2" value="<?php echo $this->_tpl_vars['data']['password_2']; ?>
+		<td>password (repeat)</td><td><input type="password" name="password_2" value="<?php echo $this->_tpl_vars['data']['password_2']; ?>
 " maxlength="16" />
 		<?php endif; ?>
 		</td>
 	</tr>
 	<tr>
-		<td>first_name</td><td>
+		<td>first_name:</td><td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['first_name']; ?>
 
@@ -59,7 +54,7 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 		</td>
 	</tr>
 	<tr>
-		<td>last_name</td><td>
+		<td>last_name:</td><td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['last_name']; ?>
 
@@ -70,19 +65,19 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 		</td>
 	</tr>
 	<tr>
-		<td>gender</td>
+		<td>gender:</td>
 		<td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['gender']; ?>
 
 		<?php else: ?>
-			<label for="gender-f"><input type="radio" id="gender-f" name="gender" value="f" <?php if ($this->_tpl_vars['data']['gender'] != 'm'): ?>checked<?php endif; ?>/>f</label>
-			<label for="gender-m"><input type="radio" id="gender-m" name="gender" value="m" <?php if ($this->_tpl_vars['data']['gender'] == 'm'): ?>checked<?php endif; ?> />m</label>
+			<label for="gender-f"><input type="radio" id="gender-f" name="gender" value="f" <?php if ($this->_tpl_vars['data']['gender'] != 'm'): ?>checked="checked"<?php endif; ?>/>f</label>
+			<label for="gender-m"><input type="radio" id="gender-m" name="gender" value="m" <?php if ($this->_tpl_vars['data']['gender'] == 'm'): ?>checked="checked"<?php endif; ?> />m</label>
 		<?php endif; ?>
 		</td>
 	</tr>
 	<tr>
-		<td>email_address</td><td>
+		<td>email_address:</td><td>
 		<?php if ($this->_tpl_vars['check'] == true): ?>
 			<?php echo $this->_tpl_vars['data']['email_address']; ?>
 
@@ -90,6 +85,73 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 			<input type="text" name="email_address" value="<?php echo $this->_tpl_vars['data']['email_address']; ?>
 " maxlength="64" /></td>
 		<?php endif; ?>
+	</tr>
+	<tr>
+		<td>role in current project:</td>
+		<td>
+		<?php if ($this->_tpl_vars['check'] == true): ?>
+<?php unset($this->_sections['i']);
+$this->_sections['i']['name'] = 'i';
+$this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['roles']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
+$this->_sections['i']['show'] = true;
+$this->_sections['i']['max'] = $this->_sections['i']['loop'];
+$this->_sections['i']['step'] = 1;
+$this->_sections['i']['start'] = $this->_sections['i']['step'] > 0 ? 0 : $this->_sections['i']['loop']-1;
+if ($this->_sections['i']['show']) {
+    $this->_sections['i']['total'] = $this->_sections['i']['loop'];
+    if ($this->_sections['i']['total'] == 0)
+        $this->_sections['i']['show'] = false;
+} else
+    $this->_sections['i']['total'] = 0;
+if ($this->_sections['i']['show']):
+
+            for ($this->_sections['i']['index'] = $this->_sections['i']['start'], $this->_sections['i']['iteration'] = 1;
+                 $this->_sections['i']['iteration'] <= $this->_sections['i']['total'];
+                 $this->_sections['i']['index'] += $this->_sections['i']['step'], $this->_sections['i']['iteration']++):
+$this->_sections['i']['rownum'] = $this->_sections['i']['iteration'];
+$this->_sections['i']['index_prev'] = $this->_sections['i']['index'] - $this->_sections['i']['step'];
+$this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_sections['i']['step'];
+$this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
+$this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
+?>
+<?php if ($this->_tpl_vars['roles'][$this->_sections['i']['index']]['id'] == $this->_tpl_vars['data']['role_id']): ?>			<?php echo $this->_tpl_vars['roles'][$this->_sections['i']['index']]['role']; ?>
+<?php endif; ?>
+<?php endfor; endif; ?>
+		<?php else: ?>
+		<select name="role_id">
+<?php unset($this->_sections['i']);
+$this->_sections['i']['name'] = 'i';
+$this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['roles']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
+$this->_sections['i']['show'] = true;
+$this->_sections['i']['max'] = $this->_sections['i']['loop'];
+$this->_sections['i']['step'] = 1;
+$this->_sections['i']['start'] = $this->_sections['i']['step'] > 0 ? 0 : $this->_sections['i']['loop']-1;
+if ($this->_sections['i']['show']) {
+    $this->_sections['i']['total'] = $this->_sections['i']['loop'];
+    if ($this->_sections['i']['total'] == 0)
+        $this->_sections['i']['show'] = false;
+} else
+    $this->_sections['i']['total'] = 0;
+if ($this->_sections['i']['show']):
+
+            for ($this->_sections['i']['index'] = $this->_sections['i']['start'], $this->_sections['i']['iteration'] = 1;
+                 $this->_sections['i']['iteration'] <= $this->_sections['i']['total'];
+                 $this->_sections['i']['index'] += $this->_sections['i']['step'], $this->_sections['i']['iteration']++):
+$this->_sections['i']['rownum'] = $this->_sections['i']['iteration'];
+$this->_sections['i']['index_prev'] = $this->_sections['i']['index'] - $this->_sections['i']['step'];
+$this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_sections['i']['step'];
+$this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
+$this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
+?>
+			<option title="<?php echo $this->_tpl_vars['roles'][$this->_sections['i']['index']]['role']; ?>
+: <?php echo $this->_tpl_vars['roles'][$this->_sections['i']['index']]['description']; ?>
+" value="<?php echo $this->_tpl_vars['roles'][$this->_sections['i']['index']]['id']; ?>
+"<?php if ($this->_tpl_vars['roles'][$this->_sections['i']['index']]['id'] == $this->_tpl_vars['data']['role_id']): ?> selected class="option-selected" <?php endif; ?>><?php echo $this->_tpl_vars['roles'][$this->_sections['i']['index']]['role']; ?>
+</option>
+<?php endfor; endif; ?>
+		</select>
+		<?php endif; ?>
+</td>
 	</tr>
 	<tr>
 		<td colspan="2">
@@ -105,8 +167,8 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 
 </div>
 
-<div id="admin-messages">
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
+<div id="admin-errors">
 <?php unset($this->_sections['error']);
 $this->_sections['error']['name'] = 'error';
 $this->_sections['error']['loop'] = is_array($_loop=$this->_tpl_vars['errors']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
@@ -134,14 +196,40 @@ $this->_sections['error']['last']       = ($this->_sections['error']['iteration'
 <span class="admin-message-error"><?php echo $this->_tpl_vars['errors'][$this->_sections['error']['index']]; ?>
 </span><br />
 <?php endfor; endif; ?>
-<?php endif; ?>
 </div>
+<?php endif; ?>
+<?php if (! empty ( $this->_tpl_vars['messages'] )): ?>
+<div id="admin-messages">
+<?php unset($this->_sections['i']);
+$this->_sections['i']['name'] = 'i';
+$this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['messages']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
+$this->_sections['i']['show'] = true;
+$this->_sections['i']['max'] = $this->_sections['i']['loop'];
+$this->_sections['i']['step'] = 1;
+$this->_sections['i']['start'] = $this->_sections['i']['step'] > 0 ? 0 : $this->_sections['i']['loop']-1;
+if ($this->_sections['i']['show']) {
+    $this->_sections['i']['total'] = $this->_sections['i']['loop'];
+    if ($this->_sections['i']['total'] == 0)
+        $this->_sections['i']['show'] = false;
+} else
+    $this->_sections['i']['total'] = 0;
+if ($this->_sections['i']['show']):
 
-<?php $_smarty_tpl_vars = $this->_tpl_vars;
-$this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-bottom.tpl", 'smarty_include_vars' => array()));
-$this->_tpl_vars = $_smarty_tpl_vars;
-unset($_smarty_tpl_vars);
- ?>
+            for ($this->_sections['i']['index'] = $this->_sections['i']['start'], $this->_sections['i']['iteration'] = 1;
+                 $this->_sections['i']['iteration'] <= $this->_sections['i']['total'];
+                 $this->_sections['i']['index'] += $this->_sections['i']['step'], $this->_sections['i']['iteration']++):
+$this->_sections['i']['rownum'] = $this->_sections['i']['iteration'];
+$this->_sections['i']['index_prev'] = $this->_sections['i']['index'] - $this->_sections['i']['step'];
+$this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_sections['i']['step'];
+$this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
+$this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
+?>
+<span class="admin-message"><?php echo $this->_tpl_vars['messages'][$this->_sections['i']['index']]; ?>
+</span><br />
+<?php endfor; endif; ?>
+</div>
+<?php endif; ?>
+
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-footer.tpl", 'smarty_include_vars' => array()));
 $this->_tpl_vars = $_smarty_tpl_vars;
