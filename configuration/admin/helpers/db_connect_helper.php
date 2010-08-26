@@ -1,6 +1,6 @@
 <?php
 
-	include_once(__DIR__."/../BaseClass.php");
+	include_once(dirname(__FILE__)."/../BaseClass.php");
 
 	class dbConnectHelper extends BaseClass {
 
