@@ -2,10 +2,10 @@
 
 	require_once('../../../../configuration/admin/controllers/UsersController.php');
 
-	$v = new UsersController();
+	$c = new UsersController();
 
-	$v->indexAction();
+	$c->indexAction();
 
-	$v->printPage();
+	$c->printPage();
 
 ?>

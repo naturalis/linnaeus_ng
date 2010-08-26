@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-23 17:13:32
+<?php /* Smarty version 2.6.26, created on 2010-08-26 11:53:12
          compiled from login.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -6,13 +6,8 @@ $this->_tpl_vars = $_smarty_tpl_vars;
 unset($_smarty_tpl_vars);
  ?>
 
-<div id="admin-titles">
-<span id="admin-title">Administration</span><br />
-<span id="admin-subtitle">Login page</span>
-</div>
-
-<div id="admin-messages">
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
+<div id="admin-errors">
 <?php unset($this->_sections['error']);
 $this->_sections['error']['name'] = 'error';
 $this->_sections['error']['loop'] = is_array($_loop=$this->_tpl_vars['errors']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
@@ -40,20 +35,19 @@ $this->_sections['error']['last']       = ($this->_sections['error']['iteration'
 <span class="admin-message-error"><?php echo $this->_tpl_vars['errors'][$this->_sections['error']['index']]; ?>
 </span><br />
 <?php endfor; endif; ?>
-<?php endif; ?>
 </div>
+<?php endif; ?>
 
 <div id="admin-main">
-<form method="post" action="login.php">
-your username:<input type="text" name="username" value="mdschermer" maxlength="32" /><br />
-your password:<input type="text" name="password" value="balance" maxlength="32" /><br />
-<input type="submit" value="login" />
-</form>
+	<form method="post" action="login.php">
+	<table>
+		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>
+		<tr><td>your username:</td><td><input type="text" name="username" value="mdschermer" maxlength="32" /></td></tr>
+		<tr><td>your password:</td><td><input type="password" name="password" value="balance" maxlength="32" /><br /></td></tr>
+		<tr><td colspan="2"><input type="submit" value="login" /></td></tr>
+	</table>
+	</form>
 </div>
-
-<div id="admin-bottom">
-</div>
-
 
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-footer.tpl", 'smarty_include_vars' => array()));

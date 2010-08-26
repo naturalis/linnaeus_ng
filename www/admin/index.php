@@ -2,18 +2,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Linnaeus NG</title>
-<!-- script src="javascript/loadshared.js" type="text/javascript"></script -->
+<title>Login</title>
+<style type="text/css" media="all">
+  @import url("/admin/style/main.css");
+  @import url("/admin/style/admin.css");
+</style>
+<script type="text/javascript" src="/admin/javascript/main.js"></script>
 </head>
+<body><div id="admin-body-container">
+<div id="admin-header-container">
+	<img src="/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+</div>
+<div id="admin-page-container">
 
-<body>
-admin-root<br /><br />
+<div id="admin-titles">
+	<span id="admin-title">Linnaeus NG</span><br />
+	<span id="admin-subtitle">administration root</span><br />
+</div>
 
-<a href="views/users/">user management</a>
+<div id="admin-main">
+	<a href="views/users/login.php">Login</a>
+</div>
 
-<br /><br />
-<a href="../">www-root</a><br/>
-<a href="../app/">user interface</a><br/>
-
-</body>
+</div ends="admin-page-container">
+<div id="admin-footer-container">
+</div ends="admin-footer-container">
+</div ends="admin-body-container"></body>
 </html>

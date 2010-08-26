@@ -1,46 +1,23 @@
 body {
+	margin:0px;
+	padding:0px;
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
 	font-size:12px;
 }
 
 table {
-	padding:0px;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
 }
 
-td {
+td, th, tr  {
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
 	font-size:12px;
-	padding:0px;
+	padding:0px 0px 0px 0px;
 	padding-right:5px;
+	margin:0px 0px 0px 0px;
 }
 
-input[type="text"] {
-	font-size:12px;
-	width:200px;
-}
-
-#admin-titles {
-	padding-bottom:10px;
-	margin-bottom:10px;
-	border-bottom:1px dotted #ccc;
-}
-
-#admin-title {
-	font-size:16px;
-	font-weight:bold;
-}
-
-#admin-subtitle {
-	font-size:12px;
-	font-weight:bold;
-}
-
-#admin-messages {
-	padding-bottom:10px;
-	margin-bottom:10px;
-	
-}
-
-.admin-message-error {
-	 color: red;
+th {
+	text-align:left;
 }

@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-23 17:14:37
+<?php /* Smarty version 2.6.26, created on 2010-08-25 10:02:54
          compiled from ../shared/admin-bottom.tpl */ ?>
 <div id="admin-bottom">
 <a href="index.php">Back to index</a>&nbsp;
