@@ -4,14 +4,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Login</title>
 <style type="text/css" media="all">
-  @import url("/linnaeus_ng/admin/style/main.css");
-  @import url("/linnaeus_ng/admin/style/admin.css");
+  @import url("/admin/style/main.css");
+  @import url("/admin/style/admin.css");
 </style>
-<script type="text/javascript" src="/linnaeus_ng/admin/javascript/main.js"></script>
+<script type="text/javascript" src="/admin/javascript/main.js"></script>
 </head>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="/linnaeus_ng/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+	<img src="/admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 
