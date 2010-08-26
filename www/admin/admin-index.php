@@ -27,6 +27,9 @@
 
 </div ends="admin-page-container">
 <div id="admin-footer-container">
+	<div id="admin-footer-menu">
+		<a href="/admin/views/users/logout.php">Log out</a>
+	</div>
 </div ends="admin-footer-container">
 </div ends="admin-body-container"></body>
 </html>
