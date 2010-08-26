@@ -201,8 +201,10 @@
 
 			$this->smarty->assign('debugMode', $this->debugMode);
 
+			$this->smarty->assign('webroot', $this->generalSettings['webroot']);
+
 			$this->smarty->assign('session', $_SESSION);
-			
+
 			$this->smarty->assign('errors', $this->getErrors());
 			$this->smarty->assign('messages', $this->getMessages());
 			$this->smarty->assign('helpTexts', $this->getHelpTexts());
