@@ -7,6 +7,9 @@
 		public function getGeneralSettings() {
 
 			return array(
+				'debugMode' => false,
+				'applicationName' => 'Linnaeus NG Administration',
+				'applicationVersion' => '0.1',
 				'maxSessionHistorySteps' => 10
 			);
 

@@ -47,29 +47,29 @@
 			}
 
 			$fields = 
-				(isset($data['username']) ? "username," : "" ).
-				(isset($data['password']) ? "password," : "" ).
-				(isset($data['first_name']) ? "first_name," : "" ).
-				(isset($data['last_name']) ? "last_name," : "" ).
-				(isset($data['gender']) ? "gender," : "" ).
-				(isset($data['email_address']) ? "email_address," : "" ).
-				(isset($data['active']) ? "active," : "" ).
-				(isset($data['last_login']) ? "last_login," : "" ).
-				(isset($data['logins']) ? "logins," : "" ).
-				(isset($data['password_changed']) ? "password_changed," : "" ).
+				(!empty($data['username']) ? "username," : "" ).
+				(!empty($data['password']) ? "password," : "" ).
+				(!empty($data['first_name']) ? "first_name," : "" ).
+				(!empty($data['last_name']) ? "last_name," : "" ).
+				(!empty($data['gender']) ? "gender," : "" ).
+				(!empty($data['email_address']) ? "email_address," : "" ).
+				(!empty($data['active']) ? "active," : "" ).
+				(!empty($data['last_login']) ? "last_login," : "" ).
+				(!empty($data['logins']) ? "logins," : "" ).
+				(!empty($data['password_changed']) ? "password_changed," : "" ).
 				"created";
 
 			$values = 
-				(isset($data['username']) ? "'".$data['username']."'," : "" ).
-				(isset($data['password']) ? "'".$data['password']."'," : "" ).
-				(isset($data['first_name']) ? "'".$data['first_name']."', " : "" ).
-				(isset($data['last_name']) ? "'".$data['last_name']."'," : "" ).
-				(isset($data['gender']) ? "'".$data['gender']."'," : "" ).
-				(isset($data['email_address']) ? "'".$data['email_address']."'," : "" ).
-				(isset($data['active']) ? $data['active']."," : "" ).
-				(isset($data['last_login']) ? $data['last_login']."," : "" ).
-				(isset($data['logins']) ? $data['logins']."," : "" ).
-				(isset($data['password_changed']) ? $data['password_changed']."," : "" ).
+				(!empty($data['username']) ? "'".$data['username']."'," : "" ).
+				(!empty($data['password']) ? "'".$data['password']."'," : "" ).
+				(!empty($data['first_name']) ? "'".$data['first_name']."', " : "" ).
+				(!empty($data['last_name']) ? "'".$data['last_name']."'," : "" ).
+				(!empty($data['gender']) ? "'".$data['gender']."'," : "" ).
+				(!empty($data['email_address']) ? "'".$data['email_address']."'," : "" ).
+				(!empty($data['active']) ? $data['active']."," : "" ).
+				(!empty($data['last_login']) ? $data['last_login']."," : "" ).
+				(!empty($data['logins']) ? $data['logins']."," : "" ).
+				(!empty($data['password_changed']) ? $data['password_changed']."," : "" ).
 				"now()";
 
 			$query =
@@ -102,18 +102,20 @@
 
 			$query =
 				"update ".$this->tableName." set ".
-					(isset($data['username']) ? "username = '".$data['username']."', " : "" ).
-					(isset($data['password']) ? "password = '".$data['password']."', " : "" ).
-					(isset($data['first_name']) ? "first_name = '".$data['first_name']."', " : "" ).
-					(isset($data['last_name']) ? "last_name = '".$data['last_name']."', " : "" ).
-					(isset($data['gender']) ? "gender = '".$data['gender']."', " : "" ).
-					(isset($data['email_address']) ? "email_address = '".$data['email_address']."', " : "" ).
-					(isset($data['active']) ? "active = ".$data['active'].", " : "" ).
-					(isset($data['last_login']) ? "last_login = ".$data['last_login'].", " : "" ).
-					(isset($data['logins']) ? "logins = ".$data['logins'].", " : "" ).
-					(isset($data['password_changed']) ? "password_changed = ".$data['password_changed'].", " : "" ).
+					(!empty($data['username']) ? "username = '".$data['username']."', " : "" ).
+					(!empty($data['password']) ? "password = '".$data['password']."', " : "" ).
+					(!empty($data['first_name']) ? "first_name = '".$data['first_name']."', " : "" ).
+					(!empty($data['last_name']) ? "last_name = '".$data['last_name']."', " : "" ).
+					(!empty($data['gender']) ? "gender = '".$data['gender']."', " : "" ).
+					(!empty($data['email_address']) ? "email_address = '".$data['email_address']."', " : "" ).
+					(!empty($data['active']) ? "active = ".$data['active'].", " : "" ).
+					(!empty($data['last_login']) ? "last_login = ".$data['last_login'].", " : "" ).
+					(!empty($data['logins']) ? "logins = ".$data['logins'].", " : "" ).
+					(!empty($data['password_changed']) ? "password_changed = ".$data['password_changed'].", " : "" ).
 					"id = id
 				where id = ".$data['id'];
+
+			//echo($query);
 
 			if (!mysql_query($query)) {
 
@@ -129,7 +131,3 @@
 	}
 
 ?>
-
-
-
-
