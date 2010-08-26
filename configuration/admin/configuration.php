@@ -10,7 +10,8 @@
 				'debugMode' => false,
 				'applicationName' => 'Linnaeus NG Administration',
 				'applicationVersion' => '0.1',
-				'maxSessionHistorySteps' => 10
+				'maxSessionHistorySteps' => 10,
+				'webroot' => ''
 			);
 
 		}
