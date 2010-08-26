@@ -11,9 +11,10 @@
 				'applicationName' => 'Linnaeus NG Administration',
 				'applicationVersion' => '0.1',
 				'maxSessionHistorySteps' => 10,
-				'webroot' => ''
+				'webroot' => '/linnaeus_ng'
 			);
-
+			//dev.eti.uva.nl	"/linnaeus_ng"
+			//linnaeus			""
 		}
 
 		public function getDatabaseSettings() {
