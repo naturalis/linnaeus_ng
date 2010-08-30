@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-30 11:00:36
+<?php /* Smarty version 2.6.26, created on 2010-08-30 19:57:51
          compiled from ../shared/admin-header.tpl */ ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -41,7 +41,7 @@ admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
 </span><br />
 <?php if ($this->_tpl_vars['session']['_current_project_name'] != ''): ?>	<span id="admin-project-title"><?php echo $this->_tpl_vars['session']['_current_project_name']; ?>
 </span><br /><?php endif; ?>
-<?php if ($this->_tpl_vars['controllerPublicName'] != ''): ?>	<span id="admin-apptitle"><a href="index.php"><?php echo $this->_tpl_vars['controllerPublicName']; ?>
+<?php if ($this->_tpl_vars['controllerPublicName'] != '' && ! $this->_tpl_vars['hideControllerPublicName']): ?>	<span id="admin-apptitle"><a href="index.php"><?php echo $this->_tpl_vars['controllerPublicName']; ?>
 </a></span><br /><?php endif; ?>
 	<span id="admin-pagetitle"><?php echo $this->_tpl_vars['pageName']; ?>
 </span>

@@ -16,8 +16,6 @@
 
 	} else {
 
-		$c->setDefaultProject();
-
 		$c->controllerPublicName = '';
 
 		$c->printPage();

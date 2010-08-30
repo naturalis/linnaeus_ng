@@ -6,6 +6,4 @@
 
 	$c->createAction();
 
-	$c->printPage();
-
 ?>
