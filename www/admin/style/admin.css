@@ -120,6 +120,14 @@
 	text-decoration:underline;
 }
 
+.admin-module-name {
+	font-weight:bold;
+}
+
+.admin-text-block {
+	margin-bottom:10px;
+}
+
 #inlineHelp {
 	margin-top:10px;
 	background-color:#eee;
@@ -183,6 +191,10 @@ input[type="button"],input[type="submit"] {
 input[type="button"]:hover,input[type="submit"]:hover { 
 	color:#777; 
 } 
+
+input[type="checkbox"] {
+	margin-left:0px;
+}
 
 select  {
 	font-size:12px;

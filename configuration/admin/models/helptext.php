@@ -18,12 +18,6 @@
 
 		}
 
-		public function insert($data = false) {
-		}
-
-		public function update($data = false) {
-		}
-
 	}
 
 ?>

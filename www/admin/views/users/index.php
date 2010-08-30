@@ -6,6 +6,4 @@
 
 	$c->indexAction();
 
-	$c->printPage();
-
 ?>

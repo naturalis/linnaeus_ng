@@ -1,6 +1,7 @@
 <?php
 
 	include_once(dirname(__FILE__)."/../BaseClass.php");
+
 	include_once(dirname(__FILE__)."/../../../smarty/Smarty.class.php");
 
 	class Controller extends BaseClass {
@@ -129,7 +130,7 @@
 					array(
 						'controller'=>$this->getControllerBaseName(),
 						'view'=>$this->getViewName()
-					), false, ' order by show_order'
+					), false, 'show_order'
 				);
 			
 		}
@@ -423,7 +424,7 @@
 		private function setLoginStartPage() {
 
 			// "closed" pages that redirect the user towards the login set 'login_start_page' so the user can return after logging in
-			$_SESSION['login_start_page'] = $this->fullPath;		
+			$_SESSION['login_start_page'] = $this->fullPath;
 
 		}
 
@@ -491,7 +492,7 @@
 		}
 
 		public function checkAuthorisation() {
-		
+
 			// check if user is logged in, otherwise redirect to login page
 			if ($this->isUserLoggedIn()) {
 			
@@ -505,7 +506,11 @@
 	
 					} else {
 					
-						$this->redirect('not_authorized.php');
+						$this->redirect(
+							$this->generalSettings['rootWebUrl'].
+							$this->appName.
+							$this->generalSettings['paths']['notAuthorized']
+						);
 
 						/*
 							user is not authorized and redirected to the index.page; 
@@ -514,7 +519,11 @@
 						*/
 						if ($this->getViewName()=='Index') {
 
-							$this->redirect('logout.php');
+							$this->redirect(
+								$this->generalSettings['rootWebUrl'].
+								$this->appName.
+								$this->generalSettings['paths']['logout']
+							);
 
 						} else {
 
@@ -526,7 +535,11 @@
 
 				} else {
 
-					$this->redirect('choose_project.php');
+					$this->redirect(
+						$this->generalSettings['rootWebUrl'].
+						$this->appName.
+						$this->generalSettings['paths']['chooseProject']
+					);
 
 				}
 
@@ -534,8 +547,12 @@
 			
 				$this->setLoginStartPage();
 
-				$this->redirect('login.php');
-			
+				$this->redirect(
+					$this->generalSettings['rootWebUrl'].
+					$this->appName.
+					$this->generalSettings['paths']['login']
+				);
+
 			}
 
 		}

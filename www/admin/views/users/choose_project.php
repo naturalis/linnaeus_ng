@@ -6,6 +6,4 @@
 
 	$c->chooseProjectAction();
 
-	$c->printPage();
-
 ?>

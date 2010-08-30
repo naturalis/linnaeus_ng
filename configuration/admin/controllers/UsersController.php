@@ -12,6 +12,7 @@
 	class UsersController extends Controller {
 
 		public $usedModels = array('user','right','role','project_role_user','project','right_role');
+
 		public $controllerPublicName = 'User administration';
 
 		public function __construct() {
@@ -372,6 +373,7 @@
 			if(count((array)$users)!=1) {
 
 				$this->addError(_('Login failed'));
+				
 
 			} else {
 			
@@ -388,10 +390,14 @@
 				$cur = $this->getCurrentUserRights();
 
 				$this->setUserSession($users[0],$cur['roles'],$cur['rights'],$cur['number_of_projects']);
+				
+				$this->setDefaultProject();
 
 				$this->redirect($this->getLoginStartPage());
 
 			}
+
+			$this->printPage();
 
 		}
 
@@ -412,6 +418,8 @@
 			$this->checkAuthorisation();
 
 			$this->setPageName( _('Index'));
+
+			$this->printPage();
 
 		}
 		
@@ -440,6 +448,8 @@
 			}
 
 			$this->smarty->assign('projects', $this->getCurrentUserProjects());
+
+			$this->printPage();
 
 		}
 
@@ -504,6 +514,8 @@
 						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
 	
 						$this->requestData['active'] = '1';
+
+						$this->requestData['id'] = null;
 	
 						$r = $this->models->User->save($this->requestData);
 
@@ -624,6 +636,8 @@
 
 			$this->smarty->assign('data', $userData);
 
+			$this->printPage();
+
 		}
 
 		public function userOverviewAction() {
@@ -665,7 +679,10 @@
 			$this->sortUserArray($users,$sortBy);
 
 			$this->smarty->assign('sortBy', $sortBy);
+
 			$this->smarty->assign('users', $users);
+
+			$this->printPage();
 
 		}
 
@@ -684,6 +701,8 @@
 				$this->smarty->assign('data', $user);
 
 				$this->smarty->assign('userRole', $upr);
+
+				$this->printPage();
 
 			} else {
 
@@ -814,6 +833,8 @@
 
 				$this->smarty->assign('userRole', $upr);
 
+				$this->printPage();
+
 			} else {
 
 				$this->redirect();
@@ -824,7 +845,15 @@
 		
 		public function notAuthorizedAction() {
 
+			/*
+				users can be redirected to notAuthorizedAction from every controller, 
+				so we hide the controller name in the output to avoid confusion
+			*/
+			$this->smarty->assign('hideControllerPublicName', true);
+
 			$this->addError(_('You are not authorized to do that.'));
+
+			$this->printPage();
 
 		}
 		
@@ -902,6 +931,8 @@
 			}
 			
 			if (count((array)$this->errors) == 0) $this->addMessage('Ok');
+
+			$this->printPage();
 
 		}
 

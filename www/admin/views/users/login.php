@@ -5,7 +5,7 @@
 	$c = new UsersController();
 
 	$c->loginAction();
-
+	
 	$c->printPage();
 
 ?>

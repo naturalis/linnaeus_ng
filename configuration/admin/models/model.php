@@ -11,9 +11,6 @@
 		private $id;
 		public $newId;
 
-		abstract function update($data=false);
-		abstract function insert($data=false);
-
 		public function __construct($tableBaseName = false) {
 
 			parent::__construct();
@@ -141,7 +138,7 @@
 			if (!$this->hasId($data)) return false;
 
 			$this->get();
-			
+
 			if (!$this->data) {
 
 				return $this->insert($data);
@@ -154,8 +151,68 @@
 
 		}
 
-		public function xupdate($data) {
+		public function insert($data) {
 
+			foreach((array)$data as $key => $val) {
+
+				$data[$key] = $this->escapeString($val);
+
+			}
+
+			foreach((array)$data as $key => $val) {
+
+				$d = $this->columns[$key];
+
+				if ($d && !empty($val)) {
+				
+					$fields .= $key.", ";
+
+					if ($d['numeric']==1) {
+
+						$values .= $val.", ";
+
+					} elseif ($d['type']=='datetime') {
+					
+						$values .= $val.", ";
+
+					} else {
+
+						$values .= "'".$val."', ";
+
+					}
+
+				}
+			
+			}
+
+			if (array_key_exists('created',$this->columns) && !array_key_exists('created',$data)) {
+			
+				$fields .= 'created,';
+
+				$values .= 'CURRENT_TIMESTAMP,';
+
+			}
+
+			$query =
+				"insert into ".$this->tableName." (".trim($fields,', ').") values (".trim($values,', ').")";
+
+			//echo '<pre>'.$query;die();
+
+			if (!mysql_query($query)) {
+
+				return mysql_error($this->databaseConnection);
+
+			} else {
+
+				$this->newId = mysql_insert_id($this->databaseConnection);
+
+				return true;
+
+			}
+
+		}
+
+		public function update($data) {
 
 			foreach((array)$data as $key => $val) {
 
@@ -164,7 +221,7 @@
 			}
 
 			$query = "update ".$this->tableName." set ";
-			
+
 			foreach((array)$data as $key => $val) {
 
 				$d = $this->columns[$key];
@@ -204,8 +261,6 @@
 			}
 
 		}
-
-
 
 		public function delete($id = false) {
 
@@ -310,9 +365,9 @@
 
 				}
 
-				$query .= $order ? " ".$order : '';
+				$query .= $order ? " order by ".$order : '';
 
-				//echo $query.'<br />';
+				//echo $query.'<br />';die();
 
 				$set = mysql_query($query);
 
@@ -346,11 +401,11 @@
 
 		}
 
-		public function get($id = false, $cols = false, $order = false ) {
+		public function get($id = false, $cols = false, $order = false, $ignore_case = true ) {
 		
 			unset($this->data);
 
-			$this->set($id ? $id : $this->id, $cols, $order);
+			$this->set($id ? $id : $this->id, $cols, $order, $ignore_case);
 
 			return $this->data;
 

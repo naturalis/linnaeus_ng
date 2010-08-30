@@ -1,13 +1,19 @@
-/*
-id
-controller
-view
-subject
-helptext
-show_order
-created
-last_change
-*/
+CREATE TABLE helptexts (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	controller VARCHAR( 32 ) NOT NULL,
+	view VARCHAR( 32 ) NOT NULL,
+	subject VARCHAR( 64 ) NOT NULL ,
+	helptext TEXT NOT NULL ,
+	show_order int (3),
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id )
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+
+
+RENAME TABLE `helptexts`  TO `dev_helptexts` ;
 
 truncate dev_helptexts;
 

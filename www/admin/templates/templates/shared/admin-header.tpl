@@ -27,7 +27,7 @@
 <div id="admin-titles">
 	<span id="admin-title">{$applicationName} v{$applicationVersion}</span><br />
 {if $session._current_project_name!=''}	<span id="admin-project-title">{$session._current_project_name}</span><br />{/if}
-{if $controllerPublicName!=''}	<span id="admin-apptitle"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
+{if $controllerPublicName!='' && !$hideControllerPublicName}	<span id="admin-apptitle"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
 	<span id="admin-pagetitle">{$pageName}</span>
 </div>
 
