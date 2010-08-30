@@ -2,27 +2,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Login</title>
+<title></title>
 <style type="text/css" media="all">
   @import url("admin/style/main.css");
   @import url("admin/style/admin.css");
 </style>
+<script type="text/javascript" src="admin/javascript/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="admin/javascript/main.js"></script>
 </head>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="admin/images/system/eti-logo.png" id="admin-page-eti-logo" />
+	<img src="admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
+
 </div>
 <div id="admin-page-container">
 
 <div id="admin-titles">
 	<span id="admin-title">Linnaeus NG</span><br />
-	<span id="admin-subtitle">Webroot</span><br />
+	<span id="admin-subtitle"></span>
 </div>
 
 <div id="admin-main">
-	<a href="admin/">Administration</a><br />
-	<a href="app/">Application</a>
+	Welcome to Linnaeus NG.<br /><br />
+	To use the administration, follow  <a href="admin/">this link</a>.<br />
+	To use the application, follow  <a href="app/">this link</a>.<br /><br />
 </div>
 
 </div ends="admin-page-container">

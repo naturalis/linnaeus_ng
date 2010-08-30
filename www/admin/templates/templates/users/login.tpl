@@ -12,11 +12,19 @@
 	<form method="post" action="login.php">
 	<table>
 		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>
-		<tr><td>your username:</td><td><input type="text" name="username" value="" maxlength="32" /></td></tr>
-		<tr><td>your password:</td><td><input type="password" name="password" value="" maxlength="32" /><br /></td></tr>
+		<tr><td>Your username:</td><td><input type="text" name="username" id="username" value="" maxlength="32" /></td></tr>
+		<tr><td>Your password:</td><td><input type="password" name="password" value="" maxlength="32" /><br /></td></tr>
 		<tr><td colspan="2"><input type="submit" value="login" /></td></tr>
 	</table>
 	</form>
 </div>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+	$('#username').focus();
+});
+</script>
+{/literal}
 
 {include file="../shared/admin-footer.tpl"}

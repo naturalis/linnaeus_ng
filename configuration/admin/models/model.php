@@ -112,7 +112,6 @@
 
 		}
 
-
 		private function hasId($data) {
 
 			foreach((array)$data as $col => $val) {
@@ -128,6 +127,12 @@
 			}
 			
 			return false;
+
+		}
+
+		public function escapeString($d) {
+
+			return mysql_real_escape_string($d);
 
 		}
 
@@ -154,7 +159,7 @@
 
 			foreach((array)$data as $key => $val) {
 
-				$data[$key] = mysql_real_escape_string($val);
+				$data[$key] = $this->escapeString($val);
 
 			}
 
@@ -224,7 +229,7 @@
 
 					}
 
-					$query .= ' and '.$col." ".$operator." '". mysql_real_escape_string($val)."'";
+					$query .= ' and '.$col." ".$operator." '". $this->escapeString($val)."'";
 
 					//echo $query.'<br />';
 
@@ -259,15 +264,16 @@
 
 		}
 
-		private function set($id = false, $cols = false, $order = false ) {
+		private function set($id = false, $cols = false, $order = false, $ignore_case = true ) {
 
 			/*
 
-				function can take a single $id to find the corresponding row
-				or an array of column/value-pairs (array('last_name' => 'turing' ))
-				standard operator is '=' but it is possible to tag another operator 
-				after the column-value (array('last_name !=' => 'gates' ))
-				
+				function can take as $id:
+					- a single $id to find the corresponding row
+					- an array of column/value-pairs (array('last_name' => 'turing' ))
+					  standard operator is '=' but it is possible to tag another operator 
+					  after the column-value (array('last_name !=' => 'gates' ))
+					- a full query with %table% as tablename
 				$cols can hold a string that replaces the defualt * in 'select * from...'
 
 			*/
@@ -291,8 +297,16 @@
 						$col = trim(substr($col,0,strpos($col,' ')));
 
 					}
+					
+					if ($ignore_case) {
 
-					$query .= ' and '.$col." ".$operator." '". mysql_real_escape_string($val)."'";
+						$query .= ' and lower('.$col.") ".$operator." '". $this->escapeString(strtolower($val))."'";
+
+					} else {
+
+						$query .= ' and '.$col." ".$operator." '". $this->escapeString($val)."'";
+
+					}
 
 				}
 
@@ -308,21 +322,25 @@
 
 				}
 
-			} elseif ($id+0 == $id) {
+			} elseif (is_numeric($id)) {
 			
-				// is_int won't work here, as mysql returns everything as a string
-
 				$query =
 					'select '.( !$cols ? '*' : $cols).
 					' from '.$this->tableName.
-					' where id ='.mysql_real_escape_string($id).' limit 1'.
+					' where id ='.$this->escapeString($id).' limit 1'.
 					($query .= $order ? ' '.$order : '');
 
 				$this->data = mysql_fetch_assoc(mysql_query($query));
 
 			} else {
 
-				return;
+				$set = mysql_query(str_replace('%table%',$this->tableName,$id));
+
+				while ($row = mysql_fetch_assoc($set)) {
+
+					$this->data[] = $row;
+
+				}
 
 			}
 
