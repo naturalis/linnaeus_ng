@@ -4,7 +4,7 @@
 
 #admin-header-container {
 	background-color:#eee;
-	height:40px;
+	height:80px;
 	width:100%;
 	margin:0px;
 	padding:10px 10px 10px 10px;
@@ -16,8 +16,8 @@
 }
 
 #admin-page-eti-logo {
-	height:25px;
-	margin-top:5px;
+	/* height:25px; */
+	margin-top:0px;
 }
 
 #admin-titles {
@@ -33,10 +33,24 @@
 	font-weight:bold;
 }
 
-#admin-subtitle {
+#admin-apptitle {
 	margin-left:10px;
 	font-size:12px;
 	font-weight:bold;
+}
+
+#admin-apptitle a {
+	text-decoration:none;
+	color:black;
+}
+
+#admin-apptitle a:hover {
+	text-decoration:underline;
+}
+
+#admin-pagetitle {
+	margin-left:10px;
+	font-size:12px;
 }
 
 #admin-project-title {
@@ -46,12 +60,17 @@
 	font-weight:bold;
 }
 
-#admin-messages,#admin-errors {
+#admin-logged-in-as {
+	margin-left:10px;
+	font-size:12px;
+}
+
+#admin-messages,#admin-errors,#admin-no-errors{
 	margin-left:10px;
 	margin-top:10px;
 	padding:5px 5px 5px 5px;
 	border:1px dotted black;
-	width:300px;
+	width:350px;
 }
 
 #admin-errors {
@@ -62,10 +81,17 @@
 	 color: red;
 }
 
-.admin-message-error {
-	 color: red;
+.admin-message-no-error {
+	 color: green;
 }
 
+.admin-message-existing-user {
+	 color: #900;
+}
+
+.admin-required-field-asterisk {
+	font-weight:bold;
+}
 
 #admin-main {
 	margin:10px 10px 10px 10px;

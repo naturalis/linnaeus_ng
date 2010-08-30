@@ -160,11 +160,11 @@ INSERT INTO dev_rights_roles VALUES (NULL, 7, 3, CURRENT_TIMESTAMP );
 
 INSERT INTO dev_users (
 id ,username ,password ,first_name ,last_name ,gender ,email_address ,active ,last_login ,logins ,password_changed ,last_change ,created
-) VALUES ( NULL , 'mdschermer', md5('balance'), 'Maarten', 'Schermer', 'm', 'maarten.schermer@xs4all.nl', '1', NULL , '0', NULL ,
+) VALUES ( 1, 'mdschermer', md5('balance'), 'Maarten', 'Schermer', 'm', 'maarten.schermer@xs4all.nl', '1', NULL , '0', NULL ,
 CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
 INSERT INTO dev_users (
 id ,username ,password ,first_name ,last_name ,gender ,email_address ,active ,last_login ,logins ,password_changed ,last_change ,created
-) VALUES ( NULL , 'jlborges', md5('ficiones'), 'Jorge Luis', 'Borges', 'm', 'slavlab@xs4all.nl', '1', NULL , '0', NULL ,
+) VALUES ( 2 , 'jlborges', md5('ficiones'), 'Jorge Luis', 'Borges', 'm', 'slavlab@xs4all.nl', '1', NULL , '0', NULL ,
 CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
 
 

@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-26 15:02:55
+<?php /* Smarty version 2.6.26, created on 2010-08-30 10:57:41
          compiled from login.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -42,12 +42,21 @@ $this->_sections['error']['last']       = ($this->_sections['error']['iteration'
 	<form method="post" action="login.php">
 	<table>
 		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>
-		<tr><td>your username:</td><td><input type="text" name="username" value="" maxlength="32" /></td></tr>
-		<tr><td>your password:</td><td><input type="password" name="password" value="" maxlength="32" /><br /></td></tr>
+		<tr><td>Your username:</td><td><input type="text" name="username" id="username" value="" maxlength="32" /></td></tr>
+		<tr><td>Your password:</td><td><input type="password" name="password" value="" maxlength="32" /><br /></td></tr>
 		<tr><td colspan="2"><input type="submit" value="login" /></td></tr>
 	</table>
 	</form>
 </div>
+
+<?php echo '
+<script type="text/JavaScript">
+$(document).ready(function(){
+	$(\'#username\').focus();
+});
+</script>
+'; ?>
+
 
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-footer.tpl", 'smarty_include_vars' => array()));

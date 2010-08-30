@@ -2,10 +2,13 @@
 <div id="admin-footer-container">
 {if !$excludecludeBottonMenu}
 	<div id="admin-footer-menu">
-		<a href="index.php">User management index</a>
-		<a href="/admin/admin-index.php">Main index</a>
-		<a href="choose_project.php">Switch projects</a>
-		<a href="logout.php">Log out</a>
+		<a href="{$rootWebUrl}admin/admin-index.php">Main index</a>
+{if $session.user._number_of_projects > 1}
+		<a href="{$rootWebUrl}admin/views/users/choose_project.php">Switch projects</a>
+{/if}
+		<a href="{$rootWebUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>
+		<br />
+{/if}
 	</div>
 {/if}
 </div ends="admin-footer-container">

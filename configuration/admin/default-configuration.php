@@ -2,7 +2,7 @@
 
 	class configuration {
 
-		const smartyRoot = 'C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/admin/templates/';
+		const smartyRoot = 'URL.SMARTYPATH';
 
 		public function getGeneralSettings() {
 
@@ -20,7 +20,7 @@
 		public function getDatabaseSettings() {
 
 			return array(
-				'host' => '127.0.0.1',
+				'host' => 'DB.HOST',
 				'user' => 'linnaeus_user',
 				'password' => 'car0lu5',
 				'database' => 'linnaeus_ng',

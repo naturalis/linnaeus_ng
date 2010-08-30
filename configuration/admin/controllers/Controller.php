@@ -21,7 +21,7 @@
 		public $sortDirection;
 		public $sortCaseSensitivity;
 		private $helpTexts;
-
+		public $controllerPublicName;
 
 		private $usedModelsBase = array('helptext');
 
@@ -71,8 +71,7 @@
 		private function setNames() {
 
 			$this->fullPath = $_SERVER['PHP_SELF'];
-
-			$path = pathinfo($this->fullPath);
+			$path = pathinfo(substr_replace($this->fullPath,'',0,strlen($this->generalSettings['rootWebUrl'])-1));
 			//$this->viewName = ucfirst($path['filename']);
 			$this->viewName = $path['filename'];
 
@@ -109,7 +108,7 @@
 
 		private function loadModels() {
 		
-			$d = array_unique(array_merge($this->usedModelsBase,$this->usedModels));
+			$d = array_unique(array_merge((array)$this->usedModelsBase,(array)$this->usedModels));
 
 			foreach((array)$d as $key) {
 
@@ -201,8 +200,8 @@
 
 			$this->smarty->assign('debugMode', $this->debugMode);
 
-			$this->smarty->assign('webroot', $this->generalSettings['webroot']);
-
+			$this->smarty->assign('rootWebUrl', $this->generalSettings['rootWebUrl']);
+			$this->smarty->assign('controllerPublicName', $this->controllerPublicName);
 			$this->smarty->assign('session', $_SESSION);
 
 			$this->smarty->assign('errors', $this->getErrors());
@@ -280,7 +279,7 @@
 		}
 
 
-		/* set and get app, view, controller names (most set functions in initialise block) */
+		/* set and get app, view, controller names (most set functions are in initialise block) */
 		public function getControllerBaseName() {
 
 			return $this->controllerBaseName;
@@ -345,43 +344,13 @@
 
 		}
 
-		public function getCurrentUserRights() {
-
-			$pru = $this->models->ProjectRoleUser->get(array('user_id' => $this->getCurrentUserId()));
-
-			foreach((array)$pru as $key => $val) {
-
-				$p = $this->models->Project->get($val['project_id']);
-				
-				$pru[$key]['project_name'] = $p['name'];
-
-				$r = $this->models->Role->get($val['role_id']);
-
-				$pru[$key]['role_name'] = $r['role'];
-
-				$pru[$key]['role_description'] = $r['description'];
-
-				$rr = $this->models->RightRole->get(array('role_id' => $val['role_id']));
-				
-				foreach((array)$rr as $rr_key => $rr_val) {
-
-					$r = $this->models->Right->get($rr_val['right_id']);
-
-					$rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-
-				}				
-
-			}
-
-			return array('roles' => $pru,'rights' => $rs);
-
-		}
 
 		public function setCurrentProjectId($id) {
 
 			$_SESSION['_current_project_id'] = $id;
 
 		}
+
 
 		public function getCurrentProjectId() {
 
@@ -411,16 +380,56 @@
 		
 		}
 
+		public function setDefaultProject() {
+
+			$d = (array)$_SESSION['user']['_roles'];
+
+			// if user has no roles, do nothing
+			if (count($d) == 0) return;
+
+			// if user has only one role, set the corresponding project as the active project
+			if (count($d) == 1) {
+
+				$this->setCurrentProjectId($d[0]['project_id']);
+
+			}
+			// if user has more roles, set the project in which he has the lowest role_id as the active project
+			else {
+
+				$t = false;
+			
+				foreach((array)$d as $key => $val) {
+					
+					if (!$t || $val['role_id'] < $t) { 
+
+						$t = $val['role_id'];
+						
+						$p = $val['project_id'];
+
+					}
+
+				}
+
+				$this->setCurrentProjectId($p);
+
+			}
+			
+			$this->setCurrentProjectName();
+
+		}
+
 
 		/* logging in and out */
 		private function setLoginStartPage() {
 
+			// "closed" pages that redirect the user towards the login set 'login_start_page' so the user can return after logging in
 			$_SESSION['login_start_page'] = $this->fullPath;		
 
 		}
 
 		public function getLoginStartPage() {
 
+			// "closed" pages that redirected the user towards the login have set $_SESSION['login_start_page']
 			if ($_SESSION['login_start_page']) {
 
 				return $_SESSION['login_start_page'];
@@ -428,21 +437,22 @@
 			} else {
 
 				//return 'index.php';
-				return '/'.$this->getAppName().'/'.$this->getAppName().'-index.php';
+				return $this->generalSettings['rootWebUrl'].$this->getAppName().'/'.$this->getAppName().'-index.php';
 						
 			}
 
 		}
 
-		public function setUserSession($userData,$userRolesAndRights) {
+		public function setUserSession($userData,$roles,$rights,$numberOfProjects) {
 
 			if (!$userData) return;
 
 			$userData['_login']['time'] = time();
 			$userData['_login']['remember'] = false;
 
-			$userData['_roles'] = $userRolesAndRights['roles'];
-			$userData['_rights'] = $userRolesAndRights['rights'];
+			$userData['_roles'] = $roles;
+			$userData['_rights'] = $rights;
+			$userData['_number_of_projects'] = $numberOfProjects;
 
 			$_SESSION['user'] = $userData;
 
@@ -456,7 +466,7 @@
 
 
 		/* authorization etc. */
-		private function isUserLoggedIn() {
+		public function isUserLoggedIn() {
 
 			return (isset($_SESSION['user']) && $_SESSION['user'] != '');
 
