@@ -38,12 +38,36 @@ CREATE TABLE projects_roles_users (
 	user_id  )
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
+CREATE TABLE modules_projects_users (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	module_id INT( 11 ) NOT NULL ,
+	project_id INT( 11 ) NOT NULL ,
+	user_id INT( 11 ) NOT NULL ,
+	PRIMARY KEY ( id ) ,
+	UNIQUE (
+	module_id ,
+	project_id ,
+	user_id  )
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+CREATE TABLE free_modules_projects_users (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	free_module_id INT( 11 ) NOT NULL ,
+	project_id INT( 11 ) NOT NULL ,
+	user_id INT( 11 ) NOT NULL ,
+	PRIMARY KEY ( id ) ,
+	UNIQUE (
+	free_module_id ,
+	project_id ,
+	user_id  )
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
 
 
 RENAME TABLE `users`  TO `dev_users` ;
 RENAME TABLE `projects_roles_users`  TO `dev_projects_roles_users` ;
-
-
+RENAME TABLE `modules_projects_users`  TO `dev_modules_projects_users` ;
+RENAME TABLE `free_modules_projects_users`  TO `free_modules_projects_users` ;
 
 INSERT INTO dev_users (
 id ,username ,password ,first_name ,last_name ,gender ,email_address ,active ,last_login ,logins ,password_changed ,last_change ,created

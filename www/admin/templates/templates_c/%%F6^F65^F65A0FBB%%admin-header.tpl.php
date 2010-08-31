@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-08-30 19:57:51
+<?php /* Smarty version 2.6.26, created on 2010-08-31 18:37:31
          compiled from ../shared/admin-header.tpl */ ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -31,7 +31,9 @@ admin/javascript/main.js"></script>
 <body><div id="admin-body-container">
 <div id="admin-header-container">
 	<img src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
-admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
+admin/images/system/linnaeus_logo.png" id="admin-page-lng-logo" />
+	<img src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
+admin/images/system/eti_logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 

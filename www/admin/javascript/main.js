@@ -35,3 +35,107 @@ function remoteValueCheck(id,values,tests,idti) {
 	});
 
 }
+
+function moduleAction(ele,removeIds) {
+
+	var dummy = ele.id.replace('cell-','');
+	var id = dummy.substr(0,dummy.length-1);
+	var classname = ($('#'+ele.id).attr('class'));
+	var modulename = $('#cell-'+id+'e').html();
+
+	if (classname == 'admin-td-module-activate') var action = 'activate';
+	else
+	if (classname == 'admin-td-module-reactivate') var action = 'reactivate';
+	else
+	if (classname == 'admin-td-module-deactivate') var action = 'deactivate';
+	else
+	if (classname == 'admin-td-module-delete') var action = 'delete';
+	else return;
+	
+	if (action == 'delete') {
+
+		if (confirm(
+			'Are you sure you want to delete the module "'+modulename+'"?\n'+
+			'When you delete the module, all corresponding data will be irreversibly deleted.'
+			)) {
+
+			if (!confirm(
+				'Final confirmation:\n'+
+				'Are you sure you want to delete the module "'+modulename+'"?\n'+
+				'All corresponding data will be irreversibly deleted.'
+				)) {
+	
+				return;
+
+			}
+
+		}
+
+	}
+
+	$.ajax({ url:"ajax_interface.php?v=modules&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id),
+		success: function(data){
+
+			if (data=='<ok>') {
+				switch(action) {
+					case 'activate':
+					case 'reactivate':
+						var classa = 'admin-td-module-inuse';
+						var classb = 'admin-td-module-deactivate';
+						var classc = 'admin-td-module-invisible';	  
+						var classd = 'admin-td-module-title-inuse';	  
+						var titlea = 'in use in your project';
+						var titleb = 'deactivate (no data will be deleted)';
+						var titlec = '';
+						break;
+					case 'deactivate':
+						var classa = 'admin-td-module-inactive';
+						var classb = 'admin-td-module-reactivate';
+						var classc = 'admin-td-module-delete';	  
+						var classd = 'admin-td-module-title-deactivated';	  
+						var titlea = 'in use in your project, but inactive';
+						var titleb = 're-activate';
+						var titlec = 'delete module and data';
+						break;
+					case 'delete':
+						var classa = 'admin-td-module-unused';
+						var classb = 'admin-td-module-activate';	  
+						var classc = 'admin-td-module-invisible';	  
+						var classd = 'admin-td-module-title-unused';	  
+						var titlea = 'not in use in your project';
+						var titleb = 'activate';
+						var titlec = '';
+						break;
+				}
+
+				$('#cell-'+id+'a').removeClass().addClass(classa);
+				$('#cell-'+id+'b').removeClass().addClass(classb);
+				$('#cell-'+id+'c').removeClass().addClass(classc);
+				$('#cell-'+id+'d').removeClass().addClass(classd);
+
+				$('#cell-'+id+'a').attr('title',titlea);
+				$('#cell-'+id+'b').attr('title',titleb);
+				$('#cell-'+id+'c').attr('title',titlec);
+				
+				if (action == 'delete' && removeIds) {
+					for(var i=0;i<=removeIds.length;i++) {
+
+						$('#'+removeIds[i]).remove();
+
+					}
+
+				}
+				
+				if (id.substr(0,1)=='f') {
+									
+					$('#new-input').removeClass().addClass('admin-module-new-input');
+
+				}
+
+			}
+
+		}
+
+	});
+
+}

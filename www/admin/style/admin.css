@@ -15,9 +15,16 @@
 	margin-top:10px;
 }
 
-#admin-page-eti-logo {
+#admin-page-lng-logo {
 	/* height:25px; */
 	margin-top:0px;
+}
+
+#admin-page-eti-logo {
+	position:absolute;
+	height:55px;
+	margin-top:16px;
+	margin-left:10px;
 }
 
 #admin-titles {
@@ -120,12 +127,102 @@
 	text-decoration:underline;
 }
 
+.admin-text-block {
+	margin-bottom:10px;
+}
+
 .admin-module-name {
+}
+
+.admin-module-name-inuse {
+	background-color:#efe;
+}
+
+.admin-td-module-unused,
+.admin-td-module-activate,
+.admin-td-module-reactivate,
+.admin-td-module-inuse,
+.admin-td-module-deactivate,
+.admin-td-module-inactive,
+.admin-td-module-delete,
+.admin-td-module-invisible,
+.admin-td-moduser-inactive,
+.admin-td-moduser-active,
+.admin-td-moduser-add,
+.admin-td-moduser-remove {
+	background-image:url(../images/system/icons/user-gray.png);
+	background-repeat:no-repeat;
+	width:16px;
+}
+
+
+
+
+.admin-td-module-activate,.admin-td-module-reactivate {
+	background-image:url(../images/system/icons/module-activate.png);
+	cursor:pointer;
+}
+
+.admin-td-module-inuse {
+	background-image:url(../images/system/icons/module-inuse.png);
+}
+
+.admin-td-module-deactivate {
+	background-image:url(../images/system/icons/module-deactivate.png);
+	cursor:pointer;
+}
+
+.admin-td-module-inactive {
+	background-image:url(../images/system/icons/module-inactive.png);
+}
+
+.admin-td-module-delete {
+	background-image:url(../images/system/icons/module-delete.png);
+	cursor:pointer;
+}
+
+.admin-td-module-invisible {
+	background-image:none;
+}
+
+
+.admin-td-moduser-active {
+	background-image:url(../images/system/icons/user.png);
+}
+
+.admin-td-moduser-add {
+	background-image:url(../images/system/icons/user-plus.png);
+	cursor:pointer;
+}
+
+.admin-td-moduser-remove {
+	background-image:url(../images/system/icons/user-minus.png);
+	cursor:pointer;
+}
+
+.admin-td-module-title-unused,.admin-td-module-title-inuse,.admin-td-module-title-deactivated {
+	color:#888;
+}
+
+.admin-td-module-title-inuse {
+	color:#000;
 	font-weight:bold;
 }
 
-.admin-text-block {
-	margin-bottom:10px;
+.admin-td-module-title-deactivated {
+	color:#444;
+}
+
+.admin-td-module-title {
+	font-variant:small-caps;
+}
+
+
+.admin-module-new-input {
+}
+
+.admin-module-new-input-hidden {
+	visibility:collapse;
 }
 
 #inlineHelp {

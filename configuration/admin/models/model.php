@@ -212,7 +212,7 @@
 
 		}
 
-		public function update($data) {
+		public function update($data, $where = false) {
 
 			foreach((array)$data as $key => $val) {
 
@@ -246,9 +246,40 @@
 			
 			}
 			
-			$query .= " id = id where id = ".$data['id'];
+			$query = rtrim($query,', ');
 
-			//echo '<pre>'.$query;
+			if (!$where) {
+
+				$query .= " where id = ".$data['id'];
+
+			} else 
+			if (is_array($where)) {
+
+				$query .= " where id = id ";
+
+				foreach((array)$where as $col => $val) {
+
+					if (strpos($col,' ')===false) {
+
+						$operator = '=';
+
+					} else {
+
+						$operator = trim(substr($col,strpos($col,' ')));
+
+						$col = trim(substr($col,0,strpos($col,' ')));
+
+					}
+
+					$query .= ' and '.$col." ".$operator." '". $this->escapeString($val)."'";
+
+					//echo $query.'<br />';
+
+				}
+				
+			}
+
+			//echo $query;die();
 
 			if (!mysql_query($query)) {
 

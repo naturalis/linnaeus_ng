@@ -17,7 +17,13 @@
 					'logout' => '/views/users/logout.php',
 					'chooseProject' => '/views/users/choose_project.php',
 					'notAuthorized' => '/views/users/not_authorized.php'
-				)	
+				),
+				'defaultUploadFilemask' => array(
+					'jpg',
+					'jpeg',
+					'png'
+				),
+				'defaultUploadMaxSize' => 1000000
 			);
 			// hard paths are necessary as they are called from all over the place and used by functions in the base controller
 

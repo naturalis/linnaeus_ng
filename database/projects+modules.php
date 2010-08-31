@@ -1,13 +1,13 @@
 CREATE TABLE projects (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
-	name VARCHAR( 64 ) NOT NULL ,
-	version VARCHAR( 16 ) NOT NULL ,
-	description TEXT NOT NULL ,
+	sys_name VARCHAR( 64 ) NOT NULL ,
+	sys_description TEXT NOT NULL ,
+	title VARCHAR( 64 ) NOT NULL ,
+	logo_path VARCHAR( 255 ) ,
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id )
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
-
 
 CREATE TABLE modules (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
@@ -19,7 +19,6 @@ CREATE TABLE modules (
 	last_change TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id )
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
-
 
 CREATE TABLE modules_projects (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
@@ -35,6 +34,7 @@ CREATE TABLE free_modules_projects (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
 	project_id INT( 11 ) NOT NULL  ,
 	module VARCHAR( 32 ) NOT NULL ,
+	description TEXT NULL ,
 	active enum ('y','n') default 'y' not null,
 	created DATETIME NOT NULL ,
 	PRIMARY KEY ( id ) ,
@@ -49,8 +49,8 @@ RENAME TABLE `modules_projects`  TO `dev_modules_projects` ;
 RENAME TABLE `free_modules_projects`  TO `dev_free_modules_projects` ;
 
 
-insert into dev_projects values (null,'Polar Bears of Amsterdam','first beta','Ursus maritimus in the nation\'s capital',now(),null);
-insert into dev_projects values (null,'Imaginary Beings','v1.0','See Borges',now(),null);
+insert into dev_projects values (null,'Polar Bears of Amsterdam','Ursus maritimus in the nation\'s capital','Polar Bears of Amsterdam',null,now(),null);
+insert into dev_projects values (null,'Imaginary Beings','Borges bestiarium','Imaginary Beings',null,now(),null);
 
 
 insert into dev_modules values (null,'Introduction','Comprehensive project introduction','Species',0,current_timestamp,current_timestamp);
