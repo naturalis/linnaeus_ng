@@ -23,6 +23,7 @@
 		public $sortCaseSensitivity;
 		private $helpTexts;
 		public $controllerPublicName;
+		public $randomValue;
 
 		private $usedModelsBase = array('helptext');
 
@@ -44,7 +45,11 @@
 
 			$this->loadModels();
 
+			$this->loadHelpers();
+
 			$this->setHelpTexts();
+			
+			$this->setMiscellaneous();
 
 		}
 
@@ -100,10 +105,12 @@
 			$this->smarty->compile_check = $this->smartySettings['compile_check'];
 
 		}
-
+		
 		private function setRequestData() {
 
 			$this->requestData = $_REQUEST;
+
+			$this->requestDataFiles = $_FILES;
 
 		}
 
@@ -112,12 +119,42 @@
 			$d = array_unique(array_merge((array)$this->usedModelsBase,(array)$this->usedModels));
 
 			foreach((array)$d as $key) {
+			
+				if (file_exists(dirname(__FILE__).'/../models/'.$key.'.php')) {
 
-				require_once(dirname(__FILE__).'/../models/'.$key.'.php');
+					require_once(dirname(__FILE__).'/../models/'.$key.'.php');
+	
+					$t = str_replace(' ','',ucwords(str_replace('_',' ',$key)));
+	
+	
+					if (class_exists($t)) {
 
-				$d = str_replace(' ','',ucwords(str_replace('_',' ',$key)));
+						$this->models->$t = new $t();
 
-				$this->models->$d = new $d();
+					}
+				}
+
+			}
+
+		}
+
+		private function loadHelpers() {
+
+			foreach((array)$this->usedHelpers as $key) {
+			
+				if (file_exists(dirname(__FILE__).'/../helpers/'.$key.'.php')) {
+	
+					require_once(dirname(__FILE__).'/../helpers/'.$key.'.php');
+	
+					$d = str_replace(' ','',ucwords(str_replace('_',' ',$key)));
+	
+					if (class_exists($d)) {
+
+						$this->helpers->$d = new $d();
+					
+					}
+
+				}
 
 			}
 
@@ -133,6 +170,17 @@
 					), false, 'show_order'
 				);
 			
+		}
+		
+		
+		private function setMiscellaneous() {
+
+			$this->setDefaultUploadFilemask();
+
+			$this->setDefaultUploadMaxSize();
+
+			$this->setRandomValue();
+
 		}
 
 
@@ -204,6 +252,9 @@
 			$this->smarty->assign('rootWebUrl', $this->generalSettings['rootWebUrl']);
 			$this->smarty->assign('controllerPublicName', $this->controllerPublicName);
 			$this->smarty->assign('session', $_SESSION);
+
+			$this->smarty->assign('rnd', $this->getRandomValue());
+
 
 			$this->smarty->assign('errors', $this->getErrors());
 			$this->smarty->assign('messages', $this->getMessages());
@@ -634,6 +685,45 @@
 
 		}
 
+
+		/**/
+		private function setRandomValue() {
+
+			$this->randomValue = mt_rand(9999999,mt_getrandmax());
+
+		}
+
+		private function getRandomValue() {
+
+			return $this->randomValue;
+
+		}
+		
+		private function setDefaultUploadFilemask() {
+		
+			$this->defaultUploadFilemask = $this->generalSettings['defaultUploadFilemask'];
+		
+		}
+		
+		public function getDefaultUploadFilemask() {
+		
+			return $this->defaultUploadFilemask;
+		
+		}
+		
+		
+		private function setDefaultUploadMaxSize() {
+		
+			$this->defaultUploadMaxSize = $this->generalSettings['defaultUploadMaxSize'];
+		
+		}
+		
+		public function getDefaultUploadMaxSize() {
+		
+			return $this->defaultUploadMaxSize;
+		
+		}
+	
 
 	}
 

@@ -12,7 +12,7 @@
 <ul class="admin-list">
 {section name=i loop=$projects}
 <li>
-	<a href="?project_id={$projects[i].id}">{$projects[i].name}</a>
+	<a href="?project_id={$projects[i].id}">{$projects[i].sys_name}</a>
 {if $session._current_project_id==$projects[i].id}<span title="current active project">*</span>{/if}
 </li>
 {/section}

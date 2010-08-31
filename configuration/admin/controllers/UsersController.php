@@ -35,7 +35,7 @@
 			
 				$p = $this->models->Project->get($val['project_id']);
 				
-				$pru[$key]['project_name'] = $p['name'];
+				$pru[$key]['project_name'] = $p['sys_name'];
 
 				$r = $this->models->Role->get($val['role_id']);
 

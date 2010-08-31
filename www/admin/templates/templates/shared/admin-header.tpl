@@ -20,7 +20,8 @@
 
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
+	<img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="admin-page-lng-logo" />
+	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 

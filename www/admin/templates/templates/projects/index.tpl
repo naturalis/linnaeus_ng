@@ -4,6 +4,7 @@
 <ul class="admin-list">
 	<li><a href="data.php">Define basic project data</a></li>
 	<li><a href="modules.php">Define project modules</a></li>
+	<li><a href="collaborators.php">Connect collaborators to modules</a></li>
 </ul>
 </div>
 
