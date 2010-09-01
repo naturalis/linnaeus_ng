@@ -1,5 +1,5 @@
 215
-a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283329420;s:7:"expires";i:1283333020;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283335356;s:7:"expires";i:1283338956;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -45,14 +45,14 @@ a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-head
 	<th></th>
 </tr>
 <tr>
-	<td>4</td>
-	<td>Wouter</td>
-	<td>Addink</td>
+	<td>13</td>
+	<td>IJs</td>
+	<td>Beer</td>
 	<td>m</td>
-	<td>waddink@eti.uva.nl</td>
+	<td>ijsbeer@thirdeyefoundation.com</td>
 	<td>Contributor</td>
-	<td>[<a href="view.php?id=4">view</a>]</td>
-	<td>[<a href="edit.php?id=4">edit</a>]</td>
+	<td>[<a href="view.php?id=13">view</a>]</td>
+	<td>[<a href="edit.php?id=13">edit</a>]</td>
 </tr>
 <tr>
 	<td>2</td>
@@ -63,6 +63,16 @@ a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-head
 	<td>Lead expert</td>
 	<td>[<a href="view.php?id=2">view</a>]</td>
 	<td>[<a href="edit.php?id=2">edit</a>]</td>
+</tr>
+<tr>
+	<td>11</td>
+	<td>Gideon</td>
+	<td>Gijswijt</td>
+	<td>m</td>
+	<td>ggijswijt@eti.uva.nl</td>
+	<td>Contributor</td>
+	<td>[<a href="view.php?id=11">view</a>]</td>
+	<td>[<a href="edit.php?id=11">edit</a>]</td>
 </tr>
 <tr>
 	<td>1</td>

@@ -83,8 +83,8 @@
 			$this->viewName = $path['filename'];
 
 			$dirs = explode('/',$path['dirname']);
-			if (isset($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
-			if (isset($dirs[1])) $this->appName = strtolower($dirs[1]);
+			if (!empty($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
+			if (!empty($dirs[1])) $this->appName = strtolower($dirs[1]);
 			//$this->controllerName = ucfirst($this->getControllerBaseName()).'Controller';
 
 		}
@@ -524,7 +524,7 @@
 		/* authorization etc. */
 		public function isUserLoggedIn() {
 
-			return (isset($_SESSION['user']) && $_SESSION['user'] != '');
+			return (!empty($_SESSION['user']));
 
 		}
 		

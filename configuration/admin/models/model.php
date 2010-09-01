@@ -139,7 +139,7 @@
 
 			$this->get();
 
-			if (!$this->data) {
+			if (empty($this->data)) {
 
 				return $this->insert($data);
 
@@ -158,6 +158,10 @@
 				$data[$key] = $this->escapeString($val);
 
 			}
+			
+			$fields = null;
+
+			$values = null;
 
 			foreach((array)$data as $key => $val) {
 
@@ -223,6 +227,8 @@
 			$query = "update ".$this->tableName." set ";
 
 			foreach((array)$data as $key => $val) {
+
+				if (!isset($this->columns[$key])) continue;
 
 				$d = $this->columns[$key];
 

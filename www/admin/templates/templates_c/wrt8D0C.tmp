@@ -1,21 +1,14 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-01 12:32:05
+<?php /* Smarty version 2.6.26, created on 2010-08-27 13:37:03
          compiled from ../shared/admin-footer.tpl */ ?>
 </div ends="admin-page-container">
 <div id="admin-footer-container">
 <?php if (! $this->_tpl_vars['excludecludeBottonMenu']): ?>
 	<div id="admin-footer-menu">
+		<a href="index.php">User management index</a>
 		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
 admin/admin-index.php">Main index</a>
-<?php if ($this->_tpl_vars['session']['user']['_number_of_projects'] > 1): ?>
-		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
-admin/views/users/choose_project.php">Switch projects</a>
-<?php endif; ?>
-		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
-admin/views/users/logout.php">Log out (logged in as <?php if ($this->_tpl_vars['session']['user']['last_name'] != ''): ?><?php echo $this->_tpl_vars['session']['user']['first_name']; ?>
- <?php echo $this->_tpl_vars['session']['user']['last_name']; ?>
-)</a>
-		<br />
-<?php endif; ?>
+		<a href="choose_project.php">Switch projects</a>
+		<a href="logout.php">Log out</a>
 	</div>
 <?php endif; ?>
 </div ends="admin-footer-container">

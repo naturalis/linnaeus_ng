@@ -353,47 +353,46 @@
 			$this->smarty->assign('excludecludeBottonMenu',true);
 
 			if (
-				(!isset($this->requestData['username']) || $this->requestData['username']=='') && 
-				(!isset($this->requestData['password']) || $this->requestData['password']=='')
-				) {
+				(isset($this->requestData['username']) && $this->requestData['username']!='') || 
+				(isset($this->requestData['password']) && $this->requestData['password']!='')
+				) 
+			{
 
-				return;
-
-			}
-
-			$users = 
-				$this->models->User->get(
-					array(
-						'username' => $this->requestData['username'],
-						'password' => $this->userPasswordEncode($this->requestData['password']),
-						'active' => '1'
-						)
-					);
-
-			if(count((array)$users)!=1) {
-
-				$this->addError(_('Login failed'));
+				$users = 
+					$this->models->User->get(
+						array(
+							'username' => $this->requestData['username'],
+							'password' => $this->userPasswordEncode($this->requestData['password']),
+							'active' => '1'
+							)
+						);
+	
+				if(count((array)$users)!=1) {
+	
+					$this->addError(_('Login failed'));
+					
+	
+				} else {
 				
-
-			} else {
-			
-				$this->setCurrentUserId($users[0]);
-
-				$this->models->User->save(
-					array(
-						'id' => $this->getCurrentUserId(),
-						'last_login' => 'now()',
-						'logins' => 'logins+1'
-						)
-					);
-
-				$cur = $this->getCurrentUserRights();
-
-				$this->setUserSession($users[0],$cur['roles'],$cur['rights'],$cur['number_of_projects']);
-				
-				$this->setDefaultProject();
-
-				$this->redirect($this->getLoginStartPage());
+					$this->setCurrentUserId($users[0]);
+	
+					$this->models->User->save(
+						array(
+							'id' => $this->getCurrentUserId(),
+							'last_login' => 'now()',
+							'logins' => 'logins+1'
+							)
+						);
+	
+					$cur = $this->getCurrentUserRights();
+	
+					$this->setUserSession($users[0],$cur['roles'],$cur['rights'],$cur['number_of_projects']);
+					
+					$this->setDefaultProject();
+	
+					$this->redirect($this->getLoginStartPage());
+	
+				}
 
 			}
 

@@ -150,13 +150,10 @@
 .admin-td-moduser-active,
 .admin-td-moduser-add,
 .admin-td-moduser-remove {
-	background-image:url(../images/system/icons/user-gray.png);
+	background-image:url(../images/system/icons/module-unused.png);
 	background-repeat:no-repeat;
 	width:16px;
 }
-
-
-
 
 .admin-td-module-activate,.admin-td-module-reactivate {
 	background-image:url(../images/system/icons/module-activate.png);
@@ -185,17 +182,8 @@
 	background-image:none;
 }
 
-
 .admin-td-moduser-inactive {
-	cursor:pointer;
-}
-
-.admin-td-moduser-active {
-	background-image:url(../images/system/icons/user.png);
-}
-
-.admin-td-moduser-add {
-	background-image:url(../images/system/icons/user-plus.png);
+	background-image:url(../images/system/icons/user-gray.png);
 	cursor:pointer;
 }
 

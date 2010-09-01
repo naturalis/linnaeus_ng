@@ -49,7 +49,7 @@ hard coded number of free modules
 
 			$this->setPageName( _('Project modules'));
 			
-			if ($this->requestData['module_new']) {
+			if (!empty($this->requestData['module_new'])) {
 
 				$fmp = $this->models->FreeModuleProject->get(array('project_id'=>$this->getCurrentProjectId()));
 
@@ -133,7 +133,7 @@ hard coded number of free modules
 				$fpu = $this->models->FreeModuleProjectUser->get(
 					array(
 						'project_id' => $this->getCurrentProjectId(),
-						'free_module_id' => $val['module_id']
+						'free_module_id' => $val['id']
 					)
 				);
 
@@ -204,13 +204,13 @@ hard coded number of free modules
 
 		public function ajaxInterfaceAction() {
 
-			$view  = $this->requestData['v'];
-			
-			$id = $this->requestData['i'];
+			$view  = !empty($this->requestData['v']) ? $this->requestData['v'] : null;
 
-			$user = $this->requestData['u'];
+			$id = !empty($this->requestData['i']) ? $this->requestData['i'] : null;
 
-			$action  = $this->requestData['a'];
+			$user = !empty($this->requestData['u']) ? $this->requestData['u'] : null;
+
+			$action  = !empty($this->requestData['a']) ? $this->requestData['a'] : null;
 
 			if (!$view) return;
 		
@@ -220,6 +220,10 @@ hard coded number of free modules
 				$t = 'free';
 				
 				$id = substr($id,1);
+
+			} else {
+
+				$t = false;
 
 			}
 
