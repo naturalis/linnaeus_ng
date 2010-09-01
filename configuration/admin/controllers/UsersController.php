@@ -175,9 +175,9 @@
 
 		private function isPasswordCorrect($password = false, $password_2 = false) {
 
-			if (!$password) $password = $this->requestData['password'];
+			if (!$password) $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
 
-			if (!$password_2) $password_2 = $this->requestData['password_2'];
+			if (!$password_2) $password_2 = isset($this->requestData['password_2']) ? $this->requestData['password_2'] : null;
 
 			$result  = true;
 		
@@ -212,7 +212,7 @@
 
 		private function isEmailAddressCorrect($email_address = false) {
 
-			if (!$email_address) $email_address = $this->requestData['email_address'];
+			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
 
 			$result  = true;
 
@@ -246,7 +246,7 @@
 
 		private function isUsernameUnique($username = false, $idToIgnore = false) {
 
-			if (!$username) $username = $this->requestData['username'];
+			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
 
 			$result  = true;
 
@@ -284,7 +284,7 @@
 
 		private function isEmailAddressUnique($email_address = false, $idToIgnore = false, $suppress_error = false) {
 
-			if (!$email_address) $email_address = $this->requestData['email_address'];
+			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
 
 			$result  = true;
 			
@@ -722,7 +722,7 @@
 			if ($this->isUserPartOfProject($this->requestData['id'],$this->getCurrentProjectId())) {
 
 				// requested delete
-				if ($this->requestData['delete']=='1') {
+				if (isset($this->requestData['delete']) && $this->requestData['delete']=='1') {
 
 					// delete user's role from this project
 					$this->models->ProjectRoleUser->delete(
@@ -745,7 +745,7 @@
 					$this->redirect('user_overview.php');
 
 				// update data
-				} else if ($this->requestData['checked']=='1') {
+				} else if (isset($this->requestData['checked']) && $this->requestData['checked']=='1') {
 
 					// make sure an unassignable role (like system admin) wasn't hacked in
 					$r = $this->models->Role->get($this->requestData['role_id']);
@@ -874,7 +874,7 @@
 
 			$tests  = explode(',',$this->requestData['t']);
 
-			$idToIgnore  = $this->requestData['i'] or false;
+			$idToIgnore  = isset($this->requestData['i']) ? $this->requestData['i'] : false;
 
 			if ($field=='') return;
 
