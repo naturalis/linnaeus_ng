@@ -486,7 +486,7 @@
 		public function getLoginStartPage() {
 
 			// "closed" pages that redirected the user towards the login have set $_SESSION['login_start_page']
-			if ($_SESSION['login_start_page']) {
+			if (!empty($_SESSION['login_start_page'])) {
 
 				return $_SESSION['login_start_page'];
 
@@ -733,4 +733,3 @@
 
 	}
 
-?>
