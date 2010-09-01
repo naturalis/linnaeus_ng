@@ -41,7 +41,7 @@
 
 			parent::__destruct();
 		}
-		
+
 		private function connectToDatabase() {
 
 			$this->databaseSettings = $this->config->getDatabaseSettings();
@@ -63,7 +63,7 @@
 				mysql_query('SET CHARACTER SET '.$this->databaseSettings['characterSet'],$this->databaseConnection);
 
 			}
-			
+
 			return true;
 
 		}
@@ -164,6 +164,8 @@
 			$values = null;
 
 			foreach((array)$data as $key => $val) {
+
+				if (empty($this->columns[$key])) continue;
 
 				$d = $this->columns[$key];
 
@@ -427,7 +429,7 @@
 				$this->data = mysql_fetch_assoc(mysql_query($query));
 
 			} else {
-
+echo '<!--QUERY::'.str_replace('%table%',$this->tableName,$id).'-->';
 				$set = mysql_query(str_replace('%table%',$this->tableName,$id));
 
 				while ($row = mysql_fetch_assoc($set)) {
@@ -456,7 +458,40 @@
 
 		}
 
+		/*
+		private function connectToDatabasePDO() {
+
+			$this->databaseConnection = false;
+
+			$this->databaseSettings = $this->config->getDatabaseSettings();
+
+			try
+			{
+				$this->databaseConnection = 
+					new PDO(
+						'mysql:host='.$this->databaseSettings['host'].';dbname='.$this->databaseSettings['database'], 
+						$this->databaseSettings['user'],
+						$this->databaseSettings['password']
+					);
+
+				if (!empty($this->databaseSettings['characterSet'])) {
+				
+					$this->databaseConnection->exec('SET NAMES '.$this->databaseSettings['characterSet']);
+					$this->databaseConnection->exec('SET CHARACTER SET '.$this->databaseSettings['characterSet']);
+
+				}
+			
+				return true;
+			}
+			catch(PDOException $e)
+			{
+				die(_('FATAL: ').$e->getMessage());
+			}
+
+		}
+		*/
 		
 	}
 
 
+?>
