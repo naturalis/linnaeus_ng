@@ -531,7 +531,7 @@
 	
 							$this->models->ProjectRoleUser->save(
 									array(
-										'id' => 'null',
+										'id' => null,
 										'project_id' => $this->getCurrentProjectId(),
 										'role_id' => $this->requestData['role_id'],
 										'user_id' => $newUserId
