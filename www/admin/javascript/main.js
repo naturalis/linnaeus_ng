@@ -139,3 +139,51 @@ function moduleAction(ele,removeIds) {
 	});
 
 }
+
+
+function toggleModuleUsers(i) {
+
+	classname = $('#users-'+i).attr('class');
+	
+	if (classname=='admin-modusers-hidden')
+		$('#users-'+i).removeClass().addClass('admin-modusers');
+	else
+		$('#users-'+i).removeClass().addClass('admin-modusers-hidden');
+}
+
+function moduleUserAction(ele) {
+
+	if ($('#'+ele.id).attr('class') == 'admin-td-moduser-inactive')
+		action = 'add';
+	else
+		action = 'remove';
+
+	m = ele.id.replace('cell-','');
+	m = m.substr(0,m.length-1);
+	u = m.substr(m.indexOf('-')+1);
+	m = m.substr(0,m.indexOf('-'));
+
+	$.ajax({ url:"ajax_interface.php?v=collaborators"+
+				"&a="+encodeURIComponent(action)+
+				"&i="+encodeURIComponent(m)+
+				"&u="+encodeURIComponent(u),
+		success: function(data){
+
+			switch(action) {
+				case 'add':
+					var classa = 'admin-td-module-title-inuse';
+					var classb = 'admin-td-moduser-remove';
+					break;
+				case 'remove':
+					var classa = '';
+					var classb = 'admin-td-moduser-inactive';
+					break;
+			}			
+
+			$('#'+ele.id).removeClass().addClass(classb);
+			$('#'+ele.id.replace('b','a')).removeClass().addClass(classa);
+			$('#cell-'+m+'n').html(parseFloat($('#cell-'+m+'n').html())+(action=='add' ? 1 : -1 ));
+      	}
+	});
+
+}

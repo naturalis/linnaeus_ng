@@ -1,5 +1,5 @@
-205
-a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283160745;s:7:"expires";i:1283164345;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+245
+a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283329889;s:7:"expires";i:1283333489;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -21,7 +21,8 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 <body><div id="admin-body-container">
 <div id="admin-header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
+	<img src="/admin/images/system/linnaeus_logo.png" id="admin-page-lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="admin-page-eti-logo" />
 </div>
 <div id="admin-page-container">
 
@@ -42,12 +43,12 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 <div id="admin-main">
 <form method="post" action="" name="theForm" id="theForm">
-	<input name="id" value="10" type="hidden" />
+	<input name="id" value="4" type="hidden" />
 	<input name="checked" id="checked" value="1" type="hidden" />
 	<input name="delete" id="delete" value="0" type="hidden" />
-	<input name="userProjectRole" value="20" type="hidden" />
+	<input name="userProjectRole" value="19" type="hidden" />
 <script type="text/javascript">
-	userid = '10';
+	userid = '4';
 </script>
 <table>
 	<tr>
@@ -57,7 +58,7 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="username" 
 				id="username" 
-				value="jlborgesd" 
+				value="waddink" 
 				maxlength="16" 
 				onblur="remoteValueCheck(this.id,[this.value],['e','f'],userid)" 
 			/>
@@ -102,7 +103,7 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="first_name" 
 				id="first_name" 
-				value="jlborgesd" 
+				value="Wouter" 
 				maxlength="32"
 				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
@@ -117,7 +118,7 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="last_name" 
 				id="last_name" 
-				value="jlborgesd" 
+				value="Addink" 
 				maxlength="32"
 				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
@@ -133,14 +134,14 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 					type="radio" 
 					id="gender-f" 
 					name="gender" 
-					value="f" checked="checked"				/>f
+					value="f" 				/>f
 			</label>
 			<label for="gender-m">
 				<input
 					type="radio" 
 					id="gender-m" 
 					name="gender" 
-					value="m"  
+					value="m" checked="checked" 
 				/>m
 			</label>
 			<span class="admin-required-field-asterisk">*</span>
@@ -153,7 +154,7 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="email_address" 
 				id="email_address" 
-				value="jlborgesd@fgg.bo" 
+				value="waddink@eti.uva.nl" 
 				maxlength="64"
 				onblur="remoteValueCheck(this.id,[this.value],['f','e'],userid)"
 			/>
@@ -221,6 +222,9 @@ a:4:{s:8:"template";a:3:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 </div>
 
+<div id="admin-messages">
+<span class="admin-message">User data saved</span><br />
+</div>
 
 
 <script type="text/JavaScript">
