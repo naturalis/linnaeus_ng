@@ -1,11 +1,5 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-01 11:56:09
-         compiled from login.tpl */ ?>
-<?php $_smarty_tpl_vars = $this->_tpl_vars;
-$this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
-$this->_tpl_vars = $_smarty_tpl_vars;
-unset($_smarty_tpl_vars);
- ?>
-
+<?php /* Smarty version 2.6.26, created on 2010-09-01 12:32:05
+         compiled from ../shared/admin-messages.tpl */ ?>
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
 <div id="admin-errors">
 <?php unset($this->_sections['error']);
@@ -37,29 +31,34 @@ $this->_sections['error']['last']       = ($this->_sections['error']['iteration'
 <?php endfor; endif; ?>
 </div>
 <?php endif; ?>
+<?php if (! empty ( $this->_tpl_vars['messages'] )): ?>
+<div id="admin-messages">
+<?php unset($this->_sections['i']);
+$this->_sections['i']['name'] = 'i';
+$this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['messages']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
+$this->_sections['i']['show'] = true;
+$this->_sections['i']['max'] = $this->_sections['i']['loop'];
+$this->_sections['i']['step'] = 1;
+$this->_sections['i']['start'] = $this->_sections['i']['step'] > 0 ? 0 : $this->_sections['i']['loop']-1;
+if ($this->_sections['i']['show']) {
+    $this->_sections['i']['total'] = $this->_sections['i']['loop'];
+    if ($this->_sections['i']['total'] == 0)
+        $this->_sections['i']['show'] = false;
+} else
+    $this->_sections['i']['total'] = 0;
+if ($this->_sections['i']['show']):
 
-<div id="admin-main">
-	<form method="post" action="login.php">
-	<table>
-		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>
-		<tr><td>Your username:</td><td><input type="text" name="username" id="username" value="" maxlength="32" /></td></tr>
-		<tr><td>Your password:</td><td><input type="password" name="password" value="" maxlength="32" /><br /></td></tr>
-		<tr><td colspan="2"><input type="submit" value="login" /></td></tr>
-	</table>
-	</form>
+            for ($this->_sections['i']['index'] = $this->_sections['i']['start'], $this->_sections['i']['iteration'] = 1;
+                 $this->_sections['i']['iteration'] <= $this->_sections['i']['total'];
+                 $this->_sections['i']['index'] += $this->_sections['i']['step'], $this->_sections['i']['iteration']++):
+$this->_sections['i']['rownum'] = $this->_sections['i']['iteration'];
+$this->_sections['i']['index_prev'] = $this->_sections['i']['index'] - $this->_sections['i']['step'];
+$this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_sections['i']['step'];
+$this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
+$this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
+?>
+<span class="admin-message"><?php echo $this->_tpl_vars['messages'][$this->_sections['i']['index']]; ?>
+</span><br />
+<?php endfor; endif; ?>
 </div>
-
-<?php echo '
-<script type="text/JavaScript">
-$(document).ready(function(){
-	$(\'#username\').focus();
-});
-</script>
-'; ?>
-
-
-<?php $_smarty_tpl_vars = $this->_tpl_vars;
-$this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-footer.tpl", 'smarty_include_vars' => array()));
-$this->_tpl_vars = $_smarty_tpl_vars;
-unset($_smarty_tpl_vars);
- ?>
+<?php endif; ?>

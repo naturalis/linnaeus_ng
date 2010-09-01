@@ -6,6 +6,4 @@
 
 	$c->loginAction();
 	
-	$c->printPage();
-
 ?>

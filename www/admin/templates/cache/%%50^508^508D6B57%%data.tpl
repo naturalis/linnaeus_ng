@@ -1,10 +1,10 @@
 205
-a:4:{s:8:"template";a:3:{s:8:"view.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283334976;s:7:"expires";i:1283338576;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:8:"data.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283335471;s:7:"expires";i:1283339071;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-	<title>Imaginary Beings - Project collaborator data</title>
+	<title>Imaginary Beings - Project data</title>
 
 	<link href="/admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="/admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
@@ -28,43 +28,64 @@ a:4:{s:8:"template";a:3:{s:8:"view.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 <div id="admin-titles">
 	<span id="admin-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="admin-project-title">Imaginary Beings</span><br />	<span id="admin-apptitle"><a href="index.php">User administration</a></span><br />	<span id="admin-pagetitle">Project collaborator data</span>
+	<span id="admin-project-title">Imaginary Beings</span><br />	<span id="admin-apptitle"><a href="index.php">Project administration</a></span><br />	<span id="admin-pagetitle">Project data</span>
 </div>
 
 
 <div id="admin-main">
+2
 <table>
 	<tr>
-		<td>first_name:</td><td>Wouter</td>
-	</tr>
-	<tr>
-		<td>last_name:</td><td>Addink</td>
-	</tr>
-	<tr>
-		<td>username:</td><td>waddink</td>
-	</tr>
-	<tr>
-		<td>gender:</td>
-		<td>m</td>
-	</tr>
-	<tr>
-		<td>email address:</td>
-		<td>waddink@eti.uva.nl</td>
-	</tr>
-	<tr>
-		<td>role in current project:</td>
-		<td>Contributor</td>
-	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<input type="button" value="Back" onclick="window.open('user_overview.php','_self');" />
-			<input type="button" value="Edit" onclick="window.open('edit.php?id=4','_self');" />
+		<td>
+			Internal project name:
+		</td>
+		<td>
+			Imaginary Beings
 		</td>
 	</tr>
+	<tr>
+		<td>
+			Internal project description:
+		</td>
+		<td>
+			Borges bestiarium
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Project title:
+		</td>
+		<td>
+			<input type="text" name="title" value="Imaginary Beings" />
+		</td>
+	</tr>
+	<!-- tr>
+		<td>
+			Project logo:
+		</td>
+		<td>
+		<form enctype="multipart/form-data" action="" method="POST">
+		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
+			Choose a file to upload: <input name="uploadedfile" type="file" /><br />
+			<input type="submit" value="Upload File" />
+		</form>
+
+			<input type="text" name="title" value="" />
+		</td>
+	</tr -->
 </table>
+
+
+
+
+
+logo<br />
+languages<br />
+<br />
+welcome text<br />
+contrib text<br />
+about ETI (fix)<br /><br />
+
 </div>
 
 </div ends="admin-page-container">

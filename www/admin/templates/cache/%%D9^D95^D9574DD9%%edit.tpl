@@ -1,5 +1,5 @@
 245
-a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283329889;s:7:"expires";i:1283333489;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283335463;s:7:"expires";i:1283339063;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -43,12 +43,12 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 <div id="admin-main">
 <form method="post" action="" name="theForm" id="theForm">
-	<input name="id" value="4" type="hidden" />
+	<input name="id" value="11" type="hidden" />
 	<input name="checked" id="checked" value="1" type="hidden" />
 	<input name="delete" id="delete" value="0" type="hidden" />
-	<input name="userProjectRole" value="19" type="hidden" />
+	<input name="userProjectRole" value="21" type="hidden" />
 <script type="text/javascript">
-	userid = '4';
+	userid = '11';
 </script>
 <table>
 	<tr>
@@ -58,7 +58,7 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="username" 
 				id="username" 
-				value="waddink" 
+				value="ggijswijt" 
 				maxlength="16" 
 				onblur="remoteValueCheck(this.id,[this.value],['e','f'],userid)" 
 			/>
@@ -103,7 +103,7 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="first_name" 
 				id="first_name" 
-				value="Wouter" 
+				value="Gideon" 
 				maxlength="32"
 				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
@@ -118,7 +118,7 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="last_name" 
 				id="last_name" 
-				value="Addink" 
+				value="Gijswijt" 
 				maxlength="32"
 				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
@@ -154,7 +154,7 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 				type="text" 
 				name="email_address" 
 				id="email_address" 
-				value="waddink@eti.uva.nl" 
+				value="ggijswijt@eti.uva.nl" 
 				maxlength="64"
 				onblur="remoteValueCheck(this.id,[this.value],['f','e'],userid)"
 			/>
@@ -172,13 +172,13 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 					value="3"
 									>Expert</option>
 							<option 
-					title="Editor: Edits specific parts of a project" 
+					title="Editor: Edits specific parts of a project (current)" 
 					value="4"
-									>Editor</option>
+					 selected class="option-selected" 				>Editor</option>
 							<option 
-					title="Contributor: Contributes to a project but cannot edit (current)" 
+					title="Contributor: Contributes to a project but cannot edit" 
 					value="5"
-					 selected class="option-selected" 				>Contributor</option>
+									>Contributor</option>
 						</select>
 		</td>
 	</tr>

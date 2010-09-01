@@ -76,6 +76,8 @@ function moduleAction(ele,removeIds) {
 	$.ajax({ url:"ajax_interface.php?v=modules&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id),
 		success: function(data){
 
+			//alert(data);
+
 			if (data=='<ok>') {
 				switch(action) {
 					case 'activate':
