@@ -24,6 +24,7 @@
 		private $helpTexts;
 		public $controllerPublicName;
 		public $randomValue;
+		public $usedHelpers;
 
 		private $usedModelsBase = array('helptext');
 
@@ -82,8 +83,8 @@
 			$this->viewName = $path['filename'];
 
 			$dirs = explode('/',$path['dirname']);
-			$this->controllerBaseName = strtolower($dirs[3]);
-			$this->appName = strtolower($dirs[1]);
+			if (isset($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
+			if (isset($dirs[1])) $this->appName = strtolower($dirs[1]);
 			//$this->controllerName = ucfirst($this->getControllerBaseName()).'Controller';
 
 		}
@@ -131,8 +132,10 @@
 
 						$this->models->$t = new $t();
 
+						//echo $t.chr(10);
 					}
-				}
+
+				} 
 
 			}
 
@@ -141,7 +144,7 @@
 		private function loadHelpers() {
 
 			foreach((array)$this->usedHelpers as $key) {
-			
+
 				if (file_exists(dirname(__FILE__).'/../helpers/'.$key.'.php')) {
 	
 					require_once(dirname(__FILE__).'/../helpers/'.$key.'.php');

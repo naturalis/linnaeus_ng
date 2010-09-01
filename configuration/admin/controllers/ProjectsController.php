@@ -14,7 +14,7 @@ hard coded number of free modules
 		public $usedModels = array(
 			'project','module','module_project','free_module_project',
 			'project_role_user','user','role',
-			'modules_projects_users','free_modules_projects_users'
+			'module_project_user','free_module_project_user'
 			);
 
 		public $usedHelpers = array('file_upload_helper');
@@ -111,10 +111,39 @@ hard coded number of free modules
 
 				$modules[$key]['description'] = $mp['description'];
 
+				$mpu = $this->models->ModuleProjectUser->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'module_id' => $val['module_id']
+					)
+				);
+
+				foreach((array)$mpu as $key2 => $val2) {
+
+					$modules[$key]['collaborators'][$val2['user_id']] = $val2;
+
+				}
+
 			}
 
 			$free_modules = $this->models->FreeModuleProject->get(array('project_id'=>$this->getCurrentProjectId()));
 			
+			foreach((array)$free_modules as $key => $val) {
+
+				$fpu = $this->models->FreeModuleProjectUser->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'free_module_id' => $val['module_id']
+					)
+				);
+
+				foreach((array)$fpu as $key2 => $val2) {
+
+					$free_modules[$key]['collaborators'][$val2['user_id']] = $val2;
+
+				}
+
+			}
 
 			$pru =  $this->models->ProjectRoleUser->get(
 				array(
@@ -178,6 +207,8 @@ hard coded number of free modules
 			$view  = $this->requestData['v'];
 			
 			$id = $this->requestData['i'];
+
+			$user = $this->requestData['u'];
 
 			$action  = $this->requestData['a'];
 
@@ -268,9 +299,30 @@ hard coded number of free modules
 				
 			} else
 			if ($view=='collaborators') {
-			
-//$this-models->ModulesProjectsUsers
-//$this-models->FreemodulesProjectsUsers
+//NEED CHECKS!
+				if ($action=='add') {
+
+					$this->models->ModuleProjectUser->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'module_id' => $id,
+							'user_id' => $user
+						)
+					);
+
+				} else
+				if ($action=='remove') {
+
+					$this->models->ModuleProjectUser->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'module_id' => $id,
+							'user_id' => $user
+						)
+					);
+
+				}
 
 			}
 

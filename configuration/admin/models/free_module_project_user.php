@@ -2,7 +2,7 @@
 
 	include_once('model.php');
 
-	class FreemodulesProjectsUsers extends Model {
+	class FreemoduleProjectUser extends Model {
 
 		const tableBaseName = 'free_modules_projects_users';
 

@@ -363,6 +363,8 @@
 				$cols can hold a string that replaces the defualt * in 'select * from...'
 
 			*/
+			
+			$query = false;
 
 			if (!$id) return;
 
@@ -438,7 +440,7 @@
 
 			$this->set($id ? $id : $this->id, $cols, $order, $ignore_case);
 
-			return $this->data;
+			return isset($this->data) ? $this->data : null;
 
 		}
 
