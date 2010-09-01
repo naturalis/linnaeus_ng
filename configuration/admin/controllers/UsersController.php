@@ -459,8 +459,7 @@
 			$this->setPageName(_('Create new collaborator'));
 
 			if ($this->requestData) {
-var_dump($this->requestData);die('wtf?');
-				// connect an existing user to current project
+
 				if ($this->requestData['checked']=='2') {
 
 					// make sure an unassignable role (like system admin) wasn't hacked in
@@ -494,7 +493,7 @@ var_dump($this->requestData);die('wtf?');
 				}
 				// save user
 				elseif ($this->requestData['checked']=='1') {
-				
+
 					// make sure an unassignable role (like system admin) wasn't hacked in
 					$r = $this->models->Role->get($_SESSION['data']['new_user']['role_id']);
 
