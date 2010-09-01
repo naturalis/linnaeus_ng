@@ -705,7 +705,8 @@
 		
 		private function setDefaultUploadFilemask() {
 		
-			$this->defaultUploadFilemask = $this->generalSettings['defaultUploadFilemask'];
+			if (!empty($this->generalSettings['defaultUploadFilemask']))
+				$this->defaultUploadFilemask = $this->generalSettings['defaultUploadFilemask'];
 		
 		}
 		
@@ -718,7 +719,8 @@
 		
 		private function setDefaultUploadMaxSize() {
 		
-			$this->defaultUploadMaxSize = $this->generalSettings['defaultUploadMaxSize'];
+			if (!empty($this->generalSettings['defaultUploadMaxSize']))
+				$this->defaultUploadMaxSize = $this->generalSettings['defaultUploadMaxSize'];
 		
 		}
 		
