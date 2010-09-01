@@ -109,10 +109,9 @@
 		
 		private function setRequestData() {
 
-			$this->requestData = $_REQUEST;
-echo '<!-- REQUEST DATA';
-var_dump($this->requestData);
-echo '/REQUEST DATA -->';
+			//$this->requestData = $_REQUEST; // also contains cookies
+			$this->requestData = array_merge((array)$_GET,(array)$_POST); // don't want no cookies!
+
 			$this->requestDataFiles = $_FILES;
 
 		}
