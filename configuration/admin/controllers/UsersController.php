@@ -459,7 +459,7 @@
 			$this->setPageName(_('Create new collaborator'));
 
 			if ($this->requestData) {
-
+var_dump($this->requestData);die('wtf?');
 				// connect an existing user to current project
 				if ($this->requestData['checked']=='2') {
 
