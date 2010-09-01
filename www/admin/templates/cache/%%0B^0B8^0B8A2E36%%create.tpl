@@ -1,5 +1,5 @@
 248
-a:4:{s:8:"template";a:4:{s:10:"create.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283335353;s:7:"expires";i:1283338953;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:10:"create.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283349257;s:7:"expires";i:1283352857;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -43,37 +43,37 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 	<tr>
 		<td>username:</td>
 		<td>
-		ijsbeer		</td>
+		uuuuwwwww		</td>
 	</tr>
 	<tr>
 		<td>password:</td>
 		<td>
-		ijsbeer		</td>
+		uuuuuuuu		</td>
 	</tr>
 	<tr>
 		<td>first_name:</td>
 		<td>
-		IJs		</td>
+		uuuu		</td>
 	</tr>
 	<tr>
 		<td>last_name:</td>
 		<td>
-		Beer		</td>
+		uuuu		</td>
 	</tr>
 	<tr>
 		<td>gender:</td>
 		<td>
-		m		</td>
+		f		</td>
 	</tr>
 	<tr>
 		<td>email_address:</td>
 		<td>
-		ijsbeer@thirdeyefoundation.com		</td>
+		uuuu@rrr.nnn		</td>
 	</tr>
 	<tr>
 		<td>role in current project:</td>
 		<td>
-		Contributor		</td>
+		Expert		</td>
 	</tr>
 	<tr>
 		<td colspan="2">
