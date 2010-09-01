@@ -1,30 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="admin-main">
-{literal}
-<style>
-.admin-modusers-hidden {
-	visibility:collapse;
-}
-.admin-modusers {
-	visibility:visible;
-}
-</style>
-<script>
-function toggleModuleUsers(i) {
-	classname = $('#users-'+i).attr('class');
-	
-	if (classname=='admin-modusers-hidden')
-		$('#users-'+i).removeClass().addClass('admin-modusers');
-	else
-		$('#users-'+i).removeClass().addClass('admin-modusers-hidden');
-}
-function moduleUserAction(ele,removeIds) {
-//	$.ajax({ url:"ajax_interface.php?v=collaborators&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id),
-
-}
-</script>
-{/literal}
 <div class="admin-text-block">
 Select the standard modules you wish to use in your project:<br />
 <table>
@@ -43,21 +19,44 @@ Select the standard modules you wish to use in your project:<br />
 			</span>
 		</td>
 		<td>
-			<span onclick="toggleModuleUsers({$modules[i].id});" style="cursor:pointer">4 collaborators</span>
+			<span onclick="toggleModuleUsers({$modules[i].id});" style="cursor:pointer"><span id="cell-{$modules[i].id}n">{$modules[i].collaborators|@count}</span> collaborators</span>
 		</td>
 	</tr>
 	<tr id="users-{$modules[i].id}" class="admin-modusers-hidden">
 		<td colspan="3">
 			<table>
 			{section name=j loop=$users}
+				{assign var=x value=$users[j].id}
 				<tr>
-					<td style="width:5px;"></td>
-					<td>{$users[j].first_name} {$users[j].last_name}</td>
+					<td style="width:15px;">
+					</td>
+				{if $modules[i].collaborators[$x].user_id == $users[j].id}
+					<td 
+						id="cell-{$modules[i].id}-{$users[j].id}a"
+						class="admin-td-module-title-inuse">
+							{$users[j].first_name} {$users[j].last_name}
+						</td>
 					<td>{$users[j].role}</td>
-					<td title="collaborator is not working on this module" class="admin-td-moduser-inactive"></td>
-					<td title="collaborator is working on this module" class="admin-td-moduser-active"></td>
-					<td title="add collaborator" class="admin-td-moduser-add"></td>
-					<td title="remove collaborator" class="admin-td-moduser-remove"></td>
+					<td 
+						title="remove collaborator" 
+						class="admin-td-moduser-remove"
+						id="cell-{$modules[i].id}-{$users[j].id}b"
+						onclick="moduleUserAction(this,{$modules[i].id},{$users[j].id},'remove')">
+					</td>
+				{else}
+					<td
+						id="cell-{$modules[i].id}-{$users[j].id}a"
+						class="">
+						{$users[j].first_name} {$users[j].last_name}
+					</td>
+					<td>{$users[j].role}</td>
+					<td
+						title="add collaborator" 
+						class="admin-td-moduser-inactive"
+						id="cell-{$modules[i].id}-{$users[j].id}b"
+						onclick="moduleUserAction(this,{$modules[i].id},{$users[j].id},'add')">
+					</td>
+				{/if}
 				</tr>
 			{/section}			
 			</table>

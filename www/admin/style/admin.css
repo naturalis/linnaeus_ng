@@ -186,6 +186,10 @@
 }
 
 
+.admin-td-moduser-inactive {
+	cursor:pointer;
+}
+
 .admin-td-moduser-active {
 	background-image:url(../images/system/icons/user.png);
 }
@@ -224,6 +228,14 @@
 .admin-module-new-input-hidden {
 	visibility:collapse;
 }
+
+.admin-modusers-hidden {
+	visibility:collapse;
+}
+.admin-modusers {
+	visibility:visible;
+}
+
 
 #inlineHelp {
 	margin-top:10px;
