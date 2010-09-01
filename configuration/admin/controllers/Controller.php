@@ -110,7 +110,9 @@
 		private function setRequestData() {
 
 			$this->requestData = $_REQUEST;
-
+echo '<!--';
+var_dump($_REQUEST);
+echo '-->';
 			$this->requestDataFiles = $_FILES;
 
 		}
