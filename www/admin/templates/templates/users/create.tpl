@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 {if $check==true}
 Please verify the data below. Click 'Save' to save the user data; or 'Back' to return to the previous screen.
 {/if}
@@ -21,9 +21,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="username" 
 				value="{$data.username}" 
 				maxlength="16" 
-				onblur="remoteValueCheck(this.id,[this.value],['e','f'])" 
+				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'])" 
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="username-message" class=""></span>	{/if}
 		</td>
 	</tr>
@@ -37,9 +37,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="password"
 				value="{$data.password}"
 				maxlength="16"
-				onblur="remoteValueCheck(this.id,[this.value],['f'])"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="password-message" class=""></span>	</td>	
 	</tr>
 	<tr>
@@ -51,9 +51,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="password_2" 
 				value="{$data.password_2}" 
 				maxlength="16" 
-				onblur="remoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'])"
+				onblur="userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'])"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="password_2-message" class=""></span>	{/if}
 		</td>
 	</tr>
@@ -67,9 +67,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="first_name"
 				value="{$data.first_name}" 
 				maxlength="32" 
-				onblur="remoteValueCheck(this.id,[this.value],['f'])"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="first_name-message" class=""></span>	{/if}
 		</td>
 	</tr>
@@ -83,9 +83,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="last_name"
 				value="{$data.last_name}"
 				maxlength="32"
-				onblur="remoteValueCheck(this.id,[this.value],['f'])"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="last_name-message" class=""></span>	{/if}
 		</td>
 	</tr>
@@ -111,7 +111,7 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 					{if $data.gender=='m'}checked="checked"{/if}
 				 />m
 			</label>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 		{/if}
 		</td>
 	</tr>
@@ -125,9 +125,9 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				id="email_address" 
 				value="{$data.email_address}" 
 				maxlength="64" 
-				onblur="remoteValueCheck(this.id,[this.value],['f','e'])"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f','e'])"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="email_address-message" class=""></span>
 		{/if}
 		</td>
@@ -145,7 +145,7 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 				>{$roles[i].role}</option>
 			{/section}
 			</select>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 		{/if}
 		</td>
 	</tr>

@@ -408,7 +408,7 @@
 
 				$query .= $order ? " order by ".$order : '';
 
-				//echo $query.'<br />';die();
+				//echo $query.'<br />';//die();
 
 				$set = mysql_query($query);
 
@@ -429,7 +429,7 @@
 				$this->data = mysql_fetch_assoc(mysql_query($query));
 
 			} else {
-echo '<!--QUERY::'.str_replace('%table%',$this->tableName,$id).'-->';
+
 				$set = mysql_query(str_replace('%table%',$this->tableName,$id));
 
 				while ($row = mysql_fetch_assoc($set)) {

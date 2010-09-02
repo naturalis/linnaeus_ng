@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-01 15:54:17
+<?php /* Smarty version 2.6.26, created on 2010-09-02 12:34:01
          compiled from ../shared/admin-messages.tpl */ ?>
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
-<div id="admin-errors">
+<div id="page-block-errors">
 <?php unset($this->_sections['error']);
 $this->_sections['error']['name'] = 'error';
 $this->_sections['error']['loop'] = is_array($_loop=$this->_tpl_vars['errors']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
@@ -26,13 +26,13 @@ $this->_sections['error']['index_next'] = $this->_sections['error']['index'] + $
 $this->_sections['error']['first']      = ($this->_sections['error']['iteration'] == 1);
 $this->_sections['error']['last']       = ($this->_sections['error']['iteration'] == $this->_sections['error']['total']);
 ?>
-<span class="admin-message-error"><?php echo $this->_tpl_vars['errors'][$this->_sections['error']['index']]; ?>
+<span class="message-error"><?php echo $this->_tpl_vars['errors'][$this->_sections['error']['index']]; ?>
 </span><br />
 <?php endfor; endif; ?>
 </div>
 <?php endif; ?>
 <?php if (! empty ( $this->_tpl_vars['messages'] )): ?>
-<div id="admin-messages">
+<div id="page-block-messages">
 <?php unset($this->_sections['i']);
 $this->_sections['i']['name'] = 'i';
 $this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['messages']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);

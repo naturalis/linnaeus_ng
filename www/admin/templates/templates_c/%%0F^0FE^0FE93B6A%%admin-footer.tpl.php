@@ -1,9 +1,10 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-01 15:54:17
+<?php /* Smarty version 2.6.26, created on 2010-09-02 12:34:01
          compiled from ../shared/admin-footer.tpl */ ?>
-</div ends="admin-page-container">
-<div id="admin-footer-container">
+</div ends="page-container">
+
+<div id="footer-container">
 <?php if (! $this->_tpl_vars['excludecludeBottonMenu']): ?>
-	<div id="admin-footer-menu">
+	<div id="footer-menu">
 		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
 admin/admin-index.php">Main index</a>
 <?php if ($this->_tpl_vars['session']['user']['_number_of_projects'] > 1): ?>
@@ -18,7 +19,8 @@ admin/views/users/logout.php">Log out (logged in as <?php if ($this->_tpl_vars['
 <?php endif; ?>
 	</div>
 <?php endif; ?>
-</div ends="admin-footer-container">
+</div ends="footer-container">
+
 <?php if ($this->_tpl_vars['debugMode']): ?>
 <?php echo '
 <style>
@@ -40,5 +42,5 @@ var_dump($_SESSION);
  ?>
 </div>
 <?php endif; ?>
-</div ends="admin-body-container"></body>
+</div ends="body-container"></body>
 </html>

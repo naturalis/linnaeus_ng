@@ -1,8 +1,12 @@
-#admin-body-container {
+#body-container {
 	width:900px;
 }
 
-#admin-header-container {
+#page-main {
+	margin:10px 10px 10px 10px;
+}
+
+#header-container {
 	background-color:#eee;
 	height:80px;
 	width:100%;
@@ -11,100 +15,11 @@
 	vertical-align:middle;
 }
 
-#admin-page-container {
+#page-container {
 	margin-top:10px;
 }
 
-#admin-page-lng-logo {
-	/* height:25px; */
-	margin-top:0px;
-}
-
-#admin-page-eti-logo {
-	position:absolute;
-	height:55px;
-	margin-top:16px;
-	margin-left:10px;
-}
-
-#admin-titles {
-	margin-left:0px;
-	margin-top:10px;
-	padding-bottom:10px;
-	border-bottom:1px dotted #ccc;
-}
-
-#admin-title {
-	margin-left:10px;
-	font-size:16px;
-	font-weight:bold;
-}
-
-#admin-apptitle {
-	margin-left:10px;
-	font-size:12px;
-	font-weight:bold;
-}
-
-#admin-apptitle a {
-	text-decoration:none;
-	color:black;
-}
-
-#admin-apptitle a:hover {
-	text-decoration:underline;
-}
-
-#admin-pagetitle {
-	margin-left:10px;
-	font-size:12px;
-}
-
-#admin-project-title {
-	margin-left:10px;
-	font-size:12px;
-	font-style:italic;
-	font-weight:bold;
-}
-
-#admin-logged-in-as {
-	margin-left:10px;
-	font-size:12px;
-}
-
-#admin-messages,#admin-errors,#admin-no-errors{
-	margin-left:10px;
-	margin-top:10px;
-	padding:5px 5px 5px 5px;
-	border:1px dotted black;
-	width:350px;
-}
-
-#admin-errors {
-	background-color:#fee;
-}
-
-.admin-message-error {
-	 color: red;
-}
-
-.admin-message-no-error {
-	 color: green;
-}
-
-.admin-message-existing-user {
-	 color: #900;
-}
-
-.admin-required-field-asterisk {
-	font-weight:bold;
-}
-
-#admin-main {
-	margin:10px 10px 10px 10px;
-}
-
-#admin-footer-container {
+#footer-container {
 	background-color:#eee;
 	height:40px;
 	width:100%;
@@ -113,195 +28,199 @@
 	vertical-align:middle;
 }
 
-#admin-footer-menu {
+#lng-logo {
+	/* height:25px; */
+	margin-top:0px;
+}
+
+#eti-logo {
+	position:absolute;
+	height:55px;
+	margin-top:16px;
+	margin-left:10px;
+}
+
+#page-header-titles {
+	margin-left:0px;
+	margin-top:10px;
+	padding-bottom:10px;
+	border-bottom:1px dotted #ccc;
+}
+
+#page-header-title {
+	margin-left:10px;
+	font-size:16px;
+	font-weight:bold;
+}
+
+#page-header-projectname {
+	margin-left:10px;
+	font-size:12px;
+	font-style:italic;
+	font-weight:bold;
+}
+
+#page-header-appname {
+	margin-left:10px;
+	font-size:12px;
+	font-weight:bold;
+}
+
+#page-header-appname a {
+	text-decoration:none;
+	color:black;
+}
+
+#page-header-appname a:hover {
+	text-decoration:underline;
+}
+
+#page-header-pageaction {
+	margin-left:10px;
+	font-size:12px;
+}
+
+#page-block-messages,#page-block-errors {
+	margin-left:10px;
+	margin-top:10px;
+	padding:5px 5px 5px 5px;
+	border:1px dotted black;
+	width:350px;
+}
+
+#page-block-errors {
+	background-color:#fee;
+}
+
+.message-error {
+	 color: red;
+}
+
+.message-no-error {
+	 color: green;
+}
+
+.message-existing-user {
+	 color: #900;
+}
+
+.asterisk-required-field {
+	font-weight:bold;
+}
+
+#footer-menu {
 	margin-top:10px;
 	
 }
 
-#admin-footer-menu a {
+#footer-menu a {
 	text-decoration:none;
 	margin-right:20px;
 }
 
-#admin-footer-menu a:hover {
+#footer-menu a:hover {
 	text-decoration:underline;
 }
 
-.admin-text-block {
+.text-block {
 	margin-bottom:10px;
 }
 
-.admin-module-name {
-}
 
-.admin-module-name-inuse {
-	background-color:#efe;
-}
 
-.admin-td-module-unused,
-.admin-td-module-activate,
-.admin-td-module-reactivate,
-.admin-td-module-inuse,
-.admin-td-module-deactivate,
-.admin-td-module-inactive,
-.admin-td-module-delete,
-.admin-td-module-invisible,
-.admin-td-moduser-inactive,
-.admin-td-moduser-active,
-.admin-td-moduser-add,
-.admin-td-moduser-remove {
+.cell-module-unused,
+.cell-module-activate,
+.cell-module-reactivate,
+.cell-module-in-use,
+.cell-module-deactivate,
+.cell-module-inactive,
+.cell-module-delete,
+.cell-module-invisible,
+.cell-moduser-inactive,
+.cell-moduser-remove {
 	background-image:url(../images/system/icons/module-unused.png);
 	background-repeat:no-repeat;
 	width:16px;
 }
 
-.admin-td-module-activate,.admin-td-module-reactivate {
+.cell-module-activate,.cell-module-reactivate {
 	background-image:url(../images/system/icons/module-activate.png);
 	cursor:pointer;
 }
 
-.admin-td-module-inuse {
+.cell-module-in-use {
 	background-image:url(../images/system/icons/module-inuse.png);
 }
 
-.admin-td-module-deactivate {
+.cell-module-deactivate {
 	background-image:url(../images/system/icons/module-deactivate.png);
 	cursor:pointer;
 }
 
-.admin-td-module-inactive {
+.cell-module-inactive {
 	background-image:url(../images/system/icons/module-inactive.png);
 }
 
-.admin-td-module-delete {
+.cell-module-delete {
 	background-image:url(../images/system/icons/module-delete.png);
 	cursor:pointer;
 }
 
-.admin-td-module-invisible {
+.cell-module-invisible {
 	background-image:none;
 }
 
-.admin-td-moduser-inactive {
+.cell-moduser-inactive {
 	background-image:url(../images/system/icons/user-gray.png);
 	cursor:pointer;
 }
 
-.admin-td-moduser-remove {
+.cell-moduser-remove {
 	background-image:url(../images/system/icons/user-minus.png);
 	cursor:pointer;
 }
 
-.admin-td-module-title-unused,.admin-td-module-title-inuse,.admin-td-module-title-deactivated {
+.cell-module-title-unused,.cell-module-title-in-use,.cell-module-title-inactive {
 	color:#888;
 }
 
-.admin-td-module-title-inuse {
+.cell-module-title-in-use {
 	color:#000;
 	font-weight:bold;
 }
 
-.admin-td-module-title-deactivated {
+.cell-module-title-inactive {
 	color:#444;
 }
 
-.admin-td-module-title {
+.cell-module-title {
 	font-variant:small-caps;
 }
 
 
-.admin-module-new-input {
+.module-new-input {
 }
 
-.admin-module-new-input-hidden {
+.module-new-input-hidden {
 	visibility:collapse;
 }
 
-.admin-modusers-hidden {
-	visibility:collapse;
+.modusers-block-toggle {
+	cursor: pointer;
 }
-.admin-modusers {
+
+.modusers-block-toggle:hover {
+	text-decoration:underline;
+}
+
+.modusers-block,.modusers-block-hidden {
 	visibility:visible;
 }
 
-
-#inlineHelp {
-	margin-top:10px;
-	background-color:#eee;
-	float:right;
-	width:300px;
-	height:0px;
-}
-
-#inlineHelp-title {
-	cursor:pointer;
-	width:100%;
-	background-color:#aaa;
-	color:#eee;
-	text-align:center;
-	font-weight:bold;
-}
-
-.inlineHelp-body,.inlineHelp-body-hidden {
-	background-color:#fff;
-	visibility:visible;
-	border:1px dotted #ccc;
-}
-
-.inlineHelp-body-hidden {
+.modusers-block-hidden {
 	visibility:collapse;
 }
 
-.inlineHelp-subject {
-	background-color:#eee;
-	color:#222;
-	text-align:center;
-	font-weight:bold;
+.modusers-block-buffercell {
+	width:16px;
 }
-
-.inlineHelp-text {
-	text-align:justify;
-	padding:2px 2px 10px 2px;
-}
-
-th[onclick] {
-	text-align:left;
-	cursor:pointer;
-}
-
-select, input[type="text"], input[type="password"] {
-	font-size:12px;
-	width:200px;
-}
-
-input[type="button"],input[type="submit"] { 
-	cursor:pointer;
-	margin:0px;
-	color:#222; 
-	font: inherit;
-	font: bold 90%; 
-	background-color:#eee; 
-	border: 1px solid; 
-	border-color: #696 #363 #363 #696; 
-} 
-
-input[type="button"]:hover,input[type="submit"]:hover { 
-	color:#777; 
-} 
-
-input[type="checkbox"] {
-	margin-left:0px;
-}
-
-select  {
-	font-size:12px;
-}
-
-option {
-	padding:1px;
-}
-.option-selected {
-	background-color:#dfd;
-}
-
-

@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 <table>
 	<tr>
 		<td>first_name:</td><td>{$data.first_name}</td>
