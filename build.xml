@@ -49,9 +49,9 @@
             <!--/fileset-->
             <filterchain>
                 <replacetokens>
-                    <token key="PATH.SMARTY" value="/Volumes/Data/htdocs/linnaeus_ng/www/admin/templates/" />
-                    <token key="URL.WEBROOT" value="/linnaeus_ng/www/" />
-                    <token key="DB.HOST" value="localhost" />
+                    <token key="PATH.SMARTY" value="${smarty.path}" />
+                    <token key="URL.WEBROOT" value="${webroot.url}" />
+                    <token key="DB.HOST" value="${db.host}" />
                 </replacetokens>
             </filterchain>
         </copy>
