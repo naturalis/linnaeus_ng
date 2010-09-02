@@ -39,6 +39,18 @@
 <!--                      -d ${basedir}/configuration,${basedir}/www" /> -->
 <!--     </target> -->
 
+    <!-- Execute Code Sniffer -->            
+    <target name="phpcs">
+        <exec dir="${basedir}"
+            command="phpcs --report=checkstyle --standard=Zend
+                   --ignore=library/Zend/**,public/scripts/**
+                   ${basedir} > ${build}/logs/checkstyle.xml"
+            escape="false" />
+    </target>
+
+
+
+
 <target name="deploy">
   <svnupdate svnpath="svn" nocache="true" todir="${deploy.location}" />
 </target>
