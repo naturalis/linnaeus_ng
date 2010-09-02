@@ -1,6 +1,6 @@
 {include file="shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 	<ul>
 		<li><a href="views/users/">User management</a></li>
 		<li><a href="views/projects/">Project management</a></li>

@@ -10,6 +10,8 @@
 
 	<style type="text/css" media="all">
 		@import url("{$rootWebUrl}admin/style/main.css");
+		@import url("{$rootWebUrl}admin/style/admin-inputs.css");
+		@import url("{$rootWebUrl}admin/style/admin-help.css");
 		@import url("{$rootWebUrl}admin/style/admin.css");
 	</style>
 
@@ -18,27 +20,27 @@
 
 </head>
 
-<body><div id="admin-body-container">
-<div id="admin-header-container">
-	<img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="admin-page-lng-logo" />
-	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="admin-page-eti-logo" />
+<body><div id="body-container">
+<div id="header-container">
+	<img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="eti-logo" />
 </div>
-<div id="admin-page-container">
+<div id="page-container">
 
-<div id="admin-titles">
-	<span id="admin-title">{$applicationName} v{$applicationVersion}</span><br />
-{if $session._current_project_name!=''}	<span id="admin-project-title">{$session._current_project_name}</span><br />{/if}
-{if $controllerPublicName!='' && !$hideControllerPublicName}	<span id="admin-apptitle"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
-	<span id="admin-pagetitle">{$pageName}</span>
+<div id="page-header-titles">
+	<span id="page-header-title">{$applicationName} v{$applicationVersion}</span><br />
+{if $session._current_project_name!=''}	<span id="page-header-projectname">{$session._current_project_name}</span><br />{/if}
+{if $controllerPublicName!='' && !$hideControllerPublicName}	<span id="page-header-appname"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
+	<span id="page-header-pageaction">{$pageName}</span>
 </div>
 
 {if $helpTexts}
-<div id="inlineHelp">
-	<div id="inlineHelp-title" onclick="toggleHelpVisibility();">Help</div>
-	<div class="inlineHelp-body-hidden" id="inlineHelp-body">
+<div id="block-inline-help">
+	<div id="title" onclick="allToggleHelpVisibility();">Help</div>
+	<div class="body-collapsed" id="body-visible">
 {section name=i loop=$helpTexts}
-		<div class="inlineHelp-subject">{$helpTexts[i].subject}</div>
-		<div class="inlineHelp-text">{$helpTexts[i].helptext}</div>
+		<div class="subject">{$helpTexts[i].subject}</div>
+		<div class="text">{$helpTexts[i].helptext}</div>
 {/section}
 	</div>
 </div>

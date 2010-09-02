@@ -580,7 +580,7 @@
 		
 							$this->addMessage(_('A similar user, albeit with a different e-mail address, already exists in another project:'));
 
-							$this->addMessage('<span class="admin-message-existing-user">'.$sim[0]['first_name'].' '.$sim[0]['last_name'].'</span> ('.$sim[0]['email_address'].')');
+							$this->addMessage('<span class="message-existing-user">'.$sim[0]['first_name'].' '.$sim[0]['last_name'].'</span> ('.$sim[0]['email_address'].')');
 
 							$this->addMessage(_('Would you like to connect that user to the current project instead of creating a new one?'));
 
@@ -593,7 +593,7 @@
 
 							$this->addMessage(_('A user with the same e-mail address already exists in another project:'));
 
-							$this->addMessage('<span class="admin-message-existing-user">'.$sim[0]['first_name'].' '.$sim[0]['last_name'].'</span> ('.$sim[0]['email_address'].')');
+							$this->addMessage('<span class="message-existing-user">'.$sim[0]['first_name'].' '.$sim[0]['last_name'].'</span> ('.$sim[0]['email_address'].')');
 
 							$this->addMessage(_('You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Would you like to do that?'));
 
@@ -674,7 +674,7 @@
 
 			}
 
-			$this->sortUserArray($users,$sortBy);
+			$this->customSortArray($users,$sortBy);
 
 			$this->smarty->assign('sortBy', $sortBy);
 

@@ -1,7 +1,8 @@
-</div ends="admin-page-container">
-<div id="admin-footer-container">
+</div ends="page-container">
+
+<div id="footer-container">
 {if !$excludecludeBottonMenu}
-	<div id="admin-footer-menu">
+	<div id="footer-menu">
 		<a href="{$rootWebUrl}admin/admin-index.php">Main index</a>
 {if $session.user._number_of_projects > 1}
 		<a href="{$rootWebUrl}admin/views/users/choose_project.php">Switch projects</a>
@@ -11,7 +12,8 @@
 {/if}
 	</div>
 {/if}
-</div ends="admin-footer-container">
+</div ends="footer-container">
+
 {if $debugMode}
 {literal}
 <style>
@@ -32,5 +34,5 @@ var_dump($_SESSION);
 {/php}
 </div>
 {/if}
-</div ends="admin-body-container"></body>
+</div ends="body-container"></body>
 </html>

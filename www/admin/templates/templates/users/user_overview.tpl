@@ -1,14 +1,14 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 <table>
 <tr>
-	<th onclick="tableColumnSort('id');">id</th>
-	<th onclick="tableColumnSort('first_name');">first name</th>
-	<th onclick="tableColumnSort('last_name');">last name</th>
-	<th onclick="tableColumnSort('gender');">gender</th>
-	<th onclick="tableColumnSort('email_address');">e-mail</th>
-	<th onclick="tableColumnSort('role');">role</th>
+	<th onclick="allTableColumnSort('id');">id</th>
+	<th onclick="allTableColumnSort('first_name');">first name</th>
+	<th onclick="allTableColumnSort('last_name');">last name</th>
+	<th onclick="allTableColumnSort('gender');">gender</th>
+	<th onclick="allTableColumnSort('email_address');">e-mail</th>
+	<th onclick="allTableColumnSort('role');">role</th>
 	<th></th>
 	<th></th>
 </tr>

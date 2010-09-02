@@ -1,5 +1,5 @@
 206
-a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283349226;s:7:"expires";i:1283352826;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283421869;s:7:"expires";i:1283425469;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -11,6 +11,8 @@ a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b
 
 	<style type="text/css" media="all">
 		@import url("/admin/style/main.css");
+		@import url("/admin/style/admin-inputs.css");
+		@import url("/admin/style/admin-help.css");
 		@import url("/admin/style/admin.css");
 	</style>
 
@@ -19,25 +21,25 @@ a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b
 
 </head>
 
-<body><div id="admin-body-container">
-<div id="admin-header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="admin-page-lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="admin-page-eti-logo" />
+<body><div id="body-container">
+<div id="header-container">
+	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
 </div>
-<div id="admin-page-container">
+<div id="page-container">
 
-<div id="admin-titles">
-	<span id="admin-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="admin-apptitle"><a href="index.php">User administration</a></span><br />	<span id="admin-pagetitle">Login</span>
+<div id="page-header-titles">
+	<span id="page-header-title">Linnaeus NG Administration v0.1</span><br />
+	<span id="page-header-appname"><a href="index.php">User administration</a></span><br />	<span id="page-header-pageaction">Login</span>
 </div>
 
-<div id="inlineHelp">
-	<div id="inlineHelp-title" onclick="toggleHelpVisibility();">Help</div>
-	<div class="inlineHelp-body-hidden" id="inlineHelp-body">
-		<div class="inlineHelp-subject">Logging in</div>
-		<div class="inlineHelp-text">To log in, fill in your Linnaeus NG-username and password, and press the button labeled "Login".</div>
-		<div class="inlineHelp-subject">Problems logging in?</div>
-		<div class="inlineHelp-text">If you cannot login, please <a href="mailto:helpdesk@linnaeus.eti.uva.nl">contact the helpdesk</a>.</div>
+<div id="block-inline-help">
+	<div id="title" onclick="allToggleHelpVisibility();">Help</div>
+	<div class="body-collapsed" id="body-visible">
+		<div class="subject">Logging in</div>
+		<div class="text">To log in, fill in your Linnaeus NG-username and password, and press the button labeled "Login".</div>
+		<div class="subject">Problems logging in?</div>
+		<div class="text">If you cannot login, please <a href="mailto:helpdesk@linnaeus.eti.uva.nl">contact the helpdesk</a>.</div>
 	</div>
 </div>
 
@@ -61,8 +63,8 @@ $(document).ready(function(){
 </script>
 
 
-</div ends="admin-page-container">
+</div ends="page-container">
 <div id="admin-footer-container">
 </div ends="admin-footer-container">
-</div ends="admin-body-container"></body>
+</div ends="body-container"></body>
 </html>

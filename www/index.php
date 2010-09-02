@@ -4,32 +4,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title></title>
 <style type="text/css" media="all">
-  @import url("admin/style/main.css");
-  @import url("admin/style/admin.css");
+	@import url("admin/style/main.css");
+	@import url("admin/style/admin-inputs.css");
+	@import url("admin/style/admin-help.css");
+	@import url("admin/style/admin.css");
 </style>
 <script type="text/javascript" src="admin/javascript/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="admin/javascript/main.js"></script>
 </head>
-<body><div id="admin-body-container">
-<div id="admin-header-container">
-	<img src="admin/images/system/linnaeus_logo.png" id="admin-page-eti-logo" />
+<body><div id="body-container">
+<div id="header-container">
+	<img src="admin/images/system/linnaeus_logo.png" id="eti-logo" /></div>
+<div id="page-container">
 
-</div>
-<div id="admin-page-container">
-
-<div id="admin-titles">
-	<span id="admin-title">Linnaeus NG</span><br />
+<div id="page-header-titles">
+	<span id="page-header-title">Linnaeus NG</span><br />
 	<span id="admin-subtitle"></span>
 </div>
 
-<div id="admin-main">
+<div id="page-main">
 	Welcome to Linnaeus NG.<br /><br />
 	To use the administration, follow  <a href="admin/">this link</a>.<br />
 	To use the application, follow  <a href="app/">this link</a>.<br /><br />
 </div>
 
-</div ends="admin-page-container">
-<div id="admin-footer-container">
-</div ends="admin-footer-container">
-</div ends="admin-body-container"></body>
+</div ends="page-container">
+<div id="footer-container">
+</div ends="footer-container">
+</div ends="body-container"></body>
 </html>

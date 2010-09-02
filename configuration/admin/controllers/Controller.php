@@ -634,7 +634,7 @@
 
 		private function getSortField() {
 
-			return $this->sortField ? $this->sortField : 'id' ;
+			return !empty($this->sortField) ? $this->sortField : 'id' ;
 			
 		}
 
@@ -646,7 +646,7 @@
 
 		private function getSortDirection() {
 
-			return $this->sortDirection ? $this->sortDirection : 'asc' ;
+			return !empty($this->sortDirection) ? $this->sortDirection : 'asc' ;
 			
 		}
 		
@@ -658,16 +658,18 @@
 
 		private function getSortCaseSensitivity() {
 
-			return $this->sortCaseSensitivity ? $this->sortCaseSensitivity : 'i';
+			return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
 
 		}
 
-		private function doSortUserArray($a,$b) {
+		private function doCustomSortArray($a,$b) {
 		
 			$f = $this->getSortField();
 			$d = $this->getSortDirection();
 			$c = $this->getSortCaseSensitivity();
-			
+
+			if (empty($a[$f]) || empty($b[$f])) return;
+
 			if ($c!='s') {
 
 				$a[$f] = strtolower($a[$f]);
@@ -679,13 +681,13 @@
 
 		}
 
-		public function sortUserArray(&$array,$sortBy) {
+		public function customSortArray(&$array,$sortBy) {
 
 			$this->setSortField($sortBy['key']);
 			$this->setSortDirection($sortBy['dir']);
 			$this->setSortCaseSensitivity($sortBy['case']);
 
-			usort($array,array($this,'doSortUserArray'));
+			usort($array,array($this,'doCustomSortArray'));
 
 		}
 

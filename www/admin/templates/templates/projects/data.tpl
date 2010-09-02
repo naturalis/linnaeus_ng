@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 {$data.id}{$data.version}
 <table>
 	<tr>

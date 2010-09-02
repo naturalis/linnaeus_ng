@@ -1,6 +1,6 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-01 15:53:47
+<?php /* Smarty version 2.6.26, created on 2010-09-02 12:18:25
          compiled from shared/admin-footer.tpl */ ?>
-</div ends="admin-page-container">
+</div ends="page-container">
 <div id="admin-footer-container">
 <?php if (! $this->_tpl_vars['excludecludeBottonMenu']): ?>
 	<div id="admin-footer-menu">
@@ -40,5 +40,5 @@ var_dump($_SESSION);
  ?>
 </div>
 <?php endif; ?>
-</div ends="admin-body-container"></body>
+</div ends="body-container"></body>
 </html>

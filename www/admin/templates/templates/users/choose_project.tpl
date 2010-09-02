@@ -1,14 +1,14 @@
 {include file="../shared/admin-header.tpl"}
 
 {if !empty($messages)}
-<div id="admin-messages">
+<div id="page-block-messages">
 {section name=i loop=$messages}
 <span class="admin-message">{$messages[i]}</span><br />
 {/section}
 </div>
 {/if}
 
-<div id="admin-main">
+<div id="page-main">
 <ul class="admin-list">
 {section name=i loop=$projects}
 <li>

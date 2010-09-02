@@ -1,14 +1,14 @@
 {include file="../shared/admin-header.tpl"}
 
 {if !empty($errors)}
-<div id="admin-errors">
+<div id="page-block-errors">
 {section name=error loop=$errors}
-<span class="admin-message-error">{$errors[error]}</span><br />
+<span class="message-error">{$errors[error]}</span><br />
 {/section}
 </div>
 {/if}
 
-<div id="admin-main">
+<div id="page-main">
 	<form method="post" action="login.php">
 	<table>
 		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>

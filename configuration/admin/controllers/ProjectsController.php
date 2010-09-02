@@ -99,9 +99,13 @@ hard coded number of free modules
 
 			$this->checkAuthorisation();
 
-			$this->setPageName( _('Collaborator tasks'));
+			$this->setPageName( _('Assign collaborator to modules'));
 
-			$modules = $this->models->ModuleProject->get(array('project_id'=>$this->getCurrentProjectId()));
+			$modules = $this->models->ModuleProject->get(
+							array('project_id'=>$this->getCurrentProjectId()),
+							false,'
+							module_id asc'
+						);
 
 			foreach((array)$modules as $key => $val) {
 
@@ -163,7 +167,7 @@ hard coded number of free modules
 
 			}
 
-			$this->sortUserArray($users,array('key'=>'last_name','dir'=>'asc','case'=>'i'));
+			$this->customSortArray($users,array('key'=>'last_name','dir'=>'asc','case'=>'i'));
 
 			$this->smarty->assign('users', $users);
 
@@ -249,13 +253,20 @@ hard coded number of free modules
 					} else
 					if ($action=='delete') {
 		
+						$this->models->FreeModuleProjectUser->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'free_module_id' => $id
+							)
+						);
+	
 						$this->models->FreeModuleProject->delete(
 							array(
 								'id'=>$id,
 								'project_id'=>$this->getCurrentProjectId()
 							)
 						);
-		
+
 					}
 	
 				} else {
@@ -289,6 +300,13 @@ hard coded number of free modules
 		
 					} else
 					if ($action=='delete') {
+
+						$this->models->ModuleProjectUser->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'module_id' => $id
+							)
+						);
 		
 						$this->models->ModuleProject->delete(
 							array(
@@ -304,27 +322,58 @@ hard coded number of free modules
 			} else
 			if ($view=='collaborators') {
 //NEED CHECKS!
-				if ($action=='add') {
 
-					$this->models->ModuleProjectUser->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getCurrentProjectId(),
-							'module_id' => $id,
-							'user_id' => $user
-						)
-					);
+				if ($t == 'free') {
+				
+					if ($action=='add') {
+	
+						$this->models->FreeModuleProjectUser->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getCurrentProjectId(),
+								'free_module_id' => $id,
+								'user_id' => $user
+							)
+						);
 
-				} else
-				if ($action=='remove') {
+					} else
+					if ($action=='remove') {
+	
+						$this->models->FreeModuleProjectUser->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'free_module_id' => $id,
+								'user_id' => $user
+							)
+						);
+	
+					}
 
-					$this->models->ModuleProjectUser->delete(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'module_id' => $id,
-							'user_id' => $user
-						)
-					);
+				} else {
+
+					if ($action=='add') {
+	
+						$this->models->ModuleProjectUser->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getCurrentProjectId(),
+								'module_id' => $id,
+								'user_id' => $user
+							)
+						);
+	
+					} else
+					if ($action=='remove') {
+	
+						$this->models->ModuleProjectUser->delete(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'module_id' => $id,
+								'user_id' => $user
+							)
+						);
+	
+					}
 
 				}
 

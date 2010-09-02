@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 <form method="post" action="" name="theForm" id="theForm">
 	<input name="id" value="{$data.id}" type="hidden" />
 	<input name="checked" id="checked" value="1" type="hidden" />
@@ -19,9 +19,9 @@
 				id="username" 
 				value="{$data.username}" 
 				maxlength="16" 
-				onblur="remoteValueCheck(this.id,[this.value],['e','f'],userid)" 
+				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'],userid)" 
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="username-message" class=""></span>
 		</td>
 	</tr>
@@ -34,9 +34,9 @@
 				id="password" 
 				value="" 
 				maxlength="16" 
-				onblur="{literal}if (this.value) { remoteValueCheck(this.id,[this.value],['f'],userid); }{/literal}"
+				onblur="{literal}if (this.value) { userRemoteValueCheck(this.id,[this.value],['f'],userid); }{/literal}"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="password-message" class="">(leave blank to leave unchanged)</span>
 		</td>
 	</tr>
@@ -49,9 +49,9 @@
 				id="password_2" 
 				value="" 
 				maxlength="16" 
-				onblur="{literal}if (this.value || $('#password.val().)) { remoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'],userid); }{/literal}"
+				onblur="{literal}if (this.value || $('#password.val().)) { userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'],userid); }{/literal}"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="password_2-message" class="">(leave blank to leave unchanged)</span>
 		</td>
 	</tr>
@@ -64,9 +64,9 @@
 				id="first_name" 
 				value="{$data.first_name}" 
 				maxlength="32"
-				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="first_name-message" class=""></span>
 		</td>
 	</tr>
@@ -79,9 +79,9 @@
 				id="last_name" 
 				value="{$data.last_name}" 
 				maxlength="32"
-				onblur="remoteValueCheck(this.id,[this.value],['f'],userid)"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="last_name-message" class=""></span>
 		</td>
 	</tr>
@@ -104,7 +104,7 @@
 					value="m" {if $data.gender=='m'}checked="checked"{/if} 
 				/>m
 			</label>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 		</td>
 	</tr>
 	<tr>
@@ -116,9 +116,9 @@
 				id="email_address" 
 				value="{$data.email_address}" 
 				maxlength="64"
-				onblur="remoteValueCheck(this.id,[this.value],['f','e'],userid)"
+				onblur="userRemoteValueCheck(this.id,[this.value],['f','e'],userid)"
 			/>
-			<span class="admin-required-field-asterisk">*</span>
+			<span class="asterisk-required-field">*</span>
 			<span id="email_address-message" class=""></span>
 		</td>
 	</tr>

@@ -1,10 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="admin-main">
+<div id="page-main">
 <ul class="admin-list">
 	<li><a href="data.php">Define basic project data</a></li>
 	<li><a href="modules.php">Define project modules</a></li>
-	<li><a href="collaborators.php">Connect collaborators to modules</a></li>
+	<li><a href="collaborators.php">Assign collaborators to modules</a></li>
 </ul>
 </div>
 
