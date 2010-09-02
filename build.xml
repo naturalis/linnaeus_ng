@@ -31,13 +31,13 @@
 </target>
 
     <!-- Generate documentation -->
-    <target name="phpdoc">
-        <exec dir="${basedir}"
-            checkreturn="true"
-            command="phpdoc -ct type -ue on -t ${build}/api
-                     -tb /usr/share/php/data/phpUnderControl/data/phpdoc -o HTML:Phpuc:phpuc
-                     -d ${basedir}/configuration,${basedir}/www" />
-    </target>
+<!--    <target name="phpdoc"> -->
+<!--         <exec dir="${basedir}" -->
+<!--             checkreturn="true" -->
+<!--             command="phpdoc -ct type -ue on -t ${build}/api -->
+<!--                      -tb /usr/share/php/data/phpUnderControl/data/phpdoc -o HTML:Phpuc:phpuc -->
+<!--                      -d ${basedir}/configuration,${basedir}/www" /> -->
+<!--     </target> -->
 
 <target name="deploy">
   <svnupdate svnpath="svn" nocache="true" todir="${deploy.location}" />
@@ -73,7 +73,7 @@
               ${deploy.db.name} &lt; ${basedir}/${deploy.db.dump}" />
     </target>
 
-<target name="build" depends="checkout,clean,phplint,phpdoc,deploy,upload,deploydb" />
-
+<target name="build" depends="checkout,clean,phplint,deploy,upload,deploydb" />
+<!-- Unused targets: phpdoc  -->
 </project>
 
