@@ -28,6 +28,9 @@
 
 		private $usedModelsBase = array('helptext');
 
+		/**
+		* Constructor, calls all initialisation functions
+		*/
 		public function __construct() {
 
 			parent::__construct();
@@ -39,8 +42,6 @@
 			$this->setNames();
 
 			$this->setSmarty();
-
-			$this->setHistory();
 
 			$this->setRequestData();
 
@@ -54,41 +55,95 @@
 
 		}
 
+		/**
+		* Destroys!
+		*/
 		public function __destruct() {
 
 			parent::__destruct();
 
 		}
 
-		/* initialise */
+		/**
+		* Starts the user's session
+		*/
 		private function startSession() {
 		
 			session_start();
 		
 		}
 
-
+		/**
+		* Sets a global 'debug' mode, based on a general setting in the config file
+		*/
 		private function setDebugMode() {
 
 			$this->debugMode = $this->generalSettings['debugMode'];
 
 		}
 
-
+		/**
+		* Sets class variables, based on a page's url
+		* 
+		* Sets the following:
+		*   full path ('/admin/views/projects/collaborators.php')
+		*   application name ('admin')
+		*   controller's base name ('projects' for 'ProjectsController')
+		*   view name ('collaborators')
+		*   
+		*/
 		private function setNames() {
 
 			$this->fullPath = $_SERVER['PHP_SELF'];
+
 			$path = pathinfo(substr_replace($this->fullPath,'',0,strlen($this->generalSettings['rootWebUrl'])-1));
-			//$this->viewName = ucfirst($path['filename']);
-			$this->viewName = $path['filename'];
 
 			$dirs = explode('/',$path['dirname']);
-			if (!empty($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
+
 			if (!empty($dirs[1])) $this->appName = strtolower($dirs[1]);
-			//$this->controllerName = ucfirst($this->getControllerBaseName()).'Controller';
+
+			if (!empty($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
+
+			if (!empty($path['filename'])) $this->viewName = $path['filename'];
 
 		}
 
+		/**
+		* Returns the application name
+		*
+		* @return 	string	application name
+		*/
+		public function getAppName() {
+
+			return $this->appName;
+
+		}
+
+		/**
+		* Returns the controller's base name
+		*
+		* @return 	string	controller's base name
+		*/
+		public function getControllerBaseName() {
+
+			return $this->controllerBaseName;
+
+		}
+
+		/**
+		* Returns the current view's name
+		*
+		* @return 	string	current view's name
+		*/
+		public function getViewName() {
+
+			return $this->viewName;
+
+		}
+
+		/**
+		* Sets general Smarty variables (paths, compilder directives)
+		*/
 		private function setSmarty() {
 
 			$this->smartySettings = $this->config->getSmartySettings();
@@ -106,7 +161,10 @@
 			$this->smarty->compile_check = $this->smartySettings['compile_check'];
 
 		}
-		
+
+		/**
+		* Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
+		*/
 		private function setRequestData() {
 
 			//$this->requestData = $_REQUEST; // also contains cookies
@@ -116,6 +174,13 @@
 
 		}
 
+		/**
+		* Loads the required models (database abstraction classes for the various tables)
+		*
+		* Takes the model's names specified in the class variables usedModelsBase and usedModels,
+		* loads the corresponding class files, and initiates an instance of each model class 
+		* as object of the class variable 'models'.
+		*/
 		private function loadModels() {
 		
 			$d = array_unique(array_merge((array)$this->usedModelsBase,(array)$this->usedModels));
@@ -142,6 +207,13 @@
 
 		}
 
+		/**
+		* Loads the required helpers (separate multi-use classes)
+		*
+		* Takes the helper's names specified in the class variables usedHelpers,
+		* loads the corresponding class files, and initiates an instance of each helper class 
+		* as object of the class variable 'helpers'.
+		*/
 		private function loadHelpers() {
 
 			foreach((array)$this->usedHelpers as $key) {
@@ -164,6 +236,9 @@
 
 		}
 
+		/**
+		* Loads the help texts for the current view into the class variable 'helpTexts'
+		*/
 		private function setHelpTexts() {
 
 			$this->helpTexts = 
@@ -175,8 +250,26 @@
 				);
 			
 		}
+
+		/**
+		* Returns the class variable 'helptexts', which contains all the pages's help texts
+		*
+		* @return 	array	array with all help texts
+		*/
+		private function getHelpTexts() {
+
+			return $this->helpTexts;
+			
+		}
+
 		
-		
+		/**
+		* Initialises miscellaneous variables
+		*
+		* sets default filemask
+		* sets default max upload size
+		* sets a random value
+		*/		
 		private function setMiscellaneous() {
 
 			$this->setDefaultUploadFilemask();
@@ -187,68 +280,9 @@
 
 		}
 
-
-		/* history */
-		private function setHistory() {
-		
-			$d = &$_SESSION['history'];
-
-			// do not store current url if it is identical to the last (= page reload), just update timestamp
-			if ($d[count((array)$d)-1]['url']==$this->fullPath) {
-
-				$d[count((array)$d)-1]['time'] = time();
-				return;
-
-			}
-
-			// store current url and time of visiting
-			$d[] = array('time' => time(), 'url' => $this->fullPath);
-
-			// keep total history to configurated maximum
-			while (count((array)$d)> $this->generalSettings['maxSessionHistorySteps']) {
-
-				array_shift($d);
-
-			}
-
-		}
-
-		public function getHistory($stepsBack = 1, $ignoreCurrent = true) {
-
-			if ($ignoreCurrent) {
-
-				foreach(array_reverse($_SESSION['history']) as $key => $val) {
-
-					if ($stepsBack >= ($key+1) && $val['url'] != $this->fullPath) {
-
-						return $val;
-
-					} else {
-
-						$last = $val;
-
-					}
-
-				}
-			
-				return $last['url'];
-
-			} else {
-
-				return $_SESSION['history'][count((array)$_SESSION['history'])-$stepsBack]['url'];
-
-			}
-
-		}
-		
-		public function destroyHistory() {
-
-			unset($_SESSION['history']);
-
-		}
-
-
-		/* basics */
+		/**
+		* Assigns basic Smarty variables and renders the page
+		*/
 		public function printPage() {
 
 			$this->smarty->assign('debugMode', $this->debugMode);
@@ -272,6 +306,11 @@
 
 		}
 
+		/**
+		* Redirects the user to another page (and avoids circular redirection)
+		*
+		* @param  	string	$url	url to redirect to; can be false, in which case HTTP_REFERER is used
+		*/
 		public function redirect($url = false) {
 		
 			if (!$url) {
@@ -301,87 +340,99 @@
 
 		}
 
-
-		private function getHelpTexts() {
-
-			return $this->helpTexts;
-			
-		}
-
-
-		/* set and get messages and errors */
-		public function addError($err) {
+		/**
+		* Adds an error to the class's stack of errors stored in class variable 'errors'
+		*
+		* @param  	type	$error	the error
+		*/
+		public function addError($error) {
 		
-			$this->errors[] = $err;
+			$this->errors[] = $error;
 		
 		}
-		
+
+		/**
+		* Returns the class's stack of errors stored in class variable 'errors'
+		*
+		* @return 	array	stack of errors
+		*/
 		public function getErrors() {
 		
 			return $this->errors;
 		
 		}
+
+		/**
+		* Adds a message to the class's stack of messages stored in class variable 'messages'
+		*
+		* @param  	type	$message	the message
+		*/
+		public function addMessage($message) {
 		
-		public function addMessage($err) {
-		
-			$this->messages[] = $err;
+			$this->messages[] = $message;
 		
 		}
 		
+		/**
+		* Returns the class's stack of messages stored in class variable 'messages'
+		*
+		* @return 	array	stack of messages
+		*/
 		public function getMessages() {
 		
 			return $this->messages;
 		
 		}
 
-
-		/* set and get app, view, controller names (most set functions are in initialise block) */
-		public function getControllerBaseName() {
-
-			return $this->controllerBaseName;
-
-		}
-
-		public function getAppName() {
-
-			return $this->appName;
-
-		}
-
-
-		public function getViewName() {
-
-			return $this->viewName;
-
-		}
-
-
+		/**
+		* Sets the name of the current page, for display purposes, in a class variable 'pageName'.
+		*
+		* @param  	string	$name	the page's name
+		*/
 		public function setPageName($name) {
 
 			$this->pageName = $name;
 
 		}
 
+		/**
+		* Returns the name of the current page.
+		*
+		* @return 	string	the page's name
+		*/
 		public function getPageName() {
 
 			return $this->pageName;
 
 		}
 
-
-		/* set and get user, project names and id's */
+		/**
+		* Sets the current user's id as a class variable
+		*
+		* @param  	array	$userData	basic user data
+		*/
 		public function setCurrentUserId($userData) {
 
 			$this->currentUserId = $userData['id'];
 
 		}
 
+		/**
+		* Returns the current user's id class variable
+		*
+		* @return 	integer	user id
+		*/
 		public function getCurrentUserId() {
 
 			return $this->currentUserId;
 
 		}
 
+		/**
+		* Returns the projects the current user has been assigned to
+		*
+		* @return 	array	array of project's id's and names
+		*/
 		public function getCurrentUserProjects() {
 
 			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
@@ -400,20 +451,31 @@
 
 		}
 
-
+		/**
+		* Sets the active project's id as class variable
+		*
+		* @param  	integer	$id	new active project's id
+		*/
 		public function setCurrentProjectId($id) {
 
 			$_SESSION['_current_project_id'] = $id;
 
 		}
 
-
+		/**
+		* Returns the active project's id class variable
+		*
+		* @return 	integer	active project's id
+		*/
 		public function getCurrentProjectId() {
 
 			return $_SESSION['_current_project_id'];
 
 		}
 
+		/**
+		* Sets the active project's name as a session variable (for display purposes)
+		*/
 		public function setCurrentProjectName() {
 
 			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
@@ -430,12 +492,24 @@
 			
 		}
 
+		/**
+		* Gets the active project's name from the session
+		*
+		* @return 	string	active project's name
+		*/
 		public function getCurrentProjectName() {
 
 			return $_SESSION['_current_project_name'];
 		
 		}
 
+		/**
+		* Sets the default project for the current user
+		*
+		* After logging in, the app requires an active project is set, the project the user actually works on.
+		* If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
+		* the choice should be automatic. This function decides what project should be the active one, and sets it.
+		*/
 		public function setDefaultProject() {
 
 			$d = (array)$_SESSION['user']['_roles'];
@@ -450,6 +524,7 @@
 
 			}
 			// if user has more roles, set the project in which he has the lowest role_id as the active project
+			// (this assumes that the roles with the most permissions have the lowest ids)
 			else {
 
 				$t = false;
@@ -474,31 +549,49 @@
 
 		}
 
-
-		/* logging in and out */
+		/**
+		* Sets the page to redirect to after logging in
+		*
+		* Pages that require login redirect the user towards the login. By setting the 'login_start_page' 
+		* the app can direct the to the desired page after they have succesfully logged in.
+		*/
 		private function setLoginStartPage() {
 
-			// "closed" pages that redirect the user towards the login set 'login_start_page' so the user can return after logging in
 			$_SESSION['login_start_page'] = $this->fullPath;
 
 		}
 
+		/**
+		* Returns the page to redirect to after logging in
+		*
+		* @return 	string	path if page to redirect to
+		*/
 		public function getLoginStartPage() {
 
-			// "closed" pages that redirected the user towards the login have set $_SESSION['login_start_page']
 			if (!empty($_SESSION['login_start_page'])) {
 
 				return $_SESSION['login_start_page'];
 
 			} else {
 
-				//return 'index.php';
 				return $this->generalSettings['rootWebUrl'].$this->getAppName().'/'.$this->getAppName().'-index.php';
 						
 			}
 
 		}
 
+		/**
+		* Sets user's data in a session after logging in
+		*
+		* User data retrieved after logging in is stored in a session for faster access.
+		* Data includes basic personal data, the user's various roles within projects,
+		* the user's rights to see actual pages and the number of projects he is assigned to.
+		*
+		* @param  	array	$userData	basic user data
+		* @param  	array	$roles	user's roles
+		* @param  	array	$rights	user's rights
+		* @param  	integer	$numberOfProjects	number of assigned projects
+		*/
 		public function setUserSession($userData,$roles,$rights,$numberOfProjects) {
 
 			if (!$userData) return;
@@ -514,20 +607,32 @@
 
 		}
 
+		/**
+		* Destroys a user's session (when logging out)
+		*/
 		public function destroyUserSession() {
 
 			session_destroy();
 
 		}
 
-
-		/* authorization etc. */
+		/**
+		* Checks whether a user is logged in
+		*
+		* @return 	boolean		logged in or not
+		*/
 		public function isUserLoggedIn() {
 
 			return (!empty($_SESSION['user']));
 
 		}
 		
+
+		/**
+		* Checks whether a user is authorized to view/use a page within a project
+		*
+		* @return 	boolean		authorized or not
+		*/
 		private function isUserAuthorisedForProjectPage() {
 
 			$d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()];
@@ -546,6 +651,16 @@
 
 		}
 
+		/**
+		* Checks whether a user is authorized to view/use a certain page and redirects if necessary
+		*
+		* Subsequently checks: 
+		*   Is the user logged in? 
+		*   Has the user selected an active project?
+		*   Is the user authorized to see a specific page?
+		*
+		* @return 	boolean		returns true if authorized, or redirects if not
+		*/
 		public function checkAuthorisation() {
 
 			// check if user is logged in, otherwise redirect to login page
@@ -612,6 +727,12 @@
 
 		}
 
+		/**
+		* Judges whether the user is authorized to work at a specific project
+		*
+		* @param  	integer	$id	project id
+		* @return 	boolean	is or is not authorized
+		*/
 		public function isCurrentUserAuthorizedForProject($id) {
 		
 			foreach((array)$this->getCurrentUserProjects() as $key => $val) {
@@ -624,48 +745,77 @@
 
 		}
 
-
-		/*  sorting  */
+		/**
+		* Sets key to sort by for doCustomSortArray
+		* @param string	name of the field to sort by
+		*/
 		private function setSortField($field) {
 
 			$this->sortField = $field;
 			
 		}
 
+		/**
+		* Returns key to sort by; called by doCustomSortArray
+		* @return string	name of the field to sort by; defaults to 'id'
+		*/
 		private function getSortField() {
 
 			return !empty($this->sortField) ? $this->sortField : 'id' ;
 			
 		}
 
+		/**
+		* Sets sort direction for doCustomSortArray
+		* @param string	$a	asc or desc
+		*/
 		private function setSortDirection($dir) {
 
 			$this->sortDirection = $dir;
 			
 		}
 
+		/**
+		* Returns direction to sort in; called by doCustomSortArray
+		* @return string	asc or desc
+		*/
 		private function getSortDirection() {
 
 			return !empty($this->sortDirection) ? $this->sortDirection : 'asc' ;
 			
 		}
 		
+		/**
+		* Sets case sensitivity for doCustomSortArray
+		* @param string	$a	i(nsensitive) or s(ensitive)
+		*/
 		private function setSortCaseSensitivity($sens) {
 
 			$this->sortCaseSensitivity = $sens;
 			
 		}
 
+		/**
+		* Returns setting for case-sensitivity while sorting; called by doCustomSortArray
+		* @return string	i(nsensitive) or s(ensitive)
+		*/
 		private function getSortCaseSensitivity() {
 
 			return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
 
 		}
 
+		/**
+		* Performs the actual usort; called by customSortArray
+		* @param array	$a	value of one array-element
+		* @param array	$b	value of the other
+		*/
 		private function doCustomSortArray($a,$b) {
-		
+
 			$f = $this->getSortField();
+
 			$d = $this->getSortDirection();
+
 			$c = $this->getSortCaseSensitivity();
 
 			if (empty($a[$f]) || empty($b[$f])) return;
@@ -681,30 +831,45 @@
 
 		}
 
+		/**
+		* Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
+		* @param array	$array	array to sort
+		* @param array	$sortBy	array to array of key, direction and case-sensitivity
+		*/
 		public function customSortArray(&$array,$sortBy) {
 
 			$this->setSortField($sortBy['key']);
+
 			$this->setSortDirection($sortBy['dir']);
+
 			$this->setSortCaseSensitivity($sortBy['case']);
 
 			usort($array,array($this,'doCustomSortArray'));
 
 		}
 
-
-		/**/
+		/**
+		* Sets a random integer value for general use
+		*/
 		private function setRandomValue() {
 
-			$this->randomValue = mt_rand(9999999,mt_getrandmax());
+			$this->randomValue = mt_rand(99999,mt_getrandmax());
 
 		}
 
+		/**
+		* Returns random integer value
+		* @return integer	anything between 99999 and mt_getrandmax()
+		*/
 		private function getRandomValue() {
 
 			return $this->randomValue;
 
 		}
-		
+
+		/**
+		* Sets the default file allowed mask for file uploads, based on the value in general settings
+		*/
 		private function setDefaultUploadFilemask() {
 		
 			if (!empty($this->generalSettings['defaultUploadFilemask']))
@@ -712,20 +877,30 @@
 		
 		}
 		
+		/**
+		* Returns the default file allowed mask for file uploads
+		* @return array	array of allowed file extensions
+		*/
 		public function getDefaultUploadFilemask() {
 		
 			return $this->defaultUploadFilemask;
 		
 		}
 		
-		
+		/**
+		* Sets the default maximum size of file uploads, based on the value in general settings
+		*/
 		private function setDefaultUploadMaxSize() {
 		
 			if (!empty($this->generalSettings['defaultUploadMaxSize']))
 				$this->defaultUploadMaxSize = $this->generalSettings['defaultUploadMaxSize'];
 		
 		}
-		
+
+		/**
+		* Returns the default maximum size of file uploads
+		* @return integer in bytes
+		*/
 		public function getDefaultUploadMaxSize() {
 		
 			return $this->defaultUploadMaxSize;
@@ -735,3 +910,4 @@
 
 	}
 
+?>
