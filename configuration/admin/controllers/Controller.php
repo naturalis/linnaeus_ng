@@ -30,6 +30,8 @@
 
 		/**
 		* Constructor, calls all initialisation functions
+		*
+		* @access 	public
 		*/
 		public function __construct() {
 
@@ -57,6 +59,8 @@
 
 		/**
 		* Destroys!
+		*
+		* @access 	public
 		*/
 		public function __destruct() {
 
@@ -66,6 +70,8 @@
 
 		/**
 		* Starts the user's session
+		*
+		* @access 	private
 		*/
 		private function startSession() {
 		
@@ -75,6 +81,8 @@
 
 		/**
 		* Sets a global 'debug' mode, based on a general setting in the config file
+		*
+		* @access 	private
 		*/
 		private function setDebugMode() {
 
@@ -90,7 +98,8 @@
 		*   application name ('admin')
 		*   controller's base name ('projects' for 'ProjectsController')
 		*   view name ('collaborators')
-		*   
+		*
+		* @access 	private
 		*/
 		private function setNames() {
 
@@ -112,6 +121,7 @@
 		* Returns the application name
 		*
 		* @return 	string	application name
+		* @access 	public
 		*/
 		public function getAppName() {
 
@@ -123,6 +133,7 @@
 		* Returns the controller's base name
 		*
 		* @return 	string	controller's base name
+		* @access 	public
 		*/
 		public function getControllerBaseName() {
 
@@ -134,6 +145,7 @@
 		* Returns the current view's name
 		*
 		* @return 	string	current view's name
+		* @access 	public
 		*/
 		public function getViewName() {
 
@@ -143,6 +155,8 @@
 
 		/**
 		* Sets general Smarty variables (paths, compilder directives)
+		*
+		* @access 	private
 		*/
 		private function setSmarty() {
 
@@ -164,6 +178,8 @@
 
 		/**
 		* Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
+		*
+		* @access 	private
 		*/
 		private function setRequestData() {
 
@@ -180,6 +196,8 @@
 		* Takes the model's names specified in the class variables usedModelsBase and usedModels,
 		* loads the corresponding class files, and initiates an instance of each model class 
 		* as object of the class variable 'models'.
+		*
+		* @access 	private
 		*/
 		private function loadModels() {
 		
@@ -213,6 +231,8 @@
 		* Takes the helper's names specified in the class variables usedHelpers,
 		* loads the corresponding class files, and initiates an instance of each helper class 
 		* as object of the class variable 'helpers'.
+		*
+		* @access 	private
 		*/
 		private function loadHelpers() {
 
@@ -238,6 +258,8 @@
 
 		/**
 		* Loads the help texts for the current view into the class variable 'helpTexts'
+		*
+		* @access 	private
 		*/
 		private function setHelpTexts() {
 
@@ -255,6 +277,7 @@
 		* Returns the class variable 'helptexts', which contains all the pages's help texts
 		*
 		* @return 	array	array with all help texts
+		* @access 	private
 		*/
 		private function getHelpTexts() {
 
@@ -269,6 +292,8 @@
 		* sets default filemask
 		* sets default max upload size
 		* sets a random value
+		*
+		* @access 	private
 		*/		
 		private function setMiscellaneous() {
 
@@ -282,6 +307,8 @@
 
 		/**
 		* Assigns basic Smarty variables and renders the page
+		*
+		* @access 	public
 		*/
 		public function printPage() {
 
@@ -310,6 +337,7 @@
 		* Redirects the user to another page (and avoids circular redirection)
 		*
 		* @param  	string	$url	url to redirect to; can be false, in which case HTTP_REFERER is used
+		* @access 	public
 		*/
 		public function redirect($url = false) {
 		
@@ -344,6 +372,7 @@
 		* Adds an error to the class's stack of errors stored in class variable 'errors'
 		*
 		* @param  	type	$error	the error
+		* @access 	public
 		*/
 		public function addError($error) {
 		
@@ -355,6 +384,7 @@
 		* Returns the class's stack of errors stored in class variable 'errors'
 		*
 		* @return 	array	stack of errors
+		* @access 	public
 		*/
 		public function getErrors() {
 		
@@ -366,6 +396,7 @@
 		* Adds a message to the class's stack of messages stored in class variable 'messages'
 		*
 		* @param  	type	$message	the message
+		* @access 	public
 		*/
 		public function addMessage($message) {
 		
@@ -377,6 +408,7 @@
 		* Returns the class's stack of messages stored in class variable 'messages'
 		*
 		* @return 	array	stack of messages
+		* @access 	public
 		*/
 		public function getMessages() {
 		
@@ -388,6 +420,7 @@
 		* Sets the name of the current page, for display purposes, in a class variable 'pageName'.
 		*
 		* @param  	string	$name	the page's name
+		* @access 	public
 		*/
 		public function setPageName($name) {
 
@@ -399,6 +432,7 @@
 		* Returns the name of the current page.
 		*
 		* @return 	string	the page's name
+		* @access 	public
 		*/
 		public function getPageName() {
 
@@ -410,6 +444,7 @@
 		* Sets the current user's id as a class variable
 		*
 		* @param  	array	$userData	basic user data
+		* @access 	public
 		*/
 		public function setCurrentUserId($userData) {
 
@@ -421,6 +456,7 @@
 		* Returns the current user's id class variable
 		*
 		* @return 	integer	user id
+		* @access 	public
 		*/
 		public function getCurrentUserId() {
 
@@ -432,6 +468,7 @@
 		* Returns the projects the current user has been assigned to
 		*
 		* @return 	array	array of project's id's and names
+		* @access 	public
 		*/
 		public function getCurrentUserProjects() {
 
@@ -455,6 +492,7 @@
 		* Sets the active project's id as class variable
 		*
 		* @param  	integer	$id	new active project's id
+		* @access 	public
 		*/
 		public function setCurrentProjectId($id) {
 
@@ -466,6 +504,7 @@
 		* Returns the active project's id class variable
 		*
 		* @return 	integer	active project's id
+		* @access 	public
 		*/
 		public function getCurrentProjectId() {
 
@@ -475,6 +514,8 @@
 
 		/**
 		* Sets the active project's name as a session variable (for display purposes)
+		*
+		* @access 	public
 		*/
 		public function setCurrentProjectName() {
 
@@ -496,6 +537,7 @@
 		* Gets the active project's name from the session
 		*
 		* @return 	string	active project's name
+		* @access 	public
 		*/
 		public function getCurrentProjectName() {
 
@@ -509,6 +551,8 @@
 		* After logging in, the app requires an active project is set, the project the user actually works on.
 		* If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
 		* the choice should be automatic. This function decides what project should be the active one, and sets it.
+		*
+		* @access 	public
 		*/
 		public function setDefaultProject() {
 
@@ -554,6 +598,8 @@
 		*
 		* Pages that require login redirect the user towards the login. By setting the 'login_start_page' 
 		* the app can direct the to the desired page after they have succesfully logged in.
+		*
+		* @access 	private
 		*/
 		private function setLoginStartPage() {
 
@@ -565,6 +611,7 @@
 		* Returns the page to redirect to after logging in
 		*
 		* @return 	string	path if page to redirect to
+		* @access 	public
 		*/
 		public function getLoginStartPage() {
 
@@ -591,6 +638,7 @@
 		* @param  	array	$roles	user's roles
 		* @param  	array	$rights	user's rights
 		* @param  	integer	$numberOfProjects	number of assigned projects
+		* @access 	public
 		*/
 		public function setUserSession($userData,$roles,$rights,$numberOfProjects) {
 
@@ -609,6 +657,8 @@
 
 		/**
 		* Destroys a user's session (when logging out)
+		*
+		* @access 	public
 		*/
 		public function destroyUserSession() {
 
@@ -620,6 +670,7 @@
 		* Checks whether a user is logged in
 		*
 		* @return 	boolean		logged in or not
+		* @access 	public
 		*/
 		public function isUserLoggedIn() {
 
@@ -632,6 +683,7 @@
 		* Checks whether a user is authorized to view/use a page within a project
 		*
 		* @return 	boolean		authorized or not
+		* @access 	private
 		*/
 		private function isUserAuthorisedForProjectPage() {
 
@@ -660,6 +712,7 @@
 		*   Is the user authorized to see a specific page?
 		*
 		* @return 	boolean		returns true if authorized, or redirects if not
+		* @access 	public
 		*/
 		public function checkAuthorisation() {
 
@@ -732,6 +785,7 @@
 		*
 		* @param  	integer	$id	project id
 		* @return 	boolean	is or is not authorized
+		* @access 	public
 		*/
 		public function isCurrentUserAuthorizedForProject($id) {
 		
@@ -747,7 +801,9 @@
 
 		/**
 		* Sets key to sort by for doCustomSortArray
+		*
 		* @param string	name of the field to sort by
+		* @access 	private
 		*/
 		private function setSortField($field) {
 
@@ -757,7 +813,9 @@
 
 		/**
 		* Returns key to sort by; called by doCustomSortArray
+		*
 		* @return string	name of the field to sort by; defaults to 'id'
+		* @access 	private
 		*/
 		private function getSortField() {
 
@@ -767,7 +825,9 @@
 
 		/**
 		* Sets sort direction for doCustomSortArray
+		*
 		* @param string	$a	asc or desc
+		* @access 	private
 		*/
 		private function setSortDirection($dir) {
 
@@ -777,7 +837,9 @@
 
 		/**
 		* Returns direction to sort in; called by doCustomSortArray
+		*
 		* @return string	asc or desc
+		* @access 	private
 		*/
 		private function getSortDirection() {
 
@@ -787,7 +849,9 @@
 		
 		/**
 		* Sets case sensitivity for doCustomSortArray
+		*
 		* @param string	$a	i(nsensitive) or s(ensitive)
+		* @access 	private
 		*/
 		private function setSortCaseSensitivity($sens) {
 
@@ -797,7 +861,9 @@
 
 		/**
 		* Returns setting for case-sensitivity while sorting; called by doCustomSortArray
+		*
 		* @return string	i(nsensitive) or s(ensitive)
+		* @access 	private
 		*/
 		private function getSortCaseSensitivity() {
 
@@ -807,8 +873,10 @@
 
 		/**
 		* Performs the actual usort; called by customSortArray
+		*
 		* @param array	$a	value of one array-element
 		* @param array	$b	value of the other
+		* @access 	private
 		*/
 		private function doCustomSortArray($a,$b) {
 
@@ -833,8 +901,10 @@
 
 		/**
 		* Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
+		*
 		* @param array	$array	array to sort
 		* @param array	$sortBy	array to array of key, direction and case-sensitivity
+		* @access 	public
 		*/
 		public function customSortArray(&$array,$sortBy) {
 
@@ -850,6 +920,8 @@
 
 		/**
 		* Sets a random integer value for general use
+		*
+		* @access 	private
 		*/
 		private function setRandomValue() {
 
@@ -859,7 +931,9 @@
 
 		/**
 		* Returns random integer value
+		*
 		* @return integer	anything between 99999 and mt_getrandmax()
+		* @access 	private
 		*/
 		private function getRandomValue() {
 
@@ -869,6 +943,8 @@
 
 		/**
 		* Sets the default file allowed mask for file uploads, based on the value in general settings
+		*
+		* @access 	private
 		*/
 		private function setDefaultUploadFilemask() {
 		
@@ -879,7 +955,9 @@
 		
 		/**
 		* Returns the default file allowed mask for file uploads
+		*
 		* @return array	array of allowed file extensions
+		* @access 	public
 		*/
 		public function getDefaultUploadFilemask() {
 		
@@ -889,6 +967,8 @@
 		
 		/**
 		* Sets the default maximum size of file uploads, based on the value in general settings
+		*
+		* @access 	private
 		*/
 		private function setDefaultUploadMaxSize() {
 		
@@ -899,7 +979,9 @@
 
 		/**
 		* Returns the default maximum size of file uploads
-		* @return integer in bytes
+		*
+		* @return integer max upload size in bytes
+		* @access 	public
 		*/
 		public function getDefaultUploadMaxSize() {
 		
@@ -907,7 +989,6 @@
 		
 		}
 	
-
 	}
 
 ?>

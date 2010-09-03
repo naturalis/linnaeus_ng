@@ -406,8 +406,6 @@
 
 			$this->destroyUserSession();
 
-//			$this->destroyHistory();
-
 			$this->redirect('login.php');
 
 		}
@@ -452,19 +450,30 @@
 
 		}
 
+		/**
+		* Creating a new collaborator
+		*
+		* See function code for detailed comments on the function's flow
+		*
+		* @access	public
+		*/
 		public function createAction() {
 
 			$this->checkAuthorisation();
 
 			$this->setPageName(_('Create new collaborator'));
 
+			// data was submitted
 			if ($this->requestData) {
 
+				// checked = 2: user entered data of a collaborator that already exists, but was not assigned to current project yet.
+				// instead of creating a new collaborator, we assign him to the current project with the specified role.
 				if ($this->requestData['checked']=='2') {
 
-					// make sure an unassignable role (like system admin) wasn't hacked in
+					// make sure an unassignable role (like system admin) wasn't injected
 					$r = $this->models->Role->get($this->requestData['role_id']);
 
+					// if unassignable, raise error
 					if ($r['assignable'] == 'n') {
 
 						$this->addError(_('Unassignable role selected'));
@@ -475,6 +484,7 @@
 
 					} else {
 
+						// save new role only for existing collaborator and new project
 						$this->models->ProjectRoleUser->save(
 								array(
 									'id' => null,
@@ -491,12 +501,13 @@
 					}
 
 				}
-				// save user
+				// cheked = 1: new collaborator, save data
 				elseif ($this->requestData['checked']=='1') {
 
-					// make sure an unassignable role (like system admin) wasn't hacked in
+					// make sure an unassignable role (like system admin) wasn't injected
 					$r = $this->models->Role->get($_SESSION['data']['new_user']['role_id']);
 
+					// if unassignable, raise error
 					if ($r['assignable'] == 'n') {
 
 						$this->addError(_('Unassignable role selected'));
@@ -507,6 +518,7 @@
 
 					} else {
 
+						// encode passwords and save data
 						$this->requestData = $_SESSION['data']['new_user'];
 	
 						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
@@ -527,6 +539,7 @@
 	
 						} else {
 	
+							// if saving was succesfull, save new role
 							$newUserId = $this->models->User->getNewId();
 	
 							$this->models->ProjectRoleUser->save(
@@ -547,8 +560,7 @@
 					}
 
 				} 
-
-				// user verified data and clicked 'back'
+				// user verified the data and clicked 'back'
 				elseif ($this->requestData['checked']=='-1') {
 				
 					$this->smarty->assign('check', false);
@@ -556,26 +568,30 @@
 					$userData = $_SESSION['data']['new_user'];
 
 				} 
-
-				// user submitted data, is shown non-editable data to verify or editable if containing errors
+				// user submitted data, is now shown non-editable data to verify, or editable if containing errors
 				else {
 
 					$saveUser = true;
 				
 					$this->requestData = $this->models->User->sanatizeData($this->requestData);
 
+					// save data in session for saving in the next step
 					$_SESSION['data']['new_user'] = $this->requestData;
-	
+
+					// check data validity etc.
 					if (!$this->isUserDataComplete()) $saveUser = false;
 	
 					if (!$this->isUserDataCorrect()) $saveUser = false;
 	
 					if (!$this->isUserDataUnique()) $saveUser = false;
 
+					// see if similar collaborators might exist, based on identical name, or identical email address
 					$sim = $this->getSimilarUsers();
 					
+					// if there are similar users...
 					if (count((array)$sim) != 0) {
 
+						// ...it might be because of his name...
 						if ($this->isEmailAddressUnique(false,false,true)) {
 		
 							$this->addMessage(_('A similar user, albeit with a different e-mail address, already exists in another project:'));
@@ -589,7 +605,9 @@
 								<input type="button" value="'._('no, create new').'" onclick="$(\'#checked\').val(\'1\');$(\'#theForm\').submit();">&nbsp;'
 							);
 
-						} else {
+						} 
+						// ...or because of his email address (or both)
+						else {
 
 							$this->addMessage(_('A user with the same e-mail address already exists in another project:'));
 
@@ -638,6 +656,11 @@
 
 		}
 
+		/**
+		* Overview of all collaborators in the current project
+		*
+		* @access	public
+		*/
 		public function userOverviewAction() {
 
 			$this->checkAuthorisation();
@@ -645,13 +668,14 @@
 
 			$this->setPageName(_('Project collaborator overview'));
 
-
+			// get all collaborators for the current project
 			$pru =  $this->models->ProjectRoleUser->get(
 				array(
 					'project_id' => $this->getCurrentProjectId()), 
 					'distinct user_id, role_id'
 				);
 
+			// get full details, as well as roles for each collaborator
 			foreach((array)$pru as $key => $val) {
 
 				$u = $this->models->User->get($val['user_id']);
@@ -664,16 +688,20 @@
 
 			}
 
+			// user requested a sort of the table
 			if ($this->requestData) {
 
 				$sortBy = array('key'=>$this->requestData['key'],'dir'=>($this->requestData['dir']=='asc' ? 'desc' : 'asc' ),'case'=>'i');
 
-			} else {
+			} 
+			// default sort order
+			else {
 
 				$sortBy = array('key'=>'last_name','dir'=>'asc','case'=>'i');
 
 			}
 
+			// sort array of collaborators
 			$this->customSortArray($users,$sortBy);
 
 			$this->smarty->assign('sortBy', $sortBy);
@@ -684,6 +712,11 @@
 
 		}
 
+		/**
+		* Viewing data of a collaborator
+		*
+		* @access	public
+		*/
 		public function viewAction() {
 
 			$this->checkAuthorisation();
@@ -710,19 +743,26 @@
 
 		}
 
+		/**
+		* Editing collaborator data
+		*
+		* See function code for detailed comments on the function's flow
+		*
+		* @access	public
+		*/
 		public function editAction() {
 
 			$this->checkAuthorisation();
 			
 			$this->setPageName(_('Edit project collaborator'));
 
-			// check whether the user to be edited is part of the current project (avoid inserted id)
+			// check whether the collaborator to be edited is part of the current project (avoid injected id)
 			if ($this->isUserPartOfProject($this->requestData['id'],$this->getCurrentProjectId())) {
 
-				// requested delete
+				// user requested delete
 				if (isset($this->requestData['delete']) && $this->requestData['delete']=='1') {
 
-					// delete user's role from this project
+					// delete collaborator's role from this project
 					$this->models->ProjectRoleUser->delete(
 						array(
 							'user_id' => $this->requestData['id'],
@@ -730,22 +770,23 @@
 							)
 						);
 
-					// see if user is present in any other projects...
+					// avoiding orphans: see if collaborator is present in any other projects...
 					$data = $this->models->ProjectRoleUser->get(array('user_id' => $this->requestData['id']),'count(*) as tot');
 
-					// ...if not, delete user
+					// ...if not, delete entire collaborator record
 					if (isset($data) && $data[0]['tot'] == '0') {
 
 						$this->models->User->delete($this->requestData['id']);
 
 					}
 
+					// redirect user to overview of remaining collaborators
 					$this->redirect('user_overview.php');
 
-				// update data
+				// user requested data update
 				} else if (isset($this->requestData['checked']) && $this->requestData['checked']=='1') {
 
-					// make sure an unassignable role (like system admin) wasn't hacked in
+					// make sure an unassignable role (like system admin) wasn't injected
 					$r = $this->models->Role->get($this->requestData['role_id']);
 
 					if ($r['assignable'] == 'n') {
@@ -758,37 +799,45 @@
 
 						$saveUser = true;
 					
+						// clean up data
 						$this->requestData = $this->models->User->sanatizeData($this->requestData);
-		
+
+						// if a no new passwords were entered, don't do a password check...
 						if ($this->requestData['password'] == '' && $this->requestData['password_2'] == '') {
 		
 							if (!$this->isUserDataComplete(array('password', 'password_2'))) $saveUser = false;
 						
 							if (!$this->isUserDataCorrect(array('password', 'password_2'))) $saveUser = false;
 	
-						} else {
+						}
+						// ...otherwise do a full check
+						else {
 		
 							if (!$this->isUserDataComplete()) $saveUser = false;
 						
 							if (!$this->isUserDataCorrect()) $saveUser = false;
 	
 						}
-		
+
+						// check whether data is unique; passing the collaborator's id avoids conflict with himself
 						if (!$this->isUserDataUnique($this->requestData['id'])) $saveUser = false;
 					
 					}
 
+					// data ok, can be saved
 					if ($saveUser) {
 
+						// if new password, encrypt the human readable to an encrypted one
 						if ($this->requestData['password']) {
 
 							$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
 
 						}
 
+						// get the current role of the collaborator in the current project
 						$upr = $this->getUserProjectRole($this->requestData['id'],$this->getCurrentProjectId());
 
-						// cannot change the role of a lead expert or system admin, or make them inactive
+						// if collaborator has a regular role, update to the new role...
 						if ($upr['role_id'] != 1 && $upr['role_id'] != 2) {
 
 							$this->models->ProjectRoleUser->save(array(
@@ -799,17 +848,22 @@
 								)
 							);
 
-						} else {
+						} 
+						// ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
+						else {
 
 							$this->requestData['active'] = 1;
 
 						}
 
+						// save the new data
 						$this->models->User->save($this->requestData);
 
 						$this->addMessage(_('User data saved'));
 
-					} else {
+					} 
+					// user cannot be saved
+					else {
 
 						$user = $this->requestData;
 
@@ -817,6 +871,7 @@
 
 				}
 
+				// assign all data and print success or errors
 				$user = $this->models->User->get($this->requestData['id']);
 
 				$upr = $this->getUserProjectRole($this->requestData['id'],$this->getCurrentProjectId());
@@ -841,12 +896,16 @@
 
 		}
 		
+		/**
+		* View displaying 'not authorized'
+		*
+		* Users can be redirected to notAuthorizedAction from every controller,
+		* so the controller name is hidden in the output to avoid confusion.
+		*
+		* @access	public
+		*/
 		public function notAuthorizedAction() {
 
-			/*
-				users can be redirected to notAuthorizedAction from every controller, 
-				so we hide the controller name in the output to avoid confusion
-			*/
 			$this->smarty->assign('hideControllerPublicName', true);
 
 			$this->addError(_('You are not authorized to do that.'));
@@ -855,16 +914,22 @@
 
 		}
 		
+		/**
+		* AJAX interface for this class
+		*
+		* Is used by the 'edit' and 'create' views to check values without reloading the page
+		* The array 'v' contains the values of the variables to check.
+		* The variable 'f' contains the name of the variable to check.
+		* Possible test (request variable 't'):
+		*  e	does value v already exit for field f?
+		*  f	is formatting of value v correct?
+		*  q	are values 1 & 2 equal?
+		* The variable 'i' can contain the id of a user to ignore in the test (to avoid claiming conflict
+		* with a user's own username or email address when editing).
+		*
+		* @access	public
+		*/
 		public function ajaxInterfaceAction() {
-
-			/*
-				possible test:
-					e	does value v already exit for field f?
-					f	is formatting of value v correct?
-					q	are values 1 & 2 equal?
-					i	id of user to ignore
-			
-			*/
 
 			$field = $this->requestData['f'];
 
