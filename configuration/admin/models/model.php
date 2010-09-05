@@ -452,6 +452,12 @@
 
 		}
 
+		/**
+		* Returns the id of a newly inserted row
+		*
+		* @return 	integer	new id
+		* @access 	public
+		*/
 		public function getNewId() {
 
 			return $this->newId;

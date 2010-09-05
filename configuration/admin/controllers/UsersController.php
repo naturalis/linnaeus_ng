@@ -6,7 +6,6 @@
 
 	*/
 
-
 	include_once('Controller.php');
 
 	class UsersController extends Controller {
@@ -15,18 +14,36 @@
 
 		public $controllerPublicName = 'User administration';
 
+		/**
+		* Constructor, calls parent's constructor
+		*
+		* @access 	public
+		*/
 		public function __construct() {
 
 			parent::__construct();
 
 		}
 
+		/**
+		* Destroys!
+		*
+		* @access 	public
+		*/
 		public function __destruct() {
 
 			parent::__destruct();
 
 		}
 
+		/**
+		* Retrieves all rights and roles of the current user
+		*
+		* Is called directly after log in. Results are stored in the user's session.
+		*
+		* @return 	array	array of roles, rights and the number of projects the user is involved with
+		* @access 	private
+		*/
 		public function getCurrentUserRights() {
 
 			$pru = $this->models->ProjectRoleUser->get(array('user_id' => $this->getCurrentUserId()));
@@ -61,6 +78,14 @@
 
 		}
 
+		/**
+		* Finds out if a collaborator has a role within the specified project
+		*
+		* @param  	string	$userId	id of the user to find
+		* @param  	string	$projectId	id of the project to find
+		* @return 	boolean	collaborator is part of the project, or not
+		* @access 	private
+		*/
 		private function isUserPartOfProject($user,$project) {
 
 			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$user,'project_id'=>$project));
@@ -69,9 +94,17 @@
 
 		}
 
-		private function getUserProjectRole($user,$project) {
+		/**
+		* Retrieves a collaborator's role within the specified project
+		*
+		* @param  	string	$userId	id of the user to find
+		* @param  	string	$projectId	id of the project to find
+		* @return 	array	role of user
+		* @access 	private
+		*/
+		private function getUserProjectRole($userId,$projectId) {
 
-			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$user,'project_id'=>$project));
+			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$userId,'project_id'=>$projectId));
 
 			if ($pru) {
 
@@ -84,12 +117,28 @@
 
 		}
 
+		/**
+		* Encodes a user's password for storing or checking against the database when logging in
+		*
+		* Currently md5 is used as encoding function
+		*
+		* @param  	string	$p	the password
+		* @return 	string	as 32 byte md5 hash
+		* @access 	private
+		*/
 		private function userPasswordEncode($p) {
 
 			return md5($p);
 
 		}
 
+		/**
+		* Verifies if the user data that has been entered is complete 
+		*
+		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
+		* @return 	boolean	data is complete or not
+		* @access 	private
+		*/
 		private function isUserDataComplete($fieldsToIgnore = array()) {
 
 			$result = true;
@@ -147,6 +196,16 @@
 
 		}
 		
+		/**
+		* Check whether a username qualifies as correct
+		*
+		* Looks currently only at length constraints (5 <= length <= 16)
+		*
+		* @param  	string	$username	username to check; if absent, username is taken from the request variables
+		* @return 	boolean	username is correct or not
+		* @access 	private
+		* @todo		a more complete check
+		*/
 		private function isUsernameCorrect($username = false) {
 		
 			if (!$username) $username = $this->requestData['username'];
@@ -173,6 +232,17 @@
 
 		}
 
+		/**
+		* Check whether a password qualifies as correct
+		*
+		* Looks currently only at length constraints (5 <= length <= 16)
+		*
+		* @param  	string	$password	password to check; if absent, password is taken from the request variables
+		* @param  	string	$password_2	second password from user data form; idem.
+		* @return 	boolean	password is correct (and identical if two were supplied) or not 
+		* @access 	private
+		* @todo		a more complete check
+		*/
 		private function isPasswordCorrect($password = false, $password_2 = false) {
 
 			if (!$password) $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
@@ -210,6 +280,15 @@
 
 		}
 
+		/**
+		* Check whether an e-mail address qualifies as correct
+		*
+		* Uses reg exp mask: /^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/
+		*
+		* @param  	string	$email_address	address to check; if absent, username is taken from the request variables
+		* @return 	boolean	address is correct or not
+		* @access 	private
+		*/
 		private function isEmailAddressCorrect($email_address = false) {
 
 			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
@@ -230,6 +309,14 @@
 
 		}
 
+		/**
+		* Tests whether userdata (username and emailaddress) is correct
+		*
+		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
+
 		private function isUserDataCorrect($fieldsToIgnore = array()) {
 
 			$result = true;
@@ -244,6 +331,14 @@
 
 		}
 
+		/**
+		* Tests whether username is unique in the database
+		*
+		* @param  	string	$username	username to check; if false, it is the 'username' var from the request data that is tested
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
 		private function isUsernameUnique($username = false, $idToIgnore = false) {
 
 			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
@@ -282,6 +377,15 @@
 
 		}
 
+		/**
+		* Tests whether emailaddress is unique in the database
+		*
+		* @param  	string	$email_address	address to check; if false, it is the 'email_address' var from the request data that is tested
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @param  	boolean	$suppress_error	if true, function just returns result and adds no error
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
 		private function isEmailAddressUnique($email_address = false, $idToIgnore = false, $suppress_error = false) {
 
 			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
@@ -320,6 +424,13 @@
 
 		}
 
+		/**
+		* Tests whether userdata (username and emailaddress) is unique in the database
+		*
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
 		private function isUserDataUnique($idToIgnore = false) {
 
 			$result = true;
@@ -332,6 +443,13 @@
 
 		}
 
+		/**
+		* Finds existing users in the database, based on mathcing name and/or emailaddress
+		*
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	array	array of users
+		* @access 	private
+		*/
 		private function getSimilarUsers($idToIgnore = false) {
 
 			$q = "select * from %table% where 
@@ -346,18 +464,27 @@
 
 		}
 
+		/**
+		* Login page and function
+		*
+		* See function code for detailed comments on the function's flow
+		*
+		* @access	public
+		*/
 		public function loginAction() {
 
 			$this->setPageName(_('Login'));
 
 			$this->smarty->assign('excludecludeBottonMenu',true);
 
+			// check wheter the user has entered a username and/or password
 			if (
 				(isset($this->requestData['username']) && $this->requestData['username']!='') || 
 				(isset($this->requestData['password']) && $this->requestData['password']!='')
 				) 
 			{
 
+				// get data of any active user based on entered username and password
 				$users = 
 					$this->models->User->get(
 						array(
@@ -367,15 +494,20 @@
 							)
 						);
 	
+				// no user found
 				if(count((array)$users)!=1) {
 	
 					$this->addError(_('Login failed'));
 					
 	
-				} else {
+				}
+				// user found 
+				else {
 				
+					// set curreny user id
 					$this->setCurrentUserId($users[0]);
 	
+					// update last and number of logins
 					$this->models->User->save(
 						array(
 							'id' => $this->getCurrentUserId(),
@@ -384,12 +516,16 @@
 							)
 						);
 	
+					// get user's roles and rights
 					$cur = $this->getCurrentUserRights();
 	
+					// save all relevant data to the session
 					$this->setUserSession($users[0],$cur['roles'],$cur['rights'],$cur['number_of_projects']);
 					
+					// determine and set the default active project
 					$this->setDefaultProject();
 	
+					// determine and redirect to the default start page after logging in
 					$this->redirect($this->getLoginStartPage());
 	
 				}
@@ -400,6 +536,11 @@
 
 		}
 
+		/**
+		* Logging out
+		*
+		* @access	public
+		*/
 		public function logoutAction() {
 
 			$this->setPageName(_('Logout'));
@@ -410,6 +551,11 @@
 
 		}
 
+		/**
+		* Start page of the users controller
+		*
+		* @access	public
+		*/
 		public function indexAction() {
 
 			$this->checkAuthorisation();
@@ -420,6 +566,11 @@
 
 		}
 		
+		/**
+		* Choosing the active project
+		*
+		* @access	public
+		*/
 		public function chooseProjectAction() {
 
 			$this->checkAuthorisation();

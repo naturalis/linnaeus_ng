@@ -29,7 +29,7 @@
 		private $usedModelsBase = array('helptext');
 
 		/**
-		* Constructor, calls all initialisation functions
+		* Constructor, calls parent's constructor and all initialisation functions
 		*
 		* @access 	public
 		*/
