@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-02 12:04:29
+<?php /* Smarty version 2.6.26, created on 2010-09-03 10:54:38
          compiled from login.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -38,7 +38,7 @@ $this->_sections['error']['last']       = ($this->_sections['error']['iteration'
 </div>
 <?php endif; ?>
 
-<div id="admin-main">
+<div id="page-main">
 	<form method="post" action="login.php">
 	<table>
 		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>

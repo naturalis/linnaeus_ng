@@ -1,5 +1,5 @@
 206
-a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283421869;s:7:"expires";i:1283425469;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283504078;s:7:"expires";i:1283507678;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -44,7 +44,7 @@ a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b
 </div>
 
 
-<div id="admin-main">
+<div id="page-main">
 	<form method="post" action="login.php">
 	<table>
 		<tr><td colspan="2">Please enter your username and password and click 'Login'.</td></tr>
@@ -64,7 +64,9 @@ $(document).ready(function(){
 
 
 </div ends="page-container">
-<div id="admin-footer-container">
-</div ends="admin-footer-container">
+
+<div id="footer-container">
+</div ends="footer-container">
+
 </div ends="body-container"></body>
 </html>
