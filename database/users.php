@@ -84,3 +84,12 @@ insert into dev_projects_roles_users values (null, 2, 3, 1);
 insert into dev_projects_roles_users values (null, 2, 2, 2);
 insert into dev_projects_roles_users values (null, 1, 4, 2);
 
+
+INSERT INTO dev_users (
+id ,username ,password ,first_name ,last_name ,gender ,email_address ,active ,last_login ,logins ,password_changed ,last_change ,created
+) VALUES ( null , 'admin', md5('admin'), 'Lead', 'Expert', 'm', 'expert@eti.uva.nl', '1', NULL , '0', NULL ,
+CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
+
+insert into dev_projects_roles_users values (null, 1, 2, 14);
+insert into dev_projects_roles_users values (null, 2, 2, 14);
+

@@ -112,6 +112,14 @@
 			if (!empty($dirs[1])) $this->appName = strtolower($dirs[1]);
 
 			if (!empty($dirs[3])) $this->controllerBaseName = strtolower($dirs[3]);
+			
+			/*
+			if (!$this->controllerBaseName) {
+
+				$this->controllerBaseName = strtolower(str_replace('Controller','',get_class($this)));
+
+			}
+			*/
 
 			if (!empty($path['filename'])) $this->viewName = $path['filename'];
 
@@ -266,7 +274,7 @@
 			$this->helpTexts = 
 				$this->models->Helptext->get(
 					array(
-						'controller'=>$this->getControllerBaseName(),
+						'controller'=>$this->getControllerBaseName() ? $this->getControllerBaseName() : '-',
 						'view'=>$this->getViewName()
 					), false, 'show_order'
 				);
