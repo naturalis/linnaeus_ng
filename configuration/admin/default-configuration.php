@@ -2,7 +2,7 @@
 
 	class configuration {
 
-		const smartyRoot = '@PATH.SMARTY@';
+		const applicationRootDir = '@PATH.APP_ROOT@';
 
 		public function getGeneralSettings() {
 
@@ -17,12 +17,22 @@
 					'logout' => '/views/users/logout.php',
 					'chooseProject' => '/views/users/choose_project.php',
 					'notAuthorized' => '/views/users/not_authorized.php'
-				)	
+				),
+				'uploading' => array(
+					'defaultUploadFilemask' => array(
+						'image/jpg',
+						'image/jpeg',
+						'image/png'
+					),
+					'defaultUploadMaxSize' => 1000000
+				),
+				'directories' => array(
+					'defaultUploadDir' => self::applicationRootDir.'www/admin/uploads/',
+					'imageDirProject' => self::applicationRootDir.'www/admin/images/project',
+					'imageDirUpload' => self::applicationRootDir.'www/admin/images/upload',
+				)
 			);
-			// hard paths are necessary as they are called from all over the place and used by functions in the base controller
 
-			//dev.eti.uva.nl	"/linnaeus_ng/"
-			//linnaeus			"/"
 		}
 
 		public function getDatabaseSettings() {
@@ -41,10 +51,10 @@
 		public function getSmartySettings() {
 
 			return array(
-				'dir_template' => self::smartyRoot.'templates',
-				'dir_compile' => self::smartyRoot.'templates_c',
-				'dir_cache' => self::smartyRoot.'cache',
-				'dir_config' => self::smartyRoot.'configs',
+				'dir_template' => self::applicationRootDir.'www/admin/templates/templates',
+				'dir_compile' => self::applicationRootDir.'www/admin/templates/templates_c',
+				'dir_cache' => self::applicationRootDir.'www/admin/templates/cache',
+				'dir_config' => self::applicationRootDir.'www/admin/templates/configs',
 				'caching' => 1, // 1,
 				'compile_check' => true
 			);

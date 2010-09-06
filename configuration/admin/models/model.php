@@ -234,7 +234,7 @@
 
 				$d = $this->columns[$key];
 
-				if ($d && !empty($val)) {
+				if ($d && isset($val)) {
 
 					if ($d['numeric']==1) {
 

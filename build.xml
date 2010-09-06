@@ -70,7 +70,7 @@
             <!--/fileset-->
             <filterchain>
                 <replacetokens>
-                    <token key="PATH.SMARTY" value="${smarty.path}" />
+                    <token key="PATH.APP_ROOT" value="${app_root.path}" />
                     <token key="URL.WEBROOT" value="${webroot.url}" />
                     <token key="DB.HOST" value="${db.host}" />
                 </replacetokens>

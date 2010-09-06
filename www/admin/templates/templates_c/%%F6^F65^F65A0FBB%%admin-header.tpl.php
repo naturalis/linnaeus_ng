@@ -1,12 +1,12 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 10:26:33
+<?php /* Smarty version 2.6.26, created on 2010-09-06 18:52:59
          compiled from ../shared/admin-header.tpl */ ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-	<title><?php echo $this->_tpl_vars['session']['_current_project_name']; ?>
-<?php if ($this->_tpl_vars['session']['_current_project_name'] != '' && $this->_tpl_vars['pageName'] != ''): ?> - <?php endif; ?><?php echo $this->_tpl_vars['pageName']; ?>
+	<title><?php echo $this->_tpl_vars['session']['project']['name']; ?>
+<?php if ($this->_tpl_vars['session']['project']['name'] != '' && $this->_tpl_vars['pageName'] != ''): ?> - <?php endif; ?><?php echo $this->_tpl_vars['pageName']; ?>
 </title>
 
 	<link href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
@@ -34,10 +34,11 @@ admin/javascript/main.js"></script>
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
+	<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
+admin/admin-index.php"><img src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
 admin/images/system/linnaeus_logo.png" id="lng-logo" />
 	<img src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
-admin/images/system/eti_logo.png" id="eti-logo" />
+admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
@@ -45,8 +46,11 @@ admin/images/system/eti_logo.png" id="eti-logo" />
 	<span id="page-header-title"><?php echo $this->_tpl_vars['applicationName']; ?>
  v<?php echo $this->_tpl_vars['applicationVersion']; ?>
 </span><br />
-<?php if ($this->_tpl_vars['session']['_current_project_name'] != ''): ?>	<span id="page-header-projectname"><?php echo $this->_tpl_vars['session']['_current_project_name']; ?>
-</span><br /><?php endif; ?>
+<?php if ($this->_tpl_vars['session']['project']['name'] != ''): ?>	<span id="page-header-projectname"><?php echo $this->_tpl_vars['session']['project']['name']; ?>
+</span>
+<!--DEBUG ONLY:--><span style="color:white"><?php echo $this->_tpl_vars['session']['project']['id']; ?>
+</span>
+<br /><?php endif; ?>
 <?php if ($this->_tpl_vars['controllerPublicName'] != '' && ! $this->_tpl_vars['hideControllerPublicName']): ?>	<span id="page-header-appname"><a href="index.php"><?php echo $this->_tpl_vars['controllerPublicName']; ?>
 </a></span><br /><?php endif; ?>
 	<span id="page-header-pageaction"><?php echo $this->_tpl_vars['pageName']; ?>

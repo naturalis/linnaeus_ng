@@ -14,7 +14,8 @@ hard coded number of free modules
 		public $usedModels = array(
 			'project','module','module_project','free_module_project',
 			'project_role_user','user','role',
-			'module_project_user','free_module_project_user'
+			'module_project_user','free_module_project_user',
+			'language','language_project'
 			);
 
 		public $usedHelpers = array('file_upload_helper');
@@ -184,28 +185,311 @@ hard coded number of free modules
 			$this->checkAuthorisation();
 
 			$this->setPageName( _('Project data'));
-			
+
+			if ($this->requestData) {
+
+				$this->requestData['id'] = $this->getCurrentProjectId();
+
+				if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1') {
+
+					$data = $this->models->Project->get($this->getCurrentProjectId());
+					
+					if (unlink($data['logo_path'])) {
+
+						$this->requestData['logo_url'] = null;
+
+						$this->requestData['logo_path'] = null;
+
+					}						
+
+				}
+
+				$this->models->Project->save($this->requestData);
+
+			}
+
 			if ($this->requestDataFiles) {
-//DIR!
-				$d =$this->helpers->FileUploadHelper->saveFiles(
-						$this->requestDataFiles,'C:\tmp',
+
+				$fuh = $this->helpers->FileUploadHelper->saveFiles(
+						$this->requestDataFiles,
+						$this->generalSettings['directories']["imageDirProject"],
 						$this->getDefaultUploadFilemask(),
 						$this->getDefaultUploadMaxSize()
 					);
 
-				echo '<pre>';
-				var_dump($d);
+				if (!$fuh['error']) {
+				
+					$img = $_SESSION['project']['paths']['project_images'].'project_logo.'.$fuh['result'][0]['extension'];
+
+					if (rename($fuh['result'][0]['path'],$img)) {
+
+						$this->models->Project->save(
+							array(
+								'id' => $this->getCurrentProjectId(),
+								'logo_url' => 
+									$this->generalSettings['rootWebUrl'].
+									$this->appName.
+									'/images/project/'.
+									sprintf('%04s',$this->getCurrentProjectId()).'/'.
+									'project_logo.'.
+									$fuh['result'][0]['extension'],
+								'logo_path' => $img
+							)
+						);
+
+					} else {
+
+						$this->addError(_('Upload failed; could not rename.'));
+
+					}
+
+				} else {
+
+					$this->addError(_('Upload failed').$fuh['error']);
+
+				}
 
 			}
-			
+
 			$data = $this->models->Project->get($this->getCurrentProjectId());
 
+			$languages = array_merge(
+				$this->models->Language->get('select * from %table% where show_order is not null order by show_order asc'),
+				$this->models->Language->get('select * from %table% where show_order is null order by language asc')
+			);
+			
+			foreach((array)$languages as $key => $val) {
+
+				$lp = $this->models->LanguageProject->get(array(
+						'language_id' => $val['id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+				
+				$languages[$key]['language_project_id'] = $lp[0]['id'];
+
+				$languages[$key]['is_project_default'] = ($lp[0]['def_language'] == 1);
+
+				$languages[$key]['is_active'] = ($lp[0]['active'] == 'y');
+
+			}
+
 			$this->smarty->assign('data',$data);
+
+			$this->smarty->assign('languages',$languages);
 
 			$this->printPage();
 
 		}
 
+
+		private function ajaxActionModules($moduleType,$action,$id) {
+
+			if ($moduleType == 'free') {
+
+				if ($action=='activate' || $action=='reactivate') {
+
+					$this->models->FreeModuleProject->update(
+						array('active' => 'y'),
+						array('id' => $id, 'project_id' => $this->getCurrentProjectId())
+					);
+
+				}
+				if ($action=='deactivate') {
+	
+					$this->models->FreeModuleProject->update(
+						array('active' => 'n'),
+						array('id' => $id, 'project_id' => $this->getCurrentProjectId())
+					);
+	
+				} else
+				if ($action=='delete') {
+	
+					$this->models->FreeModuleProjectUser->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'free_module_id' => $id
+						)
+					);
+
+					$this->models->FreeModuleProject->delete(
+						array(
+							'id'=>$id,
+							'project_id'=>$this->getCurrentProjectId()
+						)
+					);
+
+				}
+
+			} else {
+
+				if ($action=='activate') {
+				
+					$this->models->ModuleProject->save(
+						array(
+							'id' => null,
+							'module_id'=>$id,
+							'project_id'=>$this->getCurrentProjectId()
+						)
+					);
+
+				} else
+				if ($action=='reactivate') {
+	
+					$this->models->ModuleProject->update(
+						array('active' => 'y'),
+						array('module_id' => $id, 'project_id' => $this->getCurrentProjectId())
+					);
+	
+	
+				} else
+				if ($action=='deactivate') {
+	
+					$this->models->ModuleProject->update(
+						array('active' => 'n'),
+						array('module_id' => $id, 'project_id' => $this->getCurrentProjectId())
+					);
+	
+				} else
+				if ($action=='delete') {
+
+					$this->models->ModuleProjectUser->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'module_id' => $id
+						)
+					);
+	
+					$this->models->ModuleProject->delete(
+						array(
+							'module_id'=>$id,
+							'project_id'=>$this->getCurrentProjectId()
+						)
+					);
+	
+				}
+
+			}
+
+		}	
+
+		private function ajaxActionCollaborators($moduleType,$action,$id,$user) {
+//NEED CHECKS!
+			if ($moduleType == 'free') {
+			
+				if ($action=='add') {
+	
+					$this->models->FreeModuleProjectUser->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'free_module_id' => $id,
+							'user_id' => $user
+						)
+					);
+	
+				} else
+				if ($action=='remove') {
+	
+					$this->models->FreeModuleProjectUser->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'free_module_id' => $id,
+							'user_id' => $user
+						)
+					);
+	
+				}
+	
+			} else {
+	
+				if ($action=='add') {
+	
+					$this->models->ModuleProjectUser->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'module_id' => $id,
+							'user_id' => $user
+						)
+					);
+	
+				} else
+				if ($action=='remove') {
+	
+					$this->models->ModuleProjectUser->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'module_id' => $id,
+							'user_id' => $user
+						)
+					);
+	
+				}
+	
+			}
+	
+		}
+
+		private function ajaxActionLanguages($action,$id,$user) {
+		
+			if ($action == 'add') {
+	
+				$lp = $this->models->LanguageProject->get(array('project_id' => $this->getCurrentProjectId()));
+				
+				$make_default = (count((array)$lp)==0);
+	
+				$lp = $this->models->LanguageProject->save(array(
+						'id' => null,
+						'language_id' => $id,
+						'project_id' => $this->getCurrentProjectId(),
+						'def_language' => $make_default ? 1 : 0,
+						'active' => 1
+					)
+				);
+				
+				if ($this->models->LanguageProject->getNewId()=='') $this->addError(_('Language already assigned.'));
+	
+			}
+			elseif ($action == 'default') {
+	
+				$lp = $this->models->LanguageProject->update(
+					array('def_language' => 0),
+					array('project_id' => $this->getCurrentProjectId())
+				);
+	
+				$lp = $this->models->LanguageProject->update(
+					array('def_language' => 1),
+					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+			elseif ($action == 'deactivate') {
+	
+				$lp = $this->models->LanguageProject->update(
+					array('active' => 'n'),
+					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+			elseif ($action == 'reactivate') {
+	
+				$lp = $this->models->LanguageProject->update(
+					array('active' => 'y'),
+					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+			elseif ($action == 'delete') {
+	
+				$lp = $this->models->LanguageProject->delete(
+					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+	
+		}
+	
 		public function ajaxInterfaceAction() {
 
 			$view  = !empty($this->requestData['v']) ? $this->requestData['v'] : null;
@@ -221,161 +505,29 @@ hard coded number of free modules
 			// determine type of module: free or standard
 			if (substr($id,0,1)=='f') {
 
-				$t = 'free';
+				$moduleType = 'free';
 				
 				$id = substr($id,1);
 
 			} else {
 
-				$t = false;
+				$moduleType = false;
 
 			}
 
 			if ($view=='modules') {
 	
-				if ($t == 'free') {
-	
-					if ($action=='activate' || $action=='reactivate') {
-	
-						$this->models->FreeModuleProject->update(
-							array('active' => 'y'),
-							array('id' => $id, 'project_id' => $this->getCurrentProjectId())
-						);
-	
-					}
-					if ($action=='deactivate') {
-		
-						$this->models->FreeModuleProject->update(
-							array('active' => 'n'),
-							array('id' => $id, 'project_id' => $this->getCurrentProjectId())
-						);
-		
-					} else
-					if ($action=='delete') {
-		
-						$this->models->FreeModuleProjectUser->delete(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'free_module_id' => $id
-							)
-						);
-	
-						$this->models->FreeModuleProject->delete(
-							array(
-								'id'=>$id,
-								'project_id'=>$this->getCurrentProjectId()
-							)
-						);
-
-					}
-	
-				} else {
-	
-					if ($action=='activate') {
-					
-						$this->models->ModuleProject->save(
-							array(
-								'id' => null,
-								'module_id'=>$id,
-								'project_id'=>$this->getCurrentProjectId()
-							)
-						);
-	
-					} else
-					if ($action=='reactivate') {
-		
-						$this->models->ModuleProject->update(
-							array('active' => 'y'),
-							array('module_id' => $id, 'project_id' => $this->getCurrentProjectId())
-						);
-		
-		
-					} else
-					if ($action=='deactivate') {
-		
-						$this->models->ModuleProject->update(
-							array('active' => 'n'),
-							array('module_id' => $id, 'project_id' => $this->getCurrentProjectId())
-						);
-		
-					} else
-					if ($action=='delete') {
-
-						$this->models->ModuleProjectUser->delete(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'module_id' => $id
-							)
-						);
-		
-						$this->models->ModuleProject->delete(
-							array(
-								'module_id'=>$id,
-								'project_id'=>$this->getCurrentProjectId()
-							)
-						);
-		
-					}
-	
-				}			
+				$this->ajaxActionModules($moduleType,$action,$id);	
 				
 			} else
 			if ($view=='collaborators') {
-//NEED CHECKS!
 
-				if ($t == 'free') {
-				
-					if ($action=='add') {
-	
-						$this->models->FreeModuleProjectUser->save(
-							array(
-								'id' => null,
-								'project_id' => $this->getCurrentProjectId(),
-								'free_module_id' => $id,
-								'user_id' => $user
-							)
-						);
+				$this->ajaxActionCollaborators($moduleType,$action,$id,$user);
 
-					} else
-					if ($action=='remove') {
-	
-						$this->models->FreeModuleProjectUser->delete(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'free_module_id' => $id,
-								'user_id' => $user
-							)
-						);
-	
-					}
+			} else
+			if ($view=='languages') {
 
-				} else {
-
-					if ($action=='add') {
-	
-						$this->models->ModuleProjectUser->save(
-							array(
-								'id' => null,
-								'project_id' => $this->getCurrentProjectId(),
-								'module_id' => $id,
-								'user_id' => $user
-							)
-						);
-	
-					} else
-					if ($action=='remove') {
-	
-						$this->models->ModuleProjectUser->delete(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'module_id' => $id,
-								'user_id' => $user
-							)
-						);
-	
-					}
-
-				}
+				$this->ajaxActionLanguages($action,$id,$user);
 
 			}
 
@@ -384,4 +536,21 @@ hard coded number of free modules
 		}
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

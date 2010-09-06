@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-	<title>{$session._current_project_name}{if $session._current_project_name!='' && $pageName != ''} - {/if}{$pageName}</title>
+	<title>{$session.project.name}{if $session.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
 
 	<link href="{$rootWebUrl}admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="{$rootWebUrl}admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
@@ -22,14 +22,16 @@
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="{$rootWebUrl}admin/admin-index.php"><img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
 <div id="page-header-titles">
 	<span id="page-header-title">{$applicationName} v{$applicationVersion}</span><br />
-{if $session._current_project_name!=''}	<span id="page-header-projectname">{$session._current_project_name}</span><br />{/if}
+{if $session.project.name!=''}	<span id="page-header-projectname">{$session.project.name}</span>
+<!--DEBUG ONLY:--><span style="color:white">{$session.project.id}</span>
+<br />{/if}
 {if $controllerPublicName!='' && !$hideControllerPublicName}	<span id="page-header-appname"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
 	<span id="page-header-pageaction">{$pageName}</span>
 </div>

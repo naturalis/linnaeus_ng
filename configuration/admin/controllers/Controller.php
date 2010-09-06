@@ -54,6 +54,8 @@
 			$this->setHelpTexts();
 			
 			$this->setMiscellaneous();
+			
+			$this->setPaths();
 
 		}
 
@@ -191,10 +193,18 @@
 		*/
 		private function setRequestData() {
 
+			$this->requestData = false;
+
+			$this->requestDataFiles = false;
+
 			//$this->requestData = $_REQUEST; // also contains cookies
 			$this->requestData = array_merge((array)$_GET,(array)$_POST); // don't want no cookies!
 
-			$this->requestDataFiles = $_FILES;
+			foreach((array)$_FILES as $key => $val) {
+
+				if (isset($val['size']) && $val['size']>0) $this->requestDataFiles[] = $val;
+
+			}
 
 		}
 
@@ -293,6 +303,29 @@
 			
 		}
 
+		/**
+		* Sets project paths for image uploads etc. and makes sure they actually exist
+		* 
+		* @access 	private
+		*/
+		private function setPaths() {
+		
+			$_SESSION['project']['paths']['project_images'] = 
+				$this->generalSettings['directories']["imageDirProject"].'/'.
+				sprintf('%04s',$this->getCurrentProjectId()).'/';
+
+			$_SESSION['project']['paths']['uploads_images'] = 
+				$this->generalSettings['directories']["imageDirUpload"].'/'.
+				sprintf('%04s',$this->getCurrentProjectId()).'/';
+
+			foreach((array)$_SESSION['project']['paths'] as $key => $val) {
+
+				if (!file_exists($val)) mkdir($val);
+
+			}	
+
+		}
+
 		
 		/**
 		* Initialises miscellaneous variables
@@ -304,6 +337,8 @@
 		* @access 	private
 		*/		
 		private function setMiscellaneous() {
+
+			$this->setDefaultUploadSaveDir();
 
 			$this->setDefaultUploadFilemask();
 
@@ -504,7 +539,7 @@
 		*/
 		public function setCurrentProjectId($id) {
 
-			$_SESSION['_current_project_id'] = $id;
+			$_SESSION['project']['id'] = $id;
 
 		}
 
@@ -516,7 +551,7 @@
 		*/
 		public function getCurrentProjectId() {
 
-			return $_SESSION['_current_project_id'];
+			return $_SESSION['project']['id'];
 
 		}
 
@@ -531,7 +566,7 @@
 
 				if ($val['project_id'] == $this->getCurrentProjectId())  {
 
-					$_SESSION['_current_project_name'] = $val['project_name'];
+					$_SESSION['project']['name'] = $val['project_name'];
 
 					return;
 
@@ -549,7 +584,7 @@
 		*/
 		public function getCurrentProjectName() {
 
-			return $_SESSION['_current_project_name'];
+			return $_SESSION['project']['name'];
 		
 		}
 
@@ -949,15 +984,40 @@
 
 		}
 
+
 		/**
-		* Sets the default file allowed mask for file uploads, based on the value in general settings
+		* Sets the default path to save uploads to, based on the value in general settings
+		*
+		* @access 	private
+		*/
+		private function setDefaultUploadSaveDir() {
+		
+			if (!empty($this->generalSettings['directories']['defaultUploadDir']))
+				$this->defaultUploadSaveDir= $this->generalSettings['directories']['defaultUploadDir'];
+		
+		}
+		
+		/**
+		* Returns the default save path for file uploads
+		*
+		* @return string	path
+		* @access 	public
+		*/
+		public function getDefaultUploadSaveDir() {
+		
+			return isset($this->defaultUploadSaveDir) ? $this->defaultUploadSaveDir : null;
+		
+		}
+		
+		/**
+		* Sets the default allowed file mask for file uploads, based on the value in general settings
 		*
 		* @access 	private
 		*/
 		private function setDefaultUploadFilemask() {
 		
-			if (!empty($this->generalSettings['defaultUploadFilemask']))
-				$this->defaultUploadFilemask = $this->generalSettings['defaultUploadFilemask'];
+			if (!empty($this->generalSettings['uploading']['defaultUploadFilemask']))
+				$this->defaultUploadFilemask = $this->generalSettings['uploading']['defaultUploadFilemask'];
 		
 		}
 		
@@ -969,7 +1029,7 @@
 		*/
 		public function getDefaultUploadFilemask() {
 		
-			return $this->defaultUploadFilemask;
+			return isset($this->defaultUploadFilemask) ? $this->defaultUploadFilemask : null;
 		
 		}
 		
@@ -980,8 +1040,8 @@
 		*/
 		private function setDefaultUploadMaxSize() {
 		
-			if (!empty($this->generalSettings['defaultUploadMaxSize']))
-				$this->defaultUploadMaxSize = $this->generalSettings['defaultUploadMaxSize'];
+			if (!empty($this->generalSettings['uploading']['defaultUploadMaxSize']))
+				$this->defaultUploadMaxSize = $this->generalSettings['uploading']['defaultUploadMaxSize'];
 		
 		}
 
@@ -993,7 +1053,7 @@
 		*/
 		public function getDefaultUploadMaxSize() {
 		
-			return $this->defaultUploadMaxSize;
+			return isset($this->defaultUploadMaxSize) ? $this->defaultUploadMaxSize : null;
 		
 		}
 	
