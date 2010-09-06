@@ -93,3 +93,11 @@ CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
 insert into dev_projects_roles_users values (null, 1, 2, 14);
 insert into dev_projects_roles_users values (null, 2, 2, 14);
 
+INSERT INTO dev_users (
+id ,username ,password ,first_name ,last_name ,gender ,email_address ,active ,last_login ,logins ,password_changed ,last_change ,created
+) VALUES ( null , 'sysadmin', md5('sysadmin'), 'System', 'Administrator', 'm', 'sysadmin@eti.uva.nl', '1', NULL , '0', NULL ,
+CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
+
+
+insert into dev_projects_roles_users values (null, 1, 1, 15);
+insert into dev_projects_roles_users values (null, 2, 1, 15);
