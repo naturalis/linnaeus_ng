@@ -1,24 +1,4 @@
 <?php
-/*
-
-
-array(1) {
-  ["file"]=>
-  array(5) {
-    ["name"]=>
-    string(35) "[isoHunt] sopranos season 4.torrent"
-    ["type"]=>
-    string(24) "application/x-bittorrent"
-    ["tmp_name"]=>
-    string(26) "C:\Windows\Temp\phpF14.tmp"
-    ["error"]=>
-    int(0)
-    ["size"]=>
-    int(96320)
-  }
-
-*/
-
 
 	class FileUploadHelper {
 	
@@ -30,7 +10,17 @@ array(1) {
 			$this->errors[] = $e;
 
 		}
-	
+
+		/**
+		* Handles file uploads
+		*
+		* @param  	array	$files	$_FILES variable
+		* @param  	string	$target_dir	dir to save to
+		* @param  	array	$filemask	array of allowed mime-types
+		* @param  	integer	$maxSize	max allowed uplaod size
+		* @return 	array	array with new name and locateion for each uploaded file
+		* @todo	function uses mime_content_type, which is deprecated, but the alternative finfo_file is >= php 5.3
+		*/
 		public function saveFiles($files, $target_dir, $filemask, $maxSize) {
 
 			if (substr($target_dir,strlen($target_dir)-1)!='/') $target_dir .= '/';
@@ -39,11 +29,7 @@ array(1) {
 
 			foreach((array)$this->files as $key => $val) {
 
-				if ($val['type']=='') {
-
-					$val['type'] = mime_content_type($val['tmp_name']);
-
-				}
+				$val['type'] = mime_content_type($val['tmp_name']);
 
 				if (!in_array($val['type'],$filemask)) {
 				
@@ -56,15 +42,19 @@ array(1) {
 	
 				} else {
 
-					$new_name = $target_dir . $val['name'];
+					$new_file_name = $val['name'];
+
+					$new_file_path = $target_dir . $new_file_name;
 					
 					$p = pathinfo($val['name']);
 				
 					$i = 0;
 	
-					while(file_exists($new_name)) {
+					while(file_exists($new_file_path)) {
 					
-						$new_name = $target_dir . $p['filename'].' ('.$i++.')'.'.'.$p['extension'];
+						$new_file_name = $p['filename'].' ('.$i++.')'.'.'.$p['extension'];
+					
+						$new_file_path = $target_dir . $new_file_name;
 						
 						if ($i > 999999) {
 
@@ -76,17 +66,19 @@ array(1) {
 	
 					}
 	
-					if (!move_uploaded_file($val['tmp_name'],$new_name)) {
+					if (!move_uploaded_file($val['tmp_name'],$new_file_path)) {
 	
 						$this->addError(_('Unable to move uploaded file.'));
 
-						$this->addError($val['tmp_name'].' -> '.$new_name);
+						$this->addError($val['tmp_name'].' -> '.$new_file_path);
 	
 					} else {
 
 						$result[] = 
 							array(
-								'name' => $new_name,
+								'name' => $new_file_name,
+								'path' => $new_file_path,
+								'extension' => $p['extension'],
 								'type' => $val['type'],
 								'size' => $val['size'],
 								'orig_name' => $val['name']

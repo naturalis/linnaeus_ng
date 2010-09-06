@@ -13,7 +13,7 @@
 {section name=i loop=$projects}
 <li>
 	<a href="?project_id={$projects[i].id}">{$projects[i].name}</a>
-{if $session._current_project_id==$projects[i].id}<span title="current active project">*</span>{/if}
+{if $session.project.id==$projects[i].id}<span title="current active project">*</span>{/if}
 </li>
 {/section}
 

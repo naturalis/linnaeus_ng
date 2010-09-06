@@ -10,11 +10,11 @@
 		<tr>
 		{if $modules[i].active=='y'}
 			<td title="in use in your project" class="cell-module-in-use">&nbsp;</td>
-			<td style="width:100px">
+			<td>
 				<span class="cell-module-title-in-use" id="cell-{$modules[i].module_id}d">
 		{else}
 			<td title="in use in your project, but inactive" class="cell-module-inactive" >&nbsp;</td>
-			<td style="width:100px">
+			<td >
 				<span class="cell-module-title-inactive" id="cell-{$modules[i].module_id}d">
 		{/if}
 					<span class="cell-module-title">{$modules[i].module}</span>

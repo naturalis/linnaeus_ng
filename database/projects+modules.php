@@ -3,6 +3,7 @@ CREATE TABLE projects (
 	sys_name VARCHAR( 64 ) NOT NULL ,
 	sys_description TEXT NOT NULL ,
 	title VARCHAR( 64 ) NOT NULL ,
+	logo_url VARCHAR( 255 ) ,
 	logo_path VARCHAR( 255 ) ,
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -49,8 +50,8 @@ RENAME TABLE `modules_projects`  TO `dev_modules_projects` ;
 RENAME TABLE `free_modules_projects`  TO `dev_free_modules_projects` ;
 
 
-insert into dev_projects values (null,'Polar Bears of Amsterdam','Ursus maritimus in the nation\'s capital','Polar Bears of Amsterdam',null,now(),null);
-insert into dev_projects values (null,'Imaginary Beings','Borges bestiarium','Imaginary Beings',null,now(),null);
+insert into dev_projects values (null,'Polar Bears of Amsterdam','Ursus maritimus in the nation\'s capital','Polar Bears of Amsterdam',null,null,now(),null);
+insert into dev_projects values (null,'Imaginary Beings','Borges bestiarium','Imaginary Beings',null,null,now(),null);
 
 
 insert into dev_modules values (null,'Introduction','Comprehensive project introduction','Species',0,current_timestamp,current_timestamp);

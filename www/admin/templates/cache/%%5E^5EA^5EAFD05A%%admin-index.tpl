@@ -1,5 +1,5 @@
 207
-a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tpl";b:1;s:23:"shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283761595;s:7:"expires";i:1283765195;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tpl";b:1;s:23:"shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283791970;s:7:"expires";i:1283795570;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -23,14 +23,16 @@ a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tp
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="/admin/admin-index.php"><img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
 <div id="page-header-titles">
 	<span id="page-header-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="page-header-projectname">Imaginary Beings</span><br />	<span id="page-header-pageaction"></span>
+	<span id="page-header-projectname">Imaginary Beings</span>
+<!--DEBUG ONLY:--><span style="color:white">2</span>
+<br />	<span id="page-header-pageaction"></span>
 </div>
 
 

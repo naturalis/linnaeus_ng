@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 10:26:31
+<?php /* Smarty version 2.6.26, created on 2010-09-06 18:43:19
          compiled from choose_project.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -68,7 +68,7 @@ $this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $th
 	<a href="?project_id=<?php echo $this->_tpl_vars['projects'][$this->_sections['i']['index']]['id']; ?>
 "><?php echo $this->_tpl_vars['projects'][$this->_sections['i']['index']]['name']; ?>
 </a>
-<?php if ($this->_tpl_vars['session']['_current_project_id'] == $this->_tpl_vars['projects'][$this->_sections['i']['index']]['id']): ?><span title="current active project">*</span><?php endif; ?>
+<?php if ($this->_tpl_vars['session']['project']['id'] == $this->_tpl_vars['projects'][$this->_sections['i']['index']]['id']): ?><span title="current active project">*</span><?php endif; ?>
 </li>
 <?php endfor; endif; ?>
 

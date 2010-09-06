@@ -31,6 +31,7 @@
 #lng-logo {
 	/* height:25px; */
 	margin-top:0px;
+	border:0px;
 }
 
 #eti-logo {
@@ -38,6 +39,7 @@
 	height:55px;
 	margin-top:16px;
 	margin-left:10px;
+	border:0px;
 }
 
 #page-header-titles {
@@ -182,6 +184,7 @@
 
 .cell-module-title-unused,.cell-module-title-in-use,.cell-module-title-inactive {
 	color:#888;
+	width:150px;
 }
 
 .cell-module-title-in-use {
@@ -223,4 +226,66 @@
 
 .modusers-block-buffercell {
 	width:16px;
+}
+
+.general-clickable-image {
+	cursor:pointer;
+}
+
+#language-list {
+}
+
+.cell-language-name,.cell-language-name-unused {
+	width:150px;
+}
+
+.cell-language-name-unused {
+	color:#888;
+}
+.cell-language-default,
+.cell-language-set-default,
+.cell-language-delete,
+.cell-language-active,
+.cell-language-inactive,
+.cell-language-delete-inactive,
+.cell-language-active-inactive {
+	background-image:url(../images/system/icons/asterisk.png);
+	background-repeat:no-repeat;
+	width:10px;
+	cursor:pointer;
+}
+
+.cell-language-default {
+	cursor:default;
+}
+
+.cell-language-set-default {
+	background-image:url(../images/system/icons/asterisk-gray.png);
+}
+
+.cell-language-delete {
+	background-image:url(../images/system/icons/cross.png);
+}
+
+.cell-language-delete-inactive {
+	background-image:url(../images/system/icons/cross-gray.png);
+}
+
+.cell-language-active {
+	background-image:url(../images/system/icons/module-deactivate.png);
+}
+
+.cell-language-inactive {
+	background-image:url(../images/system/icons/module-activate.png);
+}
+
+.cell-language-active-inactive {
+	background-image:url(../images/system/icons/module-deactivate-inactive.png);
+}
+
+.language-select-item-active {
+	background-color:#dfd;
+}
+
+.language-select-item {
 }

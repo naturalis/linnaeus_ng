@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 09:57:47
+<?php /* Smarty version 2.6.26, created on 2010-09-06 18:52:55
          compiled from collaborators.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'collaborators.tpl', 25, false),)), $this); ?>
@@ -41,12 +41,12 @@ $this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $th
 		<tr>
 		<?php if ($this->_tpl_vars['modules'][$this->_sections['i']['index']]['active'] == 'y'): ?>
 			<td title="in use in your project" class="cell-module-in-use">&nbsp;</td>
-			<td style="width:100px">
+			<td>
 				<span class="cell-module-title-in-use" id="cell-<?php echo $this->_tpl_vars['modules'][$this->_sections['i']['index']]['module_id']; ?>
 d">
 		<?php else: ?>
 			<td title="in use in your project, but inactive" class="cell-module-inactive" >&nbsp;</td>
-			<td style="width:100px">
+			<td >
 				<span class="cell-module-title-inactive" id="cell-<?php echo $this->_tpl_vars['modules'][$this->_sections['i']['index']]['module_id']; ?>
 d">
 		<?php endif; ?>
