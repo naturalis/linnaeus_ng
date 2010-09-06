@@ -1,5 +1,5 @@
 255
-a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283506905;s:7:"expires";i:1283510505;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283759867;s:7:"expires";i:1283763467;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -89,6 +89,21 @@ a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-head
 										</tr>
 														<tr>
 						<td class="modusers-block-buffercell"></td>
+											<td
+							id="cell-1-14a"
+							class="">
+							Lead Expert
+						</td>
+						<td>Lead expert</td>
+						<td
+							title="add collaborator" 
+							class="cell-moduser-inactive"
+							id="cell-1-14b"
+							onclick="moduleChangeModuleUserStatus(this,1,14,'add')">
+						</td>
+										</tr>
+														<tr>
+						<td class="modusers-block-buffercell"></td>
 											<td 
 							id="cell-1-11a"
 							class="cell-module-title-in-use">
@@ -171,6 +186,21 @@ a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-head
 														<tr>
 						<td class="modusers-block-buffercell"></td>
 											<td
+							id="cell-3-14a"
+							class="">
+							Lead Expert
+						</td>
+						<td>Lead expert</td>
+						<td
+							title="add collaborator" 
+							class="cell-moduser-inactive"
+							id="cell-3-14b"
+							onclick="moduleChangeModuleUserStatus(this,3,14,'add')">
+						</td>
+										</tr>
+														<tr>
+						<td class="modusers-block-buffercell"></td>
+											<td
 							id="cell-3-11a"
 							class="">
 							Gideon Gijswijt
@@ -247,6 +277,21 @@ a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-head
 							class="cell-moduser-inactive"
 							id="cell-7-2b"
 							onclick="moduleChangeModuleUserStatus(this,7,2,'add')">
+						</td>
+										</tr>
+														<tr>
+						<td class="modusers-block-buffercell"></td>
+											<td
+							id="cell-7-14a"
+							class="">
+							Lead Expert
+						</td>
+						<td>Lead expert</td>
+						<td
+							title="add collaborator" 
+							class="cell-moduser-inactive"
+							id="cell-7-14b"
+							onclick="moduleChangeModuleUserStatus(this,7,14,'add')">
 						</td>
 										</tr>
 														<tr>
@@ -347,6 +392,21 @@ a:4:{s:8:"template";a:4:{s:17:"collaborators.tpl";b:1;s:26:"../shared/admin-head
 							class="cell-moduser-remove"
 							id="cell-f17-2b"
 							onclick="moduleChangeModuleUserStatus(this,17,2,'remove')">
+						</td>
+										</tr>
+														<tr>
+						<td class="modusers-block-buffercell"></td>
+											<td
+							id="cell-f1-14a"
+							class="">
+							Lead Expert
+						</td>
+						<td>Lead expert</td>
+						<td
+							title="add collaborator" 
+							class="cell-moduser-inactive"
+							id="cell-f17-14b"
+							onclick="moduleChangeModuleUserStatus(this,17,14,'add')">
 						</td>
 										</tr>
 														<tr>

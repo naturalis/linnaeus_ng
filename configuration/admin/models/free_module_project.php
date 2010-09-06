@@ -11,7 +11,7 @@
 		*
 		* @access 	public
 		*/
-		function __construct() {
+		public function __construct() {
 
 			parent::__construct(self::tableBaseName);
 
@@ -22,7 +22,7 @@
 		*
 		* @access 	public
 		*/
-		function __destruct() {
+		public function __destruct() {
 
 			parent::__destruct();
 
