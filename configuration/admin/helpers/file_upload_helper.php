@@ -89,7 +89,9 @@
 				}
 
 			}
-			
+var_dump($result);
+var_dump($this->errors);
+
 			return array('result' => isset($result) ? $result : null, 'error' => $this->errors);
 
 		}
