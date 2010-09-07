@@ -1,5 +1,5 @@
 206
-a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283791401;s:7:"expires";i:1283795001;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283861984;s:7:"expires";i:1283865584;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -23,8 +23,8 @@ a:4:{s:8:"template";a:3:{s:9:"login.tpl";b:1;s:26:"../shared/admin-header.tpl";b
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="/admin/admin-index.php"><img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
@@ -68,22 +68,5 @@ $(document).ready(function(){
 <div id="footer-container">
 </div ends="footer-container">
 
-
-<style>
-#debug {
-	white-space:pre;
-	font-size:10px;
-	margin-top:15px;
-	color:#666;
-	font-family:Arial, Helvetica, sans-serif;
-}
-</style>
-<hr style="border-top:1px dotted #ddd;" />
-<span onclick="var a=document.getElementById('debug'); if(a.style.visibility=='visible') {a.style.visibility='hidden';} else {a.style.visibility='visible';} " style="cursor:pointer">&nbsp;&Delta;&nbsp;</span>
-
-<div id="debug" style="visibility:hidden">
-array(0) {
-}
-</div>
 </div ends="body-container"></body>
 </html>

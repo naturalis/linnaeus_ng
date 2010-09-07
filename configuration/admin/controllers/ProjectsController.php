@@ -212,14 +212,14 @@ hard coded number of free modules
 
 				$fuh = $this->helpers->FileUploadHelper->saveFiles(
 						$this->requestDataFiles,
-						$this->generalSettings['directories']["imageDirProject"],
+						$this->getDefaultImageUploadDir(),
 						$this->getDefaultUploadFilemask(),
 						$this->getDefaultUploadMaxSize()
 					);
 
 				if (!$fuh['error']) {
-				
-					$img = $_SESSION['project']['paths']['project_images'].'project_logo.'.$fuh['result'][0]['extension'];
+
+					$img = $this->getDefaultImageProjectDir().'project_logo.'.$fuh['result'][0]['extension'];
 
 					if (rename($fuh['result'][0]['path'],$img)) {
 
@@ -246,6 +246,7 @@ hard coded number of free modules
 				} else {
 
 					$this->addError(_('Upload failed'));
+
 					$this->addError($fuh['error']);
 
 				}
@@ -282,7 +283,6 @@ hard coded number of free modules
 			$this->printPage();
 
 		}
-
 
 		private function ajaxActionModules($moduleType,$action,$id) {
 

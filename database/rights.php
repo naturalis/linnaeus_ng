@@ -50,6 +50,12 @@ INSERT INTO dev_rights VALUES (NULL , 'projects', '*',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'projects', 'index',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'projects', 'data',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'projects', 'modules',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'projects', 'collaborators',CURRENT_TIMESTAMP);
+
+
+INSERT INTO dev_rights VALUES (NULL , 'species', '*',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'index',CURRENT_TIMESTAMP);
+
 
 
 
@@ -62,15 +68,20 @@ INSERT INTO dev_rights VALUES (NULL , 'projects', 'modules',CURRENT_TIMESTAMP);
 5 | Contributor          | Contributes to a project but cannot edit
 
 
-1 | users      | *
-2 | users      | index
-3 | users      | choose_project
-4 | users      | create
-5 | users      | edit
-6 | users      | user_overview
-7 | users      | view
-8 | projects   | *
-9 | projects   | index
+ 1 | users      | *
+ 2 | users      | index
+ 3 | users      | choose_project
+ 4 | users      | create
+ 5 | users      | edit
+ 6 | users      | user_overview
+ 7 | users      | view
+ 8 | projects   | *
+ 9 | projects   | index
+10 | projects   | data
+11 | projects   | modules
+12 | projects   | collaborators
+13 | species    | *
+14 | species    | index
 
 */
 
@@ -78,16 +89,17 @@ INSERT INTO dev_rights VALUES (NULL , 'projects', 'modules',CURRENT_TIMESTAMP);
 # system administrator
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 1, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 8, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 13, CURRENT_TIMESTAMP );
 
 # lead expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 1, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 8, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 13, CURRENT_TIMESTAMP );
 
 # expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 3, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 6, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 7, CURRENT_TIMESTAMP );
-INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 8, CURRENT_TIMESTAMP );
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );

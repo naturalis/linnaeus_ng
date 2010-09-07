@@ -344,8 +344,6 @@
 		*/		
 		private function setMiscellaneous() {
 
-			$this->setDefaultUploadSaveDir();
-
 			$this->setDefaultUploadFilemask();
 
 			$this->setDefaultUploadMaxSize();
@@ -1001,19 +999,6 @@
 			return $this->randomValue;
 
 		}
-
-
-		/**
-		* Sets the default path to save uploads to, based on the value in general settings
-		*
-		* @access 	private
-		*/
-		private function setDefaultUploadSaveDir() {
-		
-			if (!empty($this->generalSettings['directories']['defaultUploadDir']))
-				$this->defaultUploadSaveDir= $this->generalSettings['directories']['defaultUploadDir'];
-		
-		}
 		
 		/**
 		* Returns the default save path for file uploads
@@ -1021,12 +1006,24 @@
 		* @return string	path
 		* @access 	public
 		*/
-		public function getDefaultUploadSaveDir() {
+		public function getDefaultImageUploadDir() {
 		
-			return isset($this->defaultUploadSaveDir) ? $this->defaultUploadSaveDir : null;
+			return isset($_SESSION['project']['paths']['uploads_images']) ? $_SESSION['project']['paths']['uploads_images'] : null;
 		
 		}
+
+		/**
+		* Returns the default save path for project inmages
+		*
+		* @return string	path
+		* @access 	public
+		*/
+		public function getDefaultImageProjectDir() {
 		
+			return isset($_SESSION['project']['paths']['project_images']) ? $_SESSION['project']['paths']['project_images'] : null;
+		
+		}
+
 		/**
 		* Sets the default allowed file mask for file uploads, based on the value in general settings
 		*
