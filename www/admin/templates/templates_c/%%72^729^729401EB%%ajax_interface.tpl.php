@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 18:38:39
+<?php /* Smarty version 2.6.26, created on 2010-09-07 18:10:18
          compiled from ajax_interface.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'ajax_interface.tpl', 2, false),)), $this); ?>
@@ -51,4 +51,5 @@ $this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
 $this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
 ?><?php echo $this->_tpl_vars['messages'][$this->_sections['i']['index']]; ?>
 <?php endfor; endif; ?>
-<?php if (count($this->_tpl_vars['errors']) != 0): ?><error><?php else: ?><ok><?php endif; ?>
+<?php if (count($this->_tpl_vars['errors']) != 0): ?><error><?php else: ?><?php echo $this->_tpl_vars['returnText']; ?>
+<?php endif; ?>

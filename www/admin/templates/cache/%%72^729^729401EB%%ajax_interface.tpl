@@ -1,2 +1,2 @@
 140
-a:4:{s:8:"template";a:1:{s:18:"ajax_interface.tpl";b:1;}s:9:"timestamp";i:1283791119;s:7:"expires";i:1283794719;s:13:"cache_serials";a:0:{}}Username already exists. <error>
+a:4:{s:8:"template";a:1:{s:18:"ajax_interface.tpl";b:1;}s:9:"timestamp";i:1283875818;s:7:"expires";i:1283879418;s:13:"cache_serials";a:0:{}}id=4

@@ -1,5 +1,5 @@
 204
-a:4:{s:8:"template";a:3:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283857261;s:7:"expires";i:1283860861;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283875712;s:7:"expires";i:1283879312;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
@@ -18,6 +18,25 @@ a:4:{s:8:"template";a:3:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1
 
 	<script type="text/javascript" src="/admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="/admin/javascript/main.js"></script>
+<script type="text/javascript" src="/admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "textareas",
+		theme : "advanced",
+		plugins : "spellchecker,advhr,insertdatetime,preview",	
+		
+		// Theme options - button# indicated the row# only
+	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,code,preview,|,forecolor,backcolor",
+	theme_advanced_buttons3 : "insertdate,inserttime,|,spellchecker,advhr,,removeformat,|,sub,sup,|,charmap,emotions",	
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom" //(n.b. no trailing comma in last line of code)
+	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
+});
+</script>
+
 
 </head>
 
@@ -38,15 +57,38 @@ a:4:{s:8:"template";a:3:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1
 
 <div id="page-main">
 
-[Dutch*]
-[Kashmiri]
-[English]
-
-
-
-
+<table class="taxon-language-table">
+	<tr>
+		<td class="taxon-language-cell" onclick="alert(8)">
+			Dutch *		</td>
+		<td class="taxon-language-cell-active">
+			Kashmiri		</td>
+		<td class="taxon-language-cell" onclick="alert(6)">
+			English		</td>
+	</tr>
+</table>
+<form name="theForm" id="theForm">
+<input type="hidden" name="taxon_id" id="taxon_id" value="" />  
+Taxon name:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="" />
+<span style="float:right">
+<span id="save-message">
+<input type="button" value="save" onclick="taxonSaveData()" style="float:right" />
+</span>
+</span>
+<textarea name="content" style="width:880px;height:600px;" id="taxon-content">
+</textarea>
+</form>
 
 </div>
+
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+	activeLanguage = 11;
+});
+</script>
+
+
 
 </div ends="page-container">
 

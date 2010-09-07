@@ -291,6 +291,33 @@ function projectUpdateLanguageBlock() {
 
 }
 
+var activeLanguage = false;
+
+function taxonSaveData() {
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : $('#taxon_id').val() ,
+			'action' : 'save_taxon' ,
+			'name' : $('#taxon-name-input').val() , 
+			'content' : tinyMCE.get('taxon-content').getContent() , 
+			'language' : activeLanguage ,
+			'page' : 'Main page'			
+		},
+		function(data){
+			if (data.indexOf('id=')!=-1) {
+				$('#taxon_id').val(data.replace('id=',''));
+				$('#save-message').html('saved');
+				} else
+			if (data.length>0) {
+				alert(data);
+			}
+		}
+	);
+
+}
+
 
 
 

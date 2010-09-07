@@ -289,3 +289,62 @@
 
 .language-select-item {
 }
+
+.taxon-language-table {
+	margin:0px;
+	padding:0px;
+	margin-bottom:20px;
+}
+
+.taxon-language-cell,.taxon-language-cell-active {
+	width:100px;
+	background-color:#ccc;
+	color:#eee;
+	border:1px solid black;
+	padding:2px;
+	padding-left:5px;
+	cursor:pointer;
+	text-align:center;
+}
+
+.taxon-language-cell-active {
+	background-color:#eee;
+	color:#111;
+	cursor:default;
+	font-weight:bold;
+}
+
+#taxon-name-input {
+	margin-left:5px;
+	margin-bottom:10px;
+	width:300px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

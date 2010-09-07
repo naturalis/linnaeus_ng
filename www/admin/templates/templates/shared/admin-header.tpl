@@ -17,6 +17,27 @@
 
 	<script type="text/javascript" src="{$rootWebUrl}admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$rootWebUrl}admin/javascript/main.js"></script>
+{if $includeHtmlEditor}
+<script type="text/javascript" src="{$rootWebUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+{literal}
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "textareas",
+		theme : "advanced",
+		plugins : "spellchecker,advhr,insertdatetime,preview",	
+		
+		// Theme options - button# indicated the row# only
+	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,code,preview,|,forecolor,backcolor",
+	theme_advanced_buttons3 : "insertdate,inserttime,|,spellchecker,advhr,,removeformat,|,sub,sup,|,charmap,emotions",	
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom" //(n.b. no trailing comma in last line of code)
+	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
+});
+</script>
+{/literal}
+{/if}
 
 </head>
 
