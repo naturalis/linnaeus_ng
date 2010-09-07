@@ -90,7 +90,7 @@
 
 			}
 			
-			return array('result' => $result, 'error' => $this->errors);
+			return array('result' => isset($result) ? $result : null, 'error' => $this->errors);
 
 		}
 			
