@@ -310,19 +310,25 @@
 		*/
 		private function setPaths() {
 		
-			$_SESSION['project']['paths']['project_images'] = 
-				$this->generalSettings['directories']["imageDirProject"].'/'.
-				sprintf('%04s',$this->getCurrentProjectId()).'/';
+			$p = $this->getCurrentProjectId();
+			
+			if ($p) {
+		
+				$_SESSION['project']['paths']['project_images'] = 
+					$this->generalSettings['directories']["imageDirProject"].'/'.
+					sprintf('%04s',$p).'/';
+	
+				$_SESSION['project']['paths']['uploads_images'] = 
+					$this->generalSettings['directories']["imageDirUpload"].'/'.
+					sprintf('%04s',$p).'/';
+	
+				foreach((array)$_SESSION['project']['paths'] as $key => $val) {
+	
+					if (!file_exists($val)) mkdir($val);
+	
+				}	
 
-			$_SESSION['project']['paths']['uploads_images'] = 
-				$this->generalSettings['directories']["imageDirUpload"].'/'.
-				sprintf('%04s',$this->getCurrentProjectId()).'/';
-
-			foreach((array)$_SESSION['project']['paths'] as $key => $val) {
-
-				if (!file_exists($val)) mkdir($val);
-
-			}	
+			}
 
 		}
 
