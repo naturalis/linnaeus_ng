@@ -816,7 +816,6 @@
 
 			$this->checkAuthorisation();
 
-
 			$this->setPageName(_('Project collaborator overview'));
 
 			// get all collaborators for the current project
