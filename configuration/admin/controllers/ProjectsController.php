@@ -245,7 +245,8 @@ hard coded number of free modules
 
 				} else {
 
-					$this->addError(_('Upload failed').$fuh['error']);
+					$this->addError(_('Upload failed'));
+					$this->addError($fuh['error']);
 
 				}
 
@@ -536,21 +537,5 @@ hard coded number of free modules
 		}
 
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

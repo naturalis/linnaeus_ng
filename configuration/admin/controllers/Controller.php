@@ -420,12 +420,24 @@
 		/**
 		* Adds an error to the class's stack of errors stored in class variable 'errors'
 		*
-		* @param  	type	$error	the error
+		* @param  	string or arrayu	$error	the error(s)
 		* @access 	public
 		*/
 		public function addError($error) {
 		
-			$this->errors[] = $error;
+			if (!is_array($error)) {
+
+				$this->errors[] = $error;
+
+			} else {
+
+				foreach($error as $key => $val) {
+
+					$this->errors[] = $val;
+
+				}
+
+			}
 		
 		}
 
