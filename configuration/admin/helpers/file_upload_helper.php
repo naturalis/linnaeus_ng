@@ -70,6 +70,7 @@
 			);
 	
 			$ext = strtolower(array_pop(explode('.',$filename)));
+
 			if (array_key_exists($ext, $mime_types)) {
 				return $mime_types[$ext];
 			}
@@ -105,8 +106,8 @@
 				$val['type'] = mime_content_type($val['tmp_name']);
 				
 				if ($val['type']=='') {
-				
-					$val['type'] = $this->getMimeType($val['tmp_name']);
+
+					$val['type'] = $this->getMimeType($val['name']);
 
 				}
 
