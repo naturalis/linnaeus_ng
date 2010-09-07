@@ -551,7 +551,7 @@
 		*/
 		public function getCurrentProjectId() {
 
-			return $_SESSION['project']['id'];
+			return isset($_SESSION['project']['id']) ? $_SESSION['project']['id'] : null;
 
 		}
 
