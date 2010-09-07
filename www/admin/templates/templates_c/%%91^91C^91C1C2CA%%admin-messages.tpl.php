@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 18:52:56
+<?php /* Smarty version 2.6.26, created on 2010-09-07 14:19:47
          compiled from ../shared/admin-messages.tpl */ ?>
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
 <div id="page-block-errors">

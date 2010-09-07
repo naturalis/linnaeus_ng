@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 18:52:59
+<?php /* Smarty version 2.6.26, created on 2010-09-07 14:19:47
          compiled from data.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
@@ -122,6 +122,13 @@ admin/images/system/icons/arrow-270.png"
 <br />
 The "welcome" and "contributors" texts will be added once the html-editor is in place.
 </div>
+
+<?php $_smarty_tpl_vars = $this->_tpl_vars;
+$this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-messages.tpl", 'smarty_include_vars' => array()));
+$this->_tpl_vars = $_smarty_tpl_vars;
+unset($_smarty_tpl_vars);
+ ?>
+
 
 <?php echo '
 <script type="text/JavaScript">

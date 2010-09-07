@@ -27,7 +27,6 @@
 					'defaultUploadMaxSize' => 1000000
 				),
 				'directories' => array(
-					'defaultUploadDir' => self::applicationRootDir.'www/admin/uploads/',
 					'imageDirProject' => self::applicationRootDir.'www/admin/images/project',
 					'imageDirUpload' => self::applicationRootDir.'www/admin/images/upload',
 				)
