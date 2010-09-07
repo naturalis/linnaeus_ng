@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-07 14:19:47
+<?php /* Smarty version 2.6.26, created on 2010-09-07 18:08:32
          compiled from ../shared/admin-header.tpl */ ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -29,6 +29,29 @@ admin/style/admin.css");
 admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
 admin/javascript/main.js"></script>
+<?php if ($this->_tpl_vars['includeHtmlEditor']): ?>
+<script type="text/javascript" src="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
+admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+<?php echo '
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "textareas",
+		theme : "advanced",
+		plugins : "spellchecker,advhr,insertdatetime,preview",	
+		
+		// Theme options - button# indicated the row# only
+	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,code,preview,|,forecolor,backcolor",
+	theme_advanced_buttons3 : "insertdate,inserttime,|,spellchecker,advhr,,removeformat,|,sub,sup,|,charmap,emotions",	
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom" //(n.b. no trailing comma in last line of code)
+	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
+});
+</script>
+'; ?>
+
+<?php endif; ?>
 
 </head>
 

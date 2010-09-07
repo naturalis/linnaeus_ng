@@ -419,7 +419,7 @@
 				}
 
 			} elseif (is_numeric($id)) {
-			
+
 				$query =
 					'select '.( !$cols ? '*' : $cols).
 					' from '.$this->tableName.
