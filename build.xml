@@ -77,7 +77,7 @@
             </filterchain>
         </copy>
         <!-- Setting permissions -->
-        <exec dir="${deploy.location/}"
+        <exec dir="${deploy.location}"
              command="chown -R www:www www/admin/images/" />
 
 </target>
