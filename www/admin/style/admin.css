@@ -300,7 +300,7 @@
 	width:100px;
 	background-color:#ccc;
 	color:#eee;
-	border:1px solid black;
+	border:1px solid #999;
 	padding:2px;
 	padding-left:5px;
 	cursor:pointer;
@@ -320,10 +320,17 @@
 	width:300px;
 }
 
+#taxon-navigation-table {
+	width:100%;
+	margin:0px;
+	padding:0px;
+}
 
-
-
-
+#taxon-navigation-cell {
+	width:100%;
+	margin:0px;
+	padding:0px;
+}
 
 
 

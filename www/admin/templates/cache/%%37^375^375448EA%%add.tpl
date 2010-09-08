@@ -1,8 +1,8 @@
-204
-a:4:{s:8:"template";a:3:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283875712;s:7:"expires";i:1283879312;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+234
+a:4:{s:8:"template";a:4:{s:7:"add.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:18:"_add_edit_body.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283943791;s:7:"expires";i:1283947391;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<title>Imaginary Beings - Add a new taxon</title>
 
@@ -57,34 +57,61 @@ tinyMCE.init({
 
 <div id="page-main">
 
-<table class="taxon-language-table">
+<form name="theForm" id="theForm">
+	<input type="hidden" name="taxon_id" id="taxon_id" value="" />  
+<div id="taxon-navigation-table-div">
+<table id="taxon-navigation-table">
 	<tr>
-		<td class="taxon-language-cell" onclick="alert(8)">
-			Dutch *		</td>
-		<td class="taxon-language-cell-active">
-			Kashmiri		</td>
-		<td class="taxon-language-cell" onclick="alert(6)">
-			English		</td>
+		<td id="taxon-navigation-cell">
+			<span style="float:right">
+				<span id="message-container" style="margin-right:10px">&nbsp;</span>
+				<input type="button" value="save" onclick="taxonSaveData()" style="margin-right:5px" />
+				<input type="button" value="undo" onclick="taxonMessage('coming soon')" style="margin-right:5px" />
+				<input type="button" value="delete" onclick="taxonMessage('coming soon')" style="margin-right:5px" />
+				<input type="button" value="taxon list" onclick="window.open('list.php','_top');" style="" />
+			</span>
+		</td>
 	</tr>
 </table>
-<form name="theForm" id="theForm">
-<input type="hidden" name="taxon_id" id="taxon_id" value="" />  
+</div>
+<div id="taxon-language-table-div">
+<table id="taxon-language-table" class="taxon-language-table">
+	<tr>
+		<td class="taxon-language-cell" onclick="taxonGetData(24)">
+			Dutch		</td>
+		<td class="taxon-language-cell-active">
+			English *		</td>
+		<td class="taxon-language-cell" onclick="taxonGetData(50)">
+			Japanese		</td>
+	</tr>
+</table>
+</div>
+
 Taxon name:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="" />
-<span style="float:right">
-<span id="save-message">
-<input type="button" value="save" onclick="taxonSaveData()" style="float:right" />
-</span>
-</span>
-<textarea name="content" style="width:880px;height:600px;" id="taxon-content">
-</textarea>
+<textarea name="content" style="width:880px;height:600px;" id="taxon-content"></textarea>
 </form>
+
+
+
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+
+	taxonAddLanguage([24,'Dutch',0]);
+	taxonAddLanguage([26,'English',1]);
+	taxonAddLanguage([50,'Japanese',0]);
+	taxonActiveLanguage = 26;
+	taxonUpdateLanguageBlock();
+
+});
+</script>
 
 </div>
 
 
 <script type="text/JavaScript">
 $(document).ready(function(){
-	activeLanguage = 11;
+	activeLanguage = 26;
 });
 </script>
 

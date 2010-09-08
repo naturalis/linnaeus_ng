@@ -1,5 +1,15 @@
 <?php
 
+//	error_reporting(E_ALL | E_STRICT); 
+	error_reporting(E_ALL);
+
+	// YES this will go (eventually)
+	function q($v) {
+		echo '<pre>';
+		var_dump($v);
+
+	}
+
 	class configuration {
 
 		const applicationRootDir = 'C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/';

@@ -15,7 +15,7 @@ hard coded number of free modules
 			'project','module','module_project','free_module_project',
 			'project_role_user','user','role',
 			'module_project_user','free_module_project_user',
-			'language','language_project'
+			'language','language_project','content_taxon'
 			);
 
 		public $usedHelpers = array('file_upload_helper');
@@ -440,7 +440,7 @@ hard coded number of free modules
 				
 				$make_default = (count((array)$lp)==0);
 	
-				$lp = $this->models->LanguageProject->save(array(
+				$this->models->LanguageProject->save(array(
 						'id' => null,
 						'language_id' => $id,
 						'project_id' => $this->getCurrentProjectId(),
@@ -454,12 +454,12 @@ hard coded number of free modules
 			}
 			elseif ($action == 'default') {
 	
-				$lp = $this->models->LanguageProject->update(
+				$this->models->LanguageProject->update(
 					array('def_language' => 0),
 					array('project_id' => $this->getCurrentProjectId())
 				);
 	
-				$lp = $this->models->LanguageProject->update(
+				$this->models->LanguageProject->update(
 					array('def_language' => 1),
 					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
 				);
@@ -467,7 +467,7 @@ hard coded number of free modules
 			}
 			elseif ($action == 'deactivate') {
 	
-				$lp = $this->models->LanguageProject->update(
+				$this->models->LanguageProject->update(
 					array('active' => 'n'),
 					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
 				);
@@ -475,7 +475,7 @@ hard coded number of free modules
 			}
 			elseif ($action == 'reactivate') {
 	
-				$lp = $this->models->LanguageProject->update(
+				$this->models->LanguageProject->update(
 					array('active' => 'y'),
 					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
 				);
@@ -483,7 +483,11 @@ hard coded number of free modules
 			}
 			elseif ($action == 'delete') {
 	
-				$lp = $this->models->LanguageProject->delete(
+				$this->models->ContentTaxon->delete(
+					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
+				);
+
+				$this->models->LanguageProject->delete(
 					array('language_id' => $id,'project_id' => $this->getCurrentProjectId())
 				);
 	

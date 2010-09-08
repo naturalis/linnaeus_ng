@@ -1,10 +1,10 @@
-245
-a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283760045;s:7:"expires";i:1283763645;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+235
+a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:18:"_add_edit_body.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283945156;s:7:"expires";i:1283948756;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-	<title>Imaginary Beings - Edit project collaborator</title>
+	<title>Imaginary Beings - Edit taxon</title>
 
 	<link href="/admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="/admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
@@ -18,223 +18,109 @@ a:4:{s:8:"template";a:4:{s:8:"edit.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 	<script type="text/javascript" src="/admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="/admin/javascript/main.js"></script>
+<script type="text/javascript" src="/admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+
+<script type="text/javascript">
+tinyMCE.init({
+		mode : "textareas",
+		theme : "advanced",
+		plugins : "spellchecker,advhr,insertdatetime,preview",	
+		
+		// Theme options - button# indicated the row# only
+	theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,|,justifyleft,justifycenter,justifyright,fontselect,fontsizeselect,formatselect",
+	theme_advanced_buttons2 : "cut,copy,paste,|,bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,|,code,preview,|,forecolor,backcolor",
+	theme_advanced_buttons3 : "insertdate,inserttime,|,spellchecker,advhr,,removeformat,|,sub,sup,|,charmap,emotions",	
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_statusbar_location : "bottom" //(n.b. no trailing comma in last line of code)
+	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
+});
+</script>
+
 
 </head>
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="/admin/admin-index.php"><img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
 <div id="page-header-titles">
 	<span id="page-header-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="page-header-projectname">Imaginary Beings</span><br />	<span id="page-header-appname"><a href="index.php">User administration</a></span><br />	<span id="page-header-pageaction">Edit project collaborator</span>
+	<span id="page-header-projectname">Imaginary Beings</span>
+<!--DEBUG ONLY:--><span style="color:white">2</span>
+<br />	<span id="page-header-appname"><a href="index.php">Species module</a></span><br />	<span id="page-header-pageaction">Edit taxon</span>
 </div>
 
-<div id="block-inline-help">
-	<div id="title" onclick="allToggleHelpVisibility();">Help</div>
-	<div class="body-collapsed" id="body-visible">
-		<div class="subject">Role</div>
-		<div class="text">The 'role' indicates the role this user will have in the current project. Hover your mouse over the role's names to see a short description.</div>
-		<div class="subject">Active</div>
-		<div class="text">'Active' indicates whether a user is actively working on the current project. When set to 'n', the user can no longer log in or work on the project. It allows you to temporarily disable users without deleting them outright.<br />Users that have the role of 'Lead expert' cannot change role, or be made in-active, as they are the lead manager of a project.</div>
-	</div>
-</div>
 
 <div id="page-main">
-<form method="post" action="" name="theForm" id="theForm">
-	<input name="id" value="13" type="hidden" />
-	<input name="checked" id="checked" value="1" type="hidden" />
-	<input name="delete" id="delete" value="0" type="hidden" />
-	<input name="userProjectRole" value="22" type="hidden" />
-<script type="text/javascript">
-	userid = '13';
-</script>
-<table>
-	<tr>
-		<td>username</td>
-		<td>
-			<input
-				type="text" 
-				name="username" 
-				id="username" 
-				value="ijsbeer" 
-				maxlength="16" 
-				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'],userid)" 
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="username-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>password</td>
-		<td>
-			<input 
-				type="password" 
-				name="password" 
-				id="password" 
-				value="" 
-				maxlength="16" 
-				onblur="if (this.value) { userRemoteValueCheck(this.id,[this.value],['f'],userid); }"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="password-message" class="">(leave blank to leave unchanged)</span>
-		</td>
-	</tr>
-	<tr>
-		<td>password (repeat)</td>
-		<td>
-			<input 
-				type="password" 
-				name="password_2" 
-				id="password_2" 
-				value="" 
-				maxlength="16" 
-				onblur="if (this.value || $('#password.val().)) { userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'],userid); }"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="password_2-message" class="">(leave blank to leave unchanged)</span>
-		</td>
-	</tr>
-	<tr>
-		<td>first_name</td>
-		<td>
-			<input 
-				type="text" 
-				name="first_name" 
-				id="first_name" 
-				value="IJs" 
-				maxlength="32"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="first_name-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>last_name</td>
-		<td>
-			<input 
-				type="text" 
-				name="last_name" 
-				id="last_name" 
-				value="Beer" 
-				maxlength="32"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="last_name-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>gender</td>
-		<td>
-			<label for="gender-f">
-				<input 
-					type="radio" 
-					id="gender-f" 
-					name="gender" 
-					value="f" 				/>f
-			</label>
-			<label for="gender-m">
-				<input
-					type="radio" 
-					id="gender-m" 
-					name="gender" 
-					value="m" checked="checked" 
-				/>m
-			</label>
-			<span class="asterisk-required-field">*</span>
-		</td>
-	</tr>
-	<tr>
-		<td>email_address</td>
-		<td>
-			<input 
-				type="text" 
-				name="email_address" 
-				id="email_address" 
-				value="ijsbeer@thirdeyefoundation.com" 
-				maxlength="64"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f','e'],userid)"
-			/>
-			<span class="asterisk-required-field">*</span>
-			<span id="email_address-message" class=""></span>
-		</td>
-	</tr>
 
+<form name="theForm" id="theForm">
+	<input type="hidden" name="taxon_id" id="taxon_id" value="3" />  
+<div id="taxon-navigation-table-div">
+<table id="taxon-navigation-table">
 	<tr>
-		<td>role in current project:</td>
-		<td>
-					<select name="role_id">
-							<option 
-					title="Expert: Content manager of a project" 
-					value="3"
-									>Expert</option>
-							<option 
-					title="Editor: Edits specific parts of a project" 
-					value="4"
-									>Editor</option>
-							<option 
-					title="Contributor: Contributes to a project but cannot edit (current)" 
-					value="5"
-					 selected class="option-selected" 				>Contributor</option>
-						</select>
-		</td>
-	</tr>
-	<tr>
-		<td>active</td>
-		<td>
-			<label for="active-y">
-				<input
-					type="radio" 
-					id="active-y" 
-					name="active" 
-					value="1"
-					 
-					checked="checked"/>y
-			</label>
-			<label for="active-n">
-				<input
-					type="radio" 
-					id="active-n" 
-					name="active" 
-					value="0" 
-					 
-					 />n
-			</label>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<input type="submit" value="Save" />
-			
-			<input type="button" value="Delete" onclick="if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); } " />
-			
-			<input type="button" value="Back" onclick="window.open('user_overview.php','_self');" />
+		<td id="taxon-navigation-cell">
+			<span style="float:right">
+				<span id="message-container" style="margin-right:10px">&nbsp;</span>
+				<input type="button" value="save" onclick="taxonSaveData()" style="margin-right:5px" />
+				<input type="button" value="undo" onclick="taxonMessage('coming soon')" style="margin-right:5px" />
+				<input type="button" value="delete" onclick="taxonDeleteData(taxonActiveLanguage)" style="margin-right:5px" />
+				<input type="button" value="taxon list" onclick="window.open('list.php','_top');" style="" />
+			</span>
 		</td>
 	</tr>
 </table>
+</div>
+<div id="taxon-language-table-div">
+<table id="taxon-language-table" class="taxon-language-table">
+	<tr>
+		<td class="taxon-language-cell" onclick="taxonGetData(24)">
+			Dutch		</td>
+		<td class="taxon-language-cell" onclick="taxonGetData(26)">
+			English *		</td>
+		<td class="taxon-language-cell-active">
+			Japanese		</td>
+	</tr>
+</table>
+</div>
+
+<p>
+ADD MORE PAGES
+</p>
+
+Taxon name:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value=""Wookiees"" />
+<textarea name="content" style="width:880px;height:600px;" id="taxon-content"><h1>Wookiees</h1>
+<p><a href="http://news.3yen.com/wp-content/images/wookie-japanese_500.png"><img class="alignleft size-full wp-image-12608" title="japanese wookie" src="http://news.3yen.com/wp-content/images/wookie-japanese_500.png" alt="japanese wookie" width="162" height="270" /></a></p>
+<p>Wookieesは献身的な、忠実な友人、他人の非常に疑い深い。[4]生命負債はWookieesに神聖である。  ひどい出現および気難しな傾向にもかかわらず、Wookieesに非常に理性的であるためにそして複雑な技術の命令があるために示されている。  Chewbaccaは副操縦士、starshipの千年間の隼の維持を行う。 彼は偶然に発破を掛けられた離れてdroid  C-3POを組立て直すロボット工学の基本的な知識を、有した。 Wookieesは速い学習者である;  効果的に機械を操縦し、兵器システムを作動させるChewbaccaは帝国AT-STを徴収し、示されているEndorの戦いの間に。  それらは融合切断のマスターである。  Wookieesは非常に道徳、勇気、同情および忠誠を評価する。 Wookieeの神聖な、古代伝統は名誉家族のそれである。  名誉家族はWookiee'から成り立つ; sの親友および友達。  これらの家族はあらゆる名誉家族のメンバーがこれらの個人持つかもしれない、また互いのための彼らの生命を主張するために責任を誓約する。  同様に神聖なWookieeの生命負債のように、Wookieesは種の外のメンバーにこの伝統を拡張する。  Chewbaccaはハンを、彼の名誉家族の子供単独単独、LeiaのOrganaおよびルークSkywalkerの部品考慮した。[5]  Wookieesに理解がスターウォーズの宇宙戦いのそして戦うクローン戦争の間に共和国力の横である。  Wookieesはその対立間もなくして裏切られ、奴隷になった。  Wookieesは力に敏感である。 1そのようなWookieeはLowbacca、Chewbacca'である;  本シリーズ若いJediからのsの甥は、ナイト爵に叙する。</p></textarea>
 </form>
 
-</div>
 
 
 
 <script type="text/JavaScript">
-
 $(document).ready(function(){
 
-	$('#username').focus();
+	taxonAddLanguage([24,'Dutch',0]);
+	taxonAddLanguage([26,'English',1]);
+	taxonAddLanguage([50,'Japanese',0]);
+	taxonActiveLanguage = 50;
+	taxonUpdateLanguageBlock();
 
 });
-
 </script>
+
+</div>
+
+
+<script type="text/JavaScript">
+$(document).ready(function(){
+	activeLanguage = 50;
+});
+</script>
+
 
 
 </div ends="page-container">
