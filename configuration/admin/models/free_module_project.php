@@ -1,32 +1,32 @@
 <?php
 
-	include_once('model.php');
+    include_once('model.php');
 
-	class FreeModuleProject extends Model {
+    class FreeModuleProject extends Model {
 
-		const tableBaseName = 'free_modules_projects';
+        const tableBaseName = 'free_modules_projects';
 
-		/**
-		* Constructor, calls parent's constructor
-		*
-		* @access 	public
-		*/
-		public function __construct() {
+        /**
+        * Constructor, calls parent's constructor
+        *
+        * @access     public
+        */
+        public function __construct() {
 
-			parent::__construct(self::tableBaseName);
+            parent::__construct(self::tableBaseName);
 
-		}
+        }
 
-		/**
-		* Destructor
-		*
-		* @access 	public
-		*/
-		public function __destruct() {
+        /**
+        * Destructor
+        *
+        * @access     public
+        */
+        public function __destruct() {
 
-			parent::__destruct();
+            parent::__destruct();
 
-		}
+        }
 
-	}
+    }
 
