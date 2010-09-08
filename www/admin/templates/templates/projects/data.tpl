@@ -33,7 +33,7 @@
 		</td>
 		<td colspan="2">
 		{if $data.logo_url}
-		<img src="{$rootWebUrl}{$data.logo_url}" width="150px" /><br />
+		<img src="{$data.logo_url}" width="150px" /><br />
 		<label><input type="checkbox" value="1" name="deleteLogo" />Delete current logo (uploading a new logo deletes the old one as well)</label><br />
 		{/if}
 		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
