@@ -57,99 +57,6 @@
 
 <!-- Upload with copy -->
 <target name="upload">
-	<reflexive>
-       <copy  todir="/Volumes/Data/htdocs/linnaeus_ng/">
-            <fileset dir="/cc/projects/linnaeus_ng/source/">
-                <include name="**/**"/>
-            </fileset>
-         </copy>
-        <copy file="/Volumes/Data/htdocs/linnaeus_ng/configuration/admin/default-configuration.php"
-              tofile="/Volumes/Data/htdocs/linnaeus_ng/configuration/admin/configuration.php"
-              overwrite="true" >
-            <!--fileset dir="/Volumes/Data/htdocs/linnaeus_ng/configuration/admin/"-->
-                <!--include name="configuration.php" /-->
-            <!--/fileset-->
-            <filterchain>
-                <replacetokens>
-                    <token key="PATH.APP_ROOT" value="${app_root.path}" />
-                    <token key="URL.WEBROOT" value="${webroot.url}" />
-                    <token key="DB.HOST" value="${db.host}" />
-                </replacetokens>
-            </filterchain>
-        </copy>
-	</reflexive>
-</target>
-
-    <!-- Update database in dev server -->
-    <target name="deploydb">
-         <exec command="mysql -u${deploy.db.username} -p${deploy.db.password}
-              ${deploy.db.name} &lt; ${basedir}/${deploy.db.dump}" />
-    </target>
-
-<target name="build" depends="checkout,clean,phplint,deploy,upload,deploydb" />
-<!-- Unused targets: phpdoc  -->
-</project>
-
-=======
-<?xml version="1.0" encoding="UTF-8"?>
-<project default="build">
-
-    <property name="basedir" value="${project.basedir}" />
-    <property name="build" value="${basedir}/../build" />
-    <property file="build.properties" />
-
-<patternset id="inc.php.files">
-  <include name="**/*.php" />
-</patternset>
-
-<!-- Checkout latest version from SVN -->
-<target name="checkout">
-  <svnupdate svnpath="svn" nocache="true" todir="${basedir}" />
-</target>
-
-<!-- Clean and set up build/dist directories -->
-<target name="clean">
-  <delete dir="${build}" includeemptydirs="true" />
-  <mkdir dir="${build}/logs" />
-  <mkdir dir="${build}/api" />
-</target>
-
-<!-- Check PHP syntax -->
-<target name="phplint">
-  <phplint haltonfailure="false">
-     <fileset dir="${basedir}">
-        <patternset refid="inc.php.files" />
-     </fileset>
-  </phplint>
-</target>
-
-    <!-- Generate documentation -->
-<!--    <target name="phpdoc"> -->
-<!--         <exec dir="${basedir}" -->
-<!--             checkreturn="true" -->
-<!--             command="phpdoc -ct type -ue on -t ${build}/api -->
-<!--                      -tb /usr/share/php/data/phpUnderControl/data/phpdoc -o HTML:Phpuc:phpuc -->
-<!--                      -d ${basedir}/configuration,${basedir}/www" /> -->
-<!--     </target> -->
-
-    <!-- Execute Code Sniffer -->            
-    <target name="phpcs">
-        <exec dir="${basedir}"
-            command="phpcs --report=checkstyle --standard=Zend
-                   --ignore=library/Zend/**,public/scripts/**
-                   ${basedir} > ${build}/logs/checkstyle.xml"
-            escape="false" />
-    </target>
-
-
-
-
-<target name="deploy">
-  <svnupdate svnpath="svn" nocache="true" todir="${deploy.location}" />
-</target>
-
-<!-- Upload with copy -->
-<target name="upload">
        <copy  todir="/Volumes/Data/htdocs/linnaeus_ng/">
             <fileset dir="/cc/projects/linnaeus_ng/source/">
                 <include name="**/**"/>
@@ -184,5 +91,3 @@
 <target name="build" depends="checkout,clean,phplint,deploy,upload,deploydb" />
 <!-- Unused targets: phpdoc  -->
 </project>
-
->>>>>>> .r169
