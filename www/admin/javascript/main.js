@@ -20,13 +20,13 @@ function allToggleHelpVisibility() {
 function allDoubleDeleteConfirm(element,name) {
 
 	if (confirm(
-		'Are you sure you want to delete the '+element+' "'+name+'"?\n'+
-		'When you delete the '+element+', all corresponding data will be irreversibly deleted.'
+		'Are you sure you want to delete '+element+' "'+name+'"?\n'+
+		'When doing this, all corresponding data will be irreversibly deleted.'
 		)) {
 	
 		return (confirm(
 			'Final confirmation:\n'+
-			'Are you sure you want to delete the '+element+' "'+name+'"?\n'+
+			'Are you sure you want to delete '+element+' "'+name+'"?\n'+
 			'All corresponding data will be irreversibly deleted.'
 			));
 	
@@ -73,7 +73,7 @@ function moduleChangeModuleStatus(ele,removeIds) {
 	
 	if (action == 'delete') {
 
-		if (!allDoubleDeleteConfirm('module',modulename)) return;
+		if (!allDoubleDeleteConfirm('the module',modulename)) return;
 
 	}
 
@@ -205,7 +205,7 @@ function projectSaveLanguage(action,lan) {
 
 	if (action == 'delete') {
 
-		if (!allDoubleDeleteConfirm('language',lan[1])) return;
+		if (!allDoubleDeleteConfirm('the language',lan[1])) return;
 
 	}
 
@@ -291,7 +291,42 @@ function projectUpdateLanguageBlock() {
 
 }
 
-var activeLanguage = false;
+function taxonMessage(msg,err) {
+
+	$('#message-container').show();
+	$('#message-container').html(msg).delay(1000).fadeOut(500);
+
+}
+
+var taxonActiveLanguage = false;
+var taxonLanguages = Array();
+
+function taxonAddLanguage(lan) {
+	//[id,name,default?]
+	taxonLanguages[taxonLanguages.length] = lan;
+
+}
+						  
+function taxonUpdateLanguageBlock() {
+
+	$buffer = '<table class="taxon-language-table"><tr>';
+
+	for (var i=0;i<taxonLanguages.length;i++) {
+	
+		$buffer = $buffer+
+			'<td class="taxon-language-cell'+
+			(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '" onclick="taxonGetData('+taxonLanguages[i][0]+');' )+
+			'">'+
+			taxonLanguages[i][1]+
+			(taxonLanguages[i][2]==1 ?  ' *' : '')+
+			'</td>';
+	}
+
+	$buffer = $buffer + '</tr></table>';
+
+	$('#taxon-language-table-div').html($buffer);
+
+}
 
 function taxonSaveData() {
 
@@ -302,13 +337,13 @@ function taxonSaveData() {
 			'action' : 'save_taxon' ,
 			'name' : $('#taxon-name-input').val() , 
 			'content' : tinyMCE.get('taxon-content').getContent() , 
-			'language' : activeLanguage ,
-			'page' : 'Main page'			
+			'language' : taxonActiveLanguage ,
+			'page' : 'main'			
 		},
 		function(data){
 			if (data.indexOf('id=')!=-1) {
 				$('#taxon_id').val(data.replace('id=',''));
-				$('#save-message').html('saved');
+				taxonMessage('saved');
 				} else
 			if (data.length>0) {
 				alert(data);
@@ -318,8 +353,52 @@ function taxonSaveData() {
 
 }
 
+function taxonGetData(language) {
 
+	if ($('#taxon_id').val().length==0) return;
+	
+	// save before switching
+	taxonSaveData();
 
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : $('#taxon_id').val() ,
+			'action' : 'get_taxon' ,
+			'language' : language ,
+			'page' : 'main'			
+		},
+		function(data){
+			obj = $.parseJSON(data);
+			$('#taxon-name-input').val(obj.content_name ? obj.content_name : '');
+			tinyMCE.get('taxon-content').setContent(obj.content ? obj.content : '');
+			taxonActiveLanguage = obj.language_id;
+			taxonUpdateLanguageBlock();
+		}
+	);
+
+}
+
+function taxonDeleteData(language) {
+
+	if ($('#taxon_id').val().length==0) return;
+
+	if (!allDoubleDeleteConfirm('all content in all languages for taxon',$('#taxon-name-input').val())) return;
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : $('#taxon_id').val() ,
+			'action' : 'delete_taxon' ,
+			'language' : language ,
+			'page' : 'main'			
+		},
+		function(data){
+			window.open('list.php','_top');
+		}
+	);
+
+}
 
 
 

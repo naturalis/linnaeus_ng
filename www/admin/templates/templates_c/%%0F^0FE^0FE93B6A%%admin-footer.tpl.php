@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-07 18:08:32
+<?php /* Smarty version 2.6.26, created on 2010-09-08 13:25:56
          compiled from ../shared/admin-footer.tpl */ ?>
 </div ends="page-container">
 

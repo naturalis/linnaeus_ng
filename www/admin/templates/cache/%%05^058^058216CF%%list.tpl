@@ -1,8 +1,8 @@
 205
-a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283874556;s:7:"expires";i:1283878156;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283945154;s:7:"expires";i:1283948754;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<title>Imaginary Beings - Taxon list</title>
 
@@ -37,18 +37,67 @@ a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 
 <div id="page-main">
-<ul class="admin-list">
-<li>
-	<a href="?project_id=">A Bao A Qu</a>
-</li>
-<li>
-	<a href="?project_id=">Ichtyocentaurs</a>
-</li>
-<li>
-	<a href="?project_id=">The Hippogriff</a>
-</li>
 
-</ul>
+<table>
+<tr>
+	<td>Taxon</td>
+		<td style="text-align:right; width:75px">
+		(Dutch)	</td>
+		<td style="text-align:right; width:75px">
+		English *	</td>
+		<td style="text-align:right; width:75px">
+		Japanese	</td>
+		
+
+</tr>
+<tr>
+	<td>
+		<a href="edit.php?id=2">8-branched giant snake</a>
+	</td>
+			<td style="text-align:right">
+		<a href="edit.php?id=2&lan=24">4023</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=2&lan=26">966</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=2&lan=50">16360</a>
+	</td>
+		
+</tr>
+<tr>
+	<td>
+		<a href="edit.php?id=1">Qilin </a>
+	</td>
+			<td style="text-align:right">
+		<a href="edit.php?id=1&lan=24">4457</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=1&lan=26">11394</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=1&lan=50">4553</a>
+	</td>
+		
+</tr>
+<tr>
+	<td>
+		<a href="edit.php?id=3">Wookie</a>
+	</td>
+			<td style="text-align:right">
+		<a href="edit.php?id=3&lan=24">3577</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=3&lan=26">18704</a>
+	</td>
+		<td style="text-align:right">
+		<a href="edit.php?id=3&lan=50">2129</a>
+	</td>
+		
+</tr>
+</table>
+<br />
+<a href="add.php">Add a new taxon</a>
 </div>
 
 </div ends="page-container">
