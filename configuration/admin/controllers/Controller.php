@@ -200,6 +200,16 @@
 			//$this->requestData = $_REQUEST; // also contains cookies
 			$this->requestData = array_merge((array)$_GET,(array)$_POST); // don't want no cookies!
 
+			foreach((array)$this->requestData as $key => $val) {
+
+				if (get_magic_quotes_gpc()) {
+
+					$this->requestData[$key] = stripslashes($val);
+
+				}
+
+			}
+
 			foreach((array)$_FILES as $key => $val) {
 
 				if (isset($val['size']) && $val['size']>0) $this->requestDataFiles[] = $val;
