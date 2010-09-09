@@ -1,12 +1,10 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-08 14:54:00
+<?php /* Smarty version 2.6.26, created on 2010-09-09 18:06:20
          compiled from shared/admin-footer.tpl */ ?>
 </div ends="page-container">
 
 <div id="footer-container">
 <?php if (! $this->_tpl_vars['excludecludeBottonMenu']): ?>
 	<div id="footer-menu">
-		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
-admin/admin-index.php">Main index</a>
 <?php if ($this->_tpl_vars['session']['user']['_number_of_projects'] > 1): ?>
 		<a href="<?php echo $this->_tpl_vars['rootWebUrl']; ?>
 admin/views/users/choose_project.php">Switch projects</a>

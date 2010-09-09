@@ -1,10 +1,10 @@
 207
-a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tpl";b:1;s:23:"shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283950441;s:7:"expires";i:1283954041;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tpl";b:1;s:23:"shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284048380;s:7:"expires";i:1284051980;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-	<title>Polar Bears of Amsterdam</title>
+	<title>Imaginary Beings</title>
 
 	<link href="/admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="/admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
@@ -29,11 +29,17 @@ a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tp
 <div id="page-container">
 
 <div id="page-header-titles">
-	<span id="page-header-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="page-header-projectname">Polar Bears of Amsterdam</span>
-<!--DEBUG ONLY:--><span style="color:white">1</span>
-<br />	<span id="page-header-pageaction"></span>
+	<span id="page-header-title">Linnaeus NG Administration v0.1</span>
+	<br />
+	<div id="breadcrumbs">
+				<span class="crumb"><a href="/admin/views/users/choose_project.php">Projects</a></span>
+		<span class="crumb-arrow">&rarr;</span>
+					<span id="crumb-current">Imaginary Beings</span>
+		<span class="crumb-arrow">&nbsp;</span>
+			</div>
 </div>
+
+
 
 
 <div id="page-main">
@@ -47,9 +53,7 @@ a:4:{s:8:"template";a:3:{s:15:"admin-index.tpl";b:1;s:23:"shared/admin-header.tp
 
 <div id="footer-container">
 	<div id="footer-menu">
-		<a href="/admin/admin-index.php">Main index</a>
-		<a href="/admin/views/users/choose_project.php">Switch projects</a>
-		<a href="/admin/views/users/logout.php">Log out (logged in as Maarten Schermer)</a>
+		<a href="/admin/views/users/logout.php">Log out (logged in as Jorge Luis Borges)</a>
 		<br />
 	</div>
 </div ends="footer-container">

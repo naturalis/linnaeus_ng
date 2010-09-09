@@ -1,3 +1,11 @@
+a {
+	text-decoration:none;
+}
+
+a:hover {
+	text-decoration:underline;
+}
+
 #body-container {
 	width:900px;
 }
@@ -55,32 +63,33 @@
 	font-weight:bold;
 }
 
-#page-header-projectname {
+#breadcrumbs {
 	margin-left:10px;
 	font-size:12px;
-	font-style:italic;
-	font-weight:bold;
 }
 
-#page-header-appname {
-	margin-left:10px;
-	font-size:12px;
-	font-weight:bold;
+.crumb, #crumb-current,.crumb-arrow {
+
 }
 
-#page-header-appname a {
+.crumb a, .crumb a:hover, .crumb a:visited {
 	text-decoration:none;
 	color:black;
+	font-style:italic;
 }
 
-#page-header-appname a:hover {
+.crumb a:hover {
 	text-decoration:underline;
 }
 
-#page-header-pageaction {
-	margin-left:10px;
-	font-size:12px;
+.crumb-arrow {
+	font-size:18px;
+	font-weight:bold;
 }
+
+#crumb-current {
+}
+
 
 #page-block-messages,#page-block-errors {
 	margin-left:10px;
@@ -330,6 +339,13 @@
 	width:100%;
 	margin:0px;
 	padding:0px;
+}
+
+.cell-page-delete {
+	background-image:url(../images/system/icons/cross.png);
+	background-repeat:no-repeat;
+	width:16px;
+	cursor:pointer;
 }
 
 

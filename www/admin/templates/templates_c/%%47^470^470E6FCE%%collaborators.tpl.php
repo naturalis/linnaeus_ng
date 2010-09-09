@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-06 18:52:55
+<?php /* Smarty version 2.6.26, created on 2010-09-09 18:06:24
          compiled from collaborators.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'collaborators.tpl', 25, false),)), $this); ?>

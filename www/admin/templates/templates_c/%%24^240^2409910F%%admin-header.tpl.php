@@ -1,5 +1,7 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-08 14:54:00
+<?php /* Smarty version 2.6.26, created on 2010-09-09 18:06:20
          compiled from shared/admin-header.tpl */ ?>
+<?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
+smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'shared/admin-header.tpl', 58, false),)), $this); ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -68,17 +70,51 @@ admin/images/system/eti_logo.png" id="eti-logo" /></a>
 <div id="page-header-titles">
 	<span id="page-header-title"><?php echo $this->_tpl_vars['applicationName']; ?>
  v<?php echo $this->_tpl_vars['applicationVersion']; ?>
-</span><br />
-<?php if ($this->_tpl_vars['session']['project']['name'] != ''): ?>	<span id="page-header-projectname"><?php echo $this->_tpl_vars['session']['project']['name']; ?>
 </span>
-<!--DEBUG ONLY:--><span style="color:white"><?php echo $this->_tpl_vars['session']['project']['id']; ?>
+	<br />
+<?php if ($this->_tpl_vars['breadcrumbs']): ?>
+	<div id="breadcrumbs">
+	<?php unset($this->_sections['i']);
+$this->_sections['i']['name'] = 'i';
+$this->_sections['i']['loop'] = is_array($_loop=$this->_tpl_vars['breadcrumbs']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
+$this->_sections['i']['show'] = true;
+$this->_sections['i']['max'] = $this->_sections['i']['loop'];
+$this->_sections['i']['step'] = 1;
+$this->_sections['i']['start'] = $this->_sections['i']['step'] > 0 ? 0 : $this->_sections['i']['loop']-1;
+if ($this->_sections['i']['show']) {
+    $this->_sections['i']['total'] = $this->_sections['i']['loop'];
+    if ($this->_sections['i']['total'] == 0)
+        $this->_sections['i']['show'] = false;
+} else
+    $this->_sections['i']['total'] = 0;
+if ($this->_sections['i']['show']):
+
+            for ($this->_sections['i']['index'] = $this->_sections['i']['start'], $this->_sections['i']['iteration'] = 1;
+                 $this->_sections['i']['iteration'] <= $this->_sections['i']['total'];
+                 $this->_sections['i']['index'] += $this->_sections['i']['step'], $this->_sections['i']['iteration']++):
+$this->_sections['i']['rownum'] = $this->_sections['i']['iteration'];
+$this->_sections['i']['index_prev'] = $this->_sections['i']['index'] - $this->_sections['i']['step'];
+$this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_sections['i']['step'];
+$this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
+$this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
+?>
+	<?php $this->assign('n', $this->_tpl_vars['n']+1); ?>
+<?php if ($this->_tpl_vars['n'] == count($this->_tpl_vars['breadcrumbs'])): ?>
+		<span id="crumb-current"><?php echo $this->_tpl_vars['breadcrumbs'][$this->_sections['i']['index']]['name']; ?>
 </span>
-<br /><?php endif; ?>
-<?php if ($this->_tpl_vars['controllerPublicName'] != '' && ! $this->_tpl_vars['hideControllerPublicName']): ?>	<span id="page-header-appname"><a href="index.php"><?php echo $this->_tpl_vars['controllerPublicName']; ?>
-</a></span><br /><?php endif; ?>
-	<span id="page-header-pageaction"><?php echo $this->_tpl_vars['pageName']; ?>
-</span>
+		<span class="crumb-arrow">&nbsp;</span>
+	<?php else: ?>
+		<span class="crumb"><a href="<?php echo $this->_tpl_vars['breadcrumbs'][$this->_sections['i']['index']]['url']; ?>
+"><?php echo $this->_tpl_vars['breadcrumbs'][$this->_sections['i']['index']]['name']; ?>
+</a></span>
+		<span class="crumb-arrow">&rarr;</span>
+	<?php endif; ?>
+	<?php endfor; endif; ?>
+	</div>
+<?php endif; ?>
 </div>
+
+
 
 <?php if ($this->_tpl_vars['helpTexts']): ?>
 <div id="block-inline-help">

@@ -1,8 +1,8 @@
 215
-a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283760048;s:7:"expires";i:1283763648;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284046307;s:7:"expires";i:1284049907;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<title>Imaginary Beings - Project collaborator overview</title>
 
@@ -23,14 +23,24 @@ a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-head
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="/admin/admin-index.php"><img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
 <div id="page-header-titles">
 	<span id="page-header-title">Linnaeus NG Administration v0.1</span><br />
-	<span id="page-header-projectname">Imaginary Beings</span><br />	<span id="page-header-appname"><a href="index.php">User administration</a></span><br />	<span id="page-header-pageaction">Project collaborator overview</span>
+
+	<span id="page-header-projectname">Imaginary Beings</span>
+<!--DEBUG ONLY:--><span style="color:white">2</span>
+<br />	<span id="page-header-appname"><a href="index.php">User administration</a></span><br />	<span id="page-header-pageaction">Project collaborator overview</span>
+</div>
+
+<div id="breadcrumbs">
+<a href="/admin/views/users/choose_project.php">Projects</a> -> 
+<a href="/admin/admin-index.php">Imaginary Beings</a> -> 
+<a href="/admin/views/users">User administration</a> -> 
+Project collaborator overview
 </div>
 
 
@@ -45,6 +55,16 @@ a:4:{s:8:"template";a:3:{s:17:"user_overview.tpl";b:1;s:26:"../shared/admin-head
 	<th onclick="allTableColumnSort('role');">role</th>
 	<th></th>
 	<th></th>
+</tr>
+<tr>
+	<td>15</td>
+	<td>System</td>
+	<td>Administrator</td>
+	<td>m</td>
+	<td>sysadmin@eti.uva.nl</td>
+	<td>System administrator</td>
+	<td>[<a href="view.php?id=15">view</a>]</td>
+	<td>[<a href="edit.php?id=15">edit</a>]</td>
 </tr>
 <tr>
 	<td>2</td>

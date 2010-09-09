@@ -49,13 +49,25 @@ tinyMCE.init({
 <div id="page-container">
 
 <div id="page-header-titles">
-	<span id="page-header-title">{$applicationName} v{$applicationVersion}</span><br />
-{if $session.project.name!=''}	<span id="page-header-projectname">{$session.project.name}</span>
-<!--DEBUG ONLY:--><span style="color:white">{$session.project.id}</span>
-<br />{/if}
-{if $controllerPublicName!='' && !$hideControllerPublicName}	<span id="page-header-appname"><a href="index.php">{$controllerPublicName}</a></span><br />{/if}
-	<span id="page-header-pageaction">{$pageName}</span>
+	<span id="page-header-title">{$applicationName} v{$applicationVersion}</span>
+	<br />
+{if $breadcrumbs}
+	<div id="breadcrumbs">
+	{section name=i loop=$breadcrumbs}
+	{assign var=n value=$n+1}
+{if $n==$breadcrumbs|@count}
+		<span id="crumb-current">{$breadcrumbs[i].name}</span>
+		<span class="crumb-arrow">&nbsp;</span>
+	{else}
+		<span class="crumb"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+		<span class="crumb-arrow">&rarr;</span>
+	{/if}
+	{/section}
+	</div>
+{/if}
 </div>
+
+
 
 {if $helpTexts}
 <div id="block-inline-help">

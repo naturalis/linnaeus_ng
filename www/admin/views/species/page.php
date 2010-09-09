@@ -4,5 +4,5 @@
 
     $c = new SpeciesController();
 
-    $c->ajaxInterfaceAction();
+    $c->pageAction();
 

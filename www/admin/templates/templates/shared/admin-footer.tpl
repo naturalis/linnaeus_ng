@@ -3,7 +3,6 @@
 <div id="footer-container">
 {if !$excludecludeBottonMenu}
 	<div id="footer-menu">
-		<a href="{$rootWebUrl}admin/admin-index.php">Main index</a>
 {if $session.user._number_of_projects > 1}
 		<a href="{$rootWebUrl}admin/views/users/choose_project.php">Switch projects</a>
 {/if}

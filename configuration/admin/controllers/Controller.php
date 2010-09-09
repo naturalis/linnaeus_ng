@@ -56,7 +56,7 @@
 			$this->setMiscellaneous();
 			
 			$this->setPaths();
-
+			
 		}
 
 		/**
@@ -69,6 +69,613 @@
 			parent::__destruct();
 
 		}
+
+		/**
+		* Returns the application name
+		*
+		* @return 	string	application name
+		* @access 	public
+		*/
+		public function getAppName() {
+
+			return $this->appName;
+
+		}
+
+		/**
+		* Returns the controller's base name
+		*
+		* @return 	string	controller's base name
+		* @access 	public
+		*/
+		public function getControllerBaseName() {
+
+			return $this->controllerBaseName;
+
+		}
+
+		/**
+		* Returns the current view's name
+		*
+		* @return 	string	current view's name
+		* @access 	public
+		*/
+		public function getViewName() {
+
+			return $this->viewName;
+
+		}
+
+		/**
+		* Assigns basic Smarty variables and renders the page
+		*
+		* @access 	public
+		*/
+		public function printPage() {
+
+			$this->setBreadcrumbs();
+
+			$this->smarty->assign('debugMode', $this->debugMode);
+
+			$this->smarty->assign('rootWebUrl', $this->generalSettings['rootWebUrl']);
+			$this->smarty->assign('controllerPublicName', $this->controllerPublicName);
+			$this->smarty->assign('session', $_SESSION);
+
+			$this->smarty->assign('rnd', $this->getRandomValue());
+
+			$this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+			$this->smarty->assign('errors', $this->getErrors());
+			$this->smarty->assign('messages', $this->getMessages());
+			$this->smarty->assign('helpTexts', $this->getHelpTexts());
+
+			$this->smarty->assign('applicationName', $this->generalSettings['applicationName']);
+			$this->smarty->assign('applicationVersion', $this->generalSettings['applicationVersion']);
+			$this->smarty->assign('pageName', $this->getPageName());
+
+			$this->smarty->display(strtolower($this->getViewName().'.tpl'));
+
+		}
+
+		/**
+		* Redirects the user to another page (and avoids circular redirection)
+		*
+		* @param  	string	$url	url to redirect to; can be false, in which case HTTP_REFERER is used
+		* @access 	public
+		*/
+		public function redirect($url = false) {
+		
+			if (!$url) {
+
+				$url = $_SERVER['HTTP_REFERER'];
+				
+			}
+
+
+			if (basename($url)==$url) {
+
+				$circular = (basename($this->fullPath) == $url);
+
+			} else {
+			
+				$circular = ($this->fullPath == $url);			
+			
+			}
+
+			if ($url && !$circular) {
+
+				header('Location:'.$url);
+
+				die();
+
+			}
+
+		}
+
+		/**
+		* Adds an error to the class's stack of errors stored in class variable 'errors'
+		*
+		* @param  	string or arrayu	$error	the error(s)
+		* @access 	public
+		*/
+		public function addError($error) {
+		
+			if (!is_array($error)) {
+
+				$this->errors[] = $error;
+
+			} else {
+
+				foreach($error as $key => $val) {
+
+					$this->errors[] = $val;
+
+				}
+
+			}
+		
+		}
+
+		/**
+		* Returns the class's stack of errors stored in class variable 'errors'
+		*
+		* @return 	array	stack of errors
+		* @access 	public
+		*/
+		public function getErrors() {
+		
+			return $this->errors;
+		
+		}
+
+		/**
+		* Adds a message to the class's stack of messages stored in class variable 'messages'
+		*
+		* @param  	type	$message	the message
+		* @access 	public
+		*/
+		public function addMessage($message) {
+		
+			$this->messages[] = $message;
+		
+		}
+		
+		/**
+		* Returns the class's stack of messages stored in class variable 'messages'
+		*
+		* @return 	array	stack of messages
+		* @access 	public
+		*/
+		public function getMessages() {
+		
+			return $this->messages;
+		
+		}
+		
+		/**
+		* Sets the name of the current page, for display purposes, in a class variable 'pageName'.
+		*
+		* @param  	string	$name	the page's name
+		* @access 	public
+		*/
+		public function setPageName($name) {
+
+			$this->pageName = $name;
+
+		}
+
+		/**
+		* Returns the name of the current page.
+		*
+		* @return 	string	the page's name
+		* @access 	public
+		*/
+		public function getPageName() {
+
+			return $this->pageName;
+
+		}
+		
+		/**
+		* Sets the current user's id as a class variable
+		*
+		* @param  	array	$userData	basic user data
+		* @access 	public
+		*/
+		public function setCurrentUserId($userData) {
+
+			$this->currentUserId = $userData['id'];
+
+		}
+
+		/**
+		* Returns the current user's id class variable
+		*
+		* @return 	integer	user id
+		* @access 	public
+		*/
+		public function getCurrentUserId() {
+
+			return $this->currentUserId;
+
+		}
+
+		/**
+		* Returns the projects the current user has been assigned to
+		*
+		* @return 	array	array of project's id's and names
+		* @access 	public
+		*/
+		public function getCurrentUserProjects() {
+
+			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+
+				$r = array('id' => $val['project_id'] , 'name' => $val['project_name'] );
+				
+				if (!isset($cup) || !in_array($r,(array)$cup)) {
+
+					$cup[] = $r;
+
+				}
+
+			}
+
+			return $cup;
+
+		}
+
+		/**
+		* Sets the active project's id as class variable
+		*
+		* @param  	integer	$id	new active project's id
+		* @access 	public
+		*/
+		public function setCurrentProjectId($id) {
+
+			$_SESSION['project']['id'] = $id;
+
+		}
+
+		/**
+		* Returns the active project's id class variable
+		*
+		* @return 	integer	active project's id
+		* @access 	public
+		*/
+		public function getCurrentProjectId() {
+
+			return isset($_SESSION['project']['id']) ? $_SESSION['project']['id'] : null;
+
+		}
+
+		/**
+		* Sets the active project's name as a session variable (for display purposes)
+		*
+		* @access 	public
+		*/
+		public function setCurrentProjectName() {
+
+			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+
+				if ($val['project_id'] == $this->getCurrentProjectId())  {
+
+					$_SESSION['project']['name'] = $val['project_name'];
+
+					return;
+
+				}
+
+			}
+			
+		}
+
+		/**
+		* Gets the active project's name from the session
+		*
+		* @return 	string	active project's name
+		* @access 	public
+		*/
+		public function getCurrentProjectName() {
+
+			return $_SESSION['project']['name'];
+		
+		}
+
+		/**
+		* Sets the default project for the current user
+		*
+		* After logging in, the app requires an active project is set, the project the user actually works on.
+		* If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
+		* the choice should be automatic. This function decides what project should be the active one, and sets it.
+		*
+		* @access 	public
+		*/
+		public function setDefaultProject() {
+
+			$d = (array)$_SESSION['user']['_roles'];
+
+			// if user has no roles, do nothing
+			if (count($d) == 0) return;
+
+			// if user has only one role, set the corresponding project as the active project
+			if (count($d) == 1) {
+
+				$this->setCurrentProjectId($d[0]['project_id']);
+
+			}
+			// if user has more roles, set the project in which he has the lowest role_id as the active project
+			// (this assumes that the roles with the most permissions have the lowest ids)
+			else {
+
+				$t = false;
+			
+				foreach((array)$d as $key => $val) {
+					
+					if (!$t || $val['role_id'] < $t) { 
+
+						$t = $val['role_id'];
+						
+						$p = $val['project_id'];
+
+					}
+
+				}
+
+				$this->setCurrentProjectId($p);
+
+			}
+			
+			$this->setCurrentProjectName();
+
+		}
+		
+		/**
+		* Returns the page to redirect to after logging in
+		*
+		* @return 	string	path if page to redirect to
+		* @access 	public
+		*/
+		public function getLoginStartPage() {
+
+			if (!empty($_SESSION['login_start_page'])) {
+
+				return $_SESSION['login_start_page'];
+
+			} else {
+
+				return $this->generalSettings['rootWebUrl'].$this->getAppName().'/'.$this->getAppName().'-index.php';
+						
+			}
+
+		}
+
+		/**
+		* Sets user's data in a session after logging in
+		*
+		* User data retrieved after logging in is stored in a session for faster access.
+		* Data includes basic personal data, the user's various roles within projects,
+		* the user's rights to see actual pages and the number of projects he is assigned to.
+		*
+		* @param  	array	$userData	basic user data
+		* @param  	array	$roles	user's roles
+		* @param  	array	$rights	user's rights
+		* @param  	integer	$numberOfProjects	number of assigned projects
+		* @access 	public
+		*/
+		public function setUserSession($userData,$roles,$rights,$numberOfProjects) {
+
+			if (!$userData) return;
+
+			$userData['_login']['time'] = time();
+			$userData['_login']['remember'] = false;
+
+			$userData['_roles'] = $roles;
+			$userData['_rights'] = $rights;
+			$userData['_number_of_projects'] = $numberOfProjects;
+
+			$_SESSION['user'] = $userData;
+
+		}
+
+		/**
+		* Destroys a user's session (when logging out)
+		*
+		* @access 	public
+		*/
+		public function destroyUserSession() {
+
+			session_destroy();
+
+		}
+
+		/**
+		* Checks whether a user is logged in
+		*
+		* @return 	boolean		logged in or not
+		* @access 	public
+		*/
+		public function isUserLoggedIn() {
+
+			return (!empty($_SESSION['user']));
+
+		}
+		
+		/**
+		* Checks whether a user is authorized to view/use a certain page and redirects if necessary
+		*
+		* Subsequently checks: 
+		*   Is the user logged in? 
+		*   Has the user selected an active project?
+		*   Is the user authorized to see a specific page?
+		*
+		* @return 	boolean		returns true if authorized, or redirects if not
+		* @access 	public
+		*/
+		public function checkAuthorisation() {
+
+			// check if user is logged in, otherwise redirect to login page
+			if ($this->isUserLoggedIn()) {
+			
+				// check if there is an active project, otherwise redirect to choose project page
+				if ($this->getCurrentProjectId()) {
+
+					// check if the user is authorised for the combination of current page / current project
+					if ($this->isUserAuthorisedForProjectPage()) {
+	
+						return true;
+	
+					} else {
+					
+						$this->redirect(
+							$this->generalSettings['rootWebUrl'].
+							$this->appName.
+							$this->generalSettings['paths']['notAuthorized']
+						);
+
+						/*
+							user is not authorized and redirected to the index.page; 
+							if he already *is* on the index.page (and not authorized for that),
+							he is logged out to avoid circular reference.
+						*/
+						if ($this->getViewName()=='Index') {
+
+							$this->redirect(
+								$this->generalSettings['rootWebUrl'].
+								$this->appName.
+								$this->generalSettings['paths']['logout']
+							);
+
+						} else {
+
+							$this->redirect('index.php');
+
+						}
+
+					}
+
+				} else {
+
+					$this->redirect(
+						$this->generalSettings['rootWebUrl'].
+						$this->appName.
+						$this->generalSettings['paths']['chooseProject']
+					);
+
+				}
+
+			} else {
+			
+				$this->setLoginStartPage();
+
+				$this->redirect(
+					$this->generalSettings['rootWebUrl'].
+					$this->appName.
+					$this->generalSettings['paths']['login']
+				);
+
+			}
+
+		}
+
+		/**
+		* Judges whether the user is authorized to work at a specific project
+		*
+		* @param  	integer	$id	project id
+		* @return 	boolean	is or is not authorized
+		* @access 	public
+		*/
+		public function isCurrentUserAuthorizedForProject($id) {
+		
+			foreach((array)$this->getCurrentUserProjects() as $key => $val) {
+
+				if ($val['id'] == $id) return true;
+
+			}
+
+			return false;
+
+		}
+
+		/**
+		* Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
+		*
+		* @param array	$array	array to sort
+		* @param array	$sortBy	array to array of key, direction and case-sensitivity
+		* @access 	public
+		*/
+		public function customSortArray(&$array,$sortBy) {
+
+			$this->setSortField($sortBy['key']);
+
+			$this->setSortDirection($sortBy['dir']);
+
+			$this->setSortCaseSensitivity($sortBy['case']);
+
+			usort($array,array($this,'doCustomSortArray'));
+
+		}
+
+		/**
+		* Returns the default save path for file uploads
+		*
+		* @return string	path
+		* @access 	public
+		*/
+		public function getDefaultImageUploadDir() {
+		
+			return isset($_SESSION['project']['paths']['uploads_images']) ? $_SESSION['project']['paths']['uploads_images'] : null;
+		
+		}
+
+		/**
+		* Returns the default save path for project inmages
+		*
+		* @return string	path
+		* @access 	public
+		*/
+		public function getDefaultImageProjectDir() {
+		
+			return isset($_SESSION['project']['paths']['project_images']) ? $_SESSION['project']['paths']['project_images'] : null;
+		
+		}
+
+		/**
+		* Returns the default file allowed mask for file uploads
+		*
+		* @return array	array of allowed file extensions
+		* @access 	public
+		*/
+		public function getDefaultUploadFilemask() {
+		
+			return isset($this->defaultUploadFilemask) ? $this->defaultUploadFilemask : null;
+		
+		}
+		
+		/**
+		* Returns the default maximum size of file uploads
+		*
+		* @return integer max upload size in bytes
+		* @access 	public
+		*/
+		public function getDefaultUploadMaxSize() {
+		
+			return isset($this->defaultUploadMaxSize) ? $this->defaultUploadMaxSize : null;
+		
+		}
+	
+		/**
+		* Checks if a form submit is new or a resubmit (through user refresh)
+		*
+		* @return boolean	is resubmit or not
+		* @access 	public
+		*/
+		public function isFormResubmit() {
+		
+			$result = false;
+		
+			if (
+				isset($this->requestData['rnd']) && 
+				isset($_SESSION['system']['last_rnd']) && 
+				($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
+				)  $result = true;
+		
+			$_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+			
+			return $result;
+		
+		}
+
+		/**
+		* Returns the address of the root index for someone who is logged in
+		*
+		* @access 	public
+		* @ return	string	url
+		*/
+		public function getLoggedInMainIndex() {
+		
+			return $this->generalSettings['rootWebUrl'].$this->appName.'/admin-index.php';
+		
+		}
+
 
 		/**
 		* Starts the user's session
@@ -124,42 +731,6 @@
 			*/
 
 			if (!empty($path['filename'])) $this->viewName = $path['filename'];
-
-		}
-
-		/**
-		* Returns the application name
-		*
-		* @return 	string	application name
-		* @access 	public
-		*/
-		public function getAppName() {
-
-			return $this->appName;
-
-		}
-
-		/**
-		* Returns the controller's base name
-		*
-		* @return 	string	controller's base name
-		* @access 	public
-		*/
-		public function getControllerBaseName() {
-
-			return $this->controllerBaseName;
-
-		}
-
-		/**
-		* Returns the current view's name
-		*
-		* @return 	string	current view's name
-		* @access 	public
-		*/
-		public function getViewName() {
-
-			return $this->viewName;
 
 		}
 
@@ -342,7 +913,6 @@
 
 		}
 
-		
 		/**
 		* Initialises miscellaneous variables
 		*
@@ -363,306 +933,6 @@
 		}
 
 		/**
-		* Assigns basic Smarty variables and renders the page
-		*
-		* @access 	public
-		*/
-		public function printPage() {
-
-			$this->smarty->assign('debugMode', $this->debugMode);
-
-			$this->smarty->assign('rootWebUrl', $this->generalSettings['rootWebUrl']);
-			$this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-			$this->smarty->assign('session', $_SESSION);
-
-			$this->smarty->assign('rnd', $this->getRandomValue());
-
-
-			$this->smarty->assign('errors', $this->getErrors());
-			$this->smarty->assign('messages', $this->getMessages());
-			$this->smarty->assign('helpTexts', $this->getHelpTexts());
-
-			$this->smarty->assign('applicationName', $this->generalSettings['applicationName']);
-			$this->smarty->assign('applicationVersion', $this->generalSettings['applicationVersion']);
-			$this->smarty->assign('pageName', $this->getPageName());
-
-			$this->smarty->display(strtolower($this->getViewName().'.tpl'));
-
-		}
-
-		/**
-		* Redirects the user to another page (and avoids circular redirection)
-		*
-		* @param  	string	$url	url to redirect to; can be false, in which case HTTP_REFERER is used
-		* @access 	public
-		*/
-		public function redirect($url = false) {
-		
-			if (!$url) {
-
-				$url = $_SERVER['HTTP_REFERER'];
-				
-			}
-
-
-			if (basename($url)==$url) {
-
-				$circular = (basename($this->fullPath) == $url);
-
-			} else {
-			
-				$circular = ($this->fullPath == $url);			
-			
-			}
-
-			if ($url && !$circular) {
-
-				header('Location:'.$url);
-
-				die();
-
-			}
-
-		}
-
-		/**
-		* Adds an error to the class's stack of errors stored in class variable 'errors'
-		*
-		* @param  	string or arrayu	$error	the error(s)
-		* @access 	public
-		*/
-		public function addError($error) {
-		
-			if (!is_array($error)) {
-
-				$this->errors[] = $error;
-
-			} else {
-
-				foreach($error as $key => $val) {
-
-					$this->errors[] = $val;
-
-				}
-
-			}
-		
-		}
-
-		/**
-		* Returns the class's stack of errors stored in class variable 'errors'
-		*
-		* @return 	array	stack of errors
-		* @access 	public
-		*/
-		public function getErrors() {
-		
-			return $this->errors;
-		
-		}
-
-		/**
-		* Adds a message to the class's stack of messages stored in class variable 'messages'
-		*
-		* @param  	type	$message	the message
-		* @access 	public
-		*/
-		public function addMessage($message) {
-		
-			$this->messages[] = $message;
-		
-		}
-		
-		/**
-		* Returns the class's stack of messages stored in class variable 'messages'
-		*
-		* @return 	array	stack of messages
-		* @access 	public
-		*/
-		public function getMessages() {
-		
-			return $this->messages;
-		
-		}
-
-		/**
-		* Sets the name of the current page, for display purposes, in a class variable 'pageName'.
-		*
-		* @param  	string	$name	the page's name
-		* @access 	public
-		*/
-		public function setPageName($name) {
-
-			$this->pageName = $name;
-
-		}
-
-		/**
-		* Returns the name of the current page.
-		*
-		* @return 	string	the page's name
-		* @access 	public
-		*/
-		public function getPageName() {
-
-			return $this->pageName;
-
-		}
-
-		/**
-		* Sets the current user's id as a class variable
-		*
-		* @param  	array	$userData	basic user data
-		* @access 	public
-		*/
-		public function setCurrentUserId($userData) {
-
-			$this->currentUserId = $userData['id'];
-
-		}
-
-		/**
-		* Returns the current user's id class variable
-		*
-		* @return 	integer	user id
-		* @access 	public
-		*/
-		public function getCurrentUserId() {
-
-			return $this->currentUserId;
-
-		}
-
-		/**
-		* Returns the projects the current user has been assigned to
-		*
-		* @return 	array	array of project's id's and names
-		* @access 	public
-		*/
-		public function getCurrentUserProjects() {
-
-			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
-
-				$r = array('id' => $val['project_id'] , 'name' => $val['project_name'] );
-				
-				if (!isset($cup) || !in_array($r,(array)$cup)) {
-
-					$cup[] = $r;
-
-				}
-
-			}
-
-			return $cup;
-
-		}
-
-		/**
-		* Sets the active project's id as class variable
-		*
-		* @param  	integer	$id	new active project's id
-		* @access 	public
-		*/
-		public function setCurrentProjectId($id) {
-
-			$_SESSION['project']['id'] = $id;
-
-		}
-
-		/**
-		* Returns the active project's id class variable
-		*
-		* @return 	integer	active project's id
-		* @access 	public
-		*/
-		public function getCurrentProjectId() {
-
-			return isset($_SESSION['project']['id']) ? $_SESSION['project']['id'] : null;
-
-		}
-
-		/**
-		* Sets the active project's name as a session variable (for display purposes)
-		*
-		* @access 	public
-		*/
-		public function setCurrentProjectName() {
-
-			foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
-
-				if ($val['project_id'] == $this->getCurrentProjectId())  {
-
-					$_SESSION['project']['name'] = $val['project_name'];
-
-					return;
-
-				}
-
-			}
-			
-		}
-
-		/**
-		* Gets the active project's name from the session
-		*
-		* @return 	string	active project's name
-		* @access 	public
-		*/
-		public function getCurrentProjectName() {
-
-			return $_SESSION['project']['name'];
-		
-		}
-
-		/**
-		* Sets the default project for the current user
-		*
-		* After logging in, the app requires an active project is set, the project the user actually works on.
-		* If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
-		* the choice should be automatic. This function decides what project should be the active one, and sets it.
-		*
-		* @access 	public
-		*/
-		public function setDefaultProject() {
-
-			$d = (array)$_SESSION['user']['_roles'];
-
-			// if user has no roles, do nothing
-			if (count($d) == 0) return;
-
-			// if user has only one role, set the corresponding project as the active project
-			if (count($d) == 1) {
-
-				$this->setCurrentProjectId($d[0]['project_id']);
-
-			}
-			// if user has more roles, set the project in which he has the lowest role_id as the active project
-			// (this assumes that the roles with the most permissions have the lowest ids)
-			else {
-
-				$t = false;
-			
-				foreach((array)$d as $key => $val) {
-					
-					if (!$t || $val['role_id'] < $t) { 
-
-						$t = $val['role_id'];
-						
-						$p = $val['project_id'];
-
-					}
-
-				}
-
-				$this->setCurrentProjectId($p);
-
-			}
-			
-			$this->setCurrentProjectName();
-
-		}
-
-		/**
 		* Sets the page to redirect to after logging in
 		*
 		* Pages that require login redirect the user towards the login. By setting the 'login_start_page' 
@@ -677,77 +947,62 @@
 		}
 
 		/**
-		* Returns the page to redirect to after logging in
+		* Create the breadcrumb trail
 		*
-		* @return 	string	path if page to redirect to
-		* @access 	public
+		* @access 	private
 		*/
-		public function getLoginStartPage() {
+		private function setBreadcrumbs() {
 
-			if (!empty($_SESSION['login_start_page'])) {
+			$cp = $this->generalSettings['rootWebUrl'].$this->appName.$this->generalSettings['paths']['chooseProject'];
 
-				return $_SESSION['login_start_page'];
+			$this->breadcrumbs[] = array(
+				'name' => 'Projects', 
+				'url' => $cp
+			);
 
-			} else {
+			if ($this->fullPath != $cp && isset($_SESSION['project']['name'])) {
 
-				return $this->generalSettings['rootWebUrl'].$this->getAppName().'/'.$this->getAppName().'-index.php';
-						
+				$this->breadcrumbs[] = array(
+					'name' => $_SESSION['project']['name'],
+					'url' => $this->getLoggedInMainIndex()
+				);
+
+				if (!empty($this->controllerPublicName) && $this->fullPath != $this->getLoggedInMainIndex()) {
+				
+					$curl = $this->generalSettings['rootWebUrl'].$this->appName.'/views/'.$this->controllerBaseName;
+
+					$this->breadcrumbs[] = array(
+						'name' => $this->controllerPublicName,
+						'url' => $curl
+					);
+					
+					if ($this->getViewName()!='index') {
+
+						$this->breadcrumbs[] = array(
+							'name' => $this->getPageName(),
+							'url' => $curl.'/'.$this->getViewName().'.php'
+						);
+
+					}
+
+				}
+
 			}
 
 		}
 
 		/**
-		* Sets user's data in a session after logging in
+		* Returns the breadcrumb trail
 		*
-		* User data retrieved after logging in is stored in a session for faster access.
-		* Data includes basic personal data, the user's various roles within projects,
-		* the user's rights to see actual pages and the number of projects he is assigned to.
-		*
-		* @param  	array	$userData	basic user data
-		* @param  	array	$roles	user's roles
-		* @param  	array	$rights	user's rights
-		* @param  	integer	$numberOfProjects	number of assigned projects
-		* @access 	public
+		* @access 	private
+		* @return	array	breadcrumb trail: array of crumbname => crumbpath
 		*/
-		public function setUserSession($userData,$roles,$rights,$numberOfProjects) {
-
-			if (!$userData) return;
-
-			$userData['_login']['time'] = time();
-			$userData['_login']['remember'] = false;
-
-			$userData['_roles'] = $roles;
-			$userData['_rights'] = $rights;
-			$userData['_number_of_projects'] = $numberOfProjects;
-
-			$_SESSION['user'] = $userData;
-
-		}
-
-		/**
-		* Destroys a user's session (when logging out)
-		*
-		* @access 	public
-		*/
-		public function destroyUserSession() {
-
-			session_destroy();
-
-		}
-
-		/**
-		* Checks whether a user is logged in
-		*
-		* @return 	boolean		logged in or not
-		* @access 	public
-		*/
-		public function isUserLoggedIn() {
-
-			return (!empty($_SESSION['user']));
+		private function getBreadcrumbs() {
+		
+			if (isset($this->breadcrumbs)) return $this->breadcrumbs;
 
 		}
 		
-
 		/**
 		* Checks whether a user is authorized to view/use a page within a project
 		*
@@ -765,102 +1020,6 @@
 					return true;
 				
 				}
-
-			}
-
-			return false;
-
-		}
-
-		/**
-		* Checks whether a user is authorized to view/use a certain page and redirects if necessary
-		*
-		* Subsequently checks: 
-		*   Is the user logged in? 
-		*   Has the user selected an active project?
-		*   Is the user authorized to see a specific page?
-		*
-		* @return 	boolean		returns true if authorized, or redirects if not
-		* @access 	public
-		*/
-		public function checkAuthorisation() {
-
-			// check if user is logged in, otherwise redirect to login page
-			if ($this->isUserLoggedIn()) {
-			
-				// check if there is an active project, otherwise redirect to choose project page
-				if ($this->getCurrentProjectId()) {
-
-					// check if the user is authorised for the combination of current page / current project
-					if ($this->isUserAuthorisedForProjectPage()) {
-	
-						return true;
-	
-					} else {
-					
-						$this->redirect(
-							$this->generalSettings['rootWebUrl'].
-							$this->appName.
-							$this->generalSettings['paths']['notAuthorized']
-						);
-
-						/*
-							user is not authorized and redirected to the index.page; 
-							if he already *is* on the index.page (and not authorized for that),
-							he is logged out to avoid circular reference.
-						*/
-						if ($this->getViewName()=='Index') {
-
-							$this->redirect(
-								$this->generalSettings['rootWebUrl'].
-								$this->appName.
-								$this->generalSettings['paths']['logout']
-							);
-
-						} else {
-
-							$this->redirect('index.php');
-
-						}
-
-					}
-
-				} else {
-
-					$this->redirect(
-						$this->generalSettings['rootWebUrl'].
-						$this->appName.
-						$this->generalSettings['paths']['chooseProject']
-					);
-
-				}
-
-			} else {
-			
-				$this->setLoginStartPage();
-
-				$this->redirect(
-					$this->generalSettings['rootWebUrl'].
-					$this->appName.
-					$this->generalSettings['paths']['login']
-				);
-
-			}
-
-		}
-
-		/**
-		* Judges whether the user is authorized to work at a specific project
-		*
-		* @param  	integer	$id	project id
-		* @return 	boolean	is or is not authorized
-		* @access 	public
-		*/
-		public function isCurrentUserAuthorizedForProject($id) {
-		
-			foreach((array)$this->getCurrentUserProjects() as $key => $val) {
-
-				if ($val['id'] == $id) return true;
 
 			}
 
@@ -969,25 +1128,6 @@
 		}
 
 		/**
-		* Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
-		*
-		* @param array	$array	array to sort
-		* @param array	$sortBy	array to array of key, direction and case-sensitivity
-		* @access 	public
-		*/
-		public function customSortArray(&$array,$sortBy) {
-
-			$this->setSortField($sortBy['key']);
-
-			$this->setSortDirection($sortBy['dir']);
-
-			$this->setSortCaseSensitivity($sortBy['case']);
-
-			usort($array,array($this,'doCustomSortArray'));
-
-		}
-
-		/**
 		* Sets a random integer value for general use
 		*
 		* @access 	private
@@ -1010,29 +1150,6 @@
 
 		}
 		
-		/**
-		* Returns the default save path for file uploads
-		*
-		* @return string	path
-		* @access 	public
-		*/
-		public function getDefaultImageUploadDir() {
-		
-			return isset($_SESSION['project']['paths']['uploads_images']) ? $_SESSION['project']['paths']['uploads_images'] : null;
-		
-		}
-
-		/**
-		* Returns the default save path for project inmages
-		*
-		* @return string	path
-		* @access 	public
-		*/
-		public function getDefaultImageProjectDir() {
-		
-			return isset($_SESSION['project']['paths']['project_images']) ? $_SESSION['project']['paths']['project_images'] : null;
-		
-		}
 
 		/**
 		* Sets the default allowed file mask for file uploads, based on the value in general settings
@@ -1047,18 +1164,6 @@
 		}
 		
 		/**
-		* Returns the default file allowed mask for file uploads
-		*
-		* @return array	array of allowed file extensions
-		* @access 	public
-		*/
-		public function getDefaultUploadFilemask() {
-		
-			return isset($this->defaultUploadFilemask) ? $this->defaultUploadFilemask : null;
-		
-		}
-		
-		/**
 		* Sets the default maximum size of file uploads, based on the value in general settings
 		*
 		* @access 	private
@@ -1069,19 +1174,7 @@
 				$this->defaultUploadMaxSize = $this->generalSettings['uploading']['defaultUploadMaxSize'];
 		
 		}
-
-		/**
-		* Returns the default maximum size of file uploads
-		*
-		* @return integer max upload size in bytes
-		* @access 	public
-		*/
-		public function getDefaultUploadMaxSize() {
 		
-			return isset($this->defaultUploadMaxSize) ? $this->defaultUploadMaxSize : null;
-		
-		}
-	
 	}
 
 ?>
