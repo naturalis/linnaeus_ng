@@ -3,6 +3,9 @@
 	/*
 	
 	check out all tinyMCE options (+ instruct)
+	max pages hardcoded into page.tpl
+	page 'main' is hardcoded
+	delete page must also delete taxon_content!
 
 	*/
 
@@ -10,7 +13,7 @@
 
 	class SpeciesController extends Controller {
 
-		public $usedModels = array('taxon','content_taxon','language_project','language');
+		public $usedModels = array('taxon','content_taxon','language_project','language','taxon_page','taxon_page_title');
 
 		public $controllerPublicName = 'Species module';
 
@@ -22,6 +25,8 @@
 		public function __construct() {
 
 			parent::__construct();
+			
+			$this->createTaxonPage('Main');
 
 		}
 
@@ -50,6 +55,88 @@
 			$this->printPage();
 
 		}
+		
+		private function createTaxonPage($name) {
+
+			$this->models->TaxonPage->save(
+				array(
+					'id' => null,
+					'page' => $name,
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+	
+		}
+	
+		public function pageAction() {
+
+			$this->checkAuthorisation();
+
+			$this->setPageName(_('Subpages'));
+
+			// adding a new page
+			if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
+
+				$tp = $this->models->TaxonPage->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'page' => $this->requestData['new_page']
+					)
+				);
+				
+				if ($tp!==true) {
+
+					$this->addError(_('Could not save page name.'));
+					$this->addError('('.$tp.')');
+
+				}
+
+			}
+			
+			$lp = $this->models->LanguageProject->get(array('project_id' => $this->getCurrentProjectId()));
+	
+			foreach((array)$lp as $key => $val) {
+
+				$l = $this->models->Language->get($val['language_id']);
+
+				$lp[$key]['language'] = $l['language'];
+
+				if ($val['def_language']==1) $defaultLanguage = $val['language_id'];
+
+			}
+
+			$pages = $this->models->TaxonPage->get(array('project_id' => $this->getCurrentProjectId()));
+
+			foreach((array)$pages as $key => $page) {
+
+				foreach((array)$lp as $key2 => $language) {
+
+					$tpt = $this->models->TaxonPageTitle->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'page_id' => $page['id'],
+							'language_id' => $language['language_id']
+						)
+					);
+					
+					$pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
+
+				}
+
+			}
+
+			$this->smarty->assign('languages',$lp);
+
+			$this->smarty->assign('pages',$pages);
+
+			$this->smarty->assign('defaultLanguage',$defaultLanguage);
+
+			$this->printPage();
+
+		}
+		
+		
 
 		/**
 		* Edit taxon action
@@ -60,79 +147,58 @@
 
 			$this->checkAuthorisation();
 
-			$this->setPageName(_('Edit taxon'));
-
-$defaultPageName = 'main';
-
-			$t = $this->models->Taxon->get(
-				array(
-					'id' => $this->requestData['id'],
-					'project_id' => $this->getCurrentProjectId()
-				)
-			);
+			$defaultPageName = 'main';
 			
-			$taxon = $t[0];
+			if (!empty($this->requestData['id'])) {
 
-			$lp = $this->models->LanguageProject->get(array('project_id' => $this->getCurrentProjectId()));
-
-			foreach((array)$lp as $key => $val) {
-
-				$l = $this->models->Language->get($val['language_id']);
-
-				$lp[$key]['language'] = $l['language'];
-
-				$ct = $this->models->ContentTaxon->get(
+				$t = $this->models->Taxon->get(
 					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id'],
-						'language_id' => $val['language_id'],
-						'page' => $defaultPageName
+						'id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId()
 					)
 				);
-
-				$content[$val['language_id']] = $ct[0];
 				
-				if ($val['active']=='y') $defaultLanguage = $val['language_id'];
+				$taxon = $t[0];
+
+				$this->setPageName(_('Editing').' "'.$taxon['taxon'].'"');
+
+			} else {
+
+				$this->setPageName(_('Adding new taxon'));
 
 			}
 
-			$this->smarty->assign('taxon',$taxon);
-
-			$this->smarty->assign('content',$content);
-
-			$this->smarty->assign('languages',$lp);
-
-			$this->smarty->assign('includeHtmlEditor',true);
-
-			$this->smarty->assign('activeLanguage',!empty($this->requestData['lan']) ? $this->requestData['lan'] : $defaultLanguage);
-
-			$this->printPage();
-
-		}
-				
-		/**
-		* Add taxon action
-		*
-		* @access	public
-		*/
-		public function addAction() {
-
-			$this->checkAuthorisation();
-
-			$this->setPageName(_('Add a new taxon'));
-
 			$lp = $this->models->LanguageProject->get(array('project_id' => $this->getCurrentProjectId()));
-
+	
 			foreach((array)$lp as $key => $val) {
 
 				$l = $this->models->Language->get($val['language_id']);
 
 				$lp[$key]['language'] = $l['language'];
 
-				if ($val['def_language']=='1') $defaultLanguage = $val['language_id'];
+				if (!empty($this->requestData['id'])) {
+
+					$ct = $this->models->ContentTaxon->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id'],
+							'language_id' => $val['language_id'],
+							'page' => $defaultPageName
+						)
+					);
+	
+					$content[$val['language_id']] = $ct[0];
+
+				}
+
+				if ($val['def_language']==1) $defaultLanguage = $val['language_id'];
 
 			}
 
+			if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+			if (isset($content)) $this->smarty->assign('content',$content);
+	
 			$this->smarty->assign('languages',$lp);
 
 			$this->smarty->assign('includeHtmlEditor',true);
@@ -183,6 +249,24 @@ $defaultPageName = 'main';
 				}
 							
 			}
+
+			// user requested a sort of the table
+			if (isset($this->requestData['key'])) {
+
+				$sortBy = array('key'=>$this->requestData['key'],'dir'=>($this->requestData['dir']=='asc' ? 'desc' : 'asc' ),'case'=>'i');
+
+			} 
+			// default sort order
+			else {
+
+				$sortBy = array('key'=>'taxon','dir'=>'asc','case'=>'i');
+
+			}
+
+			// sort array of collaborators
+			$this->customSortArray($taxa,$sortBy);
+
+			$this->smarty->assign('sortBy', $sortBy);
 
 			$this->smarty->assign('taxa',$taxa);
 
@@ -252,7 +336,8 @@ $defaultPageName = 'main';
 							);
 						
 						if ($d) {
-
+							
+							// if succesful, get the projects default language
 							$lp = $this->models->LanguageProject->get(
 								array(
 									'project_id' => $this->getCurrentProjectId(),
@@ -262,6 +347,7 @@ $defaultPageName = 'main';
 							
 							$defaultLanguage = isset($lp[0]['language_id']) ? $lp[0]['language_id'] : $this->requestData['language'];
 
+							// get the main page content for the default language
 							$ct = $this->models->ContentTaxon->get(
 								array(
 									'project_id' => $this->getCurrentProjectId(),
@@ -270,11 +356,12 @@ $defaultPageName = 'main';
 								)
 							);
 
+							// save the title of that page as taxon name in the taxon table
 							$this->models->Taxon->save(
 								array(
 									'id' => $taxonId ,
 									'project_id' => $this->getCurrentProjectId(),
-									'taxon' => $ct[0]['content_name']
+									'taxon' => !empty($ct[0]['content_name']) ? $ct[0]['content_name'] : '?'
 								)
 							);
 
@@ -374,6 +461,80 @@ $defaultPageName = 'main';
 			}
 
 		}
+		
+		private function ajaxActionDeletePage() {
+
+			if (empty($this->requestData['id'])) {
+
+				return;
+
+			} else {
+
+				$this->models->TaxonPageTitle->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'page_id' => $this->requestData['id']
+					)
+				);
+	
+				$tpt = $this->models->TaxonPage->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $this->requestData['id']
+					)
+				);
+
+			}
+
+		}
+		
+		private function ajaxActionSavePageTitle() {
+
+			if (empty($this->requestData['id']) ||
+				empty($this->requestData['language'])
+			) {
+
+				return;
+
+			} else {
+
+				if (empty($this->requestData['title'])) {
+
+					$tpt = $this->models->TaxonPageTitle->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->requestData['language'],					
+							'page_id' => $this->requestData['id'],
+						)
+					);
+
+				} else {
+
+					$tpt = $this->models->TaxonPageTitle->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->requestData['language'],					
+							'page_id' => $this->requestData['id'],
+						)
+					);
+	
+					$this->models->TaxonPageTitle->save(
+						array(
+							'id' => isset($tpt[0]['id']) ? $tpt[0]['id'] : null,
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->requestData['language'],					
+							'page_id' => $this->requestData['id'],
+							'title' => $this->requestData['title'],
+						)
+					);
+
+				}	
+
+				$this->smarty->assign('returnText','saved');
+
+			}
+
+		}
 
 		/**
 		* AJAX interface for this class
@@ -395,6 +556,16 @@ $defaultPageName = 'main';
 			if ($this->requestData['action']=='delete_taxon') {
 
 				$this->ajaxActionDeleteTaxon();
+
+			} else
+			if ($this->requestData['action']=='delete_page') {
+
+				$this->ajaxActionDeletePage();
+
+			} else
+			if ($this->requestData['action']=='save_page_title') {
+
+				$this->ajaxActionSavePageTitle();
 
 			}
 

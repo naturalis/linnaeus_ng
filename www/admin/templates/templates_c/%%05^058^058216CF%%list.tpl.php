@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-08 14:53:49
+<?php /* Smarty version 2.6.26, created on 2010-09-09 17:57:46
          compiled from list.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'list.tpl', 30, false),)), $this); ?>
@@ -12,7 +12,7 @@ unset($_smarty_tpl_vars);
 
 <table>
 <tr>
-	<td>Taxon</td>
+	<th onclick="allTableColumnSort('taxon');">Taxon</th>
 	<?php unset($this->_sections['j']);
 $this->_sections['j']['name'] = 'j';
 $this->_sections['j']['loop'] = is_array($_loop=$this->_tpl_vars['languages']) ? count($_loop) : max(0, (int)$_loop); unset($_loop);
@@ -114,9 +114,16 @@ $this->_sections['j']['last']       = ($this->_sections['j']['iteration'] == $th
 You have to define at least one language in your project before you can add any taxa.<br />
 <a href="../projects/data.php">Define languages.</a>
 <?php else: ?>
-<a href="add.php">Add a new taxon</a>
+<a href="edit.php">Add a new taxon</a>
 <?php endif; ?>
 </div>
+
+<form method="post" action="" name="postForm" id="postForm">
+<input type="hidden" name="key" id="key" value="<?php echo $this->_tpl_vars['sortBy']['key']; ?>
+" />
+<input type="hidden" name="dir" value="<?php echo $this->_tpl_vars['sortBy']['dir']; ?>
+"  />
+</form>
 
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-footer.tpl", 'smarty_include_vars' => array()));

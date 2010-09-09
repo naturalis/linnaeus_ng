@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-08 13:25:56
+<?php /* Smarty version 2.6.26, created on 2010-09-09 12:50:37
          compiled from _add_edit_body.tpl */ ?>
 <form name="theForm" id="theForm">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="<?php echo $this->_tpl_vars['taxon']['id']; ?>

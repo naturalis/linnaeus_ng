@@ -54,7 +54,7 @@ hard coded number of free modules
 
 				$fmp = $this->models->FreeModuleProject->get(array('project_id'=>$this->getCurrentProjectId()));
 
-				if (count((array)$fmp) < 5 && $_SESSION['system']['last_rnd'] != $this->requestData['rnd']) {
+				if (count((array)$fmp) < 5 && !$this->isFormResubmit()) {
 
 					$this->models->FreeModuleProject->save(
 						array(

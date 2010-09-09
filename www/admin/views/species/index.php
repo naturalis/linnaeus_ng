@@ -1,8 +1,8 @@
 <?php
 
-	require_once('../../../../configuration/admin/controllers/SpeciesController.php');
+    require_once('../../../../configuration/admin/controllers/SpeciesController.php');
 
-	$c = new SpeciesController();
+    $c = new SpeciesController();
 
-	$c->indexAction();
+    $c->indexAction();
 

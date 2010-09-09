@@ -1,5 +1,6 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-08 14:53:54
+<?php /* Smarty version 2.6.26, created on 2010-09-09 18:05:30
          compiled from login.tpl */ ?>
+<?php $this->assign('breadcrumbs', false); ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/admin-header.tpl", 'smarty_include_vars' => array()));
 $this->_tpl_vars = $_smarty_tpl_vars;

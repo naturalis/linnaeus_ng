@@ -1,8 +1,8 @@
 249
-a:4:{s:8:"template";a:4:{s:11:"modules.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283780479;s:7:"expires";i:1283784079;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:11:"modules.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284037831;s:7:"expires";i:1284041431;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<title>Imaginary Beings - Project modules</title>
 
@@ -23,8 +23,8 @@ a:4:{s:8:"template";a:4:{s:11:"modules.tpl";b:1;s:26:"../shared/admin-header.tpl
 
 <body><div id="body-container">
 <div id="header-container">
-	<img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="/admin/images/system/eti_logo.png" id="eti-logo" />
+	<a href="/admin/admin-index.php"><img src="/admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="/admin/images/system/eti_logo.png" id="eti-logo" /></a>
 </div>
 <div id="page-container">
 
@@ -368,37 +368,35 @@ Besides these standard modules, you can add up to five extra content modules to 
 			<span id="cell-f17e" style="visibility:hidden">Animal sounds</span>
 		</td>
 	</tr>
-	<tr id="row-f27">
+	<tr id="row-f28">
 			<td
-			title="in use in your project, but inactive" 
-			class="cell-module-inactive"
-			id="cell-f27a"
+			title="in use in your project"
+			class="cell-module-in-use" 
+			id="cell-f28a"
 		>&nbsp;
 			
 		</td>
 		<td 
-			class="cell-module-reactivate" 
-			title="re-activate" 
+			class="cell-module-deactivate" 
+			title="deactivate (no data will be deleted)" 
 			onclick="moduleChangeModuleStatus(this)"
-			id="cell-f27b"
+			id="cell-f28b"
 		>&nbsp;
 			
 		</td>
 		<td
-			class="cell-module-delete" 
-			title="delete module and data" 
-			onclick="moduleChangeModuleStatus(this,['row-f27'])"
-			id="cell-f27c"
+			class="cell-module-invisible" 
+			title="" 
+			onclick="moduleChangeModuleStatus(this,['row-f28'])"
+			id="cell-f28c"
 		>&nbsp;
-			
 		</td>
 		<td>
-			<span
-				class="cell-module-title-inactive" 
-				id="cell-f27d">
-			<span class="cell-module-title">uu</span>
-			<span id="cell-f27e" style="visibility:hidden">uu</span>
-			</span>
+			<span 
+				class="cell-module-title-in-use" 
+				id="cell-f28d">
+			<span class="cell-module-title">Wookel</span></span>
+			<span id="cell-f28e" style="visibility:hidden">Wookel</span>
 		</td>
 	</tr>
 </table>
@@ -410,7 +408,7 @@ Besides these standard modules, you can add up to five extra content modules to 
 <tr >
 	<td colspan="4">
 		<form action="" method="post">
-		<input type="hidden" name="rnd" value="2127735652">
+		<input type="hidden" name="rnd" value="263029786">
 		Enter new module's name: <input type="text" name="module_new" id="module_new" value="" maxlength="32" />
 		<input type="submit" value="add module" onclick="addFreeModule();" />
 		</form>	

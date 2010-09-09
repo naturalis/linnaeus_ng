@@ -28,3 +28,7 @@ insert into dev_helptexts values (null, 'users', 'edit', 'Role',
 insert into dev_helptexts values (null, 'users', 'edit', 'Active',
 '\'Active\' indicates whether a user is actively working on the current project. When set to \'n\', the user can no longer log in or work on the project. It allows you to temporarily disable users without deleting them outright.<br />Users that have the role of \'Lead expert\' cannot change role, or be made in-active, as they are the lead manager of a project.',1,current_timestamp,null);
 
+
+
+insert into dev_helptexts values (null, 'species', 'index', 'Subpages',
+'Each taxon has it\'s own page. Each of these pages consists of one or more subpages. The first subpage is called \'Main\', and contains the primary data on the taxon. This subpage is generated automatically; all other subpages that you wish to use - for example, \'Classification\' or \'Breeding Patterns\', have to be defined first. To do this, click the menu option \'Define subpages\'.',0,current_timestamp,null);

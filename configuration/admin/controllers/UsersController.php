@@ -207,8 +207,8 @@
 		* @todo		a more complete check
 		*/
 		private function isUsernameCorrect($username = false) {
-		
-			if (!$username) $username = $this->requestData['username'];
+
+			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
 
 			$result  = true;
 		
@@ -585,7 +585,7 @@
 
 					$this->setCurrentProjectName();
 
-					$this->redirect('index.php');
+					$this->redirect($this->getLoggedInMainIndex());
 
 				} else {
 				
@@ -839,7 +839,7 @@
 			}
 
 			// user requested a sort of the table
-			if ($this->requestData) {
+			if (isset($this->requestData['key'])) {
 
 				$sortBy = array('key'=>$this->requestData['key'],'dir'=>($this->requestData['dir']=='asc' ? 'desc' : 'asc' ),'case'=>'i');
 

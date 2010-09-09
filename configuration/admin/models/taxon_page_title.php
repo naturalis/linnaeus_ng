@@ -2,9 +2,9 @@
 
     include_once('model.php');
 
-    class Taxon extends Model {
+    class TaxonPageTitle extends Model {
 
-        const tableBaseName = 'taxa';
+        const tableBaseName = 'taxa_pages_titles';
 
         /**
         * Constructor, calls parent's constructor

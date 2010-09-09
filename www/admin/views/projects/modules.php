@@ -1,8 +1,8 @@
 <?php
 
-	require_once('../../../../configuration/admin/controllers/ProjectsController.php');
+    require_once('../../../../configuration/admin/controllers/ProjectsController.php');
 
-	$c = new ProjectsController();
+    $c = new ProjectsController();
 
-	$c->modulesAction();
+    $c->modulesAction();
 

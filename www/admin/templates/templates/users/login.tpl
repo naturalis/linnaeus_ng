@@ -1,3 +1,4 @@
+{assign var=breadcrumbs value=false}
 {include file="../shared/admin-header.tpl"}
 
 {if !empty($errors)}

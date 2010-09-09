@@ -38,6 +38,13 @@ function allDoubleDeleteConfirm(element,name) {
 
 }
 
+function allSetMessage(msg,err) {
+
+	$('#message-container').show();
+	$('#message-container').html(msg).delay(1000).fadeOut(500);
+
+}
+
 function userRemoteValueCheck(id,values,tests,idti) {
 
 	$.ajax({ url:
@@ -291,14 +298,52 @@ function projectUpdateLanguageBlock() {
 
 }
 
-function taxonMessage(msg,err) {
+var taxonActivePageTitle = false;
 
-	$('#message-container').show();
-	$('#message-container').html(msg).delay(1000).fadeOut(500);
+function taxonSetActivePageTitle(page) {
+
+	taxonActivePageTitle = page;
+
+}
+
+function taxonPageDelete(page,name) {
+
+	if (!allDoubleDeleteConfirm('the page',name)) return;
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : page ,
+			'action' : 'delete_page' 
+		},
+		function(data){
+			$('#theForm').submit();
+		}
+	);
+
+}
+
+function taxonPageTitleSave(page) {
+
+	title = $('#name-'+page[0]+'-'+page[1]).val();
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : page[0],
+			'action' : 'save_page_title' ,
+			'title' : title , 
+			'language' : page[1] 
+		},
+		function(data){
+			allSetMessage(data);
+		}
+	);
 
 }
 
 var taxonActiveLanguage = false;
+var taxonNewLanguage = false;
 var taxonLanguages = Array();
 
 function taxonAddLanguage(lan) {
@@ -315,7 +360,7 @@ function taxonUpdateLanguageBlock() {
 	
 		$buffer = $buffer+
 			'<td class="taxon-language-cell'+
-			(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '" onclick="taxonGetData('+taxonLanguages[i][0]+');' )+
+			(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '" onclick="taxonSwitchLanguage('+taxonLanguages[i][0]+');' )+
 			'">'+
 			taxonLanguages[i][1]+
 			(taxonLanguages[i][2]==1 ?  ' *' : '')+
@@ -328,7 +373,19 @@ function taxonUpdateLanguageBlock() {
 
 }
 
-function taxonSaveData() {
+function taxonSwitchLanguage(language) {
+
+	taxonSaveData('taxonGetData('+language+')');
+
+}
+
+function taxonClose() {
+
+	taxonSaveData("window.open('list.php','_top')");
+
+}
+
+function taxonSaveData(execafter) {
 
 	$.post(
 		"ajax_interface.php", 
@@ -343,11 +400,12 @@ function taxonSaveData() {
 		function(data){
 			if (data.indexOf('id=')!=-1) {
 				$('#taxon_id').val(data.replace('id=',''));
-				taxonMessage('saved');
-				} else
+				allSetMessage('saved');
+			} else
 			if (data.length>0) {
 				alert(data);
 			}
+			eval(execafter);
 		}
 	);
 
@@ -356,9 +414,6 @@ function taxonSaveData() {
 function taxonGetData(language) {
 
 	if ($('#taxon_id').val().length==0) return;
-	
-	// save before switching
-	taxonSaveData();
 
 	$.post(
 		"ajax_interface.php", 

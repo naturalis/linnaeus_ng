@@ -1,32 +1,32 @@
 <?php
 
-	include_once('model.php');
+    include_once('model.php');
 
-	class ModuleProjectUser extends Model {
+    class ModuleProjectUser extends Model {
 
-		const tableBaseName = 'modules_projects_users';
+        const tableBaseName = 'modules_projects_users';
 
-		/**
-		* Constructor, calls parent's constructor
-		*
-		* @access 	public
-		*/
-		public function __construct() {
+        /**
+        * Constructor, calls parent's constructor
+        *
+        * @access     public
+        */
+        public function __construct() {
 
-			parent::__construct(self::tableBaseName);
+            parent::__construct(self::tableBaseName);
 
-		}
+        }
 
-		/**
-		* Destructor
-		*
-		* @access 	public
-		*/
-		public function __destruct() {
+        /**
+        * Destructor
+        *
+        * @access     public
+        */
+        public function __destruct() {
 
-			parent::__destruct();
+            parent::__destruct();
 
-		}
+        }
 
-	}
+    }
 

@@ -4,7 +4,7 @@
 
 <table>
 <tr>
-	<td>Taxon</td>
+	<th onclick="allTableColumnSort('taxon');">Taxon</th>
 	{section name=j loop=$languages}
 	<td style="text-align:right; width:75px">
 		{if $languages[j].active=='n'}({/if}{$languages[j].language}{if $languages[j].def_language==1} *{/if}{if $languages[j].active=='n'}){/if}
@@ -31,8 +31,13 @@
 You have to define at least one language in your project before you can add any taxa.<br />
 <a href="../projects/data.php">Define languages.</a>
 {else}
-<a href="add.php">Add a new taxon</a>
+<a href="edit.php">Add a new taxon</a>
 {/if}
 </div>
+
+<form method="post" action="" name="postForm" id="postForm">
+<input type="hidden" name="key" id="key" value="{$sortBy.key}" />
+<input type="hidden" name="dir" value="{$sortBy.dir}"  />
+</form>
 
 {include file="../shared/admin-footer.tpl"}

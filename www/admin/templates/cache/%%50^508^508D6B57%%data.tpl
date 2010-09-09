@@ -1,5 +1,5 @@
 245
-a:4:{s:8:"template";a:4:{s:8:"data.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1283943612;s:7:"expires";i:1283947212;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:8:"data.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284035036;s:7:"expires";i:1284038636;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -608,8 +608,8 @@ The "welcome" and "contributors" texts will be added once the html-editor is in 
 $(document).ready(function(){
 
 		projectAddLanguage([26,'English',6,1,1])
-			projectAddLanguage([24,'Dutch',8,0,1])
-																																																			projectAddLanguage([50,'Japanese',18,0,0])
+			projectAddLanguage([24,'Dutch',8,0,0])
+																																																			projectAddLanguage([50,'Japanese',18,0,1])
 																																																																									projectUpdateLanguageBlock();
 
 });
