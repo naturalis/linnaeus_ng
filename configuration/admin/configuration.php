@@ -4,10 +4,10 @@
 	error_reporting(E_ALL);
 
 	// YES this will go (eventually)
-	function q($v) {
-		echo '<pre>';
+	function q($v,$d=false,$p=true) {
+		if ($p) echo '<pre>';
 		var_dump($v);
-
+		if ($d) die();
 	}
 
 	class configuration {

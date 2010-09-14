@@ -6,6 +6,7 @@
 	max pages hardcoded into page.tpl
 	page 'main' is hardcoded
 	delete page must also delete taxon_content!
+	can't see embedded youtube in html editor
 
 	*/
 
@@ -26,7 +27,7 @@
 
 			parent::__construct();
 			
-			$this->createTaxonPage('Main');
+			$this->createTaxonPage('Main',true);
 
 		}
 
@@ -56,13 +57,14 @@
 
 		}
 		
-		private function createTaxonPage($name) {
+		private function createTaxonPage($name,$isDefault = false) {
 
 			$this->models->TaxonPage->save(
 				array(
 					'id' => null,
 					'page' => $name,
-					'project_id' => $this->getCurrentProjectId()
+					'project_id' => $this->getCurrentProjectId(),
+					'def_page' => $isDefault ? '1' : '0'
 				)
 			);
 	
@@ -135,8 +137,6 @@
 			$this->printPage();
 
 		}
-		
-		
 
 		/**
 		* Edit taxon action
@@ -147,8 +147,15 @@
 
 			$this->checkAuthorisation();
 
-			$defaultPageName = 'main';
-			
+			// this could do with a little more elegance...
+			$this->setBreadcrumbIncludeReferer(
+				array(
+					'name' => _('Taxon list'),
+					'url' => $this->generalSettings['rootWebUrl'].$this->appName.'/views/'.$this->controllerBaseName.'/list.php'
+				)
+			);
+
+			// taxon data (or new taxon)
 			if (!empty($this->requestData['id'])) {
 
 				$t = $this->models->Taxon->get(
@@ -168,6 +175,7 @@
 
 			}
 
+			// available languages
 			$lp = $this->models->LanguageProject->get(array('project_id' => $this->getCurrentProjectId()));
 	
 			foreach((array)$lp as $key => $val) {
@@ -176,34 +184,69 @@
 
 				$lp[$key]['language'] = $l['language'];
 
-				if (!empty($this->requestData['id'])) {
-
-					$ct = $this->models->ContentTaxon->get(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $this->requestData['id'],
-							'language_id' => $val['language_id'],
-							'page' => $defaultPageName
-						)
-					);
-	
-					$content[$val['language_id']] = $ct[0];
-
-				}
 
 				if ($val['def_language']==1) $defaultLanguage = $val['language_id'];
 
 			}
 
+			// determine the language the page will open in
+			$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $defaultLanguage;
+
+			// available pages
+			$tp = $this->models->TaxonPage->get(array('project_id' => $this->getCurrentProjectId()));
+	
+			foreach((array)$tp as $key => $val) {
+
+				foreach((array)$lp as $key2 => $language) {
+
+					$tpt = $this->models->TaxonPageTitle->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $language['language_id'],
+							'page_id' => $val['id']
+						)
+					);
+
+					$tp[$key]['titles'][$language['language_id']] = $tpt[0];
+
+				}
+
+				if ($val['def_page']==1) $defaultPage = $val['id'];
+
+			}
+
+			// determine the page_id the page will open in
+			$startPage = !empty($this->requestData['page']) ? $this->requestData['page'] : $defaultPage;
+
+			// get the content in the language the page will open with
+			if (!empty($this->requestData['id']) && !empty($startLanguage)) {
+
+				$ct = $this->models->ContentTaxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id'],
+						'language_id' => $startLanguage,
+						'page_id' => $startPage
+					)
+				);
+
+				$content = $ct[0];
+
+			}
+//q($content);
 			if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
 
 			if (isset($content)) $this->smarty->assign('content',$content);
+			
+			$this->smarty->assign('pages',$tp);
 	
 			$this->smarty->assign('languages',$lp);
 
 			$this->smarty->assign('includeHtmlEditor',true);
 
-			$this->smarty->assign('activeLanguage',!empty($this->requestData['lan']) ? $this->requestData['lan'] : $defaultLanguage);
+			$this->smarty->assign('activeLanguage',$startLanguage);
+
+			$this->smarty->assign('activePage',$startPage);
 
 			$this->printPage();
 
@@ -309,32 +352,48 @@
 
 					// must have a page name
 					if (!empty($this->requestData['page'])) {
-
-						// see if such content already exists
-						$ct = $this->models->ContentTaxon->get(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon_id' => $taxonId,
-								'language_id' => $this->requestData['language'],
-								'page' => 'main'
-							)
-						);
+					
+						if (empty($this->requestData['name']) && empty($this->requestData['content'])) {
 						
-						$id = count((array)$ct)!=0 ? $ct[0]['id'] : null;
-
-						// save content
-						$d = $this->models->ContentTaxon->save(
+							// no page title and no conten equals an empty page: delete
+							$ct = $this->models->ContentTaxon->delete(
 								array(
-									'id' => $id,
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon_id' => $taxonId,
 									'language_id' => $this->requestData['language'],
-									'content' => !empty($this->requestData['content']) ? $this->requestData['content'] : '',
-									'content_name' => !empty($this->requestData['name']) ? $this->requestData['name'] : '?',
-									'page' => 'main'
+									'page_id' => $this->requestData['page']
 								)
 							);
-						
+
+						} else {
+
+							// see if such content already exists
+							$ct = $this->models->ContentTaxon->get(
+								array(
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon_id' => $taxonId,
+									'language_id' => $this->requestData['language'],
+									'page_id' => $this->requestData['page']
+								)
+							);
+	
+							$id = count((array)$ct)!=0 ? $ct[0]['id'] : null;
+	
+							// save content
+							$d = $this->models->ContentTaxon->save(
+									array(
+										'id' => $id,
+										'project_id' => $this->getCurrentProjectId(),
+										'taxon_id' => $taxonId,
+										'language_id' => $this->requestData['language'],
+										'content' => !empty($this->requestData['content']) ? $this->requestData['content'] : '',
+										'title' => !empty($this->requestData['name']) ? $this->requestData['name'] : '',
+										'page_id' => $this->requestData['page']
+									)
+								);
+
+						}
+
 						if ($d) {
 							
 							// if succesful, get the projects default language
@@ -361,7 +420,7 @@
 								array(
 									'id' => $taxonId ,
 									'project_id' => $this->getCurrentProjectId(),
-									'taxon' => !empty($ct[0]['content_name']) ? $ct[0]['content_name'] : '?'
+									'taxon' => !empty($ct[0]['title']) ? $ct[0]['title'] : '?'
 								)
 							);
 
@@ -375,7 +434,7 @@
 
 					} else {
 
-						$this->addError(_('No page name specified'));
+						$this->addError(_('No page title specified'));
 
 					}				
 
@@ -407,7 +466,7 @@
 						'taxon_id' => $this->requestData['id'],
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->requestData['language'],
-						'page' => 'main'
+						'page_id' => $this->requestData['page']
 					)
 				);
 
@@ -417,9 +476,9 @@
 							'project_id' => $this->requestData['id'],
 							'taxon_id' => $this->getCurrentProjectId(),
 							'language_id' => $this->requestData['language'],
-							'page' => 'main',
+							'page_id' => $this->requestData['page'],
 							'content' => null,
-							'content_name' => null
+							'title' => null
 						);
 
 				} else { 
@@ -447,7 +506,7 @@
 					array(
 						'taxon_id' => $this->requestData['id'],
 						'project_id' => $this->getCurrentProjectId(),
-						'page' => 'main'
+						'page_id' => $this->requestData['page']
 					)
 				);
 
@@ -535,6 +594,27 @@
 			}
 
 		}
+		
+		private function ajaxActionGetPageSizes() {
+
+			// see if such content already exists
+			$ct = $this->models->ContentTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $this->requestData['id'],
+					'language_id' => $this->requestData['language']
+				),'page_id,length(content) as page_size'
+			);
+			
+			foreach((array)$ct as $key => $val) {
+
+				$d[] = array('page_id' => $val['page_id'], 'page_size' => $val['page_size']);
+
+			}
+
+			$this->smarty->assign('returnText',json_encode($d));
+	
+		}
 
 		/**
 		* AJAX interface for this class
@@ -542,6 +622,8 @@
 		* @access	public
 		*/
 		public function ajaxInterfaceAction() {
+
+			if (!isset($this->requestData['action'])) return;
 
 			if ($this->requestData['action']=='save_taxon') {
 
@@ -566,6 +648,11 @@
 			if ($this->requestData['action']=='save_page_title') {
 
 				$this->ajaxActionSavePageTitle();
+
+			} else
+			if ($this->requestData['action']=='get_page_sizes') {
+
+				$this->ajaxActionGetPageSizes();
 
 			}
 

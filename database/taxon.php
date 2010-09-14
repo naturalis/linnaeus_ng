@@ -12,20 +12,20 @@ create table content_taxa (
 	project_id INT( 11 ) NOT NULL ,
 	taxon_id INT( 11 ) NOT NULL ,
 	language_id INT( 11 ) NOT NULL ,
-page_id INT( 11 ) NOT NULL ,
-title varchar (64) not null,
+	page_id INT( 11 ) NOT NULL ,
 	content longtext ,
-	content_name varchar (32),
+	title varchar (64),
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id ) ,
-	unique (taxon_id, language_id, page)	
+	unique (project_id , taxon_id, language_id, page_id)	
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 create table taxa_pages (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
 	project_id INT( 11 ) NOT NULL ,
 	page varchar (32) not null,
+	def_page boolean not null default 0,	
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id ) ,

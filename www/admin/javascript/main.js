@@ -21,13 +21,13 @@ function allDoubleDeleteConfirm(element,name) {
 
 	if (confirm(
 		'Are you sure you want to delete '+element+' "'+name+'"?\n'+
-		'When doing this, all corresponding data will be irreversibly deleted.'
+		'All corresponding data will be irreversibly deleted.'
 		)) {
 	
 		return (confirm(
 			'Final confirmation:\n'+
 			'Are you sure you want to delete '+element+' "'+name+'"?\n'+
-			'All corresponding data will be irreversibly deleted.'
+			'ALL CORRESPONDING DATA WILL BE IRREVERSIBLY DELETED.'
 			));
 	
 	} else {
@@ -316,7 +316,7 @@ function taxonPageDelete(page,name) {
 			'id' : page ,
 			'action' : 'delete_page' 
 		},
-		function(data){
+		function() {
 			$('#theForm').submit();
 		}
 	);
@@ -351,7 +351,7 @@ function taxonAddLanguage(lan) {
 	taxonLanguages[taxonLanguages.length] = lan;
 
 }
-						  
+
 function taxonUpdateLanguageBlock() {
 
 	$buffer = '<table class="taxon-language-table"><tr>';
@@ -375,7 +375,75 @@ function taxonUpdateLanguageBlock() {
 
 function taxonSwitchLanguage(language) {
 
-	taxonSaveData('taxonGetData('+language+')');
+	taxonSaveData('taxonGetData('+language+','+taxonActivePage+')');
+
+}
+
+var taxonActivePage = false;
+var taxonPages = Array();
+var taxonPageSizes = Array();
+
+function taxonAddPage(page) {
+	//[id,[names],default?]
+	taxonPages[taxonPages.length] = page;
+}
+
+function taxonDrawPageBlock() {
+
+	$buffer = '<table class="taxon-pages-table"><tr>';
+
+	for (var i=0;i<taxonPages.length;i++) {
+		
+		var hasContent = taxonPageSizes[taxonPages[i][0]] && taxonPageSizes[taxonPages[i][0]] >=0 ;
+	
+		$buffer = $buffer+
+			'<td class="taxon-page-cell'+
+			(taxonPages[i][0]==taxonActivePage ? '-active' : '" onclick="taxonSwitchPage('+taxonPages[i][0]+');' )+
+			'">'+
+			(taxonPages[i][1][taxonActiveLanguage].length == 0 ? '('+taxonPages[i][1][-1]+')' : taxonPages[i][1][taxonActiveLanguage] )+
+			(taxonPages[i][2]==1 ?  ' *' : '')+
+			'<br /><span class="taxon-page-bytesize'+(hasContent ? '' : '-nil')+'">'+
+			(hasContent ? taxonPageSizes[taxonPages[i][0]] : 0) +
+			' ch.</span></td>';
+	}
+
+	$buffer = $buffer + '</tr></table>';
+
+	$('#taxon-pages-table-div').html($buffer);
+
+}
+
+
+function taxonUpdatePageBlock() {
+
+	$.ajax({
+		url: "ajax_interface.php",
+		data: {
+			'id' : $('#taxon_id').val() ,
+			'action' : 'get_page_sizes' ,
+			'language' : taxonActiveLanguage
+		},
+		success:
+			function(data){
+				for(var i=0;i<taxonPageSizes.length;i++) {
+					taxonPageSizes[i]=-1;
+				}
+				obj = $.parseJSON(data);
+				for(var i=0;i<obj.length;i++) {
+					taxonPageSizes[obj[i].page_id] = obj[i].page_size;
+				}
+
+				taxonDrawPageBlock();
+			}
+			
+		}
+	);
+
+}
+
+function taxonSwitchPage(page) {
+
+	taxonSaveData('taxonGetData('+taxonActiveLanguage+','+page+')');
 
 }
 
@@ -395,7 +463,7 @@ function taxonSaveData(execafter) {
 			'name' : $('#taxon-name-input').val() , 
 			'content' : tinyMCE.get('taxon-content').getContent() , 
 			'language' : taxonActiveLanguage ,
-			'page' : 'main'			
+			'page' : taxonActivePage			
 		},
 		function(data){
 			if (data.indexOf('id=')!=-1) {
@@ -403,15 +471,16 @@ function taxonSaveData(execafter) {
 				allSetMessage('saved');
 			} else
 			if (data.length>0) {
-				alert(data);
+				alert(data.replace('<error>',''));
 			}
+			taxonUpdatePageBlock();
 			eval(execafter);
 		}
 	);
 
 }
 
-function taxonGetData(language) {
+function taxonGetData(language,page) {
 
 	if ($('#taxon_id').val().length==0) return;
 
@@ -421,14 +490,16 @@ function taxonGetData(language) {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'get_taxon' ,
 			'language' : language ,
-			'page' : 'main'			
+			'page' : page			
 		},
 		function(data){
 			obj = $.parseJSON(data);
-			$('#taxon-name-input').val(obj.content_name ? obj.content_name : '');
+			$('#taxon-name-input').val(obj.title ? obj.title : '');
 			tinyMCE.get('taxon-content').setContent(obj.content ? obj.content : '');
 			taxonActiveLanguage = obj.language_id;
+			taxonActivePage = obj.page_id;
 			taxonUpdateLanguageBlock();
+			taxonUpdatePageBlock();
 		}
 	);
 
@@ -446,7 +517,7 @@ function taxonDeleteData(language) {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'delete_taxon' ,
 			'language' : language ,
-			'page' : 'main'			
+			'page' : taxonActivePage		
 		},
 		function(data){
 			window.open('list.php','_top');
@@ -455,7 +526,17 @@ function taxonDeleteData(language) {
 
 }
 
+function taxonConfirmSaveOnUnload() {
+	return;
+	
+	// issue: jquery synchronous ajax call doesn't seem to work, so this is pointless:
+	if (confirm('Do you want to save your changes before you leave this page?')) {
 
+		taxonSaveData();
+
+	}
+
+}
 
 
 

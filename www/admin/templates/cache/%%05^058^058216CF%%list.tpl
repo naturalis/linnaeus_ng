@@ -1,5 +1,5 @@
 205
-a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284047866;s:7:"expires";i:1284051466;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284395712;s:7:"expires";i:1284399312;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -62,91 +62,16 @@ a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 </tr>
 <tr>
 	<td>
-		<a href="edit.php?id=2">8-branched giant snake</a>
+		<a href="edit.php?id=23">Hydra Of Lerna</a>
 	</td>
 			<td style="text-align:right">
-		<a href="edit.php?id=2&lan=24">4023</a>
+		<a href="edit.php?id=23&lan=24">2773</a>
 	</td>
 		<td style="text-align:right">
-		<a href="edit.php?id=2&lan=26">966</a>
+		<a href="edit.php?id=23&lan=26">6959</a>
 	</td>
 		<td style="text-align:right">
-		<a href="edit.php?id=2&lan=50">16360</a>
-	</td>
-		
-</tr>
-<tr>
-	<td>
-		<a href="edit.php?id=18">?ASD!!!</a>
-	</td>
-			<td style="text-align:right">
-		<a href="edit.php?id=18&lan=24">328</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=18&lan=26">15</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=18&lan=50">11</a>
-	</td>
-		
-</tr>
-<tr>
-	<td>
-		<a href="edit.php?id=17">blob!!!!</a>
-	</td>
-			<td style="text-align:right">
-		<a href="edit.php?id=17&lan=24">12</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=17&lan=26">22</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=17&lan=50">12</a>
-	</td>
-		
-</tr>
-<tr>
-	<td>
-		<a href="edit.php?id=1">Qilin </a>
-	</td>
-			<td style="text-align:right">
-		<a href="edit.php?id=1&lan=24">4457</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=1&lan=26">11394</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=1&lan=50">4553</a>
-	</td>
-		
-</tr>
-<tr>
-	<td>
-		<a href="edit.php?id=5">Test E</a>
-	</td>
-			<td style="text-align:right">
-		<a href="edit.php?id=5&lan=24">13</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=5&lan=26">13</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=5&lan=50">13</a>
-	</td>
-		
-</tr>
-<tr>
-	<td>
-		<a href="edit.php?id=3">Wookie</a>
-	</td>
-			<td style="text-align:right">
-		<a href="edit.php?id=3&lan=24">3577</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=3&lan=26">0</a>
-	</td>
-		<td style="text-align:right">
-		<a href="edit.php?id=3&lan=50">2129</a>
+		<a href="edit.php?id=23&lan=50">3799</a>
 	</td>
 		
 </tr>
@@ -164,7 +89,6 @@ a:4:{s:8:"template";a:3:{s:8:"list.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 
 <div id="footer-container">
 	<div id="footer-menu">
-		<a href="/admin/admin-index.php">Main index</a>
 		<a href="/admin/views/users/logout.php">Log out (logged in as Jorge Luis Borges)</a>
 		<br />
 	</div>

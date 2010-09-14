@@ -202,7 +202,7 @@
             $query =
                 "insert into ".$this->tableName." (".trim($fields,', ').") values (".trim($values,', ').")";
 
-            //echo '<pre>'.$query;die();
+            //q($query);
 
             if (!mysql_query($query)) {
 
