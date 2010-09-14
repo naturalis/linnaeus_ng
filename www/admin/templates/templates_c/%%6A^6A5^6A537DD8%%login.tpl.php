@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-09 18:05:30
+<?php /* Smarty version 2.6.26, created on 2010-09-13 17:16:31
          compiled from login.tpl */ ?>
 <?php $this->assign('breadcrumbs', false); ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;

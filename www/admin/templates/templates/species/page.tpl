@@ -44,14 +44,14 @@
 You have to define at least one language in your project before you can add any pages.<br />
 <a href="../projects/data.php">Define languages.</a>
 {else}
-{if $pages|@count<10}
 <form method="post" action="" id="theForm">
+{if $pages|@count<10}
 Add a new page:
 <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="submit" value="save" />
-</form>
 {/if}
+</form>
 {/if}
 
 </div>

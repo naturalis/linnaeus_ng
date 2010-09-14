@@ -1,5 +1,5 @@
 245
-a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284047904;s:7:"expires";i:1284051504;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:1;s:28:"../shared/admin-messages.tpl";b:1;s:26:"../shared/admin-footer.tpl";b:1;}s:9:"timestamp";i:1284395597;s:7:"expires";i:1284399197;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -71,9 +71,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-14-24" 
-				onfocus="taxonSetActivePageTitle([14,24])" 
-				onblur="taxonPageTitleSave([14,24])" 
+				id="name-19-24" 
+				onfocus="taxonSetActivePageTitle([19,24])" 
+				onblur="taxonPageTitleSave([19,24])" 
 				value="Hoofdpagina" 
 			/>
 		</td>
@@ -81,9 +81,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-14-26" 
-				onfocus="taxonSetActivePageTitle([14,26])" 
-				onblur="taxonPageTitleSave([14,26])" 
+				id="name-19-26" 
+				onfocus="taxonSetActivePageTitle([19,26])" 
+				onblur="taxonPageTitleSave([19,26])" 
 				value="Main page" 
 			/>
 		</td>
@@ -91,13 +91,13 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-14-50" 
-				onfocus="taxonSetActivePageTitle([14,50])" 
-				onblur="taxonPageTitleSave([14,50])" 
-				value="主要" 
+				id="name-19-50" 
+				onfocus="taxonSetActivePageTitle([19,50])" 
+				onblur="taxonPageTitleSave([19,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(14,'Main');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(19,'Main');"></td>
 	<tr>
 		<td>
 			Threats
@@ -106,9 +106,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-15-24" 
-				onfocus="taxonSetActivePageTitle([15,24])" 
-				onblur="taxonPageTitleSave([15,24])" 
+				id="name-20-24" 
+				onfocus="taxonSetActivePageTitle([20,24])" 
+				onblur="taxonPageTitleSave([20,24])" 
 				value="Bedreigingen" 
 			/>
 		</td>
@@ -116,9 +116,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-15-26" 
-				onfocus="taxonSetActivePageTitle([15,26])" 
-				onblur="taxonPageTitleSave([15,26])" 
+				id="name-20-26" 
+				onfocus="taxonSetActivePageTitle([20,26])" 
+				onblur="taxonPageTitleSave([20,26])" 
 				value="Threats" 
 			/>
 		</td>
@@ -126,24 +126,24 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-15-50" 
-				onfocus="taxonSetActivePageTitle([15,50])" 
-				onblur="taxonPageTitleSave([15,50])" 
-				value="脅威" 
+				id="name-20-50" 
+				onfocus="taxonSetActivePageTitle([20,50])" 
+				onblur="taxonPageTitleSave([20,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(15,'Threats');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(20,'Threats');"></td>
 	<tr>
 		<td>
-			Breeding
+			Breeding habits
 		</td>
 				<td>
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-16-24" 
-				onfocus="taxonSetActivePageTitle([16,24])" 
-				onblur="taxonPageTitleSave([16,24])" 
+				id="name-21-24" 
+				onfocus="taxonSetActivePageTitle([21,24])" 
+				onblur="taxonPageTitleSave([21,24])" 
 				value="Broedpatronen" 
 			/>
 		</td>
@@ -151,9 +151,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-16-26" 
-				onfocus="taxonSetActivePageTitle([16,26])" 
-				onblur="taxonPageTitleSave([16,26])" 
+				id="name-21-26" 
+				onfocus="taxonSetActivePageTitle([21,26])" 
+				onblur="taxonPageTitleSave([21,26])" 
 				value="Breeding patterns" 
 			/>
 		</td>
@@ -161,13 +161,13 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-16-50" 
-				onfocus="taxonSetActivePageTitle([16,50])" 
-				onblur="taxonPageTitleSave([16,50])" 
-				value="繁殖" 
+				id="name-21-50" 
+				onfocus="taxonSetActivePageTitle([21,50])" 
+				onblur="taxonPageTitleSave([21,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(16,'Breeding');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(21,'Breeding habits');"></td>
 	<tr>
 		<td>
 			Synonyms
@@ -176,9 +176,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-17-24" 
-				onfocus="taxonSetActivePageTitle([17,24])" 
-				onblur="taxonPageTitleSave([17,24])" 
+				id="name-22-24" 
+				onfocus="taxonSetActivePageTitle([22,24])" 
+				onblur="taxonPageTitleSave([22,24])" 
 				value="Synoniemen" 
 			/>
 		</td>
@@ -186,9 +186,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-17-26" 
-				onfocus="taxonSetActivePageTitle([17,26])" 
-				onblur="taxonPageTitleSave([17,26])" 
+				id="name-22-26" 
+				onfocus="taxonSetActivePageTitle([22,26])" 
+				onblur="taxonPageTitleSave([22,26])" 
 				value="Synonyms" 
 			/>
 		</td>
@@ -196,13 +196,13 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-17-50" 
-				onfocus="taxonSetActivePageTitle([17,50])" 
-				onblur="taxonPageTitleSave([17,50])" 
-				value="同義語" 
+				id="name-22-50" 
+				onfocus="taxonSetActivePageTitle([22,50])" 
+				onblur="taxonPageTitleSave([22,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(17,'Synonyms');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(22,'Synonyms');"></td>
 	<tr>
 		<td>
 			Classification
@@ -211,19 +211,19 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-18-24" 
-				onfocus="taxonSetActivePageTitle([18,24])" 
-				onblur="taxonPageTitleSave([18,24])" 
-				value="Classificatie" 
+				id="name-23-24" 
+				onfocus="taxonSetActivePageTitle([23,24])" 
+				onblur="taxonPageTitleSave([23,24])" 
+				value="Klassificatie" 
 			/>
 		</td>
 				<td>
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-18-26" 
-				onfocus="taxonSetActivePageTitle([18,26])" 
-				onblur="taxonPageTitleSave([18,26])" 
+				id="name-23-26" 
+				onfocus="taxonSetActivePageTitle([23,26])" 
+				onblur="taxonPageTitleSave([23,26])" 
 				value="Classification" 
 			/>
 		</td>
@@ -231,13 +231,13 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-18-50" 
-				onfocus="taxonSetActivePageTitle([18,50])" 
-				onblur="taxonPageTitleSave([18,50])" 
-				value="分類" 
+				id="name-23-50" 
+				onfocus="taxonSetActivePageTitle([23,50])" 
+				onblur="taxonPageTitleSave([23,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(18,'Classification');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(23,'Classification');"></td>
 	<tr>
 		<td>
 			Literature
@@ -246,9 +246,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-27-24" 
-				onfocus="taxonSetActivePageTitle([27,24])" 
-				onblur="taxonPageTitleSave([27,24])" 
+				id="name-24-24" 
+				onfocus="taxonSetActivePageTitle([24,24])" 
+				onblur="taxonPageTitleSave([24,24])" 
 				value="Literatuur" 
 			/>
 		</td>
@@ -256,9 +256,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-27-26" 
-				onfocus="taxonSetActivePageTitle([27,26])" 
-				onblur="taxonPageTitleSave([27,26])" 
+				id="name-24-26" 
+				onfocus="taxonSetActivePageTitle([24,26])" 
+				onblur="taxonPageTitleSave([24,26])" 
 				value="Literature" 
 			/>
 		</td>
@@ -266,13 +266,13 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-27-50" 
-				onfocus="taxonSetActivePageTitle([27,50])" 
-				onblur="taxonPageTitleSave([27,50])" 
-				value="文献" 
+				id="name-24-50" 
+				onfocus="taxonSetActivePageTitle([24,50])" 
+				onblur="taxonPageTitleSave([24,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(27,'Literature');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(24,'Literature');"></td>
 	<tr>
 		<td>
 			Multimedia
@@ -281,9 +281,9 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-29-24" 
-				onfocus="taxonSetActivePageTitle([29,24])" 
-				onblur="taxonPageTitleSave([29,24])" 
+				id="name-25-24" 
+				onfocus="taxonSetActivePageTitle([25,24])" 
+				onblur="taxonPageTitleSave([25,24])" 
 				value="Multimedia" 
 			/>
 		</td>
@@ -291,23 +291,23 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-29-26" 
-				onfocus="taxonSetActivePageTitle([29,26])" 
-				onblur="taxonPageTitleSave([29,26])" 
-				value="Multimedia" 
+				id="name-25-26" 
+				onfocus="taxonSetActivePageTitle([25,26])" 
+				onblur="taxonPageTitleSave([25,26])" 
+				value="Multiemedia" 
 			/>
 		</td>
 				<td>
 			<input 
 				type="text" 
 				maxlength="32" 
-				id="name-29-50" 
-				onfocus="taxonSetActivePageTitle([29,50])" 
-				onblur="taxonPageTitleSave([29,50])" 
-				value="マルチメディア" 
+				id="name-25-50" 
+				onfocus="taxonSetActivePageTitle([25,50])" 
+				onblur="taxonPageTitleSave([25,50])" 
+				value="" 
 			/>
 		</td>
-			<td class="cell-page-delete" onclick="taxonPageDelete(29,'Multimedia');"></td>
+			<td class="cell-page-delete" onclick="taxonPageDelete(25,'Multimedia');"></td>
 	</tr>
 </table>
 
@@ -315,7 +315,7 @@ a:4:{s:8:"template";a:4:{s:8:"page.tpl";b:1;s:26:"../shared/admin-header.tpl";b:
 <form method="post" action="" id="theForm">
 Add a new page:
 <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
-<input type="hidden" name="rnd" value="906136329" />
+<input type="hidden" name="rnd" value="1572639290" />
 <input type="submit" value="save" />
 </form>
 
@@ -334,7 +334,6 @@ $(window).unload( function () { taxonPageTitleSave(taxonActivePageTitle); } );
 
 <div id="footer-container">
 	<div id="footer-menu">
-		<a href="/admin/admin-index.php">Main index</a>
 		<a href="/admin/views/users/logout.php">Log out (logged in as Jorge Luis Borges)</a>
 		<br />
 	</div>

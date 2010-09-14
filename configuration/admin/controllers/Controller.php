@@ -9,7 +9,7 @@
 		public $smarty;
 		private $smartySettings;
 		private $viewName;
-		private $controllerBaseName;
+		public $controllerBaseName;
 		private $fullPath;
 		public $pageName;
 		public $requestData;
@@ -25,6 +25,7 @@
 		public $controllerPublicName;
 		public $randomValue;
 		public $usedHelpers;
+		public $breadcrumbIncludeReferer;
 
 		private $usedModelsBase = array('helptext');
 
@@ -65,6 +66,8 @@
 		* @access 	public
 		*/
 		public function __destruct() {
+
+			$this->setLastVisitedPage();
 
 			parent::__destruct();
 
@@ -584,6 +587,8 @@
 		*/
 		public function customSortArray(&$array,$sortBy) {
 
+			if (!isset($array)) return;
+
 			$this->setSortField($sortBy['key']);
 
 			$this->setSortDirection($sortBy['dir']);
@@ -675,7 +680,12 @@
 			return $this->generalSettings['rootWebUrl'].$this->appName.'/admin-index.php';
 		
 		}
+		
+		public function setBreadcrumbIncludeReferer($value = true) {
 
+			$this->breadcrumbIncludeReferer = $value;
+
+		}
 
 		/**
 		* Starts the user's session
@@ -929,8 +939,22 @@
 			$this->setDefaultUploadMaxSize();
 
 			$this->setRandomValue();
+			
+		}
+
+		/**
+		* Sets a "custom http_referer", including the page's name, in the session
+		*
+		* @access 	private
+		*/		
+		private function setLastVisitedPage() {
+		
+			$_SESSION['system']['referer']['url'] = $this->fullPath;
+
+			$_SESSION['system']['referer']['name'] = $this->getPageName();
 
 		}
+
 
 		/**
 		* Sets the page to redirect to after logging in
@@ -953,6 +977,7 @@
 		*/
 		private function setBreadcrumbs() {
 
+			// root of each trail: "choose project" page
 			$cp = $this->generalSettings['rootWebUrl'].$this->appName.$this->generalSettings['paths']['chooseProject'];
 
 			$this->breadcrumbs[] = array(
@@ -977,6 +1002,23 @@
 					);
 					
 					if ($this->getViewName()!='index') {
+
+						// all views are on the same level, but sometimes we might want another level to the trail when 
+						// moving one view to the next, for logic's sake (for instance: taxon list -> edit taxon, two views)
+						// that are on the same level, but are perceived by the user to be on subsequent levels
+						if ($this->breadcrumbIncludeReferer===true) {
+
+							$this->breadcrumbs[] = array(
+								'name' => $_SESSION['system']['referer']['name'],
+								'url' => $_SESSION['system']['referer']['url']
+							);
+
+						}
+						elseif (is_array($this->breadcrumbIncludeReferer)) {
+
+							$this->breadcrumbs[] = $this->breadcrumbIncludeReferer;
+
+						}
 
 						$this->breadcrumbs[] = array(
 							'name' => $this->getPageName(),

@@ -299,21 +299,30 @@ a:hover {
 .language-select-item {
 }
 
+#taxon-pages-table-div {
+	margin-top:10px;
+}
+
+#taxon-language-table-div {
+	margin-top:2px;
+}
+
 .taxon-language-table {
 	margin:0px;
 	padding:0px;
 	margin-bottom:20px;
 }
 
-.taxon-language-cell,.taxon-language-cell-active {
-	width:100px;
-	background-color:#ccc;
+.taxon-language-cell,.taxon-language-cell-active,.taxon-page-cell,.taxon-page-cell-active  {
+	width:75px;
+	background-color:#aaa;
 	color:#eee;
 	border:1px solid #999;
 	padding:2px;
 	padding-left:5px;
 	cursor:pointer;
 	text-align:center;
+	font-size:10px;
 }
 
 .taxon-language-cell-active {
@@ -321,6 +330,26 @@ a:hover {
 	color:#111;
 	cursor:default;
 	font-weight:bold;
+}
+
+.taxon-page-cell,.taxon-page-cell-active {
+	width:100px;
+	font-size:11px;
+}
+
+.taxon-page-cell-active {
+	background-color:#eee;
+	color:#111;
+	cursor:default;
+	font-weight:bold;
+}
+
+.taxon-page-bytesize,.taxon-page-bytesize-nil {
+	font-size:10px;
+}
+
+.taxon-page-bytesize-nil {
+	color:#b00;
 }
 
 #taxon-name-input {

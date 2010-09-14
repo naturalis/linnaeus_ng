@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2010-09-09 17:58:24
+<?php /* Smarty version 2.6.26, created on 2010-09-13 18:33:16
          compiled from page.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'count', 'page.tpl', 43, false),)), $this); ?>
@@ -132,15 +132,15 @@ $this->_sections['j']['last']       = ($this->_sections['j']['iteration'] == $th
 You have to define at least one language in your project before you can add any pages.<br />
 <a href="../projects/data.php">Define languages.</a>
 <?php else: ?>
-<?php if (count($this->_tpl_vars['pages']) < 10): ?>
 <form method="post" action="" id="theForm">
+<?php if (count($this->_tpl_vars['pages']) < 10): ?>
 Add a new page:
 <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
 <input type="hidden" name="rnd" value="<?php echo $this->_tpl_vars['rnd']; ?>
 " />
 <input type="submit" value="save" />
-</form>
 <?php endif; ?>
+</form>
 <?php endif; ?>
 
 </div>
