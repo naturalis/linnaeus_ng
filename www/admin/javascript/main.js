@@ -1,3 +1,11 @@
+function allGetTimestamp() {
+
+	var tsTimeStamp= new Date().getTime();
+
+	return tsTimeStamp;
+
+}
+
 function allTableColumnSort(col) {
 
 	var e = document.getElementById('key');
@@ -45,18 +53,69 @@ function allSetMessage(msg,err) {
 
 }
 
+
+var heartbeatUserId = false;
+var heartbeatApp = false;
+var heartbeatCtrllr = false;
+var heartbeatView = false;
+var heartbeatParams = Array();
+var heartbeatFreq = 120000;
+var autosaveFreq = 120000;
+
+function allSetHeartbeatFreq(freq) {
+
+	heartbeatFreq = freq;
+
+}
+
+function allSetHeartbeat(userid,app,ctrllr,view,params) {
+
+	if (userid) heartbeatUserId = userid;
+	if (app) heartbeatApp = app;
+	if (ctrllr) heartbeatCtrllr = ctrllr;
+	if (view) heartbeatView = view;
+	if (params) heartbeatParams = params;
+
+	$.ajax({
+		url : "../utilities/ajax_interface.php",
+		type: "GET",
+		data : ({
+			'user_id' : heartbeatUserId ,
+			'app' : heartbeatApp ,
+			'ctrllr' : heartbeatCtrllr ,
+			'view' : heartbeatView ,
+			'params' : heartbeatParams ,
+			'action' : 'heartbeat',
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+		}
+	});
+
+	setTimeout ("allSetHeartbeat()", heartbeatFreq);
+
+}
+
+function allSetAutoSaveFreq(freq) {
+
+	autosaveFreq = freq;
+
+}
+
+
 function userRemoteValueCheck(id,values,tests,idti) {
 
 	$.ajax({ url:
-		   		"ajax_interface.php?f="+
-		   		encodeURIComponent(id)+"&v="+
-				encodeURIComponent(values)+"&t="
-				+encodeURIComponent(tests)+
+				"ajax_interface.php?f="+encodeURIComponent(id)+
+				"&v="+encodeURIComponent(values)+
+				"&t="+encodeURIComponent(tests)+
+				"&time="+allGetTimestamp()+
 				(idti ? "&i="+encodeURIComponent(idti) : "" ),
-		success: function(data){
-	        $('#'+id+'-message').html(data);
-			error = data.search(/\<error\>/gi)!=-1;
-			$('#'+id+'-message').removeClass().addClass(error ? 'message-error' : 'message-no-error');
+			success: function(data){
+				$('#'+id+'-message').html(data);
+				error = data.search(/\<error\>/gi)!=-1;
+				$('#'+id+'-message').removeClass().addClass(error ? 'message-error' : 'message-no-error');
       	}
 	});
 
@@ -84,7 +143,7 @@ function moduleChangeModuleStatus(ele,removeIds) {
 
 	}
 
-	$.ajax({ url:"ajax_interface.php?v=modules&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id),
+	$.ajax({ url:"ajax_interface.php?v=modules&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id)+"&time="+allGetTimestamp(),
 		success: function(data){
 
 			//alert(data);
@@ -181,7 +240,8 @@ function moduleChangeModuleUserStatus(ele) {
 	$.ajax({ url:"ajax_interface.php?v=collaborators"+
 				"&a="+encodeURIComponent(action)+
 				"&i="+encodeURIComponent(m)+
-				"&u="+encodeURIComponent(u),
+				"&u="+encodeURIComponent(u)+
+				"&time="+allGetTimestamp(),
 		success: function(data){
 
 			if (data=='<ok>') {
@@ -218,7 +278,8 @@ function projectSaveLanguage(action,lan) {
 
 	$.ajax({ url:"ajax_interface.php?v=languages"+
 				"&a="+encodeURIComponent(action)+
-				"&i="+encodeURIComponent(lan[0]),
+				"&i="+encodeURIComponent(lan[0])+
+				"&time="+allGetTimestamp(),
 		success: function(data){
 			//alert(data);
 			if (data=='<ok>') {
@@ -298,7 +359,16 @@ function projectUpdateLanguageBlock() {
 
 }
 
+
 var taxonActivePageTitle = false;
+var taxonActiveLanguage = false;
+var taxonNewLanguage = false;
+var taxonLanguages = Array();
+var taxonActivePage = false;
+var taxonPages = Array();
+var taxonPageStates = Array();
+var taxonPublishState = false;
+var taxonInitAutoSave = true;
 
 function taxonSetActivePageTitle(page) {
 
@@ -314,7 +384,8 @@ function taxonPageDelete(page,name) {
 		"ajax_interface.php", 
 		{
 			'id' : page ,
-			'action' : 'delete_page' 
+			'action' : 'delete_page' ,
+			'time' : allGetTimestamp()
 		},
 		function() {
 			$('#theForm').submit();
@@ -333,7 +404,8 @@ function taxonPageTitleSave(page) {
 			'id' : page[0],
 			'action' : 'save_page_title' ,
 			'title' : title , 
-			'language' : page[1] 
+			'language' : page[1] ,
+			'time' : allGetTimestamp()
 		},
 		function(data){
 			allSetMessage(data);
@@ -341,10 +413,6 @@ function taxonPageTitleSave(page) {
 	);
 
 }
-
-var taxonActiveLanguage = false;
-var taxonNewLanguage = false;
-var taxonLanguages = Array();
 
 function taxonAddLanguage(lan) {
 	//[id,name,default?]
@@ -379,10 +447,6 @@ function taxonSwitchLanguage(language) {
 
 }
 
-var taxonActivePage = false;
-var taxonPages = Array();
-var taxonPageSizes = Array();
-
 function taxonAddPage(page) {
 	//[id,[names],default?]
 	taxonPages[taxonPages.length] = page;
@@ -393,18 +457,16 @@ function taxonDrawPageBlock() {
 	$buffer = '<table class="taxon-pages-table"><tr>';
 
 	for (var i=0;i<taxonPages.length;i++) {
-		
-		var hasContent = taxonPageSizes[taxonPages[i][0]] && taxonPageSizes[taxonPages[i][0]] >=0 ;
-	
+
 		$buffer = $buffer+
-			'<td class="taxon-page-cell'+
-			(taxonPages[i][0]==taxonActivePage ? '-active' : '" onclick="taxonSwitchPage('+taxonPages[i][0]+');' )+
-			'">'+
-			(taxonPages[i][1][taxonActiveLanguage].length == 0 ? '('+taxonPages[i][1][-1]+')' : taxonPages[i][1][taxonActiveLanguage] )+
-			(taxonPages[i][2]==1 ?  ' *' : '')+
-			'<br /><span class="taxon-page-bytesize'+(hasContent ? '' : '-nil')+'">'+
-			(hasContent ? taxonPageSizes[taxonPages[i][0]] : 0) +
-			' ch.</span></td>';
+			'<td class="taxon-page-cell' +
+			(taxonPages[i][0]==taxonActivePage ? '-active' : '" onclick="taxonSwitchPage('+taxonPages[i][0]+');' ) +
+			'">' +
+			(taxonPages[i][1][taxonActiveLanguage].length == 0 ? '('+taxonPages[i][1][-1]+')' : taxonPages[i][1][taxonActiveLanguage] ) +
+			(taxonPages[i][2]==1 ?  ' *' : '') +
+			'<br /><span class="taxon-page-publish-state">' +
+			(taxonPageStates[taxonPages[i][0]]==1 ? 'published' : (taxonPageStates[taxonPages[i][0]] == 0 ? 'unpublished' : 'empty')) +
+			'</span></td>';
 	}
 
 	$buffer = $buffer + '</tr></table>';
@@ -420,19 +482,21 @@ function taxonUpdatePageBlock() {
 		url: "ajax_interface.php",
 		data: {
 			'id' : $('#taxon_id').val() ,
-			'action' : 'get_page_sizes' ,
-			'language' : taxonActiveLanguage
+			'action' : 'get_page_states' ,
+			'language' : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
 		},
 		success:
 			function(data){
-				for(var i=0;i<taxonPageSizes.length;i++) {
-					taxonPageSizes[i]=-1;
+				for(var i=0;i<taxonPageStates.length;i++) {
+					taxonPageStates[i]=-1;
 				}
-				obj = $.parseJSON(data);
-				for(var i=0;i<obj.length;i++) {
-					taxonPageSizes[obj[i].page_id] = obj[i].page_size;
+				if (data) {
+					obj = $.parseJSON(data);
+					for(var i=0;i<obj.length;i++) {
+						taxonPageStates[obj[i].page_id] = obj[i].publish;
+					}
 				}
-
 				taxonDrawPageBlock();
 			}
 			
@@ -453,19 +517,42 @@ function taxonClose() {
 
 }
 
-function taxonSaveData(execafter) {
+var taxonSaveType = 'auto';
 
-	$.post(
-		"ajax_interface.php", 
-		{
+function taxonSaveDataManual() {
+
+	taxonSaveType = 'manual';
+
+	taxonSaveData();
+
+}
+
+function taxonSaveData(execafter,sync) {
+
+	/*
+	prompt('url',
+		'ajax_interface.php?id='+$('#taxon_id').val()+
+		'&action=save_taxon'+
+		'&name='+$('#taxon-name-input').val()+
+		'&content=content'+
+		'&language='+taxonActiveLanguage +
+		'&page='+taxonActivePage);
+	*/
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
 			'id' : $('#taxon_id').val() ,
 			'action' : 'save_taxon' ,
 			'name' : $('#taxon-name-input').val() , 
 			'content' : tinyMCE.get('taxon-content').getContent() , 
 			'language' : taxonActiveLanguage ,
-			'page' : taxonActivePage			
-		},
-		function(data){
+			'page' : taxonActivePage ,
+			'save_type' : taxonSaveType ,
+			'time' : allGetTimestamp()	
+		}),
+		type: "POST",
+		success: function(data){
 			if (data.indexOf('id=')!=-1) {
 				$('#taxon_id').val(data.replace('id=',''));
 				allSetMessage('saved');
@@ -474,9 +561,10 @@ function taxonSaveData(execafter) {
 				alert(data.replace('<error>',''));
 			}
 			taxonUpdatePageBlock();
-			eval(execafter);
+			if (execafter) eval(execafter);
+			taxonSaveType = 'auto';
 		}
-	);
+	});
 
 }
 
@@ -490,16 +578,20 @@ function taxonGetData(language,page) {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'get_taxon' ,
 			'language' : language ,
-			'page' : page			
+			'page' : page ,
+			'time' : allGetTimestamp()			
 		},
 		function(data){
+			//alert(data);
 			obj = $.parseJSON(data);
 			$('#taxon-name-input').val(obj.title ? obj.title : '');
 			tinyMCE.get('taxon-content').setContent(obj.content ? obj.content : '');
 			taxonActiveLanguage = obj.language_id;
 			taxonActivePage = obj.page_id;
+			taxonPublishState = obj.publish;
 			taxonUpdateLanguageBlock();
 			taxonUpdatePageBlock();
+			taxonDrawPublishBlock();
 		}
 	);
 
@@ -517,7 +609,8 @@ function taxonDeleteData(language) {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'delete_taxon' ,
 			'language' : language ,
-			'page' : taxonActivePage		
+			'page' : taxonActivePage ,
+			'time': allGetTimestamp()	
 		},
 		function(data){
 			window.open('list.php','_top');
@@ -532,11 +625,139 @@ function taxonConfirmSaveOnUnload() {
 	// issue: jquery synchronous ajax call doesn't seem to work, so this is pointless:
 	if (confirm('Do you want to save your changes before you leave this page?')) {
 
-		taxonSaveData();
+		taxonSaveData(false,true);
 
 	}
 
 }
+
+function taxonSetHeartbeat(userid,app,ctrllr,view) {
+
+	var params = Array();
+
+	params[0] = ['taxon_id',$('#taxon_id').val()];
+
+	heartbeatParams = params;
+
+	allSetHeartbeat(userid,app,ctrllr,view);
+
+}
+
+function taxonClearAllUsageCells() {
+
+	$("td[id*='usage']").html('');
+
+}
+
+function taxonCheckLockOutStates() {
+
+	$.ajax({
+		url : "../utilities/ajax_interface.php",
+		type: "GET",
+		data : ({
+			'action' : 'get_taxa_edit_states',
+			'time': allGetTimestamp()
+		}),
+		success : function (data) {
+			taxonClearAllUsageCells();
+			if (data) {
+				obj = $.parseJSON(data);
+				for(var i=0;i<obj.length;i++) {
+					if (obj[i].first_name.length > 0 || obj[i].last_name.length > 0) {
+						$('#usage-'+obj[i].taxon_id).html(obj[i].first_name+' '+obj[i].last_name);
+					}
+				}
+			}
+		}
+	});
+
+	setTimeout ("taxonCheckLockOutStates()", heartbeatFreq/2);
+
+}
+
+function taxonPublishContent(state) {
+	
+	if (state==1) taxonSaveData();
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
+			'id' : $('#taxon_id').val() ,
+			'action' : 'publish_content' ,
+			'language' : taxonActiveLanguage ,
+			'page' : taxonActivePage ,
+			'state' : state ,
+			'time' : allGetTimestamp()	
+		}),
+		type: "GET",
+		success: function(data){
+			if (data=='<ok>') {
+				taxonPublishState = state;
+				taxonDrawPublishBlock();
+				taxonUpdatePageBlock();
+			}
+		}
+	});
+
+}
+
+function taxonDrawPublishBlock() {
+
+	if (taxonPublishState=='1')
+		$('#taxon-publish-table-div').html(
+			'This page has been published. '+
+			'<input type="button" value="unpublish" onclick="taxonPublishContent(0);" />'
+		);
+	else
+		$('#taxon-publish-table-div').html(
+			'This page has not been published. '+
+			'<input type="button" value="publish" onclick="taxonPublishContent(1);" />'
+		);
+
+}
+
+function taxonRunAutoSave() {
+
+	if (!taxonInitAutoSave) taxonSaveData();
+
+	taxonInitAutoSave = false;
+
+	setTimeout("taxonRunAutoSave()", autosaveFreq);
+
+}
+
+function taxonGetUndo() {
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : $('#taxon_id').val() ,
+			'action' : 'get_taxon_undo' ,
+			'language' : taxonActiveLanguage ,
+			'page' : taxonActivePage ,
+			'time' : allGetTimestamp()			
+		},
+		function(data){
+			if (data) {
+				obj = $.parseJSON(data);
+				$('#taxon-name-input').val(obj.title ? obj.title : '');
+				tinyMCE.get('taxon-content').setContent(obj.content ? obj.content : '');
+				taxonActiveLanguage = obj.language_id;
+				taxonActivePage = obj.page_id;
+				taxonPublishState = obj.publish;
+				taxonUpdateLanguageBlock();
+				taxonUpdatePageBlock();
+				taxonDrawPublishBlock();
+				allSetMessage('recovered');
+			} else {
+				allSetMessage('cannot undo');
+			}
+		}
+	);
+
+}
+
+
 
 
 
