@@ -13,16 +13,20 @@
 
 </tr>
 {section name=i loop=$taxa}
-<tr>
-	<td>
+<tr class="taxon-list-row">
+	<td class="taxon-list-cell-name">
 		<a href="edit.php?id={$taxa[i].id}">{$taxa[i].taxon}</a>
 	</td>
 	{assign var=t value=$taxa[i].id}
 	{section name=j loop=$languages}
-	<td style="text-align:right">
-		<a href="edit.php?id={$taxa[i].id}&lan={$languages[j].language_id}">{$languages[j].size[$t]}</a>
+	<td class="taxon-list-cell-language" title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} pages published">
+		<a href="edit.php?id={$taxa[i].id}&lan={$languages[j].language_id}">
+		{$languages[j].publish[$t].pct_finished}% done
+		</a>
 	</td>
 	{/section}	
+	<td id="usage-{$taxa[i].id}">
+	</td>
 </tr>
 {/section}
 </table>
@@ -39,5 +43,13 @@ You have to define at least one language in your project before you can add any 
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+	taxonCheckLockOutStates();
+});
+</script>
+{/literal}
 
 {include file="../shared/admin-footer.tpl"}
