@@ -22,7 +22,7 @@
 }
 
 #block-inline-help .body-collapsed {
-	visibility:collapse;
+	visibility:hidden;
 }
 
 #block-inline-help .subject {

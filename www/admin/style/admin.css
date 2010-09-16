@@ -1,5 +1,6 @@
 a {
 	text-decoration:none;
+	color:#000099;
 }
 
 a:hover {
@@ -13,6 +14,12 @@ a:hover {
 #page-main {
 	margin:10px 10px 10px 10px;
 }
+
+#page-main-overlay {
+	margin:10px 10px 10px 10px;
+	visibility:hidden;
+}
+
 
 #header-container {
 	background-color:#eee;
@@ -131,6 +138,10 @@ a:hover {
 
 #footer-menu a:hover {
 	text-decoration:underline;
+}
+
+#invisible_container {
+	visibility:hidden;
 }
 
 .text-block {
@@ -299,6 +310,23 @@ a:hover {
 .language-select-item {
 }
 
+.taxon-list-row {
+	background-color:#fff;
+}
+
+.taxon-list-row:hover {
+	background-color:#eee;
+}
+
+.taxon-list-cell-name {
+	width:200px;
+}
+
+.taxon-list-cell-language {
+	width:75px;
+	text-align:right;
+}
+
 #taxon-pages-table-div {
 	margin-top:10px;
 }
@@ -344,12 +372,12 @@ a:hover {
 	font-weight:bold;
 }
 
-.taxon-page-bytesize,.taxon-page-bytesize-nil {
+.taxon-page-publish-state {
 	font-size:10px;
 }
 
-.taxon-page-bytesize-nil {
-	color:#b00;
+#taxon-publish-table-div {
+	margin-bottom:10px;
 }
 
 #taxon-name-input {
