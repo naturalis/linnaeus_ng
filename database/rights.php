@@ -55,6 +55,9 @@ INSERT INTO dev_rights VALUES (NULL , 'projects', 'collaborators',CURRENT_TIMEST
 
 INSERT INTO dev_rights VALUES (NULL , 'species', '*',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'species', 'index',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'edit',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'list',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'page',CURRENT_TIMESTAMP);
 
 
 
@@ -100,9 +103,13 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 13, CURRENT
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 3, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 6, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 7, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 13, CURRENT_TIMESTAMP );
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 15, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 16, CURRENT_TIMESTAMP );
+
 
 # contributor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
