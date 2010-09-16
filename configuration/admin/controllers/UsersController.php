@@ -44,9 +44,13 @@
 		* @return 	array	array of roles, rights and the number of projects the user is involved with
 		* @access 	private
 		*/
-		public function getCurrentUserRights() {
+		public function getCurrentUserRights($id = false) {
 
-			$pru = $this->models->ProjectRoleUser->get(array('user_id' => $this->getCurrentUserId()));
+			$pru = $this->models->ProjectRoleUser->get(
+				array(
+					'user_id' => $id ? $id : $this->getCurrentUserId()
+				)
+			);
 
 			foreach((array)$pru as $key => $val) {
 			
@@ -504,20 +508,17 @@
 				// user found 
 				else {
 				
-					// set curreny user id
-					$this->setCurrentUserId($users[0]);
-	
 					// update last and number of logins
 					$this->models->User->save(
 						array(
-							'id' => $this->getCurrentUserId(),
+							'id' => $users[0]['id'],
 							'last_login' => 'now()',
 							'logins' => 'logins+1'
 							)
 						);
 	
 					// get user's roles and rights
-					$cur = $this->getCurrentUserRights();
+					$cur = $this->getCurrentUserRights($users[0]['id']);
 	
 					// save all relevant data to the session
 					$this->setUserSession($users[0],$cur['roles'],$cur['rights'],$cur['number_of_projects']);
@@ -952,7 +953,7 @@
 						// clean up data
 						$this->requestData = $this->models->User->sanatizeData($this->requestData);
 
-						// if a no new passwords were entered, don't do a password check...
+						// if no new passwords were entered, don't do a password check...
 						if ($this->requestData['password'] == '' && $this->requestData['password_2'] == '') {
 		
 							if (!$this->isUserDataComplete(array('password', 'password_2'))) $saveUser = false;
@@ -978,9 +979,13 @@
 					if ($saveUser) {
 
 						// if new password, encrypt the human readable to an encrypted one
-						if ($this->requestData['password']) {
+						if ($this->requestData['password']!='') {
 
 							$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
+
+						} else {
+
+							unset($this->requestData['password']);
 
 						}
 

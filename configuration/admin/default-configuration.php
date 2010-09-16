@@ -11,6 +11,8 @@
 				'applicationName' => 'Linnaeus NG Administration',
 				'applicationVersion' => '0.1',
 				'maxSessionHistorySteps' => 10,
+				'heartbeatFrequency' => 60000, // milliseconds
+				'autosaveFrequency' => 300000, // milliseconds
 				'rootWebUrl' => '@URL.WEBROOT@'	,
 				'paths' => array(
 					'login' => '/views/users/login.php',

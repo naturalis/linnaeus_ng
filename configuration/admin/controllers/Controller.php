@@ -43,6 +43,8 @@
 			$this->startSession();
 
 			$this->setNames();
+			
+			$this->setSessionActivePageValues();
 
 			$this->setSmarty();
 
@@ -257,18 +259,6 @@
 			return $this->pageName;
 
 		}
-		
-		/**
-		* Sets the current user's id as a class variable
-		*
-		* @param  	array	$userData	basic user data
-		* @access 	public
-		*/
-		public function setCurrentUserId($userData) {
-
-			$this->currentUserId = $userData['id'];
-
-		}
 
 		/**
 		* Returns the current user's id class variable
@@ -278,7 +268,7 @@
 		*/
 		public function getCurrentUserId() {
 
-			return $this->currentUserId;
+			return isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : null;
 
 		}
 
@@ -955,6 +945,22 @@
 
 		}
 
+		/**
+		* Stores current page's name etc. in the session for easy access by smarty for js lock out-function
+		*
+		* @access 	private
+		*/		
+		private function setSessionActivePageValues() {
+		
+			$_SESSION['system']['active_page']['url'] = $this->fullPath;
+
+			$_SESSION['system']['active_page']['appName'] = $this->appName;
+
+			$_SESSION['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
+
+			$_SESSION['system']['active_page']['viewName'] = $this->viewName;
+
+		}
 
 		/**
 		* Sets the page to redirect to after logging in
