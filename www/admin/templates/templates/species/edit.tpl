@@ -2,6 +2,7 @@
 
 <div id="page-main">
 
+{if $taxon.id!=-1}
 <form name="theForm" id="theForm">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 
@@ -11,8 +12,8 @@
 		<td id="taxon-navigation-cell">
 			<span style="float:right">
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
-				<input type="button" value="save" onclick="taxonSaveData()" style="margin-right:5px" />
-				<input type="button" value="undo" onclick="allSetMessage('coming soon')" style="margin-right:5px" />
+				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
+				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
 				<input type="button" value="delete" onclick="taxonDeleteData(taxonActiveLanguage)" style="margin-right:5px" />
 				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
 			</span>
@@ -25,11 +26,13 @@
 
 <div id="taxon-language-table-div"></div>
 
+<div id="taxon-publish-table-div"></div>
+
+
 Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />
 <textarea name="content" style="width:880px;height:600px;" id="taxon-content">{$content.content}</textarea>
 </form>
-
-
+{/if}
 
 {literal}
 <script type="text/JavaScript">
@@ -41,7 +44,6 @@ $(document).ready(function(){
 	taxonActiveLanguage = {$activeLanguage};
 	taxonUpdateLanguageBlock();
 
-
 {section name=i loop=$pages}
 	var pagenames = new Array();
 	pagenames[-1] = '{$pages[i].page|addslashes}';
@@ -52,11 +54,19 @@ $(document).ready(function(){
 	taxonActivePage = {$activePage};
 	taxonUpdatePageBlock();
 
+	taxonPublishState  = {if $content.publish!=''}{$content.publish}{else}0{/if};
+	taxonDrawPublishBlock();
+
+	allSetHeartbeatFreq({$heartbeatFrequency});
+	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
+
+	allSetAutoSaveFreq({$autosaveFrequency});
+	taxonRunAutoSave();
 
 {literal}
 	$(window).unload(
 		function () { 
-			taxonConfirmSaveOnUnload() ;
+			taxonConfirmSaveOnUnload();
 		} 
 	);
 });
@@ -65,4 +75,5 @@ $(document).ready(function(){
 
 </div>
 
+{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

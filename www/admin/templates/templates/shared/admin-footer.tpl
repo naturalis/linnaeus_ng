@@ -33,5 +33,7 @@ var_dump($_SESSION);
 {/php}
 </div>
 {/if}
-</div ends="body-container"></body>
+</div ends="body-container">
+<span id="dummy-element"></span>
+</body>
 </html>
