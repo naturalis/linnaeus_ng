@@ -5,10 +5,6 @@
     <property name="build" value="${basedir}/../build" />
     <property file="build.properties" />
 
-<patternset id="inc.php.files">
-  <include name="**/*.php" />
-</patternset>
-
 <!-- Checkout latest version from SVN -->
 <target name="checkout">
   <svnupdate svnpath="svn" nocache="true" todir="${basedir}" />
@@ -19,15 +15,6 @@
   <delete dir="${build}" includeemptydirs="true" />
   <mkdir dir="${build}/logs" />
   <mkdir dir="${build}/api" />
-</target>
-
-<!-- Check PHP syntax -->
-<target name="phplint">
-  <phplint haltonfailure="false">
-     <fileset dir="${basedir}">
-        <patternset refid="inc.php.files" />
-     </fileset>
-  </phplint>
 </target>
 
     <!-- Generate documentation -->
@@ -88,6 +75,6 @@
               ${deploy.db.name} &lt; ${basedir}/${deploy.db.dump}" />
     </target>
 
-<target name="build" depends="checkout,clean,phplint,phpdoc,deploy,upload,deploydb" />
+<target name="build" depends="checkout,clean,phpdoc,deploy,upload,deploydb" />
 <!-- Unused targets: phpdoc  -->
 </project>
