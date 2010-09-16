@@ -104,8 +104,8 @@ hard coded number of free modules
 
 			$modules = $this->models->ModuleProject->get(
 							array('project_id'=>$this->getCurrentProjectId()),
-							false,'
-							module_id asc'
+							false,
+							'module_id asc'
 						);
 
 			foreach((array)$modules as $key => $val) {
