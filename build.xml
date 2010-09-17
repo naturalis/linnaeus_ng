@@ -43,12 +43,7 @@
 </target>
 
 <!-- Upload with copy -->
-<target name="upload">
-       <copy  todir="/Volumes/Data/htdocs/linnaeus_ng/">
-            <fileset dir="/cc/projects/linnaeus_ng/source/">
-                <include name="**/**"/>
-            </fileset>
-         </copy>
+<target name="alterconfig">
         <copy file="/Volumes/Data/htdocs/linnaeus_ng/configuration/admin/default-configuration.php"
               tofile="/Volumes/Data/htdocs/linnaeus_ng/configuration/admin/configuration.php"
               overwrite="true" >
@@ -75,6 +70,6 @@
               ${deploy.db.name} &lt; ${basedir}/${deploy.db.dump}" />
     </target>
 
-<target name="build" depends="checkout,clean,phpdoc,deploy,upload,deploydb" />
+<target name="build" depends="checkout,clean,phpdoc,deploy,alterconfig,deploydb" />
 <!-- Unused targets: phpdoc  -->
 </project>
