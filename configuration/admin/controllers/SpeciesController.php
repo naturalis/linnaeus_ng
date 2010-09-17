@@ -2,11 +2,11 @@
 
 	/*
 	
+	lijkt soms javascript niet te laden in edit action?
+	
 	check out tinyMCE spell checker (requires Google: online only)
-	max pages hardcoded into page.tpl
-	page 'main' is hardcoded
 
-	MCImageManager (€€€)
+	tinyMCE images: MCImageManager (€€€)
 
 	*/
 
@@ -30,7 +30,7 @@
 
 			parent::__construct();
 			
-			$this->createTaxonPage('Main',true);
+			$this->createTaxonPage(_('Main'),true);
 			
 			$this->smarty->assign('heartbeatFrequency',$this->generalSettings['heartbeatFrequency']);
 
@@ -132,6 +132,9 @@
 				}
 
 			}
+
+
+			$this->smarty->assign('maxSubPages', $this->generalSettings['maxSubPages']);
 
 			$this->smarty->assign('languages',$lp);
 
