@@ -1,6 +1,6 @@
 {include file="../shared/admin-header.tpl"}
-
 <div id="page-main">
+<span id="debug-message"></span>
 
 {if $taxon.id!=-1}
 <form name="theForm" id="theForm">
