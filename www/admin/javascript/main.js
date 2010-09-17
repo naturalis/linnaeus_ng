@@ -1,3 +1,8 @@
+function q(m) {
+	var e = document.getElementById('debug-message');
+	e.innerHTML = m;
+}
+
 function allGetTimestamp() {
 
 	var tsTimeStamp= new Date().getTime();
@@ -369,6 +374,8 @@ var taxonPages = Array();
 var taxonPageStates = Array();
 var taxonPublishState = false;
 var taxonInitAutoSave = true;
+var taxonSaveType = 'auto';
+
 
 function taxonSetActivePageTitle(page) {
 
@@ -517,8 +524,6 @@ function taxonClose() {
 
 }
 
-var taxonSaveType = 'auto';
-
 function taxonSaveDataManual() {
 
 	taxonSaveType = 'manual';
@@ -536,7 +541,8 @@ function taxonSaveData(execafter,sync) {
 		'&name='+$('#taxon-name-input').val()+
 		'&content=content'+
 		'&language='+taxonActiveLanguage +
-		'&page='+taxonActivePage);
+		'&page='+taxonActivePage+
+		'&save_type='+taxonSaveType);
 	*/
 
 	$.ajax({
@@ -571,7 +577,15 @@ function taxonSaveData(execafter,sync) {
 function taxonGetData(language,page) {
 
 	if ($('#taxon_id').val().length==0) return;
-
+/*
+	prompt('url',"ajax_interface.php"+
+			'?id=' + $('#taxon_id').val() +
+			'&action=get_taxon' +
+			'&language='+language +
+			'&page='+page +
+			'&time='+allGetTimestamp()			
+	);
+*/
 	$.post(
 		"ajax_interface.php", 
 		{
@@ -756,22 +770,4 @@ function taxonGetUndo() {
 	);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

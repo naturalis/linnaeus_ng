@@ -19,7 +19,7 @@
 	</td>
 	{assign var=t value=$taxa[i].id}
 	{section name=j loop=$languages}
-	<td class="taxon-list-cell-language" title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} pages published">
+	<td class="taxon-list-cell-language{if $languages[j].publish[$t].pct_finished==100}-done{/if}" title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} pages published">
 		<a href="edit.php?id={$taxa[i].id}&lan={$languages[j].language_id}">
 		{$languages[j].publish[$t].pct_finished}% done
 		</a>

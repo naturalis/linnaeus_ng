@@ -322,9 +322,14 @@ a:hover {
 	width:200px;
 }
 
-.taxon-list-cell-language {
+.taxon-list-cell-language,.taxon-list-cell-language-done {
 	width:75px;
 	text-align:right;
+	background-color:#Fb6;
+}
+
+.taxon-list-cell-language-done {
+	background-color:#bF6;
 }
 
 #taxon-pages-table-div {
