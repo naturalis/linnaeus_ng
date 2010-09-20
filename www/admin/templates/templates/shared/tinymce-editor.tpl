@@ -1,3 +1,10 @@
+{section name=l loop=$languages}
+{if $activeLanguage==$languages[l].language_id}
+{assign var=spellchecker_languages value=$spellchecker_languages|cat:'+'}
+{/if}
+{assign var=spellchecker_languages value=$spellchecker_languages|cat:$languages[l].language|cat:'='|cat:$languages[l].iso2|cat:','}
+{/section}
+
 <script type="text/javascript" src="{$rootWebUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
 {literal}
 <script type="text/javascript">
@@ -13,7 +20,7 @@ tinyMCE.init({
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom",
-	spellchecker_languages : "English=en,+Japanese=ja,Dutch=nl" //(n.b. no trailing comma in last line of code)
+	spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
 	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
 });
 </script>

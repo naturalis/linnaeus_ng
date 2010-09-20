@@ -38,13 +38,23 @@
 	<div id="breadcrumbs">
 	{section name=i loop=$breadcrumbs}
 	{assign var=n value=$n+1}
-{if $n==$breadcrumbs|@count}
+{if $hideControllerPublicName}
+	{if $n<2}
+		<span class="crumb"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+		<span class="crumb-arrow">&rarr;</span>
+	{elseif $n==2}
+		<span class="crumb-current"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
+		<span class="crumb-arrow">&nbsp;</span>
+	{/if}
+{else}
+	{if $n==$breadcrumbs|@count}
 		<span id="crumb-current">{$breadcrumbs[i].name}</span>
 		<span class="crumb-arrow">&nbsp;</span>
 	{else}
 		<span class="crumb"><a href="{$breadcrumbs[i].url}">{$breadcrumbs[i].name}</a></span>
 		<span class="crumb-arrow">&rarr;</span>
 	{/if}
+{/if}
 	{/section}
 	</div>
 {/if}
