@@ -35,9 +35,6 @@
             escape="false" />
     </target>
 
-
-
-
 <target name="deploy">
   <svnupdate svnpath="svn" nocache="true" todir="${deploy.location}" />
 </target>
@@ -70,6 +67,6 @@
               ${deploy.db.name} &lt; ${basedir}/${deploy.db.dump}" />
     </target>
 
-<target name="build" depends="checkout,clean,phpdoc,deploy,alterconfig,deploydb" />
+<target name="build" depends="checkout,clean,phpdoc,phpcs,deploy,alterconfig,deploydb" />
 <!-- Unused targets: phpdoc  -->
 </project>
