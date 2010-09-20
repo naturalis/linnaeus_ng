@@ -83,392 +83,6 @@
 		}
 
 		/**
-		* Finds out if a collaborator has a role within the specified project
-		*
-		* @param  	string	$userId	id of the user to find
-		* @param  	string	$projectId	id of the project to find
-		* @return 	boolean	collaborator is part of the project, or not
-		* @access 	private
-		*/
-		private function isUserPartOfProject($user,$project) {
-
-			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$user,'project_id'=>$project));
-
-			return count((array)$pru)!=0;
-
-		}
-
-		/**
-		* Retrieves a collaborator's role within the specified project
-		*
-		* @param  	string	$userId	id of the user to find
-		* @param  	string	$projectId	id of the project to find
-		* @return 	array	role of user
-		* @access 	private
-		*/
-		private function getUserProjectRole($userId,$projectId) {
-
-			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$userId,'project_id'=>$projectId));
-
-			if ($pru) {
-
-				$r = $this->models->Role->get($pru[0]['role_id']);
-
-				$pru[0]['role'] = $r;
-			}
-			
-			return $pru[0];
-
-		}
-
-		/**
-		* Encodes a user's password for storing or checking against the database when logging in
-		*
-		* Currently md5 is used as encoding function
-		*
-		* @param  	string	$p	the password
-		* @return 	string	as 32 byte md5 hash
-		* @access 	private
-		*/
-		private function userPasswordEncode($p) {
-
-			return md5($p);
-
-		}
-
-		/**
-		* Verifies if the user data that has been entered is complete 
-		*
-		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
-		* @return 	boolean	data is complete or not
-		* @access 	private
-		*/
-		private function isUserDataComplete($fieldsToIgnore = array()) {
-
-			$result = true;
-
-			if (!in_array('username',$fieldsToIgnore) && $this->requestData['username'] == '') {
-			
-				$this->addError(_('Missing username'));
-
-				$result = false;
-
-			}
-			
-			if (!in_array('password',$fieldsToIgnore) && $this->requestData['password'] == '') {
-			
-				$this->addError(_('Missing password'));
-
-				$result = false;
-
-			}
-
-			if (!in_array('password_2',$fieldsToIgnore) && $this->requestData['password_2'] == '') {
-			
-				$this->addError(_('Missing password repeat'));
-
-				$result = false;
-
-			}
-			
-
-			if (!in_array('first_name',$fieldsToIgnore) && $this->requestData['first_name'] == '') {
-			
-				$this->addError(_('Missing first name'));
-
-				$result = false;
-
-			}
-
-			if (!in_array('last_name',$fieldsToIgnore) && $this->requestData['last_name'] == '') {
-			
-				$this->addError(_('Missing last name'));
-
-				$result = false;
-
-			}
-
-			if (!in_array('email_address',$fieldsToIgnore) && $this->requestData['email_address'] =='') {
-			
-				$this->addError(_('Missing email address'));
-
-				$result = false;
-
-			}
-			
-			return $result;
-
-		}
-		
-		/**
-		* Check whether a username qualifies as correct
-		*
-		* Looks currently only at length constraints (5 <= length <= 16)
-		*
-		* @param  	string	$username	username to check; if absent, username is taken from the request variables
-		* @return 	boolean	username is correct or not
-		* @access 	private
-		* @todo		a more complete check
-		*/
-		private function isUsernameCorrect($username = false) {
-
-			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
-
-			$result  = true;
-		
-			if (strlen($username) < 5) {
-		
-				$this->addError(_('Username too short'));
-			
-				$result = false;
-
-			}
-
-			if (strlen($username) > 16) {
-		
-				$this->addError(_('Username too long'));
-			
-				$result = false;
-
-			}
-
-			return $result;
-
-		}
-
-		/**
-		* Check whether a password qualifies as correct
-		*
-		* Looks currently only at length constraints (5 <= length <= 16)
-		*
-		* @param  	string	$password	password to check; if absent, password is taken from the request variables
-		* @param  	string	$password_2	second password from user data form; idem.
-		* @return 	boolean	password is correct (and identical if two were supplied) or not 
-		* @access 	private
-		* @todo		a more complete check
-		*/
-		private function isPasswordCorrect($password = false, $password_2 = false) {
-
-			if (!$password) $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
-
-			if (!$password_2) $password_2 = isset($this->requestData['password_2']) ? $this->requestData['password_2'] : null;
-
-			$result  = true;
-		
-			if (strlen($password) < 5) {
-		
-				$this->addError(_('Password too short'));
-			
-				$result = false;
-
-			}
-
-			if (strlen($password) > 16) {
-		
-				$this->addError(_('Password too long'));
-			
-				$result = false;
-
-			}
-			
-			if ($password_2 != '' && ($password != $password_2)) {
-
-				$this->addError(_('Passwords not the same'));
-			
-				$result = false;
-
-			}
-
-
-			return $result;
-
-		}
-
-		/**
-		* Check whether an e-mail address qualifies as correct
-		*
-		* Uses reg exp mask: /^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/
-		*
-		* @param  	string	$email_address	address to check; if absent, username is taken from the request variables
-		* @return 	boolean	address is correct or not
-		* @access 	private
-		*/
-		private function isEmailAddressCorrect($email_address = false) {
-
-			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
-
-			$result  = true;
-
-			$regexp = "/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/";
-
-			if (!preg_match($regexp, $email_address)) {
-
-				$this->addError(_('Invalid e-mail address'));
-			
-				$result = false;
-
-			}
-
-			return $result;
-
-		}
-
-		/**
-		* Tests whether userdata (username and emailaddress) is correct
-		*
-		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
-		* @return 	boolean	unique or not
-		* @access 	private
-		*/
-
-		private function isUserDataCorrect($fieldsToIgnore = array()) {
-
-			$result = true;
-
-			if (!in_array('username',$fieldsToIgnore)) if(!$this->isUsernameCorrect()) $result = false;
-
-			if (!in_array('password',$fieldsToIgnore)) if(!$this->isPasswordCorrect()) $result = false;
-
-			if (!in_array('email_address',$fieldsToIgnore)) if(!$this->isEmailAddressCorrect()) $result = false;
-
-			return $result;
-
-		}
-
-		/**
-		* Tests whether username is unique in the database
-		*
-		* @param  	string	$username	username to check; if false, it is the 'username' var from the request data that is tested
-		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-		* @return 	boolean	unique or not
-		* @access 	private
-		*/
-		private function isUsernameUnique($username = false, $idToIgnore = false) {
-
-			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
-
-			$result  = true;
-
-			if ($username=='') {
-
-				$result = false;
-
-			} else {
-			
-				if ($idToIgnore) {
-
-					$w = array('username' => $username,'id !=' => $idToIgnore);
-
-				} else {
-
-					$w = array('username' => $username);
-
-				}
-
-				$users =  $this->models->User->get($w);
-	
-				if (count((array)$users)!=0) {
-	
-					$this->addError(_('Username already exists'));
-				
-					$result = false;
-	
-				}
-
-			}
-
-			return $result;
-
-		}
-
-		/**
-		* Tests whether emailaddress is unique in the database
-		*
-		* @param  	string	$email_address	address to check; if false, it is the 'email_address' var from the request data that is tested
-		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-		* @param  	boolean	$suppress_error	if true, function just returns result and adds no error
-		* @return 	boolean	unique or not
-		* @access 	private
-		*/
-		private function isEmailAddressUnique($email_address = false, $idToIgnore = false, $suppress_error = false) {
-
-			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
-
-			$result  = true;
-			
-			if ($email_address=='') {
-
-				$result = false;
-
-			} else {
-
-				if ($idToIgnore) {
-
-					$w = array('email_address' => $email_address,'id !=' => $idToIgnore);
-
-				} else {
-
-					$w = array('email_address' => $email_address);
-
-				}
-
-				$users =  $this->models->User->get($w);
-
-				if (count((array)$users)!=0) {
-	
-					if (!$suppress_error) $this->addError(_('E-mail address already exists'));
-
-					$result = false;
-	
-				}
-
-			}
-
-			return $result;
-
-		}
-
-		/**
-		* Tests whether userdata (username and emailaddress) is unique in the database
-		*
-		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-		* @return 	boolean	unique or not
-		* @access 	private
-		*/
-		private function isUserDataUnique($idToIgnore = false) {
-
-			$result = true;
-
-			if(!$this->isUsernameUnique(false, $idToIgnore)) $result = false;
-
-			if(!$this->isEmailAddressUnique(false, $idToIgnore)) $result = false;
-
-			return $result;
-
-		}
-
-		/**
-		* Finds existing users in the database, based on mathcing name and/or emailaddress
-		*
-		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-		* @return 	array	array of users
-		* @access 	private
-		*/
-		private function getSimilarUsers($idToIgnore = false) {
-
-			$q = "select * from %table% where 
-					((lower(first_name) = '". $this->models->User->escapeString(strtolower($this->requestData['first_name']))."'
-					and lower(last_name) = '". $this->models->User->escapeString(strtolower($this->requestData['last_name']))."')
-					or email_address = '". $this->models->User->escapeString($this->requestData['email_address'])."')".
-					($idToIgnore ? " and id !=". $idToIgnore : '' );
-
-			$users =  $this->models->User->get($q);
-
-			return $users;
-
-		}
-
-		/**
 		* Login page and function
 		*
 		* See function code for detailed comments on the function's flow
@@ -1052,24 +666,6 @@
 		}
 		
 		/**
-		* View displaying 'not authorized'
-		*
-		* Users can be redirected to notAuthorizedAction from every controller,
-		* so the controller name is hidden in the output to avoid confusion.
-		*
-		* @access	public
-		*/
-		public function notAuthorizedAction() {
-
-			$this->smarty->assign('hideControllerPublicName', true);
-
-			$this->addError(_('You are not authorized to do that.'));
-
-			$this->printPage();
-
-		}
-		
-		/**
 		* AJAX interface for this class
 		*
 		* Is used by the 'edit' and 'create' views to check values without reloading the page
@@ -1151,6 +747,392 @@
 			if (count((array)$this->errors) == 0) $this->addMessage('Ok');
 
 			$this->printPage();
+
+		}
+
+		/**
+		* Finds out if a collaborator has a role within the specified project
+		*
+		* @param  	string	$userId	id of the user to find
+		* @param  	string	$projectId	id of the project to find
+		* @return 	boolean	collaborator is part of the project, or not
+		* @access 	private
+		*/
+		private function isUserPartOfProject($user,$project) {
+
+			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$user,'project_id'=>$project));
+
+			return count((array)$pru)!=0;
+
+		}
+
+		/**
+		* Retrieves a collaborator's role within the specified project
+		*
+		* @param  	string	$userId	id of the user to find
+		* @param  	string	$projectId	id of the project to find
+		* @return 	array	role of user
+		* @access 	private
+		*/
+		private function getUserProjectRole($userId,$projectId) {
+
+			$pru = $this->models->ProjectRoleUser->get(array('user_id'=>$userId,'project_id'=>$projectId));
+
+			if ($pru) {
+
+				$r = $this->models->Role->get($pru[0]['role_id']);
+
+				$pru[0]['role'] = $r;
+			}
+			
+			return $pru[0];
+
+		}
+
+		/**
+		* Encodes a user's password for storing or checking against the database when logging in
+		*
+		* Currently md5 is used as encoding function
+		*
+		* @param  	string	$p	the password
+		* @return 	string	as 32 byte md5 hash
+		* @access 	private
+		*/
+		private function userPasswordEncode($p) {
+
+			return md5($p);
+
+		}
+
+		/**
+		* Verifies if the user data that has been entered is complete 
+		*
+		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
+		* @return 	boolean	data is complete or not
+		* @access 	private
+		*/
+		private function isUserDataComplete($fieldsToIgnore = array()) {
+
+			$result = true;
+
+			if (!in_array('username',$fieldsToIgnore) && $this->requestData['username'] == '') {
+			
+				$this->addError(_('Missing username'));
+
+				$result = false;
+
+			}
+			
+			if (!in_array('password',$fieldsToIgnore) && $this->requestData['password'] == '') {
+			
+				$this->addError(_('Missing password'));
+
+				$result = false;
+
+			}
+
+			if (!in_array('password_2',$fieldsToIgnore) && $this->requestData['password_2'] == '') {
+			
+				$this->addError(_('Missing password repeat'));
+
+				$result = false;
+
+			}
+			
+
+			if (!in_array('first_name',$fieldsToIgnore) && $this->requestData['first_name'] == '') {
+			
+				$this->addError(_('Missing first name'));
+
+				$result = false;
+
+			}
+
+			if (!in_array('last_name',$fieldsToIgnore) && $this->requestData['last_name'] == '') {
+			
+				$this->addError(_('Missing last name'));
+
+				$result = false;
+
+			}
+
+			if (!in_array('email_address',$fieldsToIgnore) && $this->requestData['email_address'] =='') {
+			
+				$this->addError(_('Missing email address'));
+
+				$result = false;
+
+			}
+			
+			return $result;
+
+		}
+		
+		/**
+		* Check whether a username qualifies as correct
+		*
+		* Looks currently only at length constraints (5 <= length <= 16)
+		*
+		* @param  	string	$username	username to check; if absent, username is taken from the request variables
+		* @return 	boolean	username is correct or not
+		* @access 	private
+		* @todo		a more complete check
+		*/
+		private function isUsernameCorrect($username = false) {
+
+			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
+
+			$result  = true;
+		
+			if (strlen($username) < 5) {
+		
+				$this->addError(_('Username too short'));
+			
+				$result = false;
+
+			}
+
+			if (strlen($username) > 16) {
+		
+				$this->addError(_('Username too long'));
+			
+				$result = false;
+
+			}
+
+			return $result;
+
+		}
+
+		/**
+		* Check whether a password qualifies as correct
+		*
+		* Looks currently only at length constraints (5 <= length <= 16)
+		*
+		* @param  	string	$password	password to check; if absent, password is taken from the request variables
+		* @param  	string	$password_2	second password from user data form; idem.
+		* @return 	boolean	password is correct (and identical if two were supplied) or not 
+		* @access 	private
+		* @todo		a more complete check
+		*/
+		private function isPasswordCorrect($password = false, $password_2 = false) {
+
+			if (!$password) $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
+
+			if (!$password_2) $password_2 = isset($this->requestData['password_2']) ? $this->requestData['password_2'] : null;
+
+			$result  = true;
+		
+			if (strlen($password) < 5) {
+		
+				$this->addError(_('Password too short'));
+			
+				$result = false;
+
+			}
+
+			if (strlen($password) > 16) {
+		
+				$this->addError(_('Password too long'));
+			
+				$result = false;
+
+			}
+			
+			if ($password_2 != '' && ($password != $password_2)) {
+
+				$this->addError(_('Passwords not the same'));
+			
+				$result = false;
+
+			}
+
+
+			return $result;
+
+		}
+
+		/**
+		* Check whether an e-mail address qualifies as correct
+		*
+		* Uses reg exp mask: /^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/
+		*
+		* @param  	string	$email_address	address to check; if absent, username is taken from the request variables
+		* @return 	boolean	address is correct or not
+		* @access 	private
+		*/
+		private function isEmailAddressCorrect($email_address = false) {
+
+			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
+
+			$result  = true;
+
+			$regexp = "/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/";
+
+			if (!preg_match($regexp, $email_address)) {
+
+				$this->addError(_('Invalid e-mail address'));
+			
+				$result = false;
+
+			}
+
+			return $result;
+
+		}
+
+		/**
+		* Tests whether userdata (username and emailaddress) is correct
+		*
+		* @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
+
+		private function isUserDataCorrect($fieldsToIgnore = array()) {
+
+			$result = true;
+
+			if (!in_array('username',$fieldsToIgnore)) if(!$this->isUsernameCorrect()) $result = false;
+
+			if (!in_array('password',$fieldsToIgnore)) if(!$this->isPasswordCorrect()) $result = false;
+
+			if (!in_array('email_address',$fieldsToIgnore)) if(!$this->isEmailAddressCorrect()) $result = false;
+
+			return $result;
+
+		}
+
+		/**
+		* Tests whether username is unique in the database
+		*
+		* @param  	string	$username	username to check; if false, it is the 'username' var from the request data that is tested
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
+		private function isUsernameUnique($username = false, $idToIgnore = false) {
+
+			if (!$username) $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
+
+			$result  = true;
+
+			if ($username=='') {
+
+				$result = false;
+
+			} else {
+			
+				if ($idToIgnore) {
+
+					$w = array('username' => $username,'id !=' => $idToIgnore);
+
+				} else {
+
+					$w = array('username' => $username);
+
+				}
+
+				$users =  $this->models->User->get($w);
+	
+				if (count((array)$users)!=0) {
+	
+					$this->addError(_('Username already exists'));
+				
+					$result = false;
+	
+				}
+
+			}
+
+			return $result;
+
+		}
+
+		/**
+		* Tests whether emailaddress is unique in the database
+		*
+		* @param  	string	$email_address	address to check; if false, it is the 'email_address' var from the request data that is tested
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @param  	boolean	$suppress_error	if true, function just returns result and adds no error
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
+		private function isEmailAddressUnique($email_address = false, $idToIgnore = false, $suppress_error = false) {
+
+			if (!$email_address) $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
+
+			$result  = true;
+			
+			if ($email_address=='') {
+
+				$result = false;
+
+			} else {
+
+				if ($idToIgnore) {
+
+					$w = array('email_address' => $email_address,'id !=' => $idToIgnore);
+
+				} else {
+
+					$w = array('email_address' => $email_address);
+
+				}
+
+				$users =  $this->models->User->get($w);
+
+				if (count((array)$users)!=0) {
+	
+					if (!$suppress_error) $this->addError(_('E-mail address already exists'));
+
+					$result = false;
+	
+				}
+
+			}
+
+			return $result;
+
+		}
+
+		/**
+		* Tests whether userdata (username and emailaddress) is unique in the database
+		*
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	boolean	unique or not
+		* @access 	private
+		*/
+		private function isUserDataUnique($idToIgnore = false) {
+
+			$result = true;
+
+			if(!$this->isUsernameUnique(false, $idToIgnore)) $result = false;
+
+			if(!$this->isEmailAddressUnique(false, $idToIgnore)) $result = false;
+
+			return $result;
+
+		}
+
+		/**
+		* Finds existing users in the database, based on mathcing name and/or emailaddress
+		*
+		* @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
+		* @return 	array	array of users
+		* @access 	private
+		*/
+		private function getSimilarUsers($idToIgnore = false) {
+
+			$q = "select * from %table% where 
+					((lower(first_name) = '". $this->models->User->escapeString(strtolower($this->requestData['first_name']))."'
+					and lower(last_name) = '". $this->models->User->escapeString(strtolower($this->requestData['last_name']))."')
+					or email_address = '". $this->models->User->escapeString($this->requestData['email_address'])."')".
+					($idToIgnore ? " and id !=". $idToIgnore : '' );
+
+			$users =  $this->models->User->get($q);
+
+			return $users;
 
 		}
 

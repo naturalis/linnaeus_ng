@@ -32,6 +32,66 @@
 
 		}
 
+		/**
+		* View displaying 'not authorized'
+		*
+		* Users can be redirected to notAuthorizedAction from every controller,
+		* so the controller name is hidden in the output to avoid confusion.
+		*
+		* @access	public
+		*/
+		public function notAuthorizedAction() {
+
+			$this->smarty->assign('hideControllerPublicName', true);
+
+			$this->addError(_('You are not authorized to do that.'));
+
+			$this->printPage();
+
+		}
+
+		/**
+		* View displaying warning that the accessed module is not part of the current project
+		*
+		* Users can be redirected to moduleNotPresentAction from every controller,
+		* so the controller name is hidden in the output to avoid confusion.
+		*
+		* @access	public
+		*/
+		public function moduleNotPresentAction() {
+
+			$this->smarty->assign('hideControllerPublicName', true);
+
+			$this->addError(_('The module "'.$_SESSION['system']['last_module_name'].'" is not part of your project.'));
+
+			$this->printPage();
+
+		}
+		
+		/**
+		* AJAX interface for this class
+		*
+		* @access	public
+		*/
+		public function ajaxInterfaceAction() {
+
+			if (!isset($this->requestData['action'])) return;
+
+			if ($this->requestData['action']=='heartbeat') {
+
+				$this->ajaxActionHeartbeat();
+
+			} else
+			if ($this->requestData['action']=='get_taxa_edit_states') {
+
+				$this->ajaxActionGetTaxaEditStates();
+
+			}
+
+			$this->printPage();
+
+		}
+
 		private function cleanUpHeartbeats() {
 
 			$this->models->Heartbeat->delete(
@@ -119,31 +179,6 @@
 			}
 
 			$this->smarty->assign('returnText',isset($h) ? json_encode($h):null);
-
-		}
-
-
-		/**
-		* AJAX interface for this class
-		*
-		* @access	public
-		*/
-		public function ajaxInterfaceAction() {
-
-			if (!isset($this->requestData['action'])) return;
-
-			if ($this->requestData['action']=='heartbeat') {
-
-				$this->ajaxActionHeartbeat();
-
-			} else
-			if ($this->requestData['action']=='get_taxa_edit_states') {
-
-				$this->ajaxActionGetTaxaEditStates();
-
-			}
-
-			$this->printPage();
 
 		}
 
