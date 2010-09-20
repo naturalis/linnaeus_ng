@@ -69,6 +69,7 @@ $(document).ready(function(){
 			taxonConfirmSaveOnUnload();
 		} 
 	);
+	
 });
 </script>
 {/literal}

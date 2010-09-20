@@ -58,7 +58,6 @@ function allSetMessage(msg,err) {
 
 }
 
-
 var heartbeatUserId = false;
 var heartbeatApp = false;
 var heartbeatCtrllr = false;
