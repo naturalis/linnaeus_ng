@@ -1,39 +1,38 @@
 #block-inline-help {
-	margin-top:10px;
-	background-color:#eee;
-	float:right;
-	width:300px;
-	height:0px;
+	margin-top: 10px;
+	background-color: #eee;
+	float: right;
+	width: 300px;
+	height: 0px;
 }
 
 #block-inline-help #title {
-	cursor:pointer;
-	width:100%;
-	background-color:#aaa;
-	color:#eee;
-	text-align:center;
-	font-weight:bold;
+	cursor: pointer;
+	width: 100%;
+	background-color: #aaa;
+	color: #eee;
+	text-align: center;
+	font-weight: bold;
 }
 
 #block-inline-help .body-visible,.body-collapsed {
-	background-color:#fff;
-	visibility:visible;
-	border:1px dotted #ccc;
+	background-color: #fff;
+	visibility: visible;
+	border: 1px dotted #ccc;
 }
 
 #block-inline-help .body-collapsed {
-	visibility:hidden;
+	visibility: hidden;
 }
 
 #block-inline-help .subject {
-	background-color:#eee;
-	color:#222;
-	text-align:center;
-	font-weight:bold;
+	background-color: #eee;
+	color: #222;
+	text-align: center;
+	font-weight: bold;
 }
 
 #block-inline-help .text {
-	text-align:justify;
-	padding:2px 2px 10px 2px;
+	text-align: justify;
+	padding: 2px 2px 10px 2px;
 }
-

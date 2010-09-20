@@ -1,4 +1,7 @@
 <?php
+
+
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,13 +16,13 @@
  * Name:     strip_tags<br>
  * Purpose:  strip html tags from text
  * @link http://smarty.php.net/manual/en/language.modifier.strip.tags.php
- *          strip_tags (Smarty online manual)
+ * strip_tags (Smarty online manual)
  * @author   Monte Ohrt <monte at ohrt dot com>
  * @param string
  * @param boolean
  * @return string
  */
-function smarty_modifier_strip_tags($string, $replace_with_space = true)
+function smarty_modifier_strip_tags ($string, $replace_with_space = true)
 {
     if ($replace_with_space)
         return preg_replace('!<[^>]*?>!', ' ', $string);

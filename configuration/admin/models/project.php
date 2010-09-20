@@ -1,32 +1,39 @@
 <?php
 
-    include_once('model.php');
+include_once ('model.php');
 
-    class Project extends Model {
+class Project extends Model
+{
+    
+    const tableBaseName = 'projects';
 
-        const tableBaseName = 'projects';
 
-        /**
-        * Constructor, calls parent's constructor
-        *
-        * @access     public
-        */
-        public function __construct() {
 
-            parent::__construct(self::tableBaseName);
-
-        }
-
-        /**
-        * Destructor
-        *
-        * @access     public
-        */
-        public function __destruct() {
-
-            parent::__destruct();
-
-        }
-
+    /**
+     * Constructor, calls parent's constructor
+     *
+     * @access     public
+     */
+    public function __construct ()
+    {
+        
+        parent::__construct(self::tableBaseName);
+    
     }
+
+
+
+    /**
+     * Destructor
+     *
+     * @access     public
+     */
+    public function __destruct ()
+    {
+        
+        parent::__destruct();
+    
+    }
+
+}
 
