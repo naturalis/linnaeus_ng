@@ -1,4 +1,7 @@
 <?php
+
+
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,10 +16,10 @@
  * Purpose:  assign debug info to the template<br>
  * @author Monte Ohrt <monte at ohrt dot com>
  * @param array unused in this plugin, this plugin uses {@link Smarty::$_config},
- *              {@link Smarty::$_tpl_vars} and {@link Smarty::$_smarty_debug_info}
+ * {@link Smarty::$_tpl_vars} and {@link Smarty::$_smarty_debug_info}
  * @param Smarty
  */
-function smarty_function_assign_debug_info($params, &$smarty)
+function smarty_function_assign_debug_info ($params, &$smarty)
 {
     $assigned_vars = $smarty->_tpl_vars;
     ksort($assigned_vars);

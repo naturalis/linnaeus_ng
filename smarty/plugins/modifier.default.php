@@ -1,4 +1,7 @@
 <?php
+
+
+
 /**
  * Smarty plugin
  * @package Smarty
@@ -13,13 +16,13 @@
  * Name:     default<br>
  * Purpose:  designate default value for empty variables
  * @link http://smarty.php.net/manual/en/language.modifier.default.php
- *          default (Smarty online manual)
+ * default (Smarty online manual)
  * @author   Monte Ohrt <monte at ohrt dot com>
  * @param string
  * @param string
  * @return string
  */
-function smarty_modifier_default($string, $default = '')
+function smarty_modifier_default ($string, $default = '')
 {
     if (!isset($string) || $string === '')
         return $default;

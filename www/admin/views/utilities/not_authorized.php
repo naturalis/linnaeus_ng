@@ -1,8 +1,8 @@
 <?php
 
-    require_once('../../../../configuration/admin/controllers/UtilitiesController.php');
+require_once ('../../../../configuration/admin/controllers/UtilitiesController.php');
 
-    $c = new UtilitiesController();
+$c = new UtilitiesController();
 
-    $c->notAuthorizedAction();
+$c->notAuthorizedAction();
 

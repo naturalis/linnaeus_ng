@@ -1,23 +1,23 @@
 body {
-	margin:0px;
-	padding:0px;
+	margin: 0px;
+	padding: 0px;
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
-	font-size:12px;
+	font-size: 12px;
 }
 
 table {
-	padding:0px 0px 0px 0px;
-	margin:0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
 
-td, th, tr  {
+td,th,tr {
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
-	font-size:12px;
-	padding:0px 0px 0px 0px;
-	padding-right:5px;
-	margin:0px 0px 0px 0px;
+	font-size: 12px;
+	padding: 0px 0px 0px 0px;
+	padding-right: 5px;
+	margin: 0px 0px 0px 0px;
 }
 
 th {
-	text-align:left;
+	text-align: left;
 }

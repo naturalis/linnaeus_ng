@@ -1,10 +1,11 @@
 <?php
 
-    // AJAX interface
+// AJAX interface
 
-    require_once('../../../../configuration/admin/controllers/UsersController.php');
 
-    $c = new UsersController();
+require_once ('../../../../configuration/admin/controllers/UsersController.php');
 
-    $c->ajaxInterfaceAction();
+$c = new UsersController();
+
+$c->ajaxInterfaceAction();
 
