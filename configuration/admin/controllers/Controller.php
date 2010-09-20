@@ -7,32 +7,29 @@ include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
 class Controller extends BaseClass
 {
     
+    private $_smartySettings;
+    private $_viewName;
+    private $_fullPath;
+    private $_helpTexts;
+
     public $smarty;
-    private $smartySettings;
-    private $viewName;
-    public $controllerBaseName;
-    private $fullPath;
-    public $pageName;
     public $requestData;
     public $data;
+    public $randomValue;
+    public $breadcrumbIncludeReferer;
     public $errors;
     public $messages;
-    private $currentUserId;
-    private $currentProjectId;
+    public $controllerBaseName;
+    public $pageName;
+    public $controllerPublicName;
     public $sortField;
     public $sortDirection;
     public $sortCaseSensitivity;
-    private $helpTexts;
-    public $controllerPublicName;
-    public $randomValue;
-    public $usedHelpers;
-    public $breadcrumbIncludeReferer;
     
     private $usedModelsBase = array(
         'helptext', 
         'module_project'
     );
-
 
 
     /**
@@ -128,7 +125,7 @@ class Controller extends BaseClass
     public function getViewName ()
     {
         
-        return $this->viewName;
+        return $this->_viewName;
     
     }
 
@@ -185,12 +182,11 @@ class Controller extends BaseClass
 
         if (basename($url) == $url) {
             
-            $circular = (basename($this->fullPath) == $url);
+            $circular = (basename($this->_fullPath) == $url);
         
-        }
-        else {
+        } else {
             
-            $circular = ($this->fullPath == $url);
+            $circular = ($this->_fullPath == $url);
         
         }
         
@@ -219,8 +215,7 @@ class Controller extends BaseClass
             
             $this->errors[] = $error;
         
-        }
-        else {
+        } else {
             
             foreach ($error as $key => $val) {
                 
@@ -446,10 +441,9 @@ class Controller extends BaseClass
             
             $this->setCurrentProjectId($d[0]['project_id']);
         
-        }
+        } else {
         // if user has more roles, set the project in which he has the lowest role_id as the active project
         // (this assumes that the roles with the most permissions have the lowest ids)
-        else {
             
             $t = false;
             
@@ -488,8 +482,7 @@ class Controller extends BaseClass
             
             return $_SESSION['login_start_page'];
         
-        }
-        else {
+        } else {
             
             return $this->generalSettings['rootWebUrl'] . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
         
@@ -585,8 +578,7 @@ class Controller extends BaseClass
                     
                     return true;
                 
-                }
-                else {
+                } else {
                     
                     $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['notAuthorized']);
                     
@@ -597,11 +589,9 @@ class Controller extends BaseClass
 						*/
                     if ($this->getViewName() == 'Index') {
                         
-                        $this->redirect(
-                        $this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['logout']);
+                        $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['logout']);
                     
-                    }
-                    else {
+                    } else {
                         
                         $this->redirect('index.php');
                     
@@ -609,15 +599,13 @@ class Controller extends BaseClass
                 
                 }
             
-            }
-            else {
+            } else {
                 
                 $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject']);
             
             }
         
-        }
-        else {
+        } else {
             
             $this->setLoginStartPage();
             
@@ -862,9 +850,9 @@ class Controller extends BaseClass
     private function setNames ()
     {
         
-        $this->fullPath = $_SERVER['PHP_SELF'];
+        $this->_fullPath = $_SERVER['PHP_SELF'];
         
-        $path = pathinfo(substr_replace($this->fullPath, '', 0, strlen($this->generalSettings['rootWebUrl']) - 1));
+        $path = pathinfo(substr_replace($this->_fullPath, '', 0, strlen($this->generalSettings['rootWebUrl']) - 1));
         
         $dirs = explode('/', $path['dirname']);
         
@@ -883,7 +871,7 @@ class Controller extends BaseClass
 			*/
         
         if (!empty($path['filename']))
-            $this->viewName = $path['filename'];
+            $this->_viewName = $path['filename'];
     
     }
 
@@ -897,19 +885,19 @@ class Controller extends BaseClass
     private function setSmarty ()
     {
         
-        $this->smartySettings = $this->config->getSmartySettings();
+        $this->_smartySettings = $this->config->getSmartySettings();
         
         $this->smarty = new Smarty();
         
         /* DEBUG */
         $this->smarty->force_compile = true;
         
-        $this->smarty->template_dir = $this->smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
-        $this->smarty->compile_dir = $this->smartySettings['dir_compile'];
-        $this->smarty->cache_dir = $this->smartySettings['dir_cache'];
-        $this->smarty->config_dir = $this->smartySettings['dir_config'];
-        $this->smarty->caching = $this->smartySettings['caching'];
-        $this->smarty->compile_check = $this->smartySettings['compile_check'];
+        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
+        $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
+        $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
+        $this->smarty->config_dir = $this->_smartySettings['dir_config'];
+        $this->smarty->caching = $this->_smartySettings['caching'];
+        $this->smarty->compile_check = $this->_smartySettings['compile_check'];
     
     }
 
@@ -1002,6 +990,8 @@ class Controller extends BaseClass
     private function loadHelpers ()
     {
         
+		if (!isset($this->usedHelpers)) return;
+
         foreach ((array) $this->usedHelpers as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
@@ -1032,7 +1022,7 @@ class Controller extends BaseClass
     private function setHelpTexts ()
     {
         
-        $this->helpTexts = $this->models->Helptext->get(array(
+        $this->_helpTexts = $this->models->Helptext->get(array(
             'controller' => $this->getControllerBaseName() ? $this->getControllerBaseName() : '-', 
             'view' => $this->getViewName()
         ), false, 'show_order');
@@ -1050,7 +1040,7 @@ class Controller extends BaseClass
     private function getHelpTexts ()
     {
         
-        return $this->helpTexts;
+        return $this->_helpTexts;
     
     }
 
@@ -1115,7 +1105,7 @@ class Controller extends BaseClass
     private function setLastVisitedPage ()
     {
         
-        $_SESSION['system']['referer']['url'] = $this->fullPath;
+        $_SESSION['system']['referer']['url'] = $this->_fullPath;
         
         $_SESSION['system']['referer']['name'] = $this->getPageName();
     
@@ -1131,13 +1121,13 @@ class Controller extends BaseClass
     private function setSessionActivePageValues ()
     {
         
-        $_SESSION['system']['active_page']['url'] = $this->fullPath;
+        $_SESSION['system']['active_page']['url'] = $this->_fullPath;
         
         if (isset($this->appName)) $_SESSION['system']['active_page']['appName'] = $this->appName;
         
         if (isset($this->controllerBaseName)) $_SESSION['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
         
-        if (isset($this->viewName)) $_SESSION['system']['active_page']['viewName'] = $this->viewName;
+        if (isset($this->_viewName)) $_SESSION['system']['active_page']['viewName'] = $this->_viewName;
     
     }
 
@@ -1154,7 +1144,7 @@ class Controller extends BaseClass
     private function setLoginStartPage ()
     {
         
-        $_SESSION['login_start_page'] = $this->fullPath;
+        $_SESSION['login_start_page'] = $this->_fullPath;
     
     }
 
@@ -1178,14 +1168,14 @@ class Controller extends BaseClass
             'url' => $cp
         );
         
-        if ($this->fullPath != $cp && isset($_SESSION['project']['name'])) {
+        if ($this->_fullPath != $cp && isset($_SESSION['project']['name'])) {
             
             $this->breadcrumbs[] = array(
                 'name' => $_SESSION['project']['name'], 
                 'url' => $this->getLoggedInMainIndex()
             );
             
-            if (!empty($this->controllerPublicName) && $this->fullPath != $this->getLoggedInMainIndex()) {
+            if (!empty($this->controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
                 
                 $curl = $this->generalSettings['rootWebUrl'] . $this->appName . '/views/' . $this->controllerBaseName;
                 
