@@ -1133,11 +1133,11 @@ class Controller extends BaseClass
         
         $_SESSION['system']['active_page']['url'] = $this->fullPath;
         
-        $_SESSION['system']['active_page']['appName'] = $this->appName;
+        if (isset($this->appName)) $_SESSION['system']['active_page']['appName'] = $this->appName;
         
-        $_SESSION['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
+        if (isset($this->controllerBaseName)) $_SESSION['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
         
-        $_SESSION['system']['active_page']['viewName'] = $this->viewName;
+        if (isset($this->viewName)) $_SESSION['system']['active_page']['viewName'] = $this->viewName;
     
     }
 
@@ -1168,6 +1168,8 @@ class Controller extends BaseClass
     private function setBreadcrumbs ()
     {
         
+		if (!isset($this->appName)) return;
+
         // root of each trail: "choose project" page
         $cp = $this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject'];
         
