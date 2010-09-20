@@ -12,9 +12,9 @@ class BaseClass
 
     public function __construct ()
     {
-        
+
         $this->loadConfiguration();
-        
+
         $this->setGeneralSettings();
     
     }
@@ -35,8 +35,7 @@ class BaseClass
             
             $this->config = new configuration();
         
-        }
-        else {
+        } else {
             
             die(_('FATAL: cannot load configuration'));
         
