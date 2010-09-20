@@ -2,9 +2,11 @@
 
 	/*
 	
-	lijkt soms javascript niet te laden in edit action?
-	
-	check out tinyMCE spell checker (requires Google: online only)
+	tinyMCE spell checker:
+		- requires google: check if online
+		- change default lanmguage through js
+		- what if language has no iso2?
+		- what happens if language does not exist at google?
 
 	tinyMCE images: MCImageManager (€€€)
 
@@ -20,6 +22,7 @@
 		);
 
 		public $controllerPublicName = 'Species module';
+		public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
 
 		/**
 		* Constructor, calls parent's constructor
@@ -32,12 +35,12 @@
 			
 			$this->createTaxonPage(_('Main'),true);
 			
-			$this->smarty->assign('heartbeatFrequency',$this->generalSettings['heartbeatFrequency']);
+			$this->smarty->assign('heartbeatFrequency',$this->generalSettings['heartbeatFrequency']);			
 
 		}
 
 		/**
-		* Destroys!
+		* Destroys
 		*
 		* @access 	public
 		*/
@@ -62,19 +65,11 @@
 
 		}
 		
-		private function createTaxonPage($name,$isDefault = false) {
-
-			$this->models->TaxonPage->save(
-				array(
-					'id' => null,
-					'page' => $name,
-					'project_id' => $this->getCurrentProjectId(),
-					'def_page' => $isDefault ? '1' : '0'
-				)
-			);
-	
-		}
-	
+		/**
+		* Display, add, edit and delete subpages' names in all languages
+		*
+		* @access	public
+		*/
 		public function pageAction() {
 
 			$this->checkAuthorisation();
@@ -84,13 +79,7 @@
 			// adding a new page
 			if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
 
-				$tp = $this->models->TaxonPage->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getCurrentProjectId(),
-						'page' => $this->requestData['new_page']
-					)
-				);
+				$tp = $this->createTaxonPage($this->requestData['new_page']);				
 				
 				if ($tp!==true) {
 
@@ -146,27 +135,10 @@
 
 		}
 
-		private function doLockOutUser($taxonId) {
-
-			if (empty($taxonId)) return false;
-
-			$h = $this->models->Heartbeat->get(
-				array(
-					'project_id =' => $this->getCurrentProjectId(),
-					'app' => $this->getAppName(),
-					'ctrllr' => 'species',
-					'view' => 'edit',
-					'params' => serialize(array(array('taxon_id',$taxonId))),
-					'user_id !=' => $this->getCurrentUserId()
-				)
-			);
-
-			return isset($h) ? true : false;
-
-		}
-
 		/**
 		* Edit taxon action
+		*
+		* Actual saving etc. works via AJAX actions
 		*
 		* @access	public
 		*/
@@ -212,7 +184,10 @@
 					$l = $this->models->Language->get($val['language_id']);
 	
 					$lp[$key]['language'] = $l['language'];
-	
+
+					$lp[$key]['iso2'] = $l['iso2'];
+
+					$lp[$key]['iso3'] = $l['iso3'];
 	
 					if ($val['def_language']==1) $defaultLanguage = $val['language_id'];
 	
@@ -290,9 +265,9 @@
 			$this->printPage();
 
 		}
-		
+
 		/**
-		*  List of existing taxa
+		*  List existing taxa
 		*
 		* @access	public
 		*/
@@ -382,6 +357,100 @@
 			$this->printPage();
 
 		}		
+
+		/**
+		* AJAX interface for this class
+		*
+		* @access	public
+		*/
+		public function ajaxInterfaceAction() {
+
+			if (!isset($this->requestData['action'])) return;
+
+			if ($this->requestData['action']=='save_taxon') {
+
+				$this->ajaxActionSaveTaxon();
+
+			} else
+			if ($this->requestData['action']=='get_taxon') {
+
+				$this->ajaxActionGetTaxon();
+
+			} else
+			if ($this->requestData['action']=='delete_taxon') {
+
+				$this->ajaxActionDeleteTaxon();
+
+			} else
+			if ($this->requestData['action']=='delete_page') {
+
+				$this->ajaxActionDeletePage();
+
+			} else
+			if ($this->requestData['action']=='save_page_title') {
+
+				$this->ajaxActionSavePageTitle();
+
+			} else
+			if ($this->requestData['action']=='get_page_states') {
+
+				$this->ajaxActionGetPageStates();
+
+			} else
+			if ($this->requestData['action']=='publish_content') {
+
+				$this->ajaxActionPublishContent();
+
+			} else
+			if ($this->requestData['action']=='get_taxon_undo') {
+
+				$this->ajaxActionGetTaxonUndo();
+
+			}
+
+			$this->printPage();
+
+		}
+
+		/**
+		* Create a new subpage.
+		*
+		* A subpage is page devoted to a specific subject that appears in every taxon's
+		* detail page (main, breeding, threats, etc).
+		*
+		* @access	private
+		*/
+		private function createTaxonPage($name,$isDefault = false) {
+
+			return $this->models->TaxonPage->save(
+				array(
+					'id' => null,
+					'page' => $name,
+					'project_id' => $this->getCurrentProjectId(),
+					'def_page' => $isDefault ? '1' : '0'
+				)
+			);
+	
+		}
+	
+		private function doLockOutUser($taxonId) {
+
+			if (empty($taxonId)) return false;
+
+			$h = $this->models->Heartbeat->get(
+				array(
+					'project_id =' => $this->getCurrentProjectId(),
+					'app' => $this->getAppName(),
+					'ctrllr' => 'species',
+					'view' => 'edit',
+					'params' => serialize(array(array('taxon_id',$taxonId))),
+					'user_id !=' => $this->getCurrentUserId()
+				)
+			);
+
+			return isset($h) ? true : false;
+
+		}
 
 		private function ajaxActionDeletePage() {
 
@@ -842,62 +911,6 @@
 				}
 
 			}
-
-		}
-
-
-
-		/**
-		* AJAX interface for this class
-		*
-		* @access	public
-		*/
-		public function ajaxInterfaceAction() {
-
-			if (!isset($this->requestData['action'])) return;
-
-			if ($this->requestData['action']=='save_taxon') {
-
-				$this->ajaxActionSaveTaxon();
-
-			} else
-			if ($this->requestData['action']=='get_taxon') {
-
-				$this->ajaxActionGetTaxon();
-
-			} else
-			if ($this->requestData['action']=='delete_taxon') {
-
-				$this->ajaxActionDeleteTaxon();
-
-			} else
-			if ($this->requestData['action']=='delete_page') {
-
-				$this->ajaxActionDeletePage();
-
-			} else
-			if ($this->requestData['action']=='save_page_title') {
-
-				$this->ajaxActionSavePageTitle();
-
-			} else
-			if ($this->requestData['action']=='get_page_states') {
-
-				$this->ajaxActionGetPageStates();
-
-			} else
-			if ($this->requestData['action']=='publish_content') {
-
-				$this->ajaxActionPublishContent();
-
-			} else
-			if ($this->requestData['action']=='get_taxon_undo') {
-
-				$this->ajaxActionGetTaxonUndo();
-
-			}
-
-			$this->printPage();
 
 		}
 

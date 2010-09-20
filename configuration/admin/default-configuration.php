@@ -14,11 +14,13 @@
 				'heartbeatFrequency' => 60000, // milliseconds
 				'autosaveFrequency' => 300000, // milliseconds
 				'rootWebUrl' => '@URL.WEBROOT@'	,
+				'controllerIndexNameExtension' => '-index.php' ,
 				'paths' => array(
 					'login' => '/views/users/login.php',
 					'logout' => '/views/users/logout.php',
 					'chooseProject' => '/views/users/choose_project.php',
-					'notAuthorized' => '/views/users/not_authorized.php'
+					'notAuthorized' => '/views/utilities/not_authorized.php',
+					'moduleNotPresent' => '/views/utilities/module_not_present.php',
 				),
 				'uploading' => array(
 					'defaultUploadFilemask' => array(

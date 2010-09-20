@@ -27,7 +27,7 @@
 		public $usedHelpers;
 		public $breadcrumbIncludeReferer;
 
-		private $usedModelsBase = array('helptext');
+		private $usedModelsBase = array('helptext','module_project');
 
 		/**
 		* Constructor, calls parent's constructor and all initialisation functions
@@ -59,7 +59,9 @@
 			$this->setMiscellaneous();
 			
 			$this->setPaths();
-			
+
+			$this->checkModuleActivationStatus();
+
 		}
 
 		/**
@@ -415,8 +417,13 @@
 
 			} else {
 
-				return $this->generalSettings['rootWebUrl'].$this->getAppName().'/'.$this->getAppName().'-index.php';
-						
+				return
+					$this->generalSettings['rootWebUrl'].
+					$this->getAppName().
+					'/'.
+					$this->getAppName().
+					$this->generalSettings['controllerIndexNameExtension'];
+
 			}
 
 		}
@@ -674,6 +681,40 @@
 		public function setBreadcrumbIncludeReferer($value = true) {
 
 			$this->breadcrumbIncludeReferer = $value;
+
+		}
+
+
+		public function checkModuleActivationStatus() {
+		
+			if ($this->getModuleActivationStatus()==-1) {
+			
+				$_SESSION['system']['last_module_name'] = $this->controllerPublicName;
+	
+				$this->redirect(
+					$this->generalSettings['rootWebUrl'].
+					$this->appName.
+					$this->generalSettings['paths']['moduleNotPresent']
+				);
+
+			}
+
+		}
+
+		private function getModuleActivationStatus() {
+		
+			// if a controller has no module id, it is accessible at all times
+			if (!isset($this->controllerModuleId)) return 1;
+
+			$mp = $this->models->ModuleProject->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'module_id' => $this->controllerModuleId
+				)
+			);
+			
+			// return 1 for present and activated modules, 0 for just present, and -1 for not present
+			return ($mp[0]['active'] == 'n' ? 0 : ($mp[0]['active'] == 'y' ? 1 : -1));
 
 		}
 
