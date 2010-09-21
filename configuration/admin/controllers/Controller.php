@@ -432,8 +432,7 @@ class Controller extends BaseClass
         $d = (array) $_SESSION['user']['_roles'];
         
         // if user has no roles, do nothing
-        if (count($d) == 0)
-            return;
+        if (count($d) == 0) return;
             
         // if user has only one role, set the corresponding project as the active project
         if (count($d) == 1) {
@@ -441,9 +440,13 @@ class Controller extends BaseClass
             $this->setCurrentProjectId($d[0]['project_id']);
         
         } else {
+		// new plan: if user has more than one project assigned, he has to chose himself
+
+			return;
+
         // if user has more roles, set the project in which he has the lowest role_id as the active project
         // (this assumes that the roles with the most permissions have the lowest ids)
-            
+			
             $t = false;
             
             foreach ((array) $d as $key => $val) {
@@ -476,15 +479,22 @@ class Controller extends BaseClass
      */
     public function getLoginStartPage ()
     {
-        
+
         if (!empty($_SESSION['login_start_page'])) {
             
             return $_SESSION['login_start_page'];
         
         } else {
-            
-            return $this->generalSettings['rootWebUrl'] . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
-        
+
+			if ($_SESSION["user"]["_number_of_projects"]==1) {
+
+	            return $this->generalSettings['rootWebUrl'] . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
+    
+			} else {
+
+	            return $this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject'];
+
+			}    
         }
     
     }

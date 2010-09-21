@@ -9,6 +9,7 @@
 {/if}
 
 <div id="page-main">
+Select a project to work on:
 <ul class="admin-list">
 {section name=i loop=$projects}
 <li>
