@@ -1,16 +1,6 @@
 </div ends="page-container">
 
 <div id="footer-container">
-{if !$excludecludeBottonMenu}
-	<div id="footer-menu">
-{if $session.user._number_of_projects > 1}
-		<a href="{$rootWebUrl}admin/views/users/choose_project.php">Switch projects</a>
-{/if}
-		<a href="{$rootWebUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>
-		<br />
-{/if}
-	</div>
-{/if}
 </div ends="footer-container">
 
 {if $debugMode}

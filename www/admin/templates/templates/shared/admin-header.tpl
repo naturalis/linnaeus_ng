@@ -28,6 +28,13 @@
 <div id="header-container">
 	<a href="{$rootWebUrl}admin/admin-index.php"><img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
 	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="eti-logo" /></a>
+
+{if !$excludeLogout}
+	<div style="text-align:right;position:relative;top:-20px">
+		<a href="{$rootWebUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>{/if}
+	</div>
+{/if}
+
 </div>
 <div id="page-container">
 
