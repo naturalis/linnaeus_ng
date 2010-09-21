@@ -39,7 +39,11 @@ class configuration
                 'imageDirProject' => self::applicationRootDir . 'www/admin/images/project', 
                 'imageDirUpload' => self::applicationRootDir . 'www/admin/images/upload'
             ), 
-            'maxSubPages' => 10
+            'maxSubPages' => 10,
+			'login-cookie' => array(
+				'name' => 'linnaeus-login',
+				'lifetime' => 30, // days
+			)
         );
     
     }
