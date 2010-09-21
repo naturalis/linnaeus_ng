@@ -12,8 +12,11 @@ class configuration
         
         return array(
             'debugMode' => false, 
-            'applicationName' => 'Linnaeus NG Administration', 
-            'applicationVersion' => '0.1', 
+            'app' => array(
+				'name' => 'Linnaeus NG Administration', 
+            	'version' => '@APP.VERSION@', 
+            	'versionTimestamp' => '@TIMESTAMP@', 
+			),
             'maxSessionHistorySteps' => 10, 
             'heartbeatFrequency' => 60000,  // milliseconds
             'autosaveFrequency' => 300000,  // milliseconds
