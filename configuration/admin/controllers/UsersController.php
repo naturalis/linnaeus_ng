@@ -191,24 +191,6 @@ class UsersController extends Controller
 
 
     /**
-     * Start page of the users controller
-     *
-     * @access	public
-     */
-    public function indexAction ()
-    {
-        
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Index'));
-        
-        $this->printPage();
-    
-    }
-
-
-
-    /**
      * Choosing the active project
      *
      * @access	public
@@ -294,7 +276,7 @@ class UsersController extends Controller
                     
                     unset($_SESSION['data']['new_user']);
                     
-                    $this->redirect('user_overview.php');
+                    $this->redirect('index.php');
                 
                 }
             
@@ -352,7 +334,7 @@ class UsersController extends Controller
                         
                         unset($_SESSION['data']['new_user']);
                         
-                        $this->redirect('user_overview.php');
+                        $this->redirect('index.php');
                     
                     }
                 
@@ -425,7 +407,7 @@ class UsersController extends Controller
                         
                         $this->addMessage(
                         '<input type="button" value="' . _('yes') . '" onclick="$(\'#checked\').val(\'2\');$(\'#theForm\').submit();">&nbsp;
-								<input type="button" value="' . _('no') . '" onclick="window.open(\'user_overview.php\',\'_self\');">');
+								<input type="button" value="' . _('no') . '" onclick="window.open(\'index.php\',\'_self\');">');
                     
                     }
                     
@@ -466,13 +448,12 @@ class UsersController extends Controller
     }
 
 
-
     /**
      * Overview of all collaborators in the current project
      *
      * @access	public
      */
-    public function userOverviewAction ()
+    public function indexAction ()
     {
         
         $this->checkAuthorisation();
@@ -487,7 +468,12 @@ class UsersController extends Controller
         // get full details, as well as roles for each collaborator
         foreach ((array) $pru as $key => $val) {
             
-            $u = $this->models->User->get($val['user_id']);
+            $u = $this->models->User->get(
+				$val['user_id'],
+				'*, if(active=1,"active","blocked") as status, 
+				concat(datediff(curdate(),created)," '._('days').'") as days_active,
+				ifnull(last_login,"'._('(has never logged in)').'") as last_login'
+			);
             
             $r = $this->models->Role->get($val['role_id']);
             
@@ -511,7 +497,7 @@ class UsersController extends Controller
         else {
             
             $sortBy = array(
-                'key' => 'last_name', 
+                'key' => 'username', 
                 'dir' => 'asc', 
                 'case' => 'i'
             );
@@ -524,7 +510,17 @@ class UsersController extends Controller
         $this->smarty->assign('sortBy', $sortBy);
         
         $this->smarty->assign('users', $users);
-        
+
+        $this->smarty->assign('columnsToShow',
+			array(
+				array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
+				array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
+				array('name'=> 'role', 'label'  => _('role'),'align' => 'left'),
+				array('name'=> 'days_active', 'label' => _('collaborator for'),'align' => 'right'),
+				array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
+			)
+		);
+
         $this->printPage();
     
     }
@@ -607,7 +603,7 @@ class UsersController extends Controller
                 }
                 
                 // redirect user to overview of remaining collaborators
-                $this->redirect('user_overview.php');
+                $this->redirect('index.php');
                 
             // user requested data update
             }

@@ -15,7 +15,7 @@ function allTableColumnSort(col) {
 
 	var e = document.getElementById('key');
 	e.value = col;
-	e = document.getElementById('postForm');
+	e = document.getElementById('sortForm');
 	e.submit();
 }
 
@@ -104,6 +104,19 @@ function allSetHeartbeat(userid,app,ctrllr,view,params) {
 function allSetAutoSaveFreq(freq) {
 
 	autosaveFreq = freq;
+
+}
+
+function userDeleteUser(id) {
+
+	if (confirm('Are you sure?')) { 
+		var e = document.getElementById('delete'); 
+		e.value = '1'; 
+		e = document.getElementById('id'); 
+		e.value = id; 
+		e = document.getElementById('deleteForm'); 
+		e.submit(); 
+	}
 
 }
 

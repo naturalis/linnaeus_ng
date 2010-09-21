@@ -53,19 +53,6 @@ class ProjectsController extends Controller
 
 
 
-    public function indexAction ()
-    {
-        
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Index'));
-        
-        $this->printPage();
-    
-    }
-
-
-
     public function modulesAction ()
     {
         

@@ -1,10 +1,18 @@
-a {
+a,.pseudo-a {
 	text-decoration: none;
 	color: #000099;
 }
 
-a:hover {
+.pseudo-a {
+	cursor:pointer;
+}
+
+a:hover,.pseudo-a:hover {
 	text-decoration: underline;
+}
+
+.tr-highlight:hover {
+	background-color: #eee;
 }
 
 #body-container {
@@ -144,6 +152,27 @@ a:hover {
 .text-block {
 	margin-bottom: 10px;
 }
+
+.th-userlist-left-align {
+	padding-right:20px;
+}
+
+.th-userlist-right-align {
+	/* doesn't seem to work!? */
+	text-align:right;
+	padding-left:10px;
+}
+
+.cell-userlist-left-align {
+	padding-right:20px;
+}
+
+.cell-userlist-right-align {
+	/* doesn't seem to work!? */
+	text-align:right;
+	padding-left:10px;
+}
+
 
 .cell-module-unused,.cell-module-activate,.cell-module-reactivate,.cell-module-in-use,.cell-module-deactivate,.cell-module-inactive,.cell-module-delete,.cell-module-invisible,.cell-moduser-inactive,.cell-moduser-remove
 	{
