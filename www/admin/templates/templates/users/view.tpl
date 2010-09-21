@@ -12,10 +12,6 @@
 		<td>username:</td><td>{$data.username}</td>
 	</tr>
 	<tr>
-		<td>gender:</td>
-		<td>{$data.gender}</td>
-	</tr>
-	<tr>
 		<td>email address:</td>
 		<td>{$data.email_address}</td>
 	</tr>
