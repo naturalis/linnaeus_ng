@@ -575,6 +575,7 @@ abstract class Model extends BaseClass
                       standard operator is '=' but it is possible to tag another operator 
                       after the column-value (array('last_name !=' => 'gates' ))
                     - a full query with %table% as tablename
+					- * for no where clause
                 $cols can hold a string that replaces the defualt * in 'select * from...'
 
             */
@@ -632,8 +633,25 @@ abstract class Model extends BaseClass
             
             }
         
-        }
-        elseif (is_numeric($id)) {
+        } elseif ($id=='*') {
+
+            $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName;
+            
+            $query .= $groupby ? " group by " . $groupby : '';
+            
+            $query .= $order ? " order by " . $order : '';
+
+            $set = mysql_query($query);
+            
+            $this->setLastQuery($query);
+            
+            while ($row = mysql_fetch_assoc($set)) {
+                
+                $this->data[] = $row;
+            
+            }
+        
+        } elseif (is_numeric($id)) {
             
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where id =' . $this->escapeString($id) . ' limit 1';
             
@@ -641,8 +659,7 @@ abstract class Model extends BaseClass
             
             $this->data = mysql_fetch_assoc(mysql_query($query));
         
-        }
-        else {
+        } else {
             
             $this->setLastQuery($query);
             

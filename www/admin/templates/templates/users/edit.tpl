@@ -102,7 +102,54 @@
 	</tr>
 
 	<tr>
-		<td>role in current project:</td>
+		<td>timezone</td>
+		<td>
+			<select name="timezone_id">
+			{section name=i loop=$zones}
+				<option 
+					value="{$zones[i].id}"
+					{if $zones[i].id==$data.timezone_id} selected class="option-selected" {/if}
+				>{$zones[i].timezone}: {$zones[i].locations}</option>
+			{/section}
+			</select>
+	</td>
+	</tr>
+	<tr>
+		<td>language</td>
+		<td><input 
+				type="text" 
+				name="language" 
+				id="language" 
+				value="{$data.language}" 
+				maxlength="16"
+			/>
+			<span id="language-message" class=""></span>
+		</td>
+	</td>
+	</tr>
+	<tr>
+		<td>send e-mail notifications</td>
+		<td>
+			<label for="email_notifications-y">
+				<input
+					type="radio" 
+					id="email_notifications-y" 
+					name="email_notifications" 
+					value="1"
+					{if $data.email_notifications=='1'}checked="checked"{/if}/>y
+			</label>
+			<label for="email_notifications-n">
+				<input
+					type="radio" 
+					id="email_notifications-n" 
+					name="email_notifications" 
+					value="0" 
+					{if $data.email_notifications!='1'}checked="checked"{/if} />n
+			</label>
+		</td>
+	</tr>
+	<tr>
+		<td>project role</td>
 		<td>
 		{if $isLeadExpert}Lead expert{else}
 			<select name="role_id">
@@ -115,8 +162,9 @@
 			{/section}
 			</select>
 		{/if}
-</td>
+	</td>
 	</tr>
+
 	<tr>
 		<td>active</td>
 		<td>

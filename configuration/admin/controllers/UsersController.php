@@ -1,11 +1,11 @@
 <?php
 
 /*
-	
-		- replace hard coded role_id's
-		- user.active is project wide, but can be set by specific project admins...
 
-	*/
+	- replace hard coded role_id's
+	- user.active is project wide, but can be set by specific project admins...
+
+*/
 
 include_once ('Controller.php');
 
@@ -18,7 +18,8 @@ class UsersController extends Controller
         'role', 
         'project_role_user', 
         'project', 
-        'right_role'
+        'right_role',
+		'timezone'
     );
     
     public $controllerPublicName = 'User administration';
@@ -568,7 +569,7 @@ class UsersController extends Controller
      */
     public function editAction ()
     {
-        
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Edit project collaborator'));
@@ -602,9 +603,8 @@ class UsersController extends Controller
                 // redirect user to overview of remaining collaborators
                 $this->redirect('index.php');
                 
+            } else if (isset($this->requestData['checked']) && $this->requestData['checked'] == '1') {
             // user requested data update
-            }
-            else if (isset($this->requestData['checked']) && $this->requestData['checked'] == '1') {
                 
                 // make sure an unassignable role (like system admin) wasn't injected
                 $r = $this->models->Role->get($this->requestData['role_id']);
@@ -615,8 +615,7 @@ class UsersController extends Controller
                     
                     $saveUser = false;
                 
-                }
-                else {
+                } else {
                     
                     $saveUser = true;
                     
@@ -653,9 +652,7 @@ class UsersController extends Controller
                     }
                     
                     // check whether data is unique; passing the collaborator's id avoids conflict with himself
-                    if (!$this->isUserDataUnique(
-                    $this->requestData['id']))
-                        $saveUser = false;
+                    if (!$this->isUserDataUnique($this->requestData['id'])) $saveUser = false;
                 
                 }
                 
@@ -667,8 +664,7 @@ class UsersController extends Controller
                         
                         $this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
                     
-                    }
-                    else {
+                    } else {
                         
                         unset($this->requestData['password']);
                     
@@ -679,8 +675,7 @@ class UsersController extends Controller
                     $this->requestData['id'], $this->getCurrentProjectId());
                     
                     // if collaborator has a regular role, update to the new role...
-                    if ($upr['role_id'] != 1 && $upr['role_id'] !=
-                     2) {
+                    if ($upr['role_id'] != 1 && $upr['role_id'] != 2) {
                         
                         $this->models->ProjectRoleUser->save(
                         array(
@@ -690,17 +685,15 @@ class UsersController extends Controller
                             'role_id' => $this->requestData['role_id']
                         ));
                     
-                    }
+                    } else {
                     // ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
-                    else {
                         
                         $this->requestData['active'] = 1;
                     
                     }
                     
                     // save the new data
-                    $this->models->User->save(
-                    $this->requestData);
+                    $this->models->User->save($this->requestData);
                     
                     $this->addMessage(_('User data saved'));
                 
@@ -722,9 +715,13 @@ class UsersController extends Controller
             $roles = $this->models->Role->get(array(
                 'assignable' => 'y'
             ));
-            
+
+            $zones = $this->models->Timezone->get('*');
+
             $this->smarty->assign('isLeadExpert', $upr['role_id'] == 2);
-            
+
+            $this->smarty->assign('zones', $zones);
+
             $this->smarty->assign('roles', $roles);
             
             $this->smarty->assign('data', $user);

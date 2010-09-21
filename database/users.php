@@ -100,3 +100,4 @@ CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
 
 insert into dev_projects_roles_users values (null, 1, 1, 15);
 insert into dev_projects_roles_users values (null, 2, 1, 15);
+
