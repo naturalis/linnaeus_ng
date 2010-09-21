@@ -171,7 +171,7 @@
 			{literal}
 			<input type="button" value="Delete" onclick="if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); } " />
 			{/literal}
-			<input type="button" value="Back" onclick="window.open('user_overview.php','_self');" />
+			<input type="button" value="Back" onclick="window.open('index.php','_self');" />
 		</td>
 	</tr>
 </table>

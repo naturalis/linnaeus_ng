@@ -39,7 +39,7 @@ You have to define at least one language in your project before you can add any 
 {/if}
 </div>
 
-<form method="post" action="" name="postForm" id="postForm">
+<form method="post" action="" name="sortForm" id="sortForm">
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>

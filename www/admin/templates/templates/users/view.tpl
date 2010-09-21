@@ -28,7 +28,7 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			<input type="button" value="Back" onclick="window.open('user_overview.php','_self');" />
+			<input type="button" value="Back" onclick="window.open('index.php','_self');" />
 			<input type="button" value="Edit" onclick="window.open('edit.php?id={$data.id}','_self');" />
 		</td>
 	</tr>
