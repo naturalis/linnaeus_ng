@@ -491,53 +491,6 @@ class Controller extends BaseClass
     }
 
 
-
-    /**
-     * Sets user's data in a session after logging in
-     *
-     * User data retrieved after logging in is stored in a session for faster access.
-     * Data includes basic personal data, the user's various roles within projects,
-     * the user's rights to see actual pages and the number of projects he is assigned to.
-     *
-     * @param  	array	$userData	basic user data
-     * @param  	array	$roles	user's roles
-     * @param  	array	$rights	user's rights
-     * @param  	integer	$numberOfProjects	number of assigned projects
-     * @access 	public
-     */
-    public function setUserSession ($userData, $roles, $rights, $numberOfProjects)
-    {
-        
-        if (!$userData)
-            return;
-        
-        $userData['_login']['time'] = time();
-        $userData['_login']['remember'] = false;
-        
-        $userData['_roles'] = $roles;
-        $userData['_rights'] = $rights;
-        $userData['_number_of_projects'] = $numberOfProjects;
-        
-        $_SESSION['user'] = $userData;
-    
-    }
-
-
-
-    /**
-     * Destroys a user's session (when logging out)
-     *
-     * @access 	public
-     */
-    public function destroyUserSession ()
-    {
-        
-        session_destroy();
-    
-    }
-
-
-
     /**
      * Checks whether a user is logged in
      *

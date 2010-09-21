@@ -3,6 +3,7 @@
 /*
 	
 		- replace hard coded role_id's
+		- user.active is project wide, but can be set by specific project admins...
 
 	*/
 
@@ -104,7 +105,6 @@ class UsersController extends Controller
     }
 
 
-
     /**
      * Login page and function
      *
@@ -114,11 +114,24 @@ class UsersController extends Controller
      */
     public function loginAction ()
     {
-        
+
+		// user previously set remember me: auto-login
+		$u = $this->getRememberedUser();
+
+ 		if ($u) {
+
+			$this->doLogin($u[0],true);
+
+			// determine and redirect to the default start page after logging in
+			$this->redirect($this->getLoginStartPage());
+
+		}
+
+
         $this->setPageName(_('Login'));
-        
+       
         $this->smarty->assign('excludeLogout', true);
-        
+       
         // check wheter the user has entered a username and/or password
         if ((isset($this->requestData['username']) && $this->requestData['username'] != '') || (isset($this->requestData['password']) && $this->requestData['password'] !=
          '')) {
@@ -131,34 +144,16 @@ class UsersController extends Controller
                 'active' => '1'
             ));
             
-            // no user found
             if (count((array) $users) != 1) {
+            // no user found
                 
                 $this->addError(_('Login failed'));
-            
 
-            }
-            // user found 
-            else {
-                
-                // update last and number of logins
-                $this->models->User->save(
-                array(
-                    'id' => $users[0]['id'], 
-                    'last_login' => 'now()', 
-                    'logins' => 'logins+1'
-                ));
-                
-                // get user's roles and rights
-                $cur = $this->getCurrentUserRights($users[0]['id']);
-                
-                // save all relevant data to the session
-                $this->setUserSession($users[0], $cur['roles'], $cur['rights'], 
-                $cur['number_of_projects']);
-                
-                // determine and set the default active project
-                $this->setDefaultProject();
-                
+            } else {
+            // user found
+
+				$this->doLogin($users[0],(isset($this->requestData['remember_me']) && $this->requestData['remember_me'] == '1'));
+
                 // determine and redirect to the default start page after logging in
                 $this->redirect($this->getLoginStartPage());
             
@@ -183,7 +178,9 @@ class UsersController extends Controller
         $this->setPageName(_('Logout'));
         
         $this->destroyUserSession();
-        
+		
+		$this->unsetRememberMeCookie();
+
         $this->redirect('login.php');
     
     }
@@ -840,6 +837,142 @@ class UsersController extends Controller
     }
 
 
+    /**
+     * Calls all the relevant methods to log the user in
+     *
+     * @param  	array	$user	basic user data
+     * @param  	boolean	$remember	whether or not the user wants his being loged in to be remembered across sessions
+     * @access 	private
+     */
+	private function doLogin($user,$remember) 
+	{
+
+		// update last and number of logins
+		$this->models->User->save(
+			array(
+				'id' => $user['id'], 
+				'last_login' => 'now()', 
+				'logins' => 'logins+1'
+			)
+		);
+		
+		// get user's roles and rights
+		$cur = $this->getCurrentUserRights($user['id']);
+		
+		// save all relevant data to the session
+		$this->setUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
+		
+		// set 'remember me' cookie
+		if ($remember) {
+		
+			$this->setRememberMeCookie();
+		
+		} else {
+		
+			$this->unsetRememberMeCookie();
+		
+		}
+		
+		// determine and set the default active project
+		$this->setDefaultProject();
+
+	}
+
+
+    /**
+     * Sets user's data in a session after logging in
+     *
+     * User data retrieved after logging in is stored in a session for faster access.
+     * Data includes basic personal data, the user's various roles within projects,
+     * the user's rights to see actual pages and the number of projects he is assigned to.
+     *
+     * @param  	array	$userData	basic user data
+     * @param  	array	$roles	user's roles
+     * @param  	array	$rights	user's rights
+     * @param  	integer	$numberOfProjects	number of assigned projects
+     * @access 	public
+     */
+    private function setUserSession ($userData, $roles, $rights, $numberOfProjects )
+    {
+        
+        if (!$userData) return;
+        
+        $userData['_login']['time'] = time();
+
+        $userData['_roles'] = $roles;
+        $userData['_rights'] = $rights;
+        $userData['_number_of_projects'] = $numberOfProjects;
+        
+        $_SESSION['user'] = $userData;
+    
+    }
+
+    /**
+     * Destroys a user's session (when logging out)
+     *
+     * @access 	public
+     */
+    private function destroyUserSession ()
+    {
+        
+        session_destroy();
+    
+    }
+
+
+	private function setRememberMeCookie()
+	{
+
+		setcookie(
+			$this->generalSettings['login-cookie']['name'], 
+			$this->getCurrentUserId(), 
+			time() + (86400 * $this->generalSettings['login-cookie']['lifetime'])
+		);
+
+	}
+
+
+	private function getRememberMeCookie()
+	{
+
+		return isset($_COOKIE[$this->generalSettings['login-cookie']['name']]) ? $_COOKIE[$this->generalSettings['login-cookie']['name']] : false;
+
+	}
+
+
+	private function unsetRememberMeCookie()
+	{
+
+		setcookie(
+			$this->generalSettings['login-cookie']['name'], 
+			false, 
+			time() - 86400
+		);
+
+	}
+	
+	private function getRememberedUser()
+	{
+
+		$c = $this->getRememberMeCookie();
+
+		if ($c) {
+
+			return $this->models->User->get(
+				array(
+					'id' => $c,
+					'active' => '1'
+				)
+			);
+
+		} else {
+
+			return false;
+	
+		}
+
+	}
+
 
     /**
      * Finds out if a collaborator has a role within the specified project
@@ -1116,17 +1249,20 @@ class UsersController extends Controller
         
         $result = true;
         
-        if (!in_array('username', $fieldsToIgnore))
+        if (!in_array('username', $fieldsToIgnore)) {
             if (!$this->isUsernameCorrect())
                 $result = false;
+		}
         
-        if (!in_array('password', $fieldsToIgnore))
+        if (!in_array('password', $fieldsToIgnore)) {
             if (!$this->isPasswordCorrect())
                 $result = false;
+		}
         
-        if (!in_array('email_address', $fieldsToIgnore))
+        if (!in_array('email_address', $fieldsToIgnore)) {
             if (!$this->isEmailAddressCorrect())
                 $result = false;
+		}
         
         return $result;
     
@@ -1154,8 +1290,7 @@ class UsersController extends Controller
             
             $result = false;
         
-        }
-        else {
+        } else {
             
             if ($idToIgnore) {
                 
@@ -1164,8 +1299,7 @@ class UsersController extends Controller
                     'id !=' => $idToIgnore
                 );
             
-            }
-            else {
+            } else {
                 
                 $w = array(
                     'username' => $username
@@ -1212,8 +1346,7 @@ class UsersController extends Controller
             
             $result = false;
         
-        }
-        else {
+        } else {
             
             if ($idToIgnore) {
                 
@@ -1222,8 +1355,7 @@ class UsersController extends Controller
                     'id !=' => $idToIgnore
                 );
             
-            }
-            else {
+            } else {
                 
                 $w = array(
                     'email_address' => $email_address
