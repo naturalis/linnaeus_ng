@@ -39,7 +39,8 @@
 <div id="page-container">
 
 <div id="page-header-titles">
-	<span id="page-header-title">{$applicationName} v{$applicationVersion}</span>
+	<span id="page-header-title">{$app.name}</span>
+	<span id="page-header-version">{$app.version} ({$app.versionTimestamp})</span>
 	<br />
 {if $breadcrumbs}
 	<div id="breadcrumbs">

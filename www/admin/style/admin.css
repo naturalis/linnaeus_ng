@@ -76,6 +76,10 @@ a:hover,.pseudo-a:hover {
 	font-weight: bold;
 }
 
+#page-header-version {
+	font-size: 10px;
+}
+
 #breadcrumbs {
 	margin-left: 10px;
 	font-size: 12px;
