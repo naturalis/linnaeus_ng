@@ -154,8 +154,7 @@ class Controller extends BaseClass
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
         
-        $this->smarty->assign('applicationName', $this->generalSettings['applicationName']);
-        $this->smarty->assign('applicationVersion', $this->generalSettings['applicationVersion']);
+        $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
         
         $this->smarty->display(strtolower($this->getViewName() . '.tpl'));
