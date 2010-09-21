@@ -86,28 +86,6 @@
 		</td>
 	</tr>
 	<tr>
-		<td>gender</td>
-		<td>
-			<label for="gender-f">
-				<input 
-					type="radio" 
-					id="gender-f" 
-					name="gender" 
-					value="f" {if $data.gender!='m'}checked="checked"{/if}
-				/>f
-			</label>
-			<label for="gender-m">
-				<input
-					type="radio" 
-					id="gender-m" 
-					name="gender" 
-					value="m" {if $data.gender=='m'}checked="checked"{/if} 
-				/>m
-			</label>
-			<span class="asterisk-required-field">*</span>
-		</td>
-	</tr>
-	<tr>
 		<td>email_address</td>
 		<td>
 			<input 

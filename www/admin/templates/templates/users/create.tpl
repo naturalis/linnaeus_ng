@@ -90,32 +90,6 @@ Please verify the data below. Click 'Save' to save the user data; or 'Back' to r
 		</td>
 	</tr>
 	<tr>
-		<td>gender:</td>
-		<td>
-		{if $check==true}{$data.gender}{else}
-			<label for="gender-f">
-				<input 
-					type="radio" 
-					id="gender-f" 
-					name="gender" 
-					value="f" 
-					{if $data.gender!='m'}checked="checked"{/if}
-				/>f
-			</label>
-			<label for="gender-m">
-				<input
-					type="radio" 
-					id="gender-m" 
-					name="gender" 
-					value="m"
-					{if $data.gender=='m'}checked="checked"{/if}
-				 />m
-			</label>
-			<span class="asterisk-required-field">*</span>
-		{/if}
-		</td>
-	</tr>
-	<tr>
 		<td>email_address:</td>
 		<td>
 		{if $check==true}{$data.email_address}{else}
