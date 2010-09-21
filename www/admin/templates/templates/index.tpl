@@ -1,4 +1,5 @@
 {assign var=breadcrumbs value=false}
+{assign var=excludeLogout value=true}
 {include file="shared/admin-header.tpl"}
 
 <div id="page-main">
@@ -6,5 +7,5 @@
 	To login, follow  <a href="views/users/login.php">this link</a>.
 </div>
 
-{assign var=excludeLogout value=true}
+
 {include file="shared/admin-footer.tpl"}
