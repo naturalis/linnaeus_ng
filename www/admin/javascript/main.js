@@ -123,6 +123,13 @@ function userDeleteUser(id) {
 
 function userRemoteValueCheck(id,values,tests,idti) {
 
+	if (values[0].length==0) {
+
+		$('#'+id+'-message').html('');
+		return;
+
+	}
+
 	$.ajax({ url:
 				"ajax_interface.php?f="+encodeURIComponent(id)+
 				"&v="+encodeURIComponent(values)+
