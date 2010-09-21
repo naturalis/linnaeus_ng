@@ -117,7 +117,7 @@ class UsersController extends Controller
         
         $this->setPageName(_('Login'));
         
-        $this->smarty->assign('excludecludeBottonMenu', true);
+        $this->smarty->assign('excludeLogout', true);
         
         // check wheter the user has entered a username and/or password
         if ((isset($this->requestData['username']) && $this->requestData['username'] != '') || (isset($this->requestData['password']) && $this->requestData['password'] !=

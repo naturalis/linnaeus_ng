@@ -148,9 +148,9 @@ class ProjectsController extends Controller
                 'module_id' => $val['module_id']
             ));
             
-            foreach ((array) $mpu as $key2 => $val2) {
+            foreach ((array) $mpu as $k => $v) {
                 
-                $modules[$key]['collaborators'][$val2['user_id']] = $val2;
+                $modules[$key]['collaborators'][$v['user_id']] = $v;
             
             }
         
@@ -167,9 +167,9 @@ class ProjectsController extends Controller
                 'free_module_id' => $val['id']
             ));
             
-            foreach ((array) $fpu as $key2 => $val2) {
+            foreach ((array) $fpu as $k => $v) {
                 
-                $free_modules[$key]['collaborators'][$val2['user_id']] = $val2;
+                $free_modules[$key]['collaborators'][$v['user_id']] = $v;
             
             }
         

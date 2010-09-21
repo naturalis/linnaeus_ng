@@ -130,7 +130,7 @@ class SpeciesController extends Controller
         
         foreach ((array) $pages as $key => $page) {
             
-            foreach ((array) $lp as $key2 => $language) {
+            foreach ((array) $lp as $k => $language) {
                 
                 $tpt = $this->models->TaxonPageTitle->get(
                 array(
@@ -230,7 +230,7 @@ class SpeciesController extends Controller
             
             foreach ((array) $tp as $key => $val) {
                 
-                foreach ((array) $lp as $key2 => $language) {
+                foreach ((array) $lp as $k => $language) {
                     
                     $tpt = $this->models->TaxonPageTitle->get(
                     array(
@@ -335,7 +335,7 @@ class SpeciesController extends Controller
         
         foreach ((array) $taxa as $key => $taxon) {
             
-            foreach ((array) $lp as $key2 => $val) {
+            foreach ((array) $lp as $k => $val) {
                 
                 $ct = $this->models->ContentTaxon->get(
                 array(
@@ -346,17 +346,17 @@ class SpeciesController extends Controller
                 
                 foreach ((array) $ct as $key3 => $pub) {
                     
-                    $lp[$key2]['publish'][$taxon['id']][$pub['state']] = $pub['tot'];
+                    $lp[$k]['publish'][$taxon['id']][$pub['state']] = $pub['tot'];
                 
                 }
                 
-                isset($lp[$key2]['publish'][$taxon['id']]['published']) || $lp[$key2]['publish'][$taxon['id']]['published'] = 0;
+                isset($lp[$k]['publish'][$taxon['id']]['published']) || $lp[$k]['publish'][$taxon['id']]['published'] = 0;
                 
-                isset($lp[$key2]['publish'][$taxon['id']]['unpublished']) || $lp[$key2]['publish'][$taxon['id']]['unpublished'] = 0;
+                isset($lp[$k]['publish'][$taxon['id']]['unpublished']) || $lp[$k]['publish'][$taxon['id']]['unpublished'] = 0;
                 
-                $lp[$key2]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
+                $lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
                 
-                $lp[$key2]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$key2]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
+                $lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
             
             }
         

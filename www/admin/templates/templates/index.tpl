@@ -6,5 +6,5 @@
 	To login, follow  <a href="views/users/login.php">this link</a>.
 </div>
 
-{assign var=excludecludeBottonMenu value=true}
+{assign var=excludeLogout value=true}
 {include file="shared/admin-footer.tpl"}
