@@ -2,7 +2,8 @@
 
 /*
 
-hard coded number of free modules
+	hard coded number of free modules
+	deleting of (free) moduels does not as yet delete any data, warnings or not
 
 */
 
@@ -83,7 +84,8 @@ class ProjectsController extends Controller
                 array(
                     'id' => null, 
                     'module' => $this->requestData['module_new'], 
-                    'project_id' => $this->getCurrentProjectId()
+                    'project_id' => $this->getCurrentProjectId(),
+					'active' => 'n'
                 ));
                 
                 $_SESSION['system']['last_rnd'] = $this->requestData['rnd'];
@@ -304,10 +306,10 @@ class ProjectsController extends Controller
 
     private function ajaxActionModules ($moduleType, $action, $id)
     {
-        
+
         if ($moduleType == 'free') {
             
-            if ($action == 'activate' || $action == 'reactivate') {
+            if ($action == 'module_publish') {
                 
                 $this->models->FreeModuleProject->update(array(
                     'active' => 'y'
@@ -316,8 +318,7 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
-            }
-            if ($action == 'deactivate') {
+            } elseif ($action == 'module_unpublish') {
                 
                 $this->models->FreeModuleProject->update(array(
                     'active' => 'n'
@@ -326,8 +327,7 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
-            }
-            else if ($action == 'delete') {
+            } elseif ($action == 'module_delete') {
                 
                 $this->models->FreeModuleProjectUser->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -341,30 +341,31 @@ class ProjectsController extends Controller
             
             }
         
-        }
-        else {
-            
-            if ($action == 'activate') {
+        } elseif ($moduleType == 'regular') {
+
+            if ($action == 'module_activate') {
                 
                 $this->models->ModuleProject->save(array(
                     'id' => null, 
                     'module_id' => $id, 
+					'active' => 'n',
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
-            }
-            else if ($action == 'reactivate') {
+            } elseif ($action == 'module_publish') {
                 
-                $this->models->ModuleProject->update(array(
-                    'active' => 'y'
-                ), array(
-                    'module_id' => $id, 
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+                $this->models->ModuleProject->update(
+					array(
+	                    'active' => 'y'
+                	), 
+					array(
+						'module_id' => $id, 
+						'project_id' => $this->getCurrentProjectId()
+                	)
+				);
             
 
-            }
-            else if ($action == 'deactivate') {
+            } elseif ($action == 'module_unpublish') {
                 
                 $this->models->ModuleProject->update(array(
                     'active' => 'n'
@@ -373,8 +374,7 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
-            }
-            else if ($action == 'delete') {
+            } elseif ($action == 'module_delete') {
                 
                 $this->models->ModuleProjectUser->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
@@ -532,7 +532,7 @@ class ProjectsController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-        
+
         $view = !empty($this->requestData['v']) ? $this->requestData['v'] : null;
         
         $id = !empty($this->requestData['i']) ? $this->requestData['i'] : null;
@@ -541,7 +541,7 @@ class ProjectsController extends Controller
         
         $action = !empty($this->requestData['a']) ? $this->requestData['a'] : null;
         
-        if (!$view)
+        if (!$view && $this->requestData['view']=='')
             return;
             
         // determine type of module: free or standard
@@ -558,9 +558,9 @@ class ProjectsController extends Controller
         
         }
         
-        if ($view == 'modules') {
+        if ($this->requestData['view'] == 'modules') {
             
-            $this->ajaxActionModules($moduleType, $action, $id);
+            $this->ajaxActionModules($this->requestData['type'], $this->requestData['action'], $this->requestData['id']);
         
         }
         else if ($view == 'collaborators') {
@@ -573,7 +573,7 @@ class ProjectsController extends Controller
             $this->ajaxActionLanguages($action, $id, $user);
         
         }
-        
+
         $this->printPage();
     
     }

@@ -177,39 +177,34 @@ a:hover,.pseudo-a:hover {
 	padding-left:10px;
 }
 
-
-.cell-module-unused,.cell-module-activate,.cell-module-reactivate,.cell-module-in-use,.cell-module-deactivate,.cell-module-inactive,.cell-module-delete,.cell-module-invisible,.cell-moduser-inactive,.cell-moduser-remove
-	{
-	background-image: url(../images/system/icons/module-unused.png);
-	background-repeat: no-repeat;
-	width: 16px;
+.cell-module-header-module,.cell-module-header-status,.cell-module-header-actions {
+	border-bottom:1px solid #ccc;
 }
 
-.cell-module-activate,.cell-module-reactivate {
-	background-image: url(../images/system/icons/module-activate.png);
+.cell-module-header-module {
+	width:450px;
+}
+
+.cell-module-header-status {
+	width:250px;
+}
+
+.cell-module-header-actions {
+	width:100px;
+}
+
+.cell-module-title {
+	width:395px;
+}
+
+.cell-module-state {
+	padding-right:15px;
+	color:#555;
+}
+
+.cell-module-activate,.cell-module-reactivate,.cell-module-deactivate,.cell-module-delete {
 	cursor: pointer;
-}
-
-.cell-module-in-use {
-	background-image: url(../images/system/icons/module-inuse.png);
-}
-
-.cell-module-deactivate {
-	background-image: url(../images/system/icons/module-deactivate.png);
-	cursor: pointer;
-}
-
-.cell-module-inactive {
-	background-image: url(../images/system/icons/module-inactive.png);
-}
-
-.cell-module-delete {
-	background-image: url(../images/system/icons/module-delete.png);
-	cursor: pointer;
-}
-
-.cell-module-invisible {
-	background-image: none;
+	padding-right:10px;
 }
 
 .cell-moduser-inactive {
@@ -222,22 +217,21 @@ a:hover,.pseudo-a:hover {
 	cursor: pointer;
 }
 
-.cell-module-title-unused,.cell-module-title-in-use,.cell-module-title-inactive
-	{
-	color: #888;
+.module-title-unused,.module-title-in-use,.module-title-inactive {
+	color: #aaa;
 	width: 150px;
 }
 
-.cell-module-title-in-use {
+.module-title-in-use {
 	color: #000;
 	font-weight: bold;
 }
 
-.cell-module-title-inactive {
-	color: #444;
+.module-title-inactive {
+	color: #000;
 }
 
-.cell-module-title {
+.module-title {
 	font-variant: small-caps;
 }
 
