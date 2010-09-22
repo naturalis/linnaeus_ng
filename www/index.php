@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-	<title>Login</title>
+	<title></title>
 
 	<link href="/admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="/admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />

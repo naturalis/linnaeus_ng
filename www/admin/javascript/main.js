@@ -145,94 +145,220 @@ function userRemoteValueCheck(id,values,tests,idti) {
 
 }
 
-function moduleChangeModuleStatus(ele,removeIds) {
+var moduleModules = Array();
+var moduleFreeModules = Array();
 
-	var dummy = ele.id.replace('cell-','');
-	var id = dummy.substr(0,dummy.length-1);
-	var classname = ($('#'+ele.id).attr('class'));
-	var modulename = $('#cell-'+id+'e').html();
+function moduleAddModule(module) {
+	//[id,name,desc,[active,[id in project]]]
+	moduleModules[moduleModules.length] = module;
+}
 
-	if (classname == 'cell-module-activate') var action = 'activate';
-	else
-	if (classname == 'cell-module-reactivate') var action = 'reactivate';
-	else
-	if (classname == 'cell-module-deactivate') var action = 'deactivate';
-	else
-	if (classname == 'cell-module-delete') var action = 'delete';
-	else return;
+function moduleAddFreeModule(module) {
+	//[id,name,active]
+	moduleFreeModules[moduleFreeModules.length] = module;
+}
+
+function moduleDrawModuleBlock() {
+
+	var b = '<table>'+
+			'<tr>'+
+				'<td class="cell-module-header-module">Module</td>'+
+				'<td class="cell-module-header-status">Status</td>'+
+				'<td class="cell-module-header-actions" colspan="2">Actions</td>'+
+			'</tr>';
 	
-	if (action == 'delete') {
+	for(var i=0;i<moduleModules.length;i++) {
 
-		if (!allDoubleDeleteConfirm('the module',modulename)) return;
-
+		b = b +
+			'<tr class="tr-highlight">'+
+				'<td class="cell-module-title">'+
+					'<span class="module-title-'+(moduleModules[i][4]=='-' ? 'unused' : (moduleModules[i][3]=='y' ? 'in-use' : 'inactive'))+'" id="cell-'+moduleModules[i][0]+'d">'+
+					'<span class="module-title">'+moduleModules[i][1]+'</span> - '+moduleModules[i][2]+'</span>'+
+				'</td>'+
+				'<td>'+
+					(moduleModules[i][4]=='-' ? 'not' : '' )+
+					' part of the project'+
+					(moduleModules[i][3]=='y' ? '; published' : (moduleModules[i][4]!='-' ? '; unpublished' : '') )+
+				'</td>'+
+				'<td'+(moduleModules[i][4]=='-' ? '' : ' onclick="'+
+						(moduleModules[i][3]=='y' ? 'moduleUnpublishModule('+moduleModules[i][0]+')' : 'modulePublishModule('+moduleModules[i][0]+')')+'"')+'>'+
+						(moduleModules[i][4]=='-' ? '' : '[<span class="pseudo-a">'+(moduleModules[i][3]=='y' ? 'unpublish' : 'publish')+'</span>]')+
+				'</td>'+
+				'<td onclick="'+(moduleModules[i][4]=='-' ? 'moduleActivateModule('+moduleModules[i][0]+')' : 'moduleDeleteModule('+moduleModules[i][0]+')' )+'">'+
+					'[<span class="pseudo-a">'+(moduleModules[i][4]=='-' ? 'add' : 'delete' )+'</span>]'+
+				'</td>'+
+			'</tr>';
 	}
 
-	$.ajax({ url:"ajax_interface.php?v=modules&a="+encodeURIComponent(action)+"&i="+encodeURIComponent(id)+"&time="+allGetTimestamp(),
-		success: function(data){
+	b = b + '</table>';
 
-			//alert(data);
+	$('#module-table-div').html(b);
 
-			if (data=='<ok>') {
-				switch(action) {
-					case 'activate':
-					case 'reactivate':
-						var classa = 'cell-module-in-use';
-						var classb = 'cell-module-deactivate';
-						var classc = 'cell-module-invisible';	  
-						var classd = 'cell-module-title-in-use';	  
-						var titlea = 'in use in your project';
-						var titleb = 'deactivate (no data will be deleted)';
-						var titlec = '';
-						break;
-					case 'deactivate':
-						var classa = 'cell-module-inactive';
-						var classb = 'cell-module-reactivate';
-						var classc = 'cell-module-delete';	  
-						var classd = 'cell-module-title-inactive';	  
-						var titlea = 'in use in your project, but inactive';
-						var titleb = 're-activate';
-						var titlec = 'delete module and data';
-						break;
-					case 'delete':
-						var classa = 'cell-module-unused';
-						var classb = 'cell-module-activate';	  
-						var classc = 'cell-module-invisible';	  
-						var classd = 'cell-module-title-unused';	  
-						var titlea = 'not in use in your project';
-						var titleb = 'activate';
-						var titlec = '';
-						break;
-				}
+}
 
-				$('#cell-'+id+'a').removeClass().addClass(classa);
-				$('#cell-'+id+'b').removeClass().addClass(classb);
-				$('#cell-'+id+'c').removeClass().addClass(classc);
-				$('#cell-'+id+'d').removeClass().addClass(classd);
+function moduleDrawFreeModuleBlock() {
 
-				$('#cell-'+id+'a').attr('title',titlea);
-				$('#cell-'+id+'b').attr('title',titleb);
-				$('#cell-'+id+'c').attr('title',titlec);
-				
-				if (action == 'delete' && removeIds) {
-					for(var i=0;i<=removeIds.length;i++) {
+	var b = '<table>'+
+			'<tr>'+
+				'<td class="cell-module-header-module">Module</td>'+
+				'<td class="cell-module-header-status">Status</td>'+
+				'<td class="cell-module-header-actions" colspan="2">Actions</td>'+
+			'</tr>';
+	
+	for(var i=0;i<moduleFreeModules.length;i++) {
 
-						$('#'+removeIds[i]).remove();
+		b = b +
+			'<tr class="tr-highlight">'+
+				'<td class="cell-module-title">'+
+					'<span class="module-title-'+(moduleFreeModules[i][2]=='y' ? 'in-use' : 'inactive')+'" id="cell-'+moduleFreeModules[i][0]+'d">'+
+					'<span class="module-title">'+moduleFreeModules[i][1]+'</span>'+
+				'</td>'+
+				'<td>'+
+					(moduleFreeModules[i][2]=='y' ? 'published' : 'unpublished')+
+				'</td>'+
+				'<td onclick="'+(moduleFreeModules[i][2]=='y' ? 'moduleUnpublishFreeModule('+moduleFreeModules[i][0]+')' : 'modulePublishFreeModule('+moduleFreeModules[i][0]+')')+'">'+
+					'[<span class="pseudo-a">'+(moduleFreeModules[i][2]=='y' ? 'unpublish' : 'publish')+'</span>]'+
+				'</td>'+
+				'<td onclick="moduleDeleteFreeModule('+moduleFreeModules[i][0]+');">'+
+					'[<span class="pseudo-a">delete</span>]'+
+				'</td>'+
+			'</tr>';
+	}
 
-					}
+	b = b + '</table>';
 
-				}
-				
-				if (id.substr(0,1)=='f') {
-									
-					$('#new-input').removeClass().addClass('module-new-input');
+	$('#free-module-table-div').html(b);
+	
+	$('#new-input').removeClass();
 
-				}
+	if (moduleFreeModules.length >= 5) $('#new-input').addClass('module-new-input-hidden');
 
+}
+
+function moduleActivateModule(id) {
+
+	moduleChangeStatus(id,'module_activate','regular');
+
+}
+
+function moduleDeleteModule(id) {
+
+	moduleChangeStatus(id,'module_delete','regular');
+
+}
+
+function moduleUnpublishModule(id) {
+
+	moduleChangeStatus(id,'module_unpublish','regular');
+}
+
+function modulePublishModule(id) {
+
+	moduleChangeStatus(id,'module_publish','regular');
+
+}
+
+function moduleUnpublishFreeModule(id) {
+
+	moduleChangeStatus(id,'module_unpublish','free');
+
+}
+
+function modulePublishFreeModule(id) {
+
+	moduleChangeStatus(id,'module_publish','free');
+
+}
+
+function moduleDeleteFreeModule(id) {
+
+	moduleChangeStatus(id,'module_delete','free');
+
+}
+
+function moduleChangeStatus(id,action,type) {
+
+	if (action == 'module_delete') {
+		
+		if (type=='regular') {
+		
+			for (var j=0;j<moduleModules.length;j++) {
+				if (moduleModules[j][0]==id) var n = moduleModules[j][1];
+			}
+	
+		} else {
+
+			for (var j=0;j<moduleFreeModules.length;j++) {
+				if (moduleFreeModules[j][0]==id) var n = moduleFreeModules[j][1];
 			}
 
 		}
 
-	});
+		if (!allDoubleDeleteConfirm('the module',n)) return;
+
+	}
+
+	$.post(
+		"ajax_interface.php", 
+		{
+			'id' : id ,
+			'action' : action ,
+			'type' : type ,
+			'view' : 'modules' ,
+			'time' : allGetTimestamp()			
+		},
+		function(data){
+			if (data=='<ok>') {
+				if (type=='regular') {
+				//[id,name,desc,[active,[id in project]]]
+					for(var i=0;i<moduleModules.length;i++) {
+						if (id==moduleModules[i][0]) {
+							switch (action) {
+								case 'module_activate' :
+									moduleModules[i][3] = 'n';
+									moduleModules[i][4] = '99';
+									break;
+								case 'module_delete' :
+									moduleModules[i][3] = '-';
+									moduleModules[i][4] = '-';
+									break;
+								case 'module_unpublish' :
+									moduleModules[i][3] = 'n';
+									break;
+								case 'module_publish' :
+									moduleModules[i][3] = 'y';
+									break;
+							}
+						}
+					}
+					moduleDrawModuleBlock();
+				} else
+				if (type=='free') {
+					//[id,name,active]
+					for(var i=0;i<moduleFreeModules.length;i++) {
+						if (id==moduleFreeModules[i][0]) {
+							switch (action) {
+								case 'module_delete' :
+									var t = Array();
+									for (var j=0;j<moduleFreeModules.length;j++) {
+										if (moduleFreeModules[j][0]!=id) t[t.length]=moduleFreeModules[j];
+									}
+									moduleFreeModules = t;
+									break;
+								case 'module_unpublish' :
+									moduleFreeModules[i][2] = 'n';
+									break;
+								case 'module_publish' :
+									moduleFreeModules[i][2] = 'y';
+									break;
+							}
+						}
+					}
+					moduleDrawFreeModuleBlock();
+				}
+			}
+		}
+	);
 
 }
 
