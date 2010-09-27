@@ -3,15 +3,15 @@
 class FileUploadHelper
 {
     
-    private $files;
-    private $errors;
+    private $_files;
+    private $_errors;
 
 
 
     private function addError ($e)
     {
         
-        $this->errors[] = $e;
+        $this->_errors[] = $e;
     
     }
 
@@ -110,9 +110,9 @@ class FileUploadHelper
         if (substr($target_dir, strlen($target_dir) - 1) != '/')
             $target_dir .= '/';
         
-        $this->files = $files;
+        $this->_files = $files;
         
-        foreach ((array) $this->files as $key => $val) {
+        foreach ((array) $this->_files as $key => $val) {
             
             $val['type'] = mime_content_type($val['tmp_name']);
             
@@ -184,7 +184,7 @@ class FileUploadHelper
         
         return array(
             'result' => isset($result) ? $result : null, 
-            'error' => $this->errors
+            'error' => $this->_errors
         );
     
     }

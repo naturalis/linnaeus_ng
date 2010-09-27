@@ -80,6 +80,31 @@ a:hover,.pseudo-a:hover {
 	font-size: 10px;
 }
 
+#loadingdiv {
+	position:absolute;
+	top:100px;
+	width:32px;
+	height:32px;
+	background-image:url(../../images/system/ajax-loader.gif);
+	background-position:center;
+	background-repeat:no-repeat;
+/*
+	please note:
+	background-image:url(../../images/system/ajax-loader.gif);
+	is also in the style-declaration of the div (id="loadingdiv")
+	itself, as for reasons that are not understood, firexfox
+	refuses to show the image otherwise.
+*/
+}
+
+.loadingdiv-invisible {
+	visibility:hidden;
+}
+
+.loadingdiv-visible {
+	visibility:visible;
+}
+
 #breadcrumbs {
 	margin-left: 10px;
 	font-size: 12px;
