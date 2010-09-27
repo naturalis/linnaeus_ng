@@ -209,7 +209,9 @@ class Controller extends BaseClass
      */
     public function addError ($error)
     {
-        
+
+		if (!$error) return;
+
         if (!is_array($error)) {
             
             $this->errors[] = $error;

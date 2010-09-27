@@ -3,6 +3,10 @@ function q(m) {
 	e.innerHTML = m;
 }
 
+
+var allAjaxHandle = false;
+var allAjaxAborted = false;
+
 function allGetTimestamp() {
 
 	var tsTimeStamp= new Date().getTime();
@@ -58,6 +62,19 @@ function allSetMessage(msg,err) {
 
 }
 
+function allAjaxAbort(handle) {
+
+	if (handle) {
+		handle.abort();
+	} else
+	if (allAjaxHandle) {
+		alert('Aborting')
+		allAjaxHandle.abort(); 
+		allAjaxAborted = true;
+	}
+
+}
+
 var heartbeatUserId = false;
 var heartbeatApp = false;
 var heartbeatCtrllr = false;
@@ -104,6 +121,21 @@ function allSetHeartbeat(userid,app,ctrllr,view,params) {
 function allSetAutoSaveFreq(freq) {
 
 	autosaveFreq = freq;
+
+}
+
+function allShowLoadingDiv(ele) {
+
+	var offset = $('#'+ele).offset();
+
+	$('#loadingdiv').removeClass('loadingdiv-invisible').addClass('loadingdiv-visible');
+	$('#loadingdiv').offset({ left: offset.left+390, top: offset.top-5});
+
+}
+
+function allHideLoadingDiv() {
+
+	$('#loadingdiv').removeClass('loadingdiv-visible').addClass('loadingdiv-invisible');
 
 }
 
@@ -520,6 +552,8 @@ var taxonPageStates = Array();
 var taxonPublishState = false;
 var taxonInitAutoSave = true;
 var taxonSaveType = 'auto';
+var taxonCoLSingleLevel = false;
+var taxonTargetDiv = false;
 
 
 function taxonSetActivePageTitle(page) {
@@ -916,3 +950,129 @@ function taxonGetUndo() {
 
 }
 
+function taxonCoLMakeTableRow(d,symbol,level) {
+
+	var t = '';
+	var x = '';
+
+	for(var i=0;i<=level+1;i++) {
+		x = x + '&nbsp;';
+	}
+
+	if (d.rank.toLowerCase()=='genus' || 
+		d.rank.toLowerCase()=='species' || 
+		d.rank.toLowerCase()=='infraspecies') {
+	
+		t = t + '<tr><td>..</td><td>'+(d.rank)+':</td><td>'+x+
+			'<span onclick="taxonGetCoL(\''+(d.name)+'\',false,true)" class="pseudo-a">'+(d.name)+'</span></td></tr>\n';
+	
+	} else {
+	
+		t = t + '<tr><td>'+symbol+'</td><td>'+(d.rank)+':</td><td>'+x+(d.name)+'</td></tr>\n';
+	
+	}
+	
+	return t;
+
+}
+	
+function taxonCoLResultBuildChildTree(children,level) {
+
+	if (children==undefined) return '';
+
+	var b = '';
+
+	for(var i=0;i<children.length;i++) {
+
+		var d = children[i].taxon;
+		
+		b = b + taxonCoLMakeTableRow(d,'..',level);
+
+		if (d.child_taxa && d.child_taxa.length > 0) {
+			b = b + taxonCoLResultBuildChildTree(d.child_taxa,level+1);
+		}
+	}
+
+	return b;
+}
+
+function taxonParseCoLResult(data) { 
+
+	b = 'Results:\n<table>\n';
+	obj = $.parseJSON(data);
+	//return '<pre>'+dumpObj(obj);
+
+	if (obj.parent_taxa) {
+
+		for(var i=0;i<obj.parent_taxa.length;i++) {
+
+			var d = obj.parent_taxa[i];
+			
+			b = b + taxonCoLMakeTableRow(d,'&para;');
+
+		}
+	}
+
+	b = b + '<tr><td>&rarr;</td><td>'+(obj.taxon.rank)+':</td><td>'+(obj.taxon.name)+'</td></tr>\n';
+
+	b = b + taxonCoLResultBuildChildTree(obj.child_taxa,0);
+
+	b = b + '</table>\n';
+
+	return b;
+}
+
+function taxonGetCoL(name,singlelevel,subdiv) {
+	
+	allAjaxAborted = false;
+
+	if (!name) name = $('#taxon_name').val();
+
+	if (name.length==0) return;
+
+	taxonCoLSingleLevel = singlelevel==undefined ? $('#single-child-level').is(':checked') : singlelevel ;
+	taxonTargetDiv = subdiv ? 'col-subresult' : 'col-result';
+
+	allShowLoadingDiv('taxon_name');
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'taxon_name' : name ,
+			'action' : 'get_col',
+			'levels' : taxonCoLSingleLevel ? 1 : 99 ,
+			'time' : allGetTimestamp()
+		}),
+		timeout : 300000 , // ms (5 mins)
+		complete : function (XMLHttpRequest, textStatus) { 
+			if (textStatus=='timeout') {
+				allHideLoadingDiv();
+				alert('Request timed-out');
+			}
+		}, 
+		success : function (data) {
+			if (data.indexOf('<error>')>=0) {
+				alert(data.replace('<error>',''))
+			} else {
+				try {
+					$('#'+taxonTargetDiv).html(taxonParseCoLResult(data));
+					if (subdiv) taxonRepositionResults();
+				} catch(err) {
+					if (!allAjaxAborted) alert('An unknown error occurred ' +data)
+				}
+  			}
+			
+			allHideLoadingDiv();
+		}
+	})
+
+}
+
+function taxonRepositionResults() {
+
+	var offset = $('#col-result').offset();
+
+	$('#col-subresult').offset({ left: offset.left+390, top: offset.top});
+
+}

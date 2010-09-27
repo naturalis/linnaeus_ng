@@ -10,7 +10,9 @@
 
 	tinyMCE images: MCImageManager (€€€)
 
-	*/
+	hardcoded set_time_limit(3000); for CoL
+
+*/
 
 include_once ('Controller.php');
 
@@ -28,9 +30,12 @@ class SpeciesController extends Controller
         'content_taxon_undo'
     );
     
+    public $usedHelpers = array(
+        'col_loader_helper'
+    );
+
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
-
 
 
     /**
@@ -50,7 +55,6 @@ class SpeciesController extends Controller
     }
 
 
-
     /**
      * Destroys
      *
@@ -62,7 +66,6 @@ class SpeciesController extends Controller
         parent::__destruct();
     
     }
-
 
 
     /**
@@ -80,7 +83,6 @@ class SpeciesController extends Controller
         $this->printPage();
     
     }
-
 
 
     /**
@@ -157,7 +159,6 @@ class SpeciesController extends Controller
         $this->printPage();
     
     }
-
 
 
     /**
@@ -300,7 +301,6 @@ class SpeciesController extends Controller
     }
 
 
-
     /**
      * List existing taxa
      *
@@ -308,7 +308,7 @@ class SpeciesController extends Controller
      */
     public function listAction ()
     {
-        
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Taxon list'));
@@ -407,7 +407,7 @@ class SpeciesController extends Controller
      */
     public function ajaxInterfaceAction ()
     {
-        
+
         if (!isset($this->requestData['action']))
             return;
         
@@ -451,10 +451,62 @@ class SpeciesController extends Controller
             $this->ajaxActionGetTaxonUndo();
         
         }
+        else if ($this->requestData['action'] == 'get_col') {
+
+            $this->getCatalogueOfLifeData();
+        
+        }
         
         $this->printPage();
     
     }
+
+	private function getCatalogueOfLifeData() {
+
+		if (!empty($this->requestData['taxon_name'])) {
+		
+			// needs to go to config
+			$timeout = 600;//secs
+
+			set_time_limit($timeout);
+			
+			if (isset($this->requestData['levels'])) {
+
+				$this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->requestData['levels']);
+
+			}
+
+			$this->helpers->ColLoaderHelper->setTaxon($this->requestData['taxon_name']);
+
+			$this->helpers->ColLoaderHelper->setTimeout($timeout);
+
+			$this->helpers->ColLoaderHelper->getTaxon();
+			
+			$data = $this->helpers->ColLoaderHelper->getResult();
+			
+			if (!$data) {
+
+				$this->addError($this->helpers->ColLoaderHelper->getErrors());
+
+			} else {
+
+				$this->smarty->assign('returnText',json_encode($data));
+	
+			}
+		}
+
+	}
+
+	public function colAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Import from Catalogue Of Life'));
+
+		$this->printPage();
+	
+	}
 
 
 
