@@ -7,7 +7,7 @@
 	<th onclick="allTableColumnSort('{$columnsToShow[i].name}');" class="th-userlist-{$columnsToShow[i].align}-align" style="text-align:{$columnsToShow[i].align};">
 	{$columnsToShow[i].label}
 	{if $sortBy.key==$columnsToShow[i].name}
-		<img src="{$rootWebUrl}admin/images/system/sort-{$sortBy.dir}.gif" class="sort-image" />
+		<img src="{$baseUrl}admin/images/system/sort-{$sortBy.dir}.gif" class="sort-image" />
 	{/if}
 	</th>
 {/section}

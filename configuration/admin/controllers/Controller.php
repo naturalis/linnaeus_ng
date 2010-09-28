@@ -25,7 +25,8 @@ class Controller extends BaseClass
     public $sortField;
     public $sortDirection;
     public $sortCaseSensitivity;
-    
+	public $baseUrl;
+
     private $usedModelsBase = array(
         'helptext', 
         'module_project'
@@ -143,7 +144,7 @@ class Controller extends BaseClass
         
         $this->smarty->assign('debugMode', $this->debugMode);
         
-        $this->smarty->assign('rootWebUrl', $this->generalSettings['rootWebUrl']);
+        $this->smarty->assign('baseUrl', $this->baseUrl);		
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('session', $_SESSION);
         
@@ -490,11 +491,11 @@ class Controller extends BaseClass
 
 			if ($_SESSION["user"]["_number_of_projects"]==1) {
 
-	            return $this->generalSettings['rootWebUrl'] . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
+	            return $this->baseUrl . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
     
 			} else {
 
-	            return $this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject'];
+	            return $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
 
 			}    
         }
@@ -544,7 +545,7 @@ class Controller extends BaseClass
                 
                 } else {
                     
-                    $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['notAuthorized']);
+                    $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
                     
                     /*
 							user is not authorized and redirected to the index.page; 
@@ -553,7 +554,7 @@ class Controller extends BaseClass
 						*/
                     if ($this->getViewName() == 'Index') {
                         
-                        $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['logout']);
+                        $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
                     
                     } else {
                         
@@ -565,7 +566,7 @@ class Controller extends BaseClass
             
             } else {
                 
-                $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject']);
+                $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject']);
             
             }
         
@@ -573,7 +574,7 @@ class Controller extends BaseClass
             
             $this->setLoginStartPage();
             
-            $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['login']);
+            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['login']);
         
         }
     
@@ -723,7 +724,7 @@ class Controller extends BaseClass
     public function getLoggedInMainIndex ()
     {
         
-        return $this->generalSettings['rootWebUrl'] . $this->appName . '/admin-index.php';
+        return $this->baseUrl . $this->appName . '/admin-index.php';
     
     }
 
@@ -745,7 +746,7 @@ class Controller extends BaseClass
             
             $_SESSION['system']['last_module_name'] = $this->controllerPublicName;
             
-            $this->redirect($this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['moduleNotPresent']);
+            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['moduleNotPresent']);
         
         }
     
@@ -813,33 +814,33 @@ class Controller extends BaseClass
      */
     private function setNames ()
     {
-        
+
+		$this->appName = $this->generalSettings['app']['pathName'];
+
         $this->_fullPath = $_SERVER['PHP_SELF'];
-        
-        $path = pathinfo(substr_replace($this->_fullPath, '', 0, strlen($this->generalSettings['rootWebUrl']) - 1));
-        
-        $dirs = explode('/', $path['dirname']);
-        
-        if (!empty($dirs[1]))
-            $this->appName = strtolower($dirs[1]);
-        
-        if (!empty($dirs[3]))
-            $this->controllerBaseName = strtolower($dirs[3]);
-            
-        /*
-			if (!$this->controllerBaseName) {
+ 
+        $path = pathinfo($this->_fullPath);
 
-				$this->controllerBaseName = strtolower(str_replace('Controller','',get_class($this)));
+		$dirnames = explode('/',$path['dirname']);
+		
+		$this->baseUrl = '';
 
+		for($i=count((array)$dirnames)-1;$i>0;$i--) {
+
+			if (strtolower($dirnames[$i])==$this->appName) {
+
+				if (isset($dirnames[$i+2]))
+					$this->controllerBaseName = strtolower($dirnames[$i+2]);
+				
 			}
-			*/
-        
-        if (!empty($path['filename']))
-            $this->_viewName = $path['filename'];
-    
+			
+			$this->baseUrl .= '../';
+
+		}
+
+		if ($path['filename']) $this->_viewName = $path['filename'];
+
     }
-
-
 
     /**
      * Sets general Smarty variables (paths, compilder directives)
@@ -1125,7 +1126,7 @@ class Controller extends BaseClass
 		if (!isset($this->appName)) return;
 
         // root of each trail: "choose project" page
-        $cp = $this->generalSettings['rootWebUrl'] . $this->appName . $this->generalSettings['paths']['chooseProject'];
+        $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
         
         $this->breadcrumbs[] = array(
             'name' => 'Projects', 
@@ -1141,7 +1142,7 @@ class Controller extends BaseClass
             
             if (!empty($this->controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
                 
-                $curl = $this->generalSettings['rootWebUrl'] . $this->appName . '/views/' . $this->controllerBaseName;
+                $curl = $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName;
                 
                 $this->breadcrumbs[] = array(
                     'name' => $this->controllerPublicName, 
