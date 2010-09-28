@@ -2,6 +2,9 @@ CREATE TABLE taxa (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
 	project_id INT( 11 ) NOT NULL ,
 	taxon varchar (32) not null,
+	parent_id INT( 11 ),
+	rank varchar (16),
+	col_id INT( 11 ),
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id ) 
@@ -72,5 +75,8 @@ RENAME TABLE `content_taxa`  TO `dev_content_taxa` ;
 RENAME TABLE `content_taxa_undo`  TO `dev_content_taxa_undo` ;
 RENAME TABLE `taxa_pages`  TO `dev_taxa_pages` ;
 RENAME TABLE `taxa_pages_titles`  TO `dev_taxa_pages_titles` ;
+
+
+
 
 

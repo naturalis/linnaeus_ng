@@ -469,14 +469,28 @@ class SpeciesController extends Controller
 			$timeout = 600;//secs
 
 			set_time_limit($timeout);
-			
+
+			$this->helpers->ColLoaderHelper->setTimerInclusion(false);
+
+			$this->helpers->ColLoaderHelper->setResultStyle('concise');
+
+			if (isset($this->requestData['taxon_name'])) {
+
+				$this->helpers->ColLoaderHelper->setTaxonName($this->requestData['taxon_name']);
+
+			}
+
+			if (isset($this->requestData['taxon_id'])) {
+
+				$this->helpers->ColLoaderHelper->setTaxonId($this->requestData['taxon_id']);
+
+			}
+
 			if (isset($this->requestData['levels'])) {
 
 				$this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->requestData['levels']);
 
 			}
-
-			$this->helpers->ColLoaderHelper->setTaxon($this->requestData['taxon_name']);
 
 			$this->helpers->ColLoaderHelper->setTimeout($timeout);
 
@@ -1024,6 +1038,37 @@ class SpeciesController extends Controller
     
     }
 
+	private function ajaxActionImportTaxon() 
+	{
+
+/*
+			'taxon_rank' : taxon[2] ,
+			'taxon_name' : taxon[1] ,
+			'taxon_id' : taxon[0] ,
+			'parent_taxon_rank' : taxon[5] ,
+			'parent_taxon_name' : taxon[4] ,
+			'parent_taxon_id' : taxon[3] ,
+			
+
+		check if exists: name + rank
+		if exists
+			check if parentage exists
+				if nor, update
+				if exists, return
+		if not exists
+			create
+		
+		parenthood:
+
+
+
+*/
+
+
+
+		//ajaxActionSaveTaxon
+	}
+	
 }
 
 

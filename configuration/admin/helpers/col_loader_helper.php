@@ -2,10 +2,22 @@
 /*
 
 	make timeout fail into an error (might be pointless, as the calling function (speciescontroller) seems to have it's own timeout)
+	(but how? a timeout triggers an error of type FATAL which cannot be caught with try/catch)
 
 	dit helpt ook niet:
 		Warning: file_get_contents(http://www.catalogueoflife.org/annual-checklist/2010/webservice?id=7024544&response=full):
 		failed to open stream: HTTP request failed!
+		maybe add:		<?php
+		$ctx = stream_context_create(array(
+			'http' => array(
+				'timeout' => 1
+				)
+			)
+		);
+		file_get_contents("http://example.com/", 0, $ctx);
+		?>
+		
+
 
 */
 
@@ -14,12 +26,17 @@ class ColLoaderHelper
     
     private $_errors;
 	private $_speciesName;
+	private $_speciesId;
 	private $_result = false;
 	private $_level = 0;
 	private $_timeout;
-	private $_numberOfChildLevels = 99;
+	private $_numberOfChildLevels = 0; // 0 = all
 	private $_includedIds = array();
-	
+	private $_conciseResults = true;//false;
+	private $_includeResultsTimer = false;
+	private $_timeTaken = false;
+	private $_startTime = false;
+
 	//see: http://webservice.catalogueoflife.org/
 	const SPECIES_URL = 'http://www.catalogueoflife.org/annual-checklist/2010/webservice?name=%s';
 	const ID_URL = 'http://www.catalogueoflife.org/annual-checklist/2010/webservice?id=%s&response=full';
@@ -32,16 +49,33 @@ class ColLoaderHelper
      *
      * @access 	public
      */
-    public function __construct ($name=false,$timeout=false)
+    public function __construct ()
     {
 	
-		if ($name) $this->setTaxon($name);
+		$this->setTimeout();
 
-		$this->setTimeout($timeout);
+		$this->setResultStyle();
+
+		$this->setTimerInclusion();
 
     }
 
-	public function setTaxon($name = false)
+
+	public function setResultStyle($concise = false)
+	{
+
+		$this->_conciseResults = ($concise == 'concise');
+
+	}
+
+	public function setTimerInclusion($timerInclusion = false)
+	{
+	
+		$this->_includeResultsTimer = $timerInclusion;
+
+	}
+
+	public function setTaxonName($name = false)
 	{
 	
 		if (!$name) {
@@ -56,7 +90,22 @@ class ColLoaderHelper
 
 	}
 	
-	public function setTimeout($timeout)
+	public function setTaxonId($id = false)
+	{
+	
+		if (!$id) {
+		
+			$this->addError(_('No species ID given.'));
+		
+		} else {
+		
+			$this->_speciesId = $id;
+	
+		}
+
+	}
+	
+	public function setTimeout($timeout = false)
 	{
 	
 		if (!$timeout) {
@@ -84,50 +133,54 @@ class ColLoaderHelper
 		set_time_limit($this->_timeout);
 
 		if (!$this->getErrors()) {
+		
+			if (!$this->_speciesId) {
 
-			// get basic info for taxon, including id, based on name
-			$raw = file_get_contents(sprintf(self::SPECIES_URL,urlencode($this->_speciesName)));
-
-			$p = xml_parser_create();
-
-			$s = xml_parse_into_struct($p, $raw, $data, $dataIndex);
-			
-			unset($raw);
-
-			xml_parser_free($p);
-
-			if ($s===1) {
-
-				if ($data[$dataIndex['RESULTS'][0]]["attributes"]["NUMBER_OF_RESULTS_RETURNED"] > 0) {
+				// get basic info for taxon, including id, based on name
+				$raw = file_get_contents(sprintf(self::SPECIES_URL,urlencode($this->_speciesName)));
 	
-					// get Catalogue Of Life ID for taxon
-					$colId = $data[$dataIndex['ID'][0]]['value'];
-					
-					unset($data);
-					unset($dataIndex);
+				$p = xml_parser_create();
 	
-					if (!$colId) {
+				$s = xml_parse_into_struct($p, $raw, $data, $dataIndex);
+				
+				unset($raw);
 	
-						$this->addError(_('Unable to resolve taxon\'s Catalogue Of Life ID'));
+				xml_parser_free($p);
+
+				if ($s===1) {
 	
+					if ($data[$dataIndex['RESULTS'][0]]["attributes"]["NUMBER_OF_RESULTS_RETURNED"] > 0) {
+		
+						// get Catalogue Of Life ID for taxon
+						$this->_speciesId = $data[$dataIndex['ID'][0]]['value'];
+
+						unset($data);
+						unset($dataIndex);
+
 					} else {
-
-						// retrieve detail data for taxon, including progeny (recursive)
-						$this->_result = $this->getTaxonDetail($colId,true);
-						
+	
+						$this->addError(_('Found no basic data for: ').$this->_speciesName);
+	
 					}
 
 				} else {
-
-					$this->addError(_('Found no data for: ').$this->_speciesName);
-
+	
+					$this->addError(_('Unable to parse basic data'));
+	
 				}
+
+			}
+	
+			if (!$this->_speciesId) {
+
+				$this->addError(_('Unable to resolve taxon\'s Catalogue Of Life ID'));
 
 			} else {
 
-				$this->addError(_('Unable to parse basic data'));
-
-			}	
+				// retrieve detail data for taxon, including progeny (recursive)
+				$this->_result = $this->getTaxonDetail($this->_speciesId,true);
+				
+			}
 
 		}
 
@@ -136,7 +189,9 @@ class ColLoaderHelper
 	public function getResult()
 	{
 
-		$this->_result['levels'] = $this->_level;
+		//var_dump($this->_result);
+
+		$this->_result['child_levels'] = $this->_level;
 
 		return $this->_result;
 
@@ -168,6 +223,8 @@ class ColLoaderHelper
 	private function getTaxonDetail($id,$includeParents=false)
 	{
 
+		if ($this->_includeResultsTimer) $this->timerStart();
+
 		// get comprehensive info for id
 		$raw = file_get_contents(sprintf(self::ID_URL,$id));
 
@@ -192,6 +249,7 @@ class ColLoaderHelper
 	
 			$end_children = $dataFullIndex['CHILD_TAXA'][count((array)$dataFullIndex['CHILD_TAXA'])-1];
 
+			// parents
 			if ($includeParents) {
 
 				for ($i=$start;$i<=$end;$i++) {
@@ -203,9 +261,11 @@ class ColLoaderHelper
 						if ($val['tag']=='ID') $t['id'] = $val['value'];
 						if ($val['tag']=='NAME') $t['name'] = $val['value'];
 						if ($val['tag']=='RANK') $t['rank'] = $val['value'];
-						if ($val['tag']=='NAME_HTML') $t['name_html'] = $val['value'];
-						if ($val['tag']=='URL') $t['url'] = $val['value'];
-	
+						if (!$this->_conciseResults) {
+							if ($val['tag']=='NAME_HTML') $t['name_html'] = $val['value'];
+							if ($val['tag']=='URL') $t['url'] = $val['value'];
+						}
+
 					}	
 	
 					if (isset($val['tag']) && 
@@ -213,9 +273,9 @@ class ColLoaderHelper
 						$val['tag']=='TAXON' && 
 						$val['type']=='close'
 						) {
-	
-						$result['parent_taxa'][] = $t;
-	
+
+						if (!in_array($t['id'],$this->_includedIds)) $result['parent_taxa'][] = $t;
+
 						$this->_includedIds[] = $t['id'];
 
 						unset($t);
@@ -226,6 +286,18 @@ class ColLoaderHelper
 
 			}
 
+			// taxon
+			$t['id'] = $dataFull[$dataFullIndex['ID'][0]]['value'];
+			$t['name'] = $dataFull[$dataFullIndex['NAME'][0]]['value'];	
+			$t['rank'] = $dataFull[$dataFullIndex['RANK'][0]]['value'];
+			if (!$this->_conciseResults) {
+				$t['name_html'] = $dataFull[$dataFullIndex['NAME_HTML'][0]]['value'];
+				$t['url'] = $dataFull[$dataFullIndex['URL'][0]]['value'];
+			}
+	
+			$result['taxon'] = $t;
+
+			// children
 			for ($i=$start_children;$i<=$end_children;$i++) {
 
 				$val = $dataFull[$i];
@@ -235,8 +307,10 @@ class ColLoaderHelper
 					if ($val['tag']=='ID') $t['id'] = $val['value'];
 					if ($val['tag']=='NAME') $t['name'] = $val['value'];
 					if ($val['tag']=='RANK') $t['rank'] = $val['value'];
-					if ($val['tag']=='NAME_HTML') $t['name_html'] = $val['value'];
-					if ($val['tag']=='URL') $t['url'] = $val['value'];
+					if (!$this->_conciseResults) {
+						if ($val['tag']=='NAME_HTML') $t['name_html'] = $val['value'];
+						if ($val['tag']=='URL') $t['url'] = $val['value'];
+					}
 
 				}	
 
@@ -256,13 +330,6 @@ class ColLoaderHelper
 
 			}
 
-			$t['id'] = $dataFull[$dataFullIndex['ID'][0]]['value'];
-			$t['name'] = $dataFull[$dataFullIndex['NAME'][0]]['value'];	
-			$t['rank'] = $dataFull[$dataFullIndex['RANK'][0]]['value'];
-			$t['name_html'] = $dataFull[$dataFullIndex['NAME_HTML'][0]]['value'];
-			$t['url'] = $dataFull[$dataFullIndex['URL'][0]]['value'];
-	
-			$result['taxon'] = $t;
 
 			// preserving memory
 			unset($dataFull);
@@ -272,7 +339,9 @@ class ColLoaderHelper
 			unset($start_children);
 			unset($end_children);
 
-			if ($this->_level >= $this->_numberOfChildLevels) {
+			if ($this->_includeResultsTimer) $result['time_taken'] = $this->timerEnd();
+
+			if ($this->_numberOfChildLevels !=0 && $this->_level >= $this->_numberOfChildLevels) {
 
 				return $result;
 
@@ -303,6 +372,27 @@ class ColLoaderHelper
 		}
 
 	}
+
+	private function timerStart()
+	{
+		$this->_timeTaken = false;
+		$mtime = microtime();
+		$mtime = explode(' ', $mtime);
+		$mtime = $mtime[1] + $mtime[0];
+		$this->_startTime = $mtime;
+	}
+
+	private function timerEnd()
+	{
+		if (!$this->_startTime) return;	
+		$mtime = microtime();
+		$mtime = explode(" ", $mtime);
+		$mtime = $mtime[1] + $mtime[0];
+		$endtime = $mtime;
+		$this->_timeTaken = ($endtime - $this->_startTime);
+		$this->_startTime = false;
+		return $this->_timeTaken;
+	 }
 
 }
 

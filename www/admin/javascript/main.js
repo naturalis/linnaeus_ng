@@ -554,7 +554,7 @@ var taxonInitAutoSave = true;
 var taxonSaveType = 'auto';
 var taxonCoLSingleLevel = false;
 var taxonTargetDiv = false;
-
+var taxonTaxonParent = Array();
 
 function taxonSetActivePageTitle(page) {
 
@@ -952,26 +952,38 @@ function taxonGetUndo() {
 
 function taxonCoLMakeTableRow(d,symbol,level) {
 
-	var t = '';
 	var x = '';
 
-	for(var i=0;i<=level+1;i++) {
-		x = x + '&nbsp;';
+	if (level) {
+		for(var i=0;i<level;i++) {
+			x = x + symbol;
+		}
+	} else {
+		x = symbol;
 	}
+
+	t = '<tr><td>'+x+'</td><td><span id="rank-'+d.id+'">'+d.rank+'</span>:</td><td>';
 
 	if (d.rank.toLowerCase()=='genus' || 
 		d.rank.toLowerCase()=='species' || 
 		d.rank.toLowerCase()=='infraspecies') {
 	
-		t = t + '<tr><td>..</td><td>'+(d.rank)+':</td><td>'+x+
-			'<span onclick="taxonGetCoL(\''+(d.name)+'\',false,true)" class="pseudo-a">'+(d.name)+'</span></td></tr>\n';
-	
+		t = t + '<span onclick="taxonGetCoL(\''+(d.name ? d.name : '' )+'\','+(d.id ? d.id : '' )+',false,true)" class="pseudo-a">'+
+			'<span id="name-'+d.id+'">'+
+			d.name + '</span></span>';
+
 	} else {
 	
-		t = t + '<tr><td>'+symbol+'</td><td>'+(d.rank)+':</td><td>'+x+(d.name)+'</td></tr>\n';
+		t = t + '<span id="name-'+d.id+'">' + d.name + '</span>';
 	
 	}
-	
+
+	t = t + '</td><td><input type=checkbox id="taxon-'+d.id+'" checked="checked" />'+
+			'<input type="hidden" id="parent-id-'+d.id+'" value="'+(taxonTaxonParent.id==undefined ? '' : taxonTaxonParent.id)+'" />'+
+			'<input type="hidden" id="parent-name-'+d.id+'" value="'+(taxonTaxonParent.name==undefined ? '' : taxonTaxonParent.name)+'" />'+
+			'<input type="hidden" id="parent-rank-'+d.id+'" value="'+(taxonTaxonParent.rank==undefined ? '' : taxonTaxonParent.rank)+'" />'+
+			'</td></tr>\n';
+
 	return t;
 
 }
@@ -986,14 +998,19 @@ function taxonCoLResultBuildChildTree(children,level) {
 
 		var d = children[i].taxon;
 		
-		b = b + taxonCoLMakeTableRow(d,'..',level);
+		b = b + taxonCoLMakeTableRow(d,'.',level);
 
-		if (d.child_taxa && d.child_taxa.length > 0) {
-			b = b + taxonCoLResultBuildChildTree(d.child_taxa,level+1);
+		if (children[i].child_taxa && children[i].child_taxa.length > 0) {
+
+			b = b + taxonCoLResultBuildChildTree(children[i].child_taxa,level+1);
+			taxonTaxonParent = d;
+
 		}
+
 	}
 
 	return b;
+
 }
 
 function taxonParseCoLResult(data) { 
@@ -1009,26 +1026,31 @@ function taxonParseCoLResult(data) {
 			var d = obj.parent_taxa[i];
 			
 			b = b + taxonCoLMakeTableRow(d,'&para;');
+			
+			taxonTaxonParent = d;
 
 		}
 	}
 
-	b = b + '<tr><td>&rarr;</td><td>'+(obj.taxon.rank)+':</td><td>'+(obj.taxon.name)+'</td></tr>\n';
+	b = b + taxonCoLMakeTableRow(obj.taxon,'&rarr;');
 
-	b = b + taxonCoLResultBuildChildTree(obj.child_taxa,0);
+	taxonTaxonParent = obj.taxon;
+
+	b = b + taxonCoLResultBuildChildTree(obj.child_taxa,1);
 
 	b = b + '</table>\n';
 
 	return b;
+
 }
 
-function taxonGetCoL(name,singlelevel,subdiv) {
-	
-	allAjaxAborted = false;
+function taxonGetCoL(name,id,singlelevel,subdiv) {
 
 	if (!name) name = $('#taxon_name').val();
 
 	if (name.length==0) return;
+
+	allAjaxAborted = false;
 
 	taxonCoLSingleLevel = singlelevel==undefined ? $('#single-child-level').is(':checked') : singlelevel ;
 	taxonTargetDiv = subdiv ? 'col-subresult' : 'col-result';
@@ -1040,14 +1062,16 @@ function taxonGetCoL(name,singlelevel,subdiv) {
 		type: "POST",
 		data : ({
 			'taxon_name' : name ,
+			'taxon_id' : id ,
 			'action' : 'get_col',
-			'levels' : taxonCoLSingleLevel ? 1 : 99 ,
+			'levels' : taxonCoLSingleLevel ? '1' : '0' ,
 			'time' : allGetTimestamp()
 		}),
 		timeout : 300000 , // ms (5 mins)
 		complete : function (XMLHttpRequest, textStatus) { 
+			allHideLoadingDiv();
+
 			if (textStatus=='timeout') {
-				allHideLoadingDiv();
 				alert('Request timed-out');
 			}
 		}, 
@@ -1057,13 +1081,12 @@ function taxonGetCoL(name,singlelevel,subdiv) {
 			} else {
 				try {
 					$('#'+taxonTargetDiv).html(taxonParseCoLResult(data));
+					$('#col-result-instruction').css('visibility','visible');
 					if (subdiv) taxonRepositionResults();
 				} catch(err) {
-					if (!allAjaxAborted) alert('An unknown error occurred ' +data)
+					if (!allAjaxAborted) alert('An unknown error occurred')
 				}
-  			}
-			
-			allHideLoadingDiv();
+  			}			
 		}
 	})
 
@@ -1076,3 +1099,71 @@ function taxonRepositionResults() {
 	$('#col-subresult').offset({ left: offset.left+390, top: offset.top});
 
 }
+
+
+function taxonSaveCoLTaxon(taxon) {
+	
+	alert(taxon);
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'taxon_rank' : taxon[2] ,
+			'taxon_name' : taxon[1] ,
+			'taxon_id' : taxon[0] ,
+			'parent_taxon_rank' : taxon[5] ,
+			'parent_taxon_name' : taxon[4] ,
+			'parent_taxon_id' : taxon[3] ,
+			'action' : 'save_col',
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			if (data.indexOf('<error>')>=0) {
+				alert(data.replace('<error>',''))
+			}			
+		}
+	})
+
+}
+
+function taxonSaveCoLResult() {
+
+	$("input:checkbox[id^='taxon']").each(function(index) {
+
+		if ($(this).is(':checked')) {
+
+			var id = $(this).attr('id').replace('taxon-','');
+			
+			taxonSaveCoLTaxon([
+				id,
+				 $('#name-'+id).html(),
+				 $('#rank-'+id).html(),
+				 $('#parent-id-'+id).val(),
+				 $('#parent-name-'+id).val(),
+				 $('#parent-rank-'+id).val()
+			]);
+
+		}
+
+	});
+	
+	alert('saved');
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
