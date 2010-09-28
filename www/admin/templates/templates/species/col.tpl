@@ -19,6 +19,12 @@
 	<label><input type="checkbox" id="single-child-level" checked="checked" />retrieve a single level of child taxa only</label>
 </p>
 <br />
+<div id="col-result-instruction" class="text-block" style="visibility:hidden">
+<p>
+	Check the taxa you wish to import, and click save: <input type="button" value="save" onclick="taxonSaveCoLResult()" /><br />
+	Duplicates of the taxa already in your project's database will not be stored.
+</p>
+</div>
 <div id="col-result" class="text-block"></div>
 <div id="col-subresult" class="text-block" style="position:relative;"></div>
 
