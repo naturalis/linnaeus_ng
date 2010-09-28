@@ -44,5 +44,6 @@ To use the application, follow <a href="app/">this link</a>.<br />
 </div ends="page-container">
 <div id="footer-container"></div ends="footer-container">
 </div ends="body-container">
+
 </body>
 </html>
