@@ -144,20 +144,20 @@ class Controller extends BaseClass
         
         $this->smarty->assign('debugMode', $this->debugMode);
         
-        $this->smarty->assign('baseUrl', $this->baseUrl);		
-        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('session', $_SESSION);
+
+        $this->smarty->assign('baseUrl', $this->baseUrl);
+        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         
         $this->smarty->assign('rnd', $this->getRandomValue());
-        
-        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+		$this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
         
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
-        
+
         $this->smarty->display(strtolower($this->getViewName() . '.tpl'));
     
     }
@@ -823,15 +823,14 @@ class Controller extends BaseClass
 
 		$dirnames = explode('/',$path['dirname']);
 		
-		$this->baseUrl = '';
+		$this->baseUrl = '../';
 
-		for($i=count((array)$dirnames)-1;$i>0;$i--) {
+		for($i=count((array)$dirnames)-1;$i>=1;$i--) {
 
 			if (strtolower($dirnames[$i])==$this->appName) {
-
 				if (isset($dirnames[$i+2]))
 					$this->controllerBaseName = strtolower($dirnames[$i+2]);
-				
+				break ;
 			}
 			
 			$this->baseUrl .= '../';
@@ -858,6 +857,7 @@ class Controller extends BaseClass
         $this->smarty->force_compile = true;
         
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
+
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
