@@ -251,7 +251,7 @@ class ProjectsController extends Controller
                     $this->models->Project->save(
                     array(
                         'id' => $this->getCurrentProjectId(), 
-                        'logo_url' => $this->generalSettings['rootWebUrl'] . $this->appName . '/images/project/' . sprintf('%04s', 
+                        'logo_url' => $this->baseUrl . $this->appName . '/images/project/' . sprintf('%04s', 
                         $this->getCurrentProjectId()) . '/' . 'project_logo.' . $fuh['result'][0]['extension'], 
                         'logo_path' => $img
                     ));

@@ -5,19 +5,19 @@
 
 	<title>{$session.project.name}{if $session.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
 
-	<link href="{$rootWebUrl}admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-	<link href="{$rootWebUrl}admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
+	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
 
 	<style type="text/css" media="all">
-		@import url("{$rootWebUrl}admin/style/main.css");
-		@import url("{$rootWebUrl}admin/style/admin-inputs.css");
-		@import url("{$rootWebUrl}admin/style/admin-help.css");
-		@import url("{$rootWebUrl}admin/style/admin.css");
+		@import url("{$baseUrl}admin/style/main.css");
+		@import url("{$baseUrl}admin/style/admin-inputs.css");
+		@import url("{$baseUrl}admin/style/admin-help.css");
+		@import url("{$baseUrl}admin/style/admin.css");
 	</style>
 
-	<script type="text/javascript" src="{$rootWebUrl}admin/javascript/jquery-1.4.2.min.js"></script>
-	<script type="text/javascript" src="{$rootWebUrl}admin/javascript/main.js"></script>
-	<script type="text/javascript" src="{$rootWebUrl}admin/javascript/development.js"></script><!--this should go be removed in production-->
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should go be removed in production-->
 
 {if $includeHtmlEditor}
 {include file="../shared/tinymce-editor.tpl"}
@@ -27,12 +27,12 @@
 
 <body><div id="body-container">
 <div id="header-container">
-	<a href="{$rootWebUrl}admin/admin-index.php"><img src="{$rootWebUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="{$rootWebUrl}admin/images/system/eti_logo.png" id="eti-logo" /></a>
+	<a href="{$baseUrl}admin/admin-index.php"><img src="{$baseUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="{$baseUrl}admin/images/system/eti_logo.png" id="eti-logo" /></a>
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">
-		<a href="{$rootWebUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>{/if}
+		<a href="{$baseUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>{/if}
 	</div>
 {/if}
 

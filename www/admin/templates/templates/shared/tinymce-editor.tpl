@@ -5,7 +5,7 @@
 {assign var=spellchecker_languages value=$spellchecker_languages|cat:$languages[l].language|cat:'='|cat:$languages[l].iso2|cat:','}
 {/section}
 
-<script type="text/javascript" src="{$rootWebUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+<script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
 {literal}
 <script type="text/javascript">
 tinyMCE.init({

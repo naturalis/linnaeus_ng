@@ -175,10 +175,11 @@ class SpeciesController extends Controller
         
         // this could do with a little more elegance...
         $this->setBreadcrumbIncludeReferer(
-        array(
-            'name' => _('Taxon list'), 
-            'url' => $this->generalSettings['rootWebUrl'] . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-        ));
+			array(
+				'name' => _('Taxon list'), 
+				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+			)
+		);
         
         // taxon data (or new taxon)
         if (!empty($this->requestData['id'])) {
