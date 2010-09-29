@@ -10,6 +10,7 @@ class Controller extends BaseClass
     private $_smartySettings;
     private $_viewName;
     private $_fullPath;
+	private $_fullPathRelative;
     private $_helpTexts;
 
     public $smarty;
@@ -179,15 +180,14 @@ class Controller extends BaseClass
         
         }
         
-
         if (basename($url) == $url) {
             
             $circular = (basename($this->_fullPath) == $url);
         
         } else {
-            
-            $circular = ($this->_fullPath == $url);
-        
+
+            $circular = ($this->_fullPath == $url) || ($this->_fullPathRelative == $url);
+
         }
         
         if ($url && !$circular) {
@@ -565,7 +565,7 @@ class Controller extends BaseClass
                 }
             
             } else {
-                
+            
                 $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject']);
             
             }
@@ -838,6 +838,8 @@ class Controller extends BaseClass
 		}
 
 		if ($path['filename']) $this->_viewName = $path['filename'];
+
+		$this->_fullPathRelative = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/'.$this->_viewName .'.php';
 
     }
 
