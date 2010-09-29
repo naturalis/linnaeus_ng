@@ -457,6 +457,11 @@ class SpeciesController extends Controller
             $this->getCatalogueOfLifeData();
         
         }
+        else if ($this->requestData['action'] == 'save_col') {
+
+            $this->ajaxActionImportTaxa();
+        
+        }
         
         $this->printPage();
     
@@ -1039,35 +1044,112 @@ class SpeciesController extends Controller
     
     }
 
-	private function ajaxActionImportTaxon() 
+	private function ajaxActionImportTaxon($taxon) 
 	{
 
-/*
-			'taxon_rank' : taxon[2] ,
-			'taxon_name' : taxon[1] ,
-			'taxon_id' : taxon[0] ,
-			'parent_taxon_rank' : taxon[5] ,
-			'parent_taxon_name' : taxon[4] ,
-			'parent_taxon_id' : taxon[3] ,
-			
+		if (empty($taxon['taxon_name'])) return;
 
-		check if exists: name + rank
-		if exists
-			check if parentage exists
-				if nor, update
-				if exists, return
-		if not exists
-			create
+		$t = $this->models->Taxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon' => $taxon['taxon_name']
+			),false,false,false,true
+		);
 		
-		parenthood:
+		if (count((array)$t[0])==0) {
+		// taxon does not exist in database
 
+			if (!empty($taxon['parent_taxon_name'])) {
 
+				// see if the parent taxon already exists
+				$p = $this->models->Taxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon' => $taxon['parent_taxon_name']
+					)
+				);
 
-*/
+			}
 
+			if (isset($p) && count((array)$p)==1) {
+			
+				$pId = $p[0]['id'];
+			
+			} else {
 
+				$pId = null;
 
-		//ajaxActionSaveTaxon
+			}
+
+			// save taxon
+			$this->models->Taxon->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => $taxon['taxon_name'],
+					'parent_id' => $pId,
+					'rank' => $taxon['taxon_rank'],
+					'col_id' => $taxon['taxon_id']					
+				)
+			);
+
+		} else {
+		// taxon does exist in database
+		
+			if (empty($t[0]['rank']) || empty($t[0]['col_id']) || empty($t[0]['parent_id'])) {
+			
+				$pId = null;
+			
+				if (empty($t[0]['parent_id']) && !empty($taxon['parent_taxon_name'])) {
+
+					// see if the parent taxon already exists
+					$p = $this->models->Taxon->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon' => $taxon['parent_taxon_name']
+						)
+					);
+
+					if (isset($p) && count((array)$p)==1) {
+					
+						$pId = $p[0]['id'];
+					
+					}
+				
+				}
+
+				$this->models->Taxon->save(
+					array(
+						'id' => $t[0]['id'],
+						'project_id' => $this->getCurrentProjectId(),
+						'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']),
+						'rank' => (empty($t[0]['rank']) ? $taxon['taxon_rank'] : $t[0]['rank']),
+						'col_id' => (empty($t[0]['col_id']) ? $taxon['taxon_id'] : $t[0]['col_id'])
+					)
+
+				);
+			}
+
+		}
+
+	}
+
+	private function ajaxActionImportTaxa() 
+	{
+
+		if (empty($this->requestData['data'])) return;
+
+		foreach((array)$this->requestData['data'] as $key => $val) {
+
+			$t['taxon_id'] = $val[0];
+			$t['taxon_name'] = $val[1];
+			$t['taxon_rank'] = $val[2];
+			$t['parent_taxon_name'] = $val[3];
+
+			$this->ajaxActionImportTaxon($t);
+
+		}
+
 	}
 	
 }
