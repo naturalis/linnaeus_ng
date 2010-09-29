@@ -48,7 +48,7 @@ class SpeciesController extends Controller
         
         parent::__construct();
         
-        $this->createTaxonPage(_('Main'), true);
+        $this->createTaxonPage(_('Overview'), true);
         
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
     
