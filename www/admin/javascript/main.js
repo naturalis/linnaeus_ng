@@ -1100,28 +1100,22 @@ function taxonRepositionResults() {
 
 }
 
-
-function taxonSaveCoLTaxon(taxon) {
-	
-	alert(taxon);
+function taxonSaveCoLTaxa(taxa) {
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
 		data : ({
-			'taxon_rank' : taxon[2] ,
-			'taxon_name' : taxon[1] ,
-			'taxon_id' : taxon[0] ,
-			'parent_taxon_rank' : taxon[5] ,
-			'parent_taxon_name' : taxon[4] ,
-			'parent_taxon_id' : taxon[3] ,
+			'data' : taxa ,
 			'action' : 'save_col',
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
 			if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''))
-			}			
+			} else {
+				alert('Data saved');
+			}
 		}
 	})
 
@@ -1129,26 +1123,26 @@ function taxonSaveCoLTaxon(taxon) {
 
 function taxonSaveCoLResult() {
 
+	var taxonTaxaToSave = Array();
+	
 	$("input:checkbox[id^='taxon']").each(function(index) {
 
 		if ($(this).is(':checked')) {
 
 			var id = $(this).attr('id').replace('taxon-','');
-			
-			taxonSaveCoLTaxon([
+
+			taxonTaxaToSave[taxonTaxaToSave.length] = ([
 				id,
 				 $('#name-'+id).html(),
 				 $('#rank-'+id).html(),
-				 $('#parent-id-'+id).val(),
-				 $('#parent-name-'+id).val(),
-				 $('#parent-rank-'+id).val()
+				 $('#parent-name-'+id).val()
 			]);
 
 		}
 
 	});
-	
-	alert('saved');
+
+	taxonSaveCoLTaxa(taxonTaxaToSave);
 
 }
 

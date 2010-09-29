@@ -355,12 +355,12 @@ abstract class Model extends BaseClass
 
 
 
-    public function get ($id = false, $cols = false, $order = false, $groupby = false, $ignore_case = true)
+    public function get ($id = false, $cols = false, $order = false, $groupby = false, $ignoreCase = true)
     {
         
         unset($this->data);
         
-        $this->set($id ? $id : $this->id, $cols, $order, $groupby, $ignore_case);
+        $this->set($id ? $id : $this->id, $cols, $order, $groupby, $ignoreCase);
         
         return isset($this->data) ? $this->data : null;
     
@@ -564,7 +564,7 @@ abstract class Model extends BaseClass
 
 
 
-    private function set ($id = false, $cols = false, $order = false, $groupby = false, $ignore_case = true)
+    private function set ($id = false, $cols = false, $order = false, $groupby = false, $ignoreCase = true)
     {
         
         /*
@@ -604,7 +604,7 @@ abstract class Model extends BaseClass
                 
                 }
                 
-                if ($ignore_case && is_string($val)) {
+                if ($ignoreCase && is_string($val)) {
                     
                     $query .= ' and lower(' . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
                 

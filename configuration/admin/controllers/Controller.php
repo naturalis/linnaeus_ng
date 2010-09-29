@@ -891,7 +891,7 @@ class Controller extends BaseClass
                 $this->requestData[$key] = stripslashes($val);
             
             }
-        
+
         }
         
         foreach ((array) $_FILES as $key => $val) {
