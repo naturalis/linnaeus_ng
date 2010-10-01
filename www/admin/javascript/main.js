@@ -599,6 +599,42 @@ function taxonPageTitleSave(page) {
 
 }
 
+function taxonSaveEditedTaxonName(id) {
+	
+	var newName = $('#edit'+id).val();
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'taxon_id' : id ,
+			'taxon_name' : newName ,
+			'action' : 'save_taxon_name',
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			if(data=='<ok>') {
+				allSetMessage('saved');
+			}
+		}
+	})
+
+	$('#namecell'+id).html(
+		'<span onclick="taxonEditTaxonName('+id+')" id="name'+id+'" class="pseudo-a">'+
+		newName+'</span>'
+	);
+
+}
+
+function taxonEditTaxonName(id) {
+
+	$('#namecell'+id).html(
+		'<input class="taxonNameEdit" id="edit'+id+'" value="'+$('#name'+id).html()+'" />'+
+		'<input type="button" value="save" onclick="taxonSaveEditedTaxonName('+id+')" />'
+	);
+
+}
+
 function taxonAddLanguage(lan) {
 	//[id,name,default?]
 	taxonLanguages[taxonLanguages.length] = lan;

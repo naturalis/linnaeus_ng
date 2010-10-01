@@ -34,6 +34,8 @@ class SpeciesController extends Controller
         'col_loader_helper','csv_parser_helper'
     );
 
+	private $_treeIdList;
+
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
 
@@ -329,8 +331,8 @@ class SpeciesController extends Controller
         
         $taxa = $this->models->Taxon->get(array(
             'project_id' => $this->getCurrentProjectId()
-        ), '*', 'taxon');
-        
+        ), '*', 'taxon_order');
+
         $lp = $this->models->LanguageProject->get(array(
             'project_id' => $this->getCurrentProjectId()
         ));
@@ -348,6 +350,8 @@ class SpeciesController extends Controller
         }
         
         foreach ((array) $taxa as $key => $taxon) {
+		
+			$taxa[$key]['symbol'] = $this->getRankSymbol($taxon['rank']);
             
             foreach ((array) $lp as $k => $val) {
                 
@@ -387,9 +391,11 @@ class SpeciesController extends Controller
                 'case' => 'i'
             );
         
-        }
+			// sort array of collaborators
+			$this->customSortArray($taxa, $sortBy);
+
+        } else {
         // default sort order
-        else {
             
             $sortBy = array(
                 'key' => 'taxon', 
@@ -398,9 +404,6 @@ class SpeciesController extends Controller
             );
         
         }
-        
-        // sort array of collaborators
-        $this->customSortArray($taxa, $sortBy);
         
         $this->smarty->assign('sortBy', $sortBy);
         
@@ -535,6 +538,8 @@ class SpeciesController extends Controller
 
 				}
 
+				$this->reOrderTaxonTree();
+
 				unset($_SESSION['system']['csv_data']);
 				
 				$this->addMessage(_('Data saved.'));
@@ -557,57 +562,51 @@ class SpeciesController extends Controller
     public function ajaxInterfaceAction ()
     {
 
-        if (!isset($this->requestData['action']))
-            return;
+        if (!isset($this->requestData['action'])) return;
         
         if ($this->requestData['action'] == 'save_taxon') {
             
             $this->ajaxActionSaveTaxon();
         
-        }
-        else if ($this->requestData['action'] == 'get_taxon') {
+        } else if ($this->requestData['action'] == 'get_taxon') {
             
             $this->ajaxActionGetTaxon();
         
-        }
-        else if ($this->requestData['action'] == 'delete_taxon') {
+        } else if ($this->requestData['action'] == 'delete_taxon') {
             
             $this->ajaxActionDeleteTaxon();
         
-        }
-        else if ($this->requestData['action'] == 'delete_page') {
+        } else if ($this->requestData['action'] == 'delete_page') {
             
             $this->ajaxActionDeletePage();
         
-        }
-        else if ($this->requestData['action'] == 'save_page_title') {
+        } else if ($this->requestData['action'] == 'save_page_title') {
             
             $this->ajaxActionSavePageTitle();
         
-        }
-        else if ($this->requestData['action'] == 'get_page_states') {
+        } else if ($this->requestData['action'] == 'get_page_states') {
             
             $this->ajaxActionGetPageStates();
         
-        }
-        else if ($this->requestData['action'] == 'publish_content') {
+        } else if ($this->requestData['action'] == 'publish_content') {
             
             $this->ajaxActionPublishContent();
         
-        }
-        else if ($this->requestData['action'] == 'get_taxon_undo') {
+        } else if ($this->requestData['action'] == 'get_taxon_undo') {
             
             $this->ajaxActionGetTaxonUndo();
         
-        }
-        else if ($this->requestData['action'] == 'get_col') {
+        } else if ($this->requestData['action'] == 'get_col') {
 
             $this->getCatalogueOfLifeData();
         
-        }
-        else if ($this->requestData['action'] == 'save_col') {
+        } else if ($this->requestData['action'] == 'save_col') {
 
             $this->ajaxActionImportTaxa();
+        
+        } else if ($this->requestData['action'] == 'save_taxon_name') {
+
+            $this->ajaxSaveTaxonName();
         
         }
         
@@ -749,8 +748,6 @@ class SpeciesController extends Controller
     
     }
 
-
-
     private function doLockOutUser ($taxonId)
     {
         
@@ -775,8 +772,6 @@ class SpeciesController extends Controller
         return isset($h) ? true : false;
     
     }
-
-
 
     private function ajaxActionDeletePage ()
     {
@@ -806,8 +801,6 @@ class SpeciesController extends Controller
         }
     
     }
-
-
 
     private function ajaxActionSavePageTitle ()
     {
@@ -939,8 +932,7 @@ class SpeciesController extends Controller
                         
                         $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $this->requestData['save_type']);
                     
-                    }
-                    else {
+                    } else {
                         
                         // see if such content already exists
                         $ct = $this->models->ContentTaxon->get(
@@ -967,8 +959,7 @@ class SpeciesController extends Controller
                         );
                         
                         // save content
-                        $d = $this->models->ContentTaxon->save(
-                        $newdata);
+                        $d = $this->models->ContentTaxon->save($newdata);
                         
                         if ($id != null)
                             $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, 
@@ -978,6 +969,10 @@ class SpeciesController extends Controller
                     
                     if ($d) {
                         
+						/* the block below changed the taxon's name in the taxon table to whatever the user had 
+						   entrered as subpage title of the default page in the default language, but the assumption
+						   that that is the place where the leading name of a taxon is entered might be faulty
+
                         // if succesful, get the projects default language
                         $lp = $this->models->LanguageProject->get(
                         array(
@@ -1002,11 +997,11 @@ class SpeciesController extends Controller
                             'project_id' => $this->getCurrentProjectId(), 
                             'taxon' => !empty($ct[0]['title']) ? $ct[0]['title'] : '?'
                         ));
+						*/
                         
                         $this->smarty->assign('returnText', 'id=' . $taxonId);
                     
-                    }
-                    else {
+                    } else {
                         
                         $this->addError(_('Could not save taxon content'));
                     
@@ -1243,7 +1238,6 @@ class SpeciesController extends Controller
     
     }
 
-
 	private function importTaxon($taxon) 
 	{
 
@@ -1333,6 +1327,72 @@ class SpeciesController extends Controller
 
 	}
 
+	private function ajaxSaveTaxonName() 
+	{
+
+		if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
+
+		$t = $this->models->Taxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $this->requestData['taxon_id']
+			),'count(*) as total'
+		);
+
+		if ($t[0]['total']>0) {
+
+			$d = $this->models->Taxon->save(
+				array(
+					'id' => $this->requestData['taxon_id'],
+					'taxon' => $this->requestData['taxon_name']
+				)
+			);
+
+			if ($d) $this->smarty->assign('returnText', '<ok>');
+
+		}
+
+	}
+
+	private function getTaxonTree($pId) 
+	{
+
+		$t = $this->models->Taxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				($pId === null ? 'parent_id is' : 'parent_id') => $pId
+			),false,'taxon');
+
+		foreach((array)$t as $key => $val) {
+
+			$this->_treeIdList[] = $val['id'];
+
+			$t['children'] = $this->getTaxonTree($val['id']);
+
+		}
+		
+		return $t;
+
+	}
+
+	private function reOrderTaxonTree() 
+	{
+
+		$this->getTaxonTree(null);
+
+		foreach((array)$this->_treeIdList as $key => $val) {
+
+			$this->models->Taxon->save(
+				array(
+					'id' => $val,
+					'taxon_order' => $key
+				)
+			);
+			
+		}
+
+	}
+
 	private function ajaxActionImportTaxa() 
 	{
 
@@ -1381,6 +1441,41 @@ class SpeciesController extends Controller
 	
 	}
 
+	private function getRankSymbol($rank)
+	{
+
+		switch (strtolower($rank)) {
+			/*
+			case 'kingdom' :
+				return 'K';
+				break;
+			case 'phylum' :
+				return 'P';
+				break;
+			case 'class' :
+				return 'C';
+				break;
+			case 'order' :
+				return 'O';
+				break;
+			*/
+			case 'family' :
+				return '.';
+				break;
+			case 'genus' :
+				return '..';
+				break;
+			case 'species' :
+				return '...';
+				break;
+			case 'infraspecies' :
+				return '....';
+				break;
+			default :
+				return '&para;';
+		}
+
+	}
 
 }
 
