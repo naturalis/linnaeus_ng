@@ -595,21 +595,23 @@ abstract class Model extends BaseClass
                     
                     $operator = '=';
                 
-                }
-                else {
+                } else {
                     
                     $operator = trim(substr($col, strpos($col, ' ')));
                     
                     $col = trim(substr($col, 0, strpos($col, ' ')));
                 
                 }
-                
-                if ($ignoreCase && is_string($val)) {
+
+				if ($val===null) {
+				
+                    $query .= ' and ' . $col . " " . $operator . " null ";
+				
+                } elseif ($ignoreCase && is_string($val)) {
                     
                     $query .= ' and lower(' . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
                 
-                }
-                else {
+                } else {
                     
                     $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
                 

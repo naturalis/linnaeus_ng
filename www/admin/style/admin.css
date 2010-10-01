@@ -359,18 +359,26 @@ a:hover,.pseudo-a:hover {
 	background-color: #eee;
 }
 
+.taxon-list-cell-rank {
+	width: 75px;
+}
+
 .taxon-list-cell-name {
 	width: 200px;
 }
 
-.taxon-list-cell-language,.taxon-list-cell-language-done {
+.taxon-list-cell-language,.taxon-list-cell-language-empty,.taxon-list-cell-language-done {
 	width: 75px;
 	text-align: right;
-	background-color: #Fb6;
+	background-color: #f88;
+}
+
+.taxon-list-cell-language {
+	background-color: #fc0;
 }
 
 .taxon-list-cell-language-done {
-	background-color: #bF6;
+	background-color: #afa
 }
 
 #taxon-pages-table-div {
