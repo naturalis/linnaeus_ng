@@ -45,7 +45,7 @@
 							title="remove collaborator" 
 							class="cell-moduser-remove"
 							id="cell-{$modules[i].module_id}-{$users[j].id}b"
-							onclick="moduleChangeModuleUserStatus(this,{$modules[i].module_id},{$users[j].id},'remove')">
+							onclick="moduleChangeModuleUserStatus(this,{$modules[i].module_id},{$users[j].id},'remove','regular')">
 						</td>
 					{else}
 						<td
@@ -58,7 +58,7 @@
 							title="add collaborator" 
 							class="cell-moduser-inactive"
 							id="cell-{$modules[i].module_id}-{$users[j].id}b"
-							onclick="moduleChangeModuleUserStatus(this,{$modules[i].module_id},{$users[j].id},'add')">
+							onclick="moduleChangeModuleUserStatus(this,{$modules[i].module_id},{$users[j].id},'add','regular')">
 						</td>
 					{/if}
 					</tr>
@@ -130,7 +130,7 @@
 							title="remove collaborator" 
 							class="cell-moduser-remove"
 							id="cell-f{$free_modules[i].id}-{$users[j].id}b"
-							onclick="moduleChangeModuleUserStatus(this,{$free_modules[i].id},{$users[j].id},'remove')">
+							onclick="moduleChangeModuleUserStatus(this,{$free_modules[i].id},{$users[j].id},'remove','free')">
 						</td>
 					{else}
 						<td
@@ -143,7 +143,7 @@
 							title="add collaborator" 
 							class="cell-moduser-inactive"
 							id="cell-f{$free_modules[i].id}-{$users[j].id}b"
-							onclick="moduleChangeModuleUserStatus(this,{$free_modules[i].id},{$users[j].id},'add')">
+							onclick="moduleChangeModuleUserStatus(this,{$free_modules[i].id},{$users[j].id},'add','free')">
 						</td>
 					{/if}
 					</tr>

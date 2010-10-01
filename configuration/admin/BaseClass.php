@@ -8,8 +8,6 @@ class BaseClass
     public $config;
     public $generalSettings;
 
-
-
     public function __construct ()
     {
 
@@ -20,17 +18,15 @@ class BaseClass
     }
 
 
-
     public function __destruct ()
     {
     
     }
 
 
-
     private function loadConfiguration ()
     {
-        
+
         if (class_exists('configuration')) {
             
             $this->config = new configuration();
@@ -42,8 +38,6 @@ class BaseClass
         }
     
     }
-
-
 
     private function setGeneralSettings ()
     {

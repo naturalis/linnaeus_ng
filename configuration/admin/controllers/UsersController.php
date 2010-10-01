@@ -17,7 +17,6 @@ class UsersController extends Controller
         'right', 
         'role', 
         'project_role_user', 
-        'project', 
         'right_role',
 		'timezone'
     );
@@ -197,17 +196,17 @@ class UsersController extends Controller
     {
         
         $this->checkAuthorisation();
-        
+
         $this->setPageName(_('Select a project to work on'));
         
         if (isset($this->requestData['project_id'])) {
-            
+
             if ($this->isCurrentUserAuthorizedForProject($this->requestData['project_id'])) {
                 
                 $this->setCurrentProjectId($this->requestData['project_id']);
-                
-                $this->setCurrentProjectName();
-                
+
+				$this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
+
                 $this->redirect($this->getLoggedInMainIndex());
             
             }

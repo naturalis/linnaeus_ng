@@ -11,7 +11,8 @@ class configuration
 		$d = $this->getGeneralSettings();
 		$d['app']['pathName'];
 		$this->_appFileRoot = dirname(__FILE__);
-		$this->_appFileRoot = substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1));
+		$this->_appFileRoot = str_replace('\\','/',
+			substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
 
 	}
 
@@ -58,7 +59,46 @@ class configuration
     
     }
 
+    public function getControllerSettingsSpecies()
+    {
+        
+        return array(
+			'defaultSubPages' =>
+				array(
+					0 => array(
+						'name' => 'Overview',
+						'default' => true,
+						'mandatory' => array(0),
+						'sections' => array ('General description','Biology')
+					),
+					1 => array(					
+						'name' => 'Detailed Description',
+						'sections' => array ('Behaviour','Cytology','Diagnostic Description',
+							'Genetics','Look Alikes','Molecular Biology','Morphology','Physiology',
+							'Size','Taxon Biology')
+					),
+					2 => array(					
+						'name' => 'Ecology',
+						'sections' => array ('Associations','Cyclicity','Dispersal','Distribution',
+							'Ecology','Habitat','Life Cycle','Life Expectancy','Migration','Trophic Strategy')
+					),
+					3 => array(					
+						'name' => 'Conservation',
+						'sections' => array ('Conservation Status','Legislation','Management','Procedures',
+							'Threats','Trends')
+					),
+					4 => array(					
+						'name' => 'Relevance',
+						'sections' => array ('Diseases','Risk Statement','Uses')
+					),
+					5 => array(					
+						'name' => 'Reproductive',
+						'sections' => array ('Population Biology','Reproduction')
+					)
+				)
+			);
 
+    }
 
     public function getDatabaseSettings ()
     {

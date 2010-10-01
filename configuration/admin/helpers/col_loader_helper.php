@@ -347,9 +347,9 @@ class ColLoaderHelper
 
 			} else {
 
-				if (isset($children)) {
+				$this->_level++;
 
-					$this->_level++;
+				if (isset($children)) {
 
 					foreach((array)$children as $key => $val) {
 
@@ -375,15 +375,18 @@ class ColLoaderHelper
 
 	private function timerStart()
 	{
+
 		$this->_timeTaken = false;
 		$mtime = microtime();
 		$mtime = explode(' ', $mtime);
 		$mtime = $mtime[1] + $mtime[0];
 		$this->_startTime = $mtime;
+
 	}
 
 	private function timerEnd()
 	{
+
 		if (!$this->_startTime) return;	
 		$mtime = microtime();
 		$mtime = explode(" ", $mtime);
@@ -392,6 +395,7 @@ class ColLoaderHelper
 		$this->_timeTaken = ($endtime - $this->_startTime);
 		$this->_startTime = false;
 		return $this->_timeTaken;
+
 	 }
 
 }

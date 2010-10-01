@@ -87,7 +87,7 @@ abstract class Model extends BaseClass
 
     public function save ($data)
     {
-        
+
         if (!$this->hasId($data))
             return false;
         
@@ -110,7 +110,7 @@ abstract class Model extends BaseClass
 
     public function insert ($data)
     {
-        
+
         foreach ((array) $data as $key => $val) {
             
             $data[$key] = $this->escapeString($val);
@@ -127,9 +127,9 @@ abstract class Model extends BaseClass
                 continue;
             
             $d = $this->columns[$key];
-            
-            if ($d && !empty($val)) {
-                
+
+            if ($d && (!empty($val) || $val===0)) {
+
                 $fields .= $key . ", ";
                 
                 if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
