@@ -7,12 +7,13 @@
 
 	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
-
 	<style type="text/css" media="all">
 		@import url("{$baseUrl}admin/style/main.css");
 		@import url("{$baseUrl}admin/style/admin-inputs.css");
 		@import url("{$baseUrl}admin/style/admin-help.css");
 		@import url("{$baseUrl}admin/style/admin.css");
+{if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
+{/if}
 	</style>
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
@@ -42,6 +43,9 @@
 <div id="page-header-titles">
 	<span id="page-header-title">{$app.name}</span>
 	<span id="page-header-version">{$app.version} ({$app.versionTimestamp})</span>
+{if $session.system.server_addr=='127.0.0.1'}
+	<span id="page-header-version" style="color:#CC0000">[localhost]</span>
+{/if}
 	<br />
 {if $breadcrumbs}
 	<div id="breadcrumbs">

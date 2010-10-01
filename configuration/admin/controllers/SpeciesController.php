@@ -31,7 +31,7 @@ class SpeciesController extends Controller
     );
     
     public $usedHelpers = array(
-        'col_loader_helper'
+        'col_loader_helper','csv_parser_helper'
     );
 
     public $controllerPublicName = 'Species module';
@@ -45,13 +45,12 @@ class SpeciesController extends Controller
      */
     public function __construct ()
     {
-        
         parent::__construct();
         
-        $this->createTaxonPage(_('Overview'), true);
-        
+		$this->createStandardSubpages();
+
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
-    
+
     }
 
 
@@ -99,8 +98,8 @@ class SpeciesController extends Controller
         
         // adding a new page
         if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
-            
-            $tp = $this->createTaxonPage($this->requestData['new_page']);
+		
+            $tp = $this->createTaxonPage($this->requestData['new_page'],$this->requestData['show_order']);
             
             if ($tp !== true) {
                 
@@ -128,7 +127,9 @@ class SpeciesController extends Controller
         
         $pages = $this->models->TaxonPage->get(array(
             'project_id' => $this->getCurrentProjectId()
-        ));
+        	),
+			false,'show_order'
+		);
         
         foreach ((array) $pages as $key => $page) {
             
@@ -144,9 +145,13 @@ class SpeciesController extends Controller
                 $pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
             
             }
+			
+			$nextShowOrder = $page['show_order']+1;
         
         }
         
+
+        $this->smarty->assign('nextShowOrder', $nextShowOrder);
 
         $this->smarty->assign('maxSubPages', $this->generalSettings['maxSubPages']);
         
@@ -181,8 +186,8 @@ class SpeciesController extends Controller
 			)
 		);
         
-        // taxon data (or new taxon)
         if (!empty($this->requestData['id'])) {
+        // get existing taxon name
             
             $t = $this->models->Taxon->get(array(
                 'id' => $this->requestData['id'], 
@@ -193,16 +198,17 @@ class SpeciesController extends Controller
             
             $this->setPageName(_('Editing') . ' "' . $taxon['taxon'] . '"');
         
-        }
-        else {
+        } else {
+        // no id, new taxon
             
             $this->setPageName(_('Adding new taxon'));
         
         }
         
         if (empty($this->requestData['id']) || !$this->doLockOutUser($this->requestData['id'])) {
-            
-            // available languages
+		// if new taxon OR existing taxon not being edited by someone else, get languages and content
+
+            // get available languages
             $lp = $this->models->LanguageProject->get(array(
                 'project_id' => $this->getCurrentProjectId()
             ));
@@ -225,15 +231,16 @@ class SpeciesController extends Controller
             // determine the language the page will open in
             $startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $defaultLanguage;
             
-            // available pages
+            // get the defined subpages (just the page definitions, no content yet)
             $tp = $this->models->TaxonPage->get(array(
                 'project_id' => $this->getCurrentProjectId()
             ));
-            
+
             foreach ((array) $tp as $key => $val) {
                 
                 foreach ((array) $lp as $k => $language) {
                     
+					// for each subpage in each language, get the subpage title
                     $tpt = $this->models->TaxonPageTitle->get(
                     array(
                         'project_id' => $this->getCurrentProjectId(), 
@@ -245,8 +252,7 @@ class SpeciesController extends Controller
                 
                 }
                 
-                if ($val['def_page'] == 1)
-                    $defaultPage = $val['id'];
+                if ($val['def_page'] == 1) $defaultPage = $val['id'];
             
             }
             
@@ -263,9 +269,16 @@ class SpeciesController extends Controller
                     'language_id' => $startLanguage, 
                     'page_id' => $startPage
                 ));
-                
-                $content = $ct[0];
-            
+
+				if ($ct == null) {
+
+					$content['content'] = $this->getDefaultPageSections($startPage);
+
+				} else {
+
+	                $content = $ct[0];
+
+            	}
             }
             
             if (isset($taxon))
@@ -273,7 +286,7 @@ class SpeciesController extends Controller
             
             if (isset($content))
                 $this->smarty->assign('content', $content);
-            
+
             $this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
             
             $this->smarty->assign('pages', $tp);
@@ -286,9 +299,9 @@ class SpeciesController extends Controller
             
             $this->smarty->assign('activePage', $startPage);
         
-        }
-        else {
-            
+        } else {
+		// existing taxon already being edited by someone else
+
             $this->smarty->assign('taxon', array(
                 'id' => -1
             ));
@@ -400,6 +413,141 @@ class SpeciesController extends Controller
     }
 
 
+    /**
+     * Upload a file with taxa
+     *
+     * @access	public
+     */
+    public function fileAction ()
+    {
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Taxon file upload'));
+		
+		if ($this->requestDataFiles) {
+
+			unset($_SESSION['system']['csv_data']);
+			
+			$this->helpers->CsvParserHelper->setFieldMax(2);
+
+			$this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
+		
+			$this->addError($this->helpers->CsvParserHelper->getErrors());
+			
+			if (!$this->getErrors()) {
+
+				$r = $this->helpers->CsvParserHelper->getResults();
+
+				$_SESSION['system']['csv_data'] = $r;
+
+				$this->smarty->assign('results',$r);
+
+			}	
+
+		} elseif ($this->requestData) {
+
+			if (isset($this->requestData['rows']) && isset($_SESSION['system']['csv_data'])) {
+			
+				$parenName = false;
+				$predecessors = null;
+
+				foreach((array)$this->requestData['rows'] as $key => $val) {
+
+					$rank = $_SESSION['system']['csv_data'][$val][0];
+					$name = $_SESSION['system']['csv_data'][$val][1];
+					$parentName = null;
+
+					if ($key==0) {
+					// first one never has a parent (top of the tree)
+
+						$predecessors[] = array($rank, $name);
+
+					} else {
+						if ($rank==$predecessors[count((array)$predecessors)-1][0]) {
+						/* if this taxon has the same rank as the previous one, they must have the same
+							parent, so we go back in the list until we find the first different rank,
+							which must be the parent */
+							
+							$j=1;
+							$prevRank = $rank;
+							while($rank==$prevRank) {
+							
+								$prevRank = $predecessors[count((array)$predecessors)-$j][0];
+								$parentName = $predecessors[count((array)$predecessors)-$j][1];
+								$j++;
+
+							}
+
+							$predecessors[] = array($rank, $name);
+
+						} else {
+
+							/* if rank came before then we are no longer in the first branch of the tree
+							   and need to use the parent of the previous occurrence.
+							   we ignore the immediately preceding taxon, because if that is the same as
+							   the current one, we are simple still on the same level. */
+							foreach((array)$predecessors as $key => $val) {
+	
+								if ($rank == $val[0] && $key != count((array)$predecessors)-1) {
+								// found a previous occurrence
+								
+									if (isset($predecessors[$key-1])) {
+	
+										// get the name of the previous occurrence's parent
+										$parentName = $predecessors[$key-1][1];
+										
+										// apparantly we are at the start of a new branch, so chop off the previous one
+										$predecessors = array_slice($predecessors,0,$key);
+	
+										// and add the first child of the next one
+										$predecessors[] = array($rank, $name);
+	
+										break;
+	
+									}
+	
+								}
+	
+							}
+							
+							
+							if ($parentName==null) {
+							// did not find a previous occurrence of the current rank, so the previous taxon must be the parent
+
+								$parentName = $predecessors[count((array)$predecessors)-1][1];
+
+								$predecessors[] = array($rank, $name);
+
+							}
+
+						}
+
+					}
+
+					$this->importTaxon(
+						array(
+							'taxon_rank' => $rank,
+							'taxon_name' => $name,
+							'parent_taxon_name' => $parentName
+						)
+					);
+
+				}
+
+				unset($_SESSION['system']['csv_data']);
+				
+				$this->addMessage(_('Data saved.'));
+
+			}
+
+
+		}
+
+        $this->printPage();
+    
+    }
+
 
     /**
      * AJAX interface for this class
@@ -467,7 +615,26 @@ class SpeciesController extends Controller
     
     }
 
-	private function getCatalogueOfLifeData() {
+
+    /**
+     * Interface for getting taxon data from the Catalogue Of Life webservice (which is somewhat unreliable)
+     *
+     * @access	public
+     */
+	public function colAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Import from Catalogue Of Life'));
+
+		$this->printPage();
+	
+	}
+
+
+	private function getCatalogueOfLifeData()
+	{
 
 		if (!empty($this->requestData['taxon_name'])) {
 		
@@ -517,17 +684,48 @@ class SpeciesController extends Controller
 
 	}
 
-	public function colAction()
-	{
 
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Import from Catalogue Of Life'));
 
-		$this->printPage();
-	
+	private function createStandardSubpages() 
+	{	
+
+		$tp = $this->models->TaxonPage->get(
+			array(
+				'project_id' => $this->getCurrentProjectId()
+			),'count(*) as total'
+		);
+		
+
+		foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+
+			if ($tp[0]['total']==0) {
+
+				$this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
+
+			} else {
+
+				if (isset($page['mandatory'])) {
+
+					$d = $this->models->TaxonPage->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+				            'page' => $page['name'], 
+						),'count(*) as total'
+					);
+
+					if ($d[0]['total']==0) {
+		
+						$this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
+		
+					} 
+
+				}
+
+			}
+
+		}
+
 	}
-
 
 
     /**
@@ -538,12 +736,13 @@ class SpeciesController extends Controller
      *
      * @access	private
      */
-    private function createTaxonPage ($name, $isDefault = false)
+    private function createTaxonPage ($name, $show_order = false, $isDefault = false)
     {
-        
+
         return $this->models->TaxonPage->save(array(
             'id' => null, 
             'page' => $name, 
+            'show_order' => $show_order!==false ? $show_order : 0, 
             'project_id' => $this->getCurrentProjectId(), 
             'def_page' => $isDefault ? '1' : '0'
         ));
@@ -1044,7 +1243,8 @@ class SpeciesController extends Controller
     
     }
 
-	private function ajaxActionImportTaxon($taxon) 
+
+	private function importTaxon($taxon) 
 	{
 
 		if (empty($taxon['taxon_name'])) return;
@@ -1088,15 +1288,14 @@ class SpeciesController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon' => $taxon['taxon_name'],
 					'parent_id' => $pId,
-					'rank' => $taxon['taxon_rank'],
-					'col_id' => $taxon['taxon_id']					
+					'rank' => $taxon['taxon_rank']					
 				)
 			);
-
+			
 		} else {
 		// taxon does exist in database
 		
-			if (empty($t[0]['rank']) || empty($t[0]['col_id']) || empty($t[0]['parent_id'])) {
+			if (empty($t[0]['rank']) || empty($t[0]['parent_id'])) {
 			
 				$pId = null;
 			
@@ -1123,11 +1322,11 @@ class SpeciesController extends Controller
 						'id' => $t[0]['id'],
 						'project_id' => $this->getCurrentProjectId(),
 						'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']),
-						'rank' => (empty($t[0]['rank']) ? $taxon['taxon_rank'] : $t[0]['rank']),
-						'col_id' => (empty($t[0]['col_id']) ? $taxon['taxon_id'] : $t[0]['col_id'])
+						'rank' => (empty($t[0]['rank']) ? $taxon['taxon_rank'] : $t[0]['rank'])
 					)
 
 				);
+
 			}
 
 		}
@@ -1146,12 +1345,43 @@ class SpeciesController extends Controller
 			$t['taxon_rank'] = $val[2];
 			$t['parent_taxon_name'] = $val[3];
 
-			$this->ajaxActionImportTaxon($t);
+			$this->importTaxon($t);
 
 		}
 
 	}
+
+	private function getDefaultPageSections($pageId)
+	{
+
+		$tp = $this->models->TaxonPage->get(
+			array(
+			'id' => $pageId,
+			'project_id' => $this->getCurrentProjectId()
+			),'page'
+		);
+		
+		$b = '';
+
+		foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+		
+			if ($page['name']==$tp[0]['page']) {
+
+				foreach((array)$page['sections'] as $sectionkey => $section) {
+				
+					$b .= '<p class="taxon-section-head">'.$section.'</p>'.chr(10);
+
+				}
+
+			}
+
+		}
+
+		return $b;
 	
+	}
+
+
 }
 
 

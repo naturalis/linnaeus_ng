@@ -3,7 +3,7 @@
 /*
 
 	hard coded number of free modules
-	deleting of (free) moduels does not as yet delete any data, warnings or not
+	deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
 
 */
 
@@ -240,8 +240,13 @@ class ProjectsController extends Controller
         
         if ($this->requestDataFiles) {
             
-            $fuh = $this->helpers->FileUploadHelper->saveFiles($this->requestDataFiles, $this->getDefaultImageUploadDir(), $this->getDefaultUploadFilemask(), $this->getDefaultUploadMaxSize());
-            
+            $fuh = $this->helpers->FileUploadHelper->saveFiles(
+				$this->requestDataFiles, 
+				$this->getDefaultImageUploadDir(), 
+				$this->getDefaultUploadFilemask(), 
+				$this->getDefaultUploadMaxSize()
+			);
+
             if (!$fuh['error']) {
                 
                 $img = $this->getDefaultImageProjectDir() . 'project_logo.' . $fuh['result'][0]['extension'];
@@ -303,8 +308,43 @@ class ProjectsController extends Controller
     }
 
 
+    public function ajaxInterfaceAction ()
+    {
 
-    private function ajaxActionModules ($moduleType, $action, $id)
+		if (!isset($this->requestData['view'])) return;
+
+        if ($this->requestData['view'] == 'modules') {
+            
+            $this->ajaxActionModules(
+				$this->requestData['type'], 
+				$this->requestData['action'], 
+				$this->requestData['id']
+			);
+        
+        } elseif ($this->requestData['view'] == 'collaborators') {
+       
+            $this->ajaxActionCollaborators(
+				$this->requestData['type'], 
+				$this->requestData['action'], 
+				$this->requestData['id'], 
+				$this->requestData['user']
+			);
+        
+        } elseif ($this->requestData['view'] == 'languages') {
+            
+            $this->ajaxActionLanguages(
+				$this->requestData['action'], 
+				$this->requestData['id']
+			);
+
+        }
+
+        $this->printPage();
+    
+    }
+
+
+    private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
 
         if ($moduleType == 'free') {
@@ -314,7 +354,7 @@ class ProjectsController extends Controller
                 $this->models->FreeModuleProject->update(array(
                     'active' => 'y'
                 ), array(
-                    'id' => $id, 
+                    'id' => $moduleId, 
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
@@ -323,7 +363,7 @@ class ProjectsController extends Controller
                 $this->models->FreeModuleProject->update(array(
                     'active' => 'n'
                 ), array(
-                    'id' => $id, 
+                    'id' => $moduleId, 
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
@@ -331,11 +371,11 @@ class ProjectsController extends Controller
                 
                 $this->models->FreeModuleProjectUser->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $id
+                    'free_module_id' => $moduleId
                 ));
                 
                 $this->models->FreeModuleProject->delete(array(
-                    'id' => $id, 
+                    'id' => $moduleId, 
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
@@ -347,7 +387,7 @@ class ProjectsController extends Controller
                 
                 $this->models->ModuleProject->save(array(
                     'id' => null, 
-                    'module_id' => $id, 
+                    'module_id' => $moduleId, 
 					'active' => 'n',
                     'project_id' => $this->getCurrentProjectId()
                 ));
@@ -359,7 +399,7 @@ class ProjectsController extends Controller
 	                    'active' => 'y'
                 	), 
 					array(
-						'module_id' => $id, 
+						'module_id' => $moduleId, 
 						'project_id' => $this->getCurrentProjectId()
                 	)
 				);
@@ -370,7 +410,7 @@ class ProjectsController extends Controller
                 $this->models->ModuleProject->update(array(
                     'active' => 'n'
                 ), array(
-                    'module_id' => $id, 
+                    'module_id' => $moduleId, 
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
@@ -378,11 +418,11 @@ class ProjectsController extends Controller
                 
                 $this->models->ModuleProjectUser->delete(array(
                     'project_id' => $this->getCurrentProjectId(), 
-                    'module_id' => $id
+                    'module_id' => $moduleId
                 ));
                 
                 $this->models->ModuleProject->delete(array(
-                    'module_id' => $id, 
+                    'module_id' => $moduleId, 
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
@@ -393,9 +433,9 @@ class ProjectsController extends Controller
     }
 
 
-
-    private function ajaxActionCollaborators ($moduleType, $action, $id, $user)
+    private function ajaxActionCollaborators ($moduleType, $action, $moduleId, $userId)
     {
+
         //NEED CHECKS!
         if ($moduleType == 'free') {
             
@@ -405,8 +445,8 @@ class ProjectsController extends Controller
                 array(
                     'id' => null, 
                     'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $id, 
-                    'user_id' => $user
+                    'free_module_id' => $moduleId, 
+                    'user_id' => $userId
                 ));
             
             }
@@ -415,14 +455,13 @@ class ProjectsController extends Controller
                 $this->models->FreeModuleProjectUser->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $id, 
-                    'user_id' => $user
+                    'free_module_id' => $moduleId, 
+                    'user_id' => $userId
                 ));
             
             }
         
-        }
-        else {
+        } elseif ($moduleType == 'regular') {
             
             if ($action == 'add') {
                 
@@ -430,8 +469,8 @@ class ProjectsController extends Controller
                 array(
                     'id' => null, 
                     'project_id' => $this->getCurrentProjectId(), 
-                    'module_id' => $id, 
-                    'user_id' => $user
+                    'module_id' => $moduleId, 
+                    'user_id' => $userId
                 ));
             
             }
@@ -440,8 +479,8 @@ class ProjectsController extends Controller
                 $this->models->ModuleProjectUser->delete(
                 array(
                     'project_id' => $this->getCurrentProjectId(), 
-                    'module_id' => $id, 
-                    'user_id' => $user
+                    'module_id' => $moduleId, 
+                    'user_id' => $userId
                 ));
             
             }
@@ -451,8 +490,7 @@ class ProjectsController extends Controller
     }
 
 
-
-    private function ajaxActionLanguages ($action, $id, $user)
+    private function ajaxActionLanguages ($action, $languageId)
     {
         
         if ($action == 'add') {
@@ -466,7 +504,7 @@ class ProjectsController extends Controller
             $this->models->LanguageProject->save(
             array(
                 'id' => null, 
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId(), 
                 'def_language' => $make_default ? 1 : 0, 
                 'active' => 1
@@ -475,8 +513,7 @@ class ProjectsController extends Controller
             if ($this->models->LanguageProject->getNewId() == '')
                 $this->addError(_('Language already assigned.'));
         
-        }
-        elseif ($action == 'default') {
+        } elseif ($action == 'default') {
             
             $this->models->LanguageProject->update(array(
                 'def_language' => 0
@@ -487,94 +524,41 @@ class ProjectsController extends Controller
             $this->models->LanguageProject->update(array(
                 'def_language' => 1
             ), array(
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
             ));
         
-        }
-        elseif ($action == 'deactivate') {
+        } elseif ($action == 'deactivate') {
             
             $this->models->LanguageProject->update(array(
                 'active' => 'n'
             ), array(
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
             ));
         
-        }
-        elseif ($action == 'reactivate') {
+        } elseif ($action == 'reactivate') {
             
             $this->models->LanguageProject->update(array(
                 'active' => 'y'
             ), array(
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
             ));
         
-        }
-        elseif ($action == 'delete') {
+        } elseif ($action == 'delete') {
             
             $this->models->ContentTaxon->delete(array(
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
             ));
             
             $this->models->LanguageProject->delete(array(
-                'language_id' => $id, 
+                'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
             ));
         
         }
-    
-    }
-
-
-
-    public function ajaxInterfaceAction ()
-    {
-
-        $view = !empty($this->requestData['v']) ? $this->requestData['v'] : null;
-        
-        $id = !empty($this->requestData['i']) ? $this->requestData['i'] : null;
-        
-        $user = !empty($this->requestData['u']) ? $this->requestData['u'] : null;
-        
-        $action = !empty($this->requestData['a']) ? $this->requestData['a'] : null;
-        
-        if (!$view && $this->requestData['view']=='')
-            return;
-            
-        // determine type of module: free or standard
-        if (substr($id, 0, 1) == 'f') {
-            
-            $moduleType = 'free';
-            
-            $id = substr($id, 1);
-        
-        }
-        else {
-            
-            $moduleType = false;
-        
-        }
-        
-        if ($this->requestData['view'] == 'modules') {
-            
-            $this->ajaxActionModules($this->requestData['type'], $this->requestData['action'], $this->requestData['id']);
-        
-        }
-        else if ($view == 'collaborators') {
-            
-            $this->ajaxActionCollaborators($moduleType, $action, $id, $user);
-        
-        }
-        else if ($view == 'languages') {
-            
-            $this->ajaxActionLanguages($action, $id, $user);
-        
-        }
-
-        $this->printPage();
     
     }
 

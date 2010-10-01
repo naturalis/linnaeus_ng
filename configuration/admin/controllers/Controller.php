@@ -30,12 +30,15 @@ class Controller extends BaseClass
 
     private $usedModelsBase = array(
         'helptext', 
+        'project', 
         'module_project'
     );
 
 
     /**
      * Constructor, calls parent's constructor and all initialisation functions
+     *
+     * The order in which the functions are called is relevant! Do not change without good reason and plan.
      *
      * @access 	public
      */
@@ -45,10 +48,12 @@ class Controller extends BaseClass
         parent::__construct();
         
         $this->setDebugMode();
-        
+		
         $this->startSession();
         
         $this->setNames();
+        
+        $this->loadControllerConfig();		
         
         $this->setSessionActivePageValues();
         
@@ -67,10 +72,8 @@ class Controller extends BaseClass
         $this->setPaths();
         
         $this->checkModuleActivationStatus();
-    
+
     }
-
-
 
     /**
      * Destroys!
@@ -85,8 +88,6 @@ class Controller extends BaseClass
         parent::__destruct();
     
     }
-
-
 
     /**
      * Returns the application name
@@ -386,38 +387,12 @@ class Controller extends BaseClass
      *
      * @access 	public
      */
-    public function setCurrentProjectName ()
+    public function setCurrentProjectData ($data)
     {
         
-        foreach ((array) $_SESSION['user']['_roles'] as $key => $val) {
-            
-            if ($val['project_id'] == $this->getCurrentProjectId()) {
-                
-                $_SESSION['project']['name'] = $val['project_name'];
-                
-                return;
-            
-            }
-        
-        }
-    
+		$_SESSION['project'] = $data;
+
     }
-
-
-
-    /**
-     * Gets the active project's name from the session
-     *
-     * @return 	string	active project's name
-     * @access 	public
-     */
-    public function getCurrentProjectName ()
-    {
-        
-        return $_SESSION['project']['name'];
-    
-    }
-
 
 
     /**
@@ -468,7 +443,7 @@ class Controller extends BaseClass
         
         }
         
-        $this->setCurrentProjectName();
+        $this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
     
     }
 
@@ -754,6 +729,23 @@ class Controller extends BaseClass
 
 
 
+	private function loadControllerConfig()
+	{
+
+		$t = 'getControllerSettings'.$this->controllerBaseName;
+
+		if (method_exists($this->config,$t)) {
+
+	        $this->controllerSettings = $this->config->$t();
+
+		} else {
+
+			$this->controllerSettings = false;
+
+		}
+
+	}
+
     private function getModuleActivationStatus ()
     {
         
@@ -782,7 +774,10 @@ class Controller extends BaseClass
     {
         
         session_start();
-    
+
+		/* DEBUG */		
+		$_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+
     }
 
 
@@ -895,7 +890,7 @@ class Controller extends BaseClass
             }
 
         }
-        
+
         foreach ((array) $_FILES as $key => $val) {
             
             if (isset($val['size']) && $val['size'] > 0)
@@ -1129,16 +1124,16 @@ class Controller extends BaseClass
 
         // root of each trail: "choose project" page
         $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
-        
+
         $this->breadcrumbs[] = array(
             'name' => 'Projects', 
             'url' => $cp
         );
         
-        if ($this->_fullPath != $cp && isset($_SESSION['project']['name'])) {
+        if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title'])) {
             
             $this->breadcrumbs[] = array(
-                'name' => $_SESSION['project']['name'], 
+                'name' => $_SESSION['project']['title'], 
                 'url' => $this->getLoggedInMainIndex()
             );
             
@@ -1154,8 +1149,8 @@ class Controller extends BaseClass
                 if ($this->getViewName() != 'index') {
                     
                     // all views are on the same level, but sometimes we might want another level to the trail when 
-                    // moving one view to the next, for logic's sake (for instance: taxon list -> edit taxon, two views)
-                    // that are on the same level, but are perceived by the user to be on subsequent levels
+                    // moving one view to the next, for logic's sake (for instance: taxon list -> edit taxon, two views
+                    // that are on the same level, but are perceived by the user to be on different levels)
                     if ($this->breadcrumbIncludeReferer ===
                      true) {
                         

@@ -40,6 +40,14 @@
 		<input name="uploadedfile" type="file" /><br />
 		</td>
 	</tr>
+	<tr>
+		<td>
+			CSS url:
+		</td>
+		<td colspan="2">
+			<input type="text" name="css_url" value="{$data.css_url}" style="width:300px;" />
+		</td>
+	</tr>
 	<tr style="vertical-align:top">
 		<td>
 			Project languages:

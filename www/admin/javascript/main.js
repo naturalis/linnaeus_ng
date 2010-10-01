@@ -405,25 +405,18 @@ function moduleToggleModuleUserBlock(i) {
 
 }
 
-function moduleChangeModuleUserStatus(ele) {
+function moduleChangeModuleUserStatus(ele,module,user,action,type) {
 
-	if ($('#'+ele.id).attr('class') == 'cell-moduser-inactive')
-		action = 'add';
-	else
-		action = 'remove';
-
-
-	m = ele.id.replace('cell-','');
-
-	m = m.substr(0,m.length-1);
-	u = m.substr(m.indexOf('-')+1);
-	m = m.substr(0,m.indexOf('-'));
-
-	$.ajax({ url:"ajax_interface.php?v=collaborators"+
-				"&a="+encodeURIComponent(action)+
-				"&i="+encodeURIComponent(m)+
-				"&u="+encodeURIComponent(u)+
-				"&time="+allGetTimestamp(),
+	$.ajax({
+		url:"ajax_interface.php",
+		data: {
+			view : 'collaborators' ,
+			action : action ,
+			id : module ,
+			user : user ,
+			type : type ,
+			time : allGetTimestamp()
+		},
 		success: function(data){
 
 			if (data=='<ok>') {
@@ -441,7 +434,9 @@ function moduleChangeModuleUserStatus(ele) {
 	
 				$('#'+ele.id).removeClass().addClass(classb);
 				$('#'+ele.id.replace('b','a')).removeClass().addClass(classa);
-				$('#cell-'+m+'n').html(parseFloat($('#cell-'+m+'n').html())+(action=='add' ? 1 : -1 ));
+				$('#cell-'+(type=='free' ? 'f' : '')+module+'n').
+					html(parseFloat($('#cell-'+(type=='free' ? 'f' : '')+module+'n').
+					html())+(action=='add' ? 1 : -1 ));
 			}
 		}
 	});
@@ -458,10 +453,14 @@ function projectSaveLanguage(action,lan) {
 
 	}
 
-	$.ajax({ url:"ajax_interface.php?v=languages"+
-				"&a="+encodeURIComponent(action)+
-				"&i="+encodeURIComponent(lan[0])+
-				"&time="+allGetTimestamp(),
+	$.ajax({
+		url: "ajax_interface.php",
+		data: {
+			'view' : 'languages' ,
+			'action' : encodeURIComponent(action) ,
+			'id' : encodeURIComponent(lan[0]) ,
+			'time' : allGetTimestamp()
+		},
 		success: function(data){
 			//alert(data);
 			if (data=='<ok>') {

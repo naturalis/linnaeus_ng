@@ -19,7 +19,7 @@ a:hover,.pseudo-a:hover {
 	width: 900px;
 }
 
-#page-main {
+#page-main,.page-generic-div {
 	margin: 10px 10px 10px 10px;
 }
 
@@ -139,6 +139,7 @@ a:hover,.pseudo-a:hover {
 	padding: 5px 5px 5px 5px;
 	border: 1px dotted black;
 	width: 350px;
+	background-color: #eef;
 }
 
 #page-block-errors {
@@ -232,14 +233,15 @@ a:hover,.pseudo-a:hover {
 	padding-right:10px;
 }
 
-.cell-moduser-inactive {
+.cell-moduser-inactive,.cell-moduser-remove {
 	background-image: url(../images/system/icons/user-gray.png);
+	background-repeat:no-repeat;
 	cursor: pointer;
+	width:16px;
 }
 
 .cell-moduser-remove {
 	background-image: url(../images/system/icons/user-minus.png);
-	cursor: pointer;
 }
 
 .module-title-unused,.module-title-in-use,.module-title-inactive {
