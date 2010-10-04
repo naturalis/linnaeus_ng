@@ -28,10 +28,6 @@ class ProjectsController extends Controller
         'content_taxon'
     );
     
-    public $usedHelpers = array(
-        'file_upload_helper'
-    );
-    
     public $controllerPublicName = 'Project administration';
 
 
@@ -239,7 +235,11 @@ class ProjectsController extends Controller
         }
         
         if ($this->requestDataFiles) {
-            
+/*            
+
+allowed formats should go to controller's settings
+not sure if helper is all that useful
+
             $fuh = $this->helpers->FileUploadHelper->saveFiles(
 				$this->requestDataFiles, 
 				$this->getDefaultImageUploadDir(), 
@@ -249,7 +249,7 @@ class ProjectsController extends Controller
 
             if (!$fuh['error']) {
                 
-                $img = $this->getDefaultImageProjectDir() . 'project_logo.' . $fuh['result'][0]['extension'];
+                $img = $this->getProjectsMediaStorageDir() . 'project_logo.' . $fuh['result'][0]['extension'];
                 
                 if (rename($fuh['result'][0]['path'], $img)) {
                     
@@ -276,7 +276,7 @@ class ProjectsController extends Controller
                 $this->addError($fuh['error']);
             
             }
-        
+*/
         }
         
         $data = $this->models->Project->get($this->getCurrentProjectId());

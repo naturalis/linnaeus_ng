@@ -2,10 +2,10 @@
 
 include_once ('model.php');
 
-class TaxonPage extends Model
+class MediaTaxon extends Model
 {
-    
-    const tableBaseName = 'pages_taxa';
+ 
+    const tableBaseName = 'media_taxa';
 
 
 

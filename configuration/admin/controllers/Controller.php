@@ -629,7 +629,7 @@ class Controller extends BaseClass
      * @return string	path
      * @access 	public
      */
-    public function getDefaultImageProjectDir ()
+    public function getProjectsMediaStorageDir ()
     {
         
         return isset($_SESSION['project']['paths']['project_images']) ? $_SESSION['project']['paths']['project_images'] : null;
@@ -637,40 +637,16 @@ class Controller extends BaseClass
     }
 
 
-
-    /**
-     * Returns the default file allowed mask for file uploads
-     *
-     * @return array	array of allowed file extensions
-     * @access 	public
-     */
-    public function getDefaultUploadFilemask ()
-    {
-        
-        return isset($this->defaultUploadFilemask) ? $this->defaultUploadFilemask : null;
-    
-    }
-
-
-
-    /**
-     * Returns the default maximum size of file uploads
-     *
-     * @return integer max upload size in bytes
-     * @access 	public
-     */
-    public function getDefaultUploadMaxSize ()
-    {
-        
-        return isset($this->defaultUploadMaxSize) ? $this->defaultUploadMaxSize : null;
-    
-    }
-
-
-
     /**
      * Checks if a form submit is new or a resubmit (through user refresh)
      *
+	 * Add this line to the form in your template
+	 *		<input type="hidden" name="rnd" value="{$rnd}" />
+	 * and you can call
+	 *		$this->isFormResubmit()
+	 * in the receiving controller function to make sure whether the submit is a resubmit
+	 * of the same instance of the form (as when the user reloads a posted form)
+	 *
      * @return boolean	is resubmit or not
      * @access 	public
      */
@@ -1049,10 +1025,6 @@ class Controller extends BaseClass
     private function setMiscellaneous ()
     {
         
-        $this->setDefaultUploadFilemask();
-        
-        $this->setDefaultUploadMaxSize();
-        
         $this->setRandomValue();
     
     }
@@ -1373,35 +1345,6 @@ class Controller extends BaseClass
     
     }
 
-
-
-    /**
-     * Sets the default allowed file mask for file uploads, based on the value in general settings
-     *
-     * @access 	private
-     */
-    private function setDefaultUploadFilemask ()
-    {
-        
-        if (!empty($this->generalSettings['uploading']['defaultUploadFilemask']))
-            $this->defaultUploadFilemask = $this->generalSettings['uploading']['defaultUploadFilemask'];
-    
-    }
-
-
-
-    /**
-     * Sets the default maximum size of file uploads, based on the value in general settings
-     *
-     * @access 	private
-     */
-    private function setDefaultUploadMaxSize ()
-    {
-        
-        if (!empty($this->generalSettings['uploading']['defaultUploadMaxSize']))
-            $this->defaultUploadMaxSize = $this->generalSettings['uploading']['defaultUploadMaxSize'];
-    
-    }
 
 }
 

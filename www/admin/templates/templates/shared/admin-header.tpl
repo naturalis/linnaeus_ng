@@ -18,7 +18,7 @@
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should go be removed in production-->
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should be removed in production-->
 
 {if $includeHtmlEditor}
 {include file="../shared/tinymce-editor.tpl"}

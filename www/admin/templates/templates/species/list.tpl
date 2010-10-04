@@ -12,7 +12,9 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 	<td style="text-align:right; width:75px">
 		{if $languages[j].active=='n'}({/if}{$languages[j].language}{if $languages[j].def_language==1} *{/if}{if $languages[j].active=='n'}){/if}
 	</td>
-	{/section}	
+	{/section}
+	<td>Media</td>
+	<td>Currently being edited by:</td>
 </tr>
 {section name=i loop=$taxa}
 <tr class="taxon-list-row">
@@ -30,6 +32,7 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 		</a>
 	</td>
 	{/section}	
+	<td><a href="media.php?id={$taxa[i].id}">media</a></td>
 	<td id="usage-{$taxa[i].id}">
 	</td>
 </tr>
