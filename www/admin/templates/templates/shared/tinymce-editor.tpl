@@ -14,9 +14,8 @@ tinyMCE.init({
 		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality",	
 		
 		// Theme options - button# indicated the row# only
-	theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,|,print,|,link,unlink,anchor,image,media,|,forecolor,backcolor,|,advhr",
-	theme_advanced_buttons2 : "bold,italic,underline,strikethrough,|,fontselect,fontsizeselect,formatselect,|,ltr,rtl,|,sub,sup,|,blockquote,|,justifyleft,justifycenter,justifyright,justifyfull,|,outdent,indent,|,bullist,numlist,|,table",
-	theme_advanced_buttons3 : "",
+	theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,|,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
+	theme_advanced_buttons2 : "",
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom",
