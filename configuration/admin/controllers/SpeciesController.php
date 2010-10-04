@@ -8,8 +8,6 @@
 		- what if language has no iso2?
 		- what happens if language does not exist at google?
 
-	tinyMCE images: MCImageManager (€€€)
-
 	hardcoded set_time_limit(3000); for CoL
 
 */
@@ -27,11 +25,12 @@ class SpeciesController extends Controller
         'taxon_page', 
         'taxon_page_title', 
         'heartbeat', 
-        'content_taxon_undo'
+        'content_taxon_undo',
+		'media_taxon'
     );
     
     public $usedHelpers = array(
-        'col_loader_helper','csv_parser_helper'
+        'col_loader_helper','csv_parser_helper','file_upload_helper'
     );
 
 	private $_treeIdList;
@@ -180,7 +179,6 @@ class SpeciesController extends Controller
         
         $this->checkAuthorisation();
         
-        // this could do with a little more elegance...
         $this->setBreadcrumbIncludeReferer(
 			array(
 				'name' => _('Taxon list'), 
@@ -411,6 +409,147 @@ class SpeciesController extends Controller
         
         $this->smarty->assign('languages', $lp);
         
+        $this->printPage();
+    
+    }
+
+
+    /**
+     * See and maintain media for a taxon
+     *
+     * @access	public
+     */
+    public function mediaAction ()
+    {
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+			array(
+				'name' => _('Taxon list'), 
+				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+			)
+		);
+
+        if (!empty($this->requestData['id'])) {
+        // get existing taxon name
+            
+            $t = $this->models->Taxon->get(array(
+                'id' => $this->requestData['id'], 
+                'project_id' => $this->getCurrentProjectId()
+            ));
+            
+            $taxon = $t[0];
+            
+            $this->setPageName(_('Media for') . ' "' . $taxon['taxon'] . '"');
+
+			$this->smarty->assign('id',$this->requestData['id']);
+
+		} else {
+
+			$this->addError(_('No taxon specified'));
+
+		} 
+		
+        $this->printPage();
+
+	}
+
+    /**
+     * Upload media for a taxon
+     *
+     * @access	public
+     */
+    public function mediaUploadAction ()
+    {
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+			array(
+				'name' => _('Taxon list'), 
+				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+			)
+		);
+
+        if (!empty($this->requestData['id'])) {
+        // get existing taxon name
+            
+            $t = $this->models->Taxon->get(array(
+                'id' => $this->requestData['id'], 
+                'project_id' => $this->getCurrentProjectId()
+            ));
+            
+            $taxon = $t[0];
+			
+			if ($taxon['id']) {
+
+				$this->setPageName(_('New media for') . ' "' . $taxon['taxon'] . '"');
+
+				if ($this->requestDataFiles && !$this->isFormResubmit()) {
+					$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+					$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+					$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+					$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+	
+					$this->addError($this->helpers->FileUploadHelper->getErrors());
+					$filesToSave = $this->helpers->FileUploadHelper->getResult();
+	
+					if ($filesToSave) {
+	
+						foreach((array)$filesToSave as $key => $file) {
+	
+							$mt = $this->models->MediaTaxon->save(
+								array(
+									'id' => null,
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon_id' => $this->requestData['id'],
+									'full_path' => $file['full_path'],
+									'original_name' => $file['original_name'],
+									'mime_type' => $file['mime_type'],
+									'file_size' => $file['size'],
+								)
+							);
+				
+							if ($mt) {
+								 
+								$this->addMessage(_('Saved:').' '.$file['original_name'].' ('.$file['media_name'].')');
+	
+							} else {
+	
+								$this->addError(_('Failed writing uploaded file to database.'));
+	
+							}
+				
+						}
+			
+					}
+
+				}
+	
+			} else {
+
+				$this->addError(_('Unknown taxon.'));
+
+			}
+
+			$this->smarty->assign('id',$this->requestData['id']);
+
+			$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
+
+			$this->smarty->assign('iniSettings',
+				array(
+					'upload_max_filesize' => ini_get('upload_max_filesize'),
+					'post_max_size' => ini_get('post_max_size')
+				)
+			);
+
+		} else {
+
+			$this->addError(_('No taxon specified'));
+
+		}        
+
         $this->printPage();
     
     }
@@ -1101,7 +1240,6 @@ class SpeciesController extends Controller
     
     }
 
-
     private function ajaxActionDeleteTaxon ()
     {
         
@@ -1128,8 +1266,6 @@ class SpeciesController extends Controller
     
     }
 
-
-
     private function ajaxActionGetPageStates ()
     {
         
@@ -1153,7 +1289,6 @@ class SpeciesController extends Controller
         $this->smarty->assign('returnText', isset($d) ? json_encode($d) : null);
     
     }
-
 
 
     private function ajaxActionPublishContent ()
@@ -1501,6 +1636,7 @@ class SpeciesController extends Controller
 		}
 
 	}
+
 
 }
 

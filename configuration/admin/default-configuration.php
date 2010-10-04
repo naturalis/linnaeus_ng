@@ -38,14 +38,6 @@ class configuration
                 'notAuthorized' => '/views/utilities/not_authorized.php', 
                 'moduleNotPresent' => '/views/utilities/module_not_present.php'
             ), 
-            'uploading' => array(
-                'defaultUploadFilemask' => array(
-                    'image/jpg', 
-                    'image/jpeg', 
-                    'image/png'
-                ), 
-                'defaultUploadMaxSize' => 1000000
-            ), 
             'directories' => array(
                 'imageDirProject' => $this->_appFileRoot . 'www/admin/images/project', 
                 'imageDirUpload' => $this->_appFileRoot . 'www/admin/images/upload'
@@ -103,6 +95,21 @@ class configuration
 						'allowedTags' => '<a><b><u><i><p><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
 					)
 				),
+			'media' =>
+				array(
+					'allowedFormats' => 
+						array(
+							'image/png' => 'image',
+							'image/jpg' => 'image',
+							'image/jpeg' => 'image',
+							'image/gif' => 'image',
+							'video/h264' => 'video',
+							'video/quicktime' => 'video',
+							'audio/mpeg' => 'sound',
+							'application/zip' => 'archive',
+						),
+	                'defaultUploadMaxSize' => 50000000 //50 mb (h264!?)
+				),				
 			);
 
     }

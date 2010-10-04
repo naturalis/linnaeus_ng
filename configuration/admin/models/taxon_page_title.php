@@ -5,7 +5,7 @@ include_once ('model.php');
 class TaxonPageTitle extends Model
 {
     
-    const tableBaseName = 'taxa_pages_titles';
+    const tableBaseName = 'pages_taxa_titles';
 
 
 
