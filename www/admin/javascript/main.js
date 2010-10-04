@@ -773,13 +773,20 @@ function taxonSaveData(execafter,sync) {
 		}),
 		type: "POST",
 		success: function(data){
-			if (data.indexOf('id=')!=-1) {
-				$('#taxon_id').val(data.replace('id=',''));
-				allSetMessage('saved');
-			} else
-			if (data.length>0) {
+			if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''));
+			} else {
+				obj = $.parseJSON(data);
+				$('#taxon_id').val(obj.id);
+				if (obj.modified==true) {
+					if (taxonSaveType=='manual')
+						tinyMCE.get('taxon-content').setContent(obj.content ? obj.content : '');
+					allSetMessage('saved (could not save certain HTML-tags)');
+				} else {
+					allSetMessage('saved');
+				}
 			}
+
 			taxonUpdatePageBlock();
 			if (execafter) eval(execafter);
 			taxonSaveType = 'auto';

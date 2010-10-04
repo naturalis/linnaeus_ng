@@ -848,8 +848,6 @@ class SpeciesController extends Controller
     
     }
 
-
-
     private function saveOldTaxonContentData ($data, $newdata = false, $mode = 'auto', $label = false)
     {
         
@@ -877,8 +875,6 @@ class SpeciesController extends Controller
         $this->models->ContentTaxonUndo->save($d);
     
     }
-
-
 
     private function ajaxActionSaveTaxon ()
     {
@@ -948,12 +944,14 @@ class SpeciesController extends Controller
                         if ($id != null)
                             $this->models->ContentTaxon->setRetainBeforeAlter();
                         
+						$filteredContent = $this->filterContent($this->requestData['content']);
+						
                         $newdata = array(
                             'id' => $id, 
                             'project_id' => $this->getCurrentProjectId(), 
                             'taxon_id' => $taxonId, 
                             'language_id' => $this->requestData['language'], 
-                            'content' => !empty($this->requestData['content']) ? $this->requestData['content'] : '', 
+                            'content' => !empty($filteredContent['content']) ? $filteredContent['content'] : '', 
                             'title' => !empty($this->requestData['name']) ? $this->requestData['name'] : '', 
                             'page_id' => $this->requestData['page']
                         );
@@ -998,9 +996,19 @@ class SpeciesController extends Controller
                             'taxon' => !empty($ct[0]['title']) ? $ct[0]['title'] : '?'
                         ));
 						*/
-                        
-                        $this->smarty->assign('returnText', 'id=' . $taxonId);
-                    
+
+						//$this->smarty->assign('returnText', 'id=' . $taxonId);
+
+						$this->smarty->assign('returnText',
+							json_encode(
+								array(
+									'id' => $taxonId,
+									'content' => $filteredContent['content'],
+									'modified' => $filteredContent['modified']
+								)
+							)
+						);
+						                    
                     } else {
                         
                         $this->addError(_('Could not save taxon content'));
@@ -1030,6 +1038,24 @@ class SpeciesController extends Controller
     
     }
 
+
+	private function filterContent($content)
+	{
+	
+		if (!$this->controllerSettings['filterContent'])
+			return $content;
+
+		$modified = $content;
+
+		if ($this->controllerSettings['filterContent']['html']['doFilter']) {
+
+			$modified = strip_tags($modified,$this->controllerSettings['filterContent']['html']['allowedTags']);
+
+		}
+
+		return array('content' => $modified, 'modified' => $content!=$modified);
+
+	}
 
 
     private function ajaxActionGetTaxon ()
@@ -1074,7 +1100,6 @@ class SpeciesController extends Controller
         }
     
     }
-
 
 
     private function ajaxActionDeleteTaxon ()
