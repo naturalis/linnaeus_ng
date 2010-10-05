@@ -1188,10 +1188,58 @@ function taxonSaveCoLResult() {
 
 }
 
+var taxonMediaDescBeingEdited = false;
+var taxonMediaSaveButtonClicked = false;
 
+function taxonMediaDescription(ele) {
 
+	if (taxonMediaSaveButtonClicked) {
+		taxonMediaSaveButtonClicked = false;
+		return;
+	}
 
+	if (ele==taxonMediaDescBeingEdited) { 
+		return;
+	} else {
+		taxonMediaDescSave();
+		$(taxonMediaDescBeingEdited).html($('#taxon-media-description').val());
+	}
 
+	$(ele).html(
+		'<textarea id="taxon-media-description">'+
+		$(ele).html()+
+		'</textarea>'+
+		'<span class="taxon-media-language-tab">dutch</span>&nbsp;<span class="taxon-media-language-tab">english</span>&nbsp;<span class="taxon-media-language-tab-active">japanese</span>'+
+		'<div style="position:relative;top:-20px;left:260px;height:1px;"><input type="button" value="save" onclick="taxonMediaClickSave()" /></div>'
+	);
+
+	var offset = $(ele).offset();
+
+	$('#taxon-media-description').offset({ left: offset.left, top: offset.top});
+	$('#taxon-media-description').width($(ele).width()-10);
+	$('#taxon-media-description').height(90);
+
+	taxonMediaDescBeingEdited = ele;
+
+}
+
+function taxonMediaDescSave() {
+	
+	if (taxonMediaDescBeingEdited==false) return;
+
+	val = $('#taxon-media-description').val();
+	
+	id = taxonMediaDescBeingEdited.id.replace('media-','');
+	
+	$(taxonMediaDescBeingEdited).html(val);
+
+}
+
+function taxonMediaClickSave() {
+	taxonMediaSaveButtonClicked = true;
+	taxonMediaDescSave();
+	taxonMediaDescBeingEdited = false;
+}
 
 
 

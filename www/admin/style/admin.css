@@ -395,7 +395,7 @@ a:hover,.pseudo-a:hover {
 	margin-bottom: 20px;
 }
 
-.taxon-language-cell,.taxon-language-cell-active,.taxon-page-cell,.taxon-page-cell-active
+.taxon-language-cell,.taxon-language-cell-active,.taxon-page-cell,.taxon-page-cell-active,.taxon-media-language-tab, .taxon-media-language-tab-active
 	{
 	width: 75px;
 	background-color: #aaa;
@@ -408,7 +408,7 @@ a:hover,.pseudo-a:hover {
 	font-size: 10px;
 }
 
-.taxon-language-cell-active {
+.taxon-language-cell-active,.taxon-media-language-tab-active {
 	background-color: #eee;
 	color: #111;
 	cursor: default;
@@ -451,6 +451,42 @@ a:hover,.pseudo-a:hover {
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
+}
+
+.taxon-media-table, .taxon-media-table td, .taxon-media-table th {
+	padding:0px;
+	margin:0px;
+	border-spacing:0px;
+}
+
+.taxon-media-classheader {
+	font-weight:bold;
+}
+
+.taxon-media-colheader-file,.taxon-media-colheader-name,.taxon-media-colheader-type,.taxon-media-colheader-size {
+	text-decoration:underline;
+	font-weight:normal;
+	width:175px;
+}
+
+.taxon-media-colheader-name {
+	width:310px;
+}
+
+.taxon-media-colheader-type {
+	width:250px;
+}
+
+.taxon-media-secondary-info {
+	color:#666;
+}
+
+.taxon-media-cell-size {
+	text-align:right;
+}
+
+#taxon-media-description{
+	margin-bottom:2px;
 }
 
 .cell-page-delete {

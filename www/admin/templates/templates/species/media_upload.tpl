@@ -4,23 +4,22 @@
 
 
 {if $id}
+<p>
 <form enctype="multipart/form-data" action="" method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
 Choose a file to upload: <input name="uploadedfile" type="file" /><br />
 <input type="submit" value="upload" />
-{/if}
 </form>
-
+</p>
+{/if}
+<p>
+<a href="media.php?id={$id}">See all media for this taxon</a>
+</p>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
 {if $id}
 <div class="page-generic-div">
-
-PATH IS LOCAL
-
-<h3>Issue: uploading video files takes forever and they are rejected for format reasons AFTER upload is complete, which can be terribly frustrating. Especially since my h264 sample file is identified simply as "m4v", which is a container format, not necessarily containing h264. How to recognize the codec without uploading? not possible, so I suggest we make availiable some tool with which the user can verify the format/codec on hos own PC before he uploads. Also might mean we do not have to check anymore (hmm).</h2>
-
 <p>
 <b>Allowed MIME-types</b><br />
 Files of the following MIME-types are allowed:<ul>

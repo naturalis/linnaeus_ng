@@ -70,6 +70,8 @@ class Controller extends BaseClass
         $this->setMiscellaneous();
         
         $this->setPaths();
+
+        $this->setUrls();
         
         $this->checkModuleActivationStatus();
 
@@ -617,14 +619,14 @@ class Controller extends BaseClass
     public function getDefaultImageUploadDir ()
     {
         
-        return isset($_SESSION['project']['paths']['uploads_images']) ? $_SESSION['project']['paths']['uploads_images'] : null;
+        return isset($_SESSION['project']['paths']['uploads_media']) ? $_SESSION['project']['paths']['uploads_media'] : null;
     
     }
 
 
 
     /**
-     * Returns the default save path for project inmages
+     * Returns the default save path for project images
      *
      * @return string	path
      * @access 	public
@@ -632,7 +634,21 @@ class Controller extends BaseClass
     public function getProjectsMediaStorageDir ()
     {
         
-        return isset($_SESSION['project']['paths']['project_images']) ? $_SESSION['project']['paths']['project_images'] : null;
+        return isset($_SESSION['project']['paths']['project_media']) ? $_SESSION['project']['paths']['project_media'] : null;
+    
+    }
+
+
+    /**
+     * Returns the default save path for project thumbs
+     *
+     * @return string	path
+     * @access 	public
+     */
+    public function getProjectsThumbsStorageDir ()
+    {
+        
+        return isset($_SESSION['project']['paths']['project_thumbs']) ? $_SESSION['project']['paths']['project_thumbs'] : null;
     
     }
 
@@ -996,9 +1012,11 @@ class Controller extends BaseClass
         
         if ($p) {
             
-            $_SESSION['project']['paths']['project_images'] = $this->generalSettings['directories']["imageDirProject"] . '/' . sprintf('%04s', $p) . '/';
+            $_SESSION['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
+
+            $_SESSION['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
             
-            $_SESSION['project']['paths']['uploads_images'] = $this->generalSettings['directories']["imageDirUpload"] . '/' . sprintf('%04s', $p) . '/';
+            $_SESSION['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
             
             foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
                 
@@ -1011,7 +1029,25 @@ class Controller extends BaseClass
     
     }
 
+    /**
+     * Sets project URL for project images
+     * 
+     * @access 	private
+     */
+    private function setUrls ()
+    {
+        
+        $p = $this->getCurrentProjectId();
+        
+        if ($p) {
 
+            $_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/images/project/'.sprintf('%04s', $p).'/';
+
+            $_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+
+        }
+    
+    }
 
     /**
      * Initialises miscellaneous variables

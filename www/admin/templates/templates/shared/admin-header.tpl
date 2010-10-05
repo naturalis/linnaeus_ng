@@ -44,7 +44,7 @@
 	<span id="page-header-title">{$app.name}</span>
 	<span id="page-header-version">{$app.version} ({$app.versionTimestamp})</span>
 {if $session.system.server_addr=='127.0.0.1'}
-	<span id="page-header-version" style="color:#CC0000">[localhost]</span>
+	<span id="page-header-locality" style="color:#CC0000">[localhost]</span>
 {/if}
 	<br />
 {if $breadcrumbs}
