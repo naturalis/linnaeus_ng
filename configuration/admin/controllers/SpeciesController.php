@@ -30,7 +30,7 @@ class SpeciesController extends Controller
     );
     
     public $usedHelpers = array(
-        'col_loader_helper','csv_parser_helper','file_upload_helper'
+        'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
 	private $_treeIdList;
@@ -445,6 +445,29 @@ class SpeciesController extends Controller
 
 			$this->smarty->assign('id',$this->requestData['id']);
 
+			$media = $this->models->MediaTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId()
+				),false,'mime_type, file_name'
+			);
+			
+			
+			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+			
+				$d[$val['mime']] = $val['media_type'];
+			
+			}
+
+			foreach((array)$media as $key => $val) {
+
+				$r[$d[$val['mime_type']]][] = $val;
+
+			}
+
+			if (isset($r)) $this->smarty->assign('media',$r);
+
+			$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
+
 		} else {
 
 			$this->addError(_('No taxon specified'));
@@ -498,16 +521,37 @@ class SpeciesController extends Controller
 					if ($filesToSave) {
 	
 						foreach((array)$filesToSave as $key => $file) {
-	
+
+							$thumb = false;
+
+							if (
+								$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+								$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
+							) {
+
+								$pi = pathinfo($file['name']);
+								$this->helpers->ImageThumberHelper->size_width(150);
+								
+								if ($this->helpers->ImageThumberHelper->save(
+									$this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
+								)) {
+								
+									$thumb = $pi['filename'].'-thumb.'.$pi['extension'];
+								
+								}
+
+							}
+
 							$mt = $this->models->MediaTaxon->save(
 								array(
 									'id' => null,
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon_id' => $this->requestData['id'],
-									'full_path' => $file['full_path'],
+									'file_name' => $file['name'],
 									'original_name' => $file['original_name'],
 									'mime_type' => $file['mime_type'],
 									'file_size' => $file['size'],
+									'thumb_name' => $thumb ? $thumb : null,
 								)
 							);
 				
