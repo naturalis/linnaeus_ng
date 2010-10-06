@@ -554,6 +554,10 @@ var taxonSaveType = 'auto';
 var taxonCoLSingleLevel = false;
 var taxonTargetDiv = false;
 var taxonTaxonParent = Array();
+var taxonMediaDescBeingEdited = false;
+var taxonMediaSaveButtonClicked = false;
+var taxonMediaDescBeforeEdit = false;
+var taxonMediaIds = Array();
 
 function taxonSetActivePageTitle(page) {
 
@@ -641,24 +645,26 @@ function taxonAddLanguage(lan) {
 
 }
 
-function taxonUpdateLanguageBlock() {
+function taxonUpdateLanguageBlock(fnc) {
 
-	$buffer = '<table class="taxon-language-table"><tr>';
+	fnc = fnc || 'taxonSwitchLanguage';
+
+	var buffer = '<table class="taxon-language-table"><tr>';
 
 	for (var i=0;i<taxonLanguages.length;i++) {
 	
-		$buffer = $buffer+
+		buffer = buffer+
 			'<td class="taxon-language-cell'+
-			(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '" onclick="taxonSwitchLanguage('+taxonLanguages[i][0]+');' )+
+			(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '" onclick="'+fnc+'('+taxonLanguages[i][0]+');' )+
 			'">'+
 			taxonLanguages[i][1]+
 			(taxonLanguages[i][2]==1 ?  ' *' : '')+
 			'</td>';
 	}
 
-	$buffer = $buffer + '</tr></table>';
+	buffer = buffer + '</tr></table>';
 
-	$('#taxon-language-table-div').html($buffer);
+	$('#taxon-language-table-div').html(buffer);
 
 }
 
@@ -675,11 +681,11 @@ function taxonAddPage(page) {
 
 function taxonDrawPageBlock() {
 
-	$buffer = '<table class="taxon-pages-table"><tr>';
+	buffer = '<table class="taxon-pages-table"><tr>';
 
 	for (var i=0;i<taxonPages.length;i++) {
 
-		$buffer = $buffer+
+		buffer = buffer+
 			'<td class="taxon-page-cell' +
 			(taxonPages[i][0]==taxonActivePage ? '-active' : '" onclick="taxonSwitchPage('+taxonPages[i][0]+');' ) +
 			'">' +
@@ -690,9 +696,9 @@ function taxonDrawPageBlock() {
 			'</span></td>';
 	}
 
-	$buffer = $buffer + '</tr></table>';
+	buffer = buffer + '</tr></table>';
 
-	$('#taxon-pages-table-div').html($buffer);
+	$('#taxon-pages-table-div').html(buffer);
 
 }
 
@@ -832,23 +838,23 @@ function taxonGetData(language,page) {
 
 }
 
-function taxonDeleteData(language) {
+function taxonDeleteData() {
 
 	if ($('#taxon_id').val().length==0) return;
 
-	if (!allDoubleDeleteConfirm('all content in all languages for taxon',$('#taxon-name-input').val())) return;
+	if (!allDoubleDeleteConfirm('all content in all languages for taxon',$('#taxon-name').val())) return;
 
 	$.post(
 		"ajax_interface.php", 
 		{
 			'id' : $('#taxon_id').val() ,
 			'action' : 'delete_taxon' ,
-			'language' : language ,
 			'page' : taxonActivePage ,
 			'time': allGetTimestamp()	
 		},
 		function(data){
-			window.open('list.php','_top');
+			alert(data);
+			//window.open('list.php','_top');
 		}
 	);
 
@@ -1188,10 +1194,7 @@ function taxonSaveCoLResult() {
 
 }
 
-var taxonMediaDescBeingEdited = false;
-var taxonMediaSaveButtonClicked = false;
-
-function taxonMediaDescription(ele) {
+function taxonMediaDescriptionEdit(ele) {
 
 	if (taxonMediaSaveButtonClicked) {
 		taxonMediaSaveButtonClicked = false;
@@ -1201,53 +1204,142 @@ function taxonMediaDescription(ele) {
 	if (ele==taxonMediaDescBeingEdited) { 
 		return;
 	} else {
-		taxonMediaDescSave();
+		taxonMediaDescBeforeEdit = $(ele).html();
+		taxonMediaSaveDesc();
 		$(taxonMediaDescBeingEdited).html($('#taxon-media-description').val());
 	}
+
 
 	$(ele).html(
 		'<textarea id="taxon-media-description">'+
 		$(ele).html()+
 		'</textarea>'+
-		'<span class="taxon-media-language-tab">dutch</span>&nbsp;<span class="taxon-media-language-tab">english</span>&nbsp;<span class="taxon-media-language-tab-active">japanese</span>'+
-		'<div style="position:relative;top:-20px;left:260px;height:1px;"><input type="button" value="save" onclick="taxonMediaClickSave()" /></div>'
+		'<div>'+
+		'<input type="button" value="save" onclick="taxonMediaClickSave()" />&nbsp;'+
+		'<input type="button" value="cancel" onclick="taxonMediaClickClose()" />'+
+		'</div>'
 	);
 
-	var offset = $(ele).offset();
-
-	$('#taxon-media-description').offset({ left: offset.left, top: offset.top});
-	$('#taxon-media-description').width($(ele).width()-10);
-	$('#taxon-media-description').height(90);
+	$('#taxon-media-description').focus();
 
 	taxonMediaDescBeingEdited = ele;
 
 }
 
-function taxonMediaDescSave() {
-	
-	if (taxonMediaDescBeingEdited==false) return;
+function taxonMediaSaveDesc() {
 
-	val = $('#taxon-media-description').val();
+	if (taxonMediaDescBeingEdited==false) return;
 	
-	id = taxonMediaDescBeingEdited.id.replace('media-','');
-	
+	var val = $('#taxon-media-description').val();
+
 	$(taxonMediaDescBeingEdited).html(val);
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'save_media_desc' ,
+			'id' : taxonMediaDescBeingEdited.id.replace('media-','') ,
+			'description' : val ,
+			'language' : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			if(data=='<ok>') {
+				allSetMessage('saved');
+			}			
+		}
+	});
+
+}
+
+function taxonMediaGetDescription() {
+}
+
+function taxonMediaGetDescriptions() {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_media_descs' ,
+			'language' : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			if (data) {
+				obj = $.parseJSON(data);
+				if (obj) {
+					for(var i=0;i<obj.length;i++) {
+						$('#media-'+obj[i].id).html(obj[i].description);
+					}
+				}
+			}			
+		}
+	});
 
 }
 
 function taxonMediaClickSave() {
+	
 	taxonMediaSaveButtonClicked = true;
-	taxonMediaDescSave();
+	taxonMediaSaveDesc();
 	taxonMediaDescBeingEdited = false;
+
 }
 
+function taxonMediaClickClose() {
 
+	taxonMediaSaveButtonClicked = true;
+	$(taxonMediaDescBeingEdited).html(taxonMediaDescBeforeEdit);
+	taxonMediaDescBeingEdited = false;
 
+}
 
+function taxonMediaChangeLanguage(lan) {
+	taxonMediaSaveDesc();
+	taxonMediaDescBeingEdited = false;
+	taxonActiveLanguage = lan;
+	taxonUpdateLanguageBlock('taxonMediaChangeLanguage');
+	taxonMediaGetDescriptions();
+}
 
+function taxonMediaAddId(id) {
+	taxonMediaIds[taxonMediaIds.length] = id;
+}
 
+function taxonMediaDelete(id,type,name) {
 
+	if (!allDoubleDeleteConfirm('the '+type,name)) return;
 
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_media' ,
+			'id' : id ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			if(data=='<ok>') {
+				allSetMessage(type+' deleted');
+				$('#media-row-'+id).remove();
+			}			
+		}
+	});
 
+}
 
+function taxonMediaShowMedia(url,name) {
 
+	$.colorbox({
+		href:url,
+		title:name,
+		transition:"elastic", 
+		maxWidth:800,
+		width:"100%",
+		opacity:0
+	});
+
+}

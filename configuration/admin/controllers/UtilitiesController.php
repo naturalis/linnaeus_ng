@@ -134,7 +134,7 @@ class UtilitiesController extends Controller
         
         if (!empty($this->requestData["params"]))
             $this->requestData["params"] = serialize($this->requestData["params"]);
-        
+        /*
         $h = $this->models->Heartbeat->get(
         array(
             'project_id' => $this->getCurrentProjectId(), 
@@ -144,10 +144,10 @@ class UtilitiesController extends Controller
             'view' => $this->requestData["view"], 
             'params' => $this->requestData["params"]
         ));
-        
+        */
         $this->models->Heartbeat->save(
         array(
-            'id' => $h[0]['id'] ? $h[0]['id'] : null, 
+            'id' => null, //$h[0]['id'] ? $h[0]['id'] : null, 
             'project_id' => $this->getCurrentProjectId(), 
             'user_id' => $this->requestData["user_id"], 
             'app' => $this->requestData["app"], 
@@ -173,7 +173,7 @@ class UtilitiesController extends Controller
 						and last_change >= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
 						and app = '" . $this->getAppName() . "'
 						and ctrllr = 'species'
-						and view = 'edit'");
+						and (view = 'edit' or view = 'media' or view = 'media_upload')");
         
         foreach ((array) $h as $key => $val) {
             

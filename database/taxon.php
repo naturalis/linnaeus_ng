@@ -82,6 +82,18 @@ create table media_taxa (
 	PRIMARY KEY ( id )
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
+create table media_taxa_titles (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	media_id INT( 11 ) NOT NULL ,
+	language_id INT( 11 ) NOT NULL ,
+	title varchar (32) not null,
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) ,
+	unique ( project_id, media_id, language_id)	
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
 
 RENAME TABLE `taxa`  TO `dev_taxa` ;
 RENAME TABLE `content_taxa`  TO `dev_content_taxa` ;
@@ -89,6 +101,7 @@ RENAME TABLE `content_taxa_undo`  TO `dev_content_taxa_undo` ;
 RENAME TABLE `pages_taxa`  TO `dev_pages_taxa` ;
 RENAME TABLE `pages_taxa_titles`  TO `dev_pages_taxa_titles` ;
 RENAME TABLE `media_taxa`  TO `dev_media_taxa` ;
+RENAME TABLE `media_taxa_titles`  TO `dev_media_taxa_titles` ;
 
 
 

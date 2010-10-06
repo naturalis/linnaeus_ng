@@ -5,6 +5,7 @@
 {if $taxon.id!=-1}
 <form name="theForm" id="theForm">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
+	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
 
 <div id="taxon-navigation-table-div">
 <table id="taxon-navigation-table">
@@ -14,7 +15,7 @@
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
 				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
 				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
-				<input type="button" value="delete" onclick="taxonDeleteData(taxonActiveLanguage)" style="margin-right:5px" />
+				<input type="button" value="delete" onclick="taxonDeleteData()" style="margin-right:5px" />
 				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
 			</span>
 		</td>

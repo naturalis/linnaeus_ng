@@ -13,7 +13,7 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 		{if $languages[j].active=='n'}({/if}{$languages[j].language}{if $languages[j].def_language==1} *{/if}{if $languages[j].active=='n'}){/if}
 	</td>
 	{/section}
-	<td>Media</td>
+	<td colspan="3" style="text-align:center" title="images, videos, soundfiles">Media</td>
 	<td>Currently being edited by:</td>
 </tr>
 {section name=i loop=$taxa}
@@ -32,9 +32,10 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 		</a>
 	</td>
 	{/section}	
-	<td><a href="media.php?id={$taxa[i].id}">media</a></td>
-	<td id="usage-{$taxa[i].id}">
-	</td>
+	<td class="taxon-list-cell-media" title="images"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}</a></td>
+	<td class="taxon-list-cell-media" title="videos"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}</a></td>
+	<td class="taxon-list-cell-media" title="soundfiles"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}</a></td>
+	<td id="usage-{$taxa[i].id}"></td>
 </tr>
 {/section}
 </table>
