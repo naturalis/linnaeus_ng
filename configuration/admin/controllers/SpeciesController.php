@@ -26,7 +26,8 @@ class SpeciesController extends Controller
         'taxon_page_title', 
         'heartbeat', 
         'content_taxon_undo',
-		'media_taxon'
+		'media_taxon',
+		'media_descriptions_taxon'
     );
     
     public $usedHelpers = array(
@@ -50,10 +51,11 @@ class SpeciesController extends Controller
         
 		$this->createStandardSubpages();
 
+		$this->setProjectLanguages();
+
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
 
     }
-
 
     /**
      * Destroys
@@ -111,20 +113,10 @@ class SpeciesController extends Controller
         
         }
         
-        $lp = $this->models->LanguageProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ));
-        
-        foreach ((array) $lp as $key => $val) {
-            
-            $l = $this->models->Language->get($val['language_id']);
-            
-            $lp[$key]['language'] = $l['language'];
-            
-            if ($val['def_language'] == 1)
-                $defaultLanguage = $val['language_id'];
-        
-        }
+		
+		$lp = $_SESSION['project']['languages'];
+
+		$defaultLanguage = $_SESSION['project']['default_language_id'];
         
         $pages = $this->models->TaxonPage->get(array(
             'project_id' => $this->getCurrentProjectId()
@@ -209,10 +201,8 @@ class SpeciesController extends Controller
 		// if new taxon OR existing taxon not being edited by someone else, get languages and content
 
             // get available languages
-            $lp = $this->models->LanguageProject->get(array(
-                'project_id' => $this->getCurrentProjectId()
-            ));
-            
+			$lp = $_SESSION['project']['languages'];
+
             foreach ((array) $lp as $key => $val) {
                 
                 $l = $this->models->Language->get($val['language_id']);
@@ -222,15 +212,12 @@ class SpeciesController extends Controller
                 $lp[$key]['iso2'] = $l['iso2'];
                 
                 $lp[$key]['iso3'] = $l['iso3'];
-                
-                if ($val['def_language'] == 1)
-                    $defaultLanguage = $val['language_id'];
-            
+
             }
             
             // determine the language the page will open in
-            $startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $defaultLanguage;
-            
+            $startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
+
             // get the defined subpages (just the page definitions, no content yet)
             $tp = $this->models->TaxonPage->get(array(
                 'project_id' => $this->getCurrentProjectId()
@@ -346,7 +333,13 @@ class SpeciesController extends Controller
             $lp[$key]['language'] = $l['language'];
         
         }
-        
+
+		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+		
+			$d[$val['mime']] = $val['media_type'];
+		
+		}
+
         foreach ((array) $taxa as $key => $taxon) {
 		
 			$taxa[$key]['symbol'] = $this->getRankSymbol($taxon['rank']);
@@ -373,12 +366,23 @@ class SpeciesController extends Controller
                 $lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
                 
                 $lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
-            
+			
             }
+
+			$mt = $this->models->MediaTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon['id']
+				),'count(*) as total, mime_type',false,'mime_type'
+			);
+			
+			foreach((array)$mt as $mtkey => $mtval) {
+
+				$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
+
+			}
         
         }
-        
-
 
         // user requested a sort of the table
         if (isset($this->requestData['key'])) {
@@ -447,7 +451,8 @@ class SpeciesController extends Controller
 
 			$media = $this->models->MediaTaxon->get(
 				array(
-					'project_id' => $this->getCurrentProjectId()
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $this->requestData['id']
 				),false,'mime_type, file_name'
 			);
 			
@@ -460,11 +465,26 @@ class SpeciesController extends Controller
 
 			foreach((array)$media as $key => $val) {
 
+
+				$mdt = $this->models->MediaDescriptionsTaxon->get(
+					array(
+						'media_id' => $val['id'], 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $_SESSION['project']['default_language_id']
+					)
+				);
+				
+				$val['description'] = $mdt[0]['description'];
+
 				$r[$d[$val['mime_type']]][] = $val;
 
 			}
 
 			if (isset($r)) $this->smarty->assign('media',$r);
+
+			$this->smarty->assign('languages', $_SESSION['project']['languages']);
+			
+			$this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
 
 			$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -789,7 +809,23 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'save_taxon_name') {
 
-            $this->ajaxSaveTaxonName();
+            $this->ajaxActionSaveTaxonName();
+        
+        } else if ($this->requestData['action'] == 'save_media_desc') {
+
+            $this->ajaxActionSaveMediaDescription();
+        
+        } else if ($this->requestData['action'] == 'get_media_desc') {
+
+            $this->ajaxActionGetMediaDescription();
+        
+        } else if ($this->requestData['action'] == 'get_media_descs') {
+
+            $this->ajaxActionGetMediaDescriptions();
+        
+        } else if ($this->requestData['action'] == 'delete_media') {
+
+            $this->deleteTaxonMedia();
         
         }
         
@@ -814,6 +850,29 @@ class SpeciesController extends Controller
 	
 	}
 
+	private function setProjectLanguages()
+	{
+
+		$lp = $this->models->LanguageProject->get(array(
+			'project_id' => $this->getCurrentProjectId()
+		));
+		
+		foreach ((array) $lp as $key => $val) {
+			
+			$l = $this->models->Language->get($val['language_id']);
+			
+			$lp[$key]['language'] = $l['language'];
+			
+			if ($val['def_language'] == 1)
+				$defaultLanguage = $val['language_id'];
+		
+		}
+		
+		$_SESSION['project']['languages'] = $lp;
+
+		$_SESSION['project']['default_language_id'] = $defaultLanguage;
+
+	}
 
 	private function getCatalogueOfLifeData()
 	{
@@ -865,8 +924,6 @@ class SpeciesController extends Controller
 		}
 
 	}
-
-
 
 	private function createStandardSubpages() 
 	{	
@@ -997,12 +1054,13 @@ class SpeciesController extends Controller
             
             if (empty($this->requestData['title'])) {
                 
-                $tpt = $this->models->TaxonPageTitle->delete(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'page_id' => $this->requestData['id']
-                ));
+                $this->models->TaxonPageTitle->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'page_id' => $this->requestData['id']
+					)
+				);
             
             }
             else {
@@ -1155,14 +1213,10 @@ class SpeciesController extends Controller
 						   that that is the place where the leading name of a taxon is entered might be faulty
 
                         // if succesful, get the projects default language
-                        $lp = $this->models->LanguageProject->get(
-                        array(
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'def_language' => '1'
-                        ));
-                        
-                        $defaultLanguage = isset($lp[0]['language_id']) ? $lp[0]['language_id'] : $this->requestData['language'];
-                        
+						$lp = $_SESSION['project']['languages'];
+						
+						$defaultLanguage = $_SESSION['project']['default_language_id'];
+
                         // get the main page content for the default language
                         $ct = $this->models->ContentTaxon->get(
                         array(
@@ -1287,21 +1341,32 @@ class SpeciesController extends Controller
     private function ajaxActionDeleteTaxon ()
     {
         
-        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+        if (empty($this->requestData['id'])) {
             
             return;
         
-        }
-        else {
-            
-            $ct = $this->models->ContentTaxon->delete(
+        } else {
+
+			$mt = $this->models->MediaTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $this->requestData['id']
+				)
+			);
+
+			foreach((array)$mt as $key => $val) {
+
+				$this->deleteTaxonMedia($val['id'],false);
+
+			}
+
+            $this->models->ContentTaxon->delete(
             array(
                 'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId(), 
-                'page_id' => $this->requestData['page']
+                'project_id' => $this->getCurrentProjectId()
             ));
             
-            $ct = $this->models->Taxon->delete(array(
+            $this->models->Taxon->delete(array(
                 'id' => $this->requestData['id'], 
                 'project_id' => $this->getCurrentProjectId()
             ));
@@ -1386,8 +1451,6 @@ class SpeciesController extends Controller
         }
     
     }
-
-
 
     private function ajaxActionGetTaxonUndo ()
     {
@@ -1531,7 +1594,7 @@ class SpeciesController extends Controller
 
 	}
 
-	private function ajaxSaveTaxonName() 
+	private function ajaxActionSaveTaxonName() 
 	{
 
 		if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
@@ -1680,6 +1743,163 @@ class SpeciesController extends Controller
 		}
 
 	}
+
+	private function ajaxActionSaveMediaDescription()
+	{
+
+        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+
+            return;
+
+        } else {
+            
+            if (empty($this->requestData['description'])) {
+                
+                $this->models->MediaDescriptionsTaxon->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'media_id' => $this->requestData['id']
+					));
+            
+            } else {
+                
+                $mdt = $this->models->MediaDescriptionsTaxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'media_id' => $this->requestData['id']
+					)
+				);
+                
+                $this->models->MediaDescriptionsTaxon->save(
+					array(
+						'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'media_id' => $this->requestData['id'], 
+						'description' => $this->requestData['description']
+					)
+				);
+            
+            }
+            
+            $this->smarty->assign('returnText', '<ok>');
+        
+        }
+	
+	}
+
+	private function ajaxActionGetMediaDescription()
+	{
+
+        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+
+            return;
+
+        } else {
+            
+			$mdt = $this->models->MediaDescriptionsTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language'], 
+					'media_id' => $this->requestData['id']
+				));
+
+            $this->smarty->assign('returnText', $mdt[0]['description']);
+        
+        }
+
+	}
+
+	private function ajaxActionGetMediaDescriptions()
+	{
+
+        if (empty($this->requestData['language'])) {
+
+            return;
+
+        } else {
+            
+			$mt = $this->models->MediaTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+				),'id');
+
+			foreach((array)$mt as $key => $val) {
+
+				$mdt = $this->models->MediaDescriptionsTaxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'],
+						'media_id' => $val['id']
+					),'description');
+
+				$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
+			}
+							
+            $this->smarty->assign('returnText', json_encode($mt));
+        
+        }
+
+	}
+
+	private function deleteTaxonMedia($id = false,$output = true)
+	{
+
+		if ($id === false) {
+
+			$id = $this->requestData['id'];
+
+		}
+
+        if (empty($id)) {
+
+            return;
+
+        } else {
+
+			$mt = $this->models->MediaTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'id' => $id
+				)
+			);
+
+			if (unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
+
+				if ($mt[0]['thumb_name']) {
+					unlink($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
+				}
+
+				$this->models->MediaDescriptionsTaxon->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'media_id' => $id
+					)
+				);
+
+
+				$this->models->MediaTaxon->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $id
+					)
+				);
+				
+				if ($output) $this->smarty->assign('returnText', '<ok>');
+
+			} else {
+			
+				if ($output) $this->addError(_('Could not delete file:').' '.$mt[0]['file_name']);
+	    
+			}
+    
+        }
+
+	}
+
+
 
 
 }

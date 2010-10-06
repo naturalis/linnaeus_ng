@@ -6,6 +6,7 @@
 {if $id}
 <p>
 <form enctype="multipart/form-data" action="" method="post">
+<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
 <input type="hidden" name="rnd" value="{$rnd}" />
 Choose a file to upload: <input name="uploadedfile" type="file" /><br />
 <input type="submit" value="upload" />
@@ -45,6 +46,17 @@ In the current HTML-specification there are no cross-broswer possibilities for t
 </p>
 </div>
 {/if}
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+	allSetHeartbeatFreq({$heartbeatFrequency});
+	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
+{literal}	
+});
+</script>
+{/literal}
 
 
 {include file="../shared/admin-footer.tpl"}
