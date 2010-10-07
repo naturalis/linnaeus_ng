@@ -30,25 +30,25 @@ Note :
 
     var $img;
 
-	public function canResize($mime)
-	{
-	
-		if ($mime=='image/png' || $mime=='image/jpg' || $mime=='image/jpeg' || $mime=='image/gif') {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public function canResize($mime)
+    {
+    
+        if ($mime=='image/png' || $mime=='image/jpg' || $mime=='image/jpeg' || $mime=='image/gif') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     function thumbnail($imgfile)
-    {	
-	
+    {    
+    
         //detect image format
         //$this->img["format"]=ereg_replace(".*\.(.*)$","\\1",$imgfile);
-		$dummy = pathinfo($imgfile);
-		$this->img["format"]=$dummy['extension'];
+        $dummy = pathinfo($imgfile);
+        $this->img["format"]=$dummy['extension'];
 
-		$this->img["format"]=strtoupper($this->img["format"]);
+        $this->img["format"]=strtoupper($this->img["format"]);
         if ($this->img["format"]=="JPG" || $this->img["format"]=="JPEG") {
             //JPEG
             $this->img["format"]="JPEG";
@@ -67,16 +67,16 @@ Note :
             $this->img["src"] = ImageCreateFromWBMP ($imgfile);
         } else {
             //DEFAULT
-			//echo "Not Supported File:".$imgfile;
+            //echo "Not Supported File:".$imgfile;
             //exit();
-			return false;
+            return false;
         }
         @$this->img["lebar"] = imagesx($this->img["src"]);
         @$this->img["tinggi"] = imagesy($this->img["src"]);
         //default quality jpeg
         $this->img["quality"]=75;
 
-		return true;
+        return true;
 
     }
 

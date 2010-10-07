@@ -2,8 +2,8 @@
 
 /*
 
-	- replace hard coded role_id's
-	- user.active is project wide, but can be set by specific project admins...
+    - replace hard coded role_id's
+    - user.active is project wide, but can be set by specific project admins...
 
 */
 
@@ -18,7 +18,7 @@ class UsersController extends Controller
         'role', 
         'project_role_user', 
         'right_role',
-		'timezone'
+        'timezone'
     );
     
     public $controllerPublicName = 'User administration';
@@ -28,7 +28,7 @@ class UsersController extends Controller
     /**
      * Constructor, calls parent's constructor
      *
-     * @access 	public
+     * @access     public
      */
     public function __construct ()
     {
@@ -42,7 +42,7 @@ class UsersController extends Controller
     /**
      * Destroys!
      *
-     * @access 	public
+     * @access     public
      */
     public function __destruct ()
     {
@@ -58,8 +58,8 @@ class UsersController extends Controller
      *
      * Is called directly after log in. Results are stored in the user's session.
      *
-     * @return 	array	array of roles, rights and the number of projects the user is involved with
-     * @access 	private
+     * @return     array    array of roles, rights and the number of projects the user is involved with
+     * @access     private
      */
     public function getCurrentUserRights ($id = false)
     {
@@ -110,22 +110,22 @@ class UsersController extends Controller
      *
      * See function code for detailed comments on the function's flow
      *
-     * @access	public
+     * @access    public
      */
     public function loginAction ()
     {
 
-		// user previously set remember me: auto-login
-		$u = $this->getRememberedUser();
+        // user previously set remember me: auto-login
+        $u = $this->getRememberedUser();
 
- 		if ($u) {
+         if ($u) {
 
-			$this->doLogin($u[0],true);
+            $this->doLogin($u[0],true);
 
-			// determine and redirect to the default start page after logging in
-			$this->redirect($this->getLoginStartPage());
+            // determine and redirect to the default start page after logging in
+            $this->redirect($this->getLoginStartPage());
 
-		}
+        }
 
 
         $this->setPageName(_('Login'));
@@ -152,7 +152,7 @@ class UsersController extends Controller
             } else {
             // user found
 
-				$this->doLogin($users[0],(isset($this->requestData['remember_me']) && $this->requestData['remember_me'] == '1'));
+                $this->doLogin($users[0],(isset($this->requestData['remember_me']) && $this->requestData['remember_me'] == '1'));
 
                 // determine and redirect to the default start page after logging in
                 $this->redirect($this->getLoginStartPage());
@@ -170,7 +170,7 @@ class UsersController extends Controller
     /**
      * Logging out
      *
-     * @access	public
+     * @access    public
      */
     public function logoutAction ()
     {
@@ -178,8 +178,8 @@ class UsersController extends Controller
         $this->setPageName(_('Logout'));
         
         $this->destroyUserSession();
-		
-		$this->unsetRememberMeCookie();
+        
+        $this->unsetRememberMeCookie();
 
         $this->redirect('login.php');
     
@@ -190,7 +190,7 @@ class UsersController extends Controller
     /**
      * Choosing the active project
      *
-     * @access	public
+     * @access    public
      */
     public function chooseProjectAction ()
     {
@@ -205,7 +205,7 @@ class UsersController extends Controller
                 
                 $this->setCurrentProjectId($this->requestData['project_id']);
 
-				$this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
+                $this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
 
                 $this->redirect($this->getLoggedInMainIndex());
             
@@ -231,7 +231,7 @@ class UsersController extends Controller
      *
      * See function code for detailed comments on the function's flow
      *
-     * @access	public
+     * @access    public
      */
     public function createAction ()
     {
@@ -386,7 +386,7 @@ class UsersController extends Controller
                         
                         $this->addMessage(
                         '<input type="button" value="' . _('yes, connect existing') . '" onclick="$(\'#checked\').val(\'2\');$(\'#theForm\').submit();">&nbsp;
-								<input type="button" value="' . _('no, create new') . '" onclick="$(\'#checked\').val(\'1\');$(\'#theForm\').submit();">&nbsp;');
+                                <input type="button" value="' . _('no, create new') . '" onclick="$(\'#checked\').val(\'1\');$(\'#theForm\').submit();">&nbsp;');
                     
                     }
                     // ...or because of his email address (or both)
@@ -404,7 +404,7 @@ class UsersController extends Controller
                         
                         $this->addMessage(
                         '<input type="button" value="' . _('yes') . '" onclick="$(\'#checked\').val(\'2\');$(\'#theForm\').submit();">&nbsp;
-								<input type="button" value="' . _('no') . '" onclick="window.open(\'index.php\',\'_self\');">');
+                                <input type="button" value="' . _('no') . '" onclick="window.open(\'index.php\',\'_self\');">');
                     
                     }
                     
@@ -423,7 +423,7 @@ class UsersController extends Controller
 
         }
         
-        // input form, shows empty. or with data when user clicked 'save' but data contained errors			
+        // input form, shows empty. or with data when user clicked 'save' but data contained errors            
         else {
             
             $this->smarty->assign('check', false);
@@ -448,7 +448,7 @@ class UsersController extends Controller
     /**
      * Overview of all collaborators in the current project
      *
-     * @access	public
+     * @access    public
      */
     public function indexAction ()
     {
@@ -466,11 +466,11 @@ class UsersController extends Controller
         foreach ((array) $pru as $key => $val) {
             
             $u = $this->models->User->get(
-				$val['user_id'],
-				'*, if(active=1,"active","blocked") as status, 
-				concat(datediff(curdate(),created)," '._('days').'") as days_active,
-				ifnull(last_login,"'._('(has never logged in)').'") as last_login'
-			);
+                $val['user_id'],
+                '*, if(active=1,"active","blocked") as status, 
+                concat(datediff(curdate(),created)," '._('days').'") as days_active,
+                ifnull(last_login,"'._('(has never logged in)').'") as last_login'
+            );
             
             $r = $this->models->Role->get($val['role_id']);
             
@@ -509,14 +509,14 @@ class UsersController extends Controller
         $this->smarty->assign('users', $users);
 
         $this->smarty->assign('columnsToShow',
-			array(
-				array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
-				array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
-				array('name'=> 'role', 'label'  => _('role'),'align' => 'left'),
-				array('name'=> 'days_active', 'label' => _('collaborator for'),'align' => 'right'),
-				array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
-			)
-		);
+            array(
+                array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
+                array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
+                array('name'=> 'role', 'label'  => _('role'),'align' => 'left'),
+                array('name'=> 'days_active', 'label' => _('collaborator for'),'align' => 'right'),
+                array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
+            )
+        );
 
         $this->printPage();
     
@@ -527,7 +527,7 @@ class UsersController extends Controller
     /**
      * Viewing data of a collaborator
      *
-     * @access	public
+     * @access    public
      */
     public function viewAction ()
     {
@@ -564,7 +564,7 @@ class UsersController extends Controller
      *
      * See function code for detailed comments on the function's flow
      *
-     * @access	public
+     * @access    public
      */
     public function editAction ()
     {
@@ -747,13 +747,13 @@ class UsersController extends Controller
      * The array 'v' contains the values of the variables to check.
      * The variable 'f' contains the name of the variable to check.
      * Possible test (request variable 't'):
-     * e	does value v already exit for field f?
-     * f	is formatting of value v correct?
-     * q	are values 1 & 2 equal?
+     * e    does value v already exit for field f?
+     * f    is formatting of value v correct?
+     * q    are values 1 & 2 equal?
      * The variable 'i' can contain the id of a user to ignore in the test (to avoid claiming conflict
      * with a user's own username or email address when editing).
      *
-     * @access	public
+     * @access    public
      */
     public function ajaxInterfaceAction ()
     {
@@ -836,43 +836,43 @@ class UsersController extends Controller
     /**
      * Calls all the relevant methods to log the user in
      *
-     * @param  	array	$user	basic user data
-     * @param  	boolean	$remember	whether or not the user wants his being loged in to be remembered across sessions
-     * @access 	private
+     * @param      array    $user    basic user data
+     * @param      boolean    $remember    whether or not the user wants his being loged in to be remembered across sessions
+     * @access     private
      */
-	private function doLogin($user,$remember) 
-	{
+    private function doLogin($user,$remember) 
+    {
 
-		// update last and number of logins
-		$this->models->User->save(
-			array(
-				'id' => $user['id'], 
-				'last_login' => 'now()', 
-				'logins' => 'logins+1'
-			)
-		);
-		
-		// get user's roles and rights
-		$cur = $this->getCurrentUserRights($user['id']);
-		
-		// save all relevant data to the session
-		$this->setUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
-		
-		// set 'remember me' cookie
-		if ($remember) {
-		
-			$this->setRememberMeCookie();
-		
-		} else {
-		
-			$this->unsetRememberMeCookie();
-		
-		}
-		
-		// determine and set the default active project
-		$this->setDefaultProject();
+        // update last and number of logins
+        $this->models->User->save(
+            array(
+                'id' => $user['id'], 
+                'last_login' => 'now()', 
+                'logins' => 'logins+1'
+            )
+        );
+        
+        // get user's roles and rights
+        $cur = $this->getCurrentUserRights($user['id']);
+        
+        // save all relevant data to the session
+        $this->setUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
+        
+        // set 'remember me' cookie
+        if ($remember) {
+        
+            $this->setRememberMeCookie();
+        
+        } else {
+        
+            $this->unsetRememberMeCookie();
+        
+        }
+        
+        // determine and set the default active project
+        $this->setDefaultProject();
 
-	}
+    }
 
 
     /**
@@ -882,11 +882,11 @@ class UsersController extends Controller
      * Data includes basic personal data, the user's various roles within projects,
      * the user's rights to see actual pages and the number of projects he is assigned to.
      *
-     * @param  	array	$userData	basic user data
-     * @param  	array	$roles	user's roles
-     * @param  	array	$rights	user's rights
-     * @param  	integer	$numberOfProjects	number of assigned projects
-     * @access 	public
+     * @param      array    $userData    basic user data
+     * @param      array    $roles    user's roles
+     * @param      array    $rights    user's rights
+     * @param      integer    $numberOfProjects    number of assigned projects
+     * @access     public
      */
     private function setUserSession ($userData, $roles, $rights, $numberOfProjects )
     {
@@ -906,7 +906,7 @@ class UsersController extends Controller
     /**
      * Destroys a user's session (when logging out)
      *
-     * @access 	public
+     * @access     public
      */
     private function destroyUserSession ()
     {
@@ -916,67 +916,67 @@ class UsersController extends Controller
     }
 
 
-	private function setRememberMeCookie()
-	{
+    private function setRememberMeCookie()
+    {
 
-		setcookie(
-			$this->generalSettings['login-cookie']['name'], 
-			$this->getCurrentUserId(), 
-			time() + (86400 * $this->generalSettings['login-cookie']['lifetime'])
-		);
+        setcookie(
+            $this->generalSettings['login-cookie']['name'], 
+            $this->getCurrentUserId(), 
+            time() + (86400 * $this->generalSettings['login-cookie']['lifetime'])
+        );
 
-	}
-
-
-	private function getRememberMeCookie()
-	{
-
-		return isset($_COOKIE[$this->generalSettings['login-cookie']['name']]) ? $_COOKIE[$this->generalSettings['login-cookie']['name']] : false;
-
-	}
+    }
 
 
-	private function unsetRememberMeCookie()
-	{
+    private function getRememberMeCookie()
+    {
 
-		setcookie(
-			$this->generalSettings['login-cookie']['name'], 
-			false, 
-			time() - 86400
-		);
+        return isset($_COOKIE[$this->generalSettings['login-cookie']['name']]) ? $_COOKIE[$this->generalSettings['login-cookie']['name']] : false;
 
-	}
-	
-	private function getRememberedUser()
-	{
+    }
 
-		$c = $this->getRememberMeCookie();
 
-		if ($c) {
+    private function unsetRememberMeCookie()
+    {
 
-			return $this->models->User->get(
-				array(
-					'id' => $c,
-					'active' => '1'
-				)
-			);
+        setcookie(
+            $this->generalSettings['login-cookie']['name'], 
+            false, 
+            time() - 86400
+        );
 
-		} else {
+    }
+    
+    private function getRememberedUser()
+    {
 
-			return false;
-	
-		}
+        $c = $this->getRememberMeCookie();
 
-	}
+        if ($c) {
+
+            return $this->models->User->get(
+                array(
+                    'id' => $c,
+                    'active' => '1'
+                )
+            );
+
+        } else {
+
+            return false;
+    
+        }
+
+    }
 
 
     /**
      * Finds out if a collaborator has a role within the specified project
      *
-     * @param  	string	$userId	id of the user to find
-     * @param  	string	$projectId	id of the project to find
-     * @return 	boolean	collaborator is part of the project, or not
-     * @access 	private
+     * @param      string    $userId    id of the user to find
+     * @param      string    $projectId    id of the project to find
+     * @return     boolean    collaborator is part of the project, or not
+     * @access     private
      */
     private function isUserPartOfProject ($user, $project)
     {
@@ -995,10 +995,10 @@ class UsersController extends Controller
     /**
      * Retrieves a collaborator's role within the specified project
      *
-     * @param  	string	$userId	id of the user to find
-     * @param  	string	$projectId	id of the project to find
-     * @return 	array	role of user
-     * @access 	private
+     * @param      string    $userId    id of the user to find
+     * @param      string    $projectId    id of the project to find
+     * @return     array    role of user
+     * @access     private
      */
     private function getUserProjectRole ($userId, $projectId)
     {
@@ -1026,9 +1026,9 @@ class UsersController extends Controller
      *
      * Currently md5 is used as encoding function
      *
-     * @param  	string	$p	the password
-     * @return 	string	as 32 byte md5 hash
-     * @access 	private
+     * @param      string    $p    the password
+     * @return     string    as 32 byte md5 hash
+     * @access     private
      */
     private function userPasswordEncode ($p)
     {
@@ -1042,9 +1042,9 @@ class UsersController extends Controller
     /**
      * Verifies if the user data that has been entered is complete 
      *
-     * @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
-     * @return 	boolean	data is complete or not
-     * @access 	private
+     * @param      array    $fieldsToIgnore    fields that might be in the data, but need not be checked
+     * @return     boolean    data is complete or not
+     * @access     private
      */
     private function isUserDataComplete ($fieldsToIgnore = array())
     {
@@ -1111,10 +1111,10 @@ class UsersController extends Controller
      *
      * Looks currently only at length constraints (5 <= length <= 16)
      *
-     * @param  	string	$username	username to check; if absent, username is taken from the request variables
-     * @return 	boolean	username is correct or not
-     * @access 	private
-     * @todo		a more complete check
+     * @param      string    $username    username to check; if absent, username is taken from the request variables
+     * @return     boolean    username is correct or not
+     * @access     private
+     * @todo        a more complete check
      */
     private function isUsernameCorrect ($username = false)
     {
@@ -1151,11 +1151,11 @@ class UsersController extends Controller
      *
      * Looks currently only at length constraints (5 <= length <= 16)
      *
-     * @param  	string	$password	password to check; if absent, password is taken from the request variables
-     * @param  	string	$password_2	second password from user data form; idem.
-     * @return 	boolean	password is correct (and identical if two were supplied) or not 
-     * @access 	private
-     * @todo		a more complete check
+     * @param      string    $password    password to check; if absent, password is taken from the request variables
+     * @param      string    $password_2    second password from user data form; idem.
+     * @return     boolean    password is correct (and identical if two were supplied) or not 
+     * @access     private
+     * @todo        a more complete check
      */
     private function isPasswordCorrect ($password = false, $password_2 = false)
     {
@@ -1204,9 +1204,9 @@ class UsersController extends Controller
      *
      * Uses reg exp mask: /^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/
      *
-     * @param  	string	$email_address	address to check; if absent, username is taken from the request variables
-     * @return 	boolean	address is correct or not
-     * @access 	private
+     * @param      string    $email_address    address to check; if absent, username is taken from the request variables
+     * @return     boolean    address is correct or not
+     * @access     private
      */
     private function isEmailAddressCorrect ($email_address = false)
     {
@@ -1235,9 +1235,9 @@ class UsersController extends Controller
     /**
      * Tests whether userdata (username and emailaddress) is correct
      *
-     * @param  	array	$fieldsToIgnore	fields that might be in the data, but need not be checked
-     * @return 	boolean	unique or not
-     * @access 	private
+     * @param      array    $fieldsToIgnore    fields that might be in the data, but need not be checked
+     * @return     boolean    unique or not
+     * @access     private
      */
     
     private function isUserDataCorrect ($fieldsToIgnore = array())
@@ -1248,17 +1248,17 @@ class UsersController extends Controller
         if (!in_array('username', $fieldsToIgnore)) {
             if (!$this->isUsernameCorrect())
                 $result = false;
-		}
+        }
         
         if (!in_array('password', $fieldsToIgnore)) {
             if (!$this->isPasswordCorrect())
                 $result = false;
-		}
+        }
         
         if (!in_array('email_address', $fieldsToIgnore)) {
             if (!$this->isEmailAddressCorrect())
                 $result = false;
-		}
+        }
         
         return $result;
     
@@ -1269,10 +1269,10 @@ class UsersController extends Controller
     /**
      * Tests whether username is unique in the database
      *
-     * @param  	string	$username	username to check; if false, it is the 'username' var from the request data that is tested
-     * @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-     * @return 	boolean	unique or not
-     * @access 	private
+     * @param      string    $username    username to check; if false, it is the 'username' var from the request data that is tested
+     * @param      integer    $idToIgnore    user id to ignore, as not to match someone with himself
+     * @return     boolean    unique or not
+     * @access     private
      */
     private function isUsernameUnique ($username = false, $idToIgnore = false)
     {
@@ -1324,11 +1324,11 @@ class UsersController extends Controller
     /**
      * Tests whether emailaddress is unique in the database
      *
-     * @param  	string	$email_address	address to check; if false, it is the 'email_address' var from the request data that is tested
-     * @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-     * @param  	boolean	$suppress_error	if true, function just returns result and adds no error
-     * @return 	boolean	unique or not
-     * @access 	private
+     * @param      string    $email_address    address to check; if false, it is the 'email_address' var from the request data that is tested
+     * @param      integer    $idToIgnore    user id to ignore, as not to match someone with himself
+     * @param      boolean    $suppress_error    if true, function just returns result and adds no error
+     * @return     boolean    unique or not
+     * @access     private
      */
     private function isEmailAddressUnique ($email_address = false, $idToIgnore = false, $suppress_error = false)
     {
@@ -1381,9 +1381,9 @@ class UsersController extends Controller
     /**
      * Tests whether userdata (username and emailaddress) is unique in the database
      *
-     * @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-     * @return 	boolean	unique or not
-     * @access 	private
+     * @param      integer    $idToIgnore    user id to ignore, as not to match someone with himself
+     * @return     boolean    unique or not
+     * @access     private
      */
     private function isUserDataUnique ($idToIgnore = false)
     {
@@ -1405,17 +1405,17 @@ class UsersController extends Controller
     /**
      * Finds existing users in the database, based on mathcing name and/or emailaddress
      *
-     * @param  	integer	$idToIgnore	user id to ignore, as not to match someone with himself
-     * @return 	array	array of users
-     * @access 	private
+     * @param      integer    $idToIgnore    user id to ignore, as not to match someone with himself
+     * @return     array    array of users
+     * @access     private
      */
     private function getSimilarUsers ($idToIgnore = false)
     {
         
         $q = "select * from %table% where 
-					((lower(first_name) = '" . $this->models->User->escapeString(strtolower($this->requestData['first_name'])) . "'
-					and lower(last_name) = '" . $this->models->User->escapeString(strtolower($this->requestData['last_name'])) . "')
-					or email_address = '" . $this->models->User->escapeString($this->requestData['email_address']) . "')" . ($idToIgnore ? " and id !=" . $idToIgnore : '');
+                    ((lower(first_name) = '" . $this->models->User->escapeString(strtolower($this->requestData['first_name'])) . "'
+                    and lower(last_name) = '" . $this->models->User->escapeString(strtolower($this->requestData['last_name'])) . "')
+                    or email_address = '" . $this->models->User->escapeString($this->requestData['email_address']) . "')" . ($idToIgnore ? " and id !=" . $idToIgnore : '');
         
         $users = $this->models->User->get($q);
         

@@ -17,7 +17,7 @@ class UtilitiesController extends Controller
     /**
      * Constructor, calls parent's constructor
      *
-     * @access 	public
+     * @access     public
      */
     public function __construct ()
     {
@@ -33,7 +33,7 @@ class UtilitiesController extends Controller
     /**
      * Destroys!
      *
-     * @access 	public
+     * @access     public
      */
     public function __destruct ()
     {
@@ -50,7 +50,7 @@ class UtilitiesController extends Controller
      * Users can be redirected to notAuthorizedAction from every controller,
      * so the controller name is hidden in the output to avoid confusion.
      *
-     * @access	public
+     * @access    public
      */
     public function notAuthorizedAction ()
     {
@@ -71,7 +71,7 @@ class UtilitiesController extends Controller
      * Users can be redirected to moduleNotPresentAction from every controller,
      * so the controller name is hidden in the output to avoid confusion.
      *
-     * @access	public
+     * @access    public
      */
     public function moduleNotPresentAction ()
     {
@@ -89,7 +89,7 @@ class UtilitiesController extends Controller
     /**
      * AJAX interface for this class
      *
-     * @access	public
+     * @access    public
      */
     public function ajaxInterfaceAction ()
     {
@@ -119,8 +119,8 @@ class UtilitiesController extends Controller
         
         $this->models->Heartbeat->delete(
         "delete from %table% 
-					where project_id = " . $this->getCurrentProjectId() . "
-						and last_change <= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 2000) . ",CURRENT_TIMESTAMP)");
+                    where project_id = " . $this->getCurrentProjectId() . "
+                        and last_change <= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 2000) . ",CURRENT_TIMESTAMP)");
     
     }
 
@@ -168,12 +168,12 @@ class UtilitiesController extends Controller
         // before we assume it is dead)
         $h = $this->models->Heartbeat->get(
         "select * 
-					from %table% 
-					where project_id = " . $this->getCurrentProjectId() . "
-						and last_change >= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
-						and app = '" . $this->getAppName() . "'
-						and ctrllr = 'species'
-						and (view = 'edit' or view = 'media' or view = 'media_upload')");
+                    from %table% 
+                    where project_id = " . $this->getCurrentProjectId() . "
+                        and last_change >= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
+                        and app = '" . $this->getAppName() . "'
+                        and ctrllr = 'species'
+                        and (view = 'edit' or view = 'media' or view = 'media_upload')");
         
         foreach ((array) $h as $key => $val) {
             

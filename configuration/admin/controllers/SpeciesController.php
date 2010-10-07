@@ -1,14 +1,14 @@
 <?php
 
 /*
-	
-	tinyMCE spell checker:
-		- requires google: check if online
-		- change default lanmguage through js
-		- what if language has no iso2?
-		- what happens if language does not exist at google?
+    
+    tinyMCE spell checker:
+        - requires google: check if online
+        - change default lanmguage through js
+        - what if language has no iso2?
+        - what happens if language does not exist at google?
 
-	hardcoded set_time_limit(3000); for CoL
+    hardcoded set_time_limit(3000); for CoL
 
 */
 
@@ -26,15 +26,15 @@ class SpeciesController extends Controller
         'taxon_page_title', 
         'heartbeat', 
         'content_taxon_undo',
-		'media_taxon',
-		'media_descriptions_taxon'
+        'media_taxon',
+        'media_descriptions_taxon'
     );
     
     public $usedHelpers = array(
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
-	private $_treeIdList;
+    private $_treeIdList;
 
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
@@ -43,15 +43,15 @@ class SpeciesController extends Controller
     /**
      * Constructor, calls parent's constructor
      *
-     * @access 	public
+     * @access     public
      */
     public function __construct ()
     {
         parent::__construct();
         
-		$this->createStandardSubpages();
+        $this->createStandardSubpages();
 
-		$this->setProjectLanguages();
+        $this->setProjectLanguages();
 
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
 
@@ -60,7 +60,7 @@ class SpeciesController extends Controller
     /**
      * Destroys
      *
-     * @access 	public
+     * @access     public
      */
     public function __destruct ()
     {
@@ -73,7 +73,7 @@ class SpeciesController extends Controller
     /**
      * Index of the species module
      *
-     * @access	public
+     * @access    public
      */
     public function indexAction ()
     {
@@ -90,7 +90,7 @@ class SpeciesController extends Controller
     /**
      * Display, add, edit and delete subpages' names in all languages
      *
-     * @access	public
+     * @access    public
      */
     public function pageAction ()
     {
@@ -101,7 +101,7 @@ class SpeciesController extends Controller
         
         // adding a new page
         if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
-		
+        
             $tp = $this->createTaxonPage($this->requestData['new_page'],$this->requestData['show_order']);
             
             if ($tp !== true) {
@@ -113,16 +113,16 @@ class SpeciesController extends Controller
         
         }
         
-		
-		$lp = $_SESSION['project']['languages'];
+        
+        $lp = $_SESSION['project']['languages'];
 
-		$defaultLanguage = $_SESSION['project']['default_language_id'];
+        $defaultLanguage = $_SESSION['project']['default_language_id'];
         
         $pages = $this->models->TaxonPage->get(array(
             'project_id' => $this->getCurrentProjectId()
-        	),
-			false,'show_order'
-		);
+            ),
+            false,'show_order'
+        );
         
         foreach ((array) $pages as $key => $page) {
             
@@ -138,8 +138,8 @@ class SpeciesController extends Controller
                 $pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
             
             }
-			
-			$nextShowOrder = $page['show_order']+1;
+            
+            $nextShowOrder = $page['show_order']+1;
         
         }
         
@@ -164,7 +164,7 @@ class SpeciesController extends Controller
      *
      * Actual saving etc. works via AJAX actions
      *
-     * @access	public
+     * @access    public
      */
     public function editAction ()
     {
@@ -172,11 +172,11 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
         
         $this->setBreadcrumbIncludeReferer(
-			array(
-				'name' => _('Taxon list'), 
-				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-			)
-		);
+            array(
+                'name' => _('Taxon list'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            )
+        );
         
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
@@ -198,10 +198,10 @@ class SpeciesController extends Controller
         }
         
         if (empty($this->requestData['id']) || !$this->doLockOutUser($this->requestData['id'])) {
-		// if new taxon OR existing taxon not being edited by someone else, get languages and content
+        // if new taxon OR existing taxon not being edited by someone else, get languages and content
 
             // get available languages
-			$lp = $_SESSION['project']['languages'];
+            $lp = $_SESSION['project']['languages'];
 
             foreach ((array) $lp as $key => $val) {
                 
@@ -227,7 +227,7 @@ class SpeciesController extends Controller
                 
                 foreach ((array) $lp as $k => $language) {
                     
-					// for each subpage in each language, get the subpage title
+                    // for each subpage in each language, get the subpage title
                     $tpt = $this->models->TaxonPageTitle->get(
                     array(
                         'project_id' => $this->getCurrentProjectId(), 
@@ -257,15 +257,15 @@ class SpeciesController extends Controller
                     'page_id' => $startPage
                 ));
 
-				if ($ct == null) {
+                if ($ct == null) {
 
-					$content['content'] = $this->getDefaultPageSections($startPage);
+                    $content['content'] = $this->getDefaultPageSections($startPage);
 
-				} else {
+                } else {
 
-	                $content = $ct[0];
+                    $content = $ct[0];
 
-            	}
+                }
             }
             
             if (isset($taxon))
@@ -287,7 +287,7 @@ class SpeciesController extends Controller
             $this->smarty->assign('activePage', $startPage);
         
         } else {
-		// existing taxon already being edited by someone else
+        // existing taxon already being edited by someone else
 
             $this->smarty->assign('taxon', array(
                 'id' => -1
@@ -305,7 +305,7 @@ class SpeciesController extends Controller
     /**
      * List existing taxa
      *
-     * @access	public
+     * @access    public
      */
     public function listAction ()
     {
@@ -334,15 +334,15 @@ class SpeciesController extends Controller
         
         }
 
-		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-		
-			$d[$val['mime']] = $val['media_type'];
-		
-		}
+        foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+        
+            $d[$val['mime']] = $val['media_type'];
+        
+        }
 
         foreach ((array) $taxa as $key => $taxon) {
-		
-			$taxa[$key]['symbol'] = $this->getRankSymbol($taxon['rank']);
+        
+            $taxa[$key]['symbol'] = $this->getRankSymbol($taxon['rank']);
             
             foreach ((array) $lp as $k => $val) {
                 
@@ -366,22 +366,22 @@ class SpeciesController extends Controller
                 $lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
                 
                 $lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
-			
+            
             }
 
-			$mt = $this->models->MediaTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $taxon['id']
-				),'count(*) as total, mime_type',false,'mime_type'
-			);
-			
-			foreach((array)$mt as $mtkey => $mtval) {
+            $mt = $this->models->MediaTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'taxon_id' => $taxon['id']
+                ),'count(*) as total, mime_type',false,'mime_type'
+            );
+            
+            foreach((array)$mt as $mtkey => $mtval) {
 
-				$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
-				$taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
+                $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
+                $taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
 
-			}
+            }
         
         }
 
@@ -394,8 +394,8 @@ class SpeciesController extends Controller
                 'case' => 'i'
             );
         
-			// sort array of collaborators
-			$this->customSortArray($taxa, $sortBy);
+            // sort array of collaborators
+            $this->customSortArray($taxa, $sortBy);
 
         } else {
         // default sort order
@@ -422,7 +422,7 @@ class SpeciesController extends Controller
     /**
      * See and maintain media for a taxon
      *
-     * @access	public
+     * @access    public
      */
     public function mediaAction ()
     {
@@ -430,11 +430,11 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
 
         $this->setBreadcrumbIncludeReferer(
-			array(
-				'name' => _('Taxon list'), 
-				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-			)
-		);
+            array(
+                'name' => _('Taxon list'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            )
+        );
 
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
@@ -448,61 +448,61 @@ class SpeciesController extends Controller
             
             $this->setPageName(_('Media for') . ' "' . $taxon['taxon'] . '"');
 
-			$this->smarty->assign('id',$this->requestData['id']);
+            $this->smarty->assign('id',$this->requestData['id']);
 
-			$media = $this->models->MediaTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $this->requestData['id']
-				),false,'mime_type, file_name'
-			);
-			
-			
-			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-			
-				$d[$val['mime']] = $val['media_type'];
-			
-			}
+            $media = $this->models->MediaTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(),
+                    'taxon_id' => $this->requestData['id']
+                ),false,'mime_type, file_name'
+            );
+            
+            
+            foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+            
+                $d[$val['mime']] = $val['media_type'];
+            
+            }
 
-			foreach((array)$media as $key => $val) {
+            foreach((array)$media as $key => $val) {
 
 
-				$mdt = $this->models->MediaDescriptionsTaxon->get(
-					array(
-						'media_id' => $val['id'], 
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $_SESSION['project']['default_language_id']
-					)
-				);
-				
-				$val['description'] = $mdt[0]['description'];
+                $mdt = $this->models->MediaDescriptionsTaxon->get(
+                    array(
+                        'media_id' => $val['id'], 
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $_SESSION['project']['default_language_id']
+                    )
+                );
+                
+                $val['description'] = $mdt[0]['description'];
 
-				if (isset($d[$val['mime_type']])) $r[$d[$val['mime_type']]][] = $val;
+                if (isset($d[$val['mime_type']])) $r[$d[$val['mime_type']]][] = $val;
 
-			}
+            }
 
-			if (isset($r)) $this->smarty->assign('media',$r);
+            if (isset($r)) $this->smarty->assign('media',$r);
 
-			$this->smarty->assign('languages', $_SESSION['project']['languages']);
-			
-			$this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
+            $this->smarty->assign('languages', $_SESSION['project']['languages']);
+            
+            $this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
 
-			$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
+            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
-		} else {
+        } else {
 
-			$this->addError(_('No taxon specified'));
+            $this->addError(_('No taxon specified'));
 
-		} 
-		
+        } 
+        
         $this->printPage();
 
-	}
+    }
 
     /**
      * Upload media for a taxon
      *
-     * @access	public
+     * @access    public
      */
     public function mediaUploadAction ()
     {
@@ -510,11 +510,11 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
 
         $this->setBreadcrumbIncludeReferer(
-			array(
-				'name' => _('Taxon list'), 
-				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
-			)
-		);
+            array(
+                'name' => _('Taxon list'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            )
+        );
 
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
@@ -525,95 +525,95 @@ class SpeciesController extends Controller
             ));
             
             $taxon = $t[0];
-			
-			if ($taxon['id']) {
+            
+            if ($taxon['id']) {
 
-				$this->setPageName(_('New media for') . ' "' . $taxon['taxon'] . '"');
+                $this->setPageName(_('New media for') . ' "' . $taxon['taxon'] . '"');
 
-				if ($this->requestDataFiles && !$this->isFormResubmit()) {
-					$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
-					$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
-					$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
-					$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-	
-					$this->addError($this->helpers->FileUploadHelper->getErrors());
-					$filesToSave = $this->helpers->FileUploadHelper->getResult();
-	
-					if ($filesToSave) {
-	
-						foreach((array)$filesToSave as $key => $file) {
+                if ($this->requestDataFiles && !$this->isFormResubmit()) {
+                    $this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+                    $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+                    $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+                    $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+    
+                    $this->addError($this->helpers->FileUploadHelper->getErrors());
+                    $filesToSave = $this->helpers->FileUploadHelper->getResult();
+    
+                    if ($filesToSave) {
+    
+                        foreach((array)$filesToSave as $key => $file) {
 
-							$thumb = false;
+                            $thumb = false;
 
-							if (
-								$this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
-								$this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
-							) {
+                            if (
+                                $this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+                                $this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
+                            ) {
 
-								$pi = pathinfo($file['name']);
-								$this->helpers->ImageThumberHelper->size_width(150);
-								
-								if ($this->helpers->ImageThumberHelper->save(
-									$this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
-								)) {
-								
-									$thumb = $pi['filename'].'-thumb.'.$pi['extension'];
-								
-								}
+                                $pi = pathinfo($file['name']);
+                                $this->helpers->ImageThumberHelper->size_width(150);
+                                
+                                if ($this->helpers->ImageThumberHelper->save(
+                                    $this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
+                                )) {
+                                
+                                    $thumb = $pi['filename'].'-thumb.'.$pi['extension'];
+                                
+                                }
 
-							}
+                            }
 
-							$mt = $this->models->MediaTaxon->save(
-								array(
-									'id' => null,
-									'project_id' => $this->getCurrentProjectId(),
-									'taxon_id' => $this->requestData['id'],
-									'file_name' => $file['name'],
-									'original_name' => $file['original_name'],
-									'mime_type' => $file['mime_type'],
-									'file_size' => $file['size'],
-									'thumb_name' => $thumb ? $thumb : null,
-								)
-							);
-				
-							if ($mt) {
-								 
-								$this->addMessage(_('Saved:').' '.$file['original_name'].' ('.$file['media_name'].')');
-	
-							} else {
-	
-								$this->addError(_('Failed writing uploaded file to database.'));
-	
-							}
-				
-						}
-			
-					}
+                            $mt = $this->models->MediaTaxon->save(
+                                array(
+                                    'id' => null,
+                                    'project_id' => $this->getCurrentProjectId(),
+                                    'taxon_id' => $this->requestData['id'],
+                                    'file_name' => $file['name'],
+                                    'original_name' => $file['original_name'],
+                                    'mime_type' => $file['mime_type'],
+                                    'file_size' => $file['size'],
+                                    'thumb_name' => $thumb ? $thumb : null,
+                                )
+                            );
+                
+                            if ($mt) {
+                                 
+                                $this->addMessage(_('Saved:').' '.$file['original_name'].' ('.$file['media_name'].')');
+    
+                            } else {
+    
+                                $this->addError(_('Failed writing uploaded file to database.'));
+    
+                            }
+                
+                        }
+            
+                    }
 
-				}
-	
-			} else {
+                }
+    
+            } else {
 
-				$this->addError(_('Unknown taxon.'));
+                $this->addError(_('Unknown taxon.'));
 
-			}
+            }
 
-			$this->smarty->assign('id',$this->requestData['id']);
+            $this->smarty->assign('id',$this->requestData['id']);
 
-			$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
+            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
-			$this->smarty->assign('iniSettings',
-				array(
-					'upload_max_filesize' => ini_get('upload_max_filesize'),
-					'post_max_size' => ini_get('post_max_size')
-				)
-			);
+            $this->smarty->assign('iniSettings',
+                array(
+                    'upload_max_filesize' => ini_get('upload_max_filesize'),
+                    'post_max_size' => ini_get('post_max_size')
+                )
+            );
 
-		} else {
+        } else {
 
-			$this->addError(_('No taxon specified'));
+            $this->addError(_('No taxon specified'));
 
-		}        
+        }        
 
         $this->printPage();
     
@@ -623,7 +623,7 @@ class SpeciesController extends Controller
     /**
      * Upload a file with taxa
      *
-     * @access	public
+     * @access    public
      */
     public function fileAction ()
     {
@@ -631,127 +631,127 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Taxon file upload'));
-		
-		if ($this->requestDataFiles) {
+        
+        if ($this->requestDataFiles) {
 
-			unset($_SESSION['system']['csv_data']);
-			
-			$this->helpers->CsvParserHelper->setFieldMax(2);
+            unset($_SESSION['system']['csv_data']);
+            
+            $this->helpers->CsvParserHelper->setFieldMax(2);
 
-			$this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
-		
-			$this->addError($this->helpers->CsvParserHelper->getErrors());
-			
-			if (!$this->getErrors()) {
+            $this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
+        
+            $this->addError($this->helpers->CsvParserHelper->getErrors());
+            
+            if (!$this->getErrors()) {
 
-				$r = $this->helpers->CsvParserHelper->getResults();
+                $r = $this->helpers->CsvParserHelper->getResults();
 
-				$_SESSION['system']['csv_data'] = $r;
+                $_SESSION['system']['csv_data'] = $r;
 
-				$this->smarty->assign('results',$r);
+                $this->smarty->assign('results',$r);
 
-			}	
+            }    
 
-		} elseif ($this->requestData) {
+        } elseif ($this->requestData) {
 
-			if (isset($this->requestData['rows']) && isset($_SESSION['system']['csv_data'])) {
-			
-				$parenName = false;
-				$predecessors = null;
+            if (isset($this->requestData['rows']) && isset($_SESSION['system']['csv_data'])) {
+            
+                $parenName = false;
+                $predecessors = null;
 
-				foreach((array)$this->requestData['rows'] as $key => $val) {
+                foreach((array)$this->requestData['rows'] as $key => $val) {
 
-					$rank = $_SESSION['system']['csv_data'][$val][0];
-					$name = $_SESSION['system']['csv_data'][$val][1];
-					$parentName = null;
+                    $rank = $_SESSION['system']['csv_data'][$val][0];
+                    $name = $_SESSION['system']['csv_data'][$val][1];
+                    $parentName = null;
 
-					if ($key==0) {
-					// first one never has a parent (top of the tree)
+                    if ($key==0) {
+                    // first one never has a parent (top of the tree)
 
-						$predecessors[] = array($rank, $name);
+                        $predecessors[] = array($rank, $name);
 
-					} else {
-						if ($rank==$predecessors[count((array)$predecessors)-1][0]) {
-						/* if this taxon has the same rank as the previous one, they must have the same
-							parent, so we go back in the list until we find the first different rank,
-							which must be the parent */
-							
-							$j=1;
-							$prevRank = $rank;
-							while($rank==$prevRank) {
-							
-								$prevRank = $predecessors[count((array)$predecessors)-$j][0];
-								$parentName = $predecessors[count((array)$predecessors)-$j][1];
-								$j++;
+                    } else {
+                        if ($rank==$predecessors[count((array)$predecessors)-1][0]) {
+                        /* if this taxon has the same rank as the previous one, they must have the same
+                            parent, so we go back in the list until we find the first different rank,
+                            which must be the parent */
+                            
+                            $j=1;
+                            $prevRank = $rank;
+                            while($rank==$prevRank) {
+                            
+                                $prevRank = $predecessors[count((array)$predecessors)-$j][0];
+                                $parentName = $predecessors[count((array)$predecessors)-$j][1];
+                                $j++;
 
-							}
+                            }
 
-							$predecessors[] = array($rank, $name);
+                            $predecessors[] = array($rank, $name);
 
-						} else {
+                        } else {
 
-							/* if rank came before then we are no longer in the first branch of the tree
-							   and need to use the parent of the previous occurrence.
-							   we ignore the immediately preceding taxon, because if that is the same as
-							   the current one, we are simple still on the same level. */
-							foreach((array)$predecessors as $key => $val) {
-	
-								if ($rank == $val[0] && $key != count((array)$predecessors)-1) {
-								// found a previous occurrence
-								
-									if (isset($predecessors[$key-1])) {
-	
-										// get the name of the previous occurrence's parent
-										$parentName = $predecessors[$key-1][1];
-										
-										// apparantly we are at the start of a new branch, so chop off the previous one
-										$predecessors = array_slice($predecessors,0,$key);
-	
-										// and add the first child of the next one
-										$predecessors[] = array($rank, $name);
-	
-										break;
-	
-									}
-	
-								}
-	
-							}
-							
-							
-							if ($parentName==null) {
-							// did not find a previous occurrence of the current rank, so the previous taxon must be the parent
+                            /* if rank came before then we are no longer in the first branch of the tree
+                               and need to use the parent of the previous occurrence.
+                               we ignore the immediately preceding taxon, because if that is the same as
+                               the current one, we are simple still on the same level. */
+                            foreach((array)$predecessors as $key => $val) {
+    
+                                if ($rank == $val[0] && $key != count((array)$predecessors)-1) {
+                                // found a previous occurrence
+                                
+                                    if (isset($predecessors[$key-1])) {
+    
+                                        // get the name of the previous occurrence's parent
+                                        $parentName = $predecessors[$key-1][1];
+                                        
+                                        // apparantly we are at the start of a new branch, so chop off the previous one
+                                        $predecessors = array_slice($predecessors,0,$key);
+    
+                                        // and add the first child of the next one
+                                        $predecessors[] = array($rank, $name);
+    
+                                        break;
+    
+                                    }
+    
+                                }
+    
+                            }
+                            
+                            
+                            if ($parentName==null) {
+                            // did not find a previous occurrence of the current rank, so the previous taxon must be the parent
 
-								$parentName = $predecessors[count((array)$predecessors)-1][1];
+                                $parentName = $predecessors[count((array)$predecessors)-1][1];
 
-								$predecessors[] = array($rank, $name);
+                                $predecessors[] = array($rank, $name);
 
-							}
+                            }
 
-						}
+                        }
 
-					}
+                    }
 
-					$this->importTaxon(
-						array(
-							'taxon_rank' => $rank,
-							'taxon_name' => $name,
-							'parent_taxon_name' => $parentName
-						)
-					);
+                    $this->importTaxon(
+                        array(
+                            'taxon_rank' => $rank,
+                            'taxon_name' => $name,
+                            'parent_taxon_name' => $parentName
+                        )
+                    );
 
-				}
+                }
 
-				$this->reOrderTaxonTree();
+                $this->reOrderTaxonTree();
 
-				unset($_SESSION['system']['csv_data']);
-				
-				$this->addMessage(_('Data saved.'));
+                unset($_SESSION['system']['csv_data']);
+                
+                $this->addMessage(_('Data saved.'));
 
-			}
+            }
 
 
-		}
+        }
 
         $this->printPage();
     
@@ -761,7 +761,7 @@ class SpeciesController extends Controller
     /**
      * AJAX interface for this class
      *
-     * @access	public
+     * @access    public
      */
     public function ajaxInterfaceAction ()
     {
@@ -838,134 +838,134 @@ class SpeciesController extends Controller
     /**
      * Interface for getting taxon data from the Catalogue Of Life webservice (which is somewhat unreliable)
      *
-     * @access	public
+     * @access    public
      */
-	public function colAction()
-	{
+    public function colAction()
+    {
 
         $this->checkAuthorisation();
         
         $this->setPageName(_('Import from Catalogue Of Life'));
 
-		$this->printPage();
-	
-	}
+        $this->printPage();
+    
+    }
 
-	private function setProjectLanguages()
-	{
+    private function setProjectLanguages()
+    {
 
-		$lp = $this->models->LanguageProject->get(array(
-			'project_id' => $this->getCurrentProjectId()
-		));
-		
-		foreach ((array) $lp as $key => $val) {
-			
-			$l = $this->models->Language->get($val['language_id']);
-			
-			$lp[$key]['language'] = $l['language'];
-			
-			if ($val['def_language'] == 1)
-				$defaultLanguage = $val['language_id'];
-		
-		}
-		
-		$_SESSION['project']['languages'] = $lp;
+        $lp = $this->models->LanguageProject->get(array(
+            'project_id' => $this->getCurrentProjectId()
+        ));
+        
+        foreach ((array) $lp as $key => $val) {
+            
+            $l = $this->models->Language->get($val['language_id']);
+            
+            $lp[$key]['language'] = $l['language'];
+            
+            if ($val['def_language'] == 1)
+                $defaultLanguage = $val['language_id'];
+        
+        }
+        
+        $_SESSION['project']['languages'] = $lp;
 
-		$_SESSION['project']['default_language_id'] = $defaultLanguage;
+        $_SESSION['project']['default_language_id'] = $defaultLanguage;
 
-	}
+    }
 
-	private function getCatalogueOfLifeData()
-	{
+    private function getCatalogueOfLifeData()
+    {
 
-		if (!empty($this->requestData['taxon_name'])) {
-		
-			// needs to go to config
-			$timeout = 600;//secs
+        if (!empty($this->requestData['taxon_name'])) {
+        
+            // needs to go to config
+            $timeout = 600;//secs
 
-			set_time_limit($timeout);
+            set_time_limit($timeout);
 
-			$this->helpers->ColLoaderHelper->setTimerInclusion(false);
+            $this->helpers->ColLoaderHelper->setTimerInclusion(false);
 
-			$this->helpers->ColLoaderHelper->setResultStyle('concise');
+            $this->helpers->ColLoaderHelper->setResultStyle('concise');
 
-			if (isset($this->requestData['taxon_name'])) {
+            if (isset($this->requestData['taxon_name'])) {
 
-				$this->helpers->ColLoaderHelper->setTaxonName($this->requestData['taxon_name']);
+                $this->helpers->ColLoaderHelper->setTaxonName($this->requestData['taxon_name']);
 
-			}
+            }
 
-			if (isset($this->requestData['taxon_id'])) {
+            if (isset($this->requestData['taxon_id'])) {
 
-				$this->helpers->ColLoaderHelper->setTaxonId($this->requestData['taxon_id']);
+                $this->helpers->ColLoaderHelper->setTaxonId($this->requestData['taxon_id']);
 
-			}
+            }
 
-			if (isset($this->requestData['levels'])) {
+            if (isset($this->requestData['levels'])) {
 
-				$this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->requestData['levels']);
+                $this->helpers->ColLoaderHelper->setNumberOfChildLevels($this->requestData['levels']);
 
-			}
+            }
 
-			$this->helpers->ColLoaderHelper->setTimeout($timeout);
+            $this->helpers->ColLoaderHelper->setTimeout($timeout);
 
-			$this->helpers->ColLoaderHelper->getTaxon();
-			
-			$data = $this->helpers->ColLoaderHelper->getResult();
-			
-			if (!$data) {
+            $this->helpers->ColLoaderHelper->getTaxon();
+            
+            $data = $this->helpers->ColLoaderHelper->getResult();
+            
+            if (!$data) {
 
-				$this->addError($this->helpers->ColLoaderHelper->getErrors());
+                $this->addError($this->helpers->ColLoaderHelper->getErrors());
 
-			} else {
+            } else {
 
-				$this->smarty->assign('returnText',json_encode($data));
-	
-			}
-		}
+                $this->smarty->assign('returnText',json_encode($data));
+    
+            }
+        }
 
-	}
+    }
 
-	private function createStandardSubpages() 
-	{	
+    private function createStandardSubpages() 
+    {    
 
-		$tp = $this->models->TaxonPage->get(
-			array(
-				'project_id' => $this->getCurrentProjectId()
-			),'count(*) as total'
-		);
-		
+        $tp = $this->models->TaxonPage->get(
+            array(
+                'project_id' => $this->getCurrentProjectId()
+            ),'count(*) as total'
+        );
+        
 
-		foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+        foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
 
-			if ($tp[0]['total']==0) {
+            if ($tp[0]['total']==0) {
 
-				$this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
+                $this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
 
-			} else {
+            } else {
 
-				if (isset($page['mandatory'])) {
+                if (isset($page['mandatory'])) {
 
-					$d = $this->models->TaxonPage->get(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-				            'page' => $page['name'], 
-						),'count(*) as total'
-					);
+                    $d = $this->models->TaxonPage->get(
+                        array(
+                            'project_id' => $this->getCurrentProjectId(),
+                            'page' => $page['name'], 
+                        ),'count(*) as total'
+                    );
 
-					if ($d[0]['total']==0) {
-		
-						$this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
-		
-					} 
+                    if ($d[0]['total']==0) {
+        
+                        $this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
+        
+                    } 
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-	}
+    }
 
 
     /**
@@ -974,7 +974,7 @@ class SpeciesController extends Controller
      * A subpage is page devoted to a specific subject that appears in every taxon's
      * detail page (main, breeding, threats, etc).
      *
-     * @access	private
+     * @access    private
      */
     private function createTaxonPage ($name, $show_order = false, $isDefault = false)
     {
@@ -1056,12 +1056,12 @@ class SpeciesController extends Controller
             if (empty($this->requestData['title'])) {
                 
                 $this->models->TaxonPageTitle->delete(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'page_id' => $this->requestData['id']
-					)
-				);
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'page_id' => $this->requestData['id']
+                    )
+                );
             
             }
             else {
@@ -1186,8 +1186,8 @@ class SpeciesController extends Controller
                         if ($id != null)
                             $this->models->ContentTaxon->setRetainBeforeAlter();
                         
-						$filteredContent = $this->filterContent($this->requestData['content']);
-						
+                        $filteredContent = $this->filterContent($this->requestData['content']);
+                        
                         $newdata = array(
                             'id' => $id, 
                             'project_id' => $this->getCurrentProjectId(), 
@@ -1209,14 +1209,14 @@ class SpeciesController extends Controller
                     
                     if ($d) {
                         
-						/* the block below changed the taxon's name in the taxon table to whatever the user had 
-						   entrered as subpage title of the default page in the default language, but the assumption
-						   that that is the place where the leading name of a taxon is entered might be faulty
+                        /* the block below changed the taxon's name in the taxon table to whatever the user had 
+                           entrered as subpage title of the default page in the default language, but the assumption
+                           that that is the place where the leading name of a taxon is entered might be faulty
 
                         // if succesful, get the projects default language
-						$lp = $_SESSION['project']['languages'];
-						
-						$defaultLanguage = $_SESSION['project']['default_language_id'];
+                        $lp = $_SESSION['project']['languages'];
+                        
+                        $defaultLanguage = $_SESSION['project']['default_language_id'];
 
                         // get the main page content for the default language
                         $ct = $this->models->ContentTaxon->get(
@@ -1233,20 +1233,20 @@ class SpeciesController extends Controller
                             'project_id' => $this->getCurrentProjectId(), 
                             'taxon' => !empty($ct[0]['title']) ? $ct[0]['title'] : '?'
                         ));
-						*/
+                        */
 
-						//$this->smarty->assign('returnText', 'id=' . $taxonId);
+                        //$this->smarty->assign('returnText', 'id=' . $taxonId);
 
-						$this->smarty->assign('returnText',
-							json_encode(
-								array(
-									'id' => $taxonId,
-									'content' => $filteredContent['content'],
-									'modified' => $filteredContent['modified']
-								)
-							)
-						);
-						                    
+                        $this->smarty->assign('returnText',
+                            json_encode(
+                                array(
+                                    'id' => $taxonId,
+                                    'content' => $filteredContent['content'],
+                                    'modified' => $filteredContent['modified']
+                                )
+                            )
+                        );
+                                            
                     } else {
                         
                         $this->addError(_('Could not save taxon content'));
@@ -1277,23 +1277,23 @@ class SpeciesController extends Controller
     }
 
 
-	private function filterContent($content)
-	{
-	
-		if (!$this->controllerSettings['filterContent'])
-			return $content;
+    private function filterContent($content)
+    {
+    
+        if (!$this->controllerSettings['filterContent'])
+            return $content;
 
-		$modified = $content;
+        $modified = $content;
 
-		if ($this->controllerSettings['filterContent']['html']['doFilter']) {
+        if ($this->controllerSettings['filterContent']['html']['doFilter']) {
 
-			$modified = strip_tags($modified,$this->controllerSettings['filterContent']['html']['allowedTags']);
+            $modified = strip_tags($modified,$this->controllerSettings['filterContent']['html']['allowedTags']);
 
-		}
+        }
 
-		return array('content' => $modified, 'modified' => $content!=$modified);
+        return array('content' => $modified, 'modified' => $content!=$modified);
 
-	}
+    }
 
 
     private function ajaxActionGetTaxon ()
@@ -1348,18 +1348,18 @@ class SpeciesController extends Controller
         
         } else {
 
-			$mt = $this->models->MediaTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'taxon_id' => $this->requestData['id']
-				)
-			);
+            $mt = $this->models->MediaTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'taxon_id' => $this->requestData['id']
+                )
+            );
 
-			foreach((array)$mt as $key => $val) {
+            foreach((array)$mt as $key => $val) {
 
-				$this->deleteTaxonMedia($val['id'],false);
+                $this->deleteTaxonMedia($val['id'],false);
 
-			}
+            }
 
             $this->models->ContentTaxon->delete(
             array(
@@ -1506,247 +1506,247 @@ class SpeciesController extends Controller
     
     }
 
-	private function importTaxon($taxon) 
-	{
+    private function importTaxon($taxon) 
+    {
 
-		if (empty($taxon['taxon_name'])) return;
+        if (empty($taxon['taxon_name'])) return;
 
-		$t = $this->models->Taxon->get(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon' => $taxon['taxon_name']
-			),false,false,false,true
-		);
-		
-		if (count((array)$t[0])==0) {
-		// taxon does not exist in database
+        $t = $this->models->Taxon->get(
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon' => $taxon['taxon_name']
+            ),false,false,false,true
+        );
+        
+        if (count((array)$t[0])==0) {
+        // taxon does not exist in database
 
-			if (!empty($taxon['parent_taxon_name'])) {
+            if (!empty($taxon['parent_taxon_name'])) {
 
-				// see if the parent taxon already exists
-				$p = $this->models->Taxon->get(
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon' => $taxon['parent_taxon_name']
-					)
-				);
+                // see if the parent taxon already exists
+                $p = $this->models->Taxon->get(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(),
+                        'taxon' => $taxon['parent_taxon_name']
+                    )
+                );
 
-			}
+            }
 
-			if (isset($p) && count((array)$p)==1) {
-			
-				$pId = $p[0]['id'];
-			
-			} else {
+            if (isset($p) && count((array)$p)==1) {
+            
+                $pId = $p[0]['id'];
+            
+            } else {
 
-				$pId = null;
+                $pId = null;
 
-			}
+            }
 
-			// save taxon
-			$this->models->Taxon->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon' => $taxon['taxon_name'],
-					'parent_id' => $pId,
-					'rank' => $taxon['taxon_rank']					
-				)
-			);
-			
-		} else {
-		// taxon does exist in database
-		
-			if (empty($t[0]['rank']) || empty($t[0]['parent_id'])) {
-			
-				$pId = null;
-			
-				if (empty($t[0]['parent_id']) && !empty($taxon['parent_taxon_name'])) {
+            // save taxon
+            $this->models->Taxon->save(
+                array(
+                    'id' => null,
+                    'project_id' => $this->getCurrentProjectId(),
+                    'taxon' => $taxon['taxon_name'],
+                    'parent_id' => $pId,
+                    'rank' => $taxon['taxon_rank']                    
+                )
+            );
+            
+        } else {
+        // taxon does exist in database
+        
+            if (empty($t[0]['rank']) || empty($t[0]['parent_id'])) {
+            
+                $pId = null;
+            
+                if (empty($t[0]['parent_id']) && !empty($taxon['parent_taxon_name'])) {
 
-					// see if the parent taxon already exists
-					$p = $this->models->Taxon->get(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon' => $taxon['parent_taxon_name']
-						)
-					);
+                    // see if the parent taxon already exists
+                    $p = $this->models->Taxon->get(
+                        array(
+                            'project_id' => $this->getCurrentProjectId(),
+                            'taxon' => $taxon['parent_taxon_name']
+                        )
+                    );
 
-					if (isset($p) && count((array)$p)==1) {
-					
-						$pId = $p[0]['id'];
-					
-					}
-				
-				}
+                    if (isset($p) && count((array)$p)==1) {
+                    
+                        $pId = $p[0]['id'];
+                    
+                    }
+                
+                }
 
-				$this->models->Taxon->save(
-					array(
-						'id' => $t[0]['id'],
-						'project_id' => $this->getCurrentProjectId(),
-						'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']),
-						'rank' => (empty($t[0]['rank']) ? $taxon['taxon_rank'] : $t[0]['rank'])
-					)
+                $this->models->Taxon->save(
+                    array(
+                        'id' => $t[0]['id'],
+                        'project_id' => $this->getCurrentProjectId(),
+                        'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']),
+                        'rank' => (empty($t[0]['rank']) ? $taxon['taxon_rank'] : $t[0]['rank'])
+                    )
 
-				);
+                );
 
-			}
+            }
 
-		}
+        }
 
-	}
+    }
 
-	private function ajaxActionSaveTaxonName() 
-	{
+    private function ajaxActionSaveTaxonName() 
+    {
 
-		if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
+        if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
 
-		$t = $this->models->Taxon->get(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $this->requestData['taxon_id']
-			),'count(*) as total'
-		);
+        $t = $this->models->Taxon->get(
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                'id' => $this->requestData['taxon_id']
+            ),'count(*) as total'
+        );
 
-		if ($t[0]['total']>0) {
+        if ($t[0]['total']>0) {
 
-			$d = $this->models->Taxon->save(
-				array(
-					'id' => $this->requestData['taxon_id'],
-					'taxon' => $this->requestData['taxon_name']
-				)
-			);
+            $d = $this->models->Taxon->save(
+                array(
+                    'id' => $this->requestData['taxon_id'],
+                    'taxon' => $this->requestData['taxon_name']
+                )
+            );
 
-			if ($d) $this->smarty->assign('returnText', '<ok>');
+            if ($d) $this->smarty->assign('returnText', '<ok>');
 
-		}
+        }
 
-	}
+    }
 
-	private function getTaxonTree($pId) 
-	{
+    private function getTaxonTree($pId) 
+    {
 
-		$t = $this->models->Taxon->get(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				($pId === null ? 'parent_id is' : 'parent_id') => $pId
-			),false,'taxon');
+        $t = $this->models->Taxon->get(
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                ($pId === null ? 'parent_id is' : 'parent_id') => $pId
+            ),false,'taxon');
 
-		foreach((array)$t as $key => $val) {
+        foreach((array)$t as $key => $val) {
 
-			$this->_treeIdList[] = $val['id'];
+            $this->_treeIdList[] = $val['id'];
 
-			$t['children'] = $this->getTaxonTree($val['id']);
+            $t['children'] = $this->getTaxonTree($val['id']);
 
-		}
-		
-		return $t;
+        }
+        
+        return $t;
 
-	}
+    }
 
-	private function reOrderTaxonTree() 
-	{
+    private function reOrderTaxonTree() 
+    {
 
-		$this->getTaxonTree(null);
+        $this->getTaxonTree(null);
 
-		foreach((array)$this->_treeIdList as $key => $val) {
+        foreach((array)$this->_treeIdList as $key => $val) {
 
-			$this->models->Taxon->save(
-				array(
-					'id' => $val,
-					'taxon_order' => $key
-				)
-			);
-			
-		}
+            $this->models->Taxon->save(
+                array(
+                    'id' => $val,
+                    'taxon_order' => $key
+                )
+            );
+            
+        }
 
-	}
+    }
 
-	private function ajaxActionImportTaxa() 
-	{
+    private function ajaxActionImportTaxa() 
+    {
 
-		if (empty($this->requestData['data'])) return;
+        if (empty($this->requestData['data'])) return;
 
-		foreach((array)$this->requestData['data'] as $key => $val) {
+        foreach((array)$this->requestData['data'] as $key => $val) {
 
-			$t['taxon_id'] = $val[0];
-			$t['taxon_name'] = $val[1];
-			$t['taxon_rank'] = $val[2];
-			$t['parent_taxon_name'] = $val[3];
+            $t['taxon_id'] = $val[0];
+            $t['taxon_name'] = $val[1];
+            $t['taxon_rank'] = $val[2];
+            $t['parent_taxon_name'] = $val[3];
 
-			$this->importTaxon($t);
+            $this->importTaxon($t);
 
-		}
+        }
 
-	}
+    }
 
-	private function getDefaultPageSections($pageId)
-	{
+    private function getDefaultPageSections($pageId)
+    {
 
-		$tp = $this->models->TaxonPage->get(
-			array(
-			'id' => $pageId,
-			'project_id' => $this->getCurrentProjectId()
-			),'page'
-		);
-		
-		$b = '';
+        $tp = $this->models->TaxonPage->get(
+            array(
+            'id' => $pageId,
+            'project_id' => $this->getCurrentProjectId()
+            ),'page'
+        );
+        
+        $b = '';
 
-		foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
-		
-			if ($page['name']==$tp[0]['page']) {
+        foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+        
+            if ($page['name']==$tp[0]['page']) {
 
-				foreach((array)$page['sections'] as $sectionkey => $section) {
-				
-					$b .= '<p class="taxon-section-head">'.$section.'</p>'.chr(10);
+                foreach((array)$page['sections'] as $sectionkey => $section) {
+                
+                    $b .= '<p class="taxon-section-head">'.$section.'</p>'.chr(10);
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-		return $b;
-	
-	}
+        return $b;
+    
+    }
 
-	private function getRankSymbol($rank)
-	{
+    private function getRankSymbol($rank)
+    {
 
-		switch (strtolower($rank)) {
-			/*
-			case 'kingdom' :
-				return 'K';
-				break;
-			case 'phylum' :
-				return 'P';
-				break;
-			case 'class' :
-				return 'C';
-				break;
-			case 'order' :
-				return 'O';
-				break;
-			*/
-			case 'family' :
-				return '.';
-				break;
-			case 'genus' :
-				return '..';
-				break;
-			case 'species' :
-				return '...';
-				break;
-			case 'infraspecies' :
-				return '....';
-				break;
-			default :
-				return '&para;';
-		}
+        switch (strtolower($rank)) {
+            /*
+            case 'kingdom' :
+                return 'K';
+                break;
+            case 'phylum' :
+                return 'P';
+                break;
+            case 'class' :
+                return 'C';
+                break;
+            case 'order' :
+                return 'O';
+                break;
+            */
+            case 'family' :
+                return '.';
+                break;
+            case 'genus' :
+                return '..';
+                break;
+            case 'species' :
+                return '...';
+                break;
+            case 'infraspecies' :
+                return '....';
+                break;
+            default :
+                return '&para;';
+        }
 
-	}
+    }
 
-	private function ajaxActionSaveMediaDescription()
-	{
+    private function ajaxActionSaveMediaDescription()
+    {
 
         if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
 
@@ -1757,42 +1757,42 @@ class SpeciesController extends Controller
             if (empty($this->requestData['description'])) {
                 
                 $this->models->MediaDescriptionsTaxon->delete(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'media_id' => $this->requestData['id']
-					));
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'media_id' => $this->requestData['id']
+                    ));
             
             } else {
                 
                 $mdt = $this->models->MediaDescriptionsTaxon->get(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'media_id' => $this->requestData['id']
-					)
-				);
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'media_id' => $this->requestData['id']
+                    )
+                );
                 
                 $this->models->MediaDescriptionsTaxon->save(
-					array(
-						'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'media_id' => $this->requestData['id'], 
-						'description' => $this->requestData['description']
-					)
-				);
+                    array(
+                        'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'media_id' => $this->requestData['id'], 
+                        'description' => $this->requestData['description']
+                    )
+                );
             
             }
             
             $this->smarty->assign('returnText', '<ok>');
         
         }
-	
-	}
+    
+    }
 
-	private function ajaxActionGetMediaDescription()
-	{
+    private function ajaxActionGetMediaDescription()
+    {
 
         if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
 
@@ -1800,21 +1800,21 @@ class SpeciesController extends Controller
 
         } else {
             
-			$mdt = $this->models->MediaDescriptionsTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'language_id' => $this->requestData['language'], 
-					'media_id' => $this->requestData['id']
-				));
+            $mdt = $this->models->MediaDescriptionsTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'language_id' => $this->requestData['language'], 
+                    'media_id' => $this->requestData['id']
+                ));
 
             $this->smarty->assign('returnText', $mdt[0]['description']);
         
         }
 
-	}
+    }
 
-	private function ajaxActionGetMediaDescriptions()
-	{
+    private function ajaxActionGetMediaDescriptions()
+    {
 
         if (empty($this->requestData['language'])) {
 
@@ -1822,37 +1822,37 @@ class SpeciesController extends Controller
 
         } else {
             
-			$mt = $this->models->MediaTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(), 
-				),'id');
+            $mt = $this->models->MediaTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                ),'id');
 
-			foreach((array)$mt as $key => $val) {
+            foreach((array)$mt as $key => $val) {
 
-				$mdt = $this->models->MediaDescriptionsTaxon->get(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'],
-						'media_id' => $val['id']
-					),'description');
+                $mdt = $this->models->MediaDescriptionsTaxon->get(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'],
+                        'media_id' => $val['id']
+                    ),'description');
 
-				$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
-			}
-							
+                $mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
+            }
+                            
             $this->smarty->assign('returnText', json_encode($mt));
         
         }
 
-	}
+    }
 
-	private function deleteTaxonMedia($id = false,$output = true)
-	{
+    private function deleteTaxonMedia($id = false,$output = true)
+    {
 
-		if ($id === false) {
+        if ($id === false) {
 
-			$id = $this->requestData['id'];
+            $id = $this->requestData['id'];
 
-		}
+        }
 
         if (empty($id)) {
 
@@ -1860,45 +1860,45 @@ class SpeciesController extends Controller
 
         } else {
 
-			$mt = $this->models->MediaTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'id' => $id
-				)
-			);
+            $mt = $this->models->MediaTaxon->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'id' => $id
+                )
+            );
 
-			if (unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
+            if (unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
 
-				if ($mt[0]['thumb_name']) {
-					unlink($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
-				}
+                if ($mt[0]['thumb_name']) {
+                    unlink($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
+                }
 
-				$this->models->MediaDescriptionsTaxon->delete(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'media_id' => $id
-					)
-				);
+                $this->models->MediaDescriptionsTaxon->delete(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'media_id' => $id
+                    )
+                );
 
 
-				$this->models->MediaTaxon->delete(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'id' => $id
-					)
-				);
-				
-				if ($output) $this->smarty->assign('returnText', '<ok>');
+                $this->models->MediaTaxon->delete(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'id' => $id
+                    )
+                );
+                
+                if ($output) $this->smarty->assign('returnText', '<ok>');
 
-			} else {
-			
-				if ($output) $this->addError(_('Could not delete file:').' '.$mt[0]['file_name']);
-	    
-			}
+            } else {
+            
+                if ($output) $this->addError(_('Could not delete file:').' '.$mt[0]['file_name']);
+        
+            }
     
         }
 
-	}
+    }
 
 
 

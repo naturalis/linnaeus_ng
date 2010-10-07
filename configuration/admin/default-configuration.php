@@ -3,18 +3,18 @@
 class configuration
 {
     
-	private $_appFileRoot;
+    private $_appFileRoot;
 
     public function __construct ()
     {
 
-		$d = $this->getGeneralSettings();
-		$d['app']['pathName'];
-		$this->_appFileRoot = dirname(__FILE__);
-		$this->_appFileRoot = str_replace('\\','/',
-			substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
+        $d = $this->getGeneralSettings();
+        $d['app']['pathName'];
+        $this->_appFileRoot = dirname(__FILE__);
+        $this->_appFileRoot = str_replace('\\','/',
+            substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
 
-	}
+    }
 
     public function getGeneralSettings ()
     {
@@ -22,11 +22,11 @@ class configuration
         return array(
             'debugMode' => false, 
             'app' => array(
-				'name' => 'Linnaeus NG Administration', 
-            	'version' => '@APP.VERSION@', 
-            	'versionTimestamp' => '@TIMESTAMP@', 
-				'pathName' => 'admin',
-			),
+                'name' => 'Linnaeus NG Administration', 
+                'version' => '@APP.VERSION@', 
+                'versionTimestamp' => '@TIMESTAMP@', 
+                'pathName' => 'admin',
+            ),
             'maxSessionHistorySteps' => 10, 
             'heartbeatFrequency' => 60000,  // milliseconds
             'autosaveFrequency' => 300000,  // milliseconds
@@ -43,10 +43,10 @@ class configuration
                 'mediaDirUpload' => $this->_appFileRoot . 'www/admin/images/upload'
             ), 
             'maxSubPages' => 10,
-			'login-cookie' => array(
-				'name' => 'linnaeus-login',
-				'lifetime' => 30, // days
-			)
+            'login-cookie' => array(
+                'name' => 'linnaeus-login',
+                'lifetime' => 30, // days
+            )
         );
     
     }
@@ -55,62 +55,102 @@ class configuration
     {
         
         return array(
-			'defaultSubPages' =>
-				array(
-					0 => array(
-						'name' => 'Overview',
-						'default' => true,
-						'mandatory' => array(0),
-						'sections' => array ('General description','Biology')
-					),
-					1 => array(					
-						'name' => 'Detailed Description',
-						'sections' => array ('Behaviour','Cytology','Diagnostic Description',
-							'Genetics','Look Alikes','Molecular Biology','Morphology','Physiology',
-							'Size','Taxon Biology')
-					),
-					2 => array(					
-						'name' => 'Ecology',
-						'sections' => array ('Associations','Cyclicity','Dispersal','Distribution',
-							'Ecology','Habitat','Life Cycle','Life Expectancy','Migration','Trophic Strategy')
-					),
-					3 => array(					
-						'name' => 'Conservation',
-						'sections' => array ('Conservation Status','Legislation','Management','Procedures',
-							'Threats','Trends')
-					),
-					4 => array(					
-						'name' => 'Relevance',
-						'sections' => array ('Diseases','Risk Statement','Uses')
-					),
-					5 => array(					
-						'name' => 'Reproductive',
-						'sections' => array ('Population Biology','Reproduction')
-					)
-				),
-			'filterContent' =>
-				array(
-					'html' => array(
-						'doFilter' => true,
-						'allowedTags' => '<a><b><u><i><p><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
-					)
-				),
-			'media' =>
-				array(
-					'allowedFormats' => 
-						array(
-							'image/png' => 'image',
-							'image/jpg' => 'image',
-							'image/jpeg' => 'image',
-							'image/gif' => 'image',
-							'video/h264' => 'video',
-							'video/quicktime' => 'video',
-							'audio/mpeg' => 'sound',
-							'application/zip' => 'archive',
-						),
-	                'defaultUploadMaxSize' => 50000000 //50 mb (h264!?)
-				),				
-			);
+            'defaultSubPages' =>
+                array(
+                    0 => array(
+                        'name' => 'Overview',
+                        'default' => true,
+                        'mandatory' => array(0),
+                        'sections' => array ('General description','Biology')
+                    ),
+                    1 => array(                    
+                        'name' => 'Detailed Description',
+                        'sections' => array ('Behaviour','Cytology','Diagnostic Description',
+                            'Genetics','Look Alikes','Molecular Biology','Morphology','Physiology',
+                            'Size','Taxon Biology')
+                    ),
+                    2 => array(                    
+                        'name' => 'Ecology',
+                        'sections' => array ('Associations','Cyclicity','Dispersal','Distribution',
+                            'Ecology','Habitat','Life Cycle','Life Expectancy','Migration','Trophic Strategy')
+                    ),
+                    3 => array(                    
+                        'name' => 'Conservation',
+                        'sections' => array ('Conservation Status','Legislation','Management','Procedures',
+                            'Threats','Trends')
+                    ),
+                    4 => array(                    
+                        'name' => 'Relevance',
+                        'sections' => array ('Diseases','Risk Statement','Uses')
+                    ),
+                    5 => array(                    
+                        'name' => 'Reproductive',
+                        'sections' => array ('Population Biology','Reproduction')
+                    )
+                ),
+            'filterContent' =>
+                array(
+                    'html' => array(
+                        'doFilter' => true,
+                        'allowedTags' => '<a><b><u><i><p><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
+                    )
+                ),
+            'media' =>
+                array(
+                    'allowedFormats' => 
+                        array(
+                            array(
+                                'mime' => 'image/png', 
+                                'media_name' => 'PNG movie', 
+                                'media_type' => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/jpg', 
+                                'media_name' => 'JPG image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/jpeg', 
+                                'media_name' => 'JPG image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/gif', 
+                                'media_name' => 'GIF image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'video/h264', 
+                                'media_name' => 'h.264 movie', 
+                                'media_type'  => 'video', 
+                                'maxSize' => 50000000
+                            ),
+                            array(
+                                'mime' => 'video/quicktime', 
+                                'media_name' => 'Quicktime', 
+                                'media_type'  => 'video', 
+                                'maxSize' => 50000000
+                            ),
+                            array(
+                                'mime' => 'audio/mpeg', 
+                                'media_name' => 'mp3', 
+                                'media_type'  => 'sound', 
+                                'maxSize' => 10000000
+                            ),
+                            array(
+                                'mime' => 'application/zip', 
+                                'media_name' => 'ZIP-file', 
+                                'media_type' => 'archive', 
+                                'maxSize' => 50000000
+                            ),
+                        ),
+                    'defaultUploadMaxSize' => 50000000 //50 mb (h264!?)
+                ),                
+            );
 
     }
 

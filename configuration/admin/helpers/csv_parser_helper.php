@@ -3,33 +3,33 @@
 class CsvParserHelper
 {
 
-	private $_file;
-	private $_results;
-	private $_errors;
-	private $_separator = ',';
-	private $_delimiter = '"';
-	private $_lineMax = false;
-	private $_fieldMax = false;
-	private $_dropAllWhites = true;
+    private $_file;
+    private $_results;
+    private $_errors;
+    private $_separator = ',';
+    private $_delimiter = '"';
+    private $_lineMax = false;
+    private $_fieldMax = false;
+    private $_dropAllWhites = true;
 
-	public function parseFile($file)
-	{
+    public function parseFile($file)
+    {
 
-		$this->_file = $file;
-		
-		if ($this->testIfCSV()) {
+        $this->_file = $file;
+        
+        if ($this->testIfCSV()) {
 
-			$this->readData();
+            $this->readData();
 
-			$this->processData();
+            $this->processData();
 
-		} else {
+        } else {
 
-			$this->addError(_('File does not seem to be a CSV-file.'));
+            $this->addError(_('File does not seem to be a CSV-file.'));
 
-		}
+        }
 
-	}
+    }
 
     public function setFieldMax ($num)
     {
@@ -59,104 +59,104 @@ class CsvParserHelper
 
     }
 
-	private function testIfCSV ()
-	{
+    private function testIfCSV ()
+    {
 
-		$handle = @fopen($this->_file, "r");
+        $handle = @fopen($this->_file, "r");
 
-		if ($handle) {
+        if ($handle) {
 
-			$b = fgets($handle, 1000);
-			fclose($handle);
-		
-			$is_text = true;
-		
-			for($i=0;$i<strlen($b);$i++) {
+            $b = fgets($handle, 1000);
+            fclose($handle);
+        
+            $is_text = true;
+        
+            for($i=0;$i<strlen($b);$i++) {
 
-				$v = substr($b,$i,1);
+                $v = substr($b,$i,1);
 
-				if(ord($v) == 0) { 
+                if(ord($v) == 0) { 
 
-					$is_text = false;
-					break;
+                    $is_text = false;
+                    break;
 
-				}
-			}
+                }
+            }
 
-			return $is_text;
-		}
+            return $is_text;
+        }
 
-	}
+    }
 
-	private function readData()
-	{
+    private function readData()
+    {
 
-		if (($handle = fopen($this->_file, 'r')) !== false) {
+        if (($handle = fopen($this->_file, 'r')) !== false) {
 
-			while (($data = fgetcsv($handle, 1000, $this->_separator,$this->_delimiter)) !== false) {
+            while (($data = fgetcsv($handle, 1000, $this->_separator,$this->_delimiter)) !== false) {
 
-				$this->_results[] = $data;
-				
-				if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax) {
+                $this->_results[] = $data;
+                
+                if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax) {
 
-					break;
+                    break;
 
-				}
+                }
 
-			}
+            }
 
-			fclose($handle);
-			
-		} else {
+            fclose($handle);
+            
+        } else {
 
-			$this->addError(_('Could not read data from file.'));
+            $this->addError(_('Could not read data from file.'));
 
-		}
+        }
 
-	}
+    }
 
-	private function processData()
-	{
+    private function processData()
+    {
 
-		if ($this->_fieldMax) {
+        if ($this->_fieldMax) {
 
-			foreach((array)$this->_results as $key => $val) {
+            foreach((array)$this->_results as $key => $val) {
 
-				$this->_results[$key] = array_slice($val,0,$this->_fieldMax);
+                $this->_results[$key] = array_slice($val,0,$this->_fieldMax);
 
-			}
+            }
 
-		}
+        }
 
-		if ($this->_dropAllWhites) {
+        if ($this->_dropAllWhites) {
 
-			foreach((array)$this->_results as $key => $val) {
+            foreach((array)$this->_results as $key => $val) {
 
-				$allWhite = true;
+                $allWhite = true;
 
-				foreach((array)$val as $resultskey => $result) {
-			
-					if (strlen(trim($result))>0) {
+                foreach((array)$val as $resultskey => $result) {
+            
+                    if (strlen(trim($result))>0) {
 
-						$allWhite = false;
+                        $allWhite = false;
 
-					}
+                    }
 
-				}
-				
-				if 	(!$allWhite) {
+                }
+                
+                if     (!$allWhite) {
 
-					$d[] = $val;
+                    $d[] = $val;
 
-				}
+                }
 
-			}
-			
-			$this->_results = $d;
+            }
+            
+            $this->_results = $d;
 
-		}
+        }
 
-	}
+    }
 
     private function addError ($e)
     {
