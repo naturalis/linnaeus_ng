@@ -32,9 +32,9 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 		</a>
 	</td>
 	{/section}	
-	<td class="taxon-list-cell-media" title="images"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}</a></td>
-	<td class="taxon-list-cell-media" title="videos"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}</a></td>
-	<td class="taxon-list-cell-media" title="soundfiles"><a href="media.php?id={$taxa[i].id}">{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}</a></td>
+	<td class="taxon-list-cell-media" title="images"><a href="media.php?id={$taxa[i].id}#image">{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}</a></td>
+	<td class="taxon-list-cell-media" title="videos"><a href="media.php?id={$taxa[i].id}#video">{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}</a></td>
+	<td class="taxon-list-cell-media" title="soundfiles"><a href="media.php?id={$taxa[i].id}#sound">{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}</a></td>
 	<td id="usage-{$taxa[i].id}"></td>
 </tr>
 {/section}

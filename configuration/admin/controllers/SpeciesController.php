@@ -476,7 +476,7 @@ class SpeciesController extends Controller
 				
 				$val['description'] = $mdt[0]['description'];
 
-				$r[$d[$val['mime_type']]][] = $val;
+				if (isset($d[$val['mime_type']])) $r[$d[$val['mime_type']]][] = $val;
 
 			}
 

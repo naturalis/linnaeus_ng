@@ -16,6 +16,7 @@
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
 	<a href="media_upload.php?id={$id}">Upload media for this taxon</a><br /><br />
 
+	<a name="image">
 	<span class="taxon-media-classheader">Images</span><br />
 	<table class="taxon-media-table">
 		<tr>
@@ -51,6 +52,7 @@
 <br />
 
 <div>
+	<a name="video">
 	<span class="taxon-media-classheader">Videos</span><br />
 	<table class="taxon-media-table">
 		<tr>
@@ -61,8 +63,11 @@
 		</tr>
 		{section name=i loop=$media.video}
 		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td onclick="taxonMediaShowMedia('{$session.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" style="cursor:pointer">
-			VIDEO</td>
+			<td style="cursor:pointer" onclick="window.open('{$session.project.urls.project_media}{$media.video[i].file_name}','_video');">
+				<img 
+					src="{$baseUrl}admin/images/system/icons/video.jpg" 
+				/>
+			</td>
 			<td id="media-{$media.video[i].id}" onclick="taxonMediaDescriptionEdit(this);">{$media.video[i].description}</td>
 			<td>
 				{$media.video[i].original_name}<br />
@@ -82,6 +87,7 @@
 <br />
 
 <div>
+	<a name="sound">
 	<span class="taxon-media-classheader">Sound</span><br />
 	<table class="taxon-media-table">
 		<tr>
