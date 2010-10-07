@@ -26,15 +26,13 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 	</td>
 	{assign var=t value=$taxa[i].id}
 	{section name=j loop=$languages}
-	<td class="taxon-list-cell-language{if $languages[j].publish[$t].pct_finished==100}-done{elseif $languages[j].publish[$t].pct_finished==0}-empty{/if}" title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} pages published">
-		<a href="edit.php?id={$taxa[i].id}&lan={$languages[j].language_id}">
+	<td class="taxon-list-cell-language{if $languages[j].publish[$t].pct_finished==100}-done{elseif $languages[j].publish[$t].pct_finished==0}-empty{/if}" title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} pages published" onclick="window.open('edit.php?id={$taxa[i].id}&lan={$languages[j].language_id}','_top');">
 		{$languages[j].publish[$t].pct_finished}% done
-		</a>
 	</td>
-	{/section}	
-	<td class="taxon-list-cell-media" title="images"><a href="media.php?id={$taxa[i].id}#image">{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}</a></td>
-	<td class="taxon-list-cell-media" title="videos"><a href="media.php?id={$taxa[i].id}#video">{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}</a></td>
-	<td class="taxon-list-cell-media" title="soundfiles"><a href="media.php?id={$taxa[i].id}#sound">{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}</a></td>
+	{/section}
+	<td class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}" title="images" onclick="window.open('media.php?id={$taxa[i].id}#image','_top');">{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}</td>
+	<td class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}" title="images" title="videos" onclick="window.open('media.php?id={$taxa[i].id}#video','_top');">{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}</td>
+	<td class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}" title="images" title="soundfiles" onclick="window.open('media.php?id={$taxa[i].id}#sound','_top');">{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}</td>
 	<td id="usage-{$taxa[i].id}"></td>
 </tr>
 {/section}
