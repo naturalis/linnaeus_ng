@@ -16,7 +16,7 @@
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
 	<a href="media_upload.php?id={$id}">Upload media for this taxon</a><br /><br />
 
-	<a name="image">
+	<a name="image"></a>
 	<span class="taxon-media-classheader">Images</span><br />
 	<table class="taxon-media-table">
 		<tr>
@@ -52,7 +52,7 @@
 <br />
 
 <div>
-	<a name="video">
+	<a name="video"></a>
 	<span class="taxon-media-classheader">Videos</span><br />
 	<table class="taxon-media-table">
 		<tr>
@@ -87,7 +87,7 @@
 <br />
 
 <div>
-	<a name="sound">
+	<a name="sound"></a>
 	<span class="taxon-media-classheader">Sound</span><br />
 	<table class="taxon-media-table">
 		<tr>

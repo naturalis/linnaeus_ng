@@ -7,6 +7,66 @@ a,.pseudo-a {
 	cursor:pointer;
 }
 
+.general-clickable-image {
+	cursor: pointer;
+}
+
+.general-clickable-cell,
+.cell-module-activate,
+.cell-module-reactivate,
+.cell-module-deactivate,
+.cell-module-delete,
+.cell-moduser-inactive,
+.cell-moduser-remove,
+.cell-language-default,
+.cell-language-set-default,
+.cell-language-delete,
+.cell-language-active,
+.cell-language-inactive,
+.cell-language-delete-inactive,
+.cell-language-active-inactive,
+.taxon-language-cell,
+.taxon-language-cell-active,
+.taxon-page-cell,
+.taxon-page-cell-active,
+.taxon-media-language-tab,
+.taxon-media-language-tab-active,
+.taxon-media-cell-delete,
+.taxon-list-cell-media,.taxon-list-cell-media-empty,
+.cell-page-delete,
+.taxon-list-cell-language,.taxon-list-cell-language-empty,.taxon-list-cell-language-done
+ {
+	cursor: pointer;
+	color: #000099;
+}
+
+.general-clickable-cell:hover,
+.cell-module-activate:hover,
+.cell-module-reactivate:hover,
+.cell-module-deactivate:hover,
+.cell-module-delete:hover,
+.cell-moduser-inactive:hover,
+.cell-moduser-remove:hover,
+.cell-language-default:hover,
+.cell-language-set-default:hover,
+.cell-language-delete:hover,
+.cell-language-active:hover,
+.cell-language-inactive:hover,
+.cell-language-delete-inactive:hover,
+.cell-language-active-inactive:hover,
+.taxon-language-cell:hover,
+.taxon-language-cell-active:hover,
+.taxon-page-cell:hover,
+.taxon-page-cell-active:hover,
+.taxon-media-language-tab:hover,
+.taxon-media-language-tab-active:hover,
+.taxon-media-cell-delete:hover,
+.taxon-list-cell-media:hover,.taxon-list-cell-media-empty:hover,
+.cell-page-delete:hover,
+.taxon-list-cell-language:hover,.taxon-list-cell-language-empty:hover,.taxon-list-cell-language-done:hover {
+	text-decoration: underline;
+}
+
 a:hover,.pseudo-a:hover {
 	text-decoration: underline;
 }
@@ -229,14 +289,12 @@ a:hover,.pseudo-a:hover {
 }
 
 .cell-module-activate,.cell-module-reactivate,.cell-module-deactivate,.cell-module-delete {
-	cursor: pointer;
 	padding-right:10px;
 }
 
 .cell-moduser-inactive,.cell-moduser-remove {
 	background-image: url(../images/system/icons/user-gray.png);
 	background-repeat:no-repeat;
-	cursor: pointer;
 	width:16px;
 }
 
@@ -290,10 +348,6 @@ a:hover,.pseudo-a:hover {
 	width: 16px;
 }
 
-.general-clickable-image {
-	cursor: pointer;
-}
-
 #language-list {
 	
 }
@@ -311,7 +365,6 @@ a:hover,.pseudo-a:hover {
 	background-image: url(../images/system/icons/asterisk.png);
 	background-repeat: no-repeat;
 	width: 10px;
-	cursor: pointer;
 }
 
 .cell-language-default {
@@ -370,21 +423,26 @@ a:hover,.pseudo-a:hover {
 .taxon-list-cell-language,.taxon-list-cell-language-empty,.taxon-list-cell-language-done {
 	width: 75px;
 	text-align: right;
-	background-color: #f88;
+	background-color: #fcc;
 }
 
-.taxon-list-cell-media {
+.taxon-list-cell-media,.taxon-list-cell-media-empty {
 	width:20px;
 	text-align: right;
 	padding-right:5px;
+	background-color:#cfc;
+}
+
+.taxon-list-cell-media-empty {
+	background-color:#f1f1f1;
 }
 
 .taxon-list-cell-language {
-	background-color: #fc0;
+	background-color: #fe0;
 }
 
 .taxon-list-cell-language-done {
-	background-color: #afa
+	background-color: #bfb
 }
 
 #taxon-pages-table-div {
@@ -408,7 +466,6 @@ a:hover,.pseudo-a:hover {
 	border: 1px solid #999;
 	padding: 2px;
 	padding-left: 5px;
-	cursor: pointer;
 	text-align: center;
 	font-size: 10px;
 }
@@ -478,6 +535,7 @@ a:hover,.pseudo-a:hover {
 
 .taxon-media-classheader {
 	font-weight:bold;
+	text-decoration:none;
 }
 
 .taxon-media-colheader-file,.taxon-media-colheader-name,.taxon-media-colheader-type,.taxon-media-colheader-size {
@@ -503,7 +561,6 @@ a:hover,.pseudo-a:hover {
 }
 
 .taxon-media-cell-delete {
-	cursor:pointer;
 	width:50px;
 	text-align:center;
 }
@@ -520,5 +577,4 @@ a:hover,.pseudo-a:hover {
 	background-image: url(../images/system/icons/cross.png);
 	background-repeat: no-repeat;
 	width: 16px;
-	cursor: pointer;
 }

@@ -379,6 +379,7 @@ class SpeciesController extends Controller
 			foreach((array)$mt as $mtkey => $mtval) {
 
 				$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
+				$taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
 
 			}
         
