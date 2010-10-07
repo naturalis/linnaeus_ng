@@ -10,7 +10,7 @@ class Controller extends BaseClass
     private $_smartySettings;
     private $_viewName;
     private $_fullPath;
-	private $_fullPathRelative;
+    private $_fullPathRelative;
     private $_helpTexts;
 
     public $smarty;
@@ -26,7 +26,7 @@ class Controller extends BaseClass
     public $sortField;
     public $sortDirection;
     public $sortCaseSensitivity;
-	public $baseUrl;
+    public $baseUrl;
 
     private $usedModelsBase = array(
         'helptext', 
@@ -40,7 +40,7 @@ class Controller extends BaseClass
      *
      * The order in which the functions are called is relevant! Do not change without good reason and plan.
      *
-     * @access 	public
+     * @access     public
      */
     public function __construct ()
     {
@@ -48,12 +48,12 @@ class Controller extends BaseClass
         parent::__construct();
         
         $this->setDebugMode();
-		
+        
         $this->startSession();
         
         $this->setNames();
         
-        $this->loadControllerConfig();		
+        $this->loadControllerConfig();        
         
         $this->setSessionActivePageValues();
         
@@ -80,7 +80,7 @@ class Controller extends BaseClass
     /**
      * Destroys!
      *
-     * @access 	public
+     * @access     public
      */
     public function __destruct ()
     {
@@ -94,8 +94,8 @@ class Controller extends BaseClass
     /**
      * Returns the application name
      *
-     * @return 	string	application name
-     * @access 	public
+     * @return     string    application name
+     * @access     public
      */
     public function getAppName ()
     {
@@ -109,8 +109,8 @@ class Controller extends BaseClass
     /**
      * Returns the controller's base name
      *
-     * @return 	string	controller's base name
-     * @access 	public
+     * @return     string    controller's base name
+     * @access     public
      */
     public function getControllerBaseName ()
     {
@@ -124,8 +124,8 @@ class Controller extends BaseClass
     /**
      * Returns the current view's name
      *
-     * @return 	string	current view's name
-     * @access 	public
+     * @return     string    current view's name
+     * @access     public
      */
     public function getViewName ()
     {
@@ -139,7 +139,7 @@ class Controller extends BaseClass
     /**
      * Assigns basic Smarty variables and renders the page
      *
-     * @access 	public
+     * @access     public
      */
     public function printPage ()
     {
@@ -154,7 +154,7 @@ class Controller extends BaseClass
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         
         $this->smarty->assign('rnd', $this->getRandomValue());
-		$this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
@@ -171,8 +171,8 @@ class Controller extends BaseClass
     /**
      * Redirects the user to another page (and avoids circular redirection)
      *
-     * @param  	string	$url	url to redirect to; can be false, in which case HTTP_REFERER is used
-     * @access 	public
+     * @param      string    $url    url to redirect to; can be false, in which case HTTP_REFERER is used
+     * @access     public
      */
     public function redirect ($url = false)
     {
@@ -208,13 +208,13 @@ class Controller extends BaseClass
     /**
      * Adds an error to the class's stack of errors stored in class variable 'errors'
      *
-     * @param  	string or arrayu	$error	the error(s)
-     * @access 	public
+     * @param      string or arrayu    $error    the error(s)
+     * @access     public
      */
     public function addError ($error)
     {
 
-		if (!$error) return;
+        if (!$error) return;
 
         if (!is_array($error)) {
             
@@ -237,8 +237,8 @@ class Controller extends BaseClass
     /**
      * Returns the class's stack of errors stored in class variable 'errors'
      *
-     * @return 	array	stack of errors
-     * @access 	public
+     * @return     array    stack of errors
+     * @access     public
      */
     public function getErrors ()
     {
@@ -252,8 +252,8 @@ class Controller extends BaseClass
     /**
      * Adds a message to the class's stack of messages stored in class variable 'messages'
      *
-     * @param  	type	$message	the message
-     * @access 	public
+     * @param      type    $message    the message
+     * @access     public
      */
     public function addMessage ($message)
     {
@@ -267,8 +267,8 @@ class Controller extends BaseClass
     /**
      * Returns the class's stack of messages stored in class variable 'messages'
      *
-     * @return 	array	stack of messages
-     * @access 	public
+     * @return     array    stack of messages
+     * @access     public
      */
     public function getMessages ()
     {
@@ -282,8 +282,8 @@ class Controller extends BaseClass
     /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
      *
-     * @param  	string	$name	the page's name
-     * @access 	public
+     * @param      string    $name    the page's name
+     * @access     public
      */
     public function setPageName ($name)
     {
@@ -297,8 +297,8 @@ class Controller extends BaseClass
     /**
      * Returns the name of the current page.
      *
-     * @return 	string	the page's name
-     * @access 	public
+     * @return     string    the page's name
+     * @access     public
      */
     public function getPageName ()
     {
@@ -312,8 +312,8 @@ class Controller extends BaseClass
     /**
      * Returns the current user's id class variable
      *
-     * @return 	integer	user id
-     * @access 	public
+     * @return     integer    user id
+     * @access     public
      */
     public function getCurrentUserId ()
     {
@@ -327,8 +327,8 @@ class Controller extends BaseClass
     /**
      * Returns the projects the current user has been assigned to
      *
-     * @return 	array	array of project's id's and names
-     * @access 	public
+     * @return     array    array of project's id's and names
+     * @access     public
      */
     public function getCurrentUserProjects ()
     {
@@ -357,8 +357,8 @@ class Controller extends BaseClass
     /**
      * Sets the active project's id as class variable
      *
-     * @param  	integer	$id	new active project's id
-     * @access 	public
+     * @param      integer    $id    new active project's id
+     * @access     public
      */
     public function setCurrentProjectId ($id)
     {
@@ -372,8 +372,8 @@ class Controller extends BaseClass
     /**
      * Returns the active project's id class variable
      *
-     * @return 	integer	active project's id
-     * @access 	public
+     * @return     integer    active project's id
+     * @access     public
      */
     public function getCurrentProjectId ()
     {
@@ -387,12 +387,12 @@ class Controller extends BaseClass
     /**
      * Sets the active project's name as a session variable (for display purposes)
      *
-     * @access 	public
+     * @access     public
      */
     public function setCurrentProjectData ($data)
     {
         
-		$_SESSION['project'] = $data;
+        $_SESSION['project'] = $data;
 
     }
 
@@ -404,7 +404,7 @@ class Controller extends BaseClass
      * If the user is assigned to several projects, a choice of project is required; if he's assigned to only one,
      * the choice should be automatic. This function decides what project should be the active one, and sets it.
      *
-     * @access 	public
+     * @access     public
      */
     public function setDefaultProject ()
     {
@@ -420,13 +420,13 @@ class Controller extends BaseClass
             $this->setCurrentProjectId($d[0]['project_id']);
         
         } else {
-		// new plan: if user has more than one project assigned, he has to chose himself
+        // new plan: if user has more than one project assigned, he has to chose himself
 
-			return;
+            return;
 
         // if user has more roles, set the project in which he has the lowest role_id as the active project
         // (this assumes that the roles with the most permissions have the lowest ids)
-			
+            
             $t = false;
             
             foreach ((array) $d as $key => $val) {
@@ -454,8 +454,8 @@ class Controller extends BaseClass
     /**
      * Returns the page to redirect to after logging in
      *
-     * @return 	string	path if page to redirect to
-     * @access 	public
+     * @return     string    path if page to redirect to
+     * @access     public
      */
     public function getLoginStartPage ()
     {
@@ -466,15 +466,15 @@ class Controller extends BaseClass
         
         } else {
 
-			if ($_SESSION["user"]["_number_of_projects"]==1) {
+            if ($_SESSION["user"]["_number_of_projects"]==1) {
 
-	            return $this->baseUrl . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
+                return $this->baseUrl . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
     
-			} else {
+            } else {
 
-	            return $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
+                return $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
 
-			}    
+            }    
         }
     
     }
@@ -483,8 +483,8 @@ class Controller extends BaseClass
     /**
      * Checks whether a user is logged in
      *
-     * @return 	boolean		logged in or not
-     * @access 	public
+     * @return     boolean        logged in or not
+     * @access     public
      */
     public function isUserLoggedIn ()
     {
@@ -503,8 +503,8 @@ class Controller extends BaseClass
      * Has the user selected an active project?
      * Is the user authorized to see a specific page?
      *
-     * @return 	boolean		returns true if authorized, or redirects if not
-     * @access 	public
+     * @return     boolean        returns true if authorized, or redirects if not
+     * @access     public
      */
     public function checkAuthorisation ()
     {
@@ -525,10 +525,10 @@ class Controller extends BaseClass
                     $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
                     
                     /*
-							user is not authorized and redirected to the index.page; 
-							if he already *is* on the index.page (and not authorized for that),
-							he is logged out to avoid circular reference.
-						*/
+                            user is not authorized and redirected to the index.page; 
+                            if he already *is* on the index.page (and not authorized for that),
+                            he is logged out to avoid circular reference.
+                        */
                     if ($this->getViewName() == 'Index') {
                         
                         $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
@@ -562,9 +562,9 @@ class Controller extends BaseClass
     /**
      * Judges whether the user is authorized to work at a specific project
      *
-     * @param  	integer	$id	project id
-     * @return 	boolean	is or is not authorized
-     * @access 	public
+     * @param      integer    $id    project id
+     * @return     boolean    is or is not authorized
+     * @access     public
      */
     public function isCurrentUserAuthorizedForProject ($id)
     {
@@ -585,9 +585,9 @@ class Controller extends BaseClass
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
      *
-     * @param array	$array	array to sort
-     * @param array	$sortBy	array to array of key, direction and case-sensitivity
-     * @access 	public
+     * @param array    $array    array to sort
+     * @param array    $sortBy    array to array of key, direction and case-sensitivity
+     * @access     public
      */
     public function customSortArray (&$array, $sortBy)
     {
@@ -613,8 +613,8 @@ class Controller extends BaseClass
     /**
      * Returns the default save path for file uploads
      *
-     * @return string	path
-     * @access 	public
+     * @return string    path
+     * @access     public
      */
     public function getDefaultImageUploadDir ()
     {
@@ -628,8 +628,8 @@ class Controller extends BaseClass
     /**
      * Returns the default save path for project images
      *
-     * @return string	path
-     * @access 	public
+     * @return string    path
+     * @access     public
      */
     public function getProjectsMediaStorageDir ()
     {
@@ -642,8 +642,8 @@ class Controller extends BaseClass
     /**
      * Returns the default save path for project thumbs
      *
-     * @return string	path
-     * @access 	public
+     * @return string    path
+     * @access     public
      */
     public function getProjectsThumbsStorageDir ()
     {
@@ -656,15 +656,15 @@ class Controller extends BaseClass
     /**
      * Checks if a form submit is new or a resubmit (through user refresh)
      *
-	 * Add this line to the form in your template
-	 *		<input type="hidden" name="rnd" value="{$rnd}" />
-	 * and you can call
-	 *		$this->isFormResubmit()
-	 * in the receiving controller function to make sure whether the submit is a resubmit
-	 * of the same instance of the form (as when the user reloads a posted form)
-	 *
-     * @return boolean	is resubmit or not
-     * @access 	public
+     * Add this line to the form in your template
+     *        <input type="hidden" name="rnd" value="{$rnd}" />
+     * and you can call
+     *        $this->isFormResubmit()
+     * in the receiving controller function to make sure whether the submit is a resubmit
+     * of the same instance of the form (as when the user reloads a posted form)
+     *
+     * @return boolean    is resubmit or not
+     * @access     public
      */
     public function isFormResubmit ()
     {
@@ -685,8 +685,8 @@ class Controller extends BaseClass
     /**
      * Returns the address of the root index for someone who is logged in
      *
-     * @access 	public
-     * @ return	string	url
+     * @access     public
+     * @ return    string    url
      */
     public function getLoggedInMainIndex ()
     {
@@ -721,22 +721,22 @@ class Controller extends BaseClass
 
 
 
-	private function loadControllerConfig()
-	{
+    private function loadControllerConfig()
+    {
 
-		$t = 'getControllerSettings'.$this->controllerBaseName;
+        $t = 'getControllerSettings'.$this->controllerBaseName;
 
-		if (method_exists($this->config,$t)) {
+        if (method_exists($this->config,$t)) {
 
-	        $this->controllerSettings = $this->config->$t();
+            $this->controllerSettings = $this->config->$t();
 
-		} else {
+        } else {
 
-			$this->controllerSettings = false;
+            $this->controllerSettings = false;
 
-		}
+        }
 
-	}
+    }
 
     private function getModuleActivationStatus ()
     {
@@ -760,15 +760,15 @@ class Controller extends BaseClass
     /**
      * Starts the user's session
      *
-     * @access 	private
+     * @access     private
      */
     private function startSession ()
     {
         
         session_start();
 
-		/* DEBUG */		
-		$_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        /* DEBUG */        
+        $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
 
     }
 
@@ -777,7 +777,7 @@ class Controller extends BaseClass
     /**
      * Sets a global 'debug' mode, based on a general setting in the config file
      *
-     * @access 	private
+     * @access     private
      */
     private function setDebugMode ()
     {
@@ -797,43 +797,43 @@ class Controller extends BaseClass
      * controller's base name ('projects' for 'ProjectsController')
      * view name ('collaborators')
      *
-     * @access 	private
+     * @access     private
      */
     private function setNames ()
     {
 
-		$this->appName = $this->generalSettings['app']['pathName'];
+        $this->appName = $this->generalSettings['app']['pathName'];
 
         $this->_fullPath = $_SERVER['PHP_SELF'];
  
         $path = pathinfo($this->_fullPath);
 
-		$dirnames = explode('/',$path['dirname']);
-		
-		$this->baseUrl = '../';
+        $dirnames = explode('/',$path['dirname']);
+        
+        $this->baseUrl = '../';
 
-		for($i=count((array)$dirnames)-1;$i>=1;$i--) {
+        for($i=count((array)$dirnames)-1;$i>=1;$i--) {
 
-			if (strtolower($dirnames[$i])==$this->appName) {
-				if (isset($dirnames[$i+2]))
-					$this->controllerBaseName = strtolower($dirnames[$i+2]);
-				break ;
-			}
-			
-			$this->baseUrl .= '../';
+            if (strtolower($dirnames[$i])==$this->appName) {
+                if (isset($dirnames[$i+2]))
+                    $this->controllerBaseName = strtolower($dirnames[$i+2]);
+                break ;
+            }
+            
+            $this->baseUrl .= '../';
 
-		}
+        }
 
-		if ($path['filename']) $this->_viewName = $path['filename'];
+        if ($path['filename']) $this->_viewName = $path['filename'];
 
-		$this->_fullPathRelative = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/'.$this->_viewName .'.php';
+        $this->_fullPathRelative = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/'.$this->_viewName .'.php';
 
     }
 
     /**
      * Sets general Smarty variables (paths, compilder directives)
      *
-     * @access 	private
+     * @access     private
      */
     private function setSmarty ()
     {
@@ -860,7 +860,7 @@ class Controller extends BaseClass
     /**
      * Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
      *
-     * @access 	private
+     * @access     private
      */
     private function setRequestData ()
     {
@@ -901,7 +901,7 @@ class Controller extends BaseClass
      * loads the corresponding class files, and initiates an instance of each model class 
      * as object of the class variable 'models'.
      *
-     * @access 	private
+     * @access     private
      */
     private function loadModels ()
     {
@@ -939,12 +939,12 @@ class Controller extends BaseClass
      * loads the corresponding class files, and initiates an instance of each helper class 
      * as object of the class variable 'helpers'.
      *
-     * @access 	private
+     * @access     private
      */
     private function loadHelpers ()
     {
         
-		if (!isset($this->usedHelpers)) return;
+        if (!isset($this->usedHelpers)) return;
 
         foreach ((array) $this->usedHelpers as $key) {
             
@@ -971,7 +971,7 @@ class Controller extends BaseClass
     /**
      * Loads the help texts for the current view into the class variable 'helpTexts'
      *
-     * @access 	private
+     * @access     private
      */
     private function setHelpTexts ()
     {
@@ -988,8 +988,8 @@ class Controller extends BaseClass
     /**
      * Returns the class variable 'helptexts', which contains all the pages's help texts
      *
-     * @return 	array	array with all help texts
-     * @access 	private
+     * @return     array    array with all help texts
+     * @access     private
      */
     private function getHelpTexts ()
     {
@@ -1003,7 +1003,7 @@ class Controller extends BaseClass
     /**
      * Sets project paths for image uploads etc. and makes sure they actually exist
      * 
-     * @access 	private
+     * @access     private
      */
     private function setPaths ()
     {
@@ -1032,7 +1032,7 @@ class Controller extends BaseClass
     /**
      * Sets project URL for project images
      * 
-     * @access 	private
+     * @access     private
      */
     private function setUrls ()
     {
@@ -1056,7 +1056,7 @@ class Controller extends BaseClass
      * sets default max upload size
      * sets a random value
      *
-     * @access 	private
+     * @access     private
      */
     private function setMiscellaneous ()
     {
@@ -1070,7 +1070,7 @@ class Controller extends BaseClass
     /**
      * Sets a "custom http_referer", including the page's name, in the session
      *
-     * @access 	private
+     * @access     private
      */
     private function setLastVisitedPage ()
     {
@@ -1086,7 +1086,7 @@ class Controller extends BaseClass
     /**
      * Stores current page's name etc. in the session for easy access by smarty for js lock out-function
      *
-     * @access 	private
+     * @access     private
      */
     private function setSessionActivePageValues ()
     {
@@ -1109,7 +1109,7 @@ class Controller extends BaseClass
      * Pages that require login redirect the user towards the login. By setting the 'login_start_page' 
      * the app can direct the to the desired page after they have succesfully logged in.
      *
-     * @access 	private
+     * @access     private
      */
     private function setLoginStartPage ()
     {
@@ -1123,12 +1123,12 @@ class Controller extends BaseClass
     /**
      * Create the breadcrumb trail
      *
-     * @access 	private
+     * @access     private
      */
     private function setBreadcrumbs ()
     {
         
-		if (!isset($this->appName)) return;
+        if (!isset($this->appName)) return;
 
         // root of each trail: "choose project" page
         $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
@@ -1192,8 +1192,8 @@ class Controller extends BaseClass
     /**
      * Returns the breadcrumb trail
      *
-     * @access 	private
-     * @return	array	breadcrumb trail: array of crumbname => crumbpath
+     * @access     private
+     * @return    array    breadcrumb trail: array of crumbname => crumbpath
      */
     private function getBreadcrumbs ()
     {
@@ -1208,8 +1208,8 @@ class Controller extends BaseClass
     /**
      * Checks whether a user is authorized to view/use a page within a project
      *
-     * @return 	boolean		authorized or not
-     * @access 	private
+     * @return     boolean        authorized or not
+     * @access     private
      */
     private function isUserAuthorisedForProjectPage ()
     {
@@ -1235,8 +1235,8 @@ class Controller extends BaseClass
     /**
      * Sets key to sort by for doCustomSortArray
      *
-     * @param string	name of the field to sort by
-     * @access 	private
+     * @param string    name of the field to sort by
+     * @access     private
      */
     private function setSortField ($field)
     {
@@ -1250,8 +1250,8 @@ class Controller extends BaseClass
     /**
      * Returns key to sort by; called by doCustomSortArray
      *
-     * @return string	name of the field to sort by; defaults to 'id'
-     * @access 	private
+     * @return string    name of the field to sort by; defaults to 'id'
+     * @access     private
      */
     private function getSortField ()
     {
@@ -1265,8 +1265,8 @@ class Controller extends BaseClass
     /**
      * Sets sort direction for doCustomSortArray
      *
-     * @param string	$a	asc or desc
-     * @access 	private
+     * @param string    $a    asc or desc
+     * @access     private
      */
     private function setSortDirection ($dir)
     {
@@ -1280,8 +1280,8 @@ class Controller extends BaseClass
     /**
      * Returns direction to sort in; called by doCustomSortArray
      *
-     * @return string	asc or desc
-     * @access 	private
+     * @return string    asc or desc
+     * @access     private
      */
     private function getSortDirection ()
     {
@@ -1295,8 +1295,8 @@ class Controller extends BaseClass
     /**
      * Sets case sensitivity for doCustomSortArray
      *
-     * @param string	$a	i(nsensitive) or s(ensitive)
-     * @access 	private
+     * @param string    $a    i(nsensitive) or s(ensitive)
+     * @access     private
      */
     private function setSortCaseSensitivity ($sens)
     {
@@ -1310,8 +1310,8 @@ class Controller extends BaseClass
     /**
      * Returns setting for case-sensitivity while sorting; called by doCustomSortArray
      *
-     * @return string	i(nsensitive) or s(ensitive)
-     * @access 	private
+     * @return string    i(nsensitive) or s(ensitive)
+     * @access     private
      */
     private function getSortCaseSensitivity ()
     {
@@ -1325,9 +1325,9 @@ class Controller extends BaseClass
     /**
      * Performs the actual usort; called by customSortArray
      *
-     * @param array	$a	value of one array-element
-     * @param array	$b	value of the other
-     * @access 	private
+     * @param array    $a    value of one array-element
+     * @param array    $b    value of the other
+     * @access     private
      */
     private function doCustomSortArray ($a, $b)
     {
@@ -1357,7 +1357,7 @@ class Controller extends BaseClass
     /**
      * Sets a random integer value for general use
      *
-     * @access 	private
+     * @access     private
      */
     private function setRandomValue ()
     {
@@ -1371,8 +1371,8 @@ class Controller extends BaseClass
     /**
      * Returns random integer value
      *
-     * @return integer	anything between 99999 and mt_getrandmax()
-     * @access 	private
+     * @return integer    anything between 99999 and mt_getrandmax()
+     * @access     private
      */
     private function getRandomValue ()
     {

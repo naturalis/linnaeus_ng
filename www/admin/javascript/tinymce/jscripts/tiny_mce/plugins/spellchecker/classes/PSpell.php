@@ -66,16 +66,16 @@ class PSpell extends SpellChecker
         $plink = pspell_new($lang, $this->_config['PSpell.spelling'], $this->_config['PSpell.jargon'], $this->_config['PSpell.encoding'], $this->_config['PSpell.mode']);
         
         // Setup PSpell link
-        /*		if (!$plink) {
-			$pspellConfig = pspell_config_create(
-				$lang,
-				$this->_config['PSpell.spelling'],
-				$this->_config['PSpell.jargon'],
-				$this->_config['PSpell.encoding']
-			);
+        /*        if (!$plink) {
+            $pspellConfig = pspell_config_create(
+                $lang,
+                $this->_config['PSpell.spelling'],
+                $this->_config['PSpell.jargon'],
+                $this->_config['PSpell.encoding']
+            );
 
-			$plink = pspell_new_config($pspell_config);
-		}*/
+            $plink = pspell_new_config($pspell_config);
+        }*/
         
         if (!$plink)
             $this->throwError("No PSpell link found opened.");

@@ -575,7 +575,7 @@ abstract class Model extends BaseClass
                       standard operator is '=' but it is possible to tag another operator 
                       after the column-value (array('last_name !=' => 'gates' ))
                     - a full query with %table% as tablename
-					- * for no where clause
+                    - * for no where clause
                 $cols can hold a string that replaces the defualt * in 'select * from...'
 
             */
@@ -603,10 +603,10 @@ abstract class Model extends BaseClass
                 
                 }
 
-				if ($val===null) {
-				
+                if ($val===null) {
+                
                     $query .= ' and ' . $col . " " . $operator . " null ";
-				
+                
                 } elseif ($ignoreCase && is_string($val)) {
                     
                     $query .= ' and lower(' . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";

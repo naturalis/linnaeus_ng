@@ -2,8 +2,8 @@
 
 /*
 
-	hard coded number of free modules
-	deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
+    hard coded number of free modules
+    deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
 
 */
 
@@ -49,16 +49,16 @@ class ProjectsController extends Controller
     }
 
 
-	public function indexAction()
-	{
-	
-		$this->checkAuthorisation();
-		
-		$this->setPageName( _('Index'));
-		
-		$this->printPage();
-	
-	}
+    public function indexAction()
+    {
+    
+        $this->checkAuthorisation();
+        
+        $this->setPageName( _('Index'));
+        
+        $this->printPage();
+    
+    }
 
 
     public function modulesAction ()
@@ -81,7 +81,7 @@ class ProjectsController extends Controller
                     'id' => null, 
                     'module' => $this->requestData['module_new'], 
                     'project_id' => $this->getCurrentProjectId(),
-					'active' => 'n'
+                    'active' => 'n'
                 ));
                 
                 $_SESSION['system']['last_rnd'] = $this->requestData['rnd'];
@@ -241,11 +241,11 @@ allowed formats should go to controller's settings
 not sure if helper is all that useful
 
             $fuh = $this->helpers->FileUploadHelper->saveFiles(
-				$this->requestDataFiles, 
-				$this->getDefaultImageUploadDir(), 
-				$this->getDefaultUploadFilemask(), 
-				$this->getDefaultUploadMaxSize()
-			);
+                $this->requestDataFiles, 
+                $this->getDefaultImageUploadDir(), 
+                $this->getDefaultUploadFilemask(), 
+                $this->getDefaultUploadMaxSize()
+            );
 
             if (!$fuh['error']) {
                 
@@ -311,31 +311,31 @@ not sure if helper is all that useful
     public function ajaxInterfaceAction ()
     {
 
-		if (!isset($this->requestData['view'])) return;
+        if (!isset($this->requestData['view'])) return;
 
         if ($this->requestData['view'] == 'modules') {
             
             $this->ajaxActionModules(
-				$this->requestData['type'], 
-				$this->requestData['action'], 
-				$this->requestData['id']
-			);
+                $this->requestData['type'], 
+                $this->requestData['action'], 
+                $this->requestData['id']
+            );
         
         } elseif ($this->requestData['view'] == 'collaborators') {
        
             $this->ajaxActionCollaborators(
-				$this->requestData['type'], 
-				$this->requestData['action'], 
-				$this->requestData['id'], 
-				$this->requestData['user']
-			);
+                $this->requestData['type'], 
+                $this->requestData['action'], 
+                $this->requestData['id'], 
+                $this->requestData['user']
+            );
         
         } elseif ($this->requestData['view'] == 'languages') {
             
             $this->ajaxActionLanguages(
-				$this->requestData['action'], 
-				$this->requestData['id']
-			);
+                $this->requestData['action'], 
+                $this->requestData['id']
+            );
 
         }
 
@@ -388,21 +388,21 @@ not sure if helper is all that useful
                 $this->models->ModuleProject->save(array(
                     'id' => null, 
                     'module_id' => $moduleId, 
-					'active' => 'n',
+                    'active' => 'n',
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
             } elseif ($action == 'module_publish') {
                 
                 $this->models->ModuleProject->update(
-					array(
-	                    'active' => 'y'
-                	), 
-					array(
-						'module_id' => $moduleId, 
-						'project_id' => $this->getCurrentProjectId()
-                	)
-				);
+                    array(
+                        'active' => 'y'
+                    ), 
+                    array(
+                        'module_id' => $moduleId, 
+                        'project_id' => $this->getCurrentProjectId()
+                    )
+                );
             
 
             } elseif ($action == 'module_unpublish') {
