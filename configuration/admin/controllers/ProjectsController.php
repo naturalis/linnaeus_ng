@@ -210,7 +210,7 @@ class ProjectsController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Project data'));
+        $this->setPageName(_('Project settings'));
         
         if ($this->requestData) {
             

@@ -853,8 +853,8 @@ function taxonDeleteData() {
 			'time': allGetTimestamp()	
 		},
 		function(data){
-			alert(data);
-			//window.open('list.php','_top');
+			//alert(data);
+			window.open('list.php','_top');
 		}
 	);
 

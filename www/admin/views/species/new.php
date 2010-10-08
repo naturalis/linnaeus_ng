@@ -4,7 +4,5 @@ require_once ('../../../../configuration/admin/controllers/SpeciesController.php
 
 $c = new SpeciesController();
 
-$c->setExcludeFromReferer(true);
-
-$c->ajaxInterfaceAction();
+$c->newAction();
 

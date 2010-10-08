@@ -27,6 +27,7 @@ class Controller extends BaseClass
     public $sortDirection;
     public $sortCaseSensitivity;
     public $baseUrl;
+	public $excludeFromReferer = false;
 
     private $usedModelsBase = array(
         'helptext', 
@@ -54,6 +55,8 @@ class Controller extends BaseClass
         $this->setNames();
         
         $this->loadControllerConfig();        
+        
+        $this->checkLastVisitedPage();
         
         $this->setSessionActivePageValues();
         
@@ -718,7 +721,13 @@ class Controller extends BaseClass
         }
     
     }
-
+	
+	public function setExcludeFromReferer($mode)
+	{
+	
+		$this->excludeFromReferer = $mode;
+	
+	}
 
 
     private function loadControllerConfig()
@@ -1075,13 +1084,45 @@ class Controller extends BaseClass
      */
     private function setLastVisitedPage ()
     {
+
+		if (!$this->excludeFromReferer) {
+		
+			if (isset($_SESSION['system']['referer'])) {
         
-        $_SESSION['system']['referer']['url'] = $this->_fullPath;
-        
-        $_SESSION['system']['referer']['name'] = $this->getPageName();
-    
+				$_SESSION['system']['prev_referer']['url'] = $_SESSION['system']['referer']['url'];
+				
+				$_SESSION['system']['prev_referer']['name'] = $_SESSION['system']['referer']['name'];
+
+			}
+	
+			$_SESSION['system']['referer']['url'] = $this->_fullPath;
+			
+			$_SESSION['system']['referer']['name'] = $this->getPageName();
+		}
+
     }
 
+    /**
+     * Makes sure the custom http_referer points at the actual previous page on a user reload of the current page
+     *
+     * @access     private
+     */
+	private function checkLastVisitedPage ()
+	{
+
+		if (
+			isset($_SESSION['system']['referer']) && 
+			isset($_SESSION['system']['prev_referer']) && 
+			$_SESSION['system']['referer']['url'] == $this->_fullPath
+			) {
+	
+			$_SESSION['system']['referer'] = $_SESSION['system']['prev_referer'];
+			
+			unset($_SESSION['system']['prev_referer']);
+
+		}
+
+	}
 
 
     /**
@@ -1160,8 +1201,7 @@ class Controller extends BaseClass
                     // all views are on the same level, but sometimes we might want another level to the trail when 
                     // moving one view to the next, for logic's sake (for instance: taxon list -> edit taxon, two views
                     // that are on the same level, but are perceived by the user to be on different levels)
-                    if ($this->breadcrumbIncludeReferer ===
-                     true) {
+                    if ($this->breadcrumbIncludeReferer === true) {
                         
                         $this->breadcrumbs[] = array(
                             'name' => $_SESSION['system']['referer']['name'], 

@@ -42,7 +42,7 @@ Click a cell to access the subpages for a taxon in a specific language. To chang
 You have to define at least one language in your project before you can add any taxa.<br />
 <a href="../projects/data.php">Define languages.</a>
 {else}
-<a href="edit.php">Add a new taxon</a>
+<a href="new.php">Add a new taxon</a>
 {/if}
 </div>
 

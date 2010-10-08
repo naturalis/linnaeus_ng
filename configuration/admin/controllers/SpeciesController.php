@@ -158,6 +158,25 @@ class SpeciesController extends Controller
     
     }
 
+    /**
+     * Add new taxon action
+     *
+     * @access    public
+     */
+    public function newAction ()
+    {
+		
+		$this->checkAuthorisation();
+
+        $this->setPageName(_('New taxon'));
+		
+        $tt = $this->getTaxonTree(null, false);
+
+		$this->smarty->assign('taxa',$tt);
+
+		$this->printPage();
+
+	}
 
     /**
      * Edit taxon action
@@ -168,7 +187,7 @@ class SpeciesController extends Controller
      */
     public function editAction ()
     {
-        
+
         $this->checkAuthorisation();
         
         $this->setBreadcrumbIncludeReferer(
@@ -177,7 +196,7 @@ class SpeciesController extends Controller
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
             )
         );
-        
+		
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
             
@@ -190,113 +209,118 @@ class SpeciesController extends Controller
             
             $this->setPageName(_('Editing') . ' "' . $taxon['taxon'] . '"');
         
-        } else {
-        // no id, new taxon
-            
-            $this->setPageName(_('Adding new taxon'));
         
-        }
-        
-        if (empty($this->requestData['id']) || !$this->doLockOutUser($this->requestData['id'])) {
-        // if new taxon OR existing taxon not being edited by someone else, get languages and content
+			if (!$this->doLockOutUser($this->requestData['id'])) {
+			// if new taxon OR existing taxon not being edited by someone else, get languages and content
+	
+				// get available languages
+				$lp = $_SESSION['project']['languages'];
+	
+				foreach ((array) $lp as $key => $val) {
+					
+					$l = $this->models->Language->get($val['language_id']);
+					
+					$lp[$key]['language'] = $l['language'];
+					
+					$lp[$key]['iso2'] = $l['iso2'];
+					
+					$lp[$key]['iso3'] = $l['iso3'];
+	
+				}
+				
+				// determine the language the page will open in
+				$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
+	
+				// get the defined subpages (just the page definitions, no content yet)
+				$tp = $this->models->TaxonPage->get(array(
+					'project_id' => $this->getCurrentProjectId()
+				));
+	
+				foreach ((array) $tp as $key => $val) {
+					
+					foreach ((array) $lp as $k => $language) {
+						
+						// for each subpage in each language, get the subpage title
+						$tpt = $this->models->TaxonPageTitle->get(
+						array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $language['language_id'], 
+							'page_id' => $val['id']
+						));
+						
+						$tp[$key]['titles'][$language['language_id']] = $tpt[0];
+					
+					}
+					
+					if ($val['def_page'] == 1) $defaultPage = $val['id'];
+				
+				}
+				
+				// determine the page_id the page will open in
+				$startPage = !empty($this->requestData['page']) ? $this->requestData['page'] : $defaultPage;
+				
+				// get the content in the language the page will open with
+				if (!empty($this->requestData['id']) && !empty($startLanguage)) {
+					
+					$ct = $this->models->ContentTaxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $this->requestData['id'], 
+						'language_id' => $startLanguage, 
+						'page_id' => $startPage
+					));
+	
+					if ($ct == null) {
+	
+						$content['content'] = $this->getDefaultPageSections($startPage);
+	
+					} else {
+	
+						$content = $ct[0];
+	
+					}
+				}
+				
+				if (isset($taxon))
+					$this->smarty->assign('taxon', $taxon);
+				
+				if (isset($content))
+					$this->smarty->assign('content', $content);
+	
+				$this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
+				
+				$this->smarty->assign('pages', $tp);
+				
+				$this->smarty->assign('languages', $lp);
+				
+				$this->smarty->assign('includeHtmlEditor', true);
+				
+				$this->smarty->assign('activeLanguage', $startLanguage);
+				
+				$this->smarty->assign('activePage', $startPage);
+			
+			} else {
+			// existing taxon already being edited by someone else
+	
+				$this->smarty->assign('taxon', array(
+					'id' => -1
+				));
+				
+				$this->addError(_('Taxon is already being edited by another editor.'));
+			
+			}
 
-            // get available languages
-            $lp = $_SESSION['project']['languages'];
+		} else {
+		// no id
+		
+			$this->smarty->assign('taxon', array(
+				'id' => -1
+			));
+				
+			$this->addError(_('No taxon ID specified.'));
+		
+		}
 
-            foreach ((array) $lp as $key => $val) {
-                
-                $l = $this->models->Language->get($val['language_id']);
-                
-                $lp[$key]['language'] = $l['language'];
-                
-                $lp[$key]['iso2'] = $l['iso2'];
-                
-                $lp[$key]['iso3'] = $l['iso3'];
-
-            }
-            
-            // determine the language the page will open in
-            $startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
-
-            // get the defined subpages (just the page definitions, no content yet)
-            $tp = $this->models->TaxonPage->get(array(
-                'project_id' => $this->getCurrentProjectId()
-            ));
-
-            foreach ((array) $tp as $key => $val) {
-                
-                foreach ((array) $lp as $k => $language) {
-                    
-                    // for each subpage in each language, get the subpage title
-                    $tpt = $this->models->TaxonPageTitle->get(
-                    array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $language['language_id'], 
-                        'page_id' => $val['id']
-                    ));
-                    
-                    $tp[$key]['titles'][$language['language_id']] = $tpt[0];
-                
-                }
-                
-                if ($val['def_page'] == 1) $defaultPage = $val['id'];
-            
-            }
-            
-            // determine the page_id the page will open in
-            $startPage = !empty($this->requestData['page']) ? $this->requestData['page'] : $defaultPage;
-            
-            // get the content in the language the page will open with
-            if (!empty($this->requestData['id']) && !empty($startLanguage)) {
-                
-                $ct = $this->models->ContentTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'taxon_id' => $this->requestData['id'], 
-                    'language_id' => $startLanguage, 
-                    'page_id' => $startPage
-                ));
-
-                if ($ct == null) {
-
-                    $content['content'] = $this->getDefaultPageSections($startPage);
-
-                } else {
-
-                    $content = $ct[0];
-
-                }
-            }
-            
-            if (isset($taxon))
-                $this->smarty->assign('taxon', $taxon);
-            
-            if (isset($content))
-                $this->smarty->assign('content', $content);
-
-            $this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
-            
-            $this->smarty->assign('pages', $tp);
-            
-            $this->smarty->assign('languages', $lp);
-            
-            $this->smarty->assign('includeHtmlEditor', true);
-            
-            $this->smarty->assign('activeLanguage', $startLanguage);
-            
-            $this->smarty->assign('activePage', $startPage);
-        
-        } else {
-        // existing taxon already being edited by someone else
-
-            $this->smarty->assign('taxon', array(
-                'id' => -1
-            ));
-            
-            $this->addError(_('Taxon is already being edited by another editor.'));
-        
-        }
-        
         $this->printPage();
     
     }
@@ -807,6 +831,10 @@ class SpeciesController extends Controller
         } else if ($this->requestData['action'] == 'save_col') {
 
             $this->ajaxActionImportTaxa();
+        
+        } else if ($this->requestData['action'] == 'check_taxon_name') {
+
+            $this->ajaxActionCheckTaxonName();
         
         } else if ($this->requestData['action'] == 'save_taxon_name') {
 
@@ -1343,7 +1371,7 @@ class SpeciesController extends Controller
     {
         
         if (empty($this->requestData['id'])) {
-            
+
             return;
         
         } else {
@@ -1595,7 +1623,31 @@ class SpeciesController extends Controller
 
     }
 
-    private function ajaxActionSaveTaxonName() 
+    private function ajaxActionCheckTaxonName ()
+    {
+
+        if (empty($this->requestData['taxon_name'])) return;
+
+        $t = $this->models->Taxon->get(
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                'taxon' => trim($this->requestData['taxon_name'])
+            ),'count(*) as total',false,false,true
+        );
+
+        if ($t[0]['total']>0) {
+
+			$this->smarty->assign('returnText', _('Taxon name already in database.'));
+
+        } else {
+
+			$this->smarty->assign('returnText', '<ok>');
+
+		}
+
+    }
+
+    private function ajaxActionSaveTaxonName () 
     {
 
         if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
@@ -1622,8 +1674,18 @@ class SpeciesController extends Controller
 
     }
 
-    private function getTaxonTree($pId) 
+    private function getTaxonTree($pId=null,$nested=true,$treelevel=null) 
     {
+	
+		if ($treelevel===null) {
+
+			$treelevel = 0;
+
+		} else {
+
+			$treelevel += 1;
+
+		}
 
         $t = $this->models->Taxon->get(
             array(
@@ -1635,10 +1697,27 @@ class SpeciesController extends Controller
 
             $this->_treeIdList[] = $val['id'];
 
-            $t['children'] = $this->getTaxonTree($val['id']);
+			if ($nested) {
+
+	            $t['children'] = $this->getTaxonTree($val['id']);
+
+			} else {
+
+				$t[$key]['tree_level'] = $treelevel;
+				$t[$key]['list_padding'] = str_repeat('<%pad%>', $treelevel);
+
+	            $d = $this->getTaxonTree($val['id'],$nested,$treelevel);
+				
+				if (isset($d)) {
+
+					$t = array_merge($t,$d);
+
+				}
+
+			}
 
         }
-        
+
         return $t;
 
     }

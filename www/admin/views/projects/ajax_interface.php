@@ -4,5 +4,7 @@ require_once ('../../../../configuration/admin/controllers/ProjectsController.ph
 
 $c = new ProjectsController();
 
+$c->setExcludeFromReferer(true);
+
 $c->ajaxInterfaceAction();
 
