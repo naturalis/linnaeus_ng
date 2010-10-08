@@ -1866,10 +1866,18 @@ class SpeciesController extends Controller
                     'id' => $id
                 )
             );
+			
+			$delRecords = true;			
+			
+			if (file_exists($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
 
-            if (unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
+				$delRecords = unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name']);
 
-                if ($mt[0]['thumb_name']) {
+			}
+
+            if ($delRecords) {
+
+                if ($mt[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name'])) {
                     unlink($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
                 }
 
