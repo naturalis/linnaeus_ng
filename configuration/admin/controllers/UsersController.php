@@ -224,8 +224,6 @@ class UsersController extends Controller
     
     }
 
-
-
     /**
      * Creating a new collaborator
      *
@@ -235,212 +233,135 @@ class UsersController extends Controller
      */
     public function createAction ()
     {
-        
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Create new collaborator'));
         
         // data was submitted
-        if ($this->requestData) {
-            
-            // checked = 2: user entered data of a collaborator that already exists, but was not assigned to current project yet.
-            // instead of creating a new collaborator, we assign him to the current project with the specified role.
-            if ($this->requestData['checked'] == '2') {
-                
-                // make sure an unassignable role (like system admin) wasn't injected
-                $r = $this->models->Role->get($this->requestData['role_id']);
-                
-                // if unassignable, raise error
-                if ($r['assignable'] == 'n') {
-                    
-                    $this->addError(_('Unassignable role selected'));
-                    
-                    $this->smarty->assign('check', false);
-                    
-                    $userData = $_SESSION['data']['new_user'];
-                
-                }
-                else {
-                    
-                    // save new role only for existing collaborator and new project
-                    $this->models->ProjectRoleUser->save(
-                    array(
-                        'id' => null, 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'role_id' => $this->requestData['role_id'], 
-                        'user_id' => $this->requestData['existing_user_id']
-                    ));
-                    
-                    unset($_SESSION['data']['new_user']);
-                    
-                    $this->redirect('index.php');
-                
-                }
-            
-            }
-            // cheked = 1: new collaborator, save data
-            elseif ($this->requestData['checked'] == '1') {
-                
-                // make sure an unassignable role (like system admin) wasn't injected
-                $r = $this->models->Role->get($_SESSION['data']['new_user']['role_id']);
-                
-                // if unassignable, raise error
-                if ($r['assignable'] == 'n') {
-                    
-                    $this->addError(_('Unassignable role selected'));
-                    
-                    $this->smarty->assign('check', false);
-                    
-                    $userData = $_SESSION['data']['new_user'];
-                
-                }
-                else {
-                    
-                    // encode passwords and save data
-                    $this->requestData = $_SESSION['data']['new_user'];
-                    
-                    $this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
-                    
-                    $this->requestData['active'] = '1';
-                    
-                    $this->requestData['id'] = null;
-                    
-                    $r = $this->models->User->save($this->requestData);
-                    
-                    if ($r !== true) {
-                        
-                        $this->addError(_('Failed to save user'));
-                        
-                        $this->smarty->assign('check', false);
-                        
-                        $userData = $_SESSION['data']['new_user'];
-                    
-                    }
-                    else {
-                        
-                        // if saving was succesfull, save new role
-                        $newUserId = $this->models->User->getNewId();
-                        
-                        $this->models->ProjectRoleUser->save(
-                        array(
-                            'id' => null, 
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'role_id' => $this->requestData['role_id'], 
-                            'user_id' => $newUserId
-                        ));
-                        
-                        unset($_SESSION['data']['new_user']);
-                        
-                        $this->redirect('index.php');
-                    
-                    }
-                
-                }
-            
-            }
-            // user verified the data and clicked 'back'
-            elseif ($this->requestData['checked'] == '-1') {
-                
-                $this->smarty->assign('check', false);
-                
-                $userData = $_SESSION['data']['new_user'];
-            
-            }
-            // user submitted data, is now shown non-editable data to verify, or editable if containing errors
-            else {
-                
-                $saveUser = true;
-                
-                $this->requestData = $this->models->User->sanatizeData($this->requestData);
-                
-                // save data in session for saving in the next step
-                $_SESSION['data']['new_user'] = $this->requestData;
-                
-                // check data validity etc.
-                if (!$this->isUserDataComplete())
-                    $saveUser = false;
-                
-                if (!$this->isUserDataCorrect())
-                    $saveUser = false;
-                
-                if (!$this->isUserDataUnique())
-                    $saveUser = false;
-                    
+        if (isset($this->requestData)) {
+		
+			$_SESSION['data']['new_user'] = $this->requestData;
+
+			$saveUser = true;
+			
+			$this->requestData = $this->models->User->sanatizeData($this->requestData);
+			
+			// check data validity etc.
+			if (!$this->isUserDataComplete()) $saveUser = false;
+			
+			if (!$this->isUserDataCorrect()) $saveUser = false;
+			
+			if (!$this->isUsernameUnique()) $saveUser = false;
+			
+			if ($saveUser) {
+
                 // see if similar collaborators might exist, based on identical name, or identical email address
                 $sim = $this->getSimilarUsers();
-                
+				
+				$saveUser = count((array)$sim) == 0;
+
                 // if there are similar users...
-                if (count((array) $sim) != 0) {
-                    
+                if (!$saveUser) {
+
+                    $this->smarty->assign('existingUser', $sim[0]);
+
                     // ...it might be because of his name...
-                    if ($this->isEmailAddressUnique(false, 
-                    false, true)) {
-                        
-                        $this->addMessage(_('A similar user, albeit with a different e-mail address, already exists in another project:'));
-                        
-                        $this->addMessage(
-                        '<span class="message-existing-user">' . $sim[0]['first_name'] . ' ' . $sim[0]['last_name'] . '</span> (' . $sim[0]['email_address'] .
-                         ')');
-                        
-                        $this->addMessage(_('Would you like to connect that user to the current project instead of creating a new one?'));
-                        
-                        $this->addMessage(
-                        '<input type="button" value="' . _('yes, connect existing') . '" onclick="$(\'#checked\').val(\'2\');$(\'#theForm\').submit();">&nbsp;
-                                <input type="button" value="' . _('no, create new') . '" onclick="$(\'#checked\').val(\'1\');$(\'#theForm\').submit();">&nbsp;');
-                    
-                    }
+                    if ($this->isEmailAddressUnique(false, false, true)) {
+
+	                    $this->smarty->assign('existingUserReason', 'same name');
+
+                    } else {
                     // ...or because of his email address (or both)
-                    else {
-                        
-                        $this->addMessage(_('A user with the same e-mail address already exists in another project:'));
-                        
-                        $this->addMessage(
-                        '<span class="message-existing-user">' . $sim[0]['first_name'] . ' ' . $sim[0]['last_name'] . '</span> (' . $sim[0]['email_address'] .
-                         ')');
-                        
-                        $this->addMessage(
-                        _(
-                        'You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Would you like to do that?'));
-                        
-                        $this->addMessage(
-                        '<input type="button" value="' . _('yes') . '" onclick="$(\'#checked\').val(\'2\');$(\'#theForm\').submit();">&nbsp;
-                                <input type="button" value="' . _('no') . '" onclick="window.open(\'index.php\',\'_self\');">');
+
+	                    $this->smarty->assign('existingUserReason', 'same email');
+
+					}
+
+
+				} else {
+
+                    $this->smarty->assign('existingUser', false);
+
+					// make sure an unassignable role (like system admin) wasn't injected
+					$r = $this->models->Role->get($this->requestData['role_id']);
+					
+					$saveUser = count((array)$sim) == ($r['assignable'] != 'n');
+
+					if (!$saveUser) {
+					// if unassignable, raise error
+						
+						$this->addError(_('Unassignable role selected'));
+					
+					} else {
+					// save new user					
                     
-                    }
-                    
-                    $this->smarty->assign('existing_user', $sim[0]);
-                    
-                    $saveUser = false;
-                
-                }
-                
-                $this->smarty->assign('check', $saveUser ? '1' : false);
-                
-                $userData = $this->requestData;
-            
-            }
-        
+						// encode passwords
+						$this->requestData = $_SESSION['data']['new_user'];
+						
+						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
+						
+						$this->requestData['active'] = '1';
+						
+						$this->requestData['id'] = null;
+						
+						$r = $this->models->User->save($this->requestData);
+						
+						if ($r !== true) {
+							
+							$this->addError(_('Failed to save user'));
+							
+						} else {
+							
+							// if saving was succesful, save new role
+							$newUserId = $this->models->User->getNewId();
+							
+							$this->models->ProjectRoleUser->save(
+							array(
+								'id' => null, 
+								'project_id' => $this->getCurrentProjectId(), 
+								'role_id' => $this->requestData['role_id'], 
+								'user_id' => $newUserId
+							));
+
+							$this->redirect('index.php');
+						
+						}
+					
+					}
+
+				}
+					
+			}
 
         }
-        
-        // input form, shows empty. or with data when user clicked 'save' but data contained errors            
-        else {
-            
-            $this->smarty->assign('check', false);
-            
-            $userData = $this->requestData;
-        
-        }
-        
+
         $roles = $this->models->Role->get(array(
             'assignable' => 'y'
         ));
         
         $this->smarty->assign('roles', $roles);
         
-        $this->smarty->assign('data', $userData);
+        $this->smarty->assign('data', $this->requestData);
         
         $this->printPage();
+		
+                
+/*
+                    
+	// save new role only for existing collaborator and new project
+	$this->models->ProjectRoleUser->save(
+	array(
+		'id' => null, 
+		'project_id' => $this->getCurrentProjectId(), 
+		'role_id' => $this->requestData['role_id'], 
+		'user_id' => $this->requestData['existing_user_id']
+	));
+	
+	unset($_SESSION['data']['new_user']);
+	
+	$this->redirect('index.php');
+*/
     
     }
 
