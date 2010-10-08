@@ -5,8 +5,8 @@
 
 	<title>{$session.project.name}{if $session.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
 
-	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-	<link href="{$baseUrl}admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
+	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
 	<style type="text/css" media="all">
 		@import url("{$baseUrl}admin/style/main.css");
 		@import url("{$baseUrl}admin/style/admin-inputs.css");
@@ -30,8 +30,8 @@
 
 <body><div id="body-container">
 <div id="header-container">
-	<a href="{$baseUrl}admin/admin-index.php"><img src="{$baseUrl}admin/images/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="{$baseUrl}admin/images/system/eti_logo.png" id="eti-logo" /></a>
+	<a href="{$baseUrl}admin/admin-index.php"><img src="{$baseUrl}admin/media/system/linnaeus_logo.png" id="lng-logo" />
+	<img src="{$baseUrl}admin/media/system/eti_logo.png" id="eti-logo" /></a>
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">

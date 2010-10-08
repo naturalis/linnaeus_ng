@@ -39,8 +39,8 @@ class configuration
                 'moduleNotPresent' => '/views/utilities/module_not_present.php'
             ), 
             'directories' => array(
-                'mediaDirProject' => $this->_appFileRoot . 'www/admin/images/project', 
-                'mediaDirUpload' => $this->_appFileRoot . 'www/admin/images/upload'
+                'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
+                'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload'
             ), 
             'maxSubPages' => 10,
             'login-cookie' => array(

@@ -5,8 +5,8 @@
 
   <title></title>
 
-  <link href="admin/images/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-  <link href="admin/images/system/favicon.ico" rel="icon" type="image/x-icon" />
+  <link href="admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+  <link href="admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
 
   <style type="text/css" media="all">
     @import url("admin/style/main.css");
@@ -23,8 +23,8 @@
 
 <body><div id="body-container">
 <div id="header-container">
-  <a href="admin/admin-index.php"><img src="admin/images/system/linnaeus_logo.png" id="lng-logo" />
-  <img src="admin/images/system/eti_logo.png" id="eti-logo" /></a>
+  <a href="admin/admin-index.php"><img src="admin/media/system/linnaeus_logo.png" id="lng-logo" />
+  <img src="admin/media/system/eti_logo.png" id="eti-logo" /></a>
 
 
 </div>
