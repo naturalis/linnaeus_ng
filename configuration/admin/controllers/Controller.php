@@ -1032,6 +1032,7 @@ class Controller extends BaseClass
     /**
      * Sets project URL for project images
      * 
+	 * @todo	take out hard reference to /media/
      * @access     private
      */
     private function setUrls ()
@@ -1041,7 +1042,7 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            $_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/images/project/'.sprintf('%04s', $p).'/';
+            $_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
 
             $_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
 
