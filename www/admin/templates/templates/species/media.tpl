@@ -42,7 +42,7 @@
 				</script>
 			</td>
 			<td onclick="taxonMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/images/system/icons/cross.png" />
+				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
 			</td>
 		</tr>
 	{/section}
@@ -65,7 +65,7 @@
 		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td style="cursor:pointer" onclick="window.open('{$session.project.urls.project_media}{$media.video[i].file_name}','_video');">
 				<img 
-					src="{$baseUrl}admin/images/system/icons/video.jpg" 
+					src="{$baseUrl}admin/media/system/icons/video.jpg" 
 				/>
 			</td>
 			<td id="media-{$media.video[i].id}" onclick="taxonMediaDescriptionEdit(this);">{$media.video[i].description}</td>
@@ -77,7 +77,7 @@
 				</script>
 			</td>
 			<td onclick="taxonMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');" class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/images/system/icons/cross.png" />
+				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
 			</td>
 		</tr>
 	{/section}
@@ -113,7 +113,7 @@
 				</script>
 			</td>
 			<td onclick="taxonMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/images/system/icons/cross.png" />
+				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
 			</td>
 		{/section}
 		</tr>

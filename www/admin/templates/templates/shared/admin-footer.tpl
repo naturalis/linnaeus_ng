@@ -24,7 +24,7 @@ var_dump($_SESSION);
 </div>
 {/if}
 </div ends="body-container">
-<div id="loadingdiv" style="background-image:url(../../images/system/ajax-loader.gif);" class="loadingdiv-invisible"></div>
+<div id="loadingdiv" style="background-image:url(../../media/system/ajax-loader.gif);" class="loadingdiv-invisible"></div>
 <span id="dummy-element"></span>
 </body>
 </html>

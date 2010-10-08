@@ -60,7 +60,9 @@ You can load a list of taxa from file. The file must meet the following conditio
 	</li>
 </ol>
 Click the 'browse'-button above, select the file to load from your computer and click 'upload'.
-The contents of the file will be displayed so you can review them before they are saved to your project's database.
+The contents of the file will be displayed so you can review them before they are saved to your project's database.<br />
+You can download a sample CSV-file <a href="{$baseUrl}admin/media/system/example.csv">here</a>.
+
 {/if}
 </p>
 </form>

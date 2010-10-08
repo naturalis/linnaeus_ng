@@ -145,12 +145,12 @@ a:hover,.pseudo-a:hover {
 	top:100px;
 	width:32px;
 	height:32px;
-	background-image:url(../../images/system/ajax-loader.gif);
+	background-image:url(../../media/system/ajax-loader.gif);
 	background-position:center;
 	background-repeat:no-repeat;
 /*
 	please note:
-	background-image:url(../../images/system/ajax-loader.gif);
+	background-image:url(../../media/system/ajax-loader.gif);
 	is also in the style-declaration of the div (id="loadingdiv")
 	itself, as for reasons that are not understood, firexfox
 	refuses to show the image otherwise.
@@ -293,13 +293,13 @@ a:hover,.pseudo-a:hover {
 }
 
 .cell-moduser-inactive,.cell-moduser-remove {
-	background-image: url(../images/system/icons/user-gray.png);
+	background-image: url(../media/system/icons/user-gray.png);
 	background-repeat:no-repeat;
 	width:16px;
 }
 
 .cell-moduser-remove {
-	background-image: url(../images/system/icons/user-minus.png);
+	background-image: url(../media/system/icons/user-minus.png);
 }
 
 .module-title-unused,.module-title-in-use,.module-title-inactive {
@@ -362,7 +362,7 @@ a:hover,.pseudo-a:hover {
 
 .cell-language-default,.cell-language-set-default,.cell-language-delete,.cell-language-active,.cell-language-inactive,.cell-language-delete-inactive,.cell-language-active-inactive
 	{
-	background-image: url(../images/system/icons/asterisk.png);
+	background-image: url(../media/system/icons/asterisk.png);
 	background-repeat: no-repeat;
 	width: 10px;
 }
@@ -372,28 +372,28 @@ a:hover,.pseudo-a:hover {
 }
 
 .cell-language-set-default {
-	background-image: url(../images/system/icons/asterisk-gray.png);
+	background-image: url(../media/system/icons/asterisk-gray.png);
 }
 
 .cell-language-delete {
-	background-image: url(../images/system/icons/cross.png);
+	background-image: url(../media/system/icons/cross.png);
 }
 
 .cell-language-delete-inactive {
-	background-image: url(../images/system/icons/cross-gray.png);
+	background-image: url(../media/system/icons/cross-gray.png);
 }
 
 .cell-language-active {
-	background-image: url(../images/system/icons/module-deactivate.png);
+	background-image: url(../media/system/icons/module-deactivate.png);
 }
 
 .cell-language-inactive {
-	background-image: url(../images/system/icons/module-activate.png);
+	background-image: url(../media/system/icons/module-activate.png);
 }
 
 .cell-language-active-inactive {
 	background-image:
-		url(../images/system/icons/module-deactivate-inactive.png);
+		url(../media/system/icons/module-deactivate-inactive.png);
 }
 
 .language-select-item-active {
@@ -574,7 +574,7 @@ a:hover,.pseudo-a:hover {
 }
 
 .cell-page-delete {
-	background-image: url(../images/system/icons/cross.png);
+	background-image: url(../media/system/icons/cross.png);
 	background-repeat: no-repeat;
 	width: 16px;
 }
