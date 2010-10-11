@@ -165,6 +165,19 @@ class Controller extends BaseClass
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
 
+		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
+		
+			$msg =
+				($_SESSION['user']['logins'] <=1 ? _('Welcome,') : _('Welcome back,')).' '.
+				$_SESSION['user']['first_name'].' '.
+				$_SESSION['user']['last_name'].'.';
+
+	        $this->smarty->assign('welcomeMessage', $msg);
+			
+			$_SESSION['user']['_said_welcome'] = true;
+
+		}
+
         $this->smarty->display(strtolower($this->getViewName() . '.tpl'));
     
     }
@@ -330,7 +343,7 @@ class Controller extends BaseClass
     /**
      * Returns the projects the current user has been assigned to
      *
-     * @return     array    array of project's id's and names
+     * @return     array    array of project's id's, names and user's active states
      * @access     public
      */
     public function getCurrentUserProjects ()
@@ -340,7 +353,8 @@ class Controller extends BaseClass
             
             $r = array(
                 'id' => $val['project_id'], 
-                'name' => $val['project_name']
+                'name' => $val['project_name'],
+                'active' => $val['active']
             );
             
             if (!isset($cup) || !in_array($r, (array) $cup)) {
@@ -356,7 +370,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Sets the active project's id as class variable
      *
@@ -367,7 +380,18 @@ class Controller extends BaseClass
     {
         
         $_SESSION['project']['id'] = $id;
-    
+  
+        $this->models->ProjectRoleUser->update(
+			array(
+                'last_project_select' => 'now()', 
+                'project_selects' => 'project_selects+1'
+			),
+            array(
+				'user_id' => $this->getCurrentUserId(),
+				'project_id' => $this->getCurrentProjectId(),
+            )
+        );
+
     }
 
 
@@ -412,8 +436,13 @@ class Controller extends BaseClass
     public function setDefaultProject ()
     {
         
-        $d = (array) $_SESSION['user']['_roles'];
-        
+        //$d = (array) $_SESSION['user']['_roles'];
+		foreach((array) $_SESSION['user']['_roles'] as $key => $val){
+
+			if ($val['active']=='1') $d[] = $val;
+
+		}
+		
         // if user has no roles, do nothing
         if (count($d) == 0) return;
             
@@ -423,12 +452,12 @@ class Controller extends BaseClass
             $this->setCurrentProjectId($d[0]['project_id']);
         
         } else {
-        // new plan: if user has more than one project assigned, he has to chose himself
+        // new plan: if user has more than one project assigned, he has to choose himself
 
             return;
 
-        // if user has more roles, set the project in which he has the lowest role_id as the active project
-        // (this assumes that the roles with the most permissions have the lowest ids)
+			// old plan: if user has more roles, set the project in which he has the lowest role_id as the active project
+			// (this assumes that the roles with the most permissions have the lowest ids)
             
             $t = false;
             
@@ -449,7 +478,7 @@ class Controller extends BaseClass
         }
         
         $this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
-    
+
     }
 
 
@@ -574,7 +603,7 @@ class Controller extends BaseClass
         
         foreach ((array) $this->getCurrentUserProjects() as $key => $val) {
             
-            if ($val['id'] == $id)
+            if ($val['id'] == $id && $val['active'] == '1')
                 return true;
         
         }
@@ -876,21 +905,24 @@ class Controller extends BaseClass
         
         $this->requestData = false;
         
+		if (!empty($_GET) || !empty($_POST)) {
+
+			//$this->requestData = $_REQUEST; // also contains cookies
+			$this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
+	
+			foreach ((array) $this->requestData as $key => $val) {
+				
+				if (get_magic_quotes_gpc()) {
+					
+					$this->requestData[$key] = stripslashes($val);
+				
+				}
+	
+			}
+
+		}
+
         $this->requestDataFiles = false;
-        
-        //$this->requestData = $_REQUEST; // also contains cookies
-        $this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
-        
-
-        foreach ((array) $this->requestData as $key => $val) {
-            
-            if (get_magic_quotes_gpc()) {
-                
-                $this->requestData[$key] = stripslashes($val);
-            
-            }
-
-        }
 
         foreach ((array) $_FILES as $key => $val) {
             
@@ -1095,7 +1127,7 @@ class Controller extends BaseClass
 
 			}
 	
-			$_SESSION['system']['referer']['url'] = $this->_fullPath;
+			$_SESSION['system']['referer']['url'] = $_SERVER['REQUEST_URI'];
 			
 			$_SESSION['system']['referer']['name'] = $this->getPageName();
 		}
@@ -1113,7 +1145,7 @@ class Controller extends BaseClass
 		if (
 			isset($_SESSION['system']['referer']) && 
 			isset($_SESSION['system']['prev_referer']) && 
-			$_SESSION['system']['referer']['url'] == $this->_fullPath
+			$_SESSION['system']['referer']['url'] == $_SERVER['REQUEST_URI']
 			) {
 	
 			$_SESSION['system']['referer'] = $_SESSION['system']['prev_referer'];

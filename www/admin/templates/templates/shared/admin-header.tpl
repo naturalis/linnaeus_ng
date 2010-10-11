@@ -75,7 +75,11 @@
 {/if}
 </div>
 
-
+{if $welcomeMessage}
+<div id="welcome-message">
+{$welcomeMessage}
+</div>
+{/if}
 
 {if $helpTexts}
 <div id="block-inline-help">

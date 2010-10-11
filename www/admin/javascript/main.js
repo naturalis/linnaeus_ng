@@ -139,6 +139,44 @@ function allHideLoadingDiv() {
 
 }
 
+function userConnectExistingUser() {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'connect_existing' ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			if(data=='<ok>') {
+				window.open('index.php','_self');
+			}
+		}
+	});
+
+}
+
+function userCreateUserFromSession() {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'create_from_session' ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			if(data=='<ok>') {
+				window.open('index.php','_self');
+			}
+		}
+	});
+
+}
+
 function userDeleteUser(id) {
 
 	if (confirm('Are you sure?')) { 
@@ -162,6 +200,50 @@ function userRemoteValueCheck(id,values,tests,idti) {
 
 	}
 
+	var action = false;
+
+	switch(id) {
+		case 'username' : 
+			action = 'check_username';
+			break;
+		case 'password' :
+			action = 'check_password';
+			break;
+		case 'password_2' :
+			action = 'check_passwords';
+			break;
+		case 'first_name' :
+			action = 'check_first_name';
+			break;
+		case 'last_name' :
+			action = 'check_last_name';
+			break;
+		case 'email_address' :
+			action = 'check_email_address';
+			break;
+	}
+
+	if (!action) return;
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'values' : values ,
+			'tests' : tests ,
+			'id_to_ignore' : idti ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			$('#'+id+'-message').html(data);
+		}
+	});
+
+
+
+
+/*
 	$.ajax({ url:
 				"ajax_interface.php?f="+encodeURIComponent(id)+
 				"&v="+encodeURIComponent(values)+
@@ -174,6 +256,9 @@ function userRemoteValueCheck(id,values,tests,idti) {
 				$('#'+id+'-message').removeClass().addClass(error ? 'message-error' : 'message-no-error');
       	}
 	});
+
+*/
+
 
 }
 
@@ -740,7 +825,7 @@ function taxonSwitchPage(page) {
 
 function taxonClose() {
 
-	taxonSaveData("window.open('list.php','_top')");
+	taxonSaveData("window.open('list.php','_self')");
 
 }
 
@@ -854,7 +939,7 @@ function taxonDeleteData() {
 		},
 		function(data){
 			//alert(data);
-			window.open('list.php','_top');
+			window.open('list.php','_self');
 		}
 	);
 
@@ -1343,3 +1428,4 @@ function taxonMediaShowMedia(url,name) {
 	});
 
 }
+
