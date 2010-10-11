@@ -99,6 +99,53 @@
 		{/if}
 		</td>
 	</tr>
+
+	<tr>
+		<td>timezone</td>
+		<td>
+			<select name="timezone_id">
+			{section name=i loop=$zones}
+				<option 
+					value="{$zones[i].id}"
+				>{$zones[i].timezone}: {$zones[i].locations}</option>
+			{/section}
+			</select>
+	</td>
+	</tr>
+	<tr>
+		<td>language</td>
+		<td><input 
+				type="text" 
+				name="language" 
+				id="language" 
+				value="{$data.language}" 
+				maxlength="16"
+			/>
+			<span id="language-message" class=""></span>
+		</td>
+	</td>
+	</tr>
+	<tr>
+		<td>send e-mail notifications</td>
+		<td>
+			<label for="email_notifications-y">
+				<input
+					type="radio" 
+					id="email_notifications-y" 
+					name="email_notifications" 
+					value="1"
+					checked="checked" />y
+			</label>
+			<label for="email_notifications-n">
+				<input
+					type="radio" 
+					id="email_notifications-n" 
+					name="email_notifications" 
+					value="0" />n
+			</label>
+		</td>
+	</tr>
+	
 	<tr>
 		<td>role in current project:</td>
 		<td>
@@ -108,7 +155,6 @@
 				<option
 					title="{$roles[i].role}: {$roles[i].description}" 
 					value="{$roles[i].id}"
-					{if $roles[i].id==$data.role_id} selected class="option-selected" {/if}
 				>{$roles[i].role}</option>
 			{/section}
 			</select>
@@ -117,16 +163,32 @@
 		</td>
 	</tr>
 	<tr>
+		<td>active</td>
+		<td>
+			<label for="active-y">
+				<input
+					type="radio" 
+					id="active-y" 
+					name="active" 
+					value="1"
+					checked="checked" />y
+			</label>
+			<label for="active-n">
+				<input
+					type="radio" 
+					id="active-n" 
+					name="active" 
+					value="0" />n
+			</label>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
 		<td colspan="2">
 			<input type="submit" value="save" />&nbsp;
-		{if $check==true}
-			<input
-				type="button" 
-				value="back" 
-				onclick="$('#checked').val('-1');$('#theForm').submit()" />
-		{else}
 			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
-		{/if}
 		</td>
 	</tr>
 </table>
@@ -138,18 +200,19 @@
 <div id="page-block-messages">
 <span class="admin-message">
 {if $existingUserReason=='same name'}
-A similar user, albeit with a different e-mail address, already exists in another project:<br/>
+A similar user, albeit with a different e-mail address, already exists in this or another project:<br/>
 <span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
 Would you like to connect that user to the current project instead of creating a new one with the same name?
-
+<br /><br />
 <input type="button" value="yes, connect existing" onclick="userConnectExistingUser();" />
-<input type="button" value="no, create new" onclick="userCreateExistingUser();" />
+<input type="button" value="no, create new" onclick="userCreateUserFromSession();" />
 
 {else}
 
 A user with the same e-mail address already exists in another project:<br />
 <span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
-You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Would you like to do that?<br />                
+You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?
+<br /><br />
 <input type="button" value="yes, connect user"  onclick="userConnectExistingUser();" />
 <input type="button" value="no, cancel"  onclick="window.open('{$session.system.referer.url}','_top');" />
 

@@ -25,7 +25,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="button" value="edit" onclick="window.open('edit.php?id={$data.id}','_self');" />
-			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="back" onclick="window.open('index.php','_top')" />
 		</td>
 	</tr>
 </table>

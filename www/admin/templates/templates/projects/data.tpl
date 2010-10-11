@@ -89,6 +89,7 @@
 	</tr>		
 </table>
 <input type="submit" value="save" />
+<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
 </form>
 
 <br />

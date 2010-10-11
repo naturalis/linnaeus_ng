@@ -127,7 +127,6 @@ class UsersController extends Controller
 
         }
 
-
         $this->setPageName(_('Login'));
        
         $this->smarty->assign('excludeLogout', true);
@@ -209,8 +208,7 @@ class UsersController extends Controller
 
                 $this->redirect($this->getLoggedInMainIndex());
             
-            }
-            else {
+            } else {
                 
                 $this->redirect('choose_project.php');
             
@@ -223,6 +221,102 @@ class UsersController extends Controller
         $this->printPage();
     
     }
+
+	private function ajaxActionConnectExistingUser()
+	{
+
+		if (
+			!isset($_SESSION['data']['new_user']['role_id']) ||
+			!isset($_SESSION['data']['new_user']['existing_user_id'])
+		) return;
+
+
+		$this->models->ProjectRoleUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+			)
+		);
+
+		// save new role only for existing collaborator and new project
+		$pru = $this->models->ProjectRoleUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'role_id' => $_SESSION['data']['new_user']['role_id'], 
+				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+			)
+		);
+		
+		if (!$pru) {
+
+			$this->addError(_('Failed to connect user from session.'));
+
+		} else {
+
+			unset($_SESSION['data']['new_user']);
+
+		}
+
+	}
+
+	private function ajaxActionCreateUserFromSession ()
+	{
+	
+		if (!isset($_SESSION['data']['new_user'])) return;
+	
+		$su = $this->saveUser($_SESSION['data']['new_user']);
+
+		if (!$su) {
+
+			$this->addError(_('Failed to create user from session.'));
+
+		} else {
+
+			unset($_SESSION['data']['new_user']);
+
+		}
+
+	}
+
+	private function saveUser($data)
+	{
+
+		// encode passwords
+		$data['password'] = $this->userPasswordEncode($data['password']);
+		
+		$data['active'] = '1';
+		
+		$data['id'] = null;
+		
+		$r = $this->models->User->save($data);
+		
+		if ($r !== true) {
+			
+			$this->addError(_('Failed to save user'));
+			
+			return false;
+			
+		} else {
+			
+			// if saving was succesful, save new role
+			$newUserId = $this->models->User->getNewId();
+			
+			$this->models->ProjectRoleUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'role_id' => $data['role_id'], 
+				'user_id' => $newUserId,
+				'active' => '1'
+			));
+
+			return true;
+		
+		}
+						
+	}
+
 
     /**
      * Creating a new collaborator
@@ -237,9 +331,9 @@ class UsersController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Create new collaborator'));
-        
+
         // data was submitted
-        if (isset($this->requestData)) {
+        if (isset($this->requestData['username'])) {
 		
 			$_SESSION['data']['new_user'] = $this->requestData;
 
@@ -250,7 +344,7 @@ class UsersController extends Controller
 			// check data validity etc.
 			if (!$this->isUserDataComplete()) $saveUser = false;
 			
-			if (!$this->isUserDataCorrect()) $saveUser = false;
+			if (!$this->isUserDataCorrect(null,true)) $saveUser = false;
 			
 			if (!$this->isUsernameUnique()) $saveUser = false;
 			
@@ -264,29 +358,47 @@ class UsersController extends Controller
                 // if there are similar users...
                 if (!$saveUser) {
 
-                    $this->smarty->assign('existingUser', $sim[0]);
+					$this->smarty->assign('existingUser', $sim[0]);
 
-                    // ...it might be because of his name...
-                    if ($this->isEmailAddressUnique(false, false, true)) {
+					$_SESSION['data']['new_user']['existing_user_id'] = $sim[0]['id'];
 
-	                    $this->smarty->assign('existingUserReason', 'same name');
+					// ...it might be because of his name...
+					if ($this->isEmailAddressUnique(false, false, true)) {
 
-                    } else {
-                    // ...or because of his email address (or both)
+						$this->smarty->assign('existingUserReason', 'same name');
 
-	                    $this->smarty->assign('existingUserReason', 'same email');
+					} else {
+					// ...or because of his email address (or both)
+
+						$pru = $this->models->ProjectRoleUser->get(
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'user_id' => $sim[0]['id']
+							),'count(*) as total'
+						);
+						
+						if ($pru[0]['total']>0) {
+	
+							$this->addError(_('A user with that e-mail address already exists in your project.'));
+	
+							$this->smarty->assign('existingUser', false);
+	
+						} else {
+
+							$this->smarty->assign('existingUserReason', 'same email');
+
+						}
 
 					}
-
-
+	
 				} else {
 
                     $this->smarty->assign('existingUser', false);
 
 					// make sure an unassignable role (like system admin) wasn't injected
 					$r = $this->models->Role->get($this->requestData['role_id']);
-					
-					$saveUser = count((array)$sim) == ($r['assignable'] != 'n');
+
+					$saveUser = ($r['assignable'] != 'n');
 
 					if (!$saveUser) {
 					// if unassignable, raise error
@@ -296,33 +408,7 @@ class UsersController extends Controller
 					} else {
 					// save new user					
                     
-						// encode passwords
-						$this->requestData = $_SESSION['data']['new_user'];
-						
-						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
-						
-						$this->requestData['active'] = '1';
-						
-						$this->requestData['id'] = null;
-						
-						$r = $this->models->User->save($this->requestData);
-						
-						if ($r !== true) {
-							
-							$this->addError(_('Failed to save user'));
-							
-						} else {
-							
-							// if saving was succesful, save new role
-							$newUserId = $this->models->User->getNewId();
-							
-							$this->models->ProjectRoleUser->save(
-							array(
-								'id' => null, 
-								'project_id' => $this->getCurrentProjectId(), 
-								'role_id' => $this->requestData['role_id'], 
-								'user_id' => $newUserId
-							));
+						if ($this->saveUser($this->requestData)) {
 
 							$this->redirect('index.php');
 						
@@ -339,29 +425,16 @@ class UsersController extends Controller
         $roles = $this->models->Role->get(array(
             'assignable' => 'y'
         ));
-        
+
+		$zones = $this->models->Timezone->get('*');
+
+		$this->smarty->assign('zones', $zones);
+
         $this->smarty->assign('roles', $roles);
         
         $this->smarty->assign('data', $this->requestData);
         
         $this->printPage();
-		
-                
-/*
-                    
-	// save new role only for existing collaborator and new project
-	$this->models->ProjectRoleUser->save(
-	array(
-		'id' => null, 
-		'project_id' => $this->getCurrentProjectId(), 
-		'role_id' => $this->requestData['role_id'], 
-		'user_id' => $this->requestData['existing_user_id']
-	));
-	
-	unset($_SESSION['data']['new_user']);
-	
-	$this->redirect('index.php');
-*/
     
     }
 
@@ -379,24 +452,29 @@ class UsersController extends Controller
         $this->setPageName(_('Project collaborator overview'));
         
         // get all collaborators for the current project
-        $pru = $this->models->ProjectRoleUser->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ), 'distinct user_id, role_id');
-        
+        $pru = $this->models->ProjectRoleUser->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'role_id !=' => '1'
+			), 'distinct user_id, 
+				role_id,
+				if(active=1,"active","blocked") as status,
+				concat(datediff(curdate(),created)," '._('days').'") as days_active,
+				ifnull(last_project_select,"'._('(has never logged in)').'") as last_login'
+		);
+
         // get full details, as well as roles for each collaborator
         foreach ((array) $pru as $key => $val) {
-            
-            $u = $this->models->User->get(
-                $val['user_id'],
-                '*, if(active=1,"active","blocked") as status, 
-                concat(datediff(curdate(),created)," '._('days').'") as days_active,
-                ifnull(last_login,"'._('(has never logged in)').'") as last_login'
-            );
-            
+
+            $u = $this->models->User->get($val['user_id']);
+
             $r = $this->models->Role->get($val['role_id']);
             
             $u['role'] = $r['role'];
-            
+            $u['status'] = $val['status'];
+            $u['days_active'] = $val['days_active'];
+            $u['last_login'] = $val['last_login'];
+
             $users[] = $u;
         
         }
@@ -493,7 +571,7 @@ class UsersController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Edit project collaborator'));
-        
+
         // check whether the collaborator to be edited is part of the current project (avoid injected id)
         if ($this->isUserPartOfProject($this->requestData['id'], $this->getCurrentProjectId())) {
             
@@ -527,9 +605,9 @@ class UsersController extends Controller
             // user requested data update
                 
                 // make sure an unassignable role (like system admin) wasn't injected
-                $r = $this->models->Role->get($this->requestData['role_id']);
+                if (isset($this->requestData['role_id'])) $r = $this->models->Role->get($this->requestData['role_id']);
                 
-                if ($r['assignable'] == 'n') {
+                if (isset($r) && $r['assignable'] == 'n') {
                     
                     $this->addError(_('Unassignable role selected'));
                     
@@ -540,8 +618,7 @@ class UsersController extends Controller
                     $saveUser = true;
                     
                     // clean up data
-                    $this->requestData = $this->models->User->sanatizeData(
-                    $this->requestData);
+                    $this->requestData = $this->models->User->sanatizeData($this->requestData);
                     
                     // if no new passwords were entered, don't do a password check...
                     if ($this->requestData['password'] == '' &&
@@ -602,7 +679,8 @@ class UsersController extends Controller
                             'id' => $this->requestData['userProjectRole'], 
                             'user_id' => $this->requestData['id'], 
                             'project_id' => $this->getCurrentProjectId(), 
-                            'role_id' => $this->requestData['role_id']
+                            'role_id' => $this->requestData['role_id'],
+							'active' => $this->requestData['active']
                         ));
                     
                     } else {
@@ -613,8 +691,14 @@ class UsersController extends Controller
                     }
                     
                     // save the new data
+					/*
+						'active' was moved to the ProjectRoleUser table but the column in User does still exist
+					*/
+					$d = $this->requestData['active'];
+					$this->requestData['active'] = 1;
                     $this->models->User->save($this->requestData);
-                    
+                    $this->requestData['active'] = $d;
+					
                     $this->addMessage(_('User data saved'));
                 
                 }
@@ -664,21 +748,13 @@ class UsersController extends Controller
     /**
      * AJAX interface for this class
      *
-     * Is used by the 'edit' and 'create' views to check values without reloading the page
-     * The array 'v' contains the values of the variables to check.
-     * The variable 'f' contains the name of the variable to check.
-     * Possible test (request variable 't'):
-     * e    does value v already exit for field f?
-     * f    is formatting of value v correct?
-     * q    are values 1 & 2 equal?
-     * The variable 'i' can contain the id of a user to ignore in the test (to avoid claiming conflict
-     * with a user's own username or email address when editing).
-     *
      * @access    public
      */
     public function ajaxInterfaceAction ()
     {
-        
+
+/*
+
         $field = $this->requestData['f'];
         
         $values = explode(',', $this->requestData['v']);
@@ -689,33 +765,71 @@ class UsersController extends Controller
         
         if ($field == '')
             return;
+*/
+
+        if (!isset($this->requestData['action'])) return;
+        
+
+        if ($this->requestData['action'] == 'check_username') {
+
+			if (in_array('e',$this->requestData['tests'])) {
+
+				$this->isUsernameUnique($this->requestData['values'][0], $this->requestData['id_to_ignore']);
+
+			}
+			if (in_array('f',$this->requestData['tests'])) {
+
+				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value'));
+
+			}
+        
+		} else
+        if ($this->requestData['action'] == 'check_email_address') {
+
+			if (in_array('e',$this->requestData['tests'])) {
+
+				$this->isEmailAddressUnique($this->requestData['values'][0], $this->requestData['id_to_ignore']);
+
+			}
+			if (in_array('f',$this->requestData['tests'])) {
+
+				$this->isEmailAddressCorrect($this->requestData['values'][0]);
+
+			}
+        
+		} else
+        if ($this->requestData['action'] == 'check_first_name' || $this->requestData['action'] == 'check_last_name') {
+
+			if (in_array('f',$this->requestData['tests'])) {
+
+				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value'));
+			
+			}
+        
+		} else
+        if ($this->requestData['action'] == 'connect_existing') {
+            
+            $this->ajaxActionConnectExistingUser();
+        
+		} else
+        if ($this->requestData['action'] == 'create_from_session') {
+            
+            $this->ajaxActionCreateUserFromSession();
+        
+		}
+
+        $this->printPage();
+
+
+/*
         
         foreach ((array) $tests as $key => $test) {
             
-            if ($test == 'e') {
-                
-                if ($field == 'username')
-                    $this->isUsernameUnique($values[0], $idToIgnore);
-                
-                if ($field == 'email_address')
-                    $this->isEmailAddressUnique($values[0], $idToIgnore);
-            
-            }
             else if ($test == 'f') {
                 
                 switch ($field) {
                     
-                    case 'username':
-                        
-                        $this->isUsernameCorrect($values[0]);
-                        
-                        break;
-                    
-                    case 'email_address':
-                        
-                        $this->isEmailAddressCorrect($values[0]);
-                        
-                        break;
+ 
                     
                     case 'password':
                         
@@ -731,8 +845,7 @@ class UsersController extends Controller
                     
                     default:
                         
-                        if (strlen($values[0]) == 0)
-                            $this->addError(_('Missing value'));
+
                 
                 }
             
@@ -746,11 +859,7 @@ class UsersController extends Controller
         
         }
         
-        if (count((array) $this->errors) == 0)
-            $this->addMessage('Ok');
-        
-        $this->printPage();
-    
+*/
     }
 
 
@@ -772,10 +881,10 @@ class UsersController extends Controller
                 'logins' => 'logins+1'
             )
         );
-        
+
         // get user's roles and rights
         $cur = $this->getCurrentUserRights($user['id']);
-        
+
         // save all relevant data to the session
         $this->setUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
         
@@ -813,12 +922,13 @@ class UsersController extends Controller
     {
         
         if (!$userData) return;
-        
+
         $userData['_login']['time'] = time();
 
         $userData['_roles'] = $roles;
         $userData['_rights'] = $rights;
         $userData['_number_of_projects'] = $numberOfProjects;
+        $userData['_said_welcome'] = false;
         
         $_SESSION['user'] = $userData;
     
@@ -974,7 +1084,7 @@ class UsersController extends Controller
         
         if (!in_array('username', $fieldsToIgnore) && $this->requestData['username'] == '') {
             
-            $this->addError(_('Missing username'));
+            $this->addError(_('Missing username.'));
             
             $result = false;
         
@@ -982,7 +1092,7 @@ class UsersController extends Controller
         
         if (!in_array('password', $fieldsToIgnore) && $this->requestData['password'] == '') {
             
-            $this->addError(_('Missing password'));
+            $this->addError(_('Missing password.'));
             
             $result = false;
         
@@ -990,7 +1100,7 @@ class UsersController extends Controller
         
         if (!in_array('password_2', $fieldsToIgnore) && $this->requestData['password_2'] == '') {
             
-            $this->addError(_('Missing password repeat'));
+            $this->addError(_('Missing password repeat.'));
             
             $result = false;
         
@@ -999,7 +1109,7 @@ class UsersController extends Controller
 
         if (!in_array('first_name', $fieldsToIgnore) && $this->requestData['first_name'] == '') {
             
-            $this->addError(_('Missing first name'));
+            $this->addError(_('Missing first name.'));
             
             $result = false;
         
@@ -1007,7 +1117,7 @@ class UsersController extends Controller
         
         if (!in_array('last_name', $fieldsToIgnore) && $this->requestData['last_name'] == '') {
             
-            $this->addError(_('Missing last name'));
+            $this->addError(_('Missing last name.'));
             
             $result = false;
         
@@ -1015,7 +1125,7 @@ class UsersController extends Controller
         
         if (!in_array('email_address', $fieldsToIgnore) && $this->requestData['email_address'] == '') {
             
-            $this->addError(_('Missing email address'));
+            $this->addError(_('Missing email address.'));
             
             $result = false;
         
@@ -1037,11 +1147,13 @@ class UsersController extends Controller
      * @access     private
      * @todo        a more complete check
      */
-    private function isUsernameCorrect ($username = false)
+    private function isUsernameCorrect ($username = false,$ignoreEmptiness = false)
     {
         
         if (!$username)
             $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
+
+		if (empty($username) && $ignoreEmptiness) return;
         
         $result = true;
         
@@ -1129,12 +1241,14 @@ class UsersController extends Controller
      * @return     boolean    address is correct or not
      * @access     private
      */
-    private function isEmailAddressCorrect ($email_address = false)
+    private function isEmailAddressCorrect ($email_address = false,$ignoreEmptiness = false)
     {
         
         if (!$email_address)
             $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
         
+		if (empty($email_address) && $ignoreEmptiness) return;
+		
         $result = true;
         
         $regexp = "/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/";
@@ -1161,13 +1275,14 @@ class UsersController extends Controller
      * @access     private
      */
     
-    private function isUserDataCorrect ($fieldsToIgnore = array())
+    private function isUserDataCorrect ($fieldsToIgnore = null,$ignoreEmptiness = false)
     {
-        
+        if ($fieldsToIgnore == null) $fieldsToIgnore = array();
+
         $result = true;
         
         if (!in_array('username', $fieldsToIgnore)) {
-            if (!$this->isUsernameCorrect())
+            if (!$this->isUsernameCorrect(false,$ignoreEmptiness))
                 $result = false;
         }
         
@@ -1177,7 +1292,7 @@ class UsersController extends Controller
         }
         
         if (!in_array('email_address', $fieldsToIgnore)) {
-            if (!$this->isEmailAddressCorrect())
+            if (!$this->isEmailAddressCorrect(false,$ignoreEmptiness))
                 $result = false;
         }
         
