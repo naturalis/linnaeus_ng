@@ -526,7 +526,7 @@ function moduleChangeModuleUserStatus(ele,module,user,action,type) {
 						var classb = 'cell-moduser-inactive';
 						break;
 				}			
-	
+
 				$('#'+ele.id).removeClass().addClass(classb);
 				$('#'+ele.id.replace('b','a')).removeClass().addClass(classa);
 				$('#cell-'+(type=='free' ? 'f' : '')+module+'n').

@@ -17,7 +17,12 @@ class UsersController extends Controller
         'role', 
         'project_role_user', 
         'right_role',
-        'timezone'
+        'timezone',
+        'module', 
+        'module_project', 
+        'free_module_project', 
+        'module_project_user', 
+        'free_module_project_user', 
     );
     
     public $controllerPublicName = 'User administration';
@@ -405,8 +410,43 @@ class UsersController extends Controller
 					
 					} else {
 					// save new user					
-                    
+
 						if ($this->saveUser($this->requestData)) {
+						
+							$userId = $this->models->User->getNewId();
+
+							if (isset($this->requestData['modules'])) {
+
+								foreach((array)$this->requestData['modules'] as $key => $val) {
+
+									$this->models->ModuleProjectUser->save(
+										array(
+											'id' => null, 
+											'project_id' => $this->getCurrentProjectId(), 
+											'module_id' => $val,
+											'user_id' => $userId
+										)
+									);
+
+								}
+
+							}
+
+							if (isset($this->requestData['freeModules'])) {
+
+								foreach((array)$this->requestData['freeModules'] as $key => $val) {
+
+									$this->models->FreeModuleProjectUser->save(
+									array(
+										'id' => null, 
+										'project_id' => $this->getCurrentProjectId(), 
+										'free_module_id' => $val,
+										'user_id' => $userId
+									));
+
+								}
+
+							}
 
 							$this->redirect('index.php');
 						
@@ -420,11 +460,23 @@ class UsersController extends Controller
 
         }
 
-        $roles = $this->models->Role->get(array(
-            'assignable' => 'y'
-        ));
+        $modules = $this->models->ModuleProject->get(array(
+            'project_id' => $this->getCurrentProjectId()
+        ), false, 'module_id asc');
 
-		$zones = $this->models->Timezone->get('*');
+        foreach ((array) $modules as $key => $val) {
+            
+            $mp = $this->models->Module->get($val['module_id']);
+            
+            $modules[$key]['module'] = $mp['module'];
+            
+            $modules[$key]['description'] = $mp['description'];
+            
+        }
+        
+        $freeModules = $this->models->FreeModuleProject->get(array(
+            'project_id' => $this->getCurrentProjectId()
+        ));
 
 		$maxLengths = array(
 			'username' => $this->controllerSettings['dataChecks']['username']['maxLength'],
@@ -434,12 +486,23 @@ class UsersController extends Controller
 			'email_address' => $this->controllerSettings['dataChecks']['email_address']['maxLength'],
 		);
 
+		$zones = $this->models->Timezone->get('*');
+
+        $roles = $this->models->Role->get(array(
+            'assignable' => 'y'
+        ));
+
+
 		$this->smarty->assign('maxLengths', $maxLengths);
 
 		$this->smarty->assign('zones', $zones);
 
         $this->smarty->assign('roles', $roles);
         
+        $this->smarty->assign('modules', $modules);
+
+        $this->smarty->assign('freeModules', $freeModules);
+
         $this->smarty->assign('data', $this->requestData);
         
         $this->printPage();
@@ -565,6 +628,51 @@ class UsersController extends Controller
     }
 
 
+	private function deleteUser($id)
+	{
+
+		// delete collaborator's role from this project
+		$this->models->ProjectRoleUser->delete(
+			array(
+				'user_id' => $id, 
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		$this->models->ModuleProjectUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $id
+			)
+		);
+
+		$this->models->FreeModuleProjectUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $id
+			)
+		);
+
+
+		// avoiding orphans: see if collaborator is present in any other projects...
+		$data = $this->models->ProjectRoleUser->get(
+			array(
+				'user_id' => $id
+			), 'count(*) as tot');
+		
+		// ...if not, delete entire collaborator record
+		if (isset($data) && $data[0]['tot'] == '0') {
+
+			$this->models->User->delete($id);
+			$this->models->ModuleProjectUser->delete($id);
+			$this->models->FreeModuleProjectUser->delete($id);
+
+		}
+
+
+
+	}
+
     /**
      * Editing collaborator data
      *
@@ -594,25 +702,7 @@ class UsersController extends Controller
 				
 				if ($pru[0]['role_id'] != 2) {
 				
-					// delete collaborator's role from this project
-					$this->models->ProjectRoleUser->delete(
-					array(
-						'user_id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId()
-					));
-					
-					// avoiding orphans: see if collaborator is present in any other projects...
-					$data = $this->models->ProjectRoleUser->get(
-					array(
-						'user_id' => $this->requestData['id']
-					), 'count(*) as tot');
-					
-					// ...if not, delete entire collaborator record
-					if (isset($data) && $data[0]['tot'] == '0') {
-						
-						$this->models->User->delete($this->requestData['id']);
-					
-					}
+					$this->deleteUser($this->requestData['id']);
 
 				} else {
 
@@ -810,7 +900,7 @@ class UsersController extends Controller
 			}
 			if (in_array('q',$this->requestData['tests'])) {
 
-				$this->isPasswordCorrect($this->requestData['values'][0],$this->requestData['values'][1]);
+				$this->arePasswordsIdentical($this->requestData['values'][0],$this->requestData['values'][1]);
 
 			}
         
@@ -1233,18 +1323,15 @@ class UsersController extends Controller
      * @access     private
      * @todo        a more complete check
      */
-    private function isPasswordCorrect ($password = false, $password_2 = false)
+    private function isPasswordCorrect ($password = false)
     {
 
 		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
 		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
-        
+
         if (!$password)
             $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
-        
-        if (!$password_2)
-            $password_2 = isset($this->requestData['password_2']) ? $this->requestData['password_2'] : null;
-        
+
         $result = true;
         
         if (strlen($password) < $min) {
@@ -1270,13 +1357,6 @@ class UsersController extends Controller
             
             $result = false;
         
-        } else
-        if ($password_2 != '' && ($password != $password_2)) {
-            
-            $this->addError(_('Passwords not the same.'));
-            
-            $result = false;
-        
         }
         
 
@@ -1284,6 +1364,25 @@ class UsersController extends Controller
     
     }
 
+    private function arePasswordsIdentical ($password = false, $password_2 = false)
+    {
+
+        if (!$password)
+            $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
+
+        if (!$password_2)
+            $password_2 = isset($this->requestData['password_2']) ? $this->requestData['password_2'] : null;
+        
+        if ($password_2 != '' && ($password != $password_2)) {
+            
+            $this->addError(_('Passwords not the same.'));
+            
+			return false;        
+        }
+		
+		return true;
+
+	}
 
 
     /**
@@ -1349,6 +1448,7 @@ class UsersController extends Controller
     
     private function isUserDataCorrect ($fieldsToIgnore = null,$ignoreEmptiness = false)
     {
+
         if ($fieldsToIgnore == null) $fieldsToIgnore = array();
 
         $result = true;
