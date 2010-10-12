@@ -268,6 +268,24 @@ a:hover,.pseudo-a:hover {
 	padding-left:10px;
 }
 
+.password-weak,.password-moderate,.password-strong,.password-neutral {
+	background-color:#f77;
+	padding:0px 2px 0px 2px;
+}
+
+.password-neutral {
+	background-color:#fff;
+}
+
+.password-moderate {
+	background-color:#f90;
+}
+
+.password-strong {
+	background-color:#7f7;
+}
+
+
 .cell-module-header-module,.cell-module-header-status,.cell-module-header-actions {
 	border-bottom:1px solid #ccc;
 }
@@ -583,3 +601,4 @@ a:hover,.pseudo-a:hover {
 	background-repeat: no-repeat;
 	width: 16px;
 }
+

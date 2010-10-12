@@ -78,7 +78,7 @@ class UtilitiesController extends Controller
         
         $this->smarty->assign('hideControllerPublicName', true);
         
-        $this->addError(_('The module "' . $_SESSION['system']['last_module_name'] . '" is not part of your project.'));
+        $this->addError(sprintf(_('The module "%s" is not part of your project.'),$_SESSION['system']['last_module_name']));
         
         $this->printPage();
     

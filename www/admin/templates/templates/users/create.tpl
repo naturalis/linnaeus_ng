@@ -13,7 +13,7 @@
 				name="username" 
 				id="username" 
 				value="{$data.username}" 
-				maxlength="16" 
+				maxlength="{$maxLengths.username}" 
 				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'])" 
 			/>
 			<span class="asterisk-required-field">*</span>
@@ -29,11 +29,12 @@
 				name="password"
 				id="password"
 				value="{$data.password}"
-				maxlength="16"
-				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
+				maxlength="{$maxLengths.password}"
+				onkeyup="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="password-message" class=""></span>	</td>	
+			<span id="password-message" class=""></span>	
+		</td>	
 	</tr>
 	<tr>
 		<td>password (repeat)</td>
@@ -43,7 +44,7 @@
 				name="password_2" 
 				id="password_2" 
 				value="{$data.password_2}" 
-				maxlength="16" 
+				maxlength="{$maxLengths.password}" 
 				onblur="userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'])"
 			/>
 			<span class="asterisk-required-field">*</span>
@@ -59,7 +60,7 @@
 				name="first_name"
 				id="first_name"
 				value="{$data.first_name}" 
-				maxlength="32" 
+				maxlength="{$maxLengths.first_name}" 
 				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
 			<span class="asterisk-required-field">*</span>
@@ -75,7 +76,7 @@
 				name="last_name"
 				id="last_name"
 				value="{$data.last_name}"
-				maxlength="32"
+				maxlength="{$maxLengths.last_name}"
 				onblur="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
 			<span class="asterisk-required-field">*</span>
@@ -91,7 +92,7 @@
 				name="email_address" 
 				id="email_address" 
 				value="{$data.email_address}" 
-				maxlength="64" 
+				maxlength="{$maxLengths.email_address}" 
 				onblur="userRemoteValueCheck(this.id,[this.value],['f','e'])"
 			/>
 			<span class="asterisk-required-field">*</span>
