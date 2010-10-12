@@ -1,5 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="../shared/admin-messages.tpl"}
+
 <div id="page-main">
 <form method="post" action="" name="theForm" id="theForm">
 	<input name="id" value="{$data.id}" type="hidden" />
@@ -192,6 +194,20 @@
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
+		<td colspan="2">Select the modules this collaborator will be assigned to:</td>
+	</tr>
+{section name=i loop=$modules}
+<tr><td><label for="module-{$modules[i].module_id}">{$modules[i].module}</label></td><td><input id="module-{$modules[i].module_id}" type="checkbox" value="{$modules[i].module_id}" name="modules[]"  {if $modules[i].isAssigned}checked="checked"{/if}/></td></tr>
+{/section}
+	<tr>
+	</tr>
+{section name=i loop=$freeModules}
+<tr><td><label for="freemodule-{$freeModules[i].id}">{$freeModules[i].module}</label></td><td><input id="freemodule-{$freeModules[i].id}" type="checkbox" value="{$freeModules[i].id}" name="freeModules[]"  {if $freeModules[i].isAssigned}checked="checked"{/if}/></td></tr>
+{/section}
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>	
+	<tr>
 		<td colspan="2">
 			<input type="submit" value="save" />
 			{if $userRole.role_id != 2}
@@ -206,8 +222,6 @@
 </form>
 
 </div>
-
-{include file="../shared/admin-messages.tpl"}
 
 {literal}
 <script type="text/JavaScript">

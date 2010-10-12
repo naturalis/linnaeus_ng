@@ -1,5 +1,32 @@
 {include file="../shared/admin-header.tpl"}
 
+{if $existingUser!=false}
+<div id="page-block-messages">
+<span class="admin-message">
+{if $existingUserReason=='same name'}
+A similar user, albeit with a different e-mail address, already exists in this or another project:<br/>
+<span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
+Would you like to connect that user to the current project instead of creating a new one with the same name?
+<br /><br />
+<input type="button" value="yes, connect existing" onclick="userConnectExistingUser();" />
+<input type="button" value="no, create new" onclick="userCreateUserFromSession();" />
+
+{else}
+
+A user with the same e-mail address already exists in another project:<br />
+<span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
+You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?
+<br /><br />
+<input type="button" value="yes, connect user"  onclick="userConnectExistingUser();" />
+<input type="button" value="no, cancel"  onclick="window.open('{$session.system.referer.url}','_top');" />
+
+{/if}
+</span>
+</div>
+{/if}
+
+{include file="../shared/admin-messages.tpl"}
+
 <div id="page-main">
 
 <form method="post" action="" name="theForm" id="theForm">
@@ -210,38 +237,8 @@
 </table>
 
 
-
-
 </form>
 </div>
-
-{if $existingUser!=false}
-<div id="page-block-messages">
-<span class="admin-message">
-{if $existingUserReason=='same name'}
-A similar user, albeit with a different e-mail address, already exists in this or another project:<br/>
-<span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
-Would you like to connect that user to the current project instead of creating a new one with the same name?
-<br /><br />
-<input type="button" value="yes, connect existing" onclick="userConnectExistingUser();" />
-<input type="button" value="no, create new" onclick="userCreateUserFromSession();" />
-
-{else}
-
-A user with the same e-mail address already exists in another project:<br />
-<span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
-You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?
-<br /><br />
-<input type="button" value="yes, connect user"  onclick="userConnectExistingUser();" />
-<input type="button" value="no, cancel"  onclick="window.open('{$session.system.referer.url}','_top');" />
-
-{/if}
-</span>
-</div>
-{/if}
-
-
-{include file="../shared/admin-messages.tpl"}
 
 {literal}
 <script type="text/JavaScript">
