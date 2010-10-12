@@ -340,7 +340,7 @@ function moduleDrawFreeModuleBlock() {
 					'<span class="module-title-'+(moduleFreeModules[i][2]=='y' ? 'in-use' : 'inactive')+'" id="cell-'+moduleFreeModules[i][0]+'d">'+
 					'<span class="module-title">'+moduleFreeModules[i][1]+'</span>'+
 				'</td>'+
-				'<td>'+
+				'<td>part of the project; '+
 					(moduleFreeModules[i][2]=='y' ? 'published' : 'unpublished')+
 				'</td>'+
 				'<td onclick="'+(moduleFreeModules[i][2]=='y' ? 'moduleUnpublishFreeModule('+moduleFreeModules[i][0]+')' : 'modulePublishFreeModule('+moduleFreeModules[i][0]+')')+'">'+
