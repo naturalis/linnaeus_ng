@@ -21,7 +21,7 @@
 	<td class="cell-userlist-{$columnsToShow[j].align}-align">{$users[i].$colname}</td>{/section}
 	<td>[<a href="view.php?id={$users[i].id}">view</a>]</td>
 	<td>[<a href="edit.php?id={$users[i].id}">edit</a>]</td>
-	<td>[<span class="pseudo-a" onclick="userDeleteUser({$users[i].id});">delete</span>]</td>
+	<td>{if $users[i].role_id != 2}[<span class="pseudo-a" onclick="userDeleteUser({$users[i].id});">delete</span>]{/if}</td>
 </tr>
 {/section}
 </table>
