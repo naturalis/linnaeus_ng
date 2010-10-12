@@ -112,8 +112,8 @@ abstract class Model extends BaseClass
     {
 
         foreach ((array) $data as $key => $val) {
-            
-            $data[$key] = $this->escapeString($val);
+
+			if (!is_array($val)) $data[$key] = $this->escapeString($val);
         
         }
         
@@ -123,6 +123,9 @@ abstract class Model extends BaseClass
         
         foreach ((array) $data as $key => $val) {
             
+            if (is_array($val))
+                continue;
+
             if (empty($this->columns[$key]))
                 continue;
             
@@ -317,18 +320,15 @@ abstract class Model extends BaseClass
             
             }
         
-        }
-        elseif (is_string($id)) {
-            
-            $query = str_replace('%table%', $this->tableName, $id);
-        
-        }
-        elseif ($id + 0 == $id) {
+        } elseif (is_numeric($id)) {
             
             $query = 'delete from ' . $this->tableName . ' where id = ' . ($id ? $id : $this->id) . ' limit 1';
         
-        }
-        else {
+        } elseif (is_string($id)) {
+            
+            $query = str_replace('%table%', $this->tableName, $id);
+        
+        } else {
             
             return;
         

@@ -32,6 +32,7 @@
 				<table>
 				{section name=j loop=$users}
 					{assign var=x value=$users[j].id}
+
 					<tr>
 						<td class="modusers-block-buffercell"></td>
 					{if $modules[i].collaborators[$x].user_id == $users[j].id}
@@ -62,6 +63,7 @@
 						</td>
 					{/if}
 					</tr>
+
 				{/section}			
 				</table>
 			</td>

@@ -54,9 +54,21 @@ class User extends Model
         }
         
         foreach ((array) $data as $key => $val) {
-            
-            $data[$key] = trim($val);
-        
+
+			if (is_array($val)) {
+
+		        foreach ((array) $val as $key2 => $val2) {
+
+		            $val[$key2] = trim($val2);
+
+				}
+
+			} else {
+
+	            $data[$key] = trim($val);
+    
+			}
+    
         }
         
         return $data;

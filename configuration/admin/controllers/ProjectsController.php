@@ -16,11 +16,11 @@ class ProjectsController extends Controller
     public $usedModels = array(
         'project', 
         'module', 
-        'module_project', 
-        'free_module_project', 
         'project_role_user', 
         'user', 
         'role', 
+        'module_project', 
+        'free_module_project', 
         'module_project_user', 
         'free_module_project_user', 
         'language', 
