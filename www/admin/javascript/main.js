@@ -236,7 +236,17 @@ function userRemoteValueCheck(id,values,tests,idti) {
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
-			$('#'+id+'-message').html(data);
+			if (id=='password') {
+				if (data.match(/\<*\>/)) {
+					$('#'+id+'-message').removeClass().addClass('password-'+data.replace(/[<>]/gi,''));
+					$('#'+id+'-message').html('Password strength: '+data.replace(/[<>]/gi,''));
+				} else {
+					$('#'+id+'-message').removeClass().addClass('password-neutral');
+					$('#'+id+'-message').html(data);
+				}
+			} else {
+				$('#'+id+'-message').html(data);
+			}
 		}
 	});
 

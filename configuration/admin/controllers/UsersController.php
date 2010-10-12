@@ -146,7 +146,7 @@ class UsersController extends Controller
             if (count((array) $users) != 1) {
             // no user found
                 
-                $this->addError(_('Login failed'));
+                $this->addError(_('Login failed.'));
 
             } else {
             // user found
@@ -183,7 +183,6 @@ class UsersController extends Controller
         $this->redirect('login.php');
     
     }
-
 
 
     /**
@@ -293,7 +292,7 @@ class UsersController extends Controller
 		
 		if ($r !== true) {
 			
-			$this->addError(_('Failed to save user'));
+			$this->addError(_('Failed to save user.'));
 			
 			return false;
 			
@@ -403,7 +402,7 @@ class UsersController extends Controller
 					if (!$saveUser) {
 					// if unassignable, raise error
 						
-						$this->addError(_('Unassignable role selected'));
+						$this->addError(_('Unassignable role selected.'));
 					
 					} else {
 					// save new user					
@@ -427,6 +426,16 @@ class UsersController extends Controller
         ));
 
 		$zones = $this->models->Timezone->get('*');
+
+		$maxLengths = array(
+			'username' => $this->controllerSettings['dataChecks']['username']['maxLength'],
+			'password' => $this->controllerSettings['dataChecks']['password']['maxLength'],
+			'first_name' => $this->controllerSettings['dataChecks']['first_name']['maxLength'],
+			'last_name' => $this->controllerSettings['dataChecks']['last_name']['maxLength'],
+			'email_address' => $this->controllerSettings['dataChecks']['email_address']['maxLength'],
+		);
+
+		$this->smarty->assign('maxLengths', $maxLengths);
 
 		$this->smarty->assign('zones', $zones);
 
@@ -522,7 +531,6 @@ class UsersController extends Controller
     }
 
 
-
     /**
      * Viewing data of a collaborator
      *
@@ -555,7 +563,6 @@ class UsersController extends Controller
         }
     
     }
-
 
 
     /**
@@ -744,6 +751,47 @@ class UsersController extends Controller
     }
 
 
+	private function getPasswordStrength($password)
+	{
+
+		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
+		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
+
+		if (strlen($password) > $max) {
+
+            $this->smarty->assign('returnText',sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
+
+		} else
+		if (strlen($password) < $min) {
+
+            $this->smarty->assign('returnText',sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
+
+		} else
+		if (strlen($password) < ($min + 3)) {
+
+			$this->smarty->assign('returnText','<weak>');
+
+		} else {
+		
+			if (
+				preg_match_all('/[0-9]/',$password,$d)>=1 && 
+				preg_match_all('/[a-zA-Z]/',$password,$d)>=1 && 
+				preg_match_all('/[^a-zA-Z0-9]/',$password,$d)>=1
+			) {
+
+				$this->smarty->assign('returnText','<strong>');
+
+			} else {
+
+				$this->smarty->assign('returnText','<moderate>');
+
+			}
+
+
+		}
+
+	}
+
 
     /**
      * AJAX interface for this class
@@ -753,33 +801,45 @@ class UsersController extends Controller
     public function ajaxInterfaceAction ()
     {
 
-/*
-
-        $field = $this->requestData['f'];
-        
-        $values = explode(',', $this->requestData['v']);
-        
-        $tests = explode(',', $this->requestData['t']);
-        
-        $idToIgnore = isset($this->requestData['i']) ? $this->requestData['i'] : false;
-        
-        if ($field == '')
-            return;
-*/
 
         if (!isset($this->requestData['action'])) return;
-        
+		
+		$idsToIgnore = isset($this->requestData['id_to_ignore']) ? $this->requestData['id_to_ignore'] : null;
 
         if ($this->requestData['action'] == 'check_username') {
 
-			if (in_array('e',$this->requestData['tests'])) {
-
-				$this->isUsernameUnique($this->requestData['values'][0], $this->requestData['id_to_ignore']);
-
-			}
 			if (in_array('f',$this->requestData['tests'])) {
 
-				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value'));
+				$this->isUsernameCorrect($this->requestData['values'][0]);
+
+			}
+			if (in_array('e',$this->requestData['tests'])) {
+
+				$this->isUsernameUnique($this->requestData['values'][0], $idsToIgnore);
+
+			}
+        
+		} else
+        if ($this->requestData['action'] == 'check_password') {
+
+			if (in_array('f',$this->requestData['tests'])) {
+
+//				$this->isPasswordCorrect($this->requestData['values'][0]);
+				$this->getPasswordStrength($this->requestData['values'][0]);
+
+			}
+        
+		} else
+        if ($this->requestData['action'] == 'check_passwords') {
+
+			if (in_array('f',$this->requestData['tests'])) {
+
+				$this->isPasswordCorrect($this->requestData['values'][0]);
+
+			}
+			if (in_array('q',$this->requestData['tests'])) {
+
+				$this->isPasswordCorrect($this->requestData['values'][0],$this->requestData['values'][1]);
 
 			}
         
@@ -788,7 +848,7 @@ class UsersController extends Controller
 
 			if (in_array('e',$this->requestData['tests'])) {
 
-				$this->isEmailAddressUnique($this->requestData['values'][0], $this->requestData['id_to_ignore']);
+				$this->isEmailAddressUnique($this->requestData['values'][0], $idsToIgnore);
 
 			}
 			if (in_array('f',$this->requestData['tests'])) {
@@ -802,7 +862,7 @@ class UsersController extends Controller
 
 			if (in_array('f',$this->requestData['tests'])) {
 
-				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value'));
+				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value.'));
 			
 			}
         
@@ -1140,7 +1200,7 @@ class UsersController extends Controller
     /**
      * Check whether a username qualifies as correct
      *
-     * Looks currently only at length constraints (5 <= length <= 16)
+     * Looks currently only at length constraints (2 <= length <= 32)
      *
      * @param      string    $username    username to check; if absent, username is taken from the request variables
      * @return     boolean    username is correct or not
@@ -1150,6 +1210,9 @@ class UsersController extends Controller
     private function isUsernameCorrect ($username = false,$ignoreEmptiness = false)
     {
         
+		$min = $this->controllerSettings['dataChecks']['username']['minLength'];
+		$max = $this->controllerSettings['dataChecks']['username']['maxLength'];
+		
         if (!$username)
             $username = isset($this->requestData['username']) ? $this->requestData['username'] : null;
 
@@ -1157,17 +1220,26 @@ class UsersController extends Controller
         
         $result = true;
         
-        if (strlen($username) < 5) {
+        if (strlen($username) < $min) {
             
-            $this->addError(_('Username too short'));
+            $this->addError(sprintf(_('Username too short; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
-        }
-        
-        if (strlen($username) > 16) {
+        } else
+        if (strlen($username) > $max) {
             
-            $this->addError(_('Username too long'));
+            $this->addError(sprintf(_('Username too long; should be between %s and %s characters.'),$min,$max));
+            
+            $result = false;
+        
+        } else
+        if (
+			isset($this->controllerSettings['dataChecks']['username']['regexp']) && 
+			!preg_match($this->controllerSettings['dataChecks']['username']['regexp'],$username)
+		) {
+            
+            $this->addError(_('Username has incorrect format.'));
             
             $result = false;
         
@@ -1192,6 +1264,9 @@ class UsersController extends Controller
      */
     private function isPasswordCorrect ($password = false, $password_2 = false)
     {
+
+		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
+		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
         
         if (!$password)
             $password = isset($this->requestData['password']) ? $this->requestData['password'] : null;
@@ -1201,25 +1276,33 @@ class UsersController extends Controller
         
         $result = true;
         
-        if (strlen($password) < 5) {
+        if (strlen($password) < $min) {
             
-            $this->addError(_('Password too short'));
-            
-            $result = false;
-        
-        }
-        
-        if (strlen($password) > 16) {
-            
-            $this->addError(_('Password too long'));
+            $this->addError(sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
-        }
+        } else
+        if (strlen($password) > $max) {
+            
+            $this->addError(sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
+            
+            $result = false;
         
+        } else
+        if (
+			isset($this->controllerSettings['dataChecks']['password']['regexp']) && 
+			!preg_match($this->controllerSettings['dataChecks']['password']['regexp'],$password)
+			)  {
+
+            $this->addError(_('Password has incorrect format.'));
+            
+            $result = false;
+        
+        } else
         if ($password_2 != '' && ($password != $password_2)) {
             
-            $this->addError(_('Passwords not the same'));
+            $this->addError(_('Passwords not the same.'));
             
             $result = false;
         
@@ -1248,14 +1331,32 @@ class UsersController extends Controller
             $email_address = isset($this->requestData['email_address']) ? $this->requestData['email_address'] : null;
         
 		if (empty($email_address) && $ignoreEmptiness) return;
+
+		$min = $this->controllerSettings['dataChecks']['email_address']['minLength'];
+		$max = $this->controllerSettings['dataChecks']['email_address']['maxLength'];
 		
         $result = true;
         
-        $regexp = "/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/";
-        
-        if (!preg_match($regexp, $email_address)) {
+        if (strlen($email_address) < $min) {
             
-            $this->addError(_('Invalid e-mail address'));
+            $this->addError(sprintf(_('E-mail adress too short; should be between %s and %s characters.'),$min,$max));
+            
+            $result = false;
+        
+        } else
+        if (strlen($email_address) > $max) {
+            
+            $this->addError(sprintf(_('E-mail adress too long; should be between %s and %s characters.'),$min,$max));
+            
+            $result = false;
+        
+        } else
+        if (
+			isset($this->controllerSettings['dataChecks']['email_address']['regexp']) && 
+			!preg_match($this->controllerSettings['dataChecks']['email_address']['regexp'],$email_address)
+			)  {
+            
+            $this->addError(_('Invalid e-mail address.'));
             
             $result = false;
         
@@ -1343,7 +1444,7 @@ class UsersController extends Controller
             
             if (count((array) $users) != 0) {
                 
-                $this->addError(_('Username already exists'));
+                $this->addError(_('Username already exists.'));
                 
                 $result = false;
             
@@ -1400,7 +1501,7 @@ class UsersController extends Controller
             if (count((array) $users) != 0) {
                 
                 if (!$suppress_error)
-                    $this->addError(_('E-mail address already exists'));
+                    $this->addError(_('E-mail address already exists.'));
                 
                 $result = false;
             

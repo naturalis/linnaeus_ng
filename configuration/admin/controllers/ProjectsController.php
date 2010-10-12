@@ -271,7 +271,7 @@ not sure if helper is all that useful
             }
             else {
                 
-                $this->addError(_('Upload failed'));
+                $this->addError(_('Upload failed,'));
                 
                 $this->addError($fuh['error']);
             

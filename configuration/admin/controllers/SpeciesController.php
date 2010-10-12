@@ -207,7 +207,7 @@ class SpeciesController extends Controller
             
             $taxon = $t[0];
             
-            $this->setPageName(_('Editing') . ' "' . $taxon['taxon'] . '"');
+            $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
         
         
 			if (!$this->doLockOutUser($this->requestData['id'])) {
@@ -470,7 +470,7 @@ class SpeciesController extends Controller
             
             $taxon = $t[0];
             
-            $this->setPageName(_('Media for') . ' "' . $taxon['taxon'] . '"');
+            $this->setPageName(sprintf(_('Media for "%s"'),$taxon['taxon']));
 
             $this->smarty->assign('id',$this->requestData['id']);
 
@@ -515,7 +515,7 @@ class SpeciesController extends Controller
 
         } else {
 
-            $this->addError(_('No taxon specified'));
+            $this->addError(_('No taxon specified.'));
 
         } 
         
@@ -552,7 +552,7 @@ class SpeciesController extends Controller
             
             if ($taxon['id']) {
 
-                $this->setPageName(_('New media for') . ' "' . $taxon['taxon'] . '"');
+                $this->setPageName(sprintf(_('New media for "%s"'),$taxon['taxon']));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
                     $this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
@@ -602,7 +602,7 @@ class SpeciesController extends Controller
                 
                             if ($mt) {
                                  
-                                $this->addMessage(_('Saved:').' '.$file['original_name'].' ('.$file['media_name'].')');
+                                $this->addMessage(sprintf(_('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
     
                             } else {
     
@@ -635,7 +635,7 @@ class SpeciesController extends Controller
 
         } else {
 
-            $this->addError(_('No taxon specified'));
+            $this->addError(_('No taxon specified.'));
 
         }        
 
@@ -1277,28 +1277,28 @@ class SpeciesController extends Controller
                                             
                     } else {
                         
-                        $this->addError(_('Could not save taxon content'));
+                        $this->addError(_('Could not save taxon content.'));
                     
                     }
                 
                 }
                 else {
                     
-                    $this->addError(_('No page title specified'));
+                    $this->addError(_('No page title specified.'));
                 
                 }
             
             }
             else {
                 
-                $this->addError(_('No language specified'));
+                $this->addError(_('No language specified.'));
             
             }
         
         }
         else {
             
-            $this->addError(_('Could not save taxon'));
+            $this->addError(_('Could not save taxon.'));
         
         }
     
@@ -1979,7 +1979,7 @@ class SpeciesController extends Controller
 
             } else {
             
-                if ($output) $this->addError(_('Could not delete file:').' '.$mt[0]['file_name']);
+                if ($output) $this->addError(sprintf(_('Could not delete file: %s'),$mt[0]['file_name']));
         
             }
     
