@@ -225,101 +225,6 @@ class UsersController extends Controller
     
     }
 
-	private function ajaxActionConnectExistingUser()
-	{
-
-		if (
-			!isset($_SESSION['data']['new_user']['role_id']) ||
-			!isset($_SESSION['data']['new_user']['existing_user_id'])
-		) return;
-
-
-		$this->models->ProjectRoleUser->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
-			)
-		);
-
-		// save new role only for existing collaborator and new project
-		$pru = $this->models->ProjectRoleUser->save(
-			array(
-				'id' => null, 
-				'project_id' => $this->getCurrentProjectId(), 
-				'role_id' => $_SESSION['data']['new_user']['role_id'], 
-				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
-			)
-		);
-		
-		if (!$pru) {
-
-			$this->addError(_('Failed to connect user from session.'));
-
-		} else {
-
-			unset($_SESSION['data']['new_user']);
-
-		}
-
-	}
-
-	private function ajaxActionCreateUserFromSession ()
-	{
-	
-		if (!isset($_SESSION['data']['new_user'])) return;
-	
-		$su = $this->saveUser($_SESSION['data']['new_user']);
-
-		if (!$su) {
-
-			$this->addError(_('Failed to create user from session.'));
-
-		} else {
-
-			unset($_SESSION['data']['new_user']);
-
-		}
-
-	}
-
-	private function saveUser($data)
-	{
-
-		// encode passwords
-		$data['password'] = $this->userPasswordEncode($data['password']);
-		
-		$data['active'] = '1';
-		
-		$data['id'] = null;
-		
-		$r = $this->models->User->save($data);
-		
-		if ($r !== true) {
-			
-			$this->addError(_('Failed to save user.'));
-			
-			return false;
-			
-		} else {
-			
-			// if saving was succesful, save new role
-			$newUserId = $this->models->User->getNewId();
-			
-			$this->models->ProjectRoleUser->save(
-			array(
-				'id' => null, 
-				'project_id' => $this->getCurrentProjectId(), 
-				'role_id' => $data['role_id'], 
-				'user_id' => $newUserId,
-				'active' => '1'
-			));
-
-			return true;
-		
-		}
-						
-	}
-
 
     /**
      * Creating a new collaborator
@@ -411,43 +316,8 @@ class UsersController extends Controller
 					} else {
 					// save new user					
 
-						if ($this->saveUser($this->requestData)) {
+						if ($this->saveNewUser($this->requestData)) {
 						
-							$userId = $this->models->User->getNewId();
-
-							if (isset($this->requestData['modules'])) {
-
-								foreach((array)$this->requestData['modules'] as $key => $val) {
-
-									$this->models->ModuleProjectUser->save(
-										array(
-											'id' => null, 
-											'project_id' => $this->getCurrentProjectId(), 
-											'module_id' => $val,
-											'user_id' => $userId
-										)
-									);
-
-								}
-
-							}
-
-							if (isset($this->requestData['freeModules'])) {
-
-								foreach((array)$this->requestData['freeModules'] as $key => $val) {
-
-									$this->models->FreeModuleProjectUser->save(
-									array(
-										'id' => null, 
-										'project_id' => $this->getCurrentProjectId(), 
-										'free_module_id' => $val,
-										'user_id' => $userId
-									));
-
-								}
-
-							}
-
 							$this->redirect('index.php');
 						
 						}
@@ -628,51 +498,6 @@ class UsersController extends Controller
     }
 
 
-	private function deleteUser($id)
-	{
-
-		// delete collaborator's role from this project
-		$this->models->ProjectRoleUser->delete(
-			array(
-				'user_id' => $id, 
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-
-		$this->models->ModuleProjectUser->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $id
-			)
-		);
-
-		$this->models->FreeModuleProjectUser->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $id
-			)
-		);
-
-
-		// avoiding orphans: see if collaborator is present in any other projects...
-		$data = $this->models->ProjectRoleUser->get(
-			array(
-				'user_id' => $id
-			), 'count(*) as tot');
-		
-		// ...if not, delete entire collaborator record
-		if (isset($data) && $data[0]['tot'] == '0') {
-
-			$this->models->User->delete($id);
-			$this->models->ModuleProjectUser->delete($id);
-			$this->models->FreeModuleProjectUser->delete($id);
-
-		}
-
-
-
-	}
-
     /**
      * Editing collaborator data
      *
@@ -787,20 +612,23 @@ class UsersController extends Controller
                     if ($upr['role_id'] != 1 && $upr['role_id'] != 2) {
                         
                         $this->models->ProjectRoleUser->save(
-                        array(
-                            'id' => $this->requestData['userProjectRole'], 
-                            'user_id' => $this->requestData['id'], 
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'role_id' => $this->requestData['role_id'],
-							'active' => $this->requestData['active']
-                        ));
-                    
+							array(
+								'id' => $this->requestData['userProjectRole'], 
+								'user_id' => $this->requestData['id'], 
+								'project_id' => $this->getCurrentProjectId(), 
+								'role_id' => $this->requestData['role_id'],
+								'active' => $this->requestData['active']
+							)
+						);
+
                     } else {
                     // ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
                         
                         $this->requestData['active'] = 1;
                     
                     }
+
+					$this->saveUsersModuleData($this->requestData,$this->requestData['id'],true);
                     
                     // save the new data
 					/*
@@ -834,9 +662,54 @@ class UsersController extends Controller
 
             $zones = $this->models->Timezone->get('*');
 
+			$modules = $this->models->ModuleProject->get(array(
+				'project_id' => $this->getCurrentProjectId()
+			), false, 'module_id asc');
+	
+			foreach ((array) $modules as $key => $val) {
+				
+				$mp = $this->models->Module->get($val['module_id']);
+				
+				$modules[$key]['module'] = $mp['module'];
+				
+				$modules[$key]['description'] = $mp['description'];
+
+				$mpu = $this->models->ModuleProjectUser->get(array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $val['module_id'],
+					'user_id' => $this->requestData['id'],			
+				),'count(*) as total');
+
+				$modules[$key]['isAssigned'] = $mpu[0]['total']=='1';
+
+			}
+			
+			$freeModules = $this->models->FreeModuleProject->get(
+				array(
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+			foreach ((array) $freeModules as $key => $val) {
+				
+				$fpu = $this->models->FreeModuleProjectUser->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'free_module_id' => $val['id'],
+						'user_id' => $this->requestData['id'],			
+					),'count(*) as total');
+				
+				$freeModules[$key]['isAssigned'] = $fpu[0]['total']=='1';
+
+			}
+
             $this->smarty->assign('isLeadExpert', $upr['role_id'] == 2);
 
             $this->smarty->assign('zones', $zones);
+
+			$this->smarty->assign('modules', $modules);
+	
+			$this->smarty->assign('freeModules', $freeModules);
 
             $this->smarty->assign('roles', $roles);
             
@@ -942,6 +815,214 @@ class UsersController extends Controller
         $this->printPage();
 
     }
+
+
+	private function ajaxActionConnectExistingUser()
+	{
+
+		if (
+			!isset($_SESSION['data']['new_user']['role_id']) ||
+			!isset($_SESSION['data']['new_user']['existing_user_id'])
+		) return;
+
+
+		$this->models->ProjectRoleUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+			)
+		);
+
+		// save new role only for existing collaborator and new project
+		$pru = $this->models->ProjectRoleUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'role_id' => $_SESSION['data']['new_user']['role_id'], 
+				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+			)
+		);
+		
+		if (!$pru) {
+
+			$this->addError(_('Failed to connect user from session.'));
+
+		} else {
+
+			unset($_SESSION['data']['new_user']);
+
+		}
+
+	}
+
+	private function ajaxActionCreateUserFromSession ()
+	{
+	
+		if (!isset($_SESSION['data']['new_user'])) return;
+	
+		$su = $this->saveNewUser($_SESSION['data']['new_user']);
+
+		if (!$su) {
+
+			$this->addError(_('Failed to create user from session.'));
+
+		} else {
+
+			unset($_SESSION['data']['new_user']);
+
+		}
+
+	}
+
+	private function saveNewUser($data)
+	{
+
+		// encode passwords
+		$data['password'] = $this->userPasswordEncode($data['password']);
+		
+		$data['active'] = '1';
+		
+		$data['id'] = null;
+		
+		$r = $this->models->User->save($data);
+		
+		if ($r !== true) {
+			
+			$this->addError(_('Failed to save user.'));
+			
+			return false;
+			
+		} else {
+			
+			// if saving was succesful, save new role
+			$newUserId = $this->models->User->getNewId();
+			
+			$this->models->ProjectRoleUser->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getCurrentProjectId(), 
+					'role_id' => $data['role_id'], 
+					'user_id' => $newUserId,
+					'active' => '1'
+				)
+			);
+
+
+			$this->saveUsersModuleData($data,$newUserId); 
+
+			return true;
+		
+		}
+						
+	}
+
+
+	private function saveUsersModuleData($data,$userId,$deleteOld=false)
+	{
+
+		// is assigned modules are present, save those
+		if (isset($data['modules'])) {
+
+			if ($deleteOld) {
+
+				$this->models->ModuleProjectUser->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'user_id' => $userId
+					)
+				);
+
+			}
+
+			foreach((array)$data['modules'] as $key => $val) {
+
+				$this->models->ModuleProjectUser->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'module_id' => $val,
+						'user_id' => $userId
+					)
+				);
+
+			}
+
+		}
+
+		// is assigned free modules are present, save those
+		if (isset($data['freeModules'])) {
+
+			if ($deleteOld) {
+
+				$this->models->FreeModuleProjectUser->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'user_id' => $userId
+					)
+				);
+
+			}
+
+			foreach((array)$data['freeModules'] as $key => $val) {
+
+				$this->models->FreeModuleProjectUser->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'free_module_id' => $val,
+						'user_id' => $userId
+					)
+				);
+
+			}
+
+		}
+
+	}
+
+
+	private function deleteUser($id)
+	{
+
+		// delete collaborator's role from this project
+		$this->models->ProjectRoleUser->delete(
+			array(
+				'user_id' => $id, 
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		$this->models->ModuleProjectUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $id
+			)
+		);
+
+		$this->models->FreeModuleProjectUser->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $id
+			)
+		);
+
+
+		// avoiding orphans: see if collaborator is present in any other projects...
+		$data = $this->models->ProjectRoleUser->get(
+			array(
+				'user_id' => $id
+			), 'count(*) as tot');
+		
+		// ...if not, delete entire collaborator record
+		if (isset($data) && $data[0]['tot'] == '0') {
+
+			$this->models->User->delete($id);
+			$this->models->ModuleProjectUser->delete($id);
+			$this->models->FreeModuleProjectUser->delete($id);
+
+		}
+
+	}
 
 
 	private function getPasswordStrength($password)
