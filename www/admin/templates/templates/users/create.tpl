@@ -223,14 +223,6 @@ You cannot create a new user with the same e-mail address, but you can connect t
 {/if}
 
 
-
-
-
-
-
-
-
-
 {include file="../shared/admin-messages.tpl"}
 
 {literal}

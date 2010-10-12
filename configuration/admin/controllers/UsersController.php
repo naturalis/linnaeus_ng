@@ -1,7 +1,6 @@
 <?php
 
 /*
-
     - replace hard coded role_id's
     - user.active is project wide, but can be set by specific project admins...
 
@@ -480,6 +479,7 @@ class UsersController extends Controller
             $r = $this->models->Role->get($val['role_id']);
             
             $u['role'] = $r['role'];
+            $u['role_id'] = $r['id'];
             $u['status'] = $val['status'];
             $u['days_active'] = $val['days_active'];
             $u['last_login'] = $val['last_login'];
@@ -585,28 +585,43 @@ class UsersController extends Controller
             // user requested delete
             if (isset($this->requestData['delete']) && $this->requestData['delete'] == '1') {
                 
-                // delete collaborator's role from this project
-                $this->models->ProjectRoleUser->delete(
-                array(
-                    'user_id' => $this->requestData['id'], 
-                    'project_id' => $this->getCurrentProjectId()
-                ));
-                
-                // avoiding orphans: see if collaborator is present in any other projects...
-                $data = $this->models->ProjectRoleUser->get(
-                array(
-                    'user_id' => $this->requestData['id']
-                ), 'count(*) as tot');
-                
-                // ...if not, delete entire collaborator record
-                if (isset($data) && $data[0]['tot'] == '0') {
-                    
-                    $this->models->User->delete($this->requestData['id']);
-                
-                }
-                
-                // redirect user to overview of remaining collaborators
-                $this->redirect('index.php');
+				$pru = $this->models->ProjectRoleUser->get(
+					array(
+						'user_id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+				
+				if ($pru[0]['role_id'] != 2) {
+				
+					// delete collaborator's role from this project
+					$this->models->ProjectRoleUser->delete(
+					array(
+						'user_id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					));
+					
+					// avoiding orphans: see if collaborator is present in any other projects...
+					$data = $this->models->ProjectRoleUser->get(
+					array(
+						'user_id' => $this->requestData['id']
+					), 'count(*) as tot');
+					
+					// ...if not, delete entire collaborator record
+					if (isset($data) && $data[0]['tot'] == '0') {
+						
+						$this->models->User->delete($this->requestData['id']);
+					
+					}
+
+				} else {
+
+					$this->addError(_('Cannot delete lead expert.'));
+	
+				}
+
+				// redirect user to overview of remaining collaborators
+				$this->redirect('index.php');                
                 
             } else if (isset($this->requestData['checked']) && $this->requestData['checked'] == '1') {
             // user requested data update
@@ -739,58 +754,15 @@ class UsersController extends Controller
             
             $this->smarty->assign('userRole', $upr);
             
-            $this->printPage();
-        
-        }
-        else {
+			$this->printPage();        
+
+        } else {
             
             $this->redirect();
         
         }
-    
+
     }
-
-
-	private function getPasswordStrength($password)
-	{
-
-		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
-		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
-
-		if (strlen($password) > $max) {
-
-            $this->smarty->assign('returnText',sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
-
-		} else
-		if (strlen($password) < $min) {
-
-            $this->smarty->assign('returnText',sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
-
-		} else
-		if (strlen($password) < ($min + 3)) {
-
-			$this->smarty->assign('returnText','<weak>');
-
-		} else {
-		
-			if (
-				preg_match_all('/[0-9]/',$password,$d)>=1 && 
-				preg_match_all('/[a-zA-Z]/',$password,$d)>=1 && 
-				preg_match_all('/[^a-zA-Z0-9]/',$password,$d)>=1
-			) {
-
-				$this->smarty->assign('returnText','<strong>');
-
-			} else {
-
-				$this->smarty->assign('returnText','<moderate>');
-
-			}
-
-
-		}
-
-	}
 
 
     /**
@@ -800,7 +772,6 @@ class UsersController extends Controller
      */
     public function ajaxInterfaceAction ()
     {
-
 
         if (!isset($this->requestData['action'])) return;
 		
@@ -880,48 +851,48 @@ class UsersController extends Controller
 
         $this->printPage();
 
-
-/*
-        
-        foreach ((array) $tests as $key => $test) {
-            
-            else if ($test == 'f') {
-                
-                switch ($field) {
-                    
- 
-                    
-                    case 'password':
-                        
-                        $this->isPasswordCorrect($values[0]);
-                        
-                        break;
-                    
-                    case 'password_2':
-                        
-                        $this->isPasswordCorrect($values[0], $values[1]);
-                        
-                        break;
-                    
-                    default:
-                        
-
-                
-                }
-            
-            }
-            else if ($test == 'q') {
-                
-                if ($field == 'password')
-                    $this->isPasswordCorrect($value[0], $value[1]);
-            
-            }
-        
-        }
-        
-*/
     }
 
+
+	private function getPasswordStrength($password)
+	{
+
+		$min = $this->controllerSettings['dataChecks']['password']['minLength'];
+		$max = $this->controllerSettings['dataChecks']['password']['maxLength'];
+
+		if (strlen($password) > $max) {
+
+            $this->smarty->assign('returnText',sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
+
+		} else
+		if (strlen($password) < $min) {
+
+            $this->smarty->assign('returnText',sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
+
+		} else
+		if (strlen($password) < ($min + 3)) {
+
+			$this->smarty->assign('returnText','<weak>');
+
+		} else {
+		
+			if (
+				preg_match_all('/[0-9]/',$password,$d)>=1 && 
+				preg_match_all('/[a-zA-Z]/',$password,$d)>=1 && 
+				preg_match_all('/[^a-zA-Z0-9]/',$password,$d)>=1
+			) {
+
+				$this->smarty->assign('returnText','<strong>');
+
+			} else {
+
+				$this->smarty->assign('returnText','<moderate>');
+
+			}
+
+		}
+
+	}
 
     /**
      * Calls all the relevant methods to log the user in
