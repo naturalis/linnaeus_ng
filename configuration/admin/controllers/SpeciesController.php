@@ -35,6 +35,9 @@ class SpeciesController extends Controller
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
+	public $cssToLoad = array('colorbox/colorbox.css');
+	public $jsToLoad = array('taxon.js','colorbox/jquery.colorbox.js');
+
     private $_treeIdList;
 
     public $controllerPublicName = 'Species module';
