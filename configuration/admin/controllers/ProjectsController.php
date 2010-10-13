@@ -172,7 +172,8 @@ class ProjectsController extends Controller
         }
         
         $pru = $this->models->ProjectRoleUser->get(array(
-            'project_id' => $this->getCurrentProjectId()
+            'project_id' => $this->getCurrentProjectId(),
+			'role_id !=' => '1'
         ), 'distinct user_id, role_id');
         
         foreach ((array) $pru as $key => $val) {
@@ -441,13 +442,31 @@ not sure if helper is all that useful
             
             if ($action == 'add') {
                 
-                $this->models->FreeModuleProjectUser->save(
-                array(
-                    'id' => null, 
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $moduleId, 
-                    'user_id' => $userId
-                ));
+				if (is_array($userId)) {
+				
+					foreach((array)$userId as $key => $val) {
+		
+						$this->models->FreeModuleProjectUser->save(
+						array(
+							'id' => null, 
+							'project_id' => $this->getCurrentProjectId(), 
+							'free_module_id' => $moduleId, 
+							'user_id' => $val[0]
+						));
+		
+					}
+				
+				} else {
+
+					$this->models->FreeModuleProjectUser->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'free_module_id' => $moduleId, 
+						'user_id' => $userId
+					));
+
+				}
             
             }
             else if ($action == 'remove') {
@@ -465,13 +484,31 @@ not sure if helper is all that useful
             
             if ($action == 'add') {
                 
-                $this->models->ModuleProjectUser->save(
-                array(
-                    'id' => null, 
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'module_id' => $moduleId, 
-                    'user_id' => $userId
-                ));
+				if (is_array($userId)) {
+				
+					foreach((array)$userId as $key => $val) {
+		
+						$this->models->ModuleProjectUser->save(
+						array(
+							'id' => null, 
+							'project_id' => $this->getCurrentProjectId(), 
+							'module_id' => $moduleId, 
+							'user_id' => $val[0]
+						));
+		
+					}
+				
+				} else {
+
+					$this->models->ModuleProjectUser->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'module_id' => $moduleId, 
+						'user_id' => $userId
+					));
+
+				}
             
             }
             else if ($action == 'remove') {

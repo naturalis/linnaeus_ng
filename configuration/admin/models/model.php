@@ -469,9 +469,11 @@ abstract class Model extends BaseClass
     {
         
         $r = mysql_query('select * from ' . $this->tableName . ' limit 1');
+
+		if (!$r) return;
         
         $i = 0;
-        
+       
         while ($i < mysql_num_fields($r)) {
             
             $info = mysql_fetch_field($r, $i);

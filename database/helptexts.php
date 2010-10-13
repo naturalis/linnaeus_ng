@@ -30,5 +30,5 @@ insert into dev_helptexts values (null, 'users', 'edit', 'Active',
 
 
 
-insert into dev_helptexts values (null, 'species', 'index', 'Subpages',
-'Each taxon has it\'s own page. Each of these pages consists of one or more subpages. The first subpage is called \'Main\', and contains the primary data on the taxon. This subpage is generated automatically; all other subpages that you wish to use - for example, \'Classification\' or \'Breeding Patterns\', have to be defined first. To do this, click the menu option \'Define subpages\'.',0,current_timestamp,null);
+insert into dev_helptexts values (null, 'species', 'index', 'Categories',
+'Each taxon has it\'s own page. Each of these pages consists of one or more categories. The first category is called \'Main\', and contains the primary data on the taxon. This category is generated automatically; all other subpages that you wish to use - for example, \'Classification\' or \'Breeding Patterns\', have to be defined first. To do this, click the menu option \'Define categories\'.',0,current_timestamp,null);

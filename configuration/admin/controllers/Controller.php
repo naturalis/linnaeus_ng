@@ -1287,8 +1287,11 @@ class Controller extends BaseClass
     private function isUserAuthorisedForProjectPage ()
     {
         
+		// is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
+		if ($this->getControllerBaseName()=='') return true;
+
         $d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()];
-        
+		
         foreach ((array) $d as $key => $val) {
             
             if ($val == '*' || $val == $this->getViewName()) {

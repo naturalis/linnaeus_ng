@@ -42,7 +42,7 @@ class configuration
                 'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
                 'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload'
             ), 
-            'maxSubPages' => 10,
+            'maxCategories' => 10,
             'login-cookie' => array(
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
@@ -51,11 +51,46 @@ class configuration
     
     }
 
+    public function getControllerSettingsUsers()
+    {
+        return array(
+			'dataChecks' =>
+				array(
+					'username' =>
+						array(
+							'minLength' => 2,
+							'maxLength' => 32
+						),
+					'password' =>
+						array(
+							'minLength' => 6,
+							'maxLength' => 24
+						),
+					'first_name' =>
+						array(
+							'minLength' => 1,
+							'maxLength' => 32
+						),
+					'last_name' =>
+						array(
+							'minLength' => 1,
+							'maxLength' => 32
+						),
+					'email_address' =>
+						array(
+							'minLength' => 1,
+							'maxLength' => 64,
+							'regexp' => '/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/'
+						)
+				)
+		);
+	}
+
     public function getControllerSettingsSpecies()
     {
         
         return array(
-            'defaultSubPages' =>
+            'defaultCategories' =>
                 array(
                     0 => array(
                         'name' => 'Overview',

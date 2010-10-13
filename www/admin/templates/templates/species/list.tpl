@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-Click a cell to access the subpages for a taxon in a specific language. To change the name of a taxon, click it's name.
+Click a cell to access that category for a taxon in a specific language. To change the name of a taxon, click it's name.
 <span id="message-container" style="margin-left:175px">&nbsp;</span>
 <table>
 <tr>

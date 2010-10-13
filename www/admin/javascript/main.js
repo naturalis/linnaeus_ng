@@ -3,6 +3,12 @@ function q(m) {
 	e.innerHTML = m;
 }
 
+function isArray(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
+}
 
 var allAjaxHandle = false;
 var allAjaxAborted = false;
@@ -250,30 +256,13 @@ function userRemoteValueCheck(id,values,tests,idti) {
 		}
 	});
 
-
-
-
-/*
-	$.ajax({ url:
-				"ajax_interface.php?f="+encodeURIComponent(id)+
-				"&v="+encodeURIComponent(values)+
-				"&t="+encodeURIComponent(tests)+
-				"&time="+allGetTimestamp()+
-				(idti ? "&i="+encodeURIComponent(idti) : "" ),
-			success: function(data){
-				$('#'+id+'-message').html(data);
-				error = data.search(/\<error\>/gi)!=-1;
-				$('#'+id+'-message').removeClass().addClass(error ? 'message-error' : 'message-no-error');
-      	}
-	});
-
-*/
-
-
 }
 
+var moduleUsers = Array();
 var moduleModules = Array();
 var moduleFreeModules = Array();
+var moduleModuleUsers = Array();
+var moduleFreeModuleUsers = Array();
 
 function moduleAddModule(module) {
 	//[id,name,desc,[active,[id in project]]]
@@ -489,18 +478,105 @@ function moduleChangeStatus(id,action,type) {
 
 }
 
-function moduleToggleModuleUserBlock(i) {
+function moduleAddUser(userId,user,role) {
+	moduleUsers[moduleUsers.length]=[userId,user,role];
+}
 
-	classname = $('#users-'+i).attr('class');
-	
-	if (classname=='modusers-block-hidden')
-		$('#users-'+i).removeClass().addClass('modusers-block');
+
+function moduleAddModule(type,moduleId,module,state,collaborators) {
+	if (type=='regular')
+		moduleModules[moduleModules.length]=[moduleId,module,state,collaborators,'hidden'];
 	else
-		$('#users-'+i).removeClass().addClass('modusers-block-hidden');
+		moduleFreeModules[moduleFreeModules.length]=[moduleId,module,state,collaborators,'hidden'];
+}
+
+function moduleAddModuleUser(type,moduleId,userId,state) {
+	if (type=='regular')
+		moduleModuleUsers[moduleModuleUsers.length]=[moduleId,userId,state];
+	else
+		moduleFreeModuleUsers[moduleFreeModuleUsers.length]=[moduleId,userId,state];
+}
+
+function moduleBuildModuleUserBlock(type) {
+	var b = '';
+
+	if (type=='free') {
+		var theseModules = moduleFreeModules;
+		var theseModuleUsers = moduleFreeModuleUsers;
+		var q = 'f';
+	} else {
+		var theseModules = moduleModules;
+		var theseModuleUsers = moduleModuleUsers;
+		var q = '';
+	}
+
+	for (var i=0;i<theseModules.length;i++) {
+	
+		b = b +'<tr id="row-'+q+theseModules[i][0]+'" class="tr-highlight">';
+
+		if (theseModules[i][2]=='y') {
+			b = b +'<td class="cell-module-title-in-use"><span id="cell-'+theseModules[i][0]+'d">';
+		} else {
+			b = b + '<td class="cell-module-title-inactive"><span id="cell-'+theseModules[i][0]+'d">';
+		}
+		
+		b = b +'<span class="cell-module-title">'+theseModules[i][1]+'</span></span></td>'+
+				'<td><span onclick="moduleToggleModuleUserBlock(\''+q+theseModules[i][0]+'\');" class="modusers-block-toggle" id="toggle-'+q+theseModules[i][0]+'">+</span> '+
+				'<span id="cell-'+q+theseModules[i][0]+'n">'+theseModules[i][3]+'</span> collaborators</td></tr>'+
+				'<tr id="users-'+q+theseModules[i][0]+'" class="modusers-block'+
+				(theseModules[i][4]=='hidden' ? '-hidden' : '')+
+				'"><td colspan="2"><table>';
+						
+		for (var j=0;j<moduleUsers.length;j++) {
+	
+			b = b +'<tr><td class="modusers-block-buffercell"></td>';
+
+			for(var k=0;k<theseModuleUsers.length;k++) {
+	
+				if (theseModuleUsers[k][0]==theseModules[i][0] && theseModuleUsers[k][1]==moduleUsers[j][0]) {
+			
+					if (theseModuleUsers[k][2]==1) {
+
+						b = b +'<td id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'a" class="cell-module-user-active">'+
+							moduleUsers[j][1]+'</td><td>'+moduleUsers[j][2]+'</td>'+
+							'<td title="remove collaborator" class="cell-moduser-remove"'+
+							'id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'b"'+
+							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'remove\',\''+type+'\')">[<span class="pseudo-a">remove as collaborator</span>]</td>';
+						
+					} else {
+					
+						b = b +'<td id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'a" class="cell-module-user-inactive">'+
+							moduleUsers[j][1]+'</td><td>'+moduleUsers[j][2]+'</td>'+
+							'<td title="add collaborator" class="cell-moduser-inactive"'+
+							'id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'b"'+
+							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'add\',\''+type+'\')">[<span class="pseudo-a">add as collaborator</span>]</td>';
+					}
+					
+					b = b + '<td onclick="window.open(\'../users/edit.php?id='+moduleUsers[j][0]+'\',\'_self\');">[<span class="pseudo-a">edit user</span>]</td>';
+
+				}
+
+			}
+
+			b = b +'</tr>';
+
+		}
+
+		b = b + '<tr><td></td><td onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+',moduleUsers,\'add\',\''+type+'\');">[<span class="pseudo-a">add all collaborators</span>]</td></tr>';		
+		b = b +'</table></td></tr>';
+	}
+	
+	b = '<table>'+b+'</table>';
+
+
+	if (type == 'free')
+		$('#free-module-table').html(b);
+	else
+		$('#module-table').html(b);
 
 }
 
-function moduleChangeModuleUserStatus(ele,module,user,action,type) {
+function moduleChangeModuleUserStatus(module,user,action,type) {
 
 	$.ajax({
 		url:"ajax_interface.php",
@@ -516,27 +592,81 @@ function moduleChangeModuleUserStatus(ele,module,user,action,type) {
 
 			if (data=='<ok>') {
 
-				switch(action) {
-					case 'add':
-						var classa = 'cell-module-title-in-use';
-						var classb = 'cell-moduser-remove';
-						break;
-					case 'remove':
-						var classa = '';
-						var classb = 'cell-moduser-inactive';
-						break;
-				}			
+				if (type=='free') {
+					var theseModules = moduleFreeModules;
+					var theseModuleUsers = moduleFreeModuleUsers;
+				} else {
+					var theseModules = moduleModules;
+					var theseModuleUsers = moduleModuleUsers;
+				}
 
-				$('#'+ele.id).removeClass().addClass(classb);
-				$('#'+ele.id.replace('b','a')).removeClass().addClass(classa);
-				$('#cell-'+(type=='free' ? 'f' : '')+module+'n').
-					html(parseFloat($('#cell-'+(type=='free' ? 'f' : '')+module+'n').
-					html())+(action=='add' ? 1 : -1 ));
+				for (var i=0;i<theseModuleUsers.length;i++) {
+					if (isArray(user)) {
+						theseModuleUsers[i][2]=1;
+					} else {
+						if (theseModuleUsers[i][0]==module && theseModuleUsers[i][1]==user) {
+							if (theseModuleUsers[i][2]==1) {
+								theseModuleUsers[i][2]=0;
+							} else {
+								theseModuleUsers[i][2]=1;
+							}
+						}
+					}
+				}
+				for (var i=0;i<theseModules.length;i++) {
+					if (theseModules[i][0]==module) {
+						if (isArray(user)) {
+							theseModules[i][3] = moduleUsers.length;
+						} else {
+							theseModules[i][3] = (action == 'add' ? theseModules[i][3] +1 : theseModules[i][3] - 1);	
+						}
+					}
+				}
+
+				moduleBuildModuleUserBlock(type);
+
 			}
+
 		}
 	});
 
 }
+
+function moduleToggleModuleUserBlock(id) {
+
+	classname = $('#users-'+id).attr('class');
+	
+	if (classname=='modusers-block-hidden') {
+		$('#users-'+id).removeClass().addClass('modusers-block');
+		$('#toggle-'+id).html('-');
+	} else {
+		$('#users-'+id).removeClass().addClass('modusers-block-hidden');
+		$('#toggle-'+id).html('+');
+	}
+
+	if (id.substr(0,1)=='f') {
+		var theseModules = moduleFreeModules;
+		var q = 'f';
+	} else {
+		var theseModules = moduleModules;
+		var q = '';
+	}
+
+	for (var i=0;i<theseModules.length;i++) {
+		if (q+theseModules[i][0]==id) {
+			if (theseModules[i][4]=='hidden') {
+				theseModules[i][4]='visible';
+			} else {
+				theseModules[i][4]='hidden';
+			}		
+		}
+	}	
+
+
+
+}
+
+
 
 var selectedLanguages = Array();
 

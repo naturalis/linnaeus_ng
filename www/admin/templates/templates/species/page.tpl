@@ -45,7 +45,7 @@ You have to define at least one language in your project before you can add any 
 <a href="../projects/data.php">Define languages.</a>
 {else}
 <form method="post" action="" id="theForm">
-{if $pages|@count<$maxSubPages}
+{if $pages|@count<$maxCategories}
 Add a new page:
 <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
 <input type="hidden" name="rnd" value="{$rnd}" />

@@ -817,6 +817,49 @@ class UsersController extends Controller
     }
 
 
+    /**
+     * Creating a new collaborator
+     *
+     * See function code for detailed comments on the function's flow
+     *
+     * @access    public
+     */
+    public function adminIndexAction ()
+    {
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Project overview'));
+
+		$modules = $this->models->ModuleProject->get(array(
+			'project_id' => $this->getCurrentProjectId()
+		), false, 'module_id asc');
+
+		foreach ((array) $modules as $key => $val) {
+			
+			$mp = $this->models->Module->get($val['module_id']);
+			
+			$modules[$key]['module'] = $mp['module'];
+			$modules[$key]['controller'] = $mp['controller'];
+
+		}
+
+		$freeModules = $this->models->FreeModuleProject->get(
+			array(
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+        $this->smarty->assign('modules', $modules);
+
+        $this->smarty->assign('freeModules', $freeModules);
+
+        
+        $this->printPage();
+    
+    }
+	
+	
 	private function ajaxActionConnectExistingUser()
 	{
 
