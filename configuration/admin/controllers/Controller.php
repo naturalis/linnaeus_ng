@@ -161,7 +161,15 @@ class Controller extends BaseClass
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
-        
+
+		if (isset($this->cssToLoad)) {
+	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
+    	}
+
+		if (isset($this->jsToLoad)) {
+	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
+    	}
+    
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
 

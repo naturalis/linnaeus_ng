@@ -30,7 +30,7 @@ class ProjectsController extends Controller
     
     public $controllerPublicName = 'Project administration';
 
-
+	public $jsToLoad = array('project.js','module.js');
 
     public function __construct ()
     {

@@ -12,7 +12,11 @@
 		@import url("{$baseUrl}admin/style/admin-inputs.css");
 		@import url("{$baseUrl}admin/style/admin-help.css");
 		@import url("{$baseUrl}admin/style/admin.css");
-		@import url("{$baseUrl}admin/tools/colorbox/colorbox.css");
+{if $cssToLoad}
+{section name=i loop=$cssToLoad}
+		@import url("{$baseUrl}admin/style/{$cssToLoad[i]}");
+{/section}
+{/if}
 {if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
 {/if}
 	</style>
@@ -20,7 +24,11 @@
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should be removed in production-->
-	<script type="text/javascript" src="{$baseUrl}admin/tools/colorbox/jquery.colorbox.js"></script>
+{if $javascriptsToLoad}
+{section name=i loop=$javascriptsToLoad}
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad[i]}"></script>
+{/section}
+{/if}
 
 {if $includeHtmlEditor}
 {include file="../shared/tinymce-editor.tpl"}
