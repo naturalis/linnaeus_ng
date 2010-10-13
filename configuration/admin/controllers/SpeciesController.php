@@ -27,7 +27,8 @@ class SpeciesController extends Controller
         'heartbeat', 
         'content_taxon_undo',
         'media_taxon',
-        'media_descriptions_taxon'
+        'media_descriptions_taxon',
+		'section'
     );
     
     public $usedHelpers = array(
@@ -49,7 +50,7 @@ class SpeciesController extends Controller
     {
         parent::__construct();
         
-        $this->createStandardSubpages();
+        $this->createStandardCategories();
 
         $this->setProjectLanguages();
 
@@ -88,7 +89,7 @@ class SpeciesController extends Controller
 
 
     /**
-     * Display, add, edit and delete subpages' names in all languages
+     * Display, add, edit and delete categories' names in all languages
      *
      * @access    public
      */
@@ -97,7 +98,7 @@ class SpeciesController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Subpages'));
+        $this->setPageName(_('Categories'));
         
         // adding a new page
         if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
@@ -146,7 +147,7 @@ class SpeciesController extends Controller
 
         $this->smarty->assign('nextShowOrder', $nextShowOrder);
 
-        $this->smarty->assign('maxSubPages', $this->generalSettings['maxSubPages']);
+        $this->smarty->assign('maxCategories', $this->generalSettings['maxCategories']);
         
         $this->smarty->assign('languages', $lp);
         
@@ -231,7 +232,7 @@ class SpeciesController extends Controller
 				// determine the language the page will open in
 				$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
 	
-				// get the defined subpages (just the page definitions, no content yet)
+				// get the defined categories (just the page definitions, no content yet)
 				$tp = $this->models->TaxonPage->get(array(
 					'project_id' => $this->getCurrentProjectId()
 				));
@@ -240,7 +241,7 @@ class SpeciesController extends Controller
 					
 					foreach ((array) $lp as $k => $language) {
 						
-						// for each subpage in each language, get the subpage title
+						// for each category in each language, get the category title
 						$tpt = $this->models->TaxonPageTitle->get(
 						array(
 							'project_id' => $this->getCurrentProjectId(), 
@@ -954,7 +955,7 @@ class SpeciesController extends Controller
 
     }
 
-    private function createStandardSubpages() 
+    private function createStandardCategories() 
     {    
 
         $tp = $this->models->TaxonPage->get(
@@ -964,7 +965,7 @@ class SpeciesController extends Controller
         );
         
 
-        foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+        foreach((array)$this->controllerSettings['defaultCategories'] as $key => $page) {
 
             if ($tp[0]['total']==0) {
 
@@ -997,9 +998,9 @@ class SpeciesController extends Controller
 
 
     /**
-     * Create a new subpage.
+     * Create a new category.
      *
-     * A subpage is page devoted to a specific subject that appears in every taxon's
+     * A category is page devoted to a specific subject that appears in every taxon's
      * detail page (main, breeding, threats, etc).
      *
      * @access    private
@@ -1238,7 +1239,7 @@ class SpeciesController extends Controller
                     if ($d) {
                         
                         /* the block below changed the taxon's name in the taxon table to whatever the user had 
-                           entrered as subpage title of the default page in the default language, but the assumption
+                           entrered as category title of the default page in the default language, but the assumption
                            that that is the place where the leading name of a taxon is entered might be faulty
 
                         // if succesful, get the projects default language
@@ -1770,7 +1771,7 @@ class SpeciesController extends Controller
         
         $b = '';
 
-        foreach((array)$this->controllerSettings['defaultSubPages'] as $key => $page) {
+        foreach((array)$this->controllerSettings['defaultCategories'] as $key => $page) {
         
             if ($page['name']==$tp[0]['page']) {
 
@@ -1988,6 +1989,16 @@ class SpeciesController extends Controller
     }
 
 
+	public function sectionsAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Define sections'));
+		
+        $this->printPage();
+		
+	}
 
 
 }

@@ -1,3 +1,15 @@
+CREATE TABLE sections (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	section varchar(32) not null,
+	parent_id INT( 11 ),
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) 
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+
 CREATE TABLE taxa (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
 	project_id INT( 11 ) NOT NULL ,

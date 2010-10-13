@@ -14,12 +14,13 @@ if (!$c->isUserLoggedIn()) {
     
     $c->redirect('index.php');
 
-}
-else {
+} else {
     
     $c->controllerPublicName = '';
+	
+	
     
-    $c->printPage();
+    $c->adminIndexAction();
 
 }
 

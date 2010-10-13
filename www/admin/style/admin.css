@@ -16,29 +16,7 @@ a,.pseudo-a {
 	color: #000099;
 }
 
-.general-clickable-cell:hover,
-.cell-module-activate:hover,
-.cell-module-reactivate:hover,
-.cell-module-deactivate:hover,
-.cell-module-delete:hover,
-.cell-moduser-inactive:hover,
-.cell-moduser-remove:hover,
-.cell-language-default:hover,
-.cell-language-set-default:hover,
-.cell-language-delete:hover,
-.cell-language-active:hover,
-.cell-language-inactive:hover,
-.cell-language-delete-inactive:hover,
-.cell-language-active-inactive:hover,
-.taxon-language-cell:hover,
-.taxon-language-cell-active:hover,
-.taxon-page-cell:hover,
-.taxon-page-cell-active:hover,
-.taxon-media-language-tab:hover,
-.taxon-media-language-tab-active:hover,
-.taxon-media-cell-delete:hover,
-.taxon-list-cell-media:hover,.taxon-list-cell-media-empty:hover,
-{
+.general-clickable-cell:hover {
 	text-decoration: underline;
 }
 
@@ -277,8 +255,12 @@ a:hover,.pseudo-a:hover {
 	width:100px;
 }
 
-.cell-module-title {
-	width:395px;
+.cell-module-title-in-use,.cell-module-title-inactive {
+	width:300px;
+}
+
+.cell-module-title-inactive {
+	color:#666;
 }
 
 .cell-module-state {
@@ -286,29 +268,12 @@ a:hover,.pseudo-a:hover {
 	color:#555;
 }
 
-.cell-module-activate,.cell-module-reactivate,.cell-module-deactivate,.cell-module-delete {
-	cursor: pointer;
-	color: #000099;	
-	padding-right:10px;
+.modusers-block-buffercell {
+	width:10px;
 }
 
-.cell-module-activate:hover,
-.cell-module-reactivate:hover,
-.cell-module-deactivate:hover,
-.cell-module-delete:hover {
-	text-decoration: underline;
-}
-
-.cell-moduser-inactive,.cell-moduser-remove {
-	cursor: pointer;
-	color: #000099;	
-	background-image: url(../media/system/icons/user-gray.png);
-	background-repeat:no-repeat;
-	width:16px;
-}
-
-.cell-moduser-remove {
-	background-image: url(../media/system/icons/user-minus.png);
+.cell-module-user-active {
+	font-weight:bold;
 }
 
 .module-title-unused,.module-title-in-use,.module-title-inactive {
@@ -338,11 +303,8 @@ a:hover,.pseudo-a:hover {
 }
 
 .modusers-block-toggle {
+	padding:0px 6px 0px 6px;
 	cursor: pointer;
-}
-
-.modusers-block-toggle:hover {
-	text-decoration: underline;
 }
 
 .modusers-block,.modusers-block-hidden {
