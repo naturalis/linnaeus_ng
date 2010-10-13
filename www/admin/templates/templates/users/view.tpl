@@ -21,7 +21,7 @@
 	</tr>
 	<tr>
 		<td>Timezone:</td>
-		<td>{$zone.timezone}</td>
+		<td>{$zone.timezone}: {$zone.locations}</td>
 	</tr>
 	<tr>
 		<td>E-mail notifications:</td>
