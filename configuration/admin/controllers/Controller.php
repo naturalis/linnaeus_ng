@@ -918,12 +918,23 @@ class Controller extends BaseClass
 			//$this->requestData = $_REQUEST; // also contains cookies
 			$this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
 	
-			foreach ((array) $this->requestData as $key => $val) {
-				
-				if (get_magic_quotes_gpc()) {
-					
-					$this->requestData[$key] = stripslashes($val);
-				
+			if (get_magic_quotes_gpc()) {
+
+				foreach ((array) $this->requestData as $key => $val) {
+
+					if (is_array($val)) {
+
+						foreach ((array) $this->requestData as $key2 => $val2) {
+
+							$this->requestData[$key][$key2] = stripslashes($val2);
+
+						}
+
+					} else {					
+
+						$this->requestData[$key] = stripslashes($val);
+	
+					}
 				}
 	
 			}
