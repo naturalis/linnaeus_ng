@@ -19,6 +19,10 @@
 		<tr><td colspan="2"><input type="submit" value="Log in" /></td></tr>
 	</table>
 	</form>
+	
+<p>
+<a href="{$baseUrl}">Back to Linnaeus NG root</a>
+</p>
 </div>
 
 {literal}
