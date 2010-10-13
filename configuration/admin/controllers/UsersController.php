@@ -482,7 +482,56 @@ class UsersController extends Controller
             $user = $this->models->User->get($this->requestData['id']);
             
             $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
-            
+
+            $zone = $this->models->Timezone->get($user['timezone_id']);
+	
+			$modules = $this->models->ModuleProject->get(array(
+				'project_id' => $this->getCurrentProjectId()
+			), false, 'module_id asc');
+	
+			foreach ((array) $modules as $key => $val) {
+				
+				$mp = $this->models->Module->get($val['module_id']);
+				
+				$modules[$key]['module'] = $mp['module'];
+				
+				$modules[$key]['description'] = $mp['description'];
+
+				$mpu = $this->models->ModuleProjectUser->get(array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $val['module_id'],
+					'user_id' => $this->requestData['id'],			
+				),'count(*) as total');
+
+				$modules[$key]['isAssigned'] = $mpu[0]['total']=='1';
+
+			}
+			
+			$freeModules = $this->models->FreeModuleProject->get(
+				array(
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+			foreach ((array) $freeModules as $key => $val) {
+				
+				$fpu = $this->models->FreeModuleProjectUser->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'free_module_id' => $val['id'],
+						'user_id' => $this->requestData['id'],			
+					),'count(*) as total');
+				
+				$freeModules[$key]['isAssigned'] = $fpu[0]['total']=='1';
+
+			}
+			            
+            $this->smarty->assign('modules', $modules);
+
+            $this->smarty->assign('freeModules', $freeModules);
+
+            $this->smarty->assign('zone', $zone);
+
             $this->smarty->assign('data', $user);
             
             $this->smarty->assign('userRole', $upr);
