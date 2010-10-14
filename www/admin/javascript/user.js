@@ -39,29 +39,27 @@ function userCreateUserFromSession() {
 function userDeleteUser(id) {
 
 	if (confirm('Are you sure?')) { 
-		var e = document.getElementById('delete'); 
-		e.value = '1'; 
-		e = document.getElementById('id'); 
-		e.value = id; 
-		e = document.getElementById('deleteForm'); 
-		e.submit(); 
+		$('#delete').val('1'); 
+		$('#id').val(id); 
+		$('#deleteForm').submit(); 
 	}
 
 }
 
 
-function userRemoteValueCheck(id,values,tests,idti) {
+function userRemoteValueCheck(ele,values,tests,idti) {
 
 	if (values[0].length==0) {
 
-		$('#'+id+'-message').html('');
+		$('#'+ele+'-message').html(ele=='password' || ele=='password_2' ? '(leave blank to leave unchanged)' : '');
+		$('#'+ele+'-message').removeClass().addClass('password-neutral');
 		return;
 
 	}
 
 	var action = false;
 
-	switch(id) {
+	switch(ele) {
 		case 'username' : 
 			action = 'check_username';
 			break;
@@ -95,16 +93,16 @@ function userRemoteValueCheck(id,values,tests,idti) {
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
-			if (id=='password') {
+			if (ele=='password') {
 				if (data.match(/\<*\>/)) {
-					$('#'+id+'-message').removeClass().addClass('password-'+data.replace(/[<>]/gi,''));
-					$('#'+id+'-message').html('Password strength: '+data.replace(/[<>]/gi,''));
+					$('#'+ele+'-message').removeClass().addClass('password-'+data.replace(/[<>]/gi,''));
+					$('#'+ele+'-message').html('Password strength: '+data.replace(/[<>]/gi,''));
 				} else {
-					$('#'+id+'-message').removeClass().addClass('password-neutral');
-					$('#'+id+'-message').html(data);
+					$('#'+ele+'-message').removeClass().addClass('password-neutral');
+					$('#'+ele+'-message').html(data);
 				}
 			} else {
-				$('#'+id+'-message').html(data);
+				$('#'+ele+'-message').html(data);
 			}
 		}
 	});

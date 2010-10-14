@@ -28,7 +28,10 @@ class SpeciesController extends Controller
         'content_taxon_undo',
         'media_taxon',
         'media_descriptions_taxon',
-		'section'
+		'hybrid',
+		'project_rank',
+		'rank',
+		'label_project_rank',
     );
     
     public $usedHelpers = array(
@@ -116,7 +119,6 @@ class SpeciesController extends Controller
             }
         
         }
-        
         
         $lp = $_SESSION['project']['languages'];
 
@@ -883,7 +885,82 @@ class SpeciesController extends Controller
     
     }
 
-    private function setProjectLanguages()
+function recursiveArraySearch($haystack, $needle, $index = null)
+{
+    $aIt     = new RecursiveArrayIterator($haystack);
+    $it    = new RecursiveIteratorIterator($aIt);
+   
+    while($it->valid())
+    {       
+        if (((isset($index) AND ($it->key() == $index)) OR (!isset($index))) AND ($it->current() == $needle)) {
+            return $aIt->key();
+        }
+       
+        $it->next();
+    }
+   
+    return false;
+} 
+    
+	public function ranksAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Taxonomic ranks'));
+
+		$r = 
+			array_merge(
+				$this->models->Rank->get(array('parent_id !=' => -1),false,'parent_id',false,true,true),
+				$this->models->Rank->get(array('parent_id' => -1),false,'parent_id',false,true,true)
+			);
+
+		$h = $this->models->Hybrid->get();
+
+		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()));
+
+        $lp = $_SESSION['project']['languages'];
+
+		foreach((array)$pr as $rankkey => $rank) {
+
+			foreach((array)$lp as $langaugekey => $language) {
+	
+				$lpr = $this->models->LabelProjectRank->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'project_rank_id' => $rank['id'],
+						'language_id' => $language['language_id']
+					),'label'
+				);
+				
+				$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
+	
+			}
+
+		}
+
+		$this->smarty->assign('ranks',$r);
+
+		$this->smarty->assign('hybrids',$h);
+
+		$this->smarty->assign('projectRanks',$pr);
+
+		$this->smarty->assign('languages',$lp);
+
+        $this->printPage();
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private function setProjectLanguages()
     {
 
         $lp = $this->models->LanguageProject->get(array(
@@ -1992,16 +2069,6 @@ class SpeciesController extends Controller
     }
 
 
-	public function sectionsAction()
-	{
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Define sections'));
-		
-        $this->printPage();
-		
-	}
 
 
 }

@@ -36,10 +36,10 @@
 				id="password" 
 				value="" 
 				maxlength="16" 
-				onblur="{literal}if (this.value) { userRemoteValueCheck(this.id,[this.value],['f'],userid); }{/literal}"
+				onkeyup="userRemoteValueCheck(this.id,[this.value],['f'],userid);"
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="password-message" class="">(leave blank to leave unchanged)</span>
+			<span id="password-message" class="password-neutral">(leave blank to leave unchanged)</span>
 		</td>
 	</tr>
 	<tr>
@@ -51,10 +51,10 @@
 				id="password_2" 
 				value="" 
 				maxlength="16" 
-				onblur="{literal}if (this.value || $('#password.val().)) { userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'],userid); }{/literal}"
+				onblur="userRemoteValueCheck(this.id,[this.value,$('#password').val()],['f','q'],userid);"
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="password_2-message" class="">(leave blank to leave unchanged)</span>
+			<span id="password_2-message" class="password-neutral">(leave blank to leave unchanged)</span>
 		</td>
 	</tr>
 	<tr>
