@@ -1,0 +1,39 @@
+<?php
+
+include_once ('model.php');
+
+class Rank extends Model
+{
+    
+    const tableBaseName = 'ranks';
+
+
+
+    /**
+     * Constructor, calls parent's constructor
+     *
+     * @access     public
+     */
+    public function __construct ()
+    {
+        
+        parent::__construct(self::tableBaseName);
+    
+    }
+
+
+
+    /**
+     * Destructor
+     *
+     * @access     public
+     */
+    public function __destruct ()
+    {
+        
+        parent::__destruct();
+    
+    }
+
+}
+

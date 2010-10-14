@@ -355,12 +355,12 @@ abstract class Model extends BaseClass
 
 
 
-    public function get ($id = false, $cols = false, $order = false, $groupby = false, $ignoreCase = true)
+    public function get ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $idAsIndex = false)
     {
-        
+
         unset($this->data);
         
-        $this->set($id ? $id : $this->id, $cols, $order, $groupby, $ignoreCase);
+        $this->set($id ? $id : $this->id, $cols, $order, $groupBy, $ignoreCase, $idAsIndex);
         
         return isset($this->data) ? $this->data : null;
     
@@ -566,7 +566,7 @@ abstract class Model extends BaseClass
 
 
 
-    private function set ($id = false, $cols = false, $order = false, $groupby = false, $ignoreCase = true)
+    private function set ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $idAsIndex = false)
     {
         
         /*
@@ -584,8 +584,7 @@ abstract class Model extends BaseClass
         
         $query = false;
         
-        if (!$id)
-            return;
+        if (!$id) $id='*';
         
         if (is_array($id)) {
             
@@ -621,7 +620,7 @@ abstract class Model extends BaseClass
             
             }
             
-            $query .= $groupby ? " group by " . $groupby : '';
+            $query .= $groupBy ? " group by " . $groupBy : '';
             
             $query .= $order ? " order by " . $order : '';
             
@@ -633,15 +632,23 @@ abstract class Model extends BaseClass
             
             while ($row = mysql_fetch_assoc($set)) {
                 
-                $this->data[] = $row;
-            
+				if ($idAsIndex && isset($row['id'])) {
+
+	                $this->data[$row['id']] = $row;
+
+				} else {
+
+	                $this->data[] = $row;
+
+            	}
+
             }
         
         } elseif ($id=='*') {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName;
             
-            $query .= $groupby ? " group by " . $groupby : '';
+            $query .= $groupBy ? " group by " . $groupBy : '';
             
             $query .= $order ? " order by " . $order : '';
 
@@ -650,8 +657,16 @@ abstract class Model extends BaseClass
             $this->setLastQuery($query);
             
             while ($row = mysql_fetch_assoc($set)) {
-                
-                $this->data[] = $row;
+
+				if ($idAsIndex && isset($row['id'])) {
+
+	                $this->data[$row['id']] = $row;
+
+				} else {
+
+	                $this->data[] = $row;
+
+            	}
             
             }
         
@@ -671,7 +686,15 @@ abstract class Model extends BaseClass
             
             while ($row = mysql_fetch_assoc($set)) {
                 
-                $this->data[] = $row;
+				if ($idAsIndex && isset($row['id'])) {
+
+	                $this->data[$row['id']] = $row;
+
+				} else {
+
+	                $this->data[] = $row;
+
+            	}
             
             }
         

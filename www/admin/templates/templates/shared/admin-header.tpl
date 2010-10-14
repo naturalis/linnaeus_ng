@@ -82,7 +82,7 @@
 	</div>
 {/if}
 </div>
-
+<span id="debug-message"></span><!--this should be removed in production-->
 {if $welcomeMessage}
 <div id="welcome-message">
 {$welcomeMessage}

@@ -1,13 +1,16 @@
 function q(m) {
-	var e = document.getElementById('debug-message');
-	e.innerHTML = m;
+
+	$('#debug-message').html(m);
+
 }
 
 function isArray(obj) {
+	
    if (obj.constructor.toString().indexOf("Array") == -1)
       return false;
    else
       return true;
+
 }
 
 var allAjaxHandle = false;
@@ -23,20 +26,13 @@ function allGetTimestamp() {
 
 function allTableColumnSort(col) {
 
-	var e = document.getElementById('key');
-	e.value = col;
-	e = document.getElementById('sortForm');
-	e.submit();
+	$('#key').val(col);
+	$('#sortForm').submit();
 }
 
 function allToggleHelpVisibility() {
 
-	var e = document.getElementById('body-visible');
-	if (e.className=='body-collapsed') {
-		e.className='body-visible';
-	} else {
-		e.className='body-collapsed';
-	}
+	$('#body-visible').toggleClass('body-collapsed body-visible');
 
 }
 

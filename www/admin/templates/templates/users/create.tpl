@@ -44,13 +44,12 @@ You cannot create a new user with the same e-mail address, but you can connect t
 				onblur="userRemoteValueCheck(this.id,[this.value],['e','f'])" 
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="username-message" class=""></span>	{/if}
+			<span id="username-message" class="password-neutral"></span>	{/if}
 		</td>
 	</tr>
 	<tr>
 		<td>password:</td>
 		<td>
-		{if $check==true}{$data.password}{else}
 			<input
 				type="password"
 				name="password"
@@ -60,7 +59,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 				onkeyup="userRemoteValueCheck(this.id,[this.value],['f'])"
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="password-message" class=""></span>	
+			<span id="password-message" class="password-neutral"></span>	
 		</td>	
 	</tr>
 	<tr>
@@ -75,7 +74,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 				onblur="userRemoteValueCheck(this.id,[this.value,document.getElementById('password').value],['f','q'])"
 			/>
 			<span class="asterisk-required-field">*</span>
-			<span id="password_2-message" class=""></span>	{/if}
+			<span id="password_2-message" class=""></span>
 		</td>
 	</tr>
 	<tr>
