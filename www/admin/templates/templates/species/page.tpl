@@ -29,7 +29,7 @@
 				maxlength="32" 
 				id="name-{$pages[i].id}-{$languages[j].language_id}" 
 				onfocus="taxonSetActivePageTitle([{$pages[i].id},{$languages[j].language_id}])" 
-				onblur="taxonPageTitleSave([{$pages[i].id},{$languages[j].language_id}])" 
+				onblur="taxonSavePageTitle([{$pages[i].id},{$languages[j].language_id}])" 
 				value="{$pages[i].page_titles[$n]}" 
 			/>
 		</td>
@@ -62,7 +62,7 @@ Add a new page:
 
 {literal}
 <script type="text/JavaScript">
-$(window).unload( function () { taxonPageTitleSave(taxonActivePageTitle); } );
+$(window).unload( function () { taxonSavePageTitle(taxonActivePageTitle); } );
 </script>
 {/literal}
 

@@ -10,6 +10,10 @@
 
     hardcoded set_time_limit(3000); for CoL
 
+	check fileupload ranks with defined
+
+	must delete link taxa - ranks when deleting a rank
+
 */
 
 include_once ('Controller.php');
@@ -22,8 +26,8 @@ class SpeciesController extends Controller
         'content_taxon', 
         'language_project', 
         'language', 
-        'taxon_page', 
-        'taxon_page_title', 
+        'page_taxon', 
+        'page_taxon_title', 
         'heartbeat', 
         'content_taxon_undo',
         'media_taxon',
@@ -38,7 +42,7 @@ class SpeciesController extends Controller
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
-	public $cssToLoad = array('colorbox/colorbox.css');
+	public $cssToLoad = array('colorbox/colorbox.css','taxon.css');
 	public $jsToLoad = array('taxon.js','colorbox/jquery.colorbox.js');
 
     private $_treeIdList;
@@ -124,7 +128,7 @@ class SpeciesController extends Controller
 
         $defaultLanguage = $_SESSION['project']['default_language_id'];
         
-        $pages = $this->models->TaxonPage->get(array(
+        $pages = $this->models->PageTaxon->get(array(
             'project_id' => $this->getCurrentProjectId()
             ),
             false,'show_order'
@@ -134,7 +138,7 @@ class SpeciesController extends Controller
             
             foreach ((array) $lp as $k => $language) {
                 
-                $tpt = $this->models->TaxonPageTitle->get(
+                $tpt = $this->models->PageTaxonTitle->get(
                 array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'page_id' => $page['id'], 
@@ -238,7 +242,7 @@ class SpeciesController extends Controller
 				$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
 	
 				// get the defined categories (just the page definitions, no content yet)
-				$tp = $this->models->TaxonPage->get(array(
+				$tp = $this->models->PageTaxon->get(array(
 					'project_id' => $this->getCurrentProjectId()
 				));
 	
@@ -247,7 +251,7 @@ class SpeciesController extends Controller
 					foreach ((array) $lp as $k => $language) {
 						
 						// for each category in each language, get the category title
-						$tpt = $this->models->TaxonPageTitle->get(
+						$tpt = $this->models->PageTaxonTitle->get(
 						array(
 							'project_id' => $this->getCurrentProjectId(), 
 							'language_id' => $language['language_id'], 
@@ -352,7 +356,7 @@ class SpeciesController extends Controller
             'project_id' => $this->getCurrentProjectId()
         ));
         
-        $tp = $this->models->TaxonPage->get(array(
+        $tp = $this->models->PageTaxon->get(array(
             'project_id' => $this->getCurrentProjectId()
         ), 'count(*) as tot');
         
@@ -862,6 +866,14 @@ class SpeciesController extends Controller
 
             $this->deleteTaxonMedia();
         
+        } else if ($this->requestData['action'] == 'save_rank_label') {
+
+            $this->ajaxActionSaveRankLabel();
+        
+        } else if ($this->requestData['action'] == 'get_rank_labels') {
+
+            $this->ajaxActionGetRankLabels();
+        
         }
         
         $this->printPage();
@@ -884,23 +896,6 @@ class SpeciesController extends Controller
         $this->printPage();
     
     }
-
-function recursiveArraySearch($haystack, $needle, $index = null)
-{
-    $aIt     = new RecursiveArrayIterator($haystack);
-    $it    = new RecursiveIteratorIterator($aIt);
-   
-    while($it->valid())
-    {       
-        if (((isset($index) AND ($it->key() == $index)) OR (!isset($index))) AND ($it->current() == $needle)) {
-            return $aIt->key();
-        }
-       
-        $it->next();
-    }
-   
-    return false;
-} 
     
 	public function ranksAction()
 	{
@@ -909,22 +904,99 @@ function recursiveArraySearch($haystack, $needle, $index = null)
         
         $this->setPageName(_('Taxonomic ranks'));
 
+		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()),false,'parent_id',false,true,'rank_id');
+
+		if (isset($this->requestData['ranks'])) {
+
+			$parent = 'null';
+
+			foreach((array)$this->requestData['ranks'] as $key => $rank) {
+
+				if (!empty($pr[$rank])) {
+
+					$this->models->ProjectRank->save(
+						array(
+							'id' => $pr[$rank]['id'],
+							'parent_id' => $parent
+						)
+					);
+					
+					$parent = $pr[$rank]['id'];
+
+				} else {
+
+					$this->models->ProjectRank->save(
+						array(
+		                    'id' => null, 
+							'project_id' => $this->getCurrentProjectId(),
+							'rank_id' => $rank,
+							'parent_id' => $parent
+						)
+					);
+					
+					$parent = $this->models->ProjectRank->getNewId();
+
+				}
+
+				
+
+			}
+			
+			foreach((array)$pr as $key => $rank) {
+
+				if(!in_array($rank['rank_id'],$this->requestData['ranks'])) {
+
+					$this->models->ProjectRank->delete(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'rank_id' => $rank['rank_id']
+						)
+					);
+
+				}
+
+			}
+			
+			$this->addMessage(_('Ranks saved.'));
+
+		}
+
 		$r = 
 			array_merge(
-				$this->models->Rank->get(array('parent_id !=' => -1),false,'parent_id',false,true,true),
-				$this->models->Rank->get(array('parent_id' => -1),false,'parent_id',false,true,true)
+				$this->models->Rank->get(array('parent_id !=' => -1),false,'parent_id',false,true,'id'),
+				$this->models->Rank->get(array('parent_id' => -1),false,'parent_id',false,true,'id')
 			);
 
-		$h = $this->models->Hybrid->get();
+		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()),false,'parent_id');
 
-		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()));
+		$this->smarty->assign('ranks',$r);
+
+		$this->smarty->assign('projectRanks',$pr);
+
+        $this->printPage();
+
+	}
+	
+	public function ranklabelsAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Taxonomic ranks: labels'));
+
+		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()),false,'parent_id');
 
         $lp = $_SESSION['project']['languages'];
 
 		foreach((array)$pr as $rankkey => $rank) {
 
+			$r = $this->models->Rank->get($rank['rank_id']);
+
+			$pr[$rankkey]['rank'] = $r['rank'];
+
 			foreach((array)$lp as $langaugekey => $language) {
 	
+
 				$lpr = $this->models->LabelProjectRank->get(
 					array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -938,10 +1010,6 @@ function recursiveArraySearch($haystack, $needle, $index = null)
 			}
 
 		}
-
-		$this->smarty->assign('ranks',$r);
-
-		$this->smarty->assign('hybrids',$h);
 
 		$this->smarty->assign('projectRanks',$pr);
 
@@ -958,14 +1026,12 @@ function recursiveArraySearch($haystack, $needle, $index = null)
 	
 	
 	
-	
-	
 	private function setProjectLanguages()
     {
 
         $lp = $this->models->LanguageProject->get(array(
             'project_id' => $this->getCurrentProjectId()
-        ));
+        ),false,'def_language desc');
         
         foreach ((array) $lp as $key => $val) {
             
@@ -1038,7 +1104,7 @@ function recursiveArraySearch($haystack, $needle, $index = null)
     private function createStandardCategories() 
     {    
 
-        $tp = $this->models->TaxonPage->get(
+        $tp = $this->models->PageTaxon->get(
             array(
                 'project_id' => $this->getCurrentProjectId()
             ),'count(*) as total'
@@ -1055,7 +1121,7 @@ function recursiveArraySearch($haystack, $needle, $index = null)
 
                 if (isset($page['mandatory'])) {
 
-                    $d = $this->models->TaxonPage->get(
+                    $d = $this->models->PageTaxon->get(
                         array(
                             'project_id' => $this->getCurrentProjectId(),
                             'page' => $page['name'], 
@@ -1088,7 +1154,7 @@ function recursiveArraySearch($haystack, $needle, $index = null)
     private function createTaxonPage ($name, $show_order = false, $isDefault = false)
     {
 
-        return $this->models->TaxonPage->save(array(
+        return $this->models->PageTaxon->save(array(
             'id' => null, 
             'page' => $name, 
             'show_order' => $show_order!==false ? $show_order : 0, 
@@ -1138,12 +1204,12 @@ function recursiveArraySearch($haystack, $needle, $index = null)
                 'page_id' => $this->requestData['id']
             ));
             
-            $this->models->TaxonPageTitle->delete(array(
+            $this->models->PageTaxonTitle->delete(array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'page_id' => $this->requestData['id']
             ));
             
-            $this->models->TaxonPage->delete(array(
+            $this->models->PageTaxon->delete(array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'id' => $this->requestData['id']
             ));
@@ -1164,7 +1230,7 @@ function recursiveArraySearch($haystack, $needle, $index = null)
             
             if (empty($this->requestData['title'])) {
                 
-                $this->models->TaxonPageTitle->delete(
+                $this->models->PageTaxonTitle->delete(
                     array(
                         'project_id' => $this->getCurrentProjectId(), 
                         'language_id' => $this->requestData['language'], 
@@ -1175,14 +1241,14 @@ function recursiveArraySearch($haystack, $needle, $index = null)
             }
             else {
                 
-                $tpt = $this->models->TaxonPageTitle->get(
+                $tpt = $this->models->PageTaxonTitle->get(
                 array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'language_id' => $this->requestData['language'], 
                     'page_id' => $this->requestData['id']
                 ));
                 
-                $this->models->TaxonPageTitle->save(
+                $this->models->PageTaxonTitle->save(
                 array(
                     'id' => isset($tpt[0]['id']) ? $tpt[0]['id'] : null, 
                     'project_id' => $this->getCurrentProjectId(), 
@@ -1842,7 +1908,7 @@ function recursiveArraySearch($haystack, $needle, $index = null)
     private function getDefaultPageSections($pageId)
     {
 
-        $tp = $this->models->TaxonPage->get(
+        $tp = $this->models->PageTaxon->get(
             array(
             'id' => $pageId,
             'project_id' => $this->getCurrentProjectId()
@@ -2069,6 +2135,74 @@ function recursiveArraySearch($haystack, $needle, $index = null)
     }
 
 
+    private function ajaxActionSaveRankLabel ()
+    {
+        
+        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+            
+            if (empty($this->requestData['label'])) {
+
+                $this->models->LabelProjectRank->delete(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'project_rank_id' => $this->requestData['id']
+                    )
+                );
+
+            } else {
+                
+                $lpr = $this->models->LabelProjectRank->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'project_rank_id' => $this->requestData['id']
+					)
+				);
+                
+                $this->models->LabelProjectRank->save(
+					array(
+						'id' => isset($lpr[0]['id']) ? $lpr[0]['id'] : null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'project_rank_id' => $this->requestData['id'], 
+						'label' => $this->requestData['label']
+					)
+				);
+            
+            }
+            
+            $this->smarty->assign('returnText', 'saved');
+        
+        }
+    
+    }
+	
+	private function ajaxActionGetRankLabels()
+	{
+
+        if (empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+
+			$lpr = $this->models->LabelProjectRank->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language']
+				)
+			);
+                
+            $this->smarty->assign('returnText', json_encode($lpr));
+        
+        }
+
+	}
 
 
 }

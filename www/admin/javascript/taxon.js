@@ -1,6 +1,7 @@
 var taxonActivePageTitle = false;
 var taxonActiveLanguage = false;
 var taxonNewLanguage = false;
+var taxonDefaultLanguage = false;
 var taxonLanguages = Array();
 var taxonActivePage = false;
 var taxonPages = Array();
@@ -40,7 +41,7 @@ function taxonPageDelete(page,name) {
 
 }
 
-function taxonPageTitleSave(page) {
+function taxonSavePageTitle(page) {
 
 	title = $('#name-'+page[0]+'-'+page[1]).val();
 
@@ -801,3 +802,96 @@ function taxonMediaShowMedia(url,name) {
 
 }
 
+
+var taxonKingdom = Array();
+var taxonAddedRanks = Array();
+var taxonCoLRanks = Array();
+
+function taxonAddCoLRanks() {
+	taxonAddedRanks = taxonCoLRanks;
+	taxonShowSelectedRanks();
+}
+
+function taxonAddRank(id,noparent) {
+	if (noparent==undefined) noparent = false;
+	taxonAddedRanks[taxonAddedRanks.length]=[id,$('#rank-'+id).html(),noparent];
+	taxonOrderSelectedRanks();
+	taxonShowSelectedRanks();
+}
+
+function taxonRemoveRank(id) {
+	if (id==taxonKingdom[0]) return;
+	var t = Array();
+
+	for (var i=0;i<taxonAddedRanks.length;i++) {
+		if (taxonAddedRanks[i][0]!=id && id != null) {
+			t[t.length]=taxonAddedRanks[i];
+		}
+	}
+
+	taxonAddedRanks = t;
+	
+	if (taxonAddedRanks.length==0) taxonAddRank(taxonKingdom[0]);
+
+	taxonOrderSelectedRanks();
+	taxonShowSelectedRanks();
+}
+
+function taxonRemoveAll() {
+	taxonRemoveRank();
+	taxonShowSelectedRanks();	
+}
+
+function sortRankArray(a,b) {
+
+	return (a[0] > b[0] ? 1 : (a[0] < b[0] ? -1 : 0));
+
+}
+
+function taxonOrderSelectedRanks() {
+	var d = '|';
+	var t = Array();
+	for (var i=0;i<taxonAddedRanks.length;i++) {
+		if (d.indexOf('|'+taxonAddedRanks[i][0]+'|')==-1) {
+			d = d + taxonAddedRanks[i][0] + '|';
+			t[t.length]=taxonAddedRanks[i];
+		}
+	}
+
+	t.sort(sortRankArray)
+
+	taxonAddedRanks = t;
+
+}
+
+function taxonShowSelectedRanks() {
+
+	var first = true;
+	
+	$('#selected-ranks').children().remove();
+
+	for (var i=0;i<taxonAddedRanks.length;i++) {
+
+		if (taxonAddedRanks[i][2]==true && first==true) {
+			$('<option disabled="disabled">').val('').text('------------------------------------').appendTo('#selected-ranks');
+			first = false;
+		}
+		
+		$('<option id="sel-rank-'+taxonAddedRanks[i][0]+'">').val(taxonAddedRanks[i][0]).text(taxonAddedRanks[i][1]).appendTo('#selected-ranks');
+		$('#sel-rank-'+taxonAddedRanks[i][0]).dblclick( function () { taxonRemoveRank(this.value); });
+
+	}
+
+}
+
+function taxonSaveRanks() {
+
+	for (var i=0;i<taxonAddedRanks.length;i++) {
+
+		$('<input type="hidden" name="ranks[]" value="'+taxonAddedRanks[i][0]+'">').appendTo('#theForm');
+
+	}
+
+	$('#theForm').submit();
+
+}
