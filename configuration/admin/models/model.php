@@ -88,11 +88,11 @@ abstract class Model extends BaseClass
     public function save ($data)
     {
 
-        if (!$this->hasId($data))
-            return false;
-        
+		
+        if (!$this->hasId($data)) return false;
+
         $this->get();
-        
+
         if (empty($this->data)) {
             
             return $this->insert($data);
@@ -355,12 +355,12 @@ abstract class Model extends BaseClass
 
 
 
-    public function get ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $idAsIndex = false)
+    public function get ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $fieldAsIndex = false)
     {
 
         unset($this->data);
         
-        $this->set($id ? $id : $this->id, $cols, $order, $groupBy, $ignoreCase, $idAsIndex);
+        $this->set(($id ? $id : $this->id), $cols, $order, $groupBy, $ignoreCase, $fieldAsIndex);
         
         return isset($this->data) ? $this->data : null;
     
@@ -518,7 +518,7 @@ abstract class Model extends BaseClass
             }
         
         }
-        
+		
         return false;
     
     }
@@ -566,9 +566,9 @@ abstract class Model extends BaseClass
 
 
 
-    private function set ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $idAsIndex = false)
+    private function set ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $fieldAsIndex = false)
     {
-        
+
         /*
 
                 function can take as $id:
@@ -584,8 +584,8 @@ abstract class Model extends BaseClass
         
         $query = false;
         
-        if (!$id) $id='*';
-        
+        if (!$id) return;
+			
         if (is_array($id)) {
             
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
@@ -632,9 +632,9 @@ abstract class Model extends BaseClass
             
             while ($row = mysql_fetch_assoc($set)) {
                 
-				if ($idAsIndex && isset($row['id'])) {
+				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 
-	                $this->data[$row['id']] = $row;
+	                $this->data[$row[$fieldAsIndex]] = $row;
 
 				} else {
 
@@ -658,9 +658,9 @@ abstract class Model extends BaseClass
             
             while ($row = mysql_fetch_assoc($set)) {
 
-				if ($idAsIndex && isset($row['id'])) {
+				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 
-	                $this->data[$row['id']] = $row;
+	                $this->data[$row[$fieldAsIndex]] = $row;
 
 				} else {
 
@@ -686,9 +686,9 @@ abstract class Model extends BaseClass
             
             while ($row = mysql_fetch_assoc($set)) {
                 
-				if ($idAsIndex && isset($row['id'])) {
+				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 
-	                $this->data[$row['id']] = $row;
+	                $this->data[$row[$fieldAsIndex]] = $row;
 
 				} else {
 
