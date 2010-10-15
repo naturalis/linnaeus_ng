@@ -28,11 +28,11 @@ CREATE TABLE dev_projects_ranks (
 	project_id INT( 11 ) NOT NULL ,
 	rank_id INT( 11 ) NOT NULL ,
 	parent_id INT( 11 ),
-	hybrid_id INT( 11 ),
 	created DATETIME NOT NULL ,
 	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 	PRIMARY KEY ( id )  ,
-	index (project_id )
+	index (project_id ),
+	unique (project_id,rank_id)
 ) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 CREATE TABLE dev_labels_projects_ranks (

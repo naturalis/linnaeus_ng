@@ -72,7 +72,7 @@
 		<td></td>
 		<td style="text-align:center">
 			<img 
-				src="{$baseUrl}admin/images/system/icons/arrow-270.png" 
+				src="{$baseUrl}admin/media/system/icons/arrow-270.png" 
 				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])" 
 				class="general-clickable-image" 
 				title="add language"

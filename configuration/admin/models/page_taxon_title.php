@@ -2,7 +2,7 @@
 
 include_once ('model.php');
 
-class TaxonPageTitle extends Model
+class PageTaxonTitle extends Model
 {
     
     const tableBaseName = 'pages_taxa_titles';
