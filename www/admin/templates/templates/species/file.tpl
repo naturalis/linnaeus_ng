@@ -11,19 +11,21 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div class="page-generic-div">
-<p>
 {if $results}
 <form method="post" action="" enctype="multipart/form-data">
+<p>
 Check the results of the import below. If they look OK, press 'save' to save them: <input type="submit" value="save" /><br />
-You can exclude specific taxa by unchecking the checkbox.
+You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox the third column says 'unknown rank', you are
+attempting to load a rank that is not part of your project. Click <a href="ranks.php">here</a> to add or change ranks.
+</p>
 <table>
+<tr><th>Name</th><th>Rank</th><th>Hybrid</th></tr>
 {section name=i loop=$results}
-<tr>
-{assign var=dummy value=$results[i]}
-{section name=j loop=$dummy}
-<td><label for="chk{$smarty.section.i.index}">{$dummy[j]}</label></td>
-{/section}
-<td><input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/></td>
+<tr class="tr-highlight">
+<td><label for="chk{$smarty.section.i.index}">{$results[i][0]}</label></td>
+<td><label for="chk{$smarty.section.i.index}">{$results[i][1]}</label></td>
+<td><label for="chk{$smarty.section.i.index}">{if $results[i][2]==1}x{/if}</label></td>
+<td>{if $results[i][3]}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">unknown rank</span>{/if}</td>
 </tr>
 {/section}
 </table>
@@ -33,39 +35,56 @@ You can load a list of taxa from file. The file must meet the following conditio
 <ol>
 	<li>The format needs to be CSV.</li>
 	<li>The field separator must be , (comma), the field delimiter " (double-quote).</li>
-	<li>There should be one taxon per line.</li>
+	<li>There should be one taxon per line. No header line should be present.</li>
 	<li>Each taxon consists of two fields:
 		<ol>
-		<li>Rank</li>
-		<li>Name</li>
+		<li>Taxon name</li>
+		<li>Taxon rank</li>
+		<li>Hybrid [y]</li>
 		</ol>
-		in that order. Both are mandatory.</li>
+		in that order. The first two are mandatory.<br />
+		Hybrids are only possible for the following ranks:<br />
+		Other values than 'y', or no value, for the field 'Hybrid' are ignored.
+	</li>
+	<li>Ranks should match the list of ranks you have selected for your project.
+		{if $projectRanks|@count==0}
+		<br /><span class="message-error">Currently, you have defined no ranks in this project. Go <a href="ranks.php">here</a> to do so.</span>
+		{else}
+		These currently are:
+		<ul style="list-style:none;margin-left:0px;padding-left:20px;">		
+		{section name=i loop=$projectRanks}
+			<li>{$projectRanks[i].rank}</li>
+		{/section}
+		</ul>
+		Taxa with a rank that does not appear in this list will not be loaded.
+		{/if}
+	</li>		
 	<li>Parent-child relations are assumed top-down, one branch at a time. For instance, loading:
 		<ul style="list-style:none;margin-left:0px;padding-left:20px;">
-			<li>Genus: Ursus</li>
-			<li>Species: Ursus luteolus</li>
-			<li>Species: Ursus thibetanus</li>
-			<li>Infraspecies: Ursus thibetanus laniger</li>
-			<li>Infraspecies: Ursus thibetanus thibetanus</li>
-			<li>Infraspecies: Ursus thibetanus gedrosianus</li>
-			<li>Species: Ursus maritimus</li>
-			<li>Infraspecies: Ursus maritimus marinus</li>
-			<li>Infraspecies: Ursus maritimus maritimus</li>	
-			<li>Genus: Melursus</li>
-			<li>Species: Melursus ursinus</li>
-			<li>Infraspecies: Melursus ursinus inornatus</li>
-			<li>Infraspecies: Melursus ursinus ursinus</li>
+			<li>Ursus &rarr; Genus</li>
+			<li>Ursus luteolus &rarr; Species</li>
+			<li>Ursus thibetanus &rarr; Species</li>
+			<li>Ursus thibetanus laniger &rarr; Infraspecies</li>
+			<li>Ursus thibetanus thibetanus &rarr; Infraspecies</li>
+			<li>Ursus thibetanus gedrosianus &rarr; Infraspecies</li>
+			<li>Ursus maritimus &rarr; Species</li>
+			<li>Ursus maritimus marinus &rarr; Infraspecies</li>
+			<li>Ursus maritimus maritimus &rarr; Infraspecies</li>	
+			<li>Melursus &rarr; Genus</li>
+			<li>Melursus ursinus &rarr; Species</li>
+			<li>Melursus ursinus inornatus &rarr; Infraspecies</li>
+			<li>Melursus ursinus ursinus &rarr; Infraspecies</li>
 		</ul>
 		in this order will correctly maintain the relations between Genus, Species and Infraspecies.
 	</li>
 </ol>
+<p>
 Click the 'browse'-button above, select the file to load from your computer and click 'upload'.
 The contents of the file will be displayed so you can review them before they are saved to your project's database.<br />
 You can download a sample CSV-file <a href="{$baseUrl}admin/media/system/example.csv">here</a>.
-
-{/if}
 </p>
-</form>
+{/if}
+
 </div>
 
 {include file="../shared/admin-footer.tpl"}

@@ -16,6 +16,8 @@ var taxonMediaDescBeingEdited = false;
 var taxonMediaSaveButtonClicked = false;
 var taxonMediaDescBeforeEdit = false;
 var taxonMediaIds = Array();
+var taxonRanks = Array();
+var taxonCanHaveHybrid = Array();
 
 function taxonSetActivePageTitle(page) {
 
@@ -561,7 +563,7 @@ function taxonGetCoL(name,id,singlelevel,subdiv) {
 	taxonCoLSingleLevel = singlelevel==undefined ? $('#single-child-level').is(':checked') : singlelevel ;
 	taxonTargetDiv = subdiv ? 'col-subresult' : 'col-result';
 
-	allShowLoadingDiv('taxon_name');
+	allShowLoadingDiv();
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
@@ -893,5 +895,177 @@ function taxonSaveRanks() {
 	}
 
 	$('#theForm').submit();
+
+}
+
+function taxonAddRankId(rank) {
+
+	taxonRanks[taxonRanks.length] = rank;
+
+}
+
+function taxonSwitchRankLanguage(language) {
+
+	taxonActiveLanguage = language;
+	taxonDrawRankLanguages();
+	taxonGetRankLabels(taxonActiveLanguage);
+
+}
+
+function taxonDrawRankLanguages() {
+	
+	var b='';
+
+	for(var i=0;i<taxonLanguages.length;i++) {
+		if (taxonLanguages[i][2]!=1) {
+			b = b + 
+				'<span class="rank-language'+(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '' )+'" onclick="taxonSwitchRankLanguage('+ taxonLanguages[i][0] +')">' + 
+				taxonLanguages[i][1] + 
+				'</span>&nbsp;';
+		} else {
+			taxonDefaultLanguage = taxonLanguages[i][0];
+		}
+	}
+
+	$('#language-tabs').html(b);
+}
+
+function taxonSaveRankLabel(id,label,type) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'save_rank_label' ,
+			'id' : id , 
+			'label' : label , 
+			'language' : type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	})
+	
+}
+
+function taxonSetRankLabels(obj,language) {
+
+	for(var i=0;i<taxonRanks.length;i++) {
+		if (language==taxonDefaultLanguage) {
+			$('#default-'+taxonRanks[i]).val('');
+		} else {
+			$('#other-'+taxonRanks[i]).val('');
+		}
+	}
+	
+	for(var i=0;i<obj.length;i++) {
+		if (language==taxonDefaultLanguage) {
+			$('#default-'+obj[i].project_rank_id).val(obj[i].label);
+		} else {
+			$('#other-'+obj[i].project_rank_id).val(obj[i].label);
+		}
+	}
+
+}
+
+function taxonGetRankLabels(language) {
+
+	allShowLoadingDiv();
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_rank_labels' ,
+			'language' : language ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			obj = $.parseJSON(data);
+			taxonSetRankLabels(obj,language);
+			allHideLoadingDiv();
+		}
+	})
+	
+}
+
+function taxonCheckNewTaxonName() {
+
+	if ($('#taxon-name').val().length==0) {
+		$('#taxon-message').html('')
+		return;
+	}
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'check_taxon_name' ,
+			'taxon_name' : $('#taxon-name').val() ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			if(data=='<ok>') {
+				$('#taxon-message').removeClass().addClass('message-no-error');
+				$('#taxon-message').html('Ok')
+			} else {
+				$('#taxon-message').removeClass().addClass('message-error');
+				$('#taxon-message').html(data)
+			}
+		}
+	});
+
+}
+
+function taxonGetRankByParent() {
+
+	var id = $('#parent-id option:selected').val();
+
+	if (id == -1) {
+		return;
+	}
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_rank_by_parent' ,
+			'id' : id ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			if (data=='-1') {
+				$('#rank-message').removeClass().addClass('message-error');
+				$('#rank-message').html('That taxon cannot have child taxa.')
+			} else {
+				$('#rank-message').removeClass().addClass('message-no-error');
+				$('#rank-message').html('Ok')
+				$('#rank-id').val(data);
+			}
+
+			taxonCheckHybridCheck();
+
+		}
+	});
+
+}
+
+function taxonCheckHybridCheck() {
+
+	if (!$('#hybrid').is(':checked')) {
+		$('#hybrid-message').removeClass().addClass('message-no-error');
+		$('#hybrid-message').html('')
+		return;
+	}
+
+	if (taxonCanHaveHybrid.inArray($('#rank-id').val())==-1) {
+		$('#hybrid-message').removeClass().addClass('message-error');
+		$('#hybrid-message').html('A taxon of that rank cannot be a hybrid.')
+	} else {
+		$('#hybrid-message').removeClass().addClass('message-no-error');
+		$('#hybrid-message').html('Ok')
+	}
 
 }
