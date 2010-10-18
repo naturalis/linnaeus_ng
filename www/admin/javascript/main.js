@@ -4,6 +4,13 @@ function q(m) {
 
 }
 
+Array.prototype.inArray = function(value) {
+	for (var i in this) { 
+		if (this[i]==value) return i; 
+	}
+	return -1;
+}
+
 function isArray(obj) {
 	
    if (obj.constructor.toString().indexOf("Array") == -1)
@@ -126,12 +133,10 @@ function allSetAutoSaveFreq(freq) {
 
 }
 
-function allShowLoadingDiv(ele) {
-
-	var offset = $('#'+ele).offset();
+function allShowLoadingDiv() {
 
 	$('#loadingdiv').removeClass('loadingdiv-invisible').addClass('loadingdiv-visible');
-	$('#loadingdiv').offset({ left: offset.left+390, top: offset.top-5});
+	$('#loadingdiv').offset({ left: $('#body-container').width()/2, top: $('#body-container').height() / 2});
 
 }
 

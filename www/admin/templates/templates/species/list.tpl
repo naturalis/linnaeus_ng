@@ -5,9 +5,8 @@ Click a cell to access that category for a taxon in a specific language. To chan
 <span id="message-container" style="margin-left:175px">&nbsp;</span>
 <table>
 <tr>
-	<th></th>
 	<th onclick="allTableColumnSort('taxon_order');">Rank</th>
-	<th onclick="allTableColumnSort('taxon');">Taxon</th>
+	<th onclick="allTableColumnSort('taxon');" colspan="2">Taxon</th>
 	{section name=j loop=$languages}
 	<td style="text-align:right; width:75px">
 		{if $languages[j].active=='n'}({/if}{$languages[j].language}{if $languages[j].def_language==1} *{/if}{if $languages[j].active=='n'}){/if}
@@ -18,11 +17,13 @@ Click a cell to access that category for a taxon in a specific language. To chan
 </tr>
 {section name=i loop=$taxa}
 <tr class="taxon-list-row">
-	<td >{$taxa[i].symbol}</td>
 	<td class="taxon-list-cell-rank">{$taxa[i].rank}</td>
 	<td class="taxon-list-cell-name" id="namecell{$taxa[i].id}">
 		<!-- a href="edit.php?id={$taxa[i].id}">{$taxa[i].taxon}</a -->
 		<span onclick="taxonEditTaxonName({$taxa[i].id})" id="name{$taxa[i].id}" class="pseudo-a">{$taxa[i].taxon}</span>
+	</td>
+	<td>
+		{if $taxa[i].is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 	</td>
 	{assign var=t value=$taxa[i].id}
 	{section name=j loop=$languages}
