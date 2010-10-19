@@ -774,16 +774,18 @@ class SpeciesController extends Controller
                 $r = $this->helpers->CsvParserHelper->getResults();
 
 				$pr = $this->getProjectRanks();
-				
+
 				foreach((array)$pr as $key => $val) {
 				
 					$d[] = trim(strtolower($val['rank']));
+
+					if ($val['can_hybrid']==1) $h[] = trim(strtolower($val['rank']));
 
 				}
 
 				foreach((array)$r as $key => $val) {
 
-					$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y');
+					$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y' && in_array(strtolower($val[1]),$h));
 					$r[$key][3] = in_array(strtolower($val[1]),$d);
 				}
 
