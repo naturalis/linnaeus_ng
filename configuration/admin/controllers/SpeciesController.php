@@ -405,27 +405,7 @@ class SpeciesController extends Controller
             'project_id' => $this->getCurrentProjectId()
         ), '*', 'taxon_order');
 
-
-		if (isset($_SESSION['project']['languages'])) {
-
-	        $lp = $_SESSION['project']['languages'];
-
-			foreach ((array) $lp as $key => $val) {
-				
-				$l = $this->models->Language->get($val['language_id']);
-		
-				$lp[$key]['language'] = $l['language'];
-		
-			}
-
-		} else {
-
-			$lp = $this->models->LanguageProject->get(array(
-				'project_id' => $this->getCurrentProjectId()
-			));
-
-	        $_SESSION['project']['languages'] = $lp;
-		}
+		$lp = $_SESSION['project']['languages'];
 		
 		if (isset($_SESSION['project']['pages'])) {
 
@@ -934,6 +914,10 @@ class SpeciesController extends Controller
             
             $this->ajaxActionDeletePage();
         
+        } else if ($this->requestData['action'] == 'get_page_labels') {
+            
+            $this->ajaxActionGetPageTitles();
+        
         } else if ($this->requestData['action'] == 'save_page_title') {
             
             $this->ajaxActionSavePageTitle();
@@ -1152,6 +1136,7 @@ class SpeciesController extends Controller
             $l = $this->models->Language->get($val['language_id']);
             
             $lp[$key]['language'] = $l['language'];
+            $lp[$key]['direction'] = $l['direction'];
             
             if ($val['def_language'] == 1)
                 $defaultLanguage = $val['language_id'];
@@ -1331,6 +1316,31 @@ class SpeciesController extends Controller
     
     }
 
+    private function ajaxActionGetPageTitles ()
+    {
+        
+        if (empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+		
+			$l = $this->models->Language->get($this->requestData['language'],'direction');
+
+			$ptt = $this->models->PageTaxonTitle->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language']
+				),'id,title,page_id,language_id,\''.$l['direction'].'\' as direction'
+			);
+                
+            $this->smarty->assign('returnText', json_encode($ptt));
+        
+        }
+    
+    }
+
+
     private function ajaxActionSavePageTitle ()
     {
         
@@ -1338,8 +1348,7 @@ class SpeciesController extends Controller
             
             return;
         
-        }
-        else {
+        } else {
             
             if (empty($this->requestData['title'])) {
                 
@@ -1351,8 +1360,7 @@ class SpeciesController extends Controller
                     )
                 );
             
-            }
-            else {
+            } else {
                 
                 $tpt = $this->models->PageTaxonTitle->get(
                 array(
@@ -2274,12 +2282,13 @@ class SpeciesController extends Controller
             return;
         
         } else {
+			$l = $this->models->Language->get($this->requestData['language'],'direction');
 
 			$lpr = $this->models->LabelProjectRank->get(
 				array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'language_id' => $this->requestData['language']
-				)
+				),'*, \''.$l['direction'].'\' as direction'
 			);
                 
             $this->smarty->assign('returnText', json_encode($lpr));

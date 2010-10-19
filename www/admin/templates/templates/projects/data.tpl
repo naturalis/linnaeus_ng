@@ -27,7 +27,7 @@
 			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
 		</td>
 	</tr>
-	<tr style="vertical-align:top">
+	<!-- tr style="vertical-align:top">
 		<td>
 			Project logo:
 		</td>
@@ -39,7 +39,7 @@
 		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		<input name="uploadedfile" type="file" /><br />
 		</td>
-	</tr>
+	</tr -->
 	<tr>
 		<td>
 			CSS url:

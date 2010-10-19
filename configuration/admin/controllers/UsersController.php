@@ -889,6 +889,7 @@ class UsersController extends Controller
 			
 			$mp = $this->models->Module->get($val['module_id']);
 			
+			$modules[$key]['icon'] = $mp['icon'];
 			$modules[$key]['module'] = $mp['module'];
 			$modules[$key]['controller'] = $mp['controller'];
 

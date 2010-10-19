@@ -17,8 +17,6 @@ if (!$c->isUserLoggedIn()) {
 } else {
     
     $c->controllerPublicName = '';
-	
-	
     
     $c->adminIndexAction();
 
