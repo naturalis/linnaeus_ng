@@ -282,8 +282,10 @@ not sure if helper is all that useful
         
         $data = $this->models->Project->get($this->getCurrentProjectId());
         
-        $languages = array_merge($this->models->Language->get('select * from %table% where show_order is not null order by show_order asc'), 
-        $this->models->Language->get('select * from %table% where show_order is null order by language asc'));
+        $languages = array_merge(
+			$this->models->Language->get('select * from %table% where show_order is not null order by show_order asc'), 
+	        $this->models->Language->get('select * from %table% where show_order is null order by language asc')
+		);
         
         foreach ((array) $languages as $key => $val) {
             
@@ -297,7 +299,9 @@ not sure if helper is all that useful
             $languages[$key]['is_project_default'] = ($lp[0]['def_language'] == 1);
             
             $languages[$key]['is_active'] = ($lp[0]['active'] == 'y');
-        
+
+            $languages[$key]['tranlation_status'] = $lp[0]['tranlation_status'];
+
         }
         
         $this->smarty->assign('data', $data);
@@ -544,7 +548,7 @@ not sure if helper is all that useful
                 'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId(), 
                 'def_language' => $make_default ? 1 : 0, 
-                'active' => 1
+                'active' => 'n'
             ));
             
             if ($this->models->LanguageProject->getNewId() == '')
@@ -565,19 +569,10 @@ not sure if helper is all that useful
                 'project_id' => $this->getCurrentProjectId()
             ));
         
-        } elseif ($action == 'deactivate') {
+        } elseif ($action == 'deactivate' || $action == 'reactivate') {
             
             $this->models->LanguageProject->update(array(
-                'active' => 'n'
-            ), array(
-                'language_id' => $languageId, 
-                'project_id' => $this->getCurrentProjectId()
-            ));
-        
-        } elseif ($action == 'reactivate') {
-            
-            $this->models->LanguageProject->update(array(
-                'active' => 'y'
+                'active' => ($action == 'deactivate' ? 'n' : 'y' )
             ), array(
                 'language_id' => $languageId, 
                 'project_id' => $this->getCurrentProjectId()
@@ -595,6 +590,16 @@ not sure if helper is all that useful
                 'project_id' => $this->getCurrentProjectId()
             ));
         
+        } elseif ($action == 'translated' || $action == 'untranslated') {
+
+            $this->models->LanguageProject->update(array(
+                'tranlation_status' => ($action == 'translated' ? 1 : 0 )
+            ), array(
+                'language_id' => $languageId, 
+                'project_id' => $this->getCurrentProjectId()
+            ));
+        
+
         }
     
     }

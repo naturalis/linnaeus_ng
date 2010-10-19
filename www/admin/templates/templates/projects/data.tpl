@@ -53,6 +53,13 @@
 			Project languages:
 		</td>
 		<td>
+		<!-- u>Language(s) currently in use</u><br / -->
+		<span id="language-list"></span>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>
 			<select name="language-select" id="language-select">
 			{assign var=first value=true}
 			{section name=i loop=$languages}
@@ -66,25 +73,11 @@
 					>{$languages[i].language}</option>
 			{/section}
 			</select>
-		</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td style="text-align:center">
-			<img 
-				src="{$baseUrl}admin/media/system/icons/arrow-270.png" 
-				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])" 
-				class="general-clickable-image" 
-				title="add language"
-			/>
-		</td>
-	</td>
-	<tr>
-		<td></td>
-		<td>
-		<!-- u>Language(s) currently in use</u><br / -->
-		<span id="language-list">	
-		</span>
+			<span 
+				class="pseudo-a" 
+				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])">
+				add language
+			</span>
 		</td>
 	</tr>		
 </table>
@@ -105,7 +98,7 @@ $(document).ready(function(){
 {/literal}
 {section name=i loop=$languages}
 	{if $languages[i].language_project_id!=''}
-	projectAddLanguage([{$languages[i].id},'{$languages[i].language}',{$languages[i].language_project_id},{if $languages[i].is_project_default}1{else}0{/if},{if $languages[i].is_active}1{else}0{/if}])
+	projectAddLanguage([{$languages[i].id},'{$languages[i].language}',{$languages[i].language_project_id},{if $languages[i].is_project_default}1{else}0{/if},{if $languages[i].is_active}1{else}0{/if},{$languages[i].tranlation_status}])
 	{/if}
 {/section}
 	projectUpdateLanguageBlock();
