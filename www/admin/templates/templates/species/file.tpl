@@ -31,20 +31,22 @@ attempting to load a rank that is not part of your project. Click <a href="ranks
 </table>
 </form>
 {else}
-You can load a list of taxa from file. The file must meet the following conditions:
+<p>
+To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'.
+The contents of the file will be displayed so you can review them before they are saved to your project's database.<br />
+The file must meet the following conditions:
+</p>
 <ol>
 	<li>The format needs to be CSV.</li>
 	<li>The field separator must be , (comma), the field delimiter " (double-quote).</li>
 	<li>There should be one taxon per line. No header line should be present.</li>
-	<li>Each taxon consists of two fields:
+	<li>Each taxon consists of two or three fields:
 		<ol>
 		<li>Taxon name</li>
 		<li>Taxon rank</li>
-		<li>Hybrid [y]</li>
+		<li>Hybrid ('y'; optional)</li>
 		</ol>
-		in that order. The first two are mandatory.<br />
-		Hybrids are only possible for the following ranks:<br />
-		Other values than 'y', or no value, for the field 'Hybrid' are ignored.
+		in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored.
 	</li>
 	<li>Ranks should match the list of ranks you have selected for your project.
 		{if $projectRanks|@count==0}
@@ -58,7 +60,14 @@ You can load a list of taxa from file. The file must meet the following conditio
 		</ul>
 		Taxa with a rank that does not appear in this list will not be loaded.
 		{/if}
-	</li>		
+	</li>
+	<li>Hybrids are only possible for the following ranks:
+		<ul style="list-style:none;margin-left:0px;padding-left:20px;">		
+		{section name=i loop=$projectRanks}
+			{if $projectRanks[i].can_hybrid==1}<li>{$projectRanks[i].rank}{/if}</li>
+		{/section}
+		</ul>
+	</li>
 	<li>Parent-child relations are assumed top-down, one branch at a time. For instance, loading:
 		<ul style="list-style:none;margin-left:0px;padding-left:20px;">
 			<li>Ursus &rarr; Genus</li>
@@ -79,8 +88,6 @@ You can load a list of taxa from file. The file must meet the following conditio
 	</li>
 </ol>
 <p>
-Click the 'browse'-button above, select the file to load from your computer and click 'upload'.
-The contents of the file will be displayed so you can review them before they are saved to your project's database.<br />
 You can download a sample CSV-file <a href="{$baseUrl}admin/media/system/example.csv">here</a>.
 </p>
 {/if}
