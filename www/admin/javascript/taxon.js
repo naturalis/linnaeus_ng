@@ -1,3 +1,4 @@
+var taxonActiveView = false;
 var taxonActivePageTitle = false;
 var taxonActiveLanguage = false;
 var taxonNewLanguage = false;
@@ -38,26 +39,6 @@ function taxonPageDelete(page,name) {
 		},
 		function() {
 			$('#theForm').submit();
-		}
-	);
-
-}
-
-function taxonSavePageTitle(page) {
-
-	title = $('#name-'+page[0]+'-'+page[1]).val();
-
-	$.post(
-		"ajax_interface.php", 
-		{
-			'id' : page[0],
-			'action' : 'save_page_title' ,
-			'title' : title , 
-			'language' : page[1] ,
-			'time' : allGetTimestamp()
-		},
-		function(data){
-			allSetMessage(data);
 		}
 	);
 
@@ -907,9 +888,15 @@ function taxonAddRankId(rank) {
 function taxonSwitchRankLanguage(language) {
 
 	taxonActiveLanguage = language;
-	taxonDrawRankLanguages();
-	taxonGetRankLabels(taxonActiveLanguage);
-
+	taxonDrawRankLanguages();	
+	switch (taxonActiveView) {
+		case 'ranklabels':
+			taxonGetRankLabels(taxonActiveLanguage);
+			break;
+		case 'page':
+			taxonGetPageLabels(taxonActiveLanguage);
+			break;			
+	}
 }
 
 function taxonDrawRankLanguages() {
@@ -959,14 +946,17 @@ function taxonSetRankLabels(obj,language) {
 		}
 	}
 	
-	for(var i=0;i<obj.length;i++) {
-		if (language==taxonDefaultLanguage) {
-			$('#default-'+obj[i].project_rank_id).val(obj[i].label);
-		} else {
-			$('#other-'+obj[i].project_rank_id).val(obj[i].label);
+	if (obj) {
+		for(var i=0;i<obj.length;i++) {
+			if (language==taxonDefaultLanguage) {
+				$('#default-'+obj[i].project_rank_id).val(obj[i].label);
+				if (obj[i].direction) $('#default-'+obj[i].project_rank_id).attr('dir',obj[i].direction);
+			} else {
+				$('#other-'+obj[i].project_rank_id).val(obj[i].label);
+				if (obj[i].direction) $('#other-'+obj[i].project_rank_id).attr('dir',obj[i].direction);
+			}
 		}
 	}
-
 }
 
 function taxonGetRankLabels(language) {
@@ -1068,4 +1058,70 @@ function taxonCheckHybridCheck() {
 		$('#hybrid-message').html('Ok')
 	}
 
+}
+
+function taxonSavePageTitle(id,label,type) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'save_page_title' ,
+			'id' : id , 
+			'title' : label , 
+			'language' :  type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	});
+	
+}
+
+function taxonSetPageLabels(obj,language) {
+
+	for(var i=0;i<taxonRanks.length;i++) {
+		if (language==taxonDefaultLanguage) {
+			$('#default-'+taxonRanks[i]).val('');
+		} else {
+			$('#other-'+taxonRanks[i]).val('');
+		}
+	}
+
+	if (obj) {
+	
+		for(var i=0;i<obj.length;i++) {
+			if (language==taxonDefaultLanguage) {
+				$('#default-'+obj[i].page_id).val(obj[i].title);
+				if (obj[i].direction) $('#default-'+obj[i].page_id).attr('dir',obj[i].direction);
+			} else {
+				$('#other-'+obj[i].page_id).val(obj[i].title);
+				if (obj[i].direction) $('#other-'+obj[i].page_id).attr('dir',obj[i].direction);
+			}
+		}
+
+	}
+
+}
+
+function taxonGetPageLabels(language) {
+
+	allShowLoadingDiv();
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_page_labels' ,
+			'language' : language ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			obj = $.parseJSON(data);
+			taxonSetPageLabels(obj,language);
+			allHideLoadingDiv();
+		}
+	})
+	
 }

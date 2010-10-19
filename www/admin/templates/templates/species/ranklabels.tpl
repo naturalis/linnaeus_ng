@@ -3,7 +3,9 @@
 <div id="page-main">
 
 <span id="message-container" style="float:right;"></span>
-<br />
+Below, you can specify the correct label of each rank in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed. On the right hand side, the labels in the other languages are displayed. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
+Text you enter is automatically saved when you leave the input field.
+<br /><br />
 
 <table>
 <tr>
@@ -18,7 +20,14 @@
 {section name=i loop=$projectRanks}
 <tr>
 	<td>{$projectRanks[i].rank}</td>
-	<td><input type="text" id="default-{$projectRanks[i].id}" maxlength="64" onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'default')" /></td>
+	<td>
+		<input
+			type="text" 
+			id="default-{$projectRanks[i].id}" 
+			maxlength="64" 
+			onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'default')"
+			direction="{$languages[0].direction}" />
+	</td>
 	<td><input type="text" id="other-{$projectRanks[i].id}" maxlength="64" onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'other')" /></td>
 </tr>
 {/section}
@@ -26,12 +35,11 @@
 </div>
 
 
-
-
 <script type="text/javascript">
 {literal}
 $(document).ready(function(){
 {/literal}
+taxonActiveView = 'ranklabels';
 {section name=i loop=$projectRanks}
 taxonAddRankId({$projectRanks[i].id});
 {/section}

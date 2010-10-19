@@ -2,16 +2,37 @@
 
 <div id="page-main">
 
-Manage modules:
-<ul>
+<table>
+	<tr><td colspan="2">Manage modules:</td></tr>
 {section name=i loop=$modules}
-	<li><a href="views/{$modules[i].controller}/">{$modules[i].module}</a>{if $modules[i].active=='y'} *{/if}</li>
+	<tr>
+		<td>
+			<a href="views/{$modules[i].controller}/">
+				<img src="{$baseUrl}admin/media/system/module_icons/{$modules[i].icon}" style="width:32px;border:0px" />
+			</a>
+		</td>
+		<td>
+			<a href="views/{$modules[i].controller}/">{$modules[i].module}</a>{if $modules[i].active=='y'} *{/if}
+		</td>
+	</tr>
 {/section}
+	<tr><td colspan="2">&nbsp;</td></tr>
 {section name=i loop=$freeModules}
-	<li><a href="views/extra/index.php?id={$freeModules[i].id}">{$freeModules[i].module}</a>{if $freeModules[i].active=='y'} *{/if}</li>
+	<tr>
+		<td>
+			<a href="views/extra/index.php?id={$freeModules[i].id}">
+				<img src="{$baseUrl}admin/media/system/module_icons/custom.png" style="width:32px;border:0px" />
+			</a>
+		</td>
+		<td>
+			<a href="views/extra/index.php?id={$freeModules[i].id}">{$freeModules[i].module}</a>{if $freeModules[i].active=='y'} *{/if}
+		</td>
+	</tr>
 {/section}
-</ul>
+</table>
+
 <br />
+
 Other tasks:
 <ul>
 	<li><a href="views/users/">User management</a></li>
