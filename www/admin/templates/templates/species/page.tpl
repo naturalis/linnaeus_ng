@@ -10,16 +10,18 @@ Text you enter is automatically saved when you leave the input field.
 <br /><br />
 <table>
 <tr>
-	<td></td>
+	<th style="width:150px">Category</th>
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}
 	<td>{$languages[i].language} *</td>
 {/if}
 {/section}
+{if $languages|@count > 1}
 <td colspan="2" id="language-tabs">(languages)</td>
+{/if}
 </tr>
 {section name=i loop=$pages}
-	<tr>
+	<tr class="tr-highlight">
 		<td>
 			{$pages[i].page}
 		</td>
@@ -28,7 +30,9 @@ Text you enter is automatically saved when you leave the input field.
 					type="text" 
 					id="default-{$pages[i].id}" 
 					maxlength="64" 
-					onblur="taxonSavePageTitle({$pages[i].id},this.value,'default')" /></td>
+					onblur="taxonSavePageTitle({$pages[i].id},this.value,'default')" />
+			</td>
+			{if $languages|@count > 1}
 			<td>
 				<input 
 					type="text" 
@@ -36,11 +40,11 @@ Text you enter is automatically saved when you leave the input field.
 					maxlength="64" 
 					onblur="taxonSavePageTitle({$pages[i].id},this.value,'other')" />
 			</td>
+			{/if}
 			<td class="cell-page-delete" onclick="taxonPageDelete({$pages[i].id},'{$pages[i].page}');"></td>
 		</tr>
 {/section}
 </table>
-
 <br />
 {if $languages|@count==0}
 You have to define at least one language in your project before you can add any categories.<br />

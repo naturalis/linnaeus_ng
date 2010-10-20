@@ -64,10 +64,10 @@ function allDoubleDeleteConfirm(element,name) {
 
 }
 
-function allSetMessage(msg,err) {
+function allSetMessage(msg,delay) {
 
 	$('#message-container').show();
-	$('#message-container').html(msg).delay(1000).fadeOut(500);
+	$('#message-container').html(msg).delay(delay==undefined?1000:delay).fadeOut(500);
 
 }
 
@@ -134,9 +134,8 @@ function allSetAutoSaveFreq(freq) {
 }
 
 function allShowLoadingDiv() {
-
 	$('#loadingdiv').removeClass('loadingdiv-invisible').addClass('loadingdiv-visible');
-	$('#loadingdiv').offset({ left: $('#body-container').width()/2, top: $('#body-container').height() / 2});
+	$('#loadingdiv').offset({ left: $('#body-container').width()/2, top:  $(window).height()/2});
 
 }
 

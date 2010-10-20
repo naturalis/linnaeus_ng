@@ -4,12 +4,12 @@ var moduleFreeModules = Array();
 var moduleModuleUsers = Array();
 var moduleFreeModuleUsers = Array();
 
-function moduleAddModule(module) {
+function moduleAddProjectModule(module) {
 	//[id,name,desc,[active,[id in project]]]
 	moduleModules[moduleModules.length] = module;
 }
 
-function moduleAddFreeModule(module) {
+function moduleAddProjectFreeModule(module) {
 	//[id,name,active]
 	moduleFreeModules[moduleFreeModules.length] = module;
 }

@@ -13,7 +13,7 @@ Select the standard modules you wish to use in your project:<br />
 Besides these standard modules, you can add up to five extra content modules to your project:<br />
 <div id="free-module-table-div"></div>
 
-<table id="new-input" class="{if $free_modules|@count >= 5}module-new-input-hidden{/if}">
+<table id="new-input" class="{if $freeModules|@count >= 5}module-new-input-hidden{/if}">
 	<tr>
 		<td colspan="4">&nbsp;</td>
 	</tr>
@@ -34,13 +34,14 @@ Besides these standard modules, you can add up to five extra content modules to 
 
 <script type="text/javascript">
 {section name=i loop=$modules}
-	moduleAddModule([{$modules[i].id},'{$modules[i].module|addslashes}','{$modules[i].description|addslashes}','{if $modules[i].active==''}-{else}{$modules[i].active}{/if}',{if $modules[i].module_project_id==''}'-'{else}{$modules[i].module_project_id}{/if}]);
+	moduleAddProjectModule([{$modules[i].id},'{$modules[i].module|addslashes}','{$modules[i].description|addslashes}','{if $modules[i].active==''}-{else}{$modules[i].active}{/if}',{if $modules[i].module_project_id==''}'-'{else}{$modules[i].module_project_id}{/if}]);
 {/section}
 	moduleDrawModuleBlock();
 
-{section name=i loop=$free_modules}
-	moduleAddFreeModule([{$free_modules[i].id},'{$free_modules[i].module|addslashes}','{$free_modules[i].active}']);
+{section name=i loop=$freeModules}
+	moduleAddProjectFreeModule([{$freeModules[i].id},'{$freeModules[i].module|addslashes}','{$freeModules[i].active}']);
 {/section}
+
 	moduleDrawFreeModuleBlock();
 
 </script>

@@ -1,81 +1,106 @@
 {include file="../shared/admin-header.tpl"}
+
 <div id="page-main">
-<span id="debug-message"></span>
 
-{if $taxon.id!=-1}
-<form name="theForm" id="theForm">
-	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
-	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
+<span id="message-container" style="float:right;"></span>
+reminder to self: <h1>FIRST SECTION NEEDS TO STAY!</h1>
+You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided<br />
+Below, you can specify the correct label of each rank in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed. On the right hand side, the labels in the other languages are displayed. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
+Text you enter is automatically saved when you leave the input field.
+<br /><br />
 
-<div id="taxon-navigation-table-div">
-<table id="taxon-navigation-table">
-	<tr>
-		<td id="taxon-navigation-cell">
-			<span style="float:right">
-				<span id="message-container" style="margin-right:10px">&nbsp;</span>
-				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
-				<input type="button" value="delete" onclick="taxonDeleteData()" style="margin-right:5px" />
-				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
-			</span>
+
+<form name="theForm" id="theForm" action="" method="post">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<table>
+<tr>
+	<th>Category</th>
+	<th>Sections</th>
+{section name=i loop=$languages}
+{if $languages[i].def_language=='1'}
+	<td>{$languages[i].language} *</td>
+{/if}
+{/section}
+{if $languages|@count>1}		
+	<td colspan="2" id="language-tabs">(languages)</td>
+{/if}
+</tr>
+{section name=i loop=$pages}
+	{if $pages[i].sections|@count==0}
+	<tr class="tr-highlight">
+		<td>
+			{$pages[i].page}
 		</td>
 	</tr>
+	{else}
+	{section name=j loop=$pages[i].sections}
+	<tr class="tr-highlight">
+	{if $smarty.section.j.index != 0}
+		<td></td>
+	{else}
+		<td>
+			{$pages[i].page}
+		</td>
+	{/if}
+		<td>{$pages[i].sections[j].section}</td>
+		<td>
+			<input 
+				type="text" 
+				maxlength="64" 
+				id="default-{$pages[i].sections[j].id}"
+				onblur="taxonSaveSectionTitle({$pages[i].sections[j].id},this.value,'default')" /></td>
+		{if $languages|@count>1}		
+		<td>
+			<input 
+				type="text" 
+				maxlength="64" 
+				id="other-{$pages[i].sections[j].id}"
+				onblur="taxonSaveSectionTitle({$pages[i].sections[j].id},this.value,'other')" />
+		</td>
+		{/if}
+		<td class="cell-page-delete" onclick="taxonSectionDelete({$pages[i].sections[j].id},'{$pages[i].sections[j].section}');"></td>
+	</tr>
+	{/section}
+	{/if}
+	<tr>
+		<td></td>
+		<td style="vertical-align:top">
+			<input type="text" style="width:150px;" name="new[{$pages[i].id}]" /> [<span class="pseudo-a" onclick="$('#theForm').submit();">add</span>]
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+{/section}
 </table>
+</form>
+
 </div>
 
-<div id="taxon-pages-table-div"></div>
-
-<div id="taxon-language-table-div"></div>
-
-<div id="taxon-publish-table-div"></div>
-
-
-Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />
-<textarea name="content" style="width:880px;height:600px;" id="taxon-content">{$content.content}</textarea>
-</form>
-{/if}
-
+<script type="text/javascript">
 {literal}
-<script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-{section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
-	taxonActiveLanguage = {$activeLanguage};
-	taxonUpdateLanguageBlock();
+taxonActiveView = 'sections';
+
 
 {section name=i loop=$pages}
-	var pagenames = new Array();
-	pagenames[-1] = '{$pages[i].page|addslashes}';
-	{section name=j loop=$languages}{assign var=n value=$languages[j].language_id}pagenames[{$n}] = '{$pages[i].titles[$n].title|addslashes}';
+{section name=j loop=$pages[i].sections}
+taxonAddRankId({$pages[i].sections[j].id});
 {/section}
-	taxonAddPage([{$pages[i].id},pagenames,{if $pages[i].def_page=='1'}1{else}0{/if}]);
 {/section}
-	taxonActivePage = {$activePage};
-	taxonUpdatePageBlock();
-
-	taxonPublishState  = {if $content.publish!=''}{$content.publish}{else}0{/if};
-	taxonDrawPublishBlock();
-
-	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
-
-	allSetAutoSaveFreq({$autosaveFrequency});
-	taxonRunAutoSave();
+{section name=i loop=$languages}
+taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+{/section}
+taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+taxonDrawRankLanguages();
+taxonGetSectionLabels(taxonDefaultLanguage);
+taxonGetSectionLabels(taxonActiveLanguage);
 
 {literal}
-	$(window).unload(
-		function () { 
-			taxonConfirmSaveOnUnload();
-		} 
-	);
-	
 });
-</script>
 {/literal}
-
-</div>
+</script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
