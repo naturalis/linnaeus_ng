@@ -5,7 +5,7 @@ th[onclick] {
 
 select,input[type="text"],input[type="password"],.taxonNameEdit {
 	font-size: 12px;
-	width: 200px;
+	width: 150px;
 }
 
 .taxonNameEdit {

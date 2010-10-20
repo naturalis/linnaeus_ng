@@ -107,3 +107,17 @@ RENAME TABLE `media_taxa_titles`  TO `dev_media_taxa_titles` ;
 
 
 
+
+
+CREATE TABLE dev_sections (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	page_id INT( 11 ) NOT NULL ,
+	section varchar(32) not null,
+	show_order  INT( 2 ) NOT NULL ,
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) ,
+	index (project_id,page_id)
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+

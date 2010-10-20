@@ -106,14 +106,14 @@ class ProjectsController extends Controller
         
         }
         
-        $free_modules = $this->models->FreeModuleProject->get(array(
+        $freeModules = $this->models->FreeModuleProject->get(array(
             'project_id' => $this->getCurrentProjectId()
         ));
-        
-        $this->smarty->assign('free_modules', $free_modules);
-        
+
         $this->smarty->assign('modules', $modules);
-        
+
+        $this->smarty->assign('freeModules', $freeModules);
+
         $this->printPage();
     
     }

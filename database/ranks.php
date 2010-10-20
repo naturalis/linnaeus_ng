@@ -165,3 +165,22 @@ insert into dev_hybrids values (null,'x Genus species',now(),null);
 insert into dev_hybrids values (null,'Genus x species',now(),null);
 insert into dev_hybrids values (null,'Genus species x Genus species',now(),null);
  
+ 
+ 
+ /*
+ 
+ CREATE TABLE dev_labels_sections (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	section_id INT( 11 ) NOT NULL ,
+	language_id INT( 11 ) NOT NULL ,
+	label varchar (64) not null,
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) ,
+	index (project_id,language_id)
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+ 
+ */

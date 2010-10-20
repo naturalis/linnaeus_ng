@@ -26,21 +26,28 @@ function taxonSetActivePageTitle(page) {
 
 }
 
-function taxonPageDelete(page,name) {
+function taxonGeneralDeleteLabels(id,action,name,itm) {
 
-	if (!allDoubleDeleteConfirm('the page',name)) return;
+	if (!allDoubleDeleteConfirm(itm,name)) return;
 
-	$.post(
-		"ajax_interface.php", 
-		{
-			'id' : page ,
-			'action' : 'delete_page' ,
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'id' : id , 
 			'time' : allGetTimestamp()
-		},
-		function() {
+		}),
+		success : function (data) {
 			$('#theForm').submit();
 		}
-	);
+	});
+
+}
+
+function taxonPageDelete(page,name) {
+
+	taxonGeneralDeleteLabels(page,'delete_page',name,'the page');
 
 }
 
@@ -896,7 +903,11 @@ function taxonSwitchRankLanguage(language) {
 		case 'page':
 			taxonGetPageLabels(taxonActiveLanguage);
 			break;			
+		case 'sections':
+			taxonGetSectionLabels(taxonActiveLanguage);
+			break;			
 	}
+
 }
 
 function taxonDrawRankLanguages() {
@@ -906,7 +917,9 @@ function taxonDrawRankLanguages() {
 	for(var i=0;i<taxonLanguages.length;i++) {
 		if (taxonLanguages[i][2]!=1) {
 			b = b + 
-				'<span class="rank-language'+(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '' )+'" onclick="taxonSwitchRankLanguage('+ taxonLanguages[i][0] +')">' + 
+				'<span class="rank-language'+
+					(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '' )+
+					'" onclick="taxonSwitchRankLanguage('+ taxonLanguages[i][0] +')">' + 
 				taxonLanguages[i][1] + 
 				'</span>&nbsp;';
 		} else {
@@ -915,28 +928,50 @@ function taxonDrawRankLanguages() {
 	}
 
 	$('#language-tabs').html(b);
+
 }
 
-function taxonSaveRankLabel(id,label,type) {
+function taxonGeneralGetLabels(language,action,postFunction) {
+
+	allShowLoadingDiv();
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
 		data : ({
-			'action' : 'save_rank_label' ,
-			'id' : id , 
-			'label' : label , 
-			'language' : type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
+			'action' : action ,
+			'language' : language ,
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
-			allSetMessage(data);
+			obj = $.parseJSON(data);
+			eval(postFunction+'(obj,language)');
+			allHideLoadingDiv();
 		}
 	})
 	
 }
 
-function taxonSetRankLabels(obj,language) {
+function taxonGeneralSave(id,label,type,action) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'id' : id , 
+			'label' : label , 
+			'language' :  type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	});
+
+}
+
+function taxonGeneralSetLabels(obj,language,idField,labelField) {
 
 	for(var i=0;i<taxonRanks.length;i++) {
 		if (language==taxonDefaultLanguage) {
@@ -945,38 +980,41 @@ function taxonSetRankLabels(obj,language) {
 			$('#other-'+taxonRanks[i]).val('');
 		}
 	}
-	
+
 	if (obj) {
+	
 		for(var i=0;i<obj.length;i++) {
+			var id = eval('obj[i].'+idField);
+			var val = eval('obj[i].'+labelField);
+			
 			if (language==taxonDefaultLanguage) {
-				$('#default-'+obj[i].project_rank_id).val(obj[i].label);
-				if (obj[i].direction) $('#default-'+obj[i].project_rank_id).attr('dir',obj[i].direction);
+				$('#default-'+id).val(val);
+				if (obj[i].direction) $('#default-'+id).attr('dir',obj[i].direction);
 			} else {
-				$('#other-'+obj[i].project_rank_id).val(obj[i].label);
-				if (obj[i].direction) $('#other-'+obj[i].project_rank_id).attr('dir',obj[i].direction);
+				$('#other-'+id).val(val);
+				if (obj[i].direction) $('#other-'+id).attr('dir',obj[i].direction);
 			}
 		}
+
 	}
+
+}
+
+function taxonSaveRankLabel(id,label,type) {
+
+	taxonGeneralSave(id,label,type,'save_rank_label');
+	
+}
+
+function taxonSetRankLabels(obj,language) {
+
+	taxonGeneralSetLabels(obj,language,'project_rank_id','label');
+
 }
 
 function taxonGetRankLabels(language) {
-
-	allShowLoadingDiv();
-
-	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'get_rank_labels' ,
-			'language' : language ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			obj = $.parseJSON(data);
-			taxonSetRankLabels(obj,language);
-			allHideLoadingDiv();
-		}
-	})
+	
+	taxonGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels');
 	
 }
 
@@ -1062,66 +1100,43 @@ function taxonCheckHybridCheck() {
 
 function taxonSavePageTitle(id,label,type) {
 
-	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'save_page_title' ,
-			'id' : id , 
-			'title' : label , 
-			'language' :  type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			allSetMessage(data);
-		}
-	});
-	
+	taxonGeneralSave(id,label,type,'save_page_title');	
+
 }
+
 
 function taxonSetPageLabels(obj,language) {
 
-	for(var i=0;i<taxonRanks.length;i++) {
-		if (language==taxonDefaultLanguage) {
-			$('#default-'+taxonRanks[i]).val('');
-		} else {
-			$('#other-'+taxonRanks[i]).val('');
-		}
-	}
-
-	if (obj) {
-	
-		for(var i=0;i<obj.length;i++) {
-			if (language==taxonDefaultLanguage) {
-				$('#default-'+obj[i].page_id).val(obj[i].title);
-				if (obj[i].direction) $('#default-'+obj[i].page_id).attr('dir',obj[i].direction);
-			} else {
-				$('#other-'+obj[i].page_id).val(obj[i].title);
-				if (obj[i].direction) $('#other-'+obj[i].page_id).attr('dir',obj[i].direction);
-			}
-		}
-
-	}
+	taxonGeneralSetLabels(obj,language,'page_id','title');
 
 }
 
 function taxonGetPageLabels(language) {
 
-	allShowLoadingDiv();
+	taxonGeneralGetLabels(language,'get_page_labels','taxonSetPageLabels');
 
-	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'get_page_labels' ,
-			'language' : language ,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			obj = $.parseJSON(data);
-			taxonSetPageLabels(obj,language);
-			allHideLoadingDiv();
-		}
-	})
+}
+
+function taxonSaveSectionTitle(id,label,type) {
+	
+	taxonGeneralSave(id,label,type,'save_section_title');
+
+}
+
+function taxonSectionDelete(id,name) {
+	
+	taxonGeneralDeleteLabels(id,'delete_section_title',name,'the section');
+
+}
+
+function taxonSetSectionLabels(obj,language) {
+
+	taxonGeneralSetLabels(obj,language,'section_id','label');
+
+}
+
+function taxonGetSectionLabels(language) {
+
+	taxonGeneralGetLabels(language,'get_section_titles','taxonSetSectionLabels');
 	
 }

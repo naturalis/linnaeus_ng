@@ -28,6 +28,8 @@ class SpeciesController extends Controller
         'content_taxon', 
         'language_project', 
         'language', 
+		'section',
+		'label_section',
         'page_taxon', 
         'page_taxon_title', 
         'heartbeat', 
@@ -110,7 +112,7 @@ class SpeciesController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Categories'));
+        $this->setPageName(_('Define categories'));
         
         // adding a new page
         if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
@@ -978,8 +980,20 @@ class SpeciesController extends Controller
 
             $this->getRankByParent();
         
-        }
+        } else if ($this->requestData['action'] == 'save_section_title') {
+
+            $this->ajaxActionSaveSectionTitle();
         
+        } else if ($this->requestData['action'] == 'delete_section_title') {
+
+            $this->ajaxActionDeleteSectionTitle();
+        
+        } else if ($this->requestData['action'] == 'get_section_titles') {
+
+            $this->ajaxActionGetSectionLabels();
+        
+        }
+		
         $this->printPage();
     
     }
@@ -1124,6 +1138,61 @@ class SpeciesController extends Controller
 
 	}
 	
+	public function sectionsAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Define sections'));
+
+		if (isset($this->requestData['new']) && !$this->isFormResubmit()) {
+
+			foreach((array)$this->requestData['new'] as $key => $val) {
+
+				$this->models->Section->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(), 
+						'page_id' => $key,
+						'section' => $val
+					)
+				);
+		
+			}
+
+		}
+
+        $lp = $_SESSION['project']['languages'];
+
+        $defaultLanguage = $_SESSION['project']['default_language_id'];
+        
+        $pages = $this->models->PageTaxon->get(array(
+            'project_id' => $this->getCurrentProjectId()
+            ),'*','show_order'
+        );
+
+       foreach((array)$pages as $key => $val) {
+
+			$s = $this->models->Section->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'page_id' => $val['id'],
+			),'*, ifnull(show_order,999) as show_order','show_order');
+			
+			$pages[$key]['sections'] = $s;
+
+        }
+
+        $this->smarty->assign('languages', $lp);
+        
+        $this->smarty->assign('pages', $pages);
+        
+        $this->smarty->assign('defaultLanguage', $defaultLanguage);
+        
+        $this->printPage();
+
+	}	
+	
 	private function setProjectLanguages()
     {
 
@@ -1214,7 +1283,11 @@ class SpeciesController extends Controller
 
             if ($tp[0]['total']==0) {
 
-                $this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
+                if ($this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+
+	                $this->createTaxonPageSections($page['sections'],  $this->models->PageTaxon->getNewId());
+	
+				}
 
             } else {
 
@@ -1229,8 +1302,12 @@ class SpeciesController extends Controller
 
                     if ($d[0]['total']==0) {
         
-                        $this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default']);
-        
+                        if ($this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+
+							$this->createTaxonPageSections($page['sections'],  $this->models->PageTaxon->getNewId());
+			
+						}
+
                     } 
 
                 }
@@ -1263,6 +1340,24 @@ class SpeciesController extends Controller
     
     }
 
+	private function createTaxonPageSections($sections, $pageId)
+	{
+
+		foreach((array)$sections as $key => $val) {
+
+			$this->models->Section->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(), 
+				'page_id' => $pageId,
+				'section' => $val, 
+				'show_order' => $key, 
+			));
+
+		}
+
+	}
+
     private function doLockOutUser ($taxonId)
     {
         
@@ -1291,28 +1386,34 @@ class SpeciesController extends Controller
     private function ajaxActionDeletePage ()
     {
         
-        if (empty($this->requestData['id'])) {
-            
-            return;
-        
-        } else {
-            
-            $this->models->ContentTaxon->delete(array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'page_id' => $this->requestData['id']
-            ));
-            
-            $this->models->PageTaxonTitle->delete(array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'page_id' => $this->requestData['id']
-            ));
-            
-            $this->models->PageTaxon->delete(array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'id' => $this->requestData['id']
-            ));
-        
-        }
+	if (empty($this->requestData['id'])) {
+		
+		return;
+	
+	} else {
+		
+		$this->models->ContentTaxon->delete(array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'page_id' => $this->requestData['id']
+		));
+		
+		$this->models->PageTaxonTitle->delete(array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'page_id' => $this->requestData['id']
+		));
+
+		$this->models->Section->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'page_id' => $this->requestData['id']
+		));
+					
+		$this->models->PageTaxon->delete(array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'id' => $this->requestData['id']
+		));
+	
+	}
     
     }
 
@@ -1350,7 +1451,7 @@ class SpeciesController extends Controller
         
         } else {
             
-            if (empty($this->requestData['title'])) {
+            if (empty($this->requestData['label'])) {
                 
                 $this->models->PageTaxonTitle->delete(
                     array(
@@ -1375,7 +1476,7 @@ class SpeciesController extends Controller
                     'project_id' => $this->getCurrentProjectId(), 
                     'language_id' => $this->requestData['language'], 
                     'page_id' => $this->requestData['id'], 
-                    'title' => $this->requestData['title']
+                    'title' => trim($this->requestData['label'])
                 ));
             
             }
@@ -1962,7 +2063,7 @@ class SpeciesController extends Controller
             $d = $this->models->Taxon->save(
                 array(
                     'id' => $this->requestData['taxon_id'],
-                    'taxon' => $this->requestData['taxon_name']
+                    'taxon' => trim($this->requestData['taxon_name'])
                 )
             );
 
@@ -2097,7 +2198,7 @@ class SpeciesController extends Controller
                         'project_id' => $this->getCurrentProjectId(), 
                         'language_id' => $this->requestData['language'], 
                         'media_id' => $this->requestData['id'], 
-                        'description' => $this->requestData['description']
+                        'description' => trim($this->requestData['description'])
                     )
                 );
             
@@ -2226,7 +2327,6 @@ class SpeciesController extends Controller
 
     }
 
-
     private function ajaxActionSaveRankLabel ()
     {
         
@@ -2262,7 +2362,7 @@ class SpeciesController extends Controller
 						'project_id' => $this->getCurrentProjectId(), 
 						'language_id' => $this->requestData['language'], 
 						'project_rank_id' => $this->requestData['id'], 
-						'label' => $this->requestData['label']
+						'label' => trim($this->requestData['label'])
 					)
 				);
             
@@ -2296,7 +2396,6 @@ class SpeciesController extends Controller
         }
 
 	}
-
 
 	private function getProjectRanks($includeLanguageLabels=false)
 	{
@@ -2382,6 +2481,100 @@ class SpeciesController extends Controller
 
 	}
 
+	private function ajaxActionSaveSectionTitle()
+	{
 
+        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+            
+            if (empty($this->requestData['label'])) {
+                
+                $this->models->LabelSection->delete(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'section_id' => $this->requestData['id']
+                    )
+                );
+            
+            } else {
+                
+                $ls = $this->models->LabelSection->get(
+                array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'language_id' => $this->requestData['language'], 
+                    'section_id' => $this->requestData['id']
+                ));
+                
+                $this->models->LabelSection->save(
+					array(
+						'id' => isset($ls[0]['id']) ? $ls[0]['id'] : null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'section_id' => $this->requestData['id'], 
+						'language_id' => $this->requestData['language'], 
+						'label' => trim($this->requestData['label'])
+					));
+            
+            }
+
+            $this->smarty->assign('returnText', 'saved');
+        
+        }
+
+	}
+
+	private function ajaxActionDeleteSectionTitle()
+	{
+	
+		if (empty($this->requestData['id'])) {
+		
+			return;
+	
+		} else {
+		
+			$this->models->LabelSection->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'section_id' => $this->requestData['id']
+				)
+			);
+
+			$this->models->Section->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'id' => $this->requestData['id']
+				)
+			);
+	
+		}
+
+	}
+
+	private function ajaxActionGetSectionLabels()
+	{
+
+        if (empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+
+			$l = $this->models->Language->get($this->requestData['language'],'direction');
+
+			$ls = $this->models->LabelSection->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language'],
+				),'*, \''.$l['direction'].'\' as direction'
+			);
+   
+            $this->smarty->assign('returnText', json_encode($ls));
+        
+        }
+
+	}
 }
 
