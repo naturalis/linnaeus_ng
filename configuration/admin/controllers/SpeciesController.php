@@ -117,7 +117,7 @@ class SpeciesController extends Controller
         // adding a new page
         if (!empty($this->requestData['new_page']) && !$this->isFormResubmit()) {
         
-            $tp = $this->createTaxonPage($this->requestData['new_page'],$this->requestData['show_order']);
+            $tp = $this->createTaxonCategory($this->requestData['new_page'],$this->requestData['show_order']);
             
             if ($tp !== true) {
                 
@@ -1283,15 +1283,15 @@ class SpeciesController extends Controller
 
             if ($tp[0]['total']==0) {
 
-                if ($this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+                if ($this->createTaxonCategory(_($page['name']), $key, isset($page['default']) && $page['default'])) {
 
-	                $this->createTaxonPageSections($page['sections'],  $this->models->PageTaxon->getNewId());
+	                $this->createTaxonCategorySections($page['sections'],  $this->models->PageTaxon->getNewId());
 	
 				}
 
             } else {
 
-                if (isset($page['mandatory'])) {
+                if (isset($page['mandatory']) && $page['mandatory']===true) {
 
                     $d = $this->models->PageTaxon->get(
                         array(
@@ -1302,9 +1302,9 @@ class SpeciesController extends Controller
 
                     if ($d[0]['total']==0) {
         
-                        if ($this->createTaxonPage(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+                        if ($this->createTaxonCategory(_($page['name']), $key, isset($page['default']) && $page['default'])) {
 
-							$this->createTaxonPageSections($page['sections'],  $this->models->PageTaxon->getNewId());
+							$this->createTaxonCategorySections($page['sections'],  $this->models->PageTaxon->getNewId());
 			
 						}
 
@@ -1318,7 +1318,6 @@ class SpeciesController extends Controller
 
     }
 
-
     /**
      * Create a new category.
      *
@@ -1327,7 +1326,7 @@ class SpeciesController extends Controller
      *
      * @access    private
      */
-    private function createTaxonPage ($name, $show_order = false, $isDefault = false)
+    private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
 
         return $this->models->PageTaxon->save(array(
@@ -1339,8 +1338,8 @@ class SpeciesController extends Controller
         ));
     
     }
-
-	private function createTaxonPageSections($sections, $pageId)
+	
+	private function createTaxonCategorySections($sections, $pageId)
 	{
 
 		foreach((array)$sections as $key => $val) {
