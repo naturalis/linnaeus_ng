@@ -13,12 +13,14 @@
 	color:#777;
 	padding-left:6px;
 }
-.rank-add-arrow {
+
+.add-arrow {
 	font-size:16px;
 	cursor:pointer;
 	padding-left:7px;	
 	padding-right:7px;
 }
+
 .taxon-list-row {
 	background-color: #fff;
 }

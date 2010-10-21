@@ -24,6 +24,10 @@ class SpeciesController extends Controller
 {
     
     public $usedModels = array(
+        'user', 
+        'role',
+        'project_role_user', 
+		'user_taxon',
         'taxon', 
         'content_taxon', 
         'language_project', 
@@ -402,126 +406,166 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Taxon list'));
-        
-        $taxa = $this->models->Taxon->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ), '*', 'taxon_order');
 
-		$lp = $_SESSION['project']['languages'];
+		$ut = $this->models->UserTaxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'user_id' => $this->getCurrentUserId()
+			),'taxon_id',false,false,true,'taxon_id'
+		);
 		
-		if (isset($_SESSION['project']['pages'])) {
+		if (count((array)$ut)>0) {
 
-	        $tp = $_SESSION['project']['pages'];
-
-		} else {
+			$this->getTaxonTree(null);
 	
-			$tp = $this->models->PageTaxon->get(array(
-				'project_id' => $this->getCurrentProjectId()
-			), 'count(*) as tot');
-
-	        $_SESSION['project']['pages'] = $tp;
-		}
-
-        
-		if (isset($_SESSION['project']['ranklist'])) {
-
-			$rl = $_SESSION['project']['ranklist'];
-		
-		} else {
-
-			$pr = $this->getProjectRanks();
+			$allow = false;
 	
-			foreach((array)$pr as $key => $val) {
-			
-				$rl[$val['id']] = $val['rank'];
-
+			foreach((array)$this->_treeList as $key => $val) {
+	
+				if ($allow && $val['level'] <= $prevLevel) {
+				
+					$allow = false;
+	
+				}
+	
+				if (array_key_exists($val['id'],$ut)) {
+	
+					$allow = true;
+					
+					$prevLevel = $val['level'];
+	
+				}
+				
+				if ($allow) {
+				
+					$taxa[] = $val;
+				
+				}
+	
+	
 			}
-			
-			$_SESSION['project']['ranklist'] = $rl;
 
+			$lp = $_SESSION['project']['languages'];
+			
+			if (isset($_SESSION['project']['pages'])) {
+	
+				$tp = $_SESSION['project']['pages'];
+	
+			} else {
+		
+				$tp = $this->models->PageTaxon->get(array(
+					'project_id' => $this->getCurrentProjectId()
+				), 'count(*) as tot');
+	
+				$_SESSION['project']['pages'] = $tp;
+			}
+
+        
+			if (isset($_SESSION['project']['ranklist'])) {
+	
+				$rl = $_SESSION['project']['ranklist'];
+			
+			} else {
+	
+				$pr = $this->getProjectRanks();
+		
+				foreach((array)$pr as $key => $val) {
+				
+					$rl[$val['id']] = $val['rank'];
+	
+				}
+				
+				$_SESSION['project']['ranklist'] = $rl;
+	
+			}
+
+
+			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+	
+				$d[$val['mime']] = $val['media_type'];
+	
+			}
+
+			foreach ((array) $taxa as $key => $taxon) {
+	
+				$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
+	
+				foreach ((array) $lp as $k => $val) {
+	
+					$ct = $this->models->ContentTaxon->get(
+					array(
+						'taxon_id' => $taxon['id'], 
+						'language_id' => $val['language_id'], 
+						'project_id' => $this->getCurrentProjectId()
+					), 'count(*) as tot,if(publish=0,"unpublished","published") as state', false, 'publish');
+					
+					foreach ((array) $ct as $key3 => $pub) {
+						
+						$lp[$k]['publish'][$taxon['id']][$pub['state']] = $pub['tot'];
+					
+					}
+					
+					isset($lp[$k]['publish'][$taxon['id']]['published']) || $lp[$k]['publish'][$taxon['id']]['published'] = 0;
+					
+					isset($lp[$k]['publish'][$taxon['id']]['unpublished']) || $lp[$k]['publish'][$taxon['id']]['unpublished'] = 0;
+					
+					$lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
+					
+					$lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
+				
+				}
+
+				$mt = $this->models->MediaTaxon->get(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $taxon['id']
+					),'count(*) as total, mime_type',false,'mime_type'
+				);
+            
+				foreach((array)$mt as $mtkey => $mtval) {
+	
+					$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
+					$taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
+	
+				}
+        
+	        }
+
+			// user requested a sort of the table
+			if (isset($this->requestData['key'])) {
+				
+				$sortBy = array(
+					'key' => $this->requestData['key'], 
+					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+					'case' => 'i'
+				);
+			
+				// sort array of collaborators
+				$this->customSortArray($taxa, $sortBy);
+	
+			} else {
+			// default sort order
+				
+				$sortBy = array(
+					'key' => 'taxon', 
+					'dir' => 'asc', 
+					'case' => 'i'
+				);
+			
+			}
+
+			$this->smarty->assign('sortBy', $sortBy);
+			
+			$this->smarty->assign('taxa', $taxa);
+			
+			$this->smarty->assign('languages', $lp);
+
+		} else {
+				
+			$this->addMessage(_('No taxa have been assigned to you.'));
+		
 		}
 
-
-        foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-
-            $d[$val['mime']] = $val['media_type'];
-
-        }
-
-
-        foreach ((array) $taxa as $key => $taxon) {
-
-            $taxa[$key]['rank'] = $rl[$taxon['rank_id']];
-
-            foreach ((array) $lp as $k => $val) {
-
-                $ct = $this->models->ContentTaxon->get(
-                array(
-                    'taxon_id' => $taxon['id'], 
-                    'language_id' => $val['language_id'], 
-                    'project_id' => $this->getCurrentProjectId()
-                ), 'count(*) as tot,if(publish=0,"unpublished","published") as state', false, 'publish');
-                
-                foreach ((array) $ct as $key3 => $pub) {
-                    
-                    $lp[$k]['publish'][$taxon['id']][$pub['state']] = $pub['tot'];
-                
-                }
-                
-                isset($lp[$k]['publish'][$taxon['id']]['published']) || $lp[$k]['publish'][$taxon['id']]['published'] = 0;
-                
-                isset($lp[$k]['publish'][$taxon['id']]['unpublished']) || $lp[$k]['publish'][$taxon['id']]['unpublished'] = 0;
-                
-                $lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
-                
-                $lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
-            
-            }
-
-            $mt = $this->models->MediaTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $taxon['id']
-                ),'count(*) as total, mime_type',false,'mime_type'
-            );
-            
-            foreach((array)$mt as $mtkey => $mtval) {
-
-                $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
-                $taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
-
-            }
-        
-        }
-
-        // user requested a sort of the table
-        if (isset($this->requestData['key'])) {
-            
-            $sortBy = array(
-                'key' => $this->requestData['key'], 
-                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-                'case' => 'i'
-            );
-        
-            // sort array of collaborators
-            $this->customSortArray($taxa, $sortBy);
-
-        } else {
-        // default sort order
-            
-            $sortBy = array(
-                'key' => 'taxon', 
-                'dir' => 'asc', 
-                'case' => 'i'
-            );
-        
-        }
-        
-        $this->smarty->assign('sortBy', $sortBy);
-        
-        $this->smarty->assign('taxa', $taxa);
-        
-        $this->smarty->assign('languages', $lp);
         
         $this->printPage();
     
@@ -1192,7 +1236,87 @@ class SpeciesController extends Controller
         $this->printPage();
 
 	}	
-	
+
+	public function collaboratorsAction()
+	{
+
+		$this->checkAuthorisation();
+
+        $this->setPageName(_('Assign taxa to collaborators'));
+
+		if (isset($this->requestData) && !$this->isFormResubmit()) {
+
+			if (!empty($this->requestData['delete'])) {
+
+				$this->models->UserTaxon->delete(
+					array(
+						'id' => $this->requestData['delete'],
+						'project_id' => $this->getCurrentProjectId(),
+					)
+				);
+
+
+			} else {
+
+				$this->models->UserTaxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->requestData['user_id'],
+						'taxon_id' => $this->requestData['taxon_id'],
+					)
+				);
+
+			}
+
+		}
+
+        $pru = $this->models->ProjectRoleUser->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'role_id !=' => '1',
+				'active' => 1
+			)
+		);
+
+        foreach ((array) $pru as $key => $val) {
+
+            $u = $this->models->User->get($val['user_id']);
+
+            $r = $this->models->Role->get($val['role_id']);
+            
+            $u['role'] = $r['role'];
+            $u['role_id'] = $r['id'];
+
+            $users[] = $u;
+        
+        }
+
+        $this->getTaxonTree(null);
+
+		$ut = $this->models->UserTaxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId()
+					),false,'taxon_id'
+				);
+
+		foreach((array)$ut as $key => $val) {
+
+			$ut[$key]['taxon'] = $this->models->Taxon->get($val['taxon_id']);
+
+		}
+
+        $this->smarty->assign('usersTaxa', $ut);
+
+        $this->smarty->assign('users', $users);
+
+		$this->smarty->assign('taxa',$this->_treeList);
+
+		$this->printPage();
+
+	}	
+
+
 	private function setProjectLanguages()
     {
 
@@ -1318,14 +1442,6 @@ class SpeciesController extends Controller
 
     }
 
-    /**
-     * Create a new category.
-     *
-     * A category is page devoted to a specific subject that appears in every taxon's
-     * detail page (main, breeding, threats, etc).
-     *
-     * @access    private
-     */
     private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
 

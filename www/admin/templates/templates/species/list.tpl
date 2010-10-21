@@ -1,6 +1,8 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+{if $taxa|@count>0}
+
 Click a cell to access that category for a taxon in a specific language. To change the name of a taxon, click it's name.
 <span id="message-container" style="margin-left:175px">&nbsp;</span>
 <table>
@@ -45,6 +47,7 @@ You have to define at least one language in your project before you can add any 
 {else}
 <a href="new.php">Add a new taxon</a>
 {/if}
+{/if}
 </div>
 
 <form method="post" action="" name="sortForm" id="sortForm">
@@ -60,4 +63,5 @@ $(document).ready(function(){
 </script>
 {/literal}
 
+{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
