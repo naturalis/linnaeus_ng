@@ -101,3 +101,16 @@ CURRENT_TIMESTAMP , CURRENT_TIMESTAMP);
 insert into dev_projects_roles_users values (null, 1, 1, 15);
 insert into dev_projects_roles_users values (null, 2, 1, 15);
 
+
+
+CREATE TABLE dev_users_taxa (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	user_id INT( 11 ) NOT NULL ,
+	taxon_id INT( 11 ) NOT NULL ,
+	PRIMARY KEY ( id ) ,
+	UNIQUE (
+	project_id ,
+	taxon_id ,
+	user_id  )
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;

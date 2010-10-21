@@ -8,6 +8,7 @@
 	<li><a href="col.php">Import taxon tree from Catalogue Of Life (experimental)</a></li>
 </ul>
 <ul class="admin-list">
+	<li><a href="collaborators.php">Assign taxa to collaborators</a></li>
 	<li><a href="ranks.php">Define taxonomic ranks</a></li>
 	<li><a href="ranklabels.php">Label taxonomic ranks</a></li>
 	<li><a href="page.php">Define categories</a></li>
