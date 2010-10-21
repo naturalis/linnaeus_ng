@@ -3,9 +3,8 @@
 <div id="page-main">
 
 <span id="message-container" style="float:right;"></span>
-reminder to self: <h1>FIRST SECTION NEEDS TO STAY!</h1>
-You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided<br />
-Below, you can specify the correct label of each rank in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed. On the right hand side, the labels in the other languages are displayed. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
+You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided; these can be altered as you see fit.<br />
+Below, you can specify the correct label of each section in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
 Text you enter is automatically saved when you leave the input field.
 <br /><br />
 

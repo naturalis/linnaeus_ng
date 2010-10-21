@@ -95,7 +95,7 @@ class configuration
                     0 => array(
                         'name' => 'Overview',
                         'default' => true,
-                        'mandatory' => array(0),
+                        'mandatory' => true,
                         'sections' => array ('General description','Biology')
                     ),
                     1 => array(                    
