@@ -127,7 +127,7 @@ class configuration
                 array(
                     'html' => array(
                         'doFilter' => true,
-                        'allowedTags' => '<a><b><u><i><p><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
+                        'allowedTags' => '<a><b><u><i><p><span><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
                     )
                 ),
             'media' =>

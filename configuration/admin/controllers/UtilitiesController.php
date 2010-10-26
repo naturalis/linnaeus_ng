@@ -163,7 +163,7 @@ class UtilitiesController extends Controller
 
     private function ajaxActionGetTaxaEditStates ()
     {
-        
+
         // the 1.2 factor is a safety margin (last heartbeat has to be 1.2 times the refresh frequency old
         // before we assume it is dead)
         $h = $this->models->Heartbeat->get(
@@ -173,8 +173,8 @@ class UtilitiesController extends Controller
                         and last_change >= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
                         and app = '" . $this->getAppName() . "'
                         and ctrllr = 'species'
-                        and (view = 'edit' or view = 'media' or view = 'media_upload')");
-        
+                        and (view = 'taxon' or view = 'media' or view = 'media_upload')");
+
         foreach ((array) $h as $key => $val) {
             
             if (!empty($val['params'])) {

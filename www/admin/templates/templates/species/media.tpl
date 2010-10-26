@@ -9,7 +9,7 @@
 	<span id="message-container" style="margin-right:0px">&nbsp;</span>
 </span>
 
-<div id="taxon-language-table-div"></div>
+<div id="taxon-language-div"></div>
 
 
 <div>
@@ -132,7 +132,7 @@ $(document).ready(function(){
 {/section}
 
 	taxonActiveLanguage = {$defaultLanguage};
-	taxonUpdateLanguageBlock('taxonMediaChangeLanguage');
+	taxonDrawTaxonLanguages('taxonMediaChangeLanguage');
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
