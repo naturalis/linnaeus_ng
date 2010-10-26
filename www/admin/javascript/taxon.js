@@ -275,7 +275,7 @@ function taxonSaveDataManual() {
 	taxonSaveType = 'manual';
 	allShowLoadingDiv();
 	taxonSaveTaxonData(taxonDefaultLanguage,false);
-	taxonSaveTaxonData(taxonActiveLanguage,execafter);
+	taxonSaveTaxonData(taxonActiveLanguage,'taxonOpenContentPreview()');
 
 }
 
@@ -1190,3 +1190,12 @@ function taxonGetSectionLabels(language) {
 	
 }
 
+var x=false;
+
+function taxonOpenContentPreview(mode) {
+alert(x);
+	if (mode == 'manual' || x!==false) {
+		x = window.open('http://www.xs4all.nl','_preview');
+	}
+
+}
