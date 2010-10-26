@@ -1,81 +1,98 @@
 {include file="../shared/admin-header.tpl"}
+
 <div id="page-main">
-<span id="debug-message"></span>
-
-{if $taxon.id!=-1}
-<form name="theForm" id="theForm">
-	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
-	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
-
-<div id="taxon-navigation-table-div">
-<table id="taxon-navigation-table">
+{if $allowed}
+<form id="theForm" method="post" action="">
+<input name="id" id="id" type="hidden" value="{$data.id}"  />
+<table>
 	<tr>
-		<td id="taxon-navigation-cell">
-			<span style="float:right">
-				<span id="message-container" style="margin-right:10px">&nbsp;</span>
-				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
-				<input type="button" value="delete" onclick="taxonDeleteData()" style="margin-right:5px" />
-				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
-			</span>
+		<td>
+			Taxon name:
+		</td>
+		<td>
+			<input type="text" name="taxon" id="taxon-name" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
+		</td>
+		<td>
+			<span id="taxon-message" class=""></span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			This is a hybrid:
+		</td>
+		<td>
+			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
+		</td>
+		<td>
+			<span id="hybrid-message" class=""></span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Parent taxon: 
+		</td>
+		<td>
+	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
+	{if $taxa|@count==0}
+	<option value="-1">No parent</option>
+	{/if}
+	{section name=i loop=$taxa}
+	<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
+	{section name=foo loop=$taxa[i].level-$taxa[0].level}
+	&nbsp;
+	{/section}		
+	{$taxa[i].taxon}</option>
+	{/section}
+	</select>
+		</td>
+		<td>
+			<span id="rank-message" class=""></span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Rank: 
+		</td>
+		<td colspan="2">
+			<select name="rank_id" id="rank-id">
+{section name=i loop=$projectRanks}
+<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
+{/section}
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<input type="submit" value="save" />&nbsp;<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>
-</div>
-
-<div id="taxon-pages-table-div"></div>
-
-<div id="taxon-language-table-div"></div>
-
-<div id="taxon-publish-table-div"></div>
-
-
-Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />
-<textarea name="content" style="width:880px;height:600px;" id="taxon-content">{$content.content}</textarea>
 </form>
 {/if}
+</div>
+
 
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-{section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+{section name=i loop=$projectRanks}
+{if $projectRanks[i].can_hybrid}
+taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
+{/if}
 {/section}
-	taxonActiveLanguage = {$activeLanguage};
-	taxonUpdateLanguageBlock();
-
-{section name=i loop=$pages}
-	var pagenames = new Array();
-	pagenames[-1] = '{$pages[i].page|addslashes}';
-	{section name=j loop=$languages}{assign var=n value=$languages[j].language_id}pagenames[{$n}] = '{$pages[i].titles[$n].title|addslashes}';
-{/section}
-	taxonAddPage([{$pages[i].id},pagenames,{if $pages[i].def_page=='1'}1{else}0{/if}]);
-{/section}
-	taxonActivePage = {$activePage};
-	taxonUpdatePageBlock();
-
-	taxonPublishState  = {if $content.publish!=''}{$content.publish}{else}0{/if};
-	taxonDrawPublishBlock();
-
-	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
-
-	allSetAutoSaveFreq({$autosaveFrequency});
-	taxonRunAutoSave();
-
+taxonGetRankByParent(true);
+//taxonCheckNewTaxonName();
+//taxonGetRankByParent();
+//taxonCheckHybridCheck();
 {literal}
-	$(window).unload(
-		function () { 
-			taxonConfirmSaveOnUnload();
-		} 
-	);
-	
 });
 </script>
 {/literal}
 
-</div>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

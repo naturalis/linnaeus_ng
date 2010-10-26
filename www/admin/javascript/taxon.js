@@ -1024,13 +1024,14 @@ function taxonCheckNewTaxonName() {
 		$('#taxon-message').html('')
 		return;
 	}
-
+	
 	$.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
 		data : ({
 			'action' : 'check_taxon_name' ,
 			'taxon_name' : $('#taxon-name').val() ,
+			'id' : $('#id').val() ,
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
@@ -1047,7 +1048,7 @@ function taxonCheckNewTaxonName() {
 
 }
 
-function taxonGetRankByParent() {
+function taxonGetRankByParent(nomessage) {
 
 	var id = $('#parent-id option:selected').val();
 
@@ -1064,16 +1065,18 @@ function taxonGetRankByParent() {
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
-			if (data=='-1') {
+			if (data=='-1' && !nomessage) {
 				$('#rank-message').removeClass().addClass('message-error');
 				$('#rank-message').html('That taxon cannot have child taxa.')
 			} else {
-				$('#rank-message').removeClass().addClass('message-no-error');
-				$('#rank-message').html('Ok')
+				if (!nomessage) {
+					$('#rank-message').removeClass().addClass('message-no-error');
+					$('#rank-message').html('Ok')
+				}
 				$('#rank-id').val(data);
 			}
 
-			taxonCheckHybridCheck();
+			if (!nomessage) taxonCheckHybridCheck();
 
 		}
 	});

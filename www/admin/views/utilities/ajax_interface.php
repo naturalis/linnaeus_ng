@@ -4,5 +4,7 @@ require_once ('../../../../configuration/admin/controllers/UtilitiesController.p
 
 $c = new UtilitiesController();
 
+$c->setExcludeFromReferer(true);
+
 $c->ajaxInterfaceAction();
 
