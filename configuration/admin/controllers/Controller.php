@@ -1432,8 +1432,8 @@ class Controller extends BaseClass
         $d = $this->getSortDirection();
         
         $c = $this->getSortCaseSensitivity();
-        
-        if (empty($a[$f]) || empty($b[$f]))
+
+        if (!isset($a[$f]) || !isset($b[$f]))
             return;
         
         if ($c != 's') {

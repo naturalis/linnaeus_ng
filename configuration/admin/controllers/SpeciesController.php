@@ -249,7 +249,10 @@ class SpeciesController extends Controller
 			if (!empty($this->requestData['taxon'])) {
 			
 				$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
-			
+				
+				$parentId =
+					($this->requestData['id']==$this->requestData['parent_id'] ? null : ($isEmptyTaxaList ? null : $this->requestData['parent_id']));
+
 				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
 	
 					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
@@ -261,7 +264,7 @@ class SpeciesController extends Controller
 									'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon' => $this->requestData['taxon'],
-									'parent_id' => $isEmptyTaxaList ? null : $this->requestData['parent_id'],
+									'parent_id' => $parentId,
 									'rank_id' => $this->requestData['rank_id'],
 									'is_hybrid' =>  ($isHybrid ? 1 : 0)
 								)
@@ -303,7 +306,7 @@ class SpeciesController extends Controller
 	
 			$this->smarty->assign('projectRanks',$pr);
 
-			if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+			$this->smarty->assign('taxa',$taxa);
 
 		} else {
 				
@@ -318,7 +321,7 @@ class SpeciesController extends Controller
 	}
 
     /**
-     * Edit taxon action
+     * Edit taxon content
      *
      * Actual saving etc. works via AJAX actions
      *
@@ -398,33 +401,8 @@ class SpeciesController extends Controller
 				// determine the page_id the page will open in
 				$startPage = !empty($this->requestData['page']) ? $this->requestData['page'] : $defaultPage;
 				
-				// get the content in the language the page will open with
-				if (!empty($this->requestData['id']) && !empty($startLanguage)) {
-					
-					$ct = $this->models->ContentTaxon->get(
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'taxon_id' => $this->requestData['id'], 
-						'language_id' => $startLanguage, 
-						'page_id' => $startPage
-					));
-	
-					if ($ct == null) {
-	
-						$content['content'] = $this->getDefaultPageSections($startPage);
-	
-					} else {
-	
-						$content = $ct[0];
-	
-					}
-				}
-				
 				if (isset($taxon))
 					$this->smarty->assign('taxon', $taxon);
-				
-				if (isset($content))
-					$this->smarty->assign('content', $content);
 	
 				$this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
 				
@@ -477,46 +455,50 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon list'));
 
+		// get taxa assigned to user
 		$ut = $this->models->UserTaxon->get(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'user_id' => $this->getCurrentUserId()
 			),'taxon_id',false,false,true,'taxon_id'
 		);
-		
-		if (count((array)$ut)>0) {
 
-			$this->getTaxonTree(null);
-	
-			$allow = false;
-	
-			foreach((array)$this->_treeList as $key => $val) {
-	
-				if ($allow && $val['level'] <= $prevLevel) {
-				
-					$allow = false;
-	
-				}
-	
-				if (array_key_exists($val['id'],$ut)) {
-	
-					$allow = true;
-					
-					$prevLevel = $val['level'];
-	
-				}
-				
-				if ($allow) {
-				
-					$taxa[] = $val;
-				
-				}
-	
-	
+
+		// get complete taxon tree
+		$this->getTaxonTree(null);
+
+		$allow = false;
+
+		// discard all taxa above the levels assigned to the user
+		foreach((array)$this->_treeList as $key => $val) {
+
+			if ($allow && $val['level'] <= $prevLevel) {
+			
+				$allow = false;
+
 			}
 
-			$lp = $_SESSION['project']['languages'];
+			if (isset($ut) && array_key_exists($val['id'],$ut)) {
+
+				$allow = true;
+				
+				$prevLevel = $val['level'];
+
+			}
 			
+			if ($allow) {
+			
+				$taxa[] = $val;
+			
+			}
+
+		}
+
+		if (isset($taxa) && count((array)$taxa)>0) {
+
+			$lp = $_SESSION['project']['languages'];
+
+
 			if (isset($_SESSION['project']['pages'])) {
 	
 				$tp = $_SESSION['project']['pages'];
@@ -529,7 +511,6 @@ class SpeciesController extends Controller
 	
 				$_SESSION['project']['pages'] = $tp;
 			}
-
         
 			if (isset($_SESSION['project']['ranklist'])) {
 	
@@ -555,35 +536,20 @@ class SpeciesController extends Controller
 				$d[$val['mime']] = $val['media_type'];
 	
 			}
+		
 
 			foreach ((array) $taxa as $key => $taxon) {
 	
 				$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
-	
-				foreach ((array) $lp as $k => $val) {
-	
-					$ct = $this->models->ContentTaxon->get(
-					array(
-						'taxon_id' => $taxon['id'], 
-						'language_id' => $val['language_id'], 
-						'project_id' => $this->getCurrentProjectId()
-					), 'count(*) as tot,if(publish=0,"unpublished","published") as state', false, 'publish');
-					
-					foreach ((array) $ct as $key3 => $pub) {
-						
-						$lp[$k]['publish'][$taxon['id']][$pub['state']] = $pub['tot'];
-					
-					}
-					
-					isset($lp[$k]['publish'][$taxon['id']]['published']) || $lp[$k]['publish'][$taxon['id']]['published'] = 0;
-					
-					isset($lp[$k]['publish'][$taxon['id']]['unpublished']) || $lp[$k]['publish'][$taxon['id']]['unpublished'] = 0;
-					
-					$lp[$k]['publish'][$taxon['id']]['total'] = $tp[0]['tot'];
-					
-					$lp[$k]['publish'][$taxon['id']]['pct_finished'] = round(($lp[$k]['publish'][$taxon['id']]['published'] / $tp[0]['tot']) * 100);
 				
-				}
+				$ct = $this->models->ContentTaxon->get(
+				array(
+					'taxon_id' => $taxon['id'], 
+					'publish' => 1, 
+					'project_id' => $this->getCurrentProjectId()
+				), 'count(*) as tot');
+
+				$taxa[$key]['pct_finished'] = round(($ct[0]['tot'] / (count($lp) * $tp[0]['tot']))*100);
 
 				$mt = $this->models->MediaTaxon->get(
 					array(
@@ -603,7 +569,7 @@ class SpeciesController extends Controller
 
 			// user requested a sort of the table
 			if (isset($this->requestData['key'])) {
-				
+
 				$sortBy = array(
 					'key' => $this->requestData['key'], 
 					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
@@ -626,7 +592,7 @@ class SpeciesController extends Controller
 
 			$this->smarty->assign('sortBy', $sortBy);
 			
-			$this->smarty->assign('taxa', $taxa);
+			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
 			
 			$this->smarty->assign('languages', $lp);
 
@@ -1823,8 +1789,8 @@ class SpeciesController extends Controller
                             json_encode(
                                 array(
                                     'id' => $taxonId,
-                                    'content' => $filteredContent['content'],
-                                    'modified' => $filteredContent['modified']
+                                    'content' => isset($filteredContent) ? $filteredContent['content'] : null,
+                                    'modified' => isset($filteredContent) ? $filteredContent['modified'] : null
                                 )
                             )
                         );
@@ -1902,7 +1868,7 @@ class SpeciesController extends Controller
                     'taxon_id' => $this->getCurrentProjectId(), 
                     'language_id' => $this->requestData['language'], 
                     'page_id' => $this->requestData['page'], 
-                    'content' => null, 
+                    'content' => $this->getDefaultPageSections($this->requestData['page'],$this->requestData['language']), 
                     'publish' => '0', 
                     'title' => null
                 );
@@ -2334,31 +2300,32 @@ class SpeciesController extends Controller
 
     }
 
-    private function getDefaultPageSections($pageId)
+    private function getDefaultPageSections($pageId,$languageId)
     {
-
-        $tp = $this->models->PageTaxon->get(
+	
+        $s = $this->models->Section->get(
             array(
-            'id' => $pageId,
+            'page_id' => $pageId,
             'project_id' => $this->getCurrentProjectId()
-            ),'page'
+            ),false,'show_order asc'
         );
-        
+		
         $b = '';
 
-        foreach((array)$this->controllerSettings['defaultCategories'] as $key => $page) {
-        
-            if ($page['name']==$tp[0]['page']) {
+		foreach((array)$s as $key => $val) {
+		
+			$ls = $this->models->LabelSection->get(
+				array(
+				'section_id' => $val['id'],
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $languageId
+				),'label'
+			);
+			
 
-                foreach((array)$page['sections'] as $sectionkey => $section) {
-                
-                    $b .= '<p class="taxon-section-head">'.$section.'</p>'.chr(10);
+			$b .= '<span class="taxon-section-head">'.$ls[0]['label'].'</span>'.chr(10);
 
-                }
-
-            }
-
-        }
+		}
 
         return $b;
     

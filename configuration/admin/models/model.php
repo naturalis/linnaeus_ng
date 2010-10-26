@@ -680,10 +680,10 @@ abstract class Model extends BaseClass
         
         } else {
             
-            $this->setLastQuery($query);
-            
             $set = mysql_query(str_replace('%table%', $this->tableName, $id));
-            
+
+            $this->setLastQuery(str_replace('%table%', $this->tableName, $id));
+
             while ($row = mysql_fetch_assoc($set)) {
                 
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
