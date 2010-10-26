@@ -177,71 +177,141 @@ class SpeciesController extends Controller
     }
 
     /**
-     * Add new taxon action
+     * Add new taxon action or edit existing
      *
      * @access    public
      */
-    public function newAction ()
+    public function editAction ()
     {
 
 		$this->checkAuthorisation();
 
-        $this->setPageName(_('New taxon'));
+		if (!empty($this->requestData['id'])) {
 
-		if (!empty($this->requestData['taxon'])) {
+			$t = $this->models->Taxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' =>$this->requestData['id']
+				)
+			);
+
+			$data = $t[0];
+
+	        $this->setPageName(sprintf(_('Editing taxon "%s"'),$t[0]['taxon']));
+
+		} else {
+
+			$data = $this->requestData;
+
+	        $this->setPageName(_('New taxon'));
+
+		}
+
+		$ut = $this->models->UserTaxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'user_id' => $this->getCurrentUserId()
+			),'taxon_id',false,false,true,'taxon_id'
+		);
 		
-			if ($this->isTaxonNameUnique($this->requestData['taxon'],false)) {
+		$this->getTaxonTree(null);
+		
+		$isEmptyTaxaList = count((array)$this->_treeList)==0;
 
-				if ($this->canParentHaveChildTaxa($this->requestData['parent_id'])) {
+		if (count((array)$ut)>0 || $isEmptyTaxaList) {
 
-					if ($this->canRankBeHybrid($this->requestData['rank_id'])) {
+			$allow = false;
 	
-						$this->models->Taxon->save(
-							array(
-								'id' => null,
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon' => $this->requestData['taxon'],
-								'parent_id' => $this->requestData['parent_id'],
-								'rank_id' => $this->requestData['rank_id'],
-								'is_hybrid' =>  (isset($this->requestData['hybrid']) && $this->requestData['hybrid'] == 'on' ? 1 : 0)
-							)
-						);
-						
-						$this->reOrderTaxonTree();
-
-						$this->addMessage(_('Taxon saved.'));
-						
-						unset($this->requestData['taxon']);
+			foreach((array)$this->_treeList as $key => $val) {
 	
+				if ($allow && $val['level'] <= $prevLevel) {
+				
+					$allow = false;
+	
+				}
+	
+				if (array_key_exists($val['id'],$ut)) {
+	
+					$allow = true;
+					
+					$prevLevel = $val['level'];
+	
+				}
+				
+				if ($allow) {
+				
+					$taxa[] = $val;
+				
+				}
+
+			}
+
+			if (!empty($this->requestData['taxon'])) {
+			
+				$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
+			
+				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
+	
+					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+	
+						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
+		
+							$this->models->Taxon->save(
+								array(
+									'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon' => $this->requestData['taxon'],
+									'parent_id' => $isEmptyTaxaList ? null : $this->requestData['parent_id'],
+									'rank_id' => $this->requestData['rank_id'],
+									'is_hybrid' =>  ($isHybrid ? 1 : 0)
+								)
+							);
+							
+							$this->reOrderTaxonTree();
+	
+							$this->addMessage(_('Taxon saved.'));
+							
+							unset($this->requestData['taxon']);
+							
+							$this->redirect('list.php');
+		
+						} else {
+			
+							$this->addError(_('Rank cannot be hybrid.'));
+			
+						}
+		
 					} else {
 		
-						$this->addError(_('Rank cannot be hybrid.'));
+						$this->addError(_('Parent cannot have child taxa.'));
 		
 					}
 	
 				} else {
 	
-					$this->addError(_('Parent cannot have child taxa.'));
+					$this->addError(_('Taxon name already in database.'));
 	
 				}
-
-			} else {
-
-				$this->addError(_('Taxon name already in database.'));
-
+			
 			}
+				
+			$pr = $this->getProjectRanks();
+	
+			$this->smarty->assign('allowed',true);
+
+			$this->smarty->assign('data',$data);
+	
+			$this->smarty->assign('projectRanks',$pr);
+
+			if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		} else {
+				
+			$this->smarty->assign('allowed',false);
+
+			$this->addMessage(_('No taxa have been assigned to you.'));
 		
-		}
-
-        $this->getTaxonTree(null);
-
-		$pr = $this->getProjectRanks();
-
-		$this->smarty->assign('data',$this->requestData);
-
-		$this->smarty->assign('projectRanks',$pr);
-
-		$this->smarty->assign('taxa',$this->_treeList);
+		}	
 
 		$this->printPage();
 
@@ -254,7 +324,7 @@ class SpeciesController extends Controller
      *
      * @access    public
      */
-    public function editAction ()
+    public function taxonAction ()
     {
 
         $this->checkAuthorisation();
@@ -990,7 +1060,7 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'check_taxon_name') {
 
-            $this->isTaxonNameUnique();
+            $this->isTaxonNameUnique($this->requestData['taxon_name'],$this->requestData['id']);
         
         } else if ($this->requestData['action'] == 'save_taxon_name') {
 
@@ -2131,19 +2201,34 @@ class SpeciesController extends Controller
 
     }
 
-    private function isTaxonNameUnique($taxonName=false,$output=true)
+    private function isTaxonNameUnique($taxonName=false,$idToIgnore=false,$output=true)
     {
-	
+
 		$taxonName = $taxonName ? $taxonName : $this->requestData['taxon_name'];
 
         if (empty($taxonName)) return;
 
-        $t = $this->models->Taxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon' => trim($taxonName)
-            ),'count(*) as total',false,false,true
-        );
+		if ($idToIgnore) {
+
+			$t = $this->models->Taxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => trim($taxonName),
+					'id != ' => $idToIgnore,
+				),'count(*) as total',false,false,true
+			);
+
+		} else {
+		
+			$t = $this->models->Taxon->get(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => trim($taxonName)
+				),'count(*) as total',false,false,true
+			);
+
+		}
+
 
         if ($t[0]['total']>0) {
 		

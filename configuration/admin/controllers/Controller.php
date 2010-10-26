@@ -759,10 +759,10 @@ class Controller extends BaseClass
     
     }
 	
-	public function setExcludeFromReferer($mode)
+	public function setExcludeFromReferer($state)
 	{
 	
-		$this->excludeFromReferer = $mode;
+		$this->excludeFromReferer = $state;
 	
 	}
 
