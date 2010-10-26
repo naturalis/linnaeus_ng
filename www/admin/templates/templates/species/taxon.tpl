@@ -14,7 +14,7 @@
 			<span style="float:right">
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
 				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<input type="button" value="preview" id="ccc" onclick="taxonOpenContentPreview()" style="margin-right:5px" />
+				<input type="button" value="preview" onclick="taxonOpenContentPreview('manual')" style="margin-right:5px" />
 				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
 				<input type="button" value="delete" onclick="taxonDeleteData()" style="margin-right:5px" />
 				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
