@@ -1480,12 +1480,16 @@ class Controller extends BaseClass
 	public function setLocale ($locale=false)
 	{
 
+		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.po'))
+			die('po file does not exist');
+
 		$locale = ($locale ? $locale : $this->generalSettings['defaultLocale']);
 
 		putenv('LC_ALL='.$locale);
 		setlocale(LC_ALL,$locale);
 		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);
 		textdomain($this->getAppName());
+
 
 		$_SESSION['user']['currentLocale'] = $locale;
 
