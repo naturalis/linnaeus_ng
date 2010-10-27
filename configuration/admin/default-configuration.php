@@ -40,13 +40,15 @@ class configuration
             ), 
             'directories' => array(
                 'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
-                'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload'
+                'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload',
+				'locale' => $this->_appFileRoot . 'configuration/locale',
             ), 
             'maxCategories' => 10,
             'login-cookie' => array(
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
-            )
+            ),
+			'defaultLocale' => 'en_EN'
         );
     
     }

@@ -1,0 +1,466 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Linnaeus NG administration v0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-27 11:09+0100\n"
+"PO-Revision-Date: 2010-10-27 11:09+0100\n"
+"Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: C:\\Users\\maarten\\htdocs\\linnaeus ng\\linnaeus_ng\\configuration\\admin\\\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: NETHERLANDS\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: BaseClass.php:36
+msgid "FATAL: cannot load configuration"
+msgstr ""
+
+#: controllers/Controller.php:181
+msgid "Welcome, %s."
+msgstr "Welkom, %s."
+
+#: controllers/Controller.php:181
+msgid "Welcome back, %s."
+msgstr "Welkom terug, %s."
+
+#: controllers/ProjectsController.php:57
+msgid "Index"
+msgstr "Index"
+
+#: controllers/ProjectsController.php:69
+msgid "Project modules"
+msgstr "Project modules"
+
+#: controllers/ProjectsController.php:128
+msgid "Assign collaborator to modules"
+msgstr ""
+
+#: controllers/ProjectsController.php:214
+msgid "Project settings"
+msgstr ""
+
+#: controllers/ProjectsController.php:555
+msgid "Language already assigned."
+msgstr ""
+
+#: controllers/SpeciesController.php:104
+msgid "Species module overview"
+msgstr "Species module overzicht"
+
+#: controllers/SpeciesController.php:119
+msgid "Define categories"
+msgstr ""
+
+#: controllers/SpeciesController.php:128
+msgid "Could not save page name."
+msgstr ""
+
+#: controllers/SpeciesController.php:200
+#, php-format
+msgid "Editing taxon \"%s\""
+msgstr ""
+
+#: controllers/SpeciesController.php:206
+msgid "New taxon"
+msgstr ""
+
+#: controllers/SpeciesController.php:275
+msgid "Taxon saved."
+msgstr ""
+
+#: controllers/SpeciesController.php:283
+msgid "Rank cannot be hybrid."
+msgstr ""
+
+#: controllers/SpeciesController.php:289
+msgid "Parent cannot have child taxa."
+msgstr ""
+
+#: controllers/SpeciesController.php:295
+#: controllers/SpeciesController.php:2201
+msgid "Taxon name already in database."
+msgstr ""
+
+#: controllers/SpeciesController.php:315
+#: controllers/SpeciesController.php:601
+msgid "No taxa have been assigned to you."
+msgstr ""
+
+#: controllers/SpeciesController.php:337
+#: controllers/SpeciesController.php:456
+#: controllers/SpeciesController.php:623
+#: controllers/SpeciesController.php:703
+msgid "Taxon list"
+msgstr ""
+
+#: controllers/SpeciesController.php:352
+#, php-format
+msgid "Editing \"%s\""
+msgstr ""
+
+#: controllers/SpeciesController.php:426
+msgid "Taxon is already being edited by another editor."
+msgstr ""
+
+#: controllers/SpeciesController.php:437
+msgid "No taxon ID specified."
+msgstr ""
+
+#: controllers/SpeciesController.php:638
+#, php-format
+msgid "Media for \"%s\""
+msgstr ""
+
+#: controllers/SpeciesController.php:683
+#: controllers/SpeciesController.php:803
+msgid "No taxon specified."
+msgstr ""
+
+#: controllers/SpeciesController.php:720
+#, php-format
+msgid "New media for \"%s\""
+msgstr ""
+
+#: controllers/SpeciesController.php:770
+#, php-format
+msgid "Saved: %s (%s)"
+msgstr ""
+
+#: controllers/SpeciesController.php:774
+msgid "Failed writing uploaded file to database."
+msgstr ""
+
+#: controllers/SpeciesController.php:786
+msgid "Unknown taxon."
+msgstr ""
+
+#: controllers/SpeciesController.php:822
+msgid "Taxon file upload"
+msgstr ""
+
+#: controllers/SpeciesController.php:957
+msgid "Data saved."
+msgstr ""
+
+#: controllers/SpeciesController.php:1092
+msgid "Import from Catalogue Of Life"
+msgstr ""
+
+#: controllers/SpeciesController.php:1108
+msgid "Taxonomic ranks"
+msgstr ""
+
+#: controllers/SpeciesController.php:1179
+msgid "Ranks saved."
+msgstr ""
+
+#: controllers/SpeciesController.php:1209
+msgid "Taxonomic ranks: labels"
+msgstr ""
+
+#: controllers/SpeciesController.php:1226
+msgid "Define sections"
+msgstr ""
+
+#: controllers/SpeciesController.php:1281
+msgid "Assign taxa to collaborators"
+msgstr ""
+
+#: controllers/SpeciesController.php:1800
+msgid "Could not save taxon content."
+msgstr ""
+
+#: controllers/SpeciesController.php:1807
+msgid "No page title specified."
+msgstr ""
+
+#: controllers/SpeciesController.php:1814
+msgid "No language specified."
+msgstr ""
+
+#: controllers/SpeciesController.php:1820
+msgid "Could not save taxon."
+msgstr ""
+
+#: controllers/SpeciesController.php:2489
+#, php-format
+msgid "Could not delete file: %s"
+msgstr ""
+
+#: controllers/UsersController.php:135
+msgid "Login"
+msgstr ""
+
+#: controllers/UsersController.php:154
+msgid "Login failed."
+msgstr ""
+
+#: controllers/UsersController.php:182
+msgid "Logout"
+msgstr ""
+
+#: controllers/UsersController.php:203
+msgid "Select a project to work on"
+msgstr "Selecteer een project om aan te werken"
+
+#: controllers/UsersController.php:242
+msgid "Create new collaborator"
+msgstr ""
+
+#: controllers/UsersController.php:291
+msgid "A user with that e-mail address already exists in your project."
+msgstr ""
+
+#: controllers/UsersController.php:315
+msgid "Unassignable role selected."
+msgstr ""
+
+#: controllers/UsersController.php:394
+msgid "Project collaborator overview"
+msgstr ""
+
+#: controllers/UsersController.php:404
+msgid "days"
+msgstr ""
+
+#: controllers/UsersController.php:405
+msgid "(has never logged in)"
+msgstr ""
+
+#: controllers/UsersController.php:455
+msgid "username"
+msgstr ""
+
+#: controllers/UsersController.php:456
+msgid "status"
+msgstr ""
+
+#: controllers/UsersController.php:457
+msgid "role"
+msgstr ""
+
+#: controllers/UsersController.php:458
+msgid "collaborator for"
+msgstr ""
+
+#: controllers/UsersController.php:459
+msgid "last access"
+msgstr ""
+
+#: controllers/UsersController.php:478
+msgid "Project collaborator data"
+msgstr ""
+
+#: controllers/UsersController.php:563
+msgid "Edit project collaborator"
+msgstr ""
+
+#: controllers/UsersController.php:584
+msgid "Cannot delete lead expert."
+msgstr ""
+
+#: controllers/UsersController.php:599
+msgid "Unassignable role selected"
+msgstr ""
+
+#: controllers/UsersController.php:692
+msgid "User data saved"
+msgstr ""
+
+#: controllers/UsersController.php:849
+msgid "Missing value."
+msgstr ""
+
+#: controllers/UsersController.php:882
+msgid "Project overview"
+msgstr ""
+
+#: controllers/UsersController.php:942
+msgid "Failed to connect user from session."
+msgstr ""
+
+#: controllers/UsersController.php:961
+msgid "Failed to create user from session."
+msgstr ""
+
+#: controllers/UsersController.php:985
+msgid "Failed to save user."
+msgstr ""
+
+#: controllers/UsersController.php:1130
+#: controllers/UsersController.php:1521
+#, php-format
+msgid "Password too long; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1135
+#: controllers/UsersController.php:1514
+#, php-format
+msgid "Password too short; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1383
+msgid "Missing username."
+msgstr ""
+
+#: controllers/UsersController.php:1391
+msgid "Missing password."
+msgstr ""
+
+#: controllers/UsersController.php:1399
+msgid "Missing password repeat."
+msgstr ""
+
+#: controllers/UsersController.php:1408
+msgid "Missing first name."
+msgstr ""
+
+#: controllers/UsersController.php:1416
+msgid "Missing last name."
+msgstr ""
+
+#: controllers/UsersController.php:1424
+msgid "Missing email address."
+msgstr ""
+
+#: controllers/UsersController.php:1461
+#, php-format
+msgid "Username too short; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1468
+#, php-format
+msgid "Username too long; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1478
+msgid "Username has incorrect format."
+msgstr ""
+
+#: controllers/UsersController.php:1531
+msgid "Password has incorrect format."
+msgstr ""
+
+#: controllers/UsersController.php:1553
+msgid "Passwords not the same."
+msgstr ""
+
+#: controllers/UsersController.php:1587
+#, php-format
+msgid "E-mail adress too short; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1594
+#, php-format
+msgid "E-mail adress too long; should be between %s and %s characters."
+msgstr ""
+
+#: controllers/UsersController.php:1604
+msgid "Invalid e-mail address."
+msgstr ""
+
+#: controllers/UsersController.php:1693
+msgid "Username already exists."
+msgstr ""
+
+#: controllers/UsersController.php:1750
+msgid "E-mail address already exists."
+msgstr ""
+
+#: controllers/UtilitiesController.php:60
+msgid "You are not authorized to do that."
+msgstr ""
+
+#: controllers/UtilitiesController.php:81
+#, php-format
+msgid "The module \"%s\" is not part of your project."
+msgstr ""
+
+#: helpers/col_loader_helper.php:83
+msgid "No species name given."
+msgstr ""
+
+#: helpers/col_loader_helper.php:98
+msgid "No species ID given."
+msgstr ""
+
+#: helpers/col_loader_helper.php:162
+msgid "Found no basic data for: "
+msgstr ""
+
+#: helpers/col_loader_helper.php:168
+msgid "Unable to parse basic data"
+msgstr ""
+
+#: helpers/col_loader_helper.php:176
+msgid "Unable to resolve taxon's Catalogue Of Life ID"
+msgstr ""
+
+#: helpers/col_loader_helper.php:368
+msgid "Unable to parse comprehensive data"
+msgstr ""
+
+#: helpers/csv_parser_helper.php:28
+msgid "File does not seem to be a CSV-file."
+msgstr ""
+
+#: helpers/csv_parser_helper.php:112
+msgid "Could not read data from file."
+msgstr ""
+
+#: helpers/file_upload_helper.php:117
+msgid "No name of uploaded file specified."
+msgstr ""
+
+#: helpers/file_upload_helper.php:121
+msgid "No allowed MIME-types set."
+msgstr ""
+
+#: helpers/file_upload_helper.php:125
+msgid "No target directory specified."
+msgstr ""
+
+#: helpers/file_upload_helper.php:137
+msgid "Media type not allowed:"
+msgstr ""
+
+#: helpers/file_upload_helper.php:144
+msgid "No temporary directory specified (required for deflating archive)."
+msgstr ""
+
+#: helpers/file_upload_helper.php:199
+msgid "Could not extract files from archive."
+msgstr ""
+
+#: helpers/file_upload_helper.php:205
+msgid "Could not create temporary directory in "
+msgstr ""
+
+#: helpers/file_upload_helper.php:365
+msgid "Could not move file:"
+msgstr ""
+
+#: helpers/file_upload_helper.php:371
+msgid "File too big:"
+msgstr ""
+
+#: helpers/file_upload_helper.php:372
+msgid "max."
+msgstr ""
+
+#: helpers/file_upload_helper.php:379
+msgid "File type not allowed:"
+msgstr ""
+
+#: models/model.php:25
+msgid "FATAL: cannot connect to database"
+msgstr ""
+
+#: models/model.php:29
+msgid "FATAL: no table basename defined"
+msgstr ""
+

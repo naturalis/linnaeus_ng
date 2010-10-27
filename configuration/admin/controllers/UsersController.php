@@ -197,7 +197,7 @@ class UsersController extends Controller
      */
     public function chooseProjectAction ()
     {
-        
+
         $this->checkAuthorisation();
 
         $this->setPageName(_('Select a project to work on'));
