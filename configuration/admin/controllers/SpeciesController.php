@@ -96,7 +96,9 @@ class SpeciesController extends Controller
      */
     public function indexAction ()
     {
-        
+
+		if (isset($this->requestData['locale'])) $this->setLocale($this->requestData['locale']);
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Species module overview'));

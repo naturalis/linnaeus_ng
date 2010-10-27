@@ -176,9 +176,10 @@ class Controller extends BaseClass
 		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
 		
 			$msg =
-				($_SESSION['user']['logins'] <=1 ? _('Welcome,') : _('Welcome back,')).' '.
-				$_SESSION['user']['first_name'].' '.
-				$_SESSION['user']['last_name'].'.';
+				sprintf(
+					($_SESSION['user']['logins'] <=1 ? _('Welcome, %s.') : _('Welcome back, %s.')),
+					$_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name']
+				);
 
 	        $this->smarty->assign('welcomeMessage', $msg);
 			
@@ -765,7 +766,6 @@ class Controller extends BaseClass
 		$this->excludeFromReferer = $state;
 	
 	}
-
 
     private function loadControllerConfig()
     {
@@ -1476,6 +1476,20 @@ class Controller extends BaseClass
     
     }
 
+
+	public function setLocale ($locale=false)
+	{
+
+		$locale = ($locale ? $locale : $this->generalSettings['defaultLocale']);
+
+		putenv('LC_ALL='.$locale);
+		setlocale(LC_ALL,$locale);
+		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);
+		textdomain($this->getAppName());
+
+		$_SESSION['user']['currentLocale'] = $locale;
+
+	}
 
 }
 
