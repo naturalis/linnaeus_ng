@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-27 11:09+0100\n"
-"PO-Revision-Date: 2010-10-27 11:09+0100\n"
+"PO-Revision-Date: 2010-10-28 16:36+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: controllers/SpeciesController.php:104
 msgid "Species module overview"
-msgstr "Species module overzicht"
+msgstr "Overzicht species module"
 
 #: controllers/SpeciesController.php:119
 msgid "Define categories"

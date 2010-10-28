@@ -53,7 +53,7 @@ class Controller extends BaseClass
         $this->startSession();
         
         $this->setNames();
-        
+		
         $this->loadControllerConfig();        
         
         $this->checkLastVisitedPage();
@@ -67,6 +67,8 @@ class Controller extends BaseClass
         $this->loadModels();
         
         $this->loadHelpers();
+        
+//		$this->setLocale();
         
         $this->setHelpTexts();
         
@@ -1477,18 +1479,31 @@ class Controller extends BaseClass
     }
 
 
+	private function lookupLanguage($locale)
+	{
+		//http://msdn.microsoft.com/en-us/library/39cwe7zf%28vs.71%29.aspx
+
+		$l = array('nl_NL' => 'dutch','en_EN' => 'eng');
+		return $l[$locale];
+
+	}
+
 	public function setLocale ($locale=false)
 	{
 
-if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.po'))
-	die('.po file does not exist');
-
 		$locale = ($locale ? $locale : $this->generalSettings['defaultLocale']);
 
-		putenv('LC_ALL='.$locale);
-		setlocale(LC_ALL,$locale);
-		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);
-		textdomain($this->getAppName());
+		if (isset($_SESSION['user']['currentLocale']) && $locale==$_SESSION['user']['currentLocale']) return;
+
+		/* DEBUG */
+		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo'))
+			die('.mo file does not exist');
+		
+		q(putenv('LC_ALL='.$this->lookupLanguage($locale)));
+		q(setlocale(LC_ALL,$this->lookupLanguage($locale)));
+		q(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']));
+		q(bind_textdomain_codeset($this->getAppName(), 'UTF-8'));
+		q(textdomain($this->getAppName()));
 
 		$_SESSION['user']['currentLocale'] = $locale;
 
