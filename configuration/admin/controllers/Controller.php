@@ -1500,13 +1500,21 @@ class Controller extends BaseClass
 			die('.mo file does not exist');
 
 		echo '<pre>*language disaster debug*'.chr(10);
-		echo 'putenv: '.(putenv('LC_ALL='.$this->lookupLanguage($locale)));
-		echo 'setlocale ('.$this->lookupLanguage($locale).'): '.(setlocale(LC_ALL,$this->lookupLanguage($locale)));
-		echo 'setlocale ('.$locale.'): '.(setlocale(LC_ALL,$locale));
-		echo 'bindtextdomain: '.(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']));
-		echo 'bind_textdomain_codeset: '.(bind_textdomain_codeset($this->getAppName(), 'UTF-8'));
-		echo 'textdomain: '.(textdomain($this->getAppName()));
+		echo 'putenv: '.(putenv('LC_ALL='.$this->lookupLanguage($locale))?'true':'false').chr(10);
+		echo 'setlocale ('.$this->lookupLanguage($locale).'): '.(setlocale(LC_ALL,$this->lookupLanguage($locale))?'true':'false').chr(10);
+		echo 'setlocale ('.$locale.'): '.(setlocale(LC_ALL,$locale)?'true':'false').chr(10);
+		echo 'bindtextdomain: '.(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale'])).chr(10);
+		echo 'bind_textdomain_codeset: '.(bind_textdomain_codeset($this->getAppName(), 'UTF-8')).chr(10);
+		echo 'textdomain: '.(textdomain($this->getAppName())).chr(10);
 		echo '</pre>';
+
+	echo '<!--';
+    ob_start();
+    system('locale -a');
+    $str = ob_get_contents();
+    ob_end_clean();
+    var_dump($str);
+	echo '-->';
 
 		$_SESSION['user']['currentLocale'] = $locale;
 
