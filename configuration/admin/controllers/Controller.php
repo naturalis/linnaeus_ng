@@ -1513,7 +1513,7 @@ class Controller extends BaseClass
     system('locale -a');
     $str = ob_get_contents();
     ob_end_clean();
-    var_dump($str);
+    var_dump(explode(chr(10),$str));
 	echo '-->';
 
 		$_SESSION['user']['currentLocale'] = $locale;
