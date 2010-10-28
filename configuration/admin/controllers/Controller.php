@@ -1498,12 +1498,14 @@ class Controller extends BaseClass
 		/* DEBUG */
 		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo'))
 			die('.mo file does not exist');
-		
-		q(putenv('LC_ALL='.$this->lookupLanguage($locale)));
-		q(setlocale(LC_ALL,$this->lookupLanguage($locale)));
-		q(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']));
-		q(bind_textdomain_codeset($this->getAppName(), 'UTF-8'));
-		q(textdomain($this->getAppName()));
+
+		echo '<pre>';
+		var_dump(putenv('LC_ALL='.$this->lookupLanguage($locale)));
+		var_dump(setlocale(LC_ALL,$this->lookupLanguage($locale)));
+		var_dump(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']));
+		var_dump(bind_textdomain_codeset($this->getAppName(), 'UTF-8'));
+		var_dump(textdomain($this->getAppName()));
+		echo '</pre>';
 
 		$_SESSION['user']['currentLocale'] = $locale;
 
