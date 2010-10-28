@@ -2,6 +2,9 @@
 
 /*
     
+    tinyMCE
+		compressor php
+
     tinyMCE spell checker:
         - requires google: check if online
         - change default lanmguage through js

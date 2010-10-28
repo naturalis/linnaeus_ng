@@ -2,6 +2,8 @@
 
 /*
 
+	set upload maximum for media uploads per projects
+
     hard coded number of free modules
     deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
 
