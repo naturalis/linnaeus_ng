@@ -1493,7 +1493,7 @@ class Controller extends BaseClass
 
 		$locale = ($locale ? $locale : $this->generalSettings['defaultLocale']);
 
-		if (isset($_SESSION['user']['currentLocale']) && $locale==$_SESSION['user']['currentLocale']) return;
+//		if (isset($_SESSION['user']['currentLocale']) && $locale==$_SESSION['user']['currentLocale']) return;
 
 		/* DEBUG */
 		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo'))
@@ -1502,6 +1502,7 @@ class Controller extends BaseClass
 		echo '<pre>';
 		var_dump(putenv('LC_ALL='.$this->lookupLanguage($locale)));
 		var_dump(setlocale(LC_ALL,$this->lookupLanguage($locale)));
+		var_dump(setlocale(LC_ALL,$locale));
 		var_dump(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']));
 		var_dump(bind_textdomain_codeset($this->getAppName(), 'UTF-8'));
 		var_dump(textdomain($this->getAppName()));
