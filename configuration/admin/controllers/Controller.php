@@ -1483,7 +1483,7 @@ class Controller extends BaseClass
 	{
 		//http://msdn.microsoft.com/en-us/library/39cwe7zf%28vs.71%29.aspx
 
-		$l = array('nl_NL' => 'dutch','en_EN' => 'eng');
+		$l = array('nl_NL' => 'dutch','en_GB' => 'eng');
 		return $l[$locale];
 
 	}
@@ -1496,8 +1496,7 @@ class Controller extends BaseClass
 //		if (isset($_SESSION['user']['currentLocale']) && $locale==$_SESSION['user']['currentLocale']) return;
 
 		/* DEBUG */
-		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo'))
-			die('.mo file does not exist');
+//		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo')) die('.mo file does not exist');
 
 		echo '<pre>*language disaster debug*'.chr(10);
 		echo 'putenv: '.(putenv('LC_ALL='.$this->lookupLanguage($locale))?'true':'false').chr(10);
