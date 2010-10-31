@@ -32,7 +32,8 @@ class Controller extends BaseClass
     private $usedModelsBase = array(
         'helptext', 
         'project', 
-        'module_project'
+        'module_project',
+		'languages'
     );
 
 
@@ -1479,43 +1480,36 @@ class Controller extends BaseClass
     }
 
 
-	private function lookupLanguage($locale)
-	{
-		//http://msdn.microsoft.com/en-us/library/39cwe7zf%28vs.71%29.aspx
-
-		$l = array('nl_NL' => 'dutch','en_GB' => 'eng');
-		return $l[$locale];
-
-	}
-
-	public function setLocale ($locale=false)
+	public function setLocale ($language=false)
 	{
 
-		$locale = ($locale ? $locale : $this->generalSettings['defaultLocale']);
+		$language = ($language ? $language : $this->generalSettings['defaultLanguage']);
 
-//		if (isset($_SESSION['user']['currentLocale']) && $locale==$_SESSION['user']['currentLocale']) return;
+		if ($language == $_SESSION['user']['currentLanguage']) return;
 
-		/* DEBUG */
-//		if (!file_exists($this->generalSettings['directories']['locale'].'/'.$locale.'/LC_MESSAGES/'.$this->getAppName().'.mo')) die('.mo file does not exist');
+		$l = $this->models->Language->get(array('language'=> $language));
 
-		echo '<pre>*language disaster debug*'.chr(10);
-		echo 'putenv: '.(putenv('LC_ALL='.$this->lookupLanguage($locale))?'true':'false').chr(10);
-		echo 'setlocale ('.$this->lookupLanguage($locale).'): '.(setlocale(LC_ALL,$this->lookupLanguage($locale))?'true':'false').chr(10);
-		echo 'setlocale ('.$locale.'): '.(setlocale(LC_ALL,$locale)?'true':'false').chr(10);
-		echo 'bindtextdomain: '.(bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale'])).chr(10);
-		echo 'bind_textdomain_codeset: '.(bind_textdomain_codeset($this->getAppName(), 'UTF-8')).chr(10);
-		echo 'textdomain: '.(textdomain($this->getAppName())).chr(10);
-		echo '</pre>';
+		if (count((array)$l)==0) return;
 
-	echo '<!--';
-    ob_start();
-    system('locale -a');
-    $str = ob_get_contents();
-    ob_end_clean();
-    var_dump(explode(chr(10),$str));
-	echo '-->';
+		putenv('LC_ALL='.$l[0]['language']);
 
-		$_SESSION['user']['currentLocale'] = $locale;
+		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
+
+			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
+
+				return;
+
+			}
+
+		} 
+
+		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
+
+		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
+
+		textdomain($this->getAppName());
+
+		$_SESSION['user']['currentLanguage'] = $language;
 
 	}
 

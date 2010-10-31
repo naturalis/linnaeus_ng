@@ -80,10 +80,10 @@
 {/if}
 	{/section}
 	<span style="float:right">
-		<span class="pseudo-a" onclick="$('#locale').val('en_GB');$('#langForm').submit()">English</span>&nbsp;
-		<span class="pseudo-a" onclick="$('#locale').val('nl_NL');$('#langForm').submit()">Dutch</span>
-		<span id="page-header-version">{$session.user.currentLocale}</span>
-		<form id="langForm" method="post" target=""><input id="locale" type="hidden" name="locale" value=""></form>
+		<span class="pseudo-a" onclick="$('#language').val('English');$('#langForm').submit()">English</span>&nbsp;
+		<span class="pseudo-a" onclick="$('#language').val('Dutch');$('#langForm').submit()">Dutch</span>
+		<span id="page-header-version">{$session.user.currentLanguage}</span>
+		<form id="langForm" method="post" target=""><input id="language" type="hidden" name="language" value=""></form>
 	</span>
 	</div>
 {/if}
