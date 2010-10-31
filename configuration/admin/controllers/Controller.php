@@ -1503,6 +1503,8 @@ class Controller extends BaseClass
 
 		} 
 
+		//if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
+
 		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
 
 		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
