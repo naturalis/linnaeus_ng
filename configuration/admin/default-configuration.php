@@ -42,13 +42,14 @@ class configuration
                 'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
                 'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload',
 				'locale' => $this->_appFileRoot . 'configuration/locale',
+				'log' => $this->_appFileRoot . 'log',
             ), 
             'maxCategories' => 10,
             'login-cookie' => array(
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
             ),
-			'defaultLocale' => 'en_EN'
+			'defaultLanguage' => 'English'
         );
     
     }

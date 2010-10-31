@@ -34,7 +34,6 @@ class SpeciesController extends Controller
         'taxon', 
         'content_taxon', 
         'language_project', 
-        'language', 
 		'section',
 		'label_section',
         'page_taxon', 
@@ -69,6 +68,7 @@ class SpeciesController extends Controller
      */
     public function __construct ()
     {
+
         parent::__construct();
         
         $this->createStandardCategories();
@@ -107,7 +107,7 @@ class SpeciesController extends Controller
         $this->setPageName(_('Species module overview'));
         
         $this->printPage();
-    
+  
     }
 
 
@@ -130,9 +130,9 @@ class SpeciesController extends Controller
             
             if ($tp !== true) {
                 
-                $this->addError(_('Could not save page name.'));
-                $this->addError('(' . $tp . ')');
-            
+                $this->addError(_('Could not save category.'),1);
+                $this->addError('(' . $tp . ')',1);
+				
             }
         
         }
@@ -776,7 +776,7 @@ class SpeciesController extends Controller
     
                             } else {
     
-                                $this->addError(_('Failed writing uploaded file to database.'));
+                                $this->addError(_('Failed writing uploaded file to database.'),1);
     
                             }
                 
@@ -962,7 +962,6 @@ class SpeciesController extends Controller
                 $this->addMessage(_('Data saved.'));
 
             }
-
 
         }
 
