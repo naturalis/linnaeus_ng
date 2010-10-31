@@ -1483,13 +1483,9 @@ class Controller extends BaseClass
 	public function setLocale ($language=false)
 	{
 
-		$language =
-			($language ?
-				$language : 
-				isset($this->generalSettings['defaultLanguage']) ? $this->generalSettings['defaultLanguage'] : false
-			);
+		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
 
-		if (!$language || $language == $_SESSION['user']['currentLanguage']) return;
+		if (isset($_SESSION['user']['currentLanguage']) && $language == $_SESSION['user']['currentLanguage']) return;
 
 		$l = $this->models->Language->get(array('language'=> $language));
 
@@ -1506,6 +1502,8 @@ class Controller extends BaseClass
 			}
 
 		} 
+
+		setlocale(LC_ALL,$l[0]['locale_win']);
 
 		//if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
 
