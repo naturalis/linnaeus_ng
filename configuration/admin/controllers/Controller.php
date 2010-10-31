@@ -1483,9 +1483,13 @@ class Controller extends BaseClass
 	public function setLocale ($language=false)
 	{
 
-		$language = ($language ? $language : $this->generalSettings['defaultLanguage']);
+		$language =
+			($language ?
+				$language : 
+				isset($this->generalSettings['defaultLanguage']) ? $this->generalSettings['defaultLanguage'] : false
+			);
 
-		if ($language == $_SESSION['user']['currentLanguage']) return;
+		if (!$language || $language == $_SESSION['user']['currentLanguage']) return;
 
 		$l = $this->models->Language->get(array('language'=> $language));
 
