@@ -33,7 +33,11 @@ class Controller extends BaseClass
         'helptext', 
         'project', 
         'module_project',
-		'languages'
+		'language'
+    );
+
+    private $usedHelpersBase = array(
+		'logging_helper'
     );
 
 
@@ -65,10 +69,12 @@ class Controller extends BaseClass
         
         $this->setRequestData();
         
-        $this->loadModels();
-        
         $this->loadHelpers();
+
+		$this->initLogging();
         
+        $this->loadModels();
+
 //		$this->setLocale();
         
         $this->setHelpTexts();
@@ -153,17 +159,16 @@ class Controller extends BaseClass
         $this->setBreadcrumbs();
         
         $this->smarty->assign('debugMode', $this->debugMode);
-        
         $this->smarty->assign('session', $_SESSION);
-
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-        
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
+        $this->smarty->assign('app', $this->generalSettings['app']);
+        $this->smarty->assign('pageName', $this->getPageName());
 
 		if (isset($this->cssToLoad)) {
 	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -173,9 +178,6 @@ class Controller extends BaseClass
 	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
     	}
     
-        $this->smarty->assign('app', $this->generalSettings['app']);
-        $this->smarty->assign('pageName', $this->getPageName());
-
 		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
 		
 			$msg =
@@ -239,7 +241,7 @@ class Controller extends BaseClass
      * @param      string or arrayu    $error    the error(s)
      * @access     public
      */
-    public function addError ($error)
+    public function addError ($error,$writeToLog=false)
     {
 
         if (!$error) return;
@@ -247,17 +249,21 @@ class Controller extends BaseClass
         if (!is_array($error)) {
             
             $this->errors[] = $error;
-        
+
+			if ($writeToLog!==false ) $this->log($error,$writeToLog);
+
         } else {
             
             foreach ($error as $key => $val) {
                 
                 $this->errors[] = $val;
+
+				if ($writeToLog!==false ) $this->log($val,$writeToLog);
             
             }
         
         }
-    
+	
     }
 
 
@@ -512,7 +518,11 @@ class Controller extends BaseClass
 
             if ($_SESSION["user"]["_number_of_projects"]==1) {
 
-                return $this->baseUrl . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
+                return
+					$this->baseUrl.
+					$this->getAppName().'/'.
+					$this->getAppName().
+					$this->generalSettings['controllerIndexNameExtension'];
     
             } else {
 
@@ -569,10 +579,10 @@ class Controller extends BaseClass
                     $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
                     
                     /*
-                            user is not authorized and redirected to the index.page; 
-                            if he already *is* on the index.page (and not authorized for that),
-                            he is logged out to avoid circular reference.
-                        */
+						user is not authorized and redirected to the index.page; 
+						if he already *is* on the index.page (and not authorized to be there),
+						he is logged out to avoid circular reference.
+					*/
                     if ($this->getViewName() == 'Index') {
                         
                         $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['logout']);
@@ -645,10 +655,12 @@ class Controller extends BaseClass
         
         $this->setSortCaseSensitivity($sortBy['case']);
         
-        usort($array, array(
-            $this, 
-            'doCustomSortArray'
-        ));
+        usort($array,
+			array(
+				$this, 
+				'doCustomSortArray'
+        	)
+		);
     
     }
 
@@ -715,9 +727,13 @@ class Controller extends BaseClass
         
         $result = false;
         
-        if (isset($this->requestData['rnd']) && isset($_SESSION['system']['last_rnd']) && ($_SESSION['system']['last_rnd'] == $this->requestData['rnd']))
+        if (
+			isset($this->requestData['rnd']) && 
+			isset($_SESSION['system']['last_rnd']) && 
+			($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
+		)
             $result = true;
-        
+
         $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
         
         return $result;
@@ -769,8 +785,61 @@ class Controller extends BaseClass
 		$this->excludeFromReferer = $state;
 	
 	}
+	
+	public function log($msg,$severity=0)
+	{
 
-    private function loadControllerConfig()
+		if (!@$this->helpers->LoggingHelper->write('('.$this->getCurrentProjectId().') '.$msg,$severity))
+			trigger_error(_('Logging not initialised'), E_USER_ERROR);
+
+	}
+
+	public function setLocale ($language=false)
+	{
+
+		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
+
+		if (isset($_SESSION['user']['currentLanguage']) && $language == $_SESSION['user']['currentLanguage']) return;
+
+		$l = $this->models->Language->get(array('language'=> $language));
+
+		if (count((array)$l)==0) { 
+
+			$this->log('Tried to switch to illegal language "'.$language.'"',1);
+			
+			return;
+
+		}
+
+		putenv('LC_ALL='.$l[0]['language']);
+
+		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
+
+			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
+
+				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
+
+				return;
+
+			}
+
+		} 
+
+		setlocale(LC_ALL,$l[0]['locale_win']);
+
+		//if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
+
+		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
+
+		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
+
+		textdomain($this->getAppName());
+
+		$_SESSION['user']['currentLanguage'] = $language;
+
+	}    
+	
+	private function loadControllerConfig()
     {
 
         $t = 'getControllerSettings'.$this->controllerBaseName;
@@ -895,7 +964,6 @@ class Controller extends BaseClass
         $this->smarty->force_compile = true;
         
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
-
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
@@ -956,7 +1024,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Loads the required models (database abstraction classes for the various tables)
      *
@@ -968,11 +1035,27 @@ class Controller extends BaseClass
      */
     private function loadModels ()
     {
+
+		if (isset($this->usedModelsBase) && isset($this->usedModels)) { 
+
+	        $d = array_unique(array_merge((array) $this->usedModelsBase, (array) $this->usedModels));
         
-        $d = array_unique(array_merge((array) $this->usedModelsBase, (array) $this->usedModels));
+		} elseif (isset($this->usedModelsBase)) { 
+
+	        $d = $this->usedModelsBase;
         
+		} elseif (isset($this->usedModels)) { 
+
+	        $d = $this->usedModels;
+        
+		} else {
+
+			return;
+
+		}
+		
         foreach ((array) $d as $key) {
-            
+
             if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
                 
                 require_once (dirname(__FILE__) . '/../models/' . $key . '.php');
@@ -985,9 +1068,17 @@ class Controller extends BaseClass
                     $this->models->$t = new $t();
                     
                 //echo $t.chr(10);
-                }
+                } else {
+
+					$this->log('Attempted to initiate non-existing model class "'.$t.'"',2);
+
+				}
             
-            }
+            } else {
+
+				$this->log('Attempted to load non-existing model file "'.$key.'"',2);
+
+			}
         
         }
     
@@ -1006,10 +1097,26 @@ class Controller extends BaseClass
      */
     private function loadHelpers ()
     {
-        
-        if (!isset($this->usedHelpers)) return;
 
-        foreach ((array) $this->usedHelpers as $key) {
+		if (isset($this->usedHelpersBase) && isset($this->usedHelpers)) { 
+
+	        $d = array_unique(array_merge((array) $this->usedHelpersBase, (array) $this->usedHelpers));
+        
+		} elseif (isset($this->usedHelpersBase)) { 
+
+	        $d = $this->usedHelpersBase;
+        
+		} elseif (isset($this->usedHelpers)) { 
+
+	        $d = $this->usedHelpers;
+        
+		} else {
+
+			return;
+
+		}
+
+        foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
                 
@@ -1028,6 +1135,16 @@ class Controller extends BaseClass
         }
     
     }
+
+
+	private function initLogging()
+	{
+
+		$this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'].'/'.$this->getAppName().'.log');
+
+		$this->helpers->LoggingHelper->setLevel(0);
+
+	}
 
 
 
@@ -1070,7 +1187,7 @@ class Controller extends BaseClass
      */
     private function setPaths ()
     {
-        
+
         $p = $this->getCurrentProjectId();
         
         if ($p) {
@@ -1083,8 +1200,13 @@ class Controller extends BaseClass
             
             foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
                 
-                if (!file_exists($val))
+                if (!file_exists($val)) {
+
                     mkdir($val);
+
+					$this->log('Created directory "'.$val.'"');
+
+				}
             
             }
         
@@ -1293,8 +1415,7 @@ class Controller extends BaseClass
     private function getBreadcrumbs ()
     {
         
-        if (isset($this->breadcrumbs))
-            return $this->breadcrumbs;
+        if (isset($this->breadcrumbs)) return $this->breadcrumbs;
     
     }
 
@@ -1479,43 +1600,6 @@ class Controller extends BaseClass
     
     }
 
-
-	public function setLocale ($language=false)
-	{
-
-		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
-
-		if (isset($_SESSION['user']['currentLanguage']) && $language == $_SESSION['user']['currentLanguage']) return;
-
-		$l = $this->models->Language->get(array('language'=> $language));
-
-		if (count((array)$l)==0) return;
-
-		putenv('LC_ALL='.$l[0]['language']);
-
-		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
-
-			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
-
-				return;
-
-			}
-
-		} 
-
-		setlocale(LC_ALL,$l[0]['locale_win']);
-
-		//if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
-
-		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
-
-		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
-
-		textdomain($this->getAppName());
-
-		$_SESSION['user']['currentLanguage'] = $language;
-
-	}
 
 }
 
