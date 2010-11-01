@@ -390,8 +390,37 @@ abstract class Model extends BaseClass
     
     }
 
+	/*
 
+	only useful with InnoDB
 
+	public function startTransaction()
+	{
+
+		mysql_query('SET autocommit=0', $this->databaseConnection);		
+		mysql_query('START TRANSACTION', $this->databaseConnection);
+
+	}
+
+	public function commitTransaction()
+	{
+
+		mysql_query('COMMIT', $this->databaseConnection);
+		mysql_query('SET autocommit=1', $this->databaseConnection);		
+
+	}
+
+	public function rollbackTransaction()
+	{
+
+		mysql_query('ROLLBACK', $this->databaseConnection);
+		mysql_query('SET autocommit=1', $this->databaseConnection);		
+
+	}
+
+	*/
+
+	/* DEBUG */
     public function q ()
     {
         
@@ -604,22 +633,32 @@ abstract class Model extends BaseClass
                 
                 }
 
+	            $d = $this->columns[$col];
+
                 if ($val===null) {
                 
-                    $query .= ' and ' . $col . " " . $operator . " null ";
+                    $query .= " and " . $col . " " . $operator . " null ";
+                
+                } elseif ($d['numeric'] == 1) {
+                    
+                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
+                
+                } elseif ($d['type'] == 'datetime') {
+                    
+                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
                 
                 } elseif ($ignoreCase && is_string($val)) {
                     
-                    $query .= ' and lower(' . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
+                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
                 
                 } else {
                     
-                    $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
+                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
                 
                 }
             
             }
-            
+
             $query .= $groupBy ? " group by " . $groupBy : '';
             
             $query .= $order ? " order by " . $order : '';

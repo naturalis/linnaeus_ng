@@ -82,9 +82,9 @@
 	<span style="float:right">
 		<span class="pseudo-a" onclick="$('#language').val('English');$('#langForm').submit()">English</span>&nbsp;
 		<span class="pseudo-a" onclick="$('#language').val('Dutch');$('#langForm').submit()">Dutch</span>
-		<span id="page-header-version">{$session.user.currentLanguage}</span>
-		<form id="langForm" method="post" target=""><input id="language" type="hidden" name="language" value=""></form>
+		<span style="font-size:8px">{$session.user.currentLanguage}&nbsp;</span>
 	</span>
+	<form id="langForm" method="post" action=""><input id="language" type="hidden" name="language" value="" /></form>
 	</div>
 {/if}
 </div>

@@ -27,7 +27,7 @@ Text you enter is automatically saved when you leave the input field.
 {section name=i loop=$pages}
 	{if $pages[i].sections|@count==0}
 	<tr class="tr-highlight">
-		<td>
+		<td style="background-color:#fff;">
 			{$pages[i].page}
 		</td>
 	</tr>
@@ -35,9 +35,9 @@ Text you enter is automatically saved when you leave the input field.
 	{section name=j loop=$pages[i].sections}
 	<tr class="tr-highlight">
 	{if $smarty.section.j.index != 0}
-		<td></td>
+		<td style="background-color:#fff;"></td>
 	{else}
-		<td>
+		<td style="background-color:#fff;">
 			{$pages[i].page}
 		</td>
 	{/if}

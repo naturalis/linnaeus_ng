@@ -26,9 +26,9 @@ Once you have saved the selection, you can change the ranks' names and provide t
 <tr><td colspan="2">&nbsp;</td></tr>
 {assign var=first value=false}
 {/if}
-<tr class="tr-highlight">
+<tr class="tr-highlight" style="cursor:pointer" onclick="taxonAddRank({$ranks[i].id}{if $ranks[i].parent_id==-1},true{/if});" >
 	<td><span class="rank-name{if $ranks[i].in_col==1}-col{/if}" id="rank-{$ranks[i].id}">{$ranks[i].rank}</span>{if $ranks[i].additional!=''}<span class="rank-additional">({$ranks[i].additional})</span>{/if}{if $ranks[i].in_col==1} *{/if}</td>
-	<td onclick="taxonAddRank({$ranks[i].id}{if $ranks[i].parent_id==-1},true{/if});" class="add-arrow" id="arrow-{$ranks[i].id}">&rarr;</td>
+	<td class="add-arrow" id="arrow-{$ranks[i].id}">></td>
 </tr>
 {/section}
 </table>
