@@ -145,3 +145,8 @@ function allHideLoadingDiv() {
 
 }
 
+function allScrollTo(pos) {
+
+	$('html, body').animate({scrollTop: pos}, 0);
+
+}

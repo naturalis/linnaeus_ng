@@ -460,6 +460,14 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon list'));
 
+		if (isset($this->requestData['id']) && isset($this->requestData['move'])) {
+
+			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
+
+			if (isset($this->requestData['scroll'])) $this->smarty->assign('scroll', $this->requestData['scroll']);
+
+		}
+
 		// get taxa assigned to user
 		$ut = $this->models->UserTaxon->get(
 			array(
@@ -468,16 +476,16 @@ class SpeciesController extends Controller
 			),'taxon_id',false,false,true,'taxon_id'
 		);
 
-
 		// get complete taxon tree
 		$this->getTaxonTree(null);
 
 		$allow = false;
+		$prevAllowedLevel = -1;
 
-		// discard all taxa above the levels assigned to the user
+		// discard all taxa above the levels (which means a smaller level-value) assigned to the user
 		foreach((array)$this->_treeList as $key => $val) {
 
-			if ($allow && $val['level'] <= $prevLevel) {
+			if ($allow && $val['level'] <= $prevAllowedLevel) {
 			
 				$allow = false;
 
@@ -487,22 +495,24 @@ class SpeciesController extends Controller
 
 				$allow = true;
 				
-				$prevLevel = $val['level'];
+				$prevAllowedLevel = $val['level'];
 
 			}
-			
+
 			if ($allow) {
-			
+
 				$taxa[] = $val;
 			
 			}
+			
+			$prevLevel = $val['level'];
 
 		}
 
 		if (isset($taxa) && count((array)$taxa)>0) {
 
+			// get (or store) languages and the ranks list from session
 			$lp = $_SESSION['project']['languages'];
-
 
 			if (isset($_SESSION['project']['pages'])) {
 	
@@ -541,10 +551,9 @@ class SpeciesController extends Controller
 				$d[$val['mime']] = $val['media_type'];
 	
 			}
-		
 
 			foreach ((array) $taxa as $key => $taxon) {
-	
+			
 				$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
 				
 				$ct = $this->models->ContentTaxon->get(
@@ -565,9 +574,18 @@ class SpeciesController extends Controller
             
 				foreach((array)$mt as $mtkey => $mtval) {
 	
-					$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = (isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 0) + $mtval['total'];
-					$taxa[$key]['totMediaCount'] = (isset($taxa[$key]['totMediaCount']) ? $taxa[$key]['totMediaCount'] : 0 ) + $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
-	
+					$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = 
+						(isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? 
+							$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 
+							0) 
+						+ $mtval['total'];
+							
+					$taxa[$key]['totMediaCount'] =
+						(isset($taxa[$key]['totMediaCount']) ? 
+							$taxa[$key]['totMediaCount'] : 
+							0 ) 
+						+ $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
+
 				}
         
 	        }
@@ -1922,6 +1940,8 @@ class SpeciesController extends Controller
                 'id' => $this->requestData['id'], 
                 'project_id' => $this->getCurrentProjectId()
             ));
+			
+			$this->reOrderTaxonTree();
         
         }
     
@@ -2245,12 +2265,14 @@ class SpeciesController extends Controller
 
     private function getTaxonTree($pId=null,$level=0) 
     {
+	
+		if ($level==0) unset($this->_treeList);
 
         $t = $this->models->Taxon->get(
             array(
                 'project_id' => $this->getCurrentProjectId(),
                 ($pId === null ? 'parent_id is' : 'parent_id') => $pId
-            ),false,'taxon');
+            ),false,'taxon_order');
 
         foreach((array)$t as $key => $val) {
 
@@ -2747,5 +2769,55 @@ class SpeciesController extends Controller
         }
 
 	}
+
+	private function moveIdInTaxonOrder($id,$dir)
+	{
+	
+		if ($dir != 'up' && $dir != 'down') return;
+
+		$t1 = $this->models->Taxon->get(
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		$t2 = $this->models->Taxon->get(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'rank_id' => $t1[0]['rank_id'],
+				'taxon_order '.($dir=='up' ? '<' : '>') => $t1[0]['taxon_order']
+			),false,'taxon_order '.($dir=='up' ? 'desc' : 'asc')
+		);
+
+		if (count((array)$t2)!=0) {
+
+			$this->models->Taxon->update(
+				array(
+					'taxon_order' => $t2[0]['taxon_order']
+				),
+				array(
+					'id' => $t1[0]['id'],
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+			$this->models->Taxon->update(
+				array(
+					'taxon_order' => $t1[0]['taxon_order']
+				),
+				array(
+					'id' => $t2[0]['id'],
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+			$this->reOrderTaxonTree();
+
+		}
+
+	}
+
+
 }
 

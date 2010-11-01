@@ -238,10 +238,11 @@ class ProjectsController extends Controller
         }
         
         if ($this->requestDataFiles) {
-/*            
 
-allowed formats should go to controller's settings
-not sure if helper is all that useful
+			/*            
+			
+			allowed formats should go to controller's settings
+			not sure if helper is all that useful
 
             $fuh = $this->helpers->FileUploadHelper->saveFiles(
                 $this->requestDataFiles, 
@@ -279,7 +280,8 @@ not sure if helper is all that useful
                 $this->addError($fuh['error']);
             
             }
-*/
+		*/
+
         }
         
         $data = $this->models->Project->get($this->getCurrentProjectId());

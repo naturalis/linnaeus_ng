@@ -982,7 +982,9 @@ class UsersController extends Controller
 		
 		if ($r !== true) {
 			
-			$this->addError(_('Failed to save user.'));
+			$this->addError(_('Failed to save user.'),2);
+
+			$this->log(serialize($data));
 			
 			return false;
 			
