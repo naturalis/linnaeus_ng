@@ -2,10 +2,11 @@
 
 <div id="page-main">
 
-<span id="message-container" style="float:right;"></span>
-You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided; these can be altered as you see fit.<br />
-Below, you can specify the correct label of each section in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
-Text you enter is automatically saved when you leave the input field.
+<span id="message-container" style="float:right;"></span><br/>
+{t}You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided; these can be altered as you see fit.{/t}<br />
+{t}Below, you can specify the correct label of each section in the language or languages defined in your project.{/t}<br />
+{t}On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
+{t}Text you enter is automatically saved when you leave the input field.{/t}
 <br /><br />
 
 
@@ -13,8 +14,8 @@ Text you enter is automatically saved when you leave the input field.
 <input type="hidden" name="rnd" value="{$rnd}" />
 <table>
 <tr>
-	<th>Category</th>
-	<th>Sections</th>
+	<th>{t}Category{/t}</th>
+	<th>{t}Sections{/t}</th>
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}
 	<td>{$languages[i].language} *</td>
@@ -64,7 +65,7 @@ Text you enter is automatically saved when you leave the input field.
 	<tr>
 		<td></td>
 		<td style="vertical-align:top">
-			<input type="text" style="width:150px;" name="new[{$pages[i].id}]" /> [<span class="pseudo-a" onclick="$('#theForm').submit();">add</span>]
+			<input type="text" style="width:150px;" name="new[{$pages[i].id}]" /> [<span class="pseudo-a" onclick="$('#theForm').submit();">{t}add{/t}</span>]
 		</td>
 	</tr>
 	<tr>

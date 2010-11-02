@@ -461,3 +461,242 @@ msgstr ""
 msgid "FATAL: no table basename defined"
 msgstr ""
 
+msgid "(double click to delete)"
+msgstr ""
+
+msgid "add"
+msgstr ""
+
+msgid "Add a new taxon"
+msgstr ""
+
+msgid "After you have made the appropriate selection, click the save-button. Once you have saved the selection, you can change the ranks' names and provide translations"
+msgstr ""
+
+msgid "Assign taxon"
+msgstr ""
+
+msgid "back"
+msgstr ""
+
+msgid "Be advised, the retrieval process might take quite some time, especially with higher taxa. It is recommended not to attempt to retrieve anything above the rank of genus."
+msgstr ""
+
+msgid "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
+msgstr ""
+
+msgid "Below, you can specify the correct label of each rank in the language or languages defined in your project."
+msgstr ""
+
+msgid "Below, you can specify the correct label of each section in the language or languages defined in your project."
+msgstr ""
+
+msgid "Category"
+msgstr ""
+
+msgid "Check the results of the import below. If they look OK, press 'save' to save them:"
+msgstr ""
+
+msgid "Check the taxa you wish to import, and click save:"
+msgstr ""
+
+msgid "Collaborator"
+msgstr ""
+
+msgid "Content"
+msgstr ""
+
+msgid "Current assignments:"
+msgstr ""
+
+msgid "Currently being edited by:"
+msgstr ""
+
+msgid "Define taxonomic ranks"
+msgstr ""
+
+msgid "delete"
+msgstr ""
+
+msgid "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
+msgstr ""
+
+msgid "Duplicates of the taxa already in your project's database will not be stored."
+msgstr ""
+
+msgid "Each taxon consists of two or three fields:"
+msgstr ""
+
+msgid "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
+msgstr ""
+
+msgid "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
+msgstr ""
+
+msgid "here"
+msgstr ""
+
+msgid "Hybrid"
+msgstr ""
+
+msgid "Hybrid ('y'; optional)"
+msgstr ""
+
+msgid "Hybrids are only possible for the following ranks:"
+msgstr ""
+
+msgid "images"
+msgstr ""
+
+msgid "Import taxon tree from Catalogue Of Life (experimental)"
+msgstr ""
+
+msgid "Import taxon tree from file"
+msgstr ""
+
+msgid "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
+msgstr ""
+
+msgid "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
+msgstr ""
+
+msgid "Label taxonomic ranks"
+msgstr ""
+
+msgid "Media"
+msgstr ""
+
+msgid "move taxon downward"
+msgstr ""
+
+msgid "move taxon upward"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "pages published"
+msgstr ""
+
+msgid "Parent taxon:"
+msgstr ""
+
+msgid "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
+msgstr ""
+
+msgid "Please be advised:"
+msgstr ""
+
+msgid "preview"
+msgstr ""
+
+msgid "Rank"
+msgstr ""
+
+msgid "Rank:"
+msgstr ""
+
+msgid "Ranks should match the list of ranks you have selected for your project."
+msgstr ""
+
+msgid "Ranks:"
+msgstr ""
+
+msgid "retrieve a single level of child taxa only"
+msgstr ""
+
+msgid "save"
+msgstr ""
+
+msgid "save selected ranks"
+msgstr ""
+
+msgid "Sections"
+msgstr ""
+
+msgid "Selected ranks"
+msgstr ""
+
+msgid "soundfiles"
+msgstr ""
+
+msgid "Taxa with a rank that does not appear in this list will not be loaded."
+msgstr ""
+
+msgid "Taxon"
+msgstr ""
+
+msgid "Taxon name"
+msgstr ""
+
+msgid "Taxon name:"
+msgstr ""
+
+msgid "Taxon rank"
+msgstr ""
+
+msgid "Taxon:"
+msgstr ""
+
+msgid "Text you enter is automatically saved when you leave the input field."
+msgstr ""
+
+msgid "The field separator must be , (comma), the field delimiter \" (double-quote)."
+msgstr ""
+
+msgid "The file must meet the following conditions:"
+msgstr ""
+
+msgid "The format needs to be CSV."
+msgstr ""
+
+msgid "There should be one taxon per line. No header line should be present."
+msgstr ""
+
+msgid "These currently are:"
+msgstr ""
+
+msgid "This is a hybrid:"
+msgstr ""
+
+msgid "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
+msgstr ""
+
+msgid "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
+msgstr ""
+
+msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database."
+msgstr ""
+
+msgid "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
+msgstr ""
+
+msgid "to user"
+msgstr ""
+
+msgid "undo"
+msgstr ""
+
+msgid "unknown rank"
+msgstr ""
+
+msgid "upload"
+msgstr ""
+
+msgid "videos"
+msgstr ""
+
+msgid "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
+msgstr ""
+
+msgid "You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa."
+msgstr ""
+
+msgid "You can download a sample CSV-file"
+msgstr ""
+
+msgid "You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox the third column says 'unknown rank', you are"
+msgstr ""
+
+msgid "attempting to load a rank that is not part of your project. To add or change ranks, click"
+msgstr ""

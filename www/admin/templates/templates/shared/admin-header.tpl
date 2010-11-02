@@ -79,12 +79,18 @@
 	{/if}
 {/if}
 	{/section}
+{if $isMultiLingual}
 	<span style="float:right">
-		<span class="pseudo-a" onclick="$('#language').val('English');$('#langForm').submit()">English</span>&nbsp;
-		<span class="pseudo-a" onclick="$('#language').val('Dutch');$('#langForm').submit()">Dutch</span>
-		<span style="font-size:8px">{$session.user.currentLanguage}&nbsp;</span>
+{section name=i loop=$uiLanguages}
+{if $uiLanguages[i] == $uiCurrentLanguage}
+		<span class="active-language">{$uiLanguages[i]}</span>&nbsp;
+{else}
+		<span class="pseudo-a" onclick="$('#_uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
+{/if}
+{/section}
 	</span>
-	<form id="langForm" method="post" action=""><input id="language" type="hidden" name="language" value="" /></form>
+	<form id="langForm" method="post" action=""><input id="_uiLang" type="hidden" name="_uiLang" value="" /></form>
+{/if}
 	</div>
 {/if}
 </div>

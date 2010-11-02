@@ -2,17 +2,17 @@
 
 <div id="page-main">
 <ul class="admin-list">
-	<li><a href="list.php">Taxon list</a></li>
-	<li><a href="edit.php">Add a new taxon</a></li>
-	<li><a href="file.php">Import taxon tree from file</a></li>
-	<li><a href="col.php">Import taxon tree from Catalogue Of Life (experimental)</a></li>
+	<li><a href="list.php">{t}Taxon list{/t}</a></li>
+	<li><a href="edit.php">{t}Add a new taxon{/t}</a></li>
+	<li><a href="file.php">{t}Import taxon tree from file{/t}</a></li>
+	<li><a href="col.php">{t}Import taxon tree from Catalogue Of Life (experimental){/t}</a></li>
 </ul>
 <ul class="admin-list">
-	<li><a href="collaborators.php">Assign taxa to collaborators</a></li>
-	<li><a href="ranks.php">Define taxonomic ranks</a></li>
-	<li><a href="ranklabels.php">Label taxonomic ranks</a></li>
-	<li><a href="page.php">Define categories</a></li>
-	<li><a href="sections.php">Define sections</a></li>
+	<li><a href="collaborators.php">{t}Assign taxa to collaborators{/t}</a></li>
+	<li><a href="ranks.php">{t}Define taxonomic ranks{/t}</a></li>
+	<li><a href="ranklabels.php">{t}Label taxonomic ranks{/t}</a></li>
+	<li><a href="page.php">{t}Define categories{/t}</a></li>
+	<li><a href="sections.php">{t}Define sections{/t}</a></li>
 </ul>
 </div>
 

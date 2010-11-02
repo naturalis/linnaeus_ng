@@ -1,8 +1,8 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa.<br/>
-You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent.<br /><br />
+{t}You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa.{/t}<br/>
+{t}You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent.{/t}<br /><br />
 
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
@@ -10,7 +10,7 @@ You can assign multiple taxa to the same collaborator. However, if you assign di
 <table>
 	<tr style="vertical-align:top">
 		<td>
-			Assign taxon
+			{t}Assign taxon{/t}
 		</td>
 		<td>
 	<select name="taxon_id" style="width:200px">
@@ -24,7 +24,7 @@ You can assign multiple taxa to the same collaborator. However, if you assign di
 	</select>
 		</td>
 		<td>
-			to user
+			{t}to user{/t}
 		</td>
 		<td>
 	<select name="user_id" style="width:200px">
@@ -35,17 +35,17 @@ You can assign multiple taxa to the same collaborator. However, if you assign di
 	</select>
 		</td>
 		<td>
-			[<span onclick="$('#theForm').submit()" class="pseudo-a">save</span>]
+			[<span onclick="$('#theForm').submit()" class="pseudo-a">{t}save{/t}</span>]
 		</td>
 	</tr>
 </table>
 
 <br />
-Current assignments:
+{t}Current assignments:{/t}
 <br />
 
 <table style="border-collapse:collapse">
-<tr><th style="width:250px">Taxon</th><th></th><th style="width:250px">Collaborator</th><th></th></tr>
+<tr><th style="width:250px">Taxon</th><th></th><th style="width:250px">{t}Collaborator{/t}</th><th></th></tr>
 {section name=i loop=$usersTaxa}
 <tr class="tr-highlight"><td>{$usersTaxa[i].taxon.taxon}</td>
 <td>&rarr;</td>
