@@ -49,7 +49,8 @@ class configuration
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
             ),
-			'defaultLanguage' => 'English'
+			'uiLanguages' => array('Dutch','English'),
+			'uiDefaultLanguage' => 1 // points to the element in the array above
         );
     
     }

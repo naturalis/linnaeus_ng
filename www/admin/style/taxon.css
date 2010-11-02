@@ -196,6 +196,10 @@
 	margin-bottom:2px;
 }
 
+.col-rank {
+	background-color:#bbf
+}
+
 .rank-language,.rank-language-active {
 	padding:0px 2px 0px 2px;
 	cursor:pointer;	
@@ -208,5 +212,4 @@
 }
 
 .taxon-hybrid-x {
-
 }

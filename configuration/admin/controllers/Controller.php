@@ -28,12 +28,16 @@ class Controller extends BaseClass
     public $sortCaseSensitivity;
     public $baseUrl;
 	public $excludeFromReferer = false;
+	public $isMultiLingual = true;
+	public $uiLanguages;
+	public $uiDefaultLanguage;
 
     private $usedModelsBase = array(
         'helptext', 
         'project', 
         'module_project',
-		'language'
+		'language',
+		'sandbox'
     );
 
     private $usedHelpersBase = array(
@@ -61,13 +65,9 @@ class Controller extends BaseClass
 		
         $this->loadControllerConfig();        
         
-        $this->checkLastVisitedPage();
-        
-        $this->setSessionActivePageValues();
-        
-        $this->setSmarty();
-        
-        $this->setRequestData();
+        $this->setPaths();
+
+        $this->setUrls();
         
         $this->loadHelpers();
 
@@ -75,15 +75,21 @@ class Controller extends BaseClass
         
         $this->loadModels();
 
-//		$this->setLocale();
-        
         $this->setHelpTexts();
         
-        $this->setMiscellaneous();
-        
-        $this->setPaths();
+        $this->setRandomValue();
 
-        $this->setUrls();
+		$this->setLanguages();
+        
+        $this->checkLastVisitedPage();
+        
+        $this->setSessionActivePageValues();
+        
+        $this->setSmartySettings();
+        
+        $this->setRequestData();
+
+        $this->doLanguageChange();
         
         $this->checkModuleActivationStatus();
 
@@ -169,6 +175,10 @@ class Controller extends BaseClass
         $this->smarty->assign('helpTexts', $this->getHelpTexts());
         $this->smarty->assign('app', $this->generalSettings['app']);
         $this->smarty->assign('pageName', $this->getPageName());
+
+        $this->smarty->assign('uiLanguages', $this->uiLanguages);
+        $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
+        $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
 
 		if (isset($this->cssToLoad)) {
 	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
@@ -827,8 +837,6 @@ class Controller extends BaseClass
 
 		setlocale(LC_ALL,$l[0]['locale_win']);
 
-		//if (!defined('LC_MESSAGES')) define('LC_MESSAGES', 6);
-
 		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
 
 		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
@@ -838,7 +846,55 @@ class Controller extends BaseClass
 		$_SESSION['user']['currentLanguage'] = $language;
 
 	}    
+
+
+    /**
+     * Gettext wrapper, to be called from a registered block function within Smarty
+     *
+     * @access     public
+     */
+	public function smartyTranslate($params, $content, &$smarty, &$repeat)
+	{
+
+		if (empty($content)) return;
+
+		$this->models->Sandbox->save(
+			array(
+				'id' => null,
+				'x' => $content
+			)
+		);
+
+		$c = _($content);
 	
+		if (isset($params)) {
+
+			foreach((array)$params as $key => $val) {
+
+				if (substr($key,0,2)=='_s' && !empty($val)) {
+
+					$c = preg_replace('/\%s/',$val,$c,1);
+
+				}
+
+			}
+			
+		}
+		
+		return $c;
+	
+	}
+
+	private function getCurrentUiLanguage()
+	{
+
+		return (isset($_SESSION['user']['currentLanguage']) ? 
+			$_SESSION['user']['currentLanguage'] : 
+			$this->uiLanguages[$this->uiDefaultLanguage]
+		);
+
+	}
+
 	private function loadControllerConfig()
     {
 
@@ -872,7 +928,6 @@ class Controller extends BaseClass
         return ($mp[0]['active'] == 'n' ? 0 : ($mp[0]['active'] == 'y' ? 1 : -1));
     
     }
-
 
 
     /**
@@ -953,7 +1008,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setSmarty ()
+    private function setSmartySettings ()
     {
         
         $this->_smartySettings = $this->config->getSmartySettings();
@@ -969,10 +1024,10 @@ class Controller extends BaseClass
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-    
+
+		$this->smarty->register_block('t', array(&$this,'smartyTranslate'));
+
     }
-
-
 
     /**
      * Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
@@ -1020,6 +1075,38 @@ class Controller extends BaseClass
                 $this->requestDataFiles[] = $val;
         
         }
+    
+    }
+
+
+    private function doLanguageChange ($unsetRequestVar=true)
+    {
+
+		if ($this->isMultiLingual) {
+
+			if (isset($this->requestData['_uiLang'])) {
+			
+				$this->setLocale($this->requestData['_uiLang']);
+
+			}
+
+		} else {
+
+			$this->log('Attempt to set language '.$this->requestData['_uiLang'].' for non-mulitlanguage page',1);
+
+		}
+
+		if ($unsetRequestVar) {
+
+			unset($this->requestData['_uiLang']);
+
+			if (empty($this->requestData)) {
+
+				unset($this->requestData);
+
+			}
+				
+		}
     
     }
 
@@ -1147,6 +1234,15 @@ class Controller extends BaseClass
 	}
 
 
+	private function setLanguages()
+	{
+
+		$this->uiLanguages = $this->generalSettings['uiLanguages'];
+
+		$this->uiDefaultLanguage = $this->generalSettings['uiDefaultLanguage'];
+
+	}
+
 
     /**
      * Loads the help texts for the current view into the class variable 'helpTexts'
@@ -1234,23 +1330,6 @@ class Controller extends BaseClass
         }
     
     }
-
-    /**
-     * Initialises miscellaneous variables
-     *
-     * sets default filemask
-     * sets default max upload size
-     * sets a random value
-     *
-     * @access     private
-     */
-    private function setMiscellaneous ()
-    {
-        
-        $this->setRandomValue();
-    
-    }
-
 
 
     /**
@@ -1450,7 +1529,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Sets key to sort by for doCustomSortArray
      *
@@ -1463,7 +1541,6 @@ class Controller extends BaseClass
         $this->sortField = $field;
     
     }
-
 
 
     /**
@@ -1480,7 +1557,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Sets sort direction for doCustomSortArray
      *
@@ -1493,7 +1569,6 @@ class Controller extends BaseClass
         $this->sortDirection = $dir;
     
     }
-
 
 
     /**
@@ -1510,7 +1585,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Sets case sensitivity for doCustomSortArray
      *
@@ -1525,7 +1599,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Returns setting for case-sensitivity while sorting; called by doCustomSortArray
      *
@@ -1538,7 +1611,6 @@ class Controller extends BaseClass
         return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
     
     }
-
 
 
     /**
@@ -1572,7 +1644,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Sets a random integer value for general use
      *
@@ -1584,7 +1655,6 @@ class Controller extends BaseClass
         $this->randomValue = mt_rand(99999, mt_getrandmax());
     
     }
-
 
 
     /**
@@ -1604,3 +1674,4 @@ class Controller extends BaseClass
 }
 
 ?>
+

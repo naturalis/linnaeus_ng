@@ -3,23 +3,23 @@
 
 <div id="page-main">
 <p>
-Click the arrow next to a rank to add that rank to the selection used in this project. Currently selected ranks are shown on the right. To remove a rank from the selection, double click it in the list on the right. The uppermost rank, {$ranks[0].rank}, is mandatory and cannot be deleted.
+{t _s1=$ranks[0].rank}Click the arrow next to a rank to add that rank to the selection used in this project. Currently selected ranks are shown on the right. To remove a rank from the selection, double click it in the list on the right. The uppermost rank, %s, is mandatory and cannot be deleted.{/t}
 <br />
-Click <span onclick="taxonAddCoLRanks()" class="pseudo-a">here</span> to select all the ranks used in Catalogue Of Life, marked with an asterisk in the list below.
+
+{t}To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click {/t}<span onclick="taxonAddCoLRanks()" class="pseudo-a">{t}here{/t}</span>.
 <br />
-After you have made the appropriate selection, click the save-button.
-Once you have saved the selection, you can change the ranks' names and provide translations <a href="ranklabels.php">here</a>.<br />
+{t}After you have made the appropriate selection, click the save-button. Once you have saved the selection, you can change the ranks' names and provide translations {/t}<a href="ranklabels.php">{t}here{/t}</a>.<br />
 </p>
 {if $projectRanks|@count>0}
 <p>
-<b>Please be advised:</b> deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank.
+<b>{t}Please be advised:{/t}</b> {t}deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank.{/t}
 </p>
 {/if}
 <p>
-<input type="button" value="save selected ranks" onclick="taxonSaveRanks()" />
+<input type="button" value="{t}save selected ranks{/t}" onclick="taxonSaveRanks()" />
 </p>
 <table id="ranks-table">
-<tr><td colspan="2" class="rank-header">Ranks:</td></tr>
+<tr><td colspan="2" class="rank-header">{t}Ranks:{/t}</td></tr>
 {assign var=first value=true}
 {section name=i loop=$ranks}
 {if $ranks[i].parent_id==-1 && $first}
@@ -27,13 +27,19 @@ Once you have saved the selection, you can change the ranks' names and provide t
 {assign var=first value=false}
 {/if}
 <tr class="tr-highlight" style="cursor:pointer" onclick="taxonAddRank({$ranks[i].id}{if $ranks[i].parent_id==-1},true{/if});" >
-	<td><span class="rank-name{if $ranks[i].in_col==1}-col{/if}" id="rank-{$ranks[i].id}">{$ranks[i].rank}</span>{if $ranks[i].additional!=''}<span class="rank-additional">({$ranks[i].additional})</span>{/if}{if $ranks[i].in_col==1} *{/if}</td>
-	<td class="add-arrow" id="arrow-{$ranks[i].id}">></td>
+	<td{if $ranks[i].in_col==1} class="col-rank"{/if}>
+		<span class="rank-name{if $ranks[i].in_col==1}-col{/if}" id="rank-{$ranks[i].id}">
+			{$ranks[i].rank}
+		</span>{if $ranks[i].additional!=''}<span class="rank-additional">({$ranks[i].additional})</span>{/if}
+	</td>
+	<td class="add-arrow" id="arrow-{$ranks[i].id}">
+		>
+	</td>
 </tr>
 {/section}
 </table>
 
-<div id="floating-div" style="position:absolute;">Selected ranks <span ondblclick="taxonRemoveAll()">(double click to delete)</span>:<br />
+<div id="floating-div" style="position:absolute;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />
 	<select size="35" id="selected-ranks" style="width:250px;"></select></div>
 </div>
 

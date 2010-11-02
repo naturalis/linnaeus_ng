@@ -13,11 +13,11 @@
 		<td id="taxon-navigation-cell">
 			<span style="float:right">
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
-				<input type="button" value="save" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<input type="button" value="preview" onclick="taxonOpenContentPreview('manual')" style="margin-right:5px" />
-				<input type="button" value="undo" onclick="taxonGetUndo()" style="margin-right:5px" />
-				<input type="button" value="delete" onclick="taxonDeleteData()" style="margin-right:5px" />
-				<input type="button" value="taxon list" onclick="taxonClose()" style="" />
+				<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
+				<input type="button" value="{t}preview{/t}" onclick="taxonOpenContentPreview('manual')" style="margin-right:5px" />
+				<input type="button" value="{t}undo{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
+				<input type="button" value="{t}delete{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
+				<input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" />
 			</span>
 		</td>
 	</tr>

@@ -3,21 +3,16 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-27 11:09+0100\n"
-"PO-Revision-Date: 2010-10-28 16:36+0100\n"
+"PO-Revision-Date: 2010-11-02 17:38+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
-"X-Poedit-Basepath: C:\\Users\\maarten\\htdocs\\linnaeus ng\\linnaeus_ng\\configuration\\admin\\\n"
-"X-Poedit-Language: Dutch\n"
-"X-Poedit-Country: NETHERLANDS\n"
-"X-Poedit-SearchPath-0: .\n"
 
 #: BaseClass.php:36
 msgid "FATAL: cannot load configuration"
-msgstr ""
+msgstr "FATAL: cannot load configuration"
 
 #: controllers/Controller.php:181
 msgid "Welcome, %s."
@@ -37,15 +32,15 @@ msgstr "Project modules"
 
 #: controllers/ProjectsController.php:128
 msgid "Assign collaborator to modules"
-msgstr ""
+msgstr "Wijs medewerkers toe aan modules"
 
 #: controllers/ProjectsController.php:214
 msgid "Project settings"
-msgstr ""
+msgstr "Project instellingen"
 
 #: controllers/ProjectsController.php:555
 msgid "Language already assigned."
-msgstr ""
+msgstr "Taal al toegewezen"
 
 #: controllers/SpeciesController.php:104
 msgid "Species module overview"
@@ -53,28 +48,28 @@ msgstr "Overzicht species module"
 
 #: controllers/SpeciesController.php:119
 msgid "Define categories"
-msgstr ""
+msgstr "Definieer categeoriën"
 
 #: controllers/SpeciesController.php:128
 msgid "Could not save page name."
-msgstr ""
+msgstr "Kon categorienaam niet opslaan"
 
 #: controllers/SpeciesController.php:200
 #, php-format
 msgid "Editing taxon \"%s\""
-msgstr ""
+msgstr "Aanpassen taxon \"%s\""
 
 #: controllers/SpeciesController.php:206
 msgid "New taxon"
-msgstr ""
+msgstr "Nieuw taxon"
 
 #: controllers/SpeciesController.php:275
 msgid "Taxon saved."
-msgstr ""
+msgstr "Taxon opgeslagen."
 
 #: controllers/SpeciesController.php:283
 msgid "Rank cannot be hybrid."
-msgstr ""
+msgstr "Orde kan geen hybride zijn."
 
 #: controllers/SpeciesController.php:289
 msgid "Parent cannot have child taxa."
@@ -172,7 +167,7 @@ msgstr ""
 
 #: controllers/SpeciesController.php:1800
 msgid "Could not save taxon content."
-msgstr ""
+msgstr "Kon taxon content niet opslaan."
 
 #: controllers/SpeciesController.php:1807
 msgid "No page title specified."
@@ -369,98 +364,338 @@ msgstr ""
 
 #: controllers/UsersController.php:1750
 msgid "E-mail address already exists."
-msgstr ""
+msgstr "E-mailadres bestaat al."
 
 #: controllers/UtilitiesController.php:60
 msgid "You are not authorized to do that."
-msgstr ""
+msgstr "U bent niet geautoriseerd om die handeling te verrichten."
 
 #: controllers/UtilitiesController.php:81
 #, php-format
 msgid "The module \"%s\" is not part of your project."
-msgstr ""
+msgstr "De module \"%s\" maakt geen deel uit van uw project."
 
 #: helpers/col_loader_helper.php:83
 msgid "No species name given."
-msgstr ""
+msgstr "Geen taxon naam opgegeven."
 
 #: helpers/col_loader_helper.php:98
 msgid "No species ID given."
-msgstr ""
+msgstr "Geen taxon ID opgegeven."
 
 #: helpers/col_loader_helper.php:162
 msgid "Found no basic data for: "
-msgstr ""
+msgstr "Geen gegevens gevonden voor:"
 
 #: helpers/col_loader_helper.php:168
 msgid "Unable to parse basic data"
-msgstr ""
+msgstr "Niet in staat data te verwerken"
 
 #: helpers/col_loader_helper.php:176
 msgid "Unable to resolve taxon's Catalogue Of Life ID"
-msgstr ""
+msgstr "Niet in staat taxon;s Catalogue Of Life ID te achterhalen"
 
 #: helpers/col_loader_helper.php:368
 msgid "Unable to parse comprehensive data"
-msgstr ""
+msgstr "Niet in staat uitgebreide gegevens te verwerken"
 
 #: helpers/csv_parser_helper.php:28
 msgid "File does not seem to be a CSV-file."
-msgstr ""
+msgstr "Bestand lijkt geen CSV-bestand te zijn."
 
 #: helpers/csv_parser_helper.php:112
 msgid "Could not read data from file."
-msgstr ""
+msgstr "Kon geen gegevens uit bestand lezen."
 
 #: helpers/file_upload_helper.php:117
 msgid "No name of uploaded file specified."
-msgstr ""
+msgstr "Naam van geüpload bestand niet gespecificeerd."
 
 #: helpers/file_upload_helper.php:121
 msgid "No allowed MIME-types set."
-msgstr ""
+msgstr "Toegestane MIME-types niet gedefinieerd."
 
 #: helpers/file_upload_helper.php:125
 msgid "No target directory specified."
-msgstr ""
+msgstr "Geen doelmap gespecificeerd."
 
 #: helpers/file_upload_helper.php:137
 msgid "Media type not allowed:"
-msgstr ""
+msgstr "Media-type niet toegestaan:"
 
 #: helpers/file_upload_helper.php:144
 msgid "No temporary directory specified (required for deflating archive)."
-msgstr ""
+msgstr "Geen tijdelijke map gespecificeerd (noodzakelijk voor uitpakken archief)."
 
 #: helpers/file_upload_helper.php:199
 msgid "Could not extract files from archive."
-msgstr ""
+msgstr "Kon bestanden niet uit archief extraheren."
 
 #: helpers/file_upload_helper.php:205
 msgid "Could not create temporary directory in "
-msgstr ""
+msgstr "Kon geen tijdelijke map creëren in"
 
 #: helpers/file_upload_helper.php:365
 msgid "Could not move file:"
-msgstr ""
+msgstr "Kon bestand niet verplaatsen:"
 
 #: helpers/file_upload_helper.php:371
 msgid "File too big:"
-msgstr ""
+msgstr "Bestand te groot:"
 
 #: helpers/file_upload_helper.php:372
 msgid "max."
-msgstr ""
+msgstr "max."
 
 #: helpers/file_upload_helper.php:379
 msgid "File type not allowed:"
-msgstr ""
+msgstr "Bestandstype niet toegestaan:"
 
 #: models/model.php:25
 msgid "FATAL: cannot connect to database"
-msgstr ""
+msgstr "FATAL: cannot connect to database"
 
 #: models/model.php:29
 msgid "FATAL: no table basename defined"
-msgstr ""
+msgstr "FATAL: no table basename defined"
+
+msgid "(double click to delete)"
+msgstr "(dubbelklik om en taxon te verwijderen)"
+
+msgid "add"
+msgstr "toevoegen"
+
+msgid "Add a new taxon"
+msgstr "Voeg een nieuw taxon toe"
+
+msgid "After you have made the appropriate selection, click the save-button. Once you have saved the selection, you can change the ranks' names and provide translations"
+msgstr "Klik op de knop 'opslaan' wanneer u een selectie gemaakt heeft. Na opslaan klikt u om de namen van de ordes in de verschillende talen op te geven"
+
+msgid "Assign taxon"
+msgstr "Wijs taxon toe"
+
+msgid "back"
+msgstr "terug"
+
+msgid "Be advised, the retrieval process might take quite some time, especially with higher taxa. It is recommended not to attempt to retrieve anything above the rank of genus."
+msgstr "Opmerking: het ophalen van informatie kan de nodige tijd in beslag nemen, zeker wanneer hogere taxa worden opgevraagd. Het wordt afgeraden om gegevens op te vragen boven het niveau van genus."
+
+msgid "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
+msgstr "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
+
+msgid "Below, you can specify the correct label of each rank in the language or languages defined in your project."
+msgstr "Below, you can specify the correct label of each rank in the language or languages defined in your project."
+
+msgid "Below, you can specify the correct label of each section in the language or languages defined in your project."
+msgstr "Below, you can specify the correct label of each section in the language or languages defined in your project."
+
+msgid "Category"
+msgstr "Categorie"
+
+msgid "Check the results of the import below. If they look OK, press 'save' to save them:"
+msgstr "Check the results of the import below. If they look OK, press 'save' to save them:"
+
+msgid "Check the taxa you wish to import, and click save:"
+msgstr "Check the taxa you wish to import, and click save:"
+
+msgid "Collaborator"
+msgstr "Collaborator"
+
+msgid "Content"
+msgstr "Content"
+
+msgid "Current assignments:"
+msgstr "Current assignments:"
+
+msgid "Currently being edited by:"
+msgstr "Currently being edited by:"
+
+msgid "Define taxonomic ranks"
+msgstr "Define taxonomic ranks"
+
+msgid "delete"
+msgstr "delete"
+
+msgid "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
+msgstr "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
+
+msgid "Duplicates of the taxa already in your project's database will not be stored."
+msgstr "Duplicates of the taxa already in your project's database will not be stored."
+
+msgid "Each taxon consists of two or three fields:"
+msgstr "Each taxon consists of two or three fields:"
+
+msgid "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
+msgstr "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
+
+msgid "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
+msgstr "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
+
+msgid "here"
+msgstr "here"
+
+msgid "Hybrid"
+msgstr "Hybrid"
+
+msgid "Hybrid ('y'; optional)"
+msgstr "Hybrid ('y'; optional)"
+
+msgid "Hybrids are only possible for the following ranks:"
+msgstr "Hybrids are only possible for the following ranks:"
+
+msgid "images"
+msgstr "images"
+
+msgid "Import taxon tree from Catalogue Of Life (experimental)"
+msgstr "Import taxon tree from Catalogue Of Life (experimental)"
+
+msgid "Import taxon tree from file"
+msgstr "Import taxon tree from file"
+
+msgid "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
+msgstr "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
+
+msgid "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
+msgstr "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
+
+msgid "Label taxonomic ranks"
+msgstr "Label taxonomic ranks"
+
+msgid "Media"
+msgstr "Media"
+
+msgid "move taxon downward"
+msgstr "move taxon downward"
+
+msgid "move taxon upward"
+msgstr "move taxon upward"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "pages published"
+msgstr "pages published"
+
+msgid "Parent taxon:"
+msgstr "Parent taxon:"
+
+msgid "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
+msgstr "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
+
+msgid "Please be advised:"
+msgstr "Please be advised:"
+
+msgid "preview"
+msgstr "preview"
+
+msgid "Rank"
+msgstr "Rank"
+
+msgid "Rank:"
+msgstr "Rank:"
+
+msgid "Ranks should match the list of ranks you have selected for your project."
+msgstr "Ranks should match the list of ranks you have selected for your project."
+
+msgid "Ranks:"
+msgstr "Ranks:"
+
+msgid "retrieve a single level of child taxa only"
+msgstr "retrieve a single level of child taxa only"
+
+msgid "save"
+msgstr "save"
+
+msgid "save selected ranks"
+msgstr "save selected ranks"
+
+msgid "Sections"
+msgstr "Sections"
+
+msgid "Selected ranks"
+msgstr "Selected ranks"
+
+msgid "soundfiles"
+msgstr "soundfiles"
+
+msgid "Taxa with a rank that does not appear in this list will not be loaded."
+msgstr "Taxa with a rank that does not appear in this list will not be loaded."
+
+msgid "Taxon"
+msgstr "Taxon"
+
+msgid "Taxon name"
+msgstr "Taxon name"
+
+msgid "Taxon name:"
+msgstr "Taxon name:"
+
+msgid "Taxon rank"
+msgstr "Taxon rank"
+
+msgid "Taxon:"
+msgstr "Taxon:"
+
+msgid "Text you enter is automatically saved when you leave the input field."
+msgstr "Text you enter is automatically saved when you leave the input field."
+
+msgid "The field separator must be , (comma), the field delimiter \" (double-quote)."
+msgstr "The field separator must be , (comma), the field delimiter \" (double-quote)."
+
+msgid "The file must meet the following conditions:"
+msgstr "The file must meet the following conditions:"
+
+msgid "The format needs to be CSV."
+msgstr "The format needs to be CSV."
+
+msgid "There should be one taxon per line. No header line should be present."
+msgstr "There should be one taxon per line. No header line should be present."
+
+msgid "These currently are:"
+msgstr "Dat zijn op dit moment:"
+
+msgid "This is a hybrid:"
+msgstr "Dit is een hybride:"
+
+msgid "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
+msgstr "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
+
+msgid "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
+msgstr "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
+
+msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database."
+msgstr "The contents of the file will be displayed so you can review them before they are saved to your project's database."
+
+msgid "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
+msgstr "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
+
+msgid "to user"
+msgstr "aan medewerker"
+
+msgid "undo"
+msgstr "maak ongedaan"
+
+msgid "unknown rank"
+msgstr "onbekende orde"
+
+msgid "upload"
+msgstr "uploaden"
+
+msgid "videos"
+msgstr "videos"
+
+msgid "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
+msgstr "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
+
+msgid "You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa."
+msgstr "U kunt specifieke onderdelen van de taxonomische boom toewijzen aan een specifieke medewerker. Wanneer een taxon is toegewezen, kan de betreffende medewerker alleen dat taxon bewerken, en alle taxa onder dat taxon. Als aan een medewerker geen taxa zijn toegewezen, kan hij ook geen taxa bewerken."
+
+msgid "You can download a sample CSV-file"
+msgstr "Om een voorbeeld CSV-bestand te downloaden klikt u"
+
+msgid "You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox the third column says 'unknown rank', you are"
+msgstr "U kunt een specifiek taxon uitsluiten door de checkbox uit te vinken. Als er zich in de derde kolom geen checkbox bevindt, maar de mededeling 'onbekende orde', dan"
+
+msgid "attempting to load a rank that is not part of your project. To add or change ranks, click"
+msgstr "tracht u een orde te laden die geen deel uit maakt van uw project. Om order toe te voegen of te wijzigen, klik"
 

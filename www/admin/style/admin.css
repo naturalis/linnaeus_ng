@@ -32,6 +32,11 @@ a:hover,.pseudo-a:hover {
 	width: 900px;
 }
 
+.active-language {
+	font-weight:bold;
+	text-decoration:underline;
+}
+
 #page-main,.page-generic-div {
 	margin: 10px 10px 10px 10px;
 }

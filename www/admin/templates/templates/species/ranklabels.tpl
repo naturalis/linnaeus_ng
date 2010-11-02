@@ -3,12 +3,13 @@
 <div id="page-main">
 
 {if $projectRanks|@count==0}
-Currently, no ranks have been defined in your project. Go <a href="ranks.php">here</a> to define ranks.
+{t}Currently, no ranks have been defined in your project. To define ranks, go{/t} <a href="ranks.php">{t}here{/t}</a>.
 {else}
 
-<span id="message-container" style="float:right;"></span>
-Below, you can specify the correct label of each rank in the language or languages defined in your project.<br />On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.<br />
-Text you enter is automatically saved when you leave the input field.
+<span id="message-container" style="float:right;"></span><br />
+{t}Below, you can specify the correct label of each rank in the language or languages defined in your project.{/t}<br />
+{t}On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
+{t}Text you enter is automatically saved when you leave the input field.{/t}
 <br /><br />
 <table>
 <tr>
@@ -53,18 +54,17 @@ Text you enter is automatically saved when you leave the input field.
 {literal}
 $(document).ready(function(){
 {/literal}
-taxonActiveView = 'ranklabels';
+	taxonActiveView = 'ranklabels';
 {section name=i loop=$projectRanks}
-taxonAddRankId({$projectRanks[i].id});
+	taxonAddRankId({$projectRanks[i].id});
 {/section}
 {section name=i loop=$languages}
-taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-taxonDrawRankLanguages();
-taxonGetRankLabels(taxonDefaultLanguage);
-taxonGetRankLabels(taxonActiveLanguage);
-
+	taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+	taxonDrawRankLanguages();
+	taxonGetRankLabels(taxonDefaultLanguage);
+	taxonGetRankLabels(taxonActiveLanguage);
 {literal}
 });
 {/literal}

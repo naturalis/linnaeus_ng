@@ -30,7 +30,7 @@
 <div id="taxon-publish-table-div"></div>
 
 
-Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />
+{t}Page title:{/t}<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />
 <textarea name="content" style="width:880px;height:600px;" id="taxon-content">{$content.content}</textarea>
 </form>
 {/if}

@@ -7,7 +7,7 @@
 <table>
 	<tr>
 		<td>
-			Taxon name:
+			{t}Taxon name:{/t}
 		</td>
 		<td>
 			<input type="text" name="taxon" id="taxon-name" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
@@ -18,7 +18,7 @@
 	</tr>
 	<tr>
 		<td>
-			This is a hybrid:
+			{t}This is a hybrid:{/t}
 		</td>
 		<td>
 			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
@@ -29,12 +29,12 @@
 	</tr>
 	<tr>
 		<td>
-			Parent taxon: 
+			{t}Parent taxon: {/t}
 		</td>
 		<td>
 	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
 	{if $taxa|@count==0}
-	<option value="-1">No parent</option>
+	<option value="-1">{t}No parent{/t}</option>
 	{/if}
 	{section name=i loop=$taxa}
 	<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
@@ -51,12 +51,12 @@
 	</tr>
 	<tr>
 		<td>
-			Rank: 
+			{t}Rank:{/t}
 		</td>
 		<td colspan="2">
 			<select name="rank_id" id="rank-id">
 {section name=i loop=$projectRanks}
-<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
+				<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
 {/section}
 			</select>
 		</td>
@@ -66,7 +66,7 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<input type="submit" value="save" />&nbsp;<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="submit" value="save" />&nbsp;<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>
