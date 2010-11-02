@@ -460,7 +460,7 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon list'));
 
-		if (isset($this->requestData['id']) && isset($this->requestData['move'])) {
+		if (isset($this->requestData['id']) && isset($this->requestData['move']) && !$this->isFormResubmit()) {
 
 			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
 
@@ -2277,6 +2277,10 @@ class SpeciesController extends Controller
         foreach((array)$t as $key => $val) {
 
 			$val['level'] = $level;
+
+			$val['sibling_count'] = count((array)$t);
+
+			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
 
             $this->_treeList[] = $val;
 

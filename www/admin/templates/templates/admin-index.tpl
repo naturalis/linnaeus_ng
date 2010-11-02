@@ -45,6 +45,7 @@ Other tasks:
 <ul>
 	<li><a href="views/users/">User management</a></li>
 	<li><a href="views/projects/">Project management</a></li>
+	<li><a href="views/users/choose_project.php">Switch projects</a></li>
 </ul>
 </div>
 
