@@ -204,7 +204,7 @@ class SpeciesController extends Controller
 
 		} else {
 
-			$data = $this->requestData;
+			$data = isset($this->requestData) ? $this->requestData : null;
 
 	        $this->setPageName(_('New taxon'));
 
@@ -878,7 +878,7 @@ class SpeciesController extends Controller
 
             }    
 
-        } elseif ($this->requestData) {
+        } elseif (isset($this->requestData)) {
 
             if (isset($this->requestData['rows']) && isset($_SESSION['system']['csv_data'])) {
             

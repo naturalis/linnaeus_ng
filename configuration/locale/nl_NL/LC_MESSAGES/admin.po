@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-27 11:09+0100\n"
-"PO-Revision-Date: 2010-11-03 10:40+0100\n"
+"PO-Revision-Date: 2010-11-03 11:05+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -75,97 +75,97 @@ msgstr "Orde kan geen hybride zijn."
 
 #: controllers/SpeciesController.php:289
 msgid "Parent cannot have child taxa."
-msgstr ""
+msgstr "Taxa kan geen onderliggende taxa hebben."
 
 #: controllers/SpeciesController.php:295
 #: controllers/SpeciesController.php:2201
 msgid "Taxon name already in database."
-msgstr ""
+msgstr "Taxon reeds in database."
 
 #: controllers/SpeciesController.php:315
 #: controllers/SpeciesController.php:601
 msgid "No taxa have been assigned to you."
-msgstr ""
+msgstr "Er zijn geen taxa aan u toegewezen."
 
 #: controllers/SpeciesController.php:337
 #: controllers/SpeciesController.php:456
 #: controllers/SpeciesController.php:623
 #: controllers/SpeciesController.php:703
 msgid "Taxon list"
-msgstr ""
+msgstr "Taxonlijst"
 
 #: controllers/SpeciesController.php:352
 #, php-format
 msgid "Editing \"%s\""
-msgstr ""
+msgstr "Bewerken \"%s\""
 
 #: controllers/SpeciesController.php:426
 msgid "Taxon is already being edited by another editor."
-msgstr ""
+msgstr "Taxon wordt al bewerkt door een andere medewerker."
 
 #: controllers/SpeciesController.php:437
 msgid "No taxon ID specified."
-msgstr ""
+msgstr "Geen taxon ID gespecificeerd."
 
 #: controllers/SpeciesController.php:638
 #, php-format
 msgid "Media for \"%s\""
-msgstr ""
+msgstr "Media voor \"%s\""
 
 #: controllers/SpeciesController.php:683
 #: controllers/SpeciesController.php:803
 msgid "No taxon specified."
-msgstr ""
+msgstr "Geen taxon gespecificeerd."
 
 #: controllers/SpeciesController.php:720
 #, php-format
 msgid "New media for \"%s\""
-msgstr ""
+msgstr "Nieuwe media voor \"%s\""
 
 #: controllers/SpeciesController.php:770
 #, php-format
 msgid "Saved: %s (%s)"
-msgstr ""
+msgstr "Opgeslagen: %s (%s)"
 
 #: controllers/SpeciesController.php:774
 msgid "Failed writing uploaded file to database."
-msgstr ""
+msgstr "Kon bestand niet naar de database schrijven."
 
 #: controllers/SpeciesController.php:786
 msgid "Unknown taxon."
-msgstr ""
+msgstr "Onbekend taxon."
 
 #: controllers/SpeciesController.php:822
 msgid "Taxon file upload"
-msgstr ""
+msgstr "Taxonbestand uploaden"
 
 #: controllers/SpeciesController.php:957
 msgid "Data saved."
-msgstr ""
+msgstr "Gegevens opgeslagen."
 
 #: controllers/SpeciesController.php:1092
 msgid "Import from Catalogue Of Life"
-msgstr ""
+msgstr "Importeer uit Catalogue Of Life"
 
 #: controllers/SpeciesController.php:1108
 msgid "Taxonomic ranks"
-msgstr ""
+msgstr "Taxonomische ordes"
 
 #: controllers/SpeciesController.php:1179
 msgid "Ranks saved."
-msgstr ""
+msgstr "Ordes opgeslagen."
 
 #: controllers/SpeciesController.php:1209
 msgid "Taxonomic ranks: labels"
-msgstr ""
+msgstr "Naamgeving taxonomische ordes."
 
 #: controllers/SpeciesController.php:1226
 msgid "Define sections"
-msgstr ""
+msgstr "Definieer secties"
 
 #: controllers/SpeciesController.php:1281
 msgid "Assign taxa to collaborators"
-msgstr ""
+msgstr "Wijs taxa toe aan medewerkers"
 
 #: controllers/SpeciesController.php:1800
 msgid "Could not save taxon content."
@@ -173,32 +173,32 @@ msgstr "Kon taxon content niet opslaan."
 
 #: controllers/SpeciesController.php:1807
 msgid "No page title specified."
-msgstr ""
+msgstr "Geen paginatitel opgegeven."
 
 #: controllers/SpeciesController.php:1814
 msgid "No language specified."
-msgstr ""
+msgstr "Geen taal gespecificeerd."
 
 #: controllers/SpeciesController.php:1820
 msgid "Could not save taxon."
-msgstr ""
+msgstr "Kon taxon niet opslaan."
 
 #: controllers/SpeciesController.php:2489
 #, php-format
 msgid "Could not delete file: %s"
-msgstr ""
+msgstr "Kon bestand niet verwijderen: %s"
 
 #: controllers/UsersController.php:135
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 #: controllers/UsersController.php:154
 msgid "Login failed."
-msgstr ""
+msgstr "Login mislukt."
 
 #: controllers/UsersController.php:182
 msgid "Logout"
-msgstr ""
+msgstr "Log out"
 
 #: controllers/UsersController.php:203
 msgid "Select a project to work on"
