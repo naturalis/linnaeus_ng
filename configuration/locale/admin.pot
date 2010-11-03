@@ -700,3 +700,9 @@ msgstr ""
 
 msgid "attempting to load a rank that is not part of your project. To add or change ranks, click"
 msgstr ""
+
+msgid "retrieve"
+msgstr ""
+
+msgid "abort retrieval"
+msgstr ""

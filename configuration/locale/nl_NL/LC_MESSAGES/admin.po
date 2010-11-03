@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-27 11:09+0100\n"
-"PO-Revision-Date: 2010-11-02 17:38+0100\n"
+"PO-Revision-Date: 2010-11-03 10:40+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -12,14 +12,16 @@ msgstr ""
 
 #: BaseClass.php:36
 msgid "FATAL: cannot load configuration"
-msgstr "FATAL: cannot load configuration"
+msgstr ""
 
 #: controllers/Controller.php:181
-msgid "Welcome, %s."
+#, fuzzy
+msgid "Welcome,"
 msgstr "Welkom, %s."
 
 #: controllers/Controller.php:181
-msgid "Welcome back, %s."
+#, fuzzy
+msgid "Welcome back,"
 msgstr "Welkom terug, %s."
 
 #: controllers/ProjectsController.php:57
@@ -42,7 +44,7 @@ msgstr "Project instellingen"
 msgid "Language already assigned."
 msgstr "Taal al toegewezen"
 
-#: controllers/SpeciesController.php:104
+#: controllers/SpeciesController.php:102
 msgid "Species module overview"
 msgstr "Overzicht species module"
 
@@ -453,11 +455,11 @@ msgstr "Bestandstype niet toegestaan:"
 
 #: models/model.php:25
 msgid "FATAL: cannot connect to database"
-msgstr "FATAL: cannot connect to database"
+msgstr ""
 
 #: models/model.php:29
 msgid "FATAL: no table basename defined"
-msgstr "FATAL: no table basename defined"
+msgstr ""
 
 msgid "(double click to delete)"
 msgstr "(dubbelklik om en taxon te verwijderen)"
@@ -481,175 +483,175 @@ msgid "Be advised, the retrieval process might take quite some time, especially 
 msgstr "Opmerking: het ophalen van informatie kan de nodige tijd in beslag nemen, zeker wanneer hogere taxa worden opgevraagd. Het wordt afgeraden om gegevens op te vragen boven het niveau van genus."
 
 msgid "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
-msgstr "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
+msgstr "Indien u de gegevens van een complete familie wil downloaden, vink dan de optie 'download één niveau' aan. De applicatie zal dan alleen de genera downloaden, het eerste niveau onder familie. Daarna kunt u gegevens voor ieder genus afzonderlijk ophalen door op de naam van dat genus te klikken. De gegevens voor het genus en onderliggende taxa zullen in een separate lijst worden weergegeven, zodat de familie-gegevens niet verloren gaan."
 
 msgid "Below, you can specify the correct label of each rank in the language or languages defined in your project."
-msgstr "Below, you can specify the correct label of each rank in the language or languages defined in your project."
+msgstr "Hieronder kunt u van iedere orde de correcte naamgeving in de verschillende talen binnen uw project specificeren."
 
 msgid "Below, you can specify the correct label of each section in the language or languages defined in your project."
-msgstr "Below, you can specify the correct label of each section in the language or languages defined in your project."
+msgstr "Hieronder kunt u van iedere sectie de correcte naamgeving in de verschillende talen binnen uw project specificeren."
 
 msgid "Category"
 msgstr "Categorie"
 
 msgid "Check the results of the import below. If they look OK, press 'save' to save them:"
-msgstr "Check the results of the import below. If they look OK, press 'save' to save them:"
+msgstr "Controleer hier onder de import-resultaten, en klik vervolgens op 'opslaan'."
 
 msgid "Check the taxa you wish to import, and click save:"
-msgstr "Check the taxa you wish to import, and click save:"
+msgstr "Vink de taxa aan die u wenst te importeren en klik op 'opslaan':"
 
 msgid "Collaborator"
-msgstr "Collaborator"
+msgstr "Medewerker"
 
 msgid "Content"
 msgstr "Content"
 
 msgid "Current assignments:"
-msgstr "Current assignments:"
+msgstr "Huidige toewijzingen:"
 
 msgid "Currently being edited by:"
-msgstr "Currently being edited by:"
+msgstr "Wordt nu bewerkt door:"
 
 msgid "Define taxonomic ranks"
-msgstr "Define taxonomic ranks"
+msgstr "Definieer taxonomicsch ordes"
 
 msgid "delete"
-msgstr "delete"
+msgstr "verwijderen"
 
 msgid "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
-msgstr "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
+msgstr "wanneer u eerder gedefinieerde ordes die al toe zijn gewezen aan taxa verwijdert, zullen die taxa geen orde meer hebben."
 
 msgid "Duplicates of the taxa already in your project's database will not be stored."
-msgstr "Duplicates of the taxa already in your project's database will not be stored."
+msgstr "Duplicaten van taxa die al bestaan in de database zullen niet worden opgeslagen."
 
 msgid "Each taxon consists of two or three fields:"
-msgstr "Each taxon consists of two or three fields:"
+msgstr "Ieder taxon bestaat uit twee of drie velden:"
 
 msgid "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
-msgstr "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
+msgstr "Iedere taxon-pagina bestaat uit één of meer categorieën, met een maximum van %s. De eerste categorie, '%s', is verplicht."
 
 msgid "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
-msgstr "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
+msgstr "Vul de naam van het taxon waarvan u de gegevens wil ophalen, en klik 'downloaden'."
 
 msgid "here"
-msgstr "here"
+msgstr "hier"
 
 msgid "Hybrid"
-msgstr "Hybrid"
+msgstr "Hybride"
 
 msgid "Hybrid ('y'; optional)"
-msgstr "Hybrid ('y'; optional)"
+msgstr "Hybride ('y'; optioneel)"
 
 msgid "Hybrids are only possible for the following ranks:"
-msgstr "Hybrids are only possible for the following ranks:"
+msgstr "Hybrides kunnen alleen bestaan voor de volgende ordes:"
 
 msgid "images"
-msgstr "images"
+msgstr "afbeeldingen"
 
 msgid "Import taxon tree from Catalogue Of Life (experimental)"
-msgstr "Import taxon tree from Catalogue Of Life (experimental)"
+msgstr "Importeer taxa uit de Catalogue Of Life (experimenteel)"
 
 msgid "Import taxon tree from file"
-msgstr "Import taxon tree from file"
+msgstr "Import taxa uit bestand"
 
 msgid "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
-msgstr "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
+msgstr "in die volgorde. De eerste twee velden zijn verplicht. Andere waarden voor 'hybride' dan 'j' worden genegeerd."
 
 msgid "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
-msgstr "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
+msgstr "in deze volgorde zal de relaties tussen Genus, Species en Infraspecies correct opslaan."
 
 msgid "Label taxonomic ranks"
-msgstr "Label taxonomic ranks"
+msgstr "Naamgeving taxonomische ordes"
 
 msgid "Media"
 msgstr "Media"
 
 msgid "move taxon downward"
-msgstr "move taxon downward"
+msgstr "verplaats taxon naar beneden"
 
 msgid "move taxon upward"
-msgstr "move taxon upward"
+msgstr "verplaats taxon naar boven"
 
 msgid "Name"
-msgstr "Name"
+msgstr "Naam"
 
 msgid "pages published"
-msgstr "pages published"
+msgstr "gepubliceerde pagina's"
 
 msgid "Parent taxon:"
-msgstr "Parent taxon:"
+msgstr "Bovenliggend taxon:"
 
 msgid "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
-msgstr "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
+msgstr "Ouder-kindrelaties worden van boven naar beneden verondersteld, per tax in de taxonomische boom. Bijvoorbeeld, het laden van:"
 
 msgid "Please be advised:"
-msgstr "Please be advised:"
+msgstr "Let op:"
 
 msgid "preview"
-msgstr "preview"
+msgstr "voorbeeld"
 
 msgid "Rank"
-msgstr "Rank"
+msgstr "Orde"
 
 msgid "Rank:"
-msgstr "Rank:"
+msgstr "Orde:"
 
 msgid "Ranks should match the list of ranks you have selected for your project."
-msgstr "Ranks should match the list of ranks you have selected for your project."
+msgstr "Order dienen voor te komen op de lijst die u voor dit project hebt geselecteerd."
 
 msgid "Ranks:"
-msgstr "Ranks:"
+msgstr "Ordes:"
 
 msgid "retrieve a single level of child taxa only"
-msgstr "retrieve a single level of child taxa only"
+msgstr "download één niveau"
 
 msgid "save"
-msgstr "save"
+msgstr "opslaan"
 
 msgid "save selected ranks"
-msgstr "save selected ranks"
+msgstr "sla geselecteerde ordes op"
 
 msgid "Sections"
-msgstr "Sections"
+msgstr "Secties"
 
 msgid "Selected ranks"
-msgstr "Selected ranks"
+msgstr "Geselecteerde ordes"
 
 msgid "soundfiles"
-msgstr "soundfiles"
+msgstr "geluidsbestanden"
 
 msgid "Taxa with a rank that does not appear in this list will not be loaded."
-msgstr "Taxa with a rank that does not appear in this list will not be loaded."
+msgstr "Taxa met een orde die niet in deze lijst voorkomt zullen niet worden opgeslagen."
 
 msgid "Taxon"
 msgstr "Taxon"
 
 msgid "Taxon name"
-msgstr "Taxon name"
+msgstr "Taxon's naam"
 
 msgid "Taxon name:"
-msgstr "Taxon name:"
+msgstr "Taxon's naam:"
 
 msgid "Taxon rank"
-msgstr "Taxon rank"
+msgstr "Taxon's orde"
 
 msgid "Taxon:"
 msgstr "Taxon:"
 
 msgid "Text you enter is automatically saved when you leave the input field."
-msgstr "Text you enter is automatically saved when you leave the input field."
+msgstr "Tekst die u invult wordt automatisch opgeslagen wanneer u het invoerveld verlaat."
 
 msgid "The field separator must be , (comma), the field delimiter \" (double-quote)."
-msgstr "The field separator must be , (comma), the field delimiter \" (double-quote)."
+msgstr "De veldscheider dient een , (komma) te zijn, velden dienen te worden omsloten door \" (dubbel aanhalingsteken)."
 
 msgid "The file must meet the following conditions:"
-msgstr "The file must meet the following conditions:"
+msgstr "Het bestand dient aan de volgende voorwaarden te voldoen:"
 
 msgid "The format needs to be CSV."
-msgstr "The format needs to be CSV."
+msgstr "Het formaat dient CSV te zijn."
 
 msgid "There should be one taxon per line. No header line should be present."
-msgstr "There should be one taxon per line. No header line should be present."
+msgstr "Één taxon per regel. Geen kopregel bovenaan."
 
 msgid "These currently are:"
 msgstr "Dat zijn op dit moment:"
@@ -658,16 +660,16 @@ msgid "This is a hybrid:"
 msgstr "Dit is een hybride:"
 
 msgid "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
-msgstr "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
+msgstr "Klik om de naam, orde of bovenliggend taxon te wijzigen op de naam van een taxon. Om de content van een taxon te wijzigen, klik op de corresponderende cel in de kolom 'content'."
 
 msgid "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
-msgstr "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
+msgstr "Klik om een bestand met taxa te laden op de 'browse'-knop hierboven, selecteer het in te laden bestand en klik op 'uploaden'."
 
 msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database."
-msgstr "The contents of the file will be displayed so you can review them before they are saved to your project's database."
+msgstr "De inhoud van het bestand zal worden weergegeven zodat u de gegevens kunt controleren voordat ze in de database worden opgeslagen."
 
 msgid "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
-msgstr "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
+msgstr "Om de ordes die gebruikt worden in de Catalogue Of Life, in de lijst met blauw gemarkeerd, te selecteren, klikt u"
 
 msgid "to user"
 msgstr "aan medewerker"
@@ -685,7 +687,7 @@ msgid "videos"
 msgstr "videos"
 
 msgid "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
-msgstr "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
+msgstr "U kunt meerdere taxa aan dezelfde medewerker toewijzen. Wanneer u verschillende taxa uit dezeldfde tak van de taxonomische boom aan dezelfde medewerker toewijst, is het hoogstgelegen taxon bepalend."
 
 msgid "You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa."
 msgstr "U kunt specifieke onderdelen van de taxonomische boom toewijzen aan een specifieke medewerker. Wanneer een taxon is toegewezen, kan de betreffende medewerker alleen dat taxon bewerken, en alle taxa onder dat taxon. Als aan een medewerker geen taxa zijn toegewezen, kan hij ook geen taxa bewerken."
@@ -698,4 +700,10 @@ msgstr "U kunt een specifiek taxon uitsluiten door de checkbox uit te vinken. Al
 
 msgid "attempting to load a rank that is not part of your project. To add or change ranks, click"
 msgstr "tracht u een orde te laden die geen deel uit maakt van uw project. Om order toe te voegen of te wijzigen, klik"
+
+msgid "retrieve"
+msgstr "downloaden"
+
+msgid "abort retrieval"
+msgstr "downloaden afbreken"
 
