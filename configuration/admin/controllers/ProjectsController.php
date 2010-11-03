@@ -217,7 +217,7 @@ class ProjectsController extends Controller
         
         $this->setPageName(_('Project settings'));
         
-        if ($this->requestData) {
+        if (isset($this->requestData)) {
             
             $this->requestData['id'] = $this->getCurrentProjectId();
             
@@ -239,7 +239,7 @@ class ProjectsController extends Controller
         
         }
         
-        if ($this->requestDataFiles) {
+        if (isset($this->requestDataFiles)) {
 
 			/*            
 			

@@ -6,7 +6,7 @@ include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
 
 class Controller extends BaseClass
 {
-    
+
     private $_smartySettings;
     private $_viewName;
     private $_fullPath;
@@ -37,7 +37,7 @@ class Controller extends BaseClass
         'project', 
         'module_project',
 		'language',
-		'sandbox'
+		'translate_me'
     );
 
     private $usedHelpersBase = array(
@@ -54,7 +54,7 @@ class Controller extends BaseClass
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
         
         $this->setDebugMode();
@@ -68,7 +68,7 @@ class Controller extends BaseClass
         $this->setPaths();
 
         $this->setUrls();
-        
+
         $this->loadHelpers();
 
 		$this->initLogging();
@@ -161,9 +161,9 @@ class Controller extends BaseClass
      */
     public function printPage ()
     {
-        
+ 
         $this->setBreadcrumbs();
-        
+
         $this->smarty->assign('debugMode', $this->debugMode);
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('baseUrl', $this->baseUrl);
@@ -858,10 +858,11 @@ class Controller extends BaseClass
 
 		if (empty($content)) return;
 
-		$this->models->Sandbox->save(
+		$this->models->TranslateMe->save(
 			array(
 				'id' => null,
-				'x' => $content
+				'controller' => $this->getControllerBaseName(),
+				'content' => $content
 			)
 		);
 
@@ -1672,6 +1673,3 @@ class Controller extends BaseClass
 
 
 }
-
-?>
-

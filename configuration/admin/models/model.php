@@ -633,7 +633,15 @@ abstract class Model extends BaseClass
                 
                 }
 
-	            $d = $this->columns[$col];
+				if (isset($this->columns[$col])) {
+
+	            	$d = $this->columns[$col];
+
+				} else {
+
+					continue;
+
+				}
 
                 if ($val===null) {
                 
