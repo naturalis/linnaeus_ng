@@ -12,8 +12,8 @@
 </p>
 <p>
 	{t}Taxon:{/t} <input type="text" id="taxon_name" name="taxon_name" value="{$taxon_name}" />
-	<input value="retrieve" type="button" onclick="taxonGetCoL()" />
-	<input value="abort retrieval" type="button" onclick="allAjaxAbort();allHideLoadingDiv();" /><br />
+	<input value="{t}retrieve{/t}" type="button" onclick="taxonGetCoL()" />
+	<input value="{t}abort retrieval{/t}" type="button" onclick="allAjaxAbort();allHideLoadingDiv();" /><br />
 	<label><input type="checkbox" id="single-child-level" checked="checked" />{t}retrieve a single level of child taxa only{/t}</label>
 </p>
 <br />
