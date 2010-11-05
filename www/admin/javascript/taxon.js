@@ -1111,6 +1111,7 @@ function taxonGetRankByParent(nomessage) {
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
+
 			if (data=='-1' && !nomessage) {
 				$('#rank-message').removeClass().addClass('message-error');
 				$('#rank-message').html('That taxon cannot have child taxa.')

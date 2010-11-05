@@ -211,7 +211,7 @@ abstract class Model extends BaseClass
             $d = $this->columns[$key];
             
             if ($d && isset($val)) {
-                
+			
                 if ($d['numeric'] == 1) {
                     
                     $query .= " " . $key . " = " . $val . ", ";
@@ -223,8 +223,8 @@ abstract class Model extends BaseClass
                 
                 }
                 else {
-                    
-                    $query .= " " . $key . " = '" . $val . "', ";
+
+                    $query .= " " . $key . " = ".($val=='null' ? 'null' : "'" . $val . "'").", ";
                 
                 }
             
