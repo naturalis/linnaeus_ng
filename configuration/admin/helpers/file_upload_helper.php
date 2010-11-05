@@ -278,7 +278,7 @@ class FileUploadHelper
 
     }
 
-    private function createUniqueFileName($extension)
+    private function createUniqueNewFileName($extension)
     {
 
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
@@ -300,6 +300,22 @@ class FileUploadHelper
             // 48 bits for "node"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
             ).'.'.trim($extension,'. ');
+
+    }
+
+    private function createUniqueFileName($dir,$filename,$extension)
+    {
+
+		$extraBit = '';
+		$i = 1;
+
+		while(file_exists($dir.$filename.$extraBit.'.'.$extension)) {
+
+			$extraBit = sprintf(' (%01d)',$i++);
+
+		}
+		
+		return $filename.$extraBit.'.'.$extension;
 
     }
 
@@ -343,8 +359,9 @@ class FileUploadHelper
                 // creata a new, unique filename with the original extension
                 $pi = pathinfo($currentFileName);
 
-                $fn = $this->createUniqueFileName($pi['extension']);
-                
+                //$fn = $this->createUniqueNewFileName($pi['extension']);
+                $fn = $this->createUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
+
                 // move the file to the project's media directory
                 if (rename($oldFileName,$this->_storageDir.$fn)) {
     

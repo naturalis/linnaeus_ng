@@ -31,13 +31,15 @@ class Controller extends BaseClass
 	public $isMultiLingual = true;
 	public $uiLanguages;
 	public $uiDefaultLanguage;
+    public $_treeList;
 
     private $usedModelsBase = array(
         'helptext', 
         'project', 
         'module_project',
 		'language',
-		'translate_me'
+		'translate_me',
+		'taxon'
     );
 
     private $usedHelpersBase = array(
@@ -104,7 +106,9 @@ class Controller extends BaseClass
     {
         
         $this->setLastVisitedPage();
-        
+		
+		$this->saveFormResubmitVal();
+
         parent::__destruct();
     
     }
@@ -744,13 +748,11 @@ class Controller extends BaseClass
 		)
             $result = true;
 
-        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
-        
+        //$_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;  now done on destruct
+
         return $result;
     
     }
-
-
 
     /**
      * Returns the address of the root index for someone who is logged in
@@ -885,6 +887,38 @@ class Controller extends BaseClass
 		return $c;
 	
 	}
+
+
+    public function getTaxonTree($pId=null,$level=0) 
+    {
+	
+		if ($level==0) unset($this->_treeList);
+
+        $t = $this->models->Taxon->get(
+            array(
+                'project_id' => $this->getCurrentProjectId(),
+                ($pId === null ? 'parent_id is' : 'parent_id') => $pId
+            ),false,'taxon_order');
+
+        foreach((array)$t as $key => $val) {
+
+			$val['level'] = $level;
+
+			$val['sibling_count'] = count((array)$t);
+
+			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
+
+            $this->_treeList[] = $val;
+
+			$t[$key]['level'] = $level;
+
+			$t[$key]['children'] = $this->getTaxonTree($val['id'],$level+1);
+
+        }
+
+        return $t;
+
+    }
 
 	private function getCurrentUiLanguage()
 	{
@@ -1037,7 +1071,7 @@ class Controller extends BaseClass
      */
     private function setRequestData ()
     {
-        
+
         $this->requestData = false;
         
 		if (!empty($_GET) || !empty($_POST)) {
@@ -1068,15 +1102,16 @@ class Controller extends BaseClass
 
 		}
 
-        $this->requestDataFiles = false;
+        foreach ((array)$_FILES as $key => $val) {
 
-        foreach ((array) $_FILES as $key => $val) {
-            
-            if (isset($val['size']) && $val['size'] > 0)
+            if (isset($val['size']) && $val['size'] > 0) {
+
                 $this->requestDataFiles[] = $val;
         
+			}
+		
         }
-    
+
     }
 
 
@@ -1085,21 +1120,21 @@ class Controller extends BaseClass
 
 		if ($this->isMultiLingual) {
 
-			if (isset($this->requestData['_uiLang'])) {
+			if (isset($this->requestData['uiLang'])) {
 			
-				$this->setLocale($this->requestData['_uiLang']);
+				$this->setLocale($this->requestData['uiLang']);
 
 			}
 
 		} else {
 
-			$this->log('Attempt to set language '.$this->requestData['_uiLang'].' for non-mulitlanguage page',1);
+			$this->log('Attempt to set language '.$this->requestData['uiLang'].' for non-mulitlanguage page',1);
 
 		}
 
 		if ($unsetRequestVar) {
 
-			unset($this->requestData['_uiLang']);
+			unset($this->requestData['uiLang']);
 
 			if (empty($this->requestData)) {
 
@@ -1671,5 +1706,11 @@ class Controller extends BaseClass
     
     }
 
+    private function saveFormResubmitVal ()
+    {
+
+        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+    
+    }
 
 }

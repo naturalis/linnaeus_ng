@@ -16,6 +16,8 @@
 	check fileupload ranks with defined
 
 	must delete link taxa - ranks when deleting a rank
+
+	must delete keychoice when deleting taxon
 	
 	ordering of ranks in getProjectRanks might need some reconsidering
 
@@ -31,7 +33,6 @@ class SpeciesController extends Controller
         'role',
         'project_role_user', 
 		'user_taxon',
-        'taxon', 
         'content_taxon', 
         'language_project', 
 		'section',
@@ -54,8 +55,6 @@ class SpeciesController extends Controller
 
 	public $cssToLoad = array('colorbox/colorbox.css','taxon.css');
 	public $jsToLoad = array('taxon.js','colorbox/jquery.colorbox.js');
-
-    private $_treeList;
 
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
@@ -2258,37 +2257,6 @@ class SpeciesController extends Controller
             if ($d) $this->smarty->assign('returnText', '<ok>');
 
         }
-
-    }
-
-    private function getTaxonTree($pId=null,$level=0) 
-    {
-	
-		if ($level==0) unset($this->_treeList);
-
-        $t = $this->models->Taxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId(),
-                ($pId === null ? 'parent_id is' : 'parent_id') => $pId
-            ),false,'taxon_order');
-
-        foreach((array)$t as $key => $val) {
-
-			$val['level'] = $level;
-
-			$val['sibling_count'] = count((array)$t);
-
-			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
-
-            $this->_treeList[] = $val;
-
-			$t[$key]['level'] = $level;
-
-			$t[$key]['children'] = $this->getTaxonTree($val['id'],$level+1);
-
-        }
-
-        return $t;
 
     }
 

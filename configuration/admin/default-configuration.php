@@ -193,6 +193,45 @@ class configuration
 
     }
 
+    public function getControllerSettingsKey()
+    {
+        
+        return array(
+		  'media' =>
+			array(
+			  'allowedFormats' => 
+				array(
+				  array(
+					'mime' => 'image/png', 
+					'media_name' => 'PNG movie', 
+					'media_type' => 'image', 
+					'maxSize' => 2000000
+				  ),
+				  array(
+					'mime' => 'image/jpg', 
+					'media_name' => 'JPG image', 
+					'media_type'  => 'image', 
+					'maxSize' => 2000000
+				  ),
+				  array(
+					'mime' => 'image/jpeg', 
+					'media_name' => 'JPG image', 
+					'media_type'  => 'image', 
+					'maxSize' => 2000000
+				  ),
+				  array(
+					'mime' => 'image/gif', 
+					'media_name' => 'GIF image', 
+					'media_type'  => 'image', 
+					'maxSize' => 2000000
+				  ),
+				),
+				'defaultUploadMaxSize' => 2000000 // 2mb
+			),        
+      	);
+
+    }
+
     public function getDatabaseSettings ()
     {
         

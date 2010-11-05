@@ -1,3 +1,34 @@
+create table dev_keysteps (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	title varchar (64) not null,
+	content text,
+	is_start boolean not null default false, 
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) 
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+create table dev_choices_keysteps (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	keystep_id INT( 11 )  ,
+	show_order int(2) ,
+	choice_txt text,
+	choice_img varchar (255) ,
+	res_keystep_id INT( 11 )  ,
+	res_taxon_id INT( 11 )  ,
+	created DATETIME NOT NULL ,
+	last_change TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
+	PRIMARY KEY ( id ) 
+) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+
+
+
+
+
 CREATE TABLE taxa (
 	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
 	project_id INT( 11 ) NOT NULL ,

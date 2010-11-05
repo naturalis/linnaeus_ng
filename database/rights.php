@@ -14,7 +14,7 @@ CREATE TABLE rights (
 	view VARCHAR( 32 ) NOT NULL,
 	created DATETIME NOT NULL ,
 	PRIMARY KEY ( id ) ,
-	INDEX ( controller, view )
+	unique ( controller, view )
 ) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 CREATE TABLE rights_roles (
@@ -23,7 +23,8 @@ CREATE TABLE rights_roles (
 	role_id INT( 11 ) NOT NULL  ,
 	created DATETIME NOT NULL ,
 	PRIMARY KEY ( id ) ,
-	INDEX ( right_id, role_id )
+	INDEX ( right_id, role_id ),
+	unique(right_id,role_id)
 ) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 RENAME TABLE `roles`  TO `dev_roles` ;
@@ -58,8 +59,18 @@ INSERT INTO dev_rights VALUES (NULL , 'species', 'index',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'species', 'edit',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'species', 'list',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'species', 'page',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'col',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'collaborators',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'file',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'media',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'media_upload',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'ranklabels',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'ranks',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'sections',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'species', 'taxon',CURRENT_TIMESTAMP);
 
 
+INSERT INTO dev_rights VALUES (NULL , 'key', '*',CURRENT_TIMESTAMP);
 
 
 /*
@@ -71,20 +82,33 @@ INSERT INTO dev_rights VALUES (NULL , 'species', 'page',CURRENT_TIMESTAMP);
 5 | Contributor          | Contributes to a project but cannot edit
 
 
- 1 | users      | *
- 2 | users      | index
- 3 | users      | choose_project
- 4 | users      | create
- 5 | users      | edit
- 6 | users      | user_overview
- 7 | users      | view
- 8 | projects   | *
- 9 | projects   | index
-10 | projects   | data
-11 | projects   | modules
-12 | projects   | collaborators
-13 | species    | *
-14 | species    | index
+  1 | users      | *
+  2 | users      | index
+  3 | users      | choose_project
+  4 | users      | create
+  5 | users      | edit
+  6 | users      | user_overview
+  7 | users      | view
+  8 | projects   | *
+  9 | projects   | index
+ 10 | projects   | data
+ 11 | projects   | modules
+ 12 | projects   | collaborators
+ 13 | species    | *
+ 14 | species    | index
+ 15 | species    | edit
+ 16 | species    | list
+ 17 | species    | page
+ 18 | species    | col
+ 19 | species    | collaborators
+ 20 | species    | file
+ 21 | species    | media
+ 22 | species    | media_upload
+ 23 | species    | ranklabels
+ 24 | species    | ranks
+ 25 | species    | sections
+ 26 | species    | taxon
+ 27 | key        | *
 
 */
 
@@ -93,23 +117,25 @@ INSERT INTO dev_rights VALUES (NULL , 'species', 'page',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 1, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 8, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 13, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 27, CURRENT_TIMESTAMP );
 
 # lead expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 1, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 8, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 13, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 27, CURRENT_TIMESTAMP );
 
 # expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 3, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 6, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 7, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 13, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 27, CURRENT_TIMESTAMP );
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
-INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 15, CURRENT_TIMESTAMP );
-INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 16, CURRENT_TIMESTAMP );
-
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 15, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 16, CURRENT_TIMESTAMP );
 
 # contributor
-INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (5, 3, CURRENT_TIMESTAMP );

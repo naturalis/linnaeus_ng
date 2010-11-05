@@ -85,11 +85,11 @@
 {if $uiLanguages[i] == $uiCurrentLanguage}
 		<span class="active-language">{$uiLanguages[i]}</span>&nbsp;
 {else}
-		<span class="pseudo-a" onclick="$('#_uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
+		<span class="pseudo-a" onclick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
 {/if}
 {/section}
 	</span>
-	<form id="langForm" method="post" action=""><input id="_uiLang" type="hidden" name="_uiLang" value="" /></form>
+	<form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
 {/if}
 	</div>
 {/if}
