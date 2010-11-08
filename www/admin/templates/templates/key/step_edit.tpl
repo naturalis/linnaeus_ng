@@ -1,5 +1,8 @@
 {include file="../shared/admin-header.tpl"}
 
+{assign var=noKeypathEdit value=true}
+
+{include file="_keypath.tpl"}
 
 <div id="page-main">
 
@@ -28,7 +31,10 @@
 	</tr>
 </table>
 </form>
-
+<form method="post" action="step_show.php" id="nextForm">
+<input type="hidden" name="id" id="next" value="" />
+<input type="hidden" name="choice" id="choice" value="" />
+</form>
 </div>
 
 {include file="../shared/admin-messages.tpl"}

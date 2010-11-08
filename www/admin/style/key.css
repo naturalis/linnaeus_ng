@@ -1,0 +1,26 @@
+#keypath {
+	margin-left:10px;
+	margin-top:5px;
+}
+
+#keypath-title {
+	font-weight:bold;
+}
+
+.keypath-edit {
+	cursor:pointer;
+	color:#999;
+	font-size:9px;
+}
+
+.keypath-edit:hover {
+	text-decoration:underline;
+}
+
+#key-step-number{
+	text-decoration:underline;	
+}
+
+#key-step-choices{
+	text-decoration:underline;
+}
