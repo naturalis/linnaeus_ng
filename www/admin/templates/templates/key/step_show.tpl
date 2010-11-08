@@ -1,5 +1,8 @@
 {include file="../shared/admin-header.tpl"}
 
+{include file="_keypath.tpl"}
+
+
 
 <div id="page-main">
 <form method="post" action="step_edit.php" id="theForm">
@@ -7,10 +10,7 @@
 <input type="hidden" name="ref_choice" id="ref_choice" value="" />
 <table style="border-collapse:collapse">
 	<tr style="vertical-align:top">
-		<td colspan="2">{t}Step number{/t} {$step.number}</td>
-	</tr>
-	<tr style="vertical-align:top">
-		<td colspan="2">&nbsp;</td>
+		<td colspan="2" id="key-step-number">{t}Step number{/t} {$step.number}</td>
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Title:{/t}</td>
@@ -29,11 +29,12 @@
 
 <form method="post" action="step_show.php" id="nextForm">
 <input type="hidden" name="id" id="next" value="" />
+<input type="hidden" name="choice" id="choice" value="" />
 </form>
 
-Choices:
+<span  id="key-step-choices">Choices</span>
 <form method="post" action="choice_edit.php" id="choiceForm">
-<input type="hidden" name="id" id="choice" value="" />
+<input type="hidden" name="id" id="id2" value="" />
 <table>
 {section name=i loop=$choices}
 	<tr>
@@ -45,7 +46,7 @@ Choices:
 			Step: 
 			{if $choices[i].res_keystep_id!='-1'}
 			<span
-				onclick="$('#next').val({$choices[i].res_keystep_id});$('#nextForm').submit();" 
+				onclick="$('#choice').val({$choices[i].id});$('#next').val({$choices[i].res_keystep_id});$('#nextForm').submit();" 
 				class="pseudo-a">
 				{$choices[i].target}
 			</span>
@@ -62,7 +63,7 @@ Choices:
 			{$choices[i].target}
 			{/if}
 		</td>
-		<td>[<span class="pseudo-a" onclick="$('#choice').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
+		<td>[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
 	</tr>
 {/section}
 {if $choices|@count==0}
@@ -70,17 +71,13 @@ Choices:
 		<td colspan="2"><span class="key-no-choices">{t}(none defined){/t}</span></td>
 	</tr>
 {/if}
+{if $choices|@count < $maxChoicesPerKey}
 	<tr style="vertical-align:top">
 		<td colspan="2">[<span onclick="$('#choiceForm').submit();" class="pseudo-a">{t}add new choice{/t}</span>]</td>
 	</tr>
+{/if}
 </table>
 </form>
-<br />
-<br />
-MAX ME OUT<br />
-RENUMBER MY CHOICE STEPS<br />
-GIVE ME SOME MORE BREADCRUMBS
-
 </div>
 
 {include file="../shared/admin-messages.tpl"}
