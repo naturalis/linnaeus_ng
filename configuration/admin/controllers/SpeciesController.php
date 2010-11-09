@@ -13,12 +13,10 @@
 
     hardcoded set_time_limit(3000); for CoL
 
-	check fileupload ranks with defined
-
 	must delete link taxa - ranks when deleting a rank
 
 	must delete keychoice when deleting taxon
-	
+
 	ordering of ranks in getProjectRanks might need some reconsidering
 
 */
@@ -2319,7 +2317,7 @@ class SpeciesController extends Controller
 			);
 			
 
-			$b .= '<span class="taxon-section-head">'.$ls[0]['label'].'</span>'.chr(10);
+			$b .= '<p><span class="taxon-section-head">'.$ls[0]['label'].'</span></p>'.chr(10);
 
 		}
 

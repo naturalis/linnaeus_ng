@@ -31,15 +31,14 @@
 
 <!-- div style="position:absolute;top:320px;">Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" /></div -->
 
-<div id="taxon-language-div-default" style="position:absolute;left:10px;top:320px;"></div>
 
-<div id="taxon-language-div" style="position:absolute;left:770px;top:320px;"></div>
 
-<div style="position:absolute;left:10px;top:345px;width:780px;height:610px;">
-<textarea name="content-default" style="width:440px;height:600px;" id="taxon-content-default"></textarea>
-</div>
-<div style="position:absolute;left:770px;top:345px;width:780px;height:610px;">
-<textarea name="content-other" style="width:440px;height:600px;" id="taxon-content-other"></textarea>
+<div style="position:absolute;top:345px;width:780px;height:610px;">
+<div id="taxon-language-div-default"></div>
+<textarea name="content-default" style="width:900px;height:500px;" id="taxon-content-default"></textarea>
+<br />
+<div id="taxon-language-div"></div>
+<textarea name="content-other" style="width:900px;height:500px;" id="taxon-content-other"></textarea>
 </div>
 
 </form>
