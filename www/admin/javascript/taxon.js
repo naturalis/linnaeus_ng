@@ -141,7 +141,7 @@ function taxonAddPage(page) {
 }
 
 
-function taxonDrawTaxonLanguages(fnc) {
+function taxonDrawTaxonLanguages(fnc,includeDef) {
 
 	fnc = fnc || 'taxonSwitchLanguage';
 
@@ -149,7 +149,7 @@ function taxonDrawTaxonLanguages(fnc) {
 
 	for (var i=0;i<taxonLanguages.length;i++) {
 
-		if (taxonLanguages[i][2]!=1) {
+		if (taxonLanguages[i][2]!=1 || includeDef==true) {
 			buffer = buffer+
 				'<span class="rank-language'+
 				(taxonLanguages[i][0]==taxonActiveLanguage ? 
@@ -338,7 +338,7 @@ function taxonGetData(id,language,page,editorName,updateInterface) {
 			'time' : allGetTimestamp()			
 		}),
 		success : function (data) {
-			alert(data);
+			//alert(data);
 			obj = $.parseJSON(data);
 
 			$('#taxon-name-input').val(obj.title ? obj.title : '');
@@ -822,6 +822,7 @@ function taxonMediaGetDescriptions() {
 					}
 				}
 			}			
+			allHideLoadingDiv();
 		}
 	});
 
@@ -845,10 +846,11 @@ function taxonMediaClickClose() {
 
 function taxonMediaChangeLanguage(lan) {
 
+	allShowLoadingDiv();
 	taxonMediaSaveDesc();
 	taxonMediaDescBeingEdited = false;
 	taxonActiveLanguage = lan;
-	taxonDrawTaxonLanguages('taxonMediaChangeLanguage');
+	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
 	taxonMediaGetDescriptions();
 
 }
