@@ -19,8 +19,12 @@ tinyMCE.init({
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom",
+{/literal}{if $session.project.css_url!=''}  content_css : "{$session.project.css_url}",
+{/if}{literal}
 	spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
 	//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
 });
 </script>
 {/literal}
+
+

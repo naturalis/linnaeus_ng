@@ -450,8 +450,13 @@ class Controller extends BaseClass
      */
     public function setCurrentProjectData ($data)
     {
-        
-        $_SESSION['project'] = $data;
+
+		foreach((array)$data as $key => $val) {
+
+	        $_SESSION['project']['key'] = $val;
+
+		}
+
 
     }
 
@@ -1364,7 +1369,7 @@ class Controller extends BaseClass
             $_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
 
         }
-    
+
     }
 
 

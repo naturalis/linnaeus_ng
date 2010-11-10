@@ -1685,7 +1685,7 @@ class SpeciesController extends Controller
 
     private function ajaxActionSaveTaxon ()
     {
-        
+
         // new taxon
         if (empty($this->requestData['id'])) {
             
@@ -2316,8 +2316,7 @@ class SpeciesController extends Controller
 				),'label'
 			);
 			
-
-			$b .= '<p><span class="taxon-section-head">'.$ls[0]['label'].'</span></p>'.chr(10);
+			if ($ls[0]['label']) $b .= '<p><span class="taxon-section-head">'.$ls[0]['label'].'</span></p><br />'.chr(10);
 
 		}
 

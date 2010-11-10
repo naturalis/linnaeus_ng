@@ -1,5 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-<div id="page-main" style="height:850px">
+<div id="page-main" style="height:1200px">
 <span id="debug-message"></span>
 
 {if $taxon.id!=-1}
@@ -14,8 +14,8 @@
 			<span style="float:right">
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
 				<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<input type="button" value="{t}preview{/t}" onclick="taxonOpenContentPreview('manual')" style="margin-right:5px" />
-				<input type="button" value="{t}undo{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
+				<input type="button" value="{t}preview{/t}" onclick="alert('working on it');" style="margin-right:5px" />
+				<input type="button" value="{t}undo{/t}!?!?!" onclick="taxonGetUndo()" style="margin-right:5px" />
 				<input type="button" value="{t}delete{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
 				<input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" />
 			</span>
@@ -26,19 +26,16 @@
 
 <div id="taxon-pages-table-div"></div>
 
-<div id="taxon-publish-table-div" style="position:absolute;top:280px"></div>
+<div id="taxon-publish-table-div"></div>
 
-
-<!-- div style="position:absolute;top:320px;">Page title:<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" /></div -->
-
-
-
-<div style="position:absolute;top:345px;width:780px;height:610px;">
-<div id="taxon-language-div-default"></div>
-<textarea name="content-default" style="width:900px;height:500px;" id="taxon-content-default"></textarea>
-<br />
-<div id="taxon-language-div"></div>
-<textarea name="content-other" style="width:900px;height:500px;" id="taxon-content-other"></textarea>
+<div style="width:780px;height:610px;">
+	<div id="taxon-language-div-default"></div>
+	<textarea name="content-default" style="width:900px;height:500px;" id="taxon-content-default"></textarea>
+	<br />
+	{if $languages|@count > 1}
+	<div id="taxon-language-div"></div>
+	<textarea name="content-other" style="width:900px;height:500px;" id="taxon-content-active"></textarea>
+	{/if}
 </div>
 
 </form>
@@ -71,20 +68,14 @@ $(document).ready(function(){
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
 
-	allShowLoadingDiv();
-	taxonGetData(taxonDefaultLanguage,taxonActivePage,true);
-	taxonGetData(taxonActiveLanguage,taxonActivePage);
+	taxonActiveTaxonId = $('#taxon_id').val();
+	taxonGetDataAll();
 
-	allSetAutoSaveFreq({$autosaveFrequency});
-	taxonRunAutoSave();
+//	allSetAutoSaveFreq({$autosaveFrequency});
+//	taxonRunAutoSave();
 
-{literal}
-	$(window).unload(
-		function () { 
-			taxonConfirmSaveOnUnload();
-		} 
-	);
-	
+
+{literal}	
 });
 </script>
 {/literal}

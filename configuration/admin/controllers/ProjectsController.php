@@ -30,6 +30,10 @@ class ProjectsController extends Controller
         'content_taxon'
     );
     
+    public $usedHelpers = array(
+		'file_upload_helper'
+    );
+
     public $controllerPublicName = 'Project administration';
 
 	public $jsToLoad = array('project.js','module.js');
@@ -212,28 +216,34 @@ class ProjectsController extends Controller
 
     public function dataAction ()
     {
-        
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Project settings'));
-        
-        if (isset($this->requestData)) {
+
+		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
+			
+			$data = $this->models->Project->get($this->getCurrentProjectId());
+			
+			if (@unlink($this->getProjectsMediaStorageDir().$data['logo'])) {
+
+				$p = $this->models->Project->save(
+					array(
+						'id' => $this->getCurrentProjectId(), 
+						'logo' => 'null'
+					)
+				);
+
+			} else {
+
+				$this->addError(_('Could not delete image.'));
+
+			}
+
+		} else
+        if (isset($this->requestData) && !$this->isFormResubmit()) {
             
             $this->requestData['id'] = $this->getCurrentProjectId();
-            
-            if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo'] == '1') {
-                
-                $data = $this->models->Project->get($this->getCurrentProjectId());
-                
-                if (unlink($data['logo_path'])) {
-                    
-                    $this->requestData['logo_url'] = null;
-                    
-                    $this->requestData['logo_path'] = null;
-                
-                }
-            
-            }
             
             $this->models->Project->save($this->requestData);
         
@@ -241,52 +251,43 @@ class ProjectsController extends Controller
         
         if (isset($this->requestDataFiles)) {
 
-			/*            
-			
-			allowed formats should go to controller's settings
-			not sure if helper is all that useful
+			// save logo
+			$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+			$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+	
+			$this->addError($this->helpers->FileUploadHelper->getErrors());
+			$filesToSave = $this->helpers->FileUploadHelper->getResult();
 
-            $fuh = $this->helpers->FileUploadHelper->saveFiles(
-                $this->requestDataFiles, 
-                $this->getDefaultImageUploadDir(), 
-                $this->getDefaultUploadFilemask(), 
-                $this->getDefaultUploadMaxSize()
-            );
+			if ($filesToSave) {
 
-            if (!$fuh['error']) {
-                
-                $img = $this->getProjectsMediaStorageDir() . 'project_logo.' . $fuh['result'][0]['extension'];
-                
-                if (rename($fuh['result'][0]['path'], $img)) {
-                    
-                    $this->models->Project->save(
-                    array(
-                        'id' => $this->getCurrentProjectId(), 
-                        'logo_url' => $this->baseUrl . $this->appName . '/images/project/' . sprintf('%04s', 
-                        $this->getCurrentProjectId()) . '/' . 'project_logo.' . $fuh['result'][0]['extension'], 
-                        'logo_path' => $img
-                    ));
-                
-                }
-                else {
-                    
-                    $this->addError(_('Upload failed; could not rename.'));
-                
-                }
-            
-            }
-            else {
-                
-                $this->addError(_('Upload failed,'));
-                
-                $this->addError($fuh['error']);
-            
-            }
-		*/
+				$p = $this->models->Project->save(
+					array(
+						'id' => $this->getCurrentProjectId(), 
+						'logo' => $filesToSave[0]['name']
+					)
+				);
+
+				if ($p) {
+				
+					$this->addMessage(_('Image saved.'));
+
+				} else {
+
+					@unlink($_SESSION['project']['paths']['project_media'].$filesToSave[0]['name']);
+
+					$this->addError(_('Could not save image.'));
+
+				}
+
+			}
 
         }
         
         $data = $this->models->Project->get($this->getCurrentProjectId());
+		
+		$this->setCurrentProjectData($data);
         
         $languages = array_merge(
 			$this->models->Language->get('select * from %table% where show_order is not null order by show_order asc'), 
