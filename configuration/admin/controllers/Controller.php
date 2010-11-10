@@ -15,6 +15,7 @@ class Controller extends BaseClass
 
     public $smarty;
     public $requestData;
+	public $requestDataFiles;
     public $data;
     public $randomValue;
     public $breadcrumbIncludeReferer;

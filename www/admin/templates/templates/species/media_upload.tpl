@@ -31,9 +31,9 @@
 </ul>
 </p>
 <p>
-<b>{t}Size{{t}t}</b><br />
+<b>{t}Size{/t}</b><br />
 {t}The maximum size of a file you are allowed to upload is influenced by the settings of the server. Currently, these are:{/t}<br />
-Upload maximum size:{/t} {$iniSettings.upload_max_filesize}<br />
+{t}Upload maximum size:{/t} {$iniSettings.upload_max_filesize}<br />
 {t}POST maximum size:{/t} {$iniSettings.post_max_size}<br />
 {t}The effective size limit is determined by the smallest of these two.{/t}
 </p>
