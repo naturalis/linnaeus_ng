@@ -9,13 +9,14 @@
 	<span id="message-container" style="margin-right:0px">&nbsp;</span>
 </span>
 
-<div id="taxon-language-div"></div>
-
-
 <div>
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
 	<a href="media_upload.php?id={$id}">{t}Upload media for this taxon{/t}</a><br /><br />
+</div>
 
+<div id="taxon-language-div"></div>
+<br />
+<div>
 	<a name="image"></a>
 	<span class="taxon-media-classheader">{t}Images{/t}</span><br />
 	<table class="taxon-media-table">
@@ -140,16 +141,17 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+	allShowLoadingDiv();
 {section name=i loop=$languages}
 	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
 
 	taxonActiveLanguage = {$defaultLanguage};
-	taxonDrawTaxonLanguages('taxonMediaChangeLanguage');
+	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
-
+	allHideLoadingDiv();
 {literal}	
 });
 </script>
