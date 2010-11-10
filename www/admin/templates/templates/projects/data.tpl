@@ -1,7 +1,9 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form enctype="multipart/form-data" action="" method="POST">
+<form enctype="multipart/form-data" id="theForm" action="" method="POST">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="deleteLogo" id="deleteLogo" value="0" />
 <table>
 	<tr>
 		<td>
@@ -27,19 +29,20 @@
 			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
 		</td>
 	</tr>
-	<!-- tr style="vertical-align:top">
+	<tr style="vertical-align:top">
 		<td>
 			Project logo:
 		</td>
 		<td colspan="2">
-		{if $data.logo_url}
-		<img src="{$data.logo_url}" width="150px" /><br />
-		<label><input type="checkbox" value="1" name="deleteLogo" />Delete current logo (uploading a new logo deletes the old one as well)</label><br />
-		{/if}
+		{if $data.logo}
+		<img src="{$session.project.urls.project_media}{$data.logo}" width="150px" />
+		<span class="pseudo-a" onclick="$('#deleteLogo').val(1);$('#theForm').submit();">{t}Delete logo{/t}</span><br />
+		{else}
 		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		<input name="uploadedfile" type="file" /><br />
+		{/if}
 		</td>
-	</tr -->
+	</tr>
 	<tr>
 		<td>
 			CSS url:

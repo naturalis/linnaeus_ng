@@ -1,6 +1,7 @@
 var taxonActiveView = false;
 var taxonActivePageTitle = false;
 var taxonActiveLanguage = false;
+var taxonActiveTaxonId = false;
 var taxonNewLanguage = false;
 var taxonDefaultLanguage = false;
 var taxonLanguages = Array();
@@ -10,22 +11,13 @@ var taxonPageStates = Array();
 var taxonPublishState = false;
 var taxonInitAutoSave = true;
 var taxonSaveType = 'auto';
-var taxonCoLSingleLevel = false;
 var taxonTargetDiv = false;
 var taxonTaxonParent = Array();
-var taxonMediaDescBeingEdited = false;
-var taxonMediaSaveButtonClicked = false;
-var taxonMediaDescBeforeEdit = false;
-var taxonMediaIds = Array();
 var taxonRanks = Array();
 var taxonCanHaveHybrid = Array();
+var taxonExecAfterSave = false;
 
-function taxonSetActivePageTitle(page) {
-
-	taxonActivePageTitle = page;
-
-}
-
+//GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
 
 	if (!allDoubleDeleteConfirm(itm,name)) return;
@@ -45,6 +37,53 @@ function taxonGeneralDeleteLabels(id,action,name,itm) {
 
 }
 
+
+//HEARTBEAT & USAGE
+function taxonSetHeartbeat(userid,app,ctrllr,view) {
+
+	var params = Array();
+
+	params[0] = ['taxon_id',$('#taxon_id').val()];
+
+	heartbeatParams = params;
+
+	allSetHeartbeat(userid,app,ctrllr,view);
+
+}
+
+function taxonClearAllUsageCells() {
+
+	$("td[id*='usage']").html('');
+
+}
+
+function taxonCheckLockOutStates() {
+
+	$.ajax({
+		url : "../utilities/ajax_interface.php",
+		type: "GET",
+		data : ({
+			'action' : 'get_taxa_edit_states',
+			'time': allGetTimestamp()
+		}),
+		success : function (data) {
+			taxonClearAllUsageCells();
+			if (data) {
+				obj = $.parseJSON(data);
+				for(var i=0;i<obj.length;i++) {
+					if (obj[i].first_name.length > 0 || obj[i].last_name.length > 0) {
+						$('#usage-'+obj[i].taxon_id).html(obj[i].first_name+' '+obj[i].last_name);
+					}
+				}
+			}
+		}
+	});
+
+	setTimeout ("taxonCheckLockOutStates()", heartbeatFreq/2);
+
+}
+
+//CATEGORIES
 function taxonPageDelete(page,name) {
 
 	taxonGeneralDeleteLabels(page,'delete_page',name,'the page');
@@ -95,6 +134,13 @@ function taxonAddLanguage(lan) {
 
 }
 
+function taxonAddPage(page) {
+	//[id,[names],default?]
+	// names[-1] contains the system label, [x] the name in language x
+	taxonPages[taxonPages.length] = page;
+}
+
+
 function taxonDrawTaxonLanguages(fnc) {
 
 	fnc = fnc || 'taxonSwitchLanguage';
@@ -102,11 +148,14 @@ function taxonDrawTaxonLanguages(fnc) {
 	var buffer = '';
 
 	for (var i=0;i<taxonLanguages.length;i++) {
-	
+
 		if (taxonLanguages[i][2]!=1) {
 			buffer = buffer+
 				'<span class="rank-language'+
-				(taxonLanguages[i][0]==taxonActiveLanguage ? '-active"' : '" class="pseudo-a" onclick="'+fnc+'('+taxonLanguages[i][0]+');' )+
+				(taxonLanguages[i][0]==taxonActiveLanguage ? 
+					'-active"' : 
+					'" class="pseudo-a" onclick="'+fnc+'('+taxonLanguages[i][0]+');' 
+				)+
 				'">'+
 				taxonLanguages[i][1]+
 				'</span>&nbsp;';
@@ -121,18 +170,6 @@ function taxonDrawTaxonLanguages(fnc) {
 
 }
 
-function taxonSwitchLanguage(language) {
-
-	allShowLoadingDiv();
-	taxonSaveTaxonContent('taxonGetData('+language+','+taxonActivePage+')');
-
-}
-
-function taxonAddPage(page) {
-	//[id,[names],default?]
-	taxonPages[taxonPages.length] = page;
-}
-
 function taxonDrawPageBlock() {
 
 	buffer = '<table class="taxon-pages-table"><tr>';
@@ -143,7 +180,7 @@ function taxonDrawPageBlock() {
 			'<td class="taxon-page-cell' +
 			(taxonPages[i][0]==taxonActivePage ? '-active' : '" onclick="taxonSwitchPage('+taxonPages[i][0]+');' ) +
 			'">' +
-			(taxonPages[i][1][taxonActiveLanguage].length == 0 ? '('+taxonPages[i][1][-1]+')' : taxonPages[i][1][taxonActiveLanguage] ) +
+			taxonPages[i][1][-1]+
 			(taxonPages[i][2]==1 ?  ' *' : '') +
 			'<br /><span class="taxon-page-publish-state">' +
 			(taxonPageStates[taxonPages[i][0]]==1 ? 'published' : (taxonPageStates[taxonPages[i][0]] == 0 ? 'unpublished' : 'empty')) +
@@ -155,7 +192,6 @@ function taxonDrawPageBlock() {
 	$('#taxon-pages-table-div').html(buffer);
 
 }
-
 
 function taxonUpdatePageBlock() {
 
@@ -186,48 +222,155 @@ function taxonUpdatePageBlock() {
 
 }
 
+function taxonGetDataAll() {
+
+	allShowLoadingDiv();
+	taxonGetDataActive(false);
+	taxonGetDataDefault(true);
+
+}
+
+function taxonGetDataActive(updateInterface) {
+
+	if (taxonActiveTaxonId.length==0 || taxonActiveLanguage===false) return;
+
+	taxonGetData(
+		taxonActiveTaxonId,
+		taxonActiveLanguage,
+		taxonActivePage,
+		'taxon-content-active',
+		updateInterface
+	);
+
+}
+
+function taxonGetDataDefault(updateInterface) {
+
+	if (taxonActiveTaxonId.length==0) return;
+
+	taxonGetData(
+		taxonActiveTaxonId,
+		taxonDefaultLanguage,
+		taxonActivePage,
+		'taxon-content-default',
+		updateInterface
+	);
+
+}
+
+function taxonSwitchLanguage(language) {
+
+	taxonSaveDataActive();
+	taxonActiveLanguage = language;
+	taxonGetDataActive(true);
+
+}
+
 function taxonSwitchPage(page) {
 
-	taxonSaveTaxonContent('taxonGetTaxonContent('+taxonActiveLanguage+','+page+')');
+	taxonSaveDataAll();
+	taxonActivePage = page;
+	taxonGetDataAll();
+
+}
+
+function taxonSaveDataAll() {
+	
+	taxonSaveDataActive();
+	taxonSaveDataDefault();
+
+}
+
+function taxonSaveDataManual() {
+
+	taxonSaveType = 'manual';
+	taxonSaveDataAll();
 
 }
 
 function taxonClose() {
 
-	taxonSaveTaxonContent("window.open('list.php','_self')");
+	taxonSaveDataActive();
+	taxonExecAfterSave = "window.open('list.php','_self');";
+	taxonSaveDataDefault();
 
 }
 
-function taxonSaveTaxonContentManual() {
+function taxonSaveDataActive() {
 
-	taxonSaveType = 'manual';
+	if (taxonActiveTaxonId.length==0 || taxonActiveLanguage===false) return;
 
-	taxonSaveTaxonContent();
+	taxonSaveData(
+		taxonActiveTaxonId,
+		taxonActiveLanguage,
+		taxonActivePage,
+		tinyMCE.get('taxon-content-active').getContent(),
+		'taxon-content-active'
+	);
 
 }
 
-function taxonSaveTaxonData(language,execafter,noMenuUpdate) {
+function taxonSaveDataDefault() {
 
-	/*
-	prompt('url',
-		'ajax_interface.php?id='+$('#taxon_id').val()+
-		'&action=save_taxon'+
-		'&name='+$('#taxon-name-input').val()+
-		'&content=content'+
-		'&language='+language +
-		'&page='+taxonActivePage+
-		'&save_type='+taxonSaveType);
-	*/
+	if (taxonActiveTaxonId.length==0) return;
+
+	taxonSaveData(
+		taxonActiveTaxonId,
+		taxonDefaultLanguage,
+		taxonActivePage,
+		tinyMCE.get('taxon-content-default').getContent(),
+		'taxon-content-default'
+	);
+
+}
+
+
+function taxonGetData(id,language,page,editorName,updateInterface) {
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : 'get_taxon' ,
+			'id' : id ,
+			'language' : language ,
+			'page' : page ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			alert(data);
+			obj = $.parseJSON(data);
+
+			$('#taxon-name-input').val(obj.title ? obj.title : '');
+			tinyMCE.get(editorName).setContent(obj.content ? obj.content : '');
+			taxonActivePage = obj.page_id;
+			taxonPublishState = obj.publish;
+
+			if (language!=taxonDefaultLanguage) {
+				taxonActiveLanguage = obj.language_id;
+			}
+
+			if (updateInterface) {
+				taxonDrawTaxonLanguages();
+				taxonUpdatePageBlock();
+				taxonDrawPublishBlock();
+				allHideLoadingDiv();
+			}
+		}
+	});
+
+}
+
+function taxonSaveData(id,language,page,content,editorName) {
 
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
-			'id' : $('#taxon_id').val() ,
 			'action' : 'save_taxon' ,
-			'name' : $('#taxon-name-input').val() , 
-			'content' : tinyMCE.get('taxon-content-'+(language==taxonDefaultLanguage ? 'default' : 'other' )).getContent() , 
+			'id' : id ,
+			'content' : content , 
 			'language' : language ,
-			'page' : taxonActivePage ,
+			'page' : page ,
 			'save_type' : taxonSaveType ,
 			'time' : allGetTimestamp()	
 		}),
@@ -235,190 +378,74 @@ function taxonSaveTaxonData(language,execafter,noMenuUpdate) {
 		success: function(data){
 
 			if (data.indexOf('<error>')>=0) {
+
 				alert(data.replace('<error>',''));
+
 			} else {
+
 				obj = $.parseJSON(data);
-				$('#taxon_id').val(obj.id);
-				if (obj.modified==true) {
-					if (taxonSaveType=='manual')
-						tinyMCE.get('taxon-content-'+(language==taxonDefaultLanguage ? 'default' : 'other' )).setContent(obj.content ? obj.content : '');
-					allSetMessage('saved (could not save certain HTML-tags)');
-				} else {
-					allSetMessage('saved');
+
+				if (obj) {
+
+					if (obj.modified==true) {
+						if (taxonSaveType=='manual') tinyMCE.get(editorName).setContent(obj.content ? obj.content : '');
+						allSetMessage('saved (could not save certain HTML-tags)');
+					} else {
+						allSetMessage('saved');
+					}
+
 				}
 			}
 
-			if (!noMenuUpdate) {
-				taxonUpdatePageBlock();
-				allHideLoadingDiv();
-			}
-
-			if (execafter) eval(execafter);
-
 			taxonSaveType = 'auto';
+
+		},
+		complete: function(){
+
+			if (taxonExecAfterSave) eval(taxonExecAfterSave);
 
 		}
 	});
 
 }
 
-function taxonSaveTaxonContent(execafter,synch) {
-
-	allShowLoadingDiv();
-	taxonSaveTaxonData(taxonDefaultLanguage,false,true);
-	taxonSaveTaxonData(taxonActiveLanguage,execafter);
-
-}
-
-function taxonSaveDataManual() {
-
-	taxonSaveType = 'manual';
-	allShowLoadingDiv();
-	taxonSaveTaxonData(taxonDefaultLanguage,false);
-	taxonSaveTaxonData(taxonActiveLanguage,'taxonOpenContentPreview()');
-
-}
-
-function taxonGetData(language,page,noMenuUpdate) {
-
-	if ($('#taxon_id').val().length==0) return;
-/*
-	prompt('url',"ajax_interface.php"+
-			'?id=' + $('#taxon_id').val() +
-			'&action=get_taxon' +
-			'&language='+language +
-			'&page='+page +
-			'&time='+allGetTimestamp()			
-	);
-*/
-	$.post(
-		"ajax_interface.php", 
-		{
-			'id' : $('#taxon_id').val() ,
-			'action' : 'get_taxon' ,
-			'language' : language ,
-			'page' : page ,
-			'time' : allGetTimestamp()			
-		},
-		function(data){
-//			alert(data);
-			obj = $.parseJSON(data);
-			$('#taxon-name-input').val(obj.title ? obj.title : '');
-			tinyMCE.get('taxon-content-'+(language==taxonDefaultLanguage ? 'default' : 'other' )).setContent(obj.content ? obj.content : '');
-			if (language!=taxonDefaultLanguage) {
-				taxonActiveLanguage = obj.language_id;
-				taxonActivePage = obj.page_id;
-				taxonPublishState = obj.publish;
-			}
-
-			if (!noMenuUpdate) {
-				taxonDrawTaxonLanguages();
-				taxonUpdatePageBlock();
-				taxonDrawPublishBlock();
-				allHideLoadingDiv();
-			}
-
-		}
-	);
-
-}
-
-function taxonGetTaxonContent(language,page) {
-
-	allShowLoadingDiv();
-	taxonGetData(taxonDefaultLanguage,page,true);
-	taxonGetData(language,page);
-
-}
-
-
-
 function taxonDeleteData() {
 
-	if ($('#taxon_id').val().length==0) return;
+	if (taxonActiveTaxonId.length==0) return;
 
 	if (!allDoubleDeleteConfirm('all content in all languages for taxon',$('#taxon-name').val())) return;
 
 	$.post(
 		"ajax_interface.php", 
 		{
-			'id' : $('#taxon_id').val() ,
+			'id' : taxonActiveTaxonId ,
 			'action' : 'delete_taxon' ,
 			'page' : taxonActivePage ,
 			'time': allGetTimestamp()	
 		},
 		function(data){
-			//alert(data);
 			window.open('list.php','_self');
 		}
 	);
 
 }
 
-function taxonConfirmSaveOnUnload() {
-	return;
-	
-	// issue: jquery synchronous ajax call doesn't seem to work, so this is pointless:
-	if (confirm('Do you want to save your changes before you leave this page?')) {
 
-		taxonSaveTaxonContent(false,true);
 
-	}
 
-}
 
-function taxonSetHeartbeat(userid,app,ctrllr,view) {
 
-	var params = Array();
-
-	params[0] = ['taxon_id',$('#taxon_id').val()];
-
-	heartbeatParams = params;
-
-	allSetHeartbeat(userid,app,ctrllr,view);
-
-}
-
-function taxonClearAllUsageCells() {
-
-	$("td[id*='usage']").html('');
-
-}
-
-function taxonCheckLockOutStates() {
-
-	$.ajax({
-		url : "../utilities/ajax_interface.php",
-		type: "GET",
-		data : ({
-			'action' : 'get_taxa_edit_states',
-			'time': allGetTimestamp()
-		}),
-		success : function (data) {
-			taxonClearAllUsageCells();
-			if (data) {
-				obj = $.parseJSON(data);
-				for(var i=0;i<obj.length;i++) {
-					if (obj[i].first_name.length > 0 || obj[i].last_name.length > 0) {
-						$('#usage-'+obj[i].taxon_id).html(obj[i].first_name+' '+obj[i].last_name);
-					}
-				}
-			}
-		}
-	});
-
-	setTimeout ("taxonCheckLockOutStates()", heartbeatFreq/2);
-
-}
 
 function taxonPublishContent(state) {
 	
-	if (state==1) taxonSaveTaxonContent();
+	if (taxonActiveTaxonId.length==0) return;
+
+	if (state==1) taxonSaveDataAll();
 
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
-			'id' : $('#taxon_id').val() ,
+			'id' : taxonActiveTaxonId ,
 			'action' : 'publish_content' ,
 			'language' : taxonActiveLanguage ,
 			'page' : taxonActivePage ,
@@ -451,6 +478,10 @@ function taxonDrawPublishBlock() {
 		);
 
 }
+
+
+
+
 
 function taxonRunAutoSave() {
 
@@ -492,6 +523,19 @@ function taxonGetUndo() {
 	);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+//CATALOGUE OF LIFE
+var taxonCoLSingleLevel = false;
 
 function taxonCoLMakeTableRow(d,symbol,level) {
 
@@ -586,7 +630,6 @@ function taxonParseCoLResult(data) {
 	return b;
 
 }
-	allShowLoadingDiv();
 
 function taxonGetCoL(name,id,singlelevel,subdiv) {
 
@@ -598,6 +641,8 @@ function taxonGetCoL(name,id,singlelevel,subdiv) {
 
 	taxonCoLSingleLevel = singlelevel==undefined ? $('#single-child-level').is(':checked') : singlelevel ;
 	taxonTargetDiv = subdiv ? 'col-subresult' : 'col-result';
+
+	allShowLoadingDiv();
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
@@ -687,6 +732,14 @@ function taxonSaveCoLResult() {
 	taxonSaveCoLTaxa(taxonTaxaToSave);
 
 }
+
+
+
+//MEDIA
+var taxonMediaDescBeingEdited = false;
+var taxonMediaSaveButtonClicked = false;
+var taxonMediaDescBeforeEdit = false;
+var taxonMediaIds = Array();
 
 function taxonMediaDescriptionEdit(ele) {
 
@@ -791,15 +844,19 @@ function taxonMediaClickClose() {
 }
 
 function taxonMediaChangeLanguage(lan) {
+
 	taxonMediaSaveDesc();
 	taxonMediaDescBeingEdited = false;
 	taxonActiveLanguage = lan;
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage');
 	taxonMediaGetDescriptions();
+
 }
 
 function taxonMediaAddId(id) {
+
 	taxonMediaIds[taxonMediaIds.length] = id;
+
 }
 
 function taxonMediaDelete(id,type,name) {
@@ -839,23 +896,29 @@ function taxonMediaShowMedia(url,name) {
 }
 
 
+//RANKS, CATEGORIES & SECTIONS
 var taxonKingdom = Array();
 var taxonAddedRanks = Array();
 var taxonCoLRanks = Array();
 
 function taxonAddCoLRanks() {
+
 	taxonAddedRanks = taxonCoLRanks;
 	taxonShowSelectedRanks();
+
 }
 
 function taxonAddRank(id,noparent) {
+
 	if (noparent==undefined) noparent = false;
 	taxonAddedRanks[taxonAddedRanks.length]=[id,$('#rank-'+id).html(),noparent];
 	taxonOrderSelectedRanks();
 	taxonShowSelectedRanks();
+
 }
 
 function taxonRemoveRank(id) {
+
 	if (id==taxonKingdom[0]) return;
 	var t = Array();
 
@@ -871,11 +934,14 @@ function taxonRemoveRank(id) {
 
 	taxonOrderSelectedRanks();
 	taxonShowSelectedRanks();
+
 }
 
 function taxonRemoveAll() {
+
 	taxonRemoveRank();
 	taxonShowSelectedRanks();	
+
 }
 
 function sortRankArray(a,b) {
@@ -885,6 +951,7 @@ function sortRankArray(a,b) {
 }
 
 function taxonOrderSelectedRanks() {
+
 	var d = '|';
 	var t = Array();
 	for (var i=0;i<taxonAddedRanks.length;i++) {
@@ -1191,12 +1258,3 @@ function taxonGetSectionLabels(language) {
 	
 }
 
-var x=false;
-
-function taxonOpenContentPreview(mode) {
-alert(x);
-	if (mode == 'manual' || x!==false) {
-		x = window.open('http://www.xs4all.nl','_preview');
-	}
-
-}

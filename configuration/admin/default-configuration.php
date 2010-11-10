@@ -55,6 +55,41 @@ class configuration
     
     }
 
+    public function getControllerSettingsProjects()
+    {
+        
+        return array(
+		  'media' =>
+			array(
+			  'allowedFormats' => 
+				array(
+				  array(
+					'mime' => 'image/png', 
+					'media_name' => 'PNG image', 
+					'media_type' => 'image', 
+					'maxSize' => 500000
+				  ),
+				  array(
+					'mime' => 'image/jpg', 
+					'media_name' => 'JPG image', 
+					'media_type'  => 'image', 
+					'maxSize' => 500000
+				  ),
+				  array(
+					'mime' => 'image/jpeg', 
+					'media_name' => 'JPG image', 
+					'media_type'  => 'image', 
+					'maxSize' => 500000
+				  ),
+
+				),
+				'defaultUploadMaxSize' => 2000000 // 2mb
+			),
+			'maxChoicesPerKey' => 4
+      	);
+
+    }
+
     public function getControllerSettingsUsers()
     {
         return array(
