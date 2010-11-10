@@ -453,10 +453,9 @@ class Controller extends BaseClass
 
 		foreach((array)$data as $key => $val) {
 
-	        $_SESSION['project']['key'] = $val;
+	        $_SESSION['project'][$key] = $val;
 
 		}
-
 
     }
 
