@@ -26,14 +26,24 @@
 
 <div id="taxon-pages-table-div"></div>
 
-<div id="taxon-publish-table-div"></div>
+
 
 <div style="width:780px;height:610px;">
-	<div id="taxon-language-div-default"></div>
+
+	<div id="taxon-language-default">
+		<span id="taxon-language-default-language"></span>
+		<span id="taxon-language-default-publish"></span>
+	</div>
+	
+	
 	<textarea name="content-default" style="width:900px;height:500px;" id="taxon-content-default"></textarea>
 	<br />
 	{if $languages|@count > 1}
-	<div id="taxon-language-div"></div>
+	<div id="taxon-language-other">
+		<span id="taxon-language-other-language"></span>
+		<span id="taxon-language-other-publish"></span>
+	</div>	
+	<div id="taxon-languages-other"></div>
 	<textarea name="content-other" style="width:900px;height:500px;" id="taxon-content-active"></textarea>
 	{/if}
 </div>
@@ -62,8 +72,8 @@ $(document).ready(function(){
 	taxonActivePage = {$activePage};
 	taxonUpdatePageBlock();
 
-	taxonPublishState  = {if $content.publish!=''}{$content.publish}{else}0{/if};
-	taxonDrawPublishBlock();
+//	taxonPublishStates  = {if $content.publish!=''}{$content.publish}{else}0{/if};
+	taxonDrawPublishBlocks();
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
@@ -71,8 +81,8 @@ $(document).ready(function(){
 	taxonActiveTaxonId = $('#taxon_id').val();
 	taxonGetDataAll();
 
-//	allSetAutoSaveFreq({$autosaveFrequency});
-//	taxonRunAutoSave();
+	allSetAutoSaveFreq({$autosaveFrequency});
+	taxonRunAutoSave();
 
 
 {literal}	
