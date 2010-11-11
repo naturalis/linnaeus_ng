@@ -19,6 +19,8 @@
 
 	ordering of ranks in getProjectRanks might need some reconsidering
 
+	delete obsolete undo's
+
 */
 
 include_once ('Controller.php');
@@ -2027,14 +2029,15 @@ class SpeciesController extends Controller
         
         } else {
             
+
             $ctu = $this->models->ContentTaxonUndo->get(
             array(
                 'taxon_id' => $this->requestData['id'], 
                 'project_id' => $this->getCurrentProjectId(), 
                 'language_id' => $this->requestData['language'], 
                 'page_id' => $this->requestData['page']
-            ), 'max(content_last_change) as last_change');
-            
+            ), false, 'content_last_change desc');
+/*            
             $ctu = $this->models->ContentTaxonUndo->get(
             array(
                 'taxon_id' => $this->requestData['id'], 
@@ -2043,7 +2046,7 @@ class SpeciesController extends Controller
                 'page_id' => $this->requestData['page'], 
                 'content_last_change' => $ctu[0]['last_change']
             ));
-            
+*/
             if ($ctu) {
                 
                 $d = $ctu[0];

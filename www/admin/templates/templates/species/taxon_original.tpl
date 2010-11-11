@@ -27,7 +27,7 @@
 
 <div id="taxon-language-div"></div>
 
-<div id="taxon-publish-table-div"></div>
+<div id="taxon-default-publish-table-div"></div>
 
 
 {t}Page title:{/t}<input type="text" maxlength="64" name="taxon" id="taxon-name-input" value="{$content.title}" />

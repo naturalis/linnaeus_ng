@@ -8,7 +8,7 @@ var taxonLanguages = Array();
 var taxonActivePage = false;
 var taxonPages = Array();
 var taxonPageStates = Array();
-var taxonPublishState = false;
+var taxonPublishStates = Array();
 var taxonInitAutoSave = true;
 var taxonSaveType = 'auto';
 var taxonTargetDiv = false;
@@ -164,9 +164,9 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 		if (taxonLanguages[i][0]==taxonDefaultLanguage) var def = taxonLanguages[i][1];
 	}
 
-	$('#taxon-language-div').html(buffer);
+	$('#taxon-language-other-language').html(buffer);
 
-	$('#taxon-language-div-default').html(def+' *');
+	$('#taxon-language-default-language').html(def);
 
 }
 
@@ -344,16 +344,18 @@ function taxonGetData(id,language,page,editorName,updateInterface) {
 			$('#taxon-name-input').val(obj.title ? obj.title : '');
 			tinyMCE.get(editorName).setContent(obj.content ? obj.content : '');
 			taxonActivePage = obj.page_id;
-			taxonPublishState = obj.publish;
 
 			if (language!=taxonDefaultLanguage) {
+				taxonPublishStates[1] = obj.publish;
 				taxonActiveLanguage = obj.language_id;
+			} else {
+				taxonPublishStates[0] = obj.publish;
 			}
 
 			if (updateInterface) {
 				taxonDrawTaxonLanguages();
 				taxonUpdatePageBlock();
-				taxonDrawPublishBlock();
+				taxonDrawPublishBlocks();
 				allHideLoadingDiv();
 			}
 		}
@@ -430,24 +432,23 @@ function taxonDeleteData() {
 
 }
 
+function taxonPublishContent(type,state) {
 
-
-
-
-
-
-function taxonPublishContent(state) {
-	
 	if (taxonActiveTaxonId.length==0) return;
 
-	if (state==1) taxonSaveDataAll();
+	if (state==1 && type=='default') {
+		taxonSaveDataDefault();
+	} else
+	if (state==1 && type=='active') {
+		taxonSaveDataActive();
+	}
 
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
 			'id' : taxonActiveTaxonId ,
 			'action' : 'publish_content' ,
-			'language' : taxonActiveLanguage ,
+			'language' : (type=='active' ? taxonActiveLanguage : taxonDefaultLanguage) ,
 			'page' : taxonActivePage ,
 			'state' : state ,
 			'time' : allGetTimestamp()	
@@ -455,8 +456,8 @@ function taxonPublishContent(state) {
 		type: "GET",
 		success: function(data){
 			if (data=='<ok>') {
-				taxonPublishState = state;
-				taxonDrawPublishBlock();
+				taxonPublishStates[type=='active' ? 1 : 0] = state;
+				taxonDrawPublishBlocks();
 				taxonUpdatePageBlock();
 			}
 		}
@@ -464,28 +465,36 @@ function taxonPublishContent(state) {
 
 }
 
-function taxonDrawPublishBlock() {
 
-	if (taxonPublishState=='1')
-		$('#taxon-publish-table-div').html(
-			'This page has been published. '+
-			'<input type="button" value="unpublish" onclick="taxonPublishContent(0);" />'
+function taxonDrawPublishBlocks() {
+
+	if (taxonPublishStates[0]=='1')
+		$('#taxon-language-default-publish').html(
+			'(This page has been published in this language. Click '+
+			'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',0);">here</span> to unpublish.)'
 		);
 	else
-		$('#taxon-publish-table-div').html(
-			'This page has not been published. '+
-			'<input type="button" value="publish" onclick="taxonPublishContent(1);" />'
+		$('#taxon-language-default-publish').html(
+			'(This page has not been published in this language. Click '+
+			'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',1);">here</span> to publish.)'
+		);
+
+	if (taxonPublishStates[1]=='1')
+		$('#taxon-language-other-publish').html(
+			'(This page has been published in this language. Click '+
+			'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',0);">here</span> to unpublish.)'
+		);
+	else
+		$('#taxon-language-other-publish').html(
+			'(This page has not been published in this language. Click '+
+			'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',1);">here</span> to publish.)'
 		);
 
 }
 
-
-
-
-
 function taxonRunAutoSave() {
 
-	if (!taxonInitAutoSave) taxonSaveTaxonContent();
+	if (!taxonInitAutoSave) taxonSaveDataAll();
 
 	taxonInitAutoSave = false;
 
@@ -500,12 +509,12 @@ function taxonGetUndo() {
 		{
 			'id' : $('#taxon_id').val() ,
 			'action' : 'get_taxon_undo' ,
-			'language' : taxonActiveLanguage ,
 			'page' : taxonActivePage ,
 			'time' : allGetTimestamp()			
 		},
 		function(data){
 			if (data) {
+				alert(data);return;
 				obj = $.parseJSON(data);
 				$('#taxon-name-input').val(obj.title ? obj.title : '');
 				tinyMCE.get('taxon-content-other').setContent(obj.content ? obj.content : '');
@@ -514,7 +523,7 @@ function taxonGetUndo() {
 				taxonPublishState = obj.publish;
 				taxonDrawTaxonLanguages();
 				taxonUpdatePageBlock();
-				taxonDrawPublishBlock();
+				taxonDrawPublishBlocks();
 				allSetMessage('recovered');
 			} else {
 				allSetMessage('cannot undo');
