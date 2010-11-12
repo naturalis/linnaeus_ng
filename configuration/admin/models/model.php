@@ -354,13 +354,39 @@ abstract class Model extends BaseClass
     }
 
 
+    public function _get ($params)
+    {
+		//(models)(.)+(get)
 
-    public function get ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $fieldAsIndex = false)
+		$id = isset($params['id']) ? $params['id'] : false;
+		$select = isset($params['columns']) ? $params['columns'] : false;
+		$order = isset($params['order']) ? $params['order'] : false;
+		$group = isset($params['group']) ? $params['group'] : false;
+		$limit = isset($params['limit']) ? $params['limit'] : false;
+		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
+		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+
+        return $this->get($id,$select,$order,$group,$ignoreCase,$fieldAsIndex,$limit);
+
+    }
+
+
+    public function get ($id=false,$columns=false,$order=false,$group=false,$ignoreCase=true,$fieldAsIndex=false,$limit=false)
     {
 
         unset($this->data);
         
-        $this->set(($id ? $id : $this->id), $cols, $order, $groupBy, $ignoreCase, $fieldAsIndex);
+        $this->set(
+			array(
+				'id' => ($id ? $id : $this->id), 
+				'columns' => $columns, 
+				'order' => $order, 
+				'group' => $group, 
+				'ignoreCase' => $ignoreCase, 
+				'fieldAsIndex' => $fieldAsIndex, 
+				'limit' => $limit
+			)
+		);
         
         return isset($this->data) ? $this->data : null;
     
@@ -557,11 +583,10 @@ abstract class Model extends BaseClass
     private function retainAlteredData ($query)
     {
         
-        if (!$this->retainBeforeAlter)
-            return;
+        if (!$this->retainBeforeAlter) return;
         
         unset($this->retainedData);
-        
+
         $query = strtolower($query);
         
         if (strpos($query, 'delete') === 0) {
@@ -578,7 +603,7 @@ abstract class Model extends BaseClass
         }
         
         if (isset($q)) {
-            
+
             $this->setLastQuery($q);
             
             $result = mysql_query($q);
@@ -586,7 +611,7 @@ abstract class Model extends BaseClass
             while ($r = mysql_fetch_assoc($result)) {
                 
                 $this->retainedData[] = $r;
-            
+
             }
         
         }
@@ -595,22 +620,30 @@ abstract class Model extends BaseClass
 
 
 
-    private function set ($id = false, $cols = false, $order = false, $groupBy = false, $ignoreCase = true, $fieldAsIndex = false)
+    private function set ($params)
     {
 
         /*
 
-                function can take as $id:
-                    - a single $id to find the corresponding row
-                    - an array of column/value-pairs (array('last_name' => 'turing' ))
-                      standard operator is '=' but it is possible to tag another operator 
-                      after the column-value (array('last_name !=' => 'gates' ))
-                    - a full query with %table% as tablename
-                    - * for no where clause
-                $cols can hold a string that replaces the defualt * in 'select * from...'
+			function can take as $id:
+				- a single $id to find the corresponding row
+				- an array of column/value-pairs (array('last_name' => 'turing' ))
+				  standard operator is '=' but it is possible to tag another operator 
+				  after the column-value (array('last_name !=' => 'gates' ))
+				- a full query with %table% as tablename
+				- * for no where clause
+			$cols can hold a string that replaces the defualt * in 'select * from...'
 
-            */
-        
+		*/
+
+		$id = isset($params['id']) ? $params['id'] : false;
+		$cols = isset($params['columns']) ? $params['columns'] : false;
+		$order = isset($params['order']) ? $params['order'] : false;
+		$group = isset($params['group']) ? $params['group'] : false;
+		$limit = isset($params['limit']) ? $params['limit'] : false;
+		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
+		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+
         $query = false;
         
         if (!$id) return;
@@ -667,9 +700,11 @@ abstract class Model extends BaseClass
             
             }
 
-            $query .= $groupBy ? " group by " . $groupBy : '';
+            $query .= $group ? " group by " . $group : '';
             
             $query .= $order ? " order by " . $order : '';
+
+            $query .= $limit ? " limit " . $limit : '';
             
             $this->setLastQuery($query);
             
@@ -695,9 +730,11 @@ abstract class Model extends BaseClass
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName;
             
-            $query .= $groupBy ? " group by " . $groupBy : '';
+            $query .= $group ? " group by " . $group : '';
             
             $query .= $order ? " order by " . $order : '';
+
+            $query .= $limit ? " limit " . $limit : '';
 
             $set = mysql_query($query);
             

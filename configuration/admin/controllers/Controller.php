@@ -514,7 +514,7 @@ class Controller extends BaseClass
         
         }
         
-        $this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
+        $this->setCurrentProjectData($this->models->Project->get(array('id' => $this->getCurrentProjectId())));
 
     }
 
@@ -818,7 +818,7 @@ class Controller extends BaseClass
 
 		if (isset($_SESSION['user']['currentLanguage']) && $language == $_SESSION['user']['currentLanguage']) return;
 
-		$l = $this->models->Language->get(array('language'=> $language));
+		$l = $this->models->Language->_get(array('id' => array('language'=> $language)));
 
 		if (count((array)$l)==0) { 
 
@@ -894,16 +894,42 @@ class Controller extends BaseClass
 	}
 
 
+    /**
+     * Gettext wrapper, to be called from javascript (through the utilities controller)
+     *
+     * @access     public
+     */
+	public function javascriptTranslate($content)
+	{
+
+		if (empty($content)) return;
+
+		$this->models->TranslateMe->save(
+			array(
+				'id' => null,
+				'controller' => 'javascript',
+				'content' => $content
+			)
+		);
+
+		return _($content);
+
+	}
+
     public function getTaxonTree($pId=null,$level=0) 
     {
 	
 		if ($level==0) unset($this->_treeList);
 
-        $t = $this->models->Taxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId(),
-                ($pId === null ? 'parent_id is' : 'parent_id') => $pId
-            ),false,'taxon_order');
+        $t = $this->models->Taxon->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(),
+						($pId === null ? 'parent_id is' : 'parent_id') => $pId
+					),
+					'order' => 'taxon_order'
+				)
+			);
 
         foreach((array)$t as $key => $val) {
 
@@ -959,10 +985,14 @@ class Controller extends BaseClass
         if (!isset($this->controllerModuleId))
             return 1;
         
-        $mp = $this->models->ModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'module_id' => $this->controllerModuleId
-        ));
+        $mp = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->controllerModuleId
+				)
+			)
+		);
         
         // return 1 for present and activated modules, 0 for just present, and -1 for not present
         return ($mp[0]['active'] == 'n' ? 0 : ($mp[0]['active'] == 'y' ? 1 : -1));
@@ -1293,10 +1323,15 @@ class Controller extends BaseClass
     private function setHelpTexts ()
     {
         
-        $this->_helpTexts = $this->models->Helptext->get(array(
-            'controller' => $this->getControllerBaseName() ? $this->getControllerBaseName() : '-', 
-            'view' => $this->getViewName()
-        ), false, 'show_order');
+        $this->_helpTexts = $this->models->Helptext->_get(
+			array(
+				'id' => array(
+					'controller' => $this->getControllerBaseName() ? $this->getControllerBaseName() : '-', 
+					'view' => $this->getViewName()
+				),
+				'order' => 'show_order'
+			)
+		);
     
     }
 

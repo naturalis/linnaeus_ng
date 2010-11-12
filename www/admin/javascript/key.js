@@ -1,6 +1,6 @@
 function keyChoiceDelete() {
 	
-	if (confirm('Are you sure you want to delete this choice?')) {
+	if (confirm(_('Are you sure you want to delete this choice?'))) {
 
 		$('#action').val('delete');
 		$('#theForm').submit();
@@ -11,7 +11,7 @@ function keyChoiceDelete() {
 
 function keyDeleteImage() {
 
-	if (confirm('Are you sure you want to delete this image?')) {
+	if (confirm(_('Are you sure you want to delete this image?'))) {
 
 		$('#action').val('deleteImage');
 		$('#theForm').submit();

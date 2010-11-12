@@ -4,7 +4,7 @@ function projectSaveLanguage(action,lan) {
 
 	if (action == 'delete') {
 
-		if (!allDoubleDeleteConfirm('the language',lan[1])) return;
+		if (!allDoubleDeleteConfirm(_('the language'),lan[1])) return;
 
 	}
 
@@ -57,10 +57,15 @@ function projectAddLanguage(lan) {
 	selectedLanguages[selectedLanguages.length] = lan;
 
 }
-//untranslated translated
+
 function projectUpdateLanguageBlock() {
 
-	b = '<table><tr><th>Language</th><th>Default</th><th>Translation</th><th>Status</th><th>Delete</th></tr>';
+	b = '<table><tr><th>'+_('Language')+
+			'</th><th>'+_('Default')+
+			'</th><th>'+_('Translation')+
+			'</th><th>'+_('Status')+
+			'</th><th>'+_('Delete')+
+		'</th></tr>';
 
 	for (var i=0;i<selectedLanguages.length;i++) {
 
@@ -69,24 +74,24 @@ function projectUpdateLanguageBlock() {
 				'<td class="cell-language-name'+(selectedLanguages[i][4]!=1 ? '-unused' : '')+'">'+selectedLanguages[i][1]+'</td>'+
 				'<td style="padding-right:15px">['+
 					(selectedLanguages[i][3]==1 ? 
-						'current' : 
-						'<span class="pseudo-a" onclick="projectSaveLanguage(\'default\',[\''+selectedLanguages[i][0]+'\'])">make default</span>' )+
+						_('current') : 
+						'<span class="pseudo-a" onclick="projectSaveLanguage(\'default\',[\''+selectedLanguages[i][0]+'\'])">'+_('make default')+'</span>' )+
 			']</td>'+
 			'<td style="padding-right:15px">'+
-				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]==0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'untranslated\',[\''+selectedLanguages[i][0]+'\'])" />needs to be translated</label>'+
-				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]!=0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'translated\',[\''+selectedLanguages[i][0]+'\'])" />translated</label>' +
+				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]==0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'untranslated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('needs to be translated')+'</label>'+
+				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]!=0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'translated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('translated')+'</label>' +
 			'</td>'+
 			'<td style="padding-right:15px">'+
 				'[<span class="pseudo-a" onclick="projectSaveLanguage('+
 				(selectedLanguages[i][4]==1 ?
-					'\'deactivate\',[\''+selectedLanguages[i][0]+'\'])">unpublish' :
-					'\'reactivate\',[\''+selectedLanguages[i][0]+'\'])">publish'
+					'\'deactivate\',[\''+selectedLanguages[i][0]+'\'])">'+_('unpublish') :
+					'\'reactivate\',[\''+selectedLanguages[i][0]+'\'])">'+_('publish')
 				)+'</span>]'+
 			'</td>'+
 			'<td>'+
 				(selectedLanguages[i][4]==1 ? 
-					'[delete]' : 
-					'[<span class="pseudo-a" onclick="projectSaveLanguage(\'delete\',[\''+selectedLanguages[i][0]+'\',\''+selectedLanguages[i][1]+'\'])">delete</span>]'
+					'['+_('delete')+']' : 
+					'[<span class="pseudo-a" onclick="projectSaveLanguage(\'delete\',[\''+selectedLanguages[i][0]+'\',\''+selectedLanguages[i][1]+'\'])">'+_('delete')+'</span>]'
 				)+
 			'</td></tr>'
 

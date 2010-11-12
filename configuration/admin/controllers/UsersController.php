@@ -71,29 +71,25 @@ class UsersController extends Controller
     public function getCurrentUserRights ($id = false)
     {
         
-        $pru = $this->models->ProjectRoleUser->get(array(
-            'user_id' => $id ? $id : $this->getCurrentUserId()
-        ));
+        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
         
         foreach ((array) $pru as $key => $val) {
             
-            $p = $this->models->Project->get($val['project_id']);
+            $p = $this->models->Project->_get(array('id'=>$val['project_id']));
             
             $pru[$key]['project_name'] = $p['sys_name'];
             
-            $r = $this->models->Role->get($val['role_id']);
+            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
             
             $pru[$key]['role_name'] = $r['role'];
             
             $pru[$key]['role_description'] = $r['description'];
             
-            $rr = $this->models->RightRole->get(array(
-                'role_id' => $val['role_id']
-            ));
+            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
             
             foreach ((array) $rr as $rr_key => $rr_val) {
                 
-                $r = $this->models->Right->get($rr_val['right_id']);
+                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
                 
                 $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
             
@@ -143,12 +139,15 @@ class UsersController extends Controller
          '')) {
             
             // get data of any active user based on entered username and password
-            $users = $this->models->User->get(
-            array(
-                'username' => $this->requestData['username'], 
-                'password' => $this->userPasswordEncode($this->requestData['password']), 
-                'active' => '1'
-            ));
+            $users = $this->models->User->_get(
+				array(
+					'id' => array(
+						'username' => $this->requestData['username'], 
+						'password' => $this->userPasswordEncode($this->requestData['password']), 
+						'active' => '1'
+					)
+				)
+			);
             
             if (count((array) $users) != 1) {
             // no user found
@@ -210,7 +209,7 @@ class UsersController extends Controller
                 
                 $this->setCurrentProjectId($this->requestData['project_id']);
 
-                $this->setCurrentProjectData($this->models->Project->get($this->getCurrentProjectId()));
+                $this->setCurrentProjectData($this->models->Project->_get(array('id'=>$this->getCurrentProjectId())));
 
                 $this->redirect($this->getLoggedInMainIndex());
             
@@ -281,11 +280,14 @@ class UsersController extends Controller
 					} else {
 					// ...or because of his email address (or both)
 
-						$pru = $this->models->ProjectRoleUser->get(
+						$pru = $this->models->ProjectRoleUser->_get(
 							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'user_id' => $sim[0]['id']
-							),'count(*) as total'
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'user_id' => $sim[0]['id']
+								),
+								'columns' => 'count(*) as total'
+							)
 						);
 						
 						if ($pru[0]['total']>0) {
@@ -307,7 +309,7 @@ class UsersController extends Controller
                     $this->smarty->assign('existingUser', false);
 
 					// make sure an unassignable role (like system admin) wasn't injected
-					$r = $this->models->Role->get($this->requestData['role_id']);
+					$r = $this->models->Role->_get(array('id'=>$this->requestData['role_id']));
 
 					$saveUser = ($r['assignable'] != 'n');
 
@@ -333,13 +335,18 @@ class UsersController extends Controller
 
         }
 
-        $modules = $this->models->ModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ), false, 'module_id asc');
+        $modules = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				), 
+				'order' => 'module_id asc'
+			)
+		);
 
         foreach ((array) $modules as $key => $val) {
             
-            $mp = $this->models->Module->get($val['module_id']);
+            $mp = $this->models->Module->_get(array('id'=>$val['module_id']));
             
             $modules[$key]['module'] = $mp['module'];
             
@@ -347,9 +354,7 @@ class UsersController extends Controller
             
         }
         
-        $freeModules = $this->models->FreeModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ));
+        $freeModules = $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
 		$maxLengths = array(
 			'username' => $this->controllerSettings['dataChecks']['username']['maxLength'],
@@ -359,11 +364,9 @@ class UsersController extends Controller
 			'email_address' => $this->controllerSettings['dataChecks']['email_address']['maxLength'],
 		);
 
-		$zones = $this->models->Timezone->get('*');
+		$zones = $this->models->Timezone->_get(array('id'=>'*'));
 
-        $roles = $this->models->Role->get(array(
-            'assignable' => 'y'
-        ));
+        $roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
 
 
 		$this->smarty->assign('maxLengths', $maxLengths);
@@ -376,7 +379,7 @@ class UsersController extends Controller
 
         $this->smarty->assign('freeModules', $freeModules);
 
-        $this->smarty->assign('data', $this->requestData);
+        if (isset($this->requestData)) $this->smarty->assign('data', $this->requestData);
         
         $this->printPage();
     
@@ -396,23 +399,25 @@ class UsersController extends Controller
         $this->setPageName(_('Project collaborator overview'));
         
         // get all collaborators for the current project
-        $pru = $this->models->ProjectRoleUser->get(
+        $pru = $this->models->ProjectRoleUser->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'role_id !=' => '1'
-			), 'distinct user_id, 
-				role_id,
-				if(active=1,"active","blocked") as status,
-				concat(datediff(curdate(),created)," '._('days').'") as days_active,
-				ifnull(last_project_select,"'._('(has never logged in)').'") as last_login'
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'role_id !=' => '1'
+				),
+				'columns' => 'distinct user_id, role_id,
+					if(active=1,"active","blocked") as status,
+					concat(datediff(curdate(),created)," '._('days').'") as days_active,
+					ifnull(last_project_select,"'._('(has never logged in)').'") as last_login'
+			)
 		);
 
         // get full details, as well as roles for each collaborator
         foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->get($val['user_id']);
+            $u = $this->models->User->_get(array('id'=>$val['user_id']));
 
-            $r = $this->models->Role->get($val['role_id']);
+            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
             
             $u['role'] = $r['role'];
             $u['role_id'] = $r['id'];
@@ -481,48 +486,58 @@ class UsersController extends Controller
         
         if ($this->isUserPartOfProject($this->requestData['id'], $this->getCurrentProjectId())) {
             
-            $user = $this->models->User->get($this->requestData['id']);
+            $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
             
             $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
 
-            $zone = $this->models->Timezone->get($user['timezone_id']);
+            $zone = $this->models->Timezone->_get(array('id'=>$user['timezone_id']));
 	
-			$modules = $this->models->ModuleProject->get(array(
-				'project_id' => $this->getCurrentProjectId()
-			), false, 'module_id asc');
+			$modules = $this->models->ModuleProject->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'order' => 'module_id asc'
+				)
+			);
 	
 			foreach ((array) $modules as $key => $val) {
 				
-				$mp = $this->models->Module->get($val['module_id']);
+				$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
 				
 				$modules[$key]['module'] = $mp['module'];
 				
 				$modules[$key]['description'] = $mp['description'];
 
-				$mpu = $this->models->ModuleProjectUser->get(array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $val['module_id'],
-					'user_id' => $this->requestData['id'],			
-				),'count(*) as total');
+				$mpu = $this->models->ModuleProjectUser->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'module_id' => $val['module_id'],
+							'user_id' => $this->requestData['id'],			
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
 
 				$modules[$key]['isAssigned'] = $mpu[0]['total']=='1';
 
 			}
 			
-			$freeModules = $this->models->FreeModuleProject->get(
-				array(
-					'project_id' => $this->getCurrentProjectId()
-				)
-			);
+			$freeModules = $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
 			foreach ((array) $freeModules as $key => $val) {
 				
-				$fpu = $this->models->FreeModuleProjectUser->get(
+				$fpu = $this->models->FreeModuleProjectUser->_get(
 					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'free_module_id' => $val['id'],
-						'user_id' => $this->requestData['id'],			
-					),'count(*) as total');
+						'id'=>array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'free_module_id' => $val['id'],
+							'user_id' => $this->requestData['id'],			
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
 				
 				$freeModules[$key]['isAssigned'] = $fpu[0]['total']=='1';
 
@@ -570,10 +585,12 @@ class UsersController extends Controller
             // user requested delete
             if (isset($this->requestData['delete']) && $this->requestData['delete'] == '1') {
                 
-				$pru = $this->models->ProjectRoleUser->get(
+				$pru = $this->models->ProjectRoleUser->_get(
 					array(
-						'user_id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId()
+						'id' => array(
+							'user_id' => $this->requestData['id'], 
+							'project_id' => $this->getCurrentProjectId()
+						)
 					)
 				);
 				
@@ -594,7 +611,7 @@ class UsersController extends Controller
             // user requested data update
                 
                 // make sure an unassignable role (like system admin) wasn't injected
-                if (isset($this->requestData['role_id'])) $r = $this->models->Role->get($this->requestData['role_id']);
+                if (isset($this->requestData['role_id'])) $r = $this->models->Role->_get(array('id'=>$this->requestData['role_id']));
                 
                 if (isset($r) && $r['assignable'] == 'n') {
                     
@@ -704,52 +721,60 @@ class UsersController extends Controller
             }
             
             // assign all data and print success or errors
-            $user = $this->models->User->get($this->requestData['id']);
+            $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
             
             $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
             
-            $roles = $this->models->Role->get(array(
-                'assignable' => 'y'
-            ));
+            $roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
 
-            $zones = $this->models->Timezone->get('*');
+            $zones = $this->models->Timezone->_get(array('id' => '*'));
 
-			$modules = $this->models->ModuleProject->get(array(
-				'project_id' => $this->getCurrentProjectId()
-			), false, 'module_id asc');
+			$modules = $this->models->ModuleProject->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					), 
+					'order' => 'module_id asc'
+				)
+			);
 	
 			foreach ((array) $modules as $key => $val) {
 				
-				$mp = $this->models->Module->get($val['module_id']);
+				$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
 				
 				$modules[$key]['module'] = $mp['module'];
 				
 				$modules[$key]['description'] = $mp['description'];
 
-				$mpu = $this->models->ModuleProjectUser->get(array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $val['module_id'],
-					'user_id' => $this->requestData['id'],			
-				),'count(*) as total');
+				$mpu = $this->models->ModuleProjectUser->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'module_id' => $val['module_id'],
+							'user_id' => $this->requestData['id'],			
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
 
 				$modules[$key]['isAssigned'] = $mpu[0]['total']=='1';
 
 			}
 			
-			$freeModules = $this->models->FreeModuleProject->get(
-				array(
-					'project_id' => $this->getCurrentProjectId()
-				)
-			);
+			$freeModules = $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
 
 			foreach ((array) $freeModules as $key => $val) {
 				
-				$fpu = $this->models->FreeModuleProjectUser->get(
+				$fpu = $this->models->FreeModuleProjectUser->_get(
 					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'free_module_id' => $val['id'],
-						'user_id' => $this->requestData['id'],			
-					),'count(*) as total');
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'free_module_id' => $val['id'],
+							'user_id' => $this->requestData['id'],			
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
 				
 				$freeModules[$key]['isAssigned'] = $fpu[0]['total']=='1';
 
@@ -883,13 +908,18 @@ class UsersController extends Controller
         
         $this->setPageName(_('Project overview'));
 
-		$modules = $this->models->ModuleProject->get(array(
-			'project_id' => $this->getCurrentProjectId()
-		), false, 'module_id asc');
+		$modules = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				), 
+				'order' => 'module_id asc'
+			)
+		);
 
 		foreach ((array) $modules as $key => $val) {
 			
-			$mp = $this->models->Module->get($val['module_id']);
+			$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
 			
 			$modules[$key]['icon'] = $mp['icon'];
 			$modules[$key]['module'] = $mp['module'];
@@ -897,9 +927,11 @@ class UsersController extends Controller
 
 		}
 
-		$freeModules = $this->models->FreeModuleProject->get(
+		$freeModules = $this->models->FreeModuleProject->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId()
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				)
 			)
 		);
 
@@ -1106,10 +1138,14 @@ class UsersController extends Controller
 
 
 		// avoiding orphans: see if collaborator is present in any other projects...
-		$data = $this->models->ProjectRoleUser->get(
+		$data = $this->models->ProjectRoleUser->_get(
 			array(
-				'user_id' => $id
-			), 'count(*) as tot');
+				'id' => array(
+					'user_id' => $id
+				), 
+				'columns' => 'count(*) as tot'
+			)
+		);
 		
 		// ...if not, delete entire collaborator record
 		if (isset($data) && $data[0]['tot'] == '0') {
@@ -1285,11 +1321,13 @@ class UsersController extends Controller
 
         if ($c) {
 
-            return $this->models->User->get(
-                array(
-                    'id' => $c,
-                    'active' => '1'
-                )
+            return $this->models->User->_get(
+				array(
+					'id' => array(
+						'id' => $c,
+						'active' => '1'
+					)
+				)
             );
 
         } else {
@@ -1312,10 +1350,14 @@ class UsersController extends Controller
     private function isUserPartOfProject ($user, $project)
     {
         
-        $pru = $this->models->ProjectRoleUser->get(array(
-            'user_id' => $user, 
-            'project_id' => $project
-        ));
+        $pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id'=> array(
+					'user_id' => $user, 
+					'project_id' => $project
+				)
+			)
+		);
         
         return count((array) $pru) != 0;
     
@@ -1334,14 +1376,18 @@ class UsersController extends Controller
     private function getUserProjectRole ($userId, $projectId)
     {
         
-        $pru = $this->models->ProjectRoleUser->get(array(
-            'user_id' => $userId, 
-            'project_id' => $projectId
-        ));
+        $pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id'=> array(
+					'user_id' => $userId, 
+					'project_id' => $projectId
+				)
+        	)
+		);
         
         if ($pru) {
             
-            $r = $this->models->Role->get($pru[0]['role_id']);
+            $r = $this->models->Role->_get(array('id'=>$pru[0]['role_id']));
             
             $pru[0]['role'] = $r;
         }
@@ -1690,7 +1736,7 @@ class UsersController extends Controller
             
             }
             
-            $users = $this->models->User->get($w);
+            $users = $this->models->User->_get(array('id'=>$w));
             
             if (count((array) $users) != 0) {
                 
@@ -1746,7 +1792,7 @@ class UsersController extends Controller
             
             }
             
-            $users = $this->models->User->get($w);
+            $users = $this->models->User->_get(array('id'=>$w));
             
             if (count((array) $users) != 0) {
                 
@@ -1804,7 +1850,7 @@ class UsersController extends Controller
                     and lower(last_name) = '" . $this->models->User->escapeString(strtolower($this->requestData['last_name'])) . "')
                     or email_address = '" . $this->models->User->escapeString($this->requestData['email_address']) . "')" . ($idToIgnore ? " and id !=" . $idToIgnore : '');
         
-        $users = $this->models->User->get($q);
+        $users = $this->models->User->_get(array('id'=>$q));
         
         return $users;
     

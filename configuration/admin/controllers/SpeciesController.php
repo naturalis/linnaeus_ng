@@ -138,22 +138,27 @@ class SpeciesController extends Controller
 
         $defaultLanguage = $_SESSION['project']['default_language_id'];
         
-        $pages = $this->models->PageTaxon->get(array(
-            'project_id' => $this->getCurrentProjectId()
-            ),
-            false,'show_order'
+        $pages = $this->models->PageTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'show_order'
+			)
         );
         
         foreach ((array) $pages as $key => $page) {
             
             foreach ((array) $lp as $k => $language) {
                 
-                $tpt = $this->models->PageTaxonTitle->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'page_id' => $page['id'], 
-                    'language_id' => $language['language_id']
-                ));
+                $tpt = $this->models->PageTaxonTitle->_get(
+					array(
+						'id' =>
+							array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'page_id' => $page['id'], 
+								'language_id' => $language['language_id']
+							)
+					)
+				);
                 
                 $pages[$key]['page_titles'][$language['language_id']] = $tpt[0]['title'];
             
@@ -190,10 +195,12 @@ class SpeciesController extends Controller
 
 		if (!empty($this->requestData['id'])) {
 
-			$t = $this->models->Taxon->get(
+			$t = $this->models->Taxon->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' =>$this->requestData['id']
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' =>$this->requestData['id']
+					)
 				)
 			);
 
@@ -209,11 +216,15 @@ class SpeciesController extends Controller
 
 		}
 
-		$ut = $this->models->UserTaxon->get(
+		$ut = $this->models->UserTaxon->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'user_id' => $this->getCurrentUserId()
-			),'taxon_id',false,false,true,'taxon_id'
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'user_id' => $this->getCurrentUserId()
+				),
+			'columns' => 'taxon_id',
+			'fieldAsIndex' => 'taxon_id'
+			)
 		);
 		
 		$this->getTaxonTree(null);
@@ -344,10 +355,14 @@ class SpeciesController extends Controller
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
             
-            $t = $this->models->Taxon->get(array(
-                'id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				)
+			);
             
             $taxon = $t[0];
             
@@ -362,7 +377,7 @@ class SpeciesController extends Controller
 	
 				foreach ((array) $lp as $key => $val) {
 					
-					$l = $this->models->Language->get($val['language_id']);
+					$l = $this->models->Language->_get(array('id'=>$val['language_id']));
 					
 					$lp[$key]['language'] = $l['language'];
 					
@@ -376,21 +391,21 @@ class SpeciesController extends Controller
 				$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
 	
 				// get the defined categories (just the page definitions, no content yet)
-				$tp = $this->models->PageTaxon->get(array(
+				$tp = $this->models->PageTaxon->_get(array('id'=>array(
 					'project_id' => $this->getCurrentProjectId()
-				));
+				)));
 	
 				foreach ((array) $tp as $key => $val) {
 					
 					foreach ((array) $lp as $k => $language) {
 						
 						// for each category in each language, get the category title
-						$tpt = $this->models->PageTaxonTitle->get(
-						array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $language['language_id'], 
-							'page_id' => $val['id']
-						));
+						$tpt = $this->models->PageTaxonTitle->_get(
+							array('id'=>array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'language_id' => $language['language_id'], 
+								'page_id' => $val['id']
+							)));
 						
 						$tp[$key]['titles'][$language['language_id']] = $tpt[0];
 					
@@ -466,11 +481,15 @@ class SpeciesController extends Controller
 		}
 
 		// get taxa assigned to user
-		$ut = $this->models->UserTaxon->get(
+		$ut = $this->models->UserTaxon->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'user_id' => $this->getCurrentUserId()
-			),'taxon_id',false,false,true,'taxon_id'
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'user_id' => $this->getCurrentUserId()
+				),
+				'columns' => 'taxon_id',
+				'fieldAsIndex' => 'taxon_id'
+			)
 		);
 
 		// get complete taxon tree
@@ -517,9 +536,12 @@ class SpeciesController extends Controller
 	
 			} else {
 		
-				$tp = $this->models->PageTaxon->get(array(
-					'project_id' => $this->getCurrentProjectId()
-				), 'count(*) as tot');
+				$tp = $this->models->PageTaxon->_get(
+					array(
+						'id'=> array('project_id' => $this->getCurrentProjectId()), 
+						'columns' => 'count(*) as tot'
+					)
+				);
 	
 				$_SESSION['project']['pages'] = $tp;
 			}
@@ -553,20 +575,28 @@ class SpeciesController extends Controller
 			
 				$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
 				
-				$ct = $this->models->ContentTaxon->get(
-				array(
-					'taxon_id' => $taxon['id'], 
-					'publish' => 1, 
-					'project_id' => $this->getCurrentProjectId()
-				), 'count(*) as tot');
+				$ct = $this->models->ContentTaxon->_get(
+					array(
+						'id' =>	array(
+							'taxon_id' => $taxon['id'], 
+							'publish' => 1, 
+							'project_id' => $this->getCurrentProjectId()
+						), 
+						'columns' => 'count(*) as tot'
+					)
+				);
 
 				$taxa[$key]['pct_finished'] = round(($ct[0]['tot'] / (count($lp) * $tp[0]['tot']))*100);
 
-				$mt = $this->models->MediaTaxon->get(
+				$mt = $this->models->MediaTaxon->_get(
 					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $taxon['id']
-					),'count(*) as total, mime_type',false,'mime_type'
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $taxon['id']
+						),
+						'columns' => 'count(*) as total, mime_type',
+						'group' => 'mime_type'
+					)
 				);
             
 				foreach((array)$mt as $mtkey => $mtval) {
@@ -648,10 +678,14 @@ class SpeciesController extends Controller
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
             
-            $t = $this->models->Taxon->get(array(
-                'id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				)
+			);
             
             $taxon = $t[0];
             
@@ -659,11 +693,14 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('id',$this->requestData['id']);
 
-            $media = $this->models->MediaTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(),
-                    'taxon_id' => $this->requestData['id']
-                ),false,'mime_type, file_name'
+            $media = $this->models->MediaTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+					'odrder' => 'mime_type, file_name'
+				)
             );
             
             
@@ -676,12 +713,14 @@ class SpeciesController extends Controller
             foreach((array)$media as $key => $val) {
 
 
-                $mdt = $this->models->MediaDescriptionsTaxon->get(
-                    array(
-                        'media_id' => $val['id'], 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $_SESSION['project']['default_language_id']
-                    )
+                $mdt = $this->models->MediaDescriptionsTaxon->_get(
+					array(
+						'id' => array(
+							'media_id' => $val['id'], 
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $_SESSION['project']['default_language_id']
+						)
+					)
                 );
                 
                 $val['description'] = $mdt[0]['description'];
@@ -728,10 +767,14 @@ class SpeciesController extends Controller
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
             
-            $t = $this->models->Taxon->get(array(
-                'id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				)
+			);
             
             $taxon = $t[0];
             
@@ -1126,7 +1169,13 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxonomic ranks'));
 
-		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()),false,'parent_id',false,true,'rank_id');
+		$pr = $this->models->ProjectRank->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'parent_id',
+				'fieldAsIndex' => 'rank_id'
+			)
+		);
 
 		if (isset($this->requestData['ranks'])) {
 
@@ -1166,10 +1215,12 @@ class SpeciesController extends Controller
 
 				if(!in_array($rank['rank_id'],$this->requestData['ranks'])) {
 
-					$pr = $this->models->ProjectRank->get(
+					$pr = $this->models->ProjectRank->_get(
 						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'rank_id' => $rank['rank_id']
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'rank_id' => $rank['rank_id']
+							)
 						)
 					);
 
@@ -1201,8 +1252,20 @@ class SpeciesController extends Controller
 
 		$r = 
 			array_merge(
-				$this->models->Rank->get(array('parent_id !=' => -1),false,'parent_id',false,true,'id'),
-				$this->models->Rank->get(array('parent_id' => -1),false,'parent_id',false,true,'id')
+				$this->models->Rank->_get(
+					array(
+						'id' => array('parent_id !=' => -1),
+						'order' => 'parent_id',
+						'fieldAsIndex' => 'id'
+					)
+				),
+				$this->models->Rank->_get(
+					array(
+						'id' => array('parent_id' => -1),
+						'order' => 'parent_id',
+						'fieldAsIndex' => 'id'
+					)
+				)
 			);
 
 		$pr = $this->getProjectRanks();
@@ -1265,18 +1328,26 @@ class SpeciesController extends Controller
 
         $defaultLanguage = $_SESSION['project']['default_language_id'];
         
-        $pages = $this->models->PageTaxon->get(array(
-            'project_id' => $this->getCurrentProjectId()
-            ),'*','show_order'
+        $pages = $this->models->PageTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => '*',
+				'order' => 'show_order'
+			)
         );
 
        foreach((array)$pages as $key => $val) {
 
-			$s = $this->models->Section->get(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'page_id' => $val['id'],
-			),'*, ifnull(show_order,999) as show_order','show_order');
+			$s = $this->models->Section->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'page_id' => $val['id'],
+					),
+					'columns' => '*, ifnull(show_order,999) as show_order',
+					'order' => 'show_order'
+				)
+			);
 			
 			$pages[$key]['sections'] = $s;
 
@@ -1326,19 +1397,21 @@ class SpeciesController extends Controller
 
 		}
 
-        $pru = $this->models->ProjectRoleUser->get(
+        $pru = $this->models->ProjectRoleUser->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'role_id !=' => '1',
-				'active' => 1
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'role_id !=' => '1',
+					'active' => 1
+				)
 			)
 		);
 
         foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->get($val['user_id']);
+            $u = $this->models->User->_get(array('id' => $val['user_id']));
 
-            $r = $this->models->Role->get($val['role_id']);
+            $r = $this->models->Role->_get(array('id' => $val['role_id']));
             
             $u['role'] = $r['role'];
             $u['role_id'] = $r['id'];
@@ -1349,15 +1422,16 @@ class SpeciesController extends Controller
 
         $this->getTaxonTree(null);
 
-		$ut = $this->models->UserTaxon->get(
-				array(
-					'project_id' => $this->getCurrentProjectId()
-					),false,'taxon_id'
-				);
+		$ut = $this->models->UserTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'taxon_id'
+			)
+		);
 
 		foreach((array)$ut as $key => $val) {
 
-			$ut[$key]['taxon'] = $this->models->Taxon->get($val['taxon_id']);
+			$ut[$key]['taxon'] = $this->models->Taxon->_get(array('id' => $val['taxon_id']));
 
 		}
 
@@ -1375,13 +1449,16 @@ class SpeciesController extends Controller
 	private function setProjectLanguages()
     {
 
-        $lp = $this->models->LanguageProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ),false,'def_language desc');
+        $lp = $this->models->LanguageProject->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'def_language desc'
+			)
+		);
         
         foreach ((array) $lp as $key => $val) {
             
-            $l = $this->models->Language->get($val['language_id']);
+            $l = $this->models->Language->_get(array('id'=>$val['language_id']));
             
             $lp[$key]['language'] = $l['language'];
             $lp[$key]['direction'] = $l['direction'];
@@ -1451,10 +1528,11 @@ class SpeciesController extends Controller
     private function createStandardCategories() 
     {    
 
-        $tp = $this->models->PageTaxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId()
-            ),'count(*) as total'
+        $tp = $this->models->PageTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total'
+			)
         );
         
 
@@ -1472,11 +1550,14 @@ class SpeciesController extends Controller
 
                 if (isset($page['mandatory']) && $page['mandatory']===true) {
 
-                    $d = $this->models->PageTaxon->get(
-                        array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'page' => $page['name'], 
-                        ),'count(*) as total'
+                    $d = $this->models->PageTaxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'page' => $page['name'], 
+							),
+							'columns' => 'count(*) as total'
+						)
                     );
 
                     if ($d[0]['total']==0) {
@@ -1534,20 +1615,23 @@ class SpeciesController extends Controller
         if (empty($taxonId))
             return false;
         
-        $h = $this->models->Heartbeat->get(
-        array(
-            'project_id =' => $this->getCurrentProjectId(), 
-            'app' => $this->getAppName(), 
-            'ctrllr' => 'species', 
-            'view' => 'edit', 
-            'params' => serialize(array(
-                array(
-                    'taxon_id', 
-                    $taxonId
-                )
-            )), 
-            'user_id !=' => $this->getCurrentUserId()
-        ));
+        $h = $this->models->Heartbeat->_get(
+			array(
+				'id' => array(
+					'project_id =' => $this->getCurrentProjectId(), 
+					'app' => $this->getAppName(), 
+					'ctrllr' => 'species', 
+					'view' => 'edit', 
+					'params' => serialize(array(
+						array(
+							'taxon_id', 
+							$taxonId
+						)
+					)), 
+					'user_id !=' => $this->getCurrentUserId()
+				)
+			)
+		);
         
         return isset($h) ? true : false;
     
@@ -1555,7 +1639,7 @@ class SpeciesController extends Controller
 
     private function ajaxActionDeletePage ()
     {
-        
+
 	if (empty($this->requestData['id'])) {
 		
 		return;
@@ -1596,13 +1680,21 @@ class SpeciesController extends Controller
         
         } else {
 		
-			$l = $this->models->Language->get($this->requestData['language'],'direction');
-
-			$ptt = $this->models->PageTaxonTitle->get(
+			$l = $this->models->Language->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'language_id' => $this->requestData['language']
-				),'id,title,page_id,language_id,\''.$l['direction'].'\' as direction'
+					'id' => $this->requestData['language'],
+					'columns' => 'direction'
+				)
+			);
+
+			$ptt = $this->models->PageTaxonTitle->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language']
+					),
+					'columns' => 'id,title,page_id,language_id,\''.$l['direction'].'\' as direction'
+				)
 			);
                 
             $this->smarty->assign('returnText', json_encode($ptt));
@@ -1633,12 +1725,15 @@ class SpeciesController extends Controller
             
             } else {
                 
-                $tpt = $this->models->PageTaxonTitle->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'page_id' => $this->requestData['id']
-                ));
+                $tpt = $this->models->PageTaxonTitle->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'], 
+							'page_id' => $this->requestData['id']
+						)
+					)
+				);
                 
                 $this->models->PageTaxonTitle->save(
                 array(
@@ -1663,13 +1758,11 @@ class SpeciesController extends Controller
         $d = $data[0];
         
         // only back up if something changed (and we ignore the 'publish' setting)
-        if (($d['content'] == $newdata['content']) && ($d['title'] == $newdata['title']))
-            return;
+        if ($d['content'] == $newdata['content']) return;
         
         $d['save_type'] = $mode;
         
-        if ($label)
-            $d['save_label'] = $label;
+        if ($label) $d['save_label'] = $label;
         
         $d['content_taxa_id'] = $d['id'];
         
@@ -1700,9 +1793,8 @@ class SpeciesController extends Controller
             
             $taxonId = $this->models->Taxon->getNewId();
         
-        }
+        } else {
         // existing taxon 
-        else {
             
             $d = true;
             
@@ -1710,8 +1802,8 @@ class SpeciesController extends Controller
         
         }
         
-        // save of new taxon succeded, or existing taxon
         if ($d) {
+        // save of new taxon succeded, or existing taxon
             
             // must have a language
             if (!empty($this->requestData['language'])) {
@@ -1734,19 +1826,22 @@ class SpeciesController extends Controller
                             'language_id' => $this->requestData['language'], 
                             'page_id' => $this->requestData['page']
                         ));
-                        
+
                         $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $this->requestData['save_type']);
                     
                     } else {
                         
                         // see if such content already exists
-                        $ct = $this->models->ContentTaxon->get(
-                        array(
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'taxon_id' => $taxonId, 
-                            'language_id' => $this->requestData['language'], 
-                            'page_id' => $this->requestData['page']
-                        ));
+                        $ct = $this->models->ContentTaxon->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(), 
+									'taxon_id' => $taxonId, 
+									'language_id' => $this->requestData['language'], 
+									'page_id' => $this->requestData['page']
+								)
+							)
+						);
                         
                         $id = count((array) $ct) != 0 ? $ct[0]['id'] : null;
                         
@@ -1786,12 +1881,15 @@ class SpeciesController extends Controller
                         $defaultLanguage = $_SESSION['project']['default_language_id'];
 
                         // get the main page content for the default language
-                        $ct = $this->models->ContentTaxon->get(
-                        array(
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'taxon_id' => $taxonId, 
-                            'language_id' => $defaultLanguage
-                        ));
+                        $ct = $this->models->ContentTaxon->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(), 
+									'taxon_id' => $taxonId, 
+									'language_id' => $defaultLanguage
+								)
+							)
+						);
                         
                         // save the title of that page as taxon name in the taxon table
                         $this->models->Taxon->save(
@@ -1872,13 +1970,16 @@ class SpeciesController extends Controller
         }
         else {
             
-            $ct = $this->models->ContentTaxon->get(
-            array(
-                'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId(), 
-                'language_id' => $this->requestData['language'], 
-                'page_id' => $this->requestData['page']
-            ));
+            $ct = $this->models->ContentTaxon->_get(
+				array(
+					'id' => array(
+						'taxon_id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'page_id' => $this->requestData['page']
+					)
+				)
+			);
             
             if (empty($ct[0])) {
                 
@@ -1914,11 +2015,13 @@ class SpeciesController extends Controller
         
         } else {
 
-            $mt = $this->models->MediaTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'taxon_id' => $this->requestData['id']
-                )
+            $mt = $this->models->MediaTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $this->requestData['id']
+					)
+				)
             );
 
             foreach((array)$mt as $key => $val) {
@@ -1948,12 +2051,16 @@ class SpeciesController extends Controller
     {
         
         // see if such content already exists
-        $ct = $this->models->ContentTaxon->get(
-        array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $this->requestData['id'], 
-            'language_id' => $this->requestData['language']
-        ), 'page_id,publish');
+        $ct = $this->models->ContentTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $this->requestData['id'], 
+					'language_id' => $this->requestData['language']
+				), 
+				'columns' => 'page_id,publish'
+			)
+		);
         
         foreach ((array) $ct as $key => $val) {
             
@@ -1972,47 +2079,54 @@ class SpeciesController extends Controller
     private function ajaxActionPublishContent ()
     {
         
-        if (empty($this->requestData['id']) || empty($this->requestData['language']) || empty($this->requestData['page']) || !isset($this->requestData['state'])) {
+        if (
+			empty($this->requestData['id']) || 
+			empty($this->requestData['language']) || 
+			empty($this->requestData['page']) || 
+			!isset($this->requestData['state'])) {
             
-            $this->smarty->assign('returnText', '<error>');
+            $this->smarty->assign('returnText', _('Parameters incomplete.'));
         
-        }
-        else {
+        } else {
             
-            $ct = $this->models->ContentTaxon->get(
-            array(
-                'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId(), 
-                'language_id' => $this->requestData['language'], 
-                'page_id' => $this->requestData['page']
-            ));
-            
+            $ct = $this->models->ContentTaxon->_get(
+				array(
+					'id' => array(
+						'taxon_id' => $this->requestData['id'], 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'page_id' => $this->requestData['page']
+					)
+				)
+			);
+
             if (!empty($ct[0])) {
                 
-                $d = $this->models->ContentTaxon->update(array(
-                    'publish' => $this->requestData['state']
-                ), 
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'taxon_id' => $this->requestData['id'], 
-                    'language_id' => $this->requestData['language'], 
-                    'page_id' => $this->requestData['page']
-                ));
+                $d = $this->models->ContentTaxon->update(
+					array(
+						'publish' => $this->requestData['state']
+					), 
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $this->requestData['id'], 
+						'language_id' => $this->requestData['language'], 
+						'page_id' => $this->requestData['page']
+					)
+				);
                 
                 if ($d) {
                     
                     $this->smarty->assign('returnText', '<ok>');
                 
-                }
-                else {
+                } else {
                     
-                    $this->smarty->assign('returnText', '<error>');
+                    $this->smarty->assign('returnText', _('Could not save new publish state.'));
                 
                 }
             
             } else {
                 
-                $this->smarty->assign('returnText', '<error>');
+                $this->smarty->assign('returnText', _('Content not found.'));
             
             }
         
@@ -2023,38 +2137,31 @@ class SpeciesController extends Controller
     private function ajaxActionGetTaxonUndo ()
     {
         
-        if (empty($this->requestData['id']) || empty($this->requestData['language']) || empty($this->requestData['page'])) {
+//        if (empty($this->requestData['id']) || empty($this->requestData['language']) || empty($this->requestData['page'])) {
+        if (empty($this->requestData['id'])) {
             
             return;
         
         } else {
             
 
-            $ctu = $this->models->ContentTaxonUndo->get(
-            array(
-                'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId(), 
-                'language_id' => $this->requestData['language'], 
-                'page_id' => $this->requestData['page']
-            ), false, 'content_last_change desc');
-/*            
-            $ctu = $this->models->ContentTaxonUndo->get(
-            array(
-                'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId(), 
-                'language_id' => $this->requestData['language'], 
-                'page_id' => $this->requestData['page'], 
-                'content_last_change' => $ctu[0]['last_change']
-            ));
-*/
+            $ctu = $this->models->ContentTaxonUndo->_get(
+				array(
+					'id' => 
+						array(
+							'taxon_id' => $this->requestData['id'], 
+							'project_id' => $this->getCurrentProjectId()
+						),
+					'order' => 'content_last_change desc',
+					'limit' => 1
+					)
+				);
+
             if ($ctu) {
                 
                 $d = $ctu[0];
                 
-                $this->models->ContentTaxonUndo->delete(array(
-                    'id' => $d['id'], 
-                    'project_id' => $this->getCurrentProjectId()
-                ));
+                $this->models->ContentTaxonUndo->delete($d['id']);
                 
                 $d['id'] = $d['content_taxa_id'];
                 unset($d['content_taxa_id']);
@@ -2086,14 +2193,16 @@ class SpeciesController extends Controller
 
 		} else {
 
-			$r = $this->models->Rank->get(array('rank' => $taxon['taxon_rank']));
+			$r = $this->models->Rank->_get(array('id' => array('rank' => $taxon['taxon_rank'])));
 
 			if ($r==false) return;
 
-			$pr = $this->models->ProjectRank->get(
+			$pr = $this->models->ProjectRank->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'rank_id' => $r[0]['id']
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'rank_id' => $r[0]['id']
+					)
 				)
 			);
 
@@ -2103,10 +2212,12 @@ class SpeciesController extends Controller
 
 		if (!$rankId) return;
 
-        $t = $this->models->Taxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId(),
-                'taxon' => $taxon['taxon_name']
+        $t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => $taxon['taxon_name']
+				)
             )
         );
         
@@ -2116,11 +2227,13 @@ class SpeciesController extends Controller
             if (!empty($taxon['parent_taxon_name'])) {
 
                 // see if the parent taxon already exists
-                $p = $this->models->Taxon->get(
-                    array(
-                        'project_id' => $this->getCurrentProjectId(),
-                        'taxon' => $taxon['parent_taxon_name']
-                    )
+                $p = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon' => $taxon['parent_taxon_name']
+						)
+					)
                 );
 
             }
@@ -2157,11 +2270,13 @@ class SpeciesController extends Controller
                 if (empty($t[0]['parent_id']) && !empty($taxon['parent_taxon_name'])) {
 
                     // see if the parent taxon already exists
-                    $p = $this->models->Taxon->get(
-                        array(
-                            'project_id' => $this->getCurrentProjectId(),
-                            'taxon' => $taxon['parent_taxon_name']
-                        )
+                    $p = $this->models->Taxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon' => $taxon['parent_taxon_name']
+							)
+						)
                     );
 
                     if (isset($p) && count((array)$p)==1) {
@@ -2198,21 +2313,27 @@ class SpeciesController extends Controller
 
 		if ($idToIgnore) {
 
-			$t = $this->models->Taxon->get(
+			$t = $this->models->Taxon->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon' => trim($taxonName),
-					'id != ' => $idToIgnore,
-				),'count(*) as total',false,false,true
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon' => trim($taxonName),
+						'id != ' => $idToIgnore,
+					),
+					'columns' => 'count(*) as total'
+				)
 			);
 
 		} else {
 		
-			$t = $this->models->Taxon->get(
+			$t = $this->models->Taxon->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon' => trim($taxonName)
-				),'count(*) as total',false,false,true
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon' => trim($taxonName)
+					),
+					'columns' => 'count(*) as total'
+				)
 			);
 
 		}
@@ -2239,11 +2360,14 @@ class SpeciesController extends Controller
 
         if (empty($this->requestData['taxon_name']) || empty($this->requestData['taxon_id'])) return;
 
-        $t = $this->models->Taxon->get(
-            array(
-                'project_id' => $this->getCurrentProjectId(),
-                'id' => $this->requestData['taxon_id']
-            ),'count(*) as total'
+        $t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $this->requestData['taxon_id']
+	            ),
+				'columns' => 'count(*) as total'
+			)
         );
 
         if ($t[0]['total']>0) {
@@ -2300,23 +2424,29 @@ class SpeciesController extends Controller
     private function getDefaultPageSections($pageId,$languageId)
     {
 	
-        $s = $this->models->Section->get(
-            array(
-            'page_id' => $pageId,
-            'project_id' => $this->getCurrentProjectId()
-            ),false,'show_order asc'
+        $s = $this->models->Section->_get(
+			array(
+				'id' =>  array(
+					'page_id' => $pageId,
+					'project_id' => $this->getCurrentProjectId()
+            	),
+				'order' => 'show_order asc'
+			)
         );
 		
         $b = '';
 
 		foreach((array)$s as $key => $val) {
 		
-			$ls = $this->models->LabelSection->get(
+			$ls = $this->models->LabelSection->_get(
 				array(
-				'section_id' => $val['id'],
-				'project_id' => $this->getCurrentProjectId(),
-				'language_id' => $languageId
-				),'label'
+					'id' => array(
+						'section_id' => $val['id'],
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $languageId
+						),
+					'columns' => 'label'
+				)
 			);
 			
 			if ($ls[0]['label']) $b .= '<p><span class="taxon-section-head">'.$ls[0]['label'].'</span></p><br />'.chr(10);
@@ -2347,11 +2477,13 @@ class SpeciesController extends Controller
             
             } else {
                 
-                $mdt = $this->models->MediaDescriptionsTaxon->get(
-                    array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->requestData['language'], 
-                        'media_id' => $this->requestData['id']
+                $mdt = $this->models->MediaDescriptionsTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'], 
+							'media_id' => $this->requestData['id']
+						)
                     )
                 );
                 
@@ -2382,12 +2514,15 @@ class SpeciesController extends Controller
 
         } else {
             
-            $mdt = $this->models->MediaDescriptionsTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'media_id' => $this->requestData['id']
-                ));
+            $mdt = $this->models->MediaDescriptionsTaxon->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'media_id' => $this->requestData['id']
+					)
+				)
+			);
 
             $this->smarty->assign('returnText', $mdt[0]['description']);
         
@@ -2404,19 +2539,27 @@ class SpeciesController extends Controller
 
         } else {
             
-            $mt = $this->models->MediaTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                ),'id');
+            $mt = $this->models->MediaTaxon->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(), 
+					),
+					'columns' => 'id'
+				)
+			);
 
             foreach((array)$mt as $key => $val) {
 
-                $mdt = $this->models->MediaDescriptionsTaxon->get(
-                    array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->requestData['language'],
-                        'media_id' => $val['id']
-                    ),'description');
+                $mdt = $this->models->MediaDescriptionsTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'],
+							'media_id' => $val['id']
+						),
+						'columns' => 'description'
+					)
+				);
 
                 $mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
             }
@@ -2442,10 +2585,12 @@ class SpeciesController extends Controller
 
         } else {
 
-            $mt = $this->models->MediaTaxon->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
+            $mt = $this->models->MediaTaxon->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $id
+					)
                 )
             );
 			
@@ -2511,11 +2656,13 @@ class SpeciesController extends Controller
 
             } else {
                 
-                $lpr = $this->models->LabelProjectRank->get(
+                $lpr = $this->models->LabelProjectRank->_get(
 					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
-						'project_rank_id' => $this->requestData['id']
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'], 
+							'project_rank_id' => $this->requestData['id']
+						)
 					)
 				);
                 
@@ -2545,13 +2692,21 @@ class SpeciesController extends Controller
             return;
         
         } else {
-			$l = $this->models->Language->get($this->requestData['language'],'direction');
-
-			$lpr = $this->models->LabelProjectRank->get(
+			$l = $this->models->Language->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'language_id' => $this->requestData['language']
-				),'*, \''.$l['direction'].'\' as direction'
+					'id' => $this->requestData['language'],
+					'columns' => 'direction'
+				)
+			);
+
+			$lpr = $this->models->LabelProjectRank->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language']
+						),
+					'columns' => '*, \''.$l['direction'].'\' as direction'
+				)
 			);
                 
             $this->smarty->assign('returnText', json_encode($lpr));
@@ -2563,11 +2718,16 @@ class SpeciesController extends Controller
 	private function getProjectRanks($includeLanguageLabels=false)
 	{
 
-		$pr = $this->models->ProjectRank->get(array('project_id' => $this->getCurrentProjectId()),false,'rank_id');
+		$pr = $this->models->ProjectRank->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'rank_id'
+			)
+		);
 
 		foreach((array)$pr as $rankkey => $rank) {
 
-			$r = $this->models->Rank->get($rank['rank_id']);
+			$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
 
 			$pr[$rankkey]['rank'] = $r['rank'];
 
@@ -2577,12 +2737,15 @@ class SpeciesController extends Controller
 
 				foreach((array)$_SESSION['project']['languages'] as $langaugekey => $language) {
 	
-					$lpr = $this->models->LabelProjectRank->get(
+					$lpr = $this->models->LabelProjectRank->_get(
 						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'project_rank_id' => $rank['id'],
-							'language_id' => $language['language_id']
-						),'label'
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'project_rank_id' => $rank['id'],
+								'language_id' => $language['language_id']
+							),
+							'columns' => 'label'
+						)
 					);
 					
 					$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
@@ -2612,9 +2775,9 @@ class SpeciesController extends Controller
         
         } else {
 
-			$d = $this->models->Taxon->get($id);
+			$d = $this->models->Taxon->_get(array('id' => $id));
 
-			$d = $this->models->ProjectRank->get(array('parent_id' => $d['rank_id']));
+			$d = $this->models->ProjectRank->_get(array('id' => array('parent_id' => $d['rank_id'])));
 			
 			$result = $d[0]['id'] ? $d[0]['id'] : -1;
 			
@@ -2636,9 +2799,9 @@ class SpeciesController extends Controller
 	private function canRankBeHybrid($projectRankId)
 	{
 
-		$d = $this->models->ProjectRank->get($projectRankId);
+		$d = $this->models->ProjectRank->_get(array('id' => $projectRankId));
 
-		$r = $this->models->Rank->get($d['rank_id']);
+		$r = $this->models->Rank->_get(array('id' => $d['rank_id']));
 
 		return ($r['can_hybrid']==1);
 
@@ -2665,12 +2828,15 @@ class SpeciesController extends Controller
             
             } else {
                 
-                $ls = $this->models->LabelSection->get(
-                array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'language_id' => $this->requestData['language'], 
-                    'section_id' => $this->requestData['id']
-                ));
+                $ls = $this->models->LabelSection->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'], 
+							'section_id' => $this->requestData['id']
+						)
+					)
+				);
                 
                 $this->models->LabelSection->save(
 					array(
@@ -2725,13 +2891,21 @@ class SpeciesController extends Controller
         
         } else {
 
-			$l = $this->models->Language->get($this->requestData['language'],'direction');
-
-			$ls = $this->models->LabelSection->get(
+			$l = $this->models->Language->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'language_id' => $this->requestData['language'],
-				),'*, \''.$l['direction'].'\' as direction'
+					'id' => $this->requestData['language'],
+					'columns' => 'direction'
+				)
+			);
+
+			$ls = $this->models->LabelSection->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'],
+						),
+					'columns' => '*, \''.$l['direction'].'\' as direction'
+				)
 			);
    
             $this->smarty->assign('returnText', json_encode($ls));
@@ -2745,19 +2919,24 @@ class SpeciesController extends Controller
 	
 		if ($dir != 'up' && $dir != 'down') return;
 
-		$t1 = $this->models->Taxon->get(
+		$t1 = $this->models->Taxon->_get(
 			array(
-				'id' => $id,
-				'project_id' => $this->getCurrentProjectId()
+				'id' => array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId()
+				)
 			)
 		);
 
-		$t2 = $this->models->Taxon->get(
+		$t2 = $this->models->Taxon->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'rank_id' => $t1[0]['rank_id'],
-				'taxon_order '.($dir=='up' ? '<' : '>') => $t1[0]['taxon_order']
-			),false,'taxon_order '.($dir=='up' ? 'desc' : 'asc')
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'rank_id' => $t1[0]['rank_id'],
+					'taxon_order '.($dir=='up' ? '<' : '>') => $t1[0]['taxon_order']
+				),
+				'order' => 'taxon_order '.($dir=='up' ? 'desc' : 'asc')
+			)
 		);
 
 		if (count((array)$t2)!=0) {
