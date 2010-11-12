@@ -38,7 +38,7 @@ function userCreateUserFromSession() {
 
 function userDeleteUser(id) {
 
-	if (confirm('Are you sure?')) { 
+	if (confirm(_('Are you sure?'))) { 
 		$('#delete').val('1'); 
 		$('#id').val(id); 
 		$('#deleteForm').submit(); 
@@ -51,7 +51,7 @@ function userRemoteValueCheck(ele,values,tests,idti) {
 
 	if (values[0].length==0) {
 
-		$('#'+ele+'-message').html(ele=='password' || ele=='password_2' ? '(leave blank to leave unchanged)' : '');
+		$('#'+ele+'-message').html(ele=='password' || ele=='password_2' ? _('(leave blank to leave unchanged)') : '');
 		$('#'+ele+'-message').removeClass().addClass('password-neutral');
 		return;
 
@@ -96,7 +96,7 @@ function userRemoteValueCheck(ele,values,tests,idti) {
 			if (ele=='password') {
 				if (data.match(/\<*\>/)) {
 					$('#'+ele+'-message').removeClass().addClass('password-'+data.replace(/[<>]/gi,''));
-					$('#'+ele+'-message').html('Password strength: '+data.replace(/[<>]/gi,''));
+					$('#'+ele+'-message').html(_('Password strength:')+' '+data.replace(/[<>]/gi,''));
 				} else {
 					$('#'+ele+'-message').removeClass().addClass('password-neutral');
 					$('#'+ele+'-message').html(data);

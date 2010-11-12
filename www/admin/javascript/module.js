@@ -14,13 +14,14 @@ function moduleAddProjectFreeModule(module) {
 	moduleFreeModules[moduleFreeModules.length] = module;
 }
 
+
 function moduleDrawModuleBlock() {
 
 	var b = '<table>'+
 			'<tr>'+
-				'<td class="cell-module-header-module">Module</td>'+
-				'<td class="cell-module-header-status">Status</td>'+
-				'<td class="cell-module-header-actions" colspan="2">Actions</td>'+
+				'<td class="cell-module-header-module">'+_('Module')+'</td>'+
+				'<td class="cell-module-header-status">'+_('Status')+'</td>'+
+				'<td class="cell-module-header-actions" colspan="2">'+_('Actions')+'</td>'+
 			'</tr>';
 	
 	for(var i=0;i<moduleModules.length;i++) {
@@ -32,16 +33,15 @@ function moduleDrawModuleBlock() {
 					'<span class="module-title">'+moduleModules[i][1]+'</span> - '+moduleModules[i][2]+'</span>'+
 				'</td>'+
 				'<td>'+
-					(moduleModules[i][4]=='-' ? 'not' : '' )+
-					' part of the project'+
-					(moduleModules[i][3]=='y' ? '; published' : (moduleModules[i][4]!='-' ? '; unpublished' : '') )+
+					(moduleModules[i][4]=='-' ? _('not part of the project') : _('part of the project') )+
+					(moduleModules[i][3]=='y' ? '; '+_('published') : (moduleModules[i][4]!='-' ? '; '+_('unpublished') : '') )+
 				'</td>'+
 				'<td'+(moduleModules[i][4]=='-' ? '' : ' onclick="'+
 						(moduleModules[i][3]=='y' ? 'moduleUnpublishModule('+moduleModules[i][0]+')' : 'modulePublishModule('+moduleModules[i][0]+')')+'"')+'>'+
-						(moduleModules[i][4]=='-' ? '' : '[<span class="pseudo-a">'+(moduleModules[i][3]=='y' ? 'unpublish' : 'publish')+'</span>]')+
+						(moduleModules[i][4]=='-' ? '' : '[<span class="pseudo-a">'+(moduleModules[i][3]=='y' ? _('unpublish') : _('publish') )+'</span>]')+
 				'</td>'+
 				'<td onclick="'+(moduleModules[i][4]=='-' ? 'moduleActivateModule('+moduleModules[i][0]+')' : 'moduleDeleteModule('+moduleModules[i][0]+')' )+'">'+
-					'[<span class="pseudo-a">'+(moduleModules[i][4]=='-' ? 'add' : 'delete' )+'</span>]'+
+					'[<span class="pseudo-a">'+(moduleModules[i][4]=='-' ? _('add') : _('delete') )+'</span>]'+
 				'</td>'+
 			'</tr>';
 	}
@@ -54,11 +54,13 @@ function moduleDrawModuleBlock() {
 
 function moduleDrawFreeModuleBlock() {
 
+
+
 	var b = '<table>'+
 			'<tr>'+
-				'<td class="cell-module-header-module">Module</td>'+
-				'<td class="cell-module-header-status">Status</td>'+
-				'<td class="cell-module-header-actions" colspan="2">Actions</td>'+
+				'<td class="cell-module-header-module">'+_('Module')+'</td>'+
+				'<td class="cell-module-header-status">'+_('Status')+'</td>'+
+				'<td class="cell-module-header-actions" colspan="2">'+_('Actions')+'</td>'+
 			'</tr>';
 	
 	for(var i=0;i<moduleFreeModules.length;i++) {
@@ -70,13 +72,13 @@ function moduleDrawFreeModuleBlock() {
 					'<span class="module-title">'+moduleFreeModules[i][1]+'</span>'+
 				'</td>'+
 				'<td>part of the project; '+
-					(moduleFreeModules[i][2]=='y' ? 'published' : 'unpublished')+
+					(moduleFreeModules[i][2]=='y' ? _('published') : _('unpublished') )+
 				'</td>'+
 				'<td onclick="'+(moduleFreeModules[i][2]=='y' ? 'moduleUnpublishFreeModule('+moduleFreeModules[i][0]+')' : 'modulePublishFreeModule('+moduleFreeModules[i][0]+')')+'">'+
-					'[<span class="pseudo-a">'+(moduleFreeModules[i][2]=='y' ? 'unpublish' : 'publish')+'</span>]'+
+					'[<span class="pseudo-a">'+(moduleFreeModules[i][2]=='y' ? _('unpublish') : _('publish') )+'</span>]'+
 				'</td>'+
 				'<td onclick="moduleDeleteFreeModule('+moduleFreeModules[i][0]+');">'+
-					'[<span class="pseudo-a">delete</span>]'+
+					'[<span class="pseudo-a">'+_('delete')+'</span>]'+
 				'</td>'+
 			'</tr>';
 	}
@@ -281,7 +283,8 @@ function moduleBuildModuleUserBlock(type) {
 							moduleUsers[j][1]+'</td><td>'+moduleUsers[j][2]+'</td>'+
 							'<td title="remove collaborator" class="cell-moduser-remove"'+
 							'id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'b"'+
-							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'remove\',\''+type+'\')">[<span class="pseudo-a">remove as collaborator</span>]</td>';
+							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'remove\',\''+type+'\')">'+
+							'[<span class="pseudo-a">'+_('remove as collaborator')+'</span>]</td>';
 						
 					} else {
 					
@@ -289,10 +292,12 @@ function moduleBuildModuleUserBlock(type) {
 							moduleUsers[j][1]+'</td><td>'+moduleUsers[j][2]+'</td>'+
 							'<td title="add collaborator" class="cell-moduser-inactive"'+
 							'id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'b"'+
-							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'add\',\''+type+'\')">[<span class="pseudo-a">add as collaborator</span>]</td>';
+							'onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+','+moduleUsers[j][0]+',\'add\',\''+type+'\')">'+
+							'[<span class="pseudo-a">'+_('add as collaborator')+'</span>]</td>';
 					}
 					
-					b = b + '<td onclick="window.open(\'../users/edit.php?id='+moduleUsers[j][0]+'\',\'_self\');">[<span class="pseudo-a">edit user</span>]</td>';
+					b = b + '<td onclick="window.open(\'../users/edit.php?id='+moduleUsers[j][0]+'\',\'_self\');">'+
+					'[<span class="pseudo-a">'+_('edit user')+'</span>]</td>';
 
 				}
 
@@ -302,8 +307,9 @@ function moduleBuildModuleUserBlock(type) {
 
 		}
 
-		b = b + '<tr><td></td><td onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+',moduleUsers,\'add\',\''+type+'\');">[<span class="pseudo-a">add all collaborators</span>]</td></tr>';		
-		b = b +'</table></td></tr>';
+		b = b + '<tr><td></td><td onclick="moduleChangeModuleUserStatus('+theseModules[i][0]+',moduleUsers,\'add\',\''+type+'\');">'+
+			'[<span class="pseudo-a">'+_('add all collaborators')+'</span>]</td></tr>'+		
+			'</table></td></tr>';
 	}
 	
 	b = '<table>'+b+'</table>';

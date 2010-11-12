@@ -15,7 +15,7 @@
 				<span id="message-container" style="margin-right:10px">&nbsp;</span>
 				<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
 				<input type="button" value="{t}preview{/t}" onclick="alert('working on it');" style="margin-right:5px" />
-				<input type="button" value="{t}undo{/t}!?!?!" onclick="taxonGetUndo()" style="margin-right:5px" />
+				<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
 				<input type="button" value="{t}delete{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
 				<input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" />
 			</span>

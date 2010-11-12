@@ -94,8 +94,7 @@ class UtilitiesController extends Controller
     public function ajaxInterfaceAction ()
     {
         
-        if (!isset($this->requestData['action']))
-            return;
+        if (!isset($this->requestData['action'])) return;
         
         if ($this->requestData['action'] == 'heartbeat') {
             
@@ -106,6 +105,11 @@ class UtilitiesController extends Controller
             
             $this->ajaxActionGetTaxaEditStates();
         
+        }
+        else if ($this->requestData['action'] == 'translate') {
+            
+			$this->smarty->assign('returnText',$this->javascriptTranslate($this->requestData['text']));
+
         }
         
         $this->printPage();
@@ -118,10 +122,10 @@ class UtilitiesController extends Controller
     {
         
         $this->models->Heartbeat->delete(
-        "delete from %table% 
-                    where project_id = " . $this->getCurrentProjectId() . "
-                        and last_change <= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 2000) . ",CURRENT_TIMESTAMP)");
-    
+	        "delete from %table%  where project_id = " . $this->getCurrentProjectId() . 
+			" and last_change <= TIMESTAMPADD(microsecond,-" . 
+			($this->generalSettings['heartbeatFrequency'] * 2000) . ",CURRENT_TIMESTAMP)");
+
     }
 
 
@@ -129,33 +133,27 @@ class UtilitiesController extends Controller
     private function ajaxActionHeartbeat ()
     {
         
-        if (empty($this->requestData["user_id"]) || empty($this->requestData["app"]) || empty($this->requestData["ctrllr"]) || empty($this->requestData["view"]))
-            return;
+        if (
+			empty($this->requestData["user_id"]) || 
+			empty($this->requestData["app"]) || 
+			empty($this->requestData["ctrllr"]) || 
+			empty($this->requestData["view"])
+		) return;
         
-        if (!empty($this->requestData["params"]))
-            $this->requestData["params"] = serialize($this->requestData["params"]);
-        /*
-        $h = $this->models->Heartbeat->get(
-        array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'user_id' => $this->requestData["user_id"], 
-            'app' => $this->requestData["app"], 
-            'ctrllr' => $this->requestData["ctrllr"], 
-            'view' => $this->requestData["view"], 
-            'params' => $this->requestData["params"]
-        ));
-        */
+        if (!empty($this->requestData["params"])) $this->requestData["params"] = serialize($this->requestData["params"]);
+
         $this->models->Heartbeat->save(
-        array(
-            'id' => null, //$h[0]['id'] ? $h[0]['id'] : null, 
-            'project_id' => $this->getCurrentProjectId(), 
-            'user_id' => $this->requestData["user_id"], 
-            'app' => $this->requestData["app"], 
-            'ctrllr' => $this->requestData["ctrllr"], 
-            'view' => $this->requestData["view"], 
-            'params' => $this->requestData["params"], 
-            'last_change' => 'CURRENT_TIMESTAMP'
-        ));
+			array(
+				'id' => null, //$h[0]['id'] ? $h[0]['id'] : null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $this->requestData["user_id"], 
+				'app' => $this->requestData["app"], 
+				'ctrllr' => $this->requestData["ctrllr"], 
+				'view' => $this->requestData["view"], 
+				'params' => $this->requestData["params"], 
+				'last_change' => 'CURRENT_TIMESTAMP'
+			)
+		);
     
     }
 
@@ -166,14 +164,18 @@ class UtilitiesController extends Controller
 
         // the 1.2 factor is a safety margin (last heartbeat has to be 1.2 times the refresh frequency old
         // before we assume it is dead)
-        $h = $this->models->Heartbeat->get(
-        "select * 
-                    from %table% 
-                    where project_id = " . $this->getCurrentProjectId() . "
-                        and last_change >= TIMESTAMPADD(microsecond,-" . ($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
-                        and app = '" . $this->getAppName() . "'
-                        and ctrllr = 'species'
-                        and (view = 'taxon' or view = 'media' or view = 'media_upload')");
+        $h = $this->models->Heartbeat->_get(
+			array(
+				'id' => "select * 
+						from %table% 
+						where project_id = " . $this->getCurrentProjectId() . "
+							and last_change >= TIMESTAMPADD(microsecond,-" . 
+							($this->generalSettings['heartbeatFrequency'] * 1200) . ",CURRENT_TIMESTAMP)
+							and app = '" . $this->getAppName() . "'
+							and ctrllr = 'species'
+							and (view = 'taxon' or view = 'media' or view = 'media_upload')"
+			)
+		);
 
         foreach ((array) $h as $key => $val) {
             
@@ -186,7 +188,7 @@ class UtilitiesController extends Controller
             
             }
             
-            $u = $this->models->User->get($val['user_id']);
+            $u = $this->models->User->_get(array('id' => $val['user_id']));
             
             if (isset($u)) {
                 
