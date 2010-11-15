@@ -2,8 +2,6 @@
 
 {include file="_keypath.tpl"}
 
-
-
 <div id="page-main">
 <form method="post" action="step_edit.php" id="theForm">
 <input type="hidden" name="id" id="id" value="{$step.id}" />
@@ -32,23 +30,31 @@
 <input type="hidden" name="choice" id="choice" value="" />
 </form>
 
-<span  id="key-step-choices">Choices</span>
+<form method="post" action="" id="moveForm">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="id" value="{$step.id}" />
+<input type="hidden" name="move" id="move" value="" />
+<input type="hidden" name="direction" id="direction" value="" />
+</form>
+
+<span  id="key-step-choices">{t}Choices{/t}</span>
 <form method="post" action="choice_edit.php" id="choiceForm">
 <input type="hidden" name="id" id="id2" value="" />
 <table>
 {section name=i loop=$choices}
-	<tr>
-		<td>{$choices[i].show_order}</td>
-		<td>{$choices[i].title}</td>
-		<td>
+	<tr class="tr-highlight">
+		<td style="width:12px;text-align:right">{$choices[i].show_order}.</td>
+		<td style="width:200px">{$choices[i].title}</td>
+		<td>&rarr;</td>
+		<td style="width:250px">
 		
 		{if $choices[i].res_keystep_id!=''}
-			Step: 
+			
 			{if $choices[i].res_keystep_id!='-1'}
 			<span
 				onclick="$('#choice').val({$choices[i].id});$('#next').val({$choices[i].res_keystep_id});$('#nextForm').submit();" 
 				class="pseudo-a">
-				{$choices[i].target}
+				{t}Step{/t} {if $choices[i].target_number}{$choices[i].target_number}: {/if}{$choices[i].target}
 			</span>
 			{else}
 			<span
@@ -58,12 +64,24 @@
 			</span>
 			{/if}
 			{elseif $choices[i].res_taxon_id!=''}
-			Taxon: {$choices[i].target}
+			{t}Taxon:{/t}
+			<span
+				onclick="window.open('../species/taxon.php?id={$choices[i].res_taxon_id}','_self')"
+				class="pseudo-a">
+				{$choices[i].target}
+			</span>
 			{else}
 			{$choices[i].target}
+			</span>
 			{/if}
 		</td>
 		<td>[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
+		<td>{if $smarty.section.i.index<$choices|@count-1}
+			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('down');$('#moveForm').submit();">&darr;</span>
+			{else}
+			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
+			{/if}
+		</td>
 	</tr>
 {/section}
 {if $choices|@count==0}

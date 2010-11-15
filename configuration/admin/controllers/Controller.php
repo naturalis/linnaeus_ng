@@ -284,6 +284,20 @@ class Controller extends BaseClass
 
 
     /**
+     * Returns whether there are errors or not
+     *
+     * @return     boolean    errors or not 
+     * @access     public
+     */
+    public function hasErrors ()
+    {
+        
+        return (count((array)$this->errors)>0);
+    
+    }
+
+
+    /**
      * Returns the class's stack of errors stored in class variable 'errors'
      *
      * @return     array    stack of errors
@@ -295,7 +309,6 @@ class Controller extends BaseClass
         return $this->errors;
     
     }
-
 
 
     /**
@@ -865,6 +878,7 @@ class Controller extends BaseClass
 
 		if (empty($content)) return;
 
+		/* DEBUG */
 		$this->models->TranslateMe->save(
 			array(
 				'id' => null,
@@ -904,6 +918,7 @@ class Controller extends BaseClass
 
 		if (empty($content)) return;
 
+		/* DEBUG */
 		$this->models->TranslateMe->save(
 			array(
 				'id' => null,

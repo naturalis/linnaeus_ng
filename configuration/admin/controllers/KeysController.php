@@ -42,6 +42,7 @@ class KeysController extends Controller
         $this->setPageName( _('Index'));
 		
 		unset($_SESSION['system']['keyPath']);
+		unset($_SESSION['system']['step']);
         
         $this->printPage();
     
@@ -62,10 +63,12 @@ class KeysController extends Controller
 		if (isset($this->requestData['id']) || isset($_SESSION['system']['step'])) {
 		// request for specific key
 		
-			$k = $this->models->Keystep->get(
+			$k = $this->models->Keystep->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => isset($this->requestData['id']) ? $this->requestData['id'] : $_SESSION['system']['step']
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => isset($this->requestData['id']) ? $this->requestData['id'] : $_SESSION['system']['step']
+					)
 				)
 			);
 			
@@ -76,10 +79,12 @@ class KeysController extends Controller
 		} else {
 		// looking for the start key 
 
-			$k = $this->models->Keystep->get(
+			$k = $this->models->Keystep->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'is_start' => 1
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'is_start' => 1
+					)
 				)
 			);
 			
@@ -89,12 +94,7 @@ class KeysController extends Controller
 
 			} else {
 
-
-				$k = $this->models->Keystep->get(
-					array(
-						'project_id' => $this->getCurrentProjectId()
-					)
-				);
+				$k = $this->models->Keystep->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
 				
 				if (count((array)$k)==0) {
 
@@ -112,11 +112,21 @@ class KeysController extends Controller
 		
 		$_SESSION['system']['step'] = $step['id'];
 
-		$choices = $this->models->ChoiceKeystep->get(
+
+		if (isset($this->requestData['move']) && isset($this->requestData['direction']) && !$this->isFormResubmit()) {
+
+			$this->moveChoice($this->requestData['move'],$this->requestData['direction']);
+
+		}
+
+		$choices = $this->models->ChoiceKeystep->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'keystep_id' => $step['id']
-			),false,'show_order'
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $step['id']
+				),
+				'order' => 'show_order'
+			)
 		);
 
 		foreach((array)$choices as $key => $val) {
@@ -129,15 +139,17 @@ class KeysController extends Controller
 
 				} else {
 			
-					$k = $this->models->Keystep->get($val['res_keystep_id']);
+					$k = $this->models->Keystep->_get(array('id' => $val['res_keystep_id']));
 					
 					$choices[$key]['target'] = $k['title'];
+
+					$choices[$key]['target_number'] = $k['number'];
 
 				}
 			
 			} elseif (!empty($val['res_taxon_id'])) {
 
-				$t = $this->models->Taxon->get($val['res_taxon_id']);
+				$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
 
 				$choices[$key]['target'] = $t['taxon'];
 
@@ -149,19 +161,24 @@ class KeysController extends Controller
 
 		}
 		
-		$this->updateKeyPath($step['id'],$step['title'],isset($this->requestData['choice']) ? $this->requestData['choice'] : null);
+		$this->updateKeyPath(
+			$step['id'],
+			$step['number'],
+			$step['title'],
+			isset($this->requestData['choice']) ? $this->requestData['choice'] : null
+		);
 
-        $this->setPageName(sprintf(_('Show key step "%s"'),$step['title']));
+		$this->setPageName(sprintf(_('Show key step "%s"'),$step['title']));
 
 		$this->smarty->assign('keyPath',$this->getKeyPath());
 
 		$this->smarty->assign('step',$step);
-   
+
 		$this->smarty->assign('choices',$choices);
 
 		$this->smarty->assign('maxChoicesPerKey',$this->controllerSettings['maxChoicesPerKey']);
 
-        $this->printPage();
+		$this->printPage();
 
 	}
 
@@ -177,8 +194,10 @@ class KeysController extends Controller
 		}
 
 		if (isset($_SESSION['system']['refChoice'])) {
-			
-			$choice = $this->models->ChoiceKeystep->get($_SESSION['system']['refChoice']);
+
+			$this->updateKeyPath(null,null,null,$_SESSION['system']['refChoice']);
+
+			$choice = $this->models->ChoiceKeystep->_get(array('id' => $_SESSION['system']['refChoice']));
 
 			$this->smarty->assign('choice',$choice);
 
@@ -189,11 +208,54 @@ class KeysController extends Controller
 			$step = $this->requestData;
 
 			// save step data
+			if (empty($this->requestData['number'])) {
+			
+				$next = $this->getNextLowestStepNumber();
+
+				$this->addError(sprintf(_('Step number is required. The lowest unused number is %s.'),$next));
+
+				if (empty($this->requestData['id'])) $step['number'] = $next;
+
+			} else
+			if (!is_numeric($this->requestData['number'])) {
+
+				$this->addError(sprintf(_('"%s" is not a number.'),$this->requestData['number']));
+
+			} else {
+
+				$k = $this->models->Keystep->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'number' => $this->requestData['number'],
+							'id != ' => (empty($this->requestData['id']) ? -1 : $this->requestData['id'])
+							),
+						'columns' => 'count(*) as total'
+					)
+				);
+				
+				if ($k[0]['total']!=0) {
+
+					$this->addError(
+						sprintf(
+							_('A step with number %s already exists. The lowest unused number is %s.'),
+							$this->requestData['number'],
+							$this->getNextLowestStepNumber()
+						)
+					);
+
+				}
+
+			}
+
 			if (empty($this->requestData['title'])) {
 
 				$this->addError(_('Step title is required.'));
 
-			} else {
+			}
+
+
+			if (!$this->hasErrors()) {
 
 				$k = $this->models->Keystep->save(
 					array(
@@ -202,7 +264,6 @@ class KeysController extends Controller
 						'title' => $this->requestData['title'],
 						'content' => $this->requestData['content'],
 						'number' => !empty($this->requestData['number']) ? $this->requestData['number'] : 0,
-						'is_start' => !empty($this->requestData['is_start']) ? $this->requestData['is_start'] : 0,
 					)
 				);
 
@@ -213,39 +274,19 @@ class KeysController extends Controller
 				} else {
 
 					$step['id'] = !empty($this->requestData['id']) ? $this->requestData['id'] : $this->models->Keystep->getNewId();
-
-					$k = $this->models->Keystep->get(
+				
+					$k = $this->models->Keystep->_get(
 						array(
-							'project_id' => $this->getCurrentProjectId()
-						),'count(*) as total'
+							'id' => array('project_id' => $this->getCurrentProjectId()),
+							'columns' => 'count(*) as total'
+						)
 					);
 					
 					if ($k[0]['total']==1) {
 
-						$k = $this->models->Keystep->save(
-							array(
-								'id' => $step['id'],
-								'number' => 1,
-								'is_start' => 1
-							)
-						);
+						$k = $this->models->Keystep->save(array('id' => $step['id'],'is_start' => 1));
 
 					} else {
-
-						$k2 = $this->models->Keystep->get(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'is_total' => 1
-							),'count(*) as total'
-						);
-					
-						$k = $this->models->Keystep->save(
-							array(
-								'id' => $step['id'],
-								'number' => $k[0]['total'],
-								'is_start' => $k2[0]['total']==0 ? 1 : 0
-							)
-						);
 
 						if (isset($_SESSION['system']['refChoice'])) {
 
@@ -280,10 +321,12 @@ class KeysController extends Controller
 
 		if (!empty($this->requestData['id'])) {  
 
-			$k = $this->models->Keystep->get(
+			$k = $this->models->Keystep->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $this->requestData['id']
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $this->requestData['id']
+					)
 				)
 			);
 			
@@ -294,6 +337,8 @@ class KeysController extends Controller
 		} else {
 
 	        $this->setPageName(_('New step'));
+			
+			$step['number'] = $this->getNextLowestStepNumber();
 
 		}
 
@@ -312,10 +357,12 @@ class KeysController extends Controller
 
 		if (!isset($_SESSION['system']['step']) && !empty($this->requestData['id'])) {
 
-			$ck = $this->models->ChoiceKeystep->get(
+			$ck = $this->models->ChoiceKeystep->_get(
 				array(
-					'id' => $this->requestData['id'],
-					'project_id' => $this->getCurrentProjectId()
+					'id' => array(
+						'id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
 				)
 			);
 			
@@ -330,10 +377,12 @@ class KeysController extends Controller
         
 		if (isset($_SESSION['system']['step'])) {
 		
-			$k = $this->models->Keystep->get(
+			$k = $this->models->Keystep->_get(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $_SESSION['system']['step']
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $_SESSION['system']['step']
+					)
 				)
 			);
 
@@ -444,10 +493,12 @@ class KeysController extends Controller
 
 			if (!empty($id)) {
 
-				$ck = $this->models->ChoiceKeystep->get(
+				$ck = $this->models->ChoiceKeystep->_get(
 					array(
-						'id' => $id,
-						'project_id' => $this->getCurrentProjectId()
+						'id' => array(
+							'id' => $id,
+							'project_id' => $this->getCurrentProjectId()
+						)
 					)
 				);
 
@@ -501,11 +552,14 @@ class KeysController extends Controller
 		} // if (isset($_SESSION['system']['step']))
 
 
-		$k = $this->models->Keystep->get(
+		$k = $this->models->Keystep->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id !=' => $_SESSION['system']['step'],
-			),false,'number'
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id !=' => $_SESSION['system']['step'],
+				),
+				'order' => 'number'
+			)
 		);
 
 		$this->getTaxonTree(null);
@@ -515,6 +569,8 @@ class KeysController extends Controller
 		$this->smarty->assign('steps',$k);
 
 		$this->smarty->assign('taxa',$this->_treeList);
+
+   		$this->smarty->assign('keyPath',$this->getKeyPath());
 
         $this->printPage();
 
@@ -532,7 +588,7 @@ class KeysController extends Controller
 
     }
 
-	private function updateKeyPath($id,$title,$choice) 
+	private function updateKeyPath($id,$number,$title,$choice) 
 	{
 
 		if (isset($_SESSION['system']['keyPath'])) {
@@ -541,17 +597,19 @@ class KeysController extends Controller
 
 				if ($val['id']==$id) break;
 
-				$d[] = $val;
+				if (!empty($val['id'])) $d[] = $val;
 
 			}
 
 		}
+	
 
-		$d[] = array('id' => $id,'title' => $title,'choice' => null,'choiceTitle' => null);
+		$d[] = array('id' => $id,'number' => $number,'title' => $title,'choice' => null,'choiceTitle' => null);
+
 
 		if (!empty($choice) && (count((array)$d)-2)>=0) {
 
-			$ck = $this->models->ChoiceKeystep->get($choice);
+			$ck = $this->models->ChoiceKeystep->_get(array('id' => $choice));
 			
 			$d[count((array)$d)-2]['choice'] = $choice;
 
@@ -569,15 +627,58 @@ class KeysController extends Controller
 		return $_SESSION['system']['keyPath'];
 
 	}
+	
+	private function moveChoice($id,$direction)
+	{
+
+		$ck = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' =>  array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+
+		$ck2 = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' =>  array(
+					'keystep_id' => $ck[0]['keystep_id'],
+					'project_id' => $this->getCurrentProjectId(),
+					'id !=' => $id,
+					'show_order' => $ck[0]['show_order']+($direction=='up' ? -1 : 1)					
+				)
+			)
+		);
+
+		$this->models->ChoiceKeystep->save(
+			array(
+				'id' => $id,
+				'show_order' => $ck2[0]['show_order']
+			)
+		);
+
+		$this->models->ChoiceKeystep->save(
+			array(
+				'id' => $ck2[0]['id'],
+				'show_order' => $ck[0]['show_order']
+			)
+		);
+		
+	}
+
 
 	private function renumberChoices($step)
 	{
 
-		$ck = $this->models->ChoiceKeystep->get(
+		$ck = $this->models->ChoiceKeystep->_get(
 			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'keystep_id' => $step
-			),false,'show_order'
+				'id' =>  array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $step
+				),
+				'order' => 'show_order'
+			)
 		);
 		
 		foreach((array)$ck as $key => $val) {
@@ -585,12 +686,47 @@ class KeysController extends Controller
 			$this->models->ChoiceKeystep->save(
 				array(
 					'id' => $val['id'],
-					'show_order' => $key
+					'show_order' => $key+1
 				)
 			);
 
 		}
 
+	}
+	
+	private function getNextLowestStepNumber()
+	{
+
+		$k = $this->models->Keystep->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'number',
+				'order' => 'number'
+			)
+		);
+		
+		$prev = 0;
+		$next = false;
+	
+		foreach((array)$k as $key => $val) {
+	
+			if ($val['number'] - $prev > 1) {
+	
+				$next = $prev +1;
+				
+				break;
+	
+			} else {
+	
+				$prev = $val['number'];
+	
+			}
+	
+		}
+		
+		if (!$next) $next = $prev + 1;
+		
+		return $next;
 
 	}
 

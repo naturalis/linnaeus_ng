@@ -1,7 +1,8 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="page-main">
+{include file="_keypath.tpl"}
 
+<div id="page-main">
 <form method="post" action="" id="theForm" enctype="multipart/form-data">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$data.id}" />
@@ -40,7 +41,7 @@
 				<option value="0"{if $data.res_taxon_id!=null} selected="selected"{/if}>{t}(none){/t}</option>
 {if $steps|@count>0}
 				<option value="-1" disabled="disabled">&nbsp</option>{/if}
-{section name=i loop=$steps}<option value="{$steps[i].id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$steps[i].title}</option>
+{section name=i loop=$steps}<option value="{$steps[i].id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$steps[i].number}. {$steps[i].title}</option>
 {/section}
 			</select>
 		</td>
