@@ -135,15 +135,6 @@ sprintfWrapper = {
 
 sprintf = sprintfWrapper.init;
 
-
-String.prototype.reverse = function(){
-splitext = this.split("");
-revertext = splitext.reverse();
-reversed = revertext.join("");
-return reversed;
-}
-
-
 function q(m) {
 
 	$('#debug-message').html(m);
@@ -159,9 +150,30 @@ function isArray(obj) {
 
 }
 
-function _(text) {
+var allShouldTranslate = true;
+var allTranslations = Array();
 
-	return text;
+function _(text) {
+	
+	if (!allShouldTranslate) return text;
+
+	for(var i=0;i<allTranslations.length;i++) {
+		if (allTranslations[i][0]==text) {
+			return allTranslations[i][1];
+		}
+	}
+
+	var translation = $.ajax({
+	        type: "POST",
+	        async: false,
+	        url: "../utilities/ajax_interface.php",
+	        data: ({text: text, action: 'translate'})
+	        }).responseText;
+
+	allTranslations[allTranslations.length]=[text,translation];
+
+	return translation;
+
 }
 
 

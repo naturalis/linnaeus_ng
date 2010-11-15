@@ -9,12 +9,15 @@
 <form method="post" action="" id="theForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$step.id}" />
-<input type="hidden" name="number" value="{$step.number}" />
 <input type="hidden" name="is_start" value="{$step.is_start}" />
 <span class="key-step-title">
-{if !$data.id}{t}New step{/t}{else}{t}Editing step{/t}{/if} {if $choice}({t}follows from choice{/t} "{$choice.title}"){/if}
+{if !$data.id}{t}New step{/t}{else}{t}Editing step{/t}{/if}
 </span><br /><br />
 <table style="border-collapse:collapse">
+	<tr style="vertical-align:top">
+		<td>{t}Number:{/t}</td>
+		<td><input type="text" name="number" value="{$step.number}" style="width:40px;text-align:right" /> *</td>
+	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Title:{/t}</td>
 		<td><input type="text" name="title" value="{$step.title}" /> *</td>
