@@ -78,9 +78,7 @@ class ProjectsController extends Controller
         
         if (!empty($this->requestData['module_new'])) {
             
-            $fmp = $this->models->FreeModuleProject->get(array(
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $fmp = $this->models->FreeModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
             
             if (count((array) $fmp) < 5 && !$this->isFormResubmit()) {
                 
@@ -91,32 +89,37 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId(),
                     'active' => 'n'
                 ));
-                
+
                 $_SESSION['system']['last_rnd'] = $this->requestData['rnd'];
             
             }
         
         }
         
-        $modules = $this->models->Module->get(array(
-            '1' => '1'
-        ), false, 'show_order');
-        
+        $modules = $this->models->Module->_get(
+			array(
+				'id' => array('1' => '1'), 
+				'order' => 'show_order'
+			)
+		);
+
         foreach ((array) $modules as $key => $val) {
-            
-            $mp = $this->models->ModuleProject->get(array(
-                'module_id' => $val['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
-            
+
+            $mp = $this->models->ModuleProject->_get(
+				array(
+					'id' => array(
+						'module_id' => $val['id'], 
+						'project_id' => $this->getCurrentProjectId()
+		            )
+				)
+			);
+
             $modules[$key]['module_project_id'] = $mp[0]['id'] ? $mp[0]['id'] : false;
             $modules[$key]['active'] = $mp[0]['id'] ? $mp[0]['active'] : false;
-        
+
         }
-        
-        $freeModules = $this->models->FreeModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ));
+
+        $freeModules = $this->models->FreeModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
 
         $this->smarty->assign('modules', $modules);
 
@@ -132,25 +135,32 @@ class ProjectsController extends Controller
     {
         
         $this->checkAuthorisation();
-        
+
         $this->setPageName(_('Assign collaborator to modules'));
-        
-        $modules = $this->models->ModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ), false, 'module_id asc');
-        
+
+        $modules = $this->models->ModuleProject->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()), 
+				'order' => 'module_id asc'
+			)
+		);
+
         foreach ((array) $modules as $key => $val) {
-            
-            $mp = $this->models->Module->get($val['module_id']);
-            
+
+            $mp = $this->models->Module->_get(array('id' => $val['module_id']));
+
             $modules[$key]['module'] = $mp['module'];
-            
+
             $modules[$key]['description'] = $mp['description'];
-            
-            $mpu = $this->models->ModuleProjectUser->get(array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'module_id' => $val['module_id']
-            ));
+
+            $mpu = $this->models->ModuleProjectUser->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'module_id' => $val['module_id']
+					)
+				)
+			);
             
             foreach ((array) $mpu as $k => $v) {
                 
@@ -160,16 +170,18 @@ class ProjectsController extends Controller
         
         }
         
-        $free_modules = $this->models->FreeModuleProject->get(array(
-            'project_id' => $this->getCurrentProjectId()
-        ));
+        $free_modules = $this->models->FreeModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
         
         foreach ((array) $free_modules as $key => $val) {
             
-            $fpu = $this->models->FreeModuleProjectUser->get(array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'free_module_id' => $val['id']
-            ));
+            $fpu = $this->models->FreeModuleProjectUser->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'free_module_id' => $val['id']
+					)
+				)
+			);
             
             foreach ((array) $fpu as $k => $v) {
                 
@@ -179,17 +191,22 @@ class ProjectsController extends Controller
         
         }
         
-        $pru = $this->models->ProjectRoleUser->get(array(
-            'project_id' => $this->getCurrentProjectId(),
-			'role_id !=' => '1'
-        ), 'distinct user_id, role_id');
+        $pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'role_id !=' => '1'
+				),
+				'columns' => 'distinct user_id, role_id'
+			)
+		);
         
         foreach ((array) $pru as $key => $val) {
             
-            $u = $this->models->User->get($val['user_id']);
-            
-            $r = $this->models->Role->get($val['role_id']);
-            
+            $u = $this->models->User->_get(array('id' => $val['user_id']));
+
+            $r = $this->models->Role->_get(array('id' => $val['role_id']));
+
             $u['role'] = $r['role'];
             
             $users[] = $u;
@@ -223,8 +240,8 @@ class ProjectsController extends Controller
 
 		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
 			
-			$data = $this->models->Project->get($this->getCurrentProjectId());
-			
+			$data = $this->models->Project->_get(array('id' => $this->getCurrentProjectId()));
+
 			if (@unlink($this->getProjectsMediaStorageDir().$data['logo'])) {
 
 				$p = $this->models->Project->save(
@@ -285,21 +302,25 @@ class ProjectsController extends Controller
 
         }
         
-        $data = $this->models->Project->get($this->getCurrentProjectId());
-		
+        $data = $this->models->Project->_get(array('id' => $this->getCurrentProjectId()));
+
 		$this->setCurrentProjectData($data);
         
         $languages = array_merge(
-			$this->models->Language->get('select * from %table% where show_order is not null order by show_order asc'), 
-	        $this->models->Language->get('select * from %table% where show_order is null order by language asc')
+			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
+	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
 		);
         
         foreach ((array) $languages as $key => $val) {
             
-            $lp = $this->models->LanguageProject->get(array(
-                'language_id' => $val['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
+            $lp = $this->models->LanguageProject->_get(
+				array(
+					'id' => array(
+						'language_id' => $val['id'], 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				)
+			);
             
             $languages[$key]['language_project_id'] = $lp[0]['id'];
             
@@ -543,10 +564,12 @@ class ProjectsController extends Controller
         
         if ($action == 'add') {
             
-            $lp = $this->models->LanguageProject->get(array(
-                'project_id' => $this->getCurrentProjectId()
-            ));
-            
+            $lp = $this->models->LanguageProject->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId())
+				)
+			);
+
             $make_default = (count((array) $lp) == 0);
             
             $this->models->LanguageProject->save(

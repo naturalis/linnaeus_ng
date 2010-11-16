@@ -356,7 +356,7 @@ abstract class Model extends BaseClass
 
     public function _get ($params)
     {
-		//(models)(.)+(get)
+		//(models)(.)+(->get\()
 
 		$id = isset($params['id']) ? $params['id'] : false;
 		$select = isset($params['columns']) ? $params['columns'] : false;
