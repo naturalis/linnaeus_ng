@@ -84,7 +84,6 @@ $(document).ready(function(){
 	allSetAutoSaveFreq({$autosaveFrequency});
 	taxonRunAutoSave();
 
-
 {literal}	
 });
 </script>
