@@ -527,7 +527,14 @@ class Controller extends BaseClass
         
         }
         
-        $this->setCurrentProjectData($this->models->Project->get(array('id' => $this->getCurrentProjectId())));
+        $this->setCurrentProjectData($this->models->Project->_get(
+			array(
+				'id' => array(
+					'id' => $this->getCurrentProjectId()
+					)
+				)
+			)
+		);
 
     }
 
