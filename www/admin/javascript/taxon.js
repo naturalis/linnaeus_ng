@@ -839,7 +839,7 @@ function taxonMediaDescriptionEdit(ele) {
 
 	$(ele).html(
 		'<textarea id="taxon-media-description">'+
-		$(ele).html()+
+		$(ele).html().trim()+
 		'</textarea>'+
 		'<div>'+
 		'<input type="button" value="save" onclick="taxonMediaClickSave()" />&nbsp;'+
