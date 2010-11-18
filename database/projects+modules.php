@@ -52,6 +52,7 @@ RENAME TABLE `free_modules_projects`  TO `dev_free_modules_projects` ;
 
 insert into dev_projects values (null,'Polar Bears of Amsterdam','Ursus maritimus in the nation\'s capital','Polar Bears of Amsterdam',null,null,now(),null);
 insert into dev_projects values (null,'Imaginary Beings','Borges bestiarium','Imaginary Beings',null,null,now(),null);
+insert into dev_projects values (null,'Flora','Nieuwe Flora van Nederland','Nieuwe Flora van Nederland',null,null,now(),null);
 
 
 insert into dev_modules values (null,'Introduction','Comprehensive project introduction','Species',0,current_timestamp,current_timestamp);

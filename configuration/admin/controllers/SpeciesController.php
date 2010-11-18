@@ -216,118 +216,136 @@ class SpeciesController extends Controller
 
 		}
 
-		$ut = $this->models->UserTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'user_id' => $this->getCurrentUserId()
-				),
-			'columns' => 'taxon_id',
-			'fieldAsIndex' => 'taxon_id'
-			)
-		);
+
+		$pr = $this->getProjectRanks();
 		
-		$this->getTaxonTree(null);
-		
-		$isEmptyTaxaList = count((array)$this->_treeList)==0;
+		if (count((array)$pr)==0) {
 
-		if (count((array)$ut)>0 || $isEmptyTaxaList) {
+			$this->addMessage(_('No ranks have been defined.'));
 
-			$allow = false;
-	
-			foreach((array)$this->_treeList as $key => $val) {
-	
-				if ($allow && $val['level'] <= $prevLevel) {
-				
-					$allow = false;
-	
-				}
-	
-				if (array_key_exists($val['id'],$ut)) {
-	
-					$allow = true;
-					
-					$prevLevel = $val['level'];
-	
-				}
-				
-				if ($allow) {
-				
-					$taxa[] = $val;
-				
-				}
-
-			}
-
-			if (!empty($this->requestData['taxon'])) {
+		} else {
+			$ut = $this->models->UserTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->getCurrentUserId()
+					),
+				'columns' => 'taxon_id',
+				'fieldAsIndex' => 'taxon_id'
+				)
+			);
 			
-				$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
+			$this->getTaxonTree(null);
+	
+			$isEmptyTaxaList = !isset($this->_treeList) || count((array)$this->_treeList)==0;
+			
+			if (count((array)$ut)>0 || $isEmptyTaxaList) {
+	
+				$allow = false;
+	
+				if (!$isEmptyTaxaList) {
+		
+					foreach((array)$this->_treeList as $key => $val) {
+			
+						if ($allow && $val['level'] <= $prevLevel) {
+						
+							$allow = false;
+			
+						}
+			
+						if (array_key_exists($val['id'],$ut)) {
+			
+							$allow = true;
+							
+							$prevLevel = $val['level'];
+			
+						}
+						
+						if ($allow) {
+						
+							$taxa[] = $val;
+						
+						}
+		
+					}
+	
+				}
+	
+				if (!empty($this->requestData['taxon'])) {
 				
-				$parentId =
-					($this->requestData['id']==$this->requestData['parent_id'] ? null : ($isEmptyTaxaList ? null : $this->requestData['parent_id']));
-
-				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
+					$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
+					
+					$parentId =
+						($this->requestData['id']==$this->requestData['parent_id'] ? 
+							null : 
+							($isEmptyTaxaList ? 
+								null : 
+								$this->requestData['parent_id']
+							)
+						);
 	
-					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
-	
-						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
+					if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
 		
-							$this->models->Taxon->save(
-								array(
-									'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
-									'project_id' => $this->getCurrentProjectId(),
-									'taxon' => $this->requestData['taxon'],
-									'parent_id' => $parentId,
-									'rank_id' => $this->requestData['rank_id'],
-									'is_hybrid' =>  ($isHybrid ? 1 : 0)
-								)
-							);
-							
-							$this->reOrderTaxonTree();
-	
-							$this->addMessage(_('Taxon saved.'));
-							
-							unset($this->requestData['taxon']);
-							
-							$this->redirect('list.php');
+						if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
 		
+							if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
+			
+								$this->models->Taxon->save(
+									array(
+										'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
+										'project_id' => $this->getCurrentProjectId(),
+										'taxon' => $this->requestData['taxon'],
+										'parent_id' => $parentId,
+										'rank_id' => $this->requestData['rank_id'],
+										'is_hybrid' =>  ($isHybrid ? 1 : 0)
+									)
+								);
+								
+								$this->reOrderTaxonTree();
+		
+								$this->addMessage(_('Taxon saved.'));
+								
+								unset($this->requestData['taxon']);
+								
+								$this->redirect('list.php');
+			
+							} else {
+				
+								$this->addError(_('Rank cannot be hybrid.'));
+				
+							}
+			
 						} else {
 			
-							$this->addError(_('Rank cannot be hybrid.'));
+							$this->addError(_('Parent cannot have child taxa.'));
 			
 						}
 		
 					} else {
 		
-						$this->addError(_('Parent cannot have child taxa.'));
+						$this->addError(_('Taxon name already in database.'));
 		
 					}
-	
-				} else {
-	
-					$this->addError(_('Taxon name already in database.'));
-	
+				
 				}
+					
+				$this->smarty->assign('allowed',true);
+	
+				$this->smarty->assign('data',$data);
+		
+				$this->smarty->assign('projectRanks',$pr);
+	
+				if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+	
+			} else {
+	
+				$this->smarty->assign('allowed',false);
+	
+				$this->addMessage(_('No taxa have been assigned to you.'));
 			
 			}
-				
-			$pr = $this->getProjectRanks();
-	
-			$this->smarty->assign('allowed',true);
 
-			$this->smarty->assign('data',$data);
-	
-			$this->smarty->assign('projectRanks',$pr);
-
-			$this->smarty->assign('taxa',$taxa);
-
-		} else {
-				
-			$this->smarty->assign('allowed',false);
-
-			$this->addMessage(_('No taxa have been assigned to you.'));
-		
-		}	
+		}
 
 		$this->printPage();
 
@@ -473,6 +491,7 @@ class SpeciesController extends Controller
         $this->setPageName(_('Taxon list'));
 
 		if (isset($this->requestData['id']) && isset($this->requestData['move']) && !$this->isFormResubmit()) {
+		// moving branches up and down the stem
 
 			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
 
@@ -480,48 +499,74 @@ class SpeciesController extends Controller
 
 		}
 
-		// get taxa assigned to user
-		$ut = $this->models->UserTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'user_id' => $this->getCurrentUserId()
-				),
-				'columns' => 'taxon_id',
-				'fieldAsIndex' => 'taxon_id'
-			)
-		);
-
 		// get complete taxon tree
 		$this->getTaxonTree(null);
 
-		$allow = false;
-		$prevAllowedLevel = -1;
+		if (isset($this->_treeList)) { 
 
-		// discard all taxa above the levels (which means a smaller level-value) assigned to the user
-		foreach((array)$this->_treeList as $key => $val) {
-
-			if ($allow && $val['level'] <= $prevAllowedLevel) {
+			if (isset($_SESSION['project']['ranklist'])) {
+	
+				$rl = $_SESSION['project']['ranklist'];
 			
-				$allow = false;
-
-			}
-
-			if (isset($ut) && array_key_exists($val['id'],$ut)) {
-
-				$allow = true;
+			} else {
+	
+				$pr = $this->getProjectRanks();
+		
+				foreach((array)$pr as $key => $val) {
 				
-				$prevAllowedLevel = $val['level'];
-
+					if ($val['lower_taxon']==1) {
+					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
+				
+						$rl[$val['id']] = $val['rank'];
+					}
+	
+				}
+				
+				$_SESSION['project']['ranklist'] = $rl;
+	
 			}
 
-			if ($allow) {
+			// get taxa assigned to user
+			$ut = $this->models->UserTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->getCurrentUserId()
+					),
+					'columns' => 'taxon_id',
+					'fieldAsIndex' => 'taxon_id'
+				)
+			);
+		
+			$allow = false;
+			$prevAllowedLevel = -1;
 
-				$taxa[] = $val;
-			
+			// discard all taxa above the levels (i.e. smaller level-value) assigned to the user
+			foreach((array)$this->_treeList as $key => $val) {
+	
+				if ($allow && $val['level'] <= $prevAllowedLevel) {
+				
+					$allow = false;
+	
+				}
+	
+				if (isset($ut) && array_key_exists($val['id'],$ut)) {
+	
+					$allow = true;
+					
+					$prevAllowedLevel = $val['level'];
+	
+				}
+	
+				if ($allow) {
+	
+					$taxa[] = $val;
+				
+				}
+				
+				$prevLevel = $val['level'];
+	
 			}
-			
-			$prevLevel = $val['level'];
 
 		}
 
@@ -545,25 +590,6 @@ class SpeciesController extends Controller
 	
 				$_SESSION['project']['pages'] = $tp;
 			}
-        
-			if (isset($_SESSION['project']['ranklist'])) {
-	
-				$rl = $_SESSION['project']['ranklist'];
-			
-			} else {
-	
-				$pr = $this->getProjectRanks();
-		
-				foreach((array)$pr as $key => $val) {
-				
-					$rl[$val['id']] = $val['rank'];
-	
-				}
-				
-				$_SESSION['project']['ranklist'] = $rl;
-	
-			}
-
 
 			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
 	
@@ -573,45 +599,49 @@ class SpeciesController extends Controller
 
 			foreach ((array) $taxa as $key => $taxon) {
 			
-				$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
-				
-				$ct = $this->models->ContentTaxon->_get(
-					array(
-						'id' =>	array(
-							'taxon_id' => $taxon['id'], 
-							'publish' => 1, 
-							'project_id' => $this->getCurrentProjectId()
-						), 
-						'columns' => 'count(*) as tot'
-					)
-				);
+				if (isset($rl[$taxon['rank_id']])) {
 
-				$taxa[$key]['pct_finished'] = round(($ct[0]['tot'] / (count($lp) * $tp[0]['tot']))*100);
-
-				$mt = $this->models->MediaTaxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $taxon['id']
-						),
-						'columns' => 'count(*) as total, mime_type',
-						'group' => 'mime_type'
-					)
-				);
-            
-				foreach((array)$mt as $mtkey => $mtval) {
+					$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
+					
+					$ct = $this->models->ContentTaxon->_get(
+						array(
+							'id' =>	array(
+								'taxon_id' => $taxon['id'], 
+								'publish' => 1, 
+								'project_id' => $this->getCurrentProjectId()
+							), 
+							'columns' => 'count(*) as tot'
+						)
+					);
 	
-					$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = 
-						(isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? 
-							$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 
-							0) 
-						+ $mtval['total'];
-							
-					$taxa[$key]['totMediaCount'] =
-						(isset($taxa[$key]['totMediaCount']) ? 
-							$taxa[$key]['totMediaCount'] : 
-							0 ) 
-						+ $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
+					$taxa[$key]['pct_finished'] = round(($ct[0]['tot'] / (count($lp) * $tp[0]['tot']))*100);
+	
+					$mt = $this->models->MediaTaxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon_id' => $taxon['id']
+							),
+							'columns' => 'count(*) as total, mime_type',
+							'group' => 'mime_type'
+						)
+					);
+				
+					foreach((array)$mt as $mtkey => $mtval) {
+		
+						$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = 
+							(isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? 
+								$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 
+								0) 
+							+ $mtval['total'];
+								
+						$taxa[$key]['totMediaCount'] =
+							(isset($taxa[$key]['totMediaCount']) ? 
+								$taxa[$key]['totMediaCount'] : 
+								0 ) 
+							+ $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
+	
+					}
 
 				}
         
@@ -1177,18 +1207,27 @@ class SpeciesController extends Controller
 			)
 		);
 
-		if (isset($this->requestData['ranks'])) {
+		if (isset($this->requestData['ranks']) && !$this->isFormResubmit()) {
 
 			$parent = 'null';
+			
+			$isLowerTaxon = false;
 
 			foreach((array)$this->requestData['ranks'] as $key => $rank) {
+
+				if ($this->requestData['higherTaxaBorder']==$rank) {
+
+					$isLowerTaxon = true;
+
+				}
 
 				if (!empty($pr[$rank])) {
 
 					$this->models->ProjectRank->save(
 						array(
 							'id' => $pr[$rank]['id'],
-							'parent_id' => $parent
+							'parent_id' => $parent,
+							'lower_taxon' => $isLowerTaxon ? 1 : 0
 						)
 					);
 					
@@ -1201,7 +1240,8 @@ class SpeciesController extends Controller
 		                    'id' => null, 
 							'project_id' => $this->getCurrentProjectId(),
 							'rank_id' => $rank,
-							'parent_id' => $parent
+							'parent_id' => $parent,
+							'lower_taxon' => $isLowerTaxon ? 1 : 0
 						)
 					);
 					
@@ -1245,6 +1285,8 @@ class SpeciesController extends Controller
 				}
 
 			}
+			
+			if (isset($_SESSION['project']['ranklist'])) unset($_SESSION['project']['ranklist']);
 			
 			$this->addMessage(_('Ranks saved.'));
 
@@ -1396,8 +1438,8 @@ class SpeciesController extends Controller
 			}
 
 		}
-
-        $pru = $this->models->ProjectRoleUser->_get(
+		
+		$pru = $this->models->ProjectRoleUser->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1407,39 +1449,47 @@ class SpeciesController extends Controller
 			)
 		);
 
-        foreach ((array) $pru as $key => $val) {
+		foreach ((array) $pru as $key => $val) {
 
-            $u = $this->models->User->_get(array('id' => $val['user_id']));
+			$u = $this->models->User->_get(array('id' => $val['user_id']));
 
-            $r = $this->models->Role->_get(array('id' => $val['role_id']));
-            
-            $u['role'] = $r['role'];
-            $u['role_id'] = $r['id'];
+			$r = $this->models->Role->_get(array('id' => $val['role_id']));
+			
+			$u['role'] = $r['role'];
+			$u['role_id'] = $r['id'];
 
-            $users[] = $u;
-        
-        }
-
-        $this->getTaxonTree(null);
-
-		$ut = $this->models->UserTaxon->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'order' => 'taxon_id'
-			)
-		);
-
-		foreach((array)$ut as $key => $val) {
-
-			$ut[$key]['taxon'] = $this->models->Taxon->_get(array('id' => $val['taxon_id']));
-
+			$users[] = $u;
+		
 		}
 
-        $this->smarty->assign('usersTaxa', $ut);
+		$this->getTaxonTree(null);
+	
+		if (isset($this->_treeList)) {
 
-        $this->smarty->assign('users', $users);
-
-		$this->smarty->assign('taxa',$this->_treeList);
+			$ut = $this->models->UserTaxon->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'order' => 'taxon_id'
+				)
+			);
+	
+			foreach((array)$ut as $key => $val) {
+	
+				$ut[$key]['taxon'] = $this->models->Taxon->_get(array('id' => $val['taxon_id']));
+	
+			}
+	
+			$this->smarty->assign('usersTaxa', $ut);
+	
+			$this->smarty->assign('users', $users);
+	
+			$this->smarty->assign('taxa',$this->_treeList);
+		
+		} else {
+	
+			$this->addMessage(_('No taxon have been defined.'));
+	
+		}
 
 		$this->printPage();
 
@@ -2964,6 +3014,21 @@ class SpeciesController extends Controller
 			$this->reOrderTaxonTree();
 
 		}
+
+	}
+	
+	private function getHigherTaxaBorder() {
+
+		$pr = $this->models->ProjectRank->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'higher_taxa_border' => 1				
+				)
+			)
+		);
+		
+		return $pr[0];
 
 	}
 

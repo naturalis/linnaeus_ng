@@ -526,15 +526,8 @@ class Controller extends BaseClass
             $this->setCurrentProjectId($p);
         
         }
-        
-        $this->setCurrentProjectData($this->models->Project->_get(
-			array(
-				'id' => array(
-					'id' => $this->getCurrentProjectId()
-					)
-				)
-			)
-		);
+
+        $this->setCurrentProjectData($this->models->Project->_get(array('id' => $this->getCurrentProjectId())));
 
     }
 
@@ -940,7 +933,7 @@ class Controller extends BaseClass
 
     public function getTaxonTree($pId=null,$level=0) 
     {
-	
+
 		if ($level==0) unset($this->_treeList);
 
         $t = $this->models->Taxon->_get(
@@ -1532,7 +1525,7 @@ class Controller extends BaseClass
             'name' => 'Projects', 
             'url' => $cp
         );
-        
+
         if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title'])) {
             
             $this->breadcrumbs[] = array(
