@@ -57,6 +57,7 @@
 	<span id="page-header-locality" style="color:#CC0000">[localhost]</span>
 {/if}
 	<br />
+	
 {if $breadcrumbs}
 	<div id="breadcrumbs">
 	{section name=i loop=$breadcrumbs}

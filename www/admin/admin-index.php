@@ -15,7 +15,7 @@ if (!$c->isUserLoggedIn()) {
     $c->redirect('index.php');
 
 } else {
-    
+
     $c->controllerPublicName = '';
     
     $c->adminIndexAction();
