@@ -1,7 +1,4 @@
 {include file="../shared/admin-header.tpl"}
-
-{include file="../shared/admin-messages.tpl"}
-
 <div id="page-main">
 <p>
 {t _s1=$ranks[0].rank}Click the arrow next to a rank to add that rank to the selection used in this project. Currently selected ranks are shown on the right. To remove a rank from the selection, double click it in the list on the right. The uppermost rank, %s, is mandatory and cannot be deleted.{/t}
@@ -26,7 +23,11 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="button" value="{t}save selected ranks{/t}" onclick="taxonSaveRanks()" />
 </p>
-<br /><br />
+</div>
+
+{include file="../shared/admin-messages.tpl"}
+
+<div class="page-generic-div">
 <table id="ranks-table">
 <tr><td colspan="2" class="rank-header">{t}Ranks:{/t}</td></tr>
 {assign var=first value=true}
@@ -50,9 +51,6 @@
 
 <div id="floating-div" style="position:absolute;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />
 <div id="selected-ranks"></span>
-
-
-	<!-- select size="35" id="selected-ranks" style="width:250px;"></select></div -->
 </div>
 
 </form>
@@ -86,7 +84,7 @@ $(document).ready(function(){
 {section name=i loop=$projectRanks}
 	taxonAddRank({$projectRanks[i].rank_id},false,false);
 	{if $projectRanks[i].lower_taxon==1 && $first==true}
-	taxonRankGeneralBorder = {$projectRanks[i].rank_id};
+	taxonRankBorder = {$projectRanks[i].rank_id};
 	{assign var=first value=false}
 	{/if}
 {/section}

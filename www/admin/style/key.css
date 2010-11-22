@@ -1,3 +1,16 @@
+.keypath-full-invisible {
+	display:none;
+}
+
+.keypath-full-visible {
+	position:absolute;
+	left:10px;
+	background-color:#FFFFFF;
+	border:1px solid #999;
+	padding:2px;
+	width:400px;
+}
+
 #keypath {
 	margin-left:10px;
 	margin-top:5px;

@@ -19,13 +19,13 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Text:{/t}</td>
-		<td colspan="2"><textarea name="choice_txt" cols="50" rows="5">{$data.choice_txt}</textarea></td>
+		<td colspan="2"><textarea name="choice_txt" cols="75" rows="8">{$data.choice_txt}</textarea></td>
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Image:{/t}</td>
 		<td colspan="2">
 		{if $data.choice_img}
-			<img src="{$session.project.urls.project_media}{$data.choice_img}" style=" width:200px;" /><br />
+			<img src="{$session.project.urls.project_media}{$data.choice_img}" style=" width:200px;border:1px solid #ddd;padding:2px;" /><br />
 			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 		{else}
 			<input type="file" name="image" />
@@ -56,8 +56,9 @@
 		<td>
 			<select name="res_taxon_id" id="res_taxon_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="0">{t}(none){/t}</option>
-				<option disabled="disabled">&nbsp</option>
-{section name=i loop=$taxa}<option value="{$taxa[i].id}"{if $taxa[i].id==$data.res_taxon_id} selected="selected"{/if}>{section name=foo loop=$taxa[i].level-$taxa[0].level}&nbsp;{/section}{$taxa[i].taxon}</option>
+				<option disabled="disabled">&nbsp;</option>
+{assign var=first value=true}
+{section name=i loop=$taxa}{if $first}{assign var=minBuffer value=$taxa[i].level}{/if}{if $taxa[i].keypath_endpoint==1}<option value="{$taxa[i].id}"{if $taxa[i].id==$data.res_taxon_id} selected="selected"{/if}>{section name=foo loop=$taxa[i].level-$minBuffer}&nbsp;&nbsp;{/section}{$taxa[i].taxon}{assign var=first value=false}{/if}</option>
 {/section}
 			</select>
 		</td>

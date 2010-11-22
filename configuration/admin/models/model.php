@@ -14,8 +14,9 @@ abstract class Model extends BaseClass
     private $retainBeforeAlter;
     private $retainedData;
     private $lastQuery;
-
-
+	private $logger;
+	private $_projectId=false;
+	public $doLog = true;
 
     public function __construct ($tableBaseName = false)
     {
@@ -55,7 +56,28 @@ abstract class Model extends BaseClass
         parent::__destruct();
     
     }
+	
+	
+	private function log($msg,$level=0)
+	{
+	
+		if (!$this->doLog) return;
 
+		$this->logger->log(
+			'('.($this->_projectId ? $this->_projectId : '?').') '.$msg.' ('.mysql_errno().': '.mysql_error().')',
+			$level,
+			'Model:'.get_class($this)
+		);
+
+	}
+
+
+	public function setLogger($logger)
+	{
+
+		$this->logger = $logger;
+
+	}
 
 
     public function escapeString ($d)
@@ -131,6 +153,12 @@ abstract class Model extends BaseClass
             
             $d = $this->columns[$key];
 
+			if ($key=='project_id') {
+
+				$this->_projectId = $val;
+			
+			}
+
             if ($d && (!empty($val) || $val===0)) {
 
                 $fields .= $key . ", ";
@@ -176,7 +204,9 @@ abstract class Model extends BaseClass
         $this->setLastQuery($query);
         
         if (!mysql_query($query)) {
-            
+		
+			$this->log('Failed query: '.$query,2);
+
             return mysql_error($this->databaseConnection);
         
         }
@@ -209,6 +239,12 @@ abstract class Model extends BaseClass
                 continue;
             
             $d = $this->columns[$key];
+
+			if ($key=='project_id') {
+
+				$this->_projectId = $val;
+			
+			}
             
             if ($d && isset($val)) {
 			
@@ -277,6 +313,8 @@ abstract class Model extends BaseClass
         $this->setLastQuery($query);
         
         if (!mysql_query($query)) {
+
+			$this->log('Failed query: '.$query,2);
             
             return mysql_error($this->databaseConnection);
         
@@ -307,15 +345,20 @@ abstract class Model extends BaseClass
                     
                     $operator = '=';
                 
-                }
-                else {
+                } else {
                     
                     $operator = trim(substr($col, strpos($col, ' ')));
                     
                     $col = trim(substr($col, 0, strpos($col, ' ')));
                 
                 }
-                
+
+				if ($col=='project_id') {
+	
+					$this->_projectId = $val;
+				
+				}
+
                 $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
             
             }
@@ -341,7 +384,9 @@ abstract class Model extends BaseClass
         $result = mysql_query($query);
         
         if (!$result) {
-            
+		
+			 $this->log('Failed query: '.$query,2);
+
             return mysql_error($this->databaseConnection);
         
         }
@@ -354,9 +399,9 @@ abstract class Model extends BaseClass
     }
 
 
-    public function _get ($params)
+    public function _get ($params=false)
     {
-		//(models)(.)+(->get\()
+		if (!$params) return false;
 
 		$id = isset($params['id']) ? $params['id'] : false;
 		$select = isset($params['columns']) ? $params['columns'] : false;
@@ -416,35 +461,6 @@ abstract class Model extends BaseClass
     
     }
 
-	/*
-
-	only useful with InnoDB
-
-	public function startTransaction()
-	{
-
-		mysql_query('SET autocommit=0', $this->databaseConnection);		
-		mysql_query('START TRANSACTION', $this->databaseConnection);
-
-	}
-
-	public function commitTransaction()
-	{
-
-		mysql_query('COMMIT', $this->databaseConnection);
-		mysql_query('SET autocommit=1', $this->databaseConnection);		
-
-	}
-
-	public function rollbackTransaction()
-	{
-
-		mysql_query('ROLLBACK', $this->databaseConnection);
-		mysql_query('SET autocommit=1', $this->databaseConnection);		
-
-	}
-
-	*/
 
 	/* DEBUG */
     public function q ()
@@ -487,16 +503,19 @@ abstract class Model extends BaseClass
 
     private function connectToDatabase ()
     {
-        
         $this->databaseSettings = $this->config->getDatabaseSettings();
         
         $this->databaseConnection = mysql_connect($this->databaseSettings['host'], $this->databaseSettings['user'], $this->databaseSettings['password']);
         
-        if (!$this->databaseConnection)
+        if (!$this->databaseConnection) {
+
+			 $this->log('Failed to connect to database '.$this->databaseSettings['host'].' with user '.$this->databaseSettings['user'],2);
+
             return false;
+
+		}
         
-        mysql_select_db($this->databaseSettings['database'], $this->databaseConnection); // or return false;
-        
+        mysql_select_db($this->databaseSettings['database'], $this->databaseConnection) or $this->log('Failed to select database '.$this->databaseSettings['database'],2);
 
         if ($this->databaseSettings['characterSet']) {
             
@@ -522,8 +541,10 @@ abstract class Model extends BaseClass
 
     private function getTableColumnInfo ()
     {
+	
+		$query = 'select * from ' . $this->tableName . ' limit 1';
         
-        $r = mysql_query('select * from ' . $this->tableName . ' limit 1');
+        $r = mysql_query($query) or $this->log('Failed query: '.$query,2);
 
 		if (!$r) return;
         
@@ -608,7 +629,7 @@ abstract class Model extends BaseClass
             
             $result = mysql_query($q);
             
-            while ($r = mysql_fetch_assoc($result)) {
+            while ($r = @mysql_fetch_assoc($result)) {
                 
                 $this->retainedData[] = $r;
 
@@ -617,7 +638,6 @@ abstract class Model extends BaseClass
         }
     
     }
-
 
 
     private function set ($params)
@@ -666,6 +686,12 @@ abstract class Model extends BaseClass
                 
                 }
 
+				if ($col=='project_id') {
+
+					$this->_projectId = $val;
+				
+				}
+
 				if (isset($this->columns[$col])) {
 
 	            	$d = $this->columns[$col];
@@ -707,12 +733,12 @@ abstract class Model extends BaseClass
             $query .= $limit ? " limit " . $limit : '';
             
             $this->setLastQuery($query);
-            
-            $set = mysql_query($query);
-            
+
+            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+
             $this->setLastQuery($query);
             
-            while ($row = mysql_fetch_assoc($set)) {
+            while ($row = @mysql_fetch_assoc($set)) {
                 
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 
@@ -736,11 +762,11 @@ abstract class Model extends BaseClass
 
             $query .= $limit ? " limit " . $limit : '';
 
-            $set = mysql_query($query);
-            
             $this->setLastQuery($query);
-            
-            while ($row = mysql_fetch_assoc($set)) {
+
+            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+
+            while ($row = @mysql_fetch_assoc($set)) {
 
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 
@@ -760,15 +786,19 @@ abstract class Model extends BaseClass
             
             $this->setLastQuery($query);
             
-            $this->data = mysql_fetch_assoc(mysql_query($query));
+			$m = mysql_query($query) or $this->log('Failed query: '.$query,2);
+			
+            $this->data = @mysql_fetch_assoc($m);
         
         } else {
-            
-            $set = mysql_query(str_replace('%table%', $this->tableName, $id));
+
+			$query = str_replace('%table%', $this->tableName, $id);
+
+            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
 
             $this->setLastQuery(str_replace('%table%', $this->tableName, $id));
 
-            while ($row = mysql_fetch_assoc($set)) {
+            while ($row = @mysql_fetch_assoc($set)) {
                 
 				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
 

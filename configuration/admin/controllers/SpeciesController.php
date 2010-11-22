@@ -43,17 +43,14 @@ class SpeciesController extends Controller
         'content_taxon_undo',
         'media_taxon',
         'media_descriptions_taxon',
-		'hybrid',
-		'project_rank',
-		'rank',
-		'label_project_rank',
+		'hybrid'
     );
     
     public $usedHelpers = array(
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
-	public $cssToLoad = array('colorbox/colorbox.css','taxon.css');
+	public $cssToLoad = array('colorbox/colorbox.css','taxon.css','rank-list.css');
 	public $jsToLoad = array('taxon.js','colorbox/jquery.colorbox.js');
 
     public $controllerPublicName = 'Species module';
@@ -1250,6 +1247,12 @@ class SpeciesController extends Controller
 				}
 
 			}
+
+			$this->models->ProjectRank->update(
+				array('keypath_endpoint' => 0),
+				array('project_id' => $this->getCurrentProjectId(),'lower_taxon' => 0)
+			);
+
 			
 			foreach((array)$pr as $key => $rank) {
 
@@ -1285,7 +1288,7 @@ class SpeciesController extends Controller
 				}
 
 			}
-			
+
 			if (isset($_SESSION['project']['ranklist'])) unset($_SESSION['project']['ranklist']);
 			
 			$this->addMessage(_('Ranks saved.'));
@@ -1310,7 +1313,7 @@ class SpeciesController extends Controller
 				)
 			);
 
-		$pr = $this->getProjectRanks();
+		$pr = $this->getProjectRanks(array('forceLookup'=>true));
 
 		$this->smarty->assign('ranks',$r);
 
@@ -1332,7 +1335,7 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxonomic ranks: labels'));
 
-		$pr = $this->getProjectRanks(true);
+		$pr = $this->getProjectRanks(array('includeLanguageLabels'=>true));
 
 		$this->smarty->assign('projectRanks',$pr);
 
@@ -2439,13 +2442,14 @@ class SpeciesController extends Controller
     {
 
         $this->getTaxonTree(null);
-
+q($this->_treeList);
         foreach((array)$this->_treeList as $key => $val) {
 
             $this->models->Taxon->save(
                 array(
                     'id' => $val['id'],
-                    'taxon_order' => $key
+                    'taxon_order' => $key,
+					'list_level' => $val['level']
                 )
             );
             
@@ -2762,51 +2766,6 @@ class SpeciesController extends Controller
             $this->smarty->assign('returnText', json_encode($lpr));
         
         }
-
-	}
-
-	private function getProjectRanks($includeLanguageLabels=false)
-	{
-
-		$pr = $this->models->ProjectRank->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'order' => 'rank_id'
-			)
-		);
-
-		foreach((array)$pr as $rankkey => $rank) {
-
-			$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
-
-			$pr[$rankkey]['rank'] = $r['rank'];
-
-			$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-			
-			if ($includeLanguageLabels) {
-
-				foreach((array)$_SESSION['project']['languages'] as $langaugekey => $language) {
-	
-					$lpr = $this->models->LabelProjectRank->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'project_rank_id' => $rank['id'],
-								'language_id' => $language['language_id']
-							),
-							'columns' => 'label'
-						)
-					);
-					
-					$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
-		
-				}
-
-			}
-
-		}
-
-		return $pr;
 
 	}
 

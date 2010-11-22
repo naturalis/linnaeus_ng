@@ -18,7 +18,7 @@ class KeysController extends Controller
 
 	public $jsToLoad = array('key.js');
 
-	public $cssToLoad = array('key.css');
+	public $cssToLoad = array('key.css','rank-list.css');
 
     public function __construct ()
     {
@@ -40,10 +40,11 @@ class KeysController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName( _('Index'));
-		
+
 		unset($_SESSION['system']['keyPath']);
 		unset($_SESSION['system']['step']);
-        
+		unset($_SESSION['system']['keySubsection']);
+       
         $this->printPage();
     
     }
@@ -94,17 +95,7 @@ class KeysController extends Controller
 
 			} else {
 
-				$k = $this->models->Keystep->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
-				
-				if (count((array)$k)==0) {
-
-					$this->redirect('step_edit.php');
-
-				} else {
-
-					$this->redirect('step_start.php');
-
-				}
+				$this->redirect('step_edit.php');
 
 			}
 
@@ -277,12 +268,15 @@ class KeysController extends Controller
 				
 					$k = $this->models->Keystep->_get(
 						array(
-							'id' => array('project_id' => $this->getCurrentProjectId()),
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'is_start' => 1
+							),
 							'columns' => 'count(*) as total'
 						)
 					);
-					
-					if ($k[0]['total']==1) {
+
+					if ($k[0]['total']==0 && !isset($_SESSION['system']['keySubsection'])) {
 
 						$k = $this->models->Keystep->save(array('id' => $step['id'],'is_start' => 1));
 
@@ -306,6 +300,8 @@ class KeysController extends Controller
 						}
 
 					}
+
+					unset($_SESSION['system']['keySubsection']);
 
 					//$this->addMessage(_('Step data saved.'));
 					
@@ -377,15 +373,6 @@ class KeysController extends Controller
         
 		if (isset($_SESSION['system']['step'])) {
 		
-			$k = $this->models->Keystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $_SESSION['system']['step']
-					)
-				)
-			);
-
 			if (!empty($this->requestData['id'])) {
 			
 				$id = $this->requestData['id'];
@@ -510,6 +497,8 @@ class KeysController extends Controller
 
 			} else {
 
+				$k = $this->getKeySteps(array('id' => $_SESSION['system']['step']));
+
 		        $this->setPageName(sprintf(_('Add choice for step %s: "%s"'),$k[0]['number'],$k[0]['title']));
 
 			}
@@ -522,7 +511,7 @@ class KeysController extends Controller
 
 				$this->models->ChoiceKeystep->delete(
 					array(
-						'id' => $this->data['id'],						
+						'id' => $data['id'],						
 						'project_id' => $this->getCurrentProjectId(),
 					)
 				);
@@ -531,13 +520,13 @@ class KeysController extends Controller
 			
 			} elseif (isset($this->requestData['action']) && $this->requestData['action']=='deleteImage') {
 			// delete just the image
-			
+
 				if (!empty($data['choice_img']))
 					@unlink($_SESSION['project']['paths']['project_media'].$data['choice_img']);
 
 				$this->models->ChoiceKeystep->save(
 					array(
-						'id' => $this->data['id'],						
+						'id' => $data['id'],						
 						'choice_img' => 'null'
 					)
 				);
@@ -552,15 +541,7 @@ class KeysController extends Controller
 		} // if (isset($_SESSION['system']['step']))
 
 
-		$k = $this->models->Keystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id !=' => $_SESSION['system']['step'],
-				),
-				'order' => 'number'
-			)
-		);
+		$k = $this->getKeySteps(array('idToExclude'=>$_SESSION['system']['step']));
 
 		$this->getTaxonTree(null);
 
@@ -577,6 +558,55 @@ class KeysController extends Controller
     }
 
 
+	public function sectionAction()
+	{
+	
+		$this->checkAuthorisation();
+
+		unset($_SESSION['system']['step']);
+
+		if (isset($this->requestData['action']) && $this->requestData['action']=='new') {
+
+			$_SESSION['system']['keySubsection'] = true;
+				
+			$this->redirect('step_show.php');
+
+		}
+        
+        $this->setPageName( _('Key subsections'));
+
+		$l = $this->models->Keystep->_get(
+			array(
+				'id'=>array(
+					'project_id'=>$this->getCurrentProjectId(),
+					'is_start' => 0
+				)
+			)
+		);
+		
+		foreach((array)$l as $key => $val) {
+
+			$ck = $this->models->ChoiceKeystep->_get(
+				array(
+					'id'=>array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_keystep_id' => $val['id']
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+			
+			if ($ck[0]['total']==0) $d[] = $val;
+
+		}
+
+		if (isset($d)) $this->smarty->assign('keySections',$d);
+
+        $this->printPage();
+	
+	}
+
+
     public function mapAction()
     {
 
@@ -587,6 +617,96 @@ class KeysController extends Controller
         $this->printPage();
 
     }
+
+
+    public function rankAction()
+    {
+
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Taxon ranks in key'));
+		
+		$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>true));
+
+		if (isset($this->requestData['keyRankBorder']) && isset($pr) && !$this->isFormResubmit()) {
+
+			$endPoint = false;
+
+			foreach((array)$pr as $key => $val) {
+
+				if ($val['rank_id']==$this->requestData['keyRankBorder']) $endPoint = true;
+				
+				$this->models->ProjectRank->save(
+					array(
+						'id' => $val['id'],
+						'keypath_endpoint' => $endPoint ? 1 : 0
+					)
+				);
+
+			}
+			
+			$this->addMessage(_('Ranks saved.'));
+
+			$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>true,'forceLookup'=>true));
+
+		}
+
+		$this->smarty->assign('projectRanks',$pr);
+
+        $this->printPage();
+
+    }
+
+    public function orphansAction()
+    {
+
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Taxa not part of the key'));
+		
+		$pr = $this->getProjectRanks(array('keypathEndpoint'=>true,'forceLookup'=>true));
+
+		foreach((array)$pr as $key => $val) {
+
+			$t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'rank_id' => $val['id']
+					),
+					'order' => 'taxon_order'
+				)
+			);
+
+			foreach((array)$t as $tkey => $tval) {
+			
+				$ck = $this->models->ChoiceKeystep->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'res_taxon_id' => $tval['id']
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
+
+				if ($ck[0]['total']==0) {
+				
+					$taxa[] = $tval;
+				
+				}
+			
+			}
+
+		}
+
+		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+        $this->printPage();
+
+    }
+
+
 
 	private function updateKeyPath($id,$number,$title,$choice) 
 	{
@@ -624,7 +744,7 @@ class KeysController extends Controller
 	private function getKeyPath()
 	{
 
-		return $_SESSION['system']['keyPath'];
+		return isset($_SESSION['system']['keyPath']) ? $_SESSION['system']['keyPath'] : false;
 
 	}
 	
@@ -729,6 +849,30 @@ class KeysController extends Controller
 		return $next;
 
 	}
+
+	private function getKeySteps($params)
+	{
+
+
+		$id = isset($params['id']) ? $params['id'] : false;
+		$idToExclude = isset($params['idToExclude']) ? $params['idToExclude'] : false;
+		$isStart = isset($params['isStart']) ? $params['isStart'] : false;
+		
+		$p['columns'] = isset($params['columns']) ? $params['columns'] : '*';
+		$p['order'] = isset($params['order']) ? $params['order'] : 'number';
+
+		$p['id']['project_id'] = $this->getCurrentProjectId();
+
+		if ($id) $p['id']['id'] = $id;
+		if ($idToExclude) $p['id']['id !='] = $idToExclude;
+		if ($isStart) $p['id']['isStart'] = $isStart;
+		
+		$k = $this->models->Keystep->_get($p);
+		
+		return $k;
+
+	}
+
 
 
 }
