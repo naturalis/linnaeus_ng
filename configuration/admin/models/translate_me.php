@@ -20,9 +20,10 @@ class TranslateMe extends Model
     {
         
         parent::__construct(self::tableBaseName);
+		
+		$this->doLog = false; // lots of duplicate entry errors; lazy me
     
     }
-
 
 
     /**
@@ -36,6 +37,7 @@ class TranslateMe extends Model
         parent::__destruct();
     
     }
+
 
 }
 

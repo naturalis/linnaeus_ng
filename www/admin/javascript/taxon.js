@@ -16,7 +16,7 @@ var taxonTaxonParent = Array();
 var taxonRanks = Array();
 var taxonCanHaveHybrid = Array();
 var taxonExecAfterSave = false;
-var taxonRankGeneralBorder = false;
+var taxonRankBorder = false;
 
 
 //GENERAL
@@ -985,7 +985,7 @@ var taxonCoLRanks = Array();
 function taxonAddCoLRanks() {
 
 	taxonAddedRanks = taxonCoLRanks;
-	taxonRankGeneralBorder=taxonAddedRanks[taxonAddedRanks.length-2][0];
+	taxonRankBorder=taxonAddedRanks[taxonAddedRanks.length-2][0];
 	taxonShowSelectedRanks();
 
 }
@@ -1017,16 +1017,16 @@ function taxonRemoveRank(id) {
 	if (taxonAddedRanks.length==0) {
 
 		taxonAddRank(taxonKingdom[0]);
-		taxonRankGeneralBorder=taxonAddedRanks[taxonAddedRanks.length-1][0];
+		taxonRankBorder=taxonAddedRanks[taxonAddedRanks.length-1][0];
 
 	}
 
-	if (taxonRankGeneralBorder==id) {
+	if (taxonRankBorder==id) {
 		
 		if (taxonAddedRanks.length>1)
-			taxonRankGeneralBorder=taxonAddedRanks[taxonAddedRanks.length-2][0];
+			taxonRankBorder=taxonAddedRanks[taxonAddedRanks.length-2][0];
 		else
-			taxonRankGeneralBorder=taxonAddedRanks[taxonAddedRanks.length-1][0];
+			taxonRankBorder=taxonAddedRanks[taxonAddedRanks.length-1][0];
 
 	}
 
@@ -1067,7 +1067,7 @@ function taxonOrderSelectedRanks() {
 
 function taxonMoveBorder(id) {
 
-	taxonRankGeneralBorder = id;
+	taxonRankBorder = id;
 	taxonShowSelectedRanks();
 
 }
@@ -1077,20 +1077,20 @@ function taxonShowSelectedRanks() {
 	var first = true;
 	var b= '';
 
-	if (taxonRankGeneralBorder==false && taxonAddedRanks.length>1) {
+	if (taxonRankBorder==false && taxonAddedRanks.length>1) {
 
-		taxonRankGeneralBorder = taxonAddedRanks[(taxonAddedRanks.length)-1][0];
+		taxonRankBorder = taxonAddedRanks[(taxonAddedRanks.length)-1][0];
 
 	}
 
 	for (var i=0;i<taxonAddedRanks.length;i++) {
 
-		if (taxonAddedRanks[i][2]==true && first==true) {
-			b = b + '<tr><td>------------------------------------</td</tr>'+"\n";
-			first = false;
-		}
+//		if (taxonAddedRanks[i][2]==true && first==true) {
+//			b = b + '<tr><td>------------------------------------</td</tr>'+"\n";
+//			first = false;
+//		}
 
-		if (taxonAddedRanks[i][0]==taxonRankGeneralBorder) {
+		if (taxonAddedRanks[i][0]==taxonRankBorder) {
 
 			b = b + 
 					'<tr>'+
@@ -1108,13 +1108,10 @@ function taxonShowSelectedRanks() {
 					taxonAddedRanks[i][1]+
 				'</td>'+
 				'<td>'+
-					(i>0 && i<taxonAddedRanks.length-1 ?
-						(taxonAddedRanks[i+1][0]==taxonRankGeneralBorder ? 
-							'<span class="rankArrow" onclick="taxonMoveBorder('+taxonAddedRanks[i][0]+');">&uarr;</span>' : 
-							(taxonAddedRanks[i][0]==taxonRankGeneralBorder ? 
-								'<span class="rankArrow" onclick="taxonMoveBorder('+taxonAddedRanks[i+1][0]+');">&darr;</span>' : '')
-						) : ''
-					)+
+					(i>=0 && i<taxonAddedRanks.length-1 && taxonAddedRanks[i+1][0]==taxonRankBorder ? 
+						'<span class="rankArrow" onclick="taxonMoveBorder('+taxonAddedRanks[i][0]+');">&uarr;</span>' : '')+
+					(i>=0 && i<taxonAddedRanks.length-1 && taxonAddedRanks[i][0]==taxonRankBorder ? 
+						'<span class="rankArrow" onclick="taxonMoveBorder('+taxonAddedRanks[i+1][0]+');">&darr;</span>' : '') +
 				'</td>'+
 			'</tr>'+
 			"\n";
@@ -1134,7 +1131,7 @@ function taxonSaveRanks() {
 
 	}
 
-	$('<input type=hidden name="higherTaxaBorder" value="'+taxonRankGeneralBorder+'">').appendTo('#theForm');
+	$('<input type=hidden name="higherTaxaBorder" value="'+taxonRankBorder+'">').appendTo('#theForm');
 
 
 

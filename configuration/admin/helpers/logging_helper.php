@@ -19,6 +19,7 @@ class LoggingHelper
 	private $_file = false;
 	private $_level = 2;
 	private $_lineTerminator = "\n";
+	private $_source = false;
 
 	public function __destruct()
 	{
@@ -61,8 +62,19 @@ class LoggingHelper
 
 	}
 
-	public function write($msg,$severity=0)
+	public function log($msg,$severity=0,$source=false)
 	{
+	
+		if ($source) $this->_source = $source;
+	
+		$this->write($msg,$severity);
+	
+	}
+
+	public function write($msg,$severity=0,$source=false)
+	{
+
+		if ($source) $this->_source = $source;
 
 		if ($severity < $this->_level) return;
 
@@ -97,11 +109,21 @@ class LoggingHelper
 	private function writeLine($msg,$severity)
 	{
 
-		$d = debug_backtrace();
+		if (!$this->_source) {
+
+			$d = debug_backtrace();
+			
+			$t = ($d[2]['function']=='log' ? $d[3] : $d[2]);
+			
+			$t = ($t['function']=='addError' ? $d[4] : $t);
+			
+			$t = $t['class'].$t['type'].$t['function'];
+
+		} else {
 		
-		$t = ($d[2]['function']=='log' ? $d[3] : $d[2]);
+			$t = $this->_source;
 		
-		$t = ($t['function']=='addError' ? $d[4] : $t);
+		}
 
 		fwrite(
 			$this->_file,
@@ -111,7 +133,7 @@ class LoggingHelper
 			': '.
 			$msg.
 			' ['.
-			$t['class'].$t['type'].$t['function'].
+			$t.
 			//' ('.$t['file'].', l'.$t['line'].')'.
 			']'.
 			$this->_lineTerminator	

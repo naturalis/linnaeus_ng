@@ -40,7 +40,10 @@ class Controller extends BaseClass
         'module_project',
 		'language',
 		'translate_me',
-		'taxon'
+		'taxon',
+		'project_rank',
+		'label_project_rank',
+		'rank'
     );
 
     private $usedHelpersBase = array(
@@ -64,6 +67,10 @@ class Controller extends BaseClass
         
         $this->startSession();
         
+        $this->loadHelpers();
+		
+		$this->initLogging();
+
         $this->setNames();
 		
         $this->loadControllerConfig();        
@@ -71,10 +78,6 @@ class Controller extends BaseClass
         $this->setPaths();
 
         $this->setUrls();
-
-        $this->loadHelpers();
-
-		$this->initLogging();
         
         $this->loadModels();
 
@@ -123,7 +126,7 @@ class Controller extends BaseClass
     public function getAppName ()
     {
         
-        return $this->appName;
+        return isset($this->appName) ? $this->appName : false;
     
     }
 
@@ -411,7 +414,7 @@ class Controller extends BaseClass
         
         }
         
-        return $cup;
+        return isset($cup) ? $cup : false;
     
     }
 
@@ -879,7 +882,7 @@ class Controller extends BaseClass
 		if (empty($content)) return;
 
 		/* DEBUG */
-		$this->models->TranslateMe->save(
+		@$this->models->TranslateMe->save(
 			array(
 				'id' => null,
 				'controller' => $this->getControllerBaseName(),
@@ -933,6 +936,8 @@ class Controller extends BaseClass
 
     public function getTaxonTree($pId=null,$level=0) 
     {
+	
+		$pr = $this->getProjectRanks();
 
 		if ($level==0) unset($this->_treeList);
 
@@ -947,6 +952,20 @@ class Controller extends BaseClass
 			);
 
         foreach((array)$t as $key => $val) {
+
+			foreach((array)$pr as $rankkey => $rank) {
+
+				if ($rank['id']==$val['rank_id']) {
+
+					$val['lower_taxon'] = $rank['lower_taxon'];
+
+					$val['keypath_endpoint'] = $rank['keypath_endpoint'];
+					
+					break;	
+
+				}
+
+			}
 
 			$val['level'] = $level;
 
@@ -965,6 +984,85 @@ class Controller extends BaseClass
         return $t;
 
     }
+
+	public function getProjectRanks($params=false)
+	{
+
+		$includeLanguageLabels = isset($params['includeLanguageLabels']) ? $params['includeLanguageLabels'] : false;
+		$lowerTaxonOnly = isset($params['lowerTaxonOnly']) ? $params['lowerTaxonOnly'] : false;
+		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : false;
+		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
+
+		if (!$forceLookup) {
+
+			if (
+				!isset($_SESSION['project']['ranksIncludeLanguageLabels']) || 
+				$_SESSION['project']['ranksIncludeLanguageLabels']!=$includeLanguageLabels ||
+				!isset($_SESSION['project']['ranksLowerTaxonOnly']) || 
+				$_SESSION['project']['ranksLowerTaxonOnly']!=$lowerTaxonOnly ||
+				!isset($_SESSION['project']['keypathEndpoint']) || 
+				$_SESSION['project']['keypathEndpoint']!=$keypathEndpoint
+				)
+
+				$forceLookup = true;
+
+		}
+
+		
+		$_SESSION['project']['ranksIncludeLanguageLabels'] = $includeLanguageLabels;
+		$_SESSION['project']['ranksLowerTaxonOnly'] = $lowerTaxonOnly;
+		$_SESSION['project']['keypathEndpoint'] = $keypathEndpoint;
+
+		if (!isset($_SESSION['project']['projectRanks']) || $forceLookup) {
+
+			if ($keypathEndpoint)
+				$d = array('project_id' => $this->getCurrentProjectId(),'keypath_endpoint' => 1);
+			elseif ($lowerTaxonOnly)
+				$d = array('project_id' => $this->getCurrentProjectId(),'lower_taxon' => 1);
+			else
+				$d = array('project_id' => $this->getCurrentProjectId());
+
+			$pr = $this->models->ProjectRank->_get(array('id' => $d,'order' => 'rank_id'));
+
+			foreach((array)$pr as $rankkey => $rank) {
+	
+				$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
+	
+				$pr[$rankkey]['rank'] = $r['rank'];
+	
+				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+				
+				if ($includeLanguageLabels) {
+	
+					foreach((array)$_SESSION['project']['languages'] as $langaugekey => $language) {
+		
+						$lpr = $this->models->LabelProjectRank->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'project_rank_id' => $rank['id'],
+									'language_id' => $language['language_id']
+								),
+								'columns' => 'label'
+							)
+						);
+						
+						$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
+			
+					}
+	
+				}
+	
+			}
+			
+			$_SESSION['project']['projectRanks'] = $pr;
+			
+		}
+
+		return $_SESSION['project']['projectRanks'];
+
+	}
+	
 
 	private function getCurrentUiLanguage()
 	{
@@ -1085,6 +1183,13 @@ class Controller extends BaseClass
         if ($path['filename']) $this->_viewName = $path['filename'];
 
         $this->_fullPathRelative = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/'.$this->_viewName .'.php';
+
+        if (empty($this->appName)) $this->log('No application name set',2);
+        if (empty($this->_viewName)) $this->log('No view name set',2);
+		if (empty($this->controllerBaseName)) $this->log('No controller basename set',2);
+		if (empty($this->baseUrl)) $this->log('No base URL set',2);
+        if (empty($this->_fullPath)) $this->log('No full path set',2);
+        if (empty($this->_fullPathRelative)) $this->log('No relative full path set',2);
 
     }
 
@@ -1239,6 +1344,8 @@ class Controller extends BaseClass
                 if (class_exists($t)) {
                     
                     $this->models->$t = new $t();
+
+					$this->models->$t->setLogger($this->helpers->LoggingHelper);
                     
                 //echo $t.chr(10);
                 } else {
@@ -1313,7 +1420,9 @@ class Controller extends BaseClass
 	private function initLogging()
 	{
 
-		$this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'].'/'.$this->getAppName().'.log');
+		$fn = $this->getAppName() ? $this->getAppName() : 'general';
+
+		$this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'].'/'.$fn.'.log');
 
 		$this->helpers->LoggingHelper->setLevel(0);
 
