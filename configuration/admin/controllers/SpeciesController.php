@@ -234,7 +234,7 @@ class SpeciesController extends Controller
 			
 			$this->getTaxonTree(null);
 	
-			$isEmptyTaxaList = !isset($this->_treeList) || count((array)$this->_treeList)==0;
+			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
 			
 			if (count((array)$ut)>0 || $isEmptyTaxaList) {
 	
@@ -242,7 +242,7 @@ class SpeciesController extends Controller
 	
 				if (!$isEmptyTaxaList) {
 		
-					foreach((array)$this->_treeList as $key => $val) {
+					foreach((array)$this->treeList as $key => $val) {
 			
 						if ($allow && $val['level'] <= $prevLevel) {
 						
@@ -499,7 +499,7 @@ class SpeciesController extends Controller
 		// get complete taxon tree
 		$this->getTaxonTree(null);
 
-		if (isset($this->_treeList)) { 
+		if (isset($this->treeList)) { 
 
 			if (isset($_SESSION['project']['ranklist'])) {
 	
@@ -539,7 +539,7 @@ class SpeciesController extends Controller
 			$prevAllowedLevel = -1;
 
 			// discard all taxa above the levels (i.e. smaller level-value) assigned to the user
-			foreach((array)$this->_treeList as $key => $val) {
+			foreach((array)$this->treeList as $key => $val) {
 	
 				if ($allow && $val['level'] <= $prevAllowedLevel) {
 				
@@ -1467,7 +1467,7 @@ class SpeciesController extends Controller
 
 		$this->getTaxonTree(null);
 	
-		if (isset($this->_treeList)) {
+		if (isset($this->treeList)) {
 
 			$ut = $this->models->UserTaxon->_get(
 				array(
@@ -1486,7 +1486,7 @@ class SpeciesController extends Controller
 	
 			$this->smarty->assign('users', $users);
 	
-			$this->smarty->assign('taxa',$this->_treeList);
+			$this->smarty->assign('taxa',$this->treeList);
 		
 		} else {
 	
@@ -2442,8 +2442,8 @@ class SpeciesController extends Controller
     {
 
         $this->getTaxonTree(null);
-q($this->_treeList);
-        foreach((array)$this->_treeList as $key => $val) {
+
+        foreach((array)$this->treeList as $key => $val) {
 
             $this->models->Taxon->save(
                 array(

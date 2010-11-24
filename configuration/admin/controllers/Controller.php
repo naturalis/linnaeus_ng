@@ -32,7 +32,7 @@ class Controller extends BaseClass
 	public $isMultiLingual = true;
 	public $uiLanguages;
 	public $uiDefaultLanguage;
-    public $_treeList;
+    public $treeList;
 
     private $usedModelsBase = array(
         'helptext', 
@@ -874,6 +874,8 @@ class Controller extends BaseClass
     /**
      * Gettext wrapper, to be called from a registered block function within Smarty
      *
+	 * parametrization: {t _s1='one' _s2='two' _s3='three'}The 1st parameter is %s, the 2nd is %s and the 3nd %s.{/t}
+	 *
      * @access     public
      */
 	public function smartyTranslate($params, $content, &$smarty, &$repeat)
@@ -939,7 +941,7 @@ class Controller extends BaseClass
 	
 		$pr = $this->getProjectRanks();
 
-		if ($level==0) unset($this->_treeList);
+		if ($level==0) unset($this->treeList);
 
         $t = $this->models->Taxon->_get(
 				array(
@@ -973,7 +975,7 @@ class Controller extends BaseClass
 
 			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
 
-            $this->_treeList[] = $val;
+            $this->treeList[] = $val;
 
 			$t[$key]['level'] = $level;
 

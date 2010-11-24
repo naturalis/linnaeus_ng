@@ -54,11 +54,21 @@
 		<td>&nbsp;</td>
 		<td>taxon:</td>
 		<td>
+		
+		
 			<select name="res_taxon_id" id="res_taxon_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="0">{t}(none){/t}</option>
 				<option disabled="disabled">&nbsp;</option>
 {assign var=first value=true}
-{section name=i loop=$taxa}{if $first}{assign var=minBuffer value=$taxa[i].level}{/if}{if $taxa[i].keypath_endpoint==1}<option value="{$taxa[i].id}"{if $taxa[i].id==$data.res_taxon_id} selected="selected"{/if}>{section name=foo loop=$taxa[i].level-$minBuffer}&nbsp;&nbsp;{/section}{$taxa[i].taxon}{assign var=first value=false}{/if}</option>
+{section name=i loop=$taxa}
+{if $first}{assign var=minBuffer value=$taxa[i].level}{/if}
+{assign var=x value=$taxa[i].id}
+{if $taxa[i].keypath_endpoint==1}
+<option value="{$taxa[i].id}"{if $taxa[i].id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
+{section name=foo loop=$taxa[i].level-$minBuffer}&nbsp;&nbsp;{/section}
+{$taxa[i].taxon}{if $taxa[i].is_hybrid==1}&nbsp;x{/if}
+{assign var=first value=false}{/if}
+</option>
 {/section}
 			</select>
 		</td>
