@@ -109,3 +109,33 @@ function keyShowRanks() {
 		'</table><input type="hidden" name="keyRankBorder" value="'+keyRankBorder+'">');
 
 }
+
+var keyOpenChoices = Array();
+var keyAllOpened = false;
+
+function keyShowChoiceDetails(id) {
+
+	if (id=='all') {
+
+		for (var i=0;i<=99;i++) {
+			if (keyAllOpened)
+				$('#choice-'+i).removeClass('key-choice-details').addClass('key-choice-details-invisible');
+			else
+				$('#choice-'+i).removeClass('key-choice-details-invisible').addClass('key-choice-details');
+		}
+
+		keyAllOpened = !keyAllOpened;
+
+	} else {
+
+		if (keyOpenChoices[id]==true) {
+			$('#choice-'+id).removeClass('key-choice-details').addClass('key-choice-details-invisible');
+			keyOpenChoices[id]=false;
+		} else {
+			$('#choice-'+id).removeClass('key-choice-details-invisible').addClass('key-choice-details');
+			keyOpenChoices[id]=true;
+		}
+
+	}
+
+}
