@@ -26,7 +26,7 @@ var Log = {
 };
 
 
-function init(){
+function init(x){
     //init data
     var json = {
         id: "node02",
@@ -759,7 +759,9 @@ function init(){
             }]
         }]
     };	
-    //end
+
+var json = x;
+	//end
     //init Spacetree
     //Create a new ST instance
     var st = new $jit.ST({
@@ -807,11 +809,8 @@ function init(){
             label.id = node.id;            
             label.innerHTML = node.name;
             label.onclick = function(){
-            	if(normal.checked) {
-            	  st.onClick(node.id);
-            	} else {
-                st.setRoot(node.id, 'animate');
-            	}
+			//st.onClick(node.id);
+			st.setRoot(node.id, 'animate');
             };
             //set label styles
             var style = label.style;
@@ -893,7 +892,6 @@ function init(){
         }
     };
     
-    top.onchange = left.onchange = bottom.onchange = right.onchange = changeHandler;
     //end
 
 }
