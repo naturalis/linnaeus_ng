@@ -245,7 +245,7 @@ abstract class Model extends BaseClass
 				$this->_projectId = $val;
 			
 			}
-            
+
             if ($d && isset($val)) {
 			
                 if ($d['numeric'] == 1) {
@@ -301,9 +301,19 @@ abstract class Model extends BaseClass
                     $col = trim(substr($col, 0, strpos($col, ' ')));
                 
                 }
+
+	            $d = $this->columns[$col];
+
+                if ($d['numeric'] == 1) {
+				
+	                $query .= ' and ' . $col . " " . $operator . " " . $this->escapeString($val);
+
+				} else {
                 
-                $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
-            
+	                $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
+
+    			}
+	        
             }
         
         }

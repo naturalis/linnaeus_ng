@@ -419,16 +419,27 @@ function taxonSaveData(id,language,page,content,editorName) {
 
 }
 
-function taxonDeleteData() {
+function taxonDeleteData(id,name) {
 
-	if (taxonActiveTaxonId.length==0) return;
+	if (!id)
+		var thisId = taxonActiveTaxonId;
+	else
+		var thisId = id;
 
-	if (!allDoubleDeleteConfirm('all content in all languages for taxon',$('#taxon-name').val())) return;
+	if (!name)
+		var thisName = $('#taxon-name').val();
+	else
+		var thisName = name;
+
+
+	if (thisId.length==0) return;
+
+	if (!allDoubleDeleteConfirm('all content in all languages for taxon',thisName)) return;
 
 	$.post(
 		"ajax_interface.php", 
 		{
-			'id' : taxonActiveTaxonId ,
+			'id' : thisId ,
 			'action' : 'delete_taxon' ,
 			'page' : taxonActivePage ,
 			'time': allGetTimestamp()	
@@ -1397,5 +1408,38 @@ function taxonGetSectionLabels(language) {
 	taxonGeneralGetLabels(language,'get_section_titles','taxonSetSectionLabels');
 	
 }
+
+
+function taxonSynonymAction(id,action) {
+
+	if (action=='delete' && !confirm(_('Are you sure?'))) return;
+
+	$('#synonym_id').val(id);
+	$('#action').val(action);
+	$('#theForm').submit()
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

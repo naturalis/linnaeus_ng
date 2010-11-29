@@ -15,7 +15,9 @@
 
 	must delete link taxa - ranks when deleting a rank
 
-	must delete keychoice when deleting taxon
+	must set parent_id of children to null if parent-taxon is deleted (god forbid)
+
+	must delete keychoice, synonyms, common names when deleting taxon
 
 	ordering of ranks in getProjectRanks might need some reconsidering
 
@@ -43,7 +45,8 @@ class SpeciesController extends Controller
         'content_taxon_undo',
         'media_taxon',
         'media_descriptions_taxon',
-		'hybrid'
+		'hybrid',
+		'synonym'
     );
     
     public $usedHelpers = array(
@@ -623,7 +626,9 @@ class SpeciesController extends Controller
 							'group' => 'mime_type'
 						)
 					);
-				
+					
+					$taxa[$key]['totMediaCount'] = 0;
+
 					foreach((array)$mt as $mtkey => $mtval) {
 		
 						$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = 
@@ -631,14 +636,22 @@ class SpeciesController extends Controller
 								$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 
 								0) 
 							+ $mtval['total'];
-								
-						$taxa[$key]['totMediaCount'] =
-							(isset($taxa[$key]['totMediaCount']) ? 
-								$taxa[$key]['totMediaCount'] : 
-								0 ) 
-							+ $taxa[$key]['mediaCount'][$d[$mtval['mime_type']]];
-	
+
+						$taxa[$key]['totMediaCount'] += $mtval['total'];
+									
 					}
+
+					$s = $this->models->Synonym->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon_id' => $taxon['id']
+							),
+							'columns' => 'count(*) as total'
+						)
+					);
+
+					$taxa[$key]['synonymCount'] = $s[0]['total'];
 
 				}
         
@@ -2991,6 +3004,147 @@ class SpeciesController extends Controller
 
 	}
 
+
+	public function synonymsAction()
+	{
+
+		$this->checkAuthorisation();
+
+		if (!empty($this->requestData['id'])) {
+
+			$t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $this->requestData['id']
+					)
+				)
+			);
+
+			$data = $t[0];
+
+	        $this->setPageName(sprintf(_('Synonyms for taxon "%s"'),$t[0]['taxon']));
+
+		} else {
+
+			$this->redirect();
+
+		}
+		
+		if (!$this->isFormResubmit()) {
+
+			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
+	
+				$this->models->Synonym->delete(
+					array(
+						'id' => $this->requestData['synonym_id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+	
+				$synonyms = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'order' => 'show_order'
+					)
+				);
+				
+				foreach((array)$synonyms as $key => $val) {
+	
+					$this->models->Synonym->save(
+						array(
+							'id' => $val['id'],
+							'project_id' => $this->getCurrentProjectId(),
+							'show_order' => $key
+						)
+					);
+					
+					$synonyms[$key]['show_order'] = $key;
+	
+				}
+	
+			}
+			
+			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
+
+				$s = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'id' => $this->requestData['synonym_id'],
+							'project_id' => $this->getCurrentProjectId(),
+						)
+					)
+				);
+
+				$this->models->Synonym->update(
+					array('show_order' => $s[0]['show_order']),
+					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
+						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
+				);
+
+				$this->models->Synonym->update(
+					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
+					array('id' => $this->requestData['synonym_id'],'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+	
+			if (!empty($this->requestData['synonym'])) {
+	
+				$s = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns' => 'max(show_order) as next'
+					)
+				);
+				
+				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
+	
+				$this->models->Synonym->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id'],
+						'synonym' => $this->requestData['synonym'],
+						'remark' => !empty($this->requestData['remark']) ? $this->requestData['remark'] : null,
+						'show_order' => $show_order
+					)
+				);
+	
+			}
+			
+		}
+
+
+		if (!isset($synonyms)) {
+
+			$synonyms = $this->models->Synonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+					'order' => 'show_order'
+				)
+			);
+
+		}
+
+		$this->smarty->assign('id',$this->requestData['id']);
+
+		$this->smarty->assign('taxon',$t[0]['taxon']);
+
+		$this->smarty->assign('synonyms',$synonyms);
+
+		$this->printPage();
+
+	}
 
 }
 

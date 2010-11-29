@@ -935,11 +935,12 @@ class UsersController extends Controller
 			)
 		);
 
-        $this->smarty->assign('modules', $modules);
+        $this->smarty->assign('modules',$modules);
 
-        $this->smarty->assign('freeModules', $freeModules);
+        $this->smarty->assign('freeModules',$freeModules);
 
-        
+        $this->smarty->assign('currentRole',$this->getCurrentUserCurrentRole());
+
         $this->printPage();
     
     }
