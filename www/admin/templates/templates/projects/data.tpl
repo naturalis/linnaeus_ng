@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form enctype="multipart/form-data" id="theForm" action="" method="POST">
+<form enctype="multipart/form-data" id="theForm" action="" method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="deleteLogo" id="deleteLogo" value="0" />
 <table>
@@ -82,10 +82,30 @@
 				add language
 			</span>
 		</td>
+	</tr>
+	<tr>
+		<td>
+			This project includes hybrid taxa:
+		</td>
+		<td>
+			<label>
+				<input type="radio" name="includes_hybrids" value="1" {if $data.includes_hybrids=='1'} checked="checked"{/if}/> yes
+			</label>
+			<label>
+				<input type="radio" name="includes_hybrids" value="0" {if $data.includes_hybrids!='1'} checked="checked"{/if}/> no
+			</label>
+		</td>
+	</tr>		
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>		
+	<tr>
+		<td colspan="2">
+			<input type="submit" value="save" />
+			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+		</td>
 	</tr>		
 </table>
-<input type="submit" value="save" />
-<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
 </form>
 
 <br />

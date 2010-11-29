@@ -225,11 +225,11 @@ class Controller extends BaseClass
     public function redirect ($url = false)
     {
         
-        if (!$url) {
+        if (!$url && isset($_SERVER['HTTP_REFERER'])) {
             
             $url = $_SERVER['HTTP_REFERER'];
         
-        }
+        } 
         
         if (basename($url) == $url) {
             
@@ -670,6 +670,37 @@ class Controller extends BaseClass
     }
 
 
+    /**
+     * Returns the active users role in the current project
+     *
+     * @return     array    id and name of the role
+     * @access     public
+     */
+    public function getCurrentUserCurrentRole ()
+    {
+
+		if (isset($_SESSION['user']['currentRole'])) return $_SESSION['user']['currentRole'];
+
+		$d = $this->getCurrentProjectId();
+		$r = false;
+        
+		foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+
+			if ($val['project_id']==$d) {
+			
+				$r['role_id'] = $val['role_id'];
+				$r['role_name'] = $val['role_name'];
+				break;
+
+			}
+
+		}
+		
+		$_SESSION['user']['currentRole'] = $r;
+		
+        return $r;
+
+    }
 
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
@@ -1710,7 +1741,7 @@ class Controller extends BaseClass
      */
     private function isUserAuthorisedForProjectPage ()
     {
-        
+
 		// is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
 		if ($this->getControllerBaseName()=='') return true;
 

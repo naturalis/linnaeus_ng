@@ -39,14 +39,17 @@
 	</tr>
 </table>
 
-<br />
 
-Other tasks:
+{if $currentRole.role_id==1 || $currentRole.role_id==2}
+<br />
+Management tasks:
 <ul>
 	<li><a href="views/users/">User management</a></li>
 	<li><a href="views/projects/">Project management</a></li>
 	<li><a href="views/users/choose_project.php">Switch projects</a></li>
 </ul>
+
+{/if}
 </div>
 
 {include file="shared/admin-footer.tpl"}

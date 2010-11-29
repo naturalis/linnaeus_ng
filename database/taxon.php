@@ -27,6 +27,33 @@ create table dev_choices_keysteps (
 
 
 
+CREATE TABLE synonyms (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	taxon_id INT( 11 ) NOT NULL ,
+	synonym varchar(32) not null,
+	remark varchar(255) null,
+	lit_ref_id INT( 11 ) NULL,
+	show_order int(4)  NOT NULL default 0,
+	created DATETIME NOT NULL ,
+	PRIMARY KEY ( id ) ,
+	INDEX ( project_id, taxon_id )
+) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+CREATE TABLE commonnames (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id INT( 11 ) NOT NULL ,
+	taxon_id INT( 11 ) NOT NULL ,
+	language_id INT( 11 ) NOT NULL ,
+	commonname varchar(32) not null,
+	created DATETIME NOT NULL ,
+	PRIMARY KEY ( id ) ,
+	INDEX ( project_id, taxon_id )
+) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+rename table synonyms to dev_synonyms;
+rename table commonnames to dev_commonnames;
 
 
 CREATE TABLE taxa (

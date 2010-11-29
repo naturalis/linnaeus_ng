@@ -7,15 +7,18 @@
 	{t}To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'.{/t}
 	
 	<span id="message-container" style="margin-left:175px">&nbsp;</span>
-	<table>
-	<tr>
-		<th onclick="allTableColumnSort('taxon_order');">{t}Rank{/t}</th>
-		<th onclick="allTableColumnSort('taxon');">{t}Taxon{/t}</th>
-		<th onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>
-		<th>&nbsp;</th>
-		<th onclick="allTableColumnSort('pct_finished');" style="text-align:center" >{t}Content{/t}</th>
-		<th colspan="3" style="text-align:center" title="images, videos, soundfiles">{t}Media{/t}</th>
-		<td>{t}Currently being edited by:{/t}</td>
+	<table style="width:100%">
+	<tr style="vertical-align:bottom">
+		<th style="width:100px;" onclick="allTableColumnSort('taxon_order');">{t}Rank{/t}</th>
+		<th style="width:240px;" onclick="allTableColumnSort('taxon');">{t}Taxon{/t}</th>
+{if $session.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
+		<th style="width:50px;" onclick="allTableColumnSort('pct_finished');">{t}Content{/t}</th>
+		<th style="width:50px;" title="{t}images, videos, soundfiles{/t}">{t}Media{/t}</th>
+		<th style="width:80px;">{t}Synonyms{/t}</th>
+		<th style="width:90px;">{t}Common names{/t}</th>
+		<th style="width:40px;text-align:center">{t}Move{/t}</th>
+		<th style="width:20px;text-align:center">{t}Delete{/t}</th>
+		<th>{t}Is being edited by:{/t}</th>
 	</tr>
 	
 	{assign var=prev_rank value=-1}
@@ -39,54 +42,57 @@
 		<td class="taxon-list-cell-name" id="namecell{$taxa[i].id}">
 			<a href="edit.php?id={$taxa[i].id}">{$taxa[i].taxon}</a>
 		</td>
-		<td>
+{if $session.project.includes_hybrids==1}		<td>
 			{if $taxa[i].is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 		</td>
+{/if}
+
 		<td>
-		{if $arrowBuffer}&nbsp;{/if}
+			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pct_finished}% {t}done{/t}</span>
+		</td>
+
+		<td title="{t}media files{/t}">
+			<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{if $taxa[i].totMediaCount!=''}{$taxa[i].totMediaCount}{else}0{/if} {t}files{/t}</span>
+		</td>
+
+		<td>
+			<span class="pseudo-a" onclick="window.open('synonyms.php?id={$t}','_self');">{$taxa[i].synonymCount} {if $taxa[i].synonymCount==1}{t}synonym{/t}{else}{t}synonyms{/t}{/if}</span>
+		</td>
+
+		<td>
+			<span class="pseudo-a" onclick="window.open('common.php?id={$t}','_self');">{t}common names{/t}</span>
+		</td>
+
+		<td style="text-align:center">
+		{if $arrowBuffer}&nbsp;&nbsp;{/if}
 		{if $taxa[i].sibling_count>1}
 			{if $taxa[i].sibling_pos=='last'}
 				<span
 					class="pseudo-a"
-					title="{t}move taxon upward{/t}"
+					title="{t}move branch upward in the tree{/t}"
 					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('up');$('#rearrangeForm').submit();">
 					&uarr;
 				</span>
 			{else}
 				<span
 					class="pseudo-a"
-					title="{t}move taxon downward{/t}"
+					title="{t}move branch downward in the tree{/t}"
 					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('down');$('#rearrangeForm').submit();">
 					&darr;
 				</span>
 			{/if}
 		{/if}
+		{if !$arrowBuffer}&nbsp;&nbsp;{/if}
 		</td>
+
 		<td
-			class="taxon-list-cell-language{if $languages[j].publish[$t].pct_finished==100}-done{elseif $languages[j].publish[$t].pct_finished==0}-empty{/if}"
-			title="{$languages[j].publish[$t].published} of {$languages[j].publish[$t].total} {t}pages published{/t}"
-			onclick="window.open('taxon.php?id={$t}','_top');">
-			{$taxa[i].pct_finished}% done
+			class="pseudo-a" 
+			style="text-align:center" 
+			onclick="taxonDeleteData({$taxa[i].id},'{$taxa[i].taxon}');">
+			x
 		</td>
-		<td
-			class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}"
-			title="{t}images{/t}"
-			onclick="window.open('media.php?id={$t}#image','_top');">
-			{if $taxa[i].mediaCount.image!=''}{$taxa[i].mediaCount.image}{else}0{/if}
-		</td>
-		<td
-			class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}"
-			title="{t}videos{/t}"
-			onclick="window.open('media.php?id={$t}#video','_top');">
-			{if $taxa[i].mediaCount.video!=''}{$taxa[i].mediaCount.video}{else}0{/if}
-		</td>
-		<td class="taxon-list-cell-media{if $taxa[i].totMediaCount==''}-empty{/if}" 
-			title="{t}soundfiles{/t}" 
-			onclick="window.open('media.php?id={$t}#sound','_top');">
-			{if $taxa[i].mediaCount.sound!=''}{$taxa[i].mediaCount.sound}{else}0{/if}
-		</td>
-		<td id="usage-{$taxa[i].id}">
-		</td>
+
+		<td id="usage-{$taxa[i].id}"></td>
 	</tr>
 		{assign var=prev_rank value=$taxa[i].rank_id}
 

@@ -16,7 +16,7 @@
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
-	<tr>
+{if $session.project.includes_hybrids==1}	<tr>
 		<td>
 			{t}This is a hybrid:{/t}
 		</td>
@@ -27,7 +27,7 @@
 			<span id="hybrid-message" class=""></span>
 		</td>
 	</tr>
-	<tr>
+{/if}	<tr>
 		<td>
 			{t}Parent taxon: {/t}
 		</td>
