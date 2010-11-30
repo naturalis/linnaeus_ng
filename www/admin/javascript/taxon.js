@@ -1409,14 +1409,25 @@ function taxonGetSectionLabels(language) {
 	
 }
 
-
-function taxonSynonymAction(id,action) {
+function taxonGenericNameAction(id,action,type) {
 
 	if (action=='delete' && !confirm(_('Are you sure?'))) return;
 
-	$('#synonym_id').val(id);
+	$('#'+type+'_id').val(id);
 	$('#action').val(action);
 	$('#theForm').submit()
+
+}
+
+function taxonSynonymAction(id,action) {
+	
+	taxonGenericNameAction(id,action,'synonym');
+
+}
+
+function taxonCommonNameAction(id,action) {
+	
+	taxonGenericNameAction(id,action,'commonname');
 
 }
 

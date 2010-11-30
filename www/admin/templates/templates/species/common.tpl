@@ -1,74 +1,82 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-{if $projectRanks|@count==0}
-{t}Currently, no ranks have been defined in your project. To define ranks, go{/t} <a href="ranks.php">{t}here{/t}</a>.
-{else}
-
-<span id="message-container" style="float:right;"></span><br />
-{t}Below, you can specify the correct label of each rank in the language or languages defined in your project.{/t}<br />
-{t}On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
-{t}Text you enter is automatically saved when you leave the input field.{/t}
-<br /><br />
 <table>
 <tr>
-	<th style="width:150px">Rank</th>
-{section name=i loop=$languages}
-{if $languages[i].def_language=='1'}
-	<td {$languages[i].language_id}>{$languages[i].language} *</td>
-{/if}
-{/section}
-{if $languages|@count>1}		
-<td id="language-tabs">(languages)</td>
-{/if}
+	<td colspan="6">{t _s1=$taxon}Common names for taxon "%s":{/t}</td>
 </tr>
-{section name=i loop=$projectRanks}
-	<tr class="tr-highlight">
-		<td>{$projectRanks[i].rank}</td>
-		<td>
-			<input
-				type="text" 
-				id="default-{$projectRanks[i].id}" 
-				maxlength="64" 
-				onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'default')"
-				direction="{$languages[0].direction}" />
-		</td>
-	{if $languages|@count>1}		
-		<td>
-			<input 
-				type="text" 
-				id="other-{$projectRanks[i].id}" 
-				maxlength="64" 
-				onblur="taxonSaveRankLabel({$projectRanks[i].id},this.value,'other')" />
-		</td>
+<tr><td colspan="6">&nbsp;</td></tr>
+<tr>
+	<th style="width:225px;">{t}common name{/t}</td>
+	<th style="width:225px;">{t}transliteration{/t}</td>
+	<th style="width:350px;" colspan="2">{t}language{/t}</td>
+	<th style="width:55px;">{t}move up{/t}</td>
+	<th style="width:65px;">{t}move down{/t}</td>
+	<th>delete</td>
+</tr>
+{section name=i loop=$commonnames}
+<tr class="tr-highlight">
+	<td>{$commonnames[i].commonname}</td>
+	<td>{$commonnames[i].transliteration}</td>
+	<td>{$commonnames[i].language_name}</td>
+	<td><input type="text" value="{$commonnames[i].language_name}" /></td>
+	{if $smarty.section.i.first}
+	<td></td>
+	{else}
+	<td
+		style="text-align:center" 
+		class="pseudo-a" 
+		onclick="taxonCommonNameAction({$commonnames[i].id},'up');">
+		&uarr;
+	</td>
 	{/if}
-	</tr>
+	{if $smarty.section.i.last}
+	<td></td>
+	{else}
+	<td
+		style="text-align:center" 
+		class="pseudo-a" 
+		onclick="taxonCommonNameAction({$commonnames[i].id},'down');">
+		&darr;
+	</td>
+	{/if}
+	<td
+		style="text-align:center" 
+		class="pseudo-a" 
+		onclick="taxonCommonNameAction({$commonnames[i].id},'delete');">
+		x
+	</td>
+</tr>
 {/section}
-</table>
+{if $smarty.section.i.total==0}
+<tr><td colspan="6">{t}No synonyms have been defined for this taxon.{/t}</td></tr>
 {/if}
+</table>
+
+<br />
+<form method="post" action="" id="theForm">
+<input type="hidden" name="action" id="action" value="" />
+<input type="hidden" name="commonname_id" id="commonname_id" value="" />
+<input type="hidden" name="id" value="{$id}" />
+<input type="hidden" name="rnd" value="{$rnd}" />
+<table>
+	<tr><td colspan="2">{t}Add a new common name:{/t}</td></tr>
+	<tr><td style="width:125px">{t}common name:{/t}</td><td><input type="text" name="commonname" maxlength="64" /></td></tr>
+	<tr><td>{t}transliteration:{/t}</td><td><input type="text" name="transliteration" maxlength="64" /></td></tr>
+	<tr><td>{t}language:{/t}</td><td>
+		<select name="language_id" id="language">
+		{section name=i loop=$languages}
+			<option value="{$languages[i].id}">{$languages[i].language}</option>
+		{/section}
+		</select>
+	</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2"><input type="submit" value="{t}save{/t}" />&nbsp;<input type="button" onclick="window.open('list.php','_self');" value="{t}back{/t}" /></td></tr>
+</table>
+</form>
+<br />
+{t}After you have added a new common name, you will be allowed to provide the name of its language in the various interface languages that your project uses.{/t}</td></tr>
 </div>
-
-
-<script type="text/javascript">
-{literal}
-$(document).ready(function(){
-{/literal}
-	taxonActiveView = 'ranklabels';
-{section name=i loop=$projectRanks}
-	taxonAddRankId({$projectRanks[i].id});
-{/section}
-{section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
-{/section}
-	taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-	taxonDrawRankLanguages();
-	taxonGetRankLabels(taxonDefaultLanguage);
-	taxonGetRankLabels(taxonActiveLanguage);
-{literal}
-});
-{/literal}
-</script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
