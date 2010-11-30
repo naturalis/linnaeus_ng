@@ -46,7 +46,9 @@ class SpeciesController extends Controller
         'media_taxon',
         'media_descriptions_taxon',
 		'hybrid',
-		'synonym'
+		'synonym',
+		'commonname',
+		'label_language'
     );
     
     public $usedHelpers = array(
@@ -195,16 +197,7 @@ class SpeciesController extends Controller
 
 		if (!empty($this->requestData['id'])) {
 
-			$t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' =>$this->requestData['id']
-					)
-				)
-			);
-
-			$data = $t[0];
+			$data = $this->getTaxonById();
 
 	        $this->setPageName(sprintf(_('Editing taxon "%s"'),$t[0]['taxon']));
 
@@ -372,17 +365,8 @@ class SpeciesController extends Controller
 		
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
-            
-            $t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
-						'id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId()
-					)
-				)
-			);
-            
-            $taxon = $t[0];
+
+            $taxon = $this->getTaxonById();
             
             $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
         
@@ -717,18 +701,9 @@ class SpeciesController extends Controller
 
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
-            
-            $t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
-						'id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId()
-					)
-				)
-			);
-            
-            $taxon = $t[0];
-            
+
+            $taxon = $this->getTaxonById();
+
             $this->setPageName(sprintf(_('Media for "%s"'),$taxon['taxon']));
 
             $this->smarty->assign('id',$this->requestData['id']);
@@ -742,12 +717,11 @@ class SpeciesController extends Controller
 					'odrder' => 'mime_type, file_name'
 				)
             );
-            
-            
+
             foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-            
+
                 $d[$val['mime']] = $val['media_type'];
-            
+
             }
 
             foreach((array)$media as $key => $val) {
@@ -806,17 +780,8 @@ class SpeciesController extends Controller
 
         if (!empty($this->requestData['id'])) {
         // get existing taxon name
-            
-            $t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
-						'id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId()
-					)
-				)
-			);
-            
-            $taxon = $t[0];
+
+            $taxon = $this->getTaxonById();
             
             if ($taxon['id']) {
 
@@ -1491,7 +1456,7 @@ class SpeciesController extends Controller
 	
 			foreach((array)$ut as $key => $val) {
 	
-				$ut[$key]['taxon'] = $this->models->Taxon->_get(array('id' => $val['taxon_id']));
+				$ut[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
 	
 			}
 	
@@ -1532,11 +1497,14 @@ class SpeciesController extends Controller
             if ($val['def_language'] == 1)
                 $defaultLanguage = $val['language_id'];
         
+			$list[$val['language_id']]= array('language'=>$l['language'],'direction'=>$l['direction']);
         }
         
         $_SESSION['project']['languages'] = $lp;
 
         $_SESSION['project']['default_language_id'] = $defaultLanguage;
+
+        $_SESSION['project']['languageList'] = $list;
 
     }
 
@@ -2940,22 +2908,15 @@ class SpeciesController extends Controller
 	{
 	
 		if ($dir != 'up' && $dir != 'down') return;
-
-		$t1 = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'id' => $id,
-					'project_id' => $this->getCurrentProjectId()
-				)
-			)
-		);
+		
+		$t1 = $this->getTaxonById($id);
 
 		$t2 = $this->models->Taxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'rank_id' => $t1[0]['rank_id'],
-					'taxon_order '.($dir=='up' ? '<' : '>') => $t1[0]['taxon_order']
+					'rank_id' => $t1['rank_id'],
+					'taxon_order '.($dir=='up' ? '<' : '>') => $t1['taxon_order']
 				),
 				'order' => 'taxon_order '.($dir=='up' ? 'desc' : 'asc')
 			)
@@ -2968,14 +2929,14 @@ class SpeciesController extends Controller
 					'taxon_order' => $t2[0]['taxon_order']
 				),
 				array(
-					'id' => $t1[0]['id'],
+					'id' => $t1['id'],
 					'project_id' => $this->getCurrentProjectId()
 				)
 			);
 
 			$this->models->Taxon->update(
 				array(
-					'taxon_order' => $t1[0]['taxon_order']
+					'taxon_order' => $t1['taxon_order']
 				),
 				array(
 					'id' => $t2[0]['id'],
@@ -3004,6 +2965,23 @@ class SpeciesController extends Controller
 
 	}
 
+	private function getTaxonById($id=false)
+	{
+	
+		$id = $id ? $id : $this->requestData['id'];
+
+		$t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+		
+		return $t[0];
+	
+	}
 
 	public function synonymsAction()
 	{
@@ -3012,18 +2990,9 @@ class SpeciesController extends Controller
 
 		if (!empty($this->requestData['id'])) {
 
-			$t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $this->requestData['id']
-					)
-				)
-			);
+			$t = $this->getTaxonById();
 
-			$data = $t[0];
-
-	        $this->setPageName(sprintf(_('Synonyms for taxon "%s"'),$t[0]['taxon']));
+	        $this->setPageName(sprintf(_('Synonyms for taxon "%s"'),$t['taxon']));
 
 		} else {
 
@@ -3121,7 +3090,6 @@ class SpeciesController extends Controller
 			
 		}
 
-
 		if (!isset($synonyms)) {
 
 			$synonyms = $this->models->Synonym->_get(
@@ -3138,9 +3106,189 @@ class SpeciesController extends Controller
 
 		$this->smarty->assign('id',$this->requestData['id']);
 
-		$this->smarty->assign('taxon',$t[0]['taxon']);
+		$this->smarty->assign('taxon',$t['taxon']);
 
 		$this->smarty->assign('synonyms',$synonyms);
+
+		$this->printPage();
+
+	}
+
+
+	public function commonAction()
+	{
+
+		$this->checkAuthorisation();
+
+		if (!empty($this->requestData['id'])) {
+
+			$t = $this->getTaxonById();
+
+	        $this->setPageName(sprintf(_('Common names for taxon "%s"'),$t['taxon']));
+
+		} else {
+
+			$this->redirect();
+
+		}
+		
+		if (!$this->isFormResubmit()) {
+
+			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
+	
+				$this->models->Commonname->delete(
+					array(
+						'id' => $this->requestData['commonname_id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+	
+				$commonnames = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'order' => 'show_order'
+					)
+				);
+				
+				foreach((array)$commonnames as $key => $val) {
+	
+					$this->models->Commonname->save(
+						array(
+							'id' => $val['id'],
+							'project_id' => $this->getCurrentProjectId(),
+							'show_order' => $key
+						)
+					);
+					
+					$commonnames[$key]['show_order'] = $key;
+	
+				}
+	
+			}
+			
+			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
+
+				$s = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'id' => $this->requestData['commonname_id'],
+							'project_id' => $this->getCurrentProjectId(),
+						)
+					)
+				);
+
+				$this->models->Commonname->update(
+					array('show_order' => $s[0]['show_order']),
+					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
+						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
+				);
+
+				$this->models->Commonname->update(
+					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
+					array('id' => $this->requestData['commonname_id'],'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+	
+			if (!empty($this->requestData['commonname'])) {
+	
+				$s = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns' => 'max(show_order) as next'
+					)
+				);
+				
+				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
+	
+				$this->models->Commonname->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id'],
+						'language_id' => $this->requestData['language_id'],
+						'commonname' => $this->requestData['commonname'],
+						'transliteration' => $this->requestData['transliteration'],
+						'show_order' => $show_order
+					)
+				);
+	
+			}
+			
+		}
+
+		if (!isset(	$_SESSION['project']['system']['languages'])) {
+
+			$l = $_SESSION['project']['system']['languages'] = $this->models->Language->_get(array('id' => '*','fieldAsIndex'=>'id'));
+
+		} else {
+
+			$l = $_SESSION['project']['system']['languages'];
+
+		}
+
+		$lp = $_SESSION['project']['languages'];
+
+		if (!isset($commonnames)) {
+
+			$commonnames = $this->models->Commonname->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+					'order' => 'show_order'
+				)
+			);
+			
+		}
+			
+		if (isset($commonnames)) {
+
+			foreach((array)$commonnames as $key => $val) {
+
+					$commonnames[$key]['language_name'] = $l[$val['language_id']]['language'];
+					$commonnames[$key]['language_direction'] = $l[$val['language_id']]['direction'];
+//					$languageNames[$val['language_id']] = $val['language_id'];
+
+			}
+			
+			foreach((array)$usedLanguages as $key => $val) {
+
+//					$ll = $this->models->LabelLanguage->_get(
+//						array(
+//							'project_id' => $this->getCurrentProjectId(),
+//							'label_language_id' => $val['language_id']
+//						)
+//					);
+
+//					foreach((array)$ll as $llkey => $llval) {
+
+//						$languageNames[$key][$$llval['language_id']] = $llval['label'];
+
+//					}
+
+			}
+			
+		}
+
+		$this->smarty->assign('id',$this->requestData['id']);
+
+		$this->smarty->assign('taxon',$t['taxon']);
+
+		$this->smarty->assign('commonnames',$commonnames);
+
+		$this->smarty->assign('languages',$l);
+
+		$this->smarty->assign('projectLanguages',$lp);
+
+		if (isset($languageNames)) $this->smarty->assign('projectLanguageNames',$languageNames);
 
 		$this->printPage();
 

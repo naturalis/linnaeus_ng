@@ -1096,7 +1096,6 @@ class Controller extends BaseClass
 
 	}
 	
-
 	private function getCurrentUiLanguage()
 	{
 

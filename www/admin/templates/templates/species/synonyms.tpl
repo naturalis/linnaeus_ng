@@ -7,9 +7,8 @@
 </tr>
 <tr><td colspan="6">&nbsp;</td></tr>
 <tr>
-	<th style="width:200px;">{t}synonym{/t}</td>
-	<th style="width:250px;">{t}remark{/t}</td>
-	<th style="width:150px;">{t}literature{/t}</td>
+	<th style="width:225px;">{t}synonym{/t}</td>
+	<th style="width:175px;">{t}literature{/t}</td>
 	<th style="width:55px;">{t}move up{/t}</td>
 	<th style="width:65px;">{t}move down{/t}</td>
 	<th>delete</td>
@@ -17,7 +16,6 @@
 {section name=i loop=$synonyms}
 <tr class="tr-highlight">
 	<td>{$synonyms[i].synonym}</td>
-	<td>{$synonyms[i].remark}</td>
 	<td>(literature)</td>
 	{if $smarty.section.i.first}
 	<td></td>
@@ -59,8 +57,8 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
-<tr><td>synonym:</td><td><input type="text" name="synonym" maxlength="32" /></td></tr>
-<tr><td>remark:</td><td><input type="text" name="remark" maxlength="255" /></td></tr>
+<tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="32" /></td></tr>
+<tr><td>{t}litereature reference:{/t}</td><td><select></select></td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><td colspan="2"><input type="submit" value="{t}save{/t}" />&nbsp;<input type="button" onclick="window.open('list.php','_self');" value="{t}back{/t}" /></td></tr>
 </table>

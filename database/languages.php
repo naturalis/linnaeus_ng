@@ -9,7 +9,20 @@ CREATE TABLE languages (
 ) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
 
+CREATE TABLE lables_languages (
+	id INT( 11 ) NOT NULL AUTO_INCREMENT ,
+	project_id int( 11 ) NOT NULL  ,
+	language_id VARCHAR( 32 ) NOT NULL,
+	label_language_id VARCHAR( 32 ) NOT NULL,
+	label VARCHAR(64) NOT NULL,
+	created DATETIME NOT NULL ,
+	PRIMARY KEY ( id ) 
+) ENGINE = MYISAM  CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
+
 RENAME TABLE `languages`  TO `dev_languages` ;
+RENAME TABLE `lables_languages`  TO `dev_lables_languages` ;
 
 insert into dev_languages values (null,'Abkhaz','abk','l2r',null,now());
 insert into dev_languages values (null,'Afrikaans','afr','l2r',null,now());
