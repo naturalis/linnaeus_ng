@@ -2,7 +2,7 @@
 
 include_once ('model.php');
 
-class LabelsLanguage extends Model
+class LabelLanguage extends Model
 {
     
     const tableBaseName = 'labels_languages';

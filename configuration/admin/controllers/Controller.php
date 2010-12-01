@@ -29,6 +29,7 @@ class Controller extends BaseClass
     public $sortCaseSensitivity;
     public $baseUrl;
 	public $excludeFromReferer = false;
+	public $noResubmitvalReset = false;
 	public $isMultiLingual = true;
 	public $uiLanguages;
 	public $uiDefaultLanguage;
@@ -64,9 +65,9 @@ class Controller extends BaseClass
         parent::__construct();
         
         $this->setDebugMode();
-        
+
         $this->startSession();
-        
+
         $this->loadHelpers();
 		
 		$this->initLogging();
@@ -112,6 +113,8 @@ class Controller extends BaseClass
         $this->setLastVisitedPage();
 		
 		$this->saveFormResubmitVal();
+		
+		session_write_close();
 
         parent::__destruct();
     
@@ -784,7 +787,8 @@ class Controller extends BaseClass
      *        $this->isFormResubmit()
      * in the receiving controller function to make sure whether the submit is a resubmit
      * of the same instance of the form (as when the user reloads a posted form)
-     *
+     * the old value of last_rnd is set on destruct.
+	 *
      * @return boolean    is resubmit or not
      * @access     public
      */
@@ -792,15 +796,13 @@ class Controller extends BaseClass
     {
         
         $result = false;
-        
+
         if (
 			isset($this->requestData['rnd']) && 
 			isset($_SESSION['system']['last_rnd']) && 
 			($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
 		)
             $result = true;
-
-        //$_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;  now done on destruct
 
         return $result;
     
@@ -820,14 +822,29 @@ class Controller extends BaseClass
     }
 
 
-
+	/**
+	* Allows to addition of an extra step in the breadcrumb trail *before* the current page
+	*
+	*  example (called at the beginning of an *action() function):
+    *
+	*    $this->setBreadcrumbIncludeReferer(
+    *      array(
+    *         'name' => _('Name'), 
+    *         'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/url.php'
+    *       )
+    *     );
+	*
+	*  this would include " -> Name " in the trail as last crumb before the current page
+	*	
+	* @param  	type	$varname	description
+	* @return 	type	description
+	*/
     public function setBreadcrumbIncludeReferer ($value = true)
     {
         
         $this->breadcrumbIncludeReferer = $value;
     
     }
-
 
 
     public function checkModuleActivationStatus ()
@@ -849,9 +866,30 @@ class Controller extends BaseClass
 		$this->excludeFromReferer = $state;
 	
 	}
+
+	public function setNoResubmitvalReset($state)
+	{
+	
+		$this->noResubmitvalReset = $state;
+	
+	}
 	
 	public function log($msg,$severity=0)
 	{
+	
+		if (is_array($msg)) {
+		
+			$d = '';
+
+			foreach($msg as $key => $val) {
+			
+				$d .= $key .'=>'. $val .', ';
+			
+			}
+			
+			$msg = trim($d,' ,');
+
+		}
 
 		if (!@$this->helpers->LoggingHelper->write('('.$this->getCurrentProjectId().') '.$msg,$severity))
 			trigger_error(_('Logging not initialised'), E_USER_ERROR);
@@ -1095,7 +1133,62 @@ class Controller extends BaseClass
 		return $_SESSION['project']['projectRanks'];
 
 	}
-	
+
+	public function getAllLanguages()
+    {
+		/*
+        $languages = array_merge(
+			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
+	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
+		);
+		*/
+		
+//		unset($_SESSION['project']['system']['languages']);
+		
+		if (!isset($_SESSION['project']['system']['languages'])) {
+
+			$_SESSION['project']['system']['languages'] = $this->models->Language->_get(array('id' => '*','fieldAsIndex'=>'id'));
+
+		}
+
+		return $_SESSION['project']['system']['languages'];
+
+    }
+
+	public function setProjectLanguages()
+    {
+
+        $lp = $this->models->LanguageProject->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'order' => 'def_language desc'
+			)
+		);
+        
+        foreach ((array) $lp as $key => $val) {
+            
+            $l = $this->models->Language->_get(array('id'=>$val['language_id']));
+            
+            $lp[$key]['language'] = $l['language'];
+            $lp[$key]['direction'] = $l['direction'];
+			$lp[$key]['iso2'] = $l['iso2'];
+			$lp[$key]['iso3'] = $l['iso3'];
+            
+            if ($val['def_language'] == 1)
+                $defaultLanguage = $val['language_id'];
+        
+			$list[$val['language_id']]= array('language'=>$l['language'],'direction'=>$l['direction']);
+        }
+        
+        $_SESSION['project']['languages'] = $lp;
+
+        $_SESSION['project']['default_language_id'] = $defaultLanguage;
+
+        $_SESSION['project']['languageList'] = $list;
+
+    }
+
+
 	private function getCurrentUiLanguage()
 	{
 
@@ -1904,9 +1997,10 @@ class Controller extends BaseClass
 
     private function saveFormResubmitVal ()
     {
+	
+		if (!$this->noResubmitvalReset)
+	        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
-        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
-    
     }
 
 }

@@ -199,7 +199,7 @@ class SpeciesController extends Controller
 
 			$data = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Editing taxon "%s"'),$t[0]['taxon']));
+	        $this->setPageName(sprintf(_('Editing taxon "%s"'),$data['taxon']));
 
 		} else {
 
@@ -369,28 +369,18 @@ class SpeciesController extends Controller
             $taxon = $this->getTaxonById();
             
             $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
-        
-        
+
 			if (!$this->doLockOutUser($this->requestData['id'])) {
 			// if new taxon OR existing taxon not being edited by someone else, get languages and content
 	
 				// get available languages
 				$lp = $_SESSION['project']['languages'];
-	
-				foreach ((array) $lp as $key => $val) {
-					
-					$l = $this->models->Language->_get(array('id'=>$val['language_id']));
-					
-					$lp[$key]['language'] = $l['language'];
-					
-					$lp[$key]['iso2'] = $l['iso2'];
-					
-					$lp[$key]['iso3'] = $l['iso3'];
-	
-				}
-				
+
 				// determine the language the page will open in
-				$startLanguage = !empty($this->requestData['lan']) ? $this->requestData['lan'] : $_SESSION['project']['default_language_id'];
+				$startLanguage = 
+					!empty($this->requestData['lan']) ? 
+						$this->requestData['lan'] : 
+						$_SESSION['project']['default_language_id'];
 	
 				// get the defined categories (just the page definitions, no content yet)
 				$tp = $this->models->PageTaxon->_get(array('id'=>array(
@@ -556,87 +546,39 @@ class SpeciesController extends Controller
 
 		if (isset($taxa) && count((array)$taxa)>0) {
 
-			// get (or store) languages and the ranks list from session
-			$lp = $_SESSION['project']['languages'];
+			$projectLanguages = $_SESSION['project']['languages'];
 
-			if (isset($_SESSION['project']['pages'])) {
-	
-				$tp = $_SESSION['project']['pages'];
-	
-			} else {
-		
-				$tp = $this->models->PageTaxon->_get(
-					array(
-						'id'=> array('project_id' => $this->getCurrentProjectId()), 
-						'columns' => 'count(*) as tot'
-					)
-				);
-	
-				$_SESSION['project']['pages'] = $tp;
-			}
+			$pageCount = $this->getTaxonPageCount();
 
-			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
-	
-				$d[$val['mime']] = $val['media_type'];
-	
-			}
+			$contentCount = $this->getTaxaContentCount();
+
+			$synonymsCount = $this->getTaxaSynonymCount();
+
+			$commonnameCount = $this->getTaxaCommonnameCount();
+
+			$mediaCount = $this->getTaxaMediaCount();
 
 			foreach ((array) $taxa as $key => $taxon) {
-			
+
 				if (isset($rl[$taxon['rank_id']])) {
+
+					$taxa[$key]['pctFinished'] = 
+						isset($contentCount[$taxon['id']]) ? 
+							round(
+								(
+									(isset($contentCount[$taxon['id']]) ? $contentCount[$taxon['id']] : 0) / 
+									(count((array)$projectLanguages) * $pageCount)
+							) * 100) :
+							0;
+
+					$taxa[$key]['synonymCount'] = isset($synonymsCount[$taxon['id']]) ? $synonymsCount[$taxon['id']] : 0;
+
+					$taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
+
+					$taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
 
 					$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
 					
-					$ct = $this->models->ContentTaxon->_get(
-						array(
-							'id' =>	array(
-								'taxon_id' => $taxon['id'], 
-								'publish' => 1, 
-								'project_id' => $this->getCurrentProjectId()
-							), 
-							'columns' => 'count(*) as tot'
-						)
-					);
-	
-					$taxa[$key]['pct_finished'] = round(($ct[0]['tot'] / (count($lp) * $tp[0]['tot']))*100);
-	
-					$mt = $this->models->MediaTaxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon_id' => $taxon['id']
-							),
-							'columns' => 'count(*) as total, mime_type',
-							'group' => 'mime_type'
-						)
-					);
-					
-					$taxa[$key]['totMediaCount'] = 0;
-
-					foreach((array)$mt as $mtkey => $mtval) {
-		
-						$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]] = 
-							(isset($taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]) ? 
-								$taxa[$key]['mediaCount'][$d[$mtval['mime_type']]]: 
-								0) 
-							+ $mtval['total'];
-
-						$taxa[$key]['totMediaCount'] += $mtval['total'];
-									
-					}
-
-					$s = $this->models->Synonym->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon_id' => $taxon['id']
-							),
-							'columns' => 'count(*) as total'
-						)
-					);
-
-					$taxa[$key]['synonymCount'] = $s[0]['total'];
-
 				}
         
 	        }
@@ -668,7 +610,7 @@ class SpeciesController extends Controller
 			
 			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
 			
-			$this->smarty->assign('languages', $lp);
+			$this->smarty->assign('languages', $projectLanguages);
 
 		} else {
 				
@@ -1139,6 +1081,14 @@ class SpeciesController extends Controller
 
             $this->ajaxActionGetSectionLabels();
         
+        } else if ($this->requestData['action'] == 'get_language_labels') {
+
+            $this->ajaxActionGetLanguageLabels();
+
+        } else if ($this->requestData['action'] == 'save_language_label') {
+
+            $this->ajaxActionSaveLanguageLabel();
+
         }
 		
         $this->printPage();
@@ -1476,37 +1426,325 @@ class SpeciesController extends Controller
 
 	}	
 
+	public function synonymsAction()
+	{
 
-	private function setProjectLanguages()
-    {
+		$this->checkAuthorisation();
 
-        $lp = $this->models->LanguageProject->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'order' => 'def_language desc'
-			)
-		);
-        
-        foreach ((array) $lp as $key => $val) {
-            
-            $l = $this->models->Language->_get(array('id'=>$val['language_id']));
-            
-            $lp[$key]['language'] = $l['language'];
-            $lp[$key]['direction'] = $l['direction'];
-            
-            if ($val['def_language'] == 1)
-                $defaultLanguage = $val['language_id'];
-        
-			$list[$val['language_id']]= array('language'=>$l['language'],'direction'=>$l['direction']);
-        }
-        
-        $_SESSION['project']['languages'] = $lp;
+		if (!empty($this->requestData['id'])) {
 
-        $_SESSION['project']['default_language_id'] = $defaultLanguage;
+			$t = $this->getTaxonById();
 
-        $_SESSION['project']['languageList'] = $list;
+	        $this->setPageName(sprintf(_('Synonyms')));
 
-    }
+			$this->setBreadcrumbIncludeReferer(
+				array(
+					'name' => _('Taxon list'), 
+					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+				)
+			);			
+
+		} else {
+
+			$this->redirect();
+
+		}
+		
+		if (!$this->isFormResubmit()) {
+
+			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
+	
+				$this->models->Synonym->delete(
+					array(
+						'id' => $this->requestData['synonym_id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+	
+				$synonyms = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'order' => 'show_order'
+					)
+				);
+				
+				foreach((array)$synonyms as $key => $val) {
+	
+					$this->models->Synonym->save(
+						array(
+							'id' => $val['id'],
+							'project_id' => $this->getCurrentProjectId(),
+							'show_order' => $key
+						)
+					);
+					
+					$synonyms[$key]['show_order'] = $key;
+	
+				}
+	
+			}
+			
+			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
+
+				$s = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'id' => $this->requestData['synonym_id'],
+							'project_id' => $this->getCurrentProjectId(),
+						)
+					)
+				);
+
+				$this->models->Synonym->update(
+					array('show_order' => $s[0]['show_order']),
+					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
+						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
+				);
+
+				$this->models->Synonym->update(
+					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
+					array('id' => $this->requestData['synonym_id'],'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+	
+			if (!empty($this->requestData['synonym'])) {
+	
+				$s = $this->models->Synonym->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns' => 'max(show_order) as next'
+					)
+				);
+				
+				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
+	
+				$this->models->Synonym->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id'],
+						'synonym' => $this->requestData['synonym'],
+						'remark' => !empty($this->requestData['remark']) ? $this->requestData['remark'] : null,
+						'show_order' => $show_order
+					)
+				);
+	
+			}
+			
+		}
+
+		if (!isset($synonyms)) {
+
+			$synonyms = $this->models->Synonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+					'order' => 'show_order'
+				)
+			);
+
+		}
+
+		$this->smarty->assign('id',$this->requestData['id']);
+
+		$this->smarty->assign('taxon',$t['taxon']);
+
+		$this->smarty->assign('synonyms',$synonyms);
+
+		$this->printPage();
+
+	}
+
+
+	public function commonAction()
+	{
+
+		$this->checkAuthorisation();
+		
+		if (!empty($this->requestData['id'])) {
+
+			$t = $this->getTaxonById();
+
+	        $this->setPageName(sprintf(_('Common names')));
+
+			$this->setBreadcrumbIncludeReferer(
+				array(
+					'name' => _('Taxon list'), 
+					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+				)
+			);
+
+		} else {
+
+			$this->redirect();
+
+		}
+		
+		if (!$this->isFormResubmit()) {
+
+			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
+	
+				$this->models->Commonname->delete(
+					array(
+						'id' => $this->requestData['commonname_id'],
+						'project_id' => $this->getCurrentProjectId()
+					)
+				);
+	
+				$commonnames = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'order' => 'show_order'
+					)
+				);
+				
+				foreach((array)$commonnames as $key => $val) {
+	
+					$this->models->Commonname->save(
+						array(
+							'id' => $val['id'],
+							'project_id' => $this->getCurrentProjectId(),
+							'show_order' => $key
+						)
+					);
+					
+					$commonnames[$key]['show_order'] = $key;
+	
+				}
+	
+			}
+			
+			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
+
+				$s = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'id' => $this->requestData['commonname_id'],
+							'project_id' => $this->getCurrentProjectId(),
+						)
+					)
+				);
+
+				$this->models->Commonname->update(
+					array('show_order' => $s[0]['show_order']),
+					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
+						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
+				);
+
+				$this->models->Commonname->update(
+					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
+					array('id' => $this->requestData['commonname_id'],'project_id' => $this->getCurrentProjectId())
+				);
+	
+			}
+	
+			if (!empty($this->requestData['commonname']) || !empty($this->requestData['transliteration'])) {
+	
+				$s = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns' => 'max(show_order) as next'
+					)
+				);
+				
+				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
+	
+				$this->models->Commonname->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id'],
+						'language_id' => $this->requestData['language_id'],
+						'commonname' => $this->requestData['commonname'],
+						'transliteration' => $this->requestData['transliteration'],
+						'show_order' => $show_order
+					)
+				);
+	
+			}
+			
+		}
+
+		// get all languages
+		$allLanguages = $this->getAllLanguages();
+
+		// get project languages
+		$lp = $_SESSION['project']['languages'];
+
+		if (!isset($commonnames)) {
+
+			$commonnames = $this->models->Commonname->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+					'order' => 'show_order'
+				)
+			);
+			
+		}
+			
+		if (isset($commonnames)) {
+
+			foreach((array)$commonnames as $key => $val) {
+
+				$commonnames[$key]['language_name'] = $allLanguages[$val['language_id']]['language'];
+				
+				$d[] = $val['language_id'];
+
+			}
+/*
+			foreach((array)$d as $key => $val) {
+			
+				$ll = $this->models->LabelLanguage->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $val
+						),
+						'fieldAsIndex' => 'label_language_id'
+					)
+				);
+
+				$translations[$val]['translations'] = $ll;
+
+			}
+*/
+		}
+
+		$this->smarty->assign('id',$this->requestData['id']);
+
+		$this->smarty->assign('taxon',$t['taxon']);
+
+		$this->smarty->assign('commonnames',$commonnames);
+
+		$this->smarty->assign('allLanguages',$allLanguages);
+
+		$this->smarty->assign('languages',$lp);
+
+//		if (isset($translations)) $this->smarty->assign('translations',$translations);
+
+		$this->printPage();
+
+	}
+
+
 
     private function getCatalogueOfLifeData()
     {
@@ -1614,6 +1852,8 @@ class SpeciesController extends Controller
 
     private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
+
+		unset($_SESSION['project']['pageCount']);
 
         return $this->models->PageTaxon->save(array(
             'id' => null, 
@@ -2904,6 +3144,68 @@ class SpeciesController extends Controller
 
 	}
 
+	private function ajaxActionGetLanguageLabels()
+	{
+
+        if (empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+
+			$ll = $this->models->LabelLanguage->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->requestData['language']
+					)
+				)
+			);
+
+            $this->smarty->assign('returnText', json_encode($ll));
+        
+        }
+
+	}
+
+	private function ajaxActionSaveLanguageLabel()
+	{
+
+        if (empty($this->requestData['id']) || empty($this->requestData['language'])) {
+            
+            return;
+        
+        } else {
+           
+			$this->models->LabelLanguage->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language'], 
+					'label_language_id' => $this->requestData['id'], 
+				)
+			);
+
+            if (!empty($this->requestData['label'])) {
+                
+                $this->models->LabelLanguage->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'label_language_id' => $this->requestData['id'], 
+						'label' => trim($this->requestData['label'])
+					)
+				);
+            
+            }
+            
+            $this->smarty->assign('returnText', 'saved');
+        
+        }
+	
+	}
+
+
 	private function moveIdInTaxonOrder($id,$dir)
 	{
 	
@@ -2983,316 +3285,134 @@ class SpeciesController extends Controller
 	
 	}
 
-	public function synonymsAction()
+	private function getTaxonPageCount()
 	{
-
-		$this->checkAuthorisation();
-
-		if (!empty($this->requestData['id'])) {
-
-			$t = $this->getTaxonById();
-
-	        $this->setPageName(sprintf(_('Synonyms for taxon "%s"'),$t['taxon']));
-
-		} else {
-
-			$this->redirect();
-
-		}
+	
+		if (!isset($_SESSION['project']['pageCount'])) {
 		
-		if (!$this->isFormResubmit()) {
-
-			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
-	
-				$this->models->Synonym->delete(
-					array(
-						'id' => $this->requestData['synonym_id'],
-						'project_id' => $this->getCurrentProjectId()
-					)
-				);
-	
-				$synonyms = $this->models->Synonym->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $this->requestData['id']
-						),
-						'order' => 'show_order'
-					)
-				);
-				
-				foreach((array)$synonyms as $key => $val) {
-	
-					$this->models->Synonym->save(
-						array(
-							'id' => $val['id'],
-							'project_id' => $this->getCurrentProjectId(),
-							'show_order' => $key
-						)
-					);
-					
-					$synonyms[$key]['show_order'] = $key;
-	
-				}
-	
-			}
-			
-			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
-
-				$s = $this->models->Synonym->_get(
-					array(
-						'id' => array(
-							'id' => $this->requestData['synonym_id'],
-							'project_id' => $this->getCurrentProjectId(),
-						)
-					)
-				);
-
-				$this->models->Synonym->update(
-					array('show_order' => $s[0]['show_order']),
-					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
-						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
-				);
-
-				$this->models->Synonym->update(
-					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
-					array('id' => $this->requestData['synonym_id'],'project_id' => $this->getCurrentProjectId())
-				);
-	
-			}
-	
-			if (!empty($this->requestData['synonym'])) {
-	
-				$s = $this->models->Synonym->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $this->requestData['id']
-						),
-						'columns' => 'max(show_order) as next'
-					)
-				);
-				
-				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
-	
-				$this->models->Synonym->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id'],
-						'synonym' => $this->requestData['synonym'],
-						'remark' => !empty($this->requestData['remark']) ? $this->requestData['remark'] : null,
-						'show_order' => $show_order
-					)
-				);
-	
-			}
-			
-		}
-
-		if (!isset($synonyms)) {
-
-			$synonyms = $this->models->Synonym->_get(
+			$tp = $this->models->PageTaxon->_get(
 				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id']
-					),
-					'order' => 'show_order'
+					'id'=> array('project_id' => $this->getCurrentProjectId()), 
+					'columns' => 'count(*) as total'
 				)
 			);
-
+		
+			$_SESSION['project']['pageCount'] = isset($tp[0]['total']) ? $tp[0]['total'] : 0;
 		}
-
-		$this->smarty->assign('id',$this->requestData['id']);
-
-		$this->smarty->assign('taxon',$t['taxon']);
-
-		$this->smarty->assign('synonyms',$synonyms);
-
-		$this->printPage();
+		
+		return $_SESSION['project']['pageCount'];
 
 	}
 
-
-	public function commonAction()
+	private function getTaxaSynonymCount()
 	{
+	
+		$s = $this->models->Synonym->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total,taxon_id',
+				'group' => 'taxon_id'
+			)
+		);
 
-		$this->checkAuthorisation();
+		foreach((array)$s as $key => $val) {
 
-		if (!empty($this->requestData['id'])) {
-
-			$t = $this->getTaxonById();
-
-	        $this->setPageName(sprintf(_('Common names for taxon "%s"'),$t['taxon']));
-
-		} else {
-
-			$this->redirect();
+			$d[$val['taxon_id']] = $val['total'];
 
 		}
 		
-		if (!$this->isFormResubmit()) {
+		return isset($d) ? $d : 0;
+	
+	}
 
-			if (!empty($this->requestData['action']) && $this->requestData['action']=='delete') {
+	private function getTaxaCommonnameCount()
+	{
 	
-				$this->models->Commonname->delete(
-					array(
-						'id' => $this->requestData['commonname_id'],
-						'project_id' => $this->getCurrentProjectId()
-					)
-				);
-	
-				$commonnames = $this->models->Commonname->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $this->requestData['id']
-						),
-						'order' => 'show_order'
-					)
-				);
-				
-				foreach((array)$commonnames as $key => $val) {
-	
-					$this->models->Commonname->save(
-						array(
-							'id' => $val['id'],
-							'project_id' => $this->getCurrentProjectId(),
-							'show_order' => $key
-						)
-					);
-					
-					$commonnames[$key]['show_order'] = $key;
-	
-				}
-	
-			}
-			
-			if (!empty($this->requestData['action']) && ($this->requestData['action']=='up' || $this->requestData['action']=='down')) {
+		$c = $this->models->Commonname->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total,taxon_id',
+				'group' => 'taxon_id'
+			)
+		);
 
-				$s = $this->models->Commonname->_get(
-					array(
-						'id' => array(
-							'id' => $this->requestData['commonname_id'],
-							'project_id' => $this->getCurrentProjectId(),
-						)
-					)
-				);
+		foreach((array)$c as $key => $val) {
 
-				$this->models->Commonname->update(
-					array('show_order' => $s[0]['show_order']),
-					array('project_id' => $this->getCurrentProjectId(),'show_order' =>
-						($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
-				);
-
-				$this->models->Commonname->update(
-					array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
-					array('id' => $this->requestData['commonname_id'],'project_id' => $this->getCurrentProjectId())
-				);
-	
-			}
-	
-			if (!empty($this->requestData['commonname'])) {
-	
-				$s = $this->models->Commonname->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'taxon_id' => $this->requestData['id']
-						),
-						'columns' => 'max(show_order) as next'
-					)
-				);
-				
-				$show_order = $s[0]['next']==null ? 0 : ($s[0]['next']+1);
-	
-				$this->models->Commonname->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id'],
-						'language_id' => $this->requestData['language_id'],
-						'commonname' => $this->requestData['commonname'],
-						'transliteration' => $this->requestData['transliteration'],
-						'show_order' => $show_order
-					)
-				);
-	
-			}
-			
-		}
-
-		if (!isset(	$_SESSION['project']['system']['languages'])) {
-
-			$l = $_SESSION['project']['system']['languages'] = $this->models->Language->_get(array('id' => '*','fieldAsIndex'=>'id'));
-
-		} else {
-
-			$l = $_SESSION['project']['system']['languages'];
+			$d[$val['taxon_id']] = $val['total'];
 
 		}
-
-		$lp = $_SESSION['project']['languages'];
-
-		if (!isset($commonnames)) {
-
-			$commonnames = $this->models->Commonname->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id']
-					),
-					'order' => 'show_order'
-				)
-			);
-			
-		}
-			
-		if (isset($commonnames)) {
-
-			foreach((array)$commonnames as $key => $val) {
-
-					$commonnames[$key]['language_name'] = $l[$val['language_id']]['language'];
-					$commonnames[$key]['language_direction'] = $l[$val['language_id']]['direction'];
-//					$languageNames[$val['language_id']] = $val['language_id'];
-
-			}
-			
-			foreach((array)$usedLanguages as $key => $val) {
-
-//					$ll = $this->models->LabelLanguage->_get(
-//						array(
-//							'project_id' => $this->getCurrentProjectId(),
-//							'label_language_id' => $val['language_id']
-//						)
-//					);
-
-//					foreach((array)$ll as $llkey => $llval) {
-
-//						$languageNames[$key][$$llval['language_id']] = $llval['label'];
-
-//					}
-
-			}
-			
-		}
-
-		$this->smarty->assign('id',$this->requestData['id']);
-
-		$this->smarty->assign('taxon',$t['taxon']);
-
-		$this->smarty->assign('commonnames',$commonnames);
-
-		$this->smarty->assign('languages',$l);
-
-		$this->smarty->assign('projectLanguages',$lp);
-
-		if (isset($languageNames)) $this->smarty->assign('projectLanguageNames',$languageNames);
-
-		$this->printPage();
+		
+		return isset($d) ? $d : 0;
 
 	}
+
+	private function getTaxaMediaCount()
+	{
+
+		$mt = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total, taxon_id',
+				'group' => 'taxon_id'
+			)
+		);
+	
+		foreach((array)$mt as $key => $val) {
+
+			$d[$val['taxon_id']] = $val['total'];
+
+		}
+		
+		return isset($d) ? $d : 0;
+	
+	}
+	
+
+	private function getTaxaContentCount()
+	{
+
+		$ct = $this->models->ContentTaxon->_get(
+			array(
+				'id' =>	array(
+					'publish' => 1, 
+					'project_id' => $this->getCurrentProjectId()
+				), 
+				'columns' => 'count(*) as total, taxon_id',
+				'group' => 'taxon_id'
+			)
+		);
+
+		foreach((array)$ct as $key => $val) {
+
+			$d[$val['taxon_id']] = $val['total'];
+
+		}
+		
+		return isset($d) ? $d : 0;
+
+	}
+					
+						
+	private function getTaxonSynonymsById($id=false)
+	{
+	
+		$id = $id ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : false);
+		
+		if (!$id) return;
+
+		$s = $this->models->Synonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id
+				)
+			)
+		);
+
+		return $s;
+	
+	}
+
 
 }
 

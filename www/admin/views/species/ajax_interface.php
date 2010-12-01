@@ -6,5 +6,7 @@ $c = new SpeciesController();
 
 $c->setExcludeFromReferer(true);
 
+$c->setNoResubmitvalReset(true);
+
 $c->ajaxInterfaceAction();
 

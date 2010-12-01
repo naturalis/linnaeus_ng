@@ -90,8 +90,6 @@ class ProjectsController extends Controller
                     'active' => 'n'
                 ));
 
-                $_SESSION['system']['last_rnd'] = $this->requestData['rnd'];
-            
             }
         
         }

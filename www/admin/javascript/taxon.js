@@ -17,7 +17,7 @@ var taxonRanks = Array();
 var taxonCanHaveHybrid = Array();
 var taxonExecAfterSave = false;
 var taxonRankBorder = false;
-
+var taxonCommonnameLanguages = Array();
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -1159,16 +1159,20 @@ function taxonAddRankId(rank) {
 function taxonSwitchRankLanguage(language) {
 
 	taxonActiveLanguage = language;
-	taxonDrawRankLanguages();	
+	taxonDrawRankLanguages();
+
 	switch (taxonActiveView) {
 		case 'ranklabels':
 			taxonGetRankLabels(taxonActiveLanguage);
 			break;
 		case 'page':
 			taxonGetPageLabels(taxonActiveLanguage);
-			break;			
+			break;
 		case 'sections':
 			taxonGetSectionLabels(taxonActiveLanguage);
+			break;			
+		case 'commonnames':
+			taxonGetCommonnameLabels(taxonActiveLanguage);
 			break;			
 	}
 
@@ -1208,6 +1212,7 @@ function taxonGeneralGetLabels(language,action,postFunction) {
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
+			//alert(data);
 			obj = $.parseJSON(data);
 			eval(postFunction+'(obj,language)');
 			allHideLoadingDiv();
@@ -1431,13 +1436,68 @@ function taxonCommonNameAction(id,action) {
 
 }
 
+function taxonCommonNameSubmit() {
+
+	if ($('#commonname').val()=='' && $('#transliteration').val()=='') {
+
+		alert(_('You have to enter a common name and/or a transliteration.'));
+
+	} else {
+	
+		$('#theForm').submit();
+		
+	}
+
+}
 
 
+function taxonSetCommonnameLabels(obj,language) {
 
+	for(var j=0;j<taxonCommonnameLanguages.length;j++) {
 
+		if (language == taxonDefaultLanguage)
+			$('#default-'+j).val('');
+		else
+		if (language == taxonActiveLanguage)
+			$('#other-'+j).val('');
 
+	}
 
+	if (obj) {
 
+		for(var i=0;i<obj.length;i++) {
+
+				for(var j=0;j<taxonCommonnameLanguages.length;j++) {
+
+				if (taxonCommonnameLanguages[j]==obj[i].label_language_id) {
+	
+					if (language == taxonDefaultLanguage)
+						$('#default-'+j).val(obj[i].label);
+					else
+					if (language == taxonActiveLanguage)
+						$('#other-'+j).val(obj[i].label);
+	
+				}
+	
+			}
+	
+		}
+
+	}
+
+}
+
+function taxonGetCommonnameLabels(language) {
+
+	taxonGeneralGetLabels(language,'get_language_labels','taxonSetCommonnameLabels');
+
+}
+
+function taxonSaveLanguageLabel(id,label,type) {
+
+	taxonGeneralSave(id,label,type,'save_language_label');
+
+}
 
 
 
