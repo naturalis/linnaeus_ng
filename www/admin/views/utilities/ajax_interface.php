@@ -6,5 +6,7 @@ $c = new UtilitiesController();
 
 $c->setExcludeFromReferer(true);
 
+$c->setNoResubmitvalReset(true);
+
 $c->ajaxInterfaceAction();
 

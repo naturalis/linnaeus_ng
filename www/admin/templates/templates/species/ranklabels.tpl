@@ -19,7 +19,7 @@
 	<td {$languages[i].language_id}>{$languages[i].language} *</td>
 {/if}
 {/section}
-{if $languages|@count>1}		
+{if $languages|@count>1}
 <td id="language-tabs">(languages)</td>
 {/if}
 </tr>

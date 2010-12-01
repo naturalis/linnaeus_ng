@@ -6,5 +6,7 @@ $c = new UsersController();
 
 $c->setExcludeFromReferer(true);
 
+$c->setNoResubmitvalReset(true);
+
 $c->ajaxInterfaceAction();
 

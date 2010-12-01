@@ -48,11 +48,11 @@
 {/if}
 
 		<td>
-			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pct_finished}% {t}done{/t}</span>
+			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pctFinished}% {t}done{/t}</span>
 		</td>
 
 		<td title="{t}media files{/t}">
-			<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{if $taxa[i].totMediaCount!=''}{$taxa[i].totMediaCount}{else}0{/if} {t}files{/t}</span>
+			<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{$taxa[i].mediaCount} {if $taxa[i].mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</span>
 		</td>
 
 		<td>
@@ -60,7 +60,7 @@
 		</td>
 
 		<td>
-			<span class="pseudo-a" onclick="window.open('common.php?id={$t}','_self');">{t}common names{/t}</span>
+			<span class="pseudo-a" onclick="window.open('common.php?id={$t}','_self');">{$taxa[i].commonnameCount} {if $taxa[i].commonnameCount==1}{t}name{/t}{else}{t}names{/t}{/if}</span>
 		</td>
 
 		<td style="text-align:center">

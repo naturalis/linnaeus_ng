@@ -6,5 +6,7 @@ $c = new ProjectsController();
 
 $c->setExcludeFromReferer(true);
 
+$c->setNoResubmitvalReset(true);
+
 $c->ajaxInterfaceAction();
 
