@@ -217,6 +217,9 @@ class SpeciesController extends Controller
 			$this->addMessage(_('No ranks have been defined.'));
 
 		} else {
+
+			/*
+			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
 			$ut = $this->models->UserTaxon->_get(
 				array(
 					'id' => array(
@@ -227,11 +230,14 @@ class SpeciesController extends Controller
 				'fieldAsIndex' => 'taxon_id'
 				)
 			);
+			*/
 			
 			$this->getTaxonTree(null);
 	
 			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
 			
+			/*
+			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
 			if (count((array)$ut)>0 || $isEmptyTaxaList) {
 	
 				$allow = false;
@@ -263,73 +269,76 @@ class SpeciesController extends Controller
 					}
 	
 				}
+			*/
 	
-				if (!empty($this->requestData['taxon'])) {
+			if (!empty($this->requestData['taxon'])) {
+			
+				$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
 				
-					$isHybrid = isset($this->requestData['is_hybrid']) && $this->requestData['is_hybrid'] == 'on';
-					
-					$parentId =
-						($this->requestData['id']==$this->requestData['parent_id'] ? 
+				$parentId =
+					($this->requestData['id']==$this->requestData['parent_id'] ? 
+						null : 
+						($isEmptyTaxaList ? 
 							null : 
-							($isEmptyTaxaList ? 
-								null : 
-								$this->requestData['parent_id']
-							)
-						);
+							$this->requestData['parent_id']
+						)
+					);
+
+				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
 	
-					if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
+					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+	
+						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
 		
-						if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+							$this->models->Taxon->save(
+								array(
+									'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon' => $this->requestData['taxon'],
+									'parent_id' => $parentId,
+									'rank_id' => $this->requestData['rank_id'],
+									'is_hybrid' =>  ($isHybrid ? 1 : 0)
+								)
+							);
+							
+							$this->reOrderTaxonTree();
+	
+							$this->addMessage(sprintf(_('Taxon "%s" saved.'),$this->requestData['taxon']));
+							
+							unset($data['taxon']);
+							
+							//$this->redirect('list.php');
 		
-							if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
-			
-								$this->models->Taxon->save(
-									array(
-										'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
-										'project_id' => $this->getCurrentProjectId(),
-										'taxon' => $this->requestData['taxon'],
-										'parent_id' => $parentId,
-										'rank_id' => $this->requestData['rank_id'],
-										'is_hybrid' =>  ($isHybrid ? 1 : 0)
-									)
-								);
-								
-								$this->reOrderTaxonTree();
-		
-								$this->addMessage(_('Taxon saved.'));
-								
-								unset($this->requestData['taxon']);
-								
-								$this->redirect('list.php');
-			
-							} else {
-				
-								$this->addError(_('Rank cannot be hybrid.'));
-				
-							}
-			
 						} else {
 			
-							$this->addError(_('Parent cannot have child taxa.'));
+							$this->addError(_('Rank cannot be hybrid.'));
 			
 						}
 		
 					} else {
 		
-						$this->addError(_('Taxon name already in database.'));
+						$this->addError(_('Parent cannot have child taxa.'));
 		
 					}
-				
+	
+				} else {
+	
+					$this->addError(_('Taxon name already in database.'));
+	
 				}
-					
-				$this->smarty->assign('allowed',true);
+			
+			}
+				
+			$this->smarty->assign('allowed',true);
+
+			if (isset($data)) $this->smarty->assign('data',$data);
 	
-				$this->smarty->assign('data',$data);
-		
-				$this->smarty->assign('projectRanks',$pr);
-	
-				if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
-	
+			$this->smarty->assign('projectRanks',$pr);
+
+			if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+			/*
+			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
 			} else {
 	
 				$this->smarty->assign('allowed',false);
@@ -337,7 +346,7 @@ class SpeciesController extends Controller
 				$this->addMessage(_('No taxa have been assigned to you.'));
 			
 			}
-
+			*/
 		}
 
 		$this->printPage();
@@ -834,8 +843,34 @@ class SpeciesController extends Controller
         if ($this->requestDataFiles) {
 
             unset($_SESSION['system']['csv_data']);
-            
-            $this->helpers->CsvParserHelper->setFieldMax(3);
+
+			/*
+			switch ($this->requestData["enclosure"]) {
+				case 'double' :
+					$this->helpers->CsvParserHelper->setFieldEnclosure('"');
+					break;
+				case 'single' :
+					$this->helpers->CsvParserHelper->setFieldEnclosure("'");
+					break;
+				case 'none' :
+					$this->helpers->CsvParserHelper->setFieldEnclosure(false);
+					break;
+			}
+			*/
+
+			switch ($this->requestData["delimiter"]) {
+				case 'comma' :
+					$this->helpers->CsvParserHelper->setFieldDelimiter(',');
+					break;
+				case 'semi-colon' :
+					$this->helpers->CsvParserHelper->setFieldDelimiter(';');
+					break;
+				case 'tab' :
+					$this->helpers->CsvParserHelper->setFieldDelimiter("\t");
+					break;
+			}
+
+            $this->helpers->CsvParserHelper->setFieldMax($_SESSION['project']['includes_hybrids'] ? 3 : 2);
 
             $this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
         
@@ -851,14 +886,18 @@ class SpeciesController extends Controller
 				
 					$d[] = trim(strtolower($val['rank']));
 
-					if ($val['can_hybrid']==1) $h[] = trim(strtolower($val['rank']));
+					if ($_SESSION['project']['includes_hybrids'] && $val['can_hybrid']==1)
+						$h[] = trim(strtolower($val['rank']));
 
 				}
 
 				foreach((array)$r as $key => $val) {
 
-					$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y' && in_array(strtolower($val[1]),$h));
-					$r[$key][3] = in_array(strtolower($val[1]),$d);
+					if ($_SESSION['project']['includes_hybrids'])
+						$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y' && in_array(strtolower($val[1]),$h));
+
+					$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = (isset($val[1]) && in_array(strtolower($val[1]),$d));
+
 				}
 
                 $_SESSION['system']['csv_data'] = $r;
@@ -878,7 +917,7 @@ class SpeciesController extends Controller
 
                     $name = $_SESSION['system']['csv_data'][$val][0];
                     $rank = $_SESSION['system']['csv_data'][$val][1];
-                    $hybrid = $_SESSION['system']['csv_data'][$val][2];
+                    $hybrid = $_SESSION['project']['includes_hybrids'] ? $_SESSION['system']['csv_data'][$val][2] : false;
                     $parentName = null;
 
                     if ($key==0) {
@@ -934,8 +973,7 @@ class SpeciesController extends Controller
                                 }
     
                             }
-                            
-                            
+                        
                             if ($parentName==null) {
                             // did not find a previous occurrence of the current rank, so the previous taxon must be the parent
 
