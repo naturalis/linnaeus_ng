@@ -1,9 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-{if $taxa|@count>0}
-
 	{t}To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'.{/t}
 	
 	<span id="message-container" style="margin-left:175px">&nbsp;</span>
@@ -23,7 +20,7 @@
 	
 	{assign var=prev_rank value=-1}
 	{assign var=firstDotLength value=false}
-	
+
 	{section name=i loop=$taxa}
 	{if $taxa[i].rank!=''}
 		{if $firstDotLength==false}{assign var=firstDotLength value=$taxa[i].level}{/if}
@@ -99,7 +96,7 @@
 	{/if}
 	{/section}
 	</table>
-	
+
 	<br />
 
 	{if $languages|@count==0}
@@ -109,7 +106,6 @@
 		<a href="edit.php">{t}Add a new taxon{/t}</a>
 	{/if}
 
-{/if}
 </div>
 
 <form method="post" action="" name="sortForm" id="sortForm">
