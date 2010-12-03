@@ -4,6 +4,20 @@
 <form method="post" action="" enctype="multipart/form-data">
 	<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 	<input name="uploadedfile" type="file" /><br />
+	<table>
+		<tr>
+			<td>CSV field delimiter:</td>
+			<td><label><input type="radio" name="delimiter" value="comma" checked="checked" />, (comma)</label></td>
+			<td><label><input type="radio" name="delimiter" value="semi-colon" />; (semi-colon)</label></td>
+			<td><label><input type="radio" name="delimiter" value="tab" />tab stop</label></td>
+		</tr>
+		<!-- tr>
+			<td>CSV field enclosure:</td>
+			<td><label><input type="radio" name="enclosure" value="double" checked="checked" />" (double qoutes)</label></td>
+			<td><label><input type="radio" name="enclosure" value="single" />' (quote)</label></td>
+			<td><label><input type="radio" name="enclosure" value="none" />none</label><br /></td>
+		</tr -->
+	</table>
 	<input type="submit" value="{t}upload{/t}" />
 </form>
 </div>
@@ -15,17 +29,24 @@
 <form method="post" action="" enctype="multipart/form-data">
 <p>
 {t}Check the results of the import below. If they look OK, press 'save' to save them:{/t} <input type="submit" value="{t}save{/t}" /><br />
-{t}You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox the third column says 'unknown rank', you are
+{t}You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there is the message 'unknown rank', you are
 attempting to load a rank that is not part of your project. To add or change ranks, click{/t} <a href="ranks.php">{t}here{/t}</a> .
 </p>
 <table>
-<tr><th>{t}Name{/t}</th><th>{t}Rank{/t}</th><th>{t}Hybrid{/t}</th></tr>
+<tr><th>{t}Name{/t}</th><th>{t}Rank{/t}</th>
+{if $session.project.includes_hybrids==1}
+<th>{t}Hybrid{/t}</th></tr>
+{/if}
 {section name=i loop=$results}
 <tr class="tr-highlight">
 <td><label for="chk{$smarty.section.i.index}">{$results[i][0]}</label></td>
 <td><label for="chk{$smarty.section.i.index}">{$results[i][1]}</label></td>
+{if $session.project.includes_hybrids==1}
 <td><label for="chk{$smarty.section.i.index}">{if $results[i][2]==1}x{/if}</label></td>
 <td>{if $results[i][3]}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{t}unknown rank{/t}</span>{/if}</td>
+{else}
+<td>{if $results[i][2]}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{t}unknown rank{/t}</span>{/if}</td>
+{/if}
 </tr>
 {/section}
 </table>
@@ -38,15 +59,21 @@ The contents of the file will be displayed so you can review them before they ar
 </p>
 <ol>
 	<li>{t}The format needs to be CSV.{/t}</li>
-	<li>{t}The field separator must be , (comma), the field delimiter " (double-quote).{/t}</li>
+	<li>{t}The field delimiter must be a comma, semi-colon or tab stop, and can be selected above.{/t}</li>
+	<li>{t}The fields in the CSV-file *may* be enclosed by " (double-quotes), but this is not mandatory.{/t}</li>
 	<li>{t}There should be one taxon per line. No header line should be present.{/t}</li>
-	<li>{t}Each taxon consists of two or three fields:{/t}
+	<li>{t}Each taxon consists of the following fields:{/t}
 		<ol>
 		<li>{t}Taxon name{/t}</li>
 		<li>{t}Taxon rank{/t}</li>
+{if $session.project.includes_hybrids==1}
 		<li>{t}Hybrid ('y'; optional){/t}</li>
+{/if}
 		</ol>
-		{t}in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored.{/t}
+		{t}in that order. The first two are mandatory. {/t}
+{if $session.project.includes_hybrids==1}
+		{t}Other values for the field 'Hybrid' than 'y' are ignored.{/t}
+{/if}		
 	</li>
 	<li>{t}Ranks should match the list of ranks you have selected for your project.{/t}
 		{if $projectRanks|@count==0}

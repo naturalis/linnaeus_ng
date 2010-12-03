@@ -6,11 +6,33 @@ class CsvParserHelper
     private $_file;
     private $_results;
     private $_errors;
-    private $_separator = ',';
-    private $_delimiter = '"';
+    private $_delimiter = ',';
+    private $_enclosure = '"';
     private $_lineMax = false;
     private $_fieldMax = false;
     private $_dropAllWhites = true;
+    private $_trimFields = true;
+	private $_maxLineLength = 1000;
+	private $_oldADLEsetting;
+
+	private $_allowedDelimiters = array(',',';',"\t");
+	private $_allowedEnclosures = array('"',"'",false);
+
+    public function __construct ()
+    {
+        
+		$this->_oldADLEsetting = ini_get('auto_detect_line_endings');
+
+		ini_set('auto_detect_line_endings',true);
+   
+    }
+
+    public function __destruct ()
+    {
+        
+		ini_set('auto_detect_line_endings',$this->_oldADLEsetting);
+    
+    }
 
     public function parseFile($file)
     {
@@ -31,6 +53,21 @@ class CsvParserHelper
 
     }
 
+    public function setFieldEnclosure ($enclosure=false)
+    {
+
+		if (in_array($enclosure,$this->_allowedEnclosures)) $this->_enclosure = $enclosure;
+
+    }
+
+    public function setFieldDelimiter ($delimiter=false)
+    {
+
+		if (in_array($delimiter,$this->_allowedDelimiters)) $this->_delimiter = $delimiter;
+
+    }
+
+
     public function setFieldMax ($num)
     {
         
@@ -42,6 +79,13 @@ class CsvParserHelper
     {
         
         $this->_dropAllWhites = $mode;
+
+    }
+
+    public function setTrimFields ($mode)
+    {
+        
+        $this->_trimFields = $mode;
 
     }
 
@@ -88,24 +132,52 @@ class CsvParserHelper
 
     }
 
+
     private function readData()
     {
 
         if (($handle = fopen($this->_file, 'r')) !== false) {
 
-            while (($data = fgetcsv($handle, 1000, $this->_separator,$this->_delimiter)) !== false) {
+			// fgetcsv does not allow for enclosure being absent
+			if ($this->_enclosure==false) {
 
-                $this->_results[] = $data;
-                
-                if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax) {
+				while (($data = fgets($handle,$this->_maxLineLength)) !== false) {
+				
+					/*
+						wish we had str_getcsv, but the specs say stick to PHPv5.2
+						anyway, since there is no enclosure we can safely assume *every* delimiter is 
+						an actual delimiter and not part of the data, so... bombs away!
+						
+						ps: great, even when $this->_enclosure is defined, its actual presence in the
+						csv-file is totally optional, making this entire piece of code totally unnecessary. drat.
+					*/
+					$this->_results[] = explode($this->_delimiter,$data);
+					
+					if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax) {
+					
+						break;
+					
+					}
+				
+				}
 
-                    break;
+			} else {
 
-                }
+				while (($data = fgetcsv($handle,$this->_maxLineLength,$this->_delimiter,$this->_enclosure)) !== false) {
+				
+					$this->_results[] = $data;
+					
+					if ($this->_lineMax && count((array)$this->_results) >= $this->_lineMax) {
+					
+						break;
+					
+					}
+				
+				}
 
-            }
-
-            fclose($handle);
+			}
+			
+			fclose($handle);
             
         } else {
 
@@ -141,10 +213,16 @@ class CsvParserHelper
                         $allWhite = false;
 
                     }
+					
+					if ($this->_trimFields) {
+
+						$val[$resultskey]=trim($result);
+
+					}
 
                 }
                 
-                if     (!$allWhite) {
+                if (!$allWhite) {
 
                     $d[] = $val;
 
