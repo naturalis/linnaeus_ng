@@ -1,7 +1,27 @@
 <?php
 
 /*
-    
+
+	new project order of business (* do immediately, else can be done later):
+	
+		- select ranks *
+		- determine where the distinction between hogher taxa and species module lies *
+		- translate ranks
+		- import taxa *
+			or
+		  define taxa by hand *
+		- autorize collaborators for taxa *
+		  note: this is only useful if
+		  a) you have entered a sizeable amount of taxa
+		  b) you authorize someone for a level high up in the tree
+		- check and possibly change the default categories
+		- translate categories
+		- check and posibly change sections *
+		- translate sections *
+		  (must be done before editing taxa because they actively influence the content)
+		- edit taxa
+
+  
     tinyMCE
 		compressor php
 
@@ -15,12 +35,6 @@
 
 	must delete link taxa - ranks when deleting a rank
 
-	must set parent_id of children to null if parent-taxon is deleted (god forbid)
-
-	must delete keychoice, synonyms, common names when deleting taxon
-
-	ordering of ranks in getProjectRanks might need some reconsidering
-
 	delete obsolete undo's
 
 */
@@ -32,10 +46,12 @@ class SpeciesController extends Controller
     
     public $usedModels = array(
         'user', 
+        'user_taxon', 
         'role',
         'project_role_user', 
 		'user_taxon',
         'content_taxon', 
+        'content_taxon_undo', 
         'language_project', 
 		'section',
 		'label_section',
@@ -48,7 +64,8 @@ class SpeciesController extends Controller
 		'hybrid',
 		'synonym',
 		'commonname',
-		'label_language'
+		'label_language',
+		'choice_keystep' 
     );
     
     public $usedHelpers = array(
@@ -394,7 +411,7 @@ class SpeciesController extends Controller
 				// get the defined categories (just the page definitions, no content yet)
 				$tp = $this->models->PageTaxon->_get(array('id'=>array(
 					'project_id' => $this->getCurrentProjectId()
-				)));
+				),'order' => 'show_order'));
 	
 				foreach ((array) $tp as $key => $val) {
 					
@@ -588,9 +605,15 @@ class SpeciesController extends Controller
 
 					$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
 					
+					$d[] = $taxa[$key];
+
 				}
         
 	        }
+
+			$taxa = isset($d) ? $d : null;
+			
+			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
 
 			// user requested a sort of the table
 			if (isset($this->requestData['key'])) {
@@ -627,7 +650,6 @@ class SpeciesController extends Controller
 		
 		}
 
-        
         $this->printPage();
     
     }
@@ -881,22 +903,130 @@ class SpeciesController extends Controller
                 $r = $this->helpers->CsvParserHelper->getResults();
 
 				$pr = $this->getProjectRanks();
-
+				
+				// get all ranks for this project
 				foreach((array)$pr as $key => $val) {
 				
 					$d[] = trim(strtolower($val['rank']));
 
-					if ($_SESSION['project']['includes_hybrids'] && $val['can_hybrid']==1)
-						$h[] = trim(strtolower($val['rank']));
+					if ($_SESSION['project']['includes_hybrids'] && $val['can_hybrid']==1) $h[] = trim(strtolower($val['rank']));
 
 				}
+				
+				$upperTaxonRank = false;
+				
+				$prevNames = array();
 
 				foreach((array)$r as $key => $val) {
 
+					// check whether 'has hybrid' is present and legal
 					if ($_SESSION['project']['includes_hybrids'])
 						$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y' && in_array(strtolower($val[1]),$h));
 
-					$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = (isset($val[1]) && in_array(strtolower($val[1]),$d));
+					$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = 'ok';
+
+
+					// check whether the taxon name doesn't already exist
+					$t = $this->models->Taxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon' => $r[$key][0]
+							),
+							'columns' => 'count(*) as total'
+						)
+					);
+
+					
+					if (in_array($val[0],$prevNames)) {
+					// set whether the taxon can be imported, based on whether it has duplicates in the import
+
+						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Duplicate name');
+						
+					} else
+					if ($t[0]['total']!=0) {
+					// set whether the taxon can be imported, based on whether the name already exists
+					
+						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Name already exists in the database');
+					
+					} else
+					if (!(isset($val[1]) && in_array(strtolower($val[1]),$d))) {
+					// set whether the taxon can be imported, based on whether it has a legal rank
+
+						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Unknown rank');
+
+					} else {
+
+						$prevNames[] = $val[0];
+
+					}
+
+					if ($upperTaxonRank==false && $r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2]=='ok') $upperTaxonRank=$val[1];
+
+				}
+
+				$upperTaxonRank = strtolower($upperTaxonRank);
+
+				// check whether the uppermost taxa in the csv have to be connected to a previous taxon
+				// if the first to be imported taxon is a kingdom (or rather, of the uppermost rank), do nothing: it can't have a parent
+				if ($upperTaxonRank!=strtolower($pr[0]['rank'])) {
+
+					$parentRank = false;
+
+					// find what rank a parent should be
+					foreach((array)$pr as $key => $val) {
+
+						if (strtolower($val['rank'])==$upperTaxonRank) {
+
+							$parentRank = $pr[$key-1];
+
+							break;
+
+						}
+
+					}
+
+					if ($parentRank) {
+
+						$t = $this->models->Taxon->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'rank_id' => $parentRank['id']
+								)
+							)
+						);
+						
+						if (count($t)==1) {
+
+							$this->addMessage(
+								sprintf(
+									_('The taxon or taxa of the rank "%s" will be connected as child to the already existing taxon "%s".'),
+									$upperTaxonRank,
+									$t[0]['taxon']
+									)
+								);
+
+							$this->smarty->assign('connectToTaxonId',$t[0]['id']);
+
+						} else {
+
+							$this->addMessage(
+								sprintf(
+									_('There are multiple possible parents of the uppermost taxon or taxa. Please choose the appropriate one.')
+									)
+								);
+
+							$this->smarty->assign('connectToTaxonIds',$t);
+
+						}
+
+					} else {
+					
+						$this->addError(sprintf(
+							_('Uppermost taxon is not a %s, and has a rank that has no immediate parent.'),$pr[0]['rank']));
+
+					}
 
 				}
 
@@ -909,7 +1039,26 @@ class SpeciesController extends Controller
         } elseif (isset($this->requestData)) {
 
             if (isset($this->requestData['rows']) && isset($_SESSION['system']['csv_data'])) {
-            
+
+				if (!empty($this->requestData['connectToTaxonId'])) {
+	
+					$t = $this->models->Taxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $this->requestData['connectToTaxonId']
+							)
+						)
+					);
+	
+					$existingParent = $t[0]['taxon'];
+	
+				} else {
+
+					$existingParent = false;
+				
+				}
+	
                 $parenName = false;
                 $predecessors = null;
 
@@ -921,9 +1070,11 @@ class SpeciesController extends Controller
                     $parentName = null;
 
                     if ($key==0) {
-                    // first one never has a parent (top of the tree)
+                    // first one never has a parent (top of the tree) unless actively set or chosen
 
                         $predecessors[] = array($rank, $name, $hybrid);
+						
+						if ($existingParent) $parentName = $existingParent;
 
                     } else {
 
@@ -936,8 +1087,18 @@ class SpeciesController extends Controller
                             $prevRank = $rank;
                             while($rank==$prevRank) {
                             
-                                $prevRank = $predecessors[count((array)$predecessors)-$j][0];
-                                $parentName = $predecessors[count((array)$predecessors)-$j][1];
+								if (!isset($predecessors[count((array)$predecessors)-$j][0])) {
+
+									if ($existingParent) $parentName = $existingParent;
+									break;
+
+								} else {
+
+									$prevRank = $predecessors[count((array)$predecessors)-$j][0];
+									$parentName = $predecessors[count((array)$predecessors)-$j][1];
+
+								}
+
                                 $j++;
 
                             }
@@ -2318,6 +2479,97 @@ class SpeciesController extends Controller
     
     }
 
+	private function deleteTaxon($id)
+	{
+	
+		if (!$id) return;
+
+		// reset keychoice end-points
+		$this->models->ChoiceKeystep->update(
+			array('res_taxon_id' => 'null'),
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'res_taxon_id' => $id
+			)
+		);
+
+		// delete commonnames
+		$this->models->Commonname->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id
+			)
+		);
+
+		// delete synonyms
+		$this->models->Synonym->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id
+			)
+		);
+
+		// purge undo
+		$this->models->ContentTaxonUndo->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id
+			)
+		);
+
+		// delete taxon tree branch rights
+		$this->models->UserTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $id
+			)
+		);
+
+		// detele media
+		$mt = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $id
+				)
+			)
+		);
+
+		foreach((array)$mt as $key => $val) {
+
+			$this->deleteTaxonMedia($val['id'],false);
+
+		}
+
+		// reset parentage
+		$this->models->Taxon->update(
+			array('parent_id' => 'null'),
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'parent_id' => $id
+			)
+		);
+
+		// delete content
+		$this->models->ContentTaxon->delete(
+			array(
+				'taxon_id' => $id, 
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		// delete taxon
+		$this->models->Taxon->delete(
+			array(
+				'id' => $id, 
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		$this->reOrderTaxonTree();
+	
+	}
+
     private function ajaxActionDeleteTaxon ()
     {
         
@@ -2327,33 +2579,7 @@ class SpeciesController extends Controller
         
         } else {
 
-            $mt = $this->models->MediaTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'taxon_id' => $this->requestData['id']
-					)
-				)
-            );
-
-            foreach((array)$mt as $key => $val) {
-
-                $this->deleteTaxonMedia($val['id'],false);
-
-            }
-
-            $this->models->ContentTaxon->delete(
-            array(
-                'taxon_id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
-            
-            $this->models->Taxon->delete(array(
-                'id' => $this->requestData['id'], 
-                'project_id' => $this->getCurrentProjectId()
-            ));
-			
-			$this->reOrderTaxonTree();
+			$this->deleteTaxon($this->requestData['id']);
         
         }
     

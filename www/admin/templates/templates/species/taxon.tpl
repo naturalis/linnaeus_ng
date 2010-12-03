@@ -1,5 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-<div id="page-main" style="height:1200px">
+<div id="page-main" style="height:{if $languages|@count > 1}1200px{else}670px{/if}">
 <span id="debug-message"></span>
 
 {if $taxon.id!=-1}

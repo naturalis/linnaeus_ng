@@ -1,6 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+{if !$results}
 <form method="post" action="" enctype="multipart/form-data">
 	<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 	<input name="uploadedfile" type="file" /><br />
@@ -20,18 +21,37 @@
 	</table>
 	<input type="submit" value="{t}upload{/t}" />
 </form>
+{/if}
+</div>
+
+{if !$results}
+{include file="../shared/admin-messages.tpl"}
+{/if}
+
+<form method="post" action="" enctype="multipart/form-data">
+<div class="page-generic-div">
+{if $results}
+<p>
+{t}Check the results of the import below. You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there an error message, you are attempting to load a taxon that can not be loaded.<br />
+{t}If the results look OK, click 'save':{/t} <input type="submit" value="{t}save{/t}" />
+</p>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
 
 <div class="page-generic-div">
-{if $results}
-<form method="post" action="" enctype="multipart/form-data">
-<p>
-{t}Check the results of the import below. If they look OK, press 'save' to save them:{/t} <input type="submit" value="{t}save{/t}" /><br />
-{t}You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there is the message 'unknown rank', you are
-attempting to load a rank that is not part of your project. To add or change ranks, click{/t} <a href="ranks.php">{t}here{/t}</a> .
-</p>
+
+{if $connectToTaxonIds}
+{t}parent taxon:{/t} 
+<select name="connectToTaxonId">
+{section name=i loop=$connectToTaxonIds}
+<option value="{$connectToTaxonIds[i].id}">{$connectToTaxonIds[i].taxon}</option>
+{/section}
+</select>
+{/if}
+{if $connectToTaxonId}<input type="hidden" name="connectToTaxonId" value="{$connectToTaxonId}" />{/if}
+
+
 <table>
 <tr><th>{t}Name{/t}</th><th>{t}Rank{/t}</th>
 {if $session.project.includes_hybrids==1}
@@ -43,14 +63,13 @@ attempting to load a rank that is not part of your project. To add or change ran
 <td><label for="chk{$smarty.section.i.index}">{$results[i][1]}</label></td>
 {if $session.project.includes_hybrids==1}
 <td><label for="chk{$smarty.section.i.index}">{if $results[i][2]==1}x{/if}</label></td>
-<td>{if $results[i][3]}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{t}unknown rank{/t}</span>{/if}</td>
+<td>{if $results[i][3]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][3]}</span>{/if}</td>
 {else}
-<td>{if $results[i][2]}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{t}unknown rank{/t}</span>{/if}</td>
+<td>{if $results[i][2]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][2]}</span>{/if}</td>
 {/if}
 </tr>
 {/section}
 </table>
-</form>
 {else}
 <p>
 {t}To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'.
@@ -118,7 +137,7 @@ The contents of the file will be displayed so you can review them before they ar
 {t}You can download a sample CSV-file{/t} <a href="{$baseUrl}admin/media/system/example.csv">{t}here{/t}</a>.
 </p>
 {/if}
-
 </div>
+</form>
 
 {include file="../shared/admin-footer.tpl"}

@@ -2,6 +2,8 @@
 
 /*
 
+	default language!
+
 	set upload maximum for media uploads per projects
 
     hard coded number of free modules
