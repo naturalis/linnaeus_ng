@@ -18,6 +18,7 @@ var taxonCanHaveHybrid = Array();
 var taxonExecAfterSave = false;
 var taxonRankBorder = false;
 var taxonCommonnameLanguages = Array();
+var taxonAjaxAsynchMode = true;
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -32,6 +33,7 @@ function taxonGeneralDeleteLabels(id,action,name,itm) {
 			'id' : id , 
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			$('#theForm').submit();
 		}
@@ -68,6 +70,7 @@ function taxonCheckLockOutStates() {
 			'action' : 'get_taxa_edit_states',
 			'time': allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			taxonClearAllUsageCells();
 			if (data) {
@@ -262,17 +265,21 @@ function taxonGetDataDefault(updateInterface) {
 
 function taxonSwitchLanguage(language) {
 
+	taxonAjaxAsynchMode = false;
 	taxonSaveDataActive();
 	taxonActiveLanguage = language;
 	taxonGetDataActive(true);
+	taxonAjaxAsynchMode = true;
 
 }
 
 function taxonSwitchPage(page) {
 
+	taxonAjaxAsynchMode = false;
 	taxonSaveDataAll();
 	taxonActivePage = page;
 	taxonGetDataAll();
+	taxonAjaxAsynchMode = true;
 
 }
 
@@ -385,6 +392,7 @@ function taxonSaveData(id,language,page,content,editorName) {
 			'time' : allGetTimestamp()	
 		}),
 		type: "POST",
+		async: taxonAjaxAsynchMode ,
 		success: function (data) {
 			//alert(data);
 			if (data.indexOf('<error>')>=0) {
@@ -790,6 +798,7 @@ function taxonSaveCoLTaxa(taxa) {
 			'action' : 'save_col',
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''))
@@ -884,6 +893,7 @@ function taxonMediaSaveDesc() {
 			'language' : taxonActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			if(data=='<ok>') {
 				allSetMessage(_('saved'));
@@ -903,6 +913,7 @@ function taxonMediaGetDescriptions() {
 			'language' : taxonActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			if (data) {
 				obj = $.parseJSON(data);
@@ -963,6 +974,7 @@ function taxonMediaDelete(id,type,name) {
 			'id' : id ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			//alert(data);
 			if(data=='<ok>') {
@@ -1211,6 +1223,7 @@ function taxonGeneralGetLabels(language,action,postFunction) {
 			'language' : language ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			//alert(data);
 			obj = $.parseJSON(data);
@@ -1233,6 +1246,7 @@ function taxonGeneralSave(id,label,type,action) {
 			'language' :  type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			allSetMessage(data);
 		}
@@ -1303,6 +1317,7 @@ function taxonCheckNewTaxonName() {
 			'id' : $('#id').val() ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 			//alert(data);
 			if(data=='<ok>') {
@@ -1333,6 +1348,7 @@ function taxonGetRankByParent(nomessage) {
 			'id' : id ,
 			'time' : allGetTimestamp()
 		}),
+		async: taxonAjaxAsynchMode,
 		success : function (data) {
 
 			if (data=='-1' && !nomessage) {
