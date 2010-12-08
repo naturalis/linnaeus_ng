@@ -276,7 +276,7 @@ function moduleBuildModuleUserBlock(type) {
 			for(var k=0;k<theseModuleUsers.length;k++) {
 	
 				if (theseModuleUsers[k][0]==theseModules[i][0] && theseModuleUsers[k][1]==moduleUsers[j][0]) {
-			
+
 					if (theseModuleUsers[k][2]==1) {
 
 						b = b +'<td id="cell-'+q+theseModules[i][0]+'-'+moduleUsers[j][0]+'a" class="cell-module-user-active">'+
@@ -312,8 +312,12 @@ function moduleBuildModuleUserBlock(type) {
 			'</table></td></tr>';
 	}
 	
-	b = '<table>'+b+'</table>';
-
+	if (b=='') {
+		b = type == 'free' ? _('no free modules have been defined') : _('no modules have been defined') ;
+		b = b + '; '+sprintf(_('go %shere%s to define modules'),'<a href="modules.php">','</a>')
+	} else {
+		b = '<table>'+b+'</table>';
+	}
 
 	if (type == 'free')
 		$('#free-module-table').html(b);
@@ -347,7 +351,7 @@ function moduleChangeModuleUserStatus(module,user,action,type) {
 				}
 
 				for (var i=0;i<theseModuleUsers.length;i++) {
-					if (isArray(user)) {
+					if (isArray(user) && theseModuleUsers[i][0]==module) {
 						theseModuleUsers[i][2]=1;
 					} else {
 						if (theseModuleUsers[i][0]==module && theseModuleUsers[i][1]==user) {
@@ -359,6 +363,7 @@ function moduleChangeModuleUserStatus(module,user,action,type) {
 						}
 					}
 				}
+
 				for (var i=0;i<theseModules.length;i++) {
 					if (theseModules[i][0]==module) {
 						if (isArray(user)) {

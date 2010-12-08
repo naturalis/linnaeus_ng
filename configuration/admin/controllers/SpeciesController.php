@@ -52,7 +52,6 @@ class SpeciesController extends Controller
 		'user_taxon',
         'content_taxon', 
         'content_taxon_undo', 
-        'language_project', 
 		'section',
 		'label_section',
         'page_taxon', 
@@ -91,8 +90,6 @@ class SpeciesController extends Controller
         
         $this->createStandardCategories();
 
-        $this->setProjectLanguages();
-
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
 
     }
@@ -122,6 +119,9 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Species module overview'));
         
+		if (count((array)$_SESSION['project']['languages'])==0)
+			$this->addError(sprintf(_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),'<a href="../projects/data.php">','</a>'));
+		
         $this->printPage();
   
     }

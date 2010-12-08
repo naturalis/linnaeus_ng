@@ -1,4 +1,6 @@
 var keyFullKeyPathVisibility = false;
+var keyStepId = false;
+var keyChoiceId = false;
 
 function keyToggleFullKeyPath() {
 
@@ -139,3 +141,137 @@ function keyShowChoiceDetails(id) {
 	}
 
 }
+
+function keyGetKeystepContent(language) {
+	
+	allGeneralGetLabels(language,'get_key_step_content','keySetKeystepContent',keyStepId);
+	
+}
+
+function keySetKeystepContent(obj,language) {
+
+	if (language==allDefaultLanguage) {
+		$('#titleDefault').val(obj ? obj.title : '');
+		$('#contentDefault').val(obj ? obj.content : '');
+		$('#default-key-title').html(obj ? obj.title : '...');
+	} else {
+		$('#titleOther').val(obj ? obj.title : '');
+		$('#contentOther').val(obj ? obj.content : '');
+	}
+
+}
+
+function keySaveStepTitle(title,type) {
+
+	keySaveData(
+		keyStepId,
+		type=='default' ? allDefaultLanguage : allActiveLanguage,
+		title,
+		'save_step_title'
+	);
+
+}
+
+function keySaveStepText(title,type) {
+
+	keySaveData(
+		keyStepId,
+		type=='default' ? allDefaultLanguage : allActiveLanguage,
+		title,
+		'save_step_text'
+	);
+
+}
+
+function keySaveData(id,language,content,action) {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
+			'action' : action ,
+			'id' : id ,
+			'content' : content , 
+			'language' : language ,
+			'time' : allGetTimestamp()	
+		}),
+		type: "POST",
+		async: allAjaxAsynchMode ,
+		success: function (data) {
+			if(data=='<ok>') {
+				allSetMessage(_('saved'));
+			}
+		}
+
+	});
+
+}
+
+function keyDeleteKeyStep() {
+
+	if (!allDoubleDeleteConfirm(_('keystep'),$('#key-title').html())) return;
+
+	$('#delForm').submit();
+
+}
+
+function keyGetChoiceContent(language) {
+	
+	allGeneralGetLabels(language,'get_key_choice_content','keySetChoiceContent',keyChoiceId);
+	
+}
+
+function keySetChoiceContent(obj,language) {
+
+	if (language==allDefaultLanguage) {
+		$('#titleDefault').val(obj ? obj.title : '');
+		$('#contentDefault').val(obj ? obj.choice_txt : '');
+		$('#default-choice-title').html(obj ? obj.title : '...');
+	} else {
+		$('#titleOther').val(obj ? obj.title : '');
+		$('#contentOther').val(obj ? obj.choice_txt : '');
+	}
+
+}
+
+function keySaveChoiceTitle(title,type) {
+
+	keySaveData(
+		keyChoiceId,
+		type=='default' ? allDefaultLanguage : allActiveLanguage,
+		title,
+		'save_choice_title'
+	);
+
+}
+
+function keySaveChoiceText(title,type) {
+
+	keySaveData(
+		keyChoiceId,
+		type=='default' ? allDefaultLanguage : allActiveLanguage,
+		title,
+		'save_choice_text'
+	);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

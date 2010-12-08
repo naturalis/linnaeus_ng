@@ -21,3 +21,20 @@ td,th,tr {
 th {
 	text-align: left;
 }
+
+.project-language,.project-language-active {
+	padding:0px 2px 0px 2px;
+	cursor:pointer;	
+}
+
+.project-language-active {
+	font-weight:bold;
+	text-decoration:underline;
+	cursor: default;
+}
+
+#project-language-tabs {
+	color:#555;
+	font-size:11px;
+}
+

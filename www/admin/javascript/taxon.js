@@ -1,10 +1,7 @@
 var taxonActiveView = false;
 var taxonActivePageTitle = false;
-var taxonActiveLanguage = false;
 var taxonActiveTaxonId = false;
 var taxonNewLanguage = false;
-var taxonDefaultLanguage = false;
-var taxonLanguages = Array();
 var taxonActivePage = false;
 var taxonPages = Array();
 var taxonPageStates = Array();
@@ -18,7 +15,7 @@ var taxonCanHaveHybrid = Array();
 var taxonExecAfterSave = false;
 var taxonRankBorder = false;
 var taxonCommonnameLanguages = Array();
-var taxonAjaxAsynchMode = true;
+
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -33,7 +30,7 @@ function taxonGeneralDeleteLabels(id,action,name,itm) {
 			'id' : id , 
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			$('#theForm').submit();
 		}
@@ -70,7 +67,7 @@ function taxonCheckLockOutStates() {
 			'action' : 'get_taxa_edit_states',
 			'time': allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			taxonClearAllUsageCells();
 			if (data) {
@@ -131,14 +128,6 @@ function taxonEditTaxonName(id) {
 
 }
 
-function taxonAddLanguage(lan) {
-	//[id,name,default?]
-	taxonLanguages[taxonLanguages.length] = lan;
-	
-	if (lan[2]==1) taxonDefaultLanguage = lan[0];
-
-}
-
 function taxonAddPage(page) {
 	//[id,[names],default?]
 	// names[-1] contains the system label, [x] the name in language x
@@ -152,21 +141,21 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 
 	var buffer = '';
 
-	for (var i=0;i<taxonLanguages.length;i++) {
+	for (var i=0;i<allLanguages.length;i++) {
 
-		if (taxonLanguages[i][2]!=1 || includeDef==true) {
+		if (allLanguages[i][2]!=1 || includeDef==true) {
 			buffer = buffer+
 				'<span class="rank-language'+
-				(taxonLanguages[i][0]==taxonActiveLanguage ? 
+				(allLanguages[i][0]==allActiveLanguage ? 
 					'-active"' : 
-					'" class="pseudo-a" onclick="'+fnc+'('+taxonLanguages[i][0]+');' 
+					'" class="pseudo-a" onclick="'+fnc+'('+allLanguages[i][0]+');' 
 				)+
 				'">'+
-				taxonLanguages[i][1]+
+				allLanguages[i][1]+
 				'</span>&nbsp;';
 		}
 		
-		if (taxonLanguages[i][0]==taxonDefaultLanguage) var def = taxonLanguages[i][1];
+		if (allLanguages[i][0]==allDefaultLanguage) var def = allLanguages[i][1];
 	}
 
 	$('#taxon-language-other-language').html(buffer);
@@ -205,7 +194,7 @@ function taxonUpdatePageBlock() {
 		data: {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'get_page_states' ,
-			'language' : taxonActiveLanguage ,
+			'language' : allActiveLanguage ,
 			'time' : allGetTimestamp()
 		},
 		success:
@@ -237,11 +226,11 @@ function taxonGetDataAll() {
 
 function taxonGetDataActive(updateInterface) {
 
-	if (taxonActiveTaxonId.length==0 || taxonActiveLanguage===false) return;
+	if (taxonActiveTaxonId.length==0 || allActiveLanguage===false) return;
 
 	taxonGetData(
 		taxonActiveTaxonId,
-		taxonActiveLanguage,
+		allActiveLanguage,
 		taxonActivePage,
 		'taxon-content-active',
 		updateInterface
@@ -255,7 +244,7 @@ function taxonGetDataDefault(updateInterface) {
 
 	taxonGetData(
 		taxonActiveTaxonId,
-		taxonDefaultLanguage,
+		allDefaultLanguage,
 		taxonActivePage,
 		'taxon-content-default',
 		updateInterface
@@ -265,21 +254,21 @@ function taxonGetDataDefault(updateInterface) {
 
 function taxonSwitchLanguage(language) {
 
-	taxonAjaxAsynchMode = false;
+	allAjaxAsynchMode = false;
 	taxonSaveDataActive();
-	taxonActiveLanguage = language;
+	allActiveLanguage = language;
 	taxonGetDataActive(true);
-	taxonAjaxAsynchMode = true;
+	allAjaxAsynchMode = true;
 
 }
 
 function taxonSwitchPage(page) {
 
-	taxonAjaxAsynchMode = false;
+	allAjaxAsynchMode = false;
 	taxonSaveDataAll();
 	taxonActivePage = page;
 	taxonGetDataAll();
-	taxonAjaxAsynchMode = true;
+	allAjaxAsynchMode = true;
 
 }
 
@@ -307,11 +296,11 @@ function taxonClose() {
 
 function taxonSaveDataActive() {
 
-	if (taxonActiveTaxonId.length==0 || taxonActiveLanguage===false) return;
+	if (taxonActiveTaxonId.length==0 || allActiveLanguage===false) return;
 
 	taxonSaveData(
 		taxonActiveTaxonId,
-		taxonActiveLanguage,
+		allActiveLanguage,
 		taxonActivePage,
 		tinyMCE.get('taxon-content-active').getContent(),
 		'taxon-content-active'
@@ -325,7 +314,7 @@ function taxonSaveDataDefault() {
 
 	taxonSaveData(
 		taxonActiveTaxonId,
-		taxonDefaultLanguage,
+		allDefaultLanguage,
 		taxonActivePage,
 		tinyMCE.get('taxon-content-default').getContent(),
 		'taxon-content-default'
@@ -354,9 +343,9 @@ function taxonGetData(id,language,page,editorName,updateInterface) {
 			tinyMCE.get(editorName).setContent(obj.content ? obj.content : '');
 			taxonActivePage = obj.page_id;
 
-			if (language!=taxonDefaultLanguage) {
+			if (language!=allDefaultLanguage) {
 				taxonPublishStates[1] = obj.publish;
-				taxonActiveLanguage = obj.language_id;
+				allActiveLanguage = obj.language_id;
 			} else {
 				taxonPublishStates[0] = obj.publish;
 			}
@@ -392,7 +381,7 @@ function taxonSaveData(id,language,page,content,editorName) {
 			'time' : allGetTimestamp()	
 		}),
 		type: "POST",
-		async: taxonAjaxAsynchMode ,
+		async: allAjaxAsynchMode ,
 		success: function (data) {
 			//alert(data);
 			if (data.indexOf('<error>')>=0) {
@@ -488,7 +477,7 @@ function taxonPublishContent(type,state) {
 		data : ({
 			'id' : taxonActiveTaxonId ,
 			'action' : 'publish_content' ,
-			'language' : (type=='active' ? taxonActiveLanguage : taxonDefaultLanguage) ,
+			'language' : (type=='active' ? allActiveLanguage : allDefaultLanguage) ,
 			'page' : taxonActivePage ,
 			'state' : state ,
 			'time' : allGetTimestamp()	
@@ -588,21 +577,21 @@ function taxonGetUndo() {
 
 				}
 
-				if (obj.language_id==taxonDefaultLanguage) {
+				if (obj.language_id==allDefaultLanguage) {
 
 					tinyMCE.get('taxon-content-default').setContent(obj.content ? obj.content : '');
 					taxonPublishStates[0] = obj.publish;
 
 				} else 
-				if (obj.language_id==taxonActiveLanguage) {
+				if (obj.language_id==allActiveLanguage) {
 
 					tinyMCE.get('taxon-content-active').setContent(obj.content ? obj.content : '');
 					taxonPublishStates[1] = obj.publish;
 
 				} else
-				if (taxonLanguages.inArray(obj.language_id,0) >= 0) {
+				if (allLanguages.inArray(obj.language_id,0) >= 0) {
 
-					taxonActiveLanguage = obj.language_id;
+					allActiveLanguage = obj.language_id;
 					tinyMCE.get('taxon-content-active').setContent(obj.content ? obj.content : '');
 					taxonPublishStates[1] = obj.publish;
 
@@ -614,10 +603,10 @@ function taxonGetUndo() {
 
 				}
 
-				if (obj.language_id==taxonDefaultLanguage) {
+				if (obj.language_id==allDefaultLanguage) {
 					taxonGetDataActive(false);
 				} else
-				if (obj.language_id==taxonActiveLanguage) {
+				if (obj.language_id==allActiveLanguage) {
 					taxonGetDataDefault(false);	
 				}
 
@@ -798,7 +787,7 @@ function taxonSaveCoLTaxa(taxa) {
 			'action' : 'save_col',
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''))
@@ -890,10 +879,10 @@ function taxonMediaSaveDesc() {
 			'action' : 'save_media_desc' ,
 			'id' : taxonMediaDescBeingEdited.id.replace('media-','') ,
 			'description' : val ,
-			'language' : taxonActiveLanguage ,
+			'language' : allActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			if(data=='<ok>') {
 				allSetMessage(_('saved'));
@@ -910,10 +899,10 @@ function taxonMediaGetDescriptions() {
 		type: "POST",
 		data : ({
 			'action' : 'get_media_descs' ,
-			'language' : taxonActiveLanguage ,
+			'language' : allActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			if (data) {
 				obj = $.parseJSON(data);
@@ -950,7 +939,7 @@ function taxonMediaChangeLanguage(lan) {
 	allShowLoadingDiv();
 	taxonMediaSaveDesc();
 	taxonMediaDescBeingEdited = false;
-	taxonActiveLanguage = lan;
+	allActiveLanguage = lan;
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
 	taxonMediaGetDescriptions();
 
@@ -974,7 +963,7 @@ function taxonMediaDelete(id,type,name) {
 			'id' : id ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			//alert(data);
 			if(data=='<ok>') {
@@ -1168,72 +1157,6 @@ function taxonAddRankId(rank) {
 
 }
 
-function taxonSwitchRankLanguage(language) {
-
-	taxonActiveLanguage = language;
-	taxonDrawRankLanguages();
-
-	switch (taxonActiveView) {
-		case 'ranklabels':
-			taxonGetRankLabels(taxonActiveLanguage);
-			break;
-		case 'page':
-			taxonGetPageLabels(taxonActiveLanguage);
-			break;
-		case 'sections':
-			taxonGetSectionLabels(taxonActiveLanguage);
-			break;			
-		case 'commonnames':
-			taxonGetCommonnameLabels(taxonActiveLanguage);
-			break;			
-	}
-
-}
-
-function taxonDrawRankLanguages() {
-	
-	var b='';
-
-	for(var i=0;i<taxonLanguages.length;i++) {
-		if (taxonLanguages[i][2]!=1) {
-			b = b + 
-				'<span class="rank-language'+
-					(taxonLanguages[i][0]==taxonActiveLanguage ? '-active' : '' )+
-					'" onclick="taxonSwitchRankLanguage('+ taxonLanguages[i][0] +')">' + 
-				taxonLanguages[i][1] + 
-				'</span>&nbsp;';
-		} else {
-			taxonDefaultLanguage = taxonLanguages[i][0];
-		}
-	}
-
-	$('#language-tabs').html(b);
-
-}
-
-function taxonGeneralGetLabels(language,action,postFunction) {
-
-	allShowLoadingDiv();
-
-	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : action ,
-			'language' : language ,
-			'time' : allGetTimestamp()
-		}),
-		async: taxonAjaxAsynchMode,
-		success : function (data) {
-			//alert(data);
-			obj = $.parseJSON(data);
-			eval(postFunction+'(obj,language)');
-			allHideLoadingDiv();
-		}
-	})
-	
-}
-
 function taxonGeneralSave(id,label,type,action) {
 
 	allAjaxHandle = $.ajax({
@@ -1243,10 +1166,10 @@ function taxonGeneralSave(id,label,type,action) {
 			'action' : action ,
 			'id' : id , 
 			'label' : label , 
-			'language' :  type=='default' ? taxonDefaultLanguage : taxonActiveLanguage ,
+			'language' :  type=='default' ? allDefaultLanguage : allActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			allSetMessage(data);
 		}
@@ -1257,7 +1180,7 @@ function taxonGeneralSave(id,label,type,action) {
 function taxonGeneralSetLabels(obj,language,idField,labelField) {
 
 	for(var i=0;i<taxonRanks.length;i++) {
-		if (language==taxonDefaultLanguage) {
+		if (language==allDefaultLanguage) {
 			$('#default-'+taxonRanks[i]).val('');
 		} else {
 			$('#other-'+taxonRanks[i]).val('');
@@ -1270,7 +1193,7 @@ function taxonGeneralSetLabels(obj,language,idField,labelField) {
 			var id = eval('obj[i].'+idField);
 			var val = eval('obj[i].'+labelField);
 			
-			if (language==taxonDefaultLanguage) {
+			if (language==allDefaultLanguage) {
 				$('#default-'+id).val(val);
 				if (obj[i].direction) $('#default-'+id).attr('dir',obj[i].direction);
 			} else {
@@ -1297,7 +1220,7 @@ function taxonSetRankLabels(obj,language) {
 
 function taxonGetRankLabels(language) {
 	
-	taxonGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels');
+	allGeneralGetLabels(language,'get_rank_labels','taxonSetRankLabels');
 	
 }
 
@@ -1317,7 +1240,7 @@ function taxonCheckNewTaxonName() {
 			'id' : $('#id').val() ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 			//alert(data);
 			if(data=='<ok>') {
@@ -1348,7 +1271,7 @@ function taxonGetRankByParent(nomessage) {
 			'id' : id ,
 			'time' : allGetTimestamp()
 		}),
-		async: taxonAjaxAsynchMode,
+		async: allAjaxAsynchMode,
 		success : function (data) {
 
 			if (data=='-1' && !nomessage) {
@@ -1402,7 +1325,7 @@ function taxonSetPageLabels(obj,language) {
 
 function taxonGetPageLabels(language) {
 
-	taxonGeneralGetLabels(language,'get_page_labels','taxonSetPageLabels');
+	allGeneralGetLabels(language,'get_page_labels','taxonSetPageLabels');
 
 }
 
@@ -1426,8 +1349,8 @@ function taxonSetSectionLabels(obj,language) {
 
 function taxonGetSectionLabels(language) {
 
-	taxonGeneralGetLabels(language,'get_section_titles','taxonSetSectionLabels');
-	
+	allGeneralGetLabels(language,'get_section_titles','taxonSetSectionLabels');
+
 }
 
 function taxonGenericNameAction(id,action,type) {
@@ -1471,10 +1394,10 @@ function taxonSetCommonnameLabels(obj,language) {
 
 	for(var j=0;j<taxonCommonnameLanguages.length;j++) {
 
-		if (language == taxonDefaultLanguage)
+		if (language == allDefaultLanguage)
 			$('#default-'+j).val('');
 		else
-		if (language == taxonActiveLanguage)
+		if (language == allActiveLanguage)
 			$('#other-'+j).val('');
 
 	}
@@ -1487,10 +1410,10 @@ function taxonSetCommonnameLabels(obj,language) {
 
 				if (taxonCommonnameLanguages[j]==obj[i].label_language_id) {
 	
-					if (language == taxonDefaultLanguage)
+					if (language == allDefaultLanguage)
 						$('#default-'+j).val(obj[i].label);
 					else
-					if (language == taxonActiveLanguage)
+					if (language == allActiveLanguage)
 						$('#other-'+j).val(obj[i].label);
 	
 				}
@@ -1505,7 +1428,7 @@ function taxonSetCommonnameLabels(obj,language) {
 
 function taxonGetCommonnameLabels(language) {
 
-	taxonGeneralGetLabels(language,'get_language_labels','taxonSetCommonnameLabels');
+	allGeneralGetLabels(language,'get_language_labels','taxonSetCommonnameLabels');
 
 }
 

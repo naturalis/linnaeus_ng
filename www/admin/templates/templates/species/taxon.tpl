@@ -57,9 +57,9 @@ $(document).ready(function(){
 {/literal}
 	taxonActiveView = 'taxon';
 {section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-	taxonActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	taxonDrawTaxonLanguages();
 
 {section name=i loop=$pages}

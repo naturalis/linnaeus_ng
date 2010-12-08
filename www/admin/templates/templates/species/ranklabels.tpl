@@ -20,7 +20,7 @@
 {/if}
 {/section}
 {if $languages|@count>1}
-<td id="language-tabs">(languages)</td>
+<td id="project-language-tabs">(languages)</td>
 {/if}
 </tr>
 {section name=i loop=$projectRanks}
@@ -59,12 +59,12 @@ $(document).ready(function(){
 	taxonAddRankId({$projectRanks[i].id});
 {/section}
 {section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-	taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-	taxonDrawRankLanguages();
-	taxonGetRankLabels(taxonDefaultLanguage);
-	taxonGetRankLabels(taxonActiveLanguage);
+	allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+	allDrawRankLanguages();
+	taxonGetRankLabels(allDefaultLanguage);
+	taxonGetRankLabels(allActiveLanguage);
 {literal}
 });
 {/literal}
