@@ -462,7 +462,12 @@ abstract class Model extends BaseClass
     
     }
 
-
+    public function getAffectedRows ()
+    {
+        
+        return mysql_affected_rows();
+    
+    }
 
     public function getLastQuery ()
     {

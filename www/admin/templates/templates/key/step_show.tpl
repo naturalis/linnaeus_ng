@@ -3,7 +3,13 @@
 {include file="_keypath.tpl"}
 
 <div id="page-main">
+
+<form method="post" action="" id="delForm">
+<input type="hidden" name="action" id="action" value="delete" />
+<input type="hidden" name="id" id="id" value="{$step.id}" />
+</form>
 <form method="post" action="step_edit.php" id="theForm">
+<input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="id" id="id" value="{$step.id}" />
 <input type="hidden" name="ref_choice" id="ref_choice" value="" />
 <table style="border-collapse:collapse">
@@ -12,6 +18,7 @@
 			<span id="key-step-number">{t}Step{/t} {$step.number}:</span>
 			<span id="key-title">{$step.title}</span>
 			<span id="key-edit-link">[<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]</span>
+			<span id="key-edit-link">[<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]</span>
 		</td>
 	</tr>
 	<tr style="vertical-align:top">

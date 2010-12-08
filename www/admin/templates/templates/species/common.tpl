@@ -13,7 +13,7 @@
 	<th style="width:100px;">{t}language{/t}</th>
 	<td  style="width:100px;">{$session.project.languageList[$session.project.default_language_id].language}</td>
 	{if $languages|@count>1}
-	<td  style="width:200px;" id="language-tabs">(languages)</td>
+	<td  style="width:200px;" id="project-language-tabs">(languages)</td>
 	{/if}
 	<th style="width:65px;">{t}move up{/t} /</th>
 	<th style="width:40px;">{t}down{/t}</th>
@@ -110,12 +110,12 @@ $(document).ready(function(){
 taxonActiveView = 'commonnames';
 
 {section name=i loop=$languages}
-taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-taxonDrawRankLanguages();
-taxonGetCommonnameLabels(taxonDefaultLanguage);
-taxonGetCommonnameLabels(taxonActiveLanguage);
+allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+allDrawRankLanguages();
+taxonGetCommonnameLabels(allDefaultLanguage);
+taxonGetCommonnameLabels(allActiveLanguage);
 
 {literal}
 });

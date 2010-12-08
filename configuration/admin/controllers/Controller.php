@@ -38,6 +38,7 @@ class Controller extends BaseClass
     private $usedModelsBase = array(
         'helptext', 
         'project', 
+        'language_project', 
         'module_project',
 		'language',
 		'translate_me',
@@ -99,6 +100,8 @@ class Controller extends BaseClass
         $this->doLanguageChange();
         
         $this->checkModuleActivationStatus();
+
+        $this->setProjectLanguages();
 
     }
 
@@ -1182,12 +1185,11 @@ class Controller extends BaseClass
         
         $_SESSION['project']['languages'] = $lp;
 
-        $_SESSION['project']['default_language_id'] = $defaultLanguage;
+        if (isset($defaultLanguage)) $_SESSION['project']['default_language_id'] = $defaultLanguage;
 
-        $_SESSION['project']['languageList'] = $list;
-
+        if (isset($list)) $_SESSION['project']['languageList'] = $list;
+		
     }
-
 
 	private function getCurrentUiLanguage()
 	{

@@ -1,6 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 
+
+{include file="../shared/admin-messages.tpl"}
+
 <div id="page-main">
+{if $errors|@count ==0}
 {t}Editing taxa:{/t}
 <ul class="admin-list">
 	<li><a href="list.php">{t}Taxon list{/t}</a></li>
@@ -16,6 +20,7 @@
 	<li><a href="sections.php">{t}Define sections{/t}</a></li>
 	<li><a href="collaborators.php">{t}Assign taxa to collaborators{/t}</a></li>
 </ul>
+{/if}
 </div>
 
 {include file="../shared/admin-footer.tpl"}

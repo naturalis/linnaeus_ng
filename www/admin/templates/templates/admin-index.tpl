@@ -50,6 +50,14 @@ Management tasks:
 </ul>
 
 {/if}
+{if $currentRole.role_id==1}
+System administration tasks:
+<ul>
+	<li><a href="">Set rights</a></li>
+	<li><a href="">Create a project</a></li>
+</ul>
+
+{/if}
 </div>
 
 {include file="shared/admin-footer.tpl"}

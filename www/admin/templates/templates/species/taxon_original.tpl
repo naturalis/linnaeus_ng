@@ -40,9 +40,9 @@
 $(document).ready(function(){
 {/literal}
 {section name=i loop=$languages}
-	taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-	taxonActiveLanguage = {$activeLanguage};
+	allActiveLanguage = {$activeLanguage};
 	taxonDrawTaxonLanguages();
 
 {section name=i loop=$pages}

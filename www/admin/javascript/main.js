@@ -180,6 +180,7 @@ function _(text) {
 
 var allAjaxHandle = false;
 var allAjaxAborted = false;
+var allAjaxAsynchMode = true;
 
 function allGetTimestamp() {
 
@@ -310,3 +311,104 @@ function allScrollTo(pos) {
 	$('html, body').animate({scrollTop: pos}, 0);
 
 }
+
+var allLanguages = Array();
+var allDefaultLanguage = false;
+var allActiveLanguage = false;
+
+function allAddLanguage(lan) {
+	//[id,name,default?]
+	allLanguages[allLanguages.length] = lan;
+	
+	if (lan[2]==1) allDefaultLanguage = lan[0];
+
+}
+
+
+function allDrawRankLanguages() {
+
+	var b='';
+
+	for(var i=0;i<allLanguages.length;i++) {
+		if (allLanguages[i][2]!=1) {
+			b = b + 
+				'<span class="project-language'+
+					(allLanguages[i][0]==allActiveLanguage ? '-active' : '' )+
+					'" onclick="allSwitchRankLanguage('+ allLanguages[i][0] +')">' + 
+				allLanguages[i][1] + 
+				'</span>&nbsp;';
+		} else {
+			allDefaultLanguage = allLanguages[i][0];
+		}
+	}
+
+	$('#project-language-tabs').html(b);
+
+}
+
+function allSwitchRankLanguage(language) {
+
+	allActiveLanguage = language;
+	allDrawRankLanguages();
+
+	switch (taxonActiveView) {
+		case 'ranklabels':
+			taxonGetRankLabels(allActiveLanguage);
+			break;
+		case 'page':
+			taxonGetPageLabels(allActiveLanguage);
+			break;
+		case 'sections':
+			taxonGetSectionLabels(allActiveLanguage);
+			break;			
+		case 'commonnames':
+			taxonGetCommonnameLabels(allActiveLanguage);
+			break;
+		case 'keystepedit':
+			keyGetKeystepContent(allActiveLanguage);
+			break;			
+		case 'choiceedit':
+			keyGetChoiceContent(allActiveLanguage);
+			break;			
+	}
+
+}
+
+function allGeneralGetLabels(language,action,postFunction,id) {
+
+	/*
+		please take note that it depends on the url of the file
+		calling this function exactly *which* version of 
+		ajax_interface.php is called. for instance, called from 
+		  /admin/views/key/step_show.php
+		it will be
+		  /admin/views/key/ajax_interface.php
+		while called from 
+		  /admin/views/species/ranklabels.php
+		it will be
+		  /admin/views/species/ajax_interface.php
+		which is an entirely different file
+	*/
+
+	allShowLoadingDiv();
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'language' : language ,
+			'id' : (id ? id : false) , 
+			'time' : allGetTimestamp() ,
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			//alert(data);
+			obj = $.parseJSON(data);
+			eval(postFunction+'(obj,language)');
+			allHideLoadingDiv();
+		}
+	})
+	
+}
+

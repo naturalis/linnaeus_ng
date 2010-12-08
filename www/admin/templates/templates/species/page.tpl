@@ -17,7 +17,7 @@
 {/if}
 {/section}
 {if $languages|@count > 1}
-<td colspan="2" id="language-tabs">(languages)</td>
+<td colspan="2" id="project-language-tabs">(languages)</td>
 {/if}
 </tr>
 {section name=i loop=$pages}
@@ -72,12 +72,12 @@ taxonActiveView = 'page';
 taxonAddRankId({$pages[i].id});
 {/section}
 {section name=i loop=$languages}
-taxonAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
-taxonActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-taxonDrawRankLanguages();
-taxonGetPageLabels(taxonDefaultLanguage);
-taxonGetPageLabels(taxonActiveLanguage);
+allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+allDrawRankLanguages();
+taxonGetPageLabels(allDefaultLanguage);
+taxonGetPageLabels(allActiveLanguage);
 
 {literal}
 });

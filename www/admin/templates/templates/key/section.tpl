@@ -1,6 +1,5 @@
 {include file="../shared/admin-header.tpl"}
 
-
 <div id="page-main">
 <p>
 {t}"Key subsections" are parts of the dichotomous key that are not connected to the entire key. Put differently, they are steps that are not the starting step of your key, nor the target of any choice in another step. By creating subsections, different collaborators can work on specific parts of the key, which are later "hooked up" to the main key.{/t}
