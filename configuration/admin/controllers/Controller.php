@@ -1190,6 +1190,23 @@ class Controller extends BaseClass
         if (isset($list)) $_SESSION['project']['languageList'] = $list;
 		
     }
+	
+	public function rHasVal($var,$val=null)
+	{
+	
+		if (isset($val))
+			return isset($this->requestData[$var]) && !empty($this->requestData[$var]) && $this->requestData[$var] == $val;
+		else
+			return isset($this->requestData[$var]) && !empty($this->requestData[$var]);
+	
+	}
+
+	public function rHasId()
+	{
+	
+		return $this->rHasVal('id');
+	
+	}
 
 	private function getCurrentUiLanguage()
 	{

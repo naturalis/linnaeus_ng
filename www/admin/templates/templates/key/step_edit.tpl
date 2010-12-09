@@ -85,16 +85,22 @@
 	<tr style="vertical-align:top">
 		<td colspan="2">
 			<input type="submit" value="{t}save{/t}" />
-			<input type="button" onclick="window.open('step_show.php','_self')" value="{t}back{/t}" />
+			<input type="button" onclick="$('#backForm').submit();"  value="{t}back{/t}" />
 		</td>
 	</tr>
 </table>
 </form>
 
-<form method="post" action="step_show.php" id="nextForm">
+
+<form method="post" action="step_show.php" id="backForm">
+	<input type="hidden" name="id" value="{$step.id}" />
+</form>
+
+
+<!-- form method="post" action="step_show.php" id="nextForm">
 	<input type="hidden" name="id" id="next" value="" />
 	<input type="hidden" name="choice" id="choice" value="" />
-</form>
+</form -->
 {/if}
 </div>
 
