@@ -61,63 +61,18 @@ class KeysController extends Controller
 
         $this->checkAuthorisation();
 
-		if (isset($this->requestData['id']) && isset($this->requestData['action']) && $this->requestData['action'] == 'delete') {
+		if ($this->rHasId()) {
+		// request for specific step
 
-			$this->deleteKeyStep($this->requestData['id']);
-			
-			$_SESSION['system']['step'] = $kp[count($kp)-2]['id'];
-
-			$kp = $this->getKeyPath();
-					
-			$this->redirect('step_show.php');
-		
-		} else if (isset($this->requestData['id']) || isset($_SESSION['system']['step'])) {
-		// request for specific key
-
-			$k = $this->models->Keystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => isset($this->requestData['id']) ? $this->requestData['id'] : $_SESSION['system']['step']
-					)
-				)
-			);
-
-			$step = $k[0];
-
-			$kc = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$step['id']);
-
-			$step['title'] = $kc['title'];
-
-			$step['content'] = $kc['content'];
-
-			unset($_SESSION['system']['step']);
+			$step = $this->getKeystep($this->requestData['id']);
 
 		} else {
-		// looking for the start key 
+		// looking for the start step 
 
-			$k = $this->models->Keystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'is_start' => 1
-					)
-				)
-			);
+			$step = $this->getStartKeystep();
 			
-			if ($k) {
-			// found it
-
-				$step = $k[0];
-
-				$data = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$step['id']);
-			
-				$step['title'] = $data['title'];
-
-				$step['content'] = $data['content'];
-
-			} else {
-			// if it doesn't exist, create it and go edit
+			if (!$step) {
+			// didn't find it, create it
 
 				$this->redirect('step_edit.php?id='.$this->createNewKeystep(array('is_start'=>1)));
 
@@ -125,109 +80,92 @@ class KeysController extends Controller
 
 		}
 		
-		$_SESSION['system']['step'] = $step['id'];
+		if ($step) {
 
-		if (isset($this->requestData['move']) && isset($this->requestData['direction']) && !$this->isFormResubmit()) {
-
-			$this->moveChoice($this->requestData['move'],$this->requestData['direction']);
-
-		}
-
-		$choices = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'keystep_id' => $step['id']
-				),
-				'order' => 'show_order'
-			)
-		);
-
-		foreach((array)$choices as $key => $val) {
-
-			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {
-			
-				if ($val['res_keystep_id']=='-1') {
-
-					$choices[$key]['target'] = _('(new step)');
-
-				} else {
-			
-					$k = $this->models->Keystep->_get(array('id' => $val['res_keystep_id']));
-					
-					$choices[$key]['target'] = $k['title'];
-
-					$choices[$key]['target_number'] = $k['number'];
-
-				}
-			
-			} elseif (!empty($val['res_taxon_id'])) {
-
-				$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
-
-				$choices[$key]['target'] = $t['taxon'];
-
-			} else {
-
-				$choices[$key]['target'] = _('undefined');
-
+			if ($this->rHasVal('move') && $this->rHasVal('direction') && !$this->isFormResubmit()) {
+			// move choices up and down
+	
+				$this->moveKeystepChoice($this->requestData['move'],$this->requestData['direction']);
+	
 			}
+	
+			// get step's choices
+			$choices = $this->getKeystepChoices($step['id']);
+			
+			$this->updateKeyPath(
+				$step['id'],
+				$step['number'],
+				$step['title'],
+				$step['is_start'],
+				isset($this->requestData['choice']) ? $this->requestData['choice'] : null
+			);
+	
+			$this->smarty->assign('step',$step);
+	
+			$this->smarty->assign('choices',$choices);
+	
+			$this->smarty->assign('maxChoicesPerKey',$this->controllerSettings['maxChoicesPerKey']);
+
+		} else {
+		
+			$this->addError(_('Non-existant keystep ID. Please go back and change the target for the choice.'));
 
 		}
-		
-		$this->updateKeyPath(
-			$step['id'],
-			$step['number'],
-			$step['title'],
-			isset($this->requestData['choice']) ? $this->requestData['choice'] : null
-		);
 
 		$this->setPageName(sprintf(_('Show key step "%s"'),$step['title']));
 
 		$this->smarty->assign('keyPath',$this->getKeyPath());
-
-		$this->smarty->assign('step',$step);
-
-		$this->smarty->assign('choices',$choices);
-
-		$this->smarty->assign('maxChoicesPerKey',$this->controllerSettings['maxChoicesPerKey']);
-
+	
 		$this->printPage();
 
 	}
-
 
     public function stepEditAction()
     {
 
         $this->checkAuthorisation();
 
-		if (!isset($this->requestData['id']) || empty($this->requestData['id'])) {
+		if (!$this->rHasId()) {
+		// create a new step when no id is specified
+		
+			$id = $this->createNewKeystep();
 
-			$this->addError(_('No step ID specified.'));
+			if ($this->rHasVal('ref_choice')) {
+			// url was called from the 'new step' option of a choice: set the new referring step id
+
+				$this->models->ChoiceKeystep->save(
+					array(
+						'id' => $this->requestData['ref_choice'],
+						'res_keystep_id' => $id
+					)
+				);
+
+				$this->updateKeyPath(null,null,null,null,$_SESSION['system']['refChoice']);
+	
+			}
+
+			// redirect to self with id
+			$this->redirect('step_edit.php?id='.$id);
 
 		} else {
 
+			if ($this->rHasVal('action','delete')) {
+			
+				$this->deleteKeyStep($this->requestData['id']);
+
+				$entry = $this->getPreviousKeypathEntry($this->requestData['id']);
+
+				$this->redirect($entry ? 'step_show.php?id='.$entry['id'] : 'index.php');
+
+			}
+
 			// get step data
-			$k = $this->models->Keystep->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $this->requestData['id']
-							)
-						)
-					);
-
-			$step = $k[0];
+			$step = $this->getKeystep($this->requestData['id']);
 		
-			$data = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$step['id']);
-		
-			$step['title'] = $data['title'];
-
 	        $this->setPageName(sprintf(_('Edit step "%s"'),($step['title'] ? $step['title'] : '...')));
 
-			// saving the number (rest is done through ajax)
-			if (isset($this->requestData['action']) && $this->requestData['action']=='save' && !$this->isFormResubmit()) {
+			// saving the number (all the rest is done through ajax)
+			if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
 			
 				// checking the number
 				if (empty($this->requestData['number'])) {
@@ -308,106 +246,29 @@ class KeysController extends Controller
 
         $this->printPage();
 
-
-/*
-		if (isset($this->requestData['ref_choice'])) {
-
-			$_SESSION['system']['refChoice'] = $this->requestData['ref_choice'];
-			
-		}
-
-		if (isset($_SESSION['system']['refChoice'])) {
-
-			$this->updateKeyPath(null,null,null,$_SESSION['system']['refChoice']);
-
-			$choice = $this->models->ChoiceKeystep->_get(array('id' => $_SESSION['system']['refChoice']));
-
-			$this->smarty->assign('choice',$choice);
-
-		}
-
-
-				if (!$k) {
-
-					$this->addError(_('Could not save step data.'));
-	
-				} else {
-
-					$step['id'] = !empty($this->requestData['id']) ? $this->requestData['id'] : $this->models->Keystep->getNewId();
-				
-					$k = $this->models->Keystep->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'is_start' => 1
-							),
-							'columns' => 'count(*) as total'
-						)
-					);
-
-					if ($k[0]['total']==0 && !isset($_SESSION['system']['keySubsection'])) {
-
-						$k = $this->models->Keystep->save(array('id' => $step['id'],'is_start' => 1));
-
-					} else {
-
-						if (isset($_SESSION['system']['refChoice'])) {
-
-							if ($choice['keystep_id'] != $step['id']) {
-
-								$this->models->ChoiceKeystep->save(
-									array(
-										'id' => $_SESSION['system']['refChoice'],
-										'res_keystep_id' => $step['id']
-									)
-								);
-
-							}
-
-							unset($_SESSION['system']['refChoice']);
-
-						}
-
-					}
-
-					unset($_SESSION['system']['keySubsection']);
-
-					$this->addMessage(_('Step data saved.'));
-					
-					$_SESSION['system']['step'] = $step['id'];
-	
-					//$this->redirect('step_show.php');
-					
-				}
-
-			}
-
-		}
-
-
-*/
-
 	}
+
 
     public function choiceEditAction()
     {
 
         $this->checkAuthorisation();
 
-		if ((!isset($this->requestData['id']) || empty($this->requestData['id'])) && !$this->isFormResubmit()) {
+		if (!$this->rHasId()) {
 		// create a new choice when no id is specified
 		
-			if (!isset($_SESSION['system']['step']) || empty($_SESSION['system']['step'])) {
+			if (!$this->rHasVal('step')) {
 			// need a step to which the choice belongs
 
 				$this->redirect('step_show.php');
 
 			}
 
-			$id = $this->createNewChoice($_SESSION['system']['step']);
+			$id = $this->createNewKeystepChoice($this->requestData['step']);
 
-			$this->renumberChoices($_SESSION['system']['step']);
+			$this->renumberKeystepChoices($this->requestData['step']);
 
+			// redirecting to protect against resubmits
 			$this->redirect('choice_edit.php?id='.$id);
 
 		} else {
@@ -415,56 +276,56 @@ class KeysController extends Controller
 			$id = $this->requestData['id'];
 
 		}
-	
-		$ck = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' => array(
-					'id' => $id,
-					'project_id' => $this->getCurrentProjectId()
-				)
+
+		$choice = $this->getKeystepChoice($id);
+
+		$step = $this->getKeystep($choice['keystep_id']);
+
+		$this->setPageName(
+			sprintf(
+				_('Edit choice "%s" for step %s: "%s"'),
+				$choice['show_order'],
+				$step['number'],
+				$step['title']
 			)
 		);
 
-		$data = $ck[0];
-
-
-		if (isset($this->requestData['action']) && $this->requestData['action']=='delete') {
+		if ($this->rHasVal('action','delete')) {
 		// delete the entire choice, incl image (if any)
 		
-			if (!empty($data['choice_img']))
-				@unlink($_SESSION['project']['paths']['project_media'].$data['choice_img']);
+			if (!empty($choice['choice_img']))
+				@unlink($_SESSION['project']['paths']['project_media'].$choice['choice_img']);
 
 			$this->models->ChoiceKeystep->delete(
 				array(
-					'id' => $data['id'],						
+					'id' => $choice['id'],						
 					'project_id' => $this->getCurrentProjectId(),
 				)
 			);
 
 			unset($_SESSION['system']['remainingTaxa']);
 
-			$this->redirect('step_show.php');
+			$this->redirect('step_show.php?id='.$choice['keystep_id']);
 		
-		} elseif (isset($this->requestData['action']) && $this->requestData['action']=='deleteImage') {
+		} elseif ($this->rHasVal('action','deleteImage')) {
 		// delete just the image
 
-			if (!empty($data['choice_img']))
-				@unlink($_SESSION['project']['paths']['project_media'].$data['choice_img']);
+			if (!empty($choice['choice_img']))
+				@unlink($_SESSION['project']['paths']['project_media'].$choice['choice_img']);
 
 			$this->models->ChoiceKeystep->save(
 				array(
-					'id' => $data['id'],						
+					'id' => $choice['id'],						
 					'choice_img' => 'null'
 				)
 			);
 			
-			unset($data['choice_img']);
+			unset($choice['choice_img']);
 
-		} // elseif (isset($this->requestData['action']) && $this->requestData['action']=='deleteImage')
-			
+		} 
 
-		if ((isset($this->requestData['res_keystep_id']) || isset($this->requestData['res_taxon_id'])) && !$this->isFormResubmit()) {		
-			// save new target
+		if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit()) {		
+		// save new target
 
 			$ck = $this->models->ChoiceKeystep->update(
 				array(
@@ -491,9 +352,9 @@ class KeysController extends Controller
 
 				if ($this->requestData['res_taxon_id']!=='0') unset($_SESSION['system']['remainingTaxa']);
 				
-				$data['res_keystep_id'] = $this->requestData['res_keystep_id'];
+				$choice['res_keystep_id'] = $this->requestData['res_keystep_id'];
 
-				$data['res_taxon_id'] = $this->requestData['res_taxon_id'];
+				$choice['res_taxon_id'] = $this->requestData['res_taxon_id'];
 	
 				$this->addMessage(_('Target saved.'));
 
@@ -501,7 +362,7 @@ class KeysController extends Controller
 
 		}
 
-		if (isset($this->requestDataFiles) && !$this->isFormResubmit() && $data['id']) {
+		if ($choice['id'] && isset($this->requestDataFiles) && !$this->isFormResubmit()) {
 		// save image
 
 			// save choice image
@@ -517,7 +378,7 @@ class KeysController extends Controller
 
 				$ck = $this->models->ChoiceKeystep->save(
 					array(
-						'id' => $data['id'],
+						'id' => $choice['id'],
 						'project_id' => $this->getCurrentProjectId(),
 						'choice_img' => $filesToSave[0]['name']
 					)
@@ -527,7 +388,7 @@ class KeysController extends Controller
 				
 					$this->addMessage(_('Image saved.'));
 					
-					$data['choice_img'] = $filesToSave[0]['name'];
+					$choice['choice_img'] = $filesToSave[0]['name'];
 
 				} else {
 
@@ -541,19 +402,18 @@ class KeysController extends Controller
 
 		}
 
-		$k = $this->getKeySteps(array('idToExclude'=>$_SESSION['system']['step']));
-
 		$this->getTaxonTree(null);
 		
 		$this->getRemainingTaxa();
+
+
+		if (isset($choice)) $this->smarty->assign('data',$choice);
 
    		$this->smarty->assign('languages',$_SESSION['project']['languages']);
 
    		$this->smarty->assign('defaultLanguage',$_SESSION['project']['languageList'][$_SESSION['project']['default_language_id']]);
 
-		if (isset($data)) $this->smarty->assign('data',$data);
-
-		$this->smarty->assign('steps',$k);
+		$this->smarty->assign('steps',$this->getKeySteps(array('idToExclude'=>$choice['keystep_id'])));
 
 		$this->smarty->assign('taxa',$this->treeList);
 
@@ -563,78 +423,6 @@ class KeysController extends Controller
 
         $this->printPage();	
 		
-		
-		
-		
-/*
-		if (!isset($_SESSION['system']['step']) && !empty($this->requestData['id'])) {
-
-			$ck = $this->models->ChoiceKeystep->_get(
-				array(
-					'id' => array(
-						'id' => $this->requestData['id'],
-						'project_id' => $this->getCurrentProjectId()
-					)
-				)
-			);
-			
-			if ($ck[0]['keystep_id']) {
-
-				$_SESSION['system']['step'] = $ck[0]['keystep_id'];
-
-			}
-
-		}
-
-			} else {
-			
-				if ($this->isFormResubmit()) {
-
-					if (isset($_SESSION['system']['choice'])) {
-
-						$id = $_SESSION['system']['choice'];
-
-					}
-
-				}
-
-			}
-
-			$k = $this->getKeySteps(array('id' => $_SESSION['system']['step']));
-
-			if (!empty($id)) {
-
-				$ck = $this->models->ChoiceKeystep->_get(
-					array(
-						'id' => array(
-							'id' => $id,
-							'project_id' => $this->getCurrentProjectId()
-						)
-					)
-				);
-
-				$data = $ck[0];
-				
-				$_SESSION['system']['choice'] = $id;
-
-		        $this->setPageName(sprintf(_('Edit choice "%s" for step %s: "%s"'),$data['title'],$k[0]['number'],$k[0]['title']));
-
-			} else {
-
-		        $this->setPageName(sprintf(_('Add choice for step %s: "%s"'),$k[0]['number'],$k[0]['title']));
-
-			}
-
-
-	
-		} else {
-
-
-		} // if (isset($_SESSION['system']['step']))
-
-
-
-*/
     }
 
 
@@ -798,7 +586,51 @@ class KeysController extends Controller
 	
 	}
 
-	private function updateKeyPath($id,$number,$title,$choice) 
+
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!isset($this->requestData['action'])) return;
+        
+        if ($this->requestData['action'] == 'get_key_step_content') {
+
+            $this->getKeyStepContent();
+
+        } elseif ($this->requestData['action'] == 'save_step_title') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+
+            $this->saveKeyStepContent($this->requestData,'title');
+
+        } elseif ($this->requestData['action'] == 'save_step_text') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+	
+            $this->saveKeyStepContent($this->requestData,'text');
+
+        } elseif ($this->requestData['action'] == 'get_key_choice_content') {
+
+            $this->getKeystepChoiceContent();
+
+        } elseif ($this->requestData['action'] == 'save_choice_title') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+
+            $this->saveKeystepChoiceContent($this->requestData,'title');
+
+        } elseif ($this->requestData['action'] == 'save_choice_text') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+	
+            $this->saveKeystepChoiceContent($this->requestData,'text');
+
+        }
+		
+        $this->printPage();
+    
+    }
+
+	private function updateKeyPath($id,$number,$title,$is_start,$choice) 
 	{
 
 		if (isset($_SESSION['system']['keyPath'])) {
@@ -814,17 +646,23 @@ class KeysController extends Controller
 		}
 	
 
-		$d[] = array('id' => $id,'number' => $number,'title' => $title,'choice' => null,'choiceTitle' => null);
-
+		$d[] = array(
+			'id' => $id,
+			'number' => $number,
+			'title' => $title,
+			'is_start' => $is_start,
+			'choice' => null,
+			'choiceTitle' => null
+		);
 
 		if (!empty($choice) && (count((array)$d)-2)>=0) {
 
-			$ck = $this->models->ChoiceKeystep->_get(array('id' => $choice));
-			
+			$choice = $this->getKeystepChoice($choice);
+
 			$d[count((array)$d)-2]['choice'] = $choice;
 
-			$d[count((array)$d)-2]['choiceTitle'] = $ck['title'];
-			
+			$d[count((array)$d)-2]['choiceTitle'] = isset($choice['title']) ? $choice['title'] : '...';
+
 		}
 
 		$_SESSION['system']['keyPath'] = $d;
@@ -837,73 +675,36 @@ class KeysController extends Controller
 		return isset($_SESSION['system']['keyPath']) ? $_SESSION['system']['keyPath'] : false;
 
 	}
-	
-	private function moveChoice($id,$direction)
+
+	private function getPreviousKeypathEntry($id=false,$stepsBack=1)
 	{
 
-		$ck = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' =>  array(
-					'id' => $id,
-					'project_id' => $this->getCurrentProjectId(),
-				)
-			)
-		);
-
-		$ck2 = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' =>  array(
-					'keystep_id' => $ck[0]['keystep_id'],
-					'project_id' => $this->getCurrentProjectId(),
-					'id !=' => $id,
-					'show_order' => $ck[0]['show_order']+($direction=='up' ? -1 : 1)					
-				)
-			)
-		);
-
-		$this->models->ChoiceKeystep->save(
-			array(
-				'id' => $id,
-				'show_order' => $ck2[0]['show_order']
-			)
-		);
-
-		$this->models->ChoiceKeystep->save(
-			array(
-				'id' => $ck2[0]['id'],
-				'show_order' => $ck[0]['show_order']
-			)
-		);
+		$kp = $this->getKeyPath();
 		
-	}
-
-
-	private function renumberChoices($step)
-	{
-
-		$ck = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' =>  array(
-					'project_id' => $this->getCurrentProjectId(),
-					'keystep_id' => $step
-				),
-				'order' => 'show_order'
-			)
-		);
+		$c = count((array)$kp);
 		
-		foreach((array)$ck as $key => $val) {
+		if ($id) {
 
-			$this->models->ChoiceKeystep->save(
-				array(
-					'id' => $val['id'],
-					'show_order' => $key+1
-				)
-			);
+			for($i=($c-1);$i>=0;$i--) {
+
+				if (isset($kp[$i+$stepsBack]) && $kp[$i+$stepsBack]['id']==$id) {
+
+					return $kp[$i];
+
+				}
+
+			}
+			
+			return false;
+
+		} else {
+
+			return isset($kp[$c-($stepsBack+1)]) ? $kp[$c-($stepsBack+1)] : false;
 
 		}
 
 	}
-	
+			
 	private function getNextLowestStepNumber()
 	{
 
@@ -937,28 +738,6 @@ class KeysController extends Controller
 		if (!$next) $next = $prev + 1;
 		
 		return $next;
-
-	}
-
-	private function getKeySteps($params)
-	{
-
-		$id = isset($params['id']) ? $params['id'] : false;
-		$idToExclude = isset($params['idToExclude']) ? $params['idToExclude'] : false;
-		$isStart = isset($params['isStart']) ? $params['isStart'] : false;
-		
-		$p['columns'] = isset($params['columns']) ? $params['columns'] : '*';
-		$p['order'] = isset($params['order']) ? $params['order'] : 'number';
-
-		$p['id']['project_id'] = $this->getCurrentProjectId();
-
-		if ($id) $p['id']['id'] = $id;
-		if ($idToExclude) $p['id']['id !='] = $idToExclude;
-		if ($isStart) $p['id']['isStart'] = $isStart;
-		
-		$k = $this->models->Keystep->_get($p);
-		
-		return $k;
 
 	}
 
@@ -1087,48 +866,109 @@ class KeysController extends Controller
 
 	}
 
-    public function ajaxInterfaceAction ()
-    {
 
-        if (!isset($this->requestData['action'])) return;
-        
-        if ($this->requestData['action'] == 'get_key_step_content') {
+	private function getKeySteps($params)
+	{
 
-            $this->getKeyStepContent();
+		$id = isset($params['id']) ? $params['id'] : false;
 
-        } elseif ($this->requestData['action'] == 'save_step_title') {
+		$idToExclude = isset($params['idToExclude']) ? $params['idToExclude'] : false;
 
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-
-            $this->saveKeyStepContent($this->requestData,'title');
-
-        } elseif ($this->requestData['action'] == 'save_step_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeyStepContent($this->requestData,'text');
-
-        } elseif ($this->requestData['action'] == 'get_key_choice_content') {
-
-            $this->getKeyChoiceContent();
-
-        } elseif ($this->requestData['action'] == 'save_choice_title') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-
-            $this->saveKeyChoiceContent($this->requestData,'title');
-
-        } elseif ($this->requestData['action'] == 'save_choice_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeyChoiceContent($this->requestData,'text');
-
-        }
+		$isStart = isset($params['isStart']) ? $params['isStart'] : false;
 		
-        $this->printPage();
-    
-    }
+
+		$p['columns'] = isset($params['columns']) ? $params['columns'] : '*';
+
+		$p['order'] = isset($params['order']) ? $params['order'] : 'number';
+
+		$p['id']['project_id'] = $this->getCurrentProjectId();
+
+
+		if ($id) $p['id']['id'] = $id;
+
+		if ($idToExclude) $p['id']['id !='] = $idToExclude;
+
+		if ($isStart) $p['id']['isStart'] = $isStart;
+		
+		$k = $this->models->Keystep->_get($p);
+		
+		foreach((array)$k as $key => $val) {
+
+			$kc = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$val['id']);
+		
+			$k[$key]['title'] = $kc['title'];
+
+			$k[$key]['content'] = $kc['content'];
+
+		}
+		
+		return $k;
+
+	}
+
+	private function getKeystep($id=null)
+	{
+
+ 		$id = isset($id) ? $id : $this->requestData['id'];
+
+        if (empty($id)) {
+            
+            return;
+        
+        } else {
+
+			$k = $this->models->Keystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $id, 
+						)
+				)
+			);
+
+			if (!$k) return false;
+
+			$step = $k[0];
+
+			$kc = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$step['id']);
+
+			$step['title'] = $kc['title'];
+
+			$step['content'] = $kc['content'];
+
+            $this->smarty->assign('returnText', json_encode($step));
+
+			return $step;
+        
+        }
+
+	}
+
+	private function getStartKeystep()
+	{
+
+		$k = $this->models->Keystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'is_start' => 1
+				)
+			)
+		);
+		
+		if ($k) {
+
+			$kc = $this->getKeyStepContent($_SESSION['project']['default_language_id'],$k[0]['id']);
+		
+			$k[0]['title'] = $kc['title'];
+
+			$k[0]['content'] = $kc['content'];
+
+		}
+				
+		return $k[0];
+	
+	}
 
 	private function getKeyStepContent($language=null,$id=null)
 	{
@@ -1163,7 +1003,7 @@ class KeysController extends Controller
 	}
 
 
-    private function saveKeyStepContent ($data,$type='text')
+	private function saveKeyStepContent ($data,$type='text')
     {
         
         if (empty($data['language'])) {
@@ -1240,13 +1080,13 @@ class KeysController extends Controller
 		
 		foreach((array)$ck as $key => $val) {
 	
-			$this->models->ChoiceContentKeystep->delete(
+			$a =$this->models->ChoiceContentKeystep->delete(
 				array(
 					'project_id' => $this->getCurrentProjectId(), 
-					'choice_id' => $va['id'], 
+					'choice_id' => $val['id'], 
 				)
 			);
-	
+
 		}
 
 		$this->models->ChoiceKeystep->delete(
@@ -1260,11 +1100,11 @@ class KeysController extends Controller
 
 		$this->models->ChoiceKeystep->update(
 			array(
-				'res_taxon_id' => 'null'
+				'res_keystep_id' => 'null'
 			),
 			array(
 				'project_id' => $this->getCurrentProjectId(),
-				'res_taxon_id' => $id
+				'res_keystep_id' => $id
 			)
 		);
 
@@ -1281,10 +1121,12 @@ class KeysController extends Controller
 				'id' => $id, 
 			)
 		);
-	
+
 	}
 
-	private function createNewChoice($stepId)
+
+
+	private function createNewKeystepChoice($stepId)
 	{
 
 		if (empty($stepId)) return;
@@ -1302,7 +1144,115 @@ class KeysController extends Controller
 	
 	}
 
-    private function saveKeyChoiceContent ($data,$type='text')
+
+	private function getKeystepChoices($step)
+	{
+
+		$choices =  $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $step
+				),
+				'order' => 'show_order'
+			)
+		);
+		
+		foreach((array)$choices as $key => $val) {
+		
+			$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$val['id']);
+			
+			if (isset($kcc['title'])) $choices[$key]['title'] = $kcc['title'];
+			
+			if (isset($kcc['choice_txt'])) $choices[$key]['choice_txt'] = $kcc['choice_txt'];
+
+			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {
+			
+				if ($val['res_keystep_id']=='-1') {
+
+					$choices[$key]['target'] = _('(new step)');
+
+				} else {
+
+					$k = $this->getKeystep($val['res_keystep_id']);
+
+					if (isset($k['title'])) $choices[$key]['target'] = $k['title'];
+
+					if (isset($k['number'])) $choices[$key]['target_number'] = $k['number'];
+
+				}
+			
+			} elseif (!empty($val['res_taxon_id'])) {
+
+				$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
+
+				if (isset($t['taxon'])) $choices[$key]['target'] = $t['taxon'];
+
+			} else {
+
+				$choices[$key]['target'] = _('undefined');
+
+			}
+	
+		}
+
+		return $choices;
+
+	}
+
+	private function getKeystepChoice($id)
+	{
+
+		$ck =  $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+		
+		$choice = $ck[0];
+		
+		$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$choice['id']);
+		
+		if (isset($kcc['title'])) $choice['title'] = $kcc['title'];
+		
+		if (isset($kcc['choice_txt'])) $choice['choice_txt'] = $kcc['choice_txt'];
+
+		if (!empty($choice['res_keystep_id']) && $choice['res_keystep_id']!=0) {
+		
+			if ($choice['res_keystep_id']=='-1') {
+
+				$choice['target'] = _('(new step)');
+
+			} else {
+
+				$k = $this->models->Keystep->_get(array('id' => $choice['res_keystep_id']));
+				
+				if (isset($k['title'])) $choice['target'] = $k['title'];
+
+				if (isset($k['number'])) $choice['target_number'] = $k['number'];
+
+			}
+		
+		} elseif (!empty($choice['res_taxon_id'])) {
+
+			$t = $this->models->Taxon->_get(array('id' => $choice['res_taxon_id']));
+
+			if (isset($t['taxon'])) $choice['target'] = $t['taxon'];
+
+		} else {
+
+			$choice['target'] = _('undefined');
+
+		}
+
+		return $choice;
+
+	}
+
+	private function saveKeystepChoiceContent ($data,$type='text')
     {
         
         if (empty($data['language'])) {
@@ -1348,7 +1298,7 @@ class KeysController extends Controller
     
     }
 
-	private function getKeyChoiceContent($language=null,$id=null)
+	private function getKeystepChoiceContent($language=null,$id=null)
 	{
 
 		$language = isset($language) ? $language : $this->requestData['language'];
@@ -1379,7 +1329,74 @@ class KeysController extends Controller
         }
 
 	}
+
+	private function moveKeystepChoice($id,$direction)
+	{
+
+		$ck = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' =>  array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+
+		$ck2 = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' =>  array(
+					'keystep_id' => $ck[0]['keystep_id'],
+					'project_id' => $this->getCurrentProjectId(),
+					'id !=' => $id,
+					'show_order' => $ck[0]['show_order']+($direction=='up' ? -1 : 1)					
+				)
+			)
+		);
+
+		$this->models->ChoiceKeystep->save(
+			array(
+				'id' => $id,
+				'show_order' => $ck2[0]['show_order']
+			)
+		);
+
+		$this->models->ChoiceKeystep->save(
+			array(
+				'id' => $ck2[0]['id'],
+				'show_order' => $ck[0]['show_order']
+			)
+		);
+		
+	}
+
+
+	private function renumberKeystepChoices($step)
+	{
+
+		$ck = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' =>  array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $step
+				),
+				'order' => 'show_order'
+			)
+		);
+		
+		foreach((array)$ck as $key => $val) {
+
+			$this->models->ChoiceKeystep->save(
+				array(
+					'id' => $val['id'],
+					'show_order' => $key+1
+				)
+			);
+
+		}
+
+	}
 	
+
 
 }
 

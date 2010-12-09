@@ -2,8 +2,6 @@
 
 {include file="_keypath.tpl"}
 
-
-
 <div id="page-main">
 <form method="post" action="" id="theForm" enctype="multipart/form-data">
 <input type="hidden" name="rnd" value="{$rnd}" />
@@ -133,7 +131,9 @@
 </table>
 </form>
 
-<form method="post" action="step_show.php" id="backForm"></form>
+<form method="post" action="step_show.php" id="backForm">
+<input type="hidden" name="id" value="{$data.keystep_id}" />
+</form>
 </div>
 
 <script type="text/javascript">

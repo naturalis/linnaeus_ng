@@ -4,9 +4,9 @@
 
 <div id="page-main">
 
-<form method="post" action="" id="delForm">
+<form method="post" action="step_edit.php" id="delForm">
 <input type="hidden" name="action" id="action" value="delete" />
-<input type="hidden" name="id" id="id" value="{$step.id}" />
+<input type="hidden" name="id" value="{$step.id}" />
 </form>
 <form method="post" action="step_edit.php" id="theForm">
 <input type="hidden" name="action" id="action" value="" />
@@ -29,6 +29,7 @@
 <br />
 <form method="post" action="choice_edit.php" id="choiceForm">
 <input type="hidden" name="id" id="id2" value="" />
+<input type="hidden" name="step" value="{$step.id}" />
 <span  id="key-step-choices">{t}Possible choices{/t}:</span>
 <table>
 	<tr>
