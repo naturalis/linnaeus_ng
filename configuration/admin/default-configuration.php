@@ -85,7 +85,7 @@ class configuration
 				),
 				'defaultUploadMaxSize' => 2000000 // 2mb
 			),
-			'maxChoicesPerKey' => 4
+			'freeModulesMax' => 5
       	);
 
     }

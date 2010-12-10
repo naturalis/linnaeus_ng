@@ -10,7 +10,8 @@ Select the standard modules you wish to use in your project:<br />
 <br />
 
 <div class="text-block">
-Besides these standard modules, you can add up to five extra content modules to your project:<br />
+
+Besides these standard modules, you can add up to {$freeModuleMax} extra content modules to your project:<br />
 <div id="free-module-table-div"></div>
 
 <table id="new-input" class="{if $freeModules|@count >= 5}module-new-input-hidden{/if}">

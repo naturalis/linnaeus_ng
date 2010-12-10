@@ -61,54 +61,6 @@ class UsersController extends Controller
 
 
     /**
-     * Retrieves all rights and roles of the current user
-     *
-     * Is called directly after log in. Results are stored in the user's session.
-     *
-     * @return     array    array of roles, rights and the number of projects the user is involved with
-     * @access     private
-     */
-    public function getCurrentUserRights ($id = false)
-    {
-        
-        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
-        
-        foreach ((array) $pru as $key => $val) {
-            
-            $p = $this->models->Project->_get(array('id'=>$val['project_id']));
-            
-            $pru[$key]['project_name'] = $p['sys_name'];
-            
-            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
-            
-            $pru[$key]['role_name'] = $r['role'];
-            
-            $pru[$key]['role_description'] = $r['description'];
-            
-            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
-            
-            foreach ((array) $rr as $rr_key => $rr_val) {
-                
-                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
-                
-                $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-            
-            }
-            
-            $d[$val['project_id']] = $val['project_id'];
-        
-        }
-        
-        return array(
-            'roles' => $pru, 
-            'rights' => $rs, 
-            'number_of_projects' => count((array) $d)
-        );
-    
-    }
-
-
-    /**
      * Login page and function
      *
      * See function code for detailed comments on the function's flow
@@ -135,8 +87,7 @@ class UsersController extends Controller
         $this->smarty->assign('excludeLogout', true);
        
         // check wheter the user has entered a username and/or password
-        if ((isset($this->requestData['username']) && $this->requestData['username'] != '') || (isset($this->requestData['password']) && $this->requestData['password'] !=
-         '')) {
+        if ($this->rHasVal('username') || $this->rHasVal('password')) {
             
             // get data of any active user based on entered username and password
             $users = $this->models->User->_get(
@@ -171,7 +122,6 @@ class UsersController extends Controller
     }
 
 
-
     /**
      * Logging out
      *
@@ -203,7 +153,7 @@ class UsersController extends Controller
 
         $this->setPageName(_('Select a project to work on'));
         
-        if (isset($this->requestData['project_id'])) {
+        if ($this->rHasVal('project_id')) {
 
             if ($this->isCurrentUserAuthorizedForProject($this->requestData['project_id'])) {
                 
@@ -242,8 +192,8 @@ class UsersController extends Controller
         
         $this->setPageName(_('Create new collaborator'));
 
+        if ($this->rHasVal('username')) {
         // data was submitted
-        if (isset($this->requestData['username'])) {
 		
 			$_SESSION['data']['new_user'] = $this->requestData;
 
@@ -430,8 +380,8 @@ class UsersController extends Controller
         }
         
         // user requested a sort of the table
-        if (isset($this->requestData['key'])) {
-            
+        if ($this->rHasVal('key')) {
+
             $sortBy = array(
                 'key' => $this->requestData['key'], 
                 'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
@@ -583,7 +533,7 @@ class UsersController extends Controller
         if ($this->isUserPartOfProject($this->requestData['id'], $this->getCurrentProjectId())) {
             
             // user requested delete
-            if (isset($this->requestData['delete']) && $this->requestData['delete'] == '1') {
+            if ($this->rHasVal('delete','1')) {
                 
 				$pru = $this->models->ProjectRoleUser->_get(
 					array(
@@ -607,11 +557,11 @@ class UsersController extends Controller
 				// redirect user to overview of remaining collaborators
 				$this->redirect('index.php');                
                 
-            } else if (isset($this->requestData['checked']) && $this->requestData['checked'] == '1') {
+            } elseif ($this->rHasVal('checked','1')) {
             // user requested data update
                 
                 // make sure an unassignable role (like system admin) wasn't injected
-                if (isset($this->requestData['role_id'])) $r = $this->models->Role->_get(array('id'=>$this->requestData['role_id']));
+                if ($this->rHasVal('role_id')) $r = $this->models->Role->_get(array('id'=>$this->requestData['role_id']));
                 
                 if (isset($r) && $r['assignable'] == 'n') {
                     
@@ -813,11 +763,11 @@ class UsersController extends Controller
     public function ajaxInterfaceAction ()
     {
 
-        if (!isset($this->requestData['action'])) return;
+        if (!$this->rHasVal('action')) return;
 		
 		$idsToIgnore = isset($this->requestData['id_to_ignore']) ? $this->requestData['id_to_ignore'] : null;
 
-        if ($this->requestData['action'] == 'check_username') {
+        if ($this->rHasVal('action','check_username')) {
 
 			if (in_array('f',$this->requestData['tests'])) {
 
@@ -831,7 +781,7 @@ class UsersController extends Controller
 			}
         
 		} else
-        if ($this->requestData['action'] == 'check_password') {
+        if ($this->rHasVal('action','check_password')) {
 
 			if (in_array('f',$this->requestData['tests'])) {
 
@@ -841,7 +791,7 @@ class UsersController extends Controller
 			}
         
 		} else
-        if ($this->requestData['action'] == 'check_passwords') {
+        if ($this->rHasVal('action','check_passwords')) {
 
 			if (in_array('f',$this->requestData['tests'])) {
 
@@ -855,7 +805,7 @@ class UsersController extends Controller
 			}
         
 		} else
-        if ($this->requestData['action'] == 'check_email_address') {
+        if ($this->rHasVal('action','check_email_address')) {
 
 			if (in_array('e',$this->requestData['tests'])) {
 
@@ -869,7 +819,7 @@ class UsersController extends Controller
 			}
         
 		} else
-        if ($this->requestData['action'] == 'check_first_name' || $this->requestData['action'] == 'check_last_name') {
+        if ($this->rHasVal('action','check_first_name') || $this->rHasVal('action','check_last_name')) {
 
 			if (in_array('f',$this->requestData['tests'])) {
 
@@ -878,12 +828,12 @@ class UsersController extends Controller
 			}
         
 		} else
-        if ($this->requestData['action'] == 'connect_existing') {
+        if ($this->rHasVal('action','connect_existing')) {
             
             $this->ajaxActionConnectExistingUser();
         
 		} else
-        if ($this->requestData['action'] == 'create_from_session') {
+        if ($this->rHasVal('action','create_from_session')) {
             
             $this->ajaxActionCreateUserFromSession();
         
@@ -944,8 +894,55 @@ class UsersController extends Controller
         $this->printPage();
     
     }
-	
-	
+
+
+    /**
+     * Retrieves all rights and roles of the current user
+     *
+     * Is called directly after log in. Results are stored in the user's session.
+     *
+     * @return     array    array of roles, rights and the number of projects the user is involved with
+     * @access     private
+     */
+    private function getCurrentUserRights ($id = false)
+    {
+        
+        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
+        
+        foreach ((array) $pru as $key => $val) {
+            
+            $p = $this->models->Project->_get(array('id'=>$val['project_id']));
+            
+            $pru[$key]['project_name'] = $p['sys_name'];
+            
+            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
+            
+            $pru[$key]['role_name'] = $r['role'];
+            
+            $pru[$key]['role_description'] = $r['description'];
+            
+            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
+            
+            foreach ((array) $rr as $rr_key => $rr_val) {
+                
+                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
+                
+                $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
+            
+            }
+            
+            $d[$val['project_id']] = $val['project_id'];
+        
+        }
+        
+        return array(
+            'roles' => $pru, 
+            'rights' => $rs, 
+            'number_of_projects' => count((array) $d)
+        );
+    
+    }
+
 	private function ajaxActionConnectExistingUser()
 	{
 
