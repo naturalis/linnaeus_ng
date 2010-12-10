@@ -4,7 +4,7 @@
 {assign var=first value=true}
 {section name=i loop=$keyPath}
 	{if $smarty.section.i.index==$keyPath|@count-1}
-		{if $keyPath[i].number}{$keyPath[i].number}. {/if}{if $keyPath[i].title}{$keyPath[i].title}{else}...{/if}
+		<span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{if $keyPath[i].number}{$keyPath[i].number}. {/if}{if $keyPath[i].title}{$keyPath[i].title}{else}...{/if}</span>
 	{else}	
 		{if $keyPath|@count>3 && 
 			$smarty.section.i.index!=0 &&

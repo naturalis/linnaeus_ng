@@ -255,7 +255,30 @@ function keySaveChoiceText(title,type) {
 
 }
 
+function keySetMapInfoLabel(id) {
 
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
+			'action' : 'get_key_map_link' ,
+			'id' : id ,
+			'time' : allGetTimestamp()	
+		}),
+		type: "POST",
+		async: allAjaxAsynchMode ,
+		success: function (data) {
+			obj = $.parseJSON(data);			
+			if(obj.title) {
+				var d = sprintf(_('Click to see step "%s"'),'<a href="step_show.php?id='+obj.id+'">'+obj.title+'</a>');
+			} else {
+				var d = sprintf(_('Click to edit taxon "%s"'),'<a href="../species/taxon.php?id='+obj.id+'">'+obj.taxon+'</a>');
+			}
+			$('#info').html(d);
+		}
+
+	});
+
+}
 
 
 
