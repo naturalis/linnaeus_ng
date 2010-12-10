@@ -6,7 +6,6 @@
 
 	set upload maximum for media uploads per projects
 
-    hard coded number of free modules
     deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
 
 */
@@ -40,6 +39,11 @@ class ProjectsController extends Controller
 
 	public $jsToLoad = array('project.js','module.js');
 
+    /**
+     * Constructor, calls parent's constructor
+     *
+     * @access     public
+     */
     public function __construct ()
     {
         
@@ -49,8 +53,11 @@ class ProjectsController extends Controller
    
     }
 
-
-
+	/**
+	* Destroys
+	*
+	* @access     public
+	*/
     public function __destruct ()
     {
         
@@ -59,6 +66,11 @@ class ProjectsController extends Controller
     }
 
 
+	/**
+	* Index, showing menu of options
+	*
+	* @access     public
+	*/
     public function indexAction()
     {
     
@@ -70,20 +82,27 @@ class ProjectsController extends Controller
     
     }
 
-
+	/**
+	* List of available modules, standard and self-defined, plus possibility of (de)activation
+	*
+	* @access     public
+	*/
     public function modulesAction ()
     {
         
         $this->checkAuthorisation();
         
         $this->setPageName(_('Project modules'));
-        
-        if (!empty($this->requestData['module_new'])) {
+
+        if ($this->rHasVal('module_new')) {
             
             $fmp = $this->models->FreeModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
             
-            if (count((array) $fmp) < 5 && !$this->isFormResubmit()) {
-                
+            if (
+				count((array) $fmp) < $this->controllerSettings['freeModulesMax']
+			 	&& !$this->isFormResubmit()
+			) {
+
                 $this->models->FreeModuleProject->save(
                 array(
                     'id' => null, 
@@ -92,7 +111,11 @@ class ProjectsController extends Controller
                     'active' => 'n'
                 ));
 
-            }
+            } else {
+			
+				$this->addError(sprintf(_('There is a maximum of %s self-defined modules.'),$this->controllerSettings['freeModulesMax']));
+			
+			}
         
         }
         
@@ -125,15 +148,20 @@ class ProjectsController extends Controller
 
         $this->smarty->assign('freeModules', $freeModules);
 
+        $this->smarty->assign('freeModuleMax', $this->controllerSettings['freeModulesMax']);
+
         $this->printPage();
     
     }
 
-
-
+	/**
+	* Assigning collaborator to modules (a listing, mainly; he actual connecting is done through AJAX-calls)
+	*
+	* @access     public
+	*/
     public function collaboratorsAction ()
     {
-        
+
         $this->checkAuthorisation();
 
         $this->setPageName(_('Assign collaborator to modules'));
@@ -230,7 +258,11 @@ class ProjectsController extends Controller
     }
 
 
-
+	/**
+	* Interface to the project settings
+	*
+	* @access     public
+	*/
     public function dataAction ()
     {
 
@@ -239,6 +271,7 @@ class ProjectsController extends Controller
         $this->setPageName(_('Project settings'));
 
 		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
+		// deleting the logo
 			
 			$data = $this->models->Project->_get(array('id' => $this->getCurrentProjectId()));
 
@@ -259,6 +292,7 @@ class ProjectsController extends Controller
 
 		} else
         if (isset($this->requestData) && !$this->isFormResubmit()) {
+		// saving all data (except the logo image)
             
             $this->requestData['id'] = $this->getCurrentProjectId();
             
@@ -267,8 +301,8 @@ class ProjectsController extends Controller
         }
         
         if (isset($this->requestDataFiles)) {
+		// saving the logo
 
-			// save logo
 			$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
 			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
 			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
@@ -341,12 +375,21 @@ class ProjectsController extends Controller
     }
 
 
+	/**
+	* General interface for all AJAX-calls
+	*
+	* calls ajaxActionModules -> add, remove, status change of modules
+	* calls ajaxActionCollaborators -> add, remove, status change of collaborators / modules
+	* calls ajaxActionLanguages -> add, remove, status change of project languages
+	*
+	* @access     public
+	*/
     public function ajaxInterfaceAction ()
     {
 
-        if (!isset($this->requestData['view'])) return;
+        if (!$this->rHasVal('view')) return;
 
-        if ($this->requestData['view'] == 'modules') {
+        if ($this->rHasVal('view','modules')) {
             
             $this->ajaxActionModules(
                 $this->requestData['type'], 
@@ -354,7 +397,8 @@ class ProjectsController extends Controller
                 $this->requestData['id']
             );
         
-        } elseif ($this->requestData['view'] == 'collaborators') {
+        } else
+        if ($this->rHasVal('view','collaborators')) {
        
             $this->ajaxActionCollaborators(
                 $this->requestData['type'], 
@@ -363,7 +407,8 @@ class ProjectsController extends Controller
                 $this->requestData['user']
             );
         
-        } elseif ($this->requestData['view'] == 'languages') {
+        } else
+        if ($this->rHasVal('view','languages')) {
             
             $this->ajaxActionLanguages(
                 $this->requestData['action'], 
@@ -635,5 +680,3 @@ class ProjectsController extends Controller
     }
 
 }
-
-
