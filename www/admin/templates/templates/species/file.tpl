@@ -32,7 +32,7 @@
 <div class="page-generic-div">
 {if $results}
 <p>
-{t}Check the results of the import below. You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there an error message, you are attempting to load a taxon that can not be loaded.<br />
+{t}Check the results of the import below. You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there an error message, you are attempting to load a taxon that can not be loaded.{/t}<br />
 {t}If the results look OK, click 'save':{/t} <input type="submit" value="{t}save{/t}" />
 </p>
 </div>
