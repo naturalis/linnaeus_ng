@@ -5,7 +5,7 @@
 Below, you can define taxa of what rank or ranks will be part of your dichotomous key. Only taxa of ranks that are part of the "species module" can be part of the key, and only those are displayed here. To change the distinction between the "higher taxa" and "species" modules, click{/t} <a href="../species/ranks.php">{t}here{/t}</a>.<br />
 </p>
 <p>
-{t}The taxa that are below the red line in the list below are available in your key. To change the selection, move the red line up or down by clicking the &uarr; and &darr; arrows. To include all ranks, move the line to the top of the list, above the first rank. As at least one rank is required to be included, the line cannot be moved below the lowest rank. When you are satisfied with your selection, click the save-button.{/t}
+{t}The taxa that are of a rank below the red line in the list below are available in your key. To change the selection, move the red line up or down by clicking the &uarr; and &darr; arrows. To include all ranks, move the line to the top of the list, above the first rank. As at least one rank is required to be included, the line cannot be moved below the lowest rank. When you are satisfied with your selection, click the save-button.{/t}
 </p>
 <p>
 {t}Please note that changing this setting will not detach any taxa that have already been attached to an end-point of your key. Taxa that have a rank that is no longer part of the selection below will remain connected to the key, until you manually detach them.{/t} </p>
