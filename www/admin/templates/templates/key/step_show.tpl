@@ -126,9 +126,14 @@
 </form>
 
 <div id="key-taxa-list-remain">
+<span id="key-taxa-list-remain-header">{t}Remaining taxa:{/t}</span><br />
+{if $remainingTaxa || $choices|@count==0}
 {section name=i loop=$remainingTaxa}
 {$remainingTaxa[i].taxon}<br />
 {/section}
+{else}
+{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the remaining taxa. Go %shere%s to do so.{/t}
+{/if}
 </div>
 
 {include file="../shared/admin-messages.tpl"}

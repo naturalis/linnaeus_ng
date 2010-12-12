@@ -396,7 +396,13 @@ die();
 			
 			if ($this->models->ChoiceKeystep->getAffectedRows()>0) {
 
-				if ($this->requestData['res_taxon_id']!=='0') unset($_SESSION['system']['remainingTaxa']);
+				if ($this->requestData['res_taxon_id']!=='0') {
+
+					unset($_SESSION['system']['remainingTaxa']);
+
+					unset($_SESSION['system']['keyTaxaPerStep']);
+
+				}
 				
 				$choice['res_keystep_id'] = $this->requestData['res_keystep_id'];
 
@@ -649,52 +655,65 @@ die();
         $this->printPage();
 	
 	}
-	
-	private function setStepsPerTaxon($branch=null,$ids=null)
+
+	private function setStepsPerTaxon($choice)
 	{
-	
-		if ($branch==null) {
 
-			$tree = $this->getKeyTree();
-			$branch = $tree['children'];
-			$ids[] = $tree['id'];
+		$this->_taxaStepList[] = $choice['keystep_id'];
 
-		}
-
-		foreach((array)$branch as $key => $val) {
-
-			if ($val['type']=='taxon') $this->_taxaStepList[$val['data']['id']] = $ids;
-
-		}
-
-		foreach((array)$branch as $key => $val) {
-
-			if (isset($val['children'])) {
-
-				$ids[] = $val['id'];
-
-				$this->setStepsPerTaxon($val['children'],$ids);
-
-			}
+		// get choices that have the keystep the choice belongs to as target
+		$cks = $this->models->ChoiceKeystep->_get(
+			array('id' => 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'res_keystep_id' => $choice['keystep_id']
+				)
+			)
+		);
+		
+		foreach((array)$cks as $key => $val) {
+		
+			$this->setStepsPerTaxon($val);
 
 		}
 	
 	}
-	
+
 	private function getTaxonDivision()
 	{
 
-		unset($this->_taxaStepList);
+		// get all choices that have a taxon as result
+		$ck = $this->models->ChoiceKeystep->_get(
+			array('id' => 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'res_taxon_id is not' => 'null'
+				)
+			)
+		);
 
-		$this->setStepsPerTaxon();
-		
-		foreach((array)$this->_taxaStepList as $taxonId => $stepIds) {
+		// for each...
+		foreach((array)$ck as $key => $val) {
+
+			unset($this->_taxaStepList);
+			
+			// ...work our way back to the top most step...
+			$this->setStepsPerTaxon($val);
+			
+			/// ...and save the results
+			$results[$val['res_taxon_id']] =  $this->_taxaStepList;
+
+		}
+
+		// turn it from a list of taxa with their steps into a list of steps with their taxa
+		foreach((array)$results as $taxonId => $stepIds) {
 
 			foreach($stepIds as $key2 => $stepId) {
 
-				//if (!isset($d[$stepId][$taxonId])) $d[$stepId][$taxonId] = $this->models->Taxon->_get(array('id'=>$taxonId));
 				if (!isset($d[$stepId][$taxonId])) {
+
 					$d[$stepId][$taxonId] = true;
+
 					$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
 
 				}
@@ -703,7 +722,10 @@ die();
 
 		}
 
-		return $list;
+		return array(
+			'list' => $list,
+			'taxonCount' => count($ck)
+		);
 
 	}
 
@@ -712,15 +734,17 @@ die();
 	
 		$this->checkAuthorisation();
         
-        $this->setPageName( _('Unconnected key endings'));
+        $this->setPageName( _('Compute taxon division'));
 		
 		if ($this->rHasVal('action','process') && !$this->isFormResubmit()) {
 
-			$_SESSION['system']['keyTaxaPerStep'] = $this->getTaxonDivision();
+			$d = $this->getTaxonDivision();
 
-			$this->smarty->assign('taxonCount',count((array)$this->_taxaStepList));
+			$_SESSION['system']['keyTaxaPerStep'] = $d['list'];
 
-			$this->smarty->assign('stepCount',count((array)$_SESSION['system']['keyTaxaPerStep']));
+			$this->smarty->assign('taxonCount',$d['taxonCount']);
+
+			$this->smarty->assign('stepCount',count((array)$d['list']));
 
 		} elseif (isset($_SESSION['system']['keyTaxaPerStep'])) {
 
