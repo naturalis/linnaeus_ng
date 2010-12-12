@@ -125,6 +125,11 @@
 <input type="hidden" name="direction" id="direction" value="" />
 </form>
 
+<div id="key-taxa-list-remain">
+{section name=i loop=$remainingTaxa}
+{$remainingTaxa[i].taxon}<br />
+{/section}
+</div>
 
 {include file="../shared/admin-messages.tpl"}
 

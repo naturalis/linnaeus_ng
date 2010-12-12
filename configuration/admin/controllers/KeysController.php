@@ -5,8 +5,10 @@ include_once ('Controller.php');
 class KeysController extends Controller
 {
     
-    public $remainingTaxaList;
+    private $_remainingTaxaList;
+    private $_taxaStepList;
 	private $_stepList;
+	private $_counter = 0;
 
     public $usedModels = array(
 		'keystep',
@@ -68,6 +70,26 @@ class KeysController extends Controller
     public function stepShowAction()
     {
 
+		if ($this->rHasVal('node')) {
+
+			if ($_SESSION['system']['keyTree']) {
+
+				foreach((array)$_SESSION['system']['keyTree'] as $key => $val) {
+			
+				}
+
+			} else {
+			
+				$this->redirect('map.php');
+			
+			}
+
+$this->addError('PANIC!');
+$this->addMessage('note to self: need to recursively search the key tree to find the node, and remember the correct keypath while doing so');
+$this->printPage();
+die();
+		}
+
         $this->checkAuthorisation();
 
 		if ($this->rHasId()) {
@@ -125,6 +147,12 @@ class KeysController extends Controller
 		}
 
 		$this->setPageName(sprintf(_('Show key step "%s"'),$step['title']));
+
+		if (isset($_SESSION['system']['keyTaxaPerStep'][$step['id']])) {
+
+			$this->smarty->assign('remainingTaxa',$_SESSION['system']['keyTaxaPerStep'][$step['id']]);
+
+		}
 
 		$this->smarty->assign('keyPath',$this->getKeyPath());
 	
@@ -435,7 +463,7 @@ class KeysController extends Controller
 
 		$this->smarty->assign('taxa',$this->treeList);
 
-		$this->smarty->assign('remainingTaxa',$this->remainingTaxaList);
+		$this->smarty->assign('remainingTaxa',$this->_remainingTaxaList);
 
    		$this->smarty->assign('keyPath',$this->getKeyPath());
 
@@ -508,7 +536,7 @@ class KeysController extends Controller
         
         $this->setPageName( _('Key map'));
 
-		$key = $this->getKeyTree();
+		$key = $_SESSION['system']['keyTree'] = $this->getKeyTree();
 
 		$this->smarty->assign('json',json_encode($key));
 
@@ -575,39 +603,134 @@ class KeysController extends Controller
         
         $this->setPageName( _('Unconnected key endings'));
 
-		$ck = $this->models->ChoiceKeystep->_get(array('id' => 
-			'select * from %table% where project_id = '.
-				$this->getCurrentProjectId().' '.
-				'and (res_keystep_id = -1 or res_keystep_id is null) '.
-				'and res_taxon_id is null '.
-				'order by show_order desc'
-		));
+		$k = $this->getKeysteps();
 		
-		foreach((array)$ck as $key => $val) {
+		foreach((array)$k as $key => $val) {
+
+			$kc = $this->getKeystepChoices($val['id']);
+			
+			if (count((array)$kc)==0) $deadSteps[] = $val;
+
+		}
+
+		$deadChoices = $this->models->ChoiceKeystep->_get(
+			array('id' => 
+					'select * from %table% where project_id = '.
+						$this->getCurrentProjectId().' '.
+						'and (res_keystep_id = -1 or res_keystep_id is null) '.
+						'and res_taxon_id is null '.
+						'order by show_order desc'
+			)
+		);
+		
+		foreach((array)$deadChoices as $key => $val) {
 
 			$k = $this->getKeystep($val['keystep_id']);
 
-			$ck[$key]['orderBy'] = $k['number'];
-			$ck[$key]['step'] = $k;
+			$deadChoices[$key]['orderBy'] = $k['number'];
+			$deadChoices[$key]['step'] = $k;
 
 			$kc = $this->getKeystepChoice($val['id']);
 
-			$ck[$key]['title'] = $kc['title'];
+			$deadChoices[$key]['title'] = $kc['title'];
 	
 		}
 		
-		$this->customSortArray($ck, array(
+		$this->customSortArray($deadChoices, array(
             'key' => 'orderBy', 
             'dir' => 'asc', 
             'case' => 'i'
         ));
 
-		$this->smarty->assign('keyendings',$ck);
+		$this->smarty->assign('deadSteps',$deadSteps);
+
+		$this->smarty->assign('deadChoices',$deadChoices);
 
         $this->printPage();
 	
 	}
+	
+	private function setStepsPerTaxon($branch=null,$ids=null)
+	{
+	
+		if ($branch==null) {
 
+			$tree = $this->getKeyTree();
+			$branch = $tree['children'];
+			$ids[] = $tree['id'];
+
+		}
+
+		foreach((array)$branch as $key => $val) {
+
+			if ($val['type']=='taxon') $this->_taxaStepList[$val['data']['id']] = $ids;
+
+		}
+
+		foreach((array)$branch as $key => $val) {
+
+			if (isset($val['children'])) {
+
+				$ids[] = $val['id'];
+
+				$this->setStepsPerTaxon($val['children'],$ids);
+
+			}
+
+		}
+	
+	}
+	
+	private function getTaxonDivision()
+	{
+
+		unset($this->_taxaStepList);
+
+		$this->setStepsPerTaxon();
+		
+		foreach((array)$this->_taxaStepList as $taxonId => $stepIds) {
+
+			foreach($stepIds as $key2 => $stepId) {
+
+				//if (!isset($d[$stepId][$taxonId])) $d[$stepId][$taxonId] = $this->models->Taxon->_get(array('id'=>$taxonId));
+				if (!isset($d[$stepId][$taxonId])) {
+					$d[$stepId][$taxonId] = true;
+					$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
+
+				}
+
+			}
+
+		}
+
+		return $list;
+
+	}
+
+	public function processAction()
+	{
+	
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Unconnected key endings'));
+		
+		if ($this->rHasVal('action','process') && !$this->isFormResubmit()) {
+
+			$_SESSION['system']['keyTaxaPerStep'] = $this->getTaxonDivision();
+
+			$this->smarty->assign('taxonCount',count((array)$this->_taxaStepList));
+
+			$this->smarty->assign('stepCount',count((array)$_SESSION['system']['keyTaxaPerStep']));
+
+		} elseif (isset($_SESSION['system']['keyTaxaPerStep'])) {
+
+			$this->addMessage(_('Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it.'));
+
+		}
+	
+        $this->printPage();
+
+	}
 
     public function ajaxInterfaceAction ()
     {
@@ -645,10 +768,6 @@ class KeysController extends Controller
 			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
 	
             $this->saveKeystepChoiceContent($this->requestData,'text');
-
-        } elseif ($this->requestData['action'] == 'get_key_map_link') {
-
-            $this->ajaxGetKeyMapLink();
 
         }
 		
@@ -740,14 +859,14 @@ class KeysController extends Controller
 	private function getRemainingTaxa()
 	{
 
-		if (isset($_SESSION['system']['remainingTaxa']) && isset($_SESSION['system']['remainingTaxaList'])) {
+		if (isset($_SESSION['system']['remainingTaxa']) && isset($_SESSION['system']['_remainingTaxaList'])) {
 
-			$this->remainingTaxaList = $_SESSION['system']['remainingTaxaList'];
+			$this->_remainingTaxaList = $_SESSION['system']['_remainingTaxaList'];
 			return $_SESSION['system']['remainingTaxa'];
 
 		}
 
-		unset($this->remainingTaxaList);
+		unset($this->_remainingTaxaList);
 		unset($_SESSION['system']['remainingTaxa']);
 		
 		$taxa = false;
@@ -781,7 +900,7 @@ class KeysController extends Controller
 				
 					$taxa[] = $tval;
 					
-					$this->remainingTaxaList[$tval['id']]=true;
+					$this->_remainingTaxaList[$tval['id']]=true;
 				
 				}
 			
@@ -796,15 +915,10 @@ class KeysController extends Controller
         ));
 		
 		$_SESSION['system']['remainingTaxa'] = $taxa;
-		$this->remainingTaxaList = $_SESSION['system']['remainingTaxaList'] = $this->remainingTaxaList;
+		$this->_remainingTaxaList = $_SESSION['system']['_remainingTaxaList'] = $this->_remainingTaxaList;
 
 		return $taxa;
 
-	}
-
-	private function formatKeyTree($tree)
-	{
-	
 	}
 
 	private function getKeyTree($refId=null)
@@ -812,10 +926,17 @@ class KeysController extends Controller
 	
 		$s = $refId==null ? $this->getStartKeystep() : $this->getKeystep($refId);
 
-		$step['id'] = $s['id'];
-		$step['name'] = $s['number'].'. '.$s['title']; // required for the JIT script
-		$step['data'] = array('number'=>$s['number'],'title'=>$s['title']);
-		
+		$step = array(
+			'id' => $s['id'],
+			'name' => $s['number'].'. '.$s['title'], // required for the JIT script
+			'type' => 'step',
+			'data' => array(
+				'number'=>$s['number'],
+				'title'=>$s['title'],
+				'uniqueId' => $this->_counter++
+			)
+		);
+
 		$this->_stepList[$step['id']] = true;
 
 		$ck = $this->models->ChoiceKeystep->_get(
@@ -847,8 +968,14 @@ class KeysController extends Controller
 				);
 				$step['children'][] = array(
 					'id' => 't'.$t['id'],
-					'data' => array('number'=>'t'.$t['id'],'title'=>'&rarr; '.$t['taxon']),
-					'name' => '=> '.$t['taxon']
+					'type' => 'taxon',
+					'data' => array(
+						'number'=>'t'.$t['id'],
+						'title'=>'&rarr; '.$t['taxon'],
+						'taxon'=> $t['taxon'],
+						'id'=>$t['id']
+					),
+					'name' => '<i>'.$t['taxon'].'</i>'
 				);
 			
 			} 
@@ -860,7 +987,7 @@ class KeysController extends Controller
 	}
 
 
-	private function getKeysteps($params)
+	private function getKeysteps($params=null)
 	{
 
 		$id = isset($params['id']) ? $params['id'] : false;
@@ -1420,40 +1547,6 @@ class KeysController extends Controller
 		}
 
 	}
-
-	private function ajaxGetKeyMapLink()
-	{
-	
-		if ($this->rHasVal('id')) {
-
-			if (substr($this->requestData['id'],0,1)=='t') {
-
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => substr($this->requestData['id'],1)
-						)
-					)
-				);
-				
-				$result = $t[0];
-
-			} else {
-
-				$result = $this->getKeystep($this->requestData['id']);
-
-			}
-
-            $this->smarty->assign('returnText', json_encode($result));
-
-		} else {
-
-            $this->smarty->assign('returnText', false);
-
-		}
-
-	}	
 
 
 }

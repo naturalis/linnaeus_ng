@@ -255,28 +255,21 @@ function keySaveChoiceText(title,type) {
 
 }
 
-function keySetMapInfoLabel(id) {
+function keySetMapInfoLabel(node) {
 
-	$.ajax({
-		url : "ajax_interface.php",
-		data : ({
-			'action' : 'get_key_map_link' ,
-			'id' : id ,
-			'time' : allGetTimestamp()	
-		}),
-		type: "POST",
-		async: allAjaxAsynchMode ,
-		success: function (data) {
-			obj = $.parseJSON(data);			
-			if(obj.title) {
-				var d = sprintf(_('Click to see step "%s"'),'<a href="step_show.php?id='+obj.id+'">'+obj.title+'</a>');
-			} else {
-				var d = sprintf(_('Click to edit taxon "%s"'),'<a href="../species/taxon.php?id='+obj.id+'">'+obj.taxon+'</a>');
-			}
-			$('#info').html(d);
-		}
+	id = node.id;
 
-	});
+	if(id.substr(0,1)=='t') { 
+
+		var d = sprintf(_('Click to edit taxon "%s"'),'<a href="../species/taxon.php?id='+node.data.id+'">'+node.data.taxon+'</a>');
+
+	} else {
+
+		var d = sprintf(_('Click to see step "%s"'),'<a href="step_show.php?node='+node.data.uniqueId+'">'+node.data.title+'</a>');
+
+	}
+
+	$('#info').html(d);
 
 }
 
