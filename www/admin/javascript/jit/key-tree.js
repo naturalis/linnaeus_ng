@@ -90,7 +90,8 @@ function init(treeData){
             label.onclick = function(){
 				st.onClick(node.id);
 				if (typeof keySetMapInfoLabel=="function") {
-					keySetMapInfoLabel(node.id);
+					//keySetMapInfoLabel(node.id);
+					keySetMapInfoLabel(node);
 				}
             };
             //set label styles
@@ -163,27 +164,7 @@ function init(treeData){
 		}
 			   }
 	);
-    //end
-    //Add event handlers to switch spacetree orientation.
-    var top = $jit.id('r-top'), 
-        left = $jit.id('r-left'), 
-        bottom = $jit.id('r-bottom'), 
-        right = $jit.id('r-right'),
-        normal = $jit.id('s-normal');
-        
-    
-    function changeHandler() {
-        if(this.checked) {
-            top.disabled = bottom.disabled = right.disabled = left.disabled = true;
-            st.switchPosition(this.value, "animate", {
-                onComplete: function(){
-                    top.disabled = bottom.disabled = right.disabled = left.disabled = false;
-                }
-            });
-        }
-    };
-    
-    top.onchange = left.onchange = bottom.onchange = right.onchange = changeHandler;
+
     //end
 
 }

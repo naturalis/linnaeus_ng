@@ -1,12 +1,22 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
+{t}Below is a list of steps without any choices. To edit, click the name the step.{/t}
+<ul>
+{section name=i loop=$deadSteps}
+<li>{t}Step{/t} 
+	<span class="pseudo-a" onclick="$('#step').val({$deadSteps[i].id});$('#stepForm').submit();">{$deadSteps[i].number}: {if $deadSteps[i].title}"{$deadSteps[i].title}"{else}...{/if}</span></li>
+{/section}
+</ul>
+
+
 {t}Below is a list of unconnected choices, i.e. those that do not lead to another step or a taxon. To edit, click the name of either the step or the choice.{/t}
 <ul>
-{section name=i loop=$keyendings}
+{section name=i loop=$deadChoices}
 <li>{t}Step{/t} 
-	<span class="pseudo-a" onclick="$('#step').val({$keyendings[i].step.id});$('#stepForm').submit();">{$keyendings[i].step.number}: "{$keyendings[i].step.title}"</span>, 
-	<span class="pseudo-a" onclick="$('#choice').val({$keyendings[i].id});$('#choiceForm').submit();">{t}choice{/t} {$keyendings[i].show_order}: "{$keyendings[i].title}"</span></li>
+	<span class="pseudo-a" onclick="$('#step').val({$deadChoices[i].step.id});$('#stepForm').submit();">{$deadChoices[i].step.number}: "{$deadChoices[i].step.title}"</span>, 
+	<span class="pseudo-a" onclick="$('#choice').val({$deadChoices[i].id});$('#choiceForm').submit();">{t}choice{/t} {$deadChoices[i].show_order}: "{$deadChoices[i].title}"</span></li>
 {/section}
 </ul>
 </div>

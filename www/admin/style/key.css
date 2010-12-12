@@ -93,5 +93,6 @@
 	color:#888;
 }
 
-.key-taxa-list-remain {
+#key-taxa-list-remain {
+	margin: 10px 10px 10px 10px;
 }
