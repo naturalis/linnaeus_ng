@@ -96,3 +96,7 @@
 #key-taxa-list-remain {
 	margin: 10px 10px 10px 10px;
 }
+
+#key-taxa-list-remain-header {
+	font-weight:bold;
+}
