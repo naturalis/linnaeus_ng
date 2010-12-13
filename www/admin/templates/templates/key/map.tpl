@@ -11,8 +11,6 @@
 
 <div id="log"></div>
 
-<div id="satan">dsfsdfsdf</div>
-
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){

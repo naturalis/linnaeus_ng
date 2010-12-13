@@ -94,6 +94,8 @@
 }
 
 #key-taxa-list-remain {
+	border-top:1px dotted #ddd;
+	padding-top:3px;
 	margin: 10px 10px 10px 10px;
 }
 

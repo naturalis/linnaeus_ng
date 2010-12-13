@@ -37,7 +37,7 @@ class ProjectsController extends Controller
 
     public $controllerPublicName = 'Project administration';
 
-	public $jsToLoad = array('project.js','module.js');
+	public $jsToLoad = array('all'=>array('project.js','module.js'));
 
     /**
      * Constructor, calls parent's constructor
