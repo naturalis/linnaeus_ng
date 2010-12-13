@@ -14,7 +14,7 @@
 	<a href="media_upload.php?id={$id}">{t}Upload media for this taxon{/t}</a><br /><br />
 </div>
 
-<div id="taxon-language-div"></div>
+<div id="taxon-language-other-language"></div>
 <br />
 <div>
 	<a name="image"></a>

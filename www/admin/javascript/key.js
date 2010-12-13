@@ -14,12 +14,30 @@ function keyToggleFullKeyPath() {
 
 }
 
-function keyChoiceDelete() {
+function keyChoiceSave() {
+	
+	if ($('#titleDefault').val().trim()=='') alert(_('You have to enter a title for this choice'));
+
+	$('#theForm').submit();
+
+}
+
+
+function keyChoiceDelete(id) {
 	
 	if (confirm(_('Are you sure you want to delete this choice?'))) {
 
-		$('#action').val('delete');
-		$('#theForm').submit();
+		if (id) {
+
+			$('#id3').val(id);
+			$('#delChoiceForm').submit();
+
+		} else {
+
+			$('#action').val('delete');
+			$('#theForm').submit();
+
+		}
 
 	}
 
@@ -115,15 +133,18 @@ function keyShowRanks() {
 var keyOpenChoices = Array();
 var keyAllOpened = false;
 
-function keyShowChoiceDetails(id) {
+function keyShowChoiceDetails(ele,id) {
 
 	if (id=='all') {
 
 		for (var i=0;i<=99;i++) {
-			if (keyAllOpened)
+			if (keyAllOpened) {
 				$('#choice-'+i).removeClass('key-choice-details').addClass('key-choice-details-invisible');
-			else
+				$(ele).html(_('(show all)'));
+			} else {
 				$('#choice-'+i).removeClass('key-choice-details-invisible').addClass('key-choice-details');
+				$(ele).html(_('(hide all)'));
+			}
 		}
 
 		keyAllOpened = !keyAllOpened;
@@ -133,9 +154,11 @@ function keyShowChoiceDetails(id) {
 		if (keyOpenChoices[id]==true) {
 			$('#choice-'+id).removeClass('key-choice-details').addClass('key-choice-details-invisible');
 			keyOpenChoices[id]=false;
+			$(ele).html('show details');
 		} else {
 			$('#choice-'+id).removeClass('key-choice-details-invisible').addClass('key-choice-details');
 			keyOpenChoices[id]=true;
+			$(ele).html('hide details');
 		}
 
 	}
@@ -273,7 +296,18 @@ function keySetMapInfoLabel(node) {
 
 }
 
+function keyChoiceShowImage(url,name) {
 
+	$.colorbox({
+		href:url,
+		title:name,
+		transition:"elastic", 
+		maxWidth:800,
+		width:"100%",
+		opacity:0
+	});
+
+}
 
 
 

@@ -6,7 +6,7 @@
 	position:absolute;
 	left:10px;
 	background-color:#FFFFFF;
-	border:1px solid #999;
+	/*border:1px solid #999;*/
 	padding:2px;
 	width:400px;
 }
@@ -68,7 +68,7 @@
 }
 
 .key-choice-arrow {
-	width:90px;
+	awidth:90px;
 	text-align:center;
 }
 .key-choice-edit {
@@ -78,8 +78,8 @@
 	display:none;
 }
 .key-choice-details {
+	color:#333;
 }
-
 .key-choice-text-cell {
 	width:100%;
 }
@@ -87,18 +87,26 @@
 	width:50px;
 	border:1px solid #ddd;
 	padding:2px;
+	cursor:pointer;
 }
-
+.key-choice-image-normal {
+	width:200px;
+	border:1px solid #ddd;
+	padding:2px;
+	cursor:pointer;
+}
 .key-taxa-list {
 	color:#888;
 }
 
 #key-taxa-list-remain {
-	border-top:1px dotted #ddd;
-	padding-top:3px;
 	margin: 10px 10px 10px 10px;
 }
 
 #key-taxa-list-remain-header {
 	font-weight:bold;
+}
+
+textarea {
+	font-size:12px;
 }

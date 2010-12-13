@@ -22,19 +22,22 @@
 {/section}
 </div>
 <div id="keypath-full" class="keypath-full-invisible">
+<fieldset>
+<legend>{if $keyPath[0].is_start==0}{t}Full subsection keypath:{/t}{else}{t}Full keypath{/t}{/if}</legend>
 <table style="width:100%">
-<tr><td colspan="2">{if $keyPath[0].is_start==0}{t}Full subsection keypath:{/t}{else}{t}Full keypath:{/t}{/if}</td><td style="width:10px;cursor:pointer;font-size:14px" onclick="keyToggleFullKeyPath()">x</td></tr>
 {section name=i loop=$keyPath}
 	<tr>
 	{if $smarty.section.i.index==$keyPath|@count-1}
 		<td style="text-align:right;width:10px;">{if $keyPath[i].number}{$keyPath[i].number}.{/if}</td>{if $keyPath[i].title}<td>{$keyPath[i].title}</td>{else}<td colspan="2">...</td>{/if}
 	{else}	
 		<td style="text-align:right;width:10px;">{$keyPath[i].number}.</td>
-		<td><span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].title}</span>{if $keyPath[i].choice}: {$keyPath[i].choiceTitle}{/if}{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}</td>
+		<td><span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].title}</span>{if $keyPath[i].choice}: {$keyPath[i].choiceTitle}{/if}<!--{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}--></td>
 	{/if}
 	<td></td>
 </tr>
 {/section}
+<tr><td colspan="3" style="padding-top:10px">[<span class="pseudo-a" onclick="keyToggleFullKeyPath();">close</span>]</td></tr>
 </table>
 <form method="post" action="step_show.php" id="pathForm"><input type="hidden" name="id" id="pathNext" value="" /></form>
+</fieldset>
 </div>
