@@ -25,7 +25,7 @@ class UsersController extends Controller
         'free_module_project_user', 
     );
     
-	public $jsToLoad = array('user.js');
+	public $jsToLoad = array('all' => array('user.js'));
 
     public $controllerPublicName = 'User administration';
 

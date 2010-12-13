@@ -265,7 +265,7 @@ function keySetMapInfoLabel(node) {
 
 	} else {
 
-		var d = sprintf(_('Click to see step "%s"'),'<a href="step_show.php?node='+node.data.uniqueId+'">'+node.data.title+'</a>');
+		var d = sprintf(_('Click to see step "%s"'),'<a href="step_show.php?node='+node.data.node+'">'+node.data.title+'</a>');
 
 	}
 

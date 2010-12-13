@@ -7,7 +7,7 @@ class KeysController extends Controller
     
     private $_remainingTaxaList;
     private $_taxaStepList;
-	private $_stepList;
+	private $_stepList = array();
 	private $_counter = 0;
 
     public $usedModels = array(
@@ -23,11 +23,13 @@ class KeysController extends Controller
 
     public $controllerPublicName = 'Dichotomous key';
 
-	public $jsToLoad = array('key.js','jit/jit.js','jit/key-tree.js');
-
-/*<!--[if IE]><script language="javascript" type="text/javascript" src="../../Extras/excanvas.js"></script><![endif]--> */
-
 	public $cssToLoad = array('key.css','rank-list.css','key-tree.css');
+
+	public $jsToLoad =
+		array(
+			'all' => array('key.js','jit/jit.js','jit/key-tree.js',),
+			'IE' => array('jit/Extras/excanvas.js')
+		);
 
 
     /**
@@ -70,13 +72,26 @@ class KeysController extends Controller
     public function stepShowAction()
     {
 
+        $this->checkAuthorisation();
+
 		if ($this->rHasVal('node')) {
+		// arrived from key map; have to resolve the keypath from the node's place in the keyTree
 
 			if ($_SESSION['system']['keyTree']) {
+			// the keyTree is built when the map is called; if no keyTree exists, redirect to the map
 
-				foreach((array)$_SESSION['system']['keyTree'] as $key => $val) {
-			
+				// find the node in the keyTree and build an array of the path leading to it
+				$this->findNodeInTree(array(0 => $_SESSION['system']['keyTree']),$this->requestData['node']);
+				
+				// loop through the array and add each element to the keyPath
+				foreach((array)$this->_stepList as $key => $val) {
+
+					$this->updateKeyPath($val);
+
 				}
+					
+				// get the step itself, which always is the last element in the keyPath array
+				$step = $this->getKeystep($val['id']);
 
 			} else {
 			
@@ -84,14 +99,7 @@ class KeysController extends Controller
 			
 			}
 
-$this->addError('PANIC!');
-$this->addMessage('note to self: need to recursively search the key tree to find the node, and remember the correct keypath while doing so');
-$this->printPage();
-die();
-		}
-
-        $this->checkAuthorisation();
-
+		} else
 		if ($this->rHasId()) {
 		// request for specific step
 
@@ -799,15 +807,14 @@ die();
     
     }
 
-
 	private function updateKeyPath($params) 
 	{
 
-		$id = $params['id'] ? $params['id'] : null;
-		$number = $params['number'] ? $params['number'] : null;
-		$title = $params['title'] ? $params['title'] : null;
-		$is_start = $params['is_start'] ? $params['is_start'] : null;
-		$choice = $params['choice'] ? $params['choice'] : null;
+		$id = isset($params['id']) ? $params['id'] : null;
+		$number = isset($params['number']) ? $params['number'] : null;
+		$title = isset($params['title']) ? $params['title'] : null;
+		$is_start = isset($params['is_start']) ? $params['is_start'] : null;
+		$choice = isset($params['choice']) ? $params['choice'] : null;
 					
 		if (isset($_SESSION['system']['keyPath'])) {
 
@@ -957,7 +964,8 @@ die();
 			'data' => array(
 				'number'=>$s['number'],
 				'title'=>$s['title'],
-				'uniqueId' => $this->_counter++
+				'is_start'=>$s['is_start'],
+				'node' => $this->_counter++
 			)
 		);
 
@@ -1571,6 +1579,39 @@ die();
 		}
 
 	}
+
+	private function findNodeInTree($branch,$node)
+	{
+
+		foreach((array)$branch as $key => $val) {
+	
+			$isNode = (isset($val['data']['node']) && $val['data']['node']==$node);
+
+			$result = false;
+
+			if (!$isNode && isset($val['children'])) $result = $this->findNodeInTree($val['children'],$node);
+
+			if ($isNode || $result==true) {
+
+				array_unshift($this->_stepList,
+					array(
+						'id' => $val['id'],
+						'number' => $val['data']['number'],
+						'title' => $val['data']['title'],
+						'is_start' => $val['data']['is_start']
+					)
+				);
+
+				return true;
+
+			}
+
+		}
+		
+		return false;
+	
+	}
+
 
 
 }

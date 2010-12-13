@@ -30,7 +30,7 @@
 <form method="post" action="choice_edit.php" id="choiceForm">
 <input type="hidden" name="id" id="id2" value="" />
 <input type="hidden" name="step" value="{$step.id}" />
-<span  id="key-step-choices">{t}Possible choices{/t}:</span>
+<span  id="key-step-choices">{t}Choices{/t}:</span>
 <table>
 	<tr>
 		<th>#</th>
@@ -126,13 +126,13 @@
 </form>
 
 <div id="key-taxa-list-remain">
-<span id="key-taxa-list-remain-header">{t}Remaining taxa:{/t}</span><br />
+<span id="key-taxa-list-remain-header">{t}Possible outcomes:{/t}</span><br />
 {if $remainingTaxa || $choices|@count==0}
 {section name=i loop=$remainingTaxa}
 {$remainingTaxa[i].taxon}<br />
 {/section}
 {else}
-{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the remaining taxa. Go %shere%s to do so.{/t}
+{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the taxa. Go %shere%s to do so.{/t}
 {/if}
 </div>
 

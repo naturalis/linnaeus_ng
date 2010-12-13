@@ -22,11 +22,15 @@
 	</style>
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should be removed in production-->
 {if $javascriptsToLoad}
-{section name=i loop=$javascriptsToLoad}
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad[i]}"></script>
+{section name=i loop=$javascriptsToLoad.all}
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad.all[i]}"></script>
+{/section}
+{section name=i loop=$javascriptsToLoad.IE}
+	<!--[if IE]><script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
 {/section}
 {/if}
 
