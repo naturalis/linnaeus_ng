@@ -6,19 +6,14 @@
 
 <div id="page-main">
 {if $step.id!=''}
-<span id="message-container" style="float:right;"></span><br />
-<span class="key-step-title">{t}Editing keystep{/t} "<span id="default-key-title">...</span>"</span><br />
-<p>
-{t}Enter the title and text of this step in your key in the various languages within your project. Title and text are saved automatically after you have entered the text in the appropriate input.{/t}<br />
-{t}To change the step-number from the automatically generated one, enter a new number and click 'save'. Please note that the numbers have to be unique in your key.{/t}
-</p>
-
 <form method="post" action="" id="theForm">
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input type="hidden" name="action" value="save" />
 	<input type="hidden" name="id" id="id" value="{$step.id}" />
 	<input type="hidden" name="is_start" value="{$step.is_start}" />
-
+<fieldset>
+<legend>{t}Editing keystep{/t} "<span id="default-key-title">...</span>"</legend>
+<span id="message-container" style="float:right;"></span><br />
 <table style="border-collapse:collapse">
 	<tr style="vertical-align:top;">
 		<td>
@@ -48,6 +43,7 @@
 				type="text" 
 				name="titleDefault" 
 				id="titleDefault" 
+				maxlength="64"
 				onblur="keySaveStepTitle(this.value,'default')" />
 		</td>
 	{if $session.project.languages|@count>1}
@@ -55,6 +51,7 @@
 				type="text" 
 				name="titleOther" 
 				id="titleOther" 
+				maxlength="64"
 				onblur="keySaveStepTitle(this.value,'other')" />
 		</td>
 	{/if}
@@ -64,8 +61,7 @@
 		<td><textarea
 				name="contentDefault" 
 				id="contentDefault" 
-				cols="50" 
-				rows="9"
+				style="width:400px;height:200px;"
 				onblur="keySaveStepText(this.value,'default')" /></textarea>
 		</td>
 	{if $session.project.languages|@count>1}
@@ -73,8 +69,7 @@
 			<textarea 
 				name="contentOther" 
 				id="contentOther" 
-				cols="50" 
-				rows="9"
+				style="width:400px;height:200px;"
 				onblur="keySaveStepText(this.value,'other')" /></textarea>
 		</td>
 	{/if}
@@ -89,18 +84,20 @@
 		</td>
 	</tr>
 </table>
+</fieldset>
 </form>
+</div>
 
+{include file="../shared/admin-messages.tpl"}
+<div class="page-generic-div">
+<p>
+{t}Enter the title and text of this step in your key in the various languages within your project. Title and text are saved automatically after you have entered the text in the appropriate input.{/t}<br />
+{t}To change the step-number from the automatically generated one, enter a new number and click 'save'. Please note that the numbers have to be unique in your key.{/t}
+</p>
 
 <form method="post" action="step_show.php" id="backForm">
 	<input type="hidden" name="id" value="{$step.id}" />
 </form>
-
-
-<!-- form method="post" action="step_show.php" id="nextForm">
-	<input type="hidden" name="id" id="next" value="" />
-	<input type="hidden" name="choice" id="choice" value="" />
-</form -->
 {/if}
 </div>
 
@@ -122,5 +119,4 @@ $(document).ready(function(){
 {/literal}
 </script>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

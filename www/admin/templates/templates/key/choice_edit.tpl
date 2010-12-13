@@ -10,9 +10,11 @@
 
 <span class="key-step-title">
 <span id="message-container" style="float:right;"></span><br />
-{t}Editing choice{/t} "<span id="default-choice-title">...</span>"
-</span><br /><br />
 
+
+
+<fieldset>
+<legend>{t}Editing choice{/t} "<span id="default-choice-title">...</span>"</legend>
 <table style="border-collapse:collapse">
 
 	<tr style="vertical-align:top">
@@ -30,9 +32,10 @@
 		<td>{t}Title:{/t}</td>
 		<td colspan="2">
 			<input 
-				type="text" 
+				type="text"
 				name="titleDefault" 
 				id="titleDefault" 
+				maxlength="64"
 				onblur="keySaveChoiceTitle(this.value,'default')" />
 		</td>
 	{if $session.project.languages|@count>1}
@@ -41,6 +44,7 @@
 				type="text" 
 				name="titleOther" 
 				id="titleOther" 
+				maxlength="64"
 				onblur="keySaveChoiceTitle(this.value,'other')" />
 		</td>
 	{/if}
@@ -51,8 +55,7 @@
 			<textarea
 				name="contentDefault" 
 				id="contentDefault" 
-				cols="50" 
-				rows="9"
+				style="width:400px;height:200px;"
 				onblur="keySaveChoiceText(this.value,'default')" /></textarea>
 		</td>
 	{if $session.project.languages|@count>1}
@@ -60,8 +63,7 @@
 			<textarea
 				name="contentOther" 
 				id="contentOther" 
-				cols="50" 
-				rows="9"
+				style="width:400px;height:200px;"
 				onblur="keySaveChoiceText(this.value,'other')" /></textarea>
 		</td>
 	{/if}
@@ -70,7 +72,10 @@
 		<td>{t}Image:{/t}</td>
 		<td colspan="2">
 		{if $data.choice_img}
-			<img src="{$session.project.urls.project_media}{$data.choice_img}" style=" width:200px;border:1px solid #ddd;padding:2px;" /><br />
+			<img
+				onclick="keyChoiceShowImage('{$session.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
+				src="{$session.project.urls.project_media}{$data.choice_img}" 
+				class="key-choice-image-normal" /><br />
 			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 		{else}
 			<input type="file" name="image" />
@@ -123,13 +128,22 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td colspan="3">
-			<input type="submit" value="{t}save{/t}" />
-			<input type="button" onclick="keyChoiceDelete()" value="{t}delete{/t}" />
+			<input type="button" onclick="keyChoiceSave();" value="{t}save{/t}" />
+			<!-- input type="button" onclick="keyChoiceDelete()" value="{t}delete{/t}" / -->
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />
 		</td>
 	</tr>
 </table>
+</fieldset>
 </form>
+
+{include file="../shared/admin-messages.tpl"}
+<div class="page-generic-div">
+<p>
+{t}Enter the title, text, an optional image and the target of this choice. Title and text are saved automatically after you have entered the text in the appropriate input.{/t}<br />
+{t}To change the step-number from the automatically generated one, enter a new number and click 'save'. Please note that the numbers have to be unique in your key.{/t}
+</p>
+
 
 <form method="post" action="step_show.php" id="backForm">
 <input type="hidden" name="id" value="{$data.keystep_id}" />
@@ -153,8 +167,5 @@ $(document).ready(function(){
 });
 {/literal}
 </script>
-
-
-{include file="../shared/admin-messages.tpl"}
 
 {include file="../shared/admin-footer.tpl"}

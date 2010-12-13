@@ -3,7 +3,6 @@
 {include file="_keypath.tpl"}
 
 <div id="page-main">
-
 <form method="post" action="step_edit.php" id="delForm">
 <input type="hidden" name="action" id="action" value="delete" />
 <input type="hidden" name="id" value="{$step.id}" />
@@ -12,33 +11,31 @@
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="id" id="id" value="{$step.id}" />
 <input type="hidden" name="ref_choice" id="ref_choice" value="" />
-<table style="border-collapse:collapse">
-	<tr style="vertical-align:top">
-		<td>
-			<span id="key-step-number">{t}Step{/t} {$step.number}:</span>
-			<span id="key-title">{$step.title}</span>
-			<span id="key-edit-link">[<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]</span>
-			<span id="key-edit-link">[<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]</span>
-		</td>
-	</tr>
-	<tr style="vertical-align:top">
-		<td>{$step.content}</td>
-	</tr>
-</table>
+<fieldset>
+<legend id="key-step-choices">{t}Step{/t} {$step.number}: {$step.title}</legend>
+{$step.content}
+<p>
+[<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]
+[<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]
+</p>
+</fieldset>
+
 </form>
 <br />
 <form method="post" action="choice_edit.php" id="choiceForm">
 <input type="hidden" name="id" id="id2" value="" />
 <input type="hidden" name="step" value="{$step.id}" />
-<span  id="key-step-choices">{t}Choices{/t}:</span>
+<fieldset>
+<legend id="key-step-choices">{t}Choices{/t}</legend>
 <table>
 	<tr>
-		<th>#</th>
-		<th>{t}title{/t}</th>
-		<th colspan="2">{t}leads to{/t}</th>
-		<th>{t}change order{/t}</th>
-		<th></th>
-		<th>{t}details{/t} <span class="pseudo-a" onclick="keyShowChoiceDetails('all')">{t}(toggle all){/t}</span></th>
+		<th style="width:10px;text-align:right">#</th>
+		<th style="width:220px;">{t}choice title{/t}</th>
+		<th style="width:220px;" colspan="2">{t}choice leads to{/t}</th>
+		<th style="width:90px;">{t}change order{/t}</th>
+		<th style="width:90px;"><!-- span class="pseudo-a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
+		<th style="width:50px;"></th>
+		<th style="width:50px;"></th>
 	</tr>
 {section name=i loop=$choices}
 	<tr class="tr-highlight">
@@ -78,19 +75,24 @@
 			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
 			{/if}
 		</td>
+		<td title="{t}show details{/t}">[<span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">show details</span>]</td>
 		<td class="key-choice-edit">[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
-		<td title="{t}show details{/t}" class="pseudo-a" onclick="keyShowChoiceDetails({$smarty.section.i.index})">&nabla;</td>
+		<td class="key-choice-edit">[<span class="pseudo-a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
 	</tr>
 	<tr id="choice-{$smarty.section.i.index}" class="key-choice-details-invisible">
-		<td></td>
+		<td>&nbsp;</td>
 		<td colspan="7">
 			<table>
 				<tr style="vertical-align:top">
 				{if $choices[i].choice_img}
-					<td{if !$choices[i].choice_txt} colspan="2"{/if}><img src="{$session.project.urls.project_media}{$choices[i].choice_img}" class="key-choice-image-small" /></td>
+					<td{if !$choices[i].choice_txt} colspan="2"{/if}>
+						<img
+							onclick="keyChoiceShowImage('{$session.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
+							src="{$session.project.urls.project_media}{$choices[i].choice_img}"
+							class="key-choice-image-small" /></td>
 				{/if}
 				{if $choices[i].choice_txt}
-					<td{if !$choices[i].choice_img} colspan="2"{/if}>
+					<td{if !$choices[i].choice_img} colspan="2"{/if} class="key-choice-details">
 				{$choices[i].choice_txt}
 					</td>
 				{/if}
@@ -101,15 +103,21 @@
 {/section}
 {if $choices|@count==0}
 	<tr>
-		<td colspan="2"><span class="key-no-choices">{t}(none defined){/t}</span></td>
+		<td colspan="8"><span class="key-no-choices">{t}(none defined){/t}</span></td>
 	</tr>
 {/if}
-{if $choices|@count < $maxChoicesPerKey}
 	<tr>
-		<td colspan="2">[<span onclick="$('#choiceForm').submit();" class="pseudo-a">{t}add new choice{/t}</span>]</td>
+		<td colspan="8">&nbsp;</td>
 	</tr>
+	<tr>
+{if $choices|@count < $maxChoicesPerKeystep}
+		<td colspan="8">[<span onclick="$('#choiceForm').submit();" class="pseudo-a">{t}add new choice{/t}</span>]</td>
+{else}
+		<td colspan="8">{t _s1=$maxChoicesPerKeystep}(you have reached the maximum of %s choices per step){/t}</td>
 {/if}
+	</tr>
 </table>
+</fieldset>
 </form>
 </div>
 
@@ -125,15 +133,25 @@
 <input type="hidden" name="direction" id="direction" value="" />
 </form>
 
+<form method="post" action="choice_edit.php" id="delChoiceForm">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="id" id="id3" value="" />
+<input type="hidden" name="action" value="delete" />
+</form>
+
 <div id="key-taxa-list-remain">
-<span id="key-taxa-list-remain-header">{t}Possible outcomes:{/t}</span><br />
+<fieldset>
+<legend id="key-taxa-list-remain-header">{t}Possible outcomes{/t}</legend>
 {if $remainingTaxa || $choices|@count==0}
+This is a list of the taxa that are a possible outcome of the key, computed from the current step:<br />
 {section name=i loop=$remainingTaxa}
-{$remainingTaxa[i].taxon}<br />
+&#149;&nbsp;{$remainingTaxa[i].taxon}<br />
 {/section}
+{if $remainingTaxa|@count==0}{t}(none){/t}{/if}
 {else}
-{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the taxa. Go %shere%s to do so.{/t}
+{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the list of possible outcomes. Go %shere%s to do so.{/t}
 {/if}
+</fieldset>
 </div>
 
 {include file="../shared/admin-messages.tpl"}

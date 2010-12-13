@@ -23,11 +23,11 @@ class KeysController extends Controller
 
     public $controllerPublicName = 'Dichotomous key';
 
-	public $cssToLoad = array('key.css','rank-list.css','key-tree.css');
+	public $cssToLoad = array('key.css','rank-list.css','key-tree.css','colorbox/colorbox.css');
 
 	public $jsToLoad =
 		array(
-			'all' => array('key.js','jit/jit.js','jit/key-tree.js',),
+			'all' => array('key.js','jit/jit.js','jit/key-tree.js','colorbox/jquery.colorbox.js'),
 			'IE' => array('jit/Extras/excanvas.js')
 		);
 
@@ -129,7 +129,7 @@ class KeysController extends Controller
 			}
 	
 			// get step's choices
-			$choices = $this->getKeystepChoices($step['id']);
+			$choices = $this->getKeystepChoices($step['id'],true);
 			
 			// update the key's breadcrumb trail
 			$this->updateKeyPath(
@@ -141,12 +141,14 @@ class KeysController extends Controller
 					'choice' => isset($this->requestData['choice']) ? $this->requestData['choice'] : null
 				)
 			);
-	
+
+			$step['content'] = nl2br($step['content']);
+
 			$this->smarty->assign('step',$step);
 	
 			$this->smarty->assign('choices',$choices);
 	
-			$this->smarty->assign('maxChoicesPerKey',$this->controllerSettings['maxChoicesPerKey']);
+			$this->smarty->assign('maxChoicesPerKeystep',$this->controllerSettings['maxChoicesPerKeystep']);
 
 		} else {
 		
@@ -664,6 +666,76 @@ class KeysController extends Controller
 	
 	}
 
+	public function processAction()
+	{
+	
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Compute taxon division'));
+		
+		if ($this->rHasVal('action','process') && !$this->isFormResubmit()) {
+
+			$d = $this->getTaxonDivision();
+
+			$_SESSION['system']['keyTaxaPerStep'] = $d['list'];
+
+			$this->smarty->assign('taxonCount',$d['taxonCount']);
+
+			$this->smarty->assign('stepCount',count((array)$d['list']));
+
+		} elseif (isset($_SESSION['system']['keyTaxaPerStep'])) {
+
+			$this->addMessage(_('Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it.'));
+
+		}
+	
+        $this->printPage();
+
+	}
+
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!isset($this->requestData['action'])) return;
+        
+        if ($this->requestData['action'] == 'get_key_step_content') {
+
+            $this->getKeystepContent();
+
+        } elseif ($this->requestData['action'] == 'save_step_title') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+
+            $this->saveKeystepContent($this->requestData,'title');
+
+        } elseif ($this->requestData['action'] == 'save_step_text') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+	
+            $this->saveKeystepContent($this->requestData,'text');
+
+        } elseif ($this->requestData['action'] == 'get_key_choice_content') {
+
+            $this->getKeystepChoiceContent();
+
+        } elseif ($this->requestData['action'] == 'save_choice_title') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+
+            $this->saveKeystepChoiceContent($this->requestData,'title');
+
+        } elseif ($this->requestData['action'] == 'save_choice_text') {
+
+			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+	
+            $this->saveKeystepChoiceContent($this->requestData,'text');
+
+        }
+		
+        $this->printPage();
+    
+    }
+
 	private function setStepsPerTaxon($choice)
 	{
 
@@ -736,76 +808,6 @@ class KeysController extends Controller
 		);
 
 	}
-
-	public function processAction()
-	{
-	
-		$this->checkAuthorisation();
-        
-        $this->setPageName( _('Compute taxon division'));
-		
-		if ($this->rHasVal('action','process') && !$this->isFormResubmit()) {
-
-			$d = $this->getTaxonDivision();
-
-			$_SESSION['system']['keyTaxaPerStep'] = $d['list'];
-
-			$this->smarty->assign('taxonCount',$d['taxonCount']);
-
-			$this->smarty->assign('stepCount',count((array)$d['list']));
-
-		} elseif (isset($_SESSION['system']['keyTaxaPerStep'])) {
-
-			$this->addMessage(_('Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it.'));
-
-		}
-	
-        $this->printPage();
-
-	}
-
-    public function ajaxInterfaceAction ()
-    {
-
-        if (!isset($this->requestData['action'])) return;
-        
-        if ($this->requestData['action'] == 'get_key_step_content') {
-
-            $this->getKeystepContent();
-
-        } elseif ($this->requestData['action'] == 'save_step_title') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-
-            $this->saveKeystepContent($this->requestData,'title');
-
-        } elseif ($this->requestData['action'] == 'save_step_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeystepContent($this->requestData,'text');
-
-        } elseif ($this->requestData['action'] == 'get_key_choice_content') {
-
-            $this->getKeystepChoiceContent();
-
-        } elseif ($this->requestData['action'] == 'save_choice_title') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-
-            $this->saveKeystepChoiceContent($this->requestData,'title');
-
-        } elseif ($this->requestData['action'] == 'save_choice_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeystepChoiceContent($this->requestData,'text');
-
-        }
-		
-        $this->printPage();
-    
-    }
 
 	private function updateKeyPath($params) 
 	{
@@ -952,7 +954,7 @@ class KeysController extends Controller
 
 	}
 
-	private function getKeyTree($refId=null)
+	private function getKeyTree($refId=null,$choiceId=null)
 	{
 	
 		$s = $refId==null ? $this->getStartKeystep() : $this->getKeystep($refId);
@@ -965,7 +967,8 @@ class KeysController extends Controller
 				'number'=>$s['number'],
 				'title'=>$s['title'],
 				'is_start'=>$s['is_start'],
-				'node' => $this->_counter++
+				'node' => $this->_counter++,
+				'referringChoiceId' => $choiceId
 			)
 		);
 
@@ -987,7 +990,7 @@ class KeysController extends Controller
 			if ($val['res_keystep_id'] && !isset($this->_stepList[$val['res_keystep_id']])) {
 
 //				$ck[$key]['children'] = $this->getKeyTree($val['res_keystep_id']);
-				$step['children'][] = $this->getKeyTree($val['res_keystep_id']);
+				$step['children'][] = $this->getKeyTree($val['res_keystep_id'],$val['id']);
 
 			} elseif ($val['res_taxon_id']) {
 			
@@ -1329,7 +1332,7 @@ class KeysController extends Controller
 	}
 
 
-	private function getKeystepChoices($step)
+	private function getKeystepChoices($step,$formatHtml=false)
 	{
 
 		$choices =  $this->models->ChoiceKeystep->_get(
@@ -1348,7 +1351,7 @@ class KeysController extends Controller
 			
 			if (isset($kcc['title'])) $choices[$key]['title'] = $kcc['title'];
 			
-			if (isset($kcc['choice_txt'])) $choices[$key]['choice_txt'] = $kcc['choice_txt'];
+			if (isset($kcc['choice_txt'])) $choices[$key]['choice_txt'] = $formatHtml ? nl2br($kcc['choice_txt']) : $kcc['choice_txt'];
 
 			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {
 			
@@ -1598,7 +1601,8 @@ class KeysController extends Controller
 						'id' => $val['id'],
 						'number' => $val['data']['number'],
 						'title' => $val['data']['title'],
-						'is_start' => $val['data']['is_start']
+						'is_start' => $val['data']['is_start'],
+						'choice' => $val['data']['referringChoiceId']
 					)
 				);
 
