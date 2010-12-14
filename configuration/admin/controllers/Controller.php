@@ -1488,8 +1488,8 @@ class Controller extends BaseClass
                 if (class_exists($t)) {
                     
                     $this->models->$t = new $t();
-
-					$this->models->$t->setLogger($this->helpers->LoggingHelper);
+					
+					if (isset($this->helpers->LoggingHelper)) $this->models->$t->setLogger($this->helpers->LoggingHelper);
                     
                 //echo $t.chr(10);
                 } else {

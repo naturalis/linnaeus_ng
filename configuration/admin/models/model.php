@@ -62,12 +62,16 @@ abstract class Model extends BaseClass
 	{
 	
 		if (!$this->doLog) return;
+		
+		if (method_exists($this->logger,'log')) {
 
-		$this->logger->log(
-			'('.($this->_projectId ? $this->_projectId : '?').') '.$msg.' ('.mysql_errno().': '.mysql_error().')',
-			$level,
-			'Model:'.get_class($this)
-		);
+			$this->logger->log(
+				'('.($this->_projectId ? $this->_projectId : '?').') '.$msg.' ('.mysql_errno().': '.mysql_error().')',
+				$level,
+				'Model:'.get_class($this)
+			);
+
+		}
 
 	}
 
