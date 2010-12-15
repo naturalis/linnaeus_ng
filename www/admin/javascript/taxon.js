@@ -423,28 +423,35 @@ function taxonDeleteData(id,name) {
 	else
 		var thisId = id;
 
+	if (thisId.length==0) return;
+
 	if (!name)
 		var thisName = $('#taxon-name').val();
 	else
 		var thisName = name;
 
 
-	if (thisId.length==0) return;
-
 	if (!allDoubleDeleteConfirm('all content in all languages for taxon',thisName)) return;
 
-	$.post(
-		"ajax_interface.php", 
-		{
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
 			'id' : thisId ,
 			'action' : 'delete_taxon' ,
 			'page' : taxonActivePage ,
 			'time': allGetTimestamp()	
-		},
-		function(data){
-			window.open('list.php','_self');
+		}),
+		type: "POST",
+		async: allAjaxAsynchMode ,
+		success: function (data) {
+			if (data=='<redirect>') {
+				window.open('delete.php?id='+thisId,'_self');
+			} else {
+				window.open('list.php','_self');
+			}
+
 		}
-	);
+	});
 
 }
 
@@ -1438,7 +1445,11 @@ function taxonSaveLanguageLabel(id,label,type) {
 
 }
 
+function taxonOrphanChangeSelect(ele) {
 
+	$('#'+ele.id.replace('parent','attach')).attr('checked',true);
+
+}
 
 
 

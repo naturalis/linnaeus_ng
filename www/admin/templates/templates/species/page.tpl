@@ -47,8 +47,7 @@
 </table>
 <br />
 {if $languages|@count==0}
-{t}You have to define at least one language in your project before you can add any categories.{/t}<br />
-<a href="../projects/data.php">{t}Define languages.{/t}</a>
+{t}You have to define at least one language in your project before you can add any categories.{/t} <a href="../projects/data.php">{t}Define languages now.{/t}</a>
 {else}
 <form method="post" action="" id="theForm">
 {if $pages|@count<$maxCategories}
