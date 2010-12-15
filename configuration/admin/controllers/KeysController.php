@@ -464,7 +464,7 @@ class KeysController extends Controller
 
 		}
 
-		$this->getTaxonTree(null);
+		$this->getTaxonTree();
 		
 		$this->getRemainingTaxa();
 

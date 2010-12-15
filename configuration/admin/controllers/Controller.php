@@ -262,7 +262,7 @@ class Controller extends BaseClass
     /**
      * Adds an error to the class's stack of errors stored in class variable 'errors'
      *
-     * @param      string or arrayu    $error    the error(s)
+     * @param      string or array    $error    the error(s)
      * @access     public
      */
     public function addError ($error,$writeToLog=false)
@@ -1008,25 +1008,64 @@ class Controller extends BaseClass
 
 	}
 
-    public function getTaxonTree($pId=null,$level=0) 
+
+    /**
+     * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
+     *
+     * function at the sam time maintains a second, non-recursive list of taxa ($this->treeList)
+     *
+     * @param      array    $params    parameters for tree formatting
+     * @access     public
+     */
+    public function getTaxonTree($params=null) 
     {
-	
+
+		// the parent_id to start with
+		$pId = isset($params['pId']) ? $params['pId'] : null;
+		// the current level of depth in the tree
+		$level = isset($params['level']) ? $params['level'] : 0;
+		// a specific rank_id to stop the recursion; taxa below this rank are omitted from the tree
+		$stopAtRankId = isset($params['stopAtRankId']) ? $params['stopAtRankId'] : null;
+		// taxa without a parent_id that are not of the uppermost rank are orphans; these can be excluded from the tree
+		$includeOrphans = isset($params['includeOrphans']) ? $params['includeOrphans'] : true;
+
+		// get all ranks defined within the project	
 		$pr = $this->getProjectRanks();
 
+		// $this->treeList an additional non-recursive list of taxa
 		if ($level==0) unset($this->treeList);
 
+		// setting the parameters for the taxon search
+		$id['project_id'] = $this->getCurrentProjectId();
+
+		if ($pId === null) {
+
+			$id['parent_id is'] = $pId;
+
+		} else {
+
+			$id['parent_id'] = $pId;
+
+		}
+
+		// decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually kingdom)
+		if ($pId === null && $includeOrphans === false) {
+
+			$id['rank_id'] = $pr[0]['id'];
+
+		}
+
+		// get the child taxa of the current parent
         $t = $this->models->Taxon->_get(
 				array(
-					'id' =>  array(
-						'project_id' => $this->getCurrentProjectId(),
-						($pId === null ? 'parent_id is' : 'parent_id') => $pId
-					),
+					'id' =>  $id,
 					'order' => 'taxon_order'
 				)
 			);
 
         foreach((array)$t as $key => $val) {
 
+			// for each taxon, look whether they a) belong to the lower taxa, and b) can be the endpoint of the key
 			foreach((array)$pr as $rankkey => $rank) {
 
 				if ($rank['id']==$val['rank_id']) {
@@ -1041,17 +1080,32 @@ class Controller extends BaseClass
 
 			}
 
+			// level is effectively the recursive depth of the taxon within the tree
 			$val['level'] = $level;
 
+			// count the kids
 			$val['sibling_count'] = count((array)$t);
 
+			// sibling_pos reflects the position amongst taxa on the same level
 			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
 
+			// fill the treelist (which is a global var)
             $this->treeList[] = $val;
 
 			$t[$key]['level'] = $level;
+			
+			// and call the next recursion for each of the children
+			if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId!=$val['rank_id'])) {
 
-			$t[$key]['children'] = $this->getTaxonTree($val['id'],$level+1);
+				$t[$key]['children'] = $this->getTaxonTree(
+					array(
+						'pId' => $val['id'],
+						'level' => $level+1,
+						'stopAtRankId' => $stopAtRankId
+					)
+				);
+
+			}
 
         }
 
@@ -1066,28 +1120,31 @@ class Controller extends BaseClass
 		$lowerTaxonOnly = isset($params['lowerTaxonOnly']) ? $params['lowerTaxonOnly'] : false;
 		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : false;
 		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
+		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
 
 		if (!$forceLookup) {
 
 			if (
-				!isset($_SESSION['project']['ranksIncludeLanguageLabels']) || 
-				$_SESSION['project']['ranksIncludeLanguageLabels']!=$includeLanguageLabels ||
-				!isset($_SESSION['project']['ranksLowerTaxonOnly']) || 
-				$_SESSION['project']['ranksLowerTaxonOnly']!=$lowerTaxonOnly ||
-				!isset($_SESSION['project']['keypathEndpoint']) || 
-				$_SESSION['project']['keypathEndpoint']!=$keypathEndpoint
+				!isset($_SESSION['project']['ranks']['includeLanguageLabels']) || 
+				$_SESSION['project']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
+				!isset($_SESSION['project']['ranks']['lowerTaxonOnly']) || 
+				$_SESSION['project']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
+				!isset($_SESSION['project']['ranks']['keypathEndpoint']) || 
+				$_SESSION['project']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
+				!isset($_SESSION['project']['ranks']['idsAsIndex']) || 
+				$_SESSION['project']['ranks']['idsAsIndex']!=$idsAsIndex
 				)
 
 				$forceLookup = true;
 
 		}
 
-		
-		$_SESSION['project']['ranksIncludeLanguageLabels'] = $includeLanguageLabels;
-		$_SESSION['project']['ranksLowerTaxonOnly'] = $lowerTaxonOnly;
-		$_SESSION['project']['keypathEndpoint'] = $keypathEndpoint;
+		$_SESSION['project']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
+		$_SESSION['project']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
+		$_SESSION['project']['ranks']['keypathEndpoint'] = $keypathEndpoint;
+		$_SESSION['project']['ranks']['idsAsIndex'] = $idsAsIndex;
 
-		if (!isset($_SESSION['project']['projectRanks']) || $forceLookup) {
+		if (!isset($_SESSION['project']['ranks']['projectRanks']) || $forceLookup) {
 
 			if ($keypathEndpoint)
 				$d = array('project_id' => $this->getCurrentProjectId(),'keypath_endpoint' => 1);
@@ -1096,7 +1153,15 @@ class Controller extends BaseClass
 			else
 				$d = array('project_id' => $this->getCurrentProjectId());
 
-			$pr = $this->models->ProjectRank->_get(array('id' => $d,'order' => 'rank_id'));
+			$p = array('id' => $d,'order' => 'rank_id');
+			
+			if ($idsAsIndex) {
+
+				$p['fieldAsIndex'] = 'id';
+
+			}
+
+			$pr = $this->models->ProjectRank->_get($p);
 
 			foreach((array)$pr as $rankkey => $rank) {
 	
@@ -1129,16 +1194,17 @@ class Controller extends BaseClass
 	
 			}
 			
-			$_SESSION['project']['projectRanks'] = $pr;
+			$_SESSION['project']['ranks']['projectRanks'] = $pr;
 			
 		}
 
-		return $_SESSION['project']['projectRanks'];
+		return $_SESSION['project']['ranks']['projectRanks'];
 
 	}
 
 	public function getAllLanguages()
     {
+
 		/*
         $languages = array_merge(
 			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
@@ -1856,17 +1922,21 @@ class Controller extends BaseClass
 		// is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
 		if ($this->getControllerBaseName()=='') return true;
 
-        $d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()];
-		
-        foreach ((array) $d as $key => $val) {
-            
-            if ($val == '*' || $val == $this->getViewName()) {
-                
-                return true;
-            
-            }
-        
-        }
+		if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()])) {
+
+			$d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()];
+			
+			foreach ((array) $d as $key => $val) {
+				
+				if ($val == '*' || $val == $this->getViewName()) {
+					
+					return true;
+				
+				}
+			
+			}
+
+		}
         
         return false;
     
