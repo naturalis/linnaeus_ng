@@ -59,7 +59,7 @@
 		</td>
 		{/if}
 	</tr>
-	{if $taxa[i].tree}
+	{if $taxa[i].tree} \
 		{section name=j loop=$taxa[i].tree}
 		{assign var=z value=$taxa[i].tree[j].rank_id}
 		<tr class="tr-highlight">
