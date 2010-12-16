@@ -35,7 +35,7 @@
 
 	must delete link taxa - ranks when deleting a rank
 
-	delete obsolete undo's
+	purge and limit undo!
 
 */
 
@@ -2400,7 +2400,7 @@ class SpeciesController extends Controller
         $d = $data[0];
         
         // only back up if something changed (and we ignore the 'publish' setting)
-        if ($d['content'] == $newdata['content']) return;
+        if (isset($newdata['content']) && ($d['content'] == $newdata['content'])) return;
         
         $d['save_type'] = $mode;
         
