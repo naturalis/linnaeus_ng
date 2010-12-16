@@ -1,5 +1,12 @@
 <?php
 
+/*
+
+purge and limit undo!
+
+*/
+
+
 include_once ('Controller.php');
 
 class KeysController extends Controller
@@ -13,8 +20,10 @@ class KeysController extends Controller
     public $usedModels = array(
 		'keystep',
 		'content_keystep',
+		'content_keystep_undo',
 		'choice_keystep',
-		'choice_content_keystep'
+		'choice_content_keystep',
+		'choice_content_keystep_undo', 
     );
     
     public $usedHelpers = array(
@@ -41,7 +50,7 @@ class KeysController extends Controller
     {
         
         parent::__construct();
-   
+
     }
 
     /**
@@ -1194,8 +1203,14 @@ class KeysController extends Controller
 
 			}
 
-			
+			// initiate save to undo buffer
+			$this->models->ContentKeystep->setRetainBeforeAlter();
+
+			// save choice
 			$this->models->ContentKeystep->save($d);
+
+			// save to undo buffer
+			$this->saveOldKeyData($this->models->ContentKeystep->getRetainedData(), $d, 'manual');
 
             $this->smarty->assign('returnText', '<ok>');
         
@@ -1476,8 +1491,14 @@ class KeysController extends Controller
 
 			}
 
-			
+			// initiate save to undo buffer
+			$this->models->ChoiceContentKeystep->setRetainBeforeAlter();
+
+			// save choice
 			$this->models->ChoiceContentKeystep->save($d);
+
+			// save to undo buffer
+			$this->saveOldKeyChoiceData($this->models->ChoiceContentKeystep->getRetainedData(), $d, 'manual');
 
             $this->smarty->assign('returnText', '<ok>');
         
@@ -1616,6 +1637,53 @@ class KeysController extends Controller
 	
 	}
 
+    private function saveOldKeyChoiceData($data, $newdata = false, $mode = 'auto')
+    {
+		
+        $d = $data[0];
+        
+        // only back up if something changed (and we ignore the 'publish' setting)
+        if ($newdata['content']!=false && ($d['choice_txt'] == $newdata['choice_txt'] && $d['title'] == $newdata['title'])) return;
+        
+        $d['save_type'] = $mode;
+        
+        $d['choice_content_id'] = $d['id'];
+        
+        $d['id'] = null;
+        
+        $d['choice_content_created'] = $d['created'];
+        unset($d['created']);
+        
+        $d['choice_last_change'] = $d['last_change'];
+        unset($d['last_change']);
+        
+        $this->models->ChoiceContentKeystepUndo->save($d);
+    
+    }
 
+    private function saveOldKeyData($data, $newdata = false, $mode = 'auto')
+    {
+		
+        $d = $data[0];
+        
+        // only back up if something changed (and we ignore the 'publish' setting)
+        if ((isset($d['content']) && isset($newdata['content']) && $d['content'] == $newdata['content']) &&
+			(isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title'])) return;
+
+        $d['save_type'] = $mode;
+        
+        $d['keystep_content_id'] = $d['id'];
+        
+        $d['id'] = null;
+        
+        $d['keystep_content_created'] = $d['created'];
+        unset($d['created']);
+        
+        $d['keystep_content_last_change'] = $d['last_change'];
+        unset($d['last_change']);
+
+        $this->models->ContentKeystepUndo->save($d);
+
+    }
 
 }

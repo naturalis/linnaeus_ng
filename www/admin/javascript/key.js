@@ -222,6 +222,8 @@ function keySaveData(id,language,content,action) {
 		success: function (data) {
 			if(data=='<ok>') {
 				allSetMessage(_('saved'));
+			} else {
+				alert(data);
 			}
 		}
 
