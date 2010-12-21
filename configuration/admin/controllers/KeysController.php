@@ -361,10 +361,24 @@ class KeysController extends Controller
 			if (!empty($choice['choice_img']))
 				@unlink($_SESSION['project']['paths']['project_media'].$choice['choice_img']);
 
+			$this->models->ChoiceContentKeystep->delete(
+				array(
+					'choice_id' => $choice['id'],
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+			$this->models->ChoiceContentKeystepUndo->delete(
+				array(
+					'choice_id' => $choice['id'],
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
 			$this->models->ChoiceKeystep->delete(
 				array(
 					'id' => $choice['id'],						
-					'project_id' => $this->getCurrentProjectId(),
+					'project_id' => $this->getCurrentProjectId()
 				)
 			);
 
@@ -1269,10 +1283,17 @@ class KeysController extends Controller
 		
 		foreach((array)$ck as $key => $val) {
 	
-			$a =$this->models->ChoiceContentKeystep->delete(
+			$this->models->ChoiceContentKeystep->delete(
 				array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'choice_id' => $val['id'], 
+				)
+			);
+
+			$this->models->ChoiceContentKeystepUndo->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'choice_id' => $val['id']
 				)
 			);
 
@@ -1301,6 +1322,13 @@ class KeysController extends Controller
 			array(
 				'project_id' => $this->getCurrentProjectId(), 
 				'keystep_id' => $id, 
+			)
+		);
+
+		$this->models->ContentKeystepUndo->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'keystep_id' => $id
 			)
 		);
 
