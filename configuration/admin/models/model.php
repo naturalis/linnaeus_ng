@@ -17,6 +17,7 @@ abstract class Model extends BaseClass
 	private $logger;
 	private $_projectId=false;
 	public $doLog = true;
+	private $_affectedRows = 0;
 
     public function __construct ($tableBaseName = false)
     {
@@ -62,7 +63,7 @@ abstract class Model extends BaseClass
 	{
 	
 		if (!$this->doLog) return;
-		
+
 		if (method_exists($this->logger,'log')) {
 
 			$this->logger->log(
@@ -215,7 +216,9 @@ abstract class Model extends BaseClass
         
         }
         else {
-            
+
+			$this->setAffectedRows();            
+
             $this->newId = mysql_insert_id($this->databaseConnection);
             
             return true;
@@ -272,7 +275,7 @@ abstract class Model extends BaseClass
         
         }
         
-        // this might seen odd as all the last_change columns are defined with 'ON UPDATE CURRENT_TIMESTAMP' 
+        // this might seem odd as all the last_change columns are defined with 'ON UPDATE CURRENT_TIMESTAMP' 
         // occasionally, it is necessary to update only the last_change column, as with the heartbeats table
         if (array_key_exists('last_change', $this->columns) && array_key_exists('last_change', $data)) {
             
@@ -334,7 +337,9 @@ abstract class Model extends BaseClass
         
         }
         else {
-            
+
+			$this->setAffectedRows();            
+
             return true;
         
         }
@@ -405,7 +410,9 @@ abstract class Model extends BaseClass
         
         }
         else {
-            
+
+			$this->setAffectedRows();            
+
             return true;
         
         }
@@ -466,11 +473,21 @@ abstract class Model extends BaseClass
     
     }
 
-    public function getAffectedRows ()
+			
+
+
+    public function getAffectedRows()
     {
         
-        return mysql_affected_rows();
+        return $this->_affectedRows;
     
+    }
+
+    private function setAffectedRows()
+    {
+
+		$this->_affectedRows = mysql_affected_rows($this->databaseConnection);    
+
     }
 
     public function getLastQuery ()
@@ -574,7 +591,7 @@ abstract class Model extends BaseClass
             $info = mysql_fetch_field($r, $i);
             
             if ($info) {
-                
+
                 $this->columns[$info->name] = array(
                     'blob' => $info->blob, 
                     'max_length' => $info->max_length, 
@@ -620,7 +637,7 @@ abstract class Model extends BaseClass
 
 
 
-    private function retainAlteredData ($query)
+    private function retainAlteredData($query)
     {
         
         if (!$this->retainBeforeAlter) return;
@@ -636,12 +653,13 @@ abstract class Model extends BaseClass
         }
         else if (strpos($query, 'update') === 0) {
             
+			/* this will fail if there is a string with the substring " where " somewhere in the where-clause*/
             $d = preg_split('/ where /', $query);
             
-            $q = 'select * from ' . $this->tableName . ' where ' . $d[1];
+            $q = 'select * from ' . $this->tableName . ' where ' . $d[count((array)$d)-1];
         
         }
-        
+
         if (isset($q)) {
 
             $this->setLastQuery($q);
@@ -659,7 +677,7 @@ abstract class Model extends BaseClass
     }
 
 
-    private function set ($params)
+    private function set($params)
     {
 
         /*
@@ -726,12 +744,12 @@ abstract class Model extends BaseClass
                     $query .= " and " . $col . " " . $operator . " null ";
                 
                 } elseif ($d['numeric'] == 1) {
-                    
+
                     $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
                 
                 } elseif ($d['type'] == 'datetime') {
                     
-                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
+                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(strtolower($val))."'";
                 
                 } elseif ($ignoreCase && is_string($val)) {
                     
