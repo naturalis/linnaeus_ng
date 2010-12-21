@@ -126,8 +126,8 @@ class FileUploadHelper
 
         } else {
 
-            $mt = $this->getMimeType($file['tmp_name']);
-    
+            $mt = $this->getMimeType($file['name']);
+
             $type = $this->isLegalMimeType($mt);
             
             $filesToSave = false;
@@ -231,7 +231,7 @@ class FileUploadHelper
     {
 
         $ext = strtolower(array_pop(explode('.', $filename)));
-        
+
         if (function_exists('finfo_open')) {
 
             $finfo = finfo_open(FILEINFO_MIME);
@@ -240,7 +240,8 @@ class FileUploadHelper
             
             $result = $mimetype;
 
-        } elseif (array_key_exists($ext, $this->_mime_types)) {
+        } else
+		if (array_key_exists($ext, $this->_mime_types)) {
 
             $result = $this->_mime_types[$ext];
 
@@ -344,8 +345,8 @@ class FileUploadHelper
     {
 
         // resolve the mime-type
-        $t = $this->getMimeType($oldFileName);
-        
+        $t = $this->getMimeType($currentFileName);
+
         // assess whether the mime-type is legal
         $l = $this->isLegalMimeType($t);
         
@@ -407,7 +408,6 @@ class FileUploadHelper
         $this->_errors[] = $e;
     
     }
-
 
 
 
