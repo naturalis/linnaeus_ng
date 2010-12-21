@@ -44,7 +44,7 @@
 				name="titleDefault" 
 				id="titleDefault" 
 				maxlength="64"
-				onblur="keySaveStepTitle(this.value,'default')" />
+				onblur="keySaveStepContent('default')" />
 		</td>
 	{if $session.project.languages|@count>1}
 		<td><input 
@@ -52,7 +52,7 @@
 				name="titleOther" 
 				id="titleOther" 
 				maxlength="64"
-				onblur="keySaveStepTitle(this.value,'other')" />
+				onblur="keySaveStepContent('other')" />
 		</td>
 	{/if}
 	</tr>
@@ -62,7 +62,7 @@
 				name="contentDefault" 
 				id="contentDefault" 
 				style="width:400px;height:200px;"
-				onblur="keySaveStepText(this.value,'default')" /></textarea>
+				onblur="keySaveStepContent('default')" /></textarea>
 		</td>
 	{if $session.project.languages|@count>1}
 		<td>
@@ -70,7 +70,7 @@
 				name="contentOther" 
 				id="contentOther" 
 				style="width:400px;height:200px;"
-				onblur="keySaveStepText(this.value,'other')" /></textarea>
+				onblur="keySaveStepContent('other')" /></textarea>
 		</td>
 	{/if}
 	</tr>
@@ -79,8 +79,9 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td colspan="2">
-			<input type="submit" value="{t}save{/t}" />
-			<input type="button" onclick="$('#backForm').submit();"  value="{t}back{/t}" />
+			<input type="button" onclick="keySaveStepContent('default');keySaveStepContent('other');$('#theForm').submit();" value="{t}save{/t}" />
+			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
+			<input type="button" onclick="keyStepUndo();"  value="{t}undo last save{/t}" />
 		</td>
 	</tr>
 </table>

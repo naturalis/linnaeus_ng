@@ -2,7 +2,7 @@
 
 /*
 
-purge and limit undo!
+	purge and limit undo!
 
 */
 
@@ -707,37 +707,30 @@ class KeysController extends Controller
 
         if (!isset($this->requestData['action'])) return;
         
-        if ($this->requestData['action'] == 'get_key_step_content') {
+
+        if ($this->requestData['action'] == 'get_keystep_content') {
 
             $this->getKeystepContent();
 
-        } elseif ($this->requestData['action'] == 'save_step_title') {
+        } elseif ($this->requestData['action'] == 'save_keystep_content') {
 
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+            $this->saveKeystepContent($this->requestData);
 
-            $this->saveKeystepContent($this->requestData,'title');
+        } elseif ($this->requestData['action'] == 'get_keystep_undo') {
 
-        } elseif ($this->requestData['action'] == 'save_step_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeystepContent($this->requestData,'text');
+            $this->getKeystepUndo($this->requestData);
 
         } elseif ($this->requestData['action'] == 'get_key_choice_content') {
 
             $this->getKeystepChoiceContent();
 
-        } elseif ($this->requestData['action'] == 'save_choice_title') {
+        } elseif ($this->requestData['action'] == 'save_key_choice_content') {
 
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
+            $this->saveKeystepChoiceContent($this->requestData);
 
-            $this->saveKeystepChoiceContent($this->requestData,'title');
+        } elseif ($this->requestData['action'] == 'get_key_choice_undo') {
 
-        } elseif ($this->requestData['action'] == 'save_choice_text') {
-
-			$this->requestData = $this->requestData=='-1' ? null : $this->requestData;
-	
-            $this->saveKeystepChoiceContent($this->requestData,'text');
+            $this->getKeystepChoiceUndo($this->requestData);
 
         }
 		
@@ -1166,7 +1159,7 @@ class KeysController extends Controller
 
 	}
 
-	private function saveKeystepContent ($data,$type='text')
+	private function saveKeystepContent ($data)
     {
         
         if (empty($data['language'])) {
@@ -1190,29 +1183,21 @@ class KeysController extends Controller
 					'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
 					'project_id' => $this->getCurrentProjectId(), 
 					'keystep_id' => $data['id'], 
-					'language_id' => $data['language']
+					'language_id' => $data['language'],
+					'title' => trim($data['content'][0]),
+					'content' => trim($data['content'][1])
 				);
-
-			if ($type=='title') {
-
-				$d['title'] = trim($data['content']);
-
-			} else {
-
-				$d['content'] = trim($data['content']);
-
-			}
 
 			// initiate save to undo buffer
 			$this->models->ContentKeystep->setRetainBeforeAlter();
 
-			// save choice
+			// save step
 			$this->models->ContentKeystep->save($d);
 
 			// save to undo buffer
 			$this->saveOldKeyData($this->models->ContentKeystep->getRetainedData(), $d, 'manual');
 
-            $this->smarty->assign('returnText', '<ok>');
+            $this->smarty->assign('returnText', $this->models->ContentKeystep->getAffectedRows()>0 ? _('saved') : '');
         
         }
     
@@ -1454,7 +1439,7 @@ class KeysController extends Controller
 
 	}
 
-	private function saveKeystepChoiceContent ($data,$type='text')
+	private function saveKeystepChoiceContent ($data)
     {
         
         if (empty($data['language'])) {
@@ -1475,21 +1460,13 @@ class KeysController extends Controller
 
 
 			$d = array(
-					'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
-					'project_id' => $this->getCurrentProjectId(), 
-					'choice_id' => $data['id'], 
-					'language_id' => $data['language']
-				);
-
-			if ($type=='title') {
-
-				$d['title'] = trim($data['content']);
-
-			} else {
-
-				$d['choice_txt'] = trim($data['content']);
-
-			}
+				'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'choice_id' => $data['id'], 
+				'language_id' => $data['language'],
+				'title' => trim($data['content'][0]),
+				'choice_txt' => trim($data['content'][1])
+			);
 
 			// initiate save to undo buffer
 			$this->models->ChoiceContentKeystep->setRetainBeforeAlter();
@@ -1500,7 +1477,7 @@ class KeysController extends Controller
 			// save to undo buffer
 			$this->saveOldKeyChoiceData($this->models->ChoiceContentKeystep->getRetainedData(), $d, 'manual');
 
-            $this->smarty->assign('returnText', '<ok>');
+            $this->smarty->assign('returnText', $this->models->ChoiceContentKeystep->getAffectedRows()>0 ? _('saved') : '');
         
         }
     
@@ -1637,14 +1614,21 @@ class KeysController extends Controller
 	
 	}
 
-    private function saveOldKeyChoiceData($data, $newdata = false, $mode = 'auto')
+    private function saveOldKeyChoiceData($data, $newdata=false, $mode = 'auto')
     {
+
+		// if there is no "old" data, there's nothing to undo
+		if ($data===false) return;
 		
         $d = $data[0];
-        
-        // only back up if something changed (and we ignore the 'publish' setting)
-        if ($newdata['content']!=false && ($d['choice_txt'] == $newdata['choice_txt'] && $d['title'] == $newdata['title'])) return;
-        
+
+		if ($newdata!==false && 
+			(
+				(isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title']) &&
+				(isset($d['choice_txt']) && isset($newdata['choice_txt']) && $d['choice_txt'] == $newdata['choice_txt'])
+			)
+		) return;
+
         $d['save_type'] = $mode;
         
         $d['choice_content_id'] = $d['id'];
@@ -1663,12 +1647,18 @@ class KeysController extends Controller
 
     private function saveOldKeyData($data, $newdata = false, $mode = 'auto')
     {
-		
+
+		// if there is no "old" data, there's nothing to undo
+		if ($data===false) return;
+
         $d = $data[0];
-        
-        // only back up if something changed (and we ignore the 'publish' setting)
-        if ((isset($d['content']) && isset($newdata['content']) && $d['content'] == $newdata['content']) &&
-			(isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title'])) return;
+
+		if ($newdata!==false && 
+			(
+				(isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title']) &&
+				(isset($d['content']) && isset($newdata['content']) && $d['content'] == $newdata['content'])
+			)
+		) return; 
 
         $d['save_type'] = $mode;
         
@@ -1685,5 +1675,87 @@ class KeysController extends Controller
         $this->models->ContentKeystepUndo->save($d);
 
     }
+
+	private function getKeystepUndo($data)
+	{
+
+		if (!isset($data['id'])) return;
+		
+		// determine last insert
+		$d = $this->models->ContentKeystepUndo->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $data['id']
+				),
+				'columns' => ' max(created) as last'
+			)
+		);
+
+		// retrieve data
+		$d = $this->models->ContentKeystepUndo->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keystep_id' => $data['id'],
+					'created' => $d[0]['last']
+				)
+			)
+		);
+
+
+		// delete from undo buffer
+		$this->models->ContentKeystepUndo->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'keystep_id' => $data['id'],
+				'id' => $d[0]['id']
+			)
+		);
+
+		$this->smarty->assign('returnText', json_encode($d[0]));		
+	
+	}
+
+	private function getKeystepChoiceUndo($data)
+	{
+
+		if (!isset($data['id'])) return;
+		
+		// determine last insert
+		$d = $this->models->ChoiceContentKeystepUndo->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'choice_id' => $data['id']
+				),
+				'columns' => ' max(created) as last'
+			)
+		);
+
+		// retrieve data
+		$d = $this->models->ChoiceContentKeystepUndo->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'choice_id' => $data['id'],
+					'created' => $d[0]['last']
+				)
+			)
+		);
+
+
+		// delete from undo buffer
+		$this->models->ChoiceContentKeystepUndo->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'choice_id' => $data['id'],
+				'id' => $d[0]['id']
+			)
+		);
+
+		$this->smarty->assign('returnText', json_encode($d[0]));		
+	
+	}
 
 }

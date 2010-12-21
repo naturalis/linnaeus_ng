@@ -165,9 +165,30 @@ function keyShowChoiceDetails(ele,id) {
 
 }
 
+function keySaveData(id,language,content,action) {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
+			'action' : action ,
+			'id' : id ,
+			'content' : content , 
+			'language' : language ,
+			'time' : allGetTimestamp()	
+		}),
+		type: "POST",
+		async: allAjaxAsynchMode ,
+		success: function (data) {
+			allSetMessage(data);
+		}
+
+	});
+
+}
+
 function keyGetKeystepContent(language) {
 	
-	allGeneralGetLabels(language,'get_key_step_content','keySetKeystepContent',keyStepId);
+	allGeneralGetLabels(language,'get_keystep_content','keySetKeystepContent',keyStepId);
 	
 }
 
@@ -184,58 +205,44 @@ function keySetKeystepContent(obj,language) {
 
 }
 
-function keySaveStepTitle(title,type) {
+function keySaveStepContent(type) {
 
+	if (type=='default')
+		content = [$('#titleDefault').val(),$('#contentDefault').val()];
+	else
+		content = [$('#titleOther').val(),$('#contentOther').val()];
+	
 	keySaveData(
 		keyStepId,
 		type=='default' ? allDefaultLanguage : allActiveLanguage,
-		title,
-		'save_step_title'
+		content,
+		'save_keystep_content'
 	);
 
 }
 
-function keySaveStepText(title,type) {
-
-	keySaveData(
-		keyStepId,
-		type=='default' ? allDefaultLanguage : allActiveLanguage,
-		title,
-		'save_step_text'
-	);
-
-}
-
-function keySaveData(id,language,content,action) {
-
-	$.ajax({
-		url : "ajax_interface.php",
-		data : ({
-			'action' : action ,
-			'id' : id ,
-			'content' : content , 
-			'language' : language ,
-			'time' : allGetTimestamp()	
-		}),
-		type: "POST",
-		async: allAjaxAsynchMode ,
-		success: function (data) {
-			if(data=='<ok>') {
-				allSetMessage(_('saved'));
-			} else {
-				alert(data);
-			}
-		}
-
-	});
-
-}
 
 function keyDeleteKeyStep() {
 
 	if (!allDoubleDeleteConfirm(_('keystep'),$('#key-title').html())) return;
 
 	$('#delForm').submit();
+
+}
+
+function keySaveChoiceContent(type) {
+
+	if (type=='default')
+		content = [$('#titleDefault').val(),$('#contentDefault').val()];
+	else
+		content = [$('#titleOther').val(),$('#contentOther').val()];
+
+	keySaveData(
+		keyChoiceId,
+		type=='default' ? allDefaultLanguage : allActiveLanguage,
+		content,
+		'save_key_choice_content'
+	);
 
 }
 
@@ -255,28 +262,6 @@ function keySetChoiceContent(obj,language) {
 		$('#titleOther').val(obj ? obj.title : '');
 		$('#contentOther').val(obj ? obj.choice_txt : '');
 	}
-
-}
-
-function keySaveChoiceTitle(title,type) {
-
-	keySaveData(
-		keyChoiceId,
-		type=='default' ? allDefaultLanguage : allActiveLanguage,
-		title,
-		'save_choice_title'
-	);
-
-}
-
-function keySaveChoiceText(title,type) {
-
-	keySaveData(
-		keyChoiceId,
-		type=='default' ? allDefaultLanguage : allActiveLanguage,
-		title,
-		'save_choice_text'
-	);
 
 }
 
@@ -311,10 +296,60 @@ function keyChoiceShowImage(url,name) {
 
 }
 
+function keyStepUndo() {
+
+	allGeneralGetLabels(allDefaultLanguage,'get_keystep_undo','keyRestoreStep',keyStepId);
+
+}
+
+function keyRestoreStep(obj,language) {
+
+	if (obj==null) {
+		allSetMessage(_('nothing to restore'));
+		return;
+	}
+
+	if (obj.language_id==allDefaultLanguage) {
+		$('#titleDefault').val(obj ? obj.title : '');
+		$('#contentDefault').val(obj ? obj.content : '');
+	} else {
+		allActiveLanguage = obj.language_id;
+		allDrawRankLanguages();
+		$('#titleOther').val(obj ? obj.title : '');
+		$('#contentOther').val(obj ? obj.content : '');
+	}
+	
+	allSetMessage(_('restored'));
+
+}
+
+function keyChoiceUndo() {
+
+	allGeneralGetLabels(allDefaultLanguage,'get_key_choice_undo','keyRestoreChoice',keyChoiceId);
 
 
+}
 
+function keyRestoreChoice(obj,language) {
 
+	if (obj==null) {
+		allSetMessage(_('nothing to restore'));
+		return;
+	}
+
+	if (obj.language_id==allDefaultLanguage) {
+		$('#titleDefault').val(obj ? obj.title : '');
+		$('#contentDefault').val(obj ? obj.choice_txt : '');
+	} else {
+		allActiveLanguage = obj.language_id;
+		allDrawRankLanguages();
+		$('#titleOther').val(obj ? obj.title : '');
+		$('#contentOther').val(obj ? obj.choice_txt : '');
+	}
+	
+	allSetMessage(_('restored'));
+
+}
 
 
 

@@ -11,8 +11,6 @@
 <span class="key-step-title">
 <span id="message-container" style="float:right;"></span><br />
 
-
-
 <fieldset>
 <legend>{t}Editing choice{/t} "<span id="default-choice-title">...</span>"</legend>
 <table style="border-collapse:collapse">
@@ -36,7 +34,7 @@
 				name="titleDefault" 
 				id="titleDefault" 
 				maxlength="64"
-				onblur="keySaveChoiceTitle(this.value,'default')" />
+				onblur="keySaveChoiceContent('default')" />
 		</td>
 	{if $session.project.languages|@count>1}
 		<td>
@@ -45,7 +43,7 @@
 				name="titleOther" 
 				id="titleOther" 
 				maxlength="64"
-				onblur="keySaveChoiceTitle(this.value,'other')" />
+				onblur="keySaveChoiceContent('other')" />
 		</td>
 	{/if}
 	</tr>
@@ -56,7 +54,7 @@
 				name="contentDefault" 
 				id="contentDefault" 
 				style="width:400px;height:200px;"
-				onblur="keySaveChoiceText(this.value,'default')" /></textarea>
+				onblur="keySaveChoiceContent('default')" /></textarea>
 		</td>
 	{if $session.project.languages|@count>1}
 		<td>
@@ -64,7 +62,7 @@
 				name="contentOther" 
 				id="contentOther" 
 				style="width:400px;height:200px;"
-				onblur="keySaveChoiceText(this.value,'other')" /></textarea>
+				onblur="keySaveChoiceContent('other')" /></textarea>
 		</td>
 	{/if}
 	</tr>
@@ -130,7 +128,8 @@
 		<td colspan="3">
 			<input type="button" onclick="keyChoiceSave();" value="{t}save{/t}" />
 			<!-- input type="button" onclick="keyChoiceDelete()" value="{t}delete{/t}" / -->
-			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />
+			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
+			<input type="button" onclick="keyChoiceUndo();"  value="{t}undo last save{/t}" />
 		</td>
 	</tr>
 </table>
