@@ -2,15 +2,15 @@
 
 <div id="page-main">
 <p>
-{t}"Key subsections" are parts of the dichotomous key that are not connected to the entire key. Put differently, they are steps that are not the starting step of your key, nor the target of any choice in another step. By creating subsections, different collaborators can work on specific parts of the key, which are later "hooked up" to the main key.{/t}
+{t}"Key sections" are parts of the dichotomous key that are not connected to the entire key. Put differently, they are steps that are not the starting step of your key, nor the target of any choice in another step. By creating sections, different collaborators can work on specific parts of the key, which are later hooked up to the main key.{/t}
 </p>
 {if $keySections|@count==0}
 <p>
-{t}No key subsections are available.{/t}
+{t}No key sections are available.{/t}
 </p>
 {else}
 <p>
-{t}Available subsections (click to edit):{/t}
+{t}Available sections (click to edit):{/t}
 </p>
 <ul>
 {section name=i loop=$keySections}
