@@ -441,9 +441,11 @@ class KeysController extends Controller
 
 				$choice['res_taxon_id'] = $this->requestData['res_taxon_id'];
 	
-				$this->addMessage(_('Saved.'));
+				//$this->addMessage(_('Saved.'));
 
-			}
+			} 
+
+			$this->redirect('step_show.php?id='.$step['id']);
 
 		}
 
@@ -523,7 +525,7 @@ class KeysController extends Controller
 
 		}
         
-        $this->setPageName( _('Key subsections'));
+        $this->setPageName( _('Key sections'));
 
 		// get all keys that have is_start = 0
 		$l = $this->models->Keystep->_get(

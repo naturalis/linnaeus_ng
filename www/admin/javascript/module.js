@@ -378,7 +378,7 @@ function moduleChangeModuleUserStatus(module,user,action,type) {
 
 			}
 
-		}
+		} 
 	});
 
 }

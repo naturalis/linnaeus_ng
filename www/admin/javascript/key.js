@@ -16,10 +16,14 @@ function keyToggleFullKeyPath() {
 
 function keyChoiceSave() {
 	
-	if ($('#titleDefault').val().trim()=='') alert(_('You have to enter a title for this choice'));
-
-	$('#theForm').submit();
-
+	if ($('#titleDefault').val().trim()=='') {
+		alert(_('You have to enter a title for this choice'));
+		$('#titleDefault').focus();
+	} else {
+		keySaveChoiceContent('default');
+		keySaveChoiceContent('other');
+		$('#theForm').submit();
+	}
 }
 
 
