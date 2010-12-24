@@ -673,7 +673,7 @@ class KeysController extends Controller
 
 			$kc = $this->getKeystepChoice($val['id']);
 
-			$deadChoices[$key]['title'] = $kc['title'];
+			$deadChoices[$key]['title'] = isset($kc['title']) ? $kc['title'] : '...';
 	
 		}
 		
