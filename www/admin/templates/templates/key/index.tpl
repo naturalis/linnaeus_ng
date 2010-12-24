@@ -5,9 +5,9 @@
 {t}Each project can have one dichotomous key. That key consists of a theoretically unlimited number of steps. Each step consists of a number, a title and a description, plus a maximum of four choices. Each choice consists of a title and a text and/or an image. Also, each choice has a target: the connection to the next element within the key. The target can either be another step, or a taxon.{/t}
 </p>
 <p>
-{t}You can edit the key from the startpoint, following it's structure as the users will see it. Additionally, you can create sections of your key that are not yet connected to the main key. In that way, several people can work on different parts of the key at the same time. Once finished, a section can be hooked up to the main key by simply choosing the section's starting step as the target of a choice already part of the main key.{/t}
+{t}You can edit the key from the startpoint, following its structure as the users will see it. Additionally, you can create sections of your key that are not yet connected to the main key. In that way, several people can work on different parts of the key at the same time. Once finished, a section can be hooked up to the main key by simply choosing the sections starting step as the target of a choice already part of the main key.{/t}
 </p>
-{t _s1=&nabla;}While navigating through your key or key sections, a keypath is maintained at the top of the screen, just beneath the navigational breadcrumb trail. You can navigate within your key by clicking elements in the keypath. As the keypath can become quite large, only the last few elements are show. To see the complete keypath, click the %s symbol at it's very beginning.{/t}
+{t _s1=&nabla;}While navigating through your key or key sections, a keypath is maintained at the top of the screen, just beneath the navigational breadcrumb trail. You can navigate within your key by clicking elements in the keypath. As the keypath can become quite large, only the last few elements are show. To see the complete keypath, click the %s symbol at its very beginning.{/t}
 
 <ul class="admin-list">
 	<li><a href="step_show.php">{t}Edit key (from startpoint){/t}</a></li>

@@ -1,4 +1,10 @@
 <?php
+/*
+
+- setRequestData needs recursion for the arrays
+
+*/
+
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 
@@ -1446,22 +1452,31 @@ class Controller extends BaseClass
 	
 			foreach ((array) $this->requestData as $key => $val) {
 				
-				if (get_magic_quotes_gpc()) {
+				if (is_array($val)) {
 
-					if (is_array($val)) {
+					foreach ((array) $val as $key2 => $val2) {
 
-						foreach ((array) $val as $key2 => $val2) {
+						if (is_array($val2)) {
+		
+							foreach ((array) $val2 as $key3 => $val3) {
+		
+								$this->requestData[$key][$key2][$key3] = get_magic_quotes_gpc() ? stripslashes($val3) : $val3;
+		
+							}
+		
+						} else {
+		
+							$this->requestData[$key][$key2] = get_magic_quotes_gpc() ? stripslashes($val2) : $val2;
+		
+						}				
 
-							$this->requestData[$key][$key2] = stripslashes($val2);
+					}
 
-						}
+				} else {
 
-					} else {
+					$this->requestData[$key] = get_magic_quotes_gpc() ? stripslashes($val) : $val;
 
-						$this->requestData[$key] = stripslashes($val);
-
-					}				
-				}
+				}				
 	
 			}
 
