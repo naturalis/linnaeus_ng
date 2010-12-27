@@ -35,6 +35,8 @@
 
 	must delete link taxa - ranks when deleting a rank
 
+	must delete link taxa - literature when deleting a taxon
+
 	purge and limit undo!
 
 */
@@ -64,7 +66,9 @@ class SpeciesController extends Controller
 		'synonym',
 		'commonname',
 		'label_language',
-		'choice_keystep' 
+		'choice_keystep' ,
+		'literature',
+		'literature_taxon'
     );
     
     public $usedHelpers = array(
@@ -121,6 +125,8 @@ class SpeciesController extends Controller
         
 		if (count((array)$_SESSION['project']['languages'])==0)
 			$this->addError(sprintf(_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),'<a href="../projects/data.php">','</a>'));
+
+		unset($_SESSION['system']['literature']['taxon']);
 		
         $this->printPage();
   
@@ -658,6 +664,8 @@ class SpeciesController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Taxon list'));
+		
+		unset($_SESSION['system']['literature']['taxon']);
 
 		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
 		// moving branches up and down the stem
@@ -753,6 +761,8 @@ class SpeciesController extends Controller
 
 			$mediaCount = $this->getTaxaMediaCount();
 
+			$literatureCount = $this->getTaxaLiteratureCount();
+
 			foreach ((array) $taxa as $key => $taxon) {
 
 				if (isset($rl[$taxon['rank_id']])) {
@@ -771,6 +781,8 @@ class SpeciesController extends Controller
 					$taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
 
 					$taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
+
+					$taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
 
 					$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
 					
@@ -823,6 +835,93 @@ class SpeciesController extends Controller
     
     }
 
+    /**
+     * See and maintain literary references
+     *
+     * @access    public
+     */
+    public function literatureAction ()
+    {
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Taxon list'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            )
+        );
+
+        if ($this->rHasId()) {
+        // get existing taxon name
+		
+            $taxon = $this->getTaxonById();
+
+			$_SESSION['system']['literature']['taxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+
+            $this->setPageName(sprintf(_('Literature for "%s"'),$taxon['taxon']));
+
+            $this->smarty->assign('id',$this->requestData['id']);
+
+			$lt = $this->models->LiteratureTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $this->requestData['id']
+					),
+				)
+			);
+		
+			foreach((array)$lt as $key => $val) {
+	
+				$l = $this->models->Literature->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'id' => $val['literature_id']
+						),
+						'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
+					)
+				);
+				
+				$refs[] = $l[0];
+	
+			}
+
+			// user requested a sort of the table
+			if ($this->rHasVal('key')) {
+	
+				$sortBy = array(
+					'key' => $this->requestData['key'], 
+					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+					'case' => 'i'
+				);
+
+			} else {
+	
+				$sortBy = array(
+					'key' => 'author_first', 
+					'dir' => 'asc', 
+					'case' => 'i'
+				);
+		
+			}
+
+			$this->customSortArray($refs, $sortBy);	
+
+			$this->smarty->assign('sortBy', $sortBy);
+
+            if (isset($refs)) $this->smarty->assign('refs',$refs);
+
+        } else {
+
+            $this->addError(_('No taxon specified.'));
+
+        } 
+        
+        $this->printPage();
+
+    }
 
     /**
      * See and maintain media for a taxon
@@ -3865,8 +3964,29 @@ class SpeciesController extends Controller
 		return isset($d) ? $d : 0;
 
 	}
-					
-						
+
+
+	private function getTaxaLiteratureCount()
+	{
+
+		$lt = $this->models->LiteratureTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total, taxon_id',
+				'group' => 'taxon_id'
+			)
+		);
+	
+		foreach((array)$lt as $key => $val) {
+
+			$d[$val['taxon_id']] = $val['total'];
+
+		}
+		
+		return isset($d) ? $d : 0;
+	
+	}
+
 	private function getTaxonSynonymsById($id=false)
 	{
 	
