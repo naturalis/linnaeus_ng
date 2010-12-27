@@ -268,6 +268,13 @@ class configuration
 
     }
 
+    public function getControllerSettingsLiterature()
+    {
+
+        return array('allowedTags' => '<i>');
+
+    }
+
     public function getDatabaseSettings ()
     {
         

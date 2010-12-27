@@ -83,13 +83,13 @@ function allDoubleDeleteConfirm(element,name) {
 
 	if (confirm(
 		sprintf(_('Are you sure you want to delete %s "%s"?'),element,name)+"\n"+
-		_('All corresponding data will be irreversibly deleted.')
+		_('Deletion will be irreversibly.')
 		)) {
 	
 		return (confirm(
 			_('Final confirmation:')+"\n"+
 			sprintf(_('Are you sure you want to delete %s "%s"?'),element,name)+"\n"+
-			_('ALL CORRESPONDING DATA WILL BE IRREVERSIBLY DELETED.')
+			_('DELETION WILL BE IRREVERSIBLY.')
 			));
 	
 	} else {

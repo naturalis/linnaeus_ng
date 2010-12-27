@@ -50,8 +50,7 @@
 </table>
 
 <div id="floating-div" style="position:absolute;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />
-<div id="selected-ranks"></span>
-</div>
+<div id="selected-ranks"></div>
 
 </form>
 
