@@ -35,8 +35,6 @@
 
 	must delete link taxa - ranks when deleting a rank
 
-	must delete link taxa - literature when deleting a taxon
-
 	purge and limit undo!
 
 */
@@ -2751,6 +2749,14 @@ class SpeciesController extends Controller
 	{
 	
 		if (!$id) return;
+
+		// delete literary references
+		$this->models->LiteratureTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id
+			)
+		);
 
 		// reset keychoice end-points
 		$this->models->ChoiceKeystep->update(
