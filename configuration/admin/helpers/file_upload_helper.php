@@ -126,7 +126,7 @@ class FileUploadHelper
 
         } else {
 
-            $mt = $this->getMimeType($file['name']);
+            $mt = $this->getMimeType($file['name'],$file['tmp_name']);
 
             $type = $this->isLegalMimeType($mt);
             
@@ -227,21 +227,21 @@ class FileUploadHelper
 
     }
 
-    private function getMimeType ($filename)
+    private function getMimeType ($filename,$tmpFileName)
     {
-
-        $ext = strtolower(array_pop(explode('.', $filename)));
 
         if (function_exists('finfo_open')) {
 
             $finfo = finfo_open(FILEINFO_MIME);
-            $mimetype = finfo_file($finfo, $filename);
+            $mimetype = finfo_file($finfo, $tmpFileName);
             finfo_close($finfo);
             
             $result = $mimetype;
 
         } else
 		if (array_key_exists($ext, $this->_mime_types)) {
+
+	        $ext = strtolower(array_pop(explode('.', $filename)));
 
             $result = $this->_mime_types[$ext];
 
@@ -344,8 +344,8 @@ class FileUploadHelper
     private function doTaxonMediaUpload ($oldFileName,$currentFileName)
     {
 
-        // resolve the mime-type
-        $t = $this->getMimeType($currentFileName);
+		// resolve the mime-type
+        $t = $this->getMimeType($currentFileName,$oldFileName);
 
         // assess whether the mime-type is legal
         $l = $this->isLegalMimeType($t);
