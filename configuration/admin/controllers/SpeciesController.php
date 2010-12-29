@@ -439,10 +439,17 @@ class SpeciesController extends Controller
 				
 				// determine the page_id the page will open in
 				$startPage = $this->rHasVal('page') ? $this->requestData['page'] : $defaultPage;
-				
-				if (isset($taxon))
+
+				if (isset($taxon)) {
+
 					$this->smarty->assign('taxon', $taxon);
-	
+
+					$this->smarty->assign('media', addslashes(json_encode($this->getTaxonMedia($taxon['id']))));
+
+					$this->smarty->assign('literature', addslashes(json_encode($this->getTaxonLiterature($taxon['id']))));
+					
+				}
+
 				$this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
 				
 				$this->smarty->assign('pages', $tp);
@@ -861,31 +868,8 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('id',$this->requestData['id']);
 
-			$lt = $this->models->LiteratureTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id']
-					),
-				)
-			);
+			$refs = $this->getTaxonLiterature($taxon['id']);
 		
-			foreach((array)$lt as $key => $val) {
-	
-				$l = $this->models->Literature->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => $val['literature_id']
-						),
-						'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
-					)
-				);
-				
-				$refs[] = $l[0];
-	
-			}
-
 			// user requested a sort of the table
 			if ($this->rHasVal('key')) {
 	
@@ -947,15 +931,7 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('id',$this->requestData['id']);
 
-            $media = $this->models->MediaTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $this->requestData['id']
-					),
-					'odrder' => 'mime_type, file_name'
-				)
-            );
+            $media = $this->getTaxonMedia($this->requestData['id']);
 
             foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
 
@@ -4013,6 +3989,51 @@ class SpeciesController extends Controller
 	
 	}
 
+	private function getTaxonMedia($id)
+	{
 
+		return $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id
+				),
+				'order' => 'mime_type, file_name'
+			)
+		);
+
+	}
+
+	private function getTaxonLiterature($id)
+	{
+
+		$lt =  $this->models->LiteratureTaxon->_get(
+			array(
+				'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $id
+					),
+				)
+			);
+
+		foreach((array)$lt as $key => $val) {
+
+			$l = $this->models->Literature->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['literature_id']
+					),
+					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
+				)
+			);
+			
+			$refs[] = $l[0];
+
+		}
+		
+		return $refs;
+
+	}
 }
 

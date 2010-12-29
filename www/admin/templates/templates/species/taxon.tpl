@@ -35,7 +35,6 @@
 		<span id="taxon-language-default-publish"></span>
 	</div>
 	
-	
 	<textarea name="content-default" style="width:900px;height:500px;" id="taxon-content-default"></textarea>
 	<br />
 	{if $languages|@count > 1}
@@ -83,6 +82,8 @@ $(document).ready(function(){
 
 	allSetAutoSaveFreq({$autosaveFrequency});
 	taxonRunAutoSave();
+
+	initTinyMce('{$literature}','{$media}');
 
 {literal}	
 });
