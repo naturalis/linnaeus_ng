@@ -1,11 +1,14 @@
 <?php
 
 /*
-unset session dinges
-on
-  save
-  delete
-  update
+
+	unset session dinges
+	on
+	  save
+	  delete
+	  update
+	
+	case-sensitivity in getReferences because strtolower() on urdu seems to mess up characters
 
 */
 
@@ -148,7 +151,8 @@ class LiteratureController extends Controller
 					'author_first like' => $thisStr.'%',
 					'fieldAsIndex' => 'author_first'
 				),
-				'columns' => 'distinct author_first as author'
+				'columns' => 'distinct author_first as author',
+				'fieldAsIndex' => 'author'
 			)
 		);
 
@@ -159,10 +163,11 @@ class LiteratureController extends Controller
 					'author_second like' => $thisStr.'%',
 					'fieldAsIndex' => 'author_second'
 				),
-				'columns' => 'distinct author_second as author'
+				'columns' => 'distinct author_second as author',
+				'fieldAsIndex' => 'author'
 			)
 		);
-		
+
 		$auths = array_merge((array)$l1,(array)$l2);
 
         $this->customSortArray($auths, array(
@@ -219,6 +224,14 @@ class LiteratureController extends Controller
     
         $this->checkAuthorisation();
 
+		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['literature']['newRef'])) {
+		// referred from the taxon content editing page
+
+			$_SESSION['system']['literature']['newRef'] = '<new>';
+
+		}
+
+
 		if ($this->rHasId()) $ref = $this->getReference();
 
 		if (isset($ref)) {
@@ -236,9 +249,9 @@ class LiteratureController extends Controller
 
     	    $this->setPageName(_('New literary reference'));
 			
-			if(isset($_SESSION['system']['literature']['taxon'])) {
+			if(isset($_SESSION['system']['activeTaxon'])) {
 
-				$ref['taxa'][] = $_SESSION['system']['literature']['taxon'];
+				$ref['taxa'][] = $_SESSION['system']['activeTaxon'];
 
 			}
 
@@ -304,9 +317,24 @@ class LiteratureController extends Controller
 				
 				unset($_SESSION['system']['literature']['alpha']);
 
-				if(isset($_SESSION['system']['literature']['taxon'])) {
+				if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] == '<new>') {
 
-					$this->redirect('../species/literature.php?id='.$_SESSION['system']['literature']['taxon']['taxon_id']);
+					$_SESSION['system']['literature']['newRef'] =
+						'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('.$id.');">'.
+						$data['author_first'].
+						(isset($data['author_second']) ?
+							' &amp; '.$data['author_second'] :
+							($data['author_second']=='1' ? _(' et al.') : '' )
+						).
+						' ('.$this->requestData['year'].')'.
+						'</span>';
+
+					$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
+
+				} else
+				if(isset($_SESSION['system']['activeTaxon'])) {
+
+					$this->redirect('../species/literature.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
 
 				} else {
 
@@ -471,7 +499,8 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
+					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both',
+					'ignoreCase' => false
 				)
 			);
 

@@ -43,8 +43,6 @@ abstract class Model extends BaseClass
     
     }
 
-
-
     public function __destruct ()
     {
         
@@ -58,25 +56,6 @@ abstract class Model extends BaseClass
     
     }
 	
-	
-	private function log($msg,$level=0)
-	{
-	
-		if (!$this->doLog) return;
-
-		if (method_exists($this->logger,'log')) {
-
-			$this->logger->log(
-				'('.($this->_projectId ? $this->_projectId : '?').') '.$msg.' ('.mysql_errno().': '.mysql_error().')',
-				$level,
-				'Model:'.get_class($this)
-			);
-
-		}
-
-	}
-
-
 	public function setLogger($logger)
 	{
 
@@ -112,7 +91,7 @@ abstract class Model extends BaseClass
 
 
 
-    public function save ($data)
+    public function save($data)
     {
 
 		
@@ -459,7 +438,6 @@ abstract class Model extends BaseClass
     }
 
 
-
     /**
      * Returns the id of a newly inserted row
      *
@@ -473,9 +451,6 @@ abstract class Model extends BaseClass
     
     }
 
-			
-
-
     public function getAffectedRows()
     {
         
@@ -483,17 +458,39 @@ abstract class Model extends BaseClass
     
     }
 
-    private function setAffectedRows()
-    {
-
-		$this->_affectedRows = mysql_affected_rows($this->databaseConnection);    
-
-    }
-
     public function getLastQuery ()
     {
         
         return $this->lastQuery;
+    
+    }
+
+
+    public function execute ($query)
+    {
+        
+		$query = str_replace('%table%', $this->tableName, $query);
+
+		$this->retainAlteredData($query);
+		
+		$this->setLastQuery($query);
+		
+		$result = mysql_query($query);
+
+		if (!$result) {
+		
+			$this->log('Failed query: '.$query,2);
+			
+			return mysql_error($this->databaseConnection);
+		
+		}
+		else {
+		
+			$this->setAffectedRows();            
+			
+			return true;
+		
+		}
     
     }
 
@@ -507,6 +504,30 @@ abstract class Model extends BaseClass
     }
 
 
+	private function log($msg,$level=0)
+	{
+	
+		if (!$this->doLog) return;
+
+		if (method_exists($this->logger,'log')) {
+
+			$this->logger->log(
+				'('.($this->_projectId ? $this->_projectId : '?').') '.$msg.' ('.mysql_errno().': '.mysql_error().')',
+				$level,
+				'Model:'.get_class($this)
+			);
+
+		}
+
+	}
+
+
+    private function setAffectedRows()
+    {
+
+		$this->_affectedRows = mysql_affected_rows($this->databaseConnection);    
+
+    }
 
     private function isDateTimeFunction ($val)
     {
