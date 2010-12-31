@@ -20,6 +20,9 @@
 		- translate sections *
 		  (must be done before editing taxa because they actively influence the content)
 		- edit taxa
+		
+		- check project specific css
+		- check project specific JS (taxonContentOpenMediaLink etc.)
 
   
     tinyMCE
@@ -36,6 +39,8 @@
 	must delete link taxa - ranks when deleting a rank
 
 	purge and limit undo!
+	
+	[new litref] is hardcoded
 
 */
 
@@ -124,7 +129,7 @@ class SpeciesController extends Controller
 		if (count((array)$_SESSION['project']['languages'])==0)
 			$this->addError(sprintf(_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),'<a href="../projects/data.php">','</a>'));
 
-		unset($_SESSION['system']['literature']['taxon']);
+		unset($_SESSION['system']['activeTaxon']);
 		
         $this->printPage();
   
@@ -394,10 +399,50 @@ class SpeciesController extends Controller
         );
 		
         if ($this->rHasId()) {
-        // get existing taxon name
+        // get existing taxon
 
             $taxon = $this->getTaxonById();
             
+//
+
+if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] != '<new>') {
+
+	$this->models->ContentTaxon->execute(
+		'update %table% 
+			set content = replace(content,"[new litref]","'. mysql_real_escape_string($_SESSION['system']['literature']['newRef']) .'")
+			where project_id = '.$this->getCurrentProjectId().'
+			and taxon_id = '. $this->requestData['id']
+	);
+
+}
+
+if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] != '<new>') {
+
+	$this->models->ContentTaxon->execute(
+		'update %table% 
+			set content = replace(content,"[new media]","'. mysql_real_escape_string($_SESSION['system']['media']['newRef']) .'")
+			where project_id = '.$this->getCurrentProjectId().'
+			and taxon_id = '. $this->requestData['id']
+	);
+
+}
+
+$this->models->ContentTaxon->execute(
+	'update %table% 
+		set content = replace(replace(content,"[new litref]",""),"[new media]","")
+		where project_id = '.$this->getCurrentProjectId().'
+		and taxon_id = '. $this->requestData['id']
+);
+
+unset($_SESSION['system']['literature']['newRef']);
+unset($_SESSION['system']['media']['newRef']);
+
+
+//
+			
+			
+			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+
             $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
 
 			if (!$this->doLockOutUser($this->requestData['id'])) {
@@ -573,7 +618,6 @@ class SpeciesController extends Controller
 	}
 
 
-
     /**
      * 
      *
@@ -670,7 +714,7 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon list'));
 		
-		unset($_SESSION['system']['literature']['taxon']);
+		unset($_SESSION['system']['activeTaxon']);
 
 		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
 		// moving branches up and down the stem
@@ -862,7 +906,7 @@ class SpeciesController extends Controller
 		
             $taxon = $this->getTaxonById();
 
-			$_SESSION['system']['literature']['taxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
             $this->setPageName(sprintf(_('Literature for "%s"'),$taxon['taxon']));
 
@@ -993,6 +1037,15 @@ class SpeciesController extends Controller
             )
         );
 
+		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['media']['newRef'])) {
+		// referred from the taxon content editing page
+
+			$_SESSION['system']['media']['newRef'] = '<new>';
+
+			$this->requestData['id'] = $_SESSION['system']['activeTaxon']['taxon_id'];
+
+		}
+
         if ($this->rHasId()) {
         // get existing taxon name
 
@@ -1010,9 +1063,11 @@ class SpeciesController extends Controller
     
                     $this->addError($this->helpers->FileUploadHelper->getErrors());
                     $filesToSave = $this->helpers->FileUploadHelper->getResult();
+					
+					$firstInsert = false;
     
                     if ($filesToSave) {
-    
+
                         foreach((array)$filesToSave as $key => $file) {
 
                             $thumb = false;
@@ -1047,6 +1102,12 @@ class SpeciesController extends Controller
                                     'thumb_name' => $thumb ? $thumb : null,
                                 )
                             );
+							
+							if (!$firstInsert) {
+							
+								$firstInsert = array('id'=>$this->models->MediaTaxon->getNewId(),'name'=>$file['name']);
+
+							}
                 
                             if ($mt) {
                                  
@@ -1059,7 +1120,18 @@ class SpeciesController extends Controller
                             }
                 
                         }
-            
+
+						if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] == '<new>') {
+		
+							$_SESSION['system']['media']['newRef'] =
+								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
+									$firstInsert['name'].
+								'</span>';
+		
+							$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
+		
+						}
+
                     }
 
                 }
@@ -4031,7 +4103,15 @@ class SpeciesController extends Controller
 			$refs[] = $l[0];
 
 		}
-		
+
+		$sortBy = array(
+			'key' => 'author_first', 
+			'dir' => 'asc', 
+			'case' => 'i'
+		);
+
+		$this->customSortArray($refs, $sortBy);
+
 		return $refs;
 
 	}

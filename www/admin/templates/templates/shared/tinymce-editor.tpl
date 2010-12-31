@@ -17,7 +17,7 @@ function initTinyMce(litRefs,mediaRefs) {
 					var mlb = cm.createListBox('litref', {
 						 title : 'Literary references',
 						 onselect : function(v) {
-							 tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id, "mceInsertContent",false,v);
+							 tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,v);
 							 //ed.execCommand("mceInsertContent",false,'[i]'+v+'[/i]');
 						 }
 					});
@@ -36,7 +36,7 @@ function initTinyMce(litRefs,mediaRefs) {
 								) +
 								' ('+obj[i].year+')';
 						
-							mlb.add(l,'[litref id="'+obj[i].id+'"]'+l+'[/litref]');
+							mlb.add(l,'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('+obj[i].id+');">'+l+'</span>');
 						}
 					}
 	
@@ -49,19 +49,10 @@ function initTinyMce(litRefs,mediaRefs) {
 								title : 'Create a literary reference',
 								image : '../../media/system/tinymce/litref_add.png',
 								onclick : function() {
-									window.open('../literature/edit.php','_self');
-								},
-								icons : false
-						});
-
-						return c;
-
-			   case 'addmedia':
-						var c = cm.createMenuButton('addmedia', {
-								title : 'Upload new media',
-								image : '../../media/system/tinymce/film_add.png',
-								onclick : function() {
-									window.open('http://www.xs4all.nl/','_self');
+									tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,'[new litref]');
+									allAjaxAsynchMode = false;
+									taxonSaveDataAll();
+									window.open('../literature/edit.php?add=hoc','_self');
 								},
 								icons : false
 						});
@@ -82,12 +73,32 @@ function initTinyMce(litRefs,mediaRefs) {
 					if (obj) {
 						// Add some values to the list box
 						for (var i=0;i<obj.length;i++) {
-							mlb.add(obj[i].file_name+' ('+obj[i].mime_type+')', '[media id="'+obj[i].id+'"]'+obj[i].file_name+'[/media]');
+							mlb.add(
+								obj[i].file_name+' ('+obj[i].mime_type+')',
+								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('+obj[i].id+');">'+obj[i].file_name+'</span>'
+							);
+
 						}
 					}
 	
 					// Return the new listbox instance
 					return mlb;
+
+			   case 'addmedia':
+						var c = cm.createMenuButton('addmedia', {
+								title : 'Upload new media',
+								image : '../../media/system/tinymce/film_add.png',
+								onclick : function() {
+									tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,'[new media]');
+									allAjaxAsynchMode = false;
+									taxonSaveDataAll();
+									window.open('media_upload.php?add=hoc','_self');
+								},
+								icons : false
+						});
+
+						return c;
+
 			}
 	
 			return null;
@@ -99,10 +110,10 @@ function initTinyMce(litRefs,mediaRefs) {
 	
 	
 	tinyMCE.init({
-			mode : "textareas",
-			theme : "advanced",
-			plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,-example",	
-			
+		mode : "textareas",
+		theme : "advanced",
+		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,-example",	
+		
 			// Theme options - button# indicated the row# only
 		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,|,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
 		theme_advanced_buttons2 : "litref,addlitref,|,media,addmedia",

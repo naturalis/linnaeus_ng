@@ -6,7 +6,7 @@
 {if $id}
 <p>
 <form enctype="multipart/form-data" action="" method="post">
-<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
+<input type="hidden" name="id" value="{$id}" />  
 <input type="hidden" name="rnd" value="{$rnd}" />
 {t}Choose a file to upload:{/t} <input name="uploadedfile" type="file" /><br />
 <input type="submit" value="{t}upload{/t}" />
