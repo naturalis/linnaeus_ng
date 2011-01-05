@@ -74,114 +74,6 @@ class LiteratureController extends Controller
     
     }
 
-	private function getReference($id=null)
-	{
-
-		if (!isset($id) && !$this->rHasId()) return false;
-
-		$thisId = isset($id) ? $id : $this->requestData['id'];
-
-		$l = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $thisId
-				),
-				'columns' => '*, year(`year`) as `year`'
-			)
-		);
-		
-		if ($l) {
-		
-			$ref = $l[0];
-			
-			$lt = $this->models->LiteratureTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'literature_id' => $thisId	
-					)
-				)
-			);
-			
-			foreach((array)$lt as $key => $val) {
-
-				if (isset($val['taxon_id'])) {
-
-					$t = $this->models->Taxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $val['taxon_id']
-							)
-						)
-					);
-
-					$lt[$key]['taxon'] = $t[0]['taxon'];
-
-				}
-
-			}
-			
-			$ref['taxa'] = $lt;
-
-			return $ref;
-
-		} else {
-		
-			return false;
-
-		}
-
-	}
-
-	private function getAuthors($str=null)
-	{
-	
-		if (!isset($str) && !$this->rHasVal('str')) return false;
-
-		$thisStr = isset($str) ? $str : $this->requestData['str'];
-		
-		if (empty($thisStr)) return;
-
-		$l1 = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'author_first like' => $thisStr.'%',
-					'fieldAsIndex' => 'author_first'
-				),
-				'columns' => 'distinct author_first as author',
-				'fieldAsIndex' => 'author'
-			)
-		);
-
-		$l2 = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'author_second like' => $thisStr.'%',
-					'fieldAsIndex' => 'author_second'
-				),
-				'columns' => 'distinct author_second as author',
-				'fieldAsIndex' => 'author'
-			)
-		);
-
-		$auths = array_merge((array)$l1,(array)$l2);
-
-        $this->customSortArray($auths, array(
-				'key' => 'author', 
-				'dir' => 'asc', 
-				'case' => 'i'
-			)
-		);
-
-		$this->smarty->assign('returnText',json_encode($auths));
-
-	}
-
-
     public function ajaxInterfaceAction ()
     {
 
@@ -198,30 +90,11 @@ class LiteratureController extends Controller
     
     }
 
-	private function deleteReference($id)
-	{
-
-		if (empty($id)) return false;
-
-		$this->models->LiteratureTaxon->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'literature_id' => $id
-			)
-		);
-
-		$this->models->Literature->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $id
-			)
-		);
-
-	}
-
     public function editAction()
     {
-    
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
         $this->checkAuthorisation();
 
 		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['literature']['newRef'])) {
@@ -480,6 +353,135 @@ class LiteratureController extends Controller
 		if ($this->rHasVal('search')) $this->smarty->assign('search',$this->requestData['search']);
 
         $this->printPage();
+
+	}
+
+	private function getReference($id=null)
+	{
+
+		if (!isset($id) && !$this->rHasId()) return false;
+
+		$thisId = isset($id) ? $id : $this->requestData['id'];
+
+		$l = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $thisId
+				),
+				'columns' => '*, year(`year`) as `year`'
+			)
+		);
+		
+		if ($l) {
+		
+			$ref = $l[0];
+			
+			$lt = $this->models->LiteratureTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'literature_id' => $thisId	
+					)
+				)
+			);
+			
+			foreach((array)$lt as $key => $val) {
+
+				if (isset($val['taxon_id'])) {
+
+					$t = $this->models->Taxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $val['taxon_id']
+							)
+						)
+					);
+
+					$lt[$key]['taxon'] = $t[0]['taxon'];
+
+				}
+
+			}
+			
+			$ref['taxa'] = $lt;
+
+			return $ref;
+
+		} else {
+		
+			return false;
+
+		}
+
+	}
+
+	private function getAuthors($str=null)
+	{
+	
+		if (!isset($str) && !$this->rHasVal('str')) return false;
+
+		$thisStr = isset($str) ? $str : $this->requestData['str'];
+		
+		if (empty($thisStr)) return;
+
+		$l1 = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'author_first like' => $thisStr.'%',
+					'fieldAsIndex' => 'author_first'
+				),
+				'columns' => 'distinct author_first as author',
+				'fieldAsIndex' => 'author'
+			)
+		);
+
+		$l2 = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'author_second like' => $thisStr.'%',
+					'fieldAsIndex' => 'author_second'
+				),
+				'columns' => 'distinct author_second as author',
+				'fieldAsIndex' => 'author'
+			)
+		);
+
+		$auths = array_merge((array)$l1,(array)$l2);
+
+        $this->customSortArray($auths, array(
+				'key' => 'author', 
+				'dir' => 'asc', 
+				'case' => 'i'
+			)
+		);
+
+		$this->smarty->assign('returnText',json_encode($auths));
+
+	}
+
+
+	private function deleteReference($id)
+	{
+
+		if (empty($id)) return false;
+
+		$this->models->LiteratureTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'literature_id' => $id
+			)
+		);
+
+		$this->models->Literature->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $id
+			)
+		);
 
 	}
 

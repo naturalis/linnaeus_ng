@@ -1,7 +1,8 @@
 <?php
 /*
 
-- setRequestData needs recursion for the arrays
+- setRequestData needs recursion for the arrays (fuck knows why, though)
+- getTaxonTree could do with some fancy session storing
 
 */
 
@@ -28,11 +29,15 @@ class Controller extends BaseClass
     public $errors;
     public $messages;
     public $controllerBaseName;
+    public $controllerBaseNameMask = false;
     public $pageName;
     public $controllerPublicName;
+    public $controllerPublicNameMask = false;
     public $sortField;
     public $sortDirection;
     public $sortCaseSensitivity;
+	public $findField;
+	public $findValue;
     public $baseUrl;
 	public $excludeFromReferer = false;
 	public $noResubmitvalReset = false;
@@ -1014,16 +1019,22 @@ class Controller extends BaseClass
 
 	}
 
-
     /**
      * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
      *
-     * function at the sam time maintains a second, non-recursive list of taxa ($this->treeList)
+     * function at the same time maintains a second, non-recursive list of taxa ($this->treeList)
      *
      * @param      array    $params    parameters for tree formatting
      * @access     public
      */
-    public function getTaxonTree($params=null) 
+	public function getTaxonTree($params=null) 
+	{
+	
+		return $this->_getTaxonTree($params);
+	
+	}
+
+    private function _getTaxonTree($params) 
     {
 
 		// the parent_id to start with
@@ -1054,7 +1065,7 @@ class Controller extends BaseClass
 
 		}
 
-		// decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually kingdom)
+		// decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually 'kingdom')
 		if ($pId === null && $includeOrphans === false) {
 
 			$id['rank_id'] = $pr[0]['id'];
@@ -1079,7 +1090,7 @@ class Controller extends BaseClass
 					$val['lower_taxon'] = $rank['lower_taxon'];
 
 					$val['keypath_endpoint'] = $rank['keypath_endpoint'];
-					
+
 					break;	
 
 				}
@@ -1089,21 +1100,21 @@ class Controller extends BaseClass
 			// level is effectively the recursive depth of the taxon within the tree
 			$val['level'] = $level;
 
-			// count the kids
+			// count taxa on the same level
 			$val['sibling_count'] = count((array)$t);
 
 			// sibling_pos reflects the position amongst taxa on the same level
 			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
 
 			// fill the treelist (which is a global var)
-            $this->treeList[] = $val;
+            $this->treeList[$val['id']] = $val;
 
 			$t[$key]['level'] = $level;
 			
 			// and call the next recursion for each of the children
 			if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId!=$val['rank_id'])) {
 
-				$t[$key]['children'] = $this->getTaxonTree(
+				$children = $this->getTaxonTree(
 					array(
 						'pId' => $val['id'],
 						'level' => $level+1,
@@ -1111,7 +1122,14 @@ class Controller extends BaseClass
 					)
 				);
 
+	            $t[$key]['children_count'] = 
+					$this->treeList[$val['id']]['children_count'] = 
+					isset($children) ? count((array)$children) : 0;
+				
+				$t[$key]['children'] = $children;
+
 			}
+
 
         }
 
@@ -1280,6 +1298,43 @@ class Controller extends BaseClass
 	
 	}
 
+
+    /**
+     * Set a temporary controller base name, different from the current one
+     *
+     * @access    public
+     * @param     string  $controllerBaseName  masking controller base name
+     * @param     string  $controllerPublicName  masking controller public name
+     */
+	public function setControllerMask($controllerBaseName,$controllerPublicName)
+	{
+
+		$this->controllerBaseNameMask = $controllerBaseName;
+
+		$this->controllerPublicNameMask = $controllerPublicName;
+
+	}
+
+
+	public function maskAsHigherTaxa()
+	{
+
+		if (isset($_SESSION['system']['highertaxa']) && $_SESSION['system']['highertaxa']===true) {
+		// "abusing" this controller for the higher taxa
+
+			$this->setControllerMask('highertaxa','Higher taxa');
+			
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
+
 	private function getCurrentUiLanguage()
 	{
 
@@ -1357,8 +1412,6 @@ class Controller extends BaseClass
         $this->debugMode = $this->generalSettings['debugMode'];
     
     }
-
-
 
     /**
      * Sets class variables, based on a page's url
@@ -1866,13 +1919,17 @@ class Controller extends BaseClass
                 'name' => $_SESSION['project']['title'], 
                 'url' => $this->getLoggedInMainIndex()
             );
+			
+			// controller name can be overridden
+			$controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
+			$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
             
-            if (!empty($this->controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
+            if (!empty($controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
                 
-                $curl = $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName;
+                $curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
                 
                 $this->breadcrumbs[] = array(
-                    'name' => $this->controllerPublicName, 
+                    'name' => $controllerPublicName, 
                     'url' => $curl
                 );
                 
@@ -1934,12 +1991,14 @@ class Controller extends BaseClass
     private function isUserAuthorisedForProjectPage ()
     {
 
+		$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName());
+
 		// is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
-		if ($this->getControllerBaseName()=='') return true;
+		if ($controllerBaseName=='') return true;
 
-		if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()])) {
+		if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
 
-			$d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$this->getControllerBaseName()];
+			$d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
 			
 			foreach ((array) $d as $key => $val) {
 				
@@ -2071,7 +2130,25 @@ class Controller extends BaseClass
         return ($a[$f] > $b[$f] ? ($d == 'asc' ? 1 : -1) : ($a[$f] < $b[$f] ? ($d == 'asc' ? -1 : 1) : 0));
     
     }
+	
+	private function _doMultiArrayFind($var)
+	{
 
+		return (isset($var[$this->findField]) && $var[$this->findField]==$this->findValue);
+
+	}
+
+	public function doMultiArrayFind($array,$field,$value)
+	{
+
+		if ($field==null || $value==null) return;
+
+		$this->findField = $field;
+		$this->findValue = $value;
+
+		return array_filter($array,array($this,'_doMultiArrayFind'));
+
+	}
 
     /**
      * Sets a random integer value for general use

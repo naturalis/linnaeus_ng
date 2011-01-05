@@ -37,3 +37,19 @@ th {
 	color:#555;
 	font-size:11px;
 }
+
+#alphabet {
+	margin:5px 0px 5px 5px;
+	border-bottom:1px dotted #eee;
+}
+.alphabet-letter,.alphabet-active-letter {
+	padding:0px 5px 0px 5px;
+	cursor:pointer;
+}
+.alphabet-letter:hover {
+	text-decoration:underline;
+}
+.alphabet-active-letter {
+	font-weight:bold;
+	color:#FF0000;
+}

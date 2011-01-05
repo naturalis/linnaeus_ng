@@ -29,18 +29,3 @@
 	padding:5px;
 	width:250px;
 }
-#lit-alphabet {
-	margin:5px 0px 5px 5px;
-	border-bottom:1px dotted #eee;
-}
-.lit-alpha,.lit-alpha-active {
-	padding:0px 5px 0px 5px;
-	cursor:pointer;
-}
-.lit-alpha:hover {
-	text-decoration:underline;
-}
-.lit-alpha-active {
-	font-weight:bold;
-	color:#FF0000;
-}

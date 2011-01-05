@@ -1,9 +1,16 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+{if $isHigherTaxa}
+{t _s1='<a href="index.php">' _s2='</a>'}Below are all taxa in your project that are part of the higher taxa. All lower taxa can be found in the %sspecies module%s.{/t}
+{else}
 {t _s1='<a href="../highertaxa/">' _s2='</a>'}Below are all taxa in your project that are part of the species module. All higher taxa can be found in the %shigher taxa module%s.{/t}
+{/if}
 <br/>
 {t}To edit a name, rank or parent, click the taxon's name. To edit a taxon's pages, click the percentage-indicator for that taxon in the 'content' column. To edit media files, synoyms or common names, click the cell in the corresponding column.{/t}<br />
+{if $isHigherTaxa}
+{t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
+{/if}
 {t}You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows.{/t}
 
 <br/>
@@ -14,7 +21,9 @@
 		<th style="width:240px;" onclick="allTableColumnSort('taxon');">{t}Taxon{/t}</th>
 {if $session.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
 		<th style="width:50px;" onclick="allTableColumnSort('pct_finished');">{t}Content{/t}</th>
+{if !$isHigherTaxa}
 		<th style="width:50px;" title="{t}images, videos, soundfiles{/t}">{t}Media{/t}</th>
+{/if}
 		<th style="width:60px;">{t}Literature{/t}</th>
 		<th style="width:60px;">{t}Synonyms{/t}</th>
 		<th style="width:90px;">{t}Common names{/t}</th>
@@ -52,10 +61,11 @@
 		<td>
 			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pctFinished}% {t}done{/t}</span>
 		</td>
-
+{if !$isHigherTaxa}
 		<td title="{t}media files{/t}">
 			<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{$taxa[i].mediaCount} {if $taxa[i].mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</span>
 		</td>
+{/if}
 		<td>
 			<span class="pseudo-a" onclick="window.open('literature.php?id={$t}','_self');">{$taxa[i].literatureCount} refs.</span>
 		</td>
@@ -87,14 +97,16 @@
 		{/if}
 		{if !$arrowBuffer}&nbsp;&nbsp;{/if}
 		</td>
-
+		{if ($isHigherTaxa && $taxa[i].children_count > 0) || !$isHigherTaxa}
+		<td>
+		{else}
 		<td
 			class="pseudo-a" 
 			style="text-align:center" 
 			onclick="taxonDeleteData({$taxa[i].id},'{$taxa[i].taxon}');">
 			x
+		{/if}
 		</td>
-
 		<td id="usage-{$taxa[i].id}"></td>
 	</tr>
 		{assign var=prev_rank value=$taxa[i].rank_id}

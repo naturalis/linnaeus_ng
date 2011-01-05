@@ -1,12 +1,12 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="lit-alphabet">
+<div id="alphabet">
 Click to browse:
 {section name=i loop=$alpha}
 {if $alpha[i]==$letter}
-<span class="lit-alpha-active">{$alpha[i]}</span>
+<span class="alphabet-active-letter">{$alpha[i]}</span>
 {else}
-<span class="lit-alpha" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
+<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
 <form name="theForm" id="theForm" method="post" action="">
