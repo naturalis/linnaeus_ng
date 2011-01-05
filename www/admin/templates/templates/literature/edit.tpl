@@ -80,11 +80,13 @@
 		<td>
 			<select name="taxa" id="taxa">
 			{section name=i loop=$taxa}
+			{if $taxa[i].id && (($isHigherTaxa && $taxa[i].lower_taxon==0) || !$isHigherTaxa)}
 			<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
 			{section name=foo loop=$taxa[i].level-$taxa[0].level}
 			&nbsp;
 			{/section}		
 			{$taxa[i].taxon}</option>
+			{/if}
 			{/section}
 			</select>
 			<span class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="litAddTaxonToList()">{t}add{/t}</span>
@@ -132,9 +134,9 @@ f.offset({left : off.left + $('#taxa').width() + 50, top: off.top});
 {section name=i loop=$ref.taxa}
 	litAddTaxonToList([{$ref.taxa[i].taxon_id},'{$ref.taxa[i].taxon}']);
 {/section}
-
+{if $ref}
 litThisReference = ['{$ref.author_first|escape:'quotes'} ({$ref.year})'];
-
+{/if}
 </script>
 
 {include file="../shared/admin-messages.tpl"}

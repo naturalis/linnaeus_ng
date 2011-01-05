@@ -7,8 +7,8 @@
 </tr>
 <tr><td colspan="6">&nbsp;</td></tr>
 <tr>
-	<th style="width:225px;">{t}synonym{/t}</td>
-	<th style="width:175px;">{t}literature{/t}</td>
+	<th style="width:250px;">{t}synonym{/t}</td>
+	<th style="width:350px;">{t}literature{/t}</td>
 	<th style="width:55px;">{t}move up{/t}</td>
 	<th style="width:65px;">{t}move down{/t}</td>
 	<th>delete</td>
@@ -16,7 +16,17 @@
 {section name=i loop=$synonyms}
 <tr class="tr-highlight">
 	<td>{$synonyms[i].synonym}</td>
-	<td>(literature)</td>
+	<td>
+		{if $synonyms[i].literature}
+		{$synonyms[i].literature.author_first}
+		{if $synonyms[i].literature.multiple_authors==0}
+		{if $synonyms[i].literature.author_second} &amp; {$synonyms[i].literature.author_second}{/if}
+		{else}
+		{t}et al.{/t}
+		{/if}
+		({$synonyms[i].literature.year})
+		{/if}
+	</td>
 	{if $smarty.section.i.first}
 	<td></td>
 	{else}
@@ -58,7 +68,18 @@
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
 <tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="32" /></td></tr>
-<tr><td>{t}litereature reference:{/t}</td><td><select></select></td></tr>
+<tr><td>{t}litereature reference:{/t}</td><td>
+	<select name="lit_ref_id">
+	<option value="">{t}(none){/t}</option>
+{section name=i loop=$literature}
+	<option value="{$literature[i].id}">
+	{$literature[i].author_first}
+	{if $literature[i].author_second!=''} &amp; {$literature[i].author_second}{else}
+{if $literature[i].multiple_authors==1} et al.{/if}{/if} ({$literature[i].year})
+	</option>
+{/section}
+	</select>
+</td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><td colspan="2"><input type="submit" value="{t}save{/t}" />&nbsp;<input type="button" onclick="window.open('list.php','_self');" value="{t}back{/t}" /></td></tr>
 </table>

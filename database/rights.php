@@ -83,6 +83,13 @@ INSERT INTO dev_rights VALUES (NULL , 'key', 'process','create list of remaining
 INSERT INTO dev_rights VALUES (NULL , 'key', 'rank','define rank of taxa available in key',CURRENT_TIMESTAMP);
 
 INSERT INTO dev_rights VALUES (NULL , 'literature', '*','full access',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'literature', 'browse','browse literary references',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'literature', 'edit','edit literary references',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'literature', 'search','search literary references',CURRENT_TIMESTAMP);
+
+INSERT INTO dev_rights VALUES (NULL , 'glossary', '*','full access',CURRENT_TIMESTAMP);
+
+INSERT INTO dev_rights VALUES (NULL , 'highertaxa', '*','full access',CURRENT_TIMESTAMP);
 
 
 /*
@@ -94,46 +101,56 @@ INSERT INTO dev_rights VALUES (NULL , 'literature', '*','full access',CURRENT_TI
 5 | Contributor          | Contributes to a project but cannot edit
 
 
-  1 | users      | *
-  2 | users      | index
-  3 | users      | choose_project
-  4 | users      | create
-  5 | users      | edit
-  6 | users      | user_overview
-  7 | users      | view
-  8 | projects   | *
-  9 | projects   | index
- 10 | projects   | data
- 11 | projects   | modules
- 12 | projects   | collaborators
- 13 | species    | *
- 14 | species    | index
- 15 | species    | edit
- 16 | species    | list
- 17 | species    | page
- 18 | species    | col
- 19 | species    | collaborators
- 20 | species    | file
- 21 | species    | media
- 22 | species    | media_upload
- 23 | species    | ranklabels
- 24 | species    | ranks
- 25 | species    | sections
- 26 | species    | taxon
- 27 | key        | *
- 28 | key        | index
- 29 | key        | step_edit
- 30 | key        | step_show
- 31 | key        | choice_edit
- 32 | key        | dead_ends
- 33 | key        | section
- 34 | key        | map
- 35 | key        | orphans
- 36 | key        | process
- 37 | key        | rank
- 38 | literature | *
+ 1 | users      | *
+ 2 | users      | index
+ 3 | users      | choose_project
+ 4 | users      | create
+ 5 | users      | edit
+ 6 | users      | user_overview
+ 7 | users      | view
+ 8 | projects   | *
+ 9 | projects   | index
+10 | projects   | data
+11 | projects   | modules
+12 | projects   | collaborators
+13 | species    | *
+14 | species    | index
+15 | species    | edit
+16 | species    | list
+17 | species    | page
+18 | species    | col
+19 | species    | collaborators
+20 | species    | file
+21 | species    | media
+22 | species    | media_upload
+23 | species    | ranklabels
+24 | species    | ranks
+25 | species    | sections
+26 | species    | taxon
+27 | key        | *
+28 | key        | index
+29 | key        | step_edit
+30 | key        | step_show
+31 | key        | choice_edit
+32 | key        | dead_ends
+33 | key        | section
+34 | key        | map
+35 | key        | orphans
+36 | key        | process
+37 | key        | rank
+38 | literature | *
+39 | literature | browse
+40 | literature | edit
+41 | literature | search
+42 | glossary   | *
+43 | highertaxa | *
 
 */
+
+
+
+
+
 
 
 # system administrator
@@ -142,6 +159,8 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 8, CURRENT_
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 13, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 27, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 38, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 42, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 43, CURRENT_TIMESTAMP );
 
 # lead expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 1, CURRENT_TIMESTAMP );
@@ -149,6 +168,8 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 8, CURRENT_
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 13, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 27, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 38, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 42, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 43, CURRENT_TIMESTAMP );
 
 # expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 3, CURRENT_TIMESTAMP );
@@ -157,6 +178,8 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 7, CURRENT_
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 13, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 27, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 38, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 42, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 43, CURRENT_TIMESTAMP );
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );

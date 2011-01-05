@@ -37,11 +37,13 @@
 	<option value="-1">{t}No parent{/t}</option>
 	{/if}
 	{section name=i loop=$taxa}
-	<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
-	{section name=foo loop=$taxa[i].level-$taxa[0].level}
-	&nbsp;
-	{/section}		
-	{$taxa[i].taxon}</option>
+	{if ($isHigherTaxa && $taxa[i].lower_taxon==0) || (!$isHigherTaxa)}
+		<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
+		{section name=foo loop=$taxa[i].level-$taxa[0].level}
+		&nbsp;
+		{/section}		
+		{$taxa[i].taxon}</option>
+	{/if}
 	{/section}
 	</select>
 		</td>
@@ -55,9 +57,11 @@
 		</td>
 		<td colspan="2">
 			<select name="rank_id" id="rank-id">
-{section name=i loop=$projectRanks}
+			{section name=i loop=$projectRanks}
+				{if ($isHigherTaxa && $projectRanks[i].lower_taxon==0) || (!$isHigherTaxa)}
 				<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
-{/section}
+				{/if }
+			{/section}
 			</select>
 		</td>
 	</tr>

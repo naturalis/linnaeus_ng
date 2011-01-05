@@ -15,7 +15,7 @@ var taxonCanHaveHybrid = Array();
 var taxonExecAfterSave = false;
 var taxonRankBorder = false;
 var taxonCommonnameLanguages = Array();
-
+var taxonHigherTaxa = false;
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -179,6 +179,8 @@ function taxonDrawPageBlock() {
 			'<br /><span class="taxon-page-publish-state">' +
 			(taxonPageStates[taxonPages[i][0]]==1 ? 'published' : (taxonPageStates[taxonPages[i][0]] == 0 ? 'unpublished' : 'empty')) +
 			'</span></td>';
+		
+		if (taxonHigherTaxa && i==0) break;
 	}
 
 	buffer = buffer + '</tr></table>';

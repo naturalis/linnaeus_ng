@@ -122,15 +122,20 @@ class SpeciesController extends Controller
     public function indexAction ()
     {
 
+		unset($_SESSION['system']['activeTaxon']);
+		unset($_SESSION['system']['highertaxa']);
+
         $this->checkAuthorisation();
         
         $this->setPageName(_('Species module overview'));
         
 		if (count((array)$_SESSION['project']['languages'])==0)
-			$this->addError(sprintf(_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),'<a href="../projects/data.php">','</a>'));
+			$this->addError(
+				sprintf(
+					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
+					'<a href="../projects/data.php">','</a>')
+				);
 
-		unset($_SESSION['system']['activeTaxon']);
-		
         $this->printPage();
   
     }
@@ -219,6 +224,8 @@ class SpeciesController extends Controller
     public function editAction ()
     {
 
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
 		$this->checkAuthorisation();
 
 		if ($this->rHasId()) {
@@ -259,7 +266,7 @@ class SpeciesController extends Controller
 			*/
 			
 			$this->getTaxonTree();
-	
+
 			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
 			
 			/*
@@ -389,8 +396,10 @@ class SpeciesController extends Controller
     public function taxonAction ()
     {
 
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
         $this->checkAuthorisation();
-        
+
         $this->setBreadcrumbIncludeReferer(
             array(
                 'name' => _('Taxon list'), 
@@ -401,45 +410,10 @@ class SpeciesController extends Controller
         if ($this->rHasId()) {
         // get existing taxon
 
+			// replace possible [new litref] and [new media] tags with links to newly created reference of media
+			$this->filterInternalTags($this->requestData['id']);
+
             $taxon = $this->getTaxonById();
-            
-//
-
-if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] != '<new>') {
-
-	$this->models->ContentTaxon->execute(
-		'update %table% 
-			set content = replace(content,"[new litref]","'. mysql_real_escape_string($_SESSION['system']['literature']['newRef']) .'")
-			where project_id = '.$this->getCurrentProjectId().'
-			and taxon_id = '. $this->requestData['id']
-	);
-
-}
-
-if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] != '<new>') {
-
-	$this->models->ContentTaxon->execute(
-		'update %table% 
-			set content = replace(content,"[new media]","'. mysql_real_escape_string($_SESSION['system']['media']['newRef']) .'")
-			where project_id = '.$this->getCurrentProjectId().'
-			and taxon_id = '. $this->requestData['id']
-	);
-
-}
-
-$this->models->ContentTaxon->execute(
-	'update %table% 
-		set content = replace(replace(content,"[new litref]",""),"[new media]","")
-		where project_id = '.$this->getCurrentProjectId().'
-		and taxon_id = '. $this->requestData['id']
-);
-
-unset($_SESSION['system']['literature']['newRef']);
-unset($_SESSION['system']['media']['newRef']);
-
-
-//
-			
 			
 			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
@@ -709,6 +683,8 @@ unset($_SESSION['system']['media']['newRef']);
      */
     public function listAction ()
     {
+	
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
         $this->checkAuthorisation();
         
@@ -730,7 +706,12 @@ unset($_SESSION['system']['media']['newRef']);
 
 		if (isset($this->treeList)) { 
 
-			if (isset($_SESSION['project']['ranklist'])) {
+			if (isset($_SESSION['project']['ranklist']) && 
+				(
+					isset($_SESSION['project']['ranklistsource']) && 
+					$_SESSION['project']['ranklistsource'] == ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa')
+				)
+			) {
 	
 				$rl = $_SESSION['project']['ranklist'];
 			
@@ -740,7 +721,12 @@ unset($_SESSION['system']['media']['newRef']);
 		
 				foreach((array)$pr as $key => $val) {
 				
-					if ($val['lower_taxon']==1) {
+					if (!$this->maskAsHigherTaxa() && $val['lower_taxon']==1) {
+					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
+				
+						$rl[$val['id']] = $val['rank'];
+					} else
+					if ($this->maskAsHigherTaxa() && $val['lower_taxon']!=1) {
 					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
 				
 						$rl[$val['id']] = $val['rank'];
@@ -749,7 +735,8 @@ unset($_SESSION['system']['media']['newRef']);
 				}
 				
 				$_SESSION['project']['ranklist'] = $rl;
-	
+				$_SESSION['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
+
 			}
 
 			// get taxa assigned to user
@@ -892,6 +879,8 @@ unset($_SESSION['system']['media']['newRef']);
     public function literatureAction ()
     {
 
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
         $this->checkAuthorisation();
 
         $this->setBreadcrumbIncludeReferer(
@@ -956,6 +945,8 @@ unset($_SESSION['system']['media']['newRef']);
      */
     public function mediaAction ()
     {
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
         $this->checkAuthorisation();
 
@@ -1027,6 +1018,8 @@ unset($_SESSION['system']['media']['newRef']);
      */
     public function mediaUploadAction ()
     {
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
         $this->checkAuthorisation();
 
@@ -1764,6 +1757,7 @@ unset($_SESSION['system']['media']['newRef']);
 
 	}
 	
+
     /**
      * Enables the user to provide labels in all defined project languages
      *
@@ -1786,6 +1780,12 @@ unset($_SESSION['system']['media']['newRef']);
 
 	}
 	
+
+    /**
+     * Create standard sections for taxon content pages
+     *
+     * @access    public
+     */
 	public function sectionsAction()
 	{
 
@@ -1849,6 +1849,12 @@ unset($_SESSION['system']['media']['newRef']);
 
 	}	
 
+
+    /**
+     * Assign parts of the taxon tree to specific collaborators so they can edit only those
+     *
+     * @access    public
+     */
 	public function collaboratorsAction()
 	{
 
@@ -1939,8 +1945,16 @@ unset($_SESSION['system']['media']['newRef']);
 
 	}	
 
+
+    /**
+     * Create synonyms for a taxon
+     *
+     * @access    public
+     */
 	public function synonymsAction()
 	{
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
 		$this->checkAuthorisation();
 
@@ -2043,6 +2057,7 @@ unset($_SESSION['system']['media']['newRef']);
 						'id' => null,
 						'project_id' => $this->getCurrentProjectId(),
 						'taxon_id' => $this->requestData['id'],
+						'lit_ref_id' => $this->rHasVal('lit_ref_id') ? $this->requestData['lit_ref_id'] : null,
 						'synonym' => $this->requestData['synonym'],
 						'remark' => $this->rHasVal('remark') ? $this->requestData['remark'] : null,
 						'show_order' => $show_order
@@ -2052,6 +2067,10 @@ unset($_SESSION['system']['media']['newRef']);
 			}
 			
 		}
+		
+		$literature = $this->getTaxonLiterature($this->requestData['id']);
+
+
 
 		if (!isset($synonyms)) {
 
@@ -2065,7 +2084,20 @@ unset($_SESSION['system']['media']['newRef']);
 				)
 			);
 
+			foreach((array)$synonyms as $key => $val) {
+
+				if($val['lit_ref_id']) {
+
+					$synonyms[$key]['literature'] = $this->doMultiArrayFind($literature,'id',$val['lit_ref_id']);
+					$synonyms[$key]['literature'] = array_shift($synonyms[$key]['literature']);
+
+				}
+
+			}
+
 		}
+
+		$this->smarty->assign('literature', $literature);
 
 		$this->smarty->assign('id',$this->requestData['id']);
 
@@ -2077,9 +2109,15 @@ unset($_SESSION['system']['media']['newRef']);
 
 	}
 
-
+    /**
+     * Create common names for a taxon
+     *
+     * @access    public
+     */
 	public function commonAction()
 	{
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
 		$this->checkAuthorisation();
 		
@@ -2222,23 +2260,7 @@ unset($_SESSION['system']['media']['newRef']);
 				$d[] = $val['language_id'];
 
 			}
-/*
-			foreach((array)$d as $key => $val) {
-			
-				$ll = $this->models->LabelLanguage->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $val
-						),
-						'fieldAsIndex' => 'label_language_id'
-					)
-				);
 
-				$translations[$val]['translations'] = $ll;
-
-			}
-*/
 		}
 
 		$this->smarty->assign('id',$this->requestData['id']);
@@ -2251,13 +2273,9 @@ unset($_SESSION['system']['media']['newRef']);
 
 		$this->smarty->assign('languages',$lp);
 
-//		if (isset($translations)) $this->smarty->assign('translations',$translations);
-
 		$this->printPage();
 
 	}
-
-
 
     private function getCatalogueOfLifeData()
     {
@@ -4084,7 +4102,7 @@ unset($_SESSION['system']['media']['newRef']);
 				'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'taxon_id' => $id
-					),
+					)
 				)
 			);
 
@@ -4115,5 +4133,48 @@ unset($_SESSION['system']['media']['newRef']);
 		return $refs;
 
 	}
+
+
+	private function filterInternalTags($id)
+	{
+
+		if (empty($id)) return;
+
+		if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] != '<new>') {
+		
+			$this->models->ContentTaxon->execute(
+				'update %table% 
+					set content = replace(content,"[new litref]","'.
+						mysql_real_escape_string($_SESSION['system']['literature']['newRef']) .'")
+					where project_id = '.$this->getCurrentProjectId().'
+					and taxon_id = '. $id
+			);
+		
+		}
+		
+		if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] != '<new>') {
+		
+			$this->models->ContentTaxon->execute(
+				'update %table% 
+					set content = replace(content,"[new media]","'.
+						mysql_real_escape_string($_SESSION['system']['media']['newRef']) .'")
+					where project_id = '.$this->getCurrentProjectId().'
+					and taxon_id = '. $id
+			);
+		
+		}
+		
+		$this->models->ContentTaxon->execute(
+			'update %table% 
+				set content = replace(replace(content,"[new litref]",""),"[new media]","")
+				where project_id = '.$this->getCurrentProjectId().'
+				and taxon_id = '. $id
+		);
+		
+		unset($_SESSION['system']['literature']['newRef']);
+		unset($_SESSION['system']['media']['newRef']);
+
+	}
+
 }
 
