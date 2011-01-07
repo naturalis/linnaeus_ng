@@ -12,7 +12,7 @@
 		<td colspan="2">
 		<select name="language_id" id="language">
 		{section name=i loop=$languages}
-			{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].language_id==$gloss.language_id}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>{/if}
+			{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].id==$activeLanguage}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>{/if}
 		{/section}
 		</select> *
 		</td>

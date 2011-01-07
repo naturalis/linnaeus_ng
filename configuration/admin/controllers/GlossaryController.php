@@ -91,6 +91,16 @@ class GlossaryController extends Controller
     	    $this->setPageName(_('New glossary term'));
 
 		}
+		
+		if ($this->rHasVal('activeLanguage')) {
+
+			$activeLanguage = $this->rHasVal('activeLanguage');
+
+		} else {
+
+			$activeLanguage = $_SESSION['project']['default_language_id'];
+
+		}
 
 		if ($this->rHasVal('term') && $this->rHasVal('definition') && !$this->isFormResubmit()) {
 
@@ -136,8 +146,10 @@ class GlossaryController extends Controller
 					}
 
 				}
-				
+
 				$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+
+				$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
 
 				$this->redirect('browse.php');
 
@@ -153,7 +165,7 @@ class GlossaryController extends Controller
 
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
-        if ($_SESSION['project']['default_language_id']) $this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $activeLanguage);
 
 
         $this->printPage();
@@ -181,14 +193,14 @@ class GlossaryController extends Controller
 
     }
 
-	private function getActualAlphabet()
+	private function getActualAlphabet($languageId)
 	{
 
 		if (isset($_SESSION['system']['literature']['alpha'])) return $_SESSION['system']['literature']['alpha'];
 
 		$l = $this->models->Glossary->_get(
 			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'language_id'=>$languageId),
 				'columns' => 'distinct lower(substr(term,1,1)) as letter',
 				'order' => 'letter'
 			)
@@ -210,7 +222,6 @@ class GlossaryController extends Controller
 
 	private function getGlossaryTerm($id=null)
 	{
-
 
 		if (!isset($id) && !$this->rHasId()) return false;
 
@@ -298,58 +309,107 @@ class GlossaryController extends Controller
 
 		$this->setPageName(_('Browsing glossary'));
 		
-		$alpha = $this->getActualAlphabet();
+        if (!isset($_SESSION['project']['languages'])) {
+		
+			$this->addError(
+				sprintf(
+					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
+					'<a href="../projects/data.php">','</a>')
+				);
+		
+		} else
+        if (!isset($_SESSION['project']['default_language_id'])) {
 
-		if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
-			$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
+			$this->addError(
+				sprintf(
+					_('No default language has been defined. Go %shere%s to set the default languages.'),
+					'<a href="../projects/data.php">','</a>')
+				);
 
-		if (!$this->rHasVal('letter'))
-			$this->requestData['letter'] = $alpha[0];
+		} else {
+		
+			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
+	
+			if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
+				$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
+	
+			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['system']['glossary']['activeLanguage']))
+				$this->requestData['activeLanguage'] = $_SESSION['system']['glossary']['activeLanguage'];
+	
+			if (!$this->rHasVal('letter') || !in_array($this->requestData['letter'],(array)$alpha))
+				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
 
-
-		if ($this->rHasVal('letter')) {
-
-			$gloss = $this->getGlossaryTerms(array('term like' => $this->requestData['letter'].'%'),'term');
-
-		}
-
-        // user requested a sort of the table
-        if ($this->rHasVal('key')) {
-
-            $sortBy = array(
-                'key' => $this->requestData['key'], 
-                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-                'case' => 'i'
-            );
-        
-			$this->customSortArray($refs, $sortBy);
-
-        } else {
-
-            $sortBy = array(
-                'key' => 'author_first', 
-                'dir' => 'asc', 
-                'case' => 'i'
-            );
+			if (!$this->rHasVal('activeLanguage'))
+				$this->requestData['activeLanguage'] = $_SESSION['project']['default_language_id'];
+				
+			if ($this->rHasVal('letter')) {
+	
+				$gloss = $this->getGlossaryTerms(
+					array(
+						'term like' => $this->requestData['letter'].'%',
+						'language_id' => $this->requestData['activeLanguage']
+					),
+					'term');
+	
+			}
+	
+			// user requested a sort of the table
+			if ($this->rHasVal('key')) {
+	
+				$sortBy = array(
+					'key' => $this->requestData['key'], 
+					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+					'case' => 'i'
+				);
+			
+				$this->customSortArray($refs, $sortBy);
+	
+			} else {
+	
+				$sortBy = array(
+					'key' => 'author_first', 
+					'dir' => 'asc', 
+					'case' => 'i'
+				);
+		
+			}
+	
+			$this->smarty->assign('languages', $_SESSION['project']['languages']);
+	
+			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
+	
+			$this->smarty->assign('sortBy', $sortBy);
+	
+			$this->smarty->assign('alpha', $alpha);
+	
+			if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
+	
+			if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
 	
 		}
 
-        if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
-
-        if ($_SESSION['project']['default_language_id']) $this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
-
-		$this->smarty->assign('sortBy', $sortBy);
-
-		$this->smarty->assign('alpha', $alpha);
-
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
-		if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
-
-        $this->printPage();
+		$this->printPage();
 
 	}
 
+	private function getActiveLanguage()
+	{
+	
+		if ($this->rHasVal('activeLanguage')) {
+
+			return $this->rHasVal('activeLanguage');
+
+		} elseif(isset($_SESSION['project']['default_language_id'])) {
+
+			return $_SESSION['project']['default_language_id'];
+
+		} else {
+
+			return false;
+	
+		}
+
+	}
 
 
 }
