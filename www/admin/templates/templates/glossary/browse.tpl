@@ -1,7 +1,18 @@
 {include file="../shared/admin-header.tpl"}
 
+<form name="theForm" id="theForm" method="post" action="">
 <div id="alphabet">
-Click to browse:
+
+{t}See glossary items in:{/t}&nbsp;
+<select name="activeLanguage" id="language" onchange="$('#theForm').submit();">
+{section name=i loop=$languages}
+	{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].id==$activeLanguage}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+	{/if}
+{/section}
+</select>
+
+<br />
+{t}Click to browse:{/t}&nbsp;
 {section name=i loop=$alpha}
 {if $alpha[i]==$letter}
 <span class="alphabet-active-letter">{$alpha[i]}</span>
@@ -9,18 +20,12 @@ Click to browse:
 <span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
-<form name="theForm" id="theForm" method="post" action="">
+{if $alpha|@count==0}(no terms have been defined){/if}
 <input type="hidden" name="letter" id="letter" value="{$letter}"  />
 </form>
 </div>
 
 <div id="page-main">
-
-<select name="language_id" id="language">
-{section name=i loop=$languages}
-	{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].language_id==$gloss.language_id}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>{/if}
-{/section}
-</select> *
 
 
 <table>
@@ -43,8 +48,11 @@ Click to browse:
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
 <p>
-[<a href="edit.php">add new term</a>]
+[<span class="pseudo-a" onclick="$('#newForm').submit();">add new term</span>]
 </p>
+<form method="post" action="edit.php" name="newForm" id="newForm">
+<input type="hidden" name="activeLanguage" value="{$activeLanguage}"  />
+</form>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
