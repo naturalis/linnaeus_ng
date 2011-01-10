@@ -456,6 +456,81 @@ class GlossaryController extends Controller
 
 	}
 
+    public function searchAction()
+    {
+    
+        $this->checkAuthorisation();
+
+		$this->setPageName(_('Search for glossary terms'));
+		
+		if ($this->rHasVal('search')) {
+
+			if (
+				isset($_SESSION['system']['glossary']['search']) && 
+				$_SESSION['system']['glossary']['search']['search'] == $this->requestData['search']) 
+			{
+			
+				$terms = $_SESSION['system']['glossary']['search']['results'];
+			
+			} else {
+
+				$terms = $this->models->Glossary->_get(
+					array('id' =>
+						'select *
+						from %table%
+						where
+							(term like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
+							definition like "%'.mysql_real_escape_string($this->requestData['search']).'%")
+							and project_id = '.$this->getCurrentProjectId().'
+						order by language_id,term'
+					)
+				);
+
+				foreach((array)$terms as $key => $val) {
+
+					$terms[$key]['language'] = $_SESSION['project']['languageList'][$val['language_id']]['language'];
+
+				}
+
+				$_SESSION['system']['glossary']['search']['search'] = $this->requestData['search'];
+	
+				$_SESSION['system']['glossary']['search']['results'] = $terms;
+
+			}
+
+		}
+
+        // user requested a sort of the table
+        if ($this->rHasVal('key')) {
+
+            $sortBy = array(
+                'key' => $this->requestData['key'], 
+                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+                'case' => 'i'
+            );
+
+			$this->customSortArray($terms, $sortBy);
+
+        } else {
+
+            $sortBy = array(
+                'key' => 'term', 
+                'dir' => 'asc', 
+                'case' => 'i'
+            );
+	
+		}
+        
+		$this->smarty->assign('sortBy', $sortBy);
+
+		if (isset($terms)) $this->smarty->assign('terms',$terms);
+
+		if ($this->rHasVal('search')) $this->smarty->assign('search',$this->requestData['search']);
+
+        $this->printPage();
+
+	}
+
 
     /**
      * AJAX interface for this class
