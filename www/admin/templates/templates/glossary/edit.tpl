@@ -12,7 +12,8 @@
 		<td colspan="2">
 		<select name="language_id" id="language">
 		{section name=i loop=$languages}
-			{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].id==$activeLanguage}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>{/if}
+			{if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+			{/if}
 		{/section}
 		</select> *
 		</td>
@@ -37,7 +38,7 @@
 			<textarea
 				name="definition"
 				id="definition"
-				style="width:500px;height:250px;font-size:13px">{$ref.text}</textarea>
+				style="width:500px;height:250px;font-size:13px">{$gloss.definition}</textarea>
 		</td>
 		<td>*</td>
 	</tr>
@@ -49,6 +50,32 @@
 			<div id="synonyms"></div>
 		</td>
 	</tr>
+
+	<tr style="vertical-align:top">
+		<td>{t}Media:{/t}</td>
+		<td colspan="2">
+		{if $gloss.media|@count==0}
+		{t}(no media have been uploaded){/t}
+		{else}
+		<table>
+		{section name=i loop=$gloss.media}
+		<tr class="tr-highlight" id="media-row-{$gloss.media[i].id}">
+			<td style="width:400px">
+				<span
+					class="pseudo-a" onclick="allShowMedia('{$session.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
+			</td>
+			<td style="cursor:pointer" onclick="glossMediaDelete({$gloss.media[i].id})">
+				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
+			</td>
+		</tr>
+		{/section}
+		</table>
+		{/if}
+		<br />
+		<span class="pseudo-a" onclick="$('#action').val('media');glossCheckForm(this);">{t}upload media{/t}</span>
+		</td>
+	</tr>
+
 	<tr><td colspan="3">&nbsp;</td></tr>		
 	<tr>
 		<td colspan="3">
@@ -59,6 +86,7 @@
 			{/if}
 		</td>
 	</tr>
+
 </table>
 </form>
 </div>
@@ -74,19 +102,13 @@ f.offset({left : off.left + $('#add').width() + 50, top: off.top});
 
 });
 
-
 {/literal}
 
-
-
-
-
-
-{section name=i loop=$ref.taxa}
-	litAddTaxonToList([{$ref.taxa[i].taxon_id},'{$ref.taxa[i].taxon}']);
+{section name=i loop=$gloss.synonyms}
+glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');
 {/section}
 
-litThisReference = ['{$ref.author_first|escape:'quotes'} ({$ref.year})'];
+glossThisTerm = '{$gloss.term|@addslashes}';
 
 </script>
 

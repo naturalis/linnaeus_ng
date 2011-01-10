@@ -1,4 +1,6 @@
 var glossAddedSynonyms = Array();
+var glossThisTerm;
+
 
 function glossAddSynonymToList(synonym) {
 
@@ -94,5 +96,38 @@ function glossCheckForm(ele) {
 		$(ele).closest("form").submit();
 
 	}
+
+}
+
+function glossDelete() {
+
+	if (!allDoubleDeleteConfirm(_('the term'),glossThisTerm)) return;
+	
+	$('#action').val('delete');
+
+	$('#theForm').submit();
+
+}
+
+function glossMediaDelete(id) {
+
+	if (!confirm(_('Are you sure?')));
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_media' ,
+			'id' : id ,
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if(data=='<ok>') {
+				$('#media-row-'+id).remove();
+			}			
+		}
+	});
+	
 
 }
