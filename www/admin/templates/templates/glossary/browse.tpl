@@ -6,7 +6,7 @@
 {t}See glossary items in:{/t}&nbsp;
 <select name="activeLanguage" id="language" onchange="$('#theForm').submit();">
 {section name=i loop=$languages}
-	{if $languages[i].language!=''}<option value="{$languages[i].id}" {if $languages[i].id==$activeLanguage}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+	{if $languages[i].language!=''}<option value="{$languages[i].language_id}" {if $languages[i].language_id==$activeLanguage}selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
 	{/if}
 {/section}
 </select>

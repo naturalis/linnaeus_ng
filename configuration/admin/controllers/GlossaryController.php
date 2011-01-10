@@ -30,15 +30,20 @@ class GlossaryController extends Controller
 
     public $usedModels = array(
 		'glossary',
-		'glossary_synonym'
+		'glossary_synonym',
+		'glossary_media'
     );
    
+    public $usedHelpers = array(
+        'file_upload_helper','image_thumber_helper'
+    );
+
     public $controllerPublicName = 'Glossary';
 
 
-	public $cssToLoad = array('glossary.css');
+	public $cssToLoad = array('glossary.css','colorbox/colorbox.css');
 
-	public $jsToLoad = array('all' => array('glossary.js'));
+	public $jsToLoad = array('all' => array('glossary.js','colorbox/jquery.colorbox.js'));
 
     /**
      * Constructor, calls parent's constructor
@@ -64,37 +69,79 @@ class GlossaryController extends Controller
     
     }
 
+    /**
+     * Index of all glossary actions
+     *
+     * @access    public
+     */
     public function indexAction()
     {
     
         $this->checkAuthorisation();
         
         $this->setPageName( _('Index'));
+		
+		unset($_SESSION['system']['glossary']['alpha']);
 
         $this->printPage();
     
     }
 
+    /**
+     * Create new or edit existing glossary term
+     *
+     * @access    public
+     */
     public function editAction()
     {
     
         $this->checkAuthorisation();
 
-		if ($this->rHasId()) $gloss = $this->getGlossaryTerm();
+		if ($this->rHasId()) {
+
+			$gloss = $this->getGlossaryTerm();
+
+			$gloss['media'] =
+				$this->models->GlossaryMedia->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'glossary_id' => $gloss['id']
+						)
+					)
+				);
+
+		}
 
 		if (isset($gloss)) {
 
-    	    $this->setPageName(sprintf(_('Editing glossary term "%s (%s)"'),$gloss['term']));
+    	    $this->setPageName(sprintf(_('Editing glossary term "%s"'),$gloss['term']));
 		
 		} else {
 
     	    $this->setPageName(_('New glossary term'));
 
 		}
-		
+
+		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
+
+			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+
+			$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+
+			$this->deleteGlossaryTerm($this->requestData['id']);
+
+			$this->redirect('browse.php');
+
+		}
+
 		if ($this->rHasVal('activeLanguage')) {
 
 			$activeLanguage = $this->rHasVal('activeLanguage');
+
+		} elseif (isset($gloss)) {
+
+			$activeLanguage = $gloss['language_id'];
 
 		} else {
 
@@ -121,16 +168,16 @@ class GlossaryController extends Controller
 			} else
 			if ($this->models->Glossary->save($data)) {
 
+				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
+
+				$this->models->GlossarySynonym->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'glossary_id' => $id
+					)
+				);
+
 				if ($this->rHasVal('synonyms')) {
-
-					$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
-
-					$this->models->GlossarySynonym->delete(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'glossary_id' => $id
-						)
-					);
 
 					foreach((array)$this->requestData['synonyms'] as $key => $val) {
 
@@ -147,11 +194,19 @@ class GlossaryController extends Controller
 
 				}
 
-				$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+				if ($this->rHasVal('action','media')) {
 
-				$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+					$this->redirect('media_upload.php?id='.$id);
 
-				$this->redirect('browse.php');
+				} else {
+
+					$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+	
+					$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+	
+					$this->redirect('browse.php');
+
+				}
 
 			} else {
 
@@ -161,147 +216,156 @@ class GlossaryController extends Controller
 
 		}
 
-        if (isset($gloss)) $this->smarty->assign('gloss', $ref);
+        if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
 
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
 		$this->smarty->assign('activeLanguage', $activeLanguage);
 
-
         $this->printPage();
-
-		return;
-
-
-
-
-
-
-
-
-
-
-		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
-
-			$_SESSION['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
-			
-			$this->deleteReference($this->requestData['id']);
-
-			$this->redirect('browse.php');
-
-		} 
 
     }
 
-	private function getActualAlphabet($languageId)
-	{
+    /**
+     * Upload media for a glossary term
+     *
+     * @access    public
+     */
+    public function mediaUploadAction ()
+    {
 
-		if (isset($_SESSION['system']['literature']['alpha'])) return $_SESSION['system']['literature']['alpha'];
+        $this->checkAuthorisation();
 
-		$l = $this->models->Glossary->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId(),'language_id'=>$languageId),
-				'columns' => 'distinct lower(substr(term,1,1)) as letter',
-				'order' => 'letter'
-			)
-		);
-		
-		$alpha = null;
-		
-		foreach((array)$l as $key => $val) {
+        if ($this->rHasId()) {
+        // get existing glossary
 
-			$alpha[] = $val['letter'];
+            $gloss = $this->getGlossaryTerm();
+            
+            if ($gloss['id']) {
 
-		}
-		
-		$_SESSION['system']['glossary']['alpha'] = $alpha;
-
-		return $alpha;
-	
-	}
-
-	private function getGlossaryTerm($id=null)
-	{
-
-		if (!isset($id) && !$this->rHasId()) return false;
-
-		$thisId = isset($id) ? $id : $this->requestData['id'];
-
-		$l = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $thisId
-				),
-				'columns' => '*, year(`year`) as `year`'
-			)
-		);
-		
-		if ($l) {
-		
-			$ref = $l[0];
-			
-			$lt = $this->models->LiteratureTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'literature_id' => $thisId	
+				$this->setBreadcrumbIncludeReferer(
+					array(
+						'name' => _('Editing glossary term'), 
+						'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
 					)
-				)
-			);
-			
-			foreach((array)$lt as $key => $val) {
+				);
 
-				if (isset($val['taxon_id'])) {
+                $this->setPageName(sprintf(_('New media for "%s"'),$gloss['term']));
 
-					$t = $this->models->Taxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $val['taxon_id']
-							)
-						)
-					);
+                if ($this->requestDataFiles && !$this->isFormResubmit()) {
+                    $this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+                    $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+                    $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+                    $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+    
+                    $this->addError($this->helpers->FileUploadHelper->getErrors());
+                    $filesToSave = $this->helpers->FileUploadHelper->getResult();
+					
+					$firstInsert = false;
+    
+                    if ($filesToSave) {
 
-					$lt[$key]['taxon'] = $t[0]['taxon'];
+                        foreach((array)$filesToSave as $key => $file) {
 
-				}
+                            $thumb = false;
 
-			}
-			
-			$ref['taxa'] = $lt;
+                            if (
+                                $this->helpers->ImageThumberHelper->canResize($file['mime_type']) &&
+                                $this->helpers->ImageThumberHelper->thumbnail($this->getProjectsMediaStorageDir().$file['name'])
+                            ) {
 
-			return $ref;
+                                $pi = pathinfo($file['name']);
+                                $this->helpers->ImageThumberHelper->size_width(150);
+                                
+                                if ($this->helpers->ImageThumberHelper->save(
+                                    $this->getProjectsThumbsStorageDir().$pi['filename'].'-thumb.'.$pi['extension']
+                                )) {
+                                
+                                    $thumb = $pi['filename'].'-thumb.'.$pi['extension'];
+                                
+                                }
 
-		} else {
+                            }
+
+                            $mt = $this->models->GlossaryMedia->save(
+                                array(
+                                    'id' => null,
+                                    'project_id' => $this->getCurrentProjectId(),
+                                    'glossary_id' => $this->requestData['id'],
+                                    'file_name' => $file['name'],
+                                    'original_name' => $file['original_name'],
+                                    'mime_type' => $file['mime_type'],
+                                    'file_size' => $file['size'],
+                                    'thumb_name' => $thumb ? $thumb : null,
+                                )
+                            );
+							
+							if (!$firstInsert) {
+							
+								$firstInsert = array('id'=>$this->models->GlossaryMedia->getNewId(),'name'=>$file['name']);
+
+							}
+                
+                            if ($mt) {
+                                 
+                                $this->addMessage(sprintf(_('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
+    
+                            } else {
+    
+                                $this->addError(_('Failed writing uploaded file to database.'),1);
+    
+                            }
+                
+                        }
+
+						if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] == '<new>') {
 		
-			return false;
+							$_SESSION['system']['media']['newRef'] =
+								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
+									$firstInsert['name'].
+								'</span>';
+		
+							$this->redirect('edit.php?id='.$gloss['id']);
+		
+						}
 
-		}
+                    }
 
-	}
+                }
+    
+            } else {
 
-	private function getGlossaryTerms($search,$order=null)
-	{
+                $this->addError(_('Unknown glossary term.'));
 
-		$d['project_id'] = $this->getCurrentProjectId();
+            }
 
-		if (!empty($search['term'])) $d['term'] = $search['term'];
-		if (!empty($search['term like'])) $d['term like'] = $search['term like'];
-		if (!empty($search['definition'])) $d['definition'] = $search['definition'];
-		if (!empty($search['language_id'])) $d['language_id'] =  $search['language_id'];
+            $this->smarty->assign('id',$this->requestData['id']);
 
-		$l = $this->models->Glossary->_get(
-				array(
-					'id' => $d,
-					'order' => !empty($order) ? $order : 'term'
-				)
-			);
+            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
-		return $l;
+            $this->smarty->assign('iniSettings',
+                array(
+                    'upload_max_filesize' => ini_get('upload_max_filesize'),
+                    'post_max_size' => ini_get('post_max_size')
+                )
+            );
 
-	}
+        } else {
 
+            $this->addError(_('No glossary term specified.'));
+
+        }        
+
+        $this->printPage();
+    
+    }
+
+
+    /**
+     * Browse through all glossary terms
+     *
+     * @access    public
+     */
     public function browseAction()
     {
     
@@ -327,15 +391,15 @@ class GlossaryController extends Controller
 				);
 
 		} else {
-		
-			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
-	
+
 			if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
 				$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
 	
 			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['system']['glossary']['activeLanguage']))
 				$this->requestData['activeLanguage'] = $_SESSION['system']['glossary']['activeLanguage'];
 	
+			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
+
 			if (!$this->rHasVal('letter') || !in_array($this->requestData['letter'],(array)$alpha))
 				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
 
@@ -392,12 +456,200 @@ class GlossaryController extends Controller
 
 	}
 
+
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+        
+        if ($this->requestData['action'] == 'delete_media') {
+            
+            $this->deleteMedia();
+
+        }
+		
+        $this->printPage();
+    
+    }
+
+	private function deleteMedia($id=null)
+	{
+	
+		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+		
+		if ($id == null) return;
+
+		$gm = $this->models->GlossaryMedia->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+
+		if (file_exists($_SESSION['project']['paths']['project_media'].$gm[0]['file_name'])) {
+
+			if (unlink($_SESSION['project']['paths']['project_media'].$gm[0]['file_name'])) {
+			
+				if ($gm[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$gm[0]['thumb_name'])) {
+				
+					unlink($_SESSION['project']['paths']['project_thumbs'].$gm[0]['thumb_name']);
+
+				}
+			}
+
+		}
+
+		$this->models->GlossaryMedia->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $id
+			)
+		);
+		
+		$this->smarty->assign('returnText','<ok>');
+
+	}
+
+	private function getActualAlphabet($languageId)
+	{
+
+		//if (isset($_SESSION['system']['glossary']['alpha'])) return $_SESSION['system']['glossary']['alpha'];
+
+		$l = $this->models->Glossary->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId(),'language_id'=>$languageId),
+				'columns' => 'distinct lower(substr(term,1,1)) as letter',
+				'order' => 'letter'
+			)
+		);
+		
+		$alpha = null;
+		
+		foreach((array)$l as $key => $val) {
+
+			$alpha[] = $val['letter'];
+
+		}
+		
+		$_SESSION['system']['glossary']['alpha'] = $alpha;
+
+		return $alpha;
+	
+	}
+
+
+	private function deleteGlossaryTerm($id)
+	{
+
+		if (!isset($id)) return;
+
+		$this->models->GlossarySynonym->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'glossary_id' => $id	
+			)
+		);
+
+		$gm = $this->models->GlossaryMedia->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'glossary_id' => $id
+				),
+				'columns' => 'id'
+			)
+		);
+		
+		foreach((array)$gm as $key => $val) {
+
+			$this->deleteMedia($val['id']);
+
+		}
+
+		$this->models->Glossary->delete(
+			array(
+			'project_id' => $this->getCurrentProjectId(),
+			'id' => $id
+			)
+		);
+
+	}
+
+	private function getGlossaryTerm($id=null)
+	{
+
+		if (!isset($id) && !$this->rHasId()) return false;
+
+		$thisId = isset($id) ? $id : $this->requestData['id'];
+
+		$l = $this->models->Glossary->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $thisId
+				)
+			)
+		);
+
+		if ($l) {
+		
+			$term = $l[0];
+			
+			$lt = $this->models->GlossarySynonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'glossary_id' => $thisId	
+					)
+				)
+			);
+			
+			$term['synonyms'] = $lt;
+
+			return $term;
+
+		} else {
+		
+			return false;
+
+		}
+
+	}
+
+	private function getGlossaryTerms($search,$order=null)
+	{
+
+		$d['project_id'] = $this->getCurrentProjectId();
+
+		if (!empty($search['term'])) $d['term'] = $search['term'];
+		if (!empty($search['term like'])) $d['term like'] = $search['term like'];
+		if (!empty($search['definition'])) $d['definition'] = $search['definition'];
+		if (!empty($search['language_id'])) $d['language_id'] =  $search['language_id'];
+
+		$l = $this->models->Glossary->_get(
+				array(
+					'id' => $d,
+					'order' => !empty($order) ? $order : 'term'
+				)
+			);
+
+		return $l;
+
+	}
+
 	private function getActiveLanguage()
 	{
 	
 		if ($this->rHasVal('activeLanguage')) {
 
-			return $this->rHasVal('activeLanguage');
+			return $this->requestData['activeLanguage'];
 
 		} elseif(isset($_SESSION['project']['default_language_id'])) {
 

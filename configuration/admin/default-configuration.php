@@ -16,6 +16,35 @@ class configuration
 
     }
 
+    public function getDatabaseSettings ()
+    {
+        
+        return array(
+            'host' => '@DB.HOST@', 
+            'user' => 'linnaeus_user', 
+            'password' => 'car0lu5', 
+            'database' => 'linnaeus_ng', 
+            'tablePrefix' => 'dev_', 
+            'characterSet' => 'utf8'
+        );
+    
+    }
+
+
+    public function getSmartySettings ()
+    {
+
+        return array(
+            'dir_template' => $this->_appFileRoot . 'www/admin/templates/templates', 
+            'dir_compile' => $this->_appFileRoot . 'www/admin/templates/templates_c', 
+            'dir_cache' => $this->_appFileRoot . 'www/admin/templates/cache', 
+            'dir_config' => $this->_appFileRoot . 'www/admin/templates/configs', 
+            'caching' => 1,  // 1,
+            'compile_check' => true
+        );
+    
+    }
+
     public function getGeneralSettings ()
     {
         
@@ -175,7 +204,7 @@ class configuration
                         array(
                             array(
                                 'mime' => 'image/png', 
-                                'media_name' => 'PNG movie', 
+                                'media_name' => 'PNG image', 
                                 'media_type' => 'image', 
                                 'maxSize' => 1000000
                             ),
@@ -275,33 +304,51 @@ class configuration
 
     }
 
-    public function getDatabaseSettings ()
-    {
-        
-        return array(
-            'host' => '@DB.HOST@', 
-            'user' => 'linnaeus_user', 
-            'password' => 'car0lu5', 
-            'database' => 'linnaeus_ng', 
-            'tablePrefix' => 'dev_', 
-            'characterSet' => 'utf8'
-        );
-    
-    }
-
-    public function getSmartySettings ()
+    public function getControllerSettingsGlossary()
     {
 
-        return array(
-            'dir_template' => $this->_appFileRoot . 'www/admin/templates/templates', 
-            'dir_compile' => $this->_appFileRoot . 'www/admin/templates/templates_c', 
-            'dir_cache' => $this->_appFileRoot . 'www/admin/templates/cache', 
-            'dir_config' => $this->_appFileRoot . 'www/admin/templates/configs', 
-            'caching' => 1,  // 1,
-            'compile_check' => true
-        );
-    
-    }
+		return array(
+			'media' =>
+                array(
+                    'allowedFormats' => 
+                        array(
+                            array(
+                                'mime' => 'image/png', 
+                                'media_name' => 'PNG image', 
+                                'media_type' => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/jpg', 
+                                'media_name' => 'JPG image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/jpeg', 
+                                'media_name' => 'JPG image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'image/gif', 
+                                'media_name' => 'GIF image', 
+                                'media_type'  => 'image', 
+                                'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'application/zip', 
+                                'media_name' => 'ZIP-file', 
+                                'media_type' => 'archive', 
+                                'maxSize' => 50000000
+                            ),
+                        ),
+                    'defaultUploadMaxSize' => 5000000 // 5mb
+                )
+			);
 
+	}
+				
+				
 }
 
