@@ -27,7 +27,6 @@ class LiteratureController extends Controller
    
     public $controllerPublicName = 'Literary references';
 
-
 	public $cssToLoad = array('literature.css');
 
 	public $jsToLoad =
@@ -68,7 +67,9 @@ class LiteratureController extends Controller
 		
 		unset($_SESSION['system']['literature']['activeLetter']);
 
-		unset($_SESSION['system']['search']);
+		unset($_SESSION['system']['literature']['search']);
+
+		unset($_SESSION['system']['literature']['alpha']);
 
         $this->printPage();
     
@@ -299,9 +300,12 @@ class LiteratureController extends Controller
 		
 		if ($this->rHasVal('search')) {
 
-			if (isset($_SESSION['system']['search']) && $_SESSION['system']['search']['search'] == $this->requestData['search']) {
+			if (
+				isset($_SESSION['system']['literature']['search']) && 
+				$_SESSION['system']['literature']['search']['search'] == $this->requestData['search']) 
+			{
 			
-				$refs = $_SESSION['system']['search']['results'];
+				$refs = $_SESSION['system']['literature']['search']['results'];
 			
 			} else {
 
@@ -310,16 +314,17 @@ class LiteratureController extends Controller
 						'select *, year(`year`) as `year`, concat(author_first,author_second) as author_both
 						from %table%
 						where
-							author_first like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
+							(author_first like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
 							author_second like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
-							text like "%'.mysql_real_escape_string($this->requestData['search']).'%"
+							text like "%'.mysql_real_escape_string($this->requestData['search']).'%")
+							and project_id = '.$this->getCurrentProjectId().'
 						order by author_first,author_second,year'
 					)
 				);
 
-				$_SESSION['system']['search']['search'] = $this->requestData['search'];
+				$_SESSION['system']['literature']['search']['search'] = $this->requestData['search'];
 	
-				$_SESSION['system']['search']['results'] = $refs;
+				$_SESSION['system']['literature']['search']['results'] = $refs;
 
 			}
 

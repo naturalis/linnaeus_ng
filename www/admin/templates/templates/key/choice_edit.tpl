@@ -71,7 +71,7 @@
 		<td colspan="2">
 		{if $data.choice_img}
 			<img
-				onclick="keyChoiceShowImage('{$session.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
+				onclick="allShowMedia('{$session.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
 				src="{$session.project.urls.project_media}{$data.choice_img}" 
 				class="key-choice-image-normal" /><br />
 			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
