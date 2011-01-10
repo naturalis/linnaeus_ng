@@ -87,7 +87,7 @@
 				{if $choices[i].choice_img}
 					<td{if !$choices[i].choice_txt} colspan="2"{/if}>
 						<img
-							onclick="keyChoiceShowImage('{$session.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
+							onclick="allShowMedia('{$session.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
 							src="{$session.project.urls.project_media}{$choices[i].choice_img}"
 							class="key-choice-image-small" /></td>
 				{/if}

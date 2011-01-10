@@ -29,7 +29,7 @@
 	{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td
-				onclick="taxonMediaShowMedia('{$session.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
+				onclick="allShowMedia('{$session.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
 				style="cursor:pointer">
 				{if $media.image[i].thumb_name != ''}
 					<img

@@ -6,7 +6,7 @@
 <input type="text" name="search" value="{$search}" />&nbsp;
 <input type="{t}submit{/t}" value="search" />
 </form>
-
+<br />
 <table>
 	<tr class="tr-highlight">
 		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
@@ -24,6 +24,11 @@
 		<td>[<a href="edit.php?id={$refs[i].id}">edit</a>]</td>
 	</tr>
 {/section}
+{if $refs|@count==0 && $search!=''}
+	<tr class="tr-highlight">
+		<td colspan="4">{t}(nothing found){/t}</td>
+	</tr>
+{/if}
 </table>
 <p>
 [<a href="edit.php">add new reference</a>]

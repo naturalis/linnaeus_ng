@@ -287,19 +287,6 @@ function keySetMapInfoLabel(node) {
 
 }
 
-function keyChoiceShowImage(url,name) {
-
-	$.colorbox({
-		href:url,
-		title:name,
-		transition:"elastic", 
-		maxWidth:800,
-		width:"100%",
-		opacity:0
-	});
-
-}
-
 function keyStepUndo() {
 
 	allGeneralGetLabels(allDefaultLanguage,'get_keystep_undo','keyRestoreStep',keyStepId);

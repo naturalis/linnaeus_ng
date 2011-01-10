@@ -145,7 +145,7 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 
 		if (allLanguages[i][2]!=1 || includeDef==true) {
 			buffer = buffer+
-				'<span class="rank-language'+
+				'<span class="project-language'+
 				(allLanguages[i][0]==allActiveLanguage ? 
 					'-active"' : 
 					'" class="pseudo-a" onclick="'+fnc+'('+allLanguages[i][0]+');' 
@@ -980,19 +980,6 @@ function taxonMediaDelete(id,type,name) {
 				$('#media-row-'+id).remove();
 			}			
 		}
-	});
-
-}
-
-function taxonMediaShowMedia(url,name) {
-
-	$.colorbox({
-		href:url,
-		title:name,
-		transition:"elastic", 
-		maxWidth:800,
-		width:"100%",
-		opacity:0
 	});
 
 }
