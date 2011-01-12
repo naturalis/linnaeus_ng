@@ -199,7 +199,7 @@ class KeysController extends Controller
 					)
 				);
 
-				$this->updateKeyPath(array('choice'=>$_SESSION['system']['refChoice']));
+				$this->updateKeyPath(array('choice'=>$this->requestData['ref_choice']));
 	
 			}
 
