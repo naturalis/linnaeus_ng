@@ -25,6 +25,14 @@ var_dump($_SESSION);
 {/if}
 </div ends="body-container">
 <div id="loadingdiv" style="background-image:url(../../media/system/ajax-loader.gif);" class="loadingdiv-invisible"></div>
+
+<div id="overlay"></div>
+<div id="overlay-container">
+	<div id="overlay-close"><span id="overlay-close-x" onclick="hideOverlay()" title="{t}close{/t}">x</span></div>
+	<div id="overlay-content"></div>
+</div>
+
 <span id="dummy-element"></span>
 </body>
 </html>
+

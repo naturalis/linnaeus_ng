@@ -80,7 +80,7 @@
 	<tr>
 		<td colspan="3">
 			<input type="button" value="{t}save{/t}" onclick="glossCheckForm(this)" />
-			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />&nbsp;&nbsp;
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" />&nbsp;&nbsp;
 			{if $gloss.id}
 			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
 			{/if}

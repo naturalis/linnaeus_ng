@@ -2,12 +2,11 @@
 
 <div id="page-main">
 <ul>
-	<li><a href="edit.php">Create new glossary term</a></li>
-	<li><a href="browse.php">Browse glossary terms</a></li>
-	<li><a href="search.php">Search glossary terms</a></li>
+	<li><a href="edit.php">{t}Create new glossary term{/t}</a></li>
+	<li><a href="browse.php">{t}Browse glossary terms{/t}</a></li>
+	<li><a href="search.php">{t}Search glossary terms{/t}</a></li>
 </ul>
 
-process
 </div>
 
 {include file="../shared/admin-footer.tpl"}

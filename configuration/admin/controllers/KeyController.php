@@ -9,7 +9,7 @@
 
 include_once ('Controller.php');
 
-class KeysController extends Controller
+class KeyController extends Controller
 {
     
     private $_remainingTaxaList;

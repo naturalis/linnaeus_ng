@@ -1,4 +1,5 @@
-{include file="shared/admin-header.tpl"}
+{include file="shared/_admin-head.tpl"}
+{include file="shared/_admin-body-start.tpl"}
 
 <div id="page-main">
 
@@ -44,17 +45,17 @@
 <br />
 Management tasks:
 <ul>
-	<li><a href="views/users/">User management</a></li>
-	<li><a href="views/projects/">Project management</a></li>
-	<li><a href="views/users/choose_project.php">Switch projects</a></li>
+	<li><a href="views/users/">{t}User management{/t}</a></li>
+	<li><a href="views/projects/">{t}Project management{/t}</a></li>
+	<li><a href="views/users/choose_project.php">{t}Switch projects{/t}</a></li>
 </ul>
 
 {/if}
 {if $currentRole.role_id==1}
-System administration tasks:
+{t}System administration tasks:{/t}
 <ul>
-	<li><a href="">Set rights</a></li>
-	<li><a href="">Create a project</a></li>
+	<li><a href="">{t}Set rights{/t}</a></li>
+	<li><a href="">{t}Create a project{/t}</a></li>
 </ul>
 
 {/if}

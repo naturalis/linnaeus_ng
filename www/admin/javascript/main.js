@@ -52,8 +52,6 @@ function _(text) {
 
 }
 
-
-
 var allAjaxHandle = false;
 var allAjaxAborted = false;
 var allAjaxAsynchMode = true;
@@ -299,5 +297,30 @@ function allShowMedia(url,name) {
 		width:"100%",
 		opacity:0
 	});
+
+}
+
+function showOverlay() {
+
+	$('#overlay').css('display','block');
+	$('#overlay-container').css('display','block');
+
+	var left = ($('#body-container').width()-$('#overlay-container').width())/2;
+	var top = ($(window).height()-$('#overlay-container').height())/2;
+
+	$('#overlay-container').offset({ left: left, top: top});
+
+}
+
+function hideOverlay() {
+
+	$('#overlay').css('display','none');
+	$('#overlay-container').css('display','none');
+
+}
+
+function setOverlayContent(cnt) {
+
+	$('#overlay-content').html(cnt);
 
 }
