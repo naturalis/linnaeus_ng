@@ -17,7 +17,7 @@
 {section name=i loop=$deadChoices}
 <li>{t}Step{/t} 
 	<span class="pseudo-a" onclick="$('#step').val({$deadChoices[i].step.id});$('#stepForm').submit();">{$deadChoices[i].step.number}: "{$deadChoices[i].step.title}"</span>, 
-	<span class="pseudo-a" onclick="$('#choice').val({$deadChoices[i].id});$('#choiceForm').submit();">{t}choice{/t} {$deadChoices[i].show_order}: "{$deadChoices[i].title}"</span></li>
+	<span class="pseudo-a" onclick="$('#choice').val({$deadChoices[i].id});$('#choiceForm').submit();">{t}choice{/t} {$deadChoices[i].show_order}: "{$deadChoices[i].choice|@substr:0:50}{if $deadChoices[i].choice|@count_characters>50}...{/if}"</span></li>
 {/section}
 </ul>
 {if $smarty.section.i.max==0}There are currently no unconnected choices.{/if}
@@ -29,5 +29,4 @@
 <form action="choice_edit.php" method="post" id="choiceForm">
 <input type="hidden" name="id" id="choice" value="" />
 </form>
-
 {include file="../shared/admin-footer.tpl"}

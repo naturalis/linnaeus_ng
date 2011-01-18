@@ -27,27 +27,6 @@
 {/if}
 	</tr>
 	<tr style="vertical-align:top">
-		<td>{t}Title:{/t}</td>
-		<td colspan="2">
-			<input 
-				type="text"
-				name="titleDefault" 
-				id="titleDefault" 
-				maxlength="64"
-				onblur="keySaveChoiceContent('default')" />
-		</td>
-	{if $session.project.languages|@count>1}
-		<td>
-			<input 
-				type="text" 
-				name="titleOther" 
-				id="titleOther" 
-				maxlength="64"
-				onblur="keySaveChoiceContent('other')" />
-		</td>
-	{/if}
-	</tr>
-	<tr style="vertical-align:top">
 		<td>{t}Text:{/t}</td>
 		<td colspan="2">
 			<textarea

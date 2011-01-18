@@ -16,9 +16,9 @@ function keyToggleFullKeyPath() {
 
 function keyChoiceSave() {
 	
-	if ($('#titleDefault').val().trim()=='') {
+	if ($('#contentDefault').val().trim()=='') {
 		alert(_('You have to enter a title for this choice'));
-		$('#titleDefault').focus();
+		$('#contentDefault').focus();
 	} else {
 		keySaveChoiceContent('default');
 		keySaveChoiceContent('other');
