@@ -38,9 +38,10 @@
 		<th style="width:50px;"></th>
 	</tr>
 {section name=i loop=$choices}
-	<tr class="tr-highlight">
+	<tr class="tr-highlight" style="vertical-align:top">
 		<td class="key-choice-number">{$choices[i].show_order}.</td>
-		<td class="key-choice-title">{$choices[i].title}</td>
+		<!-- td class="key-choice-title">{$choices[i].title}</td -->
+		<td class="key-choice-title">{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}</td>
 		<td class="key-choice-leadsto">&rarr;</td>
 		<td class="key-choice-target">
 		{if $choices[i].res_keystep_id!=''}

@@ -445,47 +445,47 @@ class KeyController extends Controller
 
 			} 
 
-			$this->redirect('step_show.php?id='.$step['id']);
-
-		}
-
-		if ($choice['id'] && isset($this->requestDataFiles) && !$this->isFormResubmit()) {
-		// save image
-
-			// save choice image
-			$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
-			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
-			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
-			$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-
-			$this->addError($this->helpers->FileUploadHelper->getErrors());
-			$filesToSave = $this->helpers->FileUploadHelper->getResult();
-
-			if ($filesToSave) {
-
-				$ck = $this->models->ChoiceKeystep->save(
-					array(
-						'id' => $choice['id'],
-						'project_id' => $this->getCurrentProjectId(),
-						'choice_img' => $filesToSave[0]['name']
-					)
-				);
-			
-				if ($ck) {
+			if ($choice['id'] && isset($this->requestDataFiles) && !$this->isFormResubmit()) {
+			// save image
+	
+				// save choice image
+				$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+				$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+				$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+				$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+	
+				$this->addError($this->helpers->FileUploadHelper->getErrors());
+				$filesToSave = $this->helpers->FileUploadHelper->getResult();
+	
+				if ($filesToSave) {
+	
+					$ck = $this->models->ChoiceKeystep->save(
+						array(
+							'id' => $choice['id'],
+							'project_id' => $this->getCurrentProjectId(),
+							'choice_img' => $filesToSave[0]['name']
+						)
+					);
 				
-					$this->addMessage(_('Image saved.'));
+					if ($ck) {
 					
-					$choice['choice_img'] = $filesToSave[0]['name'];
-
-				} else {
-
-					@unlink($_SESSION['project']['paths']['project_media'].$filesToSave[0]['name']);
-
-					$this->addError(_('Could not save image.'));
-
+						$this->addMessage(_('Image saved.'));
+						
+						$choice['choice_img'] = $filesToSave[0]['name'];
+	
+					} else {
+	
+						@unlink($_SESSION['project']['paths']['project_media'].$filesToSave[0]['name']);
+	
+						$this->addError(_('Could not save image.'));
+	
+					}
+	
 				}
-
+	
 			}
+		
+			$this->redirect('step_show.php?id='.$step['id']);
 
 		}
 
@@ -673,7 +673,7 @@ class KeyController extends Controller
 
 			$kc = $this->getKeystepChoice($val['id']);
 
-			$deadChoices[$key]['title'] = isset($kc['title']) ? $kc['title'] : '...';
+			$deadChoices[$key]['choice'] = isset($kc['choice_txt']) ? $kc['choice_txt'] : '...';
 	
 		}
 		
@@ -1430,10 +1430,8 @@ class KeyController extends Controller
 		);
 		
 		$choice = $ck[0];
-		
+
 		$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$choice['id']);
-		
-		if (isset($kcc['title'])) $choice['title'] = $kcc['title'];
 		
 		if (isset($kcc['choice_txt'])) $choice['choice_txt'] = $kcc['choice_txt'];
 
@@ -1447,8 +1445,6 @@ class KeyController extends Controller
 
 				$k = $this->models->Keystep->_get(array('id' => $choice['res_keystep_id']));
 				
-				if (isset($k['title'])) $choice['target'] = $k['title'];
-
 				if (isset($k['number'])) $choice['target_number'] = $k['number'];
 
 			}
@@ -1533,7 +1529,7 @@ class KeyController extends Controller
 						'choice_id' => $id, 
 						'language_id' => $language
 						),
-					'columns' => 'title,choice_txt'
+					'columns' => 'choice_txt'
 				)
 			);
 
