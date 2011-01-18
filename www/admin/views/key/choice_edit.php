@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/KeysController.php');
+require_once ('../../../../configuration/admin/controllers/KeyController.php');
 
-$c = new KeysController();
+$c = new KeyController();
 
 $c->choiceEditAction();

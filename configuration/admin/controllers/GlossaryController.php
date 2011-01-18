@@ -2,24 +2,21 @@
 
 /*
 
+	call:
+		$this->matchTerms($text,$language_id);
+
 	glossary anatomy:
 	
 	- the glossary consists of terms.
 	- a term consists of the term and its definition.
 	- the term can consist of one or more words.
 	- term and defintion are defined in one language.
-	- terms and defintions have no translations into the other languages, as they are intended to complement the text in a specific language. this means that the glossaries for each language might differ in size and content.
+	- terms and defintions have no translations into the other languages, as they are intended to complement the text in a 
+	  specific language. this means that the glossaries for each language might differ in size and content.
 	- each term can have one or more synonyms.
 	- a synonym consists of a single term (one or more words) in the same language as the term it is a synonym of.
 
 
-term
-  term *+
-  definition *+
-  synonyms (0,1,n) (translations are useless)
-  multimedia & name +
-
-process ALL content to highlight
 
 */
 
@@ -27,6 +24,8 @@ include_once ('Controller.php');
 
 class GlossaryController extends Controller
 {
+
+	private $_currentGlossatyId = false;
 
     public $usedModels = array(
 		'glossary',
@@ -80,8 +79,8 @@ class GlossaryController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName( _('Index'));
-		
-		unset($_SESSION['system']['glossary']['alpha']);
+
+		$this->clearTempValues();
 
         $this->printPage();
     
@@ -94,7 +93,7 @@ class GlossaryController extends Controller
      */
     public function editAction()
     {
-    
+
         $this->checkAuthorisation();
 
 		if ($this->rHasId()) {
@@ -110,6 +109,10 @@ class GlossaryController extends Controller
 						)
 					)
 				);
+
+			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
+
+			$_SESSION['system']['glossary']['activeLanguage'] = $gloss['language_id'];
 
 		}
 
@@ -186,13 +189,16 @@ class GlossaryController extends Controller
 								'id' => 'null',
 								'project_id' => $this->getCurrentProjectId(),
 								'glossary_id' => $id,
-								'synonym' => $val
+								'language_id' => $this->requestData['language_id'],
+								'synonym' => rawurldecode($val)
 							)
 						);
 
 					}
 
 				}
+				
+				$this->clearTempValues();
 
 				if ($this->rHasVal('action','media')) {
 
@@ -221,6 +227,8 @@ class GlossaryController extends Controller
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
 		$this->smarty->assign('activeLanguage', $activeLanguage);
+
+		$this->smarty->assign('backUrl', $this->rHasId() ? 'browse.php' : 'index.php');
 
         $this->printPage();
 
@@ -368,8 +376,9 @@ class GlossaryController extends Controller
      */
     public function browseAction()
     {
-    
-        $this->checkAuthorisation();
+	
+	
+       $this->checkAuthorisation();
 
 		$this->setPageName(_('Browsing glossary'));
 		
@@ -456,6 +465,11 @@ class GlossaryController extends Controller
 
 	}
 
+    /**
+     * Search through all glossary terms
+     *
+     * @access    public
+     */
     public function searchAction()
     {
     
@@ -474,14 +488,35 @@ class GlossaryController extends Controller
 			
 			} else {
 
+				$synonyms = $this->models->GlossarySynonym->_get(
+					array('id' =>
+						'select distinct glossary_id
+						from %table%
+						where
+							synonym like "%'.mysql_real_escape_string($this->requestData['search']).'%"
+							and project_id = '.$this->getCurrentProjectId()
+					)
+				);
+				
+				$b = false;
+				
+				foreach((array)$synonyms as $key => $val) {
+
+					$b .= $val['glossary_id'].',';
+
+				}
+				
+				if ($b) $b = '('.rtrim($b,',').')';
+
 				$terms = $this->models->Glossary->_get(
 					array('id' =>
 						'select *
 						from %table%
 						where
-							(term like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
-							definition like "%'.mysql_real_escape_string($this->requestData['search']).'%")
-							and project_id = '.$this->getCurrentProjectId().'
+							(term like "%'.mysql_real_escape_string($this->requestData['search']).'%"
+							or definition like "%'.mysql_real_escape_string($this->requestData['search']).'%" '.
+							($b ? 'or id in '.$b.') ' : '').
+							'and project_id = '.$this->getCurrentProjectId().'
 						order by language_id,term'
 					)
 				);
@@ -551,6 +586,73 @@ class GlossaryController extends Controller
         $this->printPage();
     
     }
+
+
+	public function matchTerms($text,$languageId)
+	{
+
+		if (empty($text) || empty($languageId)) return;
+
+		$wordlist = $this->getWordList($languageId,true);
+
+		$processed = $text;
+
+		foreach((array)$wordlist as $key => $val) {
+		
+			$this->_currentGlossatyId = $val['id'];
+
+			$expr = '|\b('.$val['word'].')\b|i';
+		
+			$processed = preg_replace_callback($expr,array($this,'embedGlossaryLink'),$processed);
+		
+		}
+
+		return $processed;
+	
+	}
+
+
+	private function embedGlossaryLink($matches)
+	{
+
+		return '<span class="taxonContentGlossaryLink" onclick="taxonContentOpenGlossaryLink('.$this->_currentGlossatyId.')">'.$matches[0].'</span>';
+
+	}
+
+	private function getWordList($languageId,$force=false)
+	{
+
+		if ($force || !isset($_SESSION['system']['glossary'][$languageId]['wordlist'])) {
+
+			$terms = $this->models->Glossary->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $languageId
+					),
+					'columns' => 'id,term as word,\'term\' as source'
+				)
+			);
+
+			$synonyms = $this->models->GlossarySynonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $languageId
+					),
+					'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
+				)
+			);
+
+
+			$_SESSION['system']['glossary'][$languageId]['wordlist'] = array_merge($terms,$synonyms);
+
+		}
+
+		return $_SESSION['system']['glossary'][$languageId]['wordlist'];
+
+	}
+
 
 	private function deleteMedia($id=null)
 	{
@@ -738,5 +840,12 @@ class GlossaryController extends Controller
 
 	}
 
+	private function clearTempValues()
+	{
+	
+		unset($_SESSION['system']['glossary']['alpha']);
+		unset($_SESSION['system']['glossary']['search']);
+	
+	}
 
 }

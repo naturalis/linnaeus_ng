@@ -89,7 +89,7 @@ function glossCheckForm(ele) {
 
 		for(var i=0;i<glossAddedSynonyms.length;i++) {
 
-			$("#theForm").append('<input type="hidden" name="synonyms[]" value="'+ encodeURIComponent(glossAddedSynonyms[i])+'">');
+			$("#theForm").append('<input type="hidden" name="synonyms[]" value="'+ encodeURI(glossAddedSynonyms[i])+'">');
 
 		}
 

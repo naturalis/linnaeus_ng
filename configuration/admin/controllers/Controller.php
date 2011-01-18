@@ -178,59 +178,33 @@ class Controller extends BaseClass
     }
 
 
-
     /**
-     * Assigns basic Smarty variables and renders the page
+     * Renders and displays the page
      *
      * @access     public
      */
-    public function printPage ()
+    public function printPage ($templateName = null)
     {
  
-        $this->setBreadcrumbs();
-
-        $this->smarty->assign('debugMode', $this->debugMode);
-        $this->smarty->assign('session', $_SESSION);
-        $this->smarty->assign('baseUrl', $this->baseUrl);
-        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-        $this->smarty->assign('rnd', $this->getRandomValue());
-        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
-        $this->smarty->assign('errors', $this->getErrors());
-        $this->smarty->assign('messages', $this->getMessages());
-        $this->smarty->assign('helpTexts', $this->getHelpTexts());
-        $this->smarty->assign('app', $this->generalSettings['app']);
-        $this->smarty->assign('pageName', $this->getPageName());
-
-        $this->smarty->assign('uiLanguages', $this->uiLanguages);
-        $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
-        $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
-
-		if (isset($this->cssToLoad)) {
-	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
-    	}
-
-		if (isset($this->jsToLoad)) {
-	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-    	}
-    
-		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
+		$this->preparePage();
 		
-			$msg =
-				sprintf(
-					($_SESSION['user']['logins'] <=1 ? _('Welcome, %s.') : _('Welcome back, %s.')),
-					$_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name']
-				);
-
-	        $this->smarty->assign('welcomeMessage', $msg);
-			
-			$_SESSION['user']['_said_welcome'] = true;
-
-		}
-
-        $this->smarty->display(strtolower($this->getViewName() . '.tpl'));
+        $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
     
     }
 
+    /**
+     * Renders and returns the page
+     *
+     * @access     public
+     */
+    public function fetchPage ($templateName = null)
+    {
+
+		$this->preparePage();
+		
+        return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
+	
+	}
 
 
     /**
@@ -1333,6 +1307,57 @@ class Controller extends BaseClass
 		}
 
 	}
+
+
+    /**
+     * Assigns basic Smarty variables
+     *
+     * @access     public
+     */
+    private function preparePage()
+    {
+ 
+        $this->setBreadcrumbs();
+
+        $this->smarty->assign('debugMode', $this->debugMode);
+        $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('baseUrl', $this->baseUrl);
+        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
+        $this->smarty->assign('rnd', $this->getRandomValue());
+        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+        $this->smarty->assign('errors', $this->getErrors());
+        $this->smarty->assign('messages', $this->getMessages());
+        $this->smarty->assign('helpTexts', $this->getHelpTexts());
+        $this->smarty->assign('app', $this->generalSettings['app']);
+        $this->smarty->assign('pageName', $this->getPageName());
+
+        $this->smarty->assign('uiLanguages', $this->uiLanguages);
+        $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
+        $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
+
+		if (isset($this->cssToLoad)) {
+	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
+    	}
+
+		if (isset($this->jsToLoad)) {
+	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
+    	}
+    
+		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
+		
+			$msg =
+				sprintf(
+					($_SESSION['user']['logins'] <=1 ? _('Welcome, %s.') : _('Welcome back, %s.')),
+					$_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name']
+				);
+
+	        $this->smarty->assign('welcomeMessage', $msg);
+			
+			$_SESSION['user']['_said_welcome'] = true;
+
+		}
+
+    }
 
 
 	private function getCurrentUiLanguage()

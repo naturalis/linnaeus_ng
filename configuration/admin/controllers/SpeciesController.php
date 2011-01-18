@@ -79,7 +79,7 @@ class SpeciesController extends Controller
     );
 
 	public $cssToLoad = array('colorbox/colorbox.css','taxon.css','rank-list.css');
-	public $jsToLoad = array('all' => array('taxon.js','colorbox/jquery.colorbox.js'));
+	public $jsToLoad = array('all' => array('taxon.js','colorbox/jquery.colorbox.js','front-end.js'));
 
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
