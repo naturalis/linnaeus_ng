@@ -17,7 +17,7 @@ function keyToggleFullKeyPath() {
 function keyChoiceSave() {
 	
 	if ($('#contentDefault').val().trim()=='') {
-		alert(_('You have to enter a title for this choice'));
+		alert(_('You have to enter text for this choice'));
 		$('#contentDefault').focus();
 	} else {
 		keySaveChoiceContent('default');
@@ -237,9 +237,9 @@ function keyDeleteKeyStep() {
 function keySaveChoiceContent(type) {
 
 	if (type=='default')
-		content = [$('#titleDefault').val(),$('#contentDefault').val()];
+		content = ['',$('#contentDefault').val()];
 	else
-		content = [$('#titleOther').val(),$('#contentOther').val()];
+		content = ['',$('#contentOther').val()];
 
 	keySaveData(
 		keyChoiceId,
@@ -259,11 +259,8 @@ function keyGetChoiceContent(language) {
 function keySetChoiceContent(obj,language) {
 
 	if (language==allDefaultLanguage) {
-		$('#titleDefault').val(obj ? obj.title : '');
 		$('#contentDefault').val(obj ? obj.choice_txt : '');
-		$('#default-choice-title').html(obj ? obj.title : '...');
 	} else {
-		$('#titleOther').val(obj ? obj.title : '');
 		$('#contentOther').val(obj ? obj.choice_txt : '');
 	}
 
@@ -329,27 +326,13 @@ function keyRestoreChoice(obj,language) {
 	}
 
 	if (obj.language_id==allDefaultLanguage) {
-		$('#titleDefault').val(obj ? obj.title : '');
 		$('#contentDefault').val(obj ? obj.choice_txt : '');
 	} else {
 		allActiveLanguage = obj.language_id;
 		allDrawRankLanguages();
-		$('#titleOther').val(obj ? obj.title : '');
 		$('#contentOther').val(obj ? obj.choice_txt : '');
 	}
 	
 	allSetMessage(_('restored'));
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
