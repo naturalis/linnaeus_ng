@@ -858,7 +858,7 @@ class KeyController extends Controller
 			'title' => $title,
 			'is_start' => $is_start,
 			'choice' => null,
-			'choiceTitle' => null
+			'choice_marker' => null
 		);
 
 		if (!empty($choice) && (count((array)$d)-2)>=0) {
@@ -867,7 +867,7 @@ class KeyController extends Controller
 
 			$d[count((array)$d)-2]['choice'] = $choice;
 
-			$d[count((array)$d)-2]['choiceTitle'] = isset($choice['title']) ? $choice['title'] : '...';
+			$d[count((array)$d)-2]['choice_marker'] = isset($choice['marker']) ? $choice['marker'] : '';
 
 		}
 
@@ -976,66 +976,80 @@ class KeyController extends Controller
 
 	}
 
-	private function getKeyTree($refId=null,$choiceId=null)
+	private function getKeyTree($refId=null,$choice=null)
 	{
 	
 		$s = $refId==null ? $this->getStartKeystep() : $this->getKeystep($refId);
 
 		$step = array(
 			'id' => $s['id'],
-			'name' => $s['number'].'. '.$s['title'], // required for the JIT script
+			'name' =>
+				(isset($choice['marker']) ? '('.$choice['marker'].') ' : '') .
+				$s['number'].'. '.
+				$s['title'],
 			'type' => 'step',
 			'data' => array(
 				'number'=>$s['number'],
 				'title'=>$s['title'],
 				'is_start'=>$s['is_start'],
 				'node' => $this->_counter++,
-				'referringChoiceId' => $choiceId
+				'referringChoiceId' => $choice['id']
 			)
 		);
 
-		$this->_stepList[$step['id']] = true;
+		// $this->_stepList check is protection against circular reference
+		if (!isset($this->_stepList[$s['id']])) {
 
-		$ck = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'keystep_id' => $step['id']
-				),
-				'order' => 'show_order'
-			)
-		);
-		
-		foreach((array)$ck as $key => $val) {
-
-			// $this->_stepList check is protection against circular reference
-			if ($val['res_keystep_id'] && !isset($this->_stepList[$val['res_keystep_id']])) {
-
-//				$ck[$key]['children'] = $this->getKeyTree($val['res_keystep_id']);
-				$step['children'][] = $this->getKeyTree($val['res_keystep_id'],$val['id']);
-
-			} elseif ($val['res_taxon_id']) {
-			
-//				$ck[$key]['taxon'] = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => $val['res_taxon_id'],
-						'columns' => 'id,taxon'
-					)
-				);
-				$step['children'][] = array(
-					'id' => 't'.$t['id'],
-					'type' => 'taxon',
-					'data' => array(
-						'number'=>'t'.$t['id'],
-						'title'=>'&rarr; '.$t['taxon'],
-						'taxon'=> $t['taxon'],
-						'id'=>$t['id']
+			$this->_stepList[$step['id']] = true;
+	
+			$ck = $this->models->ChoiceKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'keystep_id' => $step['id']
 					),
-					'name' => '<i>'.$t['taxon'].'</i>'
-				);
-			
-			} 
+					'order' => 'show_order'
+				)
+			);
+
+			foreach((array)$ck as $key => $val) {
+
+				if ($val['res_taxon_id']) {
+				
+					$t = $this->models->Taxon->_get(
+						array(
+							'id' => $val['res_taxon_id'],
+							'columns' => 'id,taxon'
+						)
+					);
+	
+					$step['children'][] = array(
+						'id' => 't'.$t['id'],
+						'type' => 'taxon',
+						'data' => array(
+							'number'=>'t'.$t['id'],
+							'title'=>'&rarr; '.$t['taxon'],
+							'taxon'=> $t['taxon'],
+							'id'=>$t['id']
+						),
+						'name' => '('.$this->showOrderToMarker($val['show_order']).') '.'<i>'.$t['taxon'].'</i>'
+					);
+				
+				} else
+				if ($val['res_keystep_id']!=-1) {
+	
+					$step['children'][] =
+						$this->getKeyTree(
+							$val['res_keystep_id'],
+							array(
+								'id' => $val['id'],
+								'marker' => $this->showOrderToMarker($val['show_order'])
+							)
+						);
+	
+				}
+
+			}
 
 		}
 		
@@ -1414,7 +1428,9 @@ class KeyController extends Controller
 				$choices[$key]['target'] = _('undefined');
 
 			}
-	
+			
+			$choices[$key]['marker'] = $this->showOrderToMarker($val['show_order']);
+
 		}
 
 		return $choices;
@@ -1464,6 +1480,8 @@ class KeyController extends Controller
 			$choice['target'] = _('undefined');
 
 		}
+
+		$choice['marker'] = $this->showOrderToMarker($choice['show_order']);
 
 		return $choice;
 
@@ -1780,6 +1798,13 @@ class KeyController extends Controller
 		);
 
 		$this->smarty->assign('returnText', json_encode($d[0]));		
+	
+	}
+
+	private function showOrderToMarker($showOrder)
+	{
+	
+		return chr($showOrder+96);
 	
 	}
 
