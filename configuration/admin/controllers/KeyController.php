@@ -803,26 +803,30 @@ class KeyController extends Controller
 
 		}
 
-		// turn it from a list of taxa with their steps into a list of steps with their taxa
-		foreach((array)$results as $taxonId => $stepIds) {
+		if (isset($results)) {
 
-			foreach($stepIds as $key2 => $stepId) {
-
-				if (!isset($d[$stepId][$taxonId])) {
-
-					$d[$stepId][$taxonId] = true;
-
-					$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
-
+			// turn it from a list of taxa with their steps into a list of steps with their taxa
+			foreach((array)$results as $taxonId => $stepIds) {
+	
+				foreach($stepIds as $key2 => $stepId) {
+	
+					if (!isset($d[$stepId][$taxonId])) {
+	
+						$d[$stepId][$taxonId] = true;
+	
+						$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
+	
+					}
+	
 				}
-
+	
 			}
 
 		}
 
 		return array(
-			'list' => $list,
-			'taxonCount' => count($ck)
+			'list' => isset($list) ? $list : null,
+			'taxonCount' => isset($ck) ? count($ck) : 0
 		);
 
 	}
