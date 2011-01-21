@@ -1488,13 +1488,11 @@ class KeyController extends Controller
 				)
 			);
 
-
 			$d = array(
 				'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
 				'project_id' => $this->getCurrentProjectId(), 
 				'choice_id' => $data['id'], 
 				'language_id' => $data['language'],
-				'title' => trim($data['content'][0]),
 				'choice_txt' => trim($data['content'][1])
 			);
 
@@ -1653,10 +1651,7 @@ class KeyController extends Controller
         $d = $data[0];
 
 		if ($newdata!==false && 
-			(
-				(isset($d['title']) && isset($newdata['title']) && $d['title'] == $newdata['title']) &&
-				(isset($d['choice_txt']) && isset($newdata['choice_txt']) && $d['choice_txt'] == $newdata['choice_txt'])
-			)
+			(isset($d['choice_txt']) && isset($newdata['choice_txt']) && $d['choice_txt'] == $newdata['choice_txt'])
 		) return;
 
         $d['save_type'] = $mode;
