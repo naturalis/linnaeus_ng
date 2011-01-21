@@ -62,7 +62,7 @@ function init(treeData){
         Node: {
             overridable: true,
             height: 34,
-            width: 120,
+            width: 140,
 			align: 'left',  
             type: 'rectangle',
             color: '#aaa'

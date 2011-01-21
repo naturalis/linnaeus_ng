@@ -13,7 +13,7 @@
 		{if $first}[...]&nbsp;&rarr;&nbsp;{/if}{assign var=first value=false}
 		{else}
 		<i>
-			<span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].number}. {$keyPath[i].title}</span>{if $keyPath[i].choice}: {$keyPath[i].choiceTitle} 
+			<span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].number}. {$keyPath[i].title}</span>{if $keyPath[i].choice} ({$keyPath[i].choice_marker})
 			{/if}
 		</i>
 		{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}
@@ -31,7 +31,7 @@
 		<td style="text-align:right;width:10px;">{if $keyPath[i].number}{$keyPath[i].number}.{/if}</td>{if $keyPath[i].title}<td>{$keyPath[i].title}</td>{else}<td colspan="2">...</td>{/if}
 	{else}	
 		<td style="text-align:right;width:10px;">{$keyPath[i].number}.</td>
-		<td><span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].title}</span>{if $keyPath[i].choice}: {$keyPath[i].choiceTitle}{/if}<!--{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}--></td>
+		<td><span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].title}</span>{if $keyPath[i].choice} ({$keyPath[i].choice_marker}){/if}<!--{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}--></td>
 	{/if}
 	<td></td>
 </tr>
