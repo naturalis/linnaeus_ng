@@ -305,13 +305,7 @@ class ProjectsController extends Controller
         if (isset($this->requestDataFiles)) {
 		// saving the logo
 
-			$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
-			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
-			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
-			$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-	
-			$this->addError($this->helpers->FileUploadHelper->getErrors());
-			$filesToSave = $this->helpers->FileUploadHelper->getResult();
+			$filesToSave =  $this->getUploadedFiles();
 
 			if ($filesToSave) {
 

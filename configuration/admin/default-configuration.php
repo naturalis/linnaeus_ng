@@ -348,7 +348,81 @@ class configuration
 			);
 
 	}
-				
-				
+
+    public function getControllerSettingsMatrixKey()
+    {
+
+		return array(
+			'characteristicTypes' => array(
+				array(
+					'name' => 'text',
+					'info' => 'a textual description.'
+				),
+				array(
+					'name' => 'media',
+					'info' => 'an image, video or soundfile.'
+				),
+				array(
+					'name' => 'range',
+					'info' => 'a value range, defined by a lowest and a highest value.'
+				),
+				array(
+					'name' => 'distribution',
+					'info' => 'a value distribution, defined by a mean and values for one and two standard deviations.'
+				)
+			),
+			'media' =>
+                array(
+				  'allowedFormats' => 
+					array(
+					  array(
+						'mime' => 'image/png', 
+						'media_name' => 'PNG image', 
+						'media_type' => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/jpg', 
+						'media_name' => 'JPG image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/jpeg', 
+						'media_name' => 'JPG image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/gif', 
+						'media_name' => 'GIF image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'video/h264', 
+						'media_name' => 'h.264 movie', 
+						'media_type'  => 'video', 
+						'maxSize' => 50000000
+					  ),
+					  array(
+						'mime' => 'video/quicktime', 
+						'media_name' => 'Quicktime', 
+						'media_type'  => 'video', 
+						'maxSize' => 50000000
+					  ),
+					  array(
+						'mime' => 'audio/mpeg', 
+						'media_name' => 'mp3', 
+						'media_type'  => 'sound', 
+						'maxSize' => 10000000
+					  ),
+					),
+                    'defaultUploadMaxSize' => 5000000 // 5mb
+                )			
+		);
+
+    }
+								
 }
 

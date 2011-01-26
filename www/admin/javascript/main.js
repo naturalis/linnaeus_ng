@@ -199,7 +199,7 @@ function allAddLanguage(lan) {
 }
 
 
-function allDrawRankLanguages() {
+function allDrawLanguages() {
 
 	var b='';
 
@@ -208,7 +208,7 @@ function allDrawRankLanguages() {
 			b = b + 
 				'<span class="project-language'+
 					(allLanguages[i][0]==allActiveLanguage ? '-active' : '' )+
-					'" onclick="allSwitchRankLanguage('+ allLanguages[i][0] +')">' + 
+					'" onclick="allSwitchLanguage('+ allLanguages[i][0] +')">' + 
 				allLanguages[i][1] + 
 				'</span>&nbsp;';
 		} else {
@@ -220,12 +220,14 @@ function allDrawRankLanguages() {
 
 }
 
-function allSwitchRankLanguage(language) {
+var allActiveView = false;
+
+function allSwitchLanguage(language) {
 
 	allActiveLanguage = language;
-	allDrawRankLanguages();
+	allDrawLanguages();
 
-	switch (taxonActiveView) {
+	switch (allActiveView) {
 		case 'ranklabels':
 			taxonGetRankLabels(allActiveLanguage);
 			break;
@@ -297,30 +299,5 @@ function allShowMedia(url,name) {
 		width:"100%",
 		opacity:0
 	});
-
-}
-
-function showOverlay() {
-
-	$('#overlay').css('display','block');
-	$('#overlay-container').css('display','block');
-
-	var left = ($('#body-container').width()-$('#overlay-container').width())/2;
-	var top = ($(window).height()-$('#overlay-container').height())/2;
-
-	$('#overlay-container').offset({ left: left, top: top});
-
-}
-
-function hideOverlay() {
-
-	$('#overlay').css('display','none');
-	$('#overlay-container').css('display','none');
-
-}
-
-function setOverlayContent(cnt) {
-
-	$('#overlay-content').html(cnt);
 
 }

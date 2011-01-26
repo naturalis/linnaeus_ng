@@ -261,13 +261,8 @@ class GlossaryController extends Controller
                 $this->setPageName(sprintf(_('New media for "%s"'),$gloss['term']));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
-                    $this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
-                    $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
-                    $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
-                    $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-    
-                    $this->addError($this->helpers->FileUploadHelper->getErrors());
-                    $filesToSave = $this->helpers->FileUploadHelper->getResult();
+
+                    $filesToSave =  $this->getUploadedFiles();
 					
 					$firstInsert = false;
     

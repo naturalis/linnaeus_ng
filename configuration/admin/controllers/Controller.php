@@ -1008,6 +1008,33 @@ class Controller extends BaseClass
 	
 	}
 
+    /**
+     * Catches and saves uploaded files
+     *
+     * @access     public
+     */
+	public function getUploadedFiles() 
+	{
+
+		if (
+			isset($this->helpers->FileUploadHelper) &&
+			isset($this->controllerSettings['media']['allowedFormats']) &&
+			isset($this->requestDataFiles)
+		) {
+
+			$this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+			$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+	
+			$this->addError($this->helpers->FileUploadHelper->getErrors());
+
+			return $this->helpers->FileUploadHelper->getResult();
+
+		}
+
+	}				
+				
     private function _getTaxonTree($params) 
     {
 
@@ -1257,7 +1284,7 @@ class Controller extends BaseClass
 	
 	public function rHasVal($var,$val=null)
 	{
-	
+
 		if (isset($val))
 			return isset($this->requestData[$var]) && !empty($this->requestData[$var]) && $this->requestData[$var] == $val;
 		else

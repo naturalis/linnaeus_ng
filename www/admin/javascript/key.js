@@ -302,7 +302,7 @@ function keyRestoreStep(obj,language) {
 		$('#contentDefault').val(obj ? obj.content : '');
 	} else {
 		allActiveLanguage = obj.language_id;
-		allDrawRankLanguages();
+		allDrawLanguages();
 		$('#titleOther').val(obj ? obj.title : '');
 		$('#contentOther').val(obj ? obj.content : '');
 	}
@@ -329,7 +329,7 @@ function keyRestoreChoice(obj,language) {
 		$('#contentDefault').val(obj ? obj.choice_txt : '');
 	} else {
 		allActiveLanguage = obj.language_id;
-		allDrawRankLanguages();
+		allDrawLanguages();
 		$('#contentOther').val(obj ? obj.choice_txt : '');
 	}
 	
