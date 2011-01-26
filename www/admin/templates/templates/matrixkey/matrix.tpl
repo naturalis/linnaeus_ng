@@ -1,38 +1,36 @@
 {include file="../shared/admin-header.tpl"}
-{literal}
-<style>
-.matrix-list-select {
-	border:1px solid black;
-	width:420px;
-	height:220px;
-}
-.matrix-button {
-	font-size:11px;
-}
-</style>
-{/literal}
+
 <div id="page-main">
 <table>
 	<tr>
 		<td>
-			<select multiple="multiple" class="matrix-list-select">
+			{t}characteristics{/t}
+			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange()">
+			{section name=i loop=$characteristics}
+			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].characteristic} ({$characteristics[i].type})</option>
+			{/section}
 			</select>
 		</td>
 		<td></td>
 		<td>
+			{t}taxa{/t}
 			<select multiple="multiple" class="matrix-list-select">
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="add new characteristic"  onclick="maxtrixCharacteristicAdd()" />
-			<input type="button" class="matrix-button" value="delete selected characteristic" />
+			<input type="button" class="matrix-button" value="{t}add new{/t}" onclick="window.open('char.php','_self');" />
+			<input 
+				type="button" 
+				class="matrix-button" 
+				value="{t}edit/delete selected{/t}"  
+				onclick="window.open('char.php?id='+$('#characteristics').val(),'_self');" />
 		</td>
 		<td></td>
 		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="add new taxon" onclick="maxtrixTaxonAdd();" />
-			<input type="button" class="matrix-button" value="delete selected taxon" />
+			<input type="button" class="matrix-button" value="{t}add new taxon{/t}" onclick="maxtrixTaxonAddClick();" />
+			<input type="button" class="matrix-button" value="{t}delete selected taxon{/t}" />
 		</td>
 	</tr>
 	<tr>
@@ -40,24 +38,27 @@
 	</tr>		
 	<tr>
 		<td>
-			<select multiple="multiple" class="matrix-list-select">
+			{t}states{/t}
+				<select multiple="multiple" id="states" class="matrix-list-select">
 			</select>
 		</td>
 		<td></td>
 		<td>
+			{t}links{/t}
 			<select multiple="multiple" class="matrix-list-select">
 			</select>
 		</td>
 	</tr>		
 	<tr>
 		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="add new state" />
-			<input type="button" class="matrix-button" value="delete selected state" />
+			<input type="button" class="matrix-button" id="newStateButton" value="{t}add new{/t}" onclick="matrixAddStateClick()" />
+			<input type="button" class="matrix-button" value="{t}edit/delete selected{/t}" onclick="window.open('state.php?id='+$('#states').val(),'_self');" />
+
 		</td>
 		<td></td>
 		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="add new link" />
-			<input type="button" class="matrix-button" value="delete selected link" />
+			<input type="button" class="matrix-button" value="{t}add new{/t}" />
+			<input type="button" class="matrix-button" value="{t}delete selected{/t}" />
 		</td>
 	</tr>
 </table>
