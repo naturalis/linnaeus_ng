@@ -54,7 +54,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	taxonActiveView = 'taxon';
+	allActiveView = 'taxon';
 	taxonHigherTaxa = {if $isHigherTaxa}true{else}false{/if};
 {section name=i loop=$languages}
 	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);

@@ -107,13 +107,13 @@
 {literal}
 $(document).ready(function(){
 {/literal}
-taxonActiveView = 'commonnames';
+allActiveView = 'commonnames';
 
 {section name=i loop=$languages}
 allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}
 allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
-allDrawRankLanguages();
+allDrawLanguages();
 taxonGetCommonnameLabels(allDefaultLanguage);
 taxonGetCommonnameLabels(allActiveLanguage);
 

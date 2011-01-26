@@ -1,4 +1,3 @@
-var taxonActiveView = false;
 var taxonActivePageTitle = false;
 var taxonActiveTaxonId = false;
 var taxonNewLanguage = false;
