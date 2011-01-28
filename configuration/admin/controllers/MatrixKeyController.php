@@ -1,6 +1,13 @@
 <?php
 
 /*
+	function private deleteMatrix($id)
+del states
+del characteristics
+del matrixstate
+
+
+
 
 delete stuff besides char
 
@@ -47,7 +54,9 @@ class MatrixKeyController extends Controller
 {
     
     public $usedModels = array(
+		'matrix',
 		'characteristic',
+		'matrix_characteristic',
 		'characteristic_label',
 		'characteristic_state'
 	);
@@ -56,9 +65,9 @@ class MatrixKeyController extends Controller
 
     public $controllerPublicName = 'Matrix key';
 
-	public $cssToLoad = array('matrix.css');
+	public $cssToLoad = array('matrix.css','colorbox/colorbox.css');
 
-	public $jsToLoad = array('all' => array('matrix.js'));
+	public $jsToLoad = array('all' => array('matrix.js','colorbox/jquery.colorbox.js'));
 
 
     /**
@@ -96,46 +105,176 @@ class MatrixKeyController extends Controller
     
     }
 
+    public function matricesAction()
+    {
+    
+        $this->checkAuthorisation();
+        
+        $this->setPageName( _('Matrices'));
+
+		if ($this->rHasVal('action','delete') && !$this->isFormResubmit()) {
+
+			$this->deleteMatrix($this->requestData['id']);
+			
+			if ($this->getCurrentMatrixId()==$this->requestData['id']) $this->setCurrentMatrixId(null);
+/*
+del states
+del characteristics
+del matrox
+
+*/
+			
+		} else
+		if ($this->rHasVal('action','activate') && !$this->isFormResubmit()) {
+
+			$this->setCurrentMatrixId($this->requestData['id']);
+			
+			$this->redirect('edit.php');
+
+		}
+
+		$matrices = $this->models->Matrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'matrix'
+			)
+		);
+
+		$this->smarty->assign('matrices',$matrices);
+
+        $this->printPage();
+    
+    }
+
     public function matrixAction()
     {
     
         $this->checkAuthorisation();
         
-        $this->setPageName( _('Matrix'));
+		if ($this->rHasId()) {
 
-		$this->smarty->assign('characteristics',$this->getCharacteristics());
+			$matrix = $this->getMatrix();
+
+	        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+
+		} else {
+
+	        $this->setPageName(_('New matrix'));
+		
+		}
+
+		if ($this->rHasVal('matrix') && !$this->isFormResubmit()) {
+
+			$v = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix' => $this->requestData['matrix']
+			);
+			
+			if ($this->rHasId()) {
+
+				$v['id !='] = $this->requestData['id'];
+
+			}
+
+			$m = $this->models->Matrix->_get(
+				array(
+					'id' => $v,
+					'columns' => 'count(*) as total'
+				)
+			);
+			
+			if ($m[0]['total']>0) {
+			
+				$this->addError(_('A matrix with that name already exists.'));
+				
+				$matrix = $this->requestData;
+			
+			} else {
+
+				$this->models->Matrix->save(
+					array(
+						'id' => ($this->rHasId() ? $this->requestData['id'] : 'null'),
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix' =>  $this->requestData['matrix']
+					)
+				);
+
+				$this->redirect('matrices.php');
+
+			}
+
+		}
+
+
+		if (isset($matrix)) $this->smarty->assign('matrix',$matrix);
 
         $this->printPage();
     
     }
+
+
+    public function editAction()
+    {
+    
+        $this->checkAuthorisation();
+		
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
+		
+		$matrix = $this->getMatrix($this->getCurrentMatrixId());
+
+        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+
+		$this->smarty->assign('characteristics',$this->getCharacteristics());
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+    
+    }
+
 
 	public function charAction()
 	{
 	
         $this->checkAuthorisation();
         
+		// need an active matrix to assign the characteristic to
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
+
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Matrix'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php'
+            )
+        );
+
+		// get the current active matrix' id
+		$matrix = $this->getMatrix($this->getCurrentMatrixId());
 
 		if ($this->rHasId() && $this->rHasVal('action','delete')) {
 
+			// delete the char from this matrix (and automatically delete the char itself if it isn't used in any other matrix)
 			$this->deleteCharacteristic();
 
-			$this->redirect('matrix.php');
+			$this->redirect('edit.php');
+
+		} else
+		if ($this->rHasVal('existingChar') && $this->rHasVal('action','use')) {
+
+			$this->addCharacteristicToMatrix($this->requestData['existingChar']);
+
+			$this->redirect('edit.php');
 
 		} else
 		if ($this->rHasId()) {
 
-			$c = $this->models->Characteristic->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $this->requestData['id']
-					)
-				)
-			);
+			$c = $this->getCharacteristic($this->requestData['id']);
+			
+			$this->smarty->assign('characteristic',$c);
 
-			$this->smarty->assign('characteristic',$c[0]);
-
-	        $this->setPageName(sprintf(_('Editing characteristic "%s"'),$c[0]['characteristic']));
+	        $this->setPageName(sprintf(_('Editing characteristic "%s"'),$c['characteristic']));
 
 		} else {
 
@@ -145,25 +284,25 @@ class MatrixKeyController extends Controller
 
 		if ($this->rHasVal('characteristic') && $this->rHasVal('type') && !$this->isFormResubmit()) {
 
-			if (!$this->rHasId()) {
+			// avoid duplicate names
+			$c = $this->models->Characteristic->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'characteristic' => $this->requestData['characteristic'],
+						'id !=' => $this->rHasId() ? $this->requestData['id'] : -1
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
 
-				$c = $this->models->Characteristic->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'characteristic' => $this->requestData['characteristic']
-						),
-						'columns' => 'count(*) as total'
-					)
-				);
+			if ($c[0]['total']==0) {
 
-			}
+				$charId = $this->saveCharacteristic();
 
-			if ($this->rHasId() || $c[0]['total']==0) {
+				$this->addCharacteristicToMatrix($charId);
 
-				$this->saveCharacteristic();
-				
-				$this->redirect('matrix.php');
+				$this->redirect('edit.php');
 				
 			} else {
 
@@ -174,6 +313,10 @@ class MatrixKeyController extends Controller
 			}
 
 		}
+
+		$this->smarty->assign('matrix',$matrix);
+
+		if (!$this->rHasId()) $this->smarty->assign('charLib',$this->getAllCharacteristics($this->getCurrentMatrixId()));
 
 		$this->smarty->assign('charTypes',$this->controllerSettings['characteristicTypes']);
 
@@ -186,12 +329,13 @@ class MatrixKeyController extends Controller
 	
         $this->checkAuthorisation();
 
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
 		if ($this->rHasId() && $this->rHasVal('action','delete')) {
 
 			$this->deleteCharacteristicState();
 
-			$this->redirect('matrix.php');
+			$this->redirect('edit.php');
 
 		} else
 		if ($this->rHasId()) {
@@ -204,14 +348,14 @@ class MatrixKeyController extends Controller
 		if (!$this->rHasVal('char')) {
 		// must have a characteristic to define a state for
 		
-			$this->redirect('matrix.php');
+			$this->redirect('edit.php');
 		
 		}
 
         $this->setBreadcrumbIncludeReferer(
             array(
                 'name' => _('Matrix'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/matrix.php'
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php'
             )
         );
 
@@ -248,6 +392,7 @@ class MatrixKeyController extends Controller
 							'project_id' => $this->getCurrentProjectId(),
 							'characteristic_id' => $this->requestData['char'],
 							'label' => $this->requestData['label'],
+							'text' => isset($this->requestData['text']) ? strip_tags($this->requestData['text']) : null,
 							'file_name' => isset($filesToSave[0]['name']) ? $filesToSave[0]['name'] : null,
 							'lower' => isset($this->requestData['lower']) ? $this->requestData['lower'] : null,
 							'upper' => isset($this->requestData['upper']) ? $this->requestData['upper'] : null,
@@ -261,19 +406,19 @@ class MatrixKeyController extends Controller
 					
 					if ($this->requestData['action']!='repeat') {
 
-						$this->redirect('matrix.php');
+						$this->redirect('edit.php');
 
 					}
 
-					$this->addMessage(_('State saved.'));
+					$this->addMessage(sprintf(_('State "%s" saved.'),$this->requestData['label']));
 
 				}
 
 			}
 
-
 		}
 
+		$this->smarty->assign('matrix',$this->getMatrix($this->getCurrentMatrixId()));
 
 		$this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -285,6 +430,22 @@ class MatrixKeyController extends Controller
 	
 	}
 
+
+    public function taxaAction ()
+    {
+
+		$this->checkAuthorisation();
+
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
+			
+		$this->getTaxonTree();
+
+
+		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+		$this->printPage();
+
+	}
 
 
     /**
@@ -312,6 +473,74 @@ class MatrixKeyController extends Controller
     
     }
 
+	
+	private function setCurrentMatrixId($id,$name=null)
+	{
+	
+		if ($id == null) {
+
+			unset($_SESSION['matrixkey']['id']);
+			unset($_SESSION['matrixkey']['name']);
+
+		} else {
+	
+			$_SESSION['matrixkey']['id'] = $id;
+			if ($name) $_SESSION['matrixkey']['name'] = $name;
+
+		}
+
+	}
+
+	private function getCurrentMatrixId()
+	{
+
+		return $_SESSION['matrixkey']['id'];
+
+	}
+
+
+	private function getMatrix($id=null)
+	{
+
+		$id = isset($id) ? $id : $this->requestData['id'];
+		
+		if (!isset($id)) return;
+
+		$m = $this->models->Matrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+		
+		return $m[0];
+
+	}
+
+	private function deleteMatrix($id)
+	{
+
+		if (!isset($id)) return;
+
+/*
+
+del states
+del characteristics
+del matrixstate
+
+*/
+
+		$this->models->Matrix->delete(
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
+
     private function saveCharacteristic ()
     {
 
@@ -323,70 +552,37 @@ class MatrixKeyController extends Controller
 				'characteristic' => $this->requestData['characteristic']
 			)
 		);
+		
+		return $this->rHasId() ? $this->requestData['id'] : $this->models->Characteristic->getNewId();
 
-/*
-		$id = ($this->rHasId() ? $this->requestData['id'] : $this->models->Characteristic->getNewId());
+    }
 
-		$this->models->CharacteristicLabel->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'characteristic_id' => $id,
-				'language_id' => $this->requestData['language']
-			)
-		);
+	private function addCharacteristicToMatrix($charId,$matrixId=null)
+	{
 
-		$this->models->CharacteristicLabel->save(
+		$matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+
+		if (!isset($charId) || !isset($matrixId)) return;
+
+		@$this->models->MatrixCharacteristic->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
-				'characteristic_id' => $id,
-				'language_id' => $this->requestData['language'],
-				'label' => $this->requestData['label']
+				'matrix_id' => $matrixId,
+				'characteristic_id' => $charId
 			)
 		);
-*/
-    
-    }
 
-    private function deleteCharacteristic ($id=null)
-    {
-	
-		$id = isset($id) ? $id : $this->requestData['id'];
-		
-		if (!isset($id)) return;
-
-		$this->deleteCharacteristicStates($id);
-
-		$this->models->Characteristic->delete(
-			array(
-				'id' => $id,
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-    
-    }
-
-	private function getCharacteristics()
-	{
-	
-		return $this->models->Characteristic->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'order' => 'characteristic'
-			)
-		);
-	
 	}
 
 	private function getCharacteristic($id)
 	{
-	
+
 		$c = $this->models->Characteristic->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
 					'id' => $id
 				)
 			)
@@ -400,6 +596,108 @@ class MatrixKeyController extends Controller
 
 	}
 
+    private function deleteCharacteristic ($id=null)
+    {
+	
+		$id = isset($id) ? $id : $this->requestData['id'];
+		
+		if (!isset($id)) return;
+
+		// delete from matrix-char table for current matrix
+		$this->models->MatrixCharacteristic->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'characteristic_id' => $id
+			)
+		);
+
+		// check if char is used in any other matrix
+		$mc = $this->models->MatrixCharacteristic->_get(
+			array('id' => 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id !=' => $this->getCurrentMatrixId(),
+					'characteristic_id' => $id
+				),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		if ($mc[0]['total']==0) {
+		// if not, adieu
+
+			$this->deleteCharacteristicStates($id);
+	
+			$this->models->Characteristic->delete(
+				array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId()
+				)
+			);
+
+		}
+
+    }
+
+	private function getCharacteristics($matrixId=null)
+	{
+
+		$matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+
+		$mc = $this->models->MatrixCharacteristic->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $matrixId
+				),
+				'columns' => 'characteristic_id'
+			)
+		);
+		
+		foreach((array)$mc as $key => $val) {
+
+			$d[] = $this->getCharacteristic($val['characteristic_id']);
+
+		}
+		
+		return isset($d) ? $d : null;
+	
+	}
+
+	private function getAllCharacteristics($matrixToExclude=null)
+	{
+
+		if (isset($matrixToExclude)) {
+		
+			$ce = $this->getCharacteristics($matrixToExclude);
+			
+			$b = null;
+
+			foreach((array)$ce as $key => $val) {
+
+				$b .= $val['id'].', ';
+
+			}
+			
+			$b = '('.rtrim($b,', ').')';
+
+			$id['id not in'] = $b;
+
+		}
+
+		$id['project_id'] = $this->getCurrentProjectId();
+
+		$c = $this->models->Characteristic->_get(
+			array(
+				'id' => $id,
+				'order' => 'characteristic'
+			)
+		);
+		
+		return $c;
+	
+	}
 
 	private function getCharacteristicType($type)
 	{
@@ -426,16 +724,26 @@ class MatrixKeyController extends Controller
 
 		}
 
+		if ($data['type']=='text') {
 
+			if (!isset($data['text']) || empty($data['text'])) {
+
+				$this->addError(_('Text is required.'));
+
+				$result = false;
+
+			}
+
+		} else
 		if ($data['type']=='range') {
 
-			if (!isset($data['lower']) || empty($data['lower'])) {
+			if (!isset($data['lower']) || empty($data['lower']) && $data['lower']!=='0') {
 
 				$this->addError(_('The lower boundary is required.'));
 
 				$result = false;
 
-			} elseif ($data['lower'] !=  strval(floatval($data['lower']))) {
+			} elseif ($data['lower'] != strval(floatval($data['lower']))) {
 
 				$this->addError(_('Invalid value for the lower boundary (must be integer or real).'));
 
@@ -443,13 +751,13 @@ class MatrixKeyController extends Controller
 
 			}
 
-			if (!isset($data['upper']) || empty($data['upper'])) {
+			if (!isset($data['upper']) || empty($data['upper']) && $data['upper']!=='0') {
 
 				$this->addError(_('The upper boundary is required.'));
 
 				$result = false;
 
-			} elseif ($data['upper'] !=  strval(floatval($data['upper']))) {
+			} elseif ($data['upper'] != strval(floatval($data['upper']))) {
 
 				$this->addError(_('Invalid value for the upper boundary (must be integer or real).'));
 
@@ -475,13 +783,13 @@ class MatrixKeyController extends Controller
 		} else
 		if ($data['type']=='distribution') {
 
-			if (!isset($data['mean']) || empty($data['mean'])) {
+			if (!isset($data['mean']) || empty($data['mean']) && $data['mean']!=='0') {
 
 				$this->addError(_('The mean is required.'));
 
 				$result = false;
 
-			} elseif ($data['mean'] !=  strval(floatval($data['mean']))) {
+			} elseif ($data['mean'] != strval(floatval($data['mean']))) {
 
 				$this->addError(_('Invalid value for the mean (must be integer or real).'));
 
@@ -489,13 +797,13 @@ class MatrixKeyController extends Controller
 
 			}
 
-			if (!isset($data['sd1']) || empty($data['sd1'])) {
+			if (!isset($data['sd1']) || empty($data['sd1']) && $data['sd1']!=='0') {
 
 				$this->addError(_('The value for one standard deviation is required.'));
 
 				$result = false;
 
-			} elseif ($data['sd1'] !=  strval(floatval($data['sd1']))) {
+			} elseif ($data['sd1'] !=  strval(floatval($data['sd1'])) && $data['mean']!=='0') {
 
 				$this->addError(_('Invalid value for one standard deviation (must be integer or real).'));
 
@@ -520,7 +828,7 @@ class MatrixKeyController extends Controller
 		} else
 		if ($data['type']=='media') {
 
-			if (!$file) $this->addError(_('A media file is required.'));
+			if (!$file && !isset($data['existing_file'])) $this->addError(_('A media file is required.'));
 
 		}
 
@@ -614,7 +922,6 @@ class MatrixKeyController extends Controller
 		);
     
     }
-
 
 
 }

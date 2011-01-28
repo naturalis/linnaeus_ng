@@ -143,9 +143,9 @@ abstract class Model extends BaseClass
 			
 			}
 
-            if ($d && (!empty($val) || $val===0)) {
+            if ($d && (!empty($val) || $val===0 || $val==='0')) {
 
-                $fields .= $key . ", ";
+                $fields .= "`".$key ."`, ";
                 
                 if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
                     
@@ -232,21 +232,22 @@ abstract class Model extends BaseClass
 			
 			}
 
-            if ($d && isset($val)) {
+//            if ($d && isset($val)) {
+			if ($d && (!empty($val) || $val===0 || $val==='0')) {
 			
                 if ($d['numeric'] == 1) {
                     
-                    $query .= " " . $key . " = " . $val . ", ";
+                    $query .= " `" . $key . "` = " . $val . ", ";
                 
                 }
                 elseif ($d['type'] == 'datetime') {
                     
-                    $query .= " " . $key . " = " . $val . ", ";
+                    $query .= " `" . $key . "` = " . $val . ", ";
                 
                 }
                 else {
 
-                    $query .= " " . $key . " = ".($val=='null' ? 'null' : "'" . $val . "'").", ";
+                    $query .= " `" . $key . "` = ".($val=='null' ? 'null' : "'" . $val . "'").", ";
                 
                 }
             
@@ -292,11 +293,11 @@ abstract class Model extends BaseClass
 
                 if ($d['numeric'] == 1) {
 				
-	                $query .= ' and ' . $col . " " . $operator . " " . $this->escapeString($val);
+	                $query .= ' and `' . $col . "` " . $operator . " " . $this->escapeString($val);
 
 				} else {
                 
-	                $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
+	                $query .= ' and `' . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
 
     			}
 	        
@@ -357,7 +358,7 @@ abstract class Model extends BaseClass
 				
 				}
 
-                $query .= ' and ' . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
+                $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
             
             }
         
