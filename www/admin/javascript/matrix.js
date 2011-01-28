@@ -1,9 +1,19 @@
+function matrixMatrixDelete(id,matrix) {
+
+	if (!allDoubleDeleteConfirm(_('matrix'),matrix)) return;
+
+	$('#id').val(id);
+	$('#action').val('delete');
+	$('#theForm').submit();
+
+}
+
 function matrixSetStates(obj) {
 
 	for(var i=0;i<obj.length;i++) {
 
 		$('#states').
-			append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').
+			append('<option ondblclick="window.open(\'state.php?id='+obj[i].id+'\',\'_self\')" value="'+obj[i].id+'">'+obj[i].label+'</option>').
 			val(obj[i].id);
 
 	}
@@ -94,6 +104,12 @@ function matrixCheckStateForm() {
 
 		alert(_('A name is required.'));
 		$('#label').focus();
+		
+	} else
+	if($('#text') && $('#text').val()=='') {
+
+		alert(_('Text is required.'));
+		$('#text').focus();
 		
 	} else
 	if($('#uploadedfile') && $('#uploadedfile').val()=='')  {

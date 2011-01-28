@@ -1,72 +1,33 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+<p>
+<form id="theForm" method="post" action="">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="id" value="{$matrix.id}" />
+<input type="hidden" name="action" id="action" value="" />
 <table>
 	<tr>
 		<td>
-			{t}characteristics{/t}
-			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange()">
-			{section name=i loop=$characteristics}
-			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].characteristic} ({$characteristics[i].type})</option>
-			{/section}
-			</select>
+			{t}Matrix name:{/t}
 		</td>
-		<td></td>
 		<td>
-			{t}taxa{/t}
-			<select multiple="multiple" class="matrix-list-select">
-			</select>
+			<input type="text" name="matrix" id="matrix" value="{$matrix.matrix}" maxlength="64" />
 		</td>
 	</tr>
 	<tr>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new{/t}" onclick="window.open('char.php','_self');" />
-			<input 
-				type="button" 
-				class="matrix-button" 
-				value="{t}edit/delete selected{/t}"  
-				onclick="window.open('char.php?id='+$('#characteristics').val(),'_self');" />
-		</td>
-		<td></td>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new taxon{/t}" onclick="maxtrixTaxonAddClick();" />
-			<input type="button" class="matrix-button" value="{t}delete selected taxon{/t}" />
-		</td>
+		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td colspan="3"  style="height:10px">
-	</tr>		
-	<tr>
-		<td>
-			{t}states{/t}
-				<select multiple="multiple" id="states" class="matrix-list-select">
-			</select>
-		</td>
-		<td></td>
-		<td>
-			{t}links{/t}
-			<select multiple="multiple" class="matrix-list-select">
-			</select>
-		</td>
-	</tr>		
-	<tr>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" id="newStateButton" value="{t}add new{/t}" onclick="matrixAddStateClick()" />
-			<input type="button" class="matrix-button" value="{t}edit/delete selected{/t}" onclick="window.open('state.php?id='+$('#states').val(),'_self');" />
-
-		</td>
-		<td></td>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new{/t}" />
-			<input type="button" class="matrix-button" value="{t}delete selected{/t}" />
+		<td colspan="2">
+			<input type="submit" value="{t}save{/t}" />&nbsp;
+			{if $matrix.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>
-
-
-
-
-
+</form>
+</p>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
