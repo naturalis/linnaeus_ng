@@ -2,10 +2,10 @@
 
 include_once ('model.php');
 
-class MatrixCharacteristic extends Model
+class CharacteristicMatrix extends Model
 {
     
-    const tableBaseName = 'matrices_characteristics';
+    const tableBaseName = 'characteristics_matrices';
 
 
 

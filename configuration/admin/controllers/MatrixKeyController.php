@@ -55,10 +55,12 @@ class MatrixKeyController extends Controller
     
     public $usedModels = array(
 		'matrix',
+		'matrix_taxon',
+		'matrix_taxon_state',
 		'characteristic',
-		'matrix_characteristic',
+		'characteristic_matrix',
 		'characteristic_label',
-		'characteristic_state'
+		'characteristic_state',
 	);
     
     public $usedHelpers = array('file_upload_helper');
@@ -227,6 +229,8 @@ del matrox
         $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
 
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
+
+		$this->smarty->assign('taxa',$this->getTaxa());
 
 		$this->smarty->assign('matrix',$matrix);
 
@@ -437,9 +441,29 @@ del matrox
 		$this->checkAuthorisation();
 
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
+
+		if ($this->rHasVal('taxon')) { 
+
+			$this->models->MatrixTaxon->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
+					'taxon_id' => $this->requestData['taxon']
+				)
+			);
+
+			if ($this->requestData['action']!='repeat') {
+
+				$this->redirect('edit.php');
+
+			}
+
+			$this->addMessage(sprintf(_('Taxon added.')));			
+
+		}
 			
 		$this->getTaxonTree();
-
 
 		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
@@ -462,8 +486,29 @@ del matrox
 
 			$this->saveCharacteristic();
 
-        }
-        elseif ($this->requestData['action'] == 'get_states') {
+        } else
+        if ($this->requestData['action'] == 'remove_taxon') {
+
+			$this->removeTaxon();
+			$this->smarty->assign('returnText',json_encode($this->getTaxa()));
+
+        } else
+        if ($this->requestData['action'] == 'add_link') {
+
+			$this->addLink();
+
+        } else
+        if ($this->requestData['action'] == 'delete_link') {
+
+			$this->deleteLink();
+
+        } else
+        if ($this->requestData['action'] == 'get_links') {
+
+			$this->smarty->assign('returnText',json_encode($this->getLinks()));
+
+        } else
+		if ($this->requestData['action'] == 'get_states') {
 
 			$this->getCharacteristicStates();
 
@@ -564,7 +609,7 @@ del matrixstate
 
 		if (!isset($charId) || !isset($matrixId)) return;
 
-		@$this->models->MatrixCharacteristic->save(
+		@$this->models->CharacteristicMatrix->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
@@ -604,7 +649,7 @@ del matrixstate
 		if (!isset($id)) return;
 
 		// delete from matrix-char table for current matrix
-		$this->models->MatrixCharacteristic->delete(
+		$this->models->CharacteristicMatrix->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $this->getCurrentMatrixId(),
@@ -613,7 +658,7 @@ del matrixstate
 		);
 
 		// check if char is used in any other matrix
-		$mc = $this->models->MatrixCharacteristic->_get(
+		$mc = $this->models->CharacteristicMatrix->_get(
 			array('id' => 
 				array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -645,7 +690,7 @@ del matrixstate
 
 		$matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
 
-		$mc = $this->models->MatrixCharacteristic->_get(
+		$mc = $this->models->CharacteristicMatrix->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -923,7 +968,131 @@ del matrixstate
     
     }
 
+	private function getTaxa()
+	{
 
+		$mt = $this->models->MatrixTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId()
+				),
+				'columns' => 'taxon_id'
+			)
+		);
+
+		$this->getTaxonTree();
+
+		foreach((array)$mt as $key => $val) {
+
+			$t[] = array(
+				'id' => $this->treeList[$val['taxon_id']]['id'],
+				'taxon' => $this->treeList[$val['taxon_id']]['taxon']
+			);
+
+		}
+
+		return isset($t) ? $t : null;
+
+	}
+	
+
+	private function removeTaxon($id=null)
+	{
+
+		$id = isset($id) ? $id : $this->requestData['id'];
+		
+		if (!isset($id)) return;
+
+		$this->models->MatrixTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'taxon_id' => $id
+			)
+		);
+
+	}
+
+	private function addLink($charId=null,$taxonId=null,$stateId=null)
+	{
+
+		$charId = isset($charId) ? $charId : $this->requestData['characteristic'];
+		$taxonId = isset($taxonId) ? $taxonId : $this->requestData['taxon'];
+		$stateId = isset($stateId) ? $stateId : $this->requestData['state'];
+		
+		if (!isset($charId) || !isset($taxonId) || !isset($stateId)) return;
+
+		@$this->models->MatrixTaxonState->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'taxon_id' => $taxonId,
+				'characteristic_id' => $charId,
+				'state_id' => $stateId
+			)
+		);
+	
+	}
+
+	private function deleteLink($id=null)
+	{
+
+		$id = isset($id) ? $id : $this->requestData['id'];
+		
+		if (!isset($id)) return;
+
+		$this->models->MatrixTaxonState->delete(
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
+
+	private function getLinks($charId=null,$taxonId=null)
+	{
+
+		$charId = isset($charId) ? $charId : $this->requestData['characteristic'];
+		$taxonId = isset($taxonId) ? $taxonId : $this->requestData['taxon'];
+		
+		if (!isset($charId) || !isset($taxonId)) return;
+
+
+		$mts = $this->models->MatrixTaxonState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
+					'taxon_id' => $taxonId,
+					'characteristic_id' => $charId
+				)
+			)
+		);
+		
+		foreach((array)$mts as $key => $val) {
+
+			$cs = $this->models->CharacteristicState->_get(
+				array('id' =>
+					array(
+						'id' => $val['state_id'],
+						'project_id' => $this->getCurrentProjectId(),
+					),
+					'columns' => 'label',
+				)
+			);
+			
+			$mts[$key]['state'] = $cs[0]['label']; 
+		
+		}
+		
+		return $mts;
+
+	}
+	
+	
 }
 
 

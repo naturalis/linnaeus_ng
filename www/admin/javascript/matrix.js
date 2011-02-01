@@ -13,10 +13,12 @@ function matrixSetStates(obj) {
 	for(var i=0;i<obj.length;i++) {
 
 		$('#states').
-			append('<option ondblclick="window.open(\'state.php?id='+obj[i].id+'\',\'_self\')" value="'+obj[i].id+'">'+obj[i].label+'</option>').
-			val(obj[i].id);
+			append('<option ondblclick="window.open(\'state.php?id='+obj[i].id+'\',\'_self\')" value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
 
 	}
+
+	$("#states :last").removeAttr('selected');
+	$("#states :first").attr('selected','selected');
 
 }
 
@@ -155,12 +157,144 @@ function matrixCheckStateForm() {
 
 }
 
+function matrixSetTaxa(obj) {
 
+	$('#taxa').find('*').remove();
+	$('#taxa')[0].options.length = 0;
 
+	if (!obj) return;
 
+	for(var i=0;i<obj.length;i++) {
 
+		$('#taxa').
+			append('<option ondblclick="matrixDeleteTaxon()" value="'+obj[i].id+'">'+obj[i].taxon+'</option>').val(obj[i].id);
 
+	}
 
+}
+
+function matrixDeleteTaxon() {
+
+	var id = $("#taxa :selected").val()
+
+	if (id==undefined || !confirm(_('Are you sure?'))) return;
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'remove_taxon' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			obj = $.parseJSON(data);
+			matrixSetTaxa(obj);
+		}
+	});
+	
+}
+
+function matrixAddLink(characteristic,taxon,state) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'add_link' ,
+			'characteristic' : characteristic , 
+			'taxon' : taxon , 
+			'state' : state , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			matrixGetLinks();
+		}
+	});
+	
+}
+
+function matrixDeleteLink(id) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_link' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			matrixGetLinks();
+		}
+	});
+	
+}
+
+function matrixGetLinks() {
+
+	var characteristic = $("#characteristics :selected").val()
+	var taxon = $("#taxa :selected").val()
+
+	if (taxon==undefined || characteristic==undefined) return;
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_links',
+			'characteristic' : characteristic, 
+			'taxon' : taxon, 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			matrixSetLinks($.parseJSON(data));
+		}
+	});
+	
+}
+
+function matrixSetLinks(obj) {
+
+	$('#links').find('*').remove();
+	$('#links')[0].options.length = 0;
+
+	if (!obj) return;
+
+	for(var i=0;i<obj.length;i++) {
+
+		$('#links').
+			append('<option ondblclick="matrixDeleteLinks()" value="'+obj[i].id+'">'+obj[i].state+'</option>').val(obj[i].id);
+
+	}
+
+}
+
+function matrixAddLinkClick() {
+
+	var characteristic = $("#characteristics :selected").val()
+	var state = $("#states :selected").val()
+	var taxon = $("#taxa :selected").val()
+
+	if (characteristic==undefined || taxon==undefined || state==undefined) return;
+	
+	matrixAddLink(characteristic,taxon,state);
+
+}
+
+function matrixRemoveLink() {
+
+	var id = $("#links :selected").val()
+
+	if (id==undefined || !confirm(_('Are you sure?'))) return;
+
+	matrixDeleteLink(id);
+
+}
 
 
 
