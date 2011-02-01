@@ -8,7 +8,7 @@
 	<tr>
 		<td>
 			{t}characteristics{/t}
-			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange()">
+			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
 			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].characteristic} ({$characteristics[i].type.name})</option>
 			{/section}
@@ -17,7 +17,10 @@
 		<td></td>
 		<td>
 			{t}taxa{/t}
-			<select multiple="multiple" class="matrix-list-select">
+			<select multiple="multiple" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
+			{section name=i loop=$taxa}
+			<option value="{$taxa[i].id}" ondblclick="alert('show all')">{$taxa[i].taxon}</option>
+			{/section}
 			</select>
 		</td>
 	</tr>
@@ -33,7 +36,7 @@
 		<td></td>
 		<td style="text-align:center">
 			<input type="button" class="matrix-button" value="{t}add new taxon{/t}" onclick="window.open('taxa.php','_self');" />
-			<input type="button" class="matrix-button" value="{t}delete selected taxon{/t}" />
+			<input type="button" class="matrix-button" value="{t}remove selected taxon{/t}" onclick="matrixDeleteTaxon()" />
 		</td>
 	</tr>
 	<tr>
@@ -42,13 +45,13 @@
 	<tr>
 		<td>
 			{t}states{/t}
-				<select multiple="multiple" id="states" class="matrix-list-select">
+			<select multiple="multiple" id="states" class="matrix-list-select">
 			</select>
 		</td>
 		<td></td>
 		<td>
 			{t}links{/t}
-			<select multiple="multiple" class="matrix-list-select">
+			<select multiple="multiple" id="links" class="matrix-list-select">
 			</select>
 		</td>
 	</tr>		
@@ -60,8 +63,8 @@
 		</td>
 		<td></td>
 		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new{/t}" />
-			<input type="button" class="matrix-button" value="{t}delete selected{/t}" />
+			<input type="button" class="matrix-button" value="{t}add new{/t}"  onclick="matrixAddLinkClick()" />
+			<input type="button" class="matrix-button" value="{t}delete selected{/t}"  onclick="matrixRemoveLink()"  />
 		</td>
 	</tr>
 </table>

@@ -10,9 +10,9 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
+	<select name="taxon" id="taxon">
 	{foreach from=$taxa key=k item=val}
-		<option value="{$taxa[i].id}">
+		<option value="{$val.id}">
 		{section name=foo loop=$val.level-$taxa[0].level}
 		&nbsp;
 		{/section}		
