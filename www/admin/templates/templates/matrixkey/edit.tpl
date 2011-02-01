@@ -19,7 +19,7 @@
 			{t}taxa{/t}
 			<select multiple="multiple" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
 			{section name=i loop=$taxa}
-			<option value="{$taxa[i].id}" ondblclick="alert('show all')">{$taxa[i].taxon}</option>
+			<option value="{$taxa[i].id}">{$taxa[i].taxon}</option>
 			{/section}
 			</select>
 		</td>

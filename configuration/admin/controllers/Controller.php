@@ -706,11 +706,11 @@ class Controller extends BaseClass
         if (!isset($array))
             return;
         
-        $this->setSortField($sortBy['key']);
+        if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
         
-        $this->setSortDirection($sortBy['dir']);
+        if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
         
-        $this->setSortCaseSensitivity($sortBy['case']);
+        if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
         
         usort($array,
 			array(
