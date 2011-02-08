@@ -296,6 +296,39 @@ function matrixRemoveLink() {
 
 }
 
+function matrixGeneralSave(id,label,type,action) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'id' : id , 
+			'label' : label , 
+			'language' :  type=='default' ? allDefaultLanguage : allActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+
+			allSetMessage(data);
+
+		}
+	});
+
+}
+
+function matrixSaveCharacteristicLabel(label,type) {
+
+	matrixGeneralSave($('#id').val(),label,type,'save_characteristic_label');
+
+}
+
+function matrixGetCharacteristicLabel() {
+
+	allGeneralGetLabels(language,'get_characteristic_label','matrixSetCharacteristicLabels',$('#id').val());
+
+}
 
 
 

@@ -95,6 +95,8 @@ INSERT INTO dev_rights VALUES (NULL , 'matrixkey', '*','full access',CURRENT_TIM
 
 INSERT INTO dev_rights VALUES (NULL , 'mapkey', '*','full access',CURRENT_TIMESTAMP);
 
+INSERT INTO dev_rights VALUES (NULL , 'content', '*','full access',CURRENT_TIMESTAMP);
+
 
 /*
 
@@ -150,6 +152,7 @@ INSERT INTO dev_rights VALUES (NULL , 'mapkey', '*','full access',CURRENT_TIMEST
 43 | highertaxa | *
 44 | matrixkey  | *
 45 | mapkey     | *
+46 | content    | *
 
 */
 
@@ -169,6 +172,7 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 42, CURRENT
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 43, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 44, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 45, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (1, 46, CURRENT_TIMESTAMP );
 
 # lead expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 1, CURRENT_TIMESTAMP );
@@ -180,6 +184,7 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 42, CURRENT
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 43, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 44, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 45, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (2, 46, CURRENT_TIMESTAMP );
 
 # expert
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 3, CURRENT_TIMESTAMP );
@@ -192,6 +197,7 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 42, CURRENT
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 43, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 44, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 45, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 46, CURRENT_TIMESTAMP );
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
