@@ -22,10 +22,24 @@
 <p>
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="id" value="{$characteristic.id}" />
+<input type="hidden" id="id" name="id" value="{$characteristic.id}" />
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" id="name" value="{$characteristic.characteristic}" />
 <table>
+{if $characteristic.id}
+	<tr>
+		<td>
+		</td>
+{section name=i loop=$languages}
+{if $languages[i].def_language=='1'}
+	<td>{$languages[i].language} *</td>
+{/if}
+{/section}
+{if $languages|@count>1}
+	<td colspan="2" id="project-language-tabs">(languages)</td>
+{/if}
+	</tr>
+{/if}
 	<tr>
 		<td>
 			{t}Characteristic name:{/t}
@@ -34,9 +48,18 @@
 			<input
 				type="text" 
 				name="characteristic" 
-				id="characteristic" 
-				value="{$characteristic.characteristic}" />
+				id="default-characteristic" 
+				onblur="matrixSaveCharacteristicLabel(this.value,'default')" />
 		</td>
+{if $languages|@count>1 && $characteristic.id}
+		<td>
+			<input
+				type="text" 
+				name="characteristic" 
+				id="other-characteristic" 
+				onblur="matrixSaveCharacteristicLabel(this.value,'other')" />
+		</td>
+{/if}
 	</tr>
 	<tr>
 		<td>
@@ -93,6 +116,26 @@
 </form>
 </p>
 </div>
+
+<script type="text/javascript">
+{literal}
+$(document).ready(function(){
+{/literal}
+allActiveView = 'matrixchar';
+
+{section name=i loop=$languages}
+allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
+{/section}
+allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
+allDrawLanguages();
+
+matrixGetCharacteristicLabel(allDefaultLanguage);
+matrixGetCharacteristicLabel(allActiveLanguage);
+
+{literal}
+});
+{/literal}
+</script>
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

@@ -231,7 +231,7 @@ del matrox
 
 	public function charAction()
 	{
-	
+
         $this->checkAuthorisation();
         
 		// need an active matrix to assign the characteristic to
@@ -307,6 +307,8 @@ del matrox
 			}
 
 		}
+
+		$this->smarty->assign('languages',$_SESSION['project']['languages']);
 
 		$this->smarty->assign('matrix',$matrix);
 
@@ -511,6 +513,16 @@ del matrox
 			$this->saveCharacteristic();
 
         } else
+        if ($this->requestData['action'] == 'save_characteristic_label') {
+
+			$this->ajaxActionSaveCharacteristicLabel();
+
+        } else
+        if ($this->requestData['action'] == 'get_characteristic_label') {
+
+			$this->ajaxActionGetCharacteristicLabel();
+
+        } else
         if ($this->requestData['action'] == 'remove_taxon') {
 
 			$this->removeTaxon();
@@ -552,6 +564,98 @@ del matrox
     
     }
 
+	private function ajaxActionSaveCharacteristicLabel()
+	{
+
+		if (!$this->rHasVal('language')) {
+			
+			return;
+		
+		} else {
+			
+			if (!$this->rHasVal('label') && !$this->rHasId()) {
+	
+				$this->models->CharacteristicLabel->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'characteristic_id' => $this->requestData['id']
+					)
+				);
+		
+			} else {
+				
+				if ($this->rHasId()) {
+				
+					$cl = $this->models->CharacteristicLabel->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'language_id' => $this->requestData['language'], 
+								'characteristic_id' => $this->requestData['id']
+							)
+						)
+					);
+					
+					$charId = isset($cl[0]['id']) ? $cl[0]['id'] : null;
+
+				} else {
+				
+					$charId = null;
+				
+				}
+				
+				$this->models->CharacteristicLabel->save(
+					array(
+						'id' => $charId, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'characteristic_id' => $this->requestData['id'], 
+						'label' => trim($this->requestData['label'])
+					)
+				);
+				
+			
+			}
+			
+			$this->smarty->assign('returnText', 'z');
+
+		}
+
+	}
+
+	private function ajaxActionGetCharacteristicLabel()
+	{
+
+        if (!$this->rHasVal('language')) {
+
+            return;
+        
+        } else {
+
+			foreach ((array)$_SESSION['project']['languages'] as $key => $val) {
+
+				if ($val['language_id']==$this->requestData['language']) $direction = $val['direction'];
+
+			}
+
+
+			$cl = $this->models->CharacteristicLabel->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'],
+						'characteristic_id' => $this->requestData['language'],
+						),
+					'columns' => '*, \''.$direction.'\' as direction'
+				)
+			);
+                
+            $this->smarty->assign('returnText', json_encode($lpr));
+        
+        }
+	
+	}
 	
 	private function setCurrentMatrixId($id,$name=null)
 	{

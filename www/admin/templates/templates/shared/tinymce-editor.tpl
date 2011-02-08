@@ -7,7 +7,6 @@
 <script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
 {literal}
 <script type="text/javascript">
-
 function initTinyMce(litRefs,mediaRefs) {
 
 	tinymce.create('tinymce.plugins.LinnaeusPlugin', {
@@ -104,11 +103,10 @@ function initTinyMce(litRefs,mediaRefs) {
 			return null;
 		}
 	});
-	
+
 	// Register plugin with a short name
 	tinymce.PluginManager.add('example', tinymce.plugins.LinnaeusPlugin);
-	
-	
+
 	tinyMCE.init({
 		mode : "textareas",
 		theme : "advanced",
@@ -116,7 +114,7 @@ function initTinyMce(litRefs,mediaRefs) {
 		
 			// Theme options - button# indicated the row# only
 		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,|,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
-		theme_advanced_buttons2 : "litref,addlitref,|,media,addmedia",
+		theme_advanced_buttons2 : "litref,addlitref,|,media,addmedia,",
 		theme_advanced_buttons3 : "",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",

@@ -224,9 +224,18 @@ var allActiveView = false;
 
 function allSwitchLanguage(language) {
 
+	// before switch
+	switch (allActiveView) {
+		case 'introduction':
+			allAjaxAsynchMode = false;
+			contentSaveContentActive();
+			break;			
+	}
+
 	allActiveLanguage = language;
 	allDrawLanguages();
 
+	// after switch
 	switch (allActiveView) {
 		case 'ranklabels':
 			taxonGetRankLabels(allActiveLanguage);
@@ -242,9 +251,13 @@ function allSwitchLanguage(language) {
 			break;
 		case 'keystepedit':
 			keyGetKeystepContent(allActiveLanguage);
-			break;			
+			break;
 		case 'choiceedit':
 			keyGetChoiceContent(allActiveLanguage);
+			break;			
+		case 'introduction':
+			contentGetContentActive();
+			allAjaxAsynchMode = true;
 			break;			
 	}
 

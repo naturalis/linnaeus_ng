@@ -2003,7 +2003,7 @@ class Controller extends BaseClass
                         $this->breadcrumbs[] = $this->breadcrumbIncludeReferer;
                     
                     }
-                    
+
                     $this->breadcrumbs[] = array(
                         'name' => $this->getPageName(), 
                         'url' => $curl . '/' . $this->getViewName() . '.php'

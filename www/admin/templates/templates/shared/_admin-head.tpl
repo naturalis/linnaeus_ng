@@ -34,8 +34,9 @@
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
 {/section}
 {/if}
-
-{if $includeHtmlEditor}
+{if $includeHtmlEditor && $excludeHtmlEditorInnerLinks}
+{include file="../shared/tinymce-editor-default.tpl"}
+{elseif $includeHtmlEditor && !$excludeHtmlEditorInnerLinks}
 {include file="../shared/tinymce-editor.tpl"}
 {/if}
 
