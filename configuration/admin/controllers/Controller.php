@@ -2185,19 +2185,19 @@ class Controller extends BaseClass
 	
 	private function _doMultiArrayFind($var)
 	{
-
+	
 		return (isset($var[$this->findField]) && $var[$this->findField]==$this->findValue);
-
+	
 	}
-
+	
 	public function doMultiArrayFind($array,$field,$value)
 	{
-
+	
 		if ($field==null || $value==null) return;
-
+	
 		$this->findField = $field;
 		$this->findValue = $value;
-
+	
 		return array_filter($array,array($this,'_doMultiArrayFind'));
 
 	}
@@ -2231,8 +2231,8 @@ class Controller extends BaseClass
     private function saveFormResubmitVal ()
     {
 	
-		if (!$this->noResubmitvalReset)
-	        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+	if (!$this->noResubmitvalReset)
+        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
     }
 
