@@ -34,8 +34,6 @@
         - what if language has no iso2?
         - what happens if language does not exist at google?
 
-    hardcoded set_time_limit(3000); for CoL
-
 	must delete link taxa - ranks when deleting a rank
 
 	purge and limit undo!
@@ -2276,11 +2274,8 @@ class SpeciesController extends Controller
     {
 
         if ($this->rHasVal('taxon_name')) {
-        
-            // needs to go to config
-            $timeout = 600;//secs
 
-            set_time_limit($timeout);
+            set_time_limit(TIMEOUT_COL_RETRIEVAL);
 
             $this->helpers->ColLoaderHelper->setTimerInclusion(false);
 
@@ -2304,7 +2299,7 @@ class SpeciesController extends Controller
 
             }
 
-            $this->helpers->ColLoaderHelper->setTimeout($timeout);
+            $this->helpers->ColLoaderHelper->setTimeout(TIMEOUT_COL_RETRIEVAL);
 
             $this->helpers->ColLoaderHelper->getTaxon();
             

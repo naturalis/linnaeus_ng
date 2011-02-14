@@ -6,7 +6,10 @@
 <table>
 	<tr><td colspan="2">Manage modules:</td></tr>
 	<tr>
+{assign var=i value=1}
 {section name=i loop=$modules}
+{if $modules[i]._rights}
+	{assign var=i value=$i+1}
 		<td>
 			<a href="views/{$modules[i].controller}/">
 				<img src="{$baseUrl}admin/media/system/module_icons/{$modules[i].icon}" style="width:32px;border:0px" />
@@ -15,7 +18,8 @@
 		<td>
 			<a href="views/{$modules[i].controller}/">{$modules[i].module}</a>{if $modules[i].active=='y'} *{/if}
 		</td>
-{if $smarty.section.i.index % 2 == 1}
+{/if}
+{if $i % 2 == 1}
 	<tr>
 	</tr>
 {/if}
@@ -23,7 +27,10 @@
 	</tr>
 	<tr><td colspan="2">&nbsp;</td></tr>
 	<tr>
+{assign var=i value=1}
 {section name=i loop=$freeModules}
+{if $freeModules[i].currentUserRights}
+	{assign var=i value=$i+1}
 		<td>
 			<a href="views/extra/index.php?id={$freeModules[i].id}">
 				<img src="{$baseUrl}admin/media/system/module_icons/custom.png" style="width:32px;border:0px" />
@@ -32,7 +39,8 @@
 		<td>
 			<a href="views/extra/index.php?id={$freeModules[i].id}">{$freeModules[i].module}</a>{if $freeModules[i].active=='y'} *{/if}
 		</td>
-{if $smarty.section.i.index % 2 == 1}
+{/if}
+{if $i % 2 == 1}
 	<tr>
 	</tr>
 {/if}

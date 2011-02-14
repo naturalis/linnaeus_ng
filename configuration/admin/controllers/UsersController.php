@@ -1,7 +1,6 @@
 <?php
 
 /*
-    - replace hard coded role_id's
     - user.active is project wide, but can be set by specific project admins...
 
 */
@@ -88,7 +87,7 @@ class UsersController extends Controller
        
         // check wheter the user has entered a username and/or password
         if ($this->rHasVal('username') || $this->rHasVal('password')) {
-            
+
             // get data of any active user based on entered username and password
             $users = $this->models->User->_get(
 				array(
@@ -159,7 +158,7 @@ class UsersController extends Controller
                 
                 $this->setCurrentProjectId($this->requestData['project_id']);
 
-                $this->setCurrentProjectData($this->models->Project->_get(array('id'=>$this->getCurrentProjectId())));
+                $this->setCurrentProjectData();
 
                 $this->redirect($this->getLoggedInMainIndex());
             
@@ -544,7 +543,7 @@ class UsersController extends Controller
 					)
 				);
 				
-				if ($pru[0]['role_id'] != 2) {
+				if ($pru[0]['role_id'] != ID_ROLE_LEAD_EXPERT2) {
 				
 					$this->deleteUser($this->requestData['id']);
 
@@ -628,7 +627,7 @@ class UsersController extends Controller
                     $this->requestData['id'], $this->getCurrentProjectId());
                     
                     // if collaborator has a regular role, update to the new role...
-                    if ($upr['role_id'] != 1 && $upr['role_id'] != 2) {
+                    if ($upr['role_id'] != ID_ROLE_SYS_ADMIN && $upr['role_id'] != ID_ROLE_LEAD_EXPERT) {
                         
                         $this->models->ProjectRoleUser->save(
 							array(
@@ -730,7 +729,7 @@ class UsersController extends Controller
 
 			}
 
-            $this->smarty->assign('isLeadExpert', $upr['role_id'] == 2);
+            $this->smarty->assign('isLeadExpert', $upr['role_id'] == ID_ROLE_LEAD_EXPERT);
 
             $this->smarty->assign('zones', $zones);
 
@@ -858,6 +857,7 @@ class UsersController extends Controller
         
         $this->setPageName(_('Project overview'));
 
+		// get all modules activated in this project
 		$modules = $this->models->ModuleProject->_get(
 			array(
 				'id' => array(
@@ -869,11 +869,16 @@ class UsersController extends Controller
 
 		foreach ((array) $modules as $key => $val) {
 			
+			// get info per module
 			$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
 			
 			$modules[$key]['icon'] = $mp['icon'];
 			$modules[$key]['module'] = $mp['module'];
 			$modules[$key]['controller'] = $mp['controller'];
+
+			// see if the current user has any rights within the module
+			if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]))
+				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
 
 		}
 
@@ -884,6 +889,17 @@ class UsersController extends Controller
 				)
 			)
 		);
+
+		foreach ((array) $freeModules as $key => $val) {
+			
+			// see if the current user has any rights within the module
+			if (
+				isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) &&
+				$_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]===true
+			)
+				$freeModules[$key]['currentUserRights'] = true;
+
+		}
 
         $this->smarty->assign('modules',$modules);
 
@@ -934,7 +950,15 @@ class UsersController extends Controller
             $d[$val['project_id']] = $val['project_id'];
         
         }
-        
+
+		$fmpu = $this->models->FreeModuleProjectUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
+		
+		foreach((array)$fmpu as $key => $val) {
+
+			$rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
+
+		}
+
         return array(
             'roles' => $pru, 
             'rights' => $rs, 

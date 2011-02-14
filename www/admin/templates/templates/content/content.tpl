@@ -3,9 +3,8 @@
 <span id="message-container" style="float:right;"></span>
 <form name="theForm" id="theForm">
 <input type="button" value="{t}save{/t}" onclick="contentSaveContentAll()" style="margin-right:5px" />
-<input type="button" value="{t}back{/t}" onclick="" style="" />
+<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 <input type="hidden" name="subject" id="subject" value="{$subject}" />
-
 
 <div style="width:780px;height:610px;">
 	<br />

@@ -56,7 +56,8 @@ class Controller extends BaseClass
 		'taxon',
 		'project_rank',
 		'label_project_rank',
-		'rank'
+		'rank',
+		'project_role_user'
     );
 
     private $usedHelpersBase = array(
@@ -452,12 +453,46 @@ class Controller extends BaseClass
 
 
     /**
-     * Sets the active project's name as a session variable (for display purposes)
+     * Sets the active project's data as a session variable
      *
      * @access     public
      */
-    public function setCurrentProjectData ($data)
+    public function setCurrentProjectData ($data=null)
     {
+
+		if ($data==null) {
+
+			$id = $this->getCurrentProjectId();
+
+			if (isset($id)) {
+
+				$data = $this->models->Project->_get(array('id' => $id));
+
+				$pru = $this->models->ProjectRoleUser->_get(
+					array(
+						'id' => array(
+							'project_id' => $id,
+							'role_id' => ID_ROLE_LEAD_EXPERT
+						),
+						'columns' => 'user_id'
+					)
+				);
+				
+				foreach((array)$pru as $key => $val) {
+
+					$u = $this->models->User->_get(array('id' => array('id' => $val['user_id'],'active' => 1)));
+					
+					$pru[$key]['first_name'] = $u[0]['first_name'];
+					$pru[$key]['last_name'] = $u[0]['last_name'];
+					$pru[$key]['email_address'] = $u[0]['email_address'];
+
+				}
+				
+				$_SESSION['project']['lead_experts'] = $pru;
+
+			}
+
+		}
 
 		foreach((array)$data as $key => $val) {
 
@@ -467,6 +502,17 @@ class Controller extends BaseClass
 
     }
 
+    /**
+     * Rerturns the active project's data
+     *
+     * @access     public
+     */
+    public function getCurrentProjectData ()
+    {
+
+		return isset($_SESSION['project']) ? $_SESSION['project'] : null;
+
+    }
 
     /**
      * Sets the default project for the current user
@@ -521,7 +567,7 @@ class Controller extends BaseClass
         
         }
 
-        $this->setCurrentProjectData($this->models->Project->_get(array('id' => $this->getCurrentProjectId())));
+        $this->setCurrentProjectData();
 
     }
 
@@ -594,14 +640,14 @@ class Controller extends BaseClass
             
             // check if there is an active project, otherwise redirect to choose project page
             if ($this->getCurrentProjectId()) {
-                
+
                 // check if the user is authorised for the combination of current page / current project
                 if ($this->isUserAuthorisedForProjectPage()) {
-                    
+
                     return true;
                 
                 } else {
-                    
+
                     $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
                     
                     /*
