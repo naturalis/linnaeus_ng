@@ -17,7 +17,7 @@
 		@import url("{$baseUrl}admin/style/{$cssToLoad[i]}");
 {/section}
 {/if}
-{if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
+{if 1==2 && $session.project.css_url!=''}		@import url("{$session.project.css_url}");
 {/if}
 	</style>
 

@@ -331,11 +331,9 @@ class ProjectsController extends Controller
 			}
 
         }
-        
-        $data = $this->models->Project->_get(array('id' => $this->getCurrentProjectId()));
 
-		$this->setCurrentProjectData($data);
-        
+		$this->setCurrentProjectData();
+
         $languages = array_merge(
 			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
 	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
@@ -362,7 +360,7 @@ class ProjectsController extends Controller
 
         }
         
-        $this->smarty->assign('data', $data);
+        $this->smarty->assign('data', $this->getCurrentProjectData());
         
         $this->smarty->assign('languages', $languages);
         

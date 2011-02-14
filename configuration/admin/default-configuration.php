@@ -8,11 +8,23 @@ class configuration
     public function __construct ()
     {
 
+		$this->setConstants();
+
         $d = $this->getGeneralSettings();
         $d['app']['pathName'];
         $this->_appFileRoot = dirname(__FILE__);
         $this->_appFileRoot = str_replace('\\','/',
             substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
+
+    }
+
+	private function setConstants()
+	{
+
+		if (!defined('ID_ROLE_SYS_ADMIN')) define('ID_ROLE_SYS_ADMIN',1);
+		if (!defined('ID_ROLE_LEAD_EXPERT')) define('ID_ROLE_LEAD_EXPERT',2);
+
+		if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
 
     }
 

@@ -107,9 +107,6 @@
 	</tr>		
 </table>
 </form>
-
-<br />
-The "welcome" and "contributors" texts will be added once the html-editor is in place.
 </div>
 
 {include file="../shared/admin-messages.tpl"}

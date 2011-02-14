@@ -86,12 +86,27 @@ INSERT INTO dev_rights VALUES (NULL , 'literature', '*','full access',CURRENT_TI
 INSERT INTO dev_rights VALUES (NULL , 'literature', 'browse','browse literary references',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'literature', 'edit','edit literary references',CURRENT_TIMESTAMP);
 INSERT INTO dev_rights VALUES (NULL , 'literature', 'search','search literary references',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'literature', 'index','index',CURRENT_TIMESTAMP);
 
 INSERT INTO dev_rights VALUES (NULL , 'glossary', '*','full access',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'glossary', 'index','index',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'glossary', 'browse','browse glossary',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'glossary', 'edit','edit and add glossary items',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'glossary', 'media_upload','ulpload media for glossary item',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'glossary', 'search','search glossary',CURRENT_TIMESTAMP);
 
 INSERT INTO dev_rights VALUES (NULL , 'highertaxa', '*','full access',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'highertaxa', 'index','index',CURRENT_TIMESTAMP);
 
 INSERT INTO dev_rights VALUES (NULL , 'matrixkey', '*','full access',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'index','index',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'char','add or edit characteristic',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'edit','edit a matrix',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'links','add or edit a link',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'matrices','view matrices',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'matrix','create a new matrix',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'state','add or edit states',CURRENT_TIMESTAMP);
+INSERT INTO dev_rights VALUES (NULL , 'matrixkey', 'taxa','add or remove taxa',CURRENT_TIMESTAMP);
 
 INSERT INTO dev_rights VALUES (NULL , 'mapkey', '*','full access',CURRENT_TIMESTAMP);
 
@@ -107,52 +122,69 @@ INSERT INTO dev_rights VALUES (NULL , 'content', '*','full access',CURRENT_TIMES
 5 | Contributor          | Contributes to a project but cannot edit
 
 
- 1 | users      | *
- 2 | users      | index
- 3 | users      | choose_project
- 4 | users      | create
- 5 | users      | edit
- 6 | users      | user_overview
- 7 | users      | view
- 8 | projects   | *
- 9 | projects   | index
-10 | projects   | data
-11 | projects   | modules
-12 | projects   | collaborators
-13 | species    | *
-14 | species    | index
-15 | species    | edit
-16 | species    | list
-17 | species    | page
-18 | species    | col
-19 | species    | collaborators
-20 | species    | file
-21 | species    | media
-22 | species    | media_upload
-23 | species    | ranklabels
-24 | species    | ranks
-25 | species    | sections
-26 | species    | taxon
-27 | key        | *
-28 | key        | index
-29 | key        | step_edit
-30 | key        | step_show
-31 | key        | choice_edit
-32 | key        | dead_ends
-33 | key        | section
-34 | key        | map
-35 | key        | orphans
-36 | key        | process
-37 | key        | rank
-38 | literature | *
-39 | literature | browse
-40 | literature | edit
-41 | literature | search
-42 | glossary   | *
-43 | highertaxa | *
-44 | matrixkey  | *
-45 | mapkey     | *
-46 | content    | *
+ id | controller | view           | view_name
+----+------------+----------------+-------------------------------------
+  1 | users      | *              | full access
+  2 | users      | index          | index
+  3 | users      | choose_project | NULL
+  4 | users      | create         | NULL
+  5 | users      | edit           | NULL
+  6 | users      | user_overview  | NULL
+  7 | users      | view           | NULL
+  8 | projects   | *              | full access
+  9 | projects   | index          | index
+ 10 | projects   | data           | NULL
+ 11 | projects   | modules        | NULL
+ 12 | projects   | collaborators  | NULL
+ 13 | species    | *              | full access
+ 14 | species    | index          | index
+ 15 | species    | edit           | NULL
+ 16 | species    | list           | NULL
+ 17 | species    | page           | NULL
+ 18 | species    | col            | NULL
+ 19 | species    | collaborators  | NULL
+ 20 | species    | file           | NULL
+ 21 | species    | media          | NULL
+ 22 | species    | media_upload   | NULL
+ 23 | species    | ranklabels     | NULL
+ 24 | species    | ranks          | NULL
+ 25 | species    | sections       | NULL
+ 26 | species    | taxon          | NULL
+ 27 | key        | *              | full access
+ 28 | key        | index          | index
+ 29 | key        | step_edit      | editing keysteps
+ 30 | key        | step_show      | reviewing keysteps and choices
+ 31 | key        | choice_edit    | editing choices
+ 32 | key        | dead_ends      | list of dead ends
+ 33 | key        | section        | list of key sections
+ 34 | key        | map            | key map
+ 35 | key        | orphans        | list of orphans
+ 36 | key        | process        | create list of remaining taxa
+ 37 | key        | rank           | define rank of taxa available in key
+ 38 | literature | *              | full access
+ 47 | literature | index          | index
+ 39 | literature | browse         | browse literary references
+ 40 | literature | edit           | edit literary references
+ 41 | literature | search         | search literary references
+ 42 | glossary   | *              | full access
+ 48 | glossary   | index          | index
+ 49 | glossary   | browse         | browse glossary
+ 50 | glossary   | edit           | edit and add glossary items
+ 51 | glossary   | media_upload   | ulpload media for glossary item
+ 52 | glossary   | search         | search glossary
+ 43 | highertaxa | *              | full access
+ 53 | highertaxa | index          | index
+ 44 | matrixkey  | *              | full access
+ 54 | matrixkey  | index          | index
+ 55 | matrixkey  | char           | add or edit characteristic
+ 56 | matrixkey  | edit           | edit a matrix
+ 57 | matrixkey  | links          | add or edit a link
+ 58 | matrixkey  | matrices       | view matrices
+ 59 | matrixkey  | matrix         | create a new matrix
+ 60 | matrixkey  | state          | add or edit states
+ 61 | matrixkey  | taxa           | add or remove taxa
+ 45 | mapkey     | *              | full access
+ 46 | content    | *              | full access
 
 */
 
@@ -201,6 +233,7 @@ INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (3, 46, CURRENT
 
 # editor
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 3, CURRENT_TIMESTAMP );
+INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 14, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 15, CURRENT_TIMESTAMP );
 INSERT INTO dev_rights_roles (role_id, right_id, created) VALUES (4, 16, CURRENT_TIMESTAMP );
 

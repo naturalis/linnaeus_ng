@@ -49,18 +49,44 @@ class ContentController extends Controller
     public function indexAction()
     {
     
+        $this->checkAuthorisation();
+
+        $this->printPage();
+    
+    }
+
+
+    /**
+     * Introduction = redirect to introduction (no actual index necessary)
+     *
+     * @access    public
+     */
+
+    public function introductionAction()
+    {
+    
 		$_SESSION['system']['content']['current-subject'] = 'Introduction';
 
 		$this->redirect('content.php');
     
     }
 
-	
     /**
-     * Introduction
+     * Introduction = redirect to introduction (no actual index necessary)
      *
      * @access    public
      */
+
+    public function contributorsAction()
+    {
+    
+		$_SESSION['system']['content']['current-subject'] = 'Contributors';
+
+		$this->redirect('content.php');
+    
+    }
+
+	
     public function contentAction()
     {
     

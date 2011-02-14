@@ -37,7 +37,11 @@
 <div id="page-main">Welcome to Linnaeus NG.<br />
 <br />
 To use the administration, follow <a href="admin/views/users/login.php">this link</a>.<br />
-To use the application, follow <a href="app/">this link</a>.<br />
+To use an application, follow one of the following links:<br />
+<ul>
+<li><a href="app/views/linnaeus/set_project.php?p=imaginary_beings">Imaginary Beings Of The Literary World</a></li>
+<li><a href="app/views/linnaeus/set_project.php?p=1">Polar Bears Of Amsterdam</a></li>
+</ul>
 <br />
 </div>
 
