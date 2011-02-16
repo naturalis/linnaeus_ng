@@ -6,7 +6,9 @@ class ContentController extends Controller
 {
 
     public $usedModels = array(
-		'content'
+		'content',
+		'free_module_project',
+		'free_module_project_user'
     );
    
     public $usedHelpers = array(
@@ -42,7 +44,7 @@ class ContentController extends Controller
     }
 
     /**
-     * Index = redirect to introduction (no actual index necessary)
+     * Index
      *
      * @access    public
      */
@@ -57,7 +59,7 @@ class ContentController extends Controller
 
 
     /**
-     * Introduction = redirect to introduction (no actual index necessary)
+     * Introduction
      *
      * @access    public
      */
@@ -66,13 +68,14 @@ class ContentController extends Controller
     {
     
 		$_SESSION['system']['content']['current-subject'] = 'Introduction';
+		$_SESSION['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
     }
 
     /**
-     * Introduction = redirect to introduction (no actual index necessary)
+     * Contributors
      *
      * @access    public
      */
@@ -81,23 +84,28 @@ class ContentController extends Controller
     {
     
 		$_SESSION['system']['content']['current-subject'] = 'Contributors';
+		$_SESSION['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
     }
 
-	
     public function contentAction()
     {
     
-        $this->checkAuthorisation();
+		$this->checkAuthorisation();
 
 		$currentSubject =
 			isset($_SESSION['system']['content']['current-subject']) ?
 			$_SESSION['system']['content']['current-subject'] : 
 			'Introduction';
 
-        $this->setPageName( _($currentSubject));
+        $this->setPageName(_($currentSubject));
+
+		$this->smarty->assign('isFreeModule', $_SESSION['system']['content']['is-free-module']);
+
+		if (isset($_SESSION['system']['content']['free-module-id']))
+			$this->smarty->assign('freeModuleId',$_SESSION['system']['content']['free-module-id']);
 
 		$this->smarty->assign('subject', $currentSubject);
 
@@ -107,8 +115,6 @@ class ContentController extends Controller
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
-		$this->smarty->assign('excludeHtmlEditorInnerLinks', true);
-		
         $this->printPage();
     
     }

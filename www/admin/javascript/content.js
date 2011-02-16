@@ -25,13 +25,13 @@ function contentSaveContent(language,editorName) {
 
 function contentSaveContentDefault() {
 
-	contentSaveContent(allDefaultLanguage,'taxon-content-default');
+	contentSaveContent(allDefaultLanguage,'content-default');
 
 }
 
 function contentSaveContentActive() {
 
-	contentSaveContent(allActiveLanguage,'taxon-content-other');
+	contentSaveContent(allActiveLanguage,'content-other');
 
 }
 
@@ -68,13 +68,13 @@ function contentGetContent(language,editorName) {
 
 function contentGetContentDefault() {
 
-	contentGetContent(allDefaultLanguage,'taxon-content-default');
+	contentGetContent(allDefaultLanguage,'content-default');
 
 }
 
 function contentGetContentActive() {
 
-	contentGetContent(allActiveLanguage,'taxon-content-other');
+	contentGetContent(allActiveLanguage,'content-other');
 
 }
 

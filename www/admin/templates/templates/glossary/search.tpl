@@ -29,7 +29,7 @@
 {/if}
 </table>
 <p>
-[<a href="edit.php">add new term</a>]
+[<a href="edit.php">{t}add new term{/t}</a>]
 </p>
 <form method="post" action="" name="sortForm" id="sortForm">
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />

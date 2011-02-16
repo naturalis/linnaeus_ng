@@ -6,32 +6,38 @@
 <input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 <input type="hidden" name="subject" id="subject" value="{$subject}" />
 
-<div style="width:780px;height:610px;">
-	<br />
-	<div id="taxon-language-default">
+<div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
+	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">
 		<span id="taxon-language-default-language">
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}{$languages[i].language}{/if}
 {/section}		
 		</span>
 	</div>
-	<textarea
-		name="content-default"
-		style="width:900px;height:500px;"
-		id="taxon-content-default"></textarea>
-	<br />
-{if $languages|@count > 1}
-	<div>
-		<span id="project-language-tabs"></span>
-	</div>	
-	<div id="taxon-languages-other"></div>
-	<textarea
-		name="content-other"
-		style="width:900px;height:500px;"
-		id="taxon-content-other"></textarea>
-{/if}
+	<div style="width:100%;padding:10px">
+		<textarea
+			name="content-default"
+			style="width:870px;height:500px;"
+			id="content-default"></textarea>
+	</div>
 </div>
 
+
+{if $languages|@count > 1}
+<div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
+	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold;margin-bottom:10px;">
+		<div>
+			<span id="project-language-tabs"></span>
+		</div>	
+	</div>
+	<div style="width:100%;padding:10px">
+		<textarea
+			name="content-other"
+			style="width:870px;height:500px;"
+			id="content-other"></textarea>
+	</div>
+</div>
+{/if}
 </form>
 
 {literal}
@@ -45,12 +51,15 @@ $(document).ready(function(){
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 
-	contentGetDataAll();
-
-	initTinyMce();
+	initTinyMce(false,false);
 
 {literal}	
 });
+
+function onInitTinyMce() {
+	contentGetDataAll();
+}
+
 </script>
 {/literal}
 

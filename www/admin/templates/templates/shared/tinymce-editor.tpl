@@ -7,7 +7,14 @@
 <script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
 {literal}
 <script type="text/javascript">
+
+var inclLiteraryButtons = true;
+var inclMediaButtons = true;
+
 function initTinyMce(litRefs,mediaRefs) {
+
+	if (litRefs==false) inclLiteraryButtons = false;
+	if (mediaRefs==false) inclMediaButtons = false;
 
 	tinymce.create('tinymce.plugins.LinnaeusPlugin', {
 		createControl: function(n, cm) {
@@ -50,7 +57,7 @@ function initTinyMce(litRefs,mediaRefs) {
 								onclick : function() {
 									tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,'[new litref]');
 									allAjaxAsynchMode = false;
-									taxonSaveDataAll();
+									if (typeof taxonSaveDataAll == 'function') taxonSaveDataAll();
 									window.open('../literature/edit.php?add=hoc','_self');
 								},
 								icons : false
@@ -90,7 +97,7 @@ function initTinyMce(litRefs,mediaRefs) {
 								onclick : function() {
 									tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,'[new media]');
 									allAjaxAsynchMode = false;
-									taxonSaveDataAll();
+									if (typeof taxonSaveDataAll == 'function') taxonSaveDataAll();
 									window.open('media_upload.php?add=hoc','_self');
 								},
 								icons : false
@@ -107,25 +114,51 @@ function initTinyMce(litRefs,mediaRefs) {
 	// Register plugin with a short name
 	tinymce.PluginManager.add('example', tinymce.plugins.LinnaeusPlugin);
 
-	tinyMCE.init({
+	var propertyList = {
 		mode : "textareas",
+		oninit : tMCEOnInit ,
 		theme : "advanced",
 		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,-example",	
-		
-			// Theme options - button# indicated the row# only
 		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,|,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
-		theme_advanced_buttons2 : "litref,addlitref,|,media,addmedia,",
-		theme_advanced_buttons3 : "",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
 	{/literal}{if $session.project.css_url!=''}  content_css : "{$session.project.css_url}",
 	{/if}{literal}
 		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
-		//theme_advanced_resizing : true //leave this out as there is an intermittent bug.
-	});
+	};
+
+	if (inclLiteraryButtons && inclMediaButtons) {
+	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,";
+	 	propertyList.theme_advanced_buttons3 = "";
+	} else
+	if (inclLiteraryButtons && !inclMediaButtons) {
+	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,";
+	 	propertyList.theme_advanced_buttons3 = "";
+	} else
+	if (!inclLiteraryButtons && inclMediaButtons) {
+	 	propertyList.theme_advanced_buttons2 = "media,addmedia,";
+	 	propertyList.theme_advanced_buttons3 = "";
+	} else {
+	 	propertyList.theme_advanced_buttons2 = "";
+	}
+
+	tinyMCE.init(propertyList);
 
 }
+
+// function called after tMCE init
+function tMCEOnInit() {
+
+	// checks for the existence of onInitTinyMce() function and executes; for functions that are dependent on tMCE being loaded and ready
+	if (typeof onInitTinyMce == 'function') {
+
+		onInitTinyMce();
+
+	}
+
+}
+
 </script>
 {/literal}
 

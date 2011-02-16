@@ -508,7 +508,6 @@ class ProjectsController extends Controller
     private function ajaxActionCollaborators ($moduleType, $action, $moduleId, $userId)
     {
 
-        //NEED CHECKS!
         if ($moduleType == 'free') {
             
             if ($action == 'add') {
@@ -594,7 +593,15 @@ class ProjectsController extends Controller
             }
         
         }
-    
+
+		if (!is_array($userId) && $userId==$this->getCurrentUserId()) {
+
+			$cur = $this->getCurrentUserRights($userId);
+
+			$this->setUserSessionRights($cur['rights']);
+
+		}
+
     }
 
 

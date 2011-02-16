@@ -435,6 +435,45 @@ class configuration
 		);
 
     }
-								
+
+    public function getControllerSettingsModule()
+    {
+
+		return array(
+			'media' =>
+                array(
+				  'allowedFormats' => 
+					array(
+					  array(
+						'mime' => 'image/png', 
+						'media_name' => 'PNG image', 
+						'media_type' => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/jpg', 
+						'media_name' => 'JPG image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/jpeg', 
+						'media_name' => 'JPG image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/gif', 
+						'media_name' => 'GIF image', 
+						'media_type'  => 'image', 
+						'maxSize' => 1000000
+					  )
+					),
+				'defaultUploadMaxSize' => 5000000 // 5mb
+			)
+		);
+
+    }
+
 }
 

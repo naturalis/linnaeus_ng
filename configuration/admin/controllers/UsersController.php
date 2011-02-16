@@ -13,15 +13,12 @@ class UsersController extends Controller
     public $usedModels = array(
         'user', 
         'right', 
-        'role', 
         'project_role_user', 
-        'right_role',
         'timezone',
         'module', 
         'module_project', 
         'free_module_project', 
-        'module_project_user', 
-        'free_module_project_user', 
+        'module_project_user',
     );
     
 	public $jsToLoad = array('all' => array('user.js'));
@@ -901,6 +898,8 @@ class UsersController extends Controller
 
 		}
 
+		unset($_SESSION['user']['freeModules']['activeModule']);
+
         $this->smarty->assign('modules',$modules);
 
         $this->smarty->assign('freeModules',$freeModules);
@@ -911,61 +910,6 @@ class UsersController extends Controller
     
     }
 
-
-    /**
-     * Retrieves all rights and roles of the current user
-     *
-     * Is called directly after log in. Results are stored in the user's session.
-     *
-     * @return     array    array of roles, rights and the number of projects the user is involved with
-     * @access     private
-     */
-    private function getCurrentUserRights ($id = false)
-    {
-        
-        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
-        
-        foreach ((array) $pru as $key => $val) {
-            
-            $p = $this->models->Project->_get(array('id'=>$val['project_id']));
-            
-            $pru[$key]['project_name'] = $p['sys_name'];
-            
-            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
-            
-            $pru[$key]['role_name'] = $r['role'];
-            
-            $pru[$key]['role_description'] = $r['description'];
-            
-            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
-            
-            foreach ((array) $rr as $rr_key => $rr_val) {
-                
-                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
-                
-                $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-            
-            }
-            
-            $d[$val['project_id']] = $val['project_id'];
-        
-        }
-
-		$fmpu = $this->models->FreeModuleProjectUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
-		
-		foreach((array)$fmpu as $key => $val) {
-
-			$rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
-
-		}
-
-        return array(
-            'roles' => $pru, 
-            'rights' => $rs, 
-            'number_of_projects' => count((array) $d)
-        );
-    
-    }
 
 	private function ajaxActionConnectExistingUser()
 	{
@@ -1244,7 +1188,7 @@ class UsersController extends Controller
         $cur = $this->getCurrentUserRights($user['id']);
 
         // save all relevant data to the session
-        $this->setUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
+        $this->initUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
         
         // set 'remember me' cookie
         if ($remember) {
@@ -1276,19 +1220,22 @@ class UsersController extends Controller
      * @param      integer    $numberOfProjects    number of assigned projects
      * @access     public
      */
-    private function setUserSession ($userData, $roles, $rights, $numberOfProjects )
+    private function initUserSession($userData, $roles, $rights, $numberOfProjects)
     {
         
         if (!$userData) return;
 
-        $userData['_login']['time'] = time();
-
-        $userData['_roles'] = $roles;
-        $userData['_rights'] = $rights;
-        $userData['_number_of_projects'] = $numberOfProjects;
-        $userData['_said_welcome'] = false;
-        
         $_SESSION['user'] = $userData;
+
+        $_SESSION['user']['_login']['time'] = time();
+        $_SESSION['user']['_said_welcome'] = false;
+
+        //$_SESSION['user']['_roles'] = $roles;
+        //$_SESSION['user']['_rights'] = $rights;
+        //$_SESSION['user']['_number_of_projects'] = $numberOfProjects;
+		$this->setUserSessionRights($rights);
+		$this->setUserSessionRoles($roles);
+		$this->setUserSessionNumberOfProjects($numberOfProjects);
     
     }
 

@@ -79,7 +79,6 @@ $(document).ready(function(){
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
 
 	taxonActiveTaxonId = $('#taxon_id').val();
-	taxonGetDataAll();
 
 	allSetAutoSaveFreq({$autosaveFrequency});
 	taxonRunAutoSave();
@@ -88,6 +87,11 @@ $(document).ready(function(){
 
 {literal}	
 });
+
+function onInitTinyMce() {
+	taxonGetDataAll();
+}
+
 </script>
 {/literal}
 
