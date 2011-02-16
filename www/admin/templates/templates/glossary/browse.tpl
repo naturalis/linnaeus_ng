@@ -29,7 +29,7 @@
 
 
 <table>
-	<tr class="tr-highlight">
+	<tr>
 		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
 		<th style="width:500px">{t}definition{/t}</th>
 		<th></th>
@@ -48,7 +48,7 @@
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
 <p>
-[<span class="pseudo-a" onclick="$('#newForm').submit();">add new term</span>]
+[<span class="pseudo-a" onclick="$('#newForm').submit();">{t}add new term{/t}</span>]
 </p>
 <form method="post" action="edit.php" name="newForm" id="newForm">
 <input type="hidden" name="activeLanguage" value="{$activeLanguage}"  />

@@ -49,6 +49,11 @@ class Controller extends BaseClass
     private $usedModelsBase = array(
         'helptext', 
         'project', 
+		'role',
+		'right',
+		'right_role',
+		'project_role_user',
+        'free_module_project_user', 
         'language_project', 
         'module_project',
 		'language',
@@ -56,8 +61,7 @@ class Controller extends BaseClass
 		'taxon',
 		'project_rank',
 		'label_project_rank',
-		'rank',
-		'project_role_user'
+		'rank'
     );
 
     private $usedHelpersBase = array(
@@ -607,6 +611,98 @@ class Controller extends BaseClass
 
 
     /**
+     * Retrieves all rights and roles of the current user. Results are stored in the user's session.
+     *
+     * @return     array    array of roles, rights and the number of projects the user is involved with
+     * @access     public
+     */
+    public function getCurrentUserRights ($id = false)
+    {
+        
+        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
+        
+        foreach ((array) $pru as $key => $val) {
+            
+            $p = $this->models->Project->_get(array('id'=>$val['project_id']));
+            
+            $pru[$key]['project_name'] = $p['sys_name'];
+            
+            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
+            
+            $pru[$key]['role_name'] = $r['role'];
+            
+            $pru[$key]['role_description'] = $r['description'];
+            
+            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
+            
+            foreach ((array) $rr as $rr_key => $rr_val) {
+                
+                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
+                
+                $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
+            
+            }
+            
+            $d[$val['project_id']] = $val['project_id'];
+        
+        }
+
+		$fmpu = $this->models->FreeModuleProjectUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
+		
+		foreach((array)$fmpu as $key => $val) {
+
+			$rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
+
+		}
+
+        return array(
+            'roles' => $pru, 
+            'rights' => $rs, 
+            'number_of_projects' => count((array) $d)
+        );
+    
+    }
+
+    /**
+     * Sets the user session var that holds the rights per view per project array
+     *
+     * @access     public
+     */
+	public function setUserSessionRights($rights)
+	{
+
+        $_SESSION['user']['_rights'] = $rights;
+	
+	}
+
+
+    /**
+     * Sets the user session var that holds the roles per project array
+     *
+     * @access     public
+     */
+	public function setUserSessionRoles($roles)
+	{
+
+        $_SESSION['user']['_roles'] = $roles;
+	
+	}
+
+
+    /**
+     * Sets the user session var that describes the number of projects the user has been assigned to
+     *
+     * @access     public
+     */
+	public function setUserSessionNumberOfProjects($numberOfProjects)
+	{
+
+        $_SESSION['user']['_number_of_projects'] = $numberOfProjects;
+	
+	}
+
+
+    /**
      * Checks whether a user is logged in
      *
      * @return     boolean        logged in or not
@@ -634,7 +730,7 @@ class Controller extends BaseClass
      */
     public function checkAuthorisation ()
     {
-        
+
         // check if user is logged in, otherwise redirect to login page
         if ($this->isUserLoggedIn()) {
             

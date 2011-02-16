@@ -16,7 +16,7 @@ Click to browse:
 
 <div id="page-main">
 <table>
-	<tr class="tr-highlight">
+	<tr>
 		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
 		<th style="width:50px" onclick="allTableColumnSort('year');">{t}year{/t}</th>
 		<th style="width:500px">{t}reference{/t}</th>
@@ -39,7 +39,7 @@ Click to browse:
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
 <p>
-[<a href="edit.php">add new reference</a>]
+[<a href="edit.php">{t}add new reference{/t}</a>]
 </p>
 </div>
 

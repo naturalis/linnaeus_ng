@@ -230,6 +230,10 @@ function allSwitchLanguage(language) {
 			allAjaxAsynchMode = false;
 			contentSaveContentActive();
 			break;			
+		case 'freemodule':
+			allAjaxAsynchMode = false;
+			freemodSaveContentActive();
+			break;			
 	}
 
 	allActiveLanguage = language;
@@ -259,7 +263,12 @@ function allSwitchLanguage(language) {
 			contentGetContentActive();
 			allAjaxAsynchMode = true;
 			break;			
-	}
+		case 'freemodule':
+			freemodGetContentActive();
+			allAjaxAsynchMode = true;
+			break;			
+
+}
 
 }
 

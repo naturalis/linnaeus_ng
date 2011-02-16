@@ -32,12 +32,12 @@
 {if $freeModules[i].currentUserRights}
 	{assign var=i value=$i+1}
 		<td>
-			<a href="views/extra/index.php?id={$freeModules[i].id}">
+			<span onclick="$('#freeId').val('{$freeModules[i].id}');$('#freeForm').submit();">
 				<img src="{$baseUrl}admin/media/system/module_icons/custom.png" style="width:32px;border:0px" />
-			</a>
+			</span>
 		</td>
 		<td>
-			<a href="views/extra/index.php?id={$freeModules[i].id}">{$freeModules[i].module}</a>{if $freeModules[i].active=='y'} *{/if}
+			<span class="pseudo-a" onclick="$('#freeId').val('{$freeModules[i].id}');$('#freeForm').submit();">{$freeModules[i].module}</span>{if $freeModules[i].active=='y'} *{/if}
 		</td>
 {/if}
 {if $i % 2 == 1}
@@ -47,7 +47,9 @@
 {/section}
 	</tr>
 </table>
-
+<form method="post" id="freeForm" action="views/module/">
+<input type="hidden" id="freeId" name="freeId" value="" />
+</form>
 
 {if $currentRole.role_id==1 || $currentRole.role_id==2}
 <br />

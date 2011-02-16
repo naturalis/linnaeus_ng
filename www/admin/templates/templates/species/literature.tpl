@@ -20,7 +20,7 @@
 {/section}
 </table>
 <p>
-[<a href="../literature/edit.php">add new reference</a>]
+[<a href="../literature/edit.php">{t}add new reference{/t}</a>]
 </p>
 <input type="button" value="{t}back{/t}" onclick="window.open('list.php','_top')" />
 
