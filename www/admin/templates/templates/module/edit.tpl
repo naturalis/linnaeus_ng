@@ -16,10 +16,11 @@
 		</span>
 	</div>
 	<div style="width:100%;padding:10px">
-		{t}Topic:{/t} <input type="text" id="topic-default" style="margin-bottom:10px" />
+		{t}Topic:{/t} <input type="text" id="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" />
 		<textarea
 			name="content-default"
 			style="width:870px;height:500px;"
+			onblur="freemodSaveContentDefault()"
 			id="content-default"></textarea>
 	</div>
 </div>
@@ -32,10 +33,11 @@
 		</div>
 	</div>
 	<div style="width:100%;padding:10px">
-		{t}Topic:{/t} <input type="text" id="topic-other" style="margin-bottom:10px" />
+		{t}Topic:{/t} <input type="text" id="topic-other" style="margin-bottom:10px" onblur="freemodSaveContentActive()" />
 		<textarea
 			name="content-other"
 			style="width:870px;height:500px;"
+			onblur="freemodSaveContentActive()"
 			id="content-other"></textarea>
 	</div>
 </div>

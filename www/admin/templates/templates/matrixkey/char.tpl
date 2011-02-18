@@ -3,8 +3,8 @@
 <div id="page-main">
 <p>
 <span class="matrix-header">
-{if $characteristic.id}
-{t _s1=$characteristic.characteristic _s2=$matrix.matrix}Editing charcteristic "%s" for matrix "%s"{/t}
+{if $characteristic.label}
+{t _s1=$characteristic.label _s2=$matrix.matrix}Editing chara"%s" for matrix "%s"{/t}
 {else}
 {t _s1=$matrix.matrix}New charcteristic for matrix "%s"{/t}
 {/if}
@@ -17,7 +17,6 @@
 <li>{t}{$charTypes[i].name}{/t}: {t}{$charTypes[i].info}{/t}</li>
 {/section}
 </ul>
-{t}After you have saved the name and type, you can specify the name in the different languages within your project.{/t}
 </p>
 <p>
 <form id="theForm" method="post" action="">
@@ -26,7 +25,6 @@
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" id="name" value="{$characteristic.characteristic}" />
 <table>
-{if $characteristic.id}
 	<tr>
 		<td>
 		</td>
@@ -39,7 +37,6 @@
 	<td colspan="2" id="project-language-tabs">(languages)</td>
 {/if}
 	</tr>
-{/if}
 	<tr>
 		<td>
 			{t}Characteristic name:{/t}
@@ -47,17 +44,15 @@
 		<td>
 			<input
 				type="text" 
-				name="characteristic" 
-				id="default-characteristic" 
-				onblur="matrixSaveCharacteristicLabel(this.value,'default')" />
+				id="characteristic-default" 
+				onblur="matrixSaveCharacteristicLabel(allDefaultLanguage)" />
 		</td>
-{if $languages|@count>1 && $characteristic.id}
+{if $languages|@count>1}
 		<td>
 			<input
 				type="text" 
-				name="characteristic" 
-				id="other-characteristic" 
-				onblur="matrixSaveCharacteristicLabel(this.value,'other')" />
+				id="characteristic-other" 
+				onblur="matrixSaveCharacteristicLabel(allActiveLanguage)" />
 		</td>
 {/if}
 	</tr>
@@ -78,13 +73,13 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<input type="submit" value="{t}save{/t}" />&nbsp;
-			{if $characteristic.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" onclick="matrixSaveCharacteristic()" value="{t}save{/t}" />&nbsp;
+			<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_self')" />
+			{if $characteristic.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic('{$characteristic.label|@addslashes}')" />&nbsp;{/if}
 		</td>
 	</tr>
 </table>
-{if $charLib && !$characteristic.id}
+{if $charLib && !$characteristic.label}
 <br />
 <table>
 	<tr>
@@ -96,7 +91,7 @@
 		<td colspan="3">
 			<select name="existingChar" id="existingChar">
 			{section name=i loop=$charLib}
-				<option value="{$charLib[i].id}">{$charLib[i].characteristic}</option>
+				<option value="{$charLib[i].id}">{$charLib[i].label}</option>
 			{/section}
 			</select>
 		</td>
@@ -107,7 +102,7 @@
 	<tr>
 		<td colspan="3">
 			<input type="button" onclick="$('#action').val('use');$('#theForm').submit();" value="{t}use{/t}" />&nbsp;
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="{t}back{/t}" onclick="window.open('edit.php','_self')" />
 		</td>
 	</tr>
 </table>

@@ -35,6 +35,9 @@ matrix
 STATES HEBBEN HARDE GRENZEN! AUW!
 
 
+check deletes
+
+
 
 */
 
@@ -45,12 +48,14 @@ class MatrixKeyController extends Controller
     
     public $usedModels = array(
 		'matrix',
+		'matrix_name',
 		'matrix_taxon',
 		'matrix_taxon_state',
 		'characteristic',
 		'characteristic_matrix',
 		'characteristic_label',
 		'characteristic_state',
+		'characteristic_label_state'
 	);
     
     public $usedHelpers = array('file_upload_helper');
@@ -72,6 +77,10 @@ class MatrixKeyController extends Controller
         
         parent::__construct();
 
+		$this->smarty->assign('languages', $_SESSION['project']['languages']);
+		
+		$this->smarty->assign('activeLanguage', $_SESSION['project']['default_language_id']);
+
     }
 
     /**
@@ -90,6 +99,14 @@ class MatrixKeyController extends Controller
     {
     
         $this->checkAuthorisation();
+
+/*
+	$this->cleanup(); 
+		matrices got_names = 0
+		chars got_labels = 0, also from CharacteristicMatrix
+		states got_labels = 0, also from CharacteristicMatrix
+
+*/
         
         $this->setPageName( _('Index'));
 
@@ -109,12 +126,6 @@ class MatrixKeyController extends Controller
 			$this->deleteMatrix($this->requestData['id']);
 			
 			if ($this->getCurrentMatrixId()==$this->requestData['id']) $this->setCurrentMatrixId(null);
-/*
-del states
-del characteristics
-del matrox
-
-*/
 			
 		} else
 		if ($this->rHasVal('action','activate') && !$this->isFormResubmit()) {
@@ -125,14 +136,7 @@ del matrox
 
 		}
 
-		$matrices = $this->models->Matrix->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'order' => 'matrix'
-			)
-		);
+		$matrices = $this->getMatrices();
 
 		$this->smarty->assign('matrices',$matrices);
 
@@ -140,63 +144,40 @@ del matrox
     
     }
 
+
     public function matrixAction()
     {
-    
+
         $this->checkAuthorisation();
         
 		if ($this->rHasId()) {
 
 			$matrix = $this->getMatrix();
+			
+			if (isset($matrix['names'][$_SESSION['project']['default_language_id']]['name'])) {
 
-	        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$_SESSION['project']['default_language_id']]['name']));
+
+			} else {
+
+		        $this->setPageName(_('New matrix'));
+
+			}
 
 		} else {
 
-	        $this->setPageName(_('New matrix'));
-		
-		}
+			$id = $this->createNewMatrix();
 
-		if ($this->rHasVal('matrix') && !$this->isFormResubmit()) {
+			if ($id) {
 
-			$v = array(
-				'project_id' => $this->getCurrentProjectId(),
-				'matrix' => $this->requestData['matrix']
-			);
-			
-			if ($this->rHasId()) {
+				$this->redirect('matrix.php?id='.$id);
 
-				$v['id !='] = $this->requestData['id'];
-
-			}
-
-			$m = $this->models->Matrix->_get(
-				array(
-					'id' => $v,
-					'columns' => 'count(*) as total'
-				)
-			);
-			
-			if ($m[0]['total']>0) {
-			
-				$this->addError(_('A matrix with that name already exists.'));
-				
-				$matrix = $this->requestData;
-			
 			} else {
-
-				$this->models->Matrix->save(
-					array(
-						'id' => ($this->rHasId() ? $this->requestData['id'] : 'null'),
-						'project_id' => $this->getCurrentProjectId(),
-						'matrix' =>  $this->requestData['matrix']
-					)
-				);
-
-				$this->redirect('matrices.php');
-
+			
+				$this->addError(_('Could not create new matrix.'));			
+			
 			}
-
+		
 		}
 
 
@@ -237,6 +218,24 @@ del matrox
 		// need an active matrix to assign the characteristic to
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
+		if (!$this->rHasId()) {
+
+			$id = $this->createCharacteristic();
+			
+			if ($id) {
+
+				$this->addCharacteristicToMatrix($id);
+
+				$this->redirect('char.php?id='.$id);
+
+			} else {
+
+				$this->addError(_('Could not create characteristic.'));
+
+			}
+
+		}
+
         $this->setBreadcrumbIncludeReferer(
             array(
                 'name' => _('Matrix'), 
@@ -248,63 +247,45 @@ del matrox
 		$matrix = $this->getMatrix($this->getCurrentMatrixId());
 
 		if ($this->rHasId() && $this->rHasVal('action','delete')) {
-
+		
 			// delete the char from this matrix (and automatically delete the char itself if it isn't used in any other matrix)
 			$this->deleteCharacteristic();
-
+		
 			$this->redirect('edit.php');
-
+		
 		} else
 		if ($this->rHasVal('existingChar') && $this->rHasVal('action','use')) {
-
+		
 			$this->addCharacteristicToMatrix($this->requestData['existingChar']);
-
+		
 			$this->redirect('edit.php');
-
+		
 		} else
 		if ($this->rHasId()) {
 
 			$c = $this->getCharacteristic($this->requestData['id']);
 			
 			$this->smarty->assign('characteristic',$c);
+			
+			if (isset($c['label'])) {
 
-	        $this->setPageName(sprintf(_('Editing characteristic "%s"'),$c['characteristic']));
+		        $this->setPageName(sprintf(_('Editing characteristic "%s"'),$c['label']));
 
-		} else {
+			} else {
 
-	        $this->setPageName( _('New characteristic'));
+		        $this->setPageName( _('New characteristic'));
+
+			}
 
 		}
 
-		if ($this->rHasVal('characteristic') && $this->rHasVal('type') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('type') && !$this->isFormResubmit()) {
 
-			// avoid duplicate names
-			$c = $this->models->Characteristic->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic' => $this->requestData['characteristic'],
-						'id !=' => $this->rHasId() ? $this->requestData['id'] : -1
-					),
-					'columns' => 'count(*) as total'
-				)
-			);
+			$charId = $this->updateCharacteristic();
 
-			if ($c[0]['total']==0) {
+			//$this->addCharacteristicToMatrix($charId);
 
-				$charId = $this->saveCharacteristic();
-
-				$this->addCharacteristicToMatrix($charId);
-
-				$this->redirect('edit.php');
-				
-			} else {
-
-				$this->smarty->assign('characteristic',$this->requestData);
-
-				$this->addError(_('A characteristic with that name already exists.'));
-
-			}
+			$this->redirect('edit.php');
 
 		}
 
@@ -312,13 +293,52 @@ del matrox
 
 		$this->smarty->assign('matrix',$matrix);
 
-		if (!$this->rHasId()) $this->smarty->assign('charLib',$this->getAllCharacteristics($this->getCurrentMatrixId()));
+		$this->smarty->assign('charLib',$this->getAllCharacteristics($this->getCurrentMatrixId()));
 
 		$this->smarty->assign('charTypes',$this->controllerSettings['characteristicTypes']);
 
         $this->printPage();
 	
 	}
+
+    public function taxaAction ()
+    {
+
+		$this->checkAuthorisation();
+
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
+
+		$this->setPageName(_('Adding axa'));
+
+		if ($this->rHasVal('taxon')) { 
+
+			$this->models->MatrixTaxon->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
+					'taxon_id' => $this->requestData['taxon']
+				)
+			);
+
+			if ($this->requestData['action']!='repeat') {
+
+				$this->redirect('edit.php');
+
+			}
+
+			$this->addMessage(sprintf(_('Taxon added.')));			
+
+		}
+			
+		$this->getTaxonTree();
+
+		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+		$this->printPage();
+
+	}
+
 
 	public function stateAction()
 	{
@@ -340,13 +360,34 @@ del matrox
 			
 			$this->requestData['char'] = $state['characteristic_id'];
 
-		} else
-		if (!$this->rHasVal('char')) {
-		// must have a characteristic to define a state for
+		} else {
 		
-			$this->redirect('edit.php');
+			if (!$this->rHasVal('char')) {
+			// must have a characteristic to define a state for
+			
+				$this->redirect('edit.php');
+			
+			} else {
+
+				$id = $this->createState();
+				
+				if ($id) {
 		
+					$this->redirect('state.php?char='.$this->requestData['char'].'&id='.$id);
+
+				} else {
+
+					$this->addError(_('Cannot create new state.'));
+
+				}
+
+			}
+
 		}
+
+
+
+
 
         $this->setBreadcrumbIncludeReferer(
             array(
@@ -427,45 +468,6 @@ del matrox
 	}
 
 
-    public function taxaAction ()
-    {
-
-		$this->checkAuthorisation();
-
-		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
-
-		$this->setPageName(_('Adding axa'));
-
-		if ($this->rHasVal('taxon')) { 
-
-			$this->models->MatrixTaxon->save(
-				array(
-					'id' => 'null',
-					'project_id' => $this->getCurrentProjectId(),
-					'matrix_id' => $this->getCurrentMatrixId(),
-					'taxon_id' => $this->requestData['taxon']
-				)
-			);
-
-			if ($this->requestData['action']!='repeat') {
-
-				$this->redirect('edit.php');
-
-			}
-
-			$this->addMessage(sprintf(_('Taxon added.')));			
-
-		}
-			
-		$this->getTaxonTree();
-
-		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
-
-		$this->printPage();
-
-	}
-
-
     public function linksAction ()
     {
 
@@ -508,9 +510,14 @@ del matrox
 
         if (!$this->rHasVal('action')) return;
         
-        if ($this->requestData['action'] == 'save_characteristic') {
+        if ($this->requestData['action'] == 'save_matrix_name') {
 
-			$this->saveCharacteristic();
+			$this->ajaxSaveMatrixName();
+
+        } else
+        if ($this->requestData['action'] == 'get_matrix_name') {
+
+			$this->ajaxGetMatrixName();
 
         } else
         if ($this->requestData['action'] == 'save_characteristic_label') {
@@ -527,6 +534,11 @@ del matrox
 
 			$this->removeTaxon();
 			$this->smarty->assign('returnText',json_encode($this->getTaxa()));
+
+        } else
+		if ($this->requestData['action'] == 'get_states') {
+
+			$this->getCharacteristicStates();
 
         } else
         if ($this->requestData['action'] == 'add_link') {
@@ -553,16 +565,340 @@ del matrox
 				)
 			);
 
-        } else
-		if ($this->requestData['action'] == 'get_states') {
-
-			$this->getCharacteristicStates();
-
         }
 
         $this->printPage();
     
     }
+
+
+
+	/* matrix functions */
+	private function createNewMatrix()
+	{
+	
+		$this->models->Matrix->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+		return $this->models->Matrix->getNewId();
+		
+	}
+
+	private function setMatrixGotNames($id,$state=null)
+	{
+
+		if ($state==null) {
+
+			$mn = $this->models->MatrixName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $id,
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+
+			$state = ($mn[0]['total']==0 ? false : true);
+
+		}
+
+		$this->models->Matrix->update(
+			array(
+				'got_names' => ($state==false ? '0' : '1'),
+			),
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
+
+	private function setCurrentMatrixId($id,$name=null)
+	{
+	
+		if ($id == null) {
+
+			unset($_SESSION['matrixkey']['id']);
+			unset($_SESSION['matrixkey']['name']);
+
+		} else {
+	
+			$_SESSION['matrixkey']['id'] = $id;
+			if ($name) $_SESSION['matrixkey']['name'] = $name;
+
+		}
+
+	}
+
+	private function getCurrentMatrixId()
+	{
+
+		return $_SESSION['matrixkey']['id'];
+
+	}
+
+	private function getMatrix($id=null)
+	{
+
+		$id = isset($id) ? $id : $this->requestData['id'];
+		
+		if (!isset($id)) return;
+
+		$m = $this->models->Matrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+
+
+		$mn = $this->models->MatrixName->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $id
+				),
+				'fieldAsIndex' => 'language_id'
+			)
+		);
+
+		$m[0]['names']=$mn;
+
+		$m[0]['matrix'] = $m[0]['names'][$_SESSION['project']['default_language_id']]['name'];
+
+		return $m[0];
+
+	}
+
+	private function deleteMatrix($id)
+	{
+
+		if (!isset($id)) return;
+
+		$c = $this->getCharacteristics($id);
+		
+		foreach((array)$c as $key => $val) {
+
+			// deletes characteristics, states and links
+			$this->deleteCharacteristic($val['id']);
+
+		}
+
+		$this->models->MatrixName->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->requestData['id']
+			)
+		);
+
+		$this->models->Matrix->delete(
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
+
+	private function getMatrices()
+	{
+
+		$m = $this->models->Matrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'got_names' => 1
+				)
+			)
+		);
+		
+		foreach((array)$m as $key => $val) {
+
+			$mn = $this->models->MatrixName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $val['id']
+					),
+					'fieldAsIndex' => 'language_id'
+				)
+			);
+
+			$m[$key]['names'] = $mn;
+
+		}
+
+		return $m;
+	
+	}
+
+	private function ajaxSaveMatrixName()
+	{
+
+       if (!$this->rHasId() || !$this->rHasVal('language')) {
+            
+            return;
+        
+        } else {
+            
+            if (!$this->rHasVal('content')) {
+
+                $this->models->MatrixName->delete(
+                    array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $this->requestData['id'],
+						'language_id' => $this->requestData['language']
+                    )
+                );
+				
+				$this->setMatrixGotNames($this->requestData['id']);
+
+            } else {
+
+				$mn = $this->models->MatrixName->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'matrix_id' => $this->requestData['id'],
+							'language_id' => $this->requestData['language']
+						)
+					)
+				);
+
+                
+                $this->models->MatrixName->save(
+					array(
+						'id' => isset($mn[0]['id']) ? $mn[0]['id'] : null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'matrix_id' => $this->requestData['id'],
+						'name' => trim($this->requestData['content'])
+					)
+				);
+
+				$this->setMatrixGotNames($this->requestData['id'],true);
+
+            }
+
+            $this->smarty->assign('returnText', 'saved');
+        
+        }
+
+	}
+
+	private function ajaxGetMatrixName()
+	{
+	
+        if (!$this->rHasVal('id') || !$this->rHasVal('language')) {
+            
+            return;
+        
+        } else {
+
+			$mn = $this->models->MatrixName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $this->requestData['id'],
+						'language_id' => $this->requestData['language']
+					),
+					'columns' => 'name'
+				)
+			);
+
+            $this->smarty->assign('returnText', $mn[0]['name']);
+
+		}	
+	
+	}
+
+	/* characteristics functions */
+    private function createCharacteristic()
+    {
+
+		$this->models->Characteristic->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getCurrentProjectId(),
+				'type' => $this->controllerSettings['characteristicTypes'][0]['name']
+			)
+		);
+
+		return $this->models->Characteristic->getNewId();
+
+    }
+
+	private function addCharacteristicToMatrix($charId,$matrixId=null)
+	{
+
+		$matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+
+		if (!isset($charId) || !isset($matrixId)) return;
+
+		@$this->models->CharacteristicMatrix->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $matrixId,
+				'characteristic_id' => $charId
+			)
+		);
+
+	}
+
+    private function updateCharacteristic()
+    {
+
+		$this->models->Characteristic->update(
+			array(
+				'type' => $this->requestData['type']
+			),
+			array(
+				'id' => $this->requestData['id'],
+				'project_id' => $this->getCurrentProjectId(),
+			)
+		);
+
+    }
+
+	private function setCharacteristicGotLabels($id,$state=null)
+	{
+
+		if ($state==null) {
+
+			$cl = $this->models->CharacteristicLabel->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'characteristic_id' => $id,
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+
+			$state = ($cl[0]['total']==0 ? false : true);
+
+		}
+
+		$this->models->Characteristic->update(
+			array(
+				'got_labels' => ($state==false ? '0' : '1'),
+			),
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
 
 	private function ajaxActionSaveCharacteristicLabel()
 	{
@@ -582,6 +918,8 @@ del matrox
 						'characteristic_id' => $this->requestData['id']
 					)
 				);
+
+				$this->setCharacteristicGotLabels($this->requestData['id']);
 		
 			} else {
 				
@@ -611,14 +949,15 @@ del matrox
 						'project_id' => $this->getCurrentProjectId(), 
 						'language_id' => $this->requestData['language'], 
 						'characteristic_id' => $this->requestData['id'], 
-						'label' => trim($this->requestData['label'])
+						'label' => trim($this->requestData['content'])
 					)
 				);
-				
-			
+
+				$this->setCharacteristicGotLabels($this->requestData['id'],true);
+
 			}
 			
-			$this->smarty->assign('returnText', 'z');
+			$this->smarty->assign('returnText', 'saved');
 
 		}
 
@@ -633,130 +972,40 @@ del matrox
         
         } else {
 
-			foreach ((array)$_SESSION['project']['languages'] as $key => $val) {
-
-				if ($val['language_id']==$this->requestData['language']) $direction = $val['direction'];
-
-			}
-
-
 			$cl = $this->models->CharacteristicLabel->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
 						'language_id' => $this->requestData['language'],
-						'characteristic_id' => $this->requestData['language'],
-						),
-					'columns' => '*, \''.$direction.'\' as direction'
+						'characteristic_id' => $this->requestData['id'],
+						)
 				)
 			);
                 
-            $this->smarty->assign('returnText', json_encode($lpr));
+            $this->smarty->assign('returnText',$cl[0]['label']);
         
         }
 	
 	}
-	
-	private function setCurrentMatrixId($id,$name=null)
-	{
-	
-		if ($id == null) {
 
-			unset($_SESSION['matrixkey']['id']);
-			unset($_SESSION['matrixkey']['name']);
-
-		} else {
-	
-			$_SESSION['matrixkey']['id'] = $id;
-			if ($name) $_SESSION['matrixkey']['name'] = $name;
-
-		}
-
-	}
-
-	private function getCurrentMatrixId()
+	private function getCharacteristicLabels($id)
 	{
 
-		return $_SESSION['matrixkey']['id'];
-
-	}
-
-
-	private function getMatrix($id=null)
-	{
-
-		$id = isset($id) ? $id : $this->requestData['id'];
-		
-		if (!isset($id)) return;
-
-		$m = $this->models->Matrix->_get(
+		$cl = $this->models->CharacteristicLabel->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id
-				)
+					'project_id' => $this->getCurrentProjectId(), 
+					'characteristic_id' => $id,
+				),
+				'fieldAsIndex' => 'language_id'
 			)
+		);
+
+		return array(
+			'labels' => $cl, 
+			'label' => $cl[$_SESSION['project']['default_language_id']]['label']
 		);
 		
-		return $m[0];
-
-	}
-
-	private function deleteMatrix($id)
-	{
-
-		if (!isset($id)) return;
-
-		$c = $this->getCharacteristics($id);
-		
-		foreach((array)$c as $key => $val) {
-
-			// deletes characteristics, states and links
-			$this->deleteCharacteristic($val['id']);
-
-		}
-
-		$this->models->Matrix->delete(
-			array(
-				'id' => $id,
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-
-	}
-
-    private function saveCharacteristic ()
-    {
-
-		$this->models->Characteristic->save(
-			array(
-				'id' => ($this->rHasId() ? $this->requestData['id'] : 'null'),
-				'project_id' => $this->getCurrentProjectId(),
-				'type' => $this->requestData['type'],
-				'characteristic' => $this->requestData['characteristic']
-			)
-		);
-		
-		return $this->rHasId() ? $this->requestData['id'] : $this->models->Characteristic->getNewId();
-
-    }
-
-	private function addCharacteristicToMatrix($charId,$matrixId=null)
-	{
-
-		$matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
-
-		if (!isset($charId) || !isset($matrixId)) return;
-
-		@$this->models->CharacteristicMatrix->save(
-			array(
-				'id' => 'null',
-				'project_id' => $this->getCurrentProjectId(),
-				'matrix_id' => $matrixId,
-				'characteristic_id' => $charId
-			)
-		);
-
 	}
 
 	private function getCharacteristic($id)
@@ -772,14 +1021,21 @@ del matrox
 			)
 		);
 		
-		if (!$c) return;
+		if (!$c)
+			return;
+		else
+			$char = $c[0];
 
-		$c[0]['type'] = $this->getCharacteristicType($c[0]['type']);
+		$char['type'] = $this->getCharacteristicType($char['type']);
+		
+		$d = $this->getCharacteristicLabels($id);
 
-		return $c[0];
+		$char['labels'] = $d['labels'];
+		$char['label'] = $d['label'];
+
+		return $char;
 
 	}
-
 
     private function deleteCharacteristic($id=null)
     {
@@ -815,7 +1071,14 @@ del matrox
 		// if not, adieu
 
 			$this->deleteCharacteristicStates($id);
-	
+
+			$this->models->CharacteristicLabel->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'characteristic_id' => $id,
+				)
+			);	
+
 			$this->models->Characteristic->delete(
 				array(
 					'id' => $id,
@@ -836,18 +1099,27 @@ del matrox
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'matrix_id' => $matrixId
+					'matrix_id' => $matrixId,
 				),
 				'columns' => 'characteristic_id'
 			)
 		);
-		
+
 		foreach((array)$mc as $key => $val) {
 
-			$d[] = $this->getCharacteristic($val['characteristic_id']);
+			$labels = $this->getCharacteristicLabels($val['characteristic_id']);
+			
+			if (isset($labels['label'])) {
+
+				$d[] = array_merge(
+					$this->getCharacteristic($val['characteristic_id']),
+					$labels
+				);
+
+			}
 
 		}
-		
+
 		return isset($d) ? $d : null;
 	
 	}
@@ -858,30 +1130,38 @@ del matrox
 		if (isset($matrixToExclude)) {
 		
 			$ce = $this->getCharacteristics($matrixToExclude);
-			
-			$b = null;
 
-			foreach((array)$ce as $key => $val) {
+			if (isset($ce)) {
 
-				$b .= $val['id'].', ';
+				$b = null;
+	
+				foreach((array)$ce as $key => $val) {
+	
+					$b .= $val['id'].', ';
+	
+				}
+				
+				$b = '('.rtrim($b,', ').')';
+	
+				$id['id not in'] = $b;
 
 			}
-			
-			$b = '('.rtrim($b,', ').')';
-
-			$id['id not in'] = $b;
 
 		}
 
 		$id['project_id'] = $this->getCurrentProjectId();
 
-		$c = $this->models->Characteristic->_get(
-			array(
-				'id' => $id,
-				'order' => 'characteristic'
-			)
-		);
+		$id['got_labels'] = '1';
+
+		$c = $this->models->Characteristic->_get(array('id' => $id));
 		
+		foreach((array)$c as $key => $val) {
+
+			$d = $this->getCharacteristicLabels($val['id']);
+			$c[$key]['label'] = $d['label'];
+
+		}
+
 		return $c;
 	
 	}
@@ -896,6 +1176,25 @@ del matrox
 		}
 	
 	}
+
+	/* state functions*/
+	private function createState()
+	{
+
+		if (!$this->rHasVal('char')) return;
+
+		$this->models->CharacteristicState->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'characteristic_id' => $this->requestData['char'],
+			)
+		);
+q($this->models->CharacteristicState->q(),1);
+		return $this->models->CharacteristicState->getNewId();
+
+	}
+
+
 
 	private function verifyData($data,$file)
 	{
@@ -1076,6 +1375,13 @@ del matrox
 			@unlink($_SESSION['project']['paths']['project_media'].$cs['file_name']);
 
 		}
+
+		$this->models->CharacteristicLabelState->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'state_id' => $id
+			)
+		);
 
 		$this->models->CharacteristicState->delete(
 			array(
