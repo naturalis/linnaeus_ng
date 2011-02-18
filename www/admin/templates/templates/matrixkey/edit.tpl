@@ -10,7 +10,7 @@
 			{t}characteristics{/t}
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
-			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].characteristic} ({$characteristics[i].type.name})</option>
+			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].label} ({$characteristics[i].type.name})</option>
 			{/section}
 			</select>
 		</td>

@@ -116,7 +116,15 @@ class ModuleController extends Controller
 			$id = $this->createPage();
 
 			// redirecting to protect against resubmits
-			$this->redirect('edit.php?id='.$id);
+			if ($id) {
+
+				$this->redirect('edit.php?id='.$id);
+
+			} else {
+
+				$this->addError(_('Could not create page.'));
+
+			}
 
 		} else {
 
@@ -138,6 +146,7 @@ class ModuleController extends Controller
 			if ($page['got_content']==0) {
 
 		        $this->setPageName(_('Creating new page'));
+
 			} else {
 
 		        $this->setPageName(_('Editing page'));

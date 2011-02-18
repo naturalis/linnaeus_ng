@@ -1,3 +1,103 @@
+function matrixGetMatrixContent(language, action, target) {
+
+	var id = $('#id').val();
+
+	if (id==undefined) return;
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'id' : id ,
+			'language' : language ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			$('#'+target).val(data);
+			allHideLoadingDiv();
+		}
+	});
+
+
+}
+
+
+function matrixGetMatrixName(language) {
+
+	var target = language==allActiveLanguage ? 'matrix-other' : 'matrix-default';
+
+	matrixGetMatrixContent(language,'get_matrix_name',target);
+
+}
+
+function matrixGetCharacteristicLabel(language) {
+
+	var target = language==allActiveLanguage ? 'characteristic-other' : 'characteristic-default';
+
+	matrixGetMatrixContent(language,'get_characteristic_label',target);
+
+}
+
+
+
+
+function matrixSaveContent(language, action, content) {
+
+	var id = $('#id').val();
+
+	if (id==undefined) return;
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : action ,
+			'id' : id ,
+			'language' : language ,
+			'content' : content ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	});
+
+}
+
+
+function matrixSaveMatrixName(language) {
+
+	var src = language==allActiveLanguage ? 'matrix-other' : 'matrix-default';
+
+	matrixSaveContent(language, 'save_matrix_name',$('#'+src).val());
+
+}
+
+
+function matrixSaveCharacteristicLabel(language) {
+
+	var src = language==allActiveLanguage ? 'characteristic-other' : 'characteristic-default';
+
+	matrixSaveContent(language, 'save_characteristic_label',$('#'+src).val());
+
+}
+
+
+function matrixSaveMatrixNameAll() {
+
+	matrixSaveMatrixName(allDefaultLanguage);
+	matrixSaveMatrixName(allActiveLanguage);
+
+}
+
+function matrixSaveCharacteristicLabelAll() {
+
+	matrixSaveCharacteristicLabel(allDefaultLanguage);
+	matrixSaveCharacteristicLabel(allActiveLanguage);
+
+}
+
 function matrixMatrixDelete(id,matrix) {
 
 	if (!allDoubleDeleteConfirm(_('matrix'),matrix)) return;
@@ -41,31 +141,25 @@ function matrixGetStates(id) {
 
 }
 
-function matrixSaveCharacteristic(id,label,type) {
+function matrixSaveCharacteristic() {
 
-	allAjaxHandle = $.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'save_characteristic' ,
-			'id' : id , 
-			'label' : label , 
-			'language' :  type=='default' ? allDefaultLanguage : allActiveLanguage ,
-			'type' : $('#type').val(),
-			'time' : allGetTimestamp()
-		}),
-		async: allAjaxAsynchMode,
-		success : function (data) {
-//			alert(data);
-			allSetMessage(data);
-		}
-	});
+	if ($('#characteristic-default').val()=='') {
+
+		alert(_('You must enter a name.'));
+		$('#characteristic-default').focus();
+
+	} else {
+	
+		matrixSaveCharacteristicLabelAll();
+		$('#theForm').submit()
+
+	}
 
 }
 
-function matrixDeleteCharacteristic() {
+function matrixDeleteCharacteristic(name) {
 
-	if(allDoubleDeleteConfirm(_('characteristic'),$('#name').val())) {
+	if(allDoubleDeleteConfirm(_('characteristic'),name)) {
 
 		$('#action').val('delete');
 		$('#theForm').submit();
@@ -73,6 +167,18 @@ function matrixDeleteCharacteristic() {
 	}
 
 }
+
+//matrixGetStateLabel inc text graag
+
+//matrixSaveStateLabel
+//matrixGetStateLabel
+//matrixSaveStateText
+//matrixGetStateText
+
+
+
+
+
 
 function maxtrixSetStateButtonLabel() {
 	
@@ -318,17 +424,6 @@ function matrixGeneralSave(id,label,type,action) {
 
 }
 
-function matrixSaveCharacteristicLabel(label,type) {
-
-	matrixGeneralSave($('#id').val(),label,type,'save_characteristic_label');
-
-}
-
-function matrixGetCharacteristicLabel() {
-
-	allGeneralGetLabels(language,'get_characteristic_label','matrixSetCharacteristicLabels',$('#id').val());
-
-}
 
 
 

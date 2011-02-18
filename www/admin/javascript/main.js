@@ -262,10 +262,19 @@ function allSwitchLanguage(language) {
 		case 'introduction':
 			contentGetContentActive();
 			allAjaxAsynchMode = true;
-			break;			
+			break;
 		case 'freemodule':
 			freemodGetContentActive();
 			allAjaxAsynchMode = true;
+			break;			
+		case 'matrixname':
+			matrixGetMatrixName(allActiveLanguage);
+			break;			
+		case 'matrixchar':
+			matrixGetCharacteristicLabel(allActiveLanguage);
+			break;			
+		case 'matrixstate':
+			matrixGetStateLabel(allActiveLanguage);
 			break;			
 
 }

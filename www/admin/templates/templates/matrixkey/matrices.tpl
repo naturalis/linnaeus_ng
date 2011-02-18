@@ -8,11 +8,11 @@
 {foreach from=$matrices key=k item=val}
 <tr class="tr-highlight">
 	<td style="width:300px">
-		{$val.matrix}
+		{$val.names[$activeLanguage].name}
 	</td>
 	<td>[<span class="pseudo-a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">{t}edit matrix{/t}</span>]</td>
 	<td>[<span class="pseudo-a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span>]</td>
-	<td>[<span class="pseudo-a" onclick="matrixMatrixDelete({$val.id},'{$val.matrix|@addslashes}')">{t}delete{/t}</span>]</td>
+	<td>[<span class="pseudo-a" onclick="matrixMatrixDelete({$val.id},'{$val.names[$activeLanguage].name|@addslashes}')">{t}delete{/t}</span>]</td>
 </tr>
 {/foreach}
 </table>
