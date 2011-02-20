@@ -275,6 +275,7 @@ function allSwitchLanguage(language) {
 			break;			
 		case 'matrixstate':
 			matrixGetStateLabel(allActiveLanguage);
+			matrixGetStateText(allActiveLanguage);
 			break;			
 
 }

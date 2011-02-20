@@ -5,7 +5,7 @@
 <ul>
 	<li><a href="matrices.php">{t}Matrices{/t}</a></li>
 	<li><a href="edit.php">{t}Edit active matrix{/t}</a></li>
-	<li><a href="links.php">{t}Display current links per taxa{/t}</a></li>
+	<li><a href="links.php">{t}Display current links per taxon{/t}</a></li>
 </ul>
 {else}
 You have to choose an active matrix to edit. Click below to choose an active matrix.

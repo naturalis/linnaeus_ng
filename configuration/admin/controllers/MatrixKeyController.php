@@ -99,15 +99,9 @@ class MatrixKeyController extends Controller
     {
     
         $this->checkAuthorisation();
+		
+		$this->cleanUpEmptyVariables();
 
-/*
-	$this->cleanup(); 
-		matrices got_names = 0
-		chars got_labels = 0, also from CharacteristicMatrix
-		states got_labels = 0, also from CharacteristicMatrix
-
-*/
-        
         $this->setPageName( _('Index'));
 
         $this->printPage();
@@ -348,18 +342,18 @@ class MatrixKeyController extends Controller
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
 		if ($this->rHasId() && $this->rHasVal('action','delete')) {
-
+		
 			$this->deleteCharacteristicState();
-
+		
 			$this->redirect('edit.php');
-
+		
 		} else
 		if ($this->rHasId()) {
 		
 			$state = $this->getCharacteristicState($this->requestData['id']);
 			
 			$this->requestData['char'] = $state['characteristic_id'];
-
+		
 		} else {
 		
 			if (!$this->rHasVal('char')) {
@@ -385,10 +379,6 @@ class MatrixKeyController extends Controller
 
 		}
 
-
-
-
-
         $this->setBreadcrumbIncludeReferer(
             array(
                 'name' => _('Matrix'), 
@@ -398,15 +388,17 @@ class MatrixKeyController extends Controller
 
 		$characteristic = $this->getCharacteristic($this->requestData['char']);
 
-		if ($this->rHasId()) {
+		$state = $this->getCharacteristicState($this->requestData['id']);
+
+		if ($state['label']) {
 		// existing state
 
-			$this->setPageName(sprintf(_('Editing state for "%s"'),$characteristic['characteristic']));
+			$this->setPageName(sprintf(_('Editing state for "%s"'),$characteristic['label']));
 
 		} else {
 		// new state
 
-			$this->setPageName(sprintf(_('New state for "%s"'),$characteristic['characteristic']));
+			$this->setPageName(sprintf(_('New state for "%s"'),$characteristic['label']));
 
 		}
 
@@ -428,8 +420,6 @@ class MatrixKeyController extends Controller
 							'id' => ($this->rHasId() ? $this->requestData['id'] : 'null'),
 							'project_id' => $this->getCurrentProjectId(),
 							'characteristic_id' => $this->requestData['char'],
-							'label' => $this->requestData['label'],
-							'text' => isset($this->requestData['text']) ? strip_tags($this->requestData['text']) : null,
 							'file_name' => isset($filesToSave[0]['name']) ? $filesToSave[0]['name'] : null,
 							'lower' => isset($this->requestData['lower']) ? $this->requestData['lower'] : null,
 							'upper' => isset($this->requestData['upper']) ? $this->requestData['upper'] : null,
@@ -448,6 +438,8 @@ class MatrixKeyController extends Controller
 					}
 
 					$this->addMessage(sprintf(_('State "%s" saved.'),$this->requestData['label']));
+
+					$state = $this->getCharacteristicState($this->createState());
 
 				}
 
@@ -527,7 +519,27 @@ class MatrixKeyController extends Controller
         } else
         if ($this->requestData['action'] == 'get_characteristic_label') {
 
-			$this->ajaxActionGetCharacteristicLabel();
+			$this->smarty->assign('returnText',$this->getCharacteristicLabel());
+
+        } else
+        if ($this->requestData['action'] == 'get_state_label') {
+
+			$this->ajaxActionGetCharacteristicStateLabel();
+
+        } else
+        if ($this->requestData['action'] == 'get_state_text') {
+
+			$this->ajaxActionGetCharacteristicStateText();
+
+        } else
+        if ($this->requestData['action'] == 'save_state_label') {
+
+			$this->ajaxActionSaveCharacteristicStateLabel();
+
+        } else
+        if ($this->requestData['action'] == 'save_state_text') {
+
+			$this->ajaxActionSaveCharacteristicStateText();
 
         } else
         if ($this->requestData['action'] == 'remove_taxon') {
@@ -963,29 +975,27 @@ class MatrixKeyController extends Controller
 
 	}
 
-	private function ajaxActionGetCharacteristicLabel()
+	private function getCharacteristicLabel($id=null,$language=null)
 	{
 
-        if (!$this->rHasVal('language')) {
 
-            return;
-        
-        } else {
+		$id = isset($id) ? $id : $this->requestData['id'];
+		$language = isset($language) ? $language : $this->requestData['language'];
 
-			$cl = $this->models->CharacteristicLabel->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'],
-						'characteristic_id' => $this->requestData['id'],
-						)
-				)
-			);
-                
-            $this->smarty->assign('returnText',$cl[0]['label']);
+        if (!isset($id) || !isset($language)) return;
         
-        }
-	
+		$cl = $this->models->CharacteristicLabel->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $language,
+					'characteristic_id' => $id,
+					)
+			)
+		);
+			
+		return $cl[0]['label'];
+			
 	}
 
 	private function getCharacteristicLabels($id)
@@ -1185,16 +1195,55 @@ class MatrixKeyController extends Controller
 
 		$this->models->CharacteristicState->save(
 			array(
+				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'characteristic_id' => $this->requestData['char'],
 			)
 		);
-q($this->models->CharacteristicState->q(),1);
+
 		return $this->models->CharacteristicState->getNewId();
 
 	}
 
+	private function getCharacteristicStateLabels($id)
+	{
 
+		$cls = $this->models->CharacteristicLabelState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'state_id' => $id
+				),
+				'fieldAsIndex' => 'language_id'
+			)
+		);
+
+		return array('label' => $cls[$_SESSION['project']['default_language_id']]['label'], 'labels' => $cls);
+
+	}
+
+	private function getCharacteristicState($id)
+	{
+
+		$cs = $this->models->CharacteristicState->_get(
+			array(
+				'id' => array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+
+		$state = $cs[0];
+		
+		$d = $this->getCharacteristicStateLabels($id);
+
+		$state['labels'] = $d['labels'];
+		$state['label'] = $d['label'];
+
+		return $state;
+
+	}
 
 	private function verifyData($data,$file)
 	{
@@ -1326,7 +1375,7 @@ q($this->models->CharacteristicState->q(),1);
 	{
 	
 		$id = isset($id) ? $id : $this->requestData['id'];
-		
+
 		if (!isset($id)) return;
 
 		$cs = $this->models->CharacteristicState->_get(
@@ -1335,31 +1384,195 @@ q($this->models->CharacteristicState->q(),1);
 					'project_id' => $this->getCurrentProjectId(),
 					'characteristic_id' => $id,
 				),
-				'columns' => 'id,label,characteristic_id',
-				'order' => 'label'
+				'columns' => 'id,characteristic_id'
 			)
 		);
-		
+
+		foreach((array)$cs as $key => $val) {
+
+			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'],$_SESSION['project']['default_language_id']);
+
+		}
+
 		$this->smarty->assign('returnText', json_encode($cs));
 
 	}
 
-
-	private function getCharacteristicState($id)
+	private function getCharacteristicStateLabelOrText($id=null,$language=null,$type='label')
 	{
 
-		$cs = $this->models->CharacteristicState->_get(
+		$id = isset($id) ? $id : $this->requestData['id'];
+		$language = isset($language) ? $language : $this->requestData['language'];
+		
+		if (!isset($id) || !isset($language)) return;
+        
+		$cls = $this->models->CharacteristicLabelState->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id
+					'state_id' => $id,
+					'language_id' => $language
 				)
 			)
 		);
 
-		return $cs[0];
+		return $type=='text' ? $cls[0]['text'] : $cls[0]['label'];
 
 	}
+
+
+	private function ajaxActionGetCharacteristicStateLabel()
+	{
+
+		$this->smarty->assign(
+			'returnText',
+			$this->getCharacteristicStateLabelOrText($this->requestData['id'],$this->requestData['language'])
+		);
+
+	}
+
+
+	private function ajaxActionGetCharacteristicStateText()
+	{
+
+		$this->smarty->assign(
+			'returnText',
+			$this->getCharacteristicStateLabelOrText($this->requestData['id'],$this->requestData['language'],'text')
+		);
+
+	}
+
+
+	private function setCharacteristicStateGotLabels($id,$state=null)
+	{
+
+		if ($state==null) {
+
+			$cl = $this->models->CharacteristicLabelState->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'state_id' => $id,
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+
+			$state = ($cl[0]['total']==0 ? false : true);
+
+		}
+
+		$this->models->CharacteristicState->update(
+			array(
+				'got_labels' => ($state==false ? '0' : '1'),
+			),
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
+	}
+
+
+	private function saveCharacteristicStateLabelOrText($id,$language,$content,$type='label')
+	{
+
+		if (!$content) {
+
+			$this->models->CharacteristicLabelState->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'state_id' => $id,
+					'language_id' => $language
+				)
+			);
+
+			$this->setCharacteristicStateGotLabels($id);
+	
+		} else {
+
+			$cls = $this->models->CharacteristicLabelState->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'state_id' => $id,
+						'language_id' => $language
+					)
+				)
+			);
+			
+			$clsId = isset($cls[0]['id']) ? $cls[0]['id'] : null;
+
+			$s = array(
+				'id' => $clsId, 
+				'project_id' => $this->getCurrentProjectId(),
+				'state_id' => $id,
+				'language_id' => $language
+			);
+
+			if ($type=='label') { 
+
+				$s['label'] = trim($content);
+
+			} else {
+
+				$s['text'] = trim($content);
+
+			}
+
+			$this->models->CharacteristicLabelState->save($s);
+
+			$this->setCharacteristicStateGotLabels($id,true);
+
+		}
+
+	}
+
+
+	private function ajaxActionSaveCharacteristicStateLabel()
+	{
+
+		if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
+			
+			return;
+		
+		} else {
+
+			$this->saveCharacteristicStateLabelOrText(
+				$this->requestData['id'],
+				$this->requestData['language'],
+				$this->requestData['content']
+			);
+	
+			$this->smarty->assign('returnText', 'saved');
+
+		}
+
+	}
+
+	private function ajaxActionSaveCharacteristicStateText()
+	{
+	
+		if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
+			
+			return;
+		
+		} else {
+
+			$this->saveCharacteristicStateLabelOrText(
+				$this->requestData['id'],
+				$this->requestData['language'],
+				$this->requestData['content'],
+				'text'
+			);
+
+			$this->smarty->assign('returnText', 'saved');
+
+		}
+
+	}
+
 
     private function deleteCharacteristicState ($id=null)
     {
@@ -1515,7 +1728,7 @@ q($this->models->CharacteristicState->q(),1);
 
 		if (!isset($d)) return;
 
-		$d['project_id'] =$this->getCurrentProjectId();
+		$d['project_id'] = $this->getCurrentProjectId();
 
 		$mts = $this->models->MatrixTaxonState->_get(array('id' => $d));
 		
@@ -1527,30 +1740,41 @@ q($this->models->CharacteristicState->q(),1);
 						'id' => $val['state_id'],
 						'project_id' => $this->getCurrentProjectId(),
 					),
-					'columns' => 'label,characteristic_id'
+					'columns' => 'characteristic_id'
 				)
 			);
-
-			$c = $this->models->Characteristic->_get(
-				array('id' =>
-					array(
-						'id' => $cs[0]['characteristic_id'],
-						'project_id' => $this->getCurrentProjectId(),
-					),
-					'columns' => 'characteristic'
-				)
-			);
-
-			$mts[$key]['state'] = $cs[0]['label']; 
-			$mts[$key]['characteristic'] = $c[0]['characteristic']; 
+			
+			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$_SESSION['project']['default_language_id']);
 		
 		}
 		
 		return $mts;
 
 	}
-	
-	
+
+	private function cleanUpEmptyVariables()
+	{
+
+		$this->models->Matrix->delete('delete from %table% 
+			where project_id =  '.$this->getCurrentProjectId().'
+			and got_names = 0
+			and created < DATE_ADD(now(), INTERVAL -7 DAY)'
+		);
+
+		$this->models->Characteristic->delete('delete from %table% 
+			where project_id =  '.$this->getCurrentProjectId().'
+			and got_labels = 0
+			and created < DATE_ADD(now(), INTERVAL -7 DAY)'
+		);
+
+		$this->models->CharacteristicState->delete('delete from %table% 
+			where project_id =  '.$this->getCurrentProjectId().'
+			and got_labels = 0
+			and created < DATE_ADD(now(), INTERVAL -7 DAY)'
+		);
+
+	}	
+
 }
 
 
