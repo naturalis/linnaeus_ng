@@ -14,11 +14,10 @@ function matrixGetMatrixContent(language, action, target) {
 			'time' : allGetTimestamp()			
 		}),
 		success : function (data) {
-			$('#'+target).val(data);
+			$('#'+target).val(data ? data : '');
 			allHideLoadingDiv();
 		}
 	});
-
 
 }
 
@@ -39,8 +38,21 @@ function matrixGetCharacteristicLabel(language) {
 
 }
 
+function matrixGetStateLabel(language) {
 
+	var target = language==allActiveLanguage ? 'label-other' : 'label-default';
 
+	matrixGetMatrixContent(language,'get_state_label',target);
+
+}
+
+function matrixGetStateText(language) {
+
+	var target = language==allActiveLanguage ? 'text-other' : 'text-default';
+
+	matrixGetMatrixContent(language,'get_state_text',target);
+
+}
 
 function matrixSaveContent(language, action, content) {
 
@@ -98,6 +110,23 @@ function matrixSaveCharacteristicLabelAll() {
 
 }
 
+
+function matrixSaveStateLabel(language) {
+
+	var src = language==allActiveLanguage ? 'label-other' : 'label-default';
+
+	matrixSaveContent(language, 'save_state_label',$('#'+src).val());
+
+}
+
+function matrixSaveStateText(language) {
+
+	var src = language==allActiveLanguage ? 'text-other' : 'text-default';
+
+	matrixSaveContent(language, 'save_state_text',$('#'+src).val());
+
+}
+
 function matrixMatrixDelete(id,matrix) {
 
 	if (!allDoubleDeleteConfirm(_('matrix'),matrix)) return;
@@ -134,6 +163,7 @@ function matrixGetStates(id) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
+			//alert(data);
 			obj = $.parseJSON(data);
 			if (obj) matrixSetStates(obj);
 		}
@@ -168,17 +198,14 @@ function matrixDeleteCharacteristic(name) {
 
 }
 
-//matrixGetStateLabel inc text graag
+function matrixEditStateClick() {
 
-//matrixSaveStateLabel
-//matrixGetStateLabel
-//matrixSaveStateText
-//matrixGetStateText
+	var c = $('#characteristics').val();
+	var s = $('#states').val();
 
+	if (c!=null && s!=null) window.open('state.php?char='+c+'&id='+s,'_self');
 
-
-
-
+}
 
 function maxtrixSetStateButtonLabel() {
 	

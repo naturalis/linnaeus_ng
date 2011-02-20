@@ -17,7 +17,7 @@
 		<td></td>
 		<td>
 			{t}taxa{/t}
-			<select multiple="multiple" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
+			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
 			{section name=i loop=$taxa}
 			<option value="{$taxa[i].id}">{$taxa[i].taxon}</option>
 			{/section}
@@ -45,20 +45,20 @@
 	<tr>
 		<td>
 			{t}states{/t}
-			<select multiple="multiple" id="states" class="matrix-list-select">
+			<select size="100" id="states" class="matrix-list-select">
 			</select>
 		</td>
 		<td></td>
 		<td>
 			{t}links{/t}
-			<select multiple="multiple" id="links" class="matrix-list-select">
+			<select size="100" id="links" class="matrix-list-select">
 			</select>
 		</td>
 	</tr>		
 	<tr>
 		<td style="text-align:center">
 			<input type="button" class="matrix-button" id="newStateButton" value="{t}add new{/t}" onclick="matrixAddStateClick()" />
-			<input type="button" class="matrix-button" value="{t}edit/delete selected{/t}" onclick="window.open('state.php?id='+$('#states').val(),'_self');" />
+			<input type="button" class="matrix-button" value="{t}edit/delete selected{/t}" onclick="matrixEditStateClick()" />
 
 		</td>
 		<td></td>

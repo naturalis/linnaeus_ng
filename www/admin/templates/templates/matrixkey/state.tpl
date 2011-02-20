@@ -1,11 +1,11 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
+<span id="message-container" style="float:right;"></span>
 <form enctype="multipart/form-data" id="theForm" method="post" action="state.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" id="action" value="" />
-<input type="hidden" name="id" value="{$state.id}" />
+<input type="hidden" name="id" id="id" value="{$state.id}" />
 <input type="hidden" name="char" value="{$characteristic.id}" />
 <input type="hidden" name="type" value="{$characteristic.type.name}" />
 <p>
@@ -37,9 +37,8 @@
 		<td>
 			<input
 				type="text" 
-				name="label" 
 				id="label-other"
-				onblur="matrixSaveStateLabel(allOtherLanguage)" />
+				onblur="matrixSaveStateLabel(allActiveLanguage)" />
 		</td>
 {/if}
 	</tr>
@@ -49,6 +48,7 @@
 		<td>
 			<textarea
 				style="width:400px;height:300px;" 
+				name="text"
 				id="text-default"
 				onblur="matrixSaveStateText(allDefaultLanguage)"
 				></textarea>
@@ -58,7 +58,7 @@
 			<textarea
 				style="width:400px;height:300px;" 
 				id="text-other"
-				onblur="matrixSaveStateText(allOtherLanguage)"
+				onblur="matrixSaveStateText(allActiveLanguage)"
 				></textarea>
 		</td>
 {/if}
@@ -159,7 +159,10 @@ $(document).ready(function(){
 
 	matrixGetStateLabel(allDefaultLanguage);
 	matrixGetStateLabel(allActiveLanguage);
-
+{if $characteristic.type.name=='text'}
+	matrixGetStateText(allDefaultLanguage);
+	matrixGetStateText(allActiveLanguage);
+{/if}
 {literal}	
 });
 </script>
