@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <ul>
-	<li><a href="run_moas.php">Run Map On A Stick</a></li>
+	<!-- li><a href="run_moas.php">Run Map On A Stick</a></li -->
 </ul>
 </div>
 
