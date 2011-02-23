@@ -1585,7 +1585,9 @@ class Controller extends BaseClass
      */
     private function startSession ()
     {
-        
+
+		session_name('lng-administration');
+
         session_start();
 
         /* DEBUG */        

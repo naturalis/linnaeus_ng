@@ -179,7 +179,7 @@ class ModuleController extends Controller
 
 		$alpha = $this->getActualAlphabet();
 
-		if (!$this->rHasVal('letter'))
+		if (!$this->rHasVal('letter') && isset($alpha))
 			$this->requestData['letter'] = current($alpha);
 
 		if ($this->rHasVal('letter')) {
@@ -531,7 +531,7 @@ class ModuleController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'page_id' => $this->requestData['id']
+						'page_id' => $id
 					)
 				)
 			);
