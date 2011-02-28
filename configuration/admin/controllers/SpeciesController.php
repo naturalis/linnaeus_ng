@@ -2970,7 +2970,7 @@ class SpeciesController extends Controller
 				'columns' => 'page_id,publish'
 			)
 		);
-        
+
         foreach ((array) $ct as $key => $val) {
             
             $d[] = array(
@@ -2987,7 +2987,7 @@ class SpeciesController extends Controller
 
     private function ajaxActionPublishContent ()
     {
-        
+   
         if (
 			!$this->rHasId() || 
 			!$this->rHasVal('language') || 
@@ -3640,9 +3640,7 @@ class SpeciesController extends Controller
         
         } else {
 
-			$d = $this->models->Taxon->_get(array('id' => $id));
-
-			$d = $this->models->ProjectRank->_get(array('id' => array('parent_id' => $d['rank_id'])));
+			$d = $this->models->ProjectRank->_get(array('id' => array('parent_id' => $id)));
 			
 			$result = $d[0]['id'] ? $d[0]['id'] : -1;
 			
@@ -3887,21 +3885,6 @@ class SpeciesController extends Controller
 
 	}
 	
-	private function getHigherTaxaBorder() {
-
-		$pr = $this->models->ProjectRank->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'higher_taxa_border' => 1				
-				)
-			)
-		);
-		
-		return $pr[0];
-
-	}
-
 	private function getTaxonById($id=false)
 	{
 	
