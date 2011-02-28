@@ -195,7 +195,7 @@ function taxonUpdatePageBlock() {
 		data: {
 			'id' : $('#taxon_id').val() ,
 			'action' : 'get_page_states' ,
-			'language' : allActiveLanguage ,
+			'language' : allDefaultLanguage ,
 			'time' : allGetTimestamp()
 		},
 		success:
@@ -511,7 +511,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-default-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',0);">',
+				'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',\'0\');">',
 				'</span>'
 			)
 		);
@@ -528,7 +528,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-other-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',0);">',
+				'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',\'0\');">',
 				'</span>'
 			)
 		);
