@@ -765,6 +765,10 @@ abstract class Model extends BaseClass
                 
                     $query .= " and " . $col . " " . $operator . " null ";
                 
+                } elseif ($operator == 'like') {
+
+                    $query .= " and " . $col . " " . $operator . " '" . strtolower($val)."'";
+                
                 } elseif ($d['numeric'] == 1) {
 
                     $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));

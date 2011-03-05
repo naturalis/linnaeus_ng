@@ -487,7 +487,6 @@ class KeyController extends Controller
 		
 		$this->getRemainingTaxa();
 
-
 		if (isset($choice)) $this->smarty->assign('data',$choice);
 
    		$this->smarty->assign('languages',$_SESSION['project']['languages']);
