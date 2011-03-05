@@ -2250,8 +2250,6 @@ class SpeciesController extends Controller
 
 				$commonnames[$key]['language_name'] = $allLanguages[$val['language_id']]['language'];
 				
-				$d[] = $val['language_id'];
-
 			}
 
 		}

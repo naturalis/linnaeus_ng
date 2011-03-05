@@ -1097,7 +1097,7 @@ class Controller extends BaseClass
 
 			foreach((array)$params as $key => $val) {
 
-				if (substr($key,0,2)=='_s' && !empty($val)) {
+				if (substr($key,0,2)=='_s' && isset($val)) {
 
 					$c = preg_replace('/\%s/',$val,$c,1);
 
@@ -1427,11 +1427,16 @@ class Controller extends BaseClass
 	public function rHasVal($var,$val=null)
 	{
 
-		if (isset($val))
-			return isset($this->requestData[$var]) && !empty($this->requestData[$var]) && $this->requestData[$var] == $val;
-		else
-			return isset($this->requestData[$var]) && !empty($this->requestData[$var]);
-	
+		if ($val!==null) {
+
+			return isset($this->requestData[$var]) && $this->requestData[$var] === $val;
+
+		} else {
+
+			return isset($this->requestData[$var]) && $this->requestData[$var]!=='';
+
+		}
+
 	}
 
 	public function rHasId()
