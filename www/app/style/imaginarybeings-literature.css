@@ -1,0 +1,36 @@
+#references {
+}
+
+#references #th-author{
+	width:250px;
+}
+
+#references #th-year{
+	width:150px;
+}
+
+#references td {
+	overflow:hidden;
+}
+
+#reference {
+	text-align:justify;
+	padding-bottom:5px;
+	margin-bottom:5px;
+	overflow:auto;
+}
+
+#reference #author #name {
+	font-weight:bold;
+}
+
+#reference #author #year {
+}
+
+#reference #text {
+}
+
+#reference .title {
+	margin-top:10px;
+	font-weight:bold;	
+}
