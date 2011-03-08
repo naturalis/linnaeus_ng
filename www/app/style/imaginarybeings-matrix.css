@@ -1,0 +1,105 @@
+#pane-left {
+	width:590px;
+	height:500px;
+}
+
+#char-states {
+	width:300px;
+	height:270px;
+	margin-bottom:15px;
+	vertical-align:top;
+}
+
+#char-states #characteristics {
+	width:inherit;
+	height:125px;
+	margin-bottom:10px;
+}
+
+#char-states #states {
+	width:inherit;
+	height:inherit;
+	height:125px;
+}
+
+#info {
+	position:relative;
+	margin-top:-285px;
+	left:310px;
+	width:260px;
+	height:248px;
+	border:1px dotted #666;
+	padding:5px;
+	margin-bottom:10px;
+	font-size:inherit;
+}
+
+#pane-right {
+	background-color:#CC0000;
+	width:400px;
+	position:relative;
+	margin-top:-500px;
+	left:600px;
+	height:500px;
+}
+
+#scores-taxa {
+	width:460px;
+	height:10px;
+}
+
+#buttons {
+	margin-bottom:10px;
+	vertical-align:top;
+}
+
+#choices {
+	margin-bottom:5px;
+	vertical-align:top;
+	width:585px;
+	height:200px;
+}
+
+#selected {
+	width:inherit;
+	height:inherit;
+}
+
+#scores-taxa {
+	width:inherit;
+	height:inherit;
+}
+
+#scores {
+	width:inherit;
+	height:inherit;
+}
+
+.info-header {
+	font-weight:bold;
+}
+
+.info-image {
+	width:250px;
+	border:1px solid #666;
+	cursor:pointer;
+}
+
+#taxon-list, #taxon-list-1, #taxon-list-2 {
+	font-size:inherit;
+	height:25px;
+	width:250px;
+}
+
+.invisible {
+	visibility:hidden;
+}
+
+.visible {
+	visibility:visible;
+}
+
+#count-both, #count-1, #count-2, #count-total, #coefficient, #count-neither {
+	text-align:right;
+	padding-left:10px;
+}
