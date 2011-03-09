@@ -1,6 +1,8 @@
 var litAddedTaxa = Array();
 var litAuthors = Array();
 var litThisReference = '';
+var litDropDownVisible = false;
+
 
 function litToggleAuthorTwo() {
 	
@@ -41,13 +43,21 @@ function litShowAuthList(ele) {
 		}),
 		success : function (data) {
 			//alert(data);
-			if (data) litPopulateAuthList($.parseJSON(data),ele);
+			if (data) {
+				obj = $.parseJSON(data);
+				if (obj.length > 0) {
+					litPopulateAuthList(obj,ele);
+					if (!litDropDownVisible) {
+						var pos = $(ele).position();
+						$('#dropdown').removeClass().addClass('lit-dropdown');
+						$('#dropdown').offset({ left: pos.left, top: pos.top+23});
+						litDropDownVisible = true;
+					}
+				}
+			}
 		}
 	});	
 
-	var pos = $(ele).position();
-	$('#dropdown').removeClass().addClass('lit-dropdown');
-	$('#dropdown').offset({ left: pos.left, top: pos.top+23});
 
 }
 
@@ -78,6 +88,7 @@ function litHideAuthList() {
 
 	$('#dropdown').removeClass().addClass('lit-dropdown-invisible');
 	$('#dropdown').html('');
+	litDropDownVisible = false;
 
 }
 
