@@ -15,13 +15,13 @@
 		</td>
 		<td>
 	<select name="taxon_id" style="width:200px">
-	{section name=i loop=$taxa}
+	{foreach from=$taxa key=k item=v}
 	<option value="{$taxa[i].id}">
-	{section name=foo loop=$taxa[i].level}
+	{section name=foo loop=$v.level}
 	&nbsp;
 	{/section}		
-	{$taxa[i].taxon}</option>
-	{/section}
+	{$v.taxon}</option>
+	{/foreach}
 	</select>
 		</td>
 		<td>
