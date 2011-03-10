@@ -185,7 +185,9 @@ class MatrixKeyController extends Controller
 
 			$this->storeHistory = false;
 
-			$this->setCurrentMatrix($matrices[0]['id']);
+			$matrix = array_shift($matrices);
+
+			$this->setCurrentMatrix($matrix['id']);
 
 			$this->redirect('index.php');
 
