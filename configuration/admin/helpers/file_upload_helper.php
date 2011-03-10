@@ -238,16 +238,19 @@ class FileUploadHelper
             
             $result = $mimetype;
 
-        } else
-		if (array_key_exists($ext, $this->_mime_types)) {
+        } else {
 
 	        $ext = strtolower(array_pop(explode('.', $filename)));
 
-            $result = $this->_mime_types[$ext];
+			if (array_key_exists($ext, $this->_mime_types)) {
 
-        } else {
+        	    $result = $this->_mime_types[$ext];
+			
+			} else {
 
-            $result = 'application/octet-stream';
+    	        $result = 'application/octet-stream';
+	        }
+
         }
 
         $result = strtolower($result);
