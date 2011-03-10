@@ -52,7 +52,6 @@ function dumpObj(obj, name, indent, depth) {
 
 }
 
-
 function taxonContentOpenLiteratureLink(id) {
 	alert('to be implemented');
 }
@@ -102,6 +101,12 @@ function showMedia(url,name) {
 		width:"100%",
 		opacity:0
 	});
+
+}
+
+function showDialog(str) {
+
+	$.modaldialog.error(str);
 
 }
 

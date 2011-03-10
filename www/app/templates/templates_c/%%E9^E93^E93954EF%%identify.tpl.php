@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-08 10:13:24
+<?php /* Smarty version 2.6.26, created on 2011-03-10 10:53:16
          compiled from identify.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'identify.tpl', 22, false),array('modifier', 'addslashes', 'identify.tpl', 48, false),)), $this); ?>
