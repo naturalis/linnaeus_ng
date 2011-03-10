@@ -14,8 +14,8 @@ class ModuleController extends Controller
     );
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-module.css',
+		'basics.css',
+		'module.css',
 		'colorbox/colorbox.css'
 	); 
 

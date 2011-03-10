@@ -22,8 +22,8 @@ class KeyController extends Controller
     public $controllerPublicName = 'Dichotomous key';
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-key.css',
+		'basics.css',
+		'key.css',
 		'colorbox/colorbox.css'
 	); //'key-tree.css'
 

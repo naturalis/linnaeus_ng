@@ -37,8 +37,8 @@ class SpeciesController extends Controller
 	public $controllerPublicName = 'Species module';
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-species.css',
+		'basics.css',
+		'species.css',
 		'colorbox/colorbox.css'
 	); //'key-tree.css'
 
@@ -742,7 +742,16 @@ class SpeciesController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $val['literature_id']
 					),
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
+					'columns' => '*, year(`year`) as `year`,
+									concat(
+										author_first,
+										(
+											if(multiple_authors=1,
+												\' et al.\',
+												if(author_second!=\'\',concat(\' & \',author_second),\'\')
+											)
+										)
+									) as author_full'
 				)
 			);
 			

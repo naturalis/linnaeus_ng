@@ -37,8 +37,8 @@ class GlossaryController extends Controller
     public $controllerPublicName = 'Glossary';
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-glossary.css',
+		'basics.css',
+		'glossary.css',
 		'colorbox/colorbox.css'
 	);
 
