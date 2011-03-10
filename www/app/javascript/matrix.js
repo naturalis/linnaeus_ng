@@ -87,8 +87,7 @@ function goState() {
 		case 'distribution':
 			var val = 	
 				_('mean: ')+state.mean+'<br />'+
-				_('1 sd: ')+state.sd1+'<br />'+
-				_('2 sd: ')+state.sd2+'<br />';
+				_('sd: ')+state.sd+'<br />';
 		break;
 	}
 
@@ -105,7 +104,12 @@ function goCharacteristic() {
 
 function addSelected() {
 
+	//showDialog('message');
+	//$(\"#dialog-close\").click()
+
 	var c = characteristics[$('#characteristics').val()];
+
+	if (c[1]=='distribution') { alert('not yet implemented'); return; }
 
 	if (c[1]=='distribution' || c[1]=='range') {
 

@@ -1,2 +1,2 @@
 140
-a:4:{s:8:"template";a:1:{s:18:"ajax_interface.tpl";b:1;}s:9:"timestamp";i:1299575658;s:7:"expires";i:1299579258;s:13:"cache_serials";a:0:{}}[{"id":"170","taxon":"Oetmammoet","hits":3,"score":75},{"id":"13","taxon":"Ursus thibetanus mupinensis","hits":2,"score":50},{"id":"4","taxon":"Carnivora","hits":1,"score":25},{"id":"1","taxon":"Animalia","hits":1,"score":25},{"id":"9","taxon":"Ursus thibetanus laniger","hits":0,"score":0}]
+a:4:{s:8:"template";a:1:{s:18:"ajax_interface.tpl";b:1;}s:9:"timestamp";i:1299750826;s:7:"expires";i:1299754426;s:13:"cache_serials";a:0:{}}[{"id":"1","taxon":"Animalia"},{"id":"4","taxon":"Carnivora"},{"id":"9","taxon":"Ursus thibetanus laniger"},{"id":"13","taxon":"Ursus thibetanus mupinensis"},{"id":"170","taxon":"Oetmammoet"}]

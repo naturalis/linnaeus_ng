@@ -18,7 +18,18 @@ $(document).ready(function(){
 {foreach from=$requestData key=k item=v}
 addRequestVar('{$k}','{$v|addslashes}')
 {/foreach}
+
+
+
 {literal}
+/*
+$.modaldialog.prompt('The operation failed.', {
+  title: 'No Turning Back Now!',
+  width: 350,
+  closeLabel: 'close',
+  });
+*/
+
 });
 </script>
 {/literal}
