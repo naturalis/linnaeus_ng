@@ -44,7 +44,7 @@ body #body-container {
 #header-container {
 	height:175px;
 	border-bottom:1px solid #ffc;
-	width:500px;
+	width: 940px;
 }
 
 #header-container #image {
@@ -53,10 +53,9 @@ body #body-container {
 
 #header-container #project-logo {
 	position:relative;
-	left:40px;
-	top: 20px;
-	width:100px;
-	border:0px;
+	left:0;
+	top: 0;
+	border:1px solid black;
 }
 
 #header-container #title {
