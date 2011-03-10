@@ -41,6 +41,7 @@ To use an application, follow one of the following links:<br />
 <ul>
 <li><a href="app/views/linnaeus/set_project.php?p=imaginary_beings">Imaginary Beings Of The Literary World</a></li>
 <li><a href="app/views/linnaeus/set_project.php?p=1">Polar Bears Of Amsterdam</a></li>
+<li><a href="app/views/linnaeus/set_project.php?p=5">Lemuren</a></li>
 </ul>
 <br />
 </div>
