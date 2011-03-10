@@ -16,8 +16,8 @@ class LiteratureController extends Controller
     public $controllerPublicName = 'Literary references';
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-literature.css',
+		'basics.css',
+		'literature.css',
 	);
 
 	public $jsToLoad =

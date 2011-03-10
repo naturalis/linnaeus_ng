@@ -753,7 +753,7 @@ class Controller extends BaseClass
 
 		}
 
-		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/';
+		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
 		$_SESSION['project']['urls']['project_start'] =
 			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';

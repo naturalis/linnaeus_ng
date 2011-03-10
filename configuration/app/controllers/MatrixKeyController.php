@@ -22,9 +22,10 @@ class MatrixKeyController extends Controller
     public $controllerPublicName = 'Matrix key';
 
 	public $cssToLoad = array(
-		'imaginarybeings-basics.css',
-		'imaginarybeings-matrix.css',
-		'colorbox/colorbox.css'
+		'basics.css',
+		'matrix.css',
+		'colorbox/colorbox.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad =
@@ -32,12 +33,12 @@ class MatrixKeyController extends Controller
 			'all' => array(
 				'main.js',
 				'matrix.js',
-				'colorbox/jquery.colorbox.js'
+				'colorbox/jquery.colorbox.js',
+				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(
 			)
 		);
-
 
     /**
      * Constructor, calls parent's constructor
@@ -1032,8 +1033,7 @@ class MatrixKeyController extends Controller
 							'lower' => isset($this->requestData['lower']) ? $this->requestData['lower'] : null,
 							'upper' => isset($this->requestData['upper']) ? $this->requestData['upper'] : null,
 							'mean' => isset($this->requestData['mean']) ? $this->requestData['mean'] : null,
-							'sd1' => isset($this->requestData['sd1']) ? $this->requestData['sd1'] : null,
-							'sd2' => isset($this->requestData['sd2']) ? $this->requestData['sd2'] : null
+							'sd' => isset($this->requestData['sd']) ? $this->requestData['sd'] : null
 						)
 					);
 					
@@ -1667,240 +1667,7 @@ class MatrixKeyController extends Controller
 
 	}
 
-	private function verifyData($data,$file)
-	{
 
-		$result = true;
-
-		if (!isset($data['label']) || empty($data['label'])) {
-		// each state has a name, regardless of type
-
-			$this->addError(_('A name is required.'));
-
-			$result = false;
-
-		}
-
-		if ($data['type']=='text') {
-
-			if (!isset($data['text']) || empty($data['text'])) {
-
-				$this->addError(_('Text is required.'));
-
-				$result = false;
-
-			}
-
-		} else
-		if ($data['type']=='range') {
-
-			if (!isset($data['lower']) || empty($data['lower']) && $data['lower']!=='0') {
-
-				$this->addError(_('The lower boundary is required.'));
-
-				$result = false;
-
-			} elseif ($data['lower'] != strval(floatval($data['lower']))) {
-
-				$this->addError(_('Invalid value for the lower boundary (must be integer or real).'));
-
-				$result = false;
-
-			}
-
-			if (!isset($data['upper']) || empty($data['upper']) && $data['upper']!=='0') {
-
-				$this->addError(_('The upper boundary is required.'));
-
-				$result = false;
-
-			} elseif ($data['upper'] != strval(floatval($data['upper']))) {
-
-				$this->addError(_('Invalid value for the upper boundary (must be integer or real).'));
-
-				$result = false;
-
-			}
-
-			if ($result  && (floatval($data['upper']) < floatval($data['lower']))) {
-
-				$this->addError(_('The upper boundary value must be larger than the lower boundary value.'));
-
-				$result = false;
-
-			} elseif ($result  && (floatval($data['upper']) == floatval($data['lower']))) {
-
-				$this->addError(_('The upper and lower boundary values cannot be the same.'));
-
-				$result = false;
-
-			}
-
-
-		} else
-		if ($data['type']=='distribution') {
-
-			if (!isset($data['mean']) || empty($data['mean']) && $data['mean']!=='0') {
-
-				$this->addError(_('The mean is required.'));
-
-				$result = false;
-
-			} elseif ($data['mean'] != strval(floatval($data['mean']))) {
-
-				$this->addError(_('Invalid value for the mean (must be integer or real).'));
-
-				$result = false;
-
-			}
-
-			if (!isset($data['sd1']) || empty($data['sd1']) && $data['sd1']!=='0') {
-
-				$this->addError(_('The value for one standard deviation is required.'));
-
-				$result = false;
-
-			} elseif ($data['sd1'] !=  strval(floatval($data['sd1'])) && $data['mean']!=='0') {
-
-				$this->addError(_('Invalid value for one standard deviation (must be integer or real).'));
-
-				$result = false;
-
-			}
-
-			if (!isset($data['sd2']) || empty($data['sd2'])) {
-
-				$this->addError(_('The value for two standard deviation is required.'));
-
-				$result = false;
-
-			} elseif ($data['sd2'] !=  strval(floatval($data['sd2']))) {
-
-				$this->addError(_('Invalid value for two standard deviation (must be integer or real).'));
-
-				$result = false;
-
-			}
-
-		} else
-		if ($data['type']=='media') {
-
-			if (!$file && !isset($data['existing_file'])) $this->addError(_('A media file is required.'));
-
-		}
-
-		return $result;
-
-	}
-
-
-	private function setCharacteristicStateGotLabels($id,$state=null)
-	{
-
-		if ($state==null) {
-
-			$cl = $this->models->CharacteristicLabelState->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'state_id' => $id,
-					),
-					'columns' => 'count(*) as total'
-				)
-			);
-
-			$state = ($cl[0]['total']==0 ? false : true);
-
-		}
-
-		$this->models->CharacteristicState->update(
-			array(
-				'got_labels' => ($state==false ? '0' : '1'),
-			),
-			array(
-				'id' => $id,
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-
-	}
-
-
-	private function saveCharacteristicStateLabelOrText($id,$language,$content,$type='label')
-	{
-
-		if (!$content) {
-
-			$this->models->CharacteristicLabelState->delete(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'state_id' => $id,
-					'language_id' => $language
-				)
-			);
-
-			$this->setCharacteristicStateGotLabels($id);
-	
-		} else {
-
-			$cls = $this->models->CharacteristicLabelState->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'state_id' => $id,
-						'language_id' => $language
-					)
-				)
-			);
-			
-			$clsId = isset($cls[0]['id']) ? $cls[0]['id'] : null;
-
-			$s = array(
-				'id' => $clsId, 
-				'project_id' => $this->getCurrentProjectId(),
-				'state_id' => $id,
-				'language_id' => $language
-			);
-
-			if ($type=='label') { 
-
-				$s['label'] = trim($content);
-
-			} else {
-
-				$s['text'] = trim($content);
-
-			}
-
-			$this->models->CharacteristicLabelState->save($s);
-
-			$this->setCharacteristicStateGotLabels($id,true);
-
-		}
-
-	}
-
-
-	private function ajaxActionSaveCharacteristicStateLabel()
-	{
-
-		if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
-			
-			return;
-		
-		} else {
-
-			$this->saveCharacteristicStateLabelOrText(
-				$this->requestData['id'],
-				$this->requestData['language'],
-				$this->requestData['content']
-			);
-	
-			$this->smarty->assign('returnText', 'saved');
-
-		}
-
-	}
 
 	private function ajaxActionSaveCharacteristicStateText()
 	{

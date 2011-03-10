@@ -34,7 +34,7 @@ class LinnaeusController extends Controller
     public $usedHelpers = array(
     );
 
-	public $cssToLoad = array('imaginarybeings-basics.css','imaginarybeings-search.css');
+	public $cssToLoad = array('basics.css','search.css');
 	public $jsToLoad = array('all' => array(
 		'main.js'
 	));
@@ -243,7 +243,6 @@ class LinnaeusController extends Controller
 		);
 
 	}
-
 
 
     /**
