@@ -1,0 +1,34 @@
+#results {
+	margin-top:10px;
+}
+
+#results .highlight {
+	color:red;
+}
+
+#results #header {
+	font-weight:bold;
+	margin-bottom:5px;
+}
+
+#results .set {
+	border-bottom:1px dotted #999;
+	padding-bottom:5px;
+	margin-bottom:10px;
+}
+
+#results .subset {
+	margin-bottom:10px;
+}
+
+#results .set-header {
+	font-weight:bold;
+}
+
+#results .result {
+	cursor:pointer;
+}
+
+#results .result:hover {
+	text-decoration:underline;
+}
