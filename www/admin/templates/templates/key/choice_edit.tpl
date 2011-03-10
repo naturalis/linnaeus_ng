@@ -87,16 +87,18 @@
 				<option value="0">{t}(none){/t}</option>
 				<option disabled="disabled">&nbsp;</option>
 {assign var=first value=true}
-{section name=i loop=$taxa}
-{if $first}{assign var=minBuffer value=$taxa[i].level}{/if}
-{assign var=x value=$taxa[i].id}
-{if $taxa[i].keypath_endpoint==1}
-<option value="{$taxa[i].id}"{if $taxa[i].id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
-{section name=foo loop=$taxa[i].level-$minBuffer}&nbsp;&nbsp;{/section}
-{$taxa[i].taxon}{if $taxa[i].is_hybrid==1}&nbsp;x{/if}
+
+{foreach from=$taxa key=k item=v}
+{if $first}{assign var=minBuffer value=$v.level}{/if}
+{assign var=x value=$v.id}
+{if $v.keypath_endpoint==1}
+<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
+{section name=foo loop=$v.level-$minBuffer}&nbsp;&nbsp;{/section}
+{$v.taxon}{if $v.is_hybrid==1}&nbsp;x{/if}
 {assign var=first value=false}{/if}
 </option>
-{/section}
+
+{/foreach}
 			</select>
 		</td>
 	</tr>
