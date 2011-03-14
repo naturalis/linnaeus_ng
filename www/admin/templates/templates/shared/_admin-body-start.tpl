@@ -5,9 +5,12 @@
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">
-		<a href="{$baseUrl}admin/views/users/logout.php">Log out (logged in as {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name})</a>{/if}
+		{t}Logged in as{/t} {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name} {if $session.user.currentRole.role_name}({$session.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">Log out</a>){/if}
 	</div>
 {/if}
+
+
+
 
 </div>
 <div id="page-container">
@@ -48,7 +51,7 @@
 {if $uiLanguages[i] == $uiCurrentLanguage}
 		<span class="active-language">{$uiLanguages[i]}</span>&nbsp;
 {else}
-		<span class="pseudo-a" onclick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
+		<span class="pseudo-a" onClick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
 {/if}
 {/section}
 	</span>
@@ -66,7 +69,7 @@
 
 {if $helpTexts}
 <div id="block-inline-help">
-	<div id="title" onclick="allToggleHelpVisibility();">Help</div>
+	<div id="title" onClick="allToggleHelpVisibility();">Help</div>
 	<div class="body-collapsed" id="body-visible">
 {section name=i loop=$helpTexts}
 		<div class="subject">{$helpTexts[i].subject}</div>

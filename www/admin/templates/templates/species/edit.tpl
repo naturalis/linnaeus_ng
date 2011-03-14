@@ -16,41 +16,6 @@
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
-{if $session.project.includes_hybrids==1}	<tr>
-		<td>
-			{t}This is a hybrid:{/t}
-		</td>
-		<td>
-			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
-		</td>
-		<td>
-			<span id="hybrid-message" class=""></span>
-		</td>
-	</tr>
-{/if}	<tr>
-		<td>
-			{t}Parent taxon: {/t}
-		</td>
-		<td>
-	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
-	{if $taxa|@count==0}
-	<option value="-1">{t}No parent{/t}</option>
-	{/if}
-	{section name=i loop=$taxa}
-	{if ($isHigherTaxa && $taxa[i].lower_taxon==0) || (!$isHigherTaxa)}
-		<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
-		{section name=foo loop=$taxa[i].level-$taxa[0].level}
-		&nbsp;
-		{/section}		
-		{$taxa[i].taxon}</option>
-	{/if}
-	{/section}
-	</select>
-		</td>
-		<td>
-			<span id="rank-message" class=""></span>
-		</td>
-	</tr>
 	<tr>
 		<td>
 			{t}Rank:{/t}
@@ -63,6 +28,42 @@
 				{/if }
 			{/section}
 			</select>
+		</td>
+	</tr>
+{if $session.project.includes_hybrids==1}	<tr>
+		<td>
+			{t}This is a hybrid:{/t}
+		</td>
+		<td>
+			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
+		</td>
+		<td>
+			<span id="hybrid-message" class=""></span>
+		</td>
+	</tr>
+{/if}
+	<tr>
+		<td>
+			{t}Parent taxon: {/t}
+		</td>
+		<td>
+	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
+	{if $taxa|@count==0}
+	<option value="-1">{t}No parent{/t}</option>
+	{/if}
+	{foreach from=$taxa key=k item=v}
+	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
+		<option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+		{section name=foo loop=$v.level-$taxa[0].level}
+		&nbsp;
+		{/section}		
+		{$v.taxon}</option>
+	{/if}
+	{/foreach}
+	</select>
+		</td>
+		<td>
+			<span id="rank-message" class=""></span>
 		</td>
 	</tr>
 	<tr>
@@ -87,7 +88,7 @@ $(document).ready(function(){
 taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
 {/if}
 {/section}
-taxonGetRankByParent(true);
+//taxonGetRankByParent(true);
 //taxonCheckNewTaxonName();
 //taxonGetRankByParent();
 //taxonCheckHybridCheck();

@@ -18,68 +18,68 @@
 		<th colspan="2">{t}Attach to parent:{/t}</th>
 		<th>{t}Do nothing{/t}</th>
 	</tr>
-	{section name=i loop=$taxa}
-	{assign var=x value=$taxa[i].rank_id}
+	{foreach from=$taxa key=k item=v}
+	{assign var=x value=$v.rank_id}
 	<tr class="tr-highlight">
 		<td style="padding-right:20px;">
-			{$ranks[$x].rank}
+			{$ranks[$v.rank_id].rank}
 		</td>
 		<td style="padding-right:20px;">
-			{$taxa[i].taxon}
+			{$v.taxon}
 		</td>
 		{if $session.project.includes_hybrids==1}
 		<td style="padding-right:20px;">
-			{if $taxa[i].is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
+			{if $v.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 		</td>
 		{/if}
-		{if $taxa[i].level==$y}
+		{if $v.level==$y}
 		<td style="text-align:center">
-			<input type="radio" name="child[{$taxa[i].id}]" value="delete" />
+			<input type="radio" name="child[{$v.id}]" value="delete" />
 		</td>
 		<td style="text-align:center">
-			<input type="radio" name="child[{$taxa[i].id}]" id="attach-{$taxa[i].id}" value="attach" />
+			<input type="radio" name="child[{$v.id}]" id="attach-{$v.id}" value="attach" />
 		</td>
 		<td style="text-align:center">
 		
-	<select name="parent[{$taxa[i].id}]" id="parent-{$taxa[i].id}" onchange="taxonOrphanChangeSelect(this)">
-	{section name=k loop=$taxa[i].parents}
-	<option value="{$taxa[i].parents[k].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
-	{section name=foo loop=$taxa[i].parents[k].level-$taxa[i].parents[0].level}
+	<select name="parent[{$v.id}]" id="parent-{$v.id}" onchange="taxonOrphanChangeSelect(this)">
+	{foreach from=$v.parents key=pk item=pv}
+	<option value="{$pv.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+	{section name=foo loop=$pv.level-$v.parents[0].level}
 	&nbsp;
 	{/section}		
-	{$tree[k].taxon}</option>
-	{/section}
+	{$pv.taxon}</option>
+	{/foreach}
 	</select>
 		</td>
 		<td style="text-align:center">
-			<input type="radio" checked="checked" name="child[{$taxa[i].id}]" value="ignore" />
+			<input type="radio" checked="checked" name="child[{$v.id}]" value="ignore" />
 		</td>
 		{else}
 		<td colspan="4">
 		</td>
 		{/if}
 	</tr>
-	{if $taxa[i].tree} \
-		{section name=j loop=$taxa[i].tree}
-		{assign var=z value=$taxa[i].tree[j].rank_id}
+	{if $v.tree}
+		{foreach from=$v.tree key=pk item=pv}
+		{assign var=z value=$pv.rank_id}
 		<tr class="tr-highlight">
 			<td style="padding-right:20px;">
-				{section name=loop start=0 loop=$taxa[i].tree[j].level+1}.{/section}{$ranks[$z].rank}
+				{section name=loop start=0 loop=$pv.level+1}.{/section}{$ranks[$z].rank}
 			</td>
 			<td style="padding-right:20px;">
-				{$taxa[i].tree[j].taxon}
+				{$pv.taxon}
 			</td>
 			{if $session.project.includes_hybrids==1}
 			<td style="padding-right:20px;">
-				{if $taxa[i].tree[j].is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
+				{if $pv.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 			</td>
 			{/if}
 			<td colspan="3">
 			</td>
 		</tr>
-		{/section}
+		{/foreach}
 	{/if}
-	{/section}
+	{/foreach}
 </table>
 <p>
 <input type="submit" value="{t}save{/t}" />&nbsp;

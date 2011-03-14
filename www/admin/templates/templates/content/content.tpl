@@ -1,10 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main" style="height:{if $languages|@count > 1}1200px{else}670px{/if}">
-<span id="message-container" style="float:right;"></span>
 <form name="theForm" id="theForm">
 <input type="button" value="{t}save{/t}" onclick="contentSaveContentAll()" style="margin-right:5px" />
 <input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 <input type="hidden" name="subject" id="subject" value="{$subject}" />
+<span id="message-container" style="padding-left:10px"></span>
 
 <div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
 	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">

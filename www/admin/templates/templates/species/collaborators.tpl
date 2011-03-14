@@ -16,7 +16,7 @@
 		<td>
 	<select name="taxon_id" style="width:200px">
 	{foreach from=$taxa key=k item=v}
-	<option value="{$taxa[i].id}">
+	<option value="{$v.id}">
 	{section name=foo loop=$v.level}
 	&nbsp;
 	{/section}		

@@ -117,15 +117,9 @@
 		</td>
 	</tr>
 	<tr>
-		<td>{t}Distance from mean of one standard deviation:{/t}</td>
+		<td>{t}Standard deviation:{/t}</td>
 		<td{if $languages|@count>1} colspan="2"{/if}>
-			<input type="text" name="sd1" id="sd1" autocomplete="off" style="text-align:right;width:50px;" value="{$state.sd1}" />
-		</td>
-	</tr>
-	<tr>
-		<td>{t}Distance from mean of two standard deviation:{/t}</td>
-		<td{if $languages|@count>1} colspan="2"{/if}>
-			<input type="text" name="sd2" id="sd2" autocomplete="off" style="text-align:right;width:50px;" value="{$state.sd2}" />
+			<input type="text" name="sd" id="sd" autocomplete="off" style="text-align:right;width:50px;" value="{$state.sd}" />
 		</td>
 	</tr>
 {/if}
