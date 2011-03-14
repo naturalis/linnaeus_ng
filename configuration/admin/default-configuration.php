@@ -207,7 +207,7 @@ class configuration
                 array(
                     'html' => array(
                         'doFilter' => true,
-                        'allowedTags' => '<a><b><u><i><p><span><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
+                        'allowedTags' => '<a><b><strong><u><i><em><p><span><h1><h2><h3><h4><h5><h6><ul><ol><li><table><th><tr><td>'
                     )
                 ),
             'media' =>
@@ -312,7 +312,7 @@ class configuration
     public function getControllerSettingsLiterature()
     {
 
-        return array('allowedTags' => '<i>');
+        return array('allowedTags' => '<i><b>');
 
     }
 
