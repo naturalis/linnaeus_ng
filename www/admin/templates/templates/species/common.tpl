@@ -72,7 +72,7 @@
 </tr>
 {/section}
 {if $smarty.section.i.total==0}
-<tr><td colspan="6">{t}No synonyms have been defined for this taxon.{/t}</td></tr>
+<tr><td colspan="6">{t}No common names have been defined for this taxon.{/t}</td></tr>
 {/if}
 </table>
 

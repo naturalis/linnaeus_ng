@@ -271,16 +271,10 @@ function matrixCheckStateForm() {
 		$('#mean').focus();
 
 	} else
-	if($('#sd1') && $('#sd1').val()=='')  {
+	if($('#sd') && $('#sd').val()=='')  {
 
-		alert(_('A value for one standard deviation is required.'));
-		$('#sd1').focus();
-
-	} else
-	if($('#sd2') && $('#sd2').val()=='')  {
-
-		alert(_('A value for two standard deviation is required.'));
-		$('#sd2').focus();
+		alert(_('A value for the standard deviation is required.'));
+		$('#sd').focus();
 
 	} else {
 

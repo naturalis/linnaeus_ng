@@ -51,7 +51,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>{t}Year:{/t}</td>
+		<td>{t}Year &amp; suffix (optional):{/t}</td>
 		<td>
 			<input
 				type="text" 
@@ -62,34 +62,41 @@
 				style="width:50px" 
 				onfocus="litHideAuthList();" 
 				onkeyup="litCheckYear(this)"/>
+			<input
+				type="text" 
+				name="suffix" 
+				id="suffix" 
+				value="{$ref.suffix}" 
+				maxlength="3" 
+				style="width:25px" />
 			<span id="msgYear"></span>
 		</td>
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Reference:{/t}</td>
-		<td>
+		<td style="">
 			<textarea
 				name="text"
 				id="text"
 				style="width:500px;height:250px;font-size:13px">{$ref.text}</textarea><br />
-			{t}You can use italics in your reference by enclosing the text to be italicised with &lt;i&gt; and &lt;/i&gt; tags. Other tags are not allowed.{/t}
+			{t}You can use italics in your reference by enclosing the text to be italicised with &lt;i&gt; and &lt;/i&gt; tags, and bold text by using with &lt;b&gt; and &lt;/b&gt;. Other tags are not allowed.{/t}
 		</td>
 	</tr>
 	<tr style="vertical-align:top">
-		<td>{t}Taxa this reference pertains to:{/t}</td>
+		<td style="white-space:nowrap">{t}Taxa this reference pertains to:{/t}</td>
 		<td>
-			<select name="taxa" id="taxa">
-			{section name=i loop=$taxa}
-			{if $taxa[i].id && (($isHigherTaxa && $taxa[i].lower_taxon==0) || !$isHigherTaxa)}
-			<option value="{$taxa[i].id}" {if $data.parent_id==$taxa[i].id}selected="selected"{/if}>
-			{section name=foo loop=$taxa[i].level-$taxa[0].level}
-			&nbsp;
-			{/section}		
-			{$taxa[i].taxon}</option>
-			{/if}
-			{/section}
+			<select id="taxa">
+            {foreach from=$taxa key=k item=v}
+            {if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)}
+            <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+            {section name=foo loop=$v.level-$taxa[0].level}
+            &nbsp;
+            {/section}
+            {$v.taxon}</option>
+            {/if}
+            {/foreach}
 			</select>
-			<span class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="litAddTaxonToList()">{t}add{/t}</span>
+			<span id="add-button" class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="litAddTaxonToList()">{t}add{/t}</span>
 			<div id="selected-taxa"></div>
 		</td>
 	</tr>
@@ -125,15 +132,16 @@ $('body').click(function(e) {
 
 var f = $('#selected-taxa');
 
-var off = $('#taxa').offset();
-f.offset({left : off.left + $('#taxa').width() + 50, top: off.top});
+var off = $('#add-button').offset();
+f.offset({left : off.left + $('#add-button').width() + 25, top: off.top});
 
 });
 {/literal}
 
-{section name=i loop=$ref.taxa}
-	litAddTaxonToList([{$ref.taxa[i].taxon_id},'{$ref.taxa[i].taxon}']);
-{/section}
+{foreach from=$ref.taxa item=v}
+	litAddTaxonToList({$v},true);
+{/foreach}
+litUpdateTaxonSelection();
 {if $ref}
 litThisReference = ['{$ref.author_first|escape:'quotes'} ({$ref.year})'];
 {/if}

@@ -7,8 +7,8 @@
 </tr>
 <tr><td colspan="6">&nbsp;</td></tr>
 <tr>
-	<th style="width:250px;">{t}synonym{/t}</td>
-	<th style="width:350px;">{t}literature{/t}</td>
+	<th style="width:350px;">{t}synonym{/t}</td>
+	<th style="width:300px;">{t}literature{/t}</td>
 	<th style="width:55px;">{t}move up{/t}</td>
 	<th style="width:65px;">{t}move down{/t}</td>
 	<th>delete</td>
@@ -67,7 +67,7 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
-<tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="32" /></td></tr>
+<tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="128" /></td></tr>
 <tr><td>{t}litereature reference:{/t}</td><td>
 	<select name="lit_ref_id">
 	<option value="">{t}(none){/t}</option>

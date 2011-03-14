@@ -20,7 +20,7 @@
 		<!-- th style="width:100px;" onclick="allTableColumnSort('taxon_order');">{t}Rank{/t}</th -->
 		<th style="width:240px;" onclick="allTableColumnSort('taxon');">{t}Taxon{/t}</th>
 {if $session.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
-		<th style="width:50px;" onclick="allTableColumnSort('pct_finished');">{t}Content{/t}</th>
+		<th style="width:50px;text-align:right;" onclick="allTableColumnSort('pct_finished');">{t}Content{/t}</th>
 {if !$isHigherTaxa}
 		<th style="width:50px;" title="{t}images, videos, soundfiles{/t}">{t}Media{/t}</th>
 {/if}
@@ -58,8 +58,8 @@
 		</td>
 {/if}
 
-		<td>
-			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pctFinished}% {t}done{/t}</span>
+		<td style="text-align:right;">
+			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxa[i].pctFinished}%{* t}done{/t *}</span>
 		</td>
 {if !$isHigherTaxa}
 		<td title="{t}media files{/t}">

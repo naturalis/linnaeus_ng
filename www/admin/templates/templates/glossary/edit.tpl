@@ -48,6 +48,7 @@
 			<input type="text" name="synonym" id="synonym" value=""/>
 			<span class="pseudo-a" id="add" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="glossAddSynonymToList()">{t}add{/t}</span>
 			<div id="synonyms"></div>
+			{t}(double-click a synonym to remove it from the list){/t}
 		</td>
 	</tr>
 

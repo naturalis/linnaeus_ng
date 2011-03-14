@@ -143,7 +143,9 @@
 <div id="key-taxa-list-remain">
 <fieldset>
 <legend id="key-taxa-list-remain-header">{t}Possible outcomes{/t}</legend>
-{if $remainingTaxa || $choices|@count==0}
+{if $remainingTaxa=='none'}
+{t}Your key currently has no taxa attached to it.{/t}
+{elseif $remainingTaxa || $choices|@count==0}
 This is a list of the taxa that are a possible outcome of the key, computed from the current step:<br />
 {section name=i loop=$remainingTaxa}
 &#149;&nbsp;{$remainingTaxa[i].taxon}<br />

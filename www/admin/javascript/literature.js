@@ -160,7 +160,7 @@ function litCheckForm(ele) {
 
 		for(var i=0;i<litAddedTaxa.length;i++) {
 
-			$("#theForm").append('<input type="hidden" name="selectedTaxa[]" value="'+litAddedTaxa[i][0]+'">');
+			$("#theForm").append('<input type="hidden" name="selectedTaxa[]" value="'+litAddedTaxa[i]+'">');
 
 		}
 
@@ -170,13 +170,32 @@ function litCheckForm(ele) {
 
 }
 
+var taxonNames = Array();
+
+function litGetTaxonName(taxonId) {
+
+	if (!taxonNames[taxonId]) {
+
+		$("#taxa > option").each(function() {
+			if (this.value==taxonId) { 
+				taxonNames[taxonId] = this.text.trim();
+			}
+		});
+		
+	}
+	
+	return taxonNames[taxonId];
+
+}
+
 function litUpdateTaxonSelection() {
 
+		
 	var b = '';
 	
 	for(var i=0;i<litAddedTaxa.length;i++) {
 	
-		b = b + '<span style="cursor:pointer" ondblclick="litRemoveTaxonFromList('+litAddedTaxa[i][0]+')">'+litAddedTaxa[i][1]+'</span><br />';
+		b = b + '<span style="cursor:pointer" ondblclick="litRemoveTaxonFromList('+litAddedTaxa[i]+')">'+litGetTaxonName(litAddedTaxa[i])+'</span><br />';
 	
 	}
 	
@@ -190,7 +209,7 @@ function litRemoveTaxonFromList(id) {
 
 	for(var i=0;i<litAddedTaxa.length;i++) {
 
-		if (litAddedTaxa[i][0] != id) {
+		if (litAddedTaxa[i] != id) {
 
 			t[t.length] = litAddedTaxa[i];
 
@@ -204,33 +223,25 @@ function litRemoveTaxonFromList(id) {
 
 }
 
-function litAddTaxonToList(taxon) {
+function litAddTaxonToList(taxonId,noupdate) {
 
-	if (!taxon) {
-	
-		taxon =([$('#taxa :selected').val(),$('#taxa :selected').text().trim()]);
-	
-	}
+	if (!taxonId) taxonId = $('#taxa :selected').val();
 
 	var add = true;
 
 	for(var i=0;i<litAddedTaxa.length;i++) {
 
-		if (litAddedTaxa[i][0] == taxon[0]) {
-
+		if (litAddedTaxa[i] == taxonId) {
 			add = false;
-
 			break;
-
 		}
 
 	}
 
 	if (add) { 
-	
-		litAddedTaxa[litAddedTaxa.length] = taxon;
 
-		litUpdateTaxonSelection();
+		litAddedTaxa[litAddedTaxa.length] = taxonId;
+		if (!noupdate) litUpdateTaxonSelection();
 
 	}
 

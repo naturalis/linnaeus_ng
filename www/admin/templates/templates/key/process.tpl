@@ -1,8 +1,12 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-{if $stepCount || $taxonCount}
+{if $processed}
+{if $taxonCount==0}
+{t}Your key has no taxa attached to it.{/t}
+{else}
 {t _s1=$stepCount _s2=$taxonCount}Done. Processed %s steps and %s taxa.{/t}
+{/if}
 <p>
 {t}<a href="step_show.php">{t}Go to your key{/t}</a>.{/t}
 </p>
