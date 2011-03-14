@@ -105,7 +105,6 @@ class LiteratureController extends Controller
 
 		}
 
-
 		if ($this->rHasId()) $ref = $this->getReference();
 
 		if (isset($ref)) {
@@ -115,7 +114,7 @@ class LiteratureController extends Controller
 					_('Editing literary reference "%s (%s)"'),
 					$ref['author_first'].
 						($ref['multiple_authors']==1 ? ' '._('et al.') : ($ref['author_second'] ? ' &amp; '.$ref['author_second'] : '')),
-					$ref['year']
+					$ref['year'].$ref['suffix']
 				)
 			);
 		
@@ -140,7 +139,7 @@ class LiteratureController extends Controller
 			$this->redirect('browse.php');
 
 		} else
-		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text')) {// && !$this->isFormResubmit()) {
 
 			$data = $this->requestData;
 
@@ -151,14 +150,29 @@ class LiteratureController extends Controller
 			$data['multiple_authors'] = $data['auths']=='n' ? 1 : 0;
 
 			$data['year'] = $data['year'].'-00-00';
-
+			
             $data['text'] = strip_tags($data['text'],$this->controllerSettings['allowedTags']);
 
-			if ($data['id']=='null' && $this->getReferences($data)) {
+			$test = array(
+				'author_first' => $data['author_first'],
+				'author_second' => $data['author_second'],
+				'multiple_authors' => $data['multiple_authors'],
+				'year' => $data['year'],
+				'suffix' => $data['suffix']
+			);
 
-				$this->addError(_('Reference already exists.'));
+			if ($this->rHasId())
+				$test['id !='] = $data['id'];
+			else
+				$test['id'] = 'null';
+
+			if ($this->getReferences($test)) {
+
+				$this->addError(_('A reference with the same author(s), year and suffix already exists.'));
 
 				$ref = $this->requestData;
+
+				if ($this->rHasVal('selectedTaxa')) $ref['taxa'] = $this->requestData['selectedTaxa'];
 
 			} else
 			if ($this->models->Literature->save($data)) {
@@ -200,7 +214,7 @@ class LiteratureController extends Controller
 							' &amp; '.$data['author_second'] :
 							($data['author_second']=='1' ? _(' et al.') : '' )
 						).
-						' ('.$this->requestData['year'].')'.
+						' ('.$this->requestData['year'].$this->requestData['suffix'].')'.
 						'</span>';
 
 					$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
@@ -387,7 +401,8 @@ class LiteratureController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'literature_id' => $thisId	
-					)
+					),
+					'columns' => 'taxon_id'
 				)
 			);
 			
@@ -395,23 +410,12 @@ class LiteratureController extends Controller
 
 				if (isset($val['taxon_id'])) {
 
-					$t = $this->models->Taxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $val['taxon_id']
-							)
-						)
-					);
-
-					$lt[$key]['taxon'] = $t[0]['taxon'];
+					$ref['taxa'][] = $val['taxon_id'];
 
 				}
 
 			}
 			
-			$ref['taxa'] = $lt;
-
 			return $ref;
 
 		} else {
@@ -499,8 +503,10 @@ class LiteratureController extends Controller
 		if (!empty($search['author_first like'])) $d['author_first like'] = $search['author_first like'];
 		if (!empty($search['author_second'])) $d['author_second'] =  $search['author_second'];
 		if (!empty($search['year'])) $d['year'] = $search['year'];
+		if (!empty($search['suffix'])) $d['suffix'] = $search['suffix'];
 		if (!empty($search['text'])) $d['text'] = $search['text'];
-		if (!empty($search['multiple_authors'])) $d['multiple_authors'] = $search['multiple_authors'];
+		if (!empty($search['id'])) $d['id'] = $search['id'];
+		if (!empty($search['id !='])) $d['id !='] = $search['id !='];
 
 		$l = $this->models->Literature->_get(
 				array(
