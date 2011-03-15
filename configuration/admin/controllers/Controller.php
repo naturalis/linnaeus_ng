@@ -8,7 +8,6 @@
 
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
-
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
 
 class Controller extends BaseClass
