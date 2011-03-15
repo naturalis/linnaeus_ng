@@ -537,7 +537,7 @@ class Controller extends BaseClass
 		}
 		
         // if user has no roles, do nothing
-        if (count($d) == 0) return;
+        if (!isset($d)) return;
             
         // if user has only one role, set the corresponding project as the active project
         if (count($d) == 1) {
