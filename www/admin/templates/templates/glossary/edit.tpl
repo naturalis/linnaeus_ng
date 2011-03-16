@@ -47,8 +47,10 @@
 		<td colspan="2">
 			<input type="text" name="synonym" id="synonym" value=""/>
 			<span class="pseudo-a" id="add" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="glossAddSynonymToList()">{t}add{/t}</span>
+			<div id="synonyms-container">
 			<div id="synonyms"></div>
 			{t}(double-click a synonym to remove it from the list){/t}
+			</div>
 		</td>
 	</tr>
 
@@ -96,10 +98,10 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-var f = $('#synonyms');
+var f = $('#synonyms-container');
 
 var off = $('#add').offset();
-f.offset({left : off.left + $('#add').width() + 50, top: off.top});
+f.offset({left : off.left + $('#add').width() + 30, top: off.top});
 
 });
 

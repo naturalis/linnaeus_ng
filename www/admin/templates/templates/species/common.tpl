@@ -89,7 +89,7 @@
 	<tr><td>{t}language:{/t}</td><td>
 		<select name="language_id" id="language">
 		{section name=i loop=$allLanguages}
-			{if $allLanguages[i].language!=''}<option value="{$allLanguages[i].id}">{$allLanguages[i].language}</option>{/if}
+			{if $allLanguages[i].language!=''}<option value="{$allLanguages[i].id}"{if $allLanguages[i].id==$lastLanguage} selected="selected"{/if}>{$allLanguages[i].language}</option>{/if}
 		{/section}
 		</select>
 	</td></tr>

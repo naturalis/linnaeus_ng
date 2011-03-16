@@ -18,13 +18,8 @@
 	<td>{$synonyms[i].synonym}</td>
 	<td>
 		{if $synonyms[i].literature}
-		{$synonyms[i].literature.author_first}
-		{if $synonyms[i].literature.multiple_authors==0}
-		{if $synonyms[i].literature.author_second} &amp; {$synonyms[i].literature.author_second}{/if}
-		{else}
-		{t}et al.{/t}
-		{/if}
-		({$synonyms[i].literature.year})
+		{$synonyms[i].literature.author_full}
+		{$synonyms[i].literature.year}{$synonyms[i].literature.suffix}
 		{/if}
 	</td>
 	{if $smarty.section.i.first}
@@ -68,14 +63,12 @@
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
 <tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="128" /></td></tr>
-<tr><td>{t}litereature reference:{/t}</td><td>
+<tr><td>{t}literature reference:{/t}</td><td>
 	<select name="lit_ref_id">
 	<option value="">{t}(none){/t}</option>
 {section name=i loop=$literature}
 	<option value="{$literature[i].id}">
-	{$literature[i].author_first}
-	{if $literature[i].author_second!=''} &amp; {$literature[i].author_second}{else}
-{if $literature[i].multiple_authors==1} et al.{/if}{/if} ({$literature[i].year})
+	{$literature[i].author_full} {$literature[i].year}{$literature[i].suffix}
 	</option>
 {/section}
 	</select>

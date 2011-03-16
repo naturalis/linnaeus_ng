@@ -30,23 +30,35 @@
 
 <table>
 	<tr>
-		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
-		<th style="width:500px">{t}definition{/t}</th>
+		<th style="width:175px">{t}term{/t}</th>
+		<th style="width:350px">{t}definition{/t}</th>
+		<th>{t}synonyms{/t}</th>
+		<th>{t}media{/t}</th>
 		<th></th>
 	</tr>
 {section name=i loop=$gloss}
 	<tr class="tr-highlight">
 		<td>{$gloss[i].term}</td>
-		<td>{$gloss[i].definition|@substr:0:75}{if $gloss[i].definition|@strlen>75}...{/if}</td>
+		<td>{$gloss[i].definition|@substr:0:50}{if $gloss[i].definition|@strlen>50}...{/if}</td>
+		<td style="text-align:right;padding-right:7px;">{$gloss[i].synonyms|@count}</td>
+		<td style="text-align:right;padding-right:7px;">{$gloss[i].media|@count}</td>
 		<td>[<a href="edit.php?id={$gloss[i].id}">edit</a>]</td>
 	</tr>
 {/section}
 </table>
-<form method="post" action="" name="sortForm" id="sortForm">
-<input type="hidden" name="key" id="key" value="{$sortBy.key}" />
-<input type="hidden" name="letter" value="{$letter}"  />
-<input type="hidden" name="dir" value="{$sortBy.dir}"  />
-</form>
+
+
+{if $prevStart!=-1 || $nextStart!=-1}
+<div id="navigation">
+	{if $prevStart!=-1}
+	<span class="pseudo-a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
+	{/if}
+	{if $nextStart!=-1}
+	<span class="pseudo-a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
+	{/if}
+</div>
+{/if}
+
 <p>
 [<span class="pseudo-a" onclick="$('#newForm').submit();">{t}add new term{/t}</span>]
 </p>

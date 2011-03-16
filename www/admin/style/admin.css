@@ -424,3 +424,16 @@ a:hover,.pseudo-a:hover {
 	font-weight:bold;
 	color:#FF0000;
 }
+
+#navigation {
+	border-top:1px dotted #666;
+	margin:2px 0px 0px 2px;
+}
+
+#login-table {
+	border-collapse:collapse;
+}
+
+#login-table td {
+	padding-bottom:3px;
+}
