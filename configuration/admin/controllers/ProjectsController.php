@@ -2,8 +2,6 @@
 
 /*
 
-	default language! (eh?)
-
 	set upload maximum for media uploads per projects
 
     deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding

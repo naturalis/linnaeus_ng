@@ -86,6 +86,11 @@ class LiteratureController extends Controller
             $this->getAuthors();
 
         }
+        if ($this->requestData['action'] == 'get_references') {
+
+            $this->getReferenceList();
+
+        }
 		
         $this->printPage();
     
@@ -472,6 +477,38 @@ class LiteratureController extends Controller
 
 	}
 
+	private function getReferenceList($str=null)
+	{
+	
+		if (!isset($str) && !$this->rHasVal('str')) return false;
+
+		$thisStr = isset($str) ? $str : $this->requestData['str'];
+		
+		if (empty($thisStr)) return;
+
+		$l = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'author_first like' => $thisStr.'%',
+					'fieldAsIndex' => 'author_first'
+				),
+				'columns' => '*, year(`year`) as `year`,
+					 			concat(
+									author_first,
+									(
+										if(multiple_authors=1,
+											\' et al.\',
+											if(author_second!=\'\',concat(\' & \',author_second),\'\')
+										)
+									)
+								) as author_full'
+			)
+		);
+
+		$this->smarty->assign('returnText',json_encode($l));
+
+	}
 
 	private function deleteReference($id)
 	{

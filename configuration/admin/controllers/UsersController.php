@@ -20,7 +20,7 @@ class UsersController extends Controller
         'free_module_project', 
         'module_project_user',
     );
-    
+
 	public $jsToLoad = array('all' => array('user.js'));
 
     public $controllerPublicName = 'User administration';
@@ -271,6 +271,8 @@ class UsersController extends Controller
 
 						if ($this->saveNewUser($this->requestData)) {
 						
+							$this->sendNewUserEmail($this->requestData);
+
 							$this->redirect('index.php');
 						
 						}
@@ -654,6 +656,7 @@ class UsersController extends Controller
 					$d = $this->requestData['active'];
 					$this->requestData['active'] = 1;
                     $this->models->User->save($this->requestData);
+
                     $this->requestData['active'] = $d;
 					
                     $this->addMessage(_('User data saved'));
@@ -752,6 +755,56 @@ class UsersController extends Controller
 
     }
 
+
+    /**
+     * Find, reset and send new password
+     *
+     * See function code for detailed comments on the function's flow
+     *
+     * @access    public
+     */
+    public function passwordAction ()
+    {
+
+        $this->setPageName(_('Reset password'));
+
+		if ($this->rHasVal('email') && !$this->isFormResubmit()) {
+
+			$u = $this->models->User->_get(
+				array(
+					'id' => array(
+						'email_address' => trim($this->requestData['email']
+						)
+					)
+				)
+			);
+
+			if (count((array)$u)==1) {
+
+				$newPass = $this->generateRandomPassword();
+				
+				$this->sendPasswordEmail($u[0],$newPass);
+
+				$r = $this->models->User->save(
+					array(
+						'id' => $u[0]['id'],
+						'password' => $this->userPasswordEncode($newPass)
+					)
+				);
+
+				$this->addMessage(_('Your password has been reset. An e-mail with a new password has been sent to you.'));
+
+			} else {
+
+				$this->addError(_('Invalid or unknown e-mail address.'));
+
+			}
+
+		}
+
+		$this->printPage();
+
+    }
 
     /**
      * AJAX interface for this class
@@ -963,6 +1016,8 @@ class UsersController extends Controller
 			$this->addError(_('Failed to create user from session.'));
 
 		} else {
+
+			$this->sendNewUserEmail($_SESSION['data']['new_user']);
 
 			unset($_SESSION['data']['new_user']);
 
@@ -1826,6 +1881,93 @@ class UsersController extends Controller
         return $users;
     
     }
+
+
+	private function prepareEmail($user,$plain,$html,$mailName=null)
+	{
+
+		$plain = str_replace('[[url]]',$this->getLoginStartPage(true),$plain);
+		$html = str_replace('[[url]]',$this->getLoginStartPage(true),$html);
+
+		return
+			array(
+				'mailto_address' => $user['email_address'],
+				'mailto_name' => ($user['first_name'] ? $user['first_name'].' ' : '').$user['last_name'],
+				'mailfrom_address' => $this->controllerSettings['email']['mailfrom_address'],
+				'mailfrom_name' => $this->controllerSettings['email']['mailfrom_name'],
+				'subject' => $this->controllerSettings['email']['mails']['newuser']['subject'],
+				'plain' => $plain,
+				'html' => $html,
+				'smtp_server' => $this->controllerSettings['email']['smtp_server'],
+				'mail_name' => $mailName
+			);
+
+	}
+
+	private function sendNewUserEmail($user)
+	{
+
+		return $this->sendEmail(
+			$this->prepareEmail(
+				$user,
+				sprintf(
+					_($this->controllerSettings['email']['mails']['newuser']['plain']),
+					$user['username'],
+					$user['password']
+				),
+				sprintf(
+					_($this->controllerSettings['email']['mails']['newuser']['html']),
+					$user['username'],
+					$user['password']
+				),
+				'created new user'
+			)
+		);
+
+	}
+
+	private function sendPasswordEmail($user,$password)
+	{
+
+		return $this->sendEmail(
+			$this->prepareEmail(
+				$user,
+				sprintf(
+					_($this->controllerSettings['email']['mails']['resetpassword']['plain']),
+					$password
+				),
+				sprintf(
+					_($this->controllerSettings['email']['mails']['resetpassword']['html']),
+					$password
+				),
+				'reset password'
+			)
+		);
+
+	}
+	
+	private function generateRandomPassword()
+	{
+
+		$chars = $this->controllerSettings['randomPassword']['chars'];
+	
+		srand((double)microtime()*1000000);
+	
+		$i = 0;
+		$pass = '' ;
+	
+		while ($i <= $this->controllerSettings['randomPassword']['length']) {
+
+			$num = rand()%33;	
+			$tmp = substr($chars, $num, 1);
+			$pass = $pass.$tmp;
+			$i++;
+	
+		}
+	
+		return $pass;
+
+	}
 
 }
 
