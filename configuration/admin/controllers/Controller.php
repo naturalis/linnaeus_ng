@@ -64,7 +64,8 @@ class Controller extends BaseClass
     );
 
     private $usedHelpersBase = array(
-		'logging_helper'
+		'logging_helper',
+        'email_helper'
     );
 
 
@@ -98,7 +99,7 @@ class Controller extends BaseClass
         
         $this->loadModels();
 
-        $this->setHelpTexts();
+        //$this->setHelpTexts();
         
         $this->setRandomValue();
 
@@ -582,18 +583,19 @@ class Controller extends BaseClass
      * @return     string    path if page to redirect to
      * @access     public
      */
-    public function getLoginStartPage ()
+    public function getLoginStartPage($includeDomain=false)
     {
 
         if (!empty($_SESSION['login_start_page'])) {
             
-            return $_SESSION['login_start_page'];
+            return ($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').$_SESSION['login_start_page'];
         
         } else {
 
             if ($_SESSION["user"]["_number_of_projects"]==1) {
 
                 return
+					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').
 					$this->baseUrl.
 					$this->getAppName().'/'.
 					$this->getAppName().
@@ -601,7 +603,11 @@ class Controller extends BaseClass
     
             } else {
 
-                return $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
+                return
+					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').
+					$this->baseUrl . 
+					$this->appName . 
+					$this->generalSettings['paths']['chooseProject'];
 
             }    
         }
@@ -1219,6 +1225,63 @@ class Controller extends BaseClass
 
 	}
 	
+	public function sendEmail($params)
+	{
+
+		/*
+			params:
+
+			mailto_address
+			mailto_name
+			mailfrom_address
+			mailfrom_name
+			subject
+			plain
+			html
+			smtp_server
+			debug (boolean; optional)
+			mail_name (for identification in the log file; optional)
+
+		*/
+
+
+		$d = isset($params['mail_name']) ? ' "'.$params['mail_name'].'"' : '';
+	
+		if (
+			!isset($params['mailto_address']) ||
+			!isset($params['mailfrom_address']) ||
+			(!isset($params['plain']) && !isset($params['html'])) ||
+			!isset($params['smtp_server'])
+		) {
+
+			if (!isset($params['mailto_address'])) $this->log('Can\'t send email'.$d.': lacking rcpt address)',1);
+			if (!isset($params['mailfrom_address'])) $this->log('Can\'t send email'.$d.': lacking sender address)',1);
+			if (!isset($params['plain']) && !isset($params['html'])) $this->log('Can\'t send email'.$d.': lacking body)',1);
+			if (!isset($params['smtp_server'])) $this->log('Can\'t send email'.$d.': lacking server)',1);
+
+			return false;
+
+		}
+
+		$res = $this->helpers->EmailHelper->send(
+			array(
+				'mailto_address' => $params['mailto_address'],
+				'mailto_name' => isset($params['mailto_name']) ? $params['mailto_name'] : null,
+				'mailfrom_address' => $params['mailfrom_address'],
+				'mailfrom_name' => isset($params['mailfrom_name']) ? $params['mailfrom_name'] : null,
+				'subject' => $params['subject'],
+				'plain' => isset($params['plain']) ? $params['plain'] : null,
+				'html' => isset($params['html']) ? $params['html'] : null,
+				'smtp_server' => $params['smtp_server'],
+				'debug' => isset($params['debug']) ? $params['debug'] : false
+			)
+		);
+		
+		if (!$res) $this->log('Failed sending email'.$d,1);
+
+		return $res;
+
+	}
 	
 	
 				

@@ -162,7 +162,32 @@ class configuration
 							'maxLength' => 64,
 							'regexp' => '/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/'
 						)
-				)
+				),
+				'email' =>
+					array(
+						'smtp_server' => 'smtp.eti.uva.nl',
+						'mailfrom_address' => 'linnaeus@eti.uva.nl',
+						'mailfrom_name' => 'Linnaeus NG',
+						'mails' =>
+							array(
+								'password' =>
+									array(
+										'subject' => 'Your username and password for Linnaeus NG', 
+										'plain' => 'Below are your username and password for access to the Linnaeus NG administration environment:
+Username: %s
+Password: %s
+
+You can find Linnaeus NG at:
+http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/',
+										'html' => '<html>Below are your username and password for access to the Linnaeus NG administration environment:<br />
+Username: %s<br />
+Password: %s<br />
+<br />
+You can find Linnaeus NG at:<br />
+<a href="http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/">http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/</a>',
+									)
+							)
+					)
 		);
 	}
 
@@ -320,6 +345,7 @@ class configuration
     {
 
 		return array(
+			'termsPerPage' => 20,
 			'media' =>
                 array(
                     'allowedFormats' => 

@@ -81,6 +81,10 @@ class GlossaryController extends Controller
         $this->setPageName( _('Index'));
 
 		$this->clearTempValues();
+		
+		$gtc = $this->getGlossaryTermCount();
+
+		$this->smarty->assign('totalCount', $gtc['total']);
 
         $this->printPage();
     
@@ -100,15 +104,7 @@ class GlossaryController extends Controller
 
 			$gloss = $this->getGlossaryTerm();
 
-			$gloss['media'] =
-				$this->models->GlossaryMedia->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'glossary_id' => $gloss['id']
-						)
-					)
-				);
+			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
 
 			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
 
@@ -140,7 +136,7 @@ class GlossaryController extends Controller
 
 		if ($this->rHasVal('activeLanguage')) {
 
-			$activeLanguage = $this->rHasVal('activeLanguage');
+			$activeLanguage = $this->requestData['activeLanguage'];
 
 		} elseif (isset($gloss)) {
 
@@ -167,6 +163,8 @@ class GlossaryController extends Controller
 				$this->addError(_('Glossary term already exists.'));
 
 				$gloss = $this->requestData;
+				
+				$activeLanguage = $this->requestData['language_id'];
 
 			} else
 			if ($this->models->Glossary->save($data)) {
@@ -371,8 +369,7 @@ class GlossaryController extends Controller
      */
     public function browseAction()
     {
-	
-	
+
        $this->checkAuthorisation();
 
 		$this->setPageName(_('Browsing glossary'));
@@ -421,32 +418,17 @@ class GlossaryController extends Controller
 	
 			}
 	
-			// user requested a sort of the table
-			if ($this->rHasVal('key')) {
-	
-				$sortBy = array(
-					'key' => $this->requestData['key'], 
-					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-					'case' => 'i'
-				);
-			
-				$this->customSortArray($refs, $sortBy);
-	
-			} else {
-	
-				$sortBy = array(
-					'key' => 'author_first', 
-					'dir' => 'asc', 
-					'case' => 'i'
-				);
+			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
+
+			$gloss = $pagination['items'];
+
+			$this->smarty->assign('prevStart', $pagination['prevStart']);
 		
-			}
-	
+			$this->smarty->assign('nextStart', $pagination['nextStart']);
+		
 			$this->smarty->assign('languages', $_SESSION['project']['languages']);
 	
 			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
-	
-			$this->smarty->assign('sortBy', $sortBy);
 	
 			$this->smarty->assign('alpha', $alpha);
 	
@@ -689,6 +671,20 @@ class GlossaryController extends Controller
 
 	}
 
+	private function getGlossaryMedia($id)
+	{
+
+		return $this->models->GlossaryMedia->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'glossary_id' => $id
+				)
+			)
+		);
+
+	}			
+				
 	private function getActualAlphabet($languageId)
 	{
 
@@ -754,6 +750,20 @@ class GlossaryController extends Controller
 
 	}
 
+	private function getGlossarySynonyms($id)
+	{
+	
+		return $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'glossary_id' => $id	
+				)
+			)
+		);
+
+	}
+
 	private function getGlossaryTerm($id=null)
 	{
 
@@ -774,16 +784,7 @@ class GlossaryController extends Controller
 		
 			$term = $l[0];
 			
-			$lt = $this->models->GlossarySynonym->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'glossary_id' => $thisId	
-					)
-				)
-			);
-			
-			$term['synonyms'] = $lt;
+			$term['synonyms'] = $this->getGlossarySynonyms($thisId);
 
 			return $term;
 
@@ -812,7 +813,40 @@ class GlossaryController extends Controller
 				)
 			);
 
+		foreach((array)$l as $key => $val) {
+
+			$l[$key]['synonyms'] = $this->getGlossarySynonyms($val['id']);
+			$l[$key]['media'] = $this->getGlossaryMedia($val['id']);
+
+		}
+
 		return $l;
+
+	}
+
+	private function getGlossaryTermCount()
+	{
+
+		$l = $this->models->Glossary->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'columns' => 'count(*) as total,language_id',
+					'group' => 'language_id',
+					'fieldAsIndex' => 'language_id'
+				)
+			);
+
+		$t = 0;
+
+		foreach((array)$l as $key => $val) {
+
+			$t += $val['total'];
+
+		}
+
+		return array('count' => $l, 'total' => $t);
 
 	}
 

@@ -410,7 +410,7 @@ class MatrixKeyController extends Controller
 				$filesToSave = $this->getUploadedFiles();
 	
 				if (!$this->verifyData($this->requestData,$filesToSave)) {
-	
+
 					$state = $this->requestData;
 
 				} else {
@@ -581,8 +581,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     
     }
-
-
 
 	/* matrix functions */
 	private function createNewMatrix()
@@ -1348,7 +1346,13 @@ class MatrixKeyController extends Controller
 		} else
 		if ($data['type']=='media') {
 
-			if (!$file && !isset($data['existing_file'])) $this->addError(_('A media file is required.'));
+			if (!$file && !isset($data['existing_file'])) {
+			
+				$this->addError(_('A media file is required.'));
+				
+				$result = false;
+
+			}
 
 		}
 
@@ -1561,9 +1565,9 @@ class MatrixKeyController extends Controller
 
     private function deleteCharacteristicState ($id=null)
     {
-	
+
 		$id = isset($id) ? $id : $this->requestData['id'];
-		
+
 		if (!isset($id)) return;
 
 		$cs = $this->getCharacteristicState($id);
@@ -1587,7 +1591,7 @@ class MatrixKeyController extends Controller
 				'project_id' => $this->getCurrentProjectId()
 			)
 		);
-    
+
     }
 
     private function deleteCharacteristicStates ($charId)

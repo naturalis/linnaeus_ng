@@ -1,6 +1,8 @@
 <?php
 
 /*
+	pre-check
+		make sure $iniSettings.upload_max_filesize and $iniSettings.post_max_size are sufficient (see config for allowed filesizes)
 
 	new project order of business (* do immediately, else can be done later):
 	
@@ -214,6 +216,7 @@ class SpeciesController extends Controller
     
     }
 
+
     /**
      * Add new taxon action or edit existing
      *
@@ -250,7 +253,7 @@ class SpeciesController extends Controller
 		} else {
 
 			/*
-			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
+			// code also looked at what taxa were assigned to what user; now replaced by assigning rights to the entire page
 			$ut = $this->models->UserTaxon->_get(
 				array(
 					'id' => array(
@@ -268,7 +271,7 @@ class SpeciesController extends Controller
 			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
 			
 			/*
-			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
+			// code also looked at what taxa were assigned to what user; now replaced by assigning rights to the entire page
 			if (count((array)$ut)>0 || $isEmptyTaxaList) {
 	
 				$allow = false;
@@ -369,7 +372,7 @@ class SpeciesController extends Controller
 			if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
 			/*
-			// code also looked at what taxa were assigned to what user; no replaced by assigning rights to the entire page
+			// code also looked at what taxa were assigned to what user; now replaced by assigning rights to the entire page
 			} else {
 	
 				$this->smarty->assign('allowed',false);
@@ -383,6 +386,7 @@ class SpeciesController extends Controller
 		$this->printPage();
 
 	}
+
 
     /**
      * Edit taxon content
@@ -2062,9 +2066,7 @@ class SpeciesController extends Controller
 			
 		}
 		
-		$literature = $this->getTaxonLiterature($this->requestData['id']);
-
-
+		$literature = $this->getAllLiterature();
 
 		if (!isset($synonyms)) {
 
@@ -2102,6 +2104,7 @@ class SpeciesController extends Controller
 		$this->printPage();
 
 	}
+
 
     /**
      * Create common names for a taxon
@@ -2220,6 +2223,8 @@ class SpeciesController extends Controller
 						'show_order' => $show_order
 					)
 				);
+				
+				$this->smarty->assign('lastLanguage',$this->requestData['language_id']);
 	
 			}
 			
@@ -2434,34 +2439,34 @@ class SpeciesController extends Controller
     private function ajaxActionDeletePage ()
     {
 
-	if (!$this->rHasId()) {
+		if (!$this->rHasId()) {
+			
+			return;
 		
-		return;
+		} else {
+			
+			$this->models->ContentTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'page_id' => $this->requestData['id']
+			));
+			
+			$this->models->PageTaxonTitle->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'page_id' => $this->requestData['id']
+			));
 	
-	} else {
+			$this->models->Section->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'page_id' => $this->requestData['id']
+			));
+						
+			$this->models->PageTaxon->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $this->requestData['id']
+			));
 		
-		$this->models->ContentTaxon->delete(array(
-			'project_id' => $this->getCurrentProjectId(), 
-			'page_id' => $this->requestData['id']
-		));
-		
-		$this->models->PageTaxonTitle->delete(array(
-			'project_id' => $this->getCurrentProjectId(), 
-			'page_id' => $this->requestData['id']
-		));
-
-		$this->models->Section->delete(
-		array(
-			'project_id' => $this->getCurrentProjectId(), 
-			'page_id' => $this->requestData['id']
-		));
-					
-		$this->models->PageTaxon->delete(array(
-			'project_id' => $this->getCurrentProjectId(), 
-			'id' => $this->requestData['id']
-		));
-	
-	}
+		}
     
     }
 
@@ -3045,7 +3050,7 @@ class SpeciesController extends Controller
     private function ajaxActionGetTaxonUndo ()
     {
         
-//        if (!$this->rHasId() || !$this->rHasVal('language') || !$this->rHasVal('page')) {
+		//if (!$this->rHasId() || !$this->rHasVal('language') || !$this->rHasVal('page')) {
         if (!$this->rHasId()) {
             
             return;
@@ -4071,6 +4076,30 @@ class SpeciesController extends Controller
 
 	}
 
+	private function getAllLiterature()
+	{
+	
+		return $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'author_first,author_second,year',
+				'columns' => '*, year(`year`) as `year`,
+							concat(
+								author_first,
+								(
+									if(multiple_authors=1,
+										\' et al.\',
+										if(author_second!=\'\',concat(\' & \',author_second),\'\')
+									)
+								)
+							) as author_full'
+			)
+		);
+	
+	}
+
 	private function getTaxonLiterature($id)
 	{
 
@@ -4091,7 +4120,16 @@ class SpeciesController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $val['literature_id']
 					),
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both'
+					'columns' => '*, year(`year`) as `year`,
+							concat(
+								author_first,
+								(
+									if(multiple_authors=1,
+										\' et al.\',
+										if(author_second!=\'\',concat(\' & \',author_second),\'\')
+									)
+								)
+							) as author_full'
 				)
 			);
 			
