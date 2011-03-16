@@ -4,11 +4,7 @@ var glossThisTerm;
 
 function glossAddSynonymToList(synonym) {
 
-	if (!synonym) {
-	
-		synonym = $('#synonym').val().trim();
-
-	}
+	if (!synonym) synonym = $('#synonym').val().trim();
 
 	var add = true;
 
@@ -51,6 +47,8 @@ function glossUpdateSynonyms() {
 }
 
 function glossRemoveSynonymFromList(id) {
+
+	if (!confirm('Are you sure?')) return;
 
 	var t = Array();
 

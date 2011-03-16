@@ -31,13 +31,6 @@
 </ul>
 </p>
 <p>
-<b>{t}Size{/t}</b><br />
-{t}The maximum size of a file you are allowed to upload is influenced by the settings of the server. Currently, these are:{/t}<br />
-{t}Upload maximum size:{/t} {$iniSettings.upload_max_filesize}<br />
-{t}POST maximum size:{/t} {$iniSettings.post_max_size}<br />
-{t}The effective size limit is determined by the smallest of these two.{/t}
-</p>
-<p>
 <b>{t}Overwriting and identical filenames{/t}</b><br />
 {t}All uploaded files are assigned unique filenames, so there is no danger of accidentally overwriting an existing file. The original file names are retained in the project database and shown in the media management screens. Please be aware that there is no check on duplicate original filenames during the upload process, so do not rely on the being overwritten of identical filenames for the maintenance of your database.{/t}
 </p>

@@ -2,7 +2,7 @@ var litAddedTaxa = Array();
 var litAuthors = Array();
 var litThisReference = '';
 var litDropDownVisible = false;
-
+var litDropDownType = 'reference'; // 'authors';
 
 function litToggleAuthorTwo() {
 	
@@ -33,12 +33,14 @@ function litShowAuthList(ele) {
 		return;
 
 	}
-	
+
+	if (litDropDownType=='reference' && ele.id=='author_second') return;
+
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
 			'str' : $(ele).val() ,
-			'action' : 'get_authors',
+			'action' : (litDropDownType=='reference' ? 'get_references' : 'get_authors'),
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
@@ -46,7 +48,10 @@ function litShowAuthList(ele) {
 			if (data) {
 				obj = $.parseJSON(data);
 				if (obj.length > 0) {
-					litPopulateAuthList(obj,ele);
+					if (litDropDownType=='reference')
+						litPopulateRefList(obj,ele);
+					else
+						litPopulateAuthList(obj,ele);
 					if (!litDropDownVisible) {
 						var pos = $(ele).position();
 						$('#dropdown').removeClass().addClass('lit-dropdown');
@@ -58,12 +63,27 @@ function litShowAuthList(ele) {
 		}
 	});	
 
-
 }
+
 
 function litSetAuthorFromList(eleId,id) {
 
 	$('#'+eleId).val(litAuthors[id]);
+
+}
+
+function litSetAuthorFromRefList(id) {
+
+	var r = litAuthors[id];
+	
+	if (!r) return;
+
+	$('#auths-1').attr('checked', r[1]=='' ? true : false);
+	$('#auths-2').attr('checked', r[1]!='' ? true : false);
+	$('#auths-n').attr('checked', r[2]==1 ? true : false);
+	litToggleAuthorTwo();
+	$('#author_first').val(r[0]);
+	$('#author_second').val(r[1]);
 
 }
 
@@ -83,6 +103,24 @@ function litPopulateAuthList(obj,ele) {
 
 }
 
+function litPopulateRefList(obj,ele) {
+
+	litAuthors = Array();
+	var b = '';
+
+	for(var i=0;i<obj.length;i++) {
+
+		b = b +
+			'<span style="cursor:pointer" onclick="litSetAuthorFromRefList('+i+')">'+obj[i].author_full+'</span> '+
+			'<span style="color:#666">'+obj[i].year+(obj[i].suffix ? obj[i].suffix : '')+'</span>'+
+			'<br/>'+"\n";
+		litAuthors[i] = [obj[i].author_first,obj[i].author_second,obj[i].multiple_authors];
+
+	}
+
+	$('#dropdown').html(b);
+
+}
 
 function litHideAuthList() {
 
@@ -189,7 +227,6 @@ function litGetTaxonName(taxonId) {
 }
 
 function litUpdateTaxonSelection() {
-
 		
 	var b = '';
 	

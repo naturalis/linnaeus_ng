@@ -18,9 +18,9 @@
 	<tr>
 		<td>{t}Number of authors:{/t}</td>
 		<td>
-			<label><input type="radio" name="auths" value="1" onchange="litToggleAuthorTwo()" {if $num==1}checked="checked"{/if} />one</label>
-			<label><input type="radio" name="auths" value="2" onchange="litToggleAuthorTwo()" {if $num==2}checked="checked"{/if} />two</label>
-			<label><input type="radio" name="auths" value="n" onchange="litToggleAuthorTwo()" {if $num==99}checked="checked"{/if}/>more</label>
+			<label><input type="radio" name="auths" id="auths-1" value="1" onchange="litToggleAuthorTwo()" {if $num==1}checked="checked"{/if} />one</label>
+			<label><input type="radio" name="auths" id="auths-2" value="2" onchange="litToggleAuthorTwo()" {if $num==2}checked="checked"{/if} />two</label>
+			<label><input type="radio" name="auths" id="auths-n" value="n" onchange="litToggleAuthorTwo()" {if $num==99}checked="checked"{/if}/>more</label>
 		</td>
 	</tr>
 	<tr>

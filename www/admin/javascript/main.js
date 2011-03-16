@@ -333,3 +333,12 @@ function allShowMedia(url,name) {
 	});
 
 }
+
+function goNavigate(val,form) {
+	
+	var formId = form ? '#'+form : '#theForm';
+
+	$('<input type="hidden" name="start">').val(val).appendTo(formId);
+	$(formId).submit();
+
+}

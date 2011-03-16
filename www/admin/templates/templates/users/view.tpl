@@ -59,12 +59,14 @@
 		<td colspan="2">
 			<input type="button" value="edit" onclick="window.open('edit.php?id={$data.id}','_self');" />
 			<input type="button" value="back" onclick="window.open('index.php','_top')" />
+			<input type="button" value="send notification" onclick="$('#action').val('mail');$('#theForm').submit();" />
 		</td>
 	</tr>
 </table>
 </div>
-
-</div>
-
+<form method="post" action="" id="theForm">
+<input type="hidden" name="id" value="{$data.id}" />
+<input type="hidden" id="action" name="action" value="" />
+</form>
 
 {include file="../shared/admin-footer.tpl"}
