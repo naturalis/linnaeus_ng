@@ -99,8 +99,6 @@ class LiteratureController extends Controller
     public function editAction()
     {
 
-		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
-
         $this->checkAuthorisation();
 
 		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['literature']['newRef'])) {

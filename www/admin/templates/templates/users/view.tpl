@@ -3,43 +3,43 @@
 <div id="page-main">
 <table>
 	<tr>
-		<td>Username:</td><td>{$data.username}</td>
+		<td>{t}Username:{/t}</td><td>{$data.username}</td>
 	</tr>
 	<tr>
-		<td>First_name:</td><td>{$data.first_name}</td>
+		<td>{t}First name:{/t}</td><td>{$data.first_name}</td>
 	</tr>
 	<tr>
-		<td>Last_name:</td><td>{$data.last_name}</td>
+		<td>{t}Last name:{/t}</td><td>{$data.last_name}</td>
 	</tr>
 	<tr>
-		<td>E-mail address:</td>
+		<td>{t}E-mail address:{/t}</td>
 		<td>{$data.email_address}</td>
 	</tr>
 	<tr>
-		<td>Language:</td>
+		<td>{t}Language:{/t}</td>
 		<td>{$data.language}</td>
 	</tr>
 	<tr>
-		<td>Timezone:</td>
+		<td>{t}Timezone:{/t}</td>
 		<td>{$zone.timezone}: {$zone.locations}</td>
 	</tr>
 	<tr>
-		<td>E-mail notifications:</td>
+		<td>{t}E-mail notifications:{/t}</td>
 		<td>{if $data.email_notifications=='1'}y{else}n{/if}</td>
 	</tr>
 	<tr>
-		<td>Active:</td>
+		<td>{t}Active:{/t}</td>
 		<td>{if $data.active=='1'}y{else}n{/if}</td>
 	</tr>
 	<tr>
-		<td>Role in current project:</td>
+		<td>{t}Role in current project:{/t}</td>
 		<td>{$userRole.role.role}</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td colspan="2">Assigned to the following modules:</td>
+		<td colspan="2">{t}The following modules have been assigned to this user:{/t}</td>
 	</tr>
 
 {section name=i loop=$modules}
@@ -57,9 +57,8 @@
 	</tr>	
 	<tr>
 		<td colspan="2">
-			<input type="button" value="edit" onclick="window.open('edit.php?id={$data.id}','_self');" />
-			<input type="button" value="back" onclick="window.open('index.php','_top')" />
-			<input type="button" value="send notification" onclick="$('#action').val('mail');$('#theForm').submit();" />
+			<input type="button" value="{t}edit{/t}" onclick="window.open('edit.php?id={$data.id}','_self');" />
+			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />
 		</td>
 	</tr>
 </table>

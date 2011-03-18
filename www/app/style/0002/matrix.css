@@ -24,10 +24,10 @@
 
 #info {
 	position:relative;
-	margin-top:-285px;
+	margin-top:-270px;
 	left:310px;
 	width:260px;
-	height:248px;
+	height:262px;
 	border:1px dotted #666;
 	padding:5px;
 	margin-bottom:10px;
@@ -35,12 +35,12 @@
 }
 
 #pane-right {
-	background-color:#CC0000;
 	width:400px;
 	position:relative;
 	margin-top:-500px;
 	left:600px;
-	height:500px;
+	height:486px;
+	margin-bottom:25px;
 }
 
 #scores-taxa {
@@ -57,7 +57,7 @@
 	margin-bottom:5px;
 	vertical-align:top;
 	width:585px;
-	height:200px;
+	height:155px;
 }
 
 #selected {

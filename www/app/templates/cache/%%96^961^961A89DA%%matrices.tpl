@@ -1,5 +1,5 @@
 373
-a:4:{s:8:"template";a:8:{s:12:"matrices.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:22:"../shared/messages.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1299750666;s:7:"expires";i:1299754266;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:8:{s:12:"matrices.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:22:"../shared/messages.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300367874;s:7:"expires";i:1300371474;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -12,6 +12,8 @@ a:4:{s:8:"template";a:8:{s:12:"matrices.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 	</style>
 	<script type="text/javascript" src="../../../app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/jquery.tools.min.js"></script>
+	<script type="text/javascript" src="../../../admin/javascript/sprintf-0.7-beta1.js"></script>
+	
 	<script type="text/javascript" src="../../../app/javascript/main.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/matrix.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/colorbox/jquery.colorbox.js"></script>
@@ -22,8 +24,7 @@ a:4:{s:8:"template";a:8:{s:12:"matrices.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 	<a href="../../../app/views/linnaeus/"><img src="../../../admin/media/project/0002/imaginary-beings-logo%20%282%29.png" id="project-logo" /></a>
 	</div>
 	<div id="title">
-	Imaginary Beings Of The Literary World
-	</div>
+	Imaginary Beings Of The Literary World	</div>
 </div><div id="menu-container">
 	<div id="main-menu">
 <a class="menu-item" href="../glossary/">Glossary</a>
@@ -82,19 +83,8 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('0','')
+})
 
-
-
-
-
-$.modaldialog.prompt('The operation failed.', {
-  title: 'No Turning Back Now!',
-  width: 350,
-  closeLabel: 'close',
-  });
-
-
-});
 </script>
 
 </body>

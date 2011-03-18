@@ -104,9 +104,19 @@ function showMedia(url,name) {
 
 }
 
-function showDialog(str) {
+function isArray(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
+}
 
-	$.modaldialog.error(str);
+function showDialog(content,title) {
+
+	$.modaldialog.prompt(content, {
+		title : title ? title : _('Enter value'),
+		width: 350
+	});
 
 }
 

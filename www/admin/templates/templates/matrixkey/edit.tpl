@@ -69,10 +69,6 @@
 	</tr>
 </table>
 
-
-
-
-
 </div>
 
 {include file="../shared/admin-messages.tpl"}

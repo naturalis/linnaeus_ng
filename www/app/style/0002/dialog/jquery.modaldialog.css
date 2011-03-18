@@ -1,7 +1,38 @@
-#dialog {position:fixed; width:525px; padding:0px; z-index:200; background:#fff; font-family:inherit;font-size:inherit;}
-#dialog-header {display:block; position:relative; padding:3px 6px 7px; height:14px; font-weight:bold}
-#dialog-title {float:left}
-#dialog-close {float:left; cursor:pointer; margin:3px 3px 0 0; height:11px; width:11px; }
+#dialog {
+	position:fixed; 
+	width:525px; 
+	padding:0px; 
+	z-index:200; 
+	background:#fff; 
+	font-family:inherit;
+	font-size:inherit;
+}
+#dialog-header {
+	background-color:#eee;
+	display:block; 
+	position:relative; 
+	padding:5px; 
+	height:15px; 
+	font-weight:bold;
+	border-bottom:1px solid #999;
+}
+#dialog-title {
+	float:left;
+	margin:0px;
+}
+
+#dialog-close {
+	float:right; 
+	cursor:pointer; 
+	border-left:1px solid #666;
+	height:20px;
+	width:25px;
+	color:#666; 
+	font-weight:normal;
+	text-align:center;
+	padding-top:5px;
+	margin:-5px;
+}
 #dialog-content {display:block; padding:6px; min-height:160px; font-size:13px;}
 #dialog-content-inner { min-height:128px; }
 #dialog-mask {position:fixed; top:0; left:0; height:100%; width:100%; background:#FFF; opacity:.75; filter:alpha(opacity=75); z-index:100}

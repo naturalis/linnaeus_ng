@@ -445,6 +445,7 @@ function taxonDeleteData(id,name) {
 		type: "POST",
 		async: allAjaxAsynchMode ,
 		success: function (data) {
+			alert(data);
 			if (data=='<redirect>') {
 				window.open('delete.php?id='+thisId+'&time='+allGetTimestamp(),'_self');
 			} else {

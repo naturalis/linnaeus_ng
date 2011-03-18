@@ -13,7 +13,7 @@
 {/if}
 
 <div id="page-main">
-<table id="references" class="tablesorter">
+<table id="references">
 <thead> 
 	<tr>
 		<th id="th-author">{t}author(s){/t}</th>
@@ -35,15 +35,5 @@
 </tbody>
 </table>
 </div>
-
-{literal}
-<script type="text/javascript">
-$(document).ready(function() 
-    { 
-        $("#references").tablesorter( {sortList: [[0,0]]} ); 
-    } 
-); 
-</script>
-{/literal}
 
 {include file="../shared/footer.tpl"}

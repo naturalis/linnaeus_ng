@@ -4,9 +4,9 @@
 <div id="page-main">
 	<div id="menu">
 		<table>
-			<tr><td><a href="identify.php">Identify</a></td></tr>
-			<tr><td><a href="examine.php">Examine</a></td></tr>
-			<tr><td><a href="compare.php">Compare</a></td></tr>
+			<tr><td><a href="identify.php">{t}Identify{/t}</a></td></tr>
+			<tr><td><a href="examine.php">{t}Examine{/t}</a></td></tr>
+			<tr><td><a href="compare.php">{t}Compare{/t}</a></td></tr>
 		</table>
 	</div>
 </div>

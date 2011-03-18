@@ -76,7 +76,7 @@
 			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
 			{/if}
 		</td>
-		<td title="{t}show details{/t}">[<span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">show details</span>]</td>
+		<td title="{t}show details{/t}">[<span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show details{/t}</span>]</td>
 		<td class="key-choice-edit">[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
 		<td class="key-choice-edit">[<span class="pseudo-a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
 	</tr>
@@ -158,5 +158,4 @@ This is a list of the taxa that are a possible outcome of the key, computed from
 </div>
 
 {include file="../shared/admin-messages.tpl"}
-
 {include file="../shared/admin-footer.tpl"}

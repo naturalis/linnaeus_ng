@@ -20,7 +20,7 @@
 <span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
-{if $alpha|@count==0}(no terms have been defined){/if}
+{if $alpha|@count==0}{t}(no terms have been defined){/t}{/if}
 <input type="hidden" name="letter" id="letter" value="{$letter}"  />
 </form>
 </div>
@@ -42,7 +42,7 @@
 		<td>{$gloss[i].definition|@substr:0:50}{if $gloss[i].definition|@strlen>50}...{/if}</td>
 		<td style="text-align:right;padding-right:7px;">{$gloss[i].synonyms|@count}</td>
 		<td style="text-align:right;padding-right:7px;">{$gloss[i].media|@count}</td>
-		<td>[<a href="edit.php?id={$gloss[i].id}">edit</a>]</td>
+		<td>[<a href="edit.php?id={$gloss[i].id}">{t}edit{/t}</a>]</td>
 	</tr>
 {/section}
 </table>

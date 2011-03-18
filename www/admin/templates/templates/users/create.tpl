@@ -4,35 +4,33 @@
 <div id="page-block-messages">
 <span class="admin-message">
 {if $existingUserReason=='same name'}
-A similar user, albeit with a different e-mail address, already exists in this or another project:<br/>
+{t}A similar user, albeit with a different e-mail address, already exists in this or another project:{/t}<br/>
 <span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
-Would you like to connect that user to the current project instead of creating a new one with the same name?
+{t}Would you like to connect that user to the current project instead of creating a new one with the same name?{/t}
 <br /><br />
-<input type="button" value="yes, connect existing" onclick="userConnectExistingUser();" />
-<input type="button" value="no, create new" onclick="userCreateUserFromSession();" />
+<input type="button" value="{t}yes, connect existing{/t}" onclick="userConnectExistingUser();" />
+<input type="button" value="{t}no, create new{/t}" onclick="userCreateUserFromSession();" />
 
 {else}
 
-A user with the same e-mail address already exists in another project:<br />
+{t}A user with the same e-mail address already exists in another project:{/t}<br />
 <span class="message-existing-user">{$existingUser.first_name} {$existingUser.last_name}</span> ({$existingUser.email_address})<br />
-You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?
+{t}You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?{/t}
 <br /><br />
-<input type="button" value="yes, connect user"  onclick="userConnectExistingUser();" />
-<input type="button" value="no, cancel"  onclick="window.open('{$session.system.referer.url}','_top');" />
+<input type="button" value="{t}yes, connect user{/t}"  onclick="userConnectExistingUser();" />
+<input type="button" value="{t}no, cancel{/t}"  onclick="window.open('{$session.system.referer.url}','_top');" />
 
 {/if}
 </span>
 </div>
 {/if}
 
-{include file="../shared/admin-messages.tpl"}
-
 <div id="page-main">
 
 <form method="post" action="" name="theForm" id="theForm">
 <table>
 	<tr>
-		<td>username:</td>
+		<td>{t}Username:{/t}</td>
 		<td>
 		{if $check==true}{$data.username}{else}
 			<input 
@@ -48,7 +46,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>
 	</tr>
 	<tr>
-		<td>password:</td>
+		<td>{t}Password:{/t}</td>
 		<td>
 			<input
 				type="password"
@@ -63,7 +61,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>	
 	</tr>
 	<tr>
-		<td>password (repeat)</td>
+		<td>{t}Password (repeat):{/t}</td>
 		<td>
 			<input
 				type="password" 
@@ -78,7 +76,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>
 	</tr>
 	<tr>
-		<td>first_name:</td>
+		<td>{t}First name:{/t}</td>
 		<td>
 		{if $check==true}{$data.first_name}{else}
 			<input
@@ -94,7 +92,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>
 	</tr>
 	<tr>
-		<td>last_name:</td>
+		<td>{t}Last name:{/t}</td>
 		<td>
 		{if $check==true}{$data.last_name}{else}
 			<input
@@ -110,7 +108,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>
 	</tr>
 	<tr>
-		<td>email_address:</td>
+		<td>{t}E-mail address:{/t}</td>
 		<td>
 		{if $check==true}{$data.email_address}{else}
 			<input
@@ -128,7 +126,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 	</tr>
 
 	<tr>
-		<td>timezone</td>
+		<td>{t}Timezone:{/t}</td>
 		<td>
 			<select name="timezone_id">
 			{section name=i loop=$zones}
@@ -140,7 +138,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 	</td>
 	</tr>
 	<tr>
-		<td>language</td>
+		<td>{t}Language:{/t}</td>
 		<td><input 
 				type="text" 
 				name="language" 
@@ -153,7 +151,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 	</td>
 	</tr>
 	<tr>
-		<td>send e-mail notifications</td>
+		<td>{t}Send e-mail notifications:{/t}</td>
 		<td>
 			<label for="email_notifications-y">
 				<input
@@ -174,7 +172,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 	</tr>
 	
 	<tr>
-		<td>role in current project:</td>
+		<td>{t}Role in current project:{/t}</td>
 		<td>
 		{if $check==true}{section name=i loop=$roles}{if $roles[i].id==$data.role_id}{$roles[i].role}{/if}{/section}{else}
 			<select name="role_id">
@@ -190,7 +188,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		</td>
 	</tr>
 	<tr>
-		<td>active</td>
+		<td>{t}Active:{/t}</td>
 		<td>
 			<label for="active-y">
 				<input
@@ -213,7 +211,7 @@ You cannot create a new user with the same e-mail address, but you can connect t
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td colspan="2">Select the modules this collaborator will be assigned to:</td>
+		<td colspan="2">{t}Select the modules that will be assigned to this collaborator:{/t}</td>
 	</tr>
 {section name=i loop=$modules}
 <tr><td><label for="module-{$modules[i].module_id}">{$modules[i].module}</label></td><td><input id="module-{$modules[i].module_id}" type="checkbox" value="{$modules[i].module_id}" name="modules[]"  checked="checked"/></td></tr>
@@ -228,8 +226,8 @@ You cannot create a new user with the same e-mail address, but you can connect t
 	</tr>
 	<tr>
 		<td colspan="2">
-			<input type="submit" value="save" />&nbsp;
-			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="submit" value="{t}save{/t}" />&nbsp;
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 
@@ -251,4 +249,5 @@ $(document).ready(function(){
 </script>
 {/literal}
 
+{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

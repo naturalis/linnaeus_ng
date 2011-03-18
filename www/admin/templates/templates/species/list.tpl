@@ -97,15 +97,11 @@
 		{/if}
 		{if !$arrowBuffer}&nbsp;&nbsp;{/if}
 		</td>
-		{if ($isHigherTaxa && $taxa[i].children_count > 0) || !$isHigherTaxa}
-		<td>
-		{else}
 		<td
 			class="pseudo-a" 
 			style="text-align:center" 
 			onclick="taxonDeleteData({$taxa[i].id},'{$taxa[i].taxon}');">
 			x
-		{/if}
 		</td>
 		<td id="usage-{$taxa[i].id}"></td>
 	</tr>

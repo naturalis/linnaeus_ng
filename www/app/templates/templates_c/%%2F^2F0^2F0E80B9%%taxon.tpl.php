@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-09 16:49:49
+<?php /* Smarty version 2.6.26, created on 2011-03-18 10:26:24
          compiled from taxon.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'taxon.tpl', 10, false),array('modifier', 'count', 'taxon.tpl', 29, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'taxon.tpl', 10, false),array('modifier', 'count', 'taxon.tpl', 29, false),array('modifier', 'var_dump', 'taxon.tpl', 86, false),)), $this); ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/header.tpl", 'smarty_include_vars' => array()));
 $this->_tpl_vars = $_smarty_tpl_vars;
@@ -121,6 +121,8 @@ if ($this->_foreach['classification']['total'] > 0):
 </div>
 <?php endif; ?>
 <?php elseif ($this->_tpl_vars['activeCategory'] == 'media' && $this->_tpl_vars['contentCount']['media'] > 0): ?>
+<?php echo var_dump($this->_tpl_vars['content']); ?>
+
 <div id="media">
 	<table>
 	<?php $_from = $this->_tpl_vars['content']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):

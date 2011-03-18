@@ -1,5 +1,5 @@
 362
-a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:11:"_header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1299750796;s:7:"expires";i:1299754396;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:11:"_header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300367912;s:7:"expires";i:1300371512;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -12,6 +12,8 @@ a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 	</style>
 	<script type="text/javascript" src="../../../app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/jquery.tools.min.js"></script>
+	<script type="text/javascript" src="../../../admin/javascript/sprintf-0.7-beta1.js"></script>
+	
 	<script type="text/javascript" src="../../../app/javascript/main.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/matrix.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/colorbox/jquery.colorbox.js"></script>
@@ -22,8 +24,7 @@ a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 	<a href="../../../app/views/linnaeus/"><img src="../../../admin/media/project/0002/imaginary-beings-logo%20%282%29.png" id="project-logo" /></a>
 	</div>
 	<div id="title">
-	Imaginary Beings Of The Literary World
-	</div>
+	Imaginary Beings Of The Literary World	</div>
 </div><div id="menu-container">
 	<div id="main-menu">
 <a class="menu-item" href="../glossary/">Glossary</a>
@@ -64,17 +65,17 @@ a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 <div id="page-main">
 	<div id="pane-left">
 		<div id="char-states">
-			<select size="5" id="characteristics" onclick="goCharacteristic()">
+			Characters			<select size="5" id="characteristics" onclick="goCharacteristic()">
 									<option value="6">a distribution</option>
 												<option value="8">a text</option>
 												<option value="13">a media</option>
 												<option value="14">a range</option>
 												<option value="32">Bora Bora Bora</option>
-																		<option value="35">eeeeek</option>
-																		<option value="37">gewicht</option>
+												<option value="35">eeeeek</option>
+												<option value="37">gewicht</option>
 															</select>
 			<br />
-			<select size="5" id="states" onclick="goState()">
+			States			<select size="5" id="states" onclick="goState()">
 			</select>
 		</div>
 		<div id="info">
@@ -86,13 +87,13 @@ a:4:{s:8:"template";a:8:{s:12:"identify.tpl";b:1;s:19:"../shared/_head.tpl";b:1;
 			<input type="button" onclick="clearSelected()" value="clear all" />
 		</div>
 		<div id="choices">
-			<select size="25" id="selected">
+			Selected combination of characters			<select size="25" id="selected">
 			</select>		
 		</div>
 	</div>
 	<div id="pane-right">
 		<div id="scores-taxa">
-			<select size="5" id="scores">
+			Result of this combination of characters			<select size="5" id="scores">
 						<option ondblclick="goTaxon(1)" value="1">Animalia</option>
 						<option ondblclick="goTaxon(4)" value="4">Carnivora</option>
 						<option ondblclick="goTaxon(9)" value="9">Ursus thibetanus laniger</option>
@@ -113,9 +114,7 @@ $(document).ready(function(){
 	storeCharacteristic(13,'a media','media');
 	storeCharacteristic(14,'a range','range');
 	storeCharacteristic(32,'Bora Bora Bora','text');
-	storeCharacteristic(34,'','text');
 	storeCharacteristic(35,'eeeeek','text');
-	storeCharacteristic(36,'','text');
 	storeCharacteristic(37,'gewicht','distribution');
 	storeCharacteristic(38,'','text');
 	imagePath = '../../../admin/media/project/0002/';
@@ -136,19 +135,8 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('0','')
+})
 
-
-
-
-/*
-$.modaldialog.prompt('The operation failed.', {
-  title: 'No Turning Back Now!',
-  width: 350,
-  closeLabel: 'close',
-  });
-*/
-
-});
 </script>
 
 </body>

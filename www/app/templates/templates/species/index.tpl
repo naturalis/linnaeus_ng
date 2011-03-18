@@ -14,10 +14,10 @@
 {if $prevStart!=-1 || $nextStart!=-1}
 	<div id="navigation">
 		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
+		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
 		{/if}
 		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">next ></span>
+		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
 		{/if}
 	</div>
 {/if}

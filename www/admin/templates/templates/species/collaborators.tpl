@@ -46,7 +46,7 @@
 <br />
 
 <table style="border-collapse:collapse">
-<tr><th style="width:250px">Taxon</th><th></th><th style="width:250px">{t}Collaborator{/t}</th><th></th></tr>
+<tr><th style="width:250px">{t}Taxon{/t}</th><th></th><th style="width:250px">{t}Collaborator{/t}</th><th></th></tr>
 {section name=i loop=$usersTaxa}
 <tr class="tr-highlight"><td>{$usersTaxa[i].taxon.taxon}</td>
 <td>&rarr;</td>

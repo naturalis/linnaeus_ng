@@ -21,7 +21,7 @@
 			{if $refs[i].multiple_authors==1}{t}et al.{/t}{else}{if $refs[i].author_second!=''}&amp; {$refs[i].author_second}{/if}{/if}</td>
 		<td>{$refs[i].year}</td>
 		<td>{$refs[i].text|@substr:0:75}{if $refs[i].text|@strlen>75}...{/if}</td>
-		<td>[<a href="edit.php?id={$refs[i].id}">edit</a>]</td>
+		<td>[<a href="edit.php?id={$refs[i].id}">{t}edit{/t}</a>]</td>
 	</tr>
 {/section}
 {if $refs|@count==0 && $search!=''}

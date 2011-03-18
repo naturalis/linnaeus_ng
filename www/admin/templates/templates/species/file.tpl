@@ -7,10 +7,10 @@
 	<input name="uploadedfile" type="file" /><br />
 	<table>
 		<tr>
-			<td>CSV field delimiter:</td>
-			<td><label><input type="radio" name="delimiter" value="comma" checked="checked" />, (comma)</label></td>
-			<td><label><input type="radio" name="delimiter" value="semi-colon" />; (semi-colon)</label></td>
-			<td><label><input type="radio" name="delimiter" value="tab" />tab stop</label></td>
+			<td>{t}CSV field delimiter:{/t}</td>
+			<td><label><input type="radio" name="delimiter" value="comma" checked="checked" />, {t}(comma){/t}</label></td>
+			<td><label><input type="radio" name="delimiter" value="semi-colon" />; {t}(semi-colon){/t}</label></td>
+			<td><label><input type="radio" name="delimiter" value="tab" />{t}tab stop{/t}</label></td>
 		</tr>
 		<!-- tr>
 			<td>CSV field enclosure:</td>

@@ -102,25 +102,93 @@ function goCharacteristic() {
 
 }
 
-function addSelected() {
+var strOpen = 
+	'<table style="font-size:11px;">'+
+		'<tr style="height:30px;vertical-align:top">'+
+			'<td colspan=2>%s</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>'+_('Value:')+'</td>'+
+			'<td><input type=text id=dialogValue style="font-size:12px;width:35px;text-align:right" /></td>'+
+		'</tr>';
 
-	//showDialog('message');
-	//$(\"#dialog-close\").click()
+var strClose = 
+		'<tr style="height:50px;vertical-align:bottom">'+
+			'<td colspan=2>'+
+				'<input type=button value="'+_('ok')+'" onclick="doDialog();">'+
+				'<input type=button value="'+_('cancel')+'" onclick="$(\'#dialog-close\').click();">'+
+			'</td>'+
+		'</tr>'+
+	'</table>';
 
-	var c = characteristics[$('#characteristics').val()];
+var strDistro = 
+	strOpen +
+	'<tr>'+
+	'<td style="padding-right:10px">'+_('Number of allowed standard deviations:')+'</td>'+
+		'<td><select id=dialogSD style="font-size:11px;"><option selected>1</option><option>2</option><option>3</option></select></td>'+
+	'</tr>'+
+	strClose;
 
-	if (c[1]=='distribution') { alert('not yet implemented'); return; }
+var strRange = 
+	strOpen +
+	strClose;
 
-	if (c[1]=='distribution' || c[1]=='range') {
 
-		var val = prompt(_('Enter the desired value'));
+function doDialog() {
+	
+	var v = $('#dialogValue').val();
+	
+	if (v.length==0) {
+		
+		alert(_('Please enter a value'));
+		$('#dialogValue').focus();
+		return;
+		
+	}
+	if (isNaN(parseInt(v))) {
+		
+		alert(_('Please enter a valid number'));
+		$('#dialogValue').val('');
+		$('#dialogValue').focus();
+		return;
+		
+	}
 
-		if (val!= null && !isNaN(parseInt(val))) {
+	if ($('#dialogSD'))
+		setFreeValues([v,$('#dialogSD').val()]);
+
+	$('#dialog-close').click();
+
+}
+
+function setFreeValues(vals) {
+
+	if (isArray(vals)) alert('array'); else alert('blaa');return;
+alert(vals);return;
+
+	if (val!= null && !isNaN(parseInt(val))) {
 			
 			$('#selected').
 				append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(val)+':'+c[1]+'">'+c[0]+': '+val+'</option>');
-	
-		}
+
+	}
+
+}
+
+function addSelected() {
+
+	var c = characteristics[$('#characteristics').val()];
+
+	if (c[1]=='distribution') {
+
+		showDialog(sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c[0])));
+		$('#dialogValue').focus();
+
+	} else
+	if (c[1]=='range') {
+
+		showDialog(sprintf(strRange,sprintf(_('Enter the required values for "%s":'),c[0])));
+		$('#dialogValue').focus();
 
 	} else {
 		
@@ -210,8 +278,10 @@ function fillTaxonStates(obj,char) {
 	$('#states tbody tr').remove();
 
 	if (!obj) return;
-	
-	for(var i=0;i<obj.length;i++) {
+
+
+//	for(var i=0;i<obj.length;i++) {
+	for(var i in obj) {
 		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td></tr>');
 
 	}
@@ -236,11 +306,11 @@ function goCompare() {
 
 	}
 
-	getData('compare',[id1,id2],'fillTaxonStates');
+	getData('compare',[id1,id2],'fillTaxaStates');
 
 }
 	
-function fillTaxonStates(obj) {
+function fillTaxaStates(obj) {
 			
 	$('#count-both').html(obj.both);
 	$('#taxon-1').html(obj.taxon_1.taxon);

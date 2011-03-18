@@ -18,7 +18,7 @@
 	{foreach from=$results.species.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:
 		{/if}
@@ -39,7 +39,7 @@
 	{foreach from=$results.glossary.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span class="result" onclick="goGlossaryTerm({$v.id})">
 			{if $v.term && $v.term!=$v.label}{$v.term}: {/if}
@@ -58,7 +58,7 @@
 	{foreach from=$results.literature.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span class="result" onclick="goLiterature({$v.id})">
 			{h search=$search}{$v.author_full} ({$v.year}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
@@ -75,7 +75,7 @@
 	{foreach from=$results.dichkey.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span>
 			{if $v.label}{t}Step{/t} {$v.number}:{h search=$search} {$v.label}{/h}
@@ -95,7 +95,7 @@
 	{foreach from=$results.matrixkey.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span>
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
@@ -116,7 +116,7 @@
 	{foreach from=$results.modules.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span class="result" onclick="goModuleTopic({$v.page_id},{$v.module_id})">
 			{if $v.label}{h search=$search}{$v.label}{/h}
@@ -135,7 +135,7 @@
 	{foreach from=$results.content.results key=cat item=res}
 	{if $res|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} in {$cat|@strtolower}</div>
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
 		<span class="result" onclick="goContent({$v.id})">
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}

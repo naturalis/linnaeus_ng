@@ -12,6 +12,8 @@
 	</style>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
+	
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
 	<script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.all[i]}"></script>

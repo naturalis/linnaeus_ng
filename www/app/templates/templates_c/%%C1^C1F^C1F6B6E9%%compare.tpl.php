@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-08 09:25:48
+<?php /* Smarty version 2.6.26, created on 2011-03-17 15:07:45
          compiled from compare.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'compare.tpl', 7, false),array('modifier', 'addslashes', 'compare.tpl', 42, false),)), $this); ?>
@@ -43,12 +43,12 @@ unset($_smarty_tpl_vars);
 		</p>
 		<p>
 			<table id="states" class="invisible">
-				<tr><td style="width:300px">Unique states in <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>
-				<tr><td>Unique states in <span id="taxon-2"></span>:</td><td id="count-2"></td><td></td></tr>
-				<tr><td>States present in both:</td><td id="count-both"></td><td></td></tr>
-				<tr><td>States present in neither:</td><td id="count-neither"></td><td></td></tr>
-				<tr><td>Number of available states:</td><td id="count-total"></td><td></td></tr>
-				<tr><td>Taxonomic distance:</td><td id="coefficient"></td><td id="formula" style="padding-left:5px"></td></tr>
+				<tr><td style="width:300px"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Unique states in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>
+				<tr><td><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Unique states in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <span id="taxon-2"></span>:</td><td id="count-2"></td><td></td></tr>
+				<tr><td><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>States present in both:<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></td><td id="count-both"></td><td></td></tr>
+				<tr><td><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>States present in neither:<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></td><td id="count-neither"></td><td></td></tr>
+				<tr><td><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Number of available states:<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></td><td id="count-total"></td><td></td></tr>
+				<tr><td><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>Taxonomic distance:<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></td><td id="coefficient"></td><td id="formula" style="padding-left:5px"></td></tr>
 			</table>
 		</p>
 	</div>

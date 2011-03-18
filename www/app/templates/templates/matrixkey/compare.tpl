@@ -23,12 +23,12 @@
 		</p>
 		<p>
 			<table id="states" class="invisible">
-				<tr><td style="width:300px">Unique states in <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>
-				<tr><td>Unique states in <span id="taxon-2"></span>:</td><td id="count-2"></td><td></td></tr>
-				<tr><td>States present in both:</td><td id="count-both"></td><td></td></tr>
-				<tr><td>States present in neither:</td><td id="count-neither"></td><td></td></tr>
-				<tr><td>Number of available states:</td><td id="count-total"></td><td></td></tr>
-				<tr><td>Taxonomic distance:</td><td id="coefficient"></td><td id="formula" style="padding-left:5px"></td></tr>
+				<tr><td style="width:300px">{t}Unique states in{/t} <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>
+				<tr><td>{t}Unique states in{/t} <span id="taxon-2"></span>:</td><td id="count-2"></td><td></td></tr>
+				<tr><td>{t}States present in both:{/t}</td><td id="count-both"></td><td></td></tr>
+				<tr><td>{t}States present in neither:{/t}</td><td id="count-neither"></td><td></td></tr>
+				<tr><td>{t}Number of available states:{/t}</td><td id="count-total"></td><td></td></tr>
+				<tr><td>{t}Taxonomic distance:{/t}</td><td id="coefficient"></td><td id="formula" style="padding-left:5px"></td></tr>
 			</table>
 		</p>
 	</div>

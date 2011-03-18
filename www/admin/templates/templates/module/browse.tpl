@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="alphabet">
-Click to browse:
+{t}Click to browse:{/t}
 
 {foreach from=$alpha key=k item=v}
 {if $v==$letter}

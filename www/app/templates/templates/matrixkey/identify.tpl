@@ -4,6 +4,7 @@
 <div id="page-main">
 	<div id="pane-left">
 		<div id="char-states">
+			{t}Characters{/t}
 			<select size="5" id="characteristics" onclick="goCharacteristic()">
 			{foreach from=$characteristics key=k item=v}
 			{if $v.label}
@@ -12,6 +13,7 @@
 			{/foreach}
 			</select>
 			<br />
+			{t}States{/t}
 			<select size="5" id="states" onclick="goState()">
 			</select>
 		</div>
@@ -24,12 +26,14 @@
 			<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
 		</div>
 		<div id="choices">
+			{t}Selected combination of characters{/t}
 			<select size="25" id="selected">
 			</select>		
 		</div>
 	</div>
 	<div id="pane-right">
 		<div id="scores-taxa">
+			{t}Result of this combination of characters{/t}
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
 			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.taxon}</option>

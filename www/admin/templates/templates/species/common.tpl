@@ -122,7 +122,4 @@ taxonGetCommonnameLabels(allActiveLanguage);
 {/literal}
 </script>
 
-
 {include file="../shared/admin-footer.tpl"}
-
-

@@ -8,7 +8,7 @@
 	<li><a href="links.php">{t}Display current links per taxon{/t}</a></li>
 </ul>
 {else}
-You have to choose an active matrix to edit. Click below to choose an active matrix.
+{t}You have to choose an active matrix to edit. Click below to choose an active matrix.{/t}
 <ul>
 	<li><a href="matrices.php">{t}Matrices{/t}</a></li>
 </ul>

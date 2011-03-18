@@ -18,7 +18,7 @@
 {/section}
 </ul>
 {/if}
-<a href="?action=new">Start a new subsection</a>
+<a href="?action=new">{t}Start a new subsection{/t}</a>
 </div>
 
 {include file="../shared/admin-footer.tpl"}
