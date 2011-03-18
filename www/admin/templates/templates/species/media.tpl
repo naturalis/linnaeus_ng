@@ -1,5 +1,4 @@
 {include file="../shared/admin-header.tpl"}
-
 {include file="../shared/admin-messages.tpl"}
 
 {if $id}
