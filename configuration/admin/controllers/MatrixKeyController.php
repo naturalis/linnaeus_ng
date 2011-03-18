@@ -413,6 +413,8 @@ class MatrixKeyController extends Controller
 
 					$state = $this->requestData;
 
+					$this->deleteCharacteristicState($this->requestData['id']);
+
 				} else {
 
 					$this->models->CharacteristicState->save(

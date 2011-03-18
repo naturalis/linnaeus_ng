@@ -83,14 +83,40 @@ class configuration
 
         return array(
             'speciesPerPage' => 25,
-			'mime-types' => array(
-				'image/png' => 'image', 
-				'image/jpg' => 'image', 
-				'image/jpeg' => 'image', 
-				'image/gif' => 'image', 
-				'video/h264' => 'video', 
-				'video/quicktime' => 'video', 
-				'audio/mpeg' => 'sound', 
+			'mime_types' => array(
+				'image/png' => array(
+					'label' => 'Images',
+					'type' => 'image',
+				),
+				'image/jpg' => array(
+					'label' => 'Images', 
+					'type' => 'image',
+				),
+				'image/jpeg' => array(
+					'label' => 'Images', 
+					'type' => 'image',
+				),
+				'image/gif' => array(
+					'label' => 'Images', 
+					'type' => 'image',
+				),
+				'video/h264' => array(
+					'label' => 'Videos', 
+					'type' => 'video',
+				),
+				'video/quicktime' => array(
+					'label' => 'Videos', 
+					'type' => 'video',
+				),
+				'audio/mpeg' => array(
+					'label' => 'Sounds', 
+					'type' => 'audio',
+				),
+			),
+			'mime_show_order' => array(
+				'image' => 1,
+				'video' => 2,
+				'audio' => 3,
 			)
 		);
 

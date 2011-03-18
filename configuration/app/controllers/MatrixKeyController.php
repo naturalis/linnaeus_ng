@@ -459,7 +459,7 @@ class MatrixKeyController extends Controller
 	{
 	
 		$taxa = $this->getTaxa();
-		
+
 		if ($states==-1) return $taxa;
 
 		foreach((array)$taxa as $key => $val) {
@@ -468,32 +468,34 @@ class MatrixKeyController extends Controller
 
 			foreach((array)$states as $sKey => $sVal) {
 			
+				// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
 				if (substr($sVal,0,1)==='f') {
 			
 					$d = explode(':',$sVal);
 
 					$charId = $d[1];
 					$value = $d[2];
-					$type = $d[3];
+					if (isset($d[3])) $sd = $d[3];
 
 					$d = array(
 						'project_id' => $this->getCurrentProjectId(),
 						'characteristic_id' => $charId,
 					);
 					
-					if ($type=='range') {
+					if (isset($sd)) {
 
-						$d['lower <='] = intval($value);
-						$d['upper >='] = intval($value);
+						$d['mean >=#'] = '('. strval(intval($value)).' - ('.strval(intval($sd)).' * sd))';
+						$d['mean <=#'] = '('. strval(intval($value)).' + ('.strval(intval($sd)).' * sd))';
 
 					} else {
 			
-						continue;
+						$d['lower <='] = intval($value);
+						$d['upper >='] = intval($value);
 
 					}
 
 					$cs = $this->models->CharacteristicState->_get(array('id' => $d));
-		
+
 					$hasState = false;
 					
 					foreach((array)$cs as $cKey => $cVal) {
@@ -699,35 +701,46 @@ class MatrixKeyController extends Controller
 
 	private function calculateDistances($u1,$u2,$co,$ca)
 	{
-	
+
+		$prec = 3;
+
 		return array(
 			0 => array(
-				'name' => 'Simple dissimirality coefficient', 
-				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : (1-(($co+$ca)/($u1+$u2+$co+$ca)))),
+				'name' => _('Simple dissimilarity coefficient'), 
+				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : round(1-(($co+$ca)/($u1+$u2+$co+$ca)),$prec)
+			),
 			1 => array(
 				'name' => 'Russel & Rao', 
-				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : (1-($co/($u1+$u2+$co+$ca)))),
+				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : round(1-($co/($u1+$u2+$co+$ca)),$prec)
+			),
 			2 => array(
 				'name' => 'Rogers & Tanimoto', 
-				'value' => ($co+$ca+(2*$u1)+(2*$u2))==0 ? 'NaN' : (1-(($co+$ca)/($co+$ca+(2*$u1)+(2*$u2))))),
+				'value' => ($co+$ca+(2*$u1)+(2*$u2))==0 ? 'NaN' : round(1-(($co+$ca)/($co+$ca+(2*$u1)+(2*$u2))),$prec)
+			),
 			3 => array(
 				'name' => 'Harmann', 
-				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : (1-((($co+$ca-$u1-$u2)/($u1+$u2+$co+$ca))+1)/2)),
+				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : round(1-((($co+$ca-$u1-$u2)/($u1+$u2+$co+$ca))+1)/2,$prec)
+			),
 			4 => array(
 				'name' => 'Sokal & Sneath', 
-				'value' => (2*($co+$ca)+$u1+$u2)==0 ? 'NaN' : (1-((2*($co+$ca)/(2*($co+$ca)+$u1+$u2))))),
+				'value' => (2*($co+$ca)+$u1+$u2)==0 ? 'NaN' : round(1-((2*($co+$ca)/(2*($co+$ca)+$u1+$u2))),$prec)
+			),
 			5 => array(
 				'name' => 'Jaccard', 
-				'value' => ($co+$u1+$u2)==0 ? 'NaN' : (1-($co/($co+$u1+$u2)))),
+				'value' => ($co+$u1+$u2)==0 ? 'NaN' : round(1-($co/($co+$u1+$u2)),$prec)
+			),
 			6 => array(
 				'name' => 'Czekanowski', 
-				'value' => ((2*$co)+$u1+$u2)==0 ? 'NaN' : (1-((2*$co)/((2*$co)+$u1+$u2)))),
+				'value' => ((2*$co)+$u1+$u2)==0 ? 'NaN' : round(1-((2*$co)/((2*$co)+$u1+$u2)),$prec)
+			),
 			7 => array(
 				'name' => 'Kulczyski', 
-				'value' => (($co+$u1)==0 || ($co+$u2)==0) ? 'NaN' : (1-(($co/2)*((1/($co+$u1))+(1/($co+$u2)))))),
+				'value' => (($co+$u1)==0 || ($co+$u2)==0) ? 'NaN' : round(1-(($co/2)*((1/($co+$u1))+(1/($co+$u2)))),$prec)
+			),
 			8 => array(
 				'name' => 'Ochiai', 
-				'value' => ($co+$u1)*($co+$u2)==0 ? 'NaN' : (1-($co/sqrt(($co+$u1)*($co+$u2)))))
+				'value' => ($co+$u1)*($co+$u2)==0 ? 'NaN' : round(1-($co/sqrt(($co+$u1)*($co+$u2))),$prec)
+			)
 		);
 	
 	}
