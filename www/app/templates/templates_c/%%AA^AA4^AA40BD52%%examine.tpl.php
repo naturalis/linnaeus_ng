@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-07 21:54:15
+<?php /* Smarty version 2.6.26, created on 2011-03-17 14:52:11
          compiled from examine.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'examine.tpl', 7, false),array('modifier', 'addslashes', 'examine.tpl', 34, false),)), $this); ?>

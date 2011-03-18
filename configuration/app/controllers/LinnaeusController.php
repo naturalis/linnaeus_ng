@@ -954,6 +954,7 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
 					'term regexp' => $this->makeRegExpCompatSearchString($search)
 				),
 				'columns' => 'id,term as label'
@@ -964,6 +965,7 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
 					'definition regexp' => $this->makeRegExpCompatSearchString($search)
 				),
 				'columns' => 'id,term as label,definition as content'
@@ -976,6 +978,7 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
 				'columns' => 'glossary_id as id,synonym as label'
@@ -1014,15 +1017,23 @@ class LinnaeusController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
 						'id' => $val['id']
 					),
 					'columns' => 'term'
 				)
 			);
 	
-			$media[$key]['term'] = $g[0]['term'];
+			if (isset($g)) {
+
+				$d[$key] = $val;
+				$d[$key]['term'] = $g[0]['term'];
+
+			}
 
 		}
+
+		$media = isset($d) ? $d : null;
 
 		return array(
 			'results' => array(

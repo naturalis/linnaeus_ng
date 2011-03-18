@@ -13,7 +13,7 @@
 <br /><br />
 <table>
 <tr>
-	<th style="width:150px">Rank</th>
+	<th style="width:150px">{t}Rank{/t}</th>
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}
 	<td {$languages[i].language_id}>{$languages[i].language} *</td>

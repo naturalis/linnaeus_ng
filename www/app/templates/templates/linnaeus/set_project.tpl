@@ -45,7 +45,7 @@
 {include file="../shared/messages.tpl"}
 <div id="page-main">
 <p>
-<a href="{$baseUrl}">Back to Linnaeus NG root</a>
+<a href="{$baseUrl}">{t}Back to Linnaeus NG root{/t}</a>
 </p>
 </div>
 

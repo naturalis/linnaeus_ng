@@ -7,7 +7,7 @@
 <table>
 	<tr>
 		<td>
-			Internal project name:
+			{t}Internal project name:{/t}
 		</td>
 		<td colspan="2">
 			{$data.sys_name}
@@ -15,7 +15,7 @@
 	</tr>
 	<tr>
 		<td>
-			Internal project description:
+			{t}Internal project description:{/t}
 		</td>
 		<td colspan="2">
 			{$data.sys_description}
@@ -23,7 +23,7 @@
 	</tr>
 	<tr>
 		<td>
-			Project title:
+			{t}Project title:{/t}
 		</td>
 		<td colspan="2">
 			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
@@ -31,7 +31,7 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>
-			Project logo:
+			{t}Project logo:{/t}
 		</td>
 		<td colspan="2">
 		{if $data.logo}
@@ -45,7 +45,7 @@
 	</tr>
 	<tr>
 		<td>
-			CSS url:
+			{t}CSS url:{/t}
 		</td>
 		<td colspan="2">
 			<input type="text" name="css_url" value="{$data.css_url}" style="width:300px;" />
@@ -53,10 +53,9 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>
-			Project languages:
+			{t}Project languages:{/t}
 		</td>
 		<td>
-		<!-- u>Language(s) currently in use</u><br / -->
 		<span id="language-list"></span>
 		</td>
 	</tr>
@@ -79,20 +78,20 @@
 			<span 
 				class="pseudo-a" 
 				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])">
-				add language
+				{t}add language{/t}
 			</span>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			This project includes hybrid taxa:
+			{t}This project includes hybrid taxa:{/t}
 		</td>
 		<td>
 			<label>
-				<input type="radio" name="includes_hybrids" value="1" {if $data.includes_hybrids=='1'} checked="checked"{/if}/> yes
+				<input type="radio" name="includes_hybrids" value="1" {if $data.includes_hybrids=='1'} checked="checked"{/if}/> {t}yes{/t}
 			</label>
 			<label>
-				<input type="radio" name="includes_hybrids" value="0" {if $data.includes_hybrids!='1'} checked="checked"{/if}/> no
+				<input type="radio" name="includes_hybrids" value="0" {if $data.includes_hybrids!='1'} checked="checked"{/if}/> {t}no{/t}
 			</label>
 		</td>
 	</tr>		

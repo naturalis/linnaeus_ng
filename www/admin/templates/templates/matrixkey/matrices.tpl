@@ -16,7 +16,7 @@
 </tr>
 {/foreach}
 </table>
-{if $k==-1}No matrices have been defined.{/if}
+{if $k==-1}{t}No matrices have been defined.{/t}{/if}
 </p>
 <p>
 {t _s1='<a href="matrix.php">' _s2='</a>'}Go %shere%s to define a new matrix.{/t}

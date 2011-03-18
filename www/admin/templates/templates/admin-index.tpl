@@ -4,7 +4,7 @@
 <div id="page-main">
 
 <table>
-	<tr><td colspan="2">Manage modules:</td></tr>
+	<tr><td colspan="2">{t}Manage modules:{/t}</td></tr>
 	<tr>
 {assign var=i value=1}
 {section name=i loop=$modules}
@@ -53,7 +53,7 @@
 
 {if $currentRole.role_id==1 || $currentRole.role_id==2}
 <br />
-Management tasks:
+{t}Management tasks:{/t}
 <ul>
 	<li><a href="views/users/">{t}User management{/t}</a></li>
 	<li><a href="views/projects/">{t}Project management{/t}</a></li>
@@ -62,12 +62,13 @@ Management tasks:
 
 {/if}
 {if $currentRole.role_id==1}
+<!--
 {t}System administration tasks:{/t}
 <ul>
 	<li><a href="">{t}Set rights{/t}</a></li>
 	<li><a href="">{t}Create a project{/t}</a></li>
 </ul>
-
+-->
 {/if}
 </div>
 

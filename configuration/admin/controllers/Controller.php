@@ -592,7 +592,7 @@ class Controller extends BaseClass
         
         } else {
 
-            if ($_SESSION["user"]["_number_of_projects"]==1) {
+            if (isset($_SESSION["user"]) && $_SESSION["user"]["_number_of_projects"]==1) {
 
                 return
 					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').
@@ -1086,12 +1086,15 @@ class Controller extends BaseClass
 
 		if (empty($content)) return;
 
+		$c = $this->getControllerBaseName();
+
 		/* DEBUG */
 		@$this->models->TranslateMe->save(
 			array(
 				'id' => null,
-				'controller' => $this->getControllerBaseName(),
-				'content' => $content
+				'controller' => isset($c) ? $c : '-',
+				'content' => $content,
+				'env' => 'admin'
 			)
 		);
 

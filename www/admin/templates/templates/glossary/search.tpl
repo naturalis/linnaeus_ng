@@ -19,7 +19,7 @@
 		<td>{$terms[i].term}</td>
 		<td>{$terms[i].language}</td>
 		<td>{$terms[i].definition|@substr:0:75}{if $terms[i].definition|@strlen>75}...{/if}</td>
-		<td>[<a href="edit.php?id={$terms[i].id}">edit</a>]</td>
+		<td>[<a href="edit.php?id={$terms[i].id}">{t}edit{/t}</a>]</td>
 	</tr>
 {/section}
 {if $terms|@count==0 && $search!=''}

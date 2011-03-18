@@ -3,15 +3,14 @@
 <div id="page-main">
 
 <div class="text-block">
-Select the standard modules you wish to use in your project:<br />
+{t}Select the standard modules you wish to use in your project:{/t}<br />
 <div id="module-table-div"></div>
 </div>
 
 <br />
 
 <div class="text-block">
-
-Besides these standard modules, you can add up to {$freeModuleMax} extra content modules to your project:<br />
+{t}Besides these standard modules, you can add up to {$freeModuleMax} extra content modules to your project:{/t}<br />
 <div id="free-module-table-div"></div>
 
 <table id="new-input" class="{if $freeModules|@count >= 5}module-new-input-hidden{/if}">
@@ -22,8 +21,8 @@ Besides these standard modules, you can add up to {$freeModuleMax} extra content
 		<td colspan="4">
 			<form action="" method="post">
 			<input type="hidden" name="rnd" value="{$rnd}" />
-			Enter new module's name: <input type="text" name="module_new" id="module_new" value="" maxlength="32" />
-			<input type="submit" value="add module" onclick="addFreeModule();" />
+			{t}Enter new module's name:{/t} <input type="text" name="module_new" id="module_new" value="" maxlength="32" />
+			<input type="submit" value="{t}add module{/t}" onclick="addFreeModule();" />
 			</form>	
 		</td>
 	</tr>

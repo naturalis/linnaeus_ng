@@ -24,8 +24,8 @@ class LiteratureController extends Controller
 		array(
 			'all' => array(
 				'main.js',
-				'tablesorter/jquery-latest.js',
-				'tablesorter/jquery.tablesorter.js',
+//				'tablesorter/jquery-latest.js',
+//				'tablesorter/jquery.tablesorter.js',
 			),
 			'IE' => array(
 			)

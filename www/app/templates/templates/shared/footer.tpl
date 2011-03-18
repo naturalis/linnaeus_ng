@@ -1,6 +1,6 @@
 {if $showBackToSearch && $session.user.search.hasSearchResults}
 <div id="back-to-search">
-<span id="link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
+<span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
 </div>
 {/if}
 </div ends="page-container">
@@ -18,19 +18,8 @@ $(document).ready(function(){
 {foreach from=$requestData key=k item=v}
 addRequestVar('{$k}','{$v|addslashes}')
 {/foreach}
-
-
-
+})
 {literal}
-/*
-$.modaldialog.prompt('The operation failed.', {
-  title: 'No Turning Back Now!',
-  width: 350,
-  closeLabel: 'close',
-  });
-*/
-
-});
 </script>
 {/literal}
 </body>

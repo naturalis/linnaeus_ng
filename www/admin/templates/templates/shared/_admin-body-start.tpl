@@ -5,7 +5,7 @@
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">
-		{t}Logged in as{/t} {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name} {if $session.user.currentRole.role_name}({$session.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">Log out</a>){/if}
+		{t}Logged in as{/t} {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name} {if $session.user.currentRole.role_name}({$session.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
 	</div>
 {/if}
 
@@ -60,7 +60,7 @@
 	</div>
 {/if}
 </div>
-<span id="debug-message"></span><!--this should be removed in production-->
+<span id="debug-message"></span><!--should be removed in production-->
 {if $welcomeMessage}
 <div id="welcome-message">
 {$welcomeMessage}
@@ -69,7 +69,7 @@
 
 {if $helpTexts}
 <div id="block-inline-help">
-	<div id="title" onClick="allToggleHelpVisibility();">Help</div>
+	<div id="title" onClick="allToggleHelpVisibility();">{t}Help{/t}</div>
 	<div class="body-collapsed" id="body-visible">
 {section name=i loop=$helpTexts}
 		<div class="subject">{$helpTexts[i].subject}</div>

@@ -11,7 +11,6 @@
 </ul>
 {if $smarty.section.i.max==0}There are currently no steps without choices.{/if}
 
-
 {t}Below is a list of unconnected choices, i.e. those that do not lead to another step or a taxon. To edit, click the name of either the step or the choice.{/t}
 <ul>
 {section name=i loop=$deadChoices}

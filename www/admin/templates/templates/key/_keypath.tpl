@@ -36,7 +36,7 @@
 	<td></td>
 </tr>
 {/section}
-<tr><td colspan="3" style="padding-top:10px">[<span class="pseudo-a" onclick="keyToggleFullKeyPath();">close</span>]</td></tr>
+<tr><td colspan="3" style="padding-top:10px">[<span class="pseudo-a" onclick="keyToggleFullKeyPath();">{t}close{/t}</span>]</td></tr>
 </table>
 <form method="post" action="step_show.php" id="pathForm"><input type="hidden" name="id" id="pathNext" value="" /></form>
 </fieldset>

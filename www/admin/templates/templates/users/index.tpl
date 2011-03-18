@@ -19,16 +19,16 @@
 {section name=j loop=$columnsToShow}
 {assign var=colname value=$columnsToShow[j].name}
 	<td class="cell-userlist-{$columnsToShow[j].align}-align">{$users[i].$colname}</td>{/section}
-	<td>[<a href="view.php?id={$users[i].id}">view</a>]</td>
-	<td>[<a href="edit.php?id={$users[i].id}">edit</a>]</td>
-	<td>{if $users[i].role_id != 2}[<span class="pseudo-a" onclick="userDeleteUser({$users[i].id});">delete</span>]{/if}</td>
+	<td>[<a href="view.php?id={$users[i].id}">{t}view{/t}</a>]</td>
+	<td>[<a href="edit.php?id={$users[i].id}">{t}edit{/t}</a>]</td>
+	<td>{if $users[i].role_id != 2}[<span class="pseudo-a" onclick="userDeleteUser({$users[i].id});">{t}delete{/t}</span>]{/if}</td>
 </tr>
 {/section}
 </table>
 
 <br />
 
-<a href="create.php">Create new collaborator</a>
+<a href="create.php">{t}Create new collaborator{/t}</a>
 
 
 </div>

@@ -61,7 +61,7 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Target:{/t}</td>
-		<td>step:</td>
+		<td>{t}step:{/t}</td>
 		<td colspan="2">
 			<select name="res_keystep_id" id="res_keystep_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="-1">{t}new step{/t}</option>
@@ -79,7 +79,7 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>&nbsp;</td>
-		<td>taxon:</td>
+		<td>{t}taxon:{/t}</td>
 		<td>
 		
 		

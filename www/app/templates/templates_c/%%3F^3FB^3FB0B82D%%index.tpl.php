@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-05 17:49:52
+<?php /* Smarty version 2.6.26, created on 2011-03-17 14:11:14
          compiled from ../species/index.tpl */ ?>
 <?php $_smarty_tpl_vars = $this->_tpl_vars;
 $this->_smarty_include(array('smarty_include_tpl_file' => "../shared/header.tpl", 'smarty_include_vars' => array()));

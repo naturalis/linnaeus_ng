@@ -4,7 +4,7 @@
 
 	<div class="text-block">
 
-	Assign collaborators to work on modules:<br />
+	{t}Assign collaborators to work on modules:{/t}<br />
 
 	<span id="module-table"></span>
 
@@ -14,13 +14,13 @@
 
 	<div class="text-block">
 
-	Assign collaborators to work on free modules:<br />
+	{t}Assign collaborators to work on free modules:{/t}<br />
 
 	<span id="free-module-table"></span>
 
 	</div>
 
-	<a href="../users/create.php">Create new collaborator</a>
+	<a href="../users/create.php">{t}Create new collaborator{/t}</a>
 
 </div>
 

@@ -34,38 +34,38 @@
 		{/if}
 		<th>{t}Delete{/t}</th>
 		<th>{t}Orphan{/t}</th>
-		<th>{t}Attach{/t}</th>
+		<th>{t}Attach to{/t} {$ranks[$x].rank} "{$parent.taxon}"</th>
 	</tr>
-	{section name=i loop=$taxa}
-	{assign var=x value=$taxa[i].rank_id}
+	{foreach from=$taxa item=v}
+	{assign var=x value=$v.rank_id}
 	<tr class="tr-highlight">
 		<td style="padding-right:20px;">
-			{section name=loop start=0 loop=$taxa[i].level}.{/section}{$ranks[$x].rank}
+			{section name=loop start=0 loop=$v.level}.{/section}{$ranks[$x].rank}
 		</td>
 		<td style="padding-right:20px;">
-			{$taxa[i].taxon}
+			{$v.taxon}
 		</td>
 		{if $session.project.includes_hybrids==1}
 		<td style="padding-right:20px;">
-			{if $taxa[i].is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
+			{if $v.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 		</td>
 		{/if}
 		{if $taxa[i].level==$y}
 		<td style="text-align:center">
-			<input type="radio" checked="checked" name="child[{$taxa[i].id}]" value="delete" />
+			<input type="radio" checked="checked" name="child[{$v.id}]" value="delete" />
 		</td>
 		<td style="text-align:center">
-			<input type="radio" name="child[{$taxa[i].id}]" value="orphan" />
+			<input type="radio" name="child[{$v.id}]" value="orphan" />
 		</td>
 		<td style="text-align:center">
-			<input type="radio" name="child[{$taxa[i].id}]" value="attach" />
+			<input type="radio" name="child[{$v.id}]" value="attach" />
 		</td>
 		{else}
 		<td colspan="3">
 		</td>
 		{/if}
 	</tr>
-	{/section}
+	{/foreach}
 </table>
 <p>
 <input type="submit" value="{t}save{/t}" />&nbsp;

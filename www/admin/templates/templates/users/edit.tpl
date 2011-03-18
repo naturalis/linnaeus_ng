@@ -13,7 +13,7 @@
 </script>
 <table>
 	<tr>
-		<td>username</td>
+		<td>{t}Username:{/t}</td>
 		<td>
 			<input
 				type="text" 
@@ -28,7 +28,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>password</td>
+		<td>{t}Password:{/t}</td>
 		<td>
 			<input 
 				type="password" 
@@ -43,7 +43,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>password (repeat)</td>
+		<td>{t}Password (repeat):{/t}</td>
 		<td>
 			<input 
 				type="password" 
@@ -58,7 +58,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>first_name</td>
+		<td>{t}First name:{/t}</td>
 		<td>
 			<input 
 				type="text" 
@@ -73,7 +73,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>last_name</td>
+		<td>{t}Last name:{/t}</td>
 		<td>
 			<input 
 				type="text" 
@@ -88,7 +88,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>email_address</td>
+		<td>{t}E-mail address:{/t}</td>
 		<td>
 			<input 
 				type="text" 
@@ -104,7 +104,7 @@
 	</tr>
 
 	<tr>
-		<td>timezone</td>
+		<td>{t}Timezone:{/t}</td>
 		<td>
 			<select name="timezone_id">
 			{section name=i loop=$zones}
@@ -117,7 +117,7 @@
 	</td>
 	</tr>
 	<tr>
-		<td>language</td>
+		<td>{t}Language:{/t}</td>
 		<td><input 
 				type="text" 
 				name="language" 
@@ -130,7 +130,7 @@
 	</td>
 	</tr>
 	<tr>
-		<td>send e-mail notifications</td>
+		<td>{t}Send e-mail notifications:{/t}</td>
 		<td>
 			<label for="email_notifications-y">
 				<input
@@ -151,7 +151,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td>project role</td>
+		<td>{t}Project role:{/t}</td>
 		<td>
 		{if $isLeadExpert}Lead expert{else}
 			<select name="role_id">
@@ -168,7 +168,7 @@
 	</tr>
 
 	<tr>
-		<td>active</td>
+		<td>{t}Active{/t}</td>
 		<td>
 			<label for="active-y">
 				<input
@@ -194,7 +194,7 @@
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td colspan="2">Select the modules this collaborator will be assigned to:</td>
+		<td colspan="2">{t}Select the modules that will be assigned to this collaborator:{/t}</td>
 	</tr>
 {section name=i loop=$modules}
 <tr><td><label for="module-{$modules[i].module_id}">{$modules[i].module}</label></td><td><input id="module-{$modules[i].module_id}" type="checkbox" value="{$modules[i].module_id}" name="modules[]"  {if $modules[i].isAssigned}checked="checked"{/if}/></td></tr>
@@ -209,13 +209,13 @@
 	</tr>	
 	<tr>
 		<td colspan="2">
-			<input type="submit" value="save" />
+			<input type="submit" value="{t}save{/t}" />
 			{if $userRole.role_id != 2}
 			{literal}
-			<input type="button" value="delete" onclick="if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); } " />
+			<input type="button" value="{t}delete{/t}" onclick="if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); } " />
 			{/literal}
 			{/if}
-			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>

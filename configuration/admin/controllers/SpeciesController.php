@@ -2627,7 +2627,7 @@ class SpeciesController extends Controller
                         ));
 
                         $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $this->requestData['save_type']);
-                    
+
                     } else {
                         
                         // see if such content already exists
@@ -2643,7 +2643,7 @@ class SpeciesController extends Controller
 						);
                         
                         $id = count((array) $ct) != 0 ? $ct[0]['id'] : null;
-                        
+
                         if ($id != null)
                             $this->models->ContentTaxon->setRetainBeforeAlter();
                         
@@ -2950,7 +2950,7 @@ class SpeciesController extends Controller
 			
 			} else {
 
-				$this->deleteTaxon($this->requestData['id']);
+//				$this->deleteTaxon($this->requestData['id']);
 
 				$this->smarty->assign('returnText', '<ok>');
 
@@ -3052,12 +3052,11 @@ class SpeciesController extends Controller
         
 		//if (!$this->rHasId() || !$this->rHasVal('language') || !$this->rHasVal('page')) {
         if (!$this->rHasId()) {
-            
+
             return;
         
         } else {
             
-
             $ctu = $this->models->ContentTaxonUndo->_get(
 				array(
 					'id' => 
