@@ -102,3 +102,25 @@
 #common td {
 	width:250px;
 }
+
+.media-cat-header {
+	font-weight:bold;
+}
+
+.media-image-cell {
+	padding-right:10px;
+	vertical-align:top;
+}
+
+.media-description-cell {
+	vertical-align:top;
+	padding-bottom:10px;
+}
+
+.media-image {
+	width:150px;
+	cursor:pointer;
+}
+.media-video-icon {
+	cursor:pointer;
+}
