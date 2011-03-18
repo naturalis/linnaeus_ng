@@ -85,11 +85,47 @@
 {elseif $activeCategory=='media' && $contentCount.media>0}
 <div id="media">
 	<table>
+	{assign var=mediaCat value=false}
 	{foreach from=$content key=k item=v}
+	{if $mediaCat!=$v.category}
+	{if $k!=0}
 	<tr>
-		<td>{$v.mime_type}</td>
-		<td>{$v.description}</td>
+		<td colspan="2">&nbsp;</td>
 	</tr>
+	{/if}
+	<tr>
+		<td colspan="2" class="media-cat-header">{$v.category_label}</td>
+	</tr>
+	{/if}
+	<tr>
+		<td class="media-image-cell">
+	{if $v.category=='image'}
+		{if $v.thumb_name != ''}
+			<img
+				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.project.urls.project_thumbs}{$v.thumb_name}"
+				class="media-image" />
+		{else}
+			<img
+				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.project.urls.project_media}{$v.file_name}"
+				class="media-image" />
+		{/if}
+	{elseif $v.category=='video'}
+			<img 
+				src="../../media/system/video.jpg" 
+				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				class="media-video-icon" />
+	{elseif $v.category=='audio'}
+			<object type="application/x-shockwave-flash" data="../../media/system/player_mp3.swf" width="130" height="20">
+				<param name="movie" value="player_mp3.swf" />
+				<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$v.file_name}" />
+			</object>
+	{/if}
+			</td>
+		<td class="media-description-cell">{$v.description}</td>
+	</tr>
+	{assign var=mediaCat value=$v.category}
 	{/foreach}
 	</table>
 </div>

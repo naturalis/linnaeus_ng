@@ -5,7 +5,7 @@
 	<div id="pane-left">
 		<div id="char-states">
 			{t}Characters{/t}
-			<select size="5" id="characteristics" onclick="goCharacteristic()">
+			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
 			{foreach from=$characteristics key=k item=v}
 			{if $v.label}
 			<option value="{$v.id}">{$v.label}</option>
@@ -14,14 +14,14 @@
 			</select>
 			<br />
 			{t}States{/t}
-			<select size="5" id="states" onclick="goState()">
+			<select size="5" id="states" onclick="goState()" ondblclick="addSelected(this)">
 			</select>
 		</div>
 		<div id="info">
 		(info)
 		</div>
 		<div id="buttons">
-			<input type="button" onclick="addSelected()" value="{t}add{/t}" />
+			<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />
 			<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
 			<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
 		</div>
