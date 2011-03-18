@@ -1,0 +1,21 @@
+#dialog {position:fixed; width:525px; padding:0px; z-index:200; background:#fff; font-family:inherit;font-size:inherit;}
+#dialog-header {display:block; position:relative; padding:3px 6px 7px; height:14px; font-weight:bold}
+#dialog-title {float:left}
+#dialog-close {float:left; cursor:pointer; margin:3px 3px 0 0; height:11px; width:11px; }
+#dialog-content {display:block; padding:6px; min-height:160px; font-size:13px;}
+#dialog-content-inner { min-height:128px; }
+#dialog-mask {position:fixed; top:0; left:0; height:100%; width:100%; background:#FFF; opacity:.75; filter:alpha(opacity=75); z-index:100}
+#dialog-button-container { text-align:center; margin:2px 6px 6px 2px; }
+.error {background:#fff; border:1px solid #924949; border-top:none}
+.errorheader {color:#6f2c2c; border:1px solid #924949; border-bottom:none}
+.errorbutton {border:1px solid #924949; color:#fff;cursor:pointer;  }
+.warning {background:#fff; border:1px solid #c5a524; border-top:none}
+.warningheader {color:#957c17; border:1px solid #c5a524; border-bottom:none}
+.warningbutton { background-color:#eFcC47; border:1px solid #957C17; color:#957C17;cursor:pointer;  }
+.success {background:#fff; border:1px solid #60a174; border-top:none}
+.successheader {color:#3c7f51; border:1px solid #60a174; border-bottom:none}
+.successbutton { background-color:#3c7f51; border:1px solid #fff; color:#fff;cursor:pointer;  }
+.prompt {background:#fff; border:1px solid #4f6d81; border-top:none}
+.promptheader {border:1px solid #4f6d81; border-bottom:none}
+.promptbutton {text-decoration:none;color:#CC0000;cursor:pointer;}
+.promptbutton:hover {text-decoration:underline;}

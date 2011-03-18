@@ -93,7 +93,6 @@ function goState() {
 
 	setInfo(val ? '<span class="info-header">'+characteristics[state.characteristic_id][0]+': '+state.label+'</span><br/>'+val : ' ');
 
-
 }
 
 function goCharacteristic() {
@@ -113,14 +112,21 @@ var strOpen =
 		'</tr>';
 
 var strClose = 
-		'<tr style="height:50px;vertical-align:bottom">'+
-			'<td colspan=2>'+
-				'<input type=button value="'+_('ok')+'" onclick="doDialog();">'+
-				'<input type=button value="'+_('cancel')+'" onclick="$(\'#dialog-close\').click();">'+
-			'</td>'+
-		'</tr>'+
-	'</table>';
-
+	'<tr style="height:50px;vertical-align:bottom">'+
+		'<td colspan=2>'+
+			'<input type=button value="'+_('ok')+'" onclick="doDialog();" >'+
+			'<input type=button value="'+_('cancel')+'" onclick="$(\'#dialog-close\').click();">'+
+		'</td>'+
+	'</tr>'+
+'</table>'+
+'<script>'+
+'	$("#dialogValue").keypress(function(e) {'+
+'		if(e.keyCode == 13) {'+
+'			doDialog();'+
+'		}'+
+'	});'+
+'</script>';
+		
 var strDistro = 
 	strOpen +
 	'<tr>'+
@@ -154,8 +160,7 @@ function doDialog() {
 		
 	}
 
-	if ($('#dialogSD'))
-		setFreeValues([v,$('#dialogSD').val()]);
+	setFreeValues([v,$('#dialogSD').val()]);
 
 	$('#dialog-close').click();
 
@@ -163,21 +168,26 @@ function doDialog() {
 
 function setFreeValues(vals) {
 
-	if (isArray(vals)) alert('array'); else alert('blaa');return;
-alert(vals);return;
+	var c = characteristics[$('#characteristics').val()];
 
-	if (val!= null && !isNaN(parseInt(val))) {
-			
-			$('#selected').
-				append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(val)+':'+c[1]+'">'+c[0]+': '+val+'</option>');
+	if (c[1]=='range')
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c[0]+': '+vals[0]+'</option>');
+	else
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c[0]+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
 
-	}
+	getScores();
 
 }
 
-function addSelected() {
+function addSelected(caller) {
 
 	var c = characteristics[$('#characteristics').val()];
+
+	if (caller.id=='characteristics' && (c[1]!='distribution' && c[1]!='range')) {
+
+		return;
+
+	}
 
 	if (c[1]=='distribution') {
 
@@ -187,25 +197,25 @@ function addSelected() {
 	} else
 	if (c[1]=='range') {
 
-		showDialog(sprintf(strRange,sprintf(_('Enter the required values for "%s":'),c[0])));
+		showDialog(sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c[0])));
 		$('#dialogValue').focus();
 
 	} else {
 		
 		var s = states[$('#states').val()];
 
-	}
-
-	if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
-
-		$('#selected').
-			append('<option id="s'+s.id+'" value="'+s.id+'">'+characteristics[s.characteristic_id][0]+': '+s.label+'</option>').
-			val(s.id);
-		selected[s.id] = true;
-
-	}
+		if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
 	
-	getScores();
+			$('#selected').
+				append('<option id="s'+s.id+'" value="'+s.id+'">'+characteristics[s.characteristic_id][0]+': '+s.label+'</option>').
+				val(s.id);
+			selected[s.id] = true;
+	
+		}
+		
+		getScores();
+
+	}
 
 }
 
@@ -228,6 +238,7 @@ function deleteSelected() {
 function clearSelected() {
 
 	$('#selected').empty();
+
 	selected = selected.splice(0,0);
 
 	getScores('clear');
@@ -279,8 +290,6 @@ function fillTaxonStates(obj,char) {
 
 	if (!obj) return;
 
-
-//	for(var i=0;i<obj.length;i++) {
 	for(var i in obj) {
 		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td></tr>');
 
@@ -320,24 +329,20 @@ function fillTaxaStates(obj) {
 	$('#count-total').html(obj.total);
 	$('#count-neither').html(obj.neither);
 	$('#coefficient').html(obj.coefficients[0].value);
-	$('#formula').html('('+obj.coefficients[0].name+')');
+
+	var s = '<select onchange="$(\'#coefficient\').html($(this).val());" id="coefficients">';
+
+	for (i in obj.coefficients) {
+	
+		s = s + '<option value="'+obj.coefficients[i].value+'"'+(i==0 ? ' selected="selected"' : '')+'>'+obj.coefficients[i].name+'</option>'+"\n";
+
+	}
+	
+	s = s + '</select>';
+
+
+	$('#formula').html(s);
 
 	$('#states').removeClass().addClass('visible');
 
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

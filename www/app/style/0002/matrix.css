@@ -85,7 +85,7 @@
 	cursor:pointer;
 }
 
-#taxon-list, #taxon-list-1, #taxon-list-2 {
+#taxon-list, #taxon-list-1, #taxon-list-2, #coefficients {
 	font-size:inherit;
 	height:25px;
 	width:250px;
@@ -103,3 +103,4 @@
 	text-align:right;
 	padding-left:10px;
 }
+

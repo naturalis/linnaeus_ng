@@ -130,7 +130,7 @@ function getTimestamp() {
 
 function addFormVal(name,val) {
 
-	$('<input type="hidden" name="'+name+'">').val(val).appendTo('#theForm');
+	$('<input type="hidden" name="'+name+'">').val(val==null ? '' : val).appendTo('#theForm');
 
 }
 
