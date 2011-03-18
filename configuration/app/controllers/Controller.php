@@ -544,7 +544,8 @@ class Controller extends BaseClass
 			array(
 				'id' => null,
 				'controller' => 'javascript',
-				'content' => $content
+				'content' => $content,
+				'env' => 'front'
 			)
 		);
 
@@ -656,7 +657,8 @@ class Controller extends BaseClass
 			array(
 				'id' => null,
 				'controller' => $this->getControllerBaseName(),
-				'content' => $content
+				'content' => $content,
+				'env' => 'front'
 			)
 		);
 

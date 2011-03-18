@@ -761,7 +761,12 @@ abstract class Model extends BaseClass
 
 				}
 
-                if ($val===null) {
+				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
+                if (substr($operator,-1) == '#') {
+
+                    $query .= " and " . $col . " " . substr($operator,0,-1) . " " . $val;
+                
+                } elseif ($val===null) {
                 
                     $query .= " and " . $col . " " . $operator . " null ";
                 

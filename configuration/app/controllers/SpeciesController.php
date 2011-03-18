@@ -691,7 +691,26 @@ class SpeciesController extends Controller
 			);
 
 			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
+
+			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ?
+					$this->controllerSettings['mime_types'][$val['mime_type']] :
+					null;
+
+			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
+			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
+			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
+
 		}
+
+
+
+		$sortBy = array(
+			'key' => 'mime_show_order', 
+			'dir' => 'asc', 
+			'case' => 'i'
+		);
+
+		$this->customSortArray($mt, $sortBy);
 
 		return $mt;
 
