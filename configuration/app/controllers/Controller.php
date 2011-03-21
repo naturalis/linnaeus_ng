@@ -86,6 +86,8 @@ class Controller extends BaseClass
 		
 		$this->setCurrentLanguageId();
 
+		$this->checkBackStep();
+
     }
 
     /**
@@ -371,6 +373,9 @@ class Controller extends BaseClass
 	        $_SESSION['project'][$key] = $val;
 
 		}
+		
+		$_SESSION['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
+
     }
 
 
@@ -596,7 +601,8 @@ class Controller extends BaseClass
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+//        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+        $this->smarty->assign('backlink', $this->getBackLink());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('pageName', $this->getPageName());
@@ -1184,15 +1190,39 @@ class Controller extends BaseClass
 
 	}
 
+
+
+
+	private function getBackLink()
+	{
+
+		$d = 
+			(isset($_SESSION['user']['breadcrumbs']) &&
+			isset($_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-2])) ?
+				$_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-2] :
+				null;
+
+		$d['data'] = json_encode($d['data']);
+
+		return $d;
+
+	}
+
 	private function setBreadCrumb()
 	{
 
 		if (empty($this->pageName) || $this->storeHistory==false) return;
+		
+		foreach((array)$this->requestData as $key => $val) {
+
+			$p[] = array('var' => $key,'val' => $val);
+
+		}
 
 		$_SESSION['user']['breadcrumbs'][] = array(
 			'name' => $this->pageName,
 			'url' => $_SERVER['REQUEST_URI'],
-			'data' => $this->requestData
+			'data' => isset($p) ? $p : null
 		);
 		
 		$d = count((array)$_SESSION['user']['breadcrumbs']);
@@ -1209,8 +1239,24 @@ class Controller extends BaseClass
 		
 		}
 
-		if ($d>100) $_SESSION['user']['breadcrumbs'] = array_slice($_SESSION['user']['breadcrumbs'],$d-100);
+		if ($d>$this->generalSettings['maxBackSteps'])
+			$_SESSION['user']['breadcrumbs'] = array_slice($_SESSION['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
 
+	}
+
+	private function checkBackStep()
+	{
+	
+		if ($this->rHasVal('backstep','1')) {
+
+			array_pop($_SESSION['user']['breadcrumbs']);
+			
+			$this->storeHistory = false;
+
+			unset($this->requestData['backstep']);
+
+		}
+		
 	}
 
 }

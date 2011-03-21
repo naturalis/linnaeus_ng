@@ -274,7 +274,12 @@ class KeyController extends Controller
 
 				$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
 
-				if (isset($t['taxon'])) $choices[$key]['target'] = $t['taxon'];
+				if (isset($t['taxon'])) {
+
+					$choices[$key]['target'] = $t['taxon'];
+					$choices[$key]['is_hybrid'] = $t['is_hybrid'];
+
+				}
 
 			} else {
 

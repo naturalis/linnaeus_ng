@@ -64,7 +64,9 @@ class configuration
             'directories' => array(
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
-            )
+            ),
+			'hybridMarker' => 'X',
+			'maxBackSteps' => 100
         );
     
     }

@@ -78,8 +78,22 @@ class SpeciesController extends Controller
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
     );
 
-	public $cssToLoad = array('colorbox/colorbox.css','taxon.css','rank-list.css');
-	public $jsToLoad = array('all' => array('taxon.js','colorbox/jquery.colorbox.js','front-end.js'));
+	public $cssToLoad = array(
+		'colorbox/colorbox.css',
+		'taxon.css',
+		'rank-list.css',
+		'dialog/jquery.modaldialog.css'
+	);
+	public $jsToLoad = array(
+		'all' => array(
+			'taxon.js',
+			'colorbox/jquery.colorbox.js',
+			'front-end.js',
+			'int-link.js',
+			'dialog/jquery.modaldialog.js'
+		)
+	);
+
 
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
@@ -722,7 +736,7 @@ class SpeciesController extends Controller
 				$pr = $this->getProjectRanks();
 		
 				foreach((array)$pr as $key => $val) {
-				
+
 					if (!$this->maskAsHigherTaxa() && $val['lower_taxon']==1) {
 					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
 				

@@ -16,8 +16,9 @@ class ContentController extends Controller
 
     public $controllerPublicName = 'Content';
 
-	public $cssToLoad = array();
-	public $jsToLoad = array('all' => array('content.js'));
+	public $cssToLoad = array('dialog/jquery.modaldialog.css');
+	public $jsToLoad = array('all' => array('content.js','dialog/jquery.modaldialog.js','int-link.js'));
+
 
     /**
      * Constructor, calls parent's constructor

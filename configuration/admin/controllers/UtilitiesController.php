@@ -135,6 +135,7 @@ class UtilitiesController extends Controller
 
     private function cleanUpHeartbeats ()
     {
+
 		/*
 		It is possible to use FRAC_SECOND in place of MICROSECOND, but FRAC_SECOND is deprecated. FRAC_SECOND was removed in MySQL 5.5.3.
 		*/        
@@ -178,6 +179,7 @@ class UtilitiesController extends Controller
 
     private function ajaxActionGetTaxaEditStates ()
     {
+
 		/*
 		It is possible to use FRAC_SECOND in place of MICROSECOND, but FRAC_SECOND is deprecated. FRAC_SECOND was removed in MySQL 5.5.3.
 		*/
