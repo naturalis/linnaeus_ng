@@ -170,7 +170,9 @@ class SpeciesController extends Controller
 			
 			$this->smarty->assign('activeCategory', $activeCategory);
 
-			$this->smarty->assign('headerTitles',array('title' => $taxon['taxon']));
+			$this->smarty->assign('headerTitles',
+				array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['project']['hybrid_marker'].'</span>' : '') )
+			);
 
 		} else {
 
@@ -252,7 +254,7 @@ class SpeciesController extends Controller
 
 				if ($val['lower_taxon']=='0')  $d[$key] = $val;
 
-				if ($val['lower_taxon']=='1')  break;
+				if ($val['lower_taxon']=='1')  continue;
 
 			}
 
@@ -701,8 +703,6 @@ class SpeciesController extends Controller
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
 
 		}
-
-
 
 		$sortBy = array(
 			'key' => 'mime_show_order', 

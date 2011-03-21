@@ -60,7 +60,7 @@ class Controller extends BaseClass
 		'taxon',
 		'project_rank',
 		'label_project_rank',
-		'rank'
+		'rank',
     );
 
     private $usedHelpersBase = array(
@@ -1188,22 +1188,22 @@ class Controller extends BaseClass
 	public function getPagination($items,$maxPerPage=25)
 	{
 
-/*
-
-{if $prevStart!=-1 || $nextStart!=-1}
-	<div id="navigation">
-		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
+		/*
+		
+		{if $prevStart!=-1 || $nextStart!=-1}
+			<div id="navigation">
+				{if $prevStart!=-1}
+				<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
+				{/if}
+				{if $nextStart!=-1}
+				<span class="a" onclick="goNavigate({$nextStart});">next ></span>
+				{/if}
+			</div>
 		{/if}
-		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">next ></span>
-		{/if}
-	</div>
-{/if}
-
-//goNavigate(val,formName) formname default = 'theForm'
-
-*/
+		
+		//goNavigate(val,formName) formname default = 'theForm'
+		
+		*/
 
 		if (!isset($items)) return;
 
@@ -1285,8 +1285,6 @@ class Controller extends BaseClass
 		return $res;
 
 	}
-	
-	
 				
     private function _getTaxonTree($params) 
     {

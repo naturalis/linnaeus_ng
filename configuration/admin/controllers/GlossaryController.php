@@ -684,7 +684,7 @@ class GlossaryController extends Controller
 		);
 
 	}			
-				
+			
 	private function getActualAlphabet($languageId)
 	{
 

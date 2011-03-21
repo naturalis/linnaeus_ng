@@ -217,6 +217,8 @@ class LiteratureController extends Controller
 				)
 			);
 
+			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
+
 			foreach((array)$lt as $key => $val) {
 
 				if (isset($val['taxon_id'])) {
@@ -226,11 +228,12 @@ class LiteratureController extends Controller
 							'id' => array(
 								'project_id' => $this->getCurrentProjectId(),
 								'id' => $val['taxon_id']
-							)
+							),
+							'columns' => $tc
 						)
 					);
 
-					$lt[$key]['taxon'] = $t[0]['taxon'];
+					$lt[$key]['taxon'] = $t[0];
 
 				}
 
