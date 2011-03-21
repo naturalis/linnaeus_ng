@@ -36,7 +36,7 @@
 			{t}Result of this combination of characters{/t}
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
-			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.taxon}</option>
+			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.taxon}{if $v.is_hybrid==1} {$session.project.hybrid_marker}{/if}</option>
 			{/foreach}
 			</select>
 		</div>		

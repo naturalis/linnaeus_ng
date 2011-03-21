@@ -26,9 +26,13 @@
 		<div id="taxa">
 			<div class="title">{t}Referenced in the following taxa:{/t}</div>
 		{foreach from=$ref.taxa key=k item=v}
-			<div><span class="a" onclick="goTaxon({$v.taxon_id})">{$v.taxon}</span></div>
+			<div>
+				<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.taxon}</span>
+				{if $v.taxon.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+			</div>
 		{/foreach}
 		</div>
+		
 	{/if}
 
 	{if $ref.synonyms}

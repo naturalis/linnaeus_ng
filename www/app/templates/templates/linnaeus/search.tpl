@@ -97,12 +97,12 @@
 	<div class="subset">
 		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
 		{foreach from=$res key=k item=v}
-		<span>
+		<span {if !$v.matrices && $v.matrix_id}class="result" onclick="goMatrix({$v.matrix_id}){/if}">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
 			{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 			{if $v.characteristic}(of characteristic "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
 			{if $v.matrices}{if !$v.characteristic}({/if}{if $v.matrices|@count==1}in matrix{else}in matrices{/if}
-			{foreach from=$v.matrices key=k item=v name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"{$results.matrixkey.matrices[$v.matrix_id].name}"{/foreach}){/if}
+			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<span class="result" onclick="goMatrix({$m.matrix_id})">{$results.matrixkey.matrices[$m.matrix_id].name}</span>"{/foreach}){/if}
 		</span><br/>
 		{/foreach}
 	</div>
