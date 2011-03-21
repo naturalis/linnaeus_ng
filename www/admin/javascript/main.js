@@ -17,6 +17,21 @@ function q(m) {
 
 }
 
+function addSlashes(str) {
+	str=str.replace(/\\/g,'\\\\');
+	str=str.replace(/\'/g,'\\\'');
+	str=str.replace(/\"/g,'\\"');
+	str=str.replace(/\0/g,'\\0');
+	return str;
+}
+function stripSlashes(str) {
+	str=str.replace(/\\'/g,'\'');
+	str=str.replace(/\\"/g,'"');
+	str=str.replace(/\\0/g,'\0');
+	str=str.replace(/\\\\/g,'\\');
+	return str;
+}
+
 function isArray(obj) {
 	
    if (obj.constructor.toString().indexOf("Array") == -1)
@@ -278,7 +293,7 @@ function allSwitchLanguage(language) {
 			matrixGetStateText(allActiveLanguage);
 			break;			
 
-}
+	}
 
 }
 
@@ -340,5 +355,14 @@ function goNavigate(val,form) {
 
 	$('<input type="hidden" name="start">').val(val).appendTo(formId);
 	$(formId).submit();
+
+}
+
+function showDialog(content,title) {
+
+	$.modaldialog.prompt(content, {
+		title : title ? title : _('Enter value'),
+		width: 350
+	});
 
 }
