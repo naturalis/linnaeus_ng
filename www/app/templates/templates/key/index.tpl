@@ -28,7 +28,10 @@
 <span id="header">{t _s1=$taxa|@count _s2=$w}%s possible %s remaining:{/t}</span>
 	<select id="list" size="25">
 {foreach from=$taxa key=k item=v}
-		<option class="item" onclick="goTaxon({$v.id})">{$v.taxon}</option>
+		<option class="item" onclick="goTaxon({$v.id})">
+			{$v.taxon}
+			{if $v.is_hybrid==1}{$session.project.hybrid_marker}{/if}
+		</option>
 {/foreach}
 	</select>
 </div>
@@ -61,7 +64,10 @@
 						<span class="target-step" onclick="keyDoChoice({$v.id})">{if $v.target_number}{t}Step{/t} {$v.target_number}: {/if}{$v.target}</span>
 					{elseif $v.res_taxon_id!=''}
 						<span class="arrow">&rarr;</span>
-						<span class="target-taxon" onclick="goTaxon({$v.res_taxon_id})">{t}Taxon:{/t} {$v.target}</span>
+						<span class="target-taxon" onclick="goTaxon({$v.res_taxon_id})">
+							{t}Taxon:{/t} {$v.target}
+							{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+							</span>
 					{/if}
 					</span>
 

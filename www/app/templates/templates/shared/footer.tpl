@@ -2,6 +2,10 @@
 <div id="back-to-search">
 <span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
 </div>
+{elseif $backlink.url}
+<p>
+<span class="a" onclick="doBackForm('{$backlink.url}','{$backlink.data|@escape}');" title="Back to {$backlink.name}">BACK</span>
+</p>
 {/if}
 </div ends="page-container">
 <div id="footer-container">
@@ -18,11 +22,10 @@ $(document).ready(function(){
 {foreach from=$requestData key=k item=v}
 addRequestVar('{$k}','{$v|addslashes}')
 {/foreach}
+
 })
 {literal}
 </script>
 {/literal}
 </body>
 </html>
-
-
