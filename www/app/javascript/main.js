@@ -276,8 +276,46 @@ function doLanguageChange() {
 
 }
 
+function goIntLink(controller,url,params) {
 
+	//alert(controller+'::'+url+'::'+params); return;
 
+	if (params) {
+
+		for(i in params) {
+			
+			var x = params[i].split(':');
+
+			if (x[0]=='url')
+				url = x[1];
+			else
+				addFormVal(x[0],x[1]);
+
+		}
+
+	}
+
+	goForm('../'+controller+'/'+url);
+
+}
+
+function doBackForm(url,data) {
+	
+	data = unescape(data);
+
+	obj = $.parseJSON(data);
+
+	for (var i=0;i<obj.length;i++) {
+
+		addFormVal(obj[i].var,obj[i].val);
+
+	}
+
+	addFormVal('backstep','1');
+
+	goForm(url);
+
+}
 
 
 
