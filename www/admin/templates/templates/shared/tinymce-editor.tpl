@@ -105,6 +105,18 @@ function initTinyMce(litRefs,mediaRefs) {
 
 						return c;
 
+			   case 'addinternallink':
+						var c = cm.createMenuButton('addinternallink', {
+								title : 'Add an internal link',
+								image : '../../media/system/tinymce/link_add.png',
+								onclick : function() {
+									intLinkShowSelector();
+								},
+								icons : false
+						});
+
+						return c;
+
 			}
 	
 			return null;
@@ -123,13 +135,13 @@ function initTinyMce(litRefs,mediaRefs) {
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
-	{/literal}{if $session.project.css_url!=''}  content_css : "{$session.project.css_url}",
+	{/literal}{if $session.project.css_url!=''}  content_css : "{$session.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
 		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
 	};
 
 	if (inclLiteraryButtons && inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,";
+	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,|,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (inclLiteraryButtons && !inclMediaButtons) {
@@ -158,8 +170,5 @@ function tMCEOnInit() {
 	}
 
 }
-
 </script>
 {/literal}
-
-
