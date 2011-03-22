@@ -110,11 +110,17 @@ class LinnaeusController extends Controller
 
 		if (!$this->rHasId()) {
 
+	        $this->setPageName( _('Home'));
+
 			$this->smarty->assign('content',$this->getContent('introduction'));
 
 		} else {
+		
+			$d = $this->getContent(null,$this->requestData['id']);
 
-			$this->smarty->assign('content',$this->getContent(null,$this->requestData['id']));
+	        $this->setPageName( _($d['subject']));
+
+			$this->smarty->assign('content',$d);
 
 		}
 
