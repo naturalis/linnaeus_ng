@@ -1198,11 +1198,11 @@ class Controller extends BaseClass
 
 		$d = 
 			(isset($_SESSION['user']['breadcrumbs']) &&
-			isset($_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-2])) ?
-				$_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-2] :
+			isset($_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-1])) ?
+				$_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-1] :
 				null;
 
-		$d['data'] = json_encode($d['data']);
+		if (isset($d['data'])) $d['data'] = json_encode($d['data']);
 
 		return $d;
 
@@ -1212,7 +1212,7 @@ class Controller extends BaseClass
 	{
 
 		if (empty($this->pageName) || $this->storeHistory==false) return;
-		
+
 		foreach((array)$this->requestData as $key => $val) {
 
 			$p[] = array('var' => $key,'val' => $val);
@@ -1241,6 +1241,8 @@ class Controller extends BaseClass
 
 		if ($d>$this->generalSettings['maxBackSteps'])
 			$_SESSION['user']['breadcrumbs'] = array_slice($_SESSION['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
+
+		q($_SESSION['user']['breadcrumbs']);
 
 	}
 
