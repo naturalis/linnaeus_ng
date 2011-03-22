@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<!-- meta name="viewport" content="initial-scale=1.0, user-scalable=no" / --><!-- might be required for google map -->
 
 	<title>{$session.project.name}{if $session.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
 
@@ -28,7 +29,11 @@
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should be removed in production-->
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
+{if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad.all[i]}"></script>
+{else}
+	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
+{/if}
 {/section}
 {section name=i loop=$javascriptsToLoad.IE}
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}admin/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
