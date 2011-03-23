@@ -2,11 +2,11 @@
 
 <div id="page-main">
 
-<div id="map_canvas" style="width:650px; height:500px"></div>
+<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
 <div id="map_options">
 <form action="" method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="id" value="{$snapshot.id}" />
+<input type="hidden" name="id" value="{$mapView.id}" />
 <table>
 	<tr>
 		<td colspan="3"><input type="button" value="enable selection" id="btn-enable" onclick="toggleSelecting();" /></td>
@@ -17,30 +17,30 @@
 	<tr>
 		<td colspan="3">Snapshot parameters:</td>
 	</tr>
-	<tr><td>Name:</td><td colspan="2"><input type="text" id="name-default" name="name" value="{$snapshot.name}" /></td></tr>
+	<tr><td>Name:</td><td colspan="2"><input type="text" id="name-default" name="name" value="{$mapView.name}" /></td></tr>
 	<tr>
 		<td>Start:</td>
 		<td>latitude:</td>
-		<td><input type="text" id="coordinate1_lat" name="coordinate1_lat" style="width:50px" value="{$snapshot.coordinate1_lat}" /></td>
+		<td><input type="text" id="coordinate1_lat" name="coordinate1_lat" style="width:50px" value="{$mapView.coordinate1_lat}" /></td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>
 		<td>longitude:</td>
-		<td><input type="text" id="coordinate1_lng" name="coordinate1_lng" style="width:50px" value="{$snapshot.coordinate1_lng}" /></td>
+		<td><input type="text" id="coordinate1_lng" name="coordinate1_lng" style="width:50px" value="{$mapView.coordinate1_lng}" /></td>
 	</tr>
 	<tr>
 		<td>End:</td>
 		<td>latitude:</td>
-		<td><input type="text" id="coordinate2_lat" name="coordinate2_lat" style="width:50px" value="{$snapshot.coordinate2_lat}" /></td>
+		<td><input type="text" id="coordinate2_lat" name="coordinate2_lat" style="width:50px" value="{$mapView.coordinate2_lat}" /></td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>
 		<td>longitude:</td>
-		<td><input type="text" id="coordinate2_lng" name="coordinate2_lng" style="width:50px" value="{$snapshot.coordinate2_lng}" /></td>
+		<td><input type="text" id="coordinate2_lng" name="coordinate2_lng" style="width:50px" value="{$mapView.coordinate2_lng}" /></td>
 	</tr>
 	<tr>
 		<td>Zoom:</td>
-		<td colspan="2"><input type="text" id="zoom" name="zoom" value="{$snapshot.zoom}" /></td>
+		<td colspan="2"><input type="text" id="zoom" name="zoom" value="{$mapView.zoom}" /></td>
 	</tr>
 	<tr>
 		<td colspan="3">
@@ -57,8 +57,12 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	initMap({$middelLat}, {$middelLng}, {$initZoom}{if $snapshot}, [{$snapshot.coordinate1_lat},{$snapshot.coordinate1_lng},{$snapshot.coordinate2_lat},{$snapshot.coordinate2_lng}]{/if});
+{if $isOnline}
+	initMap({$middelLat}, {$middelLng}, {$initZoom}{if $mapView}, [{$mapView.coordinate1_lat},{$mapView.coordinate1_lng},{$mapView.coordinate2_lat},{$mapView.coordinate2_lng}]{/if});
 	addMouseClickHandlers();
+{else}
+	alert('Your computer appears to be offline.\nUnable to display map.');
+{/if}	
 {literal}
 });
 </script>
