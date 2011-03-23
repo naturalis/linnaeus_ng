@@ -119,7 +119,7 @@ abstract class Model extends BaseClass
 
         foreach ((array) $data as $key => $val) {
 
-			if (!is_array($val)) $data[$key] = $this->escapeString($val);
+			if (!is_array($val) && !(substr($val,0,1)=='#')) $data[$key] = $this->escapeString($val);
         
         }
         
@@ -146,8 +146,14 @@ abstract class Model extends BaseClass
             if ($d && (!empty($val) || $val===0 || $val==='0')) {
 
                 $fields .= "`".$key ."`, ";
-                
-                if ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
+
+				// # at beginning of value is signal to take the value literal
+                if (substr($val,0,1)=='#') {
+
+					$values .= substr($val,1) . ", ";
+
+				}
+				elseif ($d['type'] == 'date' || $d['type'] == 'datetime' || $d['type'] == 'timestamp') {
                     
                     if ($this->isDateTimeFunction($val)) {
                         
@@ -213,7 +219,8 @@ abstract class Model extends BaseClass
         
         foreach ((array) $data as $key => $val) {
             
-            $data[$key] = $this->escapeString($val);
+			if (!is_array($val) && !(substr($val,0,1)=='#')) $data[$key] = $this->escapeString($val);
+            //$data[$key] = $this->escapeString($val);
         
         }
         
@@ -232,7 +239,13 @@ abstract class Model extends BaseClass
 			
 			}
 
-//            if ($d && isset($val)) {
+			// # at beginning of value is signal to take the value literal
+			if (substr($val,0,1)=='#') {
+
+				$query .= " `" . $key . "` = " . substr($val,1) . ", ";
+
+			}
+			else
 			if ($d && (!empty($val) || $val===0 || $val==='0')) {
 			
                 if ($d['numeric'] == 1) {
@@ -761,7 +774,12 @@ abstract class Model extends BaseClass
 
 				}
 
-                if ($val===null) {
+				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
+                if (substr($operator,-1) == '#') {
+
+                    $query .= " and " . $col . " " . substr($operator,0,-1) . " " . $val;
+                
+                } elseif ($val===null) {
                 
                     $query .= " and " . $col . " " . $operator . " null ";
                 
