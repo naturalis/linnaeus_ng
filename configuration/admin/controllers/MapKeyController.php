@@ -382,42 +382,88 @@ class MapKeyController extends Controller
         $this->checkAuthorisation();
 
 		$isOnline = $this->checkRemoteServerAccessibility();
-
-		if ($this->rHasId() && $isOnline) {
 		
-			$so = $this->getSpeciesOccurrence($this->requestData['id']);
+		if (!$this->rHasId()) {
 
-        }
-
-		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$so['taxon']['taxon']));
-
-		if(isset($so) && $so['type']=='marker') {
-
-			$this->smarty->assign('middelLat',$so['latitude']);
-			$this->smarty->assign('middelLng',$so['longitude']);
-
-			$this->smarty->assign('marker',$so);
-
-		} else
-		if(isset($so) && $so['type']=='polygon') {
-
-			$so['nodes'] = json_decode($so['boundary_nodes']);
-
-			$middle = $this->getPolygonCentre($so['nodes']);
-
-			$this->smarty->assign('middelLat',$middle[0]);
-			$this->smarty->assign('middelLng',$middle[1]);
-
-			$this->smarty->assign('polygon',$so);
-
-		} else {
-
-			$this->smarty->assign('middelLat',24.886436490787712);
-			$this->smarty->assign('middelLng',-70.2685546875);
+			$this->redirect('species.php');
 
 		}
 
-		$this->smarty->assign('initZoom',5);
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Species occurrences'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php'
+            )
+        );
+
+		if ($this->rHasId() && $isOnline) {
+		
+			if (is_array($this->requestData['id'])) {
+			
+				$allNodes = array();
+
+				foreach((array)$this->requestData['id'] as $key => $val) {
+
+					$d = $this->getSpeciesOccurrence($val);
+
+					if ($d['type']=='polygon') {
+
+						$d['nodes'] = json_decode($d['boundary_nodes']);
+						$allNodes = array_merge($allNodes,$d['nodes']);
+
+					} else {
+					
+						$allNodes = array_merge($allNodes,array($d['latitude'],$d['longitude']));
+					
+					}
+
+					$so[] = $d;
+
+				}
+
+				$this->setPageName(_('Occurrences of multiple species'));
+
+				$middle = $this->getPolygonCentre($allNodes);
+				
+				$this->smarty->assign('middelLat',$middle[0]);
+				$this->smarty->assign('middelLng',$middle[1]);
+	
+			} else {
+
+				$d = $this->getSpeciesOccurrence($this->requestData['id']);
+				if ($d['type']=='polygon') $d['nodes'] = json_decode($d['boundary_nodes']);
+				$so[] = $d;
+
+				$this->setPageName(sprintf(_('Species occurrences of "%s"'),$so[0]['taxon']['taxon']));
+
+				if(isset($so[0]) && $so[0]['type']=='marker') {
+		
+					$this->smarty->assign('middelLat',$so[0]['latitude']);
+					$this->smarty->assign('middelLng',$so[0]['longitude']);
+		
+				} else
+				if(isset($so[0]) && $so['type']=='polygon') {
+
+					$middle = $this->getPolygonCentre($so[0]['nodes']);
+		
+					$this->smarty->assign('middelLat',$middle[0]);
+					$this->smarty->assign('middelLng',$middle[1]);
+		
+				} 
+
+			}
+
+        }
+
+
+// the middle is a farce
+$this->smarty->assign('middelLat',24.886436490787712);
+$this->smarty->assign('middelLng',-70.2685546875);
+
+		$this->smarty->assign('occurrences',$so);
+
+// CALCULATE ZOOM!
+$this->smarty->assign('initZoom',5);
 
 		$this->smarty->assign('isOnline',$isOnline);
 
