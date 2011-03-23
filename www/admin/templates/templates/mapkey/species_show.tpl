@@ -20,22 +20,33 @@ $(document).ready(function(){
 {/literal}
 {if $isOnline}
 	initMap({$middelLat}, {$middelLng}, {$initZoom});
-	{if $marker}
-	placeMarker([{$marker.latitude},{$marker.longitude}],{literal}{{/literal}
-		name: '{$marker.taxon.taxon}',
+
+{foreach from=$occurrences key=k item=v}
+
+{if $v.type=='marker'}
+
+	placeMarker([{$v.latitude},{$v.longitude}],{literal}{{/literal}
+		name: '{$v.taxon.taxon}',
 		addMarker: true
 	{literal}});{/literal}
-	{/if}
-	{if $polygon}
-	var nodes = Array();
-	{foreach from=$polygon.nodes key=k item=v}
-	nodes[{$k}] = [{$v[0]}, {$v[1]}];
+
+{else}
+
+	var nodes{$k} = Array();
+	{foreach from=$v.nodes key=kn item=vn}
+	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
 	{/foreach}
-	drawPolygon(nodes,polyStyle,{literal}{{/literal}
-		name: '{$polygon.taxon.taxon}',
+	drawPolygon(nodes{$k},polyStyle,{literal}{{/literal}
+		name: '{$v.taxon.taxon}',
 		addMarker: true
 	{literal}});{/literal}
-	{/if}
+
+{/if}
+
+{/foreach}
+
+
+
 {else}
 alert('Your computer appears to be offline.\nUnable to display map.');
 {/if}
