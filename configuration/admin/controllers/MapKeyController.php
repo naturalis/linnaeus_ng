@@ -136,6 +136,7 @@ class MapKeyController extends Controller
 	private function checkRemoteServerAccessibility()
 	{
 	
+//MUST PUT IN CONFIG	
 		$f = @fopen('http://maps.google.com/maps/api/js?sensor=false', 'r');
 
 		if (!$f) return false;
@@ -146,116 +147,105 @@ class MapKeyController extends Controller
 		
 	}
 
-	private function getMapViews($id=null)
-	{
-
-		$d = array('project_id' => $this->getCurrentProjectId());
-
-		if (isset($id)) $d['id'] = $id;
-
-		$m = $this->models->Map->_get(
-			array(
-				'id' => $d
-			)
-		);
-
-		foreach ((array)$m as $key => $val) {
-
-			$mn = $this->models->MapName->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'map_id' => $val['id']
-					)
-				)
-			);
-			
-			// DO SOMETHING!
-
-		}
-		
-		return isset($m) ? (isset($id) ? $m[0] : $m ) : null;
-
-	}
-
-	public function mapViewsAction()
+	public function chooseSpeciesAction()
 	{
 
         $this->checkAuthorisation();
-        
-        $this->setPageName( _('Map views'));
-		
-		$this->smarty->assign('mapViews',$this->getMapViews());
 
-        $this->printPage();
-	
+		$this->setPageName(_('Choose a species'));
+
+		$this->getTaxonTree();
+
+		if(isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+		$this->printPage();	
+
 	}
 
-    public function mapViewEditAction()
+    public function drawSpeciesAction()
     {
 
+		if (!$this->rHasId()) {
+		
+			$this->redirect('choose_species.php');
+		
+		}
+
         $this->checkAuthorisation();
+		
+		$this->getTaxonTree();
+
+		$taxon = $this->treeList[$this->requestData['id']];
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Map views'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
+                'name' => _('Choose a species'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/choose_species.php'
             )
         );
+        $this->setPageName(sprintf(_('Add occurrences for "%s"'),$taxon['taxon']));
 		
+		$saved = 0;
+
 		if ($this->rHasVal('rnd') && !$this->isFormResubmit()) {
+		
+			if(isset($this->requestData['markers'])) {
 
-			$s = $this->models->Map->save(
-				array_merge(
-					array('project_id' => $this->getCurrentProjectId()),
-					$this->requestData
-				)
-			);
+				foreach((array)$this->requestData['markers'] as $key => $val) {
 
-			if ($s) {
-
-				$mv = $this->requestData;
+					$s = $this->saveOccurrenceMarker(
+						array(
+							'taxonId'=> $this->requestData['id'],
+							'coord'=> $val
+						)
+					);
+					
+					if ($s===true) $saved++;
 	
-				if (!$this->rHasId()) $mv['id'] = $this->models->Map->getNewId();
-
-		        $this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
-	
-			    $this->addMessage(sprintf(_('Map view "%s" saved'),$mv['name']));
-
-			} else {
-
-			    $this->addError( _('Error saving map view'));
+				}
 
 			}
 
-		} else
-		if ($this->rHasId()) {
-		
-			$mv = $this->getMapViews($this->requestData['id']);
+			if(isset($this->requestData['polygons'])) {
 
-			$this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
+				foreach((array)$this->requestData['polygons'] as $key => $val) {
+				
+					$s = $this->saveOccurrencePolygon(
+						array(
+							'taxonId' => $this->requestData['id'],
+							'coord' => $val
+						)
+					);
+	
+					if ($s===true) $saved++;
+	
+				}
 
-		} else {
-    	
-			$this->setPageName( _('New map view'));
-
-        }
-
-		if(isset($mv)) {
-
-			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
-			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
-			$this->smarty->assign('initZoom',$mv['zoom']);
-
-			$this->smarty->assign('mapView',$mv);
-
-		} else {
-
-			$this->smarty->assign('middelLat',52.22);
-			$this->smarty->assign('middelLng',4.53);
-			$this->smarty->assign('initZoom',7);
+			}
 
 		}
+
+		if ($this->rHasVal('mapCentre') || isset($_SESSION['system']['mapCentre'])) {
+
+			$middle = (
+				$this->rHasVal('mapCentre') ?
+					explode(',',trim($this->requestData['mapCentre'],'()')) :
+					explode(',',trim($_SESSION['system']['mapCentre'],'()'))
+			);
+
+			$zoom = 
+				$this->rHasVal('mapZoom') ? 
+					$this->requestData['mapZoom'] : 
+					(isset($_SESSION['system']['mapZoom']) ? $_SESSION['system']['mapZoom'] : 7);
+
+			$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:'.$zoom.'}');
+
+			if ($this->rHasVal('mapCentre')) $_SESSION['system']['mapCentre'] = $this->requestData['mapCentre'];
+			if ($this->rHasVal('mapZoom')) $_SESSION['system']['mapZoom'] = $this->requestData['mapZoom'];
+
+		}
+		
+		$this->smarty->assign('taxon',$taxon);
 
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
@@ -263,51 +253,13 @@ class MapKeyController extends Controller
     
     }
 
-    public function mapViewAction()
-    {
-
-        $this->checkAuthorisation();
-
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Map views'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
-            )
-        );
-		
-		if ($this->rHasId()) {
-
-			$mv = $this->getMapViews($this->requestData['id']);
-
-	        $this->setPageName(sprintf(_('Viewing map view "%s"'),$mv['name']));
-	
-        } else {
-	
-			$this->redirect('map_views.php');
-	
-		}
-
-		if(isset($mv)) {
-
-			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
-			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
-
-			$this->smarty->assign('mapView',$mv);
-
-		}
-
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
-
-        $this->printPage();
-    
-    }
 
     public function speciesAction()
     {
 
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Species occurrences'));
+		$this->setPageName(_('Choose an occurrence'));
 
 		$this->getTaxonTree();
 
@@ -338,44 +290,6 @@ class MapKeyController extends Controller
 		
     }
 
-	private function getSpeciesOccurrence($id)
-	{
-
-		$ot = $this->models->OccurrenceTaxon->_get(
-			array(
-				'id' => array(
-					'id' => $id,
-					'project_id' => $this->getCurrentProjectId(),
-				)
-			)
-		);
-
-		$this->getTaxonTree();
-
-		if ($ot) $ot[0]['taxon'] = $this->treeList[$ot[0]['taxon_id']];
-
-		return $ot[0];
-	
-	}
-
-	private function getPolygonCentre($p)
-	{
-
-		if (count((array)$p)==0) return null;
-
-		$x = $y = 0;
-
-		foreach((array)$p as $key => $val) {
-			
-			$x += $val[0];
-			$y += $val[1];
-	
-		}
-	
-		return array($x/count($p),$y/count($p));
-	
-	}
-
 	public function speciesShowAction()
 	{
 
@@ -391,110 +305,53 @@ class MapKeyController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Species occurrences'), 
+                'name' => _('Choose an occurrence'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php'
             )
         );
 
+		$this->setPageName(_('Species occurrences'));
+
 		if ($this->rHasId() && $isOnline) {
 		
-			if (is_array($this->requestData['id'])) {
-			
-				$allNodes = array();
+			$allNodes = array();
 
-				foreach((array)$this->requestData['id'] as $key => $val) {
+			foreach((array)$this->requestData['id'] as $key => $val) {
 
-					$d = $this->getSpeciesOccurrence($val);
+				$d = $this->getSpeciesOccurrence($val);
 
-					if ($d['type']=='polygon') {
+				if ($d['type']=='polygon') {
 
-						$d['nodes'] = json_decode($d['boundary_nodes']);
-						$allNodes = array_merge($allNodes,$d['nodes']);
+					$d['nodes'] = json_decode($d['boundary_nodes']);
+					$allNodes = array_merge($allNodes,$d['nodes']);
 
-					} else {
+				} else {
 					
-						$allNodes = array_merge($allNodes,array($d['latitude'],$d['longitude']));
-					
-					}
-
-					$so[] = $d;
-
+					$a[] = array($d['latitude'],$d['longitude']);
+					$allNodes = array_merge($allNodes,$a);
+				
 				}
 
-				$this->setPageName(_('Occurrences of multiple species'));
-
-				$middle = $this->getPolygonCentre($allNodes);
-				
-				$this->smarty->assign('middelLat',$middle[0]);
-				$this->smarty->assign('middelLng',$middle[1]);
-	
-			} else {
-
-				$d = $this->getSpeciesOccurrence($this->requestData['id']);
-				if ($d['type']=='polygon') $d['nodes'] = json_decode($d['boundary_nodes']);
 				$so[] = $d;
 
-				$this->setPageName(sprintf(_('Species occurrences of "%s"'),$so[0]['taxon']['taxon']));
-
-				if(isset($so[0]) && $so[0]['type']=='marker') {
-		
-					$this->smarty->assign('middelLat',$so[0]['latitude']);
-					$this->smarty->assign('middelLng',$so[0]['longitude']);
-		
-				} else
-				if(isset($so[0]) && $so['type']=='polygon') {
-
-					$middle = $this->getPolygonCentre($so[0]['nodes']);
-		
-					$this->smarty->assign('middelLat',$middle[0]);
-					$this->smarty->assign('middelLng',$middle[1]);
-		
-				} 
-
 			}
+
+			$middle = $this->getPolygonCentre($allNodes);
 
         }
 
 
-// the middle is a farce
-$this->smarty->assign('middelLat',24.886436490787712);
-$this->smarty->assign('middelLng',-70.2685546875);
-
-		$this->smarty->assign('occurrences',$so);
-
 // CALCULATE ZOOM!
-$this->smarty->assign('initZoom',5);
+//		$this->smarty->assign('initZoom',7);
 
 		$this->smarty->assign('isOnline',$isOnline);
 
+		$this->smarty->assign('occurrences',$so);
+
+		$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:7}');
+
         $this->printPage();
 
-	
-	}
-
-
-	private function sanitizeDotsAndCommas($val)
-	{
-	
-		if (strpos($val,',')!==false && strpos($val,'.')!==false) {
-
-			$val = str_replace(',','',$val);
-
-		} else
-		if (strpos($val,',')!==false && strpos($val,'.')===false) {
-	
-			$val = str_replace(',','.',$val);
-
-		}
-		if (substr_count($val,'.')>1) {
-
-			$x = strrpos($val,'.');
-
-			$val = str_replace('.',substr($val,0,$x-1)).substr($val,$x);
-
-		}
-
-		return $val;
 	
 	}
 
@@ -552,15 +409,11 @@ $this->smarty->assign('initZoom',5);
 										$val[2] = $this->sanitizeDotsAndCommas($val[2]);
 										$val[3] = $this->sanitizeDotsAndCommas($val[3]);
 										
-										$ot = $this->models->OccurrenceTaxon->save(
+										$ot = $this->saveOccurrenceMarker(
 											array(
-												'id' => null,
-												'project_id' => $this->getCurrentProjectId(),
-												'taxon_id' => $taxonId,
-												'type' => 'marker',
-												'coordinate' => '#Point('.$val[2].','.$val[3].')',
-												'latitude' => $val[2],
-												'longitude' => $val[3]
+												'taxonId' => $taxonId,
+												'lat' => $val[2],
+												'lng' => $val[3]
 											)
 										);
 
@@ -604,7 +457,7 @@ $this->smarty->assign('initZoom',5);
 								
 									$continue=true;
 									$i=0;
-									$geoStr = '';
+									$geoStr = array();
 									$nodes = array();
 									
 									while($continue && $i<=9999) {
@@ -633,7 +486,7 @@ $this->smarty->assign('initZoom',5);
 												$cLat = $this->sanitizeDotsAndCommas($cLat);
 												$cLon = $this->sanitizeDotsAndCommas($cLon);
 												
-												$geoStr .= $cLat.' '.$cLon.',';
+												$geoStr[] = $cLat.' '.$cLon;
 												$nodes[] = array($cLat,$cLon);
 											
 											}
@@ -644,16 +497,13 @@ $this->smarty->assign('initZoom',5);
 									
 									}
 									
-									if ($geoStr) {
-									
-										$ot = $this->models->OccurrenceTaxon->save(
+									if (count($geoStr)>0) {
+
+										$ot = $this->saveOccurrencePolygon(
 											array(
-												'id' => null,
-												'project_id' => $this->getCurrentProjectId(),
-												'taxon_id' => $taxonId,
-												'type' => 'polygon',
-												'boundary' => "#GeomFromText('POLYGON((".rtrim($geoStr,',')."))')",
-												'boundary_nodes' => json_encode($nodes)
+												'taxonId' => $taxonId,
+												'geoStr' => implode(',',$geoStr),
+												'nodes' => $nodes
 											)
 										);
 										
@@ -776,6 +626,312 @@ $this->smarty->assign('initZoom',5);
     
     }
 
+	private function saveOccurrenceMarker($p)
+	{
+
+		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
+		$lat = isset($p['lat']) ? $p['lat'] : null;
+		$lng = isset($p['lng']) ? $p['lng'] : null;
+
+		if (!isset($lat) && !isset($lng) && isset($p['coord'])) {
+
+			$d = explode(',',str_replace(array('(',')'),'',$p['coord']));
+			$lat = trim($d[0]);
+			$lng = trim($d[1]);
+
+		}
+
+		if (!isset($taxonId) || !isset($lat) || !isset($lng)) return;
+
+		return $this->models->OccurrenceTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $taxonId,
+				'type' => 'marker',
+				'coordinate' => '#Point('.$lat.','.$lng.')',
+				'latitude' => $lat,
+				'longitude' => $lng
+			)
+		);
+	
+	}
+
+	private function saveOccurrencePolygon($p)
+	{
+
+		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
+		$geoStr = isset($p['geoStr']) ? $p['geoStr'] : null;
+		$nodes = isset($p['nodes']) ? $p['nodes'] : null;
+		
+		if (!isset($geoStr) && !isset($nodes) && isset($p['coord'])) {
+		
+			$d = explode('),(',trim($p['coord'],'()'));
+			
+			if (count((array)$d)>2) {
+
+				foreach((array)$d as $key => $val) {
+	
+					$g = explode(',',$val);
+					$geoStr[] = $g[0].' '.$g[1];
+					$nodes[] = array($g[0],$g[1]);
+	
+				}
+	
+				// mysql polygon has to be closed, i.e. first and last nodes must be identical
+				$g = explode(',',$d[0]);
+				
+				$geoStr = implode(',',$geoStr).','.$g[0].' '.$g[1];
+
+			}
+
+		}
+
+		if (!isset($taxonId) || !isset($geoStr) || !isset($nodes)) return;
+
+		if (count((array)$nodes)<=2) return;
+
+		 $this->models->OccurrenceTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $taxonId,
+				'type' => 'polygon',
+				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))')",
+				'boundary_nodes' => json_encode($nodes)
+			)
+		);
+
+	}
+
+	private function getSpeciesOccurrence($id)
+	{
+
+		$ot = $this->models->OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+
+		$this->getTaxonTree();
+
+		if ($ot) $ot[0]['taxon'] = $this->treeList[$ot[0]['taxon_id']];
+
+		return $ot[0];
+	
+	}
+
+	private function getPolygonCentre($p)
+	{
+
+		if (count((array)$p)==0) return null;
+
+		$x = $y = 0;
+
+		foreach((array)$p as $key => $val) {
+			
+			$x += $val[0];
+			$y += $val[1];
+	
+		}
+	
+		return array($x/count($p),$y/count($p));
+	
+	}
+
+	private function sanitizeDotsAndCommas($val)
+	{
+	
+		if (strpos($val,',')!==false && strpos($val,'.')!==false) {
+
+			$val = str_replace(',','',$val);
+
+		} else
+		if (strpos($val,',')!==false && strpos($val,'.')===false) {
+	
+			$val = str_replace(',','.',$val);
+
+		}
+		if (substr_count($val,'.')>1) {
+
+			$x = strrpos($val,'.');
+
+			$val = str_replace('.',substr($val,0,$x-1)).substr($val,$x);
+
+		}
+
+		return $val;
+	
+	}
+
+
+
+
+/*
+
+	private function getMapViews($id=null)
+	{
+
+		$d = array('project_id' => $this->getCurrentProjectId());
+
+		if (isset($id)) $d['id'] = $id;
+
+		$m = $this->models->Map->_get(
+			array(
+				'id' => $d
+			)
+		);
+
+		foreach ((array)$m as $key => $val) {
+
+			$mn = $this->models->MapName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'map_id' => $val['id']
+					)
+				)
+			);
+			
+			// DO SOMETHING!
+
+		}
+		
+		return isset($m) ? (isset($id) ? $m[0] : $m ) : null;
+
+	}
+
+	public function mapViewsAction()
+	{
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName( _('Map views'));
+		
+		$this->smarty->assign('mapViews',$this->getMapViews());
+
+        $this->printPage();
+	
+	}
+
+    public function mapViewEditAction()
+    {
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Map views'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
+            )
+        );
+		
+		if ($this->rHasVal('rnd') && !$this->isFormResubmit()) {
+
+			$s = $this->models->Map->save(
+				array_merge(
+					array('project_id' => $this->getCurrentProjectId()),
+					$this->requestData
+				)
+			);
+
+			if ($s) {
+
+				$mv = $this->requestData;
+	
+				if (!$this->rHasId()) $mv['id'] = $this->models->Map->getNewId();
+
+		        $this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
+	
+			    $this->addMessage(sprintf(_('Map view "%s" saved'),$mv['name']));
+
+			} else {
+
+			    $this->addError( _('Error saving map view'));
+
+			}
+
+		} else
+		if ($this->rHasId()) {
+		
+			$mv = $this->getMapViews($this->requestData['id']);
+
+			$this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
+
+		} else {
+    	
+			$this->setPageName( _('New map view'));
+
+        }
+
+		if(isset($mv)) {
+
+			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
+			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
+			$this->smarty->assign('initZoom',$mv['zoom']);
+
+			$this->smarty->assign('mapView',$mv);
+
+		} else {
+
+			$this->smarty->assign('middelLat',52.22);
+			$this->smarty->assign('middelLng',4.53);
+			$this->smarty->assign('initZoom',7);
+
+		}
+
+		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+
+        $this->printPage();
+    
+    }
+
+
+
+
+    public function mapViewAction()
+    {
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Map views'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
+            )
+        );
+		
+		if ($this->rHasId()) {
+
+			$mv = $this->getMapViews($this->requestData['id']);
+
+	        $this->setPageName(sprintf(_('Viewing map view "%s"'),$mv['name']));
+	
+        } else {
+	
+			$this->redirect('map_views.php');
+	
+		}
+
+		if(isset($mv)) {
+
+			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
+			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
+
+			$this->smarty->assign('mapView',$mv);
+
+		}
+
+		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+
+        $this->printPage();
+    
+    }
+
+*/
 
 }
 
