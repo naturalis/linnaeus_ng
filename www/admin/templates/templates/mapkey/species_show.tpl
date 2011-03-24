@@ -6,20 +6,11 @@
 </div>
 {literal}
 <script type="text/JavaScript">
-
-var polyStyle = {
-	strokeColor: 'yellow',
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "yellow",
-    fillOpacity: 0.2,
-	geodesic: true
-};
-
 $(document).ready(function(){
 {/literal}
 {if $isOnline}
-	initMap({$middelLat}, {$middelLng}, {$initZoom});
+
+	initMap({$mapInitString});
 
 {foreach from=$occurrences key=k item=v}
 
@@ -36,7 +27,7 @@ $(document).ready(function(){
 	{foreach from=$v.nodes key=kn item=vn}
 	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
 	{/foreach}
-	drawPolygon(nodes{$k},polyStyle,{literal}{{/literal}
+	drawPolygon(nodes{$k},null,{literal}{{/literal}
 		name: '{$v.taxon.taxon}',
 		addMarker: true
 	{literal}});{/literal}
@@ -44,7 +35,6 @@ $(document).ready(function(){
 {/if}
 
 {/foreach}
-
 
 
 {else}

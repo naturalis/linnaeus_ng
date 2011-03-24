@@ -9,7 +9,7 @@
 <input type="hidden" name="id" value="{$mapView.id}" />
 <table>
 	<tr>
-		<td colspan="3"><input type="button" value="enable selection" id="btn-enable" onclick="toggleSelecting();" /></td>
+		<td colspan="3"><input type="button" value="start selecting" id="btn-enable" onclick="toggleSelecting();" /></td>
 	</tr>
 	<tr>
 		<td colspan="3">&nbsp;</td>
@@ -44,7 +44,7 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<input type="button" value="clear selection" onclick="removeRectangle();setFormParameters(true)" />&nbsp;
+			<input type="button" value="clear selection" onclick="removeRectangle();setRectangleForm(true);" />&nbsp;
 			<input type="submit" value="save" />
 		</td>
 	</tr>
@@ -58,8 +58,19 @@
 $(document).ready(function(){
 {/literal}
 {if $isOnline}
-	initMap({$middelLat}, {$middelLng}, {$initZoom}{if $mapView}, [{$mapView.coordinate1_lat},{$mapView.coordinate1_lng},{$mapView.coordinate2_lat},{$mapView.coordinate2_lng}]{/if});
-	addMouseClickHandlers();
+
+	initMap({literal}{{/literal}
+		lat:{$middelLat},
+		lng:{$middelLng},
+		zoom:{$mapView.zoom}
+	{literal}}{/literal});
+	initRectangle();
+	setRectangleBounds({literal}{{/literal}
+		coordinate1:{literal}{{/literal}lat:{$mapView.coordinate1_lat},lng:{$mapView.coordinate1_lng}{literal}}{/literal},
+		coordinate2:{literal}{{/literal}lat:{$mapView.coordinate2_lat},lng:{$mapView.coordinate2_lng}{literal}}{/literal}
+	{literal}}{/literal});
+	addHandlersRectangle();
+
 {else}
 	alert('Your computer appears to be offline.\nUnable to display map.');
 {/if}	
