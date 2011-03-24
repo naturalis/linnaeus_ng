@@ -7,7 +7,7 @@ Name: {$mapView.name}<br />
 Start - lat {$mapView.coordinate1_lat},{$mapView.coordinate1_lng}<br />
 End - lat: {$mapView.coordinate2_lat},{$mapView.coordinate2_lng}<br />
 Zoom level: {$mapView.zoom}<br />
-<a href="snapshot.php?id={$mapView.id}">edit</a>
+<a href="map_view_edit.php?id={$mapView.id}">edit</a>
 </div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
 </div>
@@ -16,7 +16,18 @@ Zoom level: {$mapView.zoom}<br />
 $(document).ready(function(){
 {/literal}
 {if $isOnline}
-	initMap({$middelLat}, {$middelLng}, {$mapView.zoom}, [{$mapView.coordinate1_lat},{$mapView.coordinate1_lng},{$mapView.coordinate2_lat},{$mapView.coordinate2_lng}]);
+
+	initMap({literal}{{/literal}
+		lat:{$middelLat},
+		lng:{$middelLng},
+		zoom:{$mapView.zoom}
+	{literal}}{/literal});
+	initRectangle();
+	setRectangleBounds({literal}{{/literal}
+		coordinate1:{literal}{{/literal}lat:{$mapView.coordinate1_lat},lng:{$mapView.coordinate1_lng}{literal}}{/literal},
+		coordinate2:{literal}{{/literal}lat:{$mapView.coordinate2_lat},lng:{$mapView.coordinate2_lng}{literal}}{/literal}
+	{literal}}{/literal});
+	
 {else}
 alert('Your computer appears to be offline.\nUnable to display map.');
 {/if}

@@ -17,6 +17,9 @@ function toggleAllSpecies() {
 </script>
 {/literal}
 <div id="page-main">
+<p>
+Click the 'view on map' link of the occurrence you want to see, or check the checkboxes of all the occurrences you want to see and click 'show selected'.
+<p>
 <form action="species_show.php" method="post">
 <table>
 {foreach from=$taxa key=k item=v}
@@ -35,10 +38,11 @@ function toggleAllSpecies() {
 	{/foreach}
 {/foreach}
 </table>
+<p>
 <input type="submit" value="show selected" />
 <input type="button" id="select-all" value="select all" onclick="toggleAllSpecies()" />
 </form>
-<a href="file.php">Upload a file</a>
+</p>
 </div>
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
