@@ -133,20 +133,6 @@ class MapKeyController extends Controller
     
     }
 
-	private function checkRemoteServerAccessibility()
-	{
-	
-//MUST PUT IN CONFIG	
-		$f = @fopen('http://maps.google.com/maps/api/js?sensor=false', 'r');
-
-		if (!$f) return false;
-
-		fclose($f);
-
-		return true;
-		
-	}
-
 	public function chooseSpeciesAction()
 	{
 
@@ -154,7 +140,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName(_('Choose a species'));
 
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		if(isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
@@ -173,7 +159,7 @@ class MapKeyController extends Controller
 
         $this->checkAuthorisation();
 		
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		$taxon = $this->treeList[$this->requestData['id']];
 
@@ -253,7 +239,6 @@ class MapKeyController extends Controller
     
     }
 
-
     public function speciesAction()
     {
 
@@ -261,19 +246,11 @@ class MapKeyController extends Controller
 
 		$this->setPageName(_('Choose an occurrence'));
 
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		foreach((array)$this->treeList as $key => $val) {
 
-			$ot = $this->models->OccurrenceTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $val['id'],
-					),
-					'columns' => 'id,type,AsText(coordinate) as coordinate,AsText(boundary) as boundary'
-				)
-			);
+			$ot = $this->getTaxonOccurrences($val['id']);
 			
 			if ($ot) {
 
@@ -290,6 +267,7 @@ class MapKeyController extends Controller
 		
     }
 
+
 	public function speciesShowAction()
 	{
 
@@ -297,7 +275,7 @@ class MapKeyController extends Controller
 
 		$isOnline = $this->checkRemoteServerAccessibility();
 		
-		if (!$this->rHasId()) {
+		if (!$this->rHasId() && !$this->rHasVal('t')) {
 
 			$this->redirect('species.php');
 
@@ -312,13 +290,39 @@ class MapKeyController extends Controller
 
 		$this->setPageName(_('Species occurrences'));
 
-		if ($this->rHasId() && $isOnline) {
-		
-			$allNodes = array();
+		$allNodes = array();
 
+		if ($this->rHasVal('t') && $isOnline) {
+
+			$this->getTaxonTree(null,true);
+			
+			$taxon = $this->treeList[$this->requestData['t']];
+		
+			$this->setPageName(sprintf(_('Species occurrences for "%s"'),$taxon['taxon']));
+
+			$so = $this->getTaxonOccurrences($this->requestData['t']);
+
+			foreach((array)$so as $key => $val) {
+
+				if ($val['type']=='polygon') {
+
+					$so[$key]['nodes'] = json_decode($val['boundary_nodes']);
+					$allNodes = array_merge($allNodes,$so[$key]['nodes']);
+
+				} else {
+					
+					$a[] = array($val['latitude'],$val['longitude']);
+					$allNodes = array_merge($allNodes,$a);
+				
+				}
+
+			}
+
+		} elseif ($this->rHasId() && $isOnline) {
+		
 			foreach((array)$this->requestData['id'] as $key => $val) {
 
-				$d = $this->getSpeciesOccurrence($val);
+				$d = $this->getOccurrence($val);
 
 				if ($d['type']=='polygon') {
 
@@ -336,23 +340,43 @@ class MapKeyController extends Controller
 
 			}
 
-			$middle = $this->getPolygonCentre($allNodes);
-
         }
 
+		if (count($allNodes)>0) {
 
-// CALCULATE ZOOM!
-//		$this->smarty->assign('initZoom',7);
+			$middle = $this->getPolygonCentre($allNodes);
+	
+			$sLat = $sLng = 999;
+			$lLat = $lLng = -999;
+	
+			foreach((array)$allNodes as $key => $val) {
+
+				if (!empty($val[0]) && $val[0] < $sLat) $sLat = $val[0];
+				if (!empty($val[0]) && $val[0] > $lLat) $lLat = $val[0];
+				if (!empty($val[1]) && $val[1] < $sLng) $sLng = $val[1];
+				if (!empty($val[1]) && $val[1] > $lLng) $lLng = $val[1];
+
+			}
+	
+			$this->smarty->assign('mapBorder',
+				array(
+					'sw' => array('lat' => $sLat,'lng' => $sLng),
+					'ne' => array('lat' =>  $lLat,'lng' =>  $lLng)
+				)
+			);
+
+		}
 
 		$this->smarty->assign('isOnline',$isOnline);
 
 		$this->smarty->assign('occurrences',$so);
 
-		$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:7}');
+		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		if (isset($middle)) $this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:7}');
 
         $this->printPage();
 
-	
 	}
 
 
@@ -383,7 +407,7 @@ class MapKeyController extends Controller
 			
 			if (!$this->getErrors()) {
 
-				$this->getTaxonTree();
+				$this->getTaxonTree(null,true);
 				
 				$r = $this->helpers->CsvParserHelper->getResults();
 				
@@ -578,7 +602,7 @@ class MapKeyController extends Controller
 
         $this->checkAuthorisation();
 
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		$this->smarty->assign('taxa',$this->treeList);
 
@@ -592,39 +616,44 @@ class MapKeyController extends Controller
 		
     }
 
-
-    public function testAction()
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
     {
 
-        $this->checkAuthorisation();
+        if (!$this->rHasVal('action')) return;
+        
+        if ($this->requestData['action'] == 'delete_occurrence') {
+            
+            if ($this->deleteOccurrence($this->requestData['id']))
 
+				$this->smarty->assign('returnText',1);
 
-		if ($this->rHasId()) {
-		
-			$ss = $this->getSnapShots($this->requestData['id']);
+			else
 
-	        $this->setPageName(sprintf(_('Viewing map view "%s"'),$ss['name']));
+				$this->smarty->assign('returnText',0);
 
         }
-
-		if(isset($ss)) {
-
-//			$this->smarty->assign('middelLat',($ss['coordinate1_lat']+$ss['coordinate2_lat']) / 2);
-//			$this->smarty->assign('middelLng',($ss['coordinate1_lng']+$ss['coordinate2_lng']) / 2);
-
-		} else {
-
-			$this->smarty->assign('middelLat',24.886436490787712);
-			$this->smarty->assign('middelLng',-70.2685546875);
-			$this->smarty->assign('initZoom',5);
-
-		}
-
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
         $this->printPage();
     
     }
+
+	private function checkRemoteServerAccessibility()
+	{
+
+		$f = @fopen($this->controllerSettings['urlToCheckConnectivity'], 'r');
+
+		if (!$f) return false;
+
+		fclose($f);
+
+		return true;
+		
+	}
 
 	private function saveOccurrenceMarker($p)
 	{
@@ -651,7 +680,8 @@ class MapKeyController extends Controller
 				'type' => 'marker',
 				'coordinate' => '#Point('.$lat.','.$lng.')',
 				'latitude' => $lat,
-				'longitude' => $lng
+				'longitude' => $lng,
+				'nodes_hash' => md5($lat.','.$lng)
 			)
 		);
 	
@@ -691,20 +721,38 @@ class MapKeyController extends Controller
 
 		if (count((array)$nodes)<=2) return;
 
-		 $this->models->OccurrenceTaxon->save(
+		return $this->models->OccurrenceTaxon->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $taxonId,
 				'type' => 'polygon',
 				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))')",
-				'boundary_nodes' => json_encode($nodes)
+				'boundary_nodes' => json_encode($nodes),
+				'nodes_hash' => md5(json_encode($nodes))
 			)
 		);
 
 	}
 
-	private function getSpeciesOccurrence($id)
+	private function getTaxonOccurrences($id)
+	{
+	
+		if (!isset($id)) return;
+
+		return $this->models->OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id,
+				),
+				'columns' => 'id,type,latitude,longitude,boundary_nodes'
+			)
+		);
+	
+	}
+
+	private function getOccurrence($id)
 	{
 
 		$ot = $this->models->OccurrenceTaxon->_get(
@@ -716,12 +764,26 @@ class MapKeyController extends Controller
 			)
 		);
 
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		if ($ot) $ot[0]['taxon'] = $this->treeList[$ot[0]['taxon_id']];
 
 		return $ot[0];
 	
+	}
+
+	private function deleteOccurrence($id)
+	{
+
+		if (!isset($id)) return;
+	
+		return $this->models->OccurrenceTaxon->delete(
+			array(
+				'id' => $id,
+				'project_id' => $this->getCurrentProjectId()
+			)
+		);
+
 	}
 
 	private function getPolygonCentre($p)
@@ -766,172 +828,6 @@ class MapKeyController extends Controller
 		return $val;
 	
 	}
-
-
-
-
-/*
-
-	private function getMapViews($id=null)
-	{
-
-		$d = array('project_id' => $this->getCurrentProjectId());
-
-		if (isset($id)) $d['id'] = $id;
-
-		$m = $this->models->Map->_get(
-			array(
-				'id' => $d
-			)
-		);
-
-		foreach ((array)$m as $key => $val) {
-
-			$mn = $this->models->MapName->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'map_id' => $val['id']
-					)
-				)
-			);
-			
-			// DO SOMETHING!
-
-		}
-		
-		return isset($m) ? (isset($id) ? $m[0] : $m ) : null;
-
-	}
-
-	public function mapViewsAction()
-	{
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName( _('Map views'));
-		
-		$this->smarty->assign('mapViews',$this->getMapViews());
-
-        $this->printPage();
-	
-	}
-
-    public function mapViewEditAction()
-    {
-
-        $this->checkAuthorisation();
-
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Map views'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
-            )
-        );
-		
-		if ($this->rHasVal('rnd') && !$this->isFormResubmit()) {
-
-			$s = $this->models->Map->save(
-				array_merge(
-					array('project_id' => $this->getCurrentProjectId()),
-					$this->requestData
-				)
-			);
-
-			if ($s) {
-
-				$mv = $this->requestData;
-	
-				if (!$this->rHasId()) $mv['id'] = $this->models->Map->getNewId();
-
-		        $this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
-	
-			    $this->addMessage(sprintf(_('Map view "%s" saved'),$mv['name']));
-
-			} else {
-
-			    $this->addError( _('Error saving map view'));
-
-			}
-
-		} else
-		if ($this->rHasId()) {
-		
-			$mv = $this->getMapViews($this->requestData['id']);
-
-			$this->setPageName(sprintf(_('Editing map view "%s"'),$mv['name']));
-
-		} else {
-    	
-			$this->setPageName( _('New map view'));
-
-        }
-
-		if(isset($mv)) {
-
-			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
-			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
-			$this->smarty->assign('initZoom',$mv['zoom']);
-
-			$this->smarty->assign('mapView',$mv);
-
-		} else {
-
-			$this->smarty->assign('middelLat',52.22);
-			$this->smarty->assign('middelLng',4.53);
-			$this->smarty->assign('initZoom',7);
-
-		}
-
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
-
-        $this->printPage();
-    
-    }
-
-
-
-
-    public function mapViewAction()
-    {
-
-        $this->checkAuthorisation();
-
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Map views'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/map_views.php'
-            )
-        );
-		
-		if ($this->rHasId()) {
-
-			$mv = $this->getMapViews($this->requestData['id']);
-
-	        $this->setPageName(sprintf(_('Viewing map view "%s"'),$mv['name']));
-	
-        } else {
-	
-			$this->redirect('map_views.php');
-	
-		}
-
-		if(isset($mv)) {
-
-			$this->smarty->assign('middelLat',($mv['coordinate1_lat']+$mv['coordinate2_lat']) / 2);
-			$this->smarty->assign('middelLng',($mv['coordinate1_lng']+$mv['coordinate2_lng']) / 2);
-
-			$this->smarty->assign('mapView',$mv);
-
-		}
-
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
-
-        $this->printPage();
-    
-    }
-
-*/
 
 }
 
