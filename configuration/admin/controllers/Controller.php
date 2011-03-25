@@ -2,7 +2,6 @@
 /*
 
 - setRequestData needs recursion for the arrays (fuck knows why, though)
-- getTaxonTree could do with some fancy session storing
 
 */
 
@@ -1150,10 +1149,34 @@ class Controller extends BaseClass
      * @param      array    $params    parameters for tree formatting
      * @access     public
      */
-	public function getTaxonTree($params=null) 
+	public function getTaxonTree($params=null,$allowSession=false) 
 	{
-	
-		return $this->_getTaxonTree($params);
+
+		if (
+			$allowSession && 
+			isset($_SESSION['system']['taxonTree']) && 
+			isset($_SESSION['system']['treeList']) && 
+			(
+				(isset($_SESSION['system']['treeParams']) && $_SESSION['system']['treeParams']==$params) ||
+				$params==null
+			)
+			) {
+
+			$this->treeList = $_SESSION['system']['treeList'];
+			
+			return $_SESSION['system']['taxonTree'];
+
+		} else {
+
+			$_SESSION['system']['taxonTree'] = $this->_getTaxonTree($params);
+
+			$_SESSION['system']['treeList'] = $this->treeList;
+
+			$_SESSION['system']['treeParams'] = $params;
+
+			return $_SESSION['system']['taxonTree'];
+		
+		}
 	
 	}
 
