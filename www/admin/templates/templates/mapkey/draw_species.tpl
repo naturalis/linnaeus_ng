@@ -25,7 +25,7 @@
 		</form>
 	</div>
 </div>
-
+<div id="x"></div>
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){

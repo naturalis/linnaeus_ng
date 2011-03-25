@@ -5,6 +5,9 @@ var markers = Array();
 var polygons = Array();
 var polygonCoordinates = Array();
 var occurrenceType;
+var prevPolygons = Array();
+var prevMarkers = Array();
+
 
 function initMap(init) {
 
@@ -179,7 +182,7 @@ function saveAll() {
 		if (polygons[i])  $('<input type="hidden" name="polygons[]">').val(polygons[i]).appendTo('#theForm');
 
 	}
-alert(map.getZoom());
+
 	$('<input type="hidden" name="mapCentre">').val(map.getCenter().toString()).appendTo('#theForm');
 	$('<input type="hidden" name="mapZoom">').val(map.getZoom()).appendTo('#theForm');
 	
@@ -194,6 +197,26 @@ function placeMarker(coordinates,info,style) {
 		map: map,
 		title: info.name
 	});
+
+	if (info.occurrenceId) {
+		
+		prevMarkers[info.occurrenceId] = marker;
+	}
+
+	if (info.addDelete) {
+
+		var o = info.occurrenceId;
+
+		google.maps.event.addListener(marker, 'rightclick', function(event) {
+			if (confirm('Are you sure?')) {
+				this.setMap(null);
+				if (prevPolygons[o]) prevPolygons[o].setMap(null);
+				deleteOccurrence(o);
+			}
+		});
+
+	}
+
 
 	if (info.description) {
 
@@ -271,6 +294,23 @@ function drawPolygon(bounds,style,info) {
 	polygon.setMap(map);
 
 	if (!info) return;
+	
+	if (info.addDelete) {
+		
+		var b = info.addMarker;
+		var o = info.occurrenceId;
+
+		prevPolygons[o] = polygon;
+
+		google.maps.event.addListener(polygon, 'rightclick', function(event) {
+			if (confirm('Are you sure?')) {
+				if (b) prevMarkers[o].setMap(null);
+				this.setMap(null);
+				deleteOccurrence(o);
+			}
+		});
+
+	}
 
 	if (info.addMarker) {
 		
@@ -288,102 +328,19 @@ function drawPolygon(bounds,style,info) {
 
 }
 
+function deleteOccurrence(id) {
 
-
-
-
-function setRectangleBounds(coordinates) {
-
-	if (coordinates && rectangle)
-		rectangle.setBounds(
-			new google.maps.LatLngBounds(
-				new google.maps.LatLng(coordinates.coordinate1.lat,coordinates.coordinate1.lng),
-				new google.maps.LatLng(coordinates.coordinate2.lat,coordinates.coordinate2.lng)
-			)
-		);
-
-}
-
-
-
-function toggleSelecting() {
-
-	selecting = !selecting;
-	
-	$('#btn-enable').val(selecting ? 'stop selecting' : 'start selecting');
-	
-//	map.setOptions({draggable: selecting ? false : true});
-		
-}
-
-/* darwing a rectangle */
-var selecting = false;
-var dragging = false;
-var startLatLng;
-var endLatLng;
-var prevLatLng;
-
-function addHandlersRectangle() {
-
-	google.maps.event.addListener(map, 'mouseup', function(event) {mouseUpRectangle(event,'map');});
-	google.maps.event.addListener(rectangle, 'mouseup', function(event) {mouseUpRectangle(event,'overlay');});
-	google.maps.event.addListener(map, 'mousemove', function(event) {mouseMoveRectangle(event,'map');});
-	google.maps.event.addListener(rectangle, 'mousemove', function(event) {mouseMoveRectangle(event,'overlay');});
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_occurrence' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			return (parseInt(data)==1);
+		}
+	});
 
 }
-	
-function mouseUpRectangle(event,caller) {
-
-	// overlay creates a mystery second mouseup when finishing the first rectangle after loading!?
-	if (!dragging && caller!='overlay') {
-		if (!selecting) return;
-		rectangle.setMap(map);
-		dragging = true;
-		startLatLng = event.latLng;
-		endLatLng = new google.maps.LatLng;
-		$('#coordinates-start').html(startLatLng.toString());
-	} else
-	if (dragging) {
-		dragging = false;
-		endLatLng = event.latLng;
-		setRectangleForm();
-		toggleSelecting();
-	}
-
-}
-
-function mouseMoveRectangle(event) {
-
-	if (dragging) {
-
-		var currentLatLng = event.latLng;
-		if (startLatLng.lng()<currentLatLng.lng())
-			var bounds = new google.maps.LatLngBounds(startLatLng,currentLatLng);
-		else
-			var bounds = new google.maps.LatLngBounds(currentLatLng,startLatLng);
-		rectangle.setBounds(bounds);
-		//$('#coordinates-end').html(currentLatLng.toString());
-		prevLatLng = currentLatLng;
-
-	}
-		
-}
-
-function removeRectangle() {
-
-	rectangle.setMap(null);
-
-}
-
-function setRectangleForm(clear) {
-
-	$('#coordinate1_lat').val(clear ? null : startLatLng.lat());
-	$('#coordinate1_lng').val(clear ? null : startLatLng.lng());
-	$('#coordinate2_lat').val(clear ? null : endLatLng.lat());
-	$('#coordinate2_lng').val(clear ? null : endLatLng.lng());
-	$('#zoom').val(clear ? null : map.getZoom());
-
-}
-
-
-

@@ -4,6 +4,7 @@
 <div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
 </div>
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -11,32 +12,39 @@ $(document).ready(function(){
 {if $isOnline}
 
 	initMap({$mapInitString});
+	{if $mapBorder}
+	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));
+	{/if}
 
 {foreach from=$occurrences key=k item=v}
 
-{if $v.type=='marker'}
+{if $taxon}
+{assign var=taxonName value=$taxon.taxon}
+{else if $v.taxon.taxon}
+{assign var=taxonName value=$v.taxon.taxon}
+{/if}
 
+{if $v.type=='marker' && $v.latitude && $v.longitude}
 	placeMarker([{$v.latitude},{$v.longitude}],{literal}{{/literal}
-		name: '{$v.taxon.taxon}',
-		addMarker: true
+		name: '{$taxonName}',
+		addMarker: true,
+		addDelete: true,
+		occurrenceId: {$v.id}		
 	{literal}});{/literal}
-
-{else}
-
+{elseif $v.type=='polygon' && $v.nodes}
 	var nodes{$k} = Array();
 	{foreach from=$v.nodes key=kn item=vn}
 	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
 	{/foreach}
 	drawPolygon(nodes{$k},null,{literal}{{/literal}
-		name: '{$v.taxon.taxon}',
-		addMarker: true
+		name: '{$taxonName}',
+		addMarker: true,
+		addDelete: true,
+		occurrenceId: {$v.id}
 	{literal}});{/literal}
 
 {/if}
-
 {/foreach}
-
-
 {else}
 alert('Your computer appears to be offline.\nUnable to display map.');
 {/if}
