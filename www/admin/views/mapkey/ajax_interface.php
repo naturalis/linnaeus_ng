@@ -4,5 +4,8 @@ require_once ('../../../../configuration/admin/controllers/MapKeyController.php'
 
 $c = new MapKeyController();
 
-$c->mapViewsAction();
+$c->setExcludeFromReferer(true);
 
+$c->setNoResubmitvalReset(true);
+
+$c->ajaxInterfaceAction();

@@ -18,20 +18,22 @@ function toggleAllSpecies() {
 {/literal}
 <div id="page-main">
 <p>
-Click the 'view on map' link of the occurrence you want to see, or check the checkboxes of all the occurrences you want to see and click 'show selected'.
+To view all the occurrences of a single species, click the name of that species.<br />
+To view a single occurrence, click the 'view on map' link of that occurrence.<br />
+To view multiple occurrences, check the checkboxes of all the occurrences you want to see and click 'show selected'.
 <p>
 <form action="species_show.php" method="post">
 <table>
 {foreach from=$taxa key=k item=v}
 	<tr class="tr-highlight">
-		<td>{$v.taxon}</td>
+		<td><a href="species_show.php?t={$v.id}">{$v.taxon}</a></td>
 	{foreach from=$v.occurrences key=l item=o}
 	{if $l!=0}
 	<tr class="tr-highlight">
 		<td>&nbsp;</td>
 	{/if}
 		<td>{$o.type}</td>
-		<td>{if $o.type==marker}{$o.coordinate}{else}{$o.coordinate}{/if}</td>
+		<td>{if $o.type==marker}({$o.latitude},{$o.longitude}){else}{$o.boundary_nodes|@substr:1:50}...{/if}</td>
 		<td>[<a href="species_show.php?id={$o.id}">view on map</a>]</td>
 		<td><input type="checkbox" id="species-{$o.id}" name="id[]" value="{$o.id}"></td>
 	</tr>
