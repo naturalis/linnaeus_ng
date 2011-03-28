@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-21 17:53:43
+<?php /* Smarty version 2.6.26, created on 2011-03-25 13:41:53
          compiled from ../shared/footer.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/footer.tpl', 3, false),array('modifier', 'escape', '../shared/footer.tpl', 7, false),array('modifier', 'addslashes', '../shared/footer.tpl', 20, false),)), $this); ?>
@@ -6,7 +6,7 @@ smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared
 <div id="back-to-search">
 <span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>back to search results<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
 </div>
-<?php elseif ($this->_tpl_vars['backlink']['url']): ?>
+<?php elseif ($this->_tpl_vars['backlink']['url'] == 'not implemented'): ?>
 <p>
 <span class="a" onclick="doBackForm('<?php echo $this->_tpl_vars['backlink']['url']; ?>
 ','<?php echo smarty_modifier_escape($this->_tpl_vars['backlink']['data']); ?>

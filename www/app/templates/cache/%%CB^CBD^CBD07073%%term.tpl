@@ -1,9 +1,9 @@
 334
-a:4:{s:8:"template";a:7:{s:8:"term.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300726312;s:7:"expires";i:1300729912;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:8:"term.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300786004;s:7:"expires";i:1300789604;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Glossary: "Av"</title>
+	<title>Imaginary Beings Of The Literary World: Glossary: "Aaaaa"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/glossary.css");
@@ -71,18 +71,32 @@ a:4:{s:8:"template";a:7:{s:8:"term.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:
 		</div>
 
 <div id="page-main">
-	<div id="term">Av</div>
-	<div id="defintion">Av (Hebrew: אָב‎, Standard Av Tiberian ʾĀḇ ; from Akkadian abu) is the eleventh month of the civil year and the fifth month of the ecclesiastical year on the Hebrew calendar. The name is Babylonian in origin and appeared in the Talmud around the 3rd century. This is the only month which is not named in the Bible. It is a summer month of 30 days. Av usually occurs in July–August on the Gregorian calendar.
-
-The Babylonian Talmud, Taanit 29a, states that "when we enter [the month of] Av, our joy is diminished". This is because the darkest events in Jewish history occurred during the first week and a half of this month, particularly The Nine Days which culminate in Tisha B'Av, the 9th of Av. However, there is a minor and largely unknown holiday during the full moon of the month called Tu B'Av which was, in ancient times, one of the happiest days of the year.
-
-The month is also sometimes referred to as Menachem Av (Hebrew: מנחם אב‎) (Av of Comfort or Comforter of Father(s)), but most only use this title in the sanctification of the month recited on the Shabbat before Rosh Chodesh and following Tisha B'Av.</div>
+	<div id="term">Aaaaa</div>
+	<div id="defintion">The letter has two minuscule (lower-case) forms. The form used in most current handwriting consists of a circle and vertical stoke ("ɑ"), called Latin alpha or "script a". Most printed material uses a form consisting of a small loop with an arc over it ("a"). Both derive from the majuscule (capital) form. In Greek handwriting, it was common to join the left leg and horizontal stroke into a single loop, as demonstrated by the Uncial version shown. Many fonts then made the right leg vertical. In some of these, the serif that began the right leg stroke developed into an arc, resulting in the printed form, while in others it was dropped, resulting in the modern handwritten form.</div>
 		
+	<div id="synonyms">
+		<div id="synonyms-title">Synonyms</div>
+					<div class="synonym">A (English)</div>
+					<div class="synonym">Aa (English)</div>
+					<div class="synonym">Aaa (English)</div>
+					<div class="synonym">Aaaa (English)</div>
+					<div class="synonym">Aaaaa (English)</div>
+					<div class="synonym">Aaaaaaaa (English)</div>
+			</div>
+		
+		<div id="media">
+		<div id="media-title">Images</div>
+			<div class="image-cell">
+					<img
+				class="image-thumb"
+				onclick="showMedia('../../../admin/media/project/0002/741%20%282%29.jpg','741.jpg');" 
+				src="../../../admin/media/project/0002/thumbs/741%20%282%29-thumb.jpg" />
+				</div>
+		</div>
 	
 	<div id="navigation">
-				<span onclick="goGlossaryTerm(38)" id="prev">< previous</span>
 				<span id="back" onclick="goAlpha('A','index.php')">back to index</span>
-				<span onclick="goGlossaryTerm(35)" id="next">next ></span>
+				<span onclick="goGlossaryTerm(33)" id="next">next ></span>
 			</div>
 </div>
 
@@ -98,7 +112,7 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','34')
+addRequestVar('id','25')
 
 })
 

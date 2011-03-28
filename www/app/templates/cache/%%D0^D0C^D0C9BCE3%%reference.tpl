@@ -1,9 +1,9 @@
 340
-a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300717873;s:7:"expires";i:1300721473;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300786088;s:7:"expires";i:1300789688;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Literature: "Schermer, M.D. & Borges, J.L. (1975)"</title>
+	<title>Imaginary Beings Of The Literary World: Literature: "Aaproodm'ies & Johnson, H. (1999)"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/literature.css");
@@ -54,7 +54,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 </div><div id="page-container">
 
 <div id="alphabet">
-			<span class="letter" onclick="goAlpha('a','index.php')">a</span>
+			<span class="letter-active">a</span>
 				<span class="letter" onclick="goAlpha('b','index.php')">b</span>
 				<span class="letter" onclick="goAlpha('c','index.php')">c</span>
 				<span class="letter" onclick="goAlpha('d','index.php')">d</span>
@@ -66,7 +66,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 				<span class="letter" onclick="goAlpha('o','index.php')">o</span>
 				<span class="letter" onclick="goAlpha('p','index.php')">p</span>
 				<span class="letter" onclick="goAlpha('q','index.php')">q</span>
-				<span class="letter-active">s</span>
+				<span class="letter" onclick="goAlpha('s','index.php')">s</span>
 				<span class="letter" onclick="goAlpha('w','index.php')">w</span>
 				<span class="letter" onclick="goAlpha('y','index.php')">y</span>
 				<span class="letter" onclick="goAlpha('ה','index.php')">ה</span>
@@ -77,21 +77,51 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	<div id="reference">
 		<div id="author">
 			<span id="name">
-				Schermer, M.D. & Borges, J.L.
+				Aaproodm'ies & Johnson, H.
 			</span>
-			<span id="year">1975</span>
+			<span id="year">1999</span>
 		</div>
-		<div id="text">Uh la la <i>Shoebalalala</i></div>
+		<div id="text">The result of the two var dumps are 3 and 0, respectively.  Clearly the internal pointer of $a['b'] was reset by doing the foreach loop over $a.
 
+Each time the foreach loop iterated over the 'a' and 'b' keys of $a it made a copy of $a['a'] and $a['b'] into $d which resetted the internal pointers of $a['a'] and $a['b'] despite making no obvious changes.
+
+The <b>solution is instead</b> to <i>iterate</i> over the keys of $a.</div>
+
+			<div id="taxa">
+			<div class="title">Referenced in the following taxa:</div>
+					<div>
+				<span class="a" onclick="goTaxon(1)">Animalia</span>
+							</div>
+					<div>
+				<span class="a" onclick="goTaxon(5)">Ursidae</span>
+							</div>
+					<div>
+				<span class="a" onclick="goTaxon(10)">Ursus thibetanus thibetanus</span>
+				<span class="hybrid-marker" title="hybrid">X</span>			</div>
+					<div>
+				<span class="a" onclick="goTaxon(37)">Ursus americanus</span>
+							</div>
+					<div>
+				<span class="a" onclick="goTaxon(16)">Ursus maritimus</span>
+							</div>
+				</div>
+		
 	
+			<div id="synonyms">
+			<div class="title">Referenced in the following synonyms:</div>
+					<div><span class="a" onclick="goTaxon(1,'names')">Beestjes</span></div>
+				</div>
 	
 	</div>
 
 	<div id="navigation">
-		<span id="back" onclick="goAlpha('S','index.php')">back to index</span>
+		<span id="back" onclick="goAlpha('A','index.php')">back to index</span>
 	</div>
 </div>
 
+<p>
+<span class="a" onclick="doBackForm('/app/views/literature/','[{&quot;var&quot;:&quot;letter&quot;,&quot;val&quot;:&quot;a&quot;}]');" title="Back to Literature Index: A">BACK</span>
+</p>
 </div ends="page-container">
 <div id="footer-container">
 </div ends="footer-container">
@@ -104,11 +134,11 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','19')
+addRequestVar('id','4')
+
 })
 
 </script>
 
 </body>
 </html>
-
