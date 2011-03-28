@@ -2,6 +2,10 @@
 
 /*
 
+	delete type = delete data!
+
+	add choice of colours
+
 	make default central point configurable
 			$this->smarty->assign('middelLat',24.886436490787712);
 			$this->smarty->assign('middelLng',-70.2685546875);
@@ -11,14 +15,6 @@
 
 
 /*
-
-keuze google map(s)
-	vierkant op basis coordinaten
-	handmatig getekend
-	een of andere google string
-		coordinaten
-		lagen
-		zoom level
 
 per soort: voorkomen
 	punt
@@ -78,7 +74,9 @@ class MapKeyController extends Controller
     public $usedModels = array(
 		'map',
 		'map_name',
-		'occurrence_taxon'
+		'occurrence_taxon',
+		'geodata_type',
+		'geodata_type_title'
 	);
     
     public $usedHelpers = array('csv_parser_helper');
@@ -91,6 +89,7 @@ class MapKeyController extends Controller
 		'all' => 
 			array(
 				'mapkey.js',
+				'jscolor/jscolor.js',
 				'http://maps.google.com/maps/api/js?sensor=false'
 			)
 		);
@@ -129,6 +128,17 @@ class MapKeyController extends Controller
 		
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
+		$gt = $this->models->GeodataType->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentprojectId()
+				),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		$this->smarty->assign('dataTypeCount',$gt[0]['total']);
+
         $this->printPage();
     
     }
@@ -141,8 +151,20 @@ class MapKeyController extends Controller
 		$this->setPageName(_('Choose a species'));
 
 		$this->getTaxonTree(null,true);
+		
+		foreach ((array)$this->treeList as $key => $val) {
 
-		if(isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+			if ($val['lower_taxon']=='1') $taxa[$key] = $val;
+
+		}
+	
+		$pagination = $this->getPagination($taxa,$this->controllerSettings['speciesPerPage']);
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		if(isset($this->treeList)) $this->smarty->assign('taxa',$pagination['items']);
 
 		$this->printPage();	
 
@@ -169,6 +191,7 @@ class MapKeyController extends Controller
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/choose_species.php'
             )
         );
+
         $this->setPageName(sprintf(_('Add occurrences for "%s"'),$taxon['taxon']));
 		
 		$saved = 0;
@@ -182,7 +205,8 @@ class MapKeyController extends Controller
 					$s = $this->saveOccurrenceMarker(
 						array(
 							'taxonId'=> $this->requestData['id'],
-							'coord'=> $val
+							'coord'=> $val,
+							'type_id' => $this->requestData['markersDatatype'][$key]
 						)
 					);
 					
@@ -199,7 +223,8 @@ class MapKeyController extends Controller
 					$s = $this->saveOccurrencePolygon(
 						array(
 							'taxonId' => $this->requestData['id'],
-							'coord' => $val
+							'coord' => $val,
+							'type_id' => $this->requestData['polygonsDatatype'][$key]
 						)
 					);
 	
@@ -210,6 +235,11 @@ class MapKeyController extends Controller
 			}
 
 		}
+
+
+		$ot = $this->getTaxonOccurrences($this->requestData['id']);
+
+		if ($ot) $taxon['occurrences'] = $ot;
 
 		if ($this->rHasVal('mapCentre') || isset($_SESSION['system']['mapCentre'])) {
 
@@ -231,6 +261,8 @@ class MapKeyController extends Controller
 
 		}
 		
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
 		$this->smarty->assign('taxon',$taxon);
 
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
@@ -239,12 +271,12 @@ class MapKeyController extends Controller
     
     }
 
-    public function speciesAction()
+    public function speciesSelectAction()
     {
 
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Choose an occurrence'));
+		$this->setPageName(_('Choose a species'));
 
 		$this->getTaxonTree(null,true);
 
@@ -252,16 +284,50 @@ class MapKeyController extends Controller
 
 			$ot = $this->getTaxonOccurrences($val['id']);
 			
-			if ($ot) {
-
-				$val['occurrences'] = $ot;
-				$taxa[] = $val;
-
-			}
+			if ($ot) $taxa[] = $val;
 
 		}	
 
 		if(isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		$this->printPage();
+		
+    }
+
+
+    public function speciesAction()
+    {
+
+        $this->checkAuthorisation();
+
+		if ($this->rHasId()) {
+
+			$this->setPageName(_('Choose an occurrence'));
+	
+			$this->setBreadcrumbIncludeReferer(
+				array(
+					'name' => _('Choose a species'), 
+					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species_select.php'
+				)
+			);
+
+			$this->getTaxonTree(null,true);
+
+			$taxon = $this->treeList[$this->requestData['id']];
+	
+			$ot = $this->getTaxonOccurrences($this->requestData['id']);
+
+			if ($ot) $taxon['occurrences'] = $ot;
+
+			//$ot = $this->customSortArray($ot, array('key' => 'type_id'));
+
+		} else {
+
+			$this->redirect('species_select.php');
+
+		} 
+
+		if(isset($taxon)) $this->smarty->assign('taxon',$taxon);
 
 		$this->printPage();
 		
@@ -273,53 +339,27 @@ class MapKeyController extends Controller
 
         $this->checkAuthorisation();
 
+		if (!$this->rHasId()) $this->redirect('species.php');
+
 		$isOnline = $this->checkRemoteServerAccessibility();
 		
-		if (!$this->rHasId() && !$this->rHasVal('t')) {
-
-			$this->redirect('species.php');
-
-		}
-
         $this->setBreadcrumbIncludeReferer(
             array(
                 'name' => _('Choose an occurrence'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php'
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php?id='.$this->requestData['s']
             )
         );
 
-		$this->setPageName(_('Species occurrences'));
+		$this->getTaxonTree(null,true);
 
-		$allNodes = array();
+		$taxon = $this->treeList[$this->requestData['s']];
 
-		if ($this->rHasVal('t') && $isOnline) {
+		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$taxon['taxon']));
 
-			$this->getTaxonTree(null,true);
-			
-			$taxon = $this->treeList[$this->requestData['t']];
+		if ($this->rHasId() && $isOnline) {
 		
-			$this->setPageName(sprintf(_('Species occurrences for "%s"'),$taxon['taxon']));
+			$allNodes = array();
 
-			$so = $this->getTaxonOccurrences($this->requestData['t']);
-
-			foreach((array)$so as $key => $val) {
-
-				if ($val['type']=='polygon') {
-
-					$so[$key]['nodes'] = json_decode($val['boundary_nodes']);
-					$allNodes = array_merge($allNodes,$so[$key]['nodes']);
-
-				} else {
-					
-					$a[] = array($val['latitude'],$val['longitude']);
-					$allNodes = array_merge($allNodes,$a);
-				
-				}
-
-			}
-
-		} elseif ($this->rHasId() && $isOnline) {
-		
 			foreach((array)$this->requestData['id'] as $key => $val) {
 
 				$d = $this->getOccurrence($val);
@@ -387,7 +427,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName(_('Occurrence file upload'));
 
-		if ($this->requestDataFiles && !$this->isFormResubmit()) {
+		if ($this->requestDataFiles) { // && !$this->isFormResubmit()) {
 
 			switch ($this->requestData["delimiter"]) {
 				case 'comma' :
@@ -408,175 +448,189 @@ class MapKeyController extends Controller
 			if (!$this->getErrors()) {
 
 				$this->getTaxonTree(null,true);
-				
+
+				$geodataTypes = $this->getGeodataTypes();
+
 				$r = $this->helpers->CsvParserHelper->getResults();
 				
 				$line = 0;
-				
+
 				foreach((array)$r as $key => $val) {
 				
 					$line++;
 				
 					if (is_numeric($val[0])) {
-					
+
 						$taxonId = $val[0];
 						
 						if (isset($this->treeList[$taxonId])) {
 
-							if (trim(strtolower($this->treeList[$taxonId]['taxon']))==trim(strtolower($val[1]))) {
-							
-								if ($val[4]=='') {
-								// marker
-								
-									if (!empty($val[2]) && !empty($val[3])) {
-									
-										$val[2] = $this->sanitizeDotsAndCommas($val[2]);
-										$val[3] = $this->sanitizeDotsAndCommas($val[3]);
-										
-										$ot = $this->saveOccurrenceMarker(
-											array(
-												'taxonId' => $taxonId,
-												'lat' => $val[2],
-												'lng' => $val[3]
-											)
-										);
+							$geodataTypeId = $val[2];
 
-										if ($ot===true) {
-										
-											$this->addMessage(
-												sprintf(
-													_('Row %s: saved marker for "%s".'),
-													$line,
-													$val[1]
-												)
-											);
-										
-										} else {
+							if (isset($geodataTypes[$geodataTypeId])) {
 
-											$this->addError(
-												sprintf(
-													_('Row %s: unable to save marker for "%s". Duplicate?'),
-													$line,
-													$val[1]
-												)
-											);
-
-										}
-									
-									} else {
-									
-										$this->addError(
-											sprintf(
-												_('Row %s: marker for "%s" misses %s.'),
-												$line,
-												$val[1],
-												(empty($val[2]) ? _('latitude') : _('longitude') )
-											)
-										);
-									
-									}
+								if (trim(strtolower($this->treeList[$taxonId]['taxon']))==trim(strtolower($val[1]))) {
 								
-								} else {
-								// polygon
-								
-									$continue=true;
-									$i=0;
-									$geoStr = array();
-									$nodes = array();
+									if ($val[5]=='') {
+									// marker
 									
-									while($continue && $i<=9999) {
-									
-										$cLat = isset($val[4+$i]) ? $val[4+$i] : null;
-										$cLon = isset($val[5+$i]) ? $val[5+$i] : null;
+										if (!empty($val[3]) && !empty($val[4])) {
 										
-										if ($cLat=='') {
-										
-											$continue = false;
-										
-										} else {
-										
-											if ($cLon=='') {
+											$val[3] = $this->sanitizeDotsAndCommas($val[3]);
+											$val[4] = $this->sanitizeDotsAndCommas($val[4]);
 											
-												$this->addError(
+											$ot = $this->saveOccurrenceMarker(
+												array(
+													'taxonId' => $taxonId,
+													'lat' => $val[3],
+													'lng' => $val[4],
+													'type_id' => $geodataTypeId
+												)
+											);
+	
+											if ($ot===true) {
+											
+												$this->addMessage(
 													sprintf(
-														_('Row %s: polygon node for "%s" misses longitude'),
+														_('Row %s: saved marker for "%s".'),
 														$line,
 														$val[1]
 													)
 												);
-												
+											
 											} else {
+	
+												$this->addError(
+													sprintf(
+														_('Row %s: unable to save marker for "%s". Duplicate?'),
+														$line,
+														$val[1]
+													)
+												);
+	
+											}
+										
+										} else {
+										
+											$this->addError(
+												sprintf(
+													_('Row %s: marker for "%s" misses %s.'),
+													$line,
+													$val[1],
+													(empty($val[3]) ? _('latitude') : _('longitude') )
+												)
+											);
+										
+										}
+									
+									} else {
+									// polygon
+									
+										$continue=true;
+										$i=0;
+										$geoStr = array();
+										$nodes = array();
+										
+										while($continue && $i<=9999) {
+										
+											$cLat = isset($val[5+$i]) ? $val[5+$i] : null;
+											$cLon = isset($val[6+$i]) ? $val[6+$i] : null;
+											
+											if ($cLat=='') {
+											
+												$continue = false;
+											
+											} else {
+											
+												if ($cLon=='') {
 												
-												$cLat = $this->sanitizeDotsAndCommas($cLat);
-												$cLon = $this->sanitizeDotsAndCommas($cLon);
+													$this->addError(
+														sprintf(
+															_('Row %s: polygon node for "%s" misses longitude'),
+															$line,
+															$val[1]
+														)
+													);
+													
+												} else {
+													
+													$cLat = $this->sanitizeDotsAndCommas($cLat);
+													$cLon = $this->sanitizeDotsAndCommas($cLon);
+													
+													$geoStr[] = $cLat.' '.$cLon;
+													$nodes[] = array($cLat,$cLon);
 												
-												$geoStr[] = $cLat.' '.$cLon;
-												$nodes[] = array($cLat,$cLon);
+												}
 											
 											}
+											
+											$i=$i+2;
 										
 										}
 										
-										$i=$i+2;
-									
-									}
-									
-									if (count($geoStr)>0) {
-
-										$ot = $this->saveOccurrencePolygon(
-											array(
-												'taxonId' => $taxonId,
-												'geoStr' => implode(',',$geoStr),
-												'nodes' => $nodes
-											)
-										);
-										
-										if ($ot===true) {
-										
-											$this->addMessage(
-												sprintf(
-													_('Row %s: saved polygon for "%s".'),
-													$line,
-													$val[1]
+										if (count($geoStr)>0) {
+	
+											$ot = $this->saveOccurrencePolygon(
+												array(
+													'taxonId' => $taxonId,
+													'geoStr' => implode(',',$geoStr),
+													'nodes' => $nodes,
+													'type_id' => $geodataTypeId
 												)
 											);
-										
-										} else {
-
-											$this->addError(
-												sprintf(
-													_('Row %s: unable to save polygon for "%s". Duplicate?'),
-													$line,
-													$val[1]
-												)
-											);
-										
-										}										
-										
-										unset($geoStr);
-										unset($nodes);
-
+											
+											if ($ot===true) {
+											
+												$this->addMessage(
+													sprintf(
+														_('Row %s: saved polygon for "%s".'),
+														$line,
+														$val[1]
+													)
+												);
+											
+											} else {
+	
+												$this->addError(
+													sprintf(
+														_('Row %s: unable to save polygon for "%s". Duplicate?'),
+														$line,
+														$val[1]
+													)
+												);
+											
+											}										
+											
+											unset($geoStr);
+											unset($nodes);
+	
+										}
+									
 									}
 								
+								} else {
+								
+									$this->addError(
+										sprintf(
+											_('Row %s: mismatch for taxa %s: "%s" (file) <=> "%s" (database)'),
+											$line,
+											$taxonId,
+											$val[1],
+											$this->treeList[$taxonId]['taxon']
+										)
+									);
+	
 								}
 							
 							} else {
-							
-								$this->addError(
-									sprintf(
-										_('Row %s: mismatch for taxa %s: "%s" (file) <=> "%s" (database)'),
-										$line,
-										$taxonId,
-										$val[1],
-										$this->treeList[$taxonId]['taxon']
-									)
-								);
+
+								$this->addError(sprintf(_('Row %s: unknown data type ID %s'),$line,$geodataTypeId));
 
 							}
-							
+	
 						} else {
 						
-							$this->addError(sprintf(_('Row %s: unknown ID %s'),$line,$taxonId));
+							$this->addError(sprintf(_('Row %s: unknown taxon ID %s'),$line,$taxonId));
 						
 						}
 					
@@ -605,6 +659,7 @@ class MapKeyController extends Controller
 		$this->getTaxonTree(null,true);
 
 		$this->smarty->assign('taxa',$this->treeList);
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
@@ -616,6 +671,270 @@ class MapKeyController extends Controller
 		
     }
 
+	private function getGeodataTypes($id=null)
+	{
+	
+		$d['project_id'] = $this->getCurrentProjectId();
+		if (isset($id)) $d['id'] = $id;
+	
+		$gt = $this->models->GeodataType->_get(
+			array(
+				'id' => $d,
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+		foreach ((array)$gt as $key => $val) {
+
+			$gtl = $this->models->GeodataTypeTitle->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $_SESSION['project']['default_language_id'],
+						'type_id' => $val['id']
+					)
+				)
+			);
+			
+			$gt[$key]['title'] = isset($gtl[0]['title']) ? $gtl[0]['title'] : '-';
+
+		}
+		
+		return (isset($id)) ? array_shift($gt) : $gt;
+	
+	}
+
+	private function saveGeodataTitle($params)
+	{
+
+		$languageId = isset($params['language_id']) ? $params['language_id'] : null;
+		$title = isset($params['title']) ? $params['title'] : null;
+		$type_id = isset($params['type_id']) ? $params['type_id'] : null;
+
+		if ($languageId==null || $type_id==null) return _('Insufficient data.');
+
+		if (empty($params['title'])) {
+
+			return $this->models->GeodataTypeTitle->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $languageId,
+					'type_id' => $type_id
+				)
+			);
+
+		} else {
+
+			$gtt = $this->models->GeodataTypeTitle->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $languageId,
+						'type_id' => $type_id
+					)
+				)
+			);
+			
+			if (isset($gtt[0]['title']) && $gtt[0]['title']==$title) return true;
+
+			return $this->models->GeodataTypeTitle->save(
+				array(
+					'id' => (isset($gtt[0]['id']) ? $gtt[0]['id'] : 'null' ),
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $languageId,
+					'type_id' => $type_id,
+					'title' => $title
+				)
+			);
+
+		}
+	
+	}
+
+	private function saveGeodataColour($params)
+	{
+
+		$id = isset($params['id']) ? $params['id'] : null;
+		$colour = isset($params['colour']) ? $params['colour'] : null;
+
+		if (!isset($id) ||!isset($colour)) return false;
+
+		return $this->models->GeodataType->save(
+			array(
+				'id' => $id, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'colour' => $colour
+			)
+		);
+
+	}
+			
+    private function createGeodataType ($title,$languageId)
+    {
+
+		$gtt = $this->models->GeodataTypeTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'title' => $title, 
+					'language_id' => $languageId
+				),
+				'columns' => 'count(*) as total'
+			)
+		);
+		
+		if ($gtt[0]['total']>0) return _('A data type with that name already exists.');
+
+		$this->models->GeodataType->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getCurrentProjectId(), 
+			)
+		);
+
+		$typeId = $this->models->GeodataType->getNewId();
+
+		$gt = $this->saveGeodataTitle(
+			array(
+				'title' => $title,
+				'language_id' => $languageId,
+				'type_id' => $typeId
+			)
+		);
+		
+		if ($gt!==true) {
+
+			$this->models->GeodataType->delete(
+				array(
+					'id' => $typeId, 
+					'project_id' => $this->getCurrentProjectId(), 
+				)
+			);
+
+		}
+		
+		return $gt;
+
+    }
+
+    private function deleteGeodataType ($id)
+    {
+
+		if (!$id) return;
+
+		$this->models->GeodataTypeTitle->delete(
+			array(
+				'type_id' => $id, 
+				'project_id' => $this->getCurrentProjectId(), 
+			)
+		);
+		
+		$this->models->GeodataType->delete(
+			array(
+				'id' => $id, 
+				'project_id' => $this->getCurrentProjectId(), 
+			)
+		);
+
+    }
+	
+
+	public function dataTypesAction()
+	{
+	
+		$this->checkAuthorisation();
+		
+		$this->setPageName( _('Data types'));
+
+		$lp = $_SESSION['project']['languages'];
+		
+		$defaultLanguage = $_SESSION['project']['default_language_id'];
+		
+        if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
+		// deleting a type
+        
+            $tp = $this->deleteGeodataType($this->requestData['del_type']);
+
+        } else
+        if ($this->rHasVal('new_type') && !$this->isFormResubmit()) {
+        // adding a new type
+        
+            $tp = $this->createGeodataType($this->requestData['new_type'],$defaultLanguage);
+            
+            if ($tp !== true) $this->addError($tp);
+
+        }
+
+		$types = $this->models->GeodataType->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+			)
+		);
+
+		foreach ((array) $types as $key => $type) {
+
+			foreach ((array) $lp as $k => $language) {
+
+				$gtt = $this->models->GeodataTypeTitle->_get(
+					array(
+						'id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'type_id' => $type['id'], 
+						'language_id' => $language['language_id']
+						)
+					)
+				);
+				
+				$types[$key]['type_titles'][$language['language_id']] = $gtt[0]['title'];
+			
+			}
+		
+		}
+
+        $this->smarty->assign('maxTypes', $this->controllerSettings['maxTypes']);
+
+		$this->smarty->assign('languages', $lp);
+		
+		$this->smarty->assign('defaultLanguage', $defaultLanguage);
+		
+        $this->smarty->assign('types', $types);
+
+		$this->printPage();
+		
+	}
+
+	private function ajaxGetTypeLabels()
+	{
+	
+		if (!$this->rHasVal('language')) return;
+
+		return $this->models->GeodataTypeTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->requestData['language']
+					)
+				)
+		);
+
+	}
+
+	private function ajaxGetTypeColours()
+	{
+	
+		return $this->models->GeodataType->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+				),
+				'columns' => 'id,colour'
+				)
+		);
+
+	}
+
+
     /**
      * AJAX interface for this class
      *
@@ -626,6 +945,41 @@ class MapKeyController extends Controller
 
         if (!$this->rHasVal('action')) return;
         
+        if ($this->requestData['action'] == 'save_type_label') {
+		
+			$d = $this->saveGeodataTitle(
+				array(
+					'language_id' => $this->requestData['language'],
+					'title' => $this->requestData['value'],
+					'type_id' => $this->requestData['id']
+				)
+			);
+
+			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+
+        } else
+        if ($this->requestData['action'] == 'get_type_labels') {
+		
+			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeLabels()));
+
+        } else
+        if ($this->requestData['action'] == 'save_type_colour') {
+		
+			$d = $this->saveGeodataColour(
+				array(
+					'id' => $this->requestData['id'],
+					'colour' => $this->requestData['value']
+				)
+			);
+
+			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+
+        } else
+        if ($this->requestData['action'] == 'get_type_colours') {
+		
+			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeColours()));
+
+        } else
         if ($this->requestData['action'] == 'delete_occurrence') {
             
             if ($this->deleteOccurrence($this->requestData['id']))
@@ -661,6 +1015,7 @@ class MapKeyController extends Controller
 		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
 		$lat = isset($p['lat']) ? $p['lat'] : null;
 		$lng = isset($p['lng']) ? $p['lng'] : null;
+		$type_id = isset($p['type_id']) ? $p['type_id'] : null;
 
 		if (!isset($lat) && !isset($lng) && isset($p['coord'])) {
 
@@ -670,13 +1025,14 @@ class MapKeyController extends Controller
 
 		}
 
-		if (!isset($taxonId) || !isset($lat) || !isset($lng)) return;
+		if (!isset($taxonId) || !isset($lat) || !isset($lng) || !isset($type_id)) return;
 
 		return $this->models->OccurrenceTaxon->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $taxonId,
+				'type_id' => $type_id,
 				'type' => 'marker',
 				'coordinate' => '#Point('.$lat.','.$lng.')',
 				'latitude' => $lat,
@@ -693,6 +1049,7 @@ class MapKeyController extends Controller
 		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
 		$geoStr = isset($p['geoStr']) ? $p['geoStr'] : null;
 		$nodes = isset($p['nodes']) ? $p['nodes'] : null;
+		$type_id = isset($p['type_id']) ? $p['type_id'] : null;
 		
 		if (!isset($geoStr) && !isset($nodes) && isset($p['coord'])) {
 		
@@ -717,7 +1074,7 @@ class MapKeyController extends Controller
 
 		}
 
-		if (!isset($taxonId) || !isset($geoStr) || !isset($nodes)) return;
+		if (!isset($taxonId) || !isset($geoStr) || !isset($nodes) || !isset($type_id)) return;
 
 		if (count((array)$nodes)<=2) return;
 
@@ -726,6 +1083,7 @@ class MapKeyController extends Controller
 				'id' => null,
 				'project_id' => $this->getCurrentProjectId(),
 				'taxon_id' => $taxonId,
+				'type_id' => $type_id,
 				'type' => 'polygon',
 				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))')",
 				'boundary_nodes' => json_encode($nodes),
@@ -740,15 +1098,26 @@ class MapKeyController extends Controller
 	
 		if (!isset($id)) return;
 
-		return $this->models->OccurrenceTaxon->_get(
+		$ot = $this->models->OccurrenceTaxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id,
 				),
-				'columns' => 'id,type,latitude,longitude,boundary_nodes'
+				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes'
 			)
 		);
+
+		foreach((array)$ot as $key => $val) {
+		
+			$d = $this->getGeodataTypes($val['type_id']);	
+			$ot[$key]['type_title'] = $d['title'];
+			$ot[$key]['colour'] = $d['colour'];
+			if ($val['type']=='polygon' && isset($val['boundary_nodes'])) $ot[$key]['nodes'] = json_decode($val['boundary_nodes']);
+
+		}
+	
+		return $ot;
 	
 	}
 
