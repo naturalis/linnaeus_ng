@@ -1,12 +1,12 @@
 335
-a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1300726423;s:7:"expires";i:1300730023;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301056913;s:7:"expires";i:1301060513;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Glossary Index: A</title>
+	<title>Imaginary Beings Of The Literary World: Species module index</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
-		@import url("../../../app/style/0002/glossary.css");
+		@import url("../../../app/style/0002/species.css");
 		@import url("../../../app/style/0002/colorbox/colorbox.css");
 	</style>
 	<script type="text/javascript" src="../../../app/javascript/jquery-1.4.2.min.js"></script>
@@ -24,9 +24,9 @@ a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 	Imaginary Beings Of The Literary World	</div>
 </div><div id="menu-container">
 	<div id="main-menu">
-<a class="menu-item-active" href="../glossary/">Glossary</a>
+<a class="menu-item" href="../glossary/">Glossary</a>
 <a class="menu-item" href="../literature/">Literature</a>
-<a class="menu-item" href="../species/">Species module</a>
+<a class="menu-item-active" href="../species/">Species module</a>
 <a class="menu-item" href="../highertaxa/">Higher taxa</a>
 <a class="menu-item" href="../key/">Dichotomous key</a>
 <a class="menu-item" href="../matrixkey/">Matrix key</a>
@@ -55,107 +55,164 @@ a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 	</div>
 </div><div id="page-container">
 
-<div id="alphabet">
-			<span class="letter-active">a</span>
-				<span class="letter" onclick="goAlpha('b')">b</span>
-				<span class="letter" onclick="goAlpha('c')">c</span>
-				<span class="letter" onclick="goAlpha('f')">f</span>
-				<span class="letter" onclick="goAlpha('g')">g</span>
-				<span class="letter" onclick="goAlpha('k')">k</span>
-				<span class="letter" onclick="goAlpha('l')">l</span>
-				<span class="letter" onclick="goAlpha('m')">m</span>
-				<span class="letter" onclick="goAlpha('p')">p</span>
-				<span class="letter" onclick="goAlpha('q')">q</span>
-				<span class="letter" onclick="goAlpha('s')">s</span>
-				<span class="letter" onclick="goAlpha('y')">y</span>
-		</div>
-
 <div id="page-main">
-<table id="index">
-<thead> 
-	<tr>
-		<th id="th-term">term</th>
-		<th id="th-definition">synonyms</th>
-	</tr>
-</thead>
-<tbody>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(25)">Aaaaa</td>
-		<td>
-					A, 					Aa, 					Aaa, 					Aaaa, 					Aaaaa, 					Aaaaaaaa				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(33)">Aeneid</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(37)">Afyonkarahisar</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(18)">Aha</td>
-		<td>
-					aha's, 					ahahaaa, 					oe-haaaa				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(27)">Album</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(29)">Allmusic</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(30)">Amblyseius</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(28)">Angiosperms</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(32)">Aquaman</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(31)">Archaeology</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(36)">Arthropod</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(26)">Association football</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(38)">Athena</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(34)">Av</td>
-		<td>
-				</td>
-	</tr>
-	<tr class="highlight">
-		<td class="a" onclick="goGlossaryTerm(35)">Awadh</td>
-		<td>
-				</td>
-	</tr>
-</tbody>
-</table>
+	<div id="index">
+		<table>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(57)">
+				Melursus ursinus
+							</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(58)">
+				Melursus ursinus inornatus
+							</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(59)">
+				Melursus ursinus ursinus
+							</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(55)">
+				Tremarctos ornatus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(7)">
+				Ursus luteolus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(8)">
+				Ursus thibetanus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(9)">
+				Ursus thibetanus laniger
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(10)">
+				Ursus thibetanus thibetanus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(11)">
+				Ursus thibetanus gedrosianus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(12)">
+				Ursus thibetanus ussuricus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(13)">
+				Ursus thibetanus mupinensis
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(14)">
+				Ursus thibetanus formosanus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(15)">
+				Ursus thibetanus japonicus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(16)">
+				Ursus maritimus
+							</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(17)">
+				Ursus maritimus marinus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(18)">
+				Ursus maritimus maritimus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(19)">
+				Ursus arctos
+							</td>
+			<td>(Species)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(20)">
+				Ursus arctos nelsoni
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(21)">
+				Ursus arctos beringianus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(22)">
+				Ursus arctos pruinosus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(23)">
+				Ursus arctos horribilis
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(24)">
+				Ursus arctos isabellinus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(25)">
+				Ursus arctos syriacus
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(26)">
+				Ursus arctos stikeenensis
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				<tr class="highlight">
+			<td class="a" onclick="goTaxon(27)">
+				Ursus arctos sitkensis
+				<span class="hybrid-marker" title="hybrid">X</span>			</td>
+			<td>(Infraspecies)</td>
+		</tr>
+				</table>
+	</div>
+	<div id="navigation">
+						<span class="a" onclick="goNavigate(25);">next ></span>
+			</div>
 </div>
 
 </div ends="page-container">
@@ -169,8 +226,7 @@ $(document).ready(function(){
 
 	$('#body-container').height($(document).height());
 	
-addRequestVar('search','enter search term')
-addRequestVar('letter','a')
+addRequestVar('0','')
 
 })
 
