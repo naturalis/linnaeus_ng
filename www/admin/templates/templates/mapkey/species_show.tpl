@@ -4,7 +4,6 @@
 <div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
 </div>
-
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -28,7 +27,7 @@ $(document).ready(function(){
 	placeMarker([{$v.latitude},{$v.longitude}],{literal}{{/literal}
 		name: '{$taxonName}',
 		addMarker: true,
-		addDelete: true,
+		addDelete: false,
 		occurrenceId: {$v.id}		
 	{literal}});{/literal}
 {elseif $v.type=='polygon' && $v.nodes}
@@ -39,12 +38,13 @@ $(document).ready(function(){
 	drawPolygon(nodes{$k},null,{literal}{{/literal}
 		name: '{$taxonName}',
 		addMarker: true,
-		addDelete: true,
+		addDelete: false,
 		occurrenceId: {$v.id}
 	{literal}});{/literal}
 
 {/if}
 {/foreach}
+
 {else}
 alert('Your computer appears to be offline.\nUnable to display map.');
 {/if}

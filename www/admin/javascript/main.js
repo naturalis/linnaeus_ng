@@ -292,6 +292,9 @@ function allSwitchLanguage(language) {
 			matrixGetStateLabel(allActiveLanguage);
 			matrixGetStateText(allActiveLanguage);
 			break;			
+		case 'geotypes':
+			mapGetTypeLabels(allActiveLanguage);
+			break;			
 
 	}
 

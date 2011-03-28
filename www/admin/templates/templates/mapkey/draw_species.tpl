@@ -3,29 +3,39 @@
 <div id="page-main">
 	<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
 	<div id="map_options">
-		<b>Occurrences for "{$taxon.taxon}"</b><br/>
+		<b>Data for "{$taxon.taxon}"</b><br/>
 		Selection type: <span id="selection-type">(none)</span><br />
 		Coordinates:<br /><span id="coordinates">(-1,-1)</span><br />
+		<hr style="height:1px;color:#999" />
+
+		Select the type of data you are drawing on the map:<br />
+		<select id="geodatatype">
+		{foreach from=$geodataTypes key=k item=v}
+		<option value="{$v.id}" colour="{$v.colour}">{$v.title}</option>
+		{/foreach}
+		</select>		
 		
 		<form action="" method="post" id="theForm">
 		<input type="hidden" name="id" value="{$taxon.id}" />
 		<input type="hidden" name="rnd" value="{$rnd}" />
 		<p style="text-align:justify">
-		To enable setting markers (points on the map), click the button below. Then click on the appropriate spot on the map to place a marker. To remove a marker, right-click on it.<br />
+		To enable setting markers (points on the map), click the button below.
+		Then click on the appropriate spot on the map to place a marker. To remove a marker, right-click on it.<br />
 		<input type="button" value="set markers" onclick="setOccurrenceType('marker');" />
 		</p>
 		<p style="text-align:justify">
-		To enable drawing polygons, click the button below. Then draw the polygon by clicking the appropriate spots on the map. When finished drawing, click the button again. To remove a polygon, right-click on it.<br />
+		To enable drawing polygons, click the button below.
+		Then draw the polygon by clicking the appropriate spots on the map. When finished drawing, click the button again. To remove a polygon, right-click on it.<br />
 		<input type="button" value="draw a polygon" id="polygon-button" onclick="createPolygon();" />
 		</p>
 		<p>
-		When you are done, click 'save' to store the occurrences.<br />
+		When you are done, click 'save' to store all occurrences.<br />
 		<input type="button" onclick="saveAll()" value="save" />
 		</p>
 		</form>
 	</div>
 </div>
-<div id="x"></div>
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -34,6 +44,45 @@ $(document).ready(function(){
 
 	initMap({$mapInitString});	
 	addMouseHandlers();
+
+
+
+{foreach from=$taxon.occurrences key=k item=v}
+
+{if $taxon}
+{assign var=taxonName value=$taxon.taxon}
+{else if $v.taxon.taxon}
+{assign var=taxonName value=$v.taxon.taxon}
+{/if}
+
+{if $v.type=='marker' && $v.latitude && $v.longitude}
+	placeMarker([{$v.latitude},{$v.longitude}],{literal}{{/literal}
+		name: '{$taxonName}',
+		addMarker: true,
+		addDelete: true,
+		occurrenceId: {$v.id},
+		colour:'{$v.colour}'
+	{literal}});{/literal}
+{elseif $v.type=='polygon' && $v.nodes}
+	var nodes{$k} = Array();
+	{foreach from=$v.nodes key=kn item=vn}
+	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
+	{/foreach}
+	drawPolygon(nodes{$k},null,{literal}{{/literal}
+		name: '{$taxonName}',
+		addMarker: true,
+		addDelete: true,
+		occurrenceId: {$v.id},
+		colour:'{$v.colour}'
+	{literal}});{/literal}
+
+{/if}
+{/foreach}
+
+
+
+
+
 
 {else}
 	alert('Your computer appears to be offline.\nUnable to display map.');

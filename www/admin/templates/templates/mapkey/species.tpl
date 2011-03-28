@@ -1,50 +1,45 @@
 {include file="../shared/admin-header.tpl"}
-{literal}
-<script>
-var allChecked = false;
-function toggleAllSpecies() {
-
-	if (allChecked)
-		$('input[id*=species-]').attr('checked',false)
-	else
-		$('input[id*=species-]').attr('checked',true)
-
-	allChecked = !allChecked;
-	
-	$('#select-all').val(allChecked ? 'deselect all' : 'select all');
-
-}
-</script>
-{/literal}
 <div id="page-main">
+
+<b>Occurrences of {$taxon.taxon}</b>
+
 <p>
-To view all the occurrences of a single species, click the name of that species.<br />
 To view a single occurrence, click the 'view on map' link of that occurrence.<br />
 To view multiple occurrences, check the checkboxes of all the occurrences you want to see and click 'show selected'.
-<p>
+</p>
 <form action="species_show.php" method="post">
+<input type="hidden" name="id" value="{$taxon.id}" />
+<input type="hidden" name="s" value="{$taxon.id}" />
 <table>
-{foreach from=$taxa key=k item=v}
+	<thead>
 	<tr class="tr-highlight">
-		<td><a href="species_show.php?t={$v.id}">{$v.taxon}</a></td>
-	{foreach from=$v.occurrences key=l item=o}
-	{if $l!=0}
+		<th style="width:250px">Data type</th>
+		<th style="width:75px">Marker type</th>
+		<th style="width:300px">Coordinates</th>
+		<th colspan="2"></th>
+	</tr>
+	</thead>
+	{foreach from=$taxon.occurrences key=l item=o}
 	<tr class="tr-highlight">
-		<td>&nbsp;</td>
-	{/if}
+		<td>{$o.type_title}</td>
 		<td>{$o.type}</td>
 		<td>{if $o.type==marker}({$o.latitude},{$o.longitude}){else}{$o.boundary_nodes|@substr:1:50}...{/if}</td>
-		<td>[<a href="species_show.php?id={$o.id}">view on map</a>]</td>
+		<td>[<a href="species_show.php?s={$taxon.id}&id={$o.id}">view on map</a>]</td>
 		<td><input type="checkbox" id="species-{$o.id}" name="id[]" value="{$o.id}"></td>
 	</tr>
 	{/foreach}
-{/foreach}
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input type="submit" value="show selected" />
+			<input type="button" id="select-all" value="select all" onclick="toggleAllSpecies()" />
+		</td>
+	</tr>
 </table>
-<p>
-<input type="submit" value="show selected" />
-<input type="button" id="select-all" value="select all" onclick="toggleAllSpecies()" />
 </form>
-</p>
+
 </div>
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
