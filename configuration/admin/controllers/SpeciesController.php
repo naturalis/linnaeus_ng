@@ -219,7 +219,7 @@ class SpeciesController extends Controller
         $this->smarty->assign('nextShowOrder', $nextShowOrder);
 
         $this->smarty->assign('maxCategories', $this->generalSettings['maxCategories']);
-        
+
         $this->smarty->assign('languages', $lp);
         
         $this->smarty->assign('pages', $pages);

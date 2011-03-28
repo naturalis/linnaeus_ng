@@ -850,13 +850,13 @@ class Controller extends BaseClass
     {
         
         if (!isset($array) || !is_array($array)) return;
-        
+
         if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
         
         if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
         
         if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
-        
+
         usort($array,
 			array(
 				$this, 
@@ -2452,7 +2452,7 @@ class Controller extends BaseClass
 
         if (!isset($a[$f]) || !isset($b[$f]))
             return;
-        
+
         if ($c != 's') {
             
             $a[$f] = strtolower($a[$f]);
