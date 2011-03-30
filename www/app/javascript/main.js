@@ -206,6 +206,13 @@ function goMatrix(id) {
 
 }
 
+function goMap(id,url) {
+
+	if (id) addFormVal('id',id);
+	goForm(url ? url : '../mapkey/examine_species.php');
+
+}
+
 function goNavigate(id,field,url) {
 
 	addFormVal(field ? field : 'start',id);

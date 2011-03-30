@@ -18,7 +18,7 @@
 {/if}
 </tr>
 {if $types|@count==0}
-<tr><td colspan="2">(no types have been defined yet)</td></tr>
+<tr><td colspan="2">{t}(no types have been defined yet){/t}</td></tr>
 {/if}
 {section name=i loop=$types}
 	<tr class="tr-highlight">

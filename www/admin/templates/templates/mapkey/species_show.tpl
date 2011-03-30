@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
+<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
 </div>
 {literal}
@@ -46,7 +46,7 @@ $(document).ready(function(){
 {/foreach}
 
 {else}
-alert('Your computer appears to be offline.\nUnable to display map.');
+alert({t}'Your computer appears to be offline.\nUnable to display map.'{/t});
 {/if}
 {literal}
 });

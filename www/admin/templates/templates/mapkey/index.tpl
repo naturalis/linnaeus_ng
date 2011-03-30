@@ -2,15 +2,15 @@
 
 <div id="page-main">
 {if !$isOnline}
-Your computer appears to be offline. Dynamic maps will not be displayed correctly.
+{t}Your computer appears to be offline. Dynamic maps will not be displayed correctly.{/t}
 {/if}
 {if !$dataTypeCount}
-You have not yet defined any data types. Please do so before adding geographical information.
+{t}You have not yet defined any data types. Please do so before adding geographical information.{/t}
 {/if}
 <ul>
-	<li><a href="choose_species.php">Add or edit data</a></li>
-	<li><a href="species_select.php">View existing data</a></li>
-	<li><a href="data_types.php">Define data types</a></li>
+	<li><a href="choose_species.php">{t}Add or edit data{/t}</a></li>
+	<li><a href="species_select.php">{t}View existing data{/t}</a></li>
+	<li><a href="data_types.php">{t}Define data types{/t}</a></li>
 </ul>
 </div>
 

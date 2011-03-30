@@ -30,6 +30,10 @@ class Controller extends BaseClass
 	public $noResubmitvalReset = false;
 	public $showBackToSearch = true;
 	public $storeHistory = true;
+    public $treeList;
+    public $showLowerTaxon = true;
+
+
 
     private $usedModelsBase = array(
         'project', 
@@ -128,6 +132,326 @@ class Controller extends BaseClass
 	
 		return chr($showOrder+96);
 	
+	}
+
+	public function getTreeList ()
+	{
+
+		foreach((array)$this->treeList as $key => $val) {
+
+			if ($this->showLowerTaxon) {
+			
+				if ($val['lower_taxon']=='1')  $d[$key] = $val;
+			
+			} else {
+
+				if ($val['lower_taxon']=='0')  $d[$key] = $val;
+
+				if ($val['lower_taxon']=='1')  continue;
+
+			}
+
+		}	
+
+		return $d;
+	
+	}
+
+    public function getTaxonTree($params=null) 
+    {
+
+		if (
+			(isset($params['forceLookup']) && $params['forceLookup']==true) ||
+			!isset($_SESSION['user']['species']['tree']) ||
+			!isset($_SESSION['user']['species']['treeList']) ||
+			$this->didActiveLanguageChange()
+		) {
+
+			$_SESSION['user']['species']['tree'] = $this->_getTaxonTree($params);
+
+			$_SESSION['user']['species']['treeList'] = $this->treeList;
+
+		} else {
+
+			$this->treeList = $_SESSION['user']['species']['treeList'];
+
+		}
+
+		return $_SESSION['user']['species']['tree'];
+	
+	}
+
+    public function _getTaxonTree($params) 
+    {
+
+		// the parent_id to start with
+		$pId = isset($params['pId']) ? $params['pId'] : null;
+		// the current level of depth in the tree
+		$level = isset($params['level']) ? $params['level'] : 0;
+		// a specific rank_id to stop the recursion; taxa below this rank are omitted from the tree
+		$stopAtRankId = isset($params['stopAtRankId']) ? $params['stopAtRankId'] : null;
+		// taxa without a parent_id that are not of the uppermost rank are orphans; these can be excluded from the tree
+		$includeOrphans = isset($params['includeOrphans']) ? $params['includeOrphans'] : false;
+		// force lookup
+		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : null;
+
+		// get all ranks defined within the project	
+		$d = $this->getProjectRanks(array('idsAsIndex' => true,'forceLookup' => $forceLookup));
+		$pr = $d['ranks'];
+
+		// $this->treeList an additional non-recursive list of taxa
+		if ($level==0) unset($this->treeList);
+
+		// setting the parameters for the taxon search
+		$id['project_id'] = $this->getCurrentProjectId();
+
+		if ($pId === null) {
+
+			$id['parent_id is'] = $pId;
+
+		} else {
+
+			$id['parent_id'] = $pId;
+
+		}
+
+		// decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually 'kingdom')
+		if ($pId === null && $includeOrphans === false) {
+
+			$id['rank_id'] = $d['topRankId'];
+
+		}
+
+		// get the child taxa of the current parent
+        $t = $this->models->Taxon->_get(
+				array(
+					'id' =>  $id,
+					'order' => 'taxon_order'
+				)
+			);
+
+        foreach((array)$t as $key => $val) {
+
+			// for each taxon, look whether they belong to the lower taxa...
+			$val['lower_taxon'] = $pr[$val['rank_id']]['lower_taxon'];
+	
+			// ...and can be the endpoint of the key
+			$val['keypath_endpoint'] = $pr[$val['rank_id']]['keypath_endpoint'];
+
+			// level is effectively the recursive depth of the taxon within the tree
+			$val['level'] = $level;
+
+			// count taxa on the same level
+			$val['sibling_count'] = count((array)$t);
+
+			// sibling_pos reflects the position amongst taxa on the same level
+			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
+
+			// get rank label
+			$val['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
+
+			// fill the treelist (which is a global var)
+            $this->treeList[$val['id']] = $val;
+
+			$t[$key]['level'] = $level;
+			
+			// and call the next recursion for each of the children
+			if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId!=$val['rank_id'])) {
+
+				$children = $this->_getTaxonTree(
+					array(
+						'pId' => $val['id'],
+						'level' => $level+1,
+						'stopAtRankId' => $stopAtRankId
+					)
+				);
+
+	            $t[$key]['children_count'] = 
+					$this->treeList[$val['id']]['children_count'] = 
+					isset($children) ? count((array)$children) : 0;
+				
+				$t[$key]['children'] = $children;
+
+			}
+
+        }
+
+        return $t;
+
+    }
+
+	public function getProjectRanks($params=false)
+	{
+
+		$includeLanguageLabels = isset($params['includeLanguageLabels']) ? $params['includeLanguageLabels'] : true;
+		$lowerTaxonOnly = isset($params['lowerTaxonOnly']) ? $params['lowerTaxonOnly'] : false;
+		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : $this->didActiveLanguageChange();
+		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
+		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
+
+		if (!$forceLookup) $forceLookup = !isset($_SESSION['user']['species']['ranks']['projectRanks']);
+
+		if (!$forceLookup) {
+
+			if (
+				!isset($_SESSION['user']['species']['ranks']['includeLanguageLabels']) || 
+				$_SESSION['user']['species']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
+				!isset($_SESSION['user']['species']['ranks']['lowerTaxonOnly']) || 
+				$_SESSION['user']['species']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
+				!isset($_SESSION['user']['species']['ranks']['keypathEndpoint']) || 
+				$_SESSION['user']['species']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
+				!isset($_SESSION['user']['species']['ranks']['idsAsIndex']) || 
+				$_SESSION['user']['species']['ranks']['idsAsIndex']!=$idsAsIndex
+				)
+
+				$forceLookup = true;
+
+		}
+
+		$_SESSION['user']['species']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
+		$_SESSION['user']['species']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
+		$_SESSION['user']['species']['ranks']['keypathEndpoint'] = $keypathEndpoint;
+		$_SESSION['user']['species']['ranks']['idsAsIndex'] = $idsAsIndex;
+
+		if ($forceLookup) {
+
+			if ($keypathEndpoint)
+				$d = array('project_id' => $this->getCurrentProjectId(),'keypath_endpoint' => 1);
+			elseif ($lowerTaxonOnly)
+				$d = array('project_id' => $this->getCurrentProjectId(),'lower_taxon' => 1);
+			else
+				$d = array('project_id' => $this->getCurrentProjectId());
+
+			$p = array('id' => $d,'order' => 'rank_id');
+			
+			if ($idsAsIndex) {
+
+				$p['fieldAsIndex'] = 'id';
+
+			}
+
+			$pr = $this->models->ProjectRank->_get($p);
+			
+			$topRankId = null;
+
+			foreach((array)$pr as $rankkey => $rank) {
+			
+				if ($topRankId==null) $topRankId = $rankkey;
+	
+				$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
+	
+				$pr[$rankkey]['rank'] = $r['rank'];
+	
+				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+
+				if ($includeLanguageLabels) {
+	
+					$lpr = $this->models->LabelProjectRank->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'project_rank_id' => $rank['id'],
+								'language_id' => $this->getCurrentLanguageId()
+							),
+							'columns' => 'label'
+						)
+					);
+					
+					$pr[$rankkey]['labels'][$this->getCurrentLanguageId()] = $lpr[0]['label'];
+
+				}
+	
+			}
+			
+			$_SESSION['user']['species']['ranks']['projectRanks'] = $pr;
+			$_SESSION['user']['species']['ranks']['topRankId'] = $topRankId;
+			
+		}
+
+		return
+			array(
+				'ranks' => $_SESSION['user']['species']['ranks']['projectRanks'],
+				'topRankId' => $_SESSION['user']['species']['ranks']['topRankId']
+			);
+
+	}
+	
+	public function getTaxonById($id)
+	{
+
+		if (!isset($_SESSION['user']['species']['taxon']) ||
+			$_SESSION['user']['species']['taxon']['id']!=$id) {
+
+			$t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $id
+					)
+				)
+			);
+
+			$_SESSION['user']['species']['taxon'] = $t[0];
+			
+			$pr = $this->models->ProjectRank->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $_SESSION['user']['species']['taxon']['rank_id']
+					)
+				)
+			);
+			
+			$_SESSION['user']['species']['taxon']['lower_taxon'] = $pr[0]['lower_taxon'];
+
+
+		}
+
+		return $_SESSION['user']['species']['taxon'];
+	
+	}
+
+	public function getPagination($items,$maxPerPage=25)
+	{
+
+		/*
+		
+		{if $prevStart!=-1 || $nextStart!=-1}
+			<div id="navigation">
+				{if $prevStart!=-1}
+				<span class="a" onclick="goNavigate({$prevStart});">< previous</span>
+				{/if}
+				{if $nextStart!=-1}
+				<span class="a" onclick="goNavigate({$nextStart});">next ></span>
+				{/if}
+			</div>
+		{/if}
+		
+		//goNavigate(val,formName) formname default = 'theForm'
+		
+		*/
+
+		if (!isset($items)) return;
+
+		// determine index of the first taxon to show
+		$start = $this->rHasVal('start') ? $this->requestData['start'] : 0;
+	
+		//determine index of the first taxon to show on the previous page (if any)
+		$prevStart = $start==0 ? -1 : (($start-$maxPerPage<1) ? 0 : ($start-$maxPerPage));
+	
+		//determine index of the first taxon to show on the next page (if any)
+		$nextStart = ($start+$maxPerPage>=count((array)$items)) ? -1 : ($start+$maxPerPage);
+	
+		// slice out only the taxa we need (faster than looping the entire thing in smarty)
+		$items = array_slice($items,$start,$maxPerPage);
+	
+		return
+			array(
+				'items' => $items,
+				'prevStart' => $prevStart,
+				'nextStart' => $nextStart,
+			);
+
 	}
 
 	private function getBreadcrumbs()
@@ -1242,7 +1566,7 @@ class Controller extends BaseClass
 		if ($d>$this->generalSettings['maxBackSteps'])
 			$_SESSION['user']['breadcrumbs'] = array_slice($_SESSION['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
 
-		q($_SESSION['user']['breadcrumbs']);
+		//q($_SESSION['user']['breadcrumbs']);
 
 	}
 

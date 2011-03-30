@@ -1,0 +1,14 @@
+#map_canvas {
+	width:720px;
+	height:650px;
+	border: 1px solid #666;
+	margin-bottom:-110px;
+}
+
+#map_options {
+	width:279px;
+	height:500px;
+	position:relative;
+	margin-top:-650px;
+	left:731px;
+}

@@ -159,6 +159,17 @@ class configuration
 
     }
 
+    public function getControllerSettingsMapKey()
+    {
+
+		return array(
+			'speciesPerPage' => 20,
+            'maxTypes' => 10,
+			'urlToCheckConnectivity' =>'http://maps.google.com/maps/api/js?sensor=false'
+		);
+
+    }
+
 }
 
 
