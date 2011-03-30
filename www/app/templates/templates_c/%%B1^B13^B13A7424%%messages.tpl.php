@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-21 17:53:16
+<?php /* Smarty version 2.6.26, created on 2011-03-29 11:42:03
          compiled from ../shared/messages.tpl */ ?>
 <?php if (! empty ( $this->_tpl_vars['errors'] )): ?>
 <div id="errors">

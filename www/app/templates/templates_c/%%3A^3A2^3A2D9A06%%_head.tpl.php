@@ -1,5 +1,7 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-25 13:41:53
+<?php /* Smarty version 2.6.26, created on 2011-03-30 19:24:44
          compiled from ../shared/_head.tpl */ ?>
+<?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
+smarty_core_load_plugins(array('plugins' => array(array('modifier', 'strpos', '../shared/_head.tpl', 19, false),)), $this); ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -71,9 +73,14 @@ $this->_sections['i']['index_next'] = $this->_sections['i']['index'] + $this->_s
 $this->_sections['i']['first']      = ($this->_sections['i']['iteration'] == 1);
 $this->_sections['i']['last']       = ($this->_sections['i']['iteration'] == $this->_sections['i']['total']);
 ?>
+<?php if (((is_array($_tmp=$this->_tpl_vars['javascriptsToLoad']['all'][$this->_sections['i']['index']])) ? $this->_run_mod_handler('strpos', true, $_tmp, "http:") : strpos($_tmp, "http:")) === false && ((is_array($_tmp=$this->_tpl_vars['javascriptsToLoad']['all'][$this->_sections['i']['index']])) ? $this->_run_mod_handler('strpos', true, $_tmp, "https:") : strpos($_tmp, "https:")) === false): ?>
 	<script type="text/javascript" src="<?php echo $this->_tpl_vars['baseUrl']; ?>
 app/javascript/<?php echo $this->_tpl_vars['javascriptsToLoad']['all'][$this->_sections['i']['index']]; ?>
 "></script>
+<?php else: ?>
+	<script type="text/javascript" src="<?php echo $this->_tpl_vars['javascriptsToLoad']['all'][$this->_sections['i']['index']]; ?>
+"></script>
+<?php endif; ?>
 <?php endfor; endif; ?>
 <?php unset($this->_sections['i']);
 $this->_sections['i']['name'] = 'i';

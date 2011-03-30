@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
 <table>
-Click the name of the species of which you want to see the occurrences.
+{t}Click the name of the species of which you want to see the geographical data.{/t}
 {foreach from=$taxa key=k item=v}
 	<tr>
 		<td>

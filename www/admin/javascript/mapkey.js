@@ -477,20 +477,3 @@ function mapDeleteType(id,value) {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

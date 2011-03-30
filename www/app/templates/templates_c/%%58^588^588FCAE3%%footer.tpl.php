@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-25 13:41:53
+<?php /* Smarty version 2.6.26, created on 2011-03-30 19:24:45
          compiled from ../shared/footer.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/footer.tpl', 3, false),array('modifier', 'escape', '../shared/footer.tpl', 7, false),array('modifier', 'addslashes', '../shared/footer.tpl', 20, false),)), $this); ?>

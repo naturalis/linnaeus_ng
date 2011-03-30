@@ -1,14 +1,14 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-	<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}Unable to display map.{/if}</div>
+	<div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 	<div id="map_options">
-		<b>Data for "{$taxon.taxon}"</b><br/>
-		Selection type: <span id="selection-type">(none)</span><br />
-		Coordinates:<br /><span id="coordinates">(-1,-1)</span><br />
+		<b>{t _s1=$taxon.taxon}Data for "%s"{/t}</b><br/>
+		{t}Selection type:{/t} <span id="selection-type">{t}(none){/t}</span><br />
+		{t}Coordinates:{/t}<br /><span id="coordinates">(-1,-1)</span><br />
 		<hr style="height:1px;color:#999" />
 
-		Select the type of data you are drawing on the map:<br />
+		{t}Select the type of data you are drawing on the map:{/t}<br />
 		<select id="geodatatype">
 		{foreach from=$geodataTypes key=k item=v}
 		<option value="{$v.id}" colour="{$v.colour}">{$v.title}</option>
@@ -19,17 +19,17 @@
 		<input type="hidden" name="id" value="{$taxon.id}" />
 		<input type="hidden" name="rnd" value="{$rnd}" />
 		<p style="text-align:justify">
-		To enable setting markers (points on the map), click the button below.
-		Then click on the appropriate spot on the map to place a marker. To remove a marker, right-click on it.<br />
+		{t}To enable setting markers (points on the map), click the button below.{/t}
+		{t}Then click on the appropriate spot on the map to place a marker. To remove a marker, right-click on it.{/t}<br />
 		<input type="button" value="set markers" onclick="setOccurrenceType('marker');" />
 		</p>
 		<p style="text-align:justify">
-		To enable drawing polygons, click the button below.
-		Then draw the polygon by clicking the appropriate spots on the map. When finished drawing, click the button again. To remove a polygon, right-click on it.<br />
+		{t}To enable drawing polygons, click the button below.{/t}
+		{t}Then draw the polygon by clicking the appropriate spots on the map. When finished drawing, click the button again. To remove a polygon, right-click on it.{/t}<br />
 		<input type="button" value="draw a polygon" id="polygon-button" onclick="createPolygon();" />
 		</p>
 		<p>
-		When you are done, click 'save' to store all occurrences.<br />
+		{t}When you are done, click 'save' to store all occurrences.{/t}<br />
 		<input type="button" onclick="saveAll()" value="save" />
 		</p>
 		</form>
@@ -44,8 +44,6 @@ $(document).ready(function(){
 
 	initMap({$mapInitString});	
 	addMouseHandlers();
-
-
 
 {foreach from=$taxon.occurrences key=k item=v}
 
@@ -78,14 +76,8 @@ $(document).ready(function(){
 
 {/if}
 {/foreach}
-
-
-
-
-
-
 {else}
-	alert('Your computer appears to be offline.\nUnable to display map.');
+	alert({t}'Your computer appears to be offline.\nUnable to display map.'{/t});
 {/if}	
 {literal}
 });

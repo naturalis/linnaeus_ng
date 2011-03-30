@@ -42,7 +42,6 @@ class configuration
     
     }
 
-
     public function getSmartySettings ()
     {
 
@@ -163,6 +162,11 @@ class configuration
 							'regexp' => '/^[^0-9][A-z0-9_]+([.][A-z0-9_]+)*[@][A-z0-9_]+([.][A-z0-9_]+)*[.][A-z]{2,4}$/'
 						)
 				),
+				'randomPassword' =>
+					array(
+						'chars' => 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+						'length'=> 8
+					),
 				'email' =>
 					array(
 						'smtp_server' => 'smtp.eti.uva.nl',
@@ -170,24 +174,41 @@ class configuration
 						'mailfrom_name' => 'Linnaeus NG',
 						'mails' =>
 							array(
-								'password' =>
+								'newuser' =>
 									array(
 										'subject' => 'Your username and password for Linnaeus NG', 
-										'plain' => 'Below are your username and password for access to the Linnaeus NG administration environment:
-Username: %s
-Password: %s
-
-You can find Linnaeus NG at:
-http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/',
-										'html' => '<html>Below are your username and password for access to the Linnaeus NG administration environment:<br />
-Username: %s<br />
-Password: %s<br />
-<br />
-You can find Linnaeus NG at:<br />
-<a href="http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/">http://dev.eti.uva.nl/linnaeus_ng/admin/views/users/</a>',
-									)
+										'plain' =>
+											'Below are your username and password for access to the Linnaeus NG administration:'.chr(10).
+											'Username: %s'.chr(10).
+											'Password: %s'.chr(10).chr(10).
+											'You can access Linnaeus NG at:'.chr(10).
+											'[[url]]',
+										'html' =>
+											'<html>Below are your username and password for access to the Linnaeus NG administration:<br />'.chr(10).
+											'Username: %s<br />'.chr(10).
+											'Password: %s<br />'.chr(10).
+											'<br />'.chr(10).
+											'You can access Linnaeus NG at:<br />'.chr(10).
+											'<a href="[[url]]">[[url]]</a>',
+									),
+								'resetpassword' =>
+									array(
+										'subject' => 'Your new password for Linnaeus NG', 
+										'plain' =>
+											'Your password has been reset. Below is your new password for access to the Linnaeus NG administration:'.chr(10).
+											'Password: %s'.chr(10).chr(10).
+											'You can access Linnaeus NG at:'.chr(10).
+											'[[url]]',
+										'html' =>
+											'<html>Your password has been reset. Below is your new password for access to the Linnaeus NG administration:<br />'.chr(10).
+											'Password: %s<br />'.chr(10).
+											'<br />'.chr(10).
+											'You can access Linnaeus NG at:<br />'.chr(10).
+											'<a href="[[url]]">[[url]]</a>',
+									),
 							)
 					)
+
 		);
 	}
 
@@ -304,7 +325,7 @@ You can find Linnaeus NG at:<br />
 				array(
 				  array(
 					'mime' => 'image/png', 
-					'media_name' => 'PNG movie', 
+					'media_name' => 'PNG image', 
 					'media_type' => 'image', 
 					'maxSize' => 2000000
 				  ),
@@ -497,6 +518,17 @@ You can find Linnaeus NG at:<br />
 					),
 				'defaultUploadMaxSize' => 5000000 // 5mb
 			)
+		);
+
+    }
+
+    public function getControllerSettingsMapKey()
+    {
+
+		return array(
+			'speciesPerPage' => 20,
+            'maxTypes' => 10,
+			'urlToCheckConnectivity' =>'http://maps.google.com/maps/api/js?sensor=false'
 		);
 
     }

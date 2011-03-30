@@ -59,18 +59,13 @@ weergave
 		lijst van afbeeldingen
 		lijst van soorten -> afbeeldingem
 
-auto-switch
-	detect mechanism
-	als offline, list of pics
-	als online, map + avial list of pics
-
 */
 
 include_once ('Controller.php');
 
 class MapKeyController extends Controller
 {
-    
+
     public $usedModels = array(
 		'map',
 		'map_name',
@@ -236,7 +231,6 @@ class MapKeyController extends Controller
 
 		}
 
-
 		$ot = $this->getTaxonOccurrences($this->requestData['id']);
 
 		if ($ot) $taxon['occurrences'] = $ot;
@@ -260,7 +254,7 @@ class MapKeyController extends Controller
 			if ($this->rHasVal('mapZoom')) $_SESSION['system']['mapZoom'] = $this->requestData['mapZoom'];
 
 		}
-		
+
 		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		$this->smarty->assign('taxon',$taxon);
@@ -427,7 +421,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName(_('Occurrence file upload'));
 
-		if ($this->requestDataFiles) { // && !$this->isFormResubmit()) {
+		if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
 			switch ($this->requestData["delimiter"]) {
 				case 'comma' :
@@ -454,6 +448,7 @@ class MapKeyController extends Controller
 				$r = $this->helpers->CsvParserHelper->getResults();
 				
 				$line = 0;
+				$saved = 0;
 
 				foreach((array)$r as $key => $val) {
 				
@@ -497,6 +492,8 @@ class MapKeyController extends Controller
 														$val[1]
 													)
 												);
+
+												$saved++;
 											
 											} else {
 	
@@ -528,13 +525,12 @@ class MapKeyController extends Controller
 									
 										$continue=true;
 										$i=0;
-										$geoStr = array();
 										$nodes = array();
 										
 										while($continue && $i<=9999) {
 										
-											$cLat = isset($val[5+$i]) ? $val[5+$i] : null;
-											$cLon = isset($val[6+$i]) ? $val[6+$i] : null;
+											$cLat = isset($val[3+$i]) ? $val[3+$i] : null;
+											$cLon = isset($val[4+$i]) ? $val[4+$i] : null;
 											
 											if ($cLat=='') {
 											
@@ -553,11 +549,10 @@ class MapKeyController extends Controller
 													);
 													
 												} else {
-													
+												
 													$cLat = $this->sanitizeDotsAndCommas($cLat);
 													$cLon = $this->sanitizeDotsAndCommas($cLon);
 													
-													$geoStr[] = $cLat.' '.$cLon;
 													$nodes[] = array($cLat,$cLon);
 												
 												}
@@ -568,12 +563,11 @@ class MapKeyController extends Controller
 										
 										}
 										
-										if (count($geoStr)>0) {
+										if (count((array)$nodes)>0) {
 	
 											$ot = $this->saveOccurrencePolygon(
 												array(
 													'taxonId' => $taxonId,
-													'geoStr' => implode(',',$geoStr),
 													'nodes' => $nodes,
 													'type_id' => $geodataTypeId
 												)
@@ -588,6 +582,8 @@ class MapKeyController extends Controller
 														$val[1]
 													)
 												);
+												
+												$saved++;
 											
 											} else {
 	
@@ -640,6 +636,12 @@ class MapKeyController extends Controller
 					
 					}
 				
+				}
+				
+				if ($saved==0 && count((array)$this->getErrors())==0) {
+
+					$this->addMessage(_('No data to process. Please check that your data is complete and that you are using the field delimiter you have specified above.'));
+
 				}
 			
 			}
@@ -1043,40 +1045,54 @@ class MapKeyController extends Controller
 	
 	}
 
+
 	private function saveOccurrencePolygon($p)
 	{
 
-		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
-		$geoStr = isset($p['geoStr']) ? $p['geoStr'] : null;
-		$nodes = isset($p['nodes']) ? $p['nodes'] : null;
-		$type_id = isset($p['type_id']) ? $p['type_id'] : null;
-		
-		if (!isset($geoStr) && !isset($nodes) && isset($p['coord'])) {
-		
-			$d = explode('),(',trim($p['coord'],'()'));
+		/*
+			called from map, has a single string of coordinates:
+				["coord"]=> "(51.36, 6.66),(51.33, 4.09),(52.87, 4.78)"
+
+			called from file load, has an array of nodes:
+				["nodes"]=> array(array(51.36,6.66),array(51.33,4.09),array(52.87,4.78));
 			
+			furthermore, the mysql function POLYGON requires a string in the form
+				GeomFromText('POLYGON((51.36 6.66,51.33 4.09,52.87 4.78,51.36 6.66))') 
+				
+		*/
+
+		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;
+		$type_id = isset($p['type_id']) ? $p['type_id'] : null;
+		$nodes = isset($p['nodes']) ? $p['nodes'] : null;
+		$coord = isset($p['coord']) ? $p['coord'] : null;
+
+		if (!isset($nodes) && isset($coord)) {
+
+			$d = explode('),(',trim($coord,'()'));
+
 			if (count((array)$d)>2) {
 
 				foreach((array)$d as $key => $val) {
 	
 					$g = explode(',',$val);
-					$geoStr[] = $g[0].' '.$g[1];
 					$nodes[] = array($g[0],$g[1]);
 	
 				}
 	
-				// mysql polygon has to be closed, i.e. first and last nodes must be identical
-				$g = explode(',',$d[0]);
-				
-				$geoStr = implode(',',$geoStr).','.$g[0].' '.$g[1];
-
 			}
 
 		}
 
-		if (!isset($taxonId) || !isset($geoStr) || !isset($nodes) || !isset($type_id)) return;
-
 		if (count((array)$nodes)<=2) return;
+
+		// remove the last node if it is identical to the first, just in case
+		if ($nodes[0]==$nodes[count((array)$nodes)-1]) array_pop($nodes);
+
+		// create a string for mysql (which does require the first and last to be the same)
+		foreach((array)$nodes as $key => $val) $geoStr[] = $val[0].' '.$val[1];
+		$geoStr = implode(',',$geoStr).','.$geoStr[0];
+
+		if (!isset($taxonId) || !isset($geoStr) || !isset($nodes) || !isset($type_id)) return;
 
 		return $this->models->OccurrenceTaxon->save(
 			array(
@@ -1104,7 +1120,7 @@ class MapKeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id,
 				),
-				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes'
+				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes,boundary'
 			)
 		);
 
@@ -1197,6 +1213,7 @@ class MapKeyController extends Controller
 		return $val;
 	
 	}
+
 
 }
 
