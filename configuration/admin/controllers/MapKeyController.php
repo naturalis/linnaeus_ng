@@ -4,60 +4,10 @@
 
 	delete type = delete data!
 
-	add choice of colours
-
 	make default central point configurable
 			$this->smarty->assign('middelLat',24.886436490787712);
 			$this->smarty->assign('middelLng',-70.2685546875);
 			$this->smarty->assign('initZoom',5);
-
-*/
-
-
-/*
-
-per soort: voorkomen
-	punt
-	polygoon
-	per unit (punt/polygoon) metadata
-		wanneer
-		hoeveel
-		url
-	in kmz-file / csv
-	één kmz-file per soort
-	kmz files
-		uploadnaam
-		nieuwe eigen onveranderlijke unieke naam geven
-		date of adding
-		user comment (opt)
-
-browsing
-	lijst van soorten, download/delete/add kmz file
-	lijst van soorten met kmz
-	lijst van soorten zonder kmz
-
-zoeken
-	kies kaart
-	draw polygon
-	click something
-	results:
-		txt: welke soorten
-		map: incidences + polygons
-
-weergave
-	gebied -> welke soorten
-	soort -> welke gebieden
-	soorten -> welke gebieden
-	download map as png
-		lokaal opslaan
-		display only
-		meta:
-			"naam" (whatever)
-			datum van opslag
-			koppeling welke kmz-files
-			user comment (opt)
-		lijst van afbeeldingen
-		lijst van soorten -> afbeeldingem
 
 */
 
@@ -1029,6 +979,7 @@ class MapKeyController extends Controller
 
 		if (!isset($taxonId) || !isset($lat) || !isset($lng) || !isset($type_id)) return;
 
+		// 'Point' is the newer method, but seems unable to take the SRID into account
 		return $this->models->OccurrenceTaxon->save(
 			array(
 				'id' => null,
@@ -1036,13 +987,14 @@ class MapKeyController extends Controller
 				'taxon_id' => $taxonId,
 				'type_id' => $type_id,
 				'type' => 'marker',
-				'coordinate' => '#Point('.$lat.','.$lng.')',
+				'coordinate' => "#GeomFromText('POINT((".$lat." ".$lng."))',".$this->controllerSettings['SRID'].")",
+//				'coordinate' => '#Point('.$lat.','.$lng.')',
 				'latitude' => $lat,
 				'longitude' => $lng,
 				'nodes_hash' => md5($lat.','.$lng)
 			)
 		);
-	
+
 	}
 
 
@@ -1057,7 +1009,7 @@ class MapKeyController extends Controller
 				["nodes"]=> array(array(51.36,6.66),array(51.33,4.09),array(52.87,4.78));
 			
 			furthermore, the mysql function POLYGON requires a string in the form
-				GeomFromText('POLYGON((51.36 6.66,51.33 4.09,52.87 4.78,51.36 6.66))') 
+				GeomFromText('POLYGON((51.36 6.66,51.33 4.09,52.87 4.78,51.36 6.66))',SRID) 
 				
 		*/
 
@@ -1101,7 +1053,7 @@ class MapKeyController extends Controller
 				'taxon_id' => $taxonId,
 				'type_id' => $type_id,
 				'type' => 'polygon',
-				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))')",
+				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))',".$this->controllerSettings['SRID'].")",
 				'boundary_nodes' => json_encode($nodes),
 				'nodes_hash' => md5(json_encode($nodes))
 			)
@@ -1216,26 +1168,3 @@ class MapKeyController extends Controller
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

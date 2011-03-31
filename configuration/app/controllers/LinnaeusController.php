@@ -4,6 +4,7 @@ include_once ('Controller.php');
 
 class LinnaeusController extends Controller
 {
+
     public $usedModels = array(
 		'content',
         'content_taxon', 
@@ -29,6 +30,7 @@ class LinnaeusController extends Controller
 		'characteristic_matrix',
 		'characteristic_label_state',
 		'characteristic_state',
+		'occurrence_taxon'
     );
 
     public $usedHelpers = array(
@@ -238,14 +240,18 @@ class LinnaeusController extends Controller
 	private function doSearch($search)
 	{
 
+		$species = $this->searchSpecies($search);
+
 		return array(
-			'species' => $this->searchSpecies($search),
+			'species' => $species,
 			'modules' => $this->searchModules($search),
 			'dichkey' => $this->searchDichotomousKey($search),
 			'literature' => $this->searchLiterature($search),
 			'glossary' => $this->searchGlossary($search),
 			'matrixkey' => $this->searchMatrixKey($search),
-			'content' => $this->searchContent($search)
+			'content' => $this->searchContent($search),
+			'map' => $this->searchMap($species)
+			
 		);
 
 	}
@@ -271,7 +277,7 @@ class LinnaeusController extends Controller
 
 			if (strlen($this->requestData['search'])>2) { 
 			
-				if (!isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']])) {
+				if (1==1 || !isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']])) {
 		
 					$results = $this->doSearch($this->requestData['search']);
 		
@@ -282,7 +288,8 @@ class LinnaeusController extends Controller
 						$results['literature']['numOfResults'] +
 						$results['glossary']['numOfResults'] +
 						$results['matrixkey']['numOfResults'] +
-						$results['content']['numOfResults'] 
+						$results['content']['numOfResults'] +
+						$results['map']['numOfResults']
 						;
 		
 					$_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]['results'] = $results;
@@ -560,7 +567,7 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Species names') => $taxa,
+				_('Species names') => $taxa, // when changing the label 'Species names', do the same in searchMap()
 				_('Species descriptions') => $content,
 				_('Species synonyms') => $synonyms,
 				_('Species common names') => $commonnames,
@@ -1090,6 +1097,38 @@ class LinnaeusController extends Controller
 
 	}
 
+	private function searchMap($species)
+	{
+
+		foreach((array)$species['results']['Species names'] as $key => $val) {
+		
+			$ot = $this->models->OccurrenceTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $val['taxon_id']
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+			
+			if ($ot[0]['total']>0) $geo[] =
+				array(
+					'id' => $val['taxon_id'],
+					'content' => $val['label'],
+					'number' => $ot[0]['total']
+				);
+
+		}
+
+		return array(
+			'results' => array(
+				_('geographical data') => $geo,
+			),
+			'numOfResults' => count((array)$geo)
+		);
+
+	}
 
 
 }

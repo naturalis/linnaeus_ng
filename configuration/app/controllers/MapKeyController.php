@@ -487,17 +487,7 @@ class MapKeyController extends Controller
 						where project_id = '.$this->getCurrentProjectId().' 
 						and (
 							Intersects(
-								GeomFromText(\'POLYGON(('.$geoStr.'))\') ,
-								if(type=\'polygon\',boundary,coordinate)
-							)=1
-							or
-							Contains(
-								GeomFromText(\'POLYGON(('.$geoStr.'))\') ,
-								if(type=\'polygon\',boundary,coordinate)
-							)=1
-							or
-							Overlaps(
-								GeomFromText(\'POLYGON(('.$geoStr.'))\') ,
+								GeomFromText(\'POLYGON(('.$geoStr.'))\','.$this->controllerSettings['SRID'].') ,
 								if(type=\'polygon\',boundary,coordinate)
 							)=1
 						)

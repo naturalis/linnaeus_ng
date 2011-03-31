@@ -65,7 +65,7 @@
 					<td style="width:25px;border:1px solid black;background-color:#{$v.colour}"></td>
 					<td style="width:5px;"></td>
 					<td style="width:215px;">{$v.title} ({$countA.data[$k]})</td>
-					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle({$v.id},this,{$taxonA.id})" class="a">hide</td>
+					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id},{$taxonA.id})" class="a">hide</td>
 				</tr>
 				<tr><td colspan="4" style="height:1px;"></td></tr>
 			{/if}
@@ -91,7 +91,7 @@
 					<td style="width:25px;border:1px solid black;background-color:#{$v.colour_inverse}"></td>
 					<td style="width:5px;"></td>
 					<td style="width:215px;">{$v.title} ({$countB.data[$k]})</td>
-					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle({$v.id},this,{$taxonB.id})" class="a">hide</td>
+					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id},{$taxonB.id})" class="a">hide</td>
 				</tr>
 				<tr><td colspan="4" style="height:1px;"></td></tr>
 			{/if}

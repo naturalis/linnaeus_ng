@@ -10,10 +10,10 @@ var searchPolygonInit = {
 		strokeOpacity: 0.8,
 		strokeWeight: 3,
 		fillColor: "#FFFF00",
-		fillOpacity: 0.0,
+		fillOpacity: 0.1,
 		geodesic: false
 	};
-
+var preDefPolygon = false;
 
 function initMap(init) {
 
@@ -96,6 +96,8 @@ function setPredefPolygon(coord) {
 	}
 
 	polygon.setPaths(polygonCoordinates);
+	
+	preDefPolygon = true;
 
 }
 
@@ -109,6 +111,9 @@ function startPolygonDraw(init) {
 		return;
 
 	}
+
+	if (preDefPolygon) clearPolygon();
+	preDefPolygon = false;
 
 	if (!init) init = searchPolygonInit;
 
@@ -251,31 +256,22 @@ function drawPolygon(bounds,style,info) {
 
 }
 
-function doMapTypeToggle(id,ele,taxon) {
+function doMapTypeToggle(ele,id,taxon) {
 
-	if ($(ele).attr('hidden')==0) {
-
-		for (var i=0;i<markers.length;i++)
-			if (markers[i][1]==id && (taxon==undefined || taxon==markers[i][2])) markers[i][0].setMap(null);
-		
-		for (var i=0;i<polygons.length;i++)
-			if (polygons[i][1]==id && (taxon==undefined || taxon==polygons[i][2])) polygons[i][0].setMap(null);
-
-		$(ele).attr('hidden','1');
-		$(ele).html(_('show'));
+	var isVisible = $(ele).attr('hidden')==0;
 	
-	} else {
-
-		for (var i=0;i<markers.length;i++)
-			if (markers[i][1]==id && (taxon==undefined || taxon==markers[i][2])) markers[i][0].setMap(map);
-
-		for (var i=0;i<polygons.length;i++)
-			if (polygons[i][1]==id && (taxon==undefined || taxon==polygons[i][2])) polygons[i][0].setMap(map);
-
-		$(ele).attr('hidden','0');
-		$(ele).html(_('hide'));
-
+	for (var i=0;i<markers.length;i++) {
+		if (id==undefined && markers[i][2]==taxon) markers[i][0].setMap(isVisible ? null : map);
+		if (markers[i][1]==id && (taxon==undefined || taxon==markers[i][2])) markers[i][0].setMap(isVisible ? null : map);
 	}
+	
+	for (var i=0;i<polygons.length;i++) {
+		if (id==undefined && polygons[i][2]==taxon) polygons[i][0].setMap(isVisible ? null : map);
+		if (polygons[i][1]==id && (taxon==undefined || taxon==polygons[i][2])) polygons[i][0].setMap(isVisible ? null : map);
+	}
+	
+	$(ele).attr('hidden',isVisible ? '1' : '0');
+	$(ele).html(isVisible ? _('show') : _('hide'));
 
 }
 

@@ -9,7 +9,6 @@
 		<tr><td><a href="examine.php">Examine a species</a></td></tr>
 		<tr><td><a href="compare.php">Compare two species</a></td></tr>
 		<tr><td><a href="search.php">Search an area on the map</a></td></tr>
-		<tr><td><a href="diversity.php">(Diversity)</a></td></tr>
 	</table>
 {/if}
 </div>
