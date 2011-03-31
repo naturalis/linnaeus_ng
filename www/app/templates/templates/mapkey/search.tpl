@@ -16,6 +16,7 @@
 		<input type="button" onclick="clearPolygon();clearSearchResults();" value="{t}clear{/t}" />
 		</form>
 		<hr style="height:1px;color:#999" />
+		{if $geoDataTypes}
 		<table>
 		{foreach from=$geoDataTypes key=k item=v}
 		{if $count.data[$k]}
@@ -23,13 +24,14 @@
 				<td style="width:25px;border:1px solid black;background-color:#{$v.colour}"></td>
 				<td style="width:5px;"></td>
 				<td style="width:215px;">{$v.title} ({$count.data[$k]})</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle({$v.id},this)" class="a">hide</td>
+				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id})" class="a">hide</td>
 			</tr>
 			<tr><td colspan="4" style="height:1px;"></td></tr>
 		{/if}
 		{/foreach}
 		</table>
 		<hr style="height:1px;color:#999" />
+		{/if}
 		<table>
 			<tr><td colspan="2" ><b>{t}Found species{/t}</b></td></tr>
 		{assign var=prev value=false}
@@ -37,13 +39,15 @@
 		{if $prev.taxon_id!=$v.taxon_id}
 			<tr style="vertical-align:top">
 				<td style="width:245px;">{$taxa[$v.taxon_id].taxon} ({$count.taxa[$v.taxon_id]})</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(null,this,{$v.taxon_id})" class="a">hide</td>
+				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,null,{$v.taxon_id})" class="a">hide</td>
 			</tr>
 			<tr><td colspan="2" style="height:1px;"></td></tr>
 		{/if}
 		{assign var=prev value=$v}
 		{/foreach}
-
+		{if $count.total==0}
+			<tr><td colspan="2">{t}nothing found{/t}</td></tr>
+		{/if}
 		</table>
 	</div>
 
@@ -89,9 +93,9 @@ $(document).ready(function(){
 
 {/if}
 {/foreach}
-
+	{if $coordinates}
 	setPredefPolygon('{$coordinates}');
-
+	{/if}
 {literal}
 });
 </script>

@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-30 15:12:54
+<?php /* Smarty version 2.6.26, created on 2011-03-31 14:14:21
          compiled from examine_species.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'examine_species.tpl', 5, false),)), $this); ?>
@@ -31,8 +31,8 @@ unset($_smarty_tpl_vars);
 				<td style="width:215px;"><?php echo $this->_tpl_vars['v']['title']; ?>
  (<?php echo $this->_tpl_vars['count']['data'][$this->_tpl_vars['k']]; ?>
 )</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(<?php echo $this->_tpl_vars['v']['id']; ?>
-,this)" class="a">hide</td>
+				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,<?php echo $this->_tpl_vars['v']['id']; ?>
+)" class="a">hide</td>
 			</tr>
 			<tr><td colspan="4" style="height:1px;"></td></tr>
 		<?php endif; ?>
@@ -42,7 +42,14 @@ unset($_smarty_tpl_vars);
 		<?php endif; ?>
 		</table>
 		<hr style="height:1px;color:#999" />
-		<span id="back" onclick="goMap(null,'examine.php')"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>back to species list<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>		
+		<span id="back" onclick="goMap(null,'examine.php')"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>back to species list<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
+
+		<?php if ($this->_tpl_vars['showBackToSearch'] && $this->_tpl_vars['session']['user']['search']['hasSearchResults']): ?>
+		<p>
+		<span class="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>back to search results<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
+		</p>
+		<?php endif; ?>
+
 	</div>
 
 </div>

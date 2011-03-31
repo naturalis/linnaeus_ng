@@ -5,11 +5,11 @@
 <div id="results">
 <div id="header">
 {if $results.numOfResults==0}
-	{t _s1="$search"}Your search for "%s" produced no results.{/t}
+	{t _s1=$search|replace:'"':''}Your search for "%s" produced no results.{/t}
 {elseif $results.numOfResults==1}
-	{t _s1="$search" _s2=$results.numOfResults}Your search for "%s" produced %s result:{/t}
+	{t _s1=$search|replace:'"':'' _s2=$results.numOfResults}Your search for "%s" produced %s result:{/t}
 {else}
-	{t _s1="$search" _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results:{/t}
+	{t _s1=$search|replace:'"':'' _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results:{/t}
 {/if}
 </div>
 
@@ -104,6 +104,21 @@
 			{if $v.matrices}{if !$v.characteristic}({/if}{if $v.matrices|@count==1}in matrix{else}in matrices{/if}
 			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<span class="result" onclick="goMatrix({$m.matrix_id})">{$results.matrixkey.matrices[$m.matrix_id].name}</span>"{/foreach}){/if}
 		</span><br/>
+		{/foreach}
+	</div>
+	{/if}
+	{/foreach}
+</div>
+{/if}
+
+{if $results.map.numOfResults > 0}
+<div class="set">
+	{foreach from=$results.map.results key=cat item=res}
+	{if $res|@count>0}
+	<div class="subset">
+		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
+		{foreach from=$res key=k item=v}
+		<span class="result" onclick="goMap({$v.id})">{h search=$search}{$v.content}{/h}</span> ({$v.number} occurrences)<br/>
 		{/foreach}
 	</div>
 	{/if}

@@ -5,6 +5,8 @@ include_once ('Controller.php');
 class InternalLinksController extends Controller
 {
     
+	private $_lowerSpecies;
+	
     public $usedModels = array(
 		'content',
 		'glossary',
@@ -15,7 +17,8 @@ class InternalLinksController extends Controller
 		'matrix',
 		'matrix_name',
 		'free_module_project',
-		'content_free_module'
+		'content_free_module',
+		'occurrence_taxon'
     );
     
     public $controllerPublicName = 'Internal Links';
@@ -173,7 +176,8 @@ class InternalLinksController extends Controller
 						'project_id' => $this->getCurrentProjectId()
 					),
 					'order' => 'taxon_order',
-					'columns' => 'id, taxon, rank_id,is_hybrid'
+					'columns' => 'id, taxon, rank_id,is_hybrid',
+					'fieldAsIndex' => 'id'
 				)
 			);
 
@@ -187,6 +191,8 @@ class InternalLinksController extends Controller
 				);
 		
 		}
+
+		if (!$higher) $this->_lowerSpecies = $d;
 
 		return isset($d) ? $d : null;
 
@@ -236,6 +242,38 @@ class InternalLinksController extends Controller
 		}
 		
 		return isset($l) ? $l : null;
+
+	}
+
+	private function intLinkGetMapSpecies()
+	{
+
+		if (!$this->_lowerSpecies) $this->intLinkGetSpecies();
+
+		foreach((array)$this->_lowerSpecies as $key => $val) {
+
+			$ot = $this->models->OccurrenceTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $val['id']
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+
+			if ($ot[0]['total']>0) {
+
+				$d[] = array(
+					'id'=> $val['id'],
+					'label' => $val['label']
+				);
+		
+			}
+
+		}
+//q($d);
+		return isset($d) ? $d : null;
 
 	}
 
@@ -481,6 +519,25 @@ class InternalLinksController extends Controller
 				array(
 					'label' => _('Dichotomous key'),
 					'controller' => 'key',
+				),
+				array(
+					'label' => _('Map key index'),
+					'controller' => 'mapkey',
+				),
+				array(
+					'label' => _('Map key detail'),
+					'controller' => 'mapkey',
+					'url' => 'examine_species.php',
+					'params' => json_encode(
+						array(
+							array(
+								'label' => _('Species:'),
+								'param' => 'id',
+								'language_independent' => true,
+								'values' => $this->intLinkGetMapSpecies()
+							)
+						)
+					)
 				),
 			);
 

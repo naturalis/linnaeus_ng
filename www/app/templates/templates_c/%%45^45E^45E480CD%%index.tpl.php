@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-30 16:28:39
+<?php /* Smarty version 2.6.26, created on 2011-03-31 14:13:39
          compiled from index.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', 'index.tpl', 5, false),)), $this); ?>
@@ -17,7 +17,6 @@ unset($_smarty_tpl_vars);
 		<tr><td><a href="examine.php">Examine a species</a></td></tr>
 		<tr><td><a href="compare.php">Compare two species</a></td></tr>
 		<tr><td><a href="search.php">Search an area on the map</a></td></tr>
-		<tr><td><a href="diversity.php">(Diversity)</a></td></tr>
 	</table>
 <?php endif; ?>
 </div>

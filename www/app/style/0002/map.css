@@ -12,3 +12,17 @@
 	margin-top:-650px;
 	left:731px;
 }
+
+#back-to-search {
+	/* back to search link is placed differently on the map page */
+	visibility:hidden;
+}
+
+#back-link, .back-link {
+	cursor:pointer;
+	font-style:italic;
+}
+
+#back-link:hover, .back-link:hover {
+	text-decoration:underline;
+}

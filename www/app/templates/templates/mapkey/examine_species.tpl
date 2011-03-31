@@ -17,7 +17,7 @@
 				<td style="width:25px;border:1px solid black;background-color:#{$v.colour}"></td>
 				<td style="width:5px;"></td>
 				<td style="width:215px;">{$v.title} ({$count.data[$k]})</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle({$v.id},this)" class="a">hide</td>
+				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id})" class="a">hide</td>
 			</tr>
 			<tr><td colspan="4" style="height:1px;"></td></tr>
 		{/if}
@@ -27,7 +27,14 @@
 		{/if}
 		</table>
 		<hr style="height:1px;color:#999" />
-		<span id="back" onclick="goMap(null,'examine.php')">{t}back to species list{/t}</span>		
+		<span id="back" onclick="goMap(null,'examine.php')">{t}back to species list{/t}</span>
+
+		{if $showBackToSearch && $session.user.search.hasSearchResults}
+		<p>
+		<span class="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
+		</p>
+		{/if}
+
 	</div>
 
 </div>

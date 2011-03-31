@@ -1,5 +1,5 @@
 335
-a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301495319;s:7:"expires";i:1301498919;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301573619;s:7:"expires";i:1301577219;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -61,7 +61,6 @@ a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 		<tr><td><a href="examine.php">Examine a species</a></td></tr>
 		<tr><td><a href="compare.php">Compare two species</a></td></tr>
 		<tr><td><a href="search.php">Search an area on the map</a></td></tr>
-		<tr><td><a href="diversity.php">(Diversity)</a></td></tr>
 	</table>
 </div>
 

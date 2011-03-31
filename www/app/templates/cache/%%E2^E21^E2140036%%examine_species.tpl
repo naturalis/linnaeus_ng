@@ -1,9 +1,9 @@
 346
-a:4:{s:8:"template";a:7:{s:19:"examine_species.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301490774;s:7:"expires";i:1301494374;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:19:"examine_species.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301573661;s:7:"expires";i:1301577261;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Displaying "Ursus luteolus"</title>
+	<title>Imaginary Beings Of The Literary World: Displaying "Ursus maritimus"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/map.css");
@@ -59,34 +59,22 @@ a:4:{s:8:"template";a:7:{s:19:"examine_species.tpl";b:1;s:19:"../shared/_head.tp
 
 	<div id="map_canvas"></div>
 	<div id="map_options">
-		<b>Ursus luteolus</b><br/>
+		<b>Ursus maritimus</b><br/>
 		Coordinates: <span id="coordinates">(-1,-1)</span><br />
 		<hr style="height:1px;color:#999" />
 		<table>
-											<tr style="vertical-align:top">
-				<td style="width:25px;border:1px solid black;background-color:#DE0909"></td>
+							<tr style="vertical-align:top">
+				<td style="width:25px;border:1px solid black;background-color:#FFA200"></td>
 				<td style="width:5px;"></td>
-				<td style="width:215px;">Occurrences before 1900 (1)</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(25,this)" class="a">hide</td>
+				<td style="width:215px;">Occurrence (39)</td>
+				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,24)" class="a">hide</td>
 			</tr>
 			<tr><td colspan="4" style="height:1px;"></td></tr>
-									<tr style="vertical-align:top">
-				<td style="width:25px;border:1px solid black;background-color:#42CF55"></td>
-				<td style="width:5px;"></td>
-				<td style="width:215px;">Favourite hangouts (2)</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(26,this)" class="a">hide</td>
-			</tr>
-			<tr><td colspan="4" style="height:1px;"></td></tr>
-									<tr style="vertical-align:top">
-				<td style="width:25px;border:1px solid black;background-color:#2D3DA1"></td>
-				<td style="width:5px;"></td>
-				<td style="width:215px;">Claimed territory (6)</td>
-				<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(27,this)" class="a">hide</td>
-			</tr>
-			<tr><td colspan="4" style="height:1px;"></td></tr>
-								</table>
+																				</table>
 		<hr style="height:1px;color:#999" />
-		<span id="back" onclick="goMap(null,'examine.php')">back to species list</span>		
+		<span id="back" onclick="goMap(null,'examine.php')">back to species list</span>
+
+		
 	</div>
 
 </div>
@@ -97,144 +85,436 @@ $(document).ready(function(){
 
 
 	initMap();
-		map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(49.14028568238951,  1.11083984375), new google.maps.LatLng(54.61175023571463,  10.47119140625)));
+		map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(17.2535044901, -74.0485676627), new google.maps.LatLng(32.5991771506, -54.3058812065)));
 	
 
 
-	var nodes0 = Array();
-		nodes0[0] = [50.431162671908744,  3.26416015625];
-		nodes0[1] = [51.687780229555536,  3.9453125];
-		nodes0[2] = [51.66052829321105,  5.68115234375];
-		nodes0[3] = [50.849203113122755,  6.0107421875];
-		nodes0[4] = [51.20850096634179,  5.32958984375];
-		nodes0[5] = [51.49667215955402,  4.45068359375];
-		nodes0[6] = [51.263530490972535,  4.27490234375];
-		nodes0[7] = [50.80756634084576,  4.1650390625];
-		nodes0[8] = [50.1926207624341,  4.12109375];
-		nodes0[9] = [49.7545480475797,  3.96728515625];
-		nodes0[10] = [49.72614827877714,  2.978515625];
-		nodes0[11] = [50.03763202833471,  2.0556640625];
-		nodes0[12] = [50.47313411776255,  1.7041015625];
-		nodes0[13] = [50.91851522534097,  1.68212890625];
-		nodes0[14] = [51.742234918928645,  1.220703125];
-		nodes0[15] = [52.844154042156504,  1.77001953125];
-		nodes0[16] = [53.82812064521293,  1.81396484375];
-		nodes0[17] = [54.53533056824021,  1.11083984375];
-		nodes0[18] = [54.61175023571463,  1.90185546875];
-		nodes0[19] = [54.44599310078137,  2.71484375];
-		nodes0[20] = [54.09957419343013,  3.06640625];
-		nodes0[21] = [53.00311602934493,  2.1875];
-		nodes0[22] = [52.29662134775002,  2.12158203125];
-		nodes0[23] = [51.49667215955402,  1.85791015625];
-		nodes0[24] = [50.83532831527039,  2.1435546875];
-		drawPolygon(nodes0,null,{
-		name: 'Ursus luteolus',
+	placeMarker([25.8711963576,-71.1485676627],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 742,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 681,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([24.4711963576,-74.0485676627],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 715,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	var nodes2 = Array();
+		nodes2[0] = [27.1940131851, -66.5452791588];
+		nodes2[1] = [24.2762068202, -65.8352040995];
+		nodes2[2] = [25.7700426918, -64.9020779883];
+		nodes2[3] = [28.7355680056, -66.2735326378];
+		nodes2[4] = [29.052437999, -67.5891964517];
+		drawPolygon(nodes2,null,{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 704,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
 
-	placeMarker([52.1350728575,7.0874023438],{
-		name: 'Ursus luteolus',
+	placeMarker([27.3966081014,-68.3555521190],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 736,
-		colour:'42CF55',
-		typeId:26
+		occurrenceId: 677,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	placeMarker([51.5103494058,9.8559570312],{
-		name: 'Ursus luteolus',
+	placeMarker([21.6577215958,-72.1882913105],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 737,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 703,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	placeMarker([51.5103494058,8.5595703125],{
-		name: 'Ursus luteolus',
+	placeMarker([22.4998154217,-68.2705621049],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 738,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 698,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	placeMarker([51.6468961755,6.9555664062],{
-		name: 'Ursus luteolus',
+	placeMarker([24.8711963576,-72.1485676627],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 739,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 694,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	var nodes5 = Array();
-		nodes5[0] = [50.68243312581954,  9.98779296875];
-		nodes5[1] = [51.51034940583583,  6.42822265625];
-		nodes5[2] = [49.6835174547195,  8.1201171875];
-		nodes5[3] = [50.44515729105729,  8.40576171875];
-		nodes5[4] = [50.29098884243417,  9.59228515625];
-		nodes5[5] = [49.82547475768626,  9.39453125];
-		nodes5[6] = [49.412653043190694,  8.88916015625];
-		nodes5[7] = [49.65507612079224,  8.66943359375];
-		nodes5[8] = [49.45552097034248,  8.515625];
-		nodes5[9] = [49.14028568238951,  8.88916015625];
-		nodes5[10] = [49.14028568238951,  9.81201171875];
-		nodes5[11] = [49.981148067345835,  10.47119140625];
-		drawPolygon(nodes5,null,{
-		name: 'Ursus luteolus',
+	placeMarker([19.8847317394,-66.7406957944],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 741,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 699,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([27.1056855703,-59.4246021224],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 700,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([25.0966081014,-70.6555521190],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 690,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([30.8326150796,-66.9929531668],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 675,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([29.5351096373,-64.5429804641],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 712,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	var nodes12 = Array();
+		nodes12[0] = [29.4709270728, -58.5759206723];
+		nodes12[1] = [29.0582697748, -58.5557157772];
+		nodes12[2] = [29.1302747974, -58.6019854202];
+		nodes12[3] = [31.3110362221, -59.6204825522];
+		nodes12[4] = [31.1403018861, -60.9114003352];
+		nodes12[5] = [32.5991771506, -62.6103796109];
+		nodes12[6] = [30.7241428791, -62.7609177176];
+		nodes12[7] = [30.2872441866, -64.1724076373];
+		nodes12[8] = [27.8705419104, -62.3115726307];
+		drawPolygon(nodes12,null,{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 682,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
 
-	placeMarker([52.1350728575,9.5263671875],{
-		name: 'Ursus luteolus',
+	placeMarker([25.6046588661,-68.7754826618],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 735,
-		colour:'42CF55',
-		typeId:26
+		occurrenceId: 695,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	placeMarker([52.4977314143,8.7353515625],{
-		name: 'Ursus luteolus',
+	placeMarker([23.9065268726,-68.3988461393],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 734,
-		colour:'DE0909',
-		typeId:25
+		occurrenceId: 713,
+		colour:'FFA200',
+		typeId:24
 	});
 
 
-	var nodes8 = Array();
-		nodes8[0] = [52.18898764354807,  7.8564453125];
-		nodes8[1] = [52.094593896016406,  4.1650390625];
-		nodes8[2] = [49.86798093805886,  6.38427734375];
-		drawPolygon(nodes8,null,{
-		name: 'Ursus luteolus',
+	placeMarker([24.6046588661,-69.7754826618],{
+		name: 'Ursus maritimus',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: 740,
-		colour:'2D3DA1',
-		typeId:27
+		occurrenceId: 702,
+		colour:'FFA200',
+		typeId:24
 	});
 
+
+	placeMarker([19.4847317394,-68.6406957944],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 720,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([19.1535044901,-63.5384721354],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 696,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([19.5577215958,-71.5882913105],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 718,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	var nodes19 = Array();
+		nodes19[0] = [23.9836490014, -59.479874752];
+		nodes19[1] = [26.6499249095, -54.3058812065];
+		nodes19[2] = [29.4683470753, -57.117904168];
+		nodes19[3] = [29.6588115308, -59.5588565519];
+		nodes19[4] = [28.5844777035, -61.6784868044];
+		nodes19[5] = [24.7641322086, -64.1974847507];
+		nodes19[6] = [23.315631146, -65.1764959919];
+		nodes19[7] = [21.3047564067, -62.1150871942];
+		nodes19[8] = [23.1508266633, -58.9798246383];
+		nodes19[9] = [23.9446000449, -59.5391541484];
+		drawPolygon(nodes19,null,{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 721,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+
+	placeMarker([17.2535044901,-61.2384721354],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 717,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([28.2351096373,-65.8429804641],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 678,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([25.9940451364,-66.6889293583],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 714,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([29.8326150796,-67.9929531668],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 688,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([21.4998154217,-69.2705621049],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 685,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([20.6577215958,-71.1882913105],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 697,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([20.3998154217,-70.3705621049],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 706,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([28.1056855703,-58.4246021224],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 687,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([25.9940451364,-62.1549293583],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 680,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([21.6577215958,-70.1882913105],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 684,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([23.6940451364,-64.4549293583],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 693,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([24.3065268726,-67.9988461393],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 692,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	var nodes32 = Array();
+		nodes32[0] = [26.8170937243, -64.8055224316];
+		nodes32[1] = [25.8406013517, -65.780283421];
+		nodes32[2] = [24.1686760108, -64.5210249795];
+		nodes32[3] = [24.5599479188, -62.9306517636];
+		nodes32[4] = [25.3682535062, -63.9735370812];
+		nodes32[5] = [26.2344869757, -63.6087776749];
+		drawPolygon(nodes32,null,{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 701,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+
+	placeMarker([21.4535044901,-61.2384721354],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 683,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([23.3065268726,-68.9988461393],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 679,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([27.2351096373,-66.8429804641],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 691,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([22.1847317394,-64.4406957944],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 686,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([23.3706588661,-69.8754826618],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 716,
+		colour:'FFA200',
+		typeId:24
+	});
+
+
+	placeMarker([24.4847317394,-62.1406957944],{
+		name: 'Ursus maritimus',
+		addMarker: true,
+		addDelete: false,
+		occurrenceId: 707,
+		colour:'FFA200',
+		typeId:24
+	});
 
 
 });
@@ -258,7 +538,7 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','7')
+addRequestVar('id','16')
 
 })
 

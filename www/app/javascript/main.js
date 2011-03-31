@@ -69,8 +69,7 @@ var allTranslations = Array();
 function _(text) {
 	
 	return text;
-	
-	
+
 	/* TO BE DONE */
 	for(var i=0;i<allTranslations.length;i++) {
 		if (allTranslations[i][0]==text) {
