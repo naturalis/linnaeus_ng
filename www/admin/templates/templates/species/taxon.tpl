@@ -26,8 +26,6 @@
 
 <div id="taxon-pages-table-div"></div>
 
-
-
 <div style="width:780px;height:610px;">
 
 	<div id="taxon-language-default">

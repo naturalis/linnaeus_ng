@@ -55,6 +55,18 @@ function fillStates(obj,char) {
 
 		goState();
 
+	} else {
+
+		setInfo(
+			'<b>'+$('#characteristics :selected').text()+'</b><br />'+
+			sprintf(
+				_('Click %shere%s to specify a value; you can also double-click "%s" to do so.'),
+				'<span class="a" onclick="addSelected($(\'#characteristics\'))">',
+				'</span>',
+				$('#characteristics :selected').text()
+			)
+		);
+
 	}
 
 }

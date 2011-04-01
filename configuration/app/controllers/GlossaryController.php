@@ -1,10 +1,6 @@
 <?php
 
 /*
-
-	call:
-		$this->matchTerms($text,$language_id);
-
 	glossary anatomy:
 	
 	- the glossary consists of terms.
@@ -25,11 +21,7 @@ include_once ('Controller.php');
 class GlossaryController extends Controller
 {
 
-	private $_currentGlossaryId = false;
-
     public $usedModels = array(
-		'glossary',
-		'glossary_synonym',
 		'glossary_media',
 		'label_language'
     );
@@ -146,28 +138,21 @@ class GlossaryController extends Controller
     
     }
 
-	public function matchTerms($text,$languageId)
-	{
 
-		if (empty($text) || empty($languageId)) return;
+    public function hintAction()
+    {
+    
+		if (!$this->rHasId()) return;
 
-		$wordlist = $this->getWordList($languageId,true);
+		$term = $this->getGlossaryTerm($this->requestData['id']);
 
-		$processed = $text;
+		$this->smarty->assign('id', $this->requestData['id']);
 
-		foreach((array)$wordlist as $key => $val) {
-		
-			$this->_currentGlossaryId = $val['id'];
+		if (isset($term)) $this->smarty->assign('term', $term);
 
-			$expr = '|\b('.$val['word'].')\b|i';
-		
-			$processed = preg_replace_callback($expr,array($this,'embedGlossaryLink'),$processed);
-		
-		}
-
-		return $processed;
-	
-	}
+        $this->printPage();
+    
+    }
 
 	private function getGlossaryTerms($search)
 	{
@@ -297,47 +282,6 @@ class GlossaryController extends Controller
 
 		return $_SESSION['user']['glossary']['alpha'];
 	
-	}
-
-	private function embedGlossaryLink($matches)
-	{
-
-		return '<span class="taxonContentGlossaryLink" onclick="taxonContentOpenGlossaryLink('.$this->_currentGlossaryId.')">'.$matches[0].'</span>';
-
-	}
-
-	private function getWordList($languageId,$forceUpdate=false)
-	{
-
-		if ($forceUpdate || !isset($_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
-
-			$terms = $this->models->Glossary->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-					),
-					'columns' => 'id,term as word,\'term\' as source'
-				)
-			);
-
-			$synonyms = $this->models->GlossarySynonym->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-					),
-					'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
-				)
-			);
-
-
-			$_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge($terms,$synonyms);
-
-		}
-
-		return $_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'];
-
 	}
 
 	private function getAdjacentTerms($id)

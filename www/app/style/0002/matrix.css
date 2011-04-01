@@ -11,13 +11,13 @@
 }
 
 #char-states #characteristics {
-	width:inherit;
+	width:300px;
 	height:125px;
 	margin-bottom:10px;
 }
 
 #char-states #states {
-	width:inherit;
+	width:300px;
 	height:inherit;
 	height:125px;
 }
@@ -34,6 +34,19 @@
 	font-size:inherit;
 }
 
+#choices {
+	margin-bottom:5px;
+	vertical-align:top;
+	width:585px;
+	height:155px;
+}
+
+#choices #selected {
+	width:580px;
+	height:155px;
+}
+
+
 #pane-right {
 	width:400px;
 	position:relative;
@@ -43,36 +56,19 @@
 	margin-bottom:25px;
 }
 
-#scores-taxa {
-	width:460px;
-	height:10px;
-}
-
 #buttons {
 	margin-bottom:10px;
 	vertical-align:top;
 }
 
-#choices {
-	margin-bottom:5px;
-	vertical-align:top;
-	width:585px;
-	height:155px;
-}
-
-#selected {
-	width:inherit;
-	height:inherit;
-}
-
 #scores-taxa {
-	width:inherit;
-	height:inherit;
+	width:400px;
+	height:485px;
 }
 
 #scores {
-	width:inherit;
-	height:inherit;
+	width:400px;
+	height:485px;
 }
 
 .info-header {

@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-31 14:14:21
+<?php /* Smarty version 2.6.26, created on 2011-04-01 17:02:23
          compiled from ../shared/footer.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/footer.tpl', 3, false),array('modifier', 'escape', '../shared/footer.tpl', 7, false),array('modifier', 'addslashes', '../shared/footer.tpl', 20, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/footer.tpl', 3, false),array('modifier', 'escape', '../shared/footer.tpl', 7, false),array('modifier', 'addslashes', '../shared/footer.tpl', 35, false),)), $this); ?>
 <?php if ($this->_tpl_vars['showBackToSearch'] && $this->_tpl_vars['session']['user']['search']['hasSearchResults']): ?>
 <div id="back-to-search">
 <span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>back to search results<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
@@ -18,6 +18,21 @@ smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared
 <div id="footer-container">
 </div ends="footer-container">
 </div ends="body-container">
+<div id="hint-balloon" onmouseout="glossTextOut()" 
+	style="
+	background-color:#FFFF99;
+	border:1px solid #bbbb00;
+	width:225px;height:100px;
+	padding:3px;
+	font-size:9px;
+	display:none;
+	overflow:hidden;
+	cursor:pointer;
+	position:absolute;
+	top:0px;
+	left:0px;
+	">
+</div>
 </form>
 <?php echo '
 <script type="text/JavaScript">

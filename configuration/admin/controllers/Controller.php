@@ -1,10 +1,4 @@
 <?php
-/*
-
-- setRequestData needs recursion for the arrays (fuck knows why, though)
-
-*/
-
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");

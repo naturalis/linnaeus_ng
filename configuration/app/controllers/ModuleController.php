@@ -292,7 +292,7 @@ class ModuleController extends Controller
 			);
 
 			$page['topic'] = $cfm[0]['topic'];
-			$page['content'] = $cfm[0]['content'];
+			$page['content'] = $this->matchGlossaryTerms($cfm[0]['content']);
 
 			$fmm = $this->models->FreeModuleMedia->_get(
 				array(

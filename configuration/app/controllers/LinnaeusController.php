@@ -1,5 +1,7 @@
 <?php
 
+//$this->matchGlossaryTerms(
+
 include_once ('Controller.php');
 
 class LinnaeusController extends Controller
@@ -21,8 +23,6 @@ class LinnaeusController extends Controller
 		'choice_keystep',
 		'keystep',
 		'literature',
-		'glossary',
-		'glossary_synonym',
 		'glossary_media',
 		'matrix_name',
 		'characteristic_label',
@@ -37,6 +37,7 @@ class LinnaeusController extends Controller
     );
 
 	public $cssToLoad = array('basics.css','search.css');
+
 	public $jsToLoad = array('all' => array(
 		'main.js'
 	));
@@ -114,11 +115,11 @@ class LinnaeusController extends Controller
 
 	        $this->setPageName( _('Home'));
 
-			$this->smarty->assign('content',$this->getContent('introduction'));
+			$this->smarty->assign('content',$this->matchGlossaryTerms($this->getContent('introduction')));
 
 		} else {
 		
-			$d = $this->getContent(null,$this->requestData['id']);
+			$d = $this->matchGlossaryTerms($this->getContent(null,$this->requestData['id']));
 
 	        $this->setPageName( _($d['subject']));
 
@@ -130,33 +131,6 @@ class LinnaeusController extends Controller
   
     }
 
-	private function _highlightFoundCallback($matches)
-	{
-
-		return '<span class="highlight">'.$matches[0].'</span>';
-
-	}
-
-	private function _highlightFound($params, $content)
-	{
-
-		if (preg_match('/^"(.+)"$/',$params['search'])) {
-		
-			$s = '('.substr($params['search'],1,strlen($params['search'])-2).')';
-
-		} else {
-
-			$s = preg_replace('/(\s+)/',' ',trim($params['search']));
-	
-			if (strpos($s,' ')!==0) $s = '('.str_replace(' ','|',$s).')i';
-
-		}
-
-		return preg_replace_callback($s,array( &$this, '_highlightFoundCallback'),$content);
-
-	}
-
-
 	public function highlightFound($params, $content, &$smarty, &$repeat)
 	{
 
@@ -164,16 +138,6 @@ class LinnaeusController extends Controller
 
 		return $this->_highlightFound($params, $content);
 
-	}
-
-	private function clipContent($str,$pos,$s)
-	{
-
-		return
-			($pos-25 > 0 ? '...' : '' ).
-			substr($str,($pos-25<0 ? 0 : $pos-25),strlen($s)+50).
-			(($pos+strlen($s)) < strlen($str) ? '...' : '');
-	
 	}
 
 	public function foundContent($params, $content, &$smarty, &$repeat)
@@ -221,7 +185,6 @@ class LinnaeusController extends Controller
 
 	}
 
-
 	public function redoSearchAction()
 	{
 
@@ -236,26 +199,6 @@ class LinnaeusController extends Controller
 		$this->redirect('search.php');
 
 	}
-
-	private function doSearch($search)
-	{
-
-		$species = $this->searchSpecies($search);
-
-		return array(
-			'species' => $species,
-			'modules' => $this->searchModules($search),
-			'dichkey' => $this->searchDichotomousKey($search),
-			'literature' => $this->searchLiterature($search),
-			'glossary' => $this->searchGlossary($search),
-			'matrixkey' => $this->searchMatrixKey($search),
-			'content' => $this->searchContent($search),
-			'map' => $this->searchMap($species)
-			
-		);
-
-	}
-
 
     /**
      * Index of project: introduction
@@ -329,6 +272,62 @@ class LinnaeusController extends Controller
         $this->printPage();
   
     }
+
+	private function _highlightFoundCallback($matches)
+	{
+
+		return '<span class="highlight">'.$matches[0].'</span>';
+
+	}
+
+	private function _highlightFound($params, $content)
+	{
+
+		if (preg_match('/^"(.+)"$/',$params['search'])) {
+		
+			$s = '('.substr($params['search'],1,strlen($params['search'])-2).')';
+
+		} else {
+
+			$s = preg_replace('/(\s+)/',' ',trim($params['search']));
+	
+			if (strpos($s,' ')!==0) $s = '('.str_replace(' ','|',$s).')i';
+
+		}
+
+		return preg_replace_callback($s,array( &$this, '_highlightFoundCallback'),$content);
+
+	}
+
+
+	private function clipContent($str,$pos,$s)
+	{
+
+		return
+			($pos-25 > 0 ? '...' : '' ).
+			substr($str,($pos-25<0 ? 0 : $pos-25),strlen($s)+50).
+			(($pos+strlen($s)) < strlen($str) ? '...' : '');
+	
+	}
+
+	private function doSearch($search)
+	{
+
+		$species = $this->searchSpecies($search);
+
+		return array(
+			'species' => $species,
+			'modules' => $this->searchModules($search),
+			'dichkey' => $this->searchDichotomousKey($search),
+			'literature' => $this->searchLiterature($search),
+			'glossary' => $this->searchGlossary($search),
+			'matrixkey' => $this->searchMatrixKey($search),
+			'content' => $this->searchContent($search),
+			'map' => $this->searchMap($species)
+			
+		);
+
+	}
 
 	private function resolveProjectId()
 	{

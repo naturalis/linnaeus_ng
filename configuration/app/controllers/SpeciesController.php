@@ -1,15 +1,5 @@
 <?php
 
-/*
-
-lijst met species
-bladen
-classificatie (boom)
-
-glossary!
-
-*/
-
 include_once ('Controller.php');
 
 class SpeciesController extends Controller
@@ -142,6 +132,7 @@ class SpeciesController extends Controller
 			$activeCategory = $this->rHasVal('cat') ? $this->requestData['cat'] : $categories['defaultCategory'];
 
 			$content = $this->getTaxonContent($taxon['id'],$activeCategory);
+
 
 			if ($taxon['lower_taxon']==1) {
 			
@@ -370,7 +361,7 @@ class SpeciesController extends Controller
 					)
 				);
 				
-				return isset($ct) ? $ct[0]['content'] : null;
+				return isset($ct) ? $this->matchGlossaryTerms($ct[0]['content']) : null;
 
 		}
 	
@@ -402,7 +393,7 @@ class SpeciesController extends Controller
 				)
 			);
 
-			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
+			$mt[$key]['description'] = $mdt ? $this->matchGlossaryTerms($mdt[0]['description']) : null;
 
 			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ?
 					$this->controllerSettings['mime_types'][$val['mime_type']] :

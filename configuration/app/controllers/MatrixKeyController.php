@@ -234,7 +234,6 @@ class MatrixKeyController extends Controller
 
 	}
 
-
 	private function getTaxa()
 	{
 

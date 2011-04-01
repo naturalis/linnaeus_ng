@@ -592,7 +592,7 @@ class GlossaryController extends Controller
 	private function embedGlossaryLink($matches)
 	{
 
-		return '<span class="taxonContentGlossaryLink" onclick="taxonContentOpenGlossaryLink('.$this->_currentGlossatyId.')">'.$matches[0].'</span>';
+		return '<span class="glossary-term-highlight" onclick="glossTextLink('.$this->_currentGlossatyId.')">'.$matches[0].'</span>';
 
 	}
 

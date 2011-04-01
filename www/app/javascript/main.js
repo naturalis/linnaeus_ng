@@ -60,9 +60,31 @@ function taxonContentOpenMediaLink(id) {
 	alert('to be implemented');
 }
 
-function taxonContentOpenGlossaryLink(id) {
-	alert('to be implemented');
+function glossTextLink(id) {
 }
+
+function glossTextOver(id,caller) {
+
+	if (!id) return;
+
+	$('#hint-balloon').bind('click', function() {
+		goGlossaryTerm(id);
+	});
+
+	var pos = $(caller).position();
+	$('#hint-balloon').show();
+	$('#hint-balloon').offset({ left: pos.left + 10, top: pos.top - $('#hint-balloon').height() - 12});
+
+	$('#hint-balloon').load('../glossary/hint.php?id='+id);
+
+}
+
+function glossTextOut() {
+
+	$('#hint-balloon').hide();
+
+}
+
 
 var allTranslations = Array();
 
@@ -313,7 +335,7 @@ function doBackForm(url,data) {
 
 	for (var i=0;i<obj.length;i++) {
 
-		addFormVal(obj[i].var,obj[i].val);
+		addFormVal(obj[i].vari,obj[i].val);
 
 	}
 
@@ -322,16 +344,3 @@ function doBackForm(url,data) {
 	goForm(url);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

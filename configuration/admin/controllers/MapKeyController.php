@@ -17,8 +17,6 @@ class MapKeyController extends Controller
 {
 
     public $usedModels = array(
-		'map',
-		'map_name',
 		'occurrence_taxon',
 		'geodata_type',
 		'geodata_type_title'

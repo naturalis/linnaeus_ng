@@ -4,6 +4,9 @@
 
 check setLocale
 
+	$this->matchGlossaryTerms()
+
+
 */
 
 
@@ -17,6 +20,8 @@ class Controller extends BaseClass
     private $_smartySettings;
     private $_fullPath;
     private $_fullPathRelative;
+
+	private $_currentGlossaryId = false;
 
     public $viewName;
     public $controllerBaseName;
@@ -46,7 +51,9 @@ class Controller extends BaseClass
 		'taxon',
 		'project_rank',
 		'label_project_rank',
-		'rank'
+		'rank',
+		'glossary',
+		'glossary_synonym'
     );
 
     private $usedHelpersBase = array(
@@ -65,6 +72,8 @@ class Controller extends BaseClass
     {
  
         parent::__construct();
+
+        $this->setPhpIniVars();
 
         $this->setDebugMode();
 
@@ -118,7 +127,6 @@ class Controller extends BaseClass
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
 	
 	}
-
 
     /**
      * Makes a numeric show order into another list marker
@@ -454,44 +462,30 @@ class Controller extends BaseClass
 
 	}
 
-	private function getBreadcrumbs()
+	public function matchGlossaryTerms($text,$forceLookup=false)
 	{
 
-		return isset($_SESSION['user']['breadcrumbs']) ? $_SESSION['user']['breadcrumbs'] : null;
+		if (empty($text) || !is_string($text)) return $text;
 
+		$wordlist = $this->getWordList($forceLookup);
+
+		$processed = $text;
+
+		foreach((array)$wordlist as $key => $val) {
+		
+			$this->_currentGlossaryId = $val['id'];
+
+			$expr = '|\b('.$val['word'].')\b|i';
+		
+			$processed = preg_replace_callback($expr,array($this,'embedGlossaryLink'),$processed);
+		
+		}
+
+		return $processed;
+	
 	}
 
-    /**
-     * Sets a global 'debug' mode, based on a general setting in the config file
-     *
-     * @access     private
-     */
-    private function setDebugMode ()
-    {
-        
-        $this->debugMode = $this->generalSettings['debugMode'];
-    
-    }
-
-    /**
-     * Starts the user's session
-     *
-     * @access     private
-     */
-    private function startSession ()
-    {
-
-		session_name('lng-application');
-
-        session_start();
-
-        /* DEBUG */        
-        $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
-
-    }
-
-
-    /**
+   /**
      * Sets the name of the current page, for display purposes, in a class variable 'pageName'.
      *
      * @param      string    $name    the page's name
@@ -807,7 +801,6 @@ class Controller extends BaseClass
 	}
 
 
-
     /**
      * Returns the controller's base name
      *
@@ -904,43 +897,6 @@ class Controller extends BaseClass
 		return $this->rHasVal('id');
 	
 	}
-
-    /**
-     * Assigns basic Smarty variables
-     *
-     * @access     public
-     */
-    private function preparePage()
-    {
- 
- 		if (isset($_SESSION['project']['languages'])) $this->smarty->assign('languages',$_SESSION['project']['languages']);
-
- 		$this->smarty->assign('currentLanguageId',$this->getCurrentLanguageId());
-
-		$this->smarty->assign('menu',$this->getMainMenu());
- 
-//        $this->setBreadcrumbs();
-        $this->smarty->assign('session', $_SESSION);
-        $this->smarty->assign('requestData', $this->requestData);
-        $this->smarty->assign('baseUrl', $this->baseUrl);
-        $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
-        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-//        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
-        $this->smarty->assign('backlink', $this->getBackLink());
-        $this->smarty->assign('errors', $this->getErrors());
-        $this->smarty->assign('messages', $this->getMessages());
-        $this->smarty->assign('pageName', $this->getPageName());
-        $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
-
-		if (isset($this->cssToLoad)) {
-	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
-    	}
-
-		if (isset($this->jsToLoad)) {
-	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-    	}
-
-    }
 
     /**
      * Renders and displays the page
@@ -1057,6 +1013,112 @@ class Controller extends BaseClass
 
 	}
 
+    /**
+     * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
+     *
+     * @param array    $array    array to sort
+     * @param array    $sortBy    array to array of key, direction and case-sensitivity
+     * @access     public
+     */
+    public function customSortArray (&$array, $sortBy)
+    {
+        
+        if (!isset($array))
+            return;
+        
+        if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
+        
+        if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
+        
+        if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
+        
+        usort($array,
+			array(
+				$this, 
+				'doCustomSortArray'
+        	)
+		);
+    
+    }
+
+
+
+	private function setPhpIniVars()
+	{
+
+		ini_set('session.cache_limiter', 'private');
+	
+	}
+
+
+
+    /**
+     * Sets a global 'debug' mode, based on a general setting in the config file
+     *
+     * @access     private
+     */
+    private function setDebugMode ()
+    {
+        
+        $this->debugMode = $this->generalSettings['debugMode'];
+    
+    }
+
+    /**
+     * Starts the user's session
+     *
+     * @access     private
+     */
+    private function startSession ()
+    {
+
+		session_name('lng-application');
+
+        session_start();
+
+        /* DEBUG */        
+        $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+
+    }
+
+
+    /**
+     * Assigns basic Smarty variables
+     *
+     * @access     public
+     */
+    private function preparePage()
+    {
+ 
+ 		if (isset($_SESSION['project']['languages'])) $this->smarty->assign('languages',$_SESSION['project']['languages']);
+
+ 		$this->smarty->assign('currentLanguageId',$this->getCurrentLanguageId());
+
+		$this->smarty->assign('menu',$this->getMainMenu());
+ 
+//        $this->setBreadcrumbs();
+        $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('requestData', $this->requestData);
+        $this->smarty->assign('baseUrl', $this->baseUrl);
+        $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
+        $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
+//        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
+        $this->smarty->assign('backlink', $this->getBackLink());
+        $this->smarty->assign('errors', $this->getErrors());
+        $this->smarty->assign('messages', $this->getMessages());
+        $this->smarty->assign('pageName', $this->getPageName());
+        $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
+
+		if (isset($this->cssToLoad)) {
+	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
+    	}
+
+		if (isset($this->jsToLoad)) {
+	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
+    	}
+
+    }
+
 
     /**
      * Sets project URL for project images
@@ -1064,7 +1126,7 @@ class Controller extends BaseClass
 	 * @todo	take out hard reference to /media/
      * @access     private
      */
-    private function setUrls ()
+    private function setUrls()
     {
         
 		$p = $this->getCurrentProjectId();
@@ -1120,7 +1182,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setNames ()
+    private function setNames()
     {
 
         $this->appName = $this->generalSettings['app']['pathName'];
@@ -1167,7 +1229,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadModels ()
+    private function loadModels()
     {
 
 		if (isset($this->usedModelsBase) && isset($this->usedModels)) { 
@@ -1226,7 +1288,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function setSmartySettings ()
+    private function setSmartySettings()
     {
         
         $this->_smartySettings = $this->config->getSmartySettings();
@@ -1247,12 +1309,13 @@ class Controller extends BaseClass
 
     }
 
+
     /**
      * Assigns POST and GET variables to a class variable 'requestData'; posted files to 'requestDataFiles'
      *
      * @access     private
      */
-    private function setRequestData ()
+    private function setRequestData()
     {
 
         $this->requestData = false;
@@ -1307,44 +1370,13 @@ class Controller extends BaseClass
     }
 
 
-
-    /**
-     * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
-     *
-     * @param array    $array    array to sort
-     * @param array    $sortBy    array to array of key, direction and case-sensitivity
-     * @access     public
-     */
-    public function customSortArray (&$array, $sortBy)
-    {
-        
-        if (!isset($array))
-            return;
-        
-        if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
-        
-        if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
-        
-        if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
-        
-        usort($array,
-			array(
-				$this, 
-				'doCustomSortArray'
-        	)
-		);
-    
-    }
-
-
-
     /**
      * Sets key to sort by for doCustomSortArray
      *
      * @param string    name of the field to sort by
      * @access     private
      */
-    private function setSortField ($field)
+    private function setSortField($field)
     {
         
         $this->sortField = $field;
@@ -1358,7 +1390,7 @@ class Controller extends BaseClass
      * @return string    name of the field to sort by; defaults to 'id'
      * @access     private
      */
-    private function getSortField ()
+    private function getSortField()
     {
         
         return !empty($this->sortField) ? $this->sortField : 'id';
@@ -1372,7 +1404,7 @@ class Controller extends BaseClass
      * @param string    $a    asc or desc
      * @access     private
      */
-    private function setSortDirection ($dir)
+    private function setSortDirection($dir)
     {
         
         $this->sortDirection = $dir;
@@ -1386,7 +1418,7 @@ class Controller extends BaseClass
      * @return string    asc or desc
      * @access     private
      */
-    private function getSortDirection ()
+    private function getSortDirection()
     {
         
         return !empty($this->sortDirection) ? $this->sortDirection : 'asc';
@@ -1400,7 +1432,7 @@ class Controller extends BaseClass
      * @param string    $a    i(nsensitive) or s(ensitive)
      * @access     private
      */
-    private function setSortCaseSensitivity ($sens)
+    private function setSortCaseSensitivity($sens)
     {
         
         $this->sortCaseSensitivity = $sens;
@@ -1414,7 +1446,7 @@ class Controller extends BaseClass
      * @return string    i(nsensitive) or s(ensitive)
      * @access     private
      */
-    private function getSortCaseSensitivity ()
+    private function getSortCaseSensitivity()
     {
         
         return !empty($this->sortCaseSensitivity) ? $this->sortCaseSensitivity : 'i';
@@ -1429,7 +1461,7 @@ class Controller extends BaseClass
      * @param array    $b    value of the other
      * @access     private
      */
-    private function doCustomSortArray ($a, $b)
+    private function doCustomSortArray($a, $b)
     {
         
         $f = $this->getSortField();
@@ -1461,7 +1493,7 @@ class Controller extends BaseClass
      *
      * @access     private
      */
-    private function loadHelpers ()
+    private function loadHelpers()
     {
 
 		if (isset($this->usedHelpersBase) && isset($this->usedHelpers)) { 
@@ -1514,9 +1546,6 @@ class Controller extends BaseClass
 
 	}
 
-
-
-
 	private function getBackLink()
 	{
 
@@ -1539,7 +1568,7 @@ class Controller extends BaseClass
 
 		foreach((array)$this->requestData as $key => $val) {
 
-			$p[] = array('var' => $key,'val' => $val);
+			$p[] = array('vari' => $key,'val' => $val); // IE takes exception to variables called 'var' in javascript, hence 'vari'
 
 		}
 
@@ -1583,6 +1612,53 @@ class Controller extends BaseClass
 
 		}
 		
+	}
+
+	private function getWordList($forceUpdate=false)
+	{
+
+		if ($forceUpdate || !isset($_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
+
+			$terms = $this->models->Glossary->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+					),
+					'columns' => 'id,term as word,\'term\' as source'
+				)
+			);
+
+			$synonyms = $this->models->GlossarySynonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+					),
+					'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
+				)
+			);
+
+			$_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge($terms,$synonyms);
+
+		}
+
+		return $_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'];
+
+	}
+
+	private function embedGlossaryLink($matches)
+	{
+
+		return '<span class="glossary-term-highlight" onclick="glossTextLink('.$this->_currentGlossaryId.')" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
+
+	}
+	
+	private function getBreadcrumbs()
+	{
+
+		return isset($_SESSION['user']['breadcrumbs']) ? $_SESSION['user']['breadcrumbs'] : null;
+
 	}
 
 }

@@ -7,7 +7,7 @@
 	font-weight:bold;
 }
 
-.taxonContentLiteratureLink,.taxonContentMediaLink,.taxonContentGlossaryLink{
+.taxonContentLiteratureLink,.taxonContentMediaLink,.glossary-term-highlight{
 	cursor:pointer;
 	text-decoration:underline;
 	color:#0000CC;

@@ -1,9 +1,9 @@
 340
-a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301569020;s:7:"expires";i:1301572620;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301652323;s:7:"expires";i:1301655923;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Literature: "Yiekie, Carl (1987)"</title>
+	<title>Imaginary Beings Of The Literary World: Literature: "Aaproodm'ies & Johnson, H. (1999)"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/literature.css");
@@ -54,7 +54,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 </div><div id="page-container">
 
 <div id="alphabet">
-			<span class="letter" onclick="goAlpha('a','index.php')">a</span>
+			<span class="letter-active">a</span>
 				<span class="letter" onclick="goAlpha('b','index.php')">b</span>
 				<span class="letter" onclick="goAlpha('c','index.php')">c</span>
 				<span class="letter" onclick="goAlpha('d','index.php')">d</span>
@@ -68,7 +68,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 				<span class="letter" onclick="goAlpha('q','index.php')">q</span>
 				<span class="letter" onclick="goAlpha('s','index.php')">s</span>
 				<span class="letter" onclick="goAlpha('w','index.php')">w</span>
-				<span class="letter-active">y</span>
+				<span class="letter" onclick="goAlpha('y','index.php')">y</span>
 				<span class="letter" onclick="goAlpha('ה','index.php')">ה</span>
 				<span class="letter" onclick="goAlpha('م','index.php')">م</span>
 		</div>
@@ -77,41 +77,67 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	<div id="reference">
 		<div id="author">
 			<span id="name">
-				Yiekie, Carl
+				Aaproodm'ies & Johnson, H.
 			</span>
-			<span id="year">1987</span>
+			<span id="year">1999</span>
 		</div>
-		<div id="text">Bears Are For Queers: gender studies into ursus maritimus</div>
+		<div id="text">The result of the two var dumps are 3 and 0, respectively.  Clearly the internal pointer of $a['b'] was reset by doing the foreach loop over $a.
+
+<span class="glossary-term-highlight" onclick="glossTextLink(22)" onmouseover="glossTextOver(22,this)">Knulopios</span> time the foreach loop iterated over the 'a' and 'b' keys of $a it made a copy of $a['a'] and $a['b'] into $d which resetted the internal pointers of $a['a'] and $a['b'] despite making no obvious changes.
+
+The <b><span class="glossary-term-highlight" onclick="glossTextLink(21)" onmouseover="glossTextOver(21,this)">GggYY</span> is instead</b> to <i>iterate</i> over the keys of $a.</div>
 
 			<div id="taxa">
 			<div class="title">Referenced in the following taxa:</div>
 					<div>
+				<span class="a" onclick="goTaxon(37)">Ursus americanus</span>
+							</div>
+					<div>
 				<span class="a" onclick="goTaxon(16)">Ursus maritimus</span>
 							</div>
 					<div>
-				<span class="a" onclick="goTaxon(17)">Ursus maritimus marinus</span>
+				<span class="a" onclick="goTaxon(10)">Ursus thibetanus thibetanus</span>
 				<span class="hybrid-marker" title="hybrid">X</span>			</div>
 					<div>
-				<span class="a" onclick="goTaxon(18)">Ursus maritimus maritimus</span>
-				<span class="hybrid-marker" title="hybrid">X</span>			</div>
+				<span class="a" onclick="goTaxon(5)">Ursidae</span>
+							</div>
+					<div>
+				<span class="a" onclick="goTaxon(1)">Animalia</span>
+							</div>
 				</div>
 		
 	
+			<div id="synonyms">
+			<div class="title">Referenced in the following synonyms:</div>
+					<div><span class="a" onclick="goTaxon(1,'names')">Beestjes</span></div>
+				</div>
 	
 	</div>
 
 	<div id="navigation">
-		<span id="back" onclick="goAlpha('Y','index.php')">back to index</span>
+		<span id="back" onclick="goAlpha('A','index.php')">back to index</span>
 	</div>
 </div>
 
-<div id="back-to-search">
-<span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">back to search results</span>
-</div>
 </div ends="page-container">
 <div id="footer-container">
 </div ends="footer-container">
 </div ends="body-container">
+<div id="hint-balloon" onmouseout="glossTextOut()" 
+	style="
+	background-color:#FFFF99;
+	border:1px solid #bbbb00;
+	width:225px;height:100px;
+	padding:3px;
+	font-size:9px;
+	display:none;
+	overflow:hidden;
+	cursor:pointer;
+	position:absolute;
+	top:0px;
+	left:0px;
+	">
+</div>
 </form>
 
 <script type="text/JavaScript">
@@ -119,8 +145,8 @@ $(document).ready(function(){
 
 	$('#body-container').height($(document).height());
 	
-addRequestVar('search','\"Ursus maritimus\"')
-addRequestVar('id','42')
+addRequestVar('search','enter search term')
+addRequestVar('id','4')
 
 })
 

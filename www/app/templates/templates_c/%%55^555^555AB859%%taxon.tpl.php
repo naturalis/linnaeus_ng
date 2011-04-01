@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-31 13:50:22
+<?php /* Smarty version 2.6.26, created on 2011-04-01 11:34:14
          compiled from ../species/taxon.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../species/taxon.tpl', 10, false),array('modifier', 'count', '../species/taxon.tpl', 29, false),)), $this); ?>
