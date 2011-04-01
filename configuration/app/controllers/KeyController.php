@@ -1,9 +1,4 @@
 <?php
-/*
-
-in controller do something general to catch not having a projectId
-
-*/
 
 include_once ('Controller.php');
 
@@ -37,9 +32,6 @@ class KeyController extends Controller
 			'IE' => array(
 			)
 		);
-//				'jit/jit.js',
-//				'jit/key-tree.js',
-//IE				'jit/Extras/excanvas.js'
 
 
     /**
@@ -180,7 +172,7 @@ class KeyController extends Controller
 					
 		$step['title'] = $ck[0]['title'];
 
-		$step['content'] = $ck[0]['content'];
+		$step['content'] = $this->matchGlossaryTerms($ck[0]['content']);
 
 		return $step;
 
@@ -248,7 +240,7 @@ class KeyController extends Controller
 
 			if (isset($cck[0]['title'])) $choices[$key]['title'] = $cck[0]['title'];
 			
-			if (isset($cck[0]['choice_txt'])) $choices[$key]['choice_txt'] = $cck[0]['choice_txt'];
+			if (isset($cck[0]['choice_txt'])) $choices[$key]['choice_txt'] = $this->matchGlossaryTerms($cck[0]['choice_txt']);
 
 			// resolve the targets to either a next step or a taxon
 			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {

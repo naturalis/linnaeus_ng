@@ -241,3 +241,8 @@ body #body-container {
 .internal-link:hover {
 	text-decoration:underline;
 }
+
+.glossary-term-highlight {
+	background-color:#FFFF99;
+	color:#550000;
+}

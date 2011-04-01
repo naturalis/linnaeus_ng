@@ -92,6 +92,8 @@ class LiteratureController extends Controller
 		if ($this->rHasId()) {
 
 			$ref = $this->getReference($this->requestData['id']);
+			
+			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
 
 			$letter = strtolower(substr($ref['author_first'],0,1));
 

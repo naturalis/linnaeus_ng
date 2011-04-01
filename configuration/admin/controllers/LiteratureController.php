@@ -1,18 +1,5 @@
 <?php
 
-/*
-
-	unset session dinges
-	on
-	  save
-	  delete
-	  update
-	
-	case-sensitivity in getReferences because strtolower() on urdu seems to mess up characters
-
-*/
-
-
 include_once ('Controller.php');
 
 class LiteratureController extends Controller

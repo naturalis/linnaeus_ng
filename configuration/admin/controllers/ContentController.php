@@ -6,9 +6,7 @@ class ContentController extends Controller
 {
 
     public $usedModels = array(
-		'content',
-		'free_module_project',
-		'free_module_project_user'
+		'content'
     );
    
     public $usedHelpers = array(
