@@ -1,45 +1,5 @@
 <?php
 
-
-class myIterator implements Iterator {
-    private $position = 0;
-    private $array = array(
-        "firstelement",
-        "secondelement",
-        "lastelement",
-    );  
-
-    public function __construct() {
-        $this->position = 0;
-    }
-
-    function rewind() {
-        var_dump(__METHOD__);
-        $this->position = 0;
-    }
-
-    function current() {
-        var_dump(__METHOD__);
-        return $this->array[$this->position];
-    }
-
-    function key() {
-        var_dump(__METHOD__);
-        return $this->position;
-    }
-
-    function next() {
-        var_dump(__METHOD__);
-        ++$this->position;
-    }
-
-    function valid() {
-        var_dump(__METHOD__);
-        return isset($this->array[$this->position]);
-    }
-}
-
-
 include_once ('Controller.php');
 
 class ImportController extends Controller
@@ -268,12 +228,31 @@ class ImportController extends Controller
 		return isset($res) ? $res : null;
 
 	}
+	
+	private function checkTreeTops($d)
+	{
+
+		$treetops = false;
+
+		foreach((array)$d as $key => $val) {
+
+			if ($val['parent']=='') {
+
+				$treetops[] = $val;
+
+			}
+
+		}
+			
+		return $treetops;
+
+	}
 
 	private function addSpecies($species)
 	{
 
 		foreach((array)$species as $key => $val) {
-
+$species[$key]['id'] = rand(12,999);continue;
 			$this->models->Taxon->save(
 				array(
 					'id' => 'null',
@@ -290,7 +269,7 @@ class ImportController extends Controller
 			$species[$key]['id'] = $this->models->Taxon->getNewId();
 
 		}
-
+return $species;
 		foreach((array)$species as $key => $val) {
 
 			$t = $this->models->Taxon->_get(
@@ -319,6 +298,150 @@ class ImportController extends Controller
 
 	}
 
+	private function addSpeciesContent($d,$species)
+	{
+
+die('hiero!');
+
+		foreach((array)$species as $key => $val) {
+
+/*
+		records
+				.parenttaxon -> parent taxon rank (ignore)
+				.parentname ->  parent taxon name (ignore)
+				.taxon -> rankname (ignore)
+				.name -> resolve to taxon_id (and holler when that fails)
+???				.description -> content, cat = ??? (filter [p] etc)
+				.taxonomy -> ignore (auto)
+				.vernacuars
+					.vernacular
+						.name -> common name
+						.language -> common name language in default language
+				.syn_vern_description -> ignore
+				.multimedia
+???					.overview	-> image name only 
+					.multimediafile
+						.filename --> filename
+						.fullname --> same (ignore)
+						.caption --> (opt) description (<-- otherwise filename)
+???						.multimedia_type --> "image"
+*/
+		}
+
+		return $species;
+
+	}
+
+	private function replaceOldTags($s,$removeAll=false)
+	{
+	
+		$r = array('<b>','</b>','<i>','</i>',null,null);
+	
+		return str_replace(array('[b]','[/b]','[i]','[/i]','[p]','[/p]'),($removeAll?null:$r),$s);
+	
+	}
+
+	private function resolveAuthors($s)
+	{
+
+		$d = strrpos($s,',');
+		$y = trim(substr($s,$d+1));
+		$a = substr($s,0,$d);
+		$a2 = null;
+		$m = false;
+		$d = strpos($a,'et al.');
+		if ($d!==false) {
+			$a = trim(substr($a,0,$d));
+			$m = true;
+		} else {
+			$d = strpos($a,' and ');
+			if ($d!==false) {
+				$a2 = trim(substr($a,$d+strlen(' and ')));
+				$a = trim(substr($a,0,$d));
+			}
+		}
+		
+		return array(
+			'year' => $y,
+			'valid_year' => is_numeric($y),
+			'author_1' => $a,
+			'author_2' => $a2,
+			'multiple_authors' => $m
+		);
+
+	}
+
+	private function resolveLiterature($d,$species)
+	{
+
+		foreach($d->proj_literature->proj_reference as $key => $val) {
+
+			$l = (string)$val->literature_title;
+			$a = $this->resolveAuthors($l);
+			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
+			$okSp = $unSp = null;
+
+			foreach($val->keywords->keyword as $kKey => $kVal) {
+
+				$t = $this->replaceOldTags((string)$kVal->name,true);
+				if (isset($species[$t])) {
+					$okSp[] = $species[$t]['id'];
+				} else {
+					$unSp[] = $t;
+				}
+
+			}
+
+
+			$a['references'] = array('species' => $okSp,'unknown species' => $unSp);
+
+			$res[] = $a;
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function addLiterature($d)
+	{
+
+		foreach($d as $v) {
+
+			$this->models->Literature->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),				
+					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
+					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
+					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
+					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'] : null,
+					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
+					'text' => isset($val['text']) ? $val['text'] : null,
+				)
+			);
+			
+			$id = $this->models->Literature->getNewId();
+
+			foreach((array)$v['references']['species'] as $kV) {
+
+				$this->models->LiteratureTaxon->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),				
+						'taxon_id' => $kV,
+						'literature_id' => $id,
+					)
+				);
+
+			}
+
+		}
+
+	}
+
+
+
 
 /*
 what te fuck is?
@@ -335,13 +458,17 @@ need to set manually!
 	=> projects_ranks.lower_taxon
 	=> projects_ranks.keypath_endpoint (gaat dat dan ook?)
 
-	taxa tyable
+	taxa table
 		'taxon_order' => 0,
 		'is_hybrid' => 0,
 		'list_level' => 0
 	
 
+	proj_literature->proj_reference->keywords->keyword
+		taxa only, what do glossary terms look like??
+
 	WHAT MODULES!?!?!	
+
 
 
 */
@@ -384,8 +511,20 @@ need to set manually!
 //		$ranks = $this->addProjectRanks($res);
 
 		$species = $this->resolveSpecies($d,$ranks);
-//		$species = $this->addSpecies($species);
+//		user check --> might have spelling mistakes!!
+		$treetops = $this->checkTreeTops($species);
+//		if many: animalia / plantae => god species, BUT also spelling mistakes (sigh)
 
+		// BEWARE THERE ARE FAKE ID'S IN THIS FUNCION!!!!!
+		$species = $this->addSpecies($species);
+		$this->addSpeciesContent($d,$species);
+
+
+
+
+		$lit = $this->resolveLiterature($d,$species);
+// 		check for invalid years, might be suffix! (so set suffix in the $lit array)
+		//$this->addLiterature($lit);
 
 
 
@@ -443,38 +582,8 @@ v				.parentname -> resolve to taxon_id (empty when parenttaxon == none) -
 v				.taxon -> rankname -> resolve to rank_id
 v				.name -> name
 
-//IF TWO TOP TAXA WITHOUT PARENT (animalis / planate) CREATE A "GOD" TAXON AS THEIR PARENT!
-// create out of system rank_id 999 in  dev_projects_ranks;
 
-		proj_literature
-			.proj_reference
-				.literature_title -> author_first / author_second / multiple_authors / year / suffix
-				.fullreference -> text
-				.keywords
-					.keyword
-???						.name -> taxon and/or glossary (seems taxon only, whar does glossary look like?)
-		
-for [p] etc: find all and propose defaults, find internal links
 
-		records
-				.parenttaxon -> parent taxon rank (ignore)
-				.parentname ->  parent taxon name (ignore)
-				.taxon -> rankname (ignore)
-				.name -> resolve to taxon_id (and holler when that fails)
-???				.description -> content, cat = ??? (filter [p] etc)
-				.taxonomy -> ignore (auto)
-				.vernacuars
-					.vernacular
-						.name -> common name
-						.language -> common name language in default language
-				.syn_vern_description -> ignore
-				.multimedia
-???					.overview	-> image name only 
-					.multimediafile
-						.filename --> filename
-						.fullname --> same (ignore)
-						.caption --> (opt) description (<-- otherwise filename)
-???						.multimedia_type --> "image"
 						
 
 KEY
@@ -519,6 +628,14 @@ MATRIX
 	}
 
 
+
+	private function deleteLiterature($id)
+	{
+
+		$this->models->LiteratureTaxon->delete(array('project_id' => $id));
+		$this->models->Literature->delete(array('project_id' => $id));
+			
+	}
 
 	private function deleteSpecies($species)
 	{
