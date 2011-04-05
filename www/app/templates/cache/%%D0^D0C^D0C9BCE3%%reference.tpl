@@ -1,9 +1,9 @@
 340
-a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301652323;s:7:"expires";i:1301655923;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301998621;s:7:"expires";i:1302002221;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Literature: "Aaproodm'ies & Johnson, H. (1999)"</title>
+	<title>Imaginary Beings Of The Literary World: Literature: "Oonk, H. (1980)"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/literature.css");
@@ -54,7 +54,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 </div><div id="page-container">
 
 <div id="alphabet">
-			<span class="letter-active">a</span>
+			<span class="letter" onclick="goAlpha('a','index.php')">a</span>
 				<span class="letter" onclick="goAlpha('b','index.php')">b</span>
 				<span class="letter" onclick="goAlpha('c','index.php')">c</span>
 				<span class="letter" onclick="goAlpha('d','index.php')">d</span>
@@ -63,7 +63,7 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 				<span class="letter" onclick="goAlpha('k','index.php')">k</span>
 				<span class="letter" onclick="goAlpha('l','index.php')">l</span>
 				<span class="letter" onclick="goAlpha('m','index.php')">m</span>
-				<span class="letter" onclick="goAlpha('o','index.php')">o</span>
+				<span class="letter-active">o</span>
 				<span class="letter" onclick="goAlpha('p','index.php')">p</span>
 				<span class="letter" onclick="goAlpha('q','index.php')">q</span>
 				<span class="letter" onclick="goAlpha('s','index.php')">s</span>
@@ -77,45 +77,18 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	<div id="reference">
 		<div id="author">
 			<span id="name">
-				Aaproodm'ies & Johnson, H.
+				Oonk, H.
 			</span>
-			<span id="year">1999</span>
+			<span id="year">1980</span>
 		</div>
-		<div id="text">The result of the two var dumps are 3 and 0, respectively.  Clearly the internal pointer of $a['b'] was reset by doing the foreach loop over $a.
+		<div id="text">*Vinyl version from Optimo Records* Killer new release from Factory Floor backed with a smart Optimo remix. The last year has been the groups most productive, seeing the release of an essential 10" + DVD and successive remixes from Chris Carter and Stephen Morris, all on Blast First Petite. On '(R E A L L O V E)' theres no massive transformation, just a few tweaks to the formula, making for an even more dancefloor friendly thrust, Niki's vocals walking through walls of tempered industrial dub guitars and ethereal atmospheres all powered by a motorik bassline arpeggio. The Optimo remix remains very faithful to the original, reworking the mix balance to give more precedence to the flying, flanging hi-hats for a more grooving, technoid sensation. TIP! </div>
 
-<span class="glossary-term-highlight" onclick="glossTextLink(22)" onmouseover="glossTextOver(22,this)">Knulopios</span> time the foreach loop iterated over the 'a' and 'b' keys of $a it made a copy of $a['a'] and $a['b'] into $d which resetted the internal pointers of $a['a'] and $a['b'] despite making no obvious changes.
-
-The <b><span class="glossary-term-highlight" onclick="glossTextLink(21)" onmouseover="glossTextOver(21,this)">GggYY</span> is instead</b> to <i>iterate</i> over the keys of $a.</div>
-
-			<div id="taxa">
-			<div class="title">Referenced in the following taxa:</div>
-					<div>
-				<span class="a" onclick="goTaxon(37)">Ursus americanus</span>
-							</div>
-					<div>
-				<span class="a" onclick="goTaxon(16)">Ursus maritimus</span>
-							</div>
-					<div>
-				<span class="a" onclick="goTaxon(10)">Ursus thibetanus thibetanus</span>
-				<span class="hybrid-marker" title="hybrid">X</span>			</div>
-					<div>
-				<span class="a" onclick="goTaxon(5)">Ursidae</span>
-							</div>
-					<div>
-				<span class="a" onclick="goTaxon(1)">Animalia</span>
-							</div>
-				</div>
-		
 	
-			<div id="synonyms">
-			<div class="title">Referenced in the following synonyms:</div>
-					<div><span class="a" onclick="goTaxon(1,'names')">Beestjes</span></div>
-				</div>
 	
 	</div>
 
 	<div id="navigation">
-		<span id="back" onclick="goAlpha('A','index.php')">back to index</span>
+		<span id="back" onclick="goAlpha('O','index.php')">back to index</span>
 	</div>
 </div>
 
@@ -146,7 +119,7 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','4')
+addRequestVar('id','45')
 
 })
 

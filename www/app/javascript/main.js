@@ -52,12 +52,45 @@ function dumpObj(obj, name, indent, depth) {
 
 }
 
+function allGetTimestamp() {
+
+	var tsTimeStamp= new Date().getTime();
+
+	return tsTimeStamp;
+
+}
+
 function taxonContentOpenLiteratureLink(id) {
-	alert('to be implemented');
+
+	goLiterature(id);
+
 }
 
 function taxonContentOpenMediaLink(id) {
-	alert('to be implemented');
+
+	$.ajax({
+		url: "../species/ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_media_info' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			obj = $.parseJSON(data);
+			$.colorbox({
+				href:obj[0].full_path,
+				title:(obj[0].description ? obj[0].description : obj[0].file_name),
+				transition:"elastic", 
+				maxWidth:800,
+				width:"100%",
+				opacity:0
+			});
+
+		}
+	})
+
 }
 
 function glossTextLink(id) {

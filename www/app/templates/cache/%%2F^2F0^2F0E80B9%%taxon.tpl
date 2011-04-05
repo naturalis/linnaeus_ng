@@ -1,9 +1,9 @@
 335
-a:4:{s:8:"template";a:7:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301654929;s:7:"expires";i:1301658529;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:7:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301998750;s:7:"expires";i:1302002350;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Species module: "Ursus arctos isabellinus" (Classification)</title>
+	<title>Imaginary Beings Of The Literary World: Species module: "Melursus ursinus" (Overview)</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/species.css");
@@ -55,55 +55,29 @@ a:4:{s:8:"template";a:7:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 	</div>
 </div><div id="page-container">
 	<div id="header-titles">
-		<span id="header-title">Ursus arctos isabellinus<span class="hybrid-marker" title="hybrid">X</span></span><br />
+		<span id="header-title">Melursus ursinus</span><br />
 		<span id="header-subtitle"></span>
 	</div>
 
 <div id="categories">
 <table>
 	<tr>
-			<td class="category-active">Classification</td><td class="space"></td>
-		<td class="category" onclick="goTaxon(24,'literature')">Literature</td><td class="space"></td>
+			<td class="category-active">Overview</td><td class="space"></td>
+				<td class="category" onclick="goTaxon(57,'classification')">Classification</td><td class="space"></td>
+		<td class="category" onclick="goTaxon(57,'names')">Synonyms</td>
 	</tr>
 </table>
 </div>
 
 <div id="page-main">
-<div id="classification">
-	<table>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(1)">Animalia</td>
-			<td>(Kingdom)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(2)">Chordata</td>
-			<td>(Phylum)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(3)">Mammalia</td>
-			<td>(Class)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(4)">Carnivora</td>
-			<td>(Order)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(5)">Ursidae</td>
-			<td>(Family)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goHigherTaxon(6)">Ursus</td>
-			<td>(Genus)</td>
-		</tr>
-			<tr>
-			<td class="a" onclick="goTaxon(19)">Ursus arctos</td>
-			<td>(Species)</td>
-		</tr>
-			<tr>
-			<td class="current-taxon">Ursus arctos isabellinus</td>
-			<td>(Infraspecies)</td>
-		</tr>
-		</table>
+<div id="content">
+<p><span class="taxon-section-head">General description</span></p>
+<p><span class="internal-link" onclick="goIntLink('species','taxon.php',['id:7','cat:173'])">(Species module detail, Ursus luteolus X, Overview)</span></p>
+<p><span class="taxon-section-head">Biology</span></p>
+<p><span class="internal-link" onclick="goIntLink('species','taxon.php',['id:73','cat:173'])">(Species module detail, Pseudo knurft, Overview)</span></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><span class="taxon-section-head"><span class="internal-link" onclick="goIntLink('mapkey','examine_species.php',['id:19'])">what the fuck?</span></span></p>
 </div>
 
 	<div id="navigation">
@@ -138,7 +112,7 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','24')
+addRequestVar('id','57')
 addRequestVar('cat','')
 
 })
