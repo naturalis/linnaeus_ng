@@ -131,7 +131,7 @@ function initTinyMce(litRefs,mediaRefs) {
 		oninit : tMCEOnInit ,
 		theme : "advanced",
 		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,-example",	
-		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,|,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
+		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,preview,visualaid,fullscreen,print",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
@@ -154,6 +154,7 @@ function initTinyMce(litRefs,mediaRefs) {
 	} else {
 	 	propertyList.theme_advanced_buttons2 = "";
 	}
+
 
 	tinyMCE.init(propertyList);
 

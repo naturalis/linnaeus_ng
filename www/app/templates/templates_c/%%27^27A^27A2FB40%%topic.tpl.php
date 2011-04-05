@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-04-01 12:04:24
+<?php /* Smarty version 2.6.26, created on 2011-04-05 12:31:27
          compiled from topic.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'escape', 'topic.tpl', 7, false),array('modifier', 'substr', 'topic.tpl', 17, false),array('block', 't', 'topic.tpl', 15, false),)), $this); ?>

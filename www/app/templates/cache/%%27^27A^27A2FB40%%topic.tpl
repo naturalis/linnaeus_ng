@@ -1,9 +1,9 @@
 369
-a:4:{s:8:"template";a:8:{s:9:"topic.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:22:"../shared/messages.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301652264;s:7:"expires";i:1301655864;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:8:{s:9:"topic.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:22:"../shared/messages.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301999487;s:7:"expires";i:1302003087;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Animal sounds: "Wokkels rule!"</title>
+	<title>Imaginary Beings Of The Literary World: Animal sounds: "Tralala"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
 		@import url("../../../app/style/0002/module.css");
@@ -56,16 +56,17 @@ a:4:{s:8:"template";a:8:{s:9:"topic.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 </div><div id="page-container">
 	<div id="header-titles">
 		<span id="header-title">Animal sounds</span><br />
-		<span id="header-subtitle">Wokkels rule!</span>
+		<span id="header-subtitle">Tralala</span>
 	</div>
 
 <div id="page-main">
 	<div id="content">
-				<p>Investigatam diutissime quaestionem, quantum nostrae mentis igniculum lux diuina dignata est, formatam rationibus litterisque mandatam offerendam uobis communicandamque curaui tam uestri cupidus iudicii quam nostri studiosus inuenti.<br /><br />Qua in re quid mihi sit animi quotiens stilo cogitata commendo, tum ex ipsa materiae difficultate tum ex eo quod raris id est uobis tantum conloquor, intellegi potest. Neque enim famae iactatione et inanibus uulgi clamoribus excitamur; sed si quis est fructus exterior, hic non potest aliam nisi materiae similem sperare sententiam.<br /><br />Quocumque igitur a uobis deieci oculos, partim ignaua segnities partim callidus liuor occurrit, ut contumeliam uideatur diuinis tractatibus inrogare qui talibus hominum monstris non agnoscenda haec potius quam proculcanda proiecerit.<br /><br />Idcirco stilum breuitate contraho et ex intimis sumpta philosophiae disciplinis nouorum uerborum significationibus uelo, ut haec mihi tantum uobisque, si quando ad ea conuertitis oculos, conloquantur; ceteros uero ita submouimus, ut qui capere intellectu nequiuerint ad ea etiam legenda uideantur indigni. Sane tantum a nobis quaeri oportet quantum humanae rationis intuitus ad diuinitatis ualet celsa conscendere.<br /><br />Nam ceteris quoque artibus idem quasi quidam finis est constitutus, quousque potest uia rationis accedere. Neque enim medicina aegris semper affert salutem; sed nulla erit culpa medentis, si nihil eorum quae fieri oportebat omiserit. Idemque in ceteris.<br /><br />At quantum haec difficilior quaestio est, tam facilior esse debet ad ueniam. Vobis tamen etiam illud inspiciendum est, an ex beati Augustini scriptis semina rationum aliquos in nos uenientia fructus extulerint. Ac de proposita quaestione hinc sumamus initium.</p>
+				<p><img src="http://www.fromoldbooks.org/Shaw-Alphabets/065-alphabet-end-of-15th-century-letter-S-q85-462x500.jpg" alt="http://www.fromoldbooks.org/Shaw-Alphabets/065-alphabet-end-of-15th-century-letter-S-q85-462x500.jpg" width="215" height="233" /></p>
 	</div>
 	<div id="navigation">
 		<span onclick="goModuleTopic(14)" id="prev">< previous</span>
-		<span id="back" onclick="goAlpha('W','index.php')">back to index</span>
+		<span id="back" onclick="goAlpha('T','index.php')">back to index</span>
+		<span onclick="goModuleTopic(13)" id="next">next ></span>
 		</div>
 </div>
 
@@ -96,7 +97,7 @@ $(document).ready(function(){
 	$('#body-container').height($(document).height());
 	
 addRequestVar('search','enter search term')
-addRequestVar('id','13')
+addRequestVar('id','16')
 
 })
 
