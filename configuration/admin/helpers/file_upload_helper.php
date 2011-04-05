@@ -344,6 +344,23 @@ class FileUploadHelper
 
     }
 
+	private function cRename($from,$to)
+	{
+	
+		//return rename($from,$to); // generates odd errors on some linux filesystems
+	
+		if(copy($from,$to)) {
+
+			return unlink($from);
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
     private function doTaxonMediaUpload ($oldFileName,$currentFileName)
     {
 
@@ -367,7 +384,8 @@ class FileUploadHelper
                 $fn = $this->createUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
 
                 // move the file to the project's media directory
-                if (rename($oldFileName,$this->_storageDir.$fn)) {
+                //if (rename($oldFileName,$this->_storageDir.$fn)) {
+                if ($this->cRename($oldFileName,$this->_storageDir.$fn)) {
     
                     // store data to save in temporary array
                     $fileToSave = array(
