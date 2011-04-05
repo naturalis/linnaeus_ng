@@ -350,7 +350,7 @@ class configuration
 				),
 				'defaultUploadMaxSize' => 2000000 // 2mb
 			),
-			'maxChoicesPerKeystep' => 4      
+			'maxChoicesPerKeystep' => 6      
       	);
 
     }
