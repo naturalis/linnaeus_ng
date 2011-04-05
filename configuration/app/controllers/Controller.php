@@ -4,9 +4,6 @@
 
 check setLocale
 
-	$this->matchGlossaryTerms()
-
-
 */
 
 

@@ -5,13 +5,13 @@ body {
 	font-size: 12px;
 }
 
-a, .a {
+a, .a, .taxonContentMediaLink, .taxonContentLiteratureLink {
 	text-decoration:none;
 	color:#CC0000;
 	cursor:pointer;
 }
 
-a:hover, .a:hover {
+a:hover, .a:hover, .taxonContentMediaLink:hover, .taxonContentLiteratureLink:hover  {
 	text-decoration:underline;
 }
 

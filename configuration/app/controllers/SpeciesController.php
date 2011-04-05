@@ -172,6 +172,24 @@ class SpeciesController extends Controller
   
     }
 
+	public function ajaxInterfaceAction()
+	{
+
+		if (!$this->rHasVal('action') || !$this->rHasId()) {
+
+			$this->smarty->assign('returnText','error');
+		
+		} else
+		if ($this->rHasVal('action','get_media_info')) {
+
+			$this->smarty->assign('returnText',json_encode($this->getTaxonMedia(null,$this->requestData['id'])));
+		
+		}
+
+        $this->printPage();
+	
+	}
+
     private function _indexAction ()
     {
 
@@ -367,15 +385,17 @@ class SpeciesController extends Controller
 	
 	}
 
-	private function getTaxonMedia($taxon)
+	private function getTaxonMedia($taxon=null,$id=null)
 	{
+
+		$d = array('project_id' => $this->getCurrentProjectId());
+		
+		if (isset($taxon)) $d['taxon_id'] = $taxon;
+		if (isset($id)) $d['id'] = $id;
 
 		$mt = $this->models->MediaTaxon->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $taxon
-				),
+				'id' => $d,
 				'order' => 'mime_type, file_name'
 			)
 		);
@@ -402,6 +422,8 @@ class SpeciesController extends Controller
 			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
 			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
+			$mt[$key]['full_path'] = $_SESSION['project']['urls']['project_media'].$mt[$key]['file_name'];
+
 
 		}
 
