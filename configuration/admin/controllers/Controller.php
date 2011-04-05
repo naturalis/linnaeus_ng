@@ -1608,6 +1608,27 @@ class Controller extends BaseClass
 
 	}
 
+	public function loadControllerConfig($controllerBaseName=null)
+    {
+
+
+		if (isset($controllerBaseName))
+	        $t = 'getControllerSettings'.$controllerBaseName;
+		else
+	        $t = 'getControllerSettings'.$this->controllerBaseName;
+
+        if (method_exists($this->config,$t)) {
+
+            $this->controllerSettings = $this->config->$t();
+
+        } else {
+
+            $this->controllerSettings = false;
+
+        }
+
+    }
+
 
     /**
      * Assigns basic Smarty variables
@@ -1669,23 +1690,6 @@ class Controller extends BaseClass
 		);
 
 	}
-
-	private function loadControllerConfig()
-    {
-
-        $t = 'getControllerSettings'.$this->controllerBaseName;
-
-        if (method_exists($this->config,$t)) {
-
-            $this->controllerSettings = $this->config->$t();
-
-        } else {
-
-            $this->controllerSettings = false;
-
-        }
-
-    }
 
     private function getModuleActivationStatus ()
     {

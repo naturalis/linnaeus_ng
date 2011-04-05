@@ -5,6 +5,9 @@ include_once ('Controller.php');
 class ImportController extends Controller
 {
 
+    public $pathMedia = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\images\tanbif_linnaeus\pictures\\';
+    public $pathThumbs = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\images\tanbif_linnaeus\thumbs\\';
+
     public $usedModels = array(
     );
    
@@ -298,46 +301,293 @@ return $species;
 
 	}
 
-	private function addSpeciesContent($d,$species)
+	private function createStandardCat()
+	{
+return 23;
+		$pt = $this->model->PageTaxa->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getNewProjectId(),
+					'page' => 'Overview'
+				),
+				'columns' => 'id'
+			)
+		);
+		
+		if (isset($pt['id'])) return $pt['id'];
+
+		$pt = $this->model->PageTaxa->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),
+				'page' => 'Overview',
+				'show_order' => 0,
+				'def_page' => 1
+			)
+		);
+	
+		$id = $this->model->PageTaxaTitle->getNewId();
+
+		$this->model->PageTaxaTitle->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),
+				'page_id' => $id,
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'title' => 'Overview'
+			)
+		);
+		
+		return $this->model->PageTaxa->getNewId();
+	
+	}
+
+
+	private function resolveLanguage($l)
 	{
 
-die('hiero!');
+		$l = $this->models->Language->_get(
+			array(
+				'id' => array(
+					'language' => $l
+				),
+				'columns' => 'id'
+			)
+		);
 
-		foreach((array)$species as $key => $val) {
+		return ($l) ? $l[0]['id'] : false;
 
-/*
-		records
-				.parenttaxon -> parent taxon rank (ignore)
-				.parentname ->  parent taxon name (ignore)
-				.taxon -> rankname (ignore)
-				.name -> resolve to taxon_id (and holler when that fails)
-???				.description -> content, cat = ??? (filter [p] etc)
-				.taxonomy -> ignore (auto)
-				.vernacuars
-					.vernacular
-						.name -> common name
-						.language -> common name language in default language
-				.syn_vern_description -> ignore
-				.multimedia
-???					.overview	-> image name only 
-					.multimediafile
-						.filename --> filename
-						.fullname --> same (ignore)
-						.caption --> (opt) description (<-- otherwise filename)
-???						.multimedia_type --> "image"
+	}
+
+	private function addSpeciesContent($d,$species,$overviewCatId)
+	{
+
+		$failed = null;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				$taxonId = $species[(string)$val->name]['id'];
+/*				
+				$this->models->ContentTaxon->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'language_id' => $this->getNewDefaultLanguageId()
+						'page_id' => $overviewCatId,
+						'content' => $this->replaceOldTags((string)$val->description),
+						'publish' => 1
+					)
+				);
 */
+
+			} else {
+			
+				$failed[] = array(
+					'data' => $val,
+					'cause' => 'unable to resolve name "'.(string)$val->name.'" to taxon id'
+				);
+			
+			}
+
+		}
+		
+		return $failed;
+
+	}
+
+	private function addSpeciesCommonNames($d,$species)
+	{
+
+		$failed = null;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				$taxonId = $species[(string)$val->name]['id'];
+
+				foreach($val->vernaculars as $vKey => $vVal) {
+
+					$languagId = $this->resolveLanguage((string)$vVal->vernacular->language);
+
+					if ($languagId) {
+/*
+						$this->models->Commonnames->save(
+							array(
+								'id' => 'null',
+								'project_id' => $this->getNewProjectId(),
+								'taxon_id' => $taxonId,
+								'language_id' => $languagId,
+								'commonname' => (string)$vVal->vernacular->name
+							)
+						);
+*/
+					} else {
+
+						$failed[] = array(
+							'data' => $val,
+							'cause' => 'unable to resolve language "'.(string)$vVal->vernacular->language.'" to id'
+						);
+		
+					}
+
+				}
+
+			}
+
 		}
 
-		return $species;
+		return $failed;
+
+	}
+
+	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$mimes)
+	{
+
+		if (file_exists($this->pathMedia.$fileName)) {
+		
+			$thisMIME = mime_content_type($this->pathMedia.$fileName);
+			
+			if (isset($mimes[$thisMIME])) {
+			
+				$thumbName = file_exists($this->pathThumbs.$fileName) ? $fileName : null;
+
+/*				
+				$this->models->MediaTaxon->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'file_name' => $fileName,
+						'thumb_name' => $thumbName,
+						'original_name' => $fullName,
+						'mime_type' => $thisMIME,
+						'file_size' => filesize($this->pathMedia.$fileName)
+					)
+				);
+*/					
+				return array(
+					'saved' => true,
+					'filename' => $fileName,
+					'full_path' => $this->pathMedia.$fileName,
+					'thumb' => isset($thumbName) ? $thumbName : null,
+					'thumb_path' => isset($thumbName) ? $this->pathThumbs.$thumbName : null
+				);
+
+			} else {
+
+				return array(
+					'saved' => false,
+					'data' => $fileName,
+					'cause' => 'mime-type "'.$thisMIME.'" not allowed'
+				);
+
+			}
+		
+		} else {
+		
+			return array(
+				'saved' => false,
+				'data' => $fileName,
+				'cause' => 'file "'.$fileName.'" does not exist'
+			);
+		
+		}	
+
+	}
+
+	private function addSpeciesMedia($d,$species)
+	{
+
+		$this->loadControllerConfig('Species');
+		
+		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) {
+
+			$mimes[$val['mime']] = $val;
+
+		}
+		
+		$failed = null;
+		$saved = null;
+		$prev = null;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				$taxonId = $species[(string)$val->name]['id'];
+				
+				$fileName = (string)$val->multimedia->overview;
+
+				$r = $this->doAddSpeciesMedia(
+					$taxonId,
+					$fileName,
+					$fileName,
+					$mimes
+				);
+
+				if ($r['saved']==true) {
+
+					$saved[] = $r;
+					$prev[$fileName] = true;
+				
+				} else {
+
+					$failed[] = $r;
+
+				}
+
+				foreach($val->multimedia->multimediafile as $vKey => $vVal) {
+				
+					$fileName = (string)$vVal->filename;
+					
+					if (isset($prev[$fileName])) continue;
+
+
+					$r = $this->doAddSpeciesMedia(
+						$taxonId,
+						$fileName,
+						(isset($val->fullname) ? ((string)$val->fullname) : $fileName),
+						$mimes
+					);
+
+					if ($r['saved']==true) {
+	
+						$saved[] = $r;
+						$prev[$fileName] = true;
+					
+					} else {
+	
+						$failed[] = $r;
+	
+					}
+
+				}
+
+			}
+
+			unset($prev);
+
+		}
+
+		$this->loadControllerConfig();
+
+		return array(
+			'saved' => $saved,
+			'failed' => $failed
+		);
 
 	}
 
 	private function replaceOldTags($s,$removeAll=false)
 	{
 	
-		$r = array('<b>','</b>','<i>','</i>',null,null);
+		$r = array('<b>','</b>','<i>','</i>','<br />', null,null);
 	
-		return str_replace(array('[b]','[/b]','[i]','[/i]','[p]','[/p]'),($removeAll?null:$r),$s);
+		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeAll?null:$r),$s);
 	
 	}
 
@@ -440,11 +690,246 @@ die('hiero!');
 
 	}
 
+	private function createKeyStep($step,$stepIds,$stepAdd=0)
+	{
 
+/*
+		$this->model->Keystep->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),
+				'number' => ($step=='god' ? -1 : ((string)$step->pagenumber +$stepAdd)),
+				'is_start' => 0
+			)
+		);
+
+		$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = $this->model->Keystep->getNewId();
+
+		$this->model->ContentKeystep->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),
+				'keystep_id' => $stepId,
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'title' => 
+					($step=='god' ? 
+						'Choose key type' : 
+						(isset((string)$step->pagetitle) ?
+							(string)$step->pagetitle:
+							(string)$step->pagenumber
+						)
+					),
+				'content' =>
+					($step=='god' ?
+						'Choose between picture key and text key' : 
+						(isset((string)$step->pagetitle) ?
+							(string)$step->pagetitle:
+							(string)$step->pagenumber
+						)
+					)
+			)
+		);
+
+
+*/
+$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120);
+		return $stepIds;
+
+	}
+
+
+	private function createKeyStepChoices($step,$stepIds,$species)
+	{
+
+		if ($step=='god') {
+			$choices[0]['destinationtype'] = $choices[1]['destinationtype'] = 'turn';
+			$choices = (object)$choices;
+		} elseif ($step->text_choice) {
+			$choices = $step->text_choice;
+		} else {
+			$choices = $step->pict_choice;
+		}
+
+		foreach($choices as $key => $val) {
+
+			$resStep = ((string)$val->destinationtype=='turn' ? 
+							(isset($stepIds[(string)$val->destinationpagenumber]) ?
+								$stepIds[(string)$val->destinationpagenumber] :
+								($step=='god' ? 
+									($key==0 ? 
+										$stepIds['firstTxtId'] : 
+										$stepIds['firstPictId']
+									) : 
+									null
+								)
+							) :
+							null
+						);
+
+			$resTaxon = ((string)$val->destinationtype=='taxon' ?  
+							(isset($species[(string)$val->destinationtaxonname]['id']) ?
+								$species[(string)$val->destinationtaxonname]['id']:
+								null
+							) : 
+							null
+						);
+
+			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
+
+			if ($fileName && !file_exists($this->pathMedia.$fileName))
+				$error[] = array(
+					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
+				);
+
+/*
+			$this->model->ChoiceKeystep->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[(string)$step->pagenumber]),
+					'show_order' => $key,
+					'choice_img' => isset($fileName) ? $fileName : null,
+					'res_keystep_id' => $resStep,
+					'res_taxon_id' => $resTaxon,
+				)
+			);
+
+			if (isset($val->captiontext)) {
+
+				$txt = $this->replaceOldTags((string)$val->captiontext);
+				$p = (string)$step->pagenumber.(string)$val->choiceletter.'.';
+				if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));
+				if (strlen($txt)==0) $txt = $this->replaceOldTags((string)$val->captiontext);
+
+			} else
+			if (isset($val->picturefilename)) {
+
+				$txt = (string)$val->picturefilename;
+			}
+	
+			$this->model->ChoiceContentKeystep->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'choice_id' => $this->model->ChoiceKeystep->getNewId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'choice_txt' => $txt
+				)
+			);
+
+*/
+		}
+
+
+	
+	}
+
+
+	private function makeKey($d,$species)
+	{
+	
+//		q($d->pict_key);
+//		q($d->text_key);
+
+		$stepAdd = 0;
+
+		if (count($d->text_key)==1) {
+	
+			$keyStepIds = null;
+
+			// text key
+			// create steps first (no choices yet)
+			foreach($d->text_key->keypage as $key => $val) {
+
+				$keyStepIds = $this->createKeyStep($val,$keyStepIds);
+				if ($key==0) $firstTxtStepId = current($keyStepIds);	
+
+			}
+
+			// create choices
+			foreach($d->text_key->keypage as $key => $val) {
+	
+				$this->createKeyStepChoices($val,$keyStepIds,$species);
+	
+			}
+/*			
+			$k = $this->model->Keystep->_get(
+				array(
+					'id' => array('project_id' => $this->getNewProjectId()),
+					'columns' => 'max(number) as `last`'
+				)
+			);
+*/			
+			$stepAdd = $k[0]['last'];
+
+		}
+
+		if (count($d->pict_key)==1) {
+
+			$pictStepIds = null;
+
+			// pict key
+			// create steps first (no choices yet)
+			foreach($d->pict_key->keypage as $key => $val) {
+
+				$pictStepIds = $this->createKeyStep($val,$pictStepIds,$stepAdd);
+				if ($key==0) $firstPictStepId = current($pictStepIds);
+		
+			}
+
+			// create choices
+			foreach($d->pict_key->keypage as $key => $val) {
+	
+				$this->createKeyStepChoices($val,$pictStepIds,$species);
+	
+			}
+
+		}
+
+		if (count($d->text_key)==1 && count($d->pict_key)==1) {
+
+			$keyStepIds = $this->createKeyStep('god',$keyStepIds);
+
+			$this->createKeyStepChoices(
+				'god',
+				array(
+					'godId' => current($keyStepIds),
+					'firstTxtId' => $firstTxtStepId,
+					'firstPictId' => $firstPictStepId
+				)
+			);
+
+			$this->model->Keystep->update(
+				array('number' => 'number+1'),
+				array(
+					'project_id' => $this->getNewProjectId(),
+					'number >=' => '1'
+				)
+			);
+
+			$this->model->Keystep->update(
+				array('number' => '1'),
+				array(
+					'project_id' => $this->getNewProjectId(),
+					'number =' => '-1'
+				)
+			);
+
+		}
+
+		$this->model->Keystep->update(
+			array('is_start' => '1'),
+			array(
+				'project_id' => $this->getNewProjectId(),
+				'number =' => '1'
+			)
+		);
+	
+	}
 
 
 /*
-what te fuck is?
+what the fuck is?
 	$d->projectclassification
 	$d->projectnomenclaturecode
 
@@ -481,13 +966,9 @@ need to set manually!
 
 		$d = simplexml_load_file ($file);
 
-//		q($d->tree);
-
-
-//		q($d);
+// switch what to import?
 
 		
-
 		// create new project
 //		$newId = $this->createProject($d);
 //		if (!$newId) die('eeek'); else set getNewProjectId
@@ -516,18 +997,21 @@ need to set manually!
 //		if many: animalia / plantae => god species, BUT also spelling mistakes (sigh)
 
 		// BEWARE THERE ARE FAKE ID'S IN THIS FUNCION!!!!!
+		$overviewCatId = $this->createStandardCat();
+		// BEWARE THERE ARE FAKE ID'S IN THIS FUNCION!!!!!
 		$species = $this->addSpecies($species);
-		$this->addSpeciesContent($d,$species);
-
-
-
+//		$this->addSpeciesContent($d,$species,$overviewCatId);
+		$this->addSpeciesCommonNames($d,$species);
+		$r = $this->addSpeciesMedia($d,$species);
 
 		$lit = $this->resolveLiterature($d,$species);
 // 		check for invalid years, might be suffix! (so set suffix in the $lit array)
 		//$this->addLiterature($lit);
 
+//		$this->makeKey($d,$species);
 
-
+//q($d);
+//yell about getControllerSettingsKey->maxChoicesPerKeystep
 
 /*
 
@@ -584,14 +1068,22 @@ v				.name -> name
 
 
 
-						
-
-KEY
-	if both PIC and TEXT, create first GOD step (of end with that)
-
-
-
 MATRIX
+
+	loop records
+		$matrices[filename][characters][] = name / type
+			states
+				state_name
+				state_min
+				state_max
+				state_mean
+				state_sd
+				state_file ??
+
+
+
+
+
 	first check all filenames and create matrices from them
 
 		records
@@ -637,6 +1129,36 @@ MATRIX
 			
 	}
 
+	private function deleteSpeciesMedia($id)
+	{
+// GET PATHS!!!!
+		$mt = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $id
+				)
+			)
+		);
+
+		foreach((array)$mt as $val) {
+
+			if (isset($val['file_name'])) @unlink(MEDIA_PATH.$val['file_name']);
+			if (isset($val['thumb_name'])) @unlink(THUMB_PATH.$val['thumb_name']);
+
+		}
+
+		$this->models->MediaTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteStandardCat()
+	{
+	
+		$this->model->PageTaxaTitle->delete(array('project_id' => $id));
+		$this->model->PageTaxa->delete(array('project_id' => $id));
+
+	}
+	
 	private function deleteSpecies($species)
 	{
 
