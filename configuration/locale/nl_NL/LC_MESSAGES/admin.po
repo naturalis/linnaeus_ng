@@ -3,679 +3,2119 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2010-11-16 11:47+0100\n"
+"PO-Revision-Date: 2011-04-06 18:12+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "FATAL: cannot load configuration"
-msgstr ""
+msgid "Description (click to change)"
+msgstr "Omschrijving (klik om te wijzigen)"
 
-#, fuzzy
-msgid "Welcome,"
-msgstr "Welkom, %s."
+msgid "Below is a list of matrices that are currently defined. In order to edit a matrix' name, click \"edit name\". In order to edit the actual matrix, click \"edit matrix\"."
+msgstr "Hieronder ziet u een lijst van gedefinieerde matrices. Om de naam van een matrix te bewerken, klik op \"wijzig naam\". Om de huidige actieve matrix te wijzigen, klik \"wijzig matrix\"."
 
-#, fuzzy
-msgid "Welcome back,"
-msgstr "Welkom terug, %s."
-
-msgid "Index"
-msgstr "Index"
-
-msgid "Project modules"
-msgstr "Project modules"
-
-msgid "Assign collaborator to modules"
-msgstr "Wijs medewerkers toe aan modules"
-
-msgid "Project settings"
-msgstr "Project instellingen"
-
-msgid "Language already assigned."
-msgstr "Taal al toegewezen"
-
-msgid "Species module overview"
-msgstr "Overzicht species module"
-
-msgid "Define categories"
-msgstr "Definieer categeoriën"
-
-msgid "Could not save page name."
-msgstr "Kon categorienaam niet opslaan"
-
-msgid "Editing taxon \"%s\""
-msgstr "Aanpassen taxon \"%s\""
-
-msgid "New taxon"
-msgstr "Nieuw taxon"
-
-msgid "Taxon saved."
-msgstr "Taxon opgeslagen."
-
-msgid "Rank cannot be hybrid."
-msgstr "Orde kan geen hybride zijn."
-
-msgid "Parent cannot have child taxa."
-msgstr "Taxa kan geen onderliggende taxa hebben."
-
-msgid "Taxon name already in database."
-msgstr "Taxon reeds in database."
-
-msgid "No taxa have been assigned to you."
-msgstr "Er zijn geen taxa aan u toegewezen."
-
-msgid "Taxon list"
-msgstr "Taxonlijst"
-
-msgid "Editing \"%s\""
-msgstr "Bewerken \"%s\""
-
-msgid "Taxon is already being edited by another editor."
-msgstr "Taxon wordt al bewerkt door een andere medewerker."
-
-msgid "No taxon ID specified."
-msgstr "Geen taxon ID gespecificeerd."
-
-msgid "Media for \"%s\""
-msgstr "Media voor \"%s\""
-
-msgid "No taxon specified."
-msgstr "Geen taxon gespecificeerd."
-
-msgid "New media for \"%s\""
-msgstr "Nieuwe media voor \"%s\""
-
-msgid "Saved: %s (%s)"
-msgstr "Opgeslagen: %s (%s)"
-
-msgid "Failed writing uploaded file to database."
-msgstr "Kon bestand niet naar de database schrijven."
-
-msgid "Unknown taxon."
-msgstr "Onbekend taxon."
-
-msgid "Taxon file upload"
-msgstr "Taxonbestand uploaden"
-
-msgid "Data saved."
-msgstr "Gegevens opgeslagen."
-
-msgid "Import from Catalogue Of Life"
-msgstr "Importeer uit Catalogue Of Life"
-
-msgid "Taxonomic ranks"
-msgstr "Taxonomische ordes"
-
-msgid "Ranks saved."
-msgstr "Ordes opgeslagen."
-
-msgid "Taxonomic ranks: labels"
-msgstr "Naamgeving taxonomische ordes."
-
-msgid "Define sections"
-msgstr "Definieer secties"
-
-msgid "Assign taxa to collaborators"
-msgstr "Wijs taxa toe aan medewerkers"
-
-msgid "Could not save taxon content."
-msgstr "Kon taxon content niet opslaan."
-
-msgid "No page title specified."
-msgstr "Geen paginatitel opgegeven."
-
-msgid "No language specified."
-msgstr "Geen taal gespecificeerd."
-
-msgid "Could not save taxon."
-msgstr "Kon taxon niet opslaan."
-
-msgid "Could not delete file: %s"
-msgstr "Kon bestand niet verwijderen: %s"
-
-msgid "Login"
-msgstr "Login"
-
-msgid "Login failed."
-msgstr "Login mislukt."
-
-msgid "Logout"
-msgstr "Log out"
-
-msgid "Select a project to work on"
-msgstr "Selecteer een project om aan te werken"
-
-msgid "Create new collaborator"
-msgstr ""
-
-msgid "A user with that e-mail address already exists in your project."
-msgstr ""
-
-msgid "Unassignable role selected."
-msgstr ""
-
-msgid "Project collaborator overview"
-msgstr ""
-
-msgid "days"
-msgstr ""
-
-msgid "(has never logged in)"
-msgstr ""
-
-msgid "username"
-msgstr ""
-
-msgid "status"
-msgstr ""
-
-msgid "role"
-msgstr ""
-
-msgid "collaborator for"
-msgstr ""
-
-msgid "last access"
-msgstr ""
-
-msgid "Project collaborator data"
-msgstr ""
-
-msgid "Edit project collaborator"
-msgstr ""
-
-msgid "Cannot delete lead expert."
-msgstr ""
-
-msgid "Unassignable role selected"
-msgstr ""
-
-msgid "User data saved"
-msgstr ""
-
-msgid "Missing value."
-msgstr ""
-
-msgid "Project overview"
-msgstr ""
-
-msgid "Failed to connect user from session."
-msgstr ""
-
-msgid "Failed to create user from session."
-msgstr ""
-
-msgid "Failed to save user."
-msgstr ""
-
-msgid "Password too long; should be between %s and %s characters."
-msgstr ""
-
-msgid "Password too short; should be between %s and %s characters."
-msgstr ""
-
-msgid "Missing username."
-msgstr ""
-
-msgid "Missing password."
-msgstr ""
-
-msgid "Missing password repeat."
-msgstr ""
-
-msgid "Missing first name."
-msgstr ""
-
-msgid "Missing last name."
-msgstr ""
-
-msgid "Missing email address."
-msgstr ""
-
-msgid "Username too short; should be between %s and %s characters."
-msgstr ""
-
-msgid "Username too long; should be between %s and %s characters."
-msgstr ""
-
-msgid "Username has incorrect format."
-msgstr ""
-
-msgid "Password has incorrect format."
-msgstr ""
-
-msgid "Passwords not the same."
-msgstr ""
-
-msgid "E-mail adress too short; should be between %s and %s characters."
-msgstr ""
-
-msgid "E-mail adress too long; should be between %s and %s characters."
-msgstr ""
-
-msgid "Invalid e-mail address."
-msgstr ""
-
-msgid "Username already exists."
-msgstr ""
-
-msgid "E-mail address already exists."
-msgstr "E-mailadres bestaat al."
-
-msgid "You are not authorized to do that."
-msgstr "U bent niet geautoriseerd om die handeling te verrichten."
-
-msgid "The module \"%s\" is not part of your project."
-msgstr "De module \"%s\" maakt geen deel uit van uw project."
-
-msgid "No species name given."
-msgstr "Geen taxon naam opgegeven."
-
-msgid "No species ID given."
-msgstr "Geen taxon ID opgegeven."
-
-msgid "Found no basic data for: "
-msgstr "Geen gegevens gevonden voor:"
-
-msgid "Unable to parse basic data"
-msgstr "Niet in staat data te verwerken"
-
-msgid "Unable to resolve taxon's Catalogue Of Life ID"
-msgstr "Niet in staat taxon;s Catalogue Of Life ID te achterhalen"
-
-msgid "Unable to parse comprehensive data"
-msgstr "Niet in staat uitgebreide gegevens te verwerken"
-
-msgid "File does not seem to be a CSV-file."
-msgstr "Bestand lijkt geen CSV-bestand te zijn."
-
-msgid "Could not read data from file."
-msgstr "Kon geen gegevens uit bestand lezen."
-
-msgid "No name of uploaded file specified."
-msgstr "Naam van geüpload bestand niet gespecificeerd."
-
-msgid "No allowed MIME-types set."
-msgstr "Toegestane MIME-types niet gedefinieerd."
-
-msgid "No target directory specified."
-msgstr "Geen doelmap gespecificeerd."
-
-msgid "Media type not allowed:"
-msgstr "Media-type niet toegestaan:"
-
-msgid "No temporary directory specified (required for deflating archive)."
-msgstr "Geen tijdelijke map gespecificeerd (noodzakelijk voor uitpakken archief)."
-
-msgid "Could not extract files from archive."
-msgstr "Kon bestanden niet uit archief extraheren."
-
-msgid "Could not create temporary directory in "
-msgstr "Kon geen tijdelijke map creëren in"
-
-msgid "Could not move file:"
-msgstr "Kon bestand niet verplaatsen:"
-
-msgid "File too big:"
-msgstr "Bestand te groot:"
-
-msgid "max."
-msgstr "max."
-
-msgid "File type not allowed:"
-msgstr "Bestandstype niet toegestaan:"
-
-msgid "FATAL: cannot connect to database"
-msgstr ""
-
-msgid "FATAL: no table basename defined"
-msgstr ""
-
-msgid "(double click to delete)"
-msgstr "(dubbelklik om en taxon te verwijderen)"
-
-msgid "add"
-msgstr "toevoegen"
-
-msgid "Add a new taxon"
-msgstr "Voeg een nieuw taxon toe"
-
-msgid "After you have made the appropriate selection, click the save-button. Once you have saved the selection, you can change the ranks' names and provide translations"
-msgstr "Klik op de knop 'opslaan' wanneer u een selectie gemaakt heeft. Na opslaan klikt u om de namen van de ordes in de verschillende talen op te geven"
-
-msgid "Assign taxon"
-msgstr "Wijs taxon toe"
-
-msgid "back"
-msgstr "terug"
-
-msgid "Be advised, the retrieval process might take quite some time, especially with higher taxa. It is recommended not to attempt to retrieve anything above the rank of genus."
-msgstr "Opmerking: het ophalen van informatie kan de nodige tijd in beslag nemen, zeker wanneer hogere taxa worden opgevraagd. Het wordt afgeraden om gegevens op te vragen boven het niveau van genus."
-
-msgid "If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data."
-msgstr "Indien u de gegevens van een complete familie wil downloaden, vink dan de optie 'download één niveau' aan. De applicatie zal dan alleen de genera downloaden, het eerste niveau onder familie. Daarna kunt u gegevens voor ieder genus afzonderlijk ophalen door op de naam van dat genus te klikken. De gegevens voor het genus en onderliggende taxa zullen in een separate lijst worden weergegeven, zodat de familie-gegevens niet verloren gaan."
-
-msgid "Below, you can specify the correct label of each rank in the language or languages defined in your project."
-msgstr "Hieronder kunt u van iedere orde de correcte naamgeving in de verschillende talen binnen uw project specificeren."
-
-msgid "Below, you can specify the correct label of each section in the language or languages defined in your project."
-msgstr "Hieronder kunt u van iedere sectie de correcte naamgeving in de verschillende talen binnen uw project specificeren."
-
-msgid "Category"
-msgstr "Categorie"
-
-msgid "Check the results of the import below. If they look OK, press 'save' to save them:"
-msgstr "Controleer hier onder de import-resultaten, en klik vervolgens op 'opslaan'."
-
-msgid "Check the taxa you wish to import, and click save:"
-msgstr "Vink de taxa aan die u wenst te importeren en klik op 'opslaan':"
-
-msgid "Collaborator"
-msgstr "Medewerker"
-
-msgid "Content"
-msgstr "Content"
-
-msgid "Current assignments:"
-msgstr "Huidige toewijzingen:"
-
-msgid "Currently being edited by:"
-msgstr "Wordt nu bewerkt door:"
-
-msgid "Define taxonomic ranks"
-msgstr "Definieer taxonomicsch ordes"
-
-msgid "delete"
-msgstr "verwijderen"
-
-msgid "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
-msgstr "wanneer u eerder gedefinieerde ordes die al toe zijn gewezen aan taxa verwijdert, zullen die taxa geen orde meer hebben."
-
-msgid "Duplicates of the taxa already in your project's database will not be stored."
-msgstr "Duplicaten van taxa die al bestaan in de database zullen niet worden opgeslagen."
-
-msgid "Each taxon consists of two or three fields:"
-msgstr "Ieder taxon bestaat uit twee of drie velden:"
-
-msgid "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
-msgstr "Iedere taxon-pagina bestaat uit één of meer categorieën, met een maximum van %s. De eerste categorie, '%s', is verplicht."
-
-msgid "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
-msgstr "Vul de naam van het taxon waarvan u de gegevens wil ophalen, en klik 'downloaden'."
-
-msgid "here"
-msgstr "hier"
-
-msgid "Hybrid"
-msgstr "Hybride"
-
-msgid "Hybrid ('y'; optional)"
-msgstr "Hybride ('y'; optioneel)"
-
-msgid "Hybrids are only possible for the following ranks:"
-msgstr "Hybrides kunnen alleen bestaan voor de volgende ordes:"
-
-msgid "images"
-msgstr "afbeeldingen"
-
-msgid "Import taxon tree from Catalogue Of Life (experimental)"
-msgstr "Importeer taxa uit de Catalogue Of Life (experimenteel)"
-
-msgid "Import taxon tree from file"
-msgstr "Import taxa uit bestand"
-
-msgid "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
-msgstr "in die volgorde. De eerste twee velden zijn verplicht. Andere waarden voor 'hybride' dan 'j' worden genegeerd."
-
-msgid "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
-msgstr "in deze volgorde zal de relaties tussen Genus, Species en Infraspecies correct opslaan."
-
-msgid "Label taxonomic ranks"
-msgstr "Naamgeving taxonomische ordes"
-
-msgid "Media"
-msgstr "Media"
-
-msgid "move taxon downward"
-msgstr "verplaats taxon naar beneden"
-
-msgid "move taxon upward"
-msgstr "verplaats taxon naar boven"
-
-msgid "Name"
-msgstr "Naam"
-
-msgid "pages published"
-msgstr "gepubliceerde pagina's"
-
-msgid "Parent taxon:"
-msgstr "Bovenliggend taxon:"
-
-msgid "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
-msgstr "Ouder-kindrelaties worden van boven naar beneden verondersteld, per tax in de taxonomische boom. Bijvoorbeeld, het laden van:"
-
-msgid "Please be advised:"
-msgstr "Let op:"
-
-msgid "preview"
-msgstr "voorbeeld"
+msgid "choice"
+msgstr "keuz"
 
 msgid "Rank"
 msgstr "Orde"
 
-msgid "Rank:"
-msgstr "Orde:"
+msgid "Select the desired option for each of the taxa listed below and press 'save'."
+msgstr "Selecteer de gewenste optie voor ieder van de hieronder weergegeven taxa en klik op 'opslaan'."
 
-msgid "Ranks should match the list of ranks you have selected for your project."
-msgstr "Order dienen voor te komen op de lijst die u voor dit project hebt geselecteerd."
+msgid "Text is required."
+msgstr "U dient tekst in te vullen."
 
-msgid "Ranks:"
-msgstr "Ordes:"
+msgid "translated"
+msgstr "vertaald"
 
-msgid "retrieve a single level of child taxa only"
-msgstr "download één niveau"
+msgid "Logout"
+msgstr "Log out"
 
-msgid "save"
-msgstr "opslaan"
+msgid "in that order. The first two are mandatory."
+msgstr "in die volgorde. De eerste twee zijn verplicht."
 
-msgid "save selected ranks"
-msgstr "sla geselecteerde ordes op"
+msgid "Username has incorrect format."
+msgstr "Gebruikersnaam heeft een incorrect format."
 
-msgid "Sections"
-msgstr "Secties"
+msgid "Name already exists in the database"
+msgstr "Taxon reeds in database."
 
-msgid "Selected ranks"
-msgstr "Geselecteerde ordes"
+msgid "Choose a file to upload:"
+msgstr "Taxonbestand uploaden"
 
-msgid "soundfiles"
-msgstr "geluidsbestanden"
+msgid "Hybrid ('y'; optional)"
+msgstr "Hybride ('y'; optioneel)"
 
-msgid "Taxa with a rank that does not appear in this list will not be loaded."
-msgstr "Taxa met een orde die niet in deze lijst voorkomt zullen niet worden opgeslagen."
+msgid "Actions"
+msgstr "Acties"
 
-msgid "Taxon"
-msgstr "Taxon"
+msgid "Add a new data type:"
+msgstr "Voeg een nieuw gegevenstype toe:"
 
-msgid "Taxon name"
-msgstr "Taxon's naam"
+msgid "taxa"
+msgstr "taxa"
 
-msgid "Taxon name:"
-msgstr "Taxon's naam:"
+msgid "Unable to log in? What is the problem you are experiencing?"
+msgstr "Niet in staat om in te loggen? Wat is uw probleem?"
 
-msgid "Taxon rank"
-msgstr "Taxon's orde"
+msgid "view on map"
+msgstr "toon op kaart"
 
-msgid "Taxon:"
-msgstr "Taxon:"
+msgid "Standard deviation:"
+msgstr "Standaard afwijking:"
 
-msgid "Text you enter is automatically saved when you leave the input field."
-msgstr "Tekst die u invult wordt automatisch opgeslagen wanneer u het invoerveld verlaat."
+msgid "in that order. The first two are mandatory. Other values for the field 'Hybrid' than 'y' are ignored."
+msgstr "in die volgorde. De eerste twee velden zijn verplicht. Andere waarden voor 'hybride' dan 'j' worden genegeerd."
+
+msgid "delete"
+msgstr "verwijderen"
+
+msgid "Unable to parse basic data"
+msgstr "Niet in staat data te verwerken"
 
 msgid "The field separator must be , (comma), the field delimiter \" (double-quote)."
 msgstr "De veldscheider dient een , (komma) te zijn, velden dienen te worden omsloten door \" (dubbel aanhalingsteken)."
 
-msgid "The file must meet the following conditions:"
-msgstr "Het bestand dient aan de volgende voorwaarden te voldoen:"
+msgid "Import taxon tree from file"
+msgstr "Import taxa uit bestand"
 
-msgid "The format needs to be CSV."
-msgstr "Het formaat dient CSV te zijn."
+msgid "Create new page"
+msgstr "Creëer een nieuwe pagina"
 
-msgid "There should be one taxon per line. No header line should be present."
-msgstr "Één taxon per regel. Geen kopregel bovenaan."
+msgid "New matrix"
+msgstr "Nieuwe matrix:"
 
-msgid "These currently are:"
-msgstr "Dat zijn op dit moment:"
+msgid "No links found."
+msgstr "Geen links gevonden."
 
-msgid "This is a hybrid:"
-msgstr "Dit is een hybride:"
+msgid "move up"
+msgstr "omhoog verplaatsen"
 
-msgid "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
-msgstr "Klik om de naam, orde of bovenliggend taxon te wijzigen op de naam van een taxon. Om de content van een taxon te wijzigen, klik op de corresponderende cel in de kolom 'content'."
+msgid "Duplicate name"
+msgstr "Dubbele naam"
 
-msgid "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
-msgstr "Klik om een bestand met taxa te laden op de 'browse'-knop hierboven, selecteer het in te laden bestand en klik op 'uploaden'."
+msgid "Could not extract files from archive."
+msgstr "Kon bestanden niet uit archief extraheren."
 
-msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database."
-msgstr "De inhoud van het bestand zal worden weergegeven zodat u de gegevens kunt controleren voordat ze in de database worden opgeslagen."
+msgid "Taxa this reference pertains to:"
+msgstr "Taxa waar deze literatuurverwijzing naar verwijst:"
 
-msgid "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
-msgstr "Om de ordes die gebruikt worden in de Catalogue Of Life, in de lijst met blauw gemarkeerd, te selecteren, klikt u"
+msgid "Literature reference"
+msgstr "Literatuurverwijzing"
 
-msgid "to user"
-msgstr "aan medewerker"
+msgid "The mean is required."
+msgstr "Het gemiddelde is vereist."
 
-msgid "undo"
-msgstr "maak ongedaan"
+msgid "You can use italics in your reference by enclosing the text to be italicised with &lt;i&gt; and &lt;/i&gt; tags, and bold text by using with &lt;b&gt; and &lt;/b&gt;. Other tags are not allowed."
+msgstr "U kunt in uw literatuurverwijzing cursief gebruiken door de betreffende tekst te omsluiten met &lt;i&gt; and &lt;/i&gt; tags, en vette tekst door &lt;b&gt; en &lt;/b&gt; te gebruiken. Andere tags zijn niet toegestaan."
 
-msgid "unknown rank"
-msgstr "onbekende orde"
+msgid "Edit contributors text"
+msgstr "Bewerk het overzicht van medewerkers"
 
-msgid "upload"
-msgstr "uploaden"
+msgid "Search for literary references"
+msgstr "Zoek naar literatuurverwijzingen"
 
-msgid "videos"
-msgstr "videos"
+msgid "Below is a list of unconnected choices, i.e. those that do not lead to another step or a taxon. To edit, click the name of either the step or the choice."
+msgstr "Hieronder ziet u een lijst van niet niet aangesloten keuzes. d.w.z. keuzes die niet naar een andere stap of taxon leiden. Om een keuze te bewerken, klik op de naam van de stap of keuze."
 
-msgid "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
-msgstr "U kunt meerdere taxa aan dezelfde medewerker toewijzen. Wanneer u verschillende taxa uit dezeldfde tak van de taxonomische boom aan dezelfde medewerker toewijst, is het hoogstgelegen taxon bepalend."
+msgid "The lower boundary is required."
+msgstr "Een ondergrens is vereist."
 
-msgid "You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa."
-msgstr "U kunt specifieke onderdelen van de taxonomische boom toewijzen aan een specifieke medewerker. Wanneer een taxon is toegewezen, kan de betreffende medewerker alleen dat taxon bewerken, en alle taxa onder dat taxon. Als aan een medewerker geen taxa zijn toegewezen, kan hij ook geen taxa bewerken."
+msgid "No common names have been defined for this taxon."
+msgstr "Er zijn geen populaire namen gedefinieerd voor dit taxon."
 
-msgid "You can download a sample CSV-file"
-msgstr "Om een voorbeeld CSV-bestand te downloaden klikt u"
+msgid "Could not save taxon content."
+msgstr "Kon taxon content niet opslaan."
 
-msgid "You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox the third column says 'unknown rank', you are"
-msgstr "U kunt een specifiek taxon uitsluiten door de checkbox uit te vinken. Als er zich in de derde kolom geen checkbox bevindt, maar de mededeling 'onbekende orde', dan"
+msgid "add new page"
+msgstr "nieuwe pagina toevoegen"
 
-msgid "attempting to load a rank that is not part of your project. To add or change ranks, click"
-msgstr "tracht u een orde te laden die geen deel uit maakt van uw project. Om order toe te voegen of te wijzigen, klik"
+msgid "You are about to delete the taxon \"%s\", which has child taxa connected to it. Please specify what should happen to the connected child taxa. There are three possibilities:"
+msgstr "U staat op het punt het taxon \"%s\" te verwijderen, waaraan ondergeschikte taxa zijn gekoppeld. Specificeer s.v.p. wat er dient te gebeuren met de ondergeschikte taxa. Er zijn drie mogelijkheden:"
 
-msgid "retrieve"
-msgstr "downloaden"
+msgid "Each taxon consists of the following fields:"
+msgstr "Ieder taxon bestaat uit de volgende velden:"
 
-msgid "abort retrieval"
-msgstr "downloaden afbreken"
+msgid "Taxon name:"
+msgstr "Taxon's naam:"
 
-msgid "(This page has been published in this language. Click %shere%s to unpublish.)"
-msgstr "(Deze pagina is gepubliceerd in deze taal. Klik %shier%s om de publicatie ongedaan te maken.)"
+msgid "a textual description."
+msgstr "een tekstuele beschrijving."
 
-msgid "(This page has not been published in this language. Click %shere%s to publish.)"
-msgstr "(Deze pagina is niet gepubliceerd in deze taal. Klik %shier%s om hem te publiceren.)"
+msgid "After you have added a new common name, you will be allowed to provide the name of its language in the various interface languages that your project uses."
+msgstr "Nadat u een nieuwe populaire naam heeft toegevoegd, wordt u in de gelegenheid gesteld de naam van de taal waarin die naam gesteld is te vertalen naar de verschillende interface-talen binnen uw project."
 
-#, fuzzy
-msgid "A taxon of that rank cannot be a hybrid."
-msgstr "Orde kan geen hybride zijn."
+msgid "Choose a link"
+msgstr "Kies een link"
 
-msgid "All corresponding data will be irreversibly deleted."
-msgstr "Alle corresponderende gegevens worden definitief verwijderd."
+msgid "delete image"
+msgstr "afbeelding verwijderen"
 
-msgid "Are you sure you want to delete %s \"%s\"?"
-msgstr "Weet u zeker dat u %s \"%s\" wilt verwijderen?"
+msgid "Higher taxa detail"
+msgstr "Hogere taxa details"
 
-msgid "cannot undo"
-msgstr "kan niet herstellen"
+msgid "Map key detail"
+msgstr "Kaartdetail"
 
-msgid "Final confirmation:"
-msgstr "Laatste waarschuwing:"
+msgid "username"
+msgstr "gebruikersnaam"
 
-msgid "Ok"
-msgstr "Ok"
+msgid "Coordinates:"
+msgstr "Coördinaten:"
 
-msgid "recovered"
-msgstr "hersteld"
+msgid "Edit key (from startpoint)"
+msgstr "Sleutel bewerken (vanaf het startpunt)"
 
-#, fuzzy
-msgid "saved"
-msgstr "opslaan"
+msgid "Taxon name"
+msgstr "Taxon's naam"
 
-#, fuzzy
-msgid "That taxon cannot have child taxa."
-msgstr "Taxa kan geen onderliggende taxa hebben."
+msgid "E-mail adress too short; should be between %s and %s characters."
+msgstr "E-mailadres is te kort; dient tussen de %s en de %s karakters te zijn."
 
-#, fuzzy
-msgid "Allowed MIME-types"
-msgstr "Toegestane MIME-types niet gedefinieerd."
+msgid "Choose a module"
+msgstr "Kies een module"
 
-#, fuzzy
-msgid "Choose a file to upload:"
-msgstr "Taxonbestand uploaden"
+msgid "deleting previously defined ranks to which taxa already have been assigned will leave those taxa without rank."
+msgstr "wanneer u eerder gedefinieerde ordes die al toe zijn gewezen aan taxa verwijdert, zullen die taxa geen orde meer hebben."
 
-msgid "Description (click to change)"
-msgstr "Omschrijving (klik om te wijzigen)"
+msgid "Missing username."
+msgstr "Ontbrekende gebruikersnaam."
 
-msgid "Files of the following MIME-types are allowed:"
-msgstr "Bestanden van de volgende MIME-types zijn toegestaan:"
+msgid "Number of authors:"
+msgstr "Aantal auteurs:"
 
-msgid "kb"
-msgstr "kb"
+msgid "Your e-mailaddress:"
+msgstr "Uw e-mailadres:"
 
-msgid "Name, type &amp; size"
-msgstr "Naam, type &amp; omvang"
+msgid "add new taxon"
+msgstr "nieuw taxon toevoegen"
 
-msgid "Overwriting and identical filenames"
-msgstr "Overschrijven en identieke bestandsnamen"
+msgid "Select a project to work on:"
+msgstr "Selecteer een project om aan te werken"
 
-msgid "per file"
-msgstr "per file"
+msgid "literature reference:"
+msgstr "literatuurverwijzing:"
 
-msgid "POST maximum size:"
-msgstr "maximale omvang POST:"
+msgid "Step number is required. The saved number for this step is %s. The lowest unused number is %s."
+msgstr "Stapnummer is vereist. Het opgeslagen nummer van deze stap is %s. Het laagste ongebruikte nummer is %s."
 
-msgid "see below for information on uploading archives"
-msgstr "zie lager voor informatie over het uploaden van gecomprimeerde bestanden"
-
-msgid "See current media for this taxon"
-msgstr "Zie de hudige mediabestanden voor dit taxon"
-
-msgid "Size"
-msgstr "Omvang"
-
-#, fuzzy
-msgid "Sound"
-msgstr "maak ongedaan"
-
-msgid "The effective size limit is determined by the smallest of these two."
-msgstr "De effectieve beperking aan de omvang wordt bepaald door de kleinste van deze twee."
-
-msgid "The maximum size of a file you are allowed to upload is influenced by the settings of the server. Currently, these are:"
-msgstr "De maximale omvang van een up te loaden bestand wordt bepaald door instellingen van de server. Momenteel zijn dat:"
-
-#, fuzzy
-msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database. |"
-msgstr "De inhoud van het bestand zal worden weergegeven zodat u de gegevens kunt controleren voordat ze in de database worden opgeslagen."
-
-msgid "undo (auto)save"
-msgstr "herstel laatst opgeslagen wijziging"
+msgid "Unknown glossary term."
+msgstr "Onbekende woordenlijstterm."
 
 msgid "Upload maximum size:"
 msgstr "Maximale upload omvang:"
 
-msgid "Upload media for this taxon"
-msgstr "Upload mediabestanden voor dit taxon"
+msgid "Go %shere%s to define a new matrix."
+msgstr "Klik %shier%s om een nieuwe matrix te definiëren."
+
+msgid "Add a new higher taxon"
+msgstr "Voeg een nieuw hoger taxon toe"
+
+msgid "(no media have been uploaded)"
+msgstr "(er zijn geen media geüpload)"
+
+msgid "Project collaborator overview"
+msgstr "Overzicht van projectmedewerkers"
+
+msgid "Editing matrix \"%s\""
+msgstr "Aanpassen taxon \"%s\""
+
+msgid "Edit project collaborator"
+msgstr "Projectmedewerker bewerken"
+
+msgid "add new reference"
+msgstr "nieuwe literatuurverwijzing toevoegen"
+
+msgid "view"
+msgstr "tonen"
+
+msgid "edit user"
+msgstr "medewerker bewerken"
+
+msgid "Files of the following MIME-types are allowed:"
+msgstr "Bestanden van de volgende MIME-types zijn toegestaan:"
+
+msgid "an image, video or soundfile."
+msgstr "een afbeelding, video of geluidsbestand."
+
+msgid "Failed to connect user from session."
+msgstr "Aansluiten van user uit sessie is niet geslaagd."
+
+msgid "Selected ranks"
+msgstr "Geselecteerde ordes"
+
+msgid "text"
+msgstr "tekst"
+
+msgid "Illegal log level: %s"
+msgstr "Niet-toegestaan logniveau: %s"
+
+msgid "The file must meet the following conditions:"
+msgstr "Het bestand dient aan de volgende voorwaarden te voldoen:"
+
+msgid "choice title"
+msgstr "kies titel"
+
+msgid "Year &amp; suffix (optional):"
+msgstr "Jaar &amp; suffix (optioneel):"
+
+msgid "The fields in the CSV-file *may* be enclosed by \" (double-quotes), but this is not mandatory."
+msgstr "De velden in het CSV-bestand *mogen* omsloten worden met \" (dubbele aanhalingstekens), maar dit is geen vereiste."
+
+msgid "You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent."
+msgstr "U kunt meerdere taxa aan dezelfde medewerker toewijzen. Wanneer u verschillende taxa uit dezeldfde tak van de taxonomische boom aan dezelfde medewerker toewijst, is het hoogstgelegen taxon bepalend."
+
+msgid "Taxon ranks in key"
+msgstr "Ordes die in de sleutel voor kunnen komen"
+
+msgid "Missing password repeat."
+msgstr "Ontbrekende herhaling van wachtwoord."
+
+msgid "add new for \"%s\""
+msgstr "nieuwe toevoegen voor \"%s\""
+
+msgid "There are currently no orphaned taxa in your database."
+msgstr "Er bevinden zich geen \"verweesde\" taxa in de database."
+
+msgid "To select all the ranks used in Catalogue Of Life, marked in blue in the list below, click"
+msgstr "Om de ordes die gebruikt worden in de Catalogue Of Life, in de lijst met blauw gemarkeerd, te selecteren, klikt u"
+
+msgid "edit/delete selected"
+msgstr "bewerk/verwijder geselecteerde optie"
+
+msgid "save selected ranks"
+msgstr "sla geselecteerde ordes op"
+
+msgid "Besides these standard modules, you can add up to 5 extra content modules to your project:"
+msgstr "Besides these standard modules, you can add up to 5 extra content modules to your project:"
+
+msgid "Your password has been reset. An e-mail with a new password has been sent to you."
+msgstr "Uw wachtwoord is opnieuw ingesteld. Een e-mail met een nieuw wachtwoord is naar u verstuurd."
+
+msgid "Each taxon consists of two or three fields:"
+msgstr "Ieder taxon bestaat uit twee of drie velden:"
+
+msgid "matrix"
+msgstr "matrix"
+
+msgid "A user with the same e-mail address already exists in another project:"
+msgstr "Er bestaat al een medewerker met hetzelfde e-mailadres in een ander project:"
+
+msgid "Instead, you can also use an existing characteristic from one of your other matrices. To do so, select the name below and click \"use\"."
+msgstr "In plaats daarvan kunt u ook bestaande karakteristieken van een van uw andere matrices gebruiken. Selecteer om dat te doen hieronde de naam en klik op \"gebruiken\"."
+
+msgid "Row %s: saved polygon for \"%s\"."
+msgstr "Rij %s: polygoon opslaan voor \"%s\"."
+
+msgid "previous"
+msgstr "vorige"
+
+msgid "per file"
+msgstr "per file"
+
+msgid "Edit active matrix"
+msgstr "De actieve matrix bewerken"
+
+msgid "Add a new category:"
+msgstr "Voeg een nieuwe categorie toe:"
+
+msgid "See existing pages in \"%s\""
+msgstr "Toon de bestaande pagina's in \"%s\""
+
+msgid "soundfiles"
+msgstr "geluidsbestanden"
+
+msgid "To change the step-number from the automatically generated one, enter a new number and click 'save'. Please note that the numbers have to be unique in your key."
+msgstr "Vul, om het automatisch gegenereerde stapnummer te wijzigen, een nieuw nummer in en klik op 'opslaan'. Houd rekening met het feit dat stapnummers uniek dienen te zijn binnen de sleutel."
+
+msgid "Could not create new matrix."
+msgstr "Kon geen nieuwe matrix creëren."
+
+msgid "After you have made the appropriate selection, click the save-button. Once you have saved the selection, you can change the ranks' names and provide translations"
+msgstr "Klik op de knop 'opslaan' wanneer u een selectie gemaakt heeft. Na opslaan klikt u om de namen van de ordes in de verschillende talen op te geven"
+
+msgid "Project overview"
+msgstr "Projectoverzicht"
+
+msgid "no, create new"
+msgstr "nee, creëer nieuw"
+
+msgid "Assign collaborators to work on modules:"
+msgstr "Wijs medewerkers toe aan modules"
+
+msgid "characteristics"
+msgstr "karakteristieken"
+
+msgid "New media for \"%s\""
+msgstr "Nieuwe media voor \"%s\""
+
+msgid "Select the modules that will be assigned to this collaborator:"
+msgstr "Selecteer de modules die aan deze medewerker zullen worden toegewezen:"
+
+msgid "latitude"
+msgstr "breedtegraad"
+
+msgid "Create new glossary term"
+msgstr "Nieuwe woordenlijstterm definiëren"
+
+msgid "Key map"
+msgstr "Kaartsleutel"
+
+msgid "Lower limit (inclusive):"
+msgstr "Ondergrens (inclusief deze waarde):"
+
+msgid "Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module."
+msgstr "U kunt alleen taxa verwijderen die geen onderliggende taxa hebben, teneinde een correcte taxonstructuur in de \"soortenmodule\" te behouden."
+
+msgid "save and add another state for &quot;%s&quot;"
+msgstr "opslaan en nog een staat toevoegen voor \"%s\""
+
+msgid "role"
+msgstr "rol"
+
+msgid "Number:"
+msgstr "Nummer:"
+
+msgid "Go to your key"
+msgstr "Ga naar sleutel"
+
+msgid "language:"
+msgstr "taal:"
+
+msgid "Assign taxon"
+msgstr "Wijs taxon toe"
+
+msgid "Higher taxa overview"
+msgstr "Overzicht van hogere taxa"
+
+msgid "Taxon file upload"
+msgstr "Taxonbestand uploaden"
+
+msgid "Higher taxa list"
+msgstr "Lijst van hogere taxa"
+
+msgid "add all collaborators"
+msgstr "alle medewerkers toevoegen"
+
+msgid "Available sections (click to edit):"
+msgstr "Omschrijving (klik om te bewerken)"
+
+msgid "Occurrence file upload"
+msgstr "Taxonbestand uploaden"
+
+msgid "Insufficient data."
+msgstr "Onvoldoende gegevens."
+
+msgid "To view a single occurrence, click the 'view on map' link of that occurrence."
+msgstr "Klik op 'toon op kaart' om een enkel voorkomen op de kaart te zien."
+
+msgid "A step with number %s already exists. The lowest unused number is %s."
+msgstr "Een stap met nummer %s bestaat al. Het laagste ongebruikte nummer is %s."
+
+msgid "definition"
+msgstr "Definieer secties"
+
+msgid "Password too short; should be between %s and %s characters."
+msgstr "Wachtwoord is te kort; dient tussen de %s en %s karakters te zijn."
+
+msgid "add module"
+msgstr "module toevoegen"
+
+msgid "retrieve a single level of child taxa only"
+msgstr "download één niveau"
+
+msgid "There are no taxa for you to edit."
+msgstr "Er zijn geen taxa voor u om te bewerken."
+
+msgid "That taxon cannot have child taxa."
+msgstr "Taxa kan geen onderliggende taxa hebben."
+
+msgid "To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'."
+msgstr "Klik om een bestand met taxa te laden op de 'browse'-knop hierboven, selecteer het in te laden bestand en klik op 'uploaden'."
+
+msgid "No taxon specified."
+msgstr "Geen taxon gespecificeerd."
+
+msgid "Viewing taxon-state links in the matrix \"%s\""
+msgstr "Weergeven van taxon-staat links in de matrix \"%s\""
+
+msgid "There is a maximum of %s self-defined modules."
+msgstr "Er is een maximum van %s vrije modules."
+
+msgid "remove selected taxon"
+msgstr "sla geselecteerde ordes op"
+
+msgid "our password:"
+msgstr "ons wachtwoord:"
+
+msgid "next >"
+msgstr "volgende >"
+
+msgid "move branch upward in the tree"
+msgstr "tak naar boven verplaatsen"
+
+msgid "delete selected"
+msgstr "geselecteerde optie verwijderen"
+
+msgid "upload media"
+msgstr "uploaden"
+
+msgid "Ranks:"
+msgstr "Ordes:"
+
+msgid "states"
+msgstr "staten"
+
+msgid "add"
+msgstr "toevoegen"
+
+msgid "add new choice"
+msgstr "nieuwe keuze toevoegen"
+
+msgid "Element:"
+msgstr "Element:"
+
+msgid "Choose a species"
+msgstr "Kies een soort"
+
+msgid "Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory."
+msgstr "Iedere taxon-pagina bestaat uit één of meer categorieën, met een maximum van %s. De eerste categorie, '%s', is verplicht."
+
+msgid "pages published"
+msgstr "gepubliceerde pagina's"
+
+msgid "Send e-mail notifications:"
+msgstr "E-mailnotificaties versturen:"
+
+msgid "The maximum size of a file you are allowed to upload is influenced by the settings of the server. Currently, these are:"
+msgstr "De maximale omvang van een up te loaden bestand wordt bepaald door instellingen van de server. Momenteel zijn dat:"
+
+msgid "New charcteristic for matrix \"%s\""
+msgstr "Nieuwe karakteristiek voor matrix \"%s\""
+
+msgid "You have to define at least one language in your project before you can add any categories."
+msgstr "U dient tenminste één taal in uw project te definiëren voordat u enige categorieën kunt toevoegen."
+
+msgid "Characteristic name:"
+msgstr "Naam van karakteristiek:"
+
+msgid "range"
+msgstr "reeks"
+
+msgid "When you are done, click 'save' to store all occurrences."
+msgstr "Klik om alle gegevens op te slaan op 'opslaan' wanneer u gereed bent."
+
+msgid "Then click on the appropriate spot on the map to place a marker. To remove a marker, right-click on it."
+msgstr "Klik vervolgens op de gewenste lokatie op de kaart om een merkteken te plaatsen. Klik met de rechter muisknop op een merkteken om het te verwijderen."
+
+msgid "The value for one standard deviation is required."
+msgstr "De waarde voor één standaarddeviatie is vereist."
+
+msgid "No glossary term specified."
+msgstr "Geen woordenboekterm gespecificeerd."
+
+msgid "Term:"
+msgstr "Term:"
+
+msgid "No matrices have been defined."
+msgstr "Er zijn geen matrices gedefinieerd."
+
+msgid "Editing keystep"
+msgstr "Bewerken van stap"
+
+msgid "Assign collaborators to work on free modules:"
+msgstr "Wijs medewerkers toe aan modules"
+
+msgid "Category"
+msgstr "Categorie"
+
+msgid "cannot undo"
+msgstr "kan niet herstellen"
+
+msgid "Media"
+msgstr "Media"
+
+msgid "Reset password"
+msgstr "Wachtwoord opnieuw instellen"
+
+msgid "Failed to save user."
+msgstr "Kon gebruiker niet opslaan."
+
+msgid "Parent cannot have child taxa."
+msgstr "Taxa kan geen onderliggende taxa hebben."
+
+msgid "Active:"
+msgstr "Actief:"
+
+msgid "Final confirmation:"
+msgstr "Laatste waarschuwing:"
+
+msgid "(This page has been published in this language. Click %shere%s to unpublish.)"
+msgstr "(Deze pagina is gepubliceerd in deze taal. Klik %shier%s om de publicatie ongedaan te maken.)"
+
+msgid "A taxon of that rank cannot be a hybrid."
+msgstr "Orde kan geen hybride zijn."
+
+msgid "Reference:"
+msgstr "Literatuurverwijzing:"
+
+msgid "Add the name and type of the charcteristic you want to add. The following types of charcteristics are available:"
+msgstr "Geef de naam en het type van de karakteristiek dat u wilt toevoegen in. De volgende typen zijn beschikbaar:"
+
+msgid "Passwords not the same."
+msgstr "Wachtwoorden zijn niet hetzelfde."
+
+msgid "unpublished"
+msgstr "ongepubliceerd"
+
+msgid "Project logo:"
+msgstr "Project logo:"
+
+msgid "Overwriting and identical filenames"
+msgstr "Overschrijven en identieke bestandsnamen"
+
+msgid "common name"
+msgstr "populaire naam"
+
+msgid "Rank cannot be hybrid."
+msgstr "Orde kan geen hybride zijn."
+
+msgid "et al."
+msgstr "et al."
+
+msgid "No synonyms have been defined for this taxon."
+msgstr "Er zijn geen synoniemen gedefinieerd voor dit taxon."
+
+msgid "The upper boundary is required."
+msgstr "Een waarde voor de bovengrens is vereist."
+
+msgid "needs to be translated"
+msgstr "dient te worden vertaald"
+
+msgid "Password too long; should be between %s and %s characters."
+msgstr "Wachtwoord is te lang; dient tussen de %s en de %s karakters te zijn."
+
+msgid "save"
+msgstr "opslaan"
+
+msgid "Log out"
+msgstr "UItloggen"
+
+msgid "current"
+msgstr "huidig"
+
+msgid "You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows."
+msgstr "U kunt de volgorde van weergave van taxa op hetzelfde niveau wijzigen door taxa omhoog of omlaag te bewegen door op de pijlen te klikken."
+
+msgid "Could not read data from file."
+msgstr "Kon geen gegevens uit bestand lezen."
+
+msgid "New characteristic"
+msgstr "Nieuwe karakteristiek"
+
+msgid "days"
+msgstr "dagen"
+
+msgid "(has never logged in)"
+msgstr "(heeft nooit ingelogd)"
+
+msgid "files"
+msgstr "bestanden"
+
+msgid "Image:"
+msgstr "Afbeelding:"
+
+msgid "add new term"
+msgstr "nieuwe term toevoegen"
+
+msgid "Back to login"
+msgstr "Terug naar de loginpagina"
+
+msgid "You can also define multiple occurrences at once by %suploading a file%s."
+msgstr "U kunt ook meerdere voorkomens tegelijk opvoeren door een %sbestand up te loaden%s."
+
+msgid "back"
+msgstr "terug"
+
+msgid "State"
+msgstr "Staat"
+
+msgid "I forgot my password and/or username: click %shere%s to reset your password."
+msgstr "Ik ben mijn wachtwoord em/of gebruikersnaam vergeten: klik %shier%s om uw wachtwoord opnieuw in te stellen."
+
+msgid "Row %s: unknown data type ID %s"
+msgstr "Rij %s: onbekend gegevenstype ID %s"
+
+msgid "A data type with that name already exists."
+msgstr "Een gegevenstype met die naam bestaat al."
+
+msgid "show entire path"
+msgstr "toon volledige pad"
+
+msgid "Step"
+msgstr "Stap"
+
+msgid "Below is a list of steps without any choices. To edit, click the name the step."
+msgstr "Hieronder ziet u een lijst van stappen zonder keuzes. Klik om een stap te wijzigen op de naam van de betreffende stap."
+
+msgid "To gain access to the page you were attempting to view, please contact the lead expert of your project:"
+msgstr "Neem, om toegang te krijgen tot de pagina die u probeerde te openen, contact op met de lead expert van uw project:"
+
+msgid "Editing chara\"%s\" for matrix \"%s\""
+msgstr "Editing chara\"%s\" for matrix \"%s\""
+
+msgid "Cannot create log file %s"
+msgstr "Kan logbestand %s niet maken"
+
+msgid "Active"
+msgstr "Actief"
+
+msgid "Delete logo"
+msgstr "Logo verwijderen"
+
+msgid "Import key (experimental)"
+msgstr "Sleutel importeren (experimenteel)"
+
+msgid "Key sections"
+msgstr "Sleuteldelen"
+
+msgid "save and return to matrix"
+msgstr "opslaan en terug naar matrix"
+
+msgid "Name:"
+msgstr "Naam:"
+
+msgid "Internal project name:"
+msgstr "Interne projectnaam:"
+
+msgid "remove as collaborator"
+msgstr "medewerker verwijderen"
+
+msgid "Project title:"
+msgstr "Projecttitel:"
+
+msgid "Browsing pages"
+msgstr "Bladeren"
+
+msgid "Below are all taxa in your project that are part of the species module. All higher taxa can be found in the %shigher taxa module%s."
+msgstr "Hieronder ziet u alle taxa in uw project die geen deel uitmaken van de soortenmodule. Alle hogere taxa kunnen worden gevonden in de %shogere taxa module%s."
+
+msgid "Insert a link to:"
+msgstr "Voeg een link in naar:"
+
+msgid "process"
+msgstr "verwerken"
+
+msgid "No default language has been defined. Go %shere%s to set the default languages."
+msgstr "Er is geen standaardtaal ingesteld. U kunt %shier%s een standaardtaal instellen."
+
+msgid "Orphan"
+msgstr "Wees"
+
+msgid "Selection type:"
+msgstr "Selectietype:"
+
+msgid "recovered"
+msgstr "hersteld"
+
+msgid "See current media for this taxon"
+msgstr "Zie de hudige mediabestanden voor dit taxon"
+
+msgid "save and add another taxon"
+msgstr "opslaan en nog een taxon toevoegen"
+
+msgid "Title:"
+msgstr "Titel:"
+
+msgid "saved"
+msgstr "opgeslagen"
+
+msgid "Module:"
+msgstr "Module:"
+
+msgid "Invalid or unknown e-mail address."
+msgstr "Onbekend of ongeldig e-mailadres."
+
+msgid "Be advised, the retrieval process might take quite some time, especially with higher taxa. It is recommended not to attempt to retrieve anything above the rank of genus."
+msgstr "Opmerking: het ophalen van informatie kan de nodige tijd in beslag nemen, zeker wanneer hogere taxa worden opgevraagd. Het wordt afgeraden om gegevens op te vragen boven het niveau van genus."
+
+msgid "Unable to resolve taxon's Catalogue Of Life ID"
+msgstr "Niet in staat taxon;s Catalogue Of Life ID te achterhalen"
+
+msgid "Matrix key"
+msgstr "Matrixsleutel"
+
+msgid "<a href=\"step_show.php\">Go to your key</a>."
+msgstr "<a href=\"step_show.php\">Ga naar de sleutel</a>."
+
+msgid "Species occurrences of \"%s\""
+msgstr "Voorkomen van soort \"%s\""
+
+msgid "Category:"
+msgstr "Categorie:"
+
+msgid "Other values for the field 'Hybrid' than 'y' are ignored."
+msgstr "Andere waarden voor het veld hybride dan 'y' worden genegeerd."
+
+msgid "Your username:"
+msgstr "Uw gebruikersnaam:"
+
+msgid "Unknown rank"
+msgstr "Onbekende orde"
+
+msgid "Species module detail"
+msgstr "Soortenmodule detail"
+
+msgid "images"
+msgstr "afbeeldingen"
+
+msgid "Editing literary reference \"%s (%s)\""
+msgstr "Literatuurverwijzing \"%s\" wijzigen"
+
+msgid "New image"
+msgstr "Nieuwe afbeelding"
+
+msgid "Literature index"
+msgstr "Index literatuurverwijzingen"
+
+msgid "Taxon name already in database."
+msgstr "Taxon reeds in database."
+
+msgid "Define data types"
+msgstr "Definieer datatypen"
+
+msgid "Search for glossary terms"
+msgstr "Zoeken naar woordenboektermen"
+
+msgid "authors"
+msgstr "auteurs"
+
+msgid "Add a new synonym:"
+msgstr "Voeg een nieuw synoniem toe:"
+
+msgid "undefined"
+msgstr "ongedefinieerd"
+
+msgid "preview"
+msgstr "voorbeeld"
+
+msgid "use"
+msgstr "gebruiken"
+
+msgid "a value range, defined by a lowest and a highest value."
+msgstr "een reeks, gedefinieerd door een laagste en hoogste waarde."
+
+msgid "move down"
+msgstr "naar beneden verplaatsen"
+
+msgid "Below, you can specify the correct label of each rank in the language or languages defined in your project."
+msgstr "Hieronder kunt u van iedere orde de correcte naamgeving in de verschillende talen binnen uw project specificeren."
+
+msgid "(comma)"
+msgstr "(komma)"
+
+msgid "synonyms"
+msgstr "synoniemen"
+
+msgid "Missing value."
+msgstr "Ontbrekende waarde."
+
+msgid "Unassignable role selected"
+msgstr "Ontoewijsbare rol geselecteerd"
+
+msgid "Delete:"
+msgstr "Verwijderen:"
+
+msgid "Project role:"
+msgstr "Projectrol:"
+
+msgid "FATAL: no table basename defined"
+msgstr "FATAL: geen 'table basename' gedefinieerd"
+
+msgid "Log file not available for writing (%s)"
+msgstr "Logbestand niet beschikbaar voor schrijven (%s)"
+
+msgid "Text you enter is automatically saved when you leave the input field."
+msgstr "Tekst die u invult wordt automatisch opgeslagen wanneer u het invoerveld verlaat."
+
+msgid "Would you like to connect that user to the current project instead of creating a new one with the same name?"
+msgstr "Wilt u die gebruiker verbinden aan het huidige project in plaats van een nieuwe te creëren met dezelfde naam?"
+
+msgid "Invalid value for one standard deviation (must be integer or real)."
+msgstr "Ongeldige waarde voor één standaarddeviatie."
+
+msgid "Uppermost taxon is not a %s, and has a rank that has no immediate parent."
+msgstr "Het bovenste taxon is geen a %s, en is van een orde die geen directe ouder heeft."
+
+msgid "No species name given."
+msgstr "Geen taxon naam opgegeven."
+
+msgid "Password (repeat):"
+msgstr "Wachtwoord (herhaling):"
+
+msgid "First name:"
+msgstr "Voornaam:"
+
+msgid "Mean:"
+msgstr "Gemiddelde:"
+
+msgid "Content not found."
+msgstr "Content niet gevonden:"
+
+msgid "Password strength:"
+msgstr "Sterkte wachtwoord:"
+
+msgid "Editing state for \"%s\""
+msgstr "Staat onderhouden voor \"%s\""
+
+msgid "Could not save image."
+msgstr "Kan afbeelding opslaan."
+
+msgid "(no terms have been defined)"
+msgstr "(er zijn geen termen gedefineerd)"
+
+msgid "(show all)"
+msgstr "(alles tonen)"
+
+msgid "Taxon-state links"
+msgstr "Links tussen staat en taxon"
+
+msgid "index"
+msgstr "index"
+
+msgid "The module \"%s\" is not part of your project."
+msgstr "De module \"%s\" maakt geen deel uit van uw project."
+
+msgid "add new"
+msgstr "nieuwe toevoegen"
+
+msgid "You need to reprocess your key to see the list of possible outcomes. Go %shere%s to do so."
+msgstr "U dient uw sleutel opnieuw te verwerken om de lijst met mogelijke uitkomsten te zien. Ga %shierheen%s om dat te doen."
+
+msgid "max."
+msgstr "max."
+
+msgid "Move"
+msgstr "Verplaatsen"
+
+msgid "(you have reached the maximum of %s choices per step)"
+msgstr "(u hebt het maximum van %s keuzes per stap bereikt)"
+
+msgid "No data to process. Please check that your data is complete and that you are using the field delimiter you have specified above."
+msgstr "Geen gegevens om te verwerken. Verzeker u er van dat de gegevens compleet zijn en dat u gebruik maakt van het veldscheidingsteken dat u hierboven heeft gespecificeerd."
+
+msgid "Unassignable role selected."
+msgstr "Niet-toewijsbare rol geselecteerd."
+
+msgid "here"
+msgstr "hier"
+
+msgid "add data"
+msgstr "gegevens toevoegen"
+
+msgid "A name is required."
+msgstr "Een naam is vereist."
+
+msgid "distribution"
+msgstr "distributie"
+
+msgid "Create new reference"
+msgstr "Creëer een nieuwe literatuurverwijzing"
+
+msgid "Translation"
+msgstr "Vertaling"
+
+msgid "Define languages now."
+msgstr "Nu talen definiëren,"
+
+msgid "Attach to"
+msgstr "Aanhaken aan"
+
+msgid "Below is a graphic representation of your key. Click a node to see the steps that follow from it. Click and drag to move the entire tree."
+msgstr "Hieronder ziet u een grafische weergave van uw sleutel. Klik op een knooppunt om de stappen te zien die er uit volge. Klik en sleep om de complete boom te verplaatsen."
+
+msgid "Choices"
+msgstr "Keuzes"
+
+msgid "Enter the title, text, an optional image and the target of this choice. Title and text are saved automatically after you have entered the text in the appropriate input."
+msgstr "Vul de titel, tekst, een optionele afbeelding en het doel van de keuze in. Titel en tekst worden automatisch opgeslagen nadat u de tekst in het betreffende invoerveld heeft opgeslagen."
+
+msgid "Size"
+msgstr "Omvang"
+
+msgid "Orphans (taxa outside of the main taxon tree)"
+msgstr "Wezen (taxa buiten de hoofdboom)"
+
+msgid "Unknown taxon."
+msgstr "Onbekend taxon."
+
+msgid "(semi-colon)"
+msgstr "(puntkomma)"
+
+msgid "File too big:"
+msgstr "Bestand te groot:"
+
+msgid "System administration tasks:"
+msgstr "Systeemadministratietaken:"
+
+msgid "Marker type"
+msgstr "Type merkteken"
+
+msgid "Select a project to work on"
+msgstr "Selecteer een project om aan te werken"
+
+msgid "Currently being edited by:"
+msgstr "Wordt nu bewerkt door:"
+
+msgid "No name of uploaded file specified."
+msgstr "Naam van geüpload bestand niet gespecificeerd."
+
+msgid "close"
+msgstr "sluitem"
+
+msgid "Attach"
+msgstr "Aanhaken"
+
+msgid "Compute taxon division"
+msgstr "Taxonverdeling berekenen"
+
+msgid "Upper limit (inclusive):"
+msgstr "Bovengrens (inclusief deze waarde):"
+
+msgid "Are you sure?"
+msgstr "Weet u het zeker?"
+
+msgid "move branch downward in the tree"
+msgstr "verplaats tak naar beneden"
+
+msgid "Common names for taxon \"%s\":"
+msgstr "Populaire namen voor taxon \"%s\":"
+
+msgid "Species module index"
+msgstr "Overzicht soortenmodule"
+
+msgid "Allowed MIME-types"
+msgstr "Toegestane MIME-types"
+
+msgid "Is being edited by:"
+msgstr "Wordt nu bewerkt door:"
+
+msgid "Row %s: mismatch for taxa %s: \"%s\" (file) <=> \"%s\" (database)"
+msgstr "Rij %s: taxa komen niet onvereen voor %s: \"%s\" (bestand) <=> \"%s\" (database)"
+
+msgid "Occurrences of \"%s\""
+msgstr "Voorkomen van \"%s\""
+
+msgid "down"
+msgstr "neerwaarts"
+
+msgid "Search for:"
+msgstr "Zoeken naar:"
+
+msgid "upload"
+msgstr "uploaden"
+
+msgid "E-mail notifications:"
+msgstr "E-mailberichten:"
+
+msgid "Map key index"
+msgstr "Kaartsleutelindex"
+
+msgid "Saved: %s (%s)"
+msgstr "Opgeslagen: %s (%s)"
+
+msgid "FATAL: cannot load configuration"
+msgstr "FATAL: kon configuratie niet laden"
+
+msgid "No language specified."
+msgstr "Geen taal gespecificeerd."
+
+msgid "E-mail address:"
+msgstr "E-mailadres:"
+
+msgid "Taxonomic ranks"
+msgstr "Taxonomische ordes"
+
+msgid "To change the name, rank or parent of a taxon, click its name. To edit a taxon's content, click the corresponding cell in the column 'content'."
+msgstr "Klik om de naam, orde of bovenliggend taxon te wijzigen op de naam van een taxon. Om de content van een taxon te bewerken, klik op de corresponderende cel in de kolom 'content'."
+
+msgid "taxon:"
+msgstr "taxon:"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "File type not allowed:"
+msgstr "Bestandstype niet toegestaan:"
+
+msgid "Cannot create new state."
+msgstr "Kan nieuwe staat niet creëren."
+
+msgid "Row %s: saved marker for \"%s\"."
+msgstr "Rij %s: merkteken opgeslagen voor \"%s\""
+
+msgid "Choose an occurrence"
+msgstr "Kies een voorkomen"
+
+msgid "No page title specified."
+msgstr "Geen paginatitel opgegeven."
+
+msgid "Characteristic"
+msgstr "Karakteristiek"
+
+msgid "delete them as well. Effectively this will delete the entire branch from taxon \"%s\" and down."
+msgstr "verwijder ze ook. Dit betekent effectief de verwijdering van de complete tak beginnend met het taxon \"%s\"."
+
+msgid "Timezone:"
+msgstr "Tijdszone:"
+
+msgid "Editing glossary term"
+msgstr "Woordenboekterm wijzigen"
+
+msgid "collaborator for"
+msgstr "mederwerker voor"
+
+msgid "Internal project description:"
+msgstr "Interne projectbeschrijving:"
+
+msgid "Management tasks:"
+msgstr "Managementtaken:"
+
+msgid "Manage modules:"
+msgstr "Modules onderhouden:"
+
+msgid "no"
+msgstr "nee"
+
+msgid "No temporary directory specified (required for deflating archive)."
+msgstr "Geen tijdelijke map gespecificeerd (noodzakelijk voor uitpakken archief)."
+
+msgid "E-mail address already exists."
+msgstr "E-mailadres bestaat al."
+
+msgid "This project includes hybrid taxa:"
+msgstr "Dit project bevat hybride taxa:"
+
+msgid "links"
+msgstr "links"
+
+msgid "edit name"
+msgstr "naam wijzigen"
+
+msgid "Define taxonomic ranks"
+msgstr "Definieer taxonomicsch ordes"
+
+msgid "Full keypath"
+msgstr "Volledige sleutelpad"
+
+msgid "This is a hybrid:"
+msgstr "Dit is een hybride:"
+
+msgid "Taxon list"
+msgstr "Taxonlijst"
+
+msgid "Image saved."
+msgstr "Afbeelding opgeslagen."
+
+msgid "Name, type &amp; size"
+msgstr "Naam, type &amp; omvang"
+
+msgid "Project management"
+msgstr "Projectmanagement"
+
+msgid "Attach to parent:"
+msgstr "Aanhaken aan bovenliggend:"
+
+msgid "Current assignments:"
+msgstr "Huidige toewijzingen:"
+
+msgid "year"
+msgstr "jaar"
+
+msgid "language"
+msgstr "taal"
+
+msgid "Sections"
+msgstr "Secties"
+
+msgid "Dichotomous key"
+msgstr "Dichotome sleutel"
+
+msgid "My password doesn't work or my account may have been compromised: please %scontact the helpdesk%s."
+msgstr "Mijn wachtwoord werkt niet of mijn account is mogelijk gecompromitteerd: neem %scontact op met de helpdesk%s."
+
+msgid "Ranks should match the list of ranks you have selected for your project."
+msgstr "Order dienen voor te komen op de lijst die u voor dit project hebt geselecteerd."
+
+msgid "Editing characteristic \"%s\""
+msgstr "Karakteristiek \"%s\" wijzigen"
+
+msgid "Remember me"
+msgstr "Onthouden"
+
+msgid "No languages have been defined. You need to define at least one language. Go %shere%s to define project languages."
+msgstr "Er zijn geen talen gedefinieerd. U dient tenminste één taal te definiëren. Ga %shier%s naar toe om een standaardtaal in te stellen."
+
+msgid "Rank:"
+msgstr "Orde:"
+
+msgid "Row %s: marker for \"%s\" misses %s."
+msgstr "Rij %s: merkteken voor \"%s\" mist %s."
+
+msgid "Collaborator"
+msgstr "Medewerker"
+
+msgid "Index"
+msgstr "Index"
+
+msgid "Editing choice"
+msgstr "Keuze bewerken"
+
+msgid "The effective size limit is determined by the smallest of these two."
+msgstr "De effectieve beperking aan de omvang wordt bepaald door de kleinste van deze twee."
+
+msgid "Invalid value for the mean (must be integer or real)."
+msgstr "Ongeldige waarde voor het gemiddelde."
+
+msgid "see below for information on uploading archives"
+msgstr "zie lager voor informatie over het uploaden van gecomprimeerde bestanden"
+
+msgid "Row %s: unknown taxon ID %s"
+msgstr "Rij %s: onbekend taxon ID %s"
+
+msgid "Content pages"
+msgstr "Contentpagina's"
+
+msgid "A reference with the same author(s), year and suffix already exists."
+msgstr "Er bestaat al een literatuurverwijzing met dezelfde auteur(s), jaar en suffix."
+
+msgid "Media for \"%s\""
+msgstr "Media voor \"%s\""
+
+msgid "Could not move file:"
+msgstr "Kon bestand niet verplaatsen:"
+
+msgid "file"
+msgstr "bestand"
+
+msgid "Import taxon tree from Catalogue Of Life (experimental)"
+msgstr "Importeer taxa uit de Catalogue Of Life (experimenteel)"
+
+msgid "Assign collaborators to modules"
+msgstr "Wijs medewerkers toe aan modules"
+
+msgid "Glossary alphabet"
+msgstr "Woordenlijst alfabet"
+
+msgid "published"
+msgstr "gepubliceerd"
+
+msgid "Glossary term already exists."
+msgstr "Woordenboekterm bestaat al."
+
+msgid "change order"
+msgstr "wijzig volgorde"
+
+msgid "yes, connect user"
+msgstr "ja, verbind gebruiker"
+
+msgid "make default"
+msgstr "maak default"
+
+msgid "No species ID given."
+msgstr "Geen taxon ID opgegeven."
+
+msgid "Author:"
+msgstr "Auteur:"
+
+msgid "There should be one taxon per line. No header line should be present."
+msgstr "Één taxon per regel. Geen kopregel bovenaan."
+
+msgid "CSS url:"
+msgstr "CSS URL:"
+
+msgid "Parent-child relations are assumed top-down, one branch at a time. For instance, loading:"
+msgstr "Ouder-kindrelaties worden van boven naar beneden verondersteld, per tax in de taxonomische boom. Bijvoorbeeld, het laden van:"
+
+msgid "(double click to delete)"
+msgstr "(dubbelklik om en taxon te verwijderen)"
+
+msgid "Login failed."
+msgstr "Login mislukt."
+
+msgid "Orphans:"
+msgstr "Wezen:"
+
+msgid "See glossary items in:"
+msgstr "Zie woordenlijsttermen in:"
+
+msgid "Are you sure you want to delete this choice?"
+msgstr "Weet u zeker dat u deze keuze wilt verwijderen?"
+
+msgid "Choose a taxon:"
+msgstr "Kies een taxon:"
+
+msgid "Creating new page"
+msgstr "Creëer nieuwe pagina"
+
+msgid "Are you sure you want to delete %s \"%s\"?"
+msgstr "Weet u zeker dat u %s \"%s\" wilt verwijderen?"
+
+msgid "A user with that e-mail address already exists in your project."
+msgstr "Er bestaat al een gebruiker met dat e-mailadres in uw project."
+
+msgid "turn them into \"orphans\". Orphans are taxa that are unconnected to the main taxon tree. You will need to individually reattach them later."
+msgstr "maak er wezen van. Wezen zijn taxa die niet aangesloten zijn aan de taxonboom. U dient ze op een later moment manueel aan de boom aan te haken."
+
+msgid "yes, connect existing"
+msgstr "ja, verbind bestaande"
+
+msgid "(none)"
+msgstr "(geen)"
+
+msgid "Username too long; should be between %s and %s characters."
+msgstr "Gebruikersnaam is te lang: dient tussen de %s en de %s karakters te zijn."
+
+msgid "Define ranks that can appear in key"
+msgstr "Definieer ordes die in de sleutel kunnen voorkomen."
+
+msgid "Start a new subsection"
+msgstr "Start een nieuw sleuteldeel"
+
+msgid "No taxon have been defined."
+msgstr "Er zijn geen taxa gedefinieerd."
+
+msgid "Coordinates"
+msgstr "Coördinaten"
+
+msgid "Below, you can define up to ten types of geographically organised data. Once defined, you can specify locations on the map for each species, for every data type."
+msgstr "Hieronder kunt u tot tien soorten geografisch georganiseerde gegevens definiëren. Daarna kunt u per soort en per type gegevens punten of polygonen op de kaart aangeven."
+
+msgid "Definition:"
+msgstr "Definieer secties:"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "abort retrieval"
+msgstr "downloaden afbreken"
+
+msgid "Missing first name."
+msgstr "Ontbrekende voornaam."
+
+msgid "Missing email address."
+msgstr "Ontbrekend e-mailadres."
+
+msgid "attach them as child to the parent of \"%s\", which is the %s \"%s\". There will be no change in the rank of the reattached taxa."
+msgstr "haak ze als kind aan aan de ouder van taxon \"%s\": %s \"%s\". De orde van de opnieuw aangehaakte taxa blijft ongewijzigd."
+
+msgid "status"
+msgstr "status"
+
+msgid "All corresponding data will be irreversibly deleted."
+msgstr "Alle corresponderende gegevens worden definitief verwijderd."
+
+msgid "publish"
+msgstr "publiceren"
+
+msgid "Row %s: polygon node for \"%s\" misses longitude"
+msgstr "Rij %s: knooppunt van polygoon voor \"%s\" mist lengtegraad"
+
+msgid "to user"
+msgstr "aan medewerker"
+
+msgid "Sound"
+msgstr "Geluid"
+
+msgid "Set rights"
+msgstr "Rechten instellen"
+
+msgid "topic"
+msgstr "onderwerp"
+
+msgid "Adding axa"
+msgstr "Taxa toevoegen"
+
+msgid "Label taxonomic ranks"
+msgstr "Naamgeving taxonomische ordes"
+
+msgid "choice leads to"
+msgstr "keuze leidt naar"
+
+msgid "File does not seem to be a CSV-file."
+msgstr "Bestand lijkt geen CSV-bestand te zijn."
+
+msgid "synonym"
+msgstr "synoniem"
+
+msgid "Failed writing uploaded file to database."
+msgstr "Kon bestand niet naar de database schrijven."
+
+msgid "Check the taxa you wish to import, and click save:"
+msgstr "Vink de taxa aan die u wenst te importeren en klik op 'opslaan':"
+
+msgid "Taxonomic ranks: labels"
+msgstr "Naamgeving taxonomische ordes."
+
+msgid "Create new collaborator"
+msgstr "Nieuwe medewerker creëren"
+
+msgid "Search references"
+msgstr "Zoek in literatuurverwijzingen"
+
+msgid "Click the button below to have the system compute the list of remaining taxa in each step of your key. Please be aware: in the case of large keys with many species, this might take some time."
+msgstr "Klik op de onderstaande knop om het systeem de verdeling van mogelijke uitkomsten per stap van uw sleutel te laten uitrekenen. In het geval van grote sleutels met veel soorten kan dit enige tijd in beslag nemen."
+
+msgid "Literature for \"%s\""
+msgstr "Literatuurverwijzingen voor \"%s\""
+
+msgid "Click the name of the species of which you want to see the geographical data."
+msgstr "Klik op de naam van de soort waarvan u de geografische gegevens wil zien."
+
+msgid "The upper boundary value must be larger than the lower boundary value."
+msgstr "De bovengrens dient groter te zijn dan de ondergrens."
+
+msgid "Missing password."
+msgstr "Ontbrekend wachtwoord."
+
+msgid "You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?"
+msgstr "U kunt geen nieuwe gebruiker creëren met hetzelfde e-mailadres, maar u kunt de bestaande gebruiker wel verbinden aan het huidige project. Wilt u dat doen?"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "yes"
+msgstr "ja"
+
+msgid "(double-click a synonym to remove it from the list)"
+msgstr "(dubbelklik op een synoniem om het uit de lijst te verwijderen)"
+
+msgid "Editing glossary term \"%s\""
+msgstr "Aanapssen woordenboekterm \"%s\""
+
+msgid "Click to browse:"
+msgstr "Klik om te bladeren:"
+
+msgid "Language already assigned."
+msgstr "Taal al toegewezen"
+
+msgid "State \"%s\" saved."
+msgstr "Staat \"%s\" opgeslagen."
+
+msgid "Edit choice \"%s\" for step %s: \"%s\""
+msgstr "Wijzig keuze \"%s\" voor stap %s: \"%s\""
+
+msgid "Edit step \"%s\""
+msgstr "Stap \"%s\" bewerken."
+
+msgid "synonym:"
+msgstr "synoniem:"
+
+msgid "New state for \"%s\""
+msgstr "Nieuwe staat voor \"%s\""
+
+msgid "names"
+msgstr "namen"
+
+msgid "no, cancel"
+msgstr "nee, annuleren"
+
+msgid "Matrix name:"
+msgstr "Matrixnaam:"
+
+msgid "Could not delete image."
+msgstr "Kon afbeelding niet verwijderen."
+
+msgid "Synonyms for taxon \"%s\":"
+msgstr "Synoniemen voor taxon \"%s\":"
+
+msgid "Glossary term"
+msgstr "Woordenboekterm"
+
+msgid "Could not save new publish state."
+msgstr "Kon nieuwe publicatiestaat niet opslaan."
+
+msgid "Display current links per taxon"
+msgstr "Geef de huidige links per taxon weer"
+
+msgid "\"%s\" is not a number."
+msgstr "\"%s\" is geen nummer."
+
+msgid "show details"
+msgstr "toon details"
+
+msgid "Deletion will be irreversibly."
+msgstr "Verwijdering is definitief."
+
+msgid "Taxa with a rank that does not appear in this list will not be loaded."
+msgstr "Taxa met een orde die niet in deze lijst voorkomt zullen niet worden opgeslagen."
+
+msgid "more"
+msgstr "meer"
+
+msgid "in this order will correctly maintain the relations between Genus, Species and Infraspecies."
+msgstr "in deze volgorde zal de relaties tussen Genus, Species en Infraspecies correct opslaan."
+
+msgid "Higher taxa index"
+msgstr "Index hogere taxa"
+
+msgid "Data type"
+msgstr "Datatype"
+
+msgid "undo (auto)save"
+msgstr "herstel laatst opgeslagen bewerking"
+
+msgid "Add occurrences for \"%s\""
+msgstr "Data voor \"%s\" toevoegen"
+
+msgid "Hybrids are only possible for the following ranks:"
+msgstr "Hybrides kunnen alleen bestaan voor de volgende ordes:"
+
+msgid "edit matrix"
+msgstr "matrix wijzigen"
+
+msgid "Enter the name of the taxon you wish to retrieve the taxon-tree for, and click 'retrieve'."
+msgstr "Vul de naam van het taxon waarvan u de gegevens wil ophalen, en klik 'downloaden'."
+
+msgid "Cannot open log file %s"
+msgstr "Kan logbestand %s niet openen"
+
+msgid "Logged in as"
+msgstr "Ingelogd als"
+
+msgid "name"
+msgstr "naam"
+
+msgid "Taxon \"%s\" saved."
+msgstr "Taxon \"%s\" opgeslagen."
+
+msgid "unpublish"
+msgstr "onpubliceren"
 
 msgid "Uploading multiple files at once"
 msgstr "Meerdere bestanden tegelijk uploaden"
 
+msgid "Could not save category."
+msgstr "Kon categorie niet opslaan."
+
+msgid "Data for \"%s\""
+msgstr "Gegevens voor \"%s\""
+
+msgid "Password:"
+msgstr "Wachtwoord:"
+
+msgid "Below, you can specify the correct label of each section in the language or languages defined in your project."
+msgstr "Hieronder kunt u van iedere sectie de correcte naamgeving in de verschillende talen binnen uw project specificeren."
+
+msgid "term"
+msgstr "term"
+
+msgid "common name:"
+msgstr "Populaire naam:"
+
+msgid "add as collaborator"
+msgstr "toevoegen als medewerker"
+
+msgid "Media:"
+msgstr "Media:"
+
+msgid "CSV field delimiter:"
+msgstr "CSV veldbegrenzer:"
+
+msgid "Letter:"
+msgstr "Letter:"
+
+msgid "move taxon downward"
+msgstr "verplaats taxon naar beneden"
+
+msgid "Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it."
+msgstr "U hebt sinds de laatste berekening niets gewijzigd aan uw sleutel. Er is geen noodzaak de verdeling opnieuw te berekenen."
+
+msgid "Parent taxon:"
+msgstr "Bovenliggend taxon:"
+
+msgid "Username too short; should be between %s and %s characters."
+msgstr "Gebruikersnaam te kort: dient tussen %s en %s karakters te zijn."
+
+msgid "Matrices"
+msgstr "Matrices"
+
+msgid "Editing \"%s\""
+msgstr "Bewerken \"%s\""
+
+msgid "Media type not allowed:"
+msgstr "Media-type niet toegestaan:"
+
+msgid "To reset your password, enter you e-mail address and press \"reset password\":"
+msgstr "Vul, om u wachtwoord opnieuw in te stellen, uw e-mailadres in en klik op \"wachtwoord opnieuw instellen\":"
+
+msgid "two"
+msgstr "twee"
+
+msgid "reference"
+msgstr "verwijzing"
+
+msgid "Log in to administer your Linnaeus project"
+msgstr "Log in om uw Linnaeus project te administreren:"
+
+msgid "Welcome back, %s."
+msgstr "Welkom terug, %s."
+
+msgid "Matrix keys"
+msgstr "Matrixsleutels"
+
+msgid "You have to choose an active matrix to edit. Click below to choose an active matrix."
+msgstr "U dient een matrix te activeren om het te kunnen wijzigen. Klik in de lijst hieronder om een matrix te activeren."
+
+msgid "Could not create temporary directory in"
+msgstr "Kon geen tijdelijke map creëren in"
+
+msgid "kb"
+msgstr "kb"
+
+msgid "longitude"
+msgstr "lengtegraad"
+
+msgid "You are not authorized to do that."
+msgstr "U bent niet geautoriseerd om die handeling te verrichten."
+
+msgid "Data saved."
+msgstr "Gegevens opgeslagen."
+
+msgid "Browsing glossary"
+msgstr "Door woordenlijst bladeren"
+
+msgid "step:"
+msgstr "stap:"
+
+msgid "Project collaborator data"
+msgstr "Gegevens projectmedewerker"
+
+msgid "add an image to this page"
+msgstr "voeg een afbeelding toe aan deze pagina"
+
+msgid "Last name:"
+msgstr "Achternaam:"
+
+msgid "Create a project"
+msgstr "Creëer een project"
+
+msgid "Topic:"
+msgstr "Onderwerp:"
+
+msgid "To enable drawing polygons, click the button below."
+msgstr "Klik, om te beginnen met het tekenen van een polygoon, op de knop hier onder."
+
+msgid "new step"
+msgstr "nieuwe stap"
+
+msgid "Duplicates of the taxa already in your project's database will not be stored."
+msgstr "Duplicaten van taxa die al bestaan in de database zullen niet worden opgeslagen."
+
+msgid "tab stop"
+msgstr "tabulator-stop"
+
+msgid "(new step)"
+msgstr "(nieuwe stap)"
+
+msgid "You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa."
+msgstr "U kunt specifieke onderdelen van de taxonomische boom toewijzen aan een specifieke medewerker. Wanneer een taxon is toegewezen, kan de betreffende medewerker alleen dat taxon bewerken, en alle taxa onder dat taxon. Als aan een medewerker geen taxa zijn toegewezen, kan hij ook geen taxa bewerken."
+
+msgid "Data types"
+msgstr "Datatypen"
+
+msgid "a value distribution, defined by a mean and values for one and two standard deviations."
+msgstr "een distributie, gedefinieerd door een gemiddelde en de waarde voor één standaarddeviatie."
+
+msgid "(current)"
+msgstr "(huidig)"
+
+msgid "Taxa:"
+msgstr "Taxon:"
+
+msgid "add language"
+msgstr "taal toevoegen"
+
+msgid "insert link"
+msgstr "link invoegen"
+
+msgid "Editing a state of the type \"%s\" for the characteristic \"%s\" of matrix \"%s\"."
+msgstr "Wijzigen van een staat van het type \"%s\" van de karakteristiek \"%s\" van matrix \"%s\"."
+
+msgid "To enable setting markers (points on the map), click the button below."
+msgstr "Klik om merktekens te kunnen plaatsen op de knop hier onder."
+
+msgid "Currently, no ranks have been defined in your project. To define ranks, go"
+msgstr ""
+
+msgid "< previous"
+msgstr "< vorige"
+
+msgid "Deleting taxon \"%s\""
+msgstr "Taxon \"%s\" verwijderen"
+
+msgid "You can download a sample CSV-file"
+msgstr "Om een voorbeeld CSV-bestand te downloaden klikt u"
+
+msgid "No taxon ID specified."
+msgstr "Geen taxon ID gespecificeerd."
+
+msgid "Project settings"
+msgstr "Project instellingen"
+
+msgid "submit"
+msgstr "versturen"
+
+msgid "Editing taxon \"%s\""
+msgstr "Aanpassen taxon \"%s\""
+
+msgid "transliteration:"
+msgstr "transliteratie:"
+
+msgid "Cannot delete lead expert."
+msgstr "Kan lead expert niet verwijderen"
+
+msgid "Could not save glossary term."
+msgstr "Kon woordenboekterm niet opslaan."
+
+msgid "Logging not initialised"
+msgstr "Logging niet geïnititialiseerd"
+
+msgid "Browse references"
+msgstr "Door literatuurverwijzingen bladeren"
+
+msgid "A media file is required."
+msgstr "Een mediabestand is vereist."
+
+msgid "Username:"
+msgstr "Gebruikersnaam:"
+
+msgid "Invalid e-mail address."
+msgstr "Ongeldig e-mailadres."
+
+msgid "View existing data"
+msgstr "Toon bestaande gegevens"
+
+msgid "Password has incorrect format."
+msgstr "Wachtwoord heeft incorrect formaat."
+
+msgid "To gain access to the page you were attempting to view, please contact one of the lead experts of your project:"
+msgstr ""
+
+msgid "Species module overview"
+msgstr "Overzicht soortenmodule"
+
+msgid "videos"
+msgstr "videos"
+
+msgid "Do nothing"
+msgstr "Geen actie"
+
+msgid "Assign taxa to collaborators"
+msgstr "Wijs taxa toe aan medewerkers"
+
+msgid "Import from Catalogue Of Life"
+msgstr "Importeer uit Catalogue Of Life"
+
+msgid "media files"
+msgstr "mediabestanden"
+
+msgid "Edit introduction"
+msgstr "Introductie bewerken"
+
+msgid "next"
+msgstr "volgende"
+
+msgid "The field delimiter must be a comma, semi-colon or tab stop, and can be selected above."
+msgstr ""
+
+msgid "Characteristic type:"
+msgstr "Type karakteristiek:"
+
+msgid "Synonyms:"
+msgstr "Synoniemen:"
+
+msgid "Taxon rank"
+msgstr "Taxon's orde"
+
+msgid "Done. Processed %s steps and %s taxa."
+msgstr ""
+
+msgid "No ranks have been defined."
+msgstr "Er zijn geen ordes gedefinieerd."
+
+msgid "Invalid value for the lower boundary (must be integer or real)."
+msgstr ""
+
+msgid "Select the type of data you are drawing on the map:"
+msgstr ""
+
+msgid "Add a new common name:"
+msgstr "Een nieuwe publieke naam toevoegen:"
+
+msgid "Matrix key index"
+msgstr ""
+
+msgid "Download sample CSV-file"
+msgstr "CSV-voorbeeldbestand downloaden"
+
+msgid "No allowed MIME-types set."
+msgstr "Toegestane MIME-types niet gedefinieerd."
+
+msgid "Ranks saved."
+msgstr "Ordes opgeslagen."
+
+msgid "Could not save taxon."
+msgstr "Kon taxon niet opslaan."
+
+msgid "Editing taxa:"
+msgstr "Taxon \"%s\" wijzigen:"
+
+msgid "Keypath"
+msgstr "Sleutelpad:"
+
+msgid "Page:"
+msgstr "Pagina:"
+
+msgid "The upper and lower boundary values cannot be the same."
+msgstr ""
+
+msgid "Taxa not part of the key"
+msgstr ""
+
+msgid "Possible outcomes"
+msgstr "Mogelijke uitkomsten"
+
+msgid "User management"
+msgstr "Gebruikersbeheer"
+
+msgid "edit"
+msgstr "wijzig"
+
+msgid "Browsing literary references"
+msgstr "Door literatuurverwijzingen bladeren"
+
+msgid "transliteration"
+msgstr "transliteratie"
+
+msgid "Browse glossary terms"
+msgstr ""
+
+msgid "The taxon or taxa of the rank \"%s\" will be connected as child to the already existing taxon \"%s\"."
+msgstr ""
+
+msgid "Orphaned taxa"
+msgstr "Verweesde taxa"
+
+msgid "Editing page"
+msgstr "Wijzig pagina"
+
+msgid "Switch projects"
+msgstr "Wissel van project"
+
+msgid "FATAL: cannot connect to database"
+msgstr "FATAL: kan niet aan database aanloggen"
+
+msgid "Project modules"
+msgstr "Project modules"
+
+msgid "Literature alphabet"
+msgstr "Alfabet literatuurverwijzingen"
+
+msgid "The following modules have been assigned to this user:"
+msgstr ""
+
+msgid "Welcome, %s."
+msgstr "Welkom, %s."
+
+msgid "images, videos, soundfiles"
+msgstr "afbeeldingen, videos, geluidsbestanden"
+
+msgid "Assign collaborator to modules"
+msgstr "Wijs medewerkers toe aan modules"
+
+msgid "Enter the title and text of this step in your key in the various languages within your project. Title and text are saved automatically after you have entered the text in the appropriate input."
+msgstr ""
+
+msgid "move taxon upward"
+msgstr "verplaats taxon naar boven"
+
+msgid "Invalid value for the upper boundary (must be integer or real)."
+msgstr ""
+
+msgid "User data saved"
+msgstr "Gebruikersgegevens opgeslagen"
+
+msgid "Below are all taxa in your project that are part of the higher taxa. All lower taxa can be found in the %sspecies module%s."
+msgstr "Hieronder ziet u alle taxa in uw project die deel uitmaken van de hogere taxa. Alle lagere taxa vindt u in de %ssoortenmodule%s."
+
+msgid "retrieve"
+msgstr "downloaden"
+
+msgid "(leave blank to leave unchanged)"
+msgstr "(niet invullen om ongewijzigd te laten)"
+
+msgid "Module"
+msgstr "Module"
+
+msgid "Unable to parse comprehensive data"
+msgstr "Niet in staat uitgebreide gegevens te verwerken"
+
+msgid "Add a new taxon"
+msgstr "Voeg een nieuw taxon toe"
+
+msgid "Species:"
+msgstr "Soorten:"
+
+msgid "Could not delete file: %s"
+msgstr "Kon bestand niet verwijderen: %s"
+
+msgid "Define categories"
+msgstr "Definieer categeoriën"
+
+msgid "or"
+msgstr "of"
+
+msgid "To edit a name, rank or parent, click the taxon's name. To edit a taxon's pages, click the percentage-indicator for that taxon in the 'content' column. To edit media files, synoyms or common names, click the cell in the corresponding column."
+msgstr "Om een naam, rang of ouder te wijzigen, klikt u op de naam van een taxon. Om de content van een taxon te wijzigen klikt u op de percentage-indicator voor dat taxon in de kolom 'content'. Om mediabestanden, synoniemen of populaire namen te wijzigen, klikt up de cel in de corresponderende kolom."
+
+msgid "Synonyms"
+msgstr "Synoniemen"
+
+msgid "Common names"
+msgstr "Populaire namen"
+
+msgid "Row %s: unable to save polygon for \"%s\". Duplicate?"
+msgstr "Rij %s: niet in staat om polygoon op te slaan voor \"%s\". Duplicaat?"
+
+msgid "Unconnected key endings"
+msgstr "Niet-aangesloten sleuteluiteinden"
+
+msgid "New glossary term"
+msgstr "Nieuwe woordenboekterm"
+
+msgid "Role in current project:"
+msgstr "Rol in het huidige project:"
+
+msgid "A similar user, albeit with a different e-mail address, already exists in this or another project:"
+msgstr "Een vergelijkbare gebruike, zij het met een afwijkend e-mailadres, bestaat al in dit of een ander project:"
+
+msgid "Allowed formats:"
+msgstr "Toegestane formaten:"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Enter new module's name:"
+msgstr "Vul de naam in van de nieuwe module:"
+
+msgid "undo last save"
+msgstr "laatst opgeslagen wijziging ongedaan maken"
+
+msgid "Missing last name."
+msgstr "Ontrbekende achternaam."
+
+msgid "Text:"
+msgstr "Tekst:"
+
+msgid "Click to see step \"%s\""
+msgstr "Klik om stap \"%s\" te zien"
+
+msgid "Username already exists."
+msgstr "Gebruikersnaam bestaat al."
+
+msgid "Attach:"
+msgstr "Aanhaken:"
+
+msgid "The contents of the file will be displayed so you can review them before they are saved to your project's database."
+msgstr "De inhoud van het bestand zal worden weergegeven zodat u de gegevens kunt controleren voordat ze in de database worden opgeslagen."
+
+msgid "Could not create page."
+msgstr "Kon geen pagina creëren."
+
+msgid "POST maximum size:"
+msgstr "maximale omvang POST:"
+
+msgid "select all"
+msgstr "alles selecteren"
+
+msgid "Literature"
+msgstr "Literatuur"
+
+msgid "Content"
+msgstr "Content"
+
+msgid "Found no basic data for:"
+msgstr "Geen basisgegevens gevonden voor:"
+
+msgid "Then draw the polygon by clicking the appropriate spots on the map. When finished drawing, click the button again. To remove a polygon, right-click on it."
+msgstr "Klik vervolgens een polygoon door op de gewenste lokaties op de kaart te klikken. Klik wanneer de polygoon voltooid is nogmaals op de knop. Klik met de rechter muisknop op een polygoom om hem te verwijderen."
+
+msgid "Target:"
+msgstr "Doel:"
+
+msgid "last access"
+msgstr "laatste toegang"
+
+msgid "Row %s: unable to save marker for \"%s\". Duplicate?"
+msgstr "Rij %s: niet in staat om merkteken voor \"%s\" op te slaan. Duplicaat?"
+
+msgid "Parameters incomplete."
+msgstr "Parameters incompleet."
+
+msgid "No target directory specified."
+msgstr "Geen doelmap gespecificeerd."
+
+msgid "No taxa have been assigned to you."
+msgstr "Er zijn geen taxa aan u toegewezen."
+
+msgid "Upload media for this taxon"
+msgstr "Upload mediabestanden voor dit taxon"
+
+msgid "New literary reference"
+msgstr "Nieuwe literatuurverwijzing"
+
+msgid "Below is a list of taxa that are not yet part of your key:"
+msgstr "Hieronder ziet u een lijst van taxa die geen deel uitmaken van uw sleutel:"
+
+msgid "Select the standard modules you wish to use in your project:"
+msgstr "Selecteer de standaardmodules die u in uw project wilt gebruiken:"
+
+msgid "(This page has not been published in this language. Click %shere%s to publish.)"
+msgstr "(Deze pagina is niet gepubliceerd in deze taal. Klik %shier%s om hem te publiceren.)"
+
+msgid "part of the project"
+msgstr "onderdeel van het project"
+
+msgid "Matrix"
+msgstr "Matrix"
+
+msgid "Taxon is already being edited by another editor."
+msgstr "Taxon wordt al bewerkt door een andere medewerker."
+
+msgid "Project languages:"
+msgstr "Projecttalen:"
+
+msgid "Non-existant keystep ID. Please go back and change the target for the choice."
+msgstr "Niet-bestaand sleutelstap ID. Ga terug en wijzig het doel van de keuze."
+
+msgid "Could not create characteristic."
+msgstr "Kon geen karakteristiek creëren."
+
+msgid "The format needs to be CSV."
+msgstr "Het formaat dient CSV te zijn."
+
+msgid "(nothing found)"
+msgstr "(niets gevonden)"
+
+msgid "Add or edit data"
+msgstr "Gegevens toevoegen of wijzigen"
+
+msgid "These currently are:"
+msgstr "Dat zijn op dit moment:"
+
+msgid "To view multiple occurrences, check the checkboxes of all the occurrences you want to see and click 'show selected'."
+msgstr "Check, om meerdere voorkomens tegelijk te zien, de checkboxes van de gewenste gegevens aan en klik op 'geselecteerde tonen'."
+
+msgid "Define sections"
+msgstr "Definieer secties"
+
+msgid "Taxon"
+msgstr "Taxon"
+
+msgid "Back to Linnaeus NG root"
+msgstr "Terug naar de Linnaeus NG-root"
+
+msgid "one"
+msgstr "een"
+
+msgid "E-mail adress too long; should be between %s and %s characters."
+msgstr "E-mailadres is te lang; dient tussen de %s en de %s karakters te zijn."
+
+msgid "Failed to create user from session."
+msgstr "Kon gebruiker niet creëren uit sessiegegevens."
+
+msgid "Edit key sections"
+msgstr "Sleuteldelen wijzigen"
+
+msgid "Hybrid"
+msgstr "Hybride"
+
+msgid "There are multiple possible parents of the uppermost taxon or taxa. Please choose the appropriate one."
+msgstr "Er zijn meerdere mogelijke ouders van de bovenste taxa of taxon. Kies de juiste."
+
+msgid "Could not save reference."
+msgstr "Kon literatuurverwijzing niet opslaan."
+
+msgid "Please be advised:"
+msgstr "Let op:"
+
+msgid "Authors:"
+msgstr "Auteurs:"
+
+msgid "Taxon added."
+msgstr "Taxon opgeslagen."
+
+msgid "Show key step \"%s\""
+msgstr "Laat sleutelstap \"%s\" zien"
+
+msgid "New taxon"
+msgstr "Nieuw taxon"
+
+msgid "Non-existant ID."
+msgstr "Niet-bestaand ID."
+
+msgid "Search glossary terms"
+msgstr "Zoek in woordenboektermen"
+
+msgid "could not save"
+msgstr "kon niet opslaan"
+
+#~ msgid ""
+#~ "If you require the data of an entire family, please check the 'retrieve a "
+#~ "single level of child taxa only'-option. The application will retrieve "
+#~ "only genera, the first level beneath family. Subsquently, you can "
+#~ "retrieve data for each genus by clicking its name. The data for that "
+#~ "genus and its child taxa will be displayed in a separate list, so you do "
+#~ "not lose the family-data."
+#~ msgstr ""
+#~ "Indien u de gegevens van een complete familie wil downloaden, vink dan de "
+#~ "optie 'download één niveau' aan. De applicatie zal dan alleen de genera "
+#~ "downloaden, het eerste niveau onder familie. Daarna kunt u gegevens voor "
+#~ "ieder genus afzonderlijk ophalen door op de naam van dat genus te "
+#~ "klikken. De gegevens voor het genus en onderliggende taxa zullen in een "
+#~ "separate lijst worden weergegeven, zodat de familie-gegevens niet "
+#~ "verloren gaan."
+
+#~ msgid ""
+#~ "Check the results of the import below. If they look OK, press 'save' to "
+#~ "save them:"
+#~ msgstr ""
+#~ "Controleer hier onder de import-resultaten, en klik vervolgens op "
+#~ "'opslaan'."
+
+#~ msgid ""
+#~ "You can exclude specific taxa by unchecking the checkbox. If instead of a "
+#~ "checkbox the third column says 'unknown rank', you are"
+#~ msgstr ""
+#~ "U kunt een specifiek taxon uitsluiten door de checkbox uit te vinken. Als "
+#~ "er zich in de derde kolom geen checkbox bevindt, maar de mededeling "
+#~ "'onbekende orde', dan"
+
+#~ msgid ""
+#~ "attempting to load a rank that is not part of your project. To add or "
+#~ "change ranks, click"
+#~ msgstr ""
+#~ "tracht u een orde te laden die geen deel uit maakt van uw project. Om "
+#~ "order toe te voegen of te wijzigen, klik"
+
+#, fuzzy
+#~ msgid ""
+#~ "The contents of the file will be displayed so you can review them before "
+#~ "they are saved to your project's database. |"
+#~ msgstr ""
+#~ "De inhoud van het bestand zal worden weergegeven zodat u de gegevens kunt "
+#~ "controleren voordat ze in de database worden opgeslagen."

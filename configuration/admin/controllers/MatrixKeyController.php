@@ -267,7 +267,7 @@ class MatrixKeyController extends Controller
 
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
-		$this->setPageName(_('Adding axa'));
+		$this->setPageName(_('Adding taxa'));
 
 		if ($this->rHasVal('taxon')) { 
 
