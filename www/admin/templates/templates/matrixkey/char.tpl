@@ -4,7 +4,7 @@
 <p>
 <span class="matrix-header">
 {if $characteristic.label}
-{t _s1=$characteristic.label _s2=$matrix.matrix}Editing chara"%s" for matrix "%s"{/t}
+{t _s1=$characteristic.label _s2=$matrix.matrix}Editing characteristic "%s" for matrix "%s"{/t}
 {else}
 {t _s1=$matrix.matrix}New charcteristic for matrix "%s"{/t}
 {/if}

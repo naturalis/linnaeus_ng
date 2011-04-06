@@ -1,20 +1,20 @@
-369
-a:4:{s:8:"template";a:8:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:22:"../shared/messages.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1301999165;s:7:"expires";i:1302002765;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+335
+a:4:{s:8:"template";a:7:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1302019106;s:7:"expires";i:1302022706;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Imaginary Beings Of The Literary World: Animal sounds</title>
+	<title>Imaginary Beings Of The Literary World: Index</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0002/basics.css");
-		@import url("../../../app/style/0002/module.css");
-		@import url("../../../app/style/0002/colorbox/colorbox.css");
+		@import url("../../../app/style/0002/map.css");
 	</style>
 	<script type="text/javascript" src="../../../app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="../../../app/javascript/jquery.tools.min.js"></script>
 	<script type="text/javascript" src="../../../admin/javascript/sprintf-0.7-beta1.js"></script>
 	
 	<script type="text/javascript" src="../../../app/javascript/main.js"></script>
-	<script type="text/javascript" src="../../../app/javascript/colorbox/jquery.colorbox.js"></script>
+	<script type="text/javascript" src="../../../app/javascript/mapkey.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 </head><body id="body"><form method="post" action="" id="theForm" onsubmit="return checkForm();"><div id="body-container">
 <div id="header-container">
 	<div id="image">
@@ -30,8 +30,8 @@ a:4:{s:8:"template";a:8:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 <a class="menu-item" href="../highertaxa/">Higher taxa</a>
 <a class="menu-item" href="../key/">Dichotomous key</a>
 <a class="menu-item" href="../matrixkey/">Matrix key</a>
-<a class="menu-item" href="../mapkey/">Map key</a>
-<span class="menu-item-active" onclick="goMenuModule(17);">Animal sounds</span>
+<a class="menu-item-active" href="../mapkey/">Map key</a>
+<span class="menu-item" onclick="goMenuModule(17);">Animal sounds</span>
 	</div>
 	<div id="language-change">
 		<input
@@ -54,21 +54,15 @@ a:4:{s:8:"template";a:8:{s:9:"index.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 			</select>
 	</div>
 </div><div id="page-container">
-	<div id="header-titles">
-		<span id="header-title">Animal sounds</span><br />
-		<span id="header-subtitle"></span>
-	</div>
-
-<div id="alphabet">
-			<span class="letter" onclick="goAlpha('l')">l</span>
-				<span class="letter" onclick="goAlpha('o')">o</span>
-				<span class="letter-active">t</span>
-				<span class="letter" onclick="goAlpha('w')">w</span>
-		</div>
 
 <div id="page-main">
-			<span class="topic" onclick="goModuleTopic(16)">Tralala</span><br />
-		</div>
+
+	<table>
+		<tr><td><a href="examine.php">Examine a species</a></td></tr>
+		<tr><td><a href="compare.php">Compare two species</a></td></tr>
+		<tr><td><a href="search.php">Search an area on the map</a></td></tr>
+	</table>
+</div>
 
 </div ends="page-container">
 <div id="footer-container">
@@ -96,8 +90,7 @@ $(document).ready(function(){
 
 	$('#body-container').height($(document).height());
 	
-addRequestVar('search','enter search term')
-addRequestVar('letter','t')
+addRequestVar('0','')
 
 })
 
