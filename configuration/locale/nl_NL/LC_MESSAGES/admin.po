@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Linnaeus NG administration v0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2011-04-06 18:12+0100\n"
+"PO-Revision-Date: 2011-04-07 09:02+0100\n"
 "Last-Translator: maarten schermer <maarten.schermer@xs4all.nl>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1649,7 +1649,7 @@ msgid "To enable setting markers (points on the map), click the button below."
 msgstr "Klik om merktekens te kunnen plaatsen op de knop hier onder."
 
 msgid "Currently, no ranks have been defined in your project. To define ranks, go"
-msgstr ""
+msgstr "Er zij momenteel geen ordes gedefinieerd. Om dat te doen, ga"
 
 msgid "< previous"
 msgstr "< vorige"
@@ -1703,7 +1703,7 @@ msgid "Password has incorrect format."
 msgstr "Wachtwoord heeft incorrect formaat."
 
 msgid "To gain access to the page you were attempting to view, please contact one of the lead experts of your project:"
-msgstr ""
+msgstr "Neem, om toegang te krijgen tot de pagina die u probeerde te bekijken, contact op met een van de lead experts van uw project:"
 
 msgid "Species module overview"
 msgstr "Overzicht soortenmodule"
@@ -1730,7 +1730,7 @@ msgid "next"
 msgstr "volgende"
 
 msgid "The field delimiter must be a comma, semi-colon or tab stop, and can be selected above."
-msgstr ""
+msgstr "De veldbegrenzer dient een komma, puntkomma of tabulator-stop te zijn, en van hierboven worden geselecteerd."
 
 msgid "Characteristic type:"
 msgstr "Type karakteristiek:"
@@ -1742,22 +1742,22 @@ msgid "Taxon rank"
 msgstr "Taxon's orde"
 
 msgid "Done. Processed %s steps and %s taxa."
-msgstr ""
+msgstr "Voltooid. %s stappen en %s taxa verwerkt."
 
 msgid "No ranks have been defined."
 msgstr "Er zijn geen ordes gedefinieerd."
 
 msgid "Invalid value for the lower boundary (must be integer or real)."
-msgstr ""
+msgstr "Ongeldige waarde voor de ondergrens."
 
 msgid "Select the type of data you are drawing on the map:"
-msgstr ""
+msgstr "Selecteer het type data dat u op de kaart aan het tekenen bent:"
 
 msgid "Add a new common name:"
 msgstr "Een nieuwe publieke naam toevoegen:"
 
 msgid "Matrix key index"
-msgstr ""
+msgstr "Matrixsleutelindex"
 
 msgid "Download sample CSV-file"
 msgstr "CSV-voorbeeldbestand downloaden"
@@ -1781,10 +1781,10 @@ msgid "Page:"
 msgstr "Pagina:"
 
 msgid "The upper and lower boundary values cannot be the same."
-msgstr ""
+msgstr "De boven- en ondergrens kunnen niet gelijk zijn."
 
 msgid "Taxa not part of the key"
-msgstr ""
+msgstr "Taxa die geen onderdeel uit maken van de sleutel"
 
 msgid "Possible outcomes"
 msgstr "Mogelijke uitkomsten"
@@ -1802,10 +1802,10 @@ msgid "transliteration"
 msgstr "transliteratie"
 
 msgid "Browse glossary terms"
-msgstr ""
+msgstr "Door woordenboektermen bladeren"
 
 msgid "The taxon or taxa of the rank \"%s\" will be connected as child to the already existing taxon \"%s\"."
-msgstr ""
+msgstr "Het taxon of de taxa van de orde \"%s\" zullen als kind worden aangehaakt aan het reeds bestaande taxon \"%s\"."
 
 msgid "Orphaned taxa"
 msgstr "Verweesde taxa"
@@ -1826,7 +1826,7 @@ msgid "Literature alphabet"
 msgstr "Alfabet literatuurverwijzingen"
 
 msgid "The following modules have been assigned to this user:"
-msgstr ""
+msgstr "De volgende modules zijn toegewezen aan deze gebruiker:"
 
 msgid "Welcome, %s."
 msgstr "Welkom, %s."
@@ -1838,13 +1838,13 @@ msgid "Assign collaborator to modules"
 msgstr "Wijs medewerkers toe aan modules"
 
 msgid "Enter the title and text of this step in your key in the various languages within your project. Title and text are saved automatically after you have entered the text in the appropriate input."
-msgstr ""
+msgstr "Vul titel en tekst van deze sleutelstap in in de verschillende talen in uw project. Titel en tekst worden automatisch opgeslagen nadat u de tekst heeft ingevoerd in het betreffende invoerveld."
 
 msgid "move taxon upward"
 msgstr "verplaats taxon naar boven"
 
 msgid "Invalid value for the upper boundary (must be integer or real)."
-msgstr ""
+msgstr "Ongeldige waarde voor de bovengrens."
 
 msgid "User data saved"
 msgstr "Gebruikersgegevens opgeslagen"
