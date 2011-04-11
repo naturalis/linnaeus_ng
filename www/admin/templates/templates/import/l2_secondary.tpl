@@ -21,12 +21,11 @@ Data import is complete.
 </p>
 <p>
 You will have to manually set the distinction between higher and lower taxa. You can do this here:<br />
-<a href="../species/ranks.php">Species module -> Taxonomic ranks </a>
+<a href="../species/ranks.php">Species module &rarr; Taxonomic ranks </a>
 </p>
 <p>
 You will also have to assign species to collaborators in order to see and edit taxa. You can do this here:<br />
-Projects -> TanBIF species -> Species module -> s  
-<a href="../species/collaborators.php">Species module -> Assign taxa to collaborator</a>
+<a href="../species/collaborators.php">Species module &rarr; Assign taxa to collaborator</a>
 </p>
 <p>
 <a href="go_new_project.php">Go to project index</a>

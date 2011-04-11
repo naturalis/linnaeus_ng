@@ -2965,7 +2965,7 @@ class SpeciesController extends Controller
 			
 			} else {
 
-//				$this->deleteTaxon($this->requestData['id']);
+				$this->deleteTaxon($this->requestData['id']);
 
 				$this->smarty->assign('returnText', '<ok>');
 
