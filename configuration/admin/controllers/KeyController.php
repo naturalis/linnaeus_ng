@@ -119,7 +119,7 @@ class KeyController extends Controller
 		// looking for the start step 
 
 			$step = $this->getStartKeystep();
-			
+
 			if (!$step) {
 			// didn't find it, create it
 
@@ -140,7 +140,7 @@ class KeyController extends Controller
 	
 			// get step's choices
 			$choices = $this->getKeystepChoices($step['id'],true);
-			
+
 			// update the key's breadcrumb trail
 			$this->updateKeyPath(
 				array(

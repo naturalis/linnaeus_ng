@@ -1,5 +1,23 @@
 <?php
 /*
+
+
+
+
+page time out? (image copy)
+
+
+
+
+
+
+
+
+
+
+
+
+
 what the fuck is?
 	$d->projectclassification
 	$d->projectnomenclaturecode
@@ -44,6 +62,7 @@ NO GEO DATA!
 NO SYNONYMS
 NO GLOSSARY OF KEYWORDS
 
+MATRIX KEY: never saw all types
 
 */
 
@@ -206,34 +225,6 @@ class ImportController extends Controller
 
     }
 
-
-	private function addModuleToProject($id)
-	{
-
-		/*
-
-				1 | Introduction
-			2 | Glossary
-				3 | Literature
-				4 | Species module
-				5 | Higher taxa
-				6 | Dichotomous key
-				7 | Matrix key
-			8 | Map key
-		
-		*/
-	
-		$this->models->ModuleProject->save(
-			array(
-				'id' => 'null',
-				'project_id' => $this->getNewProjectId(),	
-				'module_id' => $id,
-				'active' => 'y'
-			)
-		);
-		
-	}
-
 	public function deleteProjectAction()
 	{
 
@@ -256,18 +247,6 @@ class ImportController extends Controller
 		
 		$this->redirect('linnaeus2.php');
 
-	}
-
-
-	private function getProjects($id=null)
-	{
-
-		$d = isset($id) ? array('id' => $id) : '*';
-
-		$d = $this->models->Project->_get(array('id' => $d));
-
-		return isset($id) ? $d[0] : $d;
-	
 	}
 
 	public function l2ProjectAction()
@@ -339,6 +318,8 @@ class ImportController extends Controller
 			$p = $this->getNewProjectId();
 
 			$project = $this->getProjects($p);
+			
+			$this->reInitUserRolesAndRights();
 
 			if (!isset($p)) {
 
@@ -370,8 +351,9 @@ class ImportController extends Controller
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
 			$ranks = $_SESSION['system']['import']['loaded']['ranks'] = $this->addProjectRanks($ranks);
-			$species = $_SESSION['system']['import']['loaded']['species'] = $this->addSpecies($species);
-			$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
+			$species = $_SESSION['system']['import']['loaded']['species'] = $this->addSpecies($species,$ranks);
+			if (isset($this->requestData['treetops']))
+				$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
 			
 			$this->addMessage('Saved '.count((array)$ranks).' ranks');
 			$this->addMessage('Saved '.count((array)$species).' species');
@@ -403,9 +385,9 @@ class ImportController extends Controller
 		$content = $this->getProjectContent($d);
 		$literature = $this->resolveLiterature($d,$species);
 
-		if ($this->rHasVal('process','1')     ) { // && !$this->isFormResubmit()) {
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
-			if (1==2 && $this->rHasVal('taxon_overview','on')) {
+			if ($this->rHasVal('taxon_overview','on')) {
 
 				$overviewCatId = $this->createStandardCat();
 
@@ -415,13 +397,13 @@ class ImportController extends Controller
 
 				if (isset($failed)) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed species description: '.$val['cause']);
+					foreach ((array)$failed as $val) $this->addError('Failed species description:<br />'.$val['cause']);
 
 				}
 
 			}
 
-			if (1==2 && $this->rHasVal('taxon_common','on')) {
+			if ($this->rHasVal('taxon_common','on')) {
 
 				$failed = $this->addSpeciesCommonNames($d,$species);
 
@@ -429,27 +411,27 @@ class ImportController extends Controller
 
 				if (isset($failed)) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed common name: '.$val['cause']);
+					foreach ((array)$failed as $val) $this->addError('Failed common name:<br />'.$val['cause']);
 
 				}
 
 			}
 
-			if (1==2 && $this->rHasVal('taxon_media','on')) {
+			if ($this->rHasVal('taxon_media','on')) {
 
-				$failed = $this->addSpeciesMedia($d,$species);
+				$res = $this->addSpeciesMedia($d,$species);
 
 				$this->addMessage('Added taxon media.');
 
-				if (isset($failed)) {
+				if (isset($res['failed'])) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed media: '.$val['cause']);
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed media:<br />'.$val['cause']);
 
 				}
 
 			}
 
-			if (1==2 && $this->rHasVal('content_introduction','on')) {
+			if ($this->rHasVal('content_introduction','on')) {
 
 				if ($this->addProjectContent($d,'introduction')) {
 
@@ -463,7 +445,7 @@ class ImportController extends Controller
 
 			}
 
-			if (1==2 && $this->rHasVal('content_contributors','on')) {
+			if ($this->rHasVal('content_contributors','on')) {
 
 				if ($this->addProjectContent($d,'contributors')) {
 
@@ -477,25 +459,25 @@ class ImportController extends Controller
 
 			}
 
-			if (1==2 && $this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
+			if ($this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
 
 				$this->addModuleToProject(1);
 
 			}
 
-			if (1==2 && $this->rHasVal('literature','on')) {
+			if ($this->rHasVal('literature','on')) {
 
 				$res = $this->addLiterature($literature);
 
-				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].')');
+				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].').');
 		
-				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].')');
+				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].').');
 
 				$this->addModuleToProject(3);
 
 			}
 
-			if (1==2 && $this->rHasVal('key_dich','on')) {
+			if ($this->rHasVal('key_dich','on')) {
 
 				$this->makeKey($d,$species);
 
@@ -505,19 +487,27 @@ class ImportController extends Controller
 
 			}
 
-			if (1==1 && $this->rHasVal('key_matrix','on')) {
+			if ($this->rHasVal('key_matrix','on')) {
 
 				$m = $this->resolveMatrices($d);
 
 				$m = $this->saveMatrices($m);
 
-				$this->connectMatrices($d,$m,$species);
+				$failed = $this->connectMatrices($d,$m,$species);
+
+				if (isset($failed)) {
+
+					foreach ((array)$failed as $val) $this->addError('Failed matrix:<br />'.$val['cause']);
+
+				}
 
 				$this->addMessage('Created matrix key(s).');
 
 				$this->addModuleToProject(7);
 
 			}
+			
+			$this->smarty->assign('processed',true);
 
 		}
 
@@ -525,9 +515,63 @@ class ImportController extends Controller
 		$this->smarty->assign('literature',$literature);
 
         $this->printPage();
-	
+
 	}
 
+	public function goNewProject()
+	{
+
+		$this->setCurrentProjectId($this->getNewProjectId());
+
+		$this->setCurrentProjectData();
+		
+		$this->getCurrentUserCurrentRole(true);
+
+		unset($_SESSION['system']['import']);
+		
+		unset($_SESSION['project']['ranks']);
+
+		$this->redirect($this->getLoggedInMainIndex());
+
+	}
+
+	private function addModuleToProject($id)
+	{
+
+		/*
+
+			1 | Introduction
+		2 | Glossary
+			3 | Literature
+			4 | Species module
+			5 | Higher taxa
+			6 | Dichotomous key
+			7 | Matrix key
+		8 | Map key
+		
+		*/
+
+		$this->models->ModuleProject->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),	
+				'module_id' => $id,
+				'active' => 'y'
+			)
+		);
+		
+	}
+
+	private function getProjects($id=null)
+	{
+
+		$d = isset($id) ? array('id' => $id) : '*';
+
+		$d = $this->models->Project->_get(array('id' => $d));
+
+		return isset($id) ? $d[0] : $d;
+	
+	}
 
 	private function createProject($d)
 	{
@@ -681,6 +725,35 @@ class ImportController extends Controller
 
 	}
 
+	private function addProjectRank($label,$rank)
+	{
+
+		$this->models->ProjectRank->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),	
+				'rank_id' => $rank['rank_id'],	
+				'parent_id' => isset($rank['parent_id']) ? $rank['parent_id'] : null,
+				'lower_taxon' => '1'
+			)
+		);
+		
+		$rank['id'] = $this->models->ProjectRank->getNewId();
+
+		$this->models->LabelProjectRank->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),
+				'project_rank_id' => $rank['id'],
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'label' => $label
+			)
+		);
+
+		return $rank;
+
+	}
+
 	private function addProjectRanks($ranks)
 	{
 
@@ -692,18 +765,7 @@ class ImportController extends Controller
 			if ($val['parent_id']===false) continue; // unresolvable parent rank
 			if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
 
-			$this->models->ProjectRank->save(
-				array(
-					'id' => 'null',
-					'project_id' => $this->getNewProjectId(),	
-					'rank_id' => $val['rank_id'],	
-					'parent_id' => isset($val['parent_id']) ? $val['parent_id'] : null,
-					'lower_taxon' => '1'
-				)
-			);
-			
-			$val['id'] = $this->models->ProjectRank->getNewId();
-			$d[$key] = $val;
+			$d[$key] = $this->addProjectRank($key,$val);
 
 		}
 
@@ -721,6 +783,7 @@ class ImportController extends Controller
 			$res[(string)$val->name] = array(
 				'taxon' => (string)$val->name,
 				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
+				'rank_name' => (string)$val->taxon ? (string)$val->taxon : null,
 				'parent' => (string)$val->parentname,
 				'source' => 'tree->treetaxon'
 			);
@@ -732,22 +795,23 @@ class ImportController extends Controller
 			$res[(string)$val->name] = array(
 				'taxon' => (string)$val->name,
 				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
+				'rank_name' => (string)$val->taxon ? (string)$val->taxon : null,
 				'parent' => (string)$val->parentname,
 				'source' => 'records->taxondata'
 			);
 
 		}
-		
+
 		return isset($res) ? $res : null;
 
 	}
 
-	private function addSpecies($species)
+	private function addSpecies($species,$ranks)
 	{
 
 		foreach((array)$species as $key => $val) {
 		
-			if ($val['rank_id']=='') continue; // not loading rankless taxa
+			if (!isset($ranks[$val['rank_name']]['id'])) continue; // not loading rankless taxa
 
 			$this->models->Taxon->save(
 				array(
@@ -755,7 +819,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'taxon' => $val['taxon'],
 					'parent_id' => 'null',
-					'rank_id' => $val['rank_id'],
+					'rank_id' => $ranks[$val['rank_name']]['id'],
 					'taxon_order' => 0,
 					'is_hybrid' => 0,
 					'list_level' => 0
@@ -766,6 +830,8 @@ class ImportController extends Controller
 			$d[$key] = $val;
 
 		}
+		
+		if (!isset($d)) return null;
 
 		foreach((array)$d as $key => $val) {
 
@@ -822,14 +888,27 @@ class ImportController extends Controller
 	{
 
 		if (count((array)$treetops)<2) return;
-		
+
+		$d = $this->addProjectRank('(master rank)',array('rank_id' => -1,'parent_id' => null));
+
+		$this->models->ProjectRank->update(
+			array(
+				'parent_id' => $d['id']
+			),
+			array(
+				'id !=' => $d['id'],
+				'project_id' => $this->getNewProjectId(),	
+				'parent_id' => 'null'
+			)
+		);
+
 		$this->models->Taxon->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),	
 				'taxon' => '(master taxon)',
 				'parent_id' => 'null',
-				'rank_id' => 999,
+				'rank_id' => $d['id'],
 				'taxon_order' => 0,
 				'is_hybrid' => 0,
 				'list_level' => 0
@@ -912,7 +991,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Introduction',	
-					'content' => $d->project->projectintroduction	
+					'content' => $this->replaceOldTags((string)$d->project->projectintroduction)
 				)
 			);
 
@@ -923,7 +1002,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
-					'content' => $d->project->contributors	
+					'content' => $this->replaceOldTags((string)$d->project->contributors)
 				)
 			);
 	
@@ -1109,6 +1188,16 @@ class ImportController extends Controller
 					)
 				);
 
+                $this->models->MediaDescriptionsTaxon->save(
+                    array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'language_id' => $this->getNewDefaultLanguageId(),	
+                        'media_id' => $this->models->MediaTaxon->getNewId(), 
+                        'description' => $fullName
+                    )
+                );
+
 				return array(
 					'saved' => true,
 					'filename' => $fileName,
@@ -1171,7 +1260,7 @@ class ImportController extends Controller
 			$mimes[$val['mime']] = $val;
 
 		}
-		
+
 		$failed = null;
 		$saved = null;
 		$prev = null;
@@ -1192,6 +1281,9 @@ class ImportController extends Controller
 				);
 
 				if ($r['saved']==true) {
+
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
 
 					$saved[] = $r;
 					$prev[$fileName] = true;
@@ -1225,7 +1317,7 @@ class ImportController extends Controller
 						$prev[$fileName] = true;
 						
 					} else {
-	
+
 						$failed[] = $r;
 	
 					}
@@ -1252,7 +1344,7 @@ class ImportController extends Controller
 	
 		$r = array('<b>','</b>','<i>','</i>','<br />', null,null);
 	
-		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeAll?null:$r),$s);
+		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeAll ? null : $r),$s);
 	
 	}
 
@@ -1361,7 +1453,7 @@ class ImportController extends Controller
 	private function createKeyStep($step,$stepIds,$stepAdd=0)
 	{
 
-		$this->models->Keystep->save(
+		$k = $this->models->Keystep->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),
@@ -1404,11 +1496,7 @@ class ImportController extends Controller
 	private function createKeyStepChoices($step,$stepIds,$species)
 	{
 
-		if ($step=='god') {
-			$choices[0]['destinationtype'] = $choices[1]['destinationtype'] = 'turn';
-			$choices[0]['destinationpagenumber'] = $choices[1]['destinationpagenumber'] = -999;
-			$choices = (object)$choices;
-		} elseif ($step->text_choice) {
+		if ($step->text_choice) {
 			$choices = $step->text_choice;
 		} else {
 			$choices = $step->pict_choice;
@@ -1418,30 +1506,21 @@ class ImportController extends Controller
 
 		foreach($choices as $key => $val) {
 
-			if ($step=='god') {
-			
-				$resStep = ($key==0 ? $stepIds['firstTxtId'] : $stepIds['firstPictId']);
-				$resTaxon = null;
-			
-			} else {
-
-				$resStep = ((string)$val->destinationtype=='turn' ? 
-								(isset($stepIds[(string)$val->destinationpagenumber]) ?
-									$stepIds[(string)$val->destinationpagenumber] :
-									null
-								) :
+			$resStep = ((string)$val->destinationtype=='turn' ? 
+							(isset($stepIds[(string)$val->destinationpagenumber]) ?
+								$stepIds[(string)$val->destinationpagenumber] :
 								null
-							);
+							) :
+							null
+						);
 
-				$resTaxon = ((string)$val->destinationtype=='taxon' ?  
-								(isset($species[(string)$val->destinationtaxonname]['id']) ?
-									$species[(string)$val->destinationtaxonname]['id']:
-									null
-								) : 
+			$resTaxon = ((string)$val->destinationtype=='taxon' ?  
+							(isset($species[(string)$val->destinationtaxonname]['id']) ?
+								$species[(string)$val->destinationtaxonname]['id']:
 								null
-							);
-
-			}
+							) : 
+							null
+						);
 
 			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
 
@@ -1455,18 +1534,13 @@ class ImportController extends Controller
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[(string)$step->pagenumber]),
-					'show_order' => $i++,
+					'show_order' => (1 + $i++),
 					'choice_img' => isset($fileName) ? $fileName : null,
 					'res_keystep_id' => $resStep,
 					'res_taxon_id' => $resTaxon,
 				)
 			);
 
-			if ($step=='god') {
-
-				$txt = ($key==0 ? 'Text key' : 'Picture key');
-
-			} else
 			if (isset($val->captiontext)) {
 
 				$txt = $this->replaceOldTags((string)$val->captiontext);
@@ -1556,14 +1630,46 @@ class ImportController extends Controller
 
 			$keyStepIds = $this->createKeyStep('god',$keyStepIds);
 
-			$this->createKeyStepChoices(
-				'god',
+			end ($keyStepIds);
+
+			$this->models->ChoiceKeystep->save(
 				array(
-					'godId' => current($keyStepIds),
-					'firstTxtId' => $firstTxtStepId,
-					'firstPictId' => $firstPictStepId
-				),
-				$species
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'keystep_id' =>  current($keyStepIds),
+					'show_order' => 0,
+					'res_keystep_id' => $firstTxtStepId
+				)
+			);
+
+			$this->models->ChoiceContentKeystep->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'choice_txt' => 'Text key'
+				)
+			);
+
+			$this->models->ChoiceKeystep->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'keystep_id' =>  current($keyStepIds),
+					'show_order' => 0,
+					'res_keystep_id' => $firstPictStepId
+				)
+			);
+
+			$this->models->ChoiceContentKeystep->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'choice_txt' => 'Picture key'
+				)
 			);
 
 			$this->models->Keystep->update(
@@ -1591,13 +1697,12 @@ class ImportController extends Controller
 				'number =' => '1'
 			)
 		);
-	
-	}
 
+	}
 
 	private function resolveMatrices($d)
 	{
-	
+
 		$matrices = null;
 
 		foreach($d->records->taxondata as $val) {
@@ -1665,6 +1770,7 @@ class ImportController extends Controller
 
 	private function resolveCharType($t)
 	{
+	
 		// ??? HAVE ONLY SEEN 'Text' & 'Picture'
 		switch($t) {
 			case 'Text':
@@ -1722,14 +1828,13 @@ class ImportController extends Controller
 					)
 				);
 
-
 				$m[$key]['characteristics'][$cKey]['id'] = $this->models->Characteristic->getNewId();
 
 				$this->models->CharacteristicLabel->save(
 					array(
 						'id' => 'null',
 						'project_id' => $this->getNewProjectId(),
-						'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'label' => $cVal['charname']
 					)
@@ -1740,10 +1845,9 @@ class ImportController extends Controller
 						'id' => 'null',
 						'project_id' => $this->getNewProjectId(),
 						'matrix_id' => $m[$key]['id'],
-						'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
 					)
 				);
-
 
 				foreach((array)$cVal['states'] as $sKey => $sVal) {
 
@@ -1751,7 +1855,7 @@ class ImportController extends Controller
 						array(
 							'id' => 'null',
 							'project_id' => $this->getNewProjectId(),
-							'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+							'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
 							'file_name' => isset($sVal['statefile']) ? $sVal['statefile'] : null,
 							'lower' => isset($sVal['statemin']) ? $sVal['statemin'] : null,
 							'upper' => isset($sVal['statemax']) ? $sVal['statemax'] : null,
@@ -1791,17 +1895,6 @@ class ImportController extends Controller
 
 	private function connectMatrices($d,$statelist,$species)
 	{
-
-/*
-
-dev_matrices_taxa_states
-dev_matrices_taxa
-
-
-
-
-
-*/
 
 		foreach($d->records->taxondata as $val) {
 
@@ -1882,21 +1975,6 @@ dev_matrices_taxa
 		return $failed;
 
 	}
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	private function deleteMatrices($id)
 	{

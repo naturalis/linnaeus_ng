@@ -80,6 +80,7 @@ The following species have no parent. It is possible that the taxon tree has sev
 &#149;&nbsp;{$v.taxon} <span class="minor">(found in: {$v.source})</span>&nbsp;<label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label><br />
 {/foreach}
 </p>
+
 <input type="submit" value="save" />
 </form>
 {/if}

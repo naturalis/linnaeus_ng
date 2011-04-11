@@ -31,22 +31,22 @@
 <table id="ranks-table">
 <tr><td colspan="2" class="rank-header">{t}Ranks:{/t}</td></tr>
 {assign var=first value=true}
-{section name=i loop=$ranks}
-{if $ranks[i].parent_id==-1 && $first}
+{foreach key=i item=v from=$ranks}
+{if $v.parent_id==-1 && $first}
 <tr><td colspan="2">&nbsp;</td></tr>
 {assign var=first value=false}
 {/if}
-<tr class="tr-highlight" style="cursor:pointer" onclick="taxonAddRank({$ranks[i].id}{if $ranks[i].parent_id==-1},true{/if});" >
-	<td{if $ranks[i].in_col==1} class="col-rank"{/if}>
-		<span class="rank-name{if $ranks[i].in_col==1}-col{/if}" id="rank-{$ranks[i].id}">
-			{$ranks[i].rank}
-		</span>{if $ranks[i].additional!=''}<span class="rank-additional">({$ranks[i].additional})</span>{/if}
+<tr class="tr-highlight" style="cursor:pointer" onclick="taxonAddRank({$v.id}{if $v.parent_id==-1},true{/if});" >
+	<td{if $v.in_col==1} class="col-rank"{/if}>
+		<span class="rank-name{if $v.in_col==1}-col{/if}" id="rank-{$v.id}">
+			{$v.rank}
+		</span>{if $v.additional!=''}<span class="rank-additional">({$v.additional})</span>{/if}
 	</td>
-	<td class="add-arrow" id="arrow-{$ranks[i].id}">
+	<td class="add-arrow" id="arrow-{$v.id}">
 		>
 	</td>
 </tr>
-{/section}
+{/foreach}
 </table>
 
 <div id="floating-div" style="position:absolute;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />

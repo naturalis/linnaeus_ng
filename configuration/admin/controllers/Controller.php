@@ -39,6 +39,7 @@ class Controller extends BaseClass
     public $treeList;
 
     private $usedModelsBase = array(
+        'user', 
         'helptext', 
         'project', 
 		'role',
@@ -51,9 +52,9 @@ class Controller extends BaseClass
 		'language',
 		'translate_me',
 		'taxon',
+		'rank',
 		'project_rank',
 		'label_project_rank',
-		'rank',
     );
 
     private $usedHelpersBase = array(
@@ -832,6 +833,24 @@ class Controller extends BaseClass
         return $r;
 
     }
+
+    /**
+     * Re-initialises the user's projects and roles, without loggin out and in
+     *
+     * @access     public
+     */
+	public function reInitUserRolesAndRights($userId=null)
+	{
+	
+        $cur = $this->getCurrentUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
+		$this->setUserSessionRights($cur['rights']);
+		$this->setUserSessionRoles($cur['roles']);
+		$this->setUserSessionNumberOfProjects($cur['number_of_projects']);
+
+	}
+
+
+
 
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity

@@ -730,17 +730,18 @@ class SpeciesController extends Controller
 			) {
 	
 				$rl = $_SESSION['project']['ranklist'];
-			
+
 			} else {
 	
 				$pr = $this->getProjectRanks();
-		
+
 				foreach((array)$pr as $key => $val) {
 
 					if (!$this->maskAsHigherTaxa() && $val['lower_taxon']==1) {
 					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
 				
 						$rl[$val['id']] = $val['rank'];
+
 					} else
 					if ($this->maskAsHigherTaxa() && $val['lower_taxon']!=1) {
 					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
@@ -749,8 +750,8 @@ class SpeciesController extends Controller
 					}
 	
 				}
-				
-				$_SESSION['project']['ranklist'] = $rl;
+
+				if (isset($rl)) $_SESSION['project']['ranklist'] = $rl;
 				$_SESSION['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
 
 			}

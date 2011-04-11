@@ -16,7 +16,21 @@
 {/literal}
 <div id="page-main">
 {if $processed==true}
-<a href="l2_secondary.php">Sterf, hoer</a>
+<p>
+Data import is complete.
+</p>
+<p>
+You will have to manually set the distinction between higher and lower taxa. You can do this here:<br />
+<a href="../species/ranks.php">Species module -> Taxonomic ranks </a>
+</p>
+<p>
+You will also have to assign species to collaborators in order to see and edit taxa. You can do this here:<br />
+Projects -> TanBIF species -> Species module -> s  
+<a href="../species/collaborators.php">Species module -> Assign taxa to collaborator</a>
+</p>
+<p>
+<a href="go_new_project.php">Go to project index</a>
+</p>
 {else}
 Review the options below and press "import" to start the import database. 
 <form method="post">
@@ -60,8 +74,8 @@ Import contributors text?&nbsp;&nbsp;<label><input type="checkbox" name="content
 
 <p>
 <b>Keys</b><br/>
-Import dichotomous key?&nbsp;&nbsp;<label><input type="checkbox" name="key_dich" checked="checked">yes</label><br />
-Import matrix key?&nbsp;&nbsp;<label><input type="checkbox" name="key_matrix" checked="checked">yes</label><br />
+Import dichotomous key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_dich" checked="checked">yes</label><br />
+Import matrix key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_matrix" checked="checked">yes</label><br />
 </p>
 
 <input type="submit" value="import" />
