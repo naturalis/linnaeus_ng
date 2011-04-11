@@ -113,7 +113,7 @@
 
 	<br />
 
-	{if $languages|@count==0}
+	{if $taxa && $languages|@count==0}
 		{t}You have to define at least one language in your project before you can add any taxa.{/t} <a href="../projects/data.php">{t}Define languages now.{/t}</a>
 	{else}
 		<a href="edit.php">{t}Add a new taxon{/t}</a>

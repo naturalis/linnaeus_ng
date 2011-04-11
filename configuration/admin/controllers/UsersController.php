@@ -11,7 +11,6 @@ class UsersController extends Controller
 {
     
     public $usedModels = array(
-        'user', 
         'right', 
         'project_role_user', 
         'timezone',
@@ -964,7 +963,6 @@ class UsersController extends Controller
         $this->printPage();
     
     }
-
 
 	private function ajaxActionConnectExistingUser()
 	{
