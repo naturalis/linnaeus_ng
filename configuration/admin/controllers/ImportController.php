@@ -1,4 +1,52 @@
 <?php
+/*
+what the fuck is?
+	$d->projectclassification
+	$d->projectnomenclaturecode
+
+
+need to set manually!
+	project.includes_hybrids
+	project.css_url
+	project.logo
+
+	border higher/lower taxa (give choice)
+	=> projects_ranks.lower_taxon
+	=> projects_ranks.keypath_endpoint (gaat dat dan ook?)
+
+	taxa table
+		'taxon_order' => 0,
+		'is_hybrid' => 0,
+		'list_level' => 0
+	
+
+	proj_literature->proj_reference->keywords->keyword
+		taxa only, what do glossary terms look like??
+
+	WHAT MODULES!?!?!	
+
+
+cRename : STILL COPIES RATHER THAN MOVES
+
+doesn't seem to work:
+		unlink($paths['project_thumbs']);
+		unlink($paths['project_media']);
+
+
+//yell about getControllerSettingsKey->maxChoicesPerKeystep
+test with no images
+
+NO GEO DATA!
+
+???			.classification --> "Five kingdoms"
+???			.nomenclaturecode --> "ICZM"
+
+NO SYNONYMS
+NO GLOSSARY OF KEYWORDS
+
+
+*/
+
 
 include_once ('Controller.php');
 
@@ -9,6 +57,28 @@ class ImportController extends Controller
     public $pathThumbs = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\images\tanbif_linnaeus\thumbs\\';
 
     public $usedModels = array(
+		'content_taxon',
+		'page_taxon', 
+		'page_taxon_title', 
+		'commonname',
+		'media_taxon',
+		'media_descriptions_taxon',
+		'content',
+		'literature',
+		'literature_taxon',
+		'keystep',
+		'content_keystep',
+		'choice_keystep',
+		'choice_content_keystep',
+		'matrix',
+		'matrix_name',
+		'matrix_taxon',
+		'matrix_taxon_state',
+		'characteristic',
+		'characteristic_matrix',
+		'characteristic_label',
+		'characteristic_state',
+		'characteristic_label_state'
     );
    
     public $usedHelpers = array(
@@ -52,22 +122,412 @@ class ImportController extends Controller
     public function indexAction()
     {
     
-//        $this->checkAuthorisation();
-
         $this->printPage();
     
     }
 
+    public function linnaeus2Action()
+    {
 
-	private function getNewProjectId()
+		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
+
+		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
+
+			$d = @file_get_contents($this->requestDataFiles[0]['tmp_name']) or $this->addError('Failed to load file.');
+			
+			if ($d) {
+
+				$_SESSION['system']['import']['file'] = $this->requestDataFiles[0]['name'];
+				$_SESSION['system']['import']['raw'] = $d;
+
+			} else {
+
+				unset($_SESSION['system']['import']['file']);
+				unset($_SESSION['system']['import']['raw']);
+
+			}
+
+		}
+
+		if ($this->rHasVal('imagePath') || $this->rHasVal('noImages')) {
+
+			if ($this->rHasVal('noImages')) {
+
+				$_SESSION['system']['import']['imagePath'] = false;
+
+			} else
+			if (file_exists($this->requestData['imagePath'])) {
+
+				$_SESSION['system']['import']['imagePath'] = $this->requestData['imagePath'];
+
+			} else {
+
+				$this->addError('Image path "'.$this->requestData['imagePath'].'" does not exist or unreachable.');
+				unset($_SESSION['system']['import']['imagePath']);
+
+			}
+
+		}
+
+		if ($this->rHasVal('thumbsPath') || $this->rHasVal('noThumbs')) {
+
+			if ($this->rHasVal('noThumbs')) {
+
+				$_SESSION['system']['import']['thumbsPath'] = false;
+
+			} else
+			if (file_exists($this->requestData['thumbsPath'])) {
+
+				$_SESSION['system']['import']['thumbsPath'] = $this->requestData['thumbsPath'];
+
+			} else {
+
+				$this->addError('Thumbs path "'.$this->requestData['thumbsPath'].'" does not exist or unreachable.');
+				unset($_SESSION['system']['import']['thumbsPath']);
+
+			}
+
+		}		
+
+		if ($this->rHasVal('clear','file')) {
+
+			unset($_SESSION['system']['import']['file']);
+			unset($_SESSION['system']['import']['raw']);
+
+		}
+
+		if ($this->rHasVal('clear','imagePath')) unset($_SESSION['system']['import']['imagePath']);
+		if ($this->rHasVal('clear','thumbsPath')) unset($_SESSION['system']['import']['thumbsPath']);
+
+
+		if (isset($_SESSION['system']['import'])) $this->smarty->assign('s',$_SESSION['system']['import']);
+    
+        $this->printPage();
+
+    }
+
+
+	private function addModuleToProject($id)
 	{
+
+		/*
+
+				1 | Introduction
+			2 | Glossary
+				3 | Literature
+				4 | Species module
+				5 | Higher taxa
+				6 | Dichotomous key
+				7 | Matrix key
+			8 | Map key
+		
+		*/
+	
+		$this->models->ModuleProject->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),	
+				'module_id' => $id,
+				'active' => 'y'
+			)
+		);
+		
+	}
+
+	public function deleteProjectAction()
+	{
+
+		$this->deleteMatrices($this->getNewProjectId());
+		$this->deleteDichotomousKey($this->getNewProjectId());
+		$this->deleteLiterature($this->getNewProjectId());
+		$this->deleteProjectContent($this->getNewProjectId());
+		$this->deleteCommonnames($this->getNewProjectId());
+		$this->deleteSpeciesMedia($this->getNewProjectId());
+		$this->deleteSpeciesContent($this->getNewProjectId());
+		$this->deleteStandardCat($this->getNewProjectId());
+		$this->deleteSpecies($this->getNewProjectId());
+		$this->deleteProjectRanks($this->getNewProjectId());
+		$this->deleteProjectUsers($this->getNewProjectId());
+		$this->deleteProjectLanguage($this->getNewProjectId());
+		$this->deleteModulesFromProject($this->getNewProjectId());
+		$this->deleteProject($this->getNewProjectId());
+
+		$this->setNewProjectId(null);
+		
+		$this->redirect('linnaeus2.php');
+
+	}
+
+
+	private function getProjects($id=null)
+	{
+
+		$d = isset($id) ? array('id' => $id) : '*';
+
+		$d = $this->models->Project->_get(array('id' => $d));
+
+		return isset($id) ? $d[0] : $d;
 	
 	}
 
-	private function getNewDefaultLanguageId()
+	public function l2ProjectAction()
 	{
+
+		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+		
+		libxml_use_internal_errors(true);
+		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
+		
+		if ($d===false) {
+
+			$this->addError('Failed to parse XML.');
+			foreach (libxml_get_errors() as $error) $this->addError((string)$error->message);
+
+		} else {
+
+			if ($this->rHasVal('clear','project')) {
+	
+				$this->setNewProjectId(null);
+				$this->setNewDefaultLanguageId(null);
+
+			}
+
+			if ($this->rHasVal('project','-1')) {
+			
+				$newId = $this->createProject($d);
+
+				if (!$newId) {
+	
+					$this->addError('Could not create new project. Duplicate name?');
+	
+				} else { 
+	
+					$project = $this->getProjects($this->getNewProjectId());
+					$this->addMessage('Created new project: '.(string)$d->project->title);
+					$this->setNewProjectId($newId);
+					$this->addCurrentUserToProject();
+	
+					// add language
+					$l = $this->addProjectLanguage($d);
+
+					if (!$l) 
+						$this->addError('Unable to use project language: '.(string)$d->project->language);
+					else {
+						$this->setNewDefaultLanguageId($l);
+						$this->addMessage('Set language: '.(string)$d->project->language);
+					}
+	
+				}
+
+			} else 
+			if ($this->rHasVal('project')) {
+
+				$this->setNewProjectId($this->requestData['project']);
+				$l = $this->models->LanguageProject->_get(
+					array(
+						'id' => array(
+							'project_id'=>$this->requestData['project'],
+							'def_language' => 1
+						)
+					)
+				);
+				$this->setNewDefaultLanguageId($l[0]['language_id']);
+				$this->addMessage('Using existing project');
+
+			}
+
+			$p = $this->getNewProjectId();
+
+			$project = $this->getProjects($p);
+
+			if (!isset($p)) {
+
+				$this->smarty->assign('projects',$this->getProjects());
+
+			} else {
+
+				$this->smarty->assign('project',$project);
+
+			}
+
+		}
+
+        $this->printPage();
 	
 	}
+
+	public function l2AnalyzeAction()
+	{
+
+		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+
+		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
+
+		$ranks = $this->resolveProjectRanks($d);
+		$species = $this->resolveSpecies($d,$ranks);
+		$treetops = $this->checkTreeTops($species);
+
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+
+			$ranks = $_SESSION['system']['import']['loaded']['ranks'] = $this->addProjectRanks($ranks);
+			$species = $_SESSION['system']['import']['loaded']['species'] = $this->addSpecies($species);
+			$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
+			
+			$this->addMessage('Saved '.count((array)$ranks).' ranks');
+			$this->addMessage('Saved '.count((array)$species).' species');
+
+			$this->addModuleToProject(4);
+			$this->addModuleToProject(5);
+
+			$this->smarty->assign('processed',true);
+
+		}
+		
+		$this->smarty->assign('ranks',$ranks);
+		$this->smarty->assign('species',$species);
+		$this->smarty->assign('treetops',$treetops);
+
+        $this->printPage();
+	
+	}
+
+	public function l2SecondaryAction()
+	{
+
+		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+		if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('linnaeus2.php');
+
+		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
+		$species = $_SESSION['system']['import']['loaded']['species'];
+
+		$content = $this->getProjectContent($d);
+		$literature = $this->resolveLiterature($d,$species);
+
+		if ($this->rHasVal('process','1')     ) { // && !$this->isFormResubmit()) {
+
+			if (1==2 && $this->rHasVal('taxon_overview','on')) {
+
+				$overviewCatId = $this->createStandardCat();
+
+				$failed = $this->addSpeciesContent($d,$species,$overviewCatId);
+
+				$this->addMessage('Added general species descriptions.');
+
+				if (isset($failed)) {
+
+					foreach ((array)$failed as $val) $this->addError('Failed species description: '.$val['cause']);
+
+				}
+
+			}
+
+			if (1==2 && $this->rHasVal('taxon_common','on')) {
+
+				$failed = $this->addSpeciesCommonNames($d,$species);
+
+				$this->addMessage('Added common names.');
+
+				if (isset($failed)) {
+
+					foreach ((array)$failed as $val) $this->addError('Failed common name: '.$val['cause']);
+
+				}
+
+			}
+
+			if (1==2 && $this->rHasVal('taxon_media','on')) {
+
+				$failed = $this->addSpeciesMedia($d,$species);
+
+				$this->addMessage('Added taxon media.');
+
+				if (isset($failed)) {
+
+					foreach ((array)$failed as $val) $this->addError('Failed media: '.$val['cause']);
+
+				}
+
+			}
+
+			if (1==2 && $this->rHasVal('content_introduction','on')) {
+
+				if ($this->addProjectContent($d,'introduction')) {
+
+					$this->addMessage('Added introduction.');
+
+				} else {
+
+					$this->addError('Failed loading introduction');
+
+				}
+
+			}
+
+			if (1==2 && $this->rHasVal('content_contributors','on')) {
+
+				if ($this->addProjectContent($d,'contributors')) {
+
+					$this->addMessage('Added contributors text.');
+
+				} else {
+
+					$this->addError('Failed loading contributors text');
+
+				}
+
+			}
+
+			if (1==2 && $this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
+
+				$this->addModuleToProject(1);
+
+			}
+
+			if (1==2 && $this->rHasVal('literature','on')) {
+
+				$res = $this->addLiterature($literature);
+
+				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].')');
+		
+				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].')');
+
+				$this->addModuleToProject(3);
+
+			}
+
+			if (1==2 && $this->rHasVal('key_dich','on')) {
+
+				$this->makeKey($d,$species);
+
+				$this->addMessage('Created dichotomous key.');
+
+				$this->addModuleToProject(6);
+
+			}
+
+			if (1==1 && $this->rHasVal('key_matrix','on')) {
+
+				$m = $this->resolveMatrices($d);
+
+				$m = $this->saveMatrices($m);
+
+				$this->connectMatrices($d,$m,$species);
+
+				$this->addMessage('Created matrix key(s).');
+
+				$this->addModuleToProject(7);
+
+			}
+
+		}
+
+		$this->smarty->assign('content',$content);
+		$this->smarty->assign('literature',$literature);
+
+        $this->printPage();
+	
+	}
+
 
 	private function createProject($d)
 	{
@@ -80,9 +540,43 @@ class ImportController extends Controller
 				'title' => $d->project->title,				
 			)
 		);
-	
+
 		return ($p) ? $this->models->Project->getNewId() : false;
 	
+	}
+
+	private function setNewProjectId($id)
+	{
+
+		if ($id==null)
+			unset($_SESSION['system']['import']['newProjectId']);
+		else
+			$_SESSION['system']['import']['newProjectId'] = $id;
+	
+	}
+
+	private function getNewProjectId()
+	{
+	
+		return (isset($_SESSION['system']['import']['newProjectId'])) ?
+			$_SESSION['system']['import']['newProjectId']:
+			null;
+	
+	}
+
+	private function addCurrentUserToProject()
+	{
+	
+		$this->models->ProjectRoleUser->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),	
+				'role_id' => ID_ROLE_LEAD_EXPERT,
+				'user_id' => $this->getCurrentUserId(),
+				'active' => 1
+			)
+		);
+
 	}
 
 	private function addProjectLanguage($d)
@@ -110,36 +604,26 @@ class ImportController extends Controller
 			)
 		);
 	
-		return ($p) ? $this->models->Project->getNewId() : false;
+		return ($p) ? $l[0]['id'] : false;
 	
 	}
 
-	private function addProjectContent($d)
+	private function setNewDefaultLanguageId($id)
 	{
-	
-		if ($d->project->projectintroduction)
-			$ci = $this->models->LanguageProject->save(
-				array(
-					'id' => 'null',
-					'project_id' => $this->getNewProjectId(),	
-					'language_id' => $this->getNewDefaultLanguageId(),	
-					'subject' => 'Introduction',	
-					'content' => $d->project->projectintroduction	
-				)
-			);
 
-		if ($d->project->contributors)
-			$cc = $this->models->LanguageProject->save(
-				array(
-					'id' => 'null',
-					'project_id' => $this->getNewProjectId(),	
-					'language_id' => $this->getNewDefaultLanguageId(),	
-					'subject' => 'Contributors',	
-					'content' => $d->project->contributors	
-				)
-			);
+		if ($id==null)
+			unset($_SESSION['system']['import']['newLanguageId']);
+		else
+			$_SESSION['system']['import']['newLanguageId'] = $id;
 	
-		return array('Introduction' => $ci,'Contributors' => $cc);
+	}
+
+	private function getNewDefaultLanguageId()
+	{
+
+		return (isset($_SESSION['system']['import']['newLanguageId'])) ?
+			$_SESSION['system']['import']['newLanguageId']:
+			null;
 	
 	}
 
@@ -173,7 +657,12 @@ class ImportController extends Controller
 							)
 						);
 						
-						$res[$rank]['parent_id'] = $r[0]['id'];
+						$res[$rank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+						$res[$rank]['parent_name'] = $parentRank;
+
+					} else {
+
+						$res[$rank]['parent_id'] = null;
 
 					}
 
@@ -195,7 +684,13 @@ class ImportController extends Controller
 	private function addProjectRanks($ranks)
 	{
 
+		$d = null;
+
 		foreach((array)$ranks as $key => $val) {
+
+			if (empty($val['rank_id'])) continue; // unresolvable rank
+			if ($val['parent_id']===false) continue; // unresolvable parent rank
+			if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
 
 			$this->models->ProjectRank->save(
 				array(
@@ -207,28 +702,100 @@ class ImportController extends Controller
 				)
 			);
 			
-			$ranks[$key]['id'] = $this->models->ProjectRank->getNewId();
+			$val['id'] = $this->models->ProjectRank->getNewId();
+			$d[$key] = $val;
 
 		}
 
-		return $ranks;
+		return $d;
 
 	}
-
+	
 	private function resolveSpecies($d,$ranks)
 	{
+
+		$failed = null;
 
 		foreach($d->tree->treetaxon as $key => $val) {
 
 			$res[(string)$val->name] = array(
 				'taxon' => (string)$val->name,
 				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
-				'parent' => (string)$val->parentname
+				'parent' => (string)$val->parentname,
+				'source' => 'tree->treetaxon'
 			);
 			
 		}
+
+		foreach($d->records->taxondata as $val) {
+
+			$res[(string)$val->name] = array(
+				'taxon' => (string)$val->name,
+				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
+				'parent' => (string)$val->parentname,
+				'source' => 'records->taxondata'
+			);
+
+		}
 		
 		return isset($res) ? $res : null;
+
+	}
+
+	private function addSpecies($species)
+	{
+
+		foreach((array)$species as $key => $val) {
+		
+			if ($val['rank_id']=='') continue; // not loading rankless taxa
+
+			$this->models->Taxon->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),	
+					'taxon' => $val['taxon'],
+					'parent_id' => 'null',
+					'rank_id' => $val['rank_id'],
+					'taxon_order' => 0,
+					'is_hybrid' => 0,
+					'list_level' => 0
+				)
+			);
+
+			$val['id'] = $this->models->Taxon->getNewId();
+			$d[$key] = $val;
+
+		}
+
+		foreach((array)$d as $key => $val) {
+
+			$t = $this->models->Taxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getNewProjectId(),	
+						'taxon' => $val['parent']
+					),
+					'columns' => 'id'
+				)
+			);
+			
+			if ($t) {
+			
+				$this->models->Taxon->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),	
+						'parent_id' =>  $t[0]['id']
+					)
+				);
+	
+				$d[$key]['parent_id'] = $t[0]['id'];
+
+			}
+
+		}
+
+		return $d;
 
 	}
 	
@@ -251,49 +818,41 @@ class ImportController extends Controller
 
 	}
 
-	private function addSpecies($species)
+	private function fixTreetops($species,$treetops)
 	{
 
+		if (count((array)$treetops)<2) return;
+		
+		$this->models->Taxon->save(
+			array(
+				'id' => 'null',
+				'project_id' => $this->getNewProjectId(),	
+				'taxon' => '(master taxon)',
+				'parent_id' => 'null',
+				'rank_id' => 999,
+				'taxon_order' => 0,
+				'is_hybrid' => 0,
+				'list_level' => 0
+			)
+		);
+
+		$masterId = $this->models->Taxon->getNewId();
+
 		foreach((array)$species as $key => $val) {
-$species[$key]['id'] = rand(12,999);continue;
-			$this->models->Taxon->save(
-				array(
-					'id' => 'null',
-					'project_id' => $this->getNewProjectId(),	
-					'taxon' => $val['taxon'],
-					'parent_id' => 'null',
-					'rank_id' => $val['rank_id'],
-					'taxon_order' => 0,
-					'is_hybrid' => 0,
-					'list_level' => 0
-				)
-			);
+		
+			if (in_array($val['taxon'],$treetops)) {
 
-			$species[$key]['id'] = $this->models->Taxon->getNewId();
-
-		}
-return $species;
-		foreach((array)$species as $key => $val) {
-
-			$t = $this->models->Taxon->_get(
-				array(
-					'id' => array(
+				$this->models->Taxon->save(
+					array(
+						'id' => $val['id'],
 						'project_id' => $this->getNewProjectId(),	
-						'taxon' => $val['parent']
-					),
-					'columns' => 'id'
-				)
-			);
-			
-			$this->models->Taxon->save(
-				array(
-					'id' => $val['id'],
-					'project_id' => $this->getNewProjectId(),	
-					'parent_id' =>  $t[0]['id']
-				)
-			);
+						'parent_id' =>  $masterId
+					)
+				);
+	
+				$species[$key]['parent_id'] = $masterId;
 
-			$species[$key]['parent_id'] = $t[0]['id'];
+			}
 
 		}
 
@@ -301,10 +860,82 @@ return $species;
 
 	}
 
+	private function resolveLiterature($d,$species)
+	{
+
+		foreach($d->proj_literature->proj_reference as $key => $val) {
+
+			$l = (string)$val->literature_title;
+			$a = $this->resolveAuthors($l);
+			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
+			$okSp = $unSp = null;
+
+			foreach($val->keywords->keyword as $kKey => $kVal) {
+
+				$t = $this->replaceOldTags((string)$kVal->name,true);
+				if (isset($species[$t])) {
+					$okSp[] = $species[$t]['id'];
+				} else {
+					$unSp[] = $t;
+				}
+
+			}
+
+			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
+
+			$res[] = $a;
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function getProjectContent($d)
+	{
+	
+		return array(
+			'Introduction' => isset($d->project->projectintroduction) ? $d->project->projectintroduction : null,
+			'Contributors' => isset($d->project->contributors) ? $d->project->contributors : mull
+		);
+	
+	}
+
+
+	private function addProjectContent($d,$type)
+	{
+	
+		if ($d->project->projectintroduction && $type=='introduction')
+			$c = $this->models->Content->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),	
+					'language_id' => $this->getNewDefaultLanguageId(),	
+					'subject' => 'Introduction',	
+					'content' => $d->project->projectintroduction	
+				)
+			);
+
+		if ($d->project->contributors && $type=='contributors')
+			$c = $this->models->Content->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),	
+					'language_id' => $this->getNewDefaultLanguageId(),	
+					'subject' => 'Contributors',	
+					'content' => $d->project->contributors	
+				)
+			);
+	
+		return $c;
+	
+	}
+
+
 	private function createStandardCat()
 	{
-return 23;
-		$pt = $this->model->PageTaxa->_get(
+
+		$pt = $this->models->PageTaxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getNewProjectId(),
@@ -316,7 +947,7 @@ return 23;
 		
 		if (isset($pt['id'])) return $pt['id'];
 
-		$pt = $this->model->PageTaxa->save(
+		$pt = $this->models->PageTaxon->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),
@@ -326,9 +957,9 @@ return 23;
 			)
 		);
 	
-		$id = $this->model->PageTaxaTitle->getNewId();
+		$id = $this->models->PageTaxon->getNewId();
 
-		$this->model->PageTaxaTitle->save(
+		$this->models->PageTaxonTitle->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),
@@ -338,7 +969,7 @@ return 23;
 			)
 		);
 		
-		return $this->model->PageTaxa->getNewId();
+		return $id;
 	
 	}
 
@@ -369,19 +1000,18 @@ return 23;
 			if (isset($species[(string)$val->name]['id'])) {
 			
 				$taxonId = $species[(string)$val->name]['id'];
-/*				
+
 				$this->models->ContentTaxon->save(
 					array(
 						'id' => 'null',
 						'project_id' => $this->getNewProjectId(),
 						'taxon_id' => $taxonId,
-						'language_id' => $this->getNewDefaultLanguageId()
+						'language_id' => $this->getNewDefaultLanguageId(),
 						'page_id' => $overviewCatId,
 						'content' => $this->replaceOldTags((string)$val->description),
 						'publish' => 1
 					)
 				);
-*/
 
 			} else {
 			
@@ -414,8 +1044,8 @@ return 23;
 					$languagId = $this->resolveLanguage((string)$vVal->vernacular->language);
 
 					if ($languagId) {
-/*
-						$this->models->Commonnames->save(
+
+						$this->models->Commonname->save(
 							array(
 								'id' => 'null',
 								'project_id' => $this->getNewProjectId(),
@@ -424,7 +1054,7 @@ return 23;
 								'commonname' => (string)$vVal->vernacular->name
 							)
 						);
-*/
+
 					} else {
 
 						$failed[] = array(
@@ -447,15 +1077,25 @@ return 23;
 	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$mimes)
 	{
 
-		if (file_exists($this->pathMedia.$fileName)) {
+		if ($_SESSION['system']['import']['imagePath']==false)
+			return array(
+				'saved' => false,
+				'data' => $fileName,
+				'cause' => 'user specified no media import for project'
+			);
+
+
+		if (file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
 		
-			$thisMIME = mime_content_type($this->pathMedia.$fileName);
+			$thisMIME = mime_content_type($_SESSION['system']['import']['imagePath'].$fileName);
 			
 			if (isset($mimes[$thisMIME])) {
 			
-				$thumbName = file_exists($this->pathThumbs.$fileName) ? $fileName : null;
+				if ($_SESSION['system']['import']['thumbsPath']==false)
+					$thumbName = null;
+				else
+					$thumbName = file_exists($_SESSION['system']['import']['thumbsPath'].$fileName) ? $fileName : null;
 
-/*				
 				$this->models->MediaTaxon->save(
 					array(
 						'id' => 'null',
@@ -465,16 +1105,16 @@ return 23;
 						'thumb_name' => $thumbName,
 						'original_name' => $fullName,
 						'mime_type' => $thisMIME,
-						'file_size' => filesize($this->pathMedia.$fileName)
+						'file_size' => filesize($_SESSION['system']['import']['imagePath'].$fileName)
 					)
 				);
-*/					
+
 				return array(
 					'saved' => true,
 					'filename' => $fileName,
 					'full_path' => $this->pathMedia.$fileName,
 					'thumb' => isset($thumbName) ? $thumbName : null,
-					'thumb_path' => isset($thumbName) ? $this->pathThumbs.$thumbName : null
+					'thumb_path' => isset($thumbName) ? $_SESSION['system']['import']['thumbsPath'].$thumbName : null
 				);
 
 			} else {
@@ -499,8 +1139,30 @@ return 23;
 
 	}
 
+	private function cRename($from,$to)
+	{
+	
+		//return rename($from,$to); // generates odd errors on some linux filesystems
+	
+		if(copy($from,$to)) {
+
+			return true; //unlink($from);
+
+		} else {
+
+			return false;
+
+		}
+
+	}	
+
 	private function addSpeciesMedia($d,$species)
 	{
+
+		$paths = $this->makePaths($this->getNewProjectId());
+
+		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
+		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
 
 		$this->loadControllerConfig('Species');
 		
@@ -556,9 +1218,12 @@ return 23;
 
 					if ($r['saved']==true) {
 	
+						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+						
 						$saved[] = $r;
 						$prev[$fileName] = true;
-					
+						
 					} else {
 	
 						$failed[] = $r;
@@ -616,66 +1281,57 @@ return 23;
 			'valid_year' => is_numeric($y),
 			'author_1' => $a,
 			'author_2' => $a2,
-			'multiple_authors' => $m
+			'multiple_authors' => $m,
+			'original' => $s
 		);
-
-	}
-
-	private function resolveLiterature($d,$species)
-	{
-
-		foreach($d->proj_literature->proj_reference as $key => $val) {
-
-			$l = (string)$val->literature_title;
-			$a = $this->resolveAuthors($l);
-			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
-			$okSp = $unSp = null;
-
-			foreach($val->keywords->keyword as $kKey => $kVal) {
-
-				$t = $this->replaceOldTags((string)$kVal->name,true);
-				if (isset($species[$t])) {
-					$okSp[] = $species[$t]['id'];
-				} else {
-					$unSp[] = $t;
-				}
-
-			}
-
-
-			$a['references'] = array('species' => $okSp,'unknown species' => $unSp);
-
-			$res[] = $a;
-
-		}
-
-		return isset($res) ? $res : null;
 
 	}
 
 	private function addLiterature($d)
 	{
 
-		foreach($d as $v) {
+		$lit = $ref = 0;
+		$litFail = $refFail = 0;
 
-			$this->models->Literature->save(
+		foreach($d as $val) {
+
+			$l = $this->models->Literature->save(
 				array(
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),				
 					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
 					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
 					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
-					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'] : null,
+					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : null,
 					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
 					'text' => isset($val['text']) ? $val['text'] : null,
 				)
 			);
+
+			if ($l===false) {
+
+				$litFail++;
+				continue;
+
+			} else {
+			
+				$lit++;
+
+			}
 			
 			$id = $this->models->Literature->getNewId();
 
-			foreach((array)$v['references']['species'] as $kV) {
+			foreach((array)$val['references']['species'] as $kV) {
+			
+				if (empty($kV)) {
 
-				$this->models->LiteratureTaxon->save(
+					$refFail++;
+
+					continue;
+
+				}
+
+				$lt = $this->models->LiteratureTaxon->save(
 					array(
 						'id' => 'null',
 						'project_id' => $this->getNewProjectId(),				
@@ -684,28 +1340,39 @@ return 23;
 					)
 				);
 
+				if ($lt===false)
+					$refFail++;
+				else
+					$ref++;
+
 			}
 
 		}
+
+		return array(
+			'lit' => $lit,
+			'ref' => $ref,
+			'litFail' => $litFail,
+			'refFail' => $refFail,
+		);
 
 	}
 
 	private function createKeyStep($step,$stepIds,$stepAdd=0)
 	{
 
-/*
-		$this->model->Keystep->save(
+		$this->models->Keystep->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),
-				'number' => ($step=='god' ? -1 : ((string)$step->pagenumber +$stepAdd)),
+				'number' => ($step=='god' ? -1 : (intval((string)$step->pagenumber) + $stepAdd)),
 				'is_start' => 0
 			)
 		);
 
-		$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = $this->model->Keystep->getNewId();
+		$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = $this->models->Keystep->getNewId();
 
-		$this->model->ContentKeystep->save(
+		$this->models->ContentKeystep->save(
 			array(
 				'id' => 'null',
 				'project_id' => $this->getNewProjectId(),
@@ -714,7 +1381,7 @@ return 23;
 				'title' => 
 					($step=='god' ? 
 						'Choose key type' : 
-						(isset((string)$step->pagetitle) ?
+						(isset($step->pagetitle) ?
 							(string)$step->pagetitle:
 							(string)$step->pagenumber
 						)
@@ -722,7 +1389,7 @@ return 23;
 				'content' =>
 					($step=='god' ?
 						'Choose between picture key and text key' : 
-						(isset((string)$step->pagetitle) ?
+						(isset($step->pagetitle) ?
 							(string)$step->pagetitle:
 							(string)$step->pagenumber
 						)
@@ -730,19 +1397,16 @@ return 23;
 			)
 		);
 
-
-*/
-$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120);
 		return $stepIds;
 
 	}
-
 
 	private function createKeyStepChoices($step,$stepIds,$species)
 	{
 
 		if ($step=='god') {
 			$choices[0]['destinationtype'] = $choices[1]['destinationtype'] = 'turn';
+			$choices[0]['destinationpagenumber'] = $choices[1]['destinationpagenumber'] = -999;
 			$choices = (object)$choices;
 		} elseif ($step->text_choice) {
 			$choices = $step->text_choice;
@@ -750,29 +1414,34 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 			$choices = $step->pict_choice;
 		}
 
+		$i=0;
+
 		foreach($choices as $key => $val) {
 
-			$resStep = ((string)$val->destinationtype=='turn' ? 
-							(isset($stepIds[(string)$val->destinationpagenumber]) ?
-								$stepIds[(string)$val->destinationpagenumber] :
-								($step=='god' ? 
-									($key==0 ? 
-										$stepIds['firstTxtId'] : 
-										$stepIds['firstPictId']
-									) : 
-									null
-								)
-							) :
-							null
-						);
+			if ($step=='god') {
+			
+				$resStep = ($key==0 ? $stepIds['firstTxtId'] : $stepIds['firstPictId']);
+				$resTaxon = null;
+			
+			} else {
 
-			$resTaxon = ((string)$val->destinationtype=='taxon' ?  
-							(isset($species[(string)$val->destinationtaxonname]['id']) ?
-								$species[(string)$val->destinationtaxonname]['id']:
+				$resStep = ((string)$val->destinationtype=='turn' ? 
+								(isset($stepIds[(string)$val->destinationpagenumber]) ?
+									$stepIds[(string)$val->destinationpagenumber] :
+									null
+								) :
 								null
-							) : 
-							null
-						);
+							);
+
+				$resTaxon = ((string)$val->destinationtype=='taxon' ?  
+								(isset($species[(string)$val->destinationtaxonname]['id']) ?
+									$species[(string)$val->destinationtaxonname]['id']:
+									null
+								) : 
+								null
+							);
+
+			}
 
 			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
 
@@ -781,19 +1450,23 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
 				);
 
-/*
-			$this->model->ChoiceKeystep->save(
+			$this->models->ChoiceKeystep->save(
 				array(
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[(string)$step->pagenumber]),
-					'show_order' => $key,
+					'show_order' => $i++,
 					'choice_img' => isset($fileName) ? $fileName : null,
 					'res_keystep_id' => $resStep,
 					'res_taxon_id' => $resTaxon,
 				)
 			);
 
+			if ($step=='god') {
+
+				$txt = ($key==0 ? 'Text key' : 'Picture key');
+
+			} else
 			if (isset($val->captiontext)) {
 
 				$txt = $this->replaceOldTags((string)$val->captiontext);
@@ -807,29 +1480,22 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 				$txt = (string)$val->picturefilename;
 			}
 	
-			$this->model->ChoiceContentKeystep->save(
+			$this->models->ChoiceContentKeystep->save(
 				array(
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),
-					'choice_id' => $this->model->ChoiceKeystep->getNewId(),
+					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'choice_txt' => $txt
 				)
 			);
 
-*/
 		}
 
-
-	
 	}
-
 
 	private function makeKey($d,$species)
 	{
-	
-//		q($d->pict_key);
-//		q($d->text_key);
 
 		$stepAdd = 0;
 
@@ -852,14 +1518,14 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 				$this->createKeyStepChoices($val,$keyStepIds,$species);
 	
 			}
-/*			
-			$k = $this->model->Keystep->_get(
+
+			$k = $this->models->Keystep->_get(
 				array(
 					'id' => array('project_id' => $this->getNewProjectId()),
 					'columns' => 'max(number) as `last`'
 				)
 			);
-*/			
+
 			$stepAdd = $k[0]['last'];
 
 		}
@@ -896,10 +1562,11 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 					'godId' => current($keyStepIds),
 					'firstTxtId' => $firstTxtStepId,
 					'firstPictId' => $firstPictStepId
-				)
+				),
+				$species
 			);
 
-			$this->model->Keystep->update(
+			$this->models->Keystep->update(
 				array('number' => 'number+1'),
 				array(
 					'project_id' => $this->getNewProjectId(),
@@ -907,7 +1574,7 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 				)
 			);
 
-			$this->model->Keystep->update(
+			$this->models->Keystep->update(
 				array('number' => '1'),
 				array(
 					'project_id' => $this->getNewProjectId(),
@@ -917,7 +1584,7 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 
 		}
 
-		$this->model->Keystep->update(
+		$this->models->Keystep->update(
 			array('is_start' => '1'),
 			array(
 				'project_id' => $this->getNewProjectId(),
@@ -928,197 +1595,333 @@ $stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = rand(0,120
 	}
 
 
-/*
-what the fuck is?
-	$d->projectclassification
-	$d->projectnomenclaturecode
-
-
-need to set manually!
-	project.includes_hybrids
-	project.css_url
-	project.logo
-
-	border higher/lower taxa (give choice)
-	=> projects_ranks.lower_taxon
-	=> projects_ranks.keypath_endpoint (gaat dat dan ook?)
-
-	taxa table
-		'taxon_order' => 0,
-		'is_hybrid' => 0,
-		'list_level' => 0
+	private function resolveMatrices($d)
+	{
 	
+		$matrices = null;
 
-	proj_literature->proj_reference->keywords->keyword
-		taxa only, what do glossary terms look like??
+		foreach($d->records->taxondata as $val) {
 
-	WHAT MODULES!?!?!	
+			$matrixname = (string)$val->identify->id_file->filename;
 
+			if ($matrixname) {
 
+				//?? (string)$val->identify->id_file->obj_link
 
-*/
+				$matrices[$matrixname]['name'] = str_replace('.adm','',$matrixname);
 
+				foreach($val->identify->id_file->characters->character_ as $char) {
 
-    public function linnaeus2Action()
-    {
+					//character_type ?? welke mogelijkheden + resolvement: Text 
 
-		$file = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\ExportFile\march20.xml';
-
-		$d = simplexml_load_file ($file);
-
-// switch what to import?
-
-		
-		// create new project
-//		$newId = $this->createProject($d);
-//		if (!$newId) die('eeek'); else set getNewProjectId
-
-		// add language
-//		if (!addProjectLanguage($d)) display ($d->project->language); and raise hell
-//		else set getNewDefaultLanguageId
-
-		// add content
-//	`	$res = $this->addProjectContent($d);
-
-
-		// get ranks
-		$ranks = $this->resolveProjectRanks($d);
-//		if res == null all hell (no ranks matched)
-//		if all resolved (no falses) proceed
-//		if falses, let user decide
-//		more than one parent==null: show ans resolve
-
-		// save ranks
-//		$ranks = $this->addProjectRanks($res);
-
-		$species = $this->resolveSpecies($d,$ranks);
-//		user check --> might have spelling mistakes!!
-		$treetops = $this->checkTreeTops($species);
-//		if many: animalia / plantae => god species, BUT also spelling mistakes (sigh)
-
-		// BEWARE THERE ARE FAKE ID'S IN THIS FUNCION!!!!!
-		$overviewCatId = $this->createStandardCat();
-		// BEWARE THERE ARE FAKE ID'S IN THIS FUNCION!!!!!
-		$species = $this->addSpecies($species);
-//		$this->addSpeciesContent($d,$species,$overviewCatId);
-		$this->addSpeciesCommonNames($d,$species);
-		$r = $this->addSpeciesMedia($d,$species);
-
-		$lit = $this->resolveLiterature($d,$species);
-// 		check for invalid years, might be suffix! (so set suffix in the $lit array)
-		//$this->addLiterature($lit);
-
-//		$this->makeKey($d,$species);
-
-//q($d);
-//yell about getControllerSettingsKey->maxChoicesPerKeystep
-
-/*
-
-	parse XML
-		fail
-			error
-			exit
-		success
-			display cancel /save
-		cancel
-			exit
-		save
-			create project <- xml-data
-			create standard user <- defaults
-			load
-			log
-	
-
-	xml-parsed
-		file
-			data of parsed file
-
-v		project -> new project
-v			title
-v			version
-			(default other required values)
-		
-v		==> we have new id!
-v			set new id so 'getCurrentProjectId()' works
-	
-		project
-v			.language -> march and select (if not exist, ask what it is from list)
-
-v		==> set default language
-
-v			.projectintroduction --> introduction text
-v			.contributors --> contributors text
-???			.classification --> "Five kingdoms"
-???			.nomenclaturecode --> "ICZM"
-
-		
-
-v		tree
-v			.treetaxon
-v				.taxon -> rankname -> resolve to standard ranks, and FAIL if not exist (?)
-
-
-v		tree
-v			.treetaxon
-v				.parenttaxon -> parent taxon rank (ignore) or 'none' (treetop)
-v				.parentname -> resolve to taxon_id (empty when parenttaxon == none) -
-v				.taxon -> rankname -> resolve to rank_id
-v				.name -> name
-
-
-
-MATRIX
-
-	loop records
-		$matrices[filename][characters][] = name / type
-			states
-				state_name
-				state_min
-				state_max
-				state_mean
-				state_sd
-				state_file ??
-
-
-
-
-
-	first check all filenames and create matrices from them
-
-		records
-				.identify
-					.id_file
-						.filename --> resolve matrix id
-???						.obj_link --> ??? (seems empty)
-						.character_
-							.character_name --> "Habitat"
-							.character_type --> "Text"
-							.states --> 
-								etc
-							
+					$charname = (string)$char->character_name;
+					$chartype = (string)$char->character_type;
 					
+					foreach($char->states->state as $stat) {
 
+						$statename = (string)$stat->state_name;
+						$statemin = (string)$stat->state_min;
+						$statemax = (string)$stat->state_max;
+						$statemean = (string)$stat->state_mean;
+						$statesd = (string)$stat->state_sd;
+						$statefile = (string)$stat->state_file;
 
+						//stat->state_file; immer leeg
 
+						$adHocIndex = 
+							md5(
+								$matrixname.
+								$charname.
+								$statename.
+								$statemin.
+								$statemax.
+								$statemean.
+								$statesd.
+								$statefile
+							);
 
+						$matrices[$matrixname]['characteristics'][$charname]['charname'] = $charname;
+						$matrices[$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
+						$matrices[$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
+							'statename'=>$statename,
+							'statemin'=>$statemin,
+							'statemax'=>$statemax,
+							'statemean'=>$statemean,
+							'statesd'=>$statesd,
+							'statefile'=>$statefile,
+						);
 
+					}
 
+				}
 
+			}
 
+		}
 
+		return $matrices;
 
+	}
 
-
-
-
-
-
-*/
-	
+	private function resolveCharType($t)
+	{
+		// ??? HAVE ONLY SEEN 'Text' & 'Picture'
+		switch($t) {
+			case 'Text':
+				return 'text';
+				break;
+			case 'Distribution':
+				return 'distribution';
+				break;
+			case 'Picture':
+				return 'media';
+				break;
+			case 'Range':
+				return 'range';
+				break;
+		}
 	
 	}
 
+	private function saveMatrices($m)
+	{
+
+		$d = null;
+
+		foreach((array) $m as $key => $val) {
+
+			$this->models->Matrix->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'got_names' => 1
+				)
+			);
+
+			
+			$m[$key]['id'] = $this->models->Matrix->getNewId();
+
+			$this->models->MatrixName->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'matrix_id' => $m[$key]['id'],
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'name' => $val['name']
+				)
+			);
+
+			foreach((array)$val['characteristics'] as $cKey => $cVal) {
+
+				$c = $this->models->Characteristic->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'type' => $this->resolveCharType($cVal['chartype']),
+						'got_labels' => 1
+					)
+				);
+
+
+				$m[$key]['characteristics'][$cKey]['id'] = $this->models->Characteristic->getNewId();
+
+				$this->models->CharacteristicLabel->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'label' => $cVal['charname']
+					)
+				);
+
+				$cm = $this->models->CharacteristicMatrix->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'matrix_id' => $m[$key]['id'],
+						'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+					)
+				);
+
+
+				foreach((array)$cVal['states'] as $sKey => $sVal) {
+
+					$c = $this->models->CharacteristicState->save(
+						array(
+							'id' => 'null',
+							'project_id' => $this->getNewProjectId(),
+							'characteristic_id' => $m[$key]['id']['characteristics'][$cKey]['id'],
+							'file_name' => isset($sVal['statefile']) ? $sVal['statefile'] : null,
+							'lower' => isset($sVal['statemin']) ? $sVal['statemin'] : null,
+							'upper' => isset($sVal['statemax']) ? $sVal['statemax'] : null,
+							'mean' => isset($sVal['statemean']) ? $sVal['statemean'] : null,
+							'sd' => isset($sVal['statesd']) ? $sVal['statesd'] : null,
+							'got_labels' => 1
+						)
+					);
+
+					$m[$key]['characteristics'][$cKey]['states'][$sKey]['id'] = $this->models->CharacteristicState->getNewId();
+
+					$d[$sKey] = array(
+						'matrix_id' => $m[$key]['id'],
+						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
+						'state_id' => $m[$key]['characteristics'][$cKey]['states'][$sKey]['id']
+					);
+
+					$this->models->CharacteristicLabelState->save(
+						array(
+							'id' => 'null',
+							'project_id' => $this->getNewProjectId(),
+							'state_id' => $m[$key]['characteristics'][$cKey]['states'][$sKey]['id'],
+							'language_id' => $this->getNewDefaultLanguageId(),
+							'label' => $sVal['statename']
+						)
+					);
+
+				}
+
+			}
+
+		}
+
+		return $d; //$m;
+
+	}
+
+	private function connectMatrices($d,$statelist,$species)
+	{
+
+/*
+
+dev_matrices_taxa_states
+dev_matrices_taxa
+
+
+
+
+
+*/
+
+		foreach($d->records->taxondata as $val) {
+
+			$matrixname = (string)$val->identify->id_file->filename;
+
+			if ($matrixname) {
+
+				if (isset($species[(string)$val->name]['id'])) {
+	
+					$taxonid = $species[(string)$val->name]['id'];
+
+					foreach($val->identify->id_file->characters->character_ as $char) {
+	
+						$charname = (string)$char->character_name;
+						
+						foreach($char->states->state as $stat) {
+	
+							$statename = (string)$stat->state_name;
+							$statemin = (string)$stat->state_min;
+							$statemax = (string)$stat->state_max;
+							$statemean = (string)$stat->state_mean;
+							$statesd = (string)$stat->state_sd;
+							$statefile = (string)$stat->state_file;
+	
+							$adHocIndex = 
+								md5(
+									$matrixname.
+									$charname.
+									$statename.
+									$statemin.
+									$statemax.
+									$statemean.
+									$statesd.
+									$statefile
+								);
+	
+							if (isset($statelist[$adHocIndex])) {
+
+								$this->models->MatrixTaxon->save(
+									array(
+										'id' => 'null',
+										'project_id' => $this->getNewProjectId(),
+										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
+										'taxon_id' => $taxonid,
+									)
+								);
+
+								$this->models->MatrixTaxonState->save(
+									array(
+										'id' => 'null',
+										'project_id' => $this->getNewProjectId(),
+										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
+										'characteristic_id' => $statelist[$adHocIndex]['characteristic_id'],
+										'state_id' => $statelist[$adHocIndex]['state_id'],
+										'taxon_id' => $taxonid,
+									)
+								);
+					
+							}
+	
+						}
+	
+					}
+	
+				}
+
+			} else {
+
+				$failed[] = array(
+					'cause' => 'species referenced in identifyit does not exist in the main tree and has been discarded',
+					'data' => (string)$val->name
+				);
+
+			}
+
+		}
+
+		return $failed;
+
+	}
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private function deleteMatrices($id)
+	{
+
+		$this->models->MatrixTaxonState->delete(array('project_id' => $id));
+		$this->models->MatrixTaxon->delete(array('project_id' => $id));
+		$this->models->CharacteristicLabelState->delete(array('project_id' => $id));
+		$this->models->CharacteristicState->delete(array('project_id' => $id));
+		$this->models->CharacteristicMatrix->delete(array('project_id' => $id));
+		$this->models->CharacteristicLabel->delete(array('project_id' => $id));
+		$this->models->Characteristic->delete(array('project_id' => $id));
+		$this->models->MatrixName->delete(array('project_id' => $id));
+		$this->models->Matrix->delete(array('project_id' => $id));
+
+	}
+	
+	private function deleteDichotomousKey($id)
+	{
+
+		$this->models->ChoiceContentKeystep->delete(array('project_id' => $id));
+		$this->models->ChoiceKeystep->delete(array('project_id' => $id));
+		$this->models->ContentKeystep->delete(array('project_id' => $id));
+		$this->models->Keystep->delete(array('project_id' => $id));
+
+	}
 
 
 	private function deleteLiterature($id)
@@ -1129,40 +1932,61 @@ MATRIX
 			
 	}
 
+	private function deleteProjectContent($id)
+	{
+	
+		$this->models->Content->delete(array('project_id' => $id));
+
+	}
+
 	private function deleteSpeciesMedia($id)
 	{
-// GET PATHS!!!!
-		$mt = $this->models->MediaTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $id
-				)
-			)
-		);
+
+		$paths = $this->makePaths($this->getNewProjectId());
+
+		$mt = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $id)));
 
 		foreach((array)$mt as $val) {
 
-			if (isset($val['file_name'])) @unlink(MEDIA_PATH.$val['file_name']);
-			if (isset($val['thumb_name'])) @unlink(THUMB_PATH.$val['thumb_name']);
+			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
+			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
 
 		}
 
+		@unlink($paths['project_thumbs']);
+		@unlink($paths['project_media']);
+
 		$this->models->MediaTaxon->delete(array('project_id' => $id));
+		$this->models->MediaDescriptionsTaxon->delete(array('project_id' => $id));
 
 	}
 
-	private function deleteStandardCat()
+	private function deleteCommonnames($id)
 	{
-	
-		$this->model->PageTaxaTitle->delete(array('project_id' => $id));
-		$this->model->PageTaxa->delete(array('project_id' => $id));
+
+		$this->models->Commonname->delete(array('project_id' => $id));
 
 	}
+
+	private function deleteStandardCat($id)
+	{
 	
-	private function deleteSpecies($species)
+		$this->models->PageTaxonTitle->delete(array('project_id' => $id));
+		$this->models->PageTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSpeciesContent($id)
 	{
 
-		$this->models->Taxon->delete(array('project_id' => $this->getNewProjectId()));
+		$this->models->ContentTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSpecies($id)
+	{
+
+		$this->models->Taxon->delete(array('project_id' => $id));
 
 	}
 
@@ -1173,40 +1997,111 @@ MATRIX
 
 	}
 
-	private function deleteProjectContent($id)
+	private function deleteProjectUsers($id)
 	{
 	
-		$this->models->LanguageProject->delete(
-			array(
-				'project_id' => $id
-			)
-		);
-	
+		$this->models->ProjectRoleUser->delete(array('project_id' => $id));
+
 	}
 
 	private function deleteProjectLanguage($id)
 	{
 	
-		$this->models->LanguageProject->delete(
-			array(
-				'project_id' => $id
-			)
-		);
+		$this->models->LanguageProject->delete(array('project_id' => $id));
+	
+	}
+
+	private function deleteModulesFromProject($id)
+	{
+
+		$this->models->ModuleProject->delete(array('project_id' => $id));	
 	
 	}
 
 	private function deleteProject($id)
 	{
 	
-		$p = $this->models->Project->delete(
-			array(
-				'id' => $id,
-			)
-		);
-	
-		return ($p) ? $this->models->Project->getNewId() : false;
+		$p = $this->models->Project->delete(array('id' => $id));
 	
 	}
-	
+/*
+
+<glossary>
+	<term>
+		<glossary_title></glossary_title>Deze tag was in WBD versie incorrect tussen <term> gedefinieerd
+		<definition></definition>
+		<glossary_synonyms>
+			<glossary_synonym>
+				<name></name>
+			</glossary_synonym> was <sameterm>. per ‘synonym’ te specificeren.
+		</glossary_synonyms>
+		<gloss_multimedia> onderscheid van <multimedia> in records
+			<gloss_multimediafile>
+				<filename></filename>De filenaam van het plaatje. Deze tag was in WBD versie incorrect tussen <image> gedefinieerd
+				<fullname></fullname>De naam zoals die in Linnaeus verschijnt (kan verschillen bij Mac -> PC vertaalde projecten)
+				<caption></caption>
+				<multimedia_type></multimedia_type>kan zijn: Image, Movie, Sound, Text file
+			</gloss_multimediafile>
+		</gloss_multimedia>
+	</term>
+</glossary>
+
+<introduction>
+	<topic>
+		<introduction_title></introduction_title>Deze tag was in WBD versie incorrect tussen <topic> gedefinieerd
+		<text></text>
+		<overview></overview>Link naar overviewplaatje.
+	</topic>
+</introduction>
+
+
+KAN NIET
+<!-- diversity>MapIt diversity index
+	<totalsmap>Informatie per kaart
+		<mapname></mapname>Naam van de kaart
+		<gridspecs></gridspecs>Gridinformatie, 6 comma-delimited waarden: N (+), W (+), Z (-), O (-), hoogte blok (in graden), breedte blok (in graden)
+		<squaretotals>Alle vakjes per kaart
+			<squaretotal>Gegevens per vakje
+				<squarenumber></squarenumber>Vaknummer (numeriek), moet altijd een waarde hebben
+				<squarecount>Aantal soorten per vakje (zowel totalen als per legendakleur)
+					<squaretotalcount></squaretotalcount>Som van alle legendakleuren per vakje												<squaretotalobjects>Som van alle soorten per vakje
+						<squaretotalobject>Soort die in het vakje voorkomt
+							<name></name>Naam van de soort
+						</squaretotalobject>
+					</squaretotalobjects>
+					<legend_colors>
+						<legend_color>Totalen per legendakleur per vakje
+							<legend_name></legend_name>Legendanaam
+							<object_count></object_count>Aantal soorten per legendakleur per vakje											<squareobject>Soort per legendakleur per vakje
+								<name></name>Naam van soort per legendakleur per vakje
+							</squareobject>
+						</legend_color>
+					</legend_colors>
+				</squarecount>
+			</squaretotal>
+		</squaretotals>
+	</totalsmap>
+</diversity -->
+
+		<distribution>MapIt data
+			<map>Informatie per kaart
+				<mapname></mapname>naam van de map
+				<specs></specs>Gridinformatie
+				<squares>meerdere squares per map
+					<square>Gegevens per blok
+						<number></number>Bloknummer
+						<legend></legend>Legendakleur
+					</square>
+				</squares>
+				<typelocalities>geef type locaties (meerdere mogelijk) per soort
+					<typelocality>
+						<latitude></latitude>
+						<longitude></longitude>
+						<info></info>
+					</typelocality>
+				</typelocalities>
+			</map>
+		</distribution>	
+*/	
 	
 }

@@ -2086,6 +2086,25 @@ class Controller extends BaseClass
 
 
     /**
+     * Makes project paths for image uploads etc.
+     * 
+     * @access     public
+     */
+    public function makePaths($p)
+    {
+        
+        if ($p)
+			return array(            
+				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/',
+				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/',
+				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/'
+			);
+        else
+			return null;
+    
+    }
+
+    /**
      * Sets project paths for image uploads etc. and makes sure they actually exist
      * 
      * @access     private
@@ -2096,13 +2115,21 @@ class Controller extends BaseClass
         $p = $this->getCurrentProjectId();
         
         if ($p) {
-            
-            $_SESSION['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
 
-            $_SESSION['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
+            //$_SESSION['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
+
+            //$_SESSION['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
             
-            $_SESSION['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
+            //$_SESSION['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
+
+			$paths = $this->makePaths($p);
+
+            $_SESSION['project']['paths']['project_media'] = $paths['project_media'];
+
+            $_SESSION['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
             
+            $_SESSION['project']['paths']['uploads_media'] = $paths['uploads_media'];
+
             foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
                 
                 if (!file_exists($val)) {
