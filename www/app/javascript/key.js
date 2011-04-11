@@ -2,7 +2,7 @@ function keyDoChoice(id) {
 
 	addFormVal('choice',id);
 	addFormVal('step',null);
-	goForm();
+	goForm('../key/');
 
 }
 
@@ -10,7 +10,7 @@ function keyDoStep(id) {
 
 	addFormVal('choice',null);
 	addFormVal('step',id);
-	goForm();
+	goForm('../key/');
 
 }
 

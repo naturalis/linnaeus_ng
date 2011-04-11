@@ -158,7 +158,7 @@ class Controller extends BaseClass
 
 		}	
 
-		return $d;
+		return isset($d) ? $d : null;
 	
 	}
 
@@ -384,7 +384,7 @@ class Controller extends BaseClass
 	public function getTaxonById($id)
 	{
 
-		if (!isset($_SESSION['user']['species']['taxon']) ||
+		if (!isset($_SESSION['user']['species']['taxon']['id']) ||
 			$_SESSION['user']['species']['taxon']['id']!=$id) {
 
 			$t = $this->models->Taxon->_get(
@@ -1636,7 +1636,7 @@ class Controller extends BaseClass
 				)
 			);
 
-			$_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge($terms,$synonyms);
+			$_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array)$terms,(array)$synonyms);
 
 		}
 

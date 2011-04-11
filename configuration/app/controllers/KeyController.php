@@ -308,7 +308,7 @@ class KeyController extends Controller
 					)
 				)
 			);
-	
+
 			// for each...
 			foreach((array)$ck as $key => $val) {
 	
@@ -316,24 +316,27 @@ class KeyController extends Controller
 				
 				// ...work our way back to the top-most step...
 				$this->setStepsPerTaxon($val);
-				
+
 				/// ...and save the results
-				$results[$val['res_taxon_id']] =  $this->_taxaStepList;
-	
+				$results[] =  array(
+					'taxon_id' => $val['res_taxon_id'],
+					'steps' => $this->_taxaStepList
+				);
+
 			}
 
 			if (isset($results)) {
 	
 				// turn it from a list of taxa with their steps into a list of steps with their taxa
-				foreach((array)$results as $taxonId => $stepIds) {
+				foreach((array)$results as $key => $val) {
+
+					foreach($val['steps'] as $key2 => $stepId) {
+
+						if (!isset($d[$stepId][$val['taxon_id']])) {
+
+							$d[$stepId][$val['taxon_id']] = true;
 		
-					foreach($stepIds as $key2 => $stepId) {
-		
-						if (!isset($d[$stepId][$taxonId])) {
-		
-							$d[$stepId][$taxonId] = true;
-		
-							$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
+							$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$val['taxon_id']));
 		
 						}
 		
@@ -369,6 +372,89 @@ class KeyController extends Controller
 			)
 		);
 		
+		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
+	
+	}
+
+	/*
+	// works only if each taxon appears only once in the key
+	private function getTaxonDivisionOriginal($forceLookup=false)
+	{
+
+		if(!isset($_SESSION['user']['key']['taxonDivision']) || $forceLookup) {
+
+			// get all choices that have a taxon as result
+			$ck = $this->models->ChoiceKeystep->_get(
+				array('id' => 
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_taxon_id is not' => 'null'
+					)
+				)
+			);
+
+			// for each...
+			foreach((array)$ck as $key => $val) {
+	
+				unset($this->_taxaStepList);
+				
+				// ...work our way back to the top-most step...
+				$this->setStepsPerTaxon($val);
+
+				/// ...and save the results
+//				$results[$val['res_taxon_id']] =  $this->_taxaStepList;
+				$results[] =  $this->_taxaStepList;
+	
+			}
+
+			if (isset($results)) {
+	
+				// turn it from a list of taxa with their steps into a list of steps with their taxa
+				foreach((array)$results as $taxonId => $stepIds) {
+//				foreach((array)$results as $taxonId => $stepIds) {
+		
+					foreach($stepIds as $key2 => $stepId) {
+		
+						if (!isset($d[$stepId][$taxonId])) {
+		
+							$d[$stepId][$taxonId] = true;
+		
+							$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
+		
+						}
+		
+					}
+		
+				}
+	
+			}
+
+			$_SESSION['user']['key']['taxonDivision'] = array(
+				'list' => isset($list) ? $list : null,
+				'taxonCount' => isset($ck) ? count($ck) : 0
+			);
+		
+		}
+
+		return $_SESSION['user']['key']['taxonDivision'];
+
+	}
+
+	private function setStepsPerTaxonOriginal($choice)
+	{
+
+		$this->_taxaStepList[] = $choice['keystep_id'];
+
+		// get choices that have the keystep the choice belongs to as target
+		$cks = $this->models->ChoiceKeystep->_get(
+			array('id' => 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'res_keystep_id' => $choice['keystep_id']
+				)
+			)
+		);
+		
 		foreach((array)$cks as $key => $val) {
 		
 			$this->setStepsPerTaxon($val);
@@ -376,6 +462,7 @@ class KeyController extends Controller
 		}
 	
 	}
+	*/
 
 	private function resetKeyPath()
 	{

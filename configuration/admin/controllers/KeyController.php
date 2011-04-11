@@ -774,11 +774,7 @@ class KeyController extends Controller
 			)
 		);
 		
-		foreach((array)$cks as $key => $val) {
-		
-			$this->setStepsPerTaxon($val);
-
-		}
+		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
 	
 	}
 
@@ -804,22 +800,25 @@ class KeyController extends Controller
 			$this->setStepsPerTaxon($val);
 			
 			/// ...and save the results
-			$results[$val['res_taxon_id']] =  $this->_taxaStepList;
+			$results[] =  array(
+				'taxon_id' => $val['res_taxon_id'],
+				'steps' => $this->_taxaStepList
+			);
 
 		}
 
 		if (isset($results)) {
 
 			// turn it from a list of taxa with their steps into a list of steps with their taxa
-			foreach((array)$results as $taxonId => $stepIds) {
+			foreach((array)$results as $key => $val) {
+
+				foreach($val['steps'] as $key2 => $stepId) {
+
+					if (!isset($d[$stepId][$val['taxon_id']])) {
+
+						$d[$stepId][$val['taxon_id']] = true;
 	
-				foreach($stepIds as $key2 => $stepId) {
-	
-					if (!isset($d[$stepId][$taxonId])) {
-	
-						$d[$stepId][$taxonId] = true;
-	
-						$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$taxonId));
+						$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$val['taxon_id']));
 	
 					}
 	

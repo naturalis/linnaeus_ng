@@ -497,7 +497,7 @@ class ImportController extends Controller
 
 				if (isset($failed)) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed matrix:<br />'.$val['cause']);
+					foreach ((array)$failed as $val) $this->addError('Failed in matrix:<br />'.$val['cause']);
 
 				}
 
@@ -1496,6 +1496,8 @@ class ImportController extends Controller
 	private function createKeyStepChoices($step,$stepIds,$species)
 	{
 
+		$paths = $this->makePaths($this->getNewProjectId());
+
 		if ($step->text_choice) {
 			$choices = $step->text_choice;
 		} else {
@@ -1524,10 +1526,20 @@ class ImportController extends Controller
 
 			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
 
-			if ($fileName && !file_exists($this->pathMedia.$fileName))
+			if ($fileName && !file_exists($this->pathMedia.$fileName)) {
+
 				$error[] = array(
 					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
 				);
+				
+				$fileName = null;
+
+			} else
+			if ($fileName) {
+
+				$this->cRename($this->pathMedia.$fileName,$paths['project_media'].$fileName);
+
+			}
 
 			$this->models->ChoiceKeystep->save(
 				array(
@@ -1637,7 +1649,7 @@ class ImportController extends Controller
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' =>  current($keyStepIds),
-					'show_order' => 0,
+					'show_order' => 1,
 					'res_keystep_id' => $firstTxtStepId
 				)
 			);
@@ -1657,7 +1669,7 @@ class ImportController extends Controller
 					'id' => 'null',
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' =>  current($keyStepIds),
-					'show_order' => 0,
+					'show_order' => 2,
 					'res_keystep_id' => $firstPictStepId
 				)
 			);
@@ -1903,7 +1915,7 @@ class ImportController extends Controller
 			if ($matrixname) {
 
 				if (isset($species[(string)$val->name]['id'])) {
-	
+
 					$taxonid = $species[(string)$val->name]['id'];
 
 					foreach($val->identify->id_file->characters->character_ as $char) {
@@ -1959,20 +1971,20 @@ class ImportController extends Controller
 	
 					}
 	
+				} else {
+	
+					$failed[] = array(
+						'cause' => 'species "'.(string)$val->name.'" in identifyit does not exist and has been discarded',
+						'data' => (string)$val->name
+					);
+	
 				}
 
-			} else {
-
-				$failed[] = array(
-					'cause' => 'species referenced in identifyit does not exist in the main tree and has been discarded',
-					'data' => (string)$val->name
-				);
-
-			}
+			} // not part of any matrix
 
 		}
 
-		return $failed;
+		return isset($failed) ? $failed : null;
 
 	}
 
