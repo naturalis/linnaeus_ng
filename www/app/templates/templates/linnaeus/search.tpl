@@ -16,10 +16,10 @@
 {if $results.species.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.species.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:
 		{/if}
 		<span class="result" onclick="goTaxon({$v.taxon_id}{if $v.cat},'{$v.cat}'{/if})">
@@ -37,10 +37,10 @@
 {if $results.glossary.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.glossary.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goGlossaryTerm({$v.id})">
 			{if $v.term && $v.term!=$v.label}{$v.term}: {/if}
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
@@ -56,10 +56,10 @@
 {if $results.literature.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.literature.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goLiterature({$v.id})">
 			{h search=$search}{$v.author_full} ({$v.year}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span><br/>
@@ -73,10 +73,10 @@
 {if $results.dichkey.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.dichkey.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span>
 			{if $v.label}{t}Step{/t} {$v.number}:{h search=$search} {$v.label}{/h}
 			{elseif $v.content}{t}Step{/t} {$v.number} ("{$v.title}"){if $v.marker}, {t}choice{/t} {$v.marker}{/if}: "{foundContent search=$search}{$v.content}{/foundContent}"
@@ -93,10 +93,10 @@
 {if $results.matrixkey.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.matrixkey.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span {if !$v.matrices && $v.matrix_id}class="result" onclick="goMatrix({$v.matrix_id}){/if}">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
 			{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
@@ -114,10 +114,10 @@
 {if $results.map.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.map.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goMap({$v.id})">{h search=$search}{$v.content}{/h}</span> ({$v.number} occurrences)<br/>
 		{/foreach}
 	</div>
@@ -129,10 +129,10 @@
 {if $results.modules.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.modules.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goModuleTopic({$v.page_id},{$v.module_id})">
 			{if $v.label}{h search=$search}{$v.label}{/h}
 			{elseif $v.content}{$v.topic}: "{foundContent search=$search}{$v.content}{/foundContent}"
@@ -148,10 +148,10 @@
 {if $results.content.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.content.results key=cat item=res}
-	{if $res|@count>0}
+	{if $res.data|@count>0}
 	<div class="subset">
-		<div class="set-header">{$res|@count} {t}in{/t} {$cat|@strtolower}</div>
-		{foreach from=$res key=k item=v}
+		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
+		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goContent({$v.id})">
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span><br/>

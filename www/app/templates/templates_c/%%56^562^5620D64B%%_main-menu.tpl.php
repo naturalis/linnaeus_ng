@@ -1,9 +1,10 @@
-<?php /* Smarty version 2.6.26, created on 2011-04-11 23:47:18
+<?php /* Smarty version 2.6.26, created on 2011-04-12 17:20:20
          compiled from ../shared/_main-menu.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/_main-menu.tpl', 6, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared/_main-menu.tpl', 7, false),)), $this); ?>
 <div id="menu-container">
 	<div id="main-menu">
+<?php $this->assign('first', true); ?>
 <?php $_from = $this->_tpl_vars['menu']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
@@ -12,20 +13,24 @@ smarty_core_load_plugins(array('plugins' => array(array('block', 't', '../shared
 <a class="menu-item-active" href="../<?php echo $this->_tpl_vars['v']['controller']; ?>
 /"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?><?php echo $this->_tpl_vars['v']['module']; ?>
 <?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></a>
+<?php $this->assign('first', false); ?>
 <?php else: ?>
 <a class="menu-item" href="../<?php echo $this->_tpl_vars['v']['controller']; ?>
 /"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?><?php echo $this->_tpl_vars['v']['module']; ?>
 <?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></a>
+<?php $this->assign('first', false); ?>
 <?php endif; ?>
 <?php elseif ($this->_tpl_vars['v']['module'] != 'Introduction'): ?>
 <?php if ($this->_tpl_vars['v']['id'] == $this->_tpl_vars['module']['id']): ?>
 <span class="menu-item-active" onclick="goMenuModule(<?php echo $this->_tpl_vars['v']['id']; ?>
 );"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?><?php echo $this->_tpl_vars['v']['module']; ?>
 <?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
+<?php $this->assign('first', false); ?>
 <?php else: ?>
 <span class="menu-item" onclick="goMenuModule(<?php echo $this->_tpl_vars['v']['id']; ?>
 );"><?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?><?php echo $this->_tpl_vars['v']['module']; ?>
 <?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?></span>
+<?php $this->assign('first', false); ?>
 <?php endif; ?>
 <?php endif; ?>
 <?php endforeach; endif; unset($_from); ?>

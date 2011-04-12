@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-03-31 13:03:11
+<?php /* Smarty version 2.6.26, created on 2011-04-12 16:03:39
          compiled from search.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'strlen', 'search.tpl', 4, false),array('modifier', 'replace', 'search.tpl', 8, false),array('modifier', 'count', 'search.tpl', 19, false),array('modifier', 'strtolower', 'search.tpl', 21, false),array('block', 't', 'search.tpl', 8, false),array('block', 'h', 'search.tpl', 26, false),array('block', 'foundContent', 'search.tpl', 27, false),)), $this); ?>
@@ -26,12 +26,12 @@ unset($_smarty_tpl_vars);
 	<?php $_from = $this->_tpl_vars['results']['species']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<?php if ($this->_tpl_vars['results']['species']['taxonList'][$this->_tpl_vars['v']['taxon_id']] && $this->_tpl_vars['results']['species']['taxonList'][$this->_tpl_vars['v']['taxon_id']]['taxon'] !== $this->_tpl_vars['v']['label']): ?><?php echo $this->_tpl_vars['results']['species']['taxonList'][$this->_tpl_vars['v']['taxon_id']]['taxon']; ?>
@@ -59,12 +59,12 @@ unset($_smarty_tpl_vars);
 	<?php $_from = $this->_tpl_vars['results']['glossary']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span class="result" onclick="goGlossaryTerm(<?php echo $this->_tpl_vars['v']['id']; ?>
@@ -89,12 +89,12 @@ unset($_smarty_tpl_vars);
 	<?php $_from = $this->_tpl_vars['results']['literature']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span class="result" onclick="goLiterature(<?php echo $this->_tpl_vars['v']['id']; ?>
@@ -116,12 +116,12 @@ unset($_smarty_tpl_vars);
 	<?php $_from = $this->_tpl_vars['results']['dichkey']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span>
@@ -148,12 +148,12 @@ unset($_smarty_tpl_vars);
 	<?php $_from = $this->_tpl_vars['results']['matrixkey']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span <?php if (! $this->_tpl_vars['v']['matrices'] && $this->_tpl_vars['v']['matrix_id']): ?>class="result" onclick="goMatrix(<?php echo $this->_tpl_vars['v']['matrix_id']; ?>
@@ -185,12 +185,12 @@ if ($this->_foreach['matrices']['total'] > 0):
 	<?php $_from = $this->_tpl_vars['results']['map']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span class="result" onclick="goMap(<?php echo $this->_tpl_vars['v']['id']; ?>
@@ -209,12 +209,12 @@ if ($this->_foreach['matrices']['total'] > 0):
 	<?php $_from = $this->_tpl_vars['results']['modules']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span class="result" onclick="goModuleTopic(<?php echo $this->_tpl_vars['v']['page_id']; ?>
@@ -239,12 +239,12 @@ if ($this->_foreach['matrices']['total'] > 0):
 	<?php $_from = $this->_tpl_vars['results']['content']['results']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['cat'] => $this->_tpl_vars['res']):
 ?>
-	<?php if (count($this->_tpl_vars['res']) > 0): ?>
+	<?php if (count($this->_tpl_vars['res']['data']) > 0): ?>
 	<div class="subset">
-		<div class="set-header"><?php echo count($this->_tpl_vars['res']); ?>
- <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['cat']); ?>
+		<div class="set-header"><?php echo count($this->_tpl_vars['res']['data']); ?>
+ <?php $this->_tag_stack[] = array('t', array()); $_block_repeat=true;$this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], null, $this, $_block_repeat);while ($_block_repeat) { ob_start(); ?>in<?php $_block_content = ob_get_contents(); ob_end_clean(); $_block_repeat=false;echo $this->_plugins['block']['t'][0][0]->smartyTranslate($this->_tag_stack[count($this->_tag_stack)-1][1], $_block_content, $this, $_block_repeat); }  array_pop($this->_tag_stack); ?> <?php echo strtolower($this->_tpl_vars['res']['label']); ?>
 </div>
-		<?php $_from = $this->_tpl_vars['res']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
+		<?php $_from = $this->_tpl_vars['res']['data']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['k'] => $this->_tpl_vars['v']):
 ?>
 		<span class="result" onclick="goContent(<?php echo $this->_tpl_vars['v']['id']; ?>
