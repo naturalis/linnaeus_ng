@@ -119,9 +119,53 @@ class Controller extends BaseClass
 	public function checkForProjectId ()
 	{
 	
+		if ($this->rHasVal('p')) $this->resolveProjectId();
+	
 		$d = $this->getCurrentProjectId();
 		
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
+	
+	}
+
+	public function resolveProjectId()
+	{
+	
+		if (!$this->rHasVal('p')) $this->setCurrentProjectId(null);
+
+		if (is_numeric($this->requestData['p'])) {
+
+			$p = $this->models->Project->_get(
+				array(
+					'id' => $this->requestData['p']
+				)			
+			);
+			
+			if (!$p)
+				$this->setCurrentProjectId(null);
+			else
+				$this->setCurrentProjectId(intval($this->requestData['p']));
+
+		} else {
+
+			$pName = str_replace('_',' ',strtolower($this->requestData['p']));
+
+			$p = $this->models->Project->_get(
+				array(
+					'id' => array('sys_name' => $pName)
+				)			
+			);
+
+			if (!$p[0]) {
+
+				$this->setCurrentProjectId(null);
+
+			} else {
+
+				$this->setCurrentProjectId(intval($p[0]['id']));
+
+			}
+
+		}
 	
 	}
 
@@ -1078,6 +1122,20 @@ class Controller extends BaseClass
 
     }
 
+	private function getProjectDependentTemplates()
+	{
+
+		$r = null;
+		
+		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['project']['id']). '/';
+		
+		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
+		if (file_exists($d.'_header-container.tpl')) $r['header_container'] = $d.'_header-container.tpl';
+
+		return $r;
+
+	}
+
 
     /**
      * Assigns basic Smarty variables
@@ -1093,6 +1151,8 @@ class Controller extends BaseClass
 
 		$this->smarty->assign('menu',$this->getMainMenu());
  
+		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
+	 
 //        $this->setBreadcrumbs();
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('requestData', $this->requestData);
@@ -1294,7 +1354,7 @@ class Controller extends BaseClass
         
         /* DEBUG */
         $this->smarty->force_compile = true;
-        
+
         $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
@@ -1303,7 +1363,7 @@ class Controller extends BaseClass
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
 
 		$this->smarty->register_block('t', array(&$this,'smartyTranslate'));
-
+		
     }
 
 

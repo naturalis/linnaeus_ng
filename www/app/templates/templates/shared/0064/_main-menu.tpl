@@ -4,18 +4,27 @@
 {foreach from=$menu key=k item=v}
 {if $v.type=='regular' && $v.module!='Introduction'}
 {if $v.controller == $controllerBaseName}
-<a class="menu-item-active" href="../{$v.controller}/">{t}{$v.module}{/t}</a>
+<div class="menu-item-container-active">
+<span class="menu-active-indicator"><a class="menu-item-active" href="../{$v.controller}/">{t}{$v.module}{/t}</a></span><br />
+</div>
 {assign var=first value=false}
 {else}
-<a class="menu-item" href="../{$v.controller}/">{t}{$v.module}{/t}</a>
+<div class="menu-item-container">
+<a class="menu-item" href="../{$v.controller}/">{t}{$v.module}{/t}</a><br />
+</div>
 {assign var=first value=false}
 {/if}
 {elseif $v.module!='Introduction'}
+{if !$first}<span class="menu-separator">|</span>{/if}
 {if $v.id == $module.id}
-<span class="menu-item-active" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
+<div class="menu-item-container-active">
+<span class="menu-active-indicator"><span class="menu-item-active" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span></span><br />
+</div>
 {assign var=first value=false}
 {else}
-<span class="menu-item" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
+<div class="menu-item-container">
+<span class="menu-item" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span><br />
+</div>
 {assign var=first value=false}
 {/if}
 {/if}

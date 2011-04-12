@@ -39,7 +39,7 @@ class LinnaeusController extends Controller
 	public $cssToLoad = array('basics.css','search.css');
 
 	public $jsToLoad = array('all' => array(
-		'main.js'
+		'main.js','speciesdetailpage10.js'
 	));
 
 
@@ -83,6 +83,7 @@ class LinnaeusController extends Controller
     {
 
 		unset($_SESSION['project']);
+		unset($_SESSION['user']);
 
 		$this->resolveProjectId();
 
@@ -200,14 +201,9 @@ class LinnaeusController extends Controller
 
 	}
 
-    /**
-     * Index of project: introduction
-     *
-     * @access    public
-     */
     public function searchAction ()
-    {
-
+	{
+	
 		if (isset($_SESSION['user']['search']['redo']) && $_SESSION['user']['search']['redo']==true) {
 		
 			$this->requestData['search'] = $_SESSION['user']['search']['lastSearch'];
@@ -216,12 +212,64 @@ class LinnaeusController extends Controller
 
 		}
 
+		$results = $this->_searchAction();
+
+		$this->smarty->assign('results',$results);
+
+		$this->showBackToSearch = false;
+
+		$this->smarty->assign('search',$this->requestData['search']);
+	
+		$this->smarty->register_block('h', array(&$this,'highlightFound'));
+
+		$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
+
+        $this->printPage();
+	
+	}
+
+    public function rSearchAction ()
+	{
+
+		if ($this->rHasVal('l')) $this->setCurrentLanguageId($this->requestData['l']);
+
+		$results = $this->_searchAction();
+
+		foreach((array)$results['species']['results'] as $key => $val) {
+
+			if ($val['label']=='Species descriptions') {
+
+				foreach((array)$val['data'] as $sKey => $sVal) {
+				
+					$d = $this->getTaxonById($sVal['taxon_id']);
+					if ($d) $results['species']['results'][$key]['data'][$sKey]['taxon'] = $d['taxon'];
+
+				}
+
+			}
+
+		}
+
+		$this->smarty->assign('results',json_encode($results));
+
+        $this->printPage();
+	
+	}
+
+    /**
+     * Index of project: introduction
+     *
+     * @access    public
+     */
+    private function _searchAction ()
+    {
+
 		if ($this->rHasVal('search')) {
 
 			if (strlen($this->requestData['search'])>2) { 
 			
-				if (1==1 || !isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']])) {
-		
+				if (!isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']])) {
+
 					$results = $this->doSearch($this->requestData['search']);
 		
 					$results['numOfResults'] =
@@ -246,12 +294,14 @@ class LinnaeusController extends Controller
 				$_SESSION['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
 				$_SESSION['user']['search']['lastSearch'] = $this->requestData['search'];
 					
-				$this->smarty->assign('results',$results);
+				return $results;
 	
 
 			} else {
 			
 				$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),3));
+				
+				return null;
 			
 			}
 
@@ -259,17 +309,10 @@ class LinnaeusController extends Controller
 
 			unset($_SESSION['user']['search'][$this->requestData['search']]['results']);
 
+			return null;
+
 		}
 
-		$this->showBackToSearch = false;
-
-		$this->smarty->assign('search',$this->requestData['search']);
-	
-		$this->smarty->register_block('h', array(&$this,'highlightFound'));
-
-		$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
-
-        $this->printPage();
   
     }
 
@@ -327,48 +370,6 @@ class LinnaeusController extends Controller
 			
 		);
 
-	}
-
-	private function resolveProjectId()
-	{
-	
-		if (!$this->rHasVal('p')) $this->setCurrentProjectId(null);
-
-		if (is_numeric($this->requestData['p'])) {
-
-			$p = $this->models->Project->_get(
-				array(
-					'id' => $this->requestData['p']
-				)			
-			);
-			
-			if (!$p)
-				$this->setCurrentProjectId(null);
-			else
-				$this->setCurrentProjectId(intval($this->requestData['p']));
-
-		} else {
-
-			$pName = str_replace('_',' ',strtolower($this->requestData['p']));
-
-			$p = $this->models->Project->_get(
-				array(
-					'id' => array('sys_name' => $pName)
-				)			
-			);
-
-			if (!$p[0]) {
-
-				$this->setCurrentProjectId(null);
-
-			} else {
-
-				$this->setCurrentProjectId(intval($p[0]['id']));
-
-			}
-
-		}
-	
 	}
 	
 	private function getContent($sub=null,$id=null)
@@ -566,11 +567,26 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Species names') => $taxa, // when changing the label 'Species names', do the same in searchMap()
-				_('Species descriptions') => $content,
-				_('Species synonyms') => $synonyms,
-				_('Species common names') => $commonnames,
-				_('Species media') => $media,
+				array(
+					'label' => _('Species names'),
+					'data' => $taxa, // when changing the label 'Species names', do the same in searchMap()
+				),
+				array(
+					'label' => _('Species descriptions'),
+					'data' => $content
+				),
+				array(
+					'label' => _('Species synonyms'),
+					'data' => $synonyms
+				),
+				array(
+					'label' => _('Species common names'),
+					'data' => $commonnames
+				),
+				array(
+					'label' => _('Species media'),
+					'data' => $media
+				),
 			),
 			'taxonList' => $this->maxeTaxonList($d),
 			'categoryList' => $this->makeCategoryList(),
@@ -624,8 +640,12 @@ class LinnaeusController extends Controller
 
 		}
 
+		$r = null;
+		if (isset($results))
+			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val );
+
 		return array(
-			'results' => isset($results) ? $results : null,
+			'results' => isset($r) ? $r : null,
 			'numOfResults' => count((array)$content)
 		);
 
@@ -749,9 +769,18 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Matrix key matrices') => $matrices,
-				_('Matrix key characteristics') => $characteristics,
-				_('Matrix key states') => $states
+				array(
+					'label' => _('Matrix key matrices'),
+					'data' => $matrices
+				),
+				array(
+					'label' => _('Matrix key characteristics'),
+					'data' => $characteristics
+				),
+				array(
+					'label' => _('Matrix key states'),
+					'data' => $states
+				)
 			),
 			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
 			'matrices' => $matrixNames
@@ -861,8 +890,14 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Dichotomous key steps') => $choices,
-				_('Dichotomous key choices') => $steps
+				array(
+					'label' => _('Dichotomous key steps'),
+					'data' => $choices,
+				),
+				array(
+					'label' => _('Dichotomous key choices'),
+					'data' => $steps
+				)
 			),
 			'numOfResults' => count((array)$choices)+count((array)$steps)
 		);
@@ -952,7 +987,10 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Literary references') => $books,
+				array(
+					'label' => _('Literary references'),
+					'data' => $books
+				)
 			),
 			'numOfResults' => count((array)$books)
 		);
@@ -1049,9 +1087,18 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Glossary terms') => $gloss,
-				_('Glossary synonyms') => $synonyms,
-				_('Glossary media') => $media,
+				array(
+					'label' => _('Glossary terms'),
+					'data' => $gloss
+				),
+				array(
+					'label' => _('Glossary synonyms'),
+					'data' => $synonyms
+				),
+				array(
+					'label' => _('Glossary media'),
+					'data' => $media
+				)
 			),
 			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media)
 		);
@@ -1089,7 +1136,10 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => array(
-				_('Other pages') => $content,
+				array(
+					'label' => _('Other pages'),
+					'data' => $content
+				)
 			),
 			'numOfResults' => count((array)$content)
 		);
@@ -1099,32 +1149,42 @@ class LinnaeusController extends Controller
 	private function searchMap($species)
 	{
 
-		foreach((array)$species['results']['Species names'] as $key => $val) {
+		foreach((array)$species['results'] as $key => $val) {
 		
-			$ot = $this->models->OccurrenceTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $val['taxon_id']
-					),
-					'columns' => 'count(*) as total'
-				)
-			);
-			
-			if ($ot[0]['total']>0) $geo[] =
-				array(
-					'id' => $val['taxon_id'],
-					'content' => $val['label'],
-					'number' => $ot[0]['total']
-				);
+			if ($val['label']=='Species names') {
+
+				foreach((array)$val['data'] as $dKey => $dVal) {
+
+					$ot = $this->models->OccurrenceTaxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon_id' => $dVal['taxon_id']
+							),
+							'columns' => 'count(*) as total'
+						)
+					);
+					
+					if ($ot[0]['total']>0) $geo[] =
+						array(
+							'id' => $dVal['taxon_id'],
+							'content' => $dVal['label'],
+							'number' => $ot[0]['total']
+						);
+				}
+
+			}
 
 		}
 
 		return array(
 			'results' => array(
-				_('geographical data') => $geo,
+				array(
+					'label' => _('geographical data'),
+					'data' => isset($geo) ? $geo : null
+				),
 			),
-			'numOfResults' => count((array)$geo)
+			'numOfResults' => isset($geo) ? count((array)$geo) : 0
 		);
 
 	}

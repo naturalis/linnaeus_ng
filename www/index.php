@@ -39,13 +39,17 @@
 To use the administration, follow <a href="admin/views/users/login.php">this link</a>.<br />
 To use an application, follow one of the following links:<br />
 <ul>
-<li><a href="app/views/linnaeus/set_project.php?p=imaginary_beings">Imaginary Beings Of The Literary World</a></li>
-<li><a href="app/views/linnaeus/set_project.php?p=1">Polar Bears Of Amsterdam</a></li>
-<li><a href="app/views/linnaeus/set_project.php?p=5">Lemuren</a></li>
-<li><a href="app/views/linnaeus/set_project.php?p=62">TanBIF</a></li>
+<li><span class="pseudo-a" onclick="$('#p').val('imaginary_beings');$('#theForm').submit();">Imaginary Beings Of The Literary World</span></li>
+<li><span class="pseudo-a" onclick="$('#p').val('1');$('#theForm').submit();">Polar Bears Of Amsterdam</span></li>
+<li><span class="pseudo-a" onclick="$('#p').val('5');$('#theForm').submit();">Lemuren</span></li>
+<li><span class="pseudo-a" onclick="$('#p').val('64');$('#theForm').submit();">TanBIF</span></li>
 </ul>
 <br />
 </div>
+<form method="post" id="theForm" action="app/views/linnaeus/set_project.php">
+<input type="hidden" name="p" id="p" value="" />
+<input type="hidden" name="r" value="<?php echo uniqid(null,true); ?>" />
+</form>
 
 </div ends="page-container">
 <div id="footer-container"></div ends="footer-container">

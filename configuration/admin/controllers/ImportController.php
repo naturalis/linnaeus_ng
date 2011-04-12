@@ -72,9 +72,6 @@ include_once ('Controller.php');
 class ImportController extends Controller
 {
 
-    public $pathMedia = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\images\tanbif_linnaeus\pictures\\';
-    public $pathThumbs = 'C:\Users\maarten\Desktop\Tanbif_linnaeus\images\tanbif_linnaeus\thumbs\\';
-
     public $usedModels = array(
 		'content_taxon',
 		'page_taxon', 
@@ -141,6 +138,8 @@ class ImportController extends Controller
     public function indexAction()
     {
     
+        $this->setPageName(_('Data import options'));
+	
         $this->printPage();
     
     }
@@ -493,11 +492,17 @@ class ImportController extends Controller
 
 				$m = $this->saveMatrices($m);
 
-				$failed = $this->connectMatrices($d,$m,$species);
+				if (isset($m['failed'])) {
+
+					foreach ((array)$m['failed'] as $val) $this->addError('Error in matrix:<br />'.$val['cause']);
+
+				}
+
+				$failed = $this->connectMatrices($d,$m['matrices'],$species);
 
 				if (isset($failed)) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed in matrix:<br />'.$val['cause']);
+					foreach ((array)$failed as $val) $this->addError('Error in matrix:<br />'.$val['cause']);
 
 				}
 
@@ -1201,7 +1206,7 @@ class ImportController extends Controller
 				return array(
 					'saved' => true,
 					'filename' => $fileName,
-					'full_path' => $this->pathMedia.$fileName,
+					'full_path' => $_SESSION['system']['import']['imagePath'].$fileName,
 					'thumb' => isset($thumbName) ? $thumbName : null,
 					'thumb_path' => isset($thumbName) ? $_SESSION['system']['import']['thumbsPath'].$thumbName : null
 				);
@@ -1526,7 +1531,7 @@ class ImportController extends Controller
 
 			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
 
-			if ($fileName && !file_exists($this->pathMedia.$fileName)) {
+			if ($fileName && !file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
 
 				$error[] = array(
 					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
@@ -1537,7 +1542,7 @@ class ImportController extends Controller
 			} else
 			if ($fileName) {
 
-				$this->cRename($this->pathMedia.$fileName,$paths['project_media'].$fileName);
+				$this->cRename($_SESSION['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
 
 			}
 
@@ -1804,7 +1809,9 @@ class ImportController extends Controller
 	private function saveMatrices($m)
 	{
 
-		$d = null;
+		$paths = $this->makePaths($this->getNewProjectId());
+		
+		$d = $error = null;
 
 		foreach((array) $m as $key => $val) {
 
@@ -1863,12 +1870,29 @@ class ImportController extends Controller
 
 				foreach((array)$cVal['states'] as $sKey => $sVal) {
 
+					$fileName = isset($sVal['statefile']) ? $sVal['statefile'] : null;
+		
+					if ($fileName && !file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
+		
+						$error[] = array(
+							'cause' => 'Matrix state image "'.$fileName.'" does not exist (state created anyway)'
+						);
+
+						$fileName = null;
+		
+					} else
+					if ($fileName) {
+		
+						$this->cRename($_SESSION['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+		
+					}
+
 					$c = $this->models->CharacteristicState->save(
 						array(
 							'id' => 'null',
 							'project_id' => $this->getNewProjectId(),
 							'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
-							'file_name' => isset($sVal['statefile']) ? $sVal['statefile'] : null,
+							'file_name' => $fileName,
 							'lower' => isset($sVal['statemin']) ? $sVal['statemin'] : null,
 							'upper' => isset($sVal['statemax']) ? $sVal['statemax'] : null,
 							'mean' => isset($sVal['statemean']) ? $sVal['statemean'] : null,
@@ -1901,7 +1925,10 @@ class ImportController extends Controller
 
 		}
 
-		return $d; //$m;
+		return array(
+			'matrices' => $d,
+			'failed' => $error
+		);
 
 	}
 
