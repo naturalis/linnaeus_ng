@@ -1125,12 +1125,15 @@ class Controller extends BaseClass
 	private function getProjectDependentTemplates()
 	{
 
+		if (!isset($_SESSION['project']['id'])) return null;
+
 		$r = null;
 		
 		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['project']['id']). '/';
 		
 		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
 		if (file_exists($d.'_header-container.tpl')) $r['header_container'] = $d.'_header-container.tpl';
+		if (file_exists($d.'_footer.tpl')) $r['footer'] = $d.'_footer.tpl';
 
 		return $r;
 
