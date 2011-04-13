@@ -5,6 +5,28 @@
 	</div>
 {/if}
 </div>
+
 <div id="tanbif-menu">
-<a href="/index.php" title="Home page" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem_selected" alt="Home page">Home page</span></a><span class="mainmenuseparator">|</span><a href="/search.php" title="Search" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Search">Search</span></a><span class="mainmenuseparator">|</span><a href="/lin2/tanbif_linnaeus.php?menuentry=zoeken" title="Browse species" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Browse species">Browse species</span></a><span class="mainmenuseparator">|</span><a href="/lin2/tanbif_linnaeus.php?menuentry=sleutel" title="Identify" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Identify">Identify</span></a><span class="mainmenuseparator">|</span><a href="/news.php" title="Biodiversity news" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Biodiversity news">Biodiversity news</span></a><span class="mainmenuseparator">|</span><a href="/forum/index.php" title="Forum" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Forum">Forum</span></a><span class="mainmenuseparator">|</span><a href="/gallery.php" title="Gallery" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Gallery">Gallery</span></a><span class="mainmenuseparator">|</span><a href="/contentpage.php?cat=bio-facts" title="Bio facts" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Bio facts">Bio facts</span></a><span class="mainmenuseparator">|</span><a href="/contentpage.php?cat=partners" title="Partners" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="Partners">Partners</span></a><span class="mainmenuseparator">|</span><a href="/contentpage.php?cat=about-tanbif" title="About TanBIF" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="About TanBIF">About TanBIF</a><span class="mainmenuseparator">|</span><a href="/gbifwidget.php" title="GBIF Widget" style="text-decoration: none; color: rgb(66, 80, 155);"><span class="mainmenuitem" alt="GBIF Widget">GBIF Widget</span></a><span class="mainmenuseparator"></span>
+<a href="/index.php" title="Home page"><span class="mainmenuitem" alt="Home page">Home page</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/search.php" title="Search"><span class="mainmenuitem" alt="Search">Search</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/app/views/species/" title="Browse species"><span class="mainmenuitem{if $controllerBaseName=='species'}_selected{/if}" alt="Browse species">Browse species</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/app/views/matrixkey/" title="Identify"><span class="mainmenuitem{if $controllerBaseName=='matrixkey'}_selected{/if}" alt="Identify">Identify</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/news.php" title="Biodiversity news"><span class="mainmenuitem" alt="Biodiversity news">Biodiversity news</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/forum/index.php" title="Forum"><span class="mainmenuitem" alt="Forum">Forum</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/gallery.php" title="Gallery"><span class="mainmenuitem" alt="Gallery">Gallery</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=bio-facts" title="Bio facts"><span class="mainmenuitem" alt="Bio facts">Bio facts</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=partners" title="Partners"><span class="mainmenuitem" alt="Partners">Partners</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=about-tanbif" title="About TanBIF"><span class="mainmenuitem" alt="About TanBIF">About TanBIF</a>
+<span class="mainmenuseparator">|</span>
+<a href="/gbifwidget.php" title="GBIF Widget"><span class="mainmenuitem" alt="GBIF Widget">GBIF Widget</span></a>
+<span class="mainmenuseparator"></span>
 </div>
