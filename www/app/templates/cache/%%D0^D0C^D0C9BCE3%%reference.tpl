@@ -1,9 +1,9 @@
-340
-a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:24:"../shared/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1302600239;s:7:"expires";i:1302603839;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+652
+a:4:{s:8:"template";a:9:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:109:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_header-container.tpl";b:1;s:102:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:99:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_footer.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1303118148;s:7:"expires";i:1303121748;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>TanBIF species: Literature: "African Publishing Group (International) (2001)"</title>
+	<title>TanBIF species: Literature: "Acere (1984)"</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0064/basics.css");
 		@import url("../../../app/style/0064/literature.css");
@@ -14,24 +14,53 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	
 	<script type="text/javascript" src="../../../app/javascript/main.js"></script>
 </head><body id="body"><form method="post" action="" id="theForm" onsubmit="return checkForm();"><div id="body-container">
-<div id="header-container">
+	<div id="header-container">
 	<div id="image">
 	<a href="../../../app/views/linnaeus/"><img src="../../../admin/media/project/0064/banner_logo_EN.jpg" id="project-logo" /></a>
 	</div>
-	<div id="title">
-	TanBIF species	</div>
-</div><div id="menu-container">
+</div>
+
+<div id="tanbif-menu">
+<a href="/index.php" title="Home page"><span class="mainmenuitem" alt="Home page">Home page</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/search.php" title="Search"><span class="mainmenuitem" alt="Search">Search</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/app/views/species/" title="Browse species"><span class="mainmenuitem" alt="Browse species">Browse species</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/app/views/matrixkey/" title="Identify"><span class="mainmenuitem" alt="Identify">Identify</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/news.php" title="Biodiversity news"><span class="mainmenuitem" alt="Biodiversity news">Biodiversity news</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/forum/index.php" title="Forum"><span class="mainmenuitem" alt="Forum">Forum</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/gallery.php" title="Gallery"><span class="mainmenuitem" alt="Gallery">Gallery</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=bio-facts" title="Bio facts"><span class="mainmenuitem" alt="Bio facts">Bio facts</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=partners" title="Partners"><span class="mainmenuitem" alt="Partners">Partners</span></a>
+<span class="mainmenuseparator">|</span>
+<a href="/contentpage.php?cat=about-tanbif" title="About TanBIF"><span class="mainmenuitem" alt="About TanBIF">About TanBIF</a>
+<span class="mainmenuseparator">|</span>
+<a href="/gbifwidget.php" title="GBIF Widget"><span class="mainmenuitem" alt="GBIF Widget">GBIF Widget</span></a>
+<span class="mainmenuseparator"></span>
+</div>
+	<div id="menu-container">
 	<div id="main-menu">
-<a class="menu-item-active" href="../literature/">Literature</a>
-<span class="menu-separator">|</span>
-<a class="menu-item" href="../species/">Species module</a>
-<span class="menu-separator">|</span>
-<a class="menu-item" href="../highertaxa/">Higher taxa</a>
-<span class="menu-separator">|</span>
-<a class="menu-item" href="../key/">Dichotomous key</a>
-<span class="menu-separator">|</span>
-<a class="menu-item" href="../matrixkey/">Matrix key</a>
-<span class="menu-separator">|</span>
+<div class="menu-item-container-active">
+<span class="menu-active-indicator"><a class="menu-item-active" href="../literature/">Literature</a></span><br />
+</div>
+<div class="menu-item-container">
+<a class="menu-item" href="../species/">Species module</a><br />
+</div>
+<div class="menu-item-container">
+<a class="menu-item" href="../highertaxa/">Higher taxa</a><br />
+</div>
+<div class="menu-item-container">
+<a class="menu-item" href="../key/">Dichotomous key</a><br />
+</div>
+<div class="menu-item-container">
+<a class="menu-item" href="../matrixkey/">Matrix key</a><br />
+</div>
 	</div>
 	<div id="language-change">
 		<input
@@ -48,7 +77,8 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 				<option value="26" selected="selected">English *</option>
 			</select>
 	</div>
-</div><div id="page-container">
+</div>
+<div id="page-container">
 
 <div id="alphabet">
 			<span class="letter-active">a</span>
@@ -70,16 +100,16 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	<div id="reference">
 		<div id="author">
 			<span id="name">
-				African Publishing Group (International)
+				Acere
 			</span>
-			<span id="year">2001</span>
+			<span id="year">1984</span>
 		</div>
-		<div id="text">African Publishing Group (International), (2001). Tanzania National Parks (Arusha). Harare-Zimbabwe.</div>
+		<div id="text">Acere, T. 1984. Observations on the biology, age, growth, maturity and sexuality of Nile perch, *Lates niloticus* (Linne), and the growth of its fishery in the northern waters of Lake Victoria. <i>FAO Fisheries Report</i>, 335: 42-61.</div>
 
 			<div id="taxa">
 			<div class="title">Referenced in the following taxa:</div>
 					<div>
-				<span class="a" onclick="goTaxon(20956)">Papilio dardanus</span>
+				<span class="a" onclick="goTaxon(20876)">Lates niloticus</span>
 							</div>
 				</div>
 		
@@ -92,8 +122,27 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 	</div>
 </div>
 
-</div ends="page-container">
+	</div ends="page-container">
 <div id="footer-container">
+
+					<table border="0" cellspacing="0" cellpadding="0" width="940">
+						<tr>
+
+							<td valign="top">
+								<p class="footerlinks">
+								<a style="color:inherit" href="/tanbif/contentpage.php?cat=about-tanbif&pag=contact">Contact TanBIF</a> | <a style="color:inherit" href="/tanbif/contentpage.php?cat=about-tanbif&pag=help-desk">Help desk</a> | <a style="color:inherit" href="/tanbif/contentpage.php?cat=about-tanbif&pag=disclaimer">Disclaimer</a> | <a style="color:inherit" href="/tanbif/contentpage.php?cat=about-tanbif&pag=credits">Credits</a>
+								</p>
+
+							</td>
+							<td valign="top" align="right">
+								<p class="footerlinks">Site developed by <a href="http://www.eti.uva.nl" target="_blank">ETI BioInformatics</a> with the BioPortal&trade; Toolkit
+								</p>
+							</td>
+						</tr>
+					</table>
+
+
+
 </div ends="footer-container">
 </div ends="body-container">
 <div id="hint-balloon" onmouseout="glossTextOut()" 
@@ -116,10 +165,8 @@ a:4:{s:8:"template";a:7:{s:13:"reference.tpl";b:1;s:19:"../shared/_head.tpl";b:1
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-	$('#body-container').height($(document).height());
-	
 addRequestVar('search','enter search term')
-addRequestVar('id','596')
+addRequestVar('id','604')
 
 })
 

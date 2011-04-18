@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.26, created on 2011-04-13 15:05:40
+<?php /* Smarty version 2.6.26, created on 2011-04-18 11:27:56
          compiled from ../shared/footer.tpl */ ?>
 <?php if ($this->_tpl_vars['customTemplatePaths']['footer']): ?>
 	<?php $_smarty_tpl_vars = $this->_tpl_vars;

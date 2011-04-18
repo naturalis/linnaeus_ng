@@ -39,7 +39,7 @@ var lngBaseURL = '/app/views/';
 var pId = 64;
 
 function getLinnaeusData(url) {
-return;
+
 	ajaxGetData(url);
 
 }
@@ -47,6 +47,105 @@ return;
 function doDataCategory(obj) {
 
 	var s = '';
+
+	for (var i=0;i<obj.results.length;i++) {
+
+		var d = obj.results[i];
+
+		if (d && d.numOfResults> 0) {
+
+			s = s + '<span class="">'+d.label+'</span><br />\n<hr class="">\n';
+
+			for (var j=0;j<d.data.length;j++) {
+				
+				var t = d.data[j];
+				
+				switch(d.label) {
+					
+					case 'Species descriptions':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'species/taxon.php?id='+(t.taxon_id)+'&cat='+(t.cat)+'">'+
+							t.taxon+
+							'</a></span><br />\n';
+						break;
+
+					case 'Species media':
+						s = s + '<span class="">'+
+						'<a href="'+lngBaseURL+'species/taxon.php?id='+(t.taxon_id)+'&cat=media">'+
+						(t.label ? t.label : t.content)+
+						'</a></span><br />\n';
+						break;
+
+					case 'Species names':
+					case 'Species synonyms':
+					case 'Species common names':
+						s = s + '<span class="">'+
+						'<a href="'+lngBaseURL+'species/taxon.php?id='+(t.taxon_id)+'&cat=names">'+
+						t.label+': '+t.taxon_id+
+						'</a></span><br />\n';
+						break;
+
+					case 'Dichotomous key choices':
+					case 'Dichotomous key steps':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'key/">'+
+							(t.label ? t.label : t.content)+
+							'</a></span><br />\n';
+						break;
+
+					case 'Literary references':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'literature/reference.php?id='+t.id+'">'+
+							(t.label ? t.label : t.content)+
+							'</a></span><br />\n';
+						break;
+
+					case 'Glossary terms':
+					case 'Glossary synonyms':
+					case 'Glossary media':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'glossary/term.php?id='+t.id+'">'+
+							(t.term ? t.term : (t.label ? t.label : t.content))+
+							'</a></span><br />\n';
+						break;
+
+					case 'Matrix key matrices':
+					case 'Matrix key characteristics':
+					case 'Matrix key states':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'matrixkey/identify.php">'+
+							(t.name ? t.name : (t.label ? t.label : t.content))+
+							'</a></span><br />\n';
+						break;
+
+					case 'geographical data':
+						s = s +
+							'<span class="">'+
+							'<a href="'+lngBaseURL+'mapkey/">'+
+							(t.label ? t.label : t.content)+
+							'</a></span><br />\n';
+						break;
+				}
+				
+			}
+
+			s = s + '<span class="">&nbsp;</span>\n';
+
+		}
+
+	}
+
+	return s;
+
+
+
+
+
 
 	for (var i=0;i<obj.length;i++) {
 
@@ -57,18 +156,7 @@ function doDataCategory(obj) {
 			for(var j=0;j<d.data.length;j++) {
 
 				if (d.label=='Species descriptions') {
-//					alert(dumpObj(d.data[j]));
 					s = s + 'In the <a href="'+lngBaseURL+'species/taxon.php?p='+pId+'&id='+d.data[j].taxon_id+'">description</a> of "'+d.data[j].taxon+'".<br/>\n';
-/*
-NaN
-undefined	id: 3792
-undefined	taxon_id: 20809
-undefined	content: <i>Giraffa camelopardalis</i> (Linnaeus, 1758)<br /><br />Giraffe<br /><br /><b>Description</b><br />Tallest land mammal, up to 6 meters. Has blotched brown patterning on the body. Wt 500-800 kg.<br /><br /><b>Similar species</b><br />None.<br /><br /><b>Habitat and social behaviour</b><br />Open savanna and bushland. Found in dispersed groups of 2 - 20 animals.<br /><br /><b>Distribution</b><br />http://www.tanzaniamammals.org/uploads/maps/l079_giraffe.jpg<br /><br /><b>IUCN Red List Category:</b> Lower Risk, conservation dependent.
-undefined	cat: 234
-*/
-
-
-
 
 				}
 			}
@@ -84,68 +172,19 @@ undefined	cat: 234
 function doLinnaeusData(content) {
 
 	data = $.parseJSON(content);
-
 	var s = '';
 
-	s = s + doDataCategory(data.species.results);
-	s = s + doDataCategory(data.glossary.results);
-	s = s + doDataCategory(data.literature.results);
-	s = s + doDataCategory(data.dichkey.results);
-	s = s + doDataCategory(data.matrixkey.results);
-	s = s + doDataCategory(data.map.results);
+	s = s + doDataCategory(data.species);
+	s = s + doDataCategory(data.glossary);
+	s = s + doDataCategory(data.literature);
+	s = s + doDataCategory(data.dichkey);
+	s = s + doDataCategory(data.matrixkey);
+	s = s + doDataCategory(data.content);
+	s = s + doDataCategory(data.map);
 	
-	alert(s);
+	$('#general-content').html(s);
 
 }
 
 
 getLinnaeusData(testUrl);
-
-
-
-/*
-// print functions per section
-sectionFunctions = new Array();
-	sectionFunctions[0] = 'printLinks(data,jSONsourceName)';
-
-var maxLinkDisplayLength = 75;
-var first = true;
-
-var htmlLinkData =
-	'<tr><td><div style="margin-top: 0px; margin-bottom: 20px;"><p class="stronglink" style="margin-top: 3px; margin-bottom: 3px;"><span class="nounderline">'+
-	'<a itemtitle="%label%" href="%link%" target="_blank"><img src="images/link.gif" alt="'+texts[10]+'" width="15" border="0" height="9"></a></span>'+
-	'<a itemtitle="%label%" href="%link%" target="_blank">%label%</a></p><p class="smallgray" style="margin-top: 0px; margin-bottom: 2px;">%linkDisplay%</p>'+
-	'<p style="margin-top: 0px; margin-bottom: 0px;">%text%</p></div></td></tr>';
-
-function makeHtmlLinkData(title,link,text) {
-	var linkDisplay = (link.length > maxLinkDisplayLength ? link.substring(0,maxLinkDisplayLength)+'...' : link);
-	return htmlLinkData.replace(/%label%/g,title).replace(/%link%/g,link).replace(/%linkDisplay%/g,linkDisplay).replace(/%text%/g,text);
-}
-
-function printLinks(data,jSONsourceName) {
-	if (data.links == undefined || data.links[0].list.length == 0) return;
-
-	var str = '';
-	for (var i=0;i<data.links[0].list.length;i++) {
-		var dummy = data.links[0].list[i];
-		str = str + makeHtmlLinkData(unescape(dummy.title),unescape(dummy.link),unescape(dummy.text));
-	}
-
-	data.link = data.links[0].link;
-	var sourceData = checkSourceAndLink(data,jSONsourceName);
-
-	document.getElementById('data0').innerHTML =
-		document.getElementById('data0').innerHTML +
-		makeTable(
-			(first == false ? htmlHr : '' )+
-			makeSourceHeader('sect0',0,sourceData[0],sourceData[1]) +
-			str + '<tr><td>' + htmlHr + '</td></tr>'
-		);
-	first = false;
-}
-
-function cleanUp() {
-	var sourceData = new Array();
-	if (document.getElementById('data0').innerHTML=='') document.getElementById('data0').innerHTML = makeTable(texts[0]);
-}
-*/
