@@ -570,22 +570,27 @@ class LinnaeusController extends Controller
 				array(
 					'label' => _('Species names'),
 					'data' => $taxa, // when changing the label 'Species names', do the same in searchMap()
+					'numOfResults' => count((array)$taxa)
 				),
 				array(
 					'label' => _('Species descriptions'),
-					'data' => $content
+					'data' => $content,
+					'numOfResults' => count((array)$content)
 				),
 				array(
 					'label' => _('Species synonyms'),
-					'data' => $synonyms
+					'data' => $synonyms,
+					'numOfResults' => count((array)$synonyms)
 				),
 				array(
 					'label' => _('Species common names'),
-					'data' => $commonnames
+					'data' => $commonnames,
+					'numOfResults' => count((array)$commonnames)
 				),
 				array(
 					'label' => _('Species media'),
-					'data' => $media
+					'data' => $media,
+					'numOfResults' => count((array)$media)
 				),
 			),
 			'taxonList' => $this->maxeTaxonList($d),
@@ -642,7 +647,7 @@ class LinnaeusController extends Controller
 
 		$r = null;
 		if (isset($results))
-			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val );
+			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val, 'numOfResults' => count((array)$val) );
 
 		return array(
 			'results' => isset($r) ? $r : null,
@@ -771,15 +776,18 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('Matrix key matrices'),
-					'data' => $matrices
+					'data' => $matrices,
+					'numOfResults' => count((array)$matrices)
 				),
 				array(
 					'label' => _('Matrix key characteristics'),
-					'data' => $characteristics
+					'data' => $characteristics,
+					'numOfResults' => count((array)$characteristics)
 				),
 				array(
 					'label' => _('Matrix key states'),
-					'data' => $states
+					'data' => $states,
+					'numOfResults' => count((array)$states)
 				)
 			),
 			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
@@ -893,10 +901,12 @@ class LinnaeusController extends Controller
 				array(
 					'label' => _('Dichotomous key steps'),
 					'data' => $choices,
+					'numOfResults' => count((array)$choices)
 				),
 				array(
 					'label' => _('Dichotomous key choices'),
-					'data' => $steps
+					'data' => $steps,
+					'numOfResults' => count((array)$steps)
 				)
 			),
 			'numOfResults' => count((array)$choices)+count((array)$steps)
@@ -989,7 +999,8 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('Literary references'),
-					'data' => $books
+					'data' => $books,
+					'numOfResults' => count((array)$books)
 				)
 			),
 			'numOfResults' => count((array)$books)
@@ -1089,15 +1100,18 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('Glossary terms'),
-					'data' => $gloss
+					'data' => $gloss,
+					'numOfResults' => count((array)$gloss)
 				),
 				array(
 					'label' => _('Glossary synonyms'),
-					'data' => $synonyms
+					'data' => $synonyms,
+					'numOfResults' => count((array)$synonyms)
 				),
 				array(
 					'label' => _('Glossary media'),
-					'data' => $media
+					'data' => $media,
+					'numOfResults' => count((array)$media)
 				)
 			),
 			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media)
@@ -1138,7 +1152,8 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('Other pages'),
-					'data' => $content
+					'data' => $content,
+					'numOfResults' => count((array)$content)
 				)
 			),
 			'numOfResults' => count((array)$content)
@@ -1181,7 +1196,8 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('geographical data'),
-					'data' => isset($geo) ? $geo : null
+					'data' => (isset($geo) ? $geo : null),
+					'numOfResults' => (isset($geo) ? count((array)$geo) : 0)
 				),
 			),
 			'numOfResults' => isset($geo) ? count((array)$geo) : 0

@@ -1,9 +1,9 @@
 647
-a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:109:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_header-container.tpl";b:1;s:102:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:99:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_footer.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1302688905;s:7:"expires";i:1302692505;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25:"../shared/_body-start.tpl";b:1;s:109:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_header-container.tpl";b:1;s:102:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_main-menu.tpl";b:1;s:25:"../shared/_page-start.tpl";b:1;s:20:"../shared/header.tpl";b:1;s:99:"C:/Users/maarten/htdocs/linnaeus ng/linnaeus_ng/www/app/templates/templates/shared/0064/_footer.tpl";b:1;s:20:"../shared/footer.tpl";b:1;}s:9:"timestamp";i:1303117332;s:7:"expires";i:1303120932;s:13:"cache_serials";a:0:{}}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>TanBIF species: Higher taxa: "Squamata" (Classification)</title>
+	<title>TanBIF species: Species module: "Giraffa" (Classification)</title>
 	<style type="text/css" media="all">
 		@import url("../../../app/style/0064/basics.css");
 		@import url("../../../app/style/0064/species.css");
@@ -27,7 +27,7 @@ a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 <span class="mainmenuseparator">|</span>
 <a href="/search.php" title="Search"><span class="mainmenuitem" alt="Search">Search</span></a>
 <span class="mainmenuseparator">|</span>
-<a href="/app/views/species/" title="Browse species"><span class="mainmenuitem" alt="Browse species">Browse species</span></a>
+<a href="/app/views/species/" title="Browse species"><span class="mainmenuitem_selected" alt="Browse species">Browse species</span></a>
 <span class="mainmenuseparator">|</span>
 <a href="/app/views/matrixkey/" title="Identify"><span class="mainmenuitem" alt="Identify">Identify</span></a>
 <span class="mainmenuseparator">|</span>
@@ -51,11 +51,11 @@ a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 <div class="menu-item-container">
 <a class="menu-item" href="../literature/">Literature</a><br />
 </div>
-<div class="menu-item-container">
-<a class="menu-item" href="../species/">Species module</a><br />
-</div>
 <div class="menu-item-container-active">
-<span class="menu-active-indicator"><a class="menu-item-active" href="../highertaxa/">Higher taxa</a></span><br />
+<span class="menu-active-indicator"><a class="menu-item-active" href="../species/">Species module</a></span><br />
+</div>
+<div class="menu-item-container">
+<a class="menu-item" href="../highertaxa/">Higher taxa</a><br />
 </div>
 <div class="menu-item-container">
 <a class="menu-item" href="../key/">Dichotomous key</a><br />
@@ -82,7 +82,7 @@ a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 </div>
 <div id="page-container">
 	<div id="header-titles">
-		<span id="header-title">Squamata</span><br />
+		<span id="header-title">Giraffa</span><br />
 		<span id="header-subtitle"></span>
 	</div>
 
@@ -110,18 +110,26 @@ a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 			<td>(phylum)</td>
 		</tr>
 			<tr>
-			<td class="a" onclick="goHigherTaxon(20656)">Reptilia</td>
+			<td class="a" onclick="goHigherTaxon(20639)">Mammalia</td>
 			<td>(class)</td>
 		</tr>
 			<tr>
-			<td class="current-taxon">Squamata</td>
+			<td class="a" onclick="goHigherTaxon(20653)">Artiodactyla</td>
 			<td>(order)</td>
+		</tr>
+			<tr>
+			<td class="a" onclick="goHigherTaxon(20953)">Papilionoidae</td>
+			<td>(superfamily)</td>
+		</tr>
+			<tr>
+			<td class="current-taxon">Giraffidae</td>
+			<td>(family)</td>
 		</tr>
 		</table>
 </div>
 
 	<div id="navigation">
-		<span id="back" onclick="window.open('../highertaxa/','_self')">back to index</span>
+		<span id="back" onclick="window.open('../species/','_self')">back to index</span>
 	</div>
 </div>
 
@@ -168,7 +176,9 @@ a:4:{s:8:"template";a:9:{s:9:"taxon.tpl";b:1;s:19:"../shared/_head.tpl";b:1;s:25
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-addRequestVar('id','20657')
+addRequestVar('search','enter search term')
+addRequestVar('id','20808')
+addRequestVar('cat','classification')
 
 })
 
