@@ -11,7 +11,9 @@
 		const maxInitialCommonNames = 15;
 //		const searchURL = 'http://dev.eti.uva.nl/linnaeus_ng/app/views/linnaeus/search.php?search=%s&format=plain';
 //		const searchURL = 'http://linnaeus/app/views/linnaeus/r_search.php?search=%s&p=2&l=26'; //26 = def english
-		const searchURL = 'http://linnaeus/app/views/linnaeus/r_search.php?search=%s&p=64&l=26'; //26 = def english
+
+//		const searchURL = 'http://linnaeus/app/views/linnaeus/r_search.php?search=%s&p=64&l=26'; //26 = def english
+		const searchURL = 'http://dev.eti.uva.nl/linnaeus_ng/app/views/linnaeus/r_search.php?search=%s&p=64&l=26'; //26 = def english
 
 		function linnaeusNG($searchString,$maxResults=false,$languageID=false,$outputMode=false) {
 		
