@@ -250,7 +250,7 @@ class LinnaeusController extends Controller
 
 		}
 
-		$this->smarty->assign('results',json_encode(array('results'=>$results)));
+		$this->smarty->assign('results',json_encode(array('results'=>array(0=>$results))));
 
         $this->printPage();
 	
