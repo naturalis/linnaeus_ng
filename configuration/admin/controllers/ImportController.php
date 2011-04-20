@@ -9,15 +9,6 @@ page time out? (image copy)
 
 
 
-
-
-
-
-
-
-
-
-
 what the fuck is?
 	$d->projectclassification
 	$d->projectnomenclaturecode
@@ -41,15 +32,12 @@ need to set manually!
 	proj_literature->proj_reference->keywords->keyword
 		taxa only, what do glossary terms look like??
 
-	WHAT MODULES!?!?!	
-
 
 cRename : STILL COPIES RATHER THAN MOVES
 
 doesn't seem to work:
 		unlink($paths['project_thumbs']);
 		unlink($paths['project_media']);
-
 
 //yell about getControllerSettingsKey->maxChoicesPerKeystep
 test with no images

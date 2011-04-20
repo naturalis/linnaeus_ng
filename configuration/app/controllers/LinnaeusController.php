@@ -250,7 +250,7 @@ class LinnaeusController extends Controller
 
 		}
 
-		$this->smarty->assign('results',json_encode($results));
+		$this->smarty->assign('results',json_encode(array('results'=>$results)));
 
         $this->printPage();
 	
@@ -481,21 +481,25 @@ class LinnaeusController extends Controller
 	private function searchSpecies($search)
 	{
 
+		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+
 		$taxa = $this->models->Taxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id as taxon_id,taxon as label'
+				'columns' => 'id as taxon_id,taxon as label,rank_id'
 			)
 		);
+
+		foreach((array)$taxa as $key => $val)  $taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
 
 		$synonyms = $this->models->Synonym->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
+//					'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
 				'columns' => 'id,taxon_id,synonym as label,\'names\' as cat'
@@ -506,10 +510,10 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
+//					'language_id' => $this->getCurrentLanguageId(),
 					'commonname regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,taxon_id,commonname as label,\'names\' as cat'
+				'columns' => 'id,language_id,taxon_id,commonname as label,\'names\' as cat'
 			)
 		);
 
@@ -517,14 +521,21 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
+//					'language_id' => $this->getCurrentLanguageId(),
 					'transliteration regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,taxon_id,transliteration as label,\'names\' as cat'
+				'columns' => 'id,language_id,taxon_id,transliteration as label,\'names\' as cat'
 			)
 		);
 
 		$commonnames = array_merge((array)$commonnames1,(array)$commonnames2);
+		
+		foreach((array)$commonnames as $key => $val) {
+
+            $l = $this->models->Language->_get(array('id'=>$val['language_id']));
+			$commonnames[$key]['language'] = $l['language'];
+
+		}
 
 		$content = $this->models->ContentTaxon->_get(
 			array(

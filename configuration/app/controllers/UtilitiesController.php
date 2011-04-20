@@ -232,6 +232,10 @@ class UtilitiesController extends Controller
 
 				if (count((array)$val)>=3 && $val[0]=='accepted') {
 /*
+
+EERST NAAM SELECTEREN OF NIET AL BESTAAT!
+
+
 					"insert into search_index
 						(name,name_displayed,name_record,name_type,category)
 					values
