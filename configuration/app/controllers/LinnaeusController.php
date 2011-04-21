@@ -96,8 +96,11 @@ class LinnaeusController extends Controller
 		} else {
 
 			$this->setCurrentProjectData();
-
-			$this->redirect('index.php');
+			
+			if ($this->rHasVal('r')) 
+				$this->redirect($this->requestData['r']);
+			else
+				$this->redirect('index.php');
 
 		}
 
