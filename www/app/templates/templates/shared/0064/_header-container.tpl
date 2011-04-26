@@ -11,11 +11,11 @@
 <span class="mainmenuseparator">|</span>
 <a href="http://test.eti.uva.nl/tanbif/search.php" title="Search"><span class="mainmenuitem" alt="Search">Search</span></a>
 <span class="mainmenuseparator">|</span>
-<a href="/app/views/species/" title="Browse species"><span class="mainmenuitem{if $controllerBaseName=='species'}_selected{/if}" alt="Browse species">Browse species</span></a>
+<a href="/lng/app/views/species/" title="Browse species"><span class="mainmenuitem{if $controllerBaseName=='species'}_selected{/if}" alt="Browse species">Browse species</span></a>
 <span class="mainmenuseparator">|</span>
-<a href="/app/views/matrixkey/" title="Identify"><span class="mainmenuitem{if $controllerBaseName=='matrixkey'}_selected{/if}" alt="Identify">Identify</span></a>
+<a href="/lng/app/views/matrixkey/identify.php" title="Identify"><span class="mainmenuitem{if $controllerBaseName=='matrixkey'}_selected{/if}" alt="Identify">Identify</span></a>
 <span class="mainmenuseparator">|</span>
-<a href="http://test.eti.uva.nl/tanbif/news.php" title="Biodiversity news"><span class="mainmenuitem" alt="Biodiversity news">Biodiversity news</span></a>
+<a href="http://test.eti.uva.nl/tanbif/news.php" title="News and events"><span class="mainmenuitem" alt="Biodiversity news">News and events</span></a>
 <span class="mainmenuseparator">|</span>
 <a href="http://test.eti.uva.nl/tanbif/forum/index.php" title="Forum"><span class="mainmenuitem" alt="Forum">Forum</span></a>
 <span class="mainmenuseparator">|</span>
