@@ -25,10 +25,12 @@
 <div id="classification">
 	<table>
 	{foreach from=$content key=k item=v name=classification}
+	{if $v.do_display}
 		<tr>
 			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.taxon}</td>
 			<td>({$v.rank})</td>
 		</tr>
+	{/if}
 	{/foreach}
 	</table>
 </div>
