@@ -4,6 +4,7 @@
 	<div id="index">
 		<table>
 		{foreach name=taxonloop from=$taxa key=k item=v}
+		{if $v.do_display}
 		<tr class="highlight">
 			<td class="a" onclick="goTaxon({$v.id})">
 				{$v.taxon}
@@ -11,6 +12,7 @@
 			</td>
 			<td>({$v.rank})</td>
 		</tr>
+		{/if}
 		{/foreach}
 		</table>
 	</div>
