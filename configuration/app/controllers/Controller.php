@@ -183,7 +183,7 @@ class Controller extends BaseClass
 	
 	}
 
-	public function getTreeList ()
+	public function getTreeList()
 	{
 
 		foreach((array)$this->treeList as $key => $val) {
@@ -298,6 +298,9 @@ class Controller extends BaseClass
 
 			// get rank label
 			$val['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
+
+			// give do not display flag to taxa that are in brackets
+			$val['do_display'] = !preg_match('/^\(.*\)$/',$val['taxon']);
 
 			// fill the treelist (which is a global var)
             $this->treeList[$val['id']] = $val;
