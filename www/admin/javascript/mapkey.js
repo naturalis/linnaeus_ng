@@ -49,7 +49,8 @@ function initMap(init) {
 
 function initPolygon(init) {
 
-	colour = $('#geodatatype :selected').attr('colour');
+//	colour = $('#geodatatype :selected').attr('colour');
+	colour = $('input[name=geodatatype]:radio:checked').attr('colour');
 
 	if (!init) init = {
 		strokeColor: colour? '#'+colour : '#fff',
@@ -122,9 +123,9 @@ function createPolygon() {
 		$('#polygon-button').val('draw a polygon');
 
 		if (polygon) {
-
+			var s = $('input[name=geodatatype]:radio:checked');
 			polygons[polygons.length] = polygonCoordinates.slice();
-			polygonsDatatype[polygons.length-1] = [$('#geodatatype :selected').val(),$('#geodatatype :selected').text()];
+			polygonsDatatype[polygons.length-1] = [s.val(),s.text()];
 		}
 
 		polygonCoordinates.length=0;
@@ -152,13 +153,15 @@ function mouseUp(event) {
 			map: map,
 			title: '(click to delete)'
 		});
+		
+		var s = $('input[name=geodatatype]:radio:checked');
 
-		marker.setIcon('../../media/system/map_marker.php?c='+$('#geodatatype :selected').attr('colour'));
+		marker.setIcon('../../media/system/map_marker.php?c='+s.attr('colour'));
 
 		marker.setCursor('pointer');
 		
 		markers[markers.length] = marker;
-		markersDatatype[markers.length-1] = [$('#geodatatype :selected').val(),$('#geodatatype :selected').text()];
+		markersDatatype[markers.length-1] = [s.val(),s.text()];
 
 		var i = (markers.length-1);
 		
