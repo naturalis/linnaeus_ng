@@ -296,7 +296,8 @@ class MapKeyController extends Controller
 
 		$taxon = $this->treeList[$this->requestData['s']];
 
-		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$taxon['taxon']));
+//		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
 
 		if ($this->rHasId() && $isOnline) {
 		
@@ -352,6 +353,8 @@ class MapKeyController extends Controller
 		$this->smarty->assign('isOnline',$isOnline);
 
 		$this->smarty->assign('occurrences',$so);
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
 
@@ -1098,6 +1101,10 @@ class MapKeyController extends Controller
 				)
 			)
 		);
+
+		$d = $this->getGeodataTypes($ot[0]['type_id']);	
+		$ot[0]['type_title'] = $d['title'];
+		$ot[0]['colour'] = $d['colour'];
 
 		$this->getTaxonTree(null,true);
 
