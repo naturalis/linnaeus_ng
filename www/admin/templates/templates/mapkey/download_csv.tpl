@@ -2,8 +2,9 @@
 "{t}been defined in your project:{/t}"
 
 {t}DATA TYPE{/t}	{t}DATA TYPE ID{/t}
+
 {foreach from=$geodataTypes key=k item=v}
-{$v.title}:	{$v.id}
+{$v.title}	{$v.id}
 {/foreach}
 
 "{t}Copy the appropriate data type ID's in the{/t}"
@@ -17,6 +18,7 @@
 
 
 ID {t}(do not change){/t}	{t}TAXON{/t} {t}(do not change){/t}	{t}DATA TYPE ID (see above){/t}	{t}NODE 1 LATITUDE{/t}	{t}NODE 1 LONGITUDE{/t}	{t}NODE 2 LATITUDE{/t}	N{t}ODE 2 LONGITUDE{/t}	{t}NODE 3 LATITUDE{/t}	{t}NODE 3 LONGITUDE{/t}	{t}etc.{/t}
+
 {foreach from=$taxa key=k item=v}
 {if $v.lower_taxon==1}{$v.id}	{$v.taxon}
 {/if}

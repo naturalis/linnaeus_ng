@@ -7,13 +7,15 @@
 		{t}Selection type:{/t} <span id="selection-type">{t}(none){/t}</span><br />
 		{t}Coordinates:{/t}<br /><span id="coordinates">(-1,-1)</span><br />
 		<hr style="height:1px;color:#999" />
-
 		{t}Select the type of data you are drawing on the map:{/t}<br />
-		<select id="geodatatype">
-		{foreach from=$geodataTypes key=k item=v}
-		<option value="{$v.id}" colour="{$v.colour}">{$v.title}</option>
+		{foreach from=$geodataTypes key=k item=v name=x}
+		<label>
+		<input type="radio" value="{$v.id}" name="geodatatype" id="geodatatype-{$k}" colour="{$v.colour}" {if $smarty.foreach.x.index==0} checked="checked"{/if}>
+		<span style="background-color:#{$v.colour};border:1px solid #999">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		{$v.title}
+		</label><br />
 		{/foreach}
-		</select>		
+		{t _s1='<a href="data_types.php">' _s2='</a>'}(click %shere%s to add or change datatypes.){/t}
 		
 		<form action="" method="post" id="theForm">
 		<input type="hidden" name="id" value="{$taxon.id}" />

@@ -2,6 +2,14 @@
 
 <div id="page-main">
 <div id="map_canvas" style="width:650px; height:500px">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
+	<div id="map_options">
+		<b>{t _s1=$taxon.taxon}Data for "%s"{/t}</b><br/>
+		{t}Legend:{/t}<br />
+		{foreach from=$geodataTypes key=k item=v name=x}
+		<span style="background-color:#{$v.colour};border:1px solid #999">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+		{$v.title}<br />
+		{/foreach}
+	</div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
 </div>
 {literal}
@@ -28,7 +36,8 @@ $(document).ready(function(){
 		name: '{$taxonName}',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: {$v.id}		
+		occurrenceId: {$v.id},
+		colour:'{$v.colour}'	
 	{literal}});{/literal}
 {elseif $v.type=='polygon' && $v.nodes}
 	var nodes{$k} = Array();
@@ -39,7 +48,8 @@ $(document).ready(function(){
 		name: '{$taxonName}',
 		addMarker: true,
 		addDelete: false,
-		occurrenceId: {$v.id}
+		occurrenceId: {$v.id},
+		colour:'{$v.colour}'
 	{literal}});{/literal}
 
 {/if}
