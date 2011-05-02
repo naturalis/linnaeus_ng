@@ -206,7 +206,7 @@ class MapKeyController extends Controller
 		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		$this->smarty->assign('taxon',$taxon);
-
+//q($taxon,1);
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
         $this->printPage();
@@ -598,6 +598,8 @@ class MapKeyController extends Controller
 			}
 
 		}
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 		
 		$this->printPage();
 
