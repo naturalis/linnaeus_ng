@@ -24,13 +24,21 @@
 
 <div class="page-generic-div">
 <p>
-<a href="download_csv.php">{t}Download sample CSV-file{/t}</a>
+<a href="download_csv.php">{t}Download template CSV-file{/t}</a> {t}(with species names, species ID's and data types from your project, but no example geographical data){/t}<br />
+<a href="../../media/system/geo-example.csv">{t}Download example CSV-file{/t}</a> {t}(general example, including geographical data){/t}
 </p>
 <p>
 {t}You can upload geographical data by means of a CSV-file. Above, you can download a file that can function as a template.{/t}
 </p>
 <p>
-{t}In the file, the first and second columns hold the ID and the name of the lower taxa in your database. ID and name belong together, and should not be removed or moved to other columns than the first two. The third columns specifies the type of data, represented by an ID. At the top of the file, there is a list of data types and ID's as they are currently defined in your project.{/t}
+{t}In the file, the first and second columns hold the ID and the name of the lower taxa in your database. ID and name belong together, and should not be removed or moved to other columns than the first two. The third columns specifies the type of data, represented by an ID. At the top of the file, there is a list of data types and ID's as they are currently defined in your project.{/t} {t}The same list is shown here:{/t}<br />
+<table>
+<tr><th>{t}DATA TYPE{/t}</th><th>{t}DATA TYPE ID{/t}</th></tr>
+{foreach from=$geodataTypes key=k item=v name=x}
+<tr><td>{$v.title}</td><td>{$v.id}</td></tr>
+{/foreach}
+</table>
+{if $smarty.foreach.x.index==-1}{t _s1='<a href="data_types.php">' _s2='</a>'}No data types have been defined yet. Go %shere%s to do so.{/t}{/if}
 </p>
 <p>
 {t}The following columns in each row specify the coordinates of a geographical point on the map. These always come in pairs of latitude and longitude.{/t}<br />
