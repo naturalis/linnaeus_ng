@@ -592,13 +592,10 @@ class ProjectsController extends Controller
         
         }
 
-		if (!is_array($userId) && $userId==$this->getCurrentUserId()) {
+		$cur = $this->getCurrentUserRights($this->getCurrentUserId());
 
-			$cur = $this->getCurrentUserRights($userId);
+		$this->setUserSessionRights($cur['rights']);
 
-			$this->setUserSessionRights($cur['rights']);
-
-		}
 
     }
 
