@@ -211,16 +211,14 @@
 		<td colspan="2">
 			<input type="submit" value="{t}save{/t}" />
 			{if $userRole.role_id != 2}
-			{literal}
-			<input type="button" value="{t}delete{/t}" onclick="if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); } " />
-			{/literal}
+			
+			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); }{/literal}" />
 			{/if}
 			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>
 </form>
-
 </div>
 
 {literal}
