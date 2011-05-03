@@ -101,7 +101,7 @@ class LiteratureController extends Controller
 
     	    $this->setPageName(
 				sprintf(
-					_('Editing literary reference "%s (%s)"'),
+					_('Editing literature "%s (%s)"'),
 					$ref['author_first'].
 						($ref['multiple_authors']==1 ? ' '._('et al.') : ($ref['author_second'] ? ' &amp; '.$ref['author_second'] : '')),
 					$ref['year'].$ref['suffix']
@@ -110,7 +110,7 @@ class LiteratureController extends Controller
 		
 		} else {
 
-    	    $this->setPageName(_('New literary reference'));
+    	    $this->setPageName(_('New literature'));
 			
 			if(isset($_SESSION['system']['activeTaxon'])) {
 
@@ -167,16 +167,16 @@ class LiteratureController extends Controller
 			} else
 			if ($this->models->Literature->save($data)) {
 
+				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Literature->getNewId();
+
+				$this->models->LiteratureTaxon->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'literature_id' => $id
+					)
+				);
+
 				if ($this->rHasVal('selectedTaxa')) {
-
-					$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Literature->getNewId();
-
-					$this->models->LiteratureTaxon->delete(
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'literature_id' => $id
-						)
-					);
 
 					foreach((array)$this->requestData['selectedTaxa'] as $key => $val) {
 
@@ -245,7 +245,7 @@ class LiteratureController extends Controller
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Browsing literary references'));
+		$this->setPageName(_('Browsing literature'));
 		
 		$alpha = $this->getActualAlphabet();
 
@@ -300,7 +300,7 @@ class LiteratureController extends Controller
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Search for literary references'));
+		$this->setPageName(_('Search for literature'));
 		
 		if ($this->rHasVal('search')) {
 
