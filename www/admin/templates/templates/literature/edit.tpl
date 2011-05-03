@@ -96,7 +96,7 @@
             {/if}
             {/foreach}
 			</select>
-			<span id="add-button" class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="litAddTaxonToList()">{t}add{/t}</span>
+			<span id="add-button" class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer;" onclick="litAddTaxonToList()">{t}add{/t}</span>
 			<div id="selected-taxa"></div>
 		</td>
 	</tr>
