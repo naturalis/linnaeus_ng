@@ -210,7 +210,7 @@ function litCheckForm(ele) {
 
 var taxonNames = Array();
 
-function litGetTaxonName(taxonId) {
+function litGetTaxonName(taxonId) {7
 
 	if (!taxonNames[taxonId]) {
 
@@ -228,14 +228,19 @@ function litGetTaxonName(taxonId) {
 
 function litUpdateTaxonSelection() {
 		
-	var b = '';
+	var b = '<table style="border-collapse:collapse;width:100%"">';
 	
 	for(var i=0;i<litAddedTaxa.length;i++) {
 	
-		b = b + '<span style="cursor:pointer" ondblclick="litRemoveTaxonFromList('+litAddedTaxa[i]+')">'+litGetTaxonName(litAddedTaxa[i])+'</span><br />';
+		b = b + 
+			'<tr class="tr-highlight"><td style="width:97%">'+
+			litGetTaxonName(litAddedTaxa[i])+
+			'</td><td class="pseudo-a" onclick="litRemoveTaxonFromList('+litAddedTaxa[i]+')">x</td></tr>';
 	
 	}
-	
+
+	b = b + '</table>';
+
 	$('#selected-taxa').html(b);
 
 }
