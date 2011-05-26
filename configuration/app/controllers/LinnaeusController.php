@@ -253,7 +253,13 @@ class LinnaeusController extends Controller
 
 		}
 
-		$results['baseURL'] = 'ahttp://' . $_SERVER["SERVER_NAME"] . '/'. $this->baseUrl . $this->getAppName() .'/views/';
+		$results['baseURL'] =
+			'http://' . $_SERVER["SERVER_NAME"] . 
+			str_replace(
+				$this->getControllerBaseName().'/'.$this->getViewName().'.php',
+				'',
+				$_SERVER['SCRIPT_NAME']
+			);
 
 		$this->smarty->assign('results',json_encode(array('results'=>array(0=>$results))));
 
