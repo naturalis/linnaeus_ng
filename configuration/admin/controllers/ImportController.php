@@ -2,14 +2,10 @@
 /*
 
 
-
-
 page time out? (image copy)
 
 
-
-
-what the fuck is?
+wtf is?
 	$d->projectclassification
 	$d->projectnomenclaturecode
 
@@ -27,30 +23,25 @@ need to set manually!
 		'taxon_order' => 0,
 		'is_hybrid' => 0,
 		'list_level' => 0
-	
 
 	proj_literature->proj_reference->keywords->keyword
 		taxa only, what do glossary terms look like??
 
 
-cRename : STILL COPIES RATHER THAN MOVES
-
-doesn't seem to work:
+	doesn't seem to work, though empty:
 		unlink($paths['project_thumbs']);
 		unlink($paths['project_media']);
 
-//yell about getControllerSettingsKey->maxChoicesPerKeystep
-test with no images
-
-NO GEO DATA!
-
-???			.classification --> "Five kingdoms"
-???			.nomenclaturecode --> "ICZM"
-
-NO SYNONYMS
-NO GLOSSARY OF KEYWORDS
-
-MATRIX KEY: never saw all types
+	yell about getControllerSettingsKey->maxChoicesPerKeystep
+	
+	NO GEO DATA!
+	
+	???			.classification --> "Five kingdoms"
+	???			.nomenclaturecode --> "ICZM"
+	
+	NO SYNONYMS
+	NO GLOSSARY OF KEYWORDS	
+	MATRIX KEY: never saw all types
 
 */
 
@@ -1228,7 +1219,9 @@ class ImportController extends Controller
 	
 		if(copy($from,$to)) {
 
-			return true; //unlink($from);
+			unlink($from);
+
+			return true;
 
 		} else {
 
