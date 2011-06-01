@@ -100,7 +100,7 @@ class MapKeyController extends Controller
 
 		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
 
-		$d = $this->getTaxonOccurrences($taxon['id']);
+		$d = $this->getTaxonOccurrences($taxon['id'],$this->rHasVal('o') ? $this->requestData['o'] : null);
 
 		$geoDataTypes = $this->getGeoDataTypes();
 
@@ -279,17 +279,21 @@ class MapKeyController extends Controller
 	
 	}
 
-	private function getTaxonOccurrences($id)
+	private function getTaxonOccurrences($id,$occ=null)
 	{
 	
 		if (!isset($id)) return;
 
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id,
+			);
+			
+		if (isset($occ)) $d['id'] = $occ;
+
 		$ot = $this->models->OccurrenceTaxon->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id,
-				),
+				'id' => $d,
 				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes'
 			)
 		);
