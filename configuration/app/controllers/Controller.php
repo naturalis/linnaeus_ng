@@ -1085,6 +1085,22 @@ class Controller extends BaseClass
     
     }
 
+	public function getControllerConfig($controller)
+    {
+
+        $t = 'getControllerSettings'.$controller;
+
+        if (method_exists($this->config,$t)) {
+
+            return $this->config->$t();
+
+        } else {
+
+            return false;
+
+        }
+
+    }
 
 
 	private function setPhpIniVars()
@@ -1196,19 +1212,44 @@ class Controller extends BaseClass
 
 		if (!$p) return;
 
+		$_SESSION['project']['urls']['full_base_url'] =
+			'http://'.
+			$_SERVER["HTTP_HOST"]. 
+			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
+
+		$_SESSION['project']['urls']['full_appview_url'] = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+
 		if (isset($this->generalSettings['imageRootUrlOverride'])) {
 
 			$_SESSION['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
 	
-			$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
-
 		} else {
 	
 			$_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
 
-			$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+		}
+
+		$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+
+		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
+
+			$_SESSION['project']['urls']['full_project_media'] = 
+				'http://'.
+				$_SERVER["HTTP_HOST"]. 
+				$this->generalSettings['imageRootUrlOverrideAbsolute'].
+				sprintf('%04s', $p).'/';
+
+		} else {
+	
+			$_SESSION['project']['urls']['full_project_media'] =
+				$_SESSION['project']['urls']['full_base_url'].
+				$this->getAppName().
+				'/media/project/'.sprintf('%04s', $p).'/';
 
 		}
+
+		$_SESSION['project']['urls']['full_project_thumbs'] = $_SESSION['project']['urls']['full_project_media'].'thumbs/';
+
 
 		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
@@ -1220,17 +1261,7 @@ class Controller extends BaseClass
 	private function loadControllerConfig()
     {
 
-        $t = 'getControllerSettings'.$this->controllerBaseName;
-
-        if (method_exists($this->config,$t)) {
-
-            $this->controllerSettings = $this->config->$t();
-
-        } else {
-
-            $this->controllerSettings = false;
-
-        }
+		$this->controllerSettings = $this->getControllerConfig($this->controllerBaseName);
 
     }
 

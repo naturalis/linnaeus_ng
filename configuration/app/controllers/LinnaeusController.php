@@ -267,6 +267,177 @@ class LinnaeusController extends Controller
 	
 	}
 
+    public function rGetTaxon ()
+	{
+
+		$d = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+
+		$results = null;
+
+		if (!$this->rHasVal('search')) return $results;
+
+		if ($this->rHasVal('l')) $this->setCurrentLanguageId($this->requestData['l']);
+
+		$t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => $this->requestData['search']
+				)
+			)
+		);
+		
+		if ($t) {
+		
+			$taxonId = $t[0]['id'];
+
+			$p = $this->getProjectRanks(array('idsAsIndex' => true));
+
+			// common names
+			$c = $this->models->Commonname->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $taxonId
+					)
+				)
+			);
+			
+			foreach((array)$c as $key => $val)  {
+
+				$l = $this->models->Language->_get(array('id'=>$val['language_id']));
+
+				if (isset($val['commonname']) && isset($l['language']))
+					$commonnames[] = array('name' => $val['commonname'],'language' => $l['language']);
+
+			}
+
+			// synonyms
+			$s = $this->models->Synonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $taxonId
+					)
+				)
+			);
+
+			foreach((array)$s as $key => $val)  $synonyms[] = array('name' => $val['synonym']);		
+
+			// media
+			$mt = $this->models->MediaTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $taxonId
+					)
+				)
+			);
+
+			$cfg = $this->getControllerConfig('species');
+
+			foreach((array)$mt as $key => $val)  {
+
+				$content = $this->models->MediaDescriptionsTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->getCurrentLanguageId(),
+							'media_id' => $val['id']
+						)
+					)
+				);
+
+				$type = isset($cfg['mime_types'][$val['mime_type']]['type']) ? $cfg['mime_types'][$val['mime_type']]['type'] : null;
+
+				$media[] = array(
+					'URL' => $_SESSION['project']['urls']['full_project_media'].$val['file_name'],
+					'imageLink' =>
+						$_SESSION['project']['urls']['full_appview_url'].
+						'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media&disp='.$val['id'],
+					'thumbnailURL' => $val['thumb_name'] ? $_SESSION['project']['urls']['full_project_thumbs'].$val['thumb_name'] : null,
+					'caption' => $content ? $content[0]['description'] : null,
+					'type' => $type,
+					'name' => $val['file_name'],
+					'width' => '',
+					'height' => ''
+													
+				);
+
+			}
+
+			// observations
+			$ot = $this->models->OccurrenceTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $taxonId
+					)
+				)
+			);
+
+			foreach((array)$ot as $key => $val) {
+			
+				if ($val['longitude'] && $val['latitude']) {
+			
+					$observations[] = array(
+						'longitude' => 	$this->DECtoDMS($val['longitude'],true),
+						'latitude' => $this->DECtoDMS($val['latitude'],true),
+						'longitude_decimal' => $val['longitude'],
+						'latitude_decimal' => $val['latitude'],
+						'date' => '',
+						'location' =>  '',
+						'link' => 						
+							$_SESSION['project']['urls']['full_appview_url'].
+							'mapkey/examine_species.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&o='.$val['id'],
+						'number_counted' => '1'
+					);
+
+				}
+
+			}
+
+			$results =
+				array(
+					0 =>
+						array(
+							'name' => $t[0]['taxon'],
+							'nameDisplayed' => $t[0]['taxon'],
+							'rank' => $p['ranks'][$t[0]['rank_id']]['labels'][$this->getCurrentLanguageId()],
+							'status' => '',
+							'link' =>
+								$_SESSION['project']['urls']['full_appview_url'].
+								'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId,
+							'commonNames' => isset($commonnames) ? $commonnames : null,
+							'synonyms' => isset($synonyms) ? $synonyms : null,
+							'multimedia' =>
+								array(
+									0 =>
+										array(
+											'link' => 
+												$_SESSION['project']['urls']['full_appview_url'].
+												'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media',
+											'list' => $media
+										)
+								),
+							'observations' => $observations,
+				)
+			);
+		
+
+		} else {
+
+			$results[0] = null;
+
+		}
+
+
+		$this->smarty->assign('results',json_encode(array('results'=>array(0=>$results))));
+
+        $this->printPage();
+	
+	}
+	
     /**
      * Index of project: introduction
      *
@@ -564,7 +735,7 @@ class LinnaeusController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
+//					'language_id' => $this->getCurrentLanguageId(),
 					'file_name regexp' => $this->makeRegExpCompatSearchString($search)
 				),
 			'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
@@ -1227,5 +1398,30 @@ class LinnaeusController extends Controller
 
 	}
 
+
+	private function DECtoDMS($dec,$formatted=false)
+	{
+
+		// Converts decimal longitude / latitude to DMS
+	// ( Degrees / minutes / seconds ) 
+	
+	// This is the piece of code which may appear to 
+	// be inefficient, but to avoid issues with floating
+	// point math we extract the integer part and the float
+	// part by using a string function.
+		$vars = explode(".",$dec);
+		$deg = $vars[0];
+		$tempma = "0.".$vars[1];
+	
+		$tempma = $tempma * 3600;
+		$min = floor($tempma / 60);
+		$sec = $tempma - ($min*60);
+		
+		if ($formatted)
+			return $deg.'&deg;'.$min."'".$sec."''";
+		else	
+			return array("deg"=>$deg,"min"=>$min,"sec"=>$sec);
+
+	} 
 
 }
