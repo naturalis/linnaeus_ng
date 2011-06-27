@@ -24,7 +24,10 @@ class LinnaeusController extends Controller
 		'keystep',
 		'literature',
 		'glossary_media',
+		'matrix',
 		'matrix_name',
+		'matrix_taxon_state',
+		'characteristic',
 		'characteristic_label',
 		'characteristic_label_state',
 		'characteristic_matrix',
@@ -291,7 +294,7 @@ class LinnaeusController extends Controller
 		
 			$taxonId = $t[0]['id'];
 
-			$p = $this->getProjectRanks(array('idsAsIndex' => true));
+			$p = $this->getProjectRanks(array('idsAsIndex' => true,'forceLookup' => true));
 
 			// common names
 			$c = $this->models->Commonname->_get(
@@ -348,15 +351,15 @@ class LinnaeusController extends Controller
 					)
 				);
 
-				$type = isset($cfg['mime_types'][$val['mime_type']]['type']) ? $cfg['mime_types'][$val['mime_type']]['type'] : null;
+				$type = isset($cfg['mime_types'][$val['mime_type']]['type']) ? $cfg['mime_types'][$val['mime_type']]['type'] : '';
 
 				$media[] = array(
 					'URL' => $_SESSION['project']['urls']['full_project_media'].$val['file_name'],
 					'imageLink' =>
 						$_SESSION['project']['urls']['full_appview_url'].
 						'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media&disp='.$val['id'],
-					'thumbnailURL' => $val['thumb_name'] ? $_SESSION['project']['urls']['full_project_thumbs'].$val['thumb_name'] : null,
-					'caption' => $content ? $content[0]['description'] : null,
+					'thumbnailURL' => $val['thumb_name'] ? $_SESSION['project']['urls']['full_project_thumbs'].$val['thumb_name'] : '',
+					'caption' => $content ? $content[0]['description'] : '',
 					'type' => $type,
 					'name' => $val['file_name'],
 					'width' => '',
@@ -397,32 +400,92 @@ class LinnaeusController extends Controller
 
 			}
 
-			$results =
-				array(
-					0 =>
+			// classification
+			$tc = $this->getTaxonClassification($taxonId);
+
+			foreach((array)$tc as $key => $val) {
+			
+				if ($val['do_display'])
+					$classification[] =
 						array(
-							'name' => $t[0]['taxon'],
-							'nameDisplayed' => $t[0]['taxon'],
-							'rank' => $p['ranks'][$t[0]['rank_id']]['labels'][$this->getCurrentLanguageId()],
-							'status' => '',
-							'link' =>
-								$_SESSION['project']['urls']['full_appview_url'].
-								'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId,
-							'commonNames' => isset($commonnames) ? $commonnames : null,
-							'synonyms' => isset($synonyms) ? $synonyms : null,
-							'multimedia' =>
-								array(
-									0 =>
-										array(
-											'link' => 
-												$_SESSION['project']['urls']['full_appview_url'].
-												'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media',
-											'list' => $media
-										)
-								),
-							'observations' => $observations,
+							'name' => ucfirst(strtolower($val['taxon'])), 
+							'rank' => ucfirst(strtolower($val['rank']))
+						);
+				
+			}
+
+			// description
+			$pt = $this->models->PageTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'page' => 'Overview'
+					)
 				)
 			);
+			
+			if ($pt) {
+	
+				$ct = $this->models->ContentTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->getCurrentLanguageId(),
+							'taxon_id' => $taxonId,
+							'page_id' => $pt[0]['id']						
+						)
+					)
+				);
+				
+				if ($ct) {
+
+					$description[0]['text'] = $ct[0]['content'];
+
+				}
+	
+			}
+
+			// matrices
+			$matrices = $this->getMatrices();
+			
+			foreach((array)$matrices as $key => $val) {
+			
+				$states = $this->getTaxonStates($val['id'],$taxonId);
+
+				$matrices[$key] = array(
+					'id' => $val['id'],
+					'name' => $val['name'],
+					'states' => $states
+				);
+
+			}
+			
+			$results =
+				array(
+					'name' => ucfirst($t[0]['taxon']),
+					'nameDisplayed' => '<i>'.ucfirst(strtolower($t[0]['taxon'])).'</i>',
+					'rank' =>  ucfirst($p['ranks'][$t[0]['rank_id']]['labels'][$this->getCurrentLanguageId()]),
+					'status' => 'Accepted name',
+					'link' =>
+						$_SESSION['project']['urls']['full_appview_url'].
+						'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId,
+					'commonNames' => isset($commonnames) ? $commonnames : '',
+					'synonyms' => isset($synonyms) ? $synonyms : '',
+					'description' => isset($description) ? $description : '',
+					'multimedia' =>
+						array(
+							0 =>
+								array(
+									'link' => 
+										$_SESSION['project']['urls']['full_appview_url'].
+										'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media',
+									'list' => $media
+								)
+						),
+					'observations' => isset($observations) ? $observations : '',
+					'classification' => isset($classification) ? $classification : '',
+					'matrices' => isset($matrices) ? $matrices : ''
+				);
 		
 
 		} else {
@@ -431,7 +494,7 @@ class LinnaeusController extends Controller
 
 		}
 
-
+q($results,1,1);
 		$this->smarty->assign('results',json_encode(array('results'=>array(0=>$results))));
 
         $this->printPage();
@@ -1423,5 +1486,143 @@ class LinnaeusController extends Controller
 			return array("deg"=>$deg,"min"=>$min,"sec"=>$sec);
 
 	} 
+
+	private function getMatrices()
+	{
+
+		$m = $this->models->Matrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'got_names' => 1
+				)
+			)
+		);
+		
+		foreach((array)$m as $key => $val) {
+
+			$mn = $this->models->MatrixName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $val['id'],
+						'language_id' => $this->getCurrentLanguageId()
+					),
+					'columns' => 'name'
+				)
+			);
+
+			$m[$key]['name'] = $mn[0]['name'];
+
+		}
+			
+		return $m;
+	
+	}
+
+	private function getCharacteristic($id)
+	{
+
+		$c = $this->models->Characteristic->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+
+		if (!isset($c)) return;
+		
+		$char = $c[0];
+
+		$cl = $this->models->CharacteristicLabel->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->getCurrentLanguageId(),
+					'characteristic_id' => $id,
+					)
+			)
+		);
+
+		$char['label'] = $cl[0]['label'];
+
+		return $char;
+
+	}
+
+	private function getCharacteristicStateLabelOrText($id,$type='label')
+	{
+
+		if (!isset($id)) return;
+        
+		$cls = $this->models->CharacteristicLabelState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'state_id' => $id,
+					'language_id' => $this->getCurrentLanguageId()
+				),
+				'columns' => 'text,label'
+			)
+		);
+
+		return $type=='text' ? $cls[0]['text'] : $cls[0]['label'];
+
+	}
+
+	private function getCharacteristicState($id)
+	{
+
+		if (!isset($id)) return;
+
+		$cs = $this->models->CharacteristicState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				),
+				'columns' => 'id,file_name,lower,upper,mean,sd'
+			)
+		);
+
+		$cs[0]['label'] = $this->getCharacteristicStateLabelOrText($cs[0]['id']);
+
+		return $cs[0];
+
+	}
+
+	private function getTaxonStates($matrix,$id)
+	{
+	
+		$mts = $this->models->MatrixTaxonState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $matrix,
+					'taxon_id' => $id,
+				),
+				'columns' => 'characteristic_id,state_id'
+			)
+		);
+
+
+		foreach((array)$mts as $key => $val) {
+
+			$d = $this->getCharacteristic($val['characteristic_id']);
+
+			$mts[$key] = array(
+				'characteristic_id' => $val['characteristic_id'],
+				'characteristic' => $d['label'],
+				'type' => $d['type'],
+				'state' => $this->getCharacteristicState($val['state_id'])
+			);
+
+		}
+
+		return $mts;
+
+	}
 
 }

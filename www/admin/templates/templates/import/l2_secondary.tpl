@@ -49,7 +49,8 @@ Import media?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_media" checke
 
 <p>
 <b>Literature</b><br/>
-Import literary references?&nbsp;&nbsp;<label><input type="checkbox" name="literature" checked="checked">yes</label><br />
+{if $literature}
+Import literary references ({$literature|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="literature" checked="checked">yes</label><br />
 The following literary references contain errors:<br />
 {foreach from=$literature key=k item=v}
 {if $v.references.unknown_species|@count != 0}
@@ -59,15 +60,31 @@ The following literary references contain errors:<br />
 {/foreach}
 {/if}
 {/foreach}
+{else}
+No literary references found.
+{/if}
+</p>
+
+<p>
+<b>Glossary</b><br/>
+{if $glossary}
+Import glossary items ({$glossary|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="glossary" checked="checked">yes</label><br />
+{else}
+No glossary items found.
+{/if}
 </p>
 
 <p>
 <b>Content</b><br/>
 {if $content.Introduction}
 Import project introduction?&nbsp;&nbsp;<label><input type="checkbox" name="content_introduction" checked="checked">yes</label><br />
+{else}
+No project introduction found.
 {/if}
 {if $content.Contributors}
 Import contributors text?&nbsp;&nbsp;<label><input type="checkbox" name="content_contributors" checked="checked">yes</label><br />
+{else}
+No contributors text found.
 {/if}
 </p>
 

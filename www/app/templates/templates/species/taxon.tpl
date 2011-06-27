@@ -102,6 +102,7 @@
 	<tr>
 		<td class="media-image-cell">
 	{if $v.category=='image'}
+		{capture name="fullImgUrl"}{$session.project.urls.project_media}{$v.file_name}{/capture}
 		{if $v.thumb_name != ''}
 			<img
 				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
@@ -128,6 +129,10 @@
 		<td class="media-description-cell">{$v.description}</td>
 	</tr>
 	{assign var=mediaCat value=$v.category}
+	{if $requestData.disp==$v.id}
+		{assign var=dispUrl value=$smarty.capture.fullImgUrl}
+		{assign var=dispName value=$v.original_name}
+	{/if}
 	{/foreach}
 	</table>
 </div>
@@ -141,5 +146,20 @@
 		<span id="back" onclick="window.open('{if $taxon.lower_taxon==1}../species/{else}../highertaxa/{/if}','_self')">{t}back to index{/t}</span>
 	</div>
 </div>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+
+{if $dispUrl && $dispName}
+	showMedia('{$dispUrl}','{$dispName}'); 
+{/if}
+
+{literal}
+});
+</script>
+{/literal}
+
 
 {include file="../shared/footer.tpl"}

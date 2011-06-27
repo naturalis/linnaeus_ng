@@ -124,6 +124,9 @@ class Controller extends BaseClass
 		$d = $this->getCurrentProjectId();
 		
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
+		
+		$this->setUrls();
+        $this->setProjectLanguages();
 	
 	}
 
@@ -461,6 +464,31 @@ class Controller extends BaseClass
 
 		return $_SESSION['user']['species']['taxon'];
 	
+	}
+
+	public function getTaxonClassification($taxonId)
+	{
+
+		$d = null;
+
+		$this->getTaxonTree();
+
+		foreach((array)$this->treeList as $key => $val) {
+
+			$d[$val['rank_id']] = $val;
+			
+			if ($val['id'] == $taxonId) {
+
+				$d = array_slice($d,0,$val['level']+1);
+
+				break;
+
+			}
+
+		}
+
+		return $d;
+
 	}
 
 	public function getPagination($items,$maxPerPage=25)
