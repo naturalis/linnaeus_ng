@@ -20,12 +20,19 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+
+		{if $res.label|@strtolower=='species media'}
+			<img src="{$session.project.urls.project_media}{$v.label}" style="width:50px" />
+		{/if}
+
 		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:
 		{/if}
 		<span class="result" onclick="goTaxon({$v.taxon_id}{if $v.cat},'{$v.cat}'{/if})">
-			{if $v.label}{h search=$search}{$v.label}{/h}
-			{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
-			{/if}
+
+		{if $v.label}{h search=$search}{$v.label}{/h}
+		{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
+		{/if}
+
 		</span><br/>
 		{/foreach}
 	</div>

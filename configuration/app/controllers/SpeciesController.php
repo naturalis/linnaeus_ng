@@ -439,31 +439,6 @@ class SpeciesController extends Controller
 
 	}
 
-	private function getTaxonClassification($taxon)
-	{
-
-		$d = null;
-
-		$this->getTaxonTree();
-
-		foreach((array)$this->treeList as $key => $val) {
-
-			$d[$val['rank_id']] = $val;
-			
-			if ($val['id'] == $taxon) {
-
-				$d = array_slice($d,0,$val['level']+1);
-
-				break;
-
-			}
-
-		}
-
-		return $d;
-
-	}
-
 	private function getTaxonLiterature($taxon)
 	{
 

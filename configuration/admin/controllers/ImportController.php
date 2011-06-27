@@ -34,11 +34,10 @@ need to set manually!
 
 	yell about getControllerSettingsKey->maxChoicesPerKeystep
 	
-	NO GEO DATA!
-	
 	???			.classification --> "Five kingdoms"
 	???			.nomenclaturecode --> "ICZM"
 	
+	NO GEO DATA
 	NO SYNONYMS
 	NO GLOSSARY OF KEYWORDS	
 	MATRIX KEY: never saw all types
@@ -73,13 +72,16 @@ class ImportController extends Controller
 		'characteristic_matrix',
 		'characteristic_label',
 		'characteristic_state',
-		'characteristic_label_state'
+		'characteristic_label_state',
+		'glossary',
+		'glossary_synonym',
+		'glossary_media'
     );
    
     public $usedHelpers = array(
     );
 
-    public $controllerPublicName = 'Content';
+    public $controllerPublicName = 'Linnaeus 2 Import';
 
 	public $cssToLoad = array();
 	public $jsToLoad = array();
@@ -127,6 +129,8 @@ class ImportController extends Controller
     {
 
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
+
+        $this->setPageName(_('Choose file'));
 
 		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
 
@@ -231,6 +235,8 @@ class ImportController extends Controller
 	{
 
 		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+
+        $this->setPageName(_('Choose project'));
 		
 		libxml_use_internal_errors(true);
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
@@ -320,6 +326,8 @@ class ImportController extends Controller
 
 		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
 
+        $this->setPageName(_('Data overview'));
+
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 
 		$ranks = $this->resolveProjectRanks($d);
@@ -362,6 +370,7 @@ class ImportController extends Controller
 
 		$content = $this->getProjectContent($d);
 		$literature = $this->resolveLiterature($d,$species);
+		$glossary = $this->resolveGlossary($d);
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -455,6 +464,18 @@ class ImportController extends Controller
 
 			}
 
+			if ($this->rHasVal('glossary','on')) {
+
+				$res = $this->addLiterature($literature);
+
+				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].').');
+		
+				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].').');
+
+				$this->addModuleToProject(3);
+
+			}
+
 			if ($this->rHasVal('key_dich','on')) {
 
 				$this->makeKey($d,$species);
@@ -497,6 +518,7 @@ class ImportController extends Controller
 
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('literature',$literature);
+		$this->smarty->assign('glossary',$glossary);
 
         $this->printPage();
 
@@ -930,18 +952,27 @@ class ImportController extends Controller
 
 			$l = (string)$val->literature_title;
 			$a = $this->resolveAuthors($l);
-			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
+			$a['text'] = $this->replaceOldLinks($this->replaceOldTags((string)$val->fullreference));
 			$okSp = $unSp = null;
 
-			foreach($val->keywords->keyword as $kKey => $kVal) {
+			if ($val->keywords->keyword) {
 
-				$t = $this->replaceOldTags((string)$kVal->name,true);
-				if (isset($species[$t])) {
-					$okSp[] = $species[$t]['id'];
-				} else {
-					$unSp[] = $t;
+				foreach($val->keywords->keyword as $kKey => $kVal) {
+	
+					$t = $this->replaceOldLinks($this->replaceOldTags((string)$kVal->name,true));
+	
+					if (isset($species[$t])) {
+	
+						$okSp[] = $species[$t]['id'];
+	
+					} else {
+
+						$unSp[] = $t;
+	
+					}
+	
 				}
-
+				
 			}
 
 			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
@@ -1334,6 +1365,28 @@ class ImportController extends Controller
 	
 	}
 
+	private function replaceOldLinks($s)
+	{
+					
+		//[l][m]Glossary[/m][r]indehiscent[/r][t]indehiscent[/t][/l]
+	
+		if (strpos($s,'[l]')!==false && strpos($s,'[/l]')!==false) {
+		
+			$d = preg_split('/(\[t\]|\[\/t\])/',$s);
+							
+			$t = isset($d[1]) ? $d[1] : null;			
+
+			return preg_replace('/\[l\](.*)\[\/l\]/',$t,$s);
+
+		} else {
+
+			return $s;
+
+		}
+	
+	}
+
+
 	private function resolveAuthors($s)
 	{
 
@@ -1422,6 +1475,129 @@ class ImportController extends Controller
 					$refFail++;
 				else
 					$ref++;
+
+			}
+
+		}
+
+		return array(
+			'lit' => $lit,
+			'ref' => $ref,
+			'litFail' => $litFail,
+			'refFail' => $refFail,
+		);
+
+	}
+
+	private function resolveGlossary($d)
+	{
+	
+		if (!$d->glossary->term) return null;
+	
+		foreach($d->glossary->term as $key => $val) {
+		
+			$t = (string)$val->glossary_title;
+			$d = $this->replaceOldLinks($this->replaceOldTags((string)$val->definition,true));
+			
+			unset($s);
+
+			if ($val->glossary_synonyms->glossary_synonym) {
+
+				foreach($val->glossary_synonyms->glossary_synonym as $sKey => $sVal) {
+
+					$s[] = $this->replaceOldTags((string)$sVal->name,true);
+					
+				}
+
+			}
+
+			if ($val->gloss_multimedia->gloss_multimediafile) {
+
+				foreach($val->gloss_multimedia->gloss_multimediafile as $mKey => $mVal) {
+
+					$m[] = array(
+						'filename' => (string)$mVal->filename,
+						'fullname' => (string)$mVal->fullname,
+						'caption' => (string)$mVal->caption,
+						'type' => (string)$mVal->multimedia_type,
+					);
+					
+				}
+
+			}
+			
+			$res[] = array(
+				'term' => $t,
+				'definition' => $d,
+				'synonyms' => isset($s) ? $s : null,
+				'multimedia' => isset($m) ? $m : null
+				);
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function addGlossary($d)
+	{
+
+		echo 'addGlossary: NO MEDIA YET';
+		return;
+
+
+		$gloss = $fail = 0;
+
+		foreach($d as $val) {
+
+			$g = $this->models->Glossary->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'term' => isset($val['term']) ? $val['term'] : null,
+					'definition' => isset($val['definition']) ? $val['definition'] : null
+				)
+			);
+
+			if ($g===false) {
+
+				$fail++;
+				continue;
+
+			} else {
+			
+				$gloss++;
+
+			}
+			
+			$id = $this->models->Glossary->getNewId();
+
+			foreach((array)$val['synonyms'] as $sVal) {
+			
+				$lt = $this->models->GlossarySynonym->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'glossary_id' => $id,
+						'synonym' => $sVal
+					)
+				);
+
+			}
+
+			foreach((array)$val['multimedia'] as $mVal) {
+			
+				$lt = $this->models->GlossarySynonym->save(
+					array(
+						'id' => 'null',
+						'project_id' => $this->getNewProjectId(),
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'glossary_id' => $id,
+						'synonym' => $sVal
+					)
+				);
 
 			}
 
@@ -2122,6 +2298,8 @@ class ImportController extends Controller
 		$p = $this->models->Project->delete(array('id' => $id));
 	
 	}
+
+
 /*
 
 <glossary>

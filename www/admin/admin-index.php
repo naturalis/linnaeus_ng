@@ -4,7 +4,7 @@
     
         because this file is outside the "views" directory, some logic is required here.
     
-    */
+*/
 
 require_once ('../../configuration/admin/controllers/UsersController.php');
 
