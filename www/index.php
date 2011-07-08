@@ -43,6 +43,8 @@ To use an application, follow one of the following links:<br />
 <li><span class="pseudo-a" onclick="$('#p').val('1');$('#theForm').submit();">Polar Bears Of Amsterdam</span></li>
 <li><span class="pseudo-a" onclick="$('#p').val('5');$('#theForm').submit();">Lemuren</span></li>
 <li><span class="pseudo-a" onclick="$('#p').val('64');$('#theForm').submit();">TanBIF</span></li>
+<li><span class="pseudo-a" onclick="$('#p').val('67');$('#theForm').submit();">Euphausiids</span></li>
+<li><span class="pseudo-a" onclick="$('#p').val('72');$('#theForm').submit();">Burren</span></li>
 </ul>
 <br />
 </div>
