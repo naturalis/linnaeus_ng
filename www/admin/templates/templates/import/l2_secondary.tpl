@@ -89,6 +89,15 @@ No contributors text found.
 </p>
 
 <p>
+<b>Additional topics</b><br/>
+{if $additionalContent}
+Import additional topics ({$additionalContent|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="additional_content" checked="checked">yes</label><br />
+{else}
+No additional topics found.
+{/if}
+</p>
+
+<p>
 <b>Keys</b><br/>
 Import dichotomous key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_dich" checked="checked">yes</label><br />
 Import matrix key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_matrix" checked="checked">yes</label><br />

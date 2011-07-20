@@ -23,6 +23,7 @@ Review the data below and press "save" to save it to the database. In the follow
 <form method="post">
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
+
 <p>
 <b>Ranks</b><br />
 {if $ranks|@count==0}
@@ -59,19 +60,20 @@ Resolved rank: {$k}<br />
 
 <p>
 <b>Species</b><br />
-The following species have no rank and will not be loaded:<br />
 {assign var=i value=0}
 {foreach from=$species key=k item=v}
 {if $v.rank_id==''}
-&#149;&nbsp;{$v.taxon} <span class="minor">(found in: {$v.source})</span><br />
+&#149;&nbsp;"{$v.taxon}" has no rank and will not be loaded. <span class="minor">(found in: {$v.source})</span><br />
 {else}
 {assign var=i value=$i+1}
 {/if}
 {/foreach}
-<span class="info">Found {$i} "healthy" species that will be loaded</span>
+Found {$i} "healthy" species that will be loaded<br />
 </p>
 
 <p>
+
+{if $treetops|@count > 1}
 <b>Tree conflicts</b><br />
 The following species have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
 <br />
@@ -80,6 +82,7 @@ The following species have no parent. It is possible that the taxon tree has sev
 &#149;&nbsp;{$v.taxon} <span class="minor">(found in: {$v.source})</span>&nbsp;<label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label><br />
 {/foreach}
 </p>
+{/if}
 
 <input type="submit" value="save" />
 </form>
