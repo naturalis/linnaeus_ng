@@ -1,6 +1,11 @@
 <?php
 /*
 
+FREE MODULES MEDIA
+FREE MODULES INTERNAL LINKS
+FREE MODULES RIGHTS requires login
+
+
 
 page time out? (image copy)
 
@@ -39,8 +44,9 @@ need to set manually!
 	
 	NO GEO DATA
 	NO SYNONYMS
-	NO GLOSSARY OF KEYWORDS	
 	MATRIX KEY: never saw all types
+
+	(ignored: literary references to glossary terms)
 
 */
 
@@ -75,7 +81,11 @@ class ImportController extends Controller
 		'characteristic_label_state',
 		'glossary',
 		'glossary_synonym',
-		'glossary_media'
+		'glossary_media',
+		'free_module_project',
+		'free_module_project_user',
+		'free_module_page',
+		'content_free_module'
     );
    
     public $usedHelpers = array(
@@ -212,6 +222,7 @@ class ImportController extends Controller
 
 		$this->deleteMatrices($this->getNewProjectId());
 		$this->deleteDichotomousKey($this->getNewProjectId());
+		$this->deleteGlossary($this->getNewProjectId());
 		$this->deleteLiterature($this->getNewProjectId());
 		$this->deleteProjectContent($this->getNewProjectId());
 		$this->deleteCommonnames($this->getNewProjectId());
@@ -223,6 +234,7 @@ class ImportController extends Controller
 		$this->deleteProjectUsers($this->getNewProjectId());
 		$this->deleteProjectLanguage($this->getNewProjectId());
 		$this->deleteModulesFromProject($this->getNewProjectId());
+		$this->deleteProjectImagePaths($this->getNewProjectId());
 		$this->deleteProject($this->getNewProjectId());
 
 		$this->setNewProjectId(null);
@@ -269,6 +281,7 @@ class ImportController extends Controller
 					$this->addMessage('Created new project: '.(string)$d->project->title);
 					$this->setNewProjectId($newId);
 					$this->addCurrentUserToProject();
+					$this->makeMediaTargetPaths();
 	
 					// add language
 					$l = $this->addProjectLanguage($d);
@@ -346,7 +359,7 @@ class ImportController extends Controller
 
 			$this->addModuleToProject(4);
 			$this->addModuleToProject(5);
-
+			
 			$this->smarty->assign('processed',true);
 
 		}
@@ -371,6 +384,7 @@ class ImportController extends Controller
 		$content = $this->getProjectContent($d);
 		$literature = $this->resolveLiterature($d,$species);
 		$glossary = $this->resolveGlossary($d);
+		$additionalContent = $this->checkAdditionalContent($d);
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -466,13 +480,19 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('glossary','on')) {
 
-				$res = $this->addLiterature($literature);
+				$res = $this->addGlossary($glossary);
 
-				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].').');
-		
-				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].').');
+				$this->addMessage('Added '.$res['gloss'].' glossary items (failed '.$res['fail'].').');
 
-				$this->addModuleToProject(3);
+				$this->addMessage('Added '.count((array)$res['saved']).' glossary images (failed '.count((array)$res['failed']).').');
+
+				$this->addModuleToProject(2);
+
+			}
+
+			if ($this->rHasVal('additional_content','on')) {
+
+				$res = $this->addAdditionalContent($additionalContent);
 
 			}
 
@@ -519,6 +539,7 @@ class ImportController extends Controller
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('literature',$literature);
 		$this->smarty->assign('glossary',$glossary);
+		$this->smarty->assign('additionalContent',$additionalContent);
 
         $this->printPage();
 
@@ -547,13 +568,15 @@ class ImportController extends Controller
 		/*
 
 			1 | Introduction
-		2 | Glossary
+			2 | Glossary
 			3 | Literature
 			4 | Species module
 			5 | Higher taxa
 			6 | Dichotomous key
 			7 | Matrix key
 		8 | Map key
+		
+		free modules
 		
 		*/
 
@@ -677,6 +700,7 @@ class ImportController extends Controller
 	
 	}
 
+	// project ranks
 	private function resolveProjectRanks($d)
 	{
 
@@ -778,7 +802,8 @@ class ImportController extends Controller
 		return $d;
 
 	}
-	
+
+	// species (& treetops)
 	private function resolveSpecies($d,$ranks)
 	{
 
@@ -959,7 +984,7 @@ class ImportController extends Controller
 
 				foreach($val->keywords->keyword as $kKey => $kVal) {
 	
-					$t = $this->replaceOldLinks($this->replaceOldTags((string)$kVal->name,true));
+					$t = $this->replaceOldTags($this->replaceOldLinks((string)$kVal->name),true);
 	
 					if (isset($species[$t])) {
 	
@@ -1260,15 +1285,20 @@ class ImportController extends Controller
 
 		}
 
-	}	
+	}
 
-	private function addSpeciesMedia($d,$species)
+	private function makeMediaTargetPaths()
 	{
-
+	
 		$paths = $this->makePaths($this->getNewProjectId());
 
 		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
 		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
+
+	}
+
+	private function addSpeciesMedia($d,$species)
+	{
 
 		$this->loadControllerConfig('Species');
 		
@@ -1539,12 +1569,86 @@ class ImportController extends Controller
 
 	}
 
-	private function addGlossary($d)
+	private function doAddGlossaryMedia($id,$data,$mimes)
 	{
 
-		echo 'addGlossary: NO MEDIA YET';
-		return;
+		/*
+		
+			$data = 
+				array(
+					'filename' => (string)$mVal->filename,
+					'fullname' => (string)$mVal->fullname,
+					'caption' => (string)$mVal->caption,
+					'type' => (string)$mVal->multimedia_type,
+				);
 
+		*/
+
+		if ($_SESSION['system']['import']['imagePath']==false)
+			return array(
+				'saved' => false,
+				'data' => $data['fileName'],
+				'cause' => 'user specified no media import for project'
+			);
+
+		$fileToImport = $_SESSION['system']['import']['imagePath'].$data['fileName'];
+
+		if (file_exists($fileToImport)) {
+
+			$thisMIME = mime_content_type($fileToImport);
+			
+			if (isset($mimes[$thisMIME])) {
+			
+				if ($_SESSION['system']['import']['thumbsPath']==false)
+					$thumbName = null;
+				else
+					$thumbName = file_exists($_SESSION['system']['import']['thumbsPath'].$data['fileName']) ? $data['fileName'] : null;
+
+					$this->models->GlossaryMedia->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getNewProjectId(),
+							'glossary_id' => $id,
+							'file_name' => $data['filename'],
+							'original_name' => $data['fullname'],
+							'mime_type' => $thisMIME,
+							'file_size' => filesize($fileToImport),
+							'thumb_name' => $thumbName ? $thumbName : null,
+						)
+					);
+
+				return array(
+					'saved' => true,
+					'filename' => $data['fileName'],
+					'full_path' => $fileToImport,
+					'thumb' => isset($thumbName) ? $thumbName : null,
+					'thumb_path' => isset($thumbName) ? $_SESSION['system']['import']['thumbsPath'].$thumbName : null
+				);
+
+			} else {
+
+				return array(
+					'saved' => false,
+					'data' => $data['fileName'],
+					'cause' => 'mime-type "'.$thisMIME.'" not allowed'
+				);
+
+			}
+		
+		} else {
+		
+			return array(
+				'saved' => false,
+				'data' => $data['fileName'],
+				'cause' => 'file "'.$data['fileName'].'" does not exist'
+			);
+		
+		}
+
+	}
+
+	private function addGlossary($d)
+	{
 
 		$gloss = $fail = 0;
 
@@ -1587,27 +1691,45 @@ class ImportController extends Controller
 
 			}
 
-			foreach((array)$val['multimedia'] as $mVal) {
+			$this->loadControllerConfig('Glossary');
 			
-				$lt = $this->models->GlossarySynonym->save(
-					array(
-						'id' => 'null',
-						'project_id' => $this->getNewProjectId(),
-						'language_id' => $this->getNewDefaultLanguageId(),
-						'glossary_id' => $id,
-						'synonym' => $sVal
-					)
-				);
+			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) {
+	
+				$mimes[$val['mime']] = $val;
+	
+			}
+
+
+			if (isset($val['multimedia'])) {
+
+				foreach((array)$val['multimedia'] as $mVal) {
+	
+					$r = $this->doAddGlossaryMedia($id,$mVal,$mimes);
+	
+					if ($r['saved']==true) {
+	
+						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+	
+						$saved[] = $r;
+					
+					} else {
+	
+						$failed[] = $r;
+	
+					}
+	
+				}
 
 			}
 
 		}
 
 		return array(
-			'lit' => $lit,
-			'ref' => $ref,
-			'litFail' => $litFail,
-			'refFail' => $refFail,
+			'gloss' => $gloss,
+			'fail' => $fail,
+			'saved' => isset($saved) ? $saved : null,
+			'failed' => isset($failed) ? $failed : null
 		);
 
 	}
@@ -2172,6 +2294,180 @@ class ImportController extends Controller
 
 	}
 
+	private function checkAdditionalContent($d)
+	{
+
+		if (!$d->introduction) return null;
+	
+		foreach($d->introduction->topic as $key => $val) {
+		
+			$res[] = array(
+				'title' => (string)$val->introduction_title,
+				'content' => (string)$val->text,
+				'image' => (string)$val->overview
+			);
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function addAdditionalContent($content)
+	{
+
+		// assuming only one 'introduction' branch in the import (= a single free module)
+
+		$freeModName = 'Introduction';
+
+		$exists = true;
+		$i = null;
+
+		while ($exists == true) {
+		
+			$freeModName = $freeModName.(isset($i) ? ' ('.$i.')' : '');
+
+			$fmp = $this->models->FreeModuleProject->_get(
+				array(
+					'id' => array(
+						'module' => $freeModName,
+						'project_id' => $this->getNewProjectId(),
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+			
+			if ($fmp[0]['total']!=0) {
+			
+				$i++;
+
+			} else {
+			
+				$exists = false;
+
+			}
+
+		}
+		
+		$this->models->FreeModuleProject->save(
+			array(
+				'id' => null, 
+				'module' => $freeModName, 
+				'project_id' => $this->getNewProjectId(),
+				'active' => 'y'
+			)
+		);
+		
+		$moduleId = $this->models->FreeModuleProject->getNewId();
+
+		$this->models->FreeModuleProjectUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(), 
+				'free_module_id' => $moduleId, 
+				'user_id' => $this->getCurrentUserId()
+			)
+		);
+
+		foreach($content as $key => $val) {
+
+			$this->models->FreeModulePage->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),
+					'module_id' => $moduleId
+				)
+			);
+			
+			$pageId = $this->models->FreeModulePage->getNewId();
+			
+			$this->models->ContentFreeModule->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'module_id' => $moduleId,
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'page_id' => $pageId,
+					'topic' => $val['title'],
+					'content' => $val['content']
+				)
+			);
+
+/*
+					$fmm = $this->models->FreeModuleMedia->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'page_id' => $this->requestData['id'],
+							'file_name' => $file['name'],
+							'original_name' => $file['original_name'],
+							'mime_type' => $file['mime_type'],
+							'file_size' => $file['size'],
+							'thumb_name' => $thumb ? $thumb : null,
+						)
+					);
+
+
+
+//			$res[] = array(
+//				'title' => (string)$val->introduction_title,
+//				'content' => (string)$val->text,
+//				'image' => (string)$val->overview
+//			);
+
+*/
+		}
+
+	}
+
+
+/*
+
+	extract links
+	loop links
+		if image / movie
+			extract media name
+			does media exist
+				create link for local pop up
+			does media not exist
+				create link to fail message ???
+			add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
+		if module
+			extract module
+			extract specific id <- module + name
+			extract linked text
+			add to arrays [orig links] => [new links] <- text + front-end link logic
+
+	replace [orig links] => [new links]
+
+use these, forget the rest until someone complains:
+
+[l][m]Glossary[/m][r]carapace[/r][t]carapace[/t][/l]
+[l][m]Higher Taxa[/m][r]Genus Bentheuphausia[/r][t]genus [i]Bentheuphausia[/i][/t][/l]
+[l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
+[l][m]Species[/m][r]Euphausia superba[/r][t][i]Euphausia[/i][i] [/i][i]superba[/i][/t][/l]
+
+[l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
+[l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
+
+
+
+[filename] = [f]
+[image] = [im]
+[link] = [l]
+[module] = [m]
+[movie] = [mo]
+[record] = [r]
+[sound] = [s]
+[text] = [t]
+
+*/
+
+
+
+
+
+
 	private function deleteMatrices($id)
 	{
 
@@ -2197,6 +2493,25 @@ class ImportController extends Controller
 
 	}
 
+	private function deleteGlossary($id)
+	{
+
+		$paths = $this->makePaths($this->getNewProjectId());
+
+		$mt = $this->models->GlossaryMedia->_get(array('id' => array('project_id' => $id)));
+
+		foreach((array)$mt as $val) {
+
+			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
+			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
+
+		}
+
+		$this->models->GlossaryMedia->delete(array('project_id' => $id));
+		$this->models->GlossarySynonym->delete(array('project_id' => $id));
+		$this->models->Glossary->delete(array('project_id' => $id));
+			
+	}
 
 	private function deleteLiterature($id)
 	{
@@ -2226,9 +2541,6 @@ class ImportController extends Controller
 			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
 
 		}
-
-		@unlink($paths['project_thumbs']);
-		@unlink($paths['project_media']);
 
 		$this->models->MediaTaxon->delete(array('project_id' => $id));
 		$this->models->MediaDescriptionsTaxon->delete(array('project_id' => $id));
@@ -2292,92 +2604,21 @@ class ImportController extends Controller
 	
 	}
 
+	private function deleteProjectImagePaths($id)
+	{
+	
+		$paths = $this->makePaths($this->getNewProjectId());
+
+		@unlink($paths['project_thumbs']);
+		@unlink($paths['project_media']);
+
+	}
+
 	private function deleteProject($id)
 	{
 	
 		$p = $this->models->Project->delete(array('id' => $id));
 	
 	}
-
-
-/*
-
-<glossary>
-	<term>
-		<glossary_title></glossary_title>Deze tag was in WBD versie incorrect tussen <term> gedefinieerd
-		<definition></definition>
-		<glossary_synonyms>
-			<glossary_synonym>
-				<name></name>
-			</glossary_synonym> was <sameterm>. per ‘synonym’ te specificeren.
-		</glossary_synonyms>
-		<gloss_multimedia> onderscheid van <multimedia> in records
-			<gloss_multimediafile>
-				<filename></filename>De filenaam van het plaatje. Deze tag was in WBD versie incorrect tussen <image> gedefinieerd
-				<fullname></fullname>De naam zoals die in Linnaeus verschijnt (kan verschillen bij Mac -> PC vertaalde projecten)
-				<caption></caption>
-				<multimedia_type></multimedia_type>kan zijn: Image, Movie, Sound, Text file
-			</gloss_multimediafile>
-		</gloss_multimedia>
-	</term>
-</glossary>
-
-<introduction>
-	<topic>
-		<introduction_title></introduction_title>Deze tag was in WBD versie incorrect tussen <topic> gedefinieerd
-		<text></text>
-		<overview></overview>Link naar overviewplaatje.
-	</topic>
-</introduction>
-
-
-KAN NIET
-<!-- diversity>MapIt diversity index
-	<totalsmap>Informatie per kaart
-		<mapname></mapname>Naam van de kaart
-		<gridspecs></gridspecs>Gridinformatie, 6 comma-delimited waarden: N (+), W (+), Z (-), O (-), hoogte blok (in graden), breedte blok (in graden)
-		<squaretotals>Alle vakjes per kaart
-			<squaretotal>Gegevens per vakje
-				<squarenumber></squarenumber>Vaknummer (numeriek), moet altijd een waarde hebben
-				<squarecount>Aantal soorten per vakje (zowel totalen als per legendakleur)
-					<squaretotalcount></squaretotalcount>Som van alle legendakleuren per vakje												<squaretotalobjects>Som van alle soorten per vakje
-						<squaretotalobject>Soort die in het vakje voorkomt
-							<name></name>Naam van de soort
-						</squaretotalobject>
-					</squaretotalobjects>
-					<legend_colors>
-						<legend_color>Totalen per legendakleur per vakje
-							<legend_name></legend_name>Legendanaam
-							<object_count></object_count>Aantal soorten per legendakleur per vakje											<squareobject>Soort per legendakleur per vakje
-								<name></name>Naam van soort per legendakleur per vakje
-							</squareobject>
-						</legend_color>
-					</legend_colors>
-				</squarecount>
-			</squaretotal>
-		</squaretotals>
-	</totalsmap>
-</diversity -->
-
-		<distribution>MapIt data
-			<map>Informatie per kaart
-				<mapname></mapname>naam van de map
-				<specs></specs>Gridinformatie
-				<squares>meerdere squares per map
-					<square>Gegevens per blok
-						<number></number>Bloknummer
-						<legend></legend>Legendakleur
-					</square>
-				</squares>
-				<typelocalities>geef type locaties (meerdere mogelijk) per soort
-					<typelocality>
-						<latitude></latitude>
-						<longitude></longitude>
-						<info></info>
-					</typelocality>
-				</typelocalities>
-			</map>
-		</distribution>	
-*/	
 	
 }
