@@ -141,6 +141,8 @@ class ImportController extends Controller
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
 
         $this->setPageName(_('Choose file'));
+		
+		$this->setSuppressProjectInBreadcrumbs();
 
 		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
 
