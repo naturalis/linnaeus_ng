@@ -61,16 +61,6 @@
 </ul>
 
 {/if}
-{if $currentRole.role_id==1}
-
-{t}System administration tasks:{/t}
-<ul>
-	<li><a href="views/import/linnaeus2.php">{t}Import Linnaeus 2 data{/t}</a></li>
-	<!-- li><a href="">{t}Set rights{/t}</a></li>
-	<li><a href="">{t}Create a project{/t}</a></li -->
-</ul>
-
-{/if}
 </div>
 
 {include file="shared/admin-footer.tpl"}
