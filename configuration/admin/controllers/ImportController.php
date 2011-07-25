@@ -268,8 +268,14 @@ class ImportController extends Controller
 			}
 
 			if ($this->rHasVal('project','-1')) {
-			
-				$newId = $this->createProject($d);
+
+				$newId = $this->createProject(
+					array(
+						 'title' => $d->project->title,
+						 'version' => $d->project->version,
+						 'sys_description' => 'Created from Linnaeus 2 export.'
+					)
+				);
 
 				if (!$newId) {
 	
@@ -599,22 +605,6 @@ class ImportController extends Controller
 		$d = $this->models->Project->_get(array('id' => $d));
 
 		return isset($id) ? $d[0] : $d;
-	
-	}
-
-	private function createProject($d)
-	{
-	
-		$p = $this->models->Project->save(
-			array(
-				'id' => 'null',
-				'sys_name' => $d->project->title.' v'.$d->project->version,
-				'sys_description' => 'Created from Linnaeus 2 export.',
-				'title' => $d->project->title,				
-			)
-		);
-
-		return ($p) ? $this->models->Project->getNewId() : false;
 	
 	}
 

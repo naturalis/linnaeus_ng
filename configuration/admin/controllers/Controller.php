@@ -419,7 +419,7 @@ class Controller extends BaseClass
     {
         
         $_SESSION['project']['id'] = $id;
-  
+		
         $this->models->ProjectRoleUser->update(
 			array(
                 'last_project_select' => 'now()', 
@@ -619,7 +619,7 @@ class Controller extends BaseClass
     {
         
         $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
-        
+
         foreach ((array) $pru as $key => $val) {
             
             $p = $this->models->Project->_get(array('id'=>$val['project_id']));
@@ -714,8 +714,6 @@ class Controller extends BaseClass
     
     }
 
-
-
     /**
      * Checks whether a user is authorized to view/use a certain page and redirects if necessary
      *
@@ -727,17 +725,17 @@ class Controller extends BaseClass
      * @return     boolean        returns true if authorized, or redirects if not
      * @access     public
      */
-    public function checkAuthorisation ()
+    public function checkAuthorisation($allowNoProjectId=false)
     {
 
         // check if user is logged in, otherwise redirect to login page
         if ($this->isUserLoggedIn()) {
             
             // check if there is an active project, otherwise redirect to choose project page
-            if ($this->getCurrentProjectId()) {
+            if ($this->getCurrentProjectId() || $allowNoProjectId) {
 
                 // check if the user is authorised for the combination of current page / current project
-                if ($this->isUserAuthorisedForProjectPage()) {
+                if ($this->isUserAuthorisedForProjectPage() || $this->isSysAdmin()) {
 
                     return true;
                 
@@ -829,8 +827,29 @@ class Controller extends BaseClass
 		}
 		
 		$_SESSION['user']['currentRole'] = $r;
-		
+
         return $r;
+
+    }
+
+
+
+    /**
+     * Returns whether the active user is a general sysadmin (i.e., sysadmin rights for project 0)
+     *
+     * @return     boolean	true or false
+     * @access     public
+     */
+    public function isSysAdmin()
+    {
+
+		foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+
+			if ($val['project_id']==0 && $val['role_id']==ID_ROLE_SYS_ADMIN) return true;
+
+		}
+
+		return false;
 
     }
 
@@ -1321,7 +1340,41 @@ class Controller extends BaseClass
 		return $res;
 
 	}
-				
+
+
+	public function createProject($d)
+	{
+	
+		$p = $this->models->Project->save(
+			array(
+				'id' => 'null',
+				'sys_name' => $d['title'].(isset($d['version']) ? ' v'.$d['version'] : $d['version']),
+				'sys_description' => $d['sys_description'],
+				'title' => $d['title']
+			)
+		);
+
+		return ($p) ? $this->models->Project->getNewId() : false;
+	
+	}
+
+
+	public function addUserToProject($userId,$projectId,$roleId,$active=1)
+	{
+	
+		$this->models->ProjectRoleUser->save(
+			array(
+				'id' => 'null',
+				'project_id' => $projectId,	
+				'role_id' => $roleId,
+				'user_id' =>$userId,
+				'active' => $active
+			)
+		);
+
+	}
+
+
     private function _getTaxonTree($params) 
     {
 
@@ -1696,6 +1749,8 @@ class Controller extends BaseClass
 			$_SESSION['user']['_said_welcome'] = true;
 
 		}
+
+        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
 
     }
 
@@ -2286,9 +2341,14 @@ class Controller extends BaseClass
         $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
 
         $this->breadcrumbs[] = array(
-            'name' => 'Projects', 
+            'name' => _('Projects'), 
             'url' => $cp
         );
+
+
+		// controller name can be overridden
+		$controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
+		$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
 
         if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title'])) {
             
@@ -2297,9 +2357,6 @@ class Controller extends BaseClass
                 'url' => $this->getLoggedInMainIndex()
             );
 			
-			// controller name can be overridden
-			$controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
-			$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
             
             if (!empty($controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
                 
@@ -2338,7 +2395,16 @@ class Controller extends BaseClass
             
             }
         
-        }
+        } else
+		if ($this->_fullPathRelative != $cp) {
+		// for special cases in which no project has been set (like 'create project')
+
+			$this->breadcrumbs[] = array(
+				'name' => $this->getPageName(), 
+				'url' => $curl . '/' . $this->getViewName() . '.php'
+			);
+
+		}
     
     }
 
@@ -2560,5 +2626,6 @@ class Controller extends BaseClass
         $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
     }
+
 
 }

@@ -136,6 +136,12 @@ class UsersController extends Controller
     }
 
 
+	public function doChooseProject($projectId)
+	{
+	
+	
+	}
+
     /**
      * Choosing the active project
      *
@@ -167,7 +173,7 @@ class UsersController extends Controller
             }
         
         }
-        
+
         $this->smarty->assign('projects', $this->getCurrentUserProjects());
         
         $this->printPage();
@@ -543,7 +549,7 @@ class UsersController extends Controller
 					)
 				);
 				
-				if ($pru[0]['role_id'] != ID_ROLE_LEAD_EXPERT2) {
+				if ($pru[0]['role_id'] != ID_ROLE_LEAD_EXPERT) {
 				
 					$this->deleteUser($this->requestData['id']);
 
