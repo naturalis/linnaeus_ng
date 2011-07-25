@@ -414,6 +414,62 @@ class ProjectsController extends Controller
     }
 
 
+	public function createAction()
+	{
+
+        $this->checkAuthorisation(true);
+        
+        $this->setPageName(_('Create new project'));
+
+		$this->setSuppressProjectInBreadcrumbs();
+
+        if (isset($this->requestData) && !$this->isFormResubmit()) {
+				
+			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description')) {
+	
+				if (!$this->rHasVal('title')) $this->addError(_('A title is required.'));
+				if (!$this->rHasVal('sys_description')) $this->addError(_('A description is required.'));
+				
+			} else {
+	
+				$id = $this->createProject(
+					array(
+						'title' => $this->requestData['title'],
+						'version' => isset($this->requestData['version']) ? $this->requestData['version'] : null,
+						'sys_description' => $this->requestData['sys_description'],
+					)
+				);
+				
+				if ($id) {
+				
+					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_LEAD_EXPERT);
+					
+					$this->reInitUserRolesAndRights();
+	                $this->setCurrentProjectId($id);
+	                $this->setCurrentProjectData();
+					$this->getCurrentUserCurrentRole(true);
+
+					$this->smarty->assign('saved',true);
+					$this->addMessage(sprintf(_('Project \'%s\' saved.'),$this->requestData['title']));
+					$this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
+				
+				} else {
+
+					$this->addError(_('Could not save project (duplicate name?).'));
+
+				}
+
+			}
+
+        }
+        
+		if (isset($this->requestData)) $this->smarty->assign('data',$this->requestData);
+
+        $this->printPage();
+
+	}
+
+
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
 
@@ -673,60 +729,6 @@ class ProjectsController extends Controller
         }
     
     }
-
-
-	public function createAction()
-	{
-
-        $this->checkAuthorisation(true);
-        
-        $this->setPageName(_('Create new project'));
-
-        if (isset($this->requestData) && !$this->isFormResubmit()) {
-				
-			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description')) {
-	
-				if (!$this->rHasVal('title')) $this->addError(_('A title is required.'));
-				if (!$this->rHasVal('sys_description')) $this->addError(_('A description is required.'));
-				
-			} else {
-	
-				$id = $this->createProject(
-					array(
-						'title' => $this->requestData['title'],
-						'version' => isset($this->requestData['version']) ? $this->requestData['version'] : null,
-						'sys_description' => $this->requestData['sys_description'],
-					)
-				);
-				
-				if ($id) {
-				
-					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_LEAD_EXPERT);
-					
-					$this->reInitUserRolesAndRights();
-	                $this->setCurrentProjectId($id);
-	                $this->setCurrentProjectData();
-					$this->getCurrentUserCurrentRole(true);
-
-					$this->smarty->assign('saved',true);
-					$this->addMessage(sprintf(_('Project \'%s\' saved.'),$this->requestData['title']));
-					$this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
-				
-				} else {
-
-					$this->addError(_('Could not save project (duplicate name?).'));
-
-				}
-
-			}
-
-        }
-        
-		if (isset($this->requestData)) $this->smarty->assign('data',$this->requestData);
-
-        $this->printPage();
-
-	}
 
 
 }

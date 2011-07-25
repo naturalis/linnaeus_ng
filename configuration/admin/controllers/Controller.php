@@ -37,6 +37,7 @@ class Controller extends BaseClass
 	public $uiLanguages;
 	public $uiDefaultLanguage;
     public $treeList;
+	public $suppressProjectInBreadcrumbs;
 
     private $usedModelsBase = array(
         'user', 
@@ -2326,6 +2327,12 @@ class Controller extends BaseClass
     }
 
 
+	public function setSuppressProjectInBreadcrumbs($state=true)
+	{
+
+		$this->suppressProjectInBreadcrumbs = $state;
+
+	}
 
     /**
      * Create the breadcrumb trail
@@ -2350,7 +2357,7 @@ class Controller extends BaseClass
 		$controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
 		$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
 
-        if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title'])) {
+        if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title']) && !$this->suppressProjectInBreadcrumbs) {
             
             $this->breadcrumbs[] = array(
                 'name' => $_SESSION['project']['title'], 
