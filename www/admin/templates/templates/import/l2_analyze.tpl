@@ -13,6 +13,13 @@
 	color:#888;
 }
 </style>
+<script>
+function toggleAllValid() {
+
+	$("input[@name='treetops*'][type='checkbox']").attr('checked',$('#allTreetops').is(':checked'));
+
+}
+</script>
 {/literal}
 <div id="page-main">
 {if $processed==true}
@@ -76,11 +83,23 @@ Found {$i} "healthy" species that will be loaded<br />
 {if $treetops|@count > 1}
 <b>Tree conflicts</b><br />
 The following species have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
-<br />
+<table>
+<tr>
+	<td style="border-bottom:1px solid #999">&nbsp;</td>
+	<td style="border-bottom:1px solid #999">Species</td>
+	<td style="border-bottom:1px solid #999">source</td>
+	<td style="border-bottom:1px solid #999"><label><input type="checkbox" id="allTreetops" value="{$v.taxon}" onclick="toggleAllValid()" />select all</label></td>
+</tr>
 {assign var=i value=0}
 {foreach from=$treetops key=k item=v}
-&#149;&nbsp;{$v.taxon} <span class="minor">(found in: {$v.source})</span>&nbsp;<label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label><br />
+<tr>
+	<td>&#149;&nbsp;</td>
+	<td>{$v.taxon}</td>
+	<td><span class="minor">(found in: {$v.source})</span></td>
+	<td><label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label></td>
+</tr>
 {/foreach}
+</table>
 </p>
 {/if}
 
