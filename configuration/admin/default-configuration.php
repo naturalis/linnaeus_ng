@@ -67,6 +67,7 @@ class configuration
                 'versionTimestamp' => '@TIMESTAMP@', 
                 'pathName' => 'admin',
             ),
+			'serverTimeZone' => 'Europe/Amsterdam',
             'maxSessionHistorySteps' => 10, 
             'heartbeatFrequency' => 60000,  // milliseconds
             'autosaveFrequency' => 300000,  // milliseconds

@@ -27,9 +27,6 @@ Create all new project or use existing?
 <p>
 <a href="linnaeus2.php">back</a>
 </p>
-<p>
-<a href="delete_project.php">delete current project</a>
-</p>
 </div>
 
 {include file="../shared/admin-footer.tpl"}

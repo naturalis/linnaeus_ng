@@ -41,7 +41,7 @@ need to set manually!
 	
 	???			.classification --> "Five kingdoms"
 	???			.nomenclaturecode --> "ICZM"
-	
+
 	NO GEO DATA
 	NO SYNONYMS
 	MATRIX KEY: never saw all types
@@ -219,32 +219,6 @@ class ImportController extends Controller
 
     }
 
-	public function deleteProjectAction()
-	{
-
-		$this->deleteMatrices($this->getNewProjectId());
-		$this->deleteDichotomousKey($this->getNewProjectId());
-		$this->deleteGlossary($this->getNewProjectId());
-		$this->deleteLiterature($this->getNewProjectId());
-		$this->deleteProjectContent($this->getNewProjectId());
-		$this->deleteCommonnames($this->getNewProjectId());
-		$this->deleteSpeciesMedia($this->getNewProjectId());
-		$this->deleteSpeciesContent($this->getNewProjectId());
-		$this->deleteStandardCat($this->getNewProjectId());
-		$this->deleteSpecies($this->getNewProjectId());
-		$this->deleteProjectRanks($this->getNewProjectId());
-		$this->deleteProjectUsers($this->getNewProjectId());
-		$this->deleteProjectLanguage($this->getNewProjectId());
-		$this->deleteModulesFromProject($this->getNewProjectId());
-		$this->deleteProjectImagePaths($this->getNewProjectId());
-		$this->deleteProject($this->getNewProjectId());
-
-		$this->setNewProjectId(null);
-		
-		$this->redirect('linnaeus2.php');
-
-	}
-
 	public function l2ProjectAction()
 	{
 
@@ -395,6 +369,8 @@ class ImportController extends Controller
 		$additionalContent = $this->checkAdditionalContent($d);
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+		
+			ini_set('max_execution_time',600);
 
 			if ($this->rHasVal('taxon_overview','on')) {
 
@@ -2460,157 +2436,6 @@ use these, forget the rest until someone complains:
 
 
 
-	private function deleteMatrices($id)
-	{
 
-		$this->models->MatrixTaxonState->delete(array('project_id' => $id));
-		$this->models->MatrixTaxon->delete(array('project_id' => $id));
-		$this->models->CharacteristicLabelState->delete(array('project_id' => $id));
-		$this->models->CharacteristicState->delete(array('project_id' => $id));
-		$this->models->CharacteristicMatrix->delete(array('project_id' => $id));
-		$this->models->CharacteristicLabel->delete(array('project_id' => $id));
-		$this->models->Characteristic->delete(array('project_id' => $id));
-		$this->models->MatrixName->delete(array('project_id' => $id));
-		$this->models->Matrix->delete(array('project_id' => $id));
-
-	}
-	
-	private function deleteDichotomousKey($id)
-	{
-
-		$this->models->ChoiceContentKeystep->delete(array('project_id' => $id));
-		$this->models->ChoiceKeystep->delete(array('project_id' => $id));
-		$this->models->ContentKeystep->delete(array('project_id' => $id));
-		$this->models->Keystep->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteGlossary($id)
-	{
-
-		$paths = $this->makePaths($this->getNewProjectId());
-
-		$mt = $this->models->GlossaryMedia->_get(array('id' => array('project_id' => $id)));
-
-		foreach((array)$mt as $val) {
-
-			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
-			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
-
-		}
-
-		$this->models->GlossaryMedia->delete(array('project_id' => $id));
-		$this->models->GlossarySynonym->delete(array('project_id' => $id));
-		$this->models->Glossary->delete(array('project_id' => $id));
-			
-	}
-
-	private function deleteLiterature($id)
-	{
-
-		$this->models->LiteratureTaxon->delete(array('project_id' => $id));
-		$this->models->Literature->delete(array('project_id' => $id));
-			
-	}
-
-	private function deleteProjectContent($id)
-	{
-	
-		$this->models->Content->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteSpeciesMedia($id)
-	{
-
-		$paths = $this->makePaths($this->getNewProjectId());
-
-		$mt = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $id)));
-
-		foreach((array)$mt as $val) {
-
-			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
-			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
-
-		}
-
-		$this->models->MediaTaxon->delete(array('project_id' => $id));
-		$this->models->MediaDescriptionsTaxon->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteCommonnames($id)
-	{
-
-		$this->models->Commonname->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteStandardCat($id)
-	{
-	
-		$this->models->PageTaxonTitle->delete(array('project_id' => $id));
-		$this->models->PageTaxon->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteSpeciesContent($id)
-	{
-
-		$this->models->ContentTaxon->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteSpecies($id)
-	{
-
-		$this->models->Taxon->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteProjectRanks($id)
-	{
-
-		$this->models->ProjectRank->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteProjectUsers($id)
-	{
-	
-		$this->models->ProjectRoleUser->delete(array('project_id' => $id));
-
-	}
-
-	private function deleteProjectLanguage($id)
-	{
-	
-		$this->models->LanguageProject->delete(array('project_id' => $id));
-	
-	}
-
-	private function deleteModulesFromProject($id)
-	{
-
-		$this->models->ModuleProject->delete(array('project_id' => $id));	
-	
-	}
-
-	private function deleteProjectImagePaths($id)
-	{
-	
-		$paths = $this->makePaths($this->getNewProjectId());
-
-		@unlink($paths['project_thumbs']);
-		@unlink($paths['project_media']);
-
-	}
-
-	private function deleteProject($id)
-	{
-	
-		$p = $this->models->Project->delete(array('id' => $id));
-	
-	}
 	
 }

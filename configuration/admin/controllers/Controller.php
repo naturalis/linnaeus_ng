@@ -75,6 +75,8 @@ class Controller extends BaseClass
     {
 
         parent::__construct();
+		
+		$this->setTimeZone();
         
         $this->setDebugMode();
 
@@ -843,6 +845,8 @@ class Controller extends BaseClass
      */
     public function isSysAdmin()
     {
+
+		if (!isset($_SESSION['user'])) return false;
 
 		foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
 
@@ -1805,6 +1809,12 @@ class Controller extends BaseClass
 
     }
 
+	private function setTimeZone()
+	{
+	
+		date_default_timezone_set($this->generalSettings['serverTimeZone']);
+
+	}
 
 
     /**
@@ -2405,6 +2415,8 @@ class Controller extends BaseClass
         } else
 		if ($this->_fullPathRelative != $cp) {
 		// for special cases in which no project has been set (like 'create project')
+
+			$curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
 
 			$this->breadcrumbs[] = array(
 				'name' => $this->getPageName(), 

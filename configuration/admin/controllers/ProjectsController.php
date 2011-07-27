@@ -28,7 +28,36 @@ class ProjectsController extends Controller
         'free_module_project_user', 
         'language', 
         'language_project', 
-        'content_taxon'
+		'content_taxon',
+		'page_taxon', 
+		'page_taxon_title', 
+		'commonname',
+		'media_taxon',
+		'media_descriptions_taxon',
+		'content',
+		'literature',
+		'literature_taxon',
+		'keystep',
+		'content_keystep',
+		'choice_keystep',
+		'choice_content_keystep',
+		'matrix',
+		'matrix_name',
+		'matrix_taxon',
+		'matrix_taxon_state',
+		'characteristic',
+		'characteristic_matrix',
+		'characteristic_label',
+		'characteristic_state',
+		'characteristic_label_state',
+		'glossary',
+		'glossary_synonym',
+		'glossary_media',
+		'free_module_project',
+		'free_module_project_user',
+		'free_module_page',
+		'content_free_module'
+
     );
     
     public $usedHelpers = array(
@@ -470,6 +499,91 @@ class ProjectsController extends Controller
 	}
 
 
+	public function deleteAction()
+	{
+
+        $this->checkAuthorisation(true);
+        
+        $this->setPageName(_('Delete a project'));
+
+		$this->setSuppressProjectInBreadcrumbs();
+
+
+        if ($this->rHasVal('action','delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
+		
+			$this->doDeleteProjectAction($this->requestData['id']);
+			
+			$this->addMessage('Project deleted.');
+
+		
+		} else {
+
+			$d = $this->rHasVal('p') ? array('id' => $this->requestData['p']) : '*';
+	
+			$projects = $this->models->Project->_get(array('id' => $d));
+			
+			if ($this->rHasVal('p')) {
+	
+				$this->smarty->assign('project',$projects[0]);
+	
+			} else {
+			
+				$this->smarty->assign('projects',$projects);
+	
+			}
+			
+		}
+		
+        $this->printPage();
+		
+		exit;		
+
+
+        if (isset($this->requestData) && !$this->isFormResubmit()) {
+				
+			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description')) {
+	
+				if (!$this->rHasVal('title')) $this->addError(_('A title is required.'));
+				if (!$this->rHasVal('sys_description')) $this->addError(_('A description is required.'));
+				
+			} else {
+	
+				$id = $this->createProject(
+					array(
+						'title' => $this->requestData['title'],
+						'version' => isset($this->requestData['version']) ? $this->requestData['version'] : null,
+						'sys_description' => $this->requestData['sys_description'],
+					)
+				);
+				
+				if ($id) {
+				
+					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_LEAD_EXPERT);
+					
+					$this->reInitUserRolesAndRights();
+	                $this->setCurrentProjectId($id);
+	                $this->setCurrentProjectData();
+					$this->getCurrentUserCurrentRole(true);
+
+					$this->smarty->assign('saved',true);
+					$this->addMessage(sprintf(_('Project \'%s\' saved.'),$this->requestData['title']));
+					$this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
+				
+				} else {
+
+					$this->addError(_('Could not save project (duplicate name?).'));
+
+				}
+
+			}
+
+        }
+        
+		if (isset($this->requestData)) $this->smarty->assign('data',$this->requestData);
+
+
+	}
+
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {
 
@@ -729,6 +843,182 @@ class ProjectsController extends Controller
         }
     
     }
+
+
+	private function doDeleteProjectAction($projectId)
+	{
+
+		$this->deleteMatrices($projectId);
+		$this->deleteDichotomousKey($projectId);
+		$this->deleteGlossary($projectId);
+		$this->deleteLiterature($projectId);
+		$this->deleteProjectContent($projectId);
+		$this->deleteCommonnames($projectId);
+		$this->deleteSpeciesMedia($projectId);
+		$this->deleteSpeciesContent($projectId);
+		$this->deleteStandardCat($projectId);
+		$this->deleteSpecies($projectId);
+		$this->deleteProjectRanks($projectId);
+		$this->deleteProjectUsers($projectId);
+		$this->deleteProjectLanguage($projectId);
+		$this->deleteModulesFromProject($projectId);
+		$this->deleteProjectImagePaths($projectId);
+		$this->deleteProject($projectId);
+
+	}
+
+	private function deleteMatrices($id)
+	{
+
+		$this->models->MatrixTaxonState->delete(array('project_id' => $id));
+		$this->models->MatrixTaxon->delete(array('project_id' => $id));
+		$this->models->CharacteristicLabelState->delete(array('project_id' => $id));
+		$this->models->CharacteristicState->delete(array('project_id' => $id));
+		$this->models->CharacteristicMatrix->delete(array('project_id' => $id));
+		$this->models->CharacteristicLabel->delete(array('project_id' => $id));
+		$this->models->Characteristic->delete(array('project_id' => $id));
+		$this->models->MatrixName->delete(array('project_id' => $id));
+		$this->models->Matrix->delete(array('project_id' => $id));
+
+	}
+	
+	private function deleteDichotomousKey($id)
+	{
+
+		$this->models->ChoiceContentKeystep->delete(array('project_id' => $id));
+		$this->models->ChoiceKeystep->delete(array('project_id' => $id));
+		$this->models->ContentKeystep->delete(array('project_id' => $id));
+		$this->models->Keystep->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteGlossary($id)
+	{
+
+		$paths = $this->makePaths($id);
+
+		$mt = $this->models->GlossaryMedia->_get(array('id' => array('project_id' => $id)));
+
+		foreach((array)$mt as $val) {
+
+			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
+			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
+
+		}
+
+		$this->models->GlossaryMedia->delete(array('project_id' => $id));
+		$this->models->GlossarySynonym->delete(array('project_id' => $id));
+		$this->models->Glossary->delete(array('project_id' => $id));
+			
+	}
+
+	private function deleteLiterature($id)
+	{
+
+		$this->models->LiteratureTaxon->delete(array('project_id' => $id));
+		$this->models->Literature->delete(array('project_id' => $id));
+			
+	}
+
+	private function deleteProjectContent($id)
+	{
+	
+		$this->models->Content->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSpeciesMedia($id)
+	{
+
+		$paths = $this->makePaths($id);
+
+		$mt = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $id)));
+
+		foreach((array)$mt as $val) {
+
+			if (isset($val['file_name'])) @unlink($paths['project_media'].$val['file_name']);
+			if (isset($val['thumb_name'])) @unlink($paths['project_thumbs'].$val['thumb_name']);
+
+		}
+
+		$this->models->MediaTaxon->delete(array('project_id' => $id));
+		$this->models->MediaDescriptionsTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteCommonnames($id)
+	{
+
+		$this->models->Commonname->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteStandardCat($id)
+	{
+	
+		$this->models->PageTaxonTitle->delete(array('project_id' => $id));
+		$this->models->PageTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSpeciesContent($id)
+	{
+
+		$this->models->ContentTaxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSpecies($id)
+	{
+
+		$this->models->Taxon->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteProjectRanks($id)
+	{
+
+		$this->models->ProjectRank->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteProjectUsers($id)
+	{
+	
+		$this->models->ProjectRoleUser->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteProjectLanguage($id)
+	{
+	
+		$this->models->LanguageProject->delete(array('project_id' => $id));
+	
+	}
+
+	private function deleteModulesFromProject($id)
+	{
+
+		$this->models->ModuleProject->delete(array('project_id' => $id));	
+	
+	}
+
+	private function deleteProjectImagePaths($id)
+	{
+	
+		$paths = $this->makePaths($id);
+
+		@unlink($paths['project_thumbs']);
+		@unlink($paths['project_media']);
+
+	}
+
+	private function deleteProject($id)
+	{
+	
+		$p = $this->models->Project->delete(array('id' => $id));
+	
+	}
 
 
 }
