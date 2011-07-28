@@ -2,31 +2,23 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
-<form method="post" id="theForm">
-<input type="hidden" name="clear" id="clear" value="">
-{if $project.id}
-Target roject: <b>{$project.title}</b> (<span class="pseudo-a" onclick="$('#clear').val('project');$('#theForm').submit()">change</span>)<br/>
+{if $newProjectId}
 <p>
-<input type="button" value="analyze data" onclick="window.open('l2_analyze.php','_self');" />
+A new project has been created. In the next step, species and ranks will be analyzed. The results will be presented for you to review before they are loaded.
+</p>
+<p>
+<form method="post" id="theForm">
+<input type="button" value="Analyze species and ranks" onclick="window.open('l2_analyze.php','_self');" />
+</form>
 </p>
 {else}
-Create all new project or use existing?
 <p>
-<select name="project">
-<option value="-1">create new project</option>
-{foreach from=$projects item=v}
-<option value="{$v.id}">use "{$v.title}"</option>
-{/foreach}
-</select>
+An error occurred during the creation of the new project. The import was aborted.
 </p>
-<p>
-<input type="submit" value="go" />
-</p>
-{/if}
-</form>
 <p>
 <a href="linnaeus2.php">back</a>
 </p>
+{/if}
 </div>
 
 {include file="../shared/admin-footer.tpl"}

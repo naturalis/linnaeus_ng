@@ -23,6 +23,7 @@ function toggleAllValid() {
 {/literal}
 <div id="page-main">
 {if $processed==true}
+Basic data has been loaded. Click the link below to import additional data (keys, literature, glossary, etc.)<br />
 <a href="l2_secondary.php">Import additional data</a>
 {else}
 Review the data below and press "save" to save it to the database. In the following step, data dependent on the newly saved species will be loaded. You will have to complete that step in the same session so DO NOT LOG OUT OR CLOSE YOUR BROWSER before the entire process is complete, unless you only want to load species.

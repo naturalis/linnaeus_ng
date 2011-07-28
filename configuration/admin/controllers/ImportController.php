@@ -29,10 +29,6 @@ need to set manually!
 		'is_hybrid' => 0,
 		'list_level' => 0
 
-	proj_literature->proj_reference->keywords->keyword
-		taxa only, what do glossary terms look like??
-
-
 	doesn't seem to work, though empty:
 		unlink($paths['project_thumbs']);
 		unlink($paths['project_media']);
@@ -42,11 +38,14 @@ need to set manually!
 	???			.classification --> "Five kingdoms"
 	???			.nomenclaturecode --> "ICZM"
 
-	NO GEO DATA
-	NO SYNONYMS
-	MATRIX KEY: never saw all types
+	proj_literature->proj_reference->keywords->keyword
+	ignored: literary references to glossary terms
 
-	(ignored: literary references to glossary terms)
+
+
+NO GEO DATA
+MATRIX KEY: never saw all types
+
 
 */
 
@@ -61,6 +60,7 @@ class ImportController extends Controller
 		'page_taxon', 
 		'page_taxon_title', 
 		'commonname',
+		'synonym',
 		'media_taxon',
 		'media_descriptions_taxon',
 		'content',
@@ -85,7 +85,7 @@ class ImportController extends Controller
 		'free_module_project',
 		'free_module_project_user',
 		'free_module_page',
-		'content_free_module'
+		'content_free_module',
     );
    
     public $usedHelpers = array(
@@ -224,17 +224,22 @@ class ImportController extends Controller
 
 		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
 
-        $this->setPageName(_('Choose project'));
+        $this->setPageName(_('Creating project'));
 		
 		libxml_use_internal_errors(true);
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 		
 		if ($d===false) {
 
-			$this->addError('Failed to parse XML.');
+			$this->addError('Failed to parse XML-file. The followinf error(s) occurred:');
 			foreach (libxml_get_errors() as $error) $this->addError((string)$error->message);
+			$this->addError('Import aborted.');
 
 		} else {
+		
+			/*
+			
+			// user is no longer given a choice a new project is always created
 
 			if ($this->rHasVal('clear','project')) {
 	
@@ -244,38 +249,48 @@ class ImportController extends Controller
 			}
 
 			if ($this->rHasVal('project','-1')) {
+			
+			*/
 
 				$newId = $this->createProject(
 					array(
 						 'title' => $d->project->title,
 						 'version' => $d->project->version,
-						 'sys_description' => 'Created from Linnaeus 2 export.'
+						 'sys_description' => 'Created by import from a Linnaeus 2-export.'
 					)
 				);
 
 				if (!$newId) {
 	
-					$this->addError('Could not create new project. Duplicate name?');
+					$this->addError('Could not create new project "'.(string)$d->project->title.'". Does a project with the same name already exist?');
 	
 				} else { 
 	
 					$project = $this->getProjects($this->getNewProjectId());
-					$this->addMessage('Created new project: '.(string)$d->project->title);
+					$this->addMessage('Created new project "'.(string)$d->project->title.'"');
 					$this->setNewProjectId($newId);
 					$this->addCurrentUserToProject();
 					$this->makeMediaTargetPaths();
+
+					$this->smarty->assign('newProjectId',$newId);
 	
 					// add language
 					$l = $this->addProjectLanguage($d);
 
-					if (!$l) 
-						$this->addError('Unable to use project language: '.(string)$d->project->language);
-					else {
+					if (!$l) {
+
+						$this->addError('Unable to use project language "'.(string)$d->project->language.'"');
+
+					} else {
+
 						$this->setNewDefaultLanguageId($l);
-						$this->addMessage('Set language: '.(string)$d->project->language);
+						$this->addMessage('Set language "'.(string)$d->project->language.'"');
+
 					}
 	
 				}
+
+			/*
 
 			} else 
 			if ($this->rHasVal('project')) {
@@ -293,7 +308,7 @@ class ImportController extends Controller
 				$this->addMessage('Using existing project');
 
 			}
-
+			
 			$p = $this->getNewProjectId();
 
 			$project = $this->getProjects($p);
@@ -309,6 +324,7 @@ class ImportController extends Controller
 				$this->smarty->assign('project',$project);
 
 			}
+			*/
 
 		}
 
@@ -321,7 +337,10 @@ class ImportController extends Controller
 
 		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
 
-        $this->setPageName(_('Data overview'));
+		$p = $this->getNewProjectId();
+		$project = $this->getProjects($p);
+
+        $this->setPageName(_('Data overview for "'.$project['title'].'"'));
 
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 
@@ -345,6 +364,9 @@ class ImportController extends Controller
 			$this->smarty->assign('processed',true);
 
 		}
+
+
+		$this->smarty->assign('ranks',$project);
 		
 		$this->smarty->assign('ranks',$ranks);
 		$this->smarty->assign('species',$species);
@@ -359,6 +381,12 @@ class ImportController extends Controller
 
 		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
 		if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('linnaeus2.php');
+
+		$p = $this->getNewProjectId();
+		$project = $this->getProjects($p);
+
+        $this->setPageName(_('Additional data for "'.$project['title'].'"'));
+
 
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 		$species = $_SESSION['system']['import']['loaded']['species'];
@@ -376,13 +404,13 @@ class ImportController extends Controller
 
 				$overviewCatId = $this->createStandardCat();
 
-				$failed = $this->addSpeciesContent($d,$species,$overviewCatId);
+				$res = $this->addSpeciesContent($d,$species,$overviewCatId);
 
-				$this->addMessage('Added general species descriptions.');
+				$this->addMessage('Added '.$res['loaded'].' general species description(s).');
 
-				if (isset($failed)) {
+				if (isset($res['failed'])) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed species description:<br />'.$val['cause']);
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed species description:<br />'.$val['cause']);
 
 				}
 
@@ -390,15 +418,23 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('taxon_common','on')) {
 
-				$failed = $this->addSpeciesCommonNames($d,$species);
+				$res = $this->addSpeciesCommonNames($d,$species);
 
-				$this->addMessage('Added common names.');
+				$this->addMessage('Added '.$res['loaded'].' common name(s).');
 
-				if (isset($failed)) {
+				if (isset($res['failed'])) {
 
-					foreach ((array)$failed as $val) $this->addError('Failed common name:<br />'.$val['cause']);
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed common name:<br />'.$val['cause']);
 
 				}
+
+			}
+
+			if ($this->rHasVal('taxon_synonym','on')) {
+
+				$count = $this->addSpeciesSynonyms($d,$species);
+
+				$this->addMessage('Added '.$count.' synonym(s).');
 
 			}
 
@@ -406,7 +442,7 @@ class ImportController extends Controller
 
 				$res = $this->addSpeciesMedia($d,$species);
 
-				$this->addMessage('Added taxon media.');
+				$this->addMessage('Added '.count((array)$res['saved']).' taxon media.');
 
 				if (isset($res['failed'])) {
 
@@ -454,9 +490,9 @@ class ImportController extends Controller
 
 				$res = $this->addLiterature($literature);
 
-				$this->addMessage('Added '.$res['lit'].' literary references (failed '.$res['litFail'].').');
+				$this->addMessage('Added '.$res['lit'].' literary reference(s) (failed '.$res['litFail'].').');
 		
-				$this->addMessage('Added '.$res['ref'].' literary-taxon links (failed '.$res['refFail'].').');
+				$this->addMessage('Added '.$res['ref'].' literary-taxon link(s) (failed '.$res['refFail'].').');
 
 				$this->addModuleToProject(3);
 
@@ -466,9 +502,9 @@ class ImportController extends Controller
 
 				$res = $this->addGlossary($glossary);
 
-				$this->addMessage('Added '.$res['gloss'].' glossary items (failed '.$res['fail'].').');
+				$this->addMessage('Added '.$res['gloss'].' glossary item(s) (failed '.$res['fail'].').');
 
-				$this->addMessage('Added '.count((array)$res['saved']).' glossary images (failed '.count((array)$res['failed']).').');
+				$this->addMessage('Added '.count((array)$res['saved']).' glossary image(s) (failed '.count((array)$res['failed']).').');
 
 				$this->addModuleToProject(2);
 
@@ -516,6 +552,8 @@ class ImportController extends Controller
 
 			}
 			
+			$this->addUserToProject($this->getCurrentUserId(),$this->getNewProjectId(),ID_ROLE_SYS_ADMIN);
+		
 			$this->smarty->assign('processed',true);
 
 		}
@@ -532,14 +570,12 @@ class ImportController extends Controller
 	public function goNewProject()
 	{
 
+		$this->reInitUserRolesAndRights();
 		$this->setCurrentProjectId($this->getNewProjectId());
-
 		$this->setCurrentProjectData();
-		
 		$this->getCurrentUserCurrentRole(true);
 
 		unset($_SESSION['system']['import']);
-		
 		unset($_SESSION['project']['ranks']);
 
 		$this->redirect($this->getLoggedInMainIndex());
@@ -1081,6 +1117,7 @@ class ImportController extends Controller
 	{
 
 		$failed = null;
+		$loaded = 0;
 
 		foreach($d->records->taxondata as $key => $val) {
 
@@ -1099,6 +1136,8 @@ class ImportController extends Controller
 						'publish' => 1
 					)
 				);
+				
+				$loaded++;
 
 			} else {
 			
@@ -1111,7 +1150,7 @@ class ImportController extends Controller
 
 		}
 		
-		return $failed;
+		return array('loaded' => $loaded, 'failed' => $failed);
 
 	}
 
@@ -1119,6 +1158,7 @@ class ImportController extends Controller
 	{
 
 		$failed = null;
+		$loaded = 0;
 
 		foreach($d->records->taxondata as $key => $val) {
 
@@ -1141,6 +1181,8 @@ class ImportController extends Controller
 								'commonname' => (string)$vVal->vernacular->name
 							)
 						);
+						
+						$loaded++;
 
 					} else {
 
@@ -1157,7 +1199,44 @@ class ImportController extends Controller
 
 		}
 
-		return $failed;
+		return array('loaded' => $loaded, 'failed' => $failed);
+
+	}
+
+	private function addSpeciesSynonyms($d,$species)
+	{
+
+		$loaded = 0;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				$taxonId = $species[(string)$val->name]['id'];
+				
+				$i = 0;
+
+				foreach($val->synonyms as $vKey => $vVal) {
+
+					$this->models->Synonym->save(
+						array(
+							'id' => 'null',
+							'project_id' => $this->getNewProjectId(),
+							'taxon_id' => $taxonId,
+							'synonym' => (string)$vVal->synonym->name,
+							'show_order' => $i++
+						)
+					);
+					
+					$loaded++;
+
+				}
+
+			}
+
+		}
+		
+		return $loaded;
 
 	}
 
