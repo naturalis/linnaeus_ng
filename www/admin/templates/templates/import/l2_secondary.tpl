@@ -104,6 +104,15 @@ Import dichotomous key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_di
 Import matrix key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_matrix" checked="checked"></label><br />
 </p>
 
+<p>
+<b>Map data</b><br/>
+{if $mapItems.occurrences>0}
+Import map data ({$mapItems.total} items for {$mapItems.occurrences|@count} species in {$mapItems.types|@count} categories on {$mapItems.maps|@count} maps)?&nbsp;&nbsp;<label><input type="checkbox" name="map_items" checked="checked"></label><br />
+{else}
+No map data found.
+{/if}
+</p>
+
 <input type="submit" value="import" />
 </form>
 {/if}

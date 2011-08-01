@@ -1014,6 +1014,8 @@ class MapKeyController extends Controller
 			furthermore, the mysql function POLYGON requires a string in the form
 				GeomFromText('POLYGON((51.36 6.66,51.33 4.09,52.87 4.78,51.36 6.66))',SRID) 
 				
+			all: (lat, long)
+				
 		*/
 
 		$taxonId = isset($p['taxonId']) ? $p['taxonId'] : null;

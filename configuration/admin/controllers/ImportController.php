@@ -50,6 +50,52 @@ MATRIX KEY: never saw all types
 */
 
 
+
+
+/*
+
+	extract links
+	loop links
+		if image / movie
+			extract media name
+			does media exist
+				create link for local pop up
+			does media not exist
+				create link to fail message ???
+			add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
+		if module
+			extract module
+			extract specific id <- module + name
+			extract linked text
+			add to arrays [orig links] => [new links] <- text + front-end link logic
+
+	replace [orig links] => [new links]
+
+use these, forget the rest until someone complains:
+
+[l][m]Glossary[/m][r]carapace[/r][t]carapace[/t][/l]
+[l][m]Higher Taxa[/m][r]Genus Bentheuphausia[/r][t]genus [i]Bentheuphausia[/i][/t][/l]
+[l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
+[l][m]Species[/m][r]Euphausia superba[/r][t][i]Euphausia[/i][i] [/i][i]superba[/i][/t][/l]
+
+[l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
+[l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
+
+
+
+[filename] = [f]
+[image] = [im]
+[link] = [l]
+[module] = [m]
+[movie] = [mo]
+[record] = [r]
+[sound] = [s]
+[text] = [t]
+
+*/
+
+
+
 include_once ('Controller.php');
 
 class ImportController extends Controller
@@ -86,6 +132,9 @@ class ImportController extends Controller
 		'free_module_project_user',
 		'free_module_page',
 		'content_free_module',
+		'occurrence_taxon',
+		'geodata_type',
+		'geodata_type_title'
     );
    
     public $usedHelpers = array(
@@ -391,11 +440,31 @@ class ImportController extends Controller
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 		$species = $_SESSION['system']['import']['loaded']['species'];
 
-		$content = $this->getProjectContent($d);
-		$literature = $this->resolveLiterature($d,$species);
-		$glossary = $this->resolveGlossary($d);
-		$additionalContent = $this->checkAdditionalContent($d);
+		if (!isset($_SESSION['system']['import']['content']))
+			$_SESSION['system']['import']['content'] = $content = $this->getProjectContent($d);
+		else
+			$content = $_SESSION['system']['import']['content'];
 
+		if (!isset($_SESSION['system']['import']['literature']))
+			$_SESSION['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
+		else
+			$literature = $_SESSION['system']['import']['literature'];
+
+		if (!isset($_SESSION['system']['import']['glossary']))
+			$_SESSION['system']['import']['glossary'] = $glossary = $this->resolveGlossary($d);
+		else
+			$glossary = $_SESSION['system']['import']['glossary'];
+
+		if (!isset($_SESSION['system']['import']['additionalContent']))
+			$_SESSION['system']['import']['additionalContent'] = $additionalContent = $this->checkAdditionalContent($d);
+		else
+			$additionalContent = $_SESSION['system']['import']['additionalContent'];
+
+		if (!isset($_SESSION['system']['import']['mapItems']))
+			$_SESSION['system']['import']['mapItems'] = $mapItems = $this->getMapItems($d,$species);
+		else
+			$mapItems = $_SESSION['system']['import']['mapItems'];
+	
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 		
 			ini_set('max_execution_time',600);
@@ -551,17 +620,43 @@ class ImportController extends Controller
 				$this->addModuleToProject(7);
 
 			}
-			
+
+			if ($this->rHasVal('map_items','on')) {
+
+				//$nodes = $this->translateMapItems($mapItems);
+
+				$types = $this->saveMapItemTypes($mapItems['types']);
+
+				$m = $this->saveMapItems($mapItems,$types);
+
+				if (isset($m['failed'])) {
+
+					foreach ((array)$m['failed'] as $val) $this->addError('Failed geo data: '.$val);
+
+				}
+
+				$this->addMessage('Loaded geo data (saved '.$m['saved'].', failed '.count((array)$m['failed']).').');
+
+				$this->addModuleToProject(8);
+
+			}
+
 			$this->addUserToProject($this->getCurrentUserId(),$this->getNewProjectId(),ID_ROLE_SYS_ADMIN);
 		
+			$this->addMessage('Added current user to project as system administrator.');
+
 			$this->smarty->assign('processed',true);
+			
+			unset($_SESSION['system']['import']);
 
 		}
+
 
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('literature',$literature);
 		$this->smarty->assign('glossary',$glossary);
 		$this->smarty->assign('additionalContent',$additionalContent);
+		$this->smarty->assign('mapItems',$mapItems);
 
         $this->printPage();
 
@@ -594,7 +689,7 @@ class ImportController extends Controller
 			5 | Higher taxa
 			6 | Dichotomous key
 			7 | Matrix key
-		8 | Map key
+			8 | Map key
 		
 		free modules
 		
@@ -2467,54 +2562,244 @@ class ImportController extends Controller
 
 	}
 
-
-/*
-
-	extract links
-	loop links
-		if image / movie
-			extract media name
-			does media exist
-				create link for local pop up
-			does media not exist
-				create link to fail message ???
-			add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
-		if module
-			extract module
-			extract specific id <- module + name
-			extract linked text
-			add to arrays [orig links] => [new links] <- text + front-end link logic
-
-	replace [orig links] => [new links]
-
-use these, forget the rest until someone complains:
-
-[l][m]Glossary[/m][r]carapace[/r][t]carapace[/t][/l]
-[l][m]Higher Taxa[/m][r]Genus Bentheuphausia[/r][t]genus [i]Bentheuphausia[/i][/t][/l]
-[l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
-[l][m]Species[/m][r]Euphausia superba[/r][t][i]Euphausia[/i][i] [/i][i]superba[/i][/t][/l]
-
-[l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
-[l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
-
-
-
-[filename] = [f]
-[image] = [im]
-[link] = [l]
-[module] = [m]
-[movie] = [mo]
-[record] = [r]
-[sound] = [s]
-[text] = [t]
-
-*/
-
-
-
-
-
-
-
+	private function ORIG_getMapItems($d,$species)
+	{
 	
+		$maps = $occurrences = $types = null;
+		$total = 0;
+	
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				$taxonId = $species[(string)$val->name]['id'];
+				
+				if (!isset($val->distribution)) continue;
+				
+				foreach($val->distribution->map as $vKey => $vVal) {
+				
+					$maps[(string)$vVal->mapname] = array(
+						'label' => (string)$vVal->mapname,
+						'specs' => (string)$vVal->specs
+					);
+					
+					foreach($vVal->squares->square as $sKey => $sVal) {
+
+						$occurrences[$taxonId][] = array(
+							'map' => (string)$vVal->mapname,
+							'square' => (string)$sVal->number,
+							'legend' => (string)$sVal->legend
+						);
+						
+						$types[(string)$sVal->legend] = (string)$sVal->legend;
+						
+						$total++;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return array(
+			'maps' => $maps,
+			'occurrences' => $occurrences,
+			'types' => $types,
+			'total' => $total
+		);
+			
+	}
+
+	private function getMapItems($d,$species)
+	{
+	
+		$maps = $occurrences = $types = null;
+		$total = 0;
+	
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[(string)$val->name]['id'])) {
+			
+				if (!isset($val->distribution)) continue;
+				
+				$taxonId = $species[(string)$val->name]['id'];
+
+				foreach($val->distribution->map as $vKey => $vVal) {
+				
+					if (!isset($maps[(string)$vVal->mapname])) {
+
+						$maps[(string)$vVal->mapname] = array(
+							'label' => (string)$vVal->mapname,
+							'specs' => (string)$vVal->specs
+						);
+
+						$d = explode(',',(string)$vVal->specs);
+						$maps[(string)$vVal->mapname]['coordinates'] = array(
+							'topLeft' => array('lat' => (int)$d[0],'long' => (-1 * $d[1])),
+							'bottomRight' => array('lat' => (int)$d[2],'long' => (-1 * $d[3]))
+						);		
+						$maps[(string)$vVal->mapname]['square'] = array('width' => (int)$d[4],'height' => (int)$d[5]);		
+						$maps[(string)$vVal->mapname]['widthInSquares'] = (int)($d[1] - $d[3]) / $d[4];
+						$maps[(string)$vVal->mapname]['heightInSquares'] = (int)($d[0] - $d[2]) / $d[5];
+					}
+					
+					foreach($vVal->squares->square as $sKey => $sVal) {
+
+						$types[(string)$sVal->legend] = (string)$sVal->legend;
+
+						$row = floor((string)$sVal->number / $maps[(string)$vVal->mapname]['widthInSquares']);
+						$col = (string)$sVal->number % $maps[(string)$vVal->mapname]['widthInSquares'];
+
+						/*
+				
+							<mapname>North Atlantic</mapname>
+							<specs>90,100,0,-80,5,5</specs>
+							
+							90,100 = linksboven = 90°N 100°W = 90 -100
+							0, -80 = rechtonder = 0°S 80°E = -0 80
+							5,5 - cell size (ASSUMING WxH)
+				
+						*/
+
+						$occurrences[$taxonId][] = array(
+							'taxonId' => $taxonId,
+							'map' => (string)$vVal->mapname,
+							'square' => (string)$sVal->number,
+							'legend' => (string)$sVal->legend,
+							'nodes' =>
+								array(
+									array(
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[(string)$vVal->mapname]['square']['height']),
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[(string)$vVal->mapname]['square']['width'])
+									),
+									array(
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[(string)$vVal->mapname]['square']['height']),
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + ($col * $maps[(string)$vVal->mapname]['square']['width'])
+									),
+									array(
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[(string)$vVal->mapname]['square']['height']),
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + ($col * $maps[(string)$vVal->mapname]['square']['width'])
+									),				
+									array(
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[(string)$vVal->mapname]['square']['height']),
+										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[(string)$vVal->mapname]['square']['width'])
+									)
+								)
+						);
+						
+						$total++;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return array(
+			'maps' => $maps,
+			'occurrences' => $occurrences,
+			'types' => $types,
+			'total' => $total
+		);
+			
+	}
+
+	private function saveMapItemTypes($types)
+	{
+	
+		$colours = array('00FFFF','000000','0000FF','8A2BE2','A52A2A','DEB887','5F9EA0','7FFF00','FF00FF','00FA9A');
+		
+		$i = 0;
+
+		foreach((array)$types as $key => $val) {
+
+			$this->models->GeodataType->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'colour' => $colours[$i++ % 10]
+				)
+			);
+
+			$d[$key] = array('id' => $this->models->GeodataType->getNewId(),'title' => $key);
+
+			$this->models->GeodataTypeTitle->save(
+				array(
+					'id' => 'null',
+					'project_id' => $this->getNewProjectId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'type_id' => $d[$key]['id'],
+					'title' => $val
+				)
+			);
+	
+		}
+
+		return $d;
+
+	}
+
+	private function saveMapItems($p,$types)
+	{
+
+		if (!isset($p['occurrences'])) return;
+
+		$this->loadControllerConfig('MapKey');
+		
+		$saved = 0;
+		$failed = array();
+
+		foreach((array)$p['occurrences'] as $key => $val) {
+
+			foreach((array)$val as $occurrence) {
+
+				$taxonId = $occurrence['taxonId'];
+				
+				if (!$taxonId) continue;
+	
+				$nodes = $occurrence['nodes'];
+				
+				if (count((array)$nodes)<=2) continue;
+	
+				$type_id = isset($types[$occurrence['legend']]['id']) ? $types[$occurrence['legend']]['id'] : null;
+				
+				if (!$type_id) continue;
+				
+				// remove the last node if it is identical to the first, just in case
+				if ($nodes[0]==$nodes[count((array)$nodes)-1]) array_pop($nodes);
+	
+				// create a string for mysql (which does require the first and last to be the same)
+				$geoStr = array();
+				foreach((array)$nodes as $sVal) $geoStr[] = $sVal[0].' '.$sVal[1];
+				$geoStr = implode(',',$geoStr).','.$geoStr[0];
+	
+				$d = $this->models->OccurrenceTaxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'type_id' => $type_id,
+						'type' => 'polygon',
+						'boundary' => "#GeomFromText('POLYGON((".$geoStr."))',".$this->controllerSettings['SRID'].")",
+						'boundary_nodes' => json_encode($nodes),
+						'nodes_hash' => md5(json_encode($nodes))
+					)
+				);
+	
+				if ($d===true) $saved++; else $failed[]=$d;
+				
+			}
+
+		}
+
+		return array('failed' => $failed, 'saved' => $saved);
+
+	}
+	
+
+
 }
