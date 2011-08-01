@@ -56,8 +56,10 @@ class ProjectsController extends Controller
 		'free_module_project',
 		'free_module_project_user',
 		'free_module_page',
-		'content_free_module'
-
+		'content_free_module',
+		'occurrence_taxon',
+		'geodata_type',
+		'geodata_type_title'
     );
     
     public $usedHelpers = array(
@@ -802,6 +804,7 @@ class ProjectsController extends Controller
 	private function doDeleteProjectAction($projectId)
 	{
 
+		$this->deleteGeoData($projectId);
 		$this->deleteMatrices($projectId);
 		$this->deleteDichotomousKey($projectId);
 		$this->deleteGlossary($projectId);
@@ -818,6 +821,15 @@ class ProjectsController extends Controller
 		$this->deleteModulesFromProject($projectId);
 		$this->deleteProjectImagePaths($projectId);
 		$this->deleteProject($projectId);
+
+	}
+
+	private function deleteGeoData($id)
+	{
+
+		$this->models->OccurrenceTaxon->delete(array('project_id' => $id));
+		$this->models->GeodataTypeTitle->delete(array('project_id' => $id));
+		$this->models->GeodataType->delete(array('project_id' => $id));
 
 	}
 
@@ -976,3 +988,5 @@ class ProjectsController extends Controller
 
 
 }
+
+
