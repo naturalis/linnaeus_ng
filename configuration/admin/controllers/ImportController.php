@@ -43,57 +43,10 @@ need to set manually!
 
 
 
-NO GEO DATA
+HAVE TO MERGE GEO DATA
 MATRIX KEY: never saw all types
 
-
 */
-
-
-
-
-/*
-
-	extract links
-	loop links
-		if image / movie
-			extract media name
-			does media exist
-				create link for local pop up
-			does media not exist
-				create link to fail message ???
-			add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
-		if module
-			extract module
-			extract specific id <- module + name
-			extract linked text
-			add to arrays [orig links] => [new links] <- text + front-end link logic
-
-	replace [orig links] => [new links]
-
-use these, forget the rest until someone complains:
-
-[l][m]Glossary[/m][r]carapace[/r][t]carapace[/t][/l]
-[l][m]Higher Taxa[/m][r]Genus Bentheuphausia[/r][t]genus [i]Bentheuphausia[/i][/t][/l]
-[l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
-[l][m]Species[/m][r]Euphausia superba[/r][t][i]Euphausia[/i][i] [/i][i]superba[/i][/t][/l]
-
-[l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
-[l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
-
-
-
-[filename] = [f]
-[image] = [im]
-[link] = [l]
-[module] = [m]
-[movie] = [mo]
-[record] = [r]
-[sound] = [s]
-[text] = [t]
-
-*/
-
 
 
 include_once ('Controller.php');
@@ -303,8 +256,8 @@ class ImportController extends Controller
 
 				$newId = $this->createProject(
 					array(
-						 'title' => $d->project->title,
-						 'version' => $d->project->version,
+						 'title' => (string)$d->project->title,
+						 'version' => (string)$d->project->version,
 						 'sys_description' => 'Created by import from a Linnaeus 2-export.'
 					)
 				);
@@ -314,11 +267,15 @@ class ImportController extends Controller
 					$this->addError('Could not create new project "'.(string)$d->project->title.'". Does a project with the same name already exist?');
 	
 				} else { 
-	
+
 					$project = $this->getProjects($this->getNewProjectId());
+
 					$this->addMessage('Created new project "'.(string)$d->project->title.'"');
+
 					$this->setNewProjectId($newId);
+
 					$this->addCurrentUserToProject();
+
 					$this->makeMediaTargetPaths();
 
 					$this->smarty->assign('newProjectId',$newId);
@@ -340,7 +297,7 @@ class ImportController extends Controller
 				}
 
 			/*
-
+			
 			} else 
 			if ($this->rHasVal('project')) {
 
@@ -414,9 +371,7 @@ class ImportController extends Controller
 
 		}
 
-
-		$this->smarty->assign('ranks',$project);
-		
+		$this->smarty->assign('project',$project);
 		$this->smarty->assign('ranks',$ranks);
 		$this->smarty->assign('species',$species);
 		$this->smarty->assign('treetops',$treetops);
@@ -435,7 +390,6 @@ class ImportController extends Controller
 		$project = $this->getProjects($p);
 
         $this->setPageName(_('Additional data for "'.$project['title'].'"'));
-
 
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 		$species = $_SESSION['system']['import']['loaded']['species'];
@@ -467,93 +421,11 @@ class ImportController extends Controller
 	
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 		
+			$_SESSION['system']['import']['paths'] = $this->makePaths($this->getNewProjectId());
+		
 			ini_set('max_execution_time',600);
 
-			if ($this->rHasVal('taxon_overview','on')) {
-
-				$overviewCatId = $this->createStandardCat();
-
-				$res = $this->addSpeciesContent($d,$species,$overviewCatId);
-
-				$this->addMessage('Added '.$res['loaded'].' general species description(s).');
-
-				if (isset($res['failed'])) {
-
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed species description:<br />'.$val['cause']);
-
-				}
-
-			}
-
-			if ($this->rHasVal('taxon_common','on')) {
-
-				$res = $this->addSpeciesCommonNames($d,$species);
-
-				$this->addMessage('Added '.$res['loaded'].' common name(s).');
-
-				if (isset($res['failed'])) {
-
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed common name:<br />'.$val['cause']);
-
-				}
-
-			}
-
-			if ($this->rHasVal('taxon_synonym','on')) {
-
-				$count = $this->addSpeciesSynonyms($d,$species);
-
-				$this->addMessage('Added '.$count.' synonym(s).');
-
-			}
-
-			if ($this->rHasVal('taxon_media','on')) {
-
-				$res = $this->addSpeciesMedia($d,$species);
-
-				$this->addMessage('Added '.count((array)$res['saved']).' taxon media.');
-
-				if (isset($res['failed'])) {
-
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed media:<br />'.$val['cause']);
-
-				}
-
-			}
-
-			if ($this->rHasVal('content_introduction','on')) {
-
-				if ($this->addProjectContent($d,'introduction')) {
-
-					$this->addMessage('Added introduction.');
-
-				} else {
-
-					$this->addError('Failed loading introduction');
-
-				}
-
-			}
-
-			if ($this->rHasVal('content_contributors','on')) {
-
-				if ($this->addProjectContent($d,'contributors')) {
-
-					$this->addMessage('Added contributors text.');
-
-				} else {
-
-					$this->addError('Failed loading contributors text');
-
-				}
-
-			}
-
-			if ($this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
-
-				$this->addModuleToProject(1);
-
-			}
+			// DO NOT CHANGE ORDER; GLOSSARY, LITERATURE & MEDIA (SPECIES, KEY & MTRIX) MUST COME BEFORE CONTENT, FOR THEY MAY BE LINKED TO
 
 			if ($this->rHasVal('literature','on')) {
 
@@ -579,9 +451,17 @@ class ImportController extends Controller
 
 			}
 
-			if ($this->rHasVal('additional_content','on')) {
+			if ($this->rHasVal('taxon_media','on')) {
 
-				$res = $this->addAdditionalContent($additionalContent);
+				$res = $this->addSpeciesMedia($d,$species);
+
+				$this->addMessage('Added '.count((array)$res['saved']).' taxon media.');
+
+				if (isset($res['failed'])) {
+
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed media:<br />'.$val['cause']);
+
+				}
 
 			}
 
@@ -621,6 +501,90 @@ class ImportController extends Controller
 
 			}
 
+			
+			$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
+
+
+			if ($this->rHasVal('taxon_overview','on')) {
+
+				$overviewCatId = $this->createStandardCat();
+
+				$res = $this->addSpeciesContent($d,$species,$overviewCatId);
+
+				$this->addMessage('Added '.$res['loaded'].' general species description(s).');
+
+				if (isset($res['failed'])) {
+
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed species description:<br />'.$val['cause']);
+
+				}
+
+			}
+
+			if ($this->rHasVal('taxon_common','on')) {
+
+				$res = $this->addSpeciesCommonNames($d,$species);
+
+				$this->addMessage('Added '.$res['loaded'].' common name(s).');
+
+				if (isset($res['failed'])) {
+
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed common name:<br />'.$val['cause']);
+
+				}
+
+			}
+
+			if ($this->rHasVal('taxon_synonym','on')) {
+
+				$count = $this->addSpeciesSynonyms($d,$species);
+
+				$this->addMessage('Added '.$count.' synonym(s).');
+
+			}
+
+
+
+			if ($this->rHasVal('content_introduction','on')) {
+
+				if ($this->addProjectContent($d,'introduction')) {
+
+					$this->addMessage('Added introduction.');
+
+				} else {
+
+					$this->addError('Failed loading introduction');
+
+				}
+
+			}
+
+			if ($this->rHasVal('content_contributors','on')) {
+
+				if ($this->addProjectContent($d,'contributors')) {
+
+					$this->addMessage('Added contributors text.');
+
+				} else {
+
+					$this->addError('Failed loading contributors text');
+
+				}
+
+			}
+
+			if ($this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
+
+				$this->addModuleToProject(1);
+
+			}
+
+			if ($this->rHasVal('additional_content','on')) {
+
+				$res = $this->addAdditionalContent($additionalContent);
+
+			}
+
 			if ($this->rHasVal('map_items','on')) {
 
 				//$nodes = $this->translateMapItems($mapItems);
@@ -646,11 +610,11 @@ class ImportController extends Controller
 			$this->addMessage('Added current user to project as system administrator.');
 
 			$this->smarty->assign('processed',true);
-			
+			q($_SESSION['system']['import']['glossary']);
+
 			unset($_SESSION['system']['import']);
 
 		}
-
 
 		$this->smarty->assign('content',$content);
 		$this->smarty->assign('literature',$literature);
@@ -677,6 +641,12 @@ class ImportController extends Controller
 
 	}
 
+
+
+
+
+
+
 	private function addModuleToProject($id)
 	{
 
@@ -697,7 +667,7 @@ class ImportController extends Controller
 
 		$this->models->ModuleProject->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),	
 				'module_id' => $id,
 				'active' => 'y'
@@ -738,10 +708,10 @@ class ImportController extends Controller
 
 	private function addCurrentUserToProject()
 	{
-	
+
 		$this->models->ProjectRoleUser->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),	
 				'role_id' => ID_ROLE_LEAD_EXPERT,
 				'user_id' => $this->getCurrentUserId(),
@@ -767,7 +737,7 @@ class ImportController extends Controller
 
 		$p = $this->models->LanguageProject->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'language_id' => $l[0]['id'],				
 				'project_id' => $this->getNewProjectId(),				
 				'def_language' => 1,		
@@ -859,7 +829,7 @@ class ImportController extends Controller
 
 		$this->models->ProjectRank->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),	
 				'rank_id' => $rank['rank_id'],	
 				'parent_id' => isset($rank['parent_id']) ? $rank['parent_id'] : null,
@@ -871,7 +841,7 @@ class ImportController extends Controller
 
 		$this->models->LabelProjectRank->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'project_rank_id' => $rank['id'],
 				'language_id' => $this->getNewDefaultLanguageId(),
@@ -945,7 +915,7 @@ class ImportController extends Controller
 
 			$this->models->Taxon->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
 					'taxon' => $val['taxon'],
 					'parent_id' => 'null',
@@ -1034,7 +1004,7 @@ class ImportController extends Controller
 
 		$this->models->Taxon->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),	
 				'taxon' => '(master taxon)',
 				'parent_id' => 'null',
@@ -1069,46 +1039,6 @@ class ImportController extends Controller
 
 	}
 
-	private function resolveLiterature($d,$species)
-	{
-
-		foreach($d->proj_literature->proj_reference as $key => $val) {
-
-			$l = (string)$val->literature_title;
-			$a = $this->resolveAuthors($l);
-			$a['text'] = $this->replaceOldLinks($this->replaceOldTags((string)$val->fullreference));
-			$okSp = $unSp = null;
-
-			if ($val->keywords->keyword) {
-
-				foreach($val->keywords->keyword as $kKey => $kVal) {
-	
-					$t = $this->replaceOldTags($this->replaceOldLinks((string)$kVal->name),true);
-	
-					if (isset($species[$t])) {
-	
-						$okSp[] = $species[$t]['id'];
-	
-					} else {
-
-						$unSp[] = $t;
-	
-					}
-	
-				}
-				
-			}
-
-			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
-
-			$res[] = $a;
-
-		}
-
-		return isset($res) ? $res : null;
-
-	}
-
 	private function getProjectContent($d)
 	{
 	
@@ -1126,7 +1056,7 @@ class ImportController extends Controller
 		if ($d->project->projectintroduction && $type=='introduction')
 			$c = $this->models->Content->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Introduction',	
@@ -1137,7 +1067,7 @@ class ImportController extends Controller
 		if ($d->project->contributors && $type=='contributors')
 			$c = $this->models->Content->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
@@ -1167,7 +1097,7 @@ class ImportController extends Controller
 
 		$pt = $this->models->PageTaxon->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'page' => 'Overview',
 				'show_order' => 0,
@@ -1179,7 +1109,7 @@ class ImportController extends Controller
 
 		$this->models->PageTaxonTitle->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'page_id' => $id,
 				'language_id' => $this->getNewDefaultLanguageId(),
@@ -1222,12 +1152,13 @@ class ImportController extends Controller
 
 				$this->models->ContentTaxon->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'taxon_id' => $taxonId,
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'page_id' => $overviewCatId,
-						'content' => $this->replaceOldTags((string)$val->description),
+//						'content' => $this->replaceOldTags((string)$val->description),
+						'content' => $this->replaceInternalLinks($this->replaceOldTags((string)$val->description)),
 						'publish' => 1
 					)
 				);
@@ -1269,7 +1200,7 @@ class ImportController extends Controller
 
 						$this->models->Commonname->save(
 							array(
-								'id' => 'null',
+								'id' => null,
 								'project_id' => $this->getNewProjectId(),
 								'taxon_id' => $taxonId,
 								'language_id' => $languagId,
@@ -1315,7 +1246,7 @@ class ImportController extends Controller
 
 					$this->models->Synonym->save(
 						array(
-							'id' => 'null',
+							'id' => null,
 							'project_id' => $this->getNewProjectId(),
 							'taxon_id' => $taxonId,
 							'synonym' => (string)$vVal->synonym->name,
@@ -1359,7 +1290,7 @@ class ImportController extends Controller
 
 				$this->models->MediaTaxon->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'taxon_id' => $taxonId,
 						'file_name' => $fileName,
@@ -1372,7 +1303,7 @@ class ImportController extends Controller
 
                 $this->models->MediaDescriptionsTaxon->save(
                     array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'language_id' => $this->getNewDefaultLanguageId(),	
                         'media_id' => $this->models->MediaTaxon->getNewId(), 
@@ -1444,6 +1375,8 @@ class ImportController extends Controller
 
 		$this->loadControllerConfig('Species');
 		
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
+
 		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) {
 
 			$mimes[$val['mime']] = $val;
@@ -1537,37 +1470,17 @@ class ImportController extends Controller
 	
 	}
 
-	private function replaceOldLinks($s)
-	{
-					
-		//[l][m]Glossary[/m][r]indehiscent[/r][t]indehiscent[/t][/l]
-	
-		if (strpos($s,'[l]')!==false && strpos($s,'[/l]')!==false) {
-		
-			$d = preg_split('/(\[t\]|\[\/t\])/',$s);
-							
-			$t = isset($d[1]) ? $d[1] : null;			
-
-			return preg_replace('/\[l\](.*)\[\/l\]/',$t,$s);
-
-		} else {
-
-			return $s;
-
-		}
-	
-	}
-
-
 	private function resolveAuthors($s)
 	{
 
-		$d = strrpos($s,',');
-		$y = trim(substr($s,$d+1));
-		$a = substr($s,0,$d);
-		$a2 = null;
-		$m = false;
-		$d = strpos($a,'et al.');
+		// Antezana et al., 1976b
+
+		$d = strrpos($s,',');		// comma position
+		$y = trim(substr($s,$d+1));	// year
+		$a = substr($s,0,$d);		// all but year = auhor(s)
+		$a2 = null;					// default no 2nd author
+		$m = false;					// defualt no multiple authors (>2 = et al.)
+		$d = strpos($a,'et al.');	// "et. al" position
 		if ($d!==false) {
 			$a = trim(substr($a,0,$d));
 			$m = true;
@@ -1579,14 +1492,80 @@ class ImportController extends Controller
 			}
 		}
 		
+		$f = null;
+
+		if (!is_numeric($y)) {
+
+			$f = substr($y,-1);
+			$y2 = substr($y,0,strlen($y)-2);
+			
+			if (!is_numeric($y2)) {
+
+				$f = substr($y,-2);
+				$y2 = substr($y,0,strlen($y)-3);
+				
+				if (!is_numeric($y2))
+					$f = null;
+				else
+					$y = $y2;
+
+			} else {
+
+				$y = $y2;
+			
+			}
+
+		}
+		
 		return array(
 			'year' => $y,
 			'valid_year' => is_numeric($y),
+			'suffix' => $f,
 			'author_1' => $a,
 			'author_2' => $a2,
 			'multiple_authors' => $m,
 			'original' => $s
 		);
+
+	}
+
+	private function resolveLiterature($d,$species)
+	{
+
+		foreach($d->proj_literature->proj_reference as $key => $val) {
+
+			$l = (string)$val->literature_title;
+			$a = $this->resolveAuthors($l);
+			$a['text'] = $this->replaceInternalLinks($this->replaceOldTags((string)$val->fullreference));
+			$okSp = $unSp = null;
+
+			if ($val->keywords->keyword) {
+
+				foreach($val->keywords->keyword as $kKey => $kVal) {
+	
+					$t = $this->replaceOldTags($this->removeInternalLinks((string)$kVal->name),true);
+	
+					if (isset($species[$t])) {
+
+						$okSp[] = $species[$t]['id'];
+	
+					} else {
+
+						$unSp[] = $t;
+	
+					}
+	
+				}
+				
+			}
+
+			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
+
+			$res[] = $a;
+
+		}
+
+		return isset($res) ? $res : null;
 
 	}
 
@@ -1596,16 +1575,16 @@ class ImportController extends Controller
 		$lit = $ref = 0;
 		$litFail = $refFail = 0;
 
-		foreach($d as $val) {
+		foreach($d as $key => $val) {
 
 			$l = $this->models->Literature->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),				
 					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
 					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
 					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
-					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : null,
+					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
 					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
 					'text' => isset($val['text']) ? $val['text'] : null,
 				)
@@ -1617,12 +1596,12 @@ class ImportController extends Controller
 				continue;
 
 			} else {
-			
+		
 				$lit++;
 
 			}
-			
-			$id = $this->models->Literature->getNewId();
+
+			$_SESSION['system']['import']['literature'][$key]['id'] = $id = $this->models->Literature->getNewId();
 
 			foreach((array)$val['references']['species'] as $kV) {
 			
@@ -1636,7 +1615,7 @@ class ImportController extends Controller
 
 				$lt = $this->models->LiteratureTaxon->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),				
 						'taxon_id' => $kV,
 						'literature_id' => $id,
@@ -1669,7 +1648,7 @@ class ImportController extends Controller
 		foreach($d->glossary->term as $key => $val) {
 		
 			$t = (string)$val->glossary_title;
-			$d = $this->replaceOldLinks($this->replaceOldTags((string)$val->definition,true));
+			$d = $this->replaceInternalLinks($this->replaceOldTags((string)$val->definition,true));
 			
 			unset($s);
 
@@ -1794,11 +1773,11 @@ class ImportController extends Controller
 
 		$gloss = $fail = 0;
 
-		foreach($d as $val) {
+		foreach($d as $key => $val) {
 
 			$g = $this->models->Glossary->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'term' => isset($val['term']) ? $val['term'] : null,
@@ -1806,24 +1785,26 @@ class ImportController extends Controller
 				)
 			);
 
-			if ($g===false) {
+			if ($g!==true) {
 
 				$fail++;
 				continue;
 
 			} else {
-			
+
 				$gloss++;
 
 			}
 			
 			$id = $this->models->Glossary->getNewId();
 
+			$_SESSION['system']['import']['glossary'][$key]['id'] = $id;
+
 			foreach((array)$val['synonyms'] as $sVal) {
 			
 				$lt = $this->models->GlossarySynonym->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'glossary_id' => $id,
@@ -1881,7 +1862,7 @@ class ImportController extends Controller
 
 		$k = $this->models->Keystep->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'number' => ($step=='god' ? -1 : (intval((string)$step->pagenumber) + $stepAdd)),
 				'is_start' => 0
@@ -1892,7 +1873,7 @@ class ImportController extends Controller
 
 		$this->models->ContentKeystep->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'keystep_id' => $stepId,
 				'language_id' => $this->getNewDefaultLanguageId(),
@@ -1922,7 +1903,7 @@ class ImportController extends Controller
 	private function createKeyStepChoices($step,$stepIds,$species)
 	{
 
-		$paths = $this->makePaths($this->getNewProjectId());
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
 
 		if ($step->text_choice) {
 			$choices = $step->text_choice;
@@ -1969,7 +1950,7 @@ class ImportController extends Controller
 
 			$this->models->ChoiceKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[(string)$step->pagenumber]),
 					'show_order' => (1 + $i++),
@@ -1994,7 +1975,7 @@ class ImportController extends Controller
 	
 			$this->models->ChoiceContentKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
@@ -2072,7 +2053,7 @@ class ImportController extends Controller
 
 			$this->models->ChoiceKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' =>  current($keyStepIds),
 					'show_order' => 1,
@@ -2082,7 +2063,7 @@ class ImportController extends Controller
 
 			$this->models->ChoiceContentKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
@@ -2092,7 +2073,7 @@ class ImportController extends Controller
 
 			$this->models->ChoiceKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'keystep_id' =>  current($keyStepIds),
 					'show_order' => 2,
@@ -2102,7 +2083,7 @@ class ImportController extends Controller
 
 			$this->models->ChoiceContentKeystep->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
@@ -2230,7 +2211,7 @@ class ImportController extends Controller
 	private function saveMatrices($m)
 	{
 
-		$paths = $this->makePaths($this->getNewProjectId());
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
 		
 		$d = $error = null;
 
@@ -2238,7 +2219,7 @@ class ImportController extends Controller
 
 			$this->models->Matrix->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'got_names' => 1
 				)
@@ -2249,7 +2230,7 @@ class ImportController extends Controller
 
 			$this->models->MatrixName->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'matrix_id' => $m[$key]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
@@ -2261,7 +2242,7 @@ class ImportController extends Controller
 
 				$c = $this->models->Characteristic->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'type' => $this->resolveCharType($cVal['chartype']),
 						'got_labels' => 1
@@ -2272,7 +2253,7 @@ class ImportController extends Controller
 
 				$this->models->CharacteristicLabel->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
 						'language_id' => $this->getNewDefaultLanguageId(),
@@ -2282,7 +2263,7 @@ class ImportController extends Controller
 
 				$cm = $this->models->CharacteristicMatrix->save(
 					array(
-						'id' => 'null',
+						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'matrix_id' => $m[$key]['id'],
 						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
@@ -2310,7 +2291,7 @@ class ImportController extends Controller
 
 					$c = $this->models->CharacteristicState->save(
 						array(
-							'id' => 'null',
+							'id' => null,
 							'project_id' => $this->getNewProjectId(),
 							'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
 							'file_name' => $fileName,
@@ -2332,7 +2313,7 @@ class ImportController extends Controller
 
 					$this->models->CharacteristicLabelState->save(
 						array(
-							'id' => 'null',
+							'id' => null,
 							'project_id' => $this->getNewProjectId(),
 							'state_id' => $m[$key]['characteristics'][$cKey]['states'][$sKey]['id'],
 							'language_id' => $this->getNewDefaultLanguageId(),
@@ -2393,18 +2374,22 @@ class ImportController extends Controller
 	
 							if (isset($statelist[$adHocIndex])) {
 
+								$this->models->MatrixTaxon->setNoKeyViolationLogging(true);
+
 								$this->models->MatrixTaxon->save(
 									array(
-										'id' => 'null',
+										'id' => null,
 										'project_id' => $this->getNewProjectId(),
 										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
 										'taxon_id' => $taxonid,
 									)
 								);
 
+								$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+
 								$this->models->MatrixTaxonState->save(
 									array(
-										'id' => 'null',
+										'id' => null,
 										'project_id' => $this->getNewProjectId(),
 										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
 										'characteristic_id' => $statelist[$adHocIndex]['characteristic_id'],
@@ -2719,7 +2704,7 @@ class ImportController extends Controller
 
 			$this->models->GeodataType->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'colour' => $colours[$i++ % 10]
 				)
@@ -2729,7 +2714,7 @@ class ImportController extends Controller
 
 			$this->models->GeodataTypeTitle->save(
 				array(
-					'id' => 'null',
+					'id' => null,
 					'project_id' => $this->getNewProjectId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'type_id' => $d[$key]['id'],
@@ -2776,6 +2761,8 @@ class ImportController extends Controller
 				$geoStr = array();
 				foreach((array)$nodes as $sVal) $geoStr[] = $sVal[0].' '.$sVal[1];
 				$geoStr = implode(',',$geoStr).','.$geoStr[0];
+
+				$this->models->OccurrenceTaxon->setNoKeyViolationLogging(true);
 	
 				$d = $this->models->OccurrenceTaxon->save(
 					array(
@@ -2799,7 +2786,186 @@ class ImportController extends Controller
 		return array('failed' => $failed, 'saved' => $saved);
 
 	}
+
+
+	private function resolveInternalLinks($s)
+	{
+
+/*
+	if image / movie
+		extract media name
+		does media exist
+			create link for local pop up
+		does media not exist
+			create link to fail message ???
+		add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
+
+	? [l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
+
+	x [l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
+	x [l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
+
+	[link] = [l]
 	
+	[module] = [m]
+	[image] = [im]
+	[movie] = [mo]
+	[sound] = [s]
+	
+	[filename] = [f]
+	[record] = [r]
+	[text] = [t]
 
+*/
+	
+	
+		$controllers = 
+			array(
+				'Content pages' => array(
+					'controller' => 'linnaeus',
+					'param' => 'id',
+				),
+				'Glossary' => // [m]Glossary[/m]
+					array(
+						'controller' => 'glossary',
+						'url' => 'term.php',
+						'param' => 'id',
+					),
+				'Literature' => // [m]Literature[/m]
+					array(
+						'controller' => 'literature',
+						'url' => 'reference.php',
+						'param' => 'id',
+					),
+				'Species' => // [m]Species[/m]
+					array(
+						'controller' => 'species',
+						'url' => 'taxon.php',
+						'param' => 'id',
+					),
+				'Higher taxa' => // [m]Higher taxa[/m]
+					array(
+						'controller' => 'highertaxa',
+						'url' => 'taxon.php',
+						'param' => 'id',
+					),
+				'Dichotomous key' => array(
+					'controller' => 'key',
+					'param' => 'id',
+				),
+				'Map key index' => array(
+					'controller' => 'mapkey',
+					'param' => 'id',
+				),
+				'Matrix key index' => array(
+					'controller' => 'matrixkey',
+					'url' => 'matrices.php',
+					'param' => 'id',
+				)
+			);
+	
+			/*
+			array_push($i,
+				array(
+					'label' => _($val['label'].' topic'),
+					'controller' => 'module',
+					'url' => 'topic.php?modId='.$val['id'],
+					'params' => json_encode(
+						array(
+							array(
+								'label' => _('Topic:'),
+								'param' => 'id',
+								'values' => $this->intLinkGetFreeModuleTopics($val['id'])
+							)
+						)
+					)
+				)
+			);
+			*/
+	
+//		$d = rtrim($s[count((array)$s)-1],'[/t]');
+		$d = preg_replace('/\[\/t\]$/','',$s[count((array)$s)-1]);
+	
+		$d = preg_split('/(\[\/m\]\[[r]\])|(\[\/r\]\[[t]\])/iU',$d);
+	
+		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
+			if ($controllers[$d[0]]=='glossary' && $_SESSION['system']['import']['lookupArrays']['g'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['g'][$d[1]];
+
+			if ($controllers[$d[0]]=='literature' && $_SESSION['system']['import']['lookupArrays']['l'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['l'][$d[1]];
+
+			if ($controllers[$d[0]]=='species' && $_SESSION['system']['import']['lookupArrays']['s'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['s'][$d[1]];
+
+			if ($controllers[$d[0]]=='highertaxa' && $_SESSION['system']['import']['lookupArrays']['s'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['s'][$d[1]];
+	
+			if ($id) {
+	
+				$href =
+					"goIntLink('".$controllers[$d[0]]['controller']."',".
+					(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : "'index.php'").
+					(isset($controllers[$d[0]]['param']) ? ",['".$controllers[$d[0]]['param'].":".$id."']" : null).
+					");";
+
+				return '<span class="internal-link" style="color:#900" onclick="'.$href.'">'.$d[2].'</span>';
+
+			}
+			
+		}
+		
+		return $d[2];
+	
+	}
+
+	private function replaceInternalLinks($s)
+	{
+
+		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
+
+		return $d;
+
+	}
+
+	private function removeInternalLinks($s)
+	{
+	
+		// removes internal links without replacing them, just leavinf the linked text
+
+		if (strpos($s,'[l]')!==false && strpos($s,'[/l]')!==false) {
+		
+			$d = preg_split('/(\[t\]|\[\/t\])/',$s);
+							
+			$t = isset($d[1]) ? $d[1] : null;			
+
+			return preg_replace('/\[l\](.*)\[\/l\]/',$t,$s);
+
+		} else {
+
+			return $s;
+
+		}
+		
+	}
+
+	private function createLookupArrays()
+	{
+
+		$s = $g = $l = null;
+				
+		foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) $s[$val['term']] = $val['id'];
+		foreach((array)$_SESSION['system']['import']['glossary'] as $val) $g[$val['term']] = $val['id'];
+		foreach((array)$_SESSION['system']['import']['literature'] as $val) $l[$val['term']] = $val['id'];
+		
+		return array(
+			'species' => $s,
+			'glossary' => $g,
+			'literature' => $l,
+		);
+
+	}
+
+	
 }
