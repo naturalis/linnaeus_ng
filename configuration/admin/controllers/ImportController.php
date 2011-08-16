@@ -2955,9 +2955,17 @@ class ImportController extends Controller
 
 		$s = $g = $l = null;
 				
-		foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) $s[$val['term']] = $val['id'];
-		foreach((array)$_SESSION['system']['import']['glossary'] as $val) $g[$val['term']] = $val['id'];
-		foreach((array)$_SESSION['system']['import']['literature'] as $val) $l[$val['term']] = $val['id'];
+		foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) {
+			if (isset($val['term'])) $s[$val['term']] = $val['id'];
+		}
+
+		foreach((array)$_SESSION['system']['import']['glossary'] as $val) {
+			if (isset($val['term'])) $g[$val['term']] = $val['id'];
+		}
+
+		foreach((array)$_SESSION['system']['import']['literature'] as $val) {
+			if (isset($val['term'])) $l[$val['term']] = $val['id'];
+		}
 		
 		return array(
 			'species' => $s,
