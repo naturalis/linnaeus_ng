@@ -1349,10 +1349,10 @@ class Controller extends BaseClass
 
 	public function createProject($d)
 	{
-	
+
 		$p = $this->models->Project->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'sys_name' => $d['title'].(isset($d['version']) ? ' v'.$d['version'] : $d['version']),
 				'sys_description' => $d['sys_description'],
 				'title' => $d['title']
@@ -1369,7 +1369,7 @@ class Controller extends BaseClass
 	
 		$this->models->ProjectRoleUser->save(
 			array(
-				'id' => 'null',
+				'id' => null,
 				'project_id' => $projectId,	
 				'role_id' => $roleId,
 				'user_id' =>$userId,
@@ -2182,7 +2182,8 @@ class Controller extends BaseClass
 			return array(            
 				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/',
 				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/',
-				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/'
+				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/',
+				'media_url' => '../../../admin/media/project/' . sprintf('%04s', $p) . '/',				
 			);
         else
 			return null;

@@ -4,6 +4,8 @@ include_once (dirname(__FILE__) . "/../BaseClass.php");
 
 abstract class Model extends BaseClass
 {
+
+	private $noKeyViolationLogging = false;
     
     private $databaseSettings;
     public $databaseConnection;
@@ -94,7 +96,6 @@ abstract class Model extends BaseClass
     public function save($data)
     {
 
-		
         if (!$this->hasId($data)) return false;
 
         $this->get();
@@ -195,7 +196,7 @@ abstract class Model extends BaseClass
         
         if (!mysql_query($query)) {
 		
-			$this->log('Failed query: '.$query,2);
+			$this->logQueryResult(false,$query,'ins');
 
             return mysql_error($this->databaseConnection);
         
@@ -324,7 +325,7 @@ abstract class Model extends BaseClass
         
         if (!mysql_query($query)) {
 
-			$this->log('Failed query: '.$query,2);
+			$this->logQueryResult(false,$query,'upd');
             
             return mysql_error($this->databaseConnection);
         
@@ -397,7 +398,7 @@ abstract class Model extends BaseClass
         
         if (!$result) {
 		
-			 $this->log('Failed query: '.$query,2);
+			$this->logQueryResult(false,$query,'del');
 
             return mysql_error($this->databaseConnection);
         
@@ -413,7 +414,7 @@ abstract class Model extends BaseClass
     }
 
 
-    public function _get ($params=false)
+    public function _get($params=false)
     {
 		if (!$params) return false;
 
@@ -430,7 +431,7 @@ abstract class Model extends BaseClass
     }
 
 
-    public function get ($id=false,$columns=false,$order=false,$group=false,$ignoreCase=true,$fieldAsIndex=false,$limit=false)
+    public function get($id=false,$columns=false,$order=false,$group=false,$ignoreCase=true,$fieldAsIndex=false,$limit=false)
     {
 
         unset($this->data);
@@ -480,7 +481,7 @@ abstract class Model extends BaseClass
     }
 
 
-    public function execute ($query)
+    public function execute($query)
     {
         
 		$query = str_replace('%table%', $this->tableName, $query);
@@ -493,7 +494,7 @@ abstract class Model extends BaseClass
 
 		if (!$result) {
 		
-			$this->log('Failed query: '.$query,2);
+			$this->logQueryResult(false,$query,'exec');
 			
 			return mysql_error($this->databaseConnection);
 		
@@ -507,6 +508,13 @@ abstract class Model extends BaseClass
 		}
     
     }
+
+	public function setNoKeyViolationLogging($state)
+	{
+
+		if (is_bool($state)) $this->noKeyViolationLogging = $state;
+
+	}
 
 
 	/* DEBUG */
@@ -574,6 +582,7 @@ abstract class Model extends BaseClass
 
     private function connectToDatabase ()
     {
+
         $this->databaseSettings = $this->config->getDatabaseSettings();
         
         $this->databaseConnection = mysql_connect($this->databaseSettings['host'], $this->databaseSettings['user'], $this->databaseSettings['password']);
@@ -615,7 +624,9 @@ abstract class Model extends BaseClass
 	
 		$query = 'select * from ' . $this->tableName . ' limit 1';
         
-        $r = mysql_query($query) or $this->log('Failed query: '.$query,2);
+        $r = mysql_query($query);
+		
+		$this->logQueryResult($r,$query,'table col info');
 
 		if (!$r) return;
         
@@ -815,7 +826,9 @@ abstract class Model extends BaseClass
             
             $this->setLastQuery($query);
 
-            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+            $set = mysql_query($query);
+			
+			$this->logQueryResult($set,$query,'set,normal');
 
             $this->setLastQuery($query);
             
@@ -845,7 +858,9 @@ abstract class Model extends BaseClass
 
             $this->setLastQuery($query);
 
-            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+            $set = mysql_query($query);
+			
+			$this->logQueryResult($set,$query,'set,*');
 
             while ($row = @mysql_fetch_assoc($set)) {
 
@@ -867,15 +882,19 @@ abstract class Model extends BaseClass
             
             $this->setLastQuery($query);
             
-			$m = mysql_query($query) or $this->log('Failed query: '.$query,2);
+			$m = mysql_query($query);
+			
+			$this->logQueryResult($m,$query,'set,id only');
 			
             $this->data = @mysql_fetch_assoc($m);
         
-        } else {
+        } elseif (is_null($query)) {
 
-			$query = str_replace('%table%', $this->tableName, $id);
+			$query = str_replace('%table%', $this->tableName, $query);
 
-            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+            $set = mysql_query($query);
+			
+			$this->logQueryResult($set,$query,'set,full query');
 
             $this->setLastQuery(str_replace('%table%', $this->tableName, $id));
 
@@ -893,10 +912,24 @@ abstract class Model extends BaseClass
             
             }
         
-        }
+        } else {
+			
+			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
+		
+		}
     
     }
 
+	private function logQueryResult($set,$query,$type,$severity=1) {
+
+		if (!$set) {
+
+			// 1062 = key violation
+			if (mysql_errno()!=1062 || $this->noKeyViolationLogging!=true) $this->log('Failed query ('.$type.'): '.$query,$severity);
+	
+		}
+
+	}
 
 
 
