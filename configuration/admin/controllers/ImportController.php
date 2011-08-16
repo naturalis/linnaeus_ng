@@ -610,7 +610,7 @@ class ImportController extends Controller
 			$this->addMessage('Added current user to project as system administrator.');
 
 			$this->smarty->assign('processed',true);
-			q($_SESSION['system']['import']['glossary']);
+//			q($_SESSION['system']['import']['glossary']);
 
 			unset($_SESSION['system']['import']);
 
@@ -2957,17 +2957,17 @@ return $this->removeInternalLinks($s);
 	{
 
 		$s = $g = $l = null;
-				
+
 		foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) {
-			if (isset($val['term'])) $s[$val['term']] = $val['id'];
+			if (isset($val['taxon']) && isset($val['id'])) $s[$val['taxon']] = $val['id'];
 		}
 
 		foreach((array)$_SESSION['system']['import']['glossary'] as $val) {
-			if (isset($val['term'])) $g[$val['term']] = $val['id'];
+			if (isset($val['term']) && isset($val['id'])) $g[$val['term']] = $val['id'];
 		}
 
 		foreach((array)$_SESSION['system']['import']['literature'] as $val) {
-			if (isset($val['term'])) $l[$val['term']] = $val['id'];
+			if (isset($val['original']) && isset($val['id'])) $l[$val['original']] = $val['id'];
 		}
 		
 		return array(
