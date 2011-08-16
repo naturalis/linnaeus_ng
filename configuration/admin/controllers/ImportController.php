@@ -2923,6 +2923,9 @@ class ImportController extends Controller
 	private function replaceInternalLinks($s)
 	{
 
+// TEMP WORKAROUND TO FIX "Undefined offset: 2" op 2919.
+return $this->removeInternalLinks($s);
+
 		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
 
 		return $d;
