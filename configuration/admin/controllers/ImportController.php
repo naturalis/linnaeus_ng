@@ -1536,7 +1536,8 @@ class ImportController extends Controller
 
 			$l = (string)$val->literature_title;
 			$a = $this->resolveAuthors($l);
-			$a['text'] = $this->replaceInternalLinks($this->replaceOldTags((string)$val->fullreference));
+//			$a['text'] = $this->replaceInternalLinks($this->replaceOldTags((string)$val->fullreference));
+			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
 			$okSp = $unSp = null;
 
 			if ($val->keywords->keyword) {
@@ -1586,7 +1587,7 @@ class ImportController extends Controller
 					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
 					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
 					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
-					'text' => isset($val['text']) ? $val['text'] : null,
+					'text' => isset($val['text']) ? $this->replaceInternalLinks($val['text']) : null,
 				)
 			);
 
@@ -1648,7 +1649,8 @@ class ImportController extends Controller
 		foreach($d->glossary->term as $key => $val) {
 		
 			$t = (string)$val->glossary_title;
-			$d = $this->replaceInternalLinks($this->replaceOldTags((string)$val->definition,true));
+//			$d = $this->replaceInternalLinks($this->replaceOldTags((string)$val->definition,true));
+			$d = $this->replaceOldTags((string)$val->definition,true);
 			
 			unset($s);
 
@@ -1781,7 +1783,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'term' => isset($val['term']) ? $val['term'] : null,
-					'definition' => isset($val['definition']) ? $val['definition'] : null
+					'definition' => isset($val['definition']) ? $this->replaceInternalLinks($val['definition']) : null
 				)
 			);
 
@@ -2444,7 +2446,6 @@ class ImportController extends Controller
 	{
 
 		// assuming only one 'introduction' branch in the import (= a single free module)
-
 		$freeModName = 'Introduction';
 
 		$exists = true;
@@ -2790,34 +2791,6 @@ class ImportController extends Controller
 
 	private function resolveInternalLinks($s)
 	{
-
-/*
-	if image / movie
-		extract media name
-		does media exist
-			create link for local pop up
-		does media not exist
-			create link to fail message ???
-		add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
-
-	? [l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
-
-	x [l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
-	x [l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
-
-	[link] = [l]
-	
-	[module] = [m]
-	[image] = [im]
-	[movie] = [mo]
-	[sound] = [s]
-	
-	[filename] = [f]
-	[record] = [r]
-	[text] = [t]
-
-*/
-	
 	
 		$controllers = 
 			array(
@@ -2885,9 +2858,8 @@ class ImportController extends Controller
 	
 //		$d = rtrim($s[count((array)$s)-1],'[/t]');
 		$d = preg_replace('/\[\/t\]$/','',$s[count((array)$s)-1]);
-	
 		$d = preg_split('/(\[\/m\]\[[r]\])|(\[\/r\]\[[t]\])/iU',$d);
-	
+
 		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
 			if ($controllers[$d[0]]=='glossary' && $_SESSION['system']['import']['lookupArrays']['g'][$d[1]])
@@ -2902,7 +2874,7 @@ class ImportController extends Controller
 			if ($controllers[$d[0]]=='highertaxa' && $_SESSION['system']['import']['lookupArrays']['s'][$d[1]])
 				$id = $_SESSION['system']['import']['lookupArrays']['s'][$d[1]];
 	
-			if ($id) {
+			if (isset($id) && isset($d[2])) {
 	
 				$href =
 					"goIntLink('".$controllers[$d[0]]['controller']."',".
@@ -2915,18 +2887,107 @@ class ImportController extends Controller
 			}
 			
 		}
+
+		return isset($d[2]) ? $d[2] : $s[0];
+	
+	}
+
+
+
+	function resolveEmbeddedLinks($s)
+	{
+
+/*
+	if image / movie
+		extract media name
+		does media exist
+			create link for local pop up
+		does media not exist
+			create link to fail message ???
+		add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
+
+	? [l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
+
+	x [l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
+	x [l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
+
+	[link] = [l]
+	
+	[module] = [m]
+	[image] = [im]
+	[movie] = [mo]
+	[sound] = [s]
+	
+	[filename] = [f]
+	[record] = [r]
+	[text] = [t]
+
+
+
+			
+
+									
+*/
+
+//		$d = preg_replace('/(\[\/im\]|\[\/mo\]|\[\/s\]|\[f\]|\[\/t\])/','',preg_split('/\[\/f\]\[t\]/iU',$s[count((array)$s)-1]));
+
+		$d = preg_split('/\[\/f\]\[t\]/iU',$s[count((array)$s)-1]);
 		
-		return $d[2];
+		if (isset($d[1]) && strpos($d[1],'[/im]')!==false) $type = 'image';
+		else
+		if (isset($d[1]) && strpos($d[1],'[/mo]')!==false) $type = 'movie';
+		else
+		if (isset($d[1]) && strpos($d[1],'[/s]')!==false) $type = 'sound';
+		else return $s[0];
+
+		$d = preg_replace('/(\[\/im\]|\[\/mo\]|\[\/s\]|\[f\]|\[\/t\])/','',$d);
+
+		if (isset($d[0])) $filename = $d[0]; else return $s[0];
+		$label = isset($d[1]) ? $d[1] : $filename;
+
+		if (file_exists($_SESSION['system']['import']['paths']['project_media'].$filename)) {
+		
+			if ($type=='image') {
+
+				return '<img
+					onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
+					src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
+					class="media-image">';
+
+			} else
+			if ($type=='movie') {
+
+				return '<img
+					onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
+					src="../../media/system/video.jpg" 
+					class="media-image">';
+
+			} else
+			if ($type=='sound') {
+
+				return '<object type="application/x-shockwave-flash" data="'.
+							$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
+							<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
+							<param name="FlashVars" value="mp3='.$_SESSION['system']['import']['paths']['media_url'].$filename.'">
+						</object>';
+
+			} else return $s[0];
+	
+		}
 	
 	}
 
 	private function replaceInternalLinks($s)
 	{
 
-// TEMP WORKAROUND TO FIX "Undefined offset: 2" op 2919.
-return $this->removeInternalLinks($s);
+		// regular links
+		$d = preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
 
-		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
+		// embedded media
+		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/sU',array($this,'resolveEmbeddedLinks'),$s);
+
+		// all
+//		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
 
 		return $d;
 

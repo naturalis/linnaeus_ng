@@ -37,13 +37,13 @@ Review the options below and press "import" to start the import database. Please
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
 <b>Species data</b><br/>
-Import general species descriptions?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_overview" checked="checked"></label><br />
-Import common names?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_common" checked="checked"></label><br />
-Import synonyms?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_synonym" checked="checked"></label><br />
+<label>Import general species descriptions?&nbsp;&nbsp;<input type="checkbox" name="taxon_overview" checked="checked"></label><br />
+<label>Import common names?&nbsp;&nbsp;<input type="checkbox" name="taxon_common" checked="checked"></label><br />
+<label>Import synonyms?&nbsp;&nbsp;<input type="checkbox" name="taxon_synonym" checked="checked"></label><br />
 {if $session.system.import.imagePath===false}
 (you specified no media import)<br />
 {else}
-Import media?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_media" checked="checked"></label><br />
+<label>Import media?&nbsp;&nbsp;<input type="checkbox" name="taxon_media" checked="checked"></label><br />
 {/if}
 
 </p>
@@ -51,7 +51,7 @@ Import media?&nbsp;&nbsp;<label><input type="checkbox" name="taxon_media" checke
 <p>
 <b>Literature</b><br/>
 {if $literature}
-Import literary references ({$literature|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="literature" checked="checked"></label><br /><br />	
+<label>Import literary references ({$literature|@count})?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label><br /><br />	
 The following literary references contain errors and will not be loaded:<br />
 {foreach from=$literature key=k item=v}
 {if $v.references.unknown_species|@count != 0}
@@ -69,7 +69,7 @@ No literary references found.
 <p>
 <b>Glossary</b><br/>
 {if $glossary}
-Import glossary items ({$glossary|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="glossary" checked="checked"></label><br />
+<label>Import glossary items ({$glossary|@count})?&nbsp;&nbsp;<input type="checkbox" name="glossary" checked="checked"></label><br />
 {else}
 No glossary items found.
 {/if}
@@ -78,12 +78,12 @@ No glossary items found.
 <p>
 <b>Content</b><br/>
 {if $content.Introduction}
-Import project introduction?&nbsp;&nbsp;<label><input type="checkbox" name="content_introduction" checked="checked"></label><br />
+<label>Import project introduction?&nbsp;&nbsp;<input type="checkbox" name="content_introduction" checked="checked"></label><br />
 {else}
 No project introduction found.
 {/if}
 {if $content.Contributors}
-Import contributors text?&nbsp;&nbsp;<label><input type="checkbox" name="content_contributors" checked="checked"></label><br />
+<label>Import contributors text?&nbsp;&nbsp;<input type="checkbox" name="content_contributors" checked="checked"></label><br />
 {else}
 No contributors text found.
 {/if}
@@ -92,7 +92,7 @@ No contributors text found.
 <p>
 <b>Additional topics</b><br/>
 {if $additionalContent}
-Import additional topics ({$additionalContent|@count})?&nbsp;&nbsp;<label><input type="checkbox" name="additional_content" checked="checked"></label><br />
+<label>Import additional topics ({$additionalContent|@count})?&nbsp;&nbsp;<input type="checkbox" name="additional_content" checked="checked"></label><br />
 {else}
 No additional topics found.
 {/if}
@@ -100,14 +100,14 @@ No additional topics found.
 
 <p>
 <b>Keys</b><br/>
-Import dichotomous key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_dich" checked="checked"></label><br />
-Import matrix key(s)?&nbsp;&nbsp;<label><input type="checkbox" name="key_matrix" checked="checked"></label><br />
+<label>Import dichotomous key(s)?&nbsp;&nbsp;<input type="checkbox" name="key_dich" checked="checked"></label><br />
+<label>Import matrix key(s)?&nbsp;&nbsp;<input type="checkbox" name="key_matrix" checked="checked"></label><br />
 </p>
 
 <p>
 <b>Map data</b><br/>
 {if $mapItems.occurrences>0}
-Import map data ({$mapItems.total} items for {$mapItems.occurrences|@count} species in {$mapItems.types|@count} categories on {$mapItems.maps|@count} maps)?&nbsp;&nbsp;<label><input type="checkbox" name="map_items" checked="checked"></label><br />
+<label>Import map data ({$mapItems.total} items for {$mapItems.occurrences|@count} species in {$mapItems.types|@count} categories on {$mapItems.maps|@count} maps)?&nbsp;&nbsp;<input type="checkbox" name="map_items" checked="checked"></label><br />
 {else}
 No map data found.
 {/if}

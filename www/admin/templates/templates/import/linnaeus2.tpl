@@ -14,7 +14,7 @@ XML-file to load: <input name="importFile" type="file" /><br />
 </p>
 <p>
 Set the paths below where the media files and, if they exists, thumbnails can be found. These paths should be directly accessible to the webserver.<br />
-Please check the corresponding checboxes if you do not wish to import images and/or thumbnails.
+Please check the corresponding checkboxes if you do not wish to import images and/or thumbnails.
 </p>
 <p>
 {if $s.imagePath}
