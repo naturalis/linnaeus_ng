@@ -519,6 +519,9 @@ class SpeciesController extends Controller
 		
 		}
 
+		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
+
         $this->printPage();
     
     }
@@ -1023,6 +1026,9 @@ class SpeciesController extends Controller
             $this->addError(_('No taxon specified.'));
 
         } 
+
+		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
         
         $this->printPage();
 

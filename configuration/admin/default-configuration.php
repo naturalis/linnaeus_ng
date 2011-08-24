@@ -91,7 +91,9 @@ class configuration
                 'lifetime' => 30, // days
             ),
 			'uiLanguages' => array('Dutch','English'),
-			'uiDefaultLanguage' => 1 // points to the element in the array above
+			'uiDefaultLanguage' => 1, // points to the element in the array above
+			'soundPlayerPath' => '../../media/system/',
+			'soundPlayerName' => 'player_mp3.swf'
         );
     
     }

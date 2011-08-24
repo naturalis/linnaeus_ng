@@ -110,8 +110,8 @@
 		{section name=i loop=$media.sound}
 		<tr id="media-row-{$media.sound[i].id}" class="tr-highlight">
 			<td>
-				<object type="application/x-shockwave-flash" data="../../tools/player_mp3.swf" width="130" height="20">
-					<param name="movie" value="player_mp3.swf" />
+				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
+					<param name="movie" value="{$soundPlayerName}" />
 					<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$media.sound[i].file_name}" />
 				</object>
 			</td>

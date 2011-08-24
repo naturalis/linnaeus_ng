@@ -120,12 +120,12 @@
 				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
 	{elseif $v.category=='audio'}
-			<object type="application/x-shockwave-flash" data="../../media/system/player_mp3.swf" width="130" height="20">
-				<param name="movie" value="player_mp3.swf" />
+			<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
+				<param name="movie" value="{$soundPlayerName}" />
 				<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$v.file_name}" />
 			</object>
 	{/if}
-			</td>
+			</td>		
 		<td class="media-description-cell">{$v.description}</td>
 	</tr>
 	{assign var=mediaCat value=$v.category}
