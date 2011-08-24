@@ -362,10 +362,10 @@ class ProjectsController extends Controller
 		$this->setCurrentProjectData();
 
         $languages = array_merge(
-			$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
-	        $this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
+			(array)$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
+	        (array)$this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
 		);
-        
+
         foreach ((array) $languages as $key => $val) {
             
             $lp = $this->models->LanguageProject->_get(
