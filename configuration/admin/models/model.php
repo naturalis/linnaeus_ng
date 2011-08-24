@@ -752,7 +752,7 @@ abstract class Model extends BaseClass
         if (!$id) return;
 			
         if (is_array($id)) {
-            
+
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
             
             foreach ((array) $id as $col => $val) {
@@ -888,9 +888,9 @@ abstract class Model extends BaseClass
 			
             $this->data = @mysql_fetch_assoc($m);
         
-        } elseif (is_null($query)) {
+        } elseif (!is_null($id)) {
 
-			$query = str_replace('%table%', $this->tableName, $query);
+			$query = str_replace('%table%', $this->tableName, $id);
 
             $set = mysql_query($query);
 			
