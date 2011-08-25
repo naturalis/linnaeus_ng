@@ -227,13 +227,13 @@ class FileUploadHelper
 
     }
 
-    private function getMimeType ($filename,$tmpFileName)
+    public function getMimeType ($filename,$tmpFileName=false)
     {
 
         if (function_exists('finfo_open')) {
 
             $finfo = finfo_open(FILEINFO_MIME);
-            $mimetype = finfo_file($finfo, $tmpFileName);
+            $mimetype = finfo_file($finfo, $tmpFileName!==false ? $tmpFileName : $filename);
             finfo_close($finfo);
             
             $result = $mimetype;
