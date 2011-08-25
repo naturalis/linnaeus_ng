@@ -90,8 +90,7 @@ class ImportController extends Controller
 		'geodata_type_title'
     );
    
-    public $usedHelpers = array(
-    );
+    public $usedHelpers = array('file_upload_helper');
 
     public $controllerPublicName = 'Linnaeus 2 Import';
 
@@ -1278,10 +1277,15 @@ class ImportController extends Controller
 				'cause' => 'user specified no media import for project'
 			);
 
+		if (empty($fileName)) return array(
+				'saved' => false,
+				'data' => '',
+				'cause' => 'missing file name'
+			);
 
 		if (file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
 		
-			$thisMIME = mime_content_type($_SESSION['system']['import']['imagePath'].$fileName);
+			$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['system']['import']['imagePath'].$fileName);
 			
 			if (isset($mimes[$thisMIME])) {
 			
@@ -1379,11 +1383,7 @@ class ImportController extends Controller
 		
 		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
 
-		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) {
-
-			$mimes[$val['mime']] = $val;
-
-		}
+		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
 
 		$failed = null;
 		$saved = null;
@@ -1397,33 +1397,38 @@ class ImportController extends Controller
 				
 				$fileName = (string)$val->multimedia->overview;
 
-				$r = $this->doAddSpeciesMedia(
-					$taxonId,
-					$fileName,
-					$fileName,
-					$mimes
-				);
+				if (!empty($fileName)) {
 
-				if ($r['saved']==true) {
-
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
-
-					$saved[] = $r;
-					$prev[$fileName] = true;
-				
-				} else {
-
-					$failed[] = $r;
-
+					$r = $this->doAddSpeciesMedia(
+						$taxonId,
+						$fileName,
+						$fileName,
+						$mimes
+					);
+	
+					if ($r['saved']==true) {
+	
+						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+	
+						$saved[] = $r;
+						$prev[$fileName] = true;
+					
+					} else {
+	
+						$failed[] = $r;
+	
+					}
+					
 				}
 
 				foreach($val->multimedia->multimediafile as $vKey => $vVal) {
 				
 					$fileName = (string)$vVal->filename;
-					
-					if (isset($prev[$fileName])) continue;
 
+					if (empty($fileName)) continue;
+
+					if (isset($prev[$fileName])) continue;
 
 					$r = $this->doAddSpeciesMedia(
 						$taxonId,
