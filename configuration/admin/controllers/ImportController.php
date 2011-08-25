@@ -97,6 +97,8 @@ class ImportController extends Controller
 
 	public $cssToLoad = array();
 	public $jsToLoad = array();
+	
+	private $_deleteOldMediaAfterImport = false; // might become a switch later, but let's not overdo it
 
 
     /**
@@ -173,7 +175,7 @@ class ImportController extends Controller
 			} else
 			if (file_exists($this->requestData['imagePath'])) {
 
-				$_SESSION['system']['import']['imagePath'] = $this->requestData['imagePath'];
+				$_SESSION['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'],'/').'/';
 
 			} else {
 
@@ -193,7 +195,7 @@ class ImportController extends Controller
 			} else
 			if (file_exists($this->requestData['thumbsPath'])) {
 
-				$_SESSION['system']['import']['thumbsPath'] = $this->requestData['thumbsPath'];
+				$_SESSION['system']['import']['thumbsPath'] = rtrim($this->requestData['thumbsPath'],'/').'/';
 
 			} else {
 
@@ -459,7 +461,7 @@ class ImportController extends Controller
 
 				if (isset($res['failed'])) {
 
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed media:<br />'.$val['cause']);
+					foreach ((array)$res['failed'] as $val) $this->addError('Failed media "'.$val['data'].'":<br />'.$val['cause']);
 
 				}
 
@@ -1324,7 +1326,7 @@ class ImportController extends Controller
 				return array(
 					'saved' => false,
 					'data' => $fileName,
-					'cause' => 'mime-type "'.$thisMIME.'" not allowed'
+					'cause' => isset($thisMIME) ? 'mime-type "'.$thisMIME.'" not allowed' : 'could not determine mime-type'
 				);
 
 			}
@@ -1348,7 +1350,7 @@ class ImportController extends Controller
 	
 		if(copy($from,$to)) {
 
-			unlink($from);
+			if ($this->_deleteOldMediaAfterImport===true) @unlink($from);
 
 			return true;
 
@@ -1753,7 +1755,7 @@ class ImportController extends Controller
 				return array(
 					'saved' => false,
 					'data' => $data['fileName'],
-					'cause' => 'mime-type "'.$thisMIME.'" not allowed'
+					'cause' => isset($thisMIME) ? 'mime-type "'.$thisMIME.'" not allowed' : 'could not determine mime-type'
 				);
 
 			}
