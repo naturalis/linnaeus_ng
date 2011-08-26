@@ -601,7 +601,7 @@ class ImportController extends Controller
 
 			}
 
-			$this->fixAllOldLinks();
+//			$this->fixAllOldLinks();
 
 			$this->addUserToProject($this->getCurrentUserId(),$this->getNewProjectId(),ID_ROLE_SYS_ADMIN);
 		
