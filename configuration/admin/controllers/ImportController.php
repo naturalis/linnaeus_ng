@@ -426,8 +426,6 @@ class ImportController extends Controller
 		
 			ini_set('max_execution_time',600);
 
-			// DO NOT CHANGE ORDER; GLOSSARY, LITERATURE & MEDIA (SPECIES, KEY & MTRIX) MUST COME BEFORE CONTENT, FOR THEY MAY BE LINKED TO
-
 			if ($this->rHasVal('literature','on')) {
 
 				$res = $this->addLiterature($literature);
@@ -503,9 +501,6 @@ class ImportController extends Controller
 			}
 
 			
-			$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
-
-
 			if ($this->rHasVal('taxon_overview','on')) {
 
 				$overviewCatId = $this->createStandardCat();
@@ -605,6 +600,8 @@ class ImportController extends Controller
 				$this->addModuleToProject(8);
 
 			}
+
+			$this->fixAllOldLinks();
 
 			$this->addUserToProject($this->getCurrentUserId(),$this->getNewProjectId(),ID_ROLE_SYS_ADMIN);
 		
@@ -1159,7 +1156,7 @@ class ImportController extends Controller
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'page_id' => $overviewCatId,
 //						'content' => $this->replaceOldTags((string)$val->description),
-						'content' => $this->replaceInternalLinks($this->replaceOldTags((string)$val->description)),
+						'content' => $this->replaceOldTags($this->replaceInternalLinks((string)$val->description)),
 						'publish' => 1
 					)
 				);
@@ -2798,7 +2795,7 @@ class ImportController extends Controller
 
 	private function resolveInternalLinks($s)
 	{
-	
+
 		$controllers = 
 			array(
 				'Content pages' => array(
@@ -2869,17 +2866,17 @@ class ImportController extends Controller
 
 		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
-			if ($controllers[$d[0]]=='glossary' && $_SESSION['system']['import']['lookupArrays']['g'][$d[1]])
-				$id = $_SESSION['system']['import']['lookupArrays']['g'][$d[1]];
+			if ($controllers[$d[0]]=='glossary' && $_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]];
 
-			if ($controllers[$d[0]]=='literature' && $_SESSION['system']['import']['lookupArrays']['l'][$d[1]])
-				$id = $_SESSION['system']['import']['lookupArrays']['l'][$d[1]];
+			if ($controllers[$d[0]]=='literature' && $_SESSION['system']['import']['lookupArrays']['literature'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['literature'][$d[1]];
 
-			if ($controllers[$d[0]]=='species' && $_SESSION['system']['import']['lookupArrays']['s'][$d[1]])
-				$id = $_SESSION['system']['import']['lookupArrays']['s'][$d[1]];
+			if ($controllers[$d[0]]=='species' && $_SESSION['system']['import']['lookupArrays']['species'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
 
-			if ($controllers[$d[0]]=='highertaxa' && $_SESSION['system']['import']['lookupArrays']['s'][$d[1]])
-				$id = $_SESSION['system']['import']['lookupArrays']['s'][$d[1]];
+			if ($controllers[$d[0]]=='highertaxa' && $_SESSION['system']['import']['lookupArrays']['species'][$d[1]])
+				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
 	
 			if (isset($id) && isset($d[2])) {
 	
@@ -2995,7 +2992,7 @@ class ImportController extends Controller
 
 		// all
 //		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
-
+if ($d!=$s) q($d,1);
 		return $d;
 
 	}
@@ -3043,6 +3040,13 @@ class ImportController extends Controller
 			'glossary' => $g,
 			'literature' => $l,
 		);
+
+	}
+
+	private function fixAllOldLinks()
+	{
+
+		//$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
 
 	}
 

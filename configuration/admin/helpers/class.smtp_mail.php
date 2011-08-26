@@ -84,7 +84,7 @@
 
     function connect($hostname) {
       $ret = false;
-      $this->fp = fsockopen($hostname, 25);
+      $this->fp = @fsockopen($hostname, 25);
       if($this->fp) {
         $ret = true;
       }
