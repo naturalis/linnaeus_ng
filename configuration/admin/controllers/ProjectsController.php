@@ -513,6 +513,8 @@ class ProjectsController extends Controller
 		
 			$this->doDeleteProjectAction($this->requestData['id']);
 			
+			$this->reInitUserRolesAndRights();
+	
 			$this->addMessage('Project deleted.');
 
 		
