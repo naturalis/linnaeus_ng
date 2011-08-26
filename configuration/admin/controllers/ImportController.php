@@ -1155,8 +1155,7 @@ class ImportController extends Controller
 						'taxon_id' => $taxonId,
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'page_id' => $overviewCatId,
-//						'content' => $this->replaceOldTags((string)$val->description),
-						'content' => $this->replaceOldTags($this->replaceInternalLinks((string)$val->description)),
+						'content' => (string)$val->description,
 						'publish' => 1
 					)
 				);
@@ -1540,7 +1539,6 @@ class ImportController extends Controller
 
 			$l = (string)$val->literature_title;
 			$a = $this->resolveAuthors($l);
-//			$a['text'] = $this->replaceInternalLinks($this->replaceOldTags((string)$val->fullreference));
 			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
 			$okSp = $unSp = null;
 
@@ -1591,7 +1589,7 @@ class ImportController extends Controller
 					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
 					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
 					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
-					'text' => isset($val['text']) ? $this->replaceInternalLinks($val['text']) : null,
+					'text' => isset($val['text']) ? $val['text'] : null,
 				)
 			);
 
@@ -1653,7 +1651,6 @@ class ImportController extends Controller
 		foreach($d->glossary->term as $key => $val) {
 		
 			$t = (string)$val->glossary_title;
-//			$d = $this->replaceInternalLinks($this->replaceOldTags((string)$val->definition,true));
 			$d = $this->replaceOldTags((string)$val->definition,true);
 			
 			unset($s);
@@ -1787,7 +1784,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'term' => isset($val['term']) ? $val['term'] : null,
-					'definition' => isset($val['definition']) ? $this->replaceInternalLinks($val['definition']) : null
+					'definition' => isset($val['definition']) ? $val['definition'] : null
 				)
 			);
 
@@ -2990,9 +2987,6 @@ class ImportController extends Controller
 		// embedded media
 		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/sU',array($this,'resolveEmbeddedLinks'),$s);
 
-		// all
-//		$d = preg_replace_callback('/(\[l\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
-if ($d!=$s) q($d,1);
 		return $d;
 
 	}
@@ -3045,9 +3039,49 @@ if ($d!=$s) q($d,1);
 
 	private function fixAllOldLinks()
 	{
+/*
+		$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
+replaceOldTags
+$this->replaceOldTags($this->replaceInternalLinks(
 
-		//$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
 
+				$this->models->ContentTaxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'page_id' => $overviewCatId,
+						'content' => (string)$val->description,
+						'publish' => 1
+					)
+				);
+
+
+			$l = $this->models->Literature->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),				
+					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
+					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
+					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
+					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
+					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
+					'text' => isset($val['text']) ? $this->replaceInternalLinks($val['text']) : null,
+				)
+			);				
+
+			$g = $this->models->Glossary->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'term' => isset($val['term']) ? $val['term'] : null,
+					'definition' => isset($val['definition']) ? $this->replaceInternalLinks($val['definition']) : null
+				)
+			);
+*/
+				
 	}
 
 	
