@@ -16,6 +16,7 @@
 {/literal}
 <div id="page-main">
 {if $processed==true}
+{include file="../shared/_admin-messages.tpl"}
 <p>
 Data import is complete. You have been added as system administrator to the new project. In that capacity you can finish configuring the project by adding modules, creating users etc.
 </p>
@@ -29,6 +30,7 @@ You will have to manually set the distinction between higher and lower taxa. You
 <p>
 You will also have to assign species to collaborators in order to see and edit taxa. You can do this here:<br />
 <a href="../species/collaborators.php">Species module &rarr; Assign taxa to collaborator</a>
+{include file="../shared/_admin-errors.tpl"}
 </p>
 {else}
 Review the options below and press "import" to start the import database. Please note that the loading of data might take several minutes.
