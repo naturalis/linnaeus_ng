@@ -601,14 +601,15 @@ class ImportController extends Controller
 
 			}
 
-//			$this->fixAllOldLinks();
+			$res = $this->fixOldInternalLinks();
+
+			$this->addMessage('Resolved and replaced internal links.');
 
 			$this->addUserToProject($this->getCurrentUserId(),$this->getNewProjectId(),ID_ROLE_SYS_ADMIN);
 		
 			$this->addMessage('Added current user to project as system administrator.');
 
 			$this->smarty->assign('processed',true);
-//			q($_SESSION['system']['import']['glossary']);
 
 			unset($_SESSION['system']['import']);
 
@@ -1058,7 +1059,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Introduction',	
-					'content' => $this->replaceOldTags((string)$d->project->projectintroduction)
+					'content' => (string)$d->project->projectintroduction
 				)
 			);
 
@@ -1069,7 +1070,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
-					'content' => $this->replaceOldTags((string)$d->project->contributors)
+					'content' => (string)$d->project->contributors
 				)
 			);
 	
@@ -1464,12 +1465,12 @@ class ImportController extends Controller
 
 	}
 
-	private function replaceOldTags($s,$removeAll=false)
+	private function replaceOldMarkUp($s,$removeNotReplace=false)
 	{
 	
-		$r = array('<b>','</b>','<i>','</i>','<br />', null,null);
+		$r = array('<b>','</b>','<i>','</i>','<br />', '<p>', '</p>');
 	
-		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeAll ? null : $r),$s);
+		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeNotReplace ? null : $r),$s);
 	
 	}
 
@@ -1539,14 +1540,14 @@ class ImportController extends Controller
 
 			$l = (string)$val->literature_title;
 			$a = $this->resolveAuthors($l);
-			$a['text'] = $this->replaceOldTags((string)$val->fullreference);
+			$a['text'] = (string)$val->fullreference;
 			$okSp = $unSp = null;
 
 			if ($val->keywords->keyword) {
 
 				foreach($val->keywords->keyword as $kKey => $kVal) {
 	
-					$t = $this->replaceOldTags($this->removeInternalLinks((string)$kVal->name),true);
+					$t = $this->replaceOldMarkUp($this->removeInternalLinks((string)$kVal->name),true);
 	
 					if (isset($species[$t])) {
 
@@ -1651,7 +1652,7 @@ class ImportController extends Controller
 		foreach($d->glossary->term as $key => $val) {
 		
 			$t = (string)$val->glossary_title;
-			$d = $this->replaceOldTags((string)$val->definition,true);
+			$d = (string)$val->definition;
 			
 			unset($s);
 
@@ -1659,7 +1660,7 @@ class ImportController extends Controller
 
 				foreach($val->glossary_synonyms->glossary_synonym as $sKey => $sVal) {
 
-					$s[] = $this->replaceOldTags((string)$sVal->name,true);
+					$s[] = $this->replaceOldMarkUp((string)$sVal->name,true);
 					
 				}
 
@@ -1965,10 +1966,10 @@ class ImportController extends Controller
 
 			if (isset($val->captiontext)) {
 
-				$txt = $this->replaceOldTags((string)$val->captiontext);
+				$txt = $this->replaceOldMarkUp((string)$val->captiontext);
 				$p = (string)$step->pagenumber.(string)$val->choiceletter.'.';
 				if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));
-				if (strlen($txt)==0) $txt = $this->replaceOldTags((string)$val->captiontext);
+				if (strlen($txt)==0) $txt = $this->replaceOldMarkUp((string)$val->captiontext);
 
 			} else
 			if (isset($val->picturefilename)) {
@@ -2837,7 +2838,7 @@ class ImportController extends Controller
 					'param' => 'id',
 				)
 			);
-	
+
 			/*
 			array_push($i,
 				array(
@@ -2856,46 +2857,53 @@ class ImportController extends Controller
 				)
 			);
 			*/
-	
+
 //		$d = rtrim($s[count((array)$s)-1],'[/t]');
 		$d = preg_replace('/\[\/t\]$/','',$s[count((array)$s)-1]);
 		$d = preg_split('/(\[\/m\]\[[r]\])|(\[\/r\]\[[t]\])/iU',$d);
 
 		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
-			if ($controllers[$d[0]]=='glossary' && $_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]])
+			if ($controllers[$d[0]]['controller']=='glossary' && isset($_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]])) {
 				$id = $_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]];
 
-			if ($controllers[$d[0]]=='literature' && $_SESSION['system']['import']['lookupArrays']['literature'][$d[1]])
+			}
+
+			if ($controllers[$d[0]]['controller']=='literature' && isset($_SESSION['system']['import']['lookupArrays']['literature'][$d[1]])) {
 				$id = $_SESSION['system']['import']['lookupArrays']['literature'][$d[1]];
 
-			if ($controllers[$d[0]]=='species' && $_SESSION['system']['import']['lookupArrays']['species'][$d[1]])
-				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
+			}
 
-			if ($controllers[$d[0]]=='highertaxa' && $_SESSION['system']['import']['lookupArrays']['species'][$d[1]])
+			if ($controllers[$d[0]]['controller']=='species' && isset($_SESSION['system']['import']['lookupArrays']['species'][$d[1]])) {
 				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
+			}
+
+			if ($controllers[$d[0]]['controller']=='highertaxa' && isset($_SESSION['system']['import']['lookupArrays']['species'][$d[1]])) {
+				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
+			}
 	
 			if (isset($id) && isset($d[2])) {
 	
 				$href =
 					"goIntLink('".$controllers[$d[0]]['controller']."',".
-					(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : "'index.php'").
+					"'".(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php')."'".
 					(isset($controllers[$d[0]]['param']) ? ",['".$controllers[$d[0]]['param'].":".$id."']" : null).
 					");";
 
-				return '<span class="internal-link" style="color:#900" onclick="'.$href.'">'.$d[2].'</span>';
+				return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
+
 
 			}
 			
 		}
 
-		return isset($d[2]) ? $d[2] : $s[0];
+		return isset($d[2]) ? trim($d[2]) : $s[0];
 	
 	}
 
 
 
-	function resolveEmbeddedLinks($s)
+	private function resolveEmbeddedLinks($s)
 	{
 
 /*
@@ -2946,35 +2954,33 @@ class ImportController extends Controller
 		if (isset($d[0])) $filename = $d[0]; else return $s[0];
 		$label = isset($d[1]) ? $d[1] : $filename;
 
-		if (file_exists($_SESSION['system']['import']['paths']['project_media'].$filename)) {
+		//if (file_exists($_SESSION['system']['import']['paths']['project_media'].$filename))
 		
-			if ($type=='image') {
+		if ($type=='image') {
 
-				return '<img
-					onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
-					src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
-					class="media-image">';
+			return '<img
+				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
+				src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
+				class="media-image">';
 
-			} else
-			if ($type=='movie') {
+		} else
+		if ($type=='movie') {
 
-				return '<img
-					onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
-					src="../../media/system/video.jpg" 
-					class="media-image">';
+			return '<img
+				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
+				src="../../media/system/video.jpg" 
+				class="media-image">';
 
-			} else
-			if ($type=='sound') {
+		} else
+		if ($type=='sound') {
 
-				return '<object type="application/x-shockwave-flash" data="'.
-							$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
-							<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
-							<param name="FlashVars" value="mp3='.$_SESSION['system']['import']['paths']['media_url'].$filename.'">
-						</object>';
+			return '<object type="application/x-shockwave-flash" data="'.
+						$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
+						<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
+						<param name="FlashVars" value="mp3='.$_SESSION['system']['import']['paths']['media_url'].$filename.'">
+					</object>';
 
-			} else return $s[0];
-	
-		}
+		} else return $s[0];
 	
 	}
 
@@ -2985,9 +2991,9 @@ class ImportController extends Controller
 		$d = preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
 
 		// embedded media
-		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/sU',array($this,'resolveEmbeddedLinks'),$s);
+		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/sU',array($this,'resolveEmbeddedLinks'),$d);
 
-		return $d;
+		return $this->replaceOldMarkUp($d);
 
 	}
 
@@ -3037,52 +3043,68 @@ class ImportController extends Controller
 
 	}
 
-	private function fixAllOldLinks()
+	private function fixOldInternalLinks()
 	{
-/*
+
 		$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
-replaceOldTags
-$this->replaceOldTags($this->replaceInternalLinks(
 
+		$d = $this->models->ContentTaxon->_get(array('id' => array('project_id' => $this->getNewProjectId())));
 
-				$this->models->ContentTaxon->save(
+		foreach((array)$d as $val) {
+
+			$this->models->ContentTaxon->save(
 					array(
-						'id' => null,
+						'id' => $val['id'],
 						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $taxonId,
-						'language_id' => $this->getNewDefaultLanguageId(),
-						'page_id' => $overviewCatId,
-						'content' => (string)$val->description,
-						'publish' => 1
+						'content' => $this->replaceInternalLinks($val['content'])
 					)
 				);
 
+		}
 
-			$l = $this->models->Literature->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),				
-					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
-					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
-					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
-					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
-					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
-					'text' => isset($val['text']) ? $this->replaceInternalLinks($val['text']) : null,
-				)
-			);				
+		$d = $this->models->Literature->_get(array('id' => array('project_id' => $this->getNewProjectId())));
 
-			$g = $this->models->Glossary->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'term' => isset($val['term']) ? $val['term'] : null,
-					'definition' => isset($val['definition']) ? $this->replaceInternalLinks($val['definition']) : null
-				)
-			);
-*/
-				
+		foreach((array)$d as $val) {
+
+			$this->models->Literature->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),
+						'text' => $this->replaceInternalLinks($val['text'])
+					)
+				);
+			
+		}
+
+		$d = $this->models->Glossary->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->Glossary->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),
+						'definition' => $this->replaceInternalLinks($val['definition'])
+					)
+				);
+
+		}
+
+		$d = $this->models->Content->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->Content->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),
+						'content' => $this->replaceInternalLinks($val['content'])
+					)
+				);
+			
+		}
+		
 	}
-
 	
+
 }
