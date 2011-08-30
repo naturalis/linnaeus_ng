@@ -537,5 +537,14 @@ class configuration
 
     }
 
+    public function getControllerSettingsImport()
+    {
+
+		return array(
+			'defaultProjectCss' =>'../../style/import-default-stylesheet.css',
+		);
+
+    }
+
 }
 

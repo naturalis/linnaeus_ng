@@ -1350,14 +1350,10 @@ class Controller extends BaseClass
 	public function createProject($d)
 	{
 
-		$p = $this->models->Project->save(
-			array(
-				'id' => null,
-				'sys_name' => $d['title'].(isset($d['version']) ? ' v'.$d['version'] : $d['version']),
-				'sys_description' => $d['sys_description'],
-				'title' => $d['title']
-			)
-		);
+		$d['id'] = null;
+		$d['sys_name'] = $d['title'].(isset($d['version']) ? ' v'.$d['version'] : $d['version']);
+
+		$p = $this->models->Project->save($d);
 
 		return ($p) ? $this->models->Project->getNewId() : false;
 	

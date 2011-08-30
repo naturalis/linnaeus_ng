@@ -17,7 +17,6 @@ wtf is?
 
 need to set manually!
 	project.includes_hybrids
-	project.css_url
 	project.logo
 
 	border higher/lower taxa (give choice)
@@ -133,7 +132,7 @@ class ImportController extends Controller
     {
     
         $this->setPageName(_('Data import options'));
-	
+
         $this->printPage();
     
     }
@@ -259,7 +258,8 @@ class ImportController extends Controller
 					array(
 						 'title' => (string)$d->project->title,
 						 'version' => (string)$d->project->version,
-						 'sys_description' => 'Created by import from a Linnaeus 2-export.'
+						 'sys_description' => 'Created by import from a Linnaeus 2-export.',
+						 'css_url' => $this->controllerSettings['defaultProjectCss']
 					)
 				);
 
@@ -1538,8 +1538,7 @@ class ImportController extends Controller
 
 		foreach($d->proj_literature->proj_reference as $key => $val) {
 
-			$l = (string)$val->literature_title;
-			$a = $this->resolveAuthors($l);
+			$a = $this->resolveAuthors((string)$val->literature_title);
 			$a['text'] = (string)$val->fullreference;
 			$okSp = $unSp = null;
 
