@@ -52,10 +52,10 @@ Review the options below and press "import" to start the import database. Please
 <b>Literature</b><br/>
 {if $literature}
 <label>Import literary references ({$literature|@count})?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label><br /><br />	
-The following literary references contain errors and will not be loaded:<br />
+The following literary references refer to unknown species. The literary references themselves will be imported, but the links to the unknown species listed below will not.<br />
 {foreach from=$literature key=k item=v}
 {if $v.references.unknown_species|@count != 0}
-"<i>{$v.original}</i>" contains references to unknown species:<br/>
+"<i>{$v.original}</i>" refers to an unknown species:<br/>
 {foreach from=$v.references.unknown_species item=u}
 &#149;&nbsp;<span class="error">{$u}</span><br/>
 {/foreach}
