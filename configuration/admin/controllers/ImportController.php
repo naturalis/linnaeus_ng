@@ -2957,18 +2957,29 @@ class ImportController extends Controller
 		
 		if ($type=='image') {
 
-			return '<img
-				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
-				src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
-				class="media-image">';
+			return '<span
+				class="internal-link" 
+				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
+				$label.' [IMG]</span>';
+
+//			NO INLINE
+//			return '<img
+//				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
+//				src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
+//				class="media-image">';
 
 		} else
 		if ($type=='movie') {
 
-			return '<img
-				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
-				src="../../media/system/video.jpg" 
-				class="media-image">';
+			return '<span
+				class="internal-link" 
+				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
+				$label.' [VID]</span>';
+
+//			return '<img
+//				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
+//				src="../../media/system/video.jpg" 
+//				class="media-image">';
 
 		} else
 		if ($type=='sound') {
