@@ -4,6 +4,7 @@
 <form enctype="multipart/form-data" id="theForm" action="" method="post">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="deleteLogo" id="deleteLogo" value="0" />
+IS THIS HERE?
 <table>
 	<tr>
 		<td>
