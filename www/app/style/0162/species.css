@@ -1,0 +1,126 @@
+#index table {
+	border-collapse:collapse;
+}
+
+#index td {
+	width:250px;
+}
+
+#navigation {
+	border-top:1px dotted #666;
+	padding-bottom:5px;
+	margin-bottom:5px;
+}
+
+#categories {
+	font-size:11px;
+}
+
+#categories table {
+	border-collapse:collapse;
+	padding:0px;
+	margin:0px;
+}
+
+#categories .category, .category-active {
+	width:70px;
+	border:1px solid #ddd;
+	text-align:center;
+	overflow:auto;
+	background-color:#eee;
+	padding:2px;
+	cursor:pointer;
+}
+
+#categories .category-active {
+	background-color:#fff;
+	color:#CC0000;
+	cursor:default;
+}
+
+#categories .space {
+	width:5px;
+}
+
+#page-main #content .taxon-section-head {
+	font-weight:bold;
+}
+
+#classification .current-taxon {
+	font-weight:bold;
+}
+
+#classification td {
+	width:250px;
+}
+
+#literature {
+}
+
+#literature .author {
+}
+
+#literature .name {
+	font-weight:bold;
+}
+
+#literature .year {
+}
+
+#literature .text {
+	margin-bottom:10px;
+}
+
+#synonyms {
+	border-bottom:1px dotted #666;
+	margin-bottom:10px;
+	padding-bottom:2px;
+}
+
+#synonyms .title {
+	font-weight:bold;
+	margin-bottom:2px;
+}
+
+#synonyms td {
+	width:250px;
+}
+
+#common {
+}
+
+#common .title {
+	font-weight:bold;
+	margin-bottom:2px;
+}
+
+#common th {
+	font-weight:normal;
+	font-style:italic;
+}
+
+#common td {
+	width:250px;
+}
+
+.media-cat-header {
+	font-weight:bold;
+}
+
+.media-image-cell {
+	padding-right:10px;
+	vertical-align:top;
+}
+
+.media-description-cell {
+	vertical-align:top;
+	padding-bottom:10px;
+}
+
+.media-image {
+	width:150px;
+	cursor:pointer;
+}
+.media-video-icon {
+	cursor:pointer;
+}
