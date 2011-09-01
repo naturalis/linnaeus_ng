@@ -55,8 +55,8 @@
 {/if}
 {/section}
 	<br />
-	<span class="pseudo-a" style="float:right" onclick="$('#theForm').submit();">preview&nbsp;
-		<form method="post" id="theForm" action="../../../app/views/linnaeus/set_project.php" target="_preview">		
+	<span class="pseudo-a" style="float:right" onClick="$('#previewForm').submit();">preview&nbsp;
+		<form method="post" id="previewForm" action="../../../app/views/linnaeus/set_project.php" target="_preview">		
 		<input type="hidden" name="p" id="p" value="{$session.project.id}" />
 		<input type="hidden" name="rnd" value="{$rnd}" />
 		</form>
