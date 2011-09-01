@@ -54,6 +54,12 @@
 		<span class="pseudo-a" onClick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
 {/if}
 {/section}
+	<br />
+	<span class="pseudo-a" style="float:right" onclick="$('#theForm').submit();">preview&nbsp;
+		<form method="post" id="theForm" action="../../../app/views/linnaeus/set_project.php" target="_preview">		
+		<input type="hidden" name="p" id="p" value="{$session.project.id}" />
+		<input type="hidden" name="rnd" value="{$rnd}" />
+		</form>
 	</span>
 	<form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
 {/if}

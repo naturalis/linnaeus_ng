@@ -995,7 +995,19 @@ class UsersController extends Controller
 				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
 			)
 		);
-		
+/*
+
+MUST CHECK
+
+
+		$this->saveUsersModuleData(
+			array(
+				'modules' => $this->models->ModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))),
+				'freeModules' => $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())))
+			),
+			$_SESSION['data']['new_user']['existing_user_id']
+		);
+*/
 		if (!$pru) {
 
 			$this->addError(_('Failed to connect user from session.'));
