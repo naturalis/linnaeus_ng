@@ -56,7 +56,7 @@ class configuration
 				'pathName' => 'app',
 			),
 			'defaultController' => 'linnaeus',
-			'urlNoProjectId' => '/app/views/linnaeus/set_project.php',
+			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'imageRootUrlOverride' => '../../../admin/media/project/',
 			'imageRootUrlOverrideAbsolute' => '/admin/media/project/',
             'maxSessionHistorySteps' => 10, 
