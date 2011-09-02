@@ -54,6 +54,7 @@ class configuration
 				'version' => '0.1-dev.r001', 
 				'versionTimestamp' => date('r'), 
 				'pathName' => 'app',
+				'fileRoot' => $this->_appFileRoot.'www/app/'
 			),
 			'defaultController' => 'linnaeus',
 			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',

@@ -85,7 +85,9 @@ class Controller extends BaseClass
         $this->loadControllerConfig();        
         
         $this->setUrls();
-        
+		
+		$this->setPaths();
+
         $this->loadModels();
 
         $this->setSmartySettings();
@@ -189,6 +191,8 @@ class Controller extends BaseClass
 	public function getTreeList()
 	{
 
+		if (!isset($this->treeList)) return null;
+
 		foreach((array)$this->treeList as $key => $val) {
 
 			if ($this->showLowerTaxon) {
@@ -221,7 +225,7 @@ class Controller extends BaseClass
 
 			$_SESSION['user']['species']['tree'] = $this->_getTaxonTree($params);
 
-			$_SESSION['user']['species']['treeList'] = $this->treeList;
+			$_SESSION['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
 
 		} else {
 
@@ -1131,6 +1135,97 @@ class Controller extends BaseClass
     }
 
 
+    /**
+     * Sets project URL for project images
+     * 
+	 * @todo	take out hard reference to /media/
+     * @access     public
+     */
+    public function setUrls()
+    {
+        
+		$p = $this->getCurrentProjectId();
+
+		if (!$p) return;
+
+		$_SESSION['project']['urls']['full_base_url'] =
+			'http://'.
+			$_SERVER["HTTP_HOST"]. 
+			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
+
+		$_SESSION['project']['urls']['full_appview_url'] = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+
+		if (isset($this->generalSettings['imageRootUrlOverride'])) {
+
+			$_SESSION['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
+	
+		} else {
+	
+			$_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
+
+		}
+
+		$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+
+		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
+
+			$_SESSION['project']['urls']['full_project_media'] = 
+				'http://'.
+				$_SERVER["HTTP_HOST"]. 
+				$this->generalSettings['imageRootUrlOverrideAbsolute'].
+				sprintf('%04s', $p).'/';
+
+		} else {
+	
+			$_SESSION['project']['urls']['full_project_media'] =
+				$_SESSION['project']['urls']['full_base_url'].
+				$this->getAppName().
+				'/media/project/'.sprintf('%04s', $p).'/';
+
+		}
+
+		$_SESSION['project']['urls']['full_project_thumbs'] = $_SESSION['project']['urls']['full_project_media'].'thumbs/';
+
+
+		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
+
+		$_SESSION['project']['urls']['project_start'] =
+			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';
+
+    }
+
+    /**
+     * Sets project paths for image uploads etc. and makes sure they actually exist
+     * 
+     * @access     public
+     */
+    public function setPaths ()
+    {
+
+        $p = $this->getCurrentProjectId();
+
+        if ($p) {
+
+            $_SESSION['project']['paths']['project_css'] = $this->generalSettings['app']['fileRoot'].'style/'.sprintf('%04s', $p).'/';
+
+            $_SESSION['project']['paths']['default_css'] = $this->generalSettings['app']['fileRoot'].'style/default/';
+
+            foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
+                
+                if (!file_exists($val)) {
+
+                    mkdir($val);
+
+					$this->log('Created directory "'.$val.'"');
+
+				}
+            
+            }
+        
+        }
+    
+    }
+	
 	private function setPhpIniVars()
 	{
 
@@ -1223,66 +1318,6 @@ class Controller extends BaseClass
 		if (isset($this->jsToLoad)) {
 	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
     	}
-
-    }
-
-
-    /**
-     * Sets project URL for project images
-     * 
-	 * @todo	take out hard reference to /media/
-     * @access     private
-     */
-    private function setUrls()
-    {
-        
-		$p = $this->getCurrentProjectId();
-
-		if (!$p) return;
-
-		$_SESSION['project']['urls']['full_base_url'] =
-			'http://'.
-			$_SERVER["HTTP_HOST"]. 
-			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
-
-		$_SESSION['project']['urls']['full_appview_url'] = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
-
-		if (isset($this->generalSettings['imageRootUrlOverride'])) {
-
-			$_SESSION['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
-	
-		} else {
-	
-			$_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
-
-		}
-
-		$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
-
-		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
-
-			$_SESSION['project']['urls']['full_project_media'] = 
-				'http://'.
-				$_SERVER["HTTP_HOST"]. 
-				$this->generalSettings['imageRootUrlOverrideAbsolute'].
-				sprintf('%04s', $p).'/';
-
-		} else {
-	
-			$_SESSION['project']['urls']['full_project_media'] =
-				$_SESSION['project']['urls']['full_base_url'].
-				$this->getAppName().
-				'/media/project/'.sprintf('%04s', $p).'/';
-
-		}
-
-		$_SESSION['project']['urls']['full_project_thumbs'] = $_SESSION['project']['urls']['full_project_media'].'thumbs/';
-
-
-		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
-
-		$_SESSION['project']['urls']['project_start'] =
-			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';
 
     }
 

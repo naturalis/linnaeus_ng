@@ -861,7 +861,7 @@ class ProjectsController extends Controller
 	private function deleteGlossary($id)
 	{
 
-		$paths = $this->makePaths($id);
+		$paths = $this->makePathNames($id);
 
 		$mt = $this->models->GlossaryMedia->_get(array('id' => array('project_id' => $id)));
 
@@ -896,7 +896,7 @@ class ProjectsController extends Controller
 	private function deleteSpeciesMedia($id)
 	{
 
-		$paths = $this->makePaths($id);
+		$paths = $this->makePathNames($id);
 
 		$mt = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $id)));
 
@@ -972,7 +972,7 @@ class ProjectsController extends Controller
 	private function deleteProjectImagePaths($id)
 	{
 	
-		$paths = $this->makePaths($id);
+		$paths = $this->makePathNames($id);
 
 		@unlink($paths['project_thumbs']);
 		@unlink($paths['project_media']);

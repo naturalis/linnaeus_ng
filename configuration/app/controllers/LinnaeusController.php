@@ -39,12 +39,24 @@ class LinnaeusController extends Controller
     public $usedHelpers = array(
     );
 
-	public $cssToLoad = array('basics.css','search.css');
+	public $cssToLoad = array(
+		'basics.css',
+		'glossary.css',
+		'search.css',
+		'key.css',
+		'literature.css',
+		'map.css',
+		'matrix.css',
+		'module.css',
+		'species.css',
+		'colorbox/colorbox.css',
+		'dialog/jquery.modaldialog.css'
+	);
 
 	public $jsToLoad = array('all' => array(
 		'main.js','speciesdetailpage10.js'
 	));
-
+	
 
     /**
      * Constructor, calls parent's constructor
@@ -97,6 +109,12 @@ class LinnaeusController extends Controller
 	        $this->printPage();
 
 		} else {
+
+	        $this->setUrls();
+
+			$this->setPaths();
+		
+			$this->checkForStylesheet();
 
 			$this->setCurrentProjectData();
 			
@@ -1623,6 +1641,67 @@ q($results,1,1);
 
 		return $mts;
 
+	}
+	
+	private function checkForStylesheet()
+	{
+	
+		foreach((array)$this->cssToLoad as $val) {
+		
+			if (!file_exists($_SESSION['project']['urls']['project_css'].$val)) {
+			
+				if (dirname($_SESSION['project']['paths']['default_css'].$val) != dirname($_SESSION['project']['paths']['default_css'])) {
+
+					mkdir(
+						str_replace(
+							$_SESSION['project']['paths']['default_css'],
+							$_SESSION['project']['paths']['project_css'],
+							dirname($_SESSION['project']['paths']['default_css'].$val)
+						)
+					);
+
+				}
+
+				copy($_SESSION['project']['paths']['default_css'].$val,$_SESSION['project']['paths']['project_css'].$val);
+			
+			}
+
+		}
+		
+		// this dir name should probably go somewhere more manageable.
+		$d = $_SESSION['project']['paths']['default_css'].'colorbox/images/';
+		$e = $_SESSION['project']['paths']['default_css'].'colorbox/images/internet_explorer/';
+		
+		if (!file_exists($d)) mkdir($d);
+		if (!file_exists($e)) mkdir($e);
+
+		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/'))
+			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/');
+
+		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/'))
+			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/');
+
+		$f = array(
+				'border1.png',
+				'border2.png',
+				'loading.gif',
+				'internet_explorer/borderBottomCenter.png',
+				'internet_explorer/borderBottomLeft.png',
+				'internet_explorer/borderBottomRight.png',
+				'internet_explorer/borderMiddleLeft.png',
+				'internet_explorer/borderMiddleRight.png',
+				'internet_explorer/borderTopCenter.png',
+				'internet_explorer/borderTopLeft.png',
+				'internet_explorer/borderTopRight.png',
+			);
+			
+		foreach((array)$f as $val) {
+		
+			if (file_exists($d.$val))
+				copy($d.$val,$_SESSION['project']['paths']['project_css'].'colorbox/images/'.$val);
+
+		}
+	
 	}
 
 }
