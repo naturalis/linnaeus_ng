@@ -1,0 +1,28 @@
+#map_canvas {
+	width:720px;
+	height:650px;
+	border: 1px solid #666;
+	margin-bottom:-110px;
+}
+
+#map_options {
+	width:279px;
+	height:500px;
+	position:relative;
+	margin-top:-650px;
+	left:731px;
+}
+
+#back-to-search {
+	/* back to search link is placed differently on the map page */
+	visibility:hidden;
+}
+
+#back-link, .back-link {
+	cursor:pointer;
+	font-style:italic;
+}
+
+#back-link:hover, .back-link:hover {
+	text-decoration:underline;
+}
