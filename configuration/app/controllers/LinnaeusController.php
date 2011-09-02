@@ -1652,7 +1652,7 @@ q($results,1,1);
 			
 				if (dirname($_SESSION['project']['paths']['default_css'].$val) != dirname($_SESSION['project']['paths']['default_css'])) {
 
-					mkdir(
+					@mkdir(
 						str_replace(
 							$_SESSION['project']['paths']['default_css'],
 							$_SESSION['project']['paths']['project_css'],
