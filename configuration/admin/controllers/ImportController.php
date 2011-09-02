@@ -422,7 +422,7 @@ class ImportController extends Controller
 	
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 		
-			$_SESSION['system']['import']['paths'] = $this->makePaths($this->getNewProjectId());
+			$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 		
 			ini_set('max_execution_time',600);
 
@@ -1366,7 +1366,7 @@ class ImportController extends Controller
 	private function makeMediaTargetPaths()
 	{
 	
-		$paths = $this->makePaths($this->getNewProjectId());
+		$paths = $this->makePathNames($this->getNewProjectId());
 
 		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
 		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
@@ -1378,7 +1378,7 @@ class ImportController extends Controller
 
 		$this->loadControllerConfig('Species');
 		
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 
 		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
 
@@ -1906,7 +1906,7 @@ class ImportController extends Controller
 	private function createKeyStepChoices($step,$stepIds,$species)
 	{
 
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 
 		if ($step->text_choice) {
 			$choices = $step->text_choice;
@@ -2214,7 +2214,7 @@ class ImportController extends Controller
 	private function saveMatrices($m)
 	{
 
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePaths($this->getNewProjectId());
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 		
 		$d = $error = null;
 

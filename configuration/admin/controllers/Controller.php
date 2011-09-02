@@ -2171,7 +2171,7 @@ class Controller extends BaseClass
      * 
      * @access     public
      */
-    public function makePaths($p)
+    public function makePathNames($p)
     {
         
         if ($p)
@@ -2204,7 +2204,7 @@ class Controller extends BaseClass
             
             //$_SESSION['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
 
-			$paths = $this->makePaths($p);
+			$paths = $this->makePathNames($p);
 
             $_SESSION['project']['paths']['project_media'] = $paths['project_media'];
 
