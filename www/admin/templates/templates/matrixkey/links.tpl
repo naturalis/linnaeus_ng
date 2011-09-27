@@ -2,7 +2,7 @@
 
 <div id="page-main">
 <p>
-<span class="matrix-header">{t _s1=$matrix.matrix}Viewing taxon-state links in the matrix "%s"{/t}</span>
+<span class="matrix-header">{t _s1=$matrix.matrix}Viewing taxon-state links in the matrix "%s"{/t} (<a href="edit.php">{t}view matrix{/t}</a>)</span>
 </p>
 
 <form id="theForm" method="post" action="">
@@ -40,7 +40,7 @@
 	{foreach from=$links key=k item=val}
 	<tr class="tr-highlight">
 		<td>
-		{if $prevChar!=$val.characteristic}{$val.characteristic}{/if}
+		{if $prevChar!=$val.characteristic}{$val.characteristic}{/if}{$val.characteristic}
 		{assign var=prevChar value=$val.characteristic}
 		</td>
 		<td>

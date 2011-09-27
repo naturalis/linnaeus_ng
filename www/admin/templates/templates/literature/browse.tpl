@@ -1,5 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
+{if $alpha|@count>0}
 <div id="alphabet">
 {t}Click to browse:{/t}
 {section name=i loop=$alpha}
@@ -13,8 +14,11 @@
 <input type="hidden" name="letter" id="letter" value="{$letter}"  />
 </form>
 </div>
-
+{/if}
 <div id="page-main">
+{if $alpha|@count==0}
+{t}(no references have been defined){/t}
+{else}
 <table>
 	<tr>
 		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
@@ -38,8 +42,10 @@
 <input type="hidden" name="letter" value="{$letter}"  />
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
+{/if}
 <p>
-[<a href="edit.php">{t}add new reference{/t}</a>]
+[<a href="edit.php">{t}create new reference{/t}</a>]
+[<a href="search.php">{t}search{/t}</a>]
 </p>
 </div>
 

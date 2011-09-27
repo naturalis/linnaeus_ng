@@ -19,7 +19,7 @@
 {if $k==-1}{t}No matrices have been defined.{/t}{/if}
 </p>
 <p>
-{t _s1='<a href="matrix.php">' _s2='</a>'}Go %shere%s to define a new matrix.{/t}
+[<a href="matrix.php">{t}create a new matrix{/t}</a>]
 </p>
 <form id="theForm" method="post" action="">
 <input type="hidden" name="id" id="id" value="" />

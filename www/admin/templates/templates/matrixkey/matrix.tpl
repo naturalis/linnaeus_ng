@@ -8,6 +8,7 @@
 <input type="hidden" name="id" id="id" value="{$matrix.id}" />
 <input type="hidden" name="action" id="action" value="" />
 <table>
+{if $languages|@count > 1}
 	<tr>
 		<td>
 		</td>
@@ -18,7 +19,6 @@
 {/section}		
 		</span>
 		</td>
-{if $languages|@count > 1}
 		<td>
 			<span id="project-language-tabs"></span>
 		</td>

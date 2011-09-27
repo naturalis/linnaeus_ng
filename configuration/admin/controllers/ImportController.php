@@ -233,7 +233,7 @@ class ImportController extends Controller
 		
 		if ($d===false) {
 
-			$this->addError('Failed to parse XML-file. The followinf error(s) occurred:');
+			$this->addError('Failed to parse XML-file. The following error(s) occurred:');
 			foreach (libxml_get_errors() as $error) $this->addError((string)$error->message);
 			$this->addError('Import aborted.');
 

@@ -1,1 +1,1 @@
-<body id="body"><form method="post" action="" id="theForm" onsubmit="return checkForm();"><div id="body-container">
+<body id="body"><form method="get" action="" id="theForm" onsubmit="return checkForm();"><div id="body-container">

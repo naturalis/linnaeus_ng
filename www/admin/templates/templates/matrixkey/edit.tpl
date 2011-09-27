@@ -2,7 +2,10 @@
 
 <div id="page-main">
 <p>
-<span class="matrix-header">{t _s1=$matrix.matrix}Editing matrix "%s"{/t}</span>
+<span class="matrix-header">
+	{t _s1=$matrix.matrix}Editing matrix "%s"{/t}
+	(<a href="matrices.php">{t}select another matrix{/t}</a>)
+</span>
 </p>
 <table>
 	<tr>
@@ -16,7 +19,7 @@
 		</td>
 		<td></td>
 		<td>
-			{t}taxa{/t}
+			{t}taxa{/t} (<a href="links.php">{t}display current links per taxon{/t}</a>)
 			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
 			{section name=i loop=$taxa}
 			<option value="{$taxa[i].id}">{$taxa[i].taxon}</option>
@@ -68,7 +71,7 @@
 		</td>
 	</tr>
 </table>
-
+	
 </div>
 
 {include file="../shared/admin-messages.tpl"}

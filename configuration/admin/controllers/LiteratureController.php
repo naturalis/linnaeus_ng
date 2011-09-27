@@ -48,18 +48,21 @@ class LiteratureController extends Controller
     public function indexAction()
     {
     
+		$this->clearTempValues();
+
+		$this->redirect('browse.php');
+
+		/*
+
         $this->checkAuthorisation();
         
         $this->setPageName( _('Index'));
 		
-		unset($_SESSION['system']['literature']['activeLetter']);
-
-		unset($_SESSION['system']['literature']['search']);
-
-		unset($_SESSION['system']['literature']['alpha']);
+		$this->clearTempValues();
 
         $this->printPage();
-    
+
+		*/    
     }
 
     public function ajaxInterfaceAction ()
@@ -571,34 +574,13 @@ class LiteratureController extends Controller
 	}
 
 
+	private function clearTempValues()
+	{
+	
+		unset($_SESSION['system']['literature']['activeLetter']);
+		unset($_SESSION['system']['literature']['search']);
+		unset($_SESSION['system']['literature']['alpha']);
 
+	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
