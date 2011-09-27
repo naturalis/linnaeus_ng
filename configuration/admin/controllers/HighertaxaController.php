@@ -44,10 +44,14 @@ class HighertaxaController extends Controller
         $this->checkAuthorisation();
 
 		$_SESSION['system']['highertaxa'] = true;
-        
+		
+		$this->redirect('../species/list.php');
+		
+		/*
         $this->setPageName(_('Higher taxa overview'));
 
         $this->printPage();
+  		*/
   
     }
 

@@ -75,7 +75,14 @@ class GlossaryController extends Controller
      */
     public function indexAction()
     {
+	
+		$this->clearTempValues();
+		
+		$d = $this->getFirstGlossaryTerm();
+		
+		$this->redirect('edit.php?id='.$d['id']);
     
+		/*
         $this->checkAuthorisation();
         
         $this->setPageName( _('Index'));
@@ -87,8 +94,90 @@ class GlossaryController extends Controller
 		$this->smarty->assign('totalCount', $gtc['total']);
 
         $this->printPage();
+		
+		*/
     
     }
+
+    /**
+     * Browse through all glossary terms
+     *
+     * @access    public
+     */
+    public function browseAction()
+    {
+
+       $this->checkAuthorisation();
+
+		$this->setPageName(_('Browsing glossary'));
+		
+        if (!isset($_SESSION['project']['languages'])) {
+		
+			$this->addError(
+				sprintf(
+					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
+					'<a href="../projects/data.php">','</a>')
+				);
+		
+		} else
+        if (!isset($_SESSION['project']['default_language_id'])) {
+
+			$this->addError(
+				sprintf(
+					_('No default language has been defined. Go %shere%s to set the default languages.'),
+					'<a href="../projects/data.php">','</a>')
+				);
+
+		} else {
+
+			if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
+				$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
+	
+			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['system']['glossary']['activeLanguage']))
+				$this->requestData['activeLanguage'] = $_SESSION['system']['glossary']['activeLanguage'];
+	
+			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
+
+			if (!$this->rHasVal('letter') || !in_array($this->requestData['letter'],(array)$alpha))
+				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
+
+			if (!$this->rHasVal('activeLanguage'))
+				$this->requestData['activeLanguage'] = $_SESSION['project']['default_language_id'];
+				
+			if ($this->rHasVal('letter')) {
+	
+				$gloss = $this->getGlossaryTerms(
+					array(
+						'term like' => $this->requestData['letter'].'%',
+						'language_id' => $this->requestData['activeLanguage']
+					),
+					'term');
+	
+			}
+	
+			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
+
+			$gloss = $pagination['items'];
+
+			$this->smarty->assign('prevStart', $pagination['prevStart']);
+		
+			$this->smarty->assign('nextStart', $pagination['nextStart']);
+		
+			$this->smarty->assign('languages', $_SESSION['project']['languages']);
+	
+			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
+	
+			$this->smarty->assign('alpha', $alpha);
+	
+			if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
+	
+			if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
+	
+		}
+
+		$this->printPage();
+
+	}
 
     /**
      * Create new or edit existing glossary term
@@ -130,7 +219,11 @@ class GlossaryController extends Controller
 
 			$this->deleteGlossaryTerm($this->requestData['id']);
 
-			$this->redirect('browse.php');
+			$d = $this->getFirstGlossaryTerm();
+			
+			$this->redirect('edit.php?id='.$d['id']);
+
+			//$this->redirect('browse.php');
 
 		}
 
@@ -361,86 +454,6 @@ class GlossaryController extends Controller
     
     }
 
-
-    /**
-     * Browse through all glossary terms
-     *
-     * @access    public
-     */
-    public function browseAction()
-    {
-
-       $this->checkAuthorisation();
-
-		$this->setPageName(_('Browsing glossary'));
-		
-        if (!isset($_SESSION['project']['languages'])) {
-		
-			$this->addError(
-				sprintf(
-					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
-					'<a href="../projects/data.php">','</a>')
-				);
-		
-		} else
-        if (!isset($_SESSION['project']['default_language_id'])) {
-
-			$this->addError(
-				sprintf(
-					_('No default language has been defined. Go %shere%s to set the default languages.'),
-					'<a href="../projects/data.php">','</a>')
-				);
-
-		} else {
-
-			if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
-				$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
-	
-			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['system']['glossary']['activeLanguage']))
-				$this->requestData['activeLanguage'] = $_SESSION['system']['glossary']['activeLanguage'];
-	
-			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
-
-			if (!$this->rHasVal('letter') || !in_array($this->requestData['letter'],(array)$alpha))
-				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
-
-			if (!$this->rHasVal('activeLanguage'))
-				$this->requestData['activeLanguage'] = $_SESSION['project']['default_language_id'];
-				
-			if ($this->rHasVal('letter')) {
-	
-				$gloss = $this->getGlossaryTerms(
-					array(
-						'term like' => $this->requestData['letter'].'%',
-						'language_id' => $this->requestData['activeLanguage']
-					),
-					'term');
-	
-			}
-	
-			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
-
-			$gloss = $pagination['items'];
-
-			$this->smarty->assign('prevStart', $pagination['prevStart']);
-		
-			$this->smarty->assign('nextStart', $pagination['nextStart']);
-		
-			$this->smarty->assign('languages', $_SESSION['project']['languages']);
-	
-			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
-	
-			$this->smarty->assign('alpha', $alpha);
-	
-			if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-	
-			if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
-	
-		}
-
-		$this->printPage();
-
-	}
 
     /**
      * Search through all glossary terms
@@ -764,6 +777,22 @@ class GlossaryController extends Controller
 
 	}
 
+	private function getFirstGlossaryTerm()
+	{
+
+		$l = $this->models->Glossary->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'order' => 'term',
+					'limit' => 1,
+					'columns' => 'id'
+				)
+			);
+
+		return $l[0];
+
+	}
+
 	private function getGlossaryTerm($id=null)
 	{
 
@@ -874,7 +903,9 @@ class GlossaryController extends Controller
 	
 		unset($_SESSION['system']['glossary']['alpha']);
 		unset($_SESSION['system']['glossary']['search']);
-	
+		unset($_SESSION['system']['glossary']['activeLetter']);
+		unset($_SESSION['system']['glossary']['activeLanguage']);
+
 	}
 
 }

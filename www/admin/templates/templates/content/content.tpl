@@ -4,6 +4,15 @@
 <input type="button" value="{t}save{/t}" onclick="contentSaveContentAll()" style="margin-right:5px" />
 <input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 <input type="hidden" name="subject" id="subject" value="{$subject}" />
+
+<span style="padding-left:10px">
+{t}switch to:{/t} <select id="pageSelector" onchange="contentSwitchPage()">
+{section name=i loop=$subjects}
+<option value="{$subjects[i].url}"{if $subject==$subjects[i].name} selected="selected"{/if}>{$subjects[i].name}</option>
+{/section}		
+</select>
+</span>
+
 <span id="message-container" style="padding-left:10px"></span>
 
 <div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
@@ -21,7 +30,6 @@
 			id="content-default"></textarea>
 	</div>
 </div>
-
 
 {if $languages|@count > 1}
 <div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
@@ -45,6 +53,9 @@
 $(document).ready(function(){
 {/literal}
 	allActiveView = 'introduction';
+
+	currentSubject = '{$subject}';
+	
 {section name=i loop=$languages}
 	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
 {/section}

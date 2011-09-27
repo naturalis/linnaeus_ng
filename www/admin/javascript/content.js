@@ -1,4 +1,6 @@
-function contentSaveContent(language,editorName) {
+var currentSubject = false;
+
+function contentSaveContent(language,editorName,postFunction) {
 
 	var id = $('#subject').val();
 	
@@ -18,27 +20,28 @@ function contentSaveContent(language,editorName) {
 		}),
 		success : function (data) {
 			allSetMessage(data);
+			if (postFunction) eval(postFunction);
 		}
 	});
 
 }
 
-function contentSaveContentDefault() {
+function contentSaveContentDefault(postFunction) {
 
-	contentSaveContent(allDefaultLanguage,'content-default');
-
-}
-
-function contentSaveContentActive() {
-
-	contentSaveContent(allActiveLanguage,'content-other');
+	contentSaveContent(allDefaultLanguage,'content-default',postFunction);
 
 }
 
-function contentSaveContentAll() {
+function contentSaveContentActive(postFunction) {
+
+	contentSaveContent(allActiveLanguage,'content-other',postFunction);
+
+}
+
+function contentSaveContentAll(postFunction) {
 	
 	contentSaveContentDefault();
-	contentSaveContentActive();
+	contentSaveContentActive(postFunction);
 
 }
 
@@ -85,3 +88,42 @@ function contentGetDataAll() {
 	contentGetContentDefault();
 
 }
+
+function contentSwitchPage() {
+	
+	if ((currentSubject!=false) && ($('#pageSelector option:selected').text()!==currentSubject)) {
+
+		contentSaveContentAll("window.open($('#pageSelector option:selected').val(),'_self')");
+
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

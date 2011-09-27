@@ -5,8 +5,11 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$gloss.id}" />
 <input type="hidden" name="action" id="action" value="" />
-
+{if $languages|@count==1}
+<input type="hidden" name="language_id" value="{$languages[0].language_id}" />
+{/if}
 <table>
+{if $languages|@count > 1}
 	<tr>
 		<td>{t}Language:{/t}</td>
 		<td colspan="2">
@@ -18,6 +21,7 @@
 		</select> *
 		</td>
 	</tr>
+{/if}
 	<tr>
 		<td>
 			{t}Term:{/t}

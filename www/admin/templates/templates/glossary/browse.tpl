@@ -3,6 +3,7 @@
 <form name="theForm" id="theForm" method="post" action="">
 <div id="alphabet">
 
+{if $languages|@count > 1}
 {t}See glossary items in:{/t}&nbsp;
 <select name="activeLanguage" id="language" onchange="$('#theForm').submit();">
 {section name=i loop=$languages}
@@ -10,8 +11,12 @@
 	{/if}
 {/section}
 </select>
+{/if}
 
 <br />
+{if $alpha|@count==0}
+{t}(no terms have been defined){/t}
+{else}
 {t}Click to browse:{/t}&nbsp;
 {section name=i loop=$alpha}
 {if $alpha[i]==$letter}
@@ -20,14 +25,13 @@
 <span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
-{if $alpha|@count==0}{t}(no terms have been defined){/t}{/if}
+{/if}
 <input type="hidden" name="letter" id="letter" value="{$letter}"  />
 </form>
 </div>
 
 <div id="page-main">
-
-
+{if $alpha|@count>0}
 <table>
 	<tr>
 		<th style="width:175px">{t}term{/t}</th>
@@ -58,9 +62,10 @@
 	{/if}
 </div>
 {/if}
-
+{/if}
 <p>
-[<span class="pseudo-a" onclick="$('#newForm').submit();">{t}add new term{/t}</span>]
+[<span class="pseudo-a" onclick="$('#newForm').submit();">{t}create new term{/t}</span>]
+[<a href="search.php">{t}search{/t}</a>]
 </p>
 <form method="post" action="edit.php" name="newForm" id="newForm">
 <input type="hidden" name="activeLanguage" value="{$activeLanguage}"  />

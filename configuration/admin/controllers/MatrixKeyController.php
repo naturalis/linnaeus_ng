@@ -62,15 +62,39 @@ class MatrixKeyController extends Controller
 
     public function indexAction()
     {
-    
+
         $this->checkAuthorisation();
 		
 		$this->cleanUpEmptyVariables();
 
+		if ($this->getCurrentMatrixId()==null) {
+
+			$matrices = $this->getMatrices();
+			
+			if (count((array)$matrices)>0) {
+			
+				$this->setCurrentMatrixId($matrices[0]['id']);
+	
+				$this->redirect('edit.php');
+	
+			} else {
+	
+				$this->redirect('matrices.php');
+
+			}
+
+		} else {
+
+			$this->redirect('edit.php');
+
+		}
+
+		/*
         $this->setPageName( _('Index'));
 
         $this->printPage();
-    
+	    */
+
     }
 
     public function matricesAction()
@@ -96,7 +120,7 @@ class MatrixKeyController extends Controller
 		}
 
 		$matrices = $this->getMatrices();
-
+			
 		$this->smarty->assign('matrices',$matrices);
 
         $this->printPage();
@@ -438,7 +462,7 @@ class MatrixKeyController extends Controller
 		if ($this->rHasVal('taxon')) {
 		
 			$links = $this->getLinks(array('taxon_id'=>$this->requestData['taxon']));
-			
+
 			$this->customSortArray($links, array('key'=>'characteristic','case'=>'i'));
 
 		}
@@ -1701,6 +1725,7 @@ class MatrixKeyController extends Controller
 			);
 			
 			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$_SESSION['project']['default_language_id']);
+			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$_SESSION['project']['default_language_id']);
 		
 		}
 		

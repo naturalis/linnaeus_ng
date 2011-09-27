@@ -12,7 +12,6 @@
 {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
 {/if}
 {t}You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows.{/t}
-
 <br/>
 	<span id="message-container" style="margin-left:175px">&nbsp;</span>
 	<table style="width:100%">

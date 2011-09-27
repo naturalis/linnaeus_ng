@@ -5,6 +5,12 @@ include_once ('Controller.php');
 class ContentController extends Controller
 {
 
+	private $_subjects = array(
+		0 => array('name' => 'Introduction', 'url' => 'introduction.php'),
+		1 => array('name' => 'Contributors', 'url' => 'contributors.php')
+	);
+
+
     public $usedModels = array(
 		'content'
     );
@@ -50,10 +56,14 @@ class ContentController extends Controller
     public function indexAction()
     {
     
+		$this->redirect('content.php');
+
+		/*
         $this->checkAuthorisation();
 
         $this->printPage();
-    
+	    */
+
     }
 
 
@@ -107,6 +117,8 @@ class ContentController extends Controller
 			$this->smarty->assign('freeModuleId',$_SESSION['system']['content']['free-module-id']);
 
 		$this->smarty->assign('subject', $currentSubject);
+
+		$this->smarty->assign('subjects', $this->_subjects);
 
 		$this->smarty->assign('languages', $_SESSION['project']['languages']);
 		
