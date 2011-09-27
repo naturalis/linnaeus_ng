@@ -1,6 +1,9 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
+<input type="text" id="allLookupBox" />
+
 <form action="" method="post" id="theForm">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$gloss.id}" />
@@ -87,9 +90,15 @@
 	<tr>
 		<td colspan="3">
 			<input type="button" value="{t}save{/t}" onclick="glossCheckForm(this)" />
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" />&nbsp;&nbsp;
+			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->&nbsp;&nbsp;
 			{if $gloss.id}
-			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
+			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />&nbsp;&nbsp;
+			{/if}
+			{if $navList && $navList[$gloss.id].prev}
+			<input type="button" value="{t}< previous{/t}" onclick="window.open('edit.php?id={$navList[$gloss.id].prev}','_self');" />
+			{/if}
+			{if $navList && $navList[$gloss.id].next}
+			<input type="button" value="{t}next >{/t}" onclick="window.open('edit.php?id={$navList[$gloss.id].next}','_self');" />
 			{/if}
 		</td>
 	</tr>

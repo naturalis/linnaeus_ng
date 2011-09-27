@@ -4,6 +4,7 @@
 </div ends="body-container">
 <div id="loadingdiv" style="background-image:url(../../media/system/ajax-loader.gif);" class="loadingdiv-invisible"></div>
 <span id="dummy-element"></span>
+<div id="allLookupList" class="allLookupList"></div>
 </body>
 </html>
 

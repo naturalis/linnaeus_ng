@@ -40,9 +40,9 @@ class GlossaryController extends Controller
     public $controllerPublicName = 'Glossary';
 
 
-	public $cssToLoad = array('glossary.css','colorbox/colorbox.css');
+	public $cssToLoad = array('glossary.css','colorbox/colorbox.css','lookup.css');
 
-	public $jsToLoad = array('all' => array('glossary.js','colorbox/jquery.colorbox.js'));
+	public $jsToLoad = array('all' => array('glossary.js','colorbox/jquery.colorbox.js','lookup.js'));
 
     /**
      * Constructor, calls parent's constructor
@@ -198,6 +198,8 @@ class GlossaryController extends Controller
 			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
 
 			$_SESSION['system']['glossary']['activeLanguage'] = $gloss['language_id'];
+			
+			$navList = $this->getGlossaryTermsNavList();
 
 		}
 
@@ -220,6 +222,8 @@ class GlossaryController extends Controller
 			$this->deleteGlossaryTerm($this->requestData['id']);
 
 			$d = $this->getFirstGlossaryTerm();
+
+			$navList = $this->getGlossaryTermsNavList(true);
 			
 			$this->redirect('edit.php?id='.$d['id']);
 
@@ -261,6 +265,8 @@ class GlossaryController extends Controller
 
 			} else
 			if ($this->models->Glossary->save($data)) {
+
+				$navList = $this->getGlossaryTermsNavList(true);
 
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
 
@@ -316,6 +322,8 @@ class GlossaryController extends Controller
         if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
 
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
+
+		$this->smarty->assign('navList', $navList);
 
 		$this->smarty->assign('activeLanguage', $activeLanguage);
 
@@ -570,6 +578,11 @@ class GlossaryController extends Controller
         if ($this->requestData['action'] == 'delete_media') {
             
             $this->deleteMedia();
+
+        } else
+        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
 
         }
 		
@@ -850,6 +863,66 @@ class GlossaryController extends Controller
 		}
 
 		return $l;
+
+	}
+
+	private function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+
+		$l1 = $this->models->Glossary->_get(
+			array(
+				'id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'term like' => '%'.$search.'%'
+					),
+				'columns' => 'id,term as text,"glossary" as source'
+			)
+		);
+
+		$l2 = $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'synonym like' => '%'.$search.'%'
+					),
+				'columns' => 'glossary_id as id,synonym as text,"glossary synonym" as source'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				array_merge((array)$l1,(array)$l2),
+				'glossary',
+				'../glossary/edit.php?id=%s'
+			)
+		);
+		
+	}
+
+	private function getGlossaryTermsNavList($forceLookup=false) {
+	
+		if (empty($_SESSION['glossary']['getGlossaryTermsNavList']) || $forceLookup) {
+		
+			$d = $this->getGlossaryTerms(null);
+			
+			foreach((array)$d as $key => $val) {
+
+				$res[$val['id']] = array(
+					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null, 'term' => isset($d[$key-1]['term']) ? $d[$key-1]['term'] : null),
+					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null, 'term' => isset($d[$key+1]['term']) ? $d[$key+1]['term'] : null),
+				);
+
+			}
+		
+			$_SESSION['glossary']['termsList'] = $res;
+		
+		}
+		
+		return $_SESSION['glossary']['termsList'];
 
 	}
 
