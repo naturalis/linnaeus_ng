@@ -1,0 +1,40 @@
+.allLookupList {
+
+	position:absolute;
+	top:0px;
+	left:0px;
+	border:1px dotted black;
+	width:350px;
+	height:450px;
+	background-color:#fff;
+	display:block;
+	overflow-y:scroll;
+	overflow-x:hide;
+	z-index: 50000;
+	display:none;
+
+}
+
+.allLookupListHighlight {
+
+	font-weight:bold;
+
+}
+
+.allLookupListRow, .allLookupListActiveRow {
+
+	cursor:pointer;
+
+}
+
+.allLookupListRow:hover {
+
+	background-color:#eee;
+
+}
+
+.allLookupListActiveRow {
+
+	background-color:#eee;
+
+}

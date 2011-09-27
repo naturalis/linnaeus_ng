@@ -1375,6 +1375,26 @@ class Controller extends BaseClass
 
 	}
 
+	public function makeLookupList($data,$module,$url,$encode=true)
+	{
+
+		$sortBy = array(
+			'key' => 'text', 
+			'dir' => 'asc', 
+			'case' => 'i'
+		);
+
+		$this->customSortArray($data, $sortBy);
+
+		$d = array(
+			'module' => $module,
+			'url' => $url,
+			'results' => $data
+		);
+
+		return $encode ? json_encode($d) : $d;
+	
+	}
 
     private function _getTaxonTree($params) 
     {
@@ -2638,8 +2658,8 @@ class Controller extends BaseClass
     private function saveFormResubmitVal ()
     {
 	
-	if (!$this->noResubmitvalReset)
-        $_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+		if (!$this->noResubmitvalReset)
+			$_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
     }
 
