@@ -29,3 +29,12 @@
 	padding:5px;
 	width:250px;
 }
+#text {
+	width:500px;
+	height:250px;
+	font-size:13px;
+}
+#add-button {
+	padding: 0px 10px 0px 10px;
+	cursor:pointer;
+}

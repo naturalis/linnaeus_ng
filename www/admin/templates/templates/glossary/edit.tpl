@@ -12,13 +12,13 @@
 {if $languages|@count > 1}
 	<tr>
 		<td>{t}Language:{/t}</td>
-		<td colspan="2">
-		<select name="language_id" id="language">
-		{section name=i loop=$languages}
-			{if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
-			{/if}
-		{/section}
-		</select> *
+		<td>
+			<select name="language_id" id="language">
+			{section name=i loop=$languages}
+				{if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+				{/if}
+			{/section}
+			</select> *
 		</td>
 	</tr>
 {/if}
@@ -26,31 +26,35 @@
 		<td>
 			{t}Term:{/t}
 		</td>
-		<td colspan="2">
+		<td>
 			<input
 				type="text"
 				name="term"
 				id="term"
 				value="{$gloss.term}"
-				style="width:200px;"
 				maxlength="255"/> *
 		</td>
 	</tr>
+</table>
+<table>
 	<tr style="vertical-align:top">
-		<td>{t}Definition:{/t}</td>
+		<td>{t}Definition:{/t} *</td>
+	</tr>
+	<tr style="vertical-align:top">
 		<td>
 			<textarea
 				name="definition"
-				id="definition"
-				style="width:500px;height:250px;font-size:13px">{$gloss.definition}</textarea>
+				id="definition">{$gloss.definition}</textarea>
 		</td>
-		<td>*</td>
 	</tr>
+</table>
+<br />
+<table>
 	<tr style="vertical-align:top">
 		<td>{t}Synonyms:{/t}</td>
-		<td colspan="2">
+		<td>
 			<input type="text" name="synonym" id="synonym" value=""/>
-			<span class="pseudo-a" id="add" style="padding: 0px 10px 0px 10px;cursor:pointer" onclick="glossAddSynonymToList()">{t}add{/t}</span>
+			<span class="pseudo-a" id="add" onclick="glossAddSynonymToList()">{t}add{/t}</span>
 			<div id="synonyms-container">
 			<div id="synonyms"></div>
 			{t}(double-click a synonym to remove it from the list){/t}
@@ -60,7 +64,7 @@
 
 	<tr style="vertical-align:top">
 		<td>{t}Media:{/t}</td>
-		<td colspan="2">
+		<td>
 		{if $gloss.media|@count==0}
 		{t}(no media have been uploaded){/t}
 		{else}
@@ -83,9 +87,9 @@
 		</td>
 	</tr>
 
-	<tr><td colspan="3">&nbsp;</td></tr>		
+	<tr><td colspan="2">&nbsp;</td></tr>		
 	<tr>
-		<td colspan="3">
+		<td colspan="2">
 			<input type="button" value="{t}save{/t}" onclick="glossCheckForm(this)" />
 			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->
 			{if $gloss.id}
@@ -105,6 +109,9 @@ var f = $('#synonyms-container');
 
 var off = $('#add').offset();
 f.offset({left : off.left + $('#add').width() + 30, top: off.top});
+
+initTinyMce(false,false);
+
 
 });
 

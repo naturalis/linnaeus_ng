@@ -358,13 +358,6 @@ class configuration
 
     }
 
-    public function getControllerSettingsLiterature()
-    {
-
-        return array('allowedTags' => '<i><b>');
-
-    }
-
     public function getControllerSettingsGlossary()
     {
 
