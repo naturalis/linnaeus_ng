@@ -72,16 +72,21 @@
 			<span id="msgYear"></span>
 		</td>
 	</tr>
+</table>
+<table>
 	<tr style="vertical-align:top">
-		<td>{t}Reference:{/t}</td>
-		<td style="">
+		<td>{t}Reference:{/t} *</td>
+	</tr>
+	<tr style="vertical-align:top">
+		<td>
 			<textarea
 				name="text"
-				id="text"
-				style="width:500px;height:250px;font-size:13px">{$ref.text}</textarea><br />
-			{t}You can use italics in your reference by enclosing the text to be italicised with &lt;i&gt; and &lt;/i&gt; tags, and bold text by using with &lt;b&gt; and &lt;/b&gt;. Other tags are not allowed.{/t}
+				id="text">{$ref.text}</textarea>
 		</td>
 	</tr>
+</table>
+<br />
+<table>
 	<tr style="vertical-align:top">
 		<td style="white-space:nowrap">{t}Taxa this reference pertains to:{/t}</td>
 		<td>
@@ -96,7 +101,7 @@
             {/if}
             {/foreach}
 			</select>
-			<span id="add-button" class="pseudo-a" style="padding: 0px 10px 0px 10px;cursor:pointer;" onclick="litAddTaxonToList()">{t}add{/t}</span>
+			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList()">{t}add{/t}</span>
 			<div id="selected-taxa"></div>
 		</td>
 	</tr>
@@ -104,11 +109,11 @@
 	<tr>
 		<td colspan="2">
 			<input type="button" value="{t}save{/t}" onclick="litCheckForm(this)" />
-			{if $session.system.literature.taxon.taxon_id!=''}
-			<input type="button" value="{t}back{/t}" onclick="window.open('../species/literature.php?id={$session.system.literature.taxon.taxon_id}','_top')" />&nbsp;&nbsp;
+			{* if $session.system.literature.taxon.taxon_id!=''}
+			<input type="button" value="{t}back{/t}" onclick="window.open('../species/literature.php?id={$session.system.literature.taxon.taxon_id}','_top')" />
 			{else}
-			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />&nbsp;&nbsp;
-			{/if}
+			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />
+			{/if *}
 			{if $ref.id}
 			<input type="button" value="{t}delete{/t}" onclick="litDelete()" />
 			{/if}
@@ -134,6 +139,9 @@ var f = $('#selected-taxa');
 
 var off = $('#add-button').offset();
 f.offset({left : off.left + $('#add-button').width() + 25, top: off.top});
+
+initTinyMce(false,false);
+
 
 });
 {/literal}

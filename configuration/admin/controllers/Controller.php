@@ -1375,16 +1375,16 @@ class Controller extends BaseClass
 
 	}
 
-	public function makeLookupList($data,$module,$url,$encode=true)
+	public function makeLookupList($data,$module,$url,$sortData=false,$encode=true)
 	{
 
 		$sortBy = array(
-			'key' => 'text', 
+			'key' => 'label', 
 			'dir' => 'asc', 
 			'case' => 'i'
 		);
 
-		$this->customSortArray($data, $sortBy);
+		if ($sortData) $this->customSortArray($data, $sortBy);
 
 		$d = array(
 			'module' => $module,
@@ -1394,6 +1394,13 @@ class Controller extends BaseClass
 
 		return $encode ? json_encode($d) : $d;
 	
+	}
+
+	public function cleanUpRichContent($content)
+	{
+
+		return preg_replace('/<img[^>]+\>/i', '', $content);
+
 	}
 
     private function _getTaxonTree($params) 
@@ -1757,6 +1764,8 @@ class Controller extends BaseClass
 		if (isset($this->jsToLoad)) {
 	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
     	}
+
+        $this->smarty->assign('controllerMenuExists', file_exists($this->smarty->template_dir.'../'.$this->controllerBaseName.'/_menu.tpl'));
     
 		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
 		

@@ -1,41 +1,5 @@
 /*
-	private function getLookupList($search)
-	{
 
-		if (empty($search)) return;
-
-		$l1 = $this->models->Glossary->_get(
-			array(
-				'id' =>
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'term like' => '%'.$search.'%'
-					),
-				'columns' => 'id,term as text,"glossary" as source'
-			)
-		);
-
-		$l2 = $this->models->GlossarySynonym->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'synonym like' => '%'.$search.'%'
-					),
-				'columns' => 'glossary_id as id,synonym as text,"glossary synonym" as source'
-			)
-		);
-
-		$this->smarty->assign(
-			'returnText',
-			$this->makeLookupList(
-				array_merge((array)$l1,(array)$l2),
-				'glossary',
-				'../glossary/edit.php?id=%s'
-			)
-		);
-		
-	}
-	
 	add:
 	
 	<input type="text" id="allLookupBox" onkeyup="allLookup()" />
@@ -55,7 +19,7 @@
 			)
 		);
 	
-	(the droplist div is in the admin-footer file. <div id="allLookupList" class="allLookupListInvisible"></div>)
+	(the droplist div is in the admin-footer file: <div id="allLookupList" class="allLookupListInvisible"></div>)
 
 */
 
@@ -95,7 +59,7 @@ function allLookupGetData(text) {
 
 }
 
-function allLookupBuildList(data,text) {
+function allLookupBuildList(data,txt) {
 
 	obj = $.parseJSON(data);
 	
@@ -109,12 +73,14 @@ function allLookupBuildList(data,text) {
 			
 			var d = obj.results[i];
 			
-			if (d.id && d.text) {
+			if (d.id && d.label) {
+
+//							d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
 
 				$('#'+allLookupListName).append(
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
 						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+obj.url.replace('%s',d.id)+'\',\'_self\')">'+
-							d.text.replace(eval('/'+text+'/ig'),'<span class="allLookupListHighlight">'+text+'</span>') +
+							d.label +
 							(d.source ? ' ('+d.source+')' : '')+
 						'</td>'+
 					'</tr>');

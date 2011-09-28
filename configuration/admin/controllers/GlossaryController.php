@@ -40,9 +40,22 @@ class GlossaryController extends Controller
     public $controllerPublicName = 'Glossary';
 
 
-	public $cssToLoad = array('glossary.css','colorbox/colorbox.css','lookup.css');
+	public $cssToLoad = array(
+		'glossary.css',
+		'colorbox/colorbox.css',
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
+	);
 
-	public $jsToLoad = array('all' => array('glossary.js','colorbox/jquery.colorbox.js','lookup.js'));
+	public $jsToLoad = array(
+		'all' => array(
+			'glossary.js',
+			'colorbox/jquery.colorbox.js',
+			'lookup.js',
+			'int-link.js',
+			'dialog/jquery.modaldialog.js'
+		)
+	);
 
     /**
      * Constructor, calls parent's constructor
@@ -77,7 +90,7 @@ class GlossaryController extends Controller
     {
 	
 		$this->clearTempValues();
-		
+
 		$d = $this->getFirstGlossaryTerm();
 		
 		$this->redirect('edit.php?id='.$d['id']);
@@ -253,7 +266,7 @@ class GlossaryController extends Controller
 
 			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : 'null';
 
-            $data['definition'] = strip_tags($data['definition']);
+            $data['definition'] = $this->cleanUpRichContent($data['definition']);
 
 			if ($data['id']=='null' && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
 
@@ -265,7 +278,7 @@ class GlossaryController extends Controller
 
 			} else
 			if ($this->models->Glossary->save($data)) {
-
+			
 				$navList = $this->getGlossaryTermsNavList(true);
 
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
@@ -307,7 +320,9 @@ class GlossaryController extends Controller
 	
 					$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
 	
-					$this->redirect('browse.php');
+					$this->redirect('edit.php?id='.$id);
+
+					//$this->redirect('browse.php');
 
 				}
 
@@ -323,7 +338,9 @@ class GlossaryController extends Controller
 
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
-		$this->smarty->assign('navList', $navList);
+		if (isset($navList)) $this->smarty->assign('navList', $navList);
+
+		$this->smarty->assign('includeHtmlEditor', true);
 
 		$this->smarty->assign('activeLanguage', $activeLanguage);
 
@@ -878,7 +895,7 @@ class GlossaryController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'term like' => '%'.$search.'%'
 					),
-				'columns' => 'id,term as text,"glossary" as source'
+				'columns' => 'id,term as label,"glossary" as source'
 			)
 		);
 
@@ -888,7 +905,7 @@ class GlossaryController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'synonym like' => '%'.$search.'%'
 					),
-				'columns' => 'glossary_id as id,synonym as text,"glossary synonym" as source'
+				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
 			)
 		);
 
@@ -896,33 +913,34 @@ class GlossaryController extends Controller
 			'returnText',
 			$this->makeLookupList(
 				array_merge((array)$l1,(array)$l2),
-				'glossary',
+				$this->controllerBaseName,
 				'../glossary/edit.php?id=%s'
-			)
+			),
+			true
 		);
 		
 	}
 
 	private function getGlossaryTermsNavList($forceLookup=false) {
 	
-		if (empty($_SESSION['glossary']['getGlossaryTermsNavList']) || $forceLookup) {
+		if (empty($_SESSION['glossary']['navList']) || $forceLookup) {
 		
 			$d = $this->getGlossaryTerms(null);
 			
 			foreach((array)$d as $key => $val) {
 
 				$res[$val['id']] = array(
-					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null, 'term' => isset($d[$key-1]['term']) ? $d[$key-1]['term'] : null),
-					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null, 'term' => isset($d[$key+1]['term']) ? $d[$key+1]['term'] : null),
+					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null, 'title' => isset($d[$key-1]['term']) ? $d[$key-1]['term'] : null),
+					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null, 'title' => isset($d[$key+1]['term']) ? $d[$key+1]['term'] : null),
 				);
 
 			}
 		
-			$_SESSION['glossary']['termsList'] = $res;
+			$_SESSION['glossary']['navList'] = $res;
 		
 		}
 		
-		return $_SESSION['glossary']['termsList'];
+		return $_SESSION['glossary']['navList'];
 
 	}
 

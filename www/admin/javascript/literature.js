@@ -188,7 +188,7 @@ function litCheckForm(ele) {
 		$('#year').val('').focus();
 
 	} else 
-	if ($('#text').val().length==0) {
+	if (tinyMCE.get('text').getContent().length==0) {
 
 		alert(_('A reference is required.'));
 		
@@ -202,6 +202,8 @@ function litCheckForm(ele) {
 
 		}
 
+		$('#text').val(tinyMCE.get('text').getContent());
+		
 		$(ele).closest("form").submit();
 
 	}

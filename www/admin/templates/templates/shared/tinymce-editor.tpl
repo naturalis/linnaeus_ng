@@ -145,14 +145,15 @@ function initTinyMce(litRefs,mediaRefs) {
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (inclLiteraryButtons && !inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,";
+	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (!inclLiteraryButtons && inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "media,addmedia,";
+	 	propertyList.theme_advanced_buttons2 = "media,addmedia,|,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else {
-	 	propertyList.theme_advanced_buttons2 = "";
+	 	propertyList.theme_advanced_buttons2 = "addinternallink";
+	 	propertyList.theme_advanced_buttons3 = "";
 	}
 
 

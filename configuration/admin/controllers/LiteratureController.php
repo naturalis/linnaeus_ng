@@ -14,11 +14,11 @@ class LiteratureController extends Controller
    
     public $controllerPublicName = 'Literary references';
 
-	public $cssToLoad = array('literature.css');
+	public $cssToLoad = array('literature.css','dialog/jquery.modaldialog.css','lookup.css');
 
 	public $jsToLoad =
 		array(
-			'all' => array('literature.js')
+			'all' => array('literature.js','int-link.js','dialog/jquery.modaldialog.js','lookup.js')
 		);
 
     /**
@@ -50,7 +50,9 @@ class LiteratureController extends Controller
     
 		$this->clearTempValues();
 
-		$this->redirect('browse.php');
+		$d = $this->getFirstReference();
+		
+		$this->redirect('edit.php?id='.$d['id']);
 
 		/*
 
@@ -63,27 +65,7 @@ class LiteratureController extends Controller
         $this->printPage();
 
 		*/    
-    }
 
-    public function ajaxInterfaceAction ()
-    {
-
-        if (!isset($this->requestData['action'])) return;
-        
-
-        if ($this->requestData['action'] == 'get_authors') {
-
-            $this->getAuthors();
-
-        }
-        if ($this->requestData['action'] == 'get_references') {
-
-            $this->getReferenceList();
-
-        }
-		
-        $this->printPage();
-    
     }
 
     public function editAction()
@@ -100,6 +82,8 @@ class LiteratureController extends Controller
 
 		if ($this->rHasId()) $ref = $this->getReference();
 
+		$navList = $this->getReferencesNavList();
+
 		if (isset($ref)) {
 
     	    $this->setPageName(
@@ -113,7 +97,7 @@ class LiteratureController extends Controller
 		
 		} else {
 
-    	    $this->setPageName(_('New literature'));
+    	    $this->setPageName(_('New reference'));
 			
 			if(isset($_SESSION['system']['activeTaxon'])) {
 
@@ -129,10 +113,14 @@ class LiteratureController extends Controller
 			
 			$this->deleteReference($this->requestData['id']);
 
-			$this->redirect('browse.php');
+			$navList = $this->getReferencesNavList(true);
+
+			$this->redirect('index.php');
+
+			//$this->redirect('browse.php');
 
 		} else
-		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text')) {// && !$this->isFormResubmit()) {
+		if ($this->rHasVal('author_first') && $this->rHasVal('year') && $this->rHasVal('text') && !$this->isFormResubmit()) {
 
 			$data = $this->requestData;
 
@@ -144,7 +132,7 @@ class LiteratureController extends Controller
 
 			$data['year'] = $data['year'].'-00-00';
 			
-            $data['text'] = strip_tags($data['text'],$this->controllerSettings['allowedTags']);
+            $data['text'] = $this->cleanUpRichContent($data['text']);
 
 			$test = array(
 				'author_first' => $data['author_first'],
@@ -221,7 +209,11 @@ class LiteratureController extends Controller
 
 					$_SESSION['system']['literature']['activeLetter'] = strtolower(substr($this->requestData['author_first'],0,1));
 
-					$this->redirect('browse.php');
+					$navList = $this->getReferencesNavList(true);
+
+					$this->redirect('edit.php?id='.$id);
+
+					//$this->redirect('browse.php');
 
 				}
 
@@ -237,7 +229,11 @@ class LiteratureController extends Controller
 
 		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
+		if (isset($navList)) $this->smarty->assign('navList', $navList);
+
         if (isset($ref)) $this->smarty->assign('ref', $ref);
+
+		$this->smarty->assign('includeHtmlEditor', true);
 
         $this->printPage();
 
@@ -367,6 +363,32 @@ class LiteratureController extends Controller
         $this->printPage();
 
 	}
+
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!isset($this->requestData['action'])) return;
+        
+
+        if ($this->requestData['action'] == 'get_authors') {
+
+            $this->getAuthors();
+
+        } else
+        if ($this->requestData['action'] == 'get_references') {
+
+            $this->getReferenceList();
+
+        } else
+        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
+        $this->printPage();
+    
+    }
 
 	private function getReference($id=null)
 	{
@@ -537,12 +559,39 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both',
+					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both,
+								concat(
+									author_first,
+									(
+										if(multiple_authors=1,
+											\' et al.\',
+											if(author_second!=\'\',concat(\' & \',author_second),\'\')
+										)
+									)
+								) as author_full',
 					'ignoreCase' => false
 				)
 			);
 
 		return $l;
+
+	}
+
+	private function getFirstReference()
+	{
+
+		$l = $this->models->Literature->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'order' => 'author_first',
+					'columns' => 'id',
+					'ignoreCase' => true,
+					'limit' => 1
+				)
+			);
+		
+		
+		return $l[0];
 
 	}
 
@@ -573,6 +622,38 @@ class LiteratureController extends Controller
 	
 	}
 
+	private function getReferencesNavList($forceLookup=false) {
+	
+		if (empty($_SESSION['literature']['navList']) || $forceLookup) {
+		
+			$d = $this->getReferences(null);
+			
+			foreach((array)$d as $key => $val) {
+
+				$res[$val['id']] = array(
+					'prev' => array(
+						'id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null, 
+						'title' =>
+							(isset($d[$key-1]['author_full']) ? $d[$key-1]['author_full'] : null).
+							(isset($d[$key-1]['year']) ? ' ('.$d[$key-1]['year'].(isset($d[$key-1]['suffix']) ? $d[$key-1]['suffix'] : null).')' : null)
+					),
+					'next' => array(
+						'id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null,
+						'title' =>
+							(isset($d[$key+1]['author_full']) ? $d[$key+1]['author_full'] : null).
+							(isset($d[$key+1]['year']) ? ' ('.$d[$key+1]['year'].(isset($d[$key+1]['suffix']) ? $d[$key+1]['suffix'] : null).')' : null)
+					),
+				);
+
+			}
+		
+			$_SESSION['literature']['navList'] = $res;
+		
+		}
+		
+		return $_SESSION['literature']['navList'];
+
+	}
 
 	private function clearTempValues()
 	{
@@ -582,5 +663,56 @@ class LiteratureController extends Controller
 		unset($_SESSION['system']['literature']['alpha']);
 
 	}
-	
+
+	private function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+
+		$l = $this->models->Literature->_get(
+			array('id' =>
+				'select
+					id, 
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						),
+						\' (\',
+						year(`year`),
+						(
+							if(isnull(suffix)!=1,
+									suffix,
+									\'\'
+								)
+						),
+						\')\'
+					) as label,
+					lower(author_first) as _a1,
+					lower(author_second) as _a2,
+					`year`					
+				from %table%
+				where
+					(author_first like "%'.mysql_real_escape_string($search).'%" or
+					author_second like "%'.mysql_real_escape_string($search).'%" or
+					`year` like "%'.mysql_real_escape_string($search).'%")
+					and project_id = '.$this->getCurrentProjectId().'
+				order by _a1,_a2,`year`'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				$this->controllerBaseName,
+				'../literature/edit.php?id=%s'
+			)
+		);
+		
+	}
+
 }

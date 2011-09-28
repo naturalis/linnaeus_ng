@@ -77,7 +77,7 @@ function glossCheckForm(ele) {
 		$('#term').focus();
 
 	} else 
-	if ($('#definition').val().length==0) {
+	if (tinyMCE.get('definition').getContent().length==0) {
 
 		alert(_('A definition is required.'));
 		
@@ -90,6 +90,8 @@ function glossCheckForm(ele) {
 			$("#theForm").append('<input type="hidden" name="synonyms[]" value="'+ encodeURI(glossAddedSynonyms[i])+'">');
 
 		}
+
+		$("#definition").val(tinyMCE.get('definition').getContent());
 
 		$(ele).closest("form").submit();
 

@@ -68,11 +68,10 @@
 </div>
 
 
-{assign var="_menu" value="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
-{if $_menu|file_exists eq ''} 
+{if $controllerMenuExists}
 <div id="page-header-localmenu">
 <div id="page-header-localmenu-content">
-{include file=$_menu}
+{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
 </div>
 </div>
 {/if}
