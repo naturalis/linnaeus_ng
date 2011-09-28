@@ -103,7 +103,7 @@ function allLookupBuildList(data,text) {
 
 	if (obj.results) {
 		
-		$('#'+allLookupListName).append('<table>');
+		$('#'+allLookupListName).append('<table id="allLookupListTable">');
 		
 		for(var i=0;i<obj.results.length;i++) {
 			
@@ -113,7 +113,7 @@ function allLookupBuildList(data,text) {
 
 				$('#'+allLookupListName).append(
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" onclick="window.open(\''+obj.url.replace('%s',d.id)+'\',\'_self\')">'+
+						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+obj.url.replace('%s',d.id)+'\',\'_self\')">'+
 							d.text.replace(eval('/'+text+'/ig'),'<span class="allLookupListHighlight">'+text+'</span>') +
 							(d.source ? ' ('+d.source+')' : '')+
 						'</td>'+

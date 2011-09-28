@@ -12,12 +12,20 @@
 	overflow-x:hide;
 	z-index: 50000;
 	display:none;
+	padding:2px;
 
 }
 
 .allLookupListHighlight {
 
 	font-weight:bold;
+
+}
+
+#allLookupListTable {
+
+	width:350px;
+	background-color:#CC6633;
 
 }
 
@@ -36,5 +44,11 @@
 .allLookupListActiveRow {
 
 	background-color:#eee;
+
+}
+
+.allLookupListCell {
+
+	width:350px;
 
 }
