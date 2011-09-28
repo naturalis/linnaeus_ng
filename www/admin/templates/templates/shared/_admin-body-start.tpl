@@ -66,6 +66,17 @@
 	</div>
 {/if}
 </div>
+
+
+{assign var="_menu" value="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
+{if $_menu|file_exists eq ''} 
+<div id="page-header-localmenu">
+<div id="page-header-localmenu-content">
+{include file=$_menu}
+</div>
+</div>
+{/if}
+
 <span id="debug-message"></span><!--should be removed in production-->
 {if $welcomeMessage}
 <div id="welcome-message">

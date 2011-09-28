@@ -1737,6 +1737,7 @@ class Controller extends BaseClass
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
+        $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());

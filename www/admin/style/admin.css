@@ -97,6 +97,18 @@ a:hover,.pseudo-a:hover {
 	font-size: 10px;
 }
 
+#page-header-localmenu {
+	margin-left: 0px;
+	margin-top: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px dashed #ddd;
+}
+
+#page-header-localmenu-content {
+	margin-left: 10px;
+	font-size: inherit;
+}
+
 #welcome-message {
 	margin-left:10px;
 	margin-top:10px;
