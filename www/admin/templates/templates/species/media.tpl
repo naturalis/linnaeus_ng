@@ -8,10 +8,11 @@
 	<span id="message-container" style="margin-right:0px">&nbsp;</span>
 </span>
 
-<div>
-	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />  
-	<a href="media_upload.php?id={$id}">{t}Upload media for this taxon{/t}</a><br /><br />
-</div>
+<p>
+	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
+	<input type="button" value="{t}upload media{/t}" onclick="window.open('media_upload.php?id={$id}','_top')" />&nbsp;
+	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
+</p>
 
 <div id="taxon-language-other-language"></div>
 <br />
@@ -151,6 +152,7 @@ $(document).ready(function(){
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
 	allHideLoadingDiv();
+	allLookupNavigateOverrideUrl('media.php?id=%s');
 {literal}	
 });
 </script>

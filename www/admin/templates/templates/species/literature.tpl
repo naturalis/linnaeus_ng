@@ -1,6 +1,12 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
+<p>
+	<input type="button" value="{t}add new reference{/t}" onclick="window.open('../literature/edit.php','_top')" />&nbsp;
+	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
+</p>
+
 <table>
 	<tr class="tr-highlight">
 		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
@@ -19,17 +25,22 @@
 	</tr>
 {/section}
 </table>
-<p>
-[<a href="../literature/edit.php">{t}add new reference{/t}</a>]
-</p>
-<input type="button" value="{t}back{/t}" onclick="window.open('list.php','_top')" />
-
 <form method="post" action="" name="sortForm" id="sortForm">
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />
 <input type="hidden" name="search" value="{$search}"  />
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
 </div>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+allLookupNavigateOverrideUrl('literature.php?id=%s');
+{literal}
+});
+</script>
+{/literal}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

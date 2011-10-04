@@ -9,7 +9,8 @@
 <input type="hidden" name="id" value="{$id}" />  
 <input type="hidden" name="rnd" value="{$rnd}" />
 {t}Choose a file to upload:{/t} <input name="uploadedfile" type="file" /><br />
-<input type="submit" value="{t}upload{/t}" />
+<input type="submit" value="{t}upload{/t}" />&nbsp;
+<input type="button" value="{t}back{/t}" onclick="window.open('media.php?id={$id}','_top')" />
 </form>
 </p>
 {/if}

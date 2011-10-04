@@ -27,59 +27,113 @@ var allLookupActiveRow = false;
 var allLookupRowCount = 0;
 var allLookupListName = 'allLookupList'; 
 var allLookupBoxName = 'allLookupBox'; 
+var allLookupTargetUrl = false;
+var allLookupData = null;
+var allLookupLastString = null;
+var allNavigateDefaultUrl = 'edit.php?id=%s';
+var allNavigateTargetUrl = null;
+
+
+function allLookupNavigateOverrideUrl(url) {
+
+	allLookupTargetUrl = allNavigateTargetUrl = url;
+
+}
 
 function allLookup() {
 
-	allLookupGetData($('#'+allLookupBoxName).val());	
+	var text = $('#'+allLookupBoxName).val();
+
+	if (text == allLookupLastString) return;
+
+	allLookupGetData(text);
 	allLookupPositionDiv();
 	allLookupShowDiv();
 	
+	allLookupLastString = text;
+	
 }
+
 
 function allLookupGetData(text) {
 
-	if (text == null) return;
+	if (text.length==0) {
 
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'get_lookup_list' ,
-			'search' : text ,
-			'time' : allGetTimestamp()
-		}),
-		async: allAjaxAsynchMode,
-		success : function (data) {
-			
-			allLookupClearDiv();			
-			if (data) allLookupBuildList(data,text);
+		allLookupClearDiv();
+		allLookupData = null;
+		return;
+
+	}
+
+	if (allLookupData==null) {
+
+		$.ajax({
+			url : "ajax_interface.php",
+			type: "POST",
+			data : ({
+				'action' : 'get_lookup_list' ,
+				'search' : text ,
+				'time' : allGetTimestamp()
+			}),
+			async: allAjaxAsynchMode,
+			success : function (data) {
+				
+				allLookupData = $.parseJSON(data);
+				if (data) allLookupBuildList(allLookupData,text);
+
+			}
+		});
+		
+	} else {
+
+		if (allLookupData && allLookupData.results) {
+
+			var d = eval (allLookupData.toSource());
+			r = new Array();
+
+			for(var i=0;i<allLookupData.results.length;i++) {
+				
+				if (allLookupData.results[i].label.match(eval('/'+addSlashes(text)+'/ig'))) {
+					
+					r[r.length] = allLookupData.results[i]
+					
+				}
+
+			}
+
+			d.results = r;
 
 		}
-	});
+	
+		allLookupBuildList(d,text);
+
+	}
 
 }
 
-function allLookupBuildList(data,txt) {
+function allLookupBuildList(obj,txt) {
 
-	obj = $.parseJSON(data);
-	
 	allLookupRowCount = 0;
+	
+	allLookupClearDiv();
 
 	if (obj.results) {
 		
 		$('#'+allLookupListName).append('<table id="allLookupListTable">');
 		
+		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
+
 		for(var i=0;i<obj.results.length;i++) {
 			
 			var d = obj.results[i];
 			
 			if (d.id && d.label) {
 
-//							d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
-
+				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
+				
 				$('#'+allLookupListName).append(
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+obj.url.replace('%s',d.id)+'\',\'_self\')">'+
+						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+url.replace('%s',d.id)+'\',\'_self\')">'+
 							d.label +
 							(d.source ? ' ('+d.source+')' : '')+
 						'</td>'+
@@ -197,6 +251,14 @@ function allLookupBindKeyUp() {
 
 }
 
+function allNavigate(id) {
+
+	var url = allNavigateTargetUrl ? allNavigateTargetUrl : allNavigateDefaultUrl;
+
+	window.open(url.replace('%s',id),'_self');
+
+}
+
 $(document).ready(function(){
 
 	$('body').click(function() {
@@ -208,5 +270,6 @@ $(document).ready(function(){
 	});
 
 	allLookupBindKeyUp();
+	$('#'+allLookupBoxName).focus();
 
 });

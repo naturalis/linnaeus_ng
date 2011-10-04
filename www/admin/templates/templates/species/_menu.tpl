@@ -3,4 +3,4 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" />
 &nbsp;
-<a href="edit.php" class="lookupLink">{t}Create new{/t}</a>
+<a href="list.php" class="lookupLink">{t}Taxon list{/t}</a>

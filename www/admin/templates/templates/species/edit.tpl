@@ -4,6 +4,7 @@
 {if $allowed}
 <form id="theForm" method="post" action="">
 <input name="id" id="id" type="hidden" value="{$data.id}"  />
+<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$data.id}','_top')" />
 <table>
 	<tr>
 		<td>
@@ -71,7 +72,8 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<input type="submit" value="save" />&nbsp;<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="submit" value="save" />
+			<!-- &nbsp;<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" /> -->
 		</td>
 	</tr>
 </table>
@@ -88,6 +90,7 @@ $(document).ready(function(){
 taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
 {/if}
 {/section}
+allLookupNavigateOverrideUrl('edit.php?id=%s');
 //taxonGetRankByParent(true);
 //taxonCheckNewTaxonName();
 //taxonGetRankByParent();
