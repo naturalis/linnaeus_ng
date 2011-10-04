@@ -339,6 +339,7 @@ class GlossaryController extends Controller
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
+		$this->smarty->assign('navCurrentId',$gloss['id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -914,9 +915,9 @@ class GlossaryController extends Controller
 			$this->makeLookupList(
 				array_merge((array)$l1,(array)$l2),
 				$this->controllerBaseName,
-				'../glossary/edit.php?id=%s'
-			),
-			true
+				'../glossary/edit.php?id=%s',
+				true
+			)
 		);
 		
 	}

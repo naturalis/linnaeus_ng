@@ -1,82 +1,82 @@
 {include file="../shared/admin-header.tpl"}
-
 <div id="page-main">
-<span id="message-container" style="float:right;"></span><br />
+<p>
+	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
+	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
+</p>
+<!-- span id="message-container" style="float:right;"></span><br / -->
+{if $commonnames|@count==0}
+{t}No common names have been defined for this taxon.{/t}
+{else}
 <table>
-<tr>
-	<td colspan="6">{t _s1=$taxon}Common names for taxon "%s":{/t}</td>
-</tr>
-<tr><td colspan="6">&nbsp;</td></tr>
-<tr>
-	<th style="width:150px;">{t}common name{/t}</th>
-	<th style="width:150px;">{t}transliteration{/t}</th>
-	<th style="width:100px;">{t}language{/t}</th>
-	<td  style="width:100px;">{$session.project.languageList[$session.project.default_language_id].language}</td>
-	{if $languages|@count>1}
-	<td  style="width:200px;" id="project-language-tabs">(languages)</td>
-	{/if}
-	<th style="width:65px;">{t}move up{/t} /</th>
-	<th style="width:40px;">{t}down{/t}</th>
-	<th>delete</th>
-</tr>
-{section name=i loop=$commonnames}
-<tr class="tr-highlight" style="vertical-align:bottom">
-	<td>{$commonnames[i].commonname}</td>
-	<td>{$commonnames[i].transliteration}</td>
-	<td>{$commonnames[i].language_name}</td>
-	<td>
-		<input
-			type="text" 
-			id="default-{$smarty.section.i.index}"
-			onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'default')"
-			style="width:100px" 
-			value="" />
-	</td>
-	<td>
-		<input
-			type="text" 
-			id="other-{$smarty.section.i.index}" 
-			onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'other')"
-			style="width:100px" 
-			value="" />
-	<script>
-		taxonCommonnameLanguages[{$smarty.section.i.index}] = {$commonnames[i].language_id};
-	</script>
-	</td>
-	{if $smarty.section.i.first}
-	<td></td>
-	{else}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonCommonNameAction({$commonnames[i].id},'up');">
-		&uarr;
-	</td>
-	{/if}
-	{if $smarty.section.i.last}
-	<td></td>
-	{else}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonCommonNameAction({$commonnames[i].id},'down');">
-		&darr;
-	</td>
-	{/if}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonCommonNameAction({$commonnames[i].id},'delete');">
-		x
-	</td>
-</tr>
-{/section}
-{if $smarty.section.i.total==0}
-<tr><td colspan="6">{t}No common names have been defined for this taxon.{/t}</td></tr>
-{/if}
+	<tr>
+		<th style="width:150px;">{t}common name{/t}</th>
+		<th style="width:150px;">{t}transliteration{/t}</th>
+		<th style="width:100px;">{t}language{/t}</th>
+		<td  style="width:100px;">{$session.project.languageList[$session.project.default_language_id].language}</td>
+		{if $languages|@count>1}
+		<td  style="width:200px;" id="project-language-tabs">(languages)</td>
+		{/if}
+		<th style="width:65px;">{t}move up{/t} /</th>
+		<th style="width:40px;">{t}down{/t}</th>
+		<th>delete</th>
+	</tr>
+	{section name=i loop=$commonnames}
+	<tr class="tr-highlight" style="vertical-align:bottom">
+		<td>{$commonnames[i].commonname}</td>
+		<td>{$commonnames[i].transliteration}</td>
+		<td>{$commonnames[i].language_name}</td>
+		<td>
+			<input
+				type="text" 
+				id="default-{$smarty.section.i.index}"
+				onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'default')"
+				style="width:100px" 
+				value="" />
+		</td>
+		<td>
+			<input
+				type="text" 
+				id="other-{$smarty.section.i.index}" 
+				onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'other')"
+				style="width:100px" 
+				value="" />
+		<script>
+			taxonCommonnameLanguages[{$smarty.section.i.index}] = {$commonnames[i].language_id};
+		</script>
+		</td>
+		{if $smarty.section.i.first}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonCommonNameAction({$commonnames[i].id},'up');">
+			&uarr;
+		</td>
+		{/if}
+		{if $smarty.section.i.last}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonCommonNameAction({$commonnames[i].id},'down');">
+			&darr;
+		</td>
+		{/if}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonCommonNameAction({$commonnames[i].id},'delete');">
+			x
+		</td>
+	</tr>
+	{/section}
 </table>
+{/if}
 
-<br />
+<hr style="color:#eee;height:1px" />
 <form method="post" action="" id="theForm">
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="commonname_id" id="commonname_id" value="" />
@@ -94,7 +94,7 @@
 		</select>
 	</td></tr>
 	<tr><td colspan="2">&nbsp;</td></tr>
-	<tr><td colspan="2"><input type="button" value="{t}save{/t}" onclick="taxonCommonNameSubmit();"/>&nbsp;<input type="button" onclick="window.open('list.php','_self');" value="{t}back{/t}" /></td></tr>
+	<tr><td colspan="2"><input type="button" value="{t}save{/t}" onclick="taxonCommonNameSubmit();"/></td></tr>
 </table>
 </form>
 <br />

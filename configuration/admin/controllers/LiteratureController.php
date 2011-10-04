@@ -230,6 +230,7 @@ class LiteratureController extends Controller
 		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
+		$this->smarty->assign('navCurrentId',$ref['id']);
 
         if (isset($ref)) $this->smarty->assign('ref', $ref);
 

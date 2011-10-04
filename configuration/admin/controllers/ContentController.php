@@ -111,7 +111,7 @@ class ContentController extends Controller
 
         $this->setPageName(_($currentSubject));
 
-		$this->smarty->assign('isFreeModule', $_SESSION['system']['content']['is-free-module']);
+		$this->smarty->assign('isFreeModule', isset($_SESSION['system']['content']['is-free-module']) ? $_SESSION['system']['content']['is-free-module'] : false);
 
 		if (isset($_SESSION['system']['content']['free-module-id']))
 			$this->smarty->assign('freeModuleId',$_SESSION['system']['content']['free-module-id']);

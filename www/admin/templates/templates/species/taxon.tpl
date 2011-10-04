@@ -7,22 +7,19 @@
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
 
-<div id="taxon-navigation-table-div">
-<table id="taxon-navigation-table">
-	<tr>
-		<td id="taxon-navigation-cell">
-			<span style="float:right">
-				<span id="message-container" style="margin-right:10px">&nbsp;</span>
-				<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-				<!-- input type="button" value="{t}preview{/t}" onclick="alert('working on it');" style="margin-right:5px" / -->
-				<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
-				<input type="button" value="{t}delete{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
-				<input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" />
-			</span>
-		</td>
-	</tr>
-</table>
-</div>
+	<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
+	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:25px" />
+
+
+	<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" style="margin-right:5px" />
+	<input type="button" value="{t}literature{/t}" onclick="window.open('literature.php?id={$taxon.id}','_self')" style="margin-right:5px" />
+	<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" style="margin-right:5px" />
+	<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" style="margin-right:25px" />
+
+
+	<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
+	<!-- input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" / -->
+	<span id="message-container" style="margin-right:10px">&nbsp;</span>
 
 <div id="taxon-pages-table-div"></div>
 
@@ -82,6 +79,7 @@ $(document).ready(function(){
 	taxonRunAutoSave();
 
 	initTinyMce('{$literature}','{$media}');
+	allLookupNavigateOverrideUrl('taxon.php?id=%s');
 
 {literal}	
 });

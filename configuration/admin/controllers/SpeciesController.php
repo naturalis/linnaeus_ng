@@ -82,7 +82,8 @@ class SpeciesController extends Controller
 		'colorbox/colorbox.css',
 		'taxon.css',
 		'rank-list.css',
-		'dialog/jquery.modaldialog.css'
+		'dialog/jquery.modaldialog.css',
+		'lookup.css',
 	);
 	public $jsToLoad = array(
 		'all' => array(
@@ -90,13 +91,15 @@ class SpeciesController extends Controller
 			'colorbox/jquery.colorbox.js',
 			'front-end.js',
 			'int-link.js',
-			'dialog/jquery.modaldialog.js'
+			'dialog/jquery.modaldialog.js',
+			'lookup.js',
 		)
 	);
 
 
     public $controllerPublicName = 'Species module';
     public $controllerModuleId = 4; // ref. record for Species module in table 'modules'
+	public $includeLocalMenu = false;
 
 
     /**
@@ -112,6 +115,8 @@ class SpeciesController extends Controller
         $this->createStandardCategories();
 
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
+
+		$this->includeLocalMenu = true;
 
     }
 
@@ -140,6 +145,8 @@ class SpeciesController extends Controller
 		unset($_SESSION['system']['highertaxa']);
 
         $this->checkAuthorisation();
+		
+		$this->includeLocalMenu = false;
         
         $this->setPageName(_('Species module overview'));
         
@@ -152,6 +159,115 @@ class SpeciesController extends Controller
 
         $this->printPage();
   
+    }
+
+
+    /**
+     * List existing taxa
+     *
+     * @access    public
+     */
+    public function listAction ()
+    {
+	
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
+        $this->checkAuthorisation();
+        
+        $this->setPageName(_('Taxon list'));
+
+		$this->includeLocalMenu = false;
+
+		unset($_SESSION['system']['activeTaxon']);
+
+		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
+		// moving branches up and down the stem
+
+			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
+
+			if ($this->rHasVal('scroll')) $this->smarty->assign('scroll', $this->requestData['scroll']);
+
+		}
+
+		$taxa = $this->getUserAssignedTreeList();
+
+		if (isset($taxa) && count((array)$taxa)>0) {
+
+			$projectLanguages = $_SESSION['project']['languages'];
+
+			$pageCount = $this->getTaxonPageCount();
+
+			$contentCount = $this->getTaxaContentCount();
+
+			$synonymsCount = $this->getTaxaSynonymCount();
+
+			$commonnameCount = $this->getTaxaCommonnameCount();
+
+			$mediaCount = $this->getTaxaMediaCount();
+
+			$literatureCount = $this->getTaxaLiteratureCount();
+
+			foreach ((array) $taxa as $key => $taxon) {
+
+				$taxa[$key]['pctFinished'] = 
+					isset($contentCount[$taxon['id']]) ? 
+						round(
+							(
+								(isset($contentCount[$taxon['id']]) ? $contentCount[$taxon['id']] : 0) / 
+								(count((array)$projectLanguages) * $pageCount)
+						) * 100) :
+						0;
+
+				$taxa[$key]['synonymCount'] = isset($synonymsCount[$taxon['id']]) ? $synonymsCount[$taxon['id']] : 0;
+
+				$taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
+
+				$taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
+
+				$taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
+
+
+	        }
+
+			// user requested a sort of the table
+			if ($this->rHasVal('key')) {
+
+				$sortBy = array(
+					'key' => $this->requestData['key'], 
+					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+					'case' => 'i'
+				);
+			
+				// sort array of collaborators
+				$this->customSortArray($taxa, $sortBy);
+	
+			} else {
+			// default sort order
+				
+				$sortBy = array(
+					'key' => 'taxon', 
+					'dir' => 'asc', 
+					'case' => 'i'
+				);
+			
+			}
+
+			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
+
+			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
+			
+			$this->smarty->assign('sortBy', $sortBy);
+			
+			$this->smarty->assign('languages', $projectLanguages);
+
+		} else {
+				
+			$this->addMessage(_('No taxa have been assigned to you.'));
+		
+		}
+
+        $this->printPage();
+    
     }
 
 
@@ -354,6 +470,7 @@ class SpeciesController extends Controller
 							$this->addMessage(sprintf(_('Taxon "%s" saved.'),$this->requestData['taxon']));
 							
 							unset($data['taxon']);
+							unset($_SESSION['species']['usertaxa']);
 							
 							//$this->redirect('list.php');
 		
@@ -381,6 +498,9 @@ class SpeciesController extends Controller
 
 			if (isset($data)) $this->smarty->assign('data',$data);
 	
+			$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+			$this->smarty->assign('navCurrentId',$data['id']);
+
 			$this->smarty->assign('projectRanks',$pr);
 
 			if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
@@ -519,7 +639,11 @@ class SpeciesController extends Controller
 		
 		}
 
+		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+
 		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
 
         $this->printPage();
@@ -695,201 +819,7 @@ class SpeciesController extends Controller
 	}
 	
 	
-    /**
-     * List existing taxa
-     *
-     * @access    public
-     */
-    public function listAction ()
-    {
-	
-		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Taxon list'));
-		
-		unset($_SESSION['system']['activeTaxon']);
-
-		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
-		// moving branches up and down the stem
-
-			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
-
-			if ($this->rHasVal('scroll')) $this->smarty->assign('scroll', $this->requestData['scroll']);
-
-		}
-
-		// get complete taxon tree
-		$this->getTaxonTree();
-
-		if (isset($this->treeList)) { 
-
-			if (isset($_SESSION['project']['ranklist']) && 
-				(
-					isset($_SESSION['project']['ranklistsource']) && 
-					$_SESSION['project']['ranklistsource'] == ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa')
-				)
-			) {
-	
-				$rl = $_SESSION['project']['ranklist'];
-
-			} else {
-	
-				$pr = $this->getProjectRanks();
-
-				foreach((array)$pr as $key => $val) {
-
-					if (!$this->maskAsHigherTaxa() && $val['lower_taxon']==1) {
-					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
-				
-						$rl[$val['id']] = $val['rank'];
-
-					} else
-					if ($this->maskAsHigherTaxa() && $val['lower_taxon']!=1) {
-					// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
-				
-						$rl[$val['id']] = $val['rank'];
-					}
-	
-				}
-
-				if (isset($rl)) $_SESSION['project']['ranklist'] = $rl;
-				$_SESSION['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
-
-			}
-
-			// get taxa assigned to user
-			$ut = $this->models->UserTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'user_id' => $this->getCurrentUserId()
-					),
-					'columns' => 'taxon_id',
-					'fieldAsIndex' => 'taxon_id'
-				)
-			);
-		
-			$allow = false;
-			$prevAllowedLevel = -1;
-
-			// discard all taxa above the levels (i.e. smaller level-value) assigned to the user
-			foreach((array)$this->treeList as $key => $val) {
-	
-				if ($allow && $val['level'] <= $prevAllowedLevel) {
-				
-					$allow = false;
-	
-				}
-	
-				if (isset($ut) && array_key_exists($val['id'],$ut)) {
-	
-					$allow = true;
-					
-					$prevAllowedLevel = $val['level'];
-	
-				}
-	
-				if ($allow) {
-	
-					$taxa[] = $val;
-				
-				}
-				
-				$prevLevel = $val['level'];
-	
-			}
-
-		}
-
-		if (isset($taxa) && count((array)$taxa)>0) {
-
-			$projectLanguages = $_SESSION['project']['languages'];
-
-			$pageCount = $this->getTaxonPageCount();
-
-			$contentCount = $this->getTaxaContentCount();
-
-			$synonymsCount = $this->getTaxaSynonymCount();
-
-			$commonnameCount = $this->getTaxaCommonnameCount();
-
-			$mediaCount = $this->getTaxaMediaCount();
-
-			$literatureCount = $this->getTaxaLiteratureCount();
-
-			foreach ((array) $taxa as $key => $taxon) {
-
-				if (isset($rl[$taxon['rank_id']])) {
-
-					$taxa[$key]['pctFinished'] = 
-						isset($contentCount[$taxon['id']]) ? 
-							round(
-								(
-									(isset($contentCount[$taxon['id']]) ? $contentCount[$taxon['id']] : 0) / 
-									(count((array)$projectLanguages) * $pageCount)
-							) * 100) :
-							0;
-
-					$taxa[$key]['synonymCount'] = isset($synonymsCount[$taxon['id']]) ? $synonymsCount[$taxon['id']] : 0;
-
-					$taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
-
-					$taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
-
-					$taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
-
-					$taxa[$key]['rank'] = $rl[$taxon['rank_id']];
-					
-					$d[] = $taxa[$key];
-
-				}
-        
-	        }
-
-			$taxa = isset($d) ? $d : null;
-			
-			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
-
-			// user requested a sort of the table
-			if ($this->rHasVal('key')) {
-
-				$sortBy = array(
-					'key' => $this->requestData['key'], 
-					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-					'case' => 'i'
-				);
-			
-				// sort array of collaborators
-				$this->customSortArray($taxa, $sortBy);
-	
-			} else {
-			// default sort order
-				
-				$sortBy = array(
-					'key' => 'taxon', 
-					'dir' => 'asc', 
-					'case' => 'i'
-				);
-			
-			}
-
-			$this->smarty->assign('sortBy', $sortBy);
-			
-			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
-			
-			$this->smarty->assign('languages', $projectLanguages);
-
-		} else {
-				
-			$this->addMessage(_('No taxa have been assigned to you.'));
-		
-		}
-
-        $this->printPage();
-    
-    }
 
     /**
      * See and maintain literary references
@@ -947,6 +877,11 @@ class SpeciesController extends Controller
 			$this->smarty->assign('sortBy', $sortBy);
 
             if (isset($refs)) $this->smarty->assign('refs',$refs);
+			
+			if (isset($taxon)) $this->smarty->assign('taxon', $taxon);
+
+			$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+			$this->smarty->assign('navCurrentId',$taxon['id']);
 
         } else {
 
@@ -1027,6 +962,11 @@ class SpeciesController extends Controller
 
         } 
 
+		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
 		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
         
@@ -1045,6 +985,8 @@ class SpeciesController extends Controller
 		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
         $this->checkAuthorisation();
+
+		$this->includeLocalMenu = false;
 
         $this->setBreadcrumbIncludeReferer(
             array(
@@ -1614,6 +1556,10 @@ class SpeciesController extends Controller
 
             $this->ajaxActionSaveLanguageLabel();
 
+        } else if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
         }
 		
         $this->printPage();
@@ -1905,6 +1851,8 @@ class SpeciesController extends Controller
 				);
 
 			}
+			
+			unset($_SESSION['species']['usertaxa']);
 
 		}
 		
@@ -1979,17 +1927,17 @@ class SpeciesController extends Controller
 
 		if ($this->rHasId()) {
 
-			$t = $this->getTaxonById();
+			$taxon = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Synonyms')));
-
+	        $this->setPageName(sprintf(_('Synonyms for "%s"'),$taxon['taxon']));
+/*
 			$this->setBreadcrumbIncludeReferer(
 				array(
 					'name' => _('Taxon list'), 
 					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
 				)
 			);			
-
+*/
 		} else {
 
 			$this->redirect();
@@ -2114,11 +2062,14 @@ class SpeciesController extends Controller
 
 		}
 
+		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
 		$this->smarty->assign('literature', $literature);
 
 		$this->smarty->assign('id',$this->requestData['id']);
 
-		$this->smarty->assign('taxon',$t['taxon']);
+		$this->smarty->assign('taxon',$taxon);
 
 		$this->smarty->assign('synonyms',$synonyms);
 
@@ -2141,17 +2092,17 @@ class SpeciesController extends Controller
 		
 		if ($this->rHasId()) {
 
-			$t = $this->getTaxonById();
+			$taxon = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Common names')));
-
+	        $this->setPageName(sprintf(_('Common names for "%s"'),$taxon['taxon']));
+/*
 			$this->setBreadcrumbIncludeReferer(
 				array(
 					'name' => _('Taxon list'), 
 					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
 				)
 			);
-
+*/
 		} else {
 
 			$this->redirect();
@@ -2281,9 +2232,12 @@ class SpeciesController extends Controller
 
 		}
 
+		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
 		$this->smarty->assign('id',$this->requestData['id']);
 
-		$this->smarty->assign('taxon',$t['taxon']);
+		if ($taxon) $this->smarty->assign('taxon',$taxon);
 
 		$this->smarty->assign('commonnames',$commonnames);
 
@@ -2293,6 +2247,122 @@ class SpeciesController extends Controller
 
 		$this->printPage();
 
+	}
+
+
+	private function getRankList()
+	{
+	
+		if (isset($_SESSION['project']['ranklist']) && 
+			(
+				isset($_SESSION['project']['ranklistsource']) && 
+				$_SESSION['project']['ranklistsource'] == ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa')
+			)
+		) {
+	
+			$rl = $_SESSION['project']['ranklist'];
+	
+		} else {
+	
+			$pr = $this->getProjectRanks();
+	
+			foreach((array)$pr as $key => $val) {
+	
+				if (!$this->maskAsHigherTaxa() && $val['lower_taxon']==1) {
+				// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
+			
+					$rl[$val['id']] = $val['rank'];
+	
+				} else
+				if ($this->maskAsHigherTaxa() && $val['lower_taxon']!=1) {
+				// only include taxa that are set to be 'lower_taxon', the rest is in the 'higher taxa' module
+			
+					$rl[$val['id']] = $val['rank'];
+				}
+	
+			}
+	
+			if (isset($rl)) $_SESSION['project']['ranklist'] = $rl;
+			$_SESSION['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
+	
+		}
+		
+		return $rl;
+		
+	}
+	
+	
+	private function getUserAssignedTreeList($forceLookup=false)
+	{
+	
+		$type = $this->maskAsHigherTaxa() ? 'higher-taxa' : 'species';
+	
+		if (isset($_SESSION['species']['usertaxa'][$type]) && !$forceLookup) return $_SESSION['species']['usertaxa'][$type];
+	
+		// get complete taxon tree
+		$this->getTaxonTree(null,$forceLookup);
+	
+		if (!isset($this->treeList)) return null;
+	
+		$allowedRanks = $this->getRankList();
+	
+		// get taxa assigned to user
+		$ut = $this->models->UserTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'user_id' => $this->getCurrentUserId()
+				),
+				'columns' => 'taxon_id',
+				'fieldAsIndex' => 'taxon_id'
+			)
+		);
+		
+		$allow = false;
+		$prevAllowedLevel = -1;
+		$prevId = $prevTaxon = null;
+	
+		// discard all taxa above the levels (i.e. smaller level-value) assigned to the user
+		foreach((array)$this->treeList as $key => $val) {
+	
+			if ($allow && $val['level'] <= $prevAllowedLevel) {
+			
+				$allow = false;
+	
+			}
+	
+			if (isset($ut) && array_key_exists($val['id'],$ut)) {
+	
+				$allow = true;
+				
+				$prevAllowedLevel = $val['level'];
+	
+			}
+	
+			if ($allow && isset($allowedRanks[$val['rank_id']])) {
+	
+				if ($prevId) {
+				
+					$val['prev'] = array('id' => $prevId, 'title' => $prevTaxon);
+					if (isset($taxa[$prevId])) $taxa[$prevId]['next'] = array('id' => $val['id'], 'title' => $val['taxon']);
+	
+				}
+				
+				$taxa[$val['id']] = $val;
+	
+				$prevId = $val['id'];
+				$prevTaxon = $val['taxon'];
+	
+			}
+				
+			$prevLevel = $val['level'];
+	
+		}
+	
+		$_SESSION['species']['usertaxa'][$type] = $taxa;
+	
+		return $_SESSION['species']['usertaxa'][$type];
+	
 	}
 
     private function getCatalogueOfLifeData()
@@ -4210,5 +4280,102 @@ class SpeciesController extends Controller
 		unset($_SESSION['system']['media']['newRef']);
 
 	}
+	
+	private function getAllSynonyms($forceLookup=false)
+	{
+	
+		if (isset($_SESSION['species']['synonyms']) && !$forceLookup) return $_SESSION['species']['synonyms'];
+
+		$_SESSION['species']['synonyms'] = $this->models->Synonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+		
+		return $_SESSION['species']['synonyms'];
+	
+	}
+
+	private function getAllCommonnames($forceLookup=false)
+	{
+	
+		if (isset($_SESSION['species']['commonnames']) && !$forceLookup) return $_SESSION['species']['commonnames'];
+
+		$_SESSION['species']['commonnames'] = $this->models->Commonname->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+		
+		return $_SESSION['species']['commonnames'];
+	
+	}
+
+	private function getLookupList($search)
+	{
+
+		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search)) return;
+		
+		$regexp = '/'.preg_quote($search).'/i';
+
+		$l = array();
+		
+		foreach((array)$this->getUserAssignedTreeList() as $key => $val) {
+		
+			if (preg_match($regexp,$val['taxon']) == 1)
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => $val['taxon'],
+					'source' => _('species')
+				);
+
+		}
+		
+		/*
+		
+		foreach((array)$this->getAllCommonnames() as $key => $val) {
+		
+			if (preg_match($regexp,$val['commonname']) == 1)
+				$l2[] = array(
+					'id' => $val['taxon_id'],
+					'label' => $val['commonname'],
+					'source' => _('common name')
+				);
+
+		}
+
+		foreach((array)$this->getAllSynonyms() as $key => $val) {
+		
+			if (preg_match($regexp,$val['synonym']) == 1)
+				$l2[] = array(
+					'id' => $val['taxon_id'],
+					'label' => $val['synonym'],
+					'source' => _('synonym')
+				);
+
+		}
+
+		$l = array_merge((array)$l1,(array)$l2,(array)$l3);
+
+		*/
+		
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				'species',
+				'../species/taxon.php?id=%s',
+				true
+			)
+		);
+		
+	}
+
 
 }

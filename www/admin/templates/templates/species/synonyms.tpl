@@ -1,60 +1,66 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
+
+<p>
+	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
+	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
+</p>
+
+
+
+{if $synonyms|@count==0}
+{t}No synonyms have been defined for this taxon.{/t}
+{else}
 <table>
-<tr>
-	<td colspan="6">{t _s1=$taxon}Synonyms for taxon "%s":{/t}</td>
-</tr>
-<tr><td colspan="6">&nbsp;</td></tr>
-<tr>
-	<th style="width:350px;">{t}synonym{/t}</td>
-	<th style="width:300px;">{t}literature{/t}</td>
-	<th style="width:55px;">{t}move up{/t}</td>
-	<th style="width:65px;">{t}move down{/t}</td>
-	<th>delete</td>
-</tr>
-{section name=i loop=$synonyms}
-<tr class="tr-highlight">
-	<td>{$synonyms[i].synonym}</td>
-	<td>
-		{if $synonyms[i].literature}
-		{$synonyms[i].literature.author_full}
-		{$synonyms[i].literature.year}{$synonyms[i].literature.suffix}
+	<tr>
+		<th style="width:350px;">{t}synonym{/t}</td>
+		<th style="width:300px;">{t}literature{/t}</td>
+		<th style="width:55px;">{t}move up{/t}</td>
+		<th style="width:65px;">{t}move down{/t}</td>
+		<th>delete</td>
+	</tr>
+	{section name=i loop=$synonyms}
+	<tr class="tr-highlight">
+		<td>{$synonyms[i].synonym}</td>
+		<td>
+			{if $synonyms[i].literature}
+			{$synonyms[i].literature.author_full}
+			{$synonyms[i].literature.year}{$synonyms[i].literature.suffix}
+			{/if}
+		</td>
+		{if $smarty.section.i.first}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonSynonymAction({$synonyms[i].id},'up');">
+			&uarr;
+		</td>
 		{/if}
-	</td>
-	{if $smarty.section.i.first}
-	<td></td>
-	{else}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonSynonymAction({$synonyms[i].id},'up');">
-		&uarr;
-	</td>
-	{/if}
-	{if $smarty.section.i.last}
-	<td></td>
-	{else}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonSynonymAction({$synonyms[i].id},'down');">
-		&darr;
-	</td>
-	{/if}
-	<td
-		style="text-align:center" 
-		class="pseudo-a" 
-		onclick="taxonSynonymAction({$synonyms[i].id},'delete');">
-		x
-	</td>
-</tr>
-{/section}
-{if $smarty.section.i.total==0}
-<tr><td colspan="6">{t}No synonyms have been defined for this taxon.{/t}</td></tr>
-{/if}
+		{if $smarty.section.i.last}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonSynonymAction({$synonyms[i].id},'down');">
+			&darr;
+		</td>
+		{/if}
+		<td
+			style="text-align:center" 
+			class="pseudo-a" 
+			onclick="taxonSynonymAction({$synonyms[i].id},'delete');">
+			x
+		</td>
+	</tr>
+	{/section}
 </table>
-<br />
+{/if}
+<hr style="color:#eee;height:1px" />
 <form method="post" action="" id="theForm">
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="synonym_id" id="synonym_id" value="" />
@@ -74,7 +80,7 @@
 	</select>
 </td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
-<tr><td colspan="2"><input type="submit" value="{t}save{/t}" />&nbsp;<input type="button" onclick="window.open('list.php','_self');" value="{t}back{/t}" /></td></tr>
+<tr><td colspan="2"><input type="submit" value="{t}save{/t}" /></td></tr>
 </table>
 </form>
 </div>

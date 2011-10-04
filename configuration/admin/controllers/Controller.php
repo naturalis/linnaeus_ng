@@ -11,6 +11,8 @@ class Controller extends BaseClass
     private $_fullPath;
     private $_fullPathRelative;
     private $_helpTexts;
+	private $_prevTreeId = null;
+
 
     public $smarty;
     public $requestData;
@@ -38,6 +40,7 @@ class Controller extends BaseClass
 	public $uiDefaultLanguage;
     public $treeList;
 	public $suppressProjectInBreadcrumbs;
+	public $includeLocalMenu = true;
 
     private $usedModelsBase = array(
         'user', 
@@ -1186,7 +1189,7 @@ class Controller extends BaseClass
      * @param      array    $params    parameters for tree formatting
      * @access     public
      */
-	public function getTaxonTree($params=null,$allowSession=false) 
+	public function getTaxonTree($params=null,$allowSession=true) 
 	{
 
 		if (
@@ -1200,7 +1203,7 @@ class Controller extends BaseClass
 			) {
 
 			$this->treeList = $_SESSION['system']['treeList'];
-			
+
 			return $_SESSION['system']['taxonTree'];
 
 		} else {
@@ -1765,7 +1768,9 @@ class Controller extends BaseClass
 	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
     	}
 
-        $this->smarty->assign('controllerMenuExists', file_exists($this->smarty->template_dir.'../'.$this->controllerBaseName.'/_menu.tpl'));
+        $this->smarty->assign('controllerMenuExists', 
+			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'../'.$this->controllerBaseName.'/_menu.tpl')
+		);
     
 		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
 		
