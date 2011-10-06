@@ -3,12 +3,15 @@
 <span id="debug-message"></span>
 
 {if $taxon.id!=-1}
-<form name="theForm" id="theForm">
+<form name="theForm" id="theForm" method="post">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
+	<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
+	<input type="hidden" name="activePage" value="{$activePage}" />  
 
 	<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:25px" />
+	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
+	<input type="button" value="{t}preview{/t}" onclick="taxonDoPreview()" style="margin-right:25px" />
 
 
 	<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" style="margin-right:5px" />
