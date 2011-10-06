@@ -7,7 +7,7 @@
 	{$taxonName}<br />
 	data:<br />
 	<textarea onfocus="this.select();" name="geodata" style="width:250px;height:400px;font-size:9px">{$geodata}</textarea>
-	<input type="submit" value="show"  />
+	<input type="submit" value="play"  />
 	</form>
 	</div>
 <div id="coordinates"><span id="coordinates-start"></span><span id="coordinates-end"></span></div>
