@@ -1210,9 +1210,9 @@ class Controller extends BaseClass
 
 			$_SESSION['system']['taxonTree'] = $this->_getTaxonTree($params);
 
-			$_SESSION['system']['treeList'] = $this->treeList;
+			if (isset($this->treeList)) $_SESSION['system']['treeList'] = $this->treeList;
 
-			$_SESSION['system']['treeParams'] = $params;
+			if (isset($params)) $_SESSION['system']['treeParams'] = $params;
 
 			return $_SESSION['system']['taxonTree'];
 		
@@ -1404,6 +1404,18 @@ class Controller extends BaseClass
 
 		return preg_replace('/<img[^>]+\>/i', '', $content);
 
+	}
+	
+	public function unsetProjectSessionData()
+	{
+
+		unset($_SESSION['system']);
+		unset($_SESSION['project']);
+		unset($_SESSION['glossary']);
+		unset($_SESSION['literature']);
+		unset($_SESSION['species']);
+		unset($_SESSION['matrixkey']);	
+	
 	}
 
     private function _getTaxonTree($params) 

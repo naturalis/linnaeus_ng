@@ -155,22 +155,32 @@ class UsersController extends Controller
         $this->setPageName(_('Select a project to work on'));
         
         if ($this->rHasVal('project_id')) {
+		
+			if ($this->requestData['project_id'] != $this->getCurrentProjectId()) {
 
-            if ($this->isCurrentUserAuthorizedForProject($this->requestData['project_id'])) {
-                
-                $this->setCurrentProjectId($this->requestData['project_id']);
+				if ($this->isCurrentUserAuthorizedForProject($this->requestData['project_id'])) {
+				
+					$this->unsetProjectSessionData();
+					
+					$this->setCurrentProjectId($this->requestData['project_id']);
+	
+					$this->setCurrentProjectData();
+	
+					$this->getCurrentUserCurrentRole(true);
+	
+					$this->redirect($this->getLoggedInMainIndex());
+				
+				} else {
+					
+					$this->redirect('choose_project.php');
+				
+				}
 
-                $this->setCurrentProjectData();
+			} else {
 
-				$this->getCurrentUserCurrentRole(true);
+				$this->redirect($this->getLoggedInMainIndex());
 
-                $this->redirect($this->getLoggedInMainIndex());
-            
-            } else {
-                
-                $this->redirect('choose_project.php');
-            
-            }
+			}
         
         }
 

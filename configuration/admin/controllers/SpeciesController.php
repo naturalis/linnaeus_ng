@@ -651,6 +651,203 @@ class SpeciesController extends Controller
     }
 
 
+
+
+    public function previewAction ()
+    {
+
+
+		        // get taxon
+            $taxon = $this->getTaxonById($this->requestData['taxon_id']);
+
+
+
+
+
+
+
+// get categories
+$categories = $this->getCategories($this->requestData['taxon_id'],$this->requestData['activeLanguage']);
+	
+$this->smarty->assign('taxon', $taxon);
+
+$this->smarty->assign('content', $this->requestData['content-default']);
+
+//	$this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
+
+
+$this->smarty->assign('categories', $categories['categories']);
+
+$this->smarty->assign('activeCategory', $this->requestData['activePage']);
+
+$this->smarty->assign('headerTitles',
+	array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['project']['hybrid_marker'].'</span>' : '') )
+);
+
+$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
+$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/species.css';
+$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/search.css';
+
+
+//$this->printPage('../shared/preview-header');
+
+$this->printPage('../../../../app/templates/templates/shared/_head');
+$this->printPage('../../../../app/templates/templates/shared/_body-start');
+//$this->printPage('../../../../app/templates/templates/shared/_header-container');
+//$this->printPage('../../../../app/templates/templates/shared/_main-menu');
+
+
+
+$this->printPage('../../../../app/templates/templates/species/_taxon');
+
+return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+q($_SESSION['project']["css_url"]);
+of anders
+
+		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
+
+app/species/taxon.
+
+*/
+
+// front-end template
+// font-end stye
+
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
+        $this->checkAuthorisation();
+
+        $this->setBreadcrumbIncludeReferer(
+            array(
+                'name' => _('Taxon list'), 
+                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
+            )
+        );
+		
+        if ($this->rHasId()) {
+        // get existing taxon
+
+			// replace possible [new litref] and [new media] tags with links to newly created reference of media
+			$this->filterInternalTags($this->requestData['id']);
+
+            $taxon = $this->getTaxonById();
+			
+			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+
+            $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
+
+			if (!$this->doLockOutUser($this->requestData['id'])) {
+			// if new taxon OR existing taxon not being edited by someone else, get languages and content
+	
+				// get available languages
+				$lp = $_SESSION['project']['languages'];
+
+				// determine the language the page will open in
+				$startLanguage = 
+					$this->rHasVal('lan')? 
+						$this->requestData['lan'] : 
+						$_SESSION['project']['default_language_id'];
+	
+				// get the defined categories (just the page definitions, no content yet)
+				$tp = $this->models->PageTaxon->_get(array('id'=>array(
+					'project_id' => $this->getCurrentProjectId()
+				),'order' => 'show_order'));
+	
+				foreach ((array) $tp as $key => $val) {
+					
+					foreach ((array) $lp as $k => $language) {
+						
+						// for each category in each language, get the category title
+						$tpt = $this->models->PageTaxonTitle->_get(
+							array('id'=>array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'language_id' => $language['language_id'], 
+								'page_id' => $val['id']
+							)));
+						
+						$tp[$key]['titles'][$language['language_id']] = $tpt[0];
+					
+					}
+					
+					if ($val['def_page'] == 1) $defaultPage = $val['id'];
+				
+				}
+				
+				// determine the page_id the page will open in
+				$startPage = $this->rHasVal('page') ? $this->requestData['page'] : $defaultPage;
+
+				if (isset($taxon)) {
+
+					$this->smarty->assign('taxon', $taxon);
+
+					$this->smarty->assign('media', addslashes(json_encode($this->getTaxonMedia($taxon['id']))));
+
+					$this->smarty->assign('literature', addslashes(json_encode($this->getTaxonLiterature($taxon['id']))));
+					
+				}
+
+				$this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
+				
+				$this->smarty->assign('pages', $tp);
+				
+				$this->smarty->assign('languages', $lp);
+				
+				$this->smarty->assign('includeHtmlEditor', true);
+				
+				$this->smarty->assign('activeLanguage', $startLanguage);
+				
+				$this->smarty->assign('activePage', $startPage);
+			
+			} else {
+			// existing taxon already being edited by someone else
+	
+				$this->smarty->assign('taxon', array(
+					'id' => -1
+				));
+				
+				$this->addError(_('Taxon is already being edited by another editor.'));
+			
+			}
+
+		} else {
+		// no id
+		
+			$this->smarty->assign('taxon', array(
+				'id' => -1
+			));
+				
+			$this->addError(_('No taxon ID specified.'));
+		
+		}
+
+		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
+		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+
+		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
+
+        $this->printPage();
+    
+    }
+
+
     /**
      * Deleting a taxon with children: decide what to do with the progeny
      *
@@ -2297,7 +2494,8 @@ class SpeciesController extends Controller
 	
 		$type = $this->maskAsHigherTaxa() ? 'higher-taxa' : 'species';
 	
-		if (isset($_SESSION['species']['usertaxa'][$type]) && !$forceLookup) return $_SESSION['species']['usertaxa'][$type];
+		if (isset($_SESSION['species']['usertaxa'][$type]) && !$forceLookup)
+			return $_SESSION['species']['usertaxa'][$type];
 	
 		// get complete taxon tree
 		$this->getTaxonTree(null,$forceLookup);
@@ -2359,7 +2557,7 @@ class SpeciesController extends Controller
 	
 		}
 	
-		$_SESSION['species']['usertaxa'][$type] = $taxa;
+		$_SESSION['species']['usertaxa'][$type] = isset($taxa) ? $taxa : null;
 	
 		return $_SESSION['species']['usertaxa'][$type];
 	
@@ -4280,11 +4478,12 @@ class SpeciesController extends Controller
 		unset($_SESSION['system']['media']['newRef']);
 
 	}
-	
+/*	
 	private function getAllSynonyms($forceLookup=false)
 	{
 	
-		if (isset($_SESSION['species']['synonyms']) && !$forceLookup) return $_SESSION['species']['synonyms'];
+		if (isset($_SESSION['species']['synonyms']) && !$forceLookup)
+			return $_SESSION['species']['synonyms'];
 
 		$_SESSION['species']['synonyms'] = $this->models->Synonym->_get(
 			array(
@@ -4301,7 +4500,8 @@ class SpeciesController extends Controller
 	private function getAllCommonnames($forceLookup=false)
 	{
 	
-		if (isset($_SESSION['species']['commonnames']) && !$forceLookup) return $_SESSION['species']['commonnames'];
+		if (isset($_SESSION['species']['commonnames']) && !$forceLookup)
+			return $_SESSION['species']['commonnames'];
 
 		$_SESSION['species']['commonnames'] = $this->models->Commonname->_get(
 			array(
@@ -4314,7 +4514,7 @@ class SpeciesController extends Controller
 		return $_SESSION['species']['commonnames'];
 	
 	}
-
+*/
 	private function getLookupList($search)
 	{
 
@@ -4375,6 +4575,45 @@ class SpeciesController extends Controller
 			)
 		);
 		
+	}
+
+	private function getCategories($taxon=null,$languageId=null)
+	{
+
+
+//NEED TO CACHE!
+
+		// get the defined categories (just the page definitions, no content yet)
+		$tp = $this->models->PageTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'show_order',
+				'fieldAsIndex' => 'page_id'
+			)
+		);
+
+		foreach ((array) $tp as $key => $val) {
+	
+			// for each category, get the category title
+			$tpt = $this->models->PageTaxonTitle->_get(
+				array('id'=>array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => isset($languageId) ? $languageId : $_SESSION['project']['default_language_id'],
+					'page_id' => $val['id']
+				),
+				'columns'=>'title'));
+	
+			$tp[$key]['title'] = $tpt[0]['title'];
+
+		}
+		
+		return array(
+			'categories' => $tp,
+			'defaultCategory' => 1
+		);
+
 	}
 
 
