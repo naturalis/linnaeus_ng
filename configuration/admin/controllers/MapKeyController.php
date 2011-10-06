@@ -1209,19 +1209,19 @@ class MapKeyController extends Controller
 			
 			}
 
+
+			$this->smarty->assign('mapBorder',
+				array(
+					'sw' => array('lat' => $geodata->min_lat,'lng' => $geodata->min_lon),
+					'ne' => array('lat' =>  $geodata->max_lat,'lng' =>  $geodata->max_lon)
+				)
+			);
+
+			$this->smarty->assign('taxonName','test plot (score: '.$geodata->score.')');
+
 		}
 
-		$this->smarty->assign('mapBorder',
-			array(
-				'sw' => array('lat' => $geodata->min_lat,'lng' => $geodata->min_lon),
-				'ne' => array('lat' =>  $geodata->max_lat,'lng' =>  $geodata->max_lon)
-			)
-		);
-
-
-		$this->smarty->assign('taxonName','test plot (score: '.$geodata->score.')');
-
-		$this->smarty->assign('occurrences',$occurrences);
+		$this->smarty->assign('occurrences',isset($occurrences) ? $occurrences : null);
 
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 		
