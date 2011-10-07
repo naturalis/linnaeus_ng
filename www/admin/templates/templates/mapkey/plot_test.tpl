@@ -42,8 +42,9 @@ $(document).ready(function(){
 {elseif $v.type=='polygon' && $v.nodes}
 	var nodes{$k} = Array();
 	{foreach from=$v.nodes key=kn item=vn}
-	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
+	nodes{$k}[{$kn}] = new google.maps.LatLng({$vn[0]}, {$vn[1]});
 	{/foreach}
+/*
 	drawPolygon(nodes{$k},null,{literal}{{/literal}
 		name: '{$taxonName}',
 		addMarker: false,
@@ -51,9 +52,30 @@ $(document).ready(function(){
 		occurrenceId: {$v.id},
 		colour:'{$v.colour}'
 	{literal}});{/literal}
-
+*/
 {/if}
 {/foreach}
+
+{literal}
+var donut = new google.maps.Polygon({
+paths: [
+{/literal}
+{foreach from=$occurrences key=k item=v}
+nodes{$k},
+{/foreach}
+{literal}
+],
+strokeColor: "#0000FF",
+strokeOpacity: 0.8,
+strokeWeight: 2,
+fillColor: "#FF0000",
+fillOpacity: 0.35
+});
+donut.setMap(map);
+//map.fitBounds(bounds);
+
+{/literal}
+
 
 {else}
 alert({t}'Your computer appears to be offline.\nUnable to display map.'{/t});

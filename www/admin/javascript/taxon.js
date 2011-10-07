@@ -1440,7 +1440,12 @@ function taxonOrphanChangeSelect(ele) {
 
 }
 
+function taxonDoPreview() {
 
+	$('#theForm').attr('action','preview.php')
+	$('#theForm').submit();
+
+}
 
 
 
