@@ -24,8 +24,9 @@ class ModuleController extends Controller
 
     public $controllerPublicName = 'Free Modules';
 
-	public $cssToLoad = array('colorbox/colorbox.css');
-	public $jsToLoad = array('all' => array('freemodule.js','colorbox/jquery.colorbox.js'));
+	public $cssToLoad = array('colorbox/colorbox.css','lookup.css');
+	public $jsToLoad = array('all' => array('freemodule.js','colorbox/jquery.colorbox.js','lookup.js'));
+
 
     /**
      * Constructor, calls parent's constructor
@@ -91,13 +92,18 @@ class ModuleController extends Controller
 		}
 
 		$this->cleanUpEmptyPages();
+		
+		$id = $this->getFirstPageId();
 
+		$this->redirect('edit.php?id='.$id);
+/*
     	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
 
 		$this->smarty->assign('module',$_SESSION['user']['freeModules']['activeModule']);
 
         $this->printPage();
-    
+*/
+
     }
 
 
@@ -154,6 +160,11 @@ class ModuleController extends Controller
 			}
 
 		}
+
+		$navList = $this->getModulePageNavList(true);
+	
+		if (isset($navList)) $this->smarty->assign('navList', $navList);
+			$this->smarty->assign('navCurrentId',isset($this->requestData['id']) ? $this->requestData['id'] : null);
 
 		$this->smarty->assign('id', $this->rHasId() ? $this->requestData['id'] : $id);
 
@@ -305,6 +316,11 @@ class ModuleController extends Controller
             
             $this->ajaxActionGetContent();
         
+        }
+        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
         }
 		
         $this->printPage();
@@ -554,6 +570,28 @@ class ModuleController extends Controller
 
 	}
 
+
+	private function getFirstPageId()
+	{
+
+		$cfm = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->getCurrentModuleId(),
+					'language_id' => $_SESSION['project']['default_language_id']
+					),
+				'order' => 'topic',
+				'columns' => 'page_id',
+				'ignoreCase' => true,
+				'limit' => 1
+			)
+		);
+
+		return isset($cfm[0]) ? $cfm[0]['page_id'] : null;
+		
+	}
+
 	private function cleanUpEmptyPages()
 	{
 
@@ -664,5 +702,56 @@ class ModuleController extends Controller
 
 	}	
 
+	private function getModulePageNavList($forceLookup=false) {
+	
+		if (empty($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
+		
+			$d = $this->getPages();
+
+			foreach((array)$d as $key => $val) {
+
+				$res[$val['id']] = array(
+					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null),
+					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null),
+				);
+
+			}
+
+			$_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = $res;
+		
+		}
+		
+		return $_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
+
+	}
+
+	private function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+
+		$cfm = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->getCurrentModuleId(),
+					'topic like' => '%'.$search.'%'
+					),
+				'order' => 'topic',
+				'columns' => 'distinct page_id as id, topic as label',
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				array_merge($cfm),
+				$this->controllerBaseName,
+				'../module/edit.php?id=%s',
+				true
+			)
+		);
+		
+	}
 
 }
