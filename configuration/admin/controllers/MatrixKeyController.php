@@ -639,7 +639,7 @@ class MatrixKeyController extends Controller
 	private function getCurrentMatrixId()
 	{
 
-		return $_SESSION['matrixkey']['id'];
+		return isset($_SESSION['matrixkey']['id']) ? $_SESSION['matrixkey']['id'] : null;
 
 	}
 
