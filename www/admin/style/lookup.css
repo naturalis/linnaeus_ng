@@ -4,8 +4,8 @@
 	top:0px;
 	left:0px;
 	border:1px dotted black;
-	width:350px;
-	height:450px;
+	width:450px;
+	height:500px;
 	background-color:#fff;
 	display:block;
 	overflow-y:scroll;
@@ -49,13 +49,20 @@
 
 .allLookupListCell {
 
-	width:350px;
+	width:500px;
 
 }
 
-.lookupButton {
+.allLookupListSource {
+
+	color:#666;
+
 }
 
-.lookupLink {
+.allLookupButton {
+}
+
+.allLookupLink {
 	margin-right:10px;
 }
+

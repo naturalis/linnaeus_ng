@@ -130,12 +130,14 @@ function allLookupBuildList(obj,txt) {
 			if (d.id && d.label) {
 
 				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
-				
+
 				$('#'+allLookupListName).append(
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+url.replace('%s',d.id)+'\',\'_self\')">'+
+						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+
+							(d.url ? d.url : url.replace('%s',d.id)) +
+							'\',\'_self\')">'+
 							d.label +
-							(d.source ? ' ('+d.source+')' : '')+
+							(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
 						'</td>'+
 					'</tr>');
 				

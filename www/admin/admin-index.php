@@ -2,13 +2,13 @@
 
 /*
     
-        because this file is outside the "views" directory, some logic is required here.
+	because this file is outside the "views" directory, some logic is required here.
     
 */
 
-require_once ('../../configuration/admin/controllers/UsersController.php');
+require_once ('../../configuration/admin/controllers/ProjectsController.php');
 
-$c = new UsersController();
+$c = new ProjectsController();
 
 if (!$c->isUserLoggedIn()) {
     

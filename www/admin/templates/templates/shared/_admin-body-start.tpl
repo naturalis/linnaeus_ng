@@ -8,10 +8,6 @@
 		{t}Logged in as{/t} {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name} {if $session.user.currentRole.role_name}({$session.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
 	</div>
 {/if}
-
-
-
-
 </div>
 <div id="page-container">
 
@@ -71,7 +67,7 @@
 {if $controllerMenuExists}
 <div id="page-header-localmenu">
 <div id="page-header-localmenu-content">
-{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}
+{if $controllerBaseName}{include file="../"|cat:$controllerBaseName|cat:"/_menu.tpl"}{else}{include file="_menu.tpl"}{/if}
 </div>
 </div>
 {/if}
