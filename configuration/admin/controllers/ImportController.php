@@ -256,8 +256,8 @@ class ImportController extends Controller
 
 				$newId = $this->createProject(
 					array(
-						 'title' => trim((string)$d->project->title),
-						 'version' => trim((string)$d->project->version),
+						 'title' => (string)$d->project->title,
+						 'version' => (string)$d->project->version,
 						 'sys_description' => 'Created by import from a Linnaeus 2-export.',
 						 'css_url' => $this->controllerSettings['defaultProjectCss']
 					)
@@ -286,12 +286,12 @@ class ImportController extends Controller
 
 					if (!$l) {
 
-						$this->addError('Unable to use project language "'.trim((string)$d->project->language).'"');
+						$this->addError('Unable to use project language "'.(string)$d->project->language.'"');
 
 					} else {
 
 						$this->setNewDefaultLanguageId($l);
-						$this->addMessage('Set language "'.trim((string)$d->project->language).'"');
+						$this->addMessage('Set language "'.(string)$d->project->language.'"');
 
 					}
 	
@@ -1145,9 +1145,9 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 
 				$this->models->ContentTaxon->save(
 					array(
@@ -1167,7 +1167,7 @@ class ImportController extends Controller
 			
 				$failed[] = array(
 					'data' => $val,
-					'cause' => 'unable to resolve name "'.(string)$val->name.'" to taxon id'
+					'cause' => 'unable to resolve name "'.trim((string)$val->name).'" to taxon id'
 				);
 			
 			}
@@ -1186,9 +1186,9 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 
 				foreach($val->vernaculars as $vKey => $vVal) {
 
@@ -1234,9 +1234,9 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 				
 				$i = 0;
 
@@ -1388,9 +1388,9 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 				
 				$fileName = (string)$val->multimedia->overview;
 
@@ -2129,7 +2129,7 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $val) {
 
-			$matrixname = (string)$val->identify->id_file->filename;
+			$matrixname = !empty($val->identify->id_file->filename) ? (string)$val->identify->id_file->filename : null;
 
 			if ($matrixname) {
 
@@ -2346,9 +2346,9 @@ class ImportController extends Controller
 
 			if ($matrixname) {
 
-				if (isset($species[(string)$val->name]['id'])) {
+				if (isset($species[trim((string)$val->name)]['id'])) {
 
-					$taxonid = $species[(string)$val->name]['id'];
+					$taxonid = $species[trim((string)$val->name)]['id'];
 
 					foreach($val->identify->id_file->characters->character_ as $char) {
 	
@@ -2410,8 +2410,8 @@ class ImportController extends Controller
 				} else {
 	
 					$failed[] = array(
-						'cause' => 'species "'.(string)$val->name.'" in identifyit does not exist and has been discarded',
-						'data' => (string)$val->name
+						'cause' => 'species "'.trim((string)$val->name).'" in identifyit does not exist and has been discarded',
+						'data' => trim((string)$val->name)
 					);
 	
 				}
@@ -2557,9 +2557,9 @@ class ImportController extends Controller
 	
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 				
 				if (!isset($val->distribution)) continue;
 				
@@ -2607,11 +2607,11 @@ class ImportController extends Controller
 	
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[(string)$val->name]['id'])) {
+			if (isset($species[trim((string)$val->name)]['id'])) {
 			
 				if (!isset($val->distribution)) continue;
 				
-				$taxonId = $species[(string)$val->name]['id'];
+				$taxonId = $species[trim((string)$val->name)]['id'];
 
 				foreach($val->distribution->map as $vKey => $vVal) {
 				
