@@ -4,7 +4,14 @@
 <div id="page-main">
 
 <table>
-	<tr><td colspan="2">{t}Manage modules:{/t}</td></tr>
+	<tr><td colspan="2">{t}Content{/t}</td></tr>
+	<tr><td colspan="2">{t}Welcome{/t}</td></tr>
+	<tr><td colspan="2">{t}Contributors{/t}</td></tr>
+	<tr><td colspan="2">{t}About ETI{/t}</td></tr>
+</table>
+
+
+<table>
 	<tr>
 {assign var=i value=1}
 {section name=i loop=$modules}
