@@ -2,6 +2,19 @@
 
 /*
 
+
+
+dus:
+- full screen map optie
+- mogelijkheid om met een toets het laatst gezette punt te verwijderen
+- polygoon niet inkleuren tot hij klaar is
+- verschillende cursoren
+- bestaande polygonen die gereed zijn kunnen editen
+?
+
+
+
+
 	delete type = delete data!
 
 	make default central point configurable

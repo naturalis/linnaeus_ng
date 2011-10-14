@@ -92,10 +92,12 @@ class ModuleController extends Controller
 		}
 
 		$this->cleanUpEmptyPages();
-		
-		$id = $this->getFirstPageId();
 
-		$this->redirect('edit.php?id='.$id);
+		if (!$this->rHasVal('page'))
+			$this->redirect('edit.php?id='.$this->getFirstPageId());
+		else		
+			$this->redirect('edit.php?id='.$this->requestData['page']);
+
 /*
     	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
 
@@ -745,7 +747,7 @@ class ModuleController extends Controller
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
-				array_merge($cfm),
+				$cfm,
 				$this->controllerBaseName,
 				'../module/edit.php?id=%s',
 				true
