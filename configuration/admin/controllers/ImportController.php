@@ -774,8 +774,8 @@ class ImportController extends Controller
 
 		foreach($d->tree->treetaxon as $key => $val) {
 		
-			$rank = (string)$val->taxon;
-			$parentRank = (string)$val->parenttaxon;
+			$rank = trim((string)$val->taxon);
+			$parentRank = trim((string)$val->parenttaxon);
 
 			if (!isset($res[$rank])) {
 	
@@ -879,11 +879,11 @@ class ImportController extends Controller
 
 		foreach($d->tree->treetaxon as $key => $val) {
 
-			$res[(string)$val->name] = array(
-				'taxon' => (string)$val->name,
-				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
-				'rank_name' => (string)$val->taxon ? (string)$val->taxon : null,
-				'parent' => (string)$val->parentname,
+			$res[trim((string)$val->name)] = array(
+				'taxon' => trim((string)$val->name),
+				'rank_id' => isset($ranks[trim((string)$val->taxon)]) ? $ranks[trim((string)$val->taxon)]['rank_id'] : null,
+				'rank_name' => trim((string)$val->taxon) ? trim((string)$val->taxon) : null,
+				'parent' => trim((string)$val->parentname),
 				'source' => 'tree->treetaxon'
 			);
 			
@@ -891,11 +891,11 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $val) {
 
-			$res[(string)$val->name] = array(
-				'taxon' => (string)$val->name,
-				'rank_id' => isset($ranks[(string)$val->taxon]) ? $ranks[(string)$val->taxon]['rank_id'] : null,
-				'rank_name' => (string)$val->taxon ? (string)$val->taxon : null,
-				'parent' => (string)$val->parentname,
+			$res[trim((string)$val->name)] = array(
+				'taxon' => trim((string)$val->name),
+				'rank_id' => isset($ranks[trim((string)$val->taxon)]) ? $ranks[trim((string)$val->taxon)]['rank_id'] : null,
+				'rank_name' => trim((string)$val->taxon) ? trim((string)$val->taxon) : null,
+				'parent' => trim((string)$val->parentname),
 				'source' => 'records->taxondata'
 			);
 
