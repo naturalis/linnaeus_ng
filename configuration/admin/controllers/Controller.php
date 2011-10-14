@@ -192,7 +192,7 @@ class Controller extends BaseClass
     {
  
 		$this->preparePage();
-		
+
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
     
     }
@@ -1781,9 +1781,9 @@ class Controller extends BaseClass
     	}
 
         $this->smarty->assign('controllerMenuExists', 
-			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'../'.$this->controllerBaseName.'/_menu.tpl')
+			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl')
 		);
-    
+
 		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
 		
 			$msg =
@@ -1842,10 +1842,10 @@ class Controller extends BaseClass
      */
     private function startSession ()
     {
-
+	
 		session_name('lng-administration');
 
-        session_start();
+		session_start();
 
         /* DEBUG */        
         $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
@@ -1935,8 +1935,10 @@ class Controller extends BaseClass
         
         /* DEBUG */
         $this->smarty->force_compile = true;
+		
+		$cbn = $this->getControllerBaseName();
         
-        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
+        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/'. (isset($cbn) ?  $cbn . '/' : '');
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];

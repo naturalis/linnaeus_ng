@@ -66,7 +66,8 @@ class ProjectsController extends Controller
 
     public $controllerPublicName = 'Project administration';
 
-	public $jsToLoad = array('all'=>array('project.js','module.js'));
+	public $cssToLoad = array('lookup.css');
+	public $jsToLoad = array('all'=>array('project.js','module.js','lookup.js'));
 
     /**
      * Constructor, calls parent's constructor
@@ -110,6 +111,77 @@ class ProjectsController extends Controller
         $this->printPage();
     
     }
+
+	/**
+	* Project wide index, showing start screen with module icons
+	*
+	* @access     public
+	*/
+    public function adminIndexAction ()
+    {
+
+        $this->checkAuthorisation();
+		
+		$this->includeLocalMenu = true;
+
+        $this->setPageName(_('Project overview'));
+
+		// get all modules activated in this project
+		$modules = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				), 
+				'order' => 'module_id asc'
+			)
+		);
+
+		foreach ((array) $modules as $key => $val) {
+			
+			// get info per module
+			$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
+			
+			$modules[$key]['icon'] = $mp['icon'];
+			$modules[$key]['module'] = $mp['module'];
+			$modules[$key]['controller'] = $mp['controller'];
+
+			// see if the current user has any rights within the module
+			if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]))
+				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
+
+		}
+
+		$freeModules = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				)
+			)
+		);
+
+		foreach ((array) $freeModules as $key => $val) {
+			
+			// see if the current user has any rights within the module
+			if (
+				isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) &&
+				$_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]===true
+			)
+				$freeModules[$key]['currentUserRights'] = true;
+
+		}
+
+		unset($_SESSION['user']['freeModules']['activeModule']);
+
+        $this->smarty->assign('modules',$modules);
+
+        $this->smarty->assign('freeModules',$freeModules);
+
+        $this->smarty->assign('currentRole',$this->getCurrentUserCurrentRole());
+
+        $this->printPage();
+    
+    }
+
 
 	/**
 	* List of available modules, standard and self-defined, plus possibility of (de)activation

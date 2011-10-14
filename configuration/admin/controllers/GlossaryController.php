@@ -884,7 +884,7 @@ class GlossaryController extends Controller
 
 	}
 
-	private function getLookupList($search)
+	public function getLookupList($search)
 	{
 
 		if (empty($search)) return;
@@ -918,7 +918,9 @@ class GlossaryController extends Controller
 				'../glossary/edit.php?id=%s',
 				true
 			)
-		);
+		); // for glossary lookup list
+		
+		return array_merge((array)$l1,(array)$l2); // for combined lookup list
 		
 	}
 

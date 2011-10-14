@@ -98,7 +98,7 @@ abstract class Model extends BaseClass
 
         if (!$this->hasId($data)) return false;
 
-        $this->get();
+        $this->_get();
 
         if (empty($this->data)) {
             
@@ -419,18 +419,32 @@ abstract class Model extends BaseClass
 		if (!$params) return false;
 
 		$id = isset($params['id']) ? $params['id'] : false;
-		$select = isset($params['columns']) ? $params['columns'] : false;
+		$columns = isset($params['columns']) ? $params['columns'] : false;
 		$order = isset($params['order']) ? $params['order'] : false;
 		$group = isset($params['group']) ? $params['group'] : false;
 		$limit = isset($params['limit']) ? $params['limit'] : false;
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 
-        return $this->get($id,$select,$order,$group,$ignoreCase,$fieldAsIndex,$limit);
+        unset($this->data);
+        
+        $this->set(
+			array(
+				'id' => ($id ? $id : $this->id), 
+				'columns' => $columns, 
+				'order' => $order, 
+				'group' => $group, 
+				'ignoreCase' => $ignoreCase, 
+				'fieldAsIndex' => $fieldAsIndex, 
+				'limit' => $limit
+			)
+		);
+        
+        return isset($this->data) ? $this->data : null;
 
     }
 
-
+	/*
     public function get($id=false,$columns=false,$order=false,$group=false,$ignoreCase=true,$fieldAsIndex=false,$limit=false)
     {
 
@@ -451,7 +465,7 @@ abstract class Model extends BaseClass
         return isset($this->data) ? $this->data : null;
     
     }
-
+	*/
 
     /**
      * Returns the id of a newly inserted row
