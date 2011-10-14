@@ -256,8 +256,8 @@ class ImportController extends Controller
 
 				$newId = $this->createProject(
 					array(
-						 'title' => (string)$d->project->title,
-						 'version' => (string)$d->project->version,
+						 'title' => trim((string)$d->project->title),
+						 'version' => trim((string)$d->project->version),
 						 'sys_description' => 'Created by import from a Linnaeus 2-export.',
 						 'css_url' => $this->controllerSettings['defaultProjectCss']
 					)
@@ -286,12 +286,12 @@ class ImportController extends Controller
 
 					if (!$l) {
 
-						$this->addError('Unable to use project language "'.(string)$d->project->language.'"');
+						$this->addError('Unable to use project language "'.trim((string)$d->project->language).'"');
 
 					} else {
 
 						$this->setNewDefaultLanguageId($l);
-						$this->addMessage('Set language "'.(string)$d->project->language.'"');
+						$this->addMessage('Set language "'.trim((string)$d->project->language).'"');
 
 					}
 	
