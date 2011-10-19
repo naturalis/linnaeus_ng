@@ -50,11 +50,14 @@ class LinnaeusController extends Controller
 		'module.css',
 		'species.css',
 		'colorbox/colorbox.css',
-		'dialog/jquery.modaldialog.css'
+		'dialog/jquery.modaldialog.css',
+		'lookup.css'
 	);
 
 	public $jsToLoad = array('all' => array(
-		'main.js','speciesdetailpage10.js'
+		'main.js',
+		'speciesdetailpage10.js',
+		'lookup.js'
 	));
 	
 

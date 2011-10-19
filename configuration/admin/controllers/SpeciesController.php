@@ -1753,7 +1753,7 @@ app/species/taxon.
 
             $this->ajaxActionSaveLanguageLabel();
 
-        } else if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+        } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 

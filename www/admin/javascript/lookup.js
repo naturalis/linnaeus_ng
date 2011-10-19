@@ -19,7 +19,7 @@
 			)
 		);
 	
-	(the droplist div is in the admin-footer file: <div id="allLookupList" class="allLookupListInvisible"></div>)
+	(the droplist div is in the footer file: <div id="allLookupList" class="allLookupListInvisible"></div>)
 
 */
 
@@ -45,7 +45,7 @@ function allLookup() {
 	var text = $('#'+allLookupBoxName).val();
 
 	if (text == allLookupLastString) return;
-
+	
 	allLookupGetData(text);
 	allLookupPositionDiv();
 	allLookupShowDiv();
@@ -61,6 +61,7 @@ function allLookupGetData(text) {
 
 		allLookupClearDiv();
 		allLookupData = null;
+		allLookupHideDiv();
 		return;
 
 	}
@@ -75,7 +76,6 @@ function allLookupGetData(text) {
 				'search' : text ,
 				'time' : allGetTimestamp()
 			}),
-			async: allAjaxAsynchMode,
 			success : function (data) {
 				
 				allLookupData = $.parseJSON(data);
@@ -234,17 +234,21 @@ function allLookupBindKeyUp() {
 	$('#'+allLookupBoxName).keyup(function(e) {
 
 		if (e.keyCode==13) {
+			// enter
 			allLookupGoActiveRow();
 			return;
 		}
 
 		if (e.keyCode==38)
+			// key up
 			allLookupMoveUp();
 		else
 		if (e.keyCode==40)
+			// key down
 			allLookupMoveDown();
 		else
-		if (e.keyCode==37 || e.keyCode==39)
+		if ((e.keyCode<65 || (e.keyCode >= 112 && e.keyCode <= 123)) && e.keyCode!=8)
+			// smaller than 'a' or a function-key, but not backspace
 			return;
 		else
 			allLookup();

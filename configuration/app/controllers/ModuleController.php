@@ -16,14 +16,16 @@ class ModuleController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'module.css',
-		'colorbox/colorbox.css'
+		'colorbox/colorbox.css',
+		'lookup.css'
 	); 
 
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
-				'colorbox/jquery.colorbox.js'
+				'colorbox/jquery.colorbox.js',
+				'lookup.js'
 			),
 			'IE' => array()
 		);
@@ -75,6 +77,19 @@ class ModuleController extends Controller
 
 		} else {
 
+			
+			if (!$this->rHasVal('page')) {
+
+				$page = $this->getFirstModulePage($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+				$this->redirect('topic.php?id='.$page['page_id']);
+
+			} else {
+
+				$this->redirect('topic.php?id='.$this->requestData['page']);
+
+			}
+
+			/*
 			$alpha = $this->getPageAlphabet();
 
 			if (!$this->rHasVal('letter') && $alpha) $this->requestData['letter'] = current($alpha);
@@ -100,6 +115,7 @@ class ModuleController extends Controller
 			$this->smarty->assign('headerTitles',array('title' => $module['module']));
 
 			$this->smarty->assign('module',$module);
+			*/
 
 		}
 
@@ -141,11 +157,31 @@ class ModuleController extends Controller
 	
 			$this->smarty->assign('page', $page);
 
-			$this->smarty->assign('adjacentPages', $this->getAdjacentPages($id));
+			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
 
 			$this->smarty->assign('module',$module);
 		}
 
+        $this->printPage();
+    
+    }
+
+	/**
+	* General interface for all AJAX-calls
+	*
+	* @access     public
+	*/
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
         $this->printPage();
     
     }
@@ -316,6 +352,27 @@ class ModuleController extends Controller
 
 	}
 
+	private function getFirstModulePage()
+	{
+
+		$cfm = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->getCurrentModuleId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					),
+				'order' => 'topic',
+				'columns' => 'page_id',
+				'ignoreCase' => true,
+				'limit' => 1
+			)
+		);
+
+		return isset($cfm[0]) ? $cfm[0] : null;
+		
+	}
+
 	private function getAdjacentPages($id)
 	{
 
@@ -326,14 +383,14 @@ class ModuleController extends Controller
 					'module_id' => $this->getCurrentModuleId(),
 					'language_id' => $this->getCurrentLanguageId(),
 				),
-				'columns' => 'page_id,topic',
+				'columns' => 'page_id as id,topic as label',
 				'order' => 'topic'
 			)
 		);
 
 		foreach((array)$cfm as $key => $val) {
 
-			if ($val['page_id']==$id) {
+			if ($val['id']==$id) {
 			
 				return array(
 					'prev' => isset($cfm[$key-1]) ? $cfm[$key-1] : null,
@@ -345,7 +402,35 @@ class ModuleController extends Controller
 		}
 		
 		return null;
-
+		
 	}
+	
+	private function getLookupList($search)
+	{
 
+		if (empty($search)) return;
+
+		$cfm = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->getCurrentModuleId(),
+					'topic like' => '%'.$search.'%'
+					),
+				'order' => 'topic',
+				'columns' => 'distinct page_id as id, topic as label',
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$cfm,
+				$this->controllerBaseName,
+				'../module/topic.php?id=%s',
+				true
+			)
+		);
+		
+	}
 }

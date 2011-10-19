@@ -140,9 +140,6 @@
 </div>
 {/if}
 
-	<div id="navigation">
-		<span id="back" onclick="window.open('{if $taxon.lower_taxon==1}../species/{else}../highertaxa/{/if}','_self')">{t}back to index{/t}</span>
-	</div>
 </div>
 
 {literal}

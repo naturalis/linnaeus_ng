@@ -86,10 +86,18 @@ class MatrixKeyController extends Controller
 
 			$this->storeHistory = false;
 
-			$this->redirect('matrices.php');
+			$matrices = $this->getMatrices();
 
+			$matrix = array_shift($matrices);
+
+			$this->setCurrentMatrix($matrix['id']);
+
+			//$this->redirect('matrices.php');
 		}
+		
+		$this->redirect('identify.php');
 
+		/*
         $this->setPageName(sprintf(_('Matrix "%s"'),$matrix['name']));
 
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
@@ -97,6 +105,7 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('matrix',$matrix);
 
         $this->printPage();
+		*/
     
     }
 
@@ -120,7 +129,8 @@ class MatrixKeyController extends Controller
 
 			$this->setCurrentMatrix($matrix['id']);
 
-			$this->redirect('index.php');
+			//$this->redirect('index.php');
+			$this->redirect('identify.php');
 
 		} else {
 		
@@ -143,7 +153,8 @@ class MatrixKeyController extends Controller
 
 			$this->setCurrentMatrix($this->requestData['id']);
 
-			$this->redirect('index.php');
+			//$this->redirect('index.php');
+			$this->redirect('identify.php');
 
 		} else {
 
@@ -152,6 +163,129 @@ class MatrixKeyController extends Controller
 		}
 	
 	}
+
+	public function identifyAction()
+	{
+
+		$this->checkMatrixIdOverride();
+
+		$matrix = $this->getCurrentMatrix();
+
+		if (!isset($matrix)) {
+
+			$this->storeHistory = false;
+
+			$this->redirect('matrices.php');
+
+		}
+
+		$this->smarty->assign('function','Identify');
+
+        $this->setPageName(sprintf(_('Matrix "%s": identify'),$matrix['name']));
+
+		$this->smarty->assign('characteristics',$this->getCharacteristics());
+
+		$this->smarty->assign('taxa',$this->getTaxa());
+
+		$this->smarty->assign('matrixCount',$this->getMatrixCount());
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+	
+	}
+
+	public function examineAction()
+	{
+
+		$this->checkMatrixIdOverride();
+
+		$matrix = $this->getCurrentMatrix();
+
+		if (!isset($matrix)) {
+
+			$this->storeHistory = false;
+
+			$this->redirect('matrices.php');
+
+		}
+
+		$this->smarty->assign('function','Examine');
+
+        $this->setPageName(sprintf(_('Matrix "%s": examine'),$matrix['name']));
+
+		$this->smarty->assign('taxa',$this->getTaxa());
+
+		$this->smarty->assign('matrixCount',$this->getMatrixCount());
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+	
+	}
+
+	public function compareAction()
+	{
+
+		$this->checkMatrixIdOverride();
+
+		$matrix = $this->getCurrentMatrix();
+
+		if (!isset($matrix)) {
+
+			$this->storeHistory = false;
+
+			$this->redirect('matrices.php');
+
+		}
+
+		$this->smarty->assign('function','Compare');
+
+        $this->setPageName(sprintf(_('Matrix "%s": compare'),$matrix['name']));
+
+		$this->smarty->assign('taxa',$this->getTaxa());
+
+		$this->smarty->assign('matrixCount',$this->getMatrixCount());
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+	
+	}
+
+	public function ajaxInterfaceAction()
+	{
+
+		if (!$this->rHasVal('action') || !$this->rHasId()) {
+
+			$this->smarty->assign('returnText','error');
+		
+		} else
+		if ($this->rHasVal('action','get_states')) {
+
+			$this->smarty->assign('returnText',json_encode($this->getCharacteristicStates($this->requestData['id'])));
+		
+		} else
+		if ($this->rHasVal('action','get_taxa')) {
+
+			$this->smarty->assign('returnText',json_encode((array)$this->getTaxaScores($this->requestData['id'])));
+		
+		} else
+		if ($this->rHasVal('action','get_taxon_states')) {
+
+			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonStates($this->requestData['id'])));
+		
+		} else
+		if ($this->rHasVal('action','compare')) {
+
+			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonComparison($this->requestData['id'])));
+		
+		}
+
+        $this->printPage();
+	
+	}
+
 
 	private function getCurrentMatrixId()
 	{
@@ -271,122 +405,6 @@ class MatrixKeyController extends Controller
 
 		return $_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
 
-	}
-
-	public function identifyAction()
-	{
-
-		$this->checkMatrixIdOverride();
-
-		$matrix = $this->getCurrentMatrix();
-
-		if (!isset($matrix)) {
-
-			$this->storeHistory = false;
-
-			$this->redirect('matrices.php');
-
-		}
-
-        $this->setPageName(sprintf(_('Matrix "%s": identify'),$matrix['name']));
-
-		$this->smarty->assign('characteristics',$this->getCharacteristics());
-
-		$this->smarty->assign('taxa',$this->getTaxa());
-
-		$this->smarty->assign('matrixCount',$this->getMatrixCount());
-
-		$this->smarty->assign('matrix',$matrix);
-
-        $this->printPage();
-	
-	}
-
-	public function examineAction()
-	{
-
-		$this->checkMatrixIdOverride();
-
-		$matrix = $this->getCurrentMatrix();
-
-		if (!isset($matrix)) {
-
-			$this->storeHistory = false;
-
-			$this->redirect('matrices.php');
-
-		}
-
-        $this->setPageName(sprintf(_('Matrix "%s": examine'),$matrix['name']));
-
-		$this->smarty->assign('taxa',$this->getTaxa());
-
-		$this->smarty->assign('matrixCount',$this->getMatrixCount());
-
-		$this->smarty->assign('matrix',$matrix);
-
-        $this->printPage();
-	
-	}
-
-	public function compareAction()
-	{
-
-		$this->checkMatrixIdOverride();
-
-		$matrix = $this->getCurrentMatrix();
-
-		if (!isset($matrix)) {
-
-			$this->storeHistory = false;
-
-			$this->redirect('matrices.php');
-
-		}
-
-        $this->setPageName(sprintf(_('Matrix "%s": compare'),$matrix['name']));
-
-		$this->smarty->assign('taxa',$this->getTaxa());
-
-		$this->smarty->assign('matrixCount',$this->getMatrixCount());
-
-		$this->smarty->assign('matrix',$matrix);
-
-        $this->printPage();
-	
-	}
-
-	public function ajaxInterfaceAction()
-	{
-
-		if (!$this->rHasVal('action') || !$this->rHasId()) {
-
-			$this->smarty->assign('returnText','error');
-		
-		} else
-		if ($this->rHasVal('action','get_states')) {
-
-			$this->smarty->assign('returnText',json_encode($this->getCharacteristicStates($this->requestData['id'])));
-		
-		} else
-		if ($this->rHasVal('action','get_taxa')) {
-
-			$this->smarty->assign('returnText',json_encode((array)$this->getTaxaScores($this->requestData['id'])));
-		
-		} else
-		if ($this->rHasVal('action','get_taxon_states')) {
-
-			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonStates($this->requestData['id'])));
-		
-		} else
-		if ($this->rHasVal('action','compare')) {
-
-			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonComparison($this->requestData['id'])));
-		
-		}
-
-        $this->printPage();
-	
 	}
 
 	private function getCharacteristicStates($id)

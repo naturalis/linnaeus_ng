@@ -1,12 +1,4 @@
 {include file="../shared/header.tpl"}
-{literal}
-<style>
-.taxon-select {
-	font-size:inherit;
-	height:25px;
-}
-</style>
-{/literal}
 
 <div id="page-main">
 {if !$isOnline}
@@ -15,12 +7,12 @@
 
 	<div id="map_canvas">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 	<div id="map_options">
-
-		<form method="post" action="">
+		{t}Select two species to compare{/t}<br />
+		 ({t}switch to {/t}<a href="examine.php">{t}examine species{/t}</a>{t} or {/t}<a href="search.php">{t}map search{/t}</a>)
 		<p>
 		Taxon A:
-		<select name="idA" class="taxon-select">	
-		<option value="" {if !$taxonA}selected="selected"{/if}>--choose taxon--</option>
+		<select name="idA" id="idA" class="taxon-select">	
+		<option value="" {if !$taxonA}selected="selected"{/if}>{t}--choose taxon--{/t}</option>
 		{foreach from=$taxa key=k item=v}
 		<option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
 		{/foreach}
@@ -28,17 +20,16 @@
 		</p>
 		<p>
 		Taxon B:
-		<select name="idB" class="taxon-select">	
-		<option value="" {if !$taxonB}selected="selected"{/if}>--choose taxon--</option>
+		<select name="idB" id="idB" class="taxon-select">	
+		<option value="" {if !$taxonB}selected="selected"{/if}>{t}--choose taxon--{/t}</option>
 		{foreach from=$taxa key=k item=v}
 		<option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
 		{/foreach}
 		</select>	
 		</p>
 		<p>
-		<input type="submit" value="compare" />
+		<input type="button" value="compare" onclick="doMapSearch()" />
 		</p>
-		</form>
 
 		<hr style="height:1px;color:#999" />
 		{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
@@ -192,9 +183,6 @@ $(document).ready(function(){
 });
 </script>
 {/literal}
-
-
-
 
 {/if}
 </div>

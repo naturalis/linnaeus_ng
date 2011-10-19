@@ -1,5 +1,4 @@
 {include file="../shared/header.tpl"}
-
 <div id="page-main">
 {if !$isOnline}
 {t}Your computer appears to be offline. Unfortunately, the map key doesn't work without an internet connection.{/t}
@@ -7,11 +6,14 @@
 
 	<div id="map_canvas">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 	<div id="map_options">
+		{t}Select an area to search{/t}<br />
+		 ({t}switch to {/t}<a href="examine.php">{t}examine species{/t}</a>{t} or {/t}<a href="compare.php">{t}compare species{/t}</a>)
+		<br /><br />
 		<form method="post" action="" id="theForm">
 		{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
 		<hr style="height:1px;color:#999" />
 	
-		<input type="button" onclick="startPolygonDraw()" id="button-draw" value="{t}draw area to search{/t}" /><br/>
+		<input type="button" onclick="startPolygonDraw()" id="button-draw" value="{t}draw area{/t}" /><br/>
 		<input type="button" onclick="doMapSearch()" value="{t}search{/t}" />
 		<input type="button" onclick="clearPolygon();clearSearchResults();" value="{t}clear{/t}" />
 		</form>

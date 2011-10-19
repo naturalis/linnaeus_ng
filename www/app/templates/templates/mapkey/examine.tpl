@@ -1,12 +1,11 @@
 {include file="../shared/header.tpl"}
-
 <div id="page-main">
 {if !$isOnline}
 {t}Your computer appears to be offline. Unfortunately, the map key doesn't work without an internet connection.{/t}
 {else}
 	<div id="index">
 		<p>
-		{t}Click a species to examine:{/t}
+		{t}Click a species to examine{/t} ({t}switch to {/t}<a href="compare.php">{t}species comparison{/t}</a>{t} or {/t}<a href="search.php">{t}map search{/t}</a>)
 		</p>
 		<table>
 		<tr>

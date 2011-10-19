@@ -598,7 +598,7 @@ class GlossaryController extends Controller
             $this->deleteMedia();
 
         } else
-        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 
@@ -811,7 +811,7 @@ class GlossaryController extends Controller
 	private function getFirstGlossaryTerm()
 	{
 
-		$l = $this->models->Glossary->_get(
+		$g = $this->models->Glossary->_get(
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
 					'order' => 'term',
@@ -820,7 +820,7 @@ class GlossaryController extends Controller
 				)
 			);
 
-		return $l[0];
+		return $g[0];
 
 	}
 
