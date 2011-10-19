@@ -12,8 +12,6 @@
 	- each term can have one or more synonyms.
 	- a synonym consists of a single term (one or more words) in the same language as the term it is a synonym of.
 
-
-
 */
 
 include_once ('Controller.php');
@@ -31,14 +29,16 @@ class GlossaryController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'glossary.css',
-		'colorbox/colorbox.css'
+		'colorbox/colorbox.css',
+		'lookup.css'
 	);
 
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
-				'colorbox/jquery.colorbox.js'
+				'colorbox/jquery.colorbox.js',
+				'lookup.js'
 			),
 			'IE' => array(
 			)
@@ -78,7 +78,13 @@ class GlossaryController extends Controller
      */
     public function indexAction()
     {
-	
+
+		$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+		
+		$this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
+
+		/*
+
    		$alpha = $this->getGlossaryAlphabet($this->didActiveLanguageChange());
 
 		if (!$this->rHasVal('letter')) $this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : null;
@@ -102,6 +108,8 @@ class GlossaryController extends Controller
 		if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
 
         $this->printPage();
+
+		*/
     
     }
 
@@ -132,7 +140,7 @@ class GlossaryController extends Controller
 
 		if (isset($term)) $this->smarty->assign('term', $term);
 
-		$this->smarty->assign('adjacentTerms', $this->getAdjacentTerms($term['id']));
+		if (isset($term)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($term['id']));
 
         $this->printPage();
     
@@ -153,6 +161,27 @@ class GlossaryController extends Controller
         $this->printPage();
     
     }
+
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
+        $this->printPage();
+    
+    }
+
 
 	private function getGlossaryTerms($search)
 	{
@@ -284,7 +313,31 @@ class GlossaryController extends Controller
 	
 	}
 
-	private function getAdjacentTerms($id)
+	private function getFirstGlossaryTerm($letter=null)
+	{
+
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->getCurrentLanguageId(),
+			);
+			
+		if (isset($letter)) $d['term like'] = $letter.'%';
+
+		$g = $this->models->Glossary->_get(
+			array(
+				'id' => $d,
+				'order' => 'term',
+				'limit' => 1,
+				'columns' => 'id'
+			)
+		);
+
+		return $g[0];
+
+	}
+
+
+	private function getAdjacentItems($id)
 	{
 
 		$g = $this->models->Glossary->_get(
@@ -293,7 +346,7 @@ class GlossaryController extends Controller
 					'project_id' => $this->getCurrentProjectId(), 
 					'language_id' => $this->getCurrentLanguageId(),
 				),
-				'columns' => 'id,term',
+				'columns' => 'id,term as label',
 				'order' => 'term'
 			)
 		);
@@ -314,6 +367,49 @@ class GlossaryController extends Controller
 		return null;
 
 	}
+
+	public function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+
+		$l1 = $this->models->Glossary->_get(
+			array(
+				'id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'term like' => '%'.$search.'%'
+					),
+				'columns' => 'id,term as label,"glossary" as source'
+			)
+		);
+
+		$l2 = $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'synonym like' => '%'.$search.'%'
+					),
+				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				array_merge((array)$l1,(array)$l2),
+				$this->controllerBaseName,
+				'../glossary/term.php?id=%s',
+				true
+			)
+		); // for glossary lookup list
+		
+		return array_merge((array)$l1,(array)$l2); // for combined lookup list
+		
+	}
+
 
 
 }

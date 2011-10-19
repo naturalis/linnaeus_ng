@@ -60,10 +60,14 @@ class MapKeyController extends Controller
 
     public function indexAction()
     {
-    
+    	
+		$this->redirect('examine.php');
+	
+		/*
         $this->setPageName( _('Index'));
 		
         $this->printPage();
+		*/
     
     }
 

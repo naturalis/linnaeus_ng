@@ -1,17 +1,5 @@
 {include file="../shared/header.tpl"}
 
-{if $alpha}
-<div id="alphabet">
-	{foreach from=$alpha key=k item=v}
-	{if $letter==$v}
-	<span class="letter-active">{$v}</span>
-	{else}
-	<span class="letter" onclick="goAlpha('{$v}','index.php')">{$v}</span>
-	{/if}
-	{/foreach}
-</div>
-{/if}
-
 <div id="page-main">
 	<div id="term">{$term.term}</div>
 	<div id="defintion">{$term.definition}</div>
@@ -46,15 +34,6 @@
 	</div>
 	{/if}
 
-	<div id="navigation">
-		{if $adjacentTerms.prev}
-		<span onclick="goGlossaryTerm({$adjacentTerms.prev.id})" id="prev">{t}< previous{/t}</span>
-		{/if}
-		<span id="back" onclick="goAlpha('{$term.term|@substr:0:1}','index.php')">{t}back to index{/t}</span>
-		{if $adjacentTerms.next}
-		<span onclick="goGlossaryTerm({$adjacentTerms.next.id})" id="next">{t}next >{/t}</span>
-		{/if}
-	</div>
 </div>
 
 {include file="../shared/footer.tpl"}

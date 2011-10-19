@@ -28,12 +28,14 @@ class Controller extends BaseClass
     public $controllerPublicNameMask = false;
     public $errors;
     public $messages;
+    public $randomValue;
 	public $excludeFromReferer = false;
 	public $noResubmitvalReset = false;
 	public $showBackToSearch = true;
 	public $storeHistory = true;
     public $treeList;
     public $showLowerTaxon = true;
+	public $includeLocalMenu = true;
 
 
 
@@ -89,6 +91,8 @@ class Controller extends BaseClass
 		$this->setPaths();
 
         $this->loadModels();
+
+        $this->setRandomValue();
 
         $this->setSmartySettings();
         
@@ -255,7 +259,7 @@ class Controller extends BaseClass
 		$d = $this->getProjectRanks(array('idsAsIndex' => true,'forceLookup' => $forceLookup));
 		$pr = $d['ranks'];
 
-		// $this->treeList an additional non-recursive list of taxa
+		// $this->treeList is an additional non-recursive list of taxa
 		if ($level==0) unset($this->treeList);
 
 		// setting the parameters for the taxon search
@@ -1226,6 +1230,28 @@ class Controller extends BaseClass
     
     }
 	
+
+	public function makeLookupList($data,$module,$url,$sortData=false,$encode=true)
+	{
+
+		$sortBy = array(
+			'key' => 'label', 
+			'dir' => 'asc', 
+			'case' => 'i'
+		);
+
+		if ($sortData) $this->customSortArray($data, $sortBy);
+
+		$d = array(
+			'module' => $module,
+			'url' => $url,
+			'results' => $data
+		);
+
+		return $encode ? json_encode($d) : $d;
+	
+	}
+
 	private function setPhpIniVars()
 	{
 
@@ -1296,10 +1322,15 @@ class Controller extends BaseClass
 
 		$this->smarty->assign('menu',$this->getMainMenu());
  
+         $this->smarty->assign('controllerMenuExists', 
+			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl')
+		);
+
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
 	 
 //        $this->setBreadcrumbs();
         $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
@@ -1817,5 +1848,30 @@ class Controller extends BaseClass
 		return isset($_SESSION['user']['breadcrumbs']) ? $_SESSION['user']['breadcrumbs'] : null;
 
 	}
+
+    /**
+     * Sets a random integer value for general use
+     *
+     * @access     private
+     */
+    private function setRandomValue ()
+    {
+        
+        $this->randomValue = mt_rand(99999, mt_getrandmax());
+    
+    }
+
+    /**
+     * Returns random integer value
+     *
+     * @return integer    anything between 99999 and mt_getrandmax()
+     * @access     private
+     */
+    private function getRandomValue ()
+    {
+        
+        return $this->randomValue;
+    
+    }
 
 }

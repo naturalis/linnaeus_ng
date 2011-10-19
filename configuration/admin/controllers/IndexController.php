@@ -59,7 +59,7 @@ class IndexController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 

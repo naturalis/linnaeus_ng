@@ -282,7 +282,30 @@ function clearSearchResults() {
 
 }
 
+function doMapSearch() {
 
+	if($('#idA').val()=='' || $('#idB').val()=='') {
+	
+		alert(_('You must select two taxa to compare.'));		
+	
+		if ($('#idA').val()=='')
+			$('#idA').focus();
+		else
+			$('#idB').focus();
+		
+	} else
+	if($('#idA').val()==$('#idB').val()) {
+
+		alert(_('You cannot compare a taxon to itself.'));		
+		$('#idA').focus();
+
+	} else {
+
+		$('#theForm').submit();
+	
+	}
+
+}
 
 
 

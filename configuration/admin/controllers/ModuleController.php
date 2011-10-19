@@ -24,8 +24,18 @@ class ModuleController extends Controller
 
     public $controllerPublicName = 'Free Modules';
 
-	public $cssToLoad = array('colorbox/colorbox.css','lookup.css');
-	public $jsToLoad = array('all' => array('freemodule.js','colorbox/jquery.colorbox.js','lookup.js'));
+	public $cssToLoad = array(
+		'colorbox/colorbox.css',
+		'lookup.css'
+	);
+
+	public $jsToLoad = array(
+		'all' => array(
+			'freemodule.js',
+			'colorbox/jquery.colorbox.js',
+			'lookup.js'
+		)
+	);
 
 
     /**
@@ -319,7 +329,7 @@ class ModuleController extends Controller
             $this->ajaxActionGetContent();
         
         }
-        if ($this->requestData['action'] == 'get_lookup_list' && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 

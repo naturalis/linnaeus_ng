@@ -26,14 +26,16 @@ class SpeciesController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'species.css',
-		'colorbox/colorbox.css'
+		'colorbox/colorbox.css',
+		'lookup.css'
 	); //'key-tree.css'
 
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
-				'colorbox/jquery.colorbox.js'
+				'colorbox/jquery.colorbox.js',
+				'lookup.js'
 			),
 			'IE' => array(
 			)
@@ -152,6 +154,8 @@ class SpeciesController extends Controller
 
 				$this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
 
+				$this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
+
 			}
 
 			$this->smarty->assign('categories', $categories['categories']);
@@ -159,7 +163,14 @@ class SpeciesController extends Controller
 			$this->smarty->assign('activeCategory', $activeCategory);
 
 			$this->smarty->assign('headerTitles',
-				array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['project']['hybrid_marker'].'</span>' : '') )
+				array(
+					'title' =>
+						$taxon['taxon'].
+						($taxon['is_hybrid']=='1' ?
+							'<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['project']['hybrid_marker'].'</span>'
+							: ''
+						)
+					)
 			);
 
 		} else {
@@ -175,6 +186,13 @@ class SpeciesController extends Controller
 	public function ajaxInterfaceAction()
 	{
 
+		if (!$this->rHasVal('action')) $this->smarty->assign('returnText','error');
+		
+		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        } else
 		if (!$this->rHasVal('action') || !$this->rHasId()) {
 
 			$this->smarty->assign('returnText','error');
@@ -198,6 +216,11 @@ class SpeciesController extends Controller
 		// get taxa
 		$taxa = $this->getTreeList();
 
+		$d = current($taxa);
+
+		$this->redirect('taxon.php?id='.(isset($d['id']) ? $d['id'] : null));
+
+		/*
 		// max taxa to show per page
 		$taxaPerPage = $this->controllerSettings['speciesPerPage'];
 
@@ -210,10 +233,11 @@ class SpeciesController extends Controller
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
         $this->printPage();
+		*/
   
     }
 
-	private function setTaxonType ($type)
+	public function setTaxonType ($type)
 	{
 
 		$_SESSION['user']['species']['type'] = ($type=='higher') ? 'higher' : 'lower';
@@ -660,7 +684,6 @@ class SpeciesController extends Controller
 		return isset($mt) ? $mt[0]['total'] : 0;
 	
 	}
-	
 
 	private function getTaxonLiteratureCount($id)
 	{
@@ -677,6 +700,76 @@ class SpeciesController extends Controller
 	
 		return isset($lt) ? $lt[0]['total'] : 0;
 
+	}
+
+	private function getAdjacentItems($id)
+	{
+
+		$this->showLowerTaxon = ($this->getTaxonType() == 'lower');
+
+		$this->getTaxonTree(array('forceLookup'=>true));
+
+		$taxa = $this->getTreeList();
+
+		reset($taxa);
+		
+		$prev = $next = null;
+
+		while (list($key, $val) = each($taxa)) {
+		
+			if ($key==$id) {
+
+				$next = current($taxa); // current = next because the pointer has already shifted forward
+
+				return array(
+					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+				);
+
+			}
+
+			$prev = $val;
+
+		}
+		
+		return null;
+
+	}
+
+	private function getLookupList($search)
+	{
+
+		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search)) return;
+		
+		$regexp = '/'.preg_quote($search).'/i';
+
+		$l = array();
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$taxa = $this->getTreeList();
+				
+		foreach((array)$taxa as $key => $val) {
+		
+			if (preg_match($regexp,$val['taxon']) == 1)
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => $val['taxon']
+				);
+
+		}
+		
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				'species',
+				'../species/taxon.php?id=%s',
+				true
+			)
+		);
+		
 	}
 
 }

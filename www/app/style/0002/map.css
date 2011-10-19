@@ -26,3 +26,8 @@
 #back-link:hover, .back-link:hover {
 	text-decoration:underline;
 }
+
+.taxon-select {
+	font-size:inherit;
+	height:25px;
+}

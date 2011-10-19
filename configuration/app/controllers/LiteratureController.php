@@ -18,12 +18,14 @@ class LiteratureController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'literature.css',
+		'lookup.css'
 	);
 
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
+				'lookup.js'
 //				'tablesorter/jquery-latest.js',
 //				'tablesorter/jquery.tablesorter.js',
 			),
@@ -60,6 +62,11 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
+		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+		
+		$this->redirect('reference.php?id='.$d['id']);
+
+ 		/*
  		$alpha = $this->getLiteratureAlphabet();
 
 		if (!$this->rHasVal('letter')) $this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : null;
@@ -83,6 +90,7 @@ class LiteratureController extends Controller
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
         $this->printPage();
+		*/
    
     }
 
@@ -105,6 +113,7 @@ class LiteratureController extends Controller
 		
 		}
 
+
 		$alpha = $this->getLiteratureAlphabet();
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
@@ -113,10 +122,27 @@ class LiteratureController extends Controller
 
 		if (isset($ref)) $this->smarty->assign('ref', $ref);
 
+		if (isset($ref)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($ref['id']));
+
         $this->printPage();
 
     }
 
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!isset($this->requestData['action'])) return;
+        
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
+        $this->printPage();
+    
+    }
+	
 	private function getLiteratureAlphabet($forceLookup=false)
 	{
 
@@ -264,33 +290,119 @@ class LiteratureController extends Controller
 		}
 
 	}
-	
+
+	private function getFirstReference($letter=null)
+	{
+
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+			);
+			
+		if (isset($letter)) $d['author_first like'] = $letter.'%';
+
+		$l = $this->models->Literature->_get(
+				array(
+					'id' => $d,
+					'order' => 'author_first',
+					'columns' => 'id',
+					'ignoreCase' => true,
+					'limit' => 1
+				)
+			);
+		
+		return $l[0];
+
+	}
+
+	private function getAdjacentItems($id)
+	{
+
+		$l = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'author_first',
+				'columns' => 'id, year(`year`) as `year`,
+					 			concat(
+									author_first,
+									(
+										if(multiple_authors=1,
+											\' et al.\',
+											if(author_second!=\'\',concat(\' & \',author_second),\'\')
+										)
+									),\', \',year(`year`),ifnull(suffix,\'\')
+								) as label'
+			)
+		);
+
+		foreach((array)$l as $key => $val) {
+
+			if ($val['id']==$id) {
+			
+				return array(
+					'prev' => isset($l[$key-1]) ? $l[$key-1] : null,
+					'next' => isset($l[$key+1]) ? $l[$key+1] : null
+				);
+
+			}
+
+		}
+
+		return null;
+
+	}
+
+	private function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+
+		$l = $this->models->Literature->_get(
+			array('id' =>
+				'select
+					id, 
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						),
+						\' (\',
+						year(`year`),
+						(
+							if(isnull(suffix)!=1,
+									suffix,
+									\'\'
+								)
+						),
+						\')\'
+					) as label,
+					lower(author_first) as _a1,
+					lower(author_second) as _a2,
+					`year`					
+				from %table%
+				where
+					(author_first like "%'.mysql_real_escape_string($search).'%" or
+					author_second like "%'.mysql_real_escape_string($search).'%" or
+					`year` like "%'.mysql_real_escape_string($search).'%")
+					and project_id = '.$this->getCurrentProjectId().'
+				order by _a1,_a2,`year`'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				$this->controllerBaseName,
+				'../literature/reference.php?id=%s'
+			)
+		);
+		
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
