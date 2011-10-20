@@ -2218,7 +2218,6 @@ app/species/taxon.
 	
 				$this->models->Synonym->save(
 					array(
-						'id' => null,
 						'project_id' => $this->getCurrentProjectId(),
 						'taxon_id' => $this->requestData['id'],
 						'lit_ref_id' => $this->rHasVal('lit_ref_id') ? $this->requestData['lit_ref_id'] : null,
@@ -2227,6 +2226,8 @@ app/species/taxon.
 						'show_order' => $show_order
 					)
 				);
+				
+//				echo $this->models->Synonym->getLastQuery();die();
 	
 			}
 			
@@ -2260,6 +2261,7 @@ app/species/taxon.
 		}
 
 		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
 		$this->smarty->assign('literature', $literature);

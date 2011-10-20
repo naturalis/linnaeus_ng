@@ -96,6 +96,17 @@ abstract class Model extends BaseClass
     public function save($data)
     {
 
+        if ($this->hasId($data)) {
+            
+            return $this->update($data);
+        
+        } else {
+            
+            return $this->insert($data);
+        
+        }
+
+		/*
         if (!$this->hasId($data)) return false;
 
         $this->_get();
@@ -110,6 +121,7 @@ abstract class Model extends BaseClass
             return $this->update($data);
         
         }
+		*/
     
     }
 
@@ -425,6 +437,7 @@ abstract class Model extends BaseClass
 		$limit = isset($params['limit']) ? $params['limit'] : false;
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+		$where = isset($params['where']) ? $params['where'] : false;
 
         unset($this->data);
         
@@ -436,36 +449,14 @@ abstract class Model extends BaseClass
 				'group' => $group, 
 				'ignoreCase' => $ignoreCase, 
 				'fieldAsIndex' => $fieldAsIndex, 
-				'limit' => $limit
+				'limit' => $limit,
+				'where' => $where
 			)
 		);
         
         return isset($this->data) ? $this->data : null;
 
     }
-
-	/*
-    public function get($id=false,$columns=false,$order=false,$group=false,$ignoreCase=true,$fieldAsIndex=false,$limit=false)
-    {
-
-        unset($this->data);
-        
-        $this->set(
-			array(
-				'id' => ($id ? $id : $this->id), 
-				'columns' => $columns, 
-				'order' => $order, 
-				'group' => $group, 
-				'ignoreCase' => $ignoreCase, 
-				'fieldAsIndex' => $fieldAsIndex, 
-				'limit' => $limit
-			)
-		);
-        
-        return isset($this->data) ? $this->data : null;
-    
-    }
-	*/
 
     /**
      * Returns the id of a newly inserted row
@@ -681,7 +672,7 @@ abstract class Model extends BaseClass
         
         foreach ((array) $data as $col => $val) {
             
-            if ($col == 'id') {
+            if ($col == 'id' && $val != null) {
                 
                 $this->id = $val;
                 
@@ -760,10 +751,11 @@ abstract class Model extends BaseClass
 		$limit = isset($params['limit']) ? $params['limit'] : false;
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+		$where = isset($params['where']) ? $params['where'] : false;
 
         $query = false;
         
-        if (!$id) return;
+        if (!$id && !$where) return;
 			
         if (is_array($id)) {
 
@@ -902,6 +894,30 @@ abstract class Model extends BaseClass
 			
             $this->data = @mysql_fetch_assoc($m);
         
+        } elseif (isset($where)) {
+
+            $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where ' . $where;
+
+            $this->setLastQuery($query);
+
+            $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
+
+            $this->setLastQuery($query);
+            
+            while ($row = @mysql_fetch_assoc($set)) {
+                
+				if ($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
+
+	                $this->data[$row[$fieldAsIndex]] = $row;
+
+				} else {
+
+	                $this->data[] = $row;
+
+            	}
+
+            }
+
         } elseif (!is_null($id)) {
 
 			$query = str_replace('%table%', $this->tableName, $id);
@@ -948,6 +964,3 @@ abstract class Model extends BaseClass
 
 
 }
-
-
-?>

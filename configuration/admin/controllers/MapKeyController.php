@@ -707,7 +707,7 @@ class MapKeyController extends Controller
 
 			return $this->models->GeodataTypeTitle->save(
 				array(
-					'id' => (isset($gtt[0]['id']) ? $gtt[0]['id'] : 'null' ),
+					'id' => (isset($gtt[0]['id']) ? $gtt[0]['id'] : null ),
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $languageId,
 					'type_id' => $type_id,

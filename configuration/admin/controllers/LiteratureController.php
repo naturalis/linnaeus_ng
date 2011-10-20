@@ -126,7 +126,7 @@ class LiteratureController extends Controller
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
-			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : 'null';
+			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : null;
 
 			$data['multiple_authors'] = $data['auths']=='n' ? 1 : 0;
 
@@ -173,7 +173,6 @@ class LiteratureController extends Controller
 
 						$this->models->LiteratureTaxon->save(
 							array(
-								'id' => 'null',
 								'project_id' => $this->getCurrentProjectId(),
 								'literature_id' => $id,
 								'taxon_id' => $val

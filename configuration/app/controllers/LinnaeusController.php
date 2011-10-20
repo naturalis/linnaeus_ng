@@ -1,11 +1,17 @@
 <?php
 
-//$this->matchGlossaryTerms(
+	/*
+
+		$textWithGlossaryMatches = $linnaeusController->matchGlossaryTerms($textWithoutGlossaryMatches));
+
+	*/
 
 include_once ('Controller.php');
 
 class LinnaeusController extends Controller
 {
+
+	public $noResultCaching = true;
 
     public $usedModels = array(
 		'content',
@@ -255,6 +261,7 @@ class LinnaeusController extends Controller
 	
 	}
 
+	/* TEST function */
     public function rSearchAction ()
 	{
 
@@ -291,6 +298,7 @@ class LinnaeusController extends Controller
 	
 	}
 
+	/* TEST functions */
     public function rGetTaxon ()
 	{
 
@@ -521,7 +529,28 @@ q($results,1,1);
         $this->printPage();
 	
 	}
+
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
+        $this->printPage();
+    
+    }
 	
+
     /**
      * Index of project: introduction
      *
@@ -534,7 +563,10 @@ q($results,1,1);
 
 			if (strlen($this->requestData['search'])>2) { 
 			
-				if (!isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']])) {
+				if (
+					!isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]) || 
+					$this->noResultCaching
+					) {
 
 					$results = $this->doSearch($this->requestData['search']);
 		
@@ -579,7 +611,6 @@ q($results,1,1);
 
 		}
 
-  
     }
 
 	private function _highlightFoundCallback($matches)
@@ -744,8 +775,10 @@ q($results,1,1);
 	
 	}
 
-	private function searchSpecies($search)
+	private function searchSpecies($search,$extensive=true)
 	{
+
+		$taxa = $synonyms = $commonnames = $content = $media = array();
 
 		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
 
@@ -772,30 +805,24 @@ q($results,1,1);
 			)
 		);
 
-		$commonnames1 = $this->models->Commonname->_get(
+		$commonnames = $this->models->Commonname->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-//					'language_id' => $this->getCurrentLanguageId(),
-					'commonname regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,language_id,taxon_id,commonname as label,\'names\' as cat'
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId(). ' and
+					(
+						commonname regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						transliteration regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+					)',
+				'columns' => 
+					'id,
+					language_id,
+					taxon_id,
+					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) as label,
+					\'names\' as cat'
 			)
-		);
-
-		$commonnames2 = $this->models->Commonname->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-//					'language_id' => $this->getCurrentLanguageId(),
-					'transliteration regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,language_id,taxon_id,transliteration as label,\'names\' as cat'
-			)
-		);
-
-		$commonnames = array_merge((array)$commonnames1,(array)$commonnames2);
-		
+		);	
+	
+	
 		foreach((array)$commonnames as $key => $val) {
 
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));
@@ -803,44 +830,47 @@ q($results,1,1);
 
 		}
 
-		$content = $this->models->ContentTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'publish' => 1,
-					'content regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,taxon_id,content as content,page_id as cat'
-			)
-		);
+		if ($extensive) {
 
-		$media1 = $this->models->MediaTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-//					'language_id' => $this->getCurrentLanguageId(),
-					'file_name regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-			'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
-			)
-		);
+			$content = $this->models->ContentTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'publish' => 1,
+						'content regexp' => $this->makeRegExpCompatSearchString($search)
+					),
+					'columns' => 'id,taxon_id,content as content,page_id as cat'
+				)
+			);
+	
+			$media1 = $this->models->MediaTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+	//					'language_id' => $this->getCurrentLanguageId(),
+						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+					),
+				'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
+				)
+			);
+	
+			$media2 = $this->models->MediaDescriptionsTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'description regexp' => $this->makeRegExpCompatSearchString($search)
+					),
+				'columns' => 'id,taxon_id,media_id,description as content,\'media\' as cat'
+				)
+			);
+	
+			$media = array_merge((array)$media1,(array)$media2);
 
-		$media2 = $this->models->MediaDescriptionsTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'description regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-			'columns' => 'id,taxon_id,media_id,description as content,\'media\' as cat'
-			)
-		);
-
-		$media = array_merge((array)$media1,(array)$media2);
-
+		}		
+		
 		$d = array_merge((array)$synonyms,(array)$commonnames,(array)$content,(array)$media);
-
 
 		return array(
 			'results' => array(
@@ -877,35 +907,63 @@ q($results,1,1);
 
 	}
 
+	private function getSpeciesLookupList($search)
+	{
+
+		$s = $this->searchSpecies($search,false);
+
+		$d = array();
+		
+		foreach((array)$s['results'] as $val) {
+		
+			if (
+				is_array($val['data']) &&
+					(
+						$val['label']=='Species names' ||
+						$val['label']=='Species synonyms' ||
+						$val['label']=='Species common names'	
+					)
+				) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['taxon_id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../species/taxon.php?id='.$val2['taxon_id'].($val['label']!='Species names' ? '&cat=names' : '')
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+
+	}
+
 	private function searchModules($search)
 	{
 
-		$content1 = $this->models->ContentFreeModule->_get(
+		$content = $this->models->ContentFreeModule->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'topic regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'page_id,module_id,topic as label',
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().' and
+					language_id ='.$this->getCurrentLanguageId().' and
+					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
+					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+				'columns' => 
+					'page_id,
+					module_id,
+					topic as label,
+					if(content regexp \''.$this->makeRegExpCompatSearchString($search).'\',content,null) as content',
 				'order' => 'module_id'
 			)
 		);
-
-		$content2 = $this->models->ContentFreeModule->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'content regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'page_id,module_id,topic,content as content',
-				'order' => 'module_id'
-			)
-		);
-
-		$content = array_merge((array)$content1,(array)$content2);
-
+		
+		
 		foreach((array)$content as $key => $val) {
 
 			$module = $this->models->FreeModuleProject->_get(
@@ -932,6 +990,36 @@ q($results,1,1);
 		);
 
 	}
+	
+	private function getModuleLookupList($search)
+	{
+	
+		$l = $this->searchModules($search);
+	
+		$d = array();
+		
+		foreach((array)$l['results'] as $val) {
+		
+			if (is_array($val['data'])) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['page_id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../module/topic.php?id='.$val2['page_id'].'&modId='.$val2['module_id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+	
+	}	
 
 	private function searchMatrixKey($search)
 	{
@@ -1191,86 +1279,34 @@ q($results,1,1);
 
 	}
 
-	private function searchLiterature($search)
+	private function searchLiterature($search,$extensive=true)
 	{
 
-		$books1 = $this->models->Literature->_get(
+		$books = $this->models->Literature->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'author_first regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,year(`year`) as year,author_first as label,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().'
+					and (
+						author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
+						($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
+						')',
+				'columns' => 
+					'id,
+					concat(year(`year`),ifnull(suffix,\'\')) as year,
+					text as content,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						)
+					) as author_full',
 			)
 		);
-
-		$books2 = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'author_second regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,year(`year`) as year,author_second as label,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
-			)
-		);
-
-		$books3 = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'year regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,year(`year`) as year,year as label,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
-			)
-		);
-
-		$books4 = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'text regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,year(`year`) as year ,text as content,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
-			)
-		);
-
-		$books = array_merge((array)$books1,(array)$books2,(array)$books3,(array)$books4);
 
 		return array(
 			'results' => array(
@@ -1285,32 +1321,53 @@ q($results,1,1);
 
 	}
 
-	private function searchGlossary($search)
+	private function getLiteratureLookupList($search)
+	{
+	
+		$l = $this->searchLiterature($search,false);
+	
+		$d = array();
+		
+		foreach((array)$l['results'] as $val) {
+		
+			if (is_array($val['data'])) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['id'],
+						'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
+						'source' => $val['label'],
+						'url'  => '../literature/term.php?id='.$val2['id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+	
+	}
+
+	private function searchGlossary($search,$extensive=true)
 	{
 
-		$gloss1 = $this->models->Glossary->_get(
+		$gloss = $this->models->Glossary->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'term regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,term as label'
-			)
-		);
-
-		$gloss2 = $this->models->Glossary->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'definition regexp' => $this->makeRegExpCompatSearchString($search)
-				),
+				'where' =>
+					'project_id = '.$this->getCurrentProjectId().' and
+					language_id = '. $this->getCurrentLanguageId().' and
+					(
+						term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
+						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
+					')'
+				,
 				'columns' => 'id,term as label,definition as content'
 			)
 		);
 
-		$gloss = array_merge((array)$gloss1,(array)$gloss2);
 
 		$synonyms = $this->models->GlossarySynonym->_get(
 			array(
@@ -1339,36 +1396,40 @@ q($results,1,1);
 
 		}
 
-		$media = $this->models->GlossaryMedia->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'file_name regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'glossary_id as id,file_name as label'
-			)
-		);
+		if ($extensive) {
 
-		foreach((array)$media as $key => $val) {
-		
-			$g = $this->models->Glossary->_get(
+			$media = $this->models->GlossaryMedia->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'id' => $val['id']
+						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-					'columns' => 'term'
+					'columns' => 'glossary_id as id,file_name as label'
 				)
 			);
 	
-			if (isset($g)) {
-
-				$d[$key] = $val;
-				$d[$key]['term'] = $g[0]['term'];
-
+			foreach((array)$media as $key => $val) {
+			
+				$g = $this->models->Glossary->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->getCurrentLanguageId(),
+							'id' => $val['id']
+						),
+						'columns' => 'term'
+					)
+				);
+		
+				if (isset($g)) {
+	
+					$d[$key] = $val;
+					$d[$key]['term'] = $g[0]['term'];
+	
+				}
+	
 			}
-
+			
 		}
 
 		$media = isset($d) ? $d : null;
@@ -1393,6 +1454,36 @@ q($results,1,1);
 			),
 			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media)
 		);
+
+	}
+
+	private function getGlossaryLookupList($search)
+	{
+
+		$g = $this->searchGlossary($search,false);
+
+		$d = array();
+		
+		foreach((array)$g['results'] as $val) {
+		
+			if (is_array($val['data']) && ($val['label']=='Glossary terms' || $val['label']=='Glossary synonyms')) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../glossary/term.php?id='.$val2['id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
 
 	}
 
@@ -1482,6 +1573,33 @@ q($results,1,1);
 
 	}
 
+	private function getLookupList($search)
+	{
+	
+		/*
+		excluded:
+		- Introduction / other content
+		- Dichotomous key
+		- Matrix key 
+		- Map key
+		*/
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				array_merge(
+					$this->getGlossaryLookupList($search),
+					$this->getLiteratureLookupList($search),
+					$this->getSpeciesLookupList($search),
+					$this->getModuleLookupList($search)
+				),
+				$this->controllerBaseName,
+				null,
+				true
+			)
+		);
+
+	}
 
 	private function DECtoDMS($dec,$formatted=false)
 	{

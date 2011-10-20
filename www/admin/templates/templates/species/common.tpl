@@ -117,6 +117,8 @@ allDrawLanguages();
 taxonGetCommonnameLabels(allDefaultLanguage);
 taxonGetCommonnameLabels(allActiveLanguage);
 
+allLookupNavigateOverrideUrl('common.php?id=%s');
+
 {literal}
 });
 {/literal}

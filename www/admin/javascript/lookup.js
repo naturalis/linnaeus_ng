@@ -30,9 +30,8 @@ var allLookupBoxName = 'allLookupBox';
 var allLookupTargetUrl = false;
 var allLookupData = null;
 var allLookupLastString = null;
-var allNavigateDefaultUrl = 'edit.php?id=%s';
+var allNavigateDefaultUrl = 'item.php?id=%s';
 var allNavigateTargetUrl = null;
-
 
 function allLookupNavigateOverrideUrl(url) {
 
@@ -46,10 +45,11 @@ function allLookup() {
 
 	if (text == allLookupLastString) return;
 	
-	allLookupGetData(text);
-	allLookupPositionDiv();
-	allLookupShowDiv();
-	
+	if (allLookupGetData(text)) {
+		allLookupPositionDiv();
+		allLookupShowDiv();
+	}
+
 	allLookupLastString = text;
 	
 }
@@ -62,7 +62,7 @@ function allLookupGetData(text) {
 		allLookupClearDiv();
 		allLookupData = null;
 		allLookupHideDiv();
-		return;
+		return false;
 
 	}
 
@@ -108,6 +108,8 @@ function allLookupGetData(text) {
 		allLookupBuildList(d,text);
 
 	}
+
+	return true;
 
 }
 

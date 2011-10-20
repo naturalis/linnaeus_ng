@@ -141,9 +141,9 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		<span class="result" onclick="goModuleTopic({$v.page_id},{$v.module_id})">
-			{if $v.label}{h search=$search}{$v.label}{/h}
-			{elseif $v.content}{$v.topic}: "{foundContent search=$search}{$v.content}{/foundContent}"
-			{/if}
+			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
+			{if $v.label && $v.content}: {/if}
+			{if $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span><br/>
 		{/foreach}
 	</div>

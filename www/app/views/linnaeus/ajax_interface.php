@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/IndexController.php');
+require_once ('../../../../configuration/app/controllers/LinnaeusController.php');
 
-$c = new IndexController();
+$c = new LinnaeusController();
 
 $c->ajaxInterfaceAction();
