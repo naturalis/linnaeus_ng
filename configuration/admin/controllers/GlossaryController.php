@@ -264,11 +264,11 @@ class GlossaryController extends Controller
 
 			$data['project_id'] = $this->getCurrentProjectId();
 
-			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : 'null';
+			$data['id'] =  $this->rHasId() ? $this->requestData['id'] : null;
 
             $data['definition'] = $this->cleanUpRichContent($data['definition']);
 
-			if ($data['id']=='null' && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
+			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
 
 				$this->addError(_('Glossary term already exists.'));
 
@@ -278,7 +278,7 @@ class GlossaryController extends Controller
 
 			} else
 			if ($this->models->Glossary->save($data)) {
-			
+
 				$navList = $this->getGlossaryTermsNavList(true);
 
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
@@ -296,7 +296,6 @@ class GlossaryController extends Controller
 
 						$this->models->GlossarySynonym->save(
 							array(
-								'id' => 'null',
 								'project_id' => $this->getCurrentProjectId(),
 								'glossary_id' => $id,
 								'language_id' => $this->requestData['language_id'],
@@ -339,7 +338,7 @@ class GlossaryController extends Controller
         if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-		$this->smarty->assign('navCurrentId',$gloss['id']);
+		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 

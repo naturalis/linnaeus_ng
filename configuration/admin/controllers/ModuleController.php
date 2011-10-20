@@ -478,7 +478,6 @@ class ModuleController extends Controller
 
 		$this->models->FreeModulePage->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'module_id' => $this->getCurrentModuleId()
 			)

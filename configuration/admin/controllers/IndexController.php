@@ -1,18 +1,13 @@
 <?php
 
-/*
-
- DON'T HAVE SPECIES YET!
-
-*/
-
-
 include_once ('Controller.php');
 
 class IndexController extends Controller
 {
     
     public $usedModels = array(
+		'synonym',
+		'commonname',
 		'glossary',
 		'glossary_synonym',
 		'literature',
@@ -21,7 +16,6 @@ class IndexController extends Controller
     );
     
     public $controllerPublicName = 'Index';
-
 
     /**
      * Constructor, calls parent's constructor
@@ -35,7 +29,6 @@ class IndexController extends Controller
 
     }
 
-
     /**
      * Destroys!
      *
@@ -47,7 +40,6 @@ class IndexController extends Controller
         parent::__destruct();
     
     }
-
 
     /**
      * AJAX interface for this class
@@ -68,7 +60,6 @@ class IndexController extends Controller
         $this->printPage();
     
     }
-
 
 	private function getLookupList($search)
 	{
@@ -101,19 +92,8 @@ class IndexController extends Controller
 				true
 			)
 		);	
-
-/*
-Species module
-	taxn
-	syn
-	common
-Higher taxa 		
-	taxn
-	syn
-	common
-*/		
+		
 	}
-
 
 	private function getGlossaryLookupList($search)
 	{
@@ -152,7 +132,6 @@ Higher taxa
 		return array_merge((array)$l1,(array)$l2);
 
 	}
-
 
 	private function getLiteratureLookupList($search)
 	{
@@ -200,11 +179,80 @@ Higher taxa
 
 	}
 
+	private function makeRegExpCompatSearchString($s)
+	{
+	
+		$s = trim($s);
+
+		// if string enclosed by " take it literally		
+		if (preg_match('/^"(.+)"$/',$s)) return '('.mysql_real_escape_string(substr($s,1,strlen($s)-2)).')';
+
+		$s = preg_replace('/(\s+)/',' ',$s);
+
+		if (strpos($s,' ')===0) return mysql_real_escape_string($s);
+
+		$s = str_replace(' ','|',$s);
+
+		return '('.mysql_real_escape_string($s).')';
+	
+	}
+
 	private function getSpeciesLookupList($search)
 	{
 
+		$taxa = $synonyms = $commonnames = array();
+
+		//$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+
+		$taxa = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'views/species/taxon.php?id=\',id) as url'
+			)
+		);
+
+		$synonyms = $this->models->Synonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
+			)
+		);
+
+		$commonnames = $this->models->Commonname->_get(
+			array(
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId(). ' and
+					(
+						commonname regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						transliteration regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+					)',
+				'columns' => 
+					'taxon_id as id,
+					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) as label,
+					\'common name\' as source, 
+					concat(\'views/species/common.php?id=\',taxon_id) as url'
+			)
+		);	
+	
+		/*
+		foreach((array)$commonnames as $key => $val) {
+
+            $l = $this->models->Language->_get(array('id'=>$val['language_id']));
+			$commonnames[$key]['language'] = $l['language'];
+
+		}
+		*/
+
+		return array_merge($taxa,$synonyms,$commonnames);
+
 	}
-		
+
 	private function getModuleLookupList($search)
 	{
 

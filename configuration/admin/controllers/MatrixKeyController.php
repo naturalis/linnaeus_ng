@@ -297,7 +297,6 @@ class MatrixKeyController extends Controller
 
 			$this->models->MatrixTaxon->save(
 				array(
-					'id' => 'null',
 					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $this->getCurrentMatrixId(),
 					'taxon_id' => $this->requestData['taxon']
@@ -408,7 +407,7 @@ class MatrixKeyController extends Controller
 
 					$this->models->CharacteristicState->save(
 						array(
-							'id' => ($this->rHasId() ? $this->requestData['id'] : 'null'),
+							'id' => ($this->rHasId() ? $this->requestData['id'] : null),
 							'project_id' => $this->getCurrentProjectId(),
 							'characteristic_id' => $this->requestData['char'],
 							'file_name' => isset($filesToSave[0]['name']) ? $filesToSave[0]['name'] : null,
@@ -579,7 +578,6 @@ class MatrixKeyController extends Controller
 	
 		$this->models->Matrix->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId()
 			)
 		);
@@ -826,7 +824,6 @@ class MatrixKeyController extends Controller
 
 		$this->models->Characteristic->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'type' => $this->controllerSettings['characteristicTypes'][0]['name']
 			)
@@ -845,7 +842,6 @@ class MatrixKeyController extends Controller
 
 		@$this->models->CharacteristicMatrix->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $matrixId,
 				'characteristic_id' => $charId
@@ -1183,7 +1179,6 @@ class MatrixKeyController extends Controller
 
 		$this->models->CharacteristicState->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'characteristic_id' => $this->requestData['char'],
 			)
@@ -1670,7 +1665,6 @@ class MatrixKeyController extends Controller
 
 		@$this->models->MatrixTaxonState->save(
 			array(
-				'id' => 'null',
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $this->getCurrentMatrixId(),
 				'taxon_id' => $taxonId,

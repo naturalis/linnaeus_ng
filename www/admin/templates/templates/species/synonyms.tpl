@@ -85,7 +85,17 @@
 </form>
 </div>
 
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+allLookupNavigateOverrideUrl('synonyms.php?id=%s');
+{literal}
+});
+</script>
+{/literal}
+
+
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
-
-
