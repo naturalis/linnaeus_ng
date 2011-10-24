@@ -59,6 +59,9 @@ class Controller extends BaseClass
 		'rank',
 		'project_rank',
 		'label_project_rank',
+		'module',
+		'free_module_project'
+
     );
 
     private $usedHelpersBase = array(
@@ -1417,6 +1420,76 @@ class Controller extends BaseClass
 		unset($_SESSION['matrixkey']);	
 	
 	}
+
+	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null)
+	{
+
+		$this->includeLocalMenu  = false;
+
+		$this->smarty->assign('menu', $this->getFrontEndMainMenu());
+
+		unset($this->cssToLoad);
+
+		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
+		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/'.$specificStylesheet;
+		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/search.css';
+		
+		$this->printPage('../../../../app/templates/templates/shared/_head');
+		$this->printPage('../../../../app/templates/templates/shared/_body-start');
+		$this->printPage('../../../../app/templates/templates/shared/_header-container');
+		$this->printPage('../../../../app/templates/templates/shared/_main-menu');
+		$this->printPage('../../../../app/templates/templates/shared/_page-start');
+		@$this->printPage('../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu');
+		if (isset($specificTemplate)) $this->printPage($specificTemplate);
+		$this->printPage('../../../../app/templates/templates/shared/_footer');
+		$this->printPage('../shared/preview-overlay');
+		
+	}
+		
+	private function getFrontEndMainMenu()
+	{
+
+		$modules = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'active' => 'y'
+				), 
+				'order' => 'module_id asc'
+			)
+		);
+
+		foreach ((array) $modules as $key => $val) {
+			
+			$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
+			
+			$modules[$key]['type'] = 'regular';
+			$modules[$key]['icon'] = $mp['icon'];
+			$modules[$key]['module'] = $mp['module'];
+			$modules[$key]['controller'] = $mp['controller'];
+
+		}
+
+		$freeModules = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'active' => 'y'
+				)
+			)
+		);
+		
+		foreach ((array) $freeModules as $key => $val) {
+
+			$val['type'] = 'free';
+			$modules[] = $val;
+
+		}
+		
+		return $modules;
+
+	}
+
 
     private function _getTaxonTree($params) 
     {
