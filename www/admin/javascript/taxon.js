@@ -1442,15 +1442,8 @@ function taxonOrphanChangeSelect(ele) {
 
 function taxonDoPreview() {
 
+	taxonSaveDataAll();
 	$('#theForm').attr('action','preview.php')
 	$('#theForm').submit();
 
 }
-
-
-
-
-
-
-
-

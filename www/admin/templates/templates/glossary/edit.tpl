@@ -90,7 +90,8 @@
 	<tr><td colspan="2">&nbsp;</td></tr>		
 	<tr>
 		<td colspan="2">
-			<input type="button" value="{t}save{/t}" onclick="glossCheckForm(this)" />
+			<input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm(this)" />
+			<input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm(this)" />
 			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->
 			{if $gloss.id}
 			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
