@@ -86,6 +86,7 @@ class configuration
 				'log' => $this->_appFileRoot . 'log',
             ), 
             'maxCategories' => 10,
+			'defaultHybridMarker' => 'X',
             'login-cookie' => array(
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days

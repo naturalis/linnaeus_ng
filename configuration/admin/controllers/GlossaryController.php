@@ -313,6 +313,11 @@ class GlossaryController extends Controller
 
 					$this->redirect('media_upload.php?id='.$id);
 
+				} else
+				if ($this->rHasVal('action','preview')) {
+
+					$this->redirect('preview.php?id='.$id);
+
 				} else {
 
 					$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
@@ -632,6 +637,39 @@ class GlossaryController extends Controller
 	}
 
 
+    public function previewAction ()
+    {
+
+		$term = $this->getGlossaryTerm($this->requestData['id']);
+
+		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
+		//$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
+		//$this->smarty->assign('prevUrl','taxon.php?id='.$d[$taxon['id']]['prev']['id']);
+
+		//$letter = strtolower(substr($term['term'],0,1));
+
+		//$this->setPageName(sprintf(_('Glossary: "%s"'),$term['term']));
+
+		//$alpha = $this->getGlossaryAlphabet($this->didActiveLanguageChange());
+
+		//if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
+
+		//if (isset($letter)) $this->smarty->assign('letter', $letter);
+
+		if (isset($term)) $this->smarty->assign('term', $term);
+
+		//if (isset($term)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($term['id']));
+
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/glossary/_term',
+			'glossary.css'
+		);
+
+		// front-end template
+		// font-end stye
+    
+    }
+
 	private function embedGlossaryLink($matches)
 	{
 
@@ -844,6 +882,7 @@ class GlossaryController extends Controller
 			$term = $l[0];
 			
 			$term['synonyms'] = $this->getGlossarySynonyms($thisId);
+			$term['media'] = $this->getGlossaryMedia($thisId);
 
 			return $term;
 
