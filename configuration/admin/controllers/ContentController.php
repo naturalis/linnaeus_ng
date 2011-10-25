@@ -99,6 +99,22 @@ class ContentController extends Controller
     
     }
 
+    /**
+     * Contributors
+     *
+     * @access    public
+     */
+
+    public function aboutEtiAction()
+    {
+    
+		$_SESSION['system']['content']['current-subject'] = 'About ETI';
+		$_SESSION['system']['content']['is-free-module'] = false;
+
+		$this->redirect('content.php');
+    
+    }
+
     public function contentAction()
     {
     
