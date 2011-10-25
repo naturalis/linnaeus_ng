@@ -1,10 +1,11 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form action="" method="post" id="theForm">
+<form action="" method="post" id="theForm" action="edit.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$gloss.id}" />
 <input type="hidden" name="action" id="action" value="" />
+<input type="hidden" name="letter" id="letter" value="" />
 {if $languages|@count==1}
 <input type="hidden" name="language_id" value="{$languages[0].language_id}" />
 {/if}

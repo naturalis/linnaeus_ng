@@ -3,4 +3,18 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
-<a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
+<a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
+<p>
+{if $alpha|@count==0}
+{t}(no terms have been defined){/t}
+{else}
+{t}Click to browse:{/t}&nbsp;
+{section name=i loop=$alpha}
+{if $alpha[i]==$letter}
+<span class="alphabet-active-letter">{$alpha[i]}</span>
+{else}
+<span class="alphabet-letter" onclick="$('#action').val('browse');$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
+{/if}
+{/section}
+{/if}
+</p>
