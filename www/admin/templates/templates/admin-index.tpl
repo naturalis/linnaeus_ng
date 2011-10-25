@@ -2,20 +2,11 @@
 {include file="shared/_admin-body-start.tpl"}
 
 <div id="page-main">
-
-<table>
-	<tr><td colspan="2">{t}Content{/t}</td></tr>
-	<tr><td colspan="2">{t}Welcome{/t}</td></tr>
-	<tr><td colspan="2">{t}Contributors{/t}</td></tr>
-	<tr><td colspan="2">{t}About ETI{/t}</td></tr>
-</table>
-
-
 <table>
 	<tr>
 {assign var=i value=1}
 {section name=i loop=$modules}
-{if $modules[i]._rights}
+{if $modules[i]._rights && $modules[i].module!='Introduction'}
 	{assign var=i value=$i+1}
 		<td>
 			<a href="views/{$modules[i].controller}/">

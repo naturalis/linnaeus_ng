@@ -5,14 +5,6 @@
 <input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />
 <input type="hidden" name="subject" id="subject" value="{$subject}" />
 
-<span style="padding-left:10px">
-{t}switch to:{/t} <select id="pageSelector" onchange="contentSwitchPage()">
-{section name=i loop=$subjects}
-<option value="{$subjects[i].url}"{if $subject==$subjects[i].name} selected="selected"{/if}>{$subjects[i].name}</option>
-{/section}		
-</select>
-</span>
-
 <span id="message-container" style="padding-left:10px"></span>
 
 <div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">
