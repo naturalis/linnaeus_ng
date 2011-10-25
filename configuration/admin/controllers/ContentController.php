@@ -100,7 +100,7 @@ class ContentController extends Controller
     }
 
     /**
-     * Contributors
+     * About ETI
      *
      * @access    public
      */
@@ -115,6 +115,22 @@ class ContentController extends Controller
     
     }
 
+
+    /**
+     * Welcome
+     *
+     * @access    public
+     */
+    public function welcomeAction()
+    {
+    
+		$_SESSION['system']['content']['current-subject'] = 'Welcome';
+		$_SESSION['system']['content']['is-free-module'] = false;
+
+		$this->redirect('content.php');
+    
+    }
+	
     public function contentAction()
     {
     
