@@ -2036,7 +2036,7 @@ class Controller extends BaseClass
 
 			//$this->requestData = $_REQUEST; // also contains cookies
 			$this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
-	
+
 			foreach ((array) $this->requestData as $key => $val) {
 				
 				if (is_array($val)) {

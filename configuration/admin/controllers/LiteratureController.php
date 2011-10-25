@@ -50,9 +50,10 @@ class LiteratureController extends Controller
     
 		$this->clearTempValues();
 
-		$d = $this->getFirstReference();
+		//$d = $this->getFirstReference();
 		
-		$this->redirect('edit.php?id='.$d['id']);
+		//$this->redirect('edit.php?id='.$d['id']);
+		$this->redirect('edit.php');
 
 		/*
 
@@ -80,7 +81,24 @@ class LiteratureController extends Controller
 
 		}
 
-		if ($this->rHasId()) $ref = $this->getReference();
+
+		if ($this->rHasVal('letter')) {
+
+			$ref = $this->getFirstReference($this->requestData['letter']);
+		
+		} else
+		if ($this->rHasId()) {
+
+			$ref = $this->getReference();
+
+		} else
+		if (!$this->rHasVal('action','new')) {
+
+			$ref = $this->getFirstReference();
+			
+		}
+
+		$alpha = $this->getActualAlphabet();
 
 		$navList = $this->getReferencesNavList();
 
@@ -229,11 +247,18 @@ class LiteratureController extends Controller
 		if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
-		$this->smarty->assign('navCurrentId',$ref['id']);
 
-        if (isset($ref)) $this->smarty->assign('ref', $ref);
+		if (isset($ref))  {
+		
+			$this->smarty->assign('navCurrentId',$ref['id']);
+
+	        $this->smarty->assign('ref', $ref);
+
+		}
 
 		$this->smarty->assign('includeHtmlEditor', true);
+
+		$this->smarty->assign('alpha', $alpha);
 
         $this->printPage();
 
@@ -577,20 +602,23 @@ class LiteratureController extends Controller
 
 	}
 
-	private function getFirstReference()
+	private function getFirstReference($letter=null)
 	{
+	
+		$d = array('project_id' => $this->getCurrentProjectId());
+		
+		if (isset($letter)) $d['author_first like'] = $letter.'%';
 
 		$l = $this->models->Literature->_get(
 				array(
-					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'id' => $d,
 					'order' => 'author_first',
-					'columns' => 'id',
 					'ignoreCase' => true,
-					'limit' => 1
+					'limit' => 1,
+					'columns' => '*, year(`year`) as `year`'
 				)
 			);
-		
-		
+
 		return $l[0];
 
 	}

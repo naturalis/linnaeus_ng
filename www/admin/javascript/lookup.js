@@ -30,7 +30,7 @@ var allLookupBoxName = 'allLookupBox';
 var allLookupTargetUrl = false;
 var allLookupData = null;
 var allLookupLastString = null;
-var allNavigateDefaultUrl = 'item.php?id=%s';
+var allNavigateDefaultUrl = 'edit.php?id=%s';
 var allNavigateTargetUrl = null;
 
 function allLookupNavigateOverrideUrl(url) {

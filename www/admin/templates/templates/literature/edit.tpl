@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form action="" method="post" id="theForm">
+<form action="" method="post" id="theForm" action="edit.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$ref.id}" />
 <input type="hidden" name="action" id="action" value="" />
