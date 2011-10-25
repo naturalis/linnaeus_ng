@@ -9,7 +9,7 @@
 >
 {literal}
 <input type="button" value="back to editing" onclick="window.open('{/literal}{$backUrl}{literal}','_self');" />
-<input type="button" value="next taxon" onclick="window.open('{/literal}{$nextUrl}{literal}','_self');" />
+<input type="button" value="next" onclick="window.open('{/literal}{$nextUrl}{literal}','_self');" />
 {/literal}
 </div>
 
