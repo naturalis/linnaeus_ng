@@ -6,7 +6,7 @@
 	<tr>
 {assign var=i value=1}
 {section name=i loop=$modules}
-{if $modules[i]._rights && $modules[i].module!='Introduction'}
+{if $modules[i]._rights}
 	{assign var=i value=$i+1}
 		<td>
 			<a href="views/{$modules[i].controller}/">
