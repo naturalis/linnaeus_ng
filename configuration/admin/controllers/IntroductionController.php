@@ -2,22 +2,20 @@
 
 include_once ('Controller.php');
 
-class ModuleController extends Controller
+class IntroductionController extends Controller
 {
 
     public $usedModels = array(
-		'free_module_project',
-		'free_module_project_user',
-		'free_module_page',
-		'content_free_module',
-		'free_module_media'
+		'content_introduction',
+		'introduction_pages',
+		'introduction_media'
     );
    
     public $usedHelpers = array(
         'file_upload_helper','image_thumber_helper'
     );
 
-    public $controllerPublicName = 'Free Modules';
+    public $controllerPublicName = 'Introduction';
 
 	public $cssToLoad = array(
 		'colorbox/colorbox.css',
