@@ -88,7 +88,8 @@ function allLookupGetData(text) {
 
 		if (allLookupData && allLookupData.results) {
 
-			var d = eval (allLookupData.toSource());
+			//var d = eval(allLookupData.toSource());
+			var d = jQuery.extend(true, {}, allLookupData);
 			r = new Array();
 
 			for(var i=0;i<allLookupData.results.length;i++) {
