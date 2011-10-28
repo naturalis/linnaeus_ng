@@ -2,8 +2,8 @@
 
 /*
 
+	deleting modules does not actually delete data, despite all the warning
 	set upload maximum for media uploads per projects
-    deleting of (free) moduels does not as yet delete any data, all the warnings notwithstanding
 	deleting of language should delete glossary terms
 
 */
@@ -150,7 +150,8 @@ class ProjectsController extends Controller
 				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
 
 		}
-
+echo 'eeeek!';
+//q($modules);
 		$freeModules = $this->models->FreeModuleProject->_get(
 			array(
 				'id' => array(
@@ -635,18 +636,10 @@ class ProjectsController extends Controller
                     'project_id' => $this->getCurrentProjectId()
                 ));
             
-            } elseif ($action == 'module_delete') {
-                
-                $this->models->FreeModuleProjectUser->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'free_module_id' => $moduleId
-                ));
-                
-                $this->models->FreeModuleProject->delete(array(
-                    'id' => $moduleId, 
-                    'project_id' => $this->getCurrentProjectId()
-                ));
-            
+            } elseif ($action == 'module_delete' && isset($moduleId)) {
+
+				$this->deleteFreeModules($this->getCurrentProjectId(),$moduleId);
+
             }
         
         } elseif ($moduleType == 'regular') {
@@ -699,7 +692,6 @@ class ProjectsController extends Controller
         }
     
     }
-
 
     private function ajaxActionCollaborators ($moduleType, $action, $moduleId, $userId)
     {
@@ -797,7 +789,6 @@ class ProjectsController extends Controller
 
     }
 
-
     private function ajaxActionLanguages ($action, $languageId)
     {
         
@@ -872,7 +863,6 @@ class ProjectsController extends Controller
     
     }
 
-
 	private function doDeleteProjectAction($projectId)
 	{
 
@@ -887,6 +877,7 @@ class ProjectsController extends Controller
 		$this->deleteSpeciesContent($projectId);
 		$this->deleteStandardCat($projectId);
 		$this->deleteSpecies($projectId);
+		$this->deleteFreeModules($projectId);
 		$this->deleteProjectRanks($projectId);
 		$this->deleteProjectUsers($projectId);
 		$this->deleteProjectLanguage($projectId);
@@ -1032,6 +1023,83 @@ class ProjectsController extends Controller
 	
 		$this->models->LanguageProject->delete(array('project_id' => $id));
 	
+	}
+
+	private function deleteMedia($projectId,$pageId,$paths)
+	{
+	
+		if (empty($projectId) || empty($pageId)) return;
+
+		$fmm = $this->models->FreeModuleMedia->_get(
+			array(
+				'id' => array(
+					'project_id' => $projectId,
+					'page_id' => $pageId
+				)
+			)
+		);
+
+		if (file_exists($paths['project_media'].$fmm[0]['file_name'])) {
+
+			if (unlink($paths['project_media'].$fmm[0]['file_name'])) {
+			
+				if ($fmm[0]['thumb_name'] && file_exists($paths['project_thumbs'].$fmm[0]['thumb_name'])) {
+				
+					unlink($paths['project_thumbs'].$fmm[0]['thumb_name']);
+
+				}
+			}
+
+		}
+
+		$this->models->FreeModuleMedia->delete(
+			array(
+				'project_id' => $projectId,
+				'page_id' => $pageId
+			)
+		);
+
+	}
+
+	private function deleteFreeModules($id,$moduleId=null)
+	{
+
+		if ($id == null) return;
+
+		$d['project_id'] = $id;
+		
+		if (isset($moduleId)) $d['module_id'] = $moduleId;
+
+		$this->models->ContentFreeModule->delete($d);
+		
+		$fmp = $this->models->FreeModulePage->_get(array('id' => $d));
+		
+		$paths = $this->makePathNames($id);
+		
+		foreach((array)$fmp as $key => $val) {
+		
+			$this->deleteMedia($id,$val['id'],$paths);
+
+		}
+
+		$this->models->FreeModulePage->delete($d);	
+	
+		unset($d);
+
+		$d['project_id'] = $id;
+		
+		if (isset($moduleId)) $d['free_module_id'] = $moduleId;
+				
+		$this->models->FreeModuleProjectUser->delete($d);
+		
+		unset($d);
+			
+		$d['project_id'] = $id;
+		
+		if (isset($moduleId)) $d['id'] = $moduleId;
+
+		$this->models->FreeModuleProject->delete($d);
+
 	}
 
 	private function deleteModulesFromProject($id)

@@ -900,12 +900,42 @@ class Controller extends BaseClass
         
         if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
 
+		$maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys']===true);
+
+        if ($maintainKeys) {
+
+			$keys = array();
+			
+			$f = md5(uniqid(null,true));
+	
+			foreach((array)$array as $key => $val) {
+	
+				$x = md5(json_encode($val).$key);
+				$array[$key][$f] = $x;
+				$keys[$x] = $key;
+	
+			}
+			
+		}
+
         usort($array,
 			array(
 				$this, 
 				'doCustomSortArray'
         	)
 		);
+
+        if ($maintainKeys) {
+
+			foreach((array)$array as $val) {
+			
+				$d[$keys[$val[$f]]] = $val;
+			
+			}
+			
+			$array = $d;
+			
+		}
     
     }
 
@@ -1255,6 +1285,15 @@ class Controller extends BaseClass
 	{
 
 		/*
+
+			$pagination = $this->getPagination($gloss,$this->controllerSettings['termsPerPage']);
+
+			$gloss = $pagination['items'];
+
+			$this->smarty->assign('prevStart', $pagination['prevStart']);
+		
+			$this->smarty->assign('nextStart', $pagination['nextStart']);
+
 		
 		{if $prevStart!=-1 || $nextStart!=-1}
 			<div id="navigation">
@@ -1737,7 +1776,7 @@ class Controller extends BaseClass
         if (isset($list)) $_SESSION['project']['languageList'] = $list;
 		
     }
-	
+
 	public function rHasVal($var,$val=null)
 	{
 
