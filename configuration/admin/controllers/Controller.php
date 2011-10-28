@@ -880,13 +880,11 @@ class Controller extends BaseClass
 	}
 
 
-
-
     /**
      * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
      *
      * @param array    $array    array to sort
-     * @param array    $sortBy    array to array of key, direction and case-sensitivity
+     * @param array    $sortBy    array to array of key, direction, case-sensitivity and whether or not to maintain key-association
      * @access     public
      */
     public function customSortArray (&$array, $sortBy)
@@ -938,7 +936,6 @@ class Controller extends BaseClass
 		}
     
     }
-
 
 
     /**

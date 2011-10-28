@@ -150,7 +150,7 @@ class ProjectsController extends Controller
 				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
 
 		}
-echo 'eeeek!';
+//echo 'eeeek!';
 //q($modules);
 		$freeModules = $this->models->FreeModuleProject->_get(
 			array(

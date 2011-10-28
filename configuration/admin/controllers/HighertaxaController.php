@@ -55,5 +55,16 @@ class HighertaxaController extends Controller
   
     }
 
+    public function editAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		$_SESSION['system']['highertaxa'] = true;
+		
+		$this->redirect('../species/edit.php?id='.$this->requestData['id']);
+
+    }
+
 }
 
