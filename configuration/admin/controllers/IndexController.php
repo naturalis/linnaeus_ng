@@ -19,6 +19,9 @@ class IndexController extends Controller
     
     public $controllerPublicName = 'Index';
 
+	public $cssToLoad = array('lookup.css');
+	public $jsToLoad = array('all'=>array('lookup.js'));
+
     /**
      * Constructor, calls parent's constructor
      *
@@ -28,6 +31,8 @@ class IndexController extends Controller
     {
         
         parent::__construct();
+
+		$_SESSION['system']['highertaxa'] = false;
 
     }
 
@@ -80,7 +85,9 @@ class IndexController extends Controller
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
-        $this->printPage();
+		$this->smarty->assign('taxonType',$this->getTaxonType());
+
+        $this->printPage('index');
 
 		
 	}
@@ -109,32 +116,58 @@ class IndexController extends Controller
         $this->checkAuthorisation();
 
         $this->setPageName(_('Index: comon names'));
-
+		
 		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
 		$names = $this->getCommonnameLookupList();
 
 		foreach((array)$names as $key => $val) {
 		
-			$names[$key]['language'] = $languages[$val['language_id']]['language'];
+			if ($this->rHasVal('activeLanguage')) {
+
+				if ($this->requestData['activeLanguage']==$val['language_id'] || $this->requestData['activeLanguage']=='*') {
+
+					$n[$key] = $val;
+					$n[$key]['language'] = $languages[$val['language_id']]['language'];
+
+				}
+
+			} else {
+
+				$names[$key]['language'] = $languages[$val['language_id']]['language'];
+
+			}
+
 			$l[$val['language_id']] = $languages[$val['language_id']];
 		
 		}
+
+		$this->customSortArray($l,array('key' => 'language','maintainKeys' => true));
+		
+		if ($this->rHasVal('activeLanguage')) {
+		
+			$activeLanguage = $this->requestData['activeLanguage'];
+		
+		} else {
+		
+			$d = current($l);
+
+			$activeLanguage = $d['id'];
+
+			foreach((array)$names as $key => $val) {
+			
+				if ($activeLanguage==$val['language_id']) {
+
+					$n[$key] = $val;
+
+				}
+			
+			}
+		}
 		
 
-		$this->customSortArray($l,array('key' => 'language'));
+		$pagination = $this->getPagination((array)$n);
 
-
-
-		$pagination = $this->getPagination((array)$names);
-
-//q($_SESSION['project']['default_language_id']);
-
-//q($this->models->Language->getLastQuery());
-
-
-
-//q($this->getCommonnameLookupList());
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
@@ -145,7 +178,7 @@ class IndexController extends Controller
 
 		$d = current($l);
 
-		$this->smarty->assign('activeLanguage',(isset($this->requestData['activeLanguage']) ? $this->requestData['activeLanguage'] : $d['id']));
+		$this->smarty->assign('activeLanguage',$activeLanguage);
 
         $this->printPage();
 
