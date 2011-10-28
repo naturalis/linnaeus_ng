@@ -2,28 +2,27 @@
 
 <div id="page-main">
 
-
-{if $languages|@count > 1}
-	<tr>
-		<td>{t}Language:{/t}</td>
-		<td>
-			<select name="language_id" id="language">
+	<div class="page-generic-div">
+		<form method="post" action="" id="languageForm">
+			{t}Language:{/t}
+			<select name="activeLanguage" id="activeLanguage" onchange="$('#languageForm').submit();">
+			<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}show all{/t}</option>
+			<option disabled="disabled">-----------------------</option>
 			{foreach name=languageloop from=$languages key=k item=v}
-				{if $v.language!=''}<option value="{$languages[i].language_id}"{if $v[i].language_id==$activeLanguage} selected="selected"{/if}>{$v.language}</option>
-				{/if}
+			<option value="{$v.id}"{if $v.id==$activeLanguage} selected="selected"{/if}>{$v.language}</option>
 			{/foreach}
 			</select>
-		</td>
-	</tr>
-{/if}
+		</form>
+	</div>
 
-
-	<div id="index">
+	<div class="page-generic-div">
 		<table>
 		{foreach name=taxonloop from=$taxa key=k item=v}
 		<tr class="highlight">
-			<td class="a" onclick="goTaxon({$v.id})">
+			<td>
+				<a href="../species/common.php?id={$v.id}">
 				{if $v.label}{$v.label}{else}{$v.transliteration}{/if}
+				</a>
 			</td>
 			<td>({$languages[$v.language_id].language})</td>
 		</tr>
