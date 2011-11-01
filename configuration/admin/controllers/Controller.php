@@ -1466,9 +1466,9 @@ class Controller extends BaseClass
 
 		unset($this->cssToLoad);
 
-		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
-		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/'.$specificStylesheet;
-		$this->cssToLoad[] = '../../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/search.css';
+		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
+		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/'.$specificStylesheet;
+		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/search.css';
 		
 		$this->printPage('../../../../app/templates/templates/shared/_head');
 		$this->printPage('../../../../app/templates/templates/shared/_body-start');
