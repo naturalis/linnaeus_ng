@@ -55,6 +55,7 @@ class LinnaeusController extends Controller
 		'matrix.css',
 		'module.css',
 		'species.css',
+		'index.css',
 		'colorbox/colorbox.css',
 		'dialog/jquery.modaldialog.css',
 		'lookup.css'
@@ -559,9 +560,6 @@ q($results,1,1);
 
 		$this->_indexAction();
 
-		return;	
-	
-	
 	}
 
 
@@ -593,9 +591,23 @@ q($results,1,1);
 
 		}
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->showLowerTaxon = ($this->getTaxonType()=='lower');
 
-		$pagination = $this->getPagination((array)$this->getTreeList());
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		
+		$names = $taxa = (array)$this->getTreeList();
+
+		if ($this->getTaxonType()=='lower' && 1==1) {
+
+			$syn = $this->searchSynonyms();
+			
+			$taxa = array_merge($taxa,$syn);
+
+			$this->customSortArray($taxa,array('key' => 'label'));
+
+		}
+
+		$pagination = $this->getPagination($taxa);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
@@ -603,16 +615,93 @@ q($results,1,1);
 
 		$this->smarty->assign('ranks',$ranks);
 
+		$this->smarty->assign('names',$names);
+
 		$this->smarty->assign('taxa',$pagination['items']);
 
 		$this->smarty->assign('taxonType',$this->getTaxonType());
 
         $this->printPage('species_index');
 
+	}
+
+    public function commonAction ()
+    {
+
+        $this->setPageName(_('Index: comon names'));
+		
+		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
+
+		$names = $this->searchCommonNames();
+
+		foreach((array)$names as $key => $val) {
+		
+			if ($this->rHasVal('activeLanguage')) {
+
+				if ($this->requestData['activeLanguage']==$val['language_id'] || $this->requestData['activeLanguage']=='*') {
+
+					$n[$key] = $val;
+					$n[$key]['language'] = $languages[$val['language_id']]['language'];
+
+				}
+
+			} else {
+
+				$names[$key]['language'] = $languages[$val['language_id']]['language'];
+
+			}
+
+			$l[$val['language_id']] = $languages[$val['language_id']];
+		
+		}
+
+		$this->customSortArray($n,array('key' => 'label'));
+
+		$this->customSortArray($l,array('key' => 'language','maintainKeys' => true));
+
+		if ($this->rHasVal('activeLanguage')) {
+		
+			$activeLanguage = $this->requestData['activeLanguage'];
+		
+		} else {
+		
+			$d = current($l);
+
+			$activeLanguage = $d['id'];
+
+			foreach((array)$names as $key => $val) {
+			
+				if ($activeLanguage==$val['language_id']) {
+
+					$n[$key] = $val;
+
+				}
+			
+			}
+		}
+		
+		$pagination = $this->getPagination((array)$n);
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('taxa',$pagination['items']);
+
+		$this->smarty->assign('nameLanguages',$l);
+
+		$d = current($l);
+
+		$this->smarty->assign('activeLanguage',$activeLanguage);
+
+		$this->smarty->assign('taxonType','common');
+
+        $this->printPage();
+
 		
 	}
-	
-	public function setTaxonType ($type)
+
+	private function setTaxonType ($type)
 	{
 
 		$this->_taxonType = ($type=='higher') ? 'higher' : 'lower';
@@ -1648,6 +1737,51 @@ q($results,1,1);
 
 	}
 
+	private function searchCommonNames($search=null)
+	{
+
+		return $this->models->Commonname->_get(
+			array(
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId().
+						($search ? 
+							' and
+							(
+								commonname regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+								transliteration regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+							)' : 
+							''
+						),
+				'columns' => 
+					'taxon_id as id,'.
+					($search ? '
+						if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) ' :
+						'commonname' ) .' as label,
+						transliteration,
+					\'common name\' as source, 
+					concat(\'views/species/common.php?id=\',taxon_id) as url,
+					language_id'
+			)
+		);
+
+	}
+
+	private function searchSynonyms($search=null)
+	{
+
+		$d['project_id'] = $this->getCurrentProjectId();
+		
+		if ($search) $d['synonym regexp'] = $this->makeRegExpCompatSearchString($search);
+
+		return $this->models->Synonym->_get(
+			array(
+				'id' => $d,
+				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
+			)
+		);
+
+	}
+	
 	private function getLookupList($search)
 	{
 	
