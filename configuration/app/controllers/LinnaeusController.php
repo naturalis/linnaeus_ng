@@ -550,6 +550,81 @@ q($results,1,1);
     
     }
 	
+	public function speciesIndexAction()
+	{
+	
+        $this->setPageName(_('Index: species'));
+
+		$this->setTaxonType('lower');
+
+		$this->_indexAction();
+
+		return;	
+	
+	
+	}
+
+
+    /**
+     * Index of the index module (ha); shows species
+     *
+     * @access    public
+     */
+    public function higherAction ()
+    {
+
+        $this->setPageName(_('Index: higher taxa'));
+
+		$this->setTaxonType('higher');
+
+		$this->_indexAction();
+
+	}
+
+    private function _indexAction ()
+    {
+
+		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+
+		foreach((array)$ranks['ranks'] as $key => $val) {
+
+			if ($val['lower_taxon']==1 && $this->getTaxonType()=='lower') $d[] = $val['id'];
+			if ($val['lower_taxon']==0 && $this->getTaxonType()=='higher') $d[] = $val['id'];
+
+		}
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+
+		$pagination = $this->getPagination((array)$this->getTreeList());
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('ranks',$ranks);
+
+		$this->smarty->assign('taxa',$pagination['items']);
+
+		$this->smarty->assign('taxonType',$this->getTaxonType());
+
+        $this->printPage('species_index');
+
+		
+	}
+	
+	public function setTaxonType ($type)
+	{
+
+		$this->_taxonType = ($type=='higher') ? 'higher' : 'lower';
+	
+	}
+
+	private function getTaxonType ()
+	{
+
+		return isset($this->_taxonType) ? $this->_taxonType : 'lower';
+	
+	}	
 
     /**
      * Index of project: introduction
