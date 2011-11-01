@@ -1,18 +1,29 @@
 {include file="../shared/header.tpl"}
 
 <div id="page-main">
-	<div id="index">
+
+	<div id="commonname-languages">
+		{t}Language:{/t}
+		<select name="activeLanguage" id="activeLanguage" onchange="$('#theForm').submit();">
+		<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}show all{/t}</option>
+		<option disabled="disabled">-----------------------</option>
+		{foreach name=languageloop from=$nameLanguages key=k item=v}
+		<option value="{$v.id}"{if $v.id==$activeLanguage} selected="selected"{/if}>{$v.language}</option>
+		{/foreach}
+		</select>
+	</div>
+
+	<div>
 		<table>
 		{foreach name=taxonloop from=$taxa key=k item=v}
-		{if $v.do_display}
 		<tr class="highlight">
-			<td class="a" onclick="goTaxon({$v.id})">
-				{$v.taxon}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+			<td class="species-name-cell">
+				<a href="../species/taxon.php?id={$v.id}&cat=names">
+				{if $v.label}{$v.label}{else}{$v.transliteration}{/if}
+				</a>
 			</td>
-			<td>({$v.rank})</td>
+			<td>({$nameLanguages[$v.language_id].language})</td>
 		</tr>
-		{/if}
 		{/foreach}
 		</table>
 	</div>

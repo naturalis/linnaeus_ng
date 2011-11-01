@@ -1,16 +1,21 @@
 {include file="../shared/header.tpl"}
 
 <div id="page-main">
-	<div id="index">
+	<div>
 		<table>
 		{foreach name=taxonloop from=$taxa key=k item=v}
-		{if ($v.lower_taxon==1 && $taxonType=='lower') || ($v.lower_taxon==0 && $taxonType=='higher')}
+		{if
+			($v.source =='synonym' && $taxonType=='lower') ||
+			($v.lower_taxon==1 && $taxonType=='lower') ||
+			($v.lower_taxon==0 && $taxonType=='higher')
+		}
 		<tr class="highlight">
-			<td class="a" onclick="goTaxon({$v.id})">
-				{$v.taxon}
+			<td class="species-name-cell" onclick="goTaxon({$v.id})">
+				<span class="a">{$v.label}</span>
+				{if $v.source =='synonym' && $names[$v.id].label!=''}<span class="synonym-addition"> ({$names[$v.id].label})</span>{/if}
 				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
 			</td>
-			<td>({$v.rank})</td>
+			<td>{if $v.source =='synonym'}{t}[syn.]{/t}{else}({$v.rank}){/if}</td>
 		</tr>
 		{/if}
 		{/foreach}
