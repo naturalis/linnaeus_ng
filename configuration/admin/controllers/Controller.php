@@ -927,7 +927,23 @@ class Controller extends BaseClass
 
 			foreach((array)$array as $val) {
 			
-				$d[$keys[$val[$f]]] = $val;
+				if (is_array($val)) {
+				
+					$y = array() ;
+				
+					foreach($val as $key2 => $val2) {
+					
+						if ($key2!=$f) $y[$key2] = $val2;
+					
+					}
+
+					$d[$keys[$val[$f]]] = $y;
+
+				} else {
+			
+					$d[$keys[$val[$f]]] = $val;
+
+				}
 			
 			}
 			

@@ -292,6 +292,9 @@ class Controller extends BaseClass
 
         foreach((array)$t as $key => $val) {
 
+			// level is effectively the recursive depth of the taxon within the tree
+			$val['label'] = $val['taxon'];
+
 			// for each taxon, look whether they belong to the lower taxa...
 			$val['lower_taxon'] = $pr[$val['rank_id']]['lower_taxon'];
 	
@@ -1103,21 +1106,66 @@ class Controller extends BaseClass
     public function customSortArray (&$array, $sortBy)
     {
         
-        if (!isset($array))
-            return;
-        
+        if (!isset($array) || !is_array($array)) return;
+
         if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
         
         if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
         
         if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
-        
+
+		$maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys']===true);
+
+        if ($maintainKeys) {
+
+			$keys = array();
+			
+			$f = md5(uniqid(null,true));
+	
+			foreach((array)$array as $key => $val) {
+	
+				$x = md5(json_encode($val).$key);
+				$array[$key][$f] = $x;
+				$keys[$x] = $key;
+	
+			}
+			
+		}
+
         usort($array,
 			array(
 				$this, 
 				'doCustomSortArray'
         	)
 		);
+
+        if ($maintainKeys) {
+
+			foreach((array)$array as $val) {
+			
+				if (is_array($val)) {
+				
+					$y = array() ;
+				
+					foreach($val as $key2 => $val2) {
+					
+						if ($key2!=$f) $y[$key2] = $val2;
+					
+					}
+
+					$d[$keys[$val[$f]]] = $y;
+
+				} else {
+			
+					$d[$keys[$val[$f]]] = $val;
+
+				}
+			
+			}
+			
+			$array = $d;
+			
+		}
     
     }
 

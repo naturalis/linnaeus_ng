@@ -142,6 +142,8 @@ class IndexController extends Controller
 		
 		}
 
+		$this->customSortArray($n,array('key' => 'label'));
+
 		$this->customSortArray($l,array('key' => 'language','maintainKeys' => true));
 		
 		if ($this->rHasVal('activeLanguage')) {
@@ -181,7 +183,6 @@ class IndexController extends Controller
 		$this->smarty->assign('activeLanguage',$activeLanguage);
 
         $this->printPage();
-
 		
 	}
 	
