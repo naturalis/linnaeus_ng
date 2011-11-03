@@ -607,11 +607,18 @@ q($results,1,1);
 
 		}
 
-		$pagination = $this->getPagination($taxa);
+
+		$d =  $this->makeAlphabetFromArray($taxa,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+
+		$pagination = $this->getPagination($d['names']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('alpha',$d['alpha']);
+
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
 
 		$this->smarty->assign('ranks',$ranks);
 
@@ -679,12 +686,18 @@ q($results,1,1);
 			
 			}
 		}
-		
-		$pagination = $this->getPagination((array)$n);
+
+		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+
+		$pagination = $this->getPagination($d['names']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('alpha',$d['alpha']);
+
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -2033,5 +2046,49 @@ q($results,1,1);
 		}
 	
 	}
+
+	private function makeAlphabetFromArray($names,$field,$letter=null)
+	{
+
+		$a = array();
+		
+		if (!is_null($letter)) $letter = strtolower($letter);
+	
+		foreach((array)$names as $key => $val) {
+		
+			$x = strtolower(substr($val[$field],0,1));
+
+			$a[$x] = $x;
+
+			if (!is_null($letter) && $x==$letter) {
+			
+				$n[$key] = $val;
+			
+			}
+
+		}
+
+		if (!is_null($letter) && empty($n)) $letter = null;
+
+		sort($a);
+
+		if (is_null($letter)) {
+
+			$letter = $a[0];
+
+			foreach((array)$names as $key => $val) {
+
+				if (strtolower(substr($val[$field],0,1))==$letter) $n[$key] = $val;
+	
+			}
+		
+		}
+
+		return array(
+			'alpha' => $a,
+			'names' => $n
+		);
+	
+	}	
 
 }
