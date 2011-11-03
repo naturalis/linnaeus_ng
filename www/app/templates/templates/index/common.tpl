@@ -2,15 +2,34 @@
 
 <div id="page-main">
 
+	<div id="alphabet">
+	{if $alpha|@count!=0}
+	{t}Click to browse:{/t}&nbsp;
+	{foreach name=loop from=$alpha key=k item=v}
+	{if $v==$letter}
+	<span class="alphabet-active-letter">{$v}</span>
+	{else}
+	<span class="alphabet-letter" onclick="$('#letter').val('{$v}');$('#theForm').submit();">{$v}</span>
+	{/if}
+	{/foreach}
+	{/if}
+	<input type="hidden" id="letter" name="letter" value="{$letter}" />
+	</div>
+
 	<div id="commonname-languages">
 		{t}Language:{/t}
-		<select name="activeLanguage" id="activeLanguage" onchange="$('#theForm').submit();">
+		<select id="languageSelect" onchange="
+			$('#activeLanguage').val($('#languageSelect').val());
+			$('#letter').val('');
+			$('#theForm').submit();"
+		>
 		<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}show all{/t}</option>
 		<option disabled="disabled">-----------------------</option>
 		{foreach name=languageloop from=$nameLanguages key=k item=v}
 		<option value="{$v.id}"{if $v.id==$activeLanguage} selected="selected"{/if}>{$v.language}</option>
 		{/foreach}
 		</select>
+		<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
 	</div>
 
 	<div>
