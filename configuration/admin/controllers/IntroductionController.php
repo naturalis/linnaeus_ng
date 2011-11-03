@@ -7,7 +7,7 @@ class IntroductionController extends Controller
 
     public $usedModels = array(
 		'content_introduction',
-		'introduction_pages',
+		'introduction_page',
 		'introduction_media'
     );
    
@@ -40,9 +40,8 @@ class IntroductionController extends Controller
     {
         
         parent::__construct();
-
-		if (isset($_SESSION['user']['freeModules']['activeModule']))
-	    	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
+		
+		$this->cleanUpEmptyPages();
 
     }
 
@@ -58,24 +57,6 @@ class IntroductionController extends Controller
     
     }
 
-	public function checkAuthorisation()
-	{
-
-		if ($this->rHasVal('freeId')) {
-
-			if (!$this->isUserAuthorizedForFreeModule())
-				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-		} else {
-
-			if (!$_SESSION['user']['freeModules']['activeModule'])
-				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
-
-		}
-	
-	}
-
-
     /**
      * Module index
      *
@@ -86,28 +67,15 @@ class IntroductionController extends Controller
 
         $this->checkAuthorisation();
 		
-		if (!isset($_SESSION['user']['freeModules']['activeModule'])) {
+		if (!$this->rHasVal('page')) {
 
-			$_SESSION['user']['freeModules']['activeModule'] = $this->getFreeModule();
-			
-			$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
-
-		}
-
-		$this->cleanUpEmptyPages();
-
-		if (!$this->rHasVal('page'))
 			$this->redirect('edit.php?id='.$this->getFirstPageId());
-		else		
+
+		} else {
+
 			$this->redirect('edit.php?id='.$this->requestData['page']);
 
-/*
-    	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
-
-		$this->smarty->assign('module',$_SESSION['user']['freeModules']['activeModule']);
-
-        $this->printPage();
-*/
+		}
 
     }
 
@@ -166,7 +134,7 @@ class IntroductionController extends Controller
 
 		}
 
-		$navList = $this->getModulePageNavList(true);
+		$navList = $this->getPageNavList(true);
 	
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 			$this->smarty->assign('navCurrentId',isset($this->requestData['id']) ? $this->requestData['id'] : null);
@@ -186,29 +154,88 @@ class IntroductionController extends Controller
     }
 
 
-    public function browseAction()
+    /**
+     * Change page display order
+     *
+     * @access    public
+     */
+    public function orderAction()
     {
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Browsing pages'));
+		$this->setPageName(_('Change page order'));
+		
+		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
+		
+			$d = $this->getPageHeaders();
+			
+			$lowerNext = $prev = false;
+			
+			foreach((array)$d as $key => $val) {
+			
+				$newOrder = $key;
 
-		$alpha = $this->getActualAlphabet();
+				if ($val['id'] == $this->requestData['id']) {
 
-		if (!$this->rHasVal('letter') && isset($alpha))
-			$this->requestData['letter'] = current($alpha);
+					if (($this->requestData['dir']=='up') && $prev) {
 
-		if ($this->rHasVal('letter')) {
+						$newOrder = $key - 1;
 
-			$refs = $_SESSION['system']['freeModule']['alphaIndex'][$this->requestData['letter']];
+						 $this->models->IntroductionPage->update(
+							array(
+								'show_order' => 'show_order + 1',
+							),
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $prev
+							)
+						);
+
+					} else
+					if ($this->requestData['dir']=='down') {
+
+						$newOrder = $key + 1;
+						
+					} else {
+
+						$newOrder = $key;
+
+					}
+
+				}
+				
+				if ($lowerNext) {
+
+					$newOrder = $key - 1;
+
+					$lowerNext = false;
+
+				}
+
+				 $this->models->IntroductionPage->update(
+				 	array(
+						'show_order' => $newOrder,
+					),
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['id']
+					)
+				);
+
+				if ($val['id'] == $this->requestData['id'] && $this->requestData['dir']=='down') {
+
+					$lowerNext = true;
+
+				} 
+									
+				$prev = $val['id'];
+
+			}
 
 		}
 
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
-		if (isset($alpha)) $this->smarty->assign('alpha',$alpha);
-
-		if (isset($refs)) $this->smarty->assign('refs',$refs);
+		$this->smarty->assign('pages',$this->getPageHeaders());
 
         $this->printPage();
 
@@ -226,6 +253,8 @@ class IntroductionController extends Controller
 		$this->checkAuthorisation();
 		
 		$this->setPageName(_('New image'));
+		
+		$this->loadControllerConfig('Module');
 		
 		if ($this->requestDataFiles && !$this->isFormResubmit()) {
 		
@@ -257,7 +286,7 @@ class IntroductionController extends Controller
 					
 					}
 					
-					$fmm = $this->models->FreeModuleMedia->save(
+					$fmm = $this->models->IntroductionMedia->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getCurrentProjectId(),
@@ -343,10 +372,9 @@ class IntroductionController extends Controller
             
             if (!$this->rHasVal('topic') && !$this->rHasVal('content')) {
                 
-                $this->models->ContentFreeModule->delete(
+                $this->models->ContentIntroduction->delete(
                     array(
                         'project_id' => $this->getCurrentProjectId(),
-						'module_id' => $this->getCurrentModuleId(),
                         'language_id' => $this->requestData['language'], 
                         'page_id' => $this->requestData['id']
                     )
@@ -356,22 +384,20 @@ class IntroductionController extends Controller
             
             } else {
                 
-                $cfm = $this->models->ContentFreeModule->_get(
+                $cfm = $this->models->ContentIntroduction->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'module_id' => $this->getCurrentModuleId(),
 							'language_id' => $this->requestData['language'], 
 	                        'page_id' => $this->requestData['id']
 						)
 					)
 				);
                 
-                $this->models->ContentFreeModule->save(
+                $this->models->ContentIntroduction->save(
 					array(
 						'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'module_id' => $this->getCurrentModuleId(),
+						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->requestData['language'], 
 						'page_id' => $this->requestData['id'],
 						'topic' => trim($this->requestData['topic']),
@@ -382,6 +408,8 @@ class IntroductionController extends Controller
 				$this->setPageGotContent($this->requestData['id'],true);
 
             }
+			
+			unset($_SESSION['system']['introduction']['navList']);
 
             $this->smarty->assign('returnText', 'saved');
         
@@ -398,11 +426,10 @@ class IntroductionController extends Controller
         
         } else {
 
-			$cfm = $this->models->ContentFreeModule->_get(
+			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'module_id' => $this->getCurrentModuleId(),
 						'language_id' => $this->requestData['language'], 
 						'page_id' => $this->requestData['id'],
 						)
@@ -414,80 +441,44 @@ class IntroductionController extends Controller
         }
 
 	}
-
-	private function getCurrentModuleId()
-	{
-
-		return isset($_SESSION['user']['freeModules']['activeModule']['id']) ?
-				$_SESSION['user']['freeModules']['activeModule']['id'] :
-				false;
-
-	}
-
-	private function isUserAuthorizedForFreeModule($id=null)
+	
+	private function getNextShowOrderValue()
 	{
 	
-		$id = isset($id) ? $id : $this->requestData['freeId'];
-		
-		if (!isset($id)) return false;
-	
-		$fmpu = $this->models->FreeModuleProjectUser->_get(
+		$ip =  $this->models->IntroductionPage->_get(
 			array(
 				'id' => array(
-					'free_module_id' => $id,
 					'project_id' => $this->getCurrentProjectId(),
-					'user_id' => $this->getCurrentUserId()
-				)
+					'got_content' => 1
+				),
+				'columns' => 'max(ifnull(show_order,0))+1 as next'
 			)
 		);
 
-		return (count((array)$fmpu)>0);
-
-	}
-
-
-	private function getFreeModule($id=null)
-	{
-
-		$id = isset($id) ? $id : $this->requestData['freeId'];
-
-		$fmp = $this->models->FreeModuleProject->_get(
-			array(
-				'id' => array(
-					'id' => $id,
-					'project_id' => $this->getCurrentProjectId(),
-				)
-			)
-		);
-
-		if ($fmp) return $fmp[0];
+		return $ip[0]['next'];
 	
 	}
 
 	private function createPage()
 	{
 	
-		if (!$this->getCurrentModuleId()) return;
-
-		$this->models->FreeModulePage->save(
+		$this->models->IntroductionPage->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
-				'module_id' => $this->getCurrentModuleId()
+				'show_order' => $this->getNextShowOrderValue()
 			)
 		);
 
-		return $this->models->FreeModulePage->getNewId();
+		return $this->models->IntroductionPage->getNewId();
 
 	}
 
 	private function setPageGotContent($id,$state=null)
 	{
 
-		if (!$this->getCurrentModuleId()) return;
-		
 		if ($state==null) {
 
-			$cfm = $this->models->ContentFreeModule->_get(
+			$cfm = $this->models->ContentIntroduction->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
@@ -501,30 +492,50 @@ class IntroductionController extends Controller
 
 		}
 
-		$this->models->FreeModulePage->update(
+		$this->models->IntroductionPage->update(
 			array(
 				'got_content' => ($state==false ? '0' : '1'),
 			),
 			array(
 				'id' => $id,
 				'project_id' => $this->getCurrentProjectId(),
-				'module_id' => $this->getCurrentModuleId()
 			)
 		);
 
 	}
 
-	private function getPages()
+	private function getPageHeaders()
 	{
 
-		return $this->models->FreeModulePage->_get(
+		$ip =  $this->models->IntroductionPage->_get(
 			array(
 				'id' => array(
-					'module_id' => $this->getCurrentModuleId(),
-					'project_id' => $this->getCurrentProjectId()
-				)
+					'project_id' => $this->getCurrentProjectId(),
+					'got_content' => 1
+				),
+				'order' => 'show_order,created'
 			)
 		);
+
+
+		foreach((array)$ip as $key => $val) {
+
+			$cfm = $this->models->ContentIntroduction->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $_SESSION['project']['default_language_id'], 
+						'page_id' => $val['id']
+					),
+					'columns' => 'topic',
+				)
+			);
+			
+			$ip[$key]['topic'] = $ip[$key]['label'] = $cfm[0]['topic'];
+
+		}
+		
+		return $ip;
 
 	}
 
@@ -535,11 +546,10 @@ class IntroductionController extends Controller
 		
 		if (!isset($id)) return;
 
-		$pfm = $this->models->FreeModulePage->_get(
+		$pfm = $this->models->IntroductionPage->_get(
 			array(
 				'id' => array(
 					'id' => $id,
-					'module_id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId()
 				)
 			)
@@ -547,7 +557,7 @@ class IntroductionController extends Controller
 
 		if ($pfm) {
 
-			$fmm = $this->models->FreeModuleMedia->_get(
+			$fmm = $this->models->IntroductionMedia->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -574,71 +584,35 @@ class IntroductionController extends Controller
 
 	}
 
-
 	private function getFirstPageId()
 	{
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$ip =  $this->models->IntroductionPage->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['project']['default_language_id']
-					),
-				'order' => 'topic',
-				'columns' => 'page_id',
-				'ignoreCase' => true,
+					'project_id' => $this->getCurrentProjectId(),
+					'got_content' => 1
+				),
+				'order' => 'show_order,created',
+				'columns' => 'id',
 				'limit' => 1
 			)
 		);
 
-		return isset($cfm[0]) ? $cfm[0]['page_id'] : null;
+
+		return isset($ip[0]['id']) ? $ip[0]['id'] : null;
 		
 	}
 
 	private function cleanUpEmptyPages()
 	{
 
-		if (!$this->getCurrentModuleId()) return;
-
 		// delete all pages with no content that are over 7 days old
-		$this->models->FreeModulePage->delete('delete from %table% 
-			where module_id = '.$this->getCurrentModuleId().'
-			and project_id =  '.$this->getCurrentProjectId().'
+		$this->models->IntroductionPage->delete('delete from %table% 
+			where project_id =  '.$this->getCurrentProjectId().'
 			and got_content = 0
 			and created < DATE_ADD(now(), INTERVAL -7 DAY)');
 
-	}
-
-	private function getActualAlphabet()
-	{
-
-		unset($_SESSION['system']['freeModule']['alphaIndex']);
-
-		$cfm = $this->models->ContentFreeModule->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['project']['default_language_id'], 
-				),
-				'columns' => 'page_id, topic, lower(substr(topic,1,1)) as letter',
-				'order' => 'letter'
-			)
-		);
-		
-		$alpha = null;
-		
-		foreach((array)$cfm as $key => $val) {
-
-			$alpha[$val['letter']] = $val['letter'];
-
-			$_SESSION['system']['freeModule']['alphaIndex'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
-
-		}
-
-		return $alpha;
-	
 	}
 
 	private function deleteMedia($id=null)
@@ -648,7 +622,7 @@ class IntroductionController extends Controller
 		
 		if ($id == null) return;
 
-		$fmm = $this->models->FreeModuleMedia->_get(
+		$fmm = $this->models->IntroductionMedia->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -670,7 +644,7 @@ class IntroductionController extends Controller
 
 		}
 
-		$this->models->FreeModuleMedia->delete(
+		$this->models->IntroductionMedia->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'page_id' => $id
@@ -684,33 +658,32 @@ class IntroductionController extends Controller
 	
 		$id = isset($id) ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
 		
-		if ($id == null || !$this->getCurrentModuleId()) return;
+		if ($id == null) return;
 
 		$this->deleteMedia($id);
 
-		$this->models->ContentFreeModule->delete(
+		$this->models->ContentIntroduction->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
-				'module_id' => $this->getCurrentModuleId(),
 				'page_id' => $id
 			)
 		);
 
-		$this->models->FreeModulePage->delete(
+		$this->models->IntroductionPage->delete(
 			array(
 				'id' => $id,
-				'project_id' => $this->getCurrentProjectId(),
-				'module_id' => $this->getCurrentModuleId()
+				'project_id' => $this->getCurrentProjectId()
 			)
 		);
 
 	}	
 
-	private function getModulePageNavList($forceLookup=false) {
-	
-		if (empty($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
+	private function getPageNavList($forceLookup=false)
+	{
+
+		if (empty($_SESSION['system']['introduction']['navList']) || $forceLookup) {
 		
-			$d = $this->getPages();
+			$d = $this->getPageHeaders();
 
 			foreach((array)$d as $key => $val) {
 
@@ -721,11 +694,11 @@ class IntroductionController extends Controller
 
 			}
 
-			$_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = $res;
+			$_SESSION['system']['introduction']['navList'] = $res;
 		
 		}
 		
-		return $_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
+		return $_SESSION['system']['introduction']['navList'];
 
 	}
 
@@ -734,11 +707,11 @@ class IntroductionController extends Controller
 
 		if (empty($search)) return;
 
-		$cfm = $this->models->ContentFreeModule->_get(
+		$cfm = $this->models->ContentIntroduction->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $this->getCurrentModuleId(),
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' =>  $_SESSION['project']['default_language_id'],
 					'topic like' => '%'.$search.'%'
 					),
 				'order' => 'topic',
@@ -751,7 +724,7 @@ class IntroductionController extends Controller
 			$this->makeLookupList(
 				$cfm,
 				$this->controllerBaseName,
-				'../module/edit.php?id=%s',
+				'../introduction/edit.php?id=%s',
 				true
 			)
 		);

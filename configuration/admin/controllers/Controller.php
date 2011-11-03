@@ -739,7 +739,7 @@ class Controller extends BaseClass
 
         // check if user is logged in, otherwise redirect to login page
         if ($this->isUserLoggedIn()) {
-            
+
             // check if there is an active project, otherwise redirect to choose project page
             if ($this->getCurrentProjectId() || $allowNoProjectId) {
 

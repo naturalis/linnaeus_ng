@@ -401,7 +401,7 @@ abstract class Model extends BaseClass
             return;
         
         }
-        
+
         $this->retainAlteredData($query);
         
         $this->setLastQuery($query);
