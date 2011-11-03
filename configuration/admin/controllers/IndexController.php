@@ -19,7 +19,7 @@ class IndexController extends Controller
     
     public $controllerPublicName = 'Index';
 
-	public $cssToLoad = array('lookup.css');
+	public $cssToLoad = array('lookup.css','index.css');
 	public $jsToLoad = array('all'=>array('lookup.js'));
 
     /**
@@ -62,35 +62,25 @@ class IndexController extends Controller
 		return isset($this->_taxonType) ? $this->_taxonType : 'lower';
 	
 	}
+
 	
-    private function _indexAction ()
+    /**
+     * Index of the index module (ha); shows species
+     *
+     * @access    public
+     */
+    public function indexAction ()
     {
 
-		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
-		
-		foreach((array)$ranks as $key => $val) {
+        $this->checkAuthorisation();
 
-			if ($val['lower_taxon']==1 && $this->getTaxonType()=='lower') $d[] = $val['id'];
-			if ($val['lower_taxon']==0 && $this->getTaxonType()=='higher') $d[] = $val['id'];
+        $this->setPageName(_('Index: species'));
 
-		}
+		$this->setTaxonType('lower');
 
-		$pagination = $this->getPagination((array)$this->getTaxaLookupList(null,(isset($d) ? $d : null)));
+		$this->_indexAction();
 
-		$this->smarty->assign('prevStart', $pagination['prevStart']);
-	
-		$this->smarty->assign('nextStart', $pagination['nextStart']);
-
-		$this->smarty->assign('ranks',$ranks);
-
-		$this->smarty->assign('taxa',$pagination['items']);
-
-		$this->smarty->assign('taxonType',$this->getTaxonType());
-
-        $this->printPage('index');
-
-		
-	}
+    }
 
     /**
      * Index of the index module (ha); shows species
@@ -108,6 +98,43 @@ class IndexController extends Controller
 
 		$this->_indexAction();
 
+	}
+
+    private function _indexAction ()
+    {
+
+		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+		
+		foreach((array)$ranks as $key => $val) {
+
+			if ($val['lower_taxon']==1 && $this->getTaxonType()=='lower') $d[] = $val['id'];
+			if ($val['lower_taxon']==0 && $this->getTaxonType()=='higher') $d[] = $val['id'];
+
+		}
+
+		$names = (array)$this->getTaxaLookupList(null,(isset($d) ? $d : null));
+
+		$d =  $this->makeAlphabetFromArray($names,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+
+		$pagination = $this->getPagination($d['names']);
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('alpha',$d['alpha']);
+
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
+
+		$this->smarty->assign('ranks',$ranks);
+
+		$this->smarty->assign('taxa',$pagination['items']);
+
+		$this->smarty->assign('taxonType',$this->getTaxonType());
+
+        $this->printPage('index');
+
+		
 	}
 
     public function commonAction ()
@@ -166,13 +193,18 @@ class IndexController extends Controller
 			
 			}
 		}
-		
 
-		$pagination = $this->getPagination((array)$n);
+		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+
+		$pagination = $this->getPagination($d['names']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('alpha',$d['alpha']);
+
+		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -186,66 +218,7 @@ class IndexController extends Controller
 		
 	}
 	
-	
-    /**
-     * Index of the index module (ha); shows species
-     *
-     * @access    public
-     */
-    public function indexAction ()
-    {
 
-        $this->checkAuthorisation();
-
-        $this->setPageName(_('Index: species'));
-
-		$this->setTaxonType('lower');
-
-		$this->_indexAction();
-
-		return;
-		
-/*
-
-index
-
-[4:18:59 PM] Ruud Altenburg: In LII had je drie tabs in de modules
-[4:19:02 PM] Ruud Altenburg: module
-[4:19:16 PM] Ruud Altenburg: Species, met daarin alle (onder)soorten
-[4:19:26 PM] Ruud Altenburg: Higher taxa, je raadt het
-[4:19:35 PM] Ruud Altenburg: Common names, opgesplitst per taal
-[4:20:03 PM] Ruud Altenburg: Per tab was er een breakdown per letter
-[4:20:37 PM] Ruud Altenburg: Je kon ook optioneel synoniemen meenemen in de lijst
-[4:20:42 PM] Ruud Altenburg: En epithets
-[4:20:57 PM] Ruud Altenburg: Had ik dit trouwens niet in het document geschreven?!
-[4:24:47 PM] Ruud Altenburg: Ben ff weg
-
-
-*/
-
-
-/*		
-		$synonyms = (array)$this->getSynonymLookupList();
-		
-		$commonnames = (array)$this->getCommonnameLookupList();
-*/
-
-		/*
-		foreach((array)$commonnames as $key => $val) {
-
-			$commonnames[$key]['language'] = $l['language'];
-
-		}
-		*/
-
-
-//q($languages,1);
-
-
-
-
-  
-    }
 	
 	
     /**
@@ -460,7 +433,7 @@ index
 					'taxon_id as id,'.
 					($search ? '
 						if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) ' :
-						'commonname' ) .' as label,
+						'ifnull(commonname,transliteration)' ) .' as label,
 						transliteration,
 					\'common name\' as source, 
 					concat(\'views/species/common.php?id=\',taxon_id) as url,
@@ -520,5 +493,49 @@ index
 		return $cfm;
 
 	}
+	
+	private function makeAlphabetFromArray($names,$field,$letter=null)
+	{
+
+		$a = array();
+		
+		if (!is_null($letter)) $letter = strtolower($letter);
+	
+		foreach((array)$names as $key => $val) {
+		
+			$x = strtolower(substr($val[$field],0,1));
+
+			$a[$x] = $x;
+
+			if (!is_null($letter) && $x==$letter) {
+			
+				$n[$key] = $val;
+			
+			}
+
+		}
+
+		if (!is_null($letter) && empty($n)) $letter = null;
+
+		sort($a);
+
+		if (is_null($letter)) {
+
+			$letter = $a[0];
+
+			foreach((array)$names as $key => $val) {
+
+				if (strtolower(substr($val[$field],0,1))==$letter) $n[$key] = $val;
+	
+			}
+		
+		}
+
+		return array(
+			'alpha' => $a,
+			'names' => $n
+		);
+	
+	}	
 	
 }

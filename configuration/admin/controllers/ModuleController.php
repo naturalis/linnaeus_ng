@@ -384,6 +384,8 @@ class ModuleController extends Controller
 				$this->setPageGotContent($this->requestData['id'],true);
 
             }
+			
+			unset($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']);
 
             $this->smarty->assign('returnText', 'saved');
         
@@ -523,7 +525,8 @@ class ModuleController extends Controller
 			array(
 				'id' => array(
 					'module_id' => $this->getCurrentModuleId(),
-					'project_id' => $this->getCurrentProjectId()
+					'project_id' => $this->getCurrentProjectId(),
+					'got_content' => 1
 				)
 			)
 		);
@@ -708,7 +711,8 @@ class ModuleController extends Controller
 
 	}	
 
-	private function getModulePageNavList($forceLookup=false) {
+	private function getModulePageNavList($forceLookup=false)
+	{
 	
 		if (empty($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
 		
