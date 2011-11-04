@@ -80,6 +80,8 @@ class GlossaryController extends Controller
     {
 
 		$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+
+		unset($_SESSION['user']['search']['hasSearchResults']);
 		
 		$this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
 

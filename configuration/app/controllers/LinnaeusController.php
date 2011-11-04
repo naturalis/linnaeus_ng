@@ -146,21 +146,23 @@ class LinnaeusController extends Controller
     public function indexAction ()
     {
 
-		if (!$this->rHasId()) {
+		unset($_SESSION['user']['search']['hasSearchResults']);
 
-	        $this->setPageName( _('Home'));
+		if (!$this->rHasVal('sub')) {
 
-			$this->smarty->assign('content',$this->matchGlossaryTerms($this->getContent('introduction')));
+			$d = $this->getContent('Welcome');
 
 		} else {
 		
-			$d = $this->matchGlossaryTerms($this->getContent(null,$this->requestData['id']));
-
-	        $this->setPageName( _($d['subject']));
-
-			$this->smarty->assign('content',$d);
+			$d = $this->getContent($this->requestData['sub']);
 
 		}
+
+		$this->setPageName( _($d['subject']));
+
+		$this->smarty->assign('subject',$this->matchGlossaryTerms($d['subject']));
+
+		$this->smarty->assign('content',$this->matchGlossaryTerms($d['content']));
 
         $this->printPage();
   
@@ -612,6 +614,8 @@ q($results,1,1);
 
 		$pagination = $this->getPagination($d['names']);
 
+		$this->smarty->assign('showSpeciesIndexMenu', true);
+
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
@@ -690,6 +694,8 @@ q($results,1,1);
 		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
 
 		$pagination = $this->getPagination($d['names']);
+
+		$this->smarty->assign('showSpeciesIndexMenu', true);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
@@ -860,11 +866,11 @@ q($results,1,1);
 		
 		$c = $this->models->Content->_get(array('id' => $d));
 
-		return isset($c[0]['content']) ? $c[0]['content'] : '';
+		return isset($c[0]) ? $c[0] : '';
 	
 	}
 
-	private function maxeTaxonList($records)
+	private function makeTaxonList($records)
 	{
 
 		$taxonList = null;
@@ -1077,7 +1083,7 @@ q($results,1,1);
 					'numOfResults' => count((array)$media)
 				),
 			),
-			'taxonList' => $this->maxeTaxonList($d),
+			'taxonList' => $this->makeTaxonList($d),
 			'categoryList' => $this->makeCategoryList(),
 			'numOfResults' => count((array)$d)+count((array)$taxa)
 		);
@@ -1827,12 +1833,12 @@ q($results,1,1);
 	{
 
 		// Converts decimal longitude / latitude to DMS
-	// ( Degrees / minutes / seconds ) 
-	
-	// This is the piece of code which may appear to 
-	// be inefficient, but to avoid issues with floating
-	// point math we extract the integer part and the float
-	// part by using a string function.
+		// ( Degrees / minutes / seconds ) 
+		
+		// This is the piece of code which may appear to 
+		// be inefficient, but to avoid issues with floating
+		// point math we extract the integer part and the float
+		// part by using a string function.
 		$vars = explode(".",$dec);
 		$deg = $vars[0];
 		$tempma = "0.".$vars[1];

@@ -62,6 +62,8 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
+ 		unset($_SESSION['user']['search']['hasSearchResults']);
+
 		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 		
 		$this->redirect('reference.php?id='.$d['id']);

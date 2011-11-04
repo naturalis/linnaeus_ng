@@ -1091,7 +1091,7 @@ class Controller extends BaseClass
 			$modules[] = $val;
 
 		}
-		
+
 		return $modules;
 
 	}
@@ -1303,7 +1303,8 @@ class Controller extends BaseClass
 	private function setPhpIniVars()
 	{
 
-		ini_set('session.cache_limiter', 'private');
+		// avoid "page expired" messages on using browser's "back"-button
+		//ini_set('session.cache_limiter', 'private');
 	
 	}
 
