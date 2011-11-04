@@ -290,6 +290,15 @@ function goNavigate(id,field,url) {
 
 }
 
+function goIntroductionTopic(id) {
+
+	addFormVal('id',id);
+	goForm('../introduction/topic.php');
+
+}
+
+
+
 var searchBoxSelected = false;
 var searchKeyed = false;
 
