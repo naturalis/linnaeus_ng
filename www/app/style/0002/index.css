@@ -1,0 +1,65 @@
+#indexNavigationPane {
+	top:0px;
+	left:0px;
+	border-bottom:1px dotted #666;
+	width:100%;
+}
+
+#commonname-languages {
+	padding-bottom:25px;
+}
+
+#activeLanguage {
+	font:inherit;
+	font-size:inherit;
+}
+
+.species-name-cell {
+	width:500px;
+}
+
+.synonym-addition {
+	font-style:italic;
+}
+
+.category, .category-active {
+	font-size:11px;
+	width:125px;
+	border:1px solid #ddd;
+	text-align:center;
+	overflow:auto;
+	background-color:#eee;
+	padding:2px;
+	cursor:pointer;
+}
+
+.category-active {
+	font-size:11px;
+	background-color:#fff;
+	color:#CC0000;
+	cursor:default;
+}
+
+.space {
+	width:5px;
+}
+
+#alphabet {
+	border-bottom:1px dotted #ddd;
+	padding-bottom:10px;
+	margin-bottom:10px;
+}
+
+#alphabet .alphabet-active-letter, .alphabet-letter {
+	padding-left:3px;
+	padding-right:3px;
+	text-transform:uppercase;
+}
+
+#alphabet .alphabet-active-letter {
+	color:red;
+}
+
+#alphabet .alphabet-letter {
+	cursor:pointer;
+}
