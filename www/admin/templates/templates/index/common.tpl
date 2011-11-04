@@ -2,10 +2,27 @@
 
 <div id="page-main">
 
+	<div id="alphabet">
+	{if $alpha|@count!=0}
+	{t}Click to browse:{/t}&nbsp;
+	{foreach name=loop from=$alpha key=k item=v}
+	{if $v==$letter}
+	<span class="alphabet-active-letter">{$v}</span>
+	{else}
+	<span class="alphabet-letter" onclick="$('#letter').val('{$v}');$('#theForm').submit();">{$v}</span>
+	{/if}
+	{/foreach}
+	{/if}
+	</div>
+
 	<div class="page-generic-div">
-		<form method="post" action="" id="languageForm">
+		<form>
 			{t}Language:{/t}
-			<select name="activeLanguage" id="activeLanguage" onchange="$('#languageForm').submit();">
+			<select id="languageSelect" onchange="
+				$('#activeLanguage').val($('#languageSelect').val());
+				$('#letter').val('');
+				$('#theForm').submit();"
+			>
 			<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}show all{/t}</option>
 			<option disabled="disabled">-----------------------</option>
 			{foreach name=languageloop from=$languages key=k item=v}
@@ -21,7 +38,7 @@
 		<tr class="highlight">
 			<td>
 				<a href="../species/common.php?id={$v.id}">
-				{if $v.label}{$v.label}{else}{$v.transliteration}{/if}
+				{$v.label}
 				</a>
 			</td>
 			<td>({$languages[$v.language_id].language})</td>
@@ -41,6 +58,8 @@
 {/if}
 </div>
 <form name="theForm" id="theForm" method="post" action="">
+<input type="hidden" id="letter" name="letter" value="{$letter}" />
+<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
 </form>
 
 {include file="../shared/admin-messages.tpl"}

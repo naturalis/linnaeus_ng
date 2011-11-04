@@ -38,16 +38,4 @@
 </div>
 {/if}
 
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
-{literal}	
-});
-</script>
-{/literal}
-
-
 {include file="../shared/admin-footer.tpl"}
