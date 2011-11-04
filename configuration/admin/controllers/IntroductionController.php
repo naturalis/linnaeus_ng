@@ -373,23 +373,23 @@ class IntroductionController extends Controller
             if (!$this->rHasVal('topic') && !$this->rHasVal('content')) {
                 
                 $this->models->ContentIntroduction->delete(
-                    array(
-                        'project_id' => $this->getCurrentProjectId(),
-                        'language_id' => $this->requestData['language'], 
-                        'page_id' => $this->requestData['id']
-                    )
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->requestData['language'], 
+						'page_id' => $this->requestData['id']
+					)
                 );
 				
 				$this->setPageGotContent($this->requestData['id']);
             
             } else {
-                
+
                 $cfm = $this->models->ContentIntroduction->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
 							'language_id' => $this->requestData['language'], 
-	                        'page_id' => $this->requestData['id']
+							'page_id' => $this->requestData['id']
 						)
 					)
 				);

@@ -60,6 +60,8 @@ class MapKeyController extends Controller
 
     public function indexAction()
     {
+
+		unset($_SESSION['user']['search']['hasSearchResults']);
     	
 		$this->redirect('examine.php');
 	

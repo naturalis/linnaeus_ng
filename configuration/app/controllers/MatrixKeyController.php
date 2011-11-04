@@ -77,7 +77,9 @@ class MatrixKeyController extends Controller
 
     public function indexAction()
     {
-    
+   
+		unset($_SESSION['user']['search']['hasSearchResults']);
+  
 		$this->checkMatrixIdOverride();
 
 		$matrix = $this->getCurrentMatrix();
