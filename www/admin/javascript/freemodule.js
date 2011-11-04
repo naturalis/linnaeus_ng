@@ -62,12 +62,13 @@ function freemodGetContent(language,type) {
 			'time' : allGetTimestamp()			
 		}),
 		success : function (data) {
+			tinyMCE.get('content-'+type).setContent('');
+			$('#topic-'+type).val('');
 			obj = $.parseJSON(data);
-			$('#topic-'+type).val(obj.topic);
-			if (obj.content) 
-				tinyMCE.get('content-'+type).setContent(obj.content);
-			else
-				tinyMCE.get('content-'+type).setContent('');
+			if (obj) {
+				if (obj.topic) $('#topic-'+type).val(obj.topic);
+				if (obj.content) tinyMCE.get('content-'+type).setContent(obj.content);
+			}
 			allHideLoadingDiv();
 		}
 	});
