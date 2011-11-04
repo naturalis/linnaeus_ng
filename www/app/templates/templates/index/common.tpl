@@ -18,8 +18,8 @@
 
 	<div id="commonname-languages">
 		{t}Language:{/t}
-		<select id="languageSelect" onchange="
-			$('#activeLanguage').val($('#languageSelect').val());
+		<select id="nameLanguage" onchange="
+			$('#activeLanguage').val($('#nameLanguage').val());
 			$('#letter').val('');
 			$('#theForm').submit();"
 		>
@@ -30,6 +30,7 @@
 		{/foreach}
 		</select>
 		<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
+		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
 
 	<div>
