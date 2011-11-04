@@ -1,5 +1,4 @@
 {include file="../shared/header.tpl"}
-{include file="../shared/messages.tpl"}
 
 {if $alpha}
 <div id="alphabet">
