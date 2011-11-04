@@ -67,7 +67,7 @@ function allLookupGetData(text) {
 	}
 
 	if (allLookupData==null) {
-
+		
 		$.ajax({
 			url : "ajax_interface.php",
 			type: "POST",
