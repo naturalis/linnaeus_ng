@@ -10,6 +10,18 @@
 <input type="hidden" name="language_id" value="{$languages[0].language_id}" />
 {/if}
 <table>
+	<tr>
+		<td colspan="2">
+			<input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm(this)" />
+			<input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm(this)" />
+			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->
+			{if $gloss.id}
+			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
+			{/if}
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>		
+
 {if $languages|@count > 1}
 	<tr>
 		<td>{t}Language:{/t}</td>
@@ -85,18 +97,6 @@
 		{/if}
 		<br />
 		<span class="pseudo-a" onclick="$('#action').val('media');glossCheckForm(this);">{t}upload media{/t}</span>
-		</td>
-	</tr>
-
-	<tr><td colspan="2">&nbsp;</td></tr>		
-	<tr>
-		<td colspan="2">
-			<input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm(this)" />
-			<input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm(this)" />
-			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->
-			{if $gloss.id}
-			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
-			{/if}
 		</td>
 	</tr>
 </table>

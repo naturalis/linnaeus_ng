@@ -100,30 +100,12 @@ function contentSwitchPage() {
 
 }
 
+function contentPreviewContent() {
+	
+	contentSaveContentAll();
+	contentSaveContentActive();
+	$('#theForm').attr('action','preview.php');
+	$('#theForm').submit();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 

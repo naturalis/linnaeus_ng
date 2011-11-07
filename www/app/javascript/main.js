@@ -269,6 +269,13 @@ function goContent(id) {
 
 }
 
+function goContentPage(subject) {
+
+	addFormVal('sub',subject);
+	goForm('../linnaeus/index.php');
+
+}
+
 function goMatrix(id) {
 
 	addFormVal('id',id);
@@ -296,7 +303,6 @@ function goIntroductionTopic(id) {
 	goForm('../introduction/topic.php');
 
 }
-
 
 
 var searchBoxSelected = false;

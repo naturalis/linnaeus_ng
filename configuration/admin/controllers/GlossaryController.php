@@ -656,31 +656,17 @@ class GlossaryController extends Controller
 
 		$term = $this->getGlossaryTerm($this->requestData['id']);
 
+		$navList = $this->getGlossaryTermsNavList();
+
 		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
-		//$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
-		//$this->smarty->assign('prevUrl','taxon.php?id='.$d[$taxon['id']]['prev']['id']);
-
-		//$letter = strtolower(substr($term['term'],0,1));
-
-		//$this->setPageName(sprintf(_('Glossary: "%s"'),$term['term']));
-
-		//$alpha = $this->getGlossaryAlphabet($this->didActiveLanguageChange());
-
-		//if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
-		//if (isset($letter)) $this->smarty->assign('letter', $letter);
+		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
 
 		if (isset($term)) $this->smarty->assign('term', $term);
-
-		//if (isset($term)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($term['id']));
 
 		$this->printPreviewPage(
 			'../../../../app/templates/templates/glossary/_term',
 			'glossary.css'
 		);
-
-		// front-end template
-		// font-end stye
     
     }
 

@@ -3,6 +3,7 @@
 <span id="message-container" style="float:right;"></span>
 <form name="theForm" id="theForm" method="post" action="" >
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
+<input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" />
 {*<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" style="margin-right:15px" />*}
 <input type="button" value="{t}delete{/t}" onclick="freemodDeletePage()" />
 <input type="hidden" name="id" id="id" value="{$id}" />

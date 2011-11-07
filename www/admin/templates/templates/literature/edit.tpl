@@ -16,6 +16,21 @@
 
 <table>
 	<tr>
+		<td colspan="2">
+			<input type="button" value="{t}save{/t}" onclick="litCheckForm(this)" />
+			<input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');litCheckForm(this)" />
+			{* if $session.system.literature.taxon.taxon_id!=''}
+			<input type="button" value="{t}back{/t}" onclick="window.open('../species/literature.php?id={$session.system.literature.taxon.taxon_id}','_top')" />
+			{else}
+			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />
+			{/if *}
+			{if $ref.id}
+			<input type="button" value="{t}delete{/t}" onclick="litDelete()" />
+			{/if}
+		</td>
+	</tr>	
+	<tr><td colspan="2">&nbsp;</td></tr>		
+	<tr>
 		<td>{t}Number of authors:{/t}</td>
 		<td>
 			<label><input type="radio" name="auths" id="auths-1" value="1" onchange="litToggleAuthorTwo()" {if $num==1}checked="checked"{/if} />{t}one{/t}</label>
@@ -103,20 +118,6 @@
 			</select>
 			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList()">{t}add{/t}</span>
 			<div id="selected-taxa"></div>
-		</td>
-	</tr>
-	<tr><td colspan="2">&nbsp;</td></tr>		
-	<tr>
-		<td colspan="2">
-			<input type="button" value="{t}save{/t}" onclick="litCheckForm(this)" />
-			{* if $session.system.literature.taxon.taxon_id!=''}
-			<input type="button" value="{t}back{/t}" onclick="window.open('../species/literature.php?id={$session.system.literature.taxon.taxon_id}','_top')" />
-			{else}
-			<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_top')" />
-			{/if *}
-			{if $ref.id}
-			<input type="button" value="{t}delete{/t}" onclick="litDelete()" />
-			{/if}
 		</td>
 	</tr>
 </table>

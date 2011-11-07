@@ -560,7 +560,7 @@ q($results,1,1);
 
 		$this->setTaxonType('lower');
 
-		$this->_indexAction();
+		$this->_speciesIndexAction();
 
 	}
 
@@ -577,11 +577,11 @@ q($results,1,1);
 
 		$this->setTaxonType('higher');
 
-		$this->_indexAction();
+		$this->_speciesIndexAction();
 
 	}
 
-    private function _indexAction ()
+    private function _speciesIndexAction ()
     {
 
 		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));

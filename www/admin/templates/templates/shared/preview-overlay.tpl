@@ -7,10 +7,8 @@
 	color:#aaa;
 "
 >
-{literal}
-<input type="button" value="back to editing" onclick="window.open('{/literal}{$backUrl}{literal}','_self');" />
-<input type="button" value="next" onclick="window.open('{/literal}{$nextUrl}{literal}','_self');" />
-{/literal}
+<input type="button" value="back to editing" onclick="window.open('{$backUrl}','_self');" />
+{if $nextUrl}<input type="button" value="next" onclick="window.open('{$nextUrl}','_self');" />{/if}
 </div>
 
 {literal}

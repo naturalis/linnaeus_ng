@@ -4432,7 +4432,6 @@ class SpeciesController extends Controller
 		$d = $this->getUserAssignedTreeList();					
 		$this->smarty->assign('backUrl','taxon.php?id='.$this->requestData['taxon_id']);
 		$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
-		$this->smarty->assign('prevUrl','taxon.php?id='.$d[$taxon['id']]['prev']['id']);
 
 		// get categories
 		$categories = $this->getCategories($this->requestData['taxon_id'],$this->requestData['activeLanguage']);

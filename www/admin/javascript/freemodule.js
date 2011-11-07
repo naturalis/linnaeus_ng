@@ -118,3 +118,19 @@ function freemodDeletePage(id) {
 	
 
 }
+
+function freemodDoPreview() {
+
+	freemodSaveContentAll();
+	$("#action").val('preview');
+	$('#theForm').submit();
+
+}
+
+
+function freemodSaveContentAll() {
+	
+	freemodSaveContentDefault();
+	freemodSaveContentActive();
+
+}

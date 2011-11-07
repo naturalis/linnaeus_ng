@@ -1473,12 +1473,17 @@ class Controller extends BaseClass
 	
 	}
 
-	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null)
+	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null,$specificMenuTemplate=null)
 	{
 
 		$this->includeLocalMenu  = false;
 
 		$this->smarty->assign('menu', $this->getFrontEndMainMenu());
+		$this->smarty->assign('controllerMenuOverride',
+			$specificMenuTemplate ?
+				$specificMenuTemplate :
+				'../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu.tpl'
+			);
 
 		unset($this->cssToLoad);
 
@@ -1491,7 +1496,8 @@ class Controller extends BaseClass
 		$this->printPage('../../../../app/templates/templates/shared/_header-container');
 		$this->printPage('../../../../app/templates/templates/shared/_main-menu');
 		$this->printPage('../../../../app/templates/templates/shared/_page-start');
-		@$this->printPage('../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu');
+		//@$this->printPage('../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu');
+
 		if (isset($specificTemplate)) $this->printPage($specificTemplate);
 		$this->printPage('../../../../app/templates/templates/shared/_footer');
 		$this->printPage('../shared/preview-overlay');
@@ -1850,7 +1856,6 @@ class Controller extends BaseClass
 
 	public function loadControllerConfig($controllerBaseName=null)
     {
-
 
 		if (isset($controllerBaseName))
 	        $t = 'getControllerSettings'.$controllerBaseName;
