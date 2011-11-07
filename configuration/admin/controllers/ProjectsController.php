@@ -130,7 +130,7 @@ class ProjectsController extends Controller
 		$modules = $this->models->ModuleProject->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
+					'project_id' => $this->getCurrentProjectId(),
 				), 
 				'order' => 'module_id asc'
 			)
@@ -144,14 +144,14 @@ class ProjectsController extends Controller
 			$modules[$key]['icon'] = $mp['icon'];
 			$modules[$key]['module'] = $mp['module'];
 			$modules[$key]['controller'] = $mp['controller'];
+			$modules[$key]['show_in_menu'] = $mp['show_in_menu'];
 
 			// see if the current user has any rights within the module
 			if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]))
 				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
 
 		}
-//echo 'eeeek!';
-//q($modules);
+
 		$freeModules = $this->models->FreeModuleProject->_get(
 			array(
 				'id' => array(

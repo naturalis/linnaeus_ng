@@ -113,7 +113,6 @@ class ModuleController extends Controller
 
     }
 
-
     /**
      * Create new page or edit existing
      *
@@ -152,7 +151,12 @@ class ModuleController extends Controller
 
 				$this->deleteMedia();
 
-			}
+			} else
+			if ($this->rHasVal('action','preview')) {
+
+				$this->redirect('preview.php?id='.$this->requestData['id']);
+
+			} 
 
 			$page = $this->getPage();
 
@@ -187,6 +191,28 @@ class ModuleController extends Controller
     
     }
 
+
+    public function previewAction()
+    {
+
+		$page = $this->getPageContent($this->requestData['id'],$_SESSION['project']['default_language_id']);
+		$module = $this->getFreeModule();
+
+		$navList = $this->getModulePageNavList();
+
+		$this->smarty->assign('headerTitles',array('title' => $module['module'],'subtitle' => $page['topic']));
+		$this->smarty->assign('module',$module);
+		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
+		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
+
+		if (isset($page)) $this->smarty->assign('page', $page);
+
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/module/_topic',
+			'glossary.css'
+		);
+
+    }
 
     public function browseAction()
     {
@@ -393,10 +419,10 @@ class ModuleController extends Controller
 
 	}
 
-	private function ajaxActionGetContent()
+	private function getPageContent($id,$languageId)
 	{
 
-        if (!$this->rHasVal('id') || !$this->rHasVal('language')) {
+        if (!$id || !$languageId) {
             
             return;
         
@@ -407,13 +433,30 @@ class ModuleController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
 						'module_id' => $this->getCurrentModuleId(),
-						'language_id' => $this->requestData['language'], 
-						'page_id' => $this->requestData['id'],
+						'language_id' => $languageId, 
+						'page_id' => $id,
 						)
 				)
 			);
                 
-            $this->smarty->assign('returnText', json_encode(array('topic' => $cfm[0]['topic'],'content' => $cfm[0]['content'])));
+            return $cfm[0];
+
+        }
+
+	}
+
+	private function ajaxActionGetContent()
+	{
+
+        if (!$this->rHasVal('id') || !$this->rHasVal('language')) {
+            
+            return;
+        
+        } else {
+
+			$page = $this->getPageContent($this->requestData['id'],$this->requestData['language']);
+                
+            $this->smarty->assign('returnText', json_encode(array('topic' => $page['topic'],'content' => $page['content'])));
         
         }
 
@@ -453,7 +496,12 @@ class ModuleController extends Controller
 	private function getFreeModule($id=null)
 	{
 
-		$id = isset($id) ? $id : $this->requestData['freeId'];
+		$id = 
+			isset($id) ? 
+				$id : 
+				isset($this->requestData['freeId']) ?
+					$this->requestData['freeId'] :
+					$this->getCurrentModuleId();
 
 		$fmp = $this->models->FreeModuleProject->_get(
 			array(

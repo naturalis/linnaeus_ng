@@ -79,7 +79,6 @@ class IntroductionController extends Controller
 
     }
 
-
     /**
      * Create new page or edit existing
      *
@@ -118,6 +117,11 @@ class IntroductionController extends Controller
 
 				$this->deleteMedia();
 
+			} else
+			if ($this->rHasVal('action','preview')) {
+
+				$this->redirect('preview.php?id='.$this->requestData['id']);
+
 			}
 
 			$page = $this->getPage();
@@ -153,6 +157,31 @@ class IntroductionController extends Controller
     
     }
 
+
+    /**
+     * Create new page or edit existing
+     *
+     * @access    public
+     */
+    public function previewAction()
+    {
+
+		$page = $this->getPage($this->requestData['id']);
+
+		$navList = $this->getPageNavList();
+
+		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
+		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
+
+		if (isset($page)) $this->smarty->assign('page', $page);
+		if (isset($page)) $this->smarty->assign('headerTitles', array('title' => $page['topic']));
+
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/introduction/_topic',
+			'module.css'
+		);
+
+	}
 
     /**
      * Change page display order
@@ -539,7 +568,7 @@ class IntroductionController extends Controller
 
 	}
 
-	private function getPage($id=null)
+	private function getPage($id=null,$languageId=null)
 	{
 
 		$id = isset($id) ? $id : $this->requestData['id'];
@@ -556,6 +585,24 @@ class IntroductionController extends Controller
 		);
 
 		if ($pfm) {
+
+			$cfm = $this->models->ContentIntroduction->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => isset($languageId) ? $languageId : $_SESSION['project']['default_language_id'], 
+						'page_id' => $this->requestData['id'],
+						)
+				)
+			);
+				
+			if ($cfm) {
+
+				$pfm[0]['content'] = $cfm[0]['content'];
+
+				$pfm[0]['topic'] = $cfm[0]['topic'];
+
+			}
 
 			$fmm = $this->models->IntroductionMedia->_get(
 				array(

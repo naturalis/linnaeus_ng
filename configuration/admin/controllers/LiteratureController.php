@@ -222,6 +222,11 @@ class LiteratureController extends Controller
 
 					$this->redirect('../species/literature.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
 
+				} else
+				if ($this->rHasVal('action','preview')) {
+
+					$this->redirect('preview.php?id='.$id);
+
 				} else {
 
 					$_SESSION['system']['literature']['activeLetter'] = strtolower(substr($this->requestData['author_first'],0,1));
@@ -261,6 +266,24 @@ class LiteratureController extends Controller
 		$this->smarty->assign('alpha', $alpha);
 
         $this->printPage();
+
+    }
+
+    public function previewAction()
+    {
+
+		$ref = $this->getReference($this->requestData['id']);
+		$navList = $this->getReferencesNavList();
+
+		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
+		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
+
+		if (isset($ref)) $this->smarty->assign('ref', $ref);
+
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/literature/_reference',
+			'literature.css'
+		);
 
     }
 
@@ -428,7 +451,18 @@ class LiteratureController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $thisId
 				),
-				'columns' => '*, year(`year`) as `year`'
+				'columns' =>
+					'*,
+					year(`year`) as `year`,
+					concat(
+							author_first,
+							(
+								if(multiple_authors=1,
+									\' et al.\',
+									if(author_second!=\'\',concat(\' & \',author_second),\'\')
+								)
+							)
+						) as author_full'
 			)
 		);
 		

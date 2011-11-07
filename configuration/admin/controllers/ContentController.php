@@ -162,6 +162,25 @@ class ContentController extends Controller
     
     }
 
+    public function previewAction ()
+    {
+
+		$content = $this->getContent($this->requestData['subject'],$_SESSION['project']['default_language_id']);
+
+		$this->smarty->assign('backUrl','content.php?sub='.$this->requestData['subject']);
+		//$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
+
+		$this->smarty->assign('subject', $this->requestData['subject']);
+		if (isset($content)) $this->smarty->assign('content', $content);
+
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/linnaeus/_index',
+			'index.css',
+			'../../../../app/templates/templates/linnaeus/_menu.tpl'
+		);
+    
+    }
+
 
 	/**
 	* General interface for all AJAX-calls
@@ -237,10 +256,10 @@ class ContentController extends Controller
 	}
 
 
-	private function ajaxActionGetContent()
+	private function getContent($id,$languageId)
 	{
 
-        if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
+        if (!$languageId || !$id) {
             
             return;
         
@@ -250,18 +269,32 @@ class ContentController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'],
-						'subject' => $this->requestData['id']
+						'language_id' => $languageId,
+						'subject' => $id
 						)
 				)
 			);
                 
-            $this->smarty->assign('returnText', $c[0]['content']);
+           return $c[0]['content'];
         
         }
 
 	}
 
+	private function ajaxActionGetContent()
+	{
+
+        if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
+            
+            return;
+        
+        } else {
+
+            $this->smarty->assign('returnText', $this->getContent($this->requestData['id'],$this->requestData['language']));
+
+        }
+
+	}
 
 	
 	
