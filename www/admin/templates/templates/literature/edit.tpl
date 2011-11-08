@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<form action="" method="post" id="theForm" action="edit.php">
+<form action="" method="post" id="theForm" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="id" value="{$ref.id}" />
 <input type="hidden" name="action" id="action" value="" />
@@ -137,23 +137,23 @@ $('body').click(function(e) {
 });
 
 var f = $('#selected-taxa');
-
 var off = $('#add-button').offset();
 f.offset({left : off.left + $('#add-button').width() + 25, top: off.top});
 
 initTinyMce(false,false);
-
-
-});
 {/literal}
 
 {foreach from=$ref.taxa item=v}
-	litAddTaxonToList({$v},true);
+	litAddTaxonToList({$v.taxon_id},true);
 {/foreach}
 litUpdateTaxonSelection();
 {if $ref}
-litThisReference = ['{$ref.author_first|escape:'quotes'} ({$ref.year})'];
+litThisReference = ['{$ref.author_full|escape:'quotes'}, {$ref.year}{$ref.suffix|escape:'quotes'}'];
 {/if}
+
+{literal}
+});
+{/literal}
 </script>
 
 {include file="../shared/admin-messages.tpl"}

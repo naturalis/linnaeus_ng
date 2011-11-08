@@ -894,7 +894,7 @@ abstract class Model extends BaseClass
 			
             $this->data = @mysql_fetch_assoc($m);
         
-        } elseif (isset($where)) {
+        } elseif ($where!==false) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where ' . $where;
 

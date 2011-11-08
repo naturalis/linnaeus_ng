@@ -756,7 +756,7 @@ abstract class Model extends BaseClass
         $query = false;
         
         if (!$id && !$where) return;
-			
+	
         if (is_array($id)) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
@@ -894,7 +894,7 @@ abstract class Model extends BaseClass
 			
             $this->data = @mysql_fetch_assoc($m);
         
-        } elseif (isset($where)) {
+        } elseif ($where!==false) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where ' . $where;
 
@@ -943,7 +943,7 @@ abstract class Model extends BaseClass
             }
         
         } else {
-			
+
 			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
 		
 		}

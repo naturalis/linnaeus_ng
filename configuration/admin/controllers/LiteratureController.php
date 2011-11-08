@@ -9,7 +9,8 @@ class LiteratureController extends Controller
     public $usedModels = array(
 		'literature',
 		'literature_taxon',
-		'taxon'
+		'taxon',
+		'synonym'
     );
    
     public $controllerPublicName = 'Literary references';
@@ -89,7 +90,7 @@ class LiteratureController extends Controller
 		} else
 		if ($this->rHasId()) {
 
-			$ref = $this->getReference();
+			$ref = $this->getReference($this->requestData['id']);
 
 		} else
 		if (!$this->rHasVal('action','new')) {
@@ -438,7 +439,90 @@ class LiteratureController extends Controller
     
     }
 
-	private function getReference($id=null)
+	private function getReference($id)
+	{
+
+		if (!isset($id)) return;
+
+		$l = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				),
+				'columns' => '*, year(`year`) as `year`,
+					 			concat(
+									author_first,
+									(
+										if(multiple_authors=1,
+											\' et al.\',
+											if(author_second!=\'\',concat(\' & \',author_second),\'\')
+										)
+									)
+								) as author_full',
+			)
+		);
+		
+		if ($l) {
+		
+			$ref = $l[0];
+			
+			$lt = $this->models->LiteratureTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'literature_id' => $id	
+					)
+				)
+			);
+
+			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
+
+			foreach((array)$lt as $key => $val) {
+
+				if (isset($val['taxon_id'])) {
+
+					$t = $this->models->Taxon->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $val['taxon_id']
+							),
+							'columns' => $tc
+						)
+					);
+
+					$lt[$key]['taxon'] = $t[0];
+
+				}
+
+			}
+			
+			$ref['taxa'] = $lt;
+
+			$s = $this->models->Synonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'lit_ref_id' => $id	
+					),
+					'columns' => 'synonym,taxon_id'
+				)
+			);
+
+			$ref['synonyms'] = $s;
+
+			return $ref;
+
+		} else {
+		
+			return;
+
+		}
+
+	}
+
+	private function _getReference($id=null)
 	{
 
 		if (!isset($id) && !$this->rHasId()) return false;
