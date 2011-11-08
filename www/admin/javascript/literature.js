@@ -3,6 +3,8 @@ var litAuthors = Array();
 var litThisReference = '';
 var litDropDownVisible = false;
 var litDropDownType = 'reference'; // 'authors';
+var litTaxonNames = Array();
+
 
 function litToggleAuthorTwo() {
 	
@@ -204,27 +206,26 @@ function litCheckForm(ele) {
 
 		$('#text').val(tinyMCE.get('text').getContent());
 		
-		$(ele).closest("form").submit();
+//		$(ele).closest("form").submit();
+		$("#theForm").submit();
 
 	}
 
 }
 
-var taxonNames = Array();
+function litGetTaxonName(taxonId) {
 
-function litGetTaxonName(taxonId) {7
-
-	if (!taxonNames[taxonId]) {
+	if (!litTaxonNames[taxonId]) {
 
 		$("#taxa > option").each(function() {
 			if (this.value==taxonId) { 
-				taxonNames[taxonId] = this.text.trim();
+				litTaxonNames[taxonId] = this.text.trim();
 			}
 		});
 		
 	}
 	
-	return taxonNames[taxonId];
+	return litTaxonNames[taxonId];
 
 }
 
@@ -269,10 +270,12 @@ function litRemoveTaxonFromList(id) {
 
 function litAddTaxonToList(taxonId,noupdate) {
 
+	// get taxon id to add
 	if (!taxonId) taxonId = $('#taxa :selected').val();
 
 	var add = true;
 
+	// check if it's not aready in the list
 	for(var i=0;i<litAddedTaxa.length;i++) {
 
 		if (litAddedTaxa[i] == taxonId) {
@@ -282,6 +285,7 @@ function litAddTaxonToList(taxonId,noupdate) {
 
 	}
 
+	// if it's new, add it to the list
 	if (add) { 
 
 		litAddedTaxa[litAddedTaxa.length] = taxonId;

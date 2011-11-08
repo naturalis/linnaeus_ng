@@ -12,10 +12,10 @@
 {if $alpha[i]==$letter}
 <span class="alphabet-active-letter">{$alpha[i]}</span>
 {else}
-<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#action').val('browse');$('#theForm').submit();">{$alpha[i]}</span>
+<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#action').val('browse');$('#alphaForm').submit();">{$alpha[i]}</span>
 {/if}
 {/section}
-<form name="theForm" id="theForm" method="post" action="">
+<form id="alphaForm" method="post" action="">
 <input type="hidden" name="letter" id="letter" value="{$letter}"  />
 </form>
 </div>
