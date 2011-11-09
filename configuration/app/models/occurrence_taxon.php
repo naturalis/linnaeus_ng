@@ -4,9 +4,8 @@ include_once ('model.php');
 
 class OccurrenceTaxon extends Model
 {
-    
-    const tableBaseName = 'occurrences_taxa';
 
+    const tableBaseName = 'occurrences_taxa';
 
 
     /**
@@ -16,11 +15,10 @@ class OccurrenceTaxon extends Model
      */
     public function __construct ()
     {
-        
-        parent::__construct(self::tableBaseName);
-    
-    }
 
+        parent::__construct(self::tableBaseName);
+
+    }
 
 
     /**
@@ -30,8 +28,21 @@ class OccurrenceTaxon extends Model
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
+
+    }
+
+
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
     
     }
 

@@ -44,7 +44,6 @@ class Controller extends BaseClass
 
     private $usedModelsBase = array(
         'user', 
-        'helptext', 
         'project', 
 		'role',
 		'right',
@@ -880,80 +879,53 @@ class Controller extends BaseClass
 	}
 
 
-    /**
-     * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
-     *
-     * @param array    $array    array to sort
-     * @param array    $sortBy    array to array of key, direction, case-sensitivity and whether or not to maintain key-association
-     * @access     public
-     */
-    public function customSortArray (&$array, $sortBy)
+    public function getProjectModules ($params=null)
+    {
+
+		$d['project_id'] = $this->getCurrentProjectId();
+		
+		if (isset($params['active']) && ($params['active']=='y' || $params['active']=='n'))
+			$d['active'] = $params['active'];
+
+		$p['id'] = $d;
+
+		if (isset($params['order']))
+			$p['order'] = $params['order'];
+
+		$modules = $this->models->ModuleProject->_get($p);
+
+        foreach ((array) $modules as $key => $val) {
+
+            $mp = $this->models->Module->_get(array('id' => $val['module_id']));
+
+            $modules[$key]['module'] = $mp['module'];
+
+            $modules[$key]['description'] = $mp['description'];
+
+            $modules[$key]['controller'] = $mp['controller'];
+
+        }
+
+		return $modules;
+		
+	}
+
+
+    public function checkModuleActivationStatus ()
     {
         
-        if (!isset($array) || !is_array($array)) return;
-
-        if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
+        if ($this->getModuleActivationStatus() == -1) {
+            
+            $_SESSION['system']['last_module_name'] = $this->controllerPublicName;
+            
+            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['moduleNotPresent']);
         
-        if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
-        
-        if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
-
-		$maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys']===true);
-
-        if ($maintainKeys) {
-
-			$keys = array();
-			
-			$f = md5(uniqid(null,true));
-	
-			foreach((array)$array as $key => $val) {
-	
-				$x = md5(json_encode($val).$key);
-				$array[$key][$f] = $x;
-				$keys[$x] = $key;
-	
-			}
-			
-		}
-
-        usort($array,
-			array(
-				$this, 
-				'doCustomSortArray'
-        	)
-		);
-
-        if ($maintainKeys) {
-
-			foreach((array)$array as $val) {
-			
-				if (is_array($val)) {
-				
-					$y = array() ;
-				
-					foreach($val as $key2 => $val2) {
-					
-						if ($key2!=$f) $y[$key2] = $val2;
-					
-					}
-
-					$d[$keys[$val[$f]]] = $y;
-
-				} else {
-			
-					$d[$keys[$val[$f]]] = $val;
-
-				}
-			
-			}
-			
-			$array = $d;
-			
-		}
+        }
     
     }
 
 
+		
     /**
      * Returns the default save path for file uploads
      *
@@ -998,36 +970,6 @@ class Controller extends BaseClass
 
 
     /**
-     * Checks if a form submit is new or a resubmit (through user refresh)
-     *
-     * Add this line to the form in your template
-     *        <input type="hidden" name="rnd" value="{$rnd}" />
-     * and you can call
-     *        $this->isFormResubmit()
-     * in the receiving controller function to make sure whether the submit is a resubmit
-     * of the same instance of the form (as when the user reloads a posted form)
-     * the old value of last_rnd is set on destruct.
-	 *
-     * @return boolean    is resubmit or not
-     * @access     public
-     */
-    public function isFormResubmit ()
-    {
-        
-        $result = false;
-
-        if (
-			isset($this->requestData['rnd']) && 
-			isset($_SESSION['system']['last_rnd']) && 
-			($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
-		)
-            $result = true;
-
-        return $result;
-    
-    }
-
-    /**
      * Returns the address of the root index for someone who is logged in
      *
      * @access     public
@@ -1066,16 +1008,33 @@ class Controller extends BaseClass
     }
 
 
-    public function checkModuleActivationStatus ()
+   /**
+     * Checks if a form submit is new or a resubmit (through user refresh)
+     *
+     * Add this line to the form in your template
+     *        <input type="hidden" name="rnd" value="{$rnd}" />
+     * and you can call
+     *        $this->isFormResubmit()
+     * in the receiving controller function to make sure whether the submit is a resubmit
+     * of the same instance of the form (as when the user reloads a posted form)
+     * the old value of last_rnd is set on destruct.
+	 *
+     * @return boolean    is resubmit or not
+     * @access     public
+     */
+    public function isFormResubmit ()
     {
         
-        if ($this->getModuleActivationStatus() == -1) {
-            
-            $_SESSION['system']['last_module_name'] = $this->controllerPublicName;
-            
-            $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['moduleNotPresent']);
-        
-        }
+        $result = false;
+
+        if (
+			isset($this->requestData['rnd']) && 
+			isset($_SESSION['system']['last_rnd']) && 
+			($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
+		)
+            $result = true;
+
+        return $result;
     
     }
 	
@@ -1226,6 +1185,79 @@ class Controller extends BaseClass
 		return _($content);
 
 	}
+
+    /**
+     * Perfoms a usort, using user defined sort by-field, sort direction and case-sensitivity
+     *
+     * @param array    $array    array to sort
+     * @param array    $sortBy    array to array of key, direction, case-sensitivity and whether or not to maintain key-association
+     * @access     public
+     */
+    public function customSortArray (&$array, $sortBy)
+    {
+        
+        if (!isset($array) || !is_array($array)) return;
+
+        if (isset($sortBy['key'])) $this->setSortField($sortBy['key']);
+        
+        if (isset($sortBy['dir'])) $this->setSortDirection($sortBy['dir']);
+        
+        if (isset($sortBy['case'])) $this->setSortCaseSensitivity($sortBy['case']);
+
+		$maintainKeys = isset($sortBy['maintainKeys']) && ($sortBy['maintainKeys']===true);
+
+        if ($maintainKeys) {
+
+			$keys = array();
+			
+			$f = md5(uniqid(null,true));
+	
+			foreach((array)$array as $key => $val) {
+	
+				$x = md5(json_encode($val).$key);
+				$array[$key][$f] = $x;
+				$keys[$x] = $key;
+	
+			}
+			
+		}
+
+        usort($array,
+			array(
+				$this, 
+				'doCustomSortArray'
+        	)
+		);
+
+        if ($maintainKeys) {
+
+			foreach((array)$array as $val) {
+			
+				if (is_array($val)) {
+				
+					$y = array() ;
+				
+					foreach($val as $key2 => $val2) {
+					
+						if ($key2!=$f) $y[$key2] = $val2;
+					
+					}
+
+					$d[$keys[$val[$f]]] = $y;
+
+				} else {
+			
+					$d[$keys[$val[$f]]] = $val;
+
+				}
+			
+			}
+			
+			$array = $d;
+			
+		}
+    
+    }
 
     /**
      * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
@@ -2350,7 +2382,7 @@ class Controller extends BaseClass
      * 
      * @access     public
      */
-    public function makePathNames($p)
+	public function makePathNames($p)
     {
         
         if ($p)

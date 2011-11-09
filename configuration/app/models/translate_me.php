@@ -6,9 +6,8 @@ include_once ('model.php');
 
 class TranslateMe extends Model
 {
-    
-    const tableBaseName = 'translate_me';
 
+    const tableBaseName = 'translate_me';
 
 
     /**
@@ -18,13 +17,12 @@ class TranslateMe extends Model
      */
     public function __construct ()
     {
-        
-        parent::__construct(self::tableBaseName);
-		
-		$this->doLog = false; // lots of duplicate entry errors; lazy me
-    
-    }
 
+        parent::__construct(self::tableBaseName);
+
+		$this->doLog = false; // lots of duplicate entry errors; lazy me
+
+    }
 
     /**
      * Destructor
@@ -33,11 +31,10 @@ class TranslateMe extends Model
      */
     public function __destruct ()
     {
-        
-        parent::__destruct();
-    
-    }
 
+        parent::__destruct();
+
+    }
 
 }
 

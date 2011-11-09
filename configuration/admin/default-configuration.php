@@ -540,4 +540,14 @@ class configuration
 
     }
 
+    public function getControllerSettingsUtilities()
+    {
+
+		return array(
+			'excerptLengthLeft' => 100,
+			'excerptLengthRight' => 100
+		);
+
+    }
+
 }

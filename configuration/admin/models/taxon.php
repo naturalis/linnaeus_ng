@@ -4,10 +4,8 @@ include_once ('model.php');
 
 class Taxon extends Model
 {
-    
+
     const tableBaseName = 'taxa';
-
-
 
     /**
      * Constructor, calls parent's constructor
@@ -21,8 +19,6 @@ class Taxon extends Model
     
     }
 
-
-
     /**
      * Destructor
      *
@@ -32,6 +28,19 @@ class Taxon extends Model
     {
         
         parent::__destruct();
+    
+    }
+
+
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
     
     }
 

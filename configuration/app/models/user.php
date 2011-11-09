@@ -4,9 +4,8 @@ include_once ('model.php');
 
 class User extends Model
 {
-    
-    const tableBaseName = 'users';
 
+    const tableBaseName = 'users';
 
 
     /**
@@ -16,11 +15,10 @@ class User extends Model
      */
     public function __construct ()
     {
-        
-        parent::__construct(self::tableBaseName);
-    
-    }
 
+        parent::__construct(self::tableBaseName);
+
+    }
 
 
     /**
@@ -30,11 +28,10 @@ class User extends Model
      */
     public function __destruct ()
     {
-        
-        parent::__destruct();
-    
-    }
 
+        parent::__destruct();
+
+    }
 
 
     /**
@@ -46,13 +43,13 @@ class User extends Model
      */
     public function sanatizeData ($data)
     {
-        
+
         if (isset($data['email_address'])) {
-            
+
             $data['email_address'] = strtolower($data['email_address']);
-        
+
         }
-        
+
         foreach ((array) $data as $key => $val) {
 
 			if (is_array($val)) {
@@ -66,12 +63,25 @@ class User extends Model
 			} else {
 
 	            $data[$key] = trim($val);
-    
+
 			}
-    
+
         }
-        
+
         return $data;
+
+    }
+
+
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
     
     }
 

@@ -8,7 +8,6 @@ class ContentFreeModule extends Model
     const tableBaseName = 'content_free_modules';
 
 
-
     /**
      * Constructor, calls parent's constructor
      *
@@ -16,11 +15,10 @@ class ContentFreeModule extends Model
      */
     public function __construct ()
     {
-        
-        parent::__construct(self::tableBaseName);
-    
-    }
 
+        parent::__construct(self::tableBaseName);
+
+    }
 
 
     /**
@@ -30,8 +28,21 @@ class ContentFreeModule extends Model
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
+
+    }
+
+
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
     
     }
 
