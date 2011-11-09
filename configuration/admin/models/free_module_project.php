@@ -4,9 +4,8 @@ include_once ('model.php');
 
 class FreeModuleProject extends Model
 {
-    
-    const tableBaseName = 'free_modules_projects';
 
+    const tableBaseName = 'free_modules_projects';
 
 
     /**
@@ -16,11 +15,10 @@ class FreeModuleProject extends Model
      */
     public function __construct ()
     {
-        
-        parent::__construct(self::tableBaseName);
-    
-    }
 
+        parent::__construct(self::tableBaseName);
+
+    }
 
 
     /**
@@ -30,8 +28,21 @@ class FreeModuleProject extends Model
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
+
+    }
+
+
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
     
     }
 
