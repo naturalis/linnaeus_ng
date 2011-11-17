@@ -2,25 +2,6 @@
 
 /*
 
-	$taxa = $this->models->{$species['results'][0]['data'][0]['replace']['model']}->_get(
-
-				$matches = $this->getColumnMatches($search,$val,array('synonym'));
-	
-				if (!is_null($matches)) {
-	
-					$synonyms[$key]['replace'] = array(
-						'model' => $this->models->GlossarySynonym->getClassName(),
-						'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id'],'language_id' => $val['language_id']),
-						'matches' => $matches,
-					);
-					
-				}
-
-
-*/
-
-/*
-
 	$textWithGlossaryMatches = $linnaeusController->matchGlossaryTerms($textWithoutGlossaryMatches));
 
 */
@@ -31,6 +12,7 @@ class SearchController extends Controller
 {
 
 	public $noResultCaching = true;
+	private $_replaceId = 1;
 
     public $usedModels = array(
 		'content',
@@ -60,32 +42,18 @@ class SearchController extends Controller
 		'characteristic_matrix',
 		'characteristic_label_state',
 		'characteristic_state',
-		'occurrence_taxon'
+		'geodata_type_title'
     );
 
     public $usedHelpers = array(
     );
 
 	public $cssToLoad = array(
-		'basics.css',
-		'glossary.css',
-		'search.css',
-		'key.css',
-		'literature.css',
-		'map.css',
-		'matrix.css',
-		'module.css',
-		'species.css',
-		'index.css',
-		'colorbox/colorbox.css',
-		'dialog/jquery.modaldialog.css',
-		'lookup.css'
+		'search.css'
 	);
 
 	public $jsToLoad = array('all' => array(
-		'main.js',
-		'speciesdetailpage10.js',
-		'lookup.js'
+		'search.js'
 	));
 	
 
@@ -122,6 +90,14 @@ class SearchController extends Controller
     public function searchIndexAction ()
     {
 
+//		$this->checkAuthorisation();
+		$this->setPageName(_('Search and replace'));
+
+		$this->setControllerMask('utilities','Search');
+		
+		unset($_SESSION['user']['search']['results']);
+
+
 /*
 		if (isset($_SESSION['user']['search']['redo']) && $_SESSION['user']['search']['redo']==true) {
 		
@@ -131,88 +107,273 @@ class SearchController extends Controller
 
 		}
 */
-		$results = $this->_searchAction();
 
-		$this->smarty->assign('results',$results);
+		if (isset($this->requestData['search'])) {
+
+			$_SESSION['user']['search']['search'] = array(
+				'search' => $this->requestData['search'],
+				'replace' => $this->rHasVal('replace') ? $this->requestData['replace'] : null
+				);
+
+			$_SESSION['user']['search']['results'] = $this->_searchAction();
+			
+			if ($this->rHasVal('replace'))
+				$this->redirect('search_replace.php');
+			else
+				$this->redirect('search_results.php');
+			
+		}
+
+		//$this->smarty->assign('results',$results);
 
 		if (isset($this->requestData['search'])) $this->smarty->assign('search',$this->requestData['search']);
 	
 		$this->smarty->assign('modules',$this->getProjectModules());
 
-		$this->smarty->register_block('h', array(&$this,'highlightFound'));
+		//$this->smarty->register_block('h', array(&$this,'highlightFound'));
 
-		$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
+		//$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
 
         $this->printPage();
   
     }
 
-	public function highlightFound($params, $content, &$smarty, &$repeat)
-	{
+    /**
+     * 
+     *
+     * @access    public
+     */
+    public function searchReplaceIndexAction ()
+    {
 
-		if (empty($content)) return;
 
-		return $this->_highlightFound($params, $content);
-
-	}
-
-	public function foundContent($params, $content, &$smarty, &$repeat)
-	{
-
-		if (empty($content)) return;
+//		$this->checkAuthorisation();
 		
-		$s = $params['search'];
-		
-		$content = strip_tags($content);
+		$this->setPageName(_('Search results'));
 
-		if (preg_match('/^"(.+)"$/',$s)) {
+		$this->setControllerMask('utilities','Search');
 
-			$s = substr($s,1,strlen($s)-2);
 
-			$d = $this->clipContent($content,stripos($content,$s),$s);
 
-		} else {
 
-			$s = preg_replace('/(\s+)/',' ',trim($params['search']));
-	
-			if (stripos($s,' ')!==0) {
-	
-				$s = explode(' ',$s);
-				
-				foreach((array)$s as $key => $val) {
-	
-					$pos = stripos($content,$val);
-	
-					if ($pos!==false) {
-	
-						$d = $this->clipContent($content,$pos,$val);
-	
-					}
-	
-				}
-	
-			}
+//q($_SESSION['user']['search']['results'],1);
+		if ($_SESSION['user']['search']['search']) {
+
+			$this->smarty->assign('search',$_SESSION['user']['search']['search']);
+			$this->smarty->assign('results',$_SESSION['user']['search']['results']);
 			
 		}
 
-		if ($d=='') $d = substr($content,0,50).(strlen($content) > 50 ? '...' : '');
+		//$this->smarty->assign('results',$results);
 
-		return $this->_highlightFound($params, $d);
+
+	
+		$this->smarty->assign('modules',$this->getProjectModules());
+
+		//$this->smarty->register_block('h', array(&$this,'highlightFound'));
+
+		//$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
+
+        $this->printPage();
+  
+    }
+
+
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+        
+        if ($this->requestData['action'] == 'replace') {
+            
+            $this->ajaxDoReplace($this->requestData['id']);
+
+        } else
+        if ($this->requestData['action'] == 'skip') {
+            
+            $this->ajaxDoSkip($this->requestData['id']);
+
+        } else
+        if ($this->requestData['action'] == 'reset') {
+            
+            $this->ajaxDoReset($this->requestData['id']);
+
+        }
+
+        $this->printPage('../utilities/ajax_interface');
+
+    }
+
+	private function ajaxDoReplace($id)
+	{
+
+		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'replace')));
 
 	}
 
-	public function redoSearchAction()
+	private function ajaxDoSkip($id)
 	{
 
-		$this->storeHistory = false;
+		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'skip')));
 
-		if ($_SESSION['user']['search']['hasSearchResults'] && $_SESSION['user']['search']['lastSearch']) {
+	}
 
-			$_SESSION['user']['search']['redo'] = true;
+	private function ajaxDoReset($id)
+	{
+
+		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'reset')));
+
+	}
+
+
+	/*
+	*	id can be
+	*		- an integer, representing one match in the search result
+	*		- a string with the form 'module:module name', representing all matches within one module
+	*		- an asterisk (*), representing all matches within the result
+	*
+	*	type can be
+	*		- 'skip': do not replace, set status to 'skipped'
+	*		- 'replace': replace match, set status to 'replaced'
+	*		- 'reset': reset status to null (for development purposes)
+	*/
+
+	private function doReplaceAction($id,$type)
+	{
+
+		if (!isset($_SESSION['user']['search']['results'])) return null;
+
+		if (is_string($id) && substr($id,0,7)=='module:') {
+
+			$thisModule = substr($id,7);
+
+		} else {
+
+			$thisModule = false;
 
 		}
+		
+		if (!is_numeric($id) && $id!='*' && $thisModule===false) return null;
 
-		$this->redirect('search.php');
+		foreach((array)$_SESSION['user']['search']['results'] as $key1 => $val) {
+
+			foreach((array)$val['results'] as $key2 => $module) {
+
+				foreach((array)$module['data'] as $key3 => $data) {
+				
+					if (isset($data['replace']['matches'])) {
+
+						foreach((array)$data['replace']['matches'] as $key4 => $match) {
+
+							if ($match['id']==$id || ($module!==false && $module['label']==$thisModule) || $id=='*') {
+
+								$modelData = $_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace'];
+
+								$replaceData = &$_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace']['matches'][$key4];
+							
+								if ($type=='skip') {
+
+									if($replaceData['status']===false) {
+
+										$replaceData['status'] = 'skipped';
+										
+										if ($thisModule===false && $id!='*') return array($id,'skipped');
+
+									} else {
+
+										if ($thisModule===false && $id!='*') return array($id,'no action');
+
+									}
+
+								} else
+								if ($type=='replace') {
+
+									if($replaceData['status']===false) {
+
+										if ($this->doReplace($modelData,$replaceData)) {
+
+											$replaceData['status'] = 'replaced';
+
+											if ($thisModule===false && $id!='*') return array($id,'replaced');
+
+										} else {
+
+											if ($thisModule===false && $id!='*') return array($id,'replace failed');
+
+										}
+
+									} else {
+									
+										if ($thisModule===false && $id!='*') return array($id,'no action');
+									
+									}
+
+								} else
+								if ($type=='reset') {
+
+									$replaceData['status'] = false;
+
+									if ($thisModule===false && $id!='*') return array($id,'reset');
+
+								} else {
+
+									if ($thisModule===false && $id!='*') return array($id,'no action');
+
+								}
+								
+							}
+
+						}
+
+					}
+	
+				}
+
+			}
+		
+		}
+
+		return array('*',($type=='replace' ? 'replaced' : ($type=='reset' ? 'reset' : 'skipped' )));
+	
+	}
+
+	private function doReplace($modelData,$matchData)
+	{
+
+		// viva readability
+		$searchedFor = $_SESSION['user']['search']['search']['search'];
+		$replaceWith = $_SESSION['user']['search']['search']['replace'];
+		$locationOfSearchTerm = $matchData[1];
+
+		// check whether the string is still what we want to replace (just to be on the safe side)
+		$willReplace = substr($matchData['original'],$locationOfSearchTerm,strlen($searchedFor));
+	
+		if (strtolower($searchedFor)!==strtolower($willReplace)) return false;
+
+		// match initial capital
+		$init = substr($matchData['original'],$locationOfSearchTerm,1);
+		$replaceWith = ($init == strtoupper($init)) ? ucfirst($replaceWith) : $replaceWith;
+
+		// create new data by replacing the old string (using substring to make sure we *only* replace the term starting at $locationOfSearchTerm)
+		$newData =
+			substr($matchData['original'],0,$locationOfSearchTerm).
+			$replaceWith.
+			substr($matchData['original'],$locationOfSearchTerm + strlen($searchedFor));
+
+		// replacing the old content with the new ($modelData["model"] holds the name of the appropriate model, $modelData['id'] is an array of relevant id's)
+		$result = $this->models->{$modelData["model"]}->update(
+			array(
+				$matchData['column'] => $newData,
+			),
+			$modelData['id']
+		);
+
+		return $result;
 
 	}
 
@@ -232,7 +393,9 @@ class SearchController extends Controller
 					!isset($_SESSION['user']['search'][$this->requestData['search']]) || 
 					$this->noResultCaching
 					) {
-
+					
+					$this->_replaceId = 0;
+					
 					$results = $this->doSearch($this->requestData['search']);
 
 					$results['numOfResults'] =
@@ -247,6 +410,8 @@ class SearchController extends Controller
 						;
 		
 					$_SESSION['user']['search'][$this->requestData['search']]['results'] = $results;
+
+					$this->_replaceId = null;
 
 				} else {
 
@@ -269,8 +434,6 @@ class SearchController extends Controller
 			}
 
 		} else {
-
-//			unset($_SESSION['user']['search'][$this->requestData['search']]['results']);
 
 			return null;
 
@@ -317,21 +480,19 @@ class SearchController extends Controller
 
 	private function doSearch($search)
 	{
-$search = 'Backenroth';
+
 		$species = $this->searchSpecies($search);
 // INTRODUCTION etc
 
-
-q($this->searchContent($search),1);
 		return array(
-'species' => $species,
-'modules' => $this->searchModules($search),
-'dichkey' => $this->searchDichotomousKey($search),
+			'species' => $species,
+			'modules' => $this->searchModules($search),
+			'dichkey' => $this->searchDichotomousKey($search),
 			'literature' => $this->searchLiterature($search),
 			'glossary' => $this->searchGlossary($search),
-'matrixkey' => $this->searchMatrixKey($search),
-'content' => $this->searchContent($search),
-'map' => $this->searchMap($species)
+			'matrixkey' => $this->searchMatrixKey($search),
+			'content' => $this->searchContent($search),
+			'map' => $this->searchMap($search,$species)
 			
 		);
 
@@ -436,7 +597,7 @@ q($this->searchContent($search),1);
 	
 	}
 
-	private function getColumnMatches($search,$values,$fields)
+	private function getColumnMatches($search,$values,$fields,&$counter=null)
 	{
 	
 		$results = array();
@@ -448,15 +609,18 @@ q($this->searchContent($search),1);
 		
 		foreach($columns as $key => $column) {
 		
-			$content = strip_tags($values[$column]);
-	
+			$content = $values[$column]; // do NOT strip tags, as it well mess up the replacement process
+
 			preg_match_all($this->makeRegExpCompatSearchString($search,true),$content,$matches,PREG_OFFSET_CAPTURE);
 
 			foreach((array)$matches[0] as $mK => $mV) {
-	
+
+				$matches[0][$mK]['id'] = $this->_replaceId++;
 				$matches[0][$mK]['column'] = $column;
-				$matches[0][$mK]['replaced'] = false;
-	
+				$matches[0][$mK]['status'] = false;
+				$matches[0][$mK]['original'] = $values[$column];
+
+				/*	
 				$matches[0][$mK]['excerpt'] =
 					($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
 					substr(
@@ -472,30 +636,36 @@ q($this->searchContent($search),1);
 					).					
 					($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...')
 					;
-	
+				*/
+
 				$matches[0][$mK]['highlighted'] =
-					($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
-					substr(
-						$content,
-						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
-						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
+					htmlentities(
+						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
+						substr(
+							$content,
+							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
+							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
+						)
 					).
-					'[span]'.
+					'<span class="stringToReplace">'.
 					$mV[0].
-					'[/span]'.
-					substr(
-						$content,
-						$mV[1]+strlen($mV[0]),
-						$this->controllerSettings['excerptLengthRight']
-					).					
-					($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...')
-					;
+					'</span>'.
+					htmlentities(
+						substr(
+							$content,
+							$mV[1]+strlen($mV[0]),
+							$this->controllerSettings['excerptLengthRight']
+						).					
+						($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...')
+					);
 	
 			}
 			
 			$results = array_merge($results,$matches[0]);
 			
 		}
+		
+		$counter = (is_null($counter) ? 0 : $counter) + count((array)$results);
 		
 		return empty($results) ? null : $results;
 	
@@ -504,9 +674,9 @@ q($this->searchContent($search),1);
 	private function searchSpecies($search,$extensive=true)
 	{
 
-		$regExSs = $this->makeRegExpCompatSearchString($search);
-
 		$taxa = $synonyms = $commonnames = $content = $media = array();
+		
+		$replaceCountTaxa = $replaceCountContent = $replaceCountSynonym = $replaceCountCommon = $replaceCountMedia = 0;
 
 		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
 
@@ -514,33 +684,43 @@ q($this->searchContent($search),1);
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon regexp' => $regExSs
+					'taxon regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id as taxon_id,taxon as label,rank_id'
+				'columns' => 'id,taxon,id as taxon_id,taxon as label,rank_id'
 			)
 		);
 
 		foreach((array)$taxa as $key => $val)  {
 		
 			$taxa[$key]['rank'] = $ranks[$val['rank_id']]['rank'];
+
 			$taxa[$key]['replace'] = array(
 				'model' => $this->models->Taxon->getClassName(),
-				'column' => 'taxon',
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['taxon_id'])
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('taxon'),$replaceCountTaxa)
 			);
-			
+				
 		}
 
 		$synonyms = $this->models->Synonym->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,taxon_id,synonym as label,\'names\' as cat'
+				'columns' => 'id,synonym,taxon_id,synonym as label,\'names\' as cat'
 			)
 		);
+
+		foreach((array)$synonyms as $key => $val)  {
+		
+			$synonyms[$key]['replace'] = array(
+				'model' => $this->models->Synonym->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$replaceCountSynonym)
+			);
+				
+		}
 
 		$commonnames = $this->models->Commonname->_get(
 			array(
@@ -554,16 +734,23 @@ q($this->searchContent($search),1);
 					'id,
 					language_id,
 					taxon_id,
+					commonname,
+					transliteration,
 					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) as label,
 					\'names\' as cat'
 			)
 		);	
 	
-	
 		foreach((array)$commonnames as $key => $val) {
 
 			$l = $this->models->Language->_get(array('id'=>$val['language_id']));
 			$commonnames[$key]['language'] = $l['language'];
+
+			$commonnames[$key]['replace'] = array(
+				'model' => $this->models->Commonname->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('commonname','transliteration'),$replaceCountCommon)
+			);
 
 		}
 
@@ -573,38 +760,57 @@ q($this->searchContent($search),1);
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(),
 						'publish' => 1,
 						'content regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-					'columns' => 'id,taxon_id,content as content,page_id as cat'
+					'columns' => 'id,taxon_id,content,page_id as cat'
 				)
 			);
-	
+
+			foreach((array)$content as $key => $val) {
+
+				$content[$key]['replace'] = array(
+					'model' => $this->models->ContentTaxon->getClassName(),
+					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+					'matches' => $this->getColumnMatches($search,$val,array('content'),$replaceCountContent)
+				);
+
+			}
+
+			/*
 			$media1 = $this->models->MediaTaxon->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(),
 						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
 					),
 				'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
 				)
 			);
+			*/
 	
-			$media2 = $this->models->MediaDescriptionsTaxon->_get(
+			$media = $this->models->MediaDescriptionsTaxon->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(),
 						'description regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-				'columns' => 'id,taxon_id,media_id,description as content,\'media\' as cat'
+				'columns' => 'id,media_id,description,description as content,\'media\' as cat'
 				)
 			);
-	
-			$media = array_merge((array)$media1,(array)$media2);
 
+			//$media = array_merge((array)$media1,(array)$media2);
+
+			foreach((array)$media as $key => $val) {
+
+				$media[$key]['replace'] = array(
+					'model' => $this->models->MediaDescriptionsTaxon->getClassName(),
+					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+					'matches' => $this->getColumnMatches($search,$val,array('description'),$replaceCountMedia)
+				);
+
+			}
+			
 		}		
 		
 		$d = array_merge((array)$synonyms,(array)$commonnames,(array)$content,(array)$media);
@@ -614,32 +820,38 @@ q($this->searchContent($search),1);
 				array(
 					'label' => _('Species names'),
 					'data' => $taxa, // when changing the label 'Species names', do the same in searchMap()
-					'numOfResults' => count((array)$taxa)
+					'numOfResults' => count((array)$taxa),
+					'numOfReplacements' => $replaceCountTaxa
 				),
 				array(
 					'label' => _('Species descriptions'),
 					'data' => $content,
-					'numOfResults' => count((array)$content)
+					'numOfResults' => count((array)$content),
+					'numOfReplacements' => $replaceCountContent
 				),
 				array(
 					'label' => _('Species synonyms'),
 					'data' => $synonyms,
-					'numOfResults' => count((array)$synonyms)
+					'numOfResults' => count((array)$synonyms),
+					'numOfReplacements' => $replaceCountSynonym
 				),
 				array(
 					'label' => _('Species common names'),
 					'data' => $commonnames,
-					'numOfResults' => count((array)$commonnames)
+					'numOfResults' => count((array)$commonnames),
+					'numOfReplacements' => $replaceCountCommon
 				),
 				array(
 					'label' => _('Species media'),
 					'data' => $media,
-					'numOfResults' => count((array)$media)
+					'numOfResults' => count((array)$media),
+					'numOfReplacements' => $replaceCountMedia
 				),
 			),
 			'taxonList' => $this->makeTaxonList($d),
 			'categoryList' => $this->makeCategoryList(),
-			'numOfResults' => count((array)$d)+count((array)$taxa)
+			'numOfResults' => count((array)$d)+count((array)$taxa),
+			'numOfReplacements' => $replaceCountTaxa + $replaceCountContent + $replaceCountSynonym + $replaceCountCommon + $replaceCountMedia
 		);
 
 	}
@@ -684,45 +896,72 @@ q($this->searchContent($search),1);
 	private function searchModules($search)
 	{
 
+		$modules = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+				),
+				'columns' => 'id,module',
+				'fieldAsIndex' => 'id'
+			)
+		);
+
 		$content = $this->models->ContentFreeModule->_get(
 			array(
 				'where' => 
 					'project_id = '.$this->getCurrentProjectId().' and
 					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
 					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
-				'columns' => 
-					'page_id,
-					module_id,
-					topic as label,
-					if(content regexp \''.$this->makeRegExpCompatSearchString($search).'\',content,null) as content',
+				'columns' => 'id,page_id,module_id,topic,content',
 				'order' => 'module_id'
 			)
 		);
 		
-		
+		$replaceCount = array();
+		$replaceCountTot = 0;
+
 		foreach((array)$content as $key => $val) {
 
-			$module = $this->models->FreeModuleProject->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['module_id']
-					),
-					'columns' => 'module'
-				)
-			);
+			$matches = $this->getColumnMatches($search,$val,array('topic','content'));
 
-			$results[$module[0]['module']][] = $val;
+			if (!is_null($matches)) {
 
+				$val['replace'] = array(
+					'model' => $this->models->ContentFreeModule->getClassName(),
+					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+					'matches' => $matches,
+				);
+				
+				$replaceCount[$modules[$val['module_id']]['module']] = 
+					(isset($replaceCount[$modules[$val['module_id']]['module']]) ? $replaceCount[$modules[$val['module_id']]['module']] : 0) + 
+					count((array)$matches);
+					
+				$replaceCountTot = $replaceCountTot + count((array)$matches);
+
+			}
+
+			$results[$modules[$val['module_id']]['module']][] = $val;
+		
 		}
 
 		$r = null;
-		if (isset($results))
-			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val, 'numOfResults' => count((array)$val) );
+		if (isset($results)) {
+
+			foreach ($results as $key => $val)
+
+				 $r[] = array(
+					'label' => $key, 
+					'data' => $val, 
+					'numOfResults' => count((array)$val), 
+					'numOfReplacements' => $replaceCount[$key]
+				);
+
+		}
 
 		return array(
 			'results' => isset($r) ? $r : null,
-			'numOfResults' => count((array)$content)
+			'numOfResults' => count((array)$content),
+			'numOfReplacements' => $replaceCountTot
 		);
 
 	}
@@ -764,25 +1003,39 @@ q($this->searchContent($search),1);
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
 					'name regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'matrix_id,name as label'
+				'columns' => 'id,matrix_id,name'
 			)
 		);
+
+		foreach((array)$matrices as $key => $val) {
+
+			$matrices[$key]['replace'] = array(
+				'model' => $this->models->MatrixName->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('name'),$replaceCountMatrices)
+			);
+
+		}
 
 		$characteristics = $this->models->CharacteristicLabel->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
 					'label regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'characteristic_id,label'
+				'columns' => 'id,characteristic_id,label'
 			)
 		);
 
 		foreach((array)$characteristics as $key => $val) {
+
+			$characteristics[$key]['replace'] = array(
+				'model' => $this->models->CharacteristicLabel->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('label'),$replaceCountChars)
+			);
 
 			$cm = $this->models->CharacteristicMatrix->_get(
 				array(
@@ -795,35 +1048,27 @@ q($this->searchContent($search),1);
 			);
 
 			$characteristics[$key]['matrices'] = $cm;
-
+		
 		}
 
 
-		$states1 = $this->models->CharacteristicLabelState->_get(
+		$states = $this->models->CharacteristicLabelState->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
-					'label regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'state_id,label'
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().' and 
+					(label regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
+					text regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+				'columns' => 'id,state_id,label,text'
 			)
 		);
-
-		$states2 	 = $this->models->CharacteristicLabelState->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
-					'text regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'state_id,label,text as content'
-			)
-		);
-
-		$states = array_merge((array)$states1,(array)$states2);
 
 		foreach((array)$states as $key => $val) {
+
+			$states[$key]['replace'] = array(
+				'model' => $this->models->CharacteristicLabelState->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('label','text'),$replaceCountStates)
+			);
 
 			$cs = $this->models->CharacteristicState->_get(
 				array(
@@ -839,7 +1084,6 @@ q($this->searchContent($search),1);
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(),
 						'characteristic_id' => $cs[0]['characteristic_id']
 					),
 					'columns' => 'label'
@@ -862,11 +1106,11 @@ q($this->searchContent($search),1);
 
 		}
 
+
 		$matrixNames = $this->models->MatrixName->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(), 
 				),
 				'columns' => 'matrix_id,name',
 				'fieldAsIndex' => 'matrix_id'
@@ -878,21 +1122,25 @@ q($this->searchContent($search),1);
 				array(
 					'label' => _('Matrix key matrices'),
 					'data' => $matrices,
-					'numOfResults' => count((array)$matrices)
+					'numOfResults' => count((array)$matrices),
+					'numOfReplacements' => $replaceCountMatrices
 				),
 				array(
 					'label' => _('Matrix key characteristics'),
 					'data' => $characteristics,
-					'numOfResults' => count((array)$characteristics)
+					'numOfResults' => count((array)$characteristics),
+					'numOfReplacements' => $replaceCountChars
 				),
 				array(
 					'label' => _('Matrix key states'),
 					'data' => $states,
-					'numOfResults' => count((array)$states)
+					'numOfResults' => count((array)$states),
+					'numOfReplacements' => $replaceCountStates
 				)
 			),
 			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
-			'matrices' => $matrixNames
+			'matrices' => $matrixNames,
+			'numOfReplacements' => $replaceCountMatrices+$replaceCountChars+$replaceCountStates
 		);
 
 	}
@@ -904,14 +1152,19 @@ q($this->searchContent($search),1);
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
 					'choice_txt regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'choice_id,choice_txt as content'
+				'columns' => 'id,choice_id,choice_txt as content,choice_txt'
 			)
 		);
 
 		foreach((array)$choices as $key => $val) {
+
+			$choices[$key]['replace'] = array(
+				'model' => $this->models->ChoiceContentKeystep->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('choice_txt'),$replaceCountChoices)
+			);
 
 			$step = $this->models->ChoiceKeystep->_get(
 				array(
@@ -929,7 +1182,6 @@ q($this->searchContent($search),1);
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							//'language_id' => $this->getCurrentLanguageId(),
 							'keystep_id' => $step[0]['keystep_id']
 						),
 						'columns' => 'keystep_id,title'
@@ -943,7 +1195,6 @@ q($this->searchContent($search),1);
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							//'language_id' => $this->getCurrentLanguageId(),
 							'id' => $step[0]['keystep_id']
 						),
 						'columns' => 'number'
@@ -953,40 +1204,32 @@ q($this->searchContent($search),1);
 				$choices[$key]['number'] = $step[0]['number'];
 
 			}
-
+		
 		}
 
-		$steps1 = $this->models->ContentKeystep->_get(
+
+		$steps = $this->models->ContentKeystep->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
-					'title regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'keystep_id,title,title as label'
+				'where' => 
+					'project_id = '. $this->getCurrentProjectId().' and
+					(title regexp \''. $this->makeRegExpCompatSearchString($search).'\' or
+					content regexp \''. $this->makeRegExpCompatSearchString($search).'\')',
+				'columns' => 'id,keystep_id,title,content'
 			)
 		);
-
-		$steps2 = $this->models->ContentKeystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(),
-					'content regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'keystep_id,title,content as content'
-			)
-		);
-
-		$steps = array_merge((array)$steps1,(array)$steps2);
 
 		foreach((array)$steps as $key => $val) {
+
+			$steps[$key]['replace'] = array(
+				'model' => $this->models->ContentKeystep->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('title','content'),$replaceCountSteps)
+			);
 
 			$step = $this->models->Keystep->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(),
 						'id' => $val['keystep_id']
 					),
 					'columns' => 'number'
@@ -1002,271 +1245,287 @@ q($this->searchContent($search),1);
 				array(
 					'label' => _('Dichotomous key steps'),
 					'data' => $choices,
-					'numOfResults' => count((array)$choices)
+					'numOfResults' => count((array)$choices),
+					'numOfReplacements' => $replaceCountSteps
 				),
 				array(
 					'label' => _('Dichotomous key choices'),
 					'data' => $steps,
-					'numOfResults' => count((array)$steps)
+					'numOfResults' => count((array)$steps),
+					'numOfReplacements' => $replaceCountChoices
 				)
 			),
-			'numOfResults' => count((array)$choices)+count((array)$steps)
+			'numOfResults' => count((array)$choices)+count((array)$steps),
+			'numOfReplacements' => $replaceCountSteps+$replaceCountChoices
 		);
 
 	}
 
-		private function searchLiterature($search,$extensive=true)
-		{
-	
-			$books = $this->models->Literature->_get(
-				array(
-					'where' => 
-						'project_id = '.$this->getCurrentProjectId().'
-						and (
-							author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-							author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-							year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
-							($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
-							')',
-					'columns' => 
-						'id,author_first,
-						concat(year(`year`),ifnull(suffix,\'\')) as year,
-						text as content,
-						concat(
-							author_first,
-							(
-								if(multiple_authors=1,
-									\' et al.\',
-									if(author_second!=\'\',concat(\' & \',author_second),\'\')
-								)
+	private function searchLiterature($search,$extensive=true)
+	{
+
+		/*
+		$books = $this->models->Literature->_get(
+			array(
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().'
+					and (
+						author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
+						($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
+						')',
+				'columns' => 
+					'id,author_first,
+					concat(year(`year`),ifnull(suffix,\'\')) as year,
+					text as content,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
 							)
-						) as author_full',
-				)
-			);
-			
-			foreach((array)$books as $key => $val) {
-			
-				$matches = $this->getColumnMatches($search,$val,array('content','author_first'));
-	
-				if (!is_null($matches)) {
-	
-					$books[$key]['replace'] = array(
-						'model' => $this->models->Literature->getClassName(),
-						'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-						'matches' => $matches,
-					);
-					
-				}
+						)
+					) as author_full',
+			)
+		);
+		*/
 		
-			}
-	
-			return array(
-				'results' => array(
-					array(
-						'label' => _('Literary references'),
-						'data' => $books,
-						'numOfResults' => count((array)$books)
-					)
+		$books = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'text regexp ' => $this->makeRegExpCompatSearchString($search)
 				),
-				'numOfResults' => count((array)$books)
+				'columns' => 
+					'id,author_first,
+					concat(year(`year`),ifnull(suffix,\'\')) as year,
+					text,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						)
+					) as author_full',
+			)
+		);
+		
+		foreach((array)$books as $key => $val) {
+
+			$books[$key]['replace'] = array(
+				'model' => $this->models->Literature->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('text'),$replaceCount)
 			);
-	
-		}
-	
-		private function getLiteratureLookupList($search)
-		{
-		
-			$l = $this->searchLiterature($search,false);
-		
-			$d = array();
-			
-			foreach((array)$l['results'] as $val) {
-			
-				if (is_array($val['data'])) {
-	
-					foreach($val['data'] as $val2) {
-	
-						$d[] = array(
-							'id' => $val2['id'],
-							'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
-							'source' => $val['label'],
-							'url'  => '../literature/term.php?id='.$val2['id']
-						);
-	
-					}
-	
-				}
-	
-			}
-			
-			return $d;
-		
+
 		}
 
-		private function searchGlossary($search,$extensive=true)
-		{
-	
-			$gloss = $this->models->Glossary->_get(
+		return array(
+			'results' => array(
 				array(
-					'where' =>
-						'project_id = '.$this->getCurrentProjectId().' and
-						(
-							term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
-							($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
-						')'
-					,
-					'columns' => 'id,term,definition'
+					'label' => _('Literary references'),
+					'data' => $books,
+					'numOfResults' => count((array)$books),
+					'numOfReplacements' => $replaceCount
 				)
+			),
+			'numOfResults' => count((array)$books),
+			'numOfReplacements' => $replaceCount
+		);
+
+	}
+	
+	private function getLiteratureLookupList($search)
+	{
+	
+		$l = $this->searchLiterature($search,false);
+	
+		$d = array();
+		
+		foreach((array)$l['results'] as $val) {
+		
+			if (is_array($val['data'])) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['id'],
+						'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
+						'source' => $val['label'],
+						'url'  => '../literature/term.php?id='.$val2['id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+	
+	}
+
+	private function searchGlossary($search,$extensive=true)
+	{
+
+		$gloss = $this->models->Glossary->_get(
+			array(
+				'where' =>
+					'project_id = '.$this->getCurrentProjectId().' and
+					(
+						term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
+						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
+					')'
+				,
+				'columns' => 'id,term,definition'
+			)
+		);
+
+		foreach((array)$gloss as $key => $val) {
+		
+			$gloss[$key]['replace'] = array(
+				'model' => $this->models->Glossary->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$replaceCountGloss)
 			);
 	
-			foreach((array)$gloss as $key => $val) {
-			
-				$matches = $this->getColumnMatches($search,$val,array('term','definition'));
+		}
+
+		$synonyms = $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'language_id' => $this->getCurrentLanguageId(), 
+					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'id,glossary_id,synonym,language_id'
+			)
+		);
 	
-				if (!is_null($matches)) {
-	
-					$gloss[$key]['replace'] = array(
-						'model' => $this->models->Glossary->getClassName(),
-						'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-						'matches' => $matches,
-					);
-					
-				}
+		foreach((array)$synonyms as $key => $val) {
 		
-			}
-	
-			$synonyms = $this->models->GlossarySynonym->_get(
+			$g = $this->models->Glossary->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						//'language_id' => $this->getCurrentLanguageId(), 
-						'synonym regexp' => $this->makeRegExpCompatSearchString($search)
+						'id' => $val['glossary_id']
 					),
-					'columns' => 'id,glossary_id,synonym,language_id'
+					'columns' => 'term'
 				)
 			);
 	
-			foreach((array)$synonyms as $key => $val) {
+			$synonyms[$key]['synonym'] = $g[0]['term'];
+
+			$synonyms[$key]['replace'] = array(
+				'model' => $this->models->GlossarySynonym->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$replaceCountSynonym)
+			);
+
+		}
+
+		/*
+		if ($extensive) {
+
+			$media = $this->models->GlossaryMedia->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+					),
+					'columns' => 'glossary_id as id,file_name as label'
+				)
+			);
+	
+			foreach((array)$media as $key => $val) {
 			
 				$g = $this->models->Glossary->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(),
-							'id' => $val['glossary_id']
+							//'language_id' => $this->getCurrentLanguageId(), 
+							'id' => $val['id']
 						),
 						'columns' => 'term'
 					)
 				);
 		
-				$synonyms[$key]['synonym'] = $g[0]['term'];
+				if (isset($g)) {
 	
-				$matches = $this->getColumnMatches($search,$val,array('synonym'));
+					$d[$key] = $val;
+					$d[$key]['term'] = $g[0]['term'];
 	
-				if (!is_null($matches)) {
-	
-					$synonyms[$key]['replace'] = array(
-						'model' => $this->models->GlossarySynonym->getClassName(),
-						'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id'],'language_id' => $val['language_id']),
-						'matches' => $matches,
-					);
-					
 				}
 	
 			}
-	
-			/*
-			if ($extensive) {
-	
-				$media = $this->models->GlossaryMedia->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'file_name regexp' => $this->makeRegExpCompatSearchString($search)
-						),
-						'columns' => 'glossary_id as id,file_name as label'
-					)
-				);
-		
-				foreach((array)$media as $key => $val) {
-				
-					$g = $this->models->Glossary->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								//'language_id' => $this->getCurrentLanguageId(), 
-								'id' => $val['id']
-							),
-							'columns' => 'term'
-						)
-					);
 			
-					if (isset($g)) {
+		}
+
+		$media = isset($d) ? $d : null;
 		
-						$d[$key] = $val;
-						$d[$key]['term'] = $g[0]['term'];
-		
-					}
-		
-				}
-				
-			}
-	
-			$media = isset($d) ? $d : null;
-			
-			*/
-	
-			return array(
-				'results' => array(
-					array(
-						'label' => _('Glossary terms'),
-						'data' => $gloss,
-						'numOfResults' => count((array)$gloss)
-					),
-					array(
-						'label' => _('Glossary synonyms'),
-						'data' => $synonyms,
-						'numOfResults' => count((array)$synonyms)
-					),
-					array(
-						'label' => _('Glossary media'),
-						'data' => $media,
-						'numOfResults' => count((array)$media)
-					)
+		*/
+
+		return array(
+			'results' => array(
+				array(
+					'label' => _('Glossary terms'),
+					'data' => $gloss,
+					'numOfResults' => count((array)$gloss),
+					'numOfReplacements' => $replaceCountGloss
 				),
-				'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media)
-			);
+				array(
+					'label' => _('Glossary synonyms'),
+					'data' => $synonyms,
+					'numOfResults' => count((array)$synonyms),
+					'numOfReplacements' => $replaceCountSynonym
+				)
+				/*					,
+				array(
+					'label' => _('Glossary media'),
+					'data' => $media,
+					'numOfResults' => count((array)$media)
+				)
+				*/
+			),
+			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media),
+			'numOfReplacements' => $replaceCountGloss  + $replaceCountSynonym
+		);
+
+	}
 	
-		}
-	
-		private function getGlossaryLookupList($search)
-		{
-	
-			$g = $this->searchGlossary($search,false);
-	
-			$d = array();
-			
-			foreach((array)$g['results'] as $val) {
-			
-				if (is_array($val['data']) && ($val['label']=='Glossary terms' || $val['label']=='Glossary synonyms')) {
-	
-					foreach($val['data'] as $val2) {
-	
-						$d[] = array(
-							'id' => $val2['id'],
-							'label' => $val2['label'],
-							'source' => $val['label'],
-							'url'  => '../glossary/term.php?id='.$val2['id']
-						);
-	
-					}
-	
+	private function getGlossaryLookupList($search)
+	{
+
+		$g = $this->searchGlossary($search,false);
+
+		$d = array();
+		
+		foreach((array)$g['results'] as $val) {
+		
+			if (is_array($val['data']) && ($val['label']=='Glossary terms' || $val['label']=='Glossary synonyms')) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../glossary/term.php?id='.$val2['id']
+					);
+
 				}
-	
+
 			}
-			
-			return $d;
-	
+
 		}
+		
+		return $d;
+
+	}
 
 	private function searchContent($search)
 	{
@@ -1279,64 +1538,69 @@ q($this->searchContent($search),1);
 						subject regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
 						content regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\'
 					)',
-				'columns' => 'id,subject,content'
+				'columns' => 'id,subject,content,language_id'
 			)
 
 		);
-q($content,1);
-		return array(
-			'results' => array(
-				array(
-					'label' => _('Other pages'),
-					'data' => $content,
-					'numOfResults' => count((array)$content)
-				)
-			),
-			'numOfResults' => count((array)$content)
-		);
 
-	}
+		foreach((array)$content as $key => $val) {
 
-	private function searchMap($species)
-	{
-
-		foreach((array)$species['results'] as $key => $val) {
-		
-			if ($val['label']=='Species names') {
-
-				foreach((array)$val['data'] as $dKey => $dVal) {
-
-					$ot = $this->models->OccurrenceTaxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon_id' => $dVal['taxon_id']
-							),
-							'columns' => 'count(*) as total'
-						)
-					);
-					
-					if ($ot[0]['total']>0) $geo[] =
-						array(
-							'id' => $dVal['taxon_id'],
-							'content' => $dVal['label'],
-							'number' => $ot[0]['total']
-						);
-				}
-
-			}
+			$content[$key]['replace'] = array(
+				'model' => $this->models->Content->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$replaceCount)
+			);
 
 		}
 
 		return array(
 			'results' => array(
 				array(
-					'label' => _('geographical data'),
-					'data' => (isset($geo) ? $geo : null),
-					'numOfResults' => (isset($geo) ? count((array)$geo) : 0)
+					'label' => _('Other pages'),
+					'data' => $content,
+					'numOfResults' => count((array)$content),
+					'numOfReplacements' => $replaceCount
+				)
+			),
+			'numOfResults' => count((array)$content),
+			'numOfReplacements' => $replaceCount
+		);
+
+	}
+
+	private function searchMap($search,$species)
+	{
+
+		$titles = $this->models->GeodataTypeTitle->_get(
+			array(
+				'where' =>
+					'project_id = '. $this->getCurrentProjectId().' and
+					title regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\'',
+				'columns' => 'id,title'
+			)
+		);
+
+		foreach((array)$titles as $key => $val) {
+
+			$titles[$key]['replace'] = array(
+				'model' => $this->models->GeodataTypeTitle->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('title'),$replaceCount),
+			);
+
+		}
+
+		return array(
+			'results' => array(
+				array(
+					'label' => _('Geographic datatype'),
+					'data' => $titles,
+					'numOfResults' => (isset($titles) ? count((array)$titles) : 0),
+					'numOfReplacements' => $replaceCount
 				),
 			),
-			'numOfResults' => isset($geo) ? count((array)$geo) : 0
+			'numOfResults' => isset($geo) ? count((array)$geo) : 0,
+			'numOfReplacements' => $replaceCount
 		);
 
 	}
@@ -1413,31 +1677,6 @@ q($content,1);
 		);
 
 	}
-
-	private function DECtoDMS($dec,$formatted=false)
-	{
-
-		// Converts decimal longitude / latitude to DMS
-		// ( Degrees / minutes / seconds ) 
-		
-		// This is the piece of code which may appear to 
-		// be inefficient, but to avoid issues with floating
-		// point math we extract the integer part and the float
-		// part by using a string function.
-		$vars = explode(".",$dec);
-		$deg = $vars[0];
-		$tempma = "0.".$vars[1];
-	
-		$tempma = $tempma * 3600;
-		$min = floor($tempma / 60);
-		$sec = $tempma - ($min*60);
-		
-		if ($formatted)
-			return $deg.'&deg;'.$min."'".$sec."''";
-		else	
-			return array("deg"=>$deg,"min"=>$min,"sec"=>$sec);
-
-	} 
 
 	private function getMatrices()
 	{
@@ -1544,142 +1783,5 @@ q($content,1);
 		return $cs[0];
 
 	}
-
-	private function getTaxonStates($matrix,$id)
-	{
-	
-		$mts = $this->models->MatrixTaxonState->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'matrix_id' => $matrix,
-					'taxon_id' => $id,
-				),
-				'columns' => 'characteristic_id,state_id'
-			)
-		);
-
-
-		foreach((array)$mts as $key => $val) {
-
-			$d = $this->getCharacteristic($val['characteristic_id']);
-
-			$mts[$key] = array(
-				'characteristic_id' => $val['characteristic_id'],
-				'characteristic' => $d['label'],
-				'type' => $d['type'],
-				'state' => $this->getCharacteristicState($val['state_id'])
-			);
-
-		}
-
-		return $mts;
-
-	}
-	
-	private function checkForStylesheet()
-	{
-	
-		foreach((array)$this->cssToLoad as $val) {
-		
-			if (!file_exists($_SESSION['project']['urls']['project_css'].$val)) {
-			
-				if (dirname($_SESSION['project']['paths']['default_css'].$val) != dirname($_SESSION['project']['paths']['default_css'])) {
-
-					@mkdir(
-						str_replace(
-							$_SESSION['project']['paths']['default_css'],
-							$_SESSION['project']['paths']['project_css'],
-							dirname($_SESSION['project']['paths']['default_css'].$val)
-						)
-					);
-
-				}
-
-				copy($_SESSION['project']['paths']['default_css'].$val,$_SESSION['project']['paths']['project_css'].$val);
-			
-			}
-
-		}
-		
-		// this dir name should probably go somewhere more manageable.
-		$d = $_SESSION['project']['paths']['default_css'].'colorbox/images/';
-		$e = $_SESSION['project']['paths']['default_css'].'colorbox/images/internet_explorer/';
-		
-		if (!file_exists($d)) mkdir($d);
-		if (!file_exists($e)) mkdir($e);
-
-		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/'))
-			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/');
-
-		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/'))
-			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/');
-
-		$f = array(
-				'border1.png',
-				'border2.png',
-				'loading.gif',
-				'internet_explorer/borderBottomCenter.png',
-				'internet_explorer/borderBottomLeft.png',
-				'internet_explorer/borderBottomRight.png',
-				'internet_explorer/borderMiddleLeft.png',
-				'internet_explorer/borderMiddleRight.png',
-				'internet_explorer/borderTopCenter.png',
-				'internet_explorer/borderTopLeft.png',
-				'internet_explorer/borderTopRight.png',
-			);
-			
-		foreach((array)$f as $val) {
-		
-			if (file_exists($d.$val))
-				copy($d.$val,$_SESSION['project']['paths']['project_css'].'colorbox/images/'.$val);
-
-		}
-	
-	}
-
-	private function makeAlphabetFromArray($names,$field,$letter=null)
-	{
-
-		$a = array();
-		
-		if (!is_null($letter)) $letter = strtolower($letter);
-	
-		foreach((array)$names as $key => $val) {
-		
-			$x = strtolower(substr($val[$field],0,1));
-
-			$a[$x] = $x;
-
-			if (!is_null($letter) && $x==$letter) {
-			
-				$n[$key] = $val;
-			
-			}
-
-		}
-
-		if (!is_null($letter) && empty($n)) $letter = null;
-
-		sort($a);
-
-		if (is_null($letter)) {
-
-			$letter = $a[0];
-
-			foreach((array)$names as $key => $val) {
-
-				if (strtolower(substr($val[$field],0,1))==$letter) $n[$key] = $val;
-	
-			}
-		
-		}
-
-		return array(
-			'alpha' => $a,
-			'names' => $n
-		);
-	
-	}	
 
 }

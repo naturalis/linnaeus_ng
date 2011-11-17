@@ -449,3 +449,6 @@ a:hover,.pseudo-a:hover {
 #login-table td {
 	padding-bottom:3px;
 }
+.stringToReplace {
+	background-color:#66FF66;
+}

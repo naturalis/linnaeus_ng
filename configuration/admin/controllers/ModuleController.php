@@ -536,7 +536,7 @@ class ModuleController extends Controller
 	{
 
 		if (!$this->getCurrentModuleId()) return;
-		
+
 		if ($state==null) {
 
 			$cfm = $this->models->ContentFreeModule->_get(
@@ -569,7 +569,7 @@ class ModuleController extends Controller
 	private function getPages()
 	{
 
-		return $this->models->FreeModulePage->_get(
+		$fmp = $this->models->FreeModulePage->_get(
 			array(
 				'id' => array(
 					'module_id' => $this->getCurrentModuleId(),
@@ -578,6 +578,18 @@ class ModuleController extends Controller
 				)
 			)
 		);
+		
+		foreach((array)$fmp as $key => $val) {
+
+			$d = $this->getPageContent($val['id'],$_SESSION['project']['default_language_id']);
+
+			$fmp[$key]['topic'] = $d['topic'];
+
+		}
+		
+		$this->customSortArray($fmp,array('key' => 'topic'));
+		
+		return $fmp;
 
 	}
 
@@ -759,7 +771,7 @@ class ModuleController extends Controller
 
 	}	
 
-	private function getModulePageNavList($forceLookup=false)
+	private function getModulePageNavList($forceLookup=true)
 	{
 	
 		if (empty($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
@@ -769,8 +781,14 @@ class ModuleController extends Controller
 			foreach((array)$d as $key => $val) {
 
 				$res[$val['id']] = array(
-					'prev' => array('id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null),
-					'next' => array('id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null),
+					'prev' => array(
+						'id' => isset($d[$key-1]['id']) ? $d[$key-1]['id'] : null,
+						'title' => isset($d[$key-1]['topic']) ? $d[$key-1]['topic'] : null
+					),
+					'next' => array(
+						'id' => isset($d[$key+1]['id']) ? $d[$key+1]['id'] : null,
+						'title' => isset($d[$key+1]['topic']) ? $d[$key+1]['topic'] : null
+					),
 				);
 
 			}
