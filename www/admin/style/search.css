@@ -1,0 +1,23 @@
+.replaceModule {
+	border:1px dotted black;
+	border-bottom:none;
+	margin-bottom:10px;
+}
+.replaceModuleHeader{
+	padding:5px 5px 0px 5px;
+	background-color:#eee;
+	font-style:bold;
+	border-bottom:1px dotted black;
+	height:25px;
+}
+.replaceModuleTitle{
+	text-transform:uppercase;
+}
+.replaceItem {
+	border-bottom:1px solid #bbb;
+	padding:5px 5px 0px 5px;
+}
+.replaceItemHeader {
+	color:#aaa;
+	font-style:italic;
+}

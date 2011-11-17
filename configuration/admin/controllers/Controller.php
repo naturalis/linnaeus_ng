@@ -2559,7 +2559,7 @@ class Controller extends BaseClass
      */
     private function setBreadcrumbs ()
     {
-        
+
         if (!isset($this->appName)) return;
 
         // root of each trail: "choose project" page
@@ -2584,7 +2584,7 @@ class Controller extends BaseClass
 			
             
             if (!empty($controllerPublicName) && $this->_fullPath != $this->getLoggedInMainIndex()) {
-                
+
                 $curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
                 
                 $this->breadcrumbs[] = array(

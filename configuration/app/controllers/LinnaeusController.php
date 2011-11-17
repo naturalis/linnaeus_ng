@@ -1045,7 +1045,7 @@ q($results,1,1);
 						'language_id' => $this->getCurrentLanguageId(),
 						'description regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-				'columns' => 'id,taxon_id,media_id,description as content,\'media\' as cat'
+				'columns' => 'id,media_id,description as content,\'media\' as cat'
 				)
 			);
 	
