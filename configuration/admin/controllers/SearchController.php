@@ -1,11 +1,5 @@
 <?php
 
-/*
-
-	$textWithGlossaryMatches = $linnaeusController->matchGlossaryTerms($textWithoutGlossaryMatches));
-
-*/
-
 include_once ('Controller.php');
 
 class SearchController extends Controller
@@ -13,6 +7,9 @@ class SearchController extends Controller
 
 	public $noResultCaching = true;
 	private $_replaceId = 1;
+	private $_replaceCounter = 0;
+	private $_replaceData = null;
+	private $_replaceStatusIndex = array();
 
     public $usedModels = array(
 		'content',
@@ -42,7 +39,8 @@ class SearchController extends Controller
 		'characteristic_matrix',
 		'characteristic_label_state',
 		'characteristic_state',
-		'geodata_type_title'
+		'geodata_type_title',
+		'content_introduction'
     );
 
     public $usedHelpers = array(
@@ -90,49 +88,54 @@ class SearchController extends Controller
     public function searchIndexAction ()
     {
 
-//		$this->checkAuthorisation();
+		$this->checkAuthorisation();
+
 		$this->setPageName(_('Search and replace'));
 
 		$this->setControllerMask('utilities','Search');
 		
 		unset($_SESSION['user']['search']['results']);
 
-
-/*
-		if (isset($_SESSION['user']['search']['redo']) && $_SESSION['user']['search']['redo']==true) {
-		
-			$this->requestData['search'] = $_SESSION['user']['search']['lastSearch'];
-
-			$_SESSION['user']['search']['redo'] = false;
-
-		}
-*/
-
-		if (isset($this->requestData['search'])) {
+		if ($this->rHasVal('search') && !$this->rHasVal('action','repeat')) {
 
 			$_SESSION['user']['search']['search'] = array(
 				'search' => $this->requestData['search'],
-				'replace' => $this->rHasVal('replace') ? $this->requestData['replace'] : null
+				'replacement' => $this->rHasVal('replacement') ? $this->requestData['replacement'] : null,
+				'doReplace' => $this->requestData['doReplace'],
+				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
+				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
+				'options' => $this->requestData['options'],
 				);
 
-			$_SESSION['user']['search']['results'] = $this->_searchAction();
+			$_SESSION['user']['search']['results'] =
+				$this->_searchAction(
+					$this->requestData['search'],
+					$this->rHasVal('modules') ? $this->requestData['modules'] : false,
+					$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : false
+				);
+
+			$_SESSION['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
 			
-			if ($this->rHasVal('replace'))
+			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','all')) {
+
+				$this->redirect('search_replace_all.php');
+
+			} else
+			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','perOccurrence')) {
+
 				$this->redirect('search_replace.php');
-			else
+
+			} else {
+
 				$this->redirect('search_results.php');
-			
+
+			}		
+
 		}
 
-		//$this->smarty->assign('results',$results);
+		if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
 
-		if (isset($this->requestData['search'])) $this->smarty->assign('search',$this->requestData['search']);
-	
 		$this->smarty->assign('modules',$this->getProjectModules());
-
-		//$this->smarty->register_block('h', array(&$this,'highlightFound'));
-
-		//$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
 
         $this->printPage();
   
@@ -146,33 +149,23 @@ class SearchController extends Controller
     public function searchReplaceIndexAction ()
     {
 
-
-//		$this->checkAuthorisation();
+		$this->checkAuthorisation();
 		
 		$this->setPageName(_('Search results'));
 
 		$this->setControllerMask('utilities','Search');
 
-
-
-
-//q($_SESSION['user']['search']['results'],1);
 		if ($_SESSION['user']['search']['search']) {
 
-			$this->smarty->assign('search',$_SESSION['user']['search']['search']);
-			$this->smarty->assign('results',$_SESSION['user']['search']['results']);
+			if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
+			if (isset($_SESSION['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['user']['search']['results']);
+			if (isset($_SESSION['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['user']['search']['replace']['index']);
 			
+		} else {
+		
+			$this->redirect('search_index.php');
+		
 		}
-
-		//$this->smarty->assign('results',$results);
-
-
-	
-		$this->smarty->assign('modules',$this->getProjectModules());
-
-		//$this->smarty->register_block('h', array(&$this,'highlightFound'));
-
-		//$this->smarty->register_block('foundContent', array(&$this,'foundContent'));
 
         $this->printPage();
   
@@ -242,11 +235,10 @@ class SearchController extends Controller
 	*		- 'replace': replace match, set status to 'replaced'
 	*		- 'reset': reset status to null (for development purposes)
 	*/
-
 	private function doReplaceAction($id,$type)
 	{
 
-		if (!isset($_SESSION['user']['search']['results'])) return null;
+		if (!isset($_SESSION['user']['search']['results']) || !isset($_SESSION['user']['search']['search']['replacement'])) return null;
 
 		if (is_string($id) && substr($id,0,7)=='module:') {
 
@@ -257,78 +249,28 @@ class SearchController extends Controller
 			$thisModule = false;
 
 		}
-		
+
 		if (!is_numeric($id) && $id!='*' && $thisModule===false) return null;
+		
+		if (is_numeric($id)) $id = intval($id);
 
 		foreach((array)$_SESSION['user']['search']['results'] as $key1 => $val) {
 
 			foreach((array)$val['results'] as $key2 => $module) {
 
 				foreach((array)$module['data'] as $key3 => $data) {
-				
+
 					if (isset($data['replace']['matches'])) {
-
-						foreach((array)$data['replace']['matches'] as $key4 => $match) {
-
-							if ($match['id']==$id || ($module!==false && $module['label']==$thisModule) || $id=='*') {
-
-								$modelData = $_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace'];
-
-								$replaceData = &$_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace']['matches'][$key4];
-							
-								if ($type=='skip') {
-
-									if($replaceData['status']===false) {
-
-										$replaceData['status'] = 'skipped';
-										
-										if ($thisModule===false && $id!='*') return array($id,'skipped');
-
-									} else {
-
-										if ($thisModule===false && $id!='*') return array($id,'no action');
-
-									}
-
-								} else
-								if ($type=='replace') {
-
-									if($replaceData['status']===false) {
-
-										if ($this->doReplace($modelData,$replaceData)) {
-
-											$replaceData['status'] = 'replaced';
-
-											if ($thisModule===false && $id!='*') return array($id,'replaced');
-
-										} else {
-
-											if ($thisModule===false && $id!='*') return array($id,'replace failed');
-
-										}
-
-									} else {
-									
-										if ($thisModule===false && $id!='*') return array($id,'no action');
-									
-									}
-
-								} else
-								if ($type=='reset') {
-
-									$replaceData['status'] = false;
-
-									if ($thisModule===false && $id!='*') return array($id,'reset');
-
-								} else {
-
-									if ($thisModule===false && $id!='*') return array($id,'no action');
-
-								}
-								
-							}
-
-						}
+					
+						if ($thisModule!==false && $module['label']!=$thisModule) continue;
+	
+						$this->doReplace(
+							$_SESSION['user']['search']['search']['search'],
+							$_SESSION['user']['search']['search']['replacement'],
+							$data['replace'],
+							(($thisModule!==false && $module['label']==$thisModule) ? '*' : $id),
+							$type
+						);
 
 					}
 	
@@ -338,42 +280,104 @@ class SearchController extends Controller
 		
 		}
 
-		return array('*',($type=='replace' ? 'replaced' : ($type=='reset' ? 'reset' : 'skipped' )));
+		return array($id,($type=='replace' ? 'replaced' : ($type=='reset' ? 'reset' : 'skipped' )));
+
+	}
+
+	private function doReplaceMatchCallback($matches)
+	{
+	
+		// the stored results have the same keys as the new search results
+		$storedId = $this->_replaceData['matches'][$this->_replaceCounter]['id'];
+		$requestedId = $this->_replaceData['idToReplace'];
+		$replaceStatus =
+			isset($_SESSION['user']['search']['replace']['index'][$storedId]) ? $_SESSION['user']['search']['replace']['index'][$storedId] : null;
+
+		$this->_replaceCounter++;
+
+		// match the id from the request with the one stored in the session search results
+		if (($storedId===$requestedId) || ($requestedId=='*')) {
+		
+			if ($replaceStatus===false) {
+
+				if ($this->_replaceData['matches'][($this->_replaceCounter-1)][0]==$this->_replaceData['search']) {
+				
+					if ($this->_replaceData['type']=='replace') {
+	
+						$_SESSION['user']['search']['replace']['index'][$storedId] = 'replaced';
+		
+						return $this->_replaceData['replacement'];
+					
+					} else {
+	
+						$_SESSION['user']['search']['replace']['index'][$storedId] = $this->_replaceData['type']=='skip' ? 'skipped' : false;
+		
+						return $this->_replaceData['search'];
+	
+					}
+	
+	
+				} else {
+	
+					$_SESSION['user']['search']['replace']['index'][$storedId] = 'mismatch';
+		
+					return $this->_replaceData['search'];
+	
+				}
+
+			}
+
+		}
+
+		return $this->_replaceData['search'];
 	
 	}
 
-	private function doReplace($modelData,$matchData)
+	private function doReplace($search,$replace,$data,$id,$type)
 	{
 
-		// viva readability
-		$searchedFor = $_SESSION['user']['search']['search']['search'];
-		$replaceWith = $_SESSION['user']['search']['search']['replace'];
-		$locationOfSearchTerm = $matchData[1];
-
-		// check whether the string is still what we want to replace (just to be on the safe side)
-		$willReplace = substr($matchData['original'],$locationOfSearchTerm,strlen($searchedFor));
-	
-		if (strtolower($searchedFor)!==strtolower($willReplace)) return false;
-
-		// match initial capital
-		$init = substr($matchData['original'],$locationOfSearchTerm,1);
-		$replaceWith = ($init == strtoupper($init)) ? ucfirst($replaceWith) : $replaceWith;
-
-		// create new data by replacing the old string (using substring to make sure we *only* replace the term starting at $locationOfSearchTerm)
-		$newData =
-			substr($matchData['original'],0,$locationOfSearchTerm).
-			$replaceWith.
-			substr($matchData['original'],$locationOfSearchTerm + strlen($searchedFor));
-
-		// replacing the old content with the new ($modelData["model"] holds the name of the appropriate model, $modelData['id'] is an array of relevant id's)
-		$result = $this->models->{$modelData["model"]}->update(
-			array(
-				$matchData['column'] => $newData,
-			),
-			$modelData['id']
+		// store relevant data for the callback function globally
+		$this->_replaceData = array(
+			'search' => $search,
+			'replacement' => $replace,
+			'idToReplace' => $id,
+			'type' => $type,
 		);
 
-		return $result;
+		// get the current data for this id
+		$currentData = $this->models->{$data["model"]}->_get(array('id' => $data['id']));
+
+		// walk through the search results, one column at the time
+		foreach ((array)$data['matches'] as $column => $matches) {
+
+			// check data was unchanged between searching and replacing
+			if ($matches['original_md5'] = md5($currentData[0][$column])) {
+			
+				$this->_replaceData['matches'] = $matches;
+				$this->_replaceCounter = 0;
+	
+				if (!empty($currentData[0][$column])) {
+			
+					// redo search on new data, replace that match id of requested replace
+					$d = preg_replace_callback(
+						$this->makeRegExpCompatSearchString($search,true),
+						array($this,'doReplaceMatchCallback'),
+						$currentData[0][$column]
+					);
+
+					// update to the new value					
+					$result = $this->models->{$data["model"]}->update(
+						array(
+							$column => $d
+						),
+						$data['id']
+					);
+
+				}
+				
+			}
+
+		}
 
 	}
 
@@ -382,61 +386,66 @@ class SearchController extends Controller
      *
      * @access    public
      */
-    private function _searchAction ()
+    private function _searchAction ($search,$modules,$freeModules)
     {
 
-		if ($this->rHasVal('search')) {
-
-			if (strlen($this->requestData['search'])>2) { 
-			
-				if (
-					!isset($_SESSION['user']['search'][$this->requestData['search']]) || 
-					$this->noResultCaching
-					) {
-					
-					$this->_replaceId = 0;
-					
-					$results = $this->doSearch($this->requestData['search']);
-
-					$results['numOfResults'] =
-						$results['species']['numOfResults'] +
-						$results['modules']['numOfResults'] +
-						$results['dichkey']['numOfResults'] +
-						$results['literature']['numOfResults'] +
-						$results['glossary']['numOfResults'] +
-						$results['matrixkey']['numOfResults'] +
-						$results['content']['numOfResults'] +
-						$results['map']['numOfResults']
-						;
+		if (strlen($search)>2) { 
 		
-					$_SESSION['user']['search'][$this->requestData['search']]['results'] = $results;
-
-					$this->_replaceId = null;
-
-				} else {
-
-					$results = $_SESSION['user']['search'][$this->requestData['search']]['results'];
-
-				}
+			if (
+				!isset($_SESSION['user']['search'][$search]) || 
+				$this->noResultCaching
+				) {
 				
-				$_SESSION['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
-				$_SESSION['user']['search']['lastSearch'] = $this->requestData['search'];
-					
-				return $results;
-	
+				$this->_replaceId = 0;
+				
+				$results = $this->doSearch($search,$modules,$freeModules);
+
+				$results['numOfResults'] =
+					(isset($results['introduction']['numOfResults']) ? $results['introduction']['numOfResults'] : 0) +
+					(isset($results['species']['numOfResults']) ? $results['species']['numOfResults'] : 0) +
+					(isset($results['modules']['numOfResults']) ? $results['modules']['numOfResults'] : 0)  +
+					(isset($results['dichkey']['numOfResults']) ? $results['dichkey']['numOfResults'] : 0)  +
+					(isset($results['literature']['numOfResults']) ? $results['literature']['numOfResults'] : 0)  +
+					(isset($results['glossary']['numOfResults']) ? $results['glossary']['numOfResults'] : 0)  +
+					(isset($results['matrixkey']['numOfResults']) ? $results['matrixkey']['numOfResults'] : 0)  +
+					(isset($results['content']['numOfResults']) ? $results['content']['numOfResults'] : 0)  +
+					(isset($results['map']['numOfResults']) ? $results['map']['numOfResults'] : 0) 
+					;
+
+				$results['numOfReplacements'] =
+					(isset($results['introduction']['numOfReplacements']) ? $results['introduction']['numOfReplacements'] : 0) +
+					(isset($results['species']['numOfReplacements']) ? $results['species']['numOfReplacements'] : 0) +
+					(isset($results['modules']['numOfReplacements']) ? $results['modules']['numOfReplacements'] : 0)  +
+					(isset($results['dichkey']['numOfReplacements']) ? $results['dichkey']['numOfReplacements'] : 0)  +
+					(isset($results['literature']['numOfReplacements']) ? $results['literature']['numOfReplacements'] : 0)  +
+					(isset($results['glossary']['numOfReplacements']) ? $results['glossary']['numOfReplacements'] : 0)  +
+					(isset($results['matrixkey']['numOfReplacements']) ? $results['matrixkey']['numOfReplacements'] : 0)  +
+					(isset($results['content']['numOfReplacements']) ? $results['content']['numOfReplacements'] : 0)  +
+					(isset($results['map']['numOfReplacements']) ? $results['map']['numOfReplacements'] : 0) 
+					;
+						
+				$_SESSION['user']['search'][$search]['results'] = $results;
+
+				$this->_replaceId = null;
 
 			} else {
-			
-				$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),3));
-				
-				return null;
-			
+
+				$results = $_SESSION['user']['search'][$search]['results'];
+
 			}
+			
+			$_SESSION['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
+			$_SESSION['user']['search']['lastSearch'] = $search;
+				
+			return $results;
+
 
 		} else {
-
+		
+			$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),3));
+			
 			return null;
-
+		
 		}
 
     }
@@ -478,22 +487,30 @@ class SearchController extends Controller
 	
 	}
 
-	private function doSearch($search)
+	private function doSearch($search,$modules,$freeModules)
 	{
 
 		$species = $this->searchSpecies($search);
-// INTRODUCTION etc
 
 		return array(
-			'species' => $species,
-			'modules' => $this->searchModules($search),
-			'dichkey' => $this->searchDichotomousKey($search),
-			'literature' => $this->searchLiterature($search),
-			'glossary' => $this->searchGlossary($search),
-			'matrixkey' => $this->searchMatrixKey($search),
-			'content' => $this->searchContent($search),
-			'map' => $this->searchMap($search,$species)
-			
+			'introduction' =>
+				(is_array($modules) && in_array('introduction',$modules) ? $this->searchIntroduction($search) : null),
+			'glossary' =>
+				(is_array($modules) && in_array('glossary',$modules) ? $this->searchGlossary($search) : null),
+			'literature' => 
+				(is_array($modules) && in_array('literature',$modules) ? $this->searchLiterature($search) : null),
+			'species' => 
+				(is_array($modules) && in_array('species',$modules) ? $species : null),
+			'dichkey' => 
+				(is_array($modules) && in_array('key',$modules) ? $this->searchDichotomousKey($search) : null),
+			'matrixkey' => 
+				(is_array($modules) && in_array('matrixkey',$modules) ? $this->searchMatrixKey($search) : null),
+			'map' => 
+				(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap($search,$species) : null),
+			'content' => 
+				(is_array($modules) && in_array('content',$modules) ? $this->searchContent($search) : null),
+			'modules' => 
+				$this->searchModules($search,$freeModules)	
 		);
 
 	}
@@ -606,70 +623,55 @@ class SearchController extends Controller
 			$columns[] = $fields;
 		else
 			$columns = $fields;
-		
+			
 		foreach($columns as $key => $column) {
 		
-			$content = $values[$column]; // do NOT strip tags, as it well mess up the replacement process
+			$content = $values[$column];
 
 			preg_match_all($this->makeRegExpCompatSearchString($search,true),$content,$matches,PREG_OFFSET_CAPTURE);
 
 			foreach((array)$matches[0] as $mK => $mV) {
 
 				$matches[0][$mK]['id'] = $this->_replaceId++;
-				$matches[0][$mK]['column'] = $column;
-				$matches[0][$mK]['status'] = false;
-				$matches[0][$mK]['original'] = $values[$column];
-
-				/*	
-				$matches[0][$mK]['excerpt'] =
+				$this->_replaceStatusIndex[$matches[0][$mK]['id']] = false;
+				//$matches[0][$mK]['occurrence'] = $mK;
+				//$matches[0][$mK]['column'] = $column;
+				//$matches[0][$mK]['original_md5'] = md5($values[$column]);
+				
+				$matches[0][$mK]['highlighted'] =
 					($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
 					substr(
 						$content,
 						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
 						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
 					).
+					'<span class="stringToReplace">'.
 					$mV[0].
+					'</span>'.
 					substr(
 						$content,
 						$mV[1]+strlen($mV[0]),
 						$this->controllerSettings['excerptLengthRight']
 					).					
-					($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...')
-					;
-				*/
-
-				$matches[0][$mK]['highlighted'] =
-					htmlentities(
-						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
-						substr(
-							$content,
-							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
-							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
-						)
-					).
-					'<span class="stringToReplace">'.
-					$mV[0].
-					'</span>'.
-					htmlentities(
-						substr(
-							$content,
-							$mV[1]+strlen($mV[0]),
-							$this->controllerSettings['excerptLengthRight']
-						).					
-						($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...')
-					);
+					($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...');
 	
 			}
-			
-			$results = array_merge($results,$matches[0]);
-			
+
+			//$results = array_merge($results,$matches[0]);
+			if (!empty($matches[0])) {
+
+				$results[$column] = $matches[0];
+				$results[$column]['original_md5'] = md5($values[$column]);
+
+			}
 		}
 		
 		$counter = (is_null($counter) ? 0 : $counter) + count((array)$results);
-		
+
 		return empty($results) ? null : $results;
 	
 	}
+
 
 	private function searchSpecies($search,$extensive=true)
 	{
@@ -697,7 +699,7 @@ class SearchController extends Controller
 			$taxa[$key]['replace'] = array(
 				'model' => $this->models->Taxon->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('taxon'),$replaceCountTaxa)
+				'matches' => $this->getColumnMatches($search,$val,array('taxon'),$replaceCountTaxa),
 			);
 				
 		}
@@ -848,8 +850,8 @@ class SearchController extends Controller
 					'numOfReplacements' => $replaceCountMedia
 				),
 			),
-			'taxonList' => $this->makeTaxonList($d),
-			'categoryList' => $this->makeCategoryList(),
+			//'taxonList' => $this->makeTaxonList($d),
+			//'categoryList' => $this->makeCategoryList(),
 			'numOfResults' => count((array)$d)+count((array)$taxa),
 			'numOfReplacements' => $replaceCountTaxa + $replaceCountContent + $replaceCountSynonym + $replaceCountCommon + $replaceCountMedia
 		);
@@ -893,7 +895,7 @@ class SearchController extends Controller
 
 	}
 
-	private function searchModules($search)
+	private function searchModules($search,$freeModules=null)
 	{
 
 		$modules = $this->models->FreeModuleProject->_get(
@@ -929,7 +931,7 @@ class SearchController extends Controller
 				$val['replace'] = array(
 					'model' => $this->models->ContentFreeModule->getClassName(),
 					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $matches,
+					'matches' => $matches
 				);
 				
 				$replaceCount[$modules[$val['module_id']]['module']] = 
@@ -939,12 +941,17 @@ class SearchController extends Controller
 				$replaceCountTot = $replaceCountTot + count((array)$matches);
 
 			}
+			
+			if (is_null($freeModules) || in_array($val['module_id'],$freeModules)) {
 
-			$results[$modules[$val['module_id']]['module']][] = $val;
+				$results[$modules[$val['module_id']]['module']][] = $val;
+
+			}
 		
 		}
 
 		$r = null;
+
 		if (isset($results)) {
 
 			foreach ($results as $key => $val)
@@ -998,6 +1005,8 @@ class SearchController extends Controller
 
 	private function searchMatrixKey($search)
 	{
+
+		$replaceCountMatrices = $replaceCountChars = $replaceCountStates = 0;
 
 		$matrices = $this->models->MatrixName->_get(
 			array(
@@ -1148,6 +1157,8 @@ class SearchController extends Controller
 	private function searchDichotomousKey($search)
 	{
 
+		$replaceCountSteps = $replaceCountChoices = 0;
+		
 		$choices = $this->models->ChoiceContentKeystep->_get(
 			array(
 				'id' => array(
@@ -1314,6 +1325,8 @@ class SearchController extends Controller
 			)
 		);
 		
+		$replaceCount = 0;
+		
 		foreach((array)$books as $key => $val) {
 
 			$books[$key]['replace'] = array(
@@ -1372,6 +1385,8 @@ class SearchController extends Controller
 	private function searchGlossary($search,$extensive=true)
 	{
 
+		$replaceCountGloss = $replaceCountSynonym = 0;
+
 		$gloss = $this->models->Glossary->_get(
 			array(
 				'where' =>
@@ -1390,7 +1405,8 @@ class SearchController extends Controller
 			$gloss[$key]['replace'] = array(
 				'model' => $this->models->Glossary->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$replaceCountGloss)
+				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$replaceCountGloss),
+				'url' => '../glossary/edit.php?id='.$val['id']
 			);
 	
 		}
@@ -1491,7 +1507,7 @@ class SearchController extends Controller
 				)
 				*/
 			),
-			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media),
+			'numOfResults' => count((array)$gloss)+count((array)$synonyms), //+count((array)$media),
 			'numOfReplacements' => $replaceCountGloss  + $replaceCountSynonym
 		);
 
@@ -1542,6 +1558,8 @@ class SearchController extends Controller
 			)
 
 		);
+		
+		$replaceCount = 0;
 
 		foreach((array)$content as $key => $val) {
 
@@ -1580,6 +1598,8 @@ class SearchController extends Controller
 			)
 		);
 
+		$replaceCount = 0;
+		
 		foreach((array)$titles as $key => $val) {
 
 			$titles[$key]['replace'] = array(
@@ -1649,6 +1669,48 @@ class SearchController extends Controller
 		);
 
 	}
+	
+	private function searchIntroduction($search=null)
+	{
+
+		$replaceCount = 0;
+
+		$content = $this->models->ContentIntroduction->_get(
+			array(
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().' and
+					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
+					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+				'columns' => 'id,topic,content'
+			)
+		);
+		
+
+		foreach((array)$content as $key => $val)  {
+		
+			$content[$key]['replace'] = array(
+				'model' => $this->models->ContentIntroduction->getClassName(),
+				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
+				'matches' => $this->getColumnMatches($search,$val,array('topic','content'),$replaceCount)
+			);
+				
+		}
+
+		return array(
+			'results' => array(
+				array(
+					'label' => _('Introduction'),
+					'data' => $content,
+					'numOfResults' => count((array)$content),
+					'numOfReplacements' => $replaceCount
+				)
+			),
+			'numOfResults' => count((array)$content),
+			'numOfReplacements' => $replaceCount
+		);
+
+	}
+	
 	
 	private function getLookupList($search)
 	{
@@ -1781,6 +1843,143 @@ class SearchController extends Controller
 		$cs[0]['label'] = $this->getCharacteristicStateLabelOrText($cs[0]['id']);
 
 		return $cs[0];
+
+	}
+
+	private function ORIGdoReplaceAction($id,$type)
+	{
+
+		if (!isset($_SESSION['user']['search']['results'])) return null;
+
+		if (is_string($id) && substr($id,0,7)=='module:') {
+
+			$thisModule = substr($id,7);
+
+		} else {
+
+			$thisModule = false;
+
+		}
+
+		if (!is_numeric($id) && $id!='*' && $thisModule===false) return null;
+
+		foreach((array)$_SESSION['user']['search']['results'] as $key1 => $val) {
+
+			foreach((array)$val['results'] as $key2 => $module) {
+
+				foreach((array)$module['data'] as $key3 => $data) {
+
+					if (isset($data['replace']['matches'])) {
+
+						foreach((array)$data['replace']['matches'] as $key4 => $match) {
+
+							if ($match['id']==$id || ($module!==false && $module['label']==$thisModule) || $id=='*') {
+
+								$modelData = $_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace'];
+
+								$replaceData = &$_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace']['matches'][$key4];
+							
+								if ($type=='skip') {
+
+									if($replaceData['status']===false) {
+
+										$replaceData['status'] = 'skipped';
+										
+										if ($thisModule===false && $id!='*') return array($id,'skipped');
+
+									} else {
+
+										if ($thisModule===false && $id!='*') return array($id,'no action');
+
+									}
+
+								} else
+								if ($type=='replace') {
+
+									if($replaceData['status']===false) {
+
+										if ($this->doReplace($modelData,$replaceData)) {
+
+											$replaceData['status'] = 'replaced';
+
+											if ($thisModule===false && $id!='*') return array($id,'replaced');
+
+										} else {
+
+											if ($thisModule===false && $id!='*') return array($id,'replace failed');
+
+										}
+
+									} else {
+									
+										if ($thisModule===false && $id!='*') return array($id,'no action');
+									
+									}
+
+								} else
+								if ($type=='reset') {
+
+									$replaceData['status'] = false;
+
+									if ($thisModule===false && $id!='*') return array($id,'reset');
+
+								} else {
+
+									if ($thisModule===false && $id!='*') return array($id,'no action');
+
+								}
+								
+							}
+
+						}
+
+					}
+	
+				}
+
+			}
+		
+		}
+
+		return array('*',($type=='replace' ? 'replaced' : ($type=='reset' ? 'reset' : 'skipped' )));
+	
+	}
+
+	private function ORIGdoReplace($modelData,$matchData)
+	{
+
+		// viva readability
+		$searchedFor = $_SESSION['user']['search']['search']['search'];
+		$replaceWith = $_SESSION['user']['search']['search']['replacement'];
+		$locationOfSearchTerm = $matchData[1];
+
+		// removing enbclosing double quotes
+		$searchedFor = preg_match('/^"(.+)"$/',$searchedFor) ? trim($searchedFor, '"') : $searchedFor;
+
+		// check whether the string is still what we want to replace (just to be on the safe side)
+		$willReplace = substr($matchData['original'],$locationOfSearchTerm,strlen($searchedFor));
+
+		if (strtolower($searchedFor)!==strtolower($willReplace)) return false;
+
+		// match initial capital
+		$init = substr($matchData['original'],$locationOfSearchTerm,1);
+		$replaceWith = ($init == strtoupper($init)) ? ucfirst($replaceWith) : $replaceWith;
+
+		// create new data by replacing the old string (using substring to make sure we *only* replace the term starting at $locationOfSearchTerm)
+		$newData =
+			substr($matchData['original'],0,$locationOfSearchTerm).
+			$replaceWith.
+			substr($matchData['original'],$locationOfSearchTerm + strlen($searchedFor));
+
+		// replacing the old content with the new ($modelData["model"] holds the name of the appropriate model, $modelData['id'] is an array of relevant id's)
+		$result = $this->models->{$modelData["model"]}->update(
+			array(
+				$matchData['column'] => $newData,
+			),
+			$modelData['id']
+		);
+
+		return $result;
 
 	}
 

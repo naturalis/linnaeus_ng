@@ -35,5 +35,17 @@ class IntroductionPage extends Model
     
     }
 
+    /**
+     * Returns name of class/model
+     *
+     * @access     public
+     */
+    public function getClassName ()
+    {
+        
+        return get_class();
+    
+    }
+
 }
 
