@@ -59,12 +59,12 @@
 					
 						{foreach from=$columns item=occurrences}						
 
-						{if $replaceIndex[$occurrences.id]===false}
+						{if $replaceIndex[$occurrences.id]===false && $occurrences|is_array}
 							<div id="replace-{$modules.label|@strtolower|@replace:' ':'_'}-id-{$occurrences.id}" class="replaceItem">
 							{* $occurrences.id *}
 							<span class="replaceItemHeader">
 								{$k} ({if $replaceIndex[$occurrences.id]}{$replaceIndex[$occurrences.id]}{else}{t}to be replaced{/t}{/if}):</span>
-							<br />
+							<br />							
 							{$occurrences.highlighted}
 							<p>
 							<input
@@ -82,7 +82,7 @@
 							<input
 								type="button"
 								value="{t}go to page{/t}" 
-								onclick="window.open('{$columns.url}','_example');" 
+								onclick="window.open('{$moduleData.url}','_example');" 
 							/>
 							</p>
 							</div>

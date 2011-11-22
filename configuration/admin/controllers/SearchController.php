@@ -1406,8 +1406,9 @@ class SearchController extends Controller
 				'model' => $this->models->Glossary->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$replaceCountGloss),
-				'url' => '../glossary/edit.php?id='.$val['id']
 			);
+
+			$gloss[$key]['url'] = '../glossary/edit.php?id='.$val['id'];
 	
 		}
 
@@ -1430,7 +1431,7 @@ class SearchController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'id' => $val['glossary_id']
 					),
-					'columns' => 'term'
+					'columns' => 'id,term'
 				)
 			);
 	
@@ -1441,6 +1442,8 @@ class SearchController extends Controller
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$replaceCountSynonym)
 			);
+
+			$synonyms[$key]['url'] = '../glossary/edit.php?id='.$g[0]['id'];
 
 		}
 
