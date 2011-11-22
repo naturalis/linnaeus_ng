@@ -889,8 +889,7 @@ class Controller extends BaseClass
 
 		$p['id'] = $d;
 
-		if (isset($params['order']))
-			$p['order'] = $params['order'];
+		if (isset($params['order'])) $p['order'] = $params['order'];
 
 		$modules = $this->models->ModuleProject->_get($p);
 
@@ -904,11 +903,27 @@ class Controller extends BaseClass
 
             $modules[$key]['controller'] = $mp['controller'];
 
+            $modules[$key]['show_order'] = $mp['show_order'];
+
         }
 
-		return $modules;
+		$this->customSortArray($modules,array('key' => 'show_order','maintainKeys' => true));
+
+		$freeModules = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				)
+			)
+		);
 		
+		return array(
+			'modules' => $modules,
+			'freeModules' => $freeModules
+		);
+
 	}
+
 
 
     public function checkModuleActivationStatus ()

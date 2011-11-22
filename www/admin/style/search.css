@@ -1,3 +1,15 @@
+.replaceBlankedOut{
+	opacity:0.4;
+	filter:alpha(opacity=40);
+}
+.replaceNotBlankedOut{
+	opacity:1;
+	filter:alpha(opacity=100);
+}
+#replaceResultHeader {
+	border-bottom:1px dotted #666;
+	margin-bottom:10px;
+}
 .replaceModule {
 	border:1px dotted black;
 	border-bottom:none;
