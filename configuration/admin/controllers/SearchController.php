@@ -96,7 +96,7 @@ class SearchController extends Controller
 		
 		unset($_SESSION['user']['search']['results']);
 
-		if ($this->rHasVal('search') && !$this->rHasVal('action','repeat')) {
+		if ($this->rHasVal('search')) {
 
 			$_SESSION['user']['search']['search'] = array(
 				'search' => $this->requestData['search'],
@@ -115,7 +115,7 @@ class SearchController extends Controller
 				);
 
 			$_SESSION['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
-			
+
 			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','all')) {
 
 				$this->redirect('search_replace_all.php');
@@ -166,6 +166,40 @@ class SearchController extends Controller
 			$this->redirect('search_index.php');
 		
 		}
+
+		$this->smarty->assign('includeReplace',true);
+
+        $this->printPage();
+  
+    }
+
+    /**
+     * 
+     *
+     * @access    public
+     */
+    public function searchResultsAction ()
+    {
+
+		$this->checkAuthorisation();
+		
+		$this->setPageName(_('Search results'));
+
+		$this->setControllerMask('utilities','Search');
+
+		if ($_SESSION['user']['search']['search']) {
+
+			if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
+			if (isset($_SESSION['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['user']['search']['results']);
+			if (isset($_SESSION['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['user']['search']['replace']['index']);
+			
+		} else {
+		
+			$this->redirect('search_index.php');
+		
+		}
+
+		$this->smarty->assign('includeReplace',false);
 
         $this->printPage();
   

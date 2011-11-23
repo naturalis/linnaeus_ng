@@ -5,16 +5,13 @@
 	<div id="results">
 		<div id="replaceResultHeader">
 			<p>
-				{t}Searched for:{/t} {$search.search}<br />
-				{t}To be replaced by:{/t} {$search.replacement}
+				{t}Searched for:{/t} {$search.search}
 			</p>
 		{if $resultData.numOfReplacements > 0}
 			<p>
 				{t _s1=$resultData.numOfReplacements}Found %s results.{/t}<br />
 			</p>
 			<p>
-				<input type="button" id="button-replace-all" value="{t}replace all{/t}" onclick="searchDoReplaceAll()" />&nbsp;
-				<input type="button" id="button-skip-all" value="{t}skip all{/t}" onclick="searchDoSkipAll()" />&nbsp;
 				<input type="button" value="{t}back{/t}" onclick="$('#backForm').submit()" />
 			</p>
 		{else}
