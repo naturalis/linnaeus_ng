@@ -136,6 +136,13 @@ class ContentController extends Controller
     
 		$this->checkAuthorisation();
 
+		if ($this->rHasId()) {
+		
+			$d = $this->getContentById($this->requestData['id'],$_SESSION['project']['default_language_id']);
+			$_SESSION['system']['content']['current-subject'] = $d['subject'];
+		
+		}
+
 		$currentSubject =
 			isset($_SESSION['system']['content']['current-subject']) ?
 			$_SESSION['system']['content']['current-subject'] : 
@@ -165,13 +172,13 @@ class ContentController extends Controller
     public function previewAction ()
     {
 
-		$content = $this->getContent($this->requestData['subject'],$_SESSION['project']['default_language_id']);
+		$content = $this->getContentBySubject($this->requestData['subject'],$_SESSION['project']['default_language_id']);
 
 		$this->smarty->assign('backUrl','content.php?sub='.$this->requestData['subject']);
 		//$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
 
 		$this->smarty->assign('subject', $this->requestData['subject']);
-		if (isset($content)) $this->smarty->assign('content', $content);
+		if (isset($content['content'])) $this->smarty->assign('content', $content['content']);
 
 		$this->printPreviewPage(
 			'../../../../app/templates/templates/linnaeus/_index',
@@ -256,28 +263,40 @@ class ContentController extends Controller
 	}
 
 
-	private function getContent($id,$languageId)
+	private function getContentBySubject($id,$languageId)
 	{
 
-        if (!$languageId || !$id) {
-            
-            return;
+        if (!$languageId || !$id)  return;
         
-        } else {
+		$c = $this->models->Content->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $languageId,
+					'subject' => $id
+					)
+			)
+		);
+			
+	   return $c[0];
+        
+	}
 
-			$c = $this->models->Content->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $languageId,
-						'subject' => $id
-						)
-				)
-			);
-                
-           return $c[0]['content'];
+	private function getContentById($id)
+	{
+
+        if (!$id) return;
         
-        }
+		$c = $this->models->Content->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+					)
+			)
+		);
+
+	   return $c[0];
 
 	}
 
@@ -289,8 +308,10 @@ class ContentController extends Controller
             return;
         
         } else {
+		
+			$d = $this->getContentBySubject($this->requestData['id'],$this->requestData['language']);
 
-            $this->smarty->assign('returnText', $this->getContent($this->requestData['id'],$this->requestData['language']));
+            $this->smarty->assign('returnText', $d['content']);
 
         }
 
