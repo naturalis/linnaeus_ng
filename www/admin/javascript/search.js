@@ -48,7 +48,6 @@ function searchDoSearchForm() {
 		return false;
 
 	} else
-	/*
 	if ($('#replaceToggle').is(':checked') && $('#replacement').val().trim()=='') {
 
 		alert(_('You need to enter a replacement term.'));
@@ -56,7 +55,6 @@ function searchDoSearchForm() {
 		return false;
 
 	} else 
-	*/
 	if ($('#replaceToggle').is(':checked') && $('#optionsAll').is(':checked')) {
 
 
