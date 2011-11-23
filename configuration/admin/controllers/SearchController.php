@@ -117,6 +117,8 @@ class SearchController extends Controller
 			$_SESSION['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
 
 			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','all')) {
+			
+				$_SESSION['user']['search']['results']['replace_all'] = true;
 
 				$this->redirect('search_replace_all.php');
 
@@ -206,6 +208,30 @@ class SearchController extends Controller
     }
 
 
+
+    /**
+     * 
+     *
+     * @access    public
+     */
+    public function searchReplaceAllAction ()
+    {
+
+		$this->checkAuthorisation();
+
+		if ($_SESSION['user']['search']['results']['replace_all']!==true) $this->redirect('search_index.php');
+
+		unset($_SESSION['user']['search']['results']['replace_all']);
+
+		$this->doReplaceAction('*','replace');
+		
+		$this->setPageName(_('Replace results'));
+
+        $this->printPage();
+  
+  
+    }
+	
     /**
      * AJAX interface for this class
      *
