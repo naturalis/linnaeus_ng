@@ -29,8 +29,8 @@
 {t}Replace with:{/t} <input type="text" id="replacement" name="replacement" value="" disabled="disabled" /><br />
 <i>{t}Do not enclose multiple words with double quotes, unless you want them as part of the actual replacement string.{/t}</i><br /><br />
 {t}Replace options:{/t}<br />
+<label><input type="radio" name="options" id="optionsShow" value="perOccurrence" {if $search.options!='optionsAll'}checked="checked"{/if} disabled="disabled" />{t}Confirm per match{/t}</label><br />
 <label><input type="radio" name="options" id="optionsAll" value="all" {if $search.options=='optionsAll'}checked="checked"{/if} disabled="disabled" />{t}Replace all without confirmation{/t}</label><br />
-<label><input type="radio" name="options" id="optionsShow" value="perOccurrence" {if $search.options!='optionsAll'}checked="checked"{/if} disabled="disabled" />{t}Replace per occurrence{/t}</label><br />
 </div>
 </fieldset>
 </p>
