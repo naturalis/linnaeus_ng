@@ -14,7 +14,7 @@
 			{t}Assign taxon{/t}
 		</td>
 		<td>
-	<select name="taxon_id" style="width:200px">
+	<select name="taxon_id" style="width:auto">
 	{foreach from=$taxa key=k item=v}
 	<option value="{$v.id}">
 	{section name=foo loop=$v.level}
@@ -28,7 +28,7 @@
 			{t}to user{/t}
 		</td>
 		<td>
-	<select name="user_id" style="width:200px">
+	<select name="user_id" style="width:auto">
 	{section name=i loop=$users}
 	<option value="{$users[i].id}">
 	{$users[i].first_name} {$users[i].last_name} ({$users[i].role})</option>

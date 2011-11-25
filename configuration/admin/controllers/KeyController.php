@@ -236,7 +236,7 @@ class KeyController extends Controller
 
 			// saving the number (all the rest is done through ajax)
 			if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
-			
+
 				// checking the number
 				if (empty($this->requestData['number'])) {
 				// no number specified
@@ -496,6 +496,8 @@ class KeyController extends Controller
 		$this->getTaxonTree();
 		
 		$this->getRemainingTaxa();
+		
+		$this->customSortArray($this->treeList,array('key' => 'taxon'));
 
 		if (isset($choice)) $this->smarty->assign('data',$choice);
 
@@ -1215,6 +1217,7 @@ class KeyController extends Controller
 				)
 			);
 
+			$newContent = trim($data['content'][1])=='' ? 'null' : trim($data['content'][1]);
 
 			$d = array(
 					'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
@@ -1222,7 +1225,7 @@ class KeyController extends Controller
 					'keystep_id' => $data['id'], 
 					'language_id' => $data['language'],
 					'title' => trim($data['content'][0]),
-					'content' => trim($data['content'][1])
+					'content' => $newContent
 				);
 
 			// initiate save to undo buffer
