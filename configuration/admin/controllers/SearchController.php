@@ -10,6 +10,7 @@ class SearchController extends Controller
 	private $_replaceCounter = 0;
 	private $_replaceData = null;
 	private $_replaceStatusIndex = array();
+	private $_replacementResultCounters = array('mismatched' => 0, 'skipped' => 0, 'replaced' => 0);
 
     public $usedModels = array(
 		'content',
@@ -101,10 +102,10 @@ class SearchController extends Controller
 			$_SESSION['user']['search']['search'] = array(
 				'search' => $this->requestData['search'],
 				'replacement' => $this->rHasVal('replacement') ? $this->requestData['replacement'] : null,
-				'doReplace' => $this->requestData['doReplace'],
+				'doReplace' => $this->rHasVal('doReplace') ? $this->requestData['doReplace'] : null,
 				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
 				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
-				'options' => $this->requestData['options'],
+				'options' =>$this->rHasVal('options') ? $this->requestData['options'] : null,
 				);
 
 			$_SESSION['user']['search']['results'] =
@@ -219,13 +220,17 @@ class SearchController extends Controller
 
 		$this->checkAuthorisation();
 
+		$this->setPageName(_('Replace results'));
+		
+		$this->setControllerMask('utilities','Search');
+
 		if ($_SESSION['user']['search']['results']['replace_all']!==true) $this->redirect('search_index.php');
 
 		unset($_SESSION['user']['search']['results']['replace_all']);
 
-		$this->doReplaceAction('*','replace');
+		$this->processReplacements('*','replace');
 		
-		$this->setPageName(_('Replace results'));
+		$this->smarty->assign('replacementResultCounters',$this->_replacementResultCounters);
 
         $this->printPage();
   
@@ -265,21 +270,21 @@ class SearchController extends Controller
 	private function ajaxDoReplace($id)
 	{
 
-		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'replace')));
+		$this->smarty->assign('returnText',json_encode($this->processReplacements($id,'replace')));
 
 	}
 
 	private function ajaxDoSkip($id)
 	{
 
-		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'skip')));
+		$this->smarty->assign('returnText',json_encode($this->processReplacements($id,'skip')));
 
 	}
 
 	private function ajaxDoReset($id)
 	{
 
-		$this->smarty->assign('returnText',json_encode($this->doReplaceAction($id,'reset')));
+		$this->smarty->assign('returnText',json_encode($this->processReplacements($id,'reset')));
 
 	}
 
@@ -295,7 +300,7 @@ class SearchController extends Controller
 	*		- 'replace': replace match, set status to 'replaced'
 	*		- 'reset': reset status to null (for development purposes)
 	*/
-	private function doReplaceAction($id,$type)
+	private function processReplacements($id,$type)
 	{
 
 		if (!isset($_SESSION['user']['search']['results']) || !isset($_SESSION['user']['search']['search']['replacement'])) return null;
@@ -365,6 +370,8 @@ class SearchController extends Controller
 					if ($this->_replaceData['type']=='replace') {
 	
 						$_SESSION['user']['search']['replace']['index'][$storedId] = 'replaced';
+						
+						$this->_replacementResultCounters['replaced']++;
 		
 						return $this->_replaceData['replacement'];
 					
@@ -372,6 +379,8 @@ class SearchController extends Controller
 	
 						$_SESSION['user']['search']['replace']['index'][$storedId] = $this->_replaceData['type']=='skip' ? 'skipped' : false;
 		
+						$this->_replacementResultCounters['skipped']++;
+
 						return $this->_replaceData['search'];
 	
 					}
@@ -381,6 +390,8 @@ class SearchController extends Controller
 	
 					$_SESSION['user']['search']['replace']['index'][$storedId] = 'mismatch';
 		
+					$this->_replacementResultCounters['mismatched']++;
+
 					return $this->_replaceData['search'];
 	
 				}
@@ -1943,7 +1954,7 @@ class SearchController extends Controller
 
 	}
 
-	private function ORIGdoReplaceAction($id,$type)
+	private function ORIGprocessReplacements($id,$type)
 	{
 
 		if (!isset($_SESSION['user']['search']['results'])) return null;
