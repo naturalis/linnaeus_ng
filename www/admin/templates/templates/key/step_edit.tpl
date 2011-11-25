@@ -44,7 +44,7 @@
 				name="titleDefault" 
 				id="titleDefault" 
 				maxlength="64"
-				onblur="keySaveStepContent('default')" />
+				onblur="keySaveStepContent('default')" />&nbsp;*
 		</td>
 	{if $session.project.languages|@count>1}
 		<td><input 
@@ -52,7 +52,7 @@
 				name="titleOther" 
 				id="titleOther" 
 				maxlength="64"
-				onblur="keySaveStepContent('other')" />
+				onblur="keySaveStepContent('other')" />&nbsp;*
 		</td>
 	{/if}
 	</tr>
@@ -79,7 +79,7 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td colspan="2">
-			<input type="button" onclick="keySaveStepContent('default');keySaveStepContent('other');$('#theForm').submit();" value="{t}save{/t}" />
+			<input type="button" onclick="keySaveStepContent('default');keySaveStepContent('other');keySaveStepSubmit();" value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 			<input type="button" onclick="keyStepUndo();"  value="{t}undo last save{/t}" />
 		</td>

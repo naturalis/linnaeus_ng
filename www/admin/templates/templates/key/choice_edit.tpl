@@ -67,7 +67,7 @@
 				<option value="-1">{t}new step{/t}</option>
 				<option value="0"{if $data.res_taxon_id!=null} selected="selected"{/if}>{t}(none){/t}</option>
 {if $steps|@count>0}
-				<option value="-1" disabled="disabled">&nbsp</option>{/if}
+				<option value="-1" disabled="disabled">----------------------------------------------</option>{/if}
 {section name=i loop=$steps}<option value="{$steps[i].id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$steps[i].number}. {$steps[i].title}</option>
 {/section}
 			</select>
@@ -81,11 +81,9 @@
 		<td>&nbsp;</td>
 		<td>{t}taxon:{/t}</td>
 		<td>
-		
-		
 			<select name="res_taxon_id" id="res_taxon_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="0">{t}(none){/t}</option>
-				<option disabled="disabled">&nbsp;</option>
+				<option disabled="disabled">----------------------------------------------</option>
 {assign var=first value=true}
 
 {foreach from=$taxa key=k item=v}
@@ -93,7 +91,7 @@
 {assign var=x value=$v.id}
 {if $v.keypath_endpoint==1}
 <option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
-{section name=foo loop=$v.level-$minBuffer}&nbsp;&nbsp;{/section}
+{* section name=foo loop=$v.level-$minBuffer}&nbsp;&nbsp;{/section *}
 {$v.taxon}{if $v.is_hybrid==1}&nbsp;x{/if}
 {assign var=first value=false}{/if}
 </option>
@@ -143,6 +141,10 @@ $(document).ready(function(){
 	keyChoiceId = {if $data.id}{$data.id}{else}-1{/if};
 	keyGetChoiceContent(allDefaultLanguage);
 	keyGetChoiceContent(allActiveLanguage);
+	{if $data.res_keystep_id!=null}keyCurrentTargetStep = {$data.res_keystep_id};{/if}
+	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
+	allPrevValSetUp('res_keystep_id');
+	allPrevValSetUp('res_taxon_id');
 {literal}
 });
 {/literal}

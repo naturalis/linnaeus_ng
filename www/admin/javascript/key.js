@@ -1,6 +1,8 @@
 var keyFullKeyPathVisibility = false;
 var keyStepId = false;
 var keyChoiceId = false;
+var keyCurrentTargetStep = null;
+var keyCurrentTargetTaxon = null;
 
 function keyToggleFullKeyPath() {
 
@@ -59,15 +61,30 @@ function keyDeleteImage() {
 }
 
 function keyCheckTargetIntegrity(ele) {
+	
+	if (keyCurrentTargetStep!=null || keyCurrentTargetTaxon!=null) {
+
+		if (!confirm(_('Beware: you are changing the target of this choice.\nThis can radically alter the workings of your key.\nDo you wish to continue?'))) {
+
+			$(ele).val($(ele).attr('prev')==undefined ? 0 : $(ele).attr('prev'));
+
+			return;
+		}
+
+	}
 
 	if (ele.id == 'res_taxon_id' && $('#res_taxon_id option:selected').val()!='0') {
 
-		$('#res_keystep_id').val(0);
+		var sel = $('#res_keystep_id');
+		sel.attr('prev',sel.val());
+		sel.val(0);
 
 	} else
 	if (ele.id == 'res_keystep_id' && $('#res_keystep_id option:selected').val()!='0') {
 
-		$('#res_taxon_id').val(0);
+		var sel = $('#res_taxon_id');
+		sel.attr('prev',sel.val());
+		sel.val(0);
 
 	}
 
@@ -222,6 +239,25 @@ function keySaveStepContent(type) {
 		content,
 		'save_keystep_content'
 	);
+
+}
+
+function keySaveStepSubmit() {
+
+	if ($('#number').val().length==0) {
+		alert(_('A number is required.'));
+		$('#number').focus();
+	} else
+	if ($('#titleDefault').val().length==0) {
+		alert(_('A title is required.'));
+		$('#titleDefault').focus();
+	} else
+	if ($('#titleOther') && $('#titleOther').val().length==0) {
+		alert(_('A title is required.'));
+		$('#titleOther').focus();
+	} else {
+		$('#theForm').submit();
+	}
 
 }
 

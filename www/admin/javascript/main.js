@@ -67,6 +67,18 @@ function _(text) {
 
 }
 
+function allPrevValSetUp(id) {
+
+	var sel = $('#'+id);
+	sel.attr('prev',sel.val());
+	sel.change(function(data){
+		var jqThis = $(this);
+		sel.attr('prev',jqThis.val());
+	});
+
+
+}
+
 var allAjaxHandle = false;
 var allAjaxAborted = false;
 var allAjaxAsynchMode = true;
