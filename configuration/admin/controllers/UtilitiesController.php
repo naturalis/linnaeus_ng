@@ -100,6 +100,24 @@ class UtilitiesController extends Controller
     }
 
 
+	public function rootIndexAction()
+	{
+	
+		$this->isMultiLingual = false;
+		$this->includeLocalMenu = false;
+		$this->printBreadcrumbs = false;
+	
+		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
+
+		$this->smarty->assign('projects',$projects);
+		$this->smarty->assign('excludeLogout',true);
+		$this->smarty->assign('breadcrumbs',false);
+
+
+		$this->printPage('utilities/root_index');
+	
+	}
+
 
     /**
      * AJAX interface for this class

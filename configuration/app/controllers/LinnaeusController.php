@@ -12,6 +12,7 @@ class LinnaeusController extends Controller
 {
 
 	public $noResultCaching = true;
+	private $_checkForProjectId = true;
 
     public $usedModels = array(
 		'content',
@@ -73,16 +74,14 @@ class LinnaeusController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct ($params=null)
     {
+
+		$this->setControllerParams($params);
 
         parent::__construct();
 
-		if ($this->viewName!='set_project') {
-
-			$this->checkForProjectId();
-
-		}
+		$this->checkForProjectId();
 
     }
 
@@ -137,6 +136,12 @@ class LinnaeusController extends Controller
 
     }
 
+    public function checkForProjectId ()
+    {
+
+		if ($this->getCheckForProjectId()) parent::checkForProjectId();
+
+    }
 
     /**
      * Index of project: introduction (or other content pages)
@@ -167,7 +172,7 @@ class LinnaeusController extends Controller
         $this->printPage();
   
     }
-
+	
 	public function highlightFound($params, $content, &$smarty, &$repeat)
 	{
 
@@ -580,6 +585,30 @@ q($results,1,1);
 		$this->_speciesIndexAction();
 
 	}
+
+
+	private function setControllerParams($params)
+	{
+	
+		if (isset($params['checkForProjectId'])) $this->setCheckForProjectId($params['checkForProjectId']);
+	
+	}
+
+
+	private function setCheckForProjectId($state)
+	{
+	
+		if (is_bool($state)) $this->_checkForProjectId = $state;
+	
+	}
+
+	private function getCheckForProjectId()
+	{
+	
+		return $this->_checkForProjectId;
+	
+	}
+
 
     private function _speciesIndexAction ()
     {

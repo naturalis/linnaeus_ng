@@ -79,7 +79,7 @@ class LoggingHelper
 		if ($severity < $this->_level) return;
 
 		if (!$this->_file) {
-		
+
 			trigger_error(sprintf(_('Log file not available for writing (%s)'),$this->_fileName), E_USER_ERROR);
 
 			return false;

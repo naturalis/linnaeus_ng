@@ -41,6 +41,7 @@ class Controller extends BaseClass
     public $treeList;
 	public $suppressProjectInBreadcrumbs;
 	public $includeLocalMenu = true;
+	public $printBreadcrumbs = true;
 
     private $usedModelsBase = array(
         'user', 
@@ -1938,6 +1939,7 @@ class Controller extends BaseClass
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
         $this->smarty->assign('rnd', $this->getRandomValue());
+        $this->smarty->assign('printBreadcrumbs', $this->printBreadcrumbs);
         $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
@@ -1949,13 +1951,11 @@ class Controller extends BaseClass
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
 
-		if (isset($this->cssToLoad)) {
-	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
-    	}
+        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
 
-		if (isset($this->jsToLoad)) {
-	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-    	}
+		if (isset($this->cssToLoad)) $this->smarty->assign('cssToLoad', $this->cssToLoad);
+
+		if (isset($this->jsToLoad)) $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
 
         $this->smarty->assign('controllerMenuExists', 
 			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl')
@@ -1974,8 +1974,6 @@ class Controller extends BaseClass
 			$_SESSION['user']['_said_welcome'] = true;
 
 		}
-
-        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
 
     }
 

@@ -79,11 +79,11 @@ class Controller extends BaseClass
         $this->startSession();
 
         $this->loadHelpers();
-		
-        $this->setNames();
-		
+
 		$this->initLogging();
 
+        $this->setNames();
+		
         $this->loadControllerConfig();        
         
         $this->setUrls();

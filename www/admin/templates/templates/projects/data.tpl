@@ -96,6 +96,19 @@
 		</td>
 	</tr>		
 	<tr>
+		<td>
+			{t}Publish project:{/t}
+		</td>
+		<td>
+			<label>
+				<input type="radio" name="published" value="1" {if $data.published=='1'} checked="checked"{/if}/> {t}yes{/t}
+			</label>
+			<label>
+				<input type="radio" name="published" value="0" {if $data.published!='1'} checked="checked"{/if}/> {t}no{/t}
+			</label>
+		</td>
+	</tr>		
+	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>		
 	<tr>
