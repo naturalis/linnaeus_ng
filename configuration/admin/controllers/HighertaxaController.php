@@ -43,9 +43,9 @@ class HighertaxaController extends Controller
 
         $this->checkAuthorisation();
 
-		$_SESSION['system']['highertaxa'] = true;
+		//$_SESSION['system']['highertaxa'] = true;
 		
-		$this->redirect('../species/list.php');
+		$this->redirect('../species/index.php?higher=1');
 		
 		/*
         $this->setPageName(_('Higher taxa overview'));
