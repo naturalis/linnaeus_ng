@@ -1129,5 +1129,3 @@ class ProjectsController extends Controller
 
 
 }
-
-
