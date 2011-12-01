@@ -1,27 +1,34 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main" style="height:{if $languages|@count > 1}1200px{else}670px{/if}">
 <span id="debug-message"></span>
-
 {if $taxon.id!=-1}
+{* $taxon.taxon *}
 <form name="theForm" id="theForm" method="post">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 	<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
 	<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
 	<input type="hidden" name="activePage" value="{$activePage}" />  
-
-	<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="margin-right:5px" />
-	<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="margin-right:25px" />
-	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="margin-right:5px" />
-
-	<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" style="margin-right:5px" />
-	<input type="button" value="{t}literature{/t}" onclick="window.open('literature.php?id={$taxon.id}','_self')" style="margin-right:5px" />
-	<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" style="margin-right:5px" />
-	<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" style="margin-right:25px" />
-
-
-	<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="margin-right:5px" />
-	<!-- input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" / -->
+<div style="border-bottom:1px dotted #ddd;padding-bottom:10px">
+	{* yes i know, but for some reason the buttons refused to "see" the style sheet *}
+	<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="padding-right:25px;width:150px;" />
+	{if $session.system.highertaxa!=1}
+	<input type="button" value="{t}management{/t}" onclick="window.open('manage.php','_self')" style="padding-right:25px;width:150px;" />
+	{/if}
 	<span id="message-container" style="margin-right:10px">&nbsp;</span>
+</div>
+<div style="padding:10px 0px 10px 0px">
+	<input type="button" value="{t}name and parent{/t}" onclick="window.open('edit.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}literature{/t}" onclick="window.open('literature.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
+	<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
+
+	<!-- input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" / -->
+</div>
+
 
 <div id="taxon-pages-table-div"></div>
 

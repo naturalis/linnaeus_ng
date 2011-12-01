@@ -10,7 +10,7 @@
 <p>
 <select name="p">
 {foreach from=$projects item=v}
-<option value="{$v.id}">{$v.title}</option>
+<option value="{$v.id}">{if $v.title!=''}{$v.title}{else}[untitled]{/if}</option>
 {/foreach}
 </select>
 </p>

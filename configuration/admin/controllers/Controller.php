@@ -397,7 +397,7 @@ class Controller extends BaseClass
     public function getCurrentUserProjects ()
     {
         
-        foreach ((array) $_SESSION['user']['_roles'] as $key => $val) {
+        foreach ((array)$_SESSION['user']['_roles'] as $key => $val) {
             
             $r = array(
                 'id' => $val['project_id'], 
@@ -632,28 +632,41 @@ class Controller extends BaseClass
         foreach ((array) $pru as $key => $val) {
             
             $p = $this->models->Project->_get(array('id'=>$val['project_id']));
+			
+			// $val['project_id']==0 is the stub for all round system admin
+			if ($p || $val['project_id']==0) {
             
-            $pru[$key]['project_name'] = $p['sys_name'];
-            
-            $r = $this->models->Role->_get(array('id'=>$val['role_id']));
-            
-            $pru[$key]['role_name'] = $r['role'];
-            
-            $pru[$key]['role_description'] = $r['description'];
-            
-            $rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
-            
-            foreach ((array) $rr as $rr_key => $rr_val) {
-                
-                $r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
-                
-                $rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
-            
-            }
-            
-            $d[$val['project_id']] = $val['project_id'];
-        
+				$r = $this->models->Role->_get(array('id'=>$val['role_id']));
+				
+				if ($r) {
+
+					$userProjectRoles[] = array_merge(
+						$val,
+						array(
+							'project_name' => $p['sys_name'],
+							'role_name' => $r['role'],
+							'role_description' => $r['description']
+						)
+					);
+					
+					$rr = $this->models->RightRole->_get(array('id'=>array('role_id' => $val['role_id'])));
+					
+					foreach ((array) $rr as $rr_key => $rr_val) {
+						
+						$r = $this->models->Right->_get(array('id'=>$rr_val['right_id']));
+						
+						$rs[$val['project_id']][$r['controller']][$r['id']] = $r['view'];
+					
+					}
+					
+					$projectCount[$val['project_id']] = $val['project_id'];
+
+				}
+
+			}
+
         }
+
 
 		$fmpu = $this->models->FreeModuleProjectUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
 		
@@ -664,9 +677,9 @@ class Controller extends BaseClass
 		}
 
         return array(
-            'roles' => isset($pru) ? $pru : null, 
+            'roles' => isset($userProjectRoles) ? $userProjectRoles : null, 
             'rights' => isset($rs) ? $rs : null, 
-            'number_of_projects' => isset($d) ? count((array) $d) : 0
+            'number_of_projects' => isset($projectCount) ? count((array) $projectCount) : 0
         );
     
     }

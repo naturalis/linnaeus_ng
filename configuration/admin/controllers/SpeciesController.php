@@ -142,7 +142,28 @@ class SpeciesController extends Controller
     {
 
 		unset($_SESSION['system']['activeTaxon']);
-		unset($_SESSION['system']['highertaxa']);
+
+		if ($this->rHasVal('higher','1')) {
+
+			$_SESSION['system']['highertaxa'] = true;
+
+		} else {
+
+			unset($_SESSION['system']['highertaxa']);
+
+		}
+		
+		$d = @array_shift($this->getUserAssignedTreeList());
+  
+  		$this->redirect('taxon.php?id='.$d['id']);
+
+    }
+
+    public function manageAction ()
+    {
+
+		//unset($_SESSION['system']['activeTaxon']);
+		//unset($_SESSION['system']['highertaxa']);
 
         $this->checkAuthorisation();
 		
@@ -640,6 +661,7 @@ class SpeciesController extends Controller
 		}
 
 		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);

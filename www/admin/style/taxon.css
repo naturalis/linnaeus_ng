@@ -208,3 +208,8 @@
 .taxon-delete-option {
 	font-weight:bold;
 }
+
+.taxon-nav-button {
+	margin-right:115px;
+	font-size:36px;
+}
