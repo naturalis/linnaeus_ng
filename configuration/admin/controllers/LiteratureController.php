@@ -48,6 +48,8 @@ class LiteratureController extends Controller
 
     public function indexAction()
     {
+      
+		unset($_SESSION['system']['activeTaxon']);
     
 		$this->clearTempValues();
 
@@ -254,8 +256,8 @@ class LiteratureController extends Controller
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 
-		if (isset($ref))  {
-		
+		if (isset($ref['id']))  {
+
 			$this->smarty->assign('navCurrentId',$ref['id']);
 
 	        $this->smarty->assign('ref', $ref);

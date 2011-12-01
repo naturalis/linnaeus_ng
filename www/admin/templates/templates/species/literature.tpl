@@ -3,7 +3,7 @@
 <div id="page-main">
 
 <p>
-	<input type="button" value="{t}add new reference{/t}" onclick="window.open('../literature/edit.php','_top')" />&nbsp;
+	<input type="button" value="{t}add new reference{/t}" onclick="window.open('../literature/edit.php?action=new','_top')" />&nbsp;
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
 

@@ -1534,6 +1534,7 @@ class Controller extends BaseClass
 	
 	}
 
+
 	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null,$specificMenuTemplate=null)
 	{
 

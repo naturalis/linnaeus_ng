@@ -123,7 +123,7 @@ class LinnaeusController extends Controller
 
 			$this->setPaths();
 		
-			$this->checkForStylesheet();
+			$this->checkForStylesheets();
 
 			$this->setCurrentProjectData();
 			
@@ -2021,7 +2021,7 @@ q($results,1,1);
 
 	}
 	
-	private function checkForStylesheet()
+	private function checkForStylesheets()
 	{
 	
 		foreach((array)$this->cssToLoad as $val) {

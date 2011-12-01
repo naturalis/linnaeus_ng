@@ -54,6 +54,7 @@ class ProjectsController extends Controller
 		'free_module_project',
 		'free_module_project_user',
 		'free_module_page',
+		'free_module_media',
 		'content_free_module',
 		'occurrence_taxon',
 		'geodata_type',

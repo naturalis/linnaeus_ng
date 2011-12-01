@@ -2,20 +2,30 @@
 	position:absolute;
 	top:10px;
 	left:0px;
-	width:180px;
+	width:500px;
 	height:150px;
 	color:#aaa;
+	text-align:right;
 "
 >
 <input type="button" value="back to editing" onclick="window.open('{$backUrl}','_self');" />
 {if $nextUrl}<input type="button" value="next" onclick="window.open('{$nextUrl}','_self');" />{/if}
+<div id="overlay-warning" style="margin-top:5px">
+warning - the following stylesheets do not exist yet:<br />
+{assign var=i value=0}
+{section name=i loop=$cssToLoad}
+	{if !file_exists($cssToLoad[i])}{$cssToLoad[i]}<br />{assign var=i value=$i+1}{/if}
+{/section}
 </div>
-
+</div>
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
 
+	{if $i==0}
+	$('#overlay-warning').hide();
+	{/if}
 	var pos = $('#body-container').position();
 	$('#preview-overlay').css('left',(pos.left + $('#body-container').width() - $('#preview-overlay').width()));
 
@@ -51,5 +61,3 @@ $(document).ready(function(){
 });
 </script>
 {/literal}
-
-
