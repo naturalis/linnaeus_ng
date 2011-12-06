@@ -1548,6 +1548,7 @@ class Controller extends BaseClass
 			);
 
 		unset($this->cssToLoad);
+		unset($this->jsToLoad);
 
 		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
 		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/'.$specificStylesheet;

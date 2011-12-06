@@ -135,13 +135,6 @@ class UsersController extends Controller
     
     }
 
-
-	public function doChooseProject($projectId)
-	{
-	
-	
-	}
-
     /**
      * Choosing the active project
      *

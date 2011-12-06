@@ -1042,11 +1042,11 @@ class ProjectsController extends Controller
 
 		if (file_exists($paths['project_media'].$fmm[0]['file_name'])) {
 
-			if (unlink($paths['project_media'].$fmm[0]['file_name'])) {
+			if (@unlink($paths['project_media'].$fmm[0]['file_name'])) {
 			
 				if ($fmm[0]['thumb_name'] && file_exists($paths['project_thumbs'].$fmm[0]['thumb_name'])) {
 				
-					unlink($paths['project_thumbs'].$fmm[0]['thumb_name']);
+					@unlink($paths['project_thumbs'].$fmm[0]['thumb_name']);
 
 				}
 			}

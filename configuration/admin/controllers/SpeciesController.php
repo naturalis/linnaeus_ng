@@ -154,8 +154,17 @@ class SpeciesController extends Controller
 		}
 		
 		$d = @array_shift($this->getUserAssignedTreeList());
-  
-  		$this->redirect('taxon.php?id='.$d['id']);
+
+
+		if (!isset($d['id'])) {
+
+	  		$this->redirect('collaborators.php');
+
+		} else {
+
+	  		$this->redirect('taxon.php?id='.$d['id']);
+
+		}
 
     }
 
@@ -1926,7 +1935,7 @@ class SpeciesController extends Controller
 		
 		} else {
 	
-			$this->addMessage(_('No taxon have been defined.'));
+			$this->addMessage(_('No taxa have been defined.'));
 	
 		}
 

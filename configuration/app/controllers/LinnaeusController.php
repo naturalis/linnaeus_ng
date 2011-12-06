@@ -64,7 +64,6 @@ class LinnaeusController extends Controller
 
 	public $jsToLoad = array('all' => array(
 		'main.js',
-		'speciesdetailpage10.js',
 		'lookup.js'
 	));
 	

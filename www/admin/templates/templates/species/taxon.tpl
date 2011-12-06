@@ -14,9 +14,6 @@
 	<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" />
 	<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" />
 	<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="padding-right:25px;width:150px;" />
-	{if $session.system.highertaxa!=1}
-	<input type="button" value="{t}management{/t}" onclick="window.open('manage.php','_self')" style="padding-right:25px;width:150px;" />
-	{/if}
 	<span id="message-container" style="margin-right:10px">&nbsp;</span>
 </div>
 <div style="padding:10px 0px 10px 0px">

@@ -468,7 +468,7 @@ class SearchController extends Controller
 				) {
 				
 				$this->_replaceId = 0;
-				
+
 				$results = $this->doSearch($search,$modules,$freeModules);
 
 				$results['numOfResults'] =
@@ -983,29 +983,33 @@ class SearchController extends Controller
 	private function searchModules($search,$freeModules=null)
 	{
 
+		$d['project_id'] = $this->getCurrentProjectId();		
+		if ($freeModules!==false) $d['module_id in']  = implode(',',$freeModules).')';					
+
+		// get appropriate free modules
 		$modules = $this->models->FreeModuleProject->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-				),
+				'id' => $d,
 				'columns' => 'id,module',
 				'fieldAsIndex' => 'id'
 			)
 		);
 
+		// get all matching content in all appropriate free modules
 		$content = $this->models->ContentFreeModule->_get(
 			array(
 				'where' => 
 					'project_id = '.$this->getCurrentProjectId().' and
 					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
-					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')'.
+					($freeModules!==false ? ' and module_id in ('.implode(',',$freeModules).')' : ''),
 				'columns' => 'id,page_id,module_id,topic,content',
 				'order' => 'module_id'
 			)
 		);
 		
 		$replaceCount = array();
-		$replaceCountTot = 0;
+		$replaceCountTot = $resultCountTot = 0;
 
 		foreach((array)$content as $key => $val) {
 
@@ -1028,14 +1032,15 @@ class SearchController extends Controller
 				$replaceCountTot = $replaceCountTot + count((array)$matches);
 
 			}
-			
-			if (is_null($freeModules) || in_array($val['module_id'],$freeModules)) {
-
-				$results[$modules[$val['module_id']]['module']][] = $val;
-
-			}
 		
+			$resultCountTot++;
+
+			$results[$modules[$val['module_id']]['module']][] = $val;
+
 		}
+
+
+
 
 		$r = null;
 
@@ -1054,7 +1059,7 @@ class SearchController extends Controller
 
 		return array(
 			'results' => isset($r) ? $r : null,
-			'numOfResults' => count((array)$content),
+			'numOfResults' => $resultCountTot,
 			'numOfReplacements' => $replaceCountTot
 		);
 
