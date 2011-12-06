@@ -26,6 +26,11 @@ $(document).ready(function(){
 	{if $i==0}
 	$('#overlay-warning').hide();
 	{/if}
+	
+	$('#main-menu').hide();
+	$('#language-change').hide();
+	
+
 	var pos = $('#body-container').position();
 	$('#preview-overlay').css('left',(pos.left + $('#body-container').width() - $('#preview-overlay').width()));
 

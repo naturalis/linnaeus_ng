@@ -741,7 +741,10 @@ class IntroductionController extends Controller
 
 			}
 
-			$_SESSION['system']['introduction']['navList'] = $res;
+			if (isset($res))
+				$_SESSION['system']['introduction']['navList'] = $res;
+			else
+				$_SESSION['system']['introduction']['navList'] = null;
 		
 		}
 		

@@ -22,14 +22,6 @@ Data import is complete. You have been added as system administrator to the new 
 <p>
 <a href="go_new_project.php">Go to project index</a>
 </p>
-<p>
-You will have to manually set the distinction between higher and lower taxa. You can do this here:<br />
-<a href="../species/ranks.php">Species module &rarr; Taxonomic ranks </a>
-</p>
-<p>
-You will also have to assign species to collaborators in order to see and edit taxa. You can do this here:<br />
-<a href="../species/collaborators.php">Species module &rarr; Assign taxa to collaborator</a>
-</p>
 {else}
 Review the options below and press "import" to start the import database. Please note that the loading of data might take several minutes.
 <form method="post">
@@ -51,16 +43,21 @@ Review the options below and press "import" to start the import database. Please
 <p>
 <b>Literature</b><br/>
 {if $literature}
-<label>Import literary references ({$literature|@count})?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label><br /><br />	
-The following literary references refer to unknown species. The literary references themselves will be imported, but the links to the unknown species listed below will not.<br />
-{foreach from=$literature key=k item=v}
+<label>Import literary references ({$literature|@count})?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label>
+{capture assign=lit_errors}{foreach from=$literature key=k item=v}
 {if $v.references.unknown_species|@count != 0}
 "<i>{$v.original}</i>" refers to an unknown species:<br/>
 {foreach from=$v.references.unknown_species item=u}
 &#149;&nbsp;<span class="error">{$u}</span><br/>
 {/foreach}
 {/if}
-{/foreach}
+{/foreach}{/capture}
+{if $smarty.capture.lit_errors}
+<br /><br />	
+The following literary references refer to unknown species. The literary references themselves will be imported, but the links to the unknown species listed below will not.<br />
+{$smarty.capture.lit_errors}
+{/if}
+
 {else}
 No literary references found.
 {/if}

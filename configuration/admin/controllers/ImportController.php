@@ -86,7 +86,11 @@ class ImportController extends Controller
 		'content_free_module',
 		'occurrence_taxon',
 		'geodata_type',
-		'geodata_type_title'
+		'geodata_type_title',
+		'content_introduction',
+		'introduction_page',
+		'introduction_media',
+		'user_taxon'
     );
    
     public $usedHelpers = array('file_upload_helper');
@@ -256,8 +260,8 @@ class ImportController extends Controller
 
 				$newId = $this->createProject(
 					array(
-						 'title' => (string)$d->project->title,
-						 'version' => (string)$d->project->version,
+						 'title' => trim((string)$d->project->title),
+						 'version' => trim((string)$d->project->version),
 						 'sys_description' => 'Created by import from a Linnaeus 2-export.',
 						 'css_url' => $this->controllerSettings['defaultProjectCss']
 					)
@@ -265,13 +269,13 @@ class ImportController extends Controller
 
 				if (!$newId) {
 	
-					$this->addError('Could not create new project "'.(string)$d->project->title.'". Does a project with the same name already exist?');
+					$this->addError('Could not create new project "'.trim((string)$d->project->title).'". Does a project with the same name already exist?');
 	
 				} else { 
 
 					$project = $this->getProjects($this->getNewProjectId());
 
-					$this->addMessage('Created new project "'.(string)$d->project->title.'"');
+					$this->addMessage('Created new project "'.trim((string)$d->project->title).'"');
 
 					$this->setNewProjectId($newId);
 
@@ -286,12 +290,12 @@ class ImportController extends Controller
 
 					if (!$l) {
 
-						$this->addError('Unable to use project language "'.(string)$d->project->language.'"');
+						$this->addError('Unable to use project language "'.trim((string)$d->project->language).'"');
 
 					} else {
 
 						$this->setNewDefaultLanguageId($l);
-						$this->addMessage('Set language "'.(string)$d->project->language.'"');
+						$this->addMessage('Set language "'.trim((string)$d->project->language).'"');
 
 					}
 	
@@ -359,14 +363,20 @@ class ImportController extends Controller
 
 			$ranks = $_SESSION['system']['import']['loaded']['ranks'] = $this->addProjectRanks($ranks);
 			$species = $_SESSION['system']['import']['loaded']['species'] = $this->addSpecies($species,$ranks);
+
 			if (isset($this->requestData['treetops']))
 				$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
 			
+			$this->assignTopSpeciesToUser($species);
+
 			$this->addMessage('Saved '.count((array)$ranks).' ranks');
 			$this->addMessage('Saved '.count((array)$species).' species');
 
 			$this->addModuleToProject(4);
 			$this->addModuleToProject(5);
+			$this->grantModuleAccessRights(4);
+			$this->grantModuleAccessRights(5);
+
 			
 			$this->smarty->assign('processed',true);
 
@@ -395,10 +405,11 @@ class ImportController extends Controller
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 		$species = $_SESSION['system']['import']['loaded']['species'];
 
+		// getProjectContent: 'Introduction' (= Welcome) and 'Contributors'  (= Welcome)
 		if (!isset($_SESSION['system']['import']['content']))
-			$_SESSION['system']['import']['content'] = $content = $this->getProjectContent($d);
+			$_SESSION['system']['import']['content'] = $welcomeContrib = $this->getProjectContent($d);
 		else
-			$content = $_SESSION['system']['import']['content'];
+			$welcomeContrib = $_SESSION['system']['import']['content'];
 
 		if (!isset($_SESSION['system']['import']['literature']))
 			$_SESSION['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
@@ -410,16 +421,17 @@ class ImportController extends Controller
 		else
 			$glossary = $_SESSION['system']['import']['glossary'];
 
+		// getAdditionalContent: multiple topics (= Introduction)
 		if (!isset($_SESSION['system']['import']['additionalContent']))
-			$_SESSION['system']['import']['additionalContent'] = $additionalContent = $this->checkAdditionalContent($d);
+			$_SESSION['system']['import']['additionalContent'] = $introductionContent = $this->getAdditionalContent($d);
 		else
-			$additionalContent = $_SESSION['system']['import']['additionalContent'];
+			$introductionContent = $_SESSION['system']['import']['additionalContent'];
 
 		if (!isset($_SESSION['system']['import']['mapItems']))
 			$_SESSION['system']['import']['mapItems'] = $mapItems = $this->getMapItems($d,$species);
 		else
 			$mapItems = $_SESSION['system']['import']['mapItems'];
-	
+
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 		
 			$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
@@ -435,6 +447,8 @@ class ImportController extends Controller
 				$this->addMessage('Added '.$res['ref'].' literary-taxon link(s) (failed '.$res['refFail'].').');
 
 				$this->addModuleToProject(3);
+				$this->grantModuleAccessRights(3);
+
 
 			}
 
@@ -447,6 +461,8 @@ class ImportController extends Controller
 				$this->addMessage('Added '.count((array)$res['saved']).' glossary image(s) (failed '.count((array)$res['failed']).').');
 
 				$this->addModuleToProject(2);
+				$this->grantModuleAccessRights(2);
+
 
 			}
 
@@ -471,6 +487,8 @@ class ImportController extends Controller
 				$this->addMessage('Created dichotomous key.');
 
 				$this->addModuleToProject(6);
+				$this->grantModuleAccessRights(6);
+
 
 			}
 
@@ -497,6 +515,8 @@ class ImportController extends Controller
 				$this->addMessage('Created matrix key(s).');
 
 				$this->addModuleToProject(7);
+				$this->grantModuleAccessRights(7);
+
 
 			}
 
@@ -572,12 +592,13 @@ class ImportController extends Controller
 			if ($this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
 
 				$this->addModuleToProject(1);
+				$this->grantModuleAccessRights(1);
 
 			}
 
 			if ($this->rHasVal('additional_content','on')) {
 
-				$res = $this->addAdditionalContent($additionalContent);
+				$res = $this->addAdditionalContent($introductionContent);
 
 			}
 
@@ -598,6 +619,7 @@ class ImportController extends Controller
 				$this->addMessage('Loaded geo data (saved '.$m['saved'].', failed '.count((array)$m['failed']).').');
 
 				$this->addModuleToProject(8);
+				$this->grantModuleAccessRights(8);
 
 			}
 
@@ -615,10 +637,10 @@ class ImportController extends Controller
 
 		}
 
-		$this->smarty->assign('content',$content);
+		$this->smarty->assign('content',$welcomeContrib);
 		$this->smarty->assign('literature',$literature);
 		$this->smarty->assign('glossary',$glossary);
-		$this->smarty->assign('additionalContent',$additionalContent);
+		$this->smarty->assign('additionalContent',$introductionContent);
 		$this->smarty->assign('mapItems',$mapItems);
 
         $this->printPage();
@@ -628,10 +650,10 @@ class ImportController extends Controller
 	public function goNewProject()
 	{
 
-		$this->reInitUserRolesAndRights();
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
 		$this->getCurrentUserCurrentRole(true);
+		$this->reInitUserRolesAndRights();
 
 		unset($_SESSION['system']['import']);
 		unset($_SESSION['project']['ranks']);
@@ -639,12 +661,6 @@ class ImportController extends Controller
 		$this->redirect($this->getLoggedInMainIndex());
 
 	}
-
-
-
-
-
-
 
 	private function addModuleToProject($id)
 	{
@@ -673,6 +689,12 @@ class ImportController extends Controller
 			)
 		);
 		
+	}
+
+	private function grantModuleAccessRights($id)
+	{
+
+
 	}
 
 	private function getProjects($id=null)
@@ -726,7 +748,7 @@ class ImportController extends Controller
 		$l = $this->models->Language->_get(
 			array(
 				'id' => array(
-					'language' => $d->project->language
+					'language' => trim((string)$d->project->language)
 				),
 				'columns' => 'id'
 			)
@@ -823,7 +845,7 @@ class ImportController extends Controller
 
 	}
 
-	private function addProjectRank($label,$rank)
+	private function addProjectRank($label,$rank,$isLower)
 	{
 
 		$this->models->ProjectRank->save(
@@ -832,7 +854,7 @@ class ImportController extends Controller
 				'project_id' => $this->getNewProjectId(),	
 				'rank_id' => $rank['rank_id'],	
 				'parent_id' => isset($rank['parent_id']) ? $rank['parent_id'] : null,
-				'lower_taxon' => '1'
+				'lower_taxon' => $isLower ? '1' : '0'
 			)
 		);
 		
@@ -856,14 +878,33 @@ class ImportController extends Controller
 	{
 
 		$d = null;
+		
+		$isLower = false;
 
 		foreach((array)$ranks as $key => $val) {
 
 			if (empty($val['rank_id'])) continue; // unresolvable rank
 			if ($val['parent_id']===false) continue; // unresolvable parent rank
 			if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
+			
+			if (!$isLower && (strtolower($key)=='species')) $isLower = true;
 
-			$d[$key] = $this->addProjectRank($key,$val);
+			$d[$key] = $this->addProjectRank($key,$val,$isLower);
+
+		}
+
+		// if $isLower is still false (i.e., all ranks are higher taxa), set the last (=lowest) rank to being lower taxa	
+		if ($isLower==false) {
+
+			$this->models->ProjectRank->update(
+				array(
+					'lower_taxon' => '1'
+				),
+				array(
+					'id' => $d[$key]['id'],
+					'project_id' => $this->getNewProjectId()
+				)
+			);
 
 		}
 
@@ -963,7 +1004,27 @@ class ImportController extends Controller
 		return $d;
 
 	}
-	
+
+	private function assignTopSpeciesToUser($species)
+	{
+
+		foreach((array)$species as $key => $val) {
+		
+			if (isset($val['parent_id'])) continue;
+
+			$this->models->UserTaxon->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),
+					'user_id' => $this->getCurrentUserId(),
+					'taxon_id' => $val['id'],
+				)
+			);
+				
+		}
+
+	}
+
 	private function checkTreeTops($d)
 	{
 
@@ -1051,15 +1112,15 @@ class ImportController extends Controller
 
 	private function addProjectContent($d,$type)
 	{
-	
+
 		if ($d->project->projectintroduction && $type=='introduction')
 			$c = $this->models->Content->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
-					'subject' => 'Introduction',	
-					'content' => (string)$d->project->projectintroduction
+					'topic' => 'Welcome',	
+					'content' => $this->replaceOldMarkUp((string)$d->project->projectintroduction)
 				)
 			);
 
@@ -1070,7 +1131,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
-					'content' => (string)$d->project->contributors
+					'content' => $this->replaceOldMarkUp((string)$d->project->contributors)
 				)
 			);
 	
@@ -1545,16 +1606,33 @@ class ImportController extends Controller
 			if ($val->keywords->keyword) {
 
 				foreach($val->keywords->keyword as $kKey => $kVal) {
-	
-					$t = $this->replaceOldMarkUp($this->removeInternalLinks((string)$kVal->name),true);
-	
-					if (isset($species[$t])) {
 
-						$okSp[] = $species[$t]['id'];
+					if (preg_match('/\[m\](Species|Higher taxa)\[\/m\]/i',(string)$kVal->name)==0) continue;
 	
+					$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks((string)$kVal->name),true);
+
+					if (isset($species[$speciesName])) {
+
+						$okSp[] = $species[$speciesName]['id'];
+	
+					} else
+					if (strpos($speciesName,' ')!==false) {
+					
+						$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
+	
+						if (isset($species[$speciesNameSplit])) {
+						
+							$okSp[] = $species[$speciesNameSplit]['id'];
+
+						} else {
+
+							$unSp[] = $speciesName;
+
+						}
+
 					} else {
 
-						$unSp[] = $t;
+						$unSp[] = $speciesName;
 	
 					}
 	
@@ -2424,7 +2502,7 @@ class ImportController extends Controller
 
 	}
 
-	private function checkAdditionalContent($d)
+	private function getAdditionalContent($d)
 	{
 
 		if (!$d->introduction) return null;
@@ -2443,109 +2521,61 @@ class ImportController extends Controller
 
 	}
 
+	
 	private function addAdditionalContent($content)
 	{
 
-		// assuming only one 'introduction' branch in the import (= a single free module)
-		$freeModName = 'Introduction';
+		foreach((array)$content as $key => $val) {
 
-		$exists = true;
-		$i = null;
-
-		while ($exists == true) {
-		
-			$freeModName = $freeModName.(isset($i) ? ' ('.$i.')' : '');
-
-			$fmp = $this->models->FreeModuleProject->_get(
+			$this->models->IntroductionPage->save(
 				array(
-					'id' => array(
-						'module' => $freeModName,
-						'project_id' => $this->getNewProjectId(),
-					),
-					'columns' => 'count(*) as total'
-				)
-			);
-			
-			if ($fmp[0]['total']!=0) {
-			
-				$i++;
-
-			} else {
-			
-				$exists = false;
-
-			}
-
-		}
-		
-		$this->models->FreeModuleProject->save(
-			array(
-				'id' => null, 
-				'module' => $freeModName, 
-				'project_id' => $this->getNewProjectId(),
-				'active' => 'y'
-			)
-		);
-		
-		$moduleId = $this->models->FreeModuleProject->getNewId();
-
-		$this->models->FreeModuleProjectUser->save(
-			array(
-				'id' => null, 
-				'project_id' => $this->getNewProjectId(), 
-				'free_module_id' => $moduleId, 
-				'user_id' => $this->getCurrentUserId()
-			)
-		);
-
-		foreach($content as $key => $val) {
-
-			$this->models->FreeModulePage->save(
-				array(
-					'id' => null,
 					'project_id' => $this->getNewProjectId(),
-					'module_id' => $moduleId
+					'show_order' => $key,
+					'got_content' => '1'
 				)
 			);
-			
-			$pageId = $this->models->FreeModulePage->getNewId();
-			
-			$this->models->ContentFreeModule->save(
+	
+			$newPageId = $this->models->IntroductionPage->getNewId();
+	
+			$this->models->ContentIntroduction->save(
 				array(
 					'id' => null, 
-					'project_id' => $this->getNewProjectId(), 
-					'module_id' => $moduleId,
-					'language_id' => $this->getNewDefaultLanguageId(), 
-					'page_id' => $pageId,
-					'topic' => $val['title'],
-					'content' => $val['content']
+					'project_id' => $this->getNewProjectId(),
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'page_id' => $newPageId,
+					'topic' => $this->replaceOldMarkUp(trim($val['title']),true),
+					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim($val['content'])))
 				)
 			);
 
-/*
-					$fmm = $this->models->FreeModuleMedia->save(
+
+			if ($_SESSION['system']['import']['imagePath'] && trim($val['image'])) {
+			
+				$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+
+				if ($this->cRename(
+					$_SESSION['system']['import']['imagePath'].$val['image'],
+					$paths['project_media'].$val['image']
+					)) {
+			
+					$this->models->IntroductionMedia->save(
 						array(
 							'id' => null,
-							'project_id' => $this->getCurrentProjectId(),
-							'page_id' => $this->requestData['id'],
-							'file_name' => $file['name'],
-							'original_name' => $file['original_name'],
-							'mime_type' => $file['mime_type'],
-							'file_size' => $file['size'],
-							'thumb_name' => $thumb ? $thumb : null,
+							'project_id' => $this->getNewProjectId(),
+							'page_id' => $newPageId,
+							'file_name' => trim($val['image']),
+							'original_name' =>trim($val['image']),
+							'mime_type' => @mime_content_type(trim($val['image'])),
+							'file_size' => @filesize($paths['project_media'].trim($val['image'])),
+							'thumb_name' => null,
 						)
 					);
 
+				}
 
-
-//			$res[] = array(
-//				'title' => (string)$val->introduction_title,
-//				'content' => (string)$val->text,
-//				'image' => (string)$val->overview
-//			);
-
-*/
-		}
+			}
+        
+        }
 
 	}
 
@@ -2900,42 +2930,35 @@ class ImportController extends Controller
 	
 	}
 
-
-
 	private function resolveEmbeddedLinks($s)
 	{
 
-/*
-	if image / movie
-		extract media name
-		does media exist
-			create link for local pop up
-		does media not exist
-			create link to fail message ???
-		add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
-
-	? [l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
-
-	x [l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
-	x [l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
-
-	[link] = [l]
-	
-	[module] = [m]
-	[image] = [im]
-	[movie] = [mo]
-	[sound] = [s]
-	
-	[filename] = [f]
-	[record] = [r]
-	[text] = [t]
-
-
-
+		/*
+			if image / movie
+				extract media name
+				does media exist
+					create link for local pop up
+				does media not exist
+					create link to fail message ???
+				add to arrays [orig links] => [new links] <- text + front-end image pop-up logic
+		
+			? [l][m]Introduction[/m][r]Larval Euphausiids[/r][t]Larval euphausiids[/t][/l]
+		
+			x [l][im][f]carapace.jpg[/f][t]carapace[/t][/im][/l]
+			x [l][mo][f]pleopod_motion_epacifica.mov[/f][t]Pleopod motion (E.pacifica)[/t][/mo][/l]
+		
+			[link] = [l]
 			
-
-									
-*/
+			[module] = [m]
+			[image] = [im]
+			[movie] = [mo]
+			[sound] = [s]
+			
+			[filename] = [f]
+			[record] = [r]
+			[text] = [t]
+										
+		*/
 
 //		$d = preg_replace('/(\[\/im\]|\[\/mo\]|\[\/s\]|\[f\]|\[\/t\])/','',preg_split('/\[\/f\]\[t\]/iU',$s[count((array)$s)-1]));
 
