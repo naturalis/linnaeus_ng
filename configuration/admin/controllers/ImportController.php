@@ -143,6 +143,10 @@ class ImportController extends Controller
 
     public function linnaeus2Action()
     {
+ ini_set("post_max_size", "30M");
+ ini_set("upload_max_filesize", "31M");
+
+		echo ini_get("post_max_size").':'.ini_get("upload_max_filesize");
 
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
 
@@ -153,7 +157,7 @@ class ImportController extends Controller
 		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
 
 			$d = @file_get_contents($this->requestDataFiles[0]['tmp_name']) or $this->addError('Failed to load file.');
-			
+			q($d);
 			if ($d) {
 
 				$_SESSION['system']['import']['file'] = $this->requestDataFiles[0]['name'];
