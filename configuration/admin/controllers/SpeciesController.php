@@ -2535,9 +2535,8 @@ class SpeciesController extends Controller
 
     private function doLockOutUser ($taxonId)
     {
-        
-        if (empty($taxonId))
-            return false;
+
+        if (empty($taxonId)) return false;
 
         $h = $this->models->Heartbeat->_get(
 			array(
@@ -2545,7 +2544,7 @@ class SpeciesController extends Controller
 					'project_id =' => $this->getCurrentProjectId(), 
 					'app' => $this->getAppName(), 
 					'ctrllr' => 'species', 
-					'view' => 'edit', 
+					'view' => $this->getViewName(), 
 					'params' => serialize(array(
 						array(
 							'taxon_id', 
@@ -2556,7 +2555,7 @@ class SpeciesController extends Controller
 				)
 			)
 		);
-        
+
         return isset($h) ? true : false;
     
     }

@@ -150,7 +150,13 @@ $(document).ready(function(){
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat('{$session.user.id}','{$session.system.active_page.appName}','{$session.system.active_page.controllerBaseName}','{$session.system.active_page.viewName}');
+	taxonSetHeartbeat(
+		'{$session.user.id}',
+		'{$session.system.active_page.appName}',
+		'{$session.system.active_page.controllerBaseName}',
+		'{$session.system.active_page.viewName}',
+		'{$taxon.id}'
+	);
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
 {literal}	
