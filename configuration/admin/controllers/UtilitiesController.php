@@ -168,7 +168,7 @@ class UtilitiesController extends Controller
 
     private function ajaxActionHeartbeat ()
     {
-        
+
         if (
 			empty($this->requestData["user_id"]) || 
 			empty($this->requestData["app"]) || 
@@ -177,16 +177,28 @@ class UtilitiesController extends Controller
 		) return;
         
         if (!empty($this->requestData["params"])) $this->requestData["params"] = serialize($this->requestData["params"]);
-
-        $this->models->Heartbeat->save(
-			array(
-				'id' => null, //$h[0]['id'] ? $h[0]['id'] : null, 
+		
+		$d = array(
 				'project_id' => $this->getCurrentProjectId(), 
 				'user_id' => $this->requestData["user_id"], 
 				'app' => $this->requestData["app"], 
 				'ctrllr' => $this->requestData["ctrllr"], 
 				'view' => $this->requestData["view"], 
-				'params' => $this->requestData["params"], 
+				'params_hash' => md5($this->requestData["params"]),
+			);
+
+        $h = $this->models->Heartbeat->_get(array('id' => $d));
+
+        $this->models->Heartbeat->save(
+			array(
+				'id' => $h[0]['id'] ? $h[0]['id'] : null, 
+				'project_id' => $this->getCurrentProjectId(), 
+				'user_id' => $this->requestData["user_id"], 
+				'app' => $this->requestData["app"], 
+				'ctrllr' => $this->requestData["ctrllr"], 
+				'view' => $this->requestData["view"], 
+				'params' => $this->requestData["params"],
+				'params_hash' => md5($this->requestData["params"]),
 				'last_change' => 'CURRENT_TIMESTAMP'
 			)
 		);

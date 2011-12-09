@@ -39,11 +39,11 @@ function taxonGeneralDeleteLabels(id,action,name,itm) {
 
 
 //HEARTBEAT & USAGE
-function taxonSetHeartbeat(userid,app,ctrllr,view) {
+function taxonSetHeartbeat(userid,app,ctrllr,view,taxonid) {
 
 	var params = Array();
 
-	params[0] = ['taxon_id',$('#taxon_id').val()];
+	params[0] = ['taxon_id',taxonid];
 
 	heartbeatParams = params;
 

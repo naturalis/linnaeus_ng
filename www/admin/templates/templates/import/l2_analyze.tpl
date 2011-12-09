@@ -6,6 +6,9 @@
 .error {
 	color:red;
 }
+.fixed-error {
+	color:#FF9900;
+}
 .info {
 	color:#308;
 }
@@ -19,17 +22,41 @@ function toggleAllValid() {
 	$("input[@name='treetops*'][type='checkbox']").attr('checked',$('#allTreetops').is(':checked'));
 
 }
+
+function checkForm() {
+
+	var proceed = true;
+
+	$("select option:selected").each(function () {
+		proceed = proceed && $(this).val()!='';
+	});
+
+	if (!proceed && !confirm('You have not mapped all unknown ranks. Do you want to save?')) return;
+
+	$('#process').val('1');
+	$('#theForm').submit();
+
+}
 </script>
 {/literal}
 <div id="page-main">
 {if $processed==true}
-Basic data has been loaded. Click the link below to import additional data (keys, literature, glossary, etc.)<br />
-<a href="l2_secondary.php">Import additional data</a>
+Basic data has been loaded. Click the link below to process additional data (keys, literature, glossary, etc.)<br />
+<a href="l2_secondary.php">Process additional data</a>
 {else}
 Review the data below and press "save" to save it to the database. In the following step, data dependent on the newly saved species will be loaded. You will have to complete that step in the same session so DO NOT LOG OUT OR CLOSE YOUR BROWSER before the entire process is complete, unless you only want to load species.
 
-<form method="post">
-<input type="hidden" name="process" value="1"  />
+<p>
+THIS PROCEDURE HAS LIMITED INTELLIGENCE.<br />
+ILLOGICAL CHOICES ARE JOYFULLY ACCEPTED.<br />
+USE YOUR HEAD.
+</p>
+
+
+<form method="post" id="theForm">
+<input type="submit" value="update" />
+
+<input type="hidden" id="process" name="process" value="0"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
 
 <p>
@@ -44,19 +71,35 @@ Alter import filre accordingly and try again.
 {assign var=err value=false}
 {foreach from=$ranks key=k item=v}
 {if $v.rank_id==false}
-<span class="error">Rank could not be resolved:{$k}</span><br />
+<span class="{if $substRanks[$k]!=''}fixed-{/if}error">Rank could not be resolved: "{$k}"{if $substRanks[$k]!=''}; substituting:{/if}</span>
+	<select name="substRanks[{$k}]" id="substRanks-{$i}">
+		<option value="">select appropriate rank:</option>
+		<option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
+		{foreach from=$projectRanks item=pr}
+		<option value="{$pr.id}" {if $substRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
+		{/foreach}
+	</select>
+<br />
 {assign var=err value=true}
 {/if}
 {if $v.parent_id===false}
-<span class="error">Could not resolve parent rank of "{$k}": {$v.parent_name}</span><br />
+<span class="{if $substParentRanks[$k]!=''}fixed-{/if}error">Parent rank of "{$k}" could not be resolved: "{$v.parent_name}"{if $substParentRanks[$k]!=''}; substituting:{/if}</span>
+	<select name="substParentRanks[{$k}]" id="substParentRanks-{$i}">
+		<option value="">select appropriate rank:</option>
+		<option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
+		{foreach from=$projectRanks item=pr}
+		<option value="{$pr.id}" {if $substParentRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
+		{/foreach}
+	</select>
+<br />
 {assign var=err value=true}
 {/if}
 {if $v.parent_id==null && $i>0}
-<span class="error">Parentless rank that is not top of the tree: {$k}</span><br />
+	<span class="error">Parentless rank that is not top of the tree: {$k}</span><br />
 {assign var=err value=true}
 {/if}
 {if $v.rank_id!=false && (($v.parent_id!=false && $v.parent_id!=null) || $i==0)}
-Resolved rank: {$k}<br />
+	Resolved rank: {$k}<br />
 {/if}
 {assign var=i value=$i+1}
 {/foreach}
@@ -71,7 +114,7 @@ Resolved rank: {$k}<br />
 {assign var=i value=0}
 {foreach from=$species key=k item=v}
 {if $v.rank_id==''}
-&#149;&nbsp;"{$v.taxon}" has no rank and will not be loaded. <span class="minor">(found in: {$v.source})</span><br />
+&#149;&nbsp;"{$v.taxon}" has no valid rank and will not be loaded. <span class="minor">(found in: {$v.source})</span><br />
 {else}
 {assign var=i value=$i+1}
 {/if}
@@ -80,31 +123,30 @@ Found {$i} "healthy" species that will be loaded<br />
 </p>
 
 <p>
-
-{if $treetops|@count > 1}
-<b>Tree conflicts</b><br />
-The following species have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
-<table>
-<tr>
-	<td style="border-bottom:1px solid #999">&nbsp;</td>
-	<td style="border-bottom:1px solid #999">Species</td>
-	<td style="border-bottom:1px solid #999">source</td>
-	<td style="border-bottom:1px solid #999"><label><input type="checkbox" id="allTreetops" value="{$v.taxon}" onclick="toggleAllValid()" />select all</label></td>
-</tr>
-{assign var=i value=0}
-{foreach from=$treetops key=k item=v}
-<tr>
-	<td>&#149;&nbsp;</td>
-	<td>{$v.taxon}</td>
-	<td><span class="minor">(found in: {$v.source})</span></td>
-	<td><label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label></td>
-</tr>
-{/foreach}
-</table>
+	{if $treetops|@count > 1}
+	<b>Tree conflicts</b><br />
+	The following species have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
+	<table>
+	<tr>
+		<td style="border-bottom:1px solid #999">&nbsp;</td>
+		<td style="border-bottom:1px solid #999">Species</td>
+		<td style="border-bottom:1px solid #999">source</td>
+		<td style="border-bottom:1px solid #999"><label><input type="checkbox" id="allTreetops" value="{$v.taxon}" onclick="toggleAllValid()" />select all</label></td>
+	</tr>
+	{assign var=i value=0}
+	{foreach from=$treetops key=k item=v}
+	<tr>
+		<td>&#149;&nbsp;</td>
+		<td>{$v.taxon}</td>
+		<td><span class="minor">(found in: {$v.source})</span></td>
+		<td><label><input type="checkbox" name="treetops[]" value="{$v.taxon}" />valid</label></td>
+	</tr>
+	{/foreach}
+	</table>
 </p>
 {/if}
 
-<input type="submit" value="save" />
+<input type="button" value="save" onclick="checkForm()" />
 </form>
 {/if}
 <p>
