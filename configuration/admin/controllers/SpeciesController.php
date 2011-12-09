@@ -2538,7 +2538,7 @@ class SpeciesController extends Controller
         
         if (empty($taxonId))
             return false;
-        
+
         $h = $this->models->Heartbeat->_get(
 			array(
 				'id' => array(

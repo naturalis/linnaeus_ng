@@ -143,10 +143,6 @@ class ImportController extends Controller
 
     public function linnaeus2Action()
     {
- ini_set("post_max_size", "30M");
- ini_set("upload_max_filesize", "31M");
-
-		echo ini_get("post_max_size").':'.ini_get("upload_max_filesize");
 
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
 
@@ -157,7 +153,7 @@ class ImportController extends Controller
 		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
 
 			$d = @file_get_contents($this->requestDataFiles[0]['tmp_name']) or $this->addError('Failed to load file.');
-			q($d);
+
 			if ($d) {
 
 				$_SESSION['system']['import']['file'] = $this->requestDataFiles[0]['name'];
@@ -359,14 +355,22 @@ class ImportController extends Controller
 
 		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
 
+		//$ranks = $this->resolveProjectRanks($d,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
 		$ranks = $this->resolveProjectRanks($d);
-		$species = $this->resolveSpecies($d,$ranks);
+		$species = $this->resolveSpecies($d,$ranks,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
 		$treetops = $this->checkTreeTops($species);
 
-		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
 
-			$ranks = $_SESSION['system']['import']['loaded']['ranks'] = $this->addProjectRanks($ranks);
-			$species = $_SESSION['system']['import']['loaded']['species'] = $this->addSpecies($species,$ranks);
+			$ranks = $_SESSION['system']['import']['loaded']['ranks'] =
+				$this->addProjectRanks(
+					$ranks,
+					($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null),
+					($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null)
+				);
+
+			$species = $_SESSION['system']['import']['loaded']['species'] =
+				$this->addSpecies($species,$ranks);
 
 			if (isset($this->requestData['treetops']))
 				$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
@@ -388,6 +392,9 @@ class ImportController extends Controller
 
 		$this->smarty->assign('project',$project);
 		$this->smarty->assign('ranks',$ranks);
+		$this->smarty->assign('projectRanks',$this->getPossibleRanks());
+		if ($this->rHasVal('substRanks')) $this->smarty->assign('substRanks',$this->requestData['substRanks']);
+		if ($this->rHasVal('substParentRanks')) $this->smarty->assign('substParentRanks',$this->requestData['substParentRanks']);
 		$this->smarty->assign('species',$species);
 		$this->smarty->assign('treetops',$treetops);
 
@@ -794,50 +801,50 @@ class ImportController extends Controller
 	
 	}
 
-	// project ranks
 	private function resolveProjectRanks($d)
 	{
 
 		foreach($d->tree->treetaxon as $key => $val) {
 		
-			$rank = trim((string)$val->taxon);
-			$parentRank = trim((string)$val->parenttaxon);
+			$importRank = trim((string)$val->taxon);
+			$parentRankParent = trim((string)$val->parenttaxon);
 
-			if (!isset($res[$rank])) {
-	
-				$r = $this->models->Rank->_get(
-					array(
-						'id' => array('default_label' => $rank),
-						'columns' => 'id'
-					)
-				);
-	
-				if (isset($r[0]['id'])) {
-
-					$res[$rank]['rank_id'] = $r[0]['id'];
+			if (!isset($res[$importRank])) {
+					$r = $this->models->Rank->_get(
+						array(
+							'id' => array('default_label' => $importRank),
+							'columns' => 'id'
+						)
+					);
 					
-					if ($parentRank!='none') {
+					$rankId = $r[0]['id'];
+
+				if (isset($rankId)) {
+
+					$res[$importRank]['rank_id'] = $rankId;
+					
+					if ($parentRankParent!='none') {
 
 						$r = $this->models->Rank->_get(
 							array(
-								'id' => array('default_label' => $parentRank),
+								'id' => array('default_label' => $parentRankParent),
 								'columns' => 'id'
 							)
 						);
 						
-						$res[$rank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
-						$res[$rank]['parent_name'] = $parentRank;
+						$res[$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+						$res[$importRank]['parent_name'] = $parentRankParent;
 
 					} else {
 
-						$res[$rank]['parent_id'] = null;
+						$res[$importRank]['parent_id'] = null;
 
 					}
 
 
 				} else {
 
-					$res[$rank]['rank_id'] = false;
+					$res[$importRank]['rank_id'] = false;
 
 				}
 				
@@ -846,6 +853,13 @@ class ImportController extends Controller
 		}
 
 		return isset($res) ? $res : null;
+
+	}
+
+	private function getPossibleRanks()
+	{
+	
+		return $this->models->Rank->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
 	}
 
@@ -878,8 +892,10 @@ class ImportController extends Controller
 
 	}
 
-	private function addProjectRanks($ranks)
+	private function addProjectRanks($ranks,$substituteRanks=null,$substituteParentRanks=null)
 	{
+
+		if (isset($substituteRanks) || isset($substituteParentRanks)) $possibleRanks = $this->getPossibleRanks();
 
 		$d = null;
 		
@@ -887,9 +903,37 @@ class ImportController extends Controller
 
 		foreach((array)$ranks as $key => $val) {
 
-			if (empty($val['rank_id'])) continue; // unresolvable rank
-			if ($val['parent_id']===false) continue; // unresolvable parent rank
-			if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
+			// no valid rank
+			if (!isset($val['rank_id']) || $val['rank_id']===false) {
+
+				if (isset($substituteRanks) && isset($substituteRanks[$key])) {
+				
+					$val['rank_id'] = $substituteRanks[$key]; // hand picked substitute rank
+				
+				} else {
+
+					continue; // unresolvable rank
+
+				}
+
+			}
+
+			// no valid parent (except $key==0, top of the hierarchy)
+			if ((!isset($val['parent_id']) || $val['parent_id']===false) && $key > 0) {
+			
+				if (isset($substituteParentRanks) && isset($substituteParentRanks[$key])) {
+
+					$val['parent_id'] = $substituteParentRanks[$key]; // hand picked substitute parent rank
+				
+				} else {
+
+					continue; // unresolvable parent rank
+
+				}
+
+			}
+
+			//if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
 			
 			if (!$isLower && (strtolower($key)=='species')) $isLower = true;
 
@@ -917,17 +961,27 @@ class ImportController extends Controller
 	}
 
 	// species (& treetops)
-	private function resolveSpecies($d,$ranks)
+	private function resolveSpecies($d,$ranks,$substituteRanks=null)
 	{
 
 		$failed = null;
 
 		foreach($d->tree->treetaxon as $key => $val) {
+		
+			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
+			$rankId =
+				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
+					$ranks[trim((string)$val->taxon)]['rank_id'] :
+					(isset($substituteRanks[$rankName]) ?
+						$substituteRanks[$rankName] :
+						null
+					);
+
 
 			$res[trim((string)$val->name)] = array(
 				'taxon' => trim((string)$val->name),
-				'rank_id' => isset($ranks[trim((string)$val->taxon)]) ? $ranks[trim((string)$val->taxon)]['rank_id'] : null,
-				'rank_name' => trim((string)$val->taxon) ? trim((string)$val->taxon) : null,
+				'rank_id' => $rankId,
+				'rank_name' => $rankName,
 				'parent' => trim((string)$val->parentname),
 				'source' => 'tree->treetaxon'
 			);
@@ -936,10 +990,19 @@ class ImportController extends Controller
 
 		foreach($d->records->taxondata as $val) {
 
+			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
+			$rankId =
+				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
+					$ranks[trim((string)$val->taxon)]['rank_id'] :
+					(isset($substituteRanks[$rankName]) ?
+						$substituteRanks[$rankName] :
+						null
+					);
+
 			$res[trim((string)$val->name)] = array(
 				'taxon' => trim((string)$val->name),
-				'rank_id' => isset($ranks[trim((string)$val->taxon)]) ? $ranks[trim((string)$val->taxon)]['rank_id'] : null,
-				'rank_name' => trim((string)$val->taxon) ? trim((string)$val->taxon) : null,
+				'rank_id' => $rankId,
+				'rank_name' => $rankName,
 				'parent' => trim((string)$val->parentname),
 				'source' => 'records->taxondata'
 			);
