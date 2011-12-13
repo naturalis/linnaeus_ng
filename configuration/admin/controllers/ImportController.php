@@ -93,7 +93,7 @@ class ImportController extends Controller
 		'user_taxon'
     );
    
-    public $usedHelpers = array('file_upload_helper');
+    public $usedHelpers = array('file_upload_helper','xml_parser');
 
     public $controllerPublicName = 'Linnaeus 2 Import';
 
@@ -141,7 +141,7 @@ class ImportController extends Controller
     
     }
 
-    public function linnaeus2Action()
+    public function l2StartAction()
     {
 
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
@@ -152,17 +152,37 @@ class ImportController extends Controller
 
 		if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear','file')) {
 
-			$d = @file_get_contents($this->requestDataFiles[0]['tmp_name']) or $this->addError('Failed to load file.');
+			$tmp = tempnam(sys_get_temp_dir(),'lng');
 
-			if ($d) {
+			if (copy($this->requestDataFiles[0]['tmp_name'],$tmp)) {
 
-				$_SESSION['system']['import']['file'] = $this->requestDataFiles[0]['name'];
-				$_SESSION['system']['import']['raw'] = $d;
+				$_SESSION['system']['import']['file'] = array(
+					'path' => $tmp,
+					'name' => $this->requestDataFiles[0]['name'],
+					'src' => 'upload'
+				);
 
 			} else {
 
 				unset($_SESSION['system']['import']['file']);
-				unset($_SESSION['system']['import']['raw']);
+
+			}
+
+		} else
+		if ($this->rHasVal('serverFile') && !$this->rHasVal('clear','file')) {
+		
+			if (file_exists($this->requestData['serverFile'])) {
+
+				$_SESSION['system']['import']['file'] = array(
+					'path' => $this->requestData['serverFile'],
+					'name' => $this->requestData['serverFile'],
+					'src' => 'existing'
+				);
+
+			} else {
+
+				$this->addError('File "'.$this->requestData['serverFile'].'" does not exist.');
+				unset($_SESSION['system']['import']['file']);
 
 			}
 
@@ -228,114 +248,61 @@ class ImportController extends Controller
 	public function l2ProjectAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+		if (!isset($_SESSION['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 
         $this->setPageName(_('Creating project'));
 		
-		libxml_use_internal_errors(true);
-		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
-		
-		if ($d===false) {
+		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+		$d = $this->helpers->XmlParser->getNode('project');
 
-			$this->addError('Failed to parse XML-file. The following error(s) occurred:');
-			foreach (libxml_get_errors() as $error) $this->addError((string)$error->message);
-			$this->addError('Import aborted.');
+		if (isset($d->title)) {
 
-		} else {
-		
-			/*
-			
-			// user is no longer given a choice a new project is always created
-
-			if ($this->rHasVal('clear','project')) {
+			$newId = $this->createProject(
+				array(
+					 'title' => trim((string)$d->title),
+					 'version' => trim((string)$d->version),
+					 'sys_description' => 'Created by import from a Linnaeus 2-export.',
+					 'css_url' => $this->controllerSettings['defaultProjectCss']
+				)
+			);
 	
-				$this->setNewProjectId(null);
-				$this->setNewDefaultLanguageId(null);
+			if (!$newId) {
 
-			}
+				$this->addError('Could not create new project "'.trim((string)$d->title).'". Does a project with the same name already exist?');
 
-			if ($this->rHasVal('project','-1')) {
-			
-			*/
+			} else { 
 
-				$newId = $this->createProject(
-					array(
-						 'title' => trim((string)$d->project->title),
-						 'version' => trim((string)$d->project->version),
-						 'sys_description' => 'Created by import from a Linnaeus 2-export.',
-						 'css_url' => $this->controllerSettings['defaultProjectCss']
-					)
-				);
+				$project = $this->getProjects($this->getNewProjectId());
 
-				if (!$newId) {
-	
-					$this->addError('Could not create new project "'.trim((string)$d->project->title).'". Does a project with the same name already exist?');
-	
-				} else { 
+				$this->addMessage('Created new project "'.trim((string)$d->title).'"');
 
-					$project = $this->getProjects($this->getNewProjectId());
+				$this->setNewProjectId($newId);
 
-					$this->addMessage('Created new project "'.trim((string)$d->project->title).'"');
+				$this->addCurrentUserToProject();
 
-					$this->setNewProjectId($newId);
+				$this->makeMediaTargetPaths();
 
-					$this->addCurrentUserToProject();
+				$this->smarty->assign('newProjectId',$newId);
 
-					$this->makeMediaTargetPaths();
+				// add language
+				$l = $this->addProjectLanguage((string)$d->language);
 
-					$this->smarty->assign('newProjectId',$newId);
-	
-					// add language
-					$l = $this->addProjectLanguage($d);
+				if (!$l) {
 
-					if (!$l) {
+					$this->addError('Unable to use project language "'.trim((string)$d->language).'"');
 
-						$this->addError('Unable to use project language "'.trim((string)$d->project->language).'"');
+				} else {
 
-					} else {
+					$this->setNewDefaultLanguageId($l);
+					$this->addMessage('Set language "'.trim((string)$d->language).'"');
 
-						$this->setNewDefaultLanguageId($l);
-						$this->addMessage('Set language "'.trim((string)$d->project->language).'"');
-
-					}
-	
 				}
 
-			/*
-			
-			} else 
-			if ($this->rHasVal('project')) {
-
-				$this->setNewProjectId($this->requestData['project']);
-				$l = $this->models->LanguageProject->_get(
-					array(
-						'id' => array(
-							'project_id'=>$this->requestData['project'],
-							'def_language' => 1
-						)
-					)
-				);
-				$this->setNewDefaultLanguageId($l[0]['language_id']);
-				$this->addMessage('Using existing project');
-
 			}
-			
-			$p = $this->getNewProjectId();
 
-			$project = $this->getProjects($p);
-			
-			$this->reInitUserRolesAndRights();
+		} else {
 
-			if (!isset($p)) {
-
-				$this->smarty->assign('projects',$this->getProjects());
-
-			} else {
-
-				$this->smarty->assign('project',$project);
-
-			}
-			*/
+			$this->addError('Failed to retrieve project title from XML-file.');
 
 		}
 
@@ -346,17 +313,22 @@ class ImportController extends Controller
 	public function l2AnalyzeAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
+		if (!isset($_SESSION['system']['import']['file']['path'])) $this->redirect('l2_start.php');
+		
+		set_time_limit(900);
 
-		$p = $this->getNewProjectId();
-		$project = $this->getProjects($p);
+		$project = $this->getProjects($this->getNewProjectId());
 
         $this->setPageName(_('Data overview for "'.$project['title'].'"'));
 
-		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
+		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
 
-		//$ranks = $this->resolveProjectRanks($d,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
+		$d = $this->helpers->XmlParser->getNode('tree');
 		$ranks = $this->resolveProjectRanks($d);
+
+
+die();
+
 		$species = $this->resolveSpecies($d,$ranks,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
 		$treetops = $this->checkTreeTops($species);
 
@@ -405,8 +377,8 @@ class ImportController extends Controller
 	public function l2SecondaryAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('linnaeus2.php');
-		if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('linnaeus2.php');
+		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('l2_start.php');
+		if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('l2_start.php');
 
 		$p = $this->getNewProjectId();
 		$project = $this->getProjects($p);
@@ -753,13 +725,13 @@ class ImportController extends Controller
 
 	}
 
-	private function addProjectLanguage($d)
+	private function addProjectLanguage($language)
 	{
 	
 		$l = $this->models->Language->_get(
 			array(
 				'id' => array(
-					'language' => trim((string)$d->project->language)
+					'language' => $language
 				),
 				'columns' => 'id'
 			)
@@ -803,7 +775,7 @@ class ImportController extends Controller
 
 	private function resolveProjectRanks($d)
 	{
-
+q($d,1);
 		foreach($d->tree->treetaxon as $key => $val) {
 		
 			$importRank = trim((string)$val->taxon);

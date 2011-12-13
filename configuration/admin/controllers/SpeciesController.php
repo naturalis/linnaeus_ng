@@ -1046,7 +1046,7 @@ class SpeciesController extends Controller
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
-                    $filesToSave = $this->getUploadedFiles();
+                    $filesToSave = $this->getUploadedMediaFiles();
 					
 					$firstInsert = false;
     

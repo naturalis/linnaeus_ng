@@ -1332,7 +1332,33 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-	public function getUploadedFiles() 
+	public function getUploadedFiles($allowedMimeTypes='*') 
+	{
+
+		if (
+			isset($this->helpers->FileUploadHelper) &&
+			isset($this->requestDataFiles)
+		) {
+
+			$this->helpers->FileUploadHelper->setLegalMimeTypes('*');
+			$this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
+			$this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+			$this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
+	
+			$this->addError($this->helpers->FileUploadHelper->getErrors());
+
+			return $this->helpers->FileUploadHelper->getResult();
+
+		}
+
+	}	
+
+    /**
+     * Catches and saves uploaded files
+     *
+     * @access     public
+     */
+	public function getUploadedMediaFiles() 
 	{
 
 		if (

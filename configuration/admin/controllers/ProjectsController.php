@@ -406,7 +406,7 @@ class ProjectsController extends Controller
         if (isset($this->requestDataFiles)) {
 		// saving the logo
 
-			$filesToSave =  $this->getUploadedFiles();
+			$filesToSave =  $this->getUploadedMediaFiles();
 
 			if ($filesToSave) {
 

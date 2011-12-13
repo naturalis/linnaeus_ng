@@ -459,7 +459,7 @@ class KeyController extends Controller
 			// save image
 	
 				// save choice image
-				$filesToSave =  $this->getUploadedFiles();
+				$filesToSave =  $this->getUploadedMediaFiles();
 	
 				if ($filesToSave) {
 	

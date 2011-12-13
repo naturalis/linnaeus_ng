@@ -27,7 +27,7 @@
 <ul>
 	<li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li>
 	<li><a href="../../views/projects/delete.php">{t}Delete a project{/t}</a></li>
-	<li><a href="../../views/import/linnaeus2.php">{t}Import Linnaeus 2 data{/t}</a></li>
+	<li><a href="../../views/import/l2_start.php">{t}Import Linnaeus 2 data{/t}</a></li>
 	<!-- li><a href="">{t}Set rights{/t}</a></li -->
 </ul>
 
