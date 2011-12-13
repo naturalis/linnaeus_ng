@@ -4,7 +4,8 @@ class XmlParser
 {
 
 	private $_fileName = null;
-	private $_node = null;
+	private $_nodeName = null;
+	private $_singleNode = false;
 	
 	public function setFileName($fileName)
 	{
@@ -13,40 +14,58 @@ class XmlParser
 		
 	}
 
-	public function getNode($node)
+	public function getNode($name)
 	{
 	
-		if(!isset($node)) return null;
+		$this->_singleNode = true;
+		
+		return $this->getNodes($name);
 
-		$this->setNode($node);
+	}
+
+	public function getNodes($name)
+	{
+	
+		if(!isset($name)) return null;
+		
+		$this->setNodeName($name);
 
 		$d = new XMLReader;
+		
+		$r = array();
 
 		if ($d->open($this->_fileName)) {
 
-			while ($d->read() && $d->name !== $this->_node);
-
-			while ($d->name === $this->_node) {
+			while ($d->read() && $d->name !== $this->_nodeName);
+			
+			while ($d->name === $this->_nodeName) {
 
 				$fixedNode = $this->fixNode($d->readOuterXML());
 
 				if ($xml = simplexml_load_string($fixedNode)) {
 
-					return $xml;
-					$d->next($this->_node);
+					if ($this->_singleNode===true) return $xml;
+
+					$r[] = $xml;
+
+					$d->next($this->_nodeName);
 
 				}
 
 			}
 
 		}
+		
+		return $r;
 
 	}
 	
-	private function setNode($node)
+
+
+	private function setNodeName($name)
 	{
 		
-		$this->_node = $node;
+		$this->_nodeName = $name;
 		
 	}
 
