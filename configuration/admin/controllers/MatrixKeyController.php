@@ -395,7 +395,7 @@ class MatrixKeyController extends Controller
 
 			if (!$this->isFormResubmit()) {
 
-				$filesToSave = $this->getUploadedFiles();
+				$filesToSave = $this->getUploadedMediaFiles();
 	
 				if (!$this->verifyData($this->requestData,$filesToSave)) {
 

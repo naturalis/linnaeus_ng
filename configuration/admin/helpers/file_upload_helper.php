@@ -12,6 +12,7 @@ class FileUploadHelper
     private $_result = false;
     private $_errors = false;
     private $_legalMimeTypes = false;
+	private $_currentMimeType = false;
     private $_tempDir = false;
     private $_storageDir = false;
     private $_mime_types = array(          
@@ -128,15 +129,13 @@ class FileUploadHelper
 
             $mt = $this->getMimeType($file['name'],$file['tmp_name']);
 
-            $type = $this->isLegalMimeType($mt);
-            
             $filesToSave = false;
     
-            if ($type == false) {
+            if ($this->isLegalMimeType($mt) == false) {
     
                 $this->addError(_('Media type not allowed:').' '.$mt);
     
-            } elseif($type['media_type'] == 'archive') {
+            } elseif($this->_currentMimeType['media_type'] == 'archive') {
             // archive with multiple files
     
                 if ($this->_tempDir===false) {
@@ -167,13 +166,9 @@ class FileUploadHelper
                                 // iterate through extracted fild and see whether files are allowed
                                 while($iterator->valid()) {
         
-                                    $dmtu = $this->doTaxonMediaUpload($d.$iterator->getFilename(),$iterator->getFilename());
+                                    $dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
         
-                                    if ($dmtu) {
-                                    
-                                        $this->_result[] = $dmtu;
-        
-                                    }
+                                    if ($dmtu) $this->_result[] = $dmtu;
         
                                     $iterator->next();
         
@@ -211,16 +206,12 @@ class FileUploadHelper
                 }
             
             } else {
-            // image, sound or movie
+            // normal file
     
-                $dmtu = $this->doTaxonMediaUpload($file['tmp_name'],$file['name']);
+                $dmtu = $this->doFileUpload($file['tmp_name'],$file['name']);
         
-                if ($dmtu) {
-                
-                    $this->_result[] = $dmtu;
-        
-                }
-    
+                if ($dmtu)  $this->_result[] = $dmtu;
+
             }
     
         }
@@ -326,13 +317,19 @@ class FileUploadHelper
     private function isLegalMimeType($mimetype)
     {
 
-        $type = false;
+		if ($this->_legalMimeTypes===false) return false;
+
+		if ($this->_legalMimeTypes=='*') return true;
+
+        $type = $result = false;
 
         foreach((array)$this->_legalMimeTypes as $key => $val) {
 
             if ($mimetype==$val['mime']) {
     
-                $type = $val;
+                $this->_currentMimeType = $val;
+
+                $result = true;;
 
                 break;
 
@@ -340,7 +337,7 @@ class FileUploadHelper
 
         }
 
-        return $type;
+        return $result;
 
     }
 
@@ -361,21 +358,19 @@ class FileUploadHelper
 
 	}
 
-    private function doTaxonMediaUpload ($oldFileName,$currentFileName)
+    private function doFileUpload ($oldFileName,$currentFileName)
     {
 
 		// resolve the mime-type
         $t = $this->getMimeType($currentFileName,$oldFileName);
 
         // assess whether the mime-type is legal
-        $l = $this->isLegalMimeType($t);
-        
-        if ($l!==false) {
+        if ($this->isLegalMimeType($t)!==false) {
         
             $fs = filesize($oldFileName);
 
             // assess whether the uploaded file isn't too big                                
-            if ($fs <= $l['maxSize']) {
+            if ($fs <= $this->_currentMimeType['maxSize']) {
                 
                 // creata a new, unique filename with the original extension
                 $pi = pathinfo($currentFileName);
@@ -393,7 +388,7 @@ class FileUploadHelper
                         'full_path' => $this->_storageDir.$fn,
                         'original_name' => $currentFileName,
                         'mime_type' => $t,
-                        'media_name' => $l['media_name'],
+                        'media_name' => $this->_currentMimeType['media_name'],
                         'size' => $fs
                     ); 
                     
@@ -408,7 +403,7 @@ class FileUploadHelper
             } else {
 
                 $this->addError(_('File too big:').' '.
-                    $currentFileName.' ('.ceil($fs/1000).'kb; '._('max.').' '.ceil($l['maxSize']/1000).'kb)');
+                    $currentFileName.' ('.ceil($fs/1000).'kb; '._('max.').' '.ceil($this->_currentMimeType['maxSize']/1000).'kb)');
 
             }
                             

@@ -150,7 +150,7 @@ Found {$i} "healthy" species that will be loaded<br />
 </form>
 {/if}
 <p>
-<a href="linnaeus2.php">back</a>
+<a href="l2_start.php">back</a>
 </p>
 
 </div>

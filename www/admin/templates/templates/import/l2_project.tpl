@@ -8,7 +8,8 @@ A new project has been created. In the next step, species and ranks will be anal
 </p>
 <p>
 <form method="post" id="theForm">
-<input type="button" value="Analyze species and ranks" onclick="window.open('l2_analyze.php','_self');" />
+<input type="button" value="Analyze species and ranks" onclick="window.open('l2_analyze.php','_self');" /><br />
+THIS CAN TAKE A LONG TIME!
 </form>
 </p>
 {else}
@@ -16,7 +17,7 @@ A new project has been created. In the next step, species and ranks will be anal
 An error occurred during the creation of the new project. The import was aborted.
 </p>
 <p>
-<a href="linnaeus2.php">back</a>
+<a href="l2_start.php">back</a>
 </p>
 {/if}
 </div>
