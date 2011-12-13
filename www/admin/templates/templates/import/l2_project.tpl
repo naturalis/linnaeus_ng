@@ -4,12 +4,13 @@
 <div id="page-main">
 {if $newProjectId}
 <p>
-A new project has been created. In the next step, species and ranks will be analyzed. The results will be presented for you to review before they are loaded.
+The new project has been created.<br />
+In the next step, species and ranks will be analyzed. The results will be presented for you to review before they are loaded.<br />
+Please be aware that each step can take some time, depending on he size of the project.
 </p>
 <p>
 <form method="post" id="theForm">
-<input type="button" value="Analyze species and ranks" onclick="window.open('l2_analyze.php','_self');" /><br />
-THIS CAN TAKE A LONG TIME!
+<input type="button" value="Get ranks and species" onclick="window.open('l2_species.php','_self');" /><br />
 </form>
 </p>
 {else}

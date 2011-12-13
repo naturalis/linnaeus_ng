@@ -42,7 +42,7 @@ function checkForm() {
 <div id="page-main">
 {if $processed==true}
 Basic data has been loaded. Click the link below to process additional data (keys, literature, glossary, etc.)<br />
-<a href="l2_secondary.php">Process additional data</a>
+<a href="l2_species_data.php">Process additional data</a>
 {else}
 Review the data below and press "save" to save it to the database. In the following step, data dependent on the newly saved species will be loaded. You will have to complete that step in the same session so DO NOT LOG OUT OR CLOSE YOUR BROWSER before the entire process is complete, unless you only want to load species.
 
