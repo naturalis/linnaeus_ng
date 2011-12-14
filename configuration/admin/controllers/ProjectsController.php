@@ -30,6 +30,7 @@ class ProjectsController extends Controller
 		'page_taxon', 
 		'page_taxon_title', 
 		'commonname',
+		'synonym',
 		'media_taxon',
 		'media_descriptions_taxon',
 		'content',
@@ -874,6 +875,7 @@ class ProjectsController extends Controller
 		$this->deleteLiterature($projectId);
 		$this->deleteProjectContent($projectId);
 		$this->deleteCommonnames($projectId);
+		$this->deleteSynonyms($projectId);
 		$this->deleteSpeciesMedia($projectId);
 		$this->deleteSpeciesContent($projectId);
 		$this->deleteStandardCat($projectId);
@@ -980,6 +982,13 @@ class ProjectsController extends Controller
 	{
 
 		$this->models->Commonname->delete(array('project_id' => $id));
+
+	}
+
+	private function deleteSynonyms($id)
+	{
+
+		$this->models->Synonym->delete(array('project_id' => $id));
 
 	}
 
