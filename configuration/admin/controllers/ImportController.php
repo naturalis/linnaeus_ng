@@ -286,7 +286,7 @@ class ImportController extends Controller
 				$this->smarty->assign('newProjectId',$newId);
 
 				// add language
-				$l = $this->addProjectLanguage((string)$d->language);
+				$l = $this->addProjectLanguage(trim((string)$d->language));
 
 				if (!$l) {
 
@@ -325,6 +325,7 @@ class ImportController extends Controller
 		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
 
 		$d = $this->helpers->XmlParser->getNodes('treetaxon');
+
 		$ranks = $this->resolveProjectRanks($d);
 		$species = $this->resolveSpecies($d,$ranks,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
 		$treetops = $this->checkTreeTops($species);
@@ -370,7 +371,6 @@ class ImportController extends Controller
 	
 	}
 
-
 	public function l2SpeciesDataAction()
 	{
 
@@ -385,41 +385,124 @@ class ImportController extends Controller
 
 		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
 
-		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
 
-			set_time_limit(300);
+			set_time_limit(900);
 
-			if ($this->rHasVal('taxon_overview','on')) {
+			if ($this->rHasVal('taxon_overview','on') || $this->rHasVal('taxon_media','on')) {
 
-				$overviewCatId = $this->createStandardCat();
-	
-				$d = $this->helpers->XmlParser->getNodes('taxondata');
+				if ($this->rHasVal('taxon_overview','on')) {
 
-				$res = $this->addSpeciesContent($d,$_SESSION['system']['import']['loaded']['species'],$overviewCatId);
-	
-				$this->addMessage('Added '.$res['loaded'].' general species description(s).');
-	
-				if (isset($res['failed'])) {
-	
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed species description:<br />'.$val['cause']);
-	
-				}
-	
-			}
+					$_SESSION['system']['import']['elementsToLoad']['taxon_overview'] = true;
+					$_SESSION['system']['import']['speciesOverviewCatId'] = $this->createStandardCat();
+					$_SESSION['system']['import']['loaded']['speciesContent']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['speciesContent']['failed'] = array();
 
-			if ($this->rHasVal('taxon_media','on')) {
-
-				$res = $this->addSpeciesMedia($d,$species);
-
-				$this->addMessage('Added '.count((array)$res['saved']).' taxon media.');
-
-				if (isset($res['failed'])) {
-
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed media "'.$val['data'].'":<br />'.$val['cause']);
-
+				} else {
+				
+					$_SESSION['system']['import']['elementsToLoad']['taxon_overview'] = false;
+				
 				}
 
+				if ($this->rHasVal('taxon_media','on')) {
+
+					$_SESSION['system']['import']['elementsToLoad']['taxon_media'] = true;
+
+					$this->loadControllerConfig('Species');
+
+					foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val)
+						$_SESSION['system']['import']['mimes'][$val['mime']] = $val;
+						
+					$this->loadControllerConfig();
+
+					$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
+					$_SESSION['system']['import']['loaded']['speciesMedia']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'] = array();
+
+				} else {
+				
+					$_SESSION['system']['import']['elementsToLoad']['taxon_media'] = false;
+				
+				}
+
+
+				if ($this->rHasVal('taxon_common','on')) {
+
+					$_SESSION['system']['import']['elementsToLoad']['taxon_common'] = true;
+					$_SESSION['system']['import']['loaded']['taxon_common']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['taxon_common']['failed'] = array();
+
+				} else {
+				
+					$_SESSION['system']['import']['elementsToLoad']['taxon_common'] = false;
+				
+				}
+
+				if ($this->rHasVal('taxon_synonym','on')) {
+
+					$_SESSION['system']['import']['elementsToLoad']['taxon_synonym'] = true;
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] = array();
+
+				} else {
+				
+					$_SESSION['system']['import']['elementsToLoad']['taxon_synonym'] = false;
+				
+				}
+				
+
+				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Species'));
+				$this->helpers->XmlParser->getNodes('taxondata');
+
+
+				if ($this->rHasVal('taxon_overview','on')) {
+
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['speciesContent']['saved'].' general species description(s).');
+		
+					if (count((array)$_SESSION['system']['import']['loaded']['speciesContent']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['speciesContent']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
+
+					unset($_SESSION['system']['import']['speciesOverviewCatId']);
+					unset($_SESSION['system']['import']['loaded']['speciesContent']['saved']);
+					unset($_SESSION['system']['import']['loaded']['speciesContent']['failed']);
+
+				} else {
+				
+					$this->addMessage('Skipped species description.');
+								
+				}
+
+				if ($this->rHasVal('taxon_media','on')) {
+
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['speciesMedia']['saved'].' media files.');
+		
+					if (count((array)$_SESSION['system']['import']['loaded']['speciesMedia']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['speciesMedia']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
+
+					unset($_SESSION['system']['import']['speciesOverviewCatId']);
+					unset($_SESSION['system']['import']['loaded']['speciesContent']['saved']);
+					unset($_SESSION['system']['import']['loaded']['speciesContent']['failed']);
+
+				} else {
+				
+					$this->addMessage('Skipped media.');
+								
+				}
+
+
+				unset($_SESSION['system']['import']['elementsToLoad']);
+				unset($_SESSION['system']['import']['mimes']);
+	
 			}
+/*
 
 			if ($this->rHasVal('taxon_common','on')) {
 
@@ -442,16 +525,27 @@ class ImportController extends Controller
 				$this->addMessage('Added '.$count.' synonym(s).');
 
 			}
-		
-//			$this->smarty->assign('processed',true);
+*/		
+			$this->smarty->assign('processed',true);
 	
 		}	
 			
        $this->printPage();
 
-
 	}
 
+	public function xmlParserCallback_Species($obj)
+	{
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_overview']===true) $this->addSpeciesContent($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_media']===true) $this->addSpeciesMedia($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_common']===true) $this->addSpeciesCommonNames($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_synonym']===true) $this->addSpeciesSynonyms($obj);
+	
+	}
 
 	public function l2ContentAction()
 	{
@@ -625,7 +719,7 @@ class ImportController extends Controller
 	// languages
 	private function addProjectLanguage($language)
 	{
-	
+
 		$l = $this->models->Language->_get(
 			array(
 				'id' => array(
@@ -1184,8 +1278,8 @@ class ImportController extends Controller
 				'columns' => 'id'
 			)
 		);
-		
-		if (isset($pt['id'])) return $pt['id'];
+
+		if (isset($pt[0]['id'])) return $pt[0]['id'];
 
 		$pt = $this->models->PageTaxon->save(
 			array(
@@ -1208,139 +1302,191 @@ class ImportController extends Controller
 				'title' => 'Overview'
 			)
 		);
-		
+
 		return $id;
 	
 	}
 
-	private function addSpeciesContent($d,$species,$overviewCatId)
+	private function addSpeciesContent($taxon)
 	{
 
-		$failed = null;
-		$loaded = 0;
-
-		foreach($d as $key => $val) {
-
-			if (isset($species[trim((string)$val->name)]['id'])) {
-			
-				$taxonId = $species[trim((string)$val->name)]['id'];
-
-				$this->models->ContentTaxon->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $taxonId,
-						'language_id' => $this->getNewDefaultLanguageId(),
-						'page_id' => $overviewCatId,
-						'content' => (string)$val->description,
-						'publish' => 1
-					)
-				);
-				
-				$loaded++;
-
-			} else {
-			
-				$failed[] = array(
-					'data' => $val,
-					'cause' => 'unable to resolve name "'.trim((string)$val->name).'" to taxon id'
-				);
-			
-			}
-
-		}
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 		
-		return array('loaded' => $loaded, 'failed' => $failed);
+			$this->models->ContentTaxon->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),
+					'taxon_id' => $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'],
+					'language_id' => $this->getNewDefaultLanguageId(),
+					'page_id' => $_SESSION['system']['import']['speciesOverviewCatId'],
+					'content' => trim((string)$taxon->description),
+					'publish' => 1
+				)
+			);
+			
+			$_SESSION['system']['import']['loaded']['speciesContent']['saved']++;
+
+		} else {
+		
+			$_SESSION['system']['import']['loaded']['speciesContent']['failed'][] = array(
+				'data' => $taxon,
+				'cause' => 'Unable to resolve name "'.trim((string)$taxon->name).'" to taxon id.'
+			);
+		
+		}
 
 	}
 
-	private function addSpeciesCommonNames($d,$species)
+	private function addSpeciesMedia($taxon)
 	{
 
-		$failed = null;
-		$loaded = 0;
-
-		foreach($d->records->taxondata as $key => $val) {
-
-			if (isset($species[trim((string)$val->name)]['id'])) {
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 			
-				$taxonId = $species[trim((string)$val->name)]['id'];
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+				
+			$fileName = trim((string)$taxon->multimedia->overview);
 
-				foreach($val->vernaculars as $vKey => $vVal) {
+			if (!empty($fileName)) {
 
-					$languagId = $this->resolveLanguage((string)$vVal->vernacular->language);
+				$r = $this->doAddSpeciesMedia(
+					$taxonId,
+					$fileName,
+					$fileName
+				);
+	
+				if ($r['saved']==true) {
 
-					if ($languagId) {
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['system']['import']['paths']['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['system']['import']['paths']['project_thumbs'].$r['filename']);
 
-						$this->models->Commonname->save(
-							array(
-								'id' => null,
-								'project_id' => $this->getNewProjectId(),
-								'taxon_id' => $taxonId,
-								'language_id' => $languagId,
-								'commonname' => (string)$vVal->vernacular->name
-							)
-						);
-						
-						$loaded++;
+					$_SESSION['system']['import']['loaded']['speciesMedia']['saved']++;
+				
+				} else {
 
-					} else {
+					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
 
-						$failed[] = array(
-							'data' => $val,
-							'cause' => 'unable to resolve language "'.(string)$vVal->vernacular->language.'" to id'
-						);
-		
-					}
+				}
+				
+			}
+
+			foreach($taxon->multimedia->multimediafile as $vKey => $vVal) {
+			
+				$fileName = trim((string)$vVal->filename);
+
+				if (empty($fileName)) continue;
+
+				$r = $this->doAddSpeciesMedia(
+					$taxonId,
+					$fileName,
+					(isset($val->fullname) ? ((string)$val->fullname) : $fileName)
+				);
+
+				if ($r['saved']==true) {
+
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['system']['import']['paths']['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['system']['import']['paths']['project_thumbs'].$r['filename']);
+					
+					$_SESSION['system']['import']['loaded']['speciesMedia']['saved']++;
+					
+				} else {
+
+					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
 
 				}
 
 			}
 
 		}
-
-		return array('loaded' => $loaded, 'failed' => $failed);
-
+					
 	}
 
-	private function addSpeciesSynonyms($d,$species)
+	private function addSpeciesCommonNames($taxon)
 	{
 
-		$loaded = 0;
 
-		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($species[trim((string)$val->name)]['id'])) {
-			
-				$taxonId = $species[trim((string)$val->name)]['id'];
-				
-				$i = 0;
 
-				foreach($val->synonyms as $vKey => $vVal) {
+					$_SESSION['system']['import']['loaded']['taxon_common']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['taxon_common']['failed'] = array();
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] = array();
+					
+					
+					
+					
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
 
-					$this->models->Synonym->save(
+			foreach($taxon->vernaculars as $vKey => $vVal) {
+
+				$languagId = $this->resolveLanguage(trim((string)$vVal->vernacular->language));
+
+				if ($languagId) {
+
+					$this->models->Commonname->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getNewProjectId(),
 							'taxon_id' => $taxonId,
-							'synonym' => (string)$vVal->synonym->name,
-							'show_order' => $i++
+							'language_id' => $languagId,
+							'commonname' => trim((string)$vVal->vernacular->name)
 						)
 					);
 					
 					$loaded++;
 
+				} else {
+
+					$failed[] = array(
+						'data' => $taxon,
+						'cause' => 'unable to resolve language "'.trim((string)$vVal->vernacular->language).'"'
+					);
+	
 				}
 
 			}
 
 		}
+
+
+
+		return array('loaded' => $loaded, 'failed' => $failed);
+
+	}
+
+	private function addSpeciesSynonyms($taxon)
+	{
+
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 		
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			
+			$i = 0;
+	
+			foreach($taxon->synonyms as $vKey => $vVal) {
+			
+				$this->models->Synonym->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'synonym' => trim((string)$vVal->synonym->name),
+						'show_order' => $i++
+					)
+				);
+				
+				$loaded++;
+	
+			}
+	
+		}
+
 		return $loaded;
 
 	}
 
-	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$mimes)
+	private function doAddSpeciesMedia($taxonId,$fileName,$fullName)
 	{
 
 		if ($_SESSION['system']['import']['imagePath']==false)
@@ -1360,7 +1506,7 @@ class ImportController extends Controller
 		
 			$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['system']['import']['imagePath'].$fileName);
 			
-			if (isset($mimes[$thisMIME])) {
+			if (isset($_SESSION['system']['import']['mimes'][$thisMIME])) {
 			
 				if ($_SESSION['system']['import']['thumbsPath']==false)
 					$thumbName = null;
@@ -1446,98 +1592,6 @@ class ImportController extends Controller
 
 		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
 		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
-
-	}
-
-	private function addSpeciesMedia($d,$species)
-	{
-
-		$this->loadControllerConfig('Species');
-		
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
-
-		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
-
-		$failed = null;
-		$saved = null;
-		$prev = null;
-
-		foreach($d->records->taxondata as $key => $val) {
-
-			if (isset($species[trim((string)$val->name)]['id'])) {
-			
-				$taxonId = $species[trim((string)$val->name)]['id'];
-				
-				$fileName = (string)$val->multimedia->overview;
-
-				if (!empty($fileName)) {
-
-					$r = $this->doAddSpeciesMedia(
-						$taxonId,
-						$fileName,
-						$fileName,
-						$mimes
-					);
-	
-					if ($r['saved']==true) {
-	
-						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
-						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
-	
-						$saved[] = $r;
-						$prev[$fileName] = true;
-					
-					} else {
-	
-						$failed[] = $r;
-	
-					}
-					
-				}
-
-				foreach($val->multimedia->multimediafile as $vKey => $vVal) {
-				
-					$fileName = (string)$vVal->filename;
-
-					if (empty($fileName)) continue;
-
-					if (isset($prev[$fileName])) continue;
-
-					$r = $this->doAddSpeciesMedia(
-						$taxonId,
-						$fileName,
-						(isset($val->fullname) ? ((string)$val->fullname) : $fileName),
-						$mimes
-					);
-
-					if ($r['saved']==true) {
-	
-						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
-						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
-						
-						$saved[] = $r;
-						$prev[$fileName] = true;
-						
-					} else {
-
-						$failed[] = $r;
-	
-					}
-
-				}
-
-			}
-
-			unset($prev);
-
-		}
-
-		$this->loadControllerConfig();
-
-		return array(
-			'saved' => $saved,
-			'failed' => $failed
-		);
 
 	}
 
@@ -2517,56 +2571,6 @@ class ImportController extends Controller
 
 	}
 
-	private function ORIG_getMapItems($d,$species)
-	{
-	
-		$maps = $occurrences = $types = null;
-		$total = 0;
-	
-		foreach($d->records->taxondata as $key => $val) {
-
-			if (isset($species[trim((string)$val->name)]['id'])) {
-			
-				$taxonId = $species[trim((string)$val->name)]['id'];
-				
-				if (!isset($val->distribution)) continue;
-				
-				foreach($val->distribution->map as $vKey => $vVal) {
-				
-					$maps[(string)$vVal->mapname] = array(
-						'label' => (string)$vVal->mapname,
-						'specs' => (string)$vVal->specs
-					);
-					
-					foreach($vVal->squares->square as $sKey => $sVal) {
-
-						$occurrences[$taxonId][] = array(
-							'map' => (string)$vVal->mapname,
-							'square' => (string)$sVal->number,
-							'legend' => (string)$sVal->legend
-						);
-						
-						$types[(string)$sVal->legend] = (string)$sVal->legend;
-						
-						$total++;
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return array(
-			'maps' => $maps,
-			'occurrences' => $occurrences,
-			'types' => $types,
-			'total' => $total
-		);
-			
-	}
-
 	private function getMapItems($d,$species)
 	{
 	
@@ -3082,6 +3086,287 @@ class ImportController extends Controller
 
 
 	}
+
+
+	/*
+
+		ENTERING FUNCTION JUNKYARD
+
+		where obsolete and replaced functions go to dream of
+		their former glory days as critical parts of The Program,
+		while living in constant fear of extinction at the hands
+		of the program overlord, Cannibalizer of Codes.
+
+	*/
+	private function ORIG_addSpeciesContent($d,$species,$overviewCatId)
+	{
+
+		$failed = null;
+		$loaded = 0;
+
+		foreach($d as $key => $val) {
+
+			if (isset($species[trim((string)$val->name)]['id'])) {
+			
+				$taxonId = $species[trim((string)$val->name)]['id'];
+
+				$this->models->ContentTaxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'page_id' => $overviewCatId,
+						'content' => (string)$val->description,
+						'publish' => 1
+					)
+				);
+				
+				$loaded++;
+
+			} else {
+			
+				$failed[] = array(
+					'data' => $val,
+					'cause' => 'unable to resolve name "'.trim((string)$val->name).'" to taxon id'
+				);
+			
+			}
+
+		}
+		
+		return array('loaded' => $loaded, 'failed' => $failed);
+
+	}
+
+	private function ORIG_addSpeciesMedia($d,$species)
+	{
+
+		$this->loadControllerConfig('Species');
+		
+		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+
+		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
+
+		$failed = null;
+		$saved = null;
+		$prev = null;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[trim((string)$val->name)]['id'])) {
+			
+				$taxonId = $species[trim((string)$val->name)]['id'];
+				
+				$fileName = (string)$val->multimedia->overview;
+
+				if (!empty($fileName)) {
+
+					$r = $this->doAddSpeciesMedia(
+						$taxonId,
+						$fileName,
+						$fileName,
+						$mimes
+					);
+	
+					if ($r['saved']==true) {
+	
+						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+	
+						$saved[] = $r;
+						$prev[$fileName] = true;
+					
+					} else {
+	
+						$failed[] = $r;
+	
+					}
+					
+				}
+
+				foreach($val->multimedia->multimediafile as $vKey => $vVal) {
+				
+					$fileName = (string)$vVal->filename;
+
+					if (empty($fileName)) continue;
+
+					if (isset($prev[$fileName])) continue;
+
+					$r = $this->doAddSpeciesMedia(
+						$taxonId,
+						$fileName,
+						(isset($val->fullname) ? ((string)$val->fullname) : $fileName),
+						$mimes
+					);
+
+					if ($r['saved']==true) {
+	
+						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+						
+						$saved[] = $r;
+						$prev[$fileName] = true;
+						
+					} else {
+
+						$failed[] = $r;
+	
+					}
+
+				}
+
+			}
+
+			unset($prev);
+
+		}
+
+		$this->loadControllerConfig();
+
+		return array(
+			'saved' => $saved,
+			'failed' => $failed
+		);
+
+	}
+
+	private function ORIG_addSpeciesCommonNames($d,$species)
+	{
+
+		$failed = null;
+		$loaded = 0;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
+			
+				$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
+
+				foreach($val->vernaculars as $vKey => $vVal) {
+
+					$languagId = $this->resolveLanguage((string)$vVal->vernacular->language);
+
+					if ($languagId) {
+
+						$this->models->Commonname->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getNewProjectId(),
+								'taxon_id' => $taxonId,
+								'language_id' => $languagId,
+								'commonname' => (string)$vVal->vernacular->name
+							)
+						);
+						
+						$loaded++;
+
+					} else {
+
+						$failed[] = array(
+							'data' => $val,
+							'cause' => 'unable to resolve language "'.(string)$vVal->vernacular->language.'" to id'
+						);
+		
+					}
+
+				}
+
+			}
+
+		}
+
+		return array('loaded' => $loaded, 'failed' => $failed);
+
+	}
+
+	private function ORIG_addSpeciesSynonyms($d,$species)
+	{
+
+		$loaded = 0;
+
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
+			
+				$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
+				
+				$i = 0;
+
+				foreach($val->synonyms as $vKey => $vVal) {
+
+					$this->models->Synonym->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getNewProjectId(),
+							'taxon_id' => $taxonId,
+							'synonym' => (string)$vVal->synonym->name,
+							'show_order' => $i++
+						)
+					);
+					
+					$loaded++;
+
+				}
+
+			}
+
+		}
+		
+		return $loaded;
+
+	}
+
+	private function ORIG_getMapItems($d,$species)
+	{
+	
+		$maps = $occurrences = $types = null;
+		$total = 0;
+	
+		foreach($d->records->taxondata as $key => $val) {
+
+			if (isset($species[trim((string)$val->name)]['id'])) {
+			
+				$taxonId = $species[trim((string)$val->name)]['id'];
+				
+				if (!isset($val->distribution)) continue;
+				
+				foreach($val->distribution->map as $vKey => $vVal) {
+				
+					$maps[(string)$vVal->mapname] = array(
+						'label' => (string)$vVal->mapname,
+						'specs' => (string)$vVal->specs
+					);
+					
+					foreach($vVal->squares->square as $sKey => $sVal) {
+
+						$occurrences[$taxonId][] = array(
+							'map' => (string)$vVal->mapname,
+							'square' => (string)$sVal->number,
+							'legend' => (string)$sVal->legend
+						);
+						
+						$types[(string)$sVal->legend] = (string)$sVal->legend;
+						
+						$total++;
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return array(
+			'maps' => $maps,
+			'occurrences' => $occurrences,
+			'types' => $types,
+			'total' => $total
+		);
+			
+	}
+
 
 	public function l2SecondaryAction()
 	{

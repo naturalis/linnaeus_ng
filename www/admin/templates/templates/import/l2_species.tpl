@@ -46,16 +46,7 @@ Basic data has been loaded. Click the link below to process additional data (key
 {else}
 Review the data below and press "save" to save it to the database. In the following step, data dependent on the newly saved species will be loaded. You will have to complete that step in the same session so DO NOT LOG OUT OR CLOSE YOUR BROWSER before the entire process is complete, unless you only want to load species.
 
-<p>
-THIS PROCEDURE HAS LIMITED INTELLIGENCE.<br />
-ILLOGICAL CHOICES ARE JOYFULLY ACCEPTED.<br />
-USE YOUR HEAD.
-</p>
-
-
 <form method="post" id="theForm">
-<input type="submit" value="update" />
-
 <input type="hidden" id="process" name="process" value="0"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
 
@@ -108,6 +99,14 @@ Alter import filre accordingly and try again.
 <span class="info">(Ranks shown in red will not be imported, nor will species of that rank be imported.)</span>
 {/if}
 </p>
+{if $substRanks|@count > 0 || $substParentRanks|@count > 0}
+<p>
+After selecting substitute ranks above, click "Update". Your selection will not be saved until you click "Save"
+at the bottom of this page.<br />
+PLEASE CHOOSE CAREFULLY. The application will <u>not</u> check the logic of your choices before saving them.<br /><br />
+<input type="submit" value="{t}Update{/t}" />
+</p>
+{/if}
 
 <p>
 <b>Species</b><br />
@@ -146,7 +145,7 @@ Found {$i} "healthy" species that will be loaded<br />
 </p>
 {/if}
 
-<input type="button" value="save" onclick="checkForm()" />
+<input type="button" value="{t}Save{/t}" onclick="checkForm()" />
 </form>
 {/if}
 <p>

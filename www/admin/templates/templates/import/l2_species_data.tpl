@@ -6,7 +6,9 @@
 XYZ
 </p>
 {else}
-Review the options below and press "import" to start the import database. Please note that the loading of data might take several minutes.
+Select which elements you wish to import and click "Import".<br />
+Please note that importing might take several minutes, especially when you
+are importing media files.
 <form method="post">
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
@@ -24,7 +26,7 @@ You specified no media import.</span>
 <label>Import synonyms?&nbsp;&nbsp;<input type="checkbox" name="taxon_synonym" checked="checked"></label><br />
 </p>
 
-<input type="submit" value="import" />
+<input type="submit" value="{t}Import{/t}" />
 </form>
 {/if}
 <p>

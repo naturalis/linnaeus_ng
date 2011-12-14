@@ -16,6 +16,7 @@
 </p>
 <p>
 <input type="submit" value="{t}select{/t}" />
+<input type="button" value="{t}back{/t}" onclick="window.open('../users/choose_project.php','_self')" />
 </p>
 {elseif $project}
 <p>

@@ -5,7 +5,9 @@ class XmlParser
 
 	private $_fileName = null;
 	private $_nodeName = null;
-	private $_singleNode = false;
+	private $_getSingleNode = false;
+	private $_callbackFunction = null;
+	private $_doReturnValues = true;
 	
 	public function setFileName($fileName)
 	{
@@ -14,10 +16,30 @@ class XmlParser
 		
 	}
 
+	public function setDoReturnValues($state)
+	{
+
+		if (is_bool($state)) $this->_doReturnValues = $state;
+	
+	}
+
+	public function setCallbackFunction($function)
+	{
+
+		if (is_callable($function)) {
+
+			$this->_callbackFunction = $function;
+
+			$this->setDoReturnValues(false);
+
+		}
+	
+	}
+
 	public function getNode($name)
 	{
 	
-		$this->_singleNode = true;
+		$this->_getSingleNode = true;
 		
 		return $this->getNodes($name);
 
@@ -44,9 +66,18 @@ class XmlParser
 
 				if ($xml = simplexml_load_string($fixedNode)) {
 
-					if ($this->_singleNode===true) return $xml;
+					if (isset($this->_callbackFunction)) call_user_func($this->_callbackFunction,$xml);
 
-					$r[] = $xml;
+					if ($this->_getSingleNode===true) {
+
+						if ($this->_doReturnValues===true)
+							return $xml;
+						else
+							exit();
+
+					}
+
+					if ($this->_doReturnValues===true) $r[] = $xml;
 
 					$d->next($this->_nodeName);
 
@@ -56,7 +87,7 @@ class XmlParser
 
 		}
 		
-		return $r;
+		if ($this->_doReturnValues===true) return $r;
 
 	}
 	
