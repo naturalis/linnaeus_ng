@@ -66,7 +66,7 @@ class XmlParser
 
 				if ($xml = simplexml_load_string($fixedNode)) {
 
-					if (isset($this->_callbackFunction)) call_user_func($this->_callbackFunction,$xml);
+					if (isset($this->_callbackFunction)) call_user_func($this->_callbackFunction,$xml,$this->_nodeName);
 
 					if ($this->_getSingleNode===true) {
 

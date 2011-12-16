@@ -298,6 +298,8 @@ class ImportController extends Controller
 					$this->addMessage('Set language "'.trim((string)$d->language).'"');
 
 				}
+				
+				$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 
 			}
 
@@ -383,13 +385,15 @@ class ImportController extends Controller
 
         $this->setPageName(_('Additional species data for "'.$project['title'].'"'));
 
-		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
-
-		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
 			set_time_limit(900);
 
-			if ($this->rHasVal('taxon_overview','on') || $this->rHasVal('taxon_media','on')) {
+			if ($this->rHasVal('taxon_overview','on') || 
+				$this->rHasVal('taxon_media','on') ||
+				$this->rHasVal('taxon_common','on') ||
+				$this->rHasVal('taxon_synonym','on')
+				) {
 
 				if ($this->rHasVal('taxon_overview','on')) {
 
@@ -415,7 +419,6 @@ class ImportController extends Controller
 						
 					$this->loadControllerConfig();
 
-					$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 					$_SESSION['system']['import']['loaded']['speciesMedia']['saved'] = 0;
 					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'] = array();
 
@@ -451,7 +454,10 @@ class ImportController extends Controller
 				}
 				
 
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+
 				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Species'));
+
 				$this->helpers->XmlParser->getNodes('taxondata');
 
 
@@ -490,6 +496,7 @@ class ImportController extends Controller
 					unset($_SESSION['system']['import']['speciesOverviewCatId']);
 					unset($_SESSION['system']['import']['loaded']['speciesContent']['saved']);
 					unset($_SESSION['system']['import']['loaded']['speciesContent']['failed']);
+					unset($_SESSION['system']['import']['mimes']);
 
 				} else {
 				
@@ -497,35 +504,48 @@ class ImportController extends Controller
 								
 				}
 
+				if ($this->rHasVal('taxon_common','on')) {
 
-				unset($_SESSION['system']['import']['elementsToLoad']);
-				unset($_SESSION['system']['import']['mimes']);
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['taxon_common']['saved'].' common name(s).');
 	
-			}
-/*
+					if (count((array)$_SESSION['system']['import']['loaded']['taxon_common']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['taxon_common']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
 
-			if ($this->rHasVal('taxon_common','on')) {
-
-				$res = $this->addSpeciesCommonNames($d,$species);
-
-				$this->addMessage('Added '.$res['loaded'].' common name(s).');
-
-				if (isset($res['failed'])) {
-
-					foreach ((array)$res['failed'] as $val) $this->addError('Failed common name:<br />'.$val['cause']);
+				} else {
+				
+					$this->addMessage('Skipped common names.');
 
 				}
 
+
+				if ($this->rHasVal('taxon_synonym','on')) {
+
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'].' synonym(s).');
+	
+					if (count((array)$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
+
+				} else {
+				
+					$this->addMessage('Skipped synonyms.');
+								
+				}
+
+
+				unset($_SESSION['system']['import']['elementsToLoad']);
+
+	
 			}
 
-			if ($this->rHasVal('taxon_synonym','on')) {
-
-				$count = $this->addSpeciesSynonyms($d,$species);
-
-				$this->addMessage('Added '.$count.' synonym(s).');
-
-			}
-*/		
+	
 			$this->smarty->assign('processed',true);
 	
 		}	
@@ -534,19 +554,101 @@ class ImportController extends Controller
 
 	}
 
-	public function xmlParserCallback_Species($obj)
+	public function l2LiteratureGlossaryAction()
 	{
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_overview']===true) $this->addSpeciesContent($obj);
+		if (
+			!isset($_SESSION['system']['import']['file']['path']) ||
+			!isset($_SESSION['system']['import']['loaded']['species'])
+		) $this->redirect('l2_start.php');
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_media']===true) $this->addSpeciesMedia($obj);
+		$project = $this->getProjects($this->getNewProjectId());
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_common']===true) $this->addSpeciesCommonNames($obj);
+        $this->setPageName(_('Literature and glossary for "'.$project['title'].'"'));
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_synonym']===true) $this->addSpeciesSynonyms($obj);
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+
+			set_time_limit(900);
+
+			if ($this->rHasVal('literature','on') || $this->rHasVal('glossary','on')) {
+
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+
+				if ($this->rHasVal('literature','on')) {
+
+					$_SESSION['system']['import']['loaded']['literature']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['literature']['failed'] = array();
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Literature'));
 	
-	}
+					$this->helpers->XmlParser->getNodes('proj_reference');
 
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['literature']['saved'].' literary reference(s)).');
+	
+					if (count((array)$_SESSION['system']['import']['loaded']['literature']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['literature']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
+
+					$this->addModuleToProject(3);
+					$this->grantModuleAccessRights(3);
+
+				} else {
+				
+					$this->addMessage('Skipped literature.');
+				
+				}
+
+				if ($this->rHasVal('glossary','on')) {
+
+					$_SESSION['system']['import']['loaded']['glossary']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['glossary']['failed'] = array();
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Glossary'));
+
+					$this->loadControllerConfig('Glossary');
+
+					foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val)
+						$_SESSION['system']['import']['mimes'][$val['mime']] = $val;
+						
+					$this->loadControllerConfig();
+
+					$this->helpers->XmlParser->getNodes('term');
+
+					$this->loadControllerConfig();
+
+					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['glossary']['saved'].' glossary item(s).');
+	
+					if (count((array)$_SESSION['system']['import']['loaded']['glossary']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['glossary']['failed'] as $val)
+							$this->addError($val['cause']);
+		
+					}
+
+					unset($_SESSION['system']['import']['mimes']);
+
+					$this->addModuleToProject(2);
+					$this->grantModuleAccessRights(2);
+
+				} else {
+				
+					$this->addMessage('Skipped glossary.');
+				
+				}
+
+			}
+	
+			$this->smarty->assign('processed',true);
+	
+		}	
+			
+       $this->printPage();
+
+	}
+	
 	public function l2ContentAction()
 	{
 
@@ -557,74 +659,179 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Additional data for "'.$project['title'].'"'));
+        $this->setPageName(_('Additional content for "'.$project['title'].'"'));
 
-		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+
+			set_time_limit(900);
+
+			if ($this->rHasVal('welcome','on') || 
+				$this->rHasVal('introduction','on')
+			) {
+
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+
+				if ($this->rHasVal('welcome','on')) {
+
+					$_SESSION['system']['import']['loaded']['welcome']['saved'] = array();
+					$_SESSION['system']['import']['loaded']['welcome']['failed'] = array();
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Welcome'));
+					
+					$this->helpers->XmlParser->getNodes('project');
+
+					$this->addModuleToProject(10);
+					$this->grantModuleAccessRights(10);
+
+					if (count((array)$_SESSION['system']['import']['loaded']['welcome']['saved'])!==0) {
 		
-		// getProjectContent: 'Introduction' (= Welcome) and 'Contributors'  (= Welcome)
-		$d = $this->helpers->XmlParser->getNode('project');
-		if (!isset($_SESSION['system']['import']['content']))
-			$_SESSION['system']['import']['content'] = $this->getProjectContent($d);
+						foreach ((array)$_SESSION['system']['import']['loaded']['welcome']['saved'] as $val)
+							$this->addMessage($val);
+		
+					}
 
+					if (count((array)$_SESSION['system']['import']['loaded']['welcome']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['welcome']['failed'] as $val)
+							$this->addError($val);
+		
+					}
 
-		// getAdditionalContent: multiple topics (= Introduction)
-		$d = $this->helpers->XmlParser->getNode('introduction');
-		if (!isset($_SESSION['system']['import']['additionalContent'])) 
-			$_SESSION['system']['import']['additionalContent'] = $this->getAdditionalContent($d);
+				}
 
-/*
+				if ($this->rHasVal('introduction','on')) {
 
-			if ($this->rHasVal('content_introduction','on')) {
+					$_SESSION['system']['import']['loaded']['introduction']['show_order'] = 0;
+					$_SESSION['system']['import']['loaded']['introduction']['saved'] = array();
+					$_SESSION['system']['import']['loaded']['introduction']['failed'] = array();
 
-				if ($this->addProjectContent($d,'introduction')) {
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Introduction'));
 
-					$this->addMessage('Added introduction.');
+					$this->helpers->XmlParser->getNodes('topic');
 
-				} else {
+					$this->addModuleToProject(1);
+					$this->grantModuleAccessRights(1);
 
-					$this->addError('Failed loading introduction');
+					if (count((array)$_SESSION['system']['import']['loaded']['introduction']['saved'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['introduction']['saved'] as $val)
+							$this->addMessage($val);
+		
+					}
+
+					if (count((array)$_SESSION['system']['import']['loaded']['introduction']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['introduction']['failed'] as $val)
+							$this->addError($val);
+		
+					}
+					
+					unset($_SESSION['system']['import']['loaded']['introduction']['show_order']);
 
 				}
 
 			}
+			
+			$this->smarty->assign('processed',true);
 
-			if ($this->rHasVal('content_contributors','on')) {
-
-				if ($this->addProjectContent($d,'contributors')) {
-
-					$this->addMessage('Added contributors text.');
-
-				} else {
-
-					$this->addError('Failed loading contributors text');
-
-				}
-
-			}
-
-			if ($this->rHasVal('content_introduction','on') || $this->rHasVal('content_contributors','on')) {
-
-				$this->addModuleToProject(1);
-				$this->grantModuleAccessRights(1);
-
-			}
-
-			if ($this->rHasVal('additional_content','on')) {
-
-				$res = $this->addAdditionalContent($introductionContent);
-
-			}
-
-*/
-
-		if (isset($_SESSION['system']['import']['content'])) $this->smarty->assign('content',$_SESSION['system']['import']['content']);
-		if (isset($_SESSION['system']['import']['additionalContent'])) $this->smarty->assign('additionalContent',$_SESSION['system']['import']['additionalContent']);
+		}
 
         $this->printPage();
 
-
 	}
 
+	public function l2KeysAction()
+	{
+
+		if (
+			!isset($_SESSION['system']['import']['file']['path']) ||
+			!isset($_SESSION['system']['import']['loaded']['species'])
+		) $this->redirect('l2_start.php');
+
+		$project = $this->getProjects($this->getNewProjectId());
+
+        $this->setPageName(_('Keys for "'.$project['title'].'"'));
+
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+
+			set_time_limit(900);
+
+			if ($this->rHasVal('key_dich','on') || 
+				$this->rHasVal('key_matrix','on')
+			) {
+
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+
+				if ($this->rHasVal('key_dich','on')) {
+
+					$_SESSION['system']['import']['loaded']['key_dich']['keys'] = array('text_key' => false, 'pict_key' => false);
+					$_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'] = null;
+					$_SESSION['system']['import']['loaded']['key_dich']['stepAdd'] = null;
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyDichotomous'));
+
+					$this->helpers->XmlParser->getNodes('text_key');
+					$this->helpers->XmlParser->getNodes('pict_key');
+
+					$this->addModuleToProject(6);
+					$this->grantModuleAccessRights(6);
+	
+					$this->addMessage('Created dichotomous key.');
+					
+					unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+
+				} else {
+
+					$this->addMessage('Skipped dichotomous key.');
+
+				}
+
+				if ($this->rHasVal('key_matrix','on')) {
+
+					$_SESSION['system']['import']['loaded']['key_matrix']['show_order'] = 0;
+					$_SESSION['system']['import']['loaded']['key_matrix']['saved'] = array();
+					$_SESSION['system']['import']['loaded']['key_matrix']['failed'] = array();
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrix'));
+
+					$this->helpers->XmlParser->getNodes('topic');
+
+					$this->addModuleToProject(7);
+					$this->grantModuleAccessRights(7);
+	
+					$this->addMessage('NOT YET Created matrix key(s).');
+
+					if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['saved'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['saved'] as $val)
+							$this->addMessage($val);
+		
+					}
+
+					if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'] as $val)
+							$this->addError($val);
+		
+					}
+					
+					unset($_SESSION['system']['import']['loaded']['key_matrix']['show_order']);
+
+				} else {
+				
+					$this->addMessage('Skipped matrix key(s).');
+				
+				}
+
+			}
+			
+			$this->smarty->assign('processed',true);
+
+		}
+
+        $this->printPage();
+
+	}
 
 	public function goNewProject()
 	{
@@ -640,6 +847,68 @@ class ImportController extends Controller
 		$this->redirect($this->getLoggedInMainIndex());
 
 	}
+
+
+	/* xml parser callback functions */
+	public function xmlParserCallback_Species($obj)
+	{
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_overview']===true) $this->addSpeciesContent($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_media']===true) $this->addSpeciesMedia($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_common']===true) $this->addSpeciesCommonNames($obj);
+
+		if ($_SESSION['system']['import']['elementsToLoad']['taxon_synonym']===true) $this->addSpeciesSynonyms($obj);
+	
+	}
+
+	public function xmlParserCallback_Literature($obj)
+	{
+
+		$this->addLiterature($obj);
+
+	}
+
+	public function xmlParserCallback_Glossary($obj)
+	{
+
+		$this->addGlossary($obj);
+
+	}
+
+	public function xmlParserCallback_Welcome($obj)
+	{
+
+		$this->addWelcomeTexts($obj);
+
+	}
+
+	public function xmlParserCallback_Introduction($obj)
+	{
+
+		$this->addIntroduction($obj);
+
+	}
+
+	public function xmlParserCallback_KeyDichotomous($obj,$node)
+	{
+
+		$this->addKeyDichotomous($obj,$node);
+
+	}
+
+	public function xmlParserCallback_KeyMatrix($obj)
+	{
+
+	return;
+				$m = $this->resolveMatrices($d);
+				$m = $this->saveMatrices($m);
+				$failed = $this->connectMatrices($d,$m['matrices'],$species);
+		$this->addIntroduction($obj);
+
+	}
+
 
 	// projects, modules, users
 	private function getProjects($id=null)
@@ -1147,125 +1416,7 @@ class ImportController extends Controller
 
 	}
 
-	// content & introduction
-	private function getProjectContent($d)
-	{
-
-		return array(
-			'Introduction' => isset($d->projectintroduction) ? (string)$d->projectintroduction : null,
-			'Contributors' => isset($d->contributors) ? (string)$d->contributors : mull
-		);
-	
-	}
-
-
-	private function addProjectContent($d,$type)
-	{
-
-		if ($d->project->projectintroduction && $type=='introduction')
-			$c = $this->models->Content->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),	
-					'language_id' => $this->getNewDefaultLanguageId(),	
-					'topic' => 'Welcome',	
-					'content' => $this->replaceOldMarkUp((string)$d->project->projectintroduction)
-				)
-			);
-
-		if ($d->project->contributors && $type=='contributors')
-			$c = $this->models->Content->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),	
-					'language_id' => $this->getNewDefaultLanguageId(),	
-					'subject' => 'Contributors',	
-					'content' => $this->replaceOldMarkUp((string)$d->project->contributors)
-				)
-			);
-	
-		return $c;
-	
-	}
-
-	private function getAdditionalContent($d)
-	{
-
-		if (!isset($d->topic)) return null;
-
-		foreach($d->topic as $key => $val) {
-
-			$res[] = array(
-				'title' => (string)$val->introduction_title,
-				'content' => (string)$val->text,
-				'image' => (string)$val->overview
-			);
-
-		}
-
-		return isset($res) ? $res : null;
-
-	}
-
-	
-	private function addAdditionalContent($content)
-	{
-
-		foreach((array)$content as $key => $val) {
-
-			$this->models->IntroductionPage->save(
-				array(
-					'project_id' => $this->getNewProjectId(),
-					'show_order' => $key,
-					'got_content' => '1'
-				)
-			);
-	
-			$newPageId = $this->models->IntroductionPage->getNewId();
-	
-			$this->models->ContentIntroduction->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getNewProjectId(),
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'page_id' => $newPageId,
-					'topic' => $this->replaceOldMarkUp(trim($val['title']),true),
-					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim($val['content'])))
-				)
-			);
-
-
-			if ($_SESSION['system']['import']['imagePath'] && trim($val['image'])) {
-			
-				$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
-
-				if ($this->cRename(
-					$_SESSION['system']['import']['imagePath'].$val['image'],
-					$paths['project_media'].$val['image']
-					)) {
-			
-					$this->models->IntroductionMedia->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getNewProjectId(),
-							'page_id' => $newPageId,
-							'file_name' => trim($val['image']),
-							'original_name' =>trim($val['image']),
-							'mime_type' => @mime_content_type(trim($val['image'])),
-							'file_size' => @filesize($paths['project_media'].trim($val['image'])),
-							'thumb_name' => null,
-						)
-					);
-
-				}
-
-			}
-        
-        }
-
-	}
-
-	// species content
+	//  species content, species media, common names, synoynms
 	private function createStandardCat()
 	{
 
@@ -1306,7 +1457,7 @@ class ImportController extends Controller
 		return $id;
 	
 	}
-
+	
 	private function addSpeciesContent($taxon)
 	{
 
@@ -1400,92 +1551,6 @@ class ImportController extends Controller
 					
 	}
 
-	private function addSpeciesCommonNames($taxon)
-	{
-
-
-
-
-					$_SESSION['system']['import']['loaded']['taxon_common']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['taxon_common']['failed'] = array();
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] = array();
-					
-					
-					
-					
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
-		
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
-
-			foreach($taxon->vernaculars as $vKey => $vVal) {
-
-				$languagId = $this->resolveLanguage(trim((string)$vVal->vernacular->language));
-
-				if ($languagId) {
-
-					$this->models->Commonname->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getNewProjectId(),
-							'taxon_id' => $taxonId,
-							'language_id' => $languagId,
-							'commonname' => trim((string)$vVal->vernacular->name)
-						)
-					);
-					
-					$loaded++;
-
-				} else {
-
-					$failed[] = array(
-						'data' => $taxon,
-						'cause' => 'unable to resolve language "'.trim((string)$vVal->vernacular->language).'"'
-					);
-	
-				}
-
-			}
-
-		}
-
-
-
-		return array('loaded' => $loaded, 'failed' => $failed);
-
-	}
-
-	private function addSpeciesSynonyms($taxon)
-	{
-
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
-		
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
-			
-			$i = 0;
-	
-			foreach($taxon->synonyms as $vKey => $vVal) {
-			
-				$this->models->Synonym->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $taxonId,
-						'synonym' => trim((string)$vVal->synonym->name),
-						'show_order' => $i++
-					)
-				);
-				
-				$loaded++;
-	
-			}
-	
-		}
-
-		return $loaded;
-
-	}
-
 	private function doAddSpeciesMedia($taxonId,$fileName,$fullName)
 	{
 
@@ -1493,13 +1558,13 @@ class ImportController extends Controller
 			return array(
 				'saved' => false,
 				'data' => $fileName,
-				'cause' => 'user specified no media import for project'
+				'cause' => 'User specified no media import for project'
 			);
 
 		if (empty($fileName)) return array(
 				'saved' => false,
 				'data' => '',
-				'cause' => 'missing file name'
+				'cause' => 'Missing file name'
 			);
 
 		if (file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
@@ -1549,7 +1614,7 @@ class ImportController extends Controller
 				return array(
 					'saved' => false,
 					'data' => $fileName,
-					'cause' => isset($thisMIME) ? 'mime-type "'.$thisMIME.'" not allowed' : 'could not determine mime-type'
+					'cause' => isset($thisMIME) ? 'MIME-type "'.$thisMIME.'" not allowed' : 'Could not determine MIME-type'
 				);
 
 			}
@@ -1559,52 +1624,90 @@ class ImportController extends Controller
 			return array(
 				'saved' => false,
 				'data' => $fileName,
-				'cause' => 'file "'.$fileName.'" does not exist'
+				'cause' => 'File "'.$fileName.'" does not exist'
 			);
 		
 		}	
 
 	}
 
-	private function cRename($from,$to)
+	private function addSpeciesCommonNames($taxon)
 	{
+
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+
+			foreach($taxon->vernaculars as $vKey => $vVal) {
+
+				$languagId = $this->resolveLanguage(trim((string)$vVal->vernacular->language));
+
+				if ($languagId) {
+
+					$this->models->Commonname->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getNewProjectId(),
+							'taxon_id' => $taxonId,
+							'language_id' => $languagId,
+							'commonname' => trim((string)$vVal->vernacular->name)
+						)
+					);
+					
+					$_SESSION['system']['import']['loaded']['taxon_common']['saved']++;
+
+				} else {
+
+					$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
+						'data' => $taxon,
+						'cause' => 'Unable to resolve language "'.trim((string)$vVal->vernacular->language).'"'
+					);
 	
-		//return rename($from,$to); // generates odd errors on some linux filesystems
-	
-		if(copy($from,$to)) {
+				}
 
-			if ($this->_deleteOldMediaAfterImport===true) @unlink($from);
-
-			return true;
-
-		} else {
-
-			return false;
+			}
 
 		}
 
 	}
 
-	private function makeMediaTargetPaths()
+	private function addSpeciesSynonyms($taxon)
 	{
-	
-		$paths = $this->makePathNames($this->getNewProjectId());
 
-		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
-		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			
+			$i = 0;
+			
+			foreach($taxon->synonyms as $vKey => $vVal) {
+			
+				$s = $this->models->Synonym->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'taxon_id' => $taxonId,
+						'synonym' => trim((string)$vVal->synonym->name),
+						'show_order' => $i++
+					)
+				);
+
+				if ($s===true)
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved']++;
+				else
+					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
+						'data' => $taxon,
+						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'"'
+					);
+	
+			}
+	
+		}
 
 	}
 
-	private function replaceOldMarkUp($s,$removeNotReplace=false)
-	{
-	
-		$r = array('<b>','</b>','<i>','</i>','<br />', '<p>', '</p>');
-	
-		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeNotReplace ? null : $r),$s);
-	
-	}
-
-	private function resolveAuthors($s)
+	// literature & glossary
+	private function fixAuthors($s)
 	{
 
 		// Antezana et al., 1976b
@@ -1663,184 +1766,157 @@ class ImportController extends Controller
 
 	}
 
-	private function resolveLiterature($d,$species)
+	private function resolveLiterature($obj)
 	{
 
-		foreach($d->proj_literature->proj_reference as $key => $val) {
+		$lit = $this->fixAuthors(trim((string)$obj->literature_title));
 
-			$a = $this->resolveAuthors((string)$val->literature_title);
-			$a['text'] = (string)$val->fullreference;
-			$okSp = $unSp = null;
+		$lit['text'] = trim((string)$obj->fullreference);
 
-			if ($val->keywords->keyword) {
+		$okSp = $unSp = null;
 
-				foreach($val->keywords->keyword as $kKey => $kVal) {
+		if ($obj->keywords->keyword) {
 
-					if (preg_match('/\[m\](Species|Higher taxa)\[\/m\]/i',(string)$kVal->name)==0) continue;
-	
-					$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks((string)$kVal->name),true);
+			foreach($obj->keywords->keyword as $kKey => $kVal) {
 
-					if (isset($species[$speciesName])) {
+				// apparently we're skipping literature that is not related to species or higher taxa
+				if (preg_match('/\[m\](Species|Higher taxa)\[\/m\]/i',trim((string)$kVal->name))==0) continue;
 
-						$okSp[] = $species[$speciesName]['id'];
-	
-					} else
-					if (strpos($speciesName,' ')!==false) {
+				$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
+
+				if (isset($_SESSION['system']['import']['loaded']['species'][$speciesName])) {
+
+					$okSp[] = $_SESSION['system']['import']['loaded']['species'][$speciesName]['id'];
+
+				} else
+				if (strpos($speciesName,' ')!==false) {
+				
+					$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
+
+					if (isset($_SESSION['system']['import']['loaded']['species'][$speciesNameSplit])) {
 					
-						$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
-	
-						if (isset($species[$speciesNameSplit])) {
-						
-							$okSp[] = $species[$speciesNameSplit]['id'];
-
-						} else {
-
-							$unSp[] = $speciesName;
-
-						}
+						$okSp[] = $_SESSION['system']['import']['loaded']['species'][$speciesNameSplit]['id'];
 
 					} else {
 
 						$unSp[] = $speciesName;
-	
+
 					}
-	
+
+				} else {
+
+					$unSp[] = $speciesName;
+
 				}
-				
+
 			}
-
-			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
-
-			$res[] = $a;
-
+			
 		}
 
-		return isset($res) ? $res : null;
+		$lit['references'] = array('species' => $okSp,'unknown_species' => $unSp);
+
+		return $lit;
 
 	}
 
-	private function addLiterature($d)
+	private function addLiterature($obj)
 	{
 
-		$lit = $ref = 0;
-		$litFail = $refFail = 0;
+		$lit = $this->resolveLiterature($obj);
 
-		foreach($d as $key => $val) {
+		if ($this->models->Literature->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),				
+				'author_first' => isset($lit['author_1']) ? $lit['author_1'] : null,
+				'author_second' => (isset($lit['author_2']) && $lit['multiple_authors']==false) ? $lit['author_2'] : null,
+				'multiple_authors' => $lit['multiple_authors']==true ? 1 : 0,
+				'year' => (isset($lit['year'])  && $lit['valid_year'] == true) ? $lit['year'].'-00-00' : '0000-00-00',
+				'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null,
+				'text' => isset($lit['text']) ? $lit['text'] : null,
+			)
+		)===true) {
 
-			$l = $this->models->Literature->save(
+			$_SESSION['system']['import']['loaded']['literature']['saved']++;
+
+		} else {
+
+			$_SESSION['system']['import']['loaded']['literature']['failed'] =
+				array('data' => $lit,'cause' => 'Failed to save lit. ref. "'.$lit['original'].'".');
+
+			return;
+
+		}
+
+		$_SESSION['system']['import']['literature'][]['id'] = $id = $this->models->Literature->getNewId();
+
+		foreach((array)$lit['references']['species'] as $kV) {
+		
+			if (empty($kV)) continue;
+
+			$this->models->LiteratureTaxon->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),				
-					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
-					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
-					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
-					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
-					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
-					'text' => isset($val['text']) ? $val['text'] : null,
+					'taxon_id' => $kV,
+					'literature_id' => $id,
 				)
 			);
 
-			if ($l===false) {
+		}
 
-				$litFail++;
-				continue;
-
-			} else {
+		foreach((array)$lit['references']['unknown_species'] as $kV) {
 		
-				$lit++;
+			if (empty($kV)) continue;
 
+			$_SESSION['system']['import']['loaded']['literature']['failed'] =
+				array('data' => $lit,'cause' => 'Saved lit. ref. "'.$lit['original'].'" but could not resolve reference to "'.$kV.'".');
+
+		}
+
+	}
+
+	private function resolveGlossary($obj)
+	{
+
+		$t = trim((string)$obj->glossary_title);
+		$d = trim((string)$obj->definition);
+		
+		if ($obj->glossary_synonyms->glossary_synonym) {
+
+			foreach($obj->glossary_synonyms->glossary_synonym as $sKey => $sVal) {
+
+				$s[] = $this->replaceOldMarkUp(trim((string)$sVal->name),true);
+				
 			}
 
-			$_SESSION['system']['import']['literature'][$key]['id'] = $id = $this->models->Literature->getNewId();
+		}
 
-			foreach((array)$val['references']['species'] as $kV) {
-			
-				if (empty($kV)) {
+		if ($obj->gloss_multimedia->gloss_multimediafile) {
 
-					$refFail++;
+			foreach($obj->gloss_multimedia->gloss_multimediafile as $mKey => $mVal) {
 
-					continue;
-
-				}
-
-				$lt = $this->models->LiteratureTaxon->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),				
-						'taxon_id' => $kV,
-						'literature_id' => $id,
-					)
+				$m[] = array(
+					'filename' => trim((string)$mVal->filename),
+					'fullname' => trim((string)$mVal->fullname),
+					'caption' => trim((string)$mVal->caption),
+					'type' => trim((string)$mVal->multimedia_type),
 				);
-
-				if ($lt===false)
-					$refFail++;
-				else
-					$ref++;
-
+				
 			}
 
 		}
 
 		return array(
-			'lit' => $lit,
-			'ref' => $ref,
-			'litFail' => $litFail,
-			'refFail' => $refFail,
-		);
+			'term' => $t,
+			'definition' => $d,
+			'synonyms' => isset($s) ? $s : null,
+			'multimedia' => isset($m) ? $m : null
+			);
 
 	}
 
-	private function resolveGlossary($d)
-	{
-	
-		if (!$d->glossary->term) return null;
-	
-		foreach($d->glossary->term as $key => $val) {
-		
-			$t = (string)$val->glossary_title;
-			$d = (string)$val->definition;
-			
-			unset($s);
-
-			if ($val->glossary_synonyms->glossary_synonym) {
-
-				foreach($val->glossary_synonyms->glossary_synonym as $sKey => $sVal) {
-
-					$s[] = $this->replaceOldMarkUp((string)$sVal->name,true);
-					
-				}
-
-			}
-
-			if ($val->gloss_multimedia->gloss_multimediafile) {
-
-				foreach($val->gloss_multimedia->gloss_multimediafile as $mKey => $mVal) {
-
-					$m[] = array(
-						'filename' => (string)$mVal->filename,
-						'fullname' => (string)$mVal->fullname,
-						'caption' => (string)$mVal->caption,
-						'type' => (string)$mVal->multimedia_type,
-					);
-					
-				}
-
-			}
-			
-			$res[] = array(
-				'term' => $t,
-				'definition' => $d,
-				'synonyms' => isset($s) ? $s : null,
-				'multimedia' => isset($m) ? $m : null
-				);
-
-		}
-
-		return isset($res) ? $res : null;
-
-	}
-
-	private function doAddGlossaryMedia($id,$data,$mimes)
+	private function addGlossaryMedia($id,$data)
 	{
 
 		/*
@@ -1857,9 +1933,9 @@ class ImportController extends Controller
 
 		if ($_SESSION['system']['import']['imagePath']==false)
 			return array(
-				'saved' => false,
-				'data' => $data['fileName'],
-				'cause' => 'user specified no media import for project'
+				'saved' => 'skipped',
+				'data' => $data['filename'],
+				'cause' => 'User specified no media import for project'
 			);
 
 		$fileToImport = $_SESSION['system']['import']['imagePath'].$data['fileName'];
@@ -1868,7 +1944,7 @@ class ImportController extends Controller
 
 			$thisMIME = mime_content_type($fileToImport);
 			
-			if (isset($mimes[$thisMIME])) {
+			if (isset($_SESSION['system']['import']['mimes'][$thisMIME])) {
 			
 				if ($_SESSION['system']['import']['thumbsPath']==false)
 					$thumbName = null;
@@ -1901,7 +1977,7 @@ class ImportController extends Controller
 				return array(
 					'saved' => false,
 					'data' => $data['fileName'],
-					'cause' => isset($thisMIME) ? 'mime-type "'.$thisMIME.'" not allowed' : 'could not determine mime-type'
+					'cause' => isset($thisMIME) ? 'MIME-type "'.$thisMIME.'" not allowed' : 'Could not determine MIME-type'
 				);
 
 			}
@@ -1911,46 +1987,43 @@ class ImportController extends Controller
 			return array(
 				'saved' => false,
 				'data' => $data['fileName'],
-				'cause' => 'file "'.$data['fileName'].'" does not exist'
+				'cause' => 'File "'.$data['fileName'].'" does not exist'
 			);
 		
 		}
 
 	}
 
-	private function addGlossary($d)
+	private function addGlossary($obj)
 	{
 
-		$gloss = $fail = 0;
+		$gls = $this->resolveGlossary($obj);
 
-		foreach($d as $key => $val) {
+		if ($this->models->Glossary->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'term' => isset($gls['term']) ? $gls['term'] : null,
+				'definition' => isset($gls['definition']) ? $gls['definition'] : null
+			)
+		)===true) {
+		
+			$_SESSION['system']['import']['loaded']['glossary']['saved']++;
 
-			$g = $this->models->Glossary->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'term' => isset($val['term']) ? $val['term'] : null,
-					'definition' => isset($val['definition']) ? $val['definition'] : null
-				)
-			);
+		} else {
 
-			if ($g!==true) {
+			$_SESSION['system']['import']['loaded']['glossary']['failed'][] =
+				array('data' => $gls,'cause' => 'Failed to save glossary item "'.$gls['term'].'".');
+			return;
 
-				$fail++;
-				continue;
+		} 
+		
+		$_SESSION['system']['import']['glossary'][]['id'] = $id = $this->models->Glossary->getNewId();
 
-			} else {
+		if (isset($gls['synonyms'])) {
 
-				$gloss++;
-
-			}
-			
-			$id = $this->models->Glossary->getNewId();
-
-			$_SESSION['system']['import']['glossary'][$key]['id'] = $id;
-
-			foreach((array)$val['synonyms'] as $sVal) {
+			foreach((array)$gls['synonyms'] as $sVal) {
 			
 				$lt = $this->models->GlossarySynonym->save(
 					array(
@@ -1961,52 +2034,157 @@ class ImportController extends Controller
 						'synonym' => $sVal
 					)
 				);
-
-			}
-
-			$this->loadControllerConfig('Glossary');
-			
-			foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) {
-	
-				$mimes[$val['mime']] = $val;
 	
 			}
 
+		}
 
-			if (isset($val['multimedia'])) {
+		if (isset($gls['multimedia'])) {
 
-				foreach((array)$val['multimedia'] as $mVal) {
-	
-					$r = $this->doAddGlossaryMedia($id,$mVal,$mimes);
-	
-					if ($r['saved']==true) {
-	
-						if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
-						if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
-	
-						$saved[] = $r;
-					
-					} else {
-	
-						$failed[] = $r;
-	
-					}
-	
+			foreach((array)$gls['multimedia'] as $mVal) {
+
+				$r = $this->addGlossaryMedia($id,$mVal);
+
+				if ($r['saved']==true) {
+
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+
+				} else
+				if ($r['saved']!=='skipped') {
+
+					$_SESSION['system']['import']['loaded']['glossary']['failed'][] =
+							array('data' => $gls,'cause' => 'Could not save "'.$mVal['filename'].'" ('.$r['cause'].').');
+
 				}
 
 			}
 
 		}
 
-		return array(
-			'gloss' => $gloss,
-			'fail' => $fail,
-			'saved' => isset($saved) ? $saved : null,
-			'failed' => isset($failed) ? $failed : null
-		);
+	}
+
+	// content & introduction
+	private function addWelcomeTexts($obj)
+	{
+
+		if (!empty($obj->projectintroduction)) {
+
+			if ($this->models->Content->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),	
+					'language_id' => $this->getNewDefaultLanguageId(),	
+					'subject' => 'Welcome',	
+					'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
+				)
+			)===true) {
+
+				$_SESSION['system']['import']['loaded']['welcome']['saved'][] = 'Saved welcome text.';
+
+			} else {
+
+				$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save welcome text.';
+			}
+
+		} else {
+
+			$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'No welcome text found.';
+
+		}
+
+		if (!empty($obj->contributors)) {
+
+			if ($this->models->Content->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),	
+					'language_id' => $this->getNewDefaultLanguageId(),	
+					'subject' => 'Contributors',	
+					'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
+				)
+			)===true) {
+
+				$_SESSION['system']['import']['loaded']['welcome']['saved'][] = 'Saved contributors text.';
+
+			} else {
+
+				$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save contributors text.';
+			}
+
+		} else {
+
+			$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'No contributors text found.';
+
+		}
 
 	}
 
+	private function addIntroduction($obj)
+	{
+
+		$this->models->IntroductionPage->save(
+			array(
+				'project_id' => $this->getNewProjectId(),
+				'show_order' => $_SESSION['system']['import']['loaded']['introduction']['show_order']++,
+				'got_content' => '1'
+			)
+		);
+		
+		$id = $this->models->IntroductionPage->getNewId();
+		
+		if ($this->models->ContentIntroduction->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(),
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'page_id' => $id,
+				'topic' => $this->replaceOldMarkUp(trim((string)$obj->introduction_title),true),
+				'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->text)))
+			)
+		)===true) {
+
+			$_SESSION['system']['import']['loaded']['introduction']['saved'][] = 'Saved topic "'.trim((string)$obj->introduction_title).'".';
+
+		} else {
+	
+			$_SESSION['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'".';
+			return;
+
+		}
+ 
+ 		$img = trim((string)$obj->overview);
+ 
+		if ($_SESSION['system']['import']['imagePath'] && $img) {
+		
+			$paths = $_SESSION['system']['import']['paths'];
+
+			if ($this->cRename(
+				$_SESSION['system']['import']['imagePath'].$img,
+				$paths['project_media'].$img
+				)
+			) {
+		
+				$this->models->IntroductionMedia->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'page_id' => $id,
+						'file_name' => $img,
+						'original_name' => $img,
+						'mime_type' => @mime_content_type($img),
+						'file_size' => @filesize($paths['project_media'].$img),
+						'thumb_name' => null,
+					)
+				);
+
+			}
+        
+        }
+
+	}
+
+	// dichotomous key
 	private function createKeyStep($step,$stepIds,$stepAdd=0)
 	{
 
@@ -2014,12 +2192,12 @@ class ImportController extends Controller
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),
-				'number' => ($step=='god' ? -1 : (intval((string)$step->pagenumber) + $stepAdd)),
+				'number' => ($step=='god' ? -1 : (intval(trim((string)$step->pagenumber)) + $stepAdd)),
 				'is_start' => 0
 			)
 		);
 
-		$stepId = $stepIds[($step=='god' ? -1 : (string)$step->pagenumber)] = $this->models->Keystep->getNewId();
+		$stepId = $stepIds[($step=='god' ? -1 : trim((string)$step->pagenumber))] = $this->models->Keystep->getNewId();
 
 		$this->models->ContentKeystep->save(
 			array(
@@ -2031,16 +2209,16 @@ class ImportController extends Controller
 					($step=='god' ? 
 						'Choose key type' : 
 						(isset($step->pagetitle) ?
-							(string)$step->pagetitle:
-							(string)$step->pagenumber
+							trim((string)$step->pagetitle) :
+							trim((string)$step->pagenumber)
 						)
 					),
 				'content' =>
 					($step=='god' ?
 						'Choose between picture key and text key' : 
 						(isset($step->pagetitle) ?
-							(string)$step->pagetitle:
-							(string)$step->pagenumber
+							trim((string)$step->pagetitle) :
+							trim((string)$step->pagenumber)
 						)
 					)
 			)
@@ -2050,10 +2228,10 @@ class ImportController extends Controller
 
 	}
 
-	private function createKeyStepChoices($step,$stepIds,$species)
+	private function createKeyStepChoices($step,$stepIds)
 	{
 
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+		$paths = $_SESSION['system']['import']['paths'];
 
 		if ($step->text_choice) {
 			$choices = $step->text_choice;
@@ -2063,25 +2241,25 @@ class ImportController extends Controller
 
 		$i=0;
 
-		foreach($choices as $key => $val) {
+		foreach($step as $key => $val) {
 
-			$resStep = ((string)$val->destinationtype=='turn' ? 
-							(isset($stepIds[(string)$val->destinationpagenumber]) ?
-								$stepIds[(string)$val->destinationpagenumber] :
+			$resStep = (trim((string)$val->destinationtype)=='turn' ? 
+							(isset($stepIds[trim((string)$val->destinationpagenumber)]) ?
+								$stepIds[trim((string)$val->destinationpagenumber)] :
 								null
 							) :
 							null
 						);
 
-			$resTaxon = ((string)$val->destinationtype=='taxon' ?  
-							(isset($species[(string)$val->destinationtaxonname]['id']) ?
-								$species[(string)$val->destinationtaxonname]['id']:
+			$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
+							(isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
+								$_SESSION['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
 								null
 							) : 
 							null
 						);
 
-			$fileName = isset($val->picturefilename) ? (string)$val->picturefilename : null;
+			$fileName = isset($val->picturefilename) ? trim((string)$val->picturefilename) : null;
 
 			if ($fileName && !file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
 
@@ -2102,7 +2280,7 @@ class ImportController extends Controller
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),
-					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[(string)$step->pagenumber]),
+					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]),
 					'show_order' => (1 + $i++),
 					'choice_img' => isset($fileName) ? $fileName : null,
 					'res_keystep_id' => $resStep,
@@ -2112,15 +2290,15 @@ class ImportController extends Controller
 
 			if (isset($val->captiontext)) {
 
-				$txt = $this->replaceOldMarkUp((string)$val->captiontext);
-				$p = (string)$step->pagenumber.(string)$val->choiceletter.'.';
+				$txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
+				$p = trim((string)$step->pagenumber).trim((string)$val->choiceletter).'.';
 				if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));
-				if (strlen($txt)==0) $txt = $this->replaceOldMarkUp((string)$val->captiontext);
+				if (strlen($txt)==0) $txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
 
 			} else
 			if (isset($val->picturefilename)) {
 
-				$txt = (string)$val->picturefilename;
+				$txt = trim((string)$val->picturefilename);
 			}
 	
 			$this->models->ChoiceContentKeystep->save(
@@ -2129,7 +2307,7 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),
 					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
 					'language_id' => $this->getNewDefaultLanguageId(),
-					'choice_txt' => $txt
+					'choice_txt' => isset($txt) ? $txt : null
 				)
 			);
 
@@ -2137,18 +2315,20 @@ class ImportController extends Controller
 
 	}
 
-	private function makeKey($d,$species)
+
+
+	private function addKeyDichotomous($obj,$node)
 	{
 
 		$stepAdd = 0;
 
-		if (count($d->text_key)==1) {
-	
+		if ($node == 'text_key') {
+
 			$keyStepIds = null;
 
 			// text key
 			// create steps first (no choices yet)
-			foreach($d->text_key->keypage as $key => $val) {
+			foreach($obj->keypage as $key => $val) {
 
 				$keyStepIds = $this->createKeyStep($val,$keyStepIds);
 				if ($key==0) $firstTxtStepId = current($keyStepIds);	
@@ -2156,9 +2336,9 @@ class ImportController extends Controller
 			}
 
 			// create choices
-			foreach($d->text_key->keypage as $key => $val) {
+			foreach($obj->keypage as $key => $val) {
 	
-				$this->createKeyStepChoices($val,$keyStepIds,$species);
+				$this->createKeyStepChoices($val,$keyStepIds);
 	
 			}
 
@@ -2168,18 +2348,23 @@ class ImportController extends Controller
 					'columns' => 'max(number) as `last`'
 				)
 			);
-
-			$stepAdd = $k[0]['last'];
+			
+			$_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key'] = $firstTxtStepId;
+			$_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'] = $keyStepIds;
+			$_SESSION['system']['import']['loaded']['key_dich']['stepAdd'] = $k[0]['last'];
 
 		}
 
-		if (count($d->pict_key)==1) {
+		if ($node == 'pict_key') {
+
+			$keyStepIds = $_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'];
+			$stepAdd = $_SESSION['system']['import']['loaded']['key_dich']['stepAdd'];
 
 			$pictStepIds = null;
 
 			// pict key
 			// create steps first (no choices yet)
-			foreach($d->pict_key->keypage as $key => $val) {
+			foreach($obj->keypage as $key => $val) {
 
 				$pictStepIds = $this->createKeyStep($val,$pictStepIds,$stepAdd);
 				if ($key==0) $firstPictStepId = current($pictStepIds);
@@ -2187,19 +2372,25 @@ class ImportController extends Controller
 			}
 
 			// create choices
-			foreach($d->pict_key->keypage as $key => $val) {
+			foreach($obj->keypage as $key => $val) {
 	
-				$this->createKeyStepChoices($val,$pictStepIds,$species);
+				$this->createKeyStepChoices($val,$pictStepIds);
 	
 			}
+			
+			$_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key'] = $firstPictStepId;
 
 		}
 
-		if (count($d->text_key)==1 && count($d->pict_key)==1) {
+		if ($_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key']!==false &&
+			$_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key']!==false) {
 
 			$keyStepIds = $this->createKeyStep('god',$keyStepIds);
+			
+			$firstTxtStepId = $_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key'];
+			$firstPictStepId = $_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key'];
 
-			end ($keyStepIds);
+			end($keyStepIds);
 
 			$this->models->ChoiceKeystep->save(
 				array(
@@ -2268,6 +2459,18 @@ class ImportController extends Controller
 		);
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 	private function resolveMatrices($d)
 	{
@@ -2557,7 +2760,7 @@ class ImportController extends Controller
 				} else {
 	
 					$failed[] = array(
-						'cause' => 'species "'.trim((string)$val->name).'" in identifyit does not exist and has been discarded',
+						'cause' => 'Species "'.trim((string)$val->name).'" in identifyit does not exist and has been discarded',
 						'data' => trim((string)$val->name)
 					);
 	
@@ -2761,6 +2964,45 @@ class ImportController extends Controller
 
 	}
 
+
+	/* auxiliray functions */
+	private function cRename($from,$to)
+	{
+	
+		//return rename($from,$to); // generates odd errors on some linux filesystems
+	
+		if(copy($from,$to)) {
+
+			if ($this->_deleteOldMediaAfterImport===true) @unlink($from);
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
+	private function makeMediaTargetPaths()
+	{
+	
+		$paths = $this->makePathNames($this->getNewProjectId());
+
+		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
+		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
+
+	}
+
+	private function replaceOldMarkUp($s,$removeNotReplace=false)
+	{
+	
+		$r = array('<b>','</b>','<i>','</i>','<br />', '<p>', '</p>');
+	
+		return str_replace(array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]'),($removeNotReplace ? null : $r),$s);
+	
+	}
 
 	private function resolveInternalLinks($s)
 	{
@@ -3128,7 +3370,7 @@ class ImportController extends Controller
 			
 				$failed[] = array(
 					'data' => $val,
-					'cause' => 'unable to resolve name "'.trim((string)$val->name).'" to taxon id'
+					'cause' => 'Unable to resolve name "'.trim((string)$val->name).'" to taxon id'
 				);
 			
 			}
@@ -3265,7 +3507,7 @@ class ImportController extends Controller
 
 						$failed[] = array(
 							'data' => $val,
-							'cause' => 'unable to resolve language "'.(string)$vVal->vernacular->language.'" to id'
+							'cause' => 'Unable to resolve language "'.(string)$vVal->vernacular->language.'" to id'
 						);
 		
 					}
@@ -3367,20 +3609,147 @@ class ImportController extends Controller
 			
 	}
 
+	private function ORG_resolveLiterature($d,$species)
+	{
+
+		foreach($d->proj_literature->proj_reference as $key => $val) {
+
+			$a = $this->fixAuthors((string)$val->literature_title);
+			$a['text'] = (string)$val->fullreference;
+			$okSp = $unSp = null;
+
+			if ($val->keywords->keyword) {
+
+				foreach($val->keywords->keyword as $kKey => $kVal) {
+
+					// apparently we're skipping literature that is not related to species or higher taxa
+					if (preg_match('/\[m\](Species|Higher taxa)\[\/m\]/i',(string)$kVal->name)==0) continue;
+	
+					$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks((string)$kVal->name),true);
+
+					if (isset($species[$speciesName])) {
+
+						$okSp[] = $species[$speciesName]['id'];
+	
+					} else
+					if (strpos($speciesName,' ')!==false) {
+					
+						$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
+	
+						if (isset($species[$speciesNameSplit])) {
+						
+							$okSp[] = $species[$speciesNameSplit]['id'];
+
+						} else {
+
+							$unSp[] = $speciesName;
+
+						}
+
+					} else {
+
+						$unSp[] = $speciesName;
+	
+					}
+	
+				}
+				
+			}
+
+			$a['references'] = array('species' => $okSp,'unknown_species' => $unSp);
+
+			$res[] = $a;
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function ORG_addLiterature($d)
+	{
+
+		$lit = $ref = 0;
+		$litFail = $refFail = 0;
+
+		foreach($d as $key => $val) {
+
+			$l = $this->models->Literature->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getNewProjectId(),				
+					'author_first' => isset($val['author_1']) ? $val['author_1'] : null,
+					'author_second' => (isset($val['author_2']) && $val['multiple_authors']==false) ? $val['author_2'] : null,
+					'multiple_authors' => $val['multiple_authors']==true ? 1 : 0,
+					'year' => (isset($val['year'])  && $val['valid_year'] == true) ? $val['year'].'-00-00' : '0000-00-00',
+					'suffix' => isset($val['suffix']) ? $val['suffix'] : null,
+					'text' => isset($val['text']) ? $val['text'] : null,
+				)
+			);
+
+			if ($l===false) {
+
+				$litFail++;
+				continue;
+
+			} else {
+		
+				$lit++;
+
+			}
+
+			$_SESSION['system']['import']['literature'][$key]['id'] = $id = $this->models->Literature->getNewId();
+
+			foreach((array)$val['references']['species'] as $kV) {
+			
+				if (empty($kV)) {
+
+					$refFail++;
+
+					continue;
+
+				}
+
+				$lt = $this->models->LiteratureTaxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),				
+						'taxon_id' => $kV,
+						'literature_id' => $id,
+					)
+				);
+
+				if ($lt===false)
+					$refFail++;
+				else
+					$ref++;
+
+			}
+
+		}
+
+		return array(
+			'lit' => $lit,
+			'ref' => $ref,
+			'litFail' => $litFail,
+			'refFail' => $refFail,
+		);
+
+	}
 
 	public function l2SecondaryAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('l2_start.php');
-		if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('l2_start.php');
+		//if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('l2_start.php');
+		//if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('l2_start.php');
 
-		$p = $this->getNewProjectId();
-		$project = $this->getProjects($p);
+		//$p = $this->getNewProjectId();
+		//$project = $this->getProjects($p);
 
-        $this->setPageName(_('Additional data for "'.$project['title'].'"'));
+        //$this->setPageName(_('Additional data for "'.$project['title'].'"'));
 
-		$d = simplexml_load_string($_SESSION['system']['import']['raw']);
-		$species = $_SESSION['system']['import']['loaded']['species'];
+		//$d = simplexml_load_string($_SESSION['system']['import']['raw']);
+		//$species = $_SESSION['system']['import']['loaded']['species'];
 
 		// getProjectContent: 'Introduction' (= Welcome) and 'Contributors'  (= Welcome)
 //		if (!isset($_SESSION['system']['import']['content']))
@@ -3388,15 +3757,15 @@ class ImportController extends Controller
 //		else
 //			$welcomeContrib = $_SESSION['system']['import']['content'];
 
-		if (!isset($_SESSION['system']['import']['literature']))
-			$_SESSION['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
-		else
-			$literature = $_SESSION['system']['import']['literature'];
+//		if (!isset($_SESSION['system']['import']['literature']))
+//			$_SESSION['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
+//		else
+//			$literature = $_SESSION['system']['import']['literature'];
 
-		if (!isset($_SESSION['system']['import']['glossary']))
-			$_SESSION['system']['import']['glossary'] = $glossary = $this->resolveGlossary($d);
-		else
-			$glossary = $_SESSION['system']['import']['glossary'];
+//		if (!isset($_SESSION['system']['import']['glossary']))
+//			$_SESSION['system']['import']['glossary'] = $glossary = $this->resolveGlossary($d);
+//		else
+//			$glossary = $_SESSION['system']['import']['glossary'];
 
 		// getAdditionalContent: multiple topics (= Introduction)
 //		if (!isset($_SESSION['system']['import']['additionalContent']))
@@ -3414,7 +3783,7 @@ class ImportController extends Controller
 			$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 		
 			ini_set('max_execution_time',600);
-
+/*
 			if ($this->rHasVal('literature','on')) {
 
 				$res = $this->addLiterature($literature);
@@ -3440,6 +3809,7 @@ class ImportController extends Controller
 				$this->grantModuleAccessRights(2);
 
 			}
+*/
 /*
 			if ($this->rHasVal('taxon_media','on')) {
 
@@ -3455,6 +3825,7 @@ class ImportController extends Controller
 
 			}
 */
+/*
 			if ($this->rHasVal('key_dich','on')) {
 
 				$this->makeKey($d,$species);
@@ -3492,7 +3863,7 @@ class ImportController extends Controller
 				$this->grantModuleAccessRights(7);
 
 			}
-
+*/
 /*			
 			if ($this->rHasVal('taxon_overview','on')) {
 
@@ -3569,7 +3940,7 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('additional_content','on')) {
 
-				$res = $this->addAdditionalContent($introductionContent);
+				$res = $this->addIntroduction($introductionContent);
 
 			}
 */
@@ -3619,3 +3990,5 @@ class ImportController extends Controller
 	}
 
 }
+
+//$_SESSION['system']['import']['loaded']['species']

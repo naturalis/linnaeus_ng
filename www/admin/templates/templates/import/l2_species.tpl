@@ -2,20 +2,6 @@
 {include file="../shared/admin-messages.tpl"}
 {assign var=process value=true}
 {literal}
-<style>
-.error {
-	color:red;
-}
-.fixed-error {
-	color:#FF9900;
-}
-.info {
-	color:#308;
-}
-.minor {
-	color:#888;
-}
-</style>
 <script>
 function toggleAllValid() {
 
@@ -41,8 +27,8 @@ function checkForm() {
 {/literal}
 <div id="page-main">
 {if $processed==true}
-Basic data has been loaded. Click the link below to process additional data (keys, literature, glossary, etc.)<br />
-<a href="l2_species_data.php">Process additional data</a>
+Basic data has been loaded. Click the link below to import additional data (keys, literature, glossary, etc.)<br />
+<a href="l2_species_data.php">Import additional data</a>
 {else}
 Review the data below and press "save" to save it to the database. In the following step, data dependent on the newly saved species will be loaded. You will have to complete that step in the same session so DO NOT LOG OUT OR CLOSE YOUR BROWSER before the entire process is complete, unless you only want to load species.
 
@@ -148,10 +134,6 @@ Found {$i} "healthy" species that will be loaded<br />
 <input type="button" value="{t}Save{/t}" onclick="checkForm()" />
 </form>
 {/if}
-<p>
-<a href="l2_start.php">back</a>
-</p>
-
 </div>
 
 {include file="../shared/admin-footer.tpl"}

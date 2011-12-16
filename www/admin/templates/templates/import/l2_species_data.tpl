@@ -3,7 +3,7 @@
 <div id="page-main">
 {if $processed==true}
 <p>
-XYZ
+<a href="l2_literature_glossary.php">Import literature and glossary</a>
 </p>
 {else}
 Select which elements you wish to import and click "Import".<br />
@@ -29,10 +29,6 @@ You specified no media import.</span>
 <input type="submit" value="{t}Import{/t}" />
 </form>
 {/if}
-<p>
-<a href="l2_start.php">back</a>
-</p>
-
 </div>
 
 {include file="../shared/admin-footer.tpl"}
