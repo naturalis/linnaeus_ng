@@ -7,3 +7,7 @@
 .minor {
 	color:#888;
 }
+
+#page-block-messages,#page-block-errors {
+	width: 700px;
+}

@@ -5,19 +5,17 @@
 <div id="page-main">
 {if $processed==true}
 <p>
-<a href="l2_keys.php">Import keys</a>
+<a href="l2_content.php">Import introduction and additional content</a>
 </p>
 {else}
-<b>Welcome, contributors and introduction.</b>
+<b>Literature and glossary</b>
 <form method="post">
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
-
 <p>
-<label>Import welcome and contributors text?&nbsp;&nbsp;<input type="checkbox" name="welcome" checked="checked"></label><br />
-<label>Import introduction?&nbsp;&nbsp;<input type="checkbox" name="introduction" checked="checked"></label><br />
+<label>Import literary references?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label><br />
+<label>Import glossary items?&nbsp;&nbsp;<input type="checkbox" name="glossary" checked="checked"></label>
 </p>
-
 <input type="submit" value="import" />
 </form>
 {/if}
