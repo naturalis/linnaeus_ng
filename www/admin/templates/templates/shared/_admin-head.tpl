@@ -18,8 +18,8 @@
 		@import url("{$baseUrl}admin/style/{$cssToLoad[i]}");
 {/section}
 {/if}
-{if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
-{/if}
+{* if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
+{/if *}
 	</style>
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>

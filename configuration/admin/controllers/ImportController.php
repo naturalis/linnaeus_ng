@@ -788,34 +788,44 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('key_matrix','on')) {
 
-					$_SESSION['system']['import']['loaded']['key_matrix']['show_order'] = 0;
-					$_SESSION['system']['import']['loaded']['key_matrix']['saved'] = array();
+					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'] = null;
 					$_SESSION['system']['import']['loaded']['key_matrix']['failed'] = array();
 
-					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrix'));
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrixResolve'));
 
-					$this->helpers->XmlParser->getNodes('topic');
-
-					$this->addModuleToProject(7);
-					$this->grantModuleAccessRights(7);
-	
-					$this->addMessage('NOT YET Created matrix key(s).');
-
-					if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['saved'])!==0) {
-		
-						foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['saved'] as $val)
-							$this->addMessage($val);
-		
-					}
-
-					if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'])!==0) {
-		
-						foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'] as $val)
-							$this->addError($val);
-		
-					}
+					$this->helpers->XmlParser->getNodes('taxondata');
 					
-					unset($_SESSION['system']['import']['loaded']['key_matrix']['show_order']);
+					if (isset($_SESSION['system']['import']['loaded']['key_matrix']['matrices'])) {
+
+						$m = $this->saveMatrices($_SESSION['system']['import']['loaded']['key_matrix']['matrices']);
+	
+						if (isset($m['failed'])) foreach ((array)$m['failed'] as $val) $this->addError($val['cause']);
+	
+						$_SESSION['system']['import']['loaded']['key_matrix']['matrices'] = $m['matrices'];
+	
+						$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrixConnect'));
+	
+						$this->helpers->XmlParser->getNodes('taxondata');
+	
+						if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'])!==0) {
+			
+							foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'] as $val)
+								$this->addError($val['cause']);
+			
+						}
+	
+						$this->addModuleToProject(7);
+						$this->grantModuleAccessRights(7);
+		
+						$this->addMessage('Created matrix key(s).');
+	
+						unset($_SESSION['system']['import']['loaded']['key_matrix']['matrices']);
+
+					} else {
+
+						$this->addMessage('No matrix key found.');
+
+					}
 
 				} else {
 				
@@ -828,6 +838,67 @@ class ImportController extends Controller
 			$this->smarty->assign('processed',true);
 
 		}
+
+        $this->printPage();
+
+	}
+
+	public function l2MapAction()
+	{
+
+		if (
+			!isset($_SESSION['system']['import']['file']['path']) ||
+			!isset($_SESSION['system']['import']['loaded']['species'])
+		) $this->redirect('l2_start.php');
+
+		$project = $this->getProjects($this->getNewProjectId());
+
+        $this->setPageName(_('Map data for "'.$project['title'].'"'));
+
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+
+			set_time_limit(900);
+
+			if ($this->rHasVal('map_items','on')) {
+
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+
+					$_SESSION['system']['import']['loaded']['map']['maps'] = null;
+					$_SESSION['system']['import']['loaded']['map']['types'] = null;
+					$_SESSION['system']['import']['loaded']['map']['saved'] = 0;
+					$_SESSION['system']['import']['loaded']['map']['failed'] = 0;
+					$_SESSION['system']['import']['loaded']['map']['skipped'] = 0;
+
+					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
+
+					$this->loadControllerConfig('MapKey');
+		
+					$this->helpers->XmlParser->getNodes('taxondata');
+
+					$this->loadControllerConfig();
+	
+					$this->addModuleToProject(8);
+					$this->grantModuleAccessRights(8);
+
+					$this->addMessage(
+						'Imported '.
+						$_SESSION['system']['import']['loaded']['map']['saved'].
+						' map items (skipped '.
+						$_SESSION['system']['import']['loaded']['map']['skipped'].
+						', failed '.$_SESSION['system']['import']['loaded']['map']['failed'].').'
+					);
+					
+					unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+
+				} else {
+
+					$this->addMessage('Skipped map.');
+
+				}
+
+				$this->smarty->assign('processed',true);
+			}
+			
 
         $this->printPage();
 
@@ -898,14 +969,24 @@ class ImportController extends Controller
 
 	}
 
-	public function xmlParserCallback_KeyMatrix($obj)
+	public function xmlParserCallback_KeyMatrixResolve($obj)
 	{
 
-	return;
-				$m = $this->resolveMatrices($d);
-				$m = $this->saveMatrices($m);
-				$failed = $this->connectMatrices($d,$m['matrices'],$species);
-		$this->addIntroduction($obj);
+		$this->resolveMatrices($obj);
+
+	}
+
+	public function xmlParserCallback_KeyMatrixConnect($obj)
+	{
+
+		$this->connectMatrices($obj);
+
+	}
+
+	public function xmlParserCallback_Map($obj)
+	{
+
+		$this->saveMapItem($obj);
 
 	}
 
@@ -2315,8 +2396,6 @@ class ImportController extends Controller
 
 	}
 
-
-
 	private function addKeyDichotomous($obj,$node)
 	{
 
@@ -2460,83 +2539,64 @@ class ImportController extends Controller
 
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-	private function resolveMatrices($d)
+	// matrix key
+	private function resolveMatrices($obj)
 	{
 
-		$matrices = null;
+		$matrixname = !empty($obj->identify->id_file->filename) ? trim((string)$obj->identify->id_file->filename) : null;
 
-		foreach($d->records->taxondata as $val) {
+		if ($matrixname) {
 
-			$matrixname = !empty($val->identify->id_file->filename) ? (string)$val->identify->id_file->filename : null;
+			//?? (string)$obj->identify->id_file->obj_link
 
-			if ($matrixname) {
+			$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_replace('.adm','',$matrixname);
 
-				//?? (string)$val->identify->id_file->obj_link
+			foreach($obj->identify->id_file->characters->character_ as $char) {
 
-				$matrices[$matrixname]['name'] = str_replace('.adm','',$matrixname);
+				//character_type ?? welke mogelijkheden + resolvement: Text 
 
-				foreach($val->identify->id_file->characters->character_ as $char) {
+				$charname = trim((string)$char->character_name);
+				$chartype = trim((string)$char->character_type);
+				
+				foreach($char->states->state as $stat) {
 
-					//character_type ?? welke mogelijkheden + resolvement: Text 
+					$statename = trim((string)$stat->state_name);
+					$statemin = trim((string)$stat->state_min);
+					$statemax = trim((string)$stat->state_max);
+					$statemean = trim((string)$stat->state_mean);
+					$statesd = trim((string)$stat->state_sd);
+					$statefile = trim((string)$stat->state_file);
 
-					$charname = (string)$char->character_name;
-					$chartype = (string)$char->character_type;
-					
-					foreach($char->states->state as $stat) {
+					//stat->state_file; immer leeg
 
-						$statename = (string)$stat->state_name;
-						$statemin = (string)$stat->state_min;
-						$statemax = (string)$stat->state_max;
-						$statemean = (string)$stat->state_mean;
-						$statesd = (string)$stat->state_sd;
-						$statefile = (string)$stat->state_file;
-
-						//stat->state_file; immer leeg
-
-						$adHocIndex = 
-							md5(
-								$matrixname.
-								$charname.
-								$statename.
-								$statemin.
-								$statemax.
-								$statemean.
-								$statesd.
-								$statefile
-							);
-
-						$matrices[$matrixname]['characteristics'][$charname]['charname'] = $charname;
-						$matrices[$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
-						$matrices[$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
-							'statename'=>$statename,
-							'statemin'=>$statemin,
-							'statemax'=>$statemax,
-							'statemean'=>$statemean,
-							'statesd'=>$statesd,
-							'statefile'=>$statefile,
+					$adHocIndex = 
+						md5(
+							$matrixname.
+							$charname.
+							$statename.
+							$statemin.
+							$statemax.
+							$statemean.
+							$statesd.
+							$statefile
 						);
 
-					}
+					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['charname'] = $charname;
+					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
+					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
+						'statename'=>$statename,
+						'statemin'=>$statemin,
+						'statemax'=>$statemax,
+						'statemean'=>$statemean,
+						'statesd'=>$statesd,
+						'statefile'=>$statefile,
+					);
 
 				}
 
 			}
 
 		}
-
-		return $matrices;
 
 	}
 
@@ -2563,7 +2623,7 @@ class ImportController extends Controller
 
 	private function saveMatrices($m)
 	{
-
+		
 		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 		
 		$d = $error = null;
@@ -2687,285 +2747,254 @@ class ImportController extends Controller
 
 	}
 
-	private function connectMatrices($d,$statelist,$species)
+	private function connectMatrices($obj)
 	{
 
-		foreach($d->records->taxondata as $val) {
+		$matrixname = !empty($obj->identify->id_file->filename) ? trim((string)$obj->identify->id_file->filename) : null;
 
-			$matrixname = (string)$val->identify->id_file->filename;
+		if ($matrixname) {
 
-			if ($matrixname) {
+			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
 
-				if (isset($species[trim((string)$val->name)]['id'])) {
+				$taxonid = $_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
 
-					$taxonid = $species[trim((string)$val->name)]['id'];
+				foreach($obj->identify->id_file->characters->character_ as $char) {
 
-					foreach($val->identify->id_file->characters->character_ as $char) {
-	
-						$charname = (string)$char->character_name;
-						
-						foreach($char->states->state as $stat) {
-	
-							$statename = (string)$stat->state_name;
-							$statemin = (string)$stat->state_min;
-							$statemax = (string)$stat->state_max;
-							$statemean = (string)$stat->state_mean;
-							$statesd = (string)$stat->state_sd;
-							$statefile = (string)$stat->state_file;
-	
-							$adHocIndex = 
-								md5(
-									$matrixname.
-									$charname.
-									$statename.
-									$statemin.
-									$statemax.
-									$statemean.
-									$statesd.
-									$statefile
-								);
-	
-							if (isset($statelist[$adHocIndex])) {
-
-								$this->models->MatrixTaxon->setNoKeyViolationLogging(true);
-
-								$this->models->MatrixTaxon->save(
-									array(
-										'id' => null,
-										'project_id' => $this->getNewProjectId(),
-										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
-										'taxon_id' => $taxonid,
-									)
-								);
-
-								$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
-
-								$this->models->MatrixTaxonState->save(
-									array(
-										'id' => null,
-										'project_id' => $this->getNewProjectId(),
-										'matrix_id' => $statelist[$adHocIndex]['matrix_id'],
-										'characteristic_id' => $statelist[$adHocIndex]['characteristic_id'],
-										'state_id' => $statelist[$adHocIndex]['state_id'],
-										'taxon_id' => $taxonid,
-									)
-								);
+					$charname = trim((string)$char->character_name);
 					
-							}
-	
-						}
-	
-					}
-	
-				} else {
-	
-					$failed[] = array(
-						'cause' => 'Species "'.trim((string)$val->name).'" in identifyit does not exist and has been discarded',
-						'data' => trim((string)$val->name)
-					);
-	
-				}
+					foreach($char->states->state as $stat) {
 
-			} // not part of any matrix
+						$adHocIndex = 
+							md5(
+								$matrixname.
+								$charname.
+								trim((string)$stat->state_name).
+								trim((string)$stat->state_min).
+								trim((string)$stat->state_max).
+								trim((string)$stat->state_mean).
+								trim((string)$stat->state_sd).
+								trim((string)$stat->state_file)
+							);
 
-		}
+						if (isset($_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex])) {
 
-		return isset($failed) ? $failed : null;
+							$this->models->MatrixTaxon->setNoKeyViolationLogging(true);
 
-	}
-
-	private function getMapItems($d,$species)
-	{
-	
-		$maps = $occurrences = $types = null;
-		$total = 0;
-	
-		foreach($d->records->taxondata as $key => $val) {
-
-			if (isset($species[trim((string)$val->name)]['id'])) {
-			
-				if (!isset($val->distribution)) continue;
-				
-				$taxonId = $species[trim((string)$val->name)]['id'];
-
-				foreach($val->distribution->map as $vKey => $vVal) {
-				
-					if (!isset($maps[(string)$vVal->mapname])) {
-
-						$maps[(string)$vVal->mapname] = array(
-							'label' => (string)$vVal->mapname,
-							'specs' => (string)$vVal->specs
-						);
-
-						$d = explode(',',(string)$vVal->specs);
-						$maps[(string)$vVal->mapname]['coordinates'] = array(
-							'topLeft' => array('lat' => (int)$d[0],'long' => (-1 * $d[1])),
-							'bottomRight' => array('lat' => (int)$d[2],'long' => (-1 * $d[3]))
-						);		
-						$maps[(string)$vVal->mapname]['square'] = array('width' => (int)$d[4],'height' => (int)$d[5]);		
-						$maps[(string)$vVal->mapname]['widthInSquares'] = (int)($d[1] - $d[3]) / $d[4];
-						$maps[(string)$vVal->mapname]['heightInSquares'] = (int)($d[0] - $d[2]) / $d[5];
-					}
-					
-					foreach($vVal->squares->square as $sKey => $sVal) {
-
-						$types[(string)$sVal->legend] = (string)$sVal->legend;
-
-						$row = floor((string)$sVal->number / $maps[(string)$vVal->mapname]['widthInSquares']);
-						$col = (string)$sVal->number % $maps[(string)$vVal->mapname]['widthInSquares'];
-
-						/*
-				
-							<mapname>North Atlantic</mapname>
-							<specs>90,100,0,-80,5,5</specs>
-							
-							90,100 = linksboven = 90°N 100°W = 90 -100
-							0, -80 = rechtonder = 0°S 80°E = -0 80
-							5,5 - cell size (ASSUMING WxH)
-				
-						*/
-
-						$occurrences[$taxonId][] = array(
-							'taxonId' => $taxonId,
-							'map' => (string)$vVal->mapname,
-							'square' => (string)$sVal->number,
-							'legend' => (string)$sVal->legend,
-							'nodes' =>
+							$this->models->MatrixTaxon->save(
 								array(
-									array(
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[(string)$vVal->mapname]['square']['height']),
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[(string)$vVal->mapname]['square']['width'])
-									),
-									array(
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[(string)$vVal->mapname]['square']['height']),
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + ($col * $maps[(string)$vVal->mapname]['square']['width'])
-									),
-									array(
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[(string)$vVal->mapname]['square']['height']),
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + ($col * $maps[(string)$vVal->mapname]['square']['width'])
-									),				
-									array(
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[(string)$vVal->mapname]['square']['height']),
-										$maps[(string)$vVal->mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[(string)$vVal->mapname]['square']['width'])
-									)
+									'id' => null,
+									'project_id' => $this->getNewProjectId(),
+									'matrix_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
+									'taxon_id' => $taxonid,
 								)
-						);
-						
-						$total++;
+							);
+
+							$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+
+							$this->models->MatrixTaxonState->save(
+								array(
+									'id' => null,
+									'project_id' => $this->getNewProjectId(),
+									'matrix_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
+									'characteristic_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['characteristic_id'],
+									'state_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['state_id'],
+									'taxon_id' => $taxonid,
+								)
+							);
+				
+						}
 
 					}
 
 				}
 
-			}
+			} else {
 
-		}
-
-		return array(
-			'maps' => $maps,
-			'occurrences' => $occurrences,
-			'types' => $types,
-			'total' => $total
-		);
-			
-	}
-
-	private function saveMapItemTypes($types)
-	{
-	
-		$colours = array('00FFFF','000000','0000FF','8A2BE2','A52A2A','DEB887','5F9EA0','7FFF00','FF00FF','00FA9A');
-		
-		$i = 0;
-
-		foreach((array)$types as $key => $val) {
-
-			$this->models->GeodataType->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'colour' => $colours[$i++ % 10]
-				)
-			);
-
-			$d[$key] = array('id' => $this->models->GeodataType->getNewId(),'title' => $key);
-
-			$this->models->GeodataTypeTitle->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'type_id' => $d[$key]['id'],
-					'title' => $val
-				)
-			);
-	
-		}
-
-		return $d;
-
-	}
-
-	private function saveMapItems($p,$types)
-	{
-
-		if (!isset($p['occurrences'])) return;
-
-		$this->loadControllerConfig('MapKey');
-		
-		$saved = 0;
-		$failed = array();
-
-		foreach((array)$p['occurrences'] as $key => $val) {
-
-			foreach((array)$val as $occurrence) {
-
-				$taxonId = $occurrence['taxonId'];
-				
-				if (!$taxonId) continue;
-	
-				$nodes = $occurrence['nodes'];
-				
-				if (count((array)$nodes)<=2) continue;
-	
-				$type_id = isset($types[$occurrence['legend']]['id']) ? $types[$occurrence['legend']]['id'] : null;
-				
-				if (!$type_id) continue;
-				
-				// remove the last node if it is identical to the first, just in case
-				if ($nodes[0]==$nodes[count((array)$nodes)-1]) array_pop($nodes);
-	
-				// create a string for mysql (which does require the first and last to be the same)
-				$geoStr = array();
-				foreach((array)$nodes as $sVal) $geoStr[] = $sVal[0].' '.$sVal[1];
-				$geoStr = implode(',',$geoStr).','.$geoStr[0];
-
-				$this->models->OccurrenceTaxon->setNoKeyViolationLogging(true);
-	
-				$d = $this->models->OccurrenceTaxon->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $taxonId,
-						'type_id' => $type_id,
-						'type' => 'polygon',
-						'boundary' => "#GeomFromText('POLYGON((".$geoStr."))',".$this->controllerSettings['SRID'].")",
-						'boundary_nodes' => json_encode($nodes),
-						'nodes_hash' => md5(json_encode($nodes))
-					)
+				$_SESSION['system']['import']['loaded']['key_matrix']['failed'][] = array(
+					'cause' => 'Species "'.trim((string)$obj->name).'" in matrix key does not exist and has been discarded',
+					'data' => trim((string)$obj->name)
 				);
-	
-				if ($d===true) $saved++; else $failed[]=$d;
-				
+
 			}
 
-		}
+		} // not part of any matrix
 
-		return array('failed' => $failed, 'saved' => $saved);
+	}
+
+	// map
+	private function saveMapItemType($type)
+	{
+	
+		$this->models->GeodataType->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),
+				'colour' => 'FFFFFF'
+			)
+		);
+
+		$id = $this->models->GeodataType->getNewId();
+
+		$this->models->GeodataTypeTitle->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),
+				'language_id' => $this->getNewDefaultLanguageId(),
+				'type_id' => $id,
+				'title' => $type
+			)
+		);
+	
+		return $id;
+
+	}
+
+	private function doSaveMapItem($occurrence)
+	{
+
+		if (
+			(!$occurrence['taxonId']) ||
+			(count((array)$occurrence['nodes'])<=2) ||
+			(!$occurrence['typeId'])
+		) {
+
+			$_SESSION['system']['import']['loaded']['map']['skipped']++;
+			return;
+
+		}
+				
+		// remove the last node if it is identical to the first, just in case
+		if ($occurrence['nodes'][0]==$occurrence['nodes'][count((array)$occurrence['nodes'])-1]) array_pop($occurrence['nodes']);
+	
+		// create a string for mysql (which does require the first and last to be the same)
+		$geoStr = array();
+		foreach((array)$occurrence['nodes'] as $sVal) $geoStr[] = $sVal[0].' '.$sVal[1];
+		$geoStr = implode(',',$geoStr).','.$geoStr[0];
+
+		$this->models->OccurrenceTaxon->setNoKeyViolationLogging(true);
+	
+		$d = $this->models->OccurrenceTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getNewProjectId(),
+				'taxon_id' => $occurrence['taxonId'],
+				'type_id' => $occurrence['typeId'],
+				'type' => 'polygon',
+				'boundary' => "#GeomFromText('POLYGON((".$geoStr."))',".$this->controllerSettings['SRID'].")",
+				'boundary_nodes' => json_encode($occurrence['nodes']),
+				'nodes_hash' => md5(json_encode($occurrence['nodes']))
+			)
+		);
+		
+		if ($d===true)
+			$_SESSION['system']['import']['loaded']['map']['saved']++;
+		else
+			$_SESSION['system']['import']['loaded']['map']['failed']++;
 
 	}
 
 
-	/* auxiliray functions */
+	private function saveMapItem($obj)
+	{
+	
+		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
+		
+			if (!isset($obj->distribution)) return;
+			
+			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
+
+			foreach($obj->distribution->map as $vKey => $vVal) {
+
+				if (!isset($_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)])) {
+
+					$d = explode(',',trim((string)$vVal->specs));
+
+					$_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
+						array(
+							'label' => trim((string)$vVal->mapname),
+							'specs' => trim((string)$vVal->specs),
+							'coordinates' =>
+								array(
+									'topLeft' => array('lat' => (int)$d[0],'long' => (-1 * $d[1])),
+									'bottomRight' => array('lat' => (int)$d[2],'long' => (-1 * $d[3]))
+								),
+							'square' => array('width' => (int)$d[4],'height' => (int)$d[5]),
+							'widthInSquares' => ((int)($d[1] - $d[3]) / $d[4]),
+							'heightInSquares' => ((int)($d[0] - $d[2]) / $d[5])
+						);
+				}
+				
+				$maps = $_SESSION['system']['import']['loaded']['map']['maps'];
+				
+				foreach($vVal->squares->square as $sKey => $sVal) {
+
+					if (!isset($_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
+						$_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
+
+					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
+
+					$col = trim((string)$sVal->number) % $maps[trim((string)$vVal->mapname)]['widthInSquares'];
+					if ($col==0) $col = $maps[trim((string)$vVal->mapname)]['widthInSquares'];
+
+					/*
+			
+						<mapname>North Atlantic</mapname>
+						<specs>90,100,0,-80,5,5</specs>
+						
+						90,100 = linksboven = 90°N 100°W = 90 -100
+						0, -80 = rechtonder = 0°S 80°E = -0 80
+						5,5 - cell size (ASSUMING WxH)
+			
+					*/
+					
+					$mapname = trim((string)$vVal->mapname);
+
+					$occurrence = array(
+						'taxon' => trim((string)$obj->name),
+						'taxonId' => $taxonId,
+						'map' => $mapname,
+						'square' => trim((string)$sVal->number),
+						'row' => $row,
+						'col' => $col,
+						'legend' => trim((string)$sVal->legend),
+						'typeId' => $_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
+						'nodes' =>
+							array(
+								array(
+									$maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']),
+									$maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width'])
+								),
+								array(
+									$maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']),
+									$maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width'])
+								),
+								array(
+									$maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']),
+									$maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width'])
+								),				
+								array(
+									$maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']),
+									$maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width'])
+								)
+							)
+					);
+					
+					$this->doSaveMapItem($occurrence);
+
+				}
+
+			}
+
+		} else {
+		
+			// unknown species
+		
+		}
+
+	}
+
+
+	/* auxiliry functions */
 	private function cRename($from,$to)
 	{
 	
@@ -3960,8 +3989,6 @@ class ImportController extends Controller
 
 				$this->addMessage('Loaded geo data (saved '.$m['saved'].', failed '.count((array)$m['failed']).').');
 
-				$this->addModuleToProject(8);
-				$this->grantModuleAccessRights(8);
 
 			}
 
