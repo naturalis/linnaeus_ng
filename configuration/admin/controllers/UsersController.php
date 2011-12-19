@@ -1845,7 +1845,8 @@ MUST CHECK
 				'plain' => $plain,
 				'html' => $html,
 				'smtp_server' => $this->controllerSettings['email']['smtp_server'],
-				'mail_name' => $mailName
+				'mail_name' => $mailName,
+				'debug' => true
 			);
 
 	}

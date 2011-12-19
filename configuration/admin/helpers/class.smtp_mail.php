@@ -40,7 +40,7 @@
     }
 
     function error_message() {
-      //echo "SMTP protocol failure (".$this->lastmsg.").<br>";
+      if ($this->debug)  echo "SMTP protocol failure (".$this->lastmsg.")".chr(10);
     }
 
     function crlf_encode($data) {
@@ -80,8 +80,6 @@
 
     }
 
-    // connect() connects to an SMTP server on the well-know port 25
-
     function connect($hostname) {
       $ret = false;
       $this->fp = @fsockopen($hostname, 25);
@@ -95,8 +93,11 @@
     // list of reciepients is expected in $to
 
     function send_email($hostname, $from, $to, $data, $crlf_encode = 0) {
+
+      if ($this->debug) echo '<!-- smtp_mail class debug:'.chr(10).chr(10);
+	  
       if(!$this->connect($hostname)) {
-        //echo "connot open socket<br>\n";
+        if ($this->debug) echo 'cannot open socket'.chr(10);
         return false;
       }
 
@@ -113,6 +114,8 @@
         $this->error_message();
       }
       fclose($this->fp);
+
+		if ($this->debug) echo chr(10).chr(10).'-->'.chr(10);
 
       return $ret;
     }
