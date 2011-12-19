@@ -117,19 +117,6 @@
 	</td>
 	</tr>
 	<tr>
-		<td>{t}Language:{/t}</td>
-		<td><input 
-				type="text" 
-				name="language" 
-				id="language" 
-				value="{$data.language}" 
-				maxlength="16"
-			/>
-			<span id="language-message" class=""></span>
-		</td>
-	</td>
-	</tr>
-	<tr>
 		<td>{t}Send e-mail notifications:{/t}</td>
 		<td>
 			<label for="email_notifications-y">
