@@ -173,9 +173,9 @@ class configuration
 					),
 				'email' =>
 					array(
-						'smtp_server' => 'smtp.eti.uva.nl',
+						'smtp_server' => '145.18.162.61', // 'smtp.eti.uva.nl',
 						'mailfrom_address' => 'linnaeus@eti.uva.nl',
-						'mailfrom_name' => 'Linnaeus NG',
+						'mailfrom_name' => 'linnaeus-system',
 						'mails' =>
 							array(
 								'newuser' =>

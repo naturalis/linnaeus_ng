@@ -8,12 +8,11 @@
 <a href="l2_map.php">Import map data</a>
 </p>
 {else}
-<b>Dichotomous and matrix keys</b>
 <form method="post">
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
-<b>Keys</b><br/>
+<b>Dichotomous and matrix keys</b><br />
 <label>Import dichotomous key(s)?&nbsp;&nbsp;<input type="checkbox" name="key_dich" checked="checked"></label><br />
 <label>Import matrix key(s)?&nbsp;&nbsp;<input type="checkbox" name="key_matrix" checked="checked"></label><br />
 </p>

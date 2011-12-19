@@ -591,14 +591,14 @@ class Controller extends BaseClass
 
         if (!empty($_SESSION['login_start_page'])) {
             
-            return ($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').$_SESSION['login_start_page'];
+            return ($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').$_SESSION['login_start_page'];
         
         } else {
 
             if (isset($_SESSION["user"]) && $_SESSION["user"]["_number_of_projects"]==1) {
 
                 return
-					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').
+					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').
 					$this->baseUrl.
 					$this->getAppName().'/'.
 					$this->getAppName().
@@ -607,7 +607,7 @@ class Controller extends BaseClass
             } else {
 
                 return
-					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'] : '').
+					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').
 					$this->baseUrl . 
 					$this->appName . 
 					$this->generalSettings['paths']['chooseProject'];

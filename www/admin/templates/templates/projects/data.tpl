@@ -43,14 +43,14 @@
 		{/if}
 		</td>
 	</tr>
-	<tr>
+	{* <tr>
 		<td>
 			{t}CSS url:{/t}
 		</td>
 		<td colspan="2">
 			<input type="text" name="css_url" value="{$data.css_url}" style="width:300px;" />
 		</td>
-	</tr>
+	</tr> *}
 	<tr style="vertical-align:top">
 		<td>
 			{t}Project languages:{/t}
