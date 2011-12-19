@@ -668,20 +668,18 @@ class UsersController extends Controller
                     $this->requestData['active'] = $d;
 					
                     $this->addMessage(_('User data saved'));
-                
+
                 }
                 // user cannot be saved
                 else {
-                    
                     $user = $this->requestData;
                 
                 }
             
             }
             
-            // assign all data and print success or errors
-            $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
-            
+			if(!isset($user)) $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
+
             $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
             
             $roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
@@ -1916,6 +1914,68 @@ MUST CHECK
 		return $pass;
 
 	}
+
+	public function rightsMatrixAction()
+	{
+	
+        $this->checkAuthorisation(true);
+
+        $this->setPageName(_('Rights matrix'));
+
+		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit()) {
+
+			$d = $this->models->RightRole->_get(
+				array(
+					'id' => array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role'])
+				)
+			);
+			
+			if (isset($d)) {
+
+				$this->models->RightRole->delete(array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role']));
+
+			} else {
+
+				$this->models->RightRole->save(
+					array(
+						'id' => null,
+						'right_id' => $this->requestData['right'],
+						'role_id' => $this->requestData['role']
+					)
+				);
+
+			}
+
+		}
+
+		$roles = $this->models->Role->_get(array('id' => '*'));
+		$rights = $this->models->Right->_get(array('id' => '*'));
+		
+		foreach((array)$rights as $iKey => $iVal) {
+
+			foreach((array)$roles as $oKey => $oVal) {
+
+				$d = $this->models->RightRole->_get(
+					array(
+						'id' => array('right_id' => $iVal['id'],'role_id' => $oVal['id'])
+					)
+				);
+					
+				$rights[$iKey]['roles'][] = array('id' => $oVal['id'], 'state' => $d[0]['id']);
+
+			}
+
+		}
+
+
+        $this->smarty->assign('roles', $roles);
+
+        $this->smarty->assign('rights', $rights);
+
+        $this->printPage();
+			
+	}
+
 
 }
 
