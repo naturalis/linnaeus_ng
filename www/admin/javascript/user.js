@@ -108,3 +108,17 @@ function userRemoteValueCheck(ele,values,tests,idti) {
 	});
 
 }
+
+function userChangeRoleRight(ele) {
+
+	if (confirm(_('Are you sure?'))) {
+		
+		var d = ele.id.split('-');
+				  
+		$('#right').val(d[1]);
+		$('#wrong').val(d[2]);
+		$('#theForm').submit();
+				  
+	}
+
+}
