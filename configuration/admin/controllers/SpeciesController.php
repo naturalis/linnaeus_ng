@@ -668,9 +668,9 @@ class SpeciesController extends Controller
 				$startPage =
 					$this->rHasVal('page') ?
 						$this->requestData['page'] : 
-						isset($_SESSION['system']['lastActivePage']) ?
+						(isset($_SESSION['system']['lastActivePage']) ?
 							$_SESSION['system']['lastActivePage'] :
-							$defaultPage;
+							$defaultPage);
 
 				if (isset($taxon)) {
 

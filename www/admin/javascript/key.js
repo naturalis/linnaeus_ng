@@ -175,11 +175,11 @@ function keyShowChoiceDetails(ele,id) {
 		if (keyOpenChoices[id]==true) {
 			$('#choice-'+id).removeClass('key-choice-details').addClass('key-choice-details-invisible');
 			keyOpenChoices[id]=false;
-			$(ele).html('show details');
+			$(ele).html('show');
 		} else {
 			$('#choice-'+id).removeClass('key-choice-details-invisible').addClass('key-choice-details');
 			keyOpenChoices[id]=true;
-			$(ele).html('hide details');
+			$(ele).html('hide');
 		}
 
 	}

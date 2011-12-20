@@ -1,6 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 {include file="_keypath.tpl"}
+{include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
 <form method="post" action="step_edit.php" id="delForm">
@@ -33,15 +34,18 @@
 		<th style="width:220px;">{t}choice title{/t}</th>
 		<th style="width:220px;" colspan="2">{t}choice leads to{/t}</th>
 		<th style="width:90px;">{t}change order{/t}</th>
-		<th style="width:90px;"><!-- span class="pseudo-a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
-		<th style="width:50px;"></th>
-		<th style="width:50px;"></th>
+		<th style="width:30px;"><!-- span class="pseudo-a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
+		<th style="width:60px;"></th>
+		<th style="width:130px;"></th>
 	</tr>
 {section name=i loop=$choices}
 	<tr class="tr-highlight" style="vertical-align:top">
 		<td class="key-choice-number">{$choices[i].marker}.</td>
 		<!-- td class="key-choice-title">{$choices[i].title}</td -->
-		<td class="key-choice-title">{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}</td>
+		<td class="key-choice-title">
+			{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}
+			<i><span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
+		</td>
 		<td class="key-choice-leadsto">&rarr;</td>
 		<td class="key-choice-target">
 		{if $choices[i].res_keystep_id!=''}
@@ -76,9 +80,10 @@
 			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
 			{/if}
 		</td>
-		<td title="{t}show details{/t}">[<span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show details{/t}</span>]</td>
+		
 		<td class="key-choice-edit">[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
 		<td class="key-choice-edit">[<span class="pseudo-a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
+		<td class="key-choice-edit">[<a href="step_edit.php?insert={$choices[i].id}" title="{t}insert step between choice and target{/t}">{t}insert step{/t}</a>]</td>
 	</tr>
 	<tr id="choice-{$smarty.section.i.index}" class="key-choice-details-invisible">
 		<td>&nbsp;</td>
@@ -157,5 +162,4 @@ This is a list of the taxa that are a possible outcome of the key, computed from
 </fieldset>
 </div>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
