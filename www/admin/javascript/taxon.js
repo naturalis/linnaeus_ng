@@ -873,20 +873,16 @@ function taxonMediaDescriptionEdit(ele) {
 
 }
 
-function taxonMediaSaveDesc() {
+function taxonMediaSaveDesc(ele,id) {
 
-	if (taxonMediaDescBeingEdited==false) return;
-	
-	var val = $('#taxon-media-description').val();
-
-	$(taxonMediaDescBeingEdited).html(val);
+	var val = $('#'+ele).val();
 
 	$.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
 		data : ({
 			'action' : 'save_media_desc' ,
-			'id' : taxonMediaDescBeingEdited.id.replace('media-','') ,
+			'id' : id ,
 			'description' : val ,
 			'language' : allActiveLanguage ,
 			'time' : allGetTimestamp()
@@ -924,22 +920,6 @@ function taxonMediaGetDescriptions() {
 			allHideLoadingDiv();
 		}
 	});
-
-}
-
-function taxonMediaClickSave() {
-	
-	taxonMediaSaveButtonClicked = true;
-	taxonMediaSaveDesc();
-	taxonMediaDescBeingEdited = false;
-
-}
-
-function taxonMediaClickClose() {
-
-	taxonMediaSaveButtonClicked = true;
-	$(taxonMediaDescBeingEdited).html(taxonMediaDescBeforeEdit);
-	taxonMediaDescBeingEdited = false;
 
 }
 

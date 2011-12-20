@@ -436,10 +436,7 @@ class ProjectsController extends Controller
 
 		$this->setCurrentProjectData();
 
-        $languages = array_merge(
-			(array)$this->models->Language->_get(array('id' => 'select * from %table% where show_order is not null order by show_order asc')), 
-	        (array)$this->models->Language->_get(array('id' => 'select * from %table% where show_order is null order by language asc'))
-		);
+        $languages = $this->getAvailableLanguages();
 
         foreach ((array) $languages as $key => $val) {
             
@@ -529,10 +526,11 @@ class ProjectsController extends Controller
 
         if (isset($this->requestData) && !$this->isFormResubmit()) {
 				
-			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description')) {
+			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language')) {
 	
 				if (!$this->rHasVal('title')) $this->addError(_('A title is required.'));
 				if (!$this->rHasVal('sys_description')) $this->addError(_('A description is required.'));
+				if (!$this->rHasVal('language')) $this->addError(_('A default language is required.'));
 				
 			} else {
 	
@@ -545,7 +543,17 @@ class ProjectsController extends Controller
 				);
 				
 				if ($id) {
-				
+
+				   $this->models->LanguageProject->save(
+						array(
+							'id' => null, 
+							'language_id' =>$this->requestData['language'], 
+							'project_id' => $id, 
+							'def_language' => 1, 
+							'active' => 'y'
+						)
+					);
+							
 					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_SYS_ADMIN);
 					
 					$this->reInitUserRolesAndRights();
@@ -568,6 +576,8 @@ class ProjectsController extends Controller
         }
         
 		if (isset($this->requestData)) $this->smarty->assign('data',$this->requestData);
+		
+		 $this->smarty->assign('languages', $this->getAvailableLanguages());
 
         $this->printPage();
 
@@ -788,7 +798,6 @@ class ProjectsController extends Controller
 
 		$this->setUserSessionRights($cur['rights']);
 
-
     }
 
     private function ajaxActionLanguages ($action, $languageId)
@@ -864,6 +873,27 @@ class ProjectsController extends Controller
         }
     
     }
+
+	private function getAvailableLanguages()
+	{
+
+        return array_merge(
+			(array)$this->models->Language->_get(
+				array(
+					'id' => array('show_order is not' => null),
+					'order' => 'show_order asc'
+				)
+			),
+			(array)$this->models->Language->_get(
+				array(
+					'id' => array('show_order is' => null),
+					'order' => 'language asc'
+				)
+			)
+		);
+
+	}
+	
 
 	private function doDeleteProjectAction($projectId)
 	{
@@ -1135,6 +1165,7 @@ class ProjectsController extends Controller
 		$p = $this->models->Project->delete(array('id' => $id));
 	
 	}
+
 
 
 }

@@ -1,17 +1,10 @@
 <?php
 
-/*
-
-	purge and limit undo!
-
-*/
-
 include_once ('Controller.php');
 
 class KeyController extends Controller
 {
     
-    private $_remainingTaxaList;
     private $_taxaStepList;
 	private $_stepList = array();
 	private $_counter = 0;
@@ -185,6 +178,15 @@ class KeyController extends Controller
 
 		}
 
+		/*
+		if (isset($_SESSION['system']['insertAfterChoice']))
+			$this->addMessage(sprintf(
+				_('You are inserting this step between %s and %s.'),
+				$_SESSION['system']['insertAfterChoice']['keystep_number'].$_SESSION['system']['insertAfterChoice']['marker'],
+				$_SESSION['system']['insertAfterChoice']['target'])
+			);
+		*/
+
 		$this->smarty->assign('keyPath',$this->getKeyPath());
 	
 		$this->printPage();
@@ -200,6 +202,12 @@ class KeyController extends Controller
 		// create a new step when no id is specified
 		
 			$id = $this->createNewKeystep();
+
+			if ($this->rHasVal('insert')) {
+	
+				$this->insertKeyStep($id,$this->requestData['insert']);
+	
+			}
 
 			if ($this->rHasVal('ref_choice')) {
 			// url was called from the 'new step' option of a choice: set the new referring step id
@@ -217,7 +225,7 @@ class KeyController extends Controller
 
 			// redirect to self with id
 			//$this->redirect('step_edit.php?id='.$id);
-			$this->redirect('step_show.php?id='.$id);
+			$this->redirect('step_show.php?id='.$id.($this->rHasVal('insert') ? '&insert='.$this->requestData['insert'] : '' ));
 
 		} else {
 
@@ -497,9 +505,7 @@ class KeyController extends Controller
 		}
 
 		$this->getTaxonTree();
-		
-		$this->getRemainingTaxa();
-		
+
 		$this->customSortArray($this->treeList,array('key' => 'taxon'));
 
 		if (isset($choice)) $this->smarty->assign('data',$choice);
@@ -512,7 +518,7 @@ class KeyController extends Controller
 
 		$this->smarty->assign('taxa',$this->treeList);
 
-		$this->smarty->assign('remainingTaxa',$this->_remainingTaxaList);
+		$this->smarty->assign('remainingTaxa',$this->getRemainingTaxa());
 
    		$this->smarty->assign('keyPath',$this->getKeyPath());
 
@@ -601,7 +607,7 @@ class KeyController extends Controller
         
         $this->setPageName( _('Taxon ranks in key'));
 
-		$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>true));
+		$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>false));
 
 		if ($this->rHasVal('keyRankBorder') && isset($pr) && !$this->isFormResubmit()) {
 
@@ -620,9 +626,9 @@ class KeyController extends Controller
 
 			}
 			
-			$this->addMessage(_('Ranks saved.'));
+			$this->addMessage(_('Saved.'));
 
-			$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>true,'forceLookup'=>true));
+			$pr = $this->getProjectRanks(array('lowerTaxonOnly'=>false,'forceLookup'=>true));
 
 		}
 
@@ -926,16 +932,6 @@ class KeyController extends Controller
 	private function getRemainingTaxa()
 	{
 
-		if (isset($_SESSION['system']['remainingTaxa']) && isset($_SESSION['system']['_remainingTaxaList'])) {
-
-			$this->_remainingTaxaList = $_SESSION['system']['_remainingTaxaList'];
-			return $_SESSION['system']['remainingTaxa'];
-
-		}
-
-		unset($this->_remainingTaxaList);
-		unset($_SESSION['system']['remainingTaxa']);
-		
 		$taxa = false;
 
 		$pr = $this->getProjectRanks(array('keypathEndpoint'=>true,'forceLookup'=>true));
@@ -966,9 +962,7 @@ class KeyController extends Controller
 				if ($ck[0]['total']==0) {
 				
 					$taxa[] = $tval;
-					
-					$this->_remainingTaxaList[$tval['id']]=true;
-				
+
 				}
 			
 			}
@@ -981,8 +975,6 @@ class KeyController extends Controller
             'case' => 'i'
         ));
 		
-		$this->_remainingTaxaList = $_SESSION['system']['remainingTaxa'] = $taxa;
-
 		return $taxa;
 
 	}
@@ -1463,6 +1455,10 @@ class KeyController extends Controller
 		);
 		
 		$choice = $ck[0];
+		
+		$k = $this->models->Keystep->_get(array('id' => $choice['keystep_id']));
+
+		$choice['keystep_number'] = $k['number'];
 
 		$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$choice['id']);
 		
@@ -1477,7 +1473,7 @@ class KeyController extends Controller
 			} else {
 
 				$k = $this->models->Keystep->_get(array('id' => $choice['res_keystep_id']));
-				
+
 				if (isset($k['number'])) $choice['target_number'] = $k['number'];
 
 			}
@@ -1892,5 +1888,46 @@ class KeyController extends Controller
 		}
 	
 	}
+
+	private function insertKeyStep($stepId,$choiceId)
+	{
+	
+		// get the original values of the source choice
+		$srcChoice = $this->getKeystepChoice($choiceId);
+	
+		// update the source choice, making it point to the new, inserted step
+		$this->models->ChoiceKeystep->update(
+			array(
+				'res_keystep_id' => $stepId,
+				'res_taxon_id' => 'null'
+			),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $choiceId
+			)
+		);
+
+		// create a new choice for the new keystep		
+		$newChoice = $this->createNewKeystepChoice($stepId);
+
+		$this->renumberKeystepChoices($stepId);
+
+		// set the target for the new choice to the original target of the source choice
+		$x = $this->models->ChoiceKeystep->update(
+			array(
+				'res_keystep_id' => $srcChoice['res_keystep_id'],
+				'res_taxon_id' => $srcChoice['res_taxon_id'],
+			),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $newChoice
+			)
+		);
+
+	}
+
+
+
+
 
 }

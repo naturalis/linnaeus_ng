@@ -597,7 +597,7 @@ class ModuleController extends Controller
 	{
 
 		$id = isset($id) ? $id : $this->requestData['id'];
-		
+
 		if (!isset($id)) return;
 
 		$pfm = $this->models->FreeModulePage->_get(
@@ -609,7 +609,7 @@ class ModuleController extends Controller
 				)
 			)
 		);
-
+	
 		if ($pfm) {
 
 			$fmm = $this->models->FreeModuleMedia->_get(

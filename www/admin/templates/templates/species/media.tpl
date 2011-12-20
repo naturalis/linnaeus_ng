@@ -18,11 +18,10 @@
 <br />
 <div>
 	<a name="image"></a>
-	<span class="taxon-media-classheader">{t}Images{/t}</span><br />
 	<table class="taxon-media-table">
 		<tr>
-			<th class="taxon-media-colheader-file">{t}Media{/t}</th>
-			<th class="taxon-media-colheader-name">{t}Description (click to change){/t}</th>
+			<th class="taxon-media-colheader-file">{t}Images{/t}</th>
+			<th class="taxon-media-colheader-name" colspan="2">{t}Description{/t}</th>
 			<th class="taxon-media-colheader-type">{t}Name, type &amp; size{/t}</th>
 			<th></th>
 		</tr>
@@ -41,8 +40,15 @@
 						style="width:150px;border:1px solid black;margin-bottom:5px" />
 				{/if}
 			</td>
-			<td id="media-{$media.image[i].id}" onclick="taxonMediaDescriptionEdit(this);">
-				{$media.image[i].description}
+			<td>
+
+<textarea id="media-{$media.image[i].id}">{$media.image[i].description}
+</textarea>
+<div>
+<input type="button" value="save" onclick="taxonMediaSaveDesc('media-{$media.image[i].id}','{$media.image[i].id}')" />
+</div>
+	
+				
 			</td>
 			<td>
 				{$media.image[i].original_name}<br />

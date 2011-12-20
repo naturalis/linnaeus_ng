@@ -187,7 +187,7 @@ class FileUploadHelper
                                 }
         
                                 // as well as the temp dir itself
-                                rmdir($d);
+                                $this->rmDirAndFiles($d);
         
                             } else {
         
@@ -449,7 +449,30 @@ class FileUploadHelper
     
     }
 
+	private function rmDirAndFiles($dir)
+	{
+		if (is_dir($dir)) {
 
+			$objects = scandir($dir);
+
+			foreach ($objects as $object) {
+
+				if ($object != '.' && $object != '..') {
+	
+					if (filetype($dir.'/'.$object) == 'dir') $this->rmDirAndFiles($dir.'/'.$object); else unlink($dir.'/'.$object);
+	
+				}
+
+			}
+
+			reset($objects);
+
+			rmdir($dir);
+
+		}
+
+	} 
+	
 
 }
 

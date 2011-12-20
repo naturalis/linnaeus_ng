@@ -867,7 +867,7 @@ class SearchController extends Controller
 					'matches' => $this->getColumnMatches($search,$val,array('content'),$replaceCountContent)
 				);
 				
-				$content[$key]['url'] = '../species/taxon.php?id='.$val['id'].'&page='.$val['page_id'];
+				$content[$key]['url'] = '../species/taxon.php?id='.$val['taxon_id'].'&page='.$val['page_id'];
 
 			}
 
@@ -992,7 +992,8 @@ class SearchController extends Controller
 	private function searchModules($search,$freeModules=null)
 	{
 
-		$d['project_id'] = $this->getCurrentProjectId();		
+		$d['project_id'] = $this->getCurrentProjectId();	
+	
 		if ($freeModules!==false) $d['module_id in']  = implode(',',$freeModules).')';					
 
 		// get appropriate free modules
@@ -1032,7 +1033,7 @@ class SearchController extends Controller
 					'matches' => $matches
 				);
 				
-				$val['url'] = '../module/edit.php?id='.$val['id'];
+				$val['url'] = '../module/edit.php?id='.$val['page_id'];
 				
 				$replaceCount[$modules[$val['module_id']]['module']] = 
 					(isset($replaceCount[$modules[$val['module_id']]['module']]) ? $replaceCount[$modules[$val['module_id']]['module']] : 0) + 
@@ -1124,7 +1125,7 @@ class SearchController extends Controller
 				'matches' => $this->getColumnMatches($search,$val,array('name'),$replaceCountMatrices)
 			);
 			
-			$matrices[$key]['url'] = '../matrixkey/matrix.php?id='.$val['id'];
+			$matrices[$key]['url'] = '../matrixkey/matrix.php?id='.$val['matrix_id'];
 
 		}
 
@@ -1146,7 +1147,7 @@ class SearchController extends Controller
 				'matches' => $this->getColumnMatches($search,$val,array('label'),$replaceCountChars)
 			);
 			
-			$characteristics[$key]['url'] = '../matrixkey/char.php?id='.$val['id'];
+			$characteristics[$key]['url'] = '../matrixkey/char.php?id='.$val['characteristic_id'];
 
 			$cm = $this->models->CharacteristicMatrix->_get(
 				array(
@@ -1191,7 +1192,7 @@ class SearchController extends Controller
 				)
 			);
 
-			$states[$key]['url'] = '../matrixkey/state.php?char='.$cs[0]['characteristic_id'].'&id='.$val['id'];
+			$states[$key]['url'] = '../matrixkey/state.php?char='.$cs[0]['characteristic_id'].'&id='.$val['state_id'];
 
 			$cl = $this->models->CharacteristicLabel->_get(
 				array(

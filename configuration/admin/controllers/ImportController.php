@@ -907,6 +907,10 @@ class ImportController extends Controller
 	public function goNewProject()
 	{
 
+
+		// THIS HAS TO GO SOMEWHERE BETTER!
+		$res = $this->fixOldInternalLinks();
+
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
 		$this->getCurrentUserCurrentRole(true);
@@ -1550,7 +1554,7 @@ class ImportController extends Controller
 					'taxon_id' => $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'page_id' => $_SESSION['system']['import']['speciesOverviewCatId'],
-					'content' => trim((string)$taxon->description),
+					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
 					'publish' => 1
 				)
 			);
