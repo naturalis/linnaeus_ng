@@ -12,7 +12,7 @@
 <input type="hidden" name="id" id="id" value="{$step.id}" />
 <input type="hidden" name="ref_choice" id="ref_choice" value="" />
 <fieldset>
-<legend id="key-step-choices">{t}Step{/t} {$step.number}: {$step.title}</legend>
+<legend id="key-step-title">{t}Step{/t} {$step.number}{if $step.title}: {$step.title}{/if}</legend>
 {$step.content}
 <p>
 [<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]

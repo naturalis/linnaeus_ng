@@ -100,7 +100,7 @@ $(document).ready(function(){
 	taxonRunAutoSave();
 
 	initTinyMce('{$literature}','{$media}');
-	allLookupNavigateOverrideUrl('taxon.php?id=%s');
+	allLookupNavigateOverrideUrl('taxon.php?id=%s&cat=');
 
 {literal}	
 });

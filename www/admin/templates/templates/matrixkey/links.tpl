@@ -40,7 +40,7 @@
 	{foreach from=$links key=k item=val}
 	<tr class="tr-highlight">
 		<td>
-		{if $prevChar!=$val.characteristic}{$val.characteristic}{/if}{$val.characteristic}
+		{if $prevChar!=$val.characteristic}{$val.characteristic}{/if}
 		{assign var=prevChar value=$val.characteristic}
 		</td>
 		<td>

@@ -95,7 +95,7 @@
     function send_email($hostname, $from, $to, $data, $crlf_encode = 0) {
 
       if ($this->debug) echo '<!-- smtp_mail class debug:'.chr(10).chr(10);
-	  
+
       if(!$this->connect($hostname)) {
         if ($this->debug) echo 'cannot open socket'.chr(10);
         return false;

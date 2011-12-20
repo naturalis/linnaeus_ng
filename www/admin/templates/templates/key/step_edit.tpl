@@ -44,7 +44,7 @@
 				name="titleDefault" 
 				id="titleDefault" 
 				maxlength="64"
-				onblur="keySaveStepContent('default')" />&nbsp;*
+				onblur="keySaveStepContent('default')" />
 		</td>
 	{if $session.project.languages|@count>1}
 		<td><input 
@@ -52,7 +52,7 @@
 				name="titleOther" 
 				id="titleOther" 
 				maxlength="64"
-				onblur="keySaveStepContent('other')" />&nbsp;*
+				onblur="keySaveStepContent('other')" />
 		</td>
 	{/if}
 	</tr>

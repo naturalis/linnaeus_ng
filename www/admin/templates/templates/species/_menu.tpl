@@ -7,3 +7,5 @@
 {if $session.system.highertaxa!=1}
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 {/if}
+&nbsp;
+<a href="../utilities/search_index.php">Extensive search</a>

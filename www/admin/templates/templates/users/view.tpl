@@ -16,10 +16,6 @@
 		<td>{$data.email_address}</td>
 	</tr>
 	<tr>
-		<td>{t}Language:{/t}</td>
-		<td>{$data.language}</td>
-	</tr>
-	<tr>
 		<td>{t}Timezone:{/t}</td>
 		<td>{$zone.timezone}: {$zone.locations}</td>
 	</tr>

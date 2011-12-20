@@ -1730,7 +1730,7 @@ q($results,1,1);
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Other pages'),
+					'label' => _('Navigator'),
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				)

@@ -385,14 +385,23 @@ class IndexController extends Controller
 		if ($search) $d['taxon regexp'] = $this->makeRegExpCompatSearchString($search);
 
 		if ($ranks) $d['rank_id in'] = '('.implode(',',$ranks).')';
-
-		return $this->models->Taxon->_get(
+		
+		$pr = $this->getProjectRanks(array('idsAsIndex' => true));
+		
+		$t = $this->models->Taxon->_get(
 			array(
 				'id' => $d,
-				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'views/species/taxon.php?id=\',id) as url,
-				rank_id'
+				'columns' => 'id,taxon as label,\'taxon\' as source, concat(\'views/species/taxon.php?id=\',id) as url,rank_id'
 			)
 		);
+		
+		foreach((array)$t as $key => $val) {
+
+			$t[$key]['source'] = strtolower($pr[$val['rank_id']]['rank']);
+
+		}
+
+		return $t;
 
 	}
 

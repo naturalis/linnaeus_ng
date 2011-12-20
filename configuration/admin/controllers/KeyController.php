@@ -130,6 +130,8 @@ class KeyController extends Controller
 		}
 		
 		if ($step) {
+		
+			$this->cleanUpEmptyChoices();
 
 			if ($this->rHasVal('move') && $this->rHasVal('direction') && !$this->isFormResubmit()) {
 			// move choices up and down
@@ -166,7 +168,7 @@ class KeyController extends Controller
 
 		}
 
-		$this->setPageName(sprintf(_('Show key step "%s"'),$step['title']));
+		$this->setPageName(sprintf(_('Show key step %s'),$step['number']));
 
 		if (isset($_SESSION['system']['keyTaxaPerStep'])) {
 
@@ -214,7 +216,8 @@ class KeyController extends Controller
 			}
 
 			// redirect to self with id
-			$this->redirect('step_edit.php?id='.$id);
+			//$this->redirect('step_edit.php?id='.$id);
+			$this->redirect('step_show.php?id='.$id);
 
 		} else {
 
@@ -232,7 +235,7 @@ class KeyController extends Controller
 			// get step data
 			$step = $this->getKeystep($this->requestData['id']);
 		
-	        $this->setPageName(sprintf(_('Edit step "%s"'),($step['title'] ? $step['title'] : '...')));
+	        $this->setPageName(sprintf(_('Edit step %s'),$step['number']));
 
 			// saving the number (all the rest is done through ajax)
 			if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
@@ -358,7 +361,7 @@ class KeyController extends Controller
 
 		$this->setPageName(
 			sprintf(
-				_('Edit choice "%s" for step %s: "%s"'),
+				_('Edit choice "%s" for step %s'),
 				$choice['show_order'],
 				$step['number'],
 				$step['title']
@@ -647,7 +650,7 @@ class KeyController extends Controller
 	
 		$this->checkAuthorisation();
         
-        $this->setPageName( _('Unconnected key endings'));
+        $this->setPageName( _('Key validation'));
 
 		$k = $this->getKeysteps();
 		
@@ -656,6 +659,7 @@ class KeyController extends Controller
 			$kc = $this->getKeystepChoices($val['id']);
 			
 			if (count((array)$kc)==0) $deadSteps[] = $val;
+			if (count((array)$kc)==1) $sadSteps[] = $val;
 
 		}
 
@@ -689,6 +693,8 @@ class KeyController extends Controller
         ));
 
 		$this->smarty->assign('deadSteps',$deadSteps);
+
+		$this->smarty->assign('sadSteps',$sadSteps);
 
 		$this->smarty->assign('deadChoices',$deadChoices);
 
@@ -1218,13 +1224,14 @@ class KeyController extends Controller
 			);
 
 			$newContent = trim($data['content'][1])=='' ? 'null' : trim($data['content'][1]);
+			$newTitle = trim($data['content'][0])=='' ? 'null' : trim($data['content'][0]);
 
 			$d = array(
 					'id' => isset($ck[0]['id']) ? $ck[0]['id'] : null, 
 					'project_id' => $this->getCurrentProjectId(), 
 					'keystep_id' => $data['id'], 
 					'language_id' => $data['language'],
-					'title' => trim($data['content'][0]),
+					'title' => $newTitle,
 					'content' => $newContent
 				);
 
@@ -1842,6 +1849,48 @@ class KeyController extends Controller
 		
 		}
 				
+	}
+
+	private function cleanUpEmptyChoices()
+	{
+	
+		$x = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'choice_img is' => null,
+					'res_keystep_id is' => null,
+					'res_taxon_id is' => null
+				),
+				'columns' => 'id'
+			)
+		);
+	
+		foreach((array)$x as $val) {
+	
+			$y = $this->models->ChoiceContentKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'choice_id' => $val['id']
+					),
+					'columns' => 'count(*) as total'
+				)
+			);
+			
+			if ($y[0]['total']==0) {
+	
+				$x = $this->models->ChoiceKeystep->delete(
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['id']
+					)
+				);
+		
+			}
+	
+		}
+	
 	}
 
 }

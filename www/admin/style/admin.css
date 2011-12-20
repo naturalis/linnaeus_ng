@@ -323,11 +323,11 @@ a:hover,.pseudo-a:hover {
 }
 
 .modusers-block,.modusers-block-hidden {
-	visibility: visible;
+	display:block;
 }
 
 .modusers-block-hidden {
-	visibility: collapse;
+	display:none;
 }
 
 .modusers-block-buffercell {

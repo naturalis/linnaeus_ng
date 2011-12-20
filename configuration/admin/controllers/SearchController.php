@@ -656,16 +656,25 @@ class SearchController extends Controller
 	
 	}
 
+	private function escapeRegExSpecialChars($matches)
+	{
+	
+		return '\\'.$matches[0];
+	
+	}
+
 	private function makeRegExpCompatSearchString($s,$phpCompat=false)
 	{
 	
 		$s = trim($s);
+		
+		$s = preg_replace_callback('/(\^|\$|\(|\)|\<|\>|\{|\}|\[|\]|\\|\||\.|\*|\+|\?)/',array(&$this,'escapeRegExSpecialChars'),$s);
 
 		// if string enclosed by " take it literally		
 		if (preg_match('/^"(.+)"$/',$s))
 			return
 				($phpCompat ? '/' : '').
-				'('.mysql_real_escape_string(substr($s,1,strlen($s)-2)).')'.
+				'('.(substr($s,1,strlen($s)-2)).')'.
 				($phpCompat ? '/i' : '');
 
 		$s = preg_replace('/(\s+)/',' ',$s);
@@ -673,14 +682,14 @@ class SearchController extends Controller
 		if (strpos($s,' ')===0)
 			return
 				($phpCompat ? '/' : '').
-				mysql_real_escape_string($s).
+				($s).
 				($phpCompat ? '/i' : '');
 
 		$s = str_replace(' ','|',$s);
 
 		return
 			($phpCompat ? '/' : '').
-			'('.mysql_real_escape_string($s).')'.
+			'('.($s).')'.
 			($phpCompat ? '/i' : '');
 	
 	}
@@ -1038,9 +1047,6 @@ class SearchController extends Controller
 			$results[$modules[$val['module_id']]['module']][] = $val;
 
 		}
-
-
-
 
 		$r = null;
 
@@ -1683,7 +1689,7 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Other pages'),
+					'label' => _('Navigator'),
 					'data' => $content,
 					'numOfResults' => count((array)$content),
 					'numOfReplacements' => $replaceCount
@@ -1795,7 +1801,6 @@ class SearchController extends Controller
 				'columns' => 'id,topic,content'
 			)
 		);
-		
 
 		foreach((array)$content as $key => $val)  {
 		

@@ -49,9 +49,11 @@
 		<span style="color:#bbb">{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}</span>{$taxon.rank}
 		</td -->
 		<td class="taxon-list-cell-name" id="namecell{$taxon.id}">
-			{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>			
+			{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}
+			{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
+			<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
 		</td>
-{if $session.project.includes_hybrids==1}		<td>
+{if $session.project.includes_hybrids==1}<td>
 			{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 		</td>
 {/if}

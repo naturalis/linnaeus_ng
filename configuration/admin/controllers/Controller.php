@@ -1296,11 +1296,11 @@ class Controller extends BaseClass
      * @param      array    $params    parameters for tree formatting
      * @access     public
      */
-	public function getTaxonTree($params=null,$allowSession=true) 
+	public function getTaxonTree($params=null,$forceLookup=false) 
 	{
 
 		if (
-			$allowSession && 
+			!$forceLookup && 
 			isset($_SESSION['system']['taxonTree']) && 
 			isset($_SESSION['system']['treeList']) && 
 			(
