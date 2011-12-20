@@ -219,7 +219,7 @@ class SpeciesController extends Controller
 
 		}
 
-		$taxa = $this->getUserAssignedTreeList();
+		$taxa = $this->getUserAssignedTreeList(true);
 
 		if (isset($taxa) && count((array)$taxa)>0) {
 
@@ -284,6 +284,15 @@ class SpeciesController extends Controller
 
 			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
 
+
+			if ($this->maskAsHigherTaxa()) {
+
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+				if (isset($ranks)) $this->smarty->assign('ranks', $ranks);
+
+			}
+			
 			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
 			
 			$this->smarty->assign('sortBy', $sortBy);
@@ -393,7 +402,17 @@ class SpeciesController extends Controller
 
 			$data = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Editing taxon "%s"'),$data['taxon']));
+			if ($this->maskAsHigherTaxa()) {
+
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$data['rank_id']]['rank']),$data['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Editing "%s"'),$data['taxon']));
+
+			}
 
 		} else {
 
@@ -494,10 +513,23 @@ class SpeciesController extends Controller
 									'is_hybrid' =>  ($isHybrid ? 1 : 0)
 								)
 							);
+
+							if (empty($parentId) && empty($this->requestData['id'])) {
+							
+								$this->models->UserTaxon->save(
+									array(
+										'id' => null,
+										'project_id' => $this->getCurrentProjectId(),
+										'user_id' => $this->getCurrentUserId(),
+										'taxon_id' => $this->models->Taxon->getNewId()
+									)
+								);
+
+							}
 							
 							$this->reOrderTaxonTree();
 	
-							$this->addMessage(sprintf(_('Taxon "%s" saved.'),$this->requestData['taxon']));
+							$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
 							
 							unset($data['taxon']);
 							unset($_SESSION['species']['usertaxa']);
@@ -583,7 +615,17 @@ class SpeciesController extends Controller
 			
 			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
-            $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
+			if ($this->maskAsHigherTaxa()) {
+
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
+
+			}
 
 			if (!$this->doLockOutUser($this->requestData['id'])) {
 			// if new taxon OR existing taxon not being edited by someone else, get languages and content
@@ -621,9 +663,14 @@ class SpeciesController extends Controller
 					if ($val['def_page'] == 1) $defaultPage = $val['id'];
 				
 				}
-				
+
 				// determine the page_id the page will open in
-				$startPage = $this->rHasVal('page') ? $this->requestData['page'] : $defaultPage;
+				$startPage =
+					$this->rHasVal('page') ?
+						$this->requestData['page'] : 
+						isset($_SESSION['system']['lastActivePage']) ?
+							$_SESSION['system']['lastActivePage'] :
+							$defaultPage;
 
 				if (isset($taxon)) {
 
@@ -878,8 +925,18 @@ class SpeciesController extends Controller
 
 			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
-            $this->setPageName(sprintf(_('Literature for "%s"'),$taxon['taxon']));
+			if ($this->maskAsHigherTaxa()) {
 
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Literature for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Literature for "%s"'),$data['taxon']));
+
+			}
+			
             $this->smarty->assign('id',$this->requestData['id']);
 
 			$refs = $this->getTaxonLiterature($taxon['id']);
@@ -948,8 +1005,18 @@ class SpeciesController extends Controller
 
             $taxon = $this->getTaxonById();
 
-            $this->setPageName(sprintf(_('Media for "%s"'),$taxon['taxon']));
+			if ($this->maskAsHigherTaxa()) {
 
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Media for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Media for "%s"'),$taxon['taxon']));
+
+			}
+						
             $this->smarty->assign('id',$this->requestData['id']);
 
             $media = $this->getTaxonMedia($this->requestData['id']);
@@ -1493,6 +1560,8 @@ class SpeciesController extends Controller
         } else if ($this->requestData['action'] == 'get_taxon') {
             
             $this->ajaxActionGetTaxon();
+			
+			$_SESSION['system']['lastActivePage'] = $this->requestData['page'];
         
         } else if ($this->requestData['action'] == 'delete_taxon') {
             
@@ -1960,7 +2029,19 @@ class SpeciesController extends Controller
 
 			$taxon = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Synonyms for "%s"'),$taxon['taxon']));
+			if ($this->maskAsHigherTaxa()) {
+
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Synonyms for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Synonyms for "%s"'),$taxon['taxon']));
+
+			}
+			
+
 /*
 			$this->setBreadcrumbIncludeReferer(
 				array(
@@ -2127,7 +2208,18 @@ class SpeciesController extends Controller
 
 			$taxon = $this->getTaxonById();
 
-	        $this->setPageName(sprintf(_('Common names for "%s"'),$taxon['taxon']));
+			if ($this->maskAsHigherTaxa()) {
+
+				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
+		        $this->setPageName(sprintf(_('Common names for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+
+			} else {
+
+		        $this->setPageName(sprintf(_('Common names for "%s"'),$taxon['taxon']));
+
+			}
+
 /*
 			$this->setBreadcrumbIncludeReferer(
 				array(
@@ -2335,9 +2427,9 @@ class SpeciesController extends Controller
 	
 		// get complete taxon tree
 		$this->getTaxonTree(null,$forceLookup);
-	
+
 		if (!isset($this->treeList)) return null;
-	
+
 		$allowedRanks = $this->getRankList();
 	
 		// get taxa assigned to user

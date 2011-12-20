@@ -4,7 +4,7 @@
 {assign var=first value=true}
 {section name=i loop=$keyPath}
 	{if $smarty.section.i.index==$keyPath|@count-1}
-		<span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{if $keyPath[i].number}{$keyPath[i].number}. {/if}{if $keyPath[i].title}{$keyPath[i].title}{else}...{/if}</span>
+		<span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{if $keyPath[i].number}{$keyPath[i].number}. {/if}{$keyPath[i].title}</span>
 	{else}	
 		{if $keyPath|@count>3 && 
 			$smarty.section.i.index!=0 &&
@@ -28,7 +28,7 @@
 {section name=i loop=$keyPath}
 	<tr>
 	{if $smarty.section.i.index==$keyPath|@count-1}
-		<td style="text-align:right;width:10px;">{if $keyPath[i].number}{$keyPath[i].number}.{/if}</td>{if $keyPath[i].title}<td>{$keyPath[i].title}</td>{else}<td colspan="2">...</td>{/if}
+		<td style="text-align:right;width:10px;">{if $keyPath[i].number}{$keyPath[i].number}.{/if}</td><td>{$keyPath[i].title}</td>
 	{else}	
 		<td style="text-align:right;width:10px;">{$keyPath[i].number}.</td>
 		<td><span class="pseudo-a" onclick="$('#pathNext').val({$keyPath[i].id});$('#pathForm').submit();">{$keyPath[i].title}</span>{if $keyPath[i].choice} ({$keyPath[i].choice_marker}){/if}<!--{if $keyPath|@count>1}&nbsp;&rarr;&nbsp;{/if}--></td>

@@ -325,8 +325,13 @@ function goCompare() {
 		alert(_('You must select two taxa.'));
 		return;
 
-	}
+	} else
+	if (id1==id2) {
 
+		alert(_('You cannot compare a taxon to itself.'));
+		return;
+
+	}
 	getData('compare',[id1,id2],'fillTaxaStates');
 
 }

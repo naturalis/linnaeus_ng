@@ -358,62 +358,86 @@ class FileUploadHelper
 
 	}
 
+	private function isMacFodder($f)
+	{
+
+		return (
+			substr(basename($f),0,1)=='.' ||
+			substr(basename($f),0,1)=='_'
+		);
+	
+	
+	}
+
     private function doFileUpload ($oldFileName,$currentFileName)
     {
 
 		// resolve the mime-type
         $t = $this->getMimeType($currentFileName,$oldFileName);
 
+
+		// filerting out files that start with . or _
+		if ($this->isMacFodder($oldFileName)!==true) {
+
         // assess whether the mime-type is legal
-        if ($this->isLegalMimeType($t)!==false) {
-        
-            $fs = filesize($oldFileName);
-
-            // assess whether the uploaded file isn't too big                                
-            if ($fs <= $this->_currentMimeType['maxSize']) {
-                
-                // creata a new, unique filename with the original extension
-                $pi = pathinfo($currentFileName);
-
-                //$fn = $this->createUniqueNewFileName($pi['extension']);
-                $fn = $this->createUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
-
-                // move the file to the project's media directory
-                //if (rename($oldFileName,$this->_storageDir.$fn)) {
-                if ($this->cRename($oldFileName,$this->_storageDir.$fn)) {
+			if ($this->isLegalMimeType($t)!==false) {
+	
+	
+				$fs = filesize($oldFileName);
+	
+				// assess whether the uploaded file isn't too big                                
+				if ($fs <= $this->_currentMimeType['maxSize']) {
+					
+					// creata a new, unique filename with the original extension
+					$pi = pathinfo($currentFileName);
+	
+					//$fn = $this->createUniqueNewFileName($pi['extension']);
+					$fn = $this->createUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
+	
+					// move the file to the project's media directory
+					//if (rename($oldFileName,$this->_storageDir.$fn)) {
+					if ($this->cRename($oldFileName,$this->_storageDir.$fn)) {
+		
+						// store data to save in temporary array
+						$fileToSave = array(
+							'name' => $fn,
+							'full_path' => $this->_storageDir.$fn,
+							'original_name' => $currentFileName,
+							'mime_type' => $t,
+							'media_name' => $this->_currentMimeType['media_name'],
+							'size' => $fs
+						); 
+						
+						return $fileToSave;
+	
+					} else {
+	
+						$this->addError(_('Could not move file:').' '.$currentFileName);
+	
+					}
+	
+				} else {
+	
+					$this->addError(_('File too big:').' '.
+						$currentFileName.' ('.ceil($fs/1000).'kb; '._('max.').' '.ceil($this->_currentMimeType['maxSize']/1000).'kb)');
+	
+				}
+								
+	
+	
+			} else {
+			
+				if ($t!='directory')
+					$this->addError(_('File type not allowed:').' '.$currentFileName.' ('.$t.')');
+	
+			}
     
-                    // store data to save in temporary array
-                    $fileToSave = array(
-                        'name' => $fn,
-                        'full_path' => $this->_storageDir.$fn,
-                        'original_name' => $currentFileName,
-                        'mime_type' => $t,
-                        'media_name' => $this->_currentMimeType['media_name'],
-                        'size' => $fs
-                    ); 
-                    
-                    return $fileToSave;
-
-                } else {
-
-                    $this->addError(_('Could not move file:').' '.$currentFileName);
-
-                }
-
-            } else {
-
-                $this->addError(_('File too big:').' '.
-                    $currentFileName.' ('.ceil($fs/1000).'kb; '._('max.').' '.ceil($this->_currentMimeType['maxSize']/1000).'kb)');
-
-            }
-                            
         } else {
         
-            if ($t!='directory')
-                $this->addError(_('File type not allowed:').' '.$currentFileName.' ('.$t.')');
+            //$this->addError(_('Skipped (Mac fodder):').' '.$currentFileName);
 
         }
-    
+
         return false;
 
     }

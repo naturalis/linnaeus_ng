@@ -4,3 +4,5 @@
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
+&nbsp;
+<a href="../utilities/search_index.php">Extensive search</a>

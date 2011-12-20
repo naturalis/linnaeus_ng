@@ -4,6 +4,8 @@
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
+&nbsp;
+<a href="../utilities/search_index.php">Extensive search</a>
 <p>
 {if $alpha|@count>0}
 <div id="alphabet">

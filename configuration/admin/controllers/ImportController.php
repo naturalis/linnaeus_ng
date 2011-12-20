@@ -919,7 +919,6 @@ class ImportController extends Controller
 
 	}
 
-
 	/* xml parser callback functions */
 	public function xmlParserCallback_Species($obj)
 	{
@@ -1719,33 +1718,37 @@ class ImportController extends Controller
 		
 			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
 
-			foreach($taxon->vernaculars as $vKey => $vVal) {
+			if(isset($taxon->vernaculars->vernacular)) {
 
-				$languagId = $this->resolveLanguage(trim((string)$vVal->vernacular->language));
-
-				if ($languagId) {
-
-					$this->models->Commonname->save(
-						array(
-							'id' => null,
-							'project_id' => $this->getNewProjectId(),
-							'taxon_id' => $taxonId,
-							'language_id' => $languagId,
-							'commonname' => trim((string)$vVal->vernacular->name)
-						)
-					);
-					
-					$_SESSION['system']['import']['loaded']['taxon_common']['saved']++;
-
-				} else {
-
-					$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
-						'data' => $taxon,
-						'cause' => 'Unable to resolve language "'.trim((string)$vVal->vernacular->language).'"'
-					);
+				foreach($taxon->vernaculars->vernacular as $vKey => $vVal) {
+	
+					$languagId = $this->resolveLanguage(trim((string)$vVal->language));
+	
+					if ($languagId) {
+	
+						$this->models->Commonname->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getNewProjectId(),
+								'taxon_id' => $taxonId,
+								'language_id' => $languagId,
+								'commonname' => trim((string)$vVal->name)
+							)
+						);
+	
+						$_SESSION['system']['import']['loaded']['taxon_common']['saved']++;
+	
+					} else {
+	
+						$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
+							'data' => $taxon,
+							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
+						);
+		
+					}
 	
 				}
-
+				
 			}
 
 		}

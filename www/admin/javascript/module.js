@@ -257,12 +257,12 @@ function moduleBuildModuleUserBlock(type) {
 		b = b +'<tr id="row-'+q+theseModules[i][0]+'" class="tr-highlight">';
 
 		if (theseModules[i][2]=='y') {
-			b = b +'<td class="cell-module-title-in-use"><span id="cell-'+theseModules[i][0]+'d">';
+			b = b + '<td class="cell-module-title-in-use">';
 		} else {
-			b = b + '<td class="cell-module-title-inactive"><span id="cell-'+theseModules[i][0]+'d">';
+			b = b + '<td class="cell-module-title-inactive">';
 		}
 		
-		b = b +'<span class="cell-module-title">'+theseModules[i][1]+'</span></span></td>'+
+		b = b +'<span id="cell-'+theseModules[i][0]+'d"><span class="cell-module-title">'+theseModules[i][1]+'</span></span></td>'+
 				'<td><span onclick="moduleToggleModuleUserBlock(\''+q+theseModules[i][0]+'\');" class="modusers-block-toggle" id="toggle-'+q+theseModules[i][0]+'">+</span> '+
 				'<span id="cell-'+q+theseModules[i][0]+'n">'+theseModules[i][3]+'</span> collaborators</td></tr>'+
 				'<tr id="users-'+q+theseModules[i][0]+'" class="modusers-block'+

@@ -49,7 +49,7 @@
 		</td>
 		<td>
 	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
-	{if $taxa|@count==0}
+	{if $taxa|@count==0 || $data.parent_id==''}
 	<option value="-1">{t}No parent{/t}</option>
 	{/if}
 	{foreach from=$taxa key=k item=v}

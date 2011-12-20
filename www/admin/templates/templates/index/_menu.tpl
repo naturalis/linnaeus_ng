@@ -3,3 +3,5 @@
 <input type="button" value="{t}Common Names{/t}" onclick="window.open('common.php','_self')" />
 &nbsp;&nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
+&nbsp;
+<a href="../utilities/search_index.php">Extensive search</a>

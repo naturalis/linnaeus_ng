@@ -27,8 +27,10 @@ function searchToggleReplace() {
 }
 
 function searchDoSearchForm() {
+	
+	$('#search').val($('#search').val().trim());
 
-	if ($('#search').val().trim()=='') {
+	if ($('#search').val()=='') {
 
 		alert(_('You need to enter a search term.'));
 		$('#search').focus();
@@ -61,11 +63,13 @@ function searchDoSearchForm() {
 		if (!confirm(_('Are you sure? This action cannot be undone.')))
 			return false;
 		else
-			$('#theForm').submit();
+			return true;
+			//$('#theForm').submit();
 
 	} else {
-	
-		$('#theForm').submit();
+		
+		return true;
+		//$('#theForm').submit();
 	
 	}
 

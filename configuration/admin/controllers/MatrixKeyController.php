@@ -104,12 +104,18 @@ class MatrixKeyController extends Controller
         
         $this->setPageName( _('Matrices'));
 
+		$matrices = $this->getMatrices();
+		
+		if (count((array)$matrices)==0) $this->redirect('matrix.php');
+
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
 			$this->deleteMatrix($this->requestData['id']);
 			
 			if ($this->getCurrentMatrixId()==$this->requestData['id']) $this->setCurrentMatrixId(null);
 			
+			$matrices = $this->getMatrices();
+
 		} else
 		if ($this->rHasVal('action','activate') && !$this->isFormResubmit()) {
 
@@ -118,8 +124,6 @@ class MatrixKeyController extends Controller
 			$this->redirect('edit.php');
 
 		}
-
-		$matrices = $this->getMatrices();
 			
 		$this->smarty->assign('matrices',$matrices);
 

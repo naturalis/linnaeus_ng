@@ -1,18 +1,18 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
-<form id="theForm" method="post" action="">
+<form id="theForm" method="post" action="" onsubmit="return searchDoSearchForm()" >
 <p>
 <fieldset><legend>{t}Find{/t}</legend>
 {t}Search for:{/t} <input type="text" id="search" name="search" value="{$search.search|@escape}" /><br />
 <i>{t}Enclose multiple words with double quotes (") to search for the literal string.{/t}</i><br /><br />
 {t}In modules:{/t}<br />
 {foreach from=$modules.modules item=v}
-{if $v.module!='Higher taxa' && $v.module!='Index'}
+{if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Matrix key'}
 <label>
 	<input type="checkbox" name="modules[{$v.id}]" value="{$v.controller}" {if $search.modules[$v.id]==$v.controller || $search.modules==null}checked="checked"{/if} />
-	{t}{$v.module}{/t}
-	{if $v.module=='Species module'} / {t}Higher taxa{/t}{/if}
-	{if $v.module=='Additional texts'} ({t}Welcome{/t}, {t}Contributors{/t}, {t}About ETI{/t}){/if}	
+	{if $v.module=='Species module'} {t}Species module{/t} / {t}Higher taxa{/t}
+	{elseif $v.module=='Additional texts'}{t}Navigator{/t}{else}
+	{t}{$v.module}{/t}{/if}
 </label><br />
 {/if}
 {/foreach}
@@ -34,7 +34,7 @@
 </div>
 </fieldset>
 </p>
-<input type="button" id="searchButton" onclick="searchDoSearchForm()" value="{t}search{/t}" />
+<input type="submit" id="searchButton" value="{t}search{/t}" />
 </form>
 </div>
 
