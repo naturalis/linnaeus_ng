@@ -2,18 +2,20 @@
 		{if $cat!='numOfResults'}
 			{foreach from=$resultItems.results item=modules}
 				{capture name=moduleHeader}
-				<div class="replaceModuleHeader">{$modules.numOfReplacements} found in <span class="replaceModuleTitle">{$modules.label}</span>
+				{assign var=module_sys_name value=$modules.label|@strtolower|@replace:' ':'_'}
+				<a name="{$module_sys_name}"></a> 
+				<div class="replaceModuleHeader">{$modules.numOfResults} found in <span class="replaceModuleTitle">{$modules.label}</span>
 				{if $modules.numOfReplacements > 0 && $includeReplace}
 					&nbsp;
 					<input
 						type="button"
-						id="button-replace-{$modules.label|@strtolower|@replace:' ':'_'}"
+						id="button-replace-{$module_sys_name}"
 						value="replace all"
 						onclick="searchDoReplaceModule('{$modules.label}')" 
 					/>&nbsp;
 					<input
 						type="button"
-						id="button-skip-{$modules.label|@strtolower|@replace:' ':'_'}"
+						id="button-skip-{$module_sys_name}"
 						value="skip all"
 						onclick="searchDoSkipModule('{$modules.label}')"
 					/>
@@ -31,7 +33,7 @@
 						{foreach from=$columns item=occurrences}						
 
 						{if $replaceIndex[$occurrences.id]===false && $occurrences|is_array}
-							<div id="replace-{$modules.label|@strtolower|@replace:' ':'_'}-id-{$occurrences.id}" class="replaceItem">
+							<div id="replace-{$module_sys_name}-id-{$occurrences.id}" class="replaceItem">
 							{* $occurrences.id *}
 							<span class="replaceItemHeader">
 								{$k}{if $includeReplace} ({if $replaceIndex[$occurrences.id]}{$replaceIndex[$occurrences.id]}{else}{t}to be replaced{/t}{/if}){/if}:</span>
@@ -41,13 +43,13 @@
 							{if $includeReplace}
 							<input
 								type="button"
-								id="button-replace-{$modules.label|@strtolower|@replace:' ':'_'}-id-{$occurrences.id}"
+								id="button-replace-{$module_sys_name}-id-{$occurrences.id}"
 								value="{t}replace{/t}"
 								onclick="searchDoReplace('{$occurrences.id}')"
 							/>&nbsp;
 							<input
 								type="button" 
-								id="button-skip-{$modules.label|@strtolower|@replace:' ':'_'}-id-{$occurrences.id}"
+								id="button-skip-{$module_sys_name}-id-{$occurrences.id}"
 								value="{t}skip{/t}" 
 								onclick="searchDoSkip('{$occurrences.id}')" 
 							/>&nbsp;

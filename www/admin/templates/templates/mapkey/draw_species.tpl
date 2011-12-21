@@ -15,7 +15,7 @@
 		{$v.title}
 		</label><br />
 		{/foreach}
-		{t _s1='<a href="data_types.php">' _s2='</a>'}(click %shere%s to add or change datatypes.){/t}
+		{t _s1='<a href="data_types.php">' _s2='</a>'}(%sadd or change datatypes.%s){/t}
 		
 		<form action="" method="post" id="theForm">
 		<input type="hidden" name="id" value="{$taxon.id}" />

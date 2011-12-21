@@ -38,7 +38,7 @@
 <tr><td>{$v.title}</td><td>{$v.id}</td></tr>
 {/foreach}
 </table>
-{if $smarty.foreach.x.index==-1}{t _s1='<a href="data_types.php">' _s2='</a>'}No data types have been defined yet. Go %shere%s to do so.{/t}{/if}
+{if $smarty.foreach.x.index==-1}{t _s1='<a href="data_types.php">' _s2='</a>'}No data types have been defined yet. %sDefine data types%s{/t}{/if}
 </p>
 <p>
 {t}The following columns in each row specify the coordinates of a geographical point on the map. These always come in pairs of latitude and longitude.{/t}<br />

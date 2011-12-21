@@ -3,7 +3,7 @@
 <div id="page-main">
 
 {if $projectRanks|@count==0}
-{t}Currently, no ranks have been defined in your project. To define ranks, go{/t} <a href="ranks.php">{t}here{/t}</a>.
+{t}Currently, no ranks have been defined in your project.{/t} <a href="ranks.php">{t}Define ranks{/t}</a>.
 {else}
 
 <span id="message-container" style="float:right;"></span><br />

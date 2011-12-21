@@ -8,7 +8,7 @@
 			<i>{t}Enclose multiple words with double quotes (") to search for the literal string.{/t}</i><br /><br />
 			{t}In modules:{/t}<br />
 			{foreach from=$modules.modules item=v}
-			{if $v.module!='Higher taxa' && $v.module!='Index'}
+			{if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search'}
 			<label>
 				<input
 					type="checkbox" 

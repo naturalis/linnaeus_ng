@@ -24,7 +24,7 @@
 <p>
 {t}Unable to log in? What is the problem you are experiencing?{/t}
 <ul>
-  <li>{t _s1='<a href="password.php">' _s2='</a>'}I forgot my password and/or username: click %shere%s to reset your password.{/t}</li>
+  <li>{t _s1='<a href="password.php">' _s2='</a>'}I forgot my password and/or username: %sreset my password%s.{/t}</li>
   <li>{t _s1='<a href="mailto:support@eti.uva.nl">' _s2='</a>'}My password doesn't work or my account may have been compromised: please %scontact the helpdesk%s.{/t}</li>
 </ul>
 </p>
