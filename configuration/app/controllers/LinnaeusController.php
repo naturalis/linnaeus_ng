@@ -455,7 +455,7 @@ class LinnaeusController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'page' => 'Overview'
+						'page' => 'Description'
 					)
 				)
 			);
@@ -1356,7 +1356,7 @@ q($results,1,1);
 					'numOfResults' => count((array)$matrices)
 				),
 				array(
-					'label' => _('Matrix key characteristics'),
+					'label' => _('Matrix key characters'),
 					'data' => $characteristics,
 					'numOfResults' => count((array)$characteristics)
 				),

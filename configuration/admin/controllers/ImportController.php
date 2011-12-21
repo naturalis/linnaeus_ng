@@ -6,18 +6,13 @@ FREE MODULES INTERNAL LINKS
 FREE MODULES RIGHTS requires login
 
 
+	wtf? is:
+		$d->projectclassification --> "Five kingdoms"
+		$d->projectnomenclaturecode --> "ICZM"
 
-page time out? (image copy)
-
-
-wtf is?
-	$d->projectclassification
-	$d->projectnomenclaturecode
-
-
-need to set manually!
-	project.includes_hybrids
-	project.logo
+	need to set manually!
+		project.includes_hybrids
+		project.logo
 
 	border higher/lower taxa (give choice)
 	=> projects_ranks.lower_taxon
@@ -33,17 +28,12 @@ need to set manually!
 		unlink($paths['project_media']);
 
 	yell about getControllerSettingsKey->maxChoicesPerKeystep
-	
-	???			.classification --> "Five kingdoms"
-	???			.nomenclaturecode --> "ICZM"
+
 
 	proj_literature->proj_reference->keywords->keyword
 	ignored: literary references to glossary terms
 
-
-
-HAVE TO MERGE GEO DATA
-MATRIX KEY: never saw all types
+	MATRIX KEY: never saw all types
 
 */
 
@@ -124,7 +114,7 @@ class ImportController extends Controller
     {
         
         parent::__destruct();
-    
+
     }
 
     /**
@@ -697,6 +687,10 @@ class ImportController extends Controller
 		
 					}
 
+				} else {
+				
+					$this->addMessage('Skipped welcome text(s).');
+				
 				}
 
 				if ($this->rHasVal('introduction','on')) {
@@ -728,6 +722,10 @@ class ImportController extends Controller
 					
 					unset($_SESSION['system']['import']['loaded']['introduction']['show_order']);
 
+				} else {
+				
+					$this->addMessage('Skipped introduction.');
+				
 				}
 
 			}
@@ -845,59 +843,57 @@ class ImportController extends Controller
 
 	public function l2MapAction()
 	{
-
+							
 		if (
 			!isset($_SESSION['system']['import']['file']['path']) ||
 			!isset($_SESSION['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
-
-		$project = $this->getProjects($this->getNewProjectId());
-
-        $this->setPageName(_('Map data for "'.$project['title'].'"'));
-
-		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
-
-			set_time_limit(900);
-
-			if ($this->rHasVal('map_items','on')) {
-
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
-
-					$_SESSION['system']['import']['loaded']['map']['maps'] = null;
-					$_SESSION['system']['import']['loaded']['map']['types'] = null;
-					$_SESSION['system']['import']['loaded']['map']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['map']['failed'] = 0;
-					$_SESSION['system']['import']['loaded']['map']['skipped'] = 0;
-
-					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
-
-					$this->loadControllerConfig('MapKey');
-		
-					$this->helpers->XmlParser->getNodes('taxondata');
-
-					$this->loadControllerConfig();
 	
-					$this->addModuleToProject(8);
-					$this->grantModuleAccessRights(8);
+		$project = $this->getProjects($this->getNewProjectId());
+	
+		$this->setPageName(_('Map data for "'.$project['title'].'"'));
+	
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+	
+			set_time_limit(900);
+	
+			if ($this->rHasVal('map_items','on')) {
+	
+				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+	
+				$_SESSION['system']['import']['loaded']['map']['maps'] = null;
+				$_SESSION['system']['import']['loaded']['map']['types'] = null;
+				$_SESSION['system']['import']['loaded']['map']['saved'] = 0;
+				$_SESSION['system']['import']['loaded']['map']['failed'] = 0;
+				$_SESSION['system']['import']['loaded']['map']['skipped'] = 0;
 
-					$this->addMessage(
-						'Imported '.
-						$_SESSION['system']['import']['loaded']['map']['saved'].
-						' map items (skipped '.
-						$_SESSION['system']['import']['loaded']['map']['skipped'].
-						', failed '.$_SESSION['system']['import']['loaded']['map']['failed'].').'
-					);
-					
-					unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
 
-				} else {
+				$this->loadControllerConfig('MapKey');
+	
+				$this->helpers->XmlParser->getNodes('taxondata');
 
-					$this->addMessage('Skipped map.');
+				$this->loadControllerConfig();
 
-				}
+				$this->addModuleToProject(8);
+				$this->grantModuleAccessRights(8);
 
-				$this->smarty->assign('processed',true);
+				$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['map']['saved'].' map items.');
+
+				$this->addMessage('Skipped '.$_SESSION['system']['import']['loaded']['map']['skipped'].' because of invalid coordinates.');
+
+				$this->addMessage('Failed '.$_SESSION['system']['import']['loaded']['map']['failed'].', most likely duplicates.');
+				
+				unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+
+			} else {
+
+				$this->addMessage('Skipped map.');
+
 			}
+
+			$this->smarty->assign('processed',true);
+		}
 			
 
         $this->printPage();
@@ -908,8 +904,8 @@ class ImportController extends Controller
 	{
 
 
-		// THIS HAS TO GO SOMEWHERE BETTER!
-		$res = $this->fixOldInternalLinks();
+// THIS HAS TO GO SOMEWHERE BETTER!
+$res = $this->fixOldInternalLinks();
 
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
@@ -1508,7 +1504,7 @@ class ImportController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getNewProjectId(),
-					'page' => 'Overview'
+					'page' => 'Description'
 				),
 				'columns' => 'id'
 			)
@@ -1520,7 +1516,7 @@ class ImportController extends Controller
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),
-				'page' => 'Overview',
+				'page' => 'Description',
 				'show_order' => 0,
 				'def_page' => 1
 			)
@@ -1534,7 +1530,7 @@ class ImportController extends Controller
 				'project_id' => $this->getNewProjectId(),
 				'page_id' => $id,
 				'language_id' => $this->getNewDefaultLanguageId(),
-				'title' => 'Overview'
+				'title' => 'Description'
 			)
 		);
 
@@ -2086,6 +2082,7 @@ class ImportController extends Controller
 	{
 
 		$gls = $this->resolveGlossary($obj);
+
 
 		if ($this->models->Glossary->save(
 			array(
@@ -2914,35 +2911,6 @@ class ImportController extends Controller
 
 				if (!isset($_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)])) {
 
-					$d = explode(',',trim((string)$vVal->specs));
-
-					$_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
-						array(
-							'label' => trim((string)$vVal->mapname),
-							'specs' => trim((string)$vVal->specs),
-							'coordinates' =>
-								array(
-									'topLeft' => array('lat' => (int)$d[0],'long' => (-1 * $d[1])),
-									'bottomRight' => array('lat' => (int)$d[2],'long' => (-1 * $d[3]))
-								),
-							'square' => array('width' => (int)$d[4],'height' => (int)$d[5]),
-							'widthInSquares' => ((int)($d[1] - $d[3]) / $d[4]),
-							'heightInSquares' => ((int)($d[0] - $d[2]) / $d[5])
-						);
-				}
-				
-				$maps = $_SESSION['system']['import']['loaded']['map']['maps'];
-				
-				foreach($vVal->squares->square as $sKey => $sVal) {
-
-					if (!isset($_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
-						$_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
-
-					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
-
-					$col = trim((string)$sVal->number) % $maps[trim((string)$vVal->mapname)]['widthInSquares'];
-					if ($col==0) $col = $maps[trim((string)$vVal->mapname)]['widthInSquares'];
-
 					/*
 			
 						<mapname>North Atlantic</mapname>
@@ -2953,8 +2921,51 @@ class ImportController extends Controller
 						5,5 - cell size (ASSUMING WxH)
 			
 					*/
-					
+
+					$d = explode(',',trim((string)$vVal->specs));
+
+					$lat1 = (int)$d[0];
+					$lat2 = (int)$d[2];
+					$lon1 = (-1 * (int)$d[1]);
+					$lon2 = (-1 * (int)$d[3]);
+					$sqW = (int)$d[4];
+					$sqH = (int)$d[5];
+
+					$_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
+						array(
+							'label' => trim((string)$vVal->mapname),
+							'specs' => trim((string)$vVal->specs),
+							'coordinates' =>
+								array(
+									'topLeft' => array('lat' => $lat1,'long' => $lon1),			//array('lat' => (int)$d[0],'long' => (-1 * (int)$d[1])),
+									'bottomRight' => array('lat' => $lat2,'long' => $lon2)		//array('lat' => (int)$d[2],'long' => (-1 * (int)$d[3]))
+								),
+							'square' => array('width' => $sqW,'height' => $sqH),
+							'widthInSquares' => (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW,	//((int)($d[1] - $d[3]) / $d[4]),
+							'heightInSquares' => ((int)($lat1 - $lat2) / $sqH)
+						);
+				}
+				
+				$maps = $_SESSION['system']['import']['loaded']['map']['maps'];
+				
+				foreach($vVal->squares->square as $sKey => $sVal) {
+
+					if (!isset($_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
+						$_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
+
+					// determining the position of the square in the map grid
+					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
+					$col = trim((string)$sVal->number) % $maps[trim((string)$vVal->mapname)]['widthInSquares'];
+					if ($col==0) $col = $maps[trim((string)$vVal->mapname)]['widthInSquares'];
+
 					$mapname = trim((string)$vVal->mapname);
+					
+					$n1Lat = $n2Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']);
+					$n1Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width']);
+					$n1Lon = $n4Lon = ($n1Lon > 180 ? -1 * ($n1Lon - 180) : $n1Lon);
+					$n2Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width']);
+					$n2Lon = $n3Lon = ($n2Lon > 180 ? -1 * ($n2Lon - 180) : $n2Lon);
+					$n3Lat = $n4Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']);
 
 					$occurrence = array(
 						'taxon' => trim((string)$obj->name),
@@ -2965,25 +2976,7 @@ class ImportController extends Controller
 						'col' => $col,
 						'legend' => trim((string)$sVal->legend),
 						'typeId' => $_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
-						'nodes' =>
-							array(
-								array(
-									$maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']),
-									$maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width'])
-								),
-								array(
-									$maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']),
-									$maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width'])
-								),
-								array(
-									$maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']),
-									$maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width'])
-								),				
-								array(
-									$maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']),
-									$maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width'])
-								)
-							)
+						'nodes' => array(array($n1Lat,$n1Lon),array($n2Lat,$n2Lon),array($n3Lat,$n3Lon),array($n4Lat,$n4Lon))
 					);
 					
 					$this->doSaveMapItem($occurrence);

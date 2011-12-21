@@ -933,7 +933,7 @@ class SpeciesController extends Controller
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Literature for "%s"'),$data['taxon']));
+		        $this->setPageName(sprintf(_('Literature for "%s"'),$taxon['taxon']));
 
 			}
 			

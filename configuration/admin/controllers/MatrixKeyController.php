@@ -196,7 +196,38 @@ class MatrixKeyController extends Controller
     
     }
 
+    public function charSortAction()
+    {
+    
+        $this->checkAuthorisation();
+		
+		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
+		if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {
+
+			
+			$c = $this->getCharacteristics();
+			
+			foreach((array)$c as $key => $val) {
+
+				// NOW WHAT
+			
+			} 
+
+		}
+		
+		$matrix = $this->getMatrix($this->getCurrentMatrixId());
+
+        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+
+		$this->smarty->assign('characteristics',$this->getCharacteristics());
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+    
+    }
+	
 	public function charAction()
 	{
 
@@ -966,7 +997,6 @@ class MatrixKeyController extends Controller
 	private function getCharacteristicLabel($id=null,$language=null)
 	{
 
-
 		$id = isset($id) ? $id : $this->requestData['id'];
 		$language = isset($language) ? $language : $this->requestData['language'];
 
@@ -1099,7 +1129,8 @@ class MatrixKeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $matrixId,
 				),
-				'columns' => 'characteristic_id'
+				'columns' => 'characteristic_id',
+				'order' => 'show_order'
 			)
 		);
 
