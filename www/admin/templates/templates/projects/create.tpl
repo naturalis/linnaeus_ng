@@ -56,7 +56,7 @@
 {t}As system administrator, you will automatically be made system administrator of the new project. In that capacity, you will be able to create users, add modules and execute other administrative tasks for the newly created project.{/t}<br />
 </div>
 {else}
-{t _s1='<a href="../../admin-index.php">' _s2='</a>'}Click %shere%s to administrate the new project.{/t}
+{t _s1='<a href="../../admin-index.php">' _s2='</a>'}%sAdministrate the new project.%s{/t}
 {/if}
 </div>
 {include file="../shared/admin-footer.tpl"}

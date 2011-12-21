@@ -96,7 +96,7 @@ The contents of the file will be displayed so you can review them before they ar
 	</li>
 	<li>{t}Ranks should match the list of ranks you have selected for your project.{/t}
 		{if $projectRanks|@count==0}
-		<br /><span class="message-error">{t}Currently, you have defined no ranks in this project. To do so, go{/t} <a href="ranks.php">{t}here{/t}</a>.</span>
+		<br /><span class="message-error">{t}Currently, you have defined no ranks in this project.{/t} <a href="ranks.php">{t}Define ranks{/t}</a>.</span>
 		{else}
 		{t}These currently are:{/t}
 		<ul style="list-style:none;margin-left:0px;padding-left:20px;">		
@@ -134,7 +134,7 @@ The contents of the file will be displayed so you can review them before they ar
 	</li>
 </ol>
 <p>
-{t}You can download a sample CSV-file{/t} <a href="{$baseUrl}admin/media/system/example.csv">{t}here{/t}</a>.
+<a href="{$baseUrl}admin/media/system/example.csv">{t}Download a sample CSV-file{/t}</a>.
 </p>
 {/if}
 </div>

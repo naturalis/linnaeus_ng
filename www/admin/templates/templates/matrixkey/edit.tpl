@@ -10,14 +10,15 @@
 <table>
 	<tr>
 		<td>
-			{t}characteristics{/t}
+			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>)
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
 			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].label} ({$characteristics[i].type.name})</option>
 			{/section}
 			</select>
 		</td>
-		<td></td>
+		<td>
+		</td>
 		<td>
 			{t}taxa{/t} (<a href="links.php">{t}display current links per taxon{/t}</a>)
 			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
