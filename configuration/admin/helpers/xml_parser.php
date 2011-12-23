@@ -73,7 +73,7 @@ class XmlParser
 						if ($this->_doReturnValues===true)
 							return $xml;
 						else
-							exit();
+							return;
 
 					}
 
