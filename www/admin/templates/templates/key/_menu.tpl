@@ -1,1 +1,1 @@
-<a href="views/utilities/search_index.php">Extensive search</a>
+<a href="../utilities/search_index.php">Extensive search</a>

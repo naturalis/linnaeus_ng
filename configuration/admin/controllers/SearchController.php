@@ -41,6 +41,7 @@ class SearchController extends Controller
 		'characteristic_label_state',
 		'characteristic_state',
 		'geodata_type_title',
+		'occurrence_taxon',
 		'content_introduction'
     );
 
@@ -208,8 +209,6 @@ class SearchController extends Controller
   
     }
 
-
-
     /**
      * 
      *
@@ -233,8 +232,7 @@ class SearchController extends Controller
 		$this->smarty->assign('replacementResultCounters',$this->_replacementResultCounters);
 
         $this->printPage();
-  
-  
+
     }
 	
     /**
@@ -406,6 +404,9 @@ class SearchController extends Controller
 
 	private function doReplace($search,$replace,$data,$id,$type)
 	{
+	
+		// matches that have no id cannot be processed
+		if (is_null($data['id'])) return;
 
 		// store relevant data for the callback function globally
 		$this->_replaceData = array(
@@ -471,17 +472,18 @@ class SearchController extends Controller
 
 				$results = $this->doSearch($search,$modules,$freeModules);
 
-				$results['numOfResults'] =
-					(isset($results['introduction']['numOfResults']) ? $results['introduction']['numOfResults'] : 0) +
-					(isset($results['species']['numOfResults']) ? $results['species']['numOfResults'] : 0) +
-					(isset($results['modules']['numOfResults']) ? $results['modules']['numOfResults'] : 0)  +
-					(isset($results['dichkey']['numOfResults']) ? $results['dichkey']['numOfResults'] : 0)  +
-					(isset($results['literature']['numOfResults']) ? $results['literature']['numOfResults'] : 0)  +
-					(isset($results['glossary']['numOfResults']) ? $results['glossary']['numOfResults'] : 0)  +
-					(isset($results['matrixkey']['numOfResults']) ? $results['matrixkey']['numOfResults'] : 0)  +
-					(isset($results['content']['numOfResults']) ? $results['content']['numOfResults'] : 0)  +
-					(isset($results['map']['numOfResults']) ? $results['map']['numOfResults'] : 0) 
-					;
+				$results['numOfResults'] = $results['numOfReplacements'] = 0;
+
+				foreach((array)$results as $key => $val) {
+				
+					if (isset($val['numOfResults'])) {
+
+						$results['numOfResults'] += $val['numOfResults'];
+						$results['numOfReplacements'] += isset($val['numOfReplacements']) ? $val['numOfReplacements'] : $val['numOfResults'];
+					
+					}
+				
+				}
 
 				$_SESSION['user']['search'][$search]['results'] = $results;
 
@@ -549,7 +551,8 @@ class SearchController extends Controller
 	private function doSearch($search,$modules,$freeModules)
 	{
 
-		$species = $this->searchSpecies($search);
+		if (is_array($modules) && (in_array('species',$modules) || in_array('mapkey',$modules)))
+			$species = $this->searchSpecies($search);
 
 		return array(
 			'introduction' =>
@@ -565,42 +568,13 @@ class SearchController extends Controller
 			'matrixkey' => 
 				(is_array($modules) && in_array('matrixkey',$modules) ? $this->searchMatrixKey($search) : null),
 			'map' => 
-				(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap($search,$species) : null),
+				(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap($search,$species['taxonList']) : null),
 			'content' => 
 				(is_array($modules) && in_array('content',$modules) ? $this->searchContent($search) : null),
 			'modules' => 
 				$this->searchModules($search,$freeModules)	
 		);
 
-	}
-	
-	private function makeTaxonList($records)
-	{
-
-		$taxonList = null;
-
-		foreach((array)$records as $key => $val) {
-
-			if (!isset($taxonList[$val['taxon_id']])) {
-
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => $val['taxon_id']
-						),
-						'columns' => 'id,taxon'
-					)
-				);
-				
-				$taxonList[$val['taxon_id']] = $t[0];
-
-			}
-
-		}
-
-		return $taxonList;
-	
 	}
 
 	private function makeCategoryList()
@@ -748,7 +722,7 @@ class SearchController extends Controller
 	private function searchSpecies($search,$extensive=true)
 	{
 
-		$taxa = $synonyms = $commonnames = $content = $media = array();
+		$taxa = $synonyms = $commonnames = $content = $media = $taxonList = array();
 		
 		$hitCountTaxa = $hitCountContent = $hitCountSynonym = $hitCountCommon = $hitCountMedia = 0;
 
@@ -775,6 +749,8 @@ class SearchController extends Controller
 			);
 			
 			$taxa[$key]['url'] = '../species/edit.php?id='.$val['id'];
+			
+			$taxonList[$val['id']] = $val['taxon'];
 				
 		}
 
@@ -943,7 +919,7 @@ class SearchController extends Controller
 					'numOfResults' => $hitCountMedia
 				),
 			),
-			//'taxonList' => $this->makeTaxonList($d),
+			'taxonList' => $taxonList,
 			//'categoryList' => $this->makeCategoryList(),
 			'numOfResults' => $hitCountTaxa + $hitCountContent + $hitCountSynonym + $hitCountCommon + $hitCountMedia
 		);
@@ -1665,14 +1641,14 @@ class SearchController extends Controller
 
 		);
 		
-		$replaceCount = 0;
+		$hitCount = 0;
 
 		foreach((array)$content as $key => $val) {
 
 			$content[$key]['replace'] = array(
 				'model' => $this->models->Content->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$replaceCount)
+				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$hitCount)
 			);
 			
 			$content[$key]['url'] = '../content/content.php?id='.$val['id'];
@@ -1684,17 +1660,15 @@ class SearchController extends Controller
 				array(
 					'label' => _('Navigator'),
 					'data' => $content,
-					'numOfResults' => count((array)$content),
-					'numOfReplacements' => $replaceCount
+					'numOfResults' => $hitCount
 				)
 			),
-			'numOfResults' => count((array)$content),
-			'numOfReplacements' => $replaceCount
+			'numOfResults' =>$hitCount
 		);
 
 	}
 
-	private function searchMap($search,$species)
+	private function searchMap($search,$taxonList)
 	{
 
 		$titles = $this->models->GeodataTypeTitle->_get(
@@ -1706,31 +1680,66 @@ class SearchController extends Controller
 			)
 		);
 
-		$replaceCount = 0;
+		$hitCountOccurrences = $hitCountTypes = 0;
 		
 		foreach((array)$titles as $key => $val) {
 
 			$titles[$key]['replace'] = array(
 				'model' => $this->models->GeodataTypeTitle->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('title'),$replaceCount)
+				'matches' => $this->getColumnMatches($search,$val,array('title'),$hitCountTypes)
 			);
 
 			$titles[$key]['url'] =  '../mapkey/data_types.php';
 
 		}
 
+
+		$d = $this->models->OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns' => 'distinct taxon_id'
+			)
+		);
+		
+		$occurrences = array();
+		
+		foreach((array)$d as $key => $val) {
+
+			if (isset($taxonList[$val['taxon_id']])) {
+			
+				$val['taxon'] = $taxonList[$val['taxon_id']];
+			
+				$occurrences[$key]['replace'] = array(
+					'model' => $this->models->GeodataTypeTitle->getClassName(),
+					'id' => null,
+					'matches' => $this->getColumnMatches($search,$val,array('taxon'),$hitCountOccurrences)
+				);
+
+				$occurrences[$key]['url'] =  '../mapkey/species.php?id='.$val['taxon_id'];
+
+			}
+
+		}		
+		
 		return array(
 			'results' => array(
 				array(
 					'label' => _('Geographic datatype'),
 					'data' => $titles,
-					'numOfResults' => (isset($titles) ? count((array)$titles) : 0),
-					'numOfReplacements' => $replaceCount
+					'numOfResults' => $hitCountTypes
+				),
+				array(
+					'label' => _('Geographic occurrences'),
+					'data' => $occurrences,
+					'numOfResults' => $hitCountOccurrences,
+					'canReplace' => false
 				),
 			),
-			'numOfResults' => isset($geo) ? count((array)$geo) : 0,
-			'numOfReplacements' => $replaceCount
+			'numOfResults' => $hitCountTypes+$hitCountOccurrences,
+			'numOfReplacements' => $hitCountTypes
 		);
 
 	}

@@ -2130,7 +2130,7 @@ class Controller extends BaseClass
 
         if (empty($this->appName)) $this->log('No application name set',2);
         if (empty($this->_viewName)) $this->log('No view name set',2);
-		if (empty($this->controllerBaseName)) $this->log('No controller basename set',2);
+		if (empty($this->controllerBaseName)) $this->log('No controller basename set',0);
 		if (empty($this->baseUrl)) $this->log('No base URL set',2);
         if (empty($this->_fullPath)) $this->log('No full path set',2);
         if (empty($this->_fullPathRelative)) $this->log('No relative full path set',2);
