@@ -1,6 +1,9 @@
 	{foreach from=$resultData key=cat item=resultItems}
 		{if $cat!='numOfResults'}
 			{foreach from=$resultItems.results item=modules}
+
+				{if !($includeReplace && $modules.canReplace===false)}
+			
 				{capture name=moduleHeader}
 				{assign var=module_sys_name value=$modules.label|@strtolower|@replace:' ':'_'}
 				<a name="{$module_sys_name}"></a> 
@@ -29,7 +32,7 @@
 				{foreach from=$modules.data item=moduleData}
 
 					{foreach from=$moduleData.replace.matches key=k item=columns}
-					
+			
 						{foreach from=$columns item=occurrences}						
 
 						{if $replaceIndex[$occurrences.id]===false && $occurrences|is_array}
@@ -72,7 +75,8 @@
 				{$smarty.capture.moduleHeader}
 				{$smarty.capture.moduleBody}
 				</div>
-				{/if}				
+				{/if}			
+				{/if}			
 			{/foreach}
 		{/if}
 	{/foreach}

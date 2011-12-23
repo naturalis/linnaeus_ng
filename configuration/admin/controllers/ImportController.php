@@ -1,4 +1,5 @@
 <?php
+
 /*
 
 FREE MODULES MEDIA
@@ -2924,12 +2925,12 @@ $res = $this->fixOldInternalLinks();
 
 					$d = explode(',',trim((string)$vVal->specs));
 
-					$lat1 = (int)$d[0];
-					$lat2 = (int)$d[2];
-					$lon1 = (-1 * (int)$d[1]);
-					$lon2 = (-1 * (int)$d[3]);
-					$sqW = (int)$d[4];
-					$sqH = (int)$d[5];
+					$lat1 = floatval($d[0]);
+					$lat2 = floatval($d[2]);
+					$lon1 = (-1 * floatval($d[1]));
+					$lon2 = (-1 * floatval($d[3]));
+					$sqW = floatval($d[4]);
+					$sqH = floatval($d[5]);
 
 					$_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
 						array(
@@ -2942,7 +2943,7 @@ $res = $this->fixOldInternalLinks();
 								),
 							'square' => array('width' => $sqW,'height' => $sqH),
 							'widthInSquares' => (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW,	//((int)($d[1] - $d[3]) / $d[4]),
-							'heightInSquares' => ((int)($lat1 - $lat2) / $sqH)
+							'heightInSquares' => (($lat1 - $lat2) / $sqH)
 						);
 				}
 				
@@ -3269,16 +3270,28 @@ $res = $this->fixOldInternalLinks();
 
 		$s = $g = $l = null;
 
-		foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) {
-			if (isset($val['taxon']) && isset($val['id'])) $s[$val['taxon']] = $val['id'];
+		if (isset($_SESSION['system']['import']['loaded']['species'])) {
+
+			foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) {
+				if (isset($val['taxon']) && isset($val['id'])) $s[$val['taxon']] = $val['id'];
+			}
+			
 		}
 
-		foreach((array)$_SESSION['system']['import']['glossary'] as $val) {
-			if (isset($val['term']) && isset($val['id'])) $g[$val['term']] = $val['id'];
+		if (isset($_SESSION['system']['import']['glossary'])) {
+
+			foreach((array)$_SESSION['system']['import']['glossary'] as $val) {
+				if (isset($val['term']) && isset($val['id'])) $g[$val['term']] = $val['id'];
+			}
+
 		}
 
-		foreach((array)$_SESSION['system']['import']['literature'] as $val) {
-			if (isset($val['original']) && isset($val['id'])) $l[$val['original']] = $val['id'];
+		if (isset($_SESSION['system']['import']['literature'])) {
+
+			foreach((array)$_SESSION['system']['import']['literature'] as $val) {
+				if (isset($val['original']) && isset($val['id'])) $l[$val['original']] = $val['id'];
+			}
+
 		}
 		
 		return array(
