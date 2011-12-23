@@ -7,7 +7,7 @@ class XmlParser
 	private $_nodeName = null;
 	private $_getSingleNode = false;
 	private $_callbackFunction = null;
-	private $_doReturnValues = true;
+	private $_doReturnValues = false;
 	
 	public function setFileName($fileName)
 	{
