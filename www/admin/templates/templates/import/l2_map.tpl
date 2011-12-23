@@ -5,7 +5,8 @@
 <div id="page-main">
 {if $processed==true}
 <p>
-Data import is complete. You have been added as system administrator to the new project. In that capacity you can finish configuring the project by adding modules, creating users etc.
+Data import is complete. You have been added as system administrator to the new project. In that capacity you can finish configuring the project by adding modules, creating users etc.<br />
+(project id: {$projectId})
 </p>
 <p>
 <a href="go_new_project.php">Go to project index</a>

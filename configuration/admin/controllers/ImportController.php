@@ -317,47 +317,54 @@ class ImportController extends Controller
 
 		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
 
-		$d = $this->helpers->XmlParser->getNodes('treetaxon');
+		$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_ResolveRanks'));
 
-		$ranks = $this->resolveProjectRanks($d);
-		$species = $this->resolveSpecies($d,$ranks,($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null));
-		$treetops = $this->checkTreeTops($species);
+		$this->helpers->XmlParser->getNodes('treetaxon');
+		
+		$_SESSION['system']['import']['substRanks'] = ($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null);
+
+		$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_ResolveSpecies'));
+
+		$this->helpers->XmlParser->getNodes('treetaxon');
+		
+		$treetops = $this->checkTreeTops($_SESSION['system']['import']['loaded']['species']);
 
 		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
 
-			$ranks = $_SESSION['system']['import']['loaded']['ranks'] =
+			$_SESSION['system']['import']['loaded']['ranks'] =
 				$this->addProjectRanks(
-					$ranks,
+					$_SESSION['system']['import']['loaded']['ranks'],
 					($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null),
 					($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null)
 				);
 
 			$species = $_SESSION['system']['import']['loaded']['species'] =
-				$this->addSpecies($species,$ranks);
+				$this->addSpecies($_SESSION['system']['import']['loaded']['species'],$_SESSION['system']['import']['loaded']['ranks']);
 
 			if (isset($this->requestData['treetops']))
-				$species = $_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
+				$_SESSION['system']['import']['loaded']['species'] =
+					$_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
 			
-			$this->assignTopSpeciesToUser($species);
+			$this->assignTopSpeciesToUser($_SESSION['system']['import']['loaded']['species']);
 
 			$this->addModuleToProject(4);
 			$this->addModuleToProject(5);
 			$this->grantModuleAccessRights(4);
 			$this->grantModuleAccessRights(5);
 			
-			$this->addMessage('Saved '.count((array)$ranks).' ranks');
-			$this->addMessage('Saved '.count((array)$species).' species');
+			$this->addMessage('Saved '.count((array)$_SESSION['system']['import']['loaded']['ranks']).' ranks');
+			$this->addMessage('Saved '.count((array)$_SESSION['system']['import']['loaded']['species']).' species');
 
 			$this->smarty->assign('processed',true);
 
 		}
 
 		$this->smarty->assign('project',$project);
-		$this->smarty->assign('ranks',$ranks);
+		$this->smarty->assign('ranks',$_SESSION['system']['import']['loaded']['ranks']);
 		$this->smarty->assign('projectRanks',$this->getPossibleRanks());
 		if ($this->rHasVal('substRanks')) $this->smarty->assign('substRanks',$this->requestData['substRanks']);
 		if ($this->rHasVal('substParentRanks')) $this->smarty->assign('substParentRanks',$this->requestData['substParentRanks']);
-		$this->smarty->assign('species',$species);
+		$this->smarty->assign('species',$_SESSION['system']['import']['loaded']['species']);
 		$this->smarty->assign('treetops',$treetops);
 
         $this->printPage();
@@ -793,7 +800,7 @@ class ImportController extends Controller
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrixResolve'));
 
 					$this->helpers->XmlParser->getNodes('taxondata');
-					
+
 					if (isset($_SESSION['system']['import']['loaded']['key_matrix']['matrices'])) {
 
 						$m = $this->saveMatrices($_SESSION['system']['import']['loaded']['key_matrix']['matrices']);
@@ -897,6 +904,7 @@ class ImportController extends Controller
 		}
 			
 
+		$this->smarty->assign('projectId',$this->getNewProjectId());
         $this->printPage();
 
 	}
@@ -1132,58 +1140,55 @@ $res = $this->fixOldInternalLinks();
 	}
 
 	// ranks
-	private function resolveProjectRanks($d)
+	public function xmlParserCallback_ResolveRanks($obj)
 	{
 
-		foreach((array)$d as $key => $val) {
+		$importRank = trim((string)$obj->taxon);
+		$parentRankParent = trim((string)$obj->parenttaxon);
 		
-			$importRank = trim((string)$val->taxon);
-			$parentRankParent = trim((string)$val->parenttaxon);
+		if (empty($importRank)) return;
 
-			if (!isset($res[$importRank])) {
+		if (!isset($_SESSION['system']['import']['loaded']['ranks'][$importRank])) {
+
+				$r = $this->models->Rank->_get(
+					array(
+						'id' => array('default_label' => $importRank),
+						'columns' => 'id'
+					)
+				);
+				
+				$rankId = $r[0]['id'];
+
+			if (isset($rankId)) {
+
+				$_SESSION['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = $rankId;
+				
+				if ($parentRankParent!='none') {
+
 					$r = $this->models->Rank->_get(
 						array(
-							'id' => array('default_label' => $importRank),
+							'id' => array('default_label' => $parentRankParent),
 							'columns' => 'id'
 						)
 					);
 					
-					$rankId = $r[0]['id'];
-
-				if (isset($rankId)) {
-
-					$res[$importRank]['rank_id'] = $rankId;
-					
-					if ($parentRankParent!='none') {
-
-						$r = $this->models->Rank->_get(
-							array(
-								'id' => array('default_label' => $parentRankParent),
-								'columns' => 'id'
-							)
-						);
-						
-						$res[$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
-						$res[$importRank]['parent_name'] = $parentRankParent;
-
-					} else {
-
-						$res[$importRank]['parent_id'] = null;
-
-					}
-
+					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_name'] = $parentRankParent;
 
 				} else {
 
-					$res[$importRank]['rank_id'] = false;
+					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = null;
 
 				}
-				
+
+
+			} else {
+
+				$_SESSION['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = false;
+
 			}
-
+			
 		}
-
-		return isset($res) ? $res : null;
 
 	}
 
@@ -1292,55 +1297,26 @@ $res = $this->fixOldInternalLinks();
 	}
 
 	// species (& treetops)
-	private function resolveSpecies($d,$ranks,$substituteRanks=null)
+	public function xmlParserCallback_ResolveSpecies($obj)
 	{
 
-		$failed = null;
+		$rankName = trim((string)$obj->taxon) ? trim((string)$obj->taxon) : null;
+		$rankId =
+			isset($_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]) &&
+			$_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id']!==false ?
+				$_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id'] :
+				(isset($_SESSION['system']['import']['substRanks'][$rankName]) ?
+					$_SESSION['system']['import']['substRanks'][$rankName] :
+					null
+				);
 
-		foreach((array)$d as $key => $val) {
-		
-			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
-			$rankId =
-				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
-					$ranks[trim((string)$val->taxon)]['rank_id'] :
-					(isset($substituteRanks[$rankName]) ?
-						$substituteRanks[$rankName] :
-						null
-					);
-
-
-			$res[trim((string)$val->name)] = array(
-				'taxon' => trim((string)$val->name),
-				'rank_id' => $rankId,
-				'rank_name' => $rankName,
-				'parent' => trim((string)$val->parentname),
-				'source' => 'tree->treetaxon'
-			);
-			
-		}
-
-		foreach((array)$d as $val) {
-
-			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
-			$rankId =
-				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
-					$ranks[trim((string)$val->taxon)]['rank_id'] :
-					(isset($substituteRanks[$rankName]) ?
-						$substituteRanks[$rankName] :
-						null
-					);
-
-			$res[trim((string)$val->name)] = array(
-				'taxon' => trim((string)$val->name),
-				'rank_id' => $rankId,
-				'rank_name' => $rankName,
-				'parent' => trim((string)$val->parentname),
-				'source' => 'records->taxondata'
-			);
-
-		}
-
-		return isset($res) ? $res : null;
+		$_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)] = array(
+			'taxon' => trim((string)$obj->name),
+			'rank_id' => $rankId,
+			'rank_name' => $rankName,
+			'parent' => trim((string)$obj->parentname),
+			'source' => 'records->taxondata'
+		);
 
 	}
 
@@ -1583,7 +1559,8 @@ $res = $this->fixOldInternalLinks();
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					$fileName
+					$fileName,
+					true
 				);
 	
 				if ($r['saved']==true) {
@@ -1632,7 +1609,7 @@ $res = $this->fixOldInternalLinks();
 					
 	}
 
-	private function doAddSpeciesMedia($taxonId,$fileName,$fullName)
+	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$isOverviewPicture=false)
 	{
 
 		if ($_SESSION['system']['import']['imagePath']==false)
@@ -1668,7 +1645,8 @@ $res = $this->fixOldInternalLinks();
 						'thumb_name' => $thumbName,
 						'original_name' => $fullName,
 						'mime_type' => $thisMIME,
-						'file_size' => filesize($_SESSION['system']['import']['imagePath'].$fileName)
+						'file_size' => filesize($_SESSION['system']['import']['imagePath'].$fileName),
+						'overview_image' => ($isOverviewPicture ? 1 : 0)
 					)
 				);
 
@@ -2555,8 +2533,16 @@ $res = $this->fixOldInternalLinks();
 			//?? (string)$obj->identify->id_file->obj_link
 
 			$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_replace('.adm','',$matrixname);
+			
+			if (isset($obj->identify->id_file->characters->character_))
+				$chars = $obj->identify->id_file->characters->character_;
+			else
+			if (isset($obj->identify->id_file->characters->character))
+				$chars = $obj->identify->id_file->characters->character;
+			else
+				$chars = null;
 
-			foreach($obj->identify->id_file->characters->character_ as $char) {
+			foreach($chars as $char) {
 
 				//character_type ?? welke mogelijkheden + resolvement: Text 
 
@@ -3776,6 +3762,114 @@ $res = $this->fixOldInternalLinks();
 			'litFail' => $litFail,
 			'refFail' => $refFail,
 		);
+
+	}
+
+	// ranks
+	private function resolveProjectRanks($d)
+	{
+
+		foreach((array)$d as $key => $val) {
+		
+			$importRank = trim((string)$val->taxon);
+			$parentRankParent = trim((string)$val->parenttaxon);
+
+			if (!isset($res[$importRank])) {
+					$r = $this->models->Rank->_get(
+						array(
+							'id' => array('default_label' => $importRank),
+							'columns' => 'id'
+						)
+					);
+					
+					$rankId = $r[0]['id'];
+
+				if (isset($rankId)) {
+
+					$res[$importRank]['rank_id'] = $rankId;
+					
+					if ($parentRankParent!='none') {
+
+						$r = $this->models->Rank->_get(
+							array(
+								'id' => array('default_label' => $parentRankParent),
+								'columns' => 'id'
+							)
+						);
+						
+						$res[$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+						$res[$importRank]['parent_name'] = $parentRankParent;
+
+					} else {
+
+						$res[$importRank]['parent_id'] = null;
+
+					}
+
+
+				} else {
+
+					$res[$importRank]['rank_id'] = false;
+
+				}
+				
+			}
+
+		}
+
+		return isset($res) ? $res : null;
+
+	}
+
+	private function resolveSpecies($d,$ranks,$substituteRanks=null)
+	{
+
+		$failed = null;
+
+		foreach((array)$d as $key => $val) {
+		
+			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
+			$rankId =
+				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
+					$ranks[trim((string)$val->taxon)]['rank_id'] :
+					(isset($substituteRanks[$rankName]) ?
+						$substituteRanks[$rankName] :
+						null
+					);
+
+
+			$res[trim((string)$val->name)] = array(
+				'taxon' => trim((string)$val->name),
+				'rank_id' => $rankId,
+				'rank_name' => $rankName,
+				'parent' => trim((string)$val->parentname),
+				'source' => 'tree->treetaxon'
+			);
+			
+		}
+
+		foreach((array)$d as $val) {
+
+			$rankName = trim((string)$val->taxon) ? trim((string)$val->taxon) : null;
+			$rankId =
+				isset($ranks[trim((string)$val->taxon)]) && $ranks[trim((string)$val->taxon)]['rank_id']!==false ?
+					$ranks[trim((string)$val->taxon)]['rank_id'] :
+					(isset($substituteRanks[$rankName]) ?
+						$substituteRanks[$rankName] :
+						null
+					);
+
+			$res[trim((string)$val->name)] = array(
+				'taxon' => trim((string)$val->name),
+				'rank_id' => $rankId,
+				'rank_name' => $rankName,
+				'parent' => trim((string)$val->parentname),
+				'source' => 'records->taxondata'
+			);
+
+		}
+
+		return isset($res) ? $res : null;
 
 	}
 
