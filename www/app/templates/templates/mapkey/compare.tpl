@@ -2,61 +2,54 @@
 
 <div id="page-main">
 {if !$isOnline}
-{t}Your computer appears to be offline. Unfortunately, the map key doesn't work without an internet connection.{/t}
+{t}Your computer appears to be offline. Unfortunately, the map doesn't work without an internet connection.{/t}
 {else}
 
 	<div id="map_canvas">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
-	<div id="map_options">
+	<div id="map_compare">
 		{t}Select two species to compare{/t}<br />
-		 ({t}switch to {/t}<a href="examine.php">{t}examine species{/t}</a>{t} or {/t}<a href="search.php">{t}map search{/t}</a>)
 		<p>
-		Taxon A:
+		{t}Species A:{/t}
 		<select name="idA" id="idA" class="taxon-select">	
-		<option value="" {if !$taxonA}selected="selected"{/if}>{t}--choose taxon--{/t}</option>
+		<option value="" {if !$taxonA}selected="selected"{/if}>{t}--choose species--{/t}</option>
 		{foreach from=$taxa key=k item=v}
 		<option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
 		{/foreach}
 		</select>	
-		</p>
-		<p>
-		Taxon B:
+		<br />
+		{t}Species B:{/t}
 		<select name="idB" id="idB" class="taxon-select">	
-		<option value="" {if !$taxonB}selected="selected"{/if}>{t}--choose taxon--{/t}</option>
+		<option value="" {if !$taxonB}selected="selected"{/if}>{t}--choose species--{/t}</option>
 		{foreach from=$taxa key=k item=v}
 		<option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
 		{/foreach}
-		</select>	
+		</select><br />	
+		<input id="map_compare_button" type="button" value="compare" onclick="doMapCompare()" />
 		</p>
-		<p>
-		<input type="button" value="compare" onclick="doMapSearch()" />
-		</p>
-
-		<hr style="height:1px;color:#999" />
-		{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
 
 		{if $taxonA && $taxonB}
-		<hr style="height:1px;color:#999" />
+		<hr style="height:1px;color:#eee" />
 		<b>{t}Comparison{/t}</b><br />
 		{foreach from=$overlap key=k item=v}
 			<i>{$geoDataTypes[$v.type_id].title}</i>:
 			{t _s1=$taxonA.taxon _s2=$taxonB.taxon _s3=$v.total}%s intersects or overlaps %s in %s instances.{/t}<br /><br />
 		{/foreach}
 		{if !$overlap}{t}There is no overlap between these two species.{/t}{/if}
-		<hr style="height:1px;color:#999" />
+		<hr style="height:1px;color:#eee" />
 		{/if}
 
 		<table>
 		{if $taxonA}
 			<tr style="vertical-align:top">
-				<td colspan="4"><b>{$taxonA.taxon}</b>{if $countA.total>0} ({$countA.total}){/if}</td>
+				<td colspan="4"><b>{$taxonA.taxon}</b>{* if $countA.total>0} ({$countA.total}){/if *}</td>
 			</tr>
 			{foreach from=$geoDataTypes key=k item=v}
 			{if $countA.data[$k]}
 				<tr style="vertical-align:top">
-					<td style="width:25px;border:1px solid black;background-color:#{$v.colour}"></td>
+					<td style="width:25px;border:1px solid black;background-color:#{$v.colour}" onclick="$('#toggle-{$v.id}-{$taxonA.id}').attr('checked',!$('#toggle-{$v.id}-{$taxonA.id}').attr('checked'));doMapTypeToggle({$v.id},{$taxonA.id});"></td>
 					<td style="width:5px;"></td>
-					<td style="width:215px;">{$v.title} ({$countA.data[$k]})</td>
-					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id},{$taxonA.id})" class="a">hide</td>
+					<td style="width:215px;"><label for="toggle-{$v.id}-{$taxonA.id}">{$v.title}</label></td>{* ({$countA.data[$k]}) *}
+					<td style="width:25px;"><input type="checkbox" id="toggle-{$v.id}-{$taxonA.id}" onclick="doMapTypeToggle({$v.id},{$taxonA.id})" checked="checked"></td>
 				</tr>
 				<tr><td colspan="4" style="height:1px;"></td></tr>
 			{/if}
@@ -74,15 +67,15 @@
 	
 		{if $taxonB}
 			<tr style="vertical-align:top">
-				<td colspan="4"><b>{$taxonB.taxon}</b>{if $countB.total>0} ({$countB.total}){/if}</td>
+				<td colspan="4"><b>{$taxonB.taxon}</b>{* if $countB.total>0} ({$countB.total}){/if *}</td>
 			</tr>
 			{foreach from=$geoDataTypes key=k item=v}
 			{if $countB.data[$k]}
 				<tr style="vertical-align:top">
-					<td style="width:25px;border:1px solid black;background-color:#{$v.colour_inverse}"></td>
+					<td style="width:25px;border:1px solid black;background-color:#{$v.colour_inverse}" onclick="$('#toggle-{$v.id}-{$taxonB.id}').attr('checked',!$('#toggle-{$v.id}-{$taxonB.id}').attr('checked'));doMapTypeToggle({$v.id},{$taxonB.id});"></td>
 					<td style="width:5px;"></td>
-					<td style="width:215px;">{$v.title} ({$countB.data[$k]})</td>
-					<td style="width:25px;" hidden="0" onclick="doMapTypeToggle(this,{$v.id},{$taxonB.id})" class="a">hide</td>
+					<td style="width:215px;"><label for="toggle-{$v.id}-{$taxonB.id}">{$v.title}</label></</td>{* ({$countB.data[$k]}) *}
+					<td style="width:25px;"><input type="checkbox" id="toggle-{$v.id}-{$taxonB.id}" onclick="doMapTypeToggle({$v.id},{$taxonB.id})" checked="checked"></td>
 				</tr>
 				<tr><td colspan="4" style="height:1px;"></td></tr>
 			{/if}
@@ -102,7 +95,7 @@
 $(document).ready(function(){
 {/literal}
 
-	initMap({$mapInitString});
+	initMap({if $mapInitString}{$mapInitString}{else}{literal}{}{/literal}{/if});
 	{if $mapBorder}
 	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));
 	{/if}

@@ -1,25 +1,29 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
 {if $isHigherTaxa}
-{t _s1='<a href="index.php">' _s2='</a>'}Below are all taxa in your project that are part of the higher taxa. All lower taxa can be found in the %sspecies module%s.{/t}
+	{t _s1='<a href="index.php">' _s2='</a>'}Below are all taxa in your project that are part of the higher taxa. All lower taxa can be found in the %sspecies module%s.{/t}
 {else}
-{t _s1='<a href="../highertaxa/">' _s2='</a>'}Below are all taxa in your project that are part of the species module. All higher taxa can be found in the %shigher taxa module%s.{/t}
+	{t _s1='<a href="../highertaxa/">' _s2='</a>'}Below are all taxa in your project that are part of the species module. All higher taxa can be found in the %shigher taxa module%s.{/t}
 {/if}
+
 <br/>
+
 {t}To edit a name, rank or parent, click the taxon's name. To edit a taxon's pages, click the percentage-indicator for that taxon in the 'content' column. To edit media files, synoyms or common names, click the cell in the corresponding column.{/t}<br />
 {if $isHigherTaxa}
-{t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
+	{t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
 {/if}
 {t}You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows.{/t}
+
 <br/>
 	<span id="message-container" style="margin-left:175px">&nbsp;</span>
 	<table style="width:100%">
 	<tr style="vertical-align:bottom">
 		<!-- th style="width:100px;" onclick="allTableColumnSort('taxon_order');">{t}Rank{/t}</th -->
-		<th style="width:240px;" onclick="allTableColumnSort('taxon');">{t}Taxon{/t}</th>
+		<th style="width:240px;" {*onclick="allTableColumnSort('taxon');"*}>{t}Taxon{/t}</th>
 {if $session.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
-		<th style="width:50px;text-align:right;" onclick="allTableColumnSort('pct_finished');">{t}Content{/t}</th>
+		<th style="width:50px;text-align:right;" {*onclick="allTableColumnSort('pct_finished');"*}>{t}Content{/t}</th>
 {if !$isHigherTaxa}
 		<th style="width:50px;" title="{t}images, videos, soundfiles{/t}">{t}Media{/t}</th>
 {/if}
@@ -32,10 +36,7 @@
 	</tr>
 	
 	{assign var=prev_rank value=-1}
-	{assign var=firstDotLength value=false}
-
 	{foreach item=taxon from=$taxa}
-		{if $firstDotLength==false}{assign var=firstDotLength value=$taxon.level}{/if}
 		{assign var=t value=$taxon.id}
 		{if $prev_rank!=$taxon.rank_id && $taxon.sibling_count>1}
 			{if $arrowBuffer==true}
@@ -49,7 +50,7 @@
 		<span style="color:#bbb">{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}</span>{$taxon.rank}
 		</td -->
 		<td class="taxon-list-cell-name" id="namecell{$taxon.id}">
-			{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}
+			{$taxon.dots}
 			{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
 			<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
 		</td>

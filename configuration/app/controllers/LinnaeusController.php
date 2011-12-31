@@ -165,7 +165,6 @@ class LinnaeusController extends Controller
 		$this->setPageName( _($d['subject']));
 
 		$this->smarty->assign('subject',$this->matchGlossaryTerms($d['subject']));
-
 		$this->smarty->assign('content',$this->matchGlossaryTerms($d['content']));
 
         $this->printPage();
@@ -1837,7 +1836,7 @@ q($results,1,1);
 		- Introduction / other content
 		- Dichotomous key
 		- Matrix key 
-		- Map key
+		- Distribution
 		*/
 
 		$this->smarty->assign(

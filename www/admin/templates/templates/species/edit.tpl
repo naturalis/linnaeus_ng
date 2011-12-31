@@ -24,7 +24,7 @@
 		<td colspan="2">
 			<select name="rank_id" id="rank-id">
 			{section name=i loop=$projectRanks}
-				{if ($isHigherTaxa && $projectRanks[i].lower_taxon==0) || (!$isHigherTaxa)}
+				{if ($isHigherTaxa && $projectRanks[i].lower_taxon==0) || (!$isHigherTaxa && $projectRanks[i].lower_taxon==1)}
 				<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
 				{/if }
 			{/section}

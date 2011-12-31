@@ -105,7 +105,7 @@
 	<tr style="vertical-align:top">
 		<td style="white-space:nowrap">{t}Taxa this reference pertains to:{/t}</td>
 		<td>
-			<select id="taxa">
+			<select id="taxa" multiple="multiple" size="20" style="width:250px">
             {foreach from=$taxa key=k item=v}
             {if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)}
             <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
@@ -116,7 +116,11 @@
             {/if}
             {/foreach}
 			</select>
+		</td>
+		<td>
 			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList()">{t}add{/t}</span>
+		</td>
+		<td>
 			<div id="selected-taxa"></div>
 		</td>
 	</tr>

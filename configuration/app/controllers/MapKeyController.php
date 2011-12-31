@@ -1,4 +1,26 @@
 <?php
+/*
+
+div index:
+	values of "-"
+	double nodes in boudary nodes
+	double [[ / ]] if no multi-poly
+
+
+update dev_diversity_index set project_id = 278;
+update dev_diversity_index set type_id = 468 where type_id = 418;
+update dev_diversity_index set type_id = 469 where type_id = 419;
+update dev_diversity_index set type_id = 470 where type_id = 420;
+update dev_diversity_index set type_id = 471 where type_id = 421;
+update dev_diversity_index set type_id = 472 where type_id = 422;
+update dev_diversity_index set type_id = 473 where type_id = 423;
+update dev_diversity_index set type_id = 475 where type_id = 425;
+update dev_diversity_index set type_id = 476 where type_id = 426;
+update dev_diversity_index set type_id = 477 where type_id = 427;
+
+
+
+*/
 
 include_once ('Controller.php');
 
@@ -10,16 +32,18 @@ class MapKeyController extends Controller
 		'map_name',
 		'occurrence_taxon',
 		'geodata_type',
-		'geodata_type_title'
+		'geodata_type_title',
+		'diversity_index'
 	);
     
     public $usedHelpers = array('csv_parser_helper');
 
-    public $controllerPublicName = 'Map key';
+    public $controllerPublicName = 'Distribution';
 
 	public $cssToLoad = array(
 		'basics.css',
-		'map.css'
+		'map.css',
+		'lookup.css'
 	);
 
 	public $jsToLoad = array(
@@ -27,7 +51,8 @@ class MapKeyController extends Controller
 			array(
 				'main.js',
 				'mapkey.js',
-				'http://maps.google.com/maps/api/js?sensor=false'
+				'http://maps.google.com/maps/api/js?sensor=false&libraries=drawing',
+				'lookup.js'
 			)
 		);
 
@@ -62,8 +87,17 @@ class MapKeyController extends Controller
     {
 
 		unset($_SESSION['user']['search']['hasSearchResults']);
-    	
-		$this->redirect('examine.php');
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+
+		$taxa = $this->getTaxaWithOccurrences();
+
+		$d = current($taxa);
+		
+		if (isset($d['id'])) 
+			$this->redirect('examine_species.php?id='.$d['id']);
+		else
+			$this->redirect('examine.php');
 	
 		/*
         $this->setPageName( _('Index'));
@@ -77,21 +111,14 @@ class MapKeyController extends Controller
 	{
 
 		$this->setPageName(_('Choose a species'));
-
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
-
-		// get taxa
-		$taxa = $this->getTreeList();
 		
-		$pagination = $this->getPagination($taxa,$this->controllerSettings['speciesPerPage']);
+		$pagination = $this->getPagination($this->getTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
 		if(isset($pagination['items'])) $this->smarty->assign('taxa',$pagination['items']);
-
-		if(isset($pagination['items'])) $this->smarty->assign('taxonOccurrenceCount',$this->getTaxaOccurrenceCount());
 
 		$this->printPage();	
 
@@ -119,6 +146,8 @@ class MapKeyController extends Controller
 		$this->smarty->assign('occurrences',$d['occurrences']);
 
 		$this->smarty->assign('mapBorder',$this->getMapBorder($d['occurrences']));
+		
+		$this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
 
 		$this->printPage();	
 
@@ -164,9 +193,7 @@ class MapKeyController extends Controller
 
 		}
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
-
-		$taxa = $this->getTreeList();
+		$taxa = $this->getTaxaWithOccurrences();
 
 		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
 
@@ -198,8 +225,10 @@ class MapKeyController extends Controller
 		$this->setPageName(_('Search'));
 
 		if ($this->rHasVal('coordinates')) {
+		
+			$coordinates = $this->rectangleIntoPolygon($this->requestData['coordinates']);
 
-			$results = $this->searchPolygon($this->requestData['coordinates']);
+			$results = $this->searchPolygon($coordinates);
 
 			if ($results['count']['total']>0) {
 
@@ -211,17 +240,13 @@ class MapKeyController extends Controller
 
 			}
 
-		}
-
-		if (isset($this->requestData['coordinates'])) {
-		
-			$c = explode('),(',$this->requestData['coordinates']);
+			$c = explode('),(',$coordinates);
 			
 			foreach((array)$c as $key => $val) {
 				$d = explode(',',trim($val,')('));
 				$nodes[] = array('latitude' => $d[0], 'longitude' => $d[1]);
 			}
-		
+
 			$this->smarty->assign('coordinates',$this->requestData['coordinates']);
 
 			$this->smarty->assign('mapBorder',$this->getMapBorder(array_merge((array)$results['results'],(array)$nodes)));
@@ -236,11 +261,55 @@ class MapKeyController extends Controller
 
 		if (isset($geoDataTypes)) $this->smarty->assign('geoDataTypes',$geoDataTypes);
 
+		$this->smarty->assign('mapInitString','{drawingmanager:true}');
+
 		$this->printPage();	
 
 	}
+	
+	public function diversityAction()
+	{
+	
+		$this->setPageName(_('Diversity index'));
 
+		$data = $this->getDiversityIndex();
 
+		foreach((array)$data as $key => $val) $data[$key]['nodes'] = json_decode($val['boundary_nodes']);
+
+		$geoDataTypes = $this->getGeoDataTypes();
+
+		$this->smarty->assign('geoDataTypes',$geoDataTypes);
+
+		$this->smarty->assign('data',$data);
+
+		$this->smarty->assign('mapBorder',$this->getMapBorder($data));
+		
+		$this->printPage();		
+	
+	}
+	
+	private function getDiversityIndex()
+	{
+	
+		return $this->models->DiversityIndex->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+	
+	
+	}
+
+	public function ajaxInterfaceAction()
+	{
+
+		if (!$this->rHasVal('action')) $this->smarty->assign('returnText','error');
+		
+		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+			
+		}
+
+        $this->printPage();
+	
+	}
 
 
 	private function checkRemoteServerAccessibility()
@@ -256,9 +325,9 @@ class MapKeyController extends Controller
 		
 	}
 
-	private function getTaxaOccurrenceCount()
+	private function getTaxaOccurrenceCount($taxaToFilter=null)
 	{
-	
+
 		$ot = $this->models->OccurrenceTaxon->_get(
 			array(
 				'id' => array(
@@ -269,8 +338,28 @@ class MapKeyController extends Controller
 				'fieldAsIndex' => 'taxon_id'
 			)
 		);
+		
+		
+		if (isset($taxaToFilter)) {
+		
+			foreach((array)$ot as $key => $val) {
+			
+				if ($val['total']!=0) {
+				
+					$d[$key] = $taxaToFilter[$key];
+					$d[$key]['total'] = $val['total'];
 
-		return $ot;
+				}
+			
+			}
+			
+		} else {
+		
+			$d = $ot;
+		
+		}
+
+		return $d;
 	
 	}
 
@@ -283,6 +372,15 @@ class MapKeyController extends Controller
 
 		return (strlen($r)==1 ? $r.$r : $r).(strlen($g)==1 ? $g.$g : $g).(strlen($b)==1 ? $b.$b : $b);
 	
+	}
+	
+	private function rectangleIntoPolygon($coo)
+	{
+
+		$d = explode(',',str_replace(array('(',')'),'',$coo));
+		
+		return '(('.$d[0].','.$d[1].'),('.$d[0].','.$d[3].'),('.$d[2].','.$d[3].'),('.$d[2].','.$d[1].'))';
+
 	}
 
 	private function getTaxonOccurrences($id,$occ=null)
@@ -380,7 +478,7 @@ class MapKeyController extends Controller
 
 		foreach((array)$occurrences as $key => $val) {
 
-			if ($val['latitude'] && $val['longitude']) {
+			if (isset($val['latitude']) && isset($val['longitude'])) {
 
 				if (!empty($val['latitude']) && $val['latitude'] < $sLat) $sLat = $val['latitude'];
 				if (!empty($val['latitude']) && $val['latitude'] > $lLat) $lLat = $val['latitude'];
@@ -388,7 +486,7 @@ class MapKeyController extends Controller
 				if (!empty($val['longitude']) && $val['longitude'] > $lLng) $lLng = $val['longitude'];
 
 			} else
-			if ($val['nodes']) {
+			if (isset($val['nodes'])) {
 
 				foreach((array)$val['nodes'] as $nKey => $nVal) {
 		
@@ -403,15 +501,51 @@ class MapKeyController extends Controller
 
 				}
 		
+			} else
+			if (isset($val['boundary_nodes'])) {
+
+				foreach((array)json_decode($val['boundary_nodes']) as $nKey => $nVal) {
+				
+					if (is_array($nVal)) {
+
+						foreach($nVal as $oVal) {
+				
+							if (isset($oVal[0]) && isset($oVal[1]) && is_numeric($oVal[0]) && is_numeric($oVal[1])) {
+				
+								if (!empty($oVal[0]) && $oVal[0] < $sLat) $sLat = $oVal[0];
+								if (!empty($oVal[0]) && $oVal[0] > $lLat) $lLat = $oVal[0];
+								if (!empty($oVal[1]) && $oVal[1] < $sLng) $sLng = $oVal[1];
+								if (!empty($oVal[1]) && $oVal[1] > $lLng) $lLng = $oVal[1];
+				
+							}
+	
+						}
+
+
+					} else {
+		
+						if (isset($oVal[0]) && isset($oVal[1]) && is_numeric($oVal[0]) && is_numeric($oVal[1])) {
+			
+							if (!empty($nVal[0]) && $nVal[0] < $sLat) $sLat = $nVal[0];
+							if (!empty($nVal[0]) && $nVal[0] > $lLat) $lLat = $nVal[0];
+							if (!empty($nVal[1]) && $nVal[1] < $sLng) $sLng = $nVal[1];
+							if (!empty($nVal[1]) && $nVal[1] > $lLng) $lLng = $nVal[1];
+			
+						}
+
+					}
+
+				}
+		
 			}
 
 		}
 
-		if ($sLat==999) $sLat = 51;
-		if ($sLng==999) $sLng = 2.6;
+		if ($sLat==999) $sLat = -1;
+		if ($sLng==999) $sLng = -5;
 
-		if ($lLat==-999) $lLat = 53;
-		if ($lLng==-999) $lLng = 8.7;
+		if ($lLat==-999) $lLat = 1;
+		if ($lLng==-999) $lLng = 5;
 
 		return
 			array(
@@ -532,27 +666,86 @@ class MapKeyController extends Controller
 
 	}
 
+	private function getTaxaWithOccurrences()
+	{
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+
+		$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
+		
+		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+		
+		return $taxa;
+	
+	}
+
+	private function getLookupList($search)
+	{
+
+		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search)) return;
+		
+		$regexp = '/'.preg_quote($search).'/i';
+
+		$l = array();
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+
+		$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
+				
+		foreach((array)$taxa as $key => $val) {
+
+			if (preg_match($regexp,$val['taxon']) == 1)
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => $val['taxon']
+				);
+
+		}
+
+		$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
+		
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				'species',
+				'../mapkey/examine_species.php?id=%s',
+				true
+			)
+		);
+
+	}
+
+	private function getAdjacentItems($id)
+	{
+
+		$taxa = $this->getTaxaWithOccurrences();
+		
+		reset($taxa);
+		
+		$prev = $next = null;
+
+		while (list($key, $val) = each($taxa)) {
+		
+			if ($key==$id) {
+
+				$next = current($taxa); // current = next because the pointer has already shifted forward
+
+				return array(
+					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+				);
+
+			}
+
+			$prev = $val;
+
+		}
+		
+		return null;
+
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

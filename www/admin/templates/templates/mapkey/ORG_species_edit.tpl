@@ -46,8 +46,11 @@ $(document).ready(function(){
 
 	initMap({$mapInitString});	
 	addMouseHandlers();
+	{if $mapBorder}
+	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));
+	{/if}
 
-{foreach from=$taxon.occurrences key=k item=v}
+{foreach from=$occurrences key=k item=v}
 
 {if $taxon}
 {assign var=taxonName value=$taxon.taxon}
@@ -64,13 +67,9 @@ $(document).ready(function(){
 		colour:'{$v.colour}'
 	{literal}});{/literal}
 {elseif $v.type=='polygon' && $v.nodes}
-	var nodes{$k} = Array();
-	{foreach from=$v.nodes key=kn item=vn}
-	nodes{$k}[{$kn}] = [{$vn[0]}, {$vn[1]}];
-	{/foreach}
-	drawPolygon(nodes{$k},null,{literal}{{/literal}
+	drawPolygon({$v.boundary_nodes},null,{literal}{{/literal}
 		name: '{$taxonName}',
-		addMarker: true,
+		addMarker: false,
 		addDelete: true,
 		occurrenceId: {$v.id},
 		colour:'{$v.colour}'

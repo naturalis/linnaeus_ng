@@ -1,7 +1,7 @@
 {include file="../shared/header.tpl"}
 <div id="page-main">
 {if !$isOnline}
-{t}Your computer appears to be offline. Unfortunately, the map key doesn't work without an internet connection.{/t}
+{t}Your computer appears to be offline. Unfortunately, the map doesn't work without an internet connection.{/t}
 {else}
 	<div id="index">
 		<p>
@@ -19,7 +19,7 @@
 				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
 			</td>
 			<td style="text-align:right">
-				{if $taxonOccurrenceCount[$v.id].total}{$taxonOccurrenceCount[$v.id].total}{else}0{/if}
+				{$v.total}
 			</td>
 		</tr>
 		{/foreach}

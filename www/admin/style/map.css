@@ -1,3 +1,37 @@
+#data-legend-div {
+	position:absolute;
+	top:10px;
+	left:-70px;
+	background-color:white;
+	border:2px solid #555;
+	padding:2px;
+	z-index:1;
+}
+
+#data-type-div {
+	width:250px; 
+	height:20px; 
+	position:absolute;
+	top:220px;
+	left:130px;
+	z-index:1
+}
+
+#data-select-div {
+	width:150px; 
+	height:20px; 
+	background-color:white;
+	border:2px solid #555;
+	padding:2px;
+	z-index:1
+}
+
+.map-save-button {
+	position:relative;
+	top:7px;
+	left:-79px;
+}
+
 #map_canvas {
 	height: 100%;
 	border: 1px solid #666;

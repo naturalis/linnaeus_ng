@@ -3,24 +3,18 @@
 /*
 
 
-
 dus:
 - full screen map optie
 - mogelijkheid om met een toets het laatst gezette punt te verwijderen
-- polygoon niet inkleuren tot hij klaar is
 - verschillende cursoren
-- bestaande polygonen die gereed zijn kunnen editen
 ?
 
+delete type = delete data!
 
-
-
-	delete type = delete data!
-
-	make default central point configurable
-			$this->smarty->assign('middelLat',24.886436490787712);
-			$this->smarty->assign('middelLng',-70.2685546875);
-			$this->smarty->assign('initZoom',5);
+make default central point configurable
+		$this->smarty->assign('middelLat',24.886436490787712);
+		$this->smarty->assign('middelLng',-70.2685546875);
+		$this->smarty->assign('initZoom',5);
 
 */
 
@@ -37,16 +31,17 @@ class MapKeyController extends Controller
     
     public $usedHelpers = array('csv_parser_helper');
 
-    public $controllerPublicName = 'Map key';
+    public $controllerPublicName = 'Distribution';
 
-	public $cssToLoad = array('map.css');
+	public $cssToLoad = array('map.css','lookup.css',);
 
 	public $jsToLoad = array(
 		'all' => 
 			array(
 				'mapkey.js',
 				'jscolor/jscolor.js',
-				'http://maps.google.com/maps/api/js?sensor=false'
+				'http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing',
+				'lookup.js',
 			)
 		);
 
@@ -74,127 +69,149 @@ class MapKeyController extends Controller
         parent::__destruct();
     
     }
-
+	
     public function indexAction()
     {
-    
-        $this->checkAuthorisation();
-        
-        $this->setPageName( _('Index'));
-		
-		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
-		$gt = $this->models->GeodataType->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentprojectId()
-				),
-				'columns' => 'count(*) as total'
-			)
-		);
-
-		$this->smarty->assign('dataTypeCount',$gt[0]['total']);
-
-        $this->printPage();
+		$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
     
     }
 
 	public function chooseSpeciesAction()
 	{
 
-        $this->checkAuthorisation();
+		$this->checkAuthorisation();
 
 		$this->setPageName(_('Choose a species'));
 
-		$this->getTaxonTree(null,true);
+		$this->getTaxonTree();
 		
-		foreach ((array)$this->treeList as $key => $val) {
+		$taxa = array();
+		
+		foreach((array)$this->treeList as $key => $val) if($val['lower_taxon']=='1') $taxa[$key] = $val;
 
-			if ($val['lower_taxon']=='1') $taxa[$key] = $val;
+		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
 
-		}
-	
 		$pagination = $this->getPagination($taxa,$this->controllerSettings['speciesPerPage']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
 	
 		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
-		if(isset($this->treeList)) $this->smarty->assign('taxa',$pagination['items']);
+		$this->smarty->assign('taxa',$pagination['items']);
+
+		$this->smarty->assign('occurringTaxa',$this->getOccurringTaxonList());
 
 		$this->printPage();	
 
 	}
 
-    public function drawSpeciesAction()
-    {
-
-		if (!$this->rHasId()) {
-		
-			$this->redirect('choose_species.php');
-		
-		}
+	public function speciesShowAction()
+	{
 
         $this->checkAuthorisation();
+
+		unset($_SESSION['system']['mapCentre']);
+
+		if (!$this->rHasId()) $this->redirect('species.php');
+
+		$isOnline = $this->checkRemoteServerAccessibility();
 		
-		$this->getTaxonTree(null,true);
+		$taxon = $this->getTaxonById($this->requestData['id']);
 
-		$taxon = $this->treeList[$this->requestData['id']];
+		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
 
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Choose a species'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/choose_species.php'
-            )
-        );
+		if ($this->rHasId() && $isOnline) {
+		
+			$occurrences = $this->getTaxonOccurrences($this->requestData['id']);
 
-        $this->setPageName(sprintf(_('Add occurrences for "%s"'),$taxon['taxon']));
+			$this->smarty->assign('occurrences',$occurrences['occurrences']);
+
+			$this->smarty->assign('mapBorder',$this->calculateMapBorder($occurrences['occurrences']));
+
+        }
+
+		$this->smarty->assign('isOnline',$isOnline);
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
+		$this->smarty->assign('geodataTypesPresent',$occurrences['dataTypes']);
+
+		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('navList',$this->getOccurringTaxonList());
+
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
+        $this->printPage();
+
+	}
+
+    public function speciesEditAction()
+    {
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('species.php');
+
+		$isOnline = $this->checkRemoteServerAccessibility();
+		
+		$taxon = $this->getTaxonById($this->requestData['id']);
+		
+        $this->setPageName(sprintf(_('Edit data for "%s"'),$taxon['taxon']));
 		
 		$saved = 0;
-
+		
 		if ($this->rHasVal('rnd') && !$this->isFormResubmit()) {
 		
-			if(isset($this->requestData['markers'])) {
+			// delete all old items
+			$this->deleteTaxonOccurrences($this->requestData['id']);
+		
+			if ($this->rHasVal('mapItems')) {
 
-				foreach((array)$this->requestData['markers'] as $key => $val) {
-
-					$s = $this->saveOccurrenceMarker(
-						array(
-							'taxonId'=> $this->requestData['id'],
-							'coord'=> $val,
-							'type_id' => $this->requestData['markersDatatype'][$key]
-						)
-					);
-					
-					if ($s===true) $saved++;
-	
-				}
-
-			}
-
-			if(isset($this->requestData['polygons'])) {
-
-				foreach((array)$this->requestData['polygons'] as $key => $val) {
+				foreach((array)$this->requestData['mapItems'] as $val) {
 				
-					$s = $this->saveOccurrencePolygon(
-						array(
-							'taxonId' => $this->requestData['id'],
-							'coord' => $val,
-							'type_id' => $this->requestData['polygonsDatatype'][$key]
-						)
-					);
-	
-					if ($s===true) $saved++;
-	
+					// polygon|24|((31.340595146995792,30.09002685544374),(31.291319...
+					// marker|26|(31.64271964042858, 30.15594482419374)
+					$d = explode('|',$val);
+
+					if ($d[0]=='marker') {
+
+						$s = $this->saveOccurrenceMarker(
+							array(
+								'taxonId'=> $this->requestData['id'],
+								'coord'=> $d[2],
+								'type_id' => $d[1]
+							)
+						);
+						
+						if ($s===true) $saved++;
+						
+					} else
+					if ($d[0]=='polygon') {
+
+						$s = $this->saveOccurrencePolygon(
+							array(
+								'taxonId' => $this->requestData['id'],
+								'coord' => $d[2],
+								'type_id' => $d[1]
+							)
+						);
+
+						if ($s===true) $saved++;
+
+					}
+
 				}
 
 			}
 
 		}
 
-		$ot = $this->getTaxonOccurrences($this->requestData['id']);
 
-		if ($ot) $taxon['occurrences'] = $ot;
+		$occurrences = $this->getTaxonOccurrences($this->requestData['id']);
+
+		$this->smarty->assign('occurrences',$occurrences['occurrences']);
 
 		if ($this->rHasVal('mapCentre') || isset($_SESSION['system']['mapCentre'])) {
 
@@ -209,46 +226,34 @@ class MapKeyController extends Controller
 					$this->requestData['mapZoom'] : 
 					(isset($_SESSION['system']['mapZoom']) ? $_SESSION['system']['mapZoom'] : 7);
 
-			$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:'.$zoom.'}');
+			$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:'.$zoom.',editable:true}');
 
 			if ($this->rHasVal('mapCentre')) $_SESSION['system']['mapCentre'] = $this->requestData['mapCentre'];
 			if ($this->rHasVal('mapZoom')) $_SESSION['system']['mapZoom'] = $this->requestData['mapZoom'];
+
+		} else {
+
+			$this->smarty->assign('mapInitString','{editable:true}');
+
+			$this->smarty->assign('mapBorder',$this->calculateMapBorder($occurrences['occurrences']));
 
 		}
 
 		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		$this->smarty->assign('taxon',$taxon);
-//q($taxon,1);
+
+		$this->smarty->assign('saved',$saved);
+
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+
+		$this->smarty->assign('navList',$this->getOccurringTaxonList());
+
+		$this->smarty->assign('navCurrentId',$taxon['id']);
 
         $this->printPage();
     
     }
-
-    public function speciesSelectAction()
-    {
-
-        $this->checkAuthorisation();
-
-		$this->setPageName(_('Choose a species'));
-
-		$this->getTaxonTree(null,true);
-
-		foreach((array)$this->treeList as $key => $val) {
-
-			$ot = $this->getTaxonOccurrences($val['id']);
-			
-			if ($ot) $taxa[] = $val;
-
-		}	
-
-		if(isset($taxa)) $this->smarty->assign('taxa',$taxa);
-
-		$this->printPage();
-		
-    }
-
 
     public function speciesAction()
     {
@@ -272,9 +277,9 @@ class MapKeyController extends Controller
 	
 			$ot = $this->getTaxonOccurrences($this->requestData['id']);
 
-			if ($ot) $taxon['occurrences'] = $ot;
+			if ($ot['occurrences']) $taxon['occurrences'] = $ot['occurrences'];
 
-			//$ot = $this->customSortArray($ot, array('key' => 'type_id'));
+			//$ot['occurrences'] = $this->customSortArray($ot['occurrences'], array('key' => 'type_id'));
 
 		} else {
 
@@ -289,94 +294,70 @@ class MapKeyController extends Controller
     }
 
 
-	public function speciesShowAction()
+	public function dataTypesAction()
 	{
-
-        $this->checkAuthorisation();
-
-		if (!$this->rHasId()) $this->redirect('species.php');
-
-		$isOnline = $this->checkRemoteServerAccessibility();
+	
+		$this->checkAuthorisation();
 		
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Choose an occurrence'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php?id='.$this->requestData['s']
-            )
-        );
+		$this->setPageName( _('Data types'));
 
-		$this->getTaxonTree(null,true);
-
-		$taxon = $this->treeList[$this->requestData['s']];
-
-//		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$taxon['taxon']));
-		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
-
-		if ($this->rHasId() && $isOnline) {
+		$lp = $_SESSION['project']['languages'];
 		
-			$allNodes = array();
+		$defaultLanguage = $_SESSION['project']['default_language_id'];
+		
+        if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
+		// deleting a type
+        
+            $tp = $this->deleteGeodataType($this->requestData['del_type']);
 
-			foreach((array)$this->requestData['id'] as $key => $val) {
-
-				$d = $this->getOccurrence($val);
-
-				if ($d['type']=='polygon') {
-
-					$d['nodes'] = json_decode($d['boundary_nodes']);
-					$allNodes = array_merge($allNodes,$d['nodes']);
-
-				} else {
-					
-					$a[] = array($d['latitude'],$d['longitude']);
-					$allNodes = array_merge($allNodes,$a);
-				
-				}
-
-				$so[] = $d;
-
-			}
+        } else
+        if ($this->rHasVal('new_type') && !$this->isFormResubmit()) {
+        // adding a new type
+        
+            $tp = $this->createGeodataType($this->requestData['new_type'],$defaultLanguage);
+            
+            if ($tp !== true) $this->addError($tp);
 
         }
 
-		if (count($allNodes)>0) {
+		$types = $this->models->GeodataType->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+			)
+		);
 
-			$middle = $this->getPolygonCentre($allNodes);
-	
-			$sLat = $sLng = 999;
-			$lLat = $lLng = -999;
-	
-			foreach((array)$allNodes as $key => $val) {
+		foreach ((array) $types as $key => $type) {
 
-				if (!empty($val[0]) && $val[0] < $sLat) $sLat = $val[0];
-				if (!empty($val[0]) && $val[0] > $lLat) $lLat = $val[0];
-				if (!empty($val[1]) && $val[1] < $sLng) $sLng = $val[1];
-				if (!empty($val[1]) && $val[1] > $lLng) $lLng = $val[1];
+			foreach ((array) $lp as $k => $language) {
 
+				$gtt = $this->models->GeodataTypeTitle->_get(
+					array(
+						'id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'type_id' => $type['id'], 
+						'language_id' => $language['language_id']
+						)
+					)
+				);
+				
+				$types[$key]['type_titles'][$language['language_id']] = $gtt[0]['title'];
+			
 			}
-	
-			$this->smarty->assign('mapBorder',
-				array(
-					'sw' => array('lat' => $sLat,'lng' => $sLng),
-					'ne' => array('lat' =>  $lLat,'lng' =>  $lLng)
-				)
-			);
-
+		
 		}
 
-		$this->smarty->assign('isOnline',$isOnline);
+        $this->smarty->assign('maxTypes', $this->controllerSettings['maxTypes']);
 
-		$this->smarty->assign('occurrences',$so);
+		$this->smarty->assign('languages', $lp);
+		
+		$this->smarty->assign('defaultLanguage', $defaultLanguage);
+		
+        $this->smarty->assign('types', $types);
 
-		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
-
-		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
-
-		if (isset($middle)) $this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:7}');
-
-        $this->printPage();
-
+		$this->printPage();
+		
 	}
-
 
     public function fileAction()
     {
@@ -639,6 +620,114 @@ class MapKeyController extends Controller
 		
     }
 
+    public function copyAction()
+    {
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('choose_species.php');
+
+		if ($this->rHasVal('action','copy') && !$this->isFormResubmit()) {
+
+			 $this->cloneMapData($this->requestData['source'],$this->requestData['target']);
+			 
+			 $this->redirect('species_show.php?id='.$this->requestData['target']);
+
+		} 
+
+		$this->getTaxonTree(null,true);
+
+		$taxon = $this->treeList[$this->requestData['id']];
+	
+		$this->setPageName(sprintf(_('Copy occurrences from "%s"'),$taxon['taxon']));
+
+		$taxa = array();
+		
+		foreach((array)$this->treeList as $key => $val) if($val['lower_taxon']=='1') $taxa[$key] = $val;
+		
+		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+
+		$this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('taxa',$taxa);
+		
+		$this->smarty->assign('occurringTaxa',$this->getOccurringTaxonList());
+
+		$this->printPage();
+		
+    }
+
+	private function cloneMapData($source,$target)
+	{
+
+		if (empty($source) or empty($target)) return;
+
+		$this->models->OccurrenceTaxon->execute(
+			'insert into %table% 
+				(project_id,taxon_id,type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,created)
+				(select
+					project_id,'.$target.',type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,CURRENT_TIMESTAMP
+				from %table% where taxon_id='.$source.')'
+		);
+
+	}
+
+    /**
+     * AJAX interface for this class
+     *
+     * @access    public
+     */
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData['search']);
+
+        } else        
+        if ($this->requestData['action'] == 'save_type_label') {
+		
+			$d = $this->saveGeodataTitle(
+				array(
+					'language_id' => $this->requestData['language'],
+					'title' => $this->requestData['value'],
+					'type_id' => $this->requestData['id']
+				)
+			);
+
+			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+
+        } else
+        if ($this->requestData['action'] == 'get_type_labels') {
+		
+			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeLabels()));
+
+        } else
+        if ($this->requestData['action'] == 'save_type_colour') {
+		
+			$d = $this->saveGeodataColour(
+				array(
+					'id' => $this->requestData['id'],
+					'colour' => $this->requestData['value']
+				)
+			);
+
+			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+
+        } else
+        if ($this->requestData['action'] == 'get_type_colours') {
+		
+			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeColours()));
+
+        }
+
+        $this->printPage();
+    
+    }
+
+
 	private function getGeodataTypes($id=null)
 	{
 	
@@ -670,6 +759,171 @@ class MapKeyController extends Controller
 		
 		return (isset($id)) ? array_shift($gt) : $gt;
 	
+	}
+
+
+	private function getFirstOccurringTaxonId()
+	{
+
+		$d = array_shift($this->getOccurringTaxonList());
+
+		return isset($d['id']) ? $d['id'] : null;
+
+	}
+
+	private function getOccurringTaxonList()
+	{
+
+		$ot = $this->models->OccurrenceTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'distinct taxon_id'
+			)
+		);
+
+		$this->getTaxonTree();
+		
+		foreach((array)$ot as $key => $val) {
+
+			$d = $this->treeList[$val['taxon_id']];
+
+			$t[$val['taxon_id']] = $d;
+			
+		}
+
+		$this->customSortArray($t,array('key' => 'taxon','maintainKeys' => true));
+
+		$prevId = null;
+
+		foreach((array)$t as $key => $val) {
+
+			if (isset($prevId)) {
+
+				$t[$key]['prev']['id'] = $prevId;
+				$t[$prevId]['next']['id'] = $val['id'];
+
+			}
+			
+			$prevId = $val['id'];
+			
+		}
+
+		return $t;
+	
+	}
+	
+	private function getTaxonOccurrences($id)
+	{
+	
+		if (!isset($id)) return;
+
+		$ot = $this->models->OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id,
+				),
+				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes,boundary'
+			)
+		);
+		
+		$dataTypes = array();
+
+		foreach((array)$ot as $key => $val) {
+		
+			$dataTypes[$val['type_id']] = $val['type_id'];
+		
+			$d = $this->getGeodataTypes($val['type_id']);
+
+			$ot[$key]['type_title'] = $d['title'];
+			$ot[$key]['colour'] = $d['colour'];
+			if ($val['type']=='polygon' && isset($val['boundary_nodes'])) $ot[$key]['nodes'] = json_decode($val['boundary_nodes']);
+
+		}
+
+		return array('occurrences' => $ot, 'dataTypes' => $dataTypes);
+
+	}
+
+	private function calculateMapBorder($occurrences)
+	{
+
+		if (count((array)$occurrences)>0) {
+
+			$sLat = $sLng = 999;
+			$lLat = $lLng = -999;
+	
+			foreach((array)$occurrences as $occurrence) {
+			
+				if($occurrence['type']=='marker') {
+				
+					if (!empty($occurrence['latitude']) && $occurrence['latitude'] < $sLat) $sLat = $occurrence['latitude'];
+					if (!empty($occurrence['latitude']) && $occurrence['latitude'] > $lLat) $lLat = $occurrence['latitude'];
+					if (!empty($occurrence['longitude']) && $occurrence['longitude'] < $sLng) $sLng = $occurrence['longitude'];
+					if (!empty($occurrence['longitude']) && $occurrence['longitude'] > $lLng) $lLng = $occurrence['longitude'];
+				
+				} else {
+
+					foreach((array)$occurrence['nodes'] as $val) {
+	
+						if (!empty($val[0]) && $val[0] < $sLat) $sLat = $val[0];
+						if (!empty($val[0]) && $val[0] > $lLat) $lLat = $val[0];
+						if (!empty($val[1]) && $val[1] < $sLng) $sLng = $val[1];
+						if (!empty($val[1]) && $val[1] > $lLng) $lLng = $val[1];
+	
+					}
+					
+				}
+
+			}
+	
+			return
+				array(
+					'sw' => array('lat' => $sLat,'lng' => $sLng),
+					'ne' => array('lat' =>  $lLat,'lng' =>  $lLng)
+				);
+
+		} else {
+		
+			return null;
+		
+		}
+	
+	}
+
+	private function getLookupList($search)
+	{
+
+		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search)) return;
+		
+		$regexp = '/'.preg_quote($search).'/i';
+
+		$l = array();
+		
+		foreach((array)$this->getOccurringTaxonList() as $key => $val) {
+		
+			if (preg_match($regexp,$val['taxon']) == 1)
+				$l[] = array(
+					'id' => $val['id'],
+					'label' => $val['taxon'],
+					'source' => _('species')
+				);
+
+		}
+		
+		
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$l,
+				'species',
+				'../mapkey/species_show.php?id=%s',
+				true
+			)
+		);
+
 	}
 
 	private function saveGeodataTitle($params)
@@ -806,72 +1060,6 @@ class MapKeyController extends Controller
 
     }
 	
-
-	public function dataTypesAction()
-	{
-	
-		$this->checkAuthorisation();
-		
-		$this->setPageName( _('Data types'));
-
-		$lp = $_SESSION['project']['languages'];
-		
-		$defaultLanguage = $_SESSION['project']['default_language_id'];
-		
-        if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
-		// deleting a type
-        
-            $tp = $this->deleteGeodataType($this->requestData['del_type']);
-
-        } else
-        if ($this->rHasVal('new_type') && !$this->isFormResubmit()) {
-        // adding a new type
-        
-            $tp = $this->createGeodataType($this->requestData['new_type'],$defaultLanguage);
-            
-            if ($tp !== true) $this->addError($tp);
-
-        }
-
-		$types = $this->models->GeodataType->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-			)
-		);
-
-		foreach ((array) $types as $key => $type) {
-
-			foreach ((array) $lp as $k => $language) {
-
-				$gtt = $this->models->GeodataTypeTitle->_get(
-					array(
-						'id' =>
-					array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'type_id' => $type['id'], 
-						'language_id' => $language['language_id']
-						)
-					)
-				);
-				
-				$types[$key]['type_titles'][$language['language_id']] = $gtt[0]['title'];
-			
-			}
-		
-		}
-
-        $this->smarty->assign('maxTypes', $this->controllerSettings['maxTypes']);
-
-		$this->smarty->assign('languages', $lp);
-		
-		$this->smarty->assign('defaultLanguage', $defaultLanguage);
-		
-        $this->smarty->assign('types', $types);
-
-		$this->printPage();
-		
-	}
-
 	private function ajaxGetTypeLabels()
 	{
 	
@@ -902,68 +1090,6 @@ class MapKeyController extends Controller
 
 	}
 
-
-    /**
-     * AJAX interface for this class
-     *
-     * @access    public
-     */
-    public function ajaxInterfaceAction ()
-    {
-
-        if (!$this->rHasVal('action')) return;
-        
-        if ($this->requestData['action'] == 'save_type_label') {
-		
-			$d = $this->saveGeodataTitle(
-				array(
-					'language_id' => $this->requestData['language'],
-					'title' => $this->requestData['value'],
-					'type_id' => $this->requestData['id']
-				)
-			);
-
-			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
-
-        } else
-        if ($this->requestData['action'] == 'get_type_labels') {
-		
-			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeLabels()));
-
-        } else
-        if ($this->requestData['action'] == 'save_type_colour') {
-		
-			$d = $this->saveGeodataColour(
-				array(
-					'id' => $this->requestData['id'],
-					'colour' => $this->requestData['value']
-				)
-			);
-
-			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
-
-        } else
-        if ($this->requestData['action'] == 'get_type_colours') {
-		
-			$this->smarty->assign('returnText',json_encode($this->ajaxGetTypeColours()));
-
-        } else
-        if ($this->requestData['action'] == 'delete_occurrence') {
-            
-            if ($this->deleteOccurrence($this->requestData['id']))
-
-				$this->smarty->assign('returnText',1);
-
-			else
-
-				$this->smarty->assign('returnText',0);
-
-        }
-
-        $this->printPage();
-    
-    }
-
 	private function checkRemoteServerAccessibility()
 	{
 
@@ -976,6 +1102,21 @@ class MapKeyController extends Controller
 		return true;
 		
 	}
+
+	private function deleteTaxonOccurrences($id)
+	{
+
+		if (!isset($id)) return;
+	
+		return $this->models->OccurrenceTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id
+			)
+		);
+
+	}
+
 
 	private function saveOccurrenceMarker($p)
 	{
@@ -1019,7 +1160,8 @@ class MapKeyController extends Controller
 
 		/*
 			called from map, has a single string of coordinates:
-				["coord"]=> "(51.36, 6.66),(51.33, 4.09),(52.87, 4.78)"
+				["coord"]=> "(51.36, 6.66),(51.33, 4.09),(52.87, 4.78)" (old)
+				["coord"]=> "((51.36, 6.66),(51.33, 4.09),(52.87, 4.78))" (new)
 
 			called from file load, has an array of nodes:
 				["nodes"]=> array(array(51.36,6.66),array(51.33,4.09),array(52.87,4.78));
@@ -1079,33 +1221,6 @@ class MapKeyController extends Controller
 
 	}
 
-	private function getTaxonOccurrences($id)
-	{
-	
-		if (!isset($id)) return;
-
-		$ot = $this->models->OccurrenceTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id,
-				),
-				'columns' => 'id,type,type_id,latitude,longitude,boundary_nodes,boundary'
-			)
-		);
-
-		foreach((array)$ot as $key => $val) {
-		
-			$d = $this->getGeodataTypes($val['type_id']);	
-			$ot[$key]['type_title'] = $d['title'];
-			$ot[$key]['colour'] = $d['colour'];
-			if ($val['type']=='polygon' && isset($val['boundary_nodes'])) $ot[$key]['nodes'] = json_decode($val['boundary_nodes']);
-
-		}
-	
-		return $ot;
-	
-	}
 
 	private function getOccurrence($id)
 	{
@@ -1128,38 +1243,6 @@ class MapKeyController extends Controller
 		if ($ot) $ot[0]['taxon'] = $this->treeList[$ot[0]['taxon_id']];
 
 		return $ot[0];
-	
-	}
-
-	private function deleteOccurrence($id)
-	{
-
-		if (!isset($id)) return;
-	
-		return $this->models->OccurrenceTaxon->delete(
-			array(
-				'id' => $id,
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-
-	}
-
-	private function getPolygonCentre($p)
-	{
-
-		if (count((array)$p)==0) return null;
-
-		$x = $y = 0;
-
-		foreach((array)$p as $key => $val) {
-			
-			$x += $val[0];
-			$y += $val[1];
-	
-		}
-	
-		return array($x/count($p),$y/count($p));
 	
 	}
 
@@ -1318,6 +1401,5 @@ class MapKeyController extends Controller
 */
 	
 	}
-
 
 }
