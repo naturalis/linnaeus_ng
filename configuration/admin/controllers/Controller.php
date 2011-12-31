@@ -1288,6 +1288,26 @@ class Controller extends BaseClass
     
     }
 
+
+	public function getTaxonById($id=false)
+	{
+	
+        $id = $id ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+
+		$t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'id' => $id
+				)
+			)
+		);
+
+		return $t[0];
+	
+	}
+
+
     /**
      * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
      *
@@ -1423,7 +1443,7 @@ class Controller extends BaseClass
 	
 		// slice out only the taxa we need (faster than looping the entire thing in smarty)
 		$items = array_slice($items,$start,$maxPerPage);
-	
+
 		return
 			array(
 				'items' => $items,
@@ -1726,8 +1746,8 @@ class Controller extends BaseClass
 					)
 				);
 
-	            $t[$key]['children_count'] = 
-					$this->treeList[$val['id']]['children_count'] = 
+	            $t[$key]['child_count'] = 
+					$this->treeList[$val['id']]['child_count'] = 
 					isset($children) ? count((array)$children) : 0;
 				
 				$t[$key]['children'] = $children;

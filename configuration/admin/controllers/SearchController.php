@@ -1838,7 +1838,7 @@ class SearchController extends Controller
 		- Introduction / other content
 		- Dichotomous key
 		- Matrix key 
-		- Map key
+		- Distribution
 		*/
 
 		$this->smarty->assign(

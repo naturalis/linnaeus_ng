@@ -34,7 +34,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="{t}submit{/t}" value="show selected" />
-			<input type="button" id="select-all" value="{t}select all{/t}" onclick="toggleAllSpecies()" />
+			<input type="button" id="select-all" value="{t}select all{/t}" onclick="mapToggleAllSpecies()" />
 		</td>
 	</tr>
 </table>

@@ -332,8 +332,8 @@ class Controller extends BaseClass
 					)
 				);
 
-	            $t[$key]['children_count'] = 
-					$this->treeList[$val['id']]['children_count'] = 
+	            $t[$key]['child_count'] = 
+					$this->treeList[$val['id']]['child_count'] = 
 					isset($children) ? count((array)$children) : 0;
 				
 				$t[$key]['children'] = $children;
@@ -556,6 +556,8 @@ class Controller extends BaseClass
 
 		foreach((array)$wordlist as $key => $val) {
 		
+			if ($val['word']=='') continue;
+
 			$this->_currentGlossaryId = $val['id'];
 
 			$expr = '|\b('.$val['word'].')\b|i';
@@ -1860,7 +1862,7 @@ class Controller extends BaseClass
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
+						'language_id' => $this->getCurrentLanguageId()
 					),
 					'columns' => 'id,term as word,\'term\' as source'
 				)
@@ -1870,7 +1872,7 @@ class Controller extends BaseClass
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
+						'language_id' => $this->getCurrentLanguageId()
 					),
 					'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
 				)

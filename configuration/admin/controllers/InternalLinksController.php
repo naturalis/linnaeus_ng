@@ -521,11 +521,11 @@ class InternalLinksController extends Controller
 					'controller' => 'key',
 				),
 				array(
-					'label' => _('Map key index'),
+					'label' => _('Distribution index'),
 					'controller' => 'mapkey',
 				),
 				array(
-					'label' => _('Map key detail'),
+					'label' => _('Distribution detail'),
 					'controller' => 'mapkey',
 					'url' => 'examine_species.php',
 					'params' => json_encode(

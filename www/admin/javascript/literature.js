@@ -268,10 +268,7 @@ function litRemoveTaxonFromList(id) {
 
 }
 
-function litAddTaxonToList(taxonId,noupdate) {
-
-	// get taxon id to add
-	if (!taxonId) taxonId = $('#taxa :selected').val();
+function litCheckTaxonList(taxonId) {
 
 	var add = true;
 
@@ -284,15 +281,38 @@ function litAddTaxonToList(taxonId,noupdate) {
 		}
 
 	}
+	
+	return add;
 
-	// if it's new, add it to the list
-	if (add) { 
+}
 
-		litAddedTaxa[litAddedTaxa.length] = taxonId;
-		if (!noupdate) litUpdateTaxonSelection();
+
+function litAddTaxonToList(taxonId,noupdate) {
+
+	if (!taxonId) {
+		
+		$('#taxa option:selected').each(function () {
+
+			if (litCheckTaxonList($(this).val())) {
+				
+				litAddedTaxa[litAddedTaxa.length] = $(this).val();
+				if (!noupdate) litUpdateTaxonSelection();
+				
+			}
+
+		});
+
+	} else {
+
+		if (litCheckTaxonList(taxonId)) {
+			
+			litAddedTaxa[litAddedTaxa.length] = taxonId;
+			if (!noupdate) litUpdateTaxonSelection();
+			
+		}
 
 	}
-
+	
 }
 
 function litDelete() {

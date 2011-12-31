@@ -2,7 +2,7 @@
 
 <div id="page-main">
 {if !$isOnline}
-{t}Your computer appears to be offline. Unfortunately, the map key doesn't work without an internet connection.{/t}
+{t}Your computer appears to be offline. Unfortunately, the map doesn't work without an internet connection.{/t}
 {else}
 
 	<table>

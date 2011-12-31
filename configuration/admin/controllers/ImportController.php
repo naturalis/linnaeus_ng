@@ -1,5 +1,20 @@
 <?php
 
+ function cleanL2Name ($taxon)
+ {
+     $l2Markers = array('subsp.', 'var.', 'subvar.', 'f.', 'subf.');
+     if (count(explode(' ', $taxon->name)) > 2) {
+         foreach ($l2Markers as $marker) {
+           if (strstr($taxon->name, $marker) !== false) {
+            $taxon->name = str_replace($marker, '', $taxon->name);
+            break;
+           }
+         }
+     }
+     return $taxon;
+ }
+ 
+ 
 /*
 
 FREE MODULES MEDIA
@@ -245,7 +260,7 @@ class ImportController extends Controller
 		
 		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
 
-		$d = $this->helpers->XmlParser->setDoReturnValues(true);
+		$this->helpers->XmlParser->setDoReturnValues(true);
 		$d = $this->helpers->XmlParser->getNode('project');
 
 		if (isset($d->title)) {
@@ -3349,7 +3364,36 @@ $res = $this->fixOldInternalLinks();
 				);
 			
 		}
-		
+
+		$d = $this->models->ContentKeystep->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->ContentKeystep->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),
+						'title' => $this->replaceInternalLinks($val['title']),
+						'content' => $this->replaceInternalLinks($val['content'])
+					)
+				);
+			
+		}
+
+		$d = $this->models->ChoiceContentKeystep->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->ChoiceContentKeystep->save(
+					array(
+						'id' => $val['id'],
+						'project_id' => $this->getNewProjectId(),
+						'choice_txt' => $this->replaceInternalLinks($val['choice_txt'])
+					)
+				);
+			
+		}
+
 	}
 	
 	private function grantModuleAccessRights($id)
