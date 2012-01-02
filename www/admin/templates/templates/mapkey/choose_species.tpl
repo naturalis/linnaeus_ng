@@ -1,13 +1,17 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
+{if $geodataTypes|@count==0}
+<p>
+	You have to define at least one data type before you can add any map data. <a href="data_types.php">Define data types</a>
+</p>
+{/if}
 <table>
 {foreach from=$taxa key=k item=v}
 	<tr class="tr-highlight">
 		<td style="width:300px">{$v.taxon}</td>
 		<td>{if $occurringTaxa[$v.id]}[<a href="species_show.php?id={$v.id}">{t}show data{/t}</a>]{else}{t}(no data){/t}{/if}</td>
-		<td>[<a href="species_edit.php?id={$v.id}">{t}edit data{/t}</a>]</td>
+		<td>{if $geodataTypes|@count>0}[<a href="species_edit.php?id={$v.id}">{t}edit data{/t}</a>]{/if}</td>
 		<td>{if $occurringTaxa[$v.id]}[<a href="copy.php?id={$v.id}">{t}copy data{/t}</a>]{/if}</td>
 	</tr>
 {/foreach}

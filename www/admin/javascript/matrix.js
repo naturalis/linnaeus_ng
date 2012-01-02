@@ -208,8 +208,8 @@ function matrixEditStateClick() {
 }
 
 function maxtrixSetStateButtonLabel() {
-	
-	$('#newStateButton').val(sprintf(_('add new for "%s"'),$('#characteristics :selected').text().substr(0,$('#characteristics :selected').text().lastIndexOf(' '))));
+
+	$('#newStateButton').html(sprintf(_('add new for "%s"'),$('#characteristics :selected').text().substr(0,$('#characteristics :selected').text().lastIndexOf(' '))));
 
 }
 
@@ -444,11 +444,5 @@ function matrixGeneralSave(id,label,type,action) {
 	});
 
 }
-
-
-
-
-
-
 
 

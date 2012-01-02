@@ -9,7 +9,7 @@
 </p>
 <table>
 	<tr>
-		<td>
+		<td colspan="2">
 			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>)
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
@@ -19,7 +19,7 @@
 		</td>
 		<td>
 		</td>
-		<td>
+		<td colspan="2">
 			{t}taxa{/t} (<a href="links.php">{t}display current links per taxon{/t}</a>)
 			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
 			{section name=i loop=$taxa}
@@ -29,47 +29,34 @@
 		</td>
 	</tr>
 	<tr>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new{/t}" onclick="window.open('char.php','_self');" />
-			<input 
-				type="button" 
-				class="matrix-button" 
-				value="{t}edit/delete selected{/t}"  
-				onclick="window.open('char.php?id='+$('#characteristics').val(),'_self');" />
-		</td>
+		<td style="text-align:center"><script> allCreateButton('{t}add new{/t}','window.open(\'char.php\',\'_self\');');</script></td>
+		<td style="text-align:center"><script> allCreateButton('{t}edit/delete selected{/t}','window.open(\'char.php?id=\'+$(\'#characteristics\').val(),\'_self\');');</script></td>
 		<td></td>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new taxon{/t}" onclick="window.open('taxa.php','_self');" />
-			<input type="button" class="matrix-button" value="{t}remove selected taxon{/t}" onclick="matrixDeleteTaxon()" />
-		</td>
+		<td style="text-align:center"><script> allCreateButton('{t}add new taxon{/t}','window.open(\'taxa.php\',\'_self\');');</script></td>
+		<td style="text-align:center"><script> allCreateButton('{t}remove selected taxon{/t}','matrixDeleteTaxon();');</script></td>
 	</tr>
 	<tr>
 		<td colspan="3"  style="height:10px">
 	</tr>		
 	<tr>
-		<td>
+		<td colspan="2">
 			{t}states{/t}
 			<select size="100" id="states" class="matrix-list-select">
 			</select>
 		</td>
 		<td></td>
-		<td>
+		<td colspan="2">
 			{t}links{/t}
 			<select size="100" id="links" class="matrix-list-select">
 			</select>
 		</td>
 	</tr>		
 	<tr>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" id="newStateButton" value="{t}add new{/t}" onclick="matrixAddStateClick()" />
-			<input type="button" class="matrix-button" value="{t}edit/delete selected{/t}" onclick="matrixEditStateClick()" />
-
-		</td>
+		<td style="text-align:center"><script> allCreateButton('{t}add new{/t}','matrixAddStateClick()','newStateButton');</script></td>
+		<td style="text-align:center"><script> allCreateButton('{t}edit/delete selected{/t}','matrixEditStateClick()');</script></td>
 		<td></td>
-		<td style="text-align:center">
-			<input type="button" class="matrix-button" value="{t}add new{/t}"  onclick="matrixAddLinkClick()" />
-			<input type="button" class="matrix-button" value="{t}delete selected{/t}"  onclick="matrixRemoveLink()"  />
-		</td>
+		<td style="text-align:center"><script> allCreateButton('{t}add new{/t}','matrixAddLinkClick()');</script></td>
+		<td style="text-align:center"><script> allCreateButton('{t}delete selected{/t}','matrixRemoveLink()');</script></td>
 	</tr>
 </table>
 	

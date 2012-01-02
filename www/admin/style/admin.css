@@ -452,3 +452,21 @@ a:hover,.pseudo-a:hover {
 .stringToReplace {
 	background-color:#66FF66;
 }
+
+.all-fake-button {
+	background-color:#eee;
+	border:1px solid #669966;
+	padding:2px;
+	width:150px;
+	color:#222;
+	cursor:pointer;
+	text-align:center;
+}
+
+.all-fake-button:hover {
+	color:#8c778c;
+}
+
+.all-fake-button-shift {
+	padding-left:3px;
+}

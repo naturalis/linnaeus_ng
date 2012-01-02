@@ -1,18 +1,6 @@
 <?php
 
- function cleanL2Name ($taxon)
- {
-     $l2Markers = array('subsp.', 'var.', 'subvar.', 'f.', 'subf.');
-     if (count(explode(' ', $taxon->name)) > 2) {
-         foreach ($l2Markers as $marker) {
-           if (strstr($taxon->name, $marker) !== false) {
-            $taxon->name = str_replace($marker, '', $taxon->name);
-            break;
-           }
-         }
-     }
-     return $taxon;
- }
+
  
  
 /*
@@ -1334,7 +1322,7 @@ $res = $this->fixOldInternalLinks();
 				);
 
 		$_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)] = array(
-			'taxon' => trim((string)$obj->name),
+			'taxon' => $this->cleanL2Name(trim((string)$obj->name)),
 			'rank_id' => $rankId,
 			'rank_name' => $rankName,
 			'parent' => trim((string)$obj->parentname),
@@ -1342,7 +1330,21 @@ $res = $this->fixOldInternalLinks();
 		);
 
 	}
-
+	
+	private function cleanL2Name ($taxon)
+	{
+		 $l2Markers = array('subsp.', 'var.', 'subvar.', 'f.', 'subf.');
+		 if (count(explode(' ', $taxon)) > 2) {
+			 foreach ($l2Markers as $marker) {
+			   if (strstr($taxon, $marker) !== false) {
+				$taxon->name = str_replace($marker, '', $taxon);
+				break;
+			   }
+			 }
+		 }
+		 return $taxon;
+	}
+ 
 	private function addSpecies($species,$ranks)
 	{
 

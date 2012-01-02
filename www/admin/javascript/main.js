@@ -383,3 +383,11 @@ function showDialog(content,title) {
 	});
 
 }
+function allCreateButton(label,action,id,fixedHeight) {
+	
+	//<script> allCreateButton('click me!','window.open(\'char.php?id=\'+$(\'#characteristics\').val(),\'_self\');',500); </script>
+
+	document.write('<div class="all-fake-button" '+(fixedHeight ? 'style="height:'+fixedHeight+'px;"' : '' )+' '+(id ? 'id="'+id+'"' : '' )+' onmousedown="$(this).addClass(\'all-fake-button-shift\')"  onmouseup="$(this).removeClass(\'all-fake-button-shift\')"" onclick="'+action+'">'+label+'</div>');
+	
+}
+

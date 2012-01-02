@@ -102,6 +102,8 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign('occurringTaxa',$this->getOccurringTaxonList());
 
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
 		$this->printPage();	
 
 	}
@@ -283,7 +285,7 @@ class MapKeyController extends Controller
 
 		} else {
 
-			$this->redirect('species_select.php');
+			$this->redirect('choose_species.php');
 
 		} 
 
@@ -308,6 +310,7 @@ class MapKeyController extends Controller
         if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
 		// deleting a type
         
+            $tp = $this->deleteDataByGeodataType($this->requestData['del_type']);
             $tp = $this->deleteGeodataType($this->requestData['del_type']);
 
         } else
@@ -991,7 +994,7 @@ class MapKeyController extends Controller
 
 	}
 			
-    private function createGeodataType ($title,$languageId)
+    private function createGeodataType($title,$languageId)
     {
 
 		$gtt = $this->models->GeodataTypeTitle->_get(
@@ -1039,7 +1042,7 @@ class MapKeyController extends Controller
 
     }
 
-    private function deleteGeodataType ($id)
+    private function deleteGeodataType($id)
     {
 
 		if (!$id) return;
@@ -1059,7 +1062,21 @@ class MapKeyController extends Controller
 		);
 
     }
-	
+
+    private function deleteDataByGeodataType($id)
+    {
+
+		if (!$id) return;
+
+		return $this->models->OccurrenceTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'type_id' => $id
+			)
+		);
+
+    }
+
 	private function ajaxGetTypeLabels()
 	{
 	
