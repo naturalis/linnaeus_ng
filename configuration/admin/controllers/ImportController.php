@@ -1215,7 +1215,7 @@ $res = $this->fixOldInternalLinks();
 
 	}
 
-	private function addProjectRank($label,$rank,$isLower)
+	private function addProjectRank($label,$rank,$isLower,$parentId)
 	{
 
 		$this->models->ProjectRank->save(
@@ -1223,7 +1223,7 @@ $res = $this->fixOldInternalLinks();
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),	
 				'rank_id' => $rank['rank_id'],	
-				'parent_id' => isset($rank['parent_id']) ? $rank['parent_id'] : null,
+				'parent_id' => isset($parentId) ? $parentId : null,
 				'lower_taxon' => $isLower ? '1' : '0'
 			)
 		);
@@ -1249,8 +1249,8 @@ $res = $this->fixOldInternalLinks();
 
 		if (isset($substituteRanks) || isset($substituteParentRanks)) $possibleRanks = $this->getPossibleRanks();
 
-		$d = null;
-		
+		$d = $prevId = null;
+
 		$isLower = false;
 
 		foreach((array)$ranks as $key => $val) {
@@ -1260,7 +1260,12 @@ $res = $this->fixOldInternalLinks();
 
 				if (isset($substituteRanks) && isset($substituteRanks[$key])) {
 				
-					$val['rank_id'] = $substituteRanks[$key]; // hand picked substitute rank
+					$x = $possibleRanks[$substituteRanks[$key]]; // hand picked substitute rank
+					$val = array(
+					  'rank_id'	=> $x['id'],
+					  'parent_id'	=> $x['parent_id'],
+					  'parent_name'	=> $x['rank']
+					 );
 				
 				} else {
 
@@ -1269,10 +1274,10 @@ $res = $this->fixOldInternalLinks();
 				}
 
 			}
-
+			/*
 			// no valid parent (except $key==0, top of the hierarchy)
-			if ((!isset($val['parent_id']) || $val['parent_id']===false) && $key > 0) {
-			
+			if ((!isset($val['parent_id']) || $val['parent_id']===false) && count((array)$d) > 0) {
+
 				if (isset($substituteParentRanks) && isset($substituteParentRanks[$key])) {
 
 					$val['parent_id'] = $substituteParentRanks[$key]; // hand picked substitute parent rank
@@ -1284,12 +1289,14 @@ $res = $this->fixOldInternalLinks();
 				}
 
 			}
+			*/
 
 			//if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
 			
 			if (!$isLower && (strtolower($key)=='species')) $isLower = true;
 
-			$d[$key] = $this->addProjectRank($key,$val,$isLower);
+			$d[$key] = $this->addProjectRank($key,$val,$isLower,$prevId);
+			$prevId = $d[$key]['id'];
 
 		}
 

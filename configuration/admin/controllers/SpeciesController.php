@@ -369,7 +369,7 @@ class SpeciesController extends Controller
 				private function newGetUserAssignedTaxonTree()
 				{
 			
-					$taxa = $this->newGetTaxonTree(array('forceLookup'=>true));
+					$taxa = $this->newGetTaxonTree();
 
 					$userTaxa = $this->newGetUserTaxa();
 			
@@ -4037,7 +4037,7 @@ if (1==2) {
         } else {
 
 			$d = $this->models->ProjectRank->_get(array('id' => array('parent_id' => $id)));
-			
+
 			$result = $d[0]['id'] ? $d[0]['id'] : -1;
 			
             if ($output) $this->smarty->assign('returnText', $result);
@@ -4050,9 +4050,10 @@ if (1==2) {
 
 	private function canParentHaveChildTaxa($parentId)
 	{
-
+		// get the projected parent taxon, get it's rank id...
 		$d = $this->getTaxonById($parentId);
 
+		// ..and check whether that rankhas any child ranks
 		return ($this->getRankByParent($d['rank_id'],false) != -1);
 
 	}
