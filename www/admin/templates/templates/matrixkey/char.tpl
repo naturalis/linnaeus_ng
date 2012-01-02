@@ -28,12 +28,12 @@
 	<tr>
 		<td>
 		</td>
+{if $languages|@count>1}
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}
 	<td>{$languages[i].language} *</td>
 {/if}
 {/section}
-{if $languages|@count>1}
 	<td colspan="2" id="project-language-tabs">(languages)</td>
 {/if}
 	</tr>

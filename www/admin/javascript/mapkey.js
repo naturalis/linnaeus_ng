@@ -97,7 +97,9 @@ var finishedLoading = false;
 
 function initMap(init) {
 
-	if (!init) init = {lat:0,lng:0,zoom:2};
+	if (!init.lat) init.lat = 0;
+	if (!init.lng) init.lng = 0;
+	if (!init.zoom) init.zoom = 2;
 
 	var myOptions = {
 		zoom: init.zoom,
