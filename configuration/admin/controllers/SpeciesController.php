@@ -197,56 +197,6 @@ class SpeciesController extends Controller
      *
      * @access    public
      */
-				private function hasTableDataChanged($table)
-				{
-			
-					if (!isset($this->models->{$table})) return true;
-			
-					if (isset($_SESSION['system']['cacheControl'][$table])) {
-			
-						$t = $this->models->{$table}->_get(
-							array(
-								'id' => array(
-									'project_id' => $this->getCurrentProjectId()
-								),
-								'columns' => 
-									'max(last_change) > "'.mysql_real_escape_string($_SESSION['system']['cacheControl'][$table]['timestamp']).'" as changed,
-									count(*) as total,
-									current_timestamp'
-							)
-						);
-						
-						$result = ($t[0]['changed']==1 || $_SESSION['system']['cacheControl'][$table]['count']!=$t[0]['total']);
-			
-						$_SESSION['system']['cacheControl'][$table] = array(
-							'timestamp' => $t[0]['current_timestamp'],
-							'count' => $t[0]['total']
-						);
-						
-						return $result;
-			
-					} else {
-					
-						$t = $this->models->{$table}->_get(
-							array(
-								'id' => array(
-									'project_id' => $this->getCurrentProjectId()
-								),
-								'columns' => 'current_timestamp,count(*) as total'
-							)
-						);
-						
-						$_SESSION['system']['cacheControl'][$table] = array(
-							'timestamp' => $t[0]['current_timestamp'],
-							'count' => $t[0]['total']
-						);
-			
-						return true;
-					
-					}
-						
-				}
-				
 				private function newGetProjectRanks()
 				{
 			
@@ -315,13 +265,14 @@ class SpeciesController extends Controller
 							'order' => 'taxon_order'
 						)
 					);
-			
+					
 					foreach((array)$t as $key => $val) {
-			
+
 						$t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
 						$t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
 						$t[$key]['sibling_count'] = count((array)$t);
 						$t[$key]['depth'] = $t[$key]['level'] = $depth;
+
 						$this->treeList[$key] = $t[$key];
 			
 						/*
@@ -346,9 +297,10 @@ class SpeciesController extends Controller
 								'depth' => $depth+1
 							)
 						);
-			
+
 						$this->treeList[$key]['child_count'] = count((array)$t[$key]['children']);
-					
+
+								
 					}
 					
 					return $t;
@@ -417,8 +369,8 @@ class SpeciesController extends Controller
 				private function newGetUserAssignedTaxonTree()
 				{
 			
-					$taxa = $this->newGetTaxonTree();
-			
+					$taxa = $this->newGetTaxonTree(array('forceLookup'=>true));
+
 					$userTaxa = $this->newGetUserTaxa();
 			
 					$taxa = $this->newSetTaxaUserAllowable(array('taxa' => $taxa,'userTaxa' => $userTaxa));
@@ -429,24 +381,33 @@ class SpeciesController extends Controller
 			
 				private function newGetUserAssignedTaxonTreeList()
 				{
-			
+
 					$this->newGetUserAssignedTaxonTree();
 					
-					$firstLevel = null;
-					
+					$prevId = $prevTitle = null;
+
 					foreach((array)$this->treeList as $key => $val) {
 					
-						if ($val['user_allowed']===true) {
+						if (isset($val['user_allowed']) && $val['user_allowed']===true) {
 
-							$firstLevel = isset($firstLevel) ? $firstLevel : $val['level'];
-							$val['dots'] = str_repeat('.',$val['level']-$firstLevel); // avoiding loops in smarty
 							$d[$key] = $val;
+						
+							if(isset($prevId)) {
+	
+								$d[$key]['prev'] = array('id' => $prevId, 'title' => $prevTitle);
+								$d[$prevId]['next'] = array('id' => $key, 'title' => $val['taxon']);
+	
+							}
+							
+							$prevId = $key;
+							$prevTitle = $val['taxon'];
+							
 						}
 			
 					}
 					
-					return $d;
-						
+					return isset($d) ? $d : null;
+
 				}
 
 
@@ -693,58 +654,9 @@ if (1==2) {
 
 		} else {
 
-			/*
-			// code also looked at what taxa were assigned to what user; now replaced by assigning rights to the entire page
-			$ut = $this->models->UserTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'user_id' => $this->getCurrentUserId()
-					),
-				'columns' => 'taxon_id',
-				'fieldAsIndex' => 'taxon_id'
-				)
-			);
-			*/
-			
 			$this->getTaxonTree();
 
 			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
-			
-			/*
-			// code also looked at what taxa were assigned to what user; now replaced by assigning rights to the entire page
-			if (count((array)$ut)>0 || $isEmptyTaxaList) {
-	
-				$allow = false;
-	
-				if (!$isEmptyTaxaList) {
-		
-					foreach((array)$this->treeList as $key => $val) {
-			
-						if ($allow && $val['level'] <= $prevLevel) {
-						
-							$allow = false;
-			
-						}
-			
-						if (array_key_exists($val['id'],$ut)) {
-			
-							$allow = true;
-							
-							$prevLevel = $val['level'];
-			
-						}
-						
-						if ($allow) {
-						
-							$taxa[] = $val;
-						
-						}
-		
-					}
-	
-				}
-			*/
 	
 			if ($this->rHasVal('taxon')) {
 			
@@ -793,6 +705,7 @@ if (1==2) {
 	
 							$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
 							
+							$this->setPageName(sprintf(_('Editing "%s"'),$this->requestData['taxon']));
 							unset($data['taxon']);
 							unset($_SESSION['species']['usertaxa']);
 							
@@ -821,8 +734,8 @@ if (1==2) {
 			$this->smarty->assign('allowed',true);
 
 			if (isset($data)) $this->smarty->assign('data',$data);
-	
-			$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+
+			$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 			$this->smarty->assign('navCurrentId',$data['id']);
 
 			$this->smarty->assign('projectRanks',$pr);
@@ -4661,43 +4574,7 @@ if (1==2) {
 		unset($_SESSION['system']['media']['newRef']);
 
 	}
-/*	
-	private function getAllSynonyms($forceLookup=false)
-	{
-	
-		if (isset($_SESSION['species']['synonyms']) && !$forceLookup)
-			return $_SESSION['species']['synonyms'];
 
-		$_SESSION['species']['synonyms'] = $this->models->Synonym->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-				)
-			)
-		);
-		
-		return $_SESSION['species']['synonyms'];
-	
-	}
-
-	private function getAllCommonnames($forceLookup=false)
-	{
-	
-		if (isset($_SESSION['species']['commonnames']) && !$forceLookup)
-			return $_SESSION['species']['commonnames'];
-
-		$_SESSION['species']['commonnames'] = $this->models->Commonname->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-				)
-			)
-		);
-		
-		return $_SESSION['species']['commonnames'];
-	
-	}
-*/
 	private function getLookupList($search)
 	{
 
@@ -4709,7 +4586,7 @@ if (1==2) {
 
 		$l = array();
 		
-		foreach((array)$this->getUserAssignedTreeList() as $key => $val) {
+		foreach((array)$this->newGetUserAssignedTaxonTreeList() as $key => $val) {
 		
 			if (preg_match($regexp,$val['taxon']) == 1)
 				$l[] = array(
