@@ -624,6 +624,19 @@ class ProjectsController extends Controller
         $this->printPage();
 
 	}
+	
+	public function getInfoAction()
+	{
+
+        $this->checkAuthorisation(true);
+        
+        $this->setPageName(_('Project info'));
+
+        $this->printPage();
+			
+	
+	}
+	
 
     private function ajaxActionModules ($moduleType, $action, $moduleId)
     {

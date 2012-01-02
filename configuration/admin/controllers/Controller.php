@@ -1580,6 +1580,55 @@ class Controller extends BaseClass
 	
 	}
 
+	public function hasTableDataChanged($table)
+	{
+
+		if (!isset($this->models->{$table})) return true;
+
+		if (isset($_SESSION['system']['cacheControl'][$table])) {
+
+			$t = $this->models->{$table}->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'columns' => 
+						'max(last_change) > "'.mysql_real_escape_string($_SESSION['system']['cacheControl'][$table]['timestamp']).'" as changed,
+						count(*) as total,
+						current_timestamp'
+				)
+			);
+			
+			$result = ($t[0]['changed']==1 || $_SESSION['system']['cacheControl'][$table]['count']!=$t[0]['total']);
+
+			$_SESSION['system']['cacheControl'][$table] = array(
+				'timestamp' => $t[0]['current_timestamp'],
+				'count' => $t[0]['total']
+			);
+			
+			return $result;
+
+		} else {
+		
+			$t = $this->models->{$table}->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'columns' => 'current_timestamp,count(*) as total'
+				)
+			);
+			
+			$_SESSION['system']['cacheControl'][$table] = array(
+				'timestamp' => $t[0]['current_timestamp'],
+				'count' => $t[0]['total']
+			);
+
+			return true;
+		
+		}
+			
+	}
 
 	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null,$specificMenuTemplate=null)
 	{

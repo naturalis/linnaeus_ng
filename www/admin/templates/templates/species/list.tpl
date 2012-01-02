@@ -36,7 +36,9 @@
 	</tr>
 	
 	{assign var=prev_rank value=-1}
+	{assign var=firstlevel value=-1}
 	{foreach item=taxon from=$taxa}
+	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
 		{assign var=t value=$taxon.id}
 		{if $prev_rank!=$taxon.rank_id && $taxon.sibling_count>1}
 			{if $arrowBuffer==true}
@@ -45,69 +47,70 @@
 				{assign var=arrowBuffer value=true}
 			{/if}
 		{/if}
-	<tr class="taxon-list-row" id="row-{$taxon.id}">
-		<!-- td class="taxon-list-cell-rank">
-		<span style="color:#bbb">{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}</span>{$taxon.rank}
-		</td -->
-		<td class="taxon-list-cell-name" id="namecell{$taxon.id}">
-			{$taxon.dots}
-			{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
-			<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
-		</td>
-{if $session.project.includes_hybrids==1}<td>
-			{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
-		</td>
-{/if}
-
-		<td style="text-align:right;">
-			<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxon.pctFinished}%{* t}done{/t *}</span>
-		</td>
-{if !$isHigherTaxa}
-		<td title="{t}media files{/t}">
-			<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{$taxon.mediaCount} {if $taxon.mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</span>
-		</td>
-{/if}
-		<td>
-			<span class="pseudo-a" onclick="window.open('literature.php?id={$t}','_self');">{$taxon.literatureCount} refs.</span>
-		</td>
-		<td>
-			<span class="pseudo-a" onclick="window.open('synonyms.php?id={$t}','_self');">{$taxon.synonymCount} syn.</span>
-		</td>
-		<td>
-			<span class="pseudo-a" onclick="window.open('common.php?id={$t}','_self');">{$taxon.commonnameCount} {if $taxon.commonnameCount==1}{t}name{/t}{else}{t}names{/t}{/if}</span>
-		</td>
-
-		<td style="text-align:center">
-		{if $arrowBuffer}&nbsp;&nbsp;{/if}
-		{if $taxon.sibling_count>1}
-			{if $taxon.sibling_pos=='last'}
-				<span
-					class="pseudo-a"
-					title="{t}move branch upward in the tree{/t}"
-					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('up');$('#rearrangeForm').submit();">
-					&uarr;
-				</span>
-			{else}
-				<span
-					class="pseudo-a"
-					title="{t}move branch downward in the tree{/t}"
-					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('down');$('#rearrangeForm').submit();">
-					&darr;
-				</span>
+		<tr class="taxon-list-row" id="row-{$taxon.id}">
+			<!-- td class="taxon-list-cell-rank">
+			<span style="color:#bbb">{section name=loop start=$firstDotLength loop=$taxon.level-$}.{/section}</span>{$taxon.rank}
+			</td -->
+			<td class="taxon-list-cell-name" id="namecell{$taxon.id}">
+				{if $firstlevel==-1}{assign var=firstlevel value=$taxon.level}{/if}
+				{'.'|str_repeat:$taxon.level-$firstlevel}
+				{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
+				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
+			</td>
+	{if $session.project.includes_hybrids==1}<td>
+				{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
+			</td>
+	{/if}
+	
+			<td style="text-align:right;">
+				<span class="pseudo-a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxon.pctFinished}%{* t}done{/t *}</span>
+			</td>
+	{if !$isHigherTaxa}
+			<td title="{t}media files{/t}">
+				<span class="pseudo-a" onclick="window.open('media.php?id={$t}','_self');">{$taxon.mediaCount} {if $taxon.mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</span>
+			</td>
+	{/if}
+			<td>
+				<span class="pseudo-a" onclick="window.open('literature.php?id={$t}','_self');">{$taxon.literatureCount} refs.</span>
+			</td>
+			<td>
+				<span class="pseudo-a" onclick="window.open('synonyms.php?id={$t}','_self');">{$taxon.synonymCount} syn.</span>
+			</td>
+			<td>
+				<span class="pseudo-a" onclick="window.open('common.php?id={$t}','_self');">{$taxon.commonnameCount} {if $taxon.commonnameCount==1}{t}name{/t}{else}{t}names{/t}{/if}</span>
+			</td>
+	
+			<td style="text-align:center">
+			{if $arrowBuffer}&nbsp;&nbsp;{/if}
+			{if $taxon.sibling_count>1}
+				{if $taxon.sibling_pos=='last'}
+					<span
+						class="pseudo-a"
+						title="{t}move branch upward in the tree{/t}"
+						onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('up');$('#rearrangeForm').submit();">
+						&uarr;
+					</span>
+				{else}
+					<span
+						class="pseudo-a"
+						title="{t}move branch downward in the tree{/t}"
+						onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('down');$('#rearrangeForm').submit();">
+						&darr;
+					</span>
+				{/if}
 			{/if}
+			{if !$arrowBuffer}&nbsp;&nbsp;{/if}
+			</td>
+			<td
+				class="pseudo-a" 
+				style="text-align:center" 
+				onclick="taxonDeleteData({$taxon.id},'{$taxon.taxon}');">
+				x
+			</td>
+			<td id="usage-{$taxon.id}"></td>
+		</tr>
+			{assign var=prev_rank value=$taxon.rank_id}
 		{/if}
-		{if !$arrowBuffer}&nbsp;&nbsp;{/if}
-		</td>
-		<td
-			class="pseudo-a" 
-			style="text-align:center" 
-			onclick="taxonDeleteData({$taxon.id},'{$taxon.taxon}');">
-			x
-		</td>
-		<td id="usage-{$taxon.id}"></td>
-	</tr>
-		{assign var=prev_rank value=$taxon.rank_id}
-
 	{/foreach}
 	</table>
 
