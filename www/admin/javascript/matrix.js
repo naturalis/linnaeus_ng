@@ -405,11 +405,11 @@ function matrixAddLinkClick() {
 
 	var characteristic = $("#characteristics :selected").val()
 	var state = $("#states :selected").val()
-	var taxon = $("#taxa :selected").val()
+	var taxonOrMatrix = $("#taxa :selected").val()
 
-	if (characteristic==undefined || taxon==undefined || state==undefined) return;
+	if (characteristic==undefined || taxonOrMatrix==undefined || state==undefined) return;
 	
-	matrixAddLink(characteristic,taxon,state);
+	matrixAddLink(characteristic,taxonOrMatrix,state);
 
 }
 

@@ -39,7 +39,7 @@
 							<div id="replace-{$module_sys_name}-id-{$occurrences.id}" class="replaceItem">
 							{* $occurrences.id *}
 							<span class="replaceItemHeader">
-								{$k}{if $includeReplace} ({if $replaceIndex[$occurrences.id]}{$replaceIndex[$occurrences.id]}{else}{t}to be replaced{/t}{/if}){/if}:</span>
+								{$moduleData.replace.label}{if $includeReplace} ({if $replaceIndex[$occurrences.id]}{$replaceIndex[$occurrences.id]}{else}{t}to be replaced{/t}{/if}){/if}:</span>
 							<br />							
 							{$occurrences.highlighted}
 							<p>

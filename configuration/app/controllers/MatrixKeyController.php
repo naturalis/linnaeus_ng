@@ -401,7 +401,7 @@ class MatrixKeyController extends Controller
 	
 			}
 
-			$_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
+			if (isset($taxa)) $_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
 			
 		}
 
@@ -477,101 +477,126 @@ class MatrixKeyController extends Controller
 
 	}
 
+	private function calculateScore($states,$item,$type)
+	{
+	
+		$item['hits'] = 0;
+
+		foreach((array)$states as $sKey => $sVal) {
+		
+			// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
+			if (substr($sVal,0,1)==='f') {
+		
+				$d = explode(':',$sVal);
+
+				$charId = $d[1];
+				$value = $d[2];
+				if (isset($d[3])) $sd = $d[3];
+
+				$d = array(
+					'project_id' => $this->getCurrentProjectId(),
+					'characteristic_id' => $charId,
+				);
+				
+				if (isset($sd)) {
+
+					$d['mean >=#'] = '('. strval(intval($value)).' - ('.strval(intval($sd)).' * sd))';
+					$d['mean <=#'] = '('. strval(intval($value)).' + ('.strval(intval($sd)).' * sd))';
+
+				} else {
+		
+					$d['lower <='] = intval($value);
+					$d['upper >='] = intval($value);
+
+				}
+
+				$cs = $this->models->CharacteristicState->_get(array('id' => $d));
+
+				$hasState = false;
+				
+				foreach((array)$cs as $cKey => $cVal) {
+
+					$d = array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $this->getCurrentMatrixId(),
+						'state_id' => $cVal['id']
+					);
+
+					if ($type=='taxon')
+						$d['taxon_id'] = $item['id'];
+					else
+						$d['ref_matrix_id'] = $item['id'];
+					
+
+					$mts = $this->models->MatrixTaxonState->_get(
+						array(
+							'id' => $d,
+							'columns' => 'count(*) as total'
+						)
+					);
+					
+					if ($mts[0]['total']>0) $hasState = true;
+
+				}
+
+				if ($hasState) $item['hits']++; 
+
+			} else {
+
+				$d = array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
+					'state_id' => $sVal
+				);
+
+				if ($type=='taxon')
+					$d['taxon_id'] = $item['id'];
+				else
+					$d['ref_matrix_id'] = $item['id'];
+					
+				$mts = $this->models->MatrixTaxonState->_get(array('id' => $d));
+
+				if ($mts) $item['hits']++; 
+
+			}
+
+		}
+
+		$item['score'] = round(($item['hits'] / count((array)$states)) * 100);
+
+		return $item;
+	
+	}
+
+
 	private function getTaxaScores($states)
 	{
 	
 		$taxa = $this->getTaxa();
+		$mtcs = $this->getMatrices();
 
 		if ($states==-1) return $taxa;
 
-		foreach((array)$taxa as $key => $val) {
+		foreach((array)$taxa as $key => $val) $taxa[$key] = $this->calculateScore($states,$val,'taxon');
 
-			$taxa[$key]['hits'] = 0;
+		foreach((array)$mtcs as $key => $val) {
 
-			foreach((array)$states as $sKey => $sVal) {
-			
-				// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
-				if (substr($sVal,0,1)==='f') {
-			
-					$d = explode(':',$sVal);
+			$d = $this->calculateScore($states,$val,'matrix');
 
-					$charId = $d[1];
-					$value = $d[2];
-					if (isset($d[3])) $sd = $d[3];
+			if ($d['score']>0) {
 
-					$d = array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $charId,
-					);
-					
-					if (isset($sd)) {
+				$d['type'] = 'matrix';
+				$matrices[$key] = $d;
 
-						$d['mean >=#'] = '('. strval(intval($value)).' - ('.strval(intval($sd)).' * sd))';
-						$d['mean <=#'] = '('. strval(intval($value)).' + ('.strval(intval($sd)).' * sd))';
-
-					} else {
-			
-						$d['lower <='] = intval($value);
-						$d['upper >='] = intval($value);
-
-					}
-
-					$cs = $this->models->CharacteristicState->_get(array('id' => $d));
-
-					$hasState = false;
-					
-					foreach((array)$cs as $cKey => $cVal) {
-
-						$mts = $this->models->MatrixTaxonState->_get(
-							array(
-								'id' => array(
-									'project_id' => $this->getCurrentProjectId(),
-									'matrix_id' => $this->getCurrentMatrixId(),
-									'taxon_id' => $val['id'],
-									'state_id' => $cVal['id']
-								),
-								'columns' => 'count(*) as total'
-							)
-						);
-						
-						if ($mts[0]['total']>0) $hasState = true;
-
-					}
-
-					if ($hasState) $taxa[$key]['hits']++; 
-
-				} else {
-
-					$mts = $this->models->MatrixTaxonState->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'matrix_id' => $this->getCurrentMatrixId(),
-								'taxon_id' => $val['id'],
-								'state_id' => $sVal
-							)
-						)
-					);
-
-					if ($mts) $taxa[$key]['hits']++; 
-	
-				}
-	
 			}
 
-			$taxa[$key]['score'] = round(($taxa[$key]['hits'] / count((array)$states)) * 100);
-
 		}
+	
+		$results = array_merge($taxa,$matrices);
+	
+		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));		
 
-		$sortBy = array(
-			'key' => 'score', 
-			'dir' => 'desc', 
-			'case' => 'i'
-		);
-
-		$this->customSortArray($taxa, $sortBy);		
-
-		return $taxa;
+		return $results;
 
 	}
 

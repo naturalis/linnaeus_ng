@@ -186,11 +186,19 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
 
+		$matrices = $this->getMatrices();
+		
+		$d = array();
+		
+		foreach((array)$matrices as $val)  if ($val['id']!=$this->getCurrentMatrixId()) array_push($d,$val);
+
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
 		$this->smarty->assign('taxa',$this->getTaxa());
 
 		$this->smarty->assign('matrix',$matrix);
+
+		$this->smarty->assign('matrices',$d);
 
         $this->printPage();
     
@@ -766,6 +774,7 @@ class MatrixKeyController extends Controller
 			);
 
 			$m[$key]['names'] = $mn;
+			$m[$key]['default_name'] = $mn[ $_SESSION['project']['default_language_id']]['name'];
 
 		}
 
@@ -1696,13 +1705,25 @@ class MatrixKeyController extends Controller
 		$taxonId = isset($taxonId) ? $taxonId : $this->requestData['taxon'];
 		$stateId = isset($stateId) ? $stateId : $this->requestData['state'];
 		
-		if (!isset($charId) || !isset($taxonId) || !isset($stateId)) return;
+		if (strpos($taxonId,'mx-')===0) {
+		
+			$refMatrixId = str_replace('mx-','',$taxonId);
+			$taxonId = null;
+		
+		} else {
 
-		@$this->models->MatrixTaxonState->save(
+			$refMatrixId = null;
+
+		}
+		
+		if (!isset($charId) || (!isset($taxonId) && !isset($refMatrixId)) || !isset($stateId)) return;
+
+		$this->models->MatrixTaxonState->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $this->getCurrentMatrixId(),
-				'taxon_id' => $taxonId,
+				'taxon_id' => (isset($taxonId) ? $taxonId : null),
+				'ref_matrix_id' => (isset($refMatrixId) ? $refMatrixId : null),
 				'characteristic_id' => $charId,
 				'state_id' => $stateId
 			)
@@ -1735,12 +1756,19 @@ class MatrixKeyController extends Controller
 		if (isset($params['taxon_id'])) $d['taxon_id'] = $params['taxon_id'];
 		if (isset($params['matrix_id'])) $d['matrix_id'] = $params['matrix_id'];
 
+		if (strpos($d['taxon_id'],'mx-')===0) {
+		
+			$d['ref_matrix_id'] = str_replace('mx-','',$d['taxon_id']);
+			unset($d['taxon_id']);
+		
+		}
+
 		if (!isset($d)) return;
 
 		$d['project_id'] = $this->getCurrentProjectId();
 
 		$mts = $this->models->MatrixTaxonState->_get(array('id' => $d));
-		
+
 		foreach((array)$mts as $key => $val) {
 
 			$cs = $this->models->CharacteristicState->_get(
@@ -1757,7 +1785,7 @@ class MatrixKeyController extends Controller
 			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$_SESSION['project']['default_language_id']);
 		
 		}
-		
+
 		return $mts;
 
 	}

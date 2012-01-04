@@ -20,15 +20,21 @@
 		<td>
 		</td>
 		<td colspan="2">
-			{t}taxa{/t} (<a href="links.php">{t}display current links per taxon{/t}</a>)
+			{t}taxa{/t} (<a href="links.php">{t}display current links per taxon{/t}</a>{if $matrices} {t}& other matrices{/t}{/if})
 			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
 			{section name=i loop=$taxa}
 			<option value="{$taxa[i].id}">{$taxa[i].taxon}</option>
 			{/section}
+			{if $matrices}
+			<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>
+			{section name=i loop=$matrices}
+			<option value="mx-{$matrices[i].id}">{$matrices[i].default_name}</option>
+			{/section}
+			{/if}
 			</select>
 		</td>
 	</tr>
-	<tr>
+	<tr>{* buttons are div's as normal buttons cannot hold more than one line of text *}
 		<td style="text-align:center"><script> allCreateButton('{t}add new{/t}','window.open(\'char.php\',\'_self\');');</script></td>
 		<td style="text-align:center"><script> allCreateButton('{t}edit/delete selected{/t}','window.open(\'char.php?id=\'+$(\'#characteristics\').val(),\'_self\');');</script></td>
 		<td></td>
