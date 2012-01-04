@@ -286,9 +286,9 @@ function fillScores(obj,char) {
 	for(var i=0;i<obj.length;i++) {
 
 		$('#scores').
-			append('<option ondblclick="goTaxon('+obj[i].id+');" value="'+obj[i].id+'">'+
+			append('<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
 				(obj[i].score!=undefined ? obj[i].score+': ' : '')+
-				obj[i].taxon+'</option>').
+				(obj[i].type=='matrix' ? _('Matrix: ')+obj[i].name : obj[i].taxon)+'</option>').
 			val(obj[i].id);
 
 	}

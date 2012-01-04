@@ -1662,6 +1662,217 @@ class Controller extends BaseClass
 		
 	}
 		
+
+	/*
+
+		"new" functions below are replacements for the "tacon tree"-functions, with improved
+		caching and - hopefully - performance. so far, only implemented in
+			SpeciesController::listAction
+			
+
+	*/
+	public function newGetProjectRanks()
+	{
+
+		if ($this->hasTableDataChanged('ProjectRank')==true || !isset($_SESSION['user']['species']['projectRank'])) {
+
+			$_SESSION['user']['species']['projectRank'] =
+				$this->models->ProjectRank->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId()
+						),
+						'fieldAsIndex' => 'id'
+					)
+				);
+
+		}
+		
+		return $_SESSION['user']['species']['projectRank'];
+	
+	}
+	
+	public function newGetTaxonTree($p=null)
+	{
+
+		if (
+			!isset($_SESSION['user']['species']['tree']) || 
+			!isset($_SESSION['user']['species']['treeList']) ||
+			isset($p['forceLookup']) && $p['forceLookup']===true) {
+
+			$_SESSION['user']['species']['tree'] = $this->_newGetTaxonTree();
+			$_SESSION['user']['species']['treeList'] = $this->treeList;
+
+		} else
+		if ($this->hasTableDataChanged('Taxon')) {
+
+			$_SESSION['user']['species']['tree'] = $this->_newGetTaxonTree();
+			$_SESSION['user']['species']['treeList'] = $this->treeList;
+
+		} else {
+
+			$this->treeList = $_SESSION['user']['species']['treeList'];
+		
+		}
+			
+		return $_SESSION['user']['species']['tree'];
+
+	}
+
+	public function _newGetTaxonTree($p=null)
+	{
+
+		$pId = isset($p['pId']) ? $p['pId'] : null;
+		$ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
+		$depth = isset($p['depth']) ? $p['depth'] : 0;
+		
+		if (!isset($p['depth'])) unset($this->treeList);
+				
+		$t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id'.(is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
+				),
+				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+				'fieldAsIndex' => 'id',
+				'order' => 'taxon_order'
+			)
+		);
+		
+		foreach((array)$t as $key => $val) {
+
+			$t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
+			$t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
+			$t[$key]['sibling_count'] = count((array)$t);
+			$t[$key]['depth'] = $t[$key]['level'] = $depth;
+
+			$this->treeList[$key] = $t[$key];
+
+			$t[$key]['children'] = $this->_newGetTaxonTree(
+				array(
+					'pId' => $val['id'],
+					'ranks' => $ranks,
+					'depth' => $depth+1
+				)
+			);
+
+			$this->treeList[$key]['child_count'] = count((array)$t[$key]['children']);
+
+					
+		}
+		
+		return $t;
+	
+	}
+	
+	public function newGetUserTaxa()
+	{
+
+		if ($this->hasTableDataChanged('UserTaxon') || !isset($_SESSION['user']['species']['userTaxa'])) {
+
+			$_SESSION['user']['species']['userTaxa'] = $this->models->UserTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'user_id' => $this->getCurrentUserId()
+					),
+					//'order' => 'taxon_id',
+					'fieldAsIndex' => 'taxon_id'
+				)
+			);
+
+		}
+
+		return $_SESSION['user']['species']['userTaxa'];
+
+	}
+
+	public function newSetTaxaUserAllowable($p)
+	{
+
+		$taxa = isset($p['taxa']) ? $p['taxa'] : null;
+		$userTaxa = isset($p['userTaxa']) ? $p['userTaxa'] : null;
+		$prevAllowed = isset($p['prevAllowed']) ? $p['prevAllowed'] : false;
+		$prevDepth = isset($p['prevDepth']) ? $p['prevDepth'] : null;
+
+		if (is_null($taxa) || is_null($userTaxa)) return null;
+
+		foreach((array)$taxa as $tKey => $tVal) {
+		
+			if (isset($userTaxa[$tKey]) || ($prevAllowed==true && $tVal['depth'] > $prevDepth)) {
+
+				$this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = true;
+
+			} else {
+
+				$this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = false;
+
+			}
+
+			$taxa[$tKey]['children'] = $this->newSetTaxaUserAllowable(
+				array(
+					'taxa' => $tVal['children'],
+					'userTaxa' => $userTaxa,
+					'prevAllowed' => $taxa[$tKey]['user_allowed'],
+					'prevDepth' => $tVal['depth']
+				)
+			);
+
+		}
+		
+		return $taxa;
+
+	}
+
+	public function newGetUserAssignedTaxonTree()
+	{
+
+		$taxa = $this->newGetTaxonTree();
+
+		$userTaxa = $this->newGetUserTaxa();
+
+		$taxa = $this->newSetTaxaUserAllowable(array('taxa' => $taxa,'userTaxa' => $userTaxa));
+
+		return $taxa;
+	
+	}
+
+	public function newGetUserAssignedTaxonTreeList()
+	{
+
+		$this->newGetUserAssignedTaxonTree();
+		
+		$prevId = $prevTitle = null;
+
+		foreach((array)$this->treeList as $key => $val) {
+		
+			if (isset($val['user_allowed']) && $val['user_allowed']===true) {
+
+				$d[$key] = $val;
+			
+				if(isset($prevId)) {
+
+					$d[$key]['prev'] = array('id' => $prevId, 'title' => $prevTitle);
+					$d[$prevId]['next'] = array('id' => $key, 'title' => $val['taxon']);
+
+				}
+				
+				$prevId = $key;
+				$prevTitle = $val['taxon'];
+				
+			}
+
+		}
+		
+		return isset($d) ? $d : null;
+
+	}
+				
+		
+		
+		
+		
 	private function getFrontEndMainMenu()
 	{
 

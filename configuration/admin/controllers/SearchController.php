@@ -728,6 +728,8 @@ class SearchController extends Controller
 
 		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
 
+		$this->newGetTaxonTree();
+
 		$taxa = $this->models->Taxon->_get(
 			array(
 				'id' => array(
@@ -746,6 +748,7 @@ class SearchController extends Controller
 				'model' => $this->models->Taxon->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 				'matches' => $this->getColumnMatches($search,$val,array('taxon'),$hitCountTaxa),
+				'label' => sprintf(_('Taxon "%s"'),$val['label'])
 			);
 			
 			$taxa[$key]['url'] = '../species/edit.php?id='.$val['id'];
@@ -769,10 +772,11 @@ class SearchController extends Controller
 			$synonyms[$key]['replace'] = array(
 				'model' => $this->models->Synonym->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym)
+				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym),
+				'label' => sprintf(_('Synonym "%s" for "%s"'),$val['label'],$this->treeList[$val['taxon_id']]['taxon'])
 			);
 			
-			$synonyms[$key]['url'] = '../species/synonyms.php?id='.$val['id'];
+			$synonyms[$key]['url'] = '../species/synonyms.php?id='.$val['taxon_id'];
 				
 		}
 
@@ -803,10 +807,11 @@ class SearchController extends Controller
 			$commonnames[$key]['replace'] = array(
 				'model' => $this->models->Commonname->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('commonname','transliteration'),$hitCountCommon)
+				'matches' => $this->getColumnMatches($search,$val,array('commonname','transliteration'),$hitCountCommon),
+				'label' => sprintf(_('Common name "%s" for "%s"'),$val['label'],$this->treeList[$val['taxon_id']]['taxon'])
 			);
 			
-			$commonnames[$key]['url'] = '../species/common.php?id='.$val['id'];
+			$commonnames[$key]['url'] = '../species/common.php?id='.$val['taxon_id'];
 
 		}
 
@@ -839,12 +844,11 @@ class SearchController extends Controller
 
 			foreach((array)$content as $key => $val) {
 
-
-
 				$content[$key]['replace'] = array(
 					'model' => $this->models->ContentTaxon->getClassName(),
 					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $this->getColumnMatches($search,$val,array('content'),$hitCountContent)
+					'matches' => $this->getColumnMatches($search,$val,array('content'),$hitCountContent),
+					'label' => sprintf(_('Description of "%s"'),$this->treeList[$val['taxon_id']]['taxon'])
 				);
 				
 				$content[$key]['url'] = '../species/taxon.php?id='.$val['taxon_id'].'&page='.$val['page_id'];
@@ -877,13 +881,24 @@ class SearchController extends Controller
 
 			foreach((array)$media as $key => $val) {
 
+				$d = $this->models->MediaTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'id' => $val['media_id']
+						),
+					'columns' => 'id,taxon_id'
+					)
+				);
+
 				$media[$key]['replace'] = array(
 					'model' => $this->models->MediaDescriptionsTaxon->getClassName(),
 					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $this->getColumnMatches($search,$val,array('description'),$hitCountMedia)
+					'matches' => $this->getColumnMatches($search,$val,array('description'),$hitCountMedia),
+					'label' => sprintf(_('Description of media file for "%s"'),$this->treeList[$d[0]['taxon_id']]['taxon'])
 				);
 				
-				$media[$key]['url'] = '../species/media.php?id='.$val['id'];
+				$media[$key]['url'] = '../species/media.php?id='.$val['taxon_id'];
 
 			}
 			
@@ -1007,7 +1022,8 @@ class SearchController extends Controller
 				$val['replace'] = array(
 					'model' => $this->models->ContentFreeModule->getClassName(),
 					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $matches
+					'matches' => $matches,
+					'label' => sprintf(_('Page "%s"'),$val['topic'])
 				);
 				
 				$val['url'] = '../module/edit.php?id='.$val['page_id'];
@@ -1099,7 +1115,8 @@ class SearchController extends Controller
 			$matrices[$key]['replace'] = array(
 				'model' => $this->models->MatrixName->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('name'),$hitCountMatrices)
+				'matches' => $this->getColumnMatches($search,$val,array('name'),$hitCountMatrices),
+				'label' => sprintf(_('Matrix "%s"'),$val['name'])
 			);
 			
 			$matrices[$key]['url'] = '../matrixkey/matrix.php?id='.$val['matrix_id'];
@@ -1121,7 +1138,8 @@ class SearchController extends Controller
 			$characteristics[$key]['replace'] = array(
 				'model' => $this->models->CharacteristicLabel->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('label'),$hitCountChars)
+				'matches' => $this->getColumnMatches($search,$val,array('label'),$hitCountChars),
+				'label' => sprintf(_('Character "%s"'),$val['label'])
 			);
 			
 			$characteristics[$key]['url'] = '../matrixkey/char.php?id='.$val['characteristic_id'];
@@ -1156,7 +1174,8 @@ class SearchController extends Controller
 			$states[$key]['replace'] = array(
 				'model' => $this->models->CharacteristicLabelState->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('label','text'),$hitCountStates)
+				'matches' => $this->getColumnMatches($search,$val,array('label','text'),$hitCountStates),
+				'label' => sprintf(_('State "%s"'),$val['label'])
 			);
 			
 			$cs = $this->models->CharacteristicState->_get(
@@ -1252,7 +1271,8 @@ class SearchController extends Controller
 			$choices[$key]['replace'] = array(
 				'model' => $this->models->ChoiceContentKeystep->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('choice_txt'),$hitCountChoices)
+				'matches' => $this->getColumnMatches($search,$val,array('choice_txt'),$hitCountChoices),
+				'label' => '"'.substr($val['content'],0,25).'..."'
 			);
 
 			$step = $this->models->ChoiceKeystep->_get(
@@ -1275,7 +1295,7 @@ class SearchController extends Controller
 							'project_id' => $this->getCurrentProjectId(),
 							'keystep_id' => $step[0]['keystep_id']
 						),
-						'columns' => 'keystep_id,title'
+						'columns' => 'keystep_id,title,content'
 					)
 				);
 
@@ -1330,6 +1350,7 @@ class SearchController extends Controller
 			);
 
 			$steps[$key]['number'] = $step[0]['number'];
+			$steps[$key]['replace']['label'] =sprintf(_('Step %s'),$step[0]['number']);
 
 		}
 
@@ -1411,7 +1432,8 @@ class SearchController extends Controller
 			$books[$key]['replace'] = array(
 				'model' => $this->models->Literature->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('text','author_full'),$hitCount)
+				'matches' => $this->getColumnMatches($search,$val,array('text','author_full'),$hitCount),
+				'label' => $val['author_full'].' '.$val['year']
 			);
 			
 			$books[$key]['url'] = '../literature/edit.php?id='.$val['id'];
@@ -1487,6 +1509,7 @@ class SearchController extends Controller
 				'model' => $this->models->Glossary->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$hitCountGloss),
+				'label' => sprintf(_('Term "%s"'),$val['term'])
 			);
 
 			$gloss[$key]['url'] = '../glossary/edit.php?id='.$val['id'];
@@ -1521,7 +1544,8 @@ class SearchController extends Controller
 			$synonyms[$key]['replace'] = array(
 				'model' => $this->models->GlossarySynonym->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym)
+				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym),
+				'label' => sprintf(_('Synonym "%s"'),$val['synonym'])
 			);
 
 			$synonyms[$key]['url'] = '../glossary/edit.php?id='.$g[0]['id'];
@@ -1648,7 +1672,8 @@ class SearchController extends Controller
 			$content[$key]['replace'] = array(
 				'model' => $this->models->Content->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$hitCount)
+				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$hitCount),
+				'label' => sprintf(_('Page "%s"'),$val['subject'])
 			);
 			
 			$content[$key]['url'] = '../content/content.php?id='.$val['id'];
@@ -1687,7 +1712,8 @@ class SearchController extends Controller
 			$titles[$key]['replace'] = array(
 				'model' => $this->models->GeodataTypeTitle->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('title'),$hitCountTypes)
+				'matches' => $this->getColumnMatches($search,$val,array('title'),$hitCountTypes),
+				'label' => sprintf(_('Datatype "%s"'),$val['title'])
 			);
 
 			$titles[$key]['url'] =  '../mapkey/data_types.php';
@@ -1715,7 +1741,8 @@ class SearchController extends Controller
 				$occurrences[$key]['replace'] = array(
 					'model' => $this->models->GeodataTypeTitle->getClassName(),
 					'id' => null,
-					'matches' => $this->getColumnMatches($search,$val,array('taxon'),$hitCountOccurrences)
+					'matches' => $this->getColumnMatches($search,$val,array('taxon'),$hitCountOccurrences),
+					'label' => $val['taxon']
 				);
 
 				$occurrences[$key]['url'] =  '../mapkey/species.php?id='.$val['taxon_id'];
@@ -1727,12 +1754,12 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Geographic datatype'),
+					'label' => _('Distribution datatype'),
 					'data' => $titles,
 					'numOfResults' => $hitCountTypes
 				),
 				array(
-					'label' => _('Geographic occurrences'),
+					'label' => _('Distribution'),
 					'data' => $occurrences,
 					'numOfResults' => $hitCountOccurrences,
 					'canReplace' => false
@@ -1809,7 +1836,8 @@ class SearchController extends Controller
 			$content[$key]['replace'] = array(
 				'model' => $this->models->ContentIntroduction->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('topic','content'),$hitCount),
+					'matches' => $this->getColumnMatches($search,$val,array('topic','content'),$hitCount),
+				'label' => sprintf(_('Page "%s"'),$val['topic'])
 			);
 			
 			$content[$key]['url'] = '../introduction/edit.php?id='.$val['id'];

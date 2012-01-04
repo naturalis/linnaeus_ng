@@ -97,6 +97,7 @@ var finishedLoading = false;
 
 function initMap(init) {
 
+	if (init==undefined) init = {};
 	if (!init.lat) init.lat = 0;
 	if (!init.lng) init.lng = 0;
 	if (!init.zoom) init.zoom = 2;
