@@ -1746,7 +1746,7 @@ $res = $this->fixOldInternalLinks();
 					} else {
 	
 						$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
-							'data' => $taxon,
+							'data' => trim((string)$taxon->name),
 							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
 						);
 		
