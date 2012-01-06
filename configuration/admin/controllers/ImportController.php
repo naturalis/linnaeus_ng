@@ -107,6 +107,8 @@ class ImportController extends Controller
         
         parent::__construct();
 
+		error_reporting(E_ERROR | E_PARSE);
+
     }
 
     /**
@@ -346,8 +348,7 @@ class ImportController extends Controller
 				$this->addSpecies($_SESSION['system']['import']['loaded']['species'],$_SESSION['system']['import']['loaded']['ranks']);
 
 			if (isset($this->requestData['treetops']))
-				$_SESSION['system']['import']['loaded']['species'] =
-					$_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
+				$_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
 			
 			$this->assignTopSpeciesToUser($_SESSION['system']['import']['loaded']['species']);
 
@@ -1936,7 +1937,8 @@ $res = $this->fixOldInternalLinks();
 
 		}
 
-		$_SESSION['system']['import']['literature'][]['id'] = $id = $this->models->Literature->getNewId();
+		$id = $this->models->Literature->getNewId();
+		$_SESSION['system']['import']['literature'][] = array('id' => $id,'original' => $lit['original']);
 
 		foreach((array)$lit['references']['species'] as $kV) {
 		
@@ -2108,7 +2110,8 @@ $res = $this->fixOldInternalLinks();
 
 		} 
 		
-		$_SESSION['system']['import']['glossary'][]['id'] = $id = $this->models->Glossary->getNewId();
+		$id = $this->models->Glossary->getNewId();
+		$_SESSION['system']['import']['glossary'][] = array('id' => $id, 'term' => $gls['term']);
 
 		if (isset($gls['synonyms'])) {
 
@@ -2974,9 +2977,9 @@ $res = $this->fixOldInternalLinks();
 					
 					$n1Lat = $n2Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']);
 					$n1Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width']);
-					$n1Lon = $n4Lon = ($n1Lon > 180 ? -1 * ($n1Lon - 180) : $n1Lon);
+					$n1Lon = $n4Lon = ($n1Lon >= 180 ? -1 * ($n1Lon - 180) : $n1Lon);
 					$n2Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width']);
-					$n2Lon = $n3Lon = ($n2Lon > 180 ? -1 * ($n2Lon - 180) : $n2Lon);
+					$n2Lon = $n3Lon = ($n2Lon >= 180 ? -1 * ($n2Lon - 180) : $n2Lon);
 					$n3Lat = $n4Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']);
 
 					$occurrence = array(
