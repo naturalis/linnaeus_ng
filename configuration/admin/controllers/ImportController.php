@@ -1746,7 +1746,7 @@ $res = $this->fixOldInternalLinks();
 					} else {
 	
 						$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
-							'data' => $taxon,
+							'data' => trim((string)$taxon->name),
 							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
 						);
 		
@@ -1785,7 +1785,7 @@ $res = $this->fixOldInternalLinks();
 					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved']++;
 				else
 					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
-						'data' => $taxon,
+						'data' => trim((string)$taxon->name),
 						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'"'
 					);
 	
