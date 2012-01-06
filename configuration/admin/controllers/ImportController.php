@@ -1746,7 +1746,7 @@ $res = $this->fixOldInternalLinks();
 					} else {
 	
 						$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
-							'data' => trim((string)$taxon->name),
+							'data' => $taxon,
 							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
 						);
 		
@@ -1785,7 +1785,7 @@ $res = $this->fixOldInternalLinks();
 					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved']++;
 				else
 					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
-						'data' => trim((string)$taxon->name),
+						'data' => $taxon,
 						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'"'
 					);
 	
@@ -2977,9 +2977,9 @@ $res = $this->fixOldInternalLinks();
 					
 					$n1Lat = $n2Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - ($row * $maps[$mapname]['square']['height']);
 					$n1Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + (($col-1) * $maps[$mapname]['square']['width']);
-					$n1Lon = $n4Lon = ($n1Lon >= 180 ? -1 * ($n1Lon - 180) : $n1Lon);
+					$n1Lon = $n4Lon = ($n1Lon >= 180 ? -360 + $n1Lon  : $n1Lon);
 					$n2Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width']);
-					$n2Lon = $n3Lon = ($n2Lon >= 180 ? -1 * ($n2Lon - 180) : $n2Lon);
+					$n2Lon = $n3Lon = ($n2Lon > 180 ? -360 + $n2Lon : $n2Lon);
 					$n3Lat = $n4Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']);
 
 					$occurrence = array(
