@@ -49,7 +49,7 @@ class LiteratureController extends Controller
     public function indexAction()
     {
       
-		unset($_SESSION['system']['activeTaxon']);
+		unset($_SESSION['admin']['system']['activeTaxon']);
     
 		$this->clearTempValues();
 
@@ -77,10 +77,10 @@ class LiteratureController extends Controller
 
         $this->checkAuthorisation();
 
-		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['literature']['newRef'])) {
+		if ($this->rHasVal('add','hoc') && !isset($_SESSION['admin']['system']['literature']['newRef'])) {
 		// referred from the taxon content editing page
 
-			$_SESSION['system']['literature']['newRef'] = '<new>';
+			$_SESSION['admin']['system']['literature']['newRef'] = '<new>';
 
 		}
 
@@ -120,9 +120,9 @@ class LiteratureController extends Controller
 
     	    $this->setPageName(_('New reference'));
 			
-			if(isset($_SESSION['system']['activeTaxon'])) {
+			if(isset($_SESSION['admin']['system']['activeTaxon'])) {
 
-				$ref['taxa'][] = $_SESSION['system']['activeTaxon'];
+				$ref['taxa'][] = $_SESSION['admin']['system']['activeTaxon'];
 
 			}
 
@@ -130,7 +130,7 @@ class LiteratureController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
-			$_SESSION['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
+			$_SESSION['admin']['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
 			
 			$this->deleteReference($this->requestData['id']);
 
@@ -190,23 +190,23 @@ class LiteratureController extends Controller
 
 				}
 				
-				unset($_SESSION['system']['literature']['alpha']);
+				unset($_SESSION['admin']['system']['literature']['alpha']);
 
-				if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] == '<new>') {
+				if (isset($_SESSION['admin']['system']['literature']['newRef']) && $_SESSION['admin']['system']['literature']['newRef'] == '<new>') {
 
 					$ref = $this->getReference($id);
 
-					$_SESSION['system']['literature']['newRef'] =
+					$_SESSION['admin']['system']['literature']['newRef'] =
 						'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('.$id.');">'.
 							$ref['author_full'].', '.$ref['year'].$ref['suffix'].
 						'</span>';
 
-					$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
+					$this->redirect('../species/taxon.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
 
 				} else
-				if(isset($_SESSION['system']['activeTaxon'])) {
+				if(isset($_SESSION['admin']['system']['activeTaxon'])) {
 
-					$this->redirect('../species/literature.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
+					$this->redirect('../species/literature.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
 
 				} else
 				if ($this->rHasVal('action','preview')) {
@@ -215,7 +215,7 @@ class LiteratureController extends Controller
 
 				} else {
 
-					$_SESSION['system']['literature']['activeLetter'] = strtolower(substr($this->requestData['author_first'],0,1));
+					$_SESSION['admin']['system']['literature']['activeLetter'] = strtolower(substr($this->requestData['author_first'],0,1));
 
 					$navList = $this->getReferencesNavList(true);
 
@@ -278,8 +278,8 @@ class LiteratureController extends Controller
 		
 		$alpha = $this->getActualAlphabet();
 
-		if (!$this->rHasVal('letter') && isset($_SESSION['system']['literature']['activeLetter']))
-			$this->requestData['letter'] = $_SESSION['system']['literature']['activeLetter'];
+		if (!$this->rHasVal('letter') && isset($_SESSION['admin']['system']['literature']['activeLetter']))
+			$this->requestData['letter'] = $_SESSION['admin']['system']['literature']['activeLetter'];
 
 		if (!$this->rHasVal('letter'))
 			$this->requestData['letter'] = $alpha[0];
@@ -334,11 +334,11 @@ class LiteratureController extends Controller
 		if ($this->rHasVal('search')) {
 
 			if (
-				isset($_SESSION['system']['literature']['search']) && 
-				$_SESSION['system']['literature']['search']['search'] == $this->requestData['search']) 
+				isset($_SESSION['admin']['system']['literature']['search']) && 
+				$_SESSION['admin']['system']['literature']['search']['search'] == $this->requestData['search']) 
 			{
 			
-				$refs = $_SESSION['system']['literature']['search']['results'];
+				$refs = $_SESSION['admin']['system']['literature']['search']['results'];
 			
 			} else {
 
@@ -355,9 +355,9 @@ class LiteratureController extends Controller
 					)
 				);
 
-				$_SESSION['system']['literature']['search']['search'] = $this->requestData['search'];
+				$_SESSION['admin']['system']['literature']['search']['search'] = $this->requestData['search'];
 	
-				$_SESSION['system']['literature']['search']['results'] = $refs;
+				$_SESSION['admin']['system']['literature']['search']['results'] = $refs;
 
 			}
 
@@ -458,7 +458,7 @@ class LiteratureController extends Controller
 				)
 			);
 
-			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
+			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['admin']['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
 
 			foreach((array)$lt as $key => $val) {
 
@@ -699,7 +699,7 @@ class LiteratureController extends Controller
 	private function getActualAlphabet()
 	{
 
-		if (isset($_SESSION['system']['literature']['alpha'])) return $_SESSION['system']['literature']['alpha'];
+		if (isset($_SESSION['admin']['system']['literature']['alpha'])) return $_SESSION['admin']['system']['literature']['alpha'];
 
 		$l = $this->models->Literature->_get(
 			array(
@@ -717,7 +717,7 @@ class LiteratureController extends Controller
 
 		}
 		
-		$_SESSION['system']['literature']['alpha'] = $alpha;
+		$_SESSION['admin']['system']['literature']['alpha'] = $alpha;
 
 		return $alpha;
 	
@@ -725,7 +725,7 @@ class LiteratureController extends Controller
 
 	private function getReferencesNavList($forceLookup=false) {
 	
-		if (empty($_SESSION['literature']['navList']) || $forceLookup) {
+		if (empty($_SESSION['admin']['literature']['navList']) || $forceLookup) {
 		
 			$d = $this->getReferences(null);
 			
@@ -748,20 +748,20 @@ class LiteratureController extends Controller
 
 			}
 		
-			$_SESSION['literature']['navList'] = $res;
+			$_SESSION['admin']['literature']['navList'] = $res;
 		
 		}
 		
-		return $_SESSION['literature']['navList'];
+		return $_SESSION['admin']['literature']['navList'];
 
 	}
 
 	private function clearTempValues()
 	{
 	
-		unset($_SESSION['system']['literature']['activeLetter']);
-		unset($_SESSION['system']['literature']['search']);
-		unset($_SESSION['system']['literature']['alpha']);
+		unset($_SESSION['admin']['system']['literature']['activeLetter']);
+		unset($_SESSION['admin']['system']['literature']['search']);
+		unset($_SESSION['admin']['system']['literature']['alpha']);
 
 	}
 

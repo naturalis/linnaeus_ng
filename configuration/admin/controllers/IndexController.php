@@ -32,7 +32,7 @@ class IndexController extends Controller
         
         parent::__construct();
 
-		$_SESSION['system']['highertaxa'] = false;
+		$_SESSION['admin']['system']['highertaxa'] = false;
 
     }
 

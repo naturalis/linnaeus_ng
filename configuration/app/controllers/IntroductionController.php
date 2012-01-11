@@ -63,7 +63,7 @@ class IntroductionController extends Controller
 	public function indexAction()
 	{
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (!$this->rHasVal('page')) {
 
@@ -95,11 +95,13 @@ class IntroductionController extends Controller
 			$id = $this->requestData['id'];
 
 			$page = $this->getPage($id);
+			
+			$page['content'] = $this->matchGlossaryTerms($page['content']);
 
 			$this->setPageName($page['topic']);
 
 			$this->smarty->assign('headerTitles',array('title' => $page['topic']));
-	
+
 			$this->smarty->assign('page', $page);
 
 			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
@@ -175,7 +177,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $_SESSION['project']['default_language_id'], 
+						'language_id' => $_SESSION['app']['project']['default_language_id'], 
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
@@ -317,7 +319,7 @@ class IntroductionController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' =>  $_SESSION['project']['default_language_id'],
+					'language_id' =>  $_SESSION['app']['project']['default_language_id'],
 					'topic like' => '%'.$search.'%'
 					),
 				'order' => 'topic',

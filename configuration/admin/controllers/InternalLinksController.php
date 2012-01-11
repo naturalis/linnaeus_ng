@@ -55,7 +55,7 @@ class InternalLinksController extends Controller
 		if ($this->rHasVal('language'))
 			$this->smarty->assign('language', $this->requestData['language']);
 		else
-			$this->smarty->assign('language', $_SESSION['project']['default_language_id']);
+			$this->smarty->assign('language', $_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('internalLinks', $this->makeInternalLinksStructure());
 

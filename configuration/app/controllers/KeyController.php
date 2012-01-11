@@ -124,7 +124,7 @@ class KeyController extends Controller
 
 		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		// get step's choices
 		if (isset($step)) $choices = $this->getKeystepChoices($step['id']);
@@ -297,7 +297,7 @@ class KeyController extends Controller
 	private function getTaxonDivision($forceLookup=false)
 	{
 
-		if(!isset($_SESSION['user']['key']['taxonDivision']) || $forceLookup) {
+		if(!isset($_SESSION['app']['user']['key']['taxonDivision']) || $forceLookup) {
 
 			// get all choices that have a taxon as result
 			$ck = $this->models->ChoiceKeystep->_get(
@@ -346,14 +346,14 @@ class KeyController extends Controller
 	
 			}
 
-			$_SESSION['user']['key']['taxonDivision'] = array(
+			$_SESSION['app']['user']['key']['taxonDivision'] = array(
 				'list' => isset($list) ? $list : null,
 				'taxonCount' => isset($ck) ? count($ck) : 0
 			);
 		
 		}
 
-		return $_SESSION['user']['key']['taxonDivision'];
+		return $_SESSION['app']['user']['key']['taxonDivision'];
 
 	}
 
@@ -381,7 +381,7 @@ class KeyController extends Controller
 	private function getTaxonDivisionOriginal($forceLookup=false)
 	{
 
-		if(!isset($_SESSION['user']['key']['taxonDivision']) || $forceLookup) {
+		if(!isset($_SESSION['app']['user']['key']['taxonDivision']) || $forceLookup) {
 
 			// get all choices that have a taxon as result
 			$ck = $this->models->ChoiceKeystep->_get(
@@ -429,14 +429,14 @@ class KeyController extends Controller
 	
 			}
 
-			$_SESSION['user']['key']['taxonDivision'] = array(
+			$_SESSION['app']['user']['key']['taxonDivision'] = array(
 				'list' => isset($list) ? $list : null,
 				'taxonCount' => isset($ck) ? count($ck) : 0
 			);
 		
 		}
 
-		return $_SESSION['user']['key']['taxonDivision'];
+		return $_SESSION['app']['user']['key']['taxonDivision'];
 
 	}
 
@@ -467,14 +467,14 @@ class KeyController extends Controller
 	private function resetKeyPath()
 	{
 	
-		unset($_SESSION['user']['key']['path']);
+		unset($_SESSION['app']['user']['key']['path']);
 
 	}
 
 	private function getKeyPath()
 	{
 	
-		return isset($_SESSION['user']['key']['path']) ? $_SESSION['user']['key']['path'] : null;
+		return isset($_SESSION['app']['user']['key']['path']) ? $_SESSION['app']['user']['key']['path'] : null;
 	
 	}
 
@@ -486,13 +486,13 @@ class KeyController extends Controller
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
 		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
 
-		if (isset($_SESSION['user']['key']['path'])) {
+		if (isset($_SESSION['app']['user']['key']['path'])) {
 		// keypath already exists...
 
 			if ($fromPath) {
 			// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
 
-				foreach((array)$_SESSION['user']['key']['path'] as $key => $val) {
+				foreach((array)$_SESSION['app']['user']['key']['path'] as $key => $val) {
 	
 					if ($val['id']==$step['id']) break;
 	
@@ -503,7 +503,7 @@ class KeyController extends Controller
 			} else {
 			// user clicked a choice, existing path remains as it is
 			
-				$d = $_SESSION['user']['key']['path'];
+				$d = $_SESSION['app']['user']['key']['path'];
 			
 			}
 
@@ -530,7 +530,7 @@ class KeyController extends Controller
 
 		}
 
-		$_SESSION['user']['key']['path'] = $d;
+		$_SESSION['app']['user']['key']['path'] = $d;
 
 	}
 

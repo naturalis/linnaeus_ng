@@ -43,7 +43,7 @@ class HighertaxaController extends Controller
 
         $this->checkAuthorisation();
 
-		//$_SESSION['system']['highertaxa'] = true;
+		//$_SESSION['admin']['system']['highertaxa'] = true;
 		
 		$this->redirect('../species/index.php?higher=1');
 		
@@ -60,7 +60,7 @@ class HighertaxaController extends Controller
 
         $this->checkAuthorisation();
 
-		$_SESSION['system']['highertaxa'] = true;
+		$_SESSION['admin']['system']['highertaxa'] = true;
 		
 		$this->redirect('../species/edit.php?id='.$this->requestData['id']);
 

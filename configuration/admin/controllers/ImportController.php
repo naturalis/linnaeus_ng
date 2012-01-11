@@ -152,7 +152,7 @@ class ImportController extends Controller
 
 			if (copy($this->requestDataFiles[0]['tmp_name'],$tmp)) {
 
-				$_SESSION['system']['import']['file'] = array(
+				$_SESSION['admin']['system']['import']['file'] = array(
 					'path' => $tmp,
 					'name' => $this->requestDataFiles[0]['name'],
 					'src' => 'upload'
@@ -160,7 +160,7 @@ class ImportController extends Controller
 
 			} else {
 
-				unset($_SESSION['system']['import']['file']);
+				unset($_SESSION['admin']['system']['import']['file']);
 
 			}
 
@@ -169,7 +169,7 @@ class ImportController extends Controller
 		
 			if (file_exists($this->requestData['serverFile'])) {
 
-				$_SESSION['system']['import']['file'] = array(
+				$_SESSION['admin']['system']['import']['file'] = array(
 					'path' => $this->requestData['serverFile'],
 					'name' => $this->requestData['serverFile'],
 					'src' => 'existing'
@@ -178,7 +178,7 @@ class ImportController extends Controller
 			} else {
 
 				$this->addError('File "'.$this->requestData['serverFile'].'" does not exist.');
-				unset($_SESSION['system']['import']['file']);
+				unset($_SESSION['admin']['system']['import']['file']);
 
 			}
 
@@ -188,17 +188,17 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('noImages')) {
 
-				$_SESSION['system']['import']['imagePath'] = false;
+				$_SESSION['admin']['system']['import']['imagePath'] = false;
 
 			} else
 			if (file_exists($this->requestData['imagePath'])) {
 
-				$_SESSION['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'],'/').'/';
+				$_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'],'/').'/';
 
 			} else {
 
 				$this->addError('Image path "'.$this->requestData['imagePath'].'" does not exist or unreachable.');
-				unset($_SESSION['system']['import']['imagePath']);
+				unset($_SESSION['admin']['system']['import']['imagePath']);
 
 			}
 
@@ -208,17 +208,17 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('noThumbs')) {
 
-				$_SESSION['system']['import']['thumbsPath'] = false;
+				$_SESSION['admin']['system']['import']['thumbsPath'] = false;
 
 			} else
 			if (file_exists($this->requestData['thumbsPath'])) {
 
-				$_SESSION['system']['import']['thumbsPath'] = rtrim($this->requestData['thumbsPath'],'/').'/';
+				$_SESSION['admin']['system']['import']['thumbsPath'] = rtrim($this->requestData['thumbsPath'],'/').'/';
 
 			} else {
 
 				$this->addError('Thumbs path "'.$this->requestData['thumbsPath'].'" does not exist or unreachable.');
-				unset($_SESSION['system']['import']['thumbsPath']);
+				unset($_SESSION['admin']['system']['import']['thumbsPath']);
 
 			}
 
@@ -226,16 +226,16 @@ class ImportController extends Controller
 
 		if ($this->rHasVal('clear','file')) {
 
-			unset($_SESSION['system']['import']['file']);
-			unset($_SESSION['system']['import']['raw']);
+			unset($_SESSION['admin']['system']['import']['file']);
+			unset($_SESSION['admin']['system']['import']['raw']);
 
 		}
 
-		if ($this->rHasVal('clear','imagePath')) unset($_SESSION['system']['import']['imagePath']);
-		if ($this->rHasVal('clear','thumbsPath')) unset($_SESSION['system']['import']['thumbsPath']);
+		if ($this->rHasVal('clear','imagePath')) unset($_SESSION['admin']['system']['import']['imagePath']);
+		if ($this->rHasVal('clear','thumbsPath')) unset($_SESSION['admin']['system']['import']['thumbsPath']);
 
 
-		if (isset($_SESSION['system']['import'])) $this->smarty->assign('s',$_SESSION['system']['import']);
+		if (isset($_SESSION['admin']['system']['import'])) $this->smarty->assign('s',$_SESSION['admin']['system']['import']);
     
         $this->printPage();
 
@@ -244,11 +244,11 @@ class ImportController extends Controller
 	public function l2ProjectAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['file']['path'])) $this->redirect('l2_start.php');
+		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 
         $this->setPageName(_('Creating project'));
 		
-		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+		$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 		$this->helpers->XmlParser->setDoReturnValues(true);
 		$d = $this->helpers->XmlParser->getNode('project');
@@ -296,7 +296,7 @@ class ImportController extends Controller
 
 				}
 				
-				$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
+				$_SESSION['admin']['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 
 			}
 
@@ -313,7 +313,7 @@ class ImportController extends Controller
 	public function l2SpeciesAction()
 	{
 
-		if (!isset($_SESSION['system']['import']['file']['path'])) $this->redirect('l2_start.php');
+		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 		
 		set_time_limit(300);
 
@@ -321,55 +321,55 @@ class ImportController extends Controller
 
         $this->setPageName(_('Data overview for "'.$project['title'].'"'));
 
-		$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+		$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 		$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_ResolveRanks'));
 
 		$this->helpers->XmlParser->getNodes('treetaxon');
 		
-		$_SESSION['system']['import']['substRanks'] = ($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null);
+		$_SESSION['admin']['system']['import']['substRanks'] = ($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null);
 
 		$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_ResolveSpecies'));
 
 		$this->helpers->XmlParser->getNodes('treetaxon');
 		
-		$treetops = $this->checkTreeTops($_SESSION['system']['import']['loaded']['species']);
+		$treetops = $this->checkTreeTops($_SESSION['admin']['system']['import']['loaded']['species']);
 
 		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
 
-			$_SESSION['system']['import']['loaded']['ranks'] =
+			$_SESSION['admin']['system']['import']['loaded']['ranks'] =
 				$this->addProjectRanks(
-					$_SESSION['system']['import']['loaded']['ranks'],
+					$_SESSION['admin']['system']['import']['loaded']['ranks'],
 					($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null),
 					($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null)
 				);
 
-			$species = $_SESSION['system']['import']['loaded']['species'] =
-				$this->addSpecies($_SESSION['system']['import']['loaded']['species'],$_SESSION['system']['import']['loaded']['ranks']);
+			$species = $_SESSION['admin']['system']['import']['loaded']['species'] =
+				$this->addSpecies($_SESSION['admin']['system']['import']['loaded']['species'],$_SESSION['admin']['system']['import']['loaded']['ranks']);
 
 			if (isset($this->requestData['treetops']))
-				$_SESSION['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
+				$_SESSION['admin']['system']['import']['loaded']['species'] = $this->fixTreetops($species,$this->requestData['treetops']);
 			
-			$this->assignTopSpeciesToUser($_SESSION['system']['import']['loaded']['species']);
+			$this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
 
 			$this->addModuleToProject(4);
 			$this->addModuleToProject(5);
 			$this->grantModuleAccessRights(4);
 			$this->grantModuleAccessRights(5);
 			
-			$this->addMessage('Saved '.count((array)$_SESSION['system']['import']['loaded']['ranks']).' ranks');
-			$this->addMessage('Saved '.count((array)$_SESSION['system']['import']['loaded']['species']).' species');
+			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['ranks']).' ranks');
+			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['species']).' species');
 
 			$this->smarty->assign('processed',true);
 
 		}
 
 		$this->smarty->assign('project',$project);
-		$this->smarty->assign('ranks',$_SESSION['system']['import']['loaded']['ranks']);
+		$this->smarty->assign('ranks',$_SESSION['admin']['system']['import']['loaded']['ranks']);
 		$this->smarty->assign('projectRanks',$this->getPossibleRanks());
 		if ($this->rHasVal('substRanks')) $this->smarty->assign('substRanks',$this->requestData['substRanks']);
 		if ($this->rHasVal('substParentRanks')) $this->smarty->assign('substParentRanks',$this->requestData['substParentRanks']);
-		$this->smarty->assign('species',$_SESSION['system']['import']['loaded']['species']);
+		$this->smarty->assign('species',$_SESSION['admin']['system']['import']['loaded']['species']);
 		$this->smarty->assign('treetops',$treetops);
 
         $this->printPage();
@@ -380,8 +380,8 @@ class ImportController extends Controller
 	{
 
 		if (
-			!isset($_SESSION['system']['import']['file']['path']) ||
-			!isset($_SESSION['system']['import']['loaded']['species'])
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
 
 		$project = $this->getProjects($this->getNewProjectId());
@@ -400,64 +400,64 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('taxon_overview','on')) {
 
-					$_SESSION['system']['import']['elementsToLoad']['taxon_overview'] = true;
-					$_SESSION['system']['import']['speciesOverviewCatId'] = $this->createStandardCat();
-					$_SESSION['system']['import']['loaded']['speciesContent']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['speciesContent']['failed'] = array();
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = true;
+					$_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createStandardCat();
+					$_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] = array();
 
 				} else {
 				
-					$_SESSION['system']['import']['elementsToLoad']['taxon_overview'] = false;
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = false;
 				
 				}
 
 				if ($this->rHasVal('taxon_media','on')) {
 
-					$_SESSION['system']['import']['elementsToLoad']['taxon_media'] = true;
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_media'] = true;
 
 					$this->loadControllerConfig('Species');
 
 					foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val)
-						$_SESSION['system']['import']['mimes'][$val['mime']] = $val;
+						$_SESSION['admin']['system']['import']['mimes'][$val['mime']] = $val;
 						
 					$this->loadControllerConfig();
 
-					$_SESSION['system']['import']['loaded']['speciesMedia']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'] = array();
 
 				} else {
 				
-					$_SESSION['system']['import']['elementsToLoad']['taxon_media'] = false;
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_media'] = false;
 				
 				}
 
 
 				if ($this->rHasVal('taxon_common','on')) {
 
-					$_SESSION['system']['import']['elementsToLoad']['taxon_common'] = true;
-					$_SESSION['system']['import']['loaded']['taxon_common']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['taxon_common']['failed'] = array();
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_common'] = true;
+					$_SESSION['admin']['system']['import']['loaded']['taxon_common']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'] = array();
 
 				} else {
 				
-					$_SESSION['system']['import']['elementsToLoad']['taxon_common'] = false;
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_common'] = false;
 				
 				}
 
 				if ($this->rHasVal('taxon_synonym','on')) {
 
-					$_SESSION['system']['import']['elementsToLoad']['taxon_synonym'] = true;
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] = array();
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_synonym'] = true;
+					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'] = array();
 
 				} else {
 				
-					$_SESSION['system']['import']['elementsToLoad']['taxon_synonym'] = false;
+					$_SESSION['admin']['system']['import']['elementsToLoad']['taxon_synonym'] = false;
 				
 				}
 				
 
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Species'));
 
@@ -466,18 +466,18 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('taxon_overview','on')) {
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['speciesContent']['saved'].' general species description(s).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved'].' general species description(s).');
 		
-					if (count((array)$_SESSION['system']['import']['loaded']['speciesContent']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['speciesContent']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
 
-					unset($_SESSION['system']['import']['speciesOverviewCatId']);
-					unset($_SESSION['system']['import']['loaded']['speciesContent']['saved']);
-					unset($_SESSION['system']['import']['loaded']['speciesContent']['failed']);
+					unset($_SESSION['admin']['system']['import']['speciesOverviewCatId']);
+					unset($_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved']);
+					unset($_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed']);
 
 				} else {
 				
@@ -487,19 +487,19 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('taxon_media','on')) {
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['speciesMedia']['saved'].' media files.');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved'].' media files.');
 		
-					if (count((array)$_SESSION['system']['import']['loaded']['speciesMedia']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['speciesMedia']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
 
-					unset($_SESSION['system']['import']['speciesOverviewCatId']);
-					unset($_SESSION['system']['import']['loaded']['speciesContent']['saved']);
-					unset($_SESSION['system']['import']['loaded']['speciesContent']['failed']);
-					unset($_SESSION['system']['import']['mimes']);
+					unset($_SESSION['admin']['system']['import']['speciesOverviewCatId']);
+					unset($_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved']);
+					unset($_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed']);
+					unset($_SESSION['admin']['system']['import']['mimes']);
 
 				} else {
 				
@@ -509,11 +509,11 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('taxon_common','on')) {
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['taxon_common']['saved'].' common name(s).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['taxon_common']['saved'].' common name(s).');
 	
-					if (count((array)$_SESSION['system']['import']['loaded']['taxon_common']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['taxon_common']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
@@ -527,11 +527,11 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('taxon_synonym','on')) {
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['taxon_synonym']['saved'].' synonym(s).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved'].' synonym(s).');
 	
-					if (count((array)$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
@@ -543,7 +543,7 @@ class ImportController extends Controller
 				}
 
 
-				unset($_SESSION['system']['import']['elementsToLoad']);
+				unset($_SESSION['admin']['system']['import']['elementsToLoad']);
 
 	
 			}
@@ -561,8 +561,8 @@ class ImportController extends Controller
 	{
 
 		if (
-			!isset($_SESSION['system']['import']['file']['path']) ||
-			!isset($_SESSION['system']['import']['loaded']['species'])
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
 
 		$project = $this->getProjects($this->getNewProjectId());
@@ -575,22 +575,22 @@ class ImportController extends Controller
 
 			if ($this->rHasVal('literature','on') || $this->rHasVal('glossary','on')) {
 
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 				if ($this->rHasVal('literature','on')) {
 
-					$_SESSION['system']['import']['loaded']['literature']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['literature']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['literature']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Literature'));
 	
 					$this->helpers->XmlParser->getNodes('proj_reference');
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['literature']['saved'].' literary reference(s)).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s)).');
 	
-					if (count((array)$_SESSION['system']['import']['loaded']['literature']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['literature']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
@@ -606,15 +606,15 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('glossary','on')) {
 
-					$_SESSION['system']['import']['loaded']['glossary']['saved'] = 0;
-					$_SESSION['system']['import']['loaded']['glossary']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['glossary']['saved'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Glossary'));
 
 					$this->loadControllerConfig('Glossary');
 
 					foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val)
-						$_SESSION['system']['import']['mimes'][$val['mime']] = $val;
+						$_SESSION['admin']['system']['import']['mimes'][$val['mime']] = $val;
 						
 					$this->loadControllerConfig();
 
@@ -622,16 +622,16 @@ class ImportController extends Controller
 
 					$this->loadControllerConfig();
 
-					$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['glossary']['saved'].' glossary item(s).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['glossary']['saved'].' glossary item(s).');
 	
-					if (count((array)$_SESSION['system']['import']['loaded']['glossary']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['glossary']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'] as $val)
 							$this->addError($val['cause']);
 		
 					}
 
-					unset($_SESSION['system']['import']['mimes']);
+					unset($_SESSION['admin']['system']['import']['mimes']);
 
 					$this->addModuleToProject(2);
 					$this->grantModuleAccessRights(2);
@@ -656,8 +656,8 @@ class ImportController extends Controller
 	{
 
 		if (
-			!isset($_SESSION['system']['import']['file']['path']) ||
-			!isset($_SESSION['system']['import']['loaded']['species'])
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
 
 		$project = $this->getProjects($this->getNewProjectId());
@@ -672,12 +672,12 @@ class ImportController extends Controller
 				$this->rHasVal('introduction','on')
 			) {
 
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 				if ($this->rHasVal('welcome','on')) {
 
-					$_SESSION['system']['import']['loaded']['welcome']['saved'] = array();
-					$_SESSION['system']['import']['loaded']['welcome']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Welcome'));
 					
@@ -686,16 +686,16 @@ class ImportController extends Controller
 					$this->addModuleToProject(10);
 					$this->grantModuleAccessRights(10);
 
-					if (count((array)$_SESSION['system']['import']['loaded']['welcome']['saved'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['welcome']['saved'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'] as $val)
 							$this->addMessage($val);
 		
 					}
 
-					if (count((array)$_SESSION['system']['import']['loaded']['welcome']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['welcome']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'] as $val)
 							$this->addError($val);
 		
 					}
@@ -708,9 +708,9 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('introduction','on')) {
 
-					$_SESSION['system']['import']['loaded']['introduction']['show_order'] = 0;
-					$_SESSION['system']['import']['loaded']['introduction']['saved'] = array();
-					$_SESSION['system']['import']['loaded']['introduction']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['introduction']['show_order'] = 0;
+					$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Introduction'));
 
@@ -719,21 +719,21 @@ class ImportController extends Controller
 					$this->addModuleToProject(1);
 					$this->grantModuleAccessRights(1);
 
-					if (count((array)$_SESSION['system']['import']['loaded']['introduction']['saved'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['introduction']['saved'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'] as $val)
 							$this->addMessage($val);
 		
 					}
 
-					if (count((array)$_SESSION['system']['import']['loaded']['introduction']['failed'])!==0) {
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'])!==0) {
 		
-						foreach ((array)$_SESSION['system']['import']['loaded']['introduction']['failed'] as $val)
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'] as $val)
 							$this->addError($val);
 		
 					}
 					
-					unset($_SESSION['system']['import']['loaded']['introduction']['show_order']);
+					unset($_SESSION['admin']['system']['import']['loaded']['introduction']['show_order']);
 
 				} else {
 				
@@ -755,8 +755,8 @@ class ImportController extends Controller
 	{
 
 		if (
-			!isset($_SESSION['system']['import']['file']['path']) ||
-			!isset($_SESSION['system']['import']['loaded']['species'])
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
 
 		$project = $this->getProjects($this->getNewProjectId());
@@ -771,13 +771,13 @@ class ImportController extends Controller
 				$this->rHasVal('key_matrix','on')
 			) {
 
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
 				if ($this->rHasVal('key_dich','on')) {
 
-					$_SESSION['system']['import']['loaded']['key_dich']['keys'] = array('text_key' => false, 'pict_key' => false);
-					$_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'] = null;
-					$_SESSION['system']['import']['loaded']['key_dich']['stepAdd'] = null;
+					$_SESSION['admin']['system']['import']['loaded']['key_dich']['keys'] = array('text_key' => false, 'pict_key' => false);
+					$_SESSION['admin']['system']['import']['loaded']['key_dich']['keyStepIds'] = null;
+					$_SESSION['admin']['system']['import']['loaded']['key_dich']['stepAdd'] = null;
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyDichotomous'));
 
@@ -789,7 +789,7 @@ class ImportController extends Controller
 	
 					$this->addMessage('Created dichotomous key.');
 					
-					unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+					unset($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']);
 
 				} else {
 
@@ -799,28 +799,28 @@ class ImportController extends Controller
 
 				if ($this->rHasVal('key_matrix','on')) {
 
-					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'] = null;
-					$_SESSION['system']['import']['loaded']['key_matrix']['failed'] = array();
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'] = null;
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrixResolve'));
 
 					$this->helpers->XmlParser->getNodes('taxondata');
 
-					if (isset($_SESSION['system']['import']['loaded']['key_matrix']['matrices'])) {
+					if (isset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'])) {
 
-						$m = $this->saveMatrices($_SESSION['system']['import']['loaded']['key_matrix']['matrices']);
+						$m = $this->saveMatrices($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices']);
 	
 						if (isset($m['failed'])) foreach ((array)$m['failed'] as $val) $this->addError($val['cause']);
 	
-						$_SESSION['system']['import']['loaded']['key_matrix']['matrices'] = $m['matrices'];
+						$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'] = $m['matrices'];
 	
 						$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyMatrixConnect'));
 	
 						$this->helpers->XmlParser->getNodes('taxondata');
 	
-						if (count((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'])!==0) {
+						if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'])!==0) {
 			
-							foreach ((array)$_SESSION['system']['import']['loaded']['key_matrix']['failed'] as $val)
+							foreach ((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] as $val)
 								$this->addError($val['cause']);
 			
 						}
@@ -830,7 +830,7 @@ class ImportController extends Controller
 		
 						$this->addMessage('Created matrix key(s).');
 	
-						unset($_SESSION['system']['import']['loaded']['key_matrix']['matrices']);
+						unset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices']);
 
 					} else {
 
@@ -858,8 +858,8 @@ class ImportController extends Controller
 	{
 							
 		if (
-			!isset($_SESSION['system']['import']['file']['path']) ||
-			!isset($_SESSION['system']['import']['loaded']['species'])
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
 		) $this->redirect('l2_start.php');
 	
 		$project = $this->getProjects($this->getNewProjectId());
@@ -872,13 +872,13 @@ class ImportController extends Controller
 	
 			if ($this->rHasVal('map_items','on')) {
 	
-				$this->helpers->XmlParser->setFileName($_SESSION['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 	
-				$_SESSION['system']['import']['loaded']['map']['maps'] = null;
-				$_SESSION['system']['import']['loaded']['map']['types'] = null;
-				$_SESSION['system']['import']['loaded']['map']['saved'] = 0;
-				$_SESSION['system']['import']['loaded']['map']['failed'] = 0;
-				$_SESSION['system']['import']['loaded']['map']['skipped'] = 0;
+				$_SESSION['admin']['system']['import']['loaded']['map']['maps'] = null;
+				$_SESSION['admin']['system']['import']['loaded']['map']['types'] = null;
+				$_SESSION['admin']['system']['import']['loaded']['map']['saved'] = 0;
+				$_SESSION['admin']['system']['import']['loaded']['map']['failed'] = 0;
+				$_SESSION['admin']['system']['import']['loaded']['map']['skipped'] = 0;
 
 				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
 
@@ -891,13 +891,13 @@ class ImportController extends Controller
 				$this->addModuleToProject(8);
 				$this->grantModuleAccessRights(8);
 
-				$this->addMessage('Imported '.$_SESSION['system']['import']['loaded']['map']['saved'].' map items.');
+				$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['map']['saved'].' map items.');
 
-				$this->addMessage('Skipped '.$_SESSION['system']['import']['loaded']['map']['skipped'].' because of invalid coordinates.');
+				$this->addMessage('Skipped '.$_SESSION['admin']['system']['import']['loaded']['map']['skipped'].' because of invalid coordinates.');
 
-				$this->addMessage('Failed '.$_SESSION['system']['import']['loaded']['map']['failed'].', most likely duplicates.');
+				$this->addMessage('Failed '.$_SESSION['admin']['system']['import']['loaded']['map']['failed'].', most likely duplicates.');
 				
-				unset($_SESSION['system']['import']['loaded']['key_dich']['keys']);
+				unset($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']);
 
 			} else {
 
@@ -918,16 +918,16 @@ class ImportController extends Controller
 	{
 
 
-// THIS HAS TO GO SOMEWHERE BETTER!
-$res = $this->fixOldInternalLinks();
+		// THIS HAS TO GO SOMEWHERE BETTER!
+		$res = $this->fixOldInternalLinks();
 
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
 		$this->getCurrentUserCurrentRole(true);
 		$this->reInitUserRolesAndRights();
 
-		unset($_SESSION['system']['import']);
-		unset($_SESSION['project']['ranks']);
+		unset($_SESSION['admin']['system']['import']);
+		unset($_SESSION['admin']['project']['ranks']);
 
 		$this->redirect($this->getLoggedInMainIndex());
 
@@ -937,13 +937,13 @@ $res = $this->fixOldInternalLinks();
 	public function xmlParserCallback_Species($obj)
 	{
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_overview']===true) $this->addSpeciesContent($obj);
+		if ($_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview']===true) $this->addSpeciesContent($obj);
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_media']===true) $this->addSpeciesMedia($obj);
+		if ($_SESSION['admin']['system']['import']['elementsToLoad']['taxon_media']===true) $this->addSpeciesMedia($obj);
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_common']===true) $this->addSpeciesCommonNames($obj);
+		if ($_SESSION['admin']['system']['import']['elementsToLoad']['taxon_common']===true) $this->addSpeciesCommonNames($obj);
 
-		if ($_SESSION['system']['import']['elementsToLoad']['taxon_synonym']===true) $this->addSpeciesSynonyms($obj);
+		if ($_SESSION['admin']['system']['import']['elementsToLoad']['taxon_synonym']===true) $this->addSpeciesSynonyms($obj);
 	
 	}
 
@@ -1020,17 +1020,17 @@ $res = $this->fixOldInternalLinks();
 	{
 
 		if ($id==null)
-			unset($_SESSION['system']['import']['newProjectId']);
+			unset($_SESSION['admin']['system']['import']['newProjectId']);
 		else
-			$_SESSION['system']['import']['newProjectId'] = $id;
+			$_SESSION['admin']['system']['import']['newProjectId'] = $id;
 	
 	}
 
 	private function getNewProjectId()
 	{
 	
-		return (isset($_SESSION['system']['import']['newProjectId'])) ?
-			$_SESSION['system']['import']['newProjectId']:
+		return (isset($_SESSION['admin']['system']['import']['newProjectId'])) ?
+			$_SESSION['admin']['system']['import']['newProjectId']:
 			null;
 	
 	}
@@ -1113,17 +1113,17 @@ $res = $this->fixOldInternalLinks();
 	{
 
 		if ($id==null)
-			unset($_SESSION['system']['import']['newLanguageId']);
+			unset($_SESSION['admin']['system']['import']['newLanguageId']);
 		else
-			$_SESSION['system']['import']['newLanguageId'] = $id;
+			$_SESSION['admin']['system']['import']['newLanguageId'] = $id;
 	
 	}
 
 	private function getNewDefaultLanguageId()
 	{
 
-		return (isset($_SESSION['system']['import']['newLanguageId'])) ?
-			$_SESSION['system']['import']['newLanguageId']:
+		return (isset($_SESSION['admin']['system']['import']['newLanguageId'])) ?
+			$_SESSION['admin']['system']['import']['newLanguageId']:
 			null;
 	
 	}
@@ -1153,7 +1153,7 @@ $res = $this->fixOldInternalLinks();
 		
 		if (empty($importRank)) return;
 
-		if (!isset($_SESSION['system']['import']['loaded']['ranks'][$importRank])) {
+		if (!isset($_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank])) {
 
 				$r = $this->models->Rank->_get(
 					array(
@@ -1166,7 +1166,7 @@ $res = $this->fixOldInternalLinks();
 
 			if (isset($rankId)) {
 
-				$_SESSION['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = $rankId;
+				$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = $rankId;
 				
 				if ($parentRankParent!='none') {
 
@@ -1177,19 +1177,19 @@ $res = $this->fixOldInternalLinks();
 						)
 					);
 					
-					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
-					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_name'] = $parentRankParent;
+					$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+					$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_name'] = $parentRankParent;
 
 				} else {
 
-					$_SESSION['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = null;
+					$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = null;
 
 				}
 
 
 			} else {
 
-				$_SESSION['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = false;
+				$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = false;
 
 			}
 			
@@ -1314,15 +1314,15 @@ $res = $this->fixOldInternalLinks();
 
 		$rankName = trim((string)$obj->taxon) ? trim((string)$obj->taxon) : null;
 		$rankId =
-			isset($_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]) &&
-			$_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id']!==false ?
-				$_SESSION['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id'] :
-				(isset($_SESSION['system']['import']['substRanks'][$rankName]) ?
-					$_SESSION['system']['import']['substRanks'][$rankName] :
+			isset($_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]) &&
+			$_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id']!==false ?
+				$_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id'] :
+				(isset($_SESSION['admin']['system']['import']['substRanks'][$rankName]) ?
+					$_SESSION['admin']['system']['import']['substRanks'][$rankName] :
 					null
 				);
 
-		$_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)] = array(
+		$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)] = array(
 			'taxon' => $this->cleanL2Name(trim((string)$obj->name)),
 			'rank_id' => $rankId,
 			'rank_name' => $rankName,
@@ -1544,25 +1544,25 @@ $res = $this->fixOldInternalLinks();
 	private function addSpeciesContent($taxon)
 	{
 
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 		
 			$this->models->ContentTaxon->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),
-					'taxon_id' => $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'],
+					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
-					'page_id' => $_SESSION['system']['import']['speciesOverviewCatId'],
+					'page_id' => $_SESSION['admin']['system']['import']['speciesOverviewCatId'],
 					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
 					'publish' => 1
 				)
 			);
 			
-			$_SESSION['system']['import']['loaded']['speciesContent']['saved']++;
+			$_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved']++;
 
 		} else {
 		
-			$_SESSION['system']['import']['loaded']['speciesContent']['failed'][] = array(
+			$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'][] = array(
 				'data' => $taxon,
 				'cause' => 'Unable to resolve name "'.trim((string)$taxon->name).'" to taxon id.'
 			);
@@ -1574,9 +1574,9 @@ $res = $this->fixOldInternalLinks();
 	private function addSpeciesMedia($taxon)
 	{
 
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 			
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
 				
 			$fileName = trim((string)$taxon->multimedia->overview);
 
@@ -1591,14 +1591,14 @@ $res = $this->fixOldInternalLinks();
 	
 				if ($r['saved']==true) {
 
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['system']['import']['paths']['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['system']['import']['paths']['project_thumbs'].$r['filename']);
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].$r['filename']);
 
-					$_SESSION['system']['import']['loaded']['speciesMedia']['saved']++;
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved']++;
 				
 				} else {
 
-					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
 
 				}
 				
@@ -1618,14 +1618,14 @@ $res = $this->fixOldInternalLinks();
 
 				if ($r['saved']==true) {
 
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['system']['import']['paths']['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['system']['import']['paths']['project_thumbs'].$r['filename']);
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].$r['filename']);
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].$r['filename']);
 					
-					$_SESSION['system']['import']['loaded']['speciesMedia']['saved']++;
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved']++;
 					
 				} else {
 
-					$_SESSION['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
+					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'][] = $r;
 
 				}
 
@@ -1638,7 +1638,7 @@ $res = $this->fixOldInternalLinks();
 	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$isOverviewPicture=false)
 	{
 
-		if ($_SESSION['system']['import']['imagePath']==false)
+		if ($_SESSION['admin']['system']['import']['imagePath']==false)
 			return array(
 				'saved' => false,
 				'data' => $fileName,
@@ -1651,16 +1651,16 @@ $res = $this->fixOldInternalLinks();
 				'cause' => 'Missing file name'
 			);
 
-		if (file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
+		if (file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 		
-			$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['system']['import']['imagePath'].$fileName);
+			$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['admin']['system']['import']['imagePath'].$fileName);
 			
-			if (isset($_SESSION['system']['import']['mimes'][$thisMIME])) {
+			if (isset($_SESSION['admin']['system']['import']['mimes'][$thisMIME])) {
 			
-				if ($_SESSION['system']['import']['thumbsPath']==false)
+				if ($_SESSION['admin']['system']['import']['thumbsPath']==false)
 					$thumbName = null;
 				else
-					$thumbName = file_exists($_SESSION['system']['import']['thumbsPath'].$fileName) ? $fileName : null;
+					$thumbName = file_exists($_SESSION['admin']['system']['import']['thumbsPath'].$fileName) ? $fileName : null;
 
 				$this->models->MediaTaxon->save(
 					array(
@@ -1671,7 +1671,7 @@ $res = $this->fixOldInternalLinks();
 						'thumb_name' => $thumbName,
 						'original_name' => $fullName,
 						'mime_type' => $thisMIME,
-						'file_size' => filesize($_SESSION['system']['import']['imagePath'].$fileName),
+						'file_size' => filesize($_SESSION['admin']['system']['import']['imagePath'].$fileName),
 						'overview_image' => ($isOverviewPicture ? 1 : 0)
 					)
 				);
@@ -1689,9 +1689,9 @@ $res = $this->fixOldInternalLinks();
 				return array(
 					'saved' => true,
 					'filename' => $fileName,
-					'full_path' => $_SESSION['system']['import']['imagePath'].$fileName,
+					'full_path' => $_SESSION['admin']['system']['import']['imagePath'].$fileName,
 					'thumb' => isset($thumbName) ? $thumbName : null,
-					'thumb_path' => isset($thumbName) ? $_SESSION['system']['import']['thumbsPath'].$thumbName : null
+					'thumb_path' => isset($thumbName) ? $_SESSION['admin']['system']['import']['thumbsPath'].$thumbName : null
 				);
 
 			} else {
@@ -1719,9 +1719,9 @@ $res = $this->fixOldInternalLinks();
 	private function addSpeciesCommonNames($taxon)
 	{
 
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 		
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
 
 			if(isset($taxon->vernaculars->vernacular)) {
 
@@ -1741,11 +1741,11 @@ $res = $this->fixOldInternalLinks();
 							)
 						);
 	
-						$_SESSION['system']['import']['loaded']['taxon_common']['saved']++;
+						$_SESSION['admin']['system']['import']['loaded']['taxon_common']['saved']++;
 	
 					} else {
 	
-						$_SESSION['system']['import']['loaded']['taxon_common']['failed'][] = array(
+						$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'][] = array(
 							'data' => trim((string)$taxon->name),
 							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
 						);
@@ -1763,9 +1763,9 @@ $res = $this->fixOldInternalLinks();
 	private function addSpeciesSynonyms($taxon)
 	{
 
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
 		
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
 			
 			$i = 0;
 			
@@ -1782,9 +1782,9 @@ $res = $this->fixOldInternalLinks();
 				);
 
 				if ($s===true)
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['saved']++;
+					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
 				else
-					$_SESSION['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
+					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
 						'data' => trim((string)$taxon->name),
 						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'"'
 					);
@@ -1873,18 +1873,18 @@ $res = $this->fixOldInternalLinks();
 
 				$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
 
-				if (isset($_SESSION['system']['import']['loaded']['species'][$speciesName])) {
+				if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
 
-					$okSp[] = $_SESSION['system']['import']['loaded']['species'][$speciesName]['id'];
+					$okSp[] = $_SESSION['admin']['system']['import']['loaded']['species'][$speciesName]['id'];
 
 				} else
 				if (strpos($speciesName,' ')!==false) {
 				
 					$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
 
-					if (isset($_SESSION['system']['import']['loaded']['species'][$speciesNameSplit])) {
+					if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesNameSplit])) {
 					
-						$okSp[] = $_SESSION['system']['import']['loaded']['species'][$speciesNameSplit]['id'];
+						$okSp[] = $_SESSION['admin']['system']['import']['loaded']['species'][$speciesNameSplit]['id'];
 
 					} else {
 
@@ -1926,11 +1926,11 @@ $res = $this->fixOldInternalLinks();
 			)
 		)===true) {
 
-			$_SESSION['system']['import']['loaded']['literature']['saved']++;
+			$_SESSION['admin']['system']['import']['loaded']['literature']['saved']++;
 
 		} else {
 
-			$_SESSION['system']['import']['loaded']['literature']['failed'] =
+			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] =
 				array('data' => $lit,'cause' => 'Failed to save lit. ref. "'.$lit['original'].'".');
 
 			return;
@@ -1938,7 +1938,7 @@ $res = $this->fixOldInternalLinks();
 		}
 
 		$id = $this->models->Literature->getNewId();
-		$_SESSION['system']['import']['literature'][] = array('id' => $id,'original' => $lit['original']);
+		$_SESSION['admin']['system']['import']['literature'][] = array('id' => $id,'original' => $lit['original']);
 
 		foreach((array)$lit['references']['species'] as $kV) {
 		
@@ -1959,7 +1959,7 @@ $res = $this->fixOldInternalLinks();
 		
 			if (empty($kV)) continue;
 
-			$_SESSION['system']['import']['loaded']['literature']['failed'] =
+			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] =
 				array('data' => $lit,'cause' => 'Saved lit. ref. "'.$lit['original'].'" but could not resolve reference to "'.$kV.'".');
 
 		}
@@ -2021,25 +2021,25 @@ $res = $this->fixOldInternalLinks();
 
 		*/
 
-		if ($_SESSION['system']['import']['imagePath']==false)
+		if ($_SESSION['admin']['system']['import']['imagePath']==false)
 			return array(
 				'saved' => 'skipped',
 				'data' => $data['filename'],
 				'cause' => 'User specified no media import for project'
 			);
 
-		$fileToImport = $_SESSION['system']['import']['imagePath'].$data['fileName'];
+		$fileToImport = $_SESSION['admin']['system']['import']['imagePath'].$data['fileName'];
 
 		if (file_exists($fileToImport)) {
 
-			$thisMIME = mime_content_type($fileToImport);
+			$thisMIME = $this->mimeContentType($fileToImport);
 			
-			if (isset($_SESSION['system']['import']['mimes'][$thisMIME])) {
+			if (isset($_SESSION['admin']['system']['import']['mimes'][$thisMIME])) {
 			
-				if ($_SESSION['system']['import']['thumbsPath']==false)
+				if ($_SESSION['admin']['system']['import']['thumbsPath']==false)
 					$thumbName = null;
 				else
-					$thumbName = file_exists($_SESSION['system']['import']['thumbsPath'].$data['fileName']) ? $data['fileName'] : null;
+					$thumbName = file_exists($_SESSION['admin']['system']['import']['thumbsPath'].$data['fileName']) ? $data['fileName'] : null;
 
 					$this->models->GlossaryMedia->save(
 						array(
@@ -2059,7 +2059,7 @@ $res = $this->fixOldInternalLinks();
 					'filename' => $data['fileName'],
 					'full_path' => $fileToImport,
 					'thumb' => isset($thumbName) ? $thumbName : null,
-					'thumb_path' => isset($thumbName) ? $_SESSION['system']['import']['thumbsPath'].$thumbName : null
+					'thumb_path' => isset($thumbName) ? $_SESSION['admin']['system']['import']['thumbsPath'].$thumbName : null
 				);
 
 			} else {
@@ -2100,18 +2100,18 @@ $res = $this->fixOldInternalLinks();
 			)
 		)===true) {
 		
-			$_SESSION['system']['import']['loaded']['glossary']['saved']++;
+			$_SESSION['admin']['system']['import']['loaded']['glossary']['saved']++;
 
 		} else {
 
-			$_SESSION['system']['import']['loaded']['glossary']['failed'][] =
+			$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'][] =
 				array('data' => $gls,'cause' => 'Failed to save glossary item "'.$gls['term'].'".');
 			return;
 
 		} 
 		
 		$id = $this->models->Glossary->getNewId();
-		$_SESSION['system']['import']['glossary'][] = array('id' => $id, 'term' => $gls['term']);
+		$_SESSION['admin']['system']['import']['glossary'][] = array('id' => $id, 'term' => $gls['term']);
 
 		if (isset($gls['synonyms'])) {
 
@@ -2145,7 +2145,7 @@ $res = $this->fixOldInternalLinks();
 				} else
 				if ($r['saved']!=='skipped') {
 
-					$_SESSION['system']['import']['loaded']['glossary']['failed'][] =
+					$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'][] =
 							array('data' => $gls,'cause' => 'Could not save "'.$mVal['filename'].'" ('.$r['cause'].').');
 
 				}
@@ -2172,16 +2172,16 @@ $res = $this->fixOldInternalLinks();
 				)
 			)===true) {
 
-				$_SESSION['system']['import']['loaded']['welcome']['saved'][] = 'Saved welcome text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'][] = 'Saved welcome text.';
 
 			} else {
 
-				$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save welcome text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save welcome text.';
 			}
 
 		} else {
 
-			$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'No welcome text found.';
+			$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'No welcome text found.';
 
 		}
 
@@ -2197,16 +2197,16 @@ $res = $this->fixOldInternalLinks();
 				)
 			)===true) {
 
-				$_SESSION['system']['import']['loaded']['welcome']['saved'][] = 'Saved contributors text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'][] = 'Saved contributors text.';
 
 			} else {
 
-				$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save contributors text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save contributors text.';
 			}
 
 		} else {
 
-			$_SESSION['system']['import']['loaded']['welcome']['failed'][] = 'No contributors text found.';
+			$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'No contributors text found.';
 
 		}
 
@@ -2218,7 +2218,7 @@ $res = $this->fixOldInternalLinks();
 		$this->models->IntroductionPage->save(
 			array(
 				'project_id' => $this->getNewProjectId(),
-				'show_order' => $_SESSION['system']['import']['loaded']['introduction']['show_order']++,
+				'show_order' => $_SESSION['admin']['system']['import']['loaded']['introduction']['show_order']++,
 				'got_content' => '1'
 			)
 		);
@@ -2236,23 +2236,23 @@ $res = $this->fixOldInternalLinks();
 			)
 		)===true) {
 
-			$_SESSION['system']['import']['loaded']['introduction']['saved'][] = 'Saved topic "'.trim((string)$obj->introduction_title).'".';
+			$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'][] = 'Saved topic "'.trim((string)$obj->introduction_title).'".';
 
 		} else {
 	
-			$_SESSION['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'".';
+			$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'".';
 			return;
 
 		}
  
  		$img = trim((string)$obj->overview);
  
-		if ($_SESSION['system']['import']['imagePath'] && $img) {
+		if ($_SESSION['admin']['system']['import']['imagePath'] && $img) {
 		
-			$paths = $_SESSION['system']['import']['paths'];
+			$paths = $_SESSION['admin']['system']['import']['paths'];
 
 			if ($this->cRename(
-				$_SESSION['system']['import']['imagePath'].$img,
+				$_SESSION['admin']['system']['import']['imagePath'].$img,
 				$paths['project_media'].$img
 				)
 			) {
@@ -2264,7 +2264,7 @@ $res = $this->fixOldInternalLinks();
 						'page_id' => $id,
 						'file_name' => $img,
 						'original_name' => $img,
-						'mime_type' => @mime_content_type($img),
+						'mime_type' => @$this->mimeContentType($img),
 						'file_size' => @filesize($paths['project_media'].$img),
 						'thumb_name' => null,
 					)
@@ -2323,7 +2323,7 @@ $res = $this->fixOldInternalLinks();
 	private function createKeyStepChoices($step,$stepIds)
 	{
 
-		$paths = $_SESSION['system']['import']['paths'];
+		$paths = $_SESSION['admin']['system']['import']['paths'];
 
 		if ($step->text_choice) {
 			$choices = $step->text_choice;
@@ -2344,8 +2344,8 @@ $res = $this->fixOldInternalLinks();
 						);
 
 			$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
-							(isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
-								$_SESSION['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
+							(isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
+								$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
 								null
 							) : 
 							null
@@ -2353,7 +2353,7 @@ $res = $this->fixOldInternalLinks();
 
 			$fileName = isset($val->picturefilename) ? trim((string)$val->picturefilename) : null;
 
-			if ($fileName && !file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
+			if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 
 				$error[] = array(
 					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
@@ -2364,21 +2364,28 @@ $res = $this->fixOldInternalLinks();
 			} else
 			if ($fileName) {
 
-				$this->cRename($_SESSION['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+				$this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
 
 			}
 
-			$this->models->ChoiceKeystep->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]),
-					'show_order' => (1 + $i++),
-					'choice_img' => isset($fileName) ? $fileName : null,
-					'res_keystep_id' => $resStep,
-					'res_taxon_id' => $resTaxon,
-				)
-			);
+			if (
+					isset($val->leftpos) ||
+					isset($val->toppos) ||
+					isset($val->width) ||
+					isset($val->height)
+				) {
+
+					$params =
+						json_encode(
+							array(
+								'leftpos' => isset($val->leftpos) ? trim($val->leftpos) : null,
+								'toppos' => isset($val->toppos) ? trim($val->toppos) : null,
+								'width' => isset($val->width) ? trim($val->width) : null,
+								'height' => isset($val->height) ? trim($val->height) : null,
+							)
+						);
+
+			}
 
 			if (isset($val->captiontext)) {
 
@@ -2392,16 +2399,35 @@ $res = $this->fixOldInternalLinks();
 
 				$txt = trim((string)$val->picturefilename);
 			}
+			
+			if ($txt) {
+
+				$this->models->ChoiceKeystep->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]),
+						'show_order' => (1 + $i++),
+						'choice_img' => isset($fileName) ? $fileName : null,
+						'choice_image_params' => isset($params) ? $params : null,
+						'res_keystep_id' => $resStep,
+						'res_taxon_id' => $resTaxon,
+					)
+				);
 	
-			$this->models->ChoiceContentKeystep->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),
-					'choice_id' => $this->models->ChoiceKeystep->getNewId(),
-					'language_id' => $this->getNewDefaultLanguageId(),
-					'choice_txt' => isset($txt) ? $txt : null
-				)
-			);
+	
+		
+				$this->models->ChoiceContentKeystep->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),
+						'choice_id' => $this->models->ChoiceKeystep->getNewId(),
+						'language_id' => $this->getNewDefaultLanguageId(),
+						'choice_txt' => isset($txt) ? $txt : null
+					)
+				);
+				
+			}
 
 		}
 
@@ -2439,16 +2465,16 @@ $res = $this->fixOldInternalLinks();
 				)
 			);
 			
-			$_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key'] = $firstTxtStepId;
-			$_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'] = $keyStepIds;
-			$_SESSION['system']['import']['loaded']['key_dich']['stepAdd'] = $k[0]['last'];
+			$_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['text_key'] = $firstTxtStepId;
+			$_SESSION['admin']['system']['import']['loaded']['key_dich']['keyStepIds'] = $keyStepIds;
+			$_SESSION['admin']['system']['import']['loaded']['key_dich']['stepAdd'] = $k[0]['last'];
 
 		}
 
 		if ($node == 'pict_key') {
 
-			$keyStepIds = $_SESSION['system']['import']['loaded']['key_dich']['keyStepIds'];
-			$stepAdd = $_SESSION['system']['import']['loaded']['key_dich']['stepAdd'];
+			$keyStepIds = $_SESSION['admin']['system']['import']['loaded']['key_dich']['keyStepIds'];
+			$stepAdd = $_SESSION['admin']['system']['import']['loaded']['key_dich']['stepAdd'];
 
 			$pictStepIds = null;
 
@@ -2468,17 +2494,17 @@ $res = $this->fixOldInternalLinks();
 	
 			}
 			
-			$_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key'] = $firstPictStepId;
+			$_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['pict_key'] = $firstPictStepId;
 
 		}
 
-		if ($_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key']!==false &&
-			$_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key']!==false) {
+		if ($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['text_key']!==false &&
+			$_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['pict_key']!==false) {
 
 			$keyStepIds = $this->createKeyStep('god',$keyStepIds);
 			
-			$firstTxtStepId = $_SESSION['system']['import']['loaded']['key_dich']['keys']['text_key'];
-			$firstPictStepId = $_SESSION['system']['import']['loaded']['key_dich']['keys']['pict_key'];
+			$firstTxtStepId = $_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['text_key'];
+			$firstPictStepId = $_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']['pict_key'];
 
 			end($keyStepIds);
 
@@ -2560,7 +2586,7 @@ $res = $this->fixOldInternalLinks();
 
 			//?? (string)$obj->identify->id_file->obj_link
 
-			$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_replace('.adm','',$matrixname);
+			$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_replace('.adm','',$matrixname);
 			
 			if (isset($obj->identify->id_file->characters->character_))
 				$chars = $obj->identify->id_file->characters->character_;
@@ -2600,9 +2626,9 @@ $res = $this->fixOldInternalLinks();
 							$statefile
 						);
 
-					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['charname'] = $charname;
-					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
-					$_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['charname'] = $charname;
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
 						'statename'=>$statename,
 						'statemin'=>$statemin,
 						'statemax'=>$statemax,
@@ -2643,7 +2669,7 @@ $res = $this->fixOldInternalLinks();
 	private function saveMatrices($m)
 	{
 		
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? $_SESSION['admin']['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 		
 		$d = $error = null;
 
@@ -2706,7 +2732,7 @@ $res = $this->fixOldInternalLinks();
 
 					$fileName = isset($sVal['statefile']) ? $sVal['statefile'] : null;
 		
-					if ($fileName && !file_exists($_SESSION['system']['import']['imagePath'].$fileName)) {
+					if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 		
 						$error[] = array(
 							'cause' => 'Matrix state image "'.$fileName.'" does not exist (state created anyway)'
@@ -2717,7 +2743,7 @@ $res = $this->fixOldInternalLinks();
 					} else
 					if ($fileName) {
 		
-						$this->cRename($_SESSION['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+						$this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
 		
 					}
 
@@ -2773,9 +2799,9 @@ $res = $this->fixOldInternalLinks();
 
 		if ($matrixname) {
 
-			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
+			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
 
-				$taxonid = $_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
+				$taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
 
 				foreach($obj->identify->id_file->characters->character_ as $char) {
 
@@ -2795,7 +2821,7 @@ $res = $this->fixOldInternalLinks();
 								trim((string)$stat->state_file)
 							);
 
-						if (isset($_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex])) {
+						if (isset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex])) {
 
 							$this->models->MatrixTaxon->setNoKeyViolationLogging(true);
 
@@ -2803,7 +2829,7 @@ $res = $this->fixOldInternalLinks();
 								array(
 									'id' => null,
 									'project_id' => $this->getNewProjectId(),
-									'matrix_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
+									'matrix_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
 									'taxon_id' => $taxonid,
 								)
 							);
@@ -2814,9 +2840,9 @@ $res = $this->fixOldInternalLinks();
 								array(
 									'id' => null,
 									'project_id' => $this->getNewProjectId(),
-									'matrix_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
-									'characteristic_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['characteristic_id'],
-									'state_id' => $_SESSION['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['state_id'],
+									'matrix_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
+									'characteristic_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['characteristic_id'],
+									'state_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['state_id'],
 									'taxon_id' => $taxonid,
 								)
 							);
@@ -2829,7 +2855,7 @@ $res = $this->fixOldInternalLinks();
 
 			} else {
 
-				$_SESSION['system']['import']['loaded']['key_matrix']['failed'][] = array(
+				$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = array(
 					'cause' => 'Species "'.trim((string)$obj->name).'" in matrix key does not exist and has been discarded',
 					'data' => trim((string)$obj->name)
 				);
@@ -2877,7 +2903,7 @@ $res = $this->fixOldInternalLinks();
 			(!$occurrence['typeId'])
 		) {
 
-			$_SESSION['system']['import']['loaded']['map']['skipped']++;
+			$_SESSION['admin']['system']['import']['loaded']['map']['skipped']++;
 			return;
 
 		}
@@ -2906,9 +2932,9 @@ $res = $this->fixOldInternalLinks();
 		);
 		
 		if ($d===true)
-			$_SESSION['system']['import']['loaded']['map']['saved']++;
+			$_SESSION['admin']['system']['import']['loaded']['map']['saved']++;
 		else
-			$_SESSION['system']['import']['loaded']['map']['failed']++;
+			$_SESSION['admin']['system']['import']['loaded']['map']['failed']++;
 
 	}
 
@@ -2916,15 +2942,15 @@ $res = $this->fixOldInternalLinks();
 	private function saveMapItem($obj)
 	{
 	
-		if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
 		
 			if (!isset($obj->distribution)) return;
 			
-			$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
 
 			foreach($obj->distribution->map as $vKey => $vVal) {
 
-				if (!isset($_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)])) {
+				if (!isset($_SESSION['admin']['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)])) {
 
 					/*
 			
@@ -2946,7 +2972,7 @@ $res = $this->fixOldInternalLinks();
 					$sqW = floatval($d[4]);
 					$sqH = floatval($d[5]);
 
-					$_SESSION['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
+					$_SESSION['admin']['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
 						array(
 							'label' => trim((string)$vVal->mapname),
 							'specs' => trim((string)$vVal->specs),
@@ -2961,12 +2987,12 @@ $res = $this->fixOldInternalLinks();
 						);
 				}
 				
-				$maps = $_SESSION['system']['import']['loaded']['map']['maps'];
+				$maps = $_SESSION['admin']['system']['import']['loaded']['map']['maps'];
 				
 				foreach($vVal->squares->square as $sKey => $sVal) {
 
-					if (!isset($_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
-						$_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
+					if (!isset($_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
+						$_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
 
 					// determining the position of the square in the map grid
 					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
@@ -2990,7 +3016,7 @@ $res = $this->fixOldInternalLinks();
 						'row' => $row,
 						'col' => $col,
 						'legend' => trim((string)$sVal->legend),
-						'typeId' => $_SESSION['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
+						'typeId' => $_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
 						'nodes' => array(array($n1Lat,$n1Lon),array($n2Lat,$n2Lon),array($n3Lat,$n3Lon),array($n4Lat,$n4Lon))
 					);
 					
@@ -3121,22 +3147,22 @@ $res = $this->fixOldInternalLinks();
 
 		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
-			if ($controllers[$d[0]]['controller']=='glossary' && isset($_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]])) {
-				$id = $_SESSION['system']['import']['lookupArrays']['glossary'][$d[1]];
+			if ($controllers[$d[0]]['controller']=='glossary' && isset($_SESSION['admin']['system']['import']['lookupArrays']['glossary'][$d[1]])) {
+				$id = $_SESSION['admin']['system']['import']['lookupArrays']['glossary'][$d[1]];
 
 			}
 
-			if ($controllers[$d[0]]['controller']=='literature' && isset($_SESSION['system']['import']['lookupArrays']['literature'][$d[1]])) {
-				$id = $_SESSION['system']['import']['lookupArrays']['literature'][$d[1]];
+			if ($controllers[$d[0]]['controller']=='literature' && isset($_SESSION['admin']['system']['import']['lookupArrays']['literature'][$d[1]])) {
+				$id = $_SESSION['admin']['system']['import']['lookupArrays']['literature'][$d[1]];
 
 			}
 
-			if ($controllers[$d[0]]['controller']=='species' && isset($_SESSION['system']['import']['lookupArrays']['species'][$d[1]])) {
-				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
+			if ($controllers[$d[0]]['controller']=='species' && isset($_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]])) {
+				$id = $_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]];
 			}
 
-			if ($controllers[$d[0]]['controller']=='highertaxa' && isset($_SESSION['system']['import']['lookupArrays']['species'][$d[1]])) {
-				$id = $_SESSION['system']['import']['lookupArrays']['species'][$d[1]];
+			if ($controllers[$d[0]]['controller']=='highertaxa' && isset($_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]])) {
+				$id = $_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]];
 			}
 	
 			if (isset($id) && isset($d[2])) {
@@ -3204,19 +3230,19 @@ $res = $this->fixOldInternalLinks();
 		if (isset($d[0])) $filename = $d[0]; else return $s[0];
 		$label = isset($d[1]) ? $d[1] : $filename;
 
-		//if (file_exists($_SESSION['system']['import']['paths']['project_media'].$filename))
+		//if (file_exists($_SESSION['admin']['system']['import']['paths']['project_media'].$filename))
 		
 		if ($type=='image') {
 
 			return '<span
 				class="internal-link" 
-				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
+				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
 				$label.' [IMG]</span>';
 
 //			NO INLINE
 //			return '<img
-//				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
-//				src="'.$_SESSION['system']['import']['paths']['media_url'].$filename.'"
+//				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
+//				src="'.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'"
 //				class="media-image">';
 
 		} else
@@ -3224,11 +3250,11 @@ $res = $this->fixOldInternalLinks();
 
 			return '<span
 				class="internal-link" 
-				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
+				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
 				$label.' [VID]</span>';
 
 //			return '<img
-//				onclick="showMedia(\''.$_SESSION['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
+//				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
 //				src="../../media/system/video.jpg" 
 //				class="media-image">';
 
@@ -3238,7 +3264,7 @@ $res = $this->fixOldInternalLinks();
 			return '<object type="application/x-shockwave-flash" data="'.
 						$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
 						<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
-						<param name="FlashVars" value="mp3='.$_SESSION['system']['import']['paths']['media_url'].$filename.'">
+						<param name="FlashVars" value="mp3='.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'">
 					</object>';
 
 		} else return $s[0];
@@ -3284,25 +3310,25 @@ $res = $this->fixOldInternalLinks();
 
 		$s = $g = $l = null;
 
-		if (isset($_SESSION['system']['import']['loaded']['species'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'])) {
 
-			foreach((array)$_SESSION['system']['import']['loaded']['species'] as $val) {
+			foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $val) {
 				if (isset($val['taxon']) && isset($val['id'])) $s[$val['taxon']] = $val['id'];
 			}
 			
 		}
 
-		if (isset($_SESSION['system']['import']['glossary'])) {
+		if (isset($_SESSION['admin']['system']['import']['glossary'])) {
 
-			foreach((array)$_SESSION['system']['import']['glossary'] as $val) {
+			foreach((array)$_SESSION['admin']['system']['import']['glossary'] as $val) {
 				if (isset($val['term']) && isset($val['id'])) $g[$val['term']] = $val['id'];
 			}
 
 		}
 
-		if (isset($_SESSION['system']['import']['literature'])) {
+		if (isset($_SESSION['admin']['system']['import']['literature'])) {
 
-			foreach((array)$_SESSION['system']['import']['literature'] as $val) {
+			foreach((array)$_SESSION['admin']['system']['import']['literature'] as $val) {
 				if (isset($val['original']) && isset($val['id'])) $l[$val['original']] = $val['id'];
 			}
 
@@ -3319,7 +3345,7 @@ $res = $this->fixOldInternalLinks();
 	private function fixOldInternalLinks()
 	{
 
-		$_SESSION['system']['import']['lookupArrays'] = $this->createLookupArrays();
+		$_SESSION['admin']['system']['import']['lookupArrays'] = $this->createLookupArrays();
 
 		$d = $this->models->ContentTaxon->_get(array('id' => array('project_id' => $this->getNewProjectId())));
 
@@ -3415,6 +3441,80 @@ $res = $this->fixOldInternalLinks();
 	}
 
 
+	private function mimeContentType($filename) {
+	
+			$mime_types = array(
+	
+				'txt' => 'text/plain',
+				'htm' => 'text/html',
+				'html' => 'text/html',
+				'php' => 'text/html',
+				'css' => 'text/css',
+				'js' => 'application/javascript',
+				'json' => 'application/json',
+				'xml' => 'application/xml',
+				'swf' => 'application/x-shockwave-flash',
+				'flv' => 'video/x-flv',
+	
+				// images
+				'png' => 'image/png',
+				'jpe' => 'image/jpeg',
+				'jpeg' => 'image/jpeg',
+				'jpg' => 'image/jpeg',
+				'gif' => 'image/gif',
+				'bmp' => 'image/bmp',
+				'ico' => 'image/vnd.microsoft.icon',
+				'tiff' => 'image/tiff',
+				'tif' => 'image/tiff',
+				'svg' => 'image/svg+xml',
+				'svgz' => 'image/svg+xml',
+	
+				// archives
+				'zip' => 'application/zip',
+				'rar' => 'application/x-rar-compressed',
+				'exe' => 'application/x-msdownload',
+				'msi' => 'application/x-msdownload',
+				'cab' => 'application/vnd.ms-cab-compressed',
+	
+				// audio/video
+				'mp3' => 'audio/mpeg',
+				'qt' => 'video/quicktime',
+				'mov' => 'video/quicktime',
+	
+				// adobe
+				'pdf' => 'application/pdf',
+				'psd' => 'image/vnd.adobe.photoshop',
+				'ai' => 'application/postscript',
+				'eps' => 'application/postscript',
+				'ps' => 'application/postscript',
+	
+				// ms office
+				'doc' => 'application/msword',
+				'rtf' => 'application/rtf',
+				'xls' => 'application/vnd.ms-excel',
+				'ppt' => 'application/vnd.ms-powerpoint',
+	
+				// open office
+				'odt' => 'application/vnd.oasis.opendocument.text',
+				'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+			);
+	
+			$ext = strtolower(array_pop(explode('.',$filename)));
+			if (array_key_exists($ext, $mime_types)) {
+				return $mime_types[$ext];
+			}
+			elseif (function_exists('finfo_open')) {
+				$finfo = finfo_open(FILEINFO_MIME);
+				$mimetype = finfo_file($finfo, $filename);
+				finfo_close($finfo);
+				return $mimetype;
+			}
+			else {
+				return 'application/octet-stream';
+			}
+		}
+
+
 	/*
 
 		ENTERING FUNCTION JUNKYARD
@@ -3471,7 +3571,7 @@ $res = $this->fixOldInternalLinks();
 
 		$this->loadControllerConfig('Species');
 		
-		$paths = isset($_SESSION['system']['import']['paths']) ? $_SESSION['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? $_SESSION['admin']['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
 
 		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
 
@@ -3566,9 +3666,9 @@ $res = $this->fixOldInternalLinks();
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
+			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
+				$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
 
 				foreach($val->vernaculars as $vKey => $vVal) {
 
@@ -3614,9 +3714,9 @@ $res = $this->fixOldInternalLinks();
 
 		foreach($d->records->taxondata as $key => $val) {
 
-			if (isset($_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
+			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->name)]['id'])) {
 			
-				$taxonId = $_SESSION['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
+				$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->name)]['id'];
 				
 				$i = 0;
 
@@ -3783,7 +3883,7 @@ $res = $this->fixOldInternalLinks();
 
 			}
 
-			$_SESSION['system']['import']['literature'][$key]['id'] = $id = $this->models->Literature->getNewId();
+			$_SESSION['admin']['system']['import']['literature'][$key]['id'] = $id = $this->models->Literature->getNewId();
 
 			foreach((array)$val['references']['species'] as $kV) {
 			
@@ -3933,47 +4033,47 @@ $res = $this->fixOldInternalLinks();
 	public function l2SecondaryAction()
 	{
 
-		//if (!isset($_SESSION['system']['import']['raw'])) $this->redirect('l2_start.php');
-		//if (!isset($_SESSION['system']['import']['loaded']['species'])) $this->redirect('l2_start.php');
+		//if (!isset($_SESSION['admin']['system']['import']['raw'])) $this->redirect('l2_start.php');
+		//if (!isset($_SESSION['admin']['system']['import']['loaded']['species'])) $this->redirect('l2_start.php');
 
 		//$p = $this->getNewProjectId();
 		//$project = $this->getProjects($p);
 
         //$this->setPageName(_('Additional data for "'.$project['title'].'"'));
 
-		//$d = simplexml_load_string($_SESSION['system']['import']['raw']);
-		//$species = $_SESSION['system']['import']['loaded']['species'];
+		//$d = simplexml_load_string($_SESSION['admin']['system']['import']['raw']);
+		//$species = $_SESSION['admin']['system']['import']['loaded']['species'];
 
 		// getProjectContent: 'Introduction' (= Welcome) and 'Contributors'  (= Welcome)
-//		if (!isset($_SESSION['system']['import']['content']))
-//			$_SESSION['system']['import']['content'] = $welcomeContrib = $this->getProjectContent($d);
+//		if (!isset($_SESSION['admin']['system']['import']['content']))
+//			$_SESSION['admin']['system']['import']['content'] = $welcomeContrib = $this->getProjectContent($d);
 //		else
-//			$welcomeContrib = $_SESSION['system']['import']['content'];
+//			$welcomeContrib = $_SESSION['admin']['system']['import']['content'];
 
-//		if (!isset($_SESSION['system']['import']['literature']))
-//			$_SESSION['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
+//		if (!isset($_SESSION['admin']['system']['import']['literature']))
+//			$_SESSION['admin']['system']['import']['literature'] = $literature = $this->resolveLiterature($d,$species);
 //		else
-//			$literature = $_SESSION['system']['import']['literature'];
+//			$literature = $_SESSION['admin']['system']['import']['literature'];
 
-//		if (!isset($_SESSION['system']['import']['glossary']))
-//			$_SESSION['system']['import']['glossary'] = $glossary = $this->resolveGlossary($d);
+//		if (!isset($_SESSION['admin']['system']['import']['glossary']))
+//			$_SESSION['admin']['system']['import']['glossary'] = $glossary = $this->resolveGlossary($d);
 //		else
-//			$glossary = $_SESSION['system']['import']['glossary'];
+//			$glossary = $_SESSION['admin']['system']['import']['glossary'];
 
 		// getAdditionalContent: multiple topics (= Introduction)
-//		if (!isset($_SESSION['system']['import']['additionalContent']))
-//			$_SESSION['system']['import']['additionalContent'] = $introductionContent = $this->getAdditionalContent($d);
+//		if (!isset($_SESSION['admin']['system']['import']['additionalContent']))
+//			$_SESSION['admin']['system']['import']['additionalContent'] = $introductionContent = $this->getAdditionalContent($d);
 //		else
-//			$introductionContent = $_SESSION['system']['import']['additionalContent'];
+//			$introductionContent = $_SESSION['admin']['system']['import']['additionalContent'];
 
-		if (!isset($_SESSION['system']['import']['mapItems']))
-			$_SESSION['system']['import']['mapItems'] = $mapItems = $this->getMapItems($d,$species);
+		if (!isset($_SESSION['admin']['system']['import']['mapItems']))
+			$_SESSION['admin']['system']['import']['mapItems'] = $mapItems = $this->getMapItems($d,$species);
 		else
-			$mapItems = $_SESSION['system']['import']['mapItems'];
+			$mapItems = $_SESSION['admin']['system']['import']['mapItems'];
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 		
-			$_SESSION['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
+			$_SESSION['admin']['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 		
 			ini_set('max_execution_time',600);
 /*
@@ -4166,7 +4266,7 @@ $res = $this->fixOldInternalLinks();
 
 			$this->smarty->assign('processed',true);
 
-			unset($_SESSION['system']['import']);
+			unset($_SESSION['admin']['system']['import']);
 
 		}
 
@@ -4182,4 +4282,4 @@ $res = $this->fixOldInternalLinks();
 
 }
 
-//$_SESSION['system']['import']['loaded']['species']
+//$_SESSION['admin']['system']['import']['loaded']['species']

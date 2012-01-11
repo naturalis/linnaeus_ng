@@ -119,7 +119,7 @@ class ModuleController extends Controller
 
 		}
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
         $this->printPage();
 	
@@ -215,7 +215,7 @@ class ModuleController extends Controller
 	private function setCurrentModule($module)
 	{
 	
-		$_SESSION['user']['module']['activeModule'] = $module;
+		$_SESSION['app']['user']['module']['activeModule'] = $module;
 
 	}
 
@@ -227,8 +227,8 @@ class ModuleController extends Controller
 	private function getCurrentModule()
 	{
 
-		return isset($_SESSION['user']['module']['activeModule']) ?
-			$_SESSION['user']['module']['activeModule'] :
+		return isset($_SESSION['app']['user']['module']['activeModule']) ?
+			$_SESSION['app']['user']['module']['activeModule'] :
 			null;
 	
 	}
@@ -241,8 +241,8 @@ class ModuleController extends Controller
 	private function getCurrentModuleId()
 	{
 
-		return isset($_SESSION['user']['module']['activeModule']['id']) ?
-				$_SESSION['user']['module']['activeModule']['id'] :
+		return isset($_SESSION['app']['user']['module']['activeModule']['id']) ?
+				$_SESSION['app']['user']['module']['activeModule']['id'] :
 				null;
 
 	}
@@ -250,10 +250,10 @@ class ModuleController extends Controller
 	private function getPagesByLetter($letter)
 	{
 	
-		if (!isset($_SESSION['user']['module']['alpha'])) $this->getPageAlphabet(true);
+		if (!isset($_SESSION['app']['user']['module']['alpha'])) $this->getPageAlphabet(true);
 
-		return isset($_SESSION['user']['module']['alpha']['pages'][$letter]) ?
-			$_SESSION['user']['module']['alpha']['pages'][$letter]:
+		return isset($_SESSION['app']['user']['module']['alpha']['pages'][$letter]) ?
+			$_SESSION['app']['user']['module']['alpha']['pages'][$letter]:
 			null;
 	
 	}
@@ -261,9 +261,9 @@ class ModuleController extends Controller
 	private function getPageAlphabet($forceLookup=false)
 	{
 
-		if (!$forceLookup && isset($_SESSION['user']['module']['alpha']['alphabet'])) $_SESSION['user']['module']['alpha']['alphabet'];
+		if (!$forceLookup && isset($_SESSION['app']['user']['module']['alpha']['alphabet'])) $_SESSION['app']['user']['module']['alpha']['alphabet'];
 
-		unset($_SESSION['user']['module']['alpha']);
+		unset($_SESSION['app']['user']['module']['alpha']);
 
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
@@ -283,11 +283,11 @@ class ModuleController extends Controller
 
 			$alpha[$val['letter']] = $val['letter'];
 
-			$_SESSION['user']['module']['alpha']['pages'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
+			$_SESSION['app']['user']['module']['alpha']['pages'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
 
 		}
 
-		$_SESSION['user']['module']['alpha']['alphabet'] = $alpha;
+		$_SESSION['app']['user']['module']['alpha']['alphabet'] = $alpha;
 
 		return $alpha;
 	

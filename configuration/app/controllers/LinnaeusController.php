@@ -2,7 +2,7 @@
 
 	/*
 
-		$textWithGlossaryMatches = $linnaeusController->matchGlossaryTerms($textWithoutGlossaryMatches));
+		$textWithGlossaryMatches = $this->matchGlossaryTerms($textWithoutGlossaryMatches));
 
 	*/
 
@@ -105,8 +105,8 @@ class LinnaeusController extends Controller
     public function setProjectAction ()
     {
 
-		unset($_SESSION['project']);
-		unset($_SESSION['user']);
+		unset($_SESSION['app']['project']);
+		unset($_SESSION['app']['user']);
 
 		$this->resolveProjectId();
 
@@ -150,7 +150,9 @@ class LinnaeusController extends Controller
     public function indexAction ()
     {
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		//q($this->isLoggedInAdmin());
+
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (!$this->rHasVal('sub')) {
 
@@ -230,9 +232,9 @@ class LinnaeusController extends Controller
 
 		$this->storeHistory = false;
 
-		if ($_SESSION['user']['search']['hasSearchResults'] && $_SESSION['user']['search']['lastSearch']) {
+		if ($_SESSION['app']['user']['search']['hasSearchResults'] && $_SESSION['app']['user']['search']['lastSearch']) {
 
-			$_SESSION['user']['search']['redo'] = true;
+			$_SESSION['app']['user']['search']['redo'] = true;
 
 		}
 
@@ -243,11 +245,11 @@ class LinnaeusController extends Controller
     public function searchAction ()
 	{
 	
-		if (isset($_SESSION['user']['search']['redo']) && $_SESSION['user']['search']['redo']==true) {
+		if (isset($_SESSION['app']['user']['search']['redo']) && $_SESSION['app']['user']['search']['redo']==true) {
 		
-			$this->requestData['search'] = $_SESSION['user']['search']['lastSearch'];
+			$this->requestData['search'] = $_SESSION['app']['user']['search']['lastSearch'];
 
-			$_SESSION['user']['search']['redo'] = false;
+			$_SESSION['app']['user']['search']['redo'] = false;
 
 		}
 
@@ -308,7 +310,7 @@ class LinnaeusController extends Controller
     public function rGetTaxon ()
 	{
 
-		$d = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+		$d = $_SESSION['app']['project']['urls']['full_base_url'].$this->getAppName().'/views/';
 
 		$results = null;
 
@@ -389,11 +391,11 @@ class LinnaeusController extends Controller
 				$type = isset($cfg['mime_types'][$val['mime_type']]['type']) ? $cfg['mime_types'][$val['mime_type']]['type'] : '';
 
 				$media[] = array(
-					'URL' => $_SESSION['project']['urls']['full_project_media'].$val['file_name'],
+					'URL' => $_SESSION['app']['project']['urls']['full_project_media'].$val['file_name'],
 					'imageLink' =>
-						$_SESSION['project']['urls']['full_appview_url'].
+						$_SESSION['app']['project']['urls']['full_appview_url'].
 						'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media&disp='.$val['id'],
-					'thumbnailURL' => $val['thumb_name'] ? $_SESSION['project']['urls']['full_project_thumbs'].$val['thumb_name'] : '',
+					'thumbnailURL' => $val['thumb_name'] ? $_SESSION['app']['project']['urls']['full_project_thumbs'].$val['thumb_name'] : '',
 					'caption' => $content ? $content[0]['description'] : '',
 					'type' => $type,
 					'name' => $val['file_name'],
@@ -426,7 +428,7 @@ class LinnaeusController extends Controller
 						'date' => '',
 						'location' =>  '',
 						'link' => 						
-							$_SESSION['project']['urls']['full_appview_url'].
+							$_SESSION['app']['project']['urls']['full_appview_url'].
 							'mapkey/examine_species.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&o='.$val['id'],
 						'number_counted' => '1'
 					);
@@ -502,7 +504,7 @@ class LinnaeusController extends Controller
 					'rank' =>  ucfirst($p['ranks'][$t[0]['rank_id']]['labels'][$this->getCurrentLanguageId()]),
 					'status' => 'Accepted name',
 					'link' =>
-						$_SESSION['project']['urls']['full_appview_url'].
+						$_SESSION['app']['project']['urls']['full_appview_url'].
 						'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId,
 					'commonNames' => isset($commonnames) ? $commonnames : '',
 					'synonyms' => isset($synonyms) ? $synonyms : '',
@@ -512,7 +514,7 @@ class LinnaeusController extends Controller
 							0 =>
 								array(
 									'link' => 
-										$_SESSION['project']['urls']['full_appview_url'].
+										$_SESSION['app']['project']['urls']['full_appview_url'].
 										'species/taxon.php?p='.$this->getCurrentProjectId().'&id='.$taxonId.'&cat=media',
 									'list' => $media
 								)
@@ -774,7 +776,7 @@ q($results,1,1);
 			if (strlen($this->requestData['search'])>2) { 
 			
 				if (
-					!isset($_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]) || 
+					!isset($_SESSION['app']['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]) || 
 					$this->noResultCaching
 					) {
 
@@ -791,16 +793,16 @@ q($results,1,1);
 						$results['map']['numOfResults']
 						;
 		
-					$_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]['results'] = $results;
+					$_SESSION['app']['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]['results'] = $results;
 
 				} else {
 
-					$results = $_SESSION['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]['results'];
+					$results = $_SESSION['app']['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]['results'];
 
 				}
 				
-				$_SESSION['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
-				$_SESSION['user']['search']['lastSearch'] = $this->requestData['search'];
+				$_SESSION['app']['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
+				$_SESSION['app']['user']['search']['lastSearch'] = $this->requestData['search'];
 					
 				return $results;
 	
@@ -815,7 +817,7 @@ q($results,1,1);
 
 		} else {
 
-			unset($_SESSION['user']['search'][$this->requestData['search']]['results']);
+			unset($_SESSION['app']['user']['search'][$this->requestData['search']]['results']);
 
 			return null;
 
@@ -929,7 +931,7 @@ q($results,1,1);
 	private function makeCategoryList()
 	{
 
-		if (!isset($_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()])) {
+		if (!isset($_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()])) {
 
 			// get the defined categories (just the page definitions, no content yet)
 			$tp = $this->models->PageTaxon->_get(
@@ -955,15 +957,15 @@ q($results,1,1);
 		
 				$tp[$key]['title'] = $tpt[0]['title'];
 		
-				if ($val['def_page'] == 1) $_SESSION['user']['species']['defaultCategory'] = $val['id'];
+				if ($val['def_page'] == 1) $_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
 			
 			}
 			
-			$_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
+			$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
 
 		}
 
-		return $_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()];
+		return $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()];
 	
 	}
 
@@ -2024,38 +2026,38 @@ q($results,1,1);
 	
 		foreach((array)$this->cssToLoad as $val) {
 		
-			if (!file_exists($_SESSION['project']['urls']['project_css'].$val)) {
+			if (!file_exists($_SESSION['app']['project']['urls']['project_css'].$val)) {
 			
-				if (dirname($_SESSION['project']['paths']['default_css'].$val) != dirname($_SESSION['project']['paths']['default_css'])) {
+				if (dirname($_SESSION['app']['project']['paths']['default_css'].$val) != dirname($_SESSION['app']['project']['paths']['default_css'])) {
 
 					@mkdir(
 						str_replace(
-							$_SESSION['project']['paths']['default_css'],
-							$_SESSION['project']['paths']['project_css'],
-							dirname($_SESSION['project']['paths']['default_css'].$val)
+							$_SESSION['app']['project']['paths']['default_css'],
+							$_SESSION['app']['project']['paths']['project_css'],
+							dirname($_SESSION['app']['project']['paths']['default_css'].$val)
 						)
 					);
 
 				}
 
-				copy($_SESSION['project']['paths']['default_css'].$val,$_SESSION['project']['paths']['project_css'].$val);
+				copy($_SESSION['app']['project']['paths']['default_css'].$val,$_SESSION['app']['project']['paths']['project_css'].$val);
 			
 			}
 
 		}
 		
 		// this dir name should probably go somewhere more manageable.
-		$d = $_SESSION['project']['paths']['default_css'].'colorbox/images/';
-		$e = $_SESSION['project']['paths']['default_css'].'colorbox/images/internet_explorer/';
+		$d = $_SESSION['app']['project']['paths']['default_css'].'colorbox/images/';
+		$e = $_SESSION['app']['project']['paths']['default_css'].'colorbox/images/internet_explorer/';
 		
 		if (!file_exists($d)) mkdir($d);
 		if (!file_exists($e)) mkdir($e);
 
-		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/'))
-			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/');
+		if (!file_exists($_SESSION['app']['project']['paths']['project_css'].'colorbox/images/'))
+			mkdir($_SESSION['app']['project']['paths']['project_css'].'colorbox/images/');
 
-		if (!file_exists($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/'))
-			mkdir($_SESSION['project']['paths']['project_css'].'colorbox/images/internet_explorer/');
+		if (!file_exists($_SESSION['app']['project']['paths']['project_css'].'colorbox/images/internet_explorer/'))
+			mkdir($_SESSION['app']['project']['paths']['project_css'].'colorbox/images/internet_explorer/');
 
 		$f = array(
 				'border1.png',
@@ -2074,7 +2076,7 @@ q($results,1,1);
 		foreach((array)$f as $val) {
 		
 			if (file_exists($d.$val))
-				copy($d.$val,$_SESSION['project']['paths']['project_css'].'colorbox/images/'.$val);
+				copy($d.$val,$_SESSION['app']['project']['paths']['project_css'].'colorbox/images/'.$val);
 
 		}
 	

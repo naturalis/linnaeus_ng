@@ -96,11 +96,11 @@ class SearchController extends Controller
 
 		$this->setControllerMask('utilities','Search');
 		
-		unset($_SESSION['user']['search']['results']);
+		unset($_SESSION['admin']['user']['search']['results']);
 
 		if ($this->rHasVal('search')) {
 
-			$_SESSION['user']['search']['search'] = array(
+			$_SESSION['admin']['user']['search']['search'] = array(
 				'search' => $this->requestData['search'],
 				'replacement' => $this->rHasVal('replacement') ? $this->requestData['replacement'] : null,
 				'doReplace' => $this->rHasVal('doReplace') ? $this->requestData['doReplace'] : null,
@@ -109,18 +109,18 @@ class SearchController extends Controller
 				'options' =>$this->rHasVal('options') ? $this->requestData['options'] : null,
 				);
 
-			$_SESSION['user']['search']['results'] =
+			$_SESSION['admin']['user']['search']['results'] =
 				$this->_searchAction(
 					$this->requestData['search'],
 					$this->rHasVal('modules') ? $this->requestData['modules'] : false,
 					$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : false
 				);
 
-			$_SESSION['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
+			$_SESSION['admin']['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
 
 			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','all')) {
 			
-				$_SESSION['user']['search']['results']['replace_all'] = true;
+				$_SESSION['admin']['user']['search']['results']['replace_all'] = true;
 
 				$this->redirect('search_replace_all.php');
 
@@ -137,7 +137,7 @@ class SearchController extends Controller
 
 		}
 
-		if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
+		if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
 
 		$this->smarty->assign('modules',$this->getProjectModules());
 
@@ -159,11 +159,11 @@ class SearchController extends Controller
 
 		$this->setControllerMask('utilities','Search');
 
-		if ($_SESSION['user']['search']['search']) {
+		if ($_SESSION['admin']['user']['search']['search']) {
 
-			if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
-			if (isset($_SESSION['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['user']['search']['results']);
-			if (isset($_SESSION['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['user']['search']['replace']['index']);
+			if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
+			if (isset($_SESSION['admin']['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['admin']['user']['search']['results']);
+			if (isset($_SESSION['admin']['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['admin']['user']['search']['replace']['index']);
 			
 		} else {
 		
@@ -191,11 +191,11 @@ class SearchController extends Controller
 
 		$this->setControllerMask('utilities','Search');
 
-		if ($_SESSION['user']['search']['search']) {
+		if ($_SESSION['admin']['user']['search']['search']) {
 
-			if (isset($_SESSION['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['user']['search']['search']);
-			if (isset($_SESSION['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['user']['search']['results']);
-			if (isset($_SESSION['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['user']['search']['replace']['index']);
+			if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
+			if (isset($_SESSION['admin']['user']['search']['results'])) $this->smarty->assign('resultData',$_SESSION['admin']['user']['search']['results']);
+			if (isset($_SESSION['admin']['user']['search']['replace']['index'] )) $this->smarty->assign('replaceIndex',$_SESSION['admin']['user']['search']['replace']['index']);
 			
 		} else {
 		
@@ -223,9 +223,9 @@ class SearchController extends Controller
 		
 		$this->setControllerMask('utilities','Search');
 
-		if ($_SESSION['user']['search']['results']['replace_all']!==true) $this->redirect('search_index.php');
+		if ($_SESSION['admin']['user']['search']['results']['replace_all']!==true) $this->redirect('search_index.php');
 
-		unset($_SESSION['user']['search']['results']['replace_all']);
+		unset($_SESSION['admin']['user']['search']['results']['replace_all']);
 
 		$this->processReplacements('*','replace');
 		
@@ -301,7 +301,7 @@ class SearchController extends Controller
 	private function processReplacements($id,$type)
 	{
 
-		if (!isset($_SESSION['user']['search']['results']) || !isset($_SESSION['user']['search']['search']['replacement'])) return null;
+		if (!isset($_SESSION['admin']['user']['search']['results']) || !isset($_SESSION['admin']['user']['search']['search']['replacement'])) return null;
 
 		if (is_string($id) && substr($id,0,7)=='module:') {
 
@@ -317,7 +317,7 @@ class SearchController extends Controller
 		
 		if (is_numeric($id)) $id = intval($id);
 
-		foreach((array)$_SESSION['user']['search']['results'] as $key1 => $val) {
+		foreach((array)$_SESSION['admin']['user']['search']['results'] as $key1 => $val) {
 
 			foreach((array)$val['results'] as $key2 => $module) {
 
@@ -328,8 +328,8 @@ class SearchController extends Controller
 						if ($thisModule!==false && $module['label']!=$thisModule) continue;
 	
 						$this->doReplace(
-							$_SESSION['user']['search']['search']['search'],
-							$_SESSION['user']['search']['search']['replacement'],
+							$_SESSION['admin']['user']['search']['search']['search'],
+							$_SESSION['admin']['user']['search']['search']['replacement'],
 							$data['replace'],
 							(($thisModule!==false && $module['label']==$thisModule) ? '*' : $id),
 							$type
@@ -354,7 +354,7 @@ class SearchController extends Controller
 		$storedId = $this->_replaceData['matches'][$this->_replaceCounter]['id'];
 		$requestedId = $this->_replaceData['idToReplace'];
 		$replaceStatus =
-			isset($_SESSION['user']['search']['replace']['index'][$storedId]) ? $_SESSION['user']['search']['replace']['index'][$storedId] : null;
+			isset($_SESSION['admin']['user']['search']['replace']['index'][$storedId]) ? $_SESSION['admin']['user']['search']['replace']['index'][$storedId] : null;
 
 		$this->_replaceCounter++;
 
@@ -367,7 +367,7 @@ class SearchController extends Controller
 				
 					if ($this->_replaceData['type']=='replace') {
 	
-						$_SESSION['user']['search']['replace']['index'][$storedId] = 'replaced';
+						$_SESSION['admin']['user']['search']['replace']['index'][$storedId] = 'replaced';
 						
 						$this->_replacementResultCounters['replaced']++;
 		
@@ -375,7 +375,7 @@ class SearchController extends Controller
 					
 					} else {
 	
-						$_SESSION['user']['search']['replace']['index'][$storedId] = $this->_replaceData['type']=='skip' ? 'skipped' : false;
+						$_SESSION['admin']['user']['search']['replace']['index'][$storedId] = $this->_replaceData['type']=='skip' ? 'skipped' : false;
 		
 						$this->_replacementResultCounters['skipped']++;
 
@@ -386,7 +386,7 @@ class SearchController extends Controller
 	
 				} else {
 	
-					$_SESSION['user']['search']['replace']['index'][$storedId] = 'mismatch';
+					$_SESSION['admin']['user']['search']['replace']['index'][$storedId] = 'mismatch';
 		
 					$this->_replacementResultCounters['mismatched']++;
 
@@ -464,7 +464,7 @@ class SearchController extends Controller
 		if (strlen($search)>2) { 
 		
 			if (
-				!isset($_SESSION['user']['search'][$search]) || 
+				!isset($_SESSION['admin']['user']['search'][$search]) || 
 				$this->noResultCaching
 				) {
 				
@@ -485,18 +485,18 @@ class SearchController extends Controller
 				
 				}
 
-				$_SESSION['user']['search'][$search]['results'] = $results;
+				$_SESSION['admin']['user']['search'][$search]['results'] = $results;
 
 				$this->_replaceId = null;
 
 			} else {
 
-				$results = $_SESSION['user']['search'][$search]['results'];
+				$results = $_SESSION['admin']['user']['search'][$search]['results'];
 
 			}
 			
-			$_SESSION['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
-			$_SESSION['user']['search']['lastSearch'] = $search;
+			$_SESSION['admin']['user']['search']['hasSearchResults'] = $results['numOfResults']>0;
+			$_SESSION['admin']['user']['search']['lastSearch'] = $search;
 				
 			return $results;
 
@@ -580,7 +580,7 @@ class SearchController extends Controller
 	private function makeCategoryList()
 	{
 
-		if (!isset($_SESSION['user']['species']['categories'])) {
+		if (!isset($_SESSION['admin']['user']['species']['categories'])) {
 
 			// get the defined categories (just the page definitions, no content yet)
 			$tp = $this->models->PageTaxon->_get(
@@ -606,15 +606,15 @@ class SearchController extends Controller
 		
 				$tp[$key]['title'] = $tpt[0]['title'];
 		
-				if ($val['def_page'] == 1) $_SESSION['user']['species']['defaultCategory'] = $val['id'];
+				if ($val['def_page'] == 1) $_SESSION['admin']['user']['species']['defaultCategory'] = $val['id'];
 			
 			}
 			
-			$_SESSION['user']['species']['categories'] = $tp;
+			$_SESSION['admin']['user']['species']['categories'] = $tp;
 
 		}
 
-		return $_SESSION['user']['species']['categories'];
+		return $_SESSION['admin']['user']['species']['categories'];
 	
 	}
 
@@ -1995,7 +1995,7 @@ class SearchController extends Controller
 	private function ORIGprocessReplacements($id,$type)
 	{
 
-		if (!isset($_SESSION['user']['search']['results'])) return null;
+		if (!isset($_SESSION['admin']['user']['search']['results'])) return null;
 
 		if (is_string($id) && substr($id,0,7)=='module:') {
 
@@ -2009,7 +2009,7 @@ class SearchController extends Controller
 
 		if (!is_numeric($id) && $id!='*' && $thisModule===false) return null;
 
-		foreach((array)$_SESSION['user']['search']['results'] as $key1 => $val) {
+		foreach((array)$_SESSION['admin']['user']['search']['results'] as $key1 => $val) {
 
 			foreach((array)$val['results'] as $key2 => $module) {
 
@@ -2021,9 +2021,9 @@ class SearchController extends Controller
 
 							if ($match['id']==$id || ($module!==false && $module['label']==$thisModule) || $id=='*') {
 
-								$modelData = $_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace'];
+								$modelData = $_SESSION['admin']['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace'];
 
-								$replaceData = &$_SESSION['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace']['matches'][$key4];
+								$replaceData = &$_SESSION['admin']['user']['search']['results'][$key1]['results'][$key2]['data'][$key3]['replace']['matches'][$key4];
 							
 								if ($type=='skip') {
 
@@ -2095,8 +2095,8 @@ class SearchController extends Controller
 	{
 
 		// viva readability
-		$searchedFor = $_SESSION['user']['search']['search']['search'];
-		$replaceWith = $_SESSION['user']['search']['search']['replacement'];
+		$searchedFor = $_SESSION['admin']['user']['search']['search']['search'];
+		$replaceWith = $_SESSION['admin']['user']['search']['search']['replacement'];
 		$locationOfSearchTerm = $matchData[1];
 
 		// removing enbclosing double quotes

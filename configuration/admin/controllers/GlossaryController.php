@@ -125,7 +125,7 @@ class GlossaryController extends Controller
 
 		$this->setPageName(_('Browsing glossary'));
 		
-        if (!isset($_SESSION['project']['languages'])) {
+        if (!isset($_SESSION['admin']['project']['languages'])) {
 		
 			$this->addError(
 				sprintf(
@@ -134,7 +134,7 @@ class GlossaryController extends Controller
 				);
 		
 		} else
-        if (!isset($_SESSION['project']['default_language_id'])) {
+        if (!isset($_SESSION['admin']['project']['default_language_id'])) {
 
 			$this->addError(
 				sprintf(
@@ -144,11 +144,11 @@ class GlossaryController extends Controller
 
 		} else {
 
-			if (!$this->rHasVal('letter') && isset($_SESSION['system']['glossary']['activeLetter']))
-				$this->requestData['letter'] = $_SESSION['system']['glossary']['activeLetter'];
+			if (!$this->rHasVal('letter') && isset($_SESSION['admin']['system']['glossary']['activeLetter']))
+				$this->requestData['letter'] = $_SESSION['admin']['system']['glossary']['activeLetter'];
 	
-			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['system']['glossary']['activeLanguage']))
-				$this->requestData['activeLanguage'] = $_SESSION['system']['glossary']['activeLanguage'];
+			if (!$this->rHasVal('activeLanguage') && isset($_SESSION['admin']['system']['glossary']['activeLanguage']))
+				$this->requestData['activeLanguage'] = $_SESSION['admin']['system']['glossary']['activeLanguage'];
 	
 			$alpha = $this->getActualAlphabet($this->getActiveLanguage());
 
@@ -156,7 +156,7 @@ class GlossaryController extends Controller
 				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
 
 			if (!$this->rHasVal('activeLanguage'))
-				$this->requestData['activeLanguage'] = $_SESSION['project']['default_language_id'];
+				$this->requestData['activeLanguage'] = $_SESSION['admin']['project']['default_language_id'];
 				
 			if ($this->rHasVal('letter')) {
 	
@@ -177,7 +177,7 @@ class GlossaryController extends Controller
 		
 			$this->smarty->assign('nextStart', $pagination['nextStart']);
 		
-			$this->smarty->assign('languages', $_SESSION['project']['languages']);
+			$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 	
 			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
 	
@@ -223,9 +223,9 @@ class GlossaryController extends Controller
 
 			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
 		
-			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
+			$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($gloss['term'],0,1));
 			
-			$_SESSION['system']['glossary']['activeLanguage'] = $gloss['language_id'];
+			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $gloss['language_id'];
 
     	    $this->setPageName(sprintf(_('Editing glossary term "%s"'),$gloss['term']));
 
@@ -239,9 +239,9 @@ class GlossaryController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
-			$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+			$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
 
-			$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
 
 			$this->deleteGlossaryTerm($this->requestData['id']);
 
@@ -265,7 +265,7 @@ class GlossaryController extends Controller
 
 		} else {
 
-			$activeLanguage = $_SESSION['project']['default_language_id'];
+			$activeLanguage = $_SESSION['admin']['project']['default_language_id'];
 
 		}
 
@@ -331,9 +331,9 @@ class GlossaryController extends Controller
 
 				} else {
 
-					$_SESSION['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
+					$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
 	
-					$_SESSION['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
+					$_SESSION['admin']['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
 	
 					$this->redirect('edit.php?id='.$id);
 
@@ -353,7 +353,7 @@ class GlossaryController extends Controller
 
         if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
 
-        if ($_SESSION['project']['languages']) $this->smarty->assign('languages', $_SESSION['project']['languages']);
+        if ($_SESSION['admin']['project']['languages']) $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
@@ -457,9 +457,9 @@ class GlossaryController extends Controller
                 
                         }
 
-						if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] == '<new>') {
+						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
 		
-							$_SESSION['system']['media']['newRef'] =
+							$_SESSION['admin']['system']['media']['newRef'] =
 								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
 									$firstInsert['name'].
 								'</span>';
@@ -515,11 +515,11 @@ class GlossaryController extends Controller
 		if ($this->rHasVal('search')) {
 
 			if (
-				isset($_SESSION['system']['glossary']['search']) && 
-				$_SESSION['system']['glossary']['search']['search'] == $this->requestData['search']) 
+				isset($_SESSION['admin']['system']['glossary']['search']) && 
+				$_SESSION['admin']['system']['glossary']['search']['search'] == $this->requestData['search']) 
 			{
 			
-				$terms = $_SESSION['system']['glossary']['search']['results'];
+				$terms = $_SESSION['admin']['system']['glossary']['search']['results'];
 			
 			} else {
 
@@ -558,13 +558,13 @@ class GlossaryController extends Controller
 
 				foreach((array)$terms as $key => $val) {
 
-					$terms[$key]['language'] = $_SESSION['project']['languageList'][$val['language_id']]['language'];
+					$terms[$key]['language'] = $_SESSION['admin']['project']['languageList'][$val['language_id']]['language'];
 
 				}
 
-				$_SESSION['system']['glossary']['search']['search'] = $this->requestData['search'];
+				$_SESSION['admin']['system']['glossary']['search']['search'] = $this->requestData['search'];
 	
-				$_SESSION['system']['glossary']['search']['results'] = $terms;
+				$_SESSION['admin']['system']['glossary']['search']['results'] = $terms;
 
 			}
 
@@ -680,7 +680,7 @@ class GlossaryController extends Controller
 	private function getWordList($languageId,$force=false)
 	{
 
-		if ($force || !isset($_SESSION['system']['glossary'][$languageId]['wordlist'])) {
+		if ($force || !isset($_SESSION['admin']['system']['glossary'][$languageId]['wordlist'])) {
 
 			$terms = $this->models->Glossary->_get(
 				array(
@@ -703,11 +703,11 @@ class GlossaryController extends Controller
 			);
 
 
-			$_SESSION['system']['glossary'][$languageId]['wordlist'] = array_merge($terms,$synonyms);
+			$_SESSION['admin']['system']['glossary'][$languageId]['wordlist'] = array_merge($terms,$synonyms);
 
 		}
 
-		return $_SESSION['system']['glossary'][$languageId]['wordlist'];
+		return $_SESSION['admin']['system']['glossary'][$languageId]['wordlist'];
 
 	}
 
@@ -728,13 +728,13 @@ class GlossaryController extends Controller
 			)
 		);
 
-		if (file_exists($_SESSION['project']['paths']['project_media'].$gm[0]['file_name'])) {
+		if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$gm[0]['file_name'])) {
 
-			if (unlink($_SESSION['project']['paths']['project_media'].$gm[0]['file_name'])) {
+			if (unlink($_SESSION['admin']['project']['paths']['project_media'].$gm[0]['file_name'])) {
 			
-				if ($gm[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$gm[0]['thumb_name'])) {
+				if ($gm[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$gm[0]['thumb_name'])) {
 				
-					unlink($_SESSION['project']['paths']['project_thumbs'].$gm[0]['thumb_name']);
+					unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$gm[0]['thumb_name']);
 
 				}
 			}
@@ -788,7 +788,7 @@ class GlossaryController extends Controller
 
 		}
 		
-		$_SESSION['system']['glossary']['alpha'] = $alpha;
+		$_SESSION['admin']['system']['glossary']['alpha'] = $alpha;
 
 		return $alpha;
 	
@@ -977,7 +977,7 @@ class GlossaryController extends Controller
 
 	private function getGlossaryTermsNavList($forceLookup=false) {
 	
-		if (empty($_SESSION['glossary']['navList']) || $forceLookup) {
+		if (empty($_SESSION['admin']['glossary']['navList']) || $forceLookup) {
 		
 			$d = $this->getGlossaryTerms(null);
 			
@@ -990,11 +990,11 @@ class GlossaryController extends Controller
 
 			}
 		
-			$_SESSION['glossary']['navList'] = $res;
+			$_SESSION['admin']['glossary']['navList'] = $res;
 		
 		}
 		
-		return $_SESSION['glossary']['navList'];
+		return $_SESSION['admin']['glossary']['navList'];
 
 	}
 
@@ -1031,9 +1031,9 @@ class GlossaryController extends Controller
 
 			return $this->requestData['activeLanguage'];
 
-		} elseif(isset($_SESSION['project']['default_language_id'])) {
+		} elseif(isset($_SESSION['admin']['project']['default_language_id'])) {
 
-			return $_SESSION['project']['default_language_id'];
+			return $_SESSION['admin']['project']['default_language_id'];
 
 		} else {
 
@@ -1046,10 +1046,10 @@ class GlossaryController extends Controller
 	private function clearTempValues()
 	{
 	
-		unset($_SESSION['system']['glossary']['alpha']);
-		unset($_SESSION['system']['glossary']['search']);
-		unset($_SESSION['system']['glossary']['activeLetter']);
-		unset($_SESSION['system']['glossary']['activeLanguage']);
+		unset($_SESSION['admin']['system']['glossary']['alpha']);
+		unset($_SESSION['admin']['system']['glossary']['search']);
+		unset($_SESSION['admin']['system']['glossary']['activeLetter']);
+		unset($_SESSION['admin']['system']['glossary']['activeLanguage']);
 
 	}
 

@@ -66,7 +66,7 @@ class KeyController extends Controller
         
         $this->setPageName( _('Index'));
 
-		unset($_SESSION['system']['keyPath']);
+		unset($_SESSION['admin']['system']['keyPath']);
        
         $this->printPage();
     
@@ -80,11 +80,11 @@ class KeyController extends Controller
 		if ($this->rHasVal('node')) {
 		// arrived from key map; have to resolve the keypath from the node's place in the keyTree
 
-			if ($_SESSION['system']['keyTree']) {
+			if ($_SESSION['admin']['system']['keyTree']) {
 			// the keyTree is built when the map is called; if no keyTree exists, redirect to the map
 
 				// find the node in the keyTree and build an array of the path leading to it
-				$this->findNodeInTree(array(0 => $_SESSION['system']['keyTree']),$this->requestData['node']);
+				$this->findNodeInTree(array(0 => $_SESSION['admin']['system']['keyTree']),$this->requestData['node']);
 				
 				// loop through the array and add each element to the keyPath
 				foreach((array)$this->_stepList as $key => $val) {
@@ -163,14 +163,14 @@ class KeyController extends Controller
 
 		$this->setPageName(sprintf(_('Show key step %s'),$step['number']));
 
-		if (isset($_SESSION['system']['keyTaxaPerStep'])) {
+		if (isset($_SESSION['admin']['system']['keyTaxaPerStep'])) {
 
-			if (isset($_SESSION['system']['keyTaxaPerStep'][$step['id']])) {
+			if (isset($_SESSION['admin']['system']['keyTaxaPerStep'][$step['id']])) {
 	
-				$this->smarty->assign('remainingTaxa',$_SESSION['system']['keyTaxaPerStep'][$step['id']]);
+				$this->smarty->assign('remainingTaxa',$_SESSION['admin']['system']['keyTaxaPerStep'][$step['id']]);
 	
 			} else
-			if ($_SESSION['system']['keyTaxaPerStep']=='none') {
+			if ($_SESSION['admin']['system']['keyTaxaPerStep']=='none') {
 	
 				$this->smarty->assign('remainingTaxa','none');
 	
@@ -179,11 +179,11 @@ class KeyController extends Controller
 		}
 
 		/*
-		if (isset($_SESSION['system']['insertAfterChoice']))
+		if (isset($_SESSION['admin']['system']['insertAfterChoice']))
 			$this->addMessage(sprintf(
 				_('You are inserting this step between %s and %s.'),
-				$_SESSION['system']['insertAfterChoice']['keystep_number'].$_SESSION['system']['insertAfterChoice']['marker'],
-				$_SESSION['system']['insertAfterChoice']['target'])
+				$_SESSION['admin']['system']['insertAfterChoice']['keystep_number'].$_SESSION['admin']['system']['insertAfterChoice']['marker'],
+				$_SESSION['admin']['system']['insertAfterChoice']['target'])
 			);
 		*/
 
@@ -324,9 +324,9 @@ class KeyController extends Controller
 
 		if (isset($step)) $this->smarty->assign('step',$step);
 
-   		$this->smarty->assign('languages',$_SESSION['project']['languages']);
+   		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
-   		$this->smarty->assign('defaultLanguage',$_SESSION['project']['languageList'][$_SESSION['project']['default_language_id']]);
+   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$_SESSION['admin']['project']['default_language_id']]);
 
    		$this->smarty->assign('keyPath',$this->getKeyPath());
 
@@ -380,7 +380,7 @@ class KeyController extends Controller
 		// delete the entire choice, incl image (if any)
 		
 			if (!empty($choice['choice_img']))
-				@unlink($_SESSION['project']['paths']['project_media'].$choice['choice_img']);
+				@unlink($_SESSION['admin']['project']['paths']['project_media'].$choice['choice_img']);
 
 			$this->models->ChoiceContentKeystep->delete(
 				array(
@@ -403,7 +403,7 @@ class KeyController extends Controller
 				)
 			);
 
-			unset($_SESSION['system']['remainingTaxa']);
+			unset($_SESSION['admin']['system']['remainingTaxa']);
 
 			$this->redirect('step_show.php?id='.$choice['keystep_id']);
 		
@@ -411,7 +411,7 @@ class KeyController extends Controller
 		// delete just the image
 
 			if (!empty($choice['choice_img']))
-				@unlink($_SESSION['project']['paths']['project_media'].$choice['choice_img']);
+				@unlink($_SESSION['admin']['project']['paths']['project_media'].$choice['choice_img']);
 
 			$this->models->ChoiceKeystep->save(
 				array(
@@ -452,9 +452,9 @@ class KeyController extends Controller
 
 				if ($this->requestData['res_taxon_id']!=='0') {
 
-					unset($_SESSION['system']['remainingTaxa']);
+					unset($_SESSION['admin']['system']['remainingTaxa']);
 
-					unset($_SESSION['system']['keyTaxaPerStep']);
+					unset($_SESSION['admin']['system']['keyTaxaPerStep']);
 
 				}
 				
@@ -490,7 +490,7 @@ class KeyController extends Controller
 	
 					} else {
 	
-						@unlink($_SESSION['project']['paths']['project_media'].$filesToSave[0]['name']);
+						@unlink($_SESSION['admin']['project']['paths']['project_media'].$filesToSave[0]['name']);
 	
 						$this->addError(_('Could not save image.'));
 	
@@ -510,9 +510,9 @@ class KeyController extends Controller
 
 		if (isset($choice)) $this->smarty->assign('data',$choice);
 
-   		$this->smarty->assign('languages',$_SESSION['project']['languages']);
+   		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
-   		$this->smarty->assign('defaultLanguage',$_SESSION['project']['languageList'][$_SESSION['project']['default_language_id']]);
+   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$_SESSION['admin']['project']['default_language_id']]);
 
 		$this->smarty->assign('steps',$this->getKeysteps(array('idToExclude'=>$choice['keystep_id'])));
 
@@ -567,7 +567,7 @@ class KeyController extends Controller
 			// if not, they are the start of a section
 			if ($ck[0]['total']==0) {
 
-				$ksc = $this->getKeystepContent($_SESSION['project']['default_language_id'],$val['id']);
+				$ksc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
 			
 				$val['title'] = $ksc['title'];
 
@@ -591,7 +591,7 @@ class KeyController extends Controller
         
         $this->setPageName( _('Key map'));
 
-		$key = $_SESSION['system']['keyTree'] = $this->getKeyTree();
+		$key = $_SESSION['admin']['system']['keyTree'] = $this->getKeyTree();
 
 		$this->smarty->assign('json',json_encode($key));
 
@@ -719,7 +719,7 @@ class KeyController extends Controller
 
 			$d = $this->getTaxonDivision();
 
-			$_SESSION['system']['keyTaxaPerStep'] = $d['list'] ? $d['list'] : 'none';
+			$_SESSION['admin']['system']['keyTaxaPerStep'] = $d['list'] ? $d['list'] : 'none';
 
 			$this->smarty->assign('processed',true);
 
@@ -727,7 +727,7 @@ class KeyController extends Controller
 
 			$this->smarty->assign('stepCount',count((array)$d['list']));
 
-		} elseif (isset($_SESSION['system']['keyTaxaPerStep'])) {
+		} elseif (isset($_SESSION['admin']['system']['keyTaxaPerStep'])) {
 
 			$this->addMessage(_('Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it.'));
 
@@ -858,9 +858,9 @@ class KeyController extends Controller
 		$is_start = isset($params['is_start']) ? $params['is_start'] : null;
 		$choice = isset($params['choice']) ? $params['choice'] : null;
 					
-		if (isset($_SESSION['system']['keyPath'])) {
+		if (isset($_SESSION['admin']['system']['keyPath'])) {
 
-			foreach((array)$_SESSION['system']['keyPath'] as $key => $val) {
+			foreach((array)$_SESSION['admin']['system']['keyPath'] as $key => $val) {
 
 				if ($val['id']==$id) break;
 
@@ -889,14 +889,14 @@ class KeyController extends Controller
 
 		}
 
-		$_SESSION['system']['keyPath'] = $d;
+		$_SESSION['admin']['system']['keyPath'] = $d;
 
 	}
 	
 	private function getKeyPath()
 	{
 
-		return isset($_SESSION['system']['keyPath']) ? $_SESSION['system']['keyPath'] : false;
+		return isset($_SESSION['admin']['system']['keyPath']) ? $_SESSION['admin']['system']['keyPath'] : false;
 
 	}
 
@@ -1088,7 +1088,7 @@ class KeyController extends Controller
 		
 		foreach((array)$k as $key => $val) {
 
-			$kc = $this->getKeystepContent($_SESSION['project']['default_language_id'],$val['id']);
+			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
 		
 			$k[$key]['title'] = $kc['title'];
 
@@ -1124,7 +1124,7 @@ class KeyController extends Controller
 
 			$step = $k[0];
 
-			$kc = $this->getKeystepContent($_SESSION['project']['default_language_id'],$step['id']);
+			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$step['id']);
 
 			$step['title'] = $kc['title'];
 
@@ -1152,7 +1152,7 @@ class KeyController extends Controller
 		
 		if ($k) {
 
-			$kc = $this->getKeystepContent($_SESSION['project']['default_language_id'],$k[0]['id']);
+			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$k[0]['id']);
 		
 			$k[0]['title'] = $kc['title'];
 
@@ -1400,7 +1400,7 @@ class KeyController extends Controller
 		
 		foreach((array)$choices as $key => $val) {
 		
-			$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$val['id']);
+			$kcc = $this->getKeystepChoiceContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
 			
 			if (isset($kcc['title'])) $choices[$key]['title'] = $kcc['title'];
 			
@@ -1460,7 +1460,7 @@ class KeyController extends Controller
 
 		$choice['keystep_number'] = $k['number'];
 
-		$kcc = $this->getKeystepChoiceContent($_SESSION['project']['default_language_id'],$choice['id']);
+		$kcc = $this->getKeystepChoiceContent($_SESSION['admin']['project']['default_language_id'],$choice['id']);
 		
 		if (isset($kcc['choice_txt'])) $choice['choice_txt'] = $kcc['choice_txt'];
 

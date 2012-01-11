@@ -113,7 +113,7 @@ class MapKeyController extends Controller
 
         $this->checkAuthorisation();
 
-		unset($_SESSION['system']['mapCentre']);
+		unset($_SESSION['admin']['system']['mapCentre']);
 
 		if (!$this->rHasId()) $this->redirect('species.php');
 
@@ -215,23 +215,23 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign('occurrences',$occurrences['occurrences']);
 
-		if ($this->rHasVal('mapCentre') || isset($_SESSION['system']['mapCentre'])) {
+		if ($this->rHasVal('mapCentre') || isset($_SESSION['admin']['system']['mapCentre'])) {
 
 			$middle = (
 				$this->rHasVal('mapCentre') ?
 					explode(',',trim($this->requestData['mapCentre'],'()')) :
-					explode(',',trim($_SESSION['system']['mapCentre'],'()'))
+					explode(',',trim($_SESSION['admin']['system']['mapCentre'],'()'))
 			);
 
 			$zoom = 
 				$this->rHasVal('mapZoom') ? 
 					$this->requestData['mapZoom'] : 
-					(isset($_SESSION['system']['mapZoom']) ? $_SESSION['system']['mapZoom'] : 7);
+					(isset($_SESSION['admin']['system']['mapZoom']) ? $_SESSION['admin']['system']['mapZoom'] : 7);
 
 			$this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:'.$zoom.',editable:true}');
 
-			if ($this->rHasVal('mapCentre')) $_SESSION['system']['mapCentre'] = $this->requestData['mapCentre'];
-			if ($this->rHasVal('mapZoom')) $_SESSION['system']['mapZoom'] = $this->requestData['mapZoom'];
+			if ($this->rHasVal('mapCentre')) $_SESSION['admin']['system']['mapCentre'] = $this->requestData['mapCentre'];
+			if ($this->rHasVal('mapZoom')) $_SESSION['admin']['system']['mapZoom'] = $this->requestData['mapZoom'];
 
 		} else {
 
@@ -303,9 +303,9 @@ class MapKeyController extends Controller
 		
 		$this->setPageName( _('Data types'));
 
-		$lp = $_SESSION['project']['languages'];
+		$lp = $_SESSION['admin']['project']['languages'];
 		
-		$defaultLanguage = $_SESSION['project']['default_language_id'];
+		$defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
 		
         if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
 		// deleting a type
@@ -750,7 +750,7 @@ class MapKeyController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $_SESSION['project']['default_language_id'],
+						'language_id' => $_SESSION['admin']['project']['default_language_id'],
 						'type_id' => $val['id']
 					)
 				)
