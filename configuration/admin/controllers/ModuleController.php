@@ -43,8 +43,8 @@ class ModuleController extends Controller
         
         parent::__construct();
 
-		if (isset($_SESSION['user']['freeModules']['activeModule']))
-	    	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
+		if (isset($_SESSION['admin']['user']['freeModules']['activeModule']))
+	    	$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
 
     }
 
@@ -70,7 +70,7 @@ class ModuleController extends Controller
 
 		} else {
 
-			if (!$_SESSION['user']['freeModules']['activeModule'])
+			if (!$_SESSION['admin']['user']['freeModules']['activeModule'])
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 
 		}
@@ -88,11 +88,11 @@ class ModuleController extends Controller
 
         $this->checkAuthorisation();
 		
-		if (!isset($_SESSION['user']['freeModules']['activeModule'])) {
+		if (!isset($_SESSION['admin']['user']['freeModules']['activeModule'])) {
 
-			$_SESSION['user']['freeModules']['activeModule'] = $this->getFreeModule();
+			$_SESSION['admin']['user']['freeModules']['activeModule'] = $this->getFreeModule();
 			
-			$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
+			$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
 
 		}
 
@@ -104,9 +104,9 @@ class ModuleController extends Controller
 			$this->redirect('edit.php?id='.$this->requestData['page']);
 
 /*
-    	$this->controllerPublicName = $_SESSION['user']['freeModules']['activeModule']['module'];
+    	$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
 
-		$this->smarty->assign('module',$_SESSION['user']['freeModules']['activeModule']);
+		$this->smarty->assign('module',$_SESSION['admin']['user']['freeModules']['activeModule']);
 
         $this->printPage();
 */
@@ -181,9 +181,9 @@ class ModuleController extends Controller
 
 		if (isset($page)) $this->smarty->assign('page', $page);
 
-		$this->smarty->assign('languages', $_SESSION['project']['languages']);
+		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -195,7 +195,7 @@ class ModuleController extends Controller
     public function previewAction()
     {
 
-		$page = $this->getPageContent($this->requestData['id'],$_SESSION['project']['default_language_id']);
+		$page = $this->getPageContent($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
 		$module = $this->getFreeModule();
 
 		$navList = $this->getModulePageNavList();
@@ -228,7 +228,7 @@ class ModuleController extends Controller
 
 		if ($this->rHasVal('letter')) {
 
-			$refs = $_SESSION['system']['freeModule']['alphaIndex'][$this->requestData['letter']];
+			$refs = $_SESSION['admin']['system']['freeModule']['alphaIndex'][$this->requestData['letter']];
 
 		}
 
@@ -411,7 +411,7 @@ class ModuleController extends Controller
 
             }
 			
-			unset($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']);
+			unset($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']);
 
             $this->smarty->assign('returnText', 'saved');
         
@@ -465,8 +465,8 @@ class ModuleController extends Controller
 	private function getCurrentModuleId()
 	{
 
-		return isset($_SESSION['user']['freeModules']['activeModule']['id']) ?
-				$_SESSION['user']['freeModules']['activeModule']['id'] :
+		return isset($_SESSION['admin']['user']['freeModules']['activeModule']['id']) ?
+				$_SESSION['admin']['user']['freeModules']['activeModule']['id'] :
 				false;
 
 	}
@@ -581,7 +581,7 @@ class ModuleController extends Controller
 		
 		foreach((array)$fmp as $key => $val) {
 
-			$d = $this->getPageContent($val['id'],$_SESSION['project']['default_language_id']);
+			$d = $this->getPageContent($val['id'],$_SESSION['admin']['project']['default_language_id']);
 
 			$fmp[$key]['topic'] = $d['topic'];
 
@@ -648,7 +648,7 @@ class ModuleController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['project']['default_language_id']
+					'language_id' => $_SESSION['admin']['project']['default_language_id']
 					),
 				'order' => 'topic',
 				'columns' => 'page_id',
@@ -678,14 +678,14 @@ class ModuleController extends Controller
 	private function getActualAlphabet()
 	{
 
-		unset($_SESSION['system']['freeModule']['alphaIndex']);
+		unset($_SESSION['admin']['system']['freeModule']['alphaIndex']);
 
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['project']['default_language_id'], 
+					'language_id' => $_SESSION['admin']['project']['default_language_id'], 
 				),
 				'columns' => 'page_id, topic, lower(substr(topic,1,1)) as letter',
 				'order' => 'letter'
@@ -698,7 +698,7 @@ class ModuleController extends Controller
 
 			$alpha[$val['letter']] = $val['letter'];
 
-			$_SESSION['system']['freeModule']['alphaIndex'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
+			$_SESSION['admin']['system']['freeModule']['alphaIndex'][$val['letter']][] = array('id' => $val['page_id'],'topic' => $val['topic']);
 
 		}
 
@@ -722,13 +722,13 @@ class ModuleController extends Controller
 			)
 		);
 			
-		if (file_exists($_SESSION['project']['paths']['project_media'].$fmm[0]['file_name'])) {
+		if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 
-			if (unlink($_SESSION['project']['paths']['project_media'].$fmm[0]['file_name'])) {
+			if (unlink($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 			
-				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
+				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
 				
-					unlink($_SESSION['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
+					unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
 
 				}
 			}
@@ -774,7 +774,7 @@ class ModuleController extends Controller
 	private function getModulePageNavList($forceLookup=true)
 	{
 	
-		if (empty($_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
+		if (empty($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']) || $forceLookup) {
 		
 			$d = $this->getPages();
 
@@ -793,11 +793,11 @@ class ModuleController extends Controller
 
 			}
 
-			if (isset($res)) $_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = $res;
+			if (isset($res)) $_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = $res;
 		
 		}
 		
-		return $_SESSION['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
+		return $_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'];
 
 	}
 

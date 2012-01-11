@@ -382,7 +382,7 @@ class Controller extends BaseClass
     public function getCurrentUserId ()
     {
         
-        return isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : null;
+        return isset($_SESSION['admin']['user']['id']) ? $_SESSION['admin']['user']['id'] : null;
     
     }
 
@@ -397,7 +397,7 @@ class Controller extends BaseClass
     public function getCurrentUserProjects ()
     {
         
-        foreach ((array)$_SESSION['user']['_roles'] as $key => $val) {
+        foreach ((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
             
             $r = array(
                 'id' => $val['project_id'], 
@@ -427,7 +427,7 @@ class Controller extends BaseClass
     public function setCurrentProjectId ($id)
     {
         
-        $_SESSION['project']['id'] = $id;
+        $_SESSION['admin']['project']['id'] = $id;
 		
         $this->models->ProjectRoleUser->update(
 			array(
@@ -453,7 +453,7 @@ class Controller extends BaseClass
     public function getCurrentProjectId ()
     {
         
-        return isset($_SESSION['project']['id']) ? $_SESSION['project']['id'] : null;
+        return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : null;
     
     }
 
@@ -495,7 +495,7 @@ class Controller extends BaseClass
 
 				}
 				
-				$_SESSION['project']['lead_experts'] = $pru;
+				$_SESSION['admin']['project']['lead_experts'] = $pru;
 
 			}
 
@@ -503,7 +503,7 @@ class Controller extends BaseClass
 
 		foreach((array)$data as $key => $val) {
 
-	        $_SESSION['project'][$key] = $val;
+	        $_SESSION['admin']['project'][$key] = $val;
 
 		}
 
@@ -517,7 +517,7 @@ class Controller extends BaseClass
     public function getCurrentProjectData ()
     {
 
-		return isset($_SESSION['project']) ? $_SESSION['project'] : null;
+		return isset($_SESSION['admin']['project']) ? $_SESSION['admin']['project'] : null;
 
     }
 
@@ -533,8 +533,8 @@ class Controller extends BaseClass
     public function setDefaultProject ()
     {
         
-        //$d = (array) $_SESSION['user']['_roles'];
-		foreach((array) $_SESSION['user']['_roles'] as $key => $val){
+        //$d = (array) $_SESSION['admin']['user']['_roles'];
+		foreach((array) $_SESSION['admin']['user']['_roles'] as $key => $val){
 
 			if ($val['active']=='1') $d[] = $val;
 
@@ -589,13 +589,13 @@ class Controller extends BaseClass
     public function getLoginStartPage($includeDomain=false)
     {
 
-        if (!empty($_SESSION['login_start_page'])) {
+        if (!empty($_SESSION['admin']['login_start_page'])) {
             
-            return ($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').$_SESSION['login_start_page'];
+            return ($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').$_SESSION['admin']['login_start_page'];
         
         } else {
 
-            if (isset($_SESSION["user"]) && $_SESSION["user"]["_number_of_projects"]==1) {
+            if (isset($_SESSION['admin']["user"]) && $_SESSION['admin']["user"]["_number_of_projects"]==1) {
 
                 return
 					($includeDomain ? 'http://'.$_SERVER['HTTP_HOST'].'/' : '').
@@ -692,7 +692,7 @@ class Controller extends BaseClass
 	public function setUserSessionRights($rights)
 	{
 
-        $_SESSION['user']['_rights'] = $rights;
+        $_SESSION['admin']['user']['_rights'] = $rights;
 	
 	}
 
@@ -705,7 +705,7 @@ class Controller extends BaseClass
 	public function setUserSessionRoles($roles)
 	{
 
-        $_SESSION['user']['_roles'] = $roles;
+        $_SESSION['admin']['user']['_roles'] = $roles;
 	
 	}
 
@@ -718,7 +718,7 @@ class Controller extends BaseClass
 	public function setUserSessionNumberOfProjects($numberOfProjects)
 	{
 
-        $_SESSION['user']['_number_of_projects'] = $numberOfProjects;
+        $_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
 	
 	}
 
@@ -732,7 +732,7 @@ class Controller extends BaseClass
     public function isUserLoggedIn ()
     {
         
-        return (!empty($_SESSION['user']));
+        return (!empty($_SESSION['admin']['user']));
     
     }
 
@@ -831,12 +831,12 @@ class Controller extends BaseClass
     public function getCurrentUserCurrentRole ($forceLookup=false)
     {
 
-		if (isset($_SESSION['user']['currentRole']) && !$forceLookup) return $_SESSION['user']['currentRole'];
+		if (isset($_SESSION['admin']['user']['currentRole']) && !$forceLookup) return $_SESSION['admin']['user']['currentRole'];
 
 		$d = $this->getCurrentProjectId();
 		$r = false;
         
-		foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+		foreach((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
 
 			if ($val['project_id']==$d) {
 			
@@ -848,7 +848,7 @@ class Controller extends BaseClass
 
 		}
 		
-		$_SESSION['user']['currentRole'] = $r;
+		$_SESSION['admin']['user']['currentRole'] = $r;
 
         return $r;
 
@@ -865,9 +865,9 @@ class Controller extends BaseClass
     public function isSysAdmin()
     {
 
-		if (!isset($_SESSION['user'])) return false;
+		if (!isset($_SESSION['admin']['user'])) return false;
 
-		foreach((array)$_SESSION['user']['_roles'] as $key => $val) {
+		foreach((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
 
 			if ($val['project_id']==0 && $val['role_id']==ID_ROLE_SYS_ADMIN) return true;
 
@@ -945,7 +945,7 @@ class Controller extends BaseClass
         
         if ($this->getModuleActivationStatus() == -1) {
             
-            $_SESSION['system']['last_module_name'] = $this->controllerPublicName;
+            $_SESSION['admin']['system']['last_module_name'] = $this->controllerPublicName;
             
             $this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['moduleNotPresent']);
         
@@ -964,7 +964,7 @@ class Controller extends BaseClass
     public function getDefaultImageUploadDir ()
     {
         
-        return isset($_SESSION['project']['paths']['uploads_media']) ? $_SESSION['project']['paths']['uploads_media'] : null;
+        return isset($_SESSION['admin']['project']['paths']['uploads_media']) ? $_SESSION['admin']['project']['paths']['uploads_media'] : null;
     
     }
 
@@ -979,7 +979,7 @@ class Controller extends BaseClass
     public function getProjectsMediaStorageDir ()
     {
         
-        return isset($_SESSION['project']['paths']['project_media']) ? $_SESSION['project']['paths']['project_media'] : null;
+        return isset($_SESSION['admin']['project']['paths']['project_media']) ? $_SESSION['admin']['project']['paths']['project_media'] : null;
     
     }
 
@@ -993,7 +993,7 @@ class Controller extends BaseClass
     public function getProjectsThumbsStorageDir ()
     {
         
-        return isset($_SESSION['project']['paths']['project_thumbs']) ? $_SESSION['project']['paths']['project_thumbs'] : null;
+        return isset($_SESSION['admin']['project']['paths']['project_thumbs']) ? $_SESSION['admin']['project']['paths']['project_thumbs'] : null;
     
     }
 
@@ -1058,8 +1058,8 @@ class Controller extends BaseClass
 
         if (
 			isset($this->requestData['rnd']) && 
-			isset($_SESSION['system']['last_rnd']) && 
-			($_SESSION['system']['last_rnd'] == $this->requestData['rnd'])
+			isset($_SESSION['admin']['system']['last_rnd']) && 
+			($_SESSION['admin']['system']['last_rnd'] == $this->requestData['rnd'])
 		)
             $result = true;
 
@@ -1108,7 +1108,7 @@ class Controller extends BaseClass
 
 		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
 
-		if (isset($_SESSION['user']['currentLanguage']) && $language == $_SESSION['user']['currentLanguage']) return;
+		if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage']) return;
 
 		$l = $this->models->Language->_get(array('id' => array('language'=> $language)));
 
@@ -1142,7 +1142,7 @@ class Controller extends BaseClass
 
 		textdomain($this->getAppName());
 
-		$_SESSION['user']['currentLanguage'] = $language;
+		$_SESSION['admin']['user']['currentLanguage'] = $language;
 
 	}    
 
@@ -1321,27 +1321,27 @@ class Controller extends BaseClass
 
 		if (
 			!$forceLookup && 
-			isset($_SESSION['system']['taxonTree']) && 
-			isset($_SESSION['system']['treeList']) && 
+			isset($_SESSION['admin']['system']['taxonTree']) && 
+			isset($_SESSION['admin']['system']['treeList']) && 
 			(
-				(isset($_SESSION['system']['treeParams']) && $_SESSION['system']['treeParams']==$params) ||
+				(isset($_SESSION['admin']['system']['treeParams']) && $_SESSION['admin']['system']['treeParams']==$params) ||
 				$params==null
 			)
 			) {
 
-			$this->treeList = $_SESSION['system']['treeList'];
+			$this->treeList = $_SESSION['admin']['system']['treeList'];
 
-			return $_SESSION['system']['taxonTree'];
+			return $_SESSION['admin']['system']['taxonTree'];
 
 		} else {
 
-			$_SESSION['system']['taxonTree'] = $this->_getTaxonTree($params);
+			$_SESSION['admin']['system']['taxonTree'] = $this->_getTaxonTree($params);
 
-			if (isset($this->treeList)) $_SESSION['system']['treeList'] = $this->treeList;
+			if (isset($this->treeList)) $_SESSION['admin']['system']['treeList'] = $this->treeList;
 
-			if (isset($params)) $_SESSION['system']['treeParams'] = $params;
+			if (isset($params)) $_SESSION['admin']['system']['treeParams'] = $params;
 
-			return $_SESSION['system']['taxonTree'];
+			return $_SESSION['admin']['system']['taxonTree'];
 		
 		}
 	
@@ -1571,12 +1571,12 @@ class Controller extends BaseClass
 	public function unsetProjectSessionData()
 	{
 
-		unset($_SESSION['system']);
-		unset($_SESSION['project']);
-		unset($_SESSION['glossary']);
-		unset($_SESSION['literature']);
-		unset($_SESSION['species']);
-		unset($_SESSION['matrixkey']);	
+		unset($_SESSION['admin']['system']);
+		unset($_SESSION['admin']['project']);
+		unset($_SESSION['admin']['glossary']);
+		unset($_SESSION['admin']['literature']);
+		unset($_SESSION['admin']['species']);
+		unset($_SESSION['admin']['matrixkey']);	
 	
 	}
 
@@ -1585,7 +1585,7 @@ class Controller extends BaseClass
 
 		if (!isset($this->models->{$table})) return true;
 
-		if (isset($_SESSION['system']['cacheControl'][$table])) {
+		if (isset($_SESSION['admin']['system']['cacheControl'][$table])) {
 
 			$t = $this->models->{$table}->_get(
 				array(
@@ -1593,15 +1593,15 @@ class Controller extends BaseClass
 						'project_id' => $this->getCurrentProjectId()
 					),
 					'columns' => 
-						'max(last_change) > "'.mysql_real_escape_string($_SESSION['system']['cacheControl'][$table]['timestamp']).'" as changed,
+						'max(last_change) > "'.mysql_real_escape_string($_SESSION['admin']['system']['cacheControl'][$table]['timestamp']).'" as changed,
 						count(*) as total,
 						current_timestamp'
 				)
 			);
 			
-			$result = ($t[0]['changed']==1 || $_SESSION['system']['cacheControl'][$table]['count']!=$t[0]['total']);
+			$result = ($t[0]['changed']==1 || $_SESSION['admin']['system']['cacheControl'][$table]['count']!=$t[0]['total']);
 
-			$_SESSION['system']['cacheControl'][$table] = array(
+			$_SESSION['admin']['system']['cacheControl'][$table] = array(
 				'timestamp' => $t[0]['current_timestamp'],
 				'count' => $t[0]['total']
 			);
@@ -1619,7 +1619,7 @@ class Controller extends BaseClass
 				)
 			);
 			
-			$_SESSION['system']['cacheControl'][$table] = array(
+			$_SESSION['admin']['system']['cacheControl'][$table] = array(
 				'timestamp' => $t[0]['current_timestamp'],
 				'count' => $t[0]['total']
 			);
@@ -1674,9 +1674,9 @@ class Controller extends BaseClass
 	public function newGetProjectRanks()
 	{
 
-		if ($this->hasTableDataChanged('ProjectRank')==true || !isset($_SESSION['user']['species']['projectRank'])) {
+		if ($this->hasTableDataChanged('ProjectRank')==true || !isset($_SESSION['admin']['user']['species']['projectRank'])) {
 
-			$_SESSION['user']['species']['projectRank'] =
+			$_SESSION['admin']['user']['species']['projectRank'] =
 				$this->models->ProjectRank->_get(
 					array(
 						'id' => array(
@@ -1688,7 +1688,7 @@ class Controller extends BaseClass
 
 		}
 		
-		return $_SESSION['user']['species']['projectRank'];
+		return $_SESSION['admin']['user']['species']['projectRank'];
 	
 	}
 	
@@ -1696,26 +1696,26 @@ class Controller extends BaseClass
 	{
 
 		if (
-			!isset($_SESSION['user']['species']['tree']) || 
-			!isset($_SESSION['user']['species']['treeList']) ||
+			!isset($_SESSION['admin']['user']['species']['tree']) || 
+			!isset($_SESSION['admin']['user']['species']['treeList']) ||
 			isset($p['forceLookup']) && $p['forceLookup']===true) {
 
-			$_SESSION['user']['species']['tree'] = $this->_newGetTaxonTree();
-			$_SESSION['user']['species']['treeList'] = $this->treeList;
+			$_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
+			$_SESSION['admin']['user']['species']['treeList'] = $this->treeList;
 
 		} else
 		if ($this->hasTableDataChanged('Taxon')) {
 
-			$_SESSION['user']['species']['tree'] = $this->_newGetTaxonTree();
-			$_SESSION['user']['species']['treeList'] = $this->treeList;
+			$_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
+			$_SESSION['admin']['user']['species']['treeList'] = $this->treeList;
 
 		} else {
 
-			$this->treeList = $_SESSION['user']['species']['treeList'];
+			$this->treeList = $_SESSION['admin']['user']['species']['treeList'];
 		
 		}
 			
-		return $_SESSION['user']['species']['tree'];
+		return $_SESSION['admin']['user']['species']['tree'];
 
 	}
 
@@ -1769,9 +1769,9 @@ class Controller extends BaseClass
 	public function newGetUserTaxa()
 	{
 
-		if ($this->hasTableDataChanged('UserTaxon') || !isset($_SESSION['user']['species']['userTaxa'])) {
+		if ($this->hasTableDataChanged('UserTaxon') || !isset($_SESSION['admin']['user']['species']['userTaxa'])) {
 
-			$_SESSION['user']['species']['userTaxa'] = $this->models->UserTaxon->_get(
+			$_SESSION['admin']['user']['species']['userTaxa'] = $this->models->UserTaxon->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -1784,7 +1784,7 @@ class Controller extends BaseClass
 
 		}
 
-		return $_SESSION['user']['species']['userTaxa'];
+		return $_SESSION['admin']['user']['species']['userTaxa'];
 
 	}
 
@@ -2033,26 +2033,26 @@ class Controller extends BaseClass
 		if (!$forceLookup) {
 
 			if (
-				!isset($_SESSION['project']['ranks']['includeLanguageLabels']) || 
-				$_SESSION['project']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
-				!isset($_SESSION['project']['ranks']['lowerTaxonOnly']) || 
-				$_SESSION['project']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
-				!isset($_SESSION['project']['ranks']['keypathEndpoint']) || 
-				$_SESSION['project']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
-				!isset($_SESSION['project']['ranks']['idsAsIndex']) || 
-				$_SESSION['project']['ranks']['idsAsIndex']!=$idsAsIndex
+				!isset($_SESSION['admin']['project']['ranks']['includeLanguageLabels']) || 
+				$_SESSION['admin']['project']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
+				!isset($_SESSION['admin']['project']['ranks']['lowerTaxonOnly']) || 
+				$_SESSION['admin']['project']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
+				!isset($_SESSION['admin']['project']['ranks']['keypathEndpoint']) || 
+				$_SESSION['admin']['project']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
+				!isset($_SESSION['admin']['project']['ranks']['idsAsIndex']) || 
+				$_SESSION['admin']['project']['ranks']['idsAsIndex']!=$idsAsIndex
 				)
 
 				$forceLookup = true;
 
 		}
 
-		$_SESSION['project']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
-		$_SESSION['project']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
-		$_SESSION['project']['ranks']['keypathEndpoint'] = $keypathEndpoint;
-		$_SESSION['project']['ranks']['idsAsIndex'] = $idsAsIndex;
+		$_SESSION['admin']['project']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
+		$_SESSION['admin']['project']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
+		$_SESSION['admin']['project']['ranks']['keypathEndpoint'] = $keypathEndpoint;
+		$_SESSION['admin']['project']['ranks']['idsAsIndex'] = $idsAsIndex;
 
-		if (!isset($_SESSION['project']['ranks']['projectRanks']) || $forceLookup) {
+		if (!isset($_SESSION['admin']['project']['ranks']['projectRanks']) || $forceLookup) {
 
 			if ($keypathEndpoint)
 				$d = array('project_id' => $this->getCurrentProjectId(),'keypath_endpoint' => 1);
@@ -2081,7 +2081,7 @@ class Controller extends BaseClass
 				
 				if ($includeLanguageLabels) {
 	
-					foreach((array)$_SESSION['project']['languages'] as $langaugekey => $language) {
+					foreach((array)$_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
 		
 						$lpr = $this->models->LabelProjectRank->_get(
 							array(
@@ -2102,11 +2102,11 @@ class Controller extends BaseClass
 	
 			}
 			
-			$_SESSION['project']['ranks']['projectRanks'] = $pr;
+			$_SESSION['admin']['project']['ranks']['projectRanks'] = $pr;
 			
 		}
 
-		return $_SESSION['project']['ranks']['projectRanks'];
+		return $_SESSION['admin']['project']['ranks']['projectRanks'];
 
 	}
 
@@ -2120,15 +2120,15 @@ class Controller extends BaseClass
 		);
 		*/
 		
-//		unset($_SESSION['project']['system']['languages']);
+//		unset($_SESSION['admin']['project']['system']['languages']);
 		
-		if (!isset($_SESSION['project']['system']['languages'])) {
+		if (!isset($_SESSION['admin']['project']['system']['languages'])) {
 
-			$_SESSION['project']['system']['languages'] = $this->models->Language->_get(array('id' => '*','fieldAsIndex'=>'id'));
+			$_SESSION['admin']['project']['system']['languages'] = $this->models->Language->_get(array('id' => '*','fieldAsIndex'=>'id'));
 
 		}
 
-		return $_SESSION['project']['system']['languages'];
+		return $_SESSION['admin']['project']['system']['languages'];
 
     }
 
@@ -2157,11 +2157,11 @@ class Controller extends BaseClass
 			$list[$val['language_id']]= array('language'=>$l['language'],'direction'=>$l['direction']);
         }
         
-        $_SESSION['project']['languages'] = $lp;
+        $_SESSION['admin']['project']['languages'] = $lp;
 
-        if (isset($defaultLanguage)) $_SESSION['project']['default_language_id'] = $defaultLanguage;
+        if (isset($defaultLanguage)) $_SESSION['admin']['project']['default_language_id'] = $defaultLanguage;
 
-        if (isset($list)) $_SESSION['project']['languageList'] = $list;
+        if (isset($list)) $_SESSION['admin']['project']['languageList'] = $list;
 		
     }
 
@@ -2208,7 +2208,7 @@ class Controller extends BaseClass
 	public function maskAsHigherTaxa()
 	{
 
-		if (isset($_SESSION['system']['highertaxa']) && $_SESSION['system']['highertaxa']===true) {
+		if (isset($_SESSION['admin']['system']['highertaxa']) && $_SESSION['admin']['system']['highertaxa']===true) {
 		// "abusing" this controller for the higher taxa
 
 			$this->setControllerMask('highertaxa','Higher taxa');
@@ -2255,7 +2255,7 @@ class Controller extends BaseClass
         $this->setBreadcrumbs();
 
         $this->smarty->assign('debugMode', $this->debugMode);
-        $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('session', $_SESSION['admin']);
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
@@ -2282,17 +2282,17 @@ class Controller extends BaseClass
 			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl')
 		);
 
-		if (isset($_SESSION['user']) && !$_SESSION['user']['_said_welcome']) {
+		if (isset($_SESSION['admin']['user']) && !$_SESSION['admin']['user']['_said_welcome']) {
 		
 			$msg =
 				sprintf(
-					($_SESSION['user']['logins'] <=1 ? _('Welcome, %s.') : _('Welcome back, %s.')),
-					$_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name']
+					($_SESSION['admin']['user']['logins'] <=1 ? _('Welcome, %s.') : _('Welcome back, %s.')),
+					$_SESSION['admin']['user']['first_name'].' '.$_SESSION['admin']['user']['last_name']
 				);
 
 	        $this->smarty->assign('welcomeMessage', $msg);
 			
-			$_SESSION['user']['_said_welcome'] = true;
+			$_SESSION['admin']['user']['_said_welcome'] = true;
 
 		}
 
@@ -2302,8 +2302,8 @@ class Controller extends BaseClass
 	private function getCurrentUiLanguage()
 	{
 
-		return (isset($_SESSION['user']['currentLanguage']) ? 
-			$_SESSION['user']['currentLanguage'] : 
+		return (isset($_SESSION['admin']['user']['currentLanguage']) ? 
+			$_SESSION['admin']['user']['currentLanguage'] : 
 			$this->uiLanguages[$this->uiDefaultLanguage]
 		);
 
@@ -2339,12 +2339,11 @@ class Controller extends BaseClass
     private function startSession ()
     {
 	
-		session_name('lng-administration');
-
+		//session_name('lng-administration');
 		session_start();
 
         /* DEBUG */        
-        $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        $_SESSION['admin']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
 
     }
 
@@ -2743,21 +2742,21 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            //$_SESSION['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
+            //$_SESSION['admin']['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
 
-            //$_SESSION['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
+            //$_SESSION['admin']['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
             
-            //$_SESSION['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
+            //$_SESSION['admin']['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
 
 			$paths = $this->makePathNames($p);
 
-            $_SESSION['project']['paths']['project_media'] = $paths['project_media'];
+            $_SESSION['admin']['project']['paths']['project_media'] = $paths['project_media'];
 
-            $_SESSION['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
+            $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
             
-            $_SESSION['project']['paths']['uploads_media'] = $paths['uploads_media'];
+            $_SESSION['admin']['project']['paths']['uploads_media'] = $paths['uploads_media'];
 
-            foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
+            foreach ((array) $_SESSION['admin']['project']['paths'] as $key => $val) {
                 
                 if (!file_exists($val)) {
 
@@ -2786,9 +2785,9 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            $_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
+            $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
 
-            $_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+            $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
 
         }
 
@@ -2805,17 +2804,17 @@ class Controller extends BaseClass
 
 		if (!$this->excludeFromReferer) {
 		
-			if (isset($_SESSION['system']['referer'])) {
+			if (isset($_SESSION['admin']['system']['referer'])) {
         
-				$_SESSION['system']['prev_referer']['url'] = $_SESSION['system']['referer']['url'];
+				$_SESSION['admin']['system']['prev_referer']['url'] = $_SESSION['admin']['system']['referer']['url'];
 				
-				$_SESSION['system']['prev_referer']['name'] = $_SESSION['system']['referer']['name'];
+				$_SESSION['admin']['system']['prev_referer']['name'] = $_SESSION['admin']['system']['referer']['name'];
 
 			}
 	
-			$_SESSION['system']['referer']['url'] = $_SERVER['REQUEST_URI'];
+			$_SESSION['admin']['system']['referer']['url'] = $_SERVER['REQUEST_URI'];
 			
-			$_SESSION['system']['referer']['name'] = $this->getPageName();
+			$_SESSION['admin']['system']['referer']['name'] = $this->getPageName();
 		}
 
     }
@@ -2829,14 +2828,14 @@ class Controller extends BaseClass
 	{
 
 		if (
-			isset($_SESSION['system']['referer']) && 
-			isset($_SESSION['system']['prev_referer']) && 
-			$_SESSION['system']['referer']['url'] == $_SERVER['REQUEST_URI']
+			isset($_SESSION['admin']['system']['referer']) && 
+			isset($_SESSION['admin']['system']['prev_referer']) && 
+			$_SESSION['admin']['system']['referer']['url'] == $_SERVER['REQUEST_URI']
 			) {
 	
-			$_SESSION['system']['referer'] = $_SESSION['system']['prev_referer'];
+			$_SESSION['admin']['system']['referer'] = $_SESSION['admin']['system']['prev_referer'];
 			
-			unset($_SESSION['system']['prev_referer']);
+			unset($_SESSION['admin']['system']['prev_referer']);
 
 		}
 
@@ -2851,13 +2850,13 @@ class Controller extends BaseClass
     private function setSessionActivePageValues ()
     {
         
-        $_SESSION['system']['active_page']['url'] = $this->_fullPath;
+        $_SESSION['admin']['system']['active_page']['url'] = $this->_fullPath;
         
-        if (isset($this->appName)) $_SESSION['system']['active_page']['appName'] = $this->appName;
+        if (isset($this->appName)) $_SESSION['admin']['system']['active_page']['appName'] = $this->appName;
         
-        if (isset($this->controllerBaseName)) $_SESSION['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
+        if (isset($this->controllerBaseName)) $_SESSION['admin']['system']['active_page']['controllerBaseName'] = $this->controllerBaseName;
         
-        if (isset($this->_viewName)) $_SESSION['system']['active_page']['viewName'] = $this->_viewName;
+        if (isset($this->_viewName)) $_SESSION['admin']['system']['active_page']['viewName'] = $this->_viewName;
     
     }
 
@@ -2874,7 +2873,7 @@ class Controller extends BaseClass
     private function setLoginStartPage ()
     {
         
-        $_SESSION['login_start_page'] = $this->_fullPath;
+        $_SESSION['admin']['login_start_page'] = $this->_fullPath;
     
     }
 
@@ -2909,10 +2908,10 @@ class Controller extends BaseClass
 		$controllerPublicName = ($this->controllerPublicNameMask ? $this->controllerPublicNameMask : $this->controllerPublicName);
 		$controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->controllerBaseName);
 
-        if ($this->_fullPathRelative != $cp && isset($_SESSION['project']['title']) && !$this->suppressProjectInBreadcrumbs) {
+        if ($this->_fullPathRelative != $cp && isset($_SESSION['admin']['project']['title']) && !$this->suppressProjectInBreadcrumbs) {
             
             $this->breadcrumbs[] = array(
-                'name' => $_SESSION['project']['title'], 
+                'name' => $_SESSION['admin']['project']['title'], 
                 'url' => $this->getLoggedInMainIndex()
             );
 			
@@ -2934,8 +2933,8 @@ class Controller extends BaseClass
                     if ($this->breadcrumbIncludeReferer === true) {
                         
                         $this->breadcrumbs[] = array(
-                            'name' => $_SESSION['system']['referer']['name'], 
-                            'url' => $_SESSION['system']['referer']['url']
+                            'name' => $_SESSION['admin']['system']['referer']['name'], 
+                            'url' => $_SESSION['admin']['system']['referer']['url']
                         );
                     
                     }
@@ -3000,9 +2999,9 @@ class Controller extends BaseClass
 		// is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
 		if ($controllerBaseName=='') return true;
 
-		if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
+		if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName])) {
 
-			$d = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
+			$d = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$controllerBaseName];
 			
 			foreach ((array) $d as $key => $val) {
 				
@@ -3184,7 +3183,7 @@ class Controller extends BaseClass
     {
 	
 		if (!$this->noResubmitvalReset)
-			$_SESSION['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
+			$_SESSION['admin']['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
     }
 

@@ -81,7 +81,7 @@ class GlossaryController extends Controller
 
 		$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 		
 		$this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
 
@@ -101,7 +101,7 @@ class GlossaryController extends Controller
 
 		}
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
 
@@ -242,7 +242,7 @@ class GlossaryController extends Controller
 		
 		foreach((array)$gs as $key => $val) {
 
-			if (!isset($_SESSION['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()])) {
+			if (!isset($_SESSION['app']['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()])) {
 
 				$ll = $this->models->LabelLanguage->_get(
 					array(
@@ -255,11 +255,11 @@ class GlossaryController extends Controller
 					)
 				);
 	
-				if ($ll) $gs[$key]['language'] = $_SESSION['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()] = $ll[0]['label'];
+				if ($ll) $gs[$key]['language'] = $_SESSION['app']['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()] = $ll[0]['label'];
 
 			} else {
 
-				$gs[$key]['language'] = $_SESSION['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()];
+				$gs[$key]['language'] = $_SESSION['app']['system']['language_names'][$val['language_id']][$this->getCurrentLanguageId()];
 
 			}
 
@@ -286,9 +286,9 @@ class GlossaryController extends Controller
 	private function getGlossaryAlphabet($forceLookup=false)
 	{
 
-		if (!isset($_SESSION['user']['glossary']['alpha']) or $forceLookup) {
+		if (!isset($_SESSION['app']['user']['glossary']['alpha']) or $forceLookup) {
 
-			unset($_SESSION['user']['glossary']['alpha']);
+			unset($_SESSION['app']['user']['glossary']['alpha']);
 
 			$g = $this->models->Glossary->_get(
 				array(
@@ -301,17 +301,17 @@ class GlossaryController extends Controller
 				)
 			);
 			
-			$_SESSION['user']['glossary']['alpha'] = null;
+			$_SESSION['app']['user']['glossary']['alpha'] = null;
 			
 			foreach((array)$g as $key => $val) {
 
-				$_SESSION['user']['glossary']['alpha'][] = $val['letter'];
+				$_SESSION['app']['user']['glossary']['alpha'][] = $val['letter'];
 
 			}
 			
 		}
 
-		return $_SESSION['user']['glossary']['alpha'];
+		return $_SESSION['app']['user']['glossary']['alpha'];
 	
 	}
 

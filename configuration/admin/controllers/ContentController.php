@@ -76,8 +76,8 @@ class ContentController extends Controller
     public function introductionAction()
     {
     
-		$_SESSION['system']['content']['current-subject'] = 'Introduction';
-		$_SESSION['system']['content']['is-free-module'] = false;
+		$_SESSION['admin']['system']['content']['current-subject'] = 'Introduction';
+		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
@@ -92,8 +92,8 @@ class ContentController extends Controller
     public function contributorsAction()
     {
     
-		$_SESSION['system']['content']['current-subject'] = 'Contributors';
-		$_SESSION['system']['content']['is-free-module'] = false;
+		$_SESSION['admin']['system']['content']['current-subject'] = 'Contributors';
+		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
@@ -108,8 +108,8 @@ class ContentController extends Controller
     public function aboutEtiAction()
     {
     
-		$_SESSION['system']['content']['current-subject'] = 'About ETI';
-		$_SESSION['system']['content']['is-free-module'] = false;
+		$_SESSION['admin']['system']['content']['current-subject'] = 'About ETI';
+		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
@@ -124,8 +124,8 @@ class ContentController extends Controller
     public function welcomeAction()
     {
     
-		$_SESSION['system']['content']['current-subject'] = 'Welcome';
-		$_SESSION['system']['content']['is-free-module'] = false;
+		$_SESSION['admin']['system']['content']['current-subject'] = 'Welcome';
+		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
     
@@ -138,30 +138,30 @@ class ContentController extends Controller
 
 		if ($this->rHasId()) {
 		
-			$d = $this->getContentById($this->requestData['id'],$_SESSION['project']['default_language_id']);
-			$_SESSION['system']['content']['current-subject'] = $d['subject'];
+			$d = $this->getContentById($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
+			$_SESSION['admin']['system']['content']['current-subject'] = $d['subject'];
 		
 		}
 
 		$currentSubject =
-			isset($_SESSION['system']['content']['current-subject']) ?
-			$_SESSION['system']['content']['current-subject'] : 
+			isset($_SESSION['admin']['system']['content']['current-subject']) ?
+			$_SESSION['admin']['system']['content']['current-subject'] : 
 			'Introduction';
 
         $this->setPageName(_($currentSubject));
 
-		$this->smarty->assign('isFreeModule', isset($_SESSION['system']['content']['is-free-module']) ? $_SESSION['system']['content']['is-free-module'] : false);
+		$this->smarty->assign('isFreeModule', isset($_SESSION['admin']['system']['content']['is-free-module']) ? $_SESSION['admin']['system']['content']['is-free-module'] : false);
 
-		if (isset($_SESSION['system']['content']['free-module-id']))
-			$this->smarty->assign('freeModuleId',$_SESSION['system']['content']['free-module-id']);
+		if (isset($_SESSION['admin']['system']['content']['free-module-id']))
+			$this->smarty->assign('freeModuleId',$_SESSION['admin']['system']['content']['free-module-id']);
 
 		$this->smarty->assign('subject', $currentSubject);
 
 		$this->smarty->assign('subjects', $this->_subjects);
 
-		$this->smarty->assign('languages', $_SESSION['project']['languages']);
+		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -172,7 +172,7 @@ class ContentController extends Controller
     public function previewAction ()
     {
 
-		$content = $this->getContentBySubject($this->requestData['subject'],$_SESSION['project']['default_language_id']);
+		$content = $this->getContentBySubject($this->requestData['subject'],$_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('backUrl','content.php?sub='.$this->requestData['subject']);
 		//$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);

@@ -62,7 +62,7 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
- 		unset($_SESSION['user']['search']['hasSearchResults']);
+ 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 		
@@ -83,7 +83,7 @@ class LiteratureController extends Controller
 
 		}
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
 
@@ -148,9 +148,9 @@ class LiteratureController extends Controller
 	private function getLiteratureAlphabet($forceLookup=false)
 	{
 
-		if (!isset($_SESSION['user']['literature']['alpha']) or $forceLookup) {
+		if (!isset($_SESSION['app']['user']['literature']['alpha']) or $forceLookup) {
 
-			unset($_SESSION['user']['literature']['alpha']);
+			unset($_SESSION['app']['user']['literature']['alpha']);
 
 			$l = $this->models->Literature->_get(
 				array(
@@ -160,17 +160,17 @@ class LiteratureController extends Controller
 				)
 			);
 
-			$_SESSION['user']['literature']['alpha'] = null;
+			$_SESSION['app']['user']['literature']['alpha'] = null;
 		
 			foreach((array)$l as $key => $val) {
 
-				$_SESSION['user']['literature']['alpha'][] = $val['letter'];
+				$_SESSION['app']['user']['literature']['alpha'][] = $val['letter'];
 
 			}
 
 		}
 
-		return $_SESSION['user']['literature']['alpha'];
+		return $_SESSION['app']['user']['literature']['alpha'];
 	
 	}
 
@@ -247,7 +247,7 @@ class LiteratureController extends Controller
 				)
 			);
 
-			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
+			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['app']['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
 
 			foreach((array)$lt as $key => $val) {
 

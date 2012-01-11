@@ -124,7 +124,7 @@ class Controller extends BaseClass
 
 	public function checkForProjectId ()
 	{
-	
+
 		if ($this->rHasVal('p')) $this->resolveProjectId();
 	
 		$d = $this->getCurrentProjectId();
@@ -222,22 +222,22 @@ class Controller extends BaseClass
 
 		if (
 			(isset($params['forceLookup']) && $params['forceLookup']==true) ||
-			!isset($_SESSION['user']['species']['tree']) ||
-			!isset($_SESSION['user']['species']['treeList']) ||
+			!isset($_SESSION['app']['user']['species']['tree']) ||
+			!isset($_SESSION['app']['user']['species']['treeList']) ||
 			$this->didActiveLanguageChange()
 		) {
 
-			$_SESSION['user']['species']['tree'] = $this->_getTaxonTree($params);
+			$_SESSION['app']['user']['species']['tree'] = $this->_getTaxonTree($params);
 
-			$_SESSION['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
+			$_SESSION['app']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
 
 		} else {
 
-			$this->treeList = $_SESSION['user']['species']['treeList'];
+			$this->treeList = $_SESSION['app']['user']['species']['treeList'];
 
 		}
 
-		return $_SESSION['user']['species']['tree'];
+		return $_SESSION['app']['user']['species']['tree'];
 	
 	}
 
@@ -355,29 +355,29 @@ class Controller extends BaseClass
 		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
 		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
 
-		if (!$forceLookup) $forceLookup = !isset($_SESSION['user']['species']['ranks']['projectRanks']);
+		if (!$forceLookup) $forceLookup = !isset($_SESSION['app']['user']['species']['ranks']['projectRanks']);
 
 		if (!$forceLookup) {
 
 			if (
-				!isset($_SESSION['user']['species']['ranks']['includeLanguageLabels']) || 
-				$_SESSION['user']['species']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
-				!isset($_SESSION['user']['species']['ranks']['lowerTaxonOnly']) || 
-				$_SESSION['user']['species']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
-				!isset($_SESSION['user']['species']['ranks']['keypathEndpoint']) || 
-				$_SESSION['user']['species']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
-				!isset($_SESSION['user']['species']['ranks']['idsAsIndex']) || 
-				$_SESSION['user']['species']['ranks']['idsAsIndex']!=$idsAsIndex
+				!isset($_SESSION['app']['user']['species']['ranks']['includeLanguageLabels']) || 
+				$_SESSION['app']['user']['species']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
+				!isset($_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly']) || 
+				$_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
+				!isset($_SESSION['app']['user']['species']['ranks']['keypathEndpoint']) || 
+				$_SESSION['app']['user']['species']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
+				!isset($_SESSION['app']['user']['species']['ranks']['idsAsIndex']) || 
+				$_SESSION['app']['user']['species']['ranks']['idsAsIndex']!=$idsAsIndex
 				)
 
 				$forceLookup = true;
 
 		}
 
-		$_SESSION['user']['species']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
-		$_SESSION['user']['species']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
-		$_SESSION['user']['species']['ranks']['keypathEndpoint'] = $keypathEndpoint;
-		$_SESSION['user']['species']['ranks']['idsAsIndex'] = $idsAsIndex;
+		$_SESSION['app']['user']['species']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
+		$_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
+		$_SESSION['app']['user']['species']['ranks']['keypathEndpoint'] = $keypathEndpoint;
+		$_SESSION['app']['user']['species']['ranks']['idsAsIndex'] = $idsAsIndex;
 
 		if ($forceLookup) {
 
@@ -429,15 +429,15 @@ class Controller extends BaseClass
 	
 			}
 			
-			$_SESSION['user']['species']['ranks']['projectRanks'] = $pr;
-			$_SESSION['user']['species']['ranks']['topRankId'] = $topRankId;
+			$_SESSION['app']['user']['species']['ranks']['projectRanks'] = $pr;
+			$_SESSION['app']['user']['species']['ranks']['topRankId'] = $topRankId;
 			
 		}
 
 		return
 			array(
-				'ranks' => $_SESSION['user']['species']['ranks']['projectRanks'],
-				'topRankId' => $_SESSION['user']['species']['ranks']['topRankId']
+				'ranks' => $_SESSION['app']['user']['species']['ranks']['projectRanks'],
+				'topRankId' => $_SESSION['app']['user']['species']['ranks']['topRankId']
 			);
 
 	}
@@ -445,8 +445,8 @@ class Controller extends BaseClass
 	public function getTaxonById($id)
 	{
 
-		if (!isset($_SESSION['user']['species']['taxon']['id']) ||
-			$_SESSION['user']['species']['taxon']['id']!=$id) {
+		if (!isset($_SESSION['app']['user']['species']['taxon']['id']) ||
+			$_SESSION['app']['user']['species']['taxon']['id']!=$id) {
 
 			$t = $this->models->Taxon->_get(
 				array(
@@ -457,23 +457,23 @@ class Controller extends BaseClass
 				)
 			);
 
-			$_SESSION['user']['species']['taxon'] = $t[0];
+			$_SESSION['app']['user']['species']['taxon'] = $t[0];
 			
 			$pr = $this->models->ProjectRank->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'id' => $_SESSION['user']['species']['taxon']['rank_id']
+						'id' => $_SESSION['app']['user']['species']['taxon']['rank_id']
 					)
 				)
 			);
 			
-			$_SESSION['user']['species']['taxon']['lower_taxon'] = $pr[0]['lower_taxon'];
+			$_SESSION['app']['user']['species']['taxon']['lower_taxon'] = $pr[0]['lower_taxon'];
 
 
 		}
 
-		return $_SESSION['user']['species']['taxon'];
+		return $_SESSION['app']['user']['species']['taxon'];
 	
 	}
 
@@ -773,11 +773,11 @@ class Controller extends BaseClass
 
 		foreach((array)$data as $key => $val) {
 
-	        $_SESSION['project'][$key] = $val;
+	        $_SESSION['app']['project'][$key] = $val;
 
 		}
 		
-		$_SESSION['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
+		$_SESSION['app']['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
 
     }
 
@@ -807,11 +807,11 @@ class Controller extends BaseClass
 			$list[$val['language_id']]= array('language'=>$l['language'],'direction'=>$l['direction']);
         }
         
-        $_SESSION['project']['languages'] = $lp;
+        $_SESSION['app']['project']['languages'] = $lp;
 
-        if (isset($defaultLanguage)) $_SESSION['project']['default_language_id'] = $defaultLanguage;
+        if (isset($defaultLanguage)) $_SESSION['app']['project']['default_language_id'] = $defaultLanguage;
 
-//        if (isset($list)) $_SESSION['project']['languageList'] = $list;
+//        if (isset($list)) $_SESSION['app']['project']['languageList'] = $list;
 		
     }
 
@@ -824,7 +824,7 @@ class Controller extends BaseClass
     public function setCurrentProjectId ($id)
     {
         
-        $_SESSION['project']['id'] = $id;
+        $_SESSION['app']['project']['id'] = $id;
  
     }
 
@@ -832,21 +832,21 @@ class Controller extends BaseClass
 	public function didActiveLanguageChange()
 	{
 
-        return $_SESSION['user']['languageChanged'];
+        return $_SESSION['app']['user']['languageChanged'];
 
 	}
 
 	public function getCurrentLanguageId()
 	{
 
-        return $_SESSION['user']['activeLanguageId'];
+        return $_SESSION['app']['user']['activeLanguageId'];
 
 	}
 
 	public function getDefaultLanguageId()
 	{
 
-        return isset($_SESSION['project']['default_language_id']) ? $_SESSION['project']['default_language_id'] : null;
+        return isset($_SESSION['app']['project']['default_language_id']) ? $_SESSION['app']['project']['default_language_id'] : null;
 
 	}
 
@@ -855,31 +855,31 @@ class Controller extends BaseClass
 
 		if ($id) {
 
-			$_SESSION['user']['languageChanged'] = $_SESSION['user']['activeLanguageId'] != $id;
+			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $id;
 
-			$_SESSION['user']['activeLanguageId'] = $id;
+			$_SESSION['app']['user']['activeLanguageId'] = $id;
 
 		} else
 		if ($this->rHasVal('languageId')) {
 
-			$_SESSION['user']['languageChanged'] = $_SESSION['user']['activeLanguageId'] != $this->requestData['languageId'];
+			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $this->requestData['languageId'];
 
-			$_SESSION['user']['activeLanguageId'] = $this->requestData['languageId'];
+			$_SESSION['app']['user']['activeLanguageId'] = $this->requestData['languageId'];
 
 		} else {
 
-			$_SESSION['user']['languageChanged'] = false;
+			$_SESSION['app']['user']['languageChanged'] = false;
 
 		}
 		
-		if (!isset($_SESSION['user']['activeLanguageId'])) {
+		if (!isset($_SESSION['app']['user']['activeLanguageId'])) {
 
-			$_SESSION['user']['activeLanguageId'] = $this->getDefaultLanguageId();
-			$_SESSION['user']['languageChanged'] = true;
+			$_SESSION['app']['user']['activeLanguageId'] = $this->getDefaultLanguageId();
+			$_SESSION['app']['user']['languageChanged'] = true;
 
 		}
 		
-		if (!isset($_SESSION['user']['languageChanged'])) $_SESSION['user']['languageChanged'] = true;
+		if (!isset($_SESSION['app']['user']['languageChanged'])) $_SESSION['app']['user']['languageChanged'] = true;
 		
 		unset($this->requestData['languageId']);
 
@@ -908,7 +908,7 @@ class Controller extends BaseClass
     public function getCurrentProjectId ()
     {
 
-        return isset($_SESSION['project']['id']) ? $_SESSION['project']['id'] : null;
+        return isset($_SESSION['app']['project']['id']) ? $_SESSION['app']['project']['id'] : null;
     
     }
 
@@ -1202,28 +1202,28 @@ class Controller extends BaseClass
 
 		if (!$p) return;
 
-		$_SESSION['project']['urls']['full_base_url'] =
+		$_SESSION['app']['project']['urls']['full_base_url'] =
 			'http://'.
 			$_SERVER["HTTP_HOST"]. 
 			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
 
-		$_SESSION['project']['urls']['full_appview_url'] = $_SESSION['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+		$_SESSION['app']['project']['urls']['full_appview_url'] = $_SESSION['app']['project']['urls']['full_base_url'].$this->getAppName().'/views/';
 
 		if (isset($this->generalSettings['imageRootUrlOverride'])) {
 
-			$_SESSION['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
+			$_SESSION['app']['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
 	
 		} else {
 	
-			$_SESSION['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
+			$_SESSION['app']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
 
 		}
 
-		$_SESSION['project']['urls']['project_thumbs'] = $_SESSION['project']['urls']['project_media'].'thumbs/';
+		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
 
 		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
 
-			$_SESSION['project']['urls']['full_project_media'] = 
+			$_SESSION['app']['project']['urls']['full_project_media'] = 
 				'http://'.
 				$_SERVER["HTTP_HOST"]. 
 				$this->generalSettings['imageRootUrlOverrideAbsolute'].
@@ -1231,19 +1231,19 @@ class Controller extends BaseClass
 
 		} else {
 	
-			$_SESSION['project']['urls']['full_project_media'] =
-				$_SESSION['project']['urls']['full_base_url'].
+			$_SESSION['app']['project']['urls']['full_project_media'] =
+				$_SESSION['app']['project']['urls']['full_base_url'].
 				$this->getAppName().
 				'/media/project/'.sprintf('%04s', $p).'/';
 
 		}
 
-		$_SESSION['project']['urls']['full_project_thumbs'] = $_SESSION['project']['urls']['full_project_media'].'thumbs/';
+		$_SESSION['app']['project']['urls']['full_project_thumbs'] = $_SESSION['app']['project']['urls']['full_project_media'].'thumbs/';
 
 
-		$_SESSION['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
+		$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
-		$_SESSION['project']['urls']['project_start'] =
+		$_SESSION['app']['project']['urls']['project_start'] =
 			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';
 
     }
@@ -1260,11 +1260,11 @@ class Controller extends BaseClass
 
         if ($p) {
 
-            $_SESSION['project']['paths']['project_css'] = $this->generalSettings['app']['fileRoot'].'style/'.sprintf('%04s', $p).'/';
+            $_SESSION['app']['project']['paths']['project_css'] = $this->generalSettings['app']['fileRoot'].'style/'.sprintf('%04s', $p).'/';
 
-            $_SESSION['project']['paths']['default_css'] = $this->generalSettings['app']['fileRoot'].'style/default/';
+            $_SESSION['app']['project']['paths']['default_css'] = $this->generalSettings['app']['fileRoot'].'style/default/';
 
-            foreach ((array) $_SESSION['project']['paths'] as $key => $val) {
+            foreach ((array) $_SESSION['app']['project']['paths'] as $key => $val) {
                 
                 if (!file_exists($val)) {
 
@@ -1301,7 +1301,18 @@ class Controller extends BaseClass
 		return $encode ? json_encode($d) : $d;
 	
 	}
+	
+	public function isLoggedInAdmin()
+	{
 
+		if (!isset($_SESSION['admin']['project']['id']))
+			return false;
+		else
+			return $this->getCurrentProjectId() == $_SESSION['admin']['project']['id'];
+	
+	}
+	
+	
 	private function setPhpIniVars()
 	{
 
@@ -1332,23 +1343,22 @@ class Controller extends BaseClass
     private function startSession ()
     {
 
-		session_name('lng-application');
-
+		//session_name('lng-application');
         session_start();
 
         /* DEBUG */        
-        $_SESSION['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
+        $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
 
     }
 
 	private function getProjectDependentTemplates()
 	{
 
-		if (!isset($_SESSION['project']['id'])) return null;
+		if (!isset($_SESSION['app']['project']['id'])) return null;
 
 		$r = null;
 		
-		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['project']['id']). '/';
+		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['app']['project']['id']). '/';
 		
 		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
 		if (file_exists($d.'_header-container.tpl')) $r['header_container'] = $d.'_header-container.tpl';
@@ -1367,7 +1377,7 @@ class Controller extends BaseClass
     private function preparePage()
     {
  
- 		if (isset($_SESSION['project']['languages'])) $this->smarty->assign('languages',$_SESSION['project']['languages']);
+ 		if (isset($_SESSION['app']['project']['languages'])) $this->smarty->assign('languages',$_SESSION['app']['project']['languages']);
 
  		$this->smarty->assign('currentLanguageId',$this->getCurrentLanguageId());
 
@@ -1380,7 +1390,7 @@ class Controller extends BaseClass
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
 	 
 //        $this->setBreadcrumbs();
-        $this->smarty->assign('session', $_SESSION);
+        $this->smarty->assign('session', $_SESSION['app']);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
         $this->smarty->assign('baseUrl', $this->baseUrl);
@@ -1789,9 +1799,9 @@ class Controller extends BaseClass
 	{
 
 		$d = 
-			(isset($_SESSION['user']['breadcrumbs']) &&
-			isset($_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-1])) ?
-				$_SESSION['user']['breadcrumbs'][count($_SESSION['user']['breadcrumbs'])-1] :
+			(isset($_SESSION['app']['user']['breadcrumbs']) &&
+			isset($_SESSION['app']['user']['breadcrumbs'][count($_SESSION['app']['user']['breadcrumbs'])-1])) ?
+				$_SESSION['app']['user']['breadcrumbs'][count($_SESSION['app']['user']['breadcrumbs'])-1] :
 				null;
 
 		if (isset($d['data'])) $d['data'] = json_encode($d['data']);
@@ -1811,19 +1821,19 @@ class Controller extends BaseClass
 
 		}
 
-		$_SESSION['user']['breadcrumbs'][] = array(
+		$_SESSION['app']['user']['breadcrumbs'][] = array(
 			'name' => $this->pageName,
 			'url' => $_SERVER['REQUEST_URI'],
 			'data' => isset($p) ? $p : null
 		);
 		
-		$d = count((array)$_SESSION['user']['breadcrumbs']);
+		$d = count((array)$_SESSION['app']['user']['breadcrumbs']);
 
-		if (isset($_SESSION['user']['breadcrumbs'][$d-2])) {
+		if (isset($_SESSION['app']['user']['breadcrumbs'][$d-2])) {
 		
-			if ($_SESSION['user']['breadcrumbs'][$d-2]==$_SESSION['user']['breadcrumbs'][$d-1]) {
+			if ($_SESSION['app']['user']['breadcrumbs'][$d-2]==$_SESSION['app']['user']['breadcrumbs'][$d-1]) {
 
-				array_pop($_SESSION['user']['breadcrumbs']);
+				array_pop($_SESSION['app']['user']['breadcrumbs']);
 				
 				$d--;
 
@@ -1832,9 +1842,9 @@ class Controller extends BaseClass
 		}
 
 		if ($d>$this->generalSettings['maxBackSteps'])
-			$_SESSION['user']['breadcrumbs'] = array_slice($_SESSION['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
+			$_SESSION['app']['user']['breadcrumbs'] = array_slice($_SESSION['app']['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
 
-		//q($_SESSION['user']['breadcrumbs']);
+		//q($_SESSION['app']['user']['breadcrumbs']);
 
 	}
 
@@ -1843,7 +1853,7 @@ class Controller extends BaseClass
 	
 		if ($this->rHasVal('backstep','1')) {
 
-			array_pop($_SESSION['user']['breadcrumbs']);
+			array_pop($_SESSION['app']['user']['breadcrumbs']);
 			
 			$this->storeHistory = false;
 
@@ -1856,7 +1866,7 @@ class Controller extends BaseClass
 	private function getWordList($forceUpdate=false)
 	{
 
-		if ($forceUpdate || !isset($_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
+		if ($forceUpdate || !isset($_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
 
 			$terms = $this->models->Glossary->_get(
 				array(
@@ -1878,25 +1888,25 @@ class Controller extends BaseClass
 				)
 			);
 
-			$_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array)$terms,(array)$synonyms);
+			$_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array)$terms,(array)$synonyms);
 
 		}
 
-		return $_SESSION['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'];
+		return $_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'];
 
 	}
 
 	private function embedGlossaryLink($matches)
 	{
 
-		return '<span class="glossary-term-highlight" onclick="glossTextLink('.$this->_currentGlossaryId.')" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
+		return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
 
 	}
 	
 	private function getBreadcrumbs()
 	{
 
-		return isset($_SESSION['user']['breadcrumbs']) ? $_SESSION['user']['breadcrumbs'] : null;
+		return isset($_SESSION['app']['user']['breadcrumbs']) ? $_SESSION['app']['user']['breadcrumbs'] : null;
 
 	}
 

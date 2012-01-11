@@ -78,7 +78,7 @@ class MatrixKeyController extends Controller
     public function indexAction()
     {
    
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
   
 		$this->checkMatrixIdOverride();
 
@@ -292,28 +292,28 @@ class MatrixKeyController extends Controller
 	private function getCurrentMatrixId()
 	{
 	
-		return isset($_SESSION['user']['matrix']['active']) ? $_SESSION['user']['matrix']['active']['id'] : null;
+		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
 
 	}
 
 	private function getCurrentMatrix()
 	{
 	
-		return isset($_SESSION['user']['matrix']['active']) ? $_SESSION['user']['matrix']['active'] : null;
+		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
 
 	}
 
 	private function setCurrentMatrix($id)
 	{
 	
-		$_SESSION['user']['matrix']['active'] = $this->getMatrix($id);
+		$_SESSION['app']['user']['matrix']['active'] = $this->getMatrix($id);
 
 	}
 
 	private function getMatrices()
 	{
 
-		if (!isset($_SESSION['user']['matrix']['matrices'])) {
+		if (!isset($_SESSION['app']['user']['matrix']['matrices'])) {
 
 			$m = $this->models->Matrix->_get(
 				array(
@@ -342,11 +342,11 @@ class MatrixKeyController extends Controller
 	
 			}
 			
-			$_SESSION['user']['matrix']['matrices'] = $m;
+			$_SESSION['app']['user']['matrix']['matrices'] = $m;
 			
 		}
 
-		return $_SESSION['user']['matrix']['matrices'];
+		return $_SESSION['app']['user']['matrix']['matrices'];
 	
 	}
 
@@ -373,7 +373,7 @@ class MatrixKeyController extends Controller
 	private function getTaxaInMatrix()
 	{
 
-		if (!isset($_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()])) {
+		if (!isset($_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()])) {
 
 			$mt = $this->models->MatrixTaxon->_get(
 				array(
@@ -401,11 +401,11 @@ class MatrixKeyController extends Controller
 	
 			}
 
-			if (isset($taxa)) $_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
+			if (isset($taxa)) $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
 			
 		}
 
-		return $_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
+		return $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
 
 	}
 

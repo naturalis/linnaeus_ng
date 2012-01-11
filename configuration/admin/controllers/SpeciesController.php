@@ -141,15 +141,15 @@ class SpeciesController extends Controller
     public function indexAction ()
     {
 
-		unset($_SESSION['system']['activeTaxon']);
+		unset($_SESSION['admin']['system']['activeTaxon']);
 
 		if ($this->rHasVal('higher','1')) {
 
-			$_SESSION['system']['highertaxa'] = true;
+			$_SESSION['admin']['system']['highertaxa'] = true;
 
 		} else {
 
-			unset($_SESSION['system']['highertaxa']);
+			unset($_SESSION['admin']['system']['highertaxa']);
 
 		}
 		
@@ -158,7 +158,7 @@ class SpeciesController extends Controller
 
 		if (!isset($d['id'])) {
 		
-			unset($_SESSION['system']['highertaxa']);
+			unset($_SESSION['admin']['system']['highertaxa']);
 
 	  		$this->redirect('collaborators.php');
 
@@ -173,14 +173,14 @@ class SpeciesController extends Controller
     public function manageAction ()
     {
 
-		//unset($_SESSION['system']['activeTaxon']);
-		//unset($_SESSION['system']['highertaxa']);
+		//unset($_SESSION['admin']['system']['activeTaxon']);
+		//unset($_SESSION['admin']['system']['highertaxa']);
 
         $this->checkAuthorisation();
 		
         $this->setPageName(_('Species module overview'));
         
-		if (count((array)$_SESSION['project']['languages'])==0)
+		if (count((array)$_SESSION['admin']['project']['languages'])==0)
 			$this->addError(
 				sprintf(
 					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
@@ -206,7 +206,7 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon list'));
 
-		unset($_SESSION['system']['activeTaxon']);
+		unset($_SESSION['admin']['system']['activeTaxon']);
 
 		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
 		// moving branches up and down the stem
@@ -222,7 +222,7 @@ class SpeciesController extends Controller
 
 		if (isset($taxa) && count((array)$taxa)>0) {
 
-			$projectLanguages = $_SESSION['project']['languages'];
+			$projectLanguages = $_SESSION['admin']['project']['languages'];
 
 			$pageCount = $this->getPageTaxonCount();
 
@@ -337,9 +337,9 @@ class SpeciesController extends Controller
         
         }
         
-        $lp = $_SESSION['project']['languages'];
+        $lp = $_SESSION['admin']['project']['languages'];
 
-        $defaultLanguage = $_SESSION['project']['default_language_id'];
+        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
         
         $pages = $this->models->PageTaxon->_get(
 			array(
@@ -485,7 +485,7 @@ class SpeciesController extends Controller
 							
 							$this->setPageName(sprintf(_('Editing "%s"'),$this->requestData['taxon']));
 							unset($data['taxon']);
-							unset($_SESSION['species']['usertaxa']);
+							unset($_SESSION['admin']['species']['usertaxa']);
 							
 							//$this->redirect('list.php');
 		
@@ -566,7 +566,7 @@ class SpeciesController extends Controller
 
             $taxon = $this->getTaxonById();
 			
-			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+			$_SESSION['admin']['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
 			if ($this->maskAsHigherTaxa()) {
 
@@ -584,13 +584,13 @@ class SpeciesController extends Controller
 			// if new taxon OR existing taxon not being edited by someone else, get languages and content
 	
 				// get available languages
-				$lp = $_SESSION['project']['languages'];
+				$lp = $_SESSION['admin']['project']['languages'];
 
 				// determine the language the page will open in
 				$startLanguage = 
 					$this->rHasVal('lan')? 
 						$this->requestData['lan'] : 
-						$_SESSION['project']['default_language_id'];
+						$_SESSION['admin']['project']['default_language_id'];
 	
 				// get the defined categories (just the page definitions, no content yet)
 				$tp = $this->models->PageTaxon->_get(array('id'=>array(
@@ -621,8 +621,8 @@ class SpeciesController extends Controller
 				$startPage =
 					$this->rHasVal('page') ?
 						$this->requestData['page'] : 
-						(isset($_SESSION['system']['lastActivePage']) ?
-							$_SESSION['system']['lastActivePage'] :
+						(isset($_SESSION['admin']['system']['lastActivePage']) ?
+							$_SESSION['admin']['system']['lastActivePage'] :
 							$defaultPage);
 
 				if (isset($taxon)) {
@@ -876,7 +876,7 @@ class SpeciesController extends Controller
 		
             $taxon = $this->getTaxonById();
 
-			$_SESSION['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
+			$_SESSION['admin']['system']['activeTaxon'] = array('taxon_id' => $taxon['id'],'taxon' => $taxon['taxon']);
 
 			if ($this->maskAsHigherTaxa()) {
 
@@ -988,7 +988,7 @@ class SpeciesController extends Controller
 						'id' => array(
 							'media_id' => $val['id'], 
 							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $_SESSION['project']['default_language_id']
+							'language_id' => $_SESSION['admin']['project']['default_language_id']
 						)
 					)
                 );
@@ -1001,9 +1001,9 @@ class SpeciesController extends Controller
 
             if (isset($r)) $this->smarty->assign('media',$r);
 
-            $this->smarty->assign('languages', $_SESSION['project']['languages']);
+            $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
             
-            $this->smarty->assign('defaultLanguage', $_SESSION['project']['default_language_id']);
+            $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['default_language_id']);
 
             $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -1046,12 +1046,12 @@ class SpeciesController extends Controller
             )
         );
 
-		if ($this->rHasVal('add','hoc') && !isset($_SESSION['system']['media']['newRef'])) {
+		if ($this->rHasVal('add','hoc') && !isset($_SESSION['admin']['system']['media']['newRef'])) {
 		// referred from the taxon content editing page
 
-			$_SESSION['system']['media']['newRef'] = '<new>';
+			$_SESSION['admin']['system']['media']['newRef'] = '<new>';
 
-			$this->requestData['id'] = $_SESSION['system']['activeTaxon']['taxon_id'];
+			$this->requestData['id'] = $_SESSION['admin']['system']['activeTaxon']['taxon_id'];
 
 		}
 
@@ -1125,14 +1125,14 @@ class SpeciesController extends Controller
                 
                         }
 
-						if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] == '<new>') {
+						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
 		
-							$_SESSION['system']['media']['newRef'] =
+							$_SESSION['admin']['system']['media']['newRef'] =
 								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
 									$firstInsert['name'].
 								'</span>';
 		
-							$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
+							$this->redirect('../species/taxon.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
 		
 						}
 
@@ -1182,7 +1182,7 @@ class SpeciesController extends Controller
         
         if ($this->requestDataFiles) {
 
-            unset($_SESSION['system']['csv_data']);
+            unset($_SESSION['admin']['system']['csv_data']);
 
 			/*
 			switch ($this->requestData["enclosure"]) {
@@ -1210,7 +1210,7 @@ class SpeciesController extends Controller
 					break;
 			}
 
-            $this->helpers->CsvParserHelper->setFieldMax($_SESSION['project']['includes_hybrids'] ? 3 : 2);
+            $this->helpers->CsvParserHelper->setFieldMax($_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2);
 
             $this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
         
@@ -1227,7 +1227,7 @@ class SpeciesController extends Controller
 				
 					$d[] = trim(strtolower($val['rank']));
 
-					if ($_SESSION['project']['includes_hybrids'] && $val['can_hybrid']==1) $h[] = trim(strtolower($val['rank']));
+					if ($_SESSION['admin']['project']['includes_hybrids'] && $val['can_hybrid']==1) $h[] = trim(strtolower($val['rank']));
 
 				}
 				
@@ -1238,10 +1238,10 @@ class SpeciesController extends Controller
 				foreach((array)$r as $key => $val) {
 
 					// check whether 'has hybrid' is present and legal
-					if ($_SESSION['project']['includes_hybrids'])
+					if ($_SESSION['admin']['project']['includes_hybrids'])
 						$r[$key][2] = (isset($val[2]) && strtolower($val[2])=='y' && in_array(strtolower($val[1]),$h));
 
-					$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = 'ok';
+					$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = 'ok';
 
 
 					// check whether the taxon name doesn't already exist
@@ -1259,19 +1259,19 @@ class SpeciesController extends Controller
 					if (in_array($val[0],$prevNames)) {
 					// set whether the taxon can be imported, based on whether it has duplicates in the import
 
-						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Duplicate name');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Duplicate name');
 						
 					} else
 					if ($t[0]['total']!=0) {
 					// set whether the taxon can be imported, based on whether the name already exists
 					
-						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Name already exists in the database');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Name already exists in the database');
 					
 					} else
 					if (!(isset($val[1]) && in_array(strtolower($val[1]),$d))) {
 					// set whether the taxon can be imported, based on whether it has a legal rank
 
-						$r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2] = _('Unknown rank');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Unknown rank');
 
 					} else {
 
@@ -1279,7 +1279,7 @@ class SpeciesController extends Controller
 
 					}
 
-					if ($upperTaxonRank==false && $r[$key][$_SESSION['project']['includes_hybrids'] ? 3 : 2]=='ok') $upperTaxonRank=$val[1];
+					if ($upperTaxonRank==false && $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2]=='ok') $upperTaxonRank=$val[1];
 
 				}
 
@@ -1348,7 +1348,7 @@ class SpeciesController extends Controller
 
 				}
 
-                $_SESSION['system']['csv_data'] = $r;
+                $_SESSION['admin']['system']['csv_data'] = $r;
 
                 $this->smarty->assign('results',$r);
 
@@ -1356,7 +1356,7 @@ class SpeciesController extends Controller
 
         } elseif (isset($this->requestData)) {
 
-            if ($this->rHasVal('rows') && isset($_SESSION['system']['csv_data'])) {
+            if ($this->rHasVal('rows') && isset($_SESSION['admin']['system']['csv_data'])) {
 
 				if ($this->rHasVal('connectToTaxonId')) {
 	
@@ -1382,9 +1382,9 @@ class SpeciesController extends Controller
 
                 foreach((array)$this->requestData['rows'] as $key => $val) {
 
-                    $name = $_SESSION['system']['csv_data'][$val][0];
-                    $rank = $_SESSION['system']['csv_data'][$val][1];
-                    $hybrid = $_SESSION['project']['includes_hybrids'] ? $_SESSION['system']['csv_data'][$val][2] : false;
+                    $name = $_SESSION['admin']['system']['csv_data'][$val][0];
+                    $rank = $_SESSION['admin']['system']['csv_data'][$val][1];
+                    $hybrid = $_SESSION['admin']['project']['includes_hybrids'] ? $_SESSION['admin']['system']['csv_data'][$val][2] : false;
                     $parentName = null;
 
                     if ($key==0) {
@@ -1479,7 +1479,7 @@ class SpeciesController extends Controller
 
                 $this->reOrderTaxonTree();
 
-                unset($_SESSION['system']['csv_data']);
+                unset($_SESSION['admin']['system']['csv_data']);
                 
                 $this->addMessage(_('Data saved.'));
 
@@ -1514,7 +1514,7 @@ class SpeciesController extends Controller
             
             $this->ajaxActionGetTaxon();
 			
-			$_SESSION['system']['lastActivePage'] = $this->requestData['page'];
+			$_SESSION['admin']['system']['lastActivePage'] = $this->requestData['page'];
         
         } else if ($this->requestData['action'] == 'delete_taxon') {
             
@@ -1745,7 +1745,7 @@ class SpeciesController extends Controller
 
 			}
 
-			if (isset($_SESSION['project']['ranklist'])) unset($_SESSION['project']['ranklist']);
+			if (isset($_SESSION['admin']['project']['ranklist'])) unset($_SESSION['admin']['project']['ranklist']);
 			
 			$this->addMessage(_('Ranks saved.'));
 
@@ -1796,7 +1796,7 @@ class SpeciesController extends Controller
 
 		$this->smarty->assign('projectRanks',$pr);
 
-		$this->smarty->assign('languages',$_SESSION['project']['languages']);
+		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
         $this->printPage();
 
@@ -1832,9 +1832,9 @@ class SpeciesController extends Controller
 
 		}
 
-        $lp = $_SESSION['project']['languages'];
+        $lp = $_SESSION['admin']['project']['languages'];
 
-        $defaultLanguage = $_SESSION['project']['default_language_id'];
+        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
         
         $pages = $this->models->PageTaxon->_get(
 			array(
@@ -1909,7 +1909,7 @@ class SpeciesController extends Controller
 
 			}
 			
-			unset($_SESSION['species']['usertaxa']);
+			unset($_SESSION['admin']['species']['usertaxa']);
 
 		}
 		
@@ -2288,7 +2288,7 @@ class SpeciesController extends Controller
 		$allLanguages = $this->getAllLanguages();
 
 		// get project languages
-		$lp = $_SESSION['project']['languages'];
+		$lp = $_SESSION['admin']['project']['languages'];
 
 		if (!isset($commonnames)) {
 
@@ -2368,14 +2368,14 @@ class SpeciesController extends Controller
 	private function getRankList()
 	{
 	
-		if (isset($_SESSION['project']['ranklist']) && 
+		if (isset($_SESSION['admin']['project']['ranklist']) && 
 			(
-				isset($_SESSION['project']['ranklistsource']) && 
-				$_SESSION['project']['ranklistsource'] == ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa')
+				isset($_SESSION['admin']['project']['ranklistsource']) && 
+				$_SESSION['admin']['project']['ranklistsource'] == ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa')
 			)
 		) {
 	
-			$rl = $_SESSION['project']['ranklist'];
+			$rl = $_SESSION['admin']['project']['ranklist'];
 	
 		} else {
 	
@@ -2397,8 +2397,8 @@ class SpeciesController extends Controller
 	
 			}
 	
-			if (isset($rl)) $_SESSION['project']['ranklist'] = $rl;
-			$_SESSION['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
+			if (isset($rl)) $_SESSION['admin']['project']['ranklist'] = $rl;
+			$_SESSION['admin']['project']['ranklistsource'] = ($this->maskAsHigherTaxa() ? 'highertaxa' : 'lowertaxa');
 	
 		}
 		
@@ -2412,8 +2412,8 @@ class SpeciesController extends Controller
 	
 		$type = $this->maskAsHigherTaxa() ? 'higher-taxa' : 'species';
 	
-		if (isset($_SESSION['species']['usertaxa'][$type]) && !$forceLookup)
-			return $_SESSION['species']['usertaxa'][$type];
+		if (isset($_SESSION['admin']['species']['usertaxa'][$type]) && !$forceLookup)
+			return $_SESSION['admin']['species']['usertaxa'][$type];
 	
 		// get complete taxon tree
 		$this->getTaxonTree(null,$forceLookup);
@@ -2475,9 +2475,9 @@ class SpeciesController extends Controller
 	
 		}
 	
-		$_SESSION['species']['usertaxa'][$type] = isset($taxa) ? $taxa : null;
+		$_SESSION['admin']['species']['usertaxa'][$type] = isset($taxa) ? $taxa : null;
 	
-		return $_SESSION['species']['usertaxa'][$type];
+		return $_SESSION['admin']['species']['usertaxa'][$type];
 	
 	}
 
@@ -2585,15 +2585,16 @@ class SpeciesController extends Controller
     private function createTaxonCategory ($name, $show_order = false, $isDefault = false)
     {
 
-		unset($_SESSION['project']['pageCount']);
-
-        return $this->models->PageTaxon->save(array(
-            'id' => null, 
-            'page' => $name, 
-            'show_order' => $show_order!==false ? $show_order : 0, 
-            'project_id' => $this->getCurrentProjectId(), 
-            'def_page' => $isDefault ? '1' : '0'
-        ));
+        return
+			$this->models->PageTaxon->save(
+				array(
+					'id' => null, 
+					'page' => $name, 
+					'show_order' => $show_order!==false ? $show_order : 0, 
+					'project_id' => $this->getCurrentProjectId(), 
+					'def_page' => $isDefault ? '1' : '0'
+				)
+			);
     
     }
 	
@@ -2603,13 +2604,14 @@ class SpeciesController extends Controller
 		foreach((array)$sections as $key => $val) {
 
 			$this->models->Section->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(), 
-				'page_id' => $pageId,
-				'section' => $val, 
-				'show_order' => $key, 
-			));
+				array(
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(), 
+					'page_id' => $pageId,
+					'section' => $val, 
+					'show_order' => $key, 
+				)
+			);
 
 		}
 
@@ -2881,9 +2883,9 @@ class SpeciesController extends Controller
                            that that is the place where the leading name of a taxon is entered might be faulty
 
                         // if succesful, get the projects default language
-                        $lp = $_SESSION['project']['languages'];
+                        $lp = $_SESSION['admin']['project']['languages'];
                         
-                        $defaultLanguage = $_SESSION['project']['default_language_id'];
+                        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
 
                         // get the main page content for the default language
                         $ct = $this->models->ContentTaxon->_get(
@@ -3719,16 +3721,16 @@ class SpeciesController extends Controller
 			
 			$delRecords = true;			
 			
-			if (file_exists($_SESSION['project']['paths']['project_media'].$mt[0]['file_name'])) {
+			if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$mt[0]['file_name'])) {
 
-				$delRecords = unlink($_SESSION['project']['paths']['project_media'].$mt[0]['file_name']);
+				$delRecords = unlink($_SESSION['admin']['project']['paths']['project_media'].$mt[0]['file_name']);
 
 			}
 
             if ($delRecords) {
 
-                if ($mt[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name'])) {
-                    unlink($_SESSION['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
+                if ($mt[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$mt[0]['thumb_name'])) {
+                    unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$mt[0]['thumb_name']);
                 }
 
                 $this->models->MediaDescriptionsTaxon->delete(
@@ -4105,7 +4107,7 @@ class SpeciesController extends Controller
 	private function getPageTaxonCount()
 	{
 	
-		if ($this->hasTableDataChanged('PageTaxon') || !isset($_SESSION['project']['PageTaxonCount'])) {
+		if ($this->hasTableDataChanged('PageTaxon') || !isset($_SESSION['admin']['project']['PageTaxonCount'])) {
 		
 			$tp = $this->models->PageTaxon->_get(
 				array(
@@ -4114,17 +4116,17 @@ class SpeciesController extends Controller
 				)
 			);
 		
-			$_SESSION['project']['PageTaxonCount'] = $tp[0]['total'];
+			$_SESSION['admin']['project']['PageTaxonCount'] = $tp[0]['total'];
 		}
 		
-		return $_SESSION['project']['PageTaxonCount'];
+		return $_SESSION['admin']['project']['PageTaxonCount'];
 
 	}
 
 	private function getContentTaxaCount()
 	{
 
-		if ($this->hasTableDataChanged('ContentTaxon') || !isset($_SESSION['project']['ContentTaxonCount'])) {
+		if ($this->hasTableDataChanged('ContentTaxon') || !isset($_SESSION['admin']['project']['ContentTaxonCount'])) {
 
 
 			$ct = $this->models->ContentTaxon->_get(
@@ -4141,19 +4143,19 @@ class SpeciesController extends Controller
 
 			foreach((array)$ct as $key => $val) $d[$val['taxon_id']] = $val['total'];
 			
-			$_SESSION['project']['ContentTaxonCount'] = isset($d) ? $d : 0;
+			$_SESSION['admin']['project']['ContentTaxonCount'] = isset($d) ? $d : 0;
 
 	
 		}
 		
-		return $_SESSION['project']['ContentTaxonCount'];
+		return $_SESSION['admin']['project']['ContentTaxonCount'];
 
 	}
 
 	private function getSynonymCount()
 	{
 	
-		if ($this->hasTableDataChanged('Synonym') || !isset($_SESSION['project']['SynonymCount'])) {
+		if ($this->hasTableDataChanged('Synonym') || !isset($_SESSION['admin']['project']['SynonymCount'])) {
 	
 			$s = $this->models->Synonym->_get(
 				array(
@@ -4165,11 +4167,11 @@ class SpeciesController extends Controller
 	
 			foreach((array)$s as $key => $val) $d[$val['taxon_id']] = $val['total'];
 			
-			$_SESSION['project']['SynonymCount'] = isset($d) ? $d : 0;
+			$_SESSION['admin']['project']['SynonymCount'] = isset($d) ? $d : 0;
 
 		}
 		
-		return $_SESSION['project']['SynonymCount'];
+		return $_SESSION['admin']['project']['SynonymCount'];
 	
 	}
 
@@ -4177,7 +4179,7 @@ class SpeciesController extends Controller
 	private function getCommonnameCount()
 	{
 	
-		if ($this->hasTableDataChanged('Commonname') || !isset($_SESSION['project']['CommonnameCount'])) {
+		if ($this->hasTableDataChanged('Commonname') || !isset($_SESSION['admin']['project']['CommonnameCount'])) {
 
 			$c = $this->models->Commonname->_get(
 				array(
@@ -4189,18 +4191,18 @@ class SpeciesController extends Controller
 	
 			foreach((array)$c as $key => $val) $d[$val['taxon_id']] = $val['total'];
 			
-			$_SESSION['project']['CommonnameCount'] = isset($d) ? $d : 0;
+			$_SESSION['admin']['project']['CommonnameCount'] = isset($d) ? $d : 0;
 
 		}
 		
-		return $_SESSION['project']['CommonnameCount'];
+		return $_SESSION['admin']['project']['CommonnameCount'];
 
 	}
 
 	private function getMediaTaxonCount()
 	{
 
-		if ($this->hasTableDataChanged('MediaTaxon') || !isset($_SESSION['project']['MediaTaxonCount'])) {
+		if ($this->hasTableDataChanged('MediaTaxon') || !isset($_SESSION['admin']['project']['MediaTaxonCount'])) {
 
 			$mt = $this->models->MediaTaxon->_get(
 				array(
@@ -4212,18 +4214,18 @@ class SpeciesController extends Controller
 		
 			foreach((array)$mt as $key => $val) $d[$val['taxon_id']] = $val['total'];
 
-			$_SESSION['project']['MediaTaxonCount'] = isset($d) ? $d : 0;
+			$_SESSION['admin']['project']['MediaTaxonCount'] = isset($d) ? $d : 0;
 
 		}
 		
-		return $_SESSION['project']['MediaTaxonCount'];
+		return $_SESSION['admin']['project']['MediaTaxonCount'];
 	
 	}
 
 	private function getLiteratureTaxonCount()
 	{
 
-		if ($this->hasTableDataChanged('LiteratureTaxon') || !isset($_SESSION['project']['LiteratureTaxonCount'])) {
+		if ($this->hasTableDataChanged('LiteratureTaxon') || !isset($_SESSION['admin']['project']['LiteratureTaxonCount'])) {
 
 			$lt = $this->models->LiteratureTaxon->_get(
 				array(
@@ -4235,11 +4237,11 @@ class SpeciesController extends Controller
 		
 			foreach((array)$lt as $key => $val) $d[$val['taxon_id']] = $val['total'];
 			
-			$_SESSION['project']['LiteratureTaxonCount'] = isset($d) ? $d : 0;
+			$_SESSION['admin']['project']['LiteratureTaxonCount'] = isset($d) ? $d : 0;
 
 		}
 		
-		return $_SESSION['project']['LiteratureTaxonCount'];
+		return $_SESSION['admin']['project']['LiteratureTaxonCount'];
 	
 	}
 
@@ -4365,24 +4367,24 @@ class SpeciesController extends Controller
 
 		if (empty($id)) return;
 
-		if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] != '<new>') {
+		if (isset($_SESSION['admin']['system']['literature']['newRef']) && $_SESSION['admin']['system']['literature']['newRef'] != '<new>') {
 		
 			$this->models->ContentTaxon->execute(
 				'update %table% 
 					set content = replace(content,"[new litref]","'.
-						mysql_real_escape_string($_SESSION['system']['literature']['newRef']) .'")
+						mysql_real_escape_string($_SESSION['admin']['system']['literature']['newRef']) .'")
 					where project_id = '.$this->getCurrentProjectId().'
 					and taxon_id = '. $id
 			);
 		
 		}
 		
-		if (isset($_SESSION['system']['media']['newRef']) && $_SESSION['system']['media']['newRef'] != '<new>') {
+		if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] != '<new>') {
 		
 			$this->models->ContentTaxon->execute(
 				'update %table% 
 					set content = replace(content,"[new media]","'.
-						mysql_real_escape_string($_SESSION['system']['media']['newRef']) .'")
+						mysql_real_escape_string($_SESSION['admin']['system']['media']['newRef']) .'")
 					where project_id = '.$this->getCurrentProjectId().'
 					and taxon_id = '. $id
 			);
@@ -4396,8 +4398,8 @@ class SpeciesController extends Controller
 				and taxon_id = '. $id
 		);
 		
-		unset($_SESSION['system']['literature']['newRef']);
-		unset($_SESSION['system']['media']['newRef']);
+		unset($_SESSION['admin']['system']['literature']['newRef']);
+		unset($_SESSION['admin']['system']['media']['newRef']);
 
 	}
 
@@ -4466,38 +4468,47 @@ class SpeciesController extends Controller
 	private function getCategories($taxon=null,$languageId=null)
 	{
 
-//NEED TO CACHE!
+		if (
+			$this->hasTableDataChanged('PageTaxon') ||
+			$this->hasTableDataChanged('PageTaxonTitle') || 
+			!isset($_SESSION['admin']['user']['species']['categories'])
+		) {
 
-		// get the defined categories (just the page definitions, no content yet)
-		$tp = $this->models->PageTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'order' => 'show_order',
-				'fieldAsIndex' => 'page_id'
-			)
-		);
-
-		foreach ((array) $tp as $key => $val) {
+			// get the defined categories (just the page definitions, no content yet)
+			$tp = $this->models->PageTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'order' => 'show_order',
+					'fieldAsIndex' => 'page_id'
+				)
+			);
 	
-			// for each category, get the category title
-			$tpt = $this->models->PageTaxonTitle->_get(
-				array('id'=>array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => isset($languageId) ? $languageId : $_SESSION['project']['default_language_id'],
-					'page_id' => $val['id']
-				),
-				'columns'=>'title'));
+			foreach ((array) $tp as $key => $val) {
+		
+				// for each category, get the category title
+				$tpt = $this->models->PageTaxonTitle->_get(
+					array('id'=>array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => isset($languageId) ? $languageId : $_SESSION['admin']['project']['default_language_id'],
+						'page_id' => $val['id']
+					),
+					'columns'=>'title'));
+		
+				$tp[$key]['title'] = $tpt[0]['title'];
 	
-			$tp[$key]['title'] = $tpt[0]['title'];
-
+			}
+			
+			$_SESSION['admin']['user']['species']['categories'] =
+				array(
+					'categories' => $tp,
+					'defaultCategory' => 1
+				);
+			
 		}
 		
-		return array(
-			'categories' => $tp,
-			'defaultCategory' => 1
-		);
+		return $_SESSION['admin']['user']['species']['categories'];
 
 	}
 
@@ -4535,227 +4546,5 @@ class SpeciesController extends Controller
 
 	}
 
-
-
-
-
-
-
-
-    public function ORG_listAction ()
-    {
-	
-		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName(_('Taxon list'));
-
-		unset($_SESSION['system']['activeTaxon']);
-
-		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
-		// moving branches up and down the stem
-
-			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
-
-			if ($this->rHasVal('scroll')) $this->smarty->assign('scroll', $this->requestData['scroll']);
-
-		}
-
-		$taxa = $this->getUserAssignedTreeList(true);
-
-		if (isset($taxa) && count((array)$taxa)>0) {
-
-			$projectLanguages = $_SESSION['project']['languages'];
-
-			$pageCount = $this->getPageTaxonCount();
-
-			$contentCount = $this->getContentTaxaCount();
-
-			$synonymsCount = $this->getSynonymCount();
-
-			$commonnameCount = $this->getCommonnameCount();
-
-			$mediaCount = $this->getMediaTaxonCount();
-
-			$literatureCount = $this->getLiteratureTaxonCount();
-
-			foreach ((array) $taxa as $key => $taxon) {
-
-				$taxa[$key]['pctFinished'] = 
-					isset($contentCount[$taxon['id']]) ? 
-						round(
-							(
-								(isset($contentCount[$taxon['id']]) ? $contentCount[$taxon['id']] : 0) / 
-								(count((array)$projectLanguages) * $pageCount)
-						) * 100) :
-						0;
-
-				$taxa[$key]['synonymCount'] = isset($synonymsCount[$taxon['id']]) ? $synonymsCount[$taxon['id']] : 0;
-
-				$taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
-
-				$taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
-
-				$taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
-
-
-	        }
-
-			// user requested a sort of the table
-			if ($this->rHasVal('key')) {
-
-				$sortBy = array(
-					'key' => $this->requestData['key'], 
-					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-					'case' => 'i'
-				);
-			
-				// sort array of collaborators
-				$this->customSortArray($taxa, $sortBy);
-	
-			} else {
-			// default sort order
-				
-				$sortBy = array(
-					'key' => 'taxon', 
-					'dir' => 'asc', 
-					'case' => 'i'
-				);
-			
-			}
-
-			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
-
-
-			if ($this->maskAsHigherTaxa()) {
-
-				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
-
-				if (isset($ranks)) $this->smarty->assign('ranks', $ranks);
-
-			}
-			
-			if (isset($taxa)) $this->smarty->assign('taxa', $taxa);
-			
-			$this->smarty->assign('sortBy', $sortBy);
-			
-			$this->smarty->assign('languages', $projectLanguages);
-
-		} else {
-				
-			$this->addMessage(_('No taxa have been assigned to you.'));
-		
-		}
-
-        $this->printPage();
-    
-    }
-
-	private function ORG_getPageTaxonCount()
-	{
-	
-		if (!isset($_SESSION['project']['pageCount'])) {
-		
-			$tp = $this->models->PageTaxon->_get(
-				array(
-					'id'=> array('project_id' => $this->getCurrentProjectId()), 
-					'columns' => 'count(*) as total'
-				)
-			);
-		
-			$_SESSION['project']['pageCount'] = isset($tp[0]['total']) ? $tp[0]['total'] : 0;
-		}
-		
-		return $_SESSION['project']['pageCount'];
-
-	}
-
-	private function ORG_getContentTaxaCount()
-	{
-
-		$ct = $this->models->ContentTaxon->_get(
-			array(
-				'id' =>	array(
-					'publish' => 1, 
-					'project_id' => $this->getCurrentProjectId()
-				), 
-				'columns' => 'count(*) as total, taxon_id',
-				'group' => 'taxon_id'
-			)
-		);
-
-		foreach((array)$ct as $key => $val) {
-
-			$d[$val['taxon_id']] = $val['total'];
-
-		}
-		
-		return isset($d) ? $d : 0;
-
-	}
-
-	private function ORG_getSynonymCount()
-	{
-	
-		$s = $this->models->Synonym->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'count(*) as total,taxon_id',
-				'group' => 'taxon_id'
-			)
-		);
-
-		foreach((array)$s as $key => $val) {
-
-			$d[$val['taxon_id']] = $val['total'];
-
-		}
-		
-		return isset($d) ? $d : 0;
-	
-	}
-
-	private function ORG_getCommonnameCount()
-	{
-	
-		$c = $this->models->Commonname->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'count(*) as total,taxon_id',
-				'group' => 'taxon_id'
-			)
-		);
-
-		foreach((array)$c as $key => $val) {
-
-			$d[$val['taxon_id']] = $val['total'];
-
-		}
-		
-		return isset($d) ? $d : 0;
-
-	}
-
-	private function ORG_getLiteratureTaxonCount()
-	{
-
-		$lt = $this->models->LiteratureTaxon->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'count(*) as total, taxon_id',
-				'group' => 'taxon_id'
-			)
-		);
-	
-		foreach((array)$lt as $key => $val) {
-
-			$d[$val['taxon_id']] = $val['total'];
-
-		}
-		
-		return isset($d) ? $d : 0;
-	
-	}
 	
 }

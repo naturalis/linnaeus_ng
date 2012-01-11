@@ -147,9 +147,9 @@ class IntroductionController extends Controller
 
 		if (isset($page)) $this->smarty->assign('page', $page);
 
-		$this->smarty->assign('languages', $_SESSION['project']['languages']);
+		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -166,6 +166,17 @@ class IntroductionController extends Controller
     public function previewAction()
     {
 
+		$this->redirect('../../..//app/views/introduction/topic.php?id=');
+
+		array(
+			'p' => $this->getCurrentProjectId(),
+			'id' => $this->requestData['id'],
+			'return' => 'edit.php?id='.$this->requestData['id']
+		);
+
+
+		/*
+
 		$page = $this->getPage($this->requestData['id']);
 
 		$navList = $this->getPageNavList();
@@ -180,6 +191,8 @@ class IntroductionController extends Controller
 			'../../../../app/templates/templates/introduction/_topic',
 			'module.css'
 		);
+		
+		*/
 
 	}
 
@@ -438,7 +451,7 @@ class IntroductionController extends Controller
 
             }
 			
-			unset($_SESSION['system']['introduction']['navList']);
+			unset($_SESSION['admin']['system']['introduction']['navList']);
 
             $this->smarty->assign('returnText', 'saved');
         
@@ -553,7 +566,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $_SESSION['project']['default_language_id'], 
+						'language_id' => $_SESSION['admin']['project']['default_language_id'], 
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
@@ -590,7 +603,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => isset($languageId) ? $languageId : $_SESSION['project']['default_language_id'], 
+						'language_id' => isset($languageId) ? $languageId : $_SESSION['admin']['project']['default_language_id'], 
 						'page_id' => $this->requestData['id'],
 						)
 				)
@@ -678,13 +691,13 @@ class IntroductionController extends Controller
 			)
 		);
 			
-		if (file_exists($_SESSION['project']['paths']['project_media'].$fmm[0]['file_name'])) {
+		if (file_exists($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 
-			if (unlink($_SESSION['project']['paths']['project_media'].$fmm[0]['file_name'])) {
+			if (unlink($_SESSION['admin']['project']['paths']['project_media'].$fmm[0]['file_name'])) {
 			
-				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
+				if ($fmm[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name'])) {
 				
-					unlink($_SESSION['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
+					unlink($_SESSION['admin']['project']['paths']['project_thumbs'].$fmm[0]['thumb_name']);
 
 				}
 			}
@@ -728,7 +741,7 @@ class IntroductionController extends Controller
 	private function getPageNavList($forceLookup=false)
 	{
 
-		if (empty($_SESSION['system']['introduction']['navList']) || $forceLookup) {
+		if (empty($_SESSION['admin']['system']['introduction']['navList']) || $forceLookup) {
 		
 			$d = $this->getPageHeaders();
 
@@ -742,13 +755,13 @@ class IntroductionController extends Controller
 			}
 
 			if (isset($res))
-				$_SESSION['system']['introduction']['navList'] = $res;
+				$_SESSION['admin']['system']['introduction']['navList'] = $res;
 			else
-				$_SESSION['system']['introduction']['navList'] = null;
+				$_SESSION['admin']['system']['introduction']['navList'] = null;
 		
 		}
 		
-		return $_SESSION['system']['introduction']['navList'];
+		return $_SESSION['admin']['system']['introduction']['navList'];
 
 	}
 
@@ -761,7 +774,7 @@ class IntroductionController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' =>  $_SESSION['project']['default_language_id'],
+					'language_id' =>  $_SESSION['admin']['project']['default_language_id'],
 					'topic like' => '%'.$search.'%'
 					),
 				'order' => 'topic',

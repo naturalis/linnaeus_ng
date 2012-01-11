@@ -85,7 +85,7 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
 
@@ -458,14 +458,14 @@ class MapKeyController extends Controller
 			$gt[$key]['title'] = isset($gtl[0]['title']) ? $gtl[0]['title'] : '-';
 			$gt[$key]['colour_inverse'] = $this->inverseColour($val['colour']);
 	
-			$_SESSION['user']['map']['geoDataTypes'] = $gt;
+			$_SESSION['app']['user']['map']['geoDataTypes'] = $gt;
 
 		}
 
 		if (isset($id))
-			return $_SESSION['user']['map']['geoDataTypes'][$id];
+			return $_SESSION['app']['user']['map']['geoDataTypes'][$id];
 		else
-			return $_SESSION['user']['map']['geoDataTypes'];
+			return $_SESSION['app']['user']['map']['geoDataTypes'];
 	
 	}
 

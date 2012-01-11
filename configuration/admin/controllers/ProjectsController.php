@@ -149,8 +149,8 @@ class ProjectsController extends Controller
 			$modules[$key]['show_in_menu'] = $mp['show_in_menu'];
 
 			// see if the current user has any rights within the module
-			if (isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]))
-				$modules[$key]['_rights'] = $_SESSION['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
+			if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]))
+				$modules[$key]['_rights'] = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
 
 		}
 
@@ -166,14 +166,14 @@ class ProjectsController extends Controller
 			
 			// see if the current user has any rights within the module
 			if (
-				isset($_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) &&
-				$_SESSION['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]===true
+				isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) &&
+				$_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]===true
 			)
 				$freeModules[$key]['currentUserRights'] = true;
 
 		}
 
-		unset($_SESSION['user']['freeModules']['activeModule']);
+		unset($_SESSION['admin']['user']['freeModules']['activeModule']);
 
         $this->smarty->assign('modules',$modules);
 
@@ -424,7 +424,7 @@ class ProjectsController extends Controller
 
 				} else {
 
-					@unlink($_SESSION['project']['paths']['project_media'].$filesToSave[0]['name']);
+					@unlink($_SESSION['admin']['project']['paths']['project_media'].$filesToSave[0]['name']);
 
 					$this->addError(_('Could not save image.'));
 

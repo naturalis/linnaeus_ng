@@ -42,9 +42,9 @@ class MatrixKeyController extends Controller
         
         parent::__construct();
 
-		$this->smarty->assign('languages', $_SESSION['project']['languages']);
+		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 
     }
 
@@ -141,9 +141,9 @@ class MatrixKeyController extends Controller
 
 			$matrix = $this->getMatrix();
 			
-			if (isset($matrix['names'][$_SESSION['project']['default_language_id']]['name'])) {
+			if (isset($matrix['names'][$_SESSION['admin']['project']['default_language_id']]['name'])) {
 
-		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$_SESSION['project']['default_language_id']]['name']));
+		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$_SESSION['admin']['project']['default_language_id']]['name']));
 
 			} else {
 
@@ -315,7 +315,7 @@ class MatrixKeyController extends Controller
 
 		}
 
-		$this->smarty->assign('languages',$_SESSION['project']['languages']);
+		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
 		$this->smarty->assign('matrix',$matrix);
 
@@ -665,13 +665,13 @@ class MatrixKeyController extends Controller
 	
 		if ($id == null) {
 
-			unset($_SESSION['matrixkey']['id']);
-			unset($_SESSION['matrixkey']['name']);
+			unset($_SESSION['admin']['matrixkey']['id']);
+			unset($_SESSION['admin']['matrixkey']['name']);
 
 		} else {
 	
-			$_SESSION['matrixkey']['id'] = $id;
-			if ($name) $_SESSION['matrixkey']['name'] = $name;
+			$_SESSION['admin']['matrixkey']['id'] = $id;
+			if ($name) $_SESSION['admin']['matrixkey']['name'] = $name;
 
 		}
 
@@ -680,7 +680,7 @@ class MatrixKeyController extends Controller
 	private function getCurrentMatrixId()
 	{
 
-		return isset($_SESSION['matrixkey']['id']) ? $_SESSION['matrixkey']['id'] : null;
+		return isset($_SESSION['admin']['matrixkey']['id']) ? $_SESSION['admin']['matrixkey']['id'] : null;
 
 	}
 
@@ -713,7 +713,7 @@ class MatrixKeyController extends Controller
 
 		$m[0]['names']=$mn;
 
-		$m[0]['matrix'] = $m[0]['names'][$_SESSION['project']['default_language_id']]['name'];
+		$m[0]['matrix'] = $m[0]['names'][$_SESSION['admin']['project']['default_language_id']]['name'];
 
 		return $m[0];
 
@@ -774,7 +774,7 @@ class MatrixKeyController extends Controller
 			);
 
 			$m[$key]['names'] = $mn;
-			$m[$key]['default_name'] = $mn[ $_SESSION['project']['default_language_id']]['name'];
+			$m[$key]['default_name'] = $mn[ $_SESSION['admin']['project']['default_language_id']]['name'];
 
 		}
 
@@ -1040,7 +1040,7 @@ class MatrixKeyController extends Controller
 
 		return array(
 			'labels' => $cl, 
-			'label' => $cl[$_SESSION['project']['default_language_id']]['label']
+			'label' => $cl[$_SESSION['admin']['project']['default_language_id']]['label']
 		);
 		
 	}
@@ -1245,7 +1245,7 @@ class MatrixKeyController extends Controller
 			)
 		);
 
-		return array('label' => $cls[$_SESSION['project']['default_language_id']]['label'], 'labels' => $cls);
+		return array('label' => $cls[$_SESSION['admin']['project']['default_language_id']]['label'], 'labels' => $cls);
 
 	}
 
@@ -1409,7 +1409,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$cs as $key => $val) {
 
-			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'],$_SESSION['project']['default_language_id']);
+			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'],$_SESSION['admin']['project']['default_language_id']);
 
 		}
 
@@ -1604,7 +1604,7 @@ class MatrixKeyController extends Controller
 
 		if ($cs['file_name']) {
 
-			@unlink($_SESSION['project']['paths']['project_media'].$cs['file_name']);
+			@unlink($_SESSION['admin']['project']['paths']['project_media'].$cs['file_name']);
 
 		}
 
@@ -1635,7 +1635,7 @@ class MatrixKeyController extends Controller
 
 			if ($val['file_name']) {
 	
-				@unlink($_SESSION['project']['paths']['project_media'].$val['file_name']);
+				@unlink($_SESSION['admin']['project']['paths']['project_media'].$val['file_name']);
 	
 			}
 
@@ -1781,8 +1781,8 @@ class MatrixKeyController extends Controller
 				)
 			);
 			
-			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$_SESSION['project']['default_language_id']);
-			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$_SESSION['project']['default_language_id']);
+			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$_SESSION['admin']['project']['default_language_id']);
+			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$_SESSION['admin']['project']['default_language_id']);
 		
 		}
 

@@ -201,7 +201,7 @@ class UsersController extends Controller
         if ($this->rHasVal('username')) {
         // data was submitted
 		
-			$_SESSION['data']['new_user'] = $this->requestData;
+			$_SESSION['admin']['data']['new_user'] = $this->requestData;
 
 			$saveUser = true;
 			
@@ -226,7 +226,7 @@ class UsersController extends Controller
 
 					$this->smarty->assign('existingUser', $sim[0]);
 
-					$_SESSION['data']['new_user']['existing_user_id'] = $sim[0]['id'];
+					$_SESSION['admin']['data']['new_user']['existing_user_id'] = $sim[0]['id'];
 
 					// ...it might be because of his name...
 					if ($this->isEmailAddressUnique(false, false, true)) {
@@ -904,15 +904,15 @@ class UsersController extends Controller
 	{
 
 		if (
-			!isset($_SESSION['data']['new_user']['role_id']) ||
-			!isset($_SESSION['data']['new_user']['existing_user_id'])
+			!isset($_SESSION['admin']['data']['new_user']['role_id']) ||
+			!isset($_SESSION['admin']['data']['new_user']['existing_user_id'])
 		) return;
 
 
 		$this->models->ProjectRoleUser->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+				'user_id' => $_SESSION['admin']['data']['new_user']['existing_user_id']
 			)
 		);
 
@@ -921,8 +921,8 @@ class UsersController extends Controller
 			array(
 				'id' => null, 
 				'project_id' => $this->getCurrentProjectId(), 
-				'role_id' => $_SESSION['data']['new_user']['role_id'], 
-				'user_id' => $_SESSION['data']['new_user']['existing_user_id']
+				'role_id' => $_SESSION['admin']['data']['new_user']['role_id'], 
+				'user_id' => $_SESSION['admin']['data']['new_user']['existing_user_id']
 			)
 		);
 /*
@@ -935,7 +935,7 @@ MUST CHECK
 				'modules' => $this->models->ModuleProject->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))),
 				'freeModules' => $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())))
 			),
-			$_SESSION['data']['new_user']['existing_user_id']
+			$_SESSION['admin']['data']['new_user']['existing_user_id']
 		);
 */
 		if (!$pru) {
@@ -944,7 +944,7 @@ MUST CHECK
 
 		} else {
 
-			unset($_SESSION['data']['new_user']);
+			unset($_SESSION['admin']['data']['new_user']);
 
 		}
 
@@ -953,9 +953,9 @@ MUST CHECK
 	private function ajaxActionCreateUserFromSession ()
 	{
 	
-		if (!isset($_SESSION['data']['new_user'])) return;
+		if (!isset($_SESSION['admin']['data']['new_user'])) return;
 	
-		$su = $this->saveNewUser($_SESSION['data']['new_user']);
+		$su = $this->saveNewUser($_SESSION['admin']['data']['new_user']);
 
 		if (!$su) {
 
@@ -963,9 +963,9 @@ MUST CHECK
 
 		} else {
 
-			$this->sendNewUserEmail($_SESSION['data']['new_user']);
+			$this->sendNewUserEmail($_SESSION['admin']['data']['new_user']);
 
-			unset($_SESSION['data']['new_user']);
+			unset($_SESSION['admin']['data']['new_user']);
 
 		}
 
@@ -1228,14 +1228,13 @@ MUST CHECK
         
         if (!$userData) return;
 
-        $_SESSION['user'] = $userData;
-
-        $_SESSION['user']['_login']['time'] = time();
-        $_SESSION['user']['_said_welcome'] = false;
-
-        //$_SESSION['user']['_roles'] = $roles;
-        //$_SESSION['user']['_rights'] = $rights;
-        //$_SESSION['user']['_number_of_projects'] = $numberOfProjects;
+        $_SESSION['admin']['user'] = $userData;
+        $_SESSION['admin']['user']['_login']['time'] = time();
+        $_SESSION['admin']['user']['_said_welcome'] = false;
+		
+        //$_SESSION['admin']['user']['_roles'] = $roles;
+        //$_SESSION['admin']['user']['_rights'] = $rights;
+        //$_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
 		$this->setUserSessionRights($rights);
 		$this->setUserSessionRoles($roles);
 		$this->setUserSessionNumberOfProjects($numberOfProjects);
@@ -1250,6 +1249,7 @@ MUST CHECK
     private function destroyUserSession ()
     {
         
+		unset($_SESSION['admin']);
         session_destroy();
     
     }

@@ -84,7 +84,7 @@ class SpeciesController extends Controller
 
 		$this->showLowerTaxon = true;
 		
-		unset($_SESSION['user']['search']['hasSearchResults']);
+		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		$this->_indexAction();
 
@@ -169,7 +169,7 @@ class SpeciesController extends Controller
 					'title' =>
 						$taxon['taxon'].
 						($taxon['is_hybrid']=='1' ?
-							'<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['project']['hybrid_marker'].'</span>'
+							'<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['app']['project']['hybrid_marker'].'</span>'
 							: ''
 						)
 					)
@@ -242,14 +242,14 @@ class SpeciesController extends Controller
 	public function setTaxonType ($type)
 	{
 
-		$_SESSION['user']['species']['type'] = ($type=='higher') ? 'higher' : 'lower';
+		$_SESSION['app']['user']['species']['type'] = ($type=='higher') ? 'higher' : 'lower';
 	
 	}
 
 	private function getTaxonType ()
 	{
 
-		return isset($_SESSION['user']['species']['type']) ? $_SESSION['user']['species']['type'] : 'lower';
+		return isset($_SESSION['app']['user']['species']['type']) ? $_SESSION['app']['user']['species']['type'] : 'lower';
 	
 	}
 
@@ -266,7 +266,7 @@ class SpeciesController extends Controller
 	private function getCategories($taxon=null,$forcelookup=false)
 	{
 
-		if (!isset($_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()]) || $forcelookup) {
+		if (!isset($_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()]) || $forcelookup) {
 
 			// get the defined categories (just the page definitions, no content yet)
 			$tp = $this->models->PageTaxon->_get(
@@ -292,11 +292,11 @@ class SpeciesController extends Controller
 		
 				$tp[$key]['title'] = $tpt[0]['title'];
 		
-				if ($val['def_page'] == 1) $_SESSION['user']['species']['defaultCategory'] = $val['id'];
+				if ($val['def_page'] == 1) $_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
 			
 			}
 			
-			$_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
+			$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
 
 		}
 
@@ -306,7 +306,7 @@ class SpeciesController extends Controller
 		
 			$d = null;
 
-			foreach((array)$_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
+			foreach((array)$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
 
 				$ct = $this->models->ContentTaxon->_get(
 					array(
@@ -322,8 +322,8 @@ class SpeciesController extends Controller
 
 				if ($ct[0]['publish']=='1') $d[] = $val;
 
-				if ($ct[0]['page_id']==$_SESSION['user']['species']['defaultCategory'] && $ct[0]['publish']=='1') 
-					$defCat = $_SESSION['user']['species']['defaultCategory'];
+				if ($ct[0]['page_id']==$_SESSION['app']['user']['species']['defaultCategory'] && $ct[0]['publish']=='1') 
+					$defCat = $_SESSION['app']['user']['species']['defaultCategory'];
 
 			}
 
@@ -335,8 +335,8 @@ class SpeciesController extends Controller
 		}
 
 		return array(
-			'categories' => $_SESSION['user']['species']['categories'][$this->getCurrentLanguageId()],
-			'defaultCategory' => $_SESSION['user']['species']['defaultCategory']
+			'categories' => $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()],
+			'defaultCategory' => $_SESSION['app']['user']['species']['defaultCategory']
 		);
 
 	}
@@ -344,7 +344,7 @@ class SpeciesController extends Controller
 	private function getCategoryName($id)
 	{
 
-		if (!isset($_SESSION['user']['species']['catnames'][$this->getCurrentLanguageId()][$id])) {
+		if (!isset($_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id])) {
 
 			if (is_numeric($id)) {
 
@@ -356,17 +356,17 @@ class SpeciesController extends Controller
 					),
 					'columns'=>'title'));
 		
-				$_SESSION['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = $tpt[0]['title'];
+				$_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = $tpt[0]['title'];
 
 			} else {
 
-				$_SESSION['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = ucwords($id);
+				$_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = ucwords($id);
 
 			}
 
 		}
 
-		return $_SESSION['user']['species']['catnames'][$this->getCurrentLanguageId()][$id];
+		return $_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id];
 
 	}
 	
@@ -448,7 +448,7 @@ class SpeciesController extends Controller
 			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
 			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-			$mt[$key]['full_path'] = $_SESSION['project']['urls']['project_media'].$mt[$key]['file_name'];
+			$mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['project_media'].$mt[$key]['file_name'];
 
 
 		}
@@ -568,9 +568,9 @@ class SpeciesController extends Controller
 
 			foreach((array)$c as $key => $val) {
 			
-				if (isset($_SESSION['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()])) {
+				if (isset($_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()])) {
 
-					$c[$key]['language_name'] = $_SESSION['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()];
+					$c[$key]['language_name'] = $_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()];
 
 				} else {
 
@@ -586,7 +586,7 @@ class SpeciesController extends Controller
 					);
 	
 					if ($ll) $c[$key]['language_name'] = 
-						$_SESSION['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = 
+						$_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = 
 						$ll[0]['label'];
 
 				}
