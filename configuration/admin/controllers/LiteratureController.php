@@ -181,26 +181,12 @@ class LiteratureController extends Controller
 
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Literature->getNewId();
 
-				$this->models->LiteratureTaxon->delete(
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'literature_id' => $id
-					)
-				);
+				$this->deleteLiteratureTaxon($id);
 
 				if ($this->rHasVal('selectedTaxa')) {
 
-					foreach((array)$this->requestData['selectedTaxa'] as $key => $val) {
-
-						$this->models->LiteratureTaxon->save(
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'literature_id' => $id,
-								'taxon_id' => $val
-							)
-						);
-
-					}
+					foreach((array)$this->requestData['selectedTaxa'] as $key => $val)
+						$this->saveLiteratureTaxon($id, $val);
 
 				}
 				
@@ -427,6 +413,16 @@ class LiteratureController extends Controller
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
+
+        } else
+        if ($this->rHasVal('action','save_taxon')) {
+		
+           $this->saveLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
+
+        } else
+        if ($this->rHasVal('action','delete_taxon')) {
+
+           $this->deleteLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
 
         }
 		
@@ -835,5 +831,62 @@ class LiteratureController extends Controller
 			) as author_full';
 	
 	}
+
+	private function saveLiteratureTaxon($id,$taxonId)
+	{
+	
+		if (!isset($id) || !isset($taxonId)) return;
+
+		$x =  $this->models->LiteratureTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'literature_id' => $id,
+				'taxon_id' => $taxonId
+			)
+		);	
+		
+		q($this->models->LiteratureTaxon->getLastQuery());
+	
+	}
+
+	private function deleteLiteratureTaxon($id,$taxonId=null)
+	{
+
+		if (!isset($id)) return;
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(),
+			'literature_id' => $id
+		);
+		
+		if (!is_null($taxonId)) $d['taxon_id'] = $taxonId;
+
+		return $this->models->LiteratureTaxon->delete($d);
+				
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -3,7 +3,7 @@
 <div id="page-main">
 <form action="" method="post" id="theForm" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="id" value="{$ref.id}" />
+<input type="hidden" name="id" id="id" value="{$ref.id}" />
 <input type="hidden" name="action" id="action" value="" />
 
 {if $ref.multiple_authors==0 && $ref.author_second!=''}
@@ -105,7 +105,7 @@
 	<tr style="vertical-align:top">
 		<td style="white-space:nowrap">{t}Taxa this reference pertains to:{/t}</td>
 		<td>
-			<select id="taxa" multiple="multiple" size="20" style="width:250px">
+			<select id="taxa" multiple="multiple" size="20" style="width:250px" ondblclick="litAddTaxonToList();">
             {foreach from=$taxa key=k item=v}
             {if $v.id && (($isHigherTaxa && $v.lower_taxon==0) || !$isHigherTaxa)}
             <option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
@@ -118,7 +118,7 @@
 			</select>
 		</td>
 		<td>
-			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList()">{t}add{/t}</span>
+			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList();">{t}add{/t}</span>
 		</td>
 		<td>
 			<div id="selected-taxa"></div>
@@ -148,7 +148,7 @@ initTinyMce(false,false);
 {/literal}
 
 {foreach from=$ref.taxa item=v}
-	litAddTaxonToList({$v.taxon_id},true);
+	litAddTaxonToList({$v.taxon_id},true,true);
 {/foreach}
 litUpdateTaxonSelection();
 {if $ref}
