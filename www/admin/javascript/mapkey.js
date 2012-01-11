@@ -100,7 +100,6 @@ function initMap(init) {
 	if (init==undefined) init = {};
 	if (!init.lat) init.lat = 0;
 	if (!init.lng) init.lng = 0;
-	if (!init.zoom) init.zoom = 2;
 
 	var myOptions = {
 		zoom: init.zoom,
@@ -128,6 +127,7 @@ function initMap(init) {
 	google.maps.event.addListener(map, 'idle', function() {
 		if (finishedLoading) return;
 		if (map.getZoom() > 9) map.setZoom(9);
+		if (map.getZoom() < 2) map.setZoom(2);
 		finishedLoading = true;
 	});
 	
@@ -222,7 +222,14 @@ function drawPolygon(bounds,info) {
 
 	var polygonCoordinates = Array();
 
-	for (var i=0;i<bounds.length;i++) polygonCoordinates[polygonCoordinates.length] = new google.maps.LatLng(bounds[i][0], bounds[i][1]);
+	for (var i=0;i<bounds.length;i++) {
+
+		// google maps has no map above and below 85.0511 deg
+		if (bounds[i][0]>85.05) bounds[i][0] = 85.05;
+		if (bounds[i][0]<-85.05) bounds[i][0] = -85.05;
+
+		polygonCoordinates[polygonCoordinates.length] = new google.maps.LatLng(bounds[i][0], bounds[i][1]);
+	}
 
 	if (polygonCoordinates.length<2) return;
 

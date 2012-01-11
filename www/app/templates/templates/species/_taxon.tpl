@@ -2,6 +2,7 @@
 <table>
 	<tr>
 	{foreach from=$categories key=k item=v}
+		{if $activeCategory==$v.id && $v.page=='Overview'}{assign var=taxonStartPage value=true}{/if}
 		<td {if $activeCategory==$v.id}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},{$v.id})"{/if}>{$v.title}</td><td class="space"></td>
 		{/foreach}
 {if $contentCount.media>0}
@@ -136,6 +137,9 @@
 </div>
 {else}
 <div id="content">
+{if $taxonStartPage && $overviewImage}
+<img id="overview-image" src="{$session.project.urls.project_media}{$overviewImage}"/>
+{/if}
 {$content}
 </div>
 {/if}

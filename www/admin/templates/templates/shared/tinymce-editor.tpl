@@ -23,15 +23,23 @@ function initTinyMce(litRefs,mediaRefs) {
 					var mlb = cm.createListBox('litref', {
 						 title : 'Literary references',
 						 onselect : function(v) {
+						 	if (v==undefined) return;
 							 tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,v);
+							 if (v=='[new litref]') {
+								allAjaxAsynchMode = false;
+								if (typeof taxonSaveDataAll == 'function') taxonSaveDataAll();
+								window.open('../literature/edit.php?add=hoc&action=new','_self');
+							 }
 							 //ed.execCommand("mceInsertContent",false,'[i]'+v+'[/i]');
 						 }
 					});
 	
+					mlb.add('create a new reference','[new litref]');
+
 					var obj = $.parseJSON(litRefs);
 	
 					if (obj) {
-						// Add some values to the list box
+						mlb.add('----------------------',null);
 						for (var i=0;i<obj.length;i++) {
 							
 							var l = 
@@ -45,8 +53,7 @@ function initTinyMce(litRefs,mediaRefs) {
 							mlb.add(l,'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('+obj[i].id+');">'+l+'</span>');
 						}
 					}
-	
-					// Return the new listbox instance
+
 					return mlb;
 
 
@@ -58,7 +65,7 @@ function initTinyMce(litRefs,mediaRefs) {
 									tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id,"mceInsertContent",false,'[new litref]');
 									allAjaxAsynchMode = false;
 									if (typeof taxonSaveDataAll == 'function') taxonSaveDataAll();
-									window.open('../literature/edit.php?add=hoc','_self');
+									window.open('../literature/edit.php?add=hoc&action=new','_self');
 								},
 								icons : false
 						});
@@ -69,15 +76,23 @@ function initTinyMce(litRefs,mediaRefs) {
 					var mlb = cm.createListBox('media', {
 						 title : 'Media link',
 						 onselect : function(v) {
+						 	if (v==undefined) return;
 							 tinyMCE.execInstanceCommand(tinymce.EditorManager.activeEditor.id, "mceInsertContent",false,v);
 							 //ed.execCommand("mceInsertContent",false,'[i]'+v+'[/i]');
+							 if (v=='[new media]') {
+								allAjaxAsynchMode = false;
+								if (typeof taxonSaveDataAll == 'function') taxonSaveDataAll();
+								window.open('media_upload.php?add=hoc','_self');
+							 }
 						 }
 					});
+
+					mlb.add('upload new media','[new media]');
 
 					var obj = $.parseJSON(mediaRefs);
 
 					if (obj) {
-						// Add some values to the list box
+						mlb.add('----------------------',null);
 						for (var i=0;i<obj.length;i++) {
 							mlb.add(
 								obj[i].file_name+' ('+obj[i].mime_type+')',
@@ -86,8 +101,7 @@ function initTinyMce(litRefs,mediaRefs) {
 
 						}
 					}
-	
-					// Return the new listbox instance
+
 					return mlb;
 
 			   case 'addmedia':
@@ -141,15 +155,18 @@ function initTinyMce(litRefs,mediaRefs) {
 	};
 
 	if (inclLiteraryButtons && inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,|,addinternallink";
+	 	//propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,|,addinternallink";
+	 	propertyList.theme_advanced_buttons2 = "litref,media,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (inclLiteraryButtons && !inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "litref,addlitref,|,addinternallink";
+	 	//propertyList.theme_advanced_buttons2 = "litref,addlitref,|,addinternallink";
+	 	propertyList.theme_advanced_buttons2 = "litref,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (!inclLiteraryButtons && inclMediaButtons) {
-	 	propertyList.theme_advanced_buttons2 = "media,addmedia,|,addinternallink";
+	 	//propertyList.theme_advanced_buttons2 = "media,addmedia,|,addinternallink";
+	 	propertyList.theme_advanced_buttons2 = "media,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else {
 	 	propertyList.theme_advanced_buttons2 = "addinternallink";

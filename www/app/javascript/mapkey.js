@@ -185,7 +185,11 @@ function drawPolygon(bounds,style,info) {
 	var centreLng = 0;
 
 	for (var i=0;i<bounds.length;i++)  {
-	
+
+		// google maps has no map above and below 85.0511 deg
+		if (bounds[i][0]>85.05) bounds[i][0] = 85.05;
+		if (bounds[i][0]<-85.05) bounds[i][0] = -85.05;
+		
 		polygonCoordinates[polygonCoordinates.length] = new google.maps.LatLng(bounds[i][0], bounds[i][1]);
 		centreLat = centreLat + bounds[i][0];
 		centreLng = centreLng + bounds[i][1];

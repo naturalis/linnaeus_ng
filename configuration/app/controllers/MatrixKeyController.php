@@ -187,7 +187,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
-		$this->smarty->assign('taxa',$this->getTaxa());
+		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
 
@@ -216,7 +216,7 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf(_('Matrix "%s": examine'),$matrix['name']));
 
-		$this->smarty->assign('taxa',$this->getTaxa());
+		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
 
@@ -245,7 +245,7 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf(_('Matrix "%s": compare'),$matrix['name']));
 
-		$this->smarty->assign('taxa',$this->getTaxa());
+		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
 
@@ -370,7 +370,7 @@ class MatrixKeyController extends Controller
 
 	}
 
-	private function getTaxa()
+	private function getTaxaInMatrix()
 	{
 
 		if (!isset($_SESSION['user']['matrix']['taxa'][$this->getCurrentMatrixId()])) {
@@ -482,6 +482,7 @@ class MatrixKeyController extends Controller
 	
 		$item['hits'] = 0;
 
+		// go through all states that the user has chosen
 		foreach((array)$states as $sKey => $sVal) {
 		
 			// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
@@ -572,7 +573,7 @@ class MatrixKeyController extends Controller
 	private function getTaxaScores($states)
 	{
 	
-		$taxa = $this->getTaxa();
+		$taxa = $this->getTaxaInMatrix();
 		$mtcs = $this->getMatrices();
 
 		if ($states==-1) return $taxa;

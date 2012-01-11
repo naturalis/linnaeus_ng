@@ -4,7 +4,6 @@
 div index:
 	values of "-"
 	double nodes in boudary nodes
-	double [[ / ]] if no multi-poly
 
 
 update dev_diversity_index set project_id = 278;

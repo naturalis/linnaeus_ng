@@ -15,6 +15,8 @@ var taxonExecAfterSave = false;
 var taxonRankBorder = false;
 var taxonCommonnameLanguages = Array();
 var taxonHigherTaxa = false;
+var taxonCopyableTaxa = Array();
+
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -157,9 +159,11 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 		if (allLanguages[i][0]==allDefaultLanguage) var def = allLanguages[i][1];
 	}
 
-	$('#taxon-language-other-language').html(buffer);
+//	$('#taxon-language-other-language').html(buffer);
+	$('[id^="taxon-language-other-language"]').html(buffer);
 
-	$('#taxon-language-default-language').html(def);
+//	$('#taxon-language-default-language').html(def);
+	$('[id^="taxon-language-default-language"]').html(def);
 
 }
 
@@ -512,7 +516,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-default-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',\'0\');">',
+				'<span class="pseudo-a" onclick="taxonPublishContent(\'default\',\'0\');">',
 				'</span>'
 			)
 		);
@@ -520,7 +524,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-default-publish').html(
 			sprintf(
 				_('(This page has not been published in this language. Click %shere%s to publish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'default\',1);">',
+				'<span class="pseudo-a" onclick="taxonPublishContent(\'default\',1);">',
 				'</span>'
 			)
 		);
@@ -529,7 +533,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-other-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',\'0\');">',
+				'<span class="pseudo-a" onclick="taxonPublishContent(\'active\',\'0\');">',
 				'</span>'
 			)
 		);
@@ -537,7 +541,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-other-publish').html(
 			sprintf(
 				_('(This page has not been published in this language. Click %shere%s to publish.)'),
-				'<span class="pseudo-a" "onclick="taxonPublishContent(\'active\',1);">',
+				'<span class="pseudo-a" onclick="taxonPublishContent(\'active\',1);">',
 				'</span>'
 			)
 		);
@@ -836,42 +840,9 @@ function taxonSaveCoLResult() {
 
 
 //MEDIA
-var taxonMediaDescBeingEdited = false;
 var taxonMediaSaveButtonClicked = false;
 var taxonMediaDescBeforeEdit = false;
 var taxonMediaIds = Array();
-
-function taxonMediaDescriptionEdit(ele) {
-
-	if (taxonMediaSaveButtonClicked) {
-		taxonMediaSaveButtonClicked = false;
-		return;
-	}
-
-	if (ele==taxonMediaDescBeingEdited) { 
-		return;
-	} else {
-		taxonMediaDescBeforeEdit = $(ele).html();
-		taxonMediaSaveDesc();
-		$(taxonMediaDescBeingEdited).html($('#taxon-media-description').val());
-	}
-
-
-	$(ele).html(
-		'<textarea id="taxon-media-description">'+
-		$(ele).html().trim()+
-		'</textarea>'+
-		'<div>'+
-		'<input type="button" value="save" onclick="taxonMediaClickSave()" />&nbsp;'+
-		'<input type="button" value="cancel" onclick="taxonMediaClickClose()" />'+
-		'</div>'
-	);
-
-	$('#taxon-media-description').focus();
-
-	taxonMediaDescBeingEdited = ele;
-
-}
 
 function taxonMediaSaveDesc(ele,id) {
 
@@ -889,9 +860,7 @@ function taxonMediaSaveDesc(ele,id) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
-			if(data=='<ok>') {
-				allSetMessage(_('saved'));
-			}			
+			if(data=='<ok>') allSetMessage(_('saved'));		
 		}
 	});
 
@@ -913,7 +882,7 @@ function taxonMediaGetDescriptions() {
 				obj = $.parseJSON(data);
 				if (obj) {
 					for(var i=0;i<obj.length;i++) {
-						$('#media-'+obj[i].id).html(obj[i].description);
+						$('#media-'+obj[i].id).val(obj[i].description);
 					}
 				}
 			}			
@@ -927,7 +896,6 @@ function taxonMediaChangeLanguage(lan) {
 
 	allShowLoadingDiv();
 	taxonMediaSaveDesc();
-	taxonMediaDescBeingEdited = false;
 	allActiveLanguage = lan;
 	taxonDrawTaxonLanguages('taxonMediaChangeLanguage',true);
 	taxonMediaGetDescriptions();
@@ -1259,6 +1227,7 @@ function taxonGetRankByParent(nomessage) {
 					$('#rank-message').html(_('Ok'))
 				}
 				$('#rank-id').val(data);
+				taxonAddNamePart();
 			}
 
 			if (!nomessage) taxonCheckHybridCheck();
@@ -1427,3 +1396,98 @@ function taxonDoPreview() {
 	$('#theForm').submit();
 
 }
+
+var taxonHasChangedNameManually = false;
+
+function taxonRegisterManualInput() {
+
+	taxonHasChangedNameManually = ($('#taxon-name').val().length==0);
+
+}
+
+function taxonStoreCopyableTaxa(id) {
+
+	taxonCopyableTaxa.push(id);
+
+}
+
+function taxonAddNamePart() {
+	
+	$('#taxon-name').val($('#parent-id :selected').text().trim()+' ');
+	$('#taxon-name').focus();
+
+	return;
+	
+	if (taxonHasChangedNameManually) return;
+
+	if (jQuery.inArray($('#parent-id :selected').val(),taxonCopyableTaxa)!==-1) {
+		
+		var namePart = $('#parent-id :selected').text().trim();
+
+		if ($('#taxon-name').val().length!=0) {
+
+			var d = $('#taxon-name').val().split(' ');
+
+			if ($('#taxon-name').val().indexOf(namePart)===-1) {
+
+				alert('Mismatch');
+
+			}
+
+		} else {
+
+			$('#taxon-name').val(namePart+' ');
+
+		}
+
+	}
+
+}
+
+function taxonChangeOverviewPicture(ele) {
+	
+	var isChecked = ele.checked;
+	$('[id^=overview-]').attr('checked',false);
+	$(ele).attr('checked',isChecked);
+	
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'set_overview' ,
+			'id' : ele.id.replace('overview-','') ,
+			'taxon_id' : $('#taxon_id').val() ,
+			'state' : isChecked,
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if(data=='<ok>') {
+				allSetMessage(_('saved'));
+			}
+		}
+	});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

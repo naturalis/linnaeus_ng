@@ -33,7 +33,11 @@
 				onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'default')"
 				style="width:100px" 
 				value="" />
+			<script>
+				taxonCommonnameLanguages[{$smarty.section.i.index}] = {$commonnames[i].language_id};
+			</script>
 		</td>
+		{if $languages|@count>1}
 		<td>
 			<input
 				type="text" 
@@ -41,10 +45,8 @@
 				onblur="taxonSaveLanguageLabel({$commonnames[i].language_id},this.value,'other')"
 				style="width:100px" 
 				value="" />
-		<script>
-			taxonCommonnameLanguages[{$smarty.section.i.index}] = {$commonnames[i].language_id};
-		</script>
 		</td>
+		{/if}
 		{if $smarty.section.i.first}
 		<td></td>
 		{else}

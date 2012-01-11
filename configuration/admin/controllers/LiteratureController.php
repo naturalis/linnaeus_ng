@@ -208,14 +208,11 @@ class LiteratureController extends Controller
 
 				if (isset($_SESSION['system']['literature']['newRef']) && $_SESSION['system']['literature']['newRef'] == '<new>') {
 
+					$ref = $this->getReference($id);
+
 					$_SESSION['system']['literature']['newRef'] =
 						'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('.$id.');">'.
-						$data['author_first'].
-						(isset($data['author_second']) ?
-							' &amp; '.$data['author_second'] :
-							($data['author_second']=='1' ? _(' et al.') : '' )
-						).
-						' ('.$this->requestData['year'].$this->requestData['suffix'].')'.
+							$ref['author_full'].', '.$ref['year'].$ref['suffix'].
 						'</span>';
 
 					$this->redirect('../species/taxon.php?id='.$_SESSION['system']['activeTaxon']['taxon_id']);
@@ -256,13 +253,9 @@ class LiteratureController extends Controller
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 
-		if (isset($ref['id']))  {
+		if (isset($ref)) $this->smarty->assign('ref', $ref);
 
-			$this->smarty->assign('navCurrentId',$ref['id']);
-
-	        $this->smarty->assign('ref', $ref);
-
-		}
+		if (isset($ref['id'])) $this->smarty->assign('navCurrentId',$ref['id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -452,16 +445,7 @@ class LiteratureController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
 				),
-				'columns' => '*, year(`year`) as `year`,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
+				'columns' => '*, year(`year`) as `year`,'.$this->getSQLColumnFullAuthor(),
 			)
 		);
 		
@@ -539,16 +523,7 @@ class LiteratureController extends Controller
 				),
 				'columns' =>
 					'*,
-					year(`year`) as `year`,
-					concat(
-							author_first,
-							(
-								if(multiple_authors=1,
-									\' et al.\',
-									if(author_second!=\'\',concat(\' & \',author_second),\'\')
-								)
-							)
-						) as author_full'
+					year(`year`) as `year`,'.$this->getSQLColumnFullAuthor()
 			)
 		);
 		
@@ -648,16 +623,7 @@ class LiteratureController extends Controller
 					'author_first like' => $thisStr.'%',
 					'fieldAsIndex' => 'author_first'
 				),
-				'columns' => '*, year(`year`) as `year`,
-					 			concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full'
+				'columns' => '*, year(`year`) as `year`,'.$this->getSQLColumnFullAuthor()
 			)
 		);
 
@@ -704,16 +670,7 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both,
-								concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full',
+					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both, '.$this->getSQLColumnFullAuthor(),
 					'ignoreCase' => false
 				)
 			);
@@ -861,6 +818,22 @@ class LiteratureController extends Controller
 			)
 		);
 		
+	}
+
+	private function getSQLColumnFullAuthor()
+	{
+	
+		return '
+			concat(
+				author_first,
+				(
+					if(multiple_authors=1,
+						\' et al.\',
+						if(author_second!=\'\',concat(\' & \',author_second),\'\')
+					)
+				)
+			) as author_full';
+	
 	}
 
 }
