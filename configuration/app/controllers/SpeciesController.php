@@ -148,6 +148,8 @@ class SpeciesController extends Controller
 
 			if (isset($taxon)) {
 
+				$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
+
 				$this->smarty->assign('taxon', $taxon);
 
 				$this->smarty->assign('content', $content);
@@ -735,6 +737,27 @@ class SpeciesController extends Controller
 		return null;
 
 	}
+	
+	private function getTaxonOverviewImage($id)
+	{
+
+		$mt = $this->models->MediaTaxon->_get(
+			array('id' =>
+				array(
+					'taxon_id' => $id,
+					'overview_image' => 1,
+					'project_id' => $this->getCurrentProjectId()
+				)
+			)
+		);
+
+		if ($mt)
+			return $mt[0]['file_name'];
+		else
+			return null;
+	
+	}
+
 
 	private function getLookupList($search)
 	{

@@ -75,7 +75,7 @@ class SpeciesController extends Controller
     );
     
     public $usedHelpers = array(
-        'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper'
+        'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper','hr_filesize_helper'
     );
 
 	public $cssToLoad = array(
@@ -1609,6 +1609,10 @@ class SpeciesController extends Controller
 
             $this->ajaxActionSaveLanguageLabel();
 
+        } else if ($this->requestData['action'] == 'set_overview') {
+
+            $this->setOverviewImageState($this->requestData['taxon_id'],$this->requestData['id'],$this->requestData['state']);
+
         } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
@@ -2326,6 +2330,39 @@ class SpeciesController extends Controller
 		$this->printPage();
 
 	}
+
+
+    public function previewAction ()
+    {
+
+		// get taxon
+		$taxon = $this->getTaxonById($this->requestData['taxon_id']);
+		$this->smarty->assign('taxon', $taxon);
+
+
+		$d = $this->getUserAssignedTreeList();					
+		$this->smarty->assign('backUrl','taxon.php?id='.$this->requestData['taxon_id']);
+		$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
+
+		// get categories
+		$categories = $this->getCategories($this->requestData['taxon_id'],$this->requestData['activeLanguage']);
+		$this->smarty->assign('categories', $categories['categories']);
+	
+		$this->smarty->assign('content', $this->requestData['content-default']);
+		
+		$this->smarty->assign('activeCategory', $this->requestData['activePage']);
+
+		$this->smarty->assign('headerTitles',
+			array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.
+			$this->generalSettings['defaultHybridMarker'].'</span>' : '') )
+		);
+		
+		$this->printPreviewPage(
+			'../../../../app/templates/templates/species/_taxon',
+			'species.css'
+		);
+
+    }
 
 
 	private function getRankList()
@@ -3571,13 +3608,15 @@ class SpeciesController extends Controller
                     )
                 );
                 
+				$d = $this->filterContent(trim($this->requestData['description']));
+				
                 $this->models->MediaDescriptionsTaxon->save(
                     array(
                         'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
                         'project_id' => $this->getCurrentProjectId(), 
                         'language_id' => $this->requestData['language'], 
                         'media_id' => $this->requestData['id'], 
-                        'description' => trim($this->requestData['description'])
+                        'description' => $d['content']
                     )
                 );
             
@@ -4227,7 +4266,7 @@ class SpeciesController extends Controller
 	private function getTaxonMedia($id)
 	{
 
-		return $this->models->MediaTaxon->_get(
+		$d = $this->models->MediaTaxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -4236,6 +4275,14 @@ class SpeciesController extends Controller
 				'order' => 'mime_type, file_name'
 			)
 		);
+		
+		foreach((array)$d as $key => $val) {
+
+			$d[$key]['hr_file_size'] = $this->helpers->HrFilesizeHelper->convert($val['file_size']);
+
+		}
+		
+		return $d;
 
 	}
 
@@ -4419,7 +4466,6 @@ class SpeciesController extends Controller
 	private function getCategories($taxon=null,$languageId=null)
 	{
 
-
 //NEED TO CACHE!
 
 		// get the defined categories (just the page definitions, no content yet)
@@ -4455,37 +4501,45 @@ class SpeciesController extends Controller
 
 	}
 
-    public function previewAction ()
-    {
+	private function setOverviewImageState($taxon,$id,$state)
+	{
 
-		// get taxon
-		$taxon = $this->getTaxonById($this->requestData['taxon_id']);
-		$this->smarty->assign('taxon', $taxon);
-
-
-		$d = $this->getUserAssignedTreeList();					
-		$this->smarty->assign('backUrl','taxon.php?id='.$this->requestData['taxon_id']);
-		$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
-
-		// get categories
-		$categories = $this->getCategories($this->requestData['taxon_id'],$this->requestData['activeLanguage']);
-		$this->smarty->assign('categories', $categories['categories']);
-	
-		$this->smarty->assign('content', $this->requestData['content-default']);
-		
-		$this->smarty->assign('activeCategory', $this->requestData['activePage']);
-
-		$this->smarty->assign('headerTitles',
-			array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.
-			$this->generalSettings['defaultHybridMarker'].'</span>' : '') )
-		);
-		
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/species/_taxon',
-			'species.css'
+		$mt = $this->models->MediaTaxon->update(
+			array(
+				'overview_image' => 0
+			),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $taxon
+			)
 		);
 
-    }
+		if ($state==true) {
+
+			return $this->models->MediaTaxon->update(
+				array(
+					'overview_image' => 1
+				),
+				array(
+					'id' => $id,
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon
+				)
+			);
+			
+		} else {
+		
+			return $mt;
+		
+		}
+
+	}
+
+
+
+
+
+
 
 
     public function ORG_listAction ()

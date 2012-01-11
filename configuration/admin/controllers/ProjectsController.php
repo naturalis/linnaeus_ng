@@ -632,6 +632,42 @@ class ProjectsController extends Controller
         
         $this->setPageName(_('Project info'));
 
+		$this->smarty->assign('commonname',$this->models->Commonname->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('contentkeystep',$this->models->ContentKeystep->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('contenttaxon',$this->models->ContentTaxon->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('freemodulepage',$this->models->FreeModulePage->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('freemoduleproject',$this->models->FreeModuleProject->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('glossary',$this->models->Glossary->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('literature',$this->models->Literature->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('matrix',$this->models->Matrix->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('mediataxon',$this->models->MediaTaxon->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('occurrencetaxon',$this->models->OccurrenceTaxon->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('synonym',$this->models->Synonym->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
+		$this->smarty->assign('taxon',$this->models->Taxon->_get(
+			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
+
         $this->printPage();
 			
 	

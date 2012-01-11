@@ -11,7 +11,7 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>
@@ -47,7 +47,7 @@
 		<td>
 			{t}Parent taxon: {/t}
 		</td>
-		<td>
+		<td>		
 	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
 	{if $taxa|@count==0 || $data.parent_id==''}
 	<option value="-1">{t}No parent{/t}</option>
@@ -95,6 +95,14 @@ allLookupNavigateOverrideUrl('edit.php?id=%s');
 //taxonCheckNewTaxonName();
 //taxonGetRankByParent();
 //taxonCheckHybridCheck();
+
+{assign var=prev value=null}			
+{foreach from=$taxa key=k item=v}
+{if ($v.lower_taxon==1 && $prev!==null)}
+taxonStoreCopyableTaxa('{$prev}');
+{/if}
+{assign var=prev value=$v.id}
+{/foreach}
 {literal}
 });
 </script>

@@ -13,133 +13,139 @@
 	<input type="button" value="{t}upload media{/t}" onclick="window.open('media_upload.php?id={$id}','_top')" />&nbsp;
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
-
-<div id="taxon-language-other-language"></div>
-<br />
 <div>
-	<a name="image"></a>
+<a name="image"></a>
+<fieldset style="width:735px;">
+<legend id="key-step-choices">{t}Images{/t}</legend>
 	<table class="taxon-media-table">
 		<tr>
-			<th class="taxon-media-colheader-file">{t}Images{/t}</th>
-			<th class="taxon-media-colheader-name" colspan="2">{t}Description{/t}</th>
-			<th class="taxon-media-colheader-type">{t}Name, type &amp; size{/t}</th>
-			<th></th>
+			<td></td>
+			<td><div id="taxon-language-other-language-1"></div></td>
+			<td>{t}Overview image{/t}</td>
 		</tr>
-	{section name=i loop=$media.image}
+		{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td
 				onclick="allShowMedia('{$session.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
-				style="cursor:pointer">
+				style="width:250px; cursor:pointer;padding-right:10px">
 				{if $media.image[i].thumb_name != ''}
 					<img
 						src="{$session.project.urls.project_thumbs}{$media.image[i].thumb_name}"
-						style="width:150px;border:1px solid black;margin-bottom:5px" />
+						style="width:250px;border:1px solid black;" />
 				{else}
 					<img
 						src="{$session.project.urls.project_media}{$media.image[i].file_name}"
-						style="width:150px;border:1px solid black;margin-bottom:5px" />
+						style="width:250px;border:1px solid black;" />
 				{/if}
-			</td>
-			<td>
-
-<textarea id="media-{$media.image[i].id}">{$media.image[i].description}
-</textarea>
-<div>
-<input type="button" value="save" onclick="taxonMediaSaveDesc('media-{$media.image[i].id}','{$media.image[i].id}')" />
-</div>
-	
-				
-			</td>
-			<td>
+				<p>
 				{$media.image[i].original_name}<br />
-				<span class="taxon-media-secondary-info">({$media.image[i].mime_type}; {$media.image[i].file_size} {t}kb{/t})</span>
+				<span class="taxon-media-secondary-info">({$media.image[i].mime_type}; {$media.image[i].hr_file_size} {t}kb{/t})</span>
+				</p>
+				<p>
+				<input type="button" value="{t}delete this image{/t}" onclick="taxonMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" />
+				</p>
 				<script type="text/javascript">
 					taxonMediaAddId({$media.image[i].id});
 				</script>
 			</td>
-			<td onclick="taxonMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
+			<td style="padding-right:10px">
+				<textarea id="media-{$media.image[i].id}" style="width:400px;height:100px">{$media.image[i].description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.image[i].id}','{$media.image[i].id}')" />
 			</td>
+			<td>
+				<input type="checkbox" id="overview-{$media.image[i].id}"{if $media.image[i].overview_image=='1'} checked="checked"{/if} onclick="taxonChangeOverviewPicture(this)" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="height:20px;"></td>
 		</tr>
 	{/section}
 	</table>
+	</fieldset>
 </div>
 
 <br />
 
 <div>
 	<a name="video"></a>
-	<span class="taxon-media-classheader">{t}Videos{/t}</span><br />
+<fieldset style="width:735px;">
+<legend id="key-step-choices">{t}Videos{/t}</legend>
 	<table class="taxon-media-table">
 		<tr>
-			<th class="taxon-media-colheader-file">{t}Media{/t}</th>
-			<th class="taxon-media-colheader-name">{t}Description (click to change){/t}</th>
-			<th class="taxon-media-colheader-type">{t}Name, type &amp; size{/t}</th>
-			<th></th>
+			<td></td>
+			<td><div id="taxon-language-other-language-2"></div></td>
 		</tr>
 		{section name=i loop=$media.video}
 		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td style="cursor:pointer" onclick="window.open('{$session.project.urls.project_media}{$media.video[i].file_name}','_video');">
+			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.project.urls.project_media}{$media.video[i].file_name}','_video');">
 				<img 
 					src="{$baseUrl}admin/media/system/icons/video.jpg" 
 				/>
-			</td>
-			<td id="media-{$media.video[i].id}" onclick="taxonMediaDescriptionEdit(this);">{$media.video[i].description}</td>
-			<td>
+				<p>
 				{$media.video[i].original_name}<br />
 				<span class="taxon-media-secondary-info">({$media.video[i].mime_type}; {$media.video[i].file_size} {t}kb{/t})</span>
+				</p>
+				<p>
+				<input type="button" value="{t}delete this video{/t}" onclick="taxonMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');" />
+				</p>
 				<script type="text/javascript">
 					taxonMediaAddId({$media.video[i].id});
 				</script>
 			</td>
-			<td
-				onclick="taxonMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');"
-				class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
+			<td>
+				<textarea id="media-{$media.video[i].id}" style="width:450px;height:100px">{$media.video[i].description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.video[i].id}','{$media.video[i].id}')" />
 			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="height:20px;"></td>
 		</tr>
 	{/section}
 	</table>
+</fieldset>
 </div>
 
 <br />
 
+
 <div>
 	<a name="sound"></a>
-	<span class="taxon-media-classheader">{t}Sound{/t}</span><br />
+<fieldset style="width:735px;">
+<legend id="key-step-choices">{t}Sound{/t}</legend>
 	<table class="taxon-media-table">
 		<tr>
-			<th class="taxon-media-colheader-file">{t}Media{/t}</th>
-			<th class="taxon-media-colheader-name">{t}Description (click to change){/t}</th>
-			<th class="taxon-media-colheader-type">{t}Name, type &amp; size{/t}</th>
-			<th></th>
+			<td></td>
+			<td><div id="taxon-language-other-language-2"></div></td>
 		</tr>
 		{section name=i loop=$media.sound}
-		<tr id="media-row-{$media.sound[i].id}" class="tr-highlight">
-			<td>
+		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
+			<td style="width:260px;" >
 				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
 					<param name="movie" value="{$soundPlayerName}" />
 					<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$media.sound[i].file_name}" />
 				</object>
-			</td>
-			<td id="media-{$media.sound[i].id}" onclick="taxonMediaDescriptionEdit(this);">
-				{$media.sound[i].description}
-			</td>
-			<td>
+				<p>
 				{$media.sound[i].original_name}<br />
 				<span class="taxon-media-secondary-info">({$media.sound[i].mime_type}; {$media.sound[i].file_size} {t}kb{/t})</span>
+				</p>
+				<p>
+				<input type="button" value="{t}delete this sound file{/t}" onclick="taxonMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" />
+				</p>
 				<script type="text/javascript">
 					taxonMediaAddId({$media.sound[i].id});
 				</script>
 			</td>
-			<td onclick="taxonMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" class="taxon-media-cell-delete">
-				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
+			<td>
+				<textarea id="media-{$media.sound[i].id}" style="width:450px;height:100px">{$media.sound[i].description}</textarea><br />
+				<input type="button" value="{t}save description{/t}" onclick="taxonMediaSaveDesc('media-{$media.sound[i].id}','{$media.sound[i].id}')" />
 			</td>
-		{/section}
 		</tr>
+		<tr>
+			<td colspan="2" style="height:20px;"></td>
+		</tr>
+	{/section}
 	</table>
-</div>
-
+</fieldset>
 </div>
 {/if}
 
