@@ -81,6 +81,7 @@ class configuration
 				'linnaeus:index' => '../../../admin/views/content/content.php?page=%s&freeId=%s',
 				'mapkey:examine_species' => '../../../admin/views/mapkey/species_edit.php?id=%s',
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
+				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
 			)
 
         );
