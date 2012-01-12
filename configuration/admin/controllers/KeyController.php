@@ -416,7 +416,8 @@ class KeyController extends Controller
 			$this->models->ChoiceKeystep->save(
 				array(
 					'id' => $choice['id'],						
-					'choice_img' => 'null'
+					'choice_img' => 'null',
+					'choice_image_params' => 'null'
 				)
 			);
 			

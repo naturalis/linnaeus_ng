@@ -54,6 +54,13 @@
 				src="{$session.admin.project.urls.project_media}{$data.choice_img}" 
 				class="key-choice-image-normal" /><br />
 			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
+			{if $data.choice_image_params!=''}
+				<br />
+				<span style="color:red">
+					Please note: this image has specific attributes for size and positioning,<br/>
+					which were inherited from Linnaeus 2. These cannot be changed, and will be<br/>
+					erased if you delete the image.
+				</span>{/if}
 		{else}
 			<input type="file" name="image" />
 		{/if}

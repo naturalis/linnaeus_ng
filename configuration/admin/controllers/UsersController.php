@@ -1,7 +1,8 @@
 <?php
 
 /*
-    - user.active is project wide, but can be set by specific project admins...
+	ISSUE
+	user.active is system wide (i.e., trans-project), but can be set by specific project admins
 
 */
 
@@ -1979,4 +1980,3 @@ MUST CHECK
 
 
 }
-

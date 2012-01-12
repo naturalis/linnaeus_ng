@@ -405,11 +405,10 @@ class MatrixKeyController extends Controller
 	
 			}
 
-			if (isset($taxa)) $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
+			$_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = isset($taxa) ? $taxa : null;
 			
 		}
-//q($this->getCurrentMatrixId());
-//q($_SESSION['app']['user']['matrix']['taxa']);
+
 		return $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
 
 	}

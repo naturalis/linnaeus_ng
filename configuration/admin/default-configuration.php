@@ -223,7 +223,7 @@ class configuration
             'defaultCategories' =>
                 array(
                     0 => array(
-                        'name' => 'Overview',
+                        'name' => 'Description',
                         'default' => true,
                         'mandatory' => true,
                         'sections' => array ('General description','Biology')

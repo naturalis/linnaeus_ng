@@ -1,6 +1,7 @@
 <?php
 
 /*
+
 	pre-check
 		make sure $iniSettings.upload_max_filesize and $iniSettings.post_max_size are sufficient (see config for allowed filesizes)
 
@@ -26,7 +27,6 @@
 		- check project specific css
 		- check project specific JS (taxonContentOpenMediaLink etc.)
 
-  
     tinyMCE
 		compressor php
 
