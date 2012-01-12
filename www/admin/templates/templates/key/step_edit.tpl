@@ -31,7 +31,7 @@
 	<td {$languages[i].language_id}>
 		{$defaultLanguage.language}
 	</td>
-{if $session.project.languages|@count>1}
+{if $session.admin.project.languages|@count>1}
 	<td id="project-language-tabs">
 		(languages)
 	</td>
@@ -46,7 +46,7 @@
 				maxlength="64"
 				onblur="keySaveStepContent('default')" />
 		</td>
-	{if $session.project.languages|@count>1}
+	{if $session.admin.project.languages|@count>1}
 		<td><input 
 				type="text" 
 				name="titleOther" 
@@ -64,7 +64,7 @@
 				style="width:400px;height:200px;"
 				onblur="keySaveStepContent('default')" /></textarea>
 		</td>
-	{if $session.project.languages|@count>1}
+	{if $session.admin.project.languages|@count>1}
 		<td>
 			<textarea 
 				name="contentOther" 

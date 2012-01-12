@@ -101,27 +101,27 @@
 	<tr>
 		<td class="media-image-cell">
 	{if $v.category=='image'}
-		{capture name="fullImgUrl"}{$session.project.urls.project_media}{$v.file_name}{/capture}
+		{capture name="fullImgUrl"}{$session.app.project.urls.project_media}{$v.file_name}{/capture}
 		{if $v.thumb_name != ''}
 			<img
-				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
-				src="{$session.project.urls.project_thumbs}{$v.thumb_name}"
+				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.app.project.urls.project_thumbs}{$v.thumb_name}"
 				class="media-image" />
 		{else}
 			<img
-				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
-				src="{$session.project.urls.project_media}{$v.file_name}"
+				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.app.project.urls.project_media}{$v.file_name}"
 				class="media-image" />
 		{/if}
 	{elseif $v.category=='video'}
 			<img 
 				src="../../media/system/video.jpg" 
-				onclick="showMedia('{$session.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
 	{elseif $v.category=='audio'}
 			<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
 				<param name="movie" value="{$soundPlayerName}" />
-				<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$v.file_name}" />
+				<param name="FlashVars" value="mp3={$session.app.project.urls.project_media}{$v.file_name}" />
 			</object>
 	{/if}
 			</td>		
@@ -138,7 +138,7 @@
 {else}
 <div id="content">
 {if $taxonStartPage && $overviewImage}
-<img id="overview-image" src="{$session.project.urls.project_media}{$overviewImage}"/>
+<img id="overview-image" src="{$session.app.project.urls.project_media}{$overviewImage}"/>
 {/if}
 {$content}
 </div>

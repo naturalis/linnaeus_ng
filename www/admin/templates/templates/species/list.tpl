@@ -22,7 +22,7 @@
 	<tr style="vertical-align:bottom">
 		<!-- th style="width:100px;" onclick="allTableColumnSort('taxon_order');">{t}Rank{/t}</th -->
 		<th style="width:240px;" {*onclick="allTableColumnSort('taxon');"*}>{t}Taxon{/t}</th>
-{if $session.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
+{if $session.admin.project.includes_hybrids==1}		<th style="width:25px;" onclick="allTableColumnSort('is_hybrid');">{t}Hybrid{/t}</th>{/if}
 		<th style="width:50px;text-align:right;" {*onclick="allTableColumnSort('pct_finished');"*}>{t}Content{/t}</th>
 {if !$isHigherTaxa}
 		<th style="width:50px;" title="{t}images, videos, soundfiles{/t}">{t}Media{/t}</th>
@@ -57,7 +57,7 @@
 				{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
 				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
 			</td>
-	{if $session.project.includes_hybrids==1}<td>
+	{if $session.admin.project.includes_hybrids==1}<td>
 				{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 			</td>
 	{/if}

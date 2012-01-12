@@ -16,7 +16,7 @@ are importing media files.
 <b>Species data</b><br/>
 <label>Import general species descriptions?&nbsp;&nbsp;<input type="checkbox" name="taxon_overview" checked="checked"></label><br />
 <label>Import media?&nbsp;&nbsp;
-{if $session.system.import.imagePath===false}
+{if $session.admin.system.import.imagePath===false}
 You specified no media import.</span>
 {else}
 <input type="checkbox" name="taxon_media" checked="checked">

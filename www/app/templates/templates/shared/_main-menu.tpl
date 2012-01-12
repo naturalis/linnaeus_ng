@@ -2,7 +2,7 @@
 	<div id="main-menu">
 	{assign var=first value=true}
 	{foreach from=$menu key=k item=v}
-	{if $v.type=='regular' && $v.controller!='content'}
+	{if $v.type=='regular' && $v.show_in_public_menu==1}
 	{if $v.controller == $controllerBaseName}
 	<a class="menu-item-active" href="../{$v.controller}/">{t}{$v.module}{/t}</a>
 	{assign var=first value=false}
@@ -10,7 +10,7 @@
 	<a class="menu-item" href="../{$v.controller}/">{t}{$v.module}{/t}</a>
 	{assign var=first value=false}
 	{/if}
-	{elseif $v.controller!='content'}
+	{elseif $v.show_in_public_menu==1}
 	{if $v.id == $module.id}
 	<span class="menu-item-active" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
 	{assign var=first value=false}

@@ -16,7 +16,7 @@
 		<tr class="highlight">
 			<td class="a" onclick="goMap({$v.id})" style="width:250px;">
 				{$v.taxon}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</td>
 			<td style="text-align:right">
 				{$v.total}

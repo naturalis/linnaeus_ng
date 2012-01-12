@@ -1633,6 +1633,9 @@ class Controller extends BaseClass
 	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null,$specificMenuTemplate=null)
 	{
 
+		die('ooops! forgot to remove old school preview!');
+
+
 		$this->includeLocalMenu  = false;
 
 		$this->smarty->assign('menu', $this->getFrontEndMainMenu());
@@ -2255,7 +2258,7 @@ class Controller extends BaseClass
         $this->setBreadcrumbs();
 
         $this->smarty->assign('debugMode', $this->debugMode);
-        $this->smarty->assign('session', $_SESSION['admin']);
+        $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);

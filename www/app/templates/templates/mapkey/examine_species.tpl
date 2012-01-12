@@ -7,7 +7,7 @@
 
 	<div id="map_canvas">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 	<div id="map_options">
-		<b>{$taxon.taxon}</b><br/><br/>
+		<b><span onclick="goTaxon({$taxon.id})" class="a">{$taxon.taxon}</span></b><br/><br/>
 		{*{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
 		<hr style="height:1px;color:#999" />*}
 		<table>
@@ -26,7 +26,7 @@
 			<tr><td colspan="4">{t}no data available{/t}</td></tr>
 		{/if}
 		</table>
-		{if $showBackToSearch && $session.user.search.hasSearchResults}
+		{if $showBackToSearch && $session.app.user.search.hasSearchResults}
 		<hr style="height:1px;color:#999" />
 		<p>
 		<span class="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>

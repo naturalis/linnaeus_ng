@@ -1,5 +1,5 @@
 <div id="allLookupList" class="allLookupListInvisible"></div>
-{if $showBackToSearch && $session.user.search.hasSearchResults}
+{if $showBackToSearch && $session.app.user.search.hasSearchResults}
 <div id="back-to-search">
 <span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
 </div>
@@ -12,7 +12,7 @@
 <div id="footer-container">
 </div ends="footer-container">
 </div ends="body-container">
-<div id="hint-balloon" onmouseout="glossTextOut()" 
+<div id="hint-balloon" 
 	style="
 	background-color:#FFFF99;
 	border:1px solid #bbbb00;

@@ -47,9 +47,9 @@
 {if $page.image}
 {t}current image for this page:{/t}<br />
 <img
-	onclick="allShowMedia('{$session.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
+	onclick="allShowMedia('{$session.admin.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
 	style="cursor:pointer"
-	src="{$session.project.urls.project_media}{$page.image.file_name}" /><br />
+	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
 	<span class="pseudo-a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
 {else}
 <span class="pseudo-a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}add an image to this page{/t}</span>

@@ -1,7 +1,7 @@
 <div id="header-container">
-{if $session.project.logo}
+{if $session.app.project.logo}
 	<div id="image">
-	<a href="{$session.project.urls.project_start}"><img src="{$session.project.urls.project_media}{$session.project.logo|escape:'url'}" id="project-logo" /></a>
+	<a href="{$session.app.project.urls.project_start}"><img src="{$session.app.project.urls.project_media}{$session.app.project.logo|escape:'url'}" id="project-logo" /></a>
 	</div>
 {/if}
 </div>

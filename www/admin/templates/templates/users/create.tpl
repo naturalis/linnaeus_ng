@@ -16,7 +16,7 @@
 {t}You cannot create a new user with the same e-mail address, but you can connect the existing user to the current project. Do you want to do that?{/t}
 <br /><br />
 <input type="button" value="{t}yes, connect user{/t}"  onclick="userConnectExistingUser();" />
-<input type="button" value="{t}no, cancel{/t}"  onclick="window.open('{$session.system.referer.url}','_top');" />
+<input type="button" value="{t}no, cancel{/t}"  onclick="window.open('{$session.admin.system.referer.url}','_top');" />
 {/if}
 </span>
 </div>
@@ -211,7 +211,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="submit" value="{t}save{/t}" />&nbsp;
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.admin.system.referer.url}','_top')" />
 		</td>
 	</tr>
 

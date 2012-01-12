@@ -40,6 +40,8 @@ class IntroductionController extends Controller
     {
         
         parent::__construct();
+
+		$this->checkForProjectId();
 		
     }
 
@@ -95,7 +97,7 @@ class IntroductionController extends Controller
 			$id = $this->requestData['id'];
 
 			$page = $this->getPage($id);
-			
+		
 			$page['content'] = $this->matchGlossaryTerms($page['content']);
 
 			$this->setPageName($page['topic']);
@@ -152,6 +154,8 @@ class IntroductionController extends Controller
             $this->getLookupList($this->requestData['search']);
 
         }
+
+		$this->allowEditPageOverlay = false;
 		
         $this->printPage();
     

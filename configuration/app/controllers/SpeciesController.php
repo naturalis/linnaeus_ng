@@ -169,7 +169,9 @@ class SpeciesController extends Controller
 					'title' =>
 						$taxon['taxon'].
 						($taxon['is_hybrid']=='1' ?
-							'<span class="hybrid-marker" title="'._('hybrid').'">'.$_SESSION['app']['project']['hybrid_marker'].'</span>'
+							'<span class="hybrid-marker" title="'._('hybrid').'">'.
+							(isset($_SESSION['app']['project']['hybrid_marker']) ? $_SESSION['app']['project']['hybrid_marker'] : 'X').
+							'</span>'
 							: ''
 						)
 					)
@@ -205,6 +207,8 @@ class SpeciesController extends Controller
 			$this->smarty->assign('returnText',json_encode($this->getTaxonMedia(null,$this->requestData['id'])));
 		
 		}
+
+		$this->allowEditPageOverlay = false;
 
         $this->printPage();
 	

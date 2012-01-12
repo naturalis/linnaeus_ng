@@ -172,19 +172,7 @@ class ContentController extends Controller
     public function previewAction ()
     {
 
-		$content = $this->getContentBySubject($this->requestData['subject'],$_SESSION['admin']['project']['default_language_id']);
-
-		$this->smarty->assign('backUrl','content.php?sub='.$this->requestData['subject']);
-		//$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
-
-		$this->smarty->assign('subject', $this->requestData['subject']);
-		if (isset($content['content'])) $this->smarty->assign('content', $content['content']);
-
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/linnaeus/_index',
-			'index.css',
-			'../../../../app/templates/templates/linnaeus/_menu.tpl'
-		);
+		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->requestData['subject']);
     
     }
 

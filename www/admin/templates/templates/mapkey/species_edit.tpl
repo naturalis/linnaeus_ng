@@ -5,6 +5,7 @@
 	<form action="" method="post" id="theForm">
 	<input type="hidden" name="id" value="{$taxon.id}" />
 	<input type="hidden" name="rnd" value="{$rnd}" />
+	<input type="hidden" name="action" id="action" value="" />
 	</form>
 		
 	<div id="data-type-div">
@@ -18,10 +19,11 @@
 			</select><br />
 		</div>
 		<input type="button" class="map-save-button" onclick="mapSaveMap()" value="{t}save{/t}" />
+		<input type="button" class="map-save-button" onclick="$('#action').val('preview');mapSaveMap()" value="{t}preview{/t}" />
+		<input type="button" class="map-save-button" onclick="window.open('copy.php?id={$taxon.id}','_self')" value="{t}copy{/t}" /><br />
 		<input type="button" class="map-save-button" onclick="window.open('species_edit.php?id={$taxon.id}','_self')" value="{t}reset{/t}" />
 		<input type="button" class="map-save-button" onclick="mapClearMap()" value="{t}clear{/t}" />
-		<input type="button" class="map-save-button" onclick="window.open('copy.php?id={$taxon.id}','_self')" value="{t}copy{/t}" />
-		<input type="button" class="map-save-button" onclick="window.open('species_show.php?id={$taxon.id}','_self')" value="{t}back{/t}" />
+		{*<input type="button" class="map-save-button" onclick="window.open('species_show.php?id={$taxon.id}','_self')" value="{t}back{/t}" />*}
 		{*<span id="coordinates">(-1,-1)</span><br />*}
 	</div>
 

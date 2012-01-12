@@ -254,18 +254,7 @@ class LiteratureController extends Controller
     public function previewAction()
     {
 
-		$ref = $this->getReference($this->requestData['id']);
-		$navList = $this->getReferencesNavList();
-
-		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
-		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
-
-		if (isset($ref)) $this->smarty->assign('ref', $ref);
-
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/literature/_reference',
-			'literature.css'
-		);
+		$this->redirect('../../../app/views/literature/reference.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
 
     }
 

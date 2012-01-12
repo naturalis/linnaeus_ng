@@ -87,10 +87,10 @@ $(document).ready(function(){
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat(
-		'{$session.user.id}',
-		'{$session.system.active_page.appName}',
-		'{$session.system.active_page.controllerBaseName}',
-		'{$session.system.active_page.viewName}',
+		'{$session.admin.user.id}',
+		'{$session.admin.system.active_page.appName}',
+		'{$session.admin.system.active_page.controllerBaseName}',
+		'{$session.admin.system.active_page.viewName}',
 		'{$taxon.id}'
 	);
 

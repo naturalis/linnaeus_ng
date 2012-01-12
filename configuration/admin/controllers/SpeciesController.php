@@ -2332,34 +2332,13 @@ class SpeciesController extends Controller
 	}
 
 
-    public function previewAction ()
+    public function previewAction()
     {
 
-		// get taxon
-		$taxon = $this->getTaxonById($this->requestData['taxon_id']);
-		$this->smarty->assign('taxon', $taxon);
-
-
-		$d = $this->getUserAssignedTreeList();					
-		$this->smarty->assign('backUrl','taxon.php?id='.$this->requestData['taxon_id']);
-		$this->smarty->assign('nextUrl','taxon.php?id='.$d[$taxon['id']]['next']['id']);
-
-		// get categories
-		$categories = $this->getCategories($this->requestData['taxon_id'],$this->requestData['activeLanguage']);
-		$this->smarty->assign('categories', $categories['categories']);
-	
-		$this->smarty->assign('content', $this->requestData['content-default']);
-		
-		$this->smarty->assign('activeCategory', $this->requestData['activePage']);
-
-		$this->smarty->assign('headerTitles',
-			array('title' => $taxon['taxon'].($taxon['is_hybrid']=='1' ? '<span class="hybrid-marker" title="'._('hybrid').'">'.
-			$this->generalSettings['defaultHybridMarker'].'</span>' : '') )
-		);
-		
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/species/_taxon',
-			'species.css'
+		$this->redirect(
+			'../../../app/views/species/taxon.php?p='.$this->getCurrentProjectId().
+			'&id='.$this->requestData['taxon_id'].
+			'&cat='.$this->requestData['activePage']
 		);
 
     }

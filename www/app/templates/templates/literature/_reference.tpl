@@ -14,7 +14,7 @@
 		{foreach from=$ref.taxa key=k item=v}
 			<div>
 				<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.taxon}</span>
-				{if $v.taxon.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+				{if $v.taxon.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</div>
 		{/foreach}
 		</div>

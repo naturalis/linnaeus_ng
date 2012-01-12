@@ -150,8 +150,6 @@ class LinnaeusController extends Controller
     public function indexAction ()
     {
 
-		//q($this->isLoggedInAdmin());
-
 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (!$this->rHasVal('sub')) {
@@ -553,7 +551,9 @@ q($results,1,1);
             $this->getLookupList($this->requestData['search']);
 
         }
-		
+
+		$this->allowEditPageOverlay = false;
+				
         $this->printPage();
     
     }

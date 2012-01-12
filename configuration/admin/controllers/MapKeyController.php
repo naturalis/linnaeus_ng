@@ -73,7 +73,8 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
-		$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
+		//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
+		$this->redirect('species_edit.php?id='.$this->getFirstOccurringTaxonId());
     
     }
 
@@ -207,6 +208,8 @@ class MapKeyController extends Controller
 				}
 
 			}
+			
+			if ($this->rHasVal('action','preview')) $this->redirect('preview.php?id='.$this->requestData['id']);
 
 		}
 
@@ -658,6 +661,13 @@ class MapKeyController extends Controller
 
 		$this->printPage();
 		
+    }
+
+    public function previewAction ()
+    {
+
+		$this->redirect('../../../app/views/mapkey/examine_species.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
+    
     }
 
 	private function cloneMapData($source,$target)

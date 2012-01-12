@@ -52,7 +52,7 @@
 		<td colspan="2">
 			<input type="button" onclick="matrixSaveMatrixNameAll();window.open('matrices.php','_top')" value="{t}save{/t}" />&nbsp;
 			{if $matrix.id}<input type="button" value="{t}delete{/t}" onclick="matrixDeleteCharacteristic()" />&nbsp;{/if}
-			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="{t}back{/t}" onclick="window.open('{$session.admin.system.referer.url}','_top')" />
 		</td>
 	</tr>
 </table>

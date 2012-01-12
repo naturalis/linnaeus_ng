@@ -36,6 +36,7 @@ class Controller extends BaseClass
     public $treeList;
     public $showLowerTaxon = true;
 	public $includeLocalMenu = true;
+	public $allowEditPageOverlay = true;
 
 
 
@@ -131,6 +132,7 @@ class Controller extends BaseClass
 		
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
 		
+		$this->setCurrentProjectData();
 		$this->setUrls();
         $this->setProjectLanguages();
 	
@@ -839,6 +841,8 @@ class Controller extends BaseClass
 	public function getCurrentLanguageId()
 	{
 
+		if (empty($_SESSION['app']['user']['activeLanguageId'])) $this->setCurrentLanguageId();
+
         return $_SESSION['app']['user']['activeLanguageId'];
 
 	}
@@ -850,14 +854,14 @@ class Controller extends BaseClass
 
 	}
 
-	public function setCurrentLanguageId($id=null)
+	public function setCurrentLanguageId($l=null)
 	{
 
-		if ($id) {
+		if ($l) {
 
-			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $id;
+			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $l;
 
-			$_SESSION['app']['user']['activeLanguageId'] = $id;
+			$_SESSION['app']['user']['activeLanguageId'] = $l;
 
 		} else
 		if ($this->rHasVal('languageId')) {
@@ -983,6 +987,58 @@ class Controller extends BaseClass
 	
 	}
 
+
+	private function previewOverlay()
+	{
+
+		$d = $this->controllerBaseName.':'.$this->viewName;
+
+		if (
+			isset($this->requestData['cat']) && 
+			!is_numeric($this->requestData['cat']) && 
+			isset($this->generalSettings['urlsToAdminEdit'][$d.':'.$this->requestData['cat']]))
+		{
+	
+			$d = $d.':'.$this->requestData['cat'];
+
+		}
+
+		if (
+			$this->isLoggedInAdmin() && 
+			$this->allowEditPageOverlay && 
+			isset($this->generalSettings['urlsToAdminEdit'][$d])
+		) {
+		
+			if (isset($this->requestData['id'])) $id = $this->requestData['id'];
+
+			if ($this->controllerBaseName=='module') {
+				$modId = $this->getCurrentModule();
+				$modId = $modId['id'];
+			} else
+			if ($this->controllerBaseName=='matrixkey') {
+				$id = $this->getCurrentMatrixId();
+			}
+
+			$this->smarty->assign(
+				'urlBackToAdmin',
+				sprintf(
+					$this->generalSettings['urlsToAdminEdit'][$d],
+					$id,
+					(isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? 
+						$this->requestData['cat'] : 
+						($this->controllerBaseName=='module' ? 
+							$modId : 
+							null
+						)
+					)
+				)
+			);
+			$this->smarty->display('../shared/preview-overlay.tpl');
+			
+		}
+	
+	}
+
     /**
      * Renders and displays the page
      *
@@ -994,6 +1050,8 @@ class Controller extends BaseClass
 		$this->preparePage();
 		
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
+
+		$this->previewOverlay();
     
     }
 
@@ -1075,6 +1133,7 @@ class Controller extends BaseClass
 			$modules[$key]['icon'] = $mp['icon'];
 			$modules[$key]['module'] = $mp['module'];
 			$modules[$key]['controller'] = $mp['controller'];
+			$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
 
 		}
 
@@ -1090,6 +1149,7 @@ class Controller extends BaseClass
 		foreach ((array) $freeModules as $key => $val) {
 
 			$val['type'] = 'free';
+			$val['show_in_public_menu'] = 1;
 			$modules[] = $val;
 
 		}
@@ -1390,7 +1450,7 @@ class Controller extends BaseClass
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
 	 
 //        $this->setBreadcrumbs();
-        $this->smarty->assign('session', $_SESSION['app']);
+        $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
         $this->smarty->assign('baseUrl', $this->baseUrl);

@@ -86,7 +86,7 @@
 		<tr class="tr-highlight" id="media-row-{$gloss.media[i].id}">
 			<td style="width:400px">
 				<span
-					class="pseudo-a" onclick="allShowMedia('{$session.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
+					class="pseudo-a" onclick="allShowMedia('{$session.admin.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
 			</td>
 			<td style="cursor:pointer" onclick="glossMediaDelete({$gloss.media[i].id})">
 				<img src="{$baseUrl}admin/media/system/icons/cross.png" />

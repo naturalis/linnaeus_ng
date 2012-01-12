@@ -182,9 +182,24 @@ class ModuleController extends Controller
 
         }
 		
+		$this->allowEditPageOverlay = false;
+		
         $this->printPage();
     
     }
+
+    /**
+     * Get the current active module's data
+     *
+     * @access    private
+     */
+	public function getCurrentModule()
+	{
+		return isset($_SESSION['app']['user']['module']['activeModule']) ?
+			$_SESSION['app']['user']['module']['activeModule'] :
+			null;
+	
+	}
 
     /**
      * Get a module's data
@@ -217,20 +232,6 @@ class ModuleController extends Controller
 	
 		$_SESSION['app']['user']['module']['activeModule'] = $module;
 
-	}
-
-    /**
-     * Get the current active module's data
-     *
-     * @access    private
-     */
-	private function getCurrentModule()
-	{
-
-		return isset($_SESSION['app']['user']['module']['activeModule']) ?
-			$_SESSION['app']['user']['module']['activeModule'] :
-			null;
-	
 	}
 
     /**
