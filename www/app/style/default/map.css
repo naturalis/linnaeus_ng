@@ -1,16 +1,38 @@
 #map_canvas {
-	width:720px;
+	width:100%;
 	height:650px;
 	border: 1px solid #666;
 	margin-bottom:-110px;
 }
 
-#map_options {
-	width:279px;
-	height:500px;
+#map_options, #map_compare, #map_search {
+	width:150px;
 	position:relative;
-	margin-top:-650px;
-	left:731px;
+	margin-top:-630px;
+	left:40px;
+	background-color:white;
+	border:1px solid black;
+	padding:2px;
+	font-size:9px;
+	opacity:0.95;
+	filter:alpha(opacity=95); /* For IE8 and earlier */
+}
+
+#map_compare {
+	width:230px;
+}
+
+#map_search {
+	width:180px;
+	top:-17px;
+	left:98px;
+}
+
+#idA, #idB {
+	margin-bottom:5px;
+}
+
+#map_compare_button {
 }
 
 #back-to-search {
@@ -25,4 +47,9 @@
 
 #back-link:hover, .back-link:hover {
 	text-decoration:underline;
+}
+
+.taxon-select {
+	font-size:inherit;
+	height:25px;
 }

@@ -1303,8 +1303,20 @@ class Controller extends BaseClass
 
 		$_SESSION['app']['project']['urls']['full_project_thumbs'] = $_SESSION['app']['project']['urls']['full_project_media'].'thumbs/';
 
+		//$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
-		$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
+		//[2012.01.12 - 1:17:29 PM] Ruud Altenburg:
+		$projectCssDir = $this->baseUrl . $this->getAppName() . '/style/';
+
+		if (file_exists($projectCssDir . sprintf('%04s',$p) . '/basics.css')) {
+
+			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . sprintf('%04s',$p).'/';
+
+		} else {
+
+			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . 'default/';
+
+		}
 
 		$_SESSION['app']['project']['urls']['project_start'] =
 			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';

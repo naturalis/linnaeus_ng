@@ -6,14 +6,14 @@
 	height:30px;
 }
 
-.allLookupList {
+#allLookupList {
 
 	position:absolute;
 	top:0px;
 	left:0px;
 	border:1px dotted black;
-	width:450px;
-	height:500px;
+	width:350px;
+	height:400px;
 	background-color:#fff;
 	display:block;
 	overflow-y:scroll;
@@ -21,6 +21,7 @@
 	z-index: 50000;
 	display:none;
 	padding:2px;
+	font-size:10px;
 
 }
 

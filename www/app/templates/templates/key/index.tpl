@@ -1,38 +1,6 @@
 {include file="../shared/header.tpl"}
-
-<div id="path">
-	<div id="concise">
-	<span onclick="keyToggleFullPath()" id="toggle">{t}Path:{/t}</span>
-	{foreach from=$keypath key=k item=v}
-	{if $v.is_start==1 || $keypath|@count<=$keyPathMaxItems || ($keypath|@count>$keyPathMaxItems && $k>=$keypath|@count-2)}
-		{if $v.is_start!=1}<span class="arrow">&rarr;</span>{/if}
-		{$v.step_number}. <span class="item" onclick="keyDoStep({$v.id})">{$v.step_title}{if $v.choice_marker} ({$v.choice_marker}){/if}</span>
-	{/if}
-	{if $v.is_start==1 && $keypath|@count>$keyPathMaxItems}<span class="arrow">&rarr;</span><span class="abbreviation">[...]</span>{/if}
-	{/foreach}
-	</div>
-	<div id="path-full" class="full-invisible">
-	<table>
-	{foreach from=$keypath key=k item=v}
-		<tr>
-			<td class="number-cell">{$v.step_number}. </td>
-			<td><span class="item" onclick="keyDoStep({$v.id})">{$v.step_title}{if $v.choice_marker} ({$v.choice_marker}){/if}</span></td>
-		</tr>
-	{/foreach}
-	</table>
-	</div>
-</div>
-
-<div id="taxa" style="overflow-y:scroll;">
-{if $taxa|@count==1}{assign var=w value=taxon}{else}{assign var=w value=taxa}{/if}
-<span id="header">{t _s1=$taxa|@count _s2=$w}%s possible %s remaining:{/t}</span><br/>
-{foreach from=$taxa key=k item=v}
-<span class="a" style="padding-left:3px" onclick="goTaxon({$v.id})">
-	{$v.taxon}
-	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
-</span><br />
-{/foreach}
-</div>
+{include file="_path.tpl"}
+{include file="_taxa.tpl"}
 	
 <div id="page-main">
 	<div id="step">

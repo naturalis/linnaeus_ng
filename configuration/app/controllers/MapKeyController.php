@@ -362,7 +362,7 @@ class MapKeyController extends Controller
 		
 		}
 
-		return $d;
+		return isset($d) ? $d : null;
 	
 	}
 

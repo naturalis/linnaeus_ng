@@ -2390,7 +2390,7 @@ class ImportController extends Controller
 				}
 	
 				if (isset($val->captiontext)) {
-	
+
 					$txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
 					$p = trim((string)$step->pagenumber).trim((string)$val->choiceletter).'.';
 					if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));

@@ -117,11 +117,21 @@
 	font-size: 11px;
 }
 
-.taxon-page-cell-active {
+.taxon-page-cell {
 	background-color: #eee;
-	color: #111;
+	color: #000	;
+}
+
+.taxon-page-cell-active {
+	background-color: #aaa;
+	color: #eee;
 	cursor: default;
 	font-weight: bold;
+}
+
+.taxon-page-cell:hover {
+	background-color: #aaa;
+	color: #eee;
 }
 
 .taxon-page-publish-state {

@@ -140,7 +140,10 @@ class KeyController extends Controller
 		
 		$this->smarty->assign('keypath',$this->getKeyPath());
 
-        $this->printPage();
+		if ($this->choicesHaveL2Attributes($choices)) 
+	        $this->printPage('index_l2');
+		else
+	        $this->printPage();
     
     }
 
@@ -149,6 +152,15 @@ class KeyController extends Controller
 	{
 	
 		return $this->currentKeyStepId;
+	
+	}
+	
+	private function choicesHaveL2Attributes($choices)
+	{
+	
+		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
+		return false;
+	
 	
 	}
 		
@@ -298,6 +310,14 @@ class KeyController extends Controller
 			}
 			
 			$choices[$key]['marker'] = $this->showOrderToMarker($val['show_order']);
+			
+			if ($val['choice_image_params']!='') {
+
+				foreach((array)json_decode($val['choice_image_params']) as $pKey => $pVal) $params[$pKey] = (string)$pVal;
+				$choices[$key]['choice_image_params'] = $params;
+				unset($params);
+
+			}
 
 		}
 
