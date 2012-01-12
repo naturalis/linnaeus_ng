@@ -1017,6 +1017,9 @@ class Controller extends BaseClass
 			} else
 			if ($this->controllerBaseName=='matrixkey') {
 				$id = $this->getCurrentMatrixId();
+			} else
+			if ($this->controllerBaseName=='key') {
+				$id = $this->getCurrentKeyStepId();
 			}
 
 			$this->smarty->assign(

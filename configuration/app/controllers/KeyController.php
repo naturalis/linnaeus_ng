@@ -6,6 +6,7 @@ class KeyController extends Controller
 {
 
     private $_taxaStepList;
+	public $currentKeyStepId;
 
     public $usedModels = array(
 		'keystep',
@@ -123,6 +124,8 @@ class KeyController extends Controller
 		$taxa = $this->getTaxonDivision(true);
 
 		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
+		
+		$this->setCurrentKeyStepId($step['id']);
 
 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
@@ -141,6 +144,21 @@ class KeyController extends Controller
     
     }
 
+	/* function exists solel for the benefit of the preview overlay's "back to editing"-button */
+	public function getCurrentKeyStepId()
+	{
+	
+		return $this->currentKeyStepId;
+	
+	}
+		
+	private function setCurrentKeyStepId($id)
+	{
+	
+		$this->currentKeyStepId = $id;
+	
+	}
+		
 	private function getKeystep($id)
 	{
 
