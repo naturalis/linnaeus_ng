@@ -2335,73 +2335,73 @@ class ImportController extends Controller
 
 		foreach($step as $key => $val) {
 
-			$resStep = (trim((string)$val->destinationtype)=='turn' ? 
-							(isset($stepIds[trim((string)$val->destinationpagenumber)]) ?
-								$stepIds[trim((string)$val->destinationpagenumber)] :
+			if ($key=='text_choice' || $key=='pict_choice') {
+
+				$resStep = (trim((string)$val->destinationtype)=='turn' ? 
+								(isset($stepIds[trim((string)$val->destinationpagenumber)]) ?
+									$stepIds[trim((string)$val->destinationpagenumber)] :
+									null
+								) :
 								null
-							) :
-							null
-						);
-
-			$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
-							(isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
-								$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
+							);
+	
+				$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
+								(isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
+									$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
+									null
+								) : 
 								null
-							) : 
-							null
-						);
-
-			$fileName = isset($val->picturefilename) ? trim((string)$val->picturefilename) : null;
-
-			if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
-
-				$error[] = array(
-					'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
-				);
+							);
+	
+				$fileName = isset($val->picturefilename) ? trim((string)$val->picturefilename) : null;
+	
+				if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
+	
+					$error[] = array(
+						'cause' => 'Picture key image "'.$fileName.'" does not exist (choice created anyway)'
+					);
+					
+					$fileName = null;
+	
+				} else
+				if ($fileName) {
+	
+					$this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+	
+				}
+	
+				if (
+						isset($val->leftpos) ||
+						isset($val->toppos) ||
+						isset($val->width) ||
+						isset($val->height)
+					) {
+	
+						$params =
+							json_encode(
+								array(
+									'leftpos' => isset($val->leftpos) ? trim($val->leftpos) : null,
+									'toppos' => isset($val->toppos) ? trim($val->toppos) : null,
+									'width' => isset($val->width) ? trim($val->width) : null,
+									'height' => isset($val->height) ? trim($val->height) : null,
+								)
+							);
+	
+				}
+	
+				if (isset($val->captiontext)) {
+	
+					$txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
+					$p = trim((string)$step->pagenumber).trim((string)$val->choiceletter).'.';
+					if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));
+					if (strlen($txt)==0) $txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
+	
+				} else
+				if (isset($val->picturefilename)) {
+	
+					$txt = trim((string)$val->picturefilename);
+				}
 				
-				$fileName = null;
-
-			} else
-			if ($fileName) {
-
-				$this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
-
-			}
-
-			if (
-					isset($val->leftpos) ||
-					isset($val->toppos) ||
-					isset($val->width) ||
-					isset($val->height)
-				) {
-
-					$params =
-						json_encode(
-							array(
-								'leftpos' => isset($val->leftpos) ? trim($val->leftpos) : null,
-								'toppos' => isset($val->toppos) ? trim($val->toppos) : null,
-								'width' => isset($val->width) ? trim($val->width) : null,
-								'height' => isset($val->height) ? trim($val->height) : null,
-							)
-						);
-
-			}
-
-			if (isset($val->captiontext)) {
-
-				$txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
-				$p = trim((string)$step->pagenumber).trim((string)$val->choiceletter).'.';
-				if (substr($txt,0,strlen($p))==$p) $txt = trim(substr($txt,strlen($p)));
-				if (strlen($txt)==0) $txt = $this->replaceOldMarkUp(trim((string)$val->captiontext));
-
-			} else
-			if (isset($val->picturefilename)) {
-
-				$txt = trim((string)$val->picturefilename);
-			}
-			
-			if ($txt) {
-
 				$this->models->ChoiceKeystep->save(
 					array(
 						'id' => null,
@@ -2426,9 +2426,9 @@ class ImportController extends Controller
 						'choice_txt' => isset($txt) ? $txt : null
 					)
 				);
-				
+					
 			}
-
+		
 		}
 
 	}

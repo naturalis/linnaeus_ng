@@ -593,7 +593,6 @@ class ProjectsController extends Controller
 
 		$this->setSuppressProjectInBreadcrumbs();
 
-
         if ($this->rHasVal('action','delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
 		
 			$this->doDeleteProjectAction($this->requestData['id']);
@@ -602,7 +601,6 @@ class ProjectsController extends Controller
 	
 			$this->addMessage('Project deleted.');
 
-		
 		} else {
 
 			$d = $this->rHasVal('p') ? array('id' => $this->requestData['p']) : '*';
