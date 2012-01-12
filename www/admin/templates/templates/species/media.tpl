@@ -26,15 +26,15 @@
 		{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td
-				onclick="allShowMedia('{$session.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
+				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
 				style="width:250px; cursor:pointer;padding-right:10px">
 				{if $media.image[i].thumb_name != ''}
 					<img
-						src="{$session.project.urls.project_thumbs}{$media.image[i].thumb_name}"
+						src="{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}"
 						style="width:250px;border:1px solid black;" />
 				{else}
 					<img
-						src="{$session.project.urls.project_media}{$media.image[i].file_name}"
+						src="{$session.admin.project.urls.project_media}{$media.image[i].file_name}"
 						style="width:250px;border:1px solid black;" />
 				{/if}
 				<p>
@@ -77,7 +77,7 @@
 		</tr>
 		{section name=i loop=$media.video}
 		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.project.urls.project_media}{$media.video[i].file_name}','_video');">
+			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.admin.project.urls.project_media}{$media.video[i].file_name}','_video');">
 				<img 
 					src="{$baseUrl}admin/media/system/icons/video.jpg" 
 				/>
@@ -122,7 +122,7 @@
 			<td style="width:260px;" >
 				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
 					<param name="movie" value="{$soundPlayerName}" />
-					<param name="FlashVars" value="mp3={$session.project.urls.project_media}{$media.sound[i].file_name}" />
+					<param name="FlashVars" value="mp3={$session.admin.project.urls.project_media}{$media.sound[i].file_name}" />
 				</object>
 				<p>
 				{$media.sound[i].original_name}<br />
@@ -163,10 +163,10 @@ $(document).ready(function(){
 
 	allSetHeartbeatFreq({$heartbeatFrequency});
 	taxonSetHeartbeat(
-		'{$session.user.id}',
-		'{$session.system.active_page.appName}',
-		'{$session.system.active_page.controllerBaseName}',
-		'{$session.system.active_page.viewName}',
+		'{$session.admin.user.id}',
+		'{$session.admin.system.active_page.appName}',
+		'{$session.admin.system.active_page.controllerBaseName}',
+		'{$session.admin.system.active_page.viewName}',
 		'{$taxon.id}'
 	);
 	allHideLoadingDiv();

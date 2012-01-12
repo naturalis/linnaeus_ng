@@ -88,7 +88,7 @@ class ModuleController extends Controller
 
         $this->checkAuthorisation();
 		
-		if (!isset($_SESSION['admin']['user']['freeModules']['activeModule'])) {
+		if (!isset($_SESSION['admin']['user']['freeModules']['activeModule']) || $this->rHasVal('freeId')) {
 
 			$_SESSION['admin']['user']['freeModules']['activeModule'] = $this->getFreeModule();
 			
@@ -195,22 +195,7 @@ class ModuleController extends Controller
     public function previewAction()
     {
 
-		$page = $this->getPageContent($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
-		$module = $this->getFreeModule();
-
-		$navList = $this->getModulePageNavList();
-
-		$this->smarty->assign('headerTitles',array('title' => $module['module'],'subtitle' => $page['topic']));
-		$this->smarty->assign('module',$module);
-		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
-		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
-
-		if (isset($page)) $this->smarty->assign('page', $page);
-
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/module/_topic',
-			'glossary.css'
-		);
+		$this->redirect('../../../app/views/module/topic.php?p='.$this->getCurrentProjectId().'&modId='.$this->getCurrentModuleId().'&id='.$this->requestData['id']);
 
     }
 

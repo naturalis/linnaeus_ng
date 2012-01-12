@@ -1,7 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-{if $session.matrixkey.id}
+{if $session.admin.matrixkey.id}
 <ul>
 	<li><a href="matrices.php">{t}Matrices{/t}</a></li>
 	<li><a href="edit.php">{t}Edit active matrix{/t}</a></li>

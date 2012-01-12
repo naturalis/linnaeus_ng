@@ -2,6 +2,8 @@
 
 /*
 
+			if ($this->rHasVal('action','preview')) $this->redirect('preview.php?id='.$this->requestData['id']);
+
 check deletes when deleting matrix etc
 
 */
@@ -67,6 +69,13 @@ class MatrixKeyController extends Controller
 		
 		$this->cleanUpEmptyVariables();
 
+		if ($this->rHasId()) {
+		
+			$this->setCurrentMatrixId($this->requestData['id']);
+			
+			$this->redirect('edit.php');
+		
+		} else
 		if ($this->getCurrentMatrixId()==null) {
 
 			$matrices = $this->getMatrices();
@@ -614,6 +623,14 @@ class MatrixKeyController extends Controller
         $this->printPage();
     
     }
+
+    public function previewAction ()
+    {
+
+		$this->redirect('../../../app/views/matrixkey/use_matrix.php?p='.$this->getCurrentProjectId().'&id='.$this->getCurrentMatrixId());
+    
+    }
+
 
 	/* matrix functions */
 	private function createNewMatrix()

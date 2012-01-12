@@ -29,7 +29,7 @@
 {foreach from=$taxa key=k item=v}
 <span class="a" style="padding-left:3px" onclick="goTaxon({$v.id})">
 	{$v.taxon}
-	{if $v.is_hybrid==1}{$session.project.hybrid_marker}{/if}
+	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
 </span><br />
 {/foreach}
 </div>
@@ -50,8 +50,8 @@
 	{if $v.choice_img}
 					<img
 						class="image-small"
-						onclick="showMedia('{$session.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-						src="{$session.project.urls.project_media}{$v.choice_img|escape:'url'}" />
+						onclick="showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
+						src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}" />
 	{/if}
 					<span class="marker">{$v.marker}</span>.
 					<span class="text">{$v.choice_txt|nl2br}</span>
@@ -64,7 +64,7 @@
 						<span class="arrow">&rarr;</span>
 						<span class="target-taxon" onclick="goTaxon({$v.res_taxon_id})">
 							{t}Taxon:{/t} {$v.target}
-							{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+							{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 							</span>
 					{/if}
 					</span>

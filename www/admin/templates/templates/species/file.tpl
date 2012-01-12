@@ -54,14 +54,14 @@
 
 <table>
 <tr><th>{t}Name{/t}</th><th>{t}Rank{/t}</th>
-{if $session.project.includes_hybrids==1}
+{if $session.admin.project.includes_hybrids==1}
 <th>{t}Hybrid{/t}</th></tr>
 {/if}
 {section name=i loop=$results}
 <tr class="tr-highlight">
 <td><label for="chk{$smarty.section.i.index}">{$results[i][0]}</label></td>
 <td><label for="chk{$smarty.section.i.index}">{$results[i][1]}</label></td>
-{if $session.project.includes_hybrids==1}
+{if $session.admin.project.includes_hybrids==1}
 <td><label for="chk{$smarty.section.i.index}">{if $results[i][2]==1}x{/if}</label></td>
 <td>{if $results[i][3]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][3]}</span>{/if}</td>
 {else}
@@ -85,12 +85,12 @@ The contents of the file will be displayed so you can review them before they ar
 		<ol>
 		<li>{t}Taxon name{/t}</li>
 		<li>{t}Taxon rank{/t}</li>
-{if $session.project.includes_hybrids==1}
+{if $session.admin.project.includes_hybrids==1}
 		<li>{t}Hybrid ('y'; optional){/t}</li>
 {/if}
 		</ol>
 		{t}in that order. The first two are mandatory. {/t}
-{if $session.project.includes_hybrids==1}
+{if $session.admin.project.includes_hybrids==1}
 		{t}Other values for the field 'Hybrid' than 'y' are ignored.{/t}
 {/if}		
 	</li>

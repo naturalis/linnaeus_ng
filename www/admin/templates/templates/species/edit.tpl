@@ -31,7 +31,7 @@
 			</select>
 		</td>
 	</tr>
-{if $session.project.includes_hybrids==1}	<tr>
+{if $session.admin.project.includes_hybrids==1}	<tr>
 		<td>
 			{t}This is a hybrid:{/t}
 		</td>
@@ -73,7 +73,7 @@
 	<tr>
 		<td colspan="3">
 			<input type="submit" value="save" />
-			<!-- &nbsp;<input type="button" value="{t}back{/t}" onclick="window.open('{$session.system.referer.url}','_top')" /> -->
+			<!-- &nbsp;<input type="button" value="{t}back{/t}" onclick="window.open('{$session.admin.system.referer.url}','_top')" /> -->
 		</td>
 	</tr>
 </table>

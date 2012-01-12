@@ -58,6 +58,8 @@ class UtilitiesController extends Controller
 
         }
         
+		$this->allowEditPageOverlay = false;
+		
         $this->printPage();
     
     }

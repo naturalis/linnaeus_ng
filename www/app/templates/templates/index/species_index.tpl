@@ -31,7 +31,7 @@
 			<td class="species-name-cell" onclick="goTaxon({$v.id})">
 				<span class="a">{$v.label}</span>
 				{if $v.source =='synonym' && $names[$v.id].label!=''}<span class="synonym-addition"> ({$names[$v.id].label})</span>{/if}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</td>
 			<td>{if $v.source =='synonym'}{t}[syn.]{/t}{else}({$v.rank}){/if}</td>
 		</tr>

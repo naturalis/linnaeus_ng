@@ -11,7 +11,7 @@
 	<tr>
 		<th>{t}Rank{/t}</th>
 		<th>{t}Taxon{/t}</th>
-		{if $session.project.includes_hybrids==1}
+		{if $session.admin.project.includes_hybrids==1}
 		<th>{t}Hybrid{/t}</th>
 		{/if}
 		<th>{t}Delete{/t}</th>
@@ -27,7 +27,7 @@
 		<td style="padding-right:20px;">
 			{$v.taxon}
 		</td>
-		{if $session.project.includes_hybrids==1}
+		{if $session.admin.project.includes_hybrids==1}
 		<td style="padding-right:20px;">
 			{if $v.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 		</td>
@@ -69,7 +69,7 @@
 			<td style="padding-right:20px;">
 				{$pv.taxon}
 			</td>
-			{if $session.project.includes_hybrids==1}
+			{if $session.admin.project.includes_hybrids==1}
 			<td style="padding-right:20px;">
 				{if $pv.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
 			</td>

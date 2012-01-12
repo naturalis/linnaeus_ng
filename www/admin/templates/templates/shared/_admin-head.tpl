@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<!-- meta name="viewport" content="initial-scale=1.0, user-scalable=no" / --><!-- might be required for google map -->
 
-	<title>{$session.project.name}{if $session.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
+	<title>{$session.admin.project.name}{if $session.admin.project.name!='' && $pageName != ''} - {/if}{$pageName}</title>
 
 	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
@@ -18,7 +18,7 @@
 		@import url("{$baseUrl}admin/style/{$cssToLoad[i]}");
 {/section}
 {/if}
-{* if $session.project.css_url!=''}		@import url("{$session.project.css_url}");
+{* if $session.admin.project.css_url!=''}		@import url("{$session.admin.project.css_url}");
 {/if *}
 	</style>
 

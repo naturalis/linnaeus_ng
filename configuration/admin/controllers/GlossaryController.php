@@ -654,19 +654,7 @@ class GlossaryController extends Controller
     public function previewAction ()
     {
 
-		$term = $this->getGlossaryTerm($this->requestData['id']);
-
-		$navList = $this->getGlossaryTermsNavList();
-
-		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
-		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
-
-		if (isset($term)) $this->smarty->assign('term', $term);
-
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/glossary/_term',
-			'glossary.css'
-		);
+		$this->redirect('../../../app/views/glossary/term.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
     
     }
 

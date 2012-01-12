@@ -10,7 +10,8 @@
 {foreach from=$taxa key=k item=v}
 	<tr class="tr-highlight">
 		<td style="width:300px">{$v.taxon}</td>
-		<td>{if $occurringTaxa[$v.id]}[<a href="species_show.php?id={$v.id}">{t}show data{/t}</a>]{else}{t}(no data){/t}{/if}</td>
+		{*<td>{if $occurringTaxa[$v.id]}[<a href="species_show.php?id={$v.id}">{t}show data{/t}</a>]{else}{t}(no data){/t}{/if}</td>*}
+		<td>{if $occurringTaxa[$v.id]}[<a href="preview.php?id={$v.id}">{t}preview{/t}</a>]{else}{t}(no data){/t}{/if}</td>
 		<td>{if $geodataTypes|@count>0}[<a href="species_edit.php?id={$v.id}">{t}edit data{/t}</a>]{/if}</td>
 		<td>{if $occurringTaxa[$v.id]}[<a href="copy.php?id={$v.id}">{t}copy data{/t}</a>]{/if}</td>
 	</tr>

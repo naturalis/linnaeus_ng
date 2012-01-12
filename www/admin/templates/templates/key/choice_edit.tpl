@@ -20,7 +20,7 @@
 		<td {$languages[i].language_id} colspan="2">
 			{$defaultLanguage.language}
 		</td>
-	{if $session.project.languages|@count>1}
+	{if $session.admin.project.languages|@count>1}
 		<td id="project-language-tabs">
 			(languages)
 		</td>
@@ -35,7 +35,7 @@
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('default')" /></textarea>
 		</td>
-	{if $session.project.languages|@count>1}
+	{if $session.admin.project.languages|@count>1}
 		<td>
 			<textarea
 				name="contentOther" 
@@ -50,8 +50,8 @@
 		<td colspan="2">
 		{if $data.choice_img}
 			<img
-				onclick="allShowMedia('{$session.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
-				src="{$session.project.urls.project_media}{$data.choice_img}" 
+				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
+				src="{$session.admin.project.urls.project_media}{$data.choice_img}" 
 				class="key-choice-image-normal" /><br />
 			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 		{else}

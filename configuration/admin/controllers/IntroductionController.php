@@ -166,33 +166,7 @@ class IntroductionController extends Controller
     public function previewAction()
     {
 
-		$this->redirect('../../..//app/views/introduction/topic.php?id=');
-
-		array(
-			'p' => $this->getCurrentProjectId(),
-			'id' => $this->requestData['id'],
-			'return' => 'edit.php?id='.$this->requestData['id']
-		);
-
-
-		/*
-
-		$page = $this->getPage($this->requestData['id']);
-
-		$navList = $this->getPageNavList();
-
-		$this->smarty->assign('backUrl','edit.php?id='.$this->requestData['id']);
-		$this->smarty->assign('nextUrl','edit.php?id='.$navList[$this->requestData['id']]['next']['id']);
-
-		if (isset($page)) $this->smarty->assign('page', $page);
-		if (isset($page)) $this->smarty->assign('headerTitles', array('title' => $page['topic']));
-
-		$this->printPreviewPage(
-			'../../../../app/templates/templates/introduction/_topic',
-			'module.css'
-		);
-		
-		*/
+		$this->redirect('../../../app/views/introduction/topic.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
 
 	}
 
@@ -398,6 +372,8 @@ class IntroductionController extends Controller
             $this->getLookupList($this->requestData['search']);
 
         }
+		
+		$this->allowEditPageOverlay = false;
 		
         $this->printPage();
     

@@ -74,7 +74,7 @@
 		</td>
 		<td{if $languages|@count>1} colspan="2"{/if}>
 		{if $state.file_name}
-			<img src="{$session.project.urls.project_media}{$state.file_name}" onclick="allShowMedia('{$session.project.urls.project_media}{$state.file_name}','{$state.file_name}');" 
+			<img src="{$session.admin.project.urls.project_media}{$state.file_name}" onclick="allShowMedia('{$session.admin.project.urls.project_media}{$state.file_name}','{$state.file_name}');" 
 				style="width:250px;border:1px solid black;margin:5px 0px 5px 0px;cursor:pointer" />
 			<input type="hidden" name="existing_file" value="{$state.file_name}" />
 		{else}

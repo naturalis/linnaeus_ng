@@ -109,9 +109,6 @@ function taxonContentOpenMediaLink(id) {
 
 }
 
-function glossTextLink(id) {
-}
-
 function glossTextOver(id,caller) {
 
 	if (!id) return;
@@ -126,14 +123,14 @@ function glossTextOver(id,caller) {
 
 	$('#hint-balloon').load('../glossary/hint.php?id='+id);
 
+	$('#hint-balloon').hover(
+		  function () {}, 
+		  function () {
+			$('#hint-balloon').hide();
+		  }
+	);
+
 }
-
-function glossTextOut() {
-
-	$('#hint-balloon').hide();
-
-}
-
 
 var allTranslations = Array();
 

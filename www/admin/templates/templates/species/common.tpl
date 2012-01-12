@@ -13,7 +13,7 @@
 		<th style="width:150px;">{t}common name{/t}</th>
 		<th style="width:150px;">{t}transliteration{/t}</th>
 		<th style="width:100px;">{t}language{/t}</th>
-		<td  style="width:100px;">{$session.project.languageList[$session.project.default_language_id].language}</td>
+		<td  style="width:100px;">{$session.admin.project.languageList[$session.admin.project.default_language_id].language}</td>
 		{if $languages|@count>1}
 		<td  style="width:200px;" id="project-language-tabs">(languages)</td>
 		{/if}

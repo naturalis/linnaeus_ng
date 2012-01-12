@@ -61,19 +61,10 @@ class MatrixKeyController extends Controller
     {
         
         parent::__destruct();
-    
+ 
+ 		$this->checkForProjectId();
+   
     }
-
-	private function checkMatrixIdOverride()
-	{
-
-		if ($this->rHasVal('mtrx')) {
-
-			$this->setCurrentMatrix($this->requestData['mtrx']);
-
-		}
-
-	}
 
     public function indexAction()
     {
@@ -284,12 +275,25 @@ class MatrixKeyController extends Controller
 		
 		}
 
+		$this->allowEditPageOverlay = false;
+		
         $this->printPage();
 	
 	}
 
 
-	private function getCurrentMatrixId()
+	private function checkMatrixIdOverride()
+	{
+
+		if ($this->rHasVal('mtrx')) {
+
+			$this->setCurrentMatrix($this->requestData['mtrx']);
+
+		}
+
+	}
+
+	public function getCurrentMatrixId()
 	{
 	
 		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
@@ -404,7 +408,8 @@ class MatrixKeyController extends Controller
 			if (isset($taxa)) $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = $taxa;
 			
 		}
-
+//q($this->getCurrentMatrixId());
+//q($_SESSION['app']['user']['matrix']['taxa']);
 		return $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
 
 	}

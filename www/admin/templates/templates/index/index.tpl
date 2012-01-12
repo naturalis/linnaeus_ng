@@ -20,7 +20,7 @@
 		<tr class="highlight">
 			<td>
 				<a href="../{if $taxonType=='higher'}highertaxa{else}species{/if}/edit.php?id={$v.id}">{$v.label}</a>
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.admin.project.hybrid_marker}</span>{/if}
 			</td>
 			<td>({$ranks[$v.rank_id].rank})</td>
 		</tr>

@@ -18,6 +18,7 @@
 <p>
 [<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]
 [<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]
+[<span onclick="window.open('preview.php?step={$step.id}','_self');" class="pseudo-a">{t}preview{/t}</span>]
 </p>
 </fieldset>
 
@@ -93,8 +94,8 @@
 				{if $choices[i].choice_img}
 					<td{if !$choices[i].choice_txt} colspan="2"{/if}>
 						<img
-							onclick="allShowMedia('{$session.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
-							src="{$session.project.urls.project_media}{$choices[i].choice_img}"
+							onclick="allShowMedia('{$session.admin.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
+							src="{$session.admin.project.urls.project_media}{$choices[i].choice_img}"
 							class="key-choice-image-small" /></td>
 				{/if}
 				{if $choices[i].choice_txt}

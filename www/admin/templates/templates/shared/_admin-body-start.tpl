@@ -5,7 +5,7 @@
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">
-		{t}Logged in as{/t} {if $session.user.last_name!=''}{$session.user.first_name} {$session.user.last_name} {if $session.user.currentRole.role_name}({$session.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
+		{t}Logged in as{/t} {if $session.admin.user.last_name!=''}{$session.admin.user.first_name} {$session.admin.user.last_name} {if $session.admin.user.currentRole.role_name}({$session.admin.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
 	</div>
 {/if}
 </div>
@@ -14,7 +14,7 @@
 <div id="page-header-titles">
 	<span id="page-header-title">{$app.name}</span>
 	<span id="page-header-version">{$app.version} ({$app.versionTimestamp})</span>
-{if $session.system.server_addr=='127.0.0.1'}
+{if $session.admin.system.server_addr=='127.0.0.1'}
 	<span id="page-header-locality" style="color:#CC0000">[localhost]</span>
 {/if}
 	<br />

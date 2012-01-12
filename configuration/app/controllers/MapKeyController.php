@@ -66,6 +66,8 @@ class MapKeyController extends Controller
         
         parent::__construct();
 
+		$this->checkForProjectId();
+
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 
     }
@@ -306,6 +308,8 @@ class MapKeyController extends Controller
 			
 		}
 
+		$this->allowEditPageOverlay = false;
+		
         $this->printPage();
 	
 	}

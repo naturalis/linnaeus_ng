@@ -4,13 +4,14 @@
 <p>
 <span class="matrix-header">
 	{t _s1=$matrix.matrix}Editing matrix "%s"{/t}
-	(<a href="matrices.php">{t}select another matrix{/t}</a>)
+	(<a href="preview.php">{t}preview{/t}</a>) (<a href="matrices.php">{t}select another matrix{/t}</a>)
+
 </span>
 </p>
 <table>
 	<tr>
 		<td colspan="2">
-			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>)
+			{t}characters{/t} {*(<a href="char_sort.php">{t}sort characters{/t}</a>)*}
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
 			<option value="{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].label} ({$characteristics[i].type.name})</option>

@@ -149,7 +149,7 @@ function initTinyMce(litRefs,mediaRefs) {
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
-	{/literal}{if $session.project.css_url!=''}  content_css : "{$session.project.css_url}?rnd={$rnd}",
+	{/literal}{if $session.admin.project.css_url!=''}  content_css : "{$session.admin.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
 		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
 	};

@@ -36,7 +36,7 @@
 			{t}Result of this combination of characters{/t}<br />
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
-			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.taxon}{if $v.is_hybrid==1} {$session.project.hybrid_marker}{/if}</option>
+			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.taxon}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
 			{/foreach}
 			</select>
 		</div>		
@@ -51,7 +51,7 @@ $(document).ready(function(){
 {foreach from=$characteristics key=k item=v}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
 {/foreach}
-	imagePath = '{$session.project.urls.project_media}';
+	imagePath = '{$session.app.project.urls.project_media}';
 {literal}
 });
 </script>

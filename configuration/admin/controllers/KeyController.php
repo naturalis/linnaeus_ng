@@ -773,6 +773,15 @@ class KeyController extends Controller
     
     }
 
+
+    public function previewAction ()
+    {
+
+		$this->redirect('../../../app/views/key/index.php?p='.$this->getCurrentProjectId().'&step='.$this->requestData['step']);
+    
+    }
+
+
 	private function setStepsPerTaxon($choice)
 	{
 

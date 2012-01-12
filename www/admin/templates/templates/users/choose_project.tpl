@@ -15,7 +15,7 @@
 {if $projects[i].active == '1' && $projects[i].id != 0}
 <li>
 	<a href="?project_id={$projects[i].id}">{if $projects[i].name!=''}{$projects[i].name}{else}[untitled]{/if}</a>
-{if $session.project.id==$projects[i].id}<span title="current active project">{t}(current){/t}</span>{/if}
+{if $session.admin.project.id==$projects[i].id}<span title="current active project">{t}(current){/t}</span>{/if}
 {/if}
 </li>
 {/section}

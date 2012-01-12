@@ -20,7 +20,7 @@ Review the options below and press "import" to start the import database. Please
 <label>Import general species descriptions?&nbsp;&nbsp;<input type="checkbox" name="taxon_overview" checked="checked"></label><br />
 <label>Import common names?&nbsp;&nbsp;<input type="checkbox" name="taxon_common" checked="checked"></label><br />
 <label>Import synonyms?&nbsp;&nbsp;<input type="checkbox" name="taxon_synonym" checked="checked"></label><br />
-{if $session.system.import.imagePath===false}
+{if $session.admin.system.import.imagePath===false}
 (you specified no media import)<br />
 {else}
 <label>Import media?&nbsp;&nbsp;<input type="checkbox" name="taxon_media" checked="checked"></label><br />

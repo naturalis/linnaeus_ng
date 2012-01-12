@@ -8,7 +8,7 @@
 		<tr class="highlight">
 			<td class="a" onclick="goTaxon({$v.id})">
 				{$v.taxon}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.project.hybrid_marker}</span>{/if}
+				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</td>
 			<td>({$v.rank})</td>
 		</tr>

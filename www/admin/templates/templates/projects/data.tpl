@@ -35,7 +35,7 @@
 		</td>
 		<td colspan="2">
 		{if $data.logo}
-		<img src="{$session.project.urls.project_media}{$data.logo}" width="150px" />
+		<img src="{$session.admin.project.urls.project_media}{$data.logo}" width="150px" />
 		<span class="pseudo-a" onclick="$('#deleteLogo').val(1);$('#theForm').submit();">{t}Delete logo{/t}</span><br />
 		{else}
 		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
@@ -114,7 +114,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="submit" value="save" />
-			<input type="button" value="back" onclick="window.open('{$session.system.referer.url}','_top')" />
+			<input type="button" value="back" onclick="window.open('{$session.admin.system.referer.url}','_top')" />
 		</td>
 	</tr>		
 </table>

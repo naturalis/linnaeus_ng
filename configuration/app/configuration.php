@@ -69,7 +69,20 @@ class configuration
 				'log' => $this->_appFileRoot . 'log',
             ),
 			'hybridMarker' => 'X',
-			'maxBackSteps' => 100
+			'maxBackSteps' => 100,
+			'urlsToAdminEdit' => array(
+				'introduction:topic' => '../../../admin/views/introduction/edit.php?id=%s',
+				'glossary:term' => '../../../admin/views/glossary/edit.php?id=%s',
+				'literature:reference' => '../../../admin/views/literature/edit.php?id=%s',
+				'species:taxon' => '../../../admin/views/species/taxon.php?id=%s',
+				'species:taxon:literature' => '../../../admin/views/species/literature.php?id=%s',
+				'species:taxon:names' => '../../../admin/views/species/synonyms.php?id=%s',
+				'module:topic' => '../../../admin/views/module/index.php?page=%s&freeId=%s',
+				'linnaeus:index' => '../../../admin/views/content/content.php?page=%s&freeId=%s',
+				'mapkey:examine_species' => '../../../admin/views/mapkey/species_edit.php?id=%s',
+				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
+			)
+
         );
     
     }

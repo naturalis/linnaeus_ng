@@ -140,7 +140,9 @@ class LiteratureController extends Controller
             $this->getLookupList($this->requestData['search']);
 
         }
-		
+
+		$this->allowEditPageOverlay = false;
+				
         $this->printPage();
     
     }
@@ -247,7 +249,9 @@ class LiteratureController extends Controller
 				)
 			);
 
-			$tc = 'id,taxon,rank_id,list_level'.($_SESSION['app']['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
+			$tc = 
+				'id,taxon,rank_id,list_level'.
+				(isset($_SESSION['app']['project']['includes_hybrids']) && $_SESSION['app']['project']['includes_hybrids']==1 ? ',is_hybrid' : '');
 
 			foreach((array)$lt as $key => $val) {
 
