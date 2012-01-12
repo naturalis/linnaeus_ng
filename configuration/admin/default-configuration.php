@@ -312,6 +312,12 @@ class configuration
                                 'media_type' => 'archive', 
                                 'maxSize' => 50000000
                             ),
+						  array(
+							'mime' => 'image/tiff', 
+							'media_name' => 'TIFF image', 
+							'media_type'  => 'image', 
+							'maxSize' => 2000000
+						  )
                         ),
                     'defaultUploadMaxSize' => 50000000 //50 mb (h264!?)
                 ),                
@@ -351,6 +357,12 @@ class configuration
 					'media_type'  => 'image', 
 					'maxSize' => 2000000
 				  ),
+				  array(
+					'mime' => 'image/tiff', 
+					'media_name' => 'TIFF image', 
+					'media_type'  => 'image', 
+					'maxSize' => 2000000
+				  )
 				),
 				'defaultUploadMaxSize' => 2000000 // 2mb
 			),
@@ -398,6 +410,12 @@ class configuration
                                 'media_type' => 'archive', 
                                 'maxSize' => 50000000
                             ),
+						  array(
+							'mime' => 'image/tiff', 
+							'media_name' => 'TIFF image', 
+							'media_type'  => 'image', 
+							'maxSize' => 2000000
+						  )
                         ),
                     'defaultUploadMaxSize' => 5000000 // 5mb
                 )
@@ -473,6 +491,12 @@ class configuration
 						'media_type'  => 'sound', 
 						'maxSize' => 10000000
 					  ),
+					  array(
+						'mime' => 'image/tiff', 
+						'media_name' => 'TIFF image', 
+						'media_type'  => 'image', 
+						'maxSize' => 2000000
+					  )
 					),
                     'defaultUploadMaxSize' => 5000000 // 5mb
                 )			
@@ -511,6 +535,12 @@ class configuration
 						'media_name' => 'GIF image', 
 						'media_type'  => 'image', 
 						'maxSize' => 1000000
+					  ),
+					  array(
+						'mime' => 'image/tiff', 
+						'media_name' => 'TIFF image', 
+						'media_type'  => 'image', 
+						'maxSize' => 2000000
 					  )
 					),
 				'defaultUploadMaxSize' => 5000000 // 5mb
