@@ -9,6 +9,11 @@
 				<span id="step-nr">{$step.number}</span>.
 				<span id="step-title">{$step.title}</span>
 			</div>
+		{if $step.image}
+			<div>
+				<img src="{$session.app.project.urls.project_media}{$step.image}" />
+			</div>
+		{/if}
 			<div id="content">{$step.content}</div>
 		</div>
 		<div id="choices">

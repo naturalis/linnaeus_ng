@@ -988,6 +988,14 @@ class Controller extends BaseClass
 	}
 
 
+	public function setControllerParams($params)
+	{
+	
+		if (isset($params['checkForProjectId'])) $this->setCheckForProjectId($params['checkForProjectId']);
+	
+	}
+
+
 	private function previewOverlay()
 	{
 

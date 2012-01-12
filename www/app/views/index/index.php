@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/LinnaeusController.php');
+require_once ('../../../../configuration/app/controllers/IndexController.php');
 
-$c = new LinnaeusController();
+$c = new IndexController();
 
-$c->speciesIndexAction();
+$c->indexAction();
