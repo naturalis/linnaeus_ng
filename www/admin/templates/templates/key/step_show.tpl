@@ -15,6 +15,11 @@
 <fieldset>
 <legend id="key-step-title">{t}Step{/t} {$step.number}{if $step.title}: {$step.title}{/if}</legend>
 {$step.content}
+{if $step.image}<p><img src="{$session.admin.project.urls.project_media}{$step.image}" /><br />
+<span style="color:red">
+	Please note: this image is a legacay feature inherited from Linnaeus 2. It cannot be changed.
+</span>
+</p>{/if}
 <p>
 [<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]
 [<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]

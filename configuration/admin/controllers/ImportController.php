@@ -2279,13 +2279,21 @@ class ImportController extends Controller
 	// dichotomous key
 	private function createKeyStep($step,$stepIds,$stepAdd=0)
 	{
+	
+		$paths = $_SESSION['admin']['system']['import']['paths'];
+	
+		$fileName = isset($step->keyoverviewpicture) ? (string)$step->keyoverviewpicture : null;
+
+		if ($fileName) $this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+
 
 		$k = $this->models->Keystep->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),
 				'number' => ($step=='god' ? -1 : (intval(trim((string)$step->pagenumber)) + $stepAdd)),
-				'is_start' => 0
+				'is_start' => 0,
+				'image' => $fileName
 			)
 		);
 
