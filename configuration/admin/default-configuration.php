@@ -69,7 +69,7 @@ class configuration
             ),
 			'serverTimeZone' => 'Europe/Amsterdam',
             'maxSessionHistorySteps' => 10, 
-            'heartbeatFrequency' => 60000,  // milliseconds
+            'heartbeatFrequency' => 30000,  // milliseconds
             'autosaveFrequency' => 300000,  // milliseconds
             'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(

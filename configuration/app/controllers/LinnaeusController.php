@@ -57,7 +57,8 @@ class LinnaeusController extends Controller
 		'species.css',
 		'colorbox/colorbox.css',
 		'dialog/jquery.modaldialog.css',
-		'lookup.css'
+		'lookup.css',
+		'index.css'
 	);
 
 	public $jsToLoad = array('all' => array(
@@ -146,6 +147,19 @@ class LinnaeusController extends Controller
      * @access    public
      */
     public function indexAction ()
+    {
+
+        $this->printPage();
+
+
+    }
+
+    /**
+     * Index of project: introduction (or other content pages)
+     *
+     * @access    public
+     */
+    public function contentAction ()
     {
 
 		unset($_SESSION['app']['user']['search']['hasSearchResults']);

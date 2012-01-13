@@ -63,3 +63,21 @@
 #alphabet .alphabet-letter {
 	cursor:pointer;
 }
+
+.navigator, .navigator-active {
+	font-size:11px;
+	width:125px;
+	border:1px solid #ddd;
+	text-align:center;
+	overflow:auto;
+	background-color:#eee;
+	padding:2px;
+	cursor:pointer;
+}
+
+.navigator-active {
+	font-size:11px;
+	background-color:#fff;
+	color:#CC0000;
+	cursor:default;
+}

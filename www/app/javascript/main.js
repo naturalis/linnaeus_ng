@@ -269,7 +269,7 @@ function goContent(id) {
 function goContentPage(subject) {
 
 	addFormVal('sub',subject);
-	goForm('../linnaeus/index.php');
+	goForm('../linnaeus/content.php');
 
 }
 
@@ -287,13 +287,6 @@ function goMap(id,url) {
 
 }
 
-function goNavigate(id,field,url) {
-
-	addFormVal(field ? field : 'start',id);
-	goForm(url ? url : null);
-
-}
-
 function goIntroductionTopic(id) {
 
 	addFormVal('id',id);
@@ -301,6 +294,18 @@ function goIntroductionTopic(id) {
 
 }
 
+function goNavigator() {
+
+	goForm('../linnaeus/index.php');
+
+}
+
+function goNavigate(id,field,url) {
+
+	addFormVal(field ? field : 'start',id);
+	goForm(url ? url : null);
+
+}
 
 var searchBoxSelected = false;
 var searchKeyed = false;
