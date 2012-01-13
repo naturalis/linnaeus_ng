@@ -17,6 +17,7 @@ class Controller extends BaseClass
     private $_smartySettings;
     private $_fullPath;
     private $_fullPathRelative;
+	private $_checkForProjectId = true;
 
 	private $_currentGlossaryId = false;
 
@@ -995,6 +996,19 @@ class Controller extends BaseClass
 	
 	}
 
+	private function setCheckForProjectId($state)
+	{
+	
+		if (is_bool($state)) $this->_checkForProjectId = $state;
+	
+	}
+
+	public function getCheckForProjectId()
+	{
+	
+		return $this->_checkForProjectId;
+	
+	}
 
 	private function previewOverlay()
 	{

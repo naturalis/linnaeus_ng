@@ -6,7 +6,6 @@ class IndexController extends Controller
 {
 
 	public $noResultCaching = true;
-	private $_checkForProjectId = true;
 
     public $usedModels = array(
 		'synonym',

@@ -12,7 +12,6 @@ class LinnaeusController extends Controller
 {
 
 	public $noResultCaching = true;
-	private $_checkForProjectId = true;
 
     public $usedModels = array(
 		'content',
@@ -556,21 +555,6 @@ q($results,1,1);
         $this->printPage();
     
     }
-
-	private function setCheckForProjectId($state)
-	{
-	
-		if (is_bool($state)) $this->_checkForProjectId = $state;
-	
-	}
-
-	private function getCheckForProjectId()
-	{
-	
-		return $this->_checkForProjectId;
-	
-	}
-
 
     /**
      * Index of project: introduction
