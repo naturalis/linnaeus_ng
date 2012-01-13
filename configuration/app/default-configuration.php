@@ -78,7 +78,7 @@ class configuration
 				'species:taxon:literature' => '../../../admin/views/species/literature.php?id=%s',
 				'species:taxon:names' => '../../../admin/views/species/synonyms.php?id=%s',
 				'module:topic' => '../../../admin/views/module/index.php?page=%s&freeId=%s',
-				'linnaeus:index' => '../../../admin/views/content/content.php?page=%s&freeId=%s',
+				'linnaeus:content' => '../../../admin/views/content/content.php?page=%s&freeId=%s',
 				'mapkey:examine_species' => '../../../admin/views/mapkey/species_edit.php?id=%s',
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',

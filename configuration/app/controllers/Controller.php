@@ -1486,14 +1486,12 @@ class Controller extends BaseClass
 
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
 	 
-//        $this->setBreadcrumbs();
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
         $this->smarty->assign('baseUrl', $this->baseUrl);
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
-//        $this->smarty->assign('breadcrumbs', $this->getBreadcrumbs());
         $this->smarty->assign('backlink', $this->getBackLink());
         $this->smarty->assign('errors', $this->getErrors());
         $this->smarty->assign('messages', $this->getMessages());
