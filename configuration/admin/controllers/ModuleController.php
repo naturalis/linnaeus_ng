@@ -778,7 +778,7 @@ class ModuleController extends Controller
 
 			}
 
-			if (isset($res)) $_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = $res;
+			$_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList'] = isset($res) ? $res : null;
 		
 		}
 		

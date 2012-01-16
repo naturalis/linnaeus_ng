@@ -53,6 +53,7 @@ class ImportController extends Controller
 		'content_keystep',
 		'choice_keystep',
 		'choice_content_keystep',
+        'module_project_user', 
 		'matrix',
 		'matrix_name',
 		'matrix_taxon',
@@ -86,6 +87,8 @@ class ImportController extends Controller
 	public $jsToLoad = array();
 	
 	private $_deleteOldMediaAfterImport = false; // might become a switch later, but let's not overdo it
+	
+	private $_knownModules = array('file','project','proj_literature','glossary','introduction','tree','records','text_key','pict_key','diversity');
 
 
     /**
@@ -366,7 +369,7 @@ class ImportController extends Controller
         $this->printPage();
 	
 	}
-
+	
 	public function l2SpeciesDataAction()
 	{
 
@@ -902,11 +905,155 @@ class ImportController extends Controller
 		}
 			
 
-		$this->smarty->assign('projectId',$this->getNewProjectId());
         $this->printPage();
 
 	}
 
+	public function xmlParserCallback_Custom($obj,$node)
+	{
+
+		$this->addCustomModule($node,$obj);
+	
+	}
+
+	private function addCustomModule($module,$data)
+	{
+
+		$m = $this->models->FreeModuleProject->save(
+			array(
+				'id' => null, 
+				'module' => $module, 
+				'project_id' => $this->getNewProjectId(),
+				'active' => 'y'
+			)
+		);
+		
+		$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = 'Created module "'.$module.'".';
+
+		$newModuleId = $this->models->FreeModuleProject->getNewId();
+	
+		$this->grantFreeModuleAccessRights($newModuleId);	
+		
+		$dTitle = $module.'_title';
+		$dText = $module.'_text';
+		$dOverview = $module.'_overview';
+
+		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
+			$_SESSION['admin']['system']['import']['paths'] : 
+			$this->makePathNames($this->getNewProjectId());
+
+		foreach($data->topic as $key => $val) {
+
+			$title = isset($val->$dTitle) ? trim((string)$val->$dTitle) : trim((string)$val->title);
+			$text = isset($val->$dText) ? trim((string)$val->$dText) : trim((string)$val->text);
+			$overview = isset($val->$dOverview) ? trim((string)$val->$dOverview) : trim((string)$val->overview);
+
+			$this->models->FreeModulePage->save(
+				array(
+					'project_id' => $this->getNewProjectId(),
+					'module_id' => $newModuleId,
+					'got_content' => 1
+				)
+			);
+			
+			$newPageId = $this->models->FreeModulePage->getNewId();
+			
+			$this->models->ContentFreeModule->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'module_id' => $newModuleId,
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'page_id' => $newPageId,
+					'topic' => $title,
+					'content' => $this->replaceOldMarkUp($text)
+				)
+			);
+			
+			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$title.'".';
+
+			if ($overview) {
+	
+				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$overview,$paths['project_media'].$overview)) {
+				
+					$this->models->FreeModulePage->update(
+						array(
+							'image' => $overview
+						),
+						array(
+							'project_id' => $this->getNewProjectId(),
+							'module_id' => $newModuleId
+						)
+					);			
+				
+				} else {
+				
+					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$overview.' for topic "'.$title.'".';	
+				
+				}
+	
+			}
+
+		}
+	
+	}
+
+
+ 	public function l2AdditionalAction()
+	{
+	
+		if (
+			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
+			!isset($_SESSION['admin']['system']['import']['loaded']['species'])
+		) $this->redirect('l2_start.php');
+
+		$project = $this->getProjects($this->getNewProjectId());
+
+		$this->setPageName(_('Additional data for "'.$project['title'].'"'));
+
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
+	
+			set_time_limit(900);
+
+			if ($this->rHasVal('modules')) {
+
+
+				$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
+				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Custom'));
+	
+				$_SESSION['admin']['system']['import']['loaded']['custom']['saved'] = null;
+				
+				foreach((array)$this->requestData['modules'] as $module => $val) {
+				
+					if ($val=='on') $this->helpers->XmlParser->getNodes($module);		
+
+				}
+
+				if (count((array)$_SESSION['admin']['system']['import']['loaded']['custom']['saved'])!==0) {
+	
+					foreach ((array)$_SESSION['admin']['system']['import']['loaded']['custom']['saved'] as $val)
+						$this->addMessage($val);
+	
+				}
+				
+				unset($_SESSION['admin']['system']['import']['loaded']['custom']['saved']);
+	
+			}
+
+			$this->smarty->assign('processed',true);
+			
+		}
+
+		$this->smarty->assign('projectId',$this->getNewProjectId());
+
+		$this->smarty->assign('modules',$this->getCustomModules());
+
+        $this->printPage();
+	
+	}
+ 
+ 
+ 
 	public function goNewProject()
 	{
 
@@ -1085,6 +1232,19 @@ class ImportController extends Controller
 
 	}
 
+	private function grantFreeModuleAccessRights($id)
+	{
+
+		$this->models->FreeModuleProjectUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(), 
+				'free_module_id' => $id, 
+				'user_id' => $this->getCurrentUserId(),
+			)
+		);
+
+	}
 
 	// languages
 	private function addProjectLanguage($language)
@@ -3538,5 +3698,27 @@ class ImportController extends Controller
 
 	}
 
+	public function getCustomModules()
+	{
+
+		if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
+
+			$d = new XMLReader;
+			$r = array();
+			if ($d->open($_SESSION['admin']['system']['import']['file']['path'])) {
+				while($d->read()) {
+					if($d->nodeType == XMLReader::ELEMENT && $d->depth == 1 && !in_array((string)$d->name,$this->_knownModules)) {
+						$r[] = $d->name;
+					}
+				}
+			}
+			
+			$_SESSION['admin']['system']['import']['additionalModules'] = $r;
+			
+		}
+
+		return $_SESSION['admin']['system']['import']['additionalModules'];
+	
+	}
 
 }
