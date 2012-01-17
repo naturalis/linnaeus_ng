@@ -972,7 +972,7 @@ class ImportController extends Controller
 			
 			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$title.'".';
 
-			if ($overview) {
+			if (!empty($overview)) {
 	
 				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$overview,$paths['project_media'].$overview)) {
 				
