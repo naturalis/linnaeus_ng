@@ -3,6 +3,7 @@ function freemodSaveContent(language,type) {
 	var id = $('#id').val();
 
 	if (id==undefined) return;
+	if ($('#topic-'+type).val()==undefined) return;
 
 	tinyMCE.triggerSave();
 
@@ -49,6 +50,7 @@ function freemodSaveContentAll() {
 function freemodGetContent(language,type) {
 
 	var id = $('#id').val();
+	if ($('#topic-'+type).val()==undefined) return;
 
 	if (id==undefined) return;
 

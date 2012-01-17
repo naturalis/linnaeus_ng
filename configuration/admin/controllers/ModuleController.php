@@ -103,13 +103,13 @@ class ModuleController extends Controller
 		else		
 			$this->redirect('edit.php?id='.$this->requestData['page']);
 
-/*
+		/*
     	$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
 
 		$this->smarty->assign('module',$_SESSION['admin']['user']['freeModules']['activeModule']);
 
         $this->printPage();
-*/
+		*/
 
     }
 
