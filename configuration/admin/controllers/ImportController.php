@@ -1,6 +1,8 @@
 <?php
 
 /*
+q($_SESSION['admin']['system']['import']['loaded']['species']);
+
 
 	what is:
 		$d->projectclassification --> "Five kingdoms"
@@ -583,7 +585,7 @@ class ImportController extends Controller
 					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s)).');
 	
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
-		
+
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] as $val)
 							$this->addError($val['cause']);
 		
@@ -1297,6 +1299,23 @@ class ImportController extends Controller
 
 	private function resolveLanguage($l)
 	{
+		// too much encoding headaches
+		switch (htmlentities($l)) {
+
+			case 'Nederlands' :
+				$l = 'Dutch';
+				break;
+			case 'Fran&Atilde;&sect;ais' :
+				$l = 'French';
+				break;
+			case 'Deutsch' :
+				$l = 'German';
+				break;
+			case 'Engels' :
+				$l = 'English';
+				break;
+
+		}
 
 		$l = $this->models->Language->_get(
 			array(
@@ -1499,20 +1518,29 @@ class ImportController extends Controller
 
 	}
 	
-	private function cleanL2Name ($taxon)
+	private function cleanL2Name($taxon)
 	{
+
 		 $l2Markers = array('subsp.', 'var.', 'subvar.', 'f.', 'subf.');
 		 if (count(explode(' ', $taxon)) > 2) {
 			 foreach ($l2Markers as $marker) {
 			   if (strstr($taxon, $marker) !== false) {
-				$taxon->name = str_replace($marker, '', $taxon);
+				$taxon = str_replace($marker, '', $taxon);
 				break;
 			   }
 			 }
 		 }
-		 return $taxon;
+		 return str_replace('  ', ' ', $taxon);;
+
 	}
  
+ 	private function extractLinkedSpeciesRatherThanDisplayed($whatever)
+	{
+
+		return trim(preg_replace('/(\[m\](.*)\[\/m\])|(\[t\](.*)\[\/t\])|(\[r\]|\[l\]|\[p\]|\[\/r\]|\[\/l\]|\[\/p\])/','',trim($whatever)));
+		
+	}
+
 	private function addSpecies($species,$ranks)
 	{
 
@@ -1893,7 +1921,7 @@ class ImportController extends Controller
 			if(isset($taxon->vernaculars->vernacular)) {
 
 				foreach($taxon->vernaculars->vernacular as $vKey => $vVal) {
-	
+
 					$languagId = $this->resolveLanguage(trim((string)$vVal->language));
 	
 					if ($languagId) {
@@ -2038,7 +2066,9 @@ class ImportController extends Controller
 				// apparently we're skipping literature that is not related to species or higher taxa
 				if (preg_match('/\[m\](Species|Higher taxa)\[\/m\]/i',trim((string)$kVal->name))==0) continue;
 
-				$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
+				//[p][l][m]Species[/m][r]Emys orbicularis subsp. hellenica[/r][t][i]Emys orbicularis hellenica[/i][/t][/l][/p]
+				//$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
+				$speciesName = $this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name);
 
 				if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
 
@@ -2097,7 +2127,7 @@ class ImportController extends Controller
 
 		} else {
 
-			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] =
+			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'][] =
 				array('data' => $lit,'cause' => 'Failed to save lit. ref. "'.$lit['original'].'".');
 
 			return;
@@ -2126,7 +2156,7 @@ class ImportController extends Controller
 		
 			if (empty($kV)) continue;
 
-			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] =
+			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'][] =
 				array('data' => $lit,'cause' => 'Saved lit. ref. "'.$lit['original'].'" but could not resolve reference to "'.$kV.'".');
 
 		}
@@ -2272,7 +2302,11 @@ class ImportController extends Controller
 		} else {
 
 			$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'][] =
-				array('data' => $gls,'cause' => 'Failed to save glossary item "'.$gls['term'].'".');
+				array(
+					'data' => $gls,
+					'cause' =>
+						'Failed to save glossary item "'.$gls['term'].'"'.(empty($gls['definition']) ? ' (empty definition)' : null).'.'
+				);
 			return;
 
 		} 

@@ -695,14 +695,17 @@ abstract class Model extends BaseClass
         
         unset($this->retainedData);
 
-        $query = strtolower($query);
-        
-        if (strpos($query, 'delete') === 0) {
-            
-            $q = str_replace('delete from', 'select * from', $query);
+        //$query = strtolower($query);
+
+        //if (strpos($query, 'delete') === 0) {
+        if (stripos($query, 'delete') === 0) {
+
+            //$q = str_replace('delete from', 'select * from', $query);
+            $q = str_ireplace('delete from', 'select * from', $query);
         
         }
-        else if (strpos($query, 'update') === 0) {
+        //else if (strpos($query, 'update') === 0) {
+        else if (stripos($query, 'update') === 0) {
             
 			/* this will fail if there is a string with the substring " where " somewhere in the where-clause*/
             $d = preg_split('/ where /', $query);
@@ -802,19 +805,19 @@ abstract class Model extends BaseClass
                 
                 } elseif ($operator == 'like') {
 
-                    $query .= " and " . $col . " " . $operator . " '" . strtolower($val)."'";
+                    $query .= " and " . $col . " " . $operator . " '" . mb_strtolower($val,'UTF-8')."'";
                 
                 } elseif ($d['numeric'] == 1) {
 
-                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
+                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(mb_strtolower($val,'UTF-8'));
                 
                 } elseif ($d['type'] == 'datetime') {
                     
-                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(strtolower($val))."'";
+                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8'))."'";
                 
                 } elseif ($ignoreCase && is_string($val)) {
-                    
-                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
+
+                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8')) . "'";
                 
                 } else {
                     
