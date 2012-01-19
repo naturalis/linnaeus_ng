@@ -331,7 +331,7 @@ class ImportController extends Controller
 		
 		$treetops = $this->checkTreeTops($_SESSION['admin']['system']['import']['loaded']['species']);
 
-		if ($this->rHasVal('process','1')) { // && !$this->isFormResubmit()) {
+		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
 			$_SESSION['admin']['system']['import']['loaded']['ranks'] =
 				$this->addProjectRanks(
@@ -1530,7 +1530,7 @@ class ImportController extends Controller
 			   }
 			 }
 		 }
-		 return str_replace('  ', ' ', $taxon);;
+		 return str_replace('  ', ' ', $taxon);
 
 	}
  
@@ -1548,7 +1548,7 @@ class ImportController extends Controller
 		
 			if (!isset($ranks[$val['rank_name']]['id'])) continue; // not loading rankless taxa
 
-			$this->models->Taxon->save(
+			$res = $this->models->Taxon->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
@@ -1560,7 +1560,7 @@ class ImportController extends Controller
 					'list_level' => 0
 				)
 			);
-
+			
 			$val['id'] = $this->models->Taxon->getNewId();
 			$d[$key] = $val;
 
@@ -1967,7 +1967,7 @@ class ImportController extends Controller
 			
 			foreach($taxon->synonyms as $vKey => $vVal) {
 			
-				$s = $this->models->Synonym->save(
+				$res = $this->models->Synonym->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
@@ -1977,12 +1977,12 @@ class ImportController extends Controller
 					)
 				);
 
-				if ($s===true)
+				if ($res===true)
 					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
 				else
 					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
 						'data' => trim((string)$taxon->name),
-						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'"'
+						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'" ('.$res.').'
 					);
 	
 			}
@@ -2111,7 +2111,7 @@ class ImportController extends Controller
 
 		$lit = $this->resolveLiterature($obj);
 
-		if ($this->models->Literature->save(
+		$res = $this->models->Literature->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),				
@@ -2122,14 +2122,16 @@ class ImportController extends Controller
 				'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null,
 				'text' => isset($lit['text']) ? $lit['text'] : null,
 			)
-		)===true) {
+		);
+
+		if ($res===true) {
 
 			$_SESSION['admin']['system']['import']['loaded']['literature']['saved']++;
 
 		} else {
 
 			$_SESSION['admin']['system']['import']['loaded']['literature']['failed'][] =
-				array('data' => $lit,'cause' => 'Failed to save lit. ref. "'.$lit['original'].'".');
+				array('data' => $lit,'cause' => 'Failed to save lit. ref. "'.$lit['original'].'" ('.$res.').');
 
 			return;
 
@@ -2288,7 +2290,7 @@ class ImportController extends Controller
 		$gls = $this->resolveGlossary($obj);
 
 
-		if ($this->models->Glossary->save(
+		$res = $this->models->Glossary->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),
@@ -2296,7 +2298,9 @@ class ImportController extends Controller
 				'term' => isset($gls['term']) ? $gls['term'] : null,
 				'definition' => isset($gls['definition']) ? $gls['definition'] : null
 			)
-		)===true) {
+		);
+		
+		if ($res===true) {
 		
 			$_SESSION['admin']['system']['import']['loaded']['glossary']['saved']++;
 
@@ -2305,8 +2309,7 @@ class ImportController extends Controller
 			$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'][] =
 				array(
 					'data' => $gls,
-					'cause' =>
-						'Failed to save glossary item "'.$gls['term'].'"'.(empty($gls['definition']) ? ' (empty definition)' : null).'.'
+					'cause' => 'Failed to save glossary item "'.$gls['term'].'" ('.$res.').'
 				);
 			return;
 
@@ -2364,7 +2367,7 @@ class ImportController extends Controller
 
 		if (!empty($obj->projectintroduction)) {
 
-			if ($this->models->Content->save(
+			$res = $this->models->Content->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
@@ -2372,13 +2375,15 @@ class ImportController extends Controller
 					'subject' => 'Welcome',	
 					'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
 				)
-			)===true) {
+			);
+
+			if ($res===true) {
 
 				$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'][] = 'Saved welcome text.';
 
 			} else {
 
-				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save welcome text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save welcome text ('.$res.').';
 			}
 
 		} else {
@@ -2389,7 +2394,7 @@ class ImportController extends Controller
 
 		if (!empty($obj->contributors)) {
 
-			if ($this->models->Content->save(
+			$res = $this->models->Content->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),	
@@ -2397,13 +2402,15 @@ class ImportController extends Controller
 					'subject' => 'Contributors',	
 					'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
 				)
-			)===true) {
+			);
+
+			if ($res===true) {
 
 				$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'][] = 'Saved contributors text.';
 
 			} else {
 
-				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save contributors text.';
+				$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'][] = 'Failed to save contributors text ('.$res.').';
 			}
 
 		} else {
@@ -2427,7 +2434,7 @@ class ImportController extends Controller
 		
 		$id = $this->models->IntroductionPage->getNewId();
 		
-		if ($this->models->ContentIntroduction->save(
+		$res = $this->models->ContentIntroduction->save(
 			array(
 				'id' => null, 
 				'project_id' => $this->getNewProjectId(),
@@ -2436,13 +2443,15 @@ class ImportController extends Controller
 				'topic' => $this->replaceOldMarkUp(trim((string)$obj->introduction_title),true),
 				'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->text)))
 			)
-		)===true) {
+		);
+
+		if ($res===true) {
 
 			$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'][] = 'Saved topic "'.trim((string)$obj->introduction_title).'".';
 
 		} else {
-	
-			$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'".';
+				
+			$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'" ('.$res.').';
 			return;
 
 		}
@@ -3128,7 +3137,7 @@ class ImportController extends Controller
 
 		$this->models->OccurrenceTaxon->setNoKeyViolationLogging(true);
 	
-		$d = $this->models->OccurrenceTaxon->save(
+		$res = $this->models->OccurrenceTaxon->save(
 			array(
 				'id' => null,
 				'project_id' => $this->getNewProjectId(),
@@ -3141,7 +3150,7 @@ class ImportController extends Controller
 			)
 		);
 		
-		if ($d===true)
+		if ($res===true)
 			$_SESSION['admin']['system']['import']['loaded']['map']['saved']++;
 		else
 			$_SESSION['admin']['system']['import']['loaded']['map']['failed']++;
