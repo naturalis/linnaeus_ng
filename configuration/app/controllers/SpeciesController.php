@@ -126,11 +126,12 @@ class SpeciesController extends Controller
 			$this->setTaxonType($taxon['lower_taxon']==1 ? 'lower' : 'higher');
 			
 			$this->setControllerBaseName();
+			
+			if (isset($this->requestData['lan'])) $this->setCurrentLanguageId($this->requestData['lan']);
 
 			// get categories
 			$categories = $this->getCategories(
 				$this->requestData['id'],
-				isset($this->requestData['lan']) ? $this->requestData['lan'] : false,
 				$this->isLoggedInAdmin(),
 				$this->isLoggedInAdmin()
 			);
@@ -141,7 +142,6 @@ class SpeciesController extends Controller
 			$content = $this->getTaxonContent(
 				$taxon['id'],
 				$activeCategory,
-				isset($this->requestData['lan']) ? $this->requestData['lan'] : false,
 				$this->isLoggedInAdmin()
 			);
 
@@ -278,12 +278,10 @@ class SpeciesController extends Controller
 	
 	}
 
-	private function getCategories($taxon=null,$languageOverride=false,$allowUnpublished=false,$forcelookup=false)
+	private function getCategories($taxon=null,$allowUnpublished=false,$forcelookup=false)
 	{
 	
-		$language = ($languageOverride!==false ? $languageOverride : $this->getCurrentLanguageId());
-
-		if (!isset($_SESSION['app']['user']['species']['categories'][$language]) || $forcelookup) {
+		if (!isset($_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()]) || $forcelookup) {
 
 			// get the defined categories (just the page definitions, no content yet)
 			$tp = $this->models->PageTaxon->_get(
@@ -302,7 +300,7 @@ class SpeciesController extends Controller
 				$tpt = $this->models->PageTaxonTitle->_get(
 					array('id'=>array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $language, 
+						'language_id' => $this->getCurrentLanguageId(), 
 						'page_id' => $val['id']
 					),
 					'columns'=>'title'));
@@ -313,7 +311,7 @@ class SpeciesController extends Controller
 			
 			}
 			
-			$_SESSION['app']['user']['species']['categories'][$language] = $tp;
+			$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
 
 		}
 
@@ -323,13 +321,13 @@ class SpeciesController extends Controller
 		
 			$d = null;
 
-			foreach((array)$_SESSION['app']['user']['species']['categories'][$language] as $key => $val) {
+			foreach((array)$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
 
 				$ct = $this->models->ContentTaxon->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $language, 
+							'language_id' => $this->getCurrentLanguageId(), 
 							'taxon_id' => $taxon, 							
 							'page_id' => $val['id']
 						),
@@ -352,7 +350,7 @@ class SpeciesController extends Controller
 		}
 
 		return array(
-			'categories' => $_SESSION['app']['user']['species']['categories'][$language],
+			'categories' => $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()],
 			'defaultCategory' => $_SESSION['app']['user']['species']['defaultCategory']
 		);
 
@@ -387,7 +385,7 @@ class SpeciesController extends Controller
 
 	}
 	
-	private function getTaxonContent($taxon,$category,$languageOverride=false,$allowUnpublished=false)
+	private function getTaxonContent($taxon,$category,$allowUnpublished=false)
 	{
 
 		switch($category) {
@@ -412,7 +410,7 @@ class SpeciesController extends Controller
 				$d = array(
 						'taxon_id' => $taxon,
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => ($languageOverride !== false ? $languageOverride : $this->getCurrentLanguageId()),
+						'language_id' => $this->getCurrentLanguageId(),
 						'page_id' => $category
 					);
 
