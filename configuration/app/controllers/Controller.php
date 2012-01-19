@@ -1994,7 +1994,10 @@ class Controller extends BaseClass
 	private function embedGlossaryLink($matches)
 	{
 
-		return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
+		if (trim($matches[0])=='')
+			return $matches[0];
+		else
+			return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
 
 	}
 	
