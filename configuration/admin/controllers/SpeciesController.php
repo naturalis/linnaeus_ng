@@ -2338,7 +2338,8 @@ class SpeciesController extends Controller
 		$this->redirect(
 			'../../../app/views/species/taxon.php?p='.$this->getCurrentProjectId().
 			'&id='.$this->requestData['taxon_id'].
-			'&cat='.$this->requestData['activePage']
+			'&cat='.$this->requestData['activePage'].
+			'&lan='.$_SESSION['admin']['project']['default_language_id']
 		);
 
     }
