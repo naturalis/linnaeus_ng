@@ -1848,7 +1848,8 @@ class ImportController extends Controller
 
 		if (file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 		
-			$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['admin']['system']['import']['imagePath'].$fileName);
+			//$thisMIME = $this->helpers->FileUploadHelper->getMimeType($_SESSION['admin']['system']['import']['imagePath'].$fileName);
+			$thisMIME = $this->mimeContentType($_SESSION['admin']['system']['import']['imagePath'].$fileName);
 			
 			if (isset($_SESSION['admin']['system']['import']['mimes'][$thisMIME])) {
 			
@@ -2225,7 +2226,7 @@ class ImportController extends Controller
 				'cause' => 'User specified no media import for project'
 			);
 
-		$fileToImport = $_SESSION['admin']['system']['import']['imagePath'].$data['fileName'];
+		$fileToImport = $_SESSION['admin']['system']['import']['imagePath'].$data['filename'];
 
 		if (file_exists($fileToImport)) {
 
@@ -2236,7 +2237,7 @@ class ImportController extends Controller
 				if ($_SESSION['admin']['system']['import']['thumbsPath']==false)
 					$thumbName = null;
 				else
-					$thumbName = file_exists($_SESSION['admin']['system']['import']['thumbsPath'].$data['fileName']) ? $data['fileName'] : null;
+					$thumbName = file_exists($_SESSION['admin']['system']['import']['thumbsPath'].$data['filename']) ? $data['filename'] : null;
 
 					$this->models->GlossaryMedia->save(
 						array(
@@ -2253,7 +2254,7 @@ class ImportController extends Controller
 
 				return array(
 					'saved' => true,
-					'filename' => $data['fileName'],
+					'filename' => $data['filename'],
 					'full_path' => $fileToImport,
 					'thumb' => isset($thumbName) ? $thumbName : null,
 					'thumb_path' => isset($thumbName) ? $_SESSION['admin']['system']['import']['thumbsPath'].$thumbName : null
@@ -2263,7 +2264,7 @@ class ImportController extends Controller
 
 				return array(
 					'saved' => false,
-					'data' => $data['fileName'],
+					'data' => $data['filename'],
 					'cause' => isset($thisMIME) ? 'MIME-type "'.$thisMIME.'" not allowed' : 'Could not determine MIME-type'
 				);
 
@@ -2273,8 +2274,8 @@ class ImportController extends Controller
 		
 			return array(
 				'saved' => false,
-				'data' => $data['fileName'],
-				'cause' => 'File "'.$data['fileName'].'" does not exist'
+				'data' => $data['filename'],
+				'cause' => 'File "'.$data['filename'].'" does not exist'
 			);
 		
 		}
