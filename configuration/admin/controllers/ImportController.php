@@ -2648,7 +2648,7 @@ class ImportController extends Controller
 
 		$stepAdd = 0;
 
-		if ($node == 'text_key') {
+		if ($node == 'text_key' && count($obj->keypage) > 1) {
 
 			$keyStepIds = null;
 
@@ -2681,7 +2681,7 @@ class ImportController extends Controller
 
 		}
 
-		if ($node == 'pict_key') {
+		if ($node == 'pict_key' && count($obj->keypage) > 1) {
 
 			$keyStepIds = $_SESSION['admin']['system']['import']['loaded']['key_dich']['keyStepIds'];
 			$stepAdd = $_SESSION['admin']['system']['import']['loaded']['key_dich']['stepAdd'];
@@ -3167,8 +3167,8 @@ class ImportController extends Controller
 						<mapname>North Atlantic</mapname>
 						<specs>90,100,0,-80,5,5</specs>
 						
-						90,100 = linksboven = 90°N 100°W = 90 -100
-						0, -80 = rechtonder = 0°S 80°E = -0 80
+						90,100 = linksboven = 90ï¿½N 100ï¿½W = 90 -100
+						0, -80 = rechtonder = 0ï¿½S 80ï¿½E = -0 80
 						5,5 - cell size (ASSUMING WxH)
 			
 					*/
