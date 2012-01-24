@@ -737,7 +737,7 @@ class LiteratureController extends Controller
 
 			}
 		
-			$_SESSION['admin']['literature']['navList'] = $res;
+			$_SESSION['admin']['literature']['navList'] = isset($res) ? $res : null;
 		
 		}
 		

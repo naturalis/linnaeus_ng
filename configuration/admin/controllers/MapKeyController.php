@@ -798,9 +798,10 @@ class MapKeyController extends Controller
 		
 		foreach((array)$ot as $key => $val) {
 
-			$d = $this->treeList[$val['taxon_id']];
-
-			$t[$val['taxon_id']] = $d;
+			if (isset($this->treeList[$val['taxon_id']])) {
+			    $d = $this->treeList[$val['taxon_id']];
+                $t[$val['taxon_id']] = $d;
+			}
 			
 		}
 

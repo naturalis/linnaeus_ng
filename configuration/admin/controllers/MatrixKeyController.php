@@ -541,6 +541,7 @@ class MatrixKeyController extends Controller
     public function ajaxInterfaceAction ()
     {
 
+
         if (!$this->rHasVal('action')) return;
         
         if ($this->requestData['action'] == 'save_matrix_name') {
@@ -1314,6 +1315,7 @@ class MatrixKeyController extends Controller
 			}
 
 		} else
+
 		if ($data['type']=='range') {
 
 			if (!isset($data['lower']) || empty($data['lower']) && $data['lower']!=='0') {
@@ -1683,11 +1685,12 @@ class MatrixKeyController extends Controller
 		$this->getTaxonTree();
 
 		foreach((array)$mt as $key => $val) {
-
-			$t[] = array(
-				'id' => $this->treeList[$val['taxon_id']]['id'],
-				'taxon' => $this->treeList[$val['taxon_id']]['taxon']
-			);
+            if (isset($this->treeList[$val['taxon_id']])) {
+    			$t[] = array(
+    				'id' => $this->treeList[$val['taxon_id']]['id'],
+    				'taxon' => $this->treeList[$val['taxon_id']]['taxon']
+    			);
+            }
 
 		}
 
@@ -1831,21 +1834,3 @@ class MatrixKeyController extends Controller
 	}	
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

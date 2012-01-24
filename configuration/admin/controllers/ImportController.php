@@ -283,7 +283,8 @@ class ImportController extends Controller
 
 				if (!$l) {
 
-					$this->addError('Unable to use project language "'.trim((string)$d->language).'"');
+					$this->addError('Unable to use project language "'.trim((string)$d->language).'"; defaulted to English.');
+					$this->addProjectLanguage('English');
 
 				} else {
 
@@ -582,7 +583,7 @@ class ImportController extends Controller
 	
 					$this->helpers->XmlParser->getNodes('proj_reference');
 
-					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s)).');
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s).');
 	
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
 
@@ -939,12 +940,13 @@ class ImportController extends Controller
 		$dTitle = $module.'_title';
 		$dText = $module.'_text';
 		$dOverview = $module.'_overview';
+		$dTopic = $module.'_topic';
 
 		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
 			$_SESSION['admin']['system']['import']['paths'] : 
 			$this->makePathNames($this->getNewProjectId());
 
-		foreach($data->topic as $key => $val) {
+		foreach((isset($data->$dTopic) ? $data->$dTopic : $data->topic) as $key => $val) {
 
 			$title = isset($val->$dTitle) ? trim((string)$val->$dTitle) : trim((string)$val->title);
 			$text = isset($val->$dText) ? trim((string)$val->$dText) : trim((string)$val->text);
@@ -960,7 +962,7 @@ class ImportController extends Controller
 			
 			$newPageId = $this->models->FreeModulePage->getNewId();
 			
-			$this->models->ContentFreeModule->save(
+			$x = $this->models->ContentFreeModule->save(
 				array(
 					'id' => null, 
 					'project_id' => $this->getNewProjectId(), 
@@ -971,7 +973,7 @@ class ImportController extends Controller
 					'content' => $this->replaceOldMarkUp($text)
 				)
 			);
-			
+
 			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$title.'".';
 
 			if (!empty($overview)) {
@@ -1252,21 +1254,14 @@ class ImportController extends Controller
 	private function addProjectLanguage($language)
 	{
 
-		$l = $this->models->Language->_get(
-			array(
-				'id' => array(
-					'language' => $language
-				),
-				'columns' => 'id'
-			)
-		);
+		$l = $this->resolveLanguage($language);
 
 		if (!$l) return false;
 
 		$p = $this->models->LanguageProject->save(
 			array(
 				'id' => null,
-				'language_id' => $l[0]['id'],				
+				'language_id' => $l,				
 				'project_id' => $this->getNewProjectId(),				
 				'def_language' => 1,		
 				'active' => 'y',				
@@ -1274,7 +1269,7 @@ class ImportController extends Controller
 			)
 		);
 	
-		return ($p) ? $l[0]['id'] : false;
+		return $p ? $l : false;
 	
 	}
 
@@ -1306,15 +1301,22 @@ class ImportController extends Controller
 				$l = 'Dutch';
 				break;
 			case 'Fran&Atilde;&sect;ais' :
+			case 'Frans' :
 				$l = 'French';
 				break;
 			case 'Deutsch' :
+			case 'Duits' :
 				$l = 'German';
 				break;
 			case 'Engels' :
 				$l = 'English';
 				break;
-
+			case 'Spaans' :
+				$l = 'Spanish';
+				break;
+			case 'Italiaans' :
+				$l = 'Italian';
+				break;
 		}
 
 		$l = $this->models->Language->_get(
@@ -3585,12 +3587,12 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->ContentTaxon->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'content' => $this->replaceInternalLinks($val['content'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'content' => $this->replaceInternalLinks($val['content'])
+				)
+			);
 
 		}
 
@@ -3599,12 +3601,12 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->Literature->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'text' => $this->replaceInternalLinks($val['text'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'text' => $this->replaceInternalLinks($val['text'])
+				)
+			);
 			
 		}
 
@@ -3613,12 +3615,12 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->Glossary->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'definition' => $this->replaceInternalLinks($val['definition'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'definition' => $this->replaceInternalLinks($val['definition'])
+				)
+			);
 
 		}
 
@@ -3627,12 +3629,12 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->Content->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'content' => $this->replaceInternalLinks($val['content'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'content' => $this->replaceInternalLinks($val['content'])
+				)
+			);
 			
 		}
 
@@ -3641,13 +3643,13 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->ContentKeystep->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'title' => $this->replaceInternalLinks($val['title']),
-						'content' => $this->replaceInternalLinks($val['content'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'title' => $this->replaceInternalLinks($val['title']),
+					'content' => $this->replaceInternalLinks($val['content'])
+				)
+			);
 			
 		}
 
@@ -3656,12 +3658,26 @@ class ImportController extends Controller
 		foreach((array)$d as $val) {
 
 			$this->models->ChoiceContentKeystep->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),
-						'choice_txt' => $this->replaceInternalLinks($val['choice_txt'])
-					)
-				);
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'choice_txt' => $this->replaceInternalLinks($val['choice_txt'])
+				)
+			);
+			
+		}
+
+		$d = $this->models->ContentFreeModule->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->ContentFreeModule->save(
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'content' => $this->replaceInternalLinks($val['content'])
+				)
+			);
 			
 		}
 
