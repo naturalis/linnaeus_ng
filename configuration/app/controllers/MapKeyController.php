@@ -347,7 +347,7 @@ class MapKeyController extends Controller
 		
 			foreach((array)$ot as $key => $val) {
 			
-				if ($val['total']!=0) {
+				if ($val['total']!=0 && isset($taxaToFilter[$key])) {
 				
 					$d[$key] = $taxaToFilter[$key];
 					$d[$key]['total'] = $val['total'];

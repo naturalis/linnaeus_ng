@@ -121,7 +121,7 @@ class LinnaeusController extends Controller
 
 			$this->setPaths();
 		
-			$this->checkForStylesheets();
+			//$this->checkForStylesheets();
 
 			$this->setCurrentProjectData();
 			
