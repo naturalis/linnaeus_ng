@@ -780,9 +780,13 @@ class MapKeyController extends Controller
 	private function getFirstOccurringTaxonId()
 	{
 
-		$d = array_shift($this->getOccurringTaxonList());
+		$d = $this->getOccurringTaxonList();
+	
+		if (!isset($d)) return null;
 
-		return isset($d['id']) ? $d['id'] : null;
+		$d = array_shift($d);
+	
+		return $d['id'];
 
 	}
 
@@ -795,6 +799,8 @@ class MapKeyController extends Controller
 				'columns' => 'distinct taxon_id'
 			)
 		);
+		
+		if (!$ot) return null;
 
 		$this->getTaxonTree();
 		
