@@ -157,7 +157,7 @@
 {if $remainingTaxa=='none'}
 {t}Your key currently has no taxa attached to it.{/t}
 {elseif $remainingTaxa || $choices|@count==0}
-This is a list of the taxa that are a possible outcome of the key, computed from the current step:<br />
+This is a list of the taxa that are a possible outcome of the key, computed from the current step ({$remainingTaxa|@count}):<br />
 {section name=i loop=$remainingTaxa}
 &#149;&nbsp;{$remainingTaxa[i].taxon}<br />
 {/section}

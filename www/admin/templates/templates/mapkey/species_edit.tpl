@@ -42,6 +42,8 @@ $(document).ready(function(){
 	addMouseHandlers();
 	{if $mapBorder}
 	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));
+	{else}
+	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(-10,-10), new google.maps.LatLng(10,10)));
 	{/if}
 
 {foreach from=$occurrences key=k item=v}

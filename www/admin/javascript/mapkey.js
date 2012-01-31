@@ -131,7 +131,6 @@ function initMap(init) {
 		finishedLoading = true;
 	});
 	
-	
 	if (init.editable) mapDrawingManagerInit();
 
 }
