@@ -89,7 +89,9 @@ class MapKeyController extends Controller
 		
 		$taxa = array();
 		
-		foreach((array)$this->treeList as $key => $val) if($val['lower_taxon']=='1') $taxa[$key] = $val;
+		if (!empty($this->treeList)) {
+		    foreach((array)$this->treeList as $key => $val) if($val['lower_taxon']=='1') $taxa[$key] = $val;
+		}
 
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
 
@@ -822,7 +824,7 @@ class MapKeyController extends Controller
 			
 		}
 
-		return $t;
+		return is_array($t) ? $t : array();
 	
 	}
 	

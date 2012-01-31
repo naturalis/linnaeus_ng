@@ -1224,6 +1224,7 @@ class Controller extends BaseClass
      */
     public function customSortArray (&$array, $sortBy)
     {
+        $d = array();
         
         if (!isset($array) || !is_array($array)) return;
 
