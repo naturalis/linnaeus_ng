@@ -219,7 +219,7 @@ class GlossaryController extends Controller
 
 		}
 
-		if (isset($gloss)) {
+		if (isset($gloss['term'])) {
 
 			$gloss['media'] = $this->getGlossaryMedia($gloss['id']);
 		
