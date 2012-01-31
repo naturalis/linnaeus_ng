@@ -1705,13 +1705,13 @@ class Controller extends BaseClass
 			isset($p['forceLookup']) && $p['forceLookup']===true) {
 
 			$_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
-			$_SESSION['admin']['user']['species']['treeList'] = $this->treeList;
+			$_SESSION['admin']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
 
 		} else
 		if ($this->hasTableDataChanged('Taxon')) {
 
 			$_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
-			$_SESSION['admin']['user']['species']['treeList'] = $this->treeList;
+			$_SESSION['admin']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
 
 		} else {
 
@@ -1846,7 +1846,9 @@ class Controller extends BaseClass
 	{
 
 		$this->newGetUserAssignedTaxonTree();
-		
+	
+		if (!isset($this->treeList)) return null;
+	
 		$prevId = $prevTitle = null;
 
 		foreach((array)$this->treeList as $key => $val) {

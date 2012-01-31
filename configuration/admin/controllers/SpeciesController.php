@@ -457,7 +457,7 @@ class SpeciesController extends Controller
 		
 							$this->models->Taxon->save(
 								array(
-									'id' => ($this->requestData['id'] ? $this->requestData['id'] : null),
+									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon' => $this->requestData['taxon'],
 									'parent_id' => $parentId,
@@ -465,6 +465,8 @@ class SpeciesController extends Controller
 									'is_hybrid' =>  ($isHybrid ? 1 : 0)
 								)
 							);
+
+							$data['id'] = ($this->rHasId() ? $this->requestData['id'] : $this->models->Taxon->getNewId());
 
 							if (empty($parentId) && empty($this->requestData['id'])) {
 							
