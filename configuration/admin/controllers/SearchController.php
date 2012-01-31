@@ -682,22 +682,18 @@ class SearchController extends Controller
 				
 				$matches[0][$mK]['highlighted'] =
 					($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? '...' : '').
-					htmlentities(
-						substr(
-							$content,
-							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
-							($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
-						)
+					substr(
+						strip_tags($content),
+						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $mV[1]-$this->controllerSettings['excerptLengthLeft'] : 0),
+						($mV[1] > $this->controllerSettings['excerptLengthLeft'] ? $this->controllerSettings['excerptLengthLeft'] : $mV[1])
 					).
 					'<span class="stringToReplace">'.
 					$mV[0].
 					'</span>'.
-					htmlentities(
-						substr(
-							$content,
-							$mV[1]+strlen($mV[0]),
-							$this->controllerSettings['excerptLengthRight']
-						)
+					substr(
+						strip_tags($content),
+						$mV[1]+strlen($mV[0]),
+						$this->controllerSettings['excerptLengthRight']
 					).					
 					($mV[1]+strlen($mV[0])+$this->controllerSettings['excerptLengthRight'] >= strlen($content) ? '' : '...');
 	
