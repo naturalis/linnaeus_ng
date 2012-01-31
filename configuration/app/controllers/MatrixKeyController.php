@@ -49,6 +49,8 @@ class MatrixKeyController extends Controller
     {
         
         parent::__construct();
+		
+		$this->checkForProjectId();
 
     }
 
@@ -61,8 +63,6 @@ class MatrixKeyController extends Controller
     {
         
         parent::__destruct();
- 
- 		$this->checkForProjectId();
    
     }
 

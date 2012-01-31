@@ -4391,16 +4391,18 @@ class SpeciesController extends Controller
 		if (empty($search)) return;
 		
 		$regexp = '/'.preg_quote($search).'/i';
+		
+		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
 
 		$l = array();
 		
 		foreach((array)$this->newGetUserAssignedTaxonTreeList() as $key => $val) {
-		
+
 			if (preg_match($regexp,$val['taxon']) == 1)
 				$l[] = array(
 					'id' => $val['id'],
 					'label' => $val['taxon'],
-					'source' => _('species')
+					'source' => $ranks[$val['rank_id']]['rank']
 				);
 
 		}

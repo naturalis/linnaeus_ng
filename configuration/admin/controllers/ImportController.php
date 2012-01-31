@@ -2291,7 +2291,6 @@ class ImportController extends Controller
 
 		$gls = $this->resolveGlossary($obj);
 
-
 		$res = $this->models->Glossary->save(
 			array(
 				'id' => null,
@@ -2318,6 +2317,7 @@ class ImportController extends Controller
 		} 
 		
 		$id = $this->models->Glossary->getNewId();
+
 		$_SESSION['admin']['system']['import']['glossary'][] = array('id' => $id, 'term' => $gls['term']);
 
 		if (isset($gls['synonyms'])) {
@@ -2339,6 +2339,8 @@ class ImportController extends Controller
 		}
 
 		if (isset($gls['multimedia'])) {
+		
+			$paths = $this->makePathNames($this->getNewProjectId());
 
 			foreach((array)$gls['multimedia'] as $mVal) {
 

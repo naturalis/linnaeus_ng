@@ -1750,6 +1750,7 @@ class Controller extends BaseClass
 			$t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
 			$t[$key]['sibling_count'] = count((array)$t);
 			$t[$key]['depth'] = $t[$key]['level'] = $depth;
+			$t[$key]['rank'] = $ranks[$val['rank_id']]['rank'];
 
 			$this->treeList[$key] = $t[$key];
 
