@@ -441,12 +441,10 @@ class SpeciesController extends Controller
 				$isHybrid = $this->rHasVal('is_hybrid','on');
 				
 				$parentId =
-					($this->requestData['id']==$this->requestData['parent_id'] ? 
-						null : 
-						($isEmptyTaxaList ? 
-							null : 
-							$this->requestData['parent_id']
-						)
+				$parentId =
+					($this->requestData['id']==$this->requestData['parent_id'] || $isEmptyTaxaList || $this->requestData['parent_id']=='-1' ? 
+						null :
+						$this->requestData['id']
 					);
 
 				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
@@ -454,7 +452,7 @@ class SpeciesController extends Controller
 					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
 	
 						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
-		
+
 							$this->models->Taxon->save(
 								array(
 									'id' => ($this->rHasId() ? $this->requestData['id'] : null),

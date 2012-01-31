@@ -1743,7 +1743,7 @@ class Controller extends BaseClass
 				'order' => 'taxon_order'
 			)
 		);
-		
+
 		foreach((array)$t as $key => $val) {
 
 			$t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
