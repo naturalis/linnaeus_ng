@@ -897,8 +897,8 @@ class SearchController extends Controller
 					'matches' => $this->getColumnMatches($search,$val,array('description'),$hitCountMedia),
 					'label' => sprintf(_('Description of media file for "%s"'),$this->treeList[$d[0]['taxon_id']]['taxon'])
 				);
-				
-				$media[$key]['url'] = '../species/media.php?id='.$val['taxon_id'];
+
+				$media[$key]['url'] = '../species/media.php?id='.$d[0]['taxon_id'];
 
 			}
 			
