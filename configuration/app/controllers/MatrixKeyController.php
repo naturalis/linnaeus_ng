@@ -583,6 +583,8 @@ class MatrixKeyController extends Controller
 		if ($states==-1) return $taxa;
 
 		foreach((array)$taxa as $key => $val) $taxa[$key] = $this->calculateScore($states,$val,'taxon');
+		
+		$matrices = array();
 
 		foreach((array)$mtcs as $key => $val) {
 
