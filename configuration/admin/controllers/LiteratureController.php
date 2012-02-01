@@ -833,9 +833,7 @@ class LiteratureController extends Controller
 				'literature_id' => $id,
 				'taxon_id' => $taxonId
 			)
-		);	
-		
-		q($this->models->LiteratureTaxon->getLastQuery());
+		);
 	
 	}
 
