@@ -201,7 +201,7 @@ class ColLoaderHelper
                 if ($data && is_array($data)) {
     
                     if ($data['number_of_results_returned'] > 0) {
-        
+         
                         // get Catalogue Of Life ID for taxon
                         $this->_speciesId = $data['results'][0]['id'];
                         unset($data);
