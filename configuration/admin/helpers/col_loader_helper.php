@@ -437,7 +437,7 @@ class ColLoaderHelper
     
             // parents
             if ($includeParents) {
-                foreach ($dataFull['results'][0]['accepted_name']['classification'] as $t) {
+                foreach ($dataFull['results'][0]['classification'] as $t) {
                     if ($this->_conciseResults) {
                         unset($t['name_html']);
                         unset($t['url']);
@@ -461,7 +461,7 @@ class ColLoaderHelper
             $result['taxon'] = $t;
 
             // children
-            foreach ($dataFull['results'][0]['accepted_name']['child_taxa'] as $t) {
+            foreach ($dataFull['results'][0]['child_taxa'] as $t) {
 
                 if ($this->_conciseResults) {
                     unset($t['name_html']);
