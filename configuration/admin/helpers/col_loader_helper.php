@@ -127,7 +127,7 @@ class ColLoaderHelper
 
     }
     
-    public function getTaxon()
+    /*public function getTaxon()
     {
 
         set_time_limit($this->_timeout);
@@ -184,8 +184,58 @@ class ColLoaderHelper
 
         }
 
-    }
+    }*/
 
+    public function getTaxon()
+    {
+
+        set_time_limit($this->_timeout);
+
+        if (!$this->getErrors()) {
+        
+            if (!$this->_speciesId) {
+
+                // get basic info for taxon, including id, based on name
+                $url = sprintf(self::SPECIES_URL,urlencode($this->_speciesName)).'&format=php';
+                $data = @unserialize(file_get_contents($url));
+                if ($data && is_array($data)) {
+    
+                    if ($data['number_of_results_returned'] > 0) {
+        
+                        // get Catalogue Of Life ID for taxon
+                        $this->_speciesId = $data['results'][0]['id'];
+                        unset($data);
+
+                    } else {
+    
+                        $this->addError(_('Found no basic data for: ').$this->_speciesName);
+    
+                    }
+
+                } else {
+    
+                    $this->addError(_('Unable to parse basic data'));
+    
+                }
+
+            }
+    
+            if (!$this->_speciesId) {
+
+                $this->addError(_('Unable to resolve taxon\'s Catalogue Of Life ID'));
+
+            } else {
+
+                // retrieve detail data for taxon, including progeny (recursive)
+                $this->_result = $this->getTaxonDetail($this->_speciesId,true);
+                
+            }
+
+        }
+
+    }
+    
+    
     public function getResult()
     {
 
@@ -220,7 +270,7 @@ class ColLoaderHelper
     
     }
 
-    private function getTaxonDetail($id,$includeParents=false)
+    /*private function getTaxonDetail($id,$includeParents=false)
     {
 
         if ($this->_includeResultsTimer) $this->timerStart();
@@ -371,8 +421,96 @@ class ColLoaderHelper
     
         }
 
-    }
+    }*/
 
+    
+    private function getTaxonDetail($id,$includeParents=false)
+    {
+
+        if ($this->_includeResultsTimer) $this->timerStart();
+
+        // get comprehensive info for id
+        $url = sprintf(self::ID_URL,$id).'&format=php';
+        $dataFull = @unserialize(file_get_contents($url));
+
+        if ($dataFull && is_array($dataFull)) {
+    
+            // parents
+            if ($includeParents) {
+                foreach ($dataFull['results'][0]['accepted_name']['classification'] as $t) {
+                    if ($this->_conciseResults) {
+                        unset($t['name_html']);
+                        unset($t['url']);
+                    }
+
+                    if (!in_array($t['id'],$this->_includedIds)) $result['parent_taxa'][] = $t;
+                    $this->_includedIds[] = $t['id'];
+                    unset($t);
+                }
+            }
+
+            // taxon
+            $t['id'] = $dataFull['results'][0]['id'];
+            $t['name'] = $dataFull['results'][0]['name'];    
+            $t['rank'] = $dataFull['results'][0]['rank'];
+            if (!$this->_conciseResults) {
+                $t['name_html'] = $dataFull['results'][0]['name_html'];
+                $t['url'] = $dataFull['results'][0]['url'];
+            }
+    
+            $result['taxon'] = $t;
+
+            // children
+            foreach ($dataFull['results'][0]['accepted_name']['child_taxa'] as $t) {
+
+                if ($this->_conciseResults) {
+                    unset($t['name_html']);
+                    unset($t['url']);
+                }
+
+                if (!in_array($t['id'],$this->_includedIds)) $children[] = $t;
+                $this->_includedIds[] = $t['id'];
+                unset($t);
+ 
+            }
+
+            // preserving memory
+            unset($dataFull);
+ 
+            if ($this->_includeResultsTimer) $result['time_taken'] = $this->timerEnd();
+
+            if ($this->_numberOfChildLevels !=0 && $this->_level >= $this->_numberOfChildLevels) {
+
+                return $result;
+
+            } else {
+
+                $this->_level++;
+
+                if (isset($children)) {
+
+                    foreach((array)$children as $key => $val) {
+
+                        $result['child_taxa'][$key] = $this->getTaxonDetail($val['id']);    
+
+                    }    
+
+                }
+                
+                return $result;
+
+            }
+
+        } else {
+    
+            $this->addError(_('Unable to parse comprehensive data'));
+
+            return false;
+    
+        }
+
+    }
+    
     private function timerStart()
     {
 
