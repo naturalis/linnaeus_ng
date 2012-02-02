@@ -43,7 +43,7 @@ $(document).ready(function(){
 	{if $mapBorder}
 	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));
 	{else}
-	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(-10,-10), new google.maps.LatLng(10,10)));
+	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng(-45,-45), new google.maps.LatLng(45,45)));
 	{/if}
 
 {foreach from=$occurrences key=k item=v}
