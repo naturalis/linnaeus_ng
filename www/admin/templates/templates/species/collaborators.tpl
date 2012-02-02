@@ -2,7 +2,7 @@
 
 <div id="page-main">
 {t}You can assign parts of the taxon tree to specific collaborator. If assigned, collaborators can only edit the assigned taxon, and all taxa beneath it in the taxon tree. If a collaborator has no taxa assigned to him, he can edit no taxa.{/t}<br/>
-{t}You can assign multiple taxa to the same collaborator. However, if you assign differente taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent.{/t}<br /><br />
+{t}You can assign multiple taxa to the same collaborator. However, if you assign different taxa that appear in the same branch of the taxon tree, the taxa highest up the same branch takes precedent.{/t}<br /><br />
 
 {if $taxa|@count > 0}
 <form id="theForm" method="post" action="">
