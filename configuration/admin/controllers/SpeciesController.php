@@ -158,7 +158,8 @@ class SpeciesController extends Controller
 
 		if (!isset($d['id'])) {
 		
-			unset($_SESSION['admin']['system']['highertaxa']);
+			// not sure why this was here...
+			//unset($_SESSION['admin']['system']['highertaxa']);
 
 	  		$this->redirect('collaborators.php');
 
@@ -1955,7 +1956,7 @@ class SpeciesController extends Controller
 	
 			$this->smarty->assign('usersTaxa', $ut);
 	
-			$this->smarty->assign('users', $users);
+			if (isset($users)) $this->smarty->assign('users', $users);
 	
 			$this->smarty->assign('taxa',$this->treeList);
 		

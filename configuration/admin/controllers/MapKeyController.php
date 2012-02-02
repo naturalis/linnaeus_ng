@@ -242,9 +242,9 @@ class MapKeyController extends Controller
 
 			$this->smarty->assign('mapInitString','{editable:true}');
 
-			$this->smarty->assign('mapBorder',$this->calculateMapBorder($occurrences['occurrences']));
-
 		}
+
+		$this->smarty->assign('mapBorder',$this->calculateMapBorder($occurrences['occurrences']));
 
 		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
