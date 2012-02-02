@@ -4,8 +4,6 @@
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="list.php" class="allLookupLink">{t}Taxon list{/t}</a>
-{if $session.admin.system.highertaxa!=1}
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
-{/if}
 &nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>
