@@ -19,8 +19,8 @@ class IndexController extends Controller
     
     public $controllerPublicName = 'Index';
 
-	public $cssToLoad = array('lookup.css','index.css');
-	public $jsToLoad = array('all'=>array('lookup.js'));
+	public $cssToLoad = array('lookup.css','index.css','dialog/jquery.modaldialog.css',);
+	public $jsToLoad = array('all'=>array('lookup.js','int-link.js','dialog/jquery.modaldialog.js'));
 
     /**
      * Constructor, calls parent's constructor

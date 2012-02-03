@@ -41,7 +41,7 @@ class MapKeyController extends Controller
 				'mapkey.js',
 				'jscolor/jscolor.js',
 				'http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing',
-				'lookup.js',
+				'lookup.js'
 			)
 		);
 
