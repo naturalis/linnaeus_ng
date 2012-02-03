@@ -19,14 +19,17 @@ class IntroductionController extends Controller
 
 	public $cssToLoad = array(
 		'colorbox/colorbox.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css',
 	);
 
 	public $jsToLoad = array(
 		'all' => array(
 			'freemodule.js',
 			'colorbox/jquery.colorbox.js',
-			'lookup.js'
+			'lookup.js',
+			'int-link.js',
+			'dialog/jquery.modaldialog.js'
 		)
 	);
 

@@ -841,6 +841,11 @@ class ImportController extends Controller
 				
 				}
 
+			} else {
+
+				$this->addMessage('Skipped dichotomous key.');				
+				$this->addMessage('Skipped matrix key(s).');
+
 			}
 			
 			$this->smarty->assign('processed',true);
@@ -884,6 +889,8 @@ class ImportController extends Controller
 				$this->helpers->XmlParser->getNodes('taxondata');
 
 				$this->loadControllerConfig();
+
+				$this->updateMapTypeColours();
 
 				$this->addModuleToProject(8);
 				$this->grantModuleAccessRights(8);
@@ -2638,8 +2645,6 @@ class ImportController extends Controller
 					)
 				);
 	
-	
-		
 				$this->models->ChoiceContentKeystep->save(
 					array(
 						'id' => null,
@@ -3116,6 +3121,35 @@ class ImportController extends Controller
 		return $id;
 
 	}
+
+	private function updateMapTypeColours()
+	{
+
+		$d = $this->models->GeodataType->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getNewProjectId(),
+				)
+			)
+		);	
+	
+		$c = array('ee0000','0033ff','00ee00','ffff00','ff66ff','990099','669999','666699','cc9966','ffcc00','008700');
+
+		foreach((array)$d as $key => $val) {
+			$this->models->GeodataType->update(
+				array(
+					'colour' => $c[$key % count((array)$c)]
+				),
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId()
+				)
+			);
+			
+		}
+		
+	}
+
 
 	private function doSaveMapItem($occurrence)
 	{

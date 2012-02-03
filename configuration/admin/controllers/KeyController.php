@@ -24,11 +24,11 @@ class KeyController extends Controller
 
     public $controllerPublicName = 'Dichotomous key';
 
-	public $cssToLoad = array('key.css','rank-list.css','key-tree.css','colorbox/colorbox.css');
+	public $cssToLoad = array('key.css','rank-list.css','key-tree.css','colorbox/colorbox.css','dialog/jquery.modaldialog.css',);
 
 	public $jsToLoad =
 		array(
-			'all' => array('key.js','jit/jit.js','jit/key-tree.js','colorbox/jquery.colorbox.js'),
+			'all' => array('key.js','jit/jit.js','jit/key-tree.js','colorbox/jquery.colorbox.js','int-link.js'),
 			'IE' => array('jit/Extras/excanvas.js')
 		);
 
