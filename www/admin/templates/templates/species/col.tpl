@@ -11,6 +11,11 @@
 	{t}If you require the data of an entire family, please check the 'retrieve a single level of child taxa only'-option. The application will retrieve only genera, the first level beneath family. Subsquently, you can retrieve data for each genus by clicking its name. The data for that genus and its child taxa will be displayed in a separate list, so you do not lose the family-data.{/t}
 </p>
 <p>
+	<b>{t}Please be aware that only those taxa will saved that are of a rank that you have defined for your project.{/t}</b>
+	<a href="ranks.php">{t}Define ranks.{/t}</a>
+</p>
+
+<p>
 	{t}Taxon:{/t} <input type="text" id="taxon_name" name="taxon_name" value="{$taxon_name}" />
 	<input value="{t}retrieve{/t}" type="button" onclick="taxonGetCoL()" />
 	<input value="{t}abort retrieval{/t}" type="button" onclick="allAjaxAbort();allHideLoadingDiv();" /><br />

@@ -802,7 +802,10 @@ function taxonSaveCoLTaxa(taxa) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
-			if (data.indexOf('<error>')>=0) {
+
+alert(data);
+
+if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''))
 			} else {
 				alert(_('Data saved'));

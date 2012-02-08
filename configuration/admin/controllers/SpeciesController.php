@@ -153,8 +153,7 @@ class SpeciesController extends Controller
 
 		}
 		
-		$d = @array_shift($this->getUserAssignedTreeList());
-
+		$d = @array_shift($this->newGetUserAssignedTaxonTreeList());
 
 		if (!isset($d['id'])) {
 		
@@ -218,7 +217,6 @@ class SpeciesController extends Controller
 
 		}
 
-		//$taxa = $this->getUserAssignedTreeList(true);
 		$taxa = $this->newGetUserAssignedTaxonTreeList();
 
 		if (isset($taxa) && count((array)$taxa)>0) {
@@ -670,7 +668,7 @@ class SpeciesController extends Controller
 		
 		}
 
-		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
@@ -922,7 +920,7 @@ class SpeciesController extends Controller
 			
 			if (isset($taxon)) $this->smarty->assign('taxon', $taxon);
 
-			$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+			$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 			$this->smarty->assign('navCurrentId',$taxon['id']);
 
         } else {
@@ -1016,7 +1014,7 @@ class SpeciesController extends Controller
 
 		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
 
-		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
@@ -2104,7 +2102,7 @@ class SpeciesController extends Controller
 
 		}
 
-		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
@@ -2286,7 +2284,7 @@ class SpeciesController extends Controller
 
 		}
 
-		$this->smarty->assign('navList',$this->getUserAssignedTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
 		$this->smarty->assign('id',$this->requestData['id']);
@@ -2358,81 +2356,6 @@ class SpeciesController extends Controller
 		
 	}
 	
-	
-	private function getUserAssignedTreeList($forceLookup=false)
-	{
-	
-		$type = $this->maskAsHigherTaxa() ? 'higher-taxa' : 'species';
-	
-		if (isset($_SESSION['admin']['species']['usertaxa'][$type]) && !$forceLookup)
-			return $_SESSION['admin']['species']['usertaxa'][$type];
-	
-		// get complete taxon tree
-		$this->getTaxonTree(null,$forceLookup);
-
-		if (!isset($this->treeList)) return null;
-
-		$allowedRanks = $this->getRankList();
-	
-		// get taxa assigned to user
-		$ut = $this->models->UserTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'user_id' => $this->getCurrentUserId()
-				),
-				'columns' => 'taxon_id',
-				'fieldAsIndex' => 'taxon_id'
-			)
-		);
-		
-		$allow = false;
-		$prevAllowedLevel = -1;
-		$prevId = $prevTaxon = null;
-	
-		// discard all taxa above the levels (i.e. smaller level-value) assigned to the user
-		foreach((array)$this->treeList as $key => $val) {
-	
-			if ($allow && $val['level'] <= $prevAllowedLevel) {
-			
-				$allow = false;
-	
-			}
-	
-			if (isset($ut) && array_key_exists($val['id'],$ut)) {
-	
-				$allow = true;
-				
-				$prevAllowedLevel = $val['level'];
-	
-			}
-	
-			if ($allow && isset($allowedRanks[$val['rank_id']])) {
-	
-				if ($prevId) {
-				
-					$val['prev'] = array('id' => $prevId, 'title' => $prevTaxon);
-					if (isset($taxa[$prevId])) $taxa[$prevId]['next'] = array('id' => $val['id'], 'title' => $val['taxon']);
-	
-				}
-				
-				$taxa[$val['id']] = $val;
-	
-				$prevId = $val['id'];
-				$prevTaxon = $val['taxon'];
-	
-			}
-				
-			$prevLevel = $val['level'];
-	
-		}
-	
-		$_SESSION['admin']['species']['usertaxa'][$type] = isset($taxa) ? $taxa : null;
-	
-		return $_SESSION['admin']['species']['usertaxa'][$type];
-	
-	}
-
     private function getCatalogueOfLifeData()
     {
 
@@ -3328,7 +3251,7 @@ class SpeciesController extends Controller
                     'taxon' => $taxon['taxon_name'],
                     'parent_id' => $pId,
                     'rank_id' => $rankId,
-                    'is_hybrid' => $taxon['hybrid'] && $this->canRankBeHybrid($rankId) ? 1 : 0
+                    'is_hybrid' => isset($taxon['hybrid']) && $this->canRankBeHybrid($rankId) ? 1 : 0
                 )
             );
 			
@@ -3367,7 +3290,7 @@ class SpeciesController extends Controller
                         'project_id' => $this->getCurrentProjectId(),
                         'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']),
                         'rank_id' => $rankId,
-	                    'is_hybrid' => $taxon['hybrid'] && $this->canRankBeHybrid($rankId) ? 1 : 0
+	                    'is_hybrid' => isset($taxon['hybrid']) && $this->canRankBeHybrid($rankId) ? 1 : 0
                     )
 
                 );
