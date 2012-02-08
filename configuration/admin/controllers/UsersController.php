@@ -159,8 +159,8 @@ class UsersController extends Controller
 					$this->setCurrentProjectId($this->requestData['project_id']);
 	
 					$this->setCurrentProjectData();
-	
-					$this->getCurrentUserCurrentRole(true);
+					
+					$this->setCurrentUserRoleId();
 	
 					$this->redirect($this->getLoggedInMainIndex());
 				

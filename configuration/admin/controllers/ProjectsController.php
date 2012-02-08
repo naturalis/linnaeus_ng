@@ -179,7 +179,7 @@ class ProjectsController extends Controller
 
         $this->smarty->assign('freeModules',$freeModules);
 
-        $this->smarty->assign('currentRole',$this->getCurrentUserCurrentRole());
+		$this->smarty->assign('currentUserRoleId',$this->getCurrentUserRoleId());
 
         $this->printPage();
     
@@ -559,7 +559,7 @@ class ProjectsController extends Controller
 					$this->reInitUserRolesAndRights();
 	                $this->setCurrentProjectId($id);
 	                $this->setCurrentProjectData();
-					$this->getCurrentUserCurrentRole(true);
+					$this->setCurrentUserRoleId();
 
 					$this->smarty->assign('saved',true);
 					$this->addMessage(sprintf(_('Project \'%s\' saved.'),$this->requestData['title']));
@@ -1201,8 +1201,9 @@ class ProjectsController extends Controller
 	
 		$paths = $this->makePathNames($id);
 
-		@unlink($paths['project_thumbs']);
-		@unlink($paths['project_media']);
+		@rmdir($paths['project_thumbs']);
+		@rmdir($paths['project_media']);
+		@rmdir($paths['uploads_media']);
 
 	}
 

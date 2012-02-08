@@ -4,6 +4,9 @@
 q($_SESSION['admin']['system']['import']['loaded']['species']);
 
 
+	DOCUMENT resolveLanguage($l) !!!!
+
+
 	what is:
 		$d->projectclassification --> "Five kingdoms"
 		$d->projectnomenclaturecode --> "ICZM"
@@ -104,6 +107,8 @@ class ImportController extends Controller
         parent::__construct();
 
 		error_reporting(E_ERROR | E_PARSE);
+		
+		$this->setSuppressProjectInBreadcrumbs();
 
     }
 
@@ -1070,8 +1075,8 @@ class ImportController extends Controller
 
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
-		$this->getCurrentUserCurrentRole(true);
 		$this->reInitUserRolesAndRights();
+		$this->setCurrentUserRoleId();
 
 		unset($_SESSION['admin']['system']['import']);
 		unset($_SESSION['admin']['project']['ranks']);
@@ -1531,9 +1536,11 @@ class ImportController extends Controller
 	{
 
 		 $l2Markers = array('subsp.', 'var.', 'subvar.', 'f.', 'subf.');
+
 		 if (count(explode(' ', $taxon)) > 2) {
+
 			 foreach ($l2Markers as $marker) {
-			   if (strstr($taxon, $marker) !== false) {
+			   if (stristr($taxon, $marker) !== false) {
 				$taxon = str_replace($marker, '', $taxon);
 				break;
 			   }
@@ -1542,6 +1549,25 @@ class ImportController extends Controller
 		 return str_replace('  ', ' ', $taxon);
 
 	}
+
+	private function removeRankFromTaxonName($taxon)
+	{
+
+		 $ranks = array_keys($_SESSION['admin']['system']['import']['loaded']['ranks']);
+
+		 if (count(explode(' ', $taxon)) > 1) {
+
+			 foreach ($ranks as $rank) {
+			   if (stripos($taxon, $rank) === 0) {
+				$taxon = str_ireplace($rank, '', $taxon);
+				break;
+			   }
+			 }
+		 }
+		 return trim($taxon);
+
+	}
+
  
  	private function extractLinkedSpeciesRatherThanDisplayed($whatever)
 	{
@@ -2574,10 +2600,14 @@ class ImportController extends Controller
 								) :
 								null
 							);
-	
+
+				// text_key->keypage->text_choice->destinationtaxonname = "Family Pontoporiidae". *SIGH*
+				$destinationtaxonname =
+					$this->removeRankFromTaxonName(trim((string)$val->destinationtaxonname));
+
 				$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
-								(isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']) ?
-									$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$val->destinationtaxonname)]['id']:
+								(isset($_SESSION['admin']['system']['import']['loaded']['species'][$destinationtaxonname]['id']) ?
+									$_SESSION['admin']['system']['import']['loaded']['species'][$destinationtaxonname]['id']:
 									null
 								) : 
 								null
