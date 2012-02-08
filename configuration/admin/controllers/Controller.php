@@ -570,7 +570,8 @@ class Controller extends BaseClass
             
             }
             
-            $this->setCurrentProjectId($p);
+			$this->setCurrentProjectId($p);
+			$this->setCurrentUserRoleId();
         
         }
 
@@ -626,7 +627,7 @@ class Controller extends BaseClass
      */
     public function getCurrentUserRights ($id = false)
     {
-        
+
         $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
 
         foreach ((array) $pru as $key => $val) {
@@ -676,6 +677,8 @@ class Controller extends BaseClass
 
 		}
 
+		$d = $this->getCurrentProjectId();
+
         return array(
             'roles' => isset($userProjectRoles) ? $userProjectRoles : null, 
             'rights' => isset($rs) ? $rs : null, 
@@ -721,7 +724,42 @@ class Controller extends BaseClass
         $_SESSION['admin']['user']['_number_of_projects'] = $numberOfProjects;
 	
 	}
+	
+	public function setCurrentUserRoleId()
+	{
 
+		if (!isset($_SESSION['admin']['user']['_roles'])) {
+
+			$_SESSION['admin']['user']['currentRole'] = null;
+
+		} else {
+		
+			$d = $this->getCurrentProjectId();
+			
+			if (is_null($d)) {
+			
+				$_SESSION['admin']['user']['currentRole'] = null;
+			
+			} else {
+			
+				foreach((array)$_SESSION['admin']['user']['_roles'] as $val) {
+				
+					if ($val['project_id']==$d) $_SESSION['admin']['user']['currentRole'] = $val["role_id"];
+				
+				}
+				
+			}
+		
+		}
+	
+	}
+
+	public function getCurrentUserRoleId()
+	{
+	
+		return isset($_SESSION['admin']['user']['currentRole']) ? $_SESSION['admin']['user']['currentRole'] : null;
+	
+	}
 
     /**
      * Checks whether a user is logged in
@@ -820,40 +858,6 @@ class Controller extends BaseClass
         return false;
     
     }
-
-
-    /**
-     * Returns the active users role in the current project
-     *
-     * @return     array    id and name of the role
-     * @access     public
-     */
-    public function getCurrentUserCurrentRole ($forceLookup=false)
-    {
-
-		if (isset($_SESSION['admin']['user']['currentRole']) && !$forceLookup) return $_SESSION['admin']['user']['currentRole'];
-
-		$d = $this->getCurrentProjectId();
-		$r = false;
-        
-		foreach((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
-
-			if ($val['project_id']==$d) {
-			
-				$r['role_id'] = $val['role_id'];
-				$r['role_name'] = $val['role_name'];
-				break;
-
-			}
-
-		}
-		
-		$_SESSION['admin']['user']['currentRole'] = $r;
-
-        return $r;
-
-    }
-
 
 
     /**
@@ -1874,10 +1878,52 @@ class Controller extends BaseClass
 		return isset($d) ? $d : null;
 
 	}
-				
+
+
+	public function getProjectUsers($pId=null)
+	{
+	
+		$pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
+	
+		$pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' => array(
+					'project_id' => $pId,
+					'role_id !=' => '1',
+					'active' => 1
+				)
+			)
+		);
 		
+		$d = array();
+
+		foreach ((array) $pru as $key => $val) {
+
+			$u = $this->models->User->_get(array('id' => $val['user_id']));
+
+			$r = $this->models->Role->_get(array('id' => $val['role_id']));
+			
+			$u['role'] = $r['role'];
+			$u['role_id'] = $r['id'];
+
+			$users[] = $u;
+			
+			$d[] = $u['id'];
 		
-		
+		}
+
+		// adding superusers (don't need assigned roles)
+		$superusers = $this->models->User->_get(array('id' => array('superuser' => '1'),'columns' => '*,\'System Admin\' as role'));
+
+		foreach((array)$superusers as $key => $val) {
+
+			if (!in_array($val['id'],$d)) $users[] = $val;
+
+		}
+
+		return $users;
+
+	}
 		
 	private function getFrontEndMainMenu()
 	{

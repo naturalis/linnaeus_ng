@@ -1872,7 +1872,6 @@ class SpeciesController extends Controller
 
 	}	
 
-
     /**
      * Assign parts of the taxon tree to specific collaborators so they can edit only those
      *
@@ -1899,14 +1898,7 @@ class SpeciesController extends Controller
 
 			} else {
 
-				$this->models->UserTaxon->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getCurrentProjectId(),
-						'user_id' => $this->requestData['user_id'],
-						'taxon_id' => $this->requestData['taxon_id'],
-					)
-				);
+				$this->doAssignUserTaxon($this->requestData['user_id'],$this->requestData['taxon_id']);
 
 			}
 			
@@ -1914,28 +1906,7 @@ class SpeciesController extends Controller
 
 		}
 		
-		$pru = $this->models->ProjectRoleUser->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'role_id !=' => '1',
-					'active' => 1
-				)
-			)
-		);
-
-		foreach ((array) $pru as $key => $val) {
-
-			$u = $this->models->User->_get(array('id' => $val['user_id']));
-
-			$r = $this->models->Role->_get(array('id' => $val['role_id']));
-			
-			$u['role'] = $r['role'];
-			$u['role_id'] = $r['id'];
-
-			$users[] = $u;
-		
-		}
+		$users = $this->getProjectUsers();
 
 		$this->getTaxonTree();
 	
@@ -3360,6 +3331,8 @@ class SpeciesController extends Controller
                     'is_hybrid' => $taxon['hybrid'] && $this->canRankBeHybrid($rankId) ? 1 : 0
                 )
             );
+			
+			return $this->models->Taxon->getNewId();
             
         } else {
         // taxon does exist in database
@@ -3398,6 +3371,8 @@ class SpeciesController extends Controller
                     )
 
                 );
+				
+				return $t[0]['id'];
 
             }
 
@@ -3519,7 +3494,10 @@ class SpeciesController extends Controller
             $t['taxon_rank'] = $val[2];
             $t['parent_taxon_name'] = $val[3];
 
-            $this->importTaxon($t);
+            $id = $this->importTaxon($t);
+			
+			// assign the topmost taxon to the current user, so he can actually see the tree branch
+			if ($key==0) $this->doAssignUserTaxon($this->getCurrentUserId(),$id);
 
         }
 
@@ -4528,6 +4506,26 @@ class SpeciesController extends Controller
 		}
 
 	}
+
+	private function doAssignUserTaxon($userId,$taxonId)
+	{
+	
+		if (empty($userId) || empty($taxonId)) return;
+		
+		$this->models->UserTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'user_id' => $userId,
+				'taxon_id' => $taxonId,
+			)
+		);
+		
+		return $this->models->UserTaxon->getNewId();
+	
+	}
+
+
 
 	
 }

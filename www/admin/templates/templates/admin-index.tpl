@@ -49,7 +49,7 @@
 <input type="hidden" id="freeId" name="freeId" value="" />
 </form>
 
-{if $currentRole.role_id==1 || $currentRole.role_id==2}
+{if $currentUserRoleId==1 || $currentUserRoleId==2 || $session.admin.user.superuser==1}
 <br />
 {t}Management tasks:{/t}
 <ul>
