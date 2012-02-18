@@ -898,6 +898,12 @@ abstract class Model extends BaseClass
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where ' . $where;
 
+            $query .= $group ? " group by " . $group : '';
+            
+            $query .= $order ? " order by " . $order : '';
+
+            $query .= $limit ? " limit " . $limit : '';
+            
             $this->setLastQuery($query);
 
             $set = mysql_query($query) or $this->log('Failed query: '.$query,2);
@@ -951,6 +957,8 @@ abstract class Model extends BaseClass
     }
 
 	private function logQueryResult($set,$query,$type,$severity=1) {
+
+		//$this->log('DEBUG: '.$query,1);
 
 		if (!$set) {
 

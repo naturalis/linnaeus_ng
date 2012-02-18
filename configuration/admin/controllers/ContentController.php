@@ -21,7 +21,7 @@ class ContentController extends Controller
     public $controllerPublicName = 'Content';
 
 	public $cssToLoad = array('dialog/jquery.modaldialog.css');
-	public $jsToLoad = array('all' => array('content.js','dialog/jquery.modaldialog.js','int-link.js','dialog/jquery.modaldialog.js'));
+	public $jsToLoad = array('all' => array('content.js','int-link.js','dialog/jquery.modaldialog.js'));
 
 
     /**

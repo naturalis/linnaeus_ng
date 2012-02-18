@@ -85,6 +85,7 @@ class SpeciesController extends Controller
 		'dialog/jquery.modaldialog.css',
 		'lookup.css',
 	);
+
 	public $jsToLoad = array(
 		'all' => array(
 			'taxon.js',
@@ -1745,6 +1746,7 @@ class SpeciesController extends Controller
 			}
 
 			if (isset($_SESSION['admin']['project']['ranklist'])) unset($_SESSION['admin']['project']['ranklist']);
+			if (isset($_SESSION['admin']['user']['species']['tree'])) unset($_SESSION['admin']['user']['species']['tree']);
 			
 			$this->addMessage(_('Ranks saved.'));
 
@@ -3180,7 +3182,7 @@ class SpeciesController extends Controller
 
         if (empty($taxon['taxon_name'])) return;
 		
-		$rankId = false;
+		$rankId = null;
 
 		if (is_numeric($taxon['taxon_rank'])) {
 
@@ -3205,7 +3207,8 @@ class SpeciesController extends Controller
 
 		}
 
-		if (!$rankId) return;
+		if (is_null($rankId)) return;
+
 
         $t = $this->models->Taxon->_get(
 			array(
