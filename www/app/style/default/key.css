@@ -98,11 +98,14 @@
 	text-align:justify;
 }
 
-#step .image-small {
-	float:right;
+#step .choice-image-div {
+	float:left;
+}
+
+#step .choice-image-small {
 	width:120px;
 	cursor:pointer;
-	margin:0px 0px 10px 5px;
+	margin:0px 10px 10px 0px;
 	border:1px solid #666;
 }
 

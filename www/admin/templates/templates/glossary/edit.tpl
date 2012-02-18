@@ -67,7 +67,7 @@
 		<td>{t}Synonyms:{/t}</td>
 		<td>
 			<input type="text" name="synonym" id="synonym" value=""/>
-			<span class="pseudo-a" id="add" onclick="glossAddSynonymToList()">{t}add{/t}</span>
+			<span class="a" id="add" onclick="glossAddSynonymToList()">{t}add{/t}</span>
 			<div id="synonyms-container">
 			<div id="synonyms"></div>
 			{t}(double-click a synonym to remove it from the list){/t}
@@ -86,7 +86,7 @@
 		<tr class="tr-highlight" id="media-row-{$gloss.media[i].id}">
 			<td style="width:400px">
 				<span
-					class="pseudo-a" onclick="allShowMedia('{$session.admin.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
+					class="a" onclick="allShowMedia('{$session.admin.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
 			</td>
 			<td style="cursor:pointer" onclick="glossMediaDelete({$gloss.media[i].id})">
 				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
@@ -96,7 +96,7 @@
 		</table>
 		{/if}
 		<br />
-		<span class="pseudo-a" onclick="$('#action').val('media');glossCheckForm(this);">{t}upload media{/t}</span>
+		<span class="a" onclick="$('#action').val('media');glossCheckForm(this);">{t}upload media{/t}</span>
 		</td>
 	</tr>
 </table>

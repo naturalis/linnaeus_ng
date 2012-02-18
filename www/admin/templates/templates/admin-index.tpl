@@ -35,7 +35,7 @@
 			</span>
 		</td>
 		<td>
-			<span class="pseudo-a" onclick="$('#freeId').val('{$freeModules[i].id}');$('#freeForm').submit();">{$freeModules[i].module}</span>{if $freeModules[i].active=='y'} *{/if}
+			<span class="a" onclick="$('#freeId').val('{$freeModules[i].id}');$('#freeForm').submit();">{$freeModules[i].module}</span>{if $freeModules[i].active=='y'} *{/if}
 		</td>
 {/if}
 {if $i % 2 == 1}
@@ -53,7 +53,7 @@
 <br />
 {t}Management tasks:{/t}
 <ul>
-	<li><a href="views/users/">{t}User management{/t}</a></li>
+	<li><a href="views/users/">{t}Collaborator management{/t}</a></li>
 	<li><a href="views/projects/">{t}Project management{/t}</a></li>
 	<li><a href="views/users/choose_project.php">{t}Switch projects{/t}</a></li>
 </ul>

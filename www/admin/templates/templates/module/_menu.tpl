@@ -5,4 +5,6 @@
 &nbsp;
 <a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
+<a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
+&nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>

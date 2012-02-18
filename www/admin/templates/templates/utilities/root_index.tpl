@@ -30,7 +30,7 @@ To use the administration, follow <a href="admin/views/users/login.php">this lin
 To use an application, follow one of the following links:<br />
 <ul>
 {foreach from=$projects key=k item=v}
-<li><span class="pseudo-a" onclick="$('#p').val('{$v.id}');$('#theForm').submit();">{$v.title}</span></li>
+<li><span class="a" onclick="$('#p').val('{$v.id}');$('#theForm').submit();">{$v.title}</span></li>
 {/foreach}
 </ul>
 (if a project appears to be missing here, its "published" status is most likely set to "no")

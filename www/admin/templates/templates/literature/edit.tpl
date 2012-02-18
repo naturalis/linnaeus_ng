@@ -1,4 +1,5 @@
 {include file="../shared/admin-header.tpl"}
+{include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
 <form action="" method="post" id="theForm" action="">
@@ -118,7 +119,7 @@
 			</select>
 		</td>
 		<td>
-			<span id="add-button" class="pseudo-a" onclick="litAddTaxonToList();">{t}add{/t}</span>
+			<span id="add-button" class="a" onclick="litAddTaxonToList();">{t}add{/t}</span>
 		</td>
 		<td>
 			<div id="selected-taxa"></div>
@@ -160,5 +161,4 @@ litThisReference = ['{$ref.author_full|escape:'quotes'}, {$ref.year}{$ref.suffix
 {/literal}
 </script>
 
-{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

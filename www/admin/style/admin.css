@@ -1,9 +1,9 @@
-a,.pseudo-a {
+a,.a {
 	text-decoration: none;
 	color: #000099;
 }
 
-.pseudo-a {
+.a {
 	cursor:pointer;
 }
 
@@ -20,7 +20,7 @@ a,.pseudo-a {
 	text-decoration: underline;
 }
 
-a:hover,.pseudo-a:hover {
+a:hover,.a:hover {
 	text-decoration: underline;
 }
 
@@ -218,12 +218,14 @@ a:hover,.pseudo-a:hover {
 
 .th-userlist-left-align {
 	padding-right:20px;
+	vertical-align:bottom;
 }
 
 .th-userlist-right-align {
 	/* doesn't seem to work!? */
 	text-align:right;
 	padding-left:10px;
+	vertical-align:bottom;
 }
 
 .cell-userlist-left-align {

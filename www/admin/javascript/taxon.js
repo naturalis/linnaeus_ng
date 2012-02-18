@@ -114,7 +114,7 @@ function taxonSaveEditedTaxonName(id) {
 	})
 
 	$('#namecell'+id).html(
-		'<span onclick="taxonEditTaxonName('+id+')" id="name'+id+'" class="pseudo-a">'+
+		'<span onclick="taxonEditTaxonName('+id+')" id="name'+id+'" class="a">'+
 		newName+'</span>'
 	);
 
@@ -149,7 +149,7 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 				'<span class="project-language'+
 				(allLanguages[i][0]==allActiveLanguage ? 
 					'-active"' : 
-					'" class="pseudo-a" onclick="'+fnc+'('+allLanguages[i][0]+');' 
+					'" class="a" onclick="'+fnc+'('+allLanguages[i][0]+');' 
 				)+
 				'">'+
 				allLanguages[i][1]+
@@ -516,7 +516,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-default-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" onclick="taxonPublishContent(\'default\',\'0\');">',
+				'<span class="a" onclick="taxonPublishContent(\'default\',\'0\');">',
 				'</span>'
 			)
 		);
@@ -524,7 +524,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-default-publish').html(
 			sprintf(
 				_('(This page has not been published in this language. Click %shere%s to publish.)'),
-				'<span class="pseudo-a" onclick="taxonPublishContent(\'default\',1);">',
+				'<span class="a" onclick="taxonPublishContent(\'default\',1);">',
 				'</span>'
 			)
 		);
@@ -533,7 +533,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-other-publish').html(
 			sprintf(
 				_('(This page has been published in this language. Click %shere%s to unpublish.)'),
-				'<span class="pseudo-a" onclick="taxonPublishContent(\'active\',\'0\');">',
+				'<span class="a" onclick="taxonPublishContent(\'active\',\'0\');">',
 				'</span>'
 			)
 		);
@@ -541,7 +541,7 @@ function taxonDrawPublishBlocks() {
 		$('#taxon-language-other-publish').html(
 			sprintf(
 				_('(This page has not been published in this language. Click %shere%s to publish.)'),
-				'<span class="pseudo-a" onclick="taxonPublishContent(\'active\',1);">',
+				'<span class="a" onclick="taxonPublishContent(\'active\',1);">',
 				'</span>'
 			)
 		);
@@ -658,7 +658,7 @@ function taxonCoLMakeTableRow(d,symbol,level) {
 		d.rank.toLowerCase()=='species' || 
 		d.rank.toLowerCase()=='infraspecies') {
 	
-		t = t + '<span onclick="taxonGetCoL(\''+(d.name ? d.name : '' )+'\','+(d.id ? d.id : '' )+',false,true)" class="pseudo-a">'+
+		t = t + '<span onclick="taxonGetCoL(\''+(d.name ? d.name : '' )+'\','+(d.id ? d.id : '' )+',false,true)" class="a">'+
 			'<span id="name-'+d.id+'">'+
 			d.name + '</span></span>';
 
@@ -802,10 +802,7 @@ function taxonSaveCoLTaxa(taxa) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
-
-alert(data);
-
-if (data.indexOf('<error>')>=0) {
+		if (data.indexOf('<error>')>=0) {
 				alert(data.replace('<error>',''))
 			} else {
 				alert(_('Data saved'));

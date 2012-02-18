@@ -122,3 +122,33 @@ function userChangeRoleRight(ele) {
 	}
 
 }
+
+
+function userAddToProject(uid,returnUrl) {
+
+	showDialog('',_('Add collaborator'));
+	$('#dialog-content-inner').load('add_user.php?uid='+uid);
+
+}
+
+
+function userRemoveFromProject(uid,returnUrl) {
+
+	showDialog('',_('Remove collaborator'));
+	$('#dialog-content-inner').load('remove_user.php?uid='+uid+(returnUrl?'&returnUrl='+returnUrl:''));
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

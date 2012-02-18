@@ -21,9 +21,9 @@
 </span>
 </p>{/if}
 <p>
-[<span onclick="$('#theForm').submit();" class="pseudo-a">{t}edit{/t}</span>]
-[<span onclick="keyDeleteKeyStep();" class="pseudo-a">{t}delete{/t}</span>]
-[<span onclick="window.open('preview.php?step={$step.id}','_self');" class="pseudo-a">{t}preview{/t}</span>]
+[<span onclick="$('#theForm').submit();" class="a">{t}edit{/t}</span>]
+[<span onclick="keyDeleteKeyStep();" class="a">{t}delete{/t}</span>]
+[<span onclick="window.open('preview.php?step={$step.id}','_self');" class="a">{t}preview{/t}</span>]
 </p>
 </fieldset>
 
@@ -40,7 +40,7 @@
 		<th style="width:220px;">{t}choice title{/t}</th>
 		<th style="width:220px;" colspan="2">{t}choice leads to{/t}</th>
 		<th style="width:90px;">{t}change order{/t}</th>
-		<th style="width:30px;"><!-- span class="pseudo-a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
+		<th style="width:30px;"><!-- span class="a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
 		<th style="width:60px;"></th>
 		<th style="width:130px;"></th>
 	</tr>
@@ -50,7 +50,7 @@
 		<!-- td class="key-choice-title">{$choices[i].title}</td -->
 		<td class="key-choice-title">
 			{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}
-			<i><span class="pseudo-a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
+			<i><span class="a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
 		</td>
 		<td class="key-choice-leadsto">&rarr;</td>
 		<td class="key-choice-target">
@@ -58,13 +58,13 @@
 			{if $choices[i].res_keystep_id!='-1'}
 			<span
 				onclick="$('#choice').val({$choices[i].id});$('#next').val({$choices[i].res_keystep_id});$('#nextForm').submit();" 
-				class="pseudo-a">
+				class="a">
 				{t}Step{/t} {if $choices[i].target_number}{$choices[i].target_number}: {/if}{$choices[i].target}
 			</span>
 			{else}
 			<span
 				onclick="$('#id').val('');$('#ref_choice').val({$choices[i].id});$('#theForm').submit();" 
-				class="pseudo-a">
+				class="a">
 				{$choices[i].target}
 			</span>
 			{/if}
@@ -72,7 +72,7 @@
 			{t}Taxon:{/t}
 			<span
 				onclick="window.open('../species/taxon.php?id={$choices[i].res_taxon_id}','_self')"
-				class="pseudo-a">
+				class="a">
 				{$choices[i].target}
 			</span>
 			{else}
@@ -81,14 +81,14 @@
 			{/if}
 		</td>
 		<td class="key-choice-arrow">{if $smarty.section.i.index<$choices|@count-1}
-			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('down');$('#moveForm').submit();">&darr;</span>
+			<span class="a" onclick="$('#move').val({$choices[i].id});$('#direction').val('down');$('#moveForm').submit();">&darr;</span>
 			{else}
-			<span class="pseudo-a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
+			<span class="a" onclick="$('#move').val({$choices[i].id});$('#direction').val('up');$('#moveForm').submit();">&uarr;</span>
 			{/if}
 		</td>
 		
-		<td class="key-choice-edit">[<span class="pseudo-a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
-		<td class="key-choice-edit">[<span class="pseudo-a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
+		<td class="key-choice-edit">[<span class="a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
+		<td class="key-choice-edit">[<span class="a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
 		<td class="key-choice-edit">[<a href="step_edit.php?insert={$choices[i].id}" title="{t}insert step between choice and target{/t}">{t}insert step{/t}</a>]</td>
 	</tr>
 	<tr id="choice-{$smarty.section.i.index}" class="key-choice-details-invisible">
@@ -123,7 +123,7 @@
 	</tr>
 	<tr>
 {if $choices|@count < $maxChoicesPerKeystep}
-		<td colspan="8">[<span onclick="$('#choiceForm').submit();" class="pseudo-a">{t}add new choice{/t}</span>]</td>
+		<td colspan="8">[<span onclick="$('#choiceForm').submit();" class="a">{t}add new choice{/t}</span>]</td>
 {else}
 		<td colspan="8">{t _s1=$maxChoicesPerKeystep}(you have reached the maximum of %s choices per step){/t}</td>
 {/if}

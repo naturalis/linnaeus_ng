@@ -53,7 +53,7 @@
 				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$data.choice_img}','{$data.choice_img}');"
 				src="{$session.admin.project.urls.project_media}{$data.choice_img}" 
 				class="key-choice-image-normal" /><br />
-			<span class="pseudo-a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
+			<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 			{if $data.choice_image_params!=''}
 				<br />
 				<span style="color:red">

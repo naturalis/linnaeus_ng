@@ -50,9 +50,9 @@
 	onclick="allShowMedia('{$session.admin.project.urls.project_media}{$page.image.file_name}','{$page.image.file_name}');"
 	style="cursor:pointer"
 	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
-	<span class="pseudo-a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
+	<span class="a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
 {else}
-<span class="pseudo-a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}add an image to this page{/t}</span>
+<span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}add an image to this page{/t}</span>
 {/if}
 </p>
 </form>

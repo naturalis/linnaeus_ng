@@ -238,7 +238,7 @@ function litUpdateTaxonSelection() {
 		b = b + 
 			'<tr class="tr-highlight"><td style="width:97%">'+
 			litGetTaxonName(litAddedTaxa[i])+
-			'</td><td class="pseudo-a" onclick="litDeleteTaxon('+litAddedTaxa[i]+');litRemoveTaxonFromList('+litAddedTaxa[i]+');">x</td></tr>';
+			'</td><td class="a" onclick="litDeleteTaxon('+litAddedTaxa[i]+');litRemoveTaxonFromList('+litAddedTaxa[i]+');">x</td></tr>';
 	
 	}
 
