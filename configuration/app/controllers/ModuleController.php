@@ -139,28 +139,46 @@ class ModuleController extends Controller
 
 		}
 
-		if (!$this->rHasId()) {
+		$module = $this->getCurrentModule();
 
-			$this->addError(_('No page ID specified.'));
+		if ($this->rHasVal('letter') && $module['show_alpha']=='1') {
+		
+			$refs = $this->getPagesByLetter(strtolower($this->requestData['letter']));
 
-		} else {
+			$id = $refs[0]['id'];
+
+		} else
+		if ($this->rHasId()) {
 
 			$id = $this->requestData['id'];
 
+		} else {
+
+			$this->addError(_('No page ID specified.'));
+			
+			$id = null;
+
+		} 
+		
+		if (!is_null($id)) {
+
 			$page = $this->getPage($id);
 
-			$module = $this->getCurrentModule();
-
-			$this->setPageName(sprintf(_($module['module'].': "%s"'),$page['topic']));
-
-			$this->smarty->assign('headerTitles',array('title' => $module['module'],'subtitle' => $page['topic']));
-	
 			$this->smarty->assign('page', $page);
 
 			$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
 
-			$this->smarty->assign('module',$module);
 		}
+
+		if ($module['show_alpha']=='1') $this->smarty->assign('alpha', $this->getPageAlphabet());
+		
+		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
+
+		$this->setPageName(sprintf(_($module['module'].': "%s"'),$page['topic']));
+
+		$this->smarty->assign('headerTitles',array('title' => $module['module'],'subtitle' => $page['topic']));
+	
+		$this->smarty->assign('module',$module);
 
         $this->printPage();
     
@@ -193,8 +211,9 @@ class ModuleController extends Controller
      *
      * @access    private
      */
-	public function getCurrentModule()
+	private function getCurrentModule()
 	{
+
 		return isset($_SESSION['app']['user']['module']['activeModule']) ?
 			$_SESSION['app']['user']['module']['activeModule'] :
 			null;
@@ -248,10 +267,10 @@ class ModuleController extends Controller
 
 	}
 
-	private function getPagesByLetter($letter)
+	private function getPagesByLetter($letter,$forceLookup=false)
 	{
 	
-		if (!isset($_SESSION['app']['user']['module']['alpha'])) $this->getPageAlphabet(true);
+		if (!isset($_SESSION['app']['user']['module']['alpha']) || $forceLookup==true) $this->getPageAlphabet(true);
 
 		return isset($_SESSION['app']['user']['module']['alpha']['pages'][$letter]) ?
 			$_SESSION['app']['user']['module']['alpha']['pages'][$letter]:

@@ -46,8 +46,7 @@ class ModuleController extends Controller
         
         parent::__construct();
 
-		if (isset($_SESSION['admin']['user']['freeModules']['activeModule']))
-	    	$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
+		$this->controllerPublicName = $this->getActiveModuleName();
 
     }
 
@@ -73,7 +72,7 @@ class ModuleController extends Controller
 
 		} else {
 
-			if (!$_SESSION['admin']['user']['freeModules']['activeModule'])
+			if (is_null($this->getActiveModule()))
 				$this->redirect($this->baseUrl . $this->appName . $this->generalSettings['paths']['notAuthorized']);
 
 		}
@@ -91,11 +90,11 @@ class ModuleController extends Controller
 
         $this->checkAuthorisation();
 		
-		if (!isset($_SESSION['admin']['user']['freeModules']['activeModule']) || $this->rHasVal('freeId')) {
+		if ($this->getActiveModule==null || $this->rHasVal('freeId')) {
 
-			$_SESSION['admin']['user']['freeModules']['activeModule'] = $this->getFreeModule();
+			$this->setActiveModule($this->getFreeModule());
 			
-			$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
+			$this->controllerPublicName = $this->getActiveModuleName();
 
 		}
 
@@ -106,13 +105,6 @@ class ModuleController extends Controller
 		else		
 			$this->redirect('edit.php?id='.$this->requestData['page']);
 
-		/*
-    	$this->controllerPublicName = $_SESSION['admin']['user']['freeModules']['activeModule']['module'];
-
-		$this->smarty->assign('module',$_SESSION['admin']['user']['freeModules']['activeModule']);
-
-        $this->printPage();
-		*/
 
     }
 
@@ -318,6 +310,47 @@ class ModuleController extends Controller
     }
 
 
+    /**
+     * Module manage
+     *
+     * @access    public
+     */
+    public function manageAction()
+    {
+
+        $this->checkAuthorisation();
+		
+		$this->setPageName(_('Management'));
+		
+		if ($this->rHasVal('submit')) {
+
+			$this->addMessage('Setting saved');
+
+			$this->models->FreeModuleProject->save(
+				array(
+					'id' => $this->getCurrentModuleId(),
+					'project_id' => $this->getCurrentProjectId(),
+					'show_alpha' => $this->requestData['show_alpha']
+				)
+			);
+		
+			$module = $this->getFreeModule();
+
+			$this->setActiveModule($module);
+
+		} else {
+
+			$module = $this->getFreeModule();
+		
+		}
+
+		$this->smarty->assign('module',$module);
+
+        $this->printPage();
+
+    }
+	
+
 	/**
 	* General interface for all AJAX-calls
 	*
@@ -348,6 +381,34 @@ class ModuleController extends Controller
     
     }
 
+
+
+	private function setActiveModule($data)
+	{
+	
+		$_SESSION['admin']['user']['freeModules']['activeModule'] = $data;
+	
+	}
+
+	private function getActiveModule()
+	{
+	
+		return isset($_SESSION['admin']['user']['freeModules']['activeModule']) ? $_SESSION['admin']['user']['freeModules']['activeModule'] : null;
+	
+	}
+
+	private function getActiveModuleName()
+	{
+	
+		return
+			isset($_SESSION['admin']['user']['freeModules']['activeModule']['module']) ? 
+				$_SESSION['admin']['user']['freeModules']['activeModule']['module'] : 
+				null;
+	
+	}
+	
+	
+	
 	private function ajaxActionSaveContent()
 	{
 

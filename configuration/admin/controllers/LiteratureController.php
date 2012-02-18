@@ -167,7 +167,7 @@ class LiteratureController extends Controller
 				$test['id !='] = $data['id'];
 			else
 				$test['id'] = 'null';
-
+//qqq
 			if ($this->getReferences($test)) {
 
 				$this->addError(_('A reference with the same author(s), year and suffix already exists.'));
@@ -637,19 +637,20 @@ class LiteratureController extends Controller
 
 	}
 
-	private function getReferences($search,$order=null)
+	private function getReferences($p,$order=null)
 	{
 
 		$d['project_id'] = $this->getCurrentProjectId();
 
-		if (!empty($search['author_first'])) $d['author_first'] = $search['author_first'];
-		if (!empty($search['author_first like'])) $d['author_first like'] = $search['author_first like'];
-		if (!empty($search['author_second'])) $d['author_second'] =  $search['author_second'];
-		if (!empty($search['year'])) $d['year'] = $search['year'];
-		if (!empty($search['suffix'])) $d['suffix'] = $search['suffix'];
-		if (!empty($search['text'])) $d['text'] = $search['text'];
-		if (!empty($search['id'])) $d['id'] = $search['id'];
-		if (!empty($search['id !='])) $d['id !='] = $search['id !='];
+		if (!empty($p['author_first'])) $d['author_first'] = $p['author_first'];
+		if (!empty($p['author_first like'])) $d['author_first like'] = $p['author_first like'];
+		if (!empty($p['author_second'])) $d['author_second'] =  $p['author_second'];
+		if (!empty($p['multiple_authors'])) $d['multiple_authors'] =  $p['multiple_authors'];
+		if (!empty($p['year'])) $d['year'] = $p['year'];
+		if (!empty($p['suffix'])) $d['suffix'] = $p['suffix'];
+		if (!empty($p['text'])) $d['text'] = $p['text'];
+		if (!empty($p['id'])) $d['id'] = $p['id'];
+		if (!empty($p['id !='])) $d['id !='] = $p['id !='];
 
 		$l = $this->models->Literature->_get(
 				array(

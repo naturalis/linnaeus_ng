@@ -21,7 +21,9 @@ class UsersController extends Controller
         'module_project_user',
     );
 
-	public $jsToLoad = array('all' => array('user.js'));
+	public $cssToLoad = array('lookup.css','dialog/jquery.modaldialog.css');
+
+	public $jsToLoad = array('all' => array('user.js','lookup.js','dialog/jquery.modaldialog.js'));
 
     public $controllerPublicName = 'User administration';
 
@@ -147,6 +149,8 @@ class UsersController extends Controller
         $this->checkAuthorisation();
 
         $this->setPageName(_('Select a project to work on'));
+		
+		$this->includeLocalMenu = false;
         
         if ($this->rHasVal('project_id')) {
 		
@@ -416,6 +420,8 @@ class UsersController extends Controller
         
         $this->smarty->assign('users', $users);
 
+        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
+
         $this->smarty->assign('columnsToShow',
             array(
                 array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
@@ -425,6 +431,55 @@ class UsersController extends Controller
                 array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
             )
         );
+
+        $this->printPage();
+    
+    }
+
+
+    /**
+     * Overview of all users in the system
+     *
+     * @access    public
+     */
+    public function allAction ()
+    {
+        
+		$this->checkAuthorisation(true);
+		
+		if ($this->getCurrentProjectId()==null) $this->setBreadcrumbRootName(_('System administration'));
+        
+        $this->setPageName(_('All users'));
+        
+		$users = $this->models->User->_get(array('id'=>'*','order' => 'last_name,first_name'));
+        
+        $userProjectCount = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' => '*',
+				'fieldAsIndex' => 'user_id',
+				'columns' => 'count(distinct project_id) as total, user_id',
+				'group' => 'user_id'
+			)
+		);
+
+        $currentProjectUsers = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'fieldAsIndex' => 'user_id',
+			)
+		);
+
+		$pagination = $this->getPagination($users,20);
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		$this->smarty->assign('users',$pagination['items']);
+
+        $this->smarty->assign('userProjectCount', $userProjectCount);
+
+        $this->smarty->assign('currentProjectUsers', $currentProjectUsers);
 
         $this->printPage();
     
@@ -813,6 +868,176 @@ class UsersController extends Controller
 
     }
 
+
+	public function rightsMatrixAction()
+	{
+	
+        $this->checkAuthorisation(true);
+
+		$this->setBreadcrumbRootName(_('System administration'));
+
+        $this->setPageName(_('Rights matrix'));
+
+		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit()) {
+
+			$d = $this->models->RightRole->_get(
+				array(
+					'id' => array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role'])
+				)
+			);
+			
+			if (isset($d)) {
+
+				$this->models->RightRole->delete(array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role']));
+
+			} else {
+
+				$this->models->RightRole->save(
+					array(
+						'id' => null,
+						'right_id' => $this->requestData['right'],
+						'role_id' => $this->requestData['role']
+					)
+				);
+
+			}
+
+		}
+
+		$roles = $this->models->Role->_get(array('id' => '*'));
+		$rights = $this->models->Right->_get(array('id' => '*'));
+		
+		foreach((array)$rights as $iKey => $iVal) {
+
+			foreach((array)$roles as $oKey => $oVal) {
+
+				$d = $this->models->RightRole->_get(
+					array(
+						'id' => array('right_id' => $iVal['id'],'role_id' => $oVal['id'])
+					)
+				);
+					
+				$rights[$iKey]['roles'][] = array('id' => $oVal['id'], 'state' => $d[0]['id']);
+
+			}
+
+		}
+
+
+        $this->smarty->assign('roles', $roles);
+
+        $this->smarty->assign('rights', $rights);
+
+        $this->printPage();
+			
+	}
+
+    public function addUserAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if ($this->rHasVal('action','save')) {
+
+			if ($this->rHasId() && $this->rHasVal('role_id')) {
+
+				$this->models->ProjectRoleUser->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'role_id' => $this->requestData['role_id'],
+						'user_id' => $this->requestData['id'],
+						'active' => '1'
+					)
+				);
+
+			}
+
+			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
+		
+		} else
+		if ($this->rHasVal('uid')) {
+
+			if ($this->isSysAdmin())
+				$d = array('id !=' => ID_ROLE_SYS_ADMIN);
+			else
+				$d = array('assignable' => 'y');
+	
+			$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
+	
+			$this->smarty->assign('roles',$this->models->Role->_get(array('id'=>$d)));
+
+			if ($this->rHasVal('returnUrl')) $this->smarty->assign('returnUrl',$this->requestData['returnUrl']);
+			
+		} else {
+
+			$this->addError(_('No user ID specified.'));
+
+		}
+
+        $this->printPage();
+    
+    }
+
+    public function removeUserAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if ($this->rHasVal('action','remove')) {
+
+			if ($this->rHasId()) {
+
+				$this->models->ProjectRoleUser->delete(
+					array(
+						'id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId(), 
+					)
+				);
+
+			}
+
+			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
+		
+		} else
+		if ($this->rHasVal('uid')) {
+		
+			$user = $this->getUser($this->requestData['uid']);
+
+			$pru = $this->models->ProjectRoleUser->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'user_id' => $this->requestData['uid'],
+					)
+				)
+			);
+			if (!$pru) {
+			
+				$this->addError(_('User is not part of current project.'));
+
+			} else {
+
+				$this->smarty->assign('id',$pru[0]['id']);
+
+				$this->smarty->assign('user',$user);
+		
+				$this->smarty->assign('role',$this->models->Role->_get(array('id'=>$pru[0]['role_id'])));
+				
+				if ($this->rHasVal('returnUrl')) $this->smarty->assign('returnUrl',$this->requestData['returnUrl']);
+
+			}
+			
+		} else {
+
+			$this->addError(_('No user ID specified.'));
+
+		}
+
+        $this->printPage();
+    
+    }
+
     /**
      * AJAX interface for this class
      *
@@ -895,8 +1120,13 @@ class UsersController extends Controller
             
             $this->ajaxActionCreateUserFromSession();
         
-		}
+		} else
+		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
+            $this->getLookupList($this->requestData['search']);
+
+        }
+		
         $this->printPage();
 
     }
@@ -981,6 +1211,8 @@ MUST CHECK
 		$data['active'] = '1';
 		
 		$data['id'] = null;
+
+		$data['created_by'] = $this->getCurrentUserId();
 		
 		$r = $this->models->User->save($data);
 		
@@ -1726,7 +1958,6 @@ MUST CHECK
     }
 
 
-
     /**
      * Tests whether emailaddress is unique in the database
      *
@@ -1782,8 +2013,6 @@ MUST CHECK
     
     }
 
-
-
     /**
      * Tests whether userdata (username and emailaddress) is unique in the database
      *
@@ -1805,8 +2034,6 @@ MUST CHECK
         return $result;
     
     }
-
-
 
     /**
      * Finds existing users in the database, based on mathcing name and/or emailaddress
@@ -1917,66 +2144,42 @@ MUST CHECK
 
 	}
 
-	public function rightsMatrixAction()
+	private function getUser($id)
 	{
-	
-        $this->checkAuthorisation(true);
 
-        $this->setPageName(_('Rights matrix'));
-
-		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit()) {
-
-			$d = $this->models->RightRole->_get(
-				array(
-					'id' => array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role'])
-				)
-			);
-			
-			if (isset($d)) {
-
-				$this->models->RightRole->delete(array('right_id' => $this->requestData['right'],'role_id' => $this->requestData['role']));
-
-			} else {
-
-				$this->models->RightRole->save(
-					array(
-						'id' => null,
-						'right_id' => $this->requestData['right'],
-						'role_id' => $this->requestData['role']
-					)
-				);
-
-			}
-
-		}
-
-		$roles = $this->models->Role->_get(array('id' => '*'));
-		$rights = $this->models->Right->_get(array('id' => '*'));
+		if (empty($id)) return;
 		
-		foreach((array)$rights as $iKey => $iVal) {
-
-			foreach((array)$roles as $oKey => $oVal) {
-
-				$d = $this->models->RightRole->_get(
-					array(
-						'id' => array('right_id' => $iVal['id'],'role_id' => $oVal['id'])
-					)
-				);
-					
-				$rights[$iKey]['roles'][] = array('id' => $oVal['id'], 'state' => $d[0]['id']);
-
-			}
-
-		}
-
-
-        $this->smarty->assign('roles', $roles);
-
-        $this->smarty->assign('rights', $rights);
-
-        $this->printPage();
-			
+		return $this->models->User->_get(array('id' => $id));
+		
 	}
 
+	private function getLookupList($search)
+	{
+
+		if (empty($search)) return;
+		
+		$users = $this->models->User->_get(
+			array(
+				'where' =>
+						'username like \'%'.$search.'%\'
+						or first_name like \'%'.$search.'%\'
+						or last_name like \'%'.$search.'%\'
+						or email_address like \'%'.$search.'%\''
+				,
+				'columns' => 'id,concat(first_name,\' \',last_name,\' (\',username,\'; \',email_address,\')\') as label,last_name,first_name',
+				'order' => 'last_name,first_name'
+			)
+		);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$users,
+				$this->controllerBaseName,
+				'edit.php?id=%s'
+			)
+		);
+		
+	}
 
 }

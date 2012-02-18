@@ -12,7 +12,7 @@ class Controller extends BaseClass
     private $_fullPathRelative;
     private $_helpTexts;
 	private $_prevTreeId = null;
-
+	private $_breadcrumbRootName = null;
 
     public $smarty;
     public $requestData;
@@ -761,6 +761,13 @@ class Controller extends BaseClass
 	
 	}
 
+	public function getCurrentUserIsSuperuser()
+	{
+	
+		return $_SESSION['admin']['user']['superuser']==1;
+	
+	}
+
     /**
      * Checks whether a user is logged in
      *
@@ -787,7 +794,7 @@ class Controller extends BaseClass
      */
     public function checkAuthorisation($allowNoProjectId=false)
     {
-
+	
         // check if user is logged in, otherwise redirect to login page
         if ($this->isUserLoggedIn()) {
 
@@ -1458,6 +1465,7 @@ class Controller extends BaseClass
 
 	}
 	
+	
 	public function sendEmail($params)
 	{
 
@@ -1603,7 +1611,7 @@ class Controller extends BaseClass
 						current_timestamp'
 				)
 			);
-			
+
 			$result = ($t[0]['changed']==1 || $_SESSION['admin']['system']['cacheControl'][$table]['count']!=$t[0]['total']);
 
 			$_SESSION['admin']['system']['cacheControl'][$table] = array(
@@ -1697,7 +1705,7 @@ class Controller extends BaseClass
 		}
 		
 		return $_SESSION['admin']['user']['species']['projectRank'];
-	
+
 	}
 	
 	public function newGetTaxonTree($p=null)
@@ -1744,7 +1752,7 @@ class Controller extends BaseClass
 				),
 				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
 				'fieldAsIndex' => 'id',
-				'order' => 'taxon_order'
+				'order' => 'taxon_order,id'
 			)
 		);
 
@@ -1777,7 +1785,12 @@ class Controller extends BaseClass
 	public function newGetUserTaxa()
 	{
 
-		if ($this->hasTableDataChanged('UserTaxon') || !isset($_SESSION['admin']['user']['species']['userTaxa'])) {
+		if (
+			$this->hasTableDataChanged('UserTaxon') || 
+			$this->hasTableDataChanged('ProjectRank') ||
+			$this->hasTableDataChanged('Taxon') || 
+			!isset($_SESSION['admin']['user']['species']['userTaxa'])
+			) {
 
 			$_SESSION['admin']['user']['species']['userTaxa'] = $this->models->UserTaxon->_get(
 				array(
@@ -1924,7 +1937,21 @@ class Controller extends BaseClass
 		return $users;
 
 	}
-		
+
+	public function setBreadcrumbRootName($name)
+	{
+
+		$this->_breadcrumbRootName = $name;
+	
+	}
+
+	public function getBreadcrumbRootName()
+	{
+
+		return $this->_breadcrumbRootName;
+	
+	}
+
 	private function getFrontEndMainMenu()
 	{
 
@@ -2946,12 +2973,14 @@ class Controller extends BaseClass
     {
 
         if (!isset($this->appName)) return;
+		
+		$breadcrumbRootName = (!is_null($this->getBreadcrumbRootName()) ? $this->getBreadcrumbRootName() : 'Projects');
 
         // root of each trail: "choose project" page
         $cp = $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
 
         $this->breadcrumbs[] = array(
-            'name' => _('Projects'), 
+            'name' => _($breadcrumbRootName), 
             'url' => $cp
         );
 

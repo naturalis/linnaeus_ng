@@ -727,7 +727,7 @@ class SpeciesController extends Controller
 
 		$this->showLowerTaxon = ($this->getTaxonType() == 'lower');
 
-		$this->getTaxonTree(array('forceLookup'=>true));
+		$this->getTaxonTree();
 
 		$taxa = $this->getTreeList();
 

@@ -522,6 +522,8 @@ class ProjectsController extends Controller
         
         $this->setPageName(_('Create new project'));
 
+		$this->setBreadcrumbRootName(_('System administration'));
+
 		$this->setSuppressProjectInBreadcrumbs();
 
         if (isset($this->requestData) && !$this->isFormResubmit()) {
@@ -590,6 +592,8 @@ class ProjectsController extends Controller
         $this->checkAuthorisation(true);
         
         $this->setPageName(_('Delete a project'));
+
+		$this->setBreadcrumbRootName(_('System administration'));
 
 		$this->setSuppressProjectInBreadcrumbs();
 
