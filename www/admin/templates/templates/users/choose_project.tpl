@@ -28,6 +28,7 @@
 	<li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li>
 	<li><a href="../../views/projects/delete.php">{t}Delete a project{/t}</a></li>
 	<li><a href="../../views/import/l2_start.php">{t}Import Linnaeus 2 data{/t}</a></li>
+	<li><a href="../../views/users/all.php">{t}Collaborator overview{/t}</a></li>
 	<li><a href="../../views/users/rights_matrix.php">{t}Rights matrix{/t}</a></li>
 </ul>
 

@@ -65,7 +65,7 @@
 	<tr>
 		<td></td>
 		<td style="vertical-align:top">
-			<input type="text" style="width:150px;" name="new[{$pages[i].id}]" /> [<span class="pseudo-a" onclick="$('#theForm').submit();">{t}add{/t}</span>]
+			<input type="text" style="width:150px;" name="new[{$pages[i].id}]" /> [<span class="a" onclick="$('#theForm').submit();">{t}add{/t}</span>]
 		</td>
 	</tr>
 	<tr>

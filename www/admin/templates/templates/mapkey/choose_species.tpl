@@ -21,10 +21,10 @@
 {if $prevStart!=-1 || $nextStart!=-1}
 	<div id="navigation">
 		{if $prevStart!=-1}
-		<span class="pseudo-a" onclick="goNavigate({$prevStart});">{t}< previous{/t}</span>
+		<span class="a" onclick="goNavigate({$prevStart});">{t}< previous{/t}</span>
 		{/if}
 		{if $nextStart!=-1}
-		<span class="pseudo-a" onclick="goNavigate({$nextStart});">{t}next >{/t}</span>
+		<span class="a" onclick="goNavigate({$nextStart});">{t}next >{/t}</span>
 		{/if}
 	</div>
 {/if}

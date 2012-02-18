@@ -36,7 +36,7 @@
 		<td colspan="2">
 		{if $data.logo}
 		<img src="{$session.admin.project.urls.project_media}{$data.logo}" width="150px" />
-		<span class="pseudo-a" onclick="$('#deleteLogo').val(1);$('#theForm').submit();">{t}Delete logo{/t}</span><br />
+		<span class="a" onclick="$('#deleteLogo').val(1);$('#theForm').submit();">{t}Delete logo{/t}</span><br />
 		{else}
 		<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		<input name="uploadedfile" type="file" /><br />
@@ -76,7 +76,7 @@
 			{/section}
 			</select>
 			<span 
-				class="pseudo-a" 
+				class="a" 
 				onclick="projectSaveLanguage('add',[$('#language-select :selected').val(),$('#language-select :selected').text()])">
 				{t}add language{/t}
 			</span>

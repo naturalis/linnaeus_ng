@@ -75,14 +75,14 @@ function projectUpdateLanguageBlock() {
 				'<td style="padding-right:15px">['+
 					(selectedLanguages[i][3]==1 ? 
 						_('current') : 
-						'<span class="pseudo-a" onclick="projectSaveLanguage(\'default\',[\''+selectedLanguages[i][0]+'\'])">'+_('make default')+'</span>' )+
+						'<span class="a" onclick="projectSaveLanguage(\'default\',[\''+selectedLanguages[i][0]+'\'])">'+_('make default')+'</span>' )+
 			']</td>'+
 			'<td style="padding-right:15px">'+
 				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]==0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'untranslated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('needs to be translated')+'</label>'+
 				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]!=0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'translated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('translated')+'</label>' +
 			'</td>'+
 			'<td style="padding-right:15px">'+
-				'[<span class="pseudo-a" onclick="projectSaveLanguage('+
+				'[<span class="a" onclick="projectSaveLanguage('+
 				(selectedLanguages[i][4]==1 ?
 					'\'deactivate\',[\''+selectedLanguages[i][0]+'\'])">'+_('unpublish') :
 					'\'reactivate\',[\''+selectedLanguages[i][0]+'\'])">'+_('publish')
@@ -91,7 +91,7 @@ function projectUpdateLanguageBlock() {
 			'<td>'+
 				(selectedLanguages[i][4]==1 ? 
 					'['+_('delete')+']' : 
-					'[<span class="pseudo-a" onclick="projectSaveLanguage(\'delete\',[\''+selectedLanguages[i][0]+'\',\''+selectedLanguages[i][1]+'\'])">'+_('delete')+'</span>]'
+					'[<span class="a" onclick="projectSaveLanguage(\'delete\',[\''+selectedLanguages[i][0]+'\',\''+selectedLanguages[i][1]+'\'])">'+_('delete')+'</span>]'
 				)+
 			'</td></tr>'
 

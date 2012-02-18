@@ -36,7 +36,7 @@
 	</select>
 		</td>
 		<td>
-			[<span onclick="$('#theForm').submit()" class="pseudo-a">{t}save{/t}</span>]
+			[<span onclick="$('#theForm').submit()" class="a">{t}save{/t}</span>]
 		</td>
 	</tr>
 </table>

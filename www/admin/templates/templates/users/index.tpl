@@ -21,7 +21,8 @@
 	<td class="cell-userlist-{$columnsToShow[j].align}-align">{$users[i].$colname}</td>{/section}
 	<td>[<a href="view.php?id={$users[i].id}">{t}view{/t}</a>]</td>
 	<td>[<a href="edit.php?id={$users[i].id}">{t}edit{/t}</a>]</td>
-	<td>{if $users[i].role_id != 2}[<span class="pseudo-a" onclick="userDeleteUser({$users[i].id});">{t}delete{/t}</span>]{/if}</td>
+	{* <td>{if $users[i].role_id != 2}[<span class="a" onclick="userDeleteUser({$users[i].id});">{t}delete{/t}</span>]{/if}</td> *}
+	<td>{if $users[i].role_id != 2 || $isSysAdmin}[<span class="a" onclick="userRemoveFromProject({$users[i].id},'index.php');">{t}remove{/t}</span>]{/if}</td>
 </tr>
 {/section}
 </table>
@@ -38,10 +39,10 @@
 <input type="hidden" name="dir" value="{$sortBy.dir}"  />
 </form>
 
-<form method="post" action="edit.php" name="deleteForm" id="deleteForm">
+{* <form method="post" action="edit.php" name="deleteForm" id="deleteForm">
 <input name="id" id="id" value="-1" type="hidden" />
 <input name="delete" id="delete" value="1" type="hidden" />
-</form>
+</form> *}
 
 
 {include file="../shared/admin-footer.tpl"}

@@ -9,8 +9,8 @@
 {foreach from=$pages key=k item=v}
 	<tr class="tr-highlight">
 		<td><a href="edit.php?id={$v.id}">{$v.topic}</a></td>
-		<td class="pseudo-a" style="text-align:center;width:15px" {if $k!=0}onclick="$('#id').val({$v.id});$('#dir').val('up');$('#theForm').submit();"{/if}>{if $k!=0}&uarr;{/if}</td>
-		<td class="pseudo-a" style="text-align:center;width:15px" {if $k!=$pages|@count-1}onclick="$('#id').val({$v.id});$('#dir').val('down');$('#theForm').submit();"{/if}>{if $k!=$pages|@count-1}&darr;{/if}</td>
+		<td class="a" style="text-align:center;width:15px" {if $k!=0}onclick="$('#id').val({$v.id});$('#dir').val('up');$('#theForm').submit();"{/if}>{if $k!=0}&uarr;{/if}</td>
+		<td class="a" style="text-align:center;width:15px" {if $k!=$pages|@count-1}onclick="$('#id').val({$v.id});$('#dir').val('down');$('#theForm').submit();"{/if}>{if $k!=$pages|@count-1}&darr;{/if}</td>
 		<td></td>
 	</tr>
 {/foreach}

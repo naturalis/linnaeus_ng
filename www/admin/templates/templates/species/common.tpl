@@ -52,7 +52,7 @@
 		{else}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonCommonNameAction({$commonnames[i].id},'up');">
 			&uarr;
 		</td>
@@ -62,14 +62,14 @@
 		{else}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonCommonNameAction({$commonnames[i].id},'down');">
 			&darr;
 		</td>
 		{/if}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonCommonNameAction({$commonnames[i].id},'delete');">
 			x
 		</td>

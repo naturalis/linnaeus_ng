@@ -8,7 +8,7 @@ This module allows you to import data from an existing Linnaeus 2-project. In or
 <fieldset><legend>DATA</legend>
 <p>
 {if $s.file}
-<b>XML-file "{$s.file}" loaded.</b> (click <span class="pseudo-a" onclick="$('#clear').val('file');$('#theForm').submit()">here</span> to load another file)
+<b>XML-file "{$s.file}" loaded.</b> (click <span class="a" onclick="$('#clear').val('file');$('#theForm').submit()">here</span> to load another file)
 {else}
 XML-file to load: <input name="importFile" type="file" />&nbsp;*<br />
 {/if}
@@ -24,9 +24,9 @@ Please check the corresponding checkboxes if you do not wish to import images an
 <p>
 Path to images:<br />
 {if $s.imagePath}
-<b>"{$s.imagePath}"</b> (click <span class="pseudo-a" onclick="$('#clear').val('imagePath');$('#theForm').submit()">here</span> to change)
+<b>"{$s.imagePath}"</b> (click <span class="a" onclick="$('#clear').val('imagePath');$('#theForm').submit()">here</span> to change)
 {elseif $s.imagePath===false}
-<b>Do not load images</b> (click <span class="pseudo-a" onclick="$('#clear').val('imagePath');$('#theForm').submit()">here</span> to change)
+<b>Do not load images</b> (click <span class="a" onclick="$('#clear').val('imagePath');$('#theForm').submit()">here</span> to change)
 {else}
 <input type="text" name="imagePath" />&nbsp;or&nbsp;<label><input type="checkbox" name="noImages" value="1">do not load images</label>&nbsp;*<br />
 {/if}
@@ -34,9 +34,9 @@ Path to images:<br />
 <p>
 Path to thumbnails:<br />
 {if $s.thumbsPath}
-<b>"{$s.thumbsPath}"</b> (click <span class="pseudo-a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">here</span> to change)
+<b>"{$s.thumbsPath}"</b> (click <span class="a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">here</span> to change)
 {elseif $s.thumbsPath===false}
-<b>Do not load thumbnails</b> (click <span class="pseudo-a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">here</span> to change)
+<b>Do not load thumbnails</b> (click <span class="a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">here</span> to change)
 {else}
 <input type="text" name="thumbsPath" />&nbsp;or&nbsp;<label><input type="checkbox" name="noThumbs" value="1">do not load thumbnails</label>&nbsp;*<br />
 {/if}

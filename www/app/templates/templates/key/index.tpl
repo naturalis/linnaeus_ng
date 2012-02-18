@@ -21,10 +21,13 @@
 {foreach from=$choices key=k item=v}
 			<div class="choice">
 	{if $v.choice_img}
+					<div class="choice-image-div">
 					<img
-						class="image-small"
-						onclick="showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-						src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}" />
+						class="choice-image-small"
+						onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}" 
+						src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}" /><br />
+						<a href="javascript:showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
+					</div>
 	{/if}
 					<span class="marker">{$v.marker}</span>.
 					<span class="text">{$v.choice_txt|nl2br}</span>

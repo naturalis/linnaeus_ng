@@ -35,7 +35,7 @@
 		{else}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonSynonymAction({$synonyms[i].id},'up');">
 			&uarr;
 		</td>
@@ -45,14 +45,14 @@
 		{else}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonSynonymAction({$synonyms[i].id},'down');">
 			&darr;
 		</td>
 		{/if}
 		<td
 			style="text-align:center" 
-			class="pseudo-a" 
+			class="a" 
 			onclick="taxonSynonymAction({$synonyms[i].id},'delete');">
 			x
 		</td>

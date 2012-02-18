@@ -4,7 +4,7 @@
 {t _s1=$ranks[0].rank}Click the arrow next to a rank to add that rank to the selection used in this project. Currently selected ranks are shown on the right. To remove a rank from the selection, double click it in the list on the right. The uppermost rank, %s, is mandatory and cannot be deleted.{/t}
 </p>
 <p>
-<span onclick="taxonAddCoLRanks()" class="pseudo-a">{t}Select all the ranks used in Catalogue Of Life, marked in blue in the list below{/t}</span>.
+<span onclick="taxonAddCoLRanks()" class="a">{t}Select all the ranks used in Catalogue Of Life, marked in blue in the list below{/t}</span>.
 <br />
 {t}After you have made the appropriate selection, click the save-button. 
 Once you have saved the selection, you can {/t}<a href="ranklabels.php">{t}change the ranks' names and provide translations{/t}</a>.<br />
