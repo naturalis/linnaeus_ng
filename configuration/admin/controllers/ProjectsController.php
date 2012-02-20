@@ -845,7 +845,7 @@ class ProjectsController extends Controller
         
         }
 
-		$cur = $this->getCurrentUserRights($this->getCurrentUserId());
+		$cur = $this->getUserRights($this->getCurrentUserId());
 
 		$this->setUserSessionRights($cur['rights']);
 

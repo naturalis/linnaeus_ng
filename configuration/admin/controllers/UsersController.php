@@ -21,7 +21,7 @@ class UsersController extends Controller
         'module_project_user',
     );
 
-	public $cssToLoad = array('lookup.css','dialog/jquery.modaldialog.css');
+	public $cssToLoad = array('users.css','lookup.css','dialog/jquery.modaldialog.css');
 
 	public $jsToLoad = array('all' => array('user.js','lookup.js','dialog/jquery.modaldialog.js'));
 
@@ -497,84 +497,97 @@ class UsersController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Project collaborator data'));
-        
-        if ($this->isUserPartOfProject($this->requestData['id'], $this->getCurrentProjectId())) {
-            
-            $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
-            
-            $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
 
-            $zone = $this->models->Timezone->_get(array('id'=>$user['timezone_id']));
-	
-			$modules = $this->models->ModuleProject->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId()
-					),
-					'order' => 'module_id asc'
-				)
-			);
-	
-			foreach ((array) $modules as $key => $val) {
+		if ($this->rHasId()) {
+
+			$user = $this->getUser($this->requestData['id']);
+			
+			if ($user==null) {
+
+				$this->addError('Unknown user ID: '.$this->requestData['id']);	
+
+			} else {
+
+	            $zone = $this->models->Timezone->_get(array('id'=>$user['timezone_id']));
+
+				$currentRole = $this->getUserProjectRole($this->requestData['id'],$this->getCurrentProjectId());
 				
-				$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
-				
-				$modules[$key]['module'] = $mp['module'];
-				
-				$modules[$key]['description'] = $mp['description'];
+				$modules = $this->getProjectModules();
 
 				$mpu = $this->models->ModuleProjectUser->_get(
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'module_id' => $val['module_id'],
 							'user_id' => $this->requestData['id'],			
 						),
-						'columns' => 'count(*) as total'
+						'columns' => 'module_id',
+						'fieldAsIndex' => 'module_id'
 					)
 				);
 
-				$modules[$key]['isAssigned'] = $mpu[0]['total']=='1';
-
-			}
-			
-			$freeModules = $this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId())));
-
-			foreach ((array) $freeModules as $key => $val) {
-				
 				$fpu = $this->models->FreeModuleProjectUser->_get(
 					array(
-						'id'=>array(
+						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'free_module_id' => $val['id'],
 							'user_id' => $this->requestData['id'],			
 						),
-						'columns' => 'count(*) as total'
+						'columns' => 'free_module_id',
+						'fieldAsIndex' => 'free_module_id'
 					)
 				);
+
+				$hasModules = false;
+
+				foreach ((array) $modules['modules'] as $key => $val) {
+
+					$modules['modules'][$key]['isAssigned'] = isset($mpu[$val['module_id']]);
+					$hasModules = $hasModules || isset($fpu[$val['module_id']]);
+
+				}
+	
+				foreach ((array) $modules['freeModules'] as $key => $val) {
+
+					$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]);
+					$hasModules = $hasModules || isset($fpu[$val['id']]);
+
+				}
+
+				$this->smarty->assign('user',$user);
 				
-				$freeModules[$key]['isAssigned'] = $fpu[0]['total']=='1';
+				$this->smarty->assign('currentRole',$currentRole);
+				
+				$this->smarty->assign('zone', $zone);
 
+				$this->smarty->assign('modules', $modules);
+
+				$this->smarty->assign('hasModules', $hasModules);
+		
 			}
-			            
-            $this->smarty->assign('modules', $modules);
+			
+		} else {
 
-            $this->smarty->assign('freeModules', $freeModules);
+			$this->addError('No ID specified');	
 
-            $this->smarty->assign('zone', $zone);
+		}
 
-            $this->smarty->assign('data', $user);
-            
-            $this->smarty->assign('userRole', $upr);
-            
-            $this->printPage();
-        
-        }
-        else {
-            
-            $this->redirect();
-        
-        }
+		$this->printPage();	
+/*
+
+x get user
+x get role current
+get rights current
+if admin
+	get all projects
+	get all roles
+if lead expert / sysadmin / self?
+	can edit
+if sysadmin
+	can delete
+	
+
+*/		
+		
+		
     
     }
 
@@ -869,6 +882,138 @@ class UsersController extends Controller
     }
 
 
+    public function addUserModuleAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if ($this->rHasVal('action','add')) {
+
+			if ($this->rHasVal('modId') && $this->rHasVal('modId')) {
+
+				if ($this->requestData['type']=='free')
+					$this->addUserToFreeModule($this->requestData['uid'],$this->getCurrentProjectId(),$this->requestData['modId']);
+				else
+					$this->addUserToModule($this->requestData['uid'],$this->getCurrentProjectId(),$this->requestData['modId']);
+
+			}
+
+			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
+		
+		} else
+		if ($this->rHasVal('uid') && $this->rHasVal('modId')) {
+
+			$modules = $this->getProjectModules();
+			
+			if ($this->rHasVal('type','free')) {
+
+				foreach((array)$modules['freeModules'] as $val) {
+
+					if ($val['id']==$this->requestData['modId']) $module = $val['module'];
+	
+				}
+
+			} else {
+
+				foreach((array)$modules['modules'] as $val) {
+
+					if ($val['module_id']==$this->requestData['modId'])  $module = $val['module'];
+	
+				}
+
+			}
+			
+			if (isset($module)) {
+
+				$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
+	
+				$this->smarty->assign('module',$module);
+		
+				$this->smarty->assign('requestData',$this->requestData);
+
+			} else {
+	
+				$this->addError(_('Non-existant module ID specified.'));
+	
+			}
+					
+		} else {
+
+			$this->addError(_('No user ID or module ID specified.'));
+
+		}
+
+        $this->printPage();
+    
+    }
+	
+
+    public function removeUserModuleAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if ($this->rHasVal('action','remove')) {
+
+			if ($this->rHasVal('modId') && $this->rHasVal('modId')) {
+
+				if ($this->requestData['type']=='free')
+					$this->removeUserFromFreeModule($this->requestData['uid'],$this->getCurrentProjectId(),$this->requestData['modId']);
+				else
+					$this->removeUserFromModule($this->requestData['uid'],$this->getCurrentProjectId(),$this->requestData['modId']);
+
+			}
+
+			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
+		
+		} else
+		if ($this->rHasVal('uid') && $this->rHasVal('modId')) {
+
+			$modules = $this->getProjectModules();
+			
+			if ($this->rHasVal('type','free')) {
+
+				foreach((array)$modules['freeModules'] as $val) {
+
+					if ($val['id']==$this->requestData['modId']) $module = $val['module'];
+	
+				}
+
+			} else {
+
+				foreach((array)$modules['modules'] as $val) {
+
+					if ($val['module_id']==$this->requestData['modId'])  $module = $val['module'];
+	
+				}
+
+			}
+			
+			if (isset($module)) {
+
+				$this->smarty->assign('user',$this->getUser($this->requestData['uid']));
+	
+				$this->smarty->assign('module',$module);
+		
+				$this->smarty->assign('requestData',$this->requestData);
+
+			} else {
+	
+				$this->addError(_('Non-existant module ID specified.'));
+	
+			}
+					
+		} else {
+
+			$this->addError(_('No user ID or module ID specified.'));
+
+		}
+
+        $this->printPage();
+    
+    }
+
+
 	public function rightsMatrixAction()
 	{
 	
@@ -941,15 +1086,7 @@ class UsersController extends Controller
 
 			if ($this->rHasId() && $this->rHasVal('role_id')) {
 
-				$this->models->ProjectRoleUser->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'role_id' => $this->requestData['role_id'],
-						'user_id' => $this->requestData['id'],
-						'active' => '1'
-					)
-				);
+				$this->addUserToProject($this->requestData['id'],$this->getCurrentProjectId(),$this->requestData['role_id']);
 
 			}
 
@@ -986,16 +1123,7 @@ class UsersController extends Controller
 
 		if ($this->rHasVal('action','remove')) {
 
-			if ($this->rHasId()) {
-
-				$this->models->ProjectRoleUser->delete(
-					array(
-						'id' => $this->requestData['id'],
-						'project_id' => $this->getCurrentProjectId(), 
-					)
-				);
-
-			}
+			if ($this->rHasVal('uid')) $this->removeUserFromProject($this->requestData['uid'],$this->getCurrentProjectId());
 
 			$this->redirect($this->rHasVal('returnUrl') ? $this->requestData['returnUrl'] : 'all.php');
 		
@@ -1018,7 +1146,7 @@ class UsersController extends Controller
 
 			} else {
 
-				$this->smarty->assign('id',$pru[0]['id']);
+				$this->smarty->assign('uid',$this->requestData['uid']);
 
 				$this->smarty->assign('user',$user);
 		
@@ -1421,7 +1549,7 @@ MUST CHECK
         );
 
         // get user's roles and rights
-        $cur = $this->getCurrentUserRights($user['id']);
+        $cur = $this->getUserRights($user['id']);
 
         // save all relevant data to the session
         $this->initUserSession($user, $cur['roles'], $cur['rights'], $cur['number_of_projects']);
@@ -1589,7 +1717,7 @@ MUST CHECK
 				)
         	)
 		);
-        
+ 
         if ($pru) {
             
             $r = $this->models->Role->_get(array('id'=>$pru[0]['role_id']));
@@ -2182,4 +2310,75 @@ MUST CHECK
 		
 	}
 
+	private function addUserToModule($uid,$pId,$modId)
+	{					
+
+		$this->models->ModuleProjectUser->save(
+			array(
+				'id' => null,
+				'user_id' => $uid,
+				'project_id' => $pId,
+				'module_id' => $modId
+			)
+		);
+
+	}
+
+
+	private function addUserToFreeModule($uid,$pId,$modId)
+	{
+	
+		$this->models->FreeModuleProjectUser->save(
+			array(
+				'id' => null,
+				'user_id' => $uid,
+				'project_id' => $pId,
+				'free_module_id' => $modId
+			)
+		);
+
+	}
+
+	private function removeUserFromModule($uid,$pId,$modId)
+	{
+
+		$this->models->ModuleProjectUser->delete(
+			array(
+				'user_id' => $uid,
+				'project_id' => $pId,
+				'module_id' => $modId
+			)
+		);
+
+	}
+
+	private function removeUserFromFreeModule($uid,$pId,$modId)
+	{
+	
+		$this->models->FreeModuleProjectUser->delete(
+			array(
+				'user_id' => $uid,
+				'project_id' => $pId,
+				'free_module_id' => $modId
+			)
+		);
+
+	}
+
+	private function removeUserFromProject($uid,$pId)
+	{
+	
+		$d = array(
+				'user_id' => $uid,
+				'project_id' => $pId
+			);
+
+		$this->models->ProjectRoleUser->delete($d);
+		$this->models->ModuleProjectUser->delete($d);
+		$this->models->FreeModuleProjectUser->delete($d);
+
+	}
+
+	
+	
 }
