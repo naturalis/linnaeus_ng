@@ -26,12 +26,6 @@
 </tr>
 {/section}
 </table>
-
-<br />
-
-<a href="create.php">{t}Create new collaborator{/t}</a>
-
-
 </div>
 
 <form method="post" action="" name="sortForm" id="sortForm">

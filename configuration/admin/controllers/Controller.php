@@ -239,7 +239,7 @@ class Controller extends BaseClass
             $circular = ($this->_fullPath == $url) || ($this->_fullPathRelative == $url);
 
         }
-        
+
         if ($url && !$circular) {
             
             header('Location:' . $url);
@@ -625,7 +625,7 @@ class Controller extends BaseClass
      * @return     array    array of roles, rights and the number of projects the user is involved with
      * @access     public
      */
-    public function getCurrentUserRights ($id = false)
+    public function getUserRights ($id = false)
     {
 
         $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
@@ -896,56 +896,66 @@ class Controller extends BaseClass
 	public function reInitUserRolesAndRights($userId=null)
 	{
 	
-        $cur = $this->getCurrentUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
+        $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
 		$this->setUserSessionRights($cur['rights']);
 		$this->setUserSessionRoles($cur['roles']);
 		$this->setUserSessionNumberOfProjects($cur['number_of_projects']);
 
 	}
 
-
-    public function getProjectModules ($params=null)
+    public function getProjectModules($params=null)
     {
 
-		$d['project_id'] = $this->getCurrentProjectId();
-		
-		if (isset($params['active']) && ($params['active']=='y' || $params['active']=='n'))
-			$d['active'] = $params['active'];
+		if (
+			$this->hasTableDataChanged('ModuleProject') ||
+			$this->hasTableDataChanged('FreeModuleProject') ||
+			$this->hasTableDataChanged('Module') ||
+			!isset($_SESSION['admin']['project']['modules'])
+		) {
 
-		$p['id'] = $d;
-
-		if (isset($params['order'])) $p['order'] = $params['order'];
-
-		$modules = $this->models->ModuleProject->_get($p);
-
-        foreach ((array) $modules as $key => $val) {
-
-            $mp = $this->models->Module->_get(array('id' => $val['module_id']));
-
-            $modules[$key]['module'] = $mp['module'];
-
-            $modules[$key]['description'] = $mp['description'];
-
-            $modules[$key]['controller'] = $mp['controller'];
-
-            $modules[$key]['show_order'] = $mp['show_order'];
-
-        }
-
-		$this->customSortArray($modules,array('key' => 'show_order','maintainKeys' => true));
-
-		$freeModules = $this->models->FreeModuleProject->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
+			$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
+			
+			if (isset($params['active']) && ($params['active']=='y' || $params['active']=='n'))
+				$d['active'] = $params['active'];
+	
+			$p['id'] = $d;
+	
+			if (isset($params['order'])) $p['order'] = $params['order'];
+	
+			$modules = $this->models->ModuleProject->_get($p);
+	
+			foreach ((array) $modules as $key => $val) {
+	
+				$mp = $this->models->Module->_get(array('id' => $val['module_id']));
+	
+				$modules[$key]['module'] = $mp['module'];
+	
+				$modules[$key]['description'] = $mp['description'];
+	
+				$modules[$key]['controller'] = $mp['controller'];
+	
+				$modules[$key]['show_order'] = $mp['show_order'];
+	
+			}
+	
+			$this->customSortArray($modules,array('key' => 'show_order','maintainKeys' => true));
+	
+			$freeModules = $this->models->FreeModuleProject->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					)
 				)
-			)
-		);
+			);
+			
+			$_SESSION['admin']['project']['modules'] = array(
+				'modules' => $modules,
+				'freeModules' => $freeModules
+			);
+
+		}
 		
-		return array(
-			'modules' => $modules,
-			'freeModules' => $freeModules
-		);
+		return $_SESSION['admin']['project']['modules'];
 
 	}
 
@@ -1538,19 +1548,45 @@ class Controller extends BaseClass
 	}
 
 
-	public function addUserToProject($userId,$projectId,$roleId,$active=1)
+	public function addUserToProject($uid,$pId,$roleId,$active=1,$addToAllModules=true)
 	{
 	
 		$this->models->ProjectRoleUser->save(
 			array(
-				'id' => null,
-				'project_id' => $projectId,	
+				'id' => null, 
+				'project_id' => $pId, 
 				'role_id' => $roleId,
-				'user_id' =>$userId,
+				'user_id' => $uid,
 				'active' => $active
 			)
 		);
-
+		
+		if ($addToAllModules===false) return;
+		
+		$d = array(
+			'id' => null,
+			'user_id' => $uid,
+			'project_id' => $pId
+		);
+					
+		$modules = $this->getProjectModules(array('project_id'=>$pId));
+		
+		foreach ((array)$modules['modules'] as $key => $val) {
+		
+			$d['module_id'] = $val['module_id'];
+			$this->models->ModuleProjectUser->save($d);
+		
+		}
+		
+		unset($d['module_id']);
+		
+		foreach ((array)$modules['freeModules'] as $key => $val) {
+		
+			$d['free_module_id'] = $val['id'];
+			$this->models->FreeModuleProjectUser->save($d);
+		
+		}
+		
 	}
 
 	public function makeLookupList($data,$module,$url,$sortData=false,$encode=true)

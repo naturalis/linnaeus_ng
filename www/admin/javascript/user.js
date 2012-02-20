@@ -127,7 +127,7 @@ function userChangeRoleRight(ele) {
 function userAddToProject(uid,returnUrl) {
 
 	showDialog('',_('Add collaborator'));
-	$('#dialog-content-inner').load('add_user.php?uid='+uid);
+	$('#dialog-content-inner').load('add_user.php?uid='+uid+(returnUrl?'&returnUrl='+returnUrl:''));
 
 }
 
@@ -139,14 +139,33 @@ function userRemoveFromProject(uid,returnUrl) {
 
 }
 
+function userAddToModule(uid,modId,returnUrl) {
 
+	showDialog('',_('Assign collaborator to module'));
+	$('#dialog-content-inner').load('add_user_module.php?uid='+uid+'&modId='+modId+(returnUrl?'&returnUrl='+returnUrl:''));
 
+}
 
+function userRemoveFromModule(uid,modId,returnUrl) {
 
+	showDialog('',_('Remove collaborator from module'));
+	$('#dialog-content-inner').load('remove_user_module.php?uid='+uid+'&modId='+modId+(returnUrl?'&returnUrl='+returnUrl:''));
 
+}
 
+function userAddToFreeModule(uid,modId,returnUrl) {
 
+	showDialog('',_('Assign collaborator to module'));
+	$('#dialog-content-inner').load('add_user_module.php?uid='+uid+'&modId='+modId+'&type=free'+(returnUrl?'&returnUrl='+returnUrl:''));
 
+}
+
+function userRemoveFromFreeModule(uid,modId,returnUrl) {
+
+	showDialog('',_('Remove collaborator from module'));
+	$('#dialog-content-inner').load('remove_user_module.php?uid='+uid+'&modId='+modId+'&type=free'+(returnUrl?'&returnUrl='+returnUrl:''));
+
+}
 
 
 
