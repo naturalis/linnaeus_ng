@@ -802,7 +802,7 @@ class Controller extends BaseClass
             if ($this->getCurrentProjectId() || $allowNoProjectId) {
 
                 // check if the user is authorised for the combination of current page / current project
-                if ($this->isUserAuthorisedForProjectPage() || $this->isSysAdmin()) {
+                if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin()) {
 
                     return true;
                 
@@ -873,7 +873,7 @@ class Controller extends BaseClass
      * @return     boolean	true or false
      * @access     public
      */
-    public function isSysAdmin()
+    public function isCurrentUserSysAdmin()
     {
 
 		if (!isset($_SESSION['admin']['user'])) return false;
@@ -2387,7 +2387,7 @@ class Controller extends BaseClass
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
 
-        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
+        $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
 
 		if (isset($this->cssToLoad)) $this->smarty->assign('cssToLoad', $this->cssToLoad);
 

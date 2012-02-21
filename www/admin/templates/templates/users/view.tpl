@@ -43,10 +43,6 @@
 	<tr>
 		<td colspan="2">
 			<input type="button" value="{t}edit{/t}" onclick="window.open('edit.php?id={$user.id}','_self');" />
-			<input type="button" value="{t}delete{/t}" onclick="window.open('edit.php?id={$user.id}','_self');" />!!!!!
-			
-			{if $currentUserRoleId==1 || $currentUserRoleId==2 || $session.admin.user.superuser==1}{/if}
-			
 		</td>
 	</tr>
 </table>
