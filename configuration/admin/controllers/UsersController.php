@@ -420,7 +420,7 @@ class UsersController extends Controller
         
         $this->smarty->assign('users', $users);
 
-        $this->smarty->assign('isSysAdmin', $this->isSysAdmin());
+        $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
 
         $this->smarty->assign('columnsToShow',
             array(
@@ -561,7 +561,7 @@ class UsersController extends Controller
 				$this->smarty->assign('modules', $modules);
 
 				$this->smarty->assign('hasModules', $hasModules);
-		
+
 			}
 			
 		} else {
@@ -571,24 +571,7 @@ class UsersController extends Controller
 		}
 
 		$this->printPage();	
-/*
 
-x get user
-x get role current
-get rights current
-if admin
-	get all projects
-	get all roles
-if lead expert / sysadmin / self?
-	can edit
-if sysadmin
-	can delete
-	
-
-*/		
-		
-		
-    
     }
 
 
@@ -606,29 +589,22 @@ if sysadmin
         
         $this->setPageName(_('Edit project collaborator'));
 
+		$user = $this->getUser($this->requestData['id']);
+
+		$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
+
         // check whether the collaborator to be edited is part of the current project (avoid injected id)
         if ($this->isUserPartOfProject($this->requestData['id'], $this->getCurrentProjectId())) {
             
             // user requested delete
-            if ($this->rHasVal('delete','1')) {
-                
-				$pru = $this->models->ProjectRoleUser->_get(
-					array(
-						'id' => array(
-							'user_id' => $this->requestData['id'], 
-							'project_id' => $this->getCurrentProjectId()
-						)
-					)
-				);
+            if ($this->rHasVal('delete','1') && $canDelete) {
+
+				$this->removeUserFromProject($this->requestData['id'],$this->getCurrentProjectId());
 				
-				if ($pru[0]['role_id'] != ID_ROLE_LEAD_EXPERT) {
-				
+				if ($canDelete) {
+
 					$this->deleteUser($this->requestData['id']);
 
-				} else {
-
-					$this->addError(_('Cannot delete lead expert.'));
-	
 				}
 
 				// redirect user to overview of remaining collaborators
@@ -746,8 +722,6 @@ if sysadmin
                 }
             
             }
-            
-			if(!isset($user)) $user = $this->models->User->_get(array('id'=>$this->requestData['id']));
 
             $upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
             
@@ -808,18 +782,20 @@ if sysadmin
 
             $this->smarty->assign('isLeadExpert', $upr['role_id'] == ID_ROLE_LEAD_EXPERT);
 
-            $this->smarty->assign('zones', $zones);
+            $this->smarty->assign('zones',$zones);
 
-			$this->smarty->assign('modules', $modules);
+			$this->smarty->assign('modules',$modules);
 	
-			$this->smarty->assign('freeModules', $freeModules);
+			$this->smarty->assign('freeModules',$freeModules);
 
-            $this->smarty->assign('roles', $roles);
+            $this->smarty->assign('roles',$roles);
             
-            $this->smarty->assign('data', $user);
+            $this->smarty->assign('data',$user);
             
-            $this->smarty->assign('userRole', $upr);
-            
+            $this->smarty->assign('userRole',$upr);
+
+			$this->smarty->assign('canDelete',$canDelete);		
+		
 			$this->printPage();        
 
         } else {
@@ -1095,7 +1071,7 @@ if sysadmin
 		} else
 		if ($this->rHasVal('uid')) {
 
-			if ($this->isSysAdmin())
+			if ($this->isCurrentUserSysAdmin())
 				$d = array('id !=' => ID_ROLE_SYS_ADMIN);
 			else
 				$d = array('assignable' => 'y');
@@ -1444,29 +1420,6 @@ MUST CHECK
 	private function deleteUser($id)
 	{
 
-		// delete collaborator's role from this project
-		$this->models->ProjectRoleUser->delete(
-			array(
-				'user_id' => $id, 
-				'project_id' => $this->getCurrentProjectId()
-			)
-		);
-
-		$this->models->ModuleProjectUser->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $id
-			)
-		);
-
-		$this->models->FreeModuleProjectUser->delete(
-			array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'user_id' => $id
-			)
-		);
-
-
 		// avoiding orphans: see if collaborator is present in any other projects...
 		$data = $this->models->ProjectRoleUser->_get(
 			array(
@@ -1480,9 +1433,9 @@ MUST CHECK
 		// ...if not, delete entire collaborator record
 		if (isset($data) && $data[0]['tot'] == '0') {
 
-			$this->models->User->delete($id);
 			$this->models->ModuleProjectUser->delete($id);
 			$this->models->FreeModuleProjectUser->delete($id);
+			$this->models->User->delete($id);
 
 		}
 
