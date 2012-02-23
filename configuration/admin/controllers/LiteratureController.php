@@ -53,10 +53,10 @@ class LiteratureController extends Controller
     
 		$this->clearTempValues();
 
-		//$d = $this->getFirstReference();
+		$d = $this->getFirstReference();
 		
-		//$this->redirect('edit.php?id='.$d['id']);
-		$this->redirect('edit.php');
+		$this->redirect('edit.php?id='.$d['id']);
+		//$this->redirect('edit.php');
 
 		/*
 

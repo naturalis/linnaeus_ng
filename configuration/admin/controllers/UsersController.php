@@ -83,6 +83,8 @@ class UsersController extends Controller
         $this->setPageName(_('Login'));
        
         $this->smarty->assign('excludeLogout', true);
+
+		$this->includeLocalMenu = false;
        
         // check wheter the user has entered a username and/or password
         if ($this->rHasVal('username') || $this->rHasVal('password')) {

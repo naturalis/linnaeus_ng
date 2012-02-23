@@ -1,5 +1,6 @@
 var intLinks = Array();
 var intLinkLanguage = '';
+var intLinkUseJSLinks = false;
 
 function intLinkSetLanguage(language) {
 
@@ -101,11 +102,36 @@ function intLinkInsertLink() {
 
 	var selection = tinyMCE.activeEditor.selection.getContent();
 
-	tinyMCE.activeEditor.selection.setContent(
-		'<span class="internal-link" onclick="goIntLink(\''+controller+'\',\''+url+'\',['+params+'])">'+
-		(selection!='' ? selection : label) +
-		'</span>'
-	);
+
+	if (intLinkUseJSLinks) {
+
+		var newContent = 
+			'<span class="internal-link" onclick="goIntLink(\''+controller+'\',\''+url+'\',['+params+'])">'+
+			(selection!='' ? selection : label) +
+			'</span>';
+		
+	} else {
+
+		var query = '';
+
+		for(var i=0;i<params.length;i++) {
+
+			var d = params[i].replace(/'$/,'').replace(/^'/,'').split(':');
+			query = query + d[0]+'='+d[1]+'&';
+			
+		}
+		
+		query = query.replace(/\&$/,'');
+		
+		var newContent = 
+			'<a class="internal-link" href="../'+controller+'/'+url+(query ? '?'+query : '') +'">'+
+			(selection!='' ? selection : label) +
+			'</a>';
+
+	}
+	
+
+	tinyMCE.activeEditor.selection.setContent(newContent);
 
 	$('#dialog-close').click();
 

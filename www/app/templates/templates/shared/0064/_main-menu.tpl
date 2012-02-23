@@ -16,17 +16,15 @@
 {/if}
 {elseif $v.module!='Introduction'}
 {if !$first}<span class="menu-separator">|</span>{/if}
-{if $v.id == $module.id}
-<div class="menu-item-container-active">
-<span class="menu-active-indicator"><span class="menu-item-active" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span></span><br />
-</div>
+
+<div class="menu-item-container{if $v.id == $module.id}-active{/if}">
+{if $v.id == $module.id}<span class="menu-active-indicator">{/if}
+<span class="menu-item{if $v.id == $module.id}-active{/if}" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span><br />
 {assign var=first value=false}
-{else}
-<div class="menu-item-container">
-<span class="menu-item" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span><br />
+{if $v.id == $module.id}</span>{/if}
 </div>
-{assign var=first value=false}
-{/if}
+
+
 {/if}
 {/foreach}
 	</div>

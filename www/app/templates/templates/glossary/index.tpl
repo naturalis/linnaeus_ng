@@ -6,7 +6,11 @@
 	{if $letter==$v}
 	<span class="letter-active">{$v}</span>
 	{else}
+	{if $useJavascriptLinks}
 	<span class="letter" onclick="goAlpha('{$v}')">{$v}</span>
+	{else}
+	<a class="letter" href="?letter={$v}">{$v}</a>
+	{/if}
 	{/if}
 	{/foreach}
 </div>
@@ -24,7 +28,13 @@
 <tbody>
 {foreach from=$gloss key=k item=v}
 	<tr class="highlight">
+	{if $useJavascriptLinks}
 		<td class="a" onclick="goGlossaryTerm({$v.id})">{$v.term}</td>
+	{else}
+		<td>
+			<a href="../glossary/term.php?id={$v.id}">{$v.term}</a>
+		</td>
+	{/if}
 		<td>
 		{foreach from=$v.synonyms key=k2 item=v2}
 			{$v2.synonym}{if $v.synonyms|@count>1 && $k2!=$v.synonyms|@count-1}, {/if}

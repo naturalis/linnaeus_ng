@@ -3,17 +3,58 @@
 	<tr>
 	{foreach from=$categories key=k item=v}
 		{if $activeCategory==$v.id && $v.page=='Overview'}{assign var=taxonStartPage value=true}{/if}
-		<td {if $activeCategory==$v.id}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},{$v.id})"{/if}>{$v.title}</td><td class="space"></td>
+		
+	{if $useJavascriptLinks}			
+		<td {if $activeCategory==$v.id}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},{$v.id})"{/if}>{$v.title}</td>
+	{else}
+		<td class="category{if $activeCategory==$v.id}-active{/if}">
+			<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}">{$v.title}</a>	
+		</td>
+	{/if}
+<td class="space"></td>
 		{/foreach}
 {if $contentCount.media>0}
-		<td {if $activeCategory=='media'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'media')"{/if}>{t}Media{/t}</td><td class="space"></td>
+
+	{if $useJavascriptLinks}			
+		<td {if $activeCategory=='media'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'media')"{/if}>{t}Media{/t}</td>
+	{else}
+		<td class="category{if $activeCategory=='media'}-active{/if}">
+			<a href="../species/taxon.php?id={$taxon.id}&cat=media">{t}Media{/t}</a>	
+		</td>
+	{/if}
+
+<td class="space"></td>
 {/if}
-		<td {if $activeCategory=='classification'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'classification')"{/if}>{t}Classification{/t}</td><td class="space"></td>
+
+	{if $useJavascriptLinks}			
+		<td {if $activeCategory=='classification'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'classification')"{/if}>{t}Classification{/t}</td>
+	{else}
+		<td class="category{if $activeCategory=='classification'}-active{/if}">
+			<a href="../species/taxon.php?id={$taxon.id}&cat=classification">{t}Classification{/t}</a>	
+		</td>
+	{/if}
+
+<td class="space"></td>
 {if $contentCount.literature>0}
-		<td {if $activeCategory=='literature'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'literature')"{/if}>{t}Literature{/t}</td><td class="space"></td>
+
+	{if $useJavascriptLinks}			
+		<td {if $activeCategory=='literature'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'literature')"{/if}">{t}Literature{/t}</td>
+	{else}
+		<td class="category{if $activeCategory=='literature'}-active{/if}">
+			<a href="../species/taxon.php?id={$taxon.id}&cat=literature">{t}Literature{/t}</a>	
+		</td>
+	{/if}
+
+<td class="space"></td>
 {/if}
 {if $contentCount.names>0}
+	{if $useJavascriptLinks}			
 		<td {if $activeCategory=='names'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'names')"{/if}>{t}Synonyms{/t}</td>
+	{else}
+		<td class="category{if $activeCategory=='names'}-active{/if}">
+			<a href="../species/taxon.php?id={$taxon.id}&cat=names">{t}Synonyms{/t}</a>	
+		</td>
+	{/if}
 {/if}
 	</tr>
 </table>
@@ -26,7 +67,17 @@
 	{foreach from=$content key=k item=v name=classification}
 	{if $v.do_display}
 		<tr>
+			{if $useJavascriptLinks}			
 			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.taxon}</td>
+			{else}
+			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{/if}>
+				{if $v.lower_taxon==1}
+				<a href="../species/taxon.php?id={$v.id}">{$v.taxon}</a>
+				{else}
+				<a href="../highertaxa/taxon.php?id={$v.id}">{$v.taxon}</a>
+				{/if}
+			</td>
+			{/if}		
 			<td>({$v.rank})</td>
 		</tr>
 	{/if}
@@ -53,7 +104,13 @@
 	{foreach from=$content.synonyms key=k item=v}
 		<tr class="highlight">
 			<td>{$v.synonym}</td>
-			<td>{if $v.reference}<span onclick="goLiterature({$v.reference.id});" class="a">{$v.reference.author_full}</span>{/if}</td>
+			<td>{if $v.reference}
+			{if $useJavascriptLinks}
+			<span onclick="goLiterature({$v.reference.id});" class="a">{$v.reference.author_full}</span>
+			{else}
+			<a href="../literature/reference.php?id={$v.reference.id}">{$v.reference.author_full}</a>
+			{/if}
+			{/if}</td>
 		</tr>
 		{* $v.remark *}
 	{/foreach}
