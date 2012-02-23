@@ -82,8 +82,8 @@ class configuration
 				'mapkey:examine_species' => '../../../admin/views/mapkey/species_edit.php?id=%s',
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
-			)
-
+			),
+			'useJavascriptLinks' => false
         );
     
     }

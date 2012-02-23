@@ -3719,14 +3719,27 @@ class ImportController extends Controller
 			}
 	
 			if (isset($id) && isset($d[2])) {
-	
-				$href =
-					"goIntLink('".$controllers[$d[0]]['controller']."',".
-					"'".(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php')."'".
-					(isset($controllers[$d[0]]['param']) ? ",['".$controllers[$d[0]]['param'].":".$id."']" : null).
-					");";
 
-				return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
+				if ($this->generalSettings['useJavascriptLinks']) {	
+
+					$href =
+						"goIntLink('".$controllers[$d[0]]['controller']."',".
+						"'".(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php')."'".
+						(isset($controllers[$d[0]]['param']) ? ",['".$controllers[$d[0]]['param'].":".$id."']" : null).
+						");";
+
+					return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
+
+				} else {
+
+					$href = 
+						'../'.$controllers[$d[0]]['controller'].'/'.
+						(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php').
+						(isset($controllers[$d[0]]['param']) ? '?'.$controllers[$d[0]]['param'].'='.$id : null);
+						
+					return '<a class="internal-link" href="'.$href.'">'.trim($d[2]).'</a>';
+
+				}
 
 
 			}
@@ -3738,9 +3751,20 @@ class ImportController extends Controller
 		
 			if (isset($id) && isset($d[2])) {
 	
-				$href = "goIntLink('module','topic.php',['modId:".$ids['moduleId']."','id:".$ids['pageId']."'])";
+				if ($this->generalSettings['useJavascriptLinks']) {	
 
-				return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
+					$href = "goIntLink('module','topic.php',['modId:".$ids['moduleId']."','id:".$ids['pageId']."'])";
+	
+					return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
+
+				} else {
+
+					$href = '../module/topic.php?modId='.$ids['moduleId'].'&id='.$ids['pageId'];
+	
+					return '<a class="internal-link" href="'.$href.'">'.trim($d[2]).'</a>';
+					
+				}
+
 
 
 			}

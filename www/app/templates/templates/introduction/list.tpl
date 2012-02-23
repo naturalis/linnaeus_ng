@@ -2,7 +2,14 @@
 
 <div id="page-main">
 	{foreach from=$refs key=k item=v}
-	<span class="topic" onclick="goIntroductionTopic({$v.id})">{$v.topic}</span><br />
+
+	{if $useJavascriptLinks}
+	<span class="topic" onclick="goIntroductionTopic({$v.id})">{$v.topic}</span>
+	{else}
+	<a class="topic" href="../introduction/topic.php?id={$v.id}">{$v.topic}</a>
+	{/if}
+	<br />
+
 	{/foreach}
 </div>
 

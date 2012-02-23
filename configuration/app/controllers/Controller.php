@@ -1485,7 +1485,9 @@ class Controller extends BaseClass
 		);
 
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
-	 
+
+        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
+
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);

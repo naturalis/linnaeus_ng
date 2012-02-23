@@ -2388,6 +2388,8 @@ class Controller extends BaseClass
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
+        $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
+
 
 		if (isset($this->cssToLoad)) $this->smarty->assign('cssToLoad', $this->cssToLoad);
 

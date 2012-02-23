@@ -55,6 +55,8 @@ $(document).ready(function(){
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 
+	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
+
 	initTinyMce(false,false);
 
 {literal}	

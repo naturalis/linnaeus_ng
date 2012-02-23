@@ -19,11 +19,19 @@
 		{assign var=i value=$i+1}
 		{elseif $v.show_in_public_menu==1}
 		<td style="width:100px;height:100px;text-align:center">
+			{if $useJavascriptLinks}
 			<span class="a" onclick="goMenuModule({$v.id});">
 				<img style="width:50px;height:50px;border:1px solid grey" src="../../media/system/module_icons/custom.png" />
 				<br />
 				{t}{$v.module}{/t}
 			</span>
+			{else}
+			<a href="../module/?modId={$v.id}">
+				<img style="width:50px;height:50px;border:1px solid grey" src="../../media/system/module_icons/custom.png" />
+				<br />
+				{t}{$v.module}{/t}
+			</a>
+			{/if}
 		</td>
 		{assign var=i value=$i+1}
 		{/if}

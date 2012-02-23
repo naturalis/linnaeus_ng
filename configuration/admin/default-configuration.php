@@ -94,7 +94,8 @@ class configuration
 			'uiLanguages' => array('Dutch','English'),
 			'uiDefaultLanguage' => 1, // points to the element in the array above
 			'soundPlayerPath' => '../../media/system/',
-			'soundPlayerName' => 'player_mp3.swf'
+			'soundPlayerName' => 'player_mp3.swf',
+			'useJavascriptLinks' => false
         );
     
     }

@@ -99,6 +99,7 @@ $(document).ready(function(){
 	allSetAutoSaveFreq({$autosaveFrequency});
 	taxonRunAutoSave();
 
+	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 	initTinyMce('{$literature}','{$media}');
 	allLookupNavigateOverrideUrl('taxon.php?id=%s&cat=');
 

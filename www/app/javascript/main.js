@@ -209,7 +209,7 @@ function goForm(url) {
 }
 
 function goTaxon(id,cat) {
-
+	//!
 	addFormVal('id',id);
 	addFormVal('cat',cat ? cat : null);
 	goForm('../species/taxon.php');
@@ -217,42 +217,42 @@ function goTaxon(id,cat) {
 }
 
 function goHigherTaxon(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../highertaxa/taxon.php');
 
 }
 
 function goMenuModule(id) {
-
+	//!
 	addFormVal('modId',id);
 	goForm('../module/');
 
 }
 
 function goAlpha(letter,url) {
-
+	//!
 	addFormVal('letter',letter);
 	goForm(url ? url : null);
 
 }
 
 function goLiterature(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../literature/reference.php');
 
 }
 
 function goGlossaryTerm(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../glossary/term.php');
 
 }
 
 function goModuleTopic(id,modId) {
-
+	//!
 	if (modId) addFormVal('modId',modId);
 	addFormVal('id',id);
 	goForm('../module/topic.php');
@@ -260,48 +260,48 @@ function goModuleTopic(id,modId) {
 }
 
 function goContent(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../linnaeus/');
 
 }
 
 function goContentPage(subject) {
-
+	//!
 	addFormVal('sub',subject);
 	goForm('../linnaeus/content.php');
 
 }
 
 function goMatrix(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../matrixkey/use_matrix.php');
 
 }
 
 function goMap(id,url) {
-
+	//!
 	if (id) addFormVal('id',id);
 	goForm(url ? url : '../mapkey/examine_species.php');
 
 }
 
 function goIntroductionTopic(id) {
-
+	//!
 	addFormVal('id',id);
 	goForm('../introduction/topic.php');
 
 }
 
 function goNavigator() {
-
+	//!
 	goForm('../linnaeus/index.php');
 
 }
 
 function goNavigate(id,field,url) {
-
+	//!
 	addFormVal(field ? field : 'start',id);
 	goForm(url ? url : null);
 
@@ -394,9 +394,8 @@ function goIntLink(controller,url,params) {
 }
 
 function doBackForm(url,data) {
-	
+	//?
 	data = unescape(data);
-
 	obj = $.parseJSON(data);
 
 	for (var i=0;i<obj.length;i++) {
@@ -406,7 +405,6 @@ function doBackForm(url,data) {
 	}
 
 	addFormVal('backstep','1');
-
 	goForm(url);
 
 }

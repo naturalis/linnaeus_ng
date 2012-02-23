@@ -91,10 +91,10 @@ class GlossaryController extends Controller
 
 		$this->clearTempValues();
 
-		//$d = $this->getFirstGlossaryTerm();
+		$d = $this->getFirstGlossaryTerm();
 		
-		//$this->redirect('edit.php?id='.$d['id']);
-		$this->redirect('edit.php');
+		$this->redirect('edit.php?id='.$d['id']);
+		//$this->redirect('edit.php');
     
 		/*
         $this->checkAuthorisation();
@@ -489,11 +489,19 @@ class GlossaryController extends Controller
                 )
             );
 
+
+			$this->smarty->assign('alpha', $this->getActualAlphabet($this->getActiveLanguage()));
+
+			$this->smarty->assign('navList', $this->getGlossaryTermsNavList());
+
+			$this->smarty->assign('navCurrentId',$gloss['id']);
+
         } else {
 
             $this->addError(_('No glossary term specified.'));
 
         }        
+
 
         $this->printPage();
     

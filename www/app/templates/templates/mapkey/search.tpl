@@ -13,7 +13,14 @@
 		{foreach from=$results key=k item=v}
 		{if $prev.taxon_id!=$v.taxon_id}
 			<tr style="vertical-align:top">
-				<td style="width:245px;"><span onclick="goTaxon({$v.taxon_id});" class="a">{$taxa[$v.taxon_id].taxon}</a></td>
+				<td style="width:245px;">
+					{if $useJavascriptLinks}			
+					<span onclick="goTaxon({$v.taxon_id});" class="a">{$taxa[$v.taxon_id].taxon}</span>
+					{else}
+					<a href="../species/taxon.php?id={$v.taxon_id}">{$taxa[$v.taxon_id].taxon}</a>
+					{/if}				
+				</td>
+				
 				<td style="width:25px;"><input type="checkbox" id="toggle-{$v.type_id}-{$v.taxon_id}" onchange="doMapTypeToggle({$v.type_id},{$v.taxon_id})" checked="checked"></td>
 			</tr>
 			<tr><td colspan="2" style="height:1px;"></td></tr>

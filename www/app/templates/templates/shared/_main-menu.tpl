@@ -11,13 +11,12 @@
 	{assign var=first value=false}
 	{/if}
 	{elseif $v.show_in_public_menu==1}
-	{if $v.id == $module.id}
-	<span class="menu-item-active" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
-	{assign var=first value=false}
+	{if $useJavascriptLinks}
+	<span class="menu-item{if $v.id == $module.id}-active{/if}" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
 	{else}
-	<span class="menu-item" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span>
-	{assign var=first value=false}
+	<a class="menu-item{if $v.id == $module.id}-active{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a>
 	{/if}
+	{assign var=first value=false}
 	{/if}
 	{/foreach}
 	</div>

@@ -112,6 +112,8 @@ var f = $('#synonyms-container');
 var off = $('#add').offset();
 f.offset({left : off.left + $('#add').width() + 30, top: off.top});
 
+{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
+
 initTinyMce(false,false);
 
 

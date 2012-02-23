@@ -145,6 +145,7 @@ var f = $('#selected-taxa');
 var off = $('#add-button').offset();
 f.offset({left : off.left + $('#add-button').width() + 25, top: off.top});
 
+{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 initTinyMce(false,false);
 {/literal}
 
