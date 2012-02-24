@@ -8,11 +8,11 @@
 	<th class="th-userlist-left-align" style="text-align:left">last name</th>
 	<th class="th-userlist-left-align" style="text-align:left">username</th>
 	<th class="th-userlist-left-align" style="text-align:left">e-mail</th>
-	<th class="th-userlist-left-align" style="text-align:right;padding-right:20px">projects</th>
+	<th class="th-userlist-left-align" style="text-align:right;">projects</th>
 	{if $session.admin.project.id}
 	<th class="th-userlist-left-align" style="text-align:left;">current<br />project</th>
 	{/if}	
-	<th class="th-userlist-left-align" style="text-align:left">last login</th>
+	<!-- th class="th-userlist-left-align" style="text-align:left">last login</th -->
 	<th class="th-userlist-left-align" style="text-align:left">detail</th>
 </tr>
 {foreach item=v from=$users}
@@ -29,7 +29,7 @@
 	<td>[<span class="a" onclick="userRemoveFromProject({$v.id});">{t}remove{/t}</span>] [A]</td>
 	{/if}
 	{/if}
-	<td class="cell-userlist-left-align">{$v.last_login}</td>
+	<!-- td class="cell-userlist-left-align">{$v.last_login}</td-->
 	<td>[<a href="view.php?id={$v.id}">{t}view{/t}</a>] [A]</td>
 	{* <td>[<a href="edit.php?id={$v.id}">{t}edit{/t}</a>] [A]</td> *}
 </tr>

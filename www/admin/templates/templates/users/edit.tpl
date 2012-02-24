@@ -4,8 +4,8 @@
 <div id="page-main">
 <form method="post" action="" name="theForm" id="theForm">
 	<input name="id" value="{$data.id}" type="hidden" />
-	<input name="checked" id="checked" value="1" type="hidden" />
-	<input name="delete" id="delete" value="0" type="hidden" />
+	<input type="hidden" name="action" id="action" value="update"  />
+	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input name="userProjectRole" value="{$userRole.id}" type="hidden" />
 <script type="text/javascript">
 	userid = '{$data.id}';
@@ -196,7 +196,7 @@
 	<tr>
 		<td colspan="2">
 			<input type="submit" value="{t}save{/t}" />
-			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { var e = document.getElementById('delete'); e.value = '1'; e = document.getElementById('theForm'); e.submit(); }{/literal}" />
+			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { $('#action').val('delete');$('#theForm').submit(); }{/literal}" />[A]
 		</td>
 	</tr>
 </table>
