@@ -29,6 +29,7 @@
 		<td>{t}Active:{/t}</td>
 		<td>{if $user.active=='1'}y{else}n{/if}</td>
 	</tr>
+	{if $session.admin.project.id}
 	<tr>
 		<td>{t}Role in current project:{/t}</td>
 		<td>
@@ -40,12 +41,20 @@
 			{/if}
 		</td>
 	</tr>
+	{/if}
+	<tr>
+		<td>{t}Last login:{/t}</td>
+		<td>
+			{$currentRole.last_login}
+		</td>
+	</tr>
 	<tr>
 		<td colspan="2">
 			<input type="button" value="{t}edit{/t}" onclick="window.open('edit.php?id={$user.id}','_self');" />
 		</td>
 	</tr>
 </table>
+{if $session.admin.project.id}
 <p>
 	{t _s1=$session.admin.project.title}Module assignment for this user in "%s":{/t}
 
@@ -70,7 +79,7 @@
 {/foreach}
 </table>
 </p>
-
+{/if}
 {/if}
 </div>
 <form method="post" action="" id="theForm">
