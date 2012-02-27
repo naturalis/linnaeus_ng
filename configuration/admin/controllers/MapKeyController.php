@@ -26,7 +26,9 @@ class MapKeyController extends Controller
     public $usedModels = array(
 		'occurrence_taxon',
 		'geodata_type',
-		'geodata_type_title'
+		'geodata_type_title',
+		'ln2_occurrence_taxon',
+		'ln2_map'
 	);
     
     public $usedHelpers = array('csv_parser_helper');
@@ -56,6 +58,8 @@ class MapKeyController extends Controller
         
         parent::__construct();
 
+		$this->smarty->assign('ln2maps',$this->ln2GetMaps());
+
     }
 
     /**
@@ -73,8 +77,12 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
-		//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
-		$this->redirect('species_edit.php?id='.$this->getFirstOccurringTaxonId());
+		// are there any LN2-style maps in the project?
+		if ($this->ln2CountMaps()!=0)
+			$this->redirect('ln2_species_show.php?id='.$this->getFirstOccurringTaxonId());
+		else
+			//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
+			$this->redirect('species_edit.php?id='.$this->getFirstOccurringTaxonId());
     
     }
 
@@ -257,7 +265,7 @@ class MapKeyController extends Controller
 		$this->smarty->assign('navList',$this->getOccurringTaxonList());
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
-
+		
         $this->printPage();
     
     }
@@ -1435,6 +1443,174 @@ class MapKeyController extends Controller
         $this->printPage();
 
 */
+	
+	}
+
+	private function ln2CountMaps()
+	{
+
+		$d = $this->models->Ln2Map->_get(
+			array('id' =>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'image !=' => '\'\''
+				),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		return $d[0]['total'];
+
+	}
+
+	public function ln2SpeciesShow()
+	{
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('species.php');
+
+		$taxon = $this->getTaxonById($this->requestData['id']);
+
+		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
+
+		if ($this->rHasId()) {
+
+			if (!$this->rHasVal('mapId'))
+				$mapId = $this->ln2GetFirstOccurrenceMapId($this->requestData['id']);
+			else
+				$mapId = $this->requestData['mapId'];
+
+			$occurrences = $this->ln2GetTaxonOccurrences($this->requestData['id'],$mapId);
+
+			$this->smarty->assign('mapId',$mapId);
+
+			$this->smarty->assign('occurrences',$occurrences['occurrences']);
+
+			$this->smarty->assign('maps',$this->ln2GetMaps());
+
+        }
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
+		//$this->smarty->assign('geodataTypesPresent',$occurrences['dataTypes']);
+
+		if ($this->rHasVal('mapId')) $this->smarty->assign('mapId',$this->requestData['mapId']);
+
+		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('navList',$this->getOccurringTaxonList());
+
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
+        $this->printPage();
+
+	}
+
+	private function ln2GetTaxonOccurrences($id,$mapId)
+	{
+	
+		if (!isset($id) || !isset($mapId)) return;
+
+		$ot = $this->models->Ln2OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id,
+					'map_id' => $mapId
+				),
+				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
+				'fieldAsIndex' => 'square_number'
+				
+			)
+		);
+
+		$dataTypes = array();
+
+		foreach((array)$ot as $key => $val) {
+		
+			$dataTypes[$val['type_id']] = $val['type_id'];
+		
+			$d = $this->getGeodataTypes($val['type_id']);
+
+			$ot[$key]['type_title'] = $d['title'];
+			$ot[$key]['colour'] = $d['colour'];
+
+		}
+
+		return array('occurrences' => $ot, 'dataTypes' => $dataTypes);
+
+	}
+
+	private function ln2GetFirstOccurrenceMapId($id)
+	{
+	
+		if (!isset($id)) return;
+
+		$d = $this->models->Ln2OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id
+				),
+				'columns' => 'map_id',
+				'limit' => 1
+			)
+		);
+
+		return $d[0]['map_id'];
+	}
+
+	private function ln2GetMaps($id=null)
+	{
+
+		if (1==1 ||
+			!isset($_SESSION['admin']['system']['maps']['ln2Maps']) ||
+			$this->hasTableDataChanged('Ln2Map')
+		) {
+
+			$m = $this->models->Ln2Map->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'fieldAsIndex' => 'id'
+				)
+			);
+
+			foreach((array)$m as $key => $val) {
+
+				if (!empty($val['image'])) {
+
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['paths']['project_media_ln2_maps'].$val['image']);
+
+					if ($m[$key]['mapExists']) {
+	
+						$m[$key]['size'] = getimagesize($_SESSION['admin']['project']['paths']['project_media_ln2_maps'].$val['image']);
+					
+					}
+					
+				}
+				
+				$d = json_decode($val['coordinates']);
+
+				$m[$key]['coordinates'] = array(
+					'topLeft' => array(
+						'lat' => (string)$d->topLeft->lat,
+						'long' => (string)$d->topLeft->long
+					),
+					'bottomRight' => array(
+						'lat' => (string)$d->bottomRight->lat,
+						'long' => (string)$d->bottomRight->long
+					),
+					'original' => $val['coordinates']
+				);
+
+			}
+			
+			$_SESSION['admin']['system']['maps']['ln2Maps'] = $m;
+	
+		}
+
+		return isset($id) ? $_SESSION['admin']['system']['maps']['ln2Maps'][$id] : $_SESSION['admin']['system']['maps']['ln2Maps'];
 	
 	}
 

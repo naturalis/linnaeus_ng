@@ -59,7 +59,9 @@ class ProjectsController extends Controller
 		'content_free_module',
 		'occurrence_taxon',
 		'geodata_type',
-		'geodata_type_title'
+		'geodata_type_title',
+		'ln2_occurrence_taxon',
+		'ln2_map'
     );
     
     public $usedHelpers = array(
@@ -978,6 +980,9 @@ class ProjectsController extends Controller
 		$this->models->GeodataTypeTitle->delete(array('project_id' => $id));
 		$this->models->GeodataType->delete(array('project_id' => $id));
 
+		$this->models->Ln2Map->delete(array('project_id' => $id));
+		$this->models->Ln2OccurrenceTaxon->delete(array('project_id' => $id));
+
 	}
 
 	private function deleteMatrices($id)
@@ -1205,6 +1210,7 @@ class ProjectsController extends Controller
 	
 		$paths = $this->makePathNames($id);
 
+		@rmdir($paths['project_media_ln2_maps']);
 		@rmdir($paths['project_thumbs']);
 		@rmdir($paths['project_media']);
 		@rmdir($paths['uploads_media']);

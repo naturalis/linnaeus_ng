@@ -259,7 +259,9 @@ class ImportController extends Controller
 		'content_introduction',
 		'introduction_page',
 		'introduction_media',
-		'user_taxon'
+		'user_taxon',
+		'ln2_occurrence_taxon',
+		'ln2_map'
     );
    
     public $usedHelpers = array('file_upload_helper','xml_parser');
@@ -3211,7 +3213,10 @@ class ImportController extends Controller
 	private function saveMatrices($m)
 	{
 		
-		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? $_SESSION['admin']['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+		$paths = 
+			isset($_SESSION['admin']['system']['import']['paths']) ? 
+				$_SESSION['admin']['system']['import']['paths'] : 
+				$this->makePathNames($this->getNewProjectId());
 		
 		$d = $error = null;
 
@@ -3508,6 +3513,72 @@ class ImportController extends Controller
 			$_SESSION['admin']['system']['import']['loaded']['map']['failed']++;
 
 	}
+	
+	
+	private function saveLN2Map($p)
+	{
+
+		$this->models->Ln2Map->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(),
+				'name' => $p['name'],
+				'coordinates' => $p['coordinates'],
+				'rows' => $p['rows'],
+				'cols' => $p['cols']
+			)
+		);
+
+		$_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id'] = $this->models->Ln2Map->getNewId();
+		
+		$mapImageName = $p['name'].'.GIF';
+		
+		$paths = $this->makePathNames($this->getNewProjectId());
+
+		if (
+			$this->cRename(
+				$_SESSION['admin']['system']['import']['imagePath'].$mapImageName,
+				$paths['project_media_ln2_maps'].$mapImageName
+			)
+		) {
+
+			$this->addMessage('Copied old map "'.$p['name'].'".');
+
+			$this->models->Ln2Map->update(
+				array(
+					'image' => $mapImageName
+				),
+				array(
+					'id' => $_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id']
+				)
+			);
+		
+		} else {
+
+			$this->addError('Missing map file: "'.$mapImageName.'" ('.$_SESSION['admin']['system']['import']['imagePath'].$mapImageName.').');
+	
+		}
+
+	}
+	
+
+	private function saveLN2Cell($p)
+	{	
+
+		$this->models->Ln2OccurrenceTaxon->save(
+			array(
+				'id' => null, 
+				'project_id' => $this->getNewProjectId(),
+				'taxon_id' => $p['taxon_id'],
+				'type_id' => $p['type_id'],
+				'map_id' => $p['map_id'],
+				'square_number' => $p['square_number'],
+				'legend' => $p['legend'],
+				'coordinates' => $p['coordinates']
+			)
+		);
+
+	}
 
 
 	private function saveMapItem($obj)
@@ -3542,20 +3613,34 @@ class ImportController extends Controller
 					$lon2 = (-1 * floatval($d[3]));
 					$sqW = floatval($d[4]);
 					$sqH = floatval($d[5]);
+					
+					$widthInSquares = (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW;	//((int)($d[1] - $d[3]) / $d[4]),
+					$heightInSquares = (($lat1 - $lat2) / $sqH);
+					$coordinates = 
+						array(
+							'topLeft' => array('lat' => $lat1,'long' => $lon1),			//array('lat' => (int)$d[0],'long' => (-1 * (int)$d[1])),
+							'bottomRight' => array('lat' => $lat2,'long' => $lon2)		//array('lat' => (int)$d[2],'long' => (-1 * (int)$d[3]))
+						);
 
 					$_SESSION['admin']['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
 						array(
 							'label' => trim((string)$vVal->mapname),
 							'specs' => trim((string)$vVal->specs),
-							'coordinates' =>
-								array(
-									'topLeft' => array('lat' => $lat1,'long' => $lon1),			//array('lat' => (int)$d[0],'long' => (-1 * (int)$d[1])),
-									'bottomRight' => array('lat' => $lat2,'long' => $lon2)		//array('lat' => (int)$d[2],'long' => (-1 * (int)$d[3]))
-								),
+							'coordinates' => $coordinates,
 							'square' => array('width' => $sqW,'height' => $sqH),
-							'widthInSquares' => (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW,	//((int)($d[1] - $d[3]) / $d[4]),
-							'heightInSquares' => (($lat1 - $lat2) / $sqH)
+							'widthInSquares' => $widthInSquares,
+							'heightInSquares' => $heightInSquares
 						);
+						
+					$this->saveLN2Map(
+						array(
+							'name' => trim((string)$vVal->mapname),
+							'coordinates' => json_encode($coordinates),
+							'rows' => $heightInSquares,
+							'cols' => $widthInSquares
+						)
+					);
+																
 				}
 				
 				$maps = $_SESSION['admin']['system']['import']['loaded']['map']['maps'];
@@ -3592,6 +3677,17 @@ class ImportController extends Controller
 					);
 					
 					$this->doSaveMapItem($occurrence);
+
+					$this->saveLN2Cell(
+						array(
+							'taxon_id' => $taxonId,
+							'type_id' => $_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
+							'square_number' => trim((string)$sVal->number),
+							'legend' => trim((string)$sVal->legend),
+							'map_id' => $maps[trim((string)$vVal->mapname)]['id'],
+							'coordinates' => json_encode(array(array($n1Lat,$n1Lon),array($n2Lat,$n2Lon),array($n3Lat,$n3Lon),array($n4Lat,$n4Lon)))
+						)
+					);
 
 				}
 
@@ -3633,6 +3729,7 @@ class ImportController extends Controller
 
 		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
 		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
+		if (!file_exists($paths['project_media_ln2_maps'])) mkdir($paths['project_media_ln2_maps']);
 
 	}
 
