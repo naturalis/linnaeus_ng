@@ -5,5 +5,9 @@
 &nbsp;
 <a href="choose_species.php" class="allLookupLink">{t}Species list{/t}</a>
 <a href="data_types.php" class="allLookupLink">{t}Data types{/t}</a>
+{if $ln2maps|@count>0}
+<a href="ln2_species_show.php?id={$taxon.id}" class="allLookupLink">{t}Linnaeus 2 maps{/t}</a>
+{/if}
 &nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>
+
