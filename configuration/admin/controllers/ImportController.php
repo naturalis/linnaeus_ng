@@ -260,8 +260,8 @@ class ImportController extends Controller
 		'introduction_page',
 		'introduction_media',
 		'user_taxon',
-		'ln2_occurrence_taxon',
-		'ln2_map'
+		'l2_occurrence_taxon',
+		'l2_map'
     );
    
     public $usedHelpers = array('file_upload_helper','xml_parser');
@@ -3515,10 +3515,10 @@ class ImportController extends Controller
 	}
 	
 	
-	private function saveLN2Map($p)
+	private function saveL2Map($p)
 	{
 
-		$this->models->Ln2Map->save(
+		$this->models->L2Map->save(
 			array(
 				'id' => null, 
 				'project_id' => $this->getNewProjectId(),
@@ -3529,7 +3529,7 @@ class ImportController extends Controller
 			)
 		);
 
-		$_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id'] = $this->models->Ln2Map->getNewId();
+		$_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id'] = $this->models->L2Map->getNewId();
 		
 		$mapImageName = $p['name'].'.GIF';
 		
@@ -3538,13 +3538,13 @@ class ImportController extends Controller
 		if (
 			$this->cRename(
 				$_SESSION['admin']['system']['import']['imagePath'].$mapImageName,
-				$paths['project_media_ln2_maps'].$mapImageName
+				$paths['project_media_l2_maps'].$mapImageName
 			)
 		) {
 
-			$this->addMessage('Copied old map "'.$p['name'].'".');
+			$this->addMessage('Copied L2-map "'.$p['name'].'".');
 
-			$this->models->Ln2Map->update(
+			$this->models->L2Map->update(
 				array(
 					'image' => $mapImageName
 				),
@@ -3565,7 +3565,7 @@ class ImportController extends Controller
 	private function saveLN2Cell($p)
 	{	
 
-		$this->models->Ln2OccurrenceTaxon->save(
+		$this->models->L2OccurrenceTaxon->save(
 			array(
 				'id' => null, 
 				'project_id' => $this->getNewProjectId(),
@@ -3609,12 +3609,16 @@ class ImportController extends Controller
 
 					$lat1 = floatval($d[0]);
 					$lat2 = floatval($d[2]);
-					$lon1 = (-1 * floatval($d[1]));
-					$lon2 = (-1 * floatval($d[3]));
+					//$lon1 = (-1 * floatval($d[1]));
+					//$lon2 = (-1 * floatval($d[3]));
+					$lon1 = floatval($d[1]);
+					$lon2 = floatval($d[3]);
 					$sqW = floatval($d[4]);
 					$sqH = floatval($d[5]);
-					
-					$widthInSquares = (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW;	//((int)($d[1] - $d[3]) / $d[4]),
+
+
+					//$widthInSquares = (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW;	//((int)($d[1] - $d[3]) / $d[4]),
+					$widthInSquares = (($lon1 >= $lon2) ? $lon1 - $lon2 : 360 + $lon1 - $lon2) / $sqW;
 					$heightInSquares = (($lat1 - $lat2) / $sqH);
 					$coordinates = 
 						array(
@@ -3632,7 +3636,7 @@ class ImportController extends Controller
 							'heightInSquares' => $heightInSquares
 						);
 						
-					$this->saveLN2Map(
+					$this->saveL2Map(
 						array(
 							'name' => trim((string)$vVal->mapname),
 							'coordinates' => json_encode($coordinates),
@@ -3640,7 +3644,7 @@ class ImportController extends Controller
 							'cols' => $widthInSquares
 						)
 					);
-																
+
 				}
 				
 				$maps = $_SESSION['admin']['system']['import']['loaded']['map']['maps'];
@@ -3729,7 +3733,7 @@ class ImportController extends Controller
 
 		if (!file_exists($paths['project_media'])) mkdir($paths['project_media']);
 		if (!file_exists($paths['project_thumbs'])) mkdir($paths['project_thumbs']);
-		if (!file_exists($paths['project_media_ln2_maps'])) mkdir($paths['project_media_ln2_maps']);
+		if (!file_exists($paths['project_media_l2_maps'])) mkdir($paths['project_media_l2_maps']);
 
 	}
 

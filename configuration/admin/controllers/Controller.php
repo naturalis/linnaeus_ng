@@ -2839,7 +2839,7 @@ class Controller extends BaseClass
 			return array(            
 				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/',
 				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/',
-				'project_media_ln2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/ln2_maps/',
+				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/l2_maps/',
 				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/',
 				'media_url' => '../../../admin/media/project/' . sprintf('%04s', $p) . '/',				
 			);
@@ -2874,7 +2874,7 @@ class Controller extends BaseClass
             
             $_SESSION['admin']['project']['paths']['uploads_media'] = $paths['uploads_media'];
 
-            $_SESSION['admin']['project']['paths']['project_media_ln2_maps'] = $paths['project_media_ln2_maps'];
+            $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
 
             foreach ((array) $_SESSION['admin']['project']['paths'] as $key => $val) {
                 
@@ -2909,7 +2909,7 @@ class Controller extends BaseClass
 
             $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
 
-            $_SESSION['admin']['project']['urls']['project_media_ln2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'ln2_maps/';
+            $_SESSION['admin']['project']['urls']['project_media_l2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'l2_maps/';
 
         }
 

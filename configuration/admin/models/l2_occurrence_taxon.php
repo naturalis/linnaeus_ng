@@ -2,10 +2,10 @@
 
 include_once ('model.php');
 
-class Ln2Map extends Model
+class L2OccurrenceTaxon extends Model
 {
 
-    const tableBaseName = 'ln2_maps';
+    const tableBaseName = 'l2_occurrences_taxa';
 
 
     /**
