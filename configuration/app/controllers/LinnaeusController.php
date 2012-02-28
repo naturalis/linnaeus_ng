@@ -884,6 +884,21 @@ class LinnaeusController extends Controller
 				'columns' => 'id,media_id,description as content,\'media\' as cat'
 				)
 			);
+			
+			foreach((array)$media2 as $key => $val) {
+
+				$d = $this->models->MediaTaxon->_get(
+					array(
+						'id' => array(
+							'id' => $val['media_id']
+						),
+					'columns' => 'taxon_id'
+					)
+				);
+				
+				$media2[$key]['taxon_id'] = $d[0]['taxon_id'];
+						
+			}
 	
 			$media = array_merge((array)$media1,(array)$media2);
 

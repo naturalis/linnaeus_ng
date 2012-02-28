@@ -27,8 +27,8 @@ class MapKeyController extends Controller
 		'occurrence_taxon',
 		'geodata_type',
 		'geodata_type_title',
-		'ln2_occurrence_taxon',
-		'ln2_map'
+		'l2_occurrence_taxon',
+		'l2_map'
 	);
     
     public $usedHelpers = array('csv_parser_helper');
@@ -58,7 +58,7 @@ class MapKeyController extends Controller
         
         parent::__construct();
 
-		$this->smarty->assign('ln2maps',$this->ln2GetMaps());
+		$this->smarty->assign('L2Maps',$this->l2GetMaps());
 
     }
 
@@ -78,8 +78,8 @@ class MapKeyController extends Controller
     {
 
 		// are there any LN2-style maps in the project?
-		if ($this->ln2CountMaps()!=0)
-			$this->redirect('ln2_species_show.php?id='.$this->getFirstOccurringTaxonId());
+		if ($this->l2CountMaps()!=0)
+			$this->redirect('l2_species_show.php?id='.$this->l2GetFirstOccurringTaxonId());
 		else
 			//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
 			$this->redirect('species_edit.php?id='.$this->getFirstOccurringTaxonId());
@@ -1446,10 +1446,10 @@ class MapKeyController extends Controller
 	
 	}
 
-	private function ln2CountMaps()
+	private function l2CountMaps()
 	{
 
-		$d = $this->models->Ln2Map->_get(
+		$d = $this->models->L2Map->_get(
 			array('id' =>
 				array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1463,7 +1463,7 @@ class MapKeyController extends Controller
 
 	}
 
-	public function ln2SpeciesShow()
+	public function l2SpeciesShowAction()
 	{
 
         $this->checkAuthorisation();
@@ -1474,20 +1474,20 @@ class MapKeyController extends Controller
 
 		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
 
+		if (!$this->rHasVal('mapId'))
+			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
+		else
+			$mapId = $this->requestData['mapId'];
+
 		if ($this->rHasId()) {
 
-			if (!$this->rHasVal('mapId'))
-				$mapId = $this->ln2GetFirstOccurrenceMapId($this->requestData['id']);
-			else
-				$mapId = $this->requestData['mapId'];
-
-			$occurrences = $this->ln2GetTaxonOccurrences($this->requestData['id'],$mapId);
+			$occurrences = $this->l2GetTaxonOccurrences($this->requestData['id'],$mapId);
 
 			$this->smarty->assign('mapId',$mapId);
 
 			$this->smarty->assign('occurrences',$occurrences['occurrences']);
 
-			$this->smarty->assign('maps',$this->ln2GetMaps());
+			$this->smarty->assign('maps',$this->l2GetMaps());
 
         }
 
@@ -1495,9 +1495,11 @@ class MapKeyController extends Controller
 
 		//$this->smarty->assign('geodataTypesPresent',$occurrences['dataTypes']);
 
-		if ($this->rHasVal('mapId')) $this->smarty->assign('mapId',$this->requestData['mapId']);
+		if (isset($mapId)) $this->smarty->assign('mapId',$mapId);
 
 		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
 
 		$this->smarty->assign('navList',$this->getOccurringTaxonList());
 
@@ -1507,12 +1509,12 @@ class MapKeyController extends Controller
 
 	}
 
-	private function ln2GetTaxonOccurrences($id,$mapId)
+	private function l2GetTaxonOccurrences($id,$mapId)
 	{
 	
 		if (!isset($id) || !isset($mapId)) return;
 
-		$ot = $this->models->Ln2OccurrenceTaxon->_get(
+		$ot = $this->models->L2OccurrenceTaxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1542,12 +1544,12 @@ class MapKeyController extends Controller
 
 	}
 
-	private function ln2GetFirstOccurrenceMapId($id)
+	private function l2GetFirstOccurrenceMapId($id)
 	{
-	
+
 		if (!isset($id)) return;
 
-		$d = $this->models->Ln2OccurrenceTaxon->_get(
+		$d = $this->models->L2OccurrenceTaxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1559,17 +1561,18 @@ class MapKeyController extends Controller
 		);
 
 		return $d[0]['map_id'];
+
 	}
 
-	private function ln2GetMaps($id=null)
+	private function l2GetMaps($id=null)
 	{
 
-		if (1==1 ||
-			!isset($_SESSION['admin']['system']['maps']['ln2Maps']) ||
-			$this->hasTableDataChanged('Ln2Map')
+		if (
+			!isset($_SESSION['admin']['system']['maps']['L2Maps']) ||
+			$this->hasTableDataChanged('L2Map')
 		) {
 
-			$m = $this->models->Ln2Map->_get(
+			$m = $this->models->L2Map->_get(
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
 					'fieldAsIndex' => 'id'
@@ -1580,11 +1583,11 @@ class MapKeyController extends Controller
 
 				if (!empty($val['image'])) {
 
-					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['paths']['project_media_ln2_maps'].$val['image']);
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['paths']['project_media_l2_maps'].$val['image']);
 
 					if ($m[$key]['mapExists']) {
 	
-						$m[$key]['size'] = getimagesize($_SESSION['admin']['project']['paths']['project_media_ln2_maps'].$val['image']);
+						$m[$key]['size'] = getimagesize($_SESSION['admin']['project']['paths']['project_media_l2_maps'].$val['image']);
 					
 					}
 					
@@ -1606,12 +1609,64 @@ class MapKeyController extends Controller
 
 			}
 			
-			$_SESSION['admin']['system']['maps']['ln2Maps'] = $m;
+			$_SESSION['admin']['system']['maps']['L2Maps'] = $m;
 	
 		}
 
-		return isset($id) ? $_SESSION['admin']['system']['maps']['ln2Maps'][$id] : $_SESSION['admin']['system']['maps']['ln2Maps'];
+		return isset($id) ? $_SESSION['admin']['system']['maps']['L2Maps'][$id] : $_SESSION['admin']['system']['maps']['L2Maps'];
 	
 	}
 
+
+	private function l2GetFirstOccurringTaxonId()
+	{
+
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'distinct taxon_id'
+			)
+		);
+		
+		if (!$ot) return null;
+
+		$this->getTaxonTree();
+		
+		$t = array();
+		
+		foreach((array)$ot as $key => $val) {
+
+			if (isset($this->treeList[$val['taxon_id']])) {
+			    $d = $this->treeList[$val['taxon_id']];
+                $t[$val['taxon_id']] = $d;
+			}
+			
+		}
+
+		$this->customSortArray($t,array('key' => 'taxon','maintainKeys' => true));
+
+		$prevId = null;
+
+		foreach((array)$t as $key => $val) {
+
+			if (isset($prevId)) {
+
+				$t[$key]['prev']['id'] = $prevId;
+				$t[$prevId]['next']['id'] = $val['id'];
+
+			}
+			
+			$prevId = $val['id'];
+			
+		}
+
+		if (!isset($t)) return null;
+
+		$t = array_shift($t);
+	
+		return $t['id'];
+
+	}
+	
+	
 }
