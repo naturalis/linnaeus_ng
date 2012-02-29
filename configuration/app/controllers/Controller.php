@@ -1301,10 +1301,11 @@ class Controller extends BaseClass
 		} else {
 	
 			$_SESSION['app']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
-
+			
 		}
 
 		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
+		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
 
 		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
 
