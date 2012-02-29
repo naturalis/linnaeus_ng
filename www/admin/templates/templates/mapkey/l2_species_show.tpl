@@ -2,7 +2,7 @@
 {assign var=map value=$maps[$mapId]}
 <div id="page-main">
 {if $map.mapExists}
-<div>{$map.name} / <span id=coordinates></span></div>
+<div>{$map.name} ({$map.coordinates.topLeft.lat}, {$map.coordinates.topLeft.long} x {$map.coordinates.bottomRight.lat}, {$map.coordinates.bottomRight.long}) <span id=coordinates></span></div>
 {else}
 <div>
 {t _s1=$map.name}The image file for the map "%s" is missing.{/t}

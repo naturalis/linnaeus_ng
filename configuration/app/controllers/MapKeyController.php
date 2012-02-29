@@ -5,20 +5,6 @@ div index:
 	values of "-"
 	double nodes in boudary nodes
 
-
-update dev_diversity_index set project_id = 278;
-update dev_diversity_index set type_id = 468 where type_id = 418;
-update dev_diversity_index set type_id = 469 where type_id = 419;
-update dev_diversity_index set type_id = 470 where type_id = 420;
-update dev_diversity_index set type_id = 471 where type_id = 421;
-update dev_diversity_index set type_id = 472 where type_id = 422;
-update dev_diversity_index set type_id = 473 where type_id = 423;
-update dev_diversity_index set type_id = 475 where type_id = 425;
-update dev_diversity_index set type_id = 476 where type_id = 426;
-update dev_diversity_index set type_id = 477 where type_id = 427;
-
-
-
 */
 
 include_once ('Controller.php');
@@ -32,7 +18,9 @@ class MapKeyController extends Controller
 		'occurrence_taxon',
 		'geodata_type',
 		'geodata_type_title',
-		'diversity_index'
+		'diversity_index',
+		'l2_occurrence_taxon',
+		'l2_map'
 	);
     
     public $usedHelpers = array('csv_parser_helper');
@@ -50,10 +38,13 @@ class MapKeyController extends Controller
 			array(
 				'main.js',
 				'mapkey.js',
+				'mapkey_l2.js',
 				'http://maps.google.com/maps/api/js?sensor=false&libraries=drawing',
 				'lookup.js'
 			)
 		);
+		
+	private $_mapType = 'lng';
 
 
     /**
@@ -69,6 +60,8 @@ class MapKeyController extends Controller
 		$this->checkForProjectId();
 
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
+		
+		$this->_mapType = $this->getDistributionMapType();
 
     }
 
@@ -91,14 +84,30 @@ class MapKeyController extends Controller
 
 		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
 
-		$taxa = $this->getTaxaWithOccurrences();
-
-		$d = current($taxa);
+		if ($this->_mapType=='l2') {
 		
-		if (isset($d['id'])) 
-			$this->redirect('examine_species.php?id='.$d['id']);
-		else
-			$this->redirect('examine.php');
+			$taxa = $this->l2GetTaxaWithOccurrences();
+		
+			$d = current($taxa);
+
+			if (isset($d['id'])) 
+				$this->redirect('l2_examine_species.php?id='.$d['id']);
+			else
+				$this->redirect('l2_examine.php');
+		
+		} else {
+
+			$taxa = $this->getTaxaWithOccurrences();
+
+			$d = current($taxa);
+		
+			if (isset($d['id'])) 
+				$this->redirect('examine_species.php?id='.$d['id']);
+			else
+				$this->redirect('examine.php');
+			
+		}
+
 	
 		/*
         $this->setPageName( _('Index'));
@@ -110,6 +119,8 @@ class MapKeyController extends Controller
 
 	public function examineAction()
 	{
+
+		if ($this->_mapType=='l2') $this->redirect('l2_examine.php');
 
 		$this->setPageName(_('Choose a species'));
 		
@@ -125,8 +136,27 @@ class MapKeyController extends Controller
 
 	}
 
+	public function l2ExamineAction()
+	{
+
+		$this->setPageName(_('Choose a species'));
+		
+		$pagination = $this->getPagination($this->l2GetTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+		if(isset($pagination['items'])) $this->smarty->assign('taxa',$pagination['items']);
+
+		$this->printPage('examine');	
+
+	}
+
 	public function examineSpeciesAction()
 	{
+
+		if ($this->_mapType=='l2') $this->redirect('l2_examine_species.php?id='.$this->requestData['id']);
 
 		if (!$this->rHasId()) $this->redirect('examine.php');
 
@@ -154,8 +184,47 @@ class MapKeyController extends Controller
 
 	}
 
+	public function l2ExamineSpeciesAction()
+	{
+	
+		if (!$this->rHasId()) $this->redirect('l2_examine.php');
+
+		$taxon = $this->getTaxonById($this->requestData['id']);
+
+		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
+
+
+		if (!$this->rHasVal('m'))
+			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
+		else
+			$mapId = $this->requestData['m'];
+
+		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
+
+		$this->smarty->assign('mapId',$mapId);
+
+		$this->smarty->assign('maps',$this->l2GetMaps());
+
+		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
+
+		$this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('count',$d['count']);
+
+		$this->smarty->assign('occurrences',$d['occurrences']);
+
+		$this->smarty->assign('adjacentItems', $this->l2getAdjacentItems($taxon['id']));
+
+		$this->smarty->assign('allLookupNavigateOverrideUrl', 'l2_examine_species.php?m='.$mapId.'&id=');
+
+		$this->printPage();	
+		
+	}
+
 	public function compareAction()
 	{
+
+		if ($this->_mapType=='l2') $this->redirect('l2_compare.php');
 
 		$occurrencesA = array();
 		$occurrencesB = array();
@@ -220,8 +289,74 @@ class MapKeyController extends Controller
 
 	}
 
+	public function L2CompareAction()
+	{
+
+		$this->setPageName(_('Comparing taxa'));
+
+		$maps = $this->l2GetMaps();
+
+		if ($this->rHasVal('m')) {
+
+			$mapId = $this->requestData['m'];
+
+		} elseif ($this->rHasVal('idA') && $this->rHasVal('idB')) {
+
+			if ($this->rHasVal('idA'))
+				$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['idA']);
+			elseif ($this->rHasVal('idB'))
+				$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['idB']);
+
+		} else {
+
+			$d = current($maps);
+
+			$mapId = $d['id'];
+
+		}
+			
+
+		if ($this->rHasVal('idA'))  $taxonA = $this->getTaxonById($this->requestData['idA']);
+
+		if ($this->rHasVal('idB')) $taxonB = $this->getTaxonById($this->requestData['idB']);
+
+		if ($this->rHasVal('idA') && $this->rHasVal('idB')) {
+		
+			$overlap = $this->L2GetOverlap(
+				$this->requestData['idA'],
+				$this->requestData['idB'],
+				$mapId,
+				$this->rHasVal('selectedDataTypes') ? $this->requestData['selectedDataTypes'] : null
+			);
+	
+			$this->setPageName(sprintf(_('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
+
+		}
+
+		if (isset($overlap)) $this->smarty->assign('overlap',$overlap);
+
+		if (isset($taxonA)) $this->smarty->assign('taxonA',$taxonA);
+
+		if (isset($taxonB)) $this->smarty->assign('taxonB',$taxonB);
+
+		$this->smarty->assign('selectedDataTypes',$this->rHasVal('selectedDataTypes') ? $this->requestData['selectedDataTypes'] : '*');
+
+		$this->smarty->assign('mapId',$mapId);
+
+		$this->smarty->assign('taxa',$this->l2GetTaxaWithOccurrences());
+
+		$this->smarty->assign('maps',$maps);
+
+		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
+
+		$this->printPage();	
+
+	}
+
 	public function searchAction()
 	{
+
+		if ($this->_mapType=='l2') $this->redirect('l2_search.php');
 
 		$this->setPageName(_('Search'));
 
@@ -265,6 +400,73 @@ class MapKeyController extends Controller
 		$this->smarty->assign('mapInitString','{drawingmanager:true}');
 
 		$this->printPage();	
+
+	}
+	
+	public function L2SearchAction()
+	{
+
+		$this->setPageName(_('Search'));
+
+		$maps = $this->l2GetMaps();
+
+		$d = current($maps);
+
+		$mapId = $d['id'];
+
+		$this->smarty->assign('mapId',$mapId);
+
+		$this->smarty->assign('maps',$maps);
+
+
+
+
+
+
+		$this->printPage();	
+
+
+
+		die();
+
+		if ($this->rHasVal('coordinates')) {
+		
+			$coordinates = $this->rectangleIntoPolygon($this->requestData['coordinates']);
+
+			$results = $this->searchPolygon($coordinates);
+
+			if ($results['count']['total']>0) {
+
+				$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		
+				$taxa = $this->getTreeList();				
+
+				$geoDataTypes = $this->getGeoDataTypes();
+
+			}
+
+			$c = explode('),(',$coordinates);
+			
+			foreach((array)$c as $key => $val) {
+				$d = explode(',',trim($val,')('));
+				$nodes[] = array('latitude' => $d[0], 'longitude' => $d[1]);
+			}
+
+			$this->smarty->assign('coordinates',$this->requestData['coordinates']);
+
+			$this->smarty->assign('mapBorder',$this->getMapBorder(array_merge((array)$results['results'],(array)$nodes)));
+
+		}
+
+		if (isset($results)) $this->smarty->assign('results',$results['results']);
+
+		if (isset($results)) $this->smarty->assign('count',$results['count']);
+
+		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		if (isset($geoDataTypes)) $this->smarty->assign('geoDataTypes',$geoDataTypes);
+
+		$this->smarty->assign('mapInitString','{drawingmanager:true}');
 
 	}
 	
@@ -434,8 +636,9 @@ class MapKeyController extends Controller
 
 	private function getGeodataTypes($id=null)
 	{
-	
+
 		$d['project_id'] = $this->getCurrentProjectId();
+
 		if (isset($id)) $d['id'] = $id;
 	
 		$gt = $this->models->GeodataType->_get(
@@ -462,14 +665,12 @@ class MapKeyController extends Controller
 			$gt[$key]['title'] = isset($gtl[0]['title']) ? $gtl[0]['title'] : '-';
 			$gt[$key]['colour_inverse'] = $this->inverseColour($val['colour']);
 	
-			$_SESSION['app']['user']['map']['geoDataTypes'] = $gt;
-
 		}
-
+			
 		if (isset($id))
-			return $_SESSION['app']['user']['map']['geoDataTypes'][$id];
+			return $gt[$id];
 		else
-			return $_SESSION['app']['user']['map']['geoDataTypes'];
+			return $gt;
 	
 	}
 
@@ -750,5 +951,254 @@ class MapKeyController extends Controller
 		return null;
 
 	}
+
+
+	// Linnaeus 2 map functions
+
+	private function getDistributionMapType()
+	{
+	
+		return $this->l2CountMaps()!=0 ? 'l2' : 'lng';
+	
+	}
+
+	private function l2CountMaps()
+	{
+
+		$d = $this->models->L2Map->_get(
+			array('id' =>
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'image !=' => '\'\''
+				),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		return $d[0]['total'];
+
+	}
+	
+	private function l2GetTaxaWithOccurrences()
+	{
+
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+
+		$taxa = $this->l2GetTaxaOccurrenceCount($this->getTreeList());
+		
+		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+		
+		return $taxa;
+	
+	}
+
+	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
+	{
+
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+				),
+				'columns' => 'taxon_id,count(*) as total',
+				'group' => 'taxon_id',
+				'fieldAsIndex' => 'taxon_id'
+			)
+		);
+		
+		
+		if (isset($taxaToFilter)) {
+		
+			foreach((array)$ot as $key => $val) {
+			
+				if ($val['total']!=0 && isset($taxaToFilter[$key])) {
+				
+					$d[$key] = $taxaToFilter[$key];
+					$d[$key]['total'] = $val['total'];
+
+				}
+			
+			}
+			
+		} else {
+		
+			$d = $ot;
+		
+		}
+
+		return isset($d) ? $d : null;
+	
+	}
+
+	private function l2GetFirstOccurrenceMapId($id)
+	{
+
+		if (!isset($id)) return;
+
+		$d = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id
+				),
+				'columns' => 'map_id',
+				'limit' => 1
+			)
+		);
+
+		return $d[0]['map_id'];
+
+	}
+
+	private function l2getAdjacentItems($id)
+	{
+
+		$taxa = $this->l2GetTaxaWithOccurrences();
+		
+		reset($taxa);
+		
+		$prev = $next = null;
+
+		while (list($key, $val) = each($taxa)) {
+		
+			if ($key==$id) {
+
+				$next = current($taxa); // current = next because the pointer has already shifted forward
+
+				return array(
+					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+				);
+
+			}
+
+			$prev = $val;
+
+		}
+		
+		return null;
+
+	}
+
+	private function l2GetMaps($id=null)
+	{
+
+		if (!isset($_SESSION['app']['user']['map']['L2Maps'])) {
+
+			$m = $this->models->L2Map->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'fieldAsIndex' => 'id'
+				)
+			);
+
+			foreach((array)$m as $key => $val) {
+
+				if (!empty($val['image'])) {
+
+					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['project_media_l2_maps'].$val['image']);
+
+					if ($m[$key]['mapExists']) {
+	
+						$m[$key]['size'] = getimagesize($_SESSION['app']['project']['urls']['project_media_l2_maps'].$val['image']);
+					
+					}
+					
+				}
+				
+				$d = json_decode($val['coordinates']);
+
+				$m[$key]['coordinates'] = array(
+					'topLeft' => array(
+						'lat' => (string)$d->topLeft->lat,
+						'long' => (string)$d->topLeft->long
+					),
+					'bottomRight' => array(
+						'lat' => (string)$d->bottomRight->lat,
+						'long' => (string)$d->bottomRight->long
+					),
+					'original' => $val['coordinates']
+				);
+
+			}
+			
+			$_SESSION['app']['user']['map']['L2Maps'] = $m;
+	
+		}
+
+		return isset($id) ? $_SESSION['app']['user']['map']['L2Maps'][$id] : $_SESSION['app']['user']['map']['L2Maps'];
+	
+	}
+
+	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
+	{
+	
+		if (!isset($id) || !isset($mapId)) return;
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $id,
+			'map_id' => $mapId
+		);
+		
+		if (isset($typeId)) $d['type_id'] = $typeId;
+
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => $d,
+				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
+				'fieldAsIndex' => 'square_number'
+				
+			)
+		);
+
+		$dataTypes = array();
+
+		foreach((array)$ot as $key => $val) {
+		
+			$dataTypes[$val['type_id']] = $val['type_id'];
+		
+			$d = $this->getGeodataTypes($val['type_id']);
+
+			$ot[$key]['type_title'] = $d['title'];
+			$ot[$key]['colour'] = $d['colour'];
+
+		}
+
+		// why the count??
+		return array('occurrences' => $ot, 'count' => count((array)$ot));
+
+	}
+
+	private function L2GetOverlap($id1,$id2,$mapId,$dataTypes)
+	{
+
+		if (!isset($id1) || !isset($id2) || !isset($mapId)) return;
+
+		$o1 = $this->l2GetTaxonOccurrences($id1,$mapId);
+		$o2 = $this->l2GetTaxonOccurrences($id2,$mapId);
+		
+		$d = array();
+		
+		foreach((array)$o1['occurrences'] as $key => $val) {
+		
+			if (is_null($dataTypes) || (!is_null($dataTypes) && isset($dataTypes[$val['type_id']])))
+				$d[$val['square_number']] = 'A';
+		
+		}
+
+		foreach((array)$o2['occurrences'] as $key => $val) {
+		
+			if (is_null($dataTypes) || (!is_null($dataTypes) && isset($dataTypes[$val['type_id']])))
+				$d[$val['square_number']] = isset($d[$val['square_number']]) && $d[$val['square_number']] == 'A' ? 'AB' : 'B';
+		
+		}
+
+		return $d;
+
+	}
+
+
+
 
 }
