@@ -1,3 +1,30 @@
+function l2SetMap(url,w,h) {
+
+	$('#mapTable').css('background','url('+url+')');
+	$('#mapTable').css('width',w+'px');
+	$('#mapTable').css('height',h+'px');
+
+}
+
+function l2ScaleCells(w,h) {
+	$('td').each(function (i) {
+		if ($(this).hasClass('mapCell')) {
+	
+			$(this).css('width',w+'px');
+			$(this).css('height',h+'px');
+
+		}
+	});
+	
+}
+
+function l2MapMouseOver(x,y) {
+
+  msg = x + ", " + y;
+  $("#coordinates").html(msg);
+}
+
+
 function l2ToggleDatatype(ele) {
 
 	if ($(ele).attr('checked'))
@@ -38,21 +65,52 @@ function l2DataTypeToggle() {
 
 }
 
-var l2TaggedCells = Array();
-
 function l2TagMapCell(ele) {
-
-	if (l2TaggedCells[ele.id]==1) {
+	
+	if ($(ele).hasClass('mapCellTagged')) {
 		
-		l2TaggedCells[ele.id] = 0;
 		$(ele).removeClass('mapCellTagged');
 		
 	} else {
 
-		l2TaggedCells[ele.id] = 1;
 		$(ele).addClass('mapCellTagged');
 
 	}
+	
 
+}
+
+function l2DoClearSearch() {
+
+	$('td[id^="cell-"]').each(function(i) {
+
+		if ($(this).hasClass('mapCellTagged')) $(this).removeClass('mapCellTagged');
+
+	});
+
+
+}
+
+function l2DoSearchMap() {
+
+	$('td[id^="cell-"]').each(function(i) {
+
+		if ($(this).hasClass('mapCellTagged')) {
+			
+			$('<input type="hidden" name="selectedCells[]">').val($(this).attr('id').replace('cell-','')).appendTo('#theForm');
+			
+		} 
+
+	});
+	
+	$('#theForm').submit();
+
+
+}
+
+function l2DiversityCellClick(ele) {
+
+	$('<input type="hidden" name="selectedCell">').val($(ele).attr('id').replace('cell-','')).appendTo('#theForm');
+	$('#theForm').submit();
 
 }

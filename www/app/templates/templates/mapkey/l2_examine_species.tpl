@@ -1,54 +1,24 @@
 {include file="../shared/header.tpl"}
 
-<div id="page-main">
 {assign var=map value=$maps[$mapId]}
+
 <div id="page-main">
 
 {if $map.mapExists}
-<div>{$map.name} ({$map.coordinates.topLeft.lat}, {$map.coordinates.topLeft.long} x {$map.coordinates.bottomRight.lat}, {$map.coordinates.bottomRight.long}) <span id=coordinates></span></div>
+	<div>{$map.name} <span id=coordinates></span></div>
 {else}
-<div>
-{t _s1=$map.name}The image file for the map "%s" is missing.{/t}
-</div>
+	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {/if}
+
+
 {if $map.mapExists}
-<style>
-{literal}
-.mapCell,.mapCellLegend {
-	width:{/literal}{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1}{literal}px;
-	height:{/literal}{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}{literal}px;
-	padding:0px;
-	margin:0px;
-	border-right:1px dotted #777;
-	border-bottom:1px dotted #777;
-	filter: alpha(opacity=60);
-	-moz-opacity: .60;
-	-khtml-opacity: 0.60;
-	opacity: .60;
-}
-.mapCellLegend {
-	border:1px solid #000;
-	width:7px;
-	height:7px;
-	padding:0px;
-	margin:0px;
-}
-{/literal}
-</style>
+
 <table>
 	<tr style="vertical-align:top">
 		<td>
 
 
-<table 
-	style="
-		background:url({$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'});
-		width:{$map.size[0]}px;
-		height:{$map.size[1]}px;
-		padding:0px;
-		margin:0px;
-		border-collapse:collapse;"
->
+<table id="mapTable">
 {assign var=cellNo value=1}
 {section name=rows start=1 loop=$map.rows+1 step=1}
 	<tr>
@@ -68,12 +38,22 @@
 {/if}
 </td>
 <td style="padding-left:4px;">
-	<span style="margin-left:4px;font-weight:bold">{$taxon.taxon}</span><br />
+	<span id="mapTaxonName">{$taxon.taxon}</span><br />
 	{foreach from=$geoDataTypes key=k item=v name=x}
 		<p style="margin:0px;">
 			<label><input type="checkbox" checked="checked" value="{$v.id}" onchange="l2ToggleDatatype(this)"/><span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{$v.title}</label>
 		</p>
 	{/foreach}
+	{if $session.app.user.map.search.taxa}
+	<p>
+	<a href="l2_search.php?action=research">{t}Back to search results.{/t}</a>
+	</p>
+	{/if}
+	{if $session.app.user.map.index}
+	<p>
+	<a href="l2_diversity.php?action=reindex">{t}Back to diversity index.{/t}</a>
+	</p>
+	{/if}
 </td>
 </tr>
 </table>	
@@ -86,10 +66,6 @@
 </p>
 
 
-
-
-
-
 </div>
 
 {literal}
@@ -97,15 +73,16 @@
 $(document).ready(function(){
 {/literal}
 
-{foreach from=$occurrences key=k item=v}
 
+l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]});
+l2ScaleCells({math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1});
+
+{foreach from=$occurrences key=k item=v}
 {if $taxon}
 {assign var=taxonName value=$taxon.taxon}
 {else if $v.taxon.taxon}
 {assign var=taxonName value=$v.taxon.taxon}
 {/if}
-
-
 {/foreach}
 
 {literal}

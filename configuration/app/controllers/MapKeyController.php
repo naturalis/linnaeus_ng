@@ -30,6 +30,7 @@ class MapKeyController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'map.css',
+		'map_l2.css',
 		'lookup.css'
 	);
 
@@ -188,11 +189,14 @@ class MapKeyController extends Controller
 	{
 	
 		if (!$this->rHasId()) $this->redirect('l2_examine.php');
+		
+		if (!$this->rHasVal('ref','search')) unset($_SESSION['app']['user']['map']['search']);
+
+		if (!$this->rHasVal('ref','diversity')) unset($_SESSION['app']['user']['map']['index']);
 
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
 		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
-
 
 		if (!$this->rHasVal('m'))
 			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
@@ -322,7 +326,7 @@ class MapKeyController extends Controller
 
 		if ($this->rHasVal('idA') && $this->rHasVal('idB')) {
 		
-			$overlap = $this->L2GetOverlap(
+			$overlap = $this->l2GetOverlap(
 				$this->requestData['idA'],
 				$this->requestData['idB'],
 				$mapId,
@@ -403,75 +407,68 @@ class MapKeyController extends Controller
 
 	}
 	
-	public function L2SearchAction()
+	public function l2SearchAction()
 	{
 
 		$this->setPageName(_('Search'));
-
+		
 		$maps = $this->l2GetMaps();
 
-		$d = current($maps);
+		if ($this->rHasVal('mapId')) {
 
-		$mapId = $d['id'];
+			$mapId = $this->requestData['mapId'];
+		
+		} else {
+
+			$d = current($maps);
+	
+			$mapId = $d['id'];
+			
+		}
+
+		if ($this->rHasVal('action','research') && isset($_SESSION['app']['user']['map']['search'])) {
+
+			$taxa = $_SESSION['app']['user']['map']['search']['taxa'];
+			$selectedCells = $_SESSION['app']['user']['map']['search']['selectedCells'];
+			$mapId = $_SESSION['app']['user']['map']['search']['mapId'];
+		
+		
+		} else
+		if ($this->rHasVal('selectedCells') && $this->rHasVal('mapId')) {
+		
+			$taxa = $this->l2DoSearchMap($this->requestData['mapId'],$this->requestData['selectedCells']);
+
+			foreach((array)$this->requestData['selectedCells'] as $val)
+				$selectedCells[$val] = true;
+		
+			$_SESSION['app']['user']['map']['search'] = array(
+				'mapId' => $mapId, 
+				'selectedCells' => $selectedCells, 
+				'taxa' => $taxa
+				);
+
+		} else {
+
+			unset($_SESSION['app']['user']['map']['search']);
+
+		}
+
+		if (isset($selectedCells)) $this->smarty->assign('selectedCells',$selectedCells);
+
+		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
 
 		$this->smarty->assign('mapId',$mapId);
 
 		$this->smarty->assign('maps',$maps);
 
-
-
-
-
-
 		$this->printPage();	
-
-
-
-		die();
-
-		if ($this->rHasVal('coordinates')) {
-		
-			$coordinates = $this->rectangleIntoPolygon($this->requestData['coordinates']);
-
-			$results = $this->searchPolygon($coordinates);
-
-			if ($results['count']['total']>0) {
-
-				$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
-		
-				$taxa = $this->getTreeList();				
-
-				$geoDataTypes = $this->getGeoDataTypes();
-
-			}
-
-			$c = explode('),(',$coordinates);
-			
-			foreach((array)$c as $key => $val) {
-				$d = explode(',',trim($val,')('));
-				$nodes[] = array('latitude' => $d[0], 'longitude' => $d[1]);
-			}
-
-			$this->smarty->assign('coordinates',$this->requestData['coordinates']);
-
-			$this->smarty->assign('mapBorder',$this->getMapBorder(array_merge((array)$results['results'],(array)$nodes)));
-
-		}
-
-		if (isset($results)) $this->smarty->assign('results',$results['results']);
-
-		if (isset($results)) $this->smarty->assign('count',$results['count']);
-
-		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
-
-		if (isset($geoDataTypes)) $this->smarty->assign('geoDataTypes',$geoDataTypes);
-
-		$this->smarty->assign('mapInitString','{drawingmanager:true}');
 
 	}
 	
 	public function diversityAction()
 	{
+
+		if ($this->_mapType=='l2') $this->redirect('l2_diversity.php');
 	
 		$this->setPageName(_('Diversity index'));
 
@@ -490,12 +487,80 @@ class MapKeyController extends Controller
 		$this->printPage();		
 	
 	}
-	
-	private function getDiversityIndex()
+
+	public function l2DiversityAction()
 	{
 	
-		return $this->models->DiversityIndex->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+		$this->setPageName(sprintf(_('Diversity index')));
+		
+		$maps = $this->l2GetMaps();
+
+		if (!$this->rHasVal('m')) {
+			$d = current($maps);
+			$mapId = $d['id'];
+		} else
+			$mapId = $this->requestData['m'];
+
+
+		if ($this->rHasVal('action','reindex') && isset($_SESSION['app']['user']['map']['index'])) {
+
+			$d = $_SESSION['app']['user']['map']['index'];
+
+			$taxa = isset($d['taxa']) ? $d['taxa'] : null;
+			$selectedCell = isset($d['selectedCell']) ? $d['selectedCell'] : null;
+			$selectedDatatypes = isset($d['selectedDatatypes']) ? $d['selectedDatatypes'] : null;
+			$mapId = isset($d['mapId']) ? $d['mapId'] : null;
+			$index = isset($d['index']) ? $d['index'] : null;
+
+		} else {
+
+			unset($_SESSION['app']['user']['map']['index']);
+
+			$index = $this->l2GetDiversityIndex($mapId,($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : null));
+
+			$_SESSION['app']['user']['map']['index'] = array(
+				'mapId' => $mapId,
+				'index' => $index
+			);
+			
+			if ($this->rHasVal('selectedDatatypes')) {
 	
+				foreach((array)$this->requestData['selectedDatatypes'] as $val)
+					$selectedDatatypes[$val] = true;
+
+				$_SESSION['app']['user']['map']['index']['selectedDatatypes'] = $selectedDatatypes;
+
+			}
+	
+			if ($this->rHasVal('selectedCell')) {
+			
+				$taxa = $this->l2DoSearchMap($this->requestData['m'],(array)$this->requestData['selectedCell']);
+			
+				$selectedCell = $this->requestData['selectedCell'];
+	
+				$_SESSION['app']['user']['map']['index']['taxa'] = $taxa;
+				$_SESSION['app']['user']['map']['index']['selectedCell'] = $this->requestData['selectedCell'];
+
+			}
+			
+		}
+				
+		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
+
+		if (isset($selectedDatatypes)) $this->smarty->assign('selectedDatatypes',$selectedDatatypes);
+
+		$this->smarty->assign('index',$index);
+
+		$this->smarty->assign('mapId',$mapId);
+
+		$this->smarty->assign('maps',$maps);
+
+		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
+
+		$this->printPage();	
+
 	
 	}
 
@@ -515,7 +580,13 @@ class MapKeyController extends Controller
         $this->printPage();
 	
 	}
+	
+	private function getDiversityIndex()
+	{
+	
+		return $this->models->DiversityIndex->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
 
+	}
 
 	private function checkRemoteServerAccessibility()
 	{
@@ -1170,7 +1241,7 @@ class MapKeyController extends Controller
 
 	}
 
-	private function L2GetOverlap($id1,$id2,$mapId,$dataTypes)
+	private function l2GetOverlap($id1,$id2,$mapId,$dataTypes)
 	{
 
 		if (!isset($id1) || !isset($id2) || !isset($mapId)) return;
@@ -1198,7 +1269,88 @@ class MapKeyController extends Controller
 
 	}
 
+	private function l2DoSearchMap($mapId,$selectedCells)
+	{
+	
+		if (!isset($mapId) || !isset($selectedCells)) return;
+		
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'map_id' => $mapId,
+					'square_number in' => '('.implode(',',$selectedCells).')'
+				),
+				'columns' => 'distinct taxon_id'
+				
+			)
+		);
+		
+		foreach((array)$ot as $val) $d[] = $this->getTaxonById($val['taxon_id']);
 
+		$this->customSortArray($d,array(
+			'key' => 'taxon', 
+			'dir' => 'asc', 
+			'case' => 'i'
+			)
+		);
+
+		return $d;
+
+	}
+
+	private function l2GetDiversityIndex($mapId,$typeId=null)
+	{
+
+		$sessIdx = 	$mapId.':'.(isset($typeId) ? implode('-',$typeId) : '');	
+
+		if (!isset($_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx])) {
+
+			$d = array(
+					'project_id' => $this->getCurrentProjectId(),
+					'map_id' => $mapId
+				);
+				
+			if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';
+		
+			$ot = $this->models->L2OccurrenceTaxon->_get(
+				array(
+					'id' => $d,
+					'columns' => 'count(*) as total, square_number',
+					'group' => 'square_number',
+					'order' => 'total desc',
+					'fieldAsIndex' => 'square_number',				
+				)
+			);
+	
+			if ($ot) {
+				$d = current($ot);
+				$max = $d['total'];
+				end($ot);
+				$d = current($ot);
+				$min = $d['total'];
+			} else {
+				$max = $min = 0;
+			}
+	
+			foreach((array)$ot as $key => $val) {
+			
+				$ot[$key]['pct'] = round(($val['total'] / $max) * 100);
+				$ot[$key]['class'] = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
+	
+			}
+
+			$_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx] = array(
+				'index' => $ot,
+				'min' => $min,
+				'max' => $max
+			);
+
+		}
+		
+		return $_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx];
+
+	}
 
 
 }

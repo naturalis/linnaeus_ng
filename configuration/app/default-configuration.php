@@ -183,7 +183,8 @@ class configuration
 			'speciesPerPage' => 20,
             'maxTypes' => 10,
 			'urlToCheckConnectivity' =>'http://maps.google.com/maps/api/js?sensor=false',
-			'SRID' => 4326
+			'SRID' => 4326,
+			'l2DiversityIndexNumOfClasses' => 8 // be aware that increasing this does *not* automatically create extra css classes
 		);
 
     }
