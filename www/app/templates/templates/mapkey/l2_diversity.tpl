@@ -5,7 +5,7 @@
 <div id="page-main">
 
 {if $map.mapExists}
-	<div>{$map.name} <span id=coordinates></span></div>
+	<div>{$map.name} (<span id=coordinates>0,0</span>)</div>
 {else}
 	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {/if}
@@ -65,16 +65,8 @@
 		{/if}
 		
 		</td>
-</tr>
-</table>	
-
-
-
-
-
-
-
-
+	</tr>
+</table>
 </div>
 
 {literal}
@@ -82,19 +74,15 @@
 $(document).ready(function(){
 {/literal}
 
-l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]});
+l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]},'{$map.coordinates.original}');
 l2ScaleCells({math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1});
-
 {literal}
-$("#satan").mousemove(function(event) {
+$("#mapTable").mousemove(function(event) {
 	l2MapMouseOver(event.pageX,event.pageY);
 });	
-
 
 });
 </script>
 {/literal}
-
-</div>
 
 {include file="../shared/footer.tpl"}

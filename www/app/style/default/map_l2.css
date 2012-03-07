@@ -15,6 +15,17 @@
 	opacity: .70;
 }
 
+.mapCellAxis {
+	background-color:white;
+	border-right:none;
+	border-bottom:none;
+	filter: alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.mapCellAxisInfoX {
+}
 .mapCellLegend {
 	border:1px solid #000;
 	width:7px;
