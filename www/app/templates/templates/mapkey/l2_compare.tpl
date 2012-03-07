@@ -5,7 +5,7 @@
 <div id="page-main">
 
 {if $map.mapExists}
-	<div>{$map.name} <span id=coordinates></span></div>
+	<div>{$map.name} (<span id=coordinates>0,0</span>)</div>
 {else}
 	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {/if}
@@ -26,12 +26,12 @@
 			{/section}
 			</table>
 		{/if}
-		<p>
-		{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-		{if $maps|@count>1}
-		{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-		{/if}
-		</p>		
+			<p>
+			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
+			{if $maps|@count>1}
+			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
+			{/if}
+			</p>		
 		</td>
 		<td style="padding-left:4px;">
 			{t}Select two species to compare{/t}<br /><br />
@@ -72,8 +72,7 @@
 			</p>
 		</td>
 	</tr>
-</table>	
-
+</table>
 </div>
 
 {literal}
@@ -81,10 +80,13 @@
 $(document).ready(function(){
 {/literal}
 
-l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]});
+l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]},'{$map.coordinates.original}');
 l2ScaleCells({math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1});
-
 {literal}
+$("#mapTable").mousemove(function(event) {
+	l2MapMouseOver(event.pageX,event.pageY);
+});
+
 });
 </script>
 {/literal}

@@ -1,8 +1,19 @@
-function l2SetMap(url,w,h) {
+var l2MapCoordinates = '';
+var l2MapPxHeight = -1;
+var l2MapPxWidth = -1;
 
-	$('#mapTable').css('background','url('+url+')');
-	$('#mapTable').css('width',w+'px');
-	$('#mapTable').css('height',h+'px');
+function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
+
+	l2MapPxWidth = mapW;
+	l2MapPxHeight = mapH;
+
+	l2MapCoordinates = $.parseJSON(mapCoord);
+
+	$('#mapTable').css('background','url('+mapUrl+')');
+	$('#mapTable').css('width',(l2MapPxWidth+cellW)+'px');
+	$('#mapTable').css('height',(l2MapPxHeight+cellH)+'px');
+	
+	l2ScaleCells(cellW,cellH);
 
 }
 
@@ -20,10 +31,27 @@ function l2ScaleCells(w,h) {
 
 function l2MapMouseOver(x,y) {
 
-  msg = x + ", " + y;
-  $("#coordinates").html(msg);
-}
+	/*
+	l2MapCoordinates.topLeft.lat
+	l2MapCoordinates.topLeft.long
+	l2MapCoordinates.bottomRight.lat
+	l2MapCoordinates.bottomRight.long
+	*/
+	
+	var o = $('#mapTable').offset();
 
+	var widthInDegrees = 
+		(l2MapCoordinates.topLeft.long >= l2MapCoordinates.bottomRight.long ? 
+		  	l2MapCoordinates.topLeft.long - l2MapCoordinates.bottomRight.long : 
+			360 + l2MapCoordinates.topLeft.long - l2MapCoordinates.bottomRight.long);
+
+	var posY = -1 * ((((y-o.top) / l2MapPxHeight) * (l2MapCoordinates.topLeft.lat - l2MapCoordinates.bottomRight.lat)) - l2MapCoordinates.topLeft.lat);
+	var posX = (l2MapCoordinates.topLeft.long - (((x-o.left) / l2MapPxWidth) * widthInDegrees));
+	posX = (posX<=-180 ? posX+360: posX);
+
+	$("#coordinates").html(Math.round(posY)+','+Math.round(posX));
+
+}
 
 function l2ToggleDatatype(ele) {
 
