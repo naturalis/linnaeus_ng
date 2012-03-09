@@ -4,6 +4,8 @@
 	ISSUE
 	user.active is system wide (i.e., trans-project), but can be set by specific project admins
 
+	send e-mail when added to a project
+
 */
 
 include_once ('Controller.php');
@@ -291,7 +293,7 @@ class UsersController extends Controller
 				'columns' => 'distinct user_id, role_id,
 					if(active=1,"active","blocked") as status,
 					concat(datediff(curdate(),created)," '._('days').'") as days_active,
-					ifnull(last_project_select,"'._('(has never worked on project)').'") as last_login'
+					ifnull(date_format(last_project_select,\'%d-%m-%Y\'),"-") as last_login'
 			)
 		);
 
@@ -344,11 +346,13 @@ class UsersController extends Controller
 
         $this->smarty->assign('columnsToShow',
             array(
+                array('name'=> 'first_name', 'label' => _('first name'),'align' => 'left'),
+                array('name'=> 'last_name', 'label' => _('last name'),'align' => 'left'),
                 array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
-                array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
+                array('name'=> 'email_address', 'label' => _('e-mail'),'align' => 'left'),
                 array('name'=> 'role', 'label'  => _('role'),'align' => 'left'),
-                array('name'=> 'days_active', 'label' => _('collaborator for'),'align' => 'right'),
                 array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
+                array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
             )
         );
 
@@ -472,6 +476,28 @@ class UsersController extends Controller
 
 				}
 
+				$pru = $this->models->ProjectRoleUser->_get(
+					array(
+						'id' => array('user_id' => $this->requestData['id']),
+						'columns' => 'project_id,role_id'
+					)
+				);
+				
+				foreach((array)$pru as $key => $val) {
+				
+					$p = $this->models->Project->_get(
+						array(
+							'id' => array('id' => $val['project_id']),
+							'columns' => 'title'
+						)
+					);
+
+					$pru[$key]['projectTitle'] = $p[0]['title'];
+					$d = $this->getUserProjectRole($this->requestData['id'],$val['project_id']);
+					$pru[$key]['role'] = $d['role']['role'];
+				
+				}
+
 				$this->smarty->assign('user',$user);
 				
 				$this->smarty->assign('currentRole',$currentRole);
@@ -481,6 +507,8 @@ class UsersController extends Controller
 				$this->smarty->assign('modules', $modules);
 
 				$this->smarty->assign('hasModules', $hasModules);
+
+				$this->smarty->assign('projects', $pru);
 
 			}
 			
@@ -494,29 +522,18 @@ class UsersController extends Controller
 
     }
 
-
-    /**
-     * Editing collaborator data
-     *
-     * See function code for detailed comments on the function's flow
-     *
-     * @access    public
-     */
-    public function editAction ()
+    public function deleteAction ()
     {
 
         $this->checkAuthorisation();
-        
-        $this->setPageName(_('Edit project collaborator'));
 
-		$user = $this->getUser($this->requestData['id']);
-
-		// [A]
-		$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
-
-		if ($this->rHasVal('action','delete') && !$this->isFormResubmit()) {
-		
+		if ($this->rHasId() && !$this->isFormResubmit()) {
 			
+			$user = $this->getUser($this->requestData['id']);
+			
+			//$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
+			$canDelete = $this->isCurrentUserSysAdmin();
+
 			if ($canDelete) {
 
 				$this->removeUserFromProject($this->requestData['id'],$this->getCurrentProjectId());
@@ -533,142 +550,180 @@ class UsersController extends Controller
 
 				}
 
-			}
-		
-		} else
-		if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
-
-			$this->requestData = $this->sanatizeUserData($this->requestData);
-			
-			$passwordsUnchanged = empty($this->requestData['password']) && empty($this->requestData['password_2']);
-
-			if (
-				$this->isUserDataComplete($this->requestData,($passwordsUnchanged ? array('password','password_2'): null)) &&
-				$this->isUsernameCorrect($this->requestData['username']) &&
-				$this->isUsernameUnique($this->requestData['username'],$user['id']) &&
-				($passwordsUnchanged || $this->arePasswordsIdentical($this->requestData['password'],$this->requestData['password_2'])) &&
-				($passwordsUnchanged || $this->isPasswordCorrect($this->requestData['password'])) &&
-				$this->isEmailAddressCorrect($this->requestData['email_address']) &&
-				$this->isEmailAddressUnique($this->requestData['email_address'],$user['id']) &&
-				$this->isRoleAssignable($this->requestData['role_id'])
-				) {
-				
-				//  [A]
-				// get the current role of the collaborator in the current project
-				//$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
-				
-				// if collaborator has a regular role, update to the new role...
-				//if ($upr['role_id'] != ID_ROLE_SYS_ADMIN && $upr['role_id'] != ID_ROLE_LEAD_EXPERT) {
-
-				$this->models->ProjectRoleUser->save(
-					array(
-						'id' => $this->requestData['userProjectRole'], 
-						'user_id' => $this->requestData['id'], 
-						'project_id' => $this->getCurrentProjectId(), 
-						'role_id' => $this->requestData['role_id'],
-						'active' => $this->requestData['active']
-					)
-				);
-				
-				/*
-				//  [A]
-			   } else {
-				// ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
-                        
-					$this->requestData['active'] = 1;
-                    
-				}
-				*/
-				
-				//  [A]
-				/*
-					'active' was moved to the ProjectRoleUser table but the column in User does still exist
-				*/
-				//$d = $this->requestData['active'];
-				//$this->requestData['active'] = 1;
-				
-				if (!$passwordsUnchanged)
-					$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
-				else
-					unset($this->requestData['password']);
-
-				$this->models->User->save($this->requestData);
-				$this->saveUsersModuleData($this->requestData,$this->requestData['id'],true);
-				
-				//$this->requestData['active'] = $d;
-				
-				$this->addMessage(_('User data saved'));
-				
-				$user = $this->getUser($this->requestData['id']);
-				
 			} else {
 
-				$user = $this->requestData;
-                
+				//$this->addError(_('User can only be deleted by system admin or user record\'s creator.'));
+				$this->addError(_('User can only be deleted by system admin.'));
+
 			}
-					
+		
+		} else {
+
+			$this->redirect('index.php');
+
 		}
 
-		$modules = $this->getProjectModules();
+	}
 
-		$mpu = $this->models->ModuleProjectUser->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'user_id' => $this->requestData['id'],			
-				),
-				'columns' => 'count(*) as total,module_id',
-				'group' =>  'module_id',
-				'fieldAsIndex' => 'module_id'
-			)
-		);
 
-		foreach ((array) $modules['modules'] as $key => $val) {
+    /**
+     * Editing collaborator data
+     *
+     * See function code for detailed comments on the function's flow
+     *
+     * @access    public
+     */
+    public function editAction ()
+    {
+
+        $this->checkAuthorisation();
+        
+		$this->setPageName(_('Edit project collaborator'));
+
+		if ($this->getCurrentUserRoleId() != ID_ROLE_SYS_ADMIN &&
+			$this->getCurrentUserRoleId() != ID_ROLE_LEAD_EXPERT && 
+			$this->getCurrentUserId() != $this->requestData['id']) {
 			
-			$modules['modules'][$key]['isAssigned'] = isset($mpu[$val['module_id']]) ? $mpu[$val['module_id']]['total']=='1' : false;
+			$this->addError(_('You are not authorized to edit that user.'));
+
+		} else {
+
+			$user = $this->getUser($this->requestData['id']);
+	
+			if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
+	
+				$this->requestData = $this->sanatizeUserData($this->requestData);
+				
+				$passwordsUnchanged = empty($this->requestData['password']) && empty($this->requestData['password_2']);
+	
+				if (
+					$this->isUserDataComplete($this->requestData,($passwordsUnchanged ? array('password','password_2'): null)) &&
+					$this->isUsernameCorrect($this->requestData['username']) &&
+					$this->isUsernameUnique($this->requestData['username'],$user['id']) &&
+					($passwordsUnchanged || $this->arePasswordsIdentical($this->requestData['password'],$this->requestData['password_2'])) &&
+					($passwordsUnchanged || $this->isPasswordCorrect($this->requestData['password'])) &&
+					$this->isEmailAddressCorrect($this->requestData['email_address']) &&
+					$this->isEmailAddressUnique($this->requestData['email_address'],$user['id']) &&
+					$this->isRoleAssignable($this->requestData['role_id'])
+					) {
+					
+					// get the current role of the collaborator in the current project
+					$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
+					
+					// if collaborator has a regular role (or the current user is sysadmin), update to the new role...
+					if (
+						($upr['role_id'] != ID_ROLE_SYS_ADMIN && $upr['role_id'] != ID_ROLE_LEAD_EXPERT) || 
+						$this->getCurrentUserRoleId() == ID_ROLE_SYS_ADMIN
+						) {
+	
+						$this->models->ProjectRoleUser->save(
+							array(
+								'id' => $this->requestData['userProjectRole'], 
+								'user_id' => $this->requestData['id'], 
+								'project_id' => $this->getCurrentProjectId(), 
+								'role_id' => $this->requestData['role_id'],
+								'active' => $this->requestData['active']
+							)
+						);
+					
+				   } else {
+					// ... but the role of lead expert or system admin cannot be changed, nether can he be made inactive
+							
+						$this->requestData['active'] = 1;
+						
+					}
+					
+					/*
+						'active' was moved to the ProjectRoleUser table but the column in User does still exist
+					*/
+					//$d = $this->requestData['active'];
+					//$this->requestData['active'] = 1;
+					
+					if (!$passwordsUnchanged)
+						$this->requestData['password'] = $this->userPasswordEncode($this->requestData['password']);
+					else
+						unset($this->requestData['password']);
+	
+					$this->models->User->save($this->requestData);
+					$this->saveUsersModuleData($this->requestData,$this->requestData['id'],true);
+					
+					//$this->requestData['active'] = $d;
+					
+					$this->addMessage(_('User data saved'));
+					
+					$user = $this->getUser($this->requestData['id']);
+					
+				} else {
+	
+					$user = $this->requestData;
+					
+				}
+						
+			}
+	
+			$modules = $this->getProjectModules();
+	
+			$mpu = $this->models->ModuleProjectUser->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'user_id' => $this->requestData['id'],			
+					),
+					'columns' => 'count(*) as total,module_id',
+					'group' =>  'module_id',
+					'fieldAsIndex' => 'module_id'
+				)
+			);
+	
+			foreach ((array) $modules['modules'] as $key => $val) {
+				
+				$modules['modules'][$key]['isAssigned'] = isset($mpu[$val['module_id']]) ? $mpu[$val['module_id']]['total']=='1' : false;
+	
+			}
+	
+			$fpu = $this->models->FreeModuleProjectUser->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'user_id' => $this->requestData['id'],			
+					),
+					'columns' => 'count(*) as total,free_module_id',
+					'group' =>  'free_module_id',
+					'fieldAsIndex' => 'free_module_id'
+				)
+			);
+	
+			foreach ((array) $modules['freeModules'] as $key => $val) {
+	
+				$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]) ? $fpu[$val['id']]['total']=='1' : false;
+	
+			}
+	
+			$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
+	
+			$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
+			
+			$roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
+	
+			$zones = $this->models->Timezone->_get(array('id' => '*'));
+	
+			$this->smarty->assign('isLeadExpert', $upr['role_id'] == ID_ROLE_LEAD_EXPERT);
+	
+			$this->smarty->assign('zones',$zones);
+	
+			$this->smarty->assign('modules',$modules['modules']);
+	
+			$this->smarty->assign('freeModules',$modules['freeModules']);
+	
+			$this->smarty->assign('roles',$roles);
+			
+			$this->smarty->assign('data',$user);
+			
+			$this->smarty->assign('userRole',$upr);
+	
+			$this->smarty->assign('canDelete',$canDelete);
 
 		}
-
-		$fpu = $this->models->FreeModuleProjectUser->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'user_id' => $this->requestData['id'],			
-				),
-				'columns' => 'count(*) as total,free_module_id',
-				'group' =>  'free_module_id',
-				'fieldAsIndex' => 'free_module_id'
-			)
-		);
-
-		foreach ((array) $modules['freeModules'] as $key => $val) {
-
-			$modules['freeModules'][$key]['isAssigned'] = isset($fpu[$val['id']]) ? $fpu[$val['id']]['total']=='1' : false;
-
-		}
-
-
-		$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
-		
-		$roles = $this->models->Role->_get(array('id'=>array('assignable' => 'y')));
-
-		$zones = $this->models->Timezone->_get(array('id' => '*'));
-
-		$this->smarty->assign('isLeadExpert', $upr['role_id'] == ID_ROLE_LEAD_EXPERT);
-
-		$this->smarty->assign('zones',$zones);
-
-		$this->smarty->assign('modules',$modules['modules']);
-
-		$this->smarty->assign('freeModules',$modules['freeModules']);
-
-		$this->smarty->assign('roles',$roles);
-		
-		$this->smarty->assign('data',$user);
-		
-		$this->smarty->assign('userRole',$upr);
-
-		$this->smarty->assign('canDelete',$canDelete);		
 	
 		$this->printPage(); 
 
@@ -894,7 +949,7 @@ class UsersController extends Controller
 		}
 
 		$roles = $this->models->Role->_get(array('id' => '*'));
-		$rights = $this->models->Right->_get(array('id' => '*'));
+		$rights = $this->models->Right->_get(array('id' => '*','order' => 'controller'));
 		
 		foreach((array)$rights as $iKey => $iVal) {
 
@@ -2111,6 +2166,6 @@ MUST CHECK
 		}
 		
 	}
-
+	
 	
 }

@@ -8,7 +8,7 @@
 	<th class="th-userlist-left-align" style="text-align:left">last name</th>
 	<th class="th-userlist-left-align" style="text-align:left">username</th>
 	<th class="th-userlist-left-align" style="text-align:left">e-mail</th>
-	<th class="th-userlist-left-align" style="text-align:right;">projects</th>
+	<th class="th-userlist-left-align" style="text-align:right;">in<br />projects</th>
 	{if $session.admin.project.id}
 	<th class="th-userlist-left-align" style="text-align:left;">current<br />project</th>
 	{/if}	
@@ -24,14 +24,14 @@
 	<td class="cell-userlist-right-align" style="padding-right:20px">{if $userProjectCount[$v.id].total}{$userProjectCount[$v.id].total}{else}0{/if}</td>
 	{if $session.admin.project.id}
 	{if $currentProjectUsers[$v.id]==''}
-	<td>[<span class="a" onclick="userAddToProject({$v.id});">{t}add{/t}</span>] [A]</td>
+	<td>[<span class="a" onclick="userAddToProject({$v.id});">{t}add{/t}</span>]</td>
 	{else}
-	<td>[<span class="a" onclick="userRemoveFromProject({$v.id});">{t}remove{/t}</span>] [A]</td>
+	<td>[<span class="a" onclick="userRemoveFromProject({$v.id});">{t}remove{/t}</span>]</td>
 	{/if}
 	{/if}
 	<!-- td class="cell-userlist-left-align">{$v.last_login}</td-->
-	<td>[<a href="view.php?id={$v.id}">{t}view{/t}</a>] [A]</td>
-	{* <td>[<a href="edit.php?id={$v.id}">{t}edit{/t}</a>] [A]</td> *}
+	<td>[<a href="view.php?id={$v.id}">{t}view{/t}</a>]</td>
+	{* <td>[<a href="edit.php?id={$v.id}">{t}edit{/t}</a>]</td> *}
 </tr>
 {/foreach}
 </table>

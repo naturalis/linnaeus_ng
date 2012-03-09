@@ -5,7 +5,7 @@
 
 {if !$excludeLogout}
 	<div style="text-align:right;position:relative;top:-20px">
-		{t}Logged in as{/t} {if $session.admin.user.last_name!=''}{$session.admin.user.first_name} {$session.admin.user.last_name} {if $session.admin.user.currentRole.role_name}({$session.admin.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
+		{t}Logged in as{/t} <a href="{$baseUrl}admin/views/users/edit.php?id={$session.admin.user.id}">{if $session.admin.user.last_name!=''}{$session.admin.user.first_name} {$session.admin.user.last_name}</a> {if $session.admin.user.currentRole.role_name}({$session.admin.user.currentRole.role_name}) {/if}(<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>){/if}
 	</div>
 {/if}
 </div>

@@ -80,8 +80,14 @@
 $(document).ready(function(){
 {/literal}
 
-l2SetMap('{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',{$map.size[0]},{$map.size[1]},'{$map.coordinates.original}');
-l2ScaleCells({math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1});
+l2SetMap(
+	'{$session.app.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'}',
+	{$map.size[0]},
+	{$map.size[1]},
+	'{$map.coordinates.original}',
+	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
+	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
+);
 {literal}
 $("#mapTable").mousemove(function(event) {
 	l2MapMouseOver(event.pageX,event.pageY);
