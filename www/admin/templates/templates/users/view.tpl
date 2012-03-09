@@ -48,38 +48,59 @@
 			{$currentRole.last_login}
 		</td>
 	</tr>
+	{if $session.admin.user.currentRole == $smarty.const.ID_ROLE_SYS_ADMIN || $session.admin.user.currentRole == $smarty.const.ID_ROLE_LEAD_EXPERT}
 	<tr>
 		<td colspan="2">
 			<input type="button" value="{t}edit{/t}" onclick="window.open('edit.php?id={$user.id}','_self');" />
 		</td>
 	</tr>
+	{/if}
 </table>
 {if $session.admin.project.id}
+	<p>
+	{t _s1=$session.admin.project.title}Module assignment in current project, "%s":{/t}
+	<table>
+	{foreach item=v from=$modules.modules}
+		<tr>
+			<td>{$v.module}</td>
+		{if $v.isAssigned}
+			<td class="userModuleAssigned">assigned</td>
+			<td>[<span class="a" onclick="userRemoveFromModule({$user.id},{$v.module_id},'view.php?id={$user.id}');">{t}remove{/t}</span>]</td>
+		{else}
+			<td class="userModuleUnassigned">not assigned</td>
+			<td>[<span class="a" onclick="userAddToModule({$user.id},{$v.module_id},'view.php?id={$user.id}');">{t}assign{/t}</span>]</td>
+		{/if}
+		</tr>
+	{/foreach}
+	{foreach item=v from=$modules.freeModules}
+		<tr>
+			<td>{$v.module}</td>
+		{if $v.isAssigned}
+			<td class="userModuleAssigned">assigned</td>
+			<td>[<span class="a" onclick="userRemoveFromFreeModule({$user.id},{$v.id},'view.php?id={$user.id}');">{t}remove{/t}</span>]</td>
+		{else}
+			<td class="userModuleUnassigned">not assigned</td>
+			<td>[<span class="a" onclick="userAddToFreeModule({$user.id},{$v.id},'view.php?id={$user.id}');">{t}assign{/t}</span>]</td>
+		{/if}
+		</tr>
+	{/foreach}
+	</table>
+	</p>
+{/if}
 <p>
-	{t _s1=$session.admin.project.title}Module assignment for this user in "%s":{/t}
-
+{t}This user is also collaborating in the following projects:{/t}
 <table>
-{foreach item=v from=$modules.modules}
-	<tr><td>{$v.module}</td>
-{if $v.isAssigned}
-	<td class="userModuleAssigned">assigned</td><td>[<span class="a" onclick="userRemoveFromModule({$user.id},{$v.module_id},'view.php?id={$user.id}');">{t}remove{/t}</span>]</td>
-{else}
-	<td class="userModuleUnassigned">not assigned</td><td>[<span class="a" onclick="userAddToModule({$user.id},{$v.module_id},'view.php?id={$user.id}');">{t}assign{/t}</span>]</td>
+{foreach item=v from=$projects}
+{if $v.project_id!=$session.admin.project.id}
+	<tr>
+		<td project_id="{$v.project_id}">{if $v.project_id==0}(system){elseif $v.projectTitle==''}? (id {$v.project_id}){else}{$v.projectTitle}{/if}</td>
+		<td>{$v.role}</td>
+	</tr>
 {/if}
-</tr>
-{/foreach}
-{foreach item=v from=$modules.freeModules}
-	<tr><td>{$v.module}</td>
-{if $v.isAssigned}
-	<td class="userModuleAssigned">assigned</td><td>[<span class="a" onclick="userRemoveFromFreeModule({$user.id},{$v.id},'view.php?id={$user.id}');">{t}remove{/t}</span>]</td>
-{else}
-	<td class="userModuleUnassigned">not assigned</td><td>[<span class="a" onclick="userAddToFreeModule({$user.id},{$v.id},'view.php?id={$user.id}');">{t}assign{/t}</span>]</td>
-{/if}
-</tr>
 {/foreach}
 </table>
 </p>
-{/if}
+
 {/if}
 </div>
 <form method="post" action="" id="theForm">

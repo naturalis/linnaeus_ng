@@ -10,8 +10,8 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 	l2MapCoordinates = $.parseJSON(mapCoord);
 
 	$('#mapTable').css('background','url('+mapUrl+')');
-	$('#mapTable').css('width',(l2MapPxWidth+cellW)+'px');
-	$('#mapTable').css('height',(l2MapPxHeight+cellH)+'px');
+	$('#mapTable').css('width',(l2MapPxWidth)+'px');
+	$('#mapTable').css('height',(l2MapPxHeight)+'px');
 	
 	l2ScaleCells(cellW,cellH);
 

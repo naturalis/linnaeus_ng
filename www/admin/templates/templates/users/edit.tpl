@@ -2,14 +2,12 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
+{if $data}
 <form method="post" action="" name="theForm" id="theForm">
 	<input name="id" value="{$data.id}" type="hidden" />
 	<input type="hidden" name="action" id="action" value="update"  />
 	<input type="hidden" name="rnd" value="{$rnd}" />
 	<input name="userProjectRole" value="{$userRole.id}" type="hidden" />
-<script type="text/javascript">
-	userid = '{$data.id}';
-</script>
 <table>
 	<tr>
 		<td>{t}Username:{/t}</td>
@@ -152,7 +150,7 @@
 		{/if}
 	</td>
 	</tr>
-
+	{if $session.admin.user.currentRole == $smarty.const.ID_ROLE_SYS_ADMIN || $session.admin.user.currentRole == $smarty.const.ID_ROLE_LEAD_EXPERT}
 	<tr>
 		<td>{t}Active{/t}</td>
 		<td>
@@ -162,7 +160,7 @@
 					id="active-y" 
 					name="active" 
 					value="1"
-					{if $isLeadExpert} disabled="disabled"{/if} 
+					{if $isLeadExpert && $session.admin.user.currentRole != $smarty.const.ID_ROLE_SYS_ADMIN} disabled="disabled"{/if} 
 					{if $data.active=='1'}checked="checked"{/if}/>y
 			</label>
 			<label for="active-n">
@@ -171,11 +169,12 @@
 					id="active-n" 
 					name="active" 
 					value="0" 
-					{if $isLeadExpert} disabled="disabled"{/if} 
+					{if $isLeadExpert && $session.admin.user.currentRole != $smarty.const.ID_ROLE_SYS_ADMIN} disabled="disabled"{/if} 
 					{if $data.active!='1'}checked="checked"{/if} />n
 			</label>
 		</td>
 	</tr>
+	{/if}
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
@@ -196,18 +195,27 @@
 	<tr>
 		<td colspan="2">
 			<input type="submit" value="{t}save{/t}" />
-			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { $('#action').val('delete');$('#theForm').submit(); }{/literal}" />[A]
+			{if $canDelete}
+			<input type="button" value="{t}delete{/t}" onclick="{literal}if (confirm('Are you sure?')) { $('#delForm').submit(); }{/literal}" />
+			{/if}
 		</td>
 	</tr>
 </table>
 </form>
+{/if}
 </div>
-
+{if $canDelete}
+<form id="delForm" method="post" action="delete.php">
+	<input name="id" value="{$data.id}" type="hidden" />
+	<input type="hidden" name="rnd" value="{$rnd}" />
+</form>
+{/if}
 {literal}
 <script type="text/JavaScript">
 
 $(document).ready(function(){
 
+	userid = '{$data.id}';
 	$('#username').focus();
 
 });

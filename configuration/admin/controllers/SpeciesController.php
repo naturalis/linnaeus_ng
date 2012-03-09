@@ -468,14 +468,7 @@ class SpeciesController extends Controller
 
 							if (empty($parentId) && empty($this->requestData['id'])) {
 							
-								$this->models->UserTaxon->save(
-									array(
-										'id' => null,
-										'project_id' => $this->getCurrentProjectId(),
-										'user_id' => $this->getCurrentUserId(),
-										'taxon_id' => $this->models->Taxon->getNewId()
-									)
-								);
+								$this->doAssignUserTaxon($this->getCurrentUserId(),$this->models->Taxon->getNewId());
 
 							}
 							
@@ -1180,6 +1173,7 @@ class SpeciesController extends Controller
         
         $this->setPageName(_('Taxon file upload'));
         
+		// uploaded file detected: parse csv
         if ($this->requestDataFiles) {
 
             unset($_SESSION['admin']['system']['csv_data']);
@@ -1354,7 +1348,9 @@ class SpeciesController extends Controller
 
             }    
 
-        } elseif (isset($this->requestData)) {
+        } else
+		// list of taxa and ranks to be saved deteceted: save taxa
+		if (isset($this->requestData)) {
 
             if ($this->rHasVal('rows') && isset($_SESSION['admin']['system']['csv_data'])) {
 
@@ -1380,6 +1376,7 @@ class SpeciesController extends Controller
                 $parenName = false;
                 $predecessors = null;
 
+				// traverse the list of taxa
                 foreach((array)$this->requestData['rows'] as $key => $val) {
 
                     $name = $_SESSION['admin']['system']['csv_data'][$val][0];
@@ -1466,7 +1463,7 @@ class SpeciesController extends Controller
 
                     }
 
-                    $this->importTaxon(
+                    $newId = $this->importTaxon(
                         array(
                             'taxon_rank' => $rank,
                             'taxon_name' => $name,
@@ -1474,6 +1471,12 @@ class SpeciesController extends Controller
 							'hybrid' => $hybrid
                         )
                     );
+
+					if (!empty($newId) && empty($taxon['parent_taxon_name'])) {
+
+						$this->doAssignUserTaxon($this->getCurrentUserId(),$newId);
+
+					}
 
                 }
 
@@ -3208,7 +3211,6 @@ class SpeciesController extends Controller
 		}
 
 		if (is_null($rankId)) return;
-
 
         $t = $this->models->Taxon->_get(
 			array(

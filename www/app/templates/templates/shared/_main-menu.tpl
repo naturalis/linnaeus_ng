@@ -30,11 +30,13 @@
 			onkeydown="setSearchKeyed(true);"
 			onblur="setSearchKeyed(false);"
 			onfocus="onSearchBoxSelect()" />
-			<img src="../../media/system/search.gif" onclick="doSearch();" />
+			<input type="image" src="../../media/system/search.gif" style="border:0" />
+		{if $languages|@count>1}
 		<select id="languageSelect" onchange="doLanguageChange()">
-	{foreach from=$languages key=k item=v}
+		{foreach from=$languages key=k item=v}
 			<option value="{$v.language_id}"{if $v.language_id==$currentLanguageId} selected="selected"{/if}>{$v.language} {if $v.def_language==1}*{/if}</option>
-	{/foreach}
+		{/foreach}
 		</select>
+		{/if}
 	</div>
 </div>

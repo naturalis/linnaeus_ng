@@ -74,8 +74,8 @@ l2SetMap(
 	{$map.size[0]},
 	{$map.size[1]},
 	'{$map.coordinates.original}',
-	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols+1 z=1},
-	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows+1 z=1}
+	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
+	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
 );
 {literal}
 $("#mapTable").mousemove(function(event) {
