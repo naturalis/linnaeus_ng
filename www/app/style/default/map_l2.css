@@ -18,7 +18,7 @@
 .mapCellAxis {
 	background-color:white;
 	border-right:none;
-	border-bottom:none;
+	border-top:1px dotted black;
 	filter: alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;

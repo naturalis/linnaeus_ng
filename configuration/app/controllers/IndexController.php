@@ -196,7 +196,7 @@ class IndexController extends Controller
 
 			$syn = $this->searchSynonyms();
 			
-			$taxa = array_merge($taxa,$syn);
+			$taxa = array_merge((array)$taxa,(array)$syn);
 
 			$this->customSortArray($taxa,array('key' => 'label'));
 

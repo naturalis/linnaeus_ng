@@ -83,7 +83,7 @@ class GlossaryController extends Controller
 
 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 		
-		$this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
+		if (isset($d['id'])) $this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
 
 		/*
 
@@ -109,9 +109,10 @@ class GlossaryController extends Controller
 
 		if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
 
+		*/
+
         $this->printPage();
 
-		*/
     
     }
 

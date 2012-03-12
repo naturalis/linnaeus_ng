@@ -670,7 +670,7 @@ class Controller extends BaseClass
 
 
 		$fmpu = $this->models->FreeModuleProjectUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
-		
+
 		foreach((array)$fmpu as $key => $val) {
 
 			$rs[$val['project_id']]['_freeModules'][$val['free_module_id']] = true;
@@ -895,7 +895,7 @@ class Controller extends BaseClass
      */
 	public function reInitUserRolesAndRights($userId=null)
 	{
-	
+
         $cur = $this->getUserRights(isset($userId) ? $userId : $this->getCurrentUserId());
 		$this->setUserSessionRights($cur['rights']);
 		$this->setUserSessionRoles($cur['roles']);

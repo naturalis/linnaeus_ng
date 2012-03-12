@@ -328,8 +328,7 @@ class ProjectsController extends Controller
         $pru = $this->models->ProjectRoleUser->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'role_id !=' => '1'
+					'project_id' => $this->getCurrentProjectId()
 				),
 				'columns' => 'distinct user_id, role_id'
 			)

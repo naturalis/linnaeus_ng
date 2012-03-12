@@ -349,6 +349,94 @@ class ModuleController extends Controller
         $this->printPage();
 
     }
+
+    /**
+     * Change page display order
+     *
+     * @access    public
+     */
+    public function orderAction()
+    {
+    
+        $this->checkAuthorisation();
+
+		$this->setPageName(_('Change page order'));
+
+		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
+		
+			$d = $this->getPages();
+			
+			$lowerNext = $prev = false;
+
+			foreach((array)$d as $key => $val) {
+			
+				$newOrder = $key;
+
+				if ($val['id'] == $this->requestData['id']) {
+
+					if (($this->requestData['dir']=='up') && $prev) {
+
+						$newOrder = $key - 1;
+
+						 $this->models->FreeModulePage->update(
+							array(
+								'show_order' => 'show_order + 1',
+							),
+							array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $prev
+							)
+						);
+
+					} else
+					if ($this->requestData['dir']=='down') {
+
+						$newOrder = $key + 1;
+						
+					} else {
+
+						$newOrder = $key;
+
+					}
+
+				}
+				
+				if ($lowerNext) {
+
+					$newOrder = $key - 1;
+
+					$lowerNext = false;
+
+				}
+
+				 $this->models->FreeModulePage->update(
+				 	array(
+						'show_order' => $newOrder,
+					),
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['id']
+					)
+				);
+
+				if ($val['id'] == $this->requestData['id'] && $this->requestData['dir']=='down') {
+
+					$lowerNext = true;
+
+				} 
+									
+				$prev = $val['id'];
+
+			}
+
+		}
+
+		$this->smarty->assign('pages',$this->getPages());
+
+        $this->printPage();
+
+	}
+
 	
 
 	/**
@@ -624,7 +712,8 @@ class ModuleController extends Controller
 					'module_id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
 					'got_content' => 1
-				)
+				),
+				'order' => 'show_order'
 			)
 		);
 		
@@ -635,8 +724,6 @@ class ModuleController extends Controller
 			$fmp[$key]['topic'] = $d['topic'];
 
 		}
-		
-		$this->customSortArray($fmp,array('key' => 'topic'));
 		
 		return $fmp;
 

@@ -80,8 +80,8 @@ class ModuleController extends Controller
 			
 			if (!$this->rHasVal('page')) {
 
-				$page = $this->getFirstModulePage($this->rHasVal('letter') ? $this->requestData['letter'] : null);
-				$this->redirect('topic.php?id='.$page['page_id']);
+				$page = $this->getFirstModulePage();
+				$this->redirect('topic.php?id='.$page['id']);
 
 			} else {
 
@@ -375,6 +375,33 @@ class ModuleController extends Controller
 	private function getFirstModulePage()
 	{
 
+		return $this->getFirstModulePageByShowOrder();
+		
+	}
+
+	private function getFirstModulePageByShowOrder()
+	{
+
+		$cfm = $this->models->FreeModulePage->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'module_id' => $this->getCurrentModuleId(),
+					'got_content' => 1
+					//'language_id' => $this->getCurrentLanguageId(),
+					),
+				'order' => 'show_order',
+				'limit' => 1
+			)
+		);
+
+		return isset($cfm[0]) ? $cfm[0] : null;
+		
+	}
+
+	private function getFirstModulePageAlphabetically()
+	{
+
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => array(
@@ -394,6 +421,70 @@ class ModuleController extends Controller
 	}
 
 	private function getAdjacentPages($id)
+	{
+
+		return $this->getAdjacentPagesByShowOrder($id);
+		
+	}
+	
+	private function getAdjacentPagesByShowOrder($id)
+	{
+
+		if (!isset($id)) return;
+
+		$fmp = $this->models->FreeModulePage->_get(
+			array(
+				'id' => array(
+					'module_id' => $this->getCurrentModuleId(),
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'show_order'
+			)
+		);
+
+		if (!$fmp) {
+		
+			return;
+
+		} else {
+		
+			foreach((array)$fmp as $key => $val) {
+		
+				$cfm = $this->models->ContentFreeModule->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'module_id' => $this->getCurrentModuleId(),
+							'language_id' => $this->getCurrentLanguageId(),
+							'page_id' => $val['id'],
+						)
+					)
+				);
+	
+				$fmp[$key]['label'] = $cfm[0]['topic'];
+				
+			}
+
+		}
+
+		foreach((array)$fmp as $key => $val) {
+
+			if ($val['id']==$id) {
+			
+				return array(
+					'prev' => isset($fmp[$key-1]) ? $fmp[$key-1] : null,
+					'next' => isset($fmp[$key+1]) ? $fmp[$key+1] : null
+				);
+
+			}
+
+		}
+		
+		return null;
+		
+	}
+	
+	private function getAdjacentPagesAlphabetically($id)
 	{
 
 		$cfm = $this->models->ContentFreeModule->_get(
