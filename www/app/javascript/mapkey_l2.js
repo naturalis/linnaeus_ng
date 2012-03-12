@@ -18,6 +18,7 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 }
 
 function l2ScaleCells(w,h) {
+
 	$('td').each(function (i) {
 		if ($(this).hasClass('mapCell')) {
 	
