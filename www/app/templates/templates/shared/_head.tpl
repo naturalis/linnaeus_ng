@@ -2,6 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" CONTENT="{$session.app.project.keywords}">
+	<meta name="description" CONTENT="{$session.app.project.description}">
+	<meta name="ROBOTS" CONTENT="ALL">
 	<title>{$session.app.project.title}{if $pageName}: {$pageName}{/if}</title>
 	<style type="text/css" media="all">
 {if $cssToLoad}

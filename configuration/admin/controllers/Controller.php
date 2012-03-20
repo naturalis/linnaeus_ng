@@ -2748,7 +2748,7 @@ class Controller extends BaseClass
 		}
 
         foreach ((array) $d as $key) {
-            
+
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
                 
                 require_once (dirname(__FILE__) . '/../helpers/' . $key . '.php');
@@ -2756,7 +2756,7 @@ class Controller extends BaseClass
                 $d = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
                 
                 if (class_exists($d)) {
-                    
+
                     $this->helpers->$d = new $d();
                 
                 }

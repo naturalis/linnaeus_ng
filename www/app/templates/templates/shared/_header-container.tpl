@@ -1,7 +1,7 @@
 <div id="header-container">
 {if $session.app.project.logo}
 	<div id="image">
-	<a href="{$session.app.project.urls.project_start}"><img src="{$session.app.project.urls.project_media}{$session.app.project.logo|escape:'url'}" id="project-logo" /></a>
+	<a href="{$session.app.project.urls.project_start}"><img alr="{$session.app.project.title}" src="{$session.app.project.urls.project_media}{$session.app.project.logo|escape:'url'}" id="project-logo" /></a>
 	</div>
 {/if}
 	<div id="title">

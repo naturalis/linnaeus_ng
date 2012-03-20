@@ -4243,7 +4243,7 @@ class ImportController extends Controller
 
 	}
 
-	public function getCustomModules()
+	private function getCustomModules()
 	{
 
 		if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
@@ -4265,5 +4265,6 @@ class ImportController extends Controller
 		return $_SESSION['admin']['system']['import']['additionalModules'];
 	
 	}
+
 
 }

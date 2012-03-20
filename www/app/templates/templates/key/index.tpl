@@ -11,7 +11,7 @@
 			</div>
 		{if $step.image}
 			<div>
-				<img src="{$session.app.project.urls.project_media}{$step.image}" />
+				<img alt="{$step.image}" src="{$session.app.project.urls.project_media}{$step.image}" />
 			</div>
 		{/if}
 			<div id="content">{$step.content}</div>
@@ -24,6 +24,7 @@
 					<div class="choice-image-div">
 					{if $useJavascriptLinks}
 						<img
+							alt="{$v.choice_img}"
 							class="choice-image-small"
 							onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}" 
 							src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
@@ -35,6 +36,7 @@
 						<a href="../species/taxon.php?id={$v.res_taxon_id}">
 					{/if}
 						<img
+							alt="{$v.choice_img}"
 							class="choice-image-small"
 							src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
 						/>

@@ -89,7 +89,7 @@ function goState() {
 			break;
 		case 'media':
 			var file = encodeURIComponent(state.file_name);
-			var val = '<img onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" src="'+imagePath+state.file_name+'" class="info-image" /><br />'+_('(click image to enlarge)');
+			var val = '<img alt="'+file+'" onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" src="'+imagePath+state.file_name+'" class="info-image" /><br />'+_('(click image to enlarge)');
 			break;
 		case 'range':
 			var val = 	
