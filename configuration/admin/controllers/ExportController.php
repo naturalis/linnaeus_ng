@@ -126,6 +126,22 @@ class ExportController extends Controller
 				
 			}
 		
+			if ($this->rHasVal('freeModules')) {
+		
+				foreach ((array)$this->requestData['freeModules'] as $val) {
+	
+					$d = 'export'.ucfirst($val);
+					
+					if (method_exists($this,$d))
+						$data[$val] = $this->$d();
+					else
+						$this->addError(_('Missing function "'.get_class($this).'::'.$d.'"'));
+						
+						
+				}
+				
+			}		
+		
 			$this->exportData($data,strtolower(preg_replace('/\W/','',$data['project']['system_name'])));
 			
 			unset($_SESSION['admin']['export']);

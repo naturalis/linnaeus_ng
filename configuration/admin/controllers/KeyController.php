@@ -505,7 +505,7 @@ class KeyController extends Controller
 
 		}
 
-		$this->getTaxonTree();
+		$this->getTaxonTree(null,true);
 
 		$this->customSortArray($this->treeList,array('key' => 'taxon'));
 
@@ -518,6 +518,8 @@ class KeyController extends Controller
 		$this->smarty->assign('steps',$this->getKeysteps(array('idToExclude'=>$choice['keystep_id'])));
 
 		$this->smarty->assign('taxa',$this->treeList);
+
+		$this->smarty->assign('ranks',$this->getProjectRanks(array('lowerTaxonOnly'=>false,'idsAsIndex'=>true)));
 
 		$this->smarty->assign('remainingTaxa',$this->getRemainingTaxa());
 

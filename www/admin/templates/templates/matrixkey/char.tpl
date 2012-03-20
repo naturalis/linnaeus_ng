@@ -4,7 +4,7 @@
 <p>
 <span class="matrix-header">
 {if $characteristic.label}
-{t _s1=$characteristic.label _s2=$matrix.matrix}Editing characteristic "%s" for matrix "%s"{/t}
+{t _s1=$characteristic.label _s2=$matrix.matrix}Editing character "%s" for matrix "%s"{/t}
 {else}
 {t _s1=$matrix.matrix}New charcteristic for matrix "%s"{/t}
 {/if}
@@ -58,7 +58,7 @@
 	</tr>
 	<tr>
 		<td>
-			{t}Characteristic type:{/t}
+			{t}Character type:{/t}
 		</td>
 		<td>
 	<select name="type" id="type">
@@ -84,7 +84,7 @@
 <table>
 	<tr>
 		<td colspan="3">
-			{t}Instead, you can also use an existing characteristic from one of your other matrices. To do so, select the name below and click "use".{/t}
+			{t}Instead, you can also use an existing character from one of your other matrices. To do so, select the name below and click "use".{/t}
 		</td>
 	</tr>
 	<tr>

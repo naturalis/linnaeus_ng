@@ -2086,6 +2086,8 @@ class Controller extends BaseClass
 
 				if ($rank['id']==$val['rank_id']) {
 
+					$val['rank'] = $rank['rank'];
+
 					$val['lower_taxon'] = $rank['lower_taxon'];
 
 					$val['keypath_endpoint'] = $rank['keypath_endpoint'];

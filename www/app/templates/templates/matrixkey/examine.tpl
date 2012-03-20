@@ -15,7 +15,7 @@
 			<thead>
 				<tr>
 					<th style="width:100px">{t}type{/t}</th>
-					<th style="width:250px">{t}characteristic{/t}</th>
+					<th style="width:250px">{t}character{/t}</th>
 					<th>{t}state{/t}</th>
 				</tr>
 			</thead>
