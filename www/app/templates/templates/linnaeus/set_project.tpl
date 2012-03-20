@@ -16,8 +16,8 @@
 
 <body><div id="body-container">
 <div id="header-container">
-  <a href="../../../admin/admin-index.php"><img src="../../../admin/media/system/linnaeus_logo.png" id="lng-logo" />
-  <img src="../../../admin/media/system/eti_logo.png" id="eti-logo" /></a>
+  <a href="../../../admin/admin-index.php"><img alt="Linnaeus NG" src="../../../admin/media/system/linnaeus_logo.png" id="lng-logo" />
+  <img alt="ETI" src="../../../admin/media/system/eti_logo.png" id="eti-logo" /></a>
 
 
 </div>

@@ -6,6 +6,7 @@
 	<li><a href="modules.php">{t}Project modules{/t}</a></li>
 	<li><a href="collaborators.php">{t}Assign collaborators to modules{/t}</a></li>
 	<li><a href="get_info.php">{t}Get info{/t}</a></li>
+	<li><a href="../import/export.php">{t}Export{/t}</a></li>
 </ul>
 </div>
 

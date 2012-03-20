@@ -43,6 +43,22 @@
 		{/if}
 		</td>
 	</tr>
+	<tr style="vertical-align:top">
+		<td>
+			{t}Description (for html meta-tag):{/t}
+		</td>
+		<td colspan="2">
+			<textarea name="description" style="width:300px;height:200px;font-size:11px" />{$data.description}</textarea>
+		</td>
+	</tr>
+	<tr style="vertical-align:top">
+		<td>
+			{t}Keywords (for html meta-tag; separate with spaces):{/t}
+		</td>
+		<td colspan="2">
+			<textarea name="keywords" style="width:300px;height:100px;font-size:11px" />{$data.keywords}</textarea>
+		</td>
+	</tr>
 	{* <tr>
 		<td>
 			{t}CSS url:{/t}

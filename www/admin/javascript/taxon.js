@@ -1469,25 +1469,3 @@ function taxonChangeOverviewPicture(ele) {
 	});
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

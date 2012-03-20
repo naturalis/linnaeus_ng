@@ -161,17 +161,20 @@
 		{capture name="fullImgUrl"}{$session.app.project.urls.project_media}{$v.file_name}{/capture}
 		{if $v.thumb_name != ''}
 			<img
+				alt="{$v.original_name}" 
 				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				src="{$session.app.project.urls.project_thumbs}{$v.thumb_name}"
 				class="media-image" />
 		{else}
 			<img
+				alt="{$v.original_name}" 
 				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				src="{$session.app.project.urls.project_media}{$v.file_name}"
 				class="media-image" />
 		{/if}
 	{elseif $v.category=='video'}
 			<img 
+				alt="{$v.original_name}" 
 				src="../../media/system/video.jpg" 
 				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
@@ -195,7 +198,7 @@
 {else}
 <div id="content">
 {if $taxonStartPage && $overviewImage}
-<img id="overview-image" src="{$session.app.project.urls.project_media}{$overviewImage}"/>
+<img alt="{$overviewImage}" id="overview-image" src="{$session.app.project.urls.project_media}{$overviewImage}"/>
 {/if}
 {$content}
 </div>

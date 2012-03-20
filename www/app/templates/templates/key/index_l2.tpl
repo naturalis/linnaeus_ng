@@ -11,7 +11,7 @@
 			</div>
 		{if $step.image}
 			<div>
-				<img src="{$session.app.project.urls.project_media}{$step.image}" />
+				<img alt="{$step.image}" src="{$session.app.project.urls.project_media}{$step.image}" />
 			</div>
 		{/if}
 			<div id="content">{$step.content}</div>
@@ -20,6 +20,7 @@
 {foreach from=$choices key=k item=v}
 	{if $v.choice_img}
 		<img
+			alt="{$v.choice_img}" 
 			id="choice-img-{$v.id}"
 			onclick="showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
 			src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
