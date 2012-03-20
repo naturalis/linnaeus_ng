@@ -6,7 +6,7 @@
 	<div id="synonyms">
 		<div id="synonyms-title">{t}Synonyms{/t}</div>
 		{foreach from=$term.synonyms key=k item=v}
-			<div class="synonym">{$v.synonym} ({$v.language})</div>
+			<div class="synonym">{$v.synonym}{if $v.language} ({$v.language}){/if}</div>
 		{/foreach}
 	</div>
 	{/if}

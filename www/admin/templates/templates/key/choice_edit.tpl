@@ -107,6 +107,7 @@
 				<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
 					{$v.taxon}{if $v.is_hybrid==1}&nbsp;x{/if}
 					{assign var=first value=false}{/if}
+					 ({$ranks[$v.rank_id].rank})
 				</option>
 				{/foreach}
 			</select>

@@ -31,7 +31,7 @@
 <table>
 	<tr>
 		<th style="width:200px">
-		{t}Characteristic{/t}
+		{t}Character{/t}
 		</th>
 		<th>
 		{t}State{/t}

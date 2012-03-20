@@ -250,7 +250,7 @@ class MatrixKeyController extends Controller
 
         $this->checkAuthorisation();
         
-		// need an active matrix to assign the characteristic to
+		// need an active matrix to assign the charcter to
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
 		if (!$this->rHasId()) {
@@ -265,7 +265,7 @@ class MatrixKeyController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not create characteristic.'));
+				$this->addError(_('Could not create character.'));
 
 			}
 
@@ -304,11 +304,11 @@ class MatrixKeyController extends Controller
 			
 			if (isset($c['label'])) {
 
-		        $this->setPageName(sprintf(_('Editing characteristic "%s"'),$c['label']));
+		        $this->setPageName(sprintf(_('Editing character "%s"'),$c['label']));
 
 			} else {
 
-		        $this->setPageName( _('New characteristic'));
+		        $this->setPageName( _('New character'));
 
 			}
 
@@ -880,7 +880,7 @@ class MatrixKeyController extends Controller
 	
 	}
 
-	/* characteristics functions */
+	/* character functions */
     private function createCharacteristic()
     {
 
