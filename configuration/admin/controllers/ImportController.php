@@ -3555,7 +3555,7 @@ class ImportController extends Controller
 		
 		} else {
 
-			$this->addError('Missing map file: "'.$mapImageName.'" ('.$_SESSION['admin']['system']['import']['imagePath'].$mapImageName.').');
+			$this->addError('Missing map file: "'.$mapImageName.'"<br />(will still function properly if map exists in default folder).');
 	
 		}
 
