@@ -143,18 +143,42 @@ class SpeciesController extends Controller
     {
 
 		unset($_SESSION['admin']['system']['activeTaxon']);
+		
+		$d = $this->newGetUserAssignedTaxonTreeList();
 
 		if ($this->rHasVal('higher','1')) {
 
 			$_SESSION['admin']['system']['highertaxa'] = true;
+			
+			foreach((array)$d as $val) {
+			
+				if ($val['lower_taxon']==0) {
+				
+					$d = $val;
+					
+					break;
+				
+				}
+			
+			}
 
 		} else {
 
 			unset($_SESSION['admin']['system']['highertaxa']);
 
+			foreach((array)$d as $val) {
+			
+				if ($val['lower_taxon']==1) {
+				
+					$d = $val;
+					
+					break;
+				
+				}
+			
+			}
 		}
 		
-		$d = @array_shift($this->newGetUserAssignedTaxonTreeList());
 
 		if (!isset($d['id'])) {
 		
