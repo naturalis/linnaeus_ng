@@ -1033,7 +1033,7 @@ class MapKeyController extends Controller
 			array('id' =>
 				array(
 					'project_id' => $this->getCurrentProjectId(),
-					'image !=' => '\'\''
+					'name !=' => '\'\''
 				),
 				'columns' => 'count(*) as total'
 			)
@@ -1147,7 +1147,7 @@ class MapKeyController extends Controller
 	private function l2GetMaps($id=null)
 	{
 
-		if (!isset($_SESSION['app']['user']['map']['L2Maps'])) {
+		if (1==1 || !isset($_SESSION['app']['user']['map']['L2Maps'])) {
 
 			$m = $this->models->L2Map->_get(
 				array(
@@ -1157,18 +1157,24 @@ class MapKeyController extends Controller
 			);
 
 			foreach((array)$m as $key => $val) {
+			
+				$m[$key]['mapExists'] = false;
 
 				if (!empty($val['image'])) {
 
 					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['project_media_l2_maps'].$val['image']);
+					
+					$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['project_media_l2_maps'].$val['image'];
+				
+				} else {
+				
+					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['general_media_l2_maps'].$val['name'].'.gif');
 
-					if ($m[$key]['mapExists']) {
-	
-						$m[$key]['size'] = getimagesize($_SESSION['app']['project']['urls']['project_media_l2_maps'].$val['image']);
-					
-					}
-					
+					$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['general_media_l2_maps'].strtolower($val['name']).'.gif';
+
 				}
+
+				if ($m[$key]['mapExists']) $m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
 				
 				$d = json_decode($val['coordinates']);
 

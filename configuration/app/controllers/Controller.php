@@ -1310,6 +1310,7 @@ class Controller extends BaseClass
 
 		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
 		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
+		$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
 
 		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
 
