@@ -100,6 +100,8 @@ class IntroductionController extends Controller
 		
 			$page['content'] = $this->matchGlossaryTerms($page['content']);
 
+			$page['content'] = $this->matchHotwords($page['content']);
+
 			$this->setPageName($page['topic']);
 
 			$this->smarty->assign('headerTitles',array('title' => $page['topic']));

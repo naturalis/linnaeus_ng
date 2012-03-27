@@ -5,6 +5,9 @@
 <form method="post">
 <input type="hidden" name="action" value="export" />
 <input type="hidden" name="rnd" value="{$rnd}" />
+
+LACKS FREE MODS
+
 {t}Export project data to XML-file.{/t}
 <table>
 {foreach from=$modules.modules item=v}

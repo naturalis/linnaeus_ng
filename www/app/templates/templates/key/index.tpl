@@ -31,7 +31,7 @@
 							/>
 					{else}
 					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-					keyDoChoice({$v.id})
+						<a href="../key/index.php?choice={$v.id}">
 					{elseif $v.res_taxon_id!=''}
 						<a href="../species/taxon.php?id={$v.res_taxon_id}">
 					{/if}
@@ -40,6 +40,7 @@
 							class="choice-image-small"
 							src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
 						/>
+						</a>
 					{/if}						
 						
 						
@@ -51,9 +52,17 @@
 					<span class="text">{$v.choice_txt|nl2br}</span>
 					<br />
 					<span class="target">
+					
+					
 					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 						<span class="arrow">&rarr;</span>
+						{if $useJavascriptLinks}
 						<span class="target-step" onclick="keyDoChoice({$v.id})">{if $v.target_number}{t}Step{/t} {$v.target_number}: {/if}{$v.target}</span>
+						{else}
+						<a class="target-step" href="../key/index.php?choice={$v.id}">
+							{if $v.target_number}{t}Step{/t} {$v.target_number}: {/if}{$v.target}
+						</a>
+						{/if}
 					{elseif $v.res_taxon_id!=''}
 						<span class="arrow">&rarr;</span>
 						{if $useJavascriptLinks}
@@ -68,6 +77,8 @@
 						{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 						{/if}
 					{/if}
+
+
 					</span>
 
 			</div>

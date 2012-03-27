@@ -349,6 +349,7 @@ class ModuleController extends Controller
 
 			$page['topic'] = $cfm[0]['topic'];
 			$page['content'] = $this->matchGlossaryTerms($cfm[0]['content']);
+			$page['content'] = $this->matchHotwords($page['content']);
 
 			$fmm = $this->models->FreeModuleMedia->_get(
 				array(

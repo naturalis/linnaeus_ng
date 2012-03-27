@@ -17,6 +17,9 @@
 {/if}
 
 <div id="page-main">
+{if !$refs}
+	{t}No literature has been defined.{/t}
+{else}
 <table id="references">
 <thead> 
 	<tr>
@@ -44,6 +47,7 @@
 {/foreach}
 </tbody>
 </table>
+{/if}
 </div>
 
 {include file="../shared/footer.tpl"}

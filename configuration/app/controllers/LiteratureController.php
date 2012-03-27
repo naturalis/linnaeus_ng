@@ -66,7 +66,7 @@ class LiteratureController extends Controller
 
 		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 		
-		$this->redirect('reference.php?id='.$d['id']);
+		if (isset($d['id'])) $this->redirect('reference.php?id='.(isset($d['id']) ? $d['id'] : null));
 
  		/*
  		$alpha = $this->getLiteratureAlphabet();
@@ -91,9 +91,10 @@ class LiteratureController extends Controller
 
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 
-        $this->printPage();
 		*/
    
+        $this->printPage();
+
     }
 
     public function referenceAction()
@@ -104,6 +105,7 @@ class LiteratureController extends Controller
 			$ref = $this->getReference($this->requestData['id']);
 			
 			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
+			$ref['text'] = $this->matchHotwords($ref['text']);
 
 			$letter = strtolower(substr($ref['author_first'],0,1));
 
@@ -300,9 +302,7 @@ class LiteratureController extends Controller
 	private function getFirstReference($letter=null)
 	{
 
-		$d = array(
-				'project_id' => $this->getCurrentProjectId(),
-			);
+		$d = array('project_id' => $this->getCurrentProjectId());
 			
 		if (isset($letter)) $d['author_first like'] = $letter.'%';
 
@@ -315,7 +315,20 @@ class LiteratureController extends Controller
 					'limit' => 1
 				)
 			);
+			
+		if (!$l) {
 		
+			$l = $this->models->Literature->_get(
+					array(
+						'id' => array('project_id' => $this->getCurrentProjectId()),
+						'order' => 'author_first',
+						'columns' => 'id',
+						'limit' => 1
+					)
+				);
+		
+		}
+
 		return $l[0];
 
 	}

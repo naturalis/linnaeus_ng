@@ -1,11 +1,4 @@
 <?php
-/*
-
-div index:
-	values of "-"
-	double nodes in boudary nodes
-
-*/
 
 include_once ('Controller.php');
 
