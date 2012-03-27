@@ -175,8 +175,8 @@ class HotwordController extends Controller
 					'language_id' => $val['language_id'],
 					'hotword' => $val['topic'],
 					'controller' => 'introduction',
-					'view' => 'item',
-					'params' => 'id='.$val['id']
+					'view' => 'topic',
+					'params' => 'id='.$val['page_id']
 				)
 			)===true) $res++;
 
@@ -219,7 +219,7 @@ class HotwordController extends Controller
 					'hotword' => $val['synonym'],
 					'controller' => 'glossary',
 					'view' => 'term',
-					'params' => 'id='.$val['id']
+					'params' => 'id='.$val['glossary_id']
 				)
 			)===true) $res++;
 

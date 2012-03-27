@@ -123,9 +123,13 @@ class GlossaryController extends Controller
 
 			$term = $this->getGlossaryTerm($this->requestData['id']);
 
-			if (isset($term)) $letter = strtolower(substr($term['term'],0,1));
+			if (isset($term['term'])) {
 
-			if (isset($term)) $this->setPageName(sprintf(_('Glossary: "%s"'),$term['term']));
+				$letter = strtolower(substr($term['term'],0,1));
+
+				$this->setPageName(sprintf(_('Glossary: "%s"'),$term['term']));
+
+			}
 
 		} else {
 		
@@ -143,7 +147,7 @@ class GlossaryController extends Controller
 
 		if (isset($term)) $this->smarty->assign('term', $term);
 
-		if (isset($term)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($term['id']));
+		if (isset($term['id'])) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($term['id']));
 
         $this->printPage();
     
