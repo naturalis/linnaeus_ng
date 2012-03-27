@@ -1583,15 +1583,19 @@ class MapKeyController extends Controller
 
 				if (!empty($val['image'])) {
 
-					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['paths']['project_media_l2_maps'].$val['image']);
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image']);
+					
+					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image'];
 
-					if ($m[$key]['mapExists']) {
-	
-						$m[$key]['size'] = getimagesize($_SESSION['admin']['project']['paths']['project_media_l2_maps'].$val['image']);
-					
-					}
-					
+				} else {
+				
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['general_media_l2_maps'].$val['name'].'.gif');
+
+					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['general_media_l2_maps'].strtolower($val['name']).'.gif';
+
 				}
+
+				if ($m[$key]['mapExists']) $m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
 				
 				$d = json_decode($val['coordinates']);
 

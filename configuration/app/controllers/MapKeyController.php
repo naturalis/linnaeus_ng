@@ -1147,7 +1147,7 @@ class MapKeyController extends Controller
 	private function l2GetMaps($id=null)
 	{
 
-		if (1==1 || !isset($_SESSION['app']['user']['map']['L2Maps'])) {
+		if (!isset($_SESSION['app']['user']['map']['L2Maps'])) {
 
 			$m = $this->models->L2Map->_get(
 				array(

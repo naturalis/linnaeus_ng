@@ -39,7 +39,7 @@
 
 <table 
 	style="
-		background:url({$session.admin.project.urls.project_media_l2_maps}{$map.image|replace:' ':'%20'});
+		background:url({$map.imageFullName|replace:' ':'%20'});
 		width:{$map.size[0]}px;
 		height:{$map.size[1]}px;
 		padding:0px;

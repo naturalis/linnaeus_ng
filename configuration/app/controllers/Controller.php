@@ -1300,17 +1300,20 @@ class Controller extends BaseClass
 
 		if (isset($this->generalSettings['imageRootUrlOverride'])) {
 
-			$_SESSION['app']['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].sprintf('%04s', $p).'/';
+			$_SESSION['app']['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].'project/'.sprintf('%04s', $p).'/';
+			$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->generalSettings['imageRootUrlOverride'].'system/l2_maps/';
 	
 		} else {
 	
 			$_SESSION['app']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
+			$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
 			
 		}
 
 		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
+
 		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
-		$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
+
 
 		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
 
@@ -1318,6 +1321,7 @@ class Controller extends BaseClass
 				'http://'.
 				$_SERVER["HTTP_HOST"]. 
 				$this->generalSettings['imageRootUrlOverrideAbsolute'].
+				'project/'.
 				sprintf('%04s', $p).'/';
 
 		} else {
