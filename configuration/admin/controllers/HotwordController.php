@@ -340,7 +340,7 @@ class HotwordController extends Controller
 					'hotword' => $val['title'],
 					'controller' => 'key',
 					'view' => 'index',
-					'params' => 'choice='.$val['keystep_id']
+					'params' => 'step='.$val['keystep_id']
 				)
 			)===true) $res++;
 

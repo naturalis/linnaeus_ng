@@ -14,6 +14,7 @@
 	<li><a href="section.php">{t}Edit key sections{/t}</a></li>
 	<li><a href="map.php">{t}Key map{/t}</a></li>
 	<li><a href="process.php">{t}Compute taxon division{/t}</a></li>
+	<li><a href="store.php">{t}Store keymap{/t}</a></li>
 </ul>
 <ul class="admin-list">
 	<li><a href="orphans.php">{t}Taxa not part of the key{/t}</a></li>
