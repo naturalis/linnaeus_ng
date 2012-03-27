@@ -740,6 +740,26 @@ class KeyController extends Controller
 
 	}
 
+	public function storeAction()
+	{
+	
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Store keymap'));
+		
+		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
+
+			// might not be a bad idea either: $d = $this->getTaxonDivision();
+			$d = $this->getKeyTree();
+
+			q($d);
+
+		}
+	
+        $this->printPage();
+
+	}
+
     public function ajaxInterfaceAction ()
     {
 
@@ -775,7 +795,6 @@ class KeyController extends Controller
         $this->printPage();
     
     }
-
 
     public function previewAction ()
     {

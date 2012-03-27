@@ -6,6 +6,7 @@ class KeyController extends Controller
 {
 
     private $_taxaStepList;
+	private $_stepList = array();
 	public $currentKeyStepId;
 
     public $usedModels = array(
@@ -515,6 +516,5 @@ class KeyController extends Controller
 		$_SESSION['app']['user']['key']['path'] = $d;
 
 	}
-
 
 }
