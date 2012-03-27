@@ -1899,7 +1899,7 @@ class Controller extends BaseClass
 	{
 
 		$this->newGetUserAssignedTaxonTree();
-	
+
 		if (!isset($this->treeList)) return null;
 	
 		$prevId = $prevTitle = null;
@@ -1923,7 +1923,7 @@ class Controller extends BaseClass
 			}
 
 		}
-		
+
 		return isset($d) ? $d : null;
 
 	}
@@ -2912,6 +2912,8 @@ class Controller extends BaseClass
             $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
 
             $_SESSION['admin']['project']['urls']['project_media_l2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'l2_maps/';
+
+			$_SESSION['admin']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
 
         }
 
