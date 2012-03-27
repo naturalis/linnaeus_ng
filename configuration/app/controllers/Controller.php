@@ -20,6 +20,9 @@ class Controller extends BaseClass
 	private $_checkForProjectId = true;
 
 	private $_currentGlossaryId = false;
+	private $_currentHotwordLink = false;
+	private $_hotwordTempLinks = array();
+	private $_hotwordNoLinks = array();
 
     public $viewName;
     public $controllerBaseName;
@@ -54,7 +57,8 @@ class Controller extends BaseClass
 		'label_project_rank',
 		'rank',
 		'glossary',
-		'glossary_synonym'
+		'glossary_synonym',
+		'hotword'
     );
 
     private $usedHelpersBase = array(
@@ -2038,5 +2042,145 @@ class Controller extends BaseClass
 
 
 
+
+	private function getHotwords($forceUpdate=false)
+	{
+
+		if ($forceUpdate || !isset($_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()])) {
+
+			$d = 
+				$this->models->Hotword->_get(
+					array(
+						'id' => 
+							'select hotword,controller,view,params
+								from %table% where project_id = '.
+								$this->getCurrentProjectId().' '.
+								'and (language_id = '.$this->getCurrentLanguageId().' or language_id = 0)'
+					)
+				);
+				
+			foreach((array)$d as $key => $val) $d[$key]['num_of_words'] = substr_count($val['hotword'],' ')+1;
+				
+			$this->customSortArray($d, array('key' => 'num_of_words', 'dir' => 'desc', 'case' => 'i'));
+			
+			$_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()] = $d;		
+
+		}
+
+		return $_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()];
+
+	}
+
+	private function embedNoLink($matches)
+	{
+
+		if (trim($matches[0])=='') {
+
+			return $matches[0];
+
+		} else {
+
+			$d = '~~@#@@#@'.count((array)$this->_hotwordNoLinks).'}}\\||';
+
+			$this->_hotwordNoLinks[] = array(
+				'str' => $d,
+				'orig' => $matches[0]
+			);
+
+			return $d;
+			
+		}
+
+	}
+		
+	private function embedHotwordLink($matches)
+	{
+
+		if (trim($matches[0])=='') {
+
+			return $matches[0];
+
+		} else {
+
+			$d = '~~&&^%%'.count((array)$this->_hotwordTempLinks).'||::--+';
+			$this->_hotwordTempLinks[] = array(
+				'str' => $d,
+				'link' => '<a href="'.$this->_currentHotwordLink.'">'.$matches[0].'</a>'
+			);
+			return $d;
+			
+		}
+
+	}
+
+	private function effectuateHotwordLinks($txt)
+	{
+
+		$this->_hotwordTempLinks = array_reverse($this->_hotwordTempLinks);
+
+		foreach((array)$this->_hotwordTempLinks as $val) {
+		
+			$txt = str_replace($val['str'],$val['link'],$txt);
+
+		}
+		
+		$this->_hotwordTempLinks = array();
+		
+		return $txt;
+
+	}
+
+	private function restoreNoLinks($txt)
+	{
+	
+		foreach((array)$this->_hotwordNoLinks as $val) {
+		
+			$txt = str_replace(
+				$val['str'],
+				str_ireplace(array('[no]','[/no]'),'',$val['orig']),
+				$txt
+			);
+
+		}
+		
+		$this->_hotwordNoLinks = array();
+		
+		return $txt;
+
+	}
+
+	public function matchHotwords($text,$forceLookup=false)
+	{
+
+		if (empty($text) || !is_string($text)) return $text;
+		
+		$wordlist = $this->getHotwords($forceLookup);
+
+		$processed = $text;
+		
+		$expr = '|(\[no\])(.*)(\[\/no\])|i';
+
+		$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
+
+		foreach((array)$wordlist as $key => $val) {
+		
+			if ($val['hotword']=='') continue;
+			
+			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
+
+			$expr = '|\b('.$val['hotword'].')\b|i';
+		
+			$processed = preg_replace_callback($expr,array($this,'embedHotwordLink'),$processed);
+		
+		}
+
+		$processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
+
+		return $processed;
+	
+	}
+	
+	
+	
 	
 }

@@ -2,8 +2,7 @@
 <table>
 	<tr>
 	{foreach from=$categories key=k item=v}
-		{if $activeCategory==$v.id && $v.page=='Overview'}{assign var=taxonStartPage value=true}{/if}
-		
+		{if $activeCategory==$v.id && $k==0}{assign var=taxonStartPage value=true}{/if}
 	{if $useJavascriptLinks}			
 		<td {if $activeCategory==$v.id}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},{$v.id})"{/if}>{$v.title}</td>
 	{else}

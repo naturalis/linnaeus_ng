@@ -3,6 +3,7 @@
 	/*
 
 		$textWithGlossaryMatches = $this->matchGlossaryTerms($textWithoutGlossaryMatches));
+		$textWithHotwordLinks = $this->matchHotwords($textWithoutHotwordLinks));
 
 	*/
 
@@ -176,8 +177,8 @@ class LinnaeusController extends Controller
 
 		$this->setPageName( _($d['subject']));
 
-		$this->smarty->assign('subject',$this->matchGlossaryTerms($d['subject']));
-		$this->smarty->assign('content',$this->matchGlossaryTerms($d['content']));
+		$this->smarty->assign('subject',$this->matchHotwords($this->matchGlossaryTerms($d['subject'])));
+		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));
 
         $this->printPage();
   

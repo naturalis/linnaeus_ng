@@ -146,6 +146,7 @@ class SpeciesController extends Controller
 			);
 
 			$content = $this->matchGlossaryTerms($content);
+			$content = $this->matchHotwords($content);
 
 			if ($taxon['lower_taxon']==1) {
 			
@@ -457,7 +458,7 @@ class SpeciesController extends Controller
 				)
 			);
 
-			$mt[$key]['description'] = $mdt ? $this->matchGlossaryTerms($mdt[0]['description']) : null;
+			$mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
 
 			$t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ?
 					$this->controllerSettings['mime_types'][$val['mime_type']] :

@@ -17,7 +17,9 @@
 {/if}
 
 <div id="page-main">
-{if $gloss}
+{if !$gloss}
+{t}No glossary has been defined.{/t}
+{else}
 <table id="index">
 <thead> 
 	<tr>
@@ -44,8 +46,6 @@
 {/foreach}
 </tbody>
 </table>
-{else}
-{t}No glossary terms have been defined in this language.{/t}
 {/if}
 </div>
 

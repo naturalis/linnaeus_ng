@@ -203,6 +203,7 @@ class KeyController extends Controller
 		$step['title'] = $ck[0]['title'];
 
 		$step['content'] = $this->matchGlossaryTerms($ck[0]['content']);
+		$step['content'] = $this->matchHotwords($step['content']);
 
 		return $step;
 
@@ -270,7 +271,12 @@ class KeyController extends Controller
 
 			if (isset($cck[0]['title'])) $choices[$key]['title'] = $cck[0]['title'];
 			
-			if (isset($cck[0]['choice_txt'])) $choices[$key]['choice_txt'] = $this->matchGlossaryTerms($cck[0]['choice_txt']);
+			if (isset($cck[0]['choice_txt'])) {
+
+				$choices[$key]['choice_txt'] = $this->matchGlossaryTerms($cck[0]['choice_txt']);
+				$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
+
+			}
 
 			// resolve the targets to either a next step or a taxon
 			if (!empty($val['res_keystep_id']) && $val['res_keystep_id']!=0) {

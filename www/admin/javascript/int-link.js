@@ -120,14 +120,14 @@ function intLinkInsertLink() {
 			query = query + d[0]+'='+d[1]+'&';
 			
 		}
-		
+
 		query = query.replace(/\&$/,'');
-		
+
 		var newContent = 
-			'<a class="internal-link" href="../'+controller+'/'+url+(query ? '?'+query : '') +'">'+
+			'<a class="internal-link" href="../'+controller+'/'+url+(query ? (url.indexOf('?')==-1 ? '?' : '&') + query : '') +'">'+
 			(selection!='' ? selection : label) +
 			'</a>';
-
+		alert(newContent);
 	}
 	
 
