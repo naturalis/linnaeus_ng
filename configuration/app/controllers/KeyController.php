@@ -11,6 +11,7 @@ class KeyController extends Controller
 
     public $usedModels = array(
 		'keystep',
+		'keymap',
 		'content_keystep',
 		'choice_keystep',
 		'choice_content_keystep',
@@ -49,6 +50,11 @@ class KeyController extends Controller
 		$this->checkForProjectId();
 
         $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
+		
+		//$this->setStoredChoiceList();
+
+
+//unset($_SESSION['app']['user']['key']['path']);
 
     }
 
@@ -148,7 +154,7 @@ class KeyController extends Controller
     
     }
 
-	/* function exists solel for the benefit of the preview overlay's "back to editing"-button */
+	/* function exists sole for the benefit of the preview overlay's "back to editing"-button */
 	public function getCurrentKeyStepId()
 	{
 	
@@ -160,8 +166,8 @@ class KeyController extends Controller
 	{
 	
 		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
-		return false;
-	
+
+		return false;	
 	
 	}
 		
@@ -469,6 +475,13 @@ class KeyController extends Controller
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
 		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
 
+		if (!isset($_SESSION['app']['user']['key']['path'])) {
+
+			$this->setStoredKeypath($step);
+
+		}
+
+
 		if (isset($_SESSION['app']['user']['key']['path'])) {
 		// keypath already exists...
 
@@ -514,6 +527,102 @@ class KeyController extends Controller
 		}
 
 		$_SESSION['app']['user']['key']['path'] = $d;
+
+	}
+
+	private function setStoredChoiceList()
+	{
+	
+		if(!isset($_SESSION['app']['user']['key']['choiceKeysteps'])) {
+
+			$_SESSION['app']['user']['key']['choiceKeysteps'] = $this->getStoredChoiceList();
+
+		}
+	
+	}
+
+	private function getStoredChoiceList()
+	{
+	
+		$d = $this->models->Keymap->_get(
+			array('id' => 
+				array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns' => 'choicelist'
+			)
+		);
+		
+		return !empty($d[0]['choicelist']) ? unserialize($d[0]['choicelist']) : null;
+	
+	}
+	
+	private function cDva($list,$id)
+	{
+
+		foreach((array)$list as $choices) {
+	
+			foreach((array)$choices as $key => $val) {
+	
+				if ($val['res_keystep_id']==$id) {
+				
+					$this->_stepList[$id] = $val;
+
+					$this->cDva($list,$val['keystep_id']);					
+				
+				}
+		
+			}
+	
+		}
+		
+	}
+	
+	private function setStoredKeypath($step)
+	{
+return;
+unset($this->_stepList);
+$this->cDva($this->getStoredChoiceList(),$step['id']);
+
+
+
+foreach(array_reverse((array)$this->_stepList) as $key => $val) {
+
+	$d[] = array(
+		'id' => $val['keystep_id'],
+		'step_number' => $val['keystep_id'],
+		'step_title' => $val['step_title'][$this->getCurrentLanguageId()]['title'],
+		'is_start' => isset($val['is_start']) ? $val['is_start'] : null,
+		'choice_marker' => $val['marker'],
+	);
+
+
+}
+
+q($d);
+
+die();
+
+
+//q($_SESSION['app']['user']['key']['path']);
+
+		$step = $params['step'];
+		$choice = isset($params['choice']) ? $params['choice'] : null;
+		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
+		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
+		
+		foreach((array)$_SESSION['app']['user']['key']['choiceKeysteps'] as $val) {
+		
+		}
+
+			$d[] = array(
+				'id' => $step['id'],
+				'step_number' => $step['number'],
+				'step_title' => $step['title'],
+				'is_start' => $step['is_start'],
+				'choice_marker' => null,
+			);
+
 
 	}
 

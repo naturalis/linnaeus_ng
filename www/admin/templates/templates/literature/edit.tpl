@@ -144,10 +144,10 @@ $('body').click(function(e) {
 var f = $('#selected-taxa');
 var off = $('#add-button').offset();
 f.offset({left : off.left + $('#add-button').width() + 25, top: off.top});
+{/literal}
 
 {if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 initTinyMce(false,false);
-{/literal}
 
 {foreach from=$ref.taxa item=v}
 	litAddTaxonToList({$v.taxon_id},true,true);

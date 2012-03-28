@@ -11,6 +11,7 @@ class KeyController extends Controller
 
     public $usedModels = array(
 		'keystep',
+		'keymap',
 		'content_keystep',
 		'content_keystep_undo',
 		'choice_keystep',
@@ -747,12 +748,15 @@ class KeyController extends Controller
         
         $this->setPageName( _('Store keymap'));
 		
-		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('action','store')) { // && !$this->isFormResubmit()) {
 
 			// might not be a bad idea either: $d = $this->getTaxonDivision();
-			$d = $this->getKeyTree();
-
-			q($d);
+			$this->storeKeyTree(
+				$this->getStorableKeyTree(),
+				$this->getChoiceList()
+			);
+			
+			$this->addMessage(_('Keymap saved'));
 
 		}
 	
@@ -1957,8 +1961,123 @@ class KeyController extends Controller
 
 	}
 
+	private function storeKeyTree($t,$l)
+	{
+
+		$this->models->Keymap->delete(array('project_id' => $this->getCurrentProjectId()));
+		
+		if (empty($t) || empty($l)) return;
+
+		$this->models->Keymap->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'keymap' => serialize($t),
+				'choicelist' => serialize($l)
+			)
+		);
+				
+	}
+
+	private function getStorableKeyTree($id=null)
+	{
+	
+		$d = !isset($id) ? $this->getStartKeystep() : $this->getKeystep($id);
+		
+		foreach((array)$this->getKeystepChoices($d['id']) as $val) {
+		
+			if (!is_null($val['res_keystep_id'])) $targetStep = $this->getStorableKeyTree($val['res_keystep_id']);
+			if (!is_null($val['res_taxon_id'])) $targetTaxon = $this->getTaxonById($val['res_taxon_id']);
+
+			$ck = $this->models->ChoiceContentKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'choice_id' => $val['id']
+						),
+					'columns' => 'choice_txt,choice_img,choice_image_params,language_id',
+					'fieldAsIndex' => 'language_id'
+				)
+			);
+
+			$c[$val['id']] = array(
+				'id' => $val['id'],
+				'marker' => $val['marker'],
+				'content' => $ck,
+				'choice_img' => $val['choice_img'],
+				'choice_image_params' => $val['choice_image_params'],
+				'res_keystep_id' => $val['res_keystep_id'],
+				'res_keystep' => isset($targetStep) ? $targetStep : null,
+				'res_taxon_id' => $val['res_taxon_id'],
+				'res_taxon' => isset($targetTaxon) ? $targetTaxon : null,
+			);
+		
+		}
+
+		$ck = $this->models->ContentKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'keystep_id' => $d['id']
+					),
+				'columns' => 'title,content,language_id',
+				'fieldAsIndex' => 'language_id'
+			)
+		);
+					
+		$s[$d['id']] = array(		
+			'id' => $d['id'],
+			'number' => $d['number'],
+			'image' => $d['image'],
+			'content' => $ck,
+			'choices' => isset($c) ? $c : null
+		);
 
 
+		return ($s);
+	
+	}
 
+	private function getChoiceList($id=null)
+	{
+	
+		$choices =  $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				)
+			)
+		);
+
+		$d = array();
+
+		foreach((array)$choices as $key => $val) {
+		
+			$ck = $this->models->ContentKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'keystep_id' => $val['keystep_id']
+						),
+					'columns' => 'title,language_id',
+					'fieldAsIndex' => 'language_id'
+				)
+			);
+
+			$d[$val['res_keystep_id']][] = array(
+				'id' => $val['id'],
+				'keystep_id' => $val['keystep_id'],
+				'marker' => $this->showOrderToMarker($val['show_order']),
+				'res_keystep_id' => $val['res_keystep_id'],
+				'res_taxon_id' => $val['res_taxon_id'],
+				'step_title' => $ck
+			);
+		
+		}
+		
+		return $d;
+	
+
+    }
 
 }

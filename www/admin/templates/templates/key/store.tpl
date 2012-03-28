@@ -10,4 +10,6 @@
 <input type="submit" value="{t}Store keymap{/t}" />
 </form>
 </div>
+
+{include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

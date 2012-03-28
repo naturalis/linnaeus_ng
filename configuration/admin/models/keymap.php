@@ -2,10 +2,10 @@
 
 include_once ('model.php');
 
-class CharacteristicLabel extends Model
+class Keymap extends Model
 {
 
-    const tableBaseName = 'characteristics_labels';
+    const tableBaseName = 'keymaps';
 
 
     /**
