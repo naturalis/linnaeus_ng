@@ -14,7 +14,7 @@
 	<tr class="tr-highlight">
 		<td style="border-bottom:1px solid #999">{$v.controller}</td>
 		<td style="border-bottom:1px solid #999;border-right:1px solid #999;">
-			<a href="../{$v.controller}/{if $v.view!='*'}{$v.view}.php{/if}">{$v.view}</a>
+			<!--a href="../{$v.controller}/{if $v.view!='*'}{$v.view}.php{/if}"-->{$v.view}!<!--/a-->
 		</td>
 	{foreach item=vv from=$v.roles}
 		<td style="

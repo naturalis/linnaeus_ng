@@ -2303,7 +2303,7 @@ class ImportController extends Controller
 				else
 					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
 						'data' => trim((string)$taxon->name),
-						'cause' => 'Unable to save synoym "'.trim((string)$vVal->synonym->name).'" ('.$res.').'
+						'cause' => 'Unable to save synonym "'.trim((string)$vVal->synonym->name).'" ('.$res.').'
 					);
 	
 			}
