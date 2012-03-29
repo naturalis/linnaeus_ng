@@ -164,7 +164,7 @@ class KeyController extends Controller
 	
 	private function choicesHaveL2Attributes($choices)
 	{
-	
+
 		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
 
 		return false;	
