@@ -19,11 +19,11 @@
 		<div id="choices">		
 {foreach from=$choices key=k item=v}
 	{if $v.choice_img}
+		{if $useJavascriptLinks}
 		<img
 			alt="{$v.choice_img}" 
 			id="choice-img-{$v.id}"
-			onclick="showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-			src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
+			onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}"
 			style="
 				position:absolute;
 				left:{$v.choice_image_params.leftpos}px;
@@ -31,6 +31,27 @@
 				width:{$v.choice_image_params.width}px;
 				height:{$v.choice_image_params.height}px;
 			"/>
+		{else}
+			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+				<a href="../key/index.php?choice={$v.id}">
+			{elseif $v.res_taxon_id!=''}
+				<a href="../species/taxon.php?id={$v.res_taxon_id}">
+			{/if}
+			<img
+				alt="{$v.choice_img}" 
+				id="choice-img-{$v.id}"
+				src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
+				style="
+					position:absolute;
+					left:{$v.choice_image_params.leftpos}px;
+					top:{$v.choice_image_params.toppos}px;
+					width:{$v.choice_image_params.width}px;
+					height:{$v.choice_image_params.height}px;
+				"/>
+			</a>
+		{/if}
+			<br />
+			<a href="javascript:showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
 		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;text-align:left">
 			<span class="marker">{$v.marker}</span>.
 			<span class="text">{$v.choice_txt|nl2br}</span>
@@ -52,9 +73,7 @@
 					{t}Taxon:{/t} {$v.target}
 				</a>
 				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-				{/if}				
-				
-
+				{/if}
 			{/if}
 			</span>
 
