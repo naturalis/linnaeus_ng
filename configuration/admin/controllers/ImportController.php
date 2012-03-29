@@ -1359,6 +1359,7 @@ class ImportController extends Controller
 	public function goNewProject()
 	{
 
+		$this->unsetProjectSessionData();
 		$this->setCurrentProjectId($this->getNewProjectId());
 		$this->setCurrentProjectData();
 		$this->reInitUserRolesAndRights();

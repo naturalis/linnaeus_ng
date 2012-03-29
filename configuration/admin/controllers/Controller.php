@@ -1627,6 +1627,8 @@ class Controller extends BaseClass
 		unset($_SESSION['admin']['literature']);
 		unset($_SESSION['admin']['species']);
 		unset($_SESSION['admin']['matrixkey']);	
+		unset($_SESSION['admin']['import']);
+		unset($_SESSION['admin']['data']);	
 	
 	}
 

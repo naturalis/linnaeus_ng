@@ -559,6 +559,7 @@ class ProjectsController extends Controller
 							
 					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_SYS_ADMIN);
 					
+					$this->unsetProjectSessionData();
 					$this->reInitUserRolesAndRights();
 	                $this->setCurrentProjectId($id);
 	                $this->setCurrentProjectData();
