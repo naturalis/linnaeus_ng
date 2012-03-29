@@ -70,7 +70,7 @@ class MatrixKeyController extends Controller
 		$this->cleanUpEmptyVariables();
 
 		if ($this->rHasId()) {
-
+		
 			$this->setCurrentMatrixId($this->requestData['id']);
 			
 			$this->redirect('edit.php');
@@ -81,24 +81,18 @@ class MatrixKeyController extends Controller
 			$matrices = $this->getMatrices();
 			
 			if (count((array)$matrices)>0) {
-echo '1';			
+			
 				$this->setCurrentMatrixId($matrices[0]['id']);
-echo '2';		
-
-q($matrices,1);	
 	
 				$this->redirect('edit.php');
 	
 			} else {
-echo '3';			
-	die();
+	
 				$this->redirect('matrices.php');
 
 			}
 
 		} else {
-echo '4';	
-die();		
 
 			$this->redirect('edit.php');
 
