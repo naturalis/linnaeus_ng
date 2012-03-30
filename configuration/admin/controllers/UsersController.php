@@ -21,6 +21,7 @@ class UsersController extends Controller
         'module_project', 
         'free_module_project', 
         'module_project_user',
+		'user_taxon'
     );
 
 	public $cssToLoad = array('users.css','lookup.css','dialog/jquery.modaldialog.css');
@@ -2144,6 +2145,7 @@ MUST CHECK
 		$this->models->ProjectRoleUser->delete($d);
 		$this->models->ModuleProjectUser->delete($d);
 		$this->models->FreeModuleProjectUser->delete($d);
+		$this->models->UserTaxon->delete($d);
 
 	}
 

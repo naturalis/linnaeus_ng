@@ -5,9 +5,7 @@
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" id="action" name="action" value="save" />
-<input name="id" id="id" type="hidden" value="{$data.id}"  />
-<input name="org_parent_id" id="org_parent_id" type="hidden" value="{$data.parent_id}"  />
-{if $data.id}<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$data.id}','_top')" />{/if}
+<input type="hidden" id="next" name="next" value="new" />
 <table>
 	<tr>
 		<td>
@@ -67,7 +65,7 @@
 	</select>
 		</td>
 		<td>
-			<span id="rank-message" class=""></span>
+			<span id="rank-message" class=""></span> 
 		</td>
 	</tr>
 	<tr>
@@ -75,7 +73,8 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-			<input type="submit" value="{t}save{/t}" />
+			<input type="submit" value="{t}save and create another{/t}" />
+			<input type="button" value="{t}save and go to main taxon page{/t}" onclick="$('#next').val('main');$('#theForm').submit();" />
 		</td>
 	</tr>
 </table>
