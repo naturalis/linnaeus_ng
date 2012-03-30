@@ -56,7 +56,7 @@
 				{if ($taxon.level-$firstlevel)>=0}{assign var=dots value=$taxon.level-$firstlevel}{else}{assign var=dots value=0}{/if}
 				{'.'|str_repeat:$dots}
 				{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
-				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>
+				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>{* $taxon.id}::{$taxon.parent_id *}
 			</td>
 	{if $session.admin.project.includes_hybrids==1}<td>
 				{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
@@ -120,7 +120,7 @@
 	{if $taxa && $languages|@count==0}
 		{t}You have to define at least one language in your project before you can add any taxa.{/t} <a href="../projects/data.php">{t}Define languages now.{/t}</a>
 	{else}
-		<a href="edit.php">{t}Add a new taxon{/t}</a>
+		<a href="new.php">{t}Add a new taxon{/t}</a>
 	{/if}
 
 </div>

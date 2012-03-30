@@ -8,7 +8,7 @@
 {t}Editing taxa:{/t}
 <ul class="admin-list">
 	<li><a href="list.php">{t}Taxon list{/t}</a></li>
-	<li><a href="edit.php">{t}Add a new taxon{/t}</a></li>
+	<li><a href="new.php">{t}Add a new taxon{/t}</a></li>
 	<li><a href="file.php">{t}Import taxon tree from file{/t}</a></li>
 	<li><a href="col.php">{t}Import taxon tree from Catalogue Of Life (experimental){/t}</a></li>
 	<li><a href="orphans.php">{t}Orphans (taxa outside of the main taxon tree){/t}</a></li>

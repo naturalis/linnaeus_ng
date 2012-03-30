@@ -47,7 +47,7 @@
 	{section name=foo loop=$pv.level-$v.parents[0].level}
 	&nbsp;
 	{/section}		
-	{$pv.taxon}</option>
+	{$pv.taxon} ({$pv.rank})</option>
 	{/foreach}
 	</select>
 		</td>

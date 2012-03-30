@@ -8,7 +8,7 @@
 {t}Please be aware that the higher and lower taxa are part of the same tree. Changes in the structure of the higher taxa might affect those of the lower taxa, so take care when editing. To avoid unforseen problems, it is impossible to delete taxa in the higher taxa module that have children among the lower taxa. In order to remove such a taxon completely, the child taxa should first be moved or deleted in the species module.{/t}
 <ul class="admin-list">
 	<li><a href="../species/list.php">{t}Higher taxa list{/t}</a></li>
-	<li><a href="../species/edit.php">{t}Add a new higher taxon{/t}</a></li>
+	<li><a href="../species/new.php">{t}Add a new higher taxon{/t}</a></li>
 </ul>
 </div>
 

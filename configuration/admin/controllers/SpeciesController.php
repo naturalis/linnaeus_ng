@@ -411,8 +411,8 @@ class SpeciesController extends Controller
     }
 
 
-    /**
-     * Add new taxon action or edit existing
+   /**
+     * Edit existing taxon
      *
      * @access    public
      */
@@ -423,63 +423,55 @@ class SpeciesController extends Controller
 
 		$this->checkAuthorisation();
 
-		if ($this->rHasId()) {
+		if (!$this->rHasId()) $this->redirect('new.php');
 
-			$data = $this->getTaxonById();
+		$data = $this->getTaxonById();
 
-			if ($this->maskAsHigherTaxa()) {
+		if ($this->maskAsHigherTaxa()) {
 
-				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+			$pr = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$data['rank_id']]['rank']),$data['taxon']));
-
-			} else {
-
-		        $this->setPageName(sprintf(_('Editing "%s"'),$data['taxon']));
-
-			}
+			$this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$data['rank_id']]['rank']),$data['taxon']));
 
 		} else {
 
-			$data = isset($this->requestData) ? $this->requestData : null;
+			$pr = $this->getProjectRanks();
 
-	        $this->setPageName(_('New taxon'));
+			$this->setPageName(sprintf(_('Editing "%s"'),$data['taxon']));
 
 		}
 
-
-		$pr = $this->getProjectRanks();
-		
 		if (count((array)$pr)==0) {
 
 			$this->addMessage(_('No ranks have been defined.'));
 
 		} else {
 
-			$this->getTaxonTree();
+			$this->_newGetTaxonTree();
 
 			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
 	
-			if ($this->rHasVal('taxon')) {
+			if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit()) {
 			
 				$isHybrid = $this->rHasVal('is_hybrid','on');
 				
-				$parentId =
-				$parentId =
-					($this->requestData['id']==$this->requestData['parent_id'] || $isEmptyTaxaList || $this->requestData['parent_id']=='-1' ? 
-						null :
-						$this->requestData['id']
-					);
+				if ($this->requestData['id']==$this->requestData['parent_id'])
+					$parentId = $this->requestData['org_parent_id'];
+				else
+				if ($isEmptyTaxaList || $this->requestData['parent_id']=='-1')
+					$parentId = null;
+				else
+					$parentId = $this->requestData['parent_id'];
 
 				if ($this->isTaxonNameUnique($this->requestData['taxon'],$this->requestData['id'],false)) {
 	
-					if ($this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+					if ($this->canParentHaveChildTaxa($parentId) || $isEmptyTaxaList) {
 	
 						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
 
 							$this->models->Taxon->save(
 								array(
-									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
+									'id' => $this->requestData['id'],
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon' => $this->requestData['taxon'],
 									'parent_id' => $parentId,
@@ -488,23 +480,16 @@ class SpeciesController extends Controller
 								)
 							);
 
-							$data['id'] = ($this->rHasId() ? $this->requestData['id'] : $this->models->Taxon->getNewId());
-
-							if (empty($parentId) && empty($this->requestData['id'])) {
-							
-								$this->doAssignUserTaxon($this->getCurrentUserId(),$this->models->Taxon->getNewId());
-
-							}
-							
 							$this->reOrderTaxonTree();
 	
-							$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
+							//$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
 							
-							$this->setPageName(sprintf(_('Editing "%s"'),$this->requestData['taxon']));
-							unset($data['taxon']);
+							//$this->setPageName(sprintf(_('Editing "%s"'),$this->requestData['taxon']));
+
+							//unset($data['taxon']);
 							unset($_SESSION['admin']['species']['usertaxa']);
 							
-							//$this->redirect('list.php');
+							$this->redirect('taxon.php?id='.$this->requestData['id']);
 		
 						} else {
 			
@@ -548,6 +533,111 @@ class SpeciesController extends Controller
 			}
 			*/
 		}
+
+		$this->printPage();
+
+	}
+
+
+   /**
+     * Add new taxon
+     *
+     * @access    public
+     */
+    public function newAction ()
+    {
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
+		$this->checkAuthorisation();
+
+		$this->setPageName(_('New taxon'));
+		
+		$pr = $this->getProjectRanks();
+
+		if (count((array)$pr)==0) {
+
+			$this->addMessage(_('No ranks have been defined.'));
+
+		} else {
+
+			$this->_newGetTaxonTree();
+
+			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
+	
+			if ($this->rHasVal('taxon') && $this->rHasVal('action','save') && !$this->isFormResubmit()) {
+
+				$isHybrid = $this->rHasVal('is_hybrid','on');
+				
+				$parentId =
+					($this->requestData['id']==$this->requestData['parent_id'] || $isEmptyTaxaList || $this->requestData['parent_id']=='-1' ? 
+						null :
+						$this->requestData['parent_id']
+					);
+
+				if ($this->isTaxonNameUnique($this->requestData['taxon'],false,false)) {
+	
+					if ($this->canParentHaveChildTaxa($parentId) || $isEmptyTaxaList) {
+	
+						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
+
+							$this->models->Taxon->save(
+								array(
+									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon' => $this->requestData['taxon'],
+									'parent_id' => $parentId,
+									'rank_id' => $this->requestData['rank_id'],
+									'is_hybrid' =>  ($isHybrid ? 1 : 0)
+								)
+							);
+
+							$newId = $this->models->Taxon->getNewId();
+
+							if (empty($parentId))  $this->doAssignUserTaxon($this->getCurrentUserId(),$newId);
+							
+							$this->reOrderTaxonTree();
+							
+							if ($this->rHasVal('next','main')) $this->redirect('taxon.php?id='.$newId);
+
+							$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
+
+							$this->_newGetTaxonTree();
+							
+						} else {
+			
+							$this->addError(_('Rank cannot be hybrid.'));
+							
+							$this->smarty->assign('data',$this->requestData);
+			
+						}
+		
+					} else {
+		
+						$this->addError(_('Parent cannot have child taxa.'));
+
+						$this->smarty->assign('data',$this->requestData);
+		
+					}
+	
+				} else {
+	
+					$this->addError(_('Taxon name already in database.'));
+
+					$this->smarty->assign('data',$this->requestData);
+	
+				}
+			
+			}
+
+			$this->smarty->assign('allowed',true);
+
+			$this->smarty->assign('projectRanks',$pr);
+
+			if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
+
+		}
+
 
 		$this->printPage();
 
@@ -3780,10 +3870,11 @@ class SpeciesController extends Controller
 
 	private function canParentHaveChildTaxa($parentId)
 	{
-		// get the projected parent taxon, get it's rank id...
+
+		// get the projected parent taxon...
 		$d = $this->getTaxonById($parentId);
 
-		// ..and check whether that rankhas any child ranks
+		// ..and check whether its rank has any child ranks
 		return ($this->getRankByParent($d['rank_id'],false) != -1);
 
 	}
