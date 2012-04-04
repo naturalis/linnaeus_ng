@@ -14,7 +14,10 @@
 </p>
 <ul>
 {section name=i loop=$keySections}
-<li><a href="step_show.php?id={$keySections[i].id}">{t}Step{/t} {$keySections[i].number}: {$keySections[i].title}</a></li>
+<li>
+	<a href="step_show.php?id={$keySections[i].id}">{t}Step{/t} {$keySections[i].number}: {$keySections[i].title}</a>
+&nbsp;(<a href="?action=setstart&id={$keySections[i].id}">set as key start</a>)
+</li>
 {/section}
 </ul>
 {/if}

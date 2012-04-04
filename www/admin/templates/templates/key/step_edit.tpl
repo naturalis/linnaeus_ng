@@ -20,7 +20,8 @@
 			{t}Number:{/t}
 		</td>
 		<td>
-			<input type="text" name="number" id="number" value="{$step.number}" style="width:40px;text-align:right" /> *
+			{*<input type="text" name="number" id="number" value="{$step.number}" style="width:40px;text-align:right" /> *}
+			{$step.number}
 		</td>
 	</tr>
 	<tr style="vertical-align:top;">
