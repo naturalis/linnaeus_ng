@@ -14,6 +14,7 @@ class Controller extends BaseClass
 	private $_prevTreeId = null;
 	private $_breadcrumbRootName = null;
 
+    public $tmp;
     public $smarty;
     public $requestData;
 	public $requestDataFiles;

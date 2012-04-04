@@ -37,12 +37,12 @@
 <table>
 	<tr>
 		<th style="width:10px;text-align:right">#</th>
-		<th style="width:220px;">{t}choice title{/t}</th>
-		<th style="width:220px;" colspan="2">{t}choice leads to{/t}</th>
+		<th style="width:270px;">{t}choice title{/t}</th>
+		<th style="width:240px;" colspan="2">{t}choice leads to{/t}</th>
 		<th style="width:90px;">{t}change order{/t}</th>
 		<th style="width:30px;"><!-- span class="a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
 		<th style="width:60px;"></th>
-		<th style="width:130px;"></th>
+		{*<th style="width:130px;"></th>*}
 	</tr>
 {section name=i loop=$choices}
 	<tr class="tr-highlight" style="vertical-align:top">
@@ -89,7 +89,7 @@
 		
 		<td class="key-choice-edit">[<span class="a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
 		<td class="key-choice-edit">[<span class="a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
-		<td class="key-choice-edit">[<a href="step_edit.php?insert={$choices[i].id}" title="{t}insert step between choice and target{/t}">{t}insert step{/t}</a>]</td>
+		{* <td class="key-choice-edit">[<a href="step_edit.php?insert={$choices[i].id}" title="{t}insert step between choice and target{/t}">{t}insert step{/t}</a>]</td> *}
 	</tr>
 	<tr id="choice-{$smarty.section.i.index}" class="key-choice-details-invisible">
 		<td>&nbsp;</td>
