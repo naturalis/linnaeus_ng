@@ -1,15 +1,5 @@
 <?php
 
-
-/*
-
-
-	CHECK THE MAP
-
-*/
-
-
-
 include_once ('Controller.php');
 
 class KeyController extends Controller
@@ -199,7 +189,7 @@ class KeyController extends Controller
 		*/
 
 		$this->smarty->assign('keyPath',$this->getKeyPath());
-	
+
 		$this->printPage();
 
 	}
@@ -1037,7 +1027,7 @@ class KeyController extends Controller
 	private function getRemainingTaxa()
 	{
 
-		$taxa = false;
+		$taxa = array();
 
 		$pr = $this->getProjectRanks(array('keypathEndpoint'=>true,'forceLookup'=>true));
 
@@ -1066,7 +1056,7 @@ class KeyController extends Controller
 
 				if ($ck[0]['total']==0) {
 				
-					$taxa[] = $tval;
+					$taxa[$tval['id']] = $tval;
 
 				}
 			
@@ -1077,9 +1067,10 @@ class KeyController extends Controller
         $this->customSortArray($taxa, array(
             'key' => 'taxon_order', 
             'dir' => 'asc', 
-            'case' => 'i'
+            'case' => 'i',
+			'maintainKeys' => true
         ));
-		
+
 		return $taxa;
 
 	}
@@ -1097,9 +1088,9 @@ class KeyController extends Controller
 				$s['title'],
 			'type' => 'step',
 			'data' => array(
-				'number'=>$s['number'],
-				'title'=>$s['title'],
-				'is_start'=>$s['is_start'],
+				'number'=> $s['number'],
+				'title'=> $s['title'],
+				'is_start'=> $s['is_start'],
 				'node' => $this->_counter++,
 				'referringChoiceId' => $choice['id']
 			)
@@ -1122,7 +1113,7 @@ class KeyController extends Controller
 
 			foreach((array)$ck as $key => $val) {
 
-				if ($val['res_taxon_id']) {
+				if (isset($val['res_taxon_id'])) {
 				
 					$t = $this->models->Taxon->_get(
 						array(
@@ -1130,9 +1121,11 @@ class KeyController extends Controller
 							'columns' => 'id,taxon'
 						)
 					);
+					
+					$this->tmp = is_null($this->tmp) ? 0 : $this->tmp;
 	
 					$step['children'][] = array(
-						'id' => 't'.$t['id'],
+						'id' => 't'. $this->tmp++, //$t['id'], // using the id makes for weird loopbacks in the map when the same id appears multiple times
 						'type' => 'taxon',
 						'data' => array(
 							'number'=>'t'.$t['id'],
@@ -1144,7 +1137,7 @@ class KeyController extends Controller
 					);
 				
 				} else
-				if ($val['res_keystep_id']!=-1) {
+				if (isset($val['res_keystep_id']) && $val['res_keystep_id']!=-1) {
 	
 					$step['children'][] =
 						$this->getKeyTree(

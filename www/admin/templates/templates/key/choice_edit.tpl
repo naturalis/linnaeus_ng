@@ -104,7 +104,7 @@
 				{foreach from=$taxa key=k item=v}
 				{assign var=x value=$v.id}
 				{if $v.keypath_endpoint==1}
-				<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]==true}-remain{/if}">
+				<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]}-remain{/if}">
 					{$v.taxon}{if $v.is_hybrid==1}&nbsp;x{/if}
 					{assign var=first value=false}{/if}
 					 ({$ranks[$v.rank_id].rank})
