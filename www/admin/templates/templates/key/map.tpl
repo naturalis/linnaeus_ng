@@ -15,10 +15,11 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+
 	init({$json});
+
 {literal}
 });
-
 </script>
 {/literal}
 
