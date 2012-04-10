@@ -542,6 +542,20 @@ class KeyController extends Controller
 
 			$this->renumberKeySteps(array(0 => $this->getKeyTree()));
 			
+			$step = $this->getKeystep($res['newStepId']);
+
+			$this->removeLastKeyPathEntry();
+
+			$this->updateKeyPath(
+				array(
+					'id' => $step['id'],
+					'number' => $step['number'],
+					'title' => $step['title'],
+					'is_start' => $step['is_start'],
+					'choice' => null
+				)
+			);
+			
 			$this->redirect('step_show.php?id='.$res['newStepId']);
 		
 		} else
@@ -648,7 +662,6 @@ class KeyController extends Controller
 	
 	}
 
-
     public function mapAction()
     {
 
@@ -663,7 +676,6 @@ class KeyController extends Controller
         $this->printPage();
 
     }
-
 
     public function rankAction()
     {
@@ -944,6 +956,13 @@ class KeyController extends Controller
 
 	}
 
+	private function removeLastKeyPathEntry()
+	{
+
+		return array_pop($_SESSION['admin']['system']['keyPath']);
+
+	}
+
 	private function updateKeyPath($params) 
 	{
 
@@ -1001,7 +1020,7 @@ class KeyController extends Controller
 		$kp = $this->getKeyPath();
 		
 		$c = count((array)$kp);
-		
+
 		if ($id) {
 
 			for($i=($c-1);$i>=0;$i--) {
@@ -1157,7 +1176,6 @@ class KeyController extends Controller
 		return $step;
 
 	}
-
 
 	private function getKeysteps($params=null)
 	{
@@ -2198,7 +2216,6 @@ class KeyController extends Controller
 		}
 		
 		return $d;
-	
 
     }
 
@@ -2351,6 +2368,5 @@ class KeyController extends Controller
 		}
 	
 	}
-
 
 }
