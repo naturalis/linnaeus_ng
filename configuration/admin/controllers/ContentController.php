@@ -14,7 +14,7 @@ class ContentController extends Controller
     public $usedModels = array(
 		'content'
     );
-   
+
     public $usedHelpers = array(
     );
 
@@ -31,7 +31,7 @@ class ContentController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
 
     }
@@ -43,9 +43,9 @@ class ContentController extends Controller
      */
     public function __destruct ()
     {
-        
+
         parent::__destruct();
-    
+
     }
 
     /**
@@ -55,7 +55,7 @@ class ContentController extends Controller
      */
     public function indexAction()
     {
-    
+
 		$this->redirect('content.php');
 
 		/*
@@ -75,12 +75,12 @@ class ContentController extends Controller
 
     public function introductionAction()
     {
-    
+
 		$_SESSION['admin']['system']['content']['current-subject'] = 'Introduction';
 		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
-    
+
     }
 
     /**
@@ -91,12 +91,12 @@ class ContentController extends Controller
 
     public function contributorsAction()
     {
-    
+
 		$_SESSION['admin']['system']['content']['current-subject'] = 'Contributors';
 		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
-    
+
     }
 
     /**
@@ -107,12 +107,12 @@ class ContentController extends Controller
 
     public function aboutEtiAction()
     {
-    
+
 		$_SESSION['admin']['system']['content']['current-subject'] = 'About ETI';
 		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
-    
+
     }
 
 
@@ -123,29 +123,29 @@ class ContentController extends Controller
      */
     public function welcomeAction()
     {
-    
+
 		$_SESSION['admin']['system']['content']['current-subject'] = 'Welcome';
 		$_SESSION['admin']['system']['content']['is-free-module'] = false;
 
 		$this->redirect('content.php');
-    
+
     }
-	
+
     public function contentAction()
     {
-    
+
 		$this->checkAuthorisation();
 
 		if ($this->rHasId()) {
-		
+
 			$d = $this->getContentById($this->requestData['id'],$_SESSION['admin']['project']['default_language_id']);
 			$_SESSION['admin']['system']['content']['current-subject'] = $d['subject'];
-		
+
 		}
 
 		$currentSubject =
 			isset($_SESSION['admin']['system']['content']['current-subject']) ?
-			$_SESSION['admin']['system']['content']['current-subject'] : 
+			$_SESSION['admin']['system']['content']['current-subject'] :
 			'Introduction';
 
         $this->setPageName(_($currentSubject));
@@ -160,20 +160,20 @@ class ContentController extends Controller
 		$this->smarty->assign('subjects', $this->_subjects);
 
 		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
-		
+
 		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
         $this->printPage();
-    
+
     }
 
     public function previewAction ()
     {
 
 		$this->redirect('../../../app/views/linnaeus/index.php?p='.$this->getCurrentProjectId().'&sub='.$this->requestData['subject']);
-    
+
     }
 
 
@@ -186,66 +186,66 @@ class ContentController extends Controller
     {
 
         if (!$this->rHasVal('action')) return;
-        
+
         if ($this->requestData['action'] == 'save_content') {
-            
+
             $this->ajaxActionSaveContent();
-        
+
         } else
         if ($this->requestData['action'] == 'get_content') {
-            
+
             $this->ajaxActionGetContent();
-        
+
         }
-		
+
         $this->printPage();
-    
+
     }
 
 	private function ajaxActionSaveContent()
 	{
 
        if (!$this->rHasId() || !$this->rHasVal('language')) {
-            
+
             return;
-        
+
         } else {
-            
+
             if (!$this->rHasVal('content')) {
-                
+
                 $this->models->Content->delete(
                     array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->requestData['language'], 
+                        'project_id' => $this->getCurrentProjectId(),
+                        'language_id' => $this->requestData['language'],
                         'subject' => $this->requestData['id']
                     )
                 );
-            
+
             } else {
-                
+
                 $ls = $this->models->Content->_get(
 					array(
 						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $this->requestData['language'], 
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->requestData['language'],
 							'subject' => $this->requestData['id']
 						)
 					)
 				);
-                
+
                 $this->models->Content->save(
 					array(
-						'id' => isset($ls[0]['id']) ? $ls[0]['id'] : null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->requestData['language'], 
+						'id' => isset($ls[0]['id']) ? $ls[0]['id'] : null,
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->requestData['language'],
 						'subject' => $this->requestData['id'],
 						'content' => trim($this->requestData['content'])
 					));
-            
+
             }
 
             $this->smarty->assign('returnText', 'saved');
-        
+
         }
 
 	}
@@ -255,26 +255,26 @@ class ContentController extends Controller
 	{
 
         if (!$languageId || !$id)  return;
-        
+
 		$c = $this->models->Content->_get(
 			array(
 				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
+					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $languageId,
 					'subject' => $id
 					)
 			)
 		);
-			
+
 	   return $c[0];
-        
+
 	}
 
 	private function getContentById($id)
 	{
 
         if (!$id) return;
-        
+
 		$c = $this->models->Content->_get(
 			array(
 				'id' => array(
@@ -292,11 +292,11 @@ class ContentController extends Controller
 	{
 
         if (!$this->rHasVal('language') || !$this->rHasVal('id')) {
-            
+
             return;
-        
+
         } else {
-		
+
 			$d = $this->getContentBySubject($this->requestData['id'],$this->requestData['language']);
 
             $this->smarty->assign('returnText', $d['content']);
@@ -305,6 +305,4 @@ class ContentController extends Controller
 
 	}
 
-	
-	
 }
