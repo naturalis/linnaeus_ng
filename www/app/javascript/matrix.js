@@ -2,8 +2,6 @@ var imagePath;
 
 function getData(action,id,postFunction) {
 
-//prompt('hoer','ajax_interface.php?action='+action+'&id='+id+'&inc_unknowns='+$('#unknowns-y').attr('checked')+);
-
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
