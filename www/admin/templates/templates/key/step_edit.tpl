@@ -1,7 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-
 {assign var=noKeypathEdit value=true}
-
 {include file="_keypath.tpl"}
 
 <div id="page-main">
@@ -11,6 +9,7 @@
 	<input type="hidden" name="action" value="save" />
 	<input type="hidden" name="id" id="id" value="{$step.id}" />
 	<input type="hidden" name="is_start" value="{$step.is_start}" />
+
 <fieldset>
 <legend>{t}Editing keystep{/t} "<span id="default-key-title">...</span>"</legend>
 <span id="message-container" style="float:right;"></span><br />
