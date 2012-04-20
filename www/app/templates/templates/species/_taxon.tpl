@@ -3,18 +3,30 @@
 <table>
 	<tr>
 	{foreach from=$categories key=k item=v}
-		{if $activeCategory==$v.id && $k==0}{assign var=taxonStartPage value=true}{/if}
+		<td class="{$v.className}" id="ctb-{$v.id}">
+			{$v.title}
+		</td>
+		<td class="space"></td>
+		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
+	{/foreach}
+	</tr>
+</table>
+
+{*<!-- table>
+	<tr>
+	{foreach from=$categories key=k item=v}
+		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
 	{if $useJavascriptLinks}			
-		<td {if $activeCategory==$v.id}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},{$v.id})"{/if}>{$v.title}</td>
+		<td class="{$v.className}" onclick="goTaxon({$taxon.id},{$v.id})">{$v.title}</td>
 	{else}
-		<td class="category{if $activeCategory==$v.id}-active{/if}">
+		<td class="{$v.className}">
 			<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}">{$v.title}</a>	
 		</td>
 	{/if}
 		<td class="space"></td>
 	{/foreach}
 	</tr>
-</table>
+</table -->*}
 
 </div>
 
@@ -155,7 +167,7 @@
 </div>
 {else}
 <div id="content">
-{if $taxonStartPage && $overviewImage}
+{if $isTaxonStartPage && $overviewImage}
 <img alt="{$overviewImage}" id="overview-image" src="{$session.app.project.urls.project_media}{$overviewImage}"/>
 {/if}
 {$content}
@@ -172,6 +184,16 @@ $(document).ready(function(){
 {if $dispUrl && $dispName}
 	showMedia('{$dispUrl}','{$dispName}'); 
 {/if}
+
+{foreach from=$categories key=k item=v}
+{if $useJavascriptLinks}	
+	$('#ctb-{$v.id}').bind('click', function() {literal}{{/literal}
+		goTaxon({$taxon.id},'{$v.id}');
+	{literal}}{/literal});
+{else}
+	$('#ctb-{$v.id}').html('<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}">'+$('#ctb-{$v.id}').html()+'</a>');
+{/if}
+{/foreach}
 
 {literal}
 });
