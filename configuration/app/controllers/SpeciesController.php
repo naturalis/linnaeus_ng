@@ -343,6 +343,29 @@ class SpeciesController extends Controller
 
 			}
 
+			// std cats
+			$d = array_merge(
+				$d,
+				array(
+					0 => array(
+						'id' => 'media',
+						'title' => _('Media')
+					),
+					1 => array(
+						'id' => 'classification',
+						'title' => _('Classification')
+					),
+					2 => array(
+						'id' => 'names',
+						'title' => _('Names')
+					),
+					3 => array(
+						'id' => 'literature',
+						'title' => _('Literature')
+					),
+				)
+			);;
+
 			return array(
 				'categories' => $d,
 				'defaultCategory' => $defCat
