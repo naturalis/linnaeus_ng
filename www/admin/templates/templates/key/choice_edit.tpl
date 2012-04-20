@@ -20,11 +20,6 @@
 		<td {$languages[i].language_id} colspan="2">
 			{$defaultLanguage.language}
 		</td>
-	{if $session.admin.project.languages|@count>1}
-		<td id="project-language-tabs">
-			(languages)
-		</td>
-{/if}
 	</tr>
 	<tr style="vertical-align:top">
 		<td>{t}Text:{/t}</td>
@@ -35,7 +30,16 @@
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('default')" /></textarea>
 		</td>
+	</tr>
 	{if $session.admin.project.languages|@count>1}
+	<tr style="vertical-align:bottom">
+		<td style="padding-top:30px;"></td>
+		<td id="project-language-tabs">
+			(languages)
+		</td>
+	</td>
+	<tr>
+		<td></td>
 		<td>
 			<textarea
 				name="contentOther" 
@@ -43,10 +47,11 @@
 				style="width:400px;height:200px;"
 				onblur="keySaveChoiceContent('other')" /></textarea>
 		</td>
+	</td>
 	{/if}
 	</tr>
-	<tr style="vertical-align:top">
-		<td>{t}Image:{/t}</td>
+	<tr style="vertical-align:bottom">
+		<td style="padding-top:30px;">{t}Image:{/t}</td>
 		<td colspan="2">
 		{if $data.choice_img}
 			<img
@@ -66,10 +71,9 @@
 		{/if}
 		</td>
 	</tr>
-	<tr style="vertical-align:top">
-		<td>{t}Target:{/t}</td>
-		<td>{t}step:{/t}</td>
-		<td colspan="2">
+	<tr style="vertical-align:bottom">
+		<td style="padding-top:30px;">{t}Target:{/t}</td>
+		<td>
 			<select name="res_keystep_id" id="res_keystep_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="-1">{t}new step{/t}</option>
 				<option value="0"{if $data.res_taxon_id!=null} selected="selected"{/if}>{t}(none){/t}</option>
@@ -84,6 +88,7 @@
 				<option value="{$steps[i].id}"{if $steps[i].id==$data.res_keystep_id} selected="selected"{/if}>{$steps[i].number}. {$steps[i].title}</option>
 				{/section}
 			</select>
+			({t}step{/t})
 		</td>
 	</tr>
 	<tr style="vertical-align:top">
@@ -92,7 +97,6 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td>&nbsp;</td>
-		<td>{t}taxon:{/t}</td>
 		<td>
 			<select name="res_taxon_id" id="res_taxon_id" onchange="keyCheckTargetIntegrity(this)">
 				<option value="0">{t}(none){/t}</option>
@@ -111,6 +115,7 @@
 				</option>
 				{/foreach}
 			</select>
+			({t}taxon{/t})
 		</td>
 	</tr>
 	<tr style="vertical-align:top">
@@ -158,6 +163,7 @@ $(document).ready(function(){
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
+	initTinyMce(false,false);
 {literal}
 });
 {/literal}
