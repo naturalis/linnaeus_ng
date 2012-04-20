@@ -1,4 +1,5 @@
 <div id="categories">
+
 <table>
 	<tr>
 	{foreach from=$categories key=k item=v}
@@ -10,53 +11,11 @@
 			<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}">{$v.title}</a>	
 		</td>
 	{/if}
-<td class="space"></td>
-		{/foreach}
-{if $contentCount.media>0}
-
-	{if $useJavascriptLinks}			
-		<td {if $activeCategory=='media'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'media')"{/if}>{t}Media{/t}</td>
-	{else}
-		<td class="category{if $activeCategory=='media'}-active{/if}">
-			<a href="../species/taxon.php?id={$taxon.id}&cat=media">{t}Media{/t}</a>	
-		</td>
-	{/if}
-
-<td class="space"></td>
-{/if}
-
-	{if $useJavascriptLinks}			
-		<td {if $activeCategory=='classification'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'classification')"{/if}>{t}Classification{/t}</td>
-	{else}
-		<td class="category{if $activeCategory=='classification'}-active{/if}">
-			<a href="../species/taxon.php?id={$taxon.id}&cat=classification">{t}Classification{/t}</a>	
-		</td>
-	{/if}
-
-<td class="space"></td>
-{if $contentCount.literature>0}
-
-	{if $useJavascriptLinks}			
-		<td {if $activeCategory=='literature'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'literature')"{/if}">{t}Literature{/t}</td>
-	{else}
-		<td class="category{if $activeCategory=='literature'}-active{/if}">
-			<a href="../species/taxon.php?id={$taxon.id}&cat=literature">{t}Literature{/t}</a>	
-		</td>
-	{/if}
-
-<td class="space"></td>
-{/if}
-{if $contentCount.names>0}
-	{if $useJavascriptLinks}			
-		<td {if $activeCategory=='names'}class="category-active"{else}class="category" onclick="goTaxon({$taxon.id},'names')"{/if}>{t}Synonyms{/t}</td>
-	{else}
-		<td class="category{if $activeCategory=='names'}-active{/if}">
-			<a href="../species/taxon.php?id={$taxon.id}&cat=names">{t}Synonyms{/t}</a>	
-		</td>
-	{/if}
-{/if}
+		<td class="space"></td>
+	{/foreach}
 	</tr>
 </table>
+
 </div>
 
 <div id="page-main">
