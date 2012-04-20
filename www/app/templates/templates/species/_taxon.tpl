@@ -1,5 +1,7 @@
 <div id="categories">
 
+
+<!--  ja, deze tabel is het, ruud, ookal zie je er geen links in staan. hocus pocus jquery pas! -->
 <table>
 	<tr>
 	{foreach from=$categories key=k item=v}
