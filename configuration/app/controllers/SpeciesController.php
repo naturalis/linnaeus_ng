@@ -135,9 +135,20 @@ class SpeciesController extends Controller
 				$this->isLoggedInAdmin(),
 				$this->isLoggedInAdmin()
 			);
-
+			
 			// determine the page_id the page will open in
 			$activeCategory = $this->rHasVal('cat') ? $this->requestData['cat'] : $categories['defaultCategory'];
+
+			// setting the css classnames
+			foreach((array)$categories['categories'] as $key => $val) {
+		
+				$c = 'category';
+		
+				if ($val['id']==$activeCategory) $c .= '-active';
+				
+				$categories['categories'][$key]['className'] = $c;
+			
+			}
 
 			$content = $this->getTaxonContent(
 				$taxon['id'],
@@ -364,7 +375,7 @@ class SpeciesController extends Controller
 						'title' => _('Literature')
 					),
 				)
-			);;
+			);
 
 			return array(
 				'categories' => $d,
