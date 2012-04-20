@@ -22,6 +22,7 @@ function freemodSaveContent(language,type) {
 			'time' : allGetTimestamp()			
 		}),
 		success : function (data) {
+			//alert(data);
 			allSetMessage(data);
 		}
 	});
