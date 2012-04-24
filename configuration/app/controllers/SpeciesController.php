@@ -334,7 +334,7 @@ class SpeciesController extends Controller
 		
 			$defCat = 'classification';
 		
-			$d = null;
+			$d = array();
 
 			foreach((array)$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
 
