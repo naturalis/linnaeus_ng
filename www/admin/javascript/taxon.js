@@ -1478,11 +1478,3 @@ function taxonChangeSubmitButtonLabel(ele) {
 	$('#submit').val(taxonSubmitButtonLabel+' '+$('#rank-id :selected').text().toLowerCase());
 
 }
-
-
-function konijn() {
-
-$('#next').val('main');
-alert($('#theForm').submit());
-
-}
