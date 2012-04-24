@@ -141,13 +141,16 @@ class SpeciesController extends Controller
 
 			// setting the css classnames
 			foreach((array)$categories['categories'] as $key => $val) {
-		
-				$c = 'category';
-		
-				if ($val['id']==$activeCategory) $c .= '-active';
-				
-				$categories['categories'][$key]['className'] = $c;
-			
+				$c = array();
+				if ($val['id']==$activeCategory) {
+				    $c[] = 'category-active';
+				}
+				if ($key == 0) {
+				    $c[] = 'category-first';
+				} else if ($key == count($categories['categories']) - 1) {
+				    $c[] ='category-last';
+				}
+				$categories['categories'][$key]['className'] = implode(' ', $c);
 			}
 
 			$content = $this->getTaxonContent(
