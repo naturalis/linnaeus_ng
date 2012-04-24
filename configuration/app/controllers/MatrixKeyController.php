@@ -180,6 +180,8 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
+		$this->smarty->assign('matrices',$this->getMatricesInMatrix());
+
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
 
 		$this->smarty->assign('matrix',$matrix);
@@ -261,7 +263,15 @@ class MatrixKeyController extends Controller
 		} else
 		if ($this->rHasVal('action','get_taxa')) {
 
-			$this->smarty->assign('returnText',json_encode((array)$this->getTaxaScores($this->requestData['id'])));
+			$this->smarty->assign(
+				'returnText',
+				json_encode(
+					(array)$this->getTaxaScores(
+						$this->requestData['id'],
+						isset($this->requestData['inc_unknowns']) ? ($this->requestData['inc_unknowns']=='1') : false
+					)
+				)
+			);
 		
 		} else
 		if ($this->rHasVal('action','get_taxon_states')) {
@@ -281,15 +291,10 @@ class MatrixKeyController extends Controller
 	
 	}
 
-
 	private function checkMatrixIdOverride()
 	{
 
-		if ($this->rHasVal('mtrx')) {
-
-			$this->setCurrentMatrix($this->requestData['mtrx']);
-
-		}
+		if ($this->rHasVal('mtrx'))  $this->setCurrentMatrix($this->requestData['mtrx']);
 
 	}
 
@@ -325,7 +330,8 @@ class MatrixKeyController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'got_names' => 1
 					),
-					'fieldAsIndex' => 'id'
+					'fieldAsIndex' => 'id',
+					'columns' => 'id,got_names,\'matrix\' as type'
 				)
 			);
 			
@@ -413,6 +419,32 @@ class MatrixKeyController extends Controller
 
 	}
 
+	private function getMatricesInMatrix()
+	{
+
+		$mts = $this->models->MatrixTaxonState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $this->getCurrentMatrixId(),
+					'ref_matrix_id is not' => 'null'
+				),
+				'columns' => 'distinct ref_matrix_id,\'matrix\' as type'
+			)
+		);
+
+		foreach((array)$mts as $key => $val) {
+
+			$d = $this->getMatrix($val['ref_matrix_id']);
+			
+			if (isset($d)) $matrices[$val['ref_matrix_id']] = $d;
+
+		}
+
+		return isset($matrices) ? $matrices : null;
+
+	}
+
 	private function getCharacteristicStates($id)
 	{
 
@@ -481,21 +513,53 @@ class MatrixKeyController extends Controller
 
 	}
 
-	private function calculateScore($states,$item,$type)
+	private function calculateScore($p)
 	{
-	
+
+		$states = $p['states'];
+		$item = $p['item'];
+		$type = $p['type'];
+		$incUnknowns = isset($p['incUnknowns']) ? $p['incUnknowns'] : false;
+
 		$item['hits'] = 0;
 
 		// go through all states that the user has chosen
 		foreach((array)$states as $sKey => $sVal) {
 		
-			// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
-			if (substr($sVal,0,1)==='f') {
-		
-				$d = explode(':',$sVal);
+			// format [f (rang or distro)|c (other)]:[charid]:[value]([: + or - times standard dev (distro only)])
+			$d = explode(':',$sVal);
 
-				$charId = $d[1];
-				$value = $d[2];
+			$charId = isset($d[1]) ? $d[1] : null;
+			$value = isset($d[2]) ? $d[2] : null;
+			
+			// if "unknowns" should be included, taxa that have no state for a given character get scored as a hit
+			if ($incUnknowns && $type=='taxon' && isset($charId)) {
+			
+				$mts = $this->models->MatrixTaxonState->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'matrix_id' => $this->getCurrentMatrixId(),
+							'characteristic_id' => $charId,
+							'taxon_id' => $item['id']
+						),
+						'columns' => 'count(*) as total'
+					)
+				);
+				
+				if ($mts[0]['total']==0) {
+				
+					$item['hits']++; 
+					
+					continue;
+				
+				}
+			
+			}
+
+			// ranges and distributions have format f:charid:value (for range or distro)[: + or - times standard dev (distro only)]
+			if (isset($d[0]) && $d[0]==='f') {
+
 				if (isset($d[3])) $sd = $d[3];
 
 				$d = array(
@@ -546,12 +610,13 @@ class MatrixKeyController extends Controller
 
 				if ($hasState) $item['hits']++; 
 
-			} else {
+			} else 
+			if (isset($d[0]) && $d[0]==='c') {
 
 				$d = array(
 					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $this->getCurrentMatrixId(),
-					'state_id' => $sVal
+					'state_id' => $value
 				);
 
 				if ($type=='taxon')
@@ -573,33 +638,42 @@ class MatrixKeyController extends Controller
 	
 	}
 
-
-	private function getTaxaScores($states)
+	private function getTaxaScores($states,$incUnknowns=false)
 	{
-	
+
 		$taxa = $this->getTaxaInMatrix();
-		$mtcs = $this->getMatrices();
+		$mtcs = $this->getMatricesInMatrix();
 
-		if ($states==-1) return $taxa;
+		if ($states==-1) return array_merge((array)$taxa,(array)$mtcs);
 
-		foreach((array)$taxa as $key => $val) $taxa[$key] = $this->calculateScore($states,$val,'taxon');
-		
+		foreach((array)$taxa as $key => $val)
+			$taxa[$key] = $this->calculateScore(
+				array(
+					'states' => $states,
+					'item' => $val,
+					'type' => 'taxon',
+					'incUnknowns' => $incUnknowns
+				)
+			);
+
 		$matrices = array();
 
 		foreach((array)$mtcs as $key => $val) {
 
-			$d = $this->calculateScore($states,$val,'matrix');
+			$d = $this->calculateScore(
+				array(
+					'states' => $states,
+					'item' => $val,
+					'type' => 'matrix'
+				)
+			);
 
-			if ($d['score']>0) {
-
-				$d['type'] = 'matrix';
-				$matrices[$key] = $d;
-
-			}
+			$d['type'] = 'matrix';
+			$matrices[$key] = $d;
 
 		}
 	
-		$results = array_merge($taxa,$matrices);
+		$results = array_merge((array)$taxa,(array)$matrices);
 	
 		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));		
 
@@ -741,8 +815,8 @@ class MatrixKeyController extends Controller
 		}
 
 		return array(
-			'taxon_1' => $this->getTaxon($id[0]),
-			'taxon_2' => $this->getTaxon($id[1]),
+			'taxon_1' => $this->getTaxonById($id[0]),
+			'taxon_2' => $this->getTaxonById($id[1]),
 			'count_1' => $t1_count,
 			'count_2' => $t2_count,
 			'neither' => $neither,
@@ -799,39 +873,4 @@ class MatrixKeyController extends Controller
 	
 	}
 
-	private function getTaxon($id)
-	{
-
-		$t = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id
-				)
-			)
-		);
-	
-		return $t[0];
-
-	}
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -2922,7 +2922,7 @@ class Controller extends BaseClass
 
             $_SESSION['admin']['project']['urls']['project_media_l2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'l2_maps/';
 
-			$_SESSION['admin']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
+			$_SESSION['admin']['project']['urls']['system_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
 
         }
 
