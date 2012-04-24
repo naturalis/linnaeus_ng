@@ -1589,9 +1589,9 @@ class MapKeyController extends Controller
 
 				} else {
 				
-					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['general_media_l2_maps'].$val['name'].'.gif');
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif');
 
-					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['general_media_l2_maps'].strtolower($val['name']).'.gif';
+					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
 
 				}
 

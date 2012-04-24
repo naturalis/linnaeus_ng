@@ -1301,12 +1301,14 @@ class Controller extends BaseClass
 		if (isset($this->generalSettings['imageRootUrlOverride'])) {
 
 			$_SESSION['app']['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].'project/'.sprintf('%04s', $p).'/';
-			$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->generalSettings['imageRootUrlOverride'].'system/l2_maps/';
+			$_SESSION['app']['project']['urls']['system_media'] = $this->generalSettings['imageRootUrlOverride'].'system/';
+			$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
 	
 		} else {
 	
 			$_SESSION['app']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
-			$_SESSION['app']['project']['urls']['general_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
+			$_SESSION['app']['project']['urls']['system_media'] = $this->baseUrl . $this->getAppName() . '/media/system/';
+			$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
 			
 		}
 
@@ -1467,8 +1469,9 @@ class Controller extends BaseClass
 		
 		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['app']['project']['id']). '/';
 		
-		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
 		if (file_exists($d.'_header-container.tpl')) $r['header_container'] = $d.'_header-container.tpl';
+		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
+		if (file_exists($d.'_page-start.tpl')) $r['main_menu'] = $d.'_page-start.tpl';
 		if (file_exists($d.'_footer.tpl')) $r['footer'] = $d.'_footer.tpl';
 
 		return $r;
