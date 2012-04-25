@@ -1,0 +1,58 @@
+#results{
+	width:500px;
+}
+
+#result-index {
+	position:fixed;
+	top:175px;
+	left:550px;
+	border:1px dotted black;
+}
+
+#result-index-header {
+	padding:5px 5px 0px 5px;
+	background-color:#eee;
+	font-style:bold;
+	border-bottom:1px dotted black;
+	height:25px;
+}
+
+#result-index-body {
+	padding:5px;
+}
+
+.replaceBlankedOut{
+	opacity:0.4;
+	filter:alpha(opacity=40);
+}
+.replaceNotBlankedOut{
+	opacity:1;
+	filter:alpha(opacity=100);
+}
+#replaceResultHeader {
+	border-bottom:1px dotted #666;
+	margin-bottom:10px;
+}
+.replaceModule {
+	border:1px dotted black;
+	border-bottom:none;
+	margin-bottom:10px;
+}
+.replaceModuleHeader{
+	padding:5px 5px 0px 5px;
+	background-color:#eee;
+	font-style:bold;
+	border-bottom:1px dotted black;
+	height:25px;
+}
+.replaceModuleTitle{
+	text-transform:uppercase;
+}
+.replaceItem {
+	border-bottom:1px solid #bbb;
+	padding:5px 5px 0px 5px;
+}
+.replaceItemHeader {
+	color:#aaa;
+	font-style:italic;
+}

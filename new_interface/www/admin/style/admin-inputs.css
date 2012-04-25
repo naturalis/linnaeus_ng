@@ -1,0 +1,55 @@
+th[onclick] {
+	text-align: left;
+	cursor: pointer;
+}
+
+select,input[type="text"],input[type="password"],.taxonNameEdit {
+	font-size: 12px;
+	width: 150px;
+}
+
+.taxonNameEdit {
+	width:145px;
+	margin-right:5px;
+}
+
+input[type="button"],input[type="submit"] {
+	cursor: pointer;
+	margin: 0px;
+	color: #222;
+	font: inherit;
+	font: bold 90%;
+	background-color: #eee;
+	border: 1px solid;
+	border-color: #696 #363 #363 #696;
+}
+
+input[type="button"][disabled="disabled"] {
+	cursor: default;
+	color: #bbb;
+}
+
+input[type="button"]:hover,input[type="submit"]:hover {
+	color: #777;
+}
+
+input[type="button"][disabled="disabled"]:hover {
+	color: #bbb;
+}
+
+input[type="checkbox"] {
+	margin-left: 0px;
+	cursor:pointer;
+}
+
+select {
+	font-size: 11px;
+}
+
+option {
+	padding: 1px;
+}
+
+.option-selected {
+	background-color: #dfd;
+}
