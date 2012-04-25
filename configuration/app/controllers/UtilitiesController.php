@@ -152,7 +152,8 @@ class UtilitiesController extends Controller
 	public function dynamicCssAction()
 	{
 	
- 		$this->smarty->assign('youWouldntDARE','Comic Sans MS');
+ 		if ($this->getCurrentProjectId()!=2 && $this->getCurrentProjectId()!=415)
+			$this->smarty->assign('youWouldntDARE','Comic Sans MS');
 
 		header('Content-type:text/css');
 
@@ -162,25 +163,3 @@ class UtilitiesController extends Controller
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
