@@ -156,7 +156,7 @@ class UtilitiesController extends Controller
 
 		header('Content-type:text/css');
 
-		$this->printPage('../../../style/default/dynamic-css');
+		$this->printPage('dynamic-css');
 	
 	}
 
