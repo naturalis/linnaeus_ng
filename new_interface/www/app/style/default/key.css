@@ -1,0 +1,179 @@
+/* path */
+#path {
+	width:750px;
+	padding-bottom:5px;
+	border-bottom:1px dotted #ddd;
+	color:#444;
+}
+
+#path #concise {
+}
+
+#path #concise #toggle {
+	cursor:pointer;
+}
+
+#path #concise #toggle:hover {
+	text-decoration:underline;
+}
+
+
+#path #concise .arrow {
+	font-family:"Times New Roman", Times, serif;
+	font-size:16px;
+}
+
+#path .item {
+	cursor:pointer;
+}
+
+#path #concise .abbreviation {
+	color:#666;
+	margin:0px 2px 0px 5px;
+}
+
+#path #concise .item:hover {
+	text-decoration:underline;
+}
+
+#path .full-invisible {
+	display:none;
+}
+
+#path .full {
+	position:absolute;
+	margin-top:4px;
+	left:10px;
+	background-color:#FFFFFF;
+	border:1px dotted #666;
+	padding:2px;
+	width:400px;
+}
+
+#path #path-full .number-cell {
+	width:10px;
+	text-align:right;
+}
+
+
+/* step */
+#step {
+	margin-top:-300px;
+	width:740px;
+	text-align:justify;
+}
+
+#step #question {
+}
+
+#step #question #head {
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom:5px;
+}
+
+#step #question #head #step-nr {
+}
+
+#step #question #head #step-title {
+}
+
+#step #question #content {
+	margin-bottom:15px;
+}
+
+#step #question hr {
+}
+
+#step #choices {
+	margin-bottom:25px;
+}
+
+#step #choices .choice {
+	border-top:1px dotted #666;
+	padding-top:5px;
+	margin-bottom:50px;
+	width:inherit;
+	overflow:hidden;
+	text-align:justify;
+}
+
+#step .choice-image-div {
+	float:left;
+}
+
+#step .choice-image-small {
+	width:120px;
+	cursor:pointer;
+	margin:0px 10px 10px 0px;
+	border:1px solid #666;
+}
+
+#step .choice {
+}
+
+#step .marker {
+	font-weight:bold;
+}
+
+#step .text {
+}
+
+#step .target {
+	font-style:italic;
+	cursor:pointer;
+}
+
+#step .arrow {
+	font-family:"Times New Roman", Times, serif;
+	font-size:16px;
+}
+
+#step .target-step {
+	color:#006;
+}
+
+#step .target-taxon {
+	color:#060;
+}
+
+#step .target-step:hover, .target-taxon:hover {
+	text-decoration:underline;
+}
+
+#step .hr-choice {
+	height:1px;
+	color:#ddd;
+}
+
+
+/* remaining taxa */
+#taxa {
+	position:relative;
+	top:0px;
+	left:755px;
+	height:300px;
+	width:250px;
+	border:1px dotted #666;
+	overflow:hidden;
+}
+
+#taxa #list {
+	width:100%;
+	height:100%;
+	border:0px;
+}
+
+#taxa #header {
+	font-weight:bold;
+	padding-left:3px;
+}
+
+#taxa #list .item {
+	cursor:pointer;
+	font-size:12px
+}
+
+#taxa #list .item:hover {
+	text-decoration:underline;
+}
