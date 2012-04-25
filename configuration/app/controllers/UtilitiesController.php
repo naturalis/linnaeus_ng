@@ -13,8 +13,6 @@ class UtilitiesController extends Controller
     
     public $controllerPublicName = 'Utilities';
 
-
-
     /**
      * Constructor, calls parent's constructor
      *
@@ -27,8 +25,6 @@ class UtilitiesController extends Controller
     
     }
 
-
-
     /**
      * Destroys!
      *
@@ -40,7 +36,6 @@ class UtilitiesController extends Controller
         parent::__destruct();
     
     }
-
 
     /**
      * AJAX interface for this class
@@ -152,6 +147,17 @@ class UtilitiesController extends Controller
 
 		$this->printPage();
 
+	}
+
+	public function dynamicCssAction()
+	{
+	
+ 		$this->smarty->assign('youWouldntDARE','Comic Sans MS');
+
+		header('Content-type:text/css');
+
+		$this->printPage('../../../style/default/dynamic-css');
+	
 	}
 
 
