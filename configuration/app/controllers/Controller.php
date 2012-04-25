@@ -1291,31 +1291,28 @@ class Controller extends BaseClass
 
 		if (!$p) return;
 
+		if (isset($this->generalSettings['imageRootUrlOverride'])) {
+
+			$_SESSION['app']['project']['urls']['image_root_url'] = $this->generalSettings['imageRootUrlOverride'];
+	
+		} else {
+	
+			$_SESSION['app']['project']['urls']['image_root_url'] = $this->baseUrl . $this->getAppName() . '/media/';
+			
+		}
+
+		$_SESSION['app']['project']['urls']['project_media'] = $_SESSION['app']['project']['urls']['image_root_url'].'project/'.sprintf('%04s', $p).'/';
+		$_SESSION['app']['project']['urls']['system_media'] = $_SESSION['app']['project']['urls']['image_root_url'].'system/';
+		$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
+		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
+		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
+
 		$_SESSION['app']['project']['urls']['full_base_url'] =
 			'http://'.
 			$_SERVER["HTTP_HOST"]. 
 			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
 
 		$_SESSION['app']['project']['urls']['full_appview_url'] = $_SESSION['app']['project']['urls']['full_base_url'].$this->getAppName().'/views/';
-
-		if (isset($this->generalSettings['imageRootUrlOverride'])) {
-
-			$_SESSION['app']['project']['urls']['project_media'] = $this->generalSettings['imageRootUrlOverride'].'project/'.sprintf('%04s', $p).'/';
-			$_SESSION['app']['project']['urls']['system_media'] = $this->generalSettings['imageRootUrlOverride'].'system/';
-			$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
-	
-		} else {
-	
-			$_SESSION['app']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
-			$_SESSION['app']['project']['urls']['system_media'] = $this->baseUrl . $this->getAppName() . '/media/system/';
-			$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
-			
-		}
-
-		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
-
-		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
-
 
 		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
 
@@ -1336,6 +1333,8 @@ class Controller extends BaseClass
 		}
 
 		$_SESSION['app']['project']['urls']['full_project_thumbs'] = $_SESSION['app']['project']['urls']['full_project_media'].'thumbs/';
+
+		$_SESSION['app']['project']['urls']['default_css'] = $this->baseUrl . $this->getAppName() . '/style/default/';
 
 		//$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
@@ -1487,20 +1486,15 @@ class Controller extends BaseClass
     private function preparePage()
     {
  
+		if (isset($this->cssToLoad))  $this->smarty->assign('cssToLoad', $this->cssToLoad);
+		if (isset($this->jsToLoad)) $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
  		if (isset($_SESSION['app']['project']['languages'])) $this->smarty->assign('languages',$_SESSION['app']['project']['languages']);
 
  		$this->smarty->assign('currentLanguageId',$this->getCurrentLanguageId());
-
 		$this->smarty->assign('menu',$this->getMainMenu());
- 
-         $this->smarty->assign('controllerMenuExists', 
-			$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl')
-		);
-
+ 		$this->smarty->assign('controllerMenuExists',$this->includeLocalMenu && file_exists($this->smarty->template_dir.'_menu.tpl'));
 		$this->smarty->assign('customTemplatePaths',$this->getProjectDependentTemplates());
-
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
-
         $this->smarty->assign('session', $_SESSION);
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
@@ -1512,14 +1506,6 @@ class Controller extends BaseClass
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('pageName', $this->getPageName());
         $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
-
-		if (isset($this->cssToLoad)) {
-	        $this->smarty->assign('cssToLoad', $this->cssToLoad);
-    	}
-
-		if (isset($this->jsToLoad)) {
-	        $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
-    	}
 
     }
 
