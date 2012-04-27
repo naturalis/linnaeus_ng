@@ -32,6 +32,8 @@ var allLookupData = null;
 var allLookupLastString = null;
 var allNavigateDefaultUrl = 'edit.php?id=%s';
 var allNavigateTargetUrl = null;
+var allNavigateStartWithAll = false;
+var allNavigateMatchStartOnly = false;
 
 function allLookupNavigateOverrideUrl(url) {
 
@@ -57,7 +59,7 @@ function allLookup() {
 
 function allLookupGetData(text) {
 
-	if (text.length==0) {
+	if (text.length==0 && !allNavigateStartWithAll) {
 
 		allLookupClearDiv();
 		allLookupData = null;
@@ -74,6 +76,8 @@ function allLookupGetData(text) {
 			data : ({
 				'action' : 'get_lookup_list' ,
 				'search' : text ,
+				'get_all' : (text.length==0 && allNavigateStartWithAll ? '1' : '0') ,
+				'match_start' : (allNavigateMatchStartOnly ? '1' : '0'),
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {

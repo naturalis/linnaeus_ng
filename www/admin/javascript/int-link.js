@@ -10,7 +10,7 @@ function intLinkSetLanguage(language) {
 
 function intLinkShowSelector(language) {
 
-	showDialog('',_('Insert internal link'));
+	showDialog(_('Insert internal link'));
 
 	$('#dialog-content-inner').load('../utilities/int_links.php'+(language ? '?language='+language : ''));
 

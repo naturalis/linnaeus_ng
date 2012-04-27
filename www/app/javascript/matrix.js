@@ -204,13 +204,13 @@ function addSelected(caller) {
 
 	if (c[1]=='distribution') {
 
-		showDialog(sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c[0])));
+		showDialog(_('Enter a value'),sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c[0])));
 		$('#dialogValue').focus();
 
 	} else
 	if (c[1]=='range') {
 
-		showDialog(sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c[0])));
+		showDialog(_('Enter a value'),sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c[0])));
 		$('#dialogValue').focus();
 
 	} else {

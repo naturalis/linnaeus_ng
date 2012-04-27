@@ -18,11 +18,13 @@ class IndexController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'index.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad = array('all' => array(
 		'main.js',
-		'lookup.js'
+		'lookup.js',
+		'dialog/jquery.modaldialog.js'
 	));
 	
 

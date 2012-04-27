@@ -17,7 +17,8 @@ class ModuleController extends Controller
 		'basics.css',
 		'module.css',
 		'colorbox/colorbox.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
 	); 
 
 	public $jsToLoad =
@@ -25,7 +26,8 @@ class ModuleController extends Controller
 			'all' => array(
 				'main.js',
 				'colorbox/jquery.colorbox.js',
-				'lookup.js'
+				'lookup.js',
+				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array()
 		);
@@ -196,7 +198,7 @@ class ModuleController extends Controller
 
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->requestData);
 
         }
 		
@@ -517,18 +519,36 @@ class ModuleController extends Controller
 		
 	}
 	
-	private function getLookupList($search)
+	private function getLookupList($p)
 	{
 
-		if (empty($search)) return;
+		$search = isset($p['search']) ? $p['search'] : null;
+		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
+		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
+
+//		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search) && !$getAll) return;
+
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'module_id' => $this->getCurrentModuleId(),
+			);
+		
+		if (!$getAll) {
+		
+			if ($matchStartOnly)
+				$match = mysql_real_escape_string($search).'%';
+			else
+				$match = '%'.mysql_real_escape_string($search).'%';
+	
+			$d['topic like'] = $match;
+			
+		}
 
 		$cfm = $this->models->ContentFreeModule->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $this->getCurrentModuleId(),
-					'topic like' => '%'.$search.'%'
-					),
+				'id' => $d,
 				'order' => 'topic',
 				'columns' => 'distinct page_id as id, topic as label',
 			)
@@ -545,4 +565,5 @@ class ModuleController extends Controller
 		);
 		
 	}
+
 }

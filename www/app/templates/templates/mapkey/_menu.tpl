@@ -19,6 +19,7 @@
 
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
+<span style="margin-left:10px;cursor:pointer;" onclick="allLookupShowDialog()">contents</span>
 &nbsp;&nbsp;
 <a href="compare.php">{t}Species comparison{/t}</a>
 &nbsp;&nbsp;
