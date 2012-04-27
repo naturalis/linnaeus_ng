@@ -1,5 +1,6 @@
 <div id="indexNavigationPane">
 {t}Central index: {/t} <input type="text" id="allLookupBox" autocomplete="off" />
+<span style="margin-left:10px;cursor:pointer;" onclick="allLookupShowDialog()">contents</span>
 <p>
 {if $showSpeciesIndexMenu}
 <table><tr>

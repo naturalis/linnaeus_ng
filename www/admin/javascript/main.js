@@ -375,7 +375,7 @@ function goNavigate(val,form) {
 
 }
 
-function showDialog(content,title) {
+function showDialog(title,content) {
 
 	$.modaldialog.prompt(content, {
 		title : title ? title : _('Enter value'),

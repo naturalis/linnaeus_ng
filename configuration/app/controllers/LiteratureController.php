@@ -18,14 +18,16 @@ class LiteratureController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'literature.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
-				'lookup.js'
+				'lookup.js',
+				'dialog/jquery.modaldialog.js'
 //				'tablesorter/jquery-latest.js',
 //				'tablesorter/jquery.tablesorter.js',
 			),
@@ -139,7 +141,7 @@ class LiteratureController extends Controller
         
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->requestData);
 
         }
 
@@ -372,10 +374,21 @@ class LiteratureController extends Controller
 
 	}
 
-	private function getLookupList($search)
+	private function getLookupList($p)
 	{
 
-		if (empty($search)) return;
+		$search = isset($p['search']) ? $p['search'] : null;
+		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
+		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
+
+//		$search = str_replace(array('/','\\'),'',$search);
+
+		if (empty($search) && !$getAll) return;
+
+		if ($matchStartOnly)
+			$match = mysql_real_escape_string($search).'%';
+		else
+			$match = '%'.mysql_real_escape_string($search).'%';
 
 		$l = $this->models->Literature->_get(
 			array('id' =>
@@ -403,11 +416,9 @@ class LiteratureController extends Controller
 					lower(author_second) as _a2,
 					`year`					
 				from %table%
-				where
-					(author_first like "%'.mysql_real_escape_string($search).'%" or
-					author_second like "%'.mysql_real_escape_string($search).'%" or
-					`year` like "%'.mysql_real_escape_string($search).'%")
-					and project_id = '.$this->getCurrentProjectId().'
+				where project_id = '.
+					$this->getCurrentProjectId().
+					(!$getAll ? ' and (author_first like ""'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
 				order by _a1,_a2,`year`'
 			)
 		);

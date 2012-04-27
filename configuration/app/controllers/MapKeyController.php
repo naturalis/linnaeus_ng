@@ -24,7 +24,8 @@ class MapKeyController extends Controller
 		'basics.css',
 		'map.css',
 		'map_l2.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad = array(
@@ -34,7 +35,8 @@ class MapKeyController extends Controller
 				'mapkey.js',
 				'mapkey_l2.js',
 				'http://maps.google.com/maps/api/js?sensor=false&libraries=drawing',
-				'lookup.js'
+				'lookup.js',
+				'dialog/jquery.modaldialog.js'
 			)
 		);
 		
@@ -564,7 +566,7 @@ class MapKeyController extends Controller
 		
 		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->requestData);
 			
 		}
 
@@ -947,14 +949,21 @@ class MapKeyController extends Controller
 	
 	}
 
-	private function getLookupList($search)
+	private function getLookupList($p)
 	{
+
+		$search = isset($p['search']) ? $p['search'] : null;
+		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
+		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 
 		$search = str_replace(array('/','\\'),'',$search);
 
-		if (empty($search)) return;
-		
-		$regexp = '/'.preg_quote($search).'/i';
+		if (empty($search) && !$getAll) return;
+
+		if ($matchStartOnly)
+			$regexp = '/^'.preg_quote($search).'/i';
+		else
+			$regexp = '/'.preg_quote($search).'/i';
 
 		$l = array();
 
@@ -964,7 +973,7 @@ class MapKeyController extends Controller
 				
 		foreach((array)$taxa as $key => $val) {
 
-			if (preg_match($regexp,$val['taxon']) == 1)
+			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
 				$l[] = array(
 					'id' => $val['id'],
 					'label' => $val['taxon']

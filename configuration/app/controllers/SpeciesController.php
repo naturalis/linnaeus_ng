@@ -27,15 +27,17 @@ class SpeciesController extends Controller
 		'basics.css',
 		'species.css',
 		'colorbox/colorbox.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
-
+				
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
 				'colorbox/jquery.colorbox.js',
-				'lookup.js'
+				'lookup.js',
+				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(
 			)
@@ -141,7 +143,7 @@ class SpeciesController extends Controller
 
 			// setting the css classnames
 			foreach((array)$categories['categories'] as $key => $val) {
-				$c = array();
+				$c = array('category');
 				if ($val['id']==$activeCategory) {
 				    $c[] = 'category-active';
 				}
@@ -220,7 +222,7 @@ class SpeciesController extends Controller
 		
 		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->requestData);
 
         } else
 		if (!$this->rHasVal('action') || !$this->rHasId()) {
@@ -815,14 +817,21 @@ class SpeciesController extends Controller
 	}
 
 
-	private function getLookupList($search)
+	private function getLookupList($p)
 	{
+
+		$search = isset($p['search']) ? $p['search'] : null;
+		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
+		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 
 		$search = str_replace(array('/','\\'),'',$search);
 
-		if (empty($search)) return;
+		if (empty($search) && !$getAll) return;
 		
-		$regexp = '/'.preg_quote($search).'/i';
+		if ($matchStartOnly)
+			$regexp = '/^'.preg_quote($search).'/i';
+		else
+			$regexp = '/'.preg_quote($search).'/i';
 
 		$l = array();
 
@@ -831,7 +840,7 @@ class SpeciesController extends Controller
 				
 		foreach((array)$taxa as $key => $val) {
 		
-			if (preg_match($regexp,$val['taxon']) == 1)
+			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
 				$l[] = array(
 					'id' => $val['id'],
 					'label' => $val['taxon']

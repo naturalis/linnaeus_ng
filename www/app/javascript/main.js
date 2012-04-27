@@ -178,12 +178,16 @@ function isArray(obj) {
       return true;
 }
 
-function showDialog(content,title) {
+function showDialog(title,content,vars) {
 
-	$.modaldialog.prompt(content, {
-		title : title ? title : _('Enter value'),
-		width: 350
-	});
+	if (!vars) {
+		vars = {};
+		vars.width = 350;
+	}
+
+	vars.title = title ? title : '';
+
+	$.modaldialog.prompt(content,vars);
 
 }
 

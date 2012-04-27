@@ -56,19 +56,21 @@
 	{/foreach}
 	</table>
 </div>
-{elseif $activeCategory=='literature' && $contentCount.literature>0}
-<div id="literature">
-	{foreach from=$content key=k item=v}
-	<div class="author">
-		<span class="name">
-			{$v.author_full}
-		</span>
-		<span class="year">{$v.year}</span>
+{elseif $activeCategory=='literature'}
+	{if $contentCount.literature>0}
+	<div id="literature">
+		{foreach from=$content key=k item=v}
+		<div class="author">
+			<span class="name">
+				{$v.author_full}
+			</span>
+			<span class="year">{$v.year}</span>
+		</div>
+		<div class="text">{$v.text}</div>
+		{/foreach}
 	</div>
-	<div class="text">{$v.text}</div>
-	{/foreach}
-</div>
-{elseif $activeCategory=='names' && $contentCount.names>0}
+	{/if}
+{elseif $activeCategory=='names'}
 {if $content.synonyms}
 <div id="synonyms">
 	<div class="title">{t}Synonyms{/t}</div>

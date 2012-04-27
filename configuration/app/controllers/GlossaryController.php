@@ -30,7 +30,8 @@ class GlossaryController extends Controller
 		'basics.css',
 		'glossary.css',
 		'colorbox/colorbox.css',
-		'lookup.css'
+		'lookup.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad =
@@ -38,7 +39,8 @@ class GlossaryController extends Controller
 			'all' => array(
 				'main.js',
 				'colorbox/jquery.colorbox.js',
-				'lookup.js'
+				'lookup.js',
+				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(
 			)
@@ -179,7 +181,7 @@ class GlossaryController extends Controller
 
         if (!$this->rHasVal('action')) return;
 
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        if ($this->rHasVal('action','get_lookup_list')) {
 
             $this->getLookupList($this->requestData['search']);
 
@@ -388,7 +390,7 @@ class GlossaryController extends Controller
 					array(
 						'project_id' => $this->getCurrentProjectId(),
 						'language_id' => $this->getCurrentLanguageId(),
-						'term like' => '%'.$search.'%'
+						'term like' => '%'. ($search=='*' ? '' : mysql_real_escape_string($search)).'%'
 					),
 				'columns' => 'id,term as label,"glossary" as source'
 			)
@@ -399,7 +401,7 @@ class GlossaryController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'synonym like' => '%'.$search.'%'
+					'synonym like' => '%'.($search=='*' ? '' : mysql_real_escape_string($search)).'%'
 					),
 				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
 			)

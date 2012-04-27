@@ -9,4 +9,5 @@
 {/if}
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
+<span style="margin-left:10px;cursor:pointer;" onclick="allLookupShowDialog()">contents</span>
 </div>

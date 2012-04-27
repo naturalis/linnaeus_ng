@@ -64,10 +64,11 @@ class LinnaeusController extends Controller
 
 	public $jsToLoad = array('all' => array(
 		'main.js',
-		'lookup.js'
+		'lookup.js',
+		'dialog/jquery.modaldialog.js'
 	));
 	
-
+		
     /**
      * Constructor, calls parent's constructor
      *
@@ -561,7 +562,7 @@ class LinnaeusController extends Controller
 
         if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
-            $this->getLookupList($this->requestData['search']);
+            $this->getLookupList($this->requestData);
 
         }
 
@@ -1373,7 +1374,7 @@ class LinnaeusController extends Controller
 						'id' => $val2['id'],
 						'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
 						'source' => $val['label'],
-						'url'  => '../literature/term.php?id='.$val2['id']
+						'url'  => '../literature/reference.php?id='.$val2['id']
 					);
 
 				}
@@ -1610,6 +1611,8 @@ class LinnaeusController extends Controller
 
 	private function getLookupList($search)
 	{
+	
+		$search = isset($p['search']) ? $p['search'] : null;
 	
 		/*
 		excluded:

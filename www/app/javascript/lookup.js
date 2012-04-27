@@ -30,6 +30,9 @@ var allLookupBoxName = 'allLookupBox';
 var allLookupTargetUrl = false;
 var allLookupData = null;
 var allLookupLastString = null;
+var allLookupMatchStartOnly = true;
+var allLookupDialogInputName = 'lookupDialogInput';
+var allLookupDialogContentName = 'lookup-DialogContent';
 var allNavigateDefaultUrl = 'item.php?id=%s';
 var allNavigateTargetUrl = null;
 
@@ -55,9 +58,47 @@ function allLookup() {
 }
 
 
-function allLookupGetData(text) {
+function allLookupPostProcessing(text,data,getAll) {
 
-	if (text.length==0) {
+	/*
+		the 'match start of word only' option was added later, and required restructuring 
+		of the corresponding lookup functions in the controller classes. in LinnaeusController
+		and GlossaryController, the required alterations were too extensive. its output was 
+		therefore left unchanged and is filtered here to meet the requirements of the 
+		allLookupMatchStartOnly setting.
+	*/
+	
+	if (allLookupMatchStartOnly  && !getAll) {
+
+		var regExp = '/^'+addSlashes(text)+'/ig';
+
+		//var d = eval (allLookupData.toSource());
+		var d = jQuery.extend(true, {}, data);
+		r = new Array();
+
+		for(var i=0;i<data.results.length;i++) {
+			
+			if (data.results[i].label.match(eval(regExp))) {
+				
+				r[r.length] = data.results[i]
+				
+			}
+
+		}
+
+		d.results = r;
+		
+		return d;
+
+	}
+
+	return data;
+
+}
+
+function allLookupGetData(text,getAll) {
+
+	if (text.length==0 && getAll!=true) {
 
 		allLookupClearDiv();
 		allLookupData = null;
@@ -73,12 +114,15 @@ function allLookupGetData(text) {
 			type: "POST",
 			data : ({
 				'action' : 'get_lookup_list' ,
-				'search' : text ,
+				'search' : (getAll==true ? '*' : text) ,
+				'match_start' : (allLookupMatchStartOnly ? '1' : '0') ,
+				'get_all' : (getAll==true ? '1' : '0') ,
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-				
-				allLookupData = $.parseJSON(data);
+
+				var tmp = $.parseJSON(data);
+				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
 
 			}
@@ -87,6 +131,11 @@ function allLookupGetData(text) {
 	} else {
 
 		if (allLookupData && allLookupData.results) {
+			
+			if (allLookupMatchStartOnly)
+				var regExp = '/^'+addSlashes(text)+'/ig';
+			else
+				var regExp = '/'+addSlashes(text)+'/ig';
 
 			//var d = eval (allLookupData.toSource());
 			var d = jQuery.extend(true, {}, allLookupData);
@@ -94,7 +143,7 @@ function allLookupGetData(text) {
 
 			for(var i=0;i<allLookupData.results.length;i++) {
 				
-				if (allLookupData.results[i].label.match(eval('/'+addSlashes(text)+'/ig'))) {
+				if (getAll || allLookupData.results[i].label.match(eval(regExp))) {
 					
 					r[r.length] = allLookupData.results[i]
 					
@@ -119,10 +168,14 @@ function allLookupBuildList(obj,txt) {
 	allLookupRowCount = 0;
 	
 	allLookupClearDiv();
+	allLookupClearDialogDiv();
 
 	if (obj.results) {
 		
-		$('#'+allLookupListName).append('<table id="allLookupListTable">');
+		var str = '<table id="allLookupListTable">';
+
+		$('#'+allLookupListName).append(str);
+		$('#'+allLookupDialogContentName).append(str);
 		
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
 
@@ -134,7 +187,7 @@ function allLookupBuildList(obj,txt) {
 
 				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
 
-				$('#'+allLookupListName).append(
+				var str =
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
 						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+
 							(d.url ? d.url : url.replace('%s',d.id)) +
@@ -142,17 +195,25 @@ function allLookupBuildList(obj,txt) {
 							d.label +
 							(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
 						'</td>'+
-					'</tr>');
-				
+					'</tr>';
+
+				$('#'+allLookupListName).append(str);
+				$('#'+allLookupDialogContentName).append(str);
+
 				allLookupRowCount++;
 
 			}
 
 		}
 
-		$('#'+allLookupListName).append('</table>');
+		str = '</table>';
+		$('#'+allLookupListName).append(str);
+		$('#'+allLookupDialogContentName).append(str);
 
 	}
+
+	var dialogTop = Math.abs($(window).height() - $('#dialog').height()) / 2;
+	$('#dialog').css('top', (dialogTop >= 25) ? dialogTop : 25);
 
 }
 
@@ -161,6 +222,13 @@ function allLookupClearDiv() {
 	$('#'+allLookupListName).empty();
 
 }
+
+function allLookupClearDialogDiv() {
+
+	$('#'+allLookupDialogContentName).empty();
+
+}
+	
 
 function allLookupPositionDiv() {
 
@@ -232,9 +300,9 @@ function allLookupHighlightRow(clearall) {
 
 }
 
-function allLookupBindKeyUp() {
+function allLookupBindKeyUp(ele) {
 
-	$('#'+allLookupBoxName).keyup(function(e) {
+	$('#'+ele).keyup(function(e) {
 
 		if (e.keyCode==13) {
 			// enter
@@ -250,12 +318,11 @@ function allLookupBindKeyUp() {
 			// key down
 			allLookupMoveDown();
 		else
-		if ((e.keyCode<65 || (e.keyCode >= 112 && e.keyCode <= 123)) && e.keyCode!=8)
+		if ((e.keyCode<65 || (e.keyCode >= 112 && e.keyCode <= 123)) && e.keyCode!=8 && !(e.keyCode>=48 && e.keyCode<=57))
 			// smaller than 'a' or a function-key, but not backspace
 			return;
 		else
 			allLookup();
-	
 	});
 
 }
@@ -268,6 +335,57 @@ function allNavigate(id) {
 
 }
 
+
+function allLookupDialog() {
+
+	var text = $('#'+allLookupDialogInputName).val();
+	if (text == allLookupLastString) return;
+	if (text.length==0)
+		allLookupGetData('*',true);
+	else
+		allLookupGetData(text);
+	allLookupLastString = text;
+
+}
+
+function allLookupBindDialogKeyUp() {
+
+	$('#'+allLookupDialogInputName).keyup(function(e) {
+
+		if (e.keyCode==27) {
+			// esc
+			$('#dialog-close').click();
+			return;
+		}
+
+		if ((e.keyCode<65 || (e.keyCode >= 112 && e.keyCode <= 123)) && e.keyCode!=8 && !(e.keyCode>=48 && e.keyCode<=57))
+			// smaller than 'a' or a function-key, but not backspace
+			return;
+		else
+			allLookupDialog();
+	});
+
+}
+
+function allLookupShowDialog() {
+
+	showDialog(
+		_('Index'),
+		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>',
+		{width:400}
+	);
+
+	$('#'+allLookupDialogContentName).css('overflow-y','scroll');
+	$('#'+allLookupDialogContentName).css('height','250px');
+
+	allLookupBindDialogKeyUp();
+	allLookupGetData('*',true);
+
+	$('#'+allLookupDialogInputName).focus();
+
+}
+
+
 $(document).ready(function(){
 
 	$('body').click(function() {
@@ -278,7 +396,8 @@ $(document).ready(function(){
 		allLookupHighlightRow(true);
 	});
 
-	allLookupBindKeyUp();
+	allLookupBindKeyUp(allLookupBoxName);
+
 	$('#'+allLookupBoxName).focus();
 
 });
