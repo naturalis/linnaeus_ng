@@ -1,0 +1,12 @@
+#categories ul li a {
+	background: #f8f8f8;
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8f8f8', endColorstr='#e4e4e4',GradientType=0 );
+}
+
+#categories ul li a:hover, #categories ul li a.category-active {
+	border-top: 1px solid #3b3a95;
+	border-right: 1px solid #6199d1;
+	color: #000;
+	background: #c6e6f8;
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaf1fb', endColorstr='#a2daf5',GradientType=0 );
+}
