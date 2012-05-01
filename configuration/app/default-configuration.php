@@ -64,8 +64,8 @@ class configuration
 			),
 			'defaultController' => 'linnaeus',
 			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
-			'imageRootUrlOverride' => '../../../admin/media/',
-			'imageRootUrlOverrideAbsolute' => '/admin/media/',
+			//'imageRootUrlOverride' => '../../../admin/media/',
+			//'imageRootUrlOverrideAbsolute' => '/admin/media/',
             'maxSessionHistorySteps' => 10, 
             'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(
