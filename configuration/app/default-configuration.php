@@ -14,6 +14,8 @@ class configuration
         $this->_appFileRoot = str_replace('\\','/',
             substr_replace($this->_appFileRoot,'', -1 * (strlen($d['app']['pathName']) + strlen('configuration')+1)));
 
+		$this->skinName = 'original_skin';
+
     }
 
     public function getDatabaseSettings ()
@@ -34,7 +36,7 @@ class configuration
     {
 
         return array(
-            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates', 
+            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates/'.$this->skinName, 
             'dir_compile' => $this->_appFileRoot . 'www/app/templates/templates_c', 
             'dir_cache' => $this->_appFileRoot . 'www/app/templates/cache', 
             'dir_config' => $this->_appFileRoot . 'www/app/templates/configs', 
@@ -54,7 +56,8 @@ class configuration
 				'version' => '0.1-dev.r001', 
 				'versionTimestamp' => date('r'), 
 				'pathName' => 'app',
-				'fileRoot' => $this->_appFileRoot.'www/app/'
+				'fileRoot' => $this->_appFileRoot.'www/app/',
+				'skinName' => $this->skinName
 			),
 			'defaultController' => 'linnaeus',
 			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',

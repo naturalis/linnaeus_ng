@@ -1334,7 +1334,7 @@ class Controller extends BaseClass
 
 		$_SESSION['app']['project']['urls']['full_project_thumbs'] = $_SESSION['app']['project']['urls']['full_project_media'].'thumbs/';
 
-		$_SESSION['app']['project']['urls']['default_css'] = $this->baseUrl . $this->getAppName() . '/style/default/';
+		$_SESSION['app']['project']['urls']['default_css'] = $this->baseUrl.$this->getAppName().'/style/default/'.$this->generalSettings['app']['skinName'].'/';
 
 		//$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
 
@@ -1347,7 +1347,7 @@ class Controller extends BaseClass
 
 		} else {
 
-			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . 'default/';
+			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . 'default/'.$this->generalSettings['app']['skinName'].'/';
 
 		}
 

@@ -1,0 +1,8 @@
+4. Search Engine Optimization
+Teneinde de vindbaarheid van projecten in zoekmachines te verhogen, zullen de volgende onderdelen worden toegevoegd:
+	-	Sitemap.
+	-	Projectnaam en informatieve paginabeschrijving in de <title>.
+	-	Automatisch gegenereerde <meta>-tags.
+	-	Vervanging “click here”-links door meer beschrijvende teksten.
+	-	<alt>-attributes in alle afbeeldingen.
+
