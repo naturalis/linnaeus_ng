@@ -11,7 +11,7 @@
 		{if $v.type=='regular' && $v.show_in_public_menu==1}
 		<td style="width:100px;height:100px;text-align:center">
 			<a class="menu-item" href="../{$v.controller}/">
-				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="../../media/system/module_icons/{$v.icon}" />
+				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="{$session.app.project.urls.system_media}module_icons/{$v.icon}" />
 				<br />
 				{t}{$v.module}{/t}
 			</a>
@@ -21,13 +21,13 @@
 		<td style="width:100px;height:100px;text-align:center">
 			{if $useJavascriptLinks}
 			<span class="a" onclick="goMenuModule({$v.id});">
-				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="../../media/system/module_icons/custom.png" />
+				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="{$session.app.project.urls.system_media}module_icons/custom.png" />
 				<br />
 				{t}{$v.module}{/t}
 			</span>
 			{else}
 			<a href="../module/?modId={$v.id}">
-				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="../../media/system/module_icons/custom.png" />
+				<img alt="{$v.module}" style="width:50px;height:50px;border:1px solid grey" src="{$session.app.project.urls.system_media}module_icons/custom.png" />
 				<br />
 				{t}{$v.module}{/t}
 			</a>

@@ -1302,7 +1302,8 @@ class Controller extends BaseClass
 		}
 
 		$_SESSION['app']['project']['urls']['project_media'] = $_SESSION['app']['project']['urls']['image_root_url'].'project/'.sprintf('%04s', $p).'/';
-		$_SESSION['app']['project']['urls']['system_media'] = $_SESSION['app']['project']['urls']['image_root_url'].'system/';
+		$_SESSION['app']['project']['urls']['system_media'] =
+			$_SESSION['app']['project']['urls']['image_root_url'].'system/'.$this->generalSettings['app']['skinName'].'/';
 		$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
 		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
 		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
