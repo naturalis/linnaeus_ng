@@ -9,7 +9,7 @@
         onkeydown="setSearchKeyed(true);"
         onblur="setSearchKeyed(false);"
         onfocus="onSearchBoxSelect()" />
-    <input type="image" src="../../media/system/search.gif" style="border:0" />
+    <input type="image" src=".{$session.app.project.urls.system_media}search.gif" style="border:0" />
 -->
     <input
         type="search"
@@ -22,5 +22,5 @@
         onfocus="onSearchBoxSelect()" 
         results="5" 
         autosave="linnaeus_ng" />
-    <input type="image" src="../../media/system/search.gif" class="search-icon" />
+    <input type="image" src=".{$session.app.project.urls.system_media}search.gif" class="search-icon" />
  </div>
