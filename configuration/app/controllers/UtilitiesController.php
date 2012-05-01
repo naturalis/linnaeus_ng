@@ -151,15 +151,19 @@ class UtilitiesController extends Controller
 
 	public function dynamicCssAction()
 	{
-	
- 		if ($this->getCurrentProjectId()!=2 && $this->getCurrentProjectId()!=415)
-			$this->smarty->assign('youWouldntDARE','Comic Sans MS');
+	    $cssVariables = array(
+	        'projectMedia' => str_replace('app', 'admin', $_SESSION['app']['project']['urls']['project_media']),
+	        'logo' => $_SESSION['app']['project']['logo'],
+	        'pathToDefaultMedia' => $_SESSION['app']['project']['urls']['system_media']
+	    );
+	    
+	    foreach ($cssVariables as $k => $v) {
+	        $this->smarty->assign($k,$v);
+	    }
 
 		header('Content-type:text/css');
-
 		$this->printPage('dynamic-css');
-	
 	}
-
+	
 
 }
