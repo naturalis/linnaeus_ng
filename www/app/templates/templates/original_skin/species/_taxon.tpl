@@ -149,7 +149,7 @@
 	{elseif $v.category=='video'}
 			<img 
 				alt="{$v.original_name}" 
-				src="../../media/system/video.jpg" 
+				src="{$session.app.project.urls.system_media}video.jpg" 
 				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
 	{elseif $v.category=='audio'}
