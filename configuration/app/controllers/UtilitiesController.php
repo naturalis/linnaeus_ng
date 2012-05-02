@@ -151,19 +151,22 @@ class UtilitiesController extends Controller
 
 	public function dynamicCssAction()
 	{
-	    $cssVariables = array(
-	        'projectMedia' => str_replace('app', 'admin', $_SESSION['app']['project']['urls']['project_media']),
-	        'logo' => $_SESSION['app']['project']['logo'],
-	        'pathToDefaultMedia' => $_SESSION['app']['project']['urls']['system_media']
-	    );
-	    
-	    foreach ($cssVariables as $k => $v) {
-	        $this->smarty->assign($k,$v);
-	    }
-
-		header('Content-type:text/css');
-		$this->printPage('dynamic-css');
-	}
 	
+		$cssVariables = array(
+			'projectMedia' => $_SESSION['app']['project']['urls']['projectMedia'],
+			'systemMedia' => $_SESSION['app']['project']['urls']['systemMedia'],
+			'logo' => $_SESSION['app']['project']['logo'],
+		);
+		
+		foreach ($cssVariables as $k => $v) {
+			$this->smarty->assign($k,$v);
+		}
+		
+		header('Content-type:text/css');
+
+		$this->printPage('dynamic-css');
+	
+	}
+
 
 }
