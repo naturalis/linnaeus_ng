@@ -506,7 +506,7 @@ class SpeciesController extends Controller
 			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
 			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-			$mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['project_media'].$mt[$key]['file_name'];
+			$mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'].$mt[$key]['file_name'];
 
 
 		}
