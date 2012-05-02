@@ -1000,6 +1000,37 @@ class Controller extends BaseClass
 	
 	}
 
+	public function matchHotwords($text,$forceLookup=false)
+	{
+
+		if (empty($text) || !is_string($text)) return $text;
+		
+		$wordlist = $this->getHotwords($forceLookup);
+
+		$processed = $text;
+		
+		$expr = '|(\[no\])(.*)(\[\/no\])|i';
+
+		$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
+
+		foreach((array)$wordlist as $key => $val) {
+		
+			if ($val['hotword']=='') continue;
+			
+			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
+
+			$expr = '|\b('.$val['hotword'].')\b|i';
+		
+			$processed = preg_replace_callback($expr,array($this,'embedHotwordLink'),$processed);
+		
+		}
+
+		$processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
+
+		return $processed;
+	
+	}
+
 	private function setCheckForProjectId($state)
 	{
 	
@@ -1290,70 +1321,39 @@ class Controller extends BaseClass
 		$p = $this->getCurrentProjectId();
 
 		if (!$p) return;
+		
+		$pCode = $this->getProjectFSCode($p);
 
-		if (isset($this->generalSettings['imageRootUrlOverride'])) {
-
-			$_SESSION['app']['project']['urls']['image_root_url'] = $this->generalSettings['imageRootUrlOverride'];
-	
+		// url of the directory containing user-uploaded media files
+		if (isset($this->generalSettings['urlUploadedProjectMedia'])) {
+			$u['uploadedMedia'] = $this->generalSettings['urlUploadedProjectMedia'].$pCode.'/';
 		} else {
-	
-			$_SESSION['app']['project']['urls']['image_root_url'] = $this->baseUrl . $this->getAppName() . '/media/';
-			
+			$u['uploadedMedia'] = $this->baseUrl.$this->getAppName().'/media/upload/'.$pCode.'/';
 		}
 
-		$_SESSION['app']['project']['urls']['project_media'] = $_SESSION['app']['project']['urls']['image_root_url'].'project/'.sprintf('%04s', $p).'/';
-		$_SESSION['app']['project']['urls']['system_media'] =
-			$_SESSION['app']['project']['urls']['image_root_url'].'system/'.$this->generalSettings['app']['skinName'].'/';
-		$_SESSION['app']['project']['urls']['system_media_l2_maps'] = $_SESSION['app']['project']['urls']['system_media'].'l2_maps/';
-		$_SESSION['app']['project']['urls']['project_thumbs'] = $_SESSION['app']['project']['urls']['project_media'].'thumbs/';
-		$_SESSION['app']['project']['urls']['project_media_l2_maps'] = $_SESSION['app']['project']['urls']['project_media'].'l2_maps/';
+		$u['uploadedMediaThumbs'] = $u['uploadedMedia'].'thumbs/';
 
-		$_SESSION['app']['project']['urls']['full_base_url'] =
-			'http://'.
-			$_SERVER["HTTP_HOST"]. 
-			substr($_SERVER["REQUEST_URI"],0,strpos($_SERVER["REQUEST_URI"],$this->getAppName().'/views/'.$this->controllerBaseName.'/'));
+		// urls of the directory containing project specific media part of the interface, but not of the content (background etc)
+		$u['projectMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
+		$u['projectL2Maps'] = $u['projectMedia'].'l2_maps/';
 
-		$_SESSION['app']['project']['urls']['full_appview_url'] = $_SESSION['app']['project']['urls']['full_base_url'].$this->getAppName().'/views/';
+		// urls of the directory containing media that are constant across projects (but can be skinned)
+		$u['systemMedia'] = $this->baseUrl.$this->getAppName().'/media/system/'.$this->generalSettings['app']['skinName'].'/';
+		$u['systemL2Maps'] = $u['systemMedia'].'l2_maps/';
 
-		if (isset($this->generalSettings['imageRootUrlOverrideAbsolute'])) {
+		// urls of css-files, either project-specific - if they exist - or generic
+		$projectCssDir = $this->baseUrl.$this->getAppName().'/style/';
 
-			$_SESSION['app']['project']['urls']['full_project_media'] = 
-				'http://'.
-				$_SERVER["HTTP_HOST"]. 
-				$this->generalSettings['imageRootUrlOverrideAbsolute'].
-				'project/'.
-				sprintf('%04s', $p).'/';
-
+		if (file_exists($projectCssDir.$pCode.'/basics.css')) {
+			$u['projectCSS'] = $projectCssDir.$pCode.'/';
 		} else {
-	
-			$_SESSION['app']['project']['urls']['full_project_media'] =
-				$_SESSION['app']['project']['urls']['full_base_url'].
-				$this->getAppName().
-				'/media/project/'.sprintf('%04s', $p).'/';
-
+			$u['projectCSS'] = $projectCssDir.'default/'.$this->generalSettings['app']['skinName'].'/';
 		}
 
-		$_SESSION['app']['project']['urls']['full_project_thumbs'] = $_SESSION['app']['project']['urls']['full_project_media'].'thumbs/';
+		// url to start the project woth (and to navigate to when a home button is clicked)
+		$u['projectStart'] = $this->baseUrl.$this->getAppName().'/views/'.$this->generalSettings['defaultController'].'/';
 
-		$_SESSION['app']['project']['urls']['default_css'] = $this->baseUrl.$this->getAppName().'/style/default/'.$this->generalSettings['app']['skinName'].'/';
-
-		//$_SESSION['app']['project']['urls']['project_css'] = $this->baseUrl . $this->getAppName() . '/style/'.sprintf('%04s',$p).'/';
-
-		//[2012.01.12 - 1:17:29 PM] Ruud Altenburg:
-		$projectCssDir = $this->baseUrl . $this->getAppName() . '/style/';
-
-		if (file_exists($projectCssDir . sprintf('%04s',$p) . '/basics.css')) {
-
-			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . sprintf('%04s',$p).'/';
-
-		} else {
-
-			$_SESSION['app']['project']['urls']['project_css'] = $projectCssDir . 'default/'.$this->generalSettings['app']['skinName'].'/';
-
-		}
-
-		$_SESSION['app']['project']['urls']['project_start'] =
-			$this->baseUrl . $this->getAppName() . '/views/'.$this->generalSettings['defaultController'].'/';
+		$_SESSION['app']['project']['urls'] = $u;
 
     }
 
@@ -1369,9 +1369,8 @@ class Controller extends BaseClass
 
         if ($p) {
 
-            $_SESSION['app']['project']['paths']['project_css'] = $this->generalSettings['app']['fileRoot'].'style/'.sprintf('%04s', $p).'/';
-
-            $_SESSION['app']['project']['paths']['default_css'] = $this->generalSettings['app']['fileRoot'].'style/default/';
+            $_SESSION['app']['project']['paths']['projectCSS'] = $this->generalSettings['app']['fileRoot'].'style/'.$this->getProjectFSCode($p).'/';
+            $_SESSION['app']['project']['paths']['defaultCSS'] = $this->generalSettings['app']['fileRoot'].'style/default/';
 
             foreach ((array) $_SESSION['app']['project']['paths'] as $key => $val) {
                 
@@ -1463,11 +1462,13 @@ class Controller extends BaseClass
 	private function getProjectDependentTemplates()
 	{
 
-		if (!isset($_SESSION['app']['project']['id'])) return null;
+		$p = $this->getCurrentProjectId();
+
+		if (is_null($p)) return;
 
 		$r = null;
 		
-		$d = $this->_smartySettings['dir_template'] . '/' . 'shared/'. sprintf('%04s', $_SESSION['app']['project']['id']). '/';
+		$d = $this->_smartySettings['dir_template'].'/'.'shared/'. $this->getProjectFSCode($p). '/';
 		
 		if (file_exists($d.'_header-container.tpl')) $r['header_container'] = $d.'_header-container.tpl';
 		if (file_exists($d.'_main-menu.tpl')) $r['main_menu'] = $d.'_main-menu.tpl';
@@ -2144,38 +2145,12 @@ class Controller extends BaseClass
 
 	}
 
-	public function matchHotwords($text,$forceLookup=false)
+	private function getProjectFSCode($p)
 	{
-
-		if (empty($text) || !is_string($text)) return $text;
-		
-		$wordlist = $this->getHotwords($forceLookup);
-
-		$processed = $text;
-		
-		$expr = '|(\[no\])(.*)(\[\/no\])|i';
-
-		$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
-
-		foreach((array)$wordlist as $key => $val) {
-		
-			if ($val['hotword']=='') continue;
-			
-			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
-
-			$expr = '|\b('.$val['hotword'].')\b|i';
-		
-			$processed = preg_replace_callback($expr,array($this,'embedHotwordLink'),$processed);
-		
-		}
-
-		$processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
-
-		return $processed;
 	
-	}
+		return sprintf('%04s',$p);
 	
-	
+	}	
 	
 	
 }
