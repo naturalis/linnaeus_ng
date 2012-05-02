@@ -1705,9 +1705,9 @@ class Controller extends BaseClass
 		unset($this->cssToLoad);
 		unset($this->jsToLoad);
 
-		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/basics.css';
-		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/'.$specificStylesheet;
-		$this->cssToLoad[] = '../../../app/style/'.sprintf('%04s',$this->getCurrentProjectId()).'/search.css';
+		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/basics.css';
+		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/'.$specificStylesheet;
+		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/search.css';
 		
 		$this->printPage('../../../../app/templates/templates/shared/_head');
 		$this->printPage('../../../../app/templates/templates/shared/_body-start');
@@ -2847,11 +2847,11 @@ class Controller extends BaseClass
         
         if ($p)
 			return array(            
-				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/',
-				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/',
-				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/l2_maps/',
-				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/',
-				'media_url' => '../../../admin/media/project/' . sprintf('%04s', $p) . '/',				
+				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/',
+				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/',
+				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/l2_maps/',
+				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . $this->getProjectFSCode($p) . '/',
+				'media_url' => '../../../admin/media/project/' . $this->getProjectFSCode($p) . '/',				
 			);
         else
 			return null;
@@ -2870,11 +2870,11 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            //$_SESSION['admin']['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/';
+            //$_SESSION['admin']['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/';
 
-            //$_SESSION['admin']['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . sprintf('%04s', $p) . '/thumbs/';
+            //$_SESSION['admin']['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/';
             
-            //$_SESSION['admin']['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . sprintf('%04s', $p) . '/';
+            //$_SESSION['admin']['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . $this->getProjectFSCode($p) . '/';
 
 			$paths = $this->makePathNames($p);
 
@@ -2916,7 +2916,7 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.sprintf('%04s', $p).'/';
+            $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.$this->getProjectFSCode($p).'/';
 
             $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
 
@@ -3324,5 +3324,11 @@ class Controller extends BaseClass
 
     }
 
+	private function getProjectFSCode($p)
+	{
+	
+		return sprintf('%04s',$p);
+	
+	}
 
 }
