@@ -59,7 +59,7 @@ $(document).ready(function(){
 {foreach from=$characteristics key=k item=v}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
 {/foreach}
-	imagePath = '{$session.app.project.urls.project_media}';
+	imagePath = '{$session.app.project.urls.uploadedMedia}';
 {literal}
 });
 </script>

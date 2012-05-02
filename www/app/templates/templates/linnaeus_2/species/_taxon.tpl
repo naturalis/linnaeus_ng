@@ -109,30 +109,30 @@
 	<tr>
 		<td class="media-image-cell">
 	{if $v.category=='image'}
-		{capture name="fullImgUrl"}{$session.app.project.urls.project_media}{$v.file_name}{/capture}
+		{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
 		{if $v.thumb_name != ''}
 			<img
 				alt="{$v.original_name}" 
-				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
-				src="{$session.app.project.urls.project_thumbs}{$v.thumb_name}"
+				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
 				class="media-image" />
 		{else}
 			<img
 				alt="{$v.original_name}" 
-				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
-				src="{$session.app.project.urls.project_media}{$v.file_name}"
+				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+				src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 				class="media-image" />
 		{/if}
 	{elseif $v.category=='video'}
 			<img 
 				alt="{$v.original_name}" 
-				src=".{$session.app.project.urls.system_media}video.jpg" 
-				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name}','{$v.original_name}');" 
+				src=".{$session.app.project.urls.systemMedia}video.jpg" 
+				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
 	{elseif $v.category=='audio'}
 			<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
 				<param name="movie" value="{$soundPlayerName}" />
-				<param name="FlashVars" value="mp3={$session.app.project.urls.project_media}{$v.file_name}" />
+				<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 			</object>
 	{/if}
 			</td>		
@@ -149,7 +149,7 @@
 {else}
 <div id="content">
 {if $isTaxonStartPage && $overviewImage}
-<img alt="{$overviewImage}" id="overview-image" src="{$session.app.project.urls.project_media}{$overviewImage}"/>
+<img alt="{$overviewImage}" id="overview-image" src="{$session.app.project.urls.uploadedMedia}{$overviewImage}"/>
 {/if}
 {$content}
 </div>

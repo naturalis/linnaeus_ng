@@ -22,7 +22,7 @@
 		{foreach from=$res.data key=k item=v}
 
 		{if $res.label|@strtolower=='species media'}
-			<img alt="{$v.label}" src="{$session.app.project.urls.project_media}{$v.label}" style="width:50px" />
+			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" style="width:50px" />
 		{/if}
 
 		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:

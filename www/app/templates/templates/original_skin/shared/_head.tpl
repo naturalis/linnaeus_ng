@@ -9,7 +9,7 @@
 	<style type="text/css" media="all">
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-		@import url("{$session.app.project.urls.project_css}{$cssToLoad[i]}");
+		@import url("{$session.app.project.urls.projectCSS}{$cssToLoad[i]}");
 {/section}
 {/if}
 		@import url("../utilities/dynamic-css.php");
