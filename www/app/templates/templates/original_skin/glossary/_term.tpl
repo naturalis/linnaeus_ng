@@ -20,14 +20,14 @@
 			<img
 				alt="{$v.original_name}"
 				class="image-thumb"
-				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name|escape:'url'}','{$v.original_name}');" 
-				src="{$session.app.project.urls.project_thumbs}{$v.thumb_name|escape:'url'}" />
+				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}','{$v.original_name}');" 
+				src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name|escape:'url'}" />
 		{else}
 			<img
 				alt="{$v.original_name}"
 				class="image-full"
-				onclick="showMedia('{$session.app.project.urls.project_media}{$v.file_name|escape:'url'}','{$v.original_name}');" 
-				src="{$session.app.project.urls.project_media}{$v.file_name|escape:'url'}" />
+				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}','{$v.original_name}');" 
+				src="{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}" />
 		{/if}
 		</div>
 	{/foreach}

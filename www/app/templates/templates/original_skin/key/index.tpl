@@ -11,7 +11,7 @@
 			</div>
 		{if $step.image}
 			<div>
-				<img alt="{$step.image}" src="{$session.app.project.urls.project_media}{$step.image}" />
+				<img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
 			</div>
 		{/if}
 			<div id="content">{$step.content}</div>
@@ -27,7 +27,7 @@
 							alt="{$v.choice_img}"
 							class="choice-image-small"
 							onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}" 
-							src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
+							src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
 							/>
 					{else}
 					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
@@ -38,14 +38,14 @@
 						<img
 							alt="{$v.choice_img}"
 							class="choice-image-small"
-							src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
+							src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
 						/>
 						</a>
 					{/if}						
 						
 						
 						<br />
-						<a href="javascript:showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
+						<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
 					</div>
 	{/if}
 					<span class="marker">{$v.marker}</span>.

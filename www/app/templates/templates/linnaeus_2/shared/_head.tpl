@@ -7,16 +7,16 @@
 	<meta name="ROBOTS" CONTENT="ALL">
 	<title>{$session.app.project.title}{if $pageName}: {$pageName}{/if}</title>
 	<style type="text/css" media="all">
-	    @import url("{$session.app.project.urls.project_css}yui/cssreset-min.css");
+	    @import url("{$session.app.project.urls.projectCSS}yui/cssreset-min.css");
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-	    @import url("{$session.app.project.urls.project_css}{$cssToLoad[i]}");
+	    @import url("{$session.app.project.urls.projectCSS}{$cssToLoad[i]}");
 {/section}
 {/if}
         @import url("../utilities/dynamic-css.php");
 	</style>
         <!--[if lt IE 9]>
-            <style type="text/css">@import "{$session.app.project.urls.project_css}ie7-8.css";</style> 
+            <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7-8.css";</style> 
         <![endif]-->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>

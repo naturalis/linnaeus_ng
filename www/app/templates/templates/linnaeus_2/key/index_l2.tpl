@@ -11,7 +11,7 @@
 			</div>
 		{if $step.image}
 			<div>
-				<img alt="{$step.image}" src="{$session.app.project.urls.project_media}{$step.image}" />
+				<img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
 			</div>
 		{/if}
 			<div id="content">{$step.content}</div>
@@ -40,7 +40,7 @@
 			<img
 				alt="{$v.choice_img}" 
 				id="choice-img-{$v.id}"
-				src="{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}"
+				src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
 				style="
 					position:absolute;
 					left:{$v.choice_image_params.leftpos}px;
@@ -51,7 +51,7 @@
 			</a>
 		{/if}
 			<br />
-			<a href="javascript:showMedia('{$session.app.project.urls.project_media}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
+			<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
 		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;text-align:left">
 			<span class="marker">{$v.marker}</span>.
 			<span class="text">{$v.choice_txt|nl2br}</span>
