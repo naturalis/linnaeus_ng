@@ -73,6 +73,9 @@ $(document).ready(function(){
 	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
 	initTinyMce(false,false);
 
+	allSetAutoSaveFreq({$autoSaveFrequency});
+	freemodRunAutoSave();
+
 {literal}	
 });
 

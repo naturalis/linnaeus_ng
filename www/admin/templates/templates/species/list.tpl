@@ -64,11 +64,11 @@
 	{/if}
 	
 			<td style="text-align:right;">
-				<span class="a" onclick="window.open('taxon.php?id={$t}','_top');">{$taxon.pctFinished}%{* t}done{/t *}</span>
+				<a href="taxon.php?id={$t}">{$taxon.pctFinished}%{* t}done{/t *}</a>
 			</td>
 	{if !$isHigherTaxa}
 			<td title="{t}media files{/t}">
-				<span class="a" onclick="window.open('media.php?id={$t}','_self');">{$taxon.mediaCount} {if $taxon.mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</span>
+				<a href="media.php?id={$t}">{$taxon.mediaCount} {if $taxon.mediaCount==1}{t}file{/t}{else}{t}files{/t}{/if}</a>
 			</td>
 	{/if}
 			<td>

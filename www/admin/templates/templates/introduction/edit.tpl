@@ -74,6 +74,9 @@ $(document).ready(function(){
 
 	initTinyMce(false,false);
 
+	allSetAutoSaveFreq({$autoSaveFrequency});
+	freemodRunAutoSave();
+
 {literal}	
 });
 
