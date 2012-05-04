@@ -97,7 +97,6 @@ function contentSwitchPage() {
 
 	}
 
-
 }
 
 function contentPreviewContent() {
@@ -109,3 +108,12 @@ function contentPreviewContent() {
 
 }
 
+function contentRunAutoSave() {
+
+	if (!autoSaveInit) contentSaveContentAll();
+
+	autoSaveInit = false;
+
+	setTimeout("contentRunAutoSave()", autoSaveFreq);
+
+}

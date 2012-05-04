@@ -137,3 +137,13 @@ function freemodSaveContentAll() {
 	freemodSaveContentActive();
 
 }
+
+function freemodRunAutoSave() {
+
+	if (!autoSaveInit) freemodSaveContentAll();
+
+	autoSaveInit = false;
+
+	setTimeout("freemodRunAutoSave()", autoSaveFreq);
+
+}
