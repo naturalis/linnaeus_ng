@@ -49,7 +49,6 @@
 			</select>
 		</div>
 	</div>
-{$matrices|@var_dump}
 </div>
 
 {literal}
