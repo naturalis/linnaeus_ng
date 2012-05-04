@@ -70,7 +70,7 @@ class configuration
 			'serverTimeZone' => 'Europe/Amsterdam',
             'maxSessionHistorySteps' => 10, 
             'heartbeatFrequency' => 30000,  // milliseconds
-            'autosaveFrequency' => 300000,  // milliseconds
+            'autoSaveFrequency' => 300000,  // milliseconds
             'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(
                 'login' => '/views/users/login.php', 
@@ -81,7 +81,6 @@ class configuration
             ), 
             'directories' => array(
                 'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
-                'mediaDirUpload' => $this->_appFileRoot . 'www/admin/media/upload',
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
             ), 

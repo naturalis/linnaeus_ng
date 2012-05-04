@@ -3274,6 +3274,7 @@ class ImportController extends Controller
 						'project_id' => $this->getNewProjectId(),
 						'matrix_id' => $m[$key]['id'],
 						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
+						'show_order' => $cKey
 					)
 				);
 

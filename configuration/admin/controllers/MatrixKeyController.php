@@ -1,13 +1,5 @@
 <?php
 
-/*
-
-			if ($this->rHasVal('action','preview')) $this->redirect('preview.php?id='.$this->requestData['id']);
-
-check deletes when deleting matrix etc
-
-*/
-
 include_once ('Controller.php');
 
 class MatrixKeyController extends Controller
@@ -221,17 +213,41 @@ class MatrixKeyController extends Controller
         $this->checkAuthorisation();
 		
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
-
+		
 		if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {
 
-			
 			$c = $this->getCharacteristics();
-			
+		
 			foreach((array)$c as $key => $val) {
 
-				// NOW WHAT
+				if ($this->requestData['id']==$val['id']) {
+				
+					if ($this->rHasVal('r','u')) {
+					
+						if (isset($c[$key-1])) $this->updateCharShowOrder($c[$key-1]['id'],$c[$key-1]['show_order']+1);
+						
+						$this->updateCharShowOrder($this->requestData['id'],$val['show_order']-1);
+						
+						break;
+
+								
+					} else
+					if ($this->rHasVal('r','d')) {
+//q(($c[$key+1]));
+						if (isset($c[$key+1])) $this->updateCharShowOrder($c[$key+1]['id'],$c[$key+1]['show_order']-1);
+						
+						$this->updateCharShowOrder($this->requestData['id'],$val['show_order']+1);
+						
+						break;
+
+								
+					}
+				
+				}
 			
 			} 
+			
+			$this->renumberCharShowOrder();
 
 		}
 		
@@ -287,6 +303,8 @@ class MatrixKeyController extends Controller
 		
 			// delete the char from this matrix (and automatically delete the char itself if it isn't used in any other matrix)
 			$this->deleteCharacteristic();
+			
+			$this->renumberCharShowOrder();
 		
 			$this->redirect('edit.php');
 		
@@ -294,6 +312,8 @@ class MatrixKeyController extends Controller
 		if ($this->rHasVal('existingChar') && $this->rHasVal('action','use')) {
 		
 			$this->addCharacteristicToMatrix($this->requestData['existingChar']);
+		
+			$this->renumberCharShowOrder();
 		
 			$this->redirect('edit.php');
 		
@@ -320,6 +340,8 @@ class MatrixKeyController extends Controller
 
 			$charId = $this->updateCharacteristic();
 
+			$this->renumberCharShowOrder();
+		
 			//$this->addCharacteristicToMatrix($charId);
 
 			$this->redirect('edit.php');
@@ -914,11 +936,24 @@ class MatrixKeyController extends Controller
 
 		if (!isset($charId) || !isset($matrixId)) return;
 
+		$mc = $this->models->CharacteristicMatrix->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'matrix_id' => $matrixId,
+				),
+				'columns' => 'max(show_order) as max'
+			)
+		);
+		
+		$next = isset($mc[0]['max']) ? $mc[0]['max'] + 1 : 0;
+		
 		@$this->models->CharacteristicMatrix->save(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $matrixId,
-				'characteristic_id' => $charId
+				'characteristic_id' => $charId,
+				'show_order' => $next
 			)
 		);
 
@@ -1168,7 +1203,7 @@ class MatrixKeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $matrixId,
 				),
-				'columns' => 'characteristic_id',
+				'columns' => 'characteristic_id,show_order,id',
 				'order' => 'show_order'
 			)
 		);
@@ -1181,7 +1216,8 @@ class MatrixKeyController extends Controller
 
 				$d[] = array_merge(
 					$this->getCharacteristic($val['characteristic_id']),
-					$labels
+					$labels,
+					array('show_order' => $val['show_order'])
 				);
 
 			}
@@ -1905,5 +1941,30 @@ class MatrixKeyController extends Controller
 		}
 
 	}	
+
+	private function updateCharShowOrder($id,$val)
+	{
+
+		$this->models->CharacteristicMatrix->update(
+			array(
+				'show_order' => $val
+				),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'characteristic_id' => $id
+			)
+		);	
+
+	}
+	
+	private function renumberCharShowOrder()
+	{
+	
+		$c = $this->getCharacteristics();
+		
+		foreach((array)$c as $key => $val) $this->updateCharShowOrder($val['id'],$key);
+				
+	}
 
 }

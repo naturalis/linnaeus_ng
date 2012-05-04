@@ -986,7 +986,8 @@ class Controller extends BaseClass
     public function getDefaultImageUploadDir ()
     {
         
-        return isset($_SESSION['admin']['project']['paths']['uploads_media']) ? $_SESSION['admin']['project']['paths']['uploads_media'] : null;
+		return sys_get_temp_dir();
+        //return isset($_SESSION['admin']['project']['paths']['uploads_media']) ? $_SESSION['admin']['project']['paths']['uploads_media'] : null;
     
     }
 
@@ -2399,7 +2400,7 @@ class Controller extends BaseClass
 
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
-
+		$this->smarty->assign('autoSaveFrequency', $this->generalSettings['autoSaveFrequency']);
 
 		if (isset($this->cssToLoad)) $this->smarty->assign('cssToLoad', $this->cssToLoad);
 
@@ -2850,7 +2851,6 @@ class Controller extends BaseClass
 				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/',
 				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/',
 				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/l2_maps/',
-				'uploads_media' => $this->generalSettings['directories']['mediaDirUpload'] . '/' . $this->getProjectFSCode($p) . '/',
 				'media_url' => '../../../admin/media/project/' . $this->getProjectFSCode($p) . '/',				
 			);
         else
@@ -2870,19 +2870,11 @@ class Controller extends BaseClass
         
         if ($p) {
 
-            //$_SESSION['admin']['project']['paths']['project_media'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/';
-
-            //$_SESSION['admin']['project']['paths']['project_thumbs'] = $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/';
-            
-            //$_SESSION['admin']['project']['paths']['uploads_media'] = $this->generalSettings['directories']['mediaDirUpload'] . '/' . $this->getProjectFSCode($p) . '/';
-
 			$paths = $this->makePathNames($p);
 
             $_SESSION['admin']['project']['paths']['project_media'] = $paths['project_media'];
 
             $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
-            
-            $_SESSION['admin']['project']['paths']['uploads_media'] = $paths['uploads_media'];
 
             $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
 

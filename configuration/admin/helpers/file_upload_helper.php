@@ -197,7 +197,7 @@ class FileUploadHelper
         
                         } else {
         
-                            $this->addError(_('Could not create temporary directory in ').$this->getDefaultImageUploadDir());
+                            $this->addError(_('Could not create temporary directory in '.$this->_tempDir));
         
                         }
         
