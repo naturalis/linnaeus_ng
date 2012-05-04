@@ -92,11 +92,18 @@ $(document).ready(function(){
 taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
 {/if}
 {/section}
+
+allSetHeartbeatFreq({$heartbeatFrequency});
+taxonSetHeartbeat(
+	'{$session.admin.user.id}',
+	'{$session.admin.system.active_page.appName}',
+	'{$session.admin.system.active_page.controllerBaseName}',
+	'{$session.admin.system.active_page.viewName}',
+	'{$taxon.id}'
+);
+
 allLookupNavigateOverrideUrl('edit.php?id=%s');
-//taxonGetRankByParent(true);
-//taxonCheckNewTaxonName();
-//taxonGetRankByParent();
-//taxonCheckHybridCheck();
+
 
 {assign var=prev value=null}			
 {foreach from=$taxa key=k item=v}

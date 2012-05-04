@@ -15,7 +15,7 @@
 		<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
 		<input type="hidden" name="activePage" value="{$activePage}" />  
 	<div style="border-bottom:1px dotted #ddd;padding-bottom:10px">
-		{* yes i know, but for some reason the buttons refused to "see" the style sheet *}
+		{* yes, i know, but for some reason the buttons refused to "see" the style sheet *}
 		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="padding-right:25px;width:150px;" />
 		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" />
 		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" />
@@ -79,28 +79,32 @@ $(document).ready(function(){
 {/section}
 	taxonAddPage([{$pages[i].id},pagenames,{if $pages[i].def_page=='1'}1{else}0{/if}]);
 {/section}
-	taxonActivePage = {$activePage};
-	taxonUpdatePageBlock();
 
-//	taxonPublishStates  = {if $content.publish!=''}{$content.publish}{else}0{/if};
-	taxonDrawPublishBlocks();
+	{if $taxon.id!=-1}
+		taxonActivePage = {$activePage};
+		taxonUpdatePageBlock();
+	//	taxonPublishStates  = {if $content.publish!=''}{$content.publish}{else}0{/if};
+		taxonDrawPublishBlocks();
+	
+		allSetHeartbeatFreq({$heartbeatFrequency});
+		taxonSetHeartbeat(
+			'{$session.admin.user.id}',
+			'{$session.admin.system.active_page.appName}',
+			'{$session.admin.system.active_page.controllerBaseName}',
+			'{$session.admin.system.active_page.viewName}',
+			'{$taxon.id}'
+		);
+	
+		taxonActiveTaxonId = $('#taxon_id').val();
 
-	allSetHeartbeatFreq({$heartbeatFrequency});
-	taxonSetHeartbeat(
-		'{$session.admin.user.id}',
-		'{$session.admin.system.active_page.appName}',
-		'{$session.admin.system.active_page.controllerBaseName}',
-		'{$session.admin.system.active_page.viewName}',
-		'{$taxon.id}'
-	);
+		allSetAutoSaveFreq({$autoSaveFrequency});
+		taxonRunAutoSave();
 
-	taxonActiveTaxonId = $('#taxon_id').val();
+		initTinyMce('{$literature}','{$media}');
+	{/if}
 
-	allSetAutoSaveFreq({$autosaveFrequency});
-	taxonRunAutoSave();
 
 	{if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
-	initTinyMce('{$literature}','{$media}');
 	allLookupNavigateOverrideUrl('taxon.php?id=%s&cat=');
 
 {literal}	

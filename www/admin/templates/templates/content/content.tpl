@@ -59,6 +59,9 @@ $(document).ready(function(){
 
 	initTinyMce(false,false);
 
+	allSetAutoSaveFreq({$autoSaveFrequency});
+	contentRunAutoSave();
+
 {literal}	
 });
 

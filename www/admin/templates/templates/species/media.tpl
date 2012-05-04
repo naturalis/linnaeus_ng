@@ -26,7 +26,11 @@
 		{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td
-				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$media.image[i].file_name}','{$media.image[i].original_name}');" 
+				onclick="taxonShowMedia(
+					'{$session.admin.project.urls.project_media}{$media.image[i].file_name}',
+					'{$media.image[i].original_name}',
+					'{$media.image[i].id}',
+					'{$media.image[i].dimensions[1]}');" 
 				style="width:250px; cursor:pointer;padding-right:10px">
 				{if $media.image[i].thumb_name != ''}
 					<img
@@ -45,7 +49,13 @@
 				<input type="button" value="{t}delete this image{/t}" onclick="taxonMediaDelete({$media.image[i].id},'image','{$media.image[i].original_name}');" />
 				</p>
 				<script type="text/javascript">
-					taxonMediaAddId({$media.image[i].id});
+					taxonMediaFileStore([
+						'image',
+						'{$media.image[i].id}',
+						'{$session.admin.project.urls.project_media}{$media.image[i].file_name}',
+						'{$media.image[i].original_name}',
+						{$media.image[i].dimensions[1]}
+					]);
 				</script>
 			</td>
 			<td style="padding-right:10px">
@@ -88,9 +98,14 @@
 				<p>
 				<input type="button" value="{t}delete this video{/t}" onclick="taxonMediaDelete({$media.video[i].id},'video','{$media.video[i].original_name}');" />
 				</p>
-				<script type="text/javascript">
-					taxonMediaAddId({$media.video[i].id});
-				</script>
+				<!-- script type="text/javascript">
+					taxonMediaFileStore([
+						'video',
+						'{$media.video[i].id}',
+						'{$session.admin.project.urls.project_media}{$media.video[i].file_name}',
+						'{$media.video[i].original_name}'
+					]);
+				</script -->
 			</td>
 			<td>
 				<textarea id="media-{$media.video[i].id}" style="width:450px;height:100px">{$media.video[i].description}</textarea><br />
@@ -131,9 +146,14 @@
 				<p>
 				<input type="button" value="{t}delete this sound file{/t}" onclick="taxonMediaDelete({$media.sound[i].id},'sound file','{$media.sound[i].original_name}');" />
 				</p>
-				<script type="text/javascript">
-					taxonMediaAddId({$media.sound[i].id});
-				</script>
+				<!-- script type="text/javascript">
+					taxonMediaFileStore([
+						'sound',
+						'{$media.sound[i].id}',
+						'{$session.admin.project.urls.project_media}{$media.sound[i].file_name}',
+						'{$media.sound[i].original_name}'
+					]);
+				</script -->
 			</td>
 			<td>
 				<textarea id="media-{$media.sound[i].id}" style="width:450px;height:100px">{$media.sound[i].description}</textarea><br />

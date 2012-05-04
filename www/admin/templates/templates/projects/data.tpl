@@ -29,7 +29,7 @@
 			<input type="text" name="title" value="{$data.title}" style="width:300px;" />
 		</td>
 	</tr>
-	<tr style="vertical-align:top">
+	{*<tr style="vertical-align:top">
 		<td>
 			{t}Project logo:{/t}
 		</td>
@@ -42,7 +42,7 @@
 		<input name="uploadedfile" type="file" /><br />
 		{/if}
 		</td>
-	</tr>
+	</tr>*}
 	<tr style="vertical-align:top">
 		<td>
 			{t}Description (for html meta-tag):{/t}
