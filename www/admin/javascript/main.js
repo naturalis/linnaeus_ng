@@ -151,7 +151,9 @@ var heartbeatCtrllr = false;
 var heartbeatView = false;
 var heartbeatParams = Array();
 var heartbeatFreq = 120000;
-var autosaveFreq = 120000;
+var autoSaveFreq = 120000;
+var autoSaveInit = true;
+
 
 function allSetHeartbeatFreq(freq) {
 
@@ -190,7 +192,7 @@ function allSetHeartbeat(userid,app,ctrllr,view,params) {
 
 function allSetAutoSaveFreq(freq) {
 
-	autosaveFreq = freq;
+	autoSaveFreq = freq;
 
 }
 

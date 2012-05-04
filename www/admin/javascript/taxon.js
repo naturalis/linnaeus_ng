@@ -5,7 +5,6 @@ var taxonActivePage = false;
 var taxonPages = Array();
 var taxonPageStates = Array();
 var taxonPublishStates = Array();
-var taxonInitAutoSave = true;
 var taxonSaveType = 'auto';
 var taxonTargetDiv = false;
 var taxonTaxonParent = Array();
@@ -551,11 +550,11 @@ function taxonDrawPublishBlocks() {
 
 function taxonRunAutoSave() {
 
-	if (!taxonInitAutoSave) taxonSaveDataAll();
+	if (!autoSaveInit) taxonSaveDataAll();
 
-	taxonInitAutoSave = false;
+	autoSaveInit = false;
 
-	setTimeout("taxonRunAutoSave()", autosaveFreq);
+	setTimeout("taxonRunAutoSave()", autoSaveFreq);
 
 }
 
@@ -843,7 +842,7 @@ function taxonSaveCoLResult() {
 //MEDIA
 var taxonMediaSaveButtonClicked = false;
 var taxonMediaDescBeforeEdit = false;
-var taxonMediaIds = Array();
+var taxonMediaFiles = Array();
 
 function taxonMediaSaveDesc(ele,id) {
 
@@ -903,9 +902,9 @@ function taxonMediaChangeLanguage(lan) {
 
 }
 
-function taxonMediaAddId(id) {
+function taxonMediaFileStore(file) {
 
-	taxonMediaIds[taxonMediaIds.length] = id;
+	taxonMediaFiles[taxonMediaFiles.length] = file;
 
 }
 
@@ -1476,5 +1475,37 @@ function taxonChangeSubmitButtonLabel(ele) {
 	if (taxonSubmitButtonLabel==null) taxonSubmitButtonLabel = $('#submit').val();
 
 	$('#submit').val(taxonSubmitButtonLabel+' '+$('#rank-id :selected').text().toLowerCase());
+
+}
+
+function taxonShowMedia(url,name,id,hght) {
+
+	allShowMedia(url,name);
+	
+	$.colorbox.settings.photo = true;
+
+	// type,id,url,name
+	for (var i=0;i<taxonMediaFiles.length;i++) {
+		if (taxonMediaFiles[i][1]==id) {
+			var prev = (taxonMediaFiles[i-1] ? taxonMediaFiles[i-1] : null);
+			var next = (taxonMediaFiles[i+1] ? taxonMediaFiles[i+1] : null);
+		}
+	}	
+
+	var str = '<span onclick="satan();" style="margin:0px 10px 0px 10px">' + (name ? name : url) + '</span>';
+	if (prev) str = str + '<br /><a href="javascript:taxonShowMedia(\''+prev[2]+'\',\''+prev[3]+'\','+prev[1]+','+prev[4]+')">< prev</a>'; 
+	if (next) str = str + '<a href="javascript:taxonShowMedia(\''+next[2]+'\',\''+next[3]+'\','+next[1]+','+next[4]+')">next ></a>'; 
+	
+	if (str) {
+
+		$.colorbox({title:function () {
+			return 	str; 
+		}});
+		
+		var hh = parseInt(hght)+100;
+
+//		$.colorbox.settings.height = hh.toString();
+
+	}
 
 }
