@@ -375,7 +375,7 @@ class ProjectsController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName(_('Project settings'));
-
+		/*
 		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
 		// deleting the logo
 			
@@ -397,6 +397,7 @@ class ProjectsController extends Controller
 			}
 
 		} else
+		*/
         if (isset($this->requestData) && !$this->isFormResubmit()) {
 		// saving all data (except the logo image)
             
@@ -405,7 +406,7 @@ class ProjectsController extends Controller
             $this->models->Project->save($this->requestData);
         
         }
-        
+        /*
         if (isset($this->requestDataFiles)) {
 		// saving the logo
 
@@ -435,6 +436,7 @@ class ProjectsController extends Controller
 			}
 
         }
+		*/
 
 		$this->setCurrentProjectData();
 
@@ -1214,7 +1216,6 @@ class ProjectsController extends Controller
 		@rmdir($paths['project_media_l2_maps']);
 		@rmdir($paths['project_thumbs']);
 		@rmdir($paths['project_media']);
-		@rmdir($paths['uploads_media']);
 
 	}
 

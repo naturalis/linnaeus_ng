@@ -1328,7 +1328,7 @@ class Controller extends BaseClass
 		if (isset($this->generalSettings['urlUploadedProjectMedia'])) {
 			$u['uploadedMedia'] = $this->generalSettings['urlUploadedProjectMedia'].$pCode.'/';
 		} else {
-			$u['uploadedMedia'] = $this->baseUrl.$this->getAppName().'/media/upload/'.$pCode.'/';
+			$u['uploadedMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
 		}
 
 		$u['uploadedMediaThumbs'] = $u['uploadedMedia'].'thumbs/';

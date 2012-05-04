@@ -426,7 +426,7 @@ class SpeciesController extends Controller
 		if (!$this->rHasId()) $this->redirect('new.php');
 
 		$data = $this->getTaxonById();
-
+	
 		if ($this->maskAsHigherTaxa()) {
 
 			$pr = $this->newGetProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
@@ -445,7 +445,9 @@ class SpeciesController extends Controller
 
 			$this->addMessage(_('No ranks have been defined.'));
 
-		} else {
+		} else
+		
+		if (!$this->doLockOutUser($this->requestData['id'],true)) {
 
 			$this->newGetTaxonTree();
 
@@ -514,15 +516,23 @@ class SpeciesController extends Controller
 			$this->smarty->assign('allowed',true);
 
 			if (isset($data)) $this->smarty->assign('data',$data);
-
-			$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
-			$this->smarty->assign('navCurrentId',$data['id']);
-
+	
 			$this->smarty->assign('projectRanks',$pr);
 
 			if (isset($this->treeList)) $this->smarty->assign('taxa',$this->treeList);
 
+		} else {
+
+			$this->smarty->assign('taxon', array(
+				'id' => -1
+			));
+			
+			$this->addError(_('Taxon is already being edited by another editor.'));
+
 		}
+
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+		$this->smarty->assign('navCurrentId',$data['id']);
 
 		$this->printPage();
 
@@ -735,8 +745,6 @@ class SpeciesController extends Controller
 					
 				}
 
-				$this->smarty->assign('autosaveFrequency', $this->generalSettings['autosaveFrequency']);
-				
 				$this->smarty->assign('pages', $tp);
 				
 				$this->smarty->assign('languages', $lp);
@@ -1077,7 +1085,6 @@ class SpeciesController extends Controller
             }
 
             foreach((array)$media as $key => $val) {
-
 
                 $mdt = $this->models->MediaDescriptionsTaxon->_get(
 					array(
@@ -2428,7 +2435,6 @@ class SpeciesController extends Controller
 
 	}
 
-
     public function previewAction()
     {
 
@@ -2440,7 +2446,6 @@ class SpeciesController extends Controller
 		);
 
     }
-
 
 	private function getRankList()
 	{
@@ -2619,28 +2624,27 @@ class SpeciesController extends Controller
 
 	}
 
-    private function doLockOutUser ($taxonId)
+    private function doLockOutUser($taxonId,$lockOutOfAllScreens=false)
     {
 
         if (empty($taxonId)) return false;
 
-        $h = $this->models->Heartbeat->_get(
-			array(
-				'id' => array(
-					'project_id =' => $this->getCurrentProjectId(), 
-					'app' => $this->getAppName(), 
-					'ctrllr' => 'species', 
-					'view' => $this->getViewName(), 
-					'params' => serialize(array(
-						array(
-							'taxon_id', 
-							$taxonId
-						)
-					)), 
-					'user_id !=' => $this->getCurrentUserId()
-				)
-			)
-		);
+		$d = array(
+				'project_id =' => $this->getCurrentProjectId(), 
+				'app' => $this->getAppName(), 
+				'ctrllr' => 'species', 
+				'params' => serialize(array(
+					array(
+						'taxon_id', 
+						$taxonId
+					)
+				)), 
+				'user_id !=' => $this->getCurrentUserId()
+			);
+			
+		if ($lockOutOfAllScreens!==true) $d['view'] = $this->getViewName();
+
+        $h = $this->models->Heartbeat->_get(array('id' => $d));
 
         return isset($h) ? true : false;
     
@@ -2711,7 +2715,6 @@ class SpeciesController extends Controller
         }
     
     }
-
 
     private function ajaxActionSavePageTitle ()
     {
@@ -2949,7 +2952,6 @@ class SpeciesController extends Controller
     
     }
 
-
     private function filterContent($content)
     {
     
@@ -2967,7 +2969,6 @@ class SpeciesController extends Controller
         return array('content' => $modified, 'modified' => $content!=$modified);
 
     }
-
 
     private function ajaxActionGetTaxon ()
     {
@@ -3111,7 +3112,7 @@ class SpeciesController extends Controller
 		);
 
 		$this->reOrderTaxonTree();
-	
+
 	}
 
 	private function deleteTaxonBranch($id)
@@ -3197,7 +3198,6 @@ class SpeciesController extends Controller
         $this->smarty->assign('returnText', isset($d) ? json_encode($d) : null);
     
     }
-
 
     private function ajaxActionPublishContent ()
     {
@@ -4303,7 +4303,8 @@ class SpeciesController extends Controller
 		);
 		
 		foreach((array)$d as $key => $val) {
-
+		
+			$d[$key]['dimensions'] = getimagesize($_SESSION['admin']['project']['urls']['project_media'].$val['file_name']);
 			$d[$key]['hr_file_size'] = $this->helpers->HrFilesizeHelper->convert($val['file_size']);
 
 		}

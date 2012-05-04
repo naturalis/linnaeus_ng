@@ -690,7 +690,8 @@ class MatrixKeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'matrix_id' => $this->getCurrentMatrixId()
 				),
-				'columns' => 'characteristic_id'
+				'columns' => 'characteristic_id,show_order',
+				'order' => 'show_order'
 			)
 		);
 
