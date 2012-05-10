@@ -49,8 +49,11 @@
 		<td class="key-choice-number">{$choices[i].marker}.</td>
 		<!-- td class="key-choice-title">{$choices[i].title}</td -->
 		<td class="key-choice-title">
-			{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}
-			<i><span class="a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
+			{$choices[i].choice_txt}
+			{*
+				{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}
+				<i><span class="a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
+			*}
 		</td>
 		<td class="key-choice-leadsto">&rarr;</td>
 		<td class="key-choice-target">

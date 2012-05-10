@@ -167,7 +167,7 @@ class LiteratureController extends Controller
 				$test['id !='] = $data['id'];
 			else
 				$test['id'] = 'null';
-//qqq
+
 			if ($this->getReferences($test)) {
 
 				$this->addError(_('A reference with the same author(s), year and suffix already exists.'));
@@ -186,7 +186,7 @@ class LiteratureController extends Controller
 				if ($this->rHasVal('selectedTaxa')) {
 
 					foreach((array)$this->requestData['selectedTaxa'] as $key => $val)
-						$this->saveLiteratureTaxon($id, $val);
+						$this->saveLiteratureTaxon($id,$val,$key);
 
 				}
 				
@@ -409,6 +409,11 @@ class LiteratureController extends Controller
            $this->saveLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
 
         } else
+        if ($this->rHasVal('action','save_order')) {
+		
+		   $this->updateLiteratureTaxonOrder($this->requestData['id'],$this->requestData['taxa']);
+
+        } else
         if ($this->rHasVal('action','delete_taxon')) {
 
            $this->deleteLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
@@ -443,7 +448,9 @@ class LiteratureController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'literature_id' => $id	
-					)
+					),
+					'columns' => 'id,taxon_id,sort_order',
+					'order' => 'sort_order'
 				)
 			);
 
@@ -822,21 +829,46 @@ class LiteratureController extends Controller
 	
 	}
 
-	private function saveLiteratureTaxon($id,$taxonId)
+	private function saveLiteratureTaxon($id,$taxonId,$sortOrder=null)
 	{
 	
-		if (!isset($id) || !isset($taxonId)) return;
+		if (empty($id) || empty($taxonId)) return;
 
-		$x =  $this->models->LiteratureTaxon->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'literature_id' => $id,
-				'taxon_id' => $taxonId
-			)
+		$d = array(
+			'id' => null,
+			'project_id' => $this->getCurrentProjectId(),
+			'literature_id' => $id,
+			'taxon_id' => $taxonId
 		);
+
+		if (!is_null($sortOrder)) $d['sort_order'] = $sortOrder;
+
+		$x =  $this->models->LiteratureTaxon->save($d);
 	
 	}
+
+	private function updateLiteratureTaxonOrder($id,$taxa)
+	{
+	
+		if (empty($id) || empty($taxa)) return;
+		
+		foreach((array)$taxa as $key => $val) {
+
+			$this->models->LiteratureTaxon->update(
+				array(
+					'sort_order' => $key
+				),
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'literature_id' => $id,
+					'taxon_id' => $val
+				)
+			);
+
+		}
+	
+	}
+
 
 	private function deleteLiteratureTaxon($id,$taxonId=null)
 	{
@@ -853,28 +885,6 @@ class LiteratureController extends Controller
 		return $this->models->LiteratureTaxon->delete($d);
 				
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

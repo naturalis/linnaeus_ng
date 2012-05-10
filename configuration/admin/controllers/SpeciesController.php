@@ -311,6 +311,7 @@ class SpeciesController extends Controller
 			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
 
 
+			//if (true) {
 			if ($this->maskAsHigherTaxa()) {
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));

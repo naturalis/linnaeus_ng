@@ -34,9 +34,9 @@
 		<th style="width:20px;text-align:center">{t}Delete{/t}</th>
 		<th>{t}Is being edited by:{/t}</th>
 	</tr>
-	
+
 	{assign var=prev_rank value=-1}
-	{assign var=firstlevel value=-1}
+{assign var=firstlevel value=-1}
 	{foreach item=taxon from=$taxa}
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
 		{assign var=t value=$taxon.id}
@@ -53,10 +53,9 @@
 			</td -->
 			<td class="taxon-list-cell-name" id="namecell{$taxon.id}">
 				{if $firstlevel==-1}{assign var=firstlevel value=$taxon.level}{/if}
-				{if ($taxon.level-$firstlevel)>=0}{assign var=dots value=$taxon.level-$firstlevel}{else}{assign var=dots value=0}{/if}
-				{'.'|str_repeat:$dots}
+				{'.'|str_repeat:$taxon.level-$firstlevel}
 				{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
-				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>{* $taxon.id}::{$taxon.parent_id *}
+				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>{* {$taxon.id}::p{$taxon.parent_id *}
 			</td>
 	{if $session.admin.project.includes_hybrids==1}<td>
 				{if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}

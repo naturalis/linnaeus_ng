@@ -106,7 +106,7 @@ class UtilitiesController extends Controller
 		$this->isMultiLingual = false;
 		$this->includeLocalMenu = false;
 		$this->printBreadcrumbs = false;
-	
+		
 		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
 
 		$this->smarty->assign('projects',$projects);
@@ -151,16 +151,20 @@ class UtilitiesController extends Controller
 
 
 
-    private function cleanUpHeartbeats ()
+    private function cleanUpHeartbeats()
     {
+
+		$pId = $this->getCurrentProjectId();
+
+		if (empty($pId)) return;
 
 		/*
 		It is possible to use FRAC_SECOND in place of MICROSECOND, but FRAC_SECOND is deprecated. FRAC_SECOND was removed in MySQL 5.5.3.
 		*/        
         $this->models->Heartbeat->delete(
-	        "delete from %table%  where project_id = " . $this->getCurrentProjectId() . 
-			" and last_change <= TIMESTAMPADD(FRAC_SECOND,-" . 
-			($this->generalSettings['heartbeatFrequency'] * 2000) . ",CURRENT_TIMESTAMP)");
+	        "delete from %table%  where project_id = ".$pId.
+			" and last_change <= TIMESTAMPADD(FRAC_SECOND,-".
+			($this->generalSettings['heartbeatFrequency'] * 2000).",CURRENT_TIMESTAMP)");
 
     }
 
