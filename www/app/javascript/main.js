@@ -171,6 +171,20 @@ function showMedia(url,name) {
 
 }
 
+function showVideo(url,name) {
+
+	var content =
+		'<video width="320" height="240" controls="controls">'+
+			'<source src="'+url+'" type="mime_type" />'+
+			'<embed src="'+url+'" width="320" height="240" />'+
+		'</video> ';
+
+	showDialog(name,content);
+
+}
+
+
+
 function isArray(obj) {
    if (obj.constructor.toString().indexOf("Array") == -1)
       return false;

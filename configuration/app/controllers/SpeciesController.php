@@ -137,7 +137,7 @@ class SpeciesController extends Controller
 				$this->isLoggedInAdmin(),
 				$this->isLoggedInAdmin()
 			);
-			
+
 			// determine the page_id the page will open in
 			$activeCategory = $this->rHasVal('cat') ? $this->requestData['cat'] : $categories['defaultCategory'];
 
@@ -298,6 +298,8 @@ class SpeciesController extends Controller
 	private function getCategories($taxon=null,$allowUnpublished=false,$forcelookup=false)
 	{
 	
+		$forcelookup = true;
+	
 		if (!isset($_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()]) || $forcelookup) {
 
 			// get the defined categories (just the page definitions, no content yet)
@@ -333,7 +335,7 @@ class SpeciesController extends Controller
 		}
 
 		if ($taxon) {
-		
+
 			$defCat = 'classification';
 		
 			$d = array();
@@ -354,7 +356,7 @@ class SpeciesController extends Controller
 
 				if ($ct[0]['publish']=='1' || $allowUnpublished) $d[] = $val;
 
-				if ($ct[0]['page_id']==$_SESSION['app']['user']['species']['defaultCategory'] && ($ct[0]['publish']=='1' || $allowUnpublished)) 
+				if ($ct[0]['page_id']==$_SESSION['app']['user']['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
 					$defCat = $_SESSION['app']['user']['species']['defaultCategory'];
 
 			}

@@ -1726,9 +1726,8 @@ class Controller extends BaseClass
 
 	/*
 
-		"new" functions below are replacements for the "tacon tree"-functions, with improved
-		caching and - hopefully - performance. so far, only implemented in
-			SpeciesController::listAction
+		"new" functions below are replacements for the "taxon tree"-functions, with improved
+		caching and - hopefully - performance.
 			
 
 	*/
@@ -1755,6 +1754,8 @@ class Controller extends BaseClass
 	
 	public function newGetTaxonTree($p=null)
 	{
+
+		//$p['forceLookup']=true;
 
 		if (
 			!isset($_SESSION['admin']['user']['species']['tree']) || 
@@ -2537,7 +2538,7 @@ class Controller extends BaseClass
 
         if (empty($this->appName)) $this->log('No application name set',2);
         if (empty($this->_viewName)) $this->log('No view name set',2);
-		if (empty($this->controllerBaseName)) $this->log('No controller basename set',0);
+		//if (empty($this->controllerBaseName)) $this->log('No controller basename set',2);
 		if (empty($this->baseUrl)) $this->log('No base URL set',2);
         if (empty($this->_fullPath)) $this->log('No full path set',2);
         if (empty($this->_fullPathRelative)) $this->log('No relative full path set',2);

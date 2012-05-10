@@ -238,7 +238,11 @@ function litUpdateTaxonSelection() {
 		b = b + 
 			'<tr class="tr-highlight"><td style="width:97%">'+
 			litGetTaxonName(litAddedTaxa[i])+
-			'</td><td class="a" onclick="litDeleteTaxon('+litAddedTaxa[i]+');litRemoveTaxonFromList('+litAddedTaxa[i]+');">x</td></tr>';
+			'</td>'+
+			(i>0 ? '<td class="a" onclick="litTaxonMove('+i+','+(i-1)+');litUpdateTaxonSelection();">&uarr;</td>' : '<td></td>')+
+			(i<litAddedTaxa.length-1 ? '<td class="a" onclick="litTaxonMove('+i+','+(i+1)+');litUpdateTaxonSelection();">&darr;</td>' : '<td></td>')+
+			'<td class="a" onclick="litDeleteTaxon('+litAddedTaxa[i]+');litRemoveTaxonFromList('+litAddedTaxa[i]+');">x</td>'+
+			'</tr>';
 	
 	}
 
@@ -317,18 +321,36 @@ function litAddTaxonToList(taxonId,noupdate,nosave) {
 	
 }
 
+function litSaveTaxonOrder() {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : ({
+			'action' : 'save_order',
+			'id' : $('#id').val(),
+			'taxa' : litAddedTaxa,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+		}
+	});
+
+}
+
 function litSaveTaxon(taxonId) {
 
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
+			'action' : 'save_taxon',
 			'id' : $('#id').val(),
 			'taxon' : taxonId,
-			'action' : 'save_taxon',
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {
 			//alert(data);
+			litSaveTaxonOrder();
 		}
 	});	
 
@@ -360,3 +382,27 @@ function litDelete() {
 	$('#theForm').submit();
 
 }
+
+function litTaxonMove(from,to) {
+
+	var t = litAddedTaxa[to];
+	litAddedTaxa[to] = litAddedTaxa[from];
+	litAddedTaxa[from] = t;
+	litSaveTaxonOrder();
+	litUpdateTaxonSelection();
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

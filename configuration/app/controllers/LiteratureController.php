@@ -249,7 +249,8 @@ class LiteratureController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'literature_id' => $id	
-					)
+					),
+					'order' => 'sort_order'
 				)
 			);
 

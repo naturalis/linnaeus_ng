@@ -65,6 +65,22 @@
 			<td>
 				<input type="checkbox" id="overview-{$media.image[i].id}"{if $media.image[i].overview_image=='1'} checked="checked"{/if} onclick="taxonChangeOverviewPicture(this)" />
 			</td>
+			<!--td>
+				<span
+					class="a"
+					title="{t}move image upward{/t}"
+					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('up');$('#rearrangeForm').submit();">
+					&uarr;
+				</span>
+			</td>
+			<td>
+				<span
+					class="a"
+					title="{t}move branch downward in the tree{/t}"
+					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('down');$('#rearrangeForm').submit();">
+					&darr;
+				</span>
+			</td-->
 		</tr>
 		<tr>
 			<td colspan="2" style="height:20px;"></td>

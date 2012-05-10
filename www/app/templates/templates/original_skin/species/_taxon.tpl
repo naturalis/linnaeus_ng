@@ -150,7 +150,7 @@
 			<img 
 				alt="{$v.original_name}" 
 				src="{$session.app.project.urls.systemMedia}video.jpg" 
-				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+				onclick="showVideo('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 				class="media-video-icon" />
 	{elseif $v.category=='audio'}
 			<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
