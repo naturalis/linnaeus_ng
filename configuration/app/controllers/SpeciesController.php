@@ -126,7 +126,7 @@ class SpeciesController extends Controller
             $taxon = $this->getTaxonById($this->requestData['id']);
 
 			$this->setTaxonType($taxon['lower_taxon']==1 ? 'lower' : 'higher');
-			
+
 			$this->setControllerBaseName();
 			
 			if (isset($this->requestData['lan'])) $this->setCurrentLanguageId($this->requestData['lan']);
@@ -271,14 +271,14 @@ class SpeciesController extends Controller
   
     }
 
-	public function setTaxonType ($type)
+	public function setTaxonType($type)
 	{
 
 		$_SESSION['app']['user']['species']['type'] = ($type=='higher') ? 'higher' : 'lower';
 	
 	}
 
-	private function getTaxonType ()
+	private function getTaxonType()
 	{
 
 		return isset($_SESSION['app']['user']['species']['type']) ? $_SESSION['app']['user']['species']['type'] : 'lower';
@@ -854,8 +854,8 @@ class SpeciesController extends Controller
 			'returnText',
 			$this->makeLookupList(
 				$l,
-				'species',
-				'../species/taxon.php?id=%s',
+				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+				'../'.($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species').'/taxon.php?id=%s',
 				true
 			)
 		);

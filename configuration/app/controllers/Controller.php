@@ -62,6 +62,8 @@ class Controller extends BaseClass
     private $usedHelpersBase = array(
 		'logging_helper'
     );
+	
+	public $cssToLoad = array();
 
 
     /**
@@ -235,7 +237,6 @@ class Controller extends BaseClass
 		) {
 
 			$_SESSION['app']['user']['species']['tree'] = $this->_getTaxonTree($params);
-
 			$_SESSION['app']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
 
 		} else {
