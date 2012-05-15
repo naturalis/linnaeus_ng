@@ -11,9 +11,11 @@
 <div style="width:890px;height:610px;border:1px solid #aaf;margin-top:10px;">
 	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">
 		<span id="taxon-language-default-language">
+{if $languages|@count>1}
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}{$languages[i].language}{/if}
-{/section}		
+{/section}
+{/if}
 		</span>
 	</div>
 	<div style="width:100%;padding:10px">

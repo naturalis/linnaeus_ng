@@ -10,6 +10,7 @@
 
 <p>
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
+	<input type="hidden" name="action" id="action" value="" />
 	<input type="button" value="{t}upload media{/t}" onclick="window.open('media_upload.php?id={$id}','_top')" />&nbsp;
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
@@ -25,22 +26,15 @@
 		</tr>
 		{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
-			<td
-				onclick="taxonShowMedia(
-					'{$session.admin.project.urls.project_media}{$media.image[i].file_name}',
-					'{$media.image[i].original_name}',
-					'{$media.image[i].id}',
-					'{$media.image[i].dimensions[1]}');" 
-				style="width:250px; cursor:pointer;padding-right:10px">
+			<td style="width:150px;padding-right:10px">
 				{if $media.image[i].thumb_name != ''}
-					<img
-						src="{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}"
-						style="width:250px;border:1px solid black;" />
+					{capture name="src"}{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}{/capture} 
 				{else}
-					<img
-						src="{$session.admin.project.urls.project_media}{$media.image[i].file_name}"
-						style="width:250px;border:1px solid black;" />
+					{capture name="src"}{$session.admin.project.urls.project_media}{$media.image[i].file_name}{/capture} 
 				{/if}
+				<a class="group1" title="{$media.image[i].original_name}" href="{$session.admin.project.urls.project_media}{$media.image[i].file_name}">
+					<img src="{$smarty.capture.src}" style="width:150px;cursor:pointer"/>
+				</a>
 				<p>
 				{$media.image[i].original_name}<br />
 				<span class="taxon-media-secondary-info">({$media.image[i].mime_type}; {$media.image[i].hr_file_size} {t}kb{/t})</span>
@@ -65,22 +59,26 @@
 			<td>
 				<input type="checkbox" id="overview-{$media.image[i].id}"{if $media.image[i].overview_image=='1'} checked="checked"{/if} onclick="taxonChangeOverviewPicture(this)" />
 			</td>
-			<!--td>
+			<td>
+			{if $smarty.section.i.index>0}
 				<span
-					class="a"
+					class="a updownarrows"
 					title="{t}move image upward{/t}"
-					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('up');$('#rearrangeForm').submit();">
+					onclick="taxonChangeMediaOrder('{$id}','{$media.image[i].id}','up')">
 					&uarr;
 				</span>
+			{/if}
 			</td>
 			<td>
+			{if $smarty.section.i.index<$media.image|@count-1}
 				<span
-					class="a"
-					title="{t}move branch downward in the tree{/t}"
-					onclick="$('#scroll').val($(window).scrollTop());$('#id').val({$t});$('#move').val('down');$('#rearrangeForm').submit();">
+					class="a updownarrows"
+					title="{t}move image downward{/t}"
+					onclick="taxonChangeMediaOrder('{$id}','{$media.image[i].id}','down')">
 					&darr;
 				</span>
-			</td-->
+			{/if}
+			</td>
 		</tr>
 		<tr>
 			<td colspan="2" style="height:20px;"></td>
@@ -208,6 +206,7 @@ $(document).ready(function(){
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
 {literal}	
+	$(".group1").colorbox({rel:'group1'});	
 });
 </script>
 {/literal}

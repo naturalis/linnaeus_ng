@@ -16,15 +16,14 @@ function keyToggleFullKeyPath() {
 
 }
 
-function keyChoiceSave() {
+function keyChoiceContentCheck() {
 	
 	if (tinyMCE.get('contentDefault').getContent().trim()=='') {
 		alert(_('You have to enter text for this choice'));
 		$('#contentDefault').focus();
+		return false;
 	} else {
-		keySaveChoiceContent('default');
-		keySaveChoiceContent('other');
-		$('#theForm').submit();
+		return true;
 	}
 }
 

@@ -133,19 +133,19 @@
 		<td class="media-image-cell">
 	{if $v.category=='image'}
 		{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
+		<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 		{if $v.thumb_name != ''}
 			<img
 				alt="{$v.original_name}" 
-				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 				src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
 				class="media-image" />
 		{else}
 			<img
 				alt="{$v.original_name}" 
-				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 				src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 				class="media-image" />
 		{/if}
+		</a>
 	{elseif $v.category=='video'}
 			<img 
 				alt="{$v.original_name}" 
@@ -200,6 +200,7 @@ $(document).ready(function(){
 {/foreach}
 
 {literal}
+	$(".group1").colorbox({rel:'group1'});	
 });
 </script>
 {/literal}

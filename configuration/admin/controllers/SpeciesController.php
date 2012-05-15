@@ -1058,6 +1058,13 @@ class SpeciesController extends Controller
             )
         );
 
+        if ($this->rHasId() && $this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
+
+			
+
+		}
+
+
         if ($this->rHasId()) {
         // get existing taxon name
 
@@ -4299,7 +4306,7 @@ class SpeciesController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id
 				),
-				'order' => 'mime_type, file_name'
+				'order' => 'mime_type,sort_order,file_name'
 			)
 		);
 		

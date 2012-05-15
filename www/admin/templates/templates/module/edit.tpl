@@ -10,11 +10,13 @@
 <input type="hidden" name="action" id="action" value="" />
 <div style="width:890px;height:610px;border:1px solid #aaf;margin-top:10px;">
 	<div id="taxon-language-default" style="background-color:#eef;padding:5px;font-weight:bold">
+{if $languages|@count > 1}
 		<span id="taxon-language-default-language">
 {section name=i loop=$languages}
 {if $languages[i].def_language=='1'}{$languages[i].language}{/if}
 {/section}		
 		</span>
+{/if}
 	</div>
 	<div style="width:100%;padding:10px">
 		{t}Topic:{/t} <input type="text" id="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" />
