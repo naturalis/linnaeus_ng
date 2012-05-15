@@ -123,8 +123,8 @@ class LinnaeusController extends Controller
 
 			$this->setPaths();
 		
-			//$this->checkForStylesheets();
-
+			$this->setCssFiles();
+		
 			$this->setCurrentProjectData();
 			
 			if ($this->rHasVal('r')) 
@@ -1533,65 +1533,5 @@ class LinnaeusController extends Controller
 
 	}
 	
-	private function checkForStylesheets()
-	{
-	
-		foreach((array)$this->cssToLoad as $val) {
-		
-			if (!file_exists($_SESSION['app']['project']['urls']['projectCSS'].$val)) {
-			
-				if (dirname($_SESSION['app']['project']['paths']['defaultCSS'].$val) != dirname($_SESSION['app']['project']['paths']['defaultCSS'])) {
-
-					@mkdir(
-						str_replace(
-							$_SESSION['app']['project']['paths']['defaultCSS'],
-							$_SESSION['app']['project']['paths']['projectCSS'],
-							dirname($_SESSION['app']['project']['paths']['defaultCSS'].$val)
-						)
-					);
-
-				}
-
-				copy($_SESSION['app']['project']['paths']['defaultCSS'].$val,$_SESSION['app']['project']['paths']['projectCSS'].$val);
-			
-			}
-
-		}
-		
-		// this dir name should probably go somewhere more manageable.
-		$d = $_SESSION['app']['project']['paths']['defaultCSS'].'colorbox/images/';
-		$e = $_SESSION['app']['project']['paths']['defaultCSS'].'colorbox/images/internet_explorer/';
-		
-		if (!file_exists($d)) mkdir($d);
-		if (!file_exists($e)) mkdir($e);
-
-		if (!file_exists($_SESSION['app']['project']['paths']['projectCSS'].'colorbox/images/'))
-			mkdir($_SESSION['app']['project']['paths']['projectCSS'].'colorbox/images/');
-
-		if (!file_exists($_SESSION['app']['project']['paths']['projectCSS'].'colorbox/images/internet_explorer/'))
-			mkdir($_SESSION['app']['project']['paths']['projectCSS'].'colorbox/images/internet_explorer/');
-
-		$f = array(
-				'border1.png',
-				'border2.png',
-				'loading.gif',
-				'internet_explorer/borderBottomCenter.png',
-				'internet_explorer/borderBottomLeft.png',
-				'internet_explorer/borderBottomRight.png',
-				'internet_explorer/borderMiddleLeft.png',
-				'internet_explorer/borderMiddleRight.png',
-				'internet_explorer/borderTopCenter.png',
-				'internet_explorer/borderTopLeft.png',
-				'internet_explorer/borderTopRight.png',
-			);
-			
-		foreach((array)$f as $val) {
-		
-			if (file_exists($d.$val))
-				copy($d.$val,$_SESSION['app']['project']['paths']['projectCSS'].'colorbox/images/'.$val);
-
-		}
-	
-	}
 
 }

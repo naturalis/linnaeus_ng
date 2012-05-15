@@ -10,10 +10,9 @@
 	    @import url("{$session.app.project.urls.projectCSS}yui/cssreset-min.css");
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-	    @import url("{$session.app.project.urls.projectCSS}{$cssToLoad[i]}");
+	    @import url("{$cssToLoad[i]}");
 {/section}
 {/if}
-        @import url("../utilities/dynamic-css.php");
 	</style>
         <!--[if lt IE 9]>
             <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7-8.css";</style> 
