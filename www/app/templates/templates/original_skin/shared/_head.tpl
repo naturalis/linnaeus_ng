@@ -9,10 +9,9 @@
 	<style type="text/css" media="all">
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-		@import url("{$session.app.project.urls.projectCSS}{$cssToLoad[i]}");
+		@import url("{$cssToLoad[i]}");
 {/section}
 {/if}
-		@import url("../utilities/dynamic-css.php");
 	</style>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>

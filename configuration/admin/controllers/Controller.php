@@ -1688,41 +1688,6 @@ class Controller extends BaseClass
 			
 	}
 
-	public function printPreviewPage($specificTemplate=null,$specificStylesheet=null,$specificMenuTemplate=null)
-	{
-
-		die('ooops! forgot to remove old school preview!');
-
-
-		$this->includeLocalMenu  = false;
-
-		$this->smarty->assign('menu', $this->getFrontEndMainMenu());
-		$this->smarty->assign('controllerMenuOverride',
-			$specificMenuTemplate ?
-				$specificMenuTemplate :
-				'../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu.tpl'
-			);
-
-		unset($this->cssToLoad);
-		unset($this->jsToLoad);
-
-		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/basics.css';
-		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/'.$specificStylesheet;
-		$this->cssToLoad[] = '../../../app/style/'.$this->getProjectFSCode($this->getCurrentProjectId()).'/search.css';
-		
-		$this->printPage('../../../../app/templates/templates/shared/_head');
-		$this->printPage('../../../../app/templates/templates/shared/_body-start');
-		$this->printPage('../../../../app/templates/templates/shared/_header-container');
-		$this->printPage('../../../../app/templates/templates/shared/_main-menu');
-		$this->printPage('../../../../app/templates/templates/shared/_page-start');
-		//@$this->printPage('../../../../app/templates/templates/'.$this->controllerBaseName.'/_menu');
-
-		if (isset($specificTemplate)) $this->printPage($specificTemplate);
-		$this->printPage('../../../../app/templates/templates/shared/_footer');
-		$this->printPage('../shared/preview-overlay');
-		
-	}
-		
 
 	/*
 
@@ -2910,11 +2875,8 @@ class Controller extends BaseClass
         if ($p) {
 
             $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.$this->getProjectFSCode($p).'/';
-
             $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
-
             $_SESSION['admin']['project']['urls']['project_media_l2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'l2_maps/';
-
 			$_SESSION['admin']['project']['urls']['system_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
 
         }

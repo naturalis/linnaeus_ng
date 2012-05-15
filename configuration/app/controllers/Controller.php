@@ -42,8 +42,6 @@ class Controller extends BaseClass
 	public $includeLocalMenu = true;
 	public $allowEditPageOverlay = true;
 
-
-
     private $usedModelsBase = array(
         'project', 
         'language_project', 
@@ -95,6 +93,8 @@ class Controller extends BaseClass
         $this->setUrls();
 		
 		$this->setPaths();
+		
+		$this->setCssFiles();
 
         $this->loadModels();
 
@@ -1362,31 +1362,32 @@ class Controller extends BaseClass
      * 
      * @access     public
      */
-    public function setPaths ()
+    public function setPaths()
     {
 
         $p = $this->getCurrentProjectId();
 
         if ($p) {
 
-            $_SESSION['app']['project']['paths']['projectCSS'] = $this->generalSettings['app']['fileRoot'].'style/'.$this->getProjectFSCode($p).'/';
             $_SESSION['app']['project']['paths']['defaultCSS'] = $this->generalSettings['app']['fileRoot'].'style/default/';
-
-            foreach ((array) $_SESSION['app']['project']['paths'] as $key => $val) {
-                
-                if (!file_exists($val)) {
-
-                    mkdir($val);
-
-					$this->log('Created directory "'.$val.'"');
-
-				}
-            
-            }
         
         }
     
     }
+	
+	public function  setCssFiles()
+	{
+
+		foreach((array)$this->cssToLoad as $key => $val)
+			$this->cssToLoad[$key] = $_SESSION['app']['project']['urls']['projectCSS'].$val;
+
+		array_push($this->cssToLoad,'../utilities/dynamic-css.php');
+
+		$d = $this->baseUrl.$this->getAppName().'/style/custom/'.$this->getProjectFSCode().'.css';
+
+		if (file_exists($d)) array_push($this->cssToLoad,$d);
+
+	}
 	
 
 	public function makeLookupList($data,$module,$url,$sortData=false,$encode=true)
@@ -2145,8 +2146,10 @@ class Controller extends BaseClass
 
 	}
 
-	private function getProjectFSCode($p)
+	private function getProjectFSCode($p=null)
 	{
+	
+		$p = is_null($p) ? $this->getCurrentProjectId() : $p;
 	
 		return sprintf('%04s',$p);
 	
