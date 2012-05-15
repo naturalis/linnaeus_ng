@@ -120,7 +120,7 @@ function allLookupGetData(text,getAll) {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-
+				//alert(data);
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
