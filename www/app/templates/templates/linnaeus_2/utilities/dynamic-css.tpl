@@ -75,7 +75,9 @@
 {literal}
 #next-icon-inactive {
 {/literal}
-    background: url('{$systemMedia}previous.png') top center no-repeat;
+    width: 40px;
+    background: url('{$systemMedia}next.png') no-repeat;
+    margin-right: 15px;
     opacity: 0.4;
     filter: alpha(opacity=40); 
 {literal}
