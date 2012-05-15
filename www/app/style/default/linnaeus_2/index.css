@@ -22,6 +22,7 @@
 	font-style:italic;
 }
 
+/*
 .category, .category-active {
 	font-size:11px;
 	width:125px;
@@ -43,7 +44,7 @@
 .space {
 	width:5px;
 }
-
+*/
 #alphabet {
 	border-bottom:1px dotted #ddd;
 	padding-bottom:10px;
