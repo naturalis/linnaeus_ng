@@ -14,13 +14,14 @@
 <fieldset>
 <legend>{t}Editing choice{/t} "<span id="default-choice-title">...</span>"</legend>
 <table style="border-collapse:collapse">
-
+	{if $session.admin.project.languages|@count>1}
 	<tr style="vertical-align:top">
 		<td></td>
 		<td {$languages[i].language_id} colspan="2">
 			{$defaultLanguage.language}
 		</td>
 	</tr>
+	{/if}
 	<tr style="vertical-align:top">
 		<td>{t}Text:{/t}</td>
 		<td colspan="2">
@@ -123,7 +124,7 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td colspan="3">
-			<input type="button" onclick="keyChoiceSave();" value="{t}save{/t}" />
+			<input type="button" onclick="if (keyChoiceContentCheck()){literal}{{/literal}keySaveChoiceContent('default');{if $session.admin.project.languages|@count>1}keySaveChoiceContent('other');{/if}$('#theForm').submit();{literal}}{/literal}" value="{t}save{/t}" />
 			<!-- input type="button" onclick="keyChoiceDelete()" value="{t}delete{/t}" / -->
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 			<input type="button" onclick="keyChoiceUndo();"  value="{t}undo last save{/t}" />

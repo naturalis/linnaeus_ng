@@ -40,8 +40,6 @@ class UsersController extends Controller
     {
         
         parent::__construct();
-		
-		$this->isMultiLingual = false;
     
     }
 

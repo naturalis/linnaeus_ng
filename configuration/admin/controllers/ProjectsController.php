@@ -83,8 +83,6 @@ class ProjectsController extends Controller
         
         parent::__construct();
    
-		$this->isMultiLingual = false;
-   
     }
 
 	/**

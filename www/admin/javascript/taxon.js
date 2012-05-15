@@ -138,6 +138,8 @@ function taxonAddPage(page) {
 
 function taxonDrawTaxonLanguages(fnc,includeDef) {
 
+	if (allLanguages.length<=1) return;
+
 	fnc = fnc || 'taxonSwitchLanguage';
 
 	var buffer = '';
@@ -158,6 +160,8 @@ function taxonDrawTaxonLanguages(fnc,includeDef) {
 		
 		if (allLanguages[i][0]==allDefaultLanguage) var def = allLanguages[i][1];
 	}
+	
+	
 
 //	$('#taxon-language-other-language').html(buffer);
 	$('[id^="taxon-language-other-language"]').html(buffer);
@@ -1478,34 +1482,8 @@ function taxonChangeSubmitButtonLabel(ele) {
 
 }
 
-function taxonShowMedia(url,name,id,hght) {
+function taxonChangeMediaOrder(id,mId,dir) {
 
-	allShowMedia(url,name);
-	
-	$.colorbox.settings.photo = true;
-
-	// type,id,url,name
-	for (var i=0;i<taxonMediaFiles.length;i++) {
-		if (taxonMediaFiles[i][1]==id) {
-			var prev = (taxonMediaFiles[i-1] ? taxonMediaFiles[i-1] : null);
-			var next = (taxonMediaFiles[i+1] ? taxonMediaFiles[i+1] : null);
-		}
-	}	
-
-	var str = '<span onclick="satan();" style="margin:0px 10px 0px 10px">' + (name ? name : url) + '</span>';
-	if (prev) str = str + '<br /><a href="javascript:taxonShowMedia(\''+prev[2]+'\',\''+prev[3]+'\','+prev[1]+','+prev[4]+')">< prev</a>'; 
-	if (next) str = str + '<a href="javascript:taxonShowMedia(\''+next[2]+'\',\''+next[3]+'\','+next[1]+','+next[4]+')">next ></a>'; 
-	
-	if (str) {
-
-		$.colorbox({title:function () {
-			return 	str; 
-		}});
-		
-		var hh = parseInt(hght)+100;
-
-//		$.colorbox.settings.height = hh.toString();
-
-	}
-
+	$.post('media.php?id='+id, { id: id, mId: mId, move: dir } );
+alert('a');	
 }
