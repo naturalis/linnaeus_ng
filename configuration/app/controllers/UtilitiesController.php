@@ -154,8 +154,7 @@ class UtilitiesController extends Controller
 	
 		$cssVariables = array(
 			'projectMedia' => $_SESSION['app']['project']['urls']['projectMedia'],
-			'systemMedia' => $_SESSION['app']['project']['urls']['systemMedia'],
-			'logo' => $_SESSION['app']['project']['logo'],
+			'systemMedia' => $_SESSION['app']['project']['urls']['systemMedia']
 		);
 		
 		foreach ($cssVariables as $k => $v) {
