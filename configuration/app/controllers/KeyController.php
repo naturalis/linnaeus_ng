@@ -49,6 +49,8 @@ class KeyController extends Controller
 		
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
         $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
 		
 		//$this->setStoredChoiceList();

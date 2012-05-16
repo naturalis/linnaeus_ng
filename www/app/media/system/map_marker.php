@@ -6,4 +6,4 @@
 	
 	$c = new Controller();
 
-	require_once($c->generalSettings['app']['skinName'].'/map_marker.php');
+	require_once('skins/'.$c->generalSettings['app']['skinName'].'/map_marker.php');

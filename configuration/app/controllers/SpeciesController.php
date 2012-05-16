@@ -56,6 +56,8 @@ class SpeciesController extends Controller
 		
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**

@@ -45,6 +45,8 @@ class IntroductionController extends Controller
 
 		$this->checkForProjectId();
 		
+		$this->setCssFiles();
+
     }
 
     /**

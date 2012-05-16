@@ -44,6 +44,8 @@ class ModuleController extends Controller
 	
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**

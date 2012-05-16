@@ -42,6 +42,8 @@ class IndexController extends Controller
 
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**

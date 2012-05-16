@@ -96,8 +96,6 @@ class Controller extends BaseClass
 		
 		$this->setPaths();
 		
-		$this->setCssFiles();
-
         $this->loadModels();
 
         $this->setRandomValue();
@@ -1339,8 +1337,8 @@ class Controller extends BaseClass
 		$u['projectL2Maps'] = $u['projectMedia'].'l2_maps/';
 
 		// urls of the directory containing media that are constant across projects (but can be skinned)
-		$u['systemMedia'] = $this->baseUrl.$this->getAppName().'/media/system/'.$this->generalSettings['app']['skinName'].'/';
-		$u['systemL2Maps'] = $u['systemMedia'].'l2_maps/';
+		$u['systemMedia'] = $this->baseUrl.$this->getAppName().'/media/system/skins/'.$this->generalSettings['app']['skinName'].'/';
+		$u['systemL2Maps'] =$this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
 
 		// urls of css-files, either project-specific - if they exist - or generic
 		$projectCssDir = $this->baseUrl.$this->getAppName().'/style/';

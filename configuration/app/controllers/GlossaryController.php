@@ -59,6 +59,8 @@ class GlossaryController extends Controller
 		
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**
