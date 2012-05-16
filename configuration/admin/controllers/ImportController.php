@@ -2,188 +2,9 @@
 
 /*
 
-
-[2:35:48 PM] maarten schermer: uiteindelijk leiden alle 4 de types tot hetzelfde:
-[2:35:54 PM] maarten schermer: - verzameling pagina's
-[2:36:04 PM] maarten schermer: - met ieder een titel en inhoud
-[2:36:09 PM] maarten schermer: - en mogelijk een afbeeling
-[2:36:23 PM] maarten schermer: voorts
-[2:36:44 PM] maarten schermer: die afbeeling is af te lezen uit ofwel een veld dat dezelfde structuur heeft als multimedia in species
-[2:36:46 PM] maarten schermer: dus iets als:
-[2:37:27 PM] maarten schermer: multimedia->multimediafile->filename / fullname / multimedia_type
-[2:37:39 PM] Ruud Altenburg: Of overview
-[2:37:42 PM] Ruud Altenburg: <overview>
-[2:37:46 PM] maarten schermer: oh ja
-[2:37:47 PM] maarten schermer: ok
-[2:37:50 PM] Ruud Altenburg: Zoals in Introduction
-[2:38:11 PM] Ruud Altenburg: Maar ik weet niet helemaal zeker of dat zo heet, moment
-[2:38:13 PM] maarten schermer: anders gezegd: ofwel uit een veld waarvan we de naam niet weten en waar alleen de naam van een afbeelding stat
-[2:38:31 PM] Ruud Altenburg: Wacht, je hebt een voorbeeld: habitat uit Vogels
-[2:38:32 PM] maarten schermer: "overview" in dagvlinders::habitat
-[2:38:40 PM] maarten schermer: die ook
-[2:38:48 PM] Ruud Altenburg: Yes
-[2:38:49 PM] maarten schermer: ok
-[2:39:10 PM] Ruud Altenburg: Het moeilijke wordt nu natuurlijk: hoe gaan we die velden noemen
-[2:39:25 PM] maarten schermer: dat komt zo, eerst even dit:
-[2:39:27 PM] Ruud Altenburg: Tenminste, dat is niet moeilijk, je kunt de naam van de tags aanhouden
-[2:39:31 PM] Ruud Altenburg: O sorry
-[2:39:35 PM] maarten schermer: en dan moet er de mogelijkheid zijn van een alfabet, maar of dat er wel of niet moet zijn is eigenlijk niet af te lezen aan het xml.
-[2:39:49 PM] Ruud Altenburg: Nee en het is ook niet bijster relevant meer
-[2:39:50 PM] maarten schermer: ok
-[2:40:13 PM] maarten schermer: wat ik kan doen, is een extra optie maken dat je het tonen van de alfabet in runtime kunt togglen.
-[2:40:15 PM] Ruud Altenburg: Ik vraag me af met die sterk verbeterde inhoudsopgave of we dat uberhaupt nog nodig hebben
-[2:40:21 PM] Ruud Altenburg: Bv
-[2:40:21 PM] maarten schermer: geen idee, zeg het maar
-[2:40:29 PM] Ruud Altenburg: Laat voorlopig maar zitten
-[2:40:30 PM] maarten schermer: ok
-[2:40:43 PM] maarten schermer: dus de vraag is vooral *hoe* de velden te herkennen
-[2:40:57 PM] maarten schermer: tussen die twee habitats zat al het nodige verschil
-[2:41:02 PM] Ruud Altenburg: Inderdaad
-[2:41:21 PM] Ruud Altenburg: De export in LII had helemaal geen optie om custom modules te exporteren
-[2:41:26 PM] maarten schermer: ok
-[2:41:40 PM] Ruud Altenburg: Wat ik deed was de code voor een bestaande module klonen
-[2:41:45 PM] Ruud Altenburg: en deze aanpassen
-[2:41:46 PM] maarten schermer: ah so
-[2:42:03 PM] Ruud Altenburg: Dus de tags zijn min of meer on-the-fly verzonnen
-[2:42:06 PM] maarten schermer: ok
-[2:42:08 PM] maarten schermer: lekkerrrr
-[2:42:13 PM] Ruud Altenburg: Ja ja
-[2:42:21 PM] maarten schermer: dan maar zo:
-- image: ofwel alleen een image naam (moet te herkennen zijn), of er moet die mm-> structuut onder hangen
-[2:42:23 PM] Ruud Altenburg: Dit is 80 jaar geleden he
-[2:42:26 PM] maarten schermer: jaja
-[2:42:48 PM] maarten schermer: andere twee velden: de lange is de content, en de korte is de titel?
-[2:43:02 PM] maarten schermer: is dat wat?
-[2:43:12 PM] Ruud Altenburg: Oei
-[2:43:16 PM] maarten schermer: het is maar een idee
-[2:43:22 PM] Ruud Altenburg: Er kunnen natuurlijk meer velden zijn
-[2:43:29 PM] maarten schermer: doe eens een voorbeeld?
-[2:43:35 PM] Ruud Altenburg: Maar er kon niet meer in dan 32(?) tekend
-[2:43:37 PM] Ruud Altenburg: tekens
-[2:43:47 PM] Ruud Altenburg: Zelfde voorbeeld habitat
-[2:43:55 PM] Ruud Altenburg: Of genitalia!
-[2:44:14 PM] Ruud Altenburg: Ik heb je Agromyzidae gestuurd met twee custom modules
-[2:44:15 PM] maarten schermer: dat is de naam van de module, dat is al geluk die te isoleren
-[2:44:24 PM] maarten schermer: ff kijken
-[2:44:50 PM] Ruud Altenburg: Volgens mij heeft dat altijd een vaste naam want die kon je niet opgeven bij het aanmaken van een module
-[2:44:51 PM] maarten schermer: heb je doe nog in de buurt? bomen, bos
-[2:45:13 PM] maarten schermer: "Volgens mij heeft dat altijd.." wat is "dat" precies?
-[2:45:19 PM] *** Ruud Altenburg verstuurde AGROMYZI.XML.zip ***
-[2:45:38 PM] Ruud Altenburg: Titel bedoel ik
-[2:45:45 PM] Ruud Altenburg: Paginatitel op precies te zijn
-[2:46:43 PM] maarten schermer: ok, maar tussen "habitat" en "habitat_title" zit bij de een nog "topic" en bij de andere "habitat_topic".
-[2:46:54 PM] Ruud Altenburg: Oeps
-[2:47:06 PM] maarten schermer: dat is een beetje een issue
-[2:47:23 PM] Ruud Altenburg: Naadje
-[2:47:41 PM] Ruud Altenburg: Je loopt straks de hele modules door voordat je gaat importeren, of niet?
-[2:47:48 PM] Ruud Altenburg: Op zoek naar de juiste velden
-[2:47:53 PM] maarten schermer: mogelijk
-[2:47:56 PM] maarten schermer: zal wel moeten denk ik
-[2:47:57 PM] Ruud Altenburg: custom modules
-[2:48:03 PM] Ruud Altenburg: Denk ik ook
-[2:48:17 PM] Ruud Altenburg: Ik zou voor elk veld de max strlen bepalen
-[2:48:17 PM] maarten schermer: getver
-[2:48:21 PM] maarten schermer: AGROMYZI:
-[2:48:31 PM] Ruud Altenburg: en degene met de kortste is de titel
-[2:48:42 PM] Ruud Altenburg: Wazzup?
-[2:48:43 PM] maarten schermer: host -> host_plant -> host_name / anyspecies
-[2:49:36 PM] maarten schermer: dat wordt zoiets als:
-[modulename] -> * -> [kortste veld] = titel
-[modulename] -> * -> [langste veld] = content
-[2:50:02 PM] Ruud Altenburg: Wat ik zei...
-[2:50:11 PM] maarten schermer: ja
-[2:51:08 PM] Ruud Altenburg: Mag ik nu?
-[2:51:14 PM] maarten schermer: sure
-[2:51:37 PM] Ruud Altenburg: Een mogelijk probleem wordt het creeren van interne links
-[2:51:45 PM] maarten schermer: ok
-[2:51:49 PM] maarten schermer: namelijk?
-[2:51:57 PM] Ruud Altenburg: Naar die custom modules
-[2:52:09 PM] maarten schermer: want?
-[2:52:18 PM] Ruud Altenburg: Want je weet de naam van de module niet van tevoren
-[2:52:27 PM] maarten schermer: ha, und?
-[2:52:31 PM] Ruud Altenburg: En de naam van de velden
-[2:52:31 PM] maarten schermer: na, und?
-[2:52:45 PM] maarten schermer: wordt er ook naar VELDEN verwezen dan??
-[2:52:50 PM] Ruud Altenburg: Nee
-[2:52:53 PM] maarten schermer: ok
-[2:53:06 PM] Ruud Altenburg: Dat kon volgens mij niet
-[2:53:20 PM] maarten schermer: ok.
-maar het gaat wel goed, denk ik. het scenario is als volgt:
-[2:53:34 PM] maarten schermer: - ik vis er een custom uit, zeg "habitat"
-[2:53:50 PM] maarten schermer: - ik sla die op, als, laten we zeggen, id = 33
-[2:54:08 PM] maarten schermer: - met een handvol pagina's die id's hebben, 101-121
-[2:54:10 PM] Ruud Altenburg: Dat is de id van een module?
-[2:54:12 PM] maarten schermer: yep
-[2:54:20 PM] maarten schermer: ik houd bij een array met de vorm:
-[2:54:37 PM] maarten schermer: ['habitat']['id'] = 33
-[2:54:42 PM] maarten schermer: en iets van
-[2:54:42 PM] Ruud Altenburg: Ik snap m
-[2:54:51 PM] Ruud Altenburg: Maar....
-[2:54:56 PM] maarten schermer: ['habitat']['pages']['struweel']['id']= 111;
-[2:54:59 PM] maarten schermer: etc
-[2:55:04 PM] Ruud Altenburg: Je weet niet de naam van de module zoals die in LII stond
-[2:55:15 PM] Ruud Altenburg: Want bv in Agro heet-ie host
-[2:55:24 PM] Ruud Altenburg: terwijl de module volgens mij Host plants heette
-[2:55:26 PM] Ruud Altenburg: maw
-[2:55:32 PM] maarten schermer: ARGH UND WEH!
-[2:55:44 PM] Ruud Altenburg: Er moet nog iets van een optie zijn om dat aan te geven of later te veranderen
-[2:55:47 PM] Ruud Altenburg: Ja!
-[2:55:54 PM] Ruud Altenburg: Ja ja ja
-[2:56:01 PM] maarten schermer: kristus chod
-[2:56:22 PM] maarten schermer: hoerenzonen!
-[2:56:42 PM] Ruud Altenburg: Maar hebben de modules bij jou geen id?
-[2:56:49 PM] Ruud Altenburg: in LNG
-[2:56:51 PM] maarten schermer: uiteraard
-[2:57:10 PM] Ruud Altenburg: Dacht ik al want je moet ze in een andere taal een andere naam kunnen geven
-[2:57:20 PM] Ruud Altenburg: Dan is het leed toch al minder groot?
-[2:57:27 PM] maarten schermer: want?
-[2:58:06 PM] maarten schermer: als er wordt verwezen naar "Host plants" en die hele naam komt nergens voor, hoe moet ik dan weten welke id daar bij hoort?
-[2:58:21 PM] Ruud Altenburg: Ik vrees een extra tabel in de db
-[2:58:28 PM] maarten schermer: ik dacht het niet!
-[2:58:36 PM] Ruud Altenburg: Hoe doe je dat dan bij custom modules?
-[2:58:40 PM] Ruud Altenburg: Nu
-[2:58:48 PM] maarten schermer: ik zal opnemen ene extra veld in het scherm
-[2:58:58 PM] Ruud Altenburg: Die kun je toch ook een willekeurige naam geven?
-[2:59:18 PM] maarten schermer: import custom modules:
-[ ] "habitat"  enter module name: [............]
-[2:59:43 PM] Ruud Altenburg: Lijkt me een goed plan
-[3:00:02 PM] maarten schermer: dan kan ik daarna [<opgegeven naam>]['pages']['struweel']['id']= 111; doen
-[3:00:08 PM] maarten schermer: etc
-
-
-Species variant:
-Zo te zien is het eigenlijk hetzelfde als de standaard module
-[3:22:56 PM] Ruud Altenburg: Alleen er MOET een media veld in zitten
-[3:23:08 PM] Ruud Altenburg: en er mag GEEN classfication veld in zitte
-
-
-[4:16:13 PM] Ruud Altenburg: Volgens jouw vriend GG was er een module gebaseerd op Species in Lemurs
-[4:16:18 PM] Ruud Altenburg: NOT!
-[4:16:24 PM] maarten schermer: pom pom pom
-[4:16:29 PM] maarten schermer: sleep hem er bij
-[4:16:34 PM] maarten schermer: (haar zat)
-[4:16:40 PM] Ruud Altenburg: Ben ik niet sterk genoeg voor
-[4:16:44 PM] Ruud Altenburg: 100+ kg
-[4:16:45 PM] maarten schermer: haha
-[4:16:56 PM] maarten schermer: 200 cm vs 100 kg
-[4:17:09 PM] Ruud Altenburg: Ik hoop maar dat je er nog niet al teveel tijd in gestoken had?
-[4:17:17 PM] maarten schermer: gaat wel
-[4:17:21 PM] maarten schermer: ik heb wel fake XML zitten maken
-[4:17:27 PM] maarten schermer: en testen
-[4:17:32 PM] Ruud Altenburg: Er zitten drie customs in, maar alle drie generiek
-[4:17:33 PM] maarten schermer: lekker dan
-[4:17:34 PM] maarten schermer: ah
-[4:17:48 PM] maarten schermer: zal ik het officieel vergeten dan?
-[4:18:10 PM] *** Ruud Altenburg verstuurde Screen shot 2012-02-14 at 16.17.57.png ***
-[4:18:23 PM] Ruud Altenburg: Doe maar
-
-
-
-q($_SESSION['admin']['system']['import']['loaded']['species']);
-
+	q($_SESSION['admin']['system']['import']['loaded']['species']);
 
 	DOCUMENT resolveLanguage($l) !!!!
-
 
 	what is:
 		$d->projectclassification --> "Five kingdoms"
@@ -1073,7 +894,7 @@ class ImportController extends Controller
 	
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 	
-			set_time_limit(900);
+			set_time_limit(1800); // RIGHT!
 	
 			if ($this->rHasVal('map_items','on')) {
 	
@@ -3534,7 +3355,7 @@ class ImportController extends Controller
 
 		$_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id'] = $this->models->L2Map->getNewId();
 		
-		$mapImageName = $p['name'].'.GIF';
+		$mapImageName = $p['name'].'.gif';
 		
 		$paths = $this->makePathNames($this->getNewProjectId());
 

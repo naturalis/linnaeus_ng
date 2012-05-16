@@ -52,6 +52,8 @@ class MatrixKeyController extends Controller
 		
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**

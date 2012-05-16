@@ -55,6 +55,8 @@ class MapKeyController extends Controller
 
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 		
 		$this->_mapType = $this->getDistributionMapType();

@@ -47,6 +47,8 @@ class LiteratureController extends Controller
 		
 		$this->checkForProjectId();
 
+		$this->setCssFiles();
+
     }
 
     /**
