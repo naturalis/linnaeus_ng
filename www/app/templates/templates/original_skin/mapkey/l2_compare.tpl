@@ -15,8 +15,8 @@
 		<td>
 		{if $map.mapExists}
 			<table id="mapTable">
-					{assign var=cellNo value=1}
-					{section name=rows start=1 loop=$map.rows+1 step=1}
+			{assign var=cellNo value=1}
+			{section name=rows start=1 loop=$map.rows+1 step=1}
 				<tr>
 				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td id="cell-{$cellNo}" datatype="{$occurrences[$cellNo].type_id}" class="mapCell mapCell{$overlap[$cellNo]}"></td>

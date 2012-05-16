@@ -13,12 +13,12 @@
 <table>
 	<tr style="vertical-align:top">
 		<td>
-			{if $map.mapExists}
+		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
-			{section name=rows start=1 loop=$map.rows step=1}
+			{section name=rows start=1 loop=$map.rows+1 step=1}
 				<tr>
-				{section name=cols start=1 loop=$map.cols step=1}
+				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td 
 						id="cell-{$cellNo}"
 						class="mapCell {if $selectedCells[$cellNo]==true}mapCellTagged{/if}"

@@ -10,11 +10,10 @@
 	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {/if}
 
-
 <table>
 	<tr style="vertical-align:top">
 		<td>
-			{if $map.mapExists}
+		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
 			{section name=rows start=1 loop=$map.rows+1 step=1}
