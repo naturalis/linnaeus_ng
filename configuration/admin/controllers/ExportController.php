@@ -37,6 +37,7 @@ class ExportController extends Controller
 		'free_module_project',
 		'free_module_project_user',
 		'free_module_page',
+		'free_module_media',
 		'content_free_module',
 		'occurrence_taxon',
 		'geodata_type',
@@ -89,6 +90,8 @@ class ExportController extends Controller
     {
     
         $this->setPageName(_('Select modules to export'));
+		
+		$pModules = $this->getProjectModules();
 
 		if ($this->rHasVal('action','export')) {
 		
@@ -109,6 +112,7 @@ class ExportController extends Controller
 			);
 
 			$data['project'] = $this->exportProject();
+			$data['project']['exportdate'] = date('c');
 
 			if ($this->rHasVal('modules')) {
 		
@@ -130,30 +134,32 @@ class ExportController extends Controller
 		
 				foreach ((array)$this->requestData['freeModules'] as $val) {
 	
-					$d = 'export'.ucfirst($val);
+					$fmp = $this->models->FreeModuleProject->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'id' => $val
+							)
+						)
+					);
 					
-					if (method_exists($this,$d))
-						$data[$val] = $this->$d();
-					else
-						$this->addError(_('Missing function "'.get_class($this).'::'.$d.'"'));
-						
-						
+					$data[$fmp[0]['module']] = $this->exportFreemodule($val);
+
 				}
 				
 			}		
-		
+
 			$this->exportData($data,strtolower(preg_replace('/\W/','',$data['project']['system_name'])));
 			
 			unset($_SESSION['admin']['export']);
 			
 		}
 
-		$this->smarty->assign('modules',$this->getProjectModules());
+		$this->smarty->assign('modules',$pModules);
 
         $this->printPage();
     
     }
-
 
 	private function exportProject()
 	{
@@ -165,13 +171,12 @@ class ExportController extends Controller
 					title as project_name,
 					sys_name as system_name,
 					sys_description as system_desctription,
-					logo,
 					includes_hybrids,
 					keywords as html_meta_keywords,
 					description as html_meta_description'
 			)
 		);	
-		
+
 		return $p;
 	
 	}
@@ -305,7 +310,6 @@ class ExportController extends Controller
 		return $d;
 
 	}
-
 
 	private function getSpeciesPageCategories()
 	{
@@ -782,6 +786,23 @@ class ExportController extends Controller
 			)
 		);
 		
+		// matrix names
+		foreach((array)$m as $mKey => $mVal) {
+
+			$mn = $this->models->MatrixName->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $mVal['id'],
+						'language_id' => $_SESSION['admin']['project']['default_language_id']
+					)
+				)
+			);
+			
+			$_SESSION['admin']['export']['matrices'][$mVal['id']] = $mn[0]['name'];
+		
+		}
+
 		foreach((array)$m as $mKey => $mVal) {
 
 			// available taxa
@@ -821,8 +842,8 @@ class ExportController extends Controller
 					'language' => $_SESSION['admin']['export']['languages'][$nVal['language_id']]['language'],
 				);
 				
-				if ($nVal['language_id']==$_SESSION['admin']['project']['default_language_id']) 
-					$_SESSION['admin']['export']['matrices'][$mVal['id']] = $nVal['name'];
+				//	if ($nVal['language_id']==$_SESSION['admin']['project']['default_language_id']) 
+				//		$_SESSION['admin']['export']['matrices'][$mVal['id']] = $nVal['name'];
 
 			}
 
@@ -922,7 +943,7 @@ class ExportController extends Controller
 							);
 							
 						} else
-						if (isset($mtsVal['ref_matrix_id'])) {
+						if (isset($mtsVal['ref_matrix_id']) && isset($_SESSION['admin']['export']['matrices'][$mtsVal['ref_matrix_id']])) {
 
 							$sMatrices['matrix'.$mtsKey] = array(
 								'matrix' => $_SESSION['admin']['export']['matrices'][$mtsVal['ref_matrix_id']],
@@ -967,8 +988,8 @@ class ExportController extends Controller
 
 			$e['matrix'.$mKey] = array(
 				'id' => $mVal['id'],
-				'name' => $mNames,
-				'characters' => $chars,
+				'name' => isset($mNames) ? $mNames : null,
+				'characters' => isset($chars) ? $chars : null,
 				'possible_taxa' => isset($mTaxa) ? $mTaxa : null
 			);
 			
@@ -982,12 +1003,92 @@ class ExportController extends Controller
 
 	}
 
+	private function exportFreemodule($mId)
+	{
+
+		// create the module
+		$m = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => array(
+					'id' => $mId,
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			)
+		);
+
+		$fmp = $this->models->FreeModulePage->_get(
+			array(
+				'id' => array(
+					'module_id' => $mId,
+					'project_id' => $this->getCurrentProjectId()
+				)
+			)
+		);
+		
+		// pages		
+		foreach((array)$fmp as $pKey => $pVal) {
+
+			$cfm = $this->models->ContentFreeModule->_get(
+				array(
+					'id' => array(
+						'module_id' => $mId,
+						'project_id' => $this->getCurrentProjectId(),
+						'page_id' => $pVal['id'],
+					)
+				)
+			);
+			
+			foreach((array)$cfm as $cKey => $cVal) {
+
+				$dummy['translation'.$cKey] = array(
+					'language' => $_SESSION['admin']['export']['languages'][$cVal['language_id']]['language'],
+					'topic' => $cVal['topic'],
+					'text' => $cVal['content'],
+				);
+
+			}
+			
+			if (isset($dummy)) $content['page'.$pKey]['translations'] = $dummy;
+			
+			unset($dummy);
+
+			$fmm = $this->models->FreeModuleMedia->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'page_id' =>$pVal['id'],
+					),
+					'columns' => 'file_name,thumb_name,original_name,mime_type,file_size'
+				)
+			);
+
+			foreach((array)$fmm as $cKey => $cVal) {
+
+				$dummy['mediafile'.$cKey] = array(
+					'label' => $cVal['original_name'],
+					'filename' => $cVal['file_name'],
+					'thumb_filename' => $cVal['thumb_name'],
+					'mime_type' => $cVal['mime_type'],
+					'file_size' => $cVal['file_size'],
+				);
+
+			}
+			
+			if (isset($dummy)) $content['page'.$pKey]['mediafiles'] = $dummy;
+			
+			unset($dummy);
+
+		}
+		
+		return $content;
+	
+	}
 
 	private function exportData($data,$filename)
 	{
-	
-//		return;
-//		q($data,1);
+
+		//return;
+		//q($data,1);
 
 		header('Content-disposition:attachment;filename='.$filename.'.xml');
 		header('Content-type:text/xml');
@@ -995,209 +1096,6 @@ class ExportController extends Controller
 		echo $this->helpers->ArrayToXml->toXml($data);
 		
 		die();
-	
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	private function addCustomModule($module,$data)
-	{
-
-		// create the module
-		$m = $this->models->FreeModuleProject->save(
-			array(
-				'id' => null, 
-				'module' => $module, 
-				'project_id' => $this->getCurrentProjectId(),
-				'active' => 'y'
-			)
-		);
-		
-		$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = 'Created module "'.$module.'".';
-
-		$newModuleId = $this->models->FreeModuleProject->getNewId();
-
-		$this->grantFreeModuleAccessRights($newModuleId);	
-		
-			// element names for the module pages can vary, find out the element name for the entire page
-		$arrayData = (array)$data;
-		$d = array_keys($arrayData);
-		$pageName = $d[0];
-
-		$titleField = null;
-		$contentField = null;
-		$imageField = null;
-		
-		$i=0;
-		foreach((array)$arrayData[$pageName] as $page) {
-		
-			/*
-				names of fields with a page are unpredictable; we assume 1st is title, 2nd is content and 3rd, if any, image.
-				image can be one of two types:
-				1)	straightforward: <image>imagename.jpg</image>
-				2)	copied from species module:
-						<multimediafile>
-							<filename>name.jpg</filename>
-							<caption>bla</caption>
-							<multimedia_type>image</multimedia_type>
-						</multimediafile>
-			*/
-			foreach((array)$page as $key => $val) {
-			
-				if ($i==0) $titleField = $key;
-				if ($i==1) $contentField = $key;
-				if ($i==2) {
-					if (is_object($val)) {
-					// is object copied from species (which, we assume, has fixed element-names)
-						$imageField = false;
-					} else {
-					// is simple field
-						$imageField = $key;
-					}
-				}
-				$i++;
-				
-			}
-		
-		}
-
-		// get the multimedia-paths
-		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
-			$_SESSION['admin']['system']['import']['paths'] : 
-			$this->makePathNames($this->getCurrentProjectId());
-
-
-		// saving the actual pages
-		foreach((array)$arrayData[$pageName] as $page) {
-		
-			$page = ((array)$page);
-			
-			if ($imageField===false) {
-		
-				$d = (array)$page['multimediafile'];
-				$image = trim($d['filename']);
-				//$thisCaption = trim($d['caption']);
-				
-		
-			} else 
-			if (!is_null($imageField)) {
-		
-				$image = trim($page[$imageField]);
-		
-			} else {
-
-				$image = null;
-
-			}
-		
-			$topic = trim($page[$titleField]);
-			$content = trim($page[$contentField]);
-
-			// create a new page
-			$this->models->FreeModulePage->save(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'module_id' => $newModuleId,
-					'got_content' => 1
-				)
-			);
-			
-			$newPageId = $this->models->FreeModulePage->getNewId();
-		
-			// save the title and content
-			$this->models->ContentFreeModule->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getCurrentProjectId(), 
-					'module_id' => $newModuleId,
-					'language_id' => $this->getNewDefaultLanguageId(), 
-					'page_id' => $newPageId,
-					'topic' => $topic,
-					'content' => $this->replaceOldMarkUp($content)
-				)
-			);
-
-			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
-
-			$moduleLinkName =
-				!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
-					$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
-					$module;
-
-			$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
-
-			if (!empty($image)) {
-	
-				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
-				
-					$this->models->FreeModulePage->update(
-						array(
-							'image' => $image
-						),
-						array(
-							'project_id' => $this->getCurrentProjectId(),
-							'module_id' => $newModuleId
-						)
-					);			
-				
-				} else {
-				
-					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
-				
-				}
-	
-			}
-			
-		}
-	
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	private function getCustomModules()
-	{
-
-		if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
-
-			$d = new XMLReader;
-			$r = array();
-			if ($d->open($_SESSION['admin']['system']['import']['file']['path'])) {
-				while($d->read()) {
-					if($d->nodeType == XMLReader::ELEMENT && $d->depth == 1 && !in_array((string)$d->name,$this->_knownModules)) {
-						$r[] = $d->name;
-					}
-				}
-			}
-			
-			$_SESSION['admin']['system']['import']['additionalModules'] = $r;
-			
-		}
-
-		return $_SESSION['admin']['system']['import']['additionalModules'];
 	
 	}
 

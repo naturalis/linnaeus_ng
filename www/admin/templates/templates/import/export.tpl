@@ -6,8 +6,6 @@
 <input type="hidden" name="action" value="export" />
 <input type="hidden" name="rnd" value="{$rnd}" />
 
-LACKS FREE MODS
-
 {t}Export project data to XML-file.{/t}
 <table>
 {foreach from=$modules.modules item=v}
@@ -26,7 +24,10 @@ LACKS FREE MODS
 <input type="submit" value="{t}export{/t}" />
 
 </form>
-
+<p>
+{t}Images and other media files should be copied by hand, and are referenced in the export file by filename only. They can be found in the server folder:<br />{/t}
+{$session.admin.project.paths.project_media}
+</p>
 </div>
 
 {include file="../shared/admin-footer.tpl"}

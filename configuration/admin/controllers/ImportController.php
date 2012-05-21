@@ -3035,7 +3035,7 @@ class ImportController extends Controller
 
 	private function saveMatrices($m)
 	{
-		
+
 		$paths = 
 			isset($_SESSION['admin']['system']['import']['paths']) ? 
 				$_SESSION['admin']['system']['import']['paths'] : 
@@ -3065,10 +3065,12 @@ class ImportController extends Controller
 					'name' => $val['name']
 				)
 			);
+			
+			$showOrder = 0;
 
 			foreach((array)$val['characteristics'] as $cKey => $cVal) {
 
-				$c = $this->models->Characteristic->save(
+				$this->models->Characteristic->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
@@ -3076,7 +3078,6 @@ class ImportController extends Controller
 						'got_labels' => 1
 					)
 				);
-
 				$m[$key]['characteristics'][$cKey]['id'] = $this->models->Characteristic->getNewId();
 
 				$this->models->CharacteristicLabel->save(
@@ -3089,13 +3090,13 @@ class ImportController extends Controller
 					)
 				);
 
-				$cm = $this->models->CharacteristicMatrix->save(
+				$this->models->CharacteristicMatrix->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
 						'matrix_id' => $m[$key]['id'],
 						'characteristic_id' => $m[$key]['characteristics'][$cKey]['id'],
-						'show_order' => $cKey
+						'show_order' => $showOrder++
 					)
 				);
 
@@ -3118,7 +3119,7 @@ class ImportController extends Controller
 		
 					}
 
-					$c = $this->models->CharacteristicState->save(
+					$this->models->CharacteristicState->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getNewProjectId(),
