@@ -362,7 +362,7 @@ class MapKeyController extends Controller
 		$this->setPageName(_('Search'));
 
 		if ($this->rHasVal('coordinates')) {
-		
+
 			$coordinates = $this->rectangleIntoPolygon($this->requestData['coordinates']);
 
 			$results = $this->searchPolygon($coordinates);
@@ -432,7 +432,7 @@ class MapKeyController extends Controller
 		
 		} else
 		if ($this->rHasVal('selectedCells') && $this->rHasVal('mapId')) {
-		
+
 			$taxa = $this->l2DoSearchMap($this->requestData['mapId'],$this->requestData['selectedCells']);
 
 			foreach((array)$this->requestData['selectedCells'] as $val)

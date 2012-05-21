@@ -915,7 +915,7 @@ class Controller extends BaseClass
 		) {
 
 			$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
-			
+
 			if (isset($params['active']) && ($params['active']=='y' || $params['active']=='n'))
 				$d['active'] = $params['active'];
 	
