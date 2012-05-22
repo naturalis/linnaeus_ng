@@ -103,7 +103,7 @@ body {
     border-top: 1px dotted #0303b2;
     border-bottom: 1px dotted #0303b2;
     padding: 20px;
-    height: 350px;
+    height: 375px;
     overflow: auto;
     font-size: 11px;
 }
@@ -297,8 +297,9 @@ body {
 
 /* Bringing back stuff from the original basics.css */
 .internal-link {
-    color: #0303b2;
-    cursor:pointer;
+    color: #400093;
+    cursor: pointer;
+    text-decoration: none;
 }
 
 .internal-link:hover {
@@ -306,7 +307,7 @@ body {
 }
 
 .glossary-term-highlight {
-    background-color:#FFFF99;
-    color:#550000;
+    background-color: #FFFF99;
+    color: #550000;
 }
 
