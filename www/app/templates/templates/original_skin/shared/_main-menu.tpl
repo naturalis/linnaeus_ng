@@ -30,7 +30,7 @@
 			onkeydown="setSearchKeyed(true);"
 			onblur="setSearchKeyed(false);"
 			onfocus="onSearchBoxSelect()" />
-			<input type="image" src="{$session.app.project.urls.systemMedia}search.gif" style="border:0" />
+			<img onclick="doSearch()" src="{$session.app.project.urls.systemMedia}search.gif" style="border:0" />
 		{if $languages|@count>1}
 		<select id="languageSelect" onchange="doLanguageChange()">
 		{foreach from=$languages key=k item=v}
