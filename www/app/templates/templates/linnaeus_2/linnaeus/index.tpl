@@ -1,8 +1,14 @@
 {include file="../shared/header.tpl"}
+<div id="header-titles"></div>
+{include file="_navigator-menu.tpl"}
+
+
+
+
+{include file="../shared/_search-main.tpl"}
 
 <div id="page-main">
 
-	{include file="_navigator-menu.tpl"}
 
 	<table>
 		<tr>

@@ -16,7 +16,7 @@
         name="search"
         id="search"
         class="search-box"
-        value="{if $search}{$search}{else}{t}enter search term{/t}{/if}"
+        value="{if $search}{$search}{else}{t}Search...{/t}{/if}"
         onkeydown="setSearchKeyed(true);"
         onblur="setSearchKeyed(false);"
         onfocus="onSearchBoxSelect()" 

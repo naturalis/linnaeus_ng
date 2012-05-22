@@ -1,6 +1,27 @@
 {include file="../shared/header.tpl"}
 
-<div id="page-main">
+<div id="header-titles"></div>
+<div id="categories">
+<ul>
+<li>
+    <a class="category{if $taxonType=='lower'}-active{/if} category-first" 
+    href="javascript:window.open('index.php','_self')">
+    {t}Species and lower taxa{/t}</a>
+</li>
+<li>
+    <a class="category{if $taxonType=='higher'}-active{/if}" 
+    href="javascript:window.open('higher.php','_self')">
+    {t}Higher Taxa{/t}</a>
+</li>
+<li>
+    <a class="category{if $taxonType=='common'}-active{/if} category-last" 
+    href="javascript:window.open('common.php','_self')">
+    {t}Common names{/t}</a>
+</li>
+</ul>
+</div>
+
+{include file="../shared/_search-main.tpl"}<div id="page-main">
 
 	<div id="alphabet">
 	{if $alpha|@count!=0}
@@ -23,7 +44,7 @@
 			$('#letter').val('');
 			$('#theForm').submit();"
 		>
-		<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}show all{/t}</option>
+		<option value="*"{if $activeLanguage=='*'} selected="selected"{/if}>{t}Show all{/t}</option>
 		<option disabled="disabled">-----------------------</option>
 		{foreach name=languageloop from=$nameLanguages key=k item=v}
 		<option value="{$v.id}"{if $v.id==$activeLanguage} selected="selected"{/if}>{$v.language}</option>
@@ -33,19 +54,15 @@
 		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
 
-	<div>
-		<table>
-		{foreach name=taxonloop from=$taxa key=k item=v}
-		<tr class="highlight">
-			<td class="species-name-cell">
-				<a href="../species/taxon.php?id={$v.id}&cat=names">
-				{if $v.label}{$v.label}{else}{$v.transliteration}{/if}
-				</a>
-			</td>
-			<td>({$nameLanguages[$v.language_id].language})</td>
-		</tr>
-		{/foreach}
-		</table>
+	<div id="content">
+        {foreach name=taxonloop from=$taxa key=k item=v}
+        <p>
+            <a class="internal-link" href="../species/taxon.php?id={$v.id}&cat=names">
+            {if $v.label}{$v.label}{else}{$v.transliteration}{/if}</a>
+            {if $activeLanguage=='*'} ({$nameLanguages[$v.language_id].language}){/if}
+        </p>
+        {/foreach}
+        
 	</div>
 {if $prevStart!=-1 || $nextStart!=-1}
 	<div id="navigation">
