@@ -59,7 +59,8 @@ class LinnaeusController extends Controller
 		'colorbox/colorbox.css',
 		'dialog/jquery.modaldialog.css',
 		'lookup.css',
-		'index.css'
+		'index.css',
+	    'linnaeus.css'
 	);
 
 	public $jsToLoad = array('all' => array(
