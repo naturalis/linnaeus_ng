@@ -257,7 +257,7 @@ class LinnaeusController extends Controller
 
 	}
 
-    public function searchAction ()
+    public function searchAction()
 	{
 	
 		if (isset($_SESSION['app']['user']['search']['redo']) && $_SESSION['app']['user']['search']['redo']==true) {

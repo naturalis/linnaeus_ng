@@ -195,8 +195,8 @@ class IndexController extends Controller
 		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
 		
 		$names = $taxa = (array)$this->getTreeList();
-
-		if ($this->getTaxonType()=='lower' && 1==1) {
+//q($taxa,1);
+		if ($this->getTaxonType()=='lower') {
 
 			$syn = $this->searchSynonyms();
 			

@@ -775,7 +775,10 @@ class SearchController extends Controller
 				'model' => $this->models->Synonym->getClassName(),
 				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym),
-				'label' => sprintf(_('Synonym "%s" for "%s"'),$val['label'],$this->treeList[$val['taxon_id']]['taxon'])
+				'label' => (isset($this->treeList[$val['taxon_id']]['taxon']) ?
+								sprintf(_('Synonym "%s" for "%s"'),$val['label'],$this->treeList[$val['taxon_id']]['taxon']) :
+								_('Synonym')
+							)
 			);
 			
 			$synonyms[$key]['url'] = '../species/synonyms.php?id='.$val['taxon_id'];
@@ -850,7 +853,11 @@ class SearchController extends Controller
 					'model' => $this->models->ContentTaxon->getClassName(),
 					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
 					'matches' => $this->getColumnMatches($search,$val,array('content'),$hitCountContent),
-					'label' => sprintf(_('Description of "%s"'),$this->treeList[$val['taxon_id']]['taxon'])
+					'label' => (isset($this->treeList[$val['taxon_id']]['taxon']) ?
+								sprintf(_('Description of "%s"'),$this->treeList[$val['taxon_id']]['taxon']) :
+								_('Description')
+								)
+								
 				);
 				
 				$content[$key]['url'] = '../species/taxon.php?id='.$val['taxon_id'].'&page='.$val['page_id'];
