@@ -913,7 +913,16 @@ class SpeciesController extends Controller
 
 		$topRank = array_slice($pr,0,1);
 
-		$taxa = $this->models->Taxon->_get(
+		$isOwnParent = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id' => 'id'
+				)
+			)
+		);
+
+		$hasNoParent = $this->models->Taxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -922,30 +931,10 @@ class SpeciesController extends Controller
 				)
 			)
 		);
+		
+		$taxa = array_merge((array)$isOwnParent,(array)$hasNoParent);
 
-		foreach((array)$taxa as $key => $val) {
-
-			$this->getTaxonTree(array('pId' => $val['id']));
-
-			if (isset($this->treeList)) $taxa[$key]['tree'] = $this->treeList;
-
-			$d = $this->models->ProjectRank->_get(
-				array(
-				'id' => $val['rank_id'],
-				'columns' => 'parent_id'
-				)
-			);
-
-			$this->getTaxonTree(
-				array(
-					'stopAtRankId' => $d['parent_id'],
-					'includeOrphans' => false
-				)
-			);
-
-			if (isset($this->treeList)) $taxa[$key]['parents'] = $this->treeList;
-
-		}
+		$this->newGetTaxonTree();
 
 		$this->smarty->assign('tree',$this->treeList);
 

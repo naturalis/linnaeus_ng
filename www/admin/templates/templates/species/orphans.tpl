@@ -40,16 +40,15 @@
 			<input type="radio" name="child[{$v.id}]" id="attach-{$v.id}" value="attach" />
 		</td>
 		<td style="text-align:center">
-		
-	<select name="parent[{$v.id}]" id="parent-{$v.id}" onchange="taxonOrphanChangeSelect(this)">
-	{foreach from=$v.parents key=pk item=pv}
-	<option value="{$pv.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
-	{section name=foo loop=$pv.level-$v.parents[0].level}
-	&nbsp;
-	{/section}		
-	{$pv.taxon} ({$pv.rank})</option>
-	{/foreach}
-	</select>
+		<select name="parent[{$v.id}]" id="parent-{$v.id}" onchange="taxonOrphanChangeSelect(this)">
+			{foreach from=$tree key=pk item=pv}
+			<option value="{$pv.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+			{section name=foo loop=$pv.level}
+			&nbsp;
+			{/section}		
+			{$pv.taxon} ({$ranks[$pv.rank_id].rank})</option>
+			{/foreach}
+		</select>
 		</td>
 		<td style="text-align:center">
 			<input type="radio" checked="checked" name="child[{$v.id}]" value="ignore" />
