@@ -98,9 +98,10 @@ class ExportController extends Controller
 			$data = array();
 			
 			$d = $this->newGetProjectRanks();
+			
 			$r = $this->models->Rank->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
-			foreach((array)$d as $key => $val) $e[$key] = $r[$val['rank_id']]['rank'];
+			foreach((array)$d as $key => $val) $e[$key] = array('name' => $r[$val['rank_id']]['rank'], 'lower_taxon' => $val['lower_taxon']);
 
 			$_SESSION['admin']['export']['languages'] = $this->getAllLanguages();
 			$_SESSION['admin']['export']['ranks'] = $e;
@@ -111,8 +112,14 @@ class ExportController extends Controller
 				)
 			);
 
-			$data['project'] = $this->exportProject();
-			$data['project']['exportdate'] = date('c');
+			$d = $this->exportProject();
+
+			$data['file'] = array(
+				'exportdate' => date('c'),
+				'filename' => $this->makeFileName($d['system_name'])
+			);
+
+			$data['project'] = $d;
 
 			if ($this->rHasVal('modules')) {
 		
@@ -120,11 +127,17 @@ class ExportController extends Controller
 	
 					$d = 'export'.ucfirst($val);
 					
-					if (method_exists($this,$d))
+					if (method_exists($this,$d)) {
+					
+						if ($d=='exportSpecies') $data['ranks'] = $this->exportRanks();
+
 						$data[$val] = $this->$d();
-					else
+
+					} else {
+
 						$this->addError(_('Missing function "'.get_class($this).'::'.$d.'"'));
-						
+
+					}
 						
 				}
 				
@@ -149,7 +162,7 @@ class ExportController extends Controller
 				
 			}		
 
-			$this->exportData($data,strtolower(preg_replace('/\W/','',$data['project']['system_name'])));
+			$this->exportData($data,$this->makeFileName($data['project']['system_name']));
 			
 			unset($_SESSION['admin']['export']);
 			
@@ -160,6 +173,13 @@ class ExportController extends Controller
         $this->printPage();
     
     }
+	
+	private function makeFileName($projectName)
+	{
+
+		return strtolower(preg_replace('/\W/','',$projectName)).'.xml';
+
+	}
 
 	private function exportProject()
 	{
@@ -290,6 +310,22 @@ class ExportController extends Controller
 
 		return $e;
 	
+	}
+	
+	private function exportRanks()
+	{
+	
+		foreach((array)$_SESSION['admin']['export']['ranks'] as $key => $val) {
+
+			$e['rank'.$key] = array(
+				'name' => $val['name'],
+				'higher_lower' => ($val['lower_taxon']=='1' ? 'lower' : 'higher')
+			);
+
+		}
+		
+		return $e;
+
 	}
 
 	private function getSpeciesContent($id,$page)
@@ -488,7 +524,7 @@ class ExportController extends Controller
 				'id' => $val['id'],
 				'taxon' => $val['taxon'],
 				'is_hybrid' => $val['is_hybrid'],
-				'rank' => $_SESSION['admin']['export']['ranks'][$val['rank_id']],
+				'rank' => $_SESSION['admin']['export']['ranks'][$val['rank_id']]['name'],
 				'parent_id' => $val['parent_id'],
 				'parent' => @$_SESSION['admin']['export']['taxa'][$val['parent_id']]['taxon'],
 				'pages' => isset($content) ? $content : null,
@@ -1090,7 +1126,7 @@ class ExportController extends Controller
 		//return;
 		//q($data,1);
 
-		header('Content-disposition:attachment;filename='.$filename.'.xml');
+		header('Content-disposition:attachment;filename='.$filename);
 		header('Content-type:text/xml');
 
 		echo $this->helpers->ArrayToXml->toXml($data);

@@ -1620,6 +1620,10 @@ class ImportController extends Controller
 	public function xmlParserCallback_ResolveSpecies($obj)
 	{
 
+q($obj,1);
+
+
+
 		$rankName = trim((string)$obj->taxon) ? trim((string)$obj->taxon) : null;
 		$rankId =
 			isset($_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]) &&

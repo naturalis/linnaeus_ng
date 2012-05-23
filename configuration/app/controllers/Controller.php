@@ -298,7 +298,7 @@ class Controller extends BaseClass
 
         foreach((array)$t as $key => $val) {
 
-			// level is effectively the recursive depth of the taxon within the tree
+			// taxon name
 			$val['label'] = $val['taxon'];
 
 			// for each taxon, look whether they belong to the lower taxa...
@@ -1377,8 +1377,13 @@ class Controller extends BaseClass
 	public function  setCssFiles()
 	{
 
-		foreach((array)$this->cssToLoad as $key => $val)
-			$this->cssToLoad[$key] = $_SESSION['app']['project']['urls']['projectCSS'].$val;
+
+		if (isset($_SESSION['app']['project']['urls']['projectCSS'])) {
+
+			foreach((array)$this->cssToLoad as $key => $val)
+				$this->cssToLoad[$key] = $_SESSION['app']['project']['urls']['projectCSS'].$val;
+
+		}
 
 		array_push($this->cssToLoad,'../utilities/dynamic-css.php');
 
