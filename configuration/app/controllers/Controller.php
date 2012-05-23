@@ -109,6 +109,8 @@ class Controller extends BaseClass
 		$this->setCurrentLanguageId();
 
 		$this->checkBackStep();
+		
+if ($this->controllerBaseName!='key') unset($_SESSION['app']['user']['key']);
 
     }
 
