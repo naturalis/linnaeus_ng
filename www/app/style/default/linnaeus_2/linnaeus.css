@@ -1,11 +1,38 @@
-td .icon-grid {
+td.grid {
 	width: 100px;
 	height: 100px;
-	text-align: center"
+	text-align: center;
 }
 
-img .icon-grid {
+img.module-icon {
 	width:50px;
 	height:50px;
-	border:1px solid grey;
+    border-right: 1px solid #8c8c8c;
+    border-bottom: 1px solid #5d5d5d;
+    -moz-box-shadow: 1px 1px 3px #7A7A7A;
+    -webkit-box-shadow: 1px 1px 3px #7A7A7A;
+    -o-box-shadow: 1px 1px 3px #7A7A7A;
+    -ms-box-shadow: 1px 1px 3px #7A7A7A;
+    box-shadow: 1px 1px 3px #7A7A7A;
+margin-bottom: 5px;
 }
+
+a.menu-item {
+    font-family: "Lucida Grande", "Lucida Sans", Tahoma, Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", sans-serif;
+	color: #000;
+	text-decoration: none;
+}
+
+img.module-icon:active {
+    margin-top: 1px;
+}
+
+a.menu-item:active {
+    text-decoration: none;
+    color: #0303b2;
+}
+
+a.menu-item img:active {
+    margin-bottom: 4px;
+}
+
