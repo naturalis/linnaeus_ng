@@ -109,8 +109,6 @@ class Controller extends BaseClass
 		$this->setCurrentLanguageId();
 
 		$this->checkBackStep();
-		
-if ($this->controllerBaseName!='key') unset($_SESSION['app']['user']['key']);
 
     }
 
@@ -1340,7 +1338,7 @@ if ($this->controllerBaseName!='key') unset($_SESSION['app']['user']['key']);
 
 		// urls of the directory containing media that are constant across projects (but can be skinned)
 		$u['systemMedia'] = $this->baseUrl.$this->getAppName().'/media/system/skins/'.$this->generalSettings['app']['skinName'].'/';
-		$u['systemL2Maps'] =$this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
+		$u['systemL2Maps'] = $this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
 
 		// urls of css-files, either project-specific - if they exist - or generic
 		$projectCssDir = $this->baseUrl.$this->getAppName().'/style/';
