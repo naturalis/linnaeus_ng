@@ -1042,7 +1042,6 @@ class ExportController extends Controller
 	private function exportFreemodule($mId)
 	{
 
-		// create the module
 		$m = $this->models->FreeModuleProject->_get(
 			array(
 				'id' => array(

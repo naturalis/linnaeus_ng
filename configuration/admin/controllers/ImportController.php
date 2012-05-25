@@ -2,6 +2,25 @@
 
 /*
 
+CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
+
+
+	
+	[4:28:27 PM] maarten schermer: R E S U M é
+	[4:28:35 PM] Ruud Altenburg: É
+	[4:29:00 PM] maarten schermer: ALS in de naam GEEN spatie zit, dan is het HT en wordt de naam/index van mijn lookup array rank+' '+taxonnaam
+	[4:29:28 PM] maarten schermer: ANDERE gevallen wordt de index gewoon de naam, met vewijdering van tussenstukjes via jouw functe
+	[4:30:10 PM] maarten schermer: en impliciet ga ik er daarbij dus van uit dat op alle plaatsen (zie lijstje boven) verwijzingen naar HT *ATIJD* ook de rank bevatten.
+	[4:30:16 PM] Ruud Altenburg: Ja
+	[4:30:36 PM] maarten schermer: ok
+	[4:31:08 PM] Ruud Altenburg: Klopt het linken van ondersoorten dan altijd?
+	[4:31:35 PM] Ruud Altenburg: Ja als je consequent die marker verwijdert
+	[4:31:40 PM] maarten schermer: ja
+	[4:31:47 PM] Ruud Altenburg: OK, dan zijn we eruit
+	[4:32:10 PM] maarten schermer: ok
+
+
+
 	q($_SESSION['admin']['system']['import']['loaded']['species']);
 
 	DOCUMENT resolveLanguage($l) !!!!
@@ -291,7 +310,7 @@ class ImportController extends Controller
 
 				if (!$l) {
 
-					$this->addError('Unable to use project language "'.trim((string)$d->language).'"; defaulted to English.');
+					$this->addError($this->storeError('Unable to use project language "'.trim((string)$d->language).'"; defaulted to English.','Project'));
 					$this->addProjectLanguage('English');
 
 				} else {
@@ -302,6 +321,13 @@ class ImportController extends Controller
 				}
 				
 				$_SESSION['admin']['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
+				
+				$_SESSION['admin']['system']['import']['errorlog']['header'] = array(
+					'project' => trim((string)$d->title),
+					'version' => trim((string)$d->version),
+					'createdate' => date('c'),
+					'imported_from' => $_SESSION['admin']['system']['import']['file']['path']	
+				);
 
 			}
 
@@ -364,6 +390,13 @@ class ImportController extends Controller
 			
 			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['ranks']).' ranks');
 			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['species']).' species');
+
+			if (count((array)$_SESSION['admin']['system']['import']['species-errors'])!==0) {
+	
+				foreach ((array)$_SESSION['admin']['system']['import']['species-errors'] as $val)
+					$this->addError($this->storeError($val['taxon'].': '.$val['cause'],'Species'));
+	
+			}
 
 			$this->smarty->assign('processed',true);
 
@@ -476,7 +509,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Species content'));
 		
 					}
 
@@ -497,7 +530,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Species media'));
 		
 					}
 
@@ -519,7 +552,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Species common name'));
 		
 					}
 
@@ -537,7 +570,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Species synonyms'));
 		
 					}
 
@@ -602,7 +635,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
 
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Literature'));
 		
 					}
 
@@ -638,7 +671,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'] as $val)
-							$this->addError($val['cause']);
+							$this->addError($this->storeError($val['cause'],'Glossary'));
 		
 					}
 
@@ -712,7 +745,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['failed'] as $val)
-							$this->addError($val);
+							$this->addError($this->storeError($val,'Welcom texts'));
 		
 					}
 
@@ -745,7 +778,7 @@ class ImportController extends Controller
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'])!==0) {
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'] as $val)
-							$this->addError($val);
+							$this->addError($this->storeError($val,'Introduction'));
 		
 					}
 					
@@ -831,7 +864,7 @@ class ImportController extends Controller
 
 						$m = $this->saveMatrices($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices']);
 	
-						if (isset($m['failed'])) foreach ((array)$m['failed'] as $val) $this->addError($val['cause']);
+						if (isset($m['failed'])) foreach ((array)$m['failed'] as $val) $this->addError($this->storeError($val['cause'],'Matrix'));
 	
 						$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'] = $m['matrices'];
 	
@@ -842,7 +875,7 @@ class ImportController extends Controller
 						if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'])!==0) {
 			
 							foreach ((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] as $val)
-								$this->addError($val['cause']);
+								$this->addError($this->storeError($val['cause'],'Matrix'));
 			
 						}
 	
@@ -1102,9 +1135,10 @@ class ImportController extends Controller
 	
 	}
 
-
  	public function l2AdditionalAction()
 	{
+	
+		if ($this->rHasVal('action','errorlog')) $this->downloadErrorLog();
 	
 		if (
 			!isset($_SESSION['admin']['system']['import']['file']['path']) ||
@@ -1174,8 +1208,6 @@ class ImportController extends Controller
         $this->printPage();
 	
 	}
- 
- 
  
 	public function goNewProject()
 	{
@@ -1615,16 +1647,26 @@ class ImportController extends Controller
 		return $d;
 
 	}
+	
+	private function makeIndexName($name,$rank)
+	{
+
+		$name = trim($name);
+		
+		// no spaces = HT, which always has the rank name prefixed
+		if (strpos($name,' ')===false)
+			return trim($rank).' '.$this->cleanL2Name($name);
+		else
+			return $this->cleanL2Name($name);
+
+	}
 
 	// species (& treetops)
 	public function xmlParserCallback_ResolveSpecies($obj)
 	{
 
-q($obj,1);
-
-
-
 		$rankName = trim((string)$obj->taxon) ? trim((string)$obj->taxon) : null;
+
 		$rankId =
 			isset($_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]) &&
 			$_SESSION['admin']['system']['import']['loaded']['ranks'][trim((string)$obj->taxon)]['rank_id']!==false ?
@@ -1634,11 +1676,15 @@ q($obj,1);
 					null
 				);
 
-		$_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)] = array(
+		$indexName = $this->makeIndexName(trim((string)$obj->name),$rankName);
+
+		$_SESSION['admin']['system']['import']['loaded']['species'][$indexName] = array(
 			'taxon' => $this->cleanL2Name(trim((string)$obj->name)),
+			'original_taxon' => trim((string)$obj->name),
 			'rank_id' => $rankId,
 			'rank_name' => $rankName,
-			'parent' => trim((string)$obj->parentname),
+			'parent' =>  $this->cleanL2Name(trim((string)$obj->parentname)),
+			'original_parent' => trim((string)$obj->parentname),
 			'source' => 'records->taxondata'
 		);
 
@@ -1658,7 +1704,7 @@ q($obj,1);
 			   }
 			 }
 		 }
-		 return str_replace('  ', ' ', $taxon);
+		 return trim(str_replace('  ', ' ', $taxon));
 
 	}
 
@@ -1680,7 +1726,6 @@ q($obj,1);
 
 	}
 
- 
  	private function extractLinkedSpeciesRatherThanDisplayed($whatever)
 	{
 
@@ -1693,23 +1738,34 @@ q($obj,1);
 
 		foreach((array)$species as $key => $val) {
 		
-			if (!isset($ranks[$val['rank_name']]['id'])) continue; // not loading rankless taxa
-
-			$res = $this->models->Taxon->save(
-				array(
-					'id' => null,
-					'project_id' => $this->getNewProjectId(),	
-					'taxon' => $val['taxon'],
-					'parent_id' => 'null',
-					'rank_id' => $ranks[$val['rank_name']]['id'],
-					'taxon_order' => ($key+1),
-					'is_hybrid' => 0,
-					'list_level' => 0
-				)
-			);
+			if (!isset($ranks[$val['rank_name']]['id'])) {
 			
-			$val['id'] = $this->models->Taxon->getNewId();
-			$d[$key] = $val;
+				$_SESSION['admin']['system']['import']['species-errors'][] =
+					array(
+						'taxon' => $val['taxon'],
+						'cause' => 'No or illegal rank ('.$val['rank_name'].')'
+					);
+
+			
+			} else {
+
+				$res = $this->models->Taxon->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getNewProjectId(),	
+						'taxon' => $val['taxon'],
+						'parent_id' => 'null',
+						'rank_id' => $ranks[$val['rank_name']]['id'],
+						'taxon_order' => ($key+1),
+						'is_hybrid' => 0,
+						'list_level' => 0
+					)
+				);
+				
+				$val['id'] = $this->models->Taxon->getNewId();
+				$d[$key] = $val;
+			
+			}
 
 		}
 		
@@ -1738,6 +1794,24 @@ q($obj,1);
 				);
 	
 				$d[$key]['parent_id'] = $t[0]['id'];
+
+				if ($d[$key]['parent_id']==$d[$key]['id']) {
+
+					$_SESSION['admin']['system']['import']['species-errors'][] =
+						array(
+							'taxon' => $d[$key]['taxon'],
+							'cause' => 'saved as orphan, defined as being its own parent.'
+						);
+
+				}
+
+			} else {
+
+				$_SESSION['admin']['system']['import']['species-errors'][] =
+					array(
+						'taxon' => $val['taxon'],
+						'cause' => 'saved as orphan, could not resolve parent.'
+					);
 
 			}
 
@@ -1886,13 +1960,15 @@ q($obj,1);
 	private function addSpeciesContent($taxon)
 	{
 
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		$indexName = $this->makeIndexName((string)$taxon->name,(string)$taxon->taxon);
+
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 		
 			$this->models->ContentTaxon->save(
 				array(
 					'id' => null,
 					'project_id' => $this->getNewProjectId(),
-					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'],
+					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'page_id' => $_SESSION['admin']['system']['import']['speciesOverviewCatId'],
 					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
@@ -1908,7 +1984,7 @@ q($obj,1);
 				'data' => $taxon,
 				'cause' => 'Unable to resolve name "'.trim((string)$taxon->name).'" to taxon id.'
 			);
-		
+			
 		}
 
 	}
@@ -1916,9 +1992,11 @@ q($obj,1);
 	private function addSpeciesMedia($taxon)
 	{
 
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		$indexName = $this->makeIndexName((string)$taxon->name,(string)$taxon->taxon);
+
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 			
-			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 				
 			$fileName = trim((string)$taxon->multimedia->overview);
 
@@ -2061,10 +2139,12 @@ q($obj,1);
 
 	private function addSpeciesCommonNames($taxon)
 	{
-
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+	
+		$indexName = $this->makeIndexName((string)$taxon->name,(string)$taxon->taxon);
+	
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 		
-			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 
 			if(isset($taxon->vernaculars->vernacular)) {
 
@@ -2090,7 +2170,7 @@ q($obj,1);
 	
 						$_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'][] = array(
 							'data' => trim((string)$taxon->name),
-							'cause' => 'Unable to resolve language "'.trim((string)$vVal->language).'"'
+							'cause' => 'Unknown language "'.trim((string)$vVal->language).' (common name "'.trim((string)$vVal->name).'").'
 						);
 		
 					}
@@ -2106,9 +2186,11 @@ q($obj,1);
 	private function addSpeciesSynonyms($taxon)
 	{
 
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'])) {
+		$indexName = $this->makeIndexName((string)$taxon->name,(string)$taxon->taxon);
+
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 		
-			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$taxon->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 			
 			$i = 0;
 			
@@ -2216,26 +2298,11 @@ q($obj,1);
 
 				//[p][l][m]Species[/m][r]Emys orbicularis subsp. hellenica[/r][t][i]Emys orbicularis hellenica[/i][/t][/l][/p]
 				//$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
-				$speciesName = $this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name);
+				$speciesName = $this->cleanL2Name($this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name));
 
 				if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
 
 					$okSp[] = $_SESSION['admin']['system']['import']['loaded']['species'][$speciesName]['id'];
-
-				} else
-				if (strpos($speciesName,' ')!==false) {
-				
-					$speciesNameSplit = trim(substr($speciesName,strpos($speciesName,' ')));
-
-					if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesNameSplit])) {
-					
-						$okSp[] = $_SESSION['admin']['system']['import']['loaded']['species'][$speciesNameSplit]['id'];
-
-					} else {
-
-						$unSp[] = $speciesName;
-
-					}
 
 				} else {
 
@@ -2713,9 +2780,8 @@ q($obj,1);
 								null
 							);
 
-				// text_key->keypage->text_choice->destinationtaxonname = "Family Pontoporiidae". *SIGH*
-				$destinationtaxonname =
-					$this->removeRankFromTaxonName(trim((string)$val->destinationtaxonname));
+
+				$destinationtaxonname = $this->cleanL2Name(trim((string)$val->destinationtaxonname));
 
 				$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
 								(isset($_SESSION['admin']['system']['import']['loaded']['species'][$destinationtaxonname]['id']) ?
@@ -3175,9 +3241,9 @@ q($obj,1);
 
 		if ($matrixname) {
 
-			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
+			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'])) {
 
-				$taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
+				$taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'];
 
 				foreach($obj->identify->id_file->characters->character_ as $char) {
 
@@ -3384,7 +3450,7 @@ q($obj,1);
 		
 		} else {
 
-			$this->addError('Missing map file: "'.$mapImageName.'"<br />(will still function properly if map exists in default folder).');
+			$this->addError($this->storeError('Missing map file: "'.$mapImageName.'"<br />(will still function properly if map exists in default folder).','Map'));
 	
 		}
 
@@ -3413,11 +3479,11 @@ q($obj,1);
 	private function saveMapItem($obj)
 	{
 	
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'])) {
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'])) {
 		
 			if (!isset($obj->distribution)) return;
 			
-			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][trim((string)$obj->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'];
 
 			foreach($obj->distribution->map as $vKey => $vVal) {
 
@@ -4094,6 +4160,66 @@ q($obj,1);
 		return $_SESSION['admin']['system']['import']['additionalModules'];
 	
 	}
+	
+	private function storeError($err,$mod)
+	{
+
+		$_SESSION['admin']['system']['import']['errorlog']['errors'][] = array($mod,$err);
+		
+		return $err;
+
+	}
+
+	private function downloadErrorLog()
+	{
+
+		header('Content-disposition:attachment;filename=import-'. strtolower(preg_replace('/\W/','',$_SESSION['admin']['system']['import']['errorlog']['header']['project'])).'-errors.log');
+		header('Content-type:text/txt');
+
+		echo 'project: '.$_SESSION['admin']['system']['import']['errorlog']['header']['project'].chr(10);
+		echo 'version: '.$_SESSION['admin']['system']['import']['errorlog']['header']['version'].chr(10);
+		echo 'source file: '.$_SESSION['admin']['system']['import']['errorlog']['header']['imported_from'].chr(10);
+		echo 'created: '.$_SESSION['admin']['system']['import']['errorlog']['header']['createdate'].chr(10);
+		echo 'project id: '.$_SESSION['admin']['system']['import']['errorlog']['header']['id'].chr(10);
+
+		echo '--------------------------------------------------------------------------------'.chr(10);
+
+		$prevMod = null;
+
+		foreach((array)$_SESSION['admin']['system']['import']['errorlog']['errors'] as $val) {
+		
+			if ($val[0]!==$prevMod) {
+			
+				if (!is_null($prevMod)) echo chr(10);
+				echo 'while loading '.strtolower($val[0]).':'.chr(10);
+			
+			}
+			
+			echo strip_tags($val[1]).chr(10);
+			
+			$prevMod = $val[0];
+		
+		}
+		
+		echo chr(10);
+		
+		
+		echo '--------------------------------------------------------------------------------'.chr(10);
+
+		echo 'loaded '.(count((array)$_SESSION['admin']['system']['import']['loaded']['species'])).' taxa:'.chr(10);
+
+		foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $key => $val) {
+		
+			echo $val['original_taxon'].' > '.$val['taxon'].' ('.$val['rank_name'].'; id: '.$val['id'].')'.chr(10);
+		
+		}
+		
+		echo chr(10);
+
+		die();
+				
+	}
+
 
 
 }

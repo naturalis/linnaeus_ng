@@ -6,7 +6,8 @@
 {if $processed==true || $modules|@count==0}
 <p>
 Data import is complete. You have been added as system administrator to the new project. In that capacity you can finish configuring the project by adding modules, creating users etc.<br />
-(project id: {$projectId})
+(project id: {$projectId})<br /><br />
+<a href="l2_additional.php?action=errorlog">Download import error log</a>
 </p>
 <p>
 <a href="go_new_project.php">Go to project index</a>
