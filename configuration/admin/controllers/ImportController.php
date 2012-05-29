@@ -1806,12 +1806,16 @@ class ImportController extends Controller
 				}
 
 			} else {
+ 
+				if ($key!=0) {
 
-				$_SESSION['admin']['system']['import']['species-errors'][] =
-					array(
-						'taxon' => $val['taxon'],
-						'cause' => 'saved as orphan, could not resolve parent.'
-					);
+					$_SESSION['admin']['system']['import']['species-errors'][] =
+						array(
+							'taxon' => $val['taxon'],
+							'cause' => 'saved as orphan, could not resolve parent.'
+						);
+				
+				}
 
 			}
 
@@ -2033,7 +2037,7 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					(isset($val->fullname) ? ((string)$val->fullname) : $fileName)
+					trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName)))
 				);
 
 				if ($r['saved']==true) {
@@ -2055,7 +2059,7 @@ class ImportController extends Controller
 					
 	}
 
-	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$isOverviewPicture=false)
+	private function doAddSpeciesMedia($taxonId,$fileName,$caption,$isOverviewPicture=false)
 	{
 
 		if ($_SESSION['admin']['system']['import']['imagePath']==false)
@@ -2090,7 +2094,7 @@ class ImportController extends Controller
 						'taxon_id' => $taxonId,
 						'file_name' => $fileName,
 						'thumb_name' => $thumbName,
-						'original_name' => $fullName,
+						'original_name' => $fileName,
 						'mime_type' => $thisMIME,
 						'file_size' => filesize($_SESSION['admin']['system']['import']['imagePath'].$fileName),
 						'overview_image' => ($isOverviewPicture ? 1 : 0)
@@ -2103,7 +2107,7 @@ class ImportController extends Controller
 						'project_id' => $this->getNewProjectId(),
 						'language_id' => $this->getNewDefaultLanguageId(),	
                         'media_id' => $this->models->MediaTaxon->getNewId(), 
-                        'description' => $fullName
+                        'description' => $caption
                     )
                 );
 
@@ -2298,7 +2302,7 @@ class ImportController extends Controller
 
 				//[p][l][m]Species[/m][r]Emys orbicularis subsp. hellenica[/r][t][i]Emys orbicularis hellenica[/i][/t][/l][/p]
 				//$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
-				$speciesName = $this->cleanL2Name($this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name));
+				$speciesName = $this->makeIndexName($this->cleanL2Name($this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name)));
 
 				if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
 
