@@ -1,12 +1,21 @@
+{include file="../shared/_search-main.tpl"}
 <div id="page-main">
+
+
+
 	<div id="reference">
-		<div id="author">
-			<span id="name">
-				{$ref.author_full}
-			</span>
-			<span id="year">{$ref.year}{$ref.suffix}</span>
-		</div>
-		<div id="text">{$ref.text}</div>
+
+    <div id="mini-header-titles">
+        <span id="mini-header-title">{$ref.author_full}, {$ref.year}{$ref.suffix}</span>
+        {if $term.synonyms}
+        <span id="synonyms">
+({foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach})
+        </span>
+        {/if}
+    </div>
+
+
+	<div id="text">{$ref.text}</div>
 	{if $ref.taxa}
 		<div id="taxa">
 			<div class="title">{t}Referenced in the following taxa:{/t}</div>

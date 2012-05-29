@@ -1,5 +1,34 @@
 {include file="../shared/header.tpl"}
 
+<div id="header-titles"></div>
+<div id="categories">
+<ul>
+<li>
+    <a class="category{if $taxonType=='lower'}-active{/if} category-first" 
+    href="examine_species.php">
+    {t}Examine{/t}</a>
+</li>
+<li>
+    <a class="category{if $taxonType=='higher'}-active{/if}" 
+    href="compare.php">
+    {t}Compare{/t}</a>
+</li>
+<li>
+    <a class="category{if $taxonType=='higher'}-active{/if}" 
+    href="search.php">
+    {t}Search{/t}</a>
+</li>
+<li>
+    <a class="category{if $taxonType=='common'}-active{/if} category-last" 
+    href="diversity.php">
+    {t}Diversity index{/t}</a>
+</li>
+</ul>
+</div>
+
+
+{include file="../shared/_search-main.tpl"}
+
 {assign var=map value=$maps[$mapId]}
 
 <div id="page-main">

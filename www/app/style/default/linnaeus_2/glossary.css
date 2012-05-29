@@ -12,23 +12,15 @@
 	overflow:hidden;
 }
 
-#page-main #term {
-	font-size:16px;
-	font-weight:bold;
-	margin-bottom:5px;
-}
 
-#page-main #defintion {
-	text-align:justify;
-	padding-bottom:5px;
-	margin-bottom:5px;
-	overflow:auto;
+#page-main #definition {
+	text-align: justify;
+	overflow: auto;
 }
 
 #page-main #synonyms {
-	padding-top:5px;
-	margin-top:5px;
-	border-top:1px dotted #666;
+	padding-top:10px;
+	margin-top:10px;
 }
 
 #page-main #synonyms-title, #media-title {

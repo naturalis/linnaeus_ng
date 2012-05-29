@@ -1,15 +1,15 @@
+{include file="../shared/_search-main.tpl"}
 <div id="page-main">
-	<div id="term">{$term.term}</div>
-	<div id="defintion">{$term.definition}</div>
-	{if $term.synonyms}
-	
-	<div id="synonyms">
-		<div id="synonyms-title">{t}Synonyms{/t}</div>
-		{foreach from=$term.synonyms key=k item=v}
-			<div class="synonym">{$v.synonym}{if $v.language} ({$v.language}){/if}</div>
-		{/foreach}
-	</div>
-	{/if}
+    <div id="mini-header-titles">
+    	<span id="mini-header-title">{$term.term}</span>
+    	{if $term.synonyms}
+        <span id="synonyms">
+({foreach from=$term.synonyms key=k item=v name=synonyms}{$v.synonym}{if $v.language} ({$v.language}){/if}{if !$smarty.foreach.synonyms.last}, {/if}{/foreach})
+        </span>
+        {/if}
+    </div>
+    
+	<div id="definition">{$term.definition}</div>
 	
 	{if $term.media}
 	<div id="media">
