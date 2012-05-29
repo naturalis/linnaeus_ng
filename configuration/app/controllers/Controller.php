@@ -1542,6 +1542,8 @@ class Controller extends BaseClass
         $this->_fullPath = $_SERVER['PHP_SELF'];
  
         $path = pathinfo($this->_fullPath);
+		
+		$_SESSION['app']['system']['path'] = $path;
 
         $dirnames = explode('/',$path['dirname']);
         
