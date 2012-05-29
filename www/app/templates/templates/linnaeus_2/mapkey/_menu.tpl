@@ -19,11 +19,5 @@
 
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
-&nbsp;&nbsp;
-<a href="compare.php">{t}Species comparison{/t}</a>
-&nbsp;&nbsp;
-<a href="search.php">{t}Map search{/t}</a>
-&nbsp;&nbsp;
-<a href="diversity.php">{t}Diversity index{/t}</a>
 </div>
 

@@ -1,3 +1,13 @@
+#header-titles {
+    height: 15px;
+	padding: 0;
+}
+
+#page-main {
+    height: 411px;
+}
+
+
 #mapTable {
 	padding:0px;
 	margin:0px;

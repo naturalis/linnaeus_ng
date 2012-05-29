@@ -7,9 +7,4 @@
     {include file="../shared/_main-menu.tpl"}
 {/if}
 
-{if $headerTitles}
-	<div id="header-titles">
-		<span id="header-title">{$headerTitles.title}</span><br />
-		<span id="header-subtitle">{$headerTitles.subtitle}</span>
-	</div>
-{/if}
+{include file="../shared/_header-titles.tpl"}
