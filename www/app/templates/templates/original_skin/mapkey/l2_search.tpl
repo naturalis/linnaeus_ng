@@ -45,19 +45,20 @@
 		</td>
 		<td style="padding-left:4px;">
 			{t}Select the area you want to search by clicking the relevant squares.{/t}<br />
+			{t}To in- or exclude specific types of data, you can toggle the boxes below.{/t}<br />
 			{t}When finished, click 'search'.{/t}<br />
 			<input type="button" value="{t}clear{/t}" onclick="l2DoClearSearch()" />&nbsp;
 			<input type="button" value="{t}search{/t}" onclick="l2DoSearchMap()" />
 			<input type="hidden" name="mapId" value="{$mapId}" />
-			{* if $taxa}
 			<br /><br />
-			{t}Found taxa:{/t}
-			<p id="mapTaxaBox">
-			{foreach from=$taxa item=v}
-			<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon}</a><br />
-			{/foreach}
+			{foreach from=$geoDataTypes key=k item=v name=x}
+			<p style="margin:0px;">
+				<label>
+					<input type="checkbox" name="dataTypes[]" {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
+					<span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{$v.title}
+				</label>
 			</p>
-			{/if *}
+			{/foreach}
 		</td>
 	</tr>
 </table>
@@ -79,10 +80,10 @@ l2SetMap(
 
 
 <!-- added ui dialog 2012.05.30 -->
-{if $taxa}
+{if $didSearch==true}
 showDialog(
-	_('Found taxa'),
-	'<p style="height:250px;overflow-y:scroll">'+
+	_('Found {$taxa|@count} taxa'),
+	'<p style="margin:0px;height:250px;overflow-y:scroll">'+
 	{foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon|escape:'htmlall'}</a><br />'+
 	{/foreach}'</p>'
 );
