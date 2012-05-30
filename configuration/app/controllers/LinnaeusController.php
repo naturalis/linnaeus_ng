@@ -306,6 +306,21 @@ class LinnaeusController extends Controller
     
     }
 
+
+    public function rootIndexAction()
+	{
+
+		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
+
+		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
+		$this->smarty->assign('showEntryProgramLink',true);
+		$this->smarty->assign('projects',$projects);
+		$this->smarty->assign('excludeLogout',true);
+
+        $this->printPage('linnaeus/root_index');
+	
+	}
+
     /**
      * Index of project: introduction
      *

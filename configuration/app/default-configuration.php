@@ -1,10 +1,11 @@
 <?php
-error_reporting(E_ALL);//  dingetje toegevoegd en zo ferrari   error_reporting(E_ALL | E_STRICT); 
+error_reporting(E_ALL);
 date_default_timezone_set('Europe/Amsterdam');
 class configuration
 {
 
     private $_appFileRoot;
+    private $_skinName;
 
     public function __construct ()
     {
@@ -17,8 +18,6 @@ class configuration
 		$this->_skinName = $d['app']['skinName'];
 
     }
-
-
 
     public function getDatabaseSettings ()
     {
@@ -63,8 +62,10 @@ class configuration
 				'skinName' => 'linnaeus_2'
 			),
 			'defaultController' => 'linnaeus',
+			'startUpUrl' => '/index.php',
 			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'urlUploadedProjectMedia' => '../../../admin/media/project/',
+			'lngFileRoot' => $this->_appFileRoot,
             'maxSessionHistorySteps' => 10, 
             'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(
