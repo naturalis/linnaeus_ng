@@ -43,7 +43,7 @@
     </td>
     </tr>
     <tr>
-    <td>    
+    <td id="gridMapCell">    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}

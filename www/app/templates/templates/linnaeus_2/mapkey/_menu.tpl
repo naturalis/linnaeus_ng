@@ -23,7 +23,6 @@
 </div>
 -->
 
-
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
@@ -69,5 +68,21 @@
         <span class="navigation-icon" id="next-icon-inactive">{t}Next{/t}</span>
     {/if}
 {/if}
+
+{if $backlink}
+    {if $session.app.user.map.search.taxa}
+        {assign var=backUrl value='l2_search.php?action=research'}
+    {elseif $session.app.user.map.index}
+        {assign var=backUrl value='l2_diversity.php?action=reindex'}
+    {else}
+        {assign var=backUrl value=$backlink.url}
+    {/if}
+    <a class="navigation-icon" id="back-icon" href="{$backUrl}" 
+    title="{t}Back{/t}{if $session.app.user.map.search.taxa}{t} to Search results{/t}{elseif $session.app.user.map.index}{t} to Diversity index{/t}{/if}">
+    {t}Back{/t}</a>
+{else}
+    <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
+{/if}
+
 </div>
 </div>

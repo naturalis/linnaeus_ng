@@ -57,7 +57,6 @@
 #next-icon {
 {/literal}
     width: 40px;
-    margin-right: 15px;
     cursor: pointer; 
     background: url('{$systemMedia}next.png') no-repeat;
 {literal}
@@ -77,7 +76,36 @@
 {/literal}
     width: 40px;
     background: url('{$systemMedia}next.png') no-repeat;
-    margin-right: 15px;
+    opacity: 0.4;
+    filter: alpha(opacity=40); 
+{literal}
+}
+{/literal}
+
+
+{literal}
+#back-icon {
+{/literal}
+    width: 40px;
+    cursor: pointer; 
+    background: url('{$systemMedia}back.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#back-icon:active {
+{/literal}
+    background-position: 0 1px;
+{literal}
+}
+{/literal}
+
+{literal}
+#back-icon-inactive {
+{/literal}
+    width: 40px;
+    background: url('{$systemMedia}back.png') no-repeat;
     opacity: 0.4;
     filter: alpha(opacity=40); 
 {literal}

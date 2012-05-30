@@ -23,7 +23,7 @@
     </td>
     </tr>
     <tr>
-    <td>    
+    <td id="gridMapCell">    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -47,9 +47,9 @@
 			{/if}
 			</p>
 		</td>
-		<td style="padding-left:4px;">
+		<td id="legend">
 		{foreach from=$geoDataTypes key=k item=v name=x}
-			<p style="margin:0px;">
+			<p>
 				<label>
 					<input 
 						type="checkbox" 
