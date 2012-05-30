@@ -156,10 +156,12 @@ function l2SetCompareSpecies(i,j) {
 	if (i==1) {
 		$('#idA').val(j);
 		$('#speciesNameA').html(label);
+		$('#speciesNameA').css('width','auto');		
 	} else
 	if (i==2) {
 		$('#idB').val(j);
 		$('#speciesNameB').html(label);
+		$('#speciesNameB').css('width','auto');		
 	}
 
 	$('#dialog-close').click();
