@@ -1316,6 +1316,9 @@ class Controller extends BaseClass
      */
     public function setUrls()
     {
+
+		$_SESSION['app']['system']['urls']['systemMedia'] =
+			$this->baseUrl.$this->getAppName().'/media/system/skins/'.$this->generalSettings['app']['skinName'].'/';
         
 		$p = $this->getCurrentProjectId();
 
@@ -1337,7 +1340,7 @@ class Controller extends BaseClass
 		$u['projectL2Maps'] = $u['projectMedia'].'l2_maps/';
 
 		// urls of the directory containing media that are constant across projects (but can be skinned)
-		$u['systemMedia'] = $this->baseUrl.$this->getAppName().'/media/system/skins/'.$this->generalSettings['app']['skinName'].'/';
+		$u['systemMedia'] = $_SESSION['app']['system']['urls']['systemMedia'];
 		$u['systemL2Maps'] = $this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
 
 		// urls of css-files, either project-specific - if they exist - or generic
@@ -1349,8 +1352,8 @@ class Controller extends BaseClass
 			$u['projectCSS'] = $projectCssDir.'default/'.$this->generalSettings['app']['skinName'].'/';
 		}
 
-		// url to start the project woth (and to navigate to when a home button is clicked)
-		$u['projectStart'] = $this->baseUrl.$this->getAppName().'/views/'.$this->generalSettings['defaultController'].'/';
+		// home
+		$u['projectHome'] = $this->baseUrl.$this->getAppName().'/views/'.$this->generalSettings['defaultController'].'/';
 
 		$_SESSION['app']['project']['urls'] = $u;
 
@@ -1363,6 +1366,8 @@ class Controller extends BaseClass
      */
     public function setPaths()
     {
+
+		$_SESSION['app']['project']['paths']['defaultCSS'] = $this->generalSettings['app']['fileRoot'].'style/default/';
 
         $p = $this->getCurrentProjectId();
 
@@ -1425,6 +1430,18 @@ class Controller extends BaseClass
 	
 	}
 	
+	public function doesEntryProgramExist()
+	{
+	
+		// ofcourse just these three aren't nowhere near sufficient to run the admin, but it's a good indication
+		return (
+			file_exists($this->generalSettings['lngFileRoot'].'configuration/admin/configuration.php') &&
+			file_exists($this->generalSettings['lngFileRoot'].'configuration/admin/controllers/Controller.php') &&
+			file_exists($this->generalSettings['lngFileRoot'].'www/admin/admin-index.php')
+		);
+	
+	}
+
 	
 	private function setPhpIniVars()
 	{
