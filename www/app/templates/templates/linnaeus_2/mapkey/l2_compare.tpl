@@ -1,18 +1,49 @@
 {include file="../shared/header.tpl"}
+{assign var=currentPage value=$session.app.system.path.filename}
+<div id="header-titles"></div>
+{include file="_categories.tpl"}
+{include file="../shared/_search-main.tpl"}
+
 
 {assign var=map value=$maps[$mapId]}
 
 <div id="page-main">
 
-{if $map.mapExists}
-	<div>{$map.name} (<span id=coordinates>0,0</span>)</div>
+{if !$map.mapExists}
+    <div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {else}
-	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
-{/if}
 
-<table>
-	<tr style="vertical-align:top">
-		<td>
+<table id="mapGrid">
+    <tr id="topBar">
+    <td>
+         
+            <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <select name="idA" id="idA" class="taxon-select">   
+                <option value="" {if !$taxonA}selected="selected"{/if}>{t}Species A{/t}</option>
+                {foreach from=$taxa key=k item=v}
+                    <option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
+                {/foreach}
+            </select>
+            </span>
+          
+            <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <select name="idB" id="idB" class="taxon-select">   
+                <option value="" {if !$taxonB}selected="selected"{/if}>{t}Species B{/t}</option>
+                {foreach from=$taxa key=k item=v}
+                    <option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
+                {/foreach}
+            </select>
+             
+            <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
+            
+
+        <span id="coordinates">0,0</span>
+    </td><td id="mapName">
+        {$map.name}
+    </td>
+    </tr>
+    <tr>
+    <td>    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -26,35 +57,9 @@
 			{/section}
 			</table>
 		{/if}
-			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-			{/if}
-			</p>		
 		</td>
-		<td style="padding-left:4px;">
-			{t}Select two species to compare{/t}<br /><br />
-			<span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Species A:{/t}
-			<select name="idA" id="idA" class="taxon-select">	
-				<option value="" {if !$taxonA}selected="selected"{/if}>{t}--choose species--{/t}</option>
-				{foreach from=$taxa key=k item=v}
-					<option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-				{/foreach}
-			</select>
-			&nbsp;&nbsp;&nbsp;&nbsp;</span>
-			<br />
-			<span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Species B:{/t}
-			<select name="idB" id="idB" class="taxon-select">	
-				<option value="" {if !$taxonB}selected="selected"{/if}>{t}--choose species--{/t}</option>
-				{foreach from=$taxa key=k item=v}
-					<option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-				{/foreach}
-			</select>
-			<br />	
-			<input id="map_compare_button" type="button" value="compare" onclick="l2DoMapCompare()" />
-			<br /><br />
-			<p style="margin:0px;">
+		<td id="legend">
+			<p>
 			<span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Show overlap in:{/t}
 			{foreach from=$geoDataTypes key=k item=v name=x}
 				<p class="mapPCheckbox">
@@ -70,32 +75,18 @@
 				</p>
 			{/foreach}
 			</p>
+
+            <p>
+            {if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
+            {if $maps|@count>1}
+            {foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
+            {/if}
+            </p>        
 		</td>
 	</tr>
 </table>
 </div>
-
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-{if $map.mapExists}
-l2SetMap(
-	'{$map.imageFullName|replace:' ':'%20'}',
-	{$map.size[0]},
-	{$map.size[1]},
-	'{$map.coordinates.original}',
-	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
-	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
-);
 {/if}
-{literal}
-$("#mapTable").mousemove(function(event) {
-	l2MapMouseOver(event.pageX,event.pageY);
-});
 
-});
-</script>
-{/literal}
-
+{include file="_mapJquery.tpl"}
 {include file="../shared/footer.tpl"}
