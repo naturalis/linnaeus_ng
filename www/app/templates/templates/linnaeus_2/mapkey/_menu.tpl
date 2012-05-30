@@ -78,7 +78,7 @@
         {assign var=backUrl value=$backlink.url}
     {/if}
     <a class="navigation-icon" id="back-icon" href="{$backUrl}" 
-    title="{t}Back{/t}{if $session.app.user.map.search.taxa}{t} to Search results{/t}{elseif $session.app.user.map.index}{t} to Diversity index{/t}{/if}">
+    title="{t}Back to {/t}{if $session.app.user.map.search.taxa}{t}Search results{/t}{elseif $session.app.user.map.index}{t} to Diversity index{/t}{else}{$backlink.name}{/if}">
     {t}Back{/t}</a>
 {else}
     <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>

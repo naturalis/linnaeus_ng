@@ -25,7 +25,7 @@
     </td>
     </tr>
     <tr>
-    <td id="gridMapCell">    
+    <td id="gridMapCell searchMap">    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}

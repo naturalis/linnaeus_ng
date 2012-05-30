@@ -32,7 +32,7 @@
 					<td 
 						id="cell-{$cellNo}"
 						datatype="{$occurrences[$cellNo].type_id}" 
-						class="mapCell" {if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
+						{if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>
