@@ -22,7 +22,7 @@
 	</td>
 	</tr>
 	<tr>
-	<td>	
+	<td id="gridMapCell">	
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -50,8 +50,6 @@
 			</p>
 			{/foreach}
 			
-			{if $session.app.user.map.search.taxa}<p><a href="l2_search.php?action=research">{t}Back to search results.{/t}</a></p>{/if}
-			{if $session.app.user.map.index}<p><a href="l2_diversity.php?action=reindex">{t}Back to diversity index.{/t}</a></p>{/if}
             <p>
             {if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
             {if $maps|@count>1}

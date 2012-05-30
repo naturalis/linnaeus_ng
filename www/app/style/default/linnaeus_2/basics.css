@@ -280,6 +280,7 @@ body {
 /* Navigation icons etc */
 .navigation-icon-wrapper {
     float: right;
+    padding: 0 15px;
 }
 
 .navigation-icon {

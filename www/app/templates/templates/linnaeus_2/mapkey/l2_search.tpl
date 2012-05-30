@@ -16,14 +16,16 @@
 <table id="mapGrid">
     <tr id="topBar">
     <td>
-        <span id="taxonName">{$taxon.taxon}</span> 
+            <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />
+            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />&nbsp;
+            <input type="hidden" name="mapId" value="{$mapId}" />
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
         {$map.name}
     </td>
     </tr>
     <tr>
-    <td>    
+    <td id="gridMapCell">    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -48,12 +50,9 @@
 			{/if}
 			</p>	
 		</td>
-		<td style="padding-left:4px;">
-			{t}Select the area you want to search by clicking the relevant squares.{/t}<br />
-			{t}When finished, click 'search'.{/t}<br />
-			<input type="button" value="{t}clear{/t}" onclick="l2DoClearSearch()" />&nbsp;
-			<input type="button" value="{t}search{/t}" onclick="l2DoSearchMap()" />
-			<input type="hidden" name="mapId" value="{$mapId}" />
+		<td id="legend">
+			<p>{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
+			<p>{t}When finished, click 'Search'.{/t}</p>
 			{if $taxa}
 			<br /><br />
 			{t}Found taxa:{/t}

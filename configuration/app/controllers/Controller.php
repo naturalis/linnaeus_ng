@@ -1925,8 +1925,9 @@ class Controller extends BaseClass
 				$_SESSION['app']['user']['breadcrumbs'][count($_SESSION['app']['user']['breadcrumbs'])-1] :
 				null;
 
+		if (isset($d['name'])) $d['name'] = str_replace('"', '', $d['name']);
 		if (isset($d['data'])) $d['data'] = json_encode($d['data']);
-
+		
 		return $d;
 
 	}

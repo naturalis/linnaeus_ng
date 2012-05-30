@@ -11,8 +11,12 @@
     vertical-align: top;
 }
 
+#gridMapCell {
+	min-width: 577px;
+}
+
 #topBar td {
-	padding-bottom: 8px;
+    padding-bottom: 8px;
 }
 
 #coordinates {
