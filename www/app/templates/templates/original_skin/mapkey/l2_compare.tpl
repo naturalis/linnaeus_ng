@@ -26,34 +26,57 @@
 			{/section}
 			</table>
 		{/if}
+		<!-- added ui dialog 2012.05.30 -->
+		{if $maps|@count>1}
 			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-			{/if}
-			</p>		
+				<span class="a" onclick="
+					showDialog(
+						_('Choose a map'),
+						{foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
+						{/foreach}' '
+					);">{t}Switch to another map{/t}</span>
+			</p>
+		{/if}	
+		<!-- /added ui dialog 2012.05.30 -->
 		</td>
 		<td style="padding-left:4px;">
+		<!-- added ui dialog 2012.05.30 -->
+
 			{t}Select two species to compare{/t}<br /><br />
-			<span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Species A:{/t}
-			<select name="idA" id="idA" class="taxon-select">	
-				<option value="" {if !$taxonA}selected="selected"{/if}>{t}--choose species--{/t}</option>
-				{foreach from=$taxa key=k item=v}
-					<option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-				{/foreach}
-			</select>
-			&nbsp;&nbsp;&nbsp;&nbsp;</span>
-			<br />
-			<span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Species B:{/t}
-			<select name="idB" id="idB" class="taxon-select">	
-				<option value="" {if !$taxonB}selected="selected"{/if}>{t}--choose species--{/t}</option>
-				{foreach from=$taxa key=k item=v}
-					<option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-				{/foreach}
-			</select>
+			<table>
+				<tr>
+					<td class="mapCellA mapCellLegend" style="width:15px;"></td>
+					<td style="padding-left:5px;width:75px">{t}Species A:{/t}</td>
+					<td id="speciesNameA" class="a" onclick="
+						allLookupSetExtraVars('l2_must_have_geo','1');
+						allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
+						allLookupShowDialog()
+					">
+						{if $taxonA}{$taxonA.taxon}{else}{t}choose species{/t}{/if}
+					</td>
+				</tr>
+				<tr>
+					<td class="mapCellB mapCellLegend" style="width:15px;"></td>
+					<td style="padding-left:5px;width:75px">{t}Species B:{/t}</td>
+					<td id="speciesNameB" class="a" onclick="
+						allLookupSetExtraVars('l2_must_have_geo','1');
+						allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
+						allLookupShowDialog()
+					">
+						{if $taxonB}{$taxonB.taxon}{else}{t}choose species{/t}{/if}
+					</td>
+				</tr>
+			</table>
+
 			<br />	
+			<input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
+			<input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
 			<input id="map_compare_button" type="button" value="compare" onclick="l2DoMapCompare()" />
 			<br /><br />
+
+			<!-- /added ui dialog 2012.05.30 -->
+
+		
 			<p style="margin:0px;">
 			<span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Show overlap in:{/t}
 			{foreach from=$geoDataTypes key=k item=v name=x}

@@ -31,6 +31,7 @@ var allLookupTargetUrl = false;
 var allLookupData = null;
 var allLookupLastString = null;
 var allLookupMatchStartOnly = true;
+var allLookupExtraVars = Array();
 var allLookupDialogInputName = 'lookupDialogInput';
 var allLookupDialogContentName = 'lookup-DialogContent';
 var allNavigateDefaultUrl = 'item.php?id=%s';
@@ -117,6 +118,7 @@ function allLookupGetData(text,getAll) {
 				'search' : (getAll==true ? '*' : text) ,
 				'match_start' : (allLookupMatchStartOnly ? '1' : '0') ,
 				'get_all' : (getAll==true ? '1' : '0') ,
+				'vars' : allLookupExtraVars,
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
@@ -163,6 +165,13 @@ function allLookupGetData(text,getAll) {
 
 }
 
+function allLookupSetExtraVars(name,value) {
+
+	allLookupExtraVars[allLookupExtraVars.length] = [name,value];
+
+}
+
+
 function allLookupBuildList(obj,txt) {
 
 	allLookupRowCount = 0;
@@ -189,7 +198,7 @@ function allLookupBuildList(obj,txt) {
 
 				var str =
 					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" onclick="window.open(\''+
+						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" lookupId="'+d.id+'" onclick="window.open(\''+
 							(d.url ? d.url : url.replace('%s',d.id)) +
 							'\',\'_self\')">'+
 							d.label +

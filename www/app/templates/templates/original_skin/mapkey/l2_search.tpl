@@ -30,12 +30,18 @@
 			{/section}
 			</table>
 			{/if}
-			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
+			<!-- added ui dialog 2012.05.30 -->
 			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?mapId={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
+				<p>
+					<span class="a" onclick="
+						showDialog(
+							_('Choose a map'),
+							{foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?mapId={$v.id}>{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+
+							{/foreach}' '
+						);">{t}Switch to another map{/t}</span>
+				</p>
 			{/if}
-			</p>	
+			<!-- /added ui dialog 2012.05.30 -->
 		</td>
 		<td style="padding-left:4px;">
 			{t}Select the area you want to search by clicking the relevant squares.{/t}<br />
@@ -43,7 +49,7 @@
 			<input type="button" value="{t}clear{/t}" onclick="l2DoClearSearch()" />&nbsp;
 			<input type="button" value="{t}search{/t}" onclick="l2DoSearchMap()" />
 			<input type="hidden" name="mapId" value="{$mapId}" />
-			{if $taxa}
+			{* if $taxa}
 			<br /><br />
 			{t}Found taxa:{/t}
 			<p id="mapTaxaBox">
@@ -51,7 +57,7 @@
 			<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon}</a><br />
 			{/foreach}
 			</p>
-			{/if}
+			{/if *}
 		</td>
 	</tr>
 </table>
@@ -70,6 +76,20 @@ l2SetMap(
 	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
 	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
 );
+
+
+<!-- added ui dialog 2012.05.30 -->
+{if $taxa}
+showDialog(
+	_('Found taxa'),
+	'<p style="height:250px;overflow-y:scroll">'+
+	{foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon|escape:'htmlall'}</a><br />'+
+	{/foreach}'</p>'
+);
+{/if}
+<!-- /added ui dialog 2012.05.30 -->
+
+
 {/if}
 {literal}
 $("#mapTable").mousemove(function(event) {

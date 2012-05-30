@@ -3,11 +3,24 @@
 <div id="back-to-search">
 <span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
 </div>
-{*elseif $backlink.url=='not implemented'}
-<p>
-<span class="a" onclick="doBackForm('{$backlink.url}','{$backlink.data|@escape}');" title="Back to {$backlink.name}">BACK</span>
-</p>
-*}
+
+{if $backlink}
+    {if $session.app.user.map.search.taxa}
+        {assign var=backUrl value='l2_search.php?action=research'}
+    {elseif $session.app.user.map.index}
+        {assign var=backUrl value='l2_diversity.php?action=reindex'}
+    {else}
+        {assign var=backUrl value='$backlink.url'}
+    {/if}
+    <a class="navigation-icon" id="back-icon" href="{$backUrl}" 
+    title="{t}Back{/t}{if $session.app.user.map.search.taxa}{t} to Search results{/t}{else if $session.app.user.map.index}{t} to Diversity index{/t}{/if}">
+    {t}Back{/t}</a>
+{else}
+    <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
+{/if}
+
+
+
 {/if}
 </div ends="page-container">
 <div id="footer-container">

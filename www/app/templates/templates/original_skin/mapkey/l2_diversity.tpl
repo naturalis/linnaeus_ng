@@ -29,12 +29,18 @@
 			{/section}
 			</table>
 			{/if}
-			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
+			<!-- added ui dialog 2012.05.30 -->
 			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
+				<p>
+					<span class="a" onclick="
+						showDialog(
+							_('Choose a map'),
+							{foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+
+							{/foreach}' '
+						);">{t}Switch to another map{/t}</span>
+				</p>
 			{/if}
-			</p>
+			<!-- /added ui dialog 2012.05.30 -->
 		</td>
 		<td style="padding-left:4px;">
 		{foreach from=$geoDataTypes key=k item=v name=x}
@@ -51,18 +57,7 @@
 				</label>
 			</p>
 		{/foreach}
-		<input type="hidden" name="m" value="{$mapId}" />
-	
-		{if $taxa}
-		<br /><br />
-		{t}Taxa in that cell:{/t}
-		<p style="height:200px;overflow-y:scroll">
-		{foreach from=$taxa item=v}
-		<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon}</a><br />
-		{/foreach}
-		</p>
-		{/if}
-		
+		<input type="hidden" name="m" id="mapId" value="{$mapId}" />
 		</td>
 	</tr>
 </table>
@@ -81,6 +76,18 @@ l2SetMap(
 	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
 	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
 );
+
+<!-- added ui dialog 2012.05.30 -->
+{if $taxa}
+showDialog(
+	_('Taxa in that cell'),
+	'<p style="height:250px;overflow-y:scroll">'+
+	{foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon|escape:'htmlall'}</a><br />'+
+	{/foreach}'</p>'
+);
+{/if}
+<!-- /added ui dialog 2012.05.30 -->
+
 {/if}
 {literal}
 $("#mapTable").mousemove(function(event) {
@@ -92,3 +99,4 @@ $("#mapTable").mousemove(function(event) {
 {/literal}
 
 {include file="../shared/footer.tpl"}
+

@@ -29,12 +29,18 @@
 			{/section}
 			</table>
 		{/if}
+		<!-- added ui dialog 2012.05.30 -->
+		{if $maps|@count>1}
 			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-			{/if}
+				<span class="a" onclick="
+					showDialog(
+						_('Choose a map'),
+						{foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
+						{/foreach}' '
+					);">{t}Switch to another map{/t}</span>
 			</p>
+		{/if}
+		<!-- /added ui dialog 2012.05.30 -->
 		</td>
 		<td style="padding-left:4px;">
 			<span id="mapTaxonName">{$taxon.taxon}</span><br />

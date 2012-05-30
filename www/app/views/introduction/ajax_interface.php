@@ -4,4 +4,6 @@ require_once ('../../../../configuration/app/controllers/IntroductionController.
 
 $c = new IntroductionController();
 
+$c->setStoreHistory(false);
+
 $c->ajaxInterfaceAction();
