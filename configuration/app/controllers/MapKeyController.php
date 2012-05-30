@@ -424,27 +424,49 @@ class MapKeyController extends Controller
 			$mapId = $d['id'];
 			
 		}
+		
+		$didSearch = false;
 
 		if ($this->rHasVal('action','research') && isset($_SESSION['app']['user']['map']['search'])) {
 
 			$taxa = $_SESSION['app']['user']['map']['search']['taxa'];
 			$selectedCells = $_SESSION['app']['user']['map']['search']['selectedCells'];
+			$selectedDataTypes = $_SESSION['app']['user']['map']['search']['selectedDataTypes'];
 			$mapId = $_SESSION['app']['user']['map']['search']['mapId'];
-		
-		
+			$didSearch = true;
+	
 		} else
 		if ($this->rHasVal('selectedCells') && $this->rHasVal('mapId')) {
 
-			$taxa = $this->l2DoSearchMap($this->requestData['mapId'],$this->requestData['selectedCells']);
+			$taxa = $this->l2DoSearchMap(
+				$this->requestData['mapId'],
+				$this->requestData['selectedCells'],
+				$this->rHasVal('dataTypes') ? $this->requestData['dataTypes'] : null
+			);
 
 			foreach((array)$this->requestData['selectedCells'] as $val)
 				$selectedCells[$val] = true;
+				
+				
+			if ($this->rHasVal('dataTypes')) {
+		
+				foreach((array)$this->requestData['dataTypes'] as $val)
+					$selectedDataTypes[$val] = true;
+					
+			} else {
+			
+				$selectedDataTypes = null;
+			
+			}
 		
 			$_SESSION['app']['user']['map']['search'] = array(
 				'mapId' => $mapId, 
 				'selectedCells' => $selectedCells, 
+				'selectedDataTypes' => $selectedDataTypes, 
 				'taxa' => $taxa
 				);
+
+			$didSearch = true;
 
 		} else {
 
@@ -452,9 +474,16 @@ class MapKeyController extends Controller
 
 		}
 
+
 		if (isset($selectedCells)) $this->smarty->assign('selectedCells',$selectedCells);
 
+		if (isset($selectedDataTypes)) $this->smarty->assign('selectedDataTypes',$selectedDataTypes);
+
 		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		$this->smarty->assign('didSearch',$didSearch);
+
+		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
 
 		$this->smarty->assign('mapId',$mapId);
 
@@ -533,7 +562,7 @@ class MapKeyController extends Controller
 	
 			if ($this->rHasVal('selectedCell')) {
 			
-				$taxa = $this->l2DoSearchMap($this->requestData['m'],(array)$this->requestData['selectedCell']);
+				$taxa = $this->l2DoSearchMap($this->requestData['m'],(array)$this->requestData['selectedCell'],'*');
 			
 				$selectedCell = $this->requestData['selectedCell'];
 	
@@ -1314,33 +1343,37 @@ class MapKeyController extends Controller
 
 	}
 
-	private function l2DoSearchMap($mapId,$selectedCells)
+	private function l2DoSearchMap($mapId,$selectedCells,$dataTypes)
 	{
 	
-		if (!isset($mapId) || !isset($selectedCells)) return;
+		if (!isset($mapId) || !isset($selectedCells)|| !isset($dataTypes)) return;
+		
+		$d =  array(
+				'project_id' => $this->getCurrentProjectId(),
+				'map_id' => $mapId,
+				'square_number in' => '('.implode(',',$selectedCells).')'
+			);
+			
+		if ($dataTypes!='*') $d['type_id in'] = '('.implode(',',$dataTypes).')';
 		
 		$ot = $this->models->L2OccurrenceTaxon->_get(
 			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'map_id' => $mapId,
-					'square_number in' => '('.implode(',',$selectedCells).')'
-				),
+				'id' => $d,
 				'columns' => 'distinct taxon_id'
 				
 			)
 		);
 		
-		foreach((array)$ot as $val) $d[] = $this->getTaxonById($val['taxon_id']);
+		foreach((array)$ot as $val) $p[] = $this->getTaxonById($val['taxon_id']);
 
-		$this->customSortArray($d,array(
+		$this->customSortArray($p,array(
 			'key' => 'taxon', 
 			'dir' => 'asc', 
 			'case' => 'i'
 			)
 		);
 
-		return $d;
+		return $p;
 
 	}
 

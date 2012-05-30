@@ -5,7 +5,7 @@
 <div id="page-main">
 
 {if $map.mapExists}
-	<div>{$map.name} (<span id=coordinates>0,0</span>)</div>
+	<div>{$map.name} (<span id=coordinates>0,0</span>) <span id=species-number></span></div>
 {else}
 	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {/if}
@@ -22,7 +22,10 @@
 					<td 
 						id="cell-{$cellNo}"
 						class="mapCell {if $index.index[$cellNo]}mapCellDiversity mapCellDiversity{$index.index[$cellNo].class}{/if}{if $cellNo==$selectedCell} mapCellSelected{/if}"
-						{if $index.index[$cellNo]}onclick="l2DiversityCellClick(this)"{/if}></td>
+						onmouseover="l2DiversityCellMouseOver({$index.index[$cellNo].total})"
+						{if $index.index[$cellNo]}
+							onclick="l2DiversityCellClick(this)"
+						{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>
