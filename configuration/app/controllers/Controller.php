@@ -33,7 +33,6 @@ class Controller extends BaseClass
     public $errors;
     public $messages;
     public $randomValue;
-	public $excludeFromReferer = false;
 	public $noResubmitvalReset = false;
 	public $showBackToSearch = true;
 	public $storeHistory = true;
@@ -2178,5 +2177,12 @@ class Controller extends BaseClass
 	
 	}	
 	
+	public function setStoreHistory($state)
+	{
+	
+		$this->storeHistory = $state;
+	
+	}
+
 	
 }
