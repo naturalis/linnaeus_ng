@@ -4,4 +4,6 @@ require_once ('../../../../configuration/app/controllers/LiteratureController.ph
 
 $c = new LiteratureController();
 
+$c->setStoreHistory(false);
+
 $c->ajaxInterfaceAction();

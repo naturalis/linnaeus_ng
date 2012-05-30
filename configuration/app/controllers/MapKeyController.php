@@ -39,7 +39,7 @@ class MapKeyController extends Controller
 				'dialog/jquery.modaldialog.js'
 			)
 		);
-		
+
 	private $_mapType = 'lng';
 
 
@@ -60,6 +60,8 @@ class MapKeyController extends Controller
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 		
 		$this->_mapType = $this->getDistributionMapType();
+		
+		$this->removeGoogleMapsJS();
 
     }
 
@@ -344,7 +346,7 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign('mapId',$mapId);
 
-		$this->smarty->assign('taxa',$this->l2GetTaxaWithOccurrences());
+		//$this->smarty->assign('taxa',$this->l2GetTaxaWithOccurrences());
 
 		$this->smarty->assign('maps',$maps);
 
@@ -957,6 +959,17 @@ class MapKeyController extends Controller
 		$search = isset($p['search']) ? $p['search'] : null;
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
+		$l2MustHaveGeo = false;
+
+		if (isset($p['vars'])) {
+
+			foreach((array)$p['vars'] as $val) {
+
+				if ($val[0]=='l2_must_have_geo' && $val[1]=='1') $l2MustHaveGeo = true;
+			
+			}
+		
+		}
 
 		$search = str_replace(array('/','\\'),'',$search);
 
@@ -971,8 +984,11 @@ class MapKeyController extends Controller
 
 		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
 
-		$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
-				
+		if ($l2MustHaveGeo)
+			$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
+		else				
+			$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
+
 		foreach((array)$taxa as $key => $val) {
 
 			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
@@ -1035,6 +1051,23 @@ class MapKeyController extends Controller
 	
 		return $this->l2CountMaps()!=0 ? 'l2' : 'lng';
 	
+	}
+
+	private function removeGoogleMapsJS()
+	{
+
+		if ($this->_mapType=='l2') {
+			
+			foreach((array)$this->jsToLoad['all'] as $val) {
+			
+				if (!preg_match('/(http:\/\/maps.google.com)/i',$val)) $d[] = $val;
+			
+			}
+			
+			$this->jsToLoad['all'] = $d;
+			
+		}
+		
 	}
 
 	private function l2CountMaps()
@@ -1363,6 +1396,5 @@ class MapKeyController extends Controller
 		return $_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx];
 
 	}
-
-
+	
 }

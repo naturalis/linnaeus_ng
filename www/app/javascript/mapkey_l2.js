@@ -141,3 +141,21 @@ function l2DiversityCellClick(ele) {
 	$('#theForm').submit();
 
 }
+
+function l2SetCompareSpecies(i,j) {
+
+	var label = $('[lookupId="'+j+'"]').html();
+
+	if (i==1) {
+		$('#idA').val(j);
+		$('#speciesNameA').html(label);
+	} else
+	if (i==2) {
+		$('#idB').val(j);
+		$('#speciesNameB').html(label);
+	}
+
+	$('#dialog-close').click();
+	
+
+}
