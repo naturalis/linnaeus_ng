@@ -19,10 +19,10 @@
 			{section name=rows start=1 loop=$map.rows+1 step=1}
 				<tr>
 				{section name=cols start=1 loop=$map.cols+1 step=1}
-					<td 
-						id="cell-{$cellNo}"
+					<td id="cell-{$cellNo}" class="mapCell"
+						{if $occurrences[$cellNo].square_number==$cellNo}
 						datatype="{$occurrences[$cellNo].type_id}" 
-						class="mapCell" {if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
+						style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>

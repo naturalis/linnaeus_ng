@@ -71,7 +71,7 @@
 			<br />	
 			<input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
 			<input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
-			<input id="map_compare_button" type="button" value="compare" onclick="l2DoMapCompare()" />
+			<input id="map_compare_button" type="button" value="{t}compare{/t}" onclick="l2DoMapCompare()" />
 			<br /><br />
 
 			<!-- /added ui dialog 2012.05.30 -->
