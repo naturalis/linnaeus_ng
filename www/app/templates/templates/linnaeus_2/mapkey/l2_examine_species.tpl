@@ -32,27 +32,13 @@
 					<td 
 						id="cell-{$cellNo}"
 						datatype="{$occurrences[$cellNo].type_id}" 
-						{if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
+						class="mapCell" {if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>
 			{/section}
 			</table>
 		{/if}
-<<<<<<< .mine
-
-{if $maps|@count>1}
-			<p onclick="
-showDialog(
-	_('Choose a map'),
-	{foreach item=v from=$maps}{if $v.id!=$mapId}'<a href="?id={$taxon.id}&m={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+{/foreach}' ',
-	{width:400}
-);">
-	Switch to another map:{/t}<br />{/if}
-</p>
-{/if}
-=======
->>>>>>> .r960
 		</td>
 		<td id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
