@@ -1,18 +1,29 @@
 {include file="../shared/header.tpl"}
+{assign var=currentPage value=$session.app.system.path.filename}
+<div id="header-titles"></div>
+{include file="_categories.tpl"}
+{include file="../shared/_search-main.tpl"}
+
 
 {assign var=map value=$maps[$mapId]}
 
 <div id="page-main">
 
-{if $map.mapExists}
-	<div>{$map.name} (<span id=coordinates>0,0</span>)</div>
+{if !$map.mapExists}
+    <div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {else}
-	<div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
-{/if}
 
-<table>
-	<tr style="vertical-align:top">
-		<td>
+<table id="mapGrid">
+    <tr id="topBar">
+    <td>
+        <span id="taxonName">{$taxon.taxon}</span> 
+        <span id="coordinates">0,0</span>
+    </td><td id="mapName">
+        {$map.name}
+    </td>
+    </tr>
+    <tr>
+    <td>    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -67,28 +78,7 @@
 	</tr>
 </table>
 </div>
-
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-{if $map.mapExists}
-l2SetMap(
-	'{$map.imageFullName|replace:' ':'%20'}',
-	{$map.size[0]},
-	{$map.size[1]},
-	'{$map.coordinates.original}',
-	{math equation="(floor( x / y ))-z" x=$map.size[0] y=$map.cols z=1},
-	{math equation="(floor( x / y ))-z" x=$map.size[1] y=$map.rows z=1}
-);
 {/if}
-{literal}
-$("#mapTable").mousemove(function(event) {
-	l2MapMouseOver(event.pageX,event.pageY);
-});	
 
-});
-</script>
-{/literal}
-
+{include file="_mapJquery.tpl"}
 {include file="../shared/footer.tpl"}
