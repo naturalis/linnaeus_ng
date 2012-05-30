@@ -1,6 +1,7 @@
 var l2MapCoordinates = '';
 var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
+var l2DataColours = Array();
 
 function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 
@@ -54,11 +55,17 @@ function l2MapMouseOver(x,y) {
 
 function l2ToggleDatatype(ele) {
 
-	if ($(ele).attr('checked'))
-		$('td[datatype='+$(ele).val()+']').css('visibility','visible');
-	else
-		$('td[datatype='+$(ele).val()+']').css('visibility','hidden');
+	if ($(ele).attr('checked')) {
+		
+		$('td[datatype='+$(ele).val()+']').css('background-color',l2DataColours[$(ele).val()]);
 
+	} else {
+
+		l2DataColours[$(ele).val()] = $('td[datatype='+$(ele).val()+']').css('background-color');
+
+		$('td[datatype='+$(ele).val()+']').css('background-color','transparent');
+
+	}
 }
 
 function l2DoMapCompare() {
