@@ -16,27 +16,6 @@
 <table id="mapGrid">
     <tr id="topBar">
     <td>
-<!--
-            <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <select name="idA" id="idA" class="taxon-select">   
-                <option value="" {if !$taxonA}selected="selected"{/if}>{t}Species A{/t}</option>
-                {foreach from=$taxa key=k item=v}
-                    <option value="{$v.id}" {if $taxonA.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-                {/foreach}
-            </select>
-            </span>
-          
-            <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <select name="idB" id="idB" class="taxon-select">   
-                <option value="" {if !$taxonB}selected="selected"{/if}>{t}Species B{/t}</option>
-                {foreach from=$taxa key=k item=v}
-                    <option value="{$v.id}" {if $taxonB.id==$v.id}selected="selected"{/if}>{$v.taxon}</option>
-                {/foreach}
-            </select>
-             
-            <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
-       -->
-       
             <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span id="speciesNameA" class="selectIcon" onclick="
                 allLookupSetExtraVars('l2_must_have_geo','1');
@@ -59,8 +38,7 @@
 
         {if $maps|@count>1}
             <span class="selectIcon" onclick="
-                showDialog(
-                    _('Choose a map'),
+                showDialog('{t}Choose a map{/t}',
                     {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
                     {/foreach}' '
                 );">{$map.name}</span>
@@ -85,9 +63,8 @@
 			</table>
 		{/if}
 		</td>
-		<td id="legend">
-			<p>
-			<span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Show overlap in:{/t}
+		<td id="legendCell">
+			<p class="legendLabel"><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Show overlap in:{/t}</p>
 			{foreach from=$geoDataTypes key=k item=v name=x}
 				<p class="mapPCheckbox">
 					<label>
