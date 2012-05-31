@@ -41,10 +41,21 @@ td.infoPanel {
 	margin-bottom: 2px;
     font-size: 10px;
 }
-
-#mapTable {
+.searchMap td {
+	cursor: pointer;
 }
 
+#mapTable td {
+    padding: 0 ;
+    margin: 0;
+    border-right: 1px dotted #777;
+    border-bottom: 1px dotted #777;
+    filter: alpha(opacity=70);
+    -moz-opacity: .70;
+    -khtml-opacity: 0.70;
+    opacity: .70;
+}
+/*
 .mapCell {
 	padding: 0 ;
 	margin: 0;
@@ -55,7 +66,7 @@ td.infoPanel {
 	-khtml-opacity: 0.70;
 	opacity: .70;
 }
-
+*/
 .mapCellAxis {
 	background-color: #fff;
 	border-right: 0;

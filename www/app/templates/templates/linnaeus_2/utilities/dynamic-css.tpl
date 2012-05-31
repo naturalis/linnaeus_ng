@@ -111,3 +111,22 @@
 {literal}
 }
 {/literal}
+
+{literal}
+.selectIcon {
+{/literal}
+    background: url('{$systemMedia}select.png') no-repeat right center;
+    padding-right: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+{literal}
+}
+{/literal}
+
+{literal}
+.selectIcon:hover {
+{/literal}
+    text-decoration: underline;
+{literal}
+}
+{/literal}

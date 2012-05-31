@@ -16,7 +16,7 @@
 <table id="mapGrid">
     <tr id="topBar">
     <td>
-         
+<!--
             <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <select name="idA" id="idA" class="taxon-select">   
                 <option value="" {if !$taxonA}selected="selected"{/if}>{t}Species A{/t}</option>
@@ -35,11 +35,38 @@
             </select>
              
             <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
-            
+       -->
+       
+            <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span id="speciesNameA" class="selectIcon" onclick="
+                allLookupSetExtraVars('l2_must_have_geo','1');
+                allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
+                allLookupShowDialog()
+            ">{if $taxonA}{$taxonA.taxon}{else}{t}Species A{/t}{/if}</span>
+             <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span id="speciesNameB" class="selectIcon" onclick="
+                allLookupSetExtraVars('l2_must_have_geo','1');
+                allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
+                allLookupShowDialog()
+            ">{if $taxonB}{$taxonB.taxon}{else}{t}Species B{/t}{/if}</span>
+            <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
+            <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
+            <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
+        
 
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
-        {$map.name}
+
+        {if $maps|@count>1}
+            <span class="selectIcon" onclick="
+                showDialog(
+                    _('Choose a map'),
+                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
+                    {/foreach}' '
+                );">{$map.name}</span>
+        {else}
+            {$map.name}
+        {/if}   
     </td>
     </tr>
     <tr>
@@ -76,12 +103,6 @@
 			{/foreach}
 			</p>
 
-            <p>
-            {if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-            {if $maps|@count>1}
-            {foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-            {/if}
-            </p>        
 		</td>
 	</tr>
 </table>
