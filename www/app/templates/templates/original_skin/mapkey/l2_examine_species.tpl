@@ -34,7 +34,7 @@
 			<p>
 				<span class="a" onclick="
 					showDialog(
-						_('Choose a map'),
+						'{t}Choose a map{/t}',
 						{foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
 						{/foreach}' '
 					);">{t}Switch to another map{/t}</span>

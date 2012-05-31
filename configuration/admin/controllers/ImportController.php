@@ -115,7 +115,6 @@ class ImportController extends Controller
 	
 	private $_knownModules = array('file','project','proj_literature','glossary','introduction','tree','records','text_key','pict_key','diversity');
 
-
     /**
      * Constructor, calls parent's constructor
      *
@@ -1508,7 +1507,7 @@ class ImportController extends Controller
 
 				$_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = $rankId;
 				
-				if ($parentRankParent!='none') {
+				if ($parentRankParent!='none' && $parentRankParent!='unknown') {
 
 					$r = $this->models->Rank->_get(
 						array(
@@ -2003,6 +2002,8 @@ class ImportController extends Controller
 			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 				
 			$fileName = trim((string)$taxon->multimedia->overview);
+			
+			$imageCount = 0;
 
 			if (!empty($fileName)) {
 
@@ -2010,7 +2011,8 @@ class ImportController extends Controller
 					$taxonId,
 					$fileName,
 					$fileName,
-					true
+					true,
+					$imageCount++
 				);
 	
 				if ($r['saved']==true) {
@@ -2037,7 +2039,9 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName)))
+					trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
+					false,
+					$imageCount++
 				);
 
 				if ($r['saved']==true) {
@@ -2059,7 +2063,7 @@ class ImportController extends Controller
 					
 	}
 
-	private function doAddSpeciesMedia($taxonId,$fileName,$caption,$isOverviewPicture=false)
+	private function doAddSpeciesMedia($taxonId,$fileName,$caption,$isOverviewPicture,$sortOrder)
 	{
 
 		if ($_SESSION['admin']['system']['import']['imagePath']==false)
@@ -2097,7 +2101,8 @@ class ImportController extends Controller
 						'original_name' => $fileName,
 						'mime_type' => $thisMIME,
 						'file_size' => filesize($_SESSION['admin']['system']['import']['imagePath'].$fileName),
-						'overview_image' => ($isOverviewPicture ? 1 : 0)
+						'overview_image' => ($isOverviewPicture ? 1 : 0),
+						'sort_order' => $sortOrder
 					)
 				);
 
