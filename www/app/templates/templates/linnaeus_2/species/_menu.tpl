@@ -1,11 +1,8 @@
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
-<!-- {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" /> -->
-
 <span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon" />
 {t}Contents{/t}</span>
-
 
 {if $useJavascriptLinks}
     <span
@@ -39,6 +36,11 @@
     {else}
         <span class="navigation-icon" id="next-icon-inactive">{t}Next{/t}</span>
     {/if}
+{/if}
+{if $backlink}
+    <a class="navigation-icon" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t}{$backlink.name}">{t}Back{/t}</a>
+{else}
+    <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 </div>
 </div>

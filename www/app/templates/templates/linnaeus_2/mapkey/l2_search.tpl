@@ -25,7 +25,7 @@
     </td>
     </tr>
     <tr>
-    <td id="gridMapCell searchMap">    
+    <td id="gridMapCell" class="searchMap">    
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -34,7 +34,7 @@
 				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td 
 						id="cell-{$cellNo}"
-						class="mapCell {if $selectedCells[$cellNo]==true}mapCellTagged{/if}"
+						{if $selectedCells[$cellNo]==true}mapCellTagged{/if}"
 						onclick="l2TagMapCell(this)">
 					</td>
 					{assign var=cellNo value=$cellNo+1}

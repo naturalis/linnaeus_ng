@@ -1,8 +1,6 @@
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
-{$backlink|@print_r}
-
 <span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon" />
 {t}Contents{/t}</span>
 
