@@ -21,13 +21,13 @@
                 allLookupSetExtraVars('l2_must_have_geo','1');
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
                 allLookupShowDialog()
-            ">{if $taxonA}{$taxonA.taxon}{else}{t}Species A{/t}{/if}</span>
+            ">{if $taxonA}{$taxonA.taxon}{else}{t}Taxon A{/t}{/if}</span>
              <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span id="speciesNameB" class="selectIcon" onclick="
                 allLookupSetExtraVars('l2_must_have_geo','1');
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
                 allLookupShowDialog()
-            ">{if $taxonB}{$taxonB.taxon}{else}{t}Species B{/t}{/if}</span>
+            ">{if $taxonB}{$taxonB.taxon}{else}{t}Taxon B{/t}{/if}</span>
             <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
             <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
             <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
@@ -64,7 +64,7 @@
 		{/if}
 		</td>
 		<td id="legendCell">
-			<p class="legendLabel"><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Show overlap in:{/t}</p>
+		    <div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
 				<p class="mapPCheckbox">
 					<label>
@@ -78,8 +78,8 @@
 					</label>
 				</p>
 			{/foreach}
-			</p>
-
+            </div>
+            <p><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}</p>
 		</td>
 	</tr>
 </table>

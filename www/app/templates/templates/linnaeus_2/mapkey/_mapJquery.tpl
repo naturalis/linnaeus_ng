@@ -22,6 +22,15 @@ showDialog(
 );
 {/if}
 
+{if $taxa}
+showDialog(
+    _('Taxa in that cell'),
+    '<p style="height:250px;overflow-y:scroll">'+
+    {foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon|escape:'htmlall'}</a><br />'+
+    {/foreach}'</p>'
+);
+{/if}
+
 {literal}
 $("#mapTable").mousemove(function(event) {
     l2MapMouseOver(event.pageX,event.pageY);

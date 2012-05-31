@@ -16,8 +16,8 @@
 <table id="mapGrid">
     <tr id="topBar">
     <td>
-            <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />
-            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />&nbsp;
+            <input type="button" value="{t}Search{/t} &gt;&gt" onclick="l2DoSearchMap()" />&nbsp;
+            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
             <input type="hidden" name="mapId" value="{$mapId}" />
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
@@ -43,7 +43,7 @@
 				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td 
 						id="cell-{$cellNo}"
-						{if $selectedCells[$cellNo]==true}mapCellTagged{/if}"
+						{if $selectedCells[$cellNo]==true}class="mapCellTagged"{/if}
 						onclick="l2TagMapCell(this)">
 					</td>
 					{assign var=cellNo value=$cellNo+1}
@@ -52,25 +52,22 @@
 			{/section}
 			</table>
 			{/if}
-			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?mapId={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-			{/if}
-			</p>	
 		</td>
 		<td id="legendCell">
-			<p>{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
-			<p>{t}When finished, click 'Search'.{/t}</p>
-			{if $taxa}
-			<br /><br />
-			{t}Found taxa:{/t}
-			<p id="mapTaxaBox">
-			{foreach from=$taxa item=v}
-			<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon}</a><br />
-			{/foreach}
-			</p>
-			{/if}
+		<div id="legend">
+            {foreach from=$geoDataTypes key=k item=v name=x}
+            <p class="mapPCheckbox">
+                <label>
+                    <input type="checkbox" 
+                        name="dataTypes[]" 
+                        {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
+                    {$v.title}
+                </label>
+            </p>
+            {/foreach}
+		</div>
+            <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
+            <p>{t}When finished, click 'Search'.{/t}</p>
 		</td>
 	</tr>
 </table>
