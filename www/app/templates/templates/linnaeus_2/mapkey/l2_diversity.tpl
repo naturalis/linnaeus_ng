@@ -19,7 +19,15 @@
         <span id="taxonName">{$taxon.taxon}</span> 
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
-        {$map.name}
+        {if $maps|@count>1}
+            <span class="selectIcon" onclick="
+                showDialog('{t}Choose a map{/t}',
+                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+
+                    {/foreach}' '
+                );">{$map.name}</span>
+        {else}
+            {$map.name}
+        {/if}   
     </td>
     </tr>
     <tr>
@@ -40,16 +48,11 @@
 			{/section}
 			</table>
 			{/if}
-			<p>
-			{if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-			{if $maps|@count>1}
-			{foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-			{/if}
-			</p>
 		</td>
-		<td id="legend">
+		<td id="legendCell">
+		<div id="legend">
 		{foreach from=$geoDataTypes key=k item=v name=x}
-			<p>
+			<p class="mapCheckbox">
 				<label>
 					<input 
 						type="checkbox" 
@@ -57,23 +60,12 @@
 						{if $selectedDatatypes[$v.id] || !$selectedDatatypes}checked="checked"{/if}
 						value="{$v.id}" 
 						onchange="$('#theForm').submit();"/>
-					<!-- span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-					&nbsp; -->{$v.title}
+					{$v.title}
 				</label>
 			</p>
 		{/foreach}
 		<input type="hidden" name="m" value="{$mapId}" />
-	
-		{if $taxa}
-		<br /><br />
-		{t}Taxa in that cell:{/t}
-		<p style="height:200px;overflow-y:scroll">
-		{foreach from=$taxa item=v}
-		<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon}</a><br />
-		{/foreach}
-		</p>
-		{/if}
-		
+		</div>
 		</td>
 	</tr>
 </table>

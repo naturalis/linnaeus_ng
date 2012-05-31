@@ -49,6 +49,7 @@
 		{/if}
 		</td>
 		<td id="legendCell">
+		<div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
 			<p class="mapCheckbox">
 				<label>
@@ -57,6 +58,7 @@
 				</label>
 			</p>
 			{/foreach}
+		</div>
 		</td>
 	</tr>
 </table>

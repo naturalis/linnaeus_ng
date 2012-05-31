@@ -16,7 +16,7 @@
 }
 
 #topBar td {
-    padding-bottom: 8px;
+    height: 30px;
 }
 
 #coordinates {
@@ -41,6 +41,14 @@
     padding-top: 20px;
 }
 
+#legend {
+	padding: 5px;
+	width: 250px;
+	background-color: #f6f6f6;
+    border: 1px solid #b8b8b8;
+    margin-bottom: 20px;
+}
+
 .searchMap td {
 	cursor: pointer;
 }
@@ -55,18 +63,7 @@
     -khtml-opacity: 0.70;
     opacity: .70;
 }
-/*
-.mapCell {
-	padding: 0 ;
-	margin: 0;
-	border-right: 1px dotted #777;
-	border-bottom: 1px dotted #777;
-	filter: alpha(opacity=70);
-	-moz-opacity: .70;
-	-khtml-opacity: 0.70;
-	opacity: .70;
-}
-*/
+
 .mapCellAxis {
 	background-color: #fff;
 	border-right: 0;
@@ -88,7 +85,7 @@
 }
 
 .mapPCheckbox, .mapCheckbox {
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     font-size: 10px;
 }
 
@@ -168,7 +165,7 @@
 	-moz-opacity: .60;
 	-khtml-opacity: 0.60;
 	opacity: .60;
-	background-color:black;
+	background-color: #33ff33;
 }
 #mapTaxaBox{
 	height:300px;
