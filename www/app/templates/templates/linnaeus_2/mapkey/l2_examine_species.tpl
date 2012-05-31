@@ -18,7 +18,15 @@
         <span id="taxonName">{$taxon.taxon}</span> 
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
-        {$map.name}
+        {if $maps|@count>1}
+            <span class="selectIcon" onclick="
+                showDialog('{t}Choose a map{/t}',
+                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
+                    {/foreach}' '
+                );">{$map.name}</span>
+        {else}
+            {$map.name}
+        {/if}   
 	</td>
 	</tr>
 	<tr>
@@ -40,22 +48,15 @@
 			</table>
 		{/if}
 		</td>
-		<td id="legend">
+		<td id="legendCell">
 			{foreach from=$geoDataTypes key=k item=v name=x}
-			<p>
+			<p class="mapCheckbox">
 				<label>
 					<input type="checkbox" checked="checked" value="{$v.id}" onchange="l2ToggleDatatype(this)"/>
 					<span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span>{$v.title}
 				</label>
 			</p>
 			{/foreach}
-			
-            <p>
-            {if $maps|@count>1}{t}Switch to another map:{/t}<br />{/if}
-            {if $maps|@count>1}
-            {foreach item=v from=$maps}{if $v.id!=$mapId}<a href="?id={$taxon.id}&m={$v.id}">{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />{/foreach}
-            {/if}
-            </p>
 		</td>
 	</tr>
 </table>

@@ -24,23 +24,23 @@
     padding-top: 3px;
 }
 
-td.infoPanel {
-	padding-left: 20px;
-}
-
 #taxonName, #mapName {
     color: #0303b2;
     font-size: 14px;
 }
 
-#mapName, #legend {
+#mapName, #legendCell {
 	padding-left: 20px;
 }
 
-#legend p {
-	margin-bottom: 2px;
-    font-size: 10px;
+.legendLabel {
+	margin-bottom: 12px;
 }
+
+#legendCell {
+    padding-top: 20px;
+}
+
 .searchMap td {
 	cursor: pointer;
 }
@@ -87,7 +87,9 @@ td.infoPanel {
 	margin-right: 3px;
 }
 
-.mapPCheckbox {
+.mapPCheckbox, .mapCheckbox {
+    margin-bottom: 4px;
+    font-size: 10px;
 }
 
 .mapCellA {
@@ -103,7 +105,7 @@ td.infoPanel {
 }
 
 .mapCellDiversity {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 .mapCellDiversity1 {

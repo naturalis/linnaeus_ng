@@ -21,7 +21,16 @@
             <input type="hidden" name="mapId" value="{$mapId}" />
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
-        {$map.name}
+
+        {if $maps|@count>1}
+            <span class="selectIcon" onclick="
+                showDialog('{t}Choose a map{/t}',
+                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?mapId={$v.id}>{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+
+                    {/foreach}' '
+                );">{$map.name}</span>
+        {else}
+            {$map.name}
+        {/if}   
     </td>
     </tr>
     <tr>
@@ -50,7 +59,7 @@
 			{/if}
 			</p>	
 		</td>
-		<td id="legend">
+		<td id="legendCell">
 			<p>{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
 			<p>{t}When finished, click 'Search'.{/t}</p>
 			{if $taxa}
