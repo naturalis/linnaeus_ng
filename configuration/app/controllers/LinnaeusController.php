@@ -313,7 +313,7 @@ class LinnaeusController extends Controller
 		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
 
 		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
-		$this->smarty->assign('showEntryProgramLink',true);
+		$this->smarty->assign('showEntryProgramLink',$this->generalSettings['showEntryProgramLink']);
 		$this->smarty->assign('projects',$projects);
 		$this->smarty->assign('excludeLogout',true);
 

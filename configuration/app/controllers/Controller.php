@@ -1840,17 +1840,33 @@ class Controller extends BaseClass
         
         $c = $this->getSortCaseSensitivity();
 
-        if (!isset($a[$f]) || !isset($b[$f]))
-            return;
-        
-        if ($c != 's') {
-            
-            $a[$f] = strtolower($a[$f]);
-            $b[$f] = strtolower($b[$f]);
-        
-        }
-        
-        return ($a[$f] > $b[$f] ? ($d == 'asc' ? 1 : -1) : ($a[$f] < $b[$f] ? ($d == 'asc' ? -1 : 1) : 0));
+		if (!is_array($f)) $f = array($f);
+		
+		$res = 0;
+		
+		$dir = !is_array($d) ? $d : null;
+
+		foreach($f as $key => $val) {
+		
+			if (!isset($a[$val]) || !isset($b[$val])) continue;
+
+			if (is_array($d) && isset($d[$key])) $dir = $d[$key];
+
+			if ($c != 's') {
+				
+				$a[$val] = strtolower($a[$val]);
+				$b[$val] = strtolower($b[$val]);
+			
+			}
+
+			$res = ($a[$val] > $b[$val] ? ($dir == 'asc' ? 1 : -1) : ($a[$val] < $b[$val] ? ($dir == 'asc' ? -1 : 1) : 0));
+
+
+			if ($res!=0) return $res;
+
+		}
+		
+		return $res;
     
     }
 

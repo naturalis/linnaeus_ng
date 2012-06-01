@@ -484,6 +484,7 @@ class SpeciesController extends Controller
 		$mt = $this->models->MediaTaxon->_get(
 			array(
 				'id' => $d,
+				'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image',
 				'order' => 'mime_type, file_name'
 			)
 		);
@@ -516,8 +517,8 @@ class SpeciesController extends Controller
 		}
 
 		$sortBy = array(
-			'key' => 'mime_show_order', 
-			'dir' => 'asc', 
+			'key' => array('overview_image','mime_show_order','sort_order'),
+			'dir' => 'asc',
 			'case' => 'i'
 		);
 

@@ -63,6 +63,7 @@ class configuration
 			),
 			'defaultController' => 'linnaeus',
 			'startUpUrl' => '/index.php',
+			'showEntryProgramLink' => true,
 			'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'urlUploadedProjectMedia' => '../../../admin/media/project/',
 			'lngFileRoot' => $this->_appFileRoot,
