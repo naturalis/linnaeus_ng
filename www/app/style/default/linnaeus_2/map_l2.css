@@ -29,6 +29,14 @@
     font-size: 14px;
 }
 
+a.selectIcon:link, a.selectIcon:visited {
+    text-decoration: none;
+}
+
+a.selectIcon:hover {
+    text-decoration: underline;
+}
+
 #mapName, #legendCell {
 	padding-left: 20px;
 }

@@ -89,13 +89,18 @@ body {
     padding: 15px 20px;
 }
 
-#search-main, #allNavigationPane {
+#search-main, #search-main-no-tabs, #allNavigationPane {
     text-align: right;
     background-color: #f6f6f6;
 }
 
 #search-main {
     border-top: 1px solid #b8b8b8;
+    font-size: 11px;
+    padding: 10px;
+}
+
+#search-main-no-tabs {
     font-size: 11px;
     padding: 10px;
 }

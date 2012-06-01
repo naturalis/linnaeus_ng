@@ -1,3 +1,5 @@
+{include file="../shared/_header-titles.tpl"}
+
 <div id="categories">
 <ul>
 	{foreach from=$categories key=k item=v}
