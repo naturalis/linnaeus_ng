@@ -1,4 +1,4 @@
-{include file="../shared/_search-main.tpl"}
+{include file="../shared/_search-main-no-tabs.tpl"}
 <div id="page-main">
 
 

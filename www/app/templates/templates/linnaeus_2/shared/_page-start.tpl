@@ -7,4 +7,3 @@
     {include file="../shared/_main-menu.tpl"}
 {/if}
 
-{include file="../shared/_header-titles.tpl"}

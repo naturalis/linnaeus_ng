@@ -15,7 +15,7 @@
 <table id="mapGrid">
 	<tr id="topBar">
 	<td>
-        <span id="taxonName">{$taxon.taxon}</span> 
+        <a id="taxonName" class="selectIcon" href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a> 
         <span id="coordinates">0,0</span>
     </td><td id="mapName">
         {if $maps|@count>1}
