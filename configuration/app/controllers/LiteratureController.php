@@ -421,7 +421,7 @@ class LiteratureController extends Controller
 				from %table%
 				where project_id = '.
 					$this->getCurrentProjectId().
-					(!$getAll ? ' and (author_first like ""'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
+					(!$getAll ? ' and (author_first like "'.$match.'" or author_second like "'.$match.'" or `year` like "'.$match.'")' : null ).'
 				order by _a1,_a2,`year`'
 			)
 		);

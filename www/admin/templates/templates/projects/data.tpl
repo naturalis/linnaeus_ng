@@ -23,6 +23,14 @@
 	</tr>
 	<tr>
 		<td>
+			{t}Project ID:{/t}
+		</td>
+		<td colspan="2">
+			{$data.id}
+		</td>
+	</tr>
+	<tr>
+		<td>
 			{t}Project title:{/t}
 		</td>
 		<td colspan="2">
