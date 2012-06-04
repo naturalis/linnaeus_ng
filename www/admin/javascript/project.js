@@ -70,7 +70,7 @@ function projectUpdateLanguageBlock() {
 	for (var i=0;i<selectedLanguages.length;i++) {
 
 		b = b+
-			'<tr>'+
+			'<tr class="tr-highlight" style="vertical-align:top">'+
 				'<td class="cell-language-name'+(selectedLanguages[i][4]!=1 ? '-unused' : '')+'">'+selectedLanguages[i][1]+'</td>'+
 				'<td style="padding-right:15px">['+
 					(selectedLanguages[i][3]==1 ? 
@@ -78,10 +78,14 @@ function projectUpdateLanguageBlock() {
 						'<span class="a" onclick="projectSaveLanguage(\'default\',[\''+selectedLanguages[i][0]+'\'])">'+_('make default')+'</span>' )+
 			']</td>'+
 			'<td style="padding-right:15px">'+
-				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]==0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'untranslated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('needs to be translated')+'</label>'+
+				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]==0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'untranslated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('to be translated')+'</label><br />'+
 				'<label><input name="translate-'+selectedLanguages[i][0]+'" type="radio" '+(selectedLanguages[i][5]!=0 ? 'checked="checked"' : '')+' onclick="projectSaveLanguage(\'translated\',[\''+selectedLanguages[i][0]+'\'])" />'+_('translated')+'</label>' +
 			'</td>'+
 			'<td style="padding-right:15px">'+
+				(selectedLanguages[i][4]==1 ?
+					_('published') :
+					_('unpublished')
+				)+'&nbsp;'+
 				'[<span class="a" onclick="projectSaveLanguage('+
 				(selectedLanguages[i][4]==1 ?
 					'\'deactivate\',[\''+selectedLanguages[i][0]+'\'])">'+_('unpublish') :
