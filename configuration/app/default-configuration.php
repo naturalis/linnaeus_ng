@@ -90,7 +90,8 @@ class configuration
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
 			),
-			'useJavascriptLinks' => false
+			'useJavascriptLinks' => false,
+			'useGlossaryPostIts' => false
         );
     
     }
