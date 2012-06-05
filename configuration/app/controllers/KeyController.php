@@ -53,10 +53,10 @@ class KeyController extends Controller
 
         $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
 		
+		$this->smarty->assign('keyType',$this->getSetting('keytype'));
+		
 		//$this->setStoredChoiceList();
-
-
-//unset($_SESSION['app']['user']['key']['path']);
+		//unset($_SESSION['app']['user']['key']['path']);
 
     }
 

@@ -58,6 +58,8 @@ class MapKeyController extends Controller
         
         parent::__construct();
 
+		$this->checkSettings();
+
 		$this->smarty->assign('L2Maps',$this->l2GetMaps());
 
     }
@@ -668,6 +670,38 @@ class MapKeyController extends Controller
 		$this->smarty->assign('taxa',$taxa);
 		
 		$this->smarty->assign('occurringTaxa',$this->getOccurringTaxonList());
+
+		$this->printPage();
+		
+    }
+
+    public function managementAction()
+    {
+
+        $this->checkAuthorisation();
+
+		$this->setPageName(_('Management'));
+
+		$this->printPage();
+		
+    }
+
+    public function typeAction()
+    {
+
+        $this->checkAuthorisation();
+		
+        if ($this->rHasVal('maptype') && !$this->isFormResubmit()) {
+		
+			$this->saveSetting('maptype',$this->requestData['maptype']);
+			
+			$this->addMessage('Saved');
+		
+		}
+		
+		$this->smarty->assign('maptype',$this->getSetting('maptype'));
+
+		$this->setPageName(_('Set runtime map type'));
 
 		$this->printPage();
 		
@@ -1671,6 +1705,12 @@ class MapKeyController extends Controller
 		return $t['id'];
 
 	}
-	
+
+	private function checkSettings()
+	{
+
+		if ($this->getSetting('maptype')==null) $this->saveSetting('maptype','lng');
+
+	}	
 	
 }

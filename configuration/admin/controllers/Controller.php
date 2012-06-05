@@ -45,6 +45,7 @@ class Controller extends BaseClass
 	public $printBreadcrumbs = true;
 
     private $usedModelsBase = array(
+        'settings', 
         'user', 
         'project', 
 		'role',
@@ -1960,6 +1961,73 @@ class Controller extends BaseClass
 	{
 
 		return $this->_breadcrumbRootName;
+	
+	}
+
+	public function getSetting($name)
+	{
+	
+		$s = $this->models->Settings->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'setting' => $name
+				),
+				'columns' => 'value'
+			)
+		);
+		
+		if (isset($s[0]))
+			return $s[0]['value'];
+		else
+			return null;
+	
+	}
+
+	public function saveSetting($name,$value=null,$delete=false)
+	{
+	
+		if ($delete) {
+
+			$this->models->Settings->delete(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'setting' => $name
+				)
+			);
+		
+		} else {	
+		
+			$d = $this->getSetting($name);
+			
+			if ($d['value']==$value) return;
+			
+			if ($d==null) {
+	
+				$s = $this->models->Settings->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(),
+						'setting' => $name,
+						'value' => $value
+					)
+				);
+				
+			} else {
+			
+				$s = $this->models->Settings->update(
+					array(
+						'value' => is_null($value) ? 'null' : $value
+					),
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'setting' => $name,
+					)
+				);
+			
+			}
+
+		}
 	
 	}
 
