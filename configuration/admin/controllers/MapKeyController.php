@@ -692,9 +692,14 @@ class MapKeyController extends Controller
         $this->checkAuthorisation();
 		
         if ($this->rHasVal('maptype') && !$this->isFormResubmit()) {
-		
-			$this->saveSetting('maptype',$this->requestData['maptype']);
-			
+
+			$this->saveSetting(
+				array(
+					'name' => 'maptype',
+					'value' => $this->requestData['maptype']
+				)
+			);	
+					
 			$this->addMessage('Saved');
 		
 		}
@@ -1709,7 +1714,16 @@ class MapKeyController extends Controller
 	private function checkSettings()
 	{
 
-		if ($this->getSetting('maptype')==null) $this->saveSetting('maptype','lng');
+		if ($this->getSetting('maptype')==null) {
+
+			$this->saveSetting(
+				array(
+					'name' => 'maptype',
+					'value' => 'lng'
+				)
+			);		
+		
+		}
 
 	}	
 	

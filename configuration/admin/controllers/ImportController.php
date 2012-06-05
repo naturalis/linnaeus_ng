@@ -839,7 +839,13 @@ class ImportController extends Controller
 
 					$this->addModuleToProject(6);
 					$this->grantModuleAccessRights(6);
-					$this->saveSetting('keytype','l2');
+					$this->saveSetting(
+						array(
+							'name' => 'keytype',
+							'value' => 'l2',
+							'pId' => $this->getNewProjectId()
+						)
+					);
 	
 					$this->addMessage('Created dichotomous key.');
 					
@@ -951,7 +957,13 @@ class ImportController extends Controller
 
 				$this->addModuleToProject(8);
 				$this->grantModuleAccessRights(8);				
-				$this->saveSetting('maptype','l2');
+				$this->saveSetting(
+						array(
+							'name' => 'maptype',
+							'value' => 'l2',
+							'pId' => $this->getNewProjectId()
+						)
+					);
 
 				$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['map']['saved'].' map items.');
 
