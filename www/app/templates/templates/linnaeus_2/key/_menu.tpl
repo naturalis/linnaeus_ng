@@ -2,23 +2,20 @@
 <div class="navigation-icon-wrapper">
 
 {assign var='totalSteps' value=$keypath|@count}
-
-{$keypath[$keypath|@count-2].id}
-
-
-
+{assign var='previousStep' value=$totalSteps-2}
 
 {if $useJavascriptLinks}
     <span
     {if $totalSteps > 1}
-        "onclick="keyDoStep($keypath[0].id)" id="first-icon" title="{t}Return to first step{/t}"
+        "onclick="keyDoStep($keypath.0.id)" id="first-icon" title="{t}Return to first step{/t}"
     {else}
         id="first-icon-inactive"
     {/if} 
     class="navigation-icon" />{t}First{/t}</span>
     <span
     {if $totalSteps > 1}
-        onclick="keyDoStep({$v.id}) id="previous-icon" title="{t}Return to step{/t} "
+        onclick="keyDoStep($keypath.$previousStep.id) id="previous-icon" 
+        title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}"
     {else}
         id="previous-icon-inactive"
     {/if} 
@@ -26,7 +23,9 @@
 {else}
     {if $totalSteps > 1}
         <a class="navigation-icon" id="first-icon" href="../key/" title="{t}Return to first step{/t}">{t}First{/t}</a>
-        <a class="navigation-icon" id="previous-icon" href="../key/index.php?choice={$totalSteps-2}" title="{t}Return to step{/t} ">{t}Previous{/t}</a>
+        <a class="navigation-icon" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
+        title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
+        {t}Previous{/t}</a>
     {else}
         <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
         <span class="navigation-icon" id="previous-icon-inactive">{t}Previous{/t}</span>
