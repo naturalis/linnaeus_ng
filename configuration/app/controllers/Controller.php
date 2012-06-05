@@ -553,7 +553,7 @@ class Controller extends BaseClass
 	public function matchGlossaryTerms($text,$forceLookup=false)
 	{
 
-		if (empty($text) || !is_string($text)) return $text;
+		if ($this->generalSettings['useGlossaryPostIts']===false || empty($text) || !is_string($text)) return $text;
 
 		$wordlist = $this->getWordList($forceLookup);
 
