@@ -63,6 +63,8 @@ class MapKeyController extends Controller
 		
 		$this->removeGoogleMapsJS();
 
+		$this->smarty->assign('mapType',$this->getSetting('maptype'));
+
     }
 
     /**

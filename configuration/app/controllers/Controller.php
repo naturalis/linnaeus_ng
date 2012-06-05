@@ -42,6 +42,7 @@ class Controller extends BaseClass
 	public $allowEditPageOverlay = true;
 
     private $usedModelsBase = array(
+        'settings', 
         'project', 
         'language_project', 
 		'module',
@@ -1029,6 +1030,26 @@ class Controller extends BaseClass
 	
 	}
 
+	public function getSetting($name)
+	{
+	
+		$s = $this->models->Settings->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'setting' => $name
+				),
+				'columns' => 'value'
+			)
+		);
+		
+		if (isset($s[0]))
+			return $s[0]['value'];
+		else
+			return null;
+	
+	}
+	
 	private function setCheckForProjectId($state)
 	{
 	

@@ -4,9 +4,10 @@
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
 <a href="choose_species.php" class="allLookupLink">{t}Species list{/t}</a>
-<a href="data_types.php" class="allLookupLink">{t}Data types{/t}</a>
+&nbsp;
+<a href="management.php" class="allLookupLink">{t}Management{/t}</a>
 {if $L2Maps|@count>0}
-<a href="l2_species_show.php?id={$taxon.id}" class="allLookupLink">{t}Linnaeus 2 maps{/t}</a>
+&nbsp;<a href="l2_species_show.php?id={$taxon.id}" class="allLookupLink">{t}Linnaeus 2 maps{/t}</a>
 {/if}
 &nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>

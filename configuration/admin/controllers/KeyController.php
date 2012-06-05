@@ -43,6 +43,8 @@ class KeyController extends Controller
     {
         
         parent::__construct();
+		
+		$this->checkSettings();
 
     }
 
@@ -839,6 +841,27 @@ class KeyController extends Controller
 
 	}
 
+    public function typeAction()
+    {
+
+        $this->checkAuthorisation();
+		
+        if ($this->rHasVal('keytype') && !$this->isFormResubmit()) {
+		
+			$this->saveSetting('keytype',$this->requestData['keytype']);
+			
+			$this->addMessage('Saved');
+		
+		}
+		
+		$this->smarty->assign('keytype',$this->getSetting('keytype'));
+
+		$this->setPageName(_('Set runtime key type'));
+
+		$this->printPage();
+		
+    }
+	
     public function ajaxInterfaceAction ()
     {
 
@@ -2369,6 +2392,13 @@ class KeyController extends Controller
 		
 		}
 	
+	}
+	
+	private function checkSettings()
+	{
+
+		if ($this->getSetting('keytype')==null) $this->saveSetting('keytype','lng');
+
 	}
 
 }
