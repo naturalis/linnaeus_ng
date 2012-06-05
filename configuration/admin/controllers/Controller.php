@@ -1984,14 +1984,21 @@ class Controller extends BaseClass
 	
 	}
 
-	public function saveSetting($name,$value=null,$delete=false)
+	public function saveSetting($p)
 	{
+	
+		if (!isset($p['name'])) return;
+	
+		$name = $p['name'];
+		$value = isset($p['value']) ? $p['value'] : null;
+		$delete = isset($p['delete']) ? $p['delete'] : false;
+		$pId = isset($p['pId']) ? $p['pId'] : $this->getCurrentProjectId();
 	
 		if ($delete) {
 
 			$this->models->Settings->delete(
 				array(
-					'project_id' => $this->getCurrentProjectId(),
+					'project_id' => $pId,
 					'setting' => $name
 				)
 			);
@@ -2007,7 +2014,7 @@ class Controller extends BaseClass
 				$s = $this->models->Settings->save(
 					array(
 						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(),
+						'project_id' => $pId,
 						'setting' => $name,
 						'value' => $value
 					)
@@ -2020,7 +2027,7 @@ class Controller extends BaseClass
 						'value' => is_null($value) ? 'null' : $value
 					),
 					array(
-						'project_id' => $this->getCurrentProjectId(),
+						'project_id' => $pId,
 						'setting' => $name,
 					)
 				);

@@ -847,8 +847,13 @@ class KeyController extends Controller
         $this->checkAuthorisation();
 		
         if ($this->rHasVal('keytype') && !$this->isFormResubmit()) {
-		
-			$this->saveSetting('keytype',$this->requestData['keytype']);
+
+			$this->saveSetting(
+				array(
+					'name' => 'keytype',
+					'value' => $this->requestData['keytype']
+				)
+			);		
 			
 			$this->addMessage('Saved');
 		
@@ -2397,7 +2402,16 @@ class KeyController extends Controller
 	private function checkSettings()
 	{
 
-		if ($this->getSetting('keytype')==null) $this->saveSetting('keytype','lng');
+		if ($this->getSetting('keytype')==null) {
+
+			$this->saveSetting(
+				array(
+					'name' => 'keytype',
+					'value' => 'lng'
+				)
+			);		
+		
+		}
 
 	}
 
