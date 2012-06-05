@@ -132,7 +132,7 @@ class KeyController extends Controller
 
 		}
 
-		$taxa = $this->getTaxonDivision(true);
+		$taxa = $this->getTaxonDivision();
 
 		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
 		
@@ -411,14 +411,24 @@ class KeyController extends Controller
 							$d[$stepId][$val['taxon_id']] = true;
 		
 							$list[$stepId][] = $taxa[$val['taxon_id']];
-		
+
 						}
 		
 					}
-		
+					
 				}
-	
+
 			}
+
+			// sort by taxon name
+			foreach((array)$list as $key => $val) {
+
+				$this->customSortArray($val,array('key' => 'taxon'));
+				$d[$key] = $val;
+
+			}
+			
+			$list = $d;
 
 			$_SESSION['app']['user']['key']['taxonDivision'] = array(
 				'list' => isset($list) ? $list : null,
