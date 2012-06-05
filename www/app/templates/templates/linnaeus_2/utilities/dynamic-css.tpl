@@ -113,6 +113,35 @@
 {/literal}
 
 {literal}
+#first-icon {
+{/literal}
+    width: 40px;
+    cursor: pointer; 
+    background: url('{$systemMedia}first.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#first-icon:active {
+{/literal}
+    background-position: 0 1px;
+{literal}
+}
+{/literal}
+
+{literal}
+#first-icon-inactive {
+{/literal}
+    width: 40px;
+    background: url('{$systemMedia}first.png') no-repeat;
+    opacity: 0.4;
+    filter: alpha(opacity=40); 
+{literal}
+}
+{/literal}
+
+{literal}
 .selectIcon {
 {/literal}
     background: url('{$systemMedia}select.png') no-repeat right center;

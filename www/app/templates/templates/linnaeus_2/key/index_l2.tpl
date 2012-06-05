@@ -10,12 +10,13 @@
 				<span id="step-title">{$step.title}</span>
 			</div>
 		{if $step.image}
-			<div>
+			<div id="step-image">
 				<img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
 			</div>
 		{/if}
 			<div id="content">{$step.content}</div>
 		</div>
+		
 		<div id="choices">		
 {foreach from=$choices key=k item=v}
 	{if $v.choice_img}
@@ -51,7 +52,9 @@
 			</a>
 		{/if}
 			<br />
-			<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
+			
+			
+		<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
 		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;text-align:left">
 			<span class="marker">{$v.marker}</span>.
 			<span class="text">{$v.choice_txt|nl2br}</span>
@@ -78,6 +81,7 @@
 			</span>
 
 		</div>
+		
 	{/if}
 {/foreach}
 		</div>

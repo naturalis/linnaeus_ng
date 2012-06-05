@@ -9,6 +9,7 @@
 	{if $v.is_start==1 && $keypath|@count>$keyPathMaxItems}<span class="arrow">&rarr;</span><span class="abbreviation">[...]</span>{/if}
 	{/foreach}
 	</div>
+	
 	<div id="path-full" class="full-invisible">
 	<table>
 	{foreach from=$keypath key=k item=v}

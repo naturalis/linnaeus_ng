@@ -7,6 +7,12 @@
 	height: 100%;
 }
 
+#step-image {
+	float: right;
+    padding: 2px 20px 0 0;
+}
+
+
 
 /* path */
 #path {
@@ -163,7 +169,7 @@
 /* remaining taxa */
 #taxa {
 	width:250px;
-    max-height: 400px;
+    height: 400px;
 	border:1px dotted #666;
 	overflow:hidden;
     background-color: pink;

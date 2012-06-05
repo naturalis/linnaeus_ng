@@ -1,20 +1,26 @@
 {include file="../shared/header.tpl"}
 {include file="_path.tpl"}
 {include file="_taxa.tpl"}
+
+{assign var="keyType" value="l2"}
+
 	
 <div id="page-main">
 	<div id="step">
 		<div id="question">
+		{if $keyType=="lng"}
 			<div id="head">
 				<span id="step-nr">{$step.number}</span>.
 				<span id="step-title">{$step.title}</span>
 			</div>
-		{if $step.image}
-			<div>
-				<img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
-			</div>
-		{/if}
-			<div id="content">{$step.content}</div>
+            <div id="content">{$step.content}</div>
+	    {else}
+            {if $step.image}
+                <div id="step-image">
+                    <img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
+                </div>
+            {/if}
+	    {/if}
 		</div>
 		<div id="choices">
 
