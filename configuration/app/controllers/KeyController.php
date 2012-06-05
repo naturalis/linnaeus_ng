@@ -22,7 +22,8 @@ class KeyController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'key.css',
-		'colorbox/colorbox.css'
+		'colorbox/colorbox.css',
+		'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
 
 	public $jsToLoad =
@@ -30,7 +31,8 @@ class KeyController extends Controller
 			'all' => array(
 				'main.js',
 				'key.js',
-				'colorbox/jquery.colorbox.js'
+				'colorbox/jquery.colorbox.js',
+				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(
 			)
