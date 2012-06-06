@@ -84,7 +84,7 @@ class MapKeyController extends Controller
 
 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false));
 
 		if ($this->_mapType=='l2') {
 		
@@ -188,7 +188,7 @@ class MapKeyController extends Controller
 
 	public function l2ExamineSpeciesAction()
 	{
-	
+
 		if (!$this->rHasId()) $this->redirect('l2_examine.php');
 		
 		if (!$this->rHasVal('ref','search')) unset($_SESSION['app']['user']['map']['search']);
@@ -373,7 +373,7 @@ class MapKeyController extends Controller
 
 			if ($results['count']['total']>0) {
 
-				$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+				$this->getTaxonTree(array('includeOrphans' => false));
 		
 				$taxa = $this->getTreeList();				
 
@@ -749,21 +749,22 @@ class MapKeyController extends Controller
 				'columns' => 'id,colour'
 			)
 		);
+		
+		$gtl = $this->models->GeodataTypeTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId()
+				),
+				'columns' => 'title,type_id',
+				'fieldAsIndex' => 'type_id'
+			)
+		);		
 
 		foreach ((array)$gt as $key => $val) {
 
-			$gtl = $this->models->GeodataTypeTitle->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'type_id' => $val['id']
-					),
-					'columns' => 'title'
-				)
-			);
-			
-			$gt[$key]['title'] = isset($gtl[0]['title']) ? $gtl[0]['title'] : '-';
+			$g = $gtl[$val['id']];
+			$gt[$key]['title'] = isset($g[0]['title']) ? $g[0]['title'] : '-';
 			$gt[$key]['colour_inverse'] = $this->inverseColour($val['colour']);
 	
 		}
@@ -974,7 +975,7 @@ class MapKeyController extends Controller
 	private function getTaxaWithOccurrences()
 	{
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false));
 
 		$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
 		
@@ -1013,7 +1014,7 @@ class MapKeyController extends Controller
 
 		$l = array();
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false));
 
 		if ($l2MustHaveGeo)
 			$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
@@ -1076,7 +1077,6 @@ class MapKeyController extends Controller
 
 
 	// Linnaeus 2 map functions
-
 	private function getDistributionMapType()
 	{
 	
@@ -1121,12 +1121,12 @@ class MapKeyController extends Controller
 	private function l2GetTaxaWithOccurrences()
 	{
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false));
 
 		$taxa = $this->l2GetTaxaOccurrenceCount($this->getTreeList());
 		
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
-		
+
 		return $taxa;
 	
 	}
@@ -1300,13 +1300,13 @@ class MapKeyController extends Controller
 		);
 
 		$dataTypes = array();
+		$dt = $this->getGeodataTypes();
 
 		foreach((array)$ot as $key => $val) {
 		
 			$dataTypes[$val['type_id']] = $val['type_id'];
 		
-			$d = $this->getGeodataTypes($val['type_id']);
-
+			$d = $dt[$val['type_id']];
 			$ot[$key]['type_title'] = $d['title'];
 			$ot[$key]['colour'] = $d['colour'];
 

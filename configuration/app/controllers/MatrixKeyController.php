@@ -49,7 +49,7 @@ class MatrixKeyController extends Controller
     {
         
         parent::__construct();
-		
+
 		$this->checkForProjectId();
 
 		$this->setCssFiles();
