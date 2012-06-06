@@ -1,6 +1,10 @@
 <div id="path">
+    <div id="path-search-box">
+        {include file="../shared/_search-box.tpl"}
+    </div>
+
 	<div id="concise">
-	<span onclick="keyToggleFullPath()" id="toggle">{t}Path:{/t}</span>
+	<span onclick="keyToggleFullPath()" id="toggle" class="selectIcon">{t}Path{/t}</span>
 	{foreach from=$keypath key=k item=v}
 	{if $v.is_start==1 || $keypath|@count<=$keyPathMaxItems || ($keypath|@count>$keyPathMaxItems && $k>=$keypath|@count-2)}
 		{if $v.is_start!=1}<span class="arrow">&rarr;</span>{/if}

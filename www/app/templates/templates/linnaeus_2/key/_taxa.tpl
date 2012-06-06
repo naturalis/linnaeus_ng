@@ -1,19 +1,17 @@
-<div id="taxa" style="overflow-y:scroll;">
+<div id="taxa">
 {if $taxa|@count==1}{assign var=w value=taxon}{else}{assign var=w value=taxa}{/if}
-<span id="header">{t _s1=$taxa|@count _s2=$w}%s possible %s remaining:{/t}</span><br/>
+<p id="header">{t _s1=$taxa|@count _s2=$w}%s possible %s remaining:{/t}</p>
 {foreach from=$taxa key=k item=v}
 {if $useJavascriptLinks}
-<span class="a" style="padding-left:3px" onclick="goTaxon({$v.id})">
-	{$v.taxon}
-	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
-</span>
+    <p class="a" onclick="goTaxon({$v.id})">
+    	{$v.taxon}
+    	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
+    </p>
 {else}
-<a href="../species/taxon.php?id={$v.id}"  style="padding-left:3px">
-	{$v.taxon}
-	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
-</a>
-
+    <p><a href="../species/taxon.php?id={$v.id}" >
+    	{$v.taxon}
+    	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
+    </a></p>
 {/if}
-<br />
 {/foreach}
 </div>
