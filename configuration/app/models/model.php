@@ -437,6 +437,7 @@ abstract class Model extends BaseClass
 		$limit = isset($params['limit']) ? $params['limit'] : false;
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 		$where = isset($params['where']) ? $params['where'] : false;
 
         unset($this->data);
@@ -958,7 +959,7 @@ abstract class Model extends BaseClass
 
 	private function logQueryResult($set,$query,$type,$severity=1) {
 
-		//$this->log('DEBUG: '.$query,1);
+		$this->log('DEBUG: '.$query,1);
 
 		if (!$set) {
 

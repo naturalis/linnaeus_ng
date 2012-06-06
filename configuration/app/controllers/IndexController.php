@@ -192,7 +192,7 @@ class IndexController extends Controller
 
 		$this->showLowerTaxon = ($this->getTaxonType()=='lower');
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false));
 		
 		$names = $taxa = (array)$this->getTreeList();
 //q($taxa,1);

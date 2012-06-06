@@ -131,7 +131,10 @@ class Controller extends BaseClass
 	public function checkForProjectId ()
 	{
 
-		if ($this->rHasVal('p')) $this->resolveProjectId();
+		if ($this->rHasVal('p'))
+			$this->resolveProjectId();
+		else
+			return;
 	
 		$d = $this->getCurrentProjectId();
 		
@@ -1203,16 +1206,21 @@ class Controller extends BaseClass
 				'order' => 'module_id asc'
 			)
 		);
+		
+		$m = $this->models->Module->_get(array('id'=>'*','fieldAsIndex' => 'id'));
 
 		foreach ((array) $modules as $key => $val) {
-			
-			$mp = $this->models->Module->_get(array('id'=>$val['module_id']));
-			
-			$modules[$key]['type'] = 'regular';
-			$modules[$key]['icon'] = $mp['icon'];
-			$modules[$key]['module'] = $mp['module'];
-			$modules[$key]['controller'] = $mp['controller'];
-			$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
+
+			if (isset($m[$val['module_id']])) {
+
+				$mp = $m[$val['module_id']];				
+				$modules[$key]['type'] = 'regular';
+				$modules[$key]['icon'] = $mp['icon'];
+				$modules[$key]['module'] = $mp['module'];
+				$modules[$key]['controller'] = $mp['controller'];
+				$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
+
+			}
 
 		}
 
