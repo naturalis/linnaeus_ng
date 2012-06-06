@@ -5,16 +5,14 @@
 {assign var='previousStep' value=$totalSteps-2}
 
 {if $useJavascriptLinks}
-    <span
     {if $totalSteps > 1}
-        "onclick="keyDoStep($keypath.0.id)" id="first-icon" title="{t}Return to first step{/t}"
+        <a class="navigation-icon" id="first-icon" href="../key/" title="{t}Return to first step{/t}">{t}First{/t}</a>
     {else}
-        id="first-icon-inactive"
+        <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
     {/if} 
-    class="navigation-icon" />{t}First{/t}</span>
     <span
     {if $totalSteps > 1}
-        onclick="keyDoStep($keypath.$previousStep.id) id="previous-icon" 
+        onclick="keyDoStep({$keypath.$previousStep.id});" id="previous-icon" 
         title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}"
     {else}
         id="previous-icon-inactive"

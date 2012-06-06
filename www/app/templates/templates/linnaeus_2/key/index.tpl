@@ -1,11 +1,11 @@
 {include file="../shared/header.tpl"}
 {include file="_path.tpl"}
-{include file="_taxa.tpl"}
 
 {assign var="keyType" value="l2"}
 
 	
 <div id="page-main">
+    {include file="_taxa.tpl"}
 	<div id="step">
 		<div id="question">
 		{if $keyType=="lng"}
@@ -24,9 +24,22 @@
 		</div>
 		<div id="choices">
 
+{if $keyType=="l2" && $choices|@count > 2}
+    <table id="choice-grid"><tr><td>
+{/if}
 {foreach from=$choices key=k item=v}
-			<div class="choice">
-	{if $v.choice_img}
+    {if $keyType=="l2" && $k==2}
+        </td><td>
+    {/if}
+
+    <div class="choice" 
+        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+            onclick="keyDoChoice({$v.id})"
+        {elseif $v.res_taxon_id!=''}
+            onclick="goTaxon({$v.res_taxon_id})"
+        {/if}
+    >
+	           {if $v.choice_img}
 					<div class="choice-image-div">
 					{if $useJavascriptLinks}
 						<img
@@ -54,12 +67,11 @@
 						<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
 					</div>
 	{/if}
-					<span class="marker">{$v.marker}</span>.
-					<span class="text">{$v.choice_txt|nl2br}</span>
-					<br />
-					<span class="target">
+					{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
+					<div class="text">{$v.choice_txt|nl2br}</div>
 					
-					
+
+					<div class="target">
 					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 						<span class="arrow">&rarr;</span>
 						{if $useJavascriptLinks}
@@ -85,12 +97,21 @@
 					{/if}
 
 
-					</span>
+					</div>
 
 			</div>
 {/foreach}
+{if $keyType=="l2" && $choices|@count > 2}
+    </td></tr></table>
+{/if}
+		
+		
+		
 		</div>
 	</div>
+	
+	
+	
 </div>
 
 {include file="../shared/footer.tpl"}
