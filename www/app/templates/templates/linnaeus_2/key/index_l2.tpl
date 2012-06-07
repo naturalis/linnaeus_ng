@@ -1,8 +1,9 @@
-{* linnaeus 2 legacy key *}	
+{* linnaeus 2 Picture key; l2 Text key is handled in index.tpl! *}	
+
 {include file="../shared/header.tpl"}
 {include file="_path.tpl"}
-{include file="_taxa.tpl"}
 <div id="page-main">
+{include file="_taxa.tpl"}
 	<div id="step">
 		<div id="question">
 			<div id="head">
@@ -21,9 +22,9 @@
 {foreach from=$choices key=k item=v}
 	{if $v.choice_img}
 		{if $useJavascriptLinks}
-		<img
-			alt="{$v.choice_img}" 
+		<div
 			id="choice-img-{$v.id}"
+            src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
 			onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}"
 			style="
 				position:absolute;
@@ -31,6 +32,7 @@
 				top:{$v.choice_image_params.toppos}px;
 				width:{$v.choice_image_params.width}px;
 				height:{$v.choice_image_params.height}px;
+				background: url("{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}");
 			"/>
 		{else}
 			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}

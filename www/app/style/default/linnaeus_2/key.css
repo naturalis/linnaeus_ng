@@ -37,7 +37,9 @@
 }
 
 #path #concise {
-	margin: 0;
+	height: 20px;
+    display: table-cell; 
+    vertical-align: middle;
 }
 
 #path #concise #toggle {
@@ -55,12 +57,12 @@
 }
 
 #path .item {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 #path #concise .abbreviation {
 	color: #666;
-	margin: 0 2px 0 5px;
+    margin: 0 5px;
 }
 
 #path #concise .item:hover {

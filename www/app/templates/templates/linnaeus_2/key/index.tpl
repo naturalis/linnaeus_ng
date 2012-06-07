@@ -1,9 +1,6 @@
 {include file="../shared/header.tpl"}
 {include file="_path.tpl"}
 
-{assign var="keyType" value="l2"}
-
-	
 <div id="page-main">
     {include file="_taxa.tpl"}
 	<div id="step">
@@ -109,9 +106,6 @@
 		
 		</div>
 	</div>
-	
-	
-	
 </div>
 
 {include file="../shared/footer.tpl"}
