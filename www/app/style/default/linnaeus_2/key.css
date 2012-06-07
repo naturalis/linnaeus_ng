@@ -3,14 +3,14 @@
 }
 
 #page-main {
-    background-color: #bbb;
-	height: 100%;
+	background-color: #bbb;
+	height: 440px;
 }
 
 #step-image {
-    border:1px solid #666;
+	border: 1px solid #666;
 	float: right;
-    margin: 38px 35px 0 0;
+	margin: 38px 35px 0 0;
 }
 
 #choice-grid {
@@ -18,38 +18,41 @@
 }
 
 #choice-grid td {
-    width: 50%;
-    vertical-align: top;
-    padding-right: 8px;
+	width: 50%;
+	vertical-align: top;
+	padding-right: 8px;
 }
 
 /* path */
 #path {
-    height: 20px;
-    padding: 10px;
+	height: 20px;
+	padding: 10px;
 	font-size: 11px;
 	border-bottom: 1px dotted #ddd;
-    background-color: #f6f6f6;
+	background-color: #f6f6f6;
 }
 
 #path-search-box {
+	margin-left: 1px;
 	float: right;
 }
 
 #path #concise {
 	height: 20px;
-    display: table-cell; 
-    vertical-align: middle;
+	display: table-cell;
+	vertical-align: middle;
+	width: 800px;
 }
 
 #path #concise #toggle {
+	float: right;
 	cursor: pointer;
+	margin-top: 2px;
 }
 
 #path #concise #toggle:hover {
 	text-decoration: underline;
 }
-
 
 #path #concise .arrow {
 	font-family: "Times New Roman", Times, serif;
@@ -62,7 +65,7 @@
 
 #path #concise .abbreviation {
 	color: #666;
-    margin: 0 5px;
+	margin: 0 5px;
 }
 
 #path #concise .item:hover {
@@ -74,85 +77,106 @@
 }
 
 #path .full {
-	position:absolute;
-	margin-top:4px;
-	left:10px;
-	background-color:#FFFFFF;
-	border:1px dotted #666;
-	padding:2px;
-	width:400px;
+	position: absolute;
+	margin-top: 4px;
+	left: 10px;
+	background-color: #FFFFFF;
+	border: 1px dotted #666;
+	padding: 2px;
+	width: 400px;
 }
 
 #path #path-full .number-cell {
-	width:10px;
-	text-align:right;
+	width: 10px;
+	text-align: right;
 }
-
 
 /* step */
 #step {
-	text-align:justify;
+	text-align: justify;
 }
 
 #step #question {
+	
 }
 
 #step #question #head {
-	font-size:14px;
-	font-weight:bold;
-	margin-bottom:5px;
+	font-size: 14px;
+	color: #0303b2;
 }
 
 #step #question #head #step-nr {
+	
 }
 
-#step #question #head #step-title {
+#step-title {
+	color: #0303b2;
+	font-size: 14px;
 }
 
 #step #question #content {
-	margin-bottom:15px;
+	margin-bottom: 15px;
 }
 
 #step #question hr {
+	
 }
 
 #step #choices {
-	margin-bottom:25px;
+	margin-bottom: 25px;
+}
+
+#step #img-choices {
+	position: relative;
 }
 
 #step .choice {
 	cursor: pointer;
-    width: 270px;
-    min-height: 155px;
-    background-color: #eee;
-    margin-bottom: 8px;
-    padding: 10px;
-    webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-	box-shadow: 
-	  0 1px 2px #666, /*bottom external highlight*/
-	  0 -1px 1px #fff, /*top external shadow*/ 
-	  inset 0 -1px 1px rgba(255,255,255,0.8), /*top internal highlight*/ 
-	  inset 0 1px 1px rgba(0,0,0,0.5); /*bottom internal shadow*/ 
+	width: 270px;
+	min-height: 155px;
+	background-color: #eee;
+	margin-bottom: 8px;
+	padding: 10px;
+	webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	box-shadow: 0 1px 2px #666, /*bottom external highlight*/ 
+	   0 -1px 1px #fff, /*top external shadow*/  
+	   inset 0 -1px 1px rgba(255, 255, 255, 0.8),
+		/*top internal highlight*/  
+	   inset 0 1px 1px rgba(0, 0, 0, 0.5); /*bottom internal shadow*/
 }
 
 #step .choice-image-div {
-	float:left;
+	float: left;
 }
 
 #step .choice-image-small {
-	width:120px;
-	cursor:pointer;
-	margin:0px 10px 10px 0px;
-	border:1px solid #666;
+	width: 120px;
+	cursor: pointer;
+	margin: 0px 10px 10px 0px;
+	border: 1px solid #666;
+}
+
+#step .choice-img-wrapper {
+	cursor: pointer;
+}
+
+.choice-img-wrapper img {
+	border: 1px solid #000;
 }
 
 #step .marker {
-	font-weight:bold;
+	font-weight: bold;
 }
 
 #step .text {
 	min-height: 120px;
+}
+
+#step .text-choice-img {
+	text-align: center; margin-top : 3px;
+	font-size: 10px;
+	margin-top: 3px;
 }
 
 #step .target {
@@ -162,53 +186,48 @@
 }
 
 #step .arrow {
-	font-family:"Times New Roman", Times, serif;
-	font-size:16px;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 16px;
 }
 
-#step .target-step {
-	color:#006;
+#step .target-step,#step .target-taxon {
+	color: #006;
 }
 
-#step .target-taxon {
-	color:#060;
-}
-
-#step .target-step:hover, .target-taxon:hover {
-	text-decoration:underline;
+#step .target-step:hover,.target-taxon:hover {
+	text-decoration: underline;
 }
 
 #step .hr-choice {
-	height:1px;
-	color:#ddd;
+	height: 1px;
+	color: #ddd;
 }
-
 
 /* remaining taxa */
 #taxa {
 	width: 240px;
-    height: 400px;
-	border:1px solid #666;
+	height: 426px;
+	border: 1px solid #666;
 	overflow: hidden;
-    background-color: #fff;
-    float: right;
-    padding: 5px;
-    overflow-y: scroll;
+	background-color: #fff;
+	float: right;
+	padding: 5px;
+	overflow-y: scroll;
 }
 
 #taxa #header {
 	font-weight: bold;
-    margin-bottom: 8px;
+	margin-bottom: 8px;
 }
 
-#taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
-    cursor: pointer;
+#taxa a:link,#taxa a:visited,#taxa p.a:link,#taxa p.a:visited {
+	cursor: pointer;
 	color: #000;
-    text-decoration: none;
+	text-decoration: none;
 }
 
-#taxa a:hover, #taxa p.a:hover {
-    cursor: pointer;
+#taxa a:hover,#taxa p.a:hover {
+	cursor: pointer;
 	color: red;
 }
 

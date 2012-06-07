@@ -5,62 +5,38 @@
 <div id="page-main">
 {include file="_taxa.tpl"}
 	<div id="step">
-		<div id="question">
+<!--	
+	<div id="question">
 			<div id="head">
 				<span id="step-nr">{$step.number}</span>.
-				<span id="step-title">{$step.title}</span>
+				{if $step.number!=$step.title}
+				    <span id="step-title">{$step.title}</span>
+				{/if}
 			</div>
-		{if $step.image}
-			<div id="step-image">
-				<img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
-			</div>
-		{/if}
-			<div id="content">{$step.content}</div>
 		</div>
-		
-		<div id="choices">		
+-->		
+		<div id="img-choices">		
 {foreach from=$choices key=k item=v}
 	{if $v.choice_img}
-		{if $useJavascriptLinks}
-		<div
-			id="choice-img-{$v.id}"
-            src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
-			onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}"
-			style="
-				position:absolute;
-				left:{$v.choice_image_params.leftpos}px;
-				top:{$v.choice_image_params.toppos}px;
-				width:{$v.choice_image_params.width}px;
-				height:{$v.choice_image_params.height}px;
-				background: url("{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}");
-			"/>
-		{else}
-			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-				<a href="../key/index.php?choice={$v.id}">
-			{elseif $v.res_taxon_id!=''}
-				<a href="../species/taxon.php?id={$v.res_taxon_id}">
-			{/if}
-			<img
-				alt="{$v.choice_img}" 
-				id="choice-img-{$v.id}"
-				src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
-				style="
-					position:absolute;
-					left:{$v.choice_image_params.leftpos}px;
-					top:{$v.choice_image_params.toppos}px;
-					width:{$v.choice_image_params.width}px;
-					height:{$v.choice_image_params.height}px;
-				"/>
-			</a>
-		{/if}
-			<br />
-			
-			
-		<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
-		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;text-align:left">
-			<span class="marker">{$v.marker}</span>.
-			<span class="text">{$v.choice_txt|nl2br}</span>
+        <div class="choice-img-wrapper" 
+        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}'{/if}"
+        {elseif $v.res_taxon_id!=''}
+            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}'{/if}"
+        {/if}
+        style="
+            position: absolute;
+            left: {$v.choice_image_params.leftpos}px;
+            top: {$v.choice_image_params.toppos}px;
+            width: {$v.choice_image_params.width}px;">
+        <img 
+            src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}" 
+            width="{$v.choice_image_params.width}"
+            height="{$v.choice_image_params.height}" />
+		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;">
+			<span class="text-choice-img">{$v.choice_txt|nl2br}</span>
 
+<!--
 			<span class="target">
 			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 				<span class="arrow">&rarr;</span>
@@ -81,7 +57,8 @@
 				{/if}
 			{/if}
 			</span>
-
+-->
+		</div>
 		</div>
 		
 	{/if}
@@ -90,6 +67,7 @@
 	</div>
 </div>
 
+<!--
 {literal}
 <script>
 var offset = $('#choices').offset();
@@ -106,5 +84,5 @@ $('#choices').height($('#choices').height()+height < $('#taxa').height() ? $('#t
 
 </script>
 {/literal}
-
+-->
 {include file="../shared/footer.tpl"}
