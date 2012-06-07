@@ -6,10 +6,6 @@
 	<div id="step">
 		<div id="question">
 		{if $keyType=="lng"}
-			<div id="head">
-				<span id="step-nr">{$step.number}</span>.
-				<span id="step-title">{$step.title}</span>
-			</div>
             <div id="content">{$step.content}</div>
 	    {else}
             {if $step.image}
@@ -31,9 +27,9 @@
 
     <div class="choice" 
         {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-            onclick="keyDoChoice({$v.id})"
+            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}'{/if}"
         {elseif $v.res_taxon_id!=''}
-            onclick="goTaxon({$v.res_taxon_id})"
+            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}'{/if}"
         {/if}
     >
 	           {if $v.choice_img}

@@ -1,4 +1,5 @@
-{include file="../shared/_search-main-no-tabs.tpl"}
+{include file="../shared/_header-titles.tpl"}
+{include file="../shared/_search-main.tpl"}
 <div id="page-main">
 	<div id="content">
 		{if $page.image.thumb_name}
