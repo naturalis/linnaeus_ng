@@ -151,8 +151,7 @@ class KeyController extends Controller
 		
 		$this->smarty->assign('keypath',$this->getKeyPath());
 
-		//if (isset($choices) && $this->choicesHaveL2Attributes($choices)) 
-		if ($this->getKeytype()=='l2')
+		if (isset($choices) && $this->choicesHaveL2Attributes($choices)) 
 	        $this->printPage('index_l2');
 		else
 	        $this->printPage();
