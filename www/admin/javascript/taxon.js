@@ -1483,7 +1483,34 @@ function taxonChangeSubmitButtonLabel(ele) {
 }
 
 function taxonChangeMediaOrder(id,mId,dir) {
+$('<input type="hidden" name="'+name+'">').val(val==null ? '' : val).appendTo('#theForm');
+	$('#theForm').attr('action','media.php?id='+id)
+	$('#theForm').submit();
 
-	$.post('media.php?id='+id, { id: id, mId: mId, move: dir } );
-alert('a');	
+//	$.post(, { id: id, mId: mId, move: dir } );
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

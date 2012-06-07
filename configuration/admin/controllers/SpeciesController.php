@@ -1049,7 +1049,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasId() && $this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
 
-			
+echo $this->requestData['move'].'::';	
 
 		}
 

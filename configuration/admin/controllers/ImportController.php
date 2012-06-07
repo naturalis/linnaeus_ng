@@ -2,9 +2,25 @@
 
 /*
 
-CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
 
 
+	keys als enige buiten de boom: nergens een los veld met de rank
+	ik wil alleen zeker weten dat er in alle projecten in de Tk en Pk ook ALTIJD de rank er bij staat voor de HT.
+	maarten schermer: want als dat niet zo is, heb ik ECHT een probleem, omdat ik er geen losse rank bij heb
+
+
+I looked a little deeper, and have concluded the following: much like L2 itself can be, the exported XML-file is also ambiguous. There are two elements that both contain the taxon tree: <tree> and <records>.
+<tree> is just that - all taxa with their rank and parent-child relationship -, whereas <records> contains more information - taxa, rank, parent-child relationship, description, reference to media, vernaculars, map data, etc. - but not necessarily for every taxon. In the Flora XML, <tree> has 3054 elements, while <records> only has 2205. Apparently, there are approx. 850 taxa that appear in the L2-tree, but have no other data than their name, rank and parentage attached to it.
+
+The import follows the same logic: create the central list of taxa from <tree> and import all other data from <records>. However, I have found, and confirmed this from the XML-file, that there are taxa that DO appear in <records> but DO NOT appear in the tree. Obviously, this is a violation of the referential integrity of the file, and as a result, these taxa cannot be saved. In the flora, they are:
+
+Unable to resolve name "Orchis militaris" to taxon id.
+Unable to resolve name "Hordeum marinum" to taxon id.
+Unable to resolve name "Saxifraga granulata-'Plena'" to taxon id.
+Unable to resolve name "Callitriche cophocarpa" to taxon id.
+Unable to resolve name "Oenanthe peucedanifolia" to taxon id.
+
+Please be aware that these are six other taxa than the three mentioned earlier - Atropa belladonna, Genianella campestris & Nemesia melissaefolium - that appear in neither <tree>, nor <records>.
 	
 	[4:28:27 PM] maarten schermer: R E S U M é
 	[4:28:35 PM] Ruud Altenburg: É
@@ -20,6 +36,7 @@ CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
 	[4:32:10 PM] maarten schermer: ok
 
 
+	CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
 
 	q($_SESSION['admin']['system']['import']['loaded']['species']);
 
@@ -831,6 +848,7 @@ class ImportController extends Controller
 					$_SESSION['admin']['system']['import']['loaded']['key_dich']['keys'] = array('text_key' => false, 'pict_key' => false);
 					$_SESSION['admin']['system']['import']['loaded']['key_dich']['keyStepIds'] = null;
 					$_SESSION['admin']['system']['import']['loaded']['key_dich']['stepAdd'] = null;
+					$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'] = array();
 
 					$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_KeyDichotomous'));
 
@@ -846,7 +864,14 @@ class ImportController extends Controller
 							'pId' => $this->getNewProjectId()
 						)
 					);
-	
+
+					if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'])!==0) {
+		
+						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'] as $val)
+							$this->addError($this->storeError($val,'Dichotomous key'));
+		
+					}
+							
 					$this->addMessage('Created dichotomous key.');
 					
 					unset($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']);
@@ -881,7 +906,7 @@ class ImportController extends Controller
 						if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'])!==0) {
 			
 							foreach ((array)$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] as $val)
-								$this->addError($this->storeError($val['cause'],'Matrix'));
+								$this->addError($this->storeError($val,'Matrix'));
 			
 						}
 	
@@ -1668,9 +1693,9 @@ class ImportController extends Controller
 		
 		// no spaces = HT, which always has the rank name prefixed
 		if (strpos($name,' ')===false)
-			return trim($rank).' '.$this->cleanL2Name($name);
+			return strtolower(trim($rank).' '.$this->cleanL2Name($name));
 		else
-			return $this->cleanL2Name($name);
+			return strtolower($this->cleanL2Name($name));
 
 	}
 
@@ -2321,7 +2346,7 @@ class ImportController extends Controller
 
 				//[p][l][m]Species[/m][r]Emys orbicularis subsp. hellenica[/r][t][i]Emys orbicularis hellenica[/i][/t][/l][/p]
 				//$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
-				$speciesName = $this->makeIndexName($this->cleanL2Name($this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name)));
+				$speciesName = $this->makeIndexName($this->extractLinkedSpeciesRatherThanDisplayed((string)$kVal->name));
 
 				if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
 
@@ -2803,8 +2828,24 @@ class ImportController extends Controller
 								null
 							);
 
+				/*
 
-				$destinationtaxonname = $this->cleanL2Name(trim((string)$val->destinationtaxonname));
+					in l2-xml files, nearly all relevant taxon-info is stored IN the taxon tree, which allows
+					for access to all data of a taxon under consideration: name, rank, parent etc.
+					
+					the exception are the dichotomous keys, pict_key and text_key. at their endpoints, they
+					have a field called 'destinationtaxonname', which contains the taxon name (in case op species)
+					or the rank name plus the taxon name (in case of higher taxa). there is *no* separate field
+					that holds just the rank. we therefore cannot use $this->makeIndexName() to create an
+					accurate index name with which to lookup the correct species in the loaded species array.
+					
+					for species, this is not a problem, but in the case of higher taxa, it is implicitly assumed
+					that they are ALWAYS listed in this field as rank plus name ('Family Cynipidae' rather than
+					'Cynipidae'). if ever an export file is used in which the destinationtaxonname-field lacks 
+					the prefixed rank in the case of higher taxa, this function will fail to resolve those taxa.
+				
+				*/
+				$destinationtaxonname = strtolower($this->cleanL2Name(trim((string)$val->destinationtaxonname)));
 
 				$resTaxon = (trim((string)$val->destinationtype)=='taxon' ?  
 								(isset($_SESSION['admin']['system']['import']['loaded']['species'][$destinationtaxonname]['id']) ?
@@ -2863,11 +2904,15 @@ class ImportController extends Controller
 					$txt = trim((string)$val->picturefilename);
 				}
 				
+				$txt = $this->replaceOldMarkUp($txt);
+				
+				$stepId = ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]);
+				
 				$this->models->ChoiceKeystep->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
-						'keystep_id' => ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]),
+						'keystep_id' => $stepId,
 						'show_order' => (1 + $i++),
 						'choice_img' => isset($fileName) ? $fileName : null,
 						'choice_image_params' => isset($params) ? $params : null,
@@ -2875,17 +2920,34 @@ class ImportController extends Controller
 						'res_taxon_id' => $resTaxon,
 					)
 				);
+				
+				$choiceId = $this->models->ChoiceKeystep->getNewId();
 	
 				$this->models->ChoiceContentKeystep->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getNewProjectId(),
-						'choice_id' => $this->models->ChoiceKeystep->getNewId(),
+						'choice_id' => $choiceId,
 						'language_id' => $this->getNewDefaultLanguageId(),
 						'choice_txt' => isset($txt) ? $txt : null
 					)
 				);
+
+				if (is_null($resTaxon) && is_null($resStep)) {
 					
+					$d = trim((string)$val->destinationtype);
+					$t = empty($d) ? '-' : $d;
+					$d = trim((string)$val->destinationpagenumber);
+					$p = empty($d) ? '-' : $d;
+					$d = trim((string)$val->destinationtaxonname);
+					$x = empty($d) ? '-' : $d;
+
+					$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'][] =
+						'Could not resolve target of "'. substr($this->replaceOldMarkUp(trim((string)$val->captiontext),true),0,25).'..." '.
+						'('.($t=='turn' ? 'turn: '.$p : ($t=='taxon' ? 'taxon: '.$x : 'unknown targettype: '.$t )).')';
+	
+				}
+
 			}
 		
 		}
@@ -3263,10 +3325,12 @@ class ImportController extends Controller
 		$matrixname = !empty($obj->identify->id_file->filename) ? trim((string)$obj->identify->id_file->filename) : null;
 
 		if ($matrixname) {
+		
+			$indexName =  $this->makeIndexName((string)$obj->name,(string)$obj->taxon);
 
-			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'])) {
+			if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 
-				$taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'];
+				$taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 
 				foreach($obj->identify->id_file->characters->character_ as $char) {
 
@@ -3320,10 +3384,8 @@ class ImportController extends Controller
 
 			} else {
 
-				$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = array(
-					'cause' => 'Species "'.trim((string)$obj->name).'" in matrix key does not exist and has been discarded',
-					'data' => trim((string)$obj->name)
-				);
+				$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = 
+					'Species "'.trim((string)$obj->name).'" in matrix key does not exist and has been discarded';
 
 			}
 
@@ -3502,11 +3564,13 @@ class ImportController extends Controller
 	private function saveMapItem($obj)
 	{
 	
-		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'])) {
+		$indexName = $this->makeIndexName(trim((string)$obj->name),$rankName);
+	
+		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 		
 			if (!isset($obj->distribution)) return;
 			
-			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$this->cleanL2Name((string)$obj->name)]['id'];
+			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 
 			foreach($obj->distribution->map as $vKey => $vVal) {
 
