@@ -342,7 +342,8 @@ class ImportController extends Controller
 					'project' => trim((string)$d->title),
 					'version' => trim((string)$d->version),
 					'createdate' => date('c'),
-					'imported_from' => $_SESSION['admin']['system']['import']['file']['path']	
+					'imported_from' => $_SESSION['admin']['system']['import']['file']['path'],
+					'id' => $this->getNewProjectId()	
 				);
 
 			}
@@ -2820,7 +2821,7 @@ class ImportController extends Controller
 
 			if ($key=='text_choice' || $key=='pict_choice') {
 
-				$resStep = (trim((string)$val->destinationtype)=='turn' ? 
+				$resStep = ((trim((string)$val->destinationtype)=='turn' || trim((string)$val->destinationtype)=='jump') ? 
 								(isset($stepIds[trim((string)$val->destinationpagenumber)]) ?
 									$stepIds[trim((string)$val->destinationpagenumber)] :
 									null
