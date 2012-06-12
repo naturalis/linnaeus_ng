@@ -4,6 +4,11 @@
 {assign var='totalSteps' value=$keypath|@count}
 {assign var='previousStep' value=$totalSteps-2}
 
+<a class="navigation-icon" id="decision-path-icon" 
+	style="margin-right: 618px;"
+	href='javascript:showDialog("{t}Decision path{/t}",tmp);' 
+	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
+
 {if $useJavascriptLinks}
     {if $totalSteps > 1}
         <a class="navigation-icon" id="first-icon" href="../key/" title="{t}Return to first step{/t}">{t}First{/t}</a>

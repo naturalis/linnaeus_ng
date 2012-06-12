@@ -1,3 +1,5 @@
+{include file="_header-titles.tpl"}
+{include file="../shared/_search-main.tpl"}
 <div id="matrix-header">
 	<div id="current">
 		{t _s1=$matrix.name _s2=$function}Using matrix "%s", function "%s"{/t}

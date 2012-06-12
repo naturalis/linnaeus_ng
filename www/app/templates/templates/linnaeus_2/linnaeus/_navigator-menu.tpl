@@ -19,12 +19,7 @@
 <div id="categories">
 <ul>
 <li>
-    <a class="category{if $subject==''}-active{/if} category-first" 
-    {if $useJavascriptLinks}href="javascript:goNavigator()"{else}href="../linnaeus/index.php"{/if}>
-    {t}Content{/t}</a>
-</li>
-<li>
-    <a class="category{if $subject=='Welcome'}-active{/if}" 
+    <a class="category{if $subject=='Welcome'}-active{/if} category-first" 
     {if $useJavascriptLinks}href="javascript:goContentPage('Welcome')"{else}href="../linnaeus/content.php?sub=Welcome"{/if}>
     {t}Welcome{/t}</a>
 </li>
