@@ -112,7 +112,7 @@ body {
 
 .search-icon {
 	border: 0;
-    margin: 0 0 2px 2px;
+    margin: 0 10px 2px 2px;
     vertical-align: bottom;
 }
 
@@ -286,7 +286,7 @@ body {
 /* Navigation icons etc */
 .navigation-icon-wrapper {
     float: right;
-    padding: 0 15px;
+    padding: 0 15px 0 0;
 }
 
 .navigation-icon {
@@ -329,3 +329,10 @@ body {
     color: #550000;
 }
 
+.introduction-img {
+	height: 281px;
+    width: 241px;
+    float: right;
+    border: 1px solid #000;
+    margin: 0 0 20px 25px;
+}
