@@ -3450,7 +3450,6 @@ class ImportController extends Controller
 		
 	}
 
-
 	private function doSaveMapItem($occurrence)
 	{
 
@@ -3494,7 +3493,6 @@ class ImportController extends Controller
 			$_SESSION['admin']['system']['import']['loaded']['map']['failed']++;
 
 	}
-	
 	
 	private function saveL2Map($p)
 	{
