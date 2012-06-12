@@ -112,6 +112,45 @@
 }
 {/literal}
 
+
+
+{literal}
+#decision-path-icon {
+{/literal}
+    width: 80px;
+    cursor: pointer; 
+    background: url('{$systemMedia}decision-path.png') center top no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#decision-path-icon:active {
+{/literal}
+    background-position: center 1px;
+{literal}
+}
+{/literal}
+
+{literal}
+#decision-path-icon-inactive {
+{/literal}
+    width: 80px;
+    background: url('{$systemMedia}decision-path.png') center top no-repeat;
+    opacity: 0.4;
+    filter: alpha(opacity=40); 
+{literal}
+}
+{/literal}
+
+
+
+
+
+
+
+
+
 {literal}
 #first-icon {
 {/literal}
@@ -148,6 +187,14 @@
     padding-right: 18px;
     margin-right: 10px;
     cursor: pointer;
+{literal}
+}
+{/literal}
+
+{literal}
+.selectRight {
+{/literal}
+    background: url('{$systemMedia}select-right.png') no-repeat right center;
 {literal}
 }
 {/literal}
