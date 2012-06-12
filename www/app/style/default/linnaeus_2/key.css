@@ -41,13 +41,14 @@
 	height: 20px;
 	display: table-cell;
 	vertical-align: middle;
-	width: 800px;
+	width: 680px;
+    padding-left: 10px;
 }
 
 #path #concise #toggle {
 	float: right;
 	cursor: pointer;
-	margin-top: 2px;
+	margin: 2px;
 }
 
 #path #concise #toggle:hover {
