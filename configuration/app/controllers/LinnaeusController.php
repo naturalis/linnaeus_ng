@@ -154,7 +154,10 @@ class LinnaeusController extends Controller
     public function indexAction ()
     {
 
-        $this->printPage();
+		if ($this->rHasVal('show','icongrid'))
+			$this->printPage();
+		else
+			$this->redirect('../linnaeus/content.php?sub=Welcome');
 
 
     }

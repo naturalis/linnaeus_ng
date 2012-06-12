@@ -1871,18 +1871,28 @@ class Controller extends BaseClass
 	
 	}
 
-	public function newGetUserAssignedTaxonTreeList()
+	public function newGetUserAssignedTaxonTreeList($p=null)
 	{
 
 		$this->newGetUserAssignedTaxonTree();
 
 		if (!isset($this->treeList)) return null;
+		
+		$incHigher = isset($p['includeHigher']) ? $p['includeHigher'] : false;
+		$higherOnly = isset($p['higherOnly']) ? $p['higherOnly'] : false;
 	
 		$prevId = $prevTitle = null;
 
 		foreach((array)$this->treeList as $key => $val) {
 		
-			if (isset($val['user_allowed']) && $val['user_allowed']===true && $val['lower_taxon']==1) {
+			if (
+				isset($val['user_allowed']) && 
+				$val['user_allowed']===true && 
+				(
+					(($val['lower_taxon']==1 || $incHigher==true) && $higherOnly==false) ||
+					($val['lower_taxon']==0 && $higherOnly==true)
+				)
+				) {
 
 				$d[$key] = $val;
 			

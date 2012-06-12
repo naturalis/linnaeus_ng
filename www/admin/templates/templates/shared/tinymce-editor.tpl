@@ -72,8 +72,8 @@ function initTinyMce(litRefs,mediaRefs) {
 
 						return c;
 
-				case 'media':
-					var mlb = cm.createListBox('media', {
+				case 'linkMedia':
+					var mlb = cm.createListBox('linkMedia', {
 						 title : 'Media link',
 						 onselect : function(v) {
 						 	if (v==undefined) return;
@@ -156,7 +156,7 @@ function initTinyMce(litRefs,mediaRefs) {
 
 	if (inclLiteraryButtons && inclMediaButtons) {
 	 	//propertyList.theme_advanced_buttons2 = "litref,addlitref,|,media,addmedia,|,addinternallink";
-	 	propertyList.theme_advanced_buttons2 = "litref,media,addinternallink";
+	 	propertyList.theme_advanced_buttons2 = "litref,linkMedia,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else
 	if (inclLiteraryButtons && !inclMediaButtons) {
@@ -166,7 +166,7 @@ function initTinyMce(litRefs,mediaRefs) {
 	} else
 	if (!inclLiteraryButtons && inclMediaButtons) {
 	 	//propertyList.theme_advanced_buttons2 = "media,addmedia,|,addinternallink";
-	 	propertyList.theme_advanced_buttons2 = "media,addinternallink";
+	 	propertyList.theme_advanced_buttons2 = "linkMedia,addinternallink";
 	 	propertyList.theme_advanced_buttons3 = "";
 	} else {
 	 	propertyList.theme_advanced_buttons2 = "addinternallink";

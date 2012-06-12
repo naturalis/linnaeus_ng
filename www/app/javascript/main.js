@@ -318,6 +318,15 @@ function goNavigator() {
 
 }
 
+function goIconGrid() {
+	//!
+	addFormVal('show','icongrid');
+	goForm('../linnaeus/index.php');
+
+}
+
+
+
 function goNavigate(id,field,url) {
 	//!
 	addFormVal(field ? field : 'start',id);

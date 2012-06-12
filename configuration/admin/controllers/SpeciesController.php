@@ -144,9 +144,9 @@ class SpeciesController extends Controller
 
 		unset($_SESSION['admin']['system']['activeTaxon']);
 		
-		$d = $this->newGetUserAssignedTaxonTreeList();
-
 		if ($this->rHasVal('higher','1')) {
+
+			$d = $this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>true));
 
 			$_SESSION['admin']['system']['highertaxa'] = true;
 
@@ -165,6 +165,8 @@ class SpeciesController extends Controller
 		} else {
 
 			unset($_SESSION['admin']['system']['highertaxa']);
+
+			$d = $this->newGetUserAssignedTaxonTreeList();
 
 			foreach((array)$d as $val) {
 			
@@ -532,7 +534,7 @@ class SpeciesController extends Controller
 
 		}
 
-		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 		$this->smarty->assign('navCurrentId',$data['id']);
 
 		$this->printPage();
@@ -778,7 +780,7 @@ class SpeciesController extends Controller
 		
 		}
 
-		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
@@ -1015,7 +1017,7 @@ class SpeciesController extends Controller
 			
 			if (isset($taxon)) $this->smarty->assign('taxon', $taxon);
 
-			$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+			$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 			$this->smarty->assign('navCurrentId',$taxon['id']);
 
         } else {
@@ -1115,7 +1117,7 @@ echo $this->requestData['move'].'::';
 
 		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
 
-		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
 		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
@@ -2233,7 +2235,7 @@ echo $this->requestData['move'].'::';
 
 		}
 
-		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList());
+		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
