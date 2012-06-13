@@ -1061,7 +1061,7 @@ class Controller extends BaseClass
 			$n = substr($name,0,strpos($name,' '));
 			$e = substr($name,strpos($name,' '));
 
-			return '<span class="taxonName" style="color:red">'.trim($n).'</span> <span class="taxonEpithet"><i>'.trim($e).'</i></span></span>';
+			return '<span class="taxonName">'.trim($n).'</span> <span class="taxonEpithet">'.trim($e).'</span>';
 		
 		} else {
 		
