@@ -648,9 +648,28 @@ class SpeciesController extends Controller
 						)
 					);
 	
-					if ($ll) $c[$key]['language_name'] = 
-						$_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = 
-						$ll[0]['label'];
+					if ($ll) {
+
+						$c[$key]['language_name'] = 
+							$_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = 
+							$ll[0]['label'];
+
+					} else {
+
+						$l = $this->models->Language->_get(
+							array(
+								'id' => array(
+									'id' =>  $val['language_id']
+								),
+								'columns' => 'language'
+							)
+						);
+
+						$c[$key]['language_name'] = 
+							$_SESSION['app']['user']['languages'][$val['language_id']][$this->getCurrentLanguageId()] = 
+							$l[0]['language'];
+					
+					}
 
 				}
 

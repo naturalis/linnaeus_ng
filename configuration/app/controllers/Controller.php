@@ -494,8 +494,8 @@ class Controller extends BaseClass
 		$this->getTaxonTree();
 
 		foreach((array)$this->treeList as $key => $val) {
-
-			$d[$val['rank_id']] = $val;
+			
+			$d[$val['level']] = $val;
 			
 			if ($val['id'] == $taxonId) {
 
