@@ -409,6 +409,8 @@ class MatrixKeyController extends Controller
 					)
 				);
 	
+				
+				$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon']);
 				$taxa[] = $t[0];
 	
 			}
