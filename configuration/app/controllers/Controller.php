@@ -302,7 +302,7 @@ class Controller extends BaseClass
         foreach((array)$t as $key => $val) {
 
 			// taxon name
-			$val['label'] = $val['taxon'];
+			$val['label'] = $this->formatSpeciesEtcNames($val['taxon']);
 
 			// for each taxon, look whether they belong to the lower taxa...
 			$val['lower_taxon'] = $pr[$val['rank_id']]['lower_taxon'];
@@ -1050,6 +1050,24 @@ class Controller extends BaseClass
 			return $s[0]['value'];
 		else
 			return null;
+	
+	}
+	
+	public function formatSpeciesEtcNames($name)
+	{
+
+		if (strpos($name,' ')!==false) {
+		
+			$n = substr($name,0,strpos($name,' '));
+			$e = substr($name,strpos($name,' '));
+
+			return '<span class="taxonName" style="color:red">'.trim($n).'</span> <span class="taxonEpithet"><i>'.trim($e).'</i></span></span>';
+		
+		} else {
+		
+			return $name;
+		
+		}
 	
 	}
 	

@@ -5,12 +5,12 @@
 {foreach from=$taxa key=k item=v}
 {if $useJavascriptLinks}
     <p class="a" onclick="goTaxon({$v.id})">
-    	{$v.taxon}
+    	{$v.label}
     	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
     </p>
 {else}
     <p><a href="../species/taxon.php?id={$v.id}" >
-    	{$v.taxon}
+    	{$v.label}
     	{if $v.is_hybrid==1}{$session.app.project.hybrid_marker}{/if}
     </a></p>
 {/if}

@@ -210,7 +210,7 @@ class IndexController extends Controller
 		$d =  $this->makeAlphabetFromArray($taxa,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
 
 		$usePagination = false;
-		
+
 		$this->smarty->assign('usePagination',$usePagination);
 		
 		if ($usePagination) {
@@ -306,7 +306,7 @@ class IndexController extends Controller
 	
 		foreach((array)$names as $key => $val) {
 		
-			$x = strtolower(substr($val[$field],0,1));
+			$x = strtolower(substr(strip_tags($val[$field]),0,1));
 
 			$a[$x] = $x;
 

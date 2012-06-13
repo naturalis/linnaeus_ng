@@ -322,7 +322,7 @@ class KeyController extends Controller
 
 				if (isset($t['taxon'])) {
 
-					$choices[$key]['target'] = $t['taxon'];
+					$choices[$key]['target'] = $this->formatSpeciesEtcNames($t['taxon']);
 					$choices[$key]['is_hybrid'] = $t['is_hybrid'];
 
 				}
@@ -416,6 +416,8 @@ class KeyController extends Controller
 						if (!isset($d[$stepId][$val['taxon_id']])) {
 
 							$d[$stepId][$val['taxon_id']] = true;
+		
+							$taxa[$val['taxon_id']]['label'] = $this->formatSpeciesEtcNames($taxa[$val['taxon_id']]['taxon']);
 		
 							$list[$stepId][] = $taxa[$val['taxon_id']];
 

@@ -8,9 +8,9 @@
 		{foreach from=$ref.taxa key=k item=v}
 			<div>
 				{if $useJavascriptLinks}
-				<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.taxon}</span>
+				<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.label}</span>
 				{else}
-				<a href="../species/taxon.php?id={$v.taxon.id}">{$v.taxon.taxon}</a>
+				<a href="../species/taxon.php?id={$v.taxon.id}">{$v.taxon.label}</a>
 				{/if}
 				{if $v.taxon.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</div>
