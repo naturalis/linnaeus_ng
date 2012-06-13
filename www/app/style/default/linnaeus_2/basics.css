@@ -71,17 +71,6 @@ body {
     background-color: #fff;
 }
 
-#mini-header-titles {
-    color: #0303b2;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted #666;
-}
-
-#mini-header-title {
-	font-size: 14px;
-}
-
 #header-titles {
     font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
     font-size: 20px;
@@ -89,8 +78,16 @@ body {
     padding: 15px 20px;
 }
 
+#header-titles-small {
+    float: left;
+    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
+    font-size: 16px;
+    color: #0303b2;
+	margin-left: 10px;
+}
+
 #search-main, #search-main-no-tabs, #allNavigationPane {
-    text-align: right;
+	text-align: right;
     background-color: #f6f6f6;
 }
 
@@ -101,19 +98,20 @@ body {
 }
 
 #search-main-no-tabs {
-    font-size: 11px;
+	line-height: 22px;
+	font-size: 11px;
     padding: 10px;
     height: 20px;
 }
 
 .search-box {
-    vertical-align: middle;
 }
 
 .search-icon {
 	border: 0;
     margin: 0 10px 2px 2px;
     vertical-align: bottom;
+	cursor: pointer;
 }
 
 #page-main {
@@ -335,4 +333,8 @@ body {
     float: right;
     border: 1px solid #000;
     margin: 0 0 20px 25px;
+}
+
+.clear {
+	clear: both;
 }

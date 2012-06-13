@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-{include file="_path.tpl"}
+{include file="_search-main-no-tabs.tpl"}
 
 <div id="page-main">
     {include file="_taxa.tpl"}
