@@ -1,3 +1,15 @@
+#header-titles {
+	height: 15px;
+	padding: 0;
+}
+
+#search-results {
+	visibility: hidden;
+}
+
+
+
+
 #pane-left {
 	width:590px;
 	height:500px;
