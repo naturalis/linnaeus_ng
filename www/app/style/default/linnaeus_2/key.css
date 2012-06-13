@@ -23,7 +23,9 @@
 	padding-right: 8px;
 }
 
+
 /* path */
+/*
 #path {
 	height: 20px;
 	padding: 10px;
@@ -91,6 +93,7 @@
 	width: 10px;
 	text-align: right;
 }
+*/
 
 /* step */
 #step {
@@ -111,8 +114,9 @@
 }
 
 #step-title {
-	color: #0303b2;
-	font-size: 14px;
+    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
+    font-size: 16px;
+    color: #0303b2;
 }
 
 #step #question #content {

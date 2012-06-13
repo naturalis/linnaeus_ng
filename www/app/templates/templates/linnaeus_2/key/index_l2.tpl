@@ -1,7 +1,7 @@
 {* linnaeus 2 Picture key; l2 Text key is handled in index.tpl! *}	
 
 {include file="../shared/header.tpl"}
-{include file="_path.tpl"}
+{include file="_search-main-no-tabs.tpl"}
 <div id="page-main">
 {include file="_taxa.tpl"}
 	<div id="step">
