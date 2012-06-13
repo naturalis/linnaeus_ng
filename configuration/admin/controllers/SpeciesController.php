@@ -244,7 +244,7 @@ class SpeciesController extends Controller
 
 		}
 
-		$taxa = $this->newGetUserAssignedTaxonTreeList();
+		$taxa = $this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa()));
 
 		if (isset($taxa) && count((array)$taxa)>0) {
 

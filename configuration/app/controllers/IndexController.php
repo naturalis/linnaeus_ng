@@ -195,7 +195,7 @@ class IndexController extends Controller
 		$this->getTaxonTree(array('includeOrphans' => false));
 		
 		$names = $taxa = (array)$this->getTreeList();
-//q($taxa,1);
+
 		if ($this->getTaxonType()=='lower') {
 
 			$syn = $this->searchSynonyms();
@@ -209,13 +209,27 @@ class IndexController extends Controller
 
 		$d =  $this->makeAlphabetFromArray($taxa,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
 
-		$pagination = $this->getPagination($d['names']);
+		$usePagination = false;
+		
+		$this->smarty->assign('usePagination',$usePagination);
+		
+		if ($usePagination) {
+		
+			$pagination = $this->getPagination($d['names']);
+
+			$this->smarty->assign('prevStart', $pagination['prevStart']);
+		
+			$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+			$this->smarty->assign('taxa',$pagination['items']);
+			
+		} else {
+
+			$this->smarty->assign('taxa',$d['names']);
+
+		}
 
 		$this->smarty->assign('showSpeciesIndexMenu', true);
-
-		$this->smarty->assign('prevStart', $pagination['prevStart']);
-	
-		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
@@ -224,8 +238,6 @@ class IndexController extends Controller
 		$this->smarty->assign('ranks',$ranks);
 
 		$this->smarty->assign('names',$names);
-
-		$this->smarty->assign('taxa',$pagination['items']);
 
 		$this->smarty->assign('taxonType',$this->getTaxonType());
 
