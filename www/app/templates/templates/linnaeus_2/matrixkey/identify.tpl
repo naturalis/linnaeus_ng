@@ -51,7 +51,7 @@
 			<div id="buttons">
 				<input type="button" onclick="showMatrixPattern(this)" value="{t}add{/t}" />
 				<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
-				<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
+				<input type="button" onclick="clearSelected(); showMatrixPattern();" value="{t}clear all{/t}" />
 			</div>
 		</div>
 

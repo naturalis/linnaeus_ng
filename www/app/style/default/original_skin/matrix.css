@@ -100,3 +100,10 @@
 	padding-left:10px;
 }
 
+.character-selected {
+	background-color:#eee;
+}
+
+.state-selected {
+	background-color:#eee;
+}

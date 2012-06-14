@@ -65,6 +65,8 @@ $(document).ready(function(){
 	setSelectedState('{$v.val}'{if $v.type=='c'},{$v.id},{$v.characteristic_id},'{$v.label|addslashes}'{/if});
 {/foreach}
 	getScores();
+	showMatrixResults();
+	highlightSelected();
 {/if}
 
 {literal}
