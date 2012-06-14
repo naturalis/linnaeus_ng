@@ -1,5 +1,6 @@
 var imagePath;
-//\u2022
+var selectIndicator = '\u2022 ';
+
 function getData(action,id,postFunction) {
 
 	allAjaxHandle = $.ajax({
@@ -239,7 +240,10 @@ function highlightSelected() {
 
 		$('#characteristics option').each(function(i){
 
-			if ($(this).val()==e[1]) $(this).addClass('character-selected');
+			if ($(this).val()==e[1]) {
+				$(this).addClass('character-selected');
+				if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
+			}
 
 		});
 		
@@ -247,7 +251,10 @@ function highlightSelected() {
 
 			$('#states option').each(function(i){
 
-				if (e[2]==$(this).val())  $(this).addClass('state-selected');
+				if (e[2]==$(this).val())  {
+					$(this).addClass('state-selected');
+					if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
+				}
 
 			});
 
@@ -261,10 +268,12 @@ function removeHighlight() {
 
 	$('#characteristics option').each(function(i){
 		$(this).removeClass('character-selected');
+		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().substring(selectIndicator.length-1));
 	});
 	
 	$('#states option').each(function(i){
 		$(this).removeClass('state-selected');
+		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().substring(selectIndicator.length-1));
 	});
 
 }
