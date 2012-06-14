@@ -59,6 +59,14 @@ $(document).ready(function(){
 	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
 {/foreach}
 	imagePath = '{$session.app.project.urls.uploadedMedia}';
+
+{if $storedStates}
+{foreach from=$storedStates key=k item=v}
+	setSelectedState('{$v.val}'{if $v.type=='c'},{$v.id},{$v.characteristic_id},'{$v.label|addslashes}'{/if});
+{/foreach}
+	getScores();
+{/if}
+
 {literal}
 });
 </script>
