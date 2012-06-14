@@ -291,6 +291,9 @@ function deleteSelected() {
 	$('#selected').children(':selected').remove();
 
 	getScores($('#selected').children().length==0 ? 'clear' : null);
+	
+	removeHighlight();
+	highlightSelected();
 
 }
 
@@ -343,6 +346,10 @@ function fillScores(obj,char) {
 	}
 	
 	highlightSelected();
+	
+	$('#scores option').each(function(i){
+		$(this).attr('selected','');
+	});	
 
 }
 
