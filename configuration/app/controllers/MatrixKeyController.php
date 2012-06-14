@@ -410,7 +410,7 @@ class MatrixKeyController extends Controller
 				);
 	
 				
-				$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon']);
+				$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id']);
 				$taxa[] = $t[0];
 	
 			}

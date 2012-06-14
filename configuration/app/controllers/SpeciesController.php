@@ -167,12 +167,12 @@ class SpeciesController extends Controller
 			$content = $this->matchHotwords($content);
 
 			if ($taxon['lower_taxon']==1) {
-			
-				$this->setPageName(sprintf(_('Species module: "%s" (%s)'),$taxon['taxon'],$this->getCategoryName($activeCategory)));
+
+				$this->setPageName(sprintf(_('Species module: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
 
 			} else {
 
-				$this->setPageName(sprintf(_('Higher taxa: "%s" (%s)'),$taxon['taxon'],$this->getCategoryName($activeCategory)));
+				$this->setPageName(sprintf(_('Higher taxa: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
 
 			}
 
@@ -197,7 +197,7 @@ class SpeciesController extends Controller
 			$this->smarty->assign('headerTitles',
 				array(
 					'title' =>
-						$taxon['taxon'].
+						$taxon['label'].
 						($taxon['is_hybrid']=='1' ?
 							'<span class="hybrid-marker" title="'._('hybrid').'">'.
 							(isset($_SESSION['app']['project']['hybrid_marker']) ? $_SESSION['app']['project']['hybrid_marker'] : 'X').

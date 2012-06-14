@@ -275,7 +275,7 @@ class LiteratureController extends Controller
 					);
 
 					$lt[$key]['taxon'] = $t[0];
-					$lt[$key]['taxon']['label'] = $this->formatSpeciesEtcNames($lt[$key]['taxon']['taxon']);
+					$lt[$key]['taxon']['label'] = $this->formatSpeciesEtcNames($lt[$key]['taxon']['taxon'],$lt[$key]['taxon']['rank_id']);
 
 				}
 

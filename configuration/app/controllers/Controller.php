@@ -302,7 +302,7 @@ class Controller extends BaseClass
         foreach((array)$t as $key => $val) {
 
 			// taxon name
-			$val['label'] = $this->formatSpeciesEtcNames($val['taxon']);
+			$val['label'] = $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id']);
 
 			// for each taxon, look whether they belong to the lower taxa...
 			$val['lower_taxon'] = $pr[$val['rank_id']]['lower_taxon'];
@@ -397,7 +397,7 @@ class Controller extends BaseClass
 			else
 				$d = array('project_id' => $this->getCurrentProjectId());
 
-			$p = array('id' => $d,'order' => 'rank_id');
+			$p = array('id' => $d,'order' => 'rank_id' ,'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint');
 			
 			if ($idsAsIndex) {
 
@@ -466,8 +466,10 @@ class Controller extends BaseClass
 				)
 			);
 
+			$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id']);
+
 			$_SESSION['app']['user']['species']['taxon'] = $t[0];
-			
+
 			$pr = $this->models->ProjectRank->_get(
 				array(
 					'id' => array(
@@ -1053,21 +1055,54 @@ class Controller extends BaseClass
 	
 	}
 	
-	public function formatSpeciesEtcNames($name)
+	public function formatSpeciesEtcNames($name,$projRankId)
 	{
-
-		if (strpos($name,' ')!==false) {
+		/*
 		
-			$n = substr($name,0,strpos($name,' '));
-			$e = substr($name,strpos($name,' '));
-
-			return '<span class="taxonName">'.trim($n).'</span> <span class="taxonEpithet">'.trim($e).'</span>';
+			In italics worden geschreven
+			
+			Genus
+			Subgenus
+			Species
+			Infraspecies
+			
+			De rest niet
+			In titel zou het dus worden
+			
+			Genus <span class="italics">Fuscus</span>
+			Subgenus (<span class="italics">Fuscus</span>) [subgenera worden altijd tussen haakjes geschreven]
+			Species <span class="italics">Fuscus fuscus</span>
+			Subspecies <span class="italics">Fuscus fuscus</span> ssp.  <span class="italics">fuscus</span>
+			
+			De rest is gewoon
+			Family Fuscidae [geen flauwekul met italics]
+			
+			PLEASE NOTE
+			the rank ID's are hardcoded, so the ranks-table should NEVER change
 		
-		} else {
+		*/
+	
+		$r = $this->getProjectRanks(array('idsAsIndex' => true));
 		
-			return $name;
+		$rankId = $r['ranks'][$projRankId]['rank_id'];
+		$rankName = $r['ranks'][$projRankId]['labels'][$this->getCurrentLanguageId()];
+		
+		switch ($rankId) {
+		
+			case '63': 
+				//Genus
+			case '64':
+				//Subgenus
+			case '74':
+				//Species
+			case '75':
+				//Infraspecies
+			default:
+				return $rankName.' '.$name;
 		
 		}
+		
+		//return '<span class="taxonName">'.trim($n).'</span> <span class="taxonEpithet">'.trim($e).'</span>';			
 	
 	}
 	
