@@ -123,8 +123,13 @@ body {
     font-size: 11px;
 }
 
-#page-main p {
+#page-main p, #content p {
+    text-align: justify;
     line-height: 14px;
+}
+
+#page-main p:last-child, #content p:last-child {
+    margin-bottom: 20px;
 }
 
 #allNavigationPane {

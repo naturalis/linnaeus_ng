@@ -18,10 +18,6 @@ table td {
 text
 }
 
-#content p:last-child {
-	margin-bottom: 20px;
-}
-
 td.grid {
 	width: 100px;
 	height: 100px;
