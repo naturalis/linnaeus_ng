@@ -40,12 +40,6 @@
 {elseif $activeCategory=='literature' && $contentCount.literature>0}
 <div id="literature">
 	{foreach from=$content key=k item=v}
-	<div class="author">
-		<span class="name">
-			{$v.author_full}
-		</span>
-		<span class="year">{$v.year}</span>
-	</div>
 	<div class="text">{$v.text}</div>
 	{/foreach}
 </div>

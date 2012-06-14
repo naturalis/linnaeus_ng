@@ -3,17 +3,26 @@
 	padding: 0;
 }
 
+#page-main {
+    height: 411px;
+}
+
+#search-results, #search-pattern {
+	margin-top: 25px;
+}
+
 #search-results {
-	visibility: hidden;
+	display: none;
+}
+
+#search-pattern {
+	//display: none;
 }
 
 
 
 
-#pane-left {
-	width:590px;
-	height:500px;
-}
+
 
 #char-states {
 	width:300px;
@@ -47,25 +56,14 @@
 }
 
 #choices {
-	margin-bottom:5px;
-	vertical-align:top;
-	width:585px;
-	height:155px;
+	margin-right: 30px;
+	height: 155px;
+	float: left;
 }
 
 #choices #selected {
-	width:580px;
-	height:155px;
-}
-
-
-#pane-right {
-	width:400px;
-	position:relative;
-	margin-top:-500px;
-	left:600px;
-	height:486px;
-	margin-bottom:25px;
+	width: 450px;
+	height: 155px;
 }
 
 #buttons {
@@ -74,13 +72,11 @@
 }
 
 #scores-taxa {
-	width:400px;
-	height:485px;
 }
 
 #scores {
-	width:400px;
-	height:485px;
+	width: 300px;
+	height: 350px;
 }
 
 .info-header {
