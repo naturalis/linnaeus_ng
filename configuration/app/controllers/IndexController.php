@@ -206,7 +206,6 @@ class IndexController extends Controller
 
 		}
 
-
 		$d =  $this->makeAlphabetFromArray($taxa,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
 
 		$usePagination = false;
@@ -328,7 +327,7 @@ class IndexController extends Controller
 
 			foreach((array)$names as $key => $val) {
 
-				if (strtolower(substr($val[$field],0,1))==$letter) $n[$key] = $val;
+				if (strtolower(substr(strip_tags($val[$field]),0,1))==$letter) $n[$key] = $val;
 	
 			}
 		
