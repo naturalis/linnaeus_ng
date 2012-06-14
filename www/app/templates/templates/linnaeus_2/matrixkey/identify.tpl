@@ -1,16 +1,6 @@
 {include file="../shared/header.tpl"}
 {include file="_header.tpl"}
-{literal}
-<style>
-.character-selected {
-	background-color:#FFCC00;
-}
 
-.state-selected {
-	background-color:#33FFFF;
-}
-</style>
-{/literal}
 <div id="page-main">
 
 <div id="matrix-header">
