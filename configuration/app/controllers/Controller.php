@@ -1087,22 +1087,31 @@ class Controller extends BaseClass
 		$rankId = $r['ranks'][$projRankId]['rank_id'];
 		$rankName = $r['ranks'][$projRankId]['labels'][$this->getCurrentLanguageId()];
 		
-		switch ($rankId) {
+		if ($rankId > 75) {
+			list($g, $s, $i) = explode(' ', $name);
+		}
 		
+		switch ($rankId) {
 			case '63': 
-				//Genus
+				return $rankName.' <span class="italics">'.$name.'</span>';
 			case '64':
-				//Subgenus
+				return $rankName.' <span class="italics">'.$name.'</span>';
 			case '74':
-				//Species
-			case '75':
-				//Infraspecies
+				return '<span class="italics">'.$name.'</span>';
+			case '77':
+				return '<span class="italics">'.$g.' '.$s.'</span> subsp. <span class="italics">'.$i.'</span';
+			case '78':
+				return '<span class="italics">'.$g.' '.$s.'</span> var. <span class="italics">'.$i.'</span';
+			case '79':
+				return '<span class="italics">'.$g.' '.$s.'</span> subvar. <span class="italics">'.$i.'</span';
+			case '81':
+				return '<span class="italics">'.$g.' '.$s.'</span> f. <span class="italics">'.$i.'</span';
+			case '82':
+				return '<span class="italics">'.$g.' '.$s.'</span> subf. <span class="italics">'.$i.'</span';
 			default:
 				return $rankName.' '.$name;
 		
 		}
-		
-		//return '<span class="taxonName">'.trim($n).'</span> <span class="taxonEpithet">'.trim($e).'</span>';			
 	
 	}
 	
