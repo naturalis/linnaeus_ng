@@ -1,6 +1,16 @@
 {include file="../shared/header.tpl"}
 {include file="_header.tpl"}
+{literal}
+<style>
+.character-selected {
+	background-color:#FFCC00;
+}
 
+.state-selected {
+	background-color:#33FFFF;
+}
+</style>
+{/literal}
 <div id="page-main">
 
 <div id="matrix-header">
@@ -34,6 +44,7 @@
 		<div id="buttons">
 			<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />
 			<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
+			<input type="button" onclick="showMatrixResults()" value="{t}search{/t}" />
 		</div>
 	</div>
 
@@ -48,7 +59,7 @@
 			<select size="25" id="selected">
 			</select>
 			<div id="buttons">
-				<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />
+				<input type="button" onclick="showMatrixPattern(this)" value="{t}add{/t}" />
 				<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
 				<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
 			</div>
@@ -69,6 +80,9 @@
 	</div>
 </div>
 
+
+
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -77,6 +91,16 @@ $(document).ready(function(){
 	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
 {/foreach}
 	imagePath = '{$session.app.project.urls.uploadedMedia}';
+	
+{if $storedStates}
+{foreach from=$storedStates key=k item=v}
+	setSelectedState('{$v.val}'{if $v.type=='c'},{$v.id},{$v.characteristic_id},'{$v.label|addslashes}'{/if});
+{/foreach}
+	getScores();
+	showMatrixResults();
+	highlightSelected();
+{/if}
+	
 {literal}
 });
 </script>

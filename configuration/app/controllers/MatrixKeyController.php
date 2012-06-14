@@ -89,7 +89,7 @@ class MatrixKeyController extends Controller
 
 			//$this->redirect('matrices.php');
 		}
-		
+
 		$this->redirect('identify.php');
 
 		/*
@@ -178,6 +178,8 @@ class MatrixKeyController extends Controller
 
         $this->setPageName(sprintf(_('Matrix "%s": identify'),$matrix['name']));
 
+		$this->smarty->assign('storedStates',$this->stateMemoryRecall());
+
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
@@ -265,6 +267,8 @@ class MatrixKeyController extends Controller
 		} else
 		if ($this->rHasVal('action','get_taxa')) {
 
+			$this->stateMemoryStore($this->requestData['id']);
+
 			$this->smarty->assign(
 				'returnText',
 				json_encode(
@@ -293,17 +297,17 @@ class MatrixKeyController extends Controller
 	
 	}
 
-	private function checkMatrixIdOverride()
-	{
-
-		if ($this->rHasVal('mtrx'))  $this->setCurrentMatrix($this->requestData['mtrx']);
-
-	}
-
 	public function getCurrentMatrixId()
 	{
 	
 		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
+
+	}
+
+	private function checkMatrixIdOverride()
+	{
+
+		if ($this->rHasVal('mtrx'))  $this->setCurrentMatrix($this->requestData['mtrx']);
 
 	}
 
@@ -405,7 +409,7 @@ class MatrixKeyController extends Controller
 							'project_id' => $this->getCurrentProjectId(),
 							'id' => $val['taxon_id']
 						),
-						'columns' => 'id,taxon,is_hybrid'
+						'columns' => 'id,taxon,is_hybrid,rank_id'
 					)
 				);
 	
@@ -878,4 +882,48 @@ class MatrixKeyController extends Controller
 	
 	}
 
+	private function stateMemoryStore($data) 
+	{
+
+		if ($data=='-1') {
+			unset($_SESSION['app']['user']['matrix']['storedStates']);
+		} else {
+			$_SESSION['app']['user']['matrix']['storedStates'] = $data;
+		}
+
+	}
+
+	private function stateMemoryRecall() 
+	{
+
+		if (isset($_SESSION['app']['user']['matrix']['storedStates'])) {
+
+			foreach((array)$_SESSION['app']['user']['matrix']['storedStates'] as $key => $val) {
+			
+				$states[$key]['val'] = $val;
+			
+				$d = explode(':',$val);
+				
+				if ($d[0]=='c' && isset($d[2])) {
+				
+					$d = $this->getCharacteristicState($d[2]);
+
+					$states[$key]['type'] = 'c';
+					$states[$key]['id'] = $d['id'];
+					$states[$key]['characteristic_id'] = $d['characteristic_id'];
+					$states[$key]['label'] = $d['label'];
+				
+				}
+			
+			}
+
+			return $states;
+
+		} else {
+		
+			return null;
+
+		}
+
+	}
 }

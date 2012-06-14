@@ -1,5 +1,5 @@
 var imagePath;
-
+//\u2022
 function getData(action,id,postFunction) {
 
 	allAjaxHandle = $.ajax({
@@ -69,6 +69,8 @@ function fillStates(obj,char) {
 		);
 
 	}
+
+	highlightSelected();
 
 }
 
@@ -196,11 +198,7 @@ function addSelected(caller) {
 
 	var c = characteristics[$('#characteristics').val()];
 
-	if (caller.id=='characteristics' && (c[1]!='distribution' && c[1]!='range')) {
-
-		return;
-
-	}
+	if (caller.id=='characteristics' && (c[1]!='distribution' && c[1]!='range')) return;
 
 	if (c[1]=='distribution') {
 
@@ -229,6 +227,45 @@ function addSelected(caller) {
 		getScores();
 
 	}
+	
+}
+
+function highlightSelected() {
+
+	var d = Array();
+
+	$('#selected option').each(function(i){
+		var e = $(this).val().split(':');
+
+		$('#characteristics option').each(function(i){
+
+			if ($(this).val()==e[1]) $(this).addClass('character-selected');
+
+		});
+		
+		if (e[1]==$('#characteristics :selected').val()) {
+
+			$('#states option').each(function(i){
+
+				if (e[2]==$(this).val())  $(this).addClass('state-selected');
+
+			});
+
+		}
+
+	});
+
+}
+
+function removeHighlight() {
+
+	$('#characteristics option').each(function(i){
+		$(this).removeClass('character-selected');
+	});
+	
+	$('#states option').each(function(i){
+		$(this).removeClass('state-selected');
+	});
 
 }
 
@@ -255,6 +292,8 @@ function clearSelected() {
 	selected = selected.splice(0,0);
 
 	getScores('clear');
+	
+	removeHighlight();
 
 }
 
@@ -293,6 +332,8 @@ function fillScores(obj,char) {
 			val(obj[i].id);
 
 	}
+	
+	highlightSelected();
 
 }
 
@@ -304,7 +345,8 @@ function fillTaxonStates(obj,char) {
 	if (!obj) return;
 
 	for(var i in obj) {
-		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td></tr>');
+
+		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
 
 	}
 
@@ -362,5 +404,42 @@ function fillTaxaStates(obj) {
 	$('#formula').html(s);
 
 	$('#states').removeClass().addClass('visible');
+
+}
+
+function showMatrixResults() {
+
+	$('#search-pattern').css('display','none');
+	$('#search-results').css('display','block');
+
+}
+
+function showMatrixPattern() {
+
+	$('#search-pattern').css('display','block');
+	$('#search-results').css('display','none');
+
+}
+
+function setSelectedState(val,id,charId,label) {
+
+	var val = val.split(':');
+
+	if (val[0]=='c') {
+		
+		$('#selected').append('<option id="s'+id+'" value="c:'+charId+':'+id+'">'+characteristics[charId][0]+': '+label+'</option>').val(id);
+
+		selected[id] = true;
+
+	} else {
+
+		var c = characteristics[val[1]];
+	
+		if (c[1]=='range')
+			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+'">'+c[0]+': '+val[2]+'</option>');
+		else
+			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+':'+(val[3])+'">'+c[0]+': '+_('mean')+' '+val[2]+' &plusmn; '+val[3]+' '+_('sd')+'</option>');
+			
+	}
 
 }
