@@ -358,6 +358,7 @@ function fillTaxonStates(obj,char) {
 		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
 
 	}
+	$('#states').removeClass().addClass('visible');
 
 }
 
