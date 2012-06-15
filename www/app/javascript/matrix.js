@@ -33,7 +33,7 @@ function storeCharacteristic(id,label,char) {
 
 function fillStates(obj,char) {
 
-	$('#states').empty();
+	$('#comparison').empty();
 
 	setInfo(' ');
 
@@ -43,7 +43,7 @@ function fillStates(obj,char) {
 
 		if (obj[0].type.name != 'range' && obj[0].type.name != 'distribution') {
 	
-			$('#states').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
+			$('#comparison').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
 	
 		}
 		
@@ -83,7 +83,7 @@ function setInfo(val) {
 
 function goState() {
 
-	var state = states[$('#states').val()];
+	var state = states[$('#comparison').val()];
 
 //	alert(dumpObj(state));
 	
@@ -214,7 +214,7 @@ function addSelected(caller) {
 
 	} else {
 		
-		var s = states[$('#states').val()];
+		var s = states[$('#comparison').val()];
 
 		if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
 	
@@ -353,77 +353,6 @@ function fillScores(obj,char) {
 
 }
 
-
-function fillTaxonStates(obj,char) {
-
-	$('#states tbody tr').remove();
-
-	if (!obj) return;
-
-	for(var i in obj) {
-
-		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
-
-	}
-	$('#states').removeClass().addClass('visible');
-
-}
-
-function goExamine() {
-
-	getData('get_taxon_states',$('#taxon-list').val(),'fillTaxonStates');
-
-}
-
-function goCompare() {
-
-	var id1 = $('#taxon-list-1').val();
-	var id2 = $('#taxon-list-2').val();
-
-	if (id1=='' || id2=='') {
-
-		alert(_('You must select two taxa.'));
-		return;
-
-	} else
-	if (id1==id2) {
-
-		alert(_('You cannot compare a taxon to itself.'));
-		return;
-
-	}
-	getData('compare',[id1,id2],'fillTaxaStates');
-
-}
-	
-function fillTaxaStates(obj) {
-			
-	$('#count-both').html(obj.both);
-	$('#taxon-1').html(obj.taxon_1.taxon);
-	$('#count-1').html(obj.count_1);
-	$('#taxon-2').html(obj.taxon_2.taxon);
-	$('#count-2').html(obj.count_2);
-	$('#count-total').html(obj.total);
-	$('#count-neither').html(obj.neither);
-	$('#coefficient').html(obj.coefficients[0].value);
-
-	var s = '<select onchange="$(\'#coefficient\').html($(this).val());" id="coefficients">';
-
-	for (i in obj.coefficients) {
-	
-		s = s + '<option value="'+obj.coefficients[i].value+'"'+(i==0 ? ' selected="selected"' : '')+'>'+obj.coefficients[i].name+'</option>'+"\n";
-
-	}
-	
-	s = s + '</select>';
-
-
-	$('#formula').html(s);
-
-	$('#states').removeClass().addClass('visible');
-
-}
-
 function showMatrixResults() {
 
 	$('#search-pattern').css('display','none');
@@ -458,5 +387,104 @@ function setSelectedState(val,id,charId,label) {
 			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+':'+(val[3])+'">'+c[0]+': '+_('mean')+' '+val[2]+' &plusmn; '+val[3]+' '+_('sd')+'</option>');
 			
 	}
+
+}
+
+function fillTaxonStates(obj,char) {
+
+	$('#states tbody tr').remove();
+
+	if (!obj) return;
+
+	for(var i in obj) {
+
+		$('#comparison').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
+
+	}
+	$('#comparison').removeClass().addClass('visible');
+
+}
+
+function goExamine() {
+
+	getData('get_taxon_states',$('#taxon-list').val(),'fillTaxonStates');
+
+}
+
+function goCompare() {
+
+	var id1 = $('#taxon-list-1').val();
+	var id2 = $('#taxon-list-2').val();
+
+	if (id1=='' || id2=='') {
+
+		alert(_('You must select two taxa.'));
+		return;
+
+	} else
+	if (id1==id2) {
+
+		alert(_('You cannot compare a taxon to itself.'));
+		return;
+
+	}
+	getData('compare',[id1,id2],'fillCompareResults');
+
+}
+
+function fillCompareResults(obj) {
+	
+	fillTaxaStatesOverviews(obj);
+	fillTaxaStates(obj);
+	
+}
+
+function fillTaxaStatesOverviews(obj) {
+	
+	$('#taxon_name_1').html(obj.taxon_1.taxon);
+	$('#taxon_name_2').html(obj.taxon_2.taxon);
+	
+	var s;
+	
+	if (obj.taxon_states_1) for (i in obj.taxon_states_1)  s = s + obj.taxon_states_1[i].characteristic+': '+obj.taxon_states_1[i].state.label+'<br />';
+	$('#states1').html(s ? s : _('(none)'));
+	s = '';
+
+	if (obj.taxon_states_2) for (i in obj.taxon_states_2)  s = s + obj.taxon_states_2[i].characteristic+': '+obj.taxon_states_2[i].state.label+'<br />';
+	$('#states2').html(s ? s : _('(none)'));
+	s = '';
+
+	if (obj.taxon_states_overlap) for (i in obj.taxon_states_overlap)  s = s + obj.taxon_states_overlap[i].characteristic+': '+obj.taxon_states_overlap[i].state.label+'<br />';
+	$('#statesBoth').html(s ? s : _('(none)'));
+
+	$('#overview').removeClass('invisible').addClass('visible');
+
+}
+
+function fillTaxaStates(obj) {
+			
+	$('#count-both').html(obj.both);
+	$('#taxon-1').html(obj.taxon_1.taxon);
+	$('#count-1').html(obj.count_1);
+	$('#taxon-2').html(obj.taxon_2.taxon);
+	$('#count-2').html(obj.count_2);
+	$('#count-total').html(obj.total);
+	$('#count-neither').html(obj.neither);
+	$('#coefficient').html(obj.coefficients[0].value);
+
+	var s = '<select onchange="$(\'#coefficient\').html($(this).val());" id="coefficients">';
+
+	for (i in obj.coefficients) {
+	
+		s = s + '<option value="'+obj.coefficients[i].value+'"'+(i==0 ? ' selected="selected"' : '')+'>'+obj.coefficients[i].name+'</option>'+"\n";
+
+	}
+	
+	s = s + '</select>';
+
+
+	$('#formula').html(s);
+
+	$('#comparison').removeClass().addClass('visible');
 
 }
