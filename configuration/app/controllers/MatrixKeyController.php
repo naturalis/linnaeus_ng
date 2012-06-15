@@ -491,7 +491,8 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
-				)
+				),
+				'columns' => 'id,characteristic_id,file_name,lower,upper,mean,sd,got_labels',
 			)
 		);
 
@@ -794,15 +795,14 @@ class MatrixKeyController extends Controller
 	
 	private function getTaxonComparison($id)
 	{
+
+		if (empty($id[0]) || empty($id[1])) return;
 	
 		$c = $this->getCharacteristics();
 		$t1 = $this->getTaxonStates($id[0]);
 		$t2 = $this->getTaxonStates($id[1]);
 
-		$both = 0;
-		$neither = 0;
-		$t1_count = 0;
-		$t2_count = 0;
+		$both = $neither = $t1_count = $t2_count = 0;
 
 		foreach((array)$c as $key => $val) {
 
@@ -822,6 +822,31 @@ class MatrixKeyController extends Controller
 			}
 
 		}
+		
+
+		$overlap = $states1 = $states2 = array();
+
+		foreach((array)$t1 as $key => $val) {
+		
+			if (isset($t2[$key]) && $val==$t2[$key]) {
+			
+				$overlap[] = $val;
+			
+			} else {
+			
+				$states1[] = $val;
+			
+			}
+		
+		}
+		
+		foreach((array)$t2 as $key => $val) {
+		
+			if (!isset($t1[$key]) || $val!=$t1[$key]) $states2[] = $val;
+
+		}
+
+		//q($overlap,1);
 
 		return array(
 			'taxon_1' => $this->getTaxonById($id[0]),
@@ -831,7 +856,10 @@ class MatrixKeyController extends Controller
 			'neither' => $neither,
 			'both' => $both,
 			'total' => count((array)$c),
-			'coefficients' => $this->calculateDistances($t1_count,$t2_count,$both,$neither)
+			'coefficients' => $this->calculateDistances($t1_count,$t2_count,$both,$neither),
+			'taxon_states_1' => $states1,
+			'taxon_states_2' => $states2,
+			'taxon_states_overlap' => $overlap
 		);
 
 	}
@@ -886,9 +914,9 @@ class MatrixKeyController extends Controller
 	{
 
 		if ($data=='-1') {
-			unset($_SESSION['app']['user']['matrix']['storedStates']);
+			unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()]);
 		} else {
-			$_SESSION['app']['user']['matrix']['storedStates'] = $data;
+			$_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()] = $data;
 		}
 
 	}
@@ -896,9 +924,9 @@ class MatrixKeyController extends Controller
 	private function stateMemoryRecall() 
 	{
 
-		if (isset($_SESSION['app']['user']['matrix']['storedStates'])) {
+		if (isset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()])) {
 
-			foreach((array)$_SESSION['app']['user']['matrix']['storedStates'] as $key => $val) {
+			foreach((array)$_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key => $val) {
 			
 				$states[$key]['val'] = $val;
 			

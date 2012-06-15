@@ -22,8 +22,20 @@
 		<p>
 		<input type="button" onclick="goCompare()" value="{t}compare taxa{/t}" />
 		</p>
+		<div id="overview" class="invisible">
+
+			<b>{t _s1='<span id="taxon_name_1"></span>'}Unique character states for %s:{/t}</b>
+			<p id="states1"></p>
+			<br />
+			<b>{t _s1='<span id="taxon_name_2"></span>'}Unique character states for %s:{/t}</b>
+			<p id="states2"></p>
+			<br />
+			<b>{t}Shared character states:{/t}</b>
+			<p id="statesBoth"></p>
+			<br />
+		</div>
 		<p>
-			<table id="states" class="invisible">
+			<table id="comparison" class="invisible">
 				<tr class="highlight"><td style="width:300px">{t}Unique states in{/t} <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>
 				<tr class="highlight"><td>{t}Unique states in{/t} <span id="taxon-2"></span>:</td><td id="count-2"></td><td></td></tr>
 				<tr class="highlight"><td>{t}States present in both:{/t}</td><td id="count-both"></td><td></td></tr>
