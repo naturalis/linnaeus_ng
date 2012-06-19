@@ -88,11 +88,11 @@
 }
 
 .invisible {
-	visibility:hidden;
+	display:none;
 }
 
 .visible {
-	visibility:visible;
+	display:block;
 }
 
 #count-both, #count-1, #count-2, #count-total, #coefficient, #count-neither {
