@@ -280,7 +280,7 @@ class MatrixKeyController extends Controller
 			);
 		
 		} else
-		if ($this->rHasVal('action','get_taxon_states')) {
+			if ($this->rHasVal('action','get_taxon_states')) {
 
 			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonStates($this->requestData['id'])));
 		
@@ -763,7 +763,7 @@ class MatrixKeyController extends Controller
 
 	private function getTaxonStates($id)
 	{
-	
+
 		$mts = $this->models->MatrixTaxonState->_get(
 			array(
 				'id' => array(
@@ -775,7 +775,6 @@ class MatrixKeyController extends Controller
 				'fieldAsIndex' => 'characteristic_id'
 			)
 		);
-
 
 		foreach((array)$mts as $key => $val) {
 

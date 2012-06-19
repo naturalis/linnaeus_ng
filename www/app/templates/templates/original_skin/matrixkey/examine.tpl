@@ -1,6 +1,10 @@
 {include file="../shared/header.tpl"}
 {include file="_header.tpl"}
 <div id="page-main">
+
+	<p id="help-text">{t}Select a taxon from the list to view characters and character states of this taxon. 
+   These are used for the identification process under Identify.{/t}</p>
+   
 	<div id="examine">
 		<p>
 			<select onchange="goExamine()" id="taxon-list">

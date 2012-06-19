@@ -398,10 +398,10 @@ function fillTaxonStates(obj,char) {
 
 	for(var i in obj) {
 
-		$('#comparison').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
+		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
 
 	}
-	$('#comparison').removeClass().addClass('visible');
+	$('#states').removeClass().addClass('visible');
 
 }
 
