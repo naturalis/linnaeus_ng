@@ -214,7 +214,7 @@ function addSelected(caller) {
 
 	} else {
 		
-		var s = states[$('#comparison').val()];
+		var s = states[$('#states').val()];
 
 		if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
 	
