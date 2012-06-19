@@ -22,19 +22,19 @@
 		</p>
 
 		<p id="help-text">{t}Select two taxa from the lists and click Compare to compare the characters and character states for both taxa. The results show the differences and similarities for both taxa.{/t}</p>
-		<div id="overview" class="invisible">
 
-			<b>{t _s1='<span id="taxon_name_1"></span>'}Unique character states for %s:{/t}</b>
-			<p id="states1"></p>
-			<br />
-			<b>{t _s1='<span id="taxon_name_2"></span>'}Unique character states for %s:{/t}</b>
-			<p id="states2"></p>
-			<br />
-			<b>{t}Shared character states:{/t}</b>
-			<p id="statesBoth"></p>
-			<br />
-		</div>
-
+			<div id="overview" class="invisible">
+				<b>{t _s1='<span id="taxon_name_1"></span>'}Unique character states for %s:{/t}</b>
+				<p id="states1"></p>
+				<br />
+				<b>{t _s1='<span id="taxon_name_2"></span>'}Unique character states for %s:{/t}</b>
+				<p id="states2"></p>
+				<br />
+				<b>{t}Shared character states:{/t}</b>
+				<p id="statesBoth"></p>
+				<br />
+			</div>
+	
 		<p>
 			<table id="comparison" class="invisible">
 				<tr><td class="compare-label">{t}Unique states in{/t} <span id="taxon-1"></span>:</td><td id="count-1"></td><td></td></tr>

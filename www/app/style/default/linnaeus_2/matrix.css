@@ -19,8 +19,20 @@
 	//display: none;
 }
 
-table#states, table#comparison {
+#help-text {
 	margin-top: 15px;
+}
+
+#overview {
+	padding: 15px 15px 0 15px;
+}
+
+table#states {
+	margin-top: 15px;
+	width: 70%;
+}
+
+table#comparison {
 	width: 70%;
 }
 
@@ -30,7 +42,7 @@ table#states th {
 }
 
 table#states td, table#comparison td {
-	white-space:nowrap;
+	white-space: nowrap;
 	padding: 2px 15px;
 	border-top: 1px solid #f4f0f0;
 }
@@ -124,11 +136,11 @@ td.compare-label {
 }
 
 .invisible {
-	visibility:hidden;
+	display: none;
 }
 
 .visible {
-	visibility:visible;
+	display: block;
 }
 
 #count-both, #count-1, #count-2, #count-total, #coefficient, #count-neither {
