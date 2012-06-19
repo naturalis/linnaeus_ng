@@ -14,7 +14,7 @@
 		<p id="help-text">{t}Select a taxon from the list to view characters and character states of this taxon. 
 			These are used for the identification process under Identify.{/t}</p>
 		<p>
-			<table id="comparison" class="invisible">
+			<table id="states" class="invisible">
 			<thead>
 				<tr>
 					<th>{t}Type{/t}</th>

@@ -19,32 +19,32 @@
 	//display: none;
 }
 
-table#comparison {
+table#states, table#comparison {
 	margin-top: 15px;
 	width: 70%;
 }
 
-table#comparison th {
+table#states th {
 	padding: 10px 15px;
 	font-weight: bold;
 }
 
-table#comparison td {
+table#states td, table#comparison td {
 	white-space:nowrap;
 	padding: 2px 15px;
 	border-top: 1px solid #f4f0f0;
 }
 
-table#comparison td:last-child {
+table#states td:last-child, table#comparison td {
 	width: 50%;
+}
+
+table#states tr:last-child, table#comparison tr:last-child {
+	border-bottom: 1px solid #f4f0f0;
 }
 
 .character-selected, .state-selected {
 	background-color: #f4f0f0;
-}
-
-table#comparison tr:last-child {
-	border-bottom: 1px solid #f4f0f0;
 }
 
 td.compare-label {
