@@ -36,7 +36,7 @@
 	<div id="content">
         {foreach name=taxonloop from=$taxa key=k item=v}
         <p>
-            <a class="internal-link" href="../species/taxon.php?id={$v.id}&cat=names">
+            <a class="internal-link" href="../species/taxon.php?id={$v.id}">
             {if $v.label}{$v.label}{else}{$v.transliteration}{/if}</a>
             {if $activeLanguage=='*'} ({$nameLanguages[$v.language_id].language}){/if}
         </p>

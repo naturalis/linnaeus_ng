@@ -38,7 +38,7 @@
 		{foreach name=taxonloop from=$taxa key=k item=v}
 		<tr class="highlight">
 			<td class="species-name-cell">
-				<a href="../species/taxon.php?id={$v.id}&cat=names">
+				<a href="../species/taxon.php?id={$v.id}">
 				{if $v.label}{$v.label}{else}{$v.transliteration}{/if}
 				</a>
 			</td>
