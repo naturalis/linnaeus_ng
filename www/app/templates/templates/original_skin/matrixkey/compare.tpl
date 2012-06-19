@@ -2,6 +2,7 @@
 {include file="_header.tpl"}
 <div id="page-main">
 	<div id="compare">
+		 <p id="help-text">{t}Select two taxa from the lists and click Compare to compare the characters and character states for both taxa. The results show the differences and similarities for both taxa.{/t}</p>	
 		<p>
 			<select id="taxon-list-1">
 			<option disabled="disabled" selected="selected" value="">{t}select a taxon{/t}</option>

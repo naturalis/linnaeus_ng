@@ -182,7 +182,7 @@ class LinnaeusController extends Controller
 
 		}
 
-		$this->setPageName( _($d['subject']));
+		$this->setPageName(_($d['subject']));
 
 		$this->smarty->assign('subject',$this->matchHotwords($this->matchGlossaryTerms($d['subject'])));
 		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));
@@ -456,7 +456,7 @@ class LinnaeusController extends Controller
 		
 		$c = $this->models->Content->_get(array('id' => $d));
 
-		return isset($c[0]) ? $c[0] : '';
+		return isset($c[0]) ? $c[0] : null;
 	
 	}
 
