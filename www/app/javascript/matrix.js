@@ -83,7 +83,7 @@ function setInfo(val) {
 
 function goState() {
 
-	var state = states[$('#comparison').val()];
+	var state = states[$('#states').val()];
 
 //	alert(dumpObj(state));
 	
