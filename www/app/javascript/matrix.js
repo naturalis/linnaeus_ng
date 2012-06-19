@@ -33,7 +33,7 @@ function storeCharacteristic(id,label,char) {
 
 function fillStates(obj,char) {
 
-	$('#comparison').empty();
+	$('#states').empty();
 
 	setInfo(' ');
 
@@ -43,7 +43,7 @@ function fillStates(obj,char) {
 
 		if (obj[0].type.name != 'range' && obj[0].type.name != 'distribution') {
 	
-			$('#comparison').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
+			$('#states').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
 	
 		}
 		
