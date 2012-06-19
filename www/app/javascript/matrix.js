@@ -444,7 +444,7 @@ function fillTaxaStatesOverviews(obj) {
 	$('#taxon_name_1').html(obj.taxon_1.taxon);
 	$('#taxon_name_2').html(obj.taxon_2.taxon);
 	
-	var s;
+	var s = '';
 	
 	if (obj.taxon_states_1) for (i in obj.taxon_states_1)  s = s + obj.taxon_states_1[i].characteristic+': '+obj.taxon_states_1[i].state.label+'<br />';
 	$('#states1').html(s ? s : _('(none)'));
