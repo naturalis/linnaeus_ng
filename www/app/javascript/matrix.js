@@ -402,7 +402,7 @@ function fillTaxonStates(obj,char) {
 
 	}
 	$('#states').removeClass().addClass('visible');
-
+	$('#help-text').removeClass().addClass('invisible');
 }
 
 function goExamine() {
@@ -486,5 +486,5 @@ function fillTaxaStates(obj) {
 	$('#formula').html(s);
 
 	$('#comparison').removeClass().addClass('visible');
-
+	$('#help-text').removeClass().addClass('invisible');
 }
