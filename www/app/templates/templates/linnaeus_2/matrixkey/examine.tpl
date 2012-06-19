@@ -4,19 +4,23 @@
 	<div id="examine">
 		<p>
 			<select onchange="goExamine()" id="taxon-list">
-			<option disabled="disabled" selected="selected">{t}select a taxon{/t}</option>
+			<option disabled="disabled" selected="selected">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
 			<option value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
 			{/foreach}
 			</select>
 		</p>
+		
+		<p id="help-text">{t}Select a taxon from the list to view characters and character states of this taxon. 
+			These are used for the identification process under Identify.{/t}</p>
 		<p>
-			<table id="states">
+			<table id="comparison" class="invisible">
 			<thead>
 				<tr>
-					<th style="width:100px">{t}type{/t}</th>
-					<th style="width:250px">{t}character{/t}</th>
-					<th>{t}state{/t}</th>
+					<th>{t}Type{/t}</th>
+					<th>{t}Character{/t}</th>
+					<th>{t}State{/t}</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>

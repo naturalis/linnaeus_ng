@@ -58,7 +58,7 @@ class configuration
 				'versionTimestamp' => date('r'), 
 				'pathName' => 'app',
 				'fileRoot' => $this->_appFileRoot.'www/app/',
-				//'skinName' => 'original_skin',
+				//'skinName' => 'original_skin'
 				'skinName' => 'linnaeus_2'
 			),
 			'defaultController' => 'linnaeus',

@@ -317,13 +317,13 @@ body {
 
 
 /* Bringing back stuff from the original basics.css */
-.internal-link {
+a, .internal-link {
     color: #400093;
     cursor: pointer;
     text-decoration: none;
 }
 
-.internal-link:hover {
+a:hover, .internal-link:hover {
     text-decoration: underline;
 }
 
@@ -332,7 +332,7 @@ body {
     color: #550000;
 }
 
-.introduction-img {
+.introduction-img, #overview-image {
 	height: 281px;
     width: 241px;
     float: right;
@@ -342,4 +342,8 @@ body {
 
 .clear {
 	clear: both;
+}
+
+.italics {
+	font-style: italic;
 }
