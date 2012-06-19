@@ -10,7 +10,7 @@
         <td class="grid">
             <a class="menu-item" href="../{$v.controller}/">
                 <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/{$v.icon}" />
-                <p>{t}{$v.module}{/t}</p>
+                <div>{t}{$v.module}{/t}</div>
             </a>
         </td>
         {assign var=i value=$i+1}
@@ -24,7 +24,7 @@
             {else}
             <a href="../module/?modId={$v.id}">
                 <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/custom.png" />
-                <p>{t}{$v.module}{/t}</p>
+                <div>{t}{$v.module}{/t}</div>
             </a>
             {/if}
         </td>

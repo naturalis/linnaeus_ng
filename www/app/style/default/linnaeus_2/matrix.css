@@ -19,16 +19,45 @@
 	//display: none;
 }
 
+table#comparison {
+	margin-top: 15px;
+	width: 70%;
+}
 
+table#comparison th {
+	padding: 10px 15px;
+	font-weight: bold;
+}
 
+table#comparison td {
+	white-space:nowrap;
+	padding: 2px 15px;
+	border-top: 1px solid #f4f0f0;
+}
 
+table#comparison td:last-child {
+	width: 50%;
+}
+
+.character-selected, .state-selected {
+	background-color: #f4f0f0;
+}
+
+table#comparison tr:last-child {
+	border-bottom: 1px solid #f4f0f0;
+}
+
+td.compare-label {
+	width: 300px;	
+	height: 30px;
+}
 
 
 #char-states {
-	width:300px;
-	height:270px;
-	margin-bottom:15px;
-	vertical-align:top;
+	width: 300px;
+	height: 270px;
+	margin-bottom: 15px;
+	vertical-align: top;
 }
 
 #char-states #characteristics {
@@ -67,8 +96,7 @@
 }
 
 #buttons {
-	margin-bottom:10px;
-	vertical-align:top;
+	margin: 10px 0;
 }
 
 #scores-taxa {

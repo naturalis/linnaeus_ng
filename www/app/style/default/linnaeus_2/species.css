@@ -123,13 +123,6 @@
 	cursor:pointer;
 }
 
-#overview-image {
-	width:250px;
-	float:right;
-	margin:0px 0px 5px 5px;
-	border:1px solid #aaa;
-}
-
 .media-video-icon {
 	cursor:pointer;
 }
