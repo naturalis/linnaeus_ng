@@ -1087,10 +1087,11 @@ class Controller extends BaseClass
 		$rankId = $r['ranks'][$projRankId]['rank_id'];
 		$rankName = $r['ranks'][$projRankId]['labels'][$this->getCurrentLanguageId()];
 		
-		if ($rankId > 75) {
-			list($g, $s, $i) = explode(' ', $name);
+		$elements = explode(' ', $name);
+			if (count($elements) > 2) {
+			list($g, $s, $i) = $elements;
 		}
-		
+				
 		switch ($rankId) {
 			case '63': 
 				return $rankName.' <span class="italics">'.$name.'</span>';
