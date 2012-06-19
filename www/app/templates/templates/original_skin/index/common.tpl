@@ -3,19 +3,28 @@
 <div id="page-main">
 
 	<div id="alphabet">
-	{if $alpha|@count!=0}
-	{t}Click to browse:{/t}&nbsp;
-	{foreach name=loop from=$alpha key=k item=v}
-	{if $v==$letter}
-	<span class="alphabet-active-letter">{$v}</span>
-	{else}
-	<span class="alphabet-letter" onclick="$('#letter').val('{$v}');$('#theForm').submit();">{$v}</span>
-	{/if}
-	{/foreach}
-	{/if}
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
+	{if $hasNonAlpha}
+		{assign var=l value=$letter|ord}
+		{if $l < 97 || $l > 122}
+		<span class="alphabet-active-letter">#</span>
+		{else}
+		<span class="alphabet-letter" onclick="$('#letter').val('#');$('#theForm').submit();">#</span>
+		{/if}
+	{/if}
+	{section name=foo start=97 loop=123 step=1}
+	  {assign var=l value=$smarty.section.foo.index|chr}
+		{if $l==$letter}
+		<span class="alphabet-active-letter">{$l|upper}</span>
+		{elseif $alpha[$l]}
+		<span class="alphabet-letter" onclick="$('#letter').val('{$l}');$('#theForm').submit();">{$l|upper}</span>
+		{else}
+		<span class="alphabet-letter-ghosted">{$l|upper}</span>
+		{/if}
+	{/section}
 	</div>
 
+	{if $nameLanguages|@count > 1}
 	<div id="commonname-languages">
 		{t}Language:{/t}
 		<select id="nameLanguage" onchange="
@@ -32,6 +41,7 @@
 		<input type="hidden" id="activeLanguage" name="activeLanguage" value="{$activeLanguage}" />
 		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
+	{/if}
 
 	<div>
 		<table>
@@ -47,27 +57,41 @@
 		{/foreach}
 		</table>
 	</div>
-{if $prevStart!=-1 || $nextStart!=-1}
-	<div id="navigation">
 
-	{if $useJavascriptLinks}
-		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
+	{if $usePagination}
+		{if $useJavascriptLinks}
+			{if $prevStart!=-1}
+			<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
+			{/if}
+			{if $nextStart!=-1}
+			<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
+			{/if}
+		{else}
+			{if $prevStart!=-1}
+			<a href="?start={$prevStart}&letter={$letter}">< {t}previous{/t}</span>
+			{/if}
+			{if $nextStart!=-1}
+			<a href="?start={$nextStart}&letter={$letter}">{t}next{/t} ></span>
+			{/if}
 		{/if}
 	{else}
-		{if $prevStart!=-1}
-		<a href="?start={$prevStart}&letter={$letter}">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<a href="?start={$nextStart}&letter={$letter}">{t}next{/t} ></span>
+		{if $useJavascriptLinks}
+			{if $alphaNav.prev}
+			<span class="a" onclick="$('#letter').val('{$alphaNav.prev}');$('#theForm').submit();">< {t}previous{/t}</span>
+			{/if}
+			{if $nextStart!=-1}
+			<span class="a" onclick="$('#letter').val('{$alphaNav.next}');$('#theForm').submit();">{t}next{/t} ></span>
+			{/if}
+		{else}
+			{if $alphaNav.prev}
+			<a href="javascript:$('#letter').val('{$alphaNav.prev}');$('#theForm').submit();">< {t}previous{/t}</span>
+			{/if}
+			{if $alphaNav.next}
+			<a href="javascript:$('#letter').val('{$alphaNav.next}');$('#theForm').submit();">{t}next{/t} ></span>
+			{/if}
 		{/if}
 	{/if}
-	
-	</div>
-{/if}
+
 </div>
 
 {include file="../shared/footer.tpl"}

@@ -50,7 +50,7 @@
 	margin-bottom:10px;
 }
 
-#alphabet .alphabet-active-letter, .alphabet-letter {
+#alphabet .alphabet-active-letter, .alphabet-letter, .alphabet-letter-ghosted {
 	padding-left:3px;
 	padding-right:3px;
 	text-transform:uppercase;
@@ -63,6 +63,12 @@
 #alphabet .alphabet-letter {
 	cursor:pointer;
 }
+
+#alphabet .alphabet-letter-ghosted {
+	color:#bbb;
+}
+
+
 
 .navigator, .navigator-active {
 	font-size:11px;
@@ -80,4 +86,8 @@
 	background-color:#fff;
 	color:#CC0000;
 	cursor:default;
+}
+
+.italics {
+	font-style:italic;
 }
