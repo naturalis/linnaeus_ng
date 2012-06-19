@@ -246,6 +246,10 @@ body #body-container {
 }
 
 .glossary-term-highlight {
-	background-color:#FFFF99;
-	color:#550000;
+	border-bottom:1px dotted #CC6633;
+	color:black;
+}
+
+.glossary-term-highlight:hover {
+	text-decoration:none;
 }

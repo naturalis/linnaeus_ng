@@ -350,7 +350,6 @@ class IntroductionController extends Controller
 		$cfm = $this->models->ContentIntroduction->_get(
 			array(
 				'id' => $d,
-				'order' => 'topic',
 				'columns' => 'distinct page_id as id, topic as label',
 			)
 		);
@@ -360,8 +359,7 @@ class IntroductionController extends Controller
 			$this->makeLookupList(
 				$cfm,
 				$this->controllerBaseName,
-				'../introduction/topic.php?id=%s',
-				true
+				'../introduction/topic.php?id=%s'
 			)
 		);
 		

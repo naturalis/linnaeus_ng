@@ -58,8 +58,6 @@ class IndexController extends Controller
     
     }
 
-
-
 	public function indexAction()
 	{
 	
@@ -117,8 +115,6 @@ class IndexController extends Controller
 		
 		}
 
-		$this->customSortArray($n,array('key' => 'label'));
-
 		$this->customSortArray($l,array('key' => 'language','maintainKeys' => true));
 
 		if ($this->rHasVal('activeLanguage')) {
@@ -133,16 +129,16 @@ class IndexController extends Controller
 
 			foreach((array)$names as $key => $val) {
 			
-				if ($activeLanguage==$val['language_id']) {
-
-					$n[$key] = $val;
-
-				}
+				if ($activeLanguage==$val['language_id']) $n[$key] = $val;
 			
 			}
 		}
 
-		$d =  $this->makeAlphabetFromArray($n,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+		$this->customSortArray($n,array('key' => 'label'));
+
+		$letterToShow = $this->getFirstUsefulLetter($n, 'label');
+		
+		$d =  $this->makeAlphabetFromArray($n,'label',$letterToShow);
 
 		$pagination = $this->getPagination($d['names']);
 
@@ -154,7 +150,9 @@ class IndexController extends Controller
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
+		$this->smarty->assign('alphaNav',$d['alphaNav']);
+
+		$this->smarty->assign('letter',$letterToShow);
 
 		$this->smarty->assign('taxa',$pagination['items']);
 
@@ -199,14 +197,16 @@ class IndexController extends Controller
 		if ($this->getTaxonType()=='lower') {
 
 			$syn = $this->searchSynonyms();
-			
-			$taxa = array_merge((array)$taxa,(array)$syn);
 
-			$this->customSortArray($taxa,array('key' => 'label'));
+			$taxa = array_merge((array)$taxa,(array)$syn);
 
 		}
 
-		$d =  $this->makeAlphabetFromArray($taxa,'label',($this->rHasVal('letter') ? $this->requestData['letter'] : null));
+		$this->customSortArray($taxa,array('key' => 'taxon'));
+
+		$letterToShow = $this->getFirstUsefulLetter($taxa, 'taxon');
+	
+		$d =  $this->makeAlphabetFromArray($taxa,'taxon',$letterToShow);
 
 		$usePagination = false;
 
@@ -226,13 +226,17 @@ class IndexController extends Controller
 
 			$this->smarty->assign('taxa',$d['names']);
 
+			$this->smarty->assign('alphaNav',$d['alphaNav']);
+
 		}
 
 		$this->smarty->assign('showSpeciesIndexMenu', true);
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
-		$this->smarty->assign('letter',$this->rHasVal('letter') ? $this->requestData['letter'] : $d['alpha'][0]);
+		$this->smarty->assign('hasNonAlpha',$d['hasNonAlpha']);
+
+		$this->smarty->assign('letter',$letterToShow);
 
 		$this->smarty->assign('ranks',$ranks);
 
@@ -261,7 +265,7 @@ class IndexController extends Controller
 		return $this->models->Synonym->_get(
 			array(
 				'id' => $d,
-				'columns' => 'taxon_id as id,synonym as label,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
+				'columns' => 'taxon_id as id,synonym as label,synonym as taxon,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
 			)
 		);
 
@@ -296,20 +300,24 @@ class IndexController extends Controller
 
 	}
 	
-	private function makeAlphabetFromArray($names,$field,$letter=null)
+	private function makeAlphabetFromArray($names,$field,$letter)
 	{
 
 		$a = array();
 		
-		if (!is_null($letter)) $letter = strtolower($letter);
-	
+		$hasNonAlpha = false;
+		
+		$letter = strtolower($letter);
+		
 		foreach((array)$names as $key => $val) {
 		
 			$x = strtolower(substr(strip_tags($val[$field]),0,1));
 
 			$a[$x] = $x;
 
-			if (!is_null($letter) && $x==$letter) {
+			$hasNonAlpha = $hasNonAlpha || (ord($x) < 97 || ord($x) > 122);
+
+			if (!is_null($letter) && ($x==$letter || ($letter=='#' && (ord($x) < 97 || ord($x) > 122)))) {
 			
 				$n[$key] = $val;
 			
@@ -319,25 +327,66 @@ class IndexController extends Controller
 
 		if (!is_null($letter) && empty($n)) $letter = null;
 
-		sort($a);
+		asort($a);
 
-		if (is_null($letter)) {
-
-			$letter = $a[0];
-
-			foreach((array)$names as $key => $val) {
-
-				if (strtolower(substr(strip_tags($val[$field]),0,1))==$letter) $n[$key] = $val;
-	
+		$stopNext = $prev = $next = null;
+		
+		$i = 0;
+		
+		foreach((array)$a as $key => $val) {
+		
+			if ($stopNext===true) {
+			
+				$next = $val;
+				
+				break;
+			
 			}
 		
-		}
+			if ($val==$letter || ($letter=='#' && $i==0)) $stopNext = true;
+		
+			if ($stopNext!==true) $prev = $val;
+			
+			$i++;
 
+		}
+		
+		$prev = ((ord($prev) < 97 || ord($prev) > 122) && !is_null($prev) ? '#' : $prev);
+		
 		return array(
-			'alpha' => $a,
-			'names' => $n
+			'alpha' => isset($a) ? $a : null,
+			'names' => isset($n) ? $n : null,
+			'hasNonAlpha' => $hasNonAlpha,
+			'alphaNav' => array(
+				'prev' => $prev,
+				'next' => $next
+			)
 		);
 	
 	}	
+
+	private function getFirstUsefulLetter($list,$field)
+	{
+
+		if ($this->rHasVal('letter')) {
+		
+			if ($this->requestData['letter']=='#') return '#';
+
+			$l = strtolower($this->requestData['letter']);
+			
+			foreach((array)$list as $val) {
+			
+				if (strtolower(substr($val[$field],0,1))==$l) return $l;
+			
+			}
+
+		}
+
+		$d = array_slice($list,0,1);
+
+		return strtolower(substr($d[0][$field],0,1));
+	
+	}
+
 
 }
