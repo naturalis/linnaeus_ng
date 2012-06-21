@@ -32,6 +32,7 @@
 	text-align:center;
 	padding-top:5px;
 	margin:-5px;
+	content: "X";
 }
 #dialog-content {display:block; padding:6px; min-height:160px; font-size:13px;}
 #dialog-content-inner { min-height:128px; }

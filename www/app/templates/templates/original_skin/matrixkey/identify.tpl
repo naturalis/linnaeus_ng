@@ -27,13 +27,11 @@
 		</div>
 		<div id="choices">
 			{t}Selected combination of characters{/t}
-			({t}treat unknowns as matches:{/t}
-			<label><input onchange="getScores()" type="radio" value="n" id="unknowns-n" name="unknowns" checked="checked" />{t}no{/t}</label>
-			<label><input onchange="getScores()" type="radio" value="y" id="unknowns-y" name="unknowns" />{t}yes{/t}</label>
-			)
-			<br />
 			<select size="25" id="selected">
 			</select>
+			{t}treat unknowns as matches:{/t}
+			<label><input onchange="getScores()" type="checkbox" id="inc_unknowns" name="inc_unknowns" checked="checked" /></label>
+			<br />
 		</div>
 	</div>
 	<div id="pane-right">
