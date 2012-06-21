@@ -25,6 +25,8 @@
         {include file="../index/_lower.tpl"}
     {/if}
 
+<!--
+
 	{if $useJavascriptLinks}
 		{if $prevStart!=-1}
 		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
@@ -40,6 +42,8 @@
 		<a href="?start={$nextStart}&letter={$letter}">{t}next{/t} ></span>
 		{/if}
 	{/if}
+	
+-->
 </div>
 
 {include file="../shared/footer.tpl"}

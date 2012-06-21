@@ -6,10 +6,13 @@
             ($v.lower_taxon==0 && $taxonType=='higher')
         }
         <p>
+        
+        {assign var="tmp" value=$v.rank|ucfirst}
+        {assign var="formatTaxon" value=$v.label|replace:$tmp:''}
         {if $useJavascriptLinks}
-            <a class="internal-link" href="javascript:goTaxon({$v.id})">{$v.label}, {$v.rank}</a>
+            <a class="internal-link" href="javascript:goTaxon({$v.id})">{$formatTaxon}, {$v.rank}</a>
         {else}
-            <a class="internal-link" href="../species/taxon.php?id={$v.id}">{$v.label}, {$v.rank}</a>
+            <a class="internal-link" href="../species/taxon.php?id={$v.id}">{$formatTaxon}, {$v.rank}</a>
         {/if}
         {if $v.source =='synonym' && $names[$v.id].label!=''}
             <span class="synonym-addition"> ({$names[$v.id].label})</span>
