@@ -643,7 +643,7 @@ class MatrixKeyController extends Controller
 
 		}
 
-		$item['score'] = round(($item['hits'] / count((array)$states)) * 100).'%';
+		$item['score'] = round(($item['hits'] / count((array)$states)) * 100);
 
 		return $item;
 	
@@ -686,7 +686,9 @@ class MatrixKeyController extends Controller
 	
 		$results = array_merge((array)$taxa,(array)$matrices);
 	
-		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));		
+		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));	
+		
+		array_walk($results, create_function('&$v,$k', '$v["score"] = $v["score"]."%";'));	
 
 		return $results;
 
