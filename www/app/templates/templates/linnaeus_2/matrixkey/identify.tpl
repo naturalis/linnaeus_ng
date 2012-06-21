@@ -3,15 +3,7 @@
 
 <div id="page-main">
 
-<div id="matrix-header">
-		{t _s1=$matrix.name _s2=$function}Matrix: 
-		{if $matrixCount>1}
-			<a class="selectIcon" href="matrices.php" title="{t}Switch to another matrix{/t}">%s</a>
-		{else}
-			%s
-		{/if}
-		{/t}	
-</div>
+{include file="_matrix-header.tpl"}
 
 	<div id="search-pattern">
 		<div id="char-states">
