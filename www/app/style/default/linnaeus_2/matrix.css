@@ -92,7 +92,7 @@ td.compare-label {
 }
 
 #choices {
-	margin: 0 15px;
+	margin: 15px 0;
 	float: left;
 	width: 50%;
 }
@@ -116,6 +116,7 @@ td.compare-label {
 }
 
 #scores-taxa {
+	margin-top: 15px;
 	margin-right: 40px;
 	float: right;
 }
