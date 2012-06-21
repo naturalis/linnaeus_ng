@@ -32,8 +32,11 @@
 	text-align:center;
 	padding-top:5px;
 	margin:-5px;
+}
+#dialog-close:before {
 	content: "X";
 }
+
 #dialog-content {display:block; padding:6px; min-height:160px; font-size:13px;}
 #dialog-content-inner { min-height:128px; }
 #dialog-mask {position:fixed; top:0; left:0; height:100%; width:100%; background:#FFF; opacity:.75; filter:alpha(opacity=75); z-index:100}
