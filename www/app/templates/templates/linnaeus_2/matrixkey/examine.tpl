@@ -1,6 +1,8 @@
 {include file="../shared/header.tpl"}
 {include file="_header.tpl"}
 <div id="page-main">
+{include file="_matrix-header.tpl"}
+
 	<div id="examine">
 		<p>
 			<select onchange="goExamine()" id="taxon-list">

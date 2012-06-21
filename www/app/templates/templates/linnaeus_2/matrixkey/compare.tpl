@@ -1,6 +1,8 @@
 {include file="../shared/header.tpl"}
 {include file="_header.tpl"}
 <div id="page-main">
+{include file="_matrix-header.tpl"}
+
 	<div id="compare">
 		<p>
 			<select id="taxon-list-1">

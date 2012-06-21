@@ -18,6 +18,7 @@
 #matrix-header {
 	color: #0303b2;
     font-size: 14px;
+	margin-bottom: 15px;
 }
 
 #help-text {
@@ -69,8 +70,6 @@ td.compare-label {
 
 #char-states {
 	height: 270px;
-	margin: 0 0 15px 15px;
-	vertical-align: top;
 	float: left;
 }
 
@@ -92,7 +91,6 @@ td.compare-label {
 }
 
 #choices {
-	margin: 15px 0;
 	float: left;
 	width: 50%;
 }
@@ -116,7 +114,6 @@ td.compare-label {
 }
 
 #scores-taxa {
-	margin-top: 15px;
 	margin-right: 40px;
 	float: right;
 }
