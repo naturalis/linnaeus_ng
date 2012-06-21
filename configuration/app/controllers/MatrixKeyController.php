@@ -107,7 +107,7 @@ class MatrixKeyController extends Controller
     public function matricesAction()
     {
 
-        $this->setPageName( _('Matrices'));
+        //$this->setPageName( _('Matrices'));
 
 		$matrices = $this->getMatrices();
 
@@ -688,7 +688,7 @@ class MatrixKeyController extends Controller
 	
 		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));	
 		
-		array_walk($results, create_function('&$v,$k', '$v["score"] = $v["score"]."%";'));	
+		array_walk($results, create_function('&$v', '$v["score"] = $v["score"]."%";'));	
 
 		return $results;
 

@@ -1236,10 +1236,20 @@ class MapKeyController extends Controller
 				$m[$key]['mapExists'] = false;
 
 				if (!empty($val['image'])) {
+				
+					if (file_exists($_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'])) {
 
-					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['projectL2Maps'].$val['image']);
+						$m[$key]['mapExists'] = true;
 					
-					$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'];
+						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'];
+					
+					} else {
+
+						$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['systemL2Maps'].$val['image']);
+	
+						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['systemL2Maps'].$val['image'];
+					
+					}
 				
 				} else {
 				
