@@ -206,3 +206,18 @@
 {literal}
 }
 {/literal}
+
+
+
+
+
+
+
+
+{literal}
+#dialog-close {
+{/literal}
+    background: url('{$systemMedia}close.png') no-repeat 50% 50%;
+{literal}
+}
+{/literal}

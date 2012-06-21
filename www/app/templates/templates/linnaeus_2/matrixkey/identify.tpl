@@ -4,18 +4,18 @@
 <div id="page-main">
 
 <div id="matrix-header">
-	<div id="current">
-		{t _s1=$matrix.name _s2=$function}Using matrix "%s", function "%s"{/t}
-		({t}switch to {/t}	
-			{if $function!='Identify'}<a href="identify.php">{t}Identify{/t}</a> or {/if}{if $function!='Examine'}<a href="examine.php">{t}Examine{/t}</a>{if $function!='Compare'} or {/if}{/if}{if $function!='Compare'}<a href="compare.php">{t}Compare{/t}</a>{/if})
-		{if $matrixCount>1}<br /><a href="matrices.php">{t}Switch to another matrix{/t}</a>{/if}.	
-	</div>
-	
+		{t _s1=$matrix.name _s2=$function}Matrix: 
+		{if $matrixCount>1}
+			<a class="selectIcon" href="matrices.php" title="{t}Switch to another matrix{/t}">%s</a>
+		{else}
+			%s
+		{/if}
+		{/t}	
 </div>
 
 	<div id="search-pattern">
 		<div id="char-states">
-			{t}Characters{/t}<br />
+			<div class="label">{t}Characters{/t}</div>
 			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
 			{foreach from=$characteristics key=k item=v}
 			{if $v.label}
@@ -23,8 +23,8 @@
 			{/if}
 			{/foreach}
 			</select>
-			<br />
-			{t}States{/t}<br />
+			
+			<div class="label">{t}States{/t}</div>
 			<select size="5" id="states" onclick="goState()" ondblclick="addSelected(this)">
 			</select>
 		</div>
@@ -40,14 +40,13 @@
 
 	<div id="search-results">
 		<div id="choices">
-			{t}Selected combination of characters{/t}
-			({t}treat unknowns as matches:{/t}
-			<label><input onchange="getScores()" type="radio" value="n" id="unknowns-n" name="unknowns" checked="checked" />{t}no{/t}</label>
-			<label><input onchange="getScores()" type="radio" value="y" id="unknowns-y" name="unknowns" />{t}yes{/t}</label>
-			)
-			<br />
+			<div class="label">{t}Selected combination of characters{/t}</div>
 			<select size="25" id="selected">
 			</select>
+			({t}treat unknowns as matches:{/t}
+			<label><input onchange="getScores()" type="radio" value="n" id="unknowns-n" name="unknowns" checked="checked" /> {t}no{/t}</label>
+			<label><input onchange="getScores()" type="radio" value="y" id="unknowns-y" name="unknowns" /> {t}yes{/t}</label>
+			)
 			<div id="buttons">
 				<input type="button" onclick="showMatrixPattern(this)" value="{t}add{/t}" />
 				<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
@@ -55,9 +54,8 @@
 			</div>
 		</div>
 
-
 		<div id="scores-taxa">
-			{t}Result of this combination of characters{/t}<br />
+			<div class="label">{t}Result of this combination of characters{/t}</div>
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
 			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>

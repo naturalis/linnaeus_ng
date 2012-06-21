@@ -8,19 +8,21 @@
 }
 
 #search-results, #search-pattern {
-	margin-top: 25px;
+	margin-top: 15px;
 }
 
 #search-results {
 	display: none;
 }
 
-#search-pattern {
-	//display: none;
+#matrix-header {
+	color: #0303b2;
+    font-size: 14px;
 }
 
 #help-text {
-	margin-top: 15px;
+	margin: 15px;
+	width: 700px;
 }
 
 #overview {
@@ -97,26 +99,33 @@ td.compare-label {
 }
 
 #choices {
-	margin-right: 30px;
-	height: 155px;
+	margin: 0 15px;
 	float: left;
+	width: 50%;
 }
 
 #choices #selected {
 	width: 450px;
-	height: 155px;
+	height: 200px;
+}
+
+.label {
+	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 #buttons {
-	margin: 10px 0;
+	padding: 10px 0;
 }
 
 #scores-taxa {
+	margin-right: 40px;
+	float: right;
 }
 
 #scores {
-	width: 300px;
-	height: 350px;
+	width: 325px;
+	height: 335px;
 }
 
 .info-header {
@@ -126,7 +135,7 @@ td.compare-label {
 .info-image {
 	width:250px;
 	border:1px solid #666;
-	cursor:pointer;
+	cursor: pointer;
 }
 
 #taxon-list, #taxon-list-1, #taxon-list-2, #coefficients {

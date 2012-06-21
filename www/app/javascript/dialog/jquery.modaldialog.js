@@ -50,7 +50,7 @@
 			$(dialog).html(
 				"<div id='dialog-header'>" +
 					"<div id='dialog-title'></div>" +
-					"<div id='dialog-close'>X</div>" +
+					"<div id='dialog-close'></div>" +
 				"</div>" +
 				"<div id='dialog-content'>" +
 					"<div id='dialog-content-inner' />" +

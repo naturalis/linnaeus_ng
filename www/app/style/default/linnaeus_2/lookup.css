@@ -23,6 +23,21 @@
 
 }
 
+#lookupDialog {
+	text-align: left;
+	margin: 5px;
+	padding: 0 0 8px 2px;
+	border-bottom: 1px dotted #0303b2;
+}
+
+#lookup-DialogContent {
+	margin: 5px;
+	padding: 5px;
+	background: #fff;
+	border: 1px solid #999;
+}
+
+
 .allLookupListHighlight {
 
 	font-weight:bold;
@@ -38,6 +53,7 @@
 
 .allLookupListRow, .allLookupListActiveRow {
 
+	text-align: left;
 	cursor:pointer;
 
 }
