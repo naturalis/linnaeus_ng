@@ -641,7 +641,7 @@ class MatrixKeyController extends Controller
 
 		}
 
-		$item['score'] = round(($item['hits'] / count((array)$states)) * 100);
+		$item['score'] = round(($item['hits'] / count((array)$states)) * 100).'%';
 
 		return $item;
 	

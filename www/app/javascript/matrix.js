@@ -9,7 +9,7 @@ function getData(action,id,postFunction) {
 		data : ({
 			'action' : action ,
 			'id' : id , 
-			'inc_unknowns' : $('#unknowns-y').attr('checked') ? 1 : 0 , 
+			'inc_unknowns' : $('#inc_unknowns').attr('checked') ? 1 : 0 , 
 			'time' : getTimestamp()
 		}),
 		success : function (data) {
