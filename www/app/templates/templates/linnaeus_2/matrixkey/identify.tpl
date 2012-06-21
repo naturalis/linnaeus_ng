@@ -15,7 +15,7 @@
 
 	<div id="search-pattern">
 		<div id="char-states">
-			<div class="info-header">{t}Characters{/t}</div>
+			<div class="select-header">{t}Characters{/t}</div>
 			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
 			{foreach from=$characteristics key=k item=v}
 			{if $v.label}
@@ -24,7 +24,7 @@
 			{/foreach}
 			</select>
 			
-			<div class="info-header">{t}States{/t}</div>
+			<div class="select-header">{t}States{/t}</div>
 			<select size="5" id="states" onclick="goState()" ondblclick="addSelected(this)">
 			</select>
 			<div id="buttons">
@@ -34,13 +34,15 @@
 			</div>
 		</div>
 		<div id="info">
-		(info)
+			<div id="info-header"></div>
+			<div id="info-body">(info)</div>
+			<div id="info-footer"></div>
 		</div>
 	</div>
 
 	<div id="search-results">
 		<div id="choices">
-			<div class="info-header">{t}Selected combination of characters{/t}</div>
+			<div class="select-header">{t}Selected combination of characters{/t}</div>
 			<select size="25" id="selected">
 			</select>
 			<div id="unknowns">
@@ -54,7 +56,7 @@
 		</div>
 
 		<div id="scores-taxa">
-			<div class="info-header">{t}Result of this combination of characters{/t}</div>
+			<div class="select-header">{t}Result of this combination of characters{/t}</div>
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
 			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
