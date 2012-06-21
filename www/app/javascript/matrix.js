@@ -94,7 +94,7 @@ function goState() {
 			var val = state.text;
 			break;
 		case 'media':
-			
+	
 			setInfo(characteristics[state.characteristic_id][0]+': '+$('#states :selected').text());
 
 			var file = encodeURIComponent(state.file_name);
@@ -104,35 +104,46 @@ function goState() {
 
 			var img = $('<img />').attr('src',imagePath+state.file_name);
 
-			var imgW = $(img).attr('width');
-			var imgH = $(img).attr('height');
-
-			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
-
-			if (canEnlarge) {
-				
-				$('#info-footer').html(_('(click image to enlarge)'));
-
-				if ((maxH/maxW) < (imgH/imgW)) {
-					var newH = (maxH - parseInt($('#info-footer').css('height')));
-					var newW = ((newH / imgH) * imgW);
-					newW = Math.round(newW);
+			// ref: http://goo.gl/dSIO4
+			$(img).load(function(){
+			
+				var imgW = $(this).attr('width');
+				var imgH = $(this).attr('height');
+						
+				var canEnlarge = ((imgW > maxW) || (imgH > maxH));
+	
+				if (canEnlarge) {
+	
+					$('#info-footer').html(_('(click image to enlarge)'));
+	
+					if ((maxH/maxW) < (imgH/imgW)) {
+						var newH = (maxH - parseInt($('#info-footer').css('height')));
+						var newW = ((newH / imgH) * imgW);
+						newW = Math.round(newW);
+					} else {
+						var newW = maxW;
+						var newH = ((newH / imgH) * imgH);
+						newH = Math.round(newH);
+					}
+	
+					var val = 
+						'<img id="state-'+state.id+'" alt="'+file+'" '+
+						'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
+						'src="'+imagePath+state.file_name+'" class="info-image" '+
+						'style="height:'+newH+'px;width:'+newW+'px;" />';
+	
 				} else {
-					var newW = maxW;
-					var newH = ((newH / imgH) * imgH);
-					newH = Math.round(newH);
+	
+					var val = '<img id="state-'+state.id+'" alt="'+file+'" src="'+imagePath+state.file_name+'" />';
+	
 				}
+				
+				setInfo(null,val);
+				
+				return;
 
-				var val = 
-					'<img id="state-'+state.id+'" alt="'+file+'" '+
-					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
-					'src="'+imagePath+state.file_name+'" class="info-image" '+
-					'style="height:'+newH+'px;width:'+newW+'px;" />';
+			})
 
-			} else {
-
-				var val = '<img id="state-'+state.id+'" alt="'+file+'" src="'+imagePath+state.file_name+'" />';
-			}
 			break;
 		case 'range':
 			var val = 	
