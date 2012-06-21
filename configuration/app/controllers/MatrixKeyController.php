@@ -419,6 +419,8 @@ class MatrixKeyController extends Controller
 	
 			}
 
+			$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
+
 			$_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = isset($taxa) ? $taxa : null;
 			
 		}
