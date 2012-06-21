@@ -107,7 +107,7 @@ function goState() {
 		break;
 	}
 
-	setInfo(val ? '<span class="info-header">'+characteristics[state.characteristic_id][0]+': '+state.label+'</span><br/>'+val : ' ');
+	setInfo(val ? '<div class="info-header">'+characteristics[state.characteristic_id][0]+': '+state.label+'</div>'+val : ' ');
 
 }
 
