@@ -488,3 +488,8 @@ function fillTaxaStates(obj) {
 	$('#comparison').removeClass().addClass('visible');
 	$('#help-text').removeClass().addClass('invisible');
 }
+
+function showMatrixSelect() {
+	showDialog(_('Choose a matrix to use'));
+	$('#dialog-content-inner').load('matrices.php');
+}
