@@ -15,7 +15,7 @@
 
 	<div id="search-pattern">
 		<div id="char-states">
-			<div class="label">{t}Characters{/t}</div>
+			<div class="info-header">{t}Characters{/t}</div>
 			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
 			{foreach from=$characteristics key=k item=v}
 			{if $v.label}
@@ -24,37 +24,37 @@
 			{/foreach}
 			</select>
 			
-			<div class="label">{t}States{/t}</div>
+			<div class="info-header">{t}States{/t}</div>
 			<select size="5" id="states" onclick="goState()" ondblclick="addSelected(this)">
 			</select>
+			<div id="buttons">
+				<input type="button" onclick="addSelected(this)" value="{t}Add{/t}" />
+				<input type="button" onclick="clearSelected()" value="{t}Clear all{/t}" />
+				<input type="button" onclick="showMatrixResults()" value="{t}Search &gt;&gt;{/t}" />
+			</div>
 		</div>
 		<div id="info">
 		(info)
-		</div>
-		<div id="buttons">
-			<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />
-			<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
-			<input type="button" onclick="showMatrixResults()" value="{t}search{/t}" />
 		</div>
 	</div>
 
 	<div id="search-results">
 		<div id="choices">
-			<div class="label">{t}Selected combination of characters{/t}</div>
+			<div class="info-header">{t}Selected combination of characters{/t}</div>
 			<select size="25" id="selected">
 			</select>
-			({t}treat unknowns as matches:{/t}
-			<label><input onchange="getScores()" type="checkbox" id="inc_unknowns" name="inc_unknowns" checked="checked" /></label>
-			)
+			<div id="unknowns">
+			<input onchange="getScores()" type="checkbox" id="inc_unknowns" name="inc_unknowns" checked="checked" />
+			<label for="inc_unknowns">{t}Treat unknowns as matches{/t}</label></div>
 			<div id="buttons">
-				<input type="button" onclick="showMatrixPattern(this)" value="{t}add{/t}" />
-				<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
-				<input type="button" onclick="clearSelected(); showMatrixPattern();" value="{t}clear all{/t}" />
+				<input type="button" onclick="showMatrixPattern(this)" value="{t}Add{/t}" />
+				<input type="button" onclick="deleteSelected()" value="{t}Delete{/t}" />
+				<input type="button" onclick="clearSelected(); showMatrixPattern();" value="{t}Clear all{/t}" />
 			</div>
 		</div>
 
 		<div id="scores-taxa">
-			<div class="label">{t}Result of this combination of characters{/t}</div>
+			<div class="info-header">{t}Result of this combination of characters{/t}</div>
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}
 			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>

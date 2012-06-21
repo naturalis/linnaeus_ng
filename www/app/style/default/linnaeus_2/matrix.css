@@ -68,34 +68,22 @@ td.compare-label {
 
 
 #char-states {
-	width: 300px;
 	height: 270px;
-	margin-bottom: 15px;
+	margin: 0 0 15px 15px;
 	vertical-align: top;
+	float: left;
 }
 
-#char-states #characteristics {
-	width:300px;
+#char-states #characteristics, #char-states #states {
+	width: 320px;
 	height:125px;
 	margin-bottom:10px;
-}
-
-#char-states #states {
-	width:300px;
-	height:inherit;
-	height:125px;
 }
 
 #info {
-	position:relative;
-	margin-top:-270px;
-	left:310px;
-	width:260px;
-	height:262px;
-	border:1px dotted #666;
-	padding:5px;
-	margin-bottom:10px;
-	font-size:inherit;
+	margin-right: 60px;
+	width:400px;
+	float: right;
 }
 
 #choices {
@@ -109,13 +97,17 @@ td.compare-label {
 	height: 200px;
 }
 
-.label {
+.info-header {
+	display: block;
 	font-weight: bold;
 	margin-bottom: 5px;
 }
 
+#unknowns {
+	margin: 5px 0 12px 0;
+}
+
 #buttons {
-	padding: 10px 0;
 }
 
 #scores-taxa {
@@ -128,14 +120,11 @@ td.compare-label {
 	height: 335px;
 }
 
-.info-header {
-	font-weight:bold;
-}
-
 .info-image {
-	width:250px;
 	border:1px solid #666;
 	cursor: pointer;
+	width: 241px;
+	height: 281px;
 }
 
 #taxon-list, #taxon-list-1, #taxon-list-2, #coefficients {
