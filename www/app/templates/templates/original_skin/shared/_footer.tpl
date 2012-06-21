@@ -19,8 +19,6 @@
     <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 
-
-
 {/if}
 </div ends="page-container">
 <div id="footer-container">
@@ -57,5 +55,10 @@ addRequestVar('{$k}','{$v|addslashes}')
 {literal}
 </script>
 {/literal}
+<!--[if IE 7]>
+<script type="text/javascript">
+$('#dialog-close').html('X');
+</script>
+<![endif]-->
 </body>
 </html>
