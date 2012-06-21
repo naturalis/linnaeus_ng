@@ -35,7 +35,7 @@ function fillStates(obj,char) {
 
 	$('#states').empty();
 
-	setInfo(' ');
+	setInfo('',' ');
 
 	if (!obj) return;
 
@@ -75,9 +75,10 @@ function fillStates(obj,char) {
 
 }
 
-function setInfo(val) {
+function setInfo(h,b) {
 
-	$('#info').html(val);
+	if (h) $('#info-header').html(h);
+	if (b) $('#info-body').html(b);
 
 }
 
@@ -85,15 +86,53 @@ function goState() {
 
 	var state = states[$('#states').val()];
 
-//	alert(dumpObj(state));
-	
+	setInfo(characteristics[state.characteristic_id][0]);
+	$('#info-footer').html(null);
+
 	switch (state.type.name) {
 		case 'text':
 			var val = state.text;
 			break;
 		case 'media':
+			
+			setInfo(characteristics[state.characteristic_id][0]+': '+$('#states :selected').text());
+
 			var file = encodeURIComponent(state.file_name);
-			var val = '<img alt="'+file+'" onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" src="'+imagePath+state.file_name+'" class="info-image" /><br />'+_('(click image to enlarge)');
+
+			var maxW = parseInt($('#info').css('width'));
+			var maxH = parseInt($('#info').css('height')) - (parseInt($('#info-header').css('height')));
+
+			var img = $('<img />').attr('src',imagePath+state.file_name);
+
+			var imgW = $(img).attr('width');
+			var imgH = $(img).attr('height');
+
+			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
+
+			if (canEnlarge) {
+				
+				$('#info-footer').html(_('(click image to enlarge)'));
+
+				if ((maxH/maxW) < (imgH/imgW)) {
+					var newH = (maxH - parseInt($('#info-footer').css('height')));
+					var newW = ((newH / imgH) * imgW);
+					newW = Math.round(newW);
+				} else {
+					var newW = maxW;
+					var newH = ((newH / imgH) * imgH);
+					newH = Math.round(newH);
+				}
+
+				var val = 
+					'<img id="state-'+state.id+'" alt="'+file+'" '+
+					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
+					'src="'+imagePath+state.file_name+'" class="info-image" '+
+					'style="height:'+newH+'px;width:'+newW+'px;" />';
+
+			} else {
+
+				var val = '<img id="state-'+state.id+'" alt="'+file+'" src="'+imagePath+state.file_name+'" />';
+			}
 			break;
 		case 'range':
 			var val = 	
@@ -107,7 +146,7 @@ function goState() {
 		break;
 	}
 
-	setInfo(val ? '<div class="info-header">'+characteristics[state.characteristic_id][0]+': '+state.label+'</div>'+val : ' ');
+	setInfo(null,val);
 
 }
 

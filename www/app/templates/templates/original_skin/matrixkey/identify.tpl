@@ -18,7 +18,9 @@
 			</select>
 		</div>
 		<div id="info">
-		(info)
+			<div id="info-header"></div>
+			<div id="info-body">(info)</div>
+			<div id="info-footer"></div>
 		</div>
 		<div id="buttons">
 			<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />

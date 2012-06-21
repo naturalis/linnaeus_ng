@@ -34,6 +34,10 @@
 	font-size:inherit;
 }
 
+#info #info-header {
+	font-weight:bold;
+}
+
 #choices {
 	margin-bottom:5px;
 	vertical-align:top;
@@ -71,7 +75,7 @@
 	height:485px;
 }
 
-.info-header {
+.select-header {
 	font-weight:bold;
 }
 
