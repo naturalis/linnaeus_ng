@@ -18,7 +18,7 @@
         <!--[if lt IE 9]>
             <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7-8.css";</style> 
         <![endif]-->
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	
