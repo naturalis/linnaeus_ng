@@ -128,19 +128,34 @@ function goState() {
 					var newH = ((newH / imgH) * imgH);
 					newH = Math.round(newH);
 				}
-
+/*				
 				var val = 
 					'<img id="state-'+state.id+'" alt="'+file+'" '+
 					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
 					'src="'+imagePath+state.file_name+'" class="info-image" '+
 					'style="height:'+newH+'px;width:'+newW+'px;" />';
+*/				
+				var val = 
+					'<div id="state-'+state.id+'" alt="'+state.label+'" class="info-image" '+
+					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
+					'style="background: url(\''+imagePath+state.file_name+'\') no-repeat;'+
+					'background-size:cover;height:'+newH+'px;width:'+newW+'px;'+
+					'filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\''+
+					imagePath+state.file_name+'\', sizingMethod=\'scale\');'+
+					'-ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src=\''+
+					imagePath+state.file_name+'\', sizingMethod=\'scale\');"/>';
 
 			} else {
-
+/*
 				var val = '<img id="state-'+state.id+'" alt="'+file+
 					'" src="'+imagePath+state.file_name+'" class="info-image" '+
 					'style="height:'+imgH+'px;width:'+imgW+'px;" />';
-
+*/
+				var val = 
+					'<div id="state-'+state.id+'" alt="'+state.label+'" class="info-image" '+
+					'style="background: url(\''+imagePath+state.file_name+'\') no-repeat;'+
+					'height:'+imgH+'px;width:'+imgW+'px;"/>';
+				
 			}
 
 			break;
