@@ -86,7 +86,7 @@ function goState() {
 
 	var state = states[$('#states').val()];
 
-	setInfo(characteristics[state.characteristic_id][0]);
+//	setInfo(characteristics[state.characteristic_id][0]);
 	$('#info-footer').html(null);
 
 	switch (state.type.name) {
@@ -99,20 +99,28 @@ function goState() {
 
 			var file = encodeURIComponent(state.file_name);
 
+			var headerHeight = parseInt($('#info-header').css('height'));
+			if (isNaN(headerHeight)) headerHeight = parseInt(document.getElementById('info-header').offsetHeight); // IE7 / IE8
+			headerHeight = headerHeight + parseInt($('#info-header').css('marginBottom'));
+
 			var maxW = parseInt($('#info').css('width'));
-			var maxH = parseInt($('#info').css('height')) - (parseInt($('#info-header').css('height')));
+			var maxH = parseInt($('#info').css('height')) - headerHeight;
 
 			var imgW = state.img_dimensions.w;
 			var imgH = state.img_dimensions.h;
 
 			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
-	
+
 			if (canEnlarge) {
 
 				$('#info-footer').html(_('(click image to enlarge)'));
 
+				var footerHeight = parseInt($('#info-footer').css('height'));
+				if (isNaN(footerHeight)) footerHeight = parseInt(document.getElementById('info-footer').offsetHeight); // IE7 / IE8
+				footerHeight = footerHeight + parseInt($('#info-footer').css('marginTop'));
+
 				if ((maxH/maxW) < (imgH/imgW)) {
-					var newH = (maxH - parseInt($('#info-footer').css('height')));
+					var newH = (maxH - footerHeight);
 					var newW = ((newH / imgH) * imgW);
 					newW = Math.round(newW);
 				} else {
