@@ -131,7 +131,7 @@ function goState() {
 
 				var val = '<img id="state-'+state.id+'" alt="'+file+
 					'" src="'+imagePath+state.file_name+'" class="info-image" '+
-					'height="'+imgH+'" width="'+imgW+'" />';
+					'style="height:'+imgH+'px;width:'+imgW+'px;" />';
 
 			}
 
