@@ -142,7 +142,7 @@ class IndexController extends Controller
 		
 		$d =  $this->makeAlphabetFromArray($n,'label',$letterToShow);
 
-		$this->smarty->assign('_usePagination',$this->_usePagination);
+		$this->smarty->assign('usePagination',$this->_usePagination);
 		
 		if ($this->_usePagination) {
 		
@@ -165,8 +165,6 @@ class IndexController extends Controller
 		$this->smarty->assign('showSpeciesIndexMenu', true);
 
 		$this->smarty->assign('alpha',$d['alpha']);
-
-		$this->smarty->assign('alphaNav',$d['alphaNav']);
 
 		$this->smarty->assign('letter',$letterToShow);
 
@@ -222,7 +220,7 @@ class IndexController extends Controller
 	
 		$d =  $this->makeAlphabetFromArray($taxa,'taxon',$letterToShow);
 
-		$this->smarty->assign('_usePagination',$this->_usePagination);
+		$this->smarty->assign('usePagination',$this->_usePagination);
 		
 		if ($this->_usePagination) {
 		
