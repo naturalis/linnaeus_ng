@@ -126,8 +126,6 @@ td.compare-label {
 .info-image {
 	border:1px solid #666;
 	cursor: pointer;
-	-width: 241px;
-	-height: 281px;
 }
 
 #taxon-list, #taxon-list-1, #taxon-list-2, #coefficients {
