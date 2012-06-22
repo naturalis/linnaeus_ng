@@ -27,7 +27,7 @@
 		</div>
 		<div id="info">
 			<div id="info-header"></div>
-			<div id="info-body">(info)</div>
+			<div id="info-body"></div>
 			<div id="info-footer"></div>
 		</div>
 	</div>
