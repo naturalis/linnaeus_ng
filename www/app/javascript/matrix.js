@@ -94,7 +94,7 @@ function goState() {
 			var val = state.text;
 			break;
 		case 'media':
-	
+
 			setInfo(characteristics[state.characteristic_id][0]+': '+$('#states :selected').text());
 
 			var file = encodeURIComponent(state.file_name);
@@ -102,49 +102,38 @@ function goState() {
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - (parseInt($('#info-header').css('height')));
 
-			var img = $('<img />').attr('src',imagePath+state.file_name);
+			var imgW = state.img_dimensions.w;
+			var imgH = state.img_dimensions.h;
 
-			// ref: http://goo.gl/dSIO4
-			$(img).load(function(){
-			
-				var imgW = $(this).attr('width');
-				var imgH = $(this).attr('height');
-						
-				var canEnlarge = ((imgW > maxW) || (imgH > maxH));
+			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
 	
-				if (canEnlarge) {
-	
-					$('#info-footer').html(_('(click image to enlarge)'));
-	
-					if ((maxH/maxW) < (imgH/imgW)) {
-						var newH = (maxH - parseInt($('#info-footer').css('height')));
-						var newW = ((newH / imgH) * imgW);
-						newW = Math.round(newW);
-					} else {
-						var newW = maxW;
-						var newH = ((newH / imgH) * imgH);
-						newH = Math.round(newH);
-					}
-	
-					var val = 
-						'<img id="state-'+state.id+'" alt="'+file+'" '+
-						'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
-						'src="'+imagePath+state.file_name+'" class="info-image" '+
-						'style="height:'+newH+'px;width:'+newW+'px;" />';
-	
+			if (canEnlarge) {
+
+				$('#info-footer').html(_('(click image to enlarge)'));
+
+				if ((maxH/maxW) < (imgH/imgW)) {
+					var newH = (maxH - parseInt($('#info-footer').css('height')));
+					var newW = ((newH / imgH) * imgW);
+					newW = Math.round(newW);
 				} else {
-	
-					var val = '<img id="state-'+state.id+'" alt="'+file+
-						'" src="'+imagePath+state.file_name+'" class="info-image" '+
-						'height="'+imgH+'" width="'+imgW+'"/>';
-	
+					var newW = maxW;
+					var newH = ((newH / imgH) * imgH);
+					newH = Math.round(newH);
 				}
-				
-				setInfo(null,val);
-				
-				return;
 
-			})
+				var val = 
+					'<img id="state-'+state.id+'" alt="'+file+'" '+
+					'onclick="showMedia(\''+imagePath+file+'\',\''+file+'\');" '+
+					'src="'+imagePath+state.file_name+'" class="info-image" '+
+					'style="height:'+newH+'px;width:'+newW+'px;" />';
+
+			} else {
+
+				var val = '<img id="state-'+state.id+'" alt="'+file+
+					'" src="'+imagePath+state.file_name+'" class="info-image" '+
+					'height="'+imgH+'" width="'+imgW+'" />';
+
+			}
 
 			break;
 		case 'range':

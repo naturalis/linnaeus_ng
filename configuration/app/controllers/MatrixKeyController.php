@@ -455,6 +455,29 @@ class MatrixKeyController extends Controller
 
 	}
 
+	private function getImageDimensions($state)
+	{
+	
+		if ($state['type']['name']=='media') {
+
+			$f = $_SESSION['app']['project']['urls']['uploadedMedia'].$state['file_name'];
+			
+			if (!file_exists($f)) return null;
+			
+			$f = getimagesize($f);
+			
+			if ($f==false) return null;
+
+			return array('w' => $f[0], 'h' => $f[1]);
+
+		} else {
+		
+			return null;
+		
+		}
+	
+	}
+
 	private function getCharacteristicStates($id)
 	{
 
@@ -475,7 +498,8 @@ class MatrixKeyController extends Controller
 			$d = $this->getCharacteristic($val['characteristic_id']);
 			$cs[$key]['type'] = $d['type'];
 			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
-			$cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'],'text');
+			$cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'],'text');			
+			$cs[$key]['img_dimensions'] = $this->getImageDimensions($cs[$key]);
 
 		}
 
