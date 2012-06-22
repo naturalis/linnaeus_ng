@@ -81,13 +81,18 @@ td.compare-label {
 
 #info {
 	margin-right: 60px;
-	width:400px;
+	width: 400px;
 	height: 300px;
 	float: right;
 }
 
-#info #info-header {
+#info-header {
 	font-weight:bold;
+	margin-bottom: 5px;
+}
+
+#info-footer {
+	margin-top: 5px;
 }
 
 #choices {
