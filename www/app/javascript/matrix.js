@@ -105,7 +105,7 @@ function goState() {
 
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - headerHeight;
-
+			
 			var imgW = state.img_dimensions.w;
 			var imgH = state.img_dimensions.h;
 
@@ -125,7 +125,7 @@ function goState() {
 					newW = Math.round(newW);
 				} else {
 					var newW = maxW;
-					var newH = ((newH / imgH) * imgH);
+					var newH = ((maxH / imgH) * imgH);
 					newH = Math.round(newH);
 				}
 /*				
