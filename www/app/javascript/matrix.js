@@ -134,7 +134,9 @@ function goState() {
 	
 				} else {
 	
-					var val = '<img id="state-'+state.id+'" alt="'+file+'" src="'+imagePath+state.file_name+'" />';
+					var val = '<img id="state-'+state.id+'" alt="'+file+
+						'" src="'+imagePath+state.file_name+'" class="info-image" '+
+						'height="'+imgH+'" width="'+imgW+'"/>';
 	
 				}
 				
