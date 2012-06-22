@@ -27,6 +27,8 @@ class IndexController extends Controller
 		'dialog/jquery.modaldialog.js'
 	));
 	
+	private $_usePagination = false;
+	
 
     /**
      * Constructor, calls parent's constructor
@@ -140,21 +142,33 @@ class IndexController extends Controller
 		
 		$d =  $this->makeAlphabetFromArray($n,'label',$letterToShow);
 
-		$pagination = $this->getPagination($d['names']);
+		$this->smarty->assign('_usePagination',$this->_usePagination);
+		
+		if ($this->_usePagination) {
+		
+			$pagination = $this->getPagination($d['names']);
+
+			$this->smarty->assign('prevStart', $pagination['prevStart']);
+		
+			$this->smarty->assign('nextStart', $pagination['nextStart']);
+
+			$this->smarty->assign('taxa',$pagination['items']);
+		
+		} else {
+
+			$this->smarty->assign('taxa',$d['names']);
+
+			$this->smarty->assign('alphaNav',$d['alphaNav']);
+
+		}
 
 		$this->smarty->assign('showSpeciesIndexMenu', true);
-
-		$this->smarty->assign('prevStart', $pagination['prevStart']);
-	
-		$this->smarty->assign('nextStart', $pagination['nextStart']);
 
 		$this->smarty->assign('alpha',$d['alpha']);
 
 		$this->smarty->assign('alphaNav',$d['alphaNav']);
 
 		$this->smarty->assign('letter',$letterToShow);
-
-		$this->smarty->assign('taxa',$pagination['items']);
 
 		$this->smarty->assign('nameLanguages',$l);
 
@@ -208,11 +222,9 @@ class IndexController extends Controller
 	
 		$d =  $this->makeAlphabetFromArray($taxa,'taxon',$letterToShow);
 
-		$usePagination = false;
-
-		$this->smarty->assign('usePagination',$usePagination);
+		$this->smarty->assign('_usePagination',$this->_usePagination);
 		
-		if ($usePagination) {
+		if ($this->_usePagination) {
 		
 			$pagination = $this->getPagination($d['names']);
 
