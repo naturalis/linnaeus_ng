@@ -710,12 +710,30 @@ class MatrixKeyController extends Controller
 	
 		$results = array_merge((array)$taxa,(array)$matrices);
 	
-		$this->customSortArray($results, array('key' => 'score', 'dir' => 'desc', 'case' => 'i'));	
-		
+		usort($results,array($this,'sortMatrixScores'));
+
 		array_walk($results, create_function('&$v', '$v["score"] = $v["score"]."%";'));	
 
 		return $results;
 
+	}
+
+	private function sortMatrixScores($a,$b)
+	{
+	
+		if ($a['score'] == $b['score']) {
+	
+			$aa = (isset($a['type']) && $a['type']=='matrix') ? strtolower($a['name']) : strtolower($a['taxon']);
+			$bb = (isset($b['type']) && $b['type']=='matrix') ? strtolower($b['name']) : strtolower($b['taxon']);
+		
+			if ($aa==$bb) return 0;
+	
+			return ($aa < $bb) ? -1 : 1;
+	
+		}
+	
+		return ($a['score'] > $b['score']) ? -1 : 1;
+	
 	}
 
 	private function getCharacteristics()
