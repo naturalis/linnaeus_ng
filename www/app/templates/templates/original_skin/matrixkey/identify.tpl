@@ -5,7 +5,7 @@
 	<div id="pane-left">
 		<div id="char-states">
 			{t}Characters{/t} <a href="javascript:showCharacterSort();void(0);">{t}sort{/t}</a><br />
-			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
+			<select size="5" id="characteristics" onclick="goCharacter()" ondblclick="addSelected(this)" >
 			</select>
 			<br />
 			{t}States{/t}<br />
@@ -51,7 +51,7 @@
 $(document).ready(function(){
 {/literal}
 {foreach from=$characteristics key=k item=v}
-	storeCharacteristic(
+	storeCharacter(
 		{$v.id},
 		'{$v.label|addslashes}',
 		'{$v.type.name}',

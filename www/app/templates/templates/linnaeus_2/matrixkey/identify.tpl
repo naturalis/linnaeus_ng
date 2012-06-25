@@ -8,7 +8,7 @@
 	<div id="search-pattern">
 		<div id="char-states">
 			<div class="select-header">{t}Characters{/t} <a href="javascript:showCharacterSort();void(0);">{t}sort{/t}</a></div>
-			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
+			<select size="5" id="characteristics" onclick="goCharacter()" ondblclick="addSelected(this)" >
 			</select>			
 			<div class="select-header">{t}States{/t}</div>
 			<select size="5" id="states" onclick="goState()" ondblclick="addSelected(this)">
@@ -63,10 +63,7 @@
 $(document).ready(function(){
 {/literal}
 {foreach from=$characteristics key=k item=v}
-	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
-{/foreach}
-{foreach from=$characteristics key=k item=v}
-	storeCharacteristic(
+	storeCharacter(
 		{$v.id},
 		'{$v.label|addslashes}',
 		'{$v.type.name}',

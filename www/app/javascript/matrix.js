@@ -30,13 +30,39 @@ function getData(action,id,postFunction) {
 	
 }
 
-var characteristics = Array();
+var characters = Array();
 var states = Array();
 var selected = Array();
 
-function storeCharacteristic(id,label,char,sorts) {
+function storeCharacter(id,label,type,sorts) {
 
-	characteristics[id] = {id:id,label:label,char:char,sorts:sorts};
+	characters[characters.length] = {id:id,label:label,type:type,sorts:sorts};
+
+}
+
+function sortfunction(a,b){
+
+	var x = (eval('a.sorts.'+sortField));
+	var y = (eval('b.sorts.'+sortField));
+
+	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	
+}
+
+function sortCharacters(field) {
+
+	sortField = field;
+	characters.sort(sortfunction);
+
+	$('#characteristics	').empty();
+
+	for (var i in characters) $('#characteristics').append('<option value="'+characters[i].id+'">'+characters[i].label+'</option>');
+
+}
+
+function goCharacter() {
+
+	getData('get_states',$('#characteristics').val(),'fillStates');
 
 }
 
@@ -95,7 +121,6 @@ function goState() {
 
 	var state = states[$('#states').val()];
 
-//	setInfo(characteristics[state.characteristic_id][0]);
 	$('#info-footer').html(null);
 
 	switch (state.type.name) {
@@ -103,8 +128,14 @@ function goState() {
 			var val = state.text;
 			break;
 		case 'media':
+		
+			if (state.img_dimensions==null) break;
+			
+			var c = getCharacter(state.characteristic_id);
+			
+			if (c) var label = c.label;
 
-			setInfo(characteristics[state.characteristic_id][0]+': '+$('#states :selected').text());
+			setInfo(label+': '+$('#states :selected').text());
 
 			var file = encodeURIComponent(state.file_name);
 
@@ -114,7 +145,7 @@ function goState() {
 
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - headerHeight;
-			
+
 			var imgW = state.img_dimensions.w;
 			var imgH = state.img_dimensions.h;
 
@@ -181,12 +212,6 @@ function goState() {
 	}
 
 	setInfo(null,val);
-
-}
-
-function goCharacteristic() {
-
-	getData('get_states',$('#characteristics').val(),'fillStates');
 
 }
 
@@ -257,32 +282,43 @@ function doDialog() {
 
 function setFreeValues(vals) {
 
-	var c = characteristics[$('#characteristics').val()];
+	var c = getCharacter($('#characteristics').val());
 
-	if (c[1]=='range')
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c[0]+': '+vals[0]+'</option>');
+	if (c.type=='range')
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c.label+': '+vals[0]+'</option>');
 	else
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c[0]+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c.label+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
 
 	getScores();
 
 }
 
+function getCharacter(id) {
+
+	for(var i=0;i<characters.length;i++) {
+
+		if (characters[i] && characters[i].id==id) return characters[i];
+	}
+	
+	return null;
+
+}
+
 function addSelected(caller) {
 
-	var c = characteristics[$('#characteristics').val()];
+	var c = getCharacter($('#characteristics').val());
 
-	if (caller.id=='characteristics' && (c[1]!='distribution' && c[1]!='range')) return;
+	if (caller.id=='characteristics' && (c.type!='distribution' && c.type!='range')) return;
 
-	if (c[1]=='distribution') {
+	if (c.type=='distribution') {
 
-		showDialog(_('Enter a value'),sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c[0])));
+		showDialog(_('Enter a value'),sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c.label)));
 		$('#dialogValue').focus();
 
 	} else
-	if (c[1]=='range') {
+	if (c.type=='range') {
 
-		showDialog(_('Enter a value'),sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c[0])));
+		showDialog(_('Enter a value'),sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c.label)));
 		$('#dialogValue').focus();
 
 	} else {
@@ -290,9 +326,11 @@ function addSelected(caller) {
 		var s = states[$('#states').val()];
 
 		if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
+			
+			var c = getCharacter(s.characteristic_id);
 	
 			$('#selected').
-				append('<option id="s'+s.id+'" value="c:'+s.characteristic_id+':'+s.id+'">'+characteristics[s.characteristic_id][0]+': '+s.label+'</option>').
+				append('<option id="s'+s.id+'" value="c:'+s.characteristic_id+':'+s.id+'">'+c.label+': '+s.label+'</option>').
 				val(s.id);
 			selected[s.id] = true;
 	
@@ -443,16 +481,18 @@ function showMatrixPattern() {
 function setSelectedState(val,id,charId,label) {
 
 	var val = val.split(':');
+	
+	var c = getCharacter(charId);
 
 	if (val[0]=='c') {
 		
-		$('#selected').append('<option id="s'+id+'" value="c:'+charId+':'+id+'">'+characteristics[charId][0]+': '+label+'</option>').val(id);
+		$('#selected').append('<option id="s'+id+'" value="c:'+charId+':'+id+'">'+c.label+': '+label+'</option>').val(id);
 
 		selected[id] = true;
 
 	} else {
 
-		var c = characteristics[val[1]];
+		var c = characters[val[1]];
 	
 		if (c[1]=='range')
 			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+'">'+c[0]+': '+val[2]+'</option>');
@@ -566,26 +606,6 @@ function showMatrixSelect() {
 	
 	showDialog(_('Choose a matrix to use'));
 	$('#dialog-content-inner').load('matrices.php');
-
-}
-
-function sortfunction(a,b){
-
-	var x = (eval('a.sorts.'+sortField));
-	var y = (eval('b.sorts.'+sortField));
-
-	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-	
-}
-
-function sortCharacters(field) {
-
-	sortField = field;
-	characteristics.sort(sortfunction);
-
-	$('#characteristics	').empty();
-
-	for (var i in characteristics) $('#characteristics').append('<option value="'+characteristics[i].id+'">'+characteristics[i].label+'</option>');
 
 }
 
