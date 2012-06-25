@@ -462,7 +462,7 @@ class MatrixKeyController extends Controller
 
 			$f = $_SESSION['app']['project']['urls']['uploadedMedia'].$state['file_name'];
 			
-			if (!file_exists($f)) return null;
+			if (!file_exists($f) || is_dir($f)) return null;
 			
 			$f = getimagesize($f);
 			
@@ -735,6 +735,67 @@ class MatrixKeyController extends Controller
 		return ($a['score'] > $b['score']) ? -1 : 1;
 	
 	}
+	
+	private function getCharacteristicHValue($charId,$states=null)
+	{
+	
+		$states = is_null($states) ? $this->getCharacteristicStates($charId) : $states;
+		
+		$taxa = array();
+		
+		$tot = 0;
+
+		foreach((array)$states as $key => $val) {
+		
+			$states[$key]['n'] = 0;
+		
+			$mts = $this->models->MatrixTaxonState->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'matrix_id' => $this->getCurrentMatrixId(),
+						'characteristic_id' => $charId,
+						'state_id' => $val['id']
+					),
+					'columns' => 'distinct taxon_id'
+				)
+			);
+			
+			foreach((array)$mts as $val2) {
+			
+				@$taxa[$val2['taxon_id']]['states']++;
+				$states[$key]['n']++;
+				$tot++;
+				
+			}
+		
+		}
+		
+		if ($tot==0) return 0;
+
+		$hValue = 0;
+
+		foreach((array)$states as $val) $hValue += ($val['n']/$tot) * log($val['n']/$tot,10);
+
+		$hValue = is_nan($hValue) ? 0 : -1 * $hValue;
+		
+		$uniqueTaxa = 0;
+
+		foreach((array)$taxa as $val) if ($val['states']==1) $uniqueTaxa++;
+		
+		$corrFactor = $uniqueTaxa / $tot;
+
+		return ($hValue * $corrFactor);
+		
+		/*
+		return array(
+			'hValue' => $hValue,
+			'corrFactor' => $corrFactor,
+			'hValueCorrected' => ($hValue * $corrFactor)
+		);
+		*/
+
+	}
 
 	private function getCharacteristics()
 	{
@@ -753,9 +814,17 @@ class MatrixKeyController extends Controller
 		foreach((array)$mc as $key => $val) {
 		
 			$d = $this->getCharacteristic($val['characteristic_id']);
-			
-			if ($d) $c[] = $d;
 
+			if ($d) {
+				$states = $this->getCharacteristicStates($val['characteristic_id']);
+				$d['sort_by']['alphabet'] = strtolower(preg_replace('/[^A-Za-z0-9]/','',$d['label']));
+				$d['sort_by']['separationCoefficient'] = -1 * $this->getCharacteristicHValue($val['characteristic_id'],$states); // -1 to avoid asc/desc hassles in JS-sorting
+				$d['sort_by']['characterType'] = strtolower(preg_replace('/[^A-Za-z0-9]/','',$d['type']['name']));
+				$d['sort_by']['numberOfStates'] = -1 * count((array)$states); // -1 to avoid asc/desc hassles in JS-sorting
+				$d['sort_by']['entryOrder'] = intval($val['show_order']);
+				$c[] = $d;
+			}
+			
 		}
 
 		return isset($c) ? $c : null;

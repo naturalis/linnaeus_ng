@@ -1,5 +1,14 @@
 var imagePath;
 var selectIndicator = '\u2022 ';
+var characterOrders =
+	Array(
+		['alphabet',_('Alphabet')],
+		['separationCoefficient',_('Separation coefficient')],
+		['characterType',_('Character type')],
+		['numberOfStates',_('Number of states')],
+		['entryOrder',_('Entry order')]
+	);
+var sortField = null;
 
 function getData(action,id,postFunction) {
 
@@ -25,9 +34,9 @@ var characteristics = Array();
 var states = Array();
 var selected = Array();
 
-function storeCharacteristic(id,label,char) {
+function storeCharacteristic(id,label,char,sorts) {
 
-	characteristics[id] = [label,char];
+	characteristics[id] = {id:id,label:label,char:char,sorts:sorts};
 
 }
 
@@ -557,5 +566,41 @@ function showMatrixSelect() {
 	
 	showDialog(_('Choose a matrix to use'));
 	$('#dialog-content-inner').load('matrices.php');
+
+}
+
+function sortfunction(a,b){
+
+	var x = (eval('a.sorts.'+sortField));
+	var y = (eval('b.sorts.'+sortField));
+
+	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	
+}
+
+function sortCharacters(field) {
+
+	sortField = field;
+	characteristics.sort(sortfunction);
+
+	$('#characteristics	').empty();
+
+	for (var i in characteristics) $('#characteristics').append('<option value="'+characteristics[i].id+'">'+characteristics[i].label+'</option>');
+
+}
+
+function showCharacterSort() {
+
+	var html = '';
+
+	for(var i=0;i<characterOrders.length;i++) {
+		if (characterOrders[i][0]==sortField)
+			html = html + selectIndicator +characterOrders[i][1]+'<br />';
+		else
+			html = html + '<a href="javascript:sortCharacters(\''+characterOrders[i][0]+'\');closeDialog();">'+characterOrders[i][1]+'</a><br />';
+	}
+
+
+	showDialog(_('Sort characters by:'),html);
 
 }
