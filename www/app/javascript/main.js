@@ -205,6 +205,12 @@ function showDialog(title,content,vars) {
 
 }
 
+function closeDialog() {
+
+	$('#dialog-close').click()
+
+}
+
 function getTimestamp() {
 
 	var tsTimeStamp= new Date().getTime();

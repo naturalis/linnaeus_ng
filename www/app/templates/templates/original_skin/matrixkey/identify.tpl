@@ -4,13 +4,8 @@
 <div id="page-main">
 	<div id="pane-left">
 		<div id="char-states">
-			{t}Characters{/t}<br />
+			{t}Characters{/t} <a href="javascript:showCharacterSort();void(0);">{t}sort{/t}</a><br />
 			<select size="5" id="characteristics" onclick="goCharacteristic()" ondblclick="addSelected(this)" >
-			{foreach from=$characteristics key=k item=v}
-			{if $v.label}
-			<option value="{$v.id}">{$v.label}</option>
-			{/if}
-			{/foreach}
 			</select>
 			<br />
 			{t}States{/t}<br />
@@ -56,8 +51,20 @@
 $(document).ready(function(){
 {/literal}
 {foreach from=$characteristics key=k item=v}
-	storeCharacteristic({$v.id},'{$v.label|addslashes}','{$v.type.name}');
+	storeCharacteristic(
+		{$v.id},
+		'{$v.label|addslashes}',
+		'{$v.type.name}',
+		{literal}{{/literal}
+			'alphabet':'{$v.sort_by.alphabet}',
+			'separationCoefficient':{$v.sort_by.separationCoefficient},
+			'characterType':'{$v.sort_by.characterType}',
+			'numberOfStates':{$v.sort_by.numberOfStates},
+			'entryOrder':{$v.sort_by.entryOrder}
+		{literal}}{/literal}
+	);
 {/foreach}
+	sortCharacters('entryOrder');
 	imagePath = '{$session.app.project.urls.uploadedMedia}';
 
 {if $storedStates}
