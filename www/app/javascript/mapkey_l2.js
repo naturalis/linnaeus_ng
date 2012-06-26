@@ -20,13 +20,10 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 
 function l2ScaleCells(w,h) {
 
-	$('td').each(function (i) {
-		if ($(this).hasClass('mapCell')) {
-			$(this).css('width',w+'px');
-			$(this).css('height',h+'px');
-		}
+	$('td[id^=cell-]').each(function (i) {
+		$(this).css('width',w+'px');
+		$(this).css('height',h+'px');
 	});
-	
 }
 
 function l2MapMouseOver(x,y) {

@@ -8,6 +8,7 @@
 	<meta name="lng-project-id" content="{$session.app.project.id}">
 	<title>{$session.app.project.title}{if $pageName}: {$pageName}{/if}</title>
 	<style type="text/css" media="all">
+		@import url("../../../app/style/default/original_skin/yui/cssreset-min.css");
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 		@import url("{$cssToLoad[i]}");
