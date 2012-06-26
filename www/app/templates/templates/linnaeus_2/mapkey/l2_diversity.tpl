@@ -38,8 +38,7 @@
 			{section name=rows start=1 loop=$map.rows+1 step=1}
 				<tr>
 				{section name=cols start=1 loop=$map.cols+1 step=1}
-					<td 
-						id="cell-{$cellNo}"
+					<td id="cell-{$cellNo}" row="{$smarty.section.rows.index}" col="{$smarty.section.cols.index}" 
 						class="{if $index.index[$cellNo]}mapCellDiversity mapCellDiversity{$index.index[$cellNo].class}{/if}{if $cellNo==$selectedCell} mapCellSelected{/if}"
 						{if $index.index[$cellNo]}onclick="l2DiversityCellClick(this)"{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
