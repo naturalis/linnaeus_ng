@@ -7,12 +7,13 @@
 <span style="float:right">
 	<span id="message-container" style="margin-right:0px">&nbsp;</span>
 </span>
-
 <p>
+<form id="theForm" method="post">
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
 	<input type="hidden" name="action" id="action" value="" />
 	<input type="button" value="{t}upload media{/t}" onclick="window.open('media_upload.php?id={$id}','_top')" />&nbsp;
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
+</form>
 </p>
 <div>
 <a name="image"></a>

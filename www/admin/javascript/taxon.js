@@ -1483,7 +1483,9 @@ function taxonChangeSubmitButtonLabel(ele) {
 }
 
 function taxonChangeMediaOrder(id,mId,dir) {
-$('<input type="hidden" name="'+name+'">').val(val==null ? '' : val).appendTo('#theForm');
+
+	$('<input type="hidden" name="move">').val(dir).appendTo('#theForm');
+	$('<input type="hidden" name="mId">').val(mId).appendTo('#theForm');
 	$('#theForm').attr('action','media.php?id='+id)
 	$('#theForm').submit();
 

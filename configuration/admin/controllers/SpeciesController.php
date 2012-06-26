@@ -1051,7 +1051,7 @@ class SpeciesController extends Controller
 
         if ($this->rHasId() && $this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
 
-echo $this->requestData['move'].'::';	
+			$this->changeMediaSortOrder($this->requestData['id'],$this->requestData['mId'],$this->requestData['move']);
 
 		}
 
@@ -1206,6 +1206,7 @@ echo $this->requestData['move'].'::';
                                     'mime_type' => $file['mime_type'],
                                     'file_size' => $file['size'],
                                     'thumb_name' => $thumb ? $thumb : null,
+									'sort_order' => $this->getNextMediaSortOrder($this->requestData['id'])
                                 )
                             );
 							
@@ -4079,7 +4080,6 @@ echo $this->requestData['move'].'::';
 	
 	}
 
-
 	private function moveIdInTaxonOrder($id,$dir)
 	{
 	
@@ -4197,7 +4197,6 @@ echo $this->requestData['move'].'::';
 		return $_SESSION['admin']['project']['SynonymCount'];
 	
 	}
-
 
 	private function getCommonnameCount()
 	{
@@ -4384,7 +4383,6 @@ echo $this->requestData['move'].'::';
 		return $refs;
 
 	}
-
 
 	private function filterInternalTags($id)
 	{
@@ -4589,6 +4587,64 @@ echo $this->requestData['move'].'::';
 		return $this->models->UserTaxon->getNewId();
 	
 	}
+	
+	private function getNextMediaSortOrder($taxon)
+	{
+
+		$d = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $taxon
+				),
+				'columns' => '(max(sort_order) + 1) as next'
+			)
+		);
+		
+		return $d[0]['next'];
+	}
+	
+	private function changeMediaSortOrder($taxon,$id,$dir)
+	{
+
+		$d = $this->models->MediaTaxon->_get(
+			array(
+				'id' => 'a',
+				'order' => 'mime_type,sort_order,file_name'
+			)
+		);
+		
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id
+			);
+
+		if ($dir=='up')
+			$d['sort_order'] = $
+	
+		$d = $this->models->MediaTaxon->_get(
+			array(
+				'id' => 'a',
+				'order' => 'mime_type,sort_order,file_name'
+			)
+		);
+		
+		$prev = null;
+		
+		
+		
+				$d = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $id
+				),
+				'order' => 'mime_type,sort_order,file_name'
+			)
+		);
+	
+	}
+
 
 	
 }
