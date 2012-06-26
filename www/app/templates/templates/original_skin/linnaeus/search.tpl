@@ -13,6 +13,8 @@
 {/if}
 </div>
 
+{assign var=hidden value=1}
+
 {if $results.species.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.species.results key=cat item=res}
@@ -20,11 +22,14 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
-
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $res.label|@strtolower=='species media'}
 			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" style="width:50px" />
 		{/if}
-
 		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:
 		{/if}
 
@@ -51,7 +56,6 @@
 	{/foreach}
 </div>
 {/if}
-
 {if $results.glossary.numOfResults > 0}
 <div class="set">
 	{foreach from=$results.glossary.results key=cat item=res}
@@ -59,6 +63,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goGlossaryTerm({$v.id})">
 			{if $v.term && $v.term!=$v.label}{$v.term}: {/if}
@@ -87,7 +96,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
-
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goLiterature({$v.id})">
 			{h search=$search}{$v.author_full} ({$v.year}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
@@ -113,6 +126,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		<span>
 			{if $v.label}{t}Step{/t} {$v.number}:{h search=$search} {$v.label}{/h}
 			{elseif $v.content}{t}Step{/t} {$v.number} ("{$v.title}"){if $v.marker}, {t}choice{/t} {$v.marker}{/if}: "{foundContent search=$search}{$v.content}{/foundContent}"
@@ -133,6 +151,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span {if !$v.matrices && $v.matrix_id}class="result" onclick="goMatrix({$v.matrix_id}){/if}">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
@@ -167,7 +190,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
-
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goMap({$v.id})">{h search=$search}{$v.content}{/h}</span> ({$v.number} occurrences)
 		{else}
@@ -189,6 +216,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goModuleTopic({$v.page_id},{$v.module_id})">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
@@ -217,6 +249,11 @@
 	<div class="subset">
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
+		{if $k==$visibleSearchResultsPerCategory}
+		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+		</div>
+		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goContent({$v.id})">
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}

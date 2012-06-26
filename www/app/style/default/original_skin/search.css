@@ -32,3 +32,15 @@
 #results .result:hover {
 	text-decoration:underline;
 }
+
+.showHidden,.hideHidden {
+	width:20px;
+	height:20px;
+	background-image:url(../../../media/system/skins/original_skin/arrow-down.png);
+	background-repeat:no-repeat;
+	margin-bottom:0px;
+	cursor:pointer;
+}
+.hideHidden {
+	background-image:url(../../../media/system/skins/original_skin/arrow-up.png);
+}

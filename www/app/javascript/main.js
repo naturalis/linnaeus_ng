@@ -441,3 +441,17 @@ function doBackForm(url,data) {
 	goForm(url);
 
 }
+
+function toggleHidden(id) {
+
+	if ($('#hidden-'+id).attr('visible')=='1') {
+		$('#hidden-'+id).removeClass('visible').addClass('invisible');
+		$('#switch-'+id).removeClass('hideHidden').addClass('showHidden');
+		$('#hidden-'+id).attr('visible','0');
+	} else { 
+		$('#hidden-'+id).removeClass('invisible').addClass('visible');
+		$('#switch-'+id).removeClass('showHidden').addClass('hideHidden');
+		$('#hidden-'+id).attr('visible','1');
+	}
+
+}
