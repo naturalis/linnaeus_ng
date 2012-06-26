@@ -122,7 +122,9 @@ function goState() {
 	var state = states[$('#states').val()];
 
 	$('#info-footer').html(null);
-
+	
+	var title = ' ';
+	
 	switch (state.type.name) {
 		case 'text':
 			var val = state.text;
@@ -135,7 +137,7 @@ function goState() {
 			
 			if (c) var label = c.label;
 
-			setInfo(label+': '+$('#states :selected').text());
+			title  = label+': '+$('#states :selected').text();
 
 			var file = encodeURIComponent(state.file_name);
 
@@ -211,7 +213,7 @@ function goState() {
 		break;
 	}
 
-	setInfo(null,val);
+	setInfo(title,val);
 
 }
 
