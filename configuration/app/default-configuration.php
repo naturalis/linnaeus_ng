@@ -96,6 +96,15 @@ class configuration
     
     }
 
+    public function getControllerSettingsLinnaeus()
+    {
+
+        return array(
+            'visibleSearchResultsPerCategory' => 3
+		);
+
+	}
+
     public function getControllerSettingsKey ()
     {
 

@@ -278,6 +278,8 @@ class LinnaeusController extends Controller
 		$this->showBackToSearch = false;
 
 		$this->smarty->assign('search',$this->requestData['search']);
+
+		$this->smarty->assign('visibleSearchResultsPerCategory',$this->controllerSettings['visibleSearchResultsPerCategory']);
 	
 		$this->smarty->register_block('h', array(&$this,'highlightFound'));
 

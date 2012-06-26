@@ -253,3 +253,10 @@ body #body-container {
 .glossary-term-highlight:hover {
 	text-decoration:none;
 }
+
+.invisible {
+	display:none;
+}
+.visible {
+	display:block;
+}
