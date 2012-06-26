@@ -4,16 +4,8 @@
 }
 
 #page-main {
-    height: 411px;
+    height: 373px;
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -27,7 +19,8 @@
 }
 
 #commonname-languages {
-	padding-bottom:25px;
+	font-size: 11px;
+	float: right;
 }
 
 #activeLanguage {
@@ -43,47 +36,29 @@
 	font-style:italic;
 }
 
-/*
-.category, .category-active {
-	font-size:11px;
-	width:125px;
-	border:1px solid #ddd;
-	text-align:center;
-	overflow:auto;
-	background-color:#eee;
-	padding:2px;
-	cursor:pointer;
-}
-
-.category-active {
-	font-size:11px;
-	background-color:#fff;
-	color:#CC0000;
-	cursor:default;
-}
-
-.space {
-	width:5px;
-}
-*/
 #alphabet {
-	border-bottom:1px dotted #ddd;
-	padding-bottom:10px;
-	margin-bottom:15px;
+    border-top: 1px solid #b8b8b8;
+	background: #fff;
+	padding: 10px 20px;
 }
 
-#alphabet .alphabet-active-letter, .alphabet-letter {
-	padding-left:3px;
-	padding-right:3px;
-	text-transform:uppercase;
+#alphabet .alphabet-active-letter, #alphabet .alphabet-letter, #alphabet .alphabet-letter-ghosted {
+	padding: 0 3px;
+	text-transform: uppercase;
 }
+
+#alphabet .alphabet-letter-ghosted {
+	cursor: default;
+	color: #b8b8b8;
+}
+
 
 #alphabet .alphabet-active-letter, #alphabet .alphabet-letter:hover {
-	color:red;
+	color: red;
 }
 
 #alphabet .alphabet-letter {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 .navigator, .navigator-active {

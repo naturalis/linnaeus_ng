@@ -51,12 +51,12 @@
 		<td id="legendCell">
 		<div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
-			<p class="mapCheckbox">
+			<div class="mapCheckbox">
 				<label>
 					<input type="checkbox" checked="checked" value="{$v.id}" onchange="l2ToggleDatatype(this)"/>
 					<span class="mapCellLegend" style="background-color:#{$v.colour};">&nbsp;&nbsp;&nbsp;&nbsp;</span>{$v.title}
 				</label>
-			</p>
+			</div>
 			{/foreach}
 		</div>
 		</td>

@@ -66,7 +66,7 @@
 		<td id="legendCell">
 		    <div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
-				<p class="mapPCheckbox">
+				<div class="mapPCheckbox">
 					<label>
 						<input 
 							type="checkbox" 
@@ -76,7 +76,7 @@
 							{if $selectedDataTypes=='*' || $selectedDataTypes[$v.id]==$v.id}checked="checked"{/if}/>
 						{$v.title}
 					</label>
-				</p>
+				</div>
 			{/foreach}
             </div>
             <p><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}</p>

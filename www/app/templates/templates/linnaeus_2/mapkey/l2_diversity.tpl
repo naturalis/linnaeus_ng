@@ -52,7 +52,7 @@
 		<td id="legendCell">
 		<div id="legend">
 		{foreach from=$geoDataTypes key=k item=v name=x}
-			<p class="mapCheckbox">
+			<div class="mapCheckbox">
 				<label>
 					<input 
 						type="checkbox" 
@@ -62,7 +62,7 @@
 						onchange="$('#theForm').submit();"/>
 					{$v.title}
 				</label>
-			</p>
+			</div>
 		{/foreach}
 		<input type="hidden" name="m" value="{$mapId}" />
 		</div>

@@ -57,3 +57,7 @@
 	font-size:inherit;
 	height:25px;
 }
+
+.mapCheckbox {
+	padding: 1px 0;
+}
