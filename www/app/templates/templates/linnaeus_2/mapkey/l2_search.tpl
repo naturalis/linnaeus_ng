@@ -56,14 +56,14 @@
 		<td id="legendCell">
 		<div id="legend">
             {foreach from=$geoDataTypes key=k item=v name=x}
-            <p class="mapPCheckbox">
+            <div class="mapPCheckbox">
                 <label>
                     <input type="checkbox" 
                         name="dataTypes[]" 
                         {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
                     {$v.title}
                 </label>
-            </p>
+            </div>
             {/foreach}
 		</div>
             <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>

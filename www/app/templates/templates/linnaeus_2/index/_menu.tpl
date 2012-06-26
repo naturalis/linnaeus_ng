@@ -1,35 +1,34 @@
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
-
 {if $useJavascriptLinks}
     <span
-    {if $adjacentItems.prev}
-        onclick="goTaxon({$adjacentItems.prev.id})" id="previous-icon" 
+    {if $alphaNav.prev}
+        onclick="$('#letter').val('{$alphaNav.prev}');$('#theForm').submit();" id="previous-icon" 
         {if $adjacentItems.prev.label} title="{$adjacentItems.prev.label}"{/if}
     {else}
         id="previous-icon-inactive"
     {/if} 
     class="navigation-icon" />{t}Previous{/t}</span>
     <span 
-    {if $adjacentItems.next}
-        onclick="goTaxon({$adjacentItems.next.id})" id="next-icon"
+    {if $nextStart!=-1}
+        onclick="$('#letter').val('{$alphaNav.next}');$('#theForm').submit();" id="next-icon"
         {if $adjacentItems.next.label} title="{$adjacentItems.next.label}"{/if}
     {else}
         id="next-icon-inactive"
     {/if} 
     class="navigation-icon" />{t}Next{/t}</span>
 {else}
-    {if $adjacentItems.prev}
+    {if $alphaNav.prev}
         <a class="navigation-icon" id="previous-icon" 
-        href="../species/taxon.php?id={$adjacentItems.prev.id}"
+        href="javascript:$('#letter').val('{$alphaNav.prev}');$('#theForm').submit();"
         {if $adjacentItems.prev.label} title="{$adjacentItems.prev.label}"{/if}>{t}Previous{/t}</a>
     {else}
         <span class="navigation-icon" id="previous-icon-inactive">{t}Previous{/t}</span>
     {/if}
-    {if $adjacentItems.next}
+    {if $alphaNav.next}
         <a class="navigation-icon" id="next-icon" 
-        href="../species/taxon.php?id={$adjacentItems.next.id}" 
+        href="javascript:$('#letter').val('{$alphaNav.next}');$('#theForm').submit();" 
         {if $adjacentItems.next.label} title="{$adjacentItems.next.label}"{/if}>{t}Next{/t}</a>
     {else}
         <span class="navigation-icon" id="next-icon-inactive">{t}Next{/t}</span>

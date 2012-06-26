@@ -1,20 +1,28 @@
 {include file="../shared/header.tpl"}
 {include file="_header-titles.tpl"}
-{include file="../shared/_search-main.tpl"}<div id="page-main">
+{include file="../shared/_search-main.tpl"}
 
 	<div id="alphabet">
-	{if $alpha|@count!=0}
-	{t}Click to browse:{/t}&nbsp;
-	{foreach name=loop from=$alpha key=k item=v}
-	{if $v==$letter}
-	<span class="alphabet-active-letter">{$v}</span>
-	{else}
-	<span class="alphabet-letter" onclick="$('#letter').val('{$v}');$('#theForm').submit();">{$v}</span>
-	{/if}
-	{/foreach}
-	{/if}
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
-	</div>
+	{if $hasNonAlpha}
+		{assign var=l value=$letter|ord}
+		{if $l < 97 || $l > 122}
+		<span class="alphabet-active-letter">#</span>
+		{else}
+		<span class="alphabet-letter" onclick="$('#letter').val('#');$('#theForm').submit();">#</span>
+		{/if}
+	{/if}
+	{section name=foo start=97 loop=123 step=1}
+	  {assign var=l value=$smarty.section.foo.index|chr}
+		{if $l==$letter}
+		<span class="alphabet-active-letter">{$l|upper}</span>
+		{elseif $alpha[$l]}
+		<span class="alphabet-letter" onclick="$('#letter').val('{$l}');$('#theForm').submit();">{$l|upper}</span>
+		{else}
+		<span class="alphabet-letter-ghosted">{$l|upper}</span>
+		{/if}
+	{/section}
+
 
 	<div id="commonname-languages">
 		{t}Language:{/t}
@@ -33,6 +41,16 @@
 		<input type="hidden" id="rnd" name="rnd" value="{$rnd}" />
 	</div>
 
+
+
+	</div>
+
+
+
+<div id="page-main">
+
+
+
 	<div id="content">
         {foreach name=taxonloop from=$taxa key=k item=v}
         <p>
@@ -43,27 +61,6 @@
         {/foreach}
         
 	</div>
-{if $prevStart!=-1 || $nextStart!=-1}
-	<div id="navigation">
-
-	{if $useJavascriptLinks}
-		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
-		{/if}
-	{else}
-		{if $prevStart!=-1}
-		<a href="?start={$prevStart}&letter={$letter}">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<a href="?start={$nextStart}&letter={$letter}">{t}next{/t} ></span>
-		{/if}
-	{/if}
-	
-	</div>
-{/if}
 </div>
 
 {include file="../shared/footer.tpl"}

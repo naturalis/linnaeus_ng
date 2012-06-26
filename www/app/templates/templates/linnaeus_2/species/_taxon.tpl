@@ -16,26 +16,26 @@
 <div id="page-main">
 {if $activeCategory=='classification'}
 <div id="classification">
-	<table>
+	
 	{foreach from=$content key=k item=v name=classification}
 	{if $v.do_display}
-		<tr>
-			{if $useJavascriptLinks}			
-			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</td>
+	
+		{if $useJavascriptLinks}			
+		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
+		{else}
+		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{/if}>
+			{if $v.lower_taxon==1}
+			<a href="../species/taxon.php?id={$v.id}">{$v.label}</a>
 			{else}
-			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{/if}>
-				{if $v.lower_taxon==1}
-				<a href="../species/taxon.php?id={$v.id}">{$v.label}</a>
-				{else}
-				<a href="../highertaxa/taxon.php?id={$v.id}">{$v.label}</a>
-				{/if}
-			</td>
-			{/if}		
-			<td>({$v.rank})</td>
-		</tr>
+			<a href="../highertaxa/taxon.php?id={$v.id}">{$v.label}</a>
+			{/if}
+		</p>
+		{/if}		
+		
+	
 	{/if}
 	{/foreach}
-	</table>
+	
 </div>
 {elseif $activeCategory=='literature' && $contentCount.literature>0}
 <div id="literature">

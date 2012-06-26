@@ -97,11 +97,12 @@
 
 #common th {
 	font-weight:normal;
+	margin-bottom:20px;
 	font-style:italic;
 }
 
 #common td {
-	width:250px;
+	width: 250px;
 }
 
 .media-cat-header {
