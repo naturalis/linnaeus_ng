@@ -20,8 +20,11 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 
 function l2ScaleCells(w,h) {
 
-	$('td[id^=cell-]').each(function (i) {
+	$('td[row=1]').each(function (i) {
 		$(this).css('width',w+'px');
+	});
+
+	$('td[col=1]').each(function (i) {
 		$(this).css('height',h+'px');
 	});
 }
