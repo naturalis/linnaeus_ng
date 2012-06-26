@@ -100,7 +100,7 @@ class configuration
     {
 
         return array(
-            'visibleSearchResultsPerCategory' => 3
+            'visibleSearchResultsPerCategory' => 10
 		);
 
 	}
