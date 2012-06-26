@@ -785,16 +785,8 @@ class MatrixKeyController extends Controller
 		
 		$corrFactor = $uniqueTaxa / $tot;
 
-		return ($hValue * $corrFactor);
+		return $hValue * ($this->controllerSettings['useCorrectedHValue']==true ?  $corrFactor : 1);
 		
-		/*
-		return array(
-			'hValue' => $hValue,
-			'corrFactor' => $corrFactor,
-			'hValueCorrected' => ($hValue * $corrFactor)
-		);
-		*/
-
 	}
 
 	private function getCharacteristics()

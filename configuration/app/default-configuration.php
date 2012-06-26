@@ -179,7 +179,8 @@ class configuration
 					'name' => 'distribution',
 					'info' => 'a value distribution, defined by a mean and values for one and two standard deviations.'
 				)
-			)
+			),
+			'useCorrectedHValue' => true
 		);
 
     }
