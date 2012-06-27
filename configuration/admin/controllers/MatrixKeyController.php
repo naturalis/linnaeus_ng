@@ -38,7 +38,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage',$this->getDefaultProjectLanguage());
 
     }
 
@@ -141,9 +141,9 @@ class MatrixKeyController extends Controller
 
 			$matrix = $this->getMatrix();
 			
-			if (isset($matrix['names'][$_SESSION['admin']['project']['default_language_id']]['name'])) {
+			if (isset($matrix['names'][$this->getDefaultProjectLanguage()]['name'])) {
 
-		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$_SESSION['admin']['project']['default_language_id']]['name']));
+		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$this->getDefaultProjectLanguage()]['name']));
 
 			} else {
 
@@ -765,7 +765,7 @@ class MatrixKeyController extends Controller
 
 		$m[0]['names']=$mn;
 
-		$m[0]['matrix'] = $m[0]['names'][$_SESSION['admin']['project']['default_language_id']]['name'];
+		$m[0]['matrix'] = $m[0]['names'][$this->getDefaultProjectLanguage()]['name'];
 
 		return $m[0];
 
@@ -826,7 +826,7 @@ class MatrixKeyController extends Controller
 			);
 
 			$m[$key]['names'] = $mn;
-			$m[$key]['default_name'] = $mn[ $_SESSION['admin']['project']['default_language_id']]['name'];
+			$m[$key]['default_name'] = $mn[$this->getDefaultProjectLanguage()]['name'];
 
 		}
 
@@ -1105,7 +1105,7 @@ class MatrixKeyController extends Controller
 
 		return array(
 			'labels' => $cl, 
-			'label' => $cl[$_SESSION['admin']['project']['default_language_id']]['label']
+			'label' => $cl[$this->getDefaultProjectLanguage()]['label']
 		);
 		
 	}
@@ -1311,7 +1311,7 @@ class MatrixKeyController extends Controller
 			)
 		);
 
-		return array('label' => $cls[$_SESSION['admin']['project']['default_language_id']]['label'], 'labels' => $cls);
+		return array('label' => $cls[$this->getDefaultProjectLanguage()]['label'], 'labels' => $cls);
 
 	}
 
@@ -1480,7 +1480,7 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$cs as $key => $val) {
 
-			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'],$_SESSION['admin']['project']['default_language_id']);
+			$cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id'],$this->getDefaultProjectLanguage());
 
 		}
 
@@ -1846,8 +1846,8 @@ class MatrixKeyController extends Controller
 				)
 			);
 			
-			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$_SESSION['admin']['project']['default_language_id']);
-			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$_SESSION['admin']['project']['default_language_id']);
+			$mts[$key]['state'] = $this->getCharacteristicStateLabelOrText($val['state_id'],$this->getDefaultProjectLanguage());
+			$mts[$key]['characteristic'] = $this->getCharacteristicLabel($val['characteristic_id'],$this->getDefaultProjectLanguage());
 		
 		}
 

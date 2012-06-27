@@ -42,7 +42,6 @@ To use an application, follow one of the following links:<br />
 </form>
 
 </div ends="page-container">
-<div id="footer-container"></div ends="footer-container">
 </div ends="body-container">
 
 </body>

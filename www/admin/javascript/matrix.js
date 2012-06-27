@@ -398,6 +398,7 @@ function matrixGetLinks() {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
+			//alert(data);
 			matrixSetLinks($.parseJSON(data));
 		}
 	});

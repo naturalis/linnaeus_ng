@@ -331,7 +331,7 @@ class KeyController extends Controller
 
    		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
-   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$_SESSION['admin']['project']['default_language_id']]);
+   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
 
    		$this->smarty->assign('keyPath',$this->getKeyPath());
 
@@ -517,7 +517,7 @@ class KeyController extends Controller
 
    		$this->smarty->assign('languages',$_SESSION['admin']['project']['languages']);
 
-   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$_SESSION['admin']['project']['default_language_id']]);
+   		$this->smarty->assign('defaultLanguage',$_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
 
 		$this->smarty->assign('steps',$this->getKeysteps(array('idToExclude'=>$choice['keystep_id'])));
 
@@ -650,7 +650,7 @@ class KeyController extends Controller
 			// if not, they are the start of a section
 			if ($ck[0]['total']==0) {
 
-				$ksc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
+				$ksc = $this->getKeystepContent($this->getDefaultProjectLanguage(),$val['id']);
 			
 				$val['title'] = $ksc['title'];
 
@@ -1234,7 +1234,7 @@ class KeyController extends Controller
 		
 		foreach((array)$k as $key => $val) {
 
-			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
+			$kc = $this->getKeystepContent($this->getDefaultProjectLanguage(),$val['id']);
 		
 			$k[$key]['title'] = $kc['title'];
 
@@ -1270,7 +1270,7 @@ class KeyController extends Controller
 
 			$step = $k[0];
 
-			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$step['id']);
+			$kc = $this->getKeystepContent($this->getDefaultProjectLanguage(),$step['id']);
 
 			$step['title'] = $kc['title'];
 
@@ -1298,7 +1298,7 @@ class KeyController extends Controller
 		
 		if ($k) {
 
-			$kc = $this->getKeystepContent($_SESSION['admin']['project']['default_language_id'],$k[0]['id']);
+			$kc = $this->getKeystepContent($this->getDefaultProjectLanguage(),$k[0]['id']);
 		
 			$k[0]['title'] = $kc['title'];
 
@@ -1552,7 +1552,7 @@ class KeyController extends Controller
 		
 		foreach((array)$choices as $key => $val) {
 		
-			$kcc = $this->getKeystepChoiceContent($_SESSION['admin']['project']['default_language_id'],$val['id']);
+			$kcc = $this->getKeystepChoiceContent($this->getDefaultProjectLanguage(),$val['id']);
 			
 			if (isset($kcc['title'])) $choices[$key]['title'] = $kcc['title'];
 			
@@ -1612,7 +1612,7 @@ class KeyController extends Controller
 
 		$choice['keystep_number'] = $k['number'];
 
-		$kcc = $this->getKeystepChoiceContent($_SESSION['admin']['project']['default_language_id'],$choice['id']);
+		$kcc = $this->getKeystepChoiceContent($this->getDefaultProjectLanguage(),$choice['id']);
 		
 		if (isset($kcc['choice_txt'])) $choice['choice_txt'] = $kcc['choice_txt'];
 

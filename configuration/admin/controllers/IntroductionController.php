@@ -152,7 +152,7 @@ class IntroductionController extends Controller
 
 		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -545,7 +545,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $_SESSION['admin']['project']['default_language_id'], 
+						'language_id' => $this->getDefaultProjectLanguage(), 
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
@@ -582,7 +582,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => isset($languageId) ? $languageId : $_SESSION['admin']['project']['default_language_id'], 
+						'language_id' => isset($languageId) ? $languageId : $this->getDefaultProjectLanguage(), 
 						'page_id' => $this->requestData['id'],
 						)
 				)
@@ -753,7 +753,7 @@ class IntroductionController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'language_id' =>  $_SESSION['admin']['project']['default_language_id'],
+					'language_id' =>  $this->getDefaultProjectLanguage(),
 					'topic like' => '%'.$search.'%'
 					),
 				'order' => 'topic',

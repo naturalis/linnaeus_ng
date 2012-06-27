@@ -178,7 +178,7 @@ class ModuleController extends Controller
 
 		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
-		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
+		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 
 		$this->smarty->assign('includeHtmlEditor', true);
 
@@ -719,7 +719,7 @@ class ModuleController extends Controller
 		
 		foreach((array)$fmp as $key => $val) {
 
-			$d = $this->getPageContent($val['id'],$_SESSION['admin']['project']['default_language_id']);
+			$d = $this->getPageContent($val['id'],$this->getDefaultProjectLanguage());
 
 			$fmp[$key]['topic'] = $d['topic'];
 
@@ -784,7 +784,7 @@ class ModuleController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['admin']['project']['default_language_id']
+					'language_id' => $this->getDefaultProjectLanguage()
 					),
 				'order' => 'topic',
 				'columns' => 'page_id',
@@ -821,7 +821,7 @@ class ModuleController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(), 
 					'module_id' => $this->getCurrentModuleId(),
-					'language_id' => $_SESSION['admin']['project']['default_language_id'], 
+					'language_id' => $this->getDefaultProjectLanguage(), 
 				),
 				'columns' => 'page_id, topic, lower(substr(topic,1,1)) as letter',
 				'order' => 'letter'

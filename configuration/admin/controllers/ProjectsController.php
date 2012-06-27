@@ -557,7 +557,8 @@ class ProjectsController extends Controller
 							'active' => 'y'
 						)
 					);
-							
+
+					$this->addAllModulesToProject($id);
 					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_SYS_ADMIN);
 					
 					$this->unsetProjectSessionData();
@@ -612,7 +613,7 @@ class ProjectsController extends Controller
 
 			$d = $this->rHasVal('p') ? array('id' => $this->requestData['p']) : '*';
 	
-			$projects = $this->models->Project->_get(array('id' => $d));
+			$projects = $this->models->Project->_get(array('id' => $d,'order'=>'title'));
 			
 			if ($this->rHasVal('p')) {
 	
@@ -1224,6 +1225,14 @@ class ProjectsController extends Controller
 	
 	}
 
+	private function addAllModulesToProject($id)
+	{
+	
+        $m = $this->models->Module->_get(array('id' => '*', 'order' => 'show_order'));
+		
+		foreach((array)$m as $val) $this->addModuleToProject($val['id'],$id);
+
+	}
 
 
 }

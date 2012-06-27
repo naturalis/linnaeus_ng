@@ -59,6 +59,8 @@ class MapKeyController extends Controller
         parent::__construct();
 
 		$this->checkSettings();
+		
+		$this->createStandardDataTypes();
 
 		$this->smarty->assign('L2Maps',$this->l2GetMaps());
 
@@ -310,17 +312,14 @@ class MapKeyController extends Controller
 		
     }
 
-
 	public function dataTypesAction()
 	{
 	
 		$this->checkAuthorisation();
 		
-		$this->setPageName( _('Data types'));
+		$this->setPageName(_('Data types'));
 
 		$lp = $_SESSION['admin']['project']['languages'];
-		
-		$defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
 		
         if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
 		// deleting a type
@@ -332,7 +331,7 @@ class MapKeyController extends Controller
         if ($this->rHasVal('new_type') && !$this->isFormResubmit()) {
         // adding a new type
         
-            $tp = $this->createGeodataType($this->requestData['new_type'],$defaultLanguage);
+            $tp = $this->createGeodataType($this->requestData['new_type'],$this->getDefaultProjectLanguage());
             
             if ($tp !== true) $this->addError($tp);
 
@@ -369,7 +368,7 @@ class MapKeyController extends Controller
 
 		$this->smarty->assign('languages', $lp);
 		
-		$this->smarty->assign('defaultLanguage', $defaultLanguage);
+		$this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
 		
         $this->smarty->assign('types', $types);
 
@@ -617,7 +616,6 @@ class MapKeyController extends Controller
 
 	}
 
-
     public function downloadCSVAction()
     {
 
@@ -719,21 +717,6 @@ class MapKeyController extends Controller
     
     }
 
-	private function cloneMapData($source,$target)
-	{
-
-		if (empty($source) or empty($target)) return;
-
-		$this->models->OccurrenceTaxon->execute(
-			'insert into %table% 
-				(project_id,taxon_id,type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,created)
-				(select
-					project_id,'.$target.',type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,CURRENT_TIMESTAMP
-				from %table% where taxon_id='.$source.')'
-		);
-
-	}
-
     /**
      * AJAX interface for this class
      *
@@ -789,6 +772,20 @@ class MapKeyController extends Controller
     
     }
 
+	private function cloneMapData($source,$target)
+	{
+
+		if (empty($source) or empty($target)) return;
+
+		$this->models->OccurrenceTaxon->execute(
+			'insert into %table% 
+				(project_id,taxon_id,type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,created)
+				(select
+					project_id,'.$target.',type_id,type,coordinate,latitude,longitude,boundary,boundary_nodes,nodes_hash,CURRENT_TIMESTAMP
+				from %table% where taxon_id='.$source.')'
+		);
+
+	}
 
 	private function getGeodataTypes($id=null)
 	{
@@ -809,7 +806,7 @@ class MapKeyController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $_SESSION['admin']['project']['default_language_id'],
+						'language_id' => $this->getDefaultProjectLanguage(),
 						'type_id' => $val['id']
 					)
 				)
@@ -818,7 +815,7 @@ class MapKeyController extends Controller
 			$gt[$key]['title'] = isset($gtl[0]['title']) ? $gtl[0]['title'] : '-';
 
 		}
-		
+
 		return (isset($id)) ? array_shift($gt) : $gt;
 	
 	}
@@ -1060,7 +1057,7 @@ class MapKeyController extends Controller
 
 	}
 			
-    private function createGeodataType($title,$languageId)
+    private function createGeodataType($title,$languageId,$type='both')
     {
 
 		$gtt = $this->models->GeodataTypeTitle->_get(
@@ -1073,13 +1070,14 @@ class MapKeyController extends Controller
 				'columns' => 'count(*) as total'
 			)
 		);
-		
+
 		if ($gtt[0]['total']>0) return _('A data type with that name already exists.');
 
 		$this->models->GeodataType->save(
 			array(
 				'id' => null, 
-				'project_id' => $this->getCurrentProjectId(), 
+				'project_id' => $this->getCurrentProjectId(),
+				'type' => $type
 			)
 		);
 
@@ -1726,5 +1724,23 @@ class MapKeyController extends Controller
 		}
 
 	}	
+	
+	private function createStandardDataTypes()
+	{
+
+		$t = $this->models->GeodataType->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		if ($t[0]['total']>0) return;
+
+		$tp = $this->createGeodataType(_('Type locality'),$this->getDefaultProjectLanguage(),'marker');
+
+	}
+
+
 	
 }

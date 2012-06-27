@@ -414,7 +414,13 @@ class Controller extends BaseClass
             }
         
         }
-        
+
+		$this->customSortArray($cup,array(
+			'key' => 'name', 
+			'dir' => 'asc', 
+			'case' => 'i'
+		));
+		
         return isset($cup) ? $cup : false;
     
     }
@@ -2048,6 +2054,35 @@ class Controller extends BaseClass
 	
 	}
 
+	public function addModuleToProject($mId,$pId=null)
+	{
+
+		/*
+			 1 | Introduction
+			 2 | Glossary
+			 3 | Literature
+			 4 | Species module
+			 5 | Higher taxa
+			 6 | Dichotomous key
+			 7 | Matrix key
+			 8 | Map key
+			10 | Additional texts
+			11 | Index
+			12 | Search
+				
+		*/
+
+		$this->models->ModuleProject->save(
+			array(
+				'id' => null,
+				'project_id' => is_null($pId) ? $this->getCurrentProjectId() : $pId,	
+				'module_id' => $mId,
+				'active' => 'y'
+			)
+		);
+		
+	}
+
 	private function getFrontEndMainMenu()
 	{
 
@@ -2341,6 +2376,13 @@ class Controller extends BaseClass
         if (isset($list)) $_SESSION['admin']['project']['languageList'] = $list;
 		
     }
+	
+	public function getDefaultProjectLanguage()
+	{
+	
+		return isset($_SESSION['admin']['project']['default_language_id']) ? $_SESSION['admin']['project']['default_language_id'] : null;
+	
+	}
 
 	public function rHasVal($var,$val=null)
 	{

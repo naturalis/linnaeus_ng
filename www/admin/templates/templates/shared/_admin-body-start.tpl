@@ -50,6 +50,7 @@
 		<span class="a" onClick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
 	{/if}
 	{/section}
+	</span>
 	<br />
 	<form id="langForm" method="post" action=""><input id="uiLang" type="hidden" name="uiLang" value="" /></form>
 {/if}
