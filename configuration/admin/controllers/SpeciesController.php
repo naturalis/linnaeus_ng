@@ -110,10 +110,11 @@ class SpeciesController extends Controller
      */
     public function __construct ()
     {
-
         parent::__construct();
         
         $this->createStandardCategories();
+		
+		$this->createStandardCoLRanks();
 
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
 
@@ -366,8 +367,6 @@ class SpeciesController extends Controller
         
         $lp = $_SESSION['admin']['project']['languages'];
 
-        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
-        
         $pages = $this->models->PageTaxon->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -407,7 +406,7 @@ class SpeciesController extends Controller
         
         $this->smarty->assign('pages', $pages);
         
-        $this->smarty->assign('defaultLanguage', $defaultLanguage);
+        $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
         
         $this->printPage();
     
@@ -703,7 +702,7 @@ class SpeciesController extends Controller
 				$startLanguage = 
 					$this->rHasVal('lan')? 
 						$this->requestData['lan'] : 
-						$_SESSION['admin']['project']['default_language_id'];
+						$this->getDefaultProjectLanguage();
 	
 				// get the defined categories (just the page definitions, no content yet)
 				$tp = $this->models->PageTaxon->_get(array('id'=>array(
@@ -1049,13 +1048,6 @@ class SpeciesController extends Controller
             )
         );
 
-        if ($this->rHasId() && $this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
-
-			$this->changeMediaSortOrder($this->requestData['id'],$this->requestData['mId'],$this->requestData['move']);
-
-		}
-
-
         if ($this->rHasId()) {
         // get existing taxon name
 
@@ -1075,6 +1067,13 @@ class SpeciesController extends Controller
 						
             $this->smarty->assign('id',$this->requestData['id']);
 
+
+			if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
+	
+				$this->changeMediaSortOrder($this->requestData['id'],$this->requestData['mId'],$this->requestData['move']);
+	
+			}
+
             $media = $this->getTaxonMedia($this->requestData['id']);
 
             foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
@@ -1090,7 +1089,7 @@ class SpeciesController extends Controller
 						'id' => array(
 							'media_id' => $val['id'], 
 							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $_SESSION['admin']['project']['default_language_id']
+							'language_id' => $this->getDefaultProjectLanguage()
 						)
 					)
                 );
@@ -1105,7 +1104,7 @@ class SpeciesController extends Controller
 
             $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
             
-            $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['default_language_id']);
+            $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
 
             $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
 
@@ -1770,6 +1769,7 @@ class SpeciesController extends Controller
     
     }
     
+	
     /**
      * Enables the user to choose taxin ranks for the project
      *
@@ -1965,8 +1965,6 @@ class SpeciesController extends Controller
 
         $lp = $_SESSION['admin']['project']['languages'];
 
-        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
-        
         $pages = $this->models->PageTaxon->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -1996,7 +1994,7 @@ class SpeciesController extends Controller
         
         $this->smarty->assign('pages', $pages);
         
-        $this->smarty->assign('defaultLanguage', $defaultLanguage);
+        $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
         
         $this->printPage();
 
@@ -2442,7 +2440,7 @@ class SpeciesController extends Controller
 			'../../../app/views/species/taxon.php?p='.$this->getCurrentProjectId().
 			'&id='.$this->requestData['taxon_id'].
 			'&cat='.$this->requestData['activePage'].
-			'&lan='.$_SESSION['admin']['project']['default_language_id']
+			'&lan='.$this->getDefaultProjectLanguage()
 		);
 
     }
@@ -2890,7 +2888,7 @@ class SpeciesController extends Controller
                         // if succesful, get the projects default language
                         $lp = $_SESSION['admin']['project']['languages'];
                         
-                        $defaultLanguage = $_SESSION['admin']['project']['default_language_id'];
+                        $defaultLanguage = $this->getDefaultProjectLanguage();
 
                         // get the main page content for the default language
                         $ct = $this->models->ContentTaxon->_get(
@@ -4296,10 +4294,11 @@ class SpeciesController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon_id' => $id
 				),
-				'order' => 'mime_type,sort_order,file_name'
+				'columns' => 'id,taxon_id,file_name,thumb_name,original_name,mime_type,file_size,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime',
+				'order' => 'mime,sort_order,file_name'
 			)
 		);
-		
+
 		foreach((array)$d as $key => $val) {
 		
 			$d[$key]['dimensions'] = getimagesize($_SESSION['admin']['project']['urls']['project_media'].$val['file_name']);
@@ -4515,7 +4514,7 @@ class SpeciesController extends Controller
 				$tpt = $this->models->PageTaxonTitle->_get(
 					array('id'=>array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => isset($languageId) ? $languageId : $_SESSION['admin']['project']['default_language_id'],
+						'language_id' => isset($languageId) ? $languageId : $this->getDefaultProjectLanguage(),
 						'page_id' => $val['id']
 					),
 					'columns'=>'title'));
@@ -4604,47 +4603,105 @@ class SpeciesController extends Controller
 		return $d[0]['next'];
 	}
 	
-	private function changeMediaSortOrder($taxon,$id,$dir)
+	private function reOrderMediaSortOrder($taxon)
 	{
 
-		$d = $this->models->MediaTaxon->_get(
-			array(
-				'id' => 'a',
-				'order' => 'mime_type,sort_order,file_name'
-			)
-		);
+		$tm = $this->getTaxonMedia($taxon);
 		
-		$d = array(
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $id
-			);
+		$prevMime = null;
 
-		if ($dir=='up')
-			$d['sort_order'] = $
+		foreach((array)$tm as $val) {
+		
+			if ($prevMime != $val['mime']) $i=0;
+
+			$this->models->MediaTaxon->update(
+				array('sort_order' => $i++),
+				array('project_id' => $this->getCurrentProjectId(),'id' => $val['id'])					
+			);
 	
-		$d = $this->models->MediaTaxon->_get(
-			array(
-				'id' => 'a',
-				'order' => 'mime_type,sort_order,file_name'
-			)
-		);
-		
-		$prev = null;
-		
-		
-		
-				$d = $this->models->MediaTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id
-				),
-				'order' => 'mime_type,sort_order,file_name'
-			)
-		);
+			$prevMime = $val['mime'];
+
+		}
 	
 	}
 
+	private function changeMediaSortOrder($taxon,$id,$dir)
+	{
 
+		$this->reOrderMediaSortOrder($taxon);
+
+		$tm = $this->getTaxonMedia($taxon);
+
+		foreach((array)$tm as $key => $val) {
+
+			if ($val['id']==$id && $dir=='down' && $key!=(count((array)$tm)-1)) {
+
+				$this->models->MediaTaxon->update(
+					array('sort_order' => $val['sort_order']+1),
+					array('project_id' => $this->getCurrentProjectId(),'id' => $id)					
+				);
+
+				$this->models->MediaTaxon->update(
+					array('sort_order' => $val['sort_order']),
+					array('project_id' => $this->getCurrentProjectId(),'id' => $tm[$key+1]['id'])					
+				);
+
+			} else
+			if ($val['id']==$id && $dir=='up' && $key!=0) {
+
+				$this->models->MediaTaxon->update(
+					array('sort_order' => $val['sort_order']-1),
+					array('project_id' => $this->getCurrentProjectId(),'id' => $id)					
+				);
+
+				$this->models->MediaTaxon->update(
+					array('sort_order' => $val['sort_order']),
+					array('project_id' => $this->getCurrentProjectId(),'id' => $tm[$key-1]['id'])					
+				);
+
+			}
+		
+		}
+	
+	}
+
+	private function createStandardCoLRanks()
+	{
+
+		$pr = $this->models->ProjectRank->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total'
+			)
+		);	
+		
+		if ($pr[0]['total']>0) return;
+		
+		$r = $this->models->Rank->_get(
+			array(
+				'id' => array('in_col' => 1),
+				'order' => 'parent_id'
+			)
+		);
+		
+		$parent = null;
+		
+		foreach((array)$r as $key => $val) {
+
+			$this->models->ProjectRank->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getCurrentProjectId(),
+					'rank_id' => $val['id'],
+					'parent_id' => $parent,
+					'lower_taxon' => ($key>=(count((array)$r)-1) ? 1 : 0)
+				)
+			);
+			
+			$parent = $this->models->ProjectRank->getNewId();
+
+		}
+		
+	}
 	
 }

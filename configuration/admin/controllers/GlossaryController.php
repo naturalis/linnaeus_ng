@@ -134,7 +134,7 @@ class GlossaryController extends Controller
 				);
 		
 		} else
-        if (!isset($_SESSION['admin']['project']['default_language_id'])) {
+        if (is_null($this->getDefaultProjectLanguage())) {
 
 			$this->addError(
 				sprintf(
@@ -156,7 +156,7 @@ class GlossaryController extends Controller
 				$this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : '-';
 
 			if (!$this->rHasVal('activeLanguage'))
-				$this->requestData['activeLanguage'] = $_SESSION['admin']['project']['default_language_id'];
+				$this->requestData['activeLanguage'] = $this->getDefaultProjectLanguage();
 				
 			if ($this->rHasVal('letter')) {
 	
@@ -265,7 +265,7 @@ class GlossaryController extends Controller
 
 		} else {
 
-			$activeLanguage = $_SESSION['admin']['project']['default_language_id'];
+			$activeLanguage = $this->getDefaultProjectLanguage();
 
 		}
 
@@ -1027,9 +1027,9 @@ class GlossaryController extends Controller
 
 			return $this->requestData['activeLanguage'];
 
-		} elseif(isset($_SESSION['admin']['project']['default_language_id'])) {
+		} elseif(!is_null($this->getDefaultProjectLanguage())) {
 
-			return $_SESSION['admin']['project']['default_language_id'];
+			return $this->getDefaultProjectLanguage();
 
 		} else {
 

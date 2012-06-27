@@ -12,7 +12,7 @@
 		<div id="data-select-div">
 			<select name="geodatatype" id="geodatatype" onchange="mapDoChangeDataType()">
 				{foreach from=$geodataTypes key=k item=v name=x}
-				<option value="{$v.id}" id="geodatatype-{$k}" colour="{$v.colour}" {if $smarty.foreach.x.index==0} selected="selected"{/if}>
+				<option value="{$v.id}" id="geodatatype-{$k}" colour="{$v.colour}" type="{$v.type}" {if $smarty.foreach.x.index==0} selected="selected"{/if}>
 				{$v.title}
 				</option>
 				{/foreach}
@@ -29,7 +29,6 @@
 
 	<div id="map_canvas" style="width:880px; height:700px">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
 </div>
-
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -38,7 +37,8 @@ $(document).ready(function(){
 
 	allLookupNavigateOverrideUrl('species_edit.php?id=%s');
 
-	initMap({$mapInitString});	
+	initMap({$mapInitString});
+	mapToggleEditorMode($('#geodatatype :selected').attr('type'));
 	addMouseHandlers();
 	{if $mapBorder}
 	map.fitBounds(new google.maps.LatLngBounds(new google.maps.LatLng({$mapBorder.sw.lat}, {$mapBorder.sw.lng}), new google.maps.LatLng({$mapBorder.ne.lat}, {$mapBorder.ne.lng})));

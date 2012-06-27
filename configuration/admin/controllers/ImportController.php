@@ -400,8 +400,8 @@ class ImportController extends Controller
 			
 			$this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
 
-			$this->addModuleToProject(4);
-			$this->addModuleToProject(5);
+			$this->addModuleToProject(4,$this->getNewProjectId());
+			$this->addModuleToProject(5,$this->getNewProjectId());
 			$this->grantModuleAccessRights(4);
 			$this->grantModuleAccessRights(5);
 			
@@ -656,7 +656,7 @@ class ImportController extends Controller
 		
 					}
 
-					$this->addModuleToProject(3);
+					$this->addModuleToProject(3,$this->getNewProjectId());
 					$this->grantModuleAccessRights(3);
 
 				} else {
@@ -694,7 +694,7 @@ class ImportController extends Controller
 
 					unset($_SESSION['admin']['system']['import']['mimes']);
 
-					$this->addModuleToProject(2);
+					$this->addModuleToProject(2,$this->getNewProjectId());
 					$this->grantModuleAccessRights(2);
 
 				} else {
@@ -749,7 +749,7 @@ class ImportController extends Controller
 					
 					$this->helpers->XmlParser->getNodes('project');
 
-					$this->addModuleToProject(10);
+					$this->addModuleToProject(10,$this->getNewProjectId());
 					$this->grantModuleAccessRights(10);
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'])!==0) {
@@ -782,7 +782,7 @@ class ImportController extends Controller
 
 					$this->helpers->XmlParser->getNodes('topic');
 
-					$this->addModuleToProject(1);
+					$this->addModuleToProject(1,$this->getNewProjectId());
 					$this->grantModuleAccessRights(1);
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'])!==0) {
@@ -856,7 +856,7 @@ class ImportController extends Controller
 					$this->helpers->XmlParser->getNodes('text_key');
 					$this->helpers->XmlParser->getNodes('pict_key');
 
-					$this->addModuleToProject(6);
+					$this->addModuleToProject(6,$this->getNewProjectId());
 					$this->grantModuleAccessRights(6);
 					$this->saveSetting(
 						array(
@@ -911,7 +911,7 @@ class ImportController extends Controller
 			
 						}
 	
-						$this->addModuleToProject(7);
+						$this->addModuleToProject(7,$this->getNewProjectId());
 						$this->grantModuleAccessRights(7);
 		
 						$this->addMessage('Created matrix key(s).');
@@ -981,7 +981,7 @@ class ImportController extends Controller
 
 				$this->updateMapTypeColours();
 
-				$this->addModuleToProject(8);
+				$this->addModuleToProject(8,$this->getNewProjectId());
 				$this->grantModuleAccessRights(8);				
 				$this->saveSetting(
 						array(
@@ -1379,38 +1379,6 @@ class ImportController extends Controller
 			)
 		);
 
-	}
-
-	private function addModuleToProject($id)
-	{
-
-		/*
-
-			 1 | Introduction
-			 2 | Glossary
-			 3 | Literature
-			 4 | Species module
-			 5 | Higher taxa
-			 6 | Dichotomous key
-			 7 | Matrix key
-			 8 | Map key
-			10 | Additional texts
-			11 | Index
-			12 | Search
-		
-		free modules
-		
-		*/
-
-		$this->models->ModuleProject->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getNewProjectId(),	
-				'module_id' => $id,
-				'active' => 'y'
-			)
-		);
-		
 	}
 
 	private function grantModuleAccessRights($id)
@@ -3985,15 +3953,15 @@ class ImportController extends Controller
 		$res = $this->fixOldInternalLinks();
 
 		// additional texts
-		$this->addModuleToProject(10);
+		$this->addModuleToProject(10,$this->getNewProjectId());
 		$this->grantModuleAccessRights(10);
 
 		// index
-		$this->addModuleToProject(11);
+		$this->addModuleToProject(11,$this->getNewProjectId());
 		$this->grantModuleAccessRights(11);
 
 		// search
-		$this->addModuleToProject(12);
+		$this->addModuleToProject(12,$this->getNewProjectId());
 		$this->grantModuleAccessRights(12);
 	
 	}

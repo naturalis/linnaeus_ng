@@ -10,10 +10,15 @@
 	{t _s1=$search|replace:'"':'' _s2=$results.numOfResults}Your search for "%s" produced %s result:{/t}
 {else}
 	{t _s1=$search|replace:'"':'' _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results:{/t}
+	<span id="showAllToggle" class="invisible" onclick="toggleAllHidden()">
+		<span id="showAllToggleShow" class="visible">{t}show all{/t}</span>
+		<span id="showAllToggleHide" class="invisible">{t}hide all{/t}</span>
+	</span>
 {/if}
 </div>
 
 {assign var=hidden value=1}
+{assign var=showShowAllToggle value=false}
 
 {if $results.species.numOfResults > 0}
 <div class="set">
@@ -23,9 +28,10 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
-		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
-		</div>
-		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+			{assign var=showShowAllToggle value=true}
+			<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+			</div>
+			<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
 		{/if}
 		{if $res.label|@strtolower=='species media'}
 			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" style="width:50px" />
@@ -64,9 +70,10 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
-		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
-		</div>
-		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
+			{assign var=showShowAllToggle value=true}
+			<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
+			</div>
+			<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
 		{/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goGlossaryTerm({$v.id})">
@@ -97,6 +104,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -127,6 +135,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -152,6 +161,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -191,6 +201,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -217,6 +228,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -250,6 +262,7 @@
 		<div class="set-header">{$res.data|@count} {t}in{/t} {$res.label|@strtolower}</div>
 		{foreach from=$res.data key=k item=v}
 		{if $k==$visibleSearchResultsPerCategory}
+		{assign var=showShowAllToggle value=true}
 		<div class="showHidden" id="switch-{$hidden}" onclick="toggleHidden({$hidden});"></div>
 		</div>
 		<div class="subset invisible" id="hidden-{$hidden++}" visible="0">
@@ -274,6 +287,17 @@
 </div>
 {/if}
 </div>
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+{if showShowAllToggle}
+	showAllToggle();
+{/if}
+{literal}
+});
+</script>
+{/literal}
 
 {include file="../shared/messages.tpl"}
 {include file="../shared/footer.tpl"}

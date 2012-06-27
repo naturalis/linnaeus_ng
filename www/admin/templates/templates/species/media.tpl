@@ -28,6 +28,10 @@
 		{section name=i loop=$media.image}
 		<tr id="media-row-{$media.image[i].id}" class="tr-highlight" style="vertical-align:top">
 			<td style="width:150px;padding-right:10px">
+			
+			{$media.image[i].sort_order}
+			
+			
 				{if $media.image[i].thumb_name != ''}
 					{capture name="src"}{$session.admin.project.urls.project_thumbs}{$media.image[i].thumb_name}{/capture} 
 				{else}

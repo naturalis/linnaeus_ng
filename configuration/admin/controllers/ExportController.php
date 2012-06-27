@@ -660,7 +660,7 @@ class ExportController extends Controller
 					'label' => $sVal['title']
 				);
 				
-				if ($sKey == $_SESSION['admin']['project']['default_language_id'])
+				if ($sKey == $this->getDefaultProjectLanguage())
 					$_SESSION['admin']['export']['mapLegend'][$key] = $sVal['title'];
 
 			}
@@ -830,7 +830,7 @@ class ExportController extends Controller
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
 						'matrix_id' => $mVal['id'],
-						'language_id' => $_SESSION['admin']['project']['default_language_id']
+						'language_id' => $this->getDefaultProjectLanguage()
 					)
 				)
 			);
@@ -878,7 +878,7 @@ class ExportController extends Controller
 					'language' => $_SESSION['admin']['export']['languages'][$nVal['language_id']]['language'],
 				);
 				
-				//	if ($nVal['language_id']==$_SESSION['admin']['project']['default_language_id']) 
+				//	if ($nVal['language_id']==$this->getDefaultProjectLanguage()) 
 				//		$_SESSION['admin']['export']['matrices'][$mVal['id']] = $nVal['name'];
 
 			}

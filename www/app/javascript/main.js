@@ -442,6 +442,29 @@ function doBackForm(url,data) {
 
 }
 
+var allHidden = true;
+
+function showAllToggle() {
+
+		$('#showAllToggle').removeClass('invisible').addClass('visible');
+//		<span id="showAllToggleShow" class="visible">{t}show all{/t}</span>
+	//	<span id="showAllToggleHide" class="invisible">{t}hide all{/t}</span>
+}
+
+function toggleAllHidden() {
+
+	if (allHidden) {
+		$('div[id^=hidden-]').removeClass('invisible').addClass('visible');
+		$('div[id^=switch-]').removeClass('showHidden').addClass('hideHidden');
+		allHidden = false;
+	} else { 
+		$('div[id^=hidden-]').removeClass('visible').addClass('invisible');
+		$('div[id^=switch-]').removeClass('hideHidden').addClass('showHidden');
+		allHidden = true;
+	}
+
+}
+
 function toggleHidden(id) {
 
 	if ($('#hidden-'+id).attr('visible')=='1') {

@@ -6,6 +6,7 @@
 	You have to define at least one data type before you can add any map data. <a href="data_types.php">Define data types</a>
 </p>
 {/if}
+{if $taxa}
 <table>
 {foreach from=$taxa key=k item=v}
 	<tr class="tr-highlight">
@@ -17,6 +18,9 @@
 	</tr>
 {/foreach}
 </table>
+{else}
+{t}No species have been defined.{/t}
+{/if}
 
 {if $prevStart!=-1 || $nextStart!=-1}
 	<div id="navigation">

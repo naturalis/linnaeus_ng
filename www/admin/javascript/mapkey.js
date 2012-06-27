@@ -1,93 +1,3 @@
-/* functions not directly related to map */
-function mapSaveTypelabel(id,value,type) {
-
-	$.ajax({
-		url : "ajax_interface.php" ,
-		type: "POST",
-		data : ({
-			'action' : 'save_type_label' ,
-			'language' : (type == 'default' ? allDefaultLanguage : allActiveLanguage) ,
-			'id' : id ,
-			'value' : value ,
-			'time' : allGetTimestamp()			
-		}),
-		success : function (data) {
-			allSetMessage(data);
-		}
-	});
-
-}
-
-function mapSaveTypeColour(id,value) {
-
-	$.ajax({
-		url : "ajax_interface.php" ,
-		type: "POST",
-		data : ({
-			'action' : 'save_type_colour' ,
-			'id' : id ,
-			'value' : value ,
-			'time' : allGetTimestamp()			
-		}),
-		success : function (data) {
-			allSetMessage(data);
-		}
-	});
-
-}
-
-function mapGetTypeLabels(language) {
-
-	$.ajax({
-		url : "ajax_interface.php" ,
-		type: "POST",
-		data : ({
-			'action' : 'get_type_labels' ,
-			'language' : language ,
-			'time' : allGetTimestamp()			
-		}),
-		success : function (data) {
-			if (language == allActiveLanguage) $('input[id*=other-]').val('');
-			obj = $.parseJSON(data);
-			if (!obj) return;			
-			for (var i=0;i<obj.length;i++) $('#'+(language == allDefaultLanguage ? 'default-' : 'other-' )+obj[i].type_id).val(obj[i].title);
-		}
-	});
-
-}
-
-
-function mapGetTypeColours() {
-
-	$.ajax({
-		url : "ajax_interface.php" ,
-		type: "POST",
-		data : ({
-			'action' : 'get_type_colours' ,
-			'time' : allGetTimestamp()			
-		}),
-		success : function (data) {
-			obj = $.parseJSON(data);
-			if (!obj) return;			
-			for (var i=0;i<obj.length;i++) {
-				if (obj[i].colour) document.getElementById('color-'+obj[i].id).color.fromString(obj[i].colour);
-			}
-		}
-	});
-
-}
-
-function mapDeleteType(id,value) {
-	
-	if (!allDoubleDeleteConfirm(_('data type'),value)) return;
-
-	$('<input type="hidden" name="del_type">').val(id).appendTo('#theForm');
-	$('#theForm').submit();
-
-
-}
-
-
 /* map */
 var map;
 var drawingManager;
@@ -165,6 +75,26 @@ function mapDrawingManagerShapeInit() {
 
 }
 
+function mapToggleEditorMode(mode) {
+
+	drawingManager.setMap(null);
+
+	var d = [];
+
+	if (mode=='both' || mode=='marker' || mode=='') d.push(google.maps.drawing.OverlayType.MARKER);
+	if (mode=='both' || mode=='polygon' || mode=='') d.push(google.maps.drawing.OverlayType.POLYGON);
+
+	drawingManager = new google.maps.drawing.DrawingManager({
+		drawingControl: true,
+		drawingControlOptions: {
+			position: google.maps.ControlPosition.TOP_LEFT,
+			drawingModes: d
+		}
+	});
+
+	drawingManager.setMap(map);
+}
+
 function mapDrawingManagerInit() {
 
 	drawingManager = new google.maps.drawing.DrawingManager({
@@ -212,6 +142,7 @@ function mapGetCurrentDataType() {
 function mapDoChangeDataType() {
 
 	mapDrawingManagerShapeInit();
+	mapToggleEditorMode($('#geodatatype :selected').attr('type'));
 
 }
 
@@ -377,3 +308,95 @@ function mapDoCopyForm(taxon) {
 	$('#theForm').submit();
 
 }
+
+
+/* functions not directly related to map */
+function mapSaveTypelabel(id,value,type) {
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : 'save_type_label' ,
+			'language' : (type == 'default' ? allDefaultLanguage : allActiveLanguage) ,
+			'id' : id ,
+			'value' : value ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	});
+
+}
+
+function mapSaveTypeColour(id,value) {
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : 'save_type_colour' ,
+			'id' : id ,
+			'value' : value ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			allSetMessage(data);
+		}
+	});
+
+}
+
+function mapGetTypeLabels(language) {
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : 'get_type_labels' ,
+			'language' : language ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			if (language == allActiveLanguage) $('input[id*=other-]').val('');
+			obj = $.parseJSON(data);
+			if (!obj) return;			
+			for (var i=0;i<obj.length;i++) $('#'+(language == allDefaultLanguage ? 'default-' : 'other-' )+obj[i].type_id).val(obj[i].title);
+		}
+	});
+
+}
+
+
+function mapGetTypeColours() {
+
+	$.ajax({
+		url : "ajax_interface.php" ,
+		type: "POST",
+		data : ({
+			'action' : 'get_type_colours' ,
+			'time' : allGetTimestamp()			
+		}),
+		success : function (data) {
+			obj = $.parseJSON(data);
+			if (!obj) return;			
+			for (var i=0;i<obj.length;i++) {
+				if (obj[i].colour) document.getElementById('color-'+obj[i].id).color.fromString(obj[i].colour);
+			}
+		}
+	});
+
+}
+
+function mapDeleteType(id,value) {
+	
+	if (!allDoubleDeleteConfirm(_('data type'),value)) return;
+
+	$('<input type="hidden" name="del_type">').val(id).appendTo('#theForm');
+	$('#theForm').submit();
+
+
+}
+
+
