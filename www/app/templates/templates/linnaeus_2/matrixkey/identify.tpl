@@ -7,7 +7,7 @@
 
 	<div id="search-pattern">
 		<div id="char-states">
-			<div class="select-header">{t}Characters{/t} <a href="javascript:showCharacterSort();void(0);">{t}sort{/t}</a></div>
+			<div class="select-header">{t}Characters{/t}<span class="selectIcon" id="sort-menu" onclick="showCharacterSort();void(0);">{t}Sort{/t}</span></div>
 			<select size="5" id="characteristics" onclick="goCharacter()" ondblclick="addSelected(this)" >
 			</select>			
 			<div class="select-header">{t}States{/t}</div>

@@ -17,7 +17,7 @@
     <tr id="topBar">
     <td>
         <span id="taxonName">{$taxon.taxon}</span> 
-        <span id="coordinates">0,0</span>
+        <span id="coordinates">0,0</span> <span id=species-number></span>
     </td><td id="mapName">
         {if $maps|@count>1}
             <span class="selectIcon" onclick="
@@ -39,8 +39,11 @@
 				<tr>
 				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td id="cell-{$cellNo}" row="{$smarty.section.rows.index}" col="{$smarty.section.cols.index}" 
-						class="{if $index.index[$cellNo]}mapCellDiversity mapCellDiversity{$index.index[$cellNo].class}{/if}{if $cellNo==$selectedCell} mapCellSelected{/if}"
-						{if $index.index[$cellNo]}onclick="l2DiversityCellClick(this)"{/if}></td>
+						{if $index.index[$cellNo]}class="mapCellDiversity{$index.index[$cellNo].class}{if $cellNo==$selectedCell} mapCellSelected{/if}"{/if}
+						onmouseover="l2DiversityCellMouseOver({$index.index[$cellNo].total})"
+						{if $index.index[$cellNo]}
+							onclick="l2DiversityCellClick(this)"
+						{/if}></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>

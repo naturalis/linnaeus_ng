@@ -1,3 +1,27 @@
+{literal}
+#main-menu ul li a.home {
+{/literal}
+    background: url('{$systemMedia}navigator.png') 5px 3px no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#main-menu ul li a.home-selected, #main-menu ul li a.home:hover {
+{/literal}
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
+	    -moz-linear-gradient(top,  #555454 0%, #454444 100%);
+	    -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555454), color-stop(100%,#454444));
+	    -webkit-linear-gradient(top,  #555454 0%,#454444 100%);
+	    -o-linear-gradient(top,  #555454 0%,#454444 100%);
+	    -ms-linear-gradient(top,  #555454 0%,#454444 100%);
+	    linear-gradient(top,  #555454 0%,#454444 100%);
+	    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555454', endColorstr='#454444',GradientType=0 );
+ {literal}
+}
+{/literal}
+
 {if $logo}
     {literal}
     #header-container {
@@ -206,13 +230,6 @@
 {literal}
 }
 {/literal}
-
-
-
-
-
-
-
 
 {literal}
 #dialog-close {

@@ -44,11 +44,12 @@ body {
 }
 
 #container {
-    margin: 0 auto;
+	left: 50%;
     width: 900px;
+	margin-left: -450px; /* set to half of container width */
     text-align: left;
     border: 0;
-    position: relative;
+    position: fixed;
 }
 
 #main-body {
@@ -203,6 +204,13 @@ body {
     background: -ms-linear-gradient(top,  #555454 0%,#454444 100%);
     background: linear-gradient(top,  #555454 0%,#454444 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555454', endColorstr='#454444',GradientType=0 );
+}
+
+#main-menu ul li a.home, #main-menu ul li a.home-selected {
+    cursor: pointer; 
+    width: 27px;
+    height: 22px;
+	padding:0;
 }
 
 #categories {  

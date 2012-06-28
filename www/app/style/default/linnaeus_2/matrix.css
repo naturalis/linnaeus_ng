@@ -111,6 +111,12 @@ td.compare-label {
 	margin-bottom: 5px;
 }
 
+#sort-menu {
+	float:right;
+	margin: 0;
+	cursor: pointer;
+}
+
 #unknowns {
 	margin: 5px 0 12px 0;
 }
