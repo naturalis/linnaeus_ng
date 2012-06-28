@@ -795,7 +795,7 @@ class SpeciesController extends Controller
 
 		$taxa = $this->getTreeList();
 
-		reset($taxa);
+		if ($taxa) reset($taxa);
 		
 		$prev = $next = null;
 

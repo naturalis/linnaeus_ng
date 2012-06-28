@@ -41,4 +41,12 @@
 	</table>
 </div>
 
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+	allLookupContentOverrideUrl('../search/ajax_interface.php');
+});
+</script>
+{/literal}
+
 {include file="../shared/footer.tpl"}
