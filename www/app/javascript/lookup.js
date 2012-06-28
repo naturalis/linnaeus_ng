@@ -36,10 +36,17 @@ var allLookupDialogInputName = 'lookupDialogInput';
 var allLookupDialogContentName = 'lookup-DialogContent';
 var allNavigateDefaultUrl = 'item.php?id=%s';
 var allNavigateTargetUrl = null;
+var allLookupContentUrl = 'ajax_interface.php';
 
 function allLookupNavigateOverrideUrl(url) {
 
 	allLookupTargetUrl = allNavigateTargetUrl = url;
+
+}
+
+function allLookupContentOverrideUrl(url) {
+
+	allLookupContentUrl = url;
 
 }
 
@@ -125,7 +132,7 @@ function allLookupGetData(text,getAll) {
 	if (allLookupData==null) {
 
 		$.ajax({
-			url : "ajax_interface.php",
+			url : allLookupContentUrl,
 			type: "POST",
 			data : ({
 				'action' : 'get_lookup_list' ,

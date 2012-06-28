@@ -196,7 +196,7 @@ function showDialog(title,content,vars) {
 
 	if (!vars) {
 		vars = {};
-		//vars.width = 350;
+		vars.width = 350;
 	}
 
 	vars.title = title ? title : '';
@@ -353,7 +353,7 @@ function checkForm() {
 
 	if ($('#search').val()=='') return false;
 
-	if (searchKeyed) $('#theForm').attr('action','../linnaeus/search.php');
+	if (searchKeyed) $('#theForm').attr('action','../search/search.php');
 
 	return true;
 
@@ -364,7 +364,7 @@ function doSearch() {
 	if (!searchBoxSelected) return false;
 	if ($('#search').val()=='') return false;
 
-	$('#theForm').attr('action','../linnaeus/search.php');
+	$('#theForm').attr('action','../search/search.php');
 	$('#theForm').submit();
 
 }
