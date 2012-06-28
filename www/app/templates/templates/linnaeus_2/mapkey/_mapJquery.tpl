@@ -18,7 +18,8 @@ showDialog(
     _('Found {$taxa|@count} taxa'),
     '<p style="margin:0px;height:250px;overflow-y:scroll">'+
     {foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon|escape:'htmlall'}</a><br />'+
-    {/foreach}'</p>'
+    {/foreach}'</p>',
+	{literal}{width:350}{/literal}
 );
 {/if}
 
@@ -27,7 +28,8 @@ showDialog(
     _('Taxa in that cell'),
     '<p style="height:250px;overflow-y:scroll">'+
     {foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon|escape:'htmlall'}</a><br />'+
-    {/foreach}'</p>'
+    {/foreach}'</p>',
+    {literal}{width:350}{/literal}
 );
 {/if}
 

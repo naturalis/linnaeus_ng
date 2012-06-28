@@ -22,7 +22,8 @@
             <span class="selectIcon" onclick="
                 showDialog('{t}Choose a map{/t}',
                     {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
-                    {/foreach}' '
+                    {/foreach}' ',
+                    {literal}{width:350}{/literal}
                 );">{$map.name}</span>
         {else}
             {$map.name}
