@@ -3,7 +3,6 @@
 {assign var=showZeroHeaders value=false}
 
 <div id="page-main">
-{if $search|@strlen>2}
 	<div id="results">
 		<div id="header">
 		{if $results.numOfResults==0}
@@ -246,7 +245,6 @@
 
 
 </div>
-{/if}
 </div>
 {literal}
 <script type="text/JavaScript">
