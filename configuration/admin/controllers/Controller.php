@@ -1759,7 +1759,7 @@ class Controller extends BaseClass
 		$pId = isset($p['pId']) ? $p['pId'] : null;
 		$ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
 		$depth = isset($p['depth']) ? $p['depth'] : 0;
-		
+
 		if (!isset($p['depth'])) unset($this->treeList);
 				
 		$t = $this->models->Taxon->_get(
