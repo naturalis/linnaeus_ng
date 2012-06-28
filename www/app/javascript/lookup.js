@@ -398,6 +398,8 @@ function allLookupShowDialog() {
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
 	);
 
+	$('#'+allLookupDialogContentName).css('overflow-y','scroll');
+	$('#'+allLookupDialogContentName).css('height','250px');
 
 	allLookupBindDialogKeyUp();
 	allLookupGetData('*',true);
