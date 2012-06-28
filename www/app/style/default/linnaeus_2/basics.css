@@ -320,6 +320,13 @@ body {
     color: #0303b2;
 }
 
+#allLookupDialogContentName {
+	overflow-y: scroll;
+	height: 300px;	
+}
+
+
+
 /* Navigation icons are included in utilities/dynamic-css.tpl */
 
 

@@ -5,7 +5,6 @@
 }
 
 #allLookupList {
-
 	position:absolute;
 	top:0px;
 	left:0px;
@@ -23,6 +22,14 @@
 
 }
 
+#allLookupLoadingDiv {
+ height:100%;
+ width:100%;
+ background-image:url(../../../media/system/skins/original_skin/loading.gif);
+ background-position:center;
+ background-repeat:no-repeat;
+}
+
 #lookupDialog {
 	text-align: left;
 	margin: 5px;
@@ -35,6 +42,8 @@
 	padding: 5px;
 	background: #fff;
 	border: 1px solid #999;
+	height: 350px;
+	overflow-y: scroll;
 }
 
 
