@@ -4,7 +4,8 @@
 }
 
 #page-main {
-    height: 411px;
+	height: auto;
+ 	min-height:411px;
 }
 
 #mapGrid td {
@@ -21,6 +22,11 @@
 
 #coordinates {
 	float: right;
+    padding-top: 3px;
+}
+
+#species-number {
+	float: left;
     padding-top: 3px;
 }
 
@@ -60,16 +66,19 @@ a.selectIcon:hover {
 .searchMap td {
 	cursor: pointer;
 }
-
+/*
+#mapTable table {
+	border-collapse: auto;
+	border-spacing: auto;
+}
+*/
 #mapTable td {
     padding: 0 ;
     margin: 0;
     border-right: 1px dotted #777;
     border-bottom: 1px dotted #777;
-    filter: alpha(opacity=70);
-    -moz-opacity: .70;
-    -khtml-opacity: 0.70;
     opacity: .70;
+	filter: alpha(opacity=70);
 }
 
 .mapCellAxis {
@@ -114,42 +123,52 @@ a.selectIcon:hover {
 }
 
 .mapCellDiversity1 {
+	cursor: pointer;
 	background-color:#99ff99;
 }
 
 .mapCellDiversity2 {
+	cursor: pointer;
 	background-color:#66ff66;
 }
 
 .mapCellDiversity3 {
+	cursor: pointer;
 	background-color:#33ff33;
 }
 
 .mapCellDiversity4 {
+	cursor: pointer;
 	background-color:#00ff00;
 }
 
 .mapCellDiversity5 {
+	cursor: pointer;
 	background-color:#00dd00;
 }
 
 .mapCellDiversity6 {
+	cursor: pointer;
 	background-color:#00bb00;
 }
 
 .mapCellDiversity7 {
+	cursor: pointer;
 	background-color:#009900;
 }
 
 .mapCellDiversity8 {
+	cursor: pointer;
 	background-color:#007700;
 }
 
 .mapCellDiversity9 {
+	cursor: pointer;
 	background-color:#005500;
 }
 
 .mapCellDiversity10 {
+	cursor: pointer;
 	background-color:#003300;
 }
 
