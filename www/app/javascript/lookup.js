@@ -137,10 +137,10 @@ function allLookupGetData(text,getAll) {
 			}),
 			success : function (data) {
 				//alert(data);
-				allLookupDataHideLoading();
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
+				allLookupDataHideLoading();
 
 			}
 		});
@@ -395,8 +395,7 @@ function allLookupShowDialog() {
 
 	showDialog(
 		_('Index'),
-		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>',
-		{width:400}
+		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
 	);
 
 	$('#'+allLookupDialogContentName).css('overflow-y','scroll');
