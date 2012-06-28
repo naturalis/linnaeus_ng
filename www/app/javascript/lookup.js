@@ -97,6 +97,18 @@ function allLookupPostProcessing(text,data,getAll) {
 
 }
 
+function allLookupDataShowLoading() {
+
+	$('#lookup-DialogContent').append('<div id="allLookupLoadingDiv"></div>');
+
+}
+
+function allLookupDataHideLoading() {
+
+	$('#allLookupLoadingDiv').remove();
+
+}
+
 function allLookupGetData(text,getAll) {
 
 	if (text.length==0 && getAll!=true) {
@@ -107,6 +119,8 @@ function allLookupGetData(text,getAll) {
 		return false;
 
 	}
+	
+	allLookupDataShowLoading();
 
 	if (allLookupData==null) {
 
@@ -123,6 +137,7 @@ function allLookupGetData(text,getAll) {
 			}),
 			success : function (data) {
 				//alert(data);
+				allLookupDataHideLoading();
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
