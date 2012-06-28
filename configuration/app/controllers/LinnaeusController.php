@@ -692,7 +692,14 @@ class LinnaeusController extends Controller
 			),
 			'taxonList' => $this->makeTaxonList($d),
 			'categoryList' => $this->makeCategoryList(),
-			'numOfResults' => count((array)$d)+count((array)$taxa)
+			'numOfResults' => count((array)$d)+count((array)$taxa),
+			'subsetsWithResults' =>
+				(count((array)$taxa) > 0 ? 1 : 0)+
+				(count((array)$content) > 0 ? 1 : 0)+
+				(count((array)$synonyms) > 0 ? 1 : 0)+
+				(count((array)$commonnames) > 0 ? 1 : 0)+
+				(count((array)$media) > 0 ? 1 : 0)
+			
 		);
 
 	}
@@ -776,7 +783,8 @@ class LinnaeusController extends Controller
 
 		return array(
 			'results' => isset($r) ? $r : null,
-			'numOfResults' => count((array)$content)
+			'numOfResults' => count((array)$content),
+			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
 		);
 
 	}
@@ -946,6 +954,10 @@ class LinnaeusController extends Controller
 				)
 			),
 			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
+			'subsetsWithResults' =>
+				(count((array)$matrices) > 0 ? 1 : 0)+
+				(count((array)$characteristics) > 0 ? 1 : 0)+
+				(count((array)$states) > 0 ? 1 : 0),
 			'matrices' => $matrixNames
 		);
 
@@ -1064,7 +1076,10 @@ class LinnaeusController extends Controller
 					'numOfResults' => count((array)$steps)
 				)
 			),
-			'numOfResults' => count((array)$choices)+count((array)$steps)
+			'numOfResults' => count((array)$choices)+count((array)$steps),
+			'subsetsWithResults' =>
+				(count((array)$choices) > 0 ? 1 : 0) +
+				(count((array)$steps) > 0 ? 1 : 0)
 		);
 
 	}
@@ -1106,7 +1121,8 @@ class LinnaeusController extends Controller
 					'numOfResults' => count((array)$books)
 				)
 			),
-			'numOfResults' => count((array)$books)
+			'numOfResults' => count((array)$books),
+			'subsetsWithResults' => count((array)$books) > 0 ? 1 : 0
 		);
 
 	}
@@ -1242,7 +1258,11 @@ class LinnaeusController extends Controller
 					'numOfResults' => count((array)$media)
 				)
 			),
-			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media)
+			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media),
+			'subsetsWithResults' => 
+				(count((array)$gloss) > 0 ? 1 : 0) +
+				(count((array)$synonyms) > 0 ? 1 : 0) +
+				(count((array)$media) > 0 ? 1 : 0)
 		);
 
 	}
@@ -1314,7 +1334,8 @@ class LinnaeusController extends Controller
 					'numOfResults' => count((array)$content)
 				)
 			),
-			'numOfResults' => count((array)$content)
+			'numOfResults' => count((array)$content),
+			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
 		);
 
 	}
@@ -1358,7 +1379,8 @@ class LinnaeusController extends Controller
 					'numOfResults' => (isset($geo) ? count((array)$geo) : 0)
 				),
 			),
-			'numOfResults' => isset($geo) ? count((array)$geo) : 0
+			'numOfResults' => isset($geo) ? count((array)$geo) : 0,
+			'subsetsWithResults' => count((array)$geo) > 0 ? 1 : 0
 		);
 
 	}

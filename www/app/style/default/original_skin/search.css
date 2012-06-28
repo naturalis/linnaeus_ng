@@ -17,13 +17,39 @@
 	margin-bottom:10px;
 }
 
+#results .set-header, .set-header-clickable {
+	font-weight:bold;
+	background-color:rgb(255,255,221);
+	width:400px;
+	height:25px;
+	margin-bottom:5px;
+	color:rgb(204, 0, 0);
+}
+
+#results .set-header-clickable {
+	cursor:pointer;
+}
+
 #results .subset {
 	margin-bottom:10px;
 }
 
-#results .set-header {
+#results .subset-header, .subset-header-zero {
 	font-weight:bold;
+	cursor:pointer;
+	background-color:rgb(255,255,230);
+	width:400px;
+	height:25px;
+	margin-bottom:5px;
+	border-bottom:1px dotted #ddd;
+	color:rgb(56,56,56);
+	padding-left:10px;
 }
+
+#results .subset-header-zero {
+	cursor:default;
+}
+
 
 #results .result {
 	cursor:pointer;
