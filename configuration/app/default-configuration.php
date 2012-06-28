@@ -100,6 +100,7 @@ class configuration
     {
 
         return array(
+            'minimumSearchStringLength' => 3,
             'visibleSearchResultsPerCategory' => 10
 		);
 

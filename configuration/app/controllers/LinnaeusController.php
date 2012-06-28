@@ -336,8 +336,8 @@ class LinnaeusController extends Controller
 
 		if ($this->rHasVal('search')) {
 
-			if (strlen($this->requestData['search'])>2) { 
-			
+			if (strlen($this->requestData['search'])>=$this->controllerSettings['minimumSearchStringLength']) { 
+
 				if (
 					!isset($_SESSION['app']['user']['search'][$this->getCurrentLanguageId()][$this->requestData['search']]) || 
 					$this->noResultCaching
@@ -372,7 +372,7 @@ class LinnaeusController extends Controller
 
 			} else {
 			
-				$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),3));
+				$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),$this->controllerSettings['minimumSearchStringLength']));
 				
 				return null;
 			
@@ -563,12 +563,22 @@ class LinnaeusController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'taxon regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id as taxon_id,taxon as label,rank_id'
+				'columns' => 'id as taxon_id,taxon as label,rank_id',
+				'order' => 'taxon'
 			)
 		);
-
-		foreach((array)$taxa as $key => $val)  $taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
-
+		
+		$species = $higherTaxa = array();
+		
+		foreach((array)$taxa as $key => $val) {
+			$taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
+			if ($ranks['ranks'][$val['rank_id']]['lower_taxon']==1)
+				$species[] = $taxa[$key];
+			else
+				$higherTaxa[] = $taxa[$key];
+				
+		}
+		
 		$synonyms = $this->models->Synonym->_get(
 			array(
 				'id' => array(
@@ -665,9 +675,14 @@ class LinnaeusController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Species names'),
-					'data' => $taxa, // when changing the label 'Species names', do the same in searchMap()
-					'numOfResults' => count((array)$taxa)
+					'label' => _('Higher taxa'),
+					'data' => $higherTaxa,
+					'numOfResults' => count((array)$higherTaxa)
+				),
+				array(
+					'label' => _('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'data' => $species, //$taxa,
+					'numOfResults' => count((array)$species)//count((array)$taxa)
 				),
 				array(
 					'label' => _('Species descriptions'),
@@ -829,7 +844,8 @@ class LinnaeusController extends Controller
 					'language_id' => $this->getCurrentLanguageId(),
 					'name regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'matrix_id,name as label'
+				'columns' => 'matrix_id,name as label',
+				'order' => 'label'
 			)
 		);
 
@@ -840,7 +856,8 @@ class LinnaeusController extends Controller
 					'language_id' => $this->getCurrentLanguageId(),
 					'label regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'characteristic_id,label'
+				'columns' => 'characteristic_id,label',
+				'order' => 'label'
 			)
 		);
 
@@ -923,6 +940,8 @@ class LinnaeusController extends Controller
 			$states[$key]['matrices'] = $cm;
 
 		}
+		
+		$this->customSortArray($states,array('key'=>'label'));
 
 		$matrixNames = $this->models->MatrixName->_get(
 			array(
@@ -1045,6 +1064,8 @@ class LinnaeusController extends Controller
 		);
 
 		$steps = array_merge((array)$steps1,(array)$steps2);
+		
+		$this->customSortArray($steps,array('key' => 'keystep_id'));
 
 		foreach((array)$steps as $key => $val) {
 
@@ -1055,7 +1076,8 @@ class LinnaeusController extends Controller
 						'language_id' => $this->getCurrentLanguageId(),
 						'id' => $val['keystep_id']
 					),
-					'columns' => 'number'
+					'columns' => 'number',
+					'order' => 'number'
 				)
 			);
 
@@ -1067,13 +1089,13 @@ class LinnaeusController extends Controller
 			'results' => array(
 				array(
 					'label' => _('Dichotomous key steps'),
-					'data' => $choices,
-					'numOfResults' => count((array)$choices)
+					'data' => $steps,
+					'numOfResults' => count((array)$steps)
 				),
 				array(
 					'label' => _('Dichotomous key choices'),
-					'data' => $steps,
-					'numOfResults' => count((array)$steps)
+					'data' => $choices,
+					'numOfResults' => count((array)$choices)
 				)
 			),
 			'numOfResults' => count((array)$choices)+count((array)$steps),
@@ -1110,6 +1132,7 @@ class LinnaeusController extends Controller
 							)
 						)
 					) as author_full',
+				'order' => 'author_full'
 			)
 		);
 
@@ -1170,7 +1193,8 @@ class LinnaeusController extends Controller
 						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
 					')'
 				,
-				'columns' => 'id,term as label,definition as content'
+				'columns' => 'id,term as label,definition as content',
+				'order' => 'label'
 			)
 		);
 
@@ -1182,7 +1206,8 @@ class LinnaeusController extends Controller
 					'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'glossary_id as id,synonym as label'
+				'columns' => 'glossary_id as id,synonym as label',
+				'order' => 'label'
 			)
 		);
 
@@ -1210,7 +1235,8 @@ class LinnaeusController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-					'columns' => 'glossary_id as id,file_name as label'
+					'columns' => 'glossary_id as id,file_name as label',
+					'order' => 'label'
 				)
 			);
 	
@@ -1325,6 +1351,8 @@ class LinnaeusController extends Controller
 		);
 
 		$content = array_merge((array)$content1,(array)$content2);
+		
+		$this->customSortArray($content,array('key'=>'label'));
 
 		return array(
 			'results' => array(

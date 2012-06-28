@@ -1316,7 +1316,7 @@ class Controller extends BaseClass
      * @param array    $sortBy    array to array of key, direction and case-sensitivity
      * @access     public
      */
-    public function customSortArray (&$array, $sortBy)
+    public function customSortArray(&$array, $sortBy)
     {
         
         if (!isset($array) || !is_array($array)) return;
