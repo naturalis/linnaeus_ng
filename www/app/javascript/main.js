@@ -196,7 +196,7 @@ function showDialog(title,content,vars) {
 
 	if (!vars) {
 		vars = {};
-		vars.width = 350;
+		//vars.width = 350;
 	}
 
 	vars.title = title ? title : '';
