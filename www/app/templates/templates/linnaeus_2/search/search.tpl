@@ -1,4 +1,5 @@
 {include file="../shared/header.tpl"}
+{include file="_search-main-no-tabs.tpl"}
 
 {assign var=showZeroHeaders value=false}
 

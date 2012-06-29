@@ -1,4 +1,24 @@
 {literal}
+@font-face {
+{/literal}
+    font-family: LeagueGothic;
+ 	src: url('{$systemMedia}webfonts/League_Gothic-webfont.eot?') format('eot'), 
+		 url('{$systemMedia}webfonts/League_Gothic-webfont.woff') format('woff'), 
+		 url('{$systemMedia}webfonts/League_Gothic-webfont.ttf') format('truetype');
+    font-weight: 400;
+{literal}
+}
+{/literal}
+
+{literal}
+#header-container {
+{/literal}
+	background: #146daf url('{$systemMedia}background.jpg') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
 #main-menu ul li a.home {
 {/literal}
     background: url('{$systemMedia}navigator.png') 5px 3px no-repeat;
@@ -10,13 +30,27 @@
 #main-menu ul li a.home-selected, #main-menu ul li a.home:hover {
 {/literal}
     background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat;
+    background:
     	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    -moz-linear-gradient(top,  #555454 0%, #454444 100%);
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555454), color-stop(100%,#454444));
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    -webkit-linear-gradient(top,  #555454 0%,#454444 100%);
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    -o-linear-gradient(top,  #555454 0%,#454444 100%);
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    -ms-linear-gradient(top,  #555454 0%,#454444 100%);
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    linear-gradient(top,  #555454 0%,#454444 100%);
+    background:
+    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
 	    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555454', endColorstr='#454444',GradientType=0 );
  {literal}
 }
