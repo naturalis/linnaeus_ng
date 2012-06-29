@@ -41,6 +41,8 @@ body {
     padding: 40px 25px;
     font-size: 25px;
     position: absolute;
+	font-family: LeagueGothic, Arial, Helvetica;
+	text-transform: uppercase;
 }
 
 #container {
