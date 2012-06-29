@@ -35,10 +35,13 @@ class LinnaeusController extends Controller
 		$this->setControllerParams($params);
 
         parent::__construct();
+		
+		if ($this->getCheckForProjectId()) {
 
-		$this->checkForProjectId();
-
-		if ($this->getCheckForProjectId()) $this->setCssFiles();
+			$this->checkForProjectId();
+			$this->setCssFiles();
+			
+		}
 
     }
 
@@ -80,10 +83,10 @@ class LinnaeusController extends Controller
 
 			$this->setPaths();
 
-			$this->setCssFiles();
-		
 			$this->setCurrentProjectData();
 			
+			$this->setCssFiles();
+		
 			if ($this->rHasVal('r')) 
 				$this->redirect($this->requestData['r']);
 			else
@@ -93,12 +96,6 @@ class LinnaeusController extends Controller
 
     }
 
-    public function checkForProjectId ()
-    {
-
-		if ($this->getCheckForProjectId()) parent::checkForProjectId();
-
-    }
 
     /**
      * Index of project: introduction (or other content pages)
