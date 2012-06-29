@@ -318,6 +318,8 @@ class ImportController extends Controller
 				$this->addCurrentUserToProject();
 
 				$this->makeMediaTargetPaths();
+				
+				$this->createProjectCssFile($newId,trim((string)$d->title));
 
 				$this->smarty->assign('newProjectId',$newId);
 
@@ -1015,165 +1017,6 @@ class ImportController extends Controller
 
 	}
 
-	public function xmlParserCallback_Custom($obj,$node)
-	{
-
-		$this->addCustomModule($node,$obj);
-	
-	}
-
-	private function addCustomModule($module,$data)
-	{
-
-		// create the module
-		$m = $this->models->FreeModuleProject->save(
-			array(
-				'id' => null, 
-				'module' => $module, 
-				'project_id' => $this->getNewProjectId(),
-				'active' => 'y'
-			)
-		);
-		
-		$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = 'Created module "'.$module.'".';
-
-		$newModuleId = $this->models->FreeModuleProject->getNewId();
-
-		$this->grantFreeModuleAccessRights($newModuleId);	
-		
-			// element names for the module pages can vary, find out the element name for the entire page
-		$arrayData = (array)$data;
-		$d = array_keys($arrayData);
-		$pageName = $d[0];
-
-		$titleField = null;
-		$contentField = null;
-		$imageField = null;
-		
-		$i=0;
-		foreach((array)$arrayData[$pageName] as $page) {
-		
-			/*
-				names of fields with a page are unpredictable; we assume 1st is title, 2nd is content and 3rd, if any, image.
-				image can be one of two types:
-				1)	straightforward: <image>imagename.jpg</image>
-				2)	copied from species module:
-						<multimediafile>
-							<filename>name.jpg</filename>
-							<caption>bla</caption>
-							<multimedia_type>image</multimedia_type>
-						</multimediafile>
-			*/
-			foreach((array)$page as $key => $val) {
-			
-				if ($i==0) $titleField = $key;
-				if ($i==1) $contentField = $key;
-				if ($i==2) {
-					if (is_object($val)) {
-					// is object copied from species (which, we assume, has fixed element-names)
-						$imageField = false;
-					} else {
-					// is simple field
-						$imageField = $key;
-					}
-				}
-				$i++;
-				
-			}
-		
-		}
-
-		// get the multimedia-paths
-		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
-			$_SESSION['admin']['system']['import']['paths'] : 
-			$this->makePathNames($this->getNewProjectId());
-
-
-		// saving the actual pages
-		foreach((array)$arrayData[$pageName] as $page) {
-		
-			$page = ((array)$page);
-			
-			if ($imageField===false) {
-		
-				$d = (array)$page['multimediafile'];
-				$image = trim($d['filename']);
-				//$thisCaption = trim($d['caption']);
-				
-		
-			} else 
-			if (!is_null($imageField)) {
-		
-				$image = trim($page[$imageField]);
-		
-			} else {
-
-				$image = null;
-
-			}
-		
-			$topic = trim($page[$titleField]);
-			$content = trim($page[$contentField]);
-
-			// create a new page
-			$this->models->FreeModulePage->save(
-				array(
-					'project_id' => $this->getNewProjectId(),
-					'module_id' => $newModuleId,
-					'got_content' => 1
-				)
-			);
-			
-			$newPageId = $this->models->FreeModulePage->getNewId();
-		
-			// save the title and content
-			$this->models->ContentFreeModule->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getNewProjectId(), 
-					'module_id' => $newModuleId,
-					'language_id' => $this->getNewDefaultLanguageId(), 
-					'page_id' => $newPageId,
-					'topic' => $topic,
-					'content' => $this->replaceOldMarkUp($content)
-				)
-			);
-
-			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
-
-			$moduleLinkName =
-				!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
-					$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
-					$module;
-
-			$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
-
-			if (!empty($image)) {
-	
-				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
-				
-					$this->models->FreeModulePage->update(
-						array(
-							'image' => $image
-						),
-						array(
-							'project_id' => $this->getNewProjectId(),
-							'module_id' => $newModuleId
-						)
-					);			
-				
-				} else {
-				
-					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
-				
-				}
-	
-			}
-			
-		}
-	
-	}
-
  	public function l2AdditionalAction()
 	{
 	
@@ -1332,6 +1175,165 @@ class ImportController extends Controller
 
 		$this->saveMapItem($obj);
 
+	}
+
+	public function xmlParserCallback_Custom($obj,$node)
+	{
+
+		$this->addCustomModule($node,$obj);
+	
+	}
+
+	private function addCustomModule($module,$data)
+	{
+
+		// create the module
+		$m = $this->models->FreeModuleProject->save(
+			array(
+				'id' => null, 
+				'module' => $module, 
+				'project_id' => $this->getNewProjectId(),
+				'active' => 'y'
+			)
+		);
+		
+		$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = 'Created module "'.$module.'".';
+
+		$newModuleId = $this->models->FreeModuleProject->getNewId();
+
+		$this->grantFreeModuleAccessRights($newModuleId);	
+		
+			// element names for the module pages can vary, find out the element name for the entire page
+		$arrayData = (array)$data;
+		$d = array_keys($arrayData);
+		$pageName = $d[0];
+
+		$titleField = null;
+		$contentField = null;
+		$imageField = null;
+		
+		$i=0;
+		foreach((array)$arrayData[$pageName] as $page) {
+		
+			/*
+				names of fields with a page are unpredictable; we assume 1st is title, 2nd is content and 3rd, if any, image.
+				image can be one of two types:
+				1)	straightforward: <image>imagename.jpg</image>
+				2)	copied from species module:
+						<multimediafile>
+							<filename>name.jpg</filename>
+							<caption>bla</caption>
+							<multimedia_type>image</multimedia_type>
+						</multimediafile>
+			*/
+			foreach((array)$page as $key => $val) {
+			
+				if ($i==0) $titleField = $key;
+				if ($i==1) $contentField = $key;
+				if ($i==2) {
+					if (is_object($val)) {
+					// is object copied from species (which, we assume, has fixed element-names)
+						$imageField = false;
+					} else {
+					// is simple field
+						$imageField = $key;
+					}
+				}
+				$i++;
+				
+			}
+		
+		}
+
+		// get the multimedia-paths
+		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
+			$_SESSION['admin']['system']['import']['paths'] : 
+			$this->makePathNames($this->getNewProjectId());
+
+
+		// saving the actual pages
+		foreach((array)$arrayData[$pageName] as $page) {
+		
+			$page = ((array)$page);
+			
+			if ($imageField===false) {
+		
+				$d = (array)$page['multimediafile'];
+				$image = trim($d['filename']);
+				//$thisCaption = trim($d['caption']);
+				
+		
+			} else 
+			if (!is_null($imageField)) {
+		
+				$image = trim($page[$imageField]);
+		
+			} else {
+
+				$image = null;
+
+			}
+		
+			$topic = trim($page[$titleField]);
+			$content = trim($page[$contentField]);
+
+			// create a new page
+			$this->models->FreeModulePage->save(
+				array(
+					'project_id' => $this->getNewProjectId(),
+					'module_id' => $newModuleId,
+					'got_content' => 1
+				)
+			);
+			
+			$newPageId = $this->models->FreeModulePage->getNewId();
+		
+			// save the title and content
+			$this->models->ContentFreeModule->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'module_id' => $newModuleId,
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'page_id' => $newPageId,
+					'topic' => $topic,
+					'content' => $this->replaceOldMarkUp($content)
+				)
+			);
+
+			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
+
+			$moduleLinkName =
+				!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
+					$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
+					$module;
+
+			$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
+
+			if (!empty($image)) {
+	
+				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
+				
+					$this->models->FreeModulePage->update(
+						array(
+							'image' => $image
+						),
+						array(
+							'project_id' => $this->getNewProjectId(),
+							'module_id' => $newModuleId
+						)
+					);			
+				
+				} else {
+				
+					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
+				
+				}
+	
+			}
+			
+		}
+	
 	}
 
 
@@ -3674,7 +3676,7 @@ class ImportController extends Controller
 		}
 
 	}
-
+	
 	private function makeMediaTargetPaths()
 	{
 	

@@ -80,7 +80,7 @@ class ProjectsController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
    
     }
@@ -558,6 +558,8 @@ class ProjectsController extends Controller
 						)
 					);
 
+					$this->createProjectCssFile($id,$this->requestData['title']);
+
 					$this->addAllModulesToProject($id);
 					$this->addUserToProject($this->getCurrentUserId(),$id,ID_ROLE_SYS_ADMIN);
 					
@@ -970,7 +972,8 @@ class ProjectsController extends Controller
 		$this->deleteProjectUsers($projectId);
 		$this->deleteProjectLanguage($projectId);
 		$this->deleteModulesFromProject($projectId);
-		$this->deleteProjectImagePaths($projectId);
+		$this->deleteProjectCssFile($projectId);
+		$this->deleteProjectImagePaths($projectId);		
 		$this->deleteProject($projectId);
 
 	}
@@ -1233,6 +1236,16 @@ class ProjectsController extends Controller
 		foreach((array)$m as $val) $this->addModuleToProject($val['id'],$id);
 
 	}
+
+	private function deleteProjectCssFile($id)
+	{
+	
+		$p = $this->models->Project->_get(array('id' => $id));
+
+		@unlink($this->makeCustomCssFileName($id,$p['title']));
+						
+	}
+
 
 
 }
