@@ -82,3 +82,12 @@
 	background-position:center;
 	background-repeat:no-repeat;
 }
+
+#lookup-DialogContent {
+	margin: 5px;
+	padding: 5px;
+	background: #fff;
+	border: 1px solid #999;
+	height: 350px;
+	overflow-y: scroll;
+}
