@@ -38,7 +38,7 @@ class LinnaeusController extends Controller
 
 		$this->checkForProjectId();
 
-		$this->setCssFiles();
+		if ($this->getCheckForProjectId()) $this->setCssFiles();
 
     }
 
@@ -79,7 +79,7 @@ class LinnaeusController extends Controller
 	        $this->setUrls();
 
 			$this->setPaths();
-		
+
 			$this->setCssFiles();
 		
 			$this->setCurrentProjectData();
