@@ -763,7 +763,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function setCurrentProjectData ($data=null)
+    public function setCurrentProjectData($data=null)
     {
 
 		if ($data==null) {
@@ -789,6 +789,7 @@ class Controller extends BaseClass
 		}
 		
 		$_SESSION['app']['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
+		$_SESSION['app']['project']['filesys_name'] = strtolower(preg_replace(array('/\s/','/[^A-Za-z0-9-]/'),array('-',''),$_SESSION['app']['project']['title']));
 
     }
 
@@ -1430,19 +1431,24 @@ class Controller extends BaseClass
 		// urls of the directory containing project specific media part of the interface, but not of the content (background etc)
 		$u['projectMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
 		$u['projectL2Maps'] = $u['projectMedia'].'l2_maps/';
+		$u['projectSystemOverride'] = $u['projectMedia'].'system_override/';
 
 		// urls of the directory containing media that are constant across projects (but can be skinned)
 		$u['systemMedia'] = $_SESSION['app']['system']['urls']['systemMedia'];
 		$u['systemL2Maps'] = $this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
 
 		// urls of css-files, either project-specific - if they exist - or generic
-		$projectCssDir = $this->baseUrl.$this->getAppName().'/style/';
+		$u['cssRootDir'] = $this->baseUrl.$this->getAppName().'/style/';
 
+		/*
 		if (file_exists($projectCssDir.$pCode.'/basics.css')) {
-			$u['projectCSS'] = $projectCssDir.$pCode.'/';
+			$u['projectCSS'] = $u['cssRootDir'].$pCode.'/';
 		} else {
-			$u['projectCSS'] = $projectCssDir.'default/'.$this->generalSettings['app']['skinName'].'/';
+			$u['projectCSS'] = $u['cssRootDir'].'default/'.$this->generalSettings['app']['skinName'].'/';
 		}
+		*/
+
+		$u['projectCSS'] = $u['cssRootDir'].'default/'.$this->generalSettings['app']['skinName'].'/';
 
 		// home
 		$u['projectHome'] = $this->baseUrl.$this->getAppName().'/views/'.$this->generalSettings['defaultController'].'/';
@@ -1471,9 +1477,18 @@ class Controller extends BaseClass
     
     }
 	
-	public function  setCssFiles()
+	public function makeCustomCssFileName($incProjectName=true,$p=null)
 	{
 
+		if ($incProjectName)
+			return $this->baseUrl.$this->getAppName().'/style/custom/'.$this->getProjectFSCode($p).'--'.$_SESSION['app']['project']['filesys_name'].'.css';
+		else
+			return $this->baseUrl.$this->getAppName().'/style/custom/'.$this->getProjectFSCode($p).'.css';
+
+	}
+	
+	public function setCssFiles()
+	{
 
 		if (isset($_SESSION['app']['project']['urls']['projectCSS'])) {
 
@@ -1484,9 +1499,23 @@ class Controller extends BaseClass
 
 		array_push($this->cssToLoad,'../utilities/dynamic-css.php');
 
-		$d = $this->baseUrl.$this->getAppName().'/style/custom/'.$this->getProjectFSCode().'.css';
+		if (!is_null($this->getCurrentProjectId())) {
 
-		if (file_exists($d)) array_push($this->cssToLoad,$d);
+			$d = $this->makeCustomCssFileName();
+	
+			if (file_exists($d)) {
+	
+				array_push($this->cssToLoad,$d);
+	
+			} else {
+	
+				$d =  $this->makeCustomCssFileName(false);
+	
+				if (file_exists($d)) array_push($this->cssToLoad,$d);
+	
+			}
+			
+		}
 
 	}
 	

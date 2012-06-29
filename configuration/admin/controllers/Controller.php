@@ -2083,6 +2083,53 @@ class Controller extends BaseClass
 		
 	}
 
+	public function getProjectFSCode($p)
+	{
+	
+		return sprintf('%04s',$p);
+	
+	}
+
+
+	public function createProjectCssFile($id,$title)
+	{
+	
+		$s = $this->generalSettings['directories']['runtimeStyleRoot'].'default/'.$this->generalSettings['projectCssTemplateFile'];
+		$t = $this->makeCustomCssFileName($id,$title);
+			
+
+		if (file_exists($s)) {
+
+			if (!copy($s,$t)) {
+
+				$this->addError(sprintf(_('Could not create %s'),$t));
+			
+			} else {
+			
+				return true;
+			
+			}
+				
+		} else {
+
+			$this->addError(sprintf(_('Template not found: %s'),$s));
+		
+		}					
+					
+		return false;
+
+	}
+
+	public function makeCustomCssFileName($p,$title)
+	{
+
+		return
+			$this->generalSettings['directories']['runtimeStyleRoot'].'custom/'.
+			$this->getProjectFSCode($p).'--'.
+			strtolower(preg_replace(array('/\s/','/[^A-Za-z0-9-]/'),array('-',''),$title).'.css');
+
+	}
+	
 	private function getFrontEndMainMenu()
 	{
 
@@ -3405,12 +3452,5 @@ class Controller extends BaseClass
 			$_SESSION['admin']['system']['last_rnd'] = isset($this->requestData['rnd']) ? $this->requestData['rnd'] : null;
 
     }
-
-	private function getProjectFSCode($p)
-	{
-	
-		return sprintf('%04s',$p);
-	
-	}
 
 }

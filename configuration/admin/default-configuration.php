@@ -84,6 +84,7 @@ class configuration
                 'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
+                'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style/'
             ), 
             'maxCategories' => 10,
 			'defaultHybridMarker' => 'X',
@@ -95,7 +96,8 @@ class configuration
 			'uiDefaultLanguage' => 1, // points to the element in the array above
 			'soundPlayerPath' => '../../media/system/',
 			'soundPlayerName' => 'player_mp3.swf',
-			'useJavascriptLinks' => false
+			'useJavascriptLinks' => false,
+			'projectCssTemplateFile' => 'project-template.css'
         );
     
     }
