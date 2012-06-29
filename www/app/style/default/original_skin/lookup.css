@@ -84,10 +84,6 @@
 }
 
 #lookup-DialogContent {
-	margin: 5px;
-	padding: 5px;
-	background: #fff;
-	border: 1px solid #999;
-	height: 350px;
+	height: 250px;
 	overflow-y: scroll;
 }
