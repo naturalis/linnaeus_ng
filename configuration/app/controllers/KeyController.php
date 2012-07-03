@@ -138,7 +138,7 @@ class KeyController extends Controller
 		
 		$this->setCurrentKeyStepId($step['id']);
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		// get step's choices
 		if (isset($step)) $choices = $this->getKeystepChoices($step['id']);

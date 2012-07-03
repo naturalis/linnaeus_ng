@@ -1,0 +1,22 @@
+body {
+	font-family: Corbel, Lucida Sans;
+	font-size: 12px;
+	background-color:#fff;
+}
+
+#main-menu .menu-item {
+	font-size: 11px;
+}
+
+#header-container {
+    height: 75px;
+}
+
+#header-container #title {
+	position:absolute;
+	left:325px;
+	font-style:normal;
+	font-variant:small-caps;
+	color:#003366;
+	font-size: 28px;
+}

@@ -1,7 +1,7 @@
 <div id="allLookupList" class="allLookupListInvisible"></div>
 {if $showBackToSearch && $session.app.user.search.hasSearchResults}
 <div id="back-to-search">
-<span id="back-link" onclick="window.open('../linnaeus/redosearch.php','_self')">{t}back to search results{/t}</span>
+<span id="back-link" onclick="window.open('../search/redosearch.php','_self')">{t}back to search results{/t}</span>
 </div>
 
 {if $backlink}

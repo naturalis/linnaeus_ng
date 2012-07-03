@@ -123,7 +123,7 @@ class ModuleController extends Controller
 
 		}
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
         $this->printPage();
 	

@@ -66,7 +66,7 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
- 		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+ 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 		
@@ -87,7 +87,7 @@ class LiteratureController extends Controller
 
 		}
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
 
