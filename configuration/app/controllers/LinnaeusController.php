@@ -25,6 +25,7 @@ class LinnaeusController extends Controller
 
 	public $cssToLoad = array(
 		'basics.css',
+		'lookup.css',
 	    'linnaeus.css'
 	);
 
