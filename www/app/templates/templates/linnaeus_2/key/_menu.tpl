@@ -1,4 +1,5 @@
 <div id="allNavigationPane">
+{include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
 
 {assign var='totalSteps' value=$keypath|@count}
