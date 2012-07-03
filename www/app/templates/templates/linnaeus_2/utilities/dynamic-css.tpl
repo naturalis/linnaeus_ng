@@ -201,14 +201,6 @@
 }
 {/literal}
 
-
-
-
-
-
-
-
-
 {literal}
 #first-icon {
 {/literal}
@@ -269,6 +261,33 @@
 #dialog-close {
 {/literal}
     background: url('{$systemMedia}close.png') no-repeat 50% 50%;
+{literal}
+}
+{/literal}
+
+{literal}
+#results .set-header-clickable, #results .subset-header {
+{/literal}
+	background: url('{$systemMedia}select-down.png') no-repeat 2px center;
+	padding-left: 18px;
+{literal}
+}
+{/literal}
+
+{literal}
+#back-to-search-icon {
+{/literal}
+    width: 85px;
+    cursor: pointer; 
+    background: url('{$systemMedia}back_to_search.png') no-repeat center 0;
+{literal}
+}
+{/literal}
+
+{literal}
+#back-to-search-icon:active {
+{/literal}
+    background-position: center 1px;
 {literal}
 }
 {/literal}
