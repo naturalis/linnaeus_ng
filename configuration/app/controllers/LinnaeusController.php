@@ -1,5 +1,16 @@
 <?php
 
+	/*
+
+	the content for 'About ETI' is the same for all projects. it is stored in the same table 
+	as the project specific content, using project ID=-10 (defined in the configuration file).
+	it needs to be available in the same language(s) that the project uses in order for
+	it to be displayed.
+	there is no editing interface for the 'About ETI' content. it should be edited directly
+	in the database (SELECT * FROM dev_content WHERE project_id = -10)
+
+	*/
+
 include_once ('Controller.php');
 
 class LinnaeusController extends Controller
@@ -121,7 +132,7 @@ class LinnaeusController extends Controller
     public function contentAction ()
     {
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (!$this->rHasVal('sub')) {
 
@@ -159,14 +170,26 @@ class LinnaeusController extends Controller
 	private function getContent($sub=null,$id=null)
 	{
 
-		$d = array(
-			'project_id' => $this->getCurrentProjectId(),
-			'language_id' => $this->getCurrentLanguageId()
-		);
+		// see note at top of file
+		if ($sub==$this->controllerSettings['contentAboutETI']['sub']) {
+
+			$d = array(
+				'project_id' => $this->controllerSettings['contentAboutETI']['projectID'],
+				'language_id' => $this->getCurrentLanguageId()
+			);
+
+		} else {
+
+			$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'language_id' => $this->getCurrentLanguageId()
+			);
+			
+			if ($id!=null) $d['id'] = $id;
+			elseif ($sub!=null) $d['subject'] = $sub;
+			else return;
 		
-		if ($id!=null) $d['id'] = $id;
-		elseif ($sub!=null) $d['subject'] = $sub;
-		else return;
+		}
 		
 		$c = $this->models->Content->_get(array('id' => $d));
 

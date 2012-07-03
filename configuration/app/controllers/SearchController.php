@@ -41,19 +41,9 @@ class SearchController extends Controller
 
 	public $cssToLoad = array(
 		'basics.css',
-		'glossary.css',
 		'search.css',
-		'key.css',
-		'literature.css',
-		'map.css',
-		'matrix.css',
-		'module.css',
-		'species.css',
-		'colorbox/colorbox.css',
 		'dialog/jquery.modaldialog.css',
 		'lookup.css',
-		'index.css',
-	    'linnaeus.css'
 	);
 
 	public $jsToLoad = array('all' => array(
@@ -393,19 +383,32 @@ class SearchController extends Controller
 	
 	}
 
-	private function makeRegExpCompatSearchString($s)
+	private function makeRegExpCompatSearchString($s,$containsOrStarts='contains')
 	{
 	
 		$s = trim($s);
 
 		// if string enclosed by " take it literally		
-		if (preg_match('/^"(.+)"$/',$s)) return '('.mysql_real_escape_string(substr($s,1,strlen($s)-2)).')';
+		if (preg_match('/^"(.+)"$/',$s)) {
+			
+			$s = mysql_real_escape_string(substr($s,1,strlen($s)-2));
+
+			if ($containsOrStarts=='begins')
+				$s = '[[:<:]]'.$s;
+			else
+				return '('.$s.')';
+
+		}
 
 		$s = preg_replace('/(\s+)/',' ',$s);
 
 		if (strpos($s,' ')===0) return mysql_real_escape_string($s);
 
-		$s = str_replace(' ','|',$s);
+		if ($containsOrStarts=='begins') {
+			$s = '[[:<:]]'.str_replace(' ','|[[:<:]]',$s);
+		} else {
+			$s = str_replace(' ','|',$s);
+		}
 
 		return '('.mysql_real_escape_string($s).')';
 	
@@ -422,10 +425,11 @@ class SearchController extends Controller
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon regexp' => $this->makeRegExpCompatSearchString($search)
+					'taxon regexp' => $this->makeRegExpCompatSearchString($search,'contains')
 				),
-				'columns' => 'id as taxon_id,taxon as label,rank_id',
-				'order' => 'taxon'
+				'columns' =>
+					'id as taxon_id,taxon as label,rank_id, taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
+				'order' => 'sOrC desc'
 			)
 		);
 		
@@ -447,7 +451,8 @@ class SearchController extends Controller
 //					'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,taxon_id,synonym as label,\'names\' as cat'
+				'columns' => 'id,taxon_id,synonym as label,\'names\' as cat, label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
+				'order' => 'sOrC desc'
 			)
 		);
 
@@ -464,7 +469,8 @@ class SearchController extends Controller
 					language_id,
 					taxon_id,
 					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) as label,
-					\'names\' as cat'
+					\'names\' as cat, label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
+				'order' => 'sOrC desc'
 			)
 		);	
 	

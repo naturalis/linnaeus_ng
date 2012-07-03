@@ -88,7 +88,7 @@ class SpeciesController extends Controller
 
 		$this->showLowerTaxon = true;
 		
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		$this->_indexAction();
 

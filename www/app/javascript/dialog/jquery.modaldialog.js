@@ -111,7 +111,9 @@
 		}
 		
 		dl.fadeIn(10);
-		$('#dialog-mask').fadeIn(100);
+		$('#dialog-mask').fadeIn(100);		
+		$('#dialog-mask').live("click", function() {  $('#dialog-close').click(); } );
+				
 	};
 
 	modaldialog.error = function $$modaldialog$error (msg, options) {

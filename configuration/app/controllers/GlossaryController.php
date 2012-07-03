@@ -85,7 +85,7 @@ class GlossaryController extends Controller
 
 		$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 		
 		if (isset($d['id'])) $this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
 
@@ -105,7 +105,7 @@ class GlossaryController extends Controller
 
 		}
 
-		unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
 

@@ -101,7 +101,12 @@ class configuration
 
         return array(
             'minimumSearchStringLength' => 3,
-            'visibleSearchResultsPerCategory' => 10
+            'visibleSearchResultsPerCategory' => 10,
+			'contentAboutETI' => 
+				array(
+					'sub' => 'About ETI',
+					'projectID' => -10
+				)
 		);
 
 	}

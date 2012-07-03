@@ -104,7 +104,7 @@ class ContentController extends Controller
      *
      * @access    public
      */
-
+	/*
     public function aboutEtiAction()
     {
 
@@ -114,7 +114,7 @@ class ContentController extends Controller
 		$this->redirect('content.php');
 
     }
-
+	*/
 
     /**
      * Welcome
