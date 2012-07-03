@@ -1,16 +1,4 @@
 <div id="allLookupList" class="allLookupListInvisible"></div>
-{if $showBackToSearch && $session.app.user.search.hasSearchResults}
-<div id="back-to-search">
-<span id="back-link" onclick="window.open('../search/redosearch.php','_self')">{t}back to search results{/t}</span>
-</div>
-{*elseif $backlink.url=='not implemented'}
-<p>
-<span class="a" onclick="doBackForm('{$backlink.url}','{$backlink.data|@escape}');" title="Back to {$backlink.name}">BACK</span>
-</p>
-*}
-{/if}
-
-
 </div ends="page-container">
 
 {if $controllerMenuOverride}
