@@ -266,10 +266,18 @@
 {/literal}
 
 {literal}
-#results .set-header-clickable, #results .subset-header {
+.closedResult {
+{/literal}
+	background: url('{$systemMedia}select-right.png') no-repeat 2px center;
+	padding-left: 18px;
+{literal}
+}
+{/literal}
+
+{literal}
+.openResult {
 {/literal}
 	background: url('{$systemMedia}select-down.png') no-repeat 2px center;
-	padding-left: 18px;
 {literal}
 }
 {/literal}
