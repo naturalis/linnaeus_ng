@@ -9,10 +9,11 @@
 		{if $results.numOfResults==0}
 			{t _s1=$search|replace:'"':''}Your search for "%s" produced no results.{/t}
 		{elseif $results.numOfResults==1}
-			{t _s1=$search|replace:'"':'' _s2=$results.numOfResults}Your search for "%s" produced %s result:{/t}
+			{t _s1=$search|replace:'"':'' _s2=$results.numOfResults}Your search for "%s" produced %s result.{/t}
 		{else}
-			{t _s1=$search|replace:'"':'' _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results:{/t}
+			{t _s1=$search|replace:'"':'' _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results.{/t}
 		{/if}
+		<a id="toggle-all" class="collapsed" href="javascript:toggleAll()">{t}Expand all{/t}</a>.
 		</div>
 
 {if $results.species.numOfResults > 0}
@@ -299,14 +300,39 @@
 $(document).ready(function(){
 
 $('.subset').hide();
+$('.set-header-clickable').addClass('closedResult');
+$('.subset-header').addClass('closedResult');
 $('.subset-header').click(function(){
-	$(this).next('.subset').slideToggle(300);
+	$(this).next('.subset').slideToggle(300, toggleClass(this));
 });
 $('.set-header-clickable').click(function(){
-	$(this).next('.subset').slideToggle(300);
+	$(this).next('.subset').slideToggle(300, toggleClass(this));
 });
 	
 });
+
+function toggleClass(theDiv) {
+	if ($(theDiv).hasClass('closedResult')) {
+		$(theDiv).removeClass('closedResult').addClass('openResult');
+	} else {
+		$(theDiv).removeClass('openResult').addClass('closedResult');
+	}
+}
+
+function toggleAll() {
+	$('.subset').slideToggle(300);
+	if ($('#toggle-all').hasClass('collapsed')) {
+		$('#toggle-all').html(_('Collapse all'));
+		$('.set-header-clickable').removeClass('closedResult').addClass('openResult');
+		$('.subset-header').removeClass('closedResult').addClass('openResult');
+		$('#toggle-all').removeClass('collapsed').addClass('expanded');
+	} else {
+		$('#toggle-all').html(_('Expand all'));
+		$('.set-header-clickable').removeClass('openResult').addClass('closedResult');
+		$('.subset-header').removeClass('openResult').addClass('closedResult');
+		$('#toggle-all').removeClass('expanded').addClass('collapsed');
+	}
+}
 </script>
 {/literal}
 
