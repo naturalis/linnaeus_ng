@@ -1,5 +1,16 @@
 <?php
 
+	/*
+
+	sort order:
+
+	1. starts with Str
+	2. has Str after a word boundary other than start
+	3. alphabet
+
+	*/
+
+
 include_once ('Controller.php');
 
 class SearchController extends Controller
@@ -312,36 +323,45 @@ class SearchController extends Controller
 		);
 
 	}
-	
-	private function makeTaxonList($records)
+
+	private function makeRegExpCompatSearchString($s,$containsOrStarts='contains')
 	{
+	
+		$s = trim($s);
 
-		$taxonList = null;
+		// if string enclosed by " take it literally		
+		if (preg_match('/^"(.+)"$/',$s)) {
+			
+			$s = mysql_real_escape_string(substr($s,1,strlen($s)-2));
 
-		foreach((array)$records as $key => $val) {
-
-			if (!isset($taxonList[$val['taxon_id']])) {
-
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => $val['taxon_id']
-						),
-						'columns' => 'id,taxon'
-					)
-				);
-				
-				$taxonList[$val['taxon_id']] = $t[0];
-
-			}
+			if ($containsOrStarts=='begins')
+				$s = '^'.$s;
+			elseif ($containsOrStarts=='boundary')
+				$s = '[[:<:]]'.$s;
+			else
+				return '('.$s.')';
 
 		}
 
-		return $taxonList;
+		$s = preg_replace('/(\s+)/',' ',$s);
+
+		if (strpos($s,' ')===0) return mysql_real_escape_string($s);
+
+		if ($containsOrStarts=='begins')
+			$s = '^'.str_replace(' ','^',$s);
+		else
+		if ($containsOrStarts=='boundary')
+			$s = '[[:<:]]'.str_replace(' ','|[[:<:]]',$s);
+		else
+			$s = str_replace(' ','|',$s);
+
+		return '('.mysql_real_escape_string($s).')';
 	
 	}
 
+
+
+	// species ++
 	private function makeCategoryList()
 	{
 
@@ -383,80 +403,108 @@ class SearchController extends Controller
 	
 	}
 
-	private function makeRegExpCompatSearchString($s,$containsOrStarts='contains')
+	private function addTaxonToFoundData($taxa,&$data)
 	{
-	
-		$s = trim($s);
 
-		// if string enclosed by " take it literally		
-		if (preg_match('/^"(.+)"$/',$s)) {
-			
-			$s = mysql_real_escape_string(substr($s,1,strlen($s)-2));
+		foreach((array)$data as $key => $val) {
+		
+			if (isset($taxa[$val['taxon_id']]['label'])) {
 
-			if ($containsOrStarts=='begins')
-				$s = '[[:<:]]'.$s;
-			else
-				return '('.$s.')';
-
+				$data[$key]['taxon'] = $taxa[$val['taxon_id']]['label'];
+				
+			}
+		
 		}
-
-		$s = preg_replace('/(\s+)/',' ',$s);
-
-		if (strpos($s,' ')===0) return mysql_real_escape_string($s);
-
-		if ($containsOrStarts=='begins') {
-			$s = '[[:<:]]'.str_replace(' ','|[[:<:]]',$s);
-		} else {
-			$s = str_replace(' ','|',$s);
-		}
-
-		return '('.mysql_real_escape_string($s).')';
 	
 	}
 
-	private function searchSpecies($search,$extensive=true)
+	private function _searchSpeciesGetTaxa($search)
 	{
-
-		$taxa = $synonyms = $commonnames = $content = $media = array();
-
-		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
-
-		$taxa = $this->models->Taxon->_get(
+	
+		$d = $this->models->Taxon->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon regexp' => $this->makeRegExpCompatSearchString($search,'contains')
+					//'taxon regexp' => $this->makeRegExpCompatSearchString($search,'contains') // we need them all!
 				),
+				'fieldAsIndex' => 'taxon_id',
 				'columns' =>
-					'id as taxon_id,taxon as label,rank_id, taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
-				'order' => 'sOrC desc'
+					'id as taxon_id,
+					taxon as label,
+					rank_id, 
+					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'contains').'\' as isMatch,
+					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, taxon'
 			)
 		);
-		
-		$species = $higherTaxa = array();
-		
+
+		foreach((array)$d as $key => $val)		
+			$d[$key]['label'] = $this->formatSpeciesEtcNames($val['label'],$val['rank_id']);
+			
+		return $d;
+	
+	}
+
+	private function _searchSpeciesGetSpAndHT($taxa,$ranks)
+	{
+	
+		$sp = $ht = array();
+	
 		foreach((array)$taxa as $key => $val) {
-			$taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
-			if ($ranks['ranks'][$val['rank_id']]['lower_taxon']==1)
-				$species[] = $taxa[$key];
-			else
-				$higherTaxa[] = $taxa[$key];
+		
+			if ($val['isMatch']=='1') {
+		
+				$taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
+
+				if ($ranks['ranks'][$val['rank_id']]['lower_taxon']==1)
+					$sp[] = $taxa[$key];
+				else
+					$ht[] = $taxa[$key];
+					
+			}
 				
 		}
 		
-		$synonyms = $this->models->Synonym->_get(
+		return
+			array(
+				'sp' => $sp,
+				'ht' => $ht
+			);
+
+	}
+
+	private function _searchSpeciesGetSynonyms($search,$taxa)
+	{
+	
+		$d = $this->models->Synonym->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 //					'language_id' => $this->getCurrentLanguageId(),
 					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,taxon_id,synonym as label,\'names\' as cat, label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
-				'order' => 'sOrC desc'
+				'columns' =>
+					'id,
+					taxon_id,
+					synonym as label,
+					\'names\' as cat, 
+					label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					label regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
 			)
 		);
 
-		$commonnames = $this->models->Commonname->_get(
+		$this->addTaxonToFoundData($taxa,$d);
+		
+		return $d;
+	
+	}
+
+	private function _searchSpeciesGetCommonnames($search,$taxa)
+	{
+	
+		$d = $this->models->Commonname->_get(
 			array(
 				'where' =>
 					'project_id  = '.$this->getCurrentProjectId(). ' and
@@ -469,22 +517,34 @@ class SearchController extends Controller
 					language_id,
 					taxon_id,
 					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) as label,
-					\'names\' as cat, label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sOrC',
-				'order' => 'sOrC desc'
+					\'names\' as cat, 
+					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					if(commonname regexp \''.$this->makeRegExpCompatSearchString($search).'\',commonname,transliteration) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
 			)
 		);	
-	
-	
-		foreach((array)$commonnames as $key => $val) {
+
+		foreach((array)$d as $key => $val) {
 
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));
-			$commonnames[$key]['language'] = $l['language'];
+			$d[$key]['language'] = $l['language'];
+			if (isset($taxa[$val['taxon_id']]['label']))
+				$d[$key]['post_script'] = sprintf(_('(common name of %s)'),$taxa[$val['taxon_id']]['label']);
 
 		}
 
-		if ($extensive) {
+		//$this->addTaxonToFoundData($taxa,$d);
+		
+		return $d;
+	
+	}
 
-			$content = $this->models->ContentTaxon->_get(
+	private function _searchSpeciesGetTaxonContent($search,$taxa)
+	{
+	
+		$d = $this->models->ContentTaxon->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
@@ -492,52 +552,92 @@ class SearchController extends Controller
 						'publish' => 1,
 						'content regexp' => $this->makeRegExpCompatSearchString($search)
 					),
-					'columns' => 'id,taxon_id,content as content,page_id as cat'
+					'columns' => 
+						'id,
+						taxon_id,
+						content as content,
+						page_id as cat'
 				)
 			);
+
+		$this->addTaxonToFoundData($taxa,$d);
+		$this->customSortArray($d,array('key'=>'taxon'));
+		
+		return $d;
 	
-			$media1 = $this->models->MediaTaxon->_get(
+	}
+
+	private function _searchSpeciesGetTaxonMedia($search,$taxa)
+	{
+	
+		$m1 = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+//					'language_id' => $this->getCurrentLanguageId(),
+					'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+			'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
+			)
+		);
+
+		$m2 = $this->models->MediaDescriptionsTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'description regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+			'columns' => 'id,media_id,description as content,\'media\' as cat'
+			)
+		);
+		
+		foreach((array)$m2 as $key => $val) {
+
+			$d = $this->models->MediaTaxon->_get(
 				array(
 					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-	//					'language_id' => $this->getCurrentLanguageId(),
-						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+						'id' => $val['media_id']
 					),
-				'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
-				)
-			);
-	
-			$media2 = $this->models->MediaDescriptionsTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'description regexp' => $this->makeRegExpCompatSearchString($search)
-					),
-				'columns' => 'id,media_id,description as content,\'media\' as cat'
+				'columns' => 'taxon_id'
 				)
 			);
 			
-			foreach((array)$media2 as $key => $val) {
+			$m2[$key]['taxon_id'] = $d[0]['taxon_id'];
+					
+		}
 
-				$d = $this->models->MediaTaxon->_get(
-					array(
-						'id' => array(
-							'id' => $val['media_id']
-						),
-					'columns' => 'taxon_id'
-					)
-				);
-				
-				$media2[$key]['taxon_id'] = $d[0]['taxon_id'];
-						
-			}
+		$d = array_merge((array)$m1,(array)$m2);
+
+		$this->addTaxonToFoundData($taxa,$d);
+		$this->customSortArray($d,array('key'=>'taxon'));
+
+		return $d;
 	
-			$media = array_merge((array)$media1,(array)$media2);
+	}
 
-		}		
+	private function searchSpecies($search,$extensive=true)
+	{
+	
+		$taxa = $synonyms = $commonnames = $content = $media = array();
+
+		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+
+		$taxa = $this->_searchSpeciesGetTaxa($search);
+
+		$d = $this->_searchSpeciesGetSpAndHT($taxa,$ranks);
+		$species = $d['sp'];
+		$higherTaxa = $d['ht'];
 		
-		$d = array_merge((array)$synonyms,(array)$commonnames,(array)$content,(array)$media);
+		$synonyms = $this->_searchSpeciesGetSynonyms($search,$taxa);
+		$commonnames = $this->_searchSpeciesGetCommonnames($search,$taxa);
+
+		if ($extensive) {
+
+			$content = $this->_searchSpeciesGetTaxonContent($search,$taxa);
+			$media = $this->_searchSpeciesGetTaxonMedia($search,$taxa);
+
+		}
 
 		return array(
 			'results' => array(
@@ -572,9 +672,14 @@ class SearchController extends Controller
 					'numOfResults' => count((array)$media)
 				),
 			),
-			'taxonList' => $this->makeTaxonList($d),
 			'categoryList' => $this->makeCategoryList(),
-			'numOfResults' => count((array)$d)+count((array)$taxa),
+			'numOfResults' =>
+				count((array)$higherTaxa)+
+				count((array)$species)+
+				count((array)$content)+
+				count((array)$synonyms)+
+				count((array)$commonnames)+
+				count((array)$media),
 			'subsetsWithResults' =>
 				(count((array)$taxa) > 0 ? 1 : 0)+
 				(count((array)$content) > 0 ? 1 : 0)+
@@ -623,58 +728,216 @@ class SearchController extends Controller
 
 	}
 
-	private function searchModules($search)
+
+	// glossary
+	private function searchGlossary($search,$extensive=true)
 	{
 
-		$content = $this->models->ContentFreeModule->_get(
+		$gloss = $this->models->Glossary->_get(
 			array(
-				'where' => 
+				'where' =>
 					'project_id = '.$this->getCurrentProjectId().' and
-					language_id ='.$this->getCurrentLanguageId().' and
-					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
-					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+					language_id = '. $this->getCurrentLanguageId().' and
+					(
+						term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
+						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
+					')'
+				,
 				'columns' => 
-					'page_id,
-					module_id,
-					topic as label,
-					if(content regexp \''.$this->makeRegExpCompatSearchString($search).'\',content,null) as content',
-				'order' => 'module_id'
+					'id,
+					term as label,
+					definition as content,
+					term regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					term regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc,sortB desc,label'
 			)
 		);
-		
-		
-		foreach((array)$content as $key => $val) {
 
-			$module = $this->models->FreeModuleProject->_get(
+
+		$synonyms = $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 
+					'glossary_id as id,
+					synonym as label,
+					synonym regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					synonym regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc,sortB desc,synonym'
+			)
+		);
+
+		foreach((array)$synonyms as $key => $val) {
+		
+			$g = $this->models->Glossary->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['module_id']
+						'id' => $val['id']
 					),
-					'columns' => 'module'
+					'columns' => 'term'
 				)
 			);
-
-			$results[$module[0]['module']][] = $val;
+	
+			$synonyms[$key]['synonym'] = $g[0]['term'];
 
 		}
 
-		$r = null;
-		if (isset($results))
-			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val, 'numOfResults' => count((array)$val) );
+		if ($extensive) {
+
+			$media = $this->models->GlossaryMedia->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+					),
+					'columns' => 
+						'glossary_id as id,
+						file_name as label',
+					'order' => 'label'
+				)
+			);
+	
+			foreach((array)$media as $key => $val) {
+			
+				$g = $this->models->Glossary->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'language_id' => $this->getCurrentLanguageId(),
+							'id' => $val['id']
+						),
+						'columns' => 'term'
+					)
+				);
+		
+				if (isset($g)) {
+	
+					$d[$key] = $val;
+					$d[$key]['term'] = $g[0]['term'];
+	
+				}
+	
+			}
+			
+			$this->customSortArray($d,array('key' => 'term'));
+
+		}
+
+		$media = isset($d) ? $d : null;
 
 		return array(
-			'results' => isset($r) ? $r : null,
-			'numOfResults' => count((array)$content),
-			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
+			'results' => array(
+				array(
+					'label' => _('Glossary terms'),
+					'data' => $gloss,
+					'numOfResults' => count((array)$gloss)
+				),
+				array(
+					'label' => _('Glossary synonyms'),
+					'data' => $synonyms,
+					'numOfResults' => count((array)$synonyms)
+				),
+				array(
+					'label' => _('Glossary media'),
+					'data' => $media,
+					'numOfResults' => count((array)$media)
+				)
+			),
+			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media),
+			'subsetsWithResults' => 
+				(count((array)$gloss) > 0 ? 1 : 0) +
+				(count((array)$synonyms) > 0 ? 1 : 0) +
+				(count((array)$media) > 0 ? 1 : 0)
 		);
 
 	}
-	
-	private function getModuleLookupList($search)
+
+	private function getGlossaryLookupList($search)
+	{
+
+		$g = $this->searchGlossary($search,false);
+
+		$d = array();
+		
+		foreach((array)$g['results'] as $val) {
+		
+			if (is_array($val['data']) && ($val['label']=='Glossary terms' || $val['label']=='Glossary synonyms')) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../glossary/term.php?id='.$val2['id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+
+	}
+
+
+	// literature
+	private function searchLiterature($search,$extensive=true)
+	{
+
+		$books = $this->models->Literature->_get(
+			array(
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().'
+					and (
+						author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
+						($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
+						')',
+				'columns' => 
+					'id,
+					concat(year(`year`),ifnull(suffix,\'\')) as year,
+					text as content,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						)
+					) as author_full,
+					author_first regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					author_first regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, author_full'
+			)
+		);
+
+		return array(
+			'results' => array(
+				array(
+					'label' => _('Literary references'),
+					'data' => $books,
+					'numOfResults' => count((array)$books)
+				)
+			),
+			'numOfResults' => count((array)$books),
+			'subsetsWithResults' => count((array)$books) > 0 ? 1 : 0
+		);
+
+	}
+
+	private function getLiteratureLookupList($search)
 	{
 	
-		$l = $this->searchModules($search);
+		$l = $this->searchLiterature($search,false);
 	
 		$d = array();
 		
@@ -685,10 +948,10 @@ class SearchController extends Controller
 				foreach($val['data'] as $val2) {
 
 					$d[] = array(
-						'id' => $val2['page_id'],
-						'label' => $val2['label'],
+						'id' => $val2['id'],
+						'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
 						'source' => $val['label'],
-						'url'  => '../module/topic.php?id='.$val2['page_id'].'&modId='.$val2['module_id']
+						'url'  => '../literature/reference.php?id='.$val2['id']
 					);
 
 				}
@@ -699,156 +962,10 @@ class SearchController extends Controller
 		
 		return $d;
 	
-	}	
-
-	private function searchMatrixKey($search)
-	{
-
-		$matrices = $this->models->MatrixName->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'name regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'matrix_id,name as label',
-				'order' => 'label'
-			)
-		);
-
-		$characteristics = $this->models->CharacteristicLabel->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'label regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'characteristic_id,label',
-				'order' => 'label'
-			)
-		);
-
-		foreach((array)$characteristics as $key => $val) {
-
-			$cm = $this->models->CharacteristicMatrix->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $val['characteristic_id'],
-					),
-					'columns' => 'matrix_id'
-				)
-			);
-
-			$characteristics[$key]['matrices'] = $cm;
-
-		}
-
-
-		$states1 = $this->models->CharacteristicLabelState->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'label regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'state_id,label'
-			)
-		);
-
-		$states2 	 = $this->models->CharacteristicLabelState->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'text regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'state_id,label,text as content'
-			)
-		);
-
-		$states = array_merge((array)$states1,(array)$states2);
-
-		foreach((array)$states as $key => $val) {
-
-			$cs = $this->models->CharacteristicState->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['state_id'],
-					),
-					'columns' => 'characteristic_id'
-				)
-			);
-
-			$cl = $this->models->CharacteristicLabel->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->getCurrentLanguageId(),
-						'characteristic_id' => $cs[0]['characteristic_id']
-					),
-					'columns' => 'label'
-				)
-			);
-			
-			$states[$key]['characteristic'] = $cl[0]['label'];
-
-			$cm = $this->models->CharacteristicMatrix->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $cs[0]['characteristic_id']
-					),
-					'columns' => 'matrix_id'
-				)
-			);
-			
-			$states[$key]['matrices'] = $cm;
-
-		}
-		
-		$this->customSortArray($states,array('key'=>'label'));
-
-		$matrixNames = $this->models->MatrixName->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-				),
-				'columns' => 'matrix_id,name',
-				'fieldAsIndex' => 'matrix_id'
-			)
-		);
-
-		return array(
-			'results' => array(
-				array(
-					'label' => _('Matrix key matrices'),
-					'data' => $matrices,
-					'numOfResults' => count((array)$matrices)
-				),
-				array(
-					'label' => _('Matrix key characters'),
-					'data' => $characteristics,
-					'numOfResults' => count((array)$characteristics)
-				),
-				array(
-					'label' => _('Matrix key states'),
-					'data' => $states,
-					'numOfResults' => count((array)$states)
-				)
-			),
-			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
-			'subsetsWithResults' =>
-				(count((array)$matrices) > 0 ? 1 : 0)+
-				(count((array)$characteristics) > 0 ? 1 : 0)+
-				(count((array)$states) > 0 ? 1 : 0),
-			'matrices' => $matrixNames
-		);
-
 	}
 
+
+	// dich. key
 	private function searchDichotomousKey($search)
 	{
 
@@ -973,268 +1090,166 @@ class SearchController extends Controller
 
 	}
 
-	private function searchLiterature($search,$extensive=true)
+
+	// matrix key
+	private function searchMatrixKey($search)
 	{
 
-		$books = $this->models->Literature->_get(
+		$matrices = $this->models->MatrixName->_get(
 			array(
-				'where' => 
-					'project_id = '.$this->getCurrentProjectId().'
-					and (
-						author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
-						($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
-						')',
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'name regexp' => $this->makeRegExpCompatSearchString($search)
+				),
 				'columns' => 
-					'id,
-					concat(year(`year`),ifnull(suffix,\'\')) as year,
-					text as content,
-					concat(
-						author_first,
-						(
-							if(multiple_authors=1,
-								\' et al.\',
-								if(author_second!=\'\',concat(\' & \',author_second),\'\')
-							)
-						)
-					) as author_full',
-				'order' => 'author_full'
+					'matrix_id,
+					name as label,
+					name regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					name regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
 			)
 		);
 
-		return array(
-			'results' => array(
-				array(
-					'label' => _('Literary references'),
-					'data' => $books,
-					'numOfResults' => count((array)$books)
-				)
-			),
-			'numOfResults' => count((array)$books),
-			'subsetsWithResults' => count((array)$books) > 0 ? 1 : 0
-		);
-
-	}
-
-	private function getLiteratureLookupList($search)
-	{
-	
-		$l = $this->searchLiterature($search,false);
-	
-		$d = array();
-		
-		foreach((array)$l['results'] as $val) {
-		
-			if (is_array($val['data'])) {
-
-				foreach($val['data'] as $val2) {
-
-					$d[] = array(
-						'id' => $val2['id'],
-						'label' => $val2['author_full'].($val2['year'] ? ', '.$val2['year'] : ''),
-						'source' => $val['label'],
-						'url'  => '../literature/reference.php?id='.$val2['id']
-					);
-
-				}
-
-			}
-
-		}
-		
-		return $d;
-	
-	}
-
-	private function searchGlossary($search,$extensive=true)
-	{
-
-		$gloss = $this->models->Glossary->_get(
-			array(
-				'where' =>
-					'project_id = '.$this->getCurrentProjectId().' and
-					language_id = '. $this->getCurrentLanguageId().' and
-					(
-						term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
-						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
-					')'
-				,
-				'columns' => 'id,term as label,definition as content',
-				'order' => 'label'
-			)
-		);
-
-
-		$synonyms = $this->models->GlossarySynonym->_get(
+		$characteristics = $this->models->CharacteristicLabel->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
+					'label regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'glossary_id as id,synonym as label',
-				'order' => 'label'
+				'columns' => 
+					'characteristic_id,
+					label,
+					label regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					label regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
 			)
 		);
 
-		foreach((array)$synonyms as $key => $val) {
-		
-			$g = $this->models->Glossary->_get(
+		foreach((array)$characteristics as $key => $val) {
+
+			$cm = $this->models->CharacteristicMatrix->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['id']
+						'characteristic_id' => $val['characteristic_id'],
 					),
-					'columns' => 'term'
+					'columns' => 'matrix_id'
 				)
 			);
-	
-			$synonyms[$key]['synonym'] = $g[0]['term'];
+
+			$characteristics[$key]['matrices'] = $cm;
 
 		}
 
-		if ($extensive) {
 
-			$media = $this->models->GlossaryMedia->_get(
+		$states1 = $this->models->CharacteristicLabelState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'label regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'state_id,label'
+			)
+		);
+
+		$states2= $this->models->CharacteristicLabelState->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'text regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'state_id,label,text as content'
+			)
+		);
+
+		$states = array_merge((array)$states1,(array)$states2);
+
+		foreach((array)$states as $key => $val) {
+
+			$cs = $this->models->CharacteristicState->_get(
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
+						'id' => $val['state_id'],
 					),
-					'columns' => 'glossary_id as id,file_name as label',
-					'order' => 'label'
+					'columns' => 'characteristic_id'
 				)
 			);
-	
-			foreach((array)$media as $key => $val) {
-			
-				$g = $this->models->Glossary->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'language_id' => $this->getCurrentLanguageId(),
-							'id' => $val['id']
-						),
-						'columns' => 'term'
-					)
-				);
-		
-				if (isset($g)) {
-	
-					$d[$key] = $val;
-					$d[$key]['term'] = $g[0]['term'];
-	
-				}
-	
-			}
-			
-		}
 
-		$media = isset($d) ? $d : null;
-
-		return array(
-			'results' => array(
+			$cl = $this->models->CharacteristicLabel->_get(
 				array(
-					'label' => _('Glossary terms'),
-					'data' => $gloss,
-					'numOfResults' => count((array)$gloss)
-				),
-				array(
-					'label' => _('Glossary synonyms'),
-					'data' => $synonyms,
-					'numOfResults' => count((array)$synonyms)
-				),
-				array(
-					'label' => _('Glossary media'),
-					'data' => $media,
-					'numOfResults' => count((array)$media)
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'characteristic_id' => $cs[0]['characteristic_id']
+					),
+					'columns' => 'label'
 				)
-			),
-			'numOfResults' => count((array)$gloss)+count((array)$synonyms)+count((array)$media),
-			'subsetsWithResults' => 
-				(count((array)$gloss) > 0 ? 1 : 0) +
-				(count((array)$synonyms) > 0 ? 1 : 0) +
-				(count((array)$media) > 0 ? 1 : 0)
-		);
+			);
+			
+			$states[$key]['characteristic'] = $cl[0]['label'];
 
-	}
-
-	private function getGlossaryLookupList($search)
-	{
-
-		$g = $this->searchGlossary($search,false);
-
-		$d = array();
-		
-		foreach((array)$g['results'] as $val) {
-		
-			if (is_array($val['data']) && ($val['label']=='Glossary terms' || $val['label']=='Glossary synonyms')) {
-
-				foreach($val['data'] as $val2) {
-
-					$d[] = array(
-						'id' => $val2['id'],
-						'label' => $val2['label'],
-						'source' => $val['label'],
-						'url'  => '../glossary/term.php?id='.$val2['id']
-					);
-
-				}
-
-			}
+			$cm = $this->models->CharacteristicMatrix->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'characteristic_id' => $cs[0]['characteristic_id']
+					),
+					'columns' => 'matrix_id'
+				)
+			);
+			
+			$states[$key]['matrices'] = $cm;
 
 		}
 		
-		return $d;
+		$this->customSortArray($states,array('key'=>'label'));
 
-	}
-
-	private function searchContent($search)
-	{
-
-		$content1 = $this->models->Content->_get(
+		$matrixNames = $this->models->MatrixName->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'language_id' => $this->getCurrentLanguageId(),
-					'subject regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-				'columns' => 'id,subject as label'
+				'columns' => 'matrix_id,name',
+				'fieldAsIndex' => 'matrix_id'
 			)
-
 		);
-
-		$content2 = $this->models->Content->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'content regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,subject as label,content'
-			)
-
-		);
-
-		$content = array_merge((array)$content1,(array)$content2);
-		
-		$this->customSortArray($content,array('key'=>'label'));
 
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Navigator'),
-					'data' => $content,
-					'numOfResults' => count((array)$content)
+					'label' => _('Matrix key matrices'),
+					'data' => $matrices,
+					'numOfResults' => count((array)$matrices)
+				),
+				array(
+					'label' => _('Matrix key characters'),
+					'data' => $characteristics,
+					'numOfResults' => count((array)$characteristics)
+				),
+				array(
+					'label' => _('Matrix key states'),
+					'data' => $states,
+					'numOfResults' => count((array)$states)
 				)
 			),
-			'numOfResults' => count((array)$content),
-			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
+			'numOfResults' => count((array)$matrices)+count((array)$characteristics)+count((array)$states),
+			'subsetsWithResults' =>
+				(count((array)$matrices) > 0 ? 1 : 0)+
+				(count((array)$characteristics) > 0 ? 1 : 0)+
+				(count((array)$states) > 0 ? 1 : 0),
+			'matrices' => $matrixNames
 		);
 
 	}
 
+
+	// distribution
 	private function searchMap($species)
 	{
 
@@ -1280,6 +1295,161 @@ class SearchController extends Controller
 
 	}
 
+
+	// content
+	private function searchContent($search)
+	{
+		/*
+		$content1 = $this->models->Content->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'subject regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'id,subject as label'
+			)
+
+		);
+
+		$content2 = $this->models->Content->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),
+					'content regexp' => $this->makeRegExpCompatSearchString($search)
+				),
+				'columns' => 'id,subject as label,content'
+			)
+
+		);
+
+		$content = array_merge((array)$content1,(array)$content2);
+		*/
+
+		$content = $this->models->Content->_get(
+			array(
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId(). ' and
+					language_id = '.$this->getCurrentLanguageId(). ' and
+					(
+						subject regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						content regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+					)',
+				'columns' => 
+					'id,
+					subject as label,
+					content,
+					if(subject regexp \''.$this->makeRegExpCompatSearchString($search).'\',subject,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					if(subject regexp \''.$this->makeRegExpCompatSearchString($search).'\',subject,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
+			)
+		);	
+		
+		//$this->customSortArray($content,array('key'=>'label'));
+
+		return array(
+			'results' => array(
+				array(
+					'label' => _('Navigator'),
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				)
+			),
+			'numOfResults' => count((array)$content),
+			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
+		);
+
+	}
+
+
+	// modules
+	private function searchModules($search)
+	{
+
+		$content = $this->models->ContentFreeModule->_get(
+			array(
+				'where' => 
+					'project_id = '.$this->getCurrentProjectId().' and
+					language_id ='.$this->getCurrentLanguageId().' and
+					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
+					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
+				'columns' => 
+					'page_id,
+					module_id,
+					content,
+					topic as label,
+					if(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\',topic,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					if(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\',topic,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'module_id,sortA desc, sortB desc, topic'
+			)
+		);
+		
+		
+		foreach((array)$content as $key => $val) {
+
+			$module = $this->models->FreeModuleProject->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['module_id']
+					),
+					'columns' => 'module'
+				)
+			);
+
+			$results[$module[0]['module']][] = $val;
+
+		}
+
+		$r = null;
+		if (isset($results))
+			foreach ($results as $key => $val) $r[] = array('label' => $key, 'data' =>$val, 'numOfResults' => count((array)$val) );
+
+		return array(
+			'results' => isset($r) ? $r : null,
+			'numOfResults' => count((array)$content),
+			'subsetsWithResults' => count((array)$r)
+		);
+
+	}
+	
+	private function getModuleLookupList($search)
+	{
+	
+		$l = $this->searchModules($search);
+	
+		$d = array();
+		
+		foreach((array)$l['results'] as $val) {
+		
+			if (is_array($val['data'])) {
+
+				foreach($val['data'] as $val2) {
+
+					$d[] = array(
+						'id' => $val2['page_id'],
+						'label' => $val2['label'],
+						'source' => $val['label'],
+						'url'  => '../module/topic.php?id='.$val2['page_id'].'&modId='.$val2['module_id']
+					);
+
+				}
+
+			}
+
+		}
+		
+		return $d;
+	
+	}	
+
+
+	// general
 	private function getLookupList($search)
 	{
 	
@@ -1297,10 +1467,10 @@ class SearchController extends Controller
 			'returnText',
 			$this->makeLookupList(
 				array_merge(
-					$this->getGlossaryLookupList($search),
-					$this->getLiteratureLookupList($search),
-					$this->getSpeciesLookupList($search),
-					$this->getModuleLookupList($search)
+					(array)$this->getGlossaryLookupList($search),
+					(array)$this->getLiteratureLookupList($search),
+					(array)$this->getSpeciesLookupList($search),
+					(array)$this->getModuleLookupList($search)
 				),
 				$this->controllerBaseName,
 				null,

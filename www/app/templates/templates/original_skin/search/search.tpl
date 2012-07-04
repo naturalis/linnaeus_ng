@@ -26,25 +26,27 @@
 		{if $res.label|@strtolower=='species media'}
 			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" style="width:50px" />
 		{/if}
-		{if $results.species.taxonList[$v.taxon_id] && $results.species.taxonList[$v.taxon_id].taxon!==$v.label}{$results.species.taxonList[$v.taxon_id].taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}:
-		{/if}
-
+		{if $v.taxon}{$v.taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}: {/if}
 		{if $useJavascriptLinks}
-		<span class="result" onclick="goTaxon({$v.taxon_id}{if $v.cat},'{$v.cat}'{/if})">
-		{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-		{if $v.label}{h search=$search}{$v.label}{/h}
-		{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
-		{/if}
-		</span>
+			<span class="result" onclick="goTaxon({$v.taxon_id}{if $v.cat},'{$v.cat}'{/if})">
+			{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+			{if $v.label}{h search=$search}{$v.label}{/h}
+			{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
+			{/if}
+			</span>
 		{else}
-		<a class="result" href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}">
-			{t}Taxon:{/t} {$v.target}
-		{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-		{if $v.label}{h search=$search}{$v.label}{/h}
-		{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
+			<a class="result" href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}">
+				{*t}Taxon:{/t*} {$v.target}
+			{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+			{if $v.label}{h search=$search}{$v.label}{/h}
+			{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"
+			{/if}
+			</a>
 		{/if}
-		</a>
-		{/if}
+		
+		{if $v.post_script}{$v.post_script}{/if}
+
+		
 		<br/>
 		{/foreach}
 	</div>
