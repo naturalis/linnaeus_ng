@@ -137,6 +137,7 @@
 	{assign var=resultCount value=$res.data|@count}
 	{if $results.dichkey.subsetsWithResults>1}<div class="subset-header{if $resultCount==0}-zero{/if}">{$resultCount} {t}in{/t} {$res.label|@strtolower}</div>{/if}
 	<div class="subset">
+		{t _s1='<a href="../key/">' _s2=</a>}<p class="c3"><span style="color: red;">It is not possible to jump directly to a specific step or choice of the dichotomous key</span>. %sStart the key from the start%s.{/t}</p>
 		{foreach from=$res.data key=k item=v name=r}
 		{if $smarty.foreach.r.first || $background=='c2'}
 			{assign var="background" value="c1"}
@@ -149,7 +150,6 @@
 			{/if}
 		</span></p>
 		{/foreach}
-		{t _s1='<a href="../key/">' _s2=</a>}It is not possible to jump directly to a specific step or choice of the dichotomous key. Click %shere%s to start the key from the start.{/t}
 	</div>
 	{/if}
 	{/foreach}
@@ -175,7 +175,7 @@
 		<span {if !$v.matrices && $v.matrix_id}class="result" onclick="goMatrix({$v.matrix_id}){/if}">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
 			{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
-			{if $v.characteristic}(of characteristic "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
+			{if $v.characteristic}(of character "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
 			{if $v.matrices}{if !$v.characteristic}({/if}{if $v.matrices|@count==1}in matrix{else}in matrices{/if}
 			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<span class="result" onclick="goMatrix({$m.matrix_id})">{$results.matrixkey.matrices[$m.matrix_id].name}</span>"{/foreach}){/if}
 		</span>
@@ -183,7 +183,7 @@
 		{if !$v.matrices && $v.matrix_id}<a class="result" href="../matrixkey/use_matrix.php?id={$v.matrix_id}">{/if}
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
 			{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
-			{if $v.characteristic}(of characteristic "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
+			{if $v.characteristic}(of characteris "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
 			{if $v.matrices}{if !$v.characteristic}({/if}{if $v.matrices|@count==1}in matrix{else}in matrices{/if}
 			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<a class="result" href="../matrixkey/use_matrix.php?id={$m.matrix_id}">{$results.matrixkey.matrices[$m.matrix_id].name}</a>"{/foreach}){/if}
 		{if !$v.matrices && $v.matrix_id}</a>{/if}
@@ -320,13 +320,14 @@ function toggleClass(theDiv) {
 }
 
 function toggleAll() {
-	$('.subset').slideToggle(300);
 	if ($('#toggle-all').hasClass('collapsed')) {
+		$('.subset').slideDown(300);
 		$('#toggle-all').html(_('Collapse all'));
 		$('.set-header-clickable').removeClass('closedResult').addClass('openResult');
 		$('.subset-header').removeClass('closedResult').addClass('openResult');
 		$('#toggle-all').removeClass('collapsed').addClass('expanded');
 	} else {
+		$('.subset').slideUp(300);
 		$('#toggle-all').html(_('Expand all'));
 		$('.set-header-clickable').removeClass('openResult').addClass('closedResult');
 		$('.subset-header').removeClass('openResult').addClass('closedResult');

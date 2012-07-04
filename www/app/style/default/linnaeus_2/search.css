@@ -58,15 +58,14 @@ div.set div.subset p {
 	cursor:default;
 }
 
-.c1,.c2 {
+.c1, .c2, .c3 {
 	padding: 3px 2px;
 }
 
-.c1 {
+.c1, .c3 {
 	background: #fff;
 }
 
 .c2 {
 	background: #f6f6f6;
 }
-
