@@ -8,6 +8,7 @@
 	it to be displayed.
 	there is no editing interface for the 'About ETI' content. it should be edited directly
 	in the database (SELECT * FROM dev_content WHERE project_id = -10)
+	(dutch = 24, english = 26)
 
 	*/
 
@@ -172,10 +173,10 @@ class LinnaeusController extends Controller
 	{
 
 		// see note at top of file
-		if ($sub==$this->controllerSettings['contentAboutETI']['sub']) {
+		if ($sub==$this->controllerSettings['AboutETI']['sub']) {
 
 			$d = array(
-				'project_id' => $this->controllerSettings['contentAboutETI']['projectID'],
+				'project_id' => $this->controllerSettings['AboutETI']['projectID'],
 				'language_id' => $this->getCurrentLanguageId()
 			);
 
