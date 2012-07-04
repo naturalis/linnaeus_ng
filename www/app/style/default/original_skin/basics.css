@@ -260,3 +260,6 @@ body #body-container {
 .visible {
 	display:block;
 }
+.italics {
+	font-style:italic;
+}
