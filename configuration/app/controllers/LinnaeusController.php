@@ -173,10 +173,10 @@ class LinnaeusController extends Controller
 	{
 
 		// see note at top of file
-		if ($sub==$this->controllerSettings['AboutETI']['sub']) {
+		if ($sub==$this->controllerSettings['contentAboutETI']['sub']) {
 
 			$d = array(
-				'project_id' => $this->controllerSettings['AboutETI']['projectID'],
+				'project_id' => $this->controllerSettings['contentAboutETI']['projectID'],
 				'language_id' => $this->getCurrentLanguageId()
 			);
 
