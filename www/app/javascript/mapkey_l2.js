@@ -31,13 +31,6 @@ function l2ScaleCells(w,h) {
 
 function l2MapMouseOver(x,y) {
 
-	/*
-	l2MapCoordinates.topLeft.lat
-	l2MapCoordinates.topLeft.long
-	l2MapCoordinates.bottomRight.lat
-	l2MapCoordinates.bottomRight.long
-	*/
-	
 	var o = $('#mapTable').offset();
 
 	var widthInDegrees = 
@@ -46,10 +39,18 @@ function l2MapMouseOver(x,y) {
 			360 + l2MapCoordinates.topLeft.long - l2MapCoordinates.bottomRight.long);
 
 	var posY = -1 * ((((y-o.top) / l2MapPxHeight) * (l2MapCoordinates.topLeft.lat - l2MapCoordinates.bottomRight.lat)) - l2MapCoordinates.topLeft.lat);
-	var posX = (l2MapCoordinates.topLeft.long - (((x-o.left) / l2MapPxWidth) * widthInDegrees));
-	posX = (posX<=-180 ? posX+360: posX);
+	var posX = -1 * (l2MapCoordinates.topLeft.long - (((x-o.left) / l2MapPxWidth) * widthInDegrees));
 
-	$("#coordinates").html(Math.round(posY)+','+Math.round(posX));
+	if (posX>180) posX = posX - 360;
+	if (posX<-180) posX = posX + 360;
+
+	posY = Math.round(posY);
+	posX = Math.round(posX);
+
+	var labX = (posX>0 ? _('E') : _('W'));
+	var labY = (posY>0 ? _('N') : _('S'));
+
+	$("#coordinates").html(Math.abs(posY)+'&deg; '+labY+','+Math.abs(posX)+'&deg; '+labX);
 
 }
 
