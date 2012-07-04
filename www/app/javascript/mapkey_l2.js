@@ -48,9 +48,9 @@ function l2MapMouseOver(x,y) {
 	posX = Math.round(posX);
 
 	var labX = (posX>0 ? _('E') : _('W'));
-	var labY = (posY>0 ? _('N') : _('S'));
+	var labY = (posY>=0 ? _('N') : _('S'));
 
-	$("#coordinates").html(Math.abs(posY)+'&deg; '+labY+','+Math.abs(posX)+'&deg; '+labX);
+	$("#coordinates").html(Math.abs(posY)+'&deg; '+labY+', '+Math.abs(posX)+'&deg; '+labX);
 
 }
 
