@@ -37,6 +37,7 @@ var allLookupDialogContentName = 'lookup-DialogContent';
 var allNavigateDefaultUrl = 'item.php?id=%s';
 var allNavigateTargetUrl = null;
 var allLookupContentUrl = 'ajax_interface.php';
+var allLookupSuppressKeyNavigation = false;
 
 function allLookupNavigateOverrideUrl(url) {
 
@@ -203,7 +204,8 @@ function allLookupBuildList(obj,txt) {
 
 	if (obj.results) {
 		
-		var str = '<table id="allLookupListTable">';
+		//var str = '<table id="allLookupListTable">';
+		var str = '';
 
 		$('#'+allLookupListName).append(str);
 		$('#'+allLookupDialogContentName).append(str);
@@ -219,14 +221,13 @@ function allLookupBuildList(obj,txt) {
 				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
 
 				var str =
-					'<tr id="allLookupListRow-'+i+'" class="allLookupListRow">'+
-						'<td id="allLookupListCell-'+i+'" class="allLookupListCell" lookupId="'+d.id+'" onclick="window.open(\''+
+					'<p id="allLookupListCell-'+i+'" class="allLookupListCell" lookupId="'+d.id+'" onclick="window.open(\''+
 							(d.url ? d.url : url.replace('%s',d.id)) +
 							'\',\'_self\')">'+
 							d.label +
 							(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
-						'</td>'+
-					'</tr>';
+					'</p>';
+
 
 				$('#'+allLookupListName).append(str);
 				$('#'+allLookupDialogContentName).append(str);
@@ -237,7 +238,7 @@ function allLookupBuildList(obj,txt) {
 
 		}
 
-		str = '</table>';
+		//str = '</table>';
 		$('#'+allLookupListName).append(str);
 		$('#'+allLookupDialogContentName).append(str);
 
@@ -364,11 +365,11 @@ function allLookupHighlightRow(clearall) {
 
 		if (i==allLookupActiveRow && clearall!=true) {
 
-			$('#allLookupListRow-'+i).addClass('allLookupListActiveRow');
+			$('#allLookupListCell-'+i).addClass('allLookupListActiveRow');
 
 		} else {
 
-			$('#allLookupListRow-'+i).removeClass('allLookupListActiveRow');
+			$('#allLookupListCell-'+i).removeClass('allLookupListActiveRow');
 
 		}
 
@@ -382,17 +383,17 @@ function allLookupBindKeyUp(ele) {
 
 		if (e.keyCode==13) {
 			// enter
-			allLookupGoActiveRow();
+			allLookupSuppressKeyNavigation || allLookupGoActiveRow();
 			return;
 		}
 
 		if (e.keyCode==38)
 			// key up
-			allLookupMoveUp();
+			allLookupSuppressKeyNavigation || allLookupMoveUp();
 		else
 		if (e.keyCode==40)
 			// key down
-			allLookupMoveDown();
+			allLookupSuppressKeyNavigation || allLookupMoveDown();
 		else
 		if ((e.keyCode<65 || (e.keyCode >= 112 && e.keyCode <= 123)) && e.keyCode!=8 && !(e.keyCode>=48 && e.keyCode<=57))
 			// smaller than 'a' or a function-key, but not backspace

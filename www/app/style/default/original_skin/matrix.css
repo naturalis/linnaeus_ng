@@ -110,3 +110,8 @@
 .state-selected {
 	background-color:#eee;
 }
+
+#lookup-DialogContent, #dialog-content, #dialog-content-inner {
+ min-height: 0;
+ height: auto;
+}
