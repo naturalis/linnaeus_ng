@@ -248,6 +248,7 @@ function allLookupBuildList(obj,txt) {
 
 }
 
+/*
 function allLookupBuildList(obj,txt) {
 
 	allLookupRowCount = 0;
@@ -268,7 +269,7 @@ function allLookupBuildList(obj,txt) {
 				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
 
 				var str =
-					'<p class="row" onclick="window.open(\''+
+					'<p class="row" lookupId="'+d.id+'" onclick="window.open(\''+
 							(d.url ? d.url : url.replace('%s',d.id)) +
 							'\',\'_self\')">'+
 							d.label +
@@ -290,6 +291,7 @@ function allLookupBuildList(obj,txt) {
 	$('#dialog').css('top', (dialogTop >= 25) ? dialogTop : 25);
 
 }
+*/
 
 function allLookupClearDiv() {
 
