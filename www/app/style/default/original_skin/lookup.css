@@ -50,6 +50,12 @@
 
 }
 
+.row a {
+	color: #000;
+	text-decoration: none;
+}
+
+
 .allLookupListActiveRow {
 
 	background-color:#eee;

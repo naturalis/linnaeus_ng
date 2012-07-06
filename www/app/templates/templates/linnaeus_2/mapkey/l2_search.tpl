@@ -19,15 +19,17 @@
             <input type="button" value="{t}Search{/t} &gt;&gt" onclick="l2DoSearchMap()" />&nbsp;
             <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
             <input type="hidden" name="mapId" value="{$mapId}" />
-        <span id="coordinates">0,0</span>
+        <span id="coordinates"></span>
     </td><td id="mapName">
 
         {if $maps|@count>1}
-            <span class="selectIcon" onclick="
-                showDialog('{t}Choose a map{/t}',
-                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?mapId={$v.id}>{/if}{$v.name}{if $v.id!=$mapId}</a>{/if}<br />'+
-                    {/foreach}' '
-                );">{$map.name}</span>
+            <span class="selectIcon" title="{t}Go to another map{/t}" onclick="
+                  showDialog('{t}Choose a map{/t}',
+                '<div id=\'lookup-DialogContent\'>'+
+                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?mapId={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+                    {/foreach}' ' + '</div>',
+                    false, true
+                 );">{$map.name}</span>
         {else}
             {$map.name}
         {/if}   
@@ -75,5 +77,14 @@
 
 {/if}
 
-{include file="_mapJquery.tpl"}
+{include file="_mapJquery-start.tpl"}
+{if $didSearch==true}
+showDialog(
+    _('Found {$taxa|@count} taxa'),
+	'<div id=\'lookup-DialogContent\'>'+
+    {foreach from=$taxa item=v}'<p class="row"><a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon|escape:'htmlall'}</a></p>'+
+    {/foreach}'</div>'
+);
+{/if}
+{include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}

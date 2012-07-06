@@ -33,16 +33,18 @@
             <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
         
 
-        <span id="coordinates">0,0</span>
+        <span id="coordinates"></span>
     </td><td id="mapName">
 
         {if $maps|@count>1}
-            <span class="selectIcon" onclick="
-                showDialog('{t}Choose a map{/t}',
-                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
-                    {/foreach}' '
+            <span class="selectIcon" title="{t}Go to another map{/t}" onclick="
+               showDialog('{t}Choose a map{/t}',
+                '<div id=\'lookup-DialogContent\'>'+
+                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+                    {/foreach}' ' + '</div>',
+                    false, true
                 );">{$map.name}</span>
-        {else}
+         {else}
             {$map.name}
         {/if}   
     </td>
@@ -86,5 +88,6 @@
 </div>
 {/if}
 
-{include file="_mapJquery.tpl"}
+{include file="_mapJquery-start.tpl"}
+{include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}

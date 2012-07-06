@@ -49,8 +49,9 @@
 	font-weight: bold;
 }
 
-#allLookupListTable {
-	width: 100%;
+.allLookupListCell {
+	padding: 1px 5px; 
+	width: 500px;
 }
 
 .allLookupListRow, .allLookupListActiveRow, .row {
@@ -62,6 +63,15 @@
 .allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
     color: #fff;
     background: #555454;
+}
+
+.row a {
+	color: #000;
+	text-decoration: none;
+}
+
+.row-selected a {
+	color: #fff;
 }
 
 .allLookupListActiveRow {

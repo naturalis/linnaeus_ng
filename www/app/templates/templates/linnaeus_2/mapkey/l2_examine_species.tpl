@@ -15,15 +15,18 @@
 <table id="mapGrid">
 	<tr id="topBar">
 	<td>
-        <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a> 
+        <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}"
+        	title="{t}Go to this taxon{/t}">
+        {$taxon.taxon}</a> 
         <span id="coordinates"></span>
     </td><td id="mapName">
         {if $maps|@count>1}
-            <span class="selectIcon" onclick="
+            <span class="selectIcon" title="{t}Go to another map{/t}" onclick="
                 showDialog('{t}Choose a map{/t}',
-                    {foreach item=v from=$maps}'{if $v.id!=$mapId}<a href=?id={$taxon.id}&m={$v.id}>{/if}{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}<br />'+
-                    {/foreach}' ',
-                    {literal}{width:350}{/literal}
+                '<div id=\'lookup-DialogContent\'>'+
+                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+                    {/foreach}' ' + '</div>',
+                    false, true
                 );">{$map.name}</span>
         {else}
             {$map.name}
@@ -68,5 +71,6 @@
 {/if}
 
 
-{include file="_mapJquery.tpl"}
+{include file="_mapJquery-start.tpl"}
+{include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}

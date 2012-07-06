@@ -200,3 +200,8 @@ a.selectIcon:hover {
 	overflow-y:scroll;
 }
 
+#speciesNameA, #speciesNameB {
+	font-size: 12px;
+	font-weight: bold;
+	color: #0303B2;
+}
