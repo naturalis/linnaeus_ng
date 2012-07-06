@@ -51,6 +51,10 @@
 
 .allLookupListCell {
 	padding: 1px 5px; 
+}
+
+td.allLookupListCell {
+	padding: 1px 5px; 
 	width: 500px;
 }
 

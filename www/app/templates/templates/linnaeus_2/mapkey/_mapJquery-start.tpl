@@ -2,6 +2,9 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+
+allLookupSuppressKeyNavigation = true;
+
 {if $map.mapExists}
 l2SetMap(
     '{$map.imageFullName|replace:' ':'%20'}',
