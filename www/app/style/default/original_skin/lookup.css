@@ -38,13 +38,13 @@
 
 }
 
-.allLookupListRow, .allLookupListActiveRow {
+.allLookupListRow, .allLookupListActiveRow, .row {
 
 	cursor:pointer;
 
 }
 
-.allLookupListRow:hover, .row-selected {
+.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
 
 	background-color:#eee;
 
