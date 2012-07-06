@@ -1,15 +1,10 @@
-<table>
+<div id="lookup-DialogContent">
 {foreach from=$matrices key=k item=v}
-<tr class="highlight">
 	{if $v.id==$currentMatrixId}
-		<td>&#149; {$v.name}</td>
+		<p class="row row-selected">{$v.name}</p>
 	{else}
-		{if $useJavascriptLinks}
-		<td class="a" style="width:200px" onclick="goMatrix({$v.id})">{$v.name}</td>
-		{else}
-		<td style="width:200px"><a href="../matrixkey/use_matrix.php?id={$v.id}">{$v.name}</a></td>
-		{/if}
+		<p class="row" onclick="goMatrix({$v.id})">{$v.name}</p>
 	{/if}
-</tr>
 {/foreach}
-</table>
+
+</div>

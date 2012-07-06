@@ -358,7 +358,7 @@ class MatrixKeyController extends Controller
 				$m[$key]['name'] = $mn[0]['name'];
 	
 			}
-			
+			$this->customSortArray($m, array('key' => 'name', 'case' => 'i','maintainKeys' => true));
 			$_SESSION['app']['user']['matrix']['matrices'] = $m;
 			
 		}
