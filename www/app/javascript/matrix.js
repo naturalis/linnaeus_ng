@@ -613,16 +613,16 @@ function showMatrixSelect() {
 
 function showCharacterSort() {
 
-	var html = '';
+	var html = '<div id="lookup-DialogContent">';
 
 	for(var i=0;i<characterOrders.length;i++) {
 		if (characterOrders[i][0]==sortField)
-			html = html + selectIndicator +characterOrders[i][1]+'<br />';
+			html = html + '<p class="row row-selected">'+characterOrders[i][1]+'</p>';
 		else
-			html = html + '<a href="javascript:sortCharacters(\''+characterOrders[i][0]+'\');closeDialog();">'+characterOrders[i][1]+'</a><br />';
+			html = html + '<p class="row" onclick="sortCharacters(\''+characterOrders[i][0]+'\');closeDialog();">'+characterOrders[i][1]+'</p>';
 	}
 
-
+	html += '</div>'
 	showDialog(_('Sort characters by:'),html);
 
 }

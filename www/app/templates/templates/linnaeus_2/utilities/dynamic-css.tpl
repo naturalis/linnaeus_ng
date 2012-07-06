@@ -233,7 +233,7 @@
 {literal}
 .selectIcon {
 {/literal}
-    background: url('{$systemMedia}select-down.png') no-repeat right center;
+    background: url('{$systemMedia}open-select.png') no-repeat right center;
     padding-right: 18px;
     margin-right: 10px;
     cursor: pointer;
@@ -244,7 +244,7 @@
 {literal}
 .selectRight {
 {/literal}
-    background: url('{$systemMedia}select-right.png') no-repeat right center;
+    background: url('{$systemMedia}go-to.png') no-repeat right 4px;
 {literal}
 }
 {/literal}

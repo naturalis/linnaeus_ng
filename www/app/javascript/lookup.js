@@ -248,6 +248,49 @@ function allLookupBuildList(obj,txt) {
 
 }
 
+function allLookupBuildList(obj,txt) {
+
+	allLookupRowCount = 0;
+	
+	allLookupClearDiv();
+	allLookupClearDialogDiv();
+
+	if (obj.results) {
+		
+		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
+
+		for(var i=0;i<obj.results.length;i++) {
+			
+			var d = obj.results[i];
+			
+			if (d.id && d.label) {
+
+				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
+
+				var str =
+					'<p class="row" onclick="window.open(\''+
+							(d.url ? d.url : url.replace('%s',d.id)) +
+							'\',\'_self\')">'+
+							d.label +
+							(d.source ? ' <span class="source">('+d.source+')</span>' : '')+
+						'</td>'+
+					'</tr>';
+
+				$('#'+allLookupListName).append(str);
+				$('#'+allLookupDialogContentName).append(str);
+
+				allLookupRowCount++;
+
+			}
+
+		}
+	}
+
+	var dialogTop = Math.abs($(window).height() - $('#dialog').height()) / 2;
+	$('#dialog').css('top', (dialogTop >= 25) ? dialogTop : 25);
+
+}
+
 function allLookupClearDiv() {
 
 	$('#'+allLookupListName).empty();

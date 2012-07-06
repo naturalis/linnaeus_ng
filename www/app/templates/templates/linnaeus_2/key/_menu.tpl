@@ -1,14 +1,10 @@
 <div id="allNavigationPane">
-{include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
 
 {assign var='totalSteps' value=$keypath|@count}
 {assign var='previousStep' value=$totalSteps-2}
 
-<a class="navigation-icon" id="decision-path-icon" 
-	style="margin-right: 618px;"
-	href='javascript:showDialog("{t}Decision path{/t}",tmp);' 
-	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
+
 
 {if $useJavascriptLinks}
     {if $totalSteps > 1}
@@ -42,4 +38,12 @@
     <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}
 </div>
+
+
+{include file="../shared/_back-to-search.tpl"}
+<a class="navigation-icon" id="decision-path-icon" 
+	
+	href='javascript:showDialog("{t}Decision path{/t}",tmp);' 
+	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
+	
 </div>

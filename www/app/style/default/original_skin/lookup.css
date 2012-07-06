@@ -44,7 +44,7 @@
 
 }
 
-.allLookupListRow:hover {
+.allLookupListRow:hover, .row-selected {
 
 	background-color:#eee;
 

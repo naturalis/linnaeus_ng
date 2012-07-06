@@ -1,33 +1,33 @@
 #allNavigationPane {
-    overflow: hidden;
-    width: 100%;
-    border-bottom: 1px solid #000;
+	overflow: hidden;
+	width: 100%;
+	border-bottom: 1px solid #000;
 }
 
 #allLookupList {
-	position:absolute;
-	top:0px;
-	left:0px;
-	border:1px dotted black;
-	width:350px;
-	height:400px;
-	background-color:#fff;
-	display:block;
-	overflow-y:scroll;
-	overflow-x:hide;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	border: 1px dotted black;
+	width: 350px;
+	height: 400px;
+	background-color: #fff;
+	display: block;
+	overflow-y: scroll;
+	overflow-x: hide;
 	z-index: 50000;
-	display:none;
-	padding:2px;
-	font-size:10px;
-
+	display: none;
+	padding: 2px;
+	font-size: 10px;
 }
 
 #allLookupLoadingDiv {
- height:100%;
- width:100%;
- background-image:url(../../../media/system/skins/original_skin/loading.gif);
- background-position:center;
- background-repeat:no-repeat;
+	height: 100%;
+	width: 100%;
+	background-image:
+		url(../../../media/system/skins/original_skin/loading.gif);
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 #lookupDialog {
@@ -39,62 +39,43 @@
 
 #lookup-DialogContent {
 	margin: 5px;
-	padding: 5px;
 	background: #fff;
 	border: 1px solid #999;
 	height: 350px;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
-
 .allLookupListHighlight {
-
-	font-weight:bold;
-
+	font-weight: bold;
 }
 
 #allLookupListTable {
-
-	width:350px;
-	background-color:#CC6633;
-
+	width: 100%;
 }
 
-.allLookupListRow, .allLookupListActiveRow {
-
+.allLookupListRow, .allLookupListActiveRow, .row {
 	text-align: left;
-	cursor:pointer;
-
+	cursor: pointer;
+	padding: 1px 5px; 
 }
 
-.allLookupListRow:hover {
-
-	background-color:#eee;
-
+.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
+    color: #fff;
+    background: #555454;
 }
 
 .allLookupListActiveRow {
-
-	background-color:#eee;
-
+	background-color: #eee;
 }
 
-.allLookupListCell {
-
-	width:500px;
-
-}
-
-.allLookupListSource {
-
-	color:#666;
-
+.allLookupListSource, .source {
+	color: #666;
 }
 
 .allLookupButton {
+	
 }
 
 .allLookupLink {
-	margin-right:10px;
+	margin-right: 10px;
 }
-
