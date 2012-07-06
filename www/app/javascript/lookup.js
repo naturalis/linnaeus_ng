@@ -221,7 +221,7 @@ function allLookupBuildList(obj,txt) {
 				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
 
 				var str =
-					'<p id="allLookupListCell-'+i+'" class="allLookupListCell" lookupId="'+d.id+'" onclick="window.open(\''+
+					'<p id="allLookupListCell-'+i+'" class="row" lookupId="'+d.id+'" onclick="window.open(\''+
 							(d.url ? d.url : url.replace('%s',d.id)) +
 							'\',\'_self\')">'+
 							d.label +
