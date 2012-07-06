@@ -16,7 +16,7 @@
 	<tr id="topBar">
 	<td>
         <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a> 
-        <span id="coordinates">0,0</span>
+        <span id="coordinates"></span>
     </td><td id="mapName">
         {if $maps|@count>1}
             <span class="selectIcon" onclick="

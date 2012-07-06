@@ -23,6 +23,13 @@
 	padding-right: 8px;
 }
 
+#decision-path-icon {
+	margin-left: 15px;
+}
+
+#back-to-search-icon {
+	margin-right: -8px;
+}
 
 
 /* step */
@@ -109,9 +116,14 @@
 }
 
 #step .text-choice-img {
-	text-align: center; margin-top : 3px;
+	text-align: center; 
 	font-size: 10px;
 	margin-top: 3px;
+}
+
+#step .text-choice-img p {
+	line-height: 130%;
+	text-align: center;
 }
 
 #step .target {

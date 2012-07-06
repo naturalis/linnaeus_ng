@@ -23,9 +23,10 @@ class MatrixKeyController extends Controller
 
 	public $cssToLoad = array(
 		'basics.css',
-		'matrix.css',
+		'lookup.css',
 		'colorbox/colorbox.css',
-		'dialog/jquery.modaldialog.css'
+		'dialog/jquery.modaldialog.css',
+		'matrix.css'
 	);
 
 	public $jsToLoad =

@@ -32,7 +32,8 @@
 
 #taxonName, #mapName {
     color: #0303b2;
-    font-size: 14px;
+    font-size: 12px;
+	font-weight: bold;
 }
 
 a.selectIcon:link, a.selectIcon:visited {

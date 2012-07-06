@@ -30,7 +30,6 @@ function l2ScaleCells(w,h) {
 }
 
 function l2MapMouseOver(x,y) {
-
 	var o = $('#mapTable').offset();
 
 	var widthInDegrees = 
@@ -50,7 +49,7 @@ function l2MapMouseOver(x,y) {
 	var labX = (posX>0 ? _('E') : _('W'));
 	var labY = (posY>=0 ? _('N') : _('S'));
 
-	$("#coordinates").html(Math.abs(posY)+'&deg; '+labY+', '+Math.abs(posX)+'&deg; '+labX);
+	$("#coordinates").html(Math.abs(posY)+'&deg;'+labY+', '+Math.abs(posX)+'&deg;'+labX);
 
 }
 
