@@ -192,7 +192,7 @@ function isArray(obj) {
       return true;
 }
 
-function showDialog(title,content,vars) {
+function showDialog(title,content,vars,resize) {
 
 	if (!vars) {
 		vars = {};
@@ -202,6 +202,11 @@ function showDialog(title,content,vars) {
 	vars.title = title ? title : '';
 
 	$.modaldialog.prompt(content,vars);
+	if (resize) {
+		$('#dialog-content').css('min-height',0);
+		$('#dialog-content-inner').css('min-height',0);
+		$('#lookup-DialogContent').css('height','auto');
+	}
 
 }
 

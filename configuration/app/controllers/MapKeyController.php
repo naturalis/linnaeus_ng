@@ -24,8 +24,8 @@ class MapKeyController extends Controller
 		'basics.css',
 		'map.css',
 		'map_l2.css',
-		'lookup.css',
-		'dialog/jquery.modaldialog.css'
+		'dialog/jquery.modaldialog.css',
+		'lookup.css'
 	);
 
 	public $jsToLoad = array(
