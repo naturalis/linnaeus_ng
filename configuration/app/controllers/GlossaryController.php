@@ -289,22 +289,44 @@ class GlossaryController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'glossary_id' => $id	
 				),
-				'columns' => 'file_name,thumb_name,original_name,id,fullname'
+				'columns' => 'file_name,thumb_name,original_name,id,fullname,mime_type,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime',
+				'order' => 'mime, sort_order'
 			)
 		);
-
-		$gmc = $this->models->GlossaryMediaCaptions->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),					
-					'media_id' => $gm[0]['id']
-				),
-				'columns' => 'caption'
-			)
-		);	
 		
-		$gm[0]['caption'] = isset($gmc[0]['caption']) ? $gmc[0]['caption'] : null;
+		$this->loadControllerConfig('Species');
+		
+		$mimes = $this->controllerSettings['mime_types'];
+
+		$this->loadControllerConfig();
+		
+		foreach((array)$gm as $key => $val) {
+
+			$gmc = $this->models->GlossaryMediaCaptions->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),					
+						'media_id' => $val['id']
+					),
+					'columns' => 'caption'
+				)
+			);	
+			
+			$gm[$key]['caption'] = isset($gmc[0]['caption']) ? $this->matchHotwords($gmc[0]['caption']) : null;
+
+			$t = isset($mimes[$val['mime_type']]) ?
+					$mimes[$val['mime_type']] :
+					null;
+
+			$gm[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
+			$gm[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
+			//$gm[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
+			$gm[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'].$gm[$key]['file_name'];
+
+		
+		}
+		
 		
 		return $gm;
 
