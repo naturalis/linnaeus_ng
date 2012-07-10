@@ -89,58 +89,51 @@
 {/if}
 {elseif $activeCategory=='media' && $contentCount.media>0}
 <div id="media">
-	<table>
+<table>
 	{assign var=mediaCat value=false}
+	{assign var=row value=1}
 	{foreach from=$content key=k item=v}
-	{if $mediaCat!=$v.category}
-	{if $k!=0}
-	<tr>
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	{/if}
-	<tr>
-		<td colspan="2" class="media-cat-header">{$v.category_label}</td>
-	</tr>
-	{/if}
-	<tr>
-		<td class="media-image-cell">
-	{if $v.category=='image'}
-		{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-		<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
-		{if $v.thumb_name != ''}
-			<img
-				alt="{$v.original_name}" 
-				src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
-				class="media-image" />
-		{else}
-			<img
-				alt="{$v.original_name}" 
-				src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
-				class="media-image" />
+		{if $k==0}
+			<tr id="row-{$row}">
+		{elseif $k%5==0}
+			</tr><tr id="row-{$row++}"><td></td><td></td><td></td><td></td><td></td></tr><tr id="row-{$row}">{/if}
+		<td class="media-cell">
+		{if $v.category=='image'}
+			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
+			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+			{if $v.thumb_name != ''}
+				<img
+					alt="{$v.original_name}" 
+					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
+					class="image-thumb" />
+			{else}
+				<img
+					alt="{$v.original_name}" 
+					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
+					class="image-full" />
+			{/if}
+			</a>
+		{elseif $v.category=='video'}
+				<img 
+					alt="{$v.original_name}" 
+					src=".{$session.app.project.urls.systemMedia}video.jpg" 
+					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+					class="media-video-icon" />
+		{elseif $v.category=='audio'}
+				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
+					<param name="movie" value="{$soundPlayerName}" />
+					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
+				</object>
 		{/if}
-		</a>
-	{elseif $v.category=='video'}
-			<img 
-				alt="{$v.original_name}" 
-				src=".{$session.app.project.urls.systemMedia}video.jpg" 
-				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
-				class="media-video-icon" />
-	{elseif $v.category=='audio'}
-			<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
-				<param name="movie" value="{$soundPlayerName}" />
-				<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
-			</object>
-	{/if}
-			</td>		
-		<td class="media-description-cell">{$v.description}</td>
-	</tr>
+		</td>
+		<!-- <td class="caption">{$v.description}</td>  -->
 	{assign var=mediaCat value=$v.category}
 	{if $requestData.disp==$v.id}
 		{assign var=dispUrl value=$smarty.capture.fullImgUrl}
 		{assign var=dispName value=$v.original_name}
 	{/if}
 	{/foreach}
-	</table>
+</table>
 </div>
 {else}
 <div id="content">

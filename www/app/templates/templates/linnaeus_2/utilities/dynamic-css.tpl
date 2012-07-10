@@ -1,16 +1,4 @@
 {literal}
-@font-face {
-{/literal}
-    font-family: LeagueGothic;
- 	src: url('{$systemMedia}webfonts/League_Gothic-webfont.eot?') format('eot'), 
-		 url('{$systemMedia}webfonts/League_Gothic-webfont.woff') format('woff'), 
-		 url('{$systemMedia}webfonts/League_Gothic-webfont.ttf') format('truetype');
-    font-weight: 400;
-{literal}
-}
-{/literal}
-
-{literal}
 #header-container {
 {/literal}
 	background: #146daf url('{$systemMedia}background.jpg') no-repeat;
