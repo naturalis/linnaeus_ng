@@ -1383,24 +1383,6 @@ class Controller extends BaseClass
     
     }
 
-	public function getControllerConfig($controller)
-    {
-
-        $t = 'getControllerSettings'.$controller;
-
-        if (method_exists($this->config,$t)) {
-
-            return $this->config->$t();
-
-        } else {
-
-            return false;
-
-        }
-
-    }
-
-
     /**
      * Sets project URL for project images
      * 
@@ -1654,12 +1636,27 @@ class Controller extends BaseClass
 
     }
 
-	private function loadControllerConfig()
+	public function loadControllerConfig($controllerBaseName=null)
     {
 
-		$this->controllerSettings = $this->getControllerConfig($this->controllerBaseName);
+		if (isset($controllerBaseName))
+	        $t = 'getControllerSettings'.$controllerBaseName;
+		else
+	        $t = 'getControllerSettings'.$this->controllerBaseName;
+
+        if (method_exists($this->config,$t)) {
+
+            $this->controllerSettings = $this->config->$t();
+
+        } else {
+
+            $this->controllerSettings = false;
+
+        }
 
     }
+
+
 
     /**
      * Sets class variables, based on a page's url
