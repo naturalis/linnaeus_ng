@@ -109,6 +109,7 @@ function glossDelete() {
 
 }
 
+
 function glossMediaDelete(id) {
 
 	if (!confirm(_('Are you sure?')));
@@ -124,10 +125,113 @@ function glossMediaDelete(id) {
 		async: allAjaxAsynchMode,
 		success : function (data) {
 			if(data=='<ok>') {
-				$('#media-row-'+id).remove();
+				$('tr[id^=media-row-'+id+']').remove();
 			}			
 		}
 	});
 	
+
+}
+
+
+var taxonMediaSaveButtonClicked = false;
+var taxonMediaDescBeforeEdit = false;
+var glossMediaFiles = Array();
+
+function glossMediaFileStore(file) {
+
+	glossMediaFiles[glossMediaFiles.length] = file;
+
+}
+
+function glossDrawLanguages(fnc,includeDef) {
+
+	if (allLanguages.length<=1) return;
+
+	var buffer = '';
+
+	for (var i=0;i<allLanguages.length;i++) {
+
+		if (allLanguages[i][2]!=1 || includeDef==true) {
+			buffer = buffer+
+				'<span class="project-language'+
+				(allLanguages[i][0]==allActiveLanguage ? 
+					'-active"' : 
+					'" class="a" onclick="'+fnc+'('+allLanguages[i][0]+');' 
+				)+
+				'">'+
+				allLanguages[i][1]+
+				'</span>&nbsp;';
+		}
+		
+		if (allLanguages[i][0]==allDefaultLanguage) var def = allLanguages[i][1];
+	}
+	
+	
+
+//	$('#taxon-language-other-language').html(buffer);
+	$('[id^="taxon-language-other-language"]').html(buffer);
+
+//	$('#taxon-language-default-language').html(def);
+	$('[id^="taxon-language-default-language"]').html(def);
+
+}
+
+function glossMediaSaveDesc(ele,id) {
+
+	var val = $('#'+ele).val();
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'save_media_desc' ,
+			'id' : id ,
+			'description' : val ,
+			'language' : allActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if(data=='<ok>') allSetMessage(_('saved'));		
+		}
+	});
+
+}
+
+function glossMediaGetDescriptions() {
+
+	$.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_media_descs' ,
+			'id' : $('#gloss_id').val() ,
+			'language' : allActiveLanguage ,
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if (data) {
+				obj = $.parseJSON(data);
+				if (obj) {
+					for(var i=0;i<obj.length;i++) {
+						$('#media-'+obj[i].id).val(obj[i].description);
+					}
+				}
+			}			
+			allHideLoadingDiv();
+		}
+	});
+
+}
+
+function glossMediaChangeLanguage(lan) {
+
+	allShowLoadingDiv();
+	glossMediaSaveDesc();
+	allActiveLanguage = lan;
+	glossDrawLanguages('glossMediaChangeLanguage',true);
+	glossMediaGetDescriptions();
 
 }

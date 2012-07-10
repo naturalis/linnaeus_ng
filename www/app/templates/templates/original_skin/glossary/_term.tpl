@@ -30,6 +30,7 @@
 				src="{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}" />
 		{/if}
 		</div>
+		{if $v.caption}{$v.caption}{elseif $v.fullname}{$v.fullname}{else}{$v.file_name}{/if}
 	{/foreach}
 	</div>
 	{/if}

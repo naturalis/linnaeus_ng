@@ -3689,6 +3689,7 @@ class SpeciesController extends Controller
 				array(
 					'id' =>  array(
 						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $this->requestData['id']
 					),
 					'columns' => 'id'
 				)

@@ -106,6 +106,7 @@ class ImportController extends Controller
 		'glossary',
 		'glossary_synonym',
 		'glossary_media',
+		'glossary_media_captions',
 		'free_module_project',
 		'free_module_project_user',
 		'free_module_page',
@@ -2474,7 +2475,7 @@ class ImportController extends Controller
 				else
 					$thumbName = file_exists($_SESSION['admin']['system']['import']['thumbsPath'].$data['filename']) ? $data['filename'] : null;
 
-					$this->models->GlossaryMedia->save(
+					if ($this->models->GlossaryMedia->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getNewProjectId(),
@@ -2483,17 +2484,46 @@ class ImportController extends Controller
 							'original_name' => $data['fullname'],
 							'mime_type' => $thisMIME,
 							'file_size' => filesize($fileToImport),
-							'thumb_name' => $thumbName ? $thumbName : null,
+							'thumb_name' => ($thumbName ? $thumbName : null),
+							'fullname' => isset($data['fullname']) ? $data['fullname'] : null
+							
 						)
-					);
+					)) {
+					
+						$newId = $this->models->GlossaryMedia->getNewId();
 
-				return array(
-					'saved' => true,
-					'filename' => $data['filename'],
-					'full_path' => $fileToImport,
-					'thumb' => isset($thumbName) ? $thumbName : null,
-					'thumb_path' => isset($thumbName) ? $_SESSION['admin']['system']['import']['thumbsPath'].$thumbName : null
-				);
+						if (!empty($data['caption'])) {
+	
+							$this->models->GlossaryMediaCaptions->save(
+								array(
+									'id' => null,
+									'project_id' => $this->getNewProjectId(),
+									'language_id' => $this->getNewDefaultLanguageId(),
+									'media_id' => $newId,
+									'caption' => isset($data['caption']) ? $data['caption'] : null
+								)
+							);
+						
+						}
+					
+						return array(
+							'saved' => true,
+							'id' => $newId,
+							'filename' => $data['filename'],
+							'full_path' => $fileToImport,
+							'thumb' => isset($thumbName) ? $thumbName : null,
+							'thumb_path' => isset($thumbName) ? $_SESSION['admin']['system']['import']['thumbsPath'].$thumbName : null
+						);
+						
+				} else {
+
+					return array(
+						'saved' => false,
+						'data' => $data['filename'],
+						'cause' => 'query failed ('.$this->models->GlossaryMedia->getLastQuery().')'
+					);
+	
+				}
 
 			} else {
 
@@ -2578,7 +2608,7 @@ class ImportController extends Controller
 				$r = $this->addGlossaryMedia($id,$mVal);
 
 				if ($r['saved']==true) {
-
+				
 					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
 					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
 

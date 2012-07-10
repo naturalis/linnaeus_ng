@@ -877,11 +877,13 @@ function taxonMediaGetDescriptions() {
 		type: "POST",
 		data : ({
 			'action' : 'get_media_descs' ,
+			'id' : $('#taxon_id').val() ,
 			'language' : allActiveLanguage ,
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
+			//alert(data);
 			if (data) {
 				obj = $.parseJSON(data);
 				if (obj) {

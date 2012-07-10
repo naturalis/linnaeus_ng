@@ -74,32 +74,10 @@
 			</div>
 		</td>
 	</tr>
-
-	<tr style="vertical-align:top">
-		<td>{t}Media:{/t}</td>
-		<td>
-		{if $gloss.media|@count==0}
-		{t}(no media have been uploaded){/t}
-		{else}
-		<table>
-		{section name=i loop=$gloss.media}
-		<tr class="tr-highlight" id="media-row-{$gloss.media[i].id}">
-			<td style="width:400px">
-				<span
-					class="a" onclick="allShowMedia('{$session.admin.project.urls.project_media|@escape}{$gloss.media[i].file_name|@escape}','{$gloss.media[i].original_name}');" >{$gloss.media[i].original_name}</span>
-			</td>
-			<td style="cursor:pointer" onclick="glossMediaDelete({$gloss.media[i].id})">
-				<img src="{$baseUrl}admin/media/system/icons/cross.png" />
-			</td>
-		</tr>
-		{/section}
-		</table>
-		{/if}
-		<br />
-		<span class="a" onclick="$('#action').val('media');glossCheckForm(this);">{t}upload media{/t}</span>
-		</td>
-	</tr>
 </table>
+
+<span class="a" onclick="$('#action').val('media');glossCheckForm(this);">{t}Edit media files{/t}</span>
+
 </form>
 </div>
 

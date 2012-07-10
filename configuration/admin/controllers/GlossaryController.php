@@ -30,7 +30,8 @@ class GlossaryController extends Controller
     public $usedModels = array(
 		'glossary',
 		'glossary_synonym',
-		'glossary_media'
+		'glossary_media',
+		'glossary_media_captions'
     );
    
     public $usedHelpers = array(
@@ -322,7 +323,7 @@ class GlossaryController extends Controller
 
 				if ($this->rHasVal('action','media')) {
 
-					$this->redirect('media_upload.php?id='.$id);
+					$this->redirect('media.php?id='.$id);
 
 				} else
 				if ($this->rHasVal('action','preview')) {
@@ -508,6 +509,98 @@ class GlossaryController extends Controller
     }
 
 
+    public function mediaAction ()
+    {
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('index.php');
+
+		$gloss = $this->getGlossaryTerm($this->requestData['id']);
+
+		$this->setBreadcrumbIncludeReferer(
+			array(
+				'name' => _('Editing glossary term'), 
+				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
+			)
+		);
+
+		$this->setPageName(sprintf(_('Media for "%s"'),$gloss['term']));
+
+        if ($this->rHasId()) {
+						
+            $this->smarty->assign('id',$this->requestData['id']);
+
+			if ($this->rHasVal('mId') && $this->rHasVal('move') && !$this->isFormResubmit()) {
+	
+				$this->changeMediaSortOrder($this->requestData['id'],$this->requestData['mId'],$this->requestData['move']);
+	
+			}
+
+            $media = $this->getGlossaryMedia($this->requestData['id']);
+
+            foreach((array)$this->controllerSettings['media']['allowedFormats'] as $key => $val) {
+
+                $d[$val['mime']] = $val['media_type'];
+
+            }
+
+            foreach((array)$media as $key => $val) {
+
+                $mdt = $this->models->GlossaryMediaCaptions->_get(
+					array(
+						'id' => array(
+							'media_id' => $val['id'], 
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->getDefaultProjectLanguage()
+						)
+					)
+                );
+                
+                $val['description'] = $mdt[0]['caption'];
+
+                if (isset($d[$val['mime_type']])) $r[$d[$val['mime_type']]][] = $val;
+
+            }
+
+            if (isset($r)) $this->smarty->assign('media',$r);
+
+            $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+            
+            $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
+
+            $this->smarty->assign('allowedFormats',$this->controllerSettings['media']['allowedFormats']);
+
+        }
+
+        if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
+
+        if ($_SESSION['admin']['project']['languages']) $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+
+		if (isset($navList)) $this->smarty->assign('navList', $navList);
+		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
+
+		$this->smarty->assign('activeLanguage',$this->getActiveLanguage());
+
+		//$this->smarty->assign('backUrl', $this->rHasId() ? 'browse.php' : 'index.php');
+
+		//$this->smarty->assign('alpha', $alpha);
+
+		$this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
+		$this->smarty->assign('soundPlayerName', $this->generalSettings['soundPlayerName']);
+        
+        $this->printPage();
+
+    }
+
+
+
+
+
+
+
+
+
     /**
      * Search through all glossary terms
      *
@@ -624,8 +717,19 @@ class GlossaryController extends Controller
             
             $this->deleteMedia();
 
-        } else
-        if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+        } else if ($this->requestData['action'] == 'save_media_desc') {
+
+            $this->ajaxActionSaveMediaDescription();
+        
+        } else if ($this->requestData['action'] == 'get_media_desc') {
+
+            $this->ajaxActionGetMediaDescription();
+        
+        } else if ($this->requestData['action'] == 'get_media_descs') {
+
+            $this->ajaxActionGetMediaDescriptions();
+        
+        } else if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData['search']);
 
@@ -737,6 +841,13 @@ class GlossaryController extends Controller
 
 		}
 
+		$this->models->GlossaryMediaCaptions->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'media_id' => $id
+			)
+		);
+		
 		$this->models->GlossaryMedia->delete(
 			array(
 				'project_id' => $this->getCurrentProjectId(),
@@ -1048,5 +1159,156 @@ class GlossaryController extends Controller
 		unset($_SESSION['admin']['system']['glossary']['activeLanguage']);
 
 	}
+
+    private function ajaxActionSaveMediaDescription()
+    {
+
+        if (!$this->rHasId() || !$this->rHasVal('language')) {
+
+            return;
+
+        } else {
+            
+            if (!$this->rHasVal('description')) {
+                
+                $this->models->GlossaryMediaCaptions->delete(
+                    array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'media_id' => $this->requestData['id']
+                    ));
+            
+            } else {
+                
+                $mdt = $this->models->GlossaryMediaCaptions->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'], 
+							'media_id' => $this->requestData['id']
+						)
+                    )
+                );
+                
+				$d = $this->filterContent(trim($this->requestData['description']));
+				
+                $this->models->GlossaryMediaCaptions->save(
+                    array(
+                        'id' => isset($mdt[0]['id']) ? $mdt[0]['id'] : null, 
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->requestData['language'], 
+                        'media_id' => $this->requestData['id'], 
+                        'caption' => $d['content']
+                    )
+                );
+            
+            }
+            
+            $this->smarty->assign('returnText', '<ok>');
+        
+        }
+    
+    }
+
+    private function ajaxActionGetMediaDescription()
+    {
+
+        if (!$this->rHasId() || !$this->rHasVal('language')) {
+
+            return;
+
+        } else {
+            
+            $mdt = $this->models->GlossaryMediaCaptions->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->requestData['language'], 
+						'media_id' => $this->requestData['id']
+					)
+				)
+			);
+
+            $this->smarty->assign('returnText', $mdt[0]['caption']);
+        
+        }
+
+    }
+
+/*
+	private function getGlossaryMedia($id)
+	{
+
+		return $this->models->GlossaryMedia->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'glossary_id' => $id
+				)
+			)
+		);
+
+	}	
+	*/
+    private function ajaxActionGetMediaDescriptions()
+    {
+
+        if (!$this->rHasVal('language')) {
+
+            return;
+
+        } else {
+            
+            $mt = $this->models->GlossaryMedia->_get(
+				array(
+					'id' =>  array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $this->requestData['id'] 
+					),
+					'columns' => 'id'
+				)
+			);
+
+            foreach((array)$mt as $key => $val) {
+
+                $mdt = $this->models->GlossaryMediaCaptions->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'language_id' => $this->requestData['language'],
+							'media_id' => $val['id']
+						),
+						'columns' => 'caption'
+					)
+				);
+
+                $mt[$key]['description'] = $mdt ? $mdt[0]['caption'] : null;
+            }
+                            
+            $this->smarty->assign('returnText', json_encode($mt));
+        
+        }
+
+    }
+
+    private function filterContent($content)
+    {
+    
+        if (!$this->controllerSettings['filterContent'])
+            return $content;
+
+        $modified = $content;
+
+        if ($this->controllerSettings['filterContent']['html']['doFilter']) {
+
+            $modified = strip_tags($modified,$this->controllerSettings['filterContent']['html']['allowedTags']);
+
+        }
+
+        return array('content' => $modified, 'modified' => $content!=$modified);
+
+    }
+
+
 
 }
