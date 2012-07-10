@@ -390,7 +390,7 @@ class configuration
                 array(
                     'allowedFormats' => 
                         array(
-                            array(
+                             array(
                                 'mime' => 'image/png', 
                                 'media_name' => 'PNG image', 
                                 'media_type' => 'image', 
@@ -413,6 +413,24 @@ class configuration
                                 'media_name' => 'GIF image', 
                                 'media_type'  => 'image', 
                                 'maxSize' => 1000000
+                            ),
+                            array(
+                                'mime' => 'video/h264', 
+                                'media_name' => 'h.264 movie', 
+                                'media_type'  => 'video', 
+                                'maxSize' => 50000000
+                            ),
+                            array(
+                                'mime' => 'video/quicktime', 
+                                'media_name' => 'Quicktime', 
+                                'media_type'  => 'video', 
+                                'maxSize' => 50000000
+                            ),
+                            array(
+                                'mime' => 'audio/mpeg', 
+                                'media_name' => 'mp3', 
+                                'media_type'  => 'sound', 
+                                'maxSize' => 10000000
                             ),
                             array(
                                 'mime' => 'application/zip', 
