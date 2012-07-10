@@ -1,57 +1,49 @@
-#index {
-}
-
-#index #th-term{
-	width:250px;
-}
-
-#index #th-definition{
-}
-
-#index td {
-	overflow:hidden;
-}
-
-
 #page-main #definition {
 	text-align: justify;
-	overflow: auto;
+	width: 470px;
+	float: left;
+	padding-right: 15px;
 }
 
 #page-main #synonyms {
-	padding-top:10px;
-	margin-top:10px;
+	margin-top: 12px;
 }
 
 #page-main #synonyms-title, #media-title {
 	font-weight:bold;
-	margin-bottom:2px;
 }
 
 #page-main .synonym {
 }
 
 #page-main #media {
-	padding-top:5px;
-	margin-top:5px;
-	border-top:1px dotted #666;
+	width: 325px;
+	float: right;
+	padding-left: 20px;
+	border-left: 1px dotted #0303b2;
 }
 
-#page-main .image-cell {
-}
-
-#page-main .image-thumb {
-}
-
-#page-main .image-full {
+#page-main .media-cell {
+	float: left;
+	width: 150px;
+	text-align: center;
+	padding-right: 10px;
 }
 
 #page-main .image-thumb, .image-full {
-	border:1px solid #666;
-	margin:0px 5px 5px 0px;
-	cursor:pointer;
+	border: 1px solid #666;
+	cursor: pointer;
+	display: block;
+	margin: 0 auto;
 }
 
 #page-main .image-full {
-	width:150px;
+	max-height: 125px;
+	max-width: 150px;
+}
+
+#page-main .caption {
+	font-size: 9px;
+	padding: 2px 0 5px 0;
+	line-height: 10px;
 }
