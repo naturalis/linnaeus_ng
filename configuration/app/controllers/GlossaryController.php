@@ -21,7 +21,8 @@ class GlossaryController extends Controller
 
     public $usedModels = array(
 		'glossary_media',
-		'label_language'
+		'label_language',
+		'glossary_media_captions'
     );
    
     public $controllerPublicName = 'Glossary';
@@ -282,15 +283,30 @@ class GlossaryController extends Controller
 
 	private function getGlossaryMedia($id) {
 
-		return $this->models->GlossaryMedia->_get(
+		$gm = $this->models->GlossaryMedia->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'glossary_id' => $id	
 				),
-				'columns' => 'file_name,thumb_name,original_name'
+				'columns' => 'file_name,thumb_name,original_name,id,fullname'
 			)
 		);
+
+		$gmc = $this->models->GlossaryMediaCaptions->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' => $this->getCurrentLanguageId(),					
+					'media_id' => $gm[0]['id']
+				),
+				'columns' => 'caption'
+			)
+		);	
+		
+		$gm[0]['caption'] = isset($gmc[0]['caption']) ? $gmc[0]['caption'] : null;
+		
+		return $gm;
 
 	}
 
