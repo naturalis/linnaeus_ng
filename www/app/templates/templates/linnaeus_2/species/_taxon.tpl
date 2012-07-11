@@ -23,11 +23,11 @@
 		{if $useJavascriptLinks}			
 		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
 		{else}
-		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{/if}>
-			{if $v.lower_taxon==1}
-			<a href="../species/taxon.php?id={$v.id}">{$v.label}</a>
+		<p>
+			{if $smarty.foreach.classification.last}
+				{$v.label}
 			{else}
-			<a href="../highertaxa/taxon.php?id={$v.id}">{$v.label}</a>
+				<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
 			{/if}
 		</p>
 		{/if}		
@@ -66,32 +66,19 @@
 {/if}
 {if $content.common}
 <div id="common">
-	<table>
-	<thead>
-		<tr class="highlight">
-			<th>{t}Common name{/t}</th>
-			<th>{t}Language{/t}</th>
-			<th>{t}Transliteration{/t}</th>
-		</tr>
-	</thead>
-	<tbody>
+	<div class="title">{t}Common names{/t}</div>
 	{foreach from=$content.common key=k item=v}
-		<tr class="highlight">
-			<td>{$v.commonname}</td>
-			<td>{$v.language_name}</td>
-			<td>{$v.transliteration}</td>
-		</tr>
+		<p>{$v.commonname}{if $v.transliteration} ({$v.transliteration}){/if} [{$v.language_name}]</p>
 	{/foreach}
-	</tbody>
-	</table>
 </div>
 {/if}
+
 {elseif $activeCategory=='media' && $contentCount.media>0}
 
 
 <div id="media">
 {assign var=widthInCells value=5}
-<table>
+<table id="media-grid">
 	{assign var=mediaCat value=false}
 	{foreach from=$content key=k item=v}
 		{if $k==0}
@@ -109,7 +96,7 @@
 		<td class="media-cell">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}"> 
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
@@ -123,7 +110,7 @@
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
-			</a>
+		</a>
 		{elseif $v.category=='video'}
 				<img 
 					id="media-{$k}"
