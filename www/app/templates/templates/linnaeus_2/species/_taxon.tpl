@@ -146,13 +146,16 @@
 	</tr>
 	<tr>
 	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
+	
 	{section name=foo start=$z loop=$k+1}
 	  <td id="caption-{$smarty.section.foo.index}" class="caption"></td>
 	{/section}
 	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
+	{if $rest > 0}
 	{section name=bar start=$rest loop=$widthInCells}
 	  <td></td>
 	{/section}
+	{/if}
 	</tr>
 
 				
