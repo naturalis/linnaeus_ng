@@ -9,7 +9,7 @@
 {if $useJavascriptLinks}
     <span
     {if $adjacentItems.prev}
-        onclick="goTaxon({$adjacentItems.prev.id})" id="previous-icon" 
+        onclick="goTaxon({$adjacentItems.prev.id},{$activeCategory})" id="previous-icon" 
         {if $adjacentItems.prev.label} title="{$adjacentItems.prev.label}"{/if}
     {else}
         id="previous-icon-inactive"
@@ -17,7 +17,7 @@
     class="navigation-icon" />{t}Previous{/t}</span>
     <span 
     {if $adjacentItems.next}
-        onclick="goTaxon({$adjacentItems.next.id})" id="next-icon"
+        onclick="goTaxon({$adjacentItems.next.id},{$activeCategory})" id="next-icon"
         {if $adjacentItems.next.label} title="{$adjacentItems.next.label}"{/if}
     {else}
         id="next-icon-inactive"
@@ -26,14 +26,14 @@
 {else}
     {if $adjacentItems.prev}
         <a class="navigation-icon" id="previous-icon" 
-        href="../species/taxon.php?id={$adjacentItems.prev.id}"
+        href="../species/taxon.php?id={$adjacentItems.prev.id}&cat={$activeCategory}"
         {if $adjacentItems.prev.label} title="{$adjacentItems.prev.label}"{/if}>{t}Previous{/t}</a>
     {else}
         <span class="navigation-icon" id="previous-icon-inactive">{t}Previous{/t}</span>
     {/if}
     {if $adjacentItems.next}
         <a class="navigation-icon" id="next-icon" 
-        href="../species/taxon.php?id={$adjacentItems.next.id}" 
+        href="../species/taxon.php?id={$adjacentItems.next.id}&cat={$activeCategory}" 
         {if $adjacentItems.next.label} title="{$adjacentItems.next.label}"{/if}>{t}Next{/t}</a>
     {else}
         <span class="navigation-icon" id="next-icon-inactive">{t}Next{/t}</span>
