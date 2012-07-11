@@ -376,28 +376,43 @@ a:hover, .internal-link:hover {
 	font-style: italic;
 }
 
-td.media-cell, td.caption {
-	padding-right: 10px;
+table#media-grid td.media-cell, table#media-grid td.caption {
+	padding: 0 5px;
 }
-	
-td.media-cell {
+
+table#media-grid td.media-cell, table#media-grid td.caption {
+	padding: 0 5px;
+}
+
+table#media-grid td.media-cell {
+	height: 125px;
 	width: 150px;
 	text-align: center;
-   	vertical-align: bottom;
+   	vertical-align: middle;
+	background: #555454;
+	border-top: 1px solid #000;
+	border-bottom: 1px solid #000;
 }
 
-#page-main img.image-full {
-	border: 1px solid #666;
+table#media-grid img.image-full {
+	border: 1px solid #000;
 	cursor: pointer;
-	margin: 0 auto;
 }
 
-#page-main img.image-full {
+table#media-grid img.image-full {
 	max-height: 125px;
 	max-width: 150px;
+	margin: 5px 0;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
 }
 
-td.caption {
+table#media-grid img.image-full:hover {
+	opacity: 1.0;
+	filter: alpha(opacity=100);
+}
+
+table#media-grid td.caption {
 	font-size: 9px;
 	padding-top: 2px;
 	padding-bottom: 15px;
@@ -406,6 +421,15 @@ td.caption {
    	vertical-align: top;
 }
 
-img.media-video-icon {
+table#media-grid img.media-video-icon {
 	cursor:pointer;
+	padding: 3px;
 }
+
+table#media-grid td:first-child {
+	padding-left: 10px;
+}
+table#media-grid td:last-child {
+	padding-right: 10px;
+}
+
