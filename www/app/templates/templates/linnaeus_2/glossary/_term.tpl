@@ -14,13 +14,14 @@
 	{if $term.media}
 	<div id="media">
 	
+<!--	
 	{foreach from=$term.media key=k item=v}
 		{if $k>0 && $k%2==0}<div class="clear"></div>{/if}
 		<div class="media-cell">
 		
 		
 		
-	<!-- {if $v.category=='image'} -->
+	 {if $v.category=='image'} 
 		{if $v.thumb_name}
 			<img
 				alt="{$v.original_name}"
@@ -34,7 +35,7 @@
 				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}','{$v.original_name}');" 
 				src="{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}" />
 		{/if}
-	<!-- {elseif $v.category=='video'}
+ {elseif $v.category=='video'}
 			<img 
 				alt="{$v.original_name}" 
 				src="{$session.app.project.urls.systemMedia}video.jpg" 
@@ -45,17 +46,122 @@
 				<param name="movie" value="{$soundPlayerName}" />
 				<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 			</object>
-	{/if} -->
+	{/if}
 		
 		
 		
 		
 		<div class="caption">{if $v.caption}{$v.caption}{elseif $v.fullname}{$v.fullname}{else}{$v.file_name}{/if}</div>
+		
+		
 		</div>
 	{/foreach}
 	
+-->	
+	
+{assign var=widthInCells value=2}
+<table>
+	{assign var=mediaCat value=false}
+	{foreach from=$term.media key=k item=v}
+		{if $k==0}
+			<tr>
+		{elseif $k%$widthInCells==0}
+			</tr>
+			<tr>
+			{section name=foo start=0 loop=$widthInCells}
+			{math equation="(x + y) - z" x=$k y=$smarty.section.foo.index z=$widthInCells assign=id}
+			  <td id="caption-{$id}" class="caption"></td>
+			{/section}
+			</tr>
+			<tr>
+		{/if}
+		<td class="media-cell">
+		{if $v.category=='image'}
+			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
+			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+			{if $v.thumb_name != ''}
+				<img
+					id="media-{$k}"
+					alt="{$v.caption}" 
+					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
+					class="image-thumb" />
+			{else}
+				<img
+					id="media-{$k}"
+					alt="{$v.caption}" 
+					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
+					class="image-full" />
+			{/if}
+			</a>
+		{elseif $v.category=='video'}
+				<img 
+					id="media-{$k}"
+					alt="{$v.description}" 
+					src="{$session.app.project.urls.systemMedia}video.jpg" 
+					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+					class="media-video-icon" />
+		{elseif $v.category=='audio'}
+				<object 
+					id="media-{$k}"
+					alt="{$v.description}" 
+					type="application/x-shockwave-flash" 
+					data="{$soundPlayerPath}{$soundPlayerName}" 
+					width="130" 
+					height="20">
+					<param name="movie" value="{$soundPlayerName}" />
+					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
+				</object>
+		{/if}
+		</td>
+	{assign var=mediaCat value=$v.category}
+	{if $requestData.disp==$v.id}
+		{assign var=dispUrl value=$smarty.capture.fullImgUrl}
+		{assign var=dispName value=$v.original_name}
+	{/if}
+	{/foreach}
+
+	{math assign=rest equation="(x%$widthInCells)+1" x=$k}
+	{section name=bar start=$rest loop=$widthInCells}
+	  <td></td>
+	{/section}
+
+	</tr>
+	<tr>
+	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
+	{section name=foo start=$z loop=$k+1}
+	  <td id="caption-{$smarty.section.foo.index}" class="caption"></td>
+	{/section}
+	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
+	{section name=bar start=$rest loop=$widthInCells}
+	  <td></td>
+	{/section}
+	</tr>
+
+				
+</table>	
 	
 	
 	</div>
 	{/if}
 </div>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+
+{if $dispUrl && $dispName}
+	showMedia('{$dispUrl}','{$dispName}'); 
+{/if}
+
+
+{literal}
+	$(".group1").colorbox({rel:'group1'});
+	
+	$('[id^=media-]').each(function(e){
+		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
+	});
+	
+});
+</script>
+{/literal}

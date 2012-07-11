@@ -66,21 +66,20 @@
 {/if}
 {if $content.common}
 <div id="common">
-	<div class="title">{t}Common Names{/t}</div>
 	<table>
 	<thead>
 		<tr class="highlight">
 			<th>{t}Common name{/t}</th>
-			<th>{t}Transliteration{/t}</th>
 			<th>{t}Language{/t}</th>
+			<th>{t}Transliteration{/t}</th>
 		</tr>
 	</thead>
 	<tbody>
 	{foreach from=$content.common key=k item=v}
 		<tr class="highlight">
 			<td>{$v.commonname}</td>
-			<td>{$v.transliteration}</td>
 			<td>{$v.language_name}</td>
+			<td>{$v.transliteration}</td>
 		</tr>
 	{/foreach}
 	</tbody>
@@ -89,9 +88,9 @@
 {/if}
 {elseif $activeCategory=='media' && $contentCount.media>0}
 
-{assign var=widthInCells value=5}
 
 <div id="media">
+{assign var=widthInCells value=5}
 <table>
 	{assign var=mediaCat value=false}
 	{foreach from=$content key=k item=v}
