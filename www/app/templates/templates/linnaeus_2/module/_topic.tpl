@@ -1,9 +1,9 @@
-{include file="../shared/_header-titles.tpl"}
-{include file="../shared/_search-main.tpl"}
+{include file="_search-main-no-tabs.tpl"}
 <div id="page-main">
 	<div id="content">
 		{if $page.image}
-		<img alt="{$page.image.file_name}" id="image-full" onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$page.image.file_name|escape:'url'}','{$page.topic}')" src="{$session.app.project.urls.uploadedMedia}{$page.image.file_name|escape:'url'}" />
+		<div class="introduction-img" style="background: url('{$session.app.project.urls.uploadedMedia}{$page.image.file_name|escape:'url'}');">
+		</div>
 		{/if}
 		{$page.content}
 	</div>
