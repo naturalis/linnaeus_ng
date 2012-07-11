@@ -96,7 +96,7 @@
 		{if $k==0}
 			<tr id="row-{$row}">
 		{elseif $k%5==0}
-			</tr><tr id="row-{$row++}"><td></td><td></td><td></td><td></td><td></td></tr><tr id="row-{$row}">{/if}
+			</tr><tr id="row-{$row++}"><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr id="row-{$row}">{/if}
 		<td class="media-cell">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}

@@ -106,7 +106,6 @@
 }
 
 #page-main .media-cell {
-	float: left;
 	width: 150px;
 	text-align: center;
 	padding-right: 10px;
@@ -116,7 +115,6 @@
 #page-main .image-thumb, .image-full {
 	border: 1px solid #666;
 	cursor: pointer;
-	display: block;
 	margin: 0 auto;
 }
 

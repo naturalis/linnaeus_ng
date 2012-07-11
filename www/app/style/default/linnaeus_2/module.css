@@ -1,13 +1,12 @@
 #page-main .topic {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 #page-main .topic:hover {
-	text-decoration:underline;
+	text-decoration: underline;
 }
 
 #page-main #content {
-	width: 60em;
 }
 
 #page-main #content #image-thumb, #image-full {
@@ -17,7 +16,7 @@
 }
 
 #page-main #content #image-full {
-	width:150px;
+	width: 150px;
 }
 
 

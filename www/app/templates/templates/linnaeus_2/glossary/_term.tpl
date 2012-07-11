@@ -20,7 +20,7 @@
 		
 		
 		
-	{if $v.category=='image'}
+	<!-- {if $v.category=='image'} -->
 		{if $v.thumb_name}
 			<img
 				alt="{$v.original_name}"
@@ -34,7 +34,7 @@
 				onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}','{$v.original_name}');" 
 				src="{$session.app.project.urls.uploadedMedia}{$v.file_name|escape:'url'}" />
 		{/if}
-	{elseif $v.category=='video'}
+	<!-- {elseif $v.category=='video'}
 			<img 
 				alt="{$v.original_name}" 
 				src="{$session.app.project.urls.systemMedia}video.jpg" 
@@ -45,7 +45,7 @@
 				<param name="movie" value="{$soundPlayerName}" />
 				<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 			</object>
-	{/if}
+	{/if} -->
 		
 		
 		
