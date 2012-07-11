@@ -290,10 +290,10 @@ class GlossaryController extends Controller
 					'glossary_id' => $id	
 				),
 				'columns' => 'file_name,thumb_name,original_name,id,fullname,mime_type,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime',
-				'order' => 'mime, sort_order'
+				'order' => 'mime'
 			)
 		);
-		
+
 		$this->loadControllerConfig('Species');
 		
 		$mimes = $this->controllerSettings['mime_types'];
