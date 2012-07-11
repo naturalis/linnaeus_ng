@@ -10,6 +10,7 @@ class configuration
     public function __construct ()
     {
 
+		$this->_setConstants();	
         $d = $this->getGeneralSettings();
         $this->_appFileRoot = dirname(__FILE__);
         $this->_appFileRoot = str_replace('\\','/',
@@ -212,6 +213,24 @@ class configuration
 		);
 
     }
+
+	private function _setConstants()
+	{
+
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INTRODUCTION',1);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_GLOSSARY',2);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_SPECIES',4);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_HIGHERTAXA',5);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_KEY',6);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_MATRIXKEY',7);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_DISTRIBUTION',8);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_CONTENT',10);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INDEX',11);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_UTILITIES',12);
+		
+	}
+
 
 }
 

@@ -9,7 +9,7 @@ class configuration
     public function __construct ()
     {
 
-		$this->setConstants();
+		$this->_setConstants();
 
         $d = $this->getGeneralSettings();
         $d['app']['pathName'];
@@ -19,13 +19,25 @@ class configuration
 
     }
 
-	private function setConstants()
+	private function _setConstants()
 	{
 
 		if (!defined('ID_ROLE_SYS_ADMIN')) define('ID_ROLE_SYS_ADMIN',1);
 		if (!defined('ID_ROLE_LEAD_EXPERT')) define('ID_ROLE_LEAD_EXPERT',2);
 
 		if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
+
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INTRODUCTION',1);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_GLOSSARY',2);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_SPECIES',4);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_HIGHERTAXA',5);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_KEY',6);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_MATRIXKEY',7);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_DISTRIBUTION',8);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_CONTENT',10);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INDEX',11);
+		if (!defined('MODCODE_LITERATURE')) define('MODCODE_UTILITIES',12);
 
     }
 
