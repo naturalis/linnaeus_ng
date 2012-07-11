@@ -88,51 +88,79 @@
 </div>
 {/if}
 {elseif $activeCategory=='media' && $contentCount.media>0}
+
+{assign var=widthInCells value=5}
+
 <div id="media">
 <table>
 	{assign var=mediaCat value=false}
-	{assign var=row value=1}
 	{foreach from=$content key=k item=v}
 		{if $k==0}
-			<tr id="row-{$row}">
-		{elseif $k%5==0}
-			</tr><tr id="row-{$row++}"><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr id="row-{$row}">{/if}
+			<tr>
+		{elseif $k%$widthInCells==0}
+			</tr>
+			<tr>
+			{section name=foo start=0 loop=$widthInCells}
+			{math equation="(x + y) - z" x=$k y=$smarty.section.foo.index z=$widthInCells assign=id}
+			  <td id="caption-{$id}"></td>
+			{/section}
+			</tr>
+			<tr>
+		{/if}
 		<td class="media-cell">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
 			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 			{if $v.thumb_name != ''}
 				<img
-					alt="{$v.original_name}" 
+					id="media-{$k}"
+					alt="{$v.description}" 
 					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
 					class="image-thumb" />
 			{else}
 				<img
-					alt="{$v.original_name}" 
+					id="media-{$k}"
+					alt="{$v.description}" 
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
 			</a>
 		{elseif $v.category=='video'}
 				<img 
-					alt="{$v.original_name}" 
-					src=".{$session.app.project.urls.systemMedia}video.jpg" 
+					id="media-{$k}"
+					alt="{$v.description}" 
+					src="{$session.app.project.urls.systemMedia}video.jpg" 
 					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 					class="media-video-icon" />
 		{elseif $v.category=='audio'}
-				<object type="application/x-shockwave-flash" data="{$soundPlayerPath}{$soundPlayerName}" width="130" height="20">
+				<object 
+					id="media-{$k}"
+					alt="{$v.description}" 
+					type="application/x-shockwave-flash" 
+					data="{$soundPlayerPath}{$soundPlayerName}" 
+					width="130" 
+					height="20">
 					<param name="movie" value="{$soundPlayerName}" />
 					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 				</object>
 		{/if}
 		</td>
-		<!-- <td class="caption">{$v.description}</td>  -->
 	{assign var=mediaCat value=$v.category}
 	{if $requestData.disp==$v.id}
 		{assign var=dispUrl value=$smarty.capture.fullImgUrl}
 		{assign var=dispName value=$v.original_name}
 	{/if}
 	{/foreach}
+
+	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
+	</tr>
+	<tr>
+	{section name=foo start=$z loop=$k+1}
+	  <td id="caption-{$smarty.section.foo.index}"></td>
+	{/section}
+	</tr>
+
+				
 </table>
 </div>
 {else}
@@ -164,7 +192,12 @@ $(document).ready(function(){
 {/foreach}
 
 {literal}
-	$(".group1").colorbox({rel:'group1'});	
+	$(".group1").colorbox({rel:'group1'});
+	
+	$('[id^=media-]').each(function(e){
+		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
+	});
+	
 });
 </script>
 {/literal}
