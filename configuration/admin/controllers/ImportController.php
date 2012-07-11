@@ -1008,8 +1008,6 @@ class ImportController extends Controller
 
 			}
 			
-			$this->importPostProcessing();
-
 			$this->smarty->assign('processed',true);
 		}
 			
@@ -1075,6 +1073,8 @@ class ImportController extends Controller
 				$this->addMessage('Skipped additional modules.');
 
 			}
+
+			$this->importPostProcessing();
 
 			$this->smarty->assign('processed',true);
 			
@@ -1277,60 +1277,68 @@ class ImportController extends Controller
 		
 			$topic = trim($page[$titleField]);
 			$content = trim($page[$contentField]);
-
-			// create a new page
-			$this->models->FreeModulePage->save(
-				array(
-					'project_id' => $this->getNewProjectId(),
-					'module_id' => $newModuleId,
-					'got_content' => 1
-				)
-			);
 			
-			$newPageId = $this->models->FreeModulePage->getNewId();
+			if (!empty($topic)) {
+
+				// create a new page
+				$this->models->FreeModulePage->save(
+					array(
+						'project_id' => $this->getNewProjectId(),
+						'module_id' => $newModuleId,
+						'got_content' => 1
+					)
+				);
+				
+				$newPageId = $this->models->FreeModulePage->getNewId();
+			
+				// save the title and content
+				$this->models->ContentFreeModule->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getNewProjectId(), 
+						'module_id' => $newModuleId,
+						'language_id' => $this->getNewDefaultLanguageId(), 
+						'page_id' => $newPageId,
+						'topic' => $topic,
+						'content' => $this->replaceOldMarkUp($content)
+					)
+				);
+	
+				$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
+	
+				$moduleLinkName =
+					!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
+						$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
+						$module;
+	
+				$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
+	
+				if (!empty($image)) {
 		
-			// save the title and content
-			$this->models->ContentFreeModule->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getNewProjectId(), 
-					'module_id' => $newModuleId,
-					'language_id' => $this->getNewDefaultLanguageId(), 
-					'page_id' => $newPageId,
-					'topic' => $topic,
-					'content' => $this->replaceOldMarkUp($content)
-				)
-			);
-
-			$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
-
-			$moduleLinkName =
-				!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
-					$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
-					$module;
-
-			$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
-
-			if (!empty($image)) {
-	
-				if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
-				
-					$this->models->FreeModulePage->update(
-						array(
-							'image' => $image
-						),
-						array(
-							'project_id' => $this->getNewProjectId(),
-							'module_id' => $newModuleId
-						)
-					);			
-				
-				} else {
-				
-					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
-				
+					if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
+					
+						$this->models->FreeModulePage->update(
+							array(
+								'image' => $image
+							),
+							array(
+								'project_id' => $this->getNewProjectId(),
+								'id' => $newPageId
+							)
+						);			
+					
+					} else {
+					
+						$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
+					
+					}
+		
 				}
-	
+				
+			} else {
+			
+				// encountered empty topic
+			
 			}
 			
 		}
@@ -4000,7 +4008,6 @@ class ImportController extends Controller
 
 	private function createLookupArrays()
 	{
-
 
 		$s = $g = $l = $m = null;
 
