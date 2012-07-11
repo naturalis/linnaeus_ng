@@ -102,7 +102,7 @@
 			<tr>
 			{section name=foo start=0 loop=$widthInCells}
 			{math equation="(x + y) - z" x=$k y=$smarty.section.foo.index z=$widthInCells assign=id}
-			  <td id="caption-{$id}"></td>
+			  <td id="caption-{$id}" class="caption"></td>
 			{/section}
 			</tr>
 			<tr>
@@ -161,7 +161,7 @@
 	<tr>
 	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
 	{section name=foo start=$z loop=$k+1}
-	  <td id="caption-{$smarty.section.foo.index}"></td>
+	  <td id="caption-{$smarty.section.foo.index}" class="caption"></td>
 	{/section}
 	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
 	{section name=bar start=$rest loop=$widthInCells}

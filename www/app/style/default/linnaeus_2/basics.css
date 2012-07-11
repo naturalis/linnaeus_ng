@@ -375,3 +375,37 @@ a:hover, .internal-link:hover {
 .italics {
 	font-style: italic;
 }
+
+td.media-cell, td.caption {
+	padding-right: 10px;
+}
+	
+td.media-cell {
+	width: 150px;
+	text-align: center;
+   	vertical-align: bottom;
+}
+
+#page-main img.image-full {
+	border: 1px solid #666;
+	cursor: pointer;
+	margin: 0 auto;
+}
+
+#page-main img.image-full {
+	max-height: 125px;
+	max-width: 150px;
+}
+
+td.caption {
+	font-size: 9px;
+	padding-top: 2px;
+	padding-bottom: 15px;
+	line-height: 10px;
+	text-align: center;
+   	vertical-align: top;
+}
+
+img.media-video-icon {
+	cursor:pointer;
+}
