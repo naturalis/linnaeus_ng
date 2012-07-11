@@ -623,7 +623,7 @@ class SpeciesController extends Controller
 					'taxon_id' => $taxon
 				),
 				'columns' => 'language_id,commonname,transliteration',
-				'order' => 'show_order'
+				'order' => 'show_order,commonname'
 			)
 		);
 
