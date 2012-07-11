@@ -129,6 +129,8 @@ class ImportController extends Controller
 	public $cssToLoad = array('import.css');
 	public $jsToLoad = array();
 	
+	private $_sawModule = false;
+	
 	private $_deleteOldMediaAfterImport = false; // might become a switch later, but let's not overdo it
 	
 	private $_knownModules = array('file','project','proj_literature','glossary','introduction','tree','records','text_key','pict_key','diversity');
@@ -403,10 +405,10 @@ class ImportController extends Controller
 			
 			$this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
 
-			$this->addModuleToProject(4,$this->getNewProjectId());
-			$this->addModuleToProject(5,$this->getNewProjectId());
-			$this->grantModuleAccessRights(4);
-			$this->grantModuleAccessRights(5);
+			$this->addModuleToProject(MODCODE_SPECIES,$this->getNewProjectId());
+			$this->addModuleToProject(MODCODE_HIGHERTAXA,$this->getNewProjectId());
+			$this->grantModuleAccessRights(MODCODE_SPECIES);
+			$this->grantModuleAccessRights(MODCODE_HIGHERTAXA);
 			
 			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['ranks']).' ranks');
 			$this->addMessage('Saved '.count((array)$_SESSION['admin']['system']['import']['loaded']['species']).' species');
@@ -659,8 +661,13 @@ class ImportController extends Controller
 		
 					}
 
-					$this->addModuleToProject(3,$this->getNewProjectId());
-					$this->grantModuleAccessRights(3);
+					if ($this->_sawModule) {
+
+						$this->addModuleToProject(MODCODE_LITERATURE,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_LITERATURE);
+						$this->_sawModule = false;
+
+					}
 
 				} else {
 				
@@ -697,8 +704,13 @@ class ImportController extends Controller
 
 					unset($_SESSION['admin']['system']['import']['mimes']);
 
-					$this->addModuleToProject(2,$this->getNewProjectId());
-					$this->grantModuleAccessRights(2);
+					if ($this->_sawModule) {
+
+						$this->addModuleToProject(MODCODE_GLOSSARY,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_GLOSSARY);
+						$this->_sawModule = false;
+
+					}
 
 				} else {
 				
@@ -752,8 +764,13 @@ class ImportController extends Controller
 					
 					$this->helpers->XmlParser->getNodes('project');
 
-					$this->addModuleToProject(10,$this->getNewProjectId());
-					$this->grantModuleAccessRights(10);
+					if ($this->_sawModule) {
+
+						$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_CONTENT);
+						$this->_sawModule = false;
+
+					}
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'])!==0) {
 		
@@ -785,8 +802,14 @@ class ImportController extends Controller
 
 					$this->helpers->XmlParser->getNodes('topic');
 
-					$this->addModuleToProject(1,$this->getNewProjectId());
-					$this->grantModuleAccessRights(1);
+					if ($this->_sawModule) {
+
+						$this->addModuleToProject(MODCODE_INTRODUCTION,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_INTRODUCTION);
+						$this->_sawModule = false;
+
+					}
+
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'])!==0) {
 		
@@ -858,16 +881,22 @@ class ImportController extends Controller
 
 					$this->helpers->XmlParser->getNodes('text_key');
 					$this->helpers->XmlParser->getNodes('pict_key');
+					
+					if ($this->_sawModule) {
 
-					$this->addModuleToProject(6,$this->getNewProjectId());
-					$this->grantModuleAccessRights(6);
-					$this->saveSetting(
-						array(
-							'name' => 'keytype',
-							'value' => 'l2',
-							'pId' => $this->getNewProjectId()
-						)
-					);
+						$this->addModuleToProject(MODCODE_KEY,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_KEY);
+						$this->saveSetting(
+							array(
+								'name' => 'keytype',
+								'value' => 'l2',
+								'pId' => $this->getNewProjectId()
+							)
+						);
+						$this->_sawModule = false;
+
+					}
+
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'])!==0) {
 		
@@ -914,8 +943,8 @@ class ImportController extends Controller
 			
 						}
 	
-						$this->addModuleToProject(7,$this->getNewProjectId());
-						$this->grantModuleAccessRights(7);
+						$this->addModuleToProject(MODCODE_MATRIXKEY,$this->getNewProjectId());
+						$this->grantModuleAccessRights(MODCODE_MATRIXKEY);
 		
 						$this->addMessage('Created matrix key(s).');
 	
@@ -983,16 +1012,23 @@ class ImportController extends Controller
 				$this->loadControllerConfig();
 
 				$this->updateMapTypeColours();
+				
+				
+				if ($this->_sawModule) {
 
-				$this->addModuleToProject(8,$this->getNewProjectId());
-				$this->grantModuleAccessRights(8);				
-				$this->saveSetting(
-						array(
-							'name' => 'maptype',
-							'value' => 'l2',
-							'pId' => $this->getNewProjectId()
-						)
-					);
+					$this->addModuleToProject(MODCODE_DISTRIBUTION,$this->getNewProjectId());
+					$this->grantModuleAccessRights(MODCODE_DISTRIBUTION);				
+					$this->saveSetting(
+							array(
+								'name' => 'maptype',
+								'value' => 'l2',
+								'pId' => $this->getNewProjectId()
+							)
+						);					
+					$this->_sawModule = false;
+
+				}
+
 
 				$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['map']['saved'].' map items.');
 
@@ -1124,6 +1160,8 @@ class ImportController extends Controller
 
 	public function xmlParserCallback_Literature($obj)
 	{
+	
+		$this->_sawModule = true;
 
 		$this->addLiterature($obj);
 
@@ -1132,12 +1170,16 @@ class ImportController extends Controller
 	public function xmlParserCallback_Glossary($obj)
 	{
 
+		$this->_sawModule = true;
+
 		$this->addGlossary($obj);
 
 	}
 
 	public function xmlParserCallback_Welcome($obj)
 	{
+
+		$this->_sawModule = true;
 
 		$this->addWelcomeTexts($obj);
 
@@ -1146,12 +1188,16 @@ class ImportController extends Controller
 	public function xmlParserCallback_Introduction($obj)
 	{
 
+		$this->_sawModule = true;
+
 		$this->addIntroduction($obj);
 
 	}
 
 	public function xmlParserCallback_KeyDichotomous($obj,$node)
 	{
+
+		$this->_sawModule = true;
 
 		$this->addKeyDichotomous($obj,$node);
 
@@ -1173,6 +1219,8 @@ class ImportController extends Controller
 
 	public function xmlParserCallback_Map($obj)
 	{
+	
+		$this->_sawModule = true;
 
 		$this->saveMapItem($obj);
 
@@ -1204,7 +1252,7 @@ class ImportController extends Controller
 
 		$this->grantFreeModuleAccessRights($newModuleId);	
 		
-			// element names for the module pages can vary, find out the element name for the entire page
+		// element names for the module pages can vary, find out the element name for the entire page
 		$arrayData = (array)$data;
 		$d = array_keys($arrayData);
 		$pageName = $d[0];
@@ -1250,7 +1298,8 @@ class ImportController extends Controller
 		$paths = isset($_SESSION['admin']['system']['import']['paths']) ? 
 			$_SESSION['admin']['system']['import']['paths'] : 
 			$this->makePathNames($this->getNewProjectId());
-
+			
+		$showOrder = 0;
 
 		// saving the actual pages
 		foreach((array)$arrayData[$pageName] as $page) {
@@ -1277,7 +1326,7 @@ class ImportController extends Controller
 		
 			$topic = trim($page[$titleField]);
 			$content = trim($page[$contentField]);
-			
+
 			if (!empty($topic)) {
 
 				// create a new page
@@ -1285,14 +1334,15 @@ class ImportController extends Controller
 					array(
 						'project_id' => $this->getNewProjectId(),
 						'module_id' => $newModuleId,
-						'got_content' => 1
+						'got_content' => 1,
+						'show_order' => $showOrder++
 					)
 				);
 				
 				$newPageId = $this->models->FreeModulePage->getNewId();
 			
 				// save the title and content
-				$this->models->ContentFreeModule->save(
+				$cfm = $this->models->ContentFreeModule->save(
 					array(
 						'id' => null, 
 						'project_id' => $this->getNewProjectId(), 
@@ -1303,41 +1353,52 @@ class ImportController extends Controller
 						'content' => $this->replaceOldMarkUp($content)
 					)
 				);
+				
+				if ($cfm===true) {
 	
-				$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
-	
-				$moduleLinkName =
-					!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
-						$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
-						$module;
-	
-				$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] = array('moduleId' => $newModuleId, 'pageId' => $newPageId);
-	
-				if (!empty($image)) {
+					$_SESSION['admin']['system']['import']['loaded']['custom']['saved'][] = '  Saved '.$module.' topic "'.$topic.'".';
 		
-					if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
-					
-						$this->models->FreeModulePage->update(
-							array(
-								'image' => $image
-							),
-							array(
-								'project_id' => $this->getNewProjectId(),
-								'id' => $newPageId
-							)
-						);			
-					
-					} else {
-					
-						$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
-					
+					$moduleLinkName =
+						!is_null($_SESSION['admin']['system']['import']['freeModules']['names'][$module]) ?
+							$_SESSION['admin']['system']['import']['freeModules']['names'][$module] :
+							$module;
+		
+					$_SESSION['admin']['system']['import']['freeModules']['ids'][$moduleLinkName][$topic] =
+						array('moduleId' => $newModuleId, 'pageId' => $newPageId);
+	
+					if (!empty($image)) {
+			
+						if ($this->cRename($_SESSION['admin']['system']['import']['imagePath'].$image,$paths['project_media'].$image)) {
+						
+							$this->models->FreeModulePage->update(
+								array(
+									'image' => $image
+								),
+								array(
+									'project_id' => $this->getNewProjectId(),
+									'id' => $newPageId
+								)
+							);			
+						
+						} else {
+						
+							$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save image '.$image.' for topic "'.$topic.'".';	
+						
+						}
+			
 					}
-		
+					
+				} else {
+
+					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Could not save content for topic "'.$topic.'" ('.$cfm.').';	
+
 				}
 				
 			} else {
 			
 				// encountered empty topic
+				if (!empty($content))
+					$_SESSION['admin']['system']['import']['loaded']['custom']['failed'][] = '  Skipped titleless topic ("'.substr($content,0,25).'...").';	
 			
 			}
 			
@@ -2029,7 +2090,7 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					$fileName,
+					null,
 					true,
 					$imageCount++
 				);
@@ -2058,7 +2119,8 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
+					//trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
+					isset($vVal->caption) ? trim((string)$vVal->caption) : null,
 					false,
 					$imageCount++
 				);
@@ -2125,15 +2187,19 @@ class ImportController extends Controller
 					)
 				);
 
-                $this->models->MediaDescriptionsTaxon->save(
-                    array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'language_id' => $this->getNewDefaultLanguageId(),	
-                        'media_id' => $this->models->MediaTaxon->getNewId(), 
-                        'description' => $caption
-                    )
-                );
+				if (!empty($caption)) {
+
+					$this->models->MediaDescriptionsTaxon->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getNewProjectId(),
+							'language_id' => $this->getNewDefaultLanguageId(),	
+							'media_id' => $this->models->MediaTaxon->getNewId(), 
+							'description' => $caption
+						)
+					);
+					
+				}
 
 				return array(
 					'saved' => true,
@@ -2720,11 +2786,13 @@ class ImportController extends Controller
 
 		if ($res===true) {
 
-			$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'][] = 'Saved topic "'.trim((string)$obj->introduction_title).'".';
+			$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'][] =
+				'Saved topic "'.trim((string)$obj->introduction_title).'".';
 
 		} else {
 				
-			$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'][] = 'Failed to save topic "'.trim((string)$obj->introduction_title).'" ('.$res.').';
+			$_SESSION['admin']['system']['import']['loaded']['introduction']['failed'][] =
+				'Failed to save topic "'.trim((string)$obj->introduction_title).'" ('.$res.').';
 			return;
 
 		}
@@ -3158,14 +3226,15 @@ class ImportController extends Controller
 
 					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['charname'] = $charname;
 					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
-					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
-						'statename'=>$statename,
-						'statemin'=>$statemin,
-						'statemax'=>$statemax,
-						'statemean'=>$statemean,
-						'statesd'=>$statesd,
-						'statefile'=>$statefile,
-					);
+					$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] =
+						array(
+							'statename'=>$statename,
+							'statemin'=>$statemin,
+							'statemax'=>$statemax,
+							'statemean'=>$statemean,
+							'statesd'=>$statesd,
+							'statefile'=>$statefile,
+						);
 
 				}
 
@@ -3379,7 +3448,8 @@ class ImportController extends Controller
 									'id' => null,
 									'project_id' => $this->getNewProjectId(),
 									'matrix_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['matrix_id'],
-									'characteristic_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['characteristic_id'],
+									'characteristic_id' =>
+										$_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['characteristic_id'],
 									'state_id' => $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex]['state_id'],
 									'taxon_id' => $taxonid,
 								)
@@ -3542,7 +3612,7 @@ class ImportController extends Controller
 		
 		} else {
 
-			$this->addError($this->storeError('Missing map file: "'.$mapImageName.'"<br />(will still function properly if map exists in default folder).','Map'));
+			$this->addError($this->storeError('Missing map file: "'.$mapImageName.'" <br />(will still function properly if map exists in default folder).','Map'));
 	
 		}
 
@@ -3566,7 +3636,6 @@ class ImportController extends Controller
 		);
 
 	}
-
 
 	private function saveMapItem($obj)
 	{
@@ -3641,7 +3710,8 @@ class ImportController extends Controller
 				foreach($vVal->squares->square as $sKey => $sVal) {
 
 					if (!isset($_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
-						$_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] = $this->saveMapItemType(trim((string)$sVal->legend));
+						$_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] =
+							$this->saveMapItemType(trim((string)$sVal->legend));
 
 					// determining the position of the square in the map grid
 					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
@@ -3993,16 +4063,16 @@ class ImportController extends Controller
 		$res = $this->fixOldInternalLinks();
 
 		// additional texts
-		$this->addModuleToProject(10,$this->getNewProjectId());
-		$this->grantModuleAccessRights(10);
+		$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
+		$this->grantModuleAccessRights(MODCODE_CONTENT);
 
 		// index
-		$this->addModuleToProject(11,$this->getNewProjectId());
-		$this->grantModuleAccessRights(11);
+		$this->addModuleToProject(MODCODE_INDEX,$this->getNewProjectId());
+		$this->grantModuleAccessRights(MODCODE_INDEX);
 
 		// search
-		$this->addModuleToProject(12,$this->getNewProjectId());
-		$this->grantModuleAccessRights(12);
+		$this->addModuleToProject(MODCODE_UTILITIES,$this->getNewProjectId());
+		$this->grantModuleAccessRights(MODCODE_UTILITIES);
 	
 	}
 
@@ -4266,7 +4336,8 @@ class ImportController extends Controller
 	private function downloadErrorLog()
 	{
 
-		header('Content-disposition:attachment;filename=import-'. strtolower(preg_replace('/\W/','',$_SESSION['admin']['system']['import']['errorlog']['header']['project'])).'-errors.log');
+		header('Content-disposition:attachment;filename=import-'.
+			strtolower(preg_replace('/\W/','',$_SESSION['admin']['system']['import']['errorlog']['header']['project'])).'-errors.log');
 		header('Content-type:text/txt');
 
 		echo 'project: '.$_SESSION['admin']['system']['import']['errorlog']['header']['project'].chr(10);

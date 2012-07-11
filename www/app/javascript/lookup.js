@@ -238,10 +238,6 @@ function allLookupBuildList(obj,txt) {
 
 		}
 
-		//str = '</table>';
-		$('#'+allLookupListName).append(str);
-		$('#'+allLookupDialogContentName).append(str);
-
 	}
 
 	var dialogTop = Math.abs($(window).height() - $('#dialog').height()) / 2;

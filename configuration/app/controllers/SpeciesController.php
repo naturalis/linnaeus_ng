@@ -364,8 +364,7 @@ class SpeciesController extends Controller
 			}
 
 			// std cats
-			$d = array_merge(
-				$d,
+			$stdCats = 
 				array(
 					0 => array(
 						'id' => 'media',
@@ -378,13 +377,19 @@ class SpeciesController extends Controller
 					2 => array(
 						'id' => 'names',
 						'title' => _('Names')
-					),
-					3 => array(
-						'id' => 'literature',
-						'title' => _('Literature')
-					),
-				)
-			);
+					)
+				);
+				
+			if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
+			
+				$stdCats[] = array(
+					'id' => 'literature',
+					'title' => _('Literature')
+				);
+
+			}
+
+			$d = array_merge($d,$stdCats);
 
 			return array(
 				'categories' => $d,
@@ -512,7 +517,6 @@ class SpeciesController extends Controller
 			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
 			$mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'].$mt[$key]['file_name'];
-
 
 		}
 

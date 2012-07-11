@@ -1284,6 +1284,7 @@ class Controller extends BaseClass
 				$modules[$key]['module'] = $mp['module'];
 				$modules[$key]['controller'] = $mp['controller'];
 				$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
+				$_SESSION['app']['project']['active-modules'][$mp['id']] = $mp['module'];
 
 			}
 
@@ -1545,6 +1546,12 @@ class Controller extends BaseClass
 	
 	}
 
+	public function doesProjectHaveModule($mpCode)
+	{
+
+		return isset($_SESSION['app']['project']['active-modules'][$mpCode]);
+
+	}
 	
 	private function setPhpIniVars()
 	{

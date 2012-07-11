@@ -763,7 +763,7 @@ class MapKeyController extends Controller
 
 		foreach ((array)$gt as $key => $val) {
 
-			$g = $gtl[$val['id']];
+			$g = isset($gtl[$val['id']]) ? $gtl[$val['id']] : null;
 			$gt[$key]['title'] = isset($g['title']) ? $g['title'] : '-';
 			$gt[$key]['colour_inverse'] = $this->inverseColour($val['colour']);
 	
