@@ -152,11 +152,20 @@
 	{/if}
 	{/foreach}
 
-	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
+	{math assign=rest equation="(x%$widthInCells)+1" x=$k}
+	{section name=bar start=$rest loop=$widthInCells}
+	  <td></td>
+	{/section}
+
 	</tr>
 	<tr>
+	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
 	{section name=foo start=$z loop=$k+1}
 	  <td id="caption-{$smarty.section.foo.index}"></td>
+	{/section}
+	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
+	{section name=bar start=$rest loop=$widthInCells}
+	  <td></td>
 	{/section}
 	</tr>
 
