@@ -22,28 +22,3 @@
 	padding-left: 20px;
 	border-left: 1px dotted #0303b2;
 }
-
-#page-main .media-cell {
-	float: left;
-	width: 150px;
-	text-align: center;
-	padding-right: 10px;
-}
-
-#page-main .image-thumb, .image-full {
-	border: 1px solid #666;
-	cursor: pointer;
-	display: block;
-	margin: 0 auto;
-}
-
-#page-main .image-full {
-	max-height: 125px;
-	max-width: 150px;
-}
-
-#page-main .caption {
-	font-size: 9px;
-	padding: 2px 0 5px 0;
-	line-height: 10px;
-}
