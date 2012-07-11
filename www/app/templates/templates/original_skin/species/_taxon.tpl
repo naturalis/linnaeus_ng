@@ -113,8 +113,10 @@
 </div>
 {/if}
 {elseif $activeCategory=='media' && $contentCount.media>0}
+
 <div id="media">
-<table>
+{assign var=widthInCells value=2}
+<table id="media-grid">
 	{assign var=mediaCat value=false}
 	{foreach from=$content key=k item=v}
 		{if $k==0}
@@ -124,7 +126,7 @@
 			<tr>
 			{section name=foo start=0 loop=$widthInCells}
 			{math equation="(x + y) - z" x=$k y=$smarty.section.foo.index z=$widthInCells assign=id}
-			  <td id="caption-{$id}"></td>
+			  <td id="caption-{$id}" class="caption"></td>
 			{/section}
 			</tr>
 			<tr>
@@ -132,7 +134,7 @@
 		<td class="media-cell">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}"> 
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
@@ -146,7 +148,7 @@
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
-			</a>
+		</a>
 		{elseif $v.category=='video'}
 				<img 
 					id="media-{$k}"
@@ -182,14 +184,18 @@
 	</tr>
 	<tr>
 	{math equation="x-(x%y)" x=$k y=$widthInCells assign=z}
+	
 	{section name=foo start=$z loop=$k+1}
-	  <td id="caption-{$smarty.section.foo.index}"></td>
+	  <td id="caption-{$smarty.section.foo.index}" class="caption"></td>
 	{/section}
 	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
+	{if $rest > 0}
 	{section name=bar start=$rest loop=$widthInCells}
 	  <td></td>
 	{/section}
+	{/if}
 	</tr>
+		
 </table>
 </div>
 {else}
