@@ -37,7 +37,7 @@
     </td><td id="mapName">
 
         {if $maps|@count>1}
-            <span class="selectIcon" title="{t}Go to another map{/t}" onclick="
+            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
                showDialog('{t}Choose a map{/t}',
                 '<div id=\'lookup-DialogContent\'>'+
                     {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}&idA={$taxonA.id}&idB={$taxonB.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
