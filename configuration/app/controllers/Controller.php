@@ -423,9 +423,9 @@ class Controller extends BaseClass
 	public function newGetProjectRanks()
 	{
 
-		if (!isset($_SESSION['admin']['user']['species']['projectRank'])) {
+		if (!isset($_SESSION['app']['user']['species']['projectRank'])) {
 
-			$_SESSION['admin']['user']['species']['projectRank'] =
+			$_SESSION['app']['user']['species']['projectRank'] =
 				$this->models->ProjectRank->_get(
 					array(
 						'id' => array(
@@ -437,7 +437,7 @@ class Controller extends BaseClass
 
 		}
 		
-		return $_SESSION['admin']['user']['species']['projectRank'];
+		return $_SESSION['app']['user']['species']['projectRank'];
 
 	}
 	
