@@ -2,6 +2,8 @@
 
 /*
 
+	should add '_sawModule' to all modules
+
 
 
 	keys als enige buiten de boom: nergens een los veld met de rank
@@ -129,11 +131,11 @@ class ImportController extends Controller
 	public $cssToLoad = array('import.css');
 	public $jsToLoad = array();
 	
-	private $_sawModule = false;
-	
 	private $_deleteOldMediaAfterImport = false; // might become a switch later, but let's not overdo it
 	
 	private $_knownModules = array('file','project','proj_literature','glossary','introduction','tree','records','text_key','pict_key','diversity');
+	
+	private $_sawModule = false;
 
     /**
      * Constructor, calls parent's constructor
@@ -541,7 +543,7 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped species description.');
+					$this->addMessage($this->storeError('Skipped species description.'));
 								
 				}
 
@@ -563,7 +565,7 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped media.');
+					$this->addMessage($this->storeError('Skipped media.'));
 								
 				}
 
@@ -580,7 +582,7 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped common names.');
+					$this->addMessage($this->storeError('Skipped common names.'));
 
 				}
 
@@ -598,7 +600,7 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped synonyms.');
+					$this->addMessage($this->storeError('Skipped synonyms.'));
 								
 				}
 
@@ -608,10 +610,10 @@ class ImportController extends Controller
 	
 			} else {
 
-				$this->addMessage('Skipped species description.');
-				$this->addMessage('Skipped media.');
-				$this->addMessage('Skipped common names.');
-				$this->addMessage('Skipped synonyms.');
+				$this->addMessage($this->storeError('Skipped species description.'));
+				$this->addMessage($this->storeError('Skipped media.'));
+				$this->addMessage($this->storeError('Skipped common names.'));
+				$this->addMessage($this->storeError('Skipped synonyms.'));
 
 			}
 	
@@ -660,18 +662,23 @@ class ImportController extends Controller
 							$this->addError($this->storeError($val['cause'],'Literature'));
 		
 					}
-
+					
 					if ($this->_sawModule) {
 
 						$this->addModuleToProject(MODCODE_LITERATURE,$this->getNewProjectId());
 						$this->grantModuleAccessRights(MODCODE_LITERATURE);
+
 						$this->_sawModule = false;
 
+					} else {
+					
+						$this->addMessage($this->storeError('Didn\'t find any literature.','Literature'));
+					
 					}
 
 				} else {
-				
-					$this->addMessage('Skipped literature.');
+
+					$this->addMessage($this->storeError('Skipped literature.'));
 				
 				}
 
@@ -708,20 +715,25 @@ class ImportController extends Controller
 
 						$this->addModuleToProject(MODCODE_GLOSSARY,$this->getNewProjectId());
 						$this->grantModuleAccessRights(MODCODE_GLOSSARY);
+
 						$this->_sawModule = false;
 
+					} else {
+					
+						$this->addMessage($this->storeError('Didn\'t find a glossary.','Glossary'));
+					
 					}
 
 				} else {
 				
-					$this->addMessage('Skipped glossary.');
+					$this->addMessage($this->storeError('Skipped glossary.'));
 				
 				}
 
 			} else {
 			
-				$this->addMessage('Skipped literature.');				
-				$this->addMessage('Skipped glossary.');
+				$this->addMessage($this->storeError('Skipped literature.'));				
+				$this->addMessage($this->storeError('Skipped glossary.'));
 
 			}
 	
@@ -764,13 +776,9 @@ class ImportController extends Controller
 					
 					$this->helpers->XmlParser->getNodes('project');
 
-					if ($this->_sawModule) {
+					$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
+					$this->grantModuleAccessRights(MODCODE_CONTENT);
 
-						$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
-						$this->grantModuleAccessRights(MODCODE_CONTENT);
-						$this->_sawModule = false;
-
-					}
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['welcome']['saved'])!==0) {
 		
@@ -788,7 +796,7 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped welcome text(s).');
+					$this->addMessage($this->storeError('Skipped welcome text(s).'));
 				
 				}
 
@@ -802,13 +810,8 @@ class ImportController extends Controller
 
 					$this->helpers->XmlParser->getNodes('topic');
 
-					if ($this->_sawModule) {
-
-						$this->addModuleToProject(MODCODE_INTRODUCTION,$this->getNewProjectId());
-						$this->grantModuleAccessRights(MODCODE_INTRODUCTION);
-						$this->_sawModule = false;
-
-					}
+					$this->addModuleToProject(MODCODE_INTRODUCTION,$this->getNewProjectId());
+					$this->grantModuleAccessRights(MODCODE_INTRODUCTION);
 
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['introduction']['saved'])!==0) {
@@ -829,14 +832,14 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped introduction.');
+					$this->addMessage($this->storeError('Skipped introduction.'));
 				
 				}
 
 			} else {
 			
-				$this->addMessage('Skipped welcome text(s).');
-				$this->addMessage('Skipped introduction.');
+				$this->addMessage($this->storeError('Skipped welcome text(s).'));
+				$this->addMessage($this->storeError('Skipped introduction.'));
 
 			}
 			
@@ -882,6 +885,8 @@ class ImportController extends Controller
 					$this->helpers->XmlParser->getNodes('text_key');
 					$this->helpers->XmlParser->getNodes('pict_key');
 					
+
+
 					if ($this->_sawModule) {
 
 						$this->addModuleToProject(MODCODE_KEY,$this->getNewProjectId());
@@ -893,10 +898,16 @@ class ImportController extends Controller
 								'pId' => $this->getNewProjectId()
 							)
 						);
+
 						$this->_sawModule = false;
 
+						$this->addMessage('Created dichotomous key.');
+					
+					} else {
+					
+						$this->addMessage($this->storeError('Didn\'t find a dichotomous key.','Dichotomous key'));
+					
 					}
-
 
 					if (count((array)$_SESSION['admin']['system']['import']['loaded']['key_dich']['failed'])!==0) {
 		
@@ -905,13 +916,11 @@ class ImportController extends Controller
 		
 					}
 							
-					$this->addMessage('Created dichotomous key.');
-					
 					unset($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']);
 
 				} else {
 
-					$this->addMessage('Skipped dichotomous key.');
+					$this->addMessage($this->storeError('Skipped dichotomous key.'));
 
 				}
 
@@ -942,12 +951,22 @@ class ImportController extends Controller
 								$this->addError($this->storeError($val,'Matrix'));
 			
 						}
+
+						if ($this->_sawModule) {
 	
-						$this->addModuleToProject(MODCODE_MATRIXKEY,$this->getNewProjectId());
-						$this->grantModuleAccessRights(MODCODE_MATRIXKEY);
+							$this->addModuleToProject(MODCODE_MATRIXKEY,$this->getNewProjectId());
+							$this->grantModuleAccessRights(MODCODE_MATRIXKEY);
+	
+							$this->_sawModule = false;
+	
+							$this->addMessage('Created matrix key(s).');
+	
+						} else {
+						
+							$this->addMessage($this->storeError('Didn\'t find any matrix key(s).','Matrix'));
+						
+						}
 		
-						$this->addMessage('Created matrix key(s).');
-	
 						unset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices']);
 
 					} else {
@@ -958,14 +977,14 @@ class ImportController extends Controller
 
 				} else {
 				
-					$this->addMessage('Skipped matrix key(s).');
+					$this->addMessage($this->storeError('Skipped matrix key(s).'));
 				
 				}
 
 			} else {
 
-				$this->addMessage('Skipped dichotomous key.');				
-				$this->addMessage('Skipped matrix key(s).');
+				$this->addMessage($this->storeError('Skipped dichotomous key.'));				
+				$this->addMessage($this->storeError('Skipped matrix key(s).'));
 
 			}
 			
@@ -999,9 +1018,10 @@ class ImportController extends Controller
 	
 				$_SESSION['admin']['system']['import']['loaded']['map']['maps'] = null;
 				$_SESSION['admin']['system']['import']['loaded']['map']['types'] = null;
-				$_SESSION['admin']['system']['import']['loaded']['map']['saved'] = 0;
-				$_SESSION['admin']['system']['import']['loaded']['map']['failed'] = 0;
+				$_SESSION['admin']['system']['import']['loaded']['map']['saved'] =
+				$_SESSION['admin']['system']['import']['loaded']['map']['failed'] =
 				$_SESSION['admin']['system']['import']['loaded']['map']['skipped'] = 0;
+				$_SESSION['admin']['system']['import']['loaded']['map']['typeless'] = null;
 
 				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
 
@@ -1012,8 +1032,7 @@ class ImportController extends Controller
 				$this->loadControllerConfig();
 
 				$this->updateMapTypeColours();
-				
-				
+
 				if ($this->_sawModule) {
 
 					$this->addModuleToProject(MODCODE_DISTRIBUTION,$this->getNewProjectId());
@@ -1025,22 +1044,37 @@ class ImportController extends Controller
 								'pId' => $this->getNewProjectId()
 							)
 						);					
+	
+					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['map']['saved'].' map items.');
+
+					if (isset($_SESSION['admin']['system']['import']['loaded']['map']['typeless'])) {
+	
+						$this->addMessage('Imported '.count((array)$_SESSION['admin']['system']['import']['loaded']['map']['typeless']).' without a datatype.');
+						
+						foreach((array)$_SESSION['admin']['system']['import']['loaded']['map']['typeless'] as $val) {
+	
+							$this->storeError('Saved map item without datatype (taxon ID / occurrence ID: '.$val.'; ref OccurrenceTaxon table)','Map');
+	
+						}
+						
+					}
+	
+					$this->addMessage('Skipped '.$_SESSION['admin']['system']['import']['loaded']['map']['skipped'].' because of invalid coordinates.');
+	
+					$this->addMessage('Failed '.$_SESSION['admin']['system']['import']['loaded']['map']['failed'].', most likely duplicates.');
+
 					$this->_sawModule = false;
 
-				}
-
-
-				$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['map']['saved'].' map items.');
-
-				$this->addMessage('Skipped '.$_SESSION['admin']['system']['import']['loaded']['map']['skipped'].' because of invalid coordinates.');
-
-				$this->addMessage('Failed '.$_SESSION['admin']['system']['import']['loaded']['map']['failed'].', most likely duplicates.');
+				} else {
 				
-				unset($_SESSION['admin']['system']['import']['loaded']['key_dich']['keys']);
+					$this->addMessage($this->storeError('Didn\'t find any maps.','Map'));
+				
+				}
+					
 
 			} else {
 
-				$this->addMessage('Skipped map.');
+				$this->addMessage($this->storeError('Skipped map.'));
 
 			}
 			
@@ -1106,7 +1140,7 @@ class ImportController extends Controller
 	
 			} else {
 							
-				$this->addMessage('Skipped additional modules.');
+				$this->addMessage($this->storeError('Skipped additional modules.'));
 
 			}
 
@@ -1162,14 +1196,14 @@ class ImportController extends Controller
 	{
 	
 		$this->_sawModule = true;
-
+	
 		$this->addLiterature($obj);
 
 	}
 
 	public function xmlParserCallback_Glossary($obj)
 	{
-
+	
 		$this->_sawModule = true;
 
 		$this->addGlossary($obj);
@@ -1179,16 +1213,12 @@ class ImportController extends Controller
 	public function xmlParserCallback_Welcome($obj)
 	{
 
-		$this->_sawModule = true;
-
 		$this->addWelcomeTexts($obj);
 
 	}
 
 	public function xmlParserCallback_Introduction($obj)
 	{
-
-		$this->_sawModule = true;
 
 		$this->addIntroduction($obj);
 
@@ -1206,6 +1236,8 @@ class ImportController extends Controller
 	public function xmlParserCallback_KeyMatrixResolve($obj)
 	{
 
+		$this->_sawModule = true;
+
 		$this->resolveMatrices($obj);
 
 	}
@@ -1219,9 +1251,9 @@ class ImportController extends Controller
 
 	public function xmlParserCallback_Map($obj)
 	{
-	
-		$this->_sawModule = true;
 
+		$this->_sawModule = true;
+	
 		$this->saveMapItem($obj);
 
 	}
@@ -3565,10 +3597,23 @@ class ImportController extends Controller
 			)
 		);
 		
-		if ($res===true)
-			$_SESSION['admin']['system']['import']['loaded']['map']['saved']++;
-		else
+		if ($res===true) {
+		
+			if ($occurrence['typeless']==true) {
+			
+				$_SESSION['admin']['system']['import']['loaded']['map']['typeless'][] = $occurrence['taxonId'].' / '.$this->models->OccurrenceTaxon->getNewId();
+
+			} else {
+
+				$_SESSION['admin']['system']['import']['loaded']['map']['saved']++;
+				
+			}
+			
+		} else {
+
 			$_SESSION['admin']['system']['import']['loaded']['map']['failed']++;
+
+		}
 
 	}
 	
@@ -3708,10 +3753,12 @@ class ImportController extends Controller
 				$maps = $_SESSION['admin']['system']['import']['loaded']['map']['maps'];
 				
 				foreach($vVal->squares->square as $sKey => $sVal) {
+				
+					$legend = trim((string)$sVal->legend);
 
-					if (!isset($_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)]))
-						$_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)] =
-							$this->saveMapItemType(trim((string)$sVal->legend));
+					if (!isset($_SESSION['admin']['system']['import']['loaded']['map']['types'][$legend]))
+						$_SESSION['admin']['system']['import']['loaded']['map']['types'][$legend] =
+							$this->saveMapItemType($legend);
 
 					// determining the position of the square in the map grid
 					$row = floor(trim((string)$sVal->number) / $maps[trim((string)$vVal->mapname)]['widthInSquares']);
@@ -3726,6 +3773,8 @@ class ImportController extends Controller
 					$n2Lon = $maps[$mapname]['coordinates']['topLeft']['long'] + ($col * $maps[$mapname]['square']['width']);
 					$n2Lon = $n3Lon = ($n2Lon > 180 ? -360 + $n2Lon : $n2Lon);
 					$n3Lat = $n4Lat = $maps[$mapname]['coordinates']['topLeft']['lat'] - (($row+1) * $maps[$mapname]['square']['height']);
+					
+					$typeless = 
 
 					$occurrence = array(
 						'taxon' => trim((string)$obj->name),
@@ -3736,7 +3785,8 @@ class ImportController extends Controller
 						'col' => $col,
 						'legend' => trim((string)$sVal->legend),
 						'typeId' => $_SESSION['admin']['system']['import']['loaded']['map']['types'][trim((string)$sVal->legend)],
-						'nodes' => array(array($n1Lat,$n1Lon),array($n2Lat,$n2Lon),array($n3Lat,$n3Lon),array($n4Lat,$n4Lon))
+						'nodes' => array(array($n1Lat,$n1Lon),array($n2Lat,$n2Lon),array($n3Lat,$n3Lon),array($n4Lat,$n4Lon)),
+						'typeless' => empty($legend)
 					);
 					
 					$this->doSaveMapItem($occurrence);

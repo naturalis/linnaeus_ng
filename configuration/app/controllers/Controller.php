@@ -18,6 +18,8 @@ class Controller extends BaseClass
     private $_fullPath;
     private $_fullPathRelative;
 	private $_checkForProjectId = true;
+	
+	private $_allowEditOverlay = false; // true
 
 	private $_currentGlossaryId = false;
 	private $_currentHotwordLink = false;
@@ -210,7 +212,7 @@ class Controller extends BaseClass
 		foreach((array)$this->treeList as $key => $val) {
 
 			if ($this->showLowerTaxon) {
-			
+
 				if ($val['lower_taxon']=='1')  $d[$key] = $val;
 			
 			} else {
@@ -250,6 +252,68 @@ class Controller extends BaseClass
 	
 	}
 
+
+	public function _getTaxonTree($p=null)
+	{
+
+		$pId = isset($p['pId']) ? $p['pId'] : null;
+		$ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
+		$depth = isset($p['depth']) ? $p['depth'] : 0;
+
+		if (!isset($p['depth'])) unset($this->treeList);
+				
+		$t = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'parent_id'.(is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
+				),
+				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+				'fieldAsIndex' => 'id',
+				'order' => 'taxon_order,id'
+			)
+		);
+
+		foreach((array)$t as $key => $val) {
+
+			$t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
+			$t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
+			$t[$key]['sibling_count'] = count((array)$t);
+			$t[$key]['depth'] = $t[$key]['level'] = $depth;
+			// give do not display flag to taxa that are in brackets
+			$t[$key]['do_display'] = !preg_match('/^\(.*\)$/',$val['taxon']);
+			// taxon name
+			$t[$key]['label'] = $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id']);
+
+			//// level is effectively the recursive depth of the taxon within the tree
+			//$t[$key]['level'] = $level;
+
+			//// sibling_pos reflects the position amongst taxa on the same level
+			//$t[$key]['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
+
+			//// get rank label
+			//$t[$key]['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
+
+			$this->treeList[$key] = $t[$key];
+
+			$t[$key]['children'] = $this->_getTaxonTree(
+				array(
+					'pId' => $val['id'],
+					'ranks' => $ranks,
+					'depth' => $depth+1
+				)
+			);
+
+			$this->treeList[$key]['child_count'] = count((array)$t[$key]['children']);
+
+					
+		}
+		
+		return $t;
+	
+	}
+
+	/*
     public function _getTaxonTree($params) 
     {
 
@@ -354,6 +418,29 @@ class Controller extends BaseClass
         return $t;
 
     }
+	*/
+
+	public function newGetProjectRanks()
+	{
+
+		if (!isset($_SESSION['admin']['user']['species']['projectRank'])) {
+
+			$_SESSION['admin']['user']['species']['projectRank'] =
+				$this->models->ProjectRank->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId()
+						),
+						'fieldAsIndex' => 'id'
+					)
+				);
+
+		}
+		
+		return $_SESSION['admin']['user']['species']['projectRank'];
+
+	}
+	
 
 	public function getProjectRanks($params=false)
 	{
@@ -1134,6 +1221,8 @@ class Controller extends BaseClass
 
 	private function previewOverlay()
 	{
+	
+		if ($this->_allowEditOverlay===false) return;
 
 		$d = $this->controllerBaseName.':'.$this->viewName;
 
@@ -1153,34 +1242,38 @@ class Controller extends BaseClass
 			isset($this->generalSettings['urlsToAdminEdit'][$d])
 		) {
 		
-			if (isset($this->requestData['id'])) $id = $this->requestData['id'];
+			if (isset($this->requestData['id'])) {
+			
+				$id = $this->requestData['id'];
 
-			if ($this->controllerBaseName=='module') {
-				$modId = $this->getCurrentModule();
-				$modId = $modId['id'];
-			} else
-			if ($this->controllerBaseName=='matrixkey') {
-				$id = $this->getCurrentMatrixId();
-			} else
-			if ($this->controllerBaseName=='key') {
-				$id = $this->getCurrentKeyStepId();
-			}
-
-			$this->smarty->assign(
-				'urlBackToAdmin',
-				sprintf(
-					$this->generalSettings['urlsToAdminEdit'][$d],
-					$id,
-					(isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? 
-						$this->requestData['cat'] : 
-						($this->controllerBaseName=='module' ? 
-							$modId : 
-							null
+				if ($this->controllerBaseName=='module') {
+					$modId = $this->getCurrentModule();
+					$modId = $modId['id'];
+				} else
+				if ($this->controllerBaseName=='matrixkey') {
+					$id = $this->getCurrentMatrixId();
+				} else
+				if ($this->controllerBaseName=='key') {
+					$id = $this->getCurrentKeyStepId();
+				}
+	
+				$this->smarty->assign(
+					'urlBackToAdmin',
+					sprintf(
+						$this->generalSettings['urlsToAdminEdit'][$d],
+						$id,
+						(isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? 
+							$this->requestData['cat'] : 
+							($this->controllerBaseName=='module' ? 
+								$modId : 
+								null
+							)
 						)
 					)
-				)
-			);
-			$this->smarty->display('../shared/preview-overlay.tpl');
+				);
+				$this->smarty->display('../shared/preview-overlay.tpl');
+				
+			}
 			
 		}
 	
@@ -1281,7 +1374,7 @@ class Controller extends BaseClass
 				$mp = $m[$val['module_id']];				
 				$modules[$key]['type'] = 'regular';
 				$modules[$key]['icon'] = $mp['icon'];
-				$modules[$key]['module'] = $mp['module'];
+				$modules[$key]['module'] = _($mp['module']);
 				$modules[$key]['controller'] = $mp['controller'];
 				$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
 				$_SESSION['app']['project']['active-modules'][$mp['id']] = $mp['module'];

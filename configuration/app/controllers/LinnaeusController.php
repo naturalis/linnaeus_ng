@@ -27,7 +27,8 @@ class LinnaeusController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'lookup.css',
-	    'linnaeus.css'
+	    'linnaeus.css',
+		'dialog/jquery.modaldialog.css'
 	);
 
 	public $jsToLoad = array('all' => array(

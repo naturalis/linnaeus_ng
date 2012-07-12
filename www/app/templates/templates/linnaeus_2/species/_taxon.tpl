@@ -16,10 +16,8 @@
 <div id="page-main">
 {if $activeCategory=='classification'}
 <div id="classification">
-	
 	{foreach from=$content key=k item=v name=classification}
-	{if $v.do_display}
-	
+	{if $v.do_display}	
 		{if $useJavascriptLinks}			
 		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
 		{else}
@@ -37,13 +35,16 @@
 	{/foreach}
 	
 </div>
-{elseif $activeCategory=='literature' && $contentCount.literature>0}
+{elseif $activeCategory=='literature'}
+{if $contentCount.literature>0}
 <div id="literature">
 	{foreach from=$content key=k item=v}
 	<div class="text">{$v.text}</div>
 	{/foreach}
 </div>
-{elseif $activeCategory=='names' && $contentCount.names>0}
+{/if}
+{elseif $activeCategory=='names'}
+{if $contentCount.names>0}
 {if $content.synonyms}
 <div id="synonyms">
 	<div class="title">{t}Synonyms{/t}</div>
@@ -72,10 +73,9 @@
 	{/foreach}
 </div>
 {/if}
-
-{elseif $activeCategory=='media' && $contentCount.media>0}
-
-
+{/if}
+{elseif $activeCategory=='media'}
+{if $contentCount.media>0}
 <div id="media">
 {assign var=widthInCells value=5}
 <table id="media-grid">
@@ -161,6 +161,7 @@
 				
 </table>
 </div>
+{/if}
 {else}
 <div id="content">
 {if $isTaxonStartPage && $overviewImage}
