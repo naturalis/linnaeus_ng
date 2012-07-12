@@ -381,7 +381,7 @@ table#media-grid td.media-cell, table#media-grid td.caption {
 }
 
 table#media-grid td.media-cell, table#media-grid td.caption {
-	padding: 0 5px;
+	padding-right: 10px;
 }
 
 table#media-grid td.media-cell {
@@ -428,8 +428,5 @@ table#media-grid img.media-video-icon {
 
 table#media-grid td:first-child {
 	padding-left: 10px;
-}
-table#media-grid td:last-child {
-	padding-right: 10px;
 }
 
