@@ -370,7 +370,7 @@ class ImportController extends Controller
 
 		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 		
-		set_time_limit(300);
+		set_time_limit(900);
 
 		$project = $this->getProjects($this->getNewProjectId());
 
