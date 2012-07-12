@@ -247,7 +247,7 @@ class SpeciesController extends Controller
     private function _indexAction ()
     {
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
+		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => true));// !isset($this->treeList)));
 
 		// get taxa
 		$taxa = $this->getTreeList();
@@ -881,8 +881,7 @@ class SpeciesController extends Controller
 			$this->makeLookupList(
 				$l,
 				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
-				'../'.($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species').'/taxon.php?id=%s',
-				true
+				'../'.($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species').'/taxon.php?id=%s'
 			)
 		);
 		

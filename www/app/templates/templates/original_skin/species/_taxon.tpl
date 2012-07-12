@@ -112,10 +112,11 @@
 	</table>
 </div>
 {/if}
-{elseif $activeCategory=='media' && $contentCount.media>0}
+{elseif $activeCategory=='media'}
+{if $contentCount.media>0}
 
 <div id="media">
-{assign var=widthInCells value=2}
+{assign var=widthInCells value=5}
 <table id="media-grid">
 	{assign var=mediaCat value=false}
 	{foreach from=$content key=k item=v}
@@ -198,6 +199,7 @@
 		
 </table>
 </div>
+{/if}
 {else}
 <div id="content">
 {if $isTaxonStartPage && $overviewImage}

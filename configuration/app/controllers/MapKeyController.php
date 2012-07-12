@@ -1227,7 +1227,8 @@ class MapKeyController extends Controller
 			$m = $this->models->L2Map->_get(
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
-					'fieldAsIndex' => 'id'
+					'fieldAsIndex' => 'id',
+					'order' => 'name'
 				)
 			);
 

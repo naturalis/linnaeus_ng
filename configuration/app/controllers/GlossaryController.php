@@ -423,8 +423,10 @@ class GlossaryController extends Controller
 	{
 
 		if (empty($search)) return;
+		
+		$includeSynonyms = false;
 
-		$l1 = $this->models->Glossary->_get(
+		$l = $this->models->Glossary->_get(
 			array(
 				'id' =>
 					array(
@@ -436,28 +438,34 @@ class GlossaryController extends Controller
 			)
 		);
 
-		$l2 = $this->models->GlossarySynonym->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'synonym like' => '%'.($search=='*' ? '' : mysql_real_escape_string($search)).'%'
-					),
-				'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
-			)
-		);
+		if ($includeSynonyms) {
+
+			$l2 = $this->models->GlossarySynonym->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'language_id' => $this->getCurrentLanguageId(),
+						'synonym like' => '%'.($search=='*' ? '' : mysql_real_escape_string($search)).'%'
+						),
+					'columns' => 'glossary_id as id,synonym as label,"glossary synonym" as source'
+				)
+			);
+			
+			$l = array_merge((array)$l,(array)$l2);
+			
+		}
 
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
-				array_merge((array)$l1,(array)$l2),
+				$l,
 				$this->controllerBaseName,
 				'../glossary/term.php?id=%s',
 				true
 			)
 		); // for glossary lookup list
 		
-		return array_merge((array)$l1,(array)$l2); // for combined lookup list
+		return $l; // for combined lookup list
 		
 	}
 

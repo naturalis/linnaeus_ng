@@ -27,17 +27,17 @@ class configuration
 
 		if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
 
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INTRODUCTION',1);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_GLOSSARY',2);
+		if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
+		if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
 		if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_SPECIES',4);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_HIGHERTAXA',5);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_KEY',6);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_MATRIXKEY',7);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_DISTRIBUTION',8);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_CONTENT',10);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_INDEX',11);
-		if (!defined('MODCODE_LITERATURE')) define('MODCODE_UTILITIES',12);
+		if (!defined('MODCODE_SPECIES')) define('MODCODE_SPECIES',4);
+		if (!defined('MODCODE_HIGHERTAXA')) define('MODCODE_HIGHERTAXA',5);
+		if (!defined('MODCODE_KEY')) define('MODCODE_KEY',6);
+		if (!defined('MODCODE_MATRIXKEY')) define('MODCODE_MATRIXKEY',7);
+		if (!defined('MODCODE_DISTRIBUTION')) define('MODCODE_DISTRIBUTION',8);
+		if (!defined('MODCODE_CONTENT')) define('MODCODE_CONTENT',10);
+		if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
+		if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
 
     }
 
