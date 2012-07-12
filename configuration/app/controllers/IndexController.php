@@ -272,13 +272,21 @@ class IndexController extends Controller
 		
 		if ($search) $d['synonym regexp'] = $this->makeRegExpCompatSearchString($search);
 
-		return $this->models->Synonym->_get(
+		$s = $this->models->Synonym->_get(
 			array(
 				'id' => $d,
 				'columns' => 'taxon_id as id,synonym as label,synonym as taxon,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
 			)
 		);
+		
+		foreach((array)$s as $key => $val) {
+		
+			$s[$key]['label'] = $this->formatSpeciesEtcNames($val['label'],'syn');
 
+		}
+
+		return $s;
+		
 	}
 
 	private function searchCommonNames($search=null)

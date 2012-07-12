@@ -6,7 +6,7 @@
 	<meta name="description" CONTENT="{$session.app.project.description}">
 	<meta name="ROBOTS" CONTENT="ALL">
 	<meta name="lng-project-id" content="{$session.app.project.id}">
-	<title>{$session.app.project.title}{if $pageName}: {$pageName}{/if}</title>
+	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
 	<style type="text/css" media="all">
 	    @import url("{$session.app.project.urls.projectCSS}yui/cssreset-min.css");
 {if $cssToLoad}

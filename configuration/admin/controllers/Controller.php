@@ -884,7 +884,7 @@ class Controller extends BaseClass
     public function isCurrentUserSysAdmin()
     {
 
-		if (!isset($_SESSION['admin']['user'])) return false;
+		if (!isset($_SESSION['admin']['user']) || !isset($_SESSION['admin']['user']['_roles'])) return false;
 
 		foreach((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
 

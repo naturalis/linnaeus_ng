@@ -1026,7 +1026,7 @@ class MapKeyController extends Controller
 			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
 				$l[] = array(
 					'id' => $val['id'],
-					'label' => $val['taxon']
+					'label' => $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id'])
 				);
 
 		}

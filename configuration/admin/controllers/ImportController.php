@@ -1158,7 +1158,7 @@ class ImportController extends Controller
 
 		$this->smarty->assign('modules',$addMod);
 
-        $this->printPage();
+		$this->printPage();
 	
 	}
  
