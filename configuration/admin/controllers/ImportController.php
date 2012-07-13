@@ -534,7 +534,9 @@ class ImportController extends Controller
 		
 						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] as $val)
 							$this->addError($this->storeError($val['cause'],'Species content'));
-		
+
+							$this->addError($this->storeError('(probable cause: the taxa above are present in <records> but not in <tree>)','Species content'));
+					
 					}
 
 					unset($_SESSION['admin']['system']['import']['speciesOverviewCatId']);
@@ -1795,7 +1797,10 @@ class ImportController extends Controller
 			'rank_id' => $rankId,
 			'rank_name' => $rankName,
 			'parent' =>  $this->cleanL2Name(trim((string)$obj->parentname)),
+
+
 			'original_parent' => trim((string)$obj->parentname),
+			'parent_rank_name' => trim((string)$obj->parenttaxon),
 			'source' => 'records->taxondata'
 		);
 
@@ -1888,7 +1893,8 @@ class ImportController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getNewProjectId(),	
-						'taxon' => $val['parent']
+						'taxon' => $val['parent'],
+						'rank_id' => $_SESSION['admin']['system']['import']['loaded']['ranks'][$val['parent_rank_name']]['rank_id']
 					),
 					'columns' => 'id'
 				)
@@ -1896,17 +1902,7 @@ class ImportController extends Controller
 			
 			if ($t) {
 			
-				$this->models->Taxon->save(
-					array(
-						'id' => $val['id'],
-						'project_id' => $this->getNewProjectId(),	
-						'parent_id' =>  $t[0]['id']
-					)
-				);
-	
-				$d[$key]['parent_id'] = $t[0]['id'];
-
-				if ($d[$key]['parent_id']==$d[$key]['id']) {
+				if ($t[0]['id']==$val['id']) {
 
 					$_SESSION['admin']['system']['import']['species-errors'][] =
 						array(
@@ -1914,7 +1910,20 @@ class ImportController extends Controller
 							'cause' => 'saved as orphan, defined as being its own parent.'
 						);
 
+				} else {
+
+					$this->models->Taxon->save(
+						array(
+							'id' => $val['id'],
+							'project_id' => $this->getNewProjectId(),	
+							'parent_id' =>  $t[0]['id']
+						)
+					);
+		
+					$d[$key]['parent_id'] = $t[0]['id'];
+					
 				}
+
 
 			} else {
  
@@ -1923,7 +1932,7 @@ class ImportController extends Controller
 					$_SESSION['admin']['system']['import']['species-errors'][] =
 						array(
 							'taxon' => $val['taxon'],
-							'cause' => 'saved as orphan, could not resolve parent.'
+							'cause' => 'saved as orphan, could not resolve parent "'.$val['parent'].'" with rank "'.$val['parent_rank_name'].'".'
 						);
 				
 				}
@@ -2151,6 +2160,7 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
+
 					//trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
 					isset($vVal->caption) ? trim((string)$vVal->caption) : null,
 					false,
@@ -3743,6 +3753,7 @@ class ImportController extends Controller
 						array(
 							'name' => trim((string)$vVal->mapname),
 							'coordinates' => json_encode($coordinates),
+
 							'rows' => $heightInSquares,
 							'cols' => $widthInSquares
 						)
