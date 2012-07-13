@@ -603,31 +603,31 @@ class KeyController extends Controller
 	
 	private function setStoredKeypath($step)
 	{
-return;
-unset($this->_stepList);
-$this->cDva($this->getStoredChoiceList(),$step['id']);
-
-
-
-foreach(array_reverse((array)$this->_stepList) as $key => $val) {
-
-	$d[] = array(
-		'id' => $val['keystep_id'],
-		'step_number' => $val['keystep_id'],
-		'step_title' => $val['step_title'][$this->getCurrentLanguageId()]['title'],
-		'is_start' => isset($val['is_start']) ? $val['is_start'] : null,
-		'choice_marker' => $val['marker'],
-	);
-
-
-}
-
-q($d);
-
-die();
-
-
-//q($_SESSION['app']['user']['key']['path']);
+		return;
+		unset($this->_stepList);
+		$this->cDva($this->getStoredChoiceList(),$step['id']);
+		
+		
+		
+		foreach(array_reverse((array)$this->_stepList) as $key => $val) {
+		
+			$d[] = array(
+				'id' => $val['keystep_id'],
+				'step_number' => $val['keystep_id'],
+				'step_title' => $val['step_title'][$this->getCurrentLanguageId()]['title'],
+				'is_start' => isset($val['is_start']) ? $val['is_start'] : null,
+				'choice_marker' => $val['marker'],
+			);
+		
+		
+		}
+		
+		q($d);
+		
+	die();
+	
+	
+	//q($_SESSION['app']['user']['key']['path']);
 
 		$step = $params['step'];
 		$choice = isset($params['choice']) ? $params['choice'] : null;

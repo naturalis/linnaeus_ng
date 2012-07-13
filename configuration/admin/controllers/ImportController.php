@@ -1147,14 +1147,21 @@ class ImportController extends Controller
 			}
 
 			$this->importPostProcessing();
+			$this->addMessage($this->storeError('Processed internal links.'));
 
 			$this->smarty->assign('processed',true);
 			
 		}
 		
-		$addMod = $this->getCustomModules();
+		$addMod = $this->detectCustomModulesInXML();
 
-		if (count((array)$addMod)==0)  $this->addMessage('No additional modules found.');
+		if (count((array)$addMod)==0)  {
+
+			$this->addMessage('No additional modules found.');
+			$this->importPostProcessing();
+			$this->addMessage($this->storeError('Processed internal links.'));
+
+		}
 
 		$this->smarty->assign('projectId',$this->getNewProjectId());
 
@@ -4362,7 +4369,7 @@ class ImportController extends Controller
 
 	}
 
-	private function getCustomModules()
+	private function detectCustomModulesInXML()
 	{
 
 		if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
