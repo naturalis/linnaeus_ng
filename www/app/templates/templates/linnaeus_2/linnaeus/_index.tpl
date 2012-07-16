@@ -22,7 +22,7 @@
                 <p>{t}{$v.module}{/t}</p>
             </span>
             {else}
-            <a href="../module/?modId={$v.id}">
+            <a class="menu-item" href="../module/?modId={$v.id}">
                 <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/custom.png" />
                 <div>{t}{$v.module}{/t}</div>
             </a>

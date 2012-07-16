@@ -9,8 +9,8 @@
         {/if}
     </div>
 
-    <p>| 
-    options | 
-    help | 
-    contact</p>
+    <p><a href="../../../">projects</a> | 
+       <a href="../../../admin/views/users/login.php">login</a> | 
+    	help | 
+    	contact</p>
 </div>
