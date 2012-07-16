@@ -205,12 +205,12 @@ class MapKeyController extends Controller
 		else
 			$mapId = $this->requestData['m'];
 
-markTime($l,'waypoint 1');
+//markTime($l,'waypoint 1');
 			
 		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
 
-markTime($l,'waypoint 2');
-getTime($l); // includes final timestamp
+//markTime($l,'waypoint 2');
+//getTime($l); // includes final timestamp
 
 		$this->smarty->assign('mapId',$mapId);
 
