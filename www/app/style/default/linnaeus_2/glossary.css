@@ -1,6 +1,6 @@
 #page-main #definition {
 	text-align: justify;
-	width: 470px;
+	width: 450px;
 	float: left;
 	padding-right: 15px;
 }
@@ -17,7 +17,6 @@
 }
 
 #page-main #media {
-	width: 325px;
 	float: right;
 	padding-left: 20px;
 	border-left: 1px dotted #0303b2;
