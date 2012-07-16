@@ -1024,6 +1024,8 @@ class ImportController extends Controller
 				$_SESSION['admin']['system']['import']['loaded']['map']['failed'] =
 				$_SESSION['admin']['system']['import']['loaded']['map']['skipped'] = 0;
 				$_SESSION['admin']['system']['import']['loaded']['map']['typeless'] = null;
+				
+				$_SESSION['admin']['system']['import']['map']['amersfoort'] = $this->rHasVal('afoort','on');
 
 				$this->helpers->XmlParser->setCallbackFunction(array($this,'xmlParserCallback_Map'));
 
@@ -3733,6 +3735,19 @@ class ImportController extends Controller
 					//$lon2 = (-1 * floatval($d[3]));
 					$lon1 = floatval($d[1]);
 					$lon2 = floatval($d[3]);
+
+					if ($_SESSION['admin']['system']['import']['map']['amersfoort']) {
+
+						//620,10,300,280,10,10	
+						$d = $this->bombAmersfoort($lat1,$lon1);
+						$lat1 = $d[0];
+						$lon1 = $d[1];
+						$d = $this->bombAmersfoort($lat2,$lon2);
+						$lat2 = $d[0];
+						$lon2 = $d[1];
+
+					}
+
 					$sqW = floatval($d[4]);
 					$sqH = floatval($d[5]);
 
@@ -4453,5 +4468,73 @@ class ImportController extends Controller
 	}
 
 
+
+ 
+	/**
+     * Vertaalt Rijksdriehoekscoördinaten naar noorderbreedte/oosterlengte
+     *
+     * Gebaseerd op Javascript van Ed Stevenhagen en Frank Kissels ({@link http://www.xs4all.nl/~estevenh/})
+     * @access private
+     * @param float x-coördinaat (RD)
+     * @param float y-coördinaat (RD)
+     * @return array array met noorderbreedte en oosterlengte
+     */
+	private function bombAmersfoort($rd_x, $rd_y)
+	{
+	
+		//De waarde van x dient te liggen tussen 0 en 290(000)
+		//De waarde van y dient te liggen tussen 290(000) en 630(000)
+
+		if ($rd_x < 1000) $rd_x = $rd_x * 1000;
+		if ($rd_y < 1000) $rd_y = $rd_y * 1000;
+
+        // constanten
+        $X0 = 155000.000;
+        $Y0 = 463000.000;
+        $F0 = 52.156160556;
+        $L0 = 5.387638889;
+
+        $A01 = 3236.0331637;
+        $B10 = 5261.3028966;
+        $A20 = -32.5915821;
+        $B11 = 105.9780241;
+        $A02 = -0.2472814;
+        $B12 = 2.4576469;
+        $A21 = -0.8501341;
+        $B30 = -0.8192156;
+        $A03 = -0.0655238;
+        $B31 = -0.0560092;
+        $A22 = -0.0171137;
+        $B13 = 0.0560089;
+        $A40 = 0.0052771;
+        $B32 = -0.0025614;
+        $A23 = -0.0003859;
+        $B14 = 0.0012770;
+        $A41 = 0.0003314;
+        $B50 = 0.0002574;
+        $A04 = 0.0000371;
+        $B33 = -0.0000973;
+        $A42 = 0.0000143;
+        $B51 = 0.0000293;
+        $A24 = -0.0000090;
+        $B15 = 0.0000291;
+
+        $dx = ($rd_x - $X0) * pow(10,-5);
+        $dy = ($rd_y - $Y0) * pow(10,-5);
+
+        $df = ($A01 * $dy) + ($A20 * pow($dx,2)) + ($A02 * pow($dy,2)) + ($A21 * pow($dx,2) * $dy) + ($A03 * pow($dy,3));
+        $df += ($A40 * pow($dx,4)) + ($A22 * pow($dx,2) * pow($dy,2)) + ($A04 * pow($dy,4)) + ($A41 * pow($dx,4) * $dy);
+        $df += ($A23 * pow($dx,2) * pow($dy,3)) + ($A42 * pow($dx,4) * pow($dy,2)) + ($A24 * pow($dx,2) * pow($dy,4)); 
+
+        $noorderbreedte = $F0 + ($df / 3600); 
+
+        $dl = ($B10 * $dx) + ($B11 * $dx * $dy) + ($B30 * pow($dx,3)) + ($B12 * $dx * pow($dy,2)) + ($B31 * pow($dx,3) * $dy);
+        $dl += ($B13 * $dx * pow($dy,3)) + ($B50 * pow($dx,5)) + ($B32 * pow($dx,3) * pow($dy,2)) + ($B14 * $dx * pow($dy,4));
+        $dl += ($B51 * pow($dx,5) * $dy) + ($B33 * pow($dx,3) * pow($dy,3)) + ($B15 * $dx * pow($dy,5));
+
+        $oosterlengte = $L0 + ($dl / 3600);
+
+        return array($noorderbreedte, $oosterlengte);
+    }
 
 }

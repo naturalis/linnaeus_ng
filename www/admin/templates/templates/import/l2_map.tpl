@@ -13,7 +13,10 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
 <b>Map data</b><br/>
-<label>Import map items?&nbsp;&nbsp;<input type="checkbox" name="map_items" checked="checked"></label>
+{literal}
+<label>Import map items?&nbsp;&nbsp;<input type="checkbox" name="map_items" onchange="$('#afoort').attr('disabled',($(this).is(':checked') ? '' : 'disabled'));$('#afoort-label').css('color',($(this).is(':checked') ? '#000' : '#999'));" checked="checked"></label><br />
+<label id="afoort-label">Map uses "Amersfoort"-coordinates&nbsp;&nbsp;<input type="checkbox" name="afoort" id="afoort"></label>
+{/literal}
 </p>
 <input type="submit" value="import" />
 </form>
