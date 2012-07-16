@@ -1989,7 +1989,8 @@ class Controller extends BaseClass
 					'project_id' => $this->getCurrentProjectId(),
 					'setting' => $name
 				),
-				'columns' => 'value'
+				'columns' => 'value',
+				'limit' => 1
 			)
 		);
 		

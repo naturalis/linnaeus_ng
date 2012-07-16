@@ -2,6 +2,8 @@
 
 /*
 
+	change the title in the xml file to %test% and a random (yet readable) project name will be assigned.
+
 	should add '_sawModule' to all modules
 
 
@@ -298,10 +300,19 @@ class ImportController extends Controller
 		$d = $this->helpers->XmlParser->getNode('project');
 
 		if (isset($d->title)) {
+		
+			$projectTitle = trim((string)$d->title);
+
+			if ($projectTitle=='%test%') {
+
+				$projectTitle = $this->getRandomTestProjectName();
+				$testProject = true;
+			
+			}
 
 			$newId = $this->createProject(
 				array(
-					 'title' => trim((string)$d->title),
+					 'title' => $projectTitle,
 					 'version' => trim((string)$d->version),
 					 'sys_description' => 'Created by import from a Linnaeus 2-export.',
 					 'css_url' => $this->controllerSettings['defaultProjectCss']
@@ -310,13 +321,13 @@ class ImportController extends Controller
 	
 			if (!$newId) {
 
-				$this->addError('Could not create new project "'.trim((string)$d->title).'". Does a project with the same name already exist?');
+				$this->addError('Could not create new project "'.$projectTitle.'". Does a project with the same name already exist?');
 
 			} else { 
 
 				$project = $this->getProjects($this->getNewProjectId());
 
-				$this->addMessage('Created new project "'.trim((string)$d->title).'"');
+				$this->addMessage('Created new project "'.$projectTitle.'"');
 
 				$this->setNewProjectId($newId);
 
@@ -324,7 +335,7 @@ class ImportController extends Controller
 
 				$this->makeMediaTargetPaths();
 				
-				$this->createProjectCssFile($newId,trim((string)$d->title));
+				$this->createProjectCssFile($newId,$projectTitle);
 
 				$this->smarty->assign('newProjectId',$newId);
 
@@ -346,11 +357,12 @@ class ImportController extends Controller
 				$_SESSION['admin']['system']['import']['paths'] = $this->makePathNames($this->getNewProjectId());
 				
 				$_SESSION['admin']['system']['import']['errorlog']['header'] = array(
-					'project' => trim((string)$d->title),
+					'project' => $projectTitle,
 					'version' => trim((string)$d->version),
+					'test_project' => (isset($testProject) && $testProject===true),
 					'createdate' => date('c'),
 					'imported_from' => $_SESSION['admin']['system']['import']['file']['path'],
-					'id' => $this->getNewProjectId()	
+					'id' => $this->getNewProjectId()
 				);
 
 			}
@@ -656,17 +668,17 @@ class ImportController extends Controller
 	
 					$this->helpers->XmlParser->getNodes('proj_reference');
 
-					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s).');
-	
-					if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
-
-						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] as $val)
-							$this->addError($this->storeError($val['cause'],'Literature'));
-		
-					}
-					
 					if ($this->_sawModule) {
 
+						$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['literature']['saved'].' literary reference(s).');
+		
+						if (count((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'])!==0) {
+	
+							foreach ((array)$_SESSION['admin']['system']['import']['loaded']['literature']['failed'] as $val)
+								$this->addError($this->storeError($val['cause'],'Literature'));
+			
+						}
+						
 						$this->addModuleToProject(MODCODE_LITERATURE,$this->getNewProjectId());
 						$this->grantModuleAccessRights(MODCODE_LITERATURE);
 
@@ -702,19 +714,19 @@ class ImportController extends Controller
 
 					$this->loadControllerConfig();
 
-					$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['glossary']['saved'].' glossary item(s).');
-	
-					if (count((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'])!==0) {
-		
-						foreach ((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'] as $val)
-							$this->addError($this->storeError($val['cause'],'Glossary'));
-		
-					}
-
-					unset($_SESSION['admin']['system']['import']['mimes']);
-
 					if ($this->_sawModule) {
 
+						$this->addMessage('Imported '.$_SESSION['admin']['system']['import']['loaded']['glossary']['saved'].' glossary item(s).');
+		
+						if (count((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'])!==0) {
+			
+							foreach ((array)$_SESSION['admin']['system']['import']['loaded']['glossary']['failed'] as $val)
+								$this->addError($this->storeError($val['cause'],'Glossary'));
+			
+						}
+	
+						unset($_SESSION['admin']['system']['import']['mimes']);
+	
 						$this->addModuleToProject(MODCODE_GLOSSARY,$this->getNewProjectId());
 						$this->grantModuleAccessRights(MODCODE_GLOSSARY);
 
@@ -973,7 +985,7 @@ class ImportController extends Controller
 
 					} else {
 
-						$this->addMessage('No matrix key found.');
+						$this->addMessage('Didn\'t find a matrix key.');
 
 					}
 
@@ -3639,7 +3651,7 @@ class ImportController extends Controller
 	private function saveL2Map($p)
 	{
 
-		$this->models->L2Map->save(
+		$d = $this->models->L2Map->save(
 			array(
 				'id' => null, 
 				'project_id' => $this->getNewProjectId(),
@@ -3649,6 +3661,8 @@ class ImportController extends Controller
 				'cols' => $p['cols']
 			)
 		);
+		
+		if ($d!==true) $this->addError('While saving L2-map: '.$d);
 
 		$_SESSION['admin']['system']['import']['loaded']['map']['maps'][$p['name']]['id'] = $this->models->L2Map->getNewId();
 		
@@ -3686,7 +3700,7 @@ class ImportController extends Controller
 	private function saveLN2Cell($p)
 	{	
 
-		$this->models->L2OccurrenceTaxon->save(
+		$d = $this->models->L2OccurrenceTaxon->save(
 			array(
 				'id' => null, 
 				'project_id' => $this->getNewProjectId(),
@@ -3698,6 +3712,8 @@ class ImportController extends Controller
 				'coordinates' => $p['coordinates']
 			)
 		);
+
+		if ($d!==true) $this->addError('While saving L2-cell: '.$d);
 
 	}
 
@@ -3731,36 +3747,39 @@ class ImportController extends Controller
 
 					$lat1 = floatval($d[0]);
 					$lat2 = floatval($d[2]);
-					//$lon1 = (-1 * floatval($d[1]));
-					//$lon2 = (-1 * floatval($d[3]));
 					$lon1 = floatval($d[1]);
 					$lon2 = floatval($d[3]);
-
-					if ($_SESSION['admin']['system']['import']['map']['amersfoort']) {
-
-						//620,10,300,280,10,10	
-						$d = $this->bombAmersfoort($lat1,$lon1);
-						$lat1 = $d[0];
-						$lon1 = $d[1];
-						$d = $this->bombAmersfoort($lat2,$lon2);
-						$lat2 = $d[0];
-						$lon2 = $d[1];
-
-					}
 
 					$sqW = floatval($d[4]);
 					$sqH = floatval($d[5]);
 
-
-					//$widthInSquares = (($lon2 > $lon1 ? $lon2 - $lon1 : (180-$lon1) - $lon2)) / $sqW;	//((int)($d[1] - $d[3]) / $d[4]),
 					$widthInSquares = (($lon1 >= $lon2) ? $lon1 - $lon2 : 360 + $lon1 - $lon2) / $sqW;
 					$heightInSquares = (($lat1 - $lat2) / $sqH);
+					
+					if ($_SESSION['admin']['system']['import']['map']['amersfoort']) {
+
+						//620,10,300,280,10,10	= y,x,y,x,w,h
+						$af = $this->bombAmersfoort($lat1,$lon1);
+						$lat1 = floatval($af[0]);
+						$lon1 = floatval($af[1]);
+						$af = $this->bombAmersfoort($lat2,$lon2);
+						$lat2 = floatval($af[0]);
+						$lon2 = floatval($af[1]);
+
+						$heightInSquares = ($d[0]-$d[2]) / $d[4];
+						$widthInSquares = ($d[3]-$d[1]) / $d[5];
+						
+						$sqH = floatval(($lat1 - $lat2) / $heightInSquares);
+						$sqW = floatval(($lon2 - $lon1) / $widthInSquares);
+
+					}
+
 					$coordinates = 
 						array(
-							'topLeft' => array('lat' => $lat1,'long' => $lon1),			//array('lat' => (int)$d[0],'long' => (-1 * (int)$d[1])),
-							'bottomRight' => array('lat' => $lat2,'long' => $lon2)		//array('lat' => (int)$d[2],'long' => (-1 * (int)$d[3]))
+							'topLeft' => array('lat' => $lat1,'long' => $lon1),
+							'bottomRight' => array('lat' => $lat2,'long' => $lon2)
 						);
-
+						
 					$_SESSION['admin']['system']['import']['loaded']['map']['maps'][trim((string)$vVal->mapname)] =
 						array(
 							'label' => trim((string)$vVal->mapname),
@@ -3771,11 +3790,20 @@ class ImportController extends Controller
 							'heightInSquares' => $heightInSquares
 						);
 						
+					if ($this->isTest()) {
+					
+						$this->addMessage('-l2 map name: <b>'.trim((string)$vVal->mapname).'</b>');
+						$this->addMessage('&nbsp;&nbsp;&nbsp;coordinates: '.var_export($coordinates,true));
+						$this->addMessage('&nbsp;&nbsp;&nbsp;square: '.var_export(array('width' => $sqW,'height' => $sqH),true));
+						$this->addMessage('&nbsp;&nbsp;&nbsp;rows: '. $heightInSquares);
+						$this->addMessage('&nbsp;&nbsp;&nbsp;cols: '. $widthInSquares);
+					
+					}
+
 					$this->saveL2Map(
 						array(
 							'name' => trim((string)$vVal->mapname),
 							'coordinates' => json_encode($coordinates),
-
 							'rows' => $heightInSquares,
 							'cols' => $widthInSquares
 						)
@@ -4466,9 +4494,6 @@ class ImportController extends Controller
 		die();
 				
 	}
-
-
-
  
 	/**
      * Vertaalt Rijksdriehoekscoördinaten naar noorderbreedte/oosterlengte
@@ -4481,12 +4506,21 @@ class ImportController extends Controller
      */
 	private function bombAmersfoort($rd_x, $rd_y)
 	{
-	
+
+		// http://et10.org/gc/rd.php
+
+		$afX = $rd_x < 1000 ? $rd_x * 1000 : $rd_x;
+		$afY = $rd_y < 1000 ? $rd_y * 1000 : $rd_y;
+
 		//De waarde van x dient te liggen tussen 0 en 290(000)
 		//De waarde van y dient te liggen tussen 290(000) en 630(000)
+		if ($afX > $afY) {
 
-		if ($rd_x < 1000) $rd_x = $rd_x * 1000;
-		if ($rd_y < 1000) $rd_y = $rd_y * 1000;
+			$afX = $afX + $afY;
+			$afY = $afX - $afY;
+			$afX = $afX - $afY;
+			
+		}
 
         // constanten
         $X0 = 155000.000;
@@ -4519,8 +4553,8 @@ class ImportController extends Controller
         $A24 = -0.0000090;
         $B15 = 0.0000291;
 
-        $dx = ($rd_x - $X0) * pow(10,-5);
-        $dy = ($rd_y - $Y0) * pow(10,-5);
+        $dx = ($afX - $X0) * pow(10,-5);
+        $dy = ($afY - $Y0) * pow(10,-5);
 
         $df = ($A01 * $dy) + ($A20 * pow($dx,2)) + ($A02 * pow($dy,2)) + ($A21 * pow($dx,2) * $dy) + ($A03 * pow($dy,3));
         $df += ($A40 * pow($dx,4)) + ($A22 * pow($dx,2) * pow($dy,2)) + ($A04 * pow($dy,4)) + ($A41 * pow($dx,4) * $dy);
@@ -4535,6 +4569,23 @@ class ImportController extends Controller
         $oosterlengte = $L0 + ($dl / 3600);
 
         return array($noorderbreedte, $oosterlengte);
+
     }
+	
+	private function getRandomTestProjectName()
+	{
+
+		$animales = array('aardvark','albatross','alpaca','anteater','antelope','armadillo','baboon','badger','barracuda','bat','bear','beaver','bee','butterfly','camel','caribou','chinchilla','clam','cobra','cormorant','coyote','crab','crane','crow','dragonfly','dugong','eagle','echidna','eland','emu','falcon','ferret','finch','gazelle','gnat','guanaco','hawk','hedgehog','heron','hippopotamus','hummingbird','hyena','iguana','jackal','koala','komodo dragon','kouprey','kudu','lemur','leopard','llama','lobster','locust','lyrebird','manatee','meerkat','mole','moose','mouse','mule','narwhal','octopus','okapi','opossum','oryx','otter','owl','oyster','pelican','penguin','platypus','porcupine','quelea','rhinoceros','rook','serval','shark','sheep','squid','swallow','swan','tapir','vicuña','wasp','weasel','wolf','wombat','yak','zebra');
+
+		return 'test project «'. ucwords($animales[rand(0,count($animales)-1)]).'» ('.date('c').')';
+		
+	}
+	
+	private function isTest()
+	{
+
+		return $_SESSION['admin']['system']['import']['errorlog']['header']['test_project'];
+
+	}
 
 }
