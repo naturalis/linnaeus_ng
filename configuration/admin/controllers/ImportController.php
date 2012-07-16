@@ -4577,7 +4577,7 @@ class ImportController extends Controller
 
 		$animales = array('aardvark','albatross','alpaca','anteater','antelope','armadillo','baboon','badger','barracuda','bat','bear','beaver','bee','butterfly','camel','caribou','chinchilla','clam','cobra','cormorant','coyote','crab','crane','crow','dragonfly','dugong','eagle','echidna','eland','emu','falcon','ferret','finch','gazelle','gnat','guanaco','hawk','hedgehog','heron','hippopotamus','hummingbird','hyena','iguana','jackal','koala','komodo dragon','kouprey','kudu','lemur','leopard','llama','lobster','locust','lyrebird','manatee','meerkat','mole','moose','mouse','mule','narwhal','octopus','okapi','opossum','oryx','otter','owl','oyster','pelican','penguin','platypus','porcupine','quelea','rhinoceros','rook','serval','shark','sheep','squid','swallow','swan','tapir','vicuña','wasp','weasel','wolf','wombat','yak','zebra');
 
-		return 'test project «'. ucwords($animales[rand(0,count($animales)-1)]).'» ('.date('c').')';
+		return '-test project «'. ucwords($animales[rand(0,count($animales)-1)]).'» ('.date('c').')';
 		
 	}
 	
