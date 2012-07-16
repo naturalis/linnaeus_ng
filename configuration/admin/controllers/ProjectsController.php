@@ -973,6 +973,7 @@ class ProjectsController extends Controller
 		$this->deleteProjectLanguage($projectId);
 		$this->deleteModulesFromProject($projectId);
 		$this->deleteProjectCssFile($projectId);
+		$this->deleteProjectSettings($projectId);		
 		$this->deleteProjectImagePaths($projectId);		
 		$this->deleteProject($projectId);
 
@@ -1246,6 +1247,11 @@ class ProjectsController extends Controller
 						
 	}
 
+	private function deleteProjectSettings($id)
+	{
+	
+		$this->models->Settings->delete(array('project_id' => $id));	
 
+	}
 
 }

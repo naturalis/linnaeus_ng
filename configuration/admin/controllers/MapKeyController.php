@@ -2,7 +2,6 @@
 
 /*
 
-
 dus:
 - full screen map optie
 - mogelijkheid om met een toets het laatst gezette punt te verwijderen
@@ -81,8 +80,7 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
-		// are there any LN2-style maps in the project?
-		if ($this->l2CountMaps()!=0)
+		if ($this->getSetting('maptype')=='l2')
 			$this->redirect('l2_species_show.php?id='.$this->l2GetFirstOccurringTaxonId());
 		else
 			//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
@@ -1198,7 +1196,6 @@ class MapKeyController extends Controller
 
 	}
 
-
 	private function saveOccurrenceMarker($p)
 	{
 
@@ -1234,7 +1231,6 @@ class MapKeyController extends Controller
 		);
 
 	}
-
 
 	private function saveOccurrencePolygon($p)
 	{
@@ -1301,7 +1297,6 @@ class MapKeyController extends Controller
 		);
 
 	}
-
 
 	private function getOccurrence($id)
 	{
@@ -1405,99 +1400,7 @@ class MapKeyController extends Controller
 		if ($this->rHasVal('geodata')) $this->smarty->assign('geodata',$this->requestData['geodata']);
 
         $this->printPage();
-
-
-/*
-        $this->checkAuthorisation();
-
-		if (!$this->rHasId()) $this->redirect('species.php');
-
-        $this->setBreadcrumbIncludeReferer(
-            array(
-                'name' => _('Choose an occurrence'), 
-                'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species.php?id='.$this->requestData['s']
-            )
-        );
-
-		$this->getTaxonTree(null,true);
-
-		$taxon = $this->treeList[$this->requestData['s']];
-
-//		$this->setPageName(sprintf(_('Species occurrences of "%s"'),$taxon['taxon']));
-		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
-
-		if ($this->rHasId() && $isOnline) {
-		
-			$allNodes = array();
-
-			foreach((array)$this->requestData['id'] as $key => $val) {
-
-				$d = $this->getOccurrence($val);
-
-				if ($d['type']=='polygon') {
-
-					$d['nodes'] = json_decode($d['boundary_nodes']);
-					$allNodes = array_merge($allNodes,$d['nodes']);
-
-				} else {
-					
-					$a[] = array($d['latitude'],$d['longitude']);
-					$allNodes = array_merge($allNodes,$a);
-				
-				}
-
-				$so[] = $d;
-
-			}
-
-        }
-
-		if (count($allNodes)>0) {
-
-			$middle = $this->getPolygonCentre($allNodes);
 	
-			$sLat = $sLng = 999;
-			$lLat = $lLng = -999;
-	
-			foreach((array)$allNodes as $key => $val) {
-
-				if (!empty($val[0]) && $val[0] < $sLat) $sLat = $val[0];
-				if (!empty($val[0]) && $val[0] > $lLat) $lLat = $val[0];
-				if (!empty($val[1]) && $val[1] < $sLng) $sLng = $val[1];
-				if (!empty($val[1]) && $val[1] > $lLng) $lLng = $val[1];
-
-			}
-	
-
-		}
-
-		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
-
-		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
-
-		if (isset($middle)) $this->smarty->assign('mapInitString','{lat:'.$middle[0].',lng:'.$middle[1].',zoom:7}');
-
-        $this->printPage();
-
-*/
-	
-	}
-
-	private function l2CountMaps()
-	{
-
-		$d = $this->models->L2Map->_get(
-			array('id' =>
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'image !=' => '\'\''
-				),
-				'columns' => 'count(*) as total'
-			)
-		);
-
-		return $d[0]['total'];
-
 	}
 
 	public function l2SpeciesShowAction()
@@ -1668,7 +1571,7 @@ class MapKeyController extends Controller
 				'columns' => 'distinct taxon_id'
 			)
 		);
-		
+
 		if (!$ot) return null;
 
 		$this->getTaxonTree();

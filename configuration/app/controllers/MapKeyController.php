@@ -1080,7 +1080,7 @@ class MapKeyController extends Controller
 	private function getDistributionMapType()
 	{
 	
-		return $this->l2CountMaps()!=0 ? 'l2' : 'lng';
+		return $this->getSetting('maptype');
 	
 	}
 
@@ -1101,23 +1101,6 @@ class MapKeyController extends Controller
 		
 	}
 
-	private function l2CountMaps()
-	{
-
-		$d = $this->models->L2Map->_get(
-			array('id' =>
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'name !=' => '\'\''
-				),
-				'columns' => 'count(*) as total'
-			)
-		);
-
-		return $d[0]['total'];
-
-	}
-	
 	private function l2GetTaxaWithOccurrences()
 	{
 
