@@ -13,6 +13,7 @@ class MapKeyController extends Controller
 		'geodata_type_title',
 		'diversity_index',
 		'l2_occurrence_taxon',
+		'l2_occurrence_taxon_combi',
 		'l2_map'
 	);
     
@@ -204,7 +205,12 @@ class MapKeyController extends Controller
 		else
 			$mapId = $this->requestData['m'];
 
+markTime($l,'waypoint 1');
+			
 		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
+
+markTime($l,'waypoint 2');
+getTime($l); // includes final timestamp
 
 		$this->smarty->assign('mapId',$mapId);
 
@@ -1274,6 +1280,21 @@ class MapKeyController extends Controller
 	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
 	{
 	
+		//return $this->l2GetTaxonOccurrencesV2($id,$mapId,$typeId);
+	
+/*
+	v1			v2
+	68.553ms	2.8732ms
+	45.755ms	2.8363ms
+	92.8979ms	2.7211ms
+	32.9481ms	3.212ms
+	1.9209ms	1.2671ms
+	66.4689ms	3.5623ms
+
+	factor 17!
+*/
+
+	
 		if (!isset($id) || !isset($mapId)) return;
 
 		$d = array(
@@ -1310,6 +1331,63 @@ class MapKeyController extends Controller
 		return array('occurrences' => $ot, 'count' => count((array)$ot));
 
 	}
+
+	private function l2GetTaxonOccurrencesV2($id,$mapId,$typeId=null)
+	{
+	
+		if (!isset($id) || !isset($mapId)) return;
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(),
+			'taxon_id' => $id,
+			'map_id' => $mapId
+		);
+		
+		if (isset($typeId)) $d['type_id'] = $typeId;
+
+		$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+			array(
+				'id' => $d,
+				'columns' => 'id,taxon_id,map_id,type_id,square_numbers'
+			)
+		);
+		
+		foreach((array)$ot as $key => $val) {
+		
+			$x = explode(',',$val['square_numbers']);
+			
+			foreach((array)$x as $val2) {
+			
+				$ot2[$val2]['taxon_id'] = $val['taxon_id'];
+				$ot2[$val2]['map_id'] = $val['map_id'];
+				$ot2[$val2]['type_id'] = $val['type_id'];
+				$ot2[$val2]['square_number'] = $val2;
+			
+			}
+		
+		}
+		
+
+		$dataTypes = array();
+		$dt = $this->getGeodataTypes();
+
+		foreach((array)$ot2 as $key => $val) {
+		
+			$dataTypes[$val['type_id']] = $val['type_id'];
+		
+			$d = $dt[$val['type_id']];
+			$ot2[$key]['type_title'] = $d['title'];
+			$ot2[$key]['colour'] = $d['colour'];
+
+		}
+
+		// why the count??
+		return array('occurrences' => $ot2, 'count' => count((array)$ot));
+
+	}
+
+
+
 
 	private function l2GetOverlap($id1,$id2,$mapId,$dataTypes)
 	{

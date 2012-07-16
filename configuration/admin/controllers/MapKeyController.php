@@ -8,8 +8,6 @@ dus:
 - verschillende cursoren
 ?
 
-delete type = delete data!
-
 make default central point configurable
 		$this->smarty->assign('middelLat',24.886436490787712);
 		$this->smarty->assign('middelLng',-70.2685546875);
@@ -27,6 +25,7 @@ class MapKeyController extends Controller
 		'geodata_type',
 		'geodata_type_title',
 		'l2_occurrence_taxon',
+		'l2_occurrence_taxon_combi',
 		'l2_map'
 	);
     
@@ -62,7 +61,7 @@ class MapKeyController extends Controller
 		$this->createStandardDataTypes();
 
 		$this->smarty->assign('L2Maps',$this->l2GetMaps());
-
+		
     }
 
     /**
@@ -1642,6 +1641,66 @@ class MapKeyController extends Controller
 
 		$tp = $this->createGeodataType(_('Type locality'),$this->getDefaultProjectLanguage(),'marker');
 
+	}
+
+
+	private function l2MakeFasterData()
+	{
+
+		//$this->l2MakeFasterData();
+
+		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
+
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'taxon_id,square_number,type_id,map_id',
+				'order' => 'taxon_id,map_id,type_id'
+			)
+		);
+		
+		$b = null;
+		$prev = null;
+
+		foreach((array)$ot as $key => $val) {
+		
+			if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
+			
+				$this->models->L2OccurrenceTaxonCombi->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $ot[$key-1]['taxon_id'],
+						'map_id' => $ot[$key-1]['map_id'],
+						'type_id' => $ot[$key-1]['type_id'],
+						'square_numbers' => trim($b,',')
+					)
+				);			
+			
+				$b = null;
+			
+			}
+
+			$b .= $val['square_number'].',';
+			
+			$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
+
+		}
+
+		$this->models->L2OccurrenceTaxonCombi->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $ot[$key-1]['taxon_id'],
+				'map_id' => $ot[$key-1]['map_id'],
+				'type_id' => $ot[$key-1]['type_id'],
+				'square_numbers' => trim($b,',')
+			)
+		);
+		
+		$this->addMessage('Done making faster L2-map data.');
+
+	
 	}
 
 
