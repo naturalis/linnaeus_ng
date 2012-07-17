@@ -4,6 +4,22 @@
 {assign var='totalSteps' value=$keypath|@count}
 {assign var='previousStep' value=$totalSteps-2}
 
+<script type="text/javascript">
+    var tmp = '<div id="lookup-DialogContent">';
+    {if $keypath|@count > 1}
+        {foreach from=$keypath key=k item=v name=pathPopup}
+            {if !$smarty.foreach.pathPopup.last}
+            tmp = tmp + 
+                '<p class="row">'+
+                '<a href="javascript:void(0);keyDoStep({$v.id})">{$v.step_number|@escape}. {$v.step_title|@escape}{if $v.choice_marker} ({$v.choice_marker|@escape}){/if}</a>'+
+                '</p>';
+            {/if}
+        {/foreach}
+    {else}
+        tmp = tmp + '<tr><td>{t}No choices made yet{/t}</td></tr>';
+    {/if}
+    tmp = tmp + '</div>';
+</script>
 
 
 {if $useJavascriptLinks}
