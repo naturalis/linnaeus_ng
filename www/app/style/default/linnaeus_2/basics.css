@@ -60,8 +60,8 @@ body {
 
 #container {
     width: 900px;
-	margin: 0 auto;
 	text-align: left;
+	margin: 0 auto;
     border: 0;
 	position: relative;
 }
@@ -79,6 +79,7 @@ body {
     -ms-box-shadow: 1px 1px 4px #7A7A7A;
     box-shadow: 1px 1px 4px #7A7A7A;
     clear: both;
+	overflow: hidden;
 }
 
 #header-titles, #categories, #page-main {
@@ -289,7 +290,6 @@ body {
     -o-border-bottom-left-radius: 6px 6px;
     -ms-border-bottom-left-radius: 6px 6px;
     border-bottom-left-radius: 6px 6px;
-    overflow: hidden;
 }
 
 #categories ul li a.category-last {
