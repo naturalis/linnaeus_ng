@@ -42,6 +42,7 @@ class Controller extends BaseClass
     public $showLowerTaxon = true;
 	public $includeLocalMenu = true;
 	public $allowEditPageOverlay = true;
+	public $tmp;
 
     private $usedModelsBase = array(
         'settings', 
@@ -1171,6 +1172,8 @@ class Controller extends BaseClass
 			the rank ID's are hardcoded, so the ranks-table should NEVER change
 		
 		*/
+		
+		if (empty($projRankId)) return $name;
 		
 		if ($projRankId=='synonym' || $projRankId=='syn' ) return '<span class="italics">'.$name.'</span>';
 	
