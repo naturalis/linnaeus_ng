@@ -23,7 +23,8 @@ class KeyController extends Controller
 		'basics.css',
 		'key.css',
 		'colorbox/colorbox.css',
-		'dialog/jquery.modaldialog.css'
+		'dialog/jquery.modaldialog.css',
+		'lookup.css'
 	); //'key-tree.css'
 
 	public $jsToLoad =
