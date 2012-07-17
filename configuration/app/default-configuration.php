@@ -233,14 +233,3 @@ class configuration
 
 
 }
-
-
-// YES this will go (eventually)
-function q ($v, $d = false)
-{
-	echo '<pre>';
-    var_dump($v);
-    if ($d)
-        die();
-}
-

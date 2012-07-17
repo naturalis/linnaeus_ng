@@ -62,7 +62,8 @@ class Controller extends BaseClass
     );
 
     private $usedHelpersBase = array(
-		'logging_helper'
+		'logging_helper',
+		'debug_tools'
     );
 	
 	public $cssToLoad = array();
