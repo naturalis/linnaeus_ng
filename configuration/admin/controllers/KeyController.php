@@ -11,7 +11,7 @@ class KeyController extends Controller
 
     public $usedModels = array(
 		'keystep',
-		'keymap',
+		'keytree',
 		'content_keystep',
 		'content_keystep_undo',
 		'choice_keystep',
@@ -823,20 +823,21 @@ class KeyController extends Controller
 	
 		$this->checkAuthorisation();
         
-        $this->setPageName( _('Store keymap'));
+        $this->setPageName( _('Store key tree'));
 		
-		if ($this->rHasVal('action','store')) { // && !$this->isFormResubmit()) {
+		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
 
-			// might not be a bad idea either: $d = $this->getTaxonDivision();
-			$this->storeKeyTree(
-				$this->getStorableKeyTree(),
-				$this->getChoiceList()
-			);
+			$k = $this->saveKeyTree();
 			
-			$this->addMessage(_('Keymap saved'));
+			if ($k==true)
+				$this->addMessage(_('Key tree saved'));
+			else
+				$this->addError($k);
 
 		}
-	
+
+		$this->smarty->assign('keyinfo',$this->getKeyInfo());
+
         $this->printPage();
 
 	}
@@ -2131,83 +2132,6 @@ class KeyController extends Controller
 
 	}
 
-	private function storeKeyTree($t,$l)
-	{
-
-		$this->models->Keymap->delete(array('project_id' => $this->getCurrentProjectId()));
-		
-		if (empty($t) || empty($l)) return;
-
-		$this->models->Keymap->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'keymap' => serialize($t),
-				'choicelist' => serialize($l)
-			)
-		);
-				
-	}
-
-	private function getStorableKeyTree($id=null)
-	{
-	
-		$d = !isset($id) ? $this->getStartKeystep() : $this->getKeystep($id);
-		
-		foreach((array)$this->getKeystepChoices($d['id']) as $val) {
-		
-			if (!is_null($val['res_keystep_id'])) $targetStep = $this->getStorableKeyTree($val['res_keystep_id']);
-			if (!is_null($val['res_taxon_id'])) $targetTaxon = $this->getTaxonById($val['res_taxon_id']);
-
-			$ck = $this->models->ChoiceContentKeystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'choice_id' => $val['id']
-						),
-					'columns' => 'choice_txt,choice_img,choice_image_params,language_id',
-					'fieldAsIndex' => 'language_id'
-				)
-			);
-
-			$c[$val['id']] = array(
-				'id' => $val['id'],
-				'marker' => $val['marker'],
-				'content' => $ck,
-				'choice_img' => $val['choice_img'],
-				'choice_image_params' => $val['choice_image_params'],
-				'res_keystep_id' => $val['res_keystep_id'],
-				'res_keystep' => isset($targetStep) ? $targetStep : null,
-				'res_taxon_id' => $val['res_taxon_id'],
-				'res_taxon' => isset($targetTaxon) ? $targetTaxon : null,
-			);
-		
-		}
-
-		$ck = $this->models->ContentKeystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'keystep_id' => $d['id']
-					),
-				'columns' => 'title,content,language_id',
-				'fieldAsIndex' => 'language_id'
-			)
-		);
-					
-		$s[$d['id']] = array(		
-			'id' => $d['id'],
-			'number' => $d['number'],
-			'image' => $d['image'],
-			'content' => $ck,
-			'choices' => isset($c) ? $c : null
-		);
-
-
-		return ($s);
-	
-	}
-
 	private function getChoiceList($id=null)
 	{
 	
@@ -2414,5 +2338,100 @@ class KeyController extends Controller
 		}
 
 	}
+
+	private function generateKeyTree($id=null)
+	{
+
+		if (is_null($id)) {
+
+			$step = $this->getStartKeystep();
+			$id = $step['id'];
+
+		}
+
+		$c = $this->getKeystepChoices($id);
+		
+		foreach((array)$c as $key => $val) {
+		
+			$d[$key]['keystep_id'] = $val['keystep_id'];
+			//$d[$key]['res_keystep_id'] = $val['res_keystep_id'];
+			$d[$key]['res_taxon_id'] = $val['res_taxon_id'];
+
+			if ($val['res_keystep_id']) $d[$key]['offspring'] = $this->generateKeyTree($val['res_keystep_id']);
+
+		}
+		
+		return isset($d) ? $d : null;
+	
+	}
+
+	private function saveKeyTree()
+	{
+	
+		$tree = $this->generateKeyTree();
+		
+		if ($tree) {
+
+			$this->models->Keytree->delete(
+				array('project_id' => $this->getCurrentProjectId())
+			);	
+
+			$k = $this->models->Keytree->save(
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'keytree' => serialize($tree)
+				)
+			);	
+
+			return $k;
+
+			
+		} else {
+		
+			return false;
+
+		}
+	
+	
+	}
+
+	private function getKeyInfo()
+	{
+
+		$d1 = $this->models->Keytree->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
+			)
+		);
+		
+		$d2 = $this->models->Keystep->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
+				'order' => 'last_change desc',
+				'limit' => 1
+			)
+		);
+
+		$d3 = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
+				'order' => 'last_change desc',
+				'limit' => 1
+			)
+		);
+
+		return
+			array(
+				'keytree' => $d1[0],
+				'keystep' => $d2[0],
+				'choice' => $d3[0]	
+			);	
+	
+	
+	}
+
 
 }
