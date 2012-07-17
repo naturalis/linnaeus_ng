@@ -6,11 +6,11 @@ table td {
 	vertical-align: top;
 }
 
-#module-grid {
-	margin-top: 30px;
+table#module-grid {
+	top: 135px;
+	left: 20px;
 	width: 300px;
-    position:fixed;
-    
+    position: absolute;
 }
 
 #content {
