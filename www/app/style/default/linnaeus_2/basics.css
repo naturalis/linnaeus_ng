@@ -4,7 +4,7 @@ html {
 }
 
 body { 
-    text-align: center; 
+    text-align: center;
 }
 
 #top-strip {
@@ -59,16 +59,14 @@ body {
 
 
 #container {
-	left: 50%;
     width: 900px;
-	margin-left: -450px; /* set to half of container width */
-    text-align: left;
+	margin: 0 auto;
+	text-align: left;
     border: 0;
-    position: fixed;
+	position: relative;
 }
 
 #main-body {
-    clear: both;
     border: 1px solid #5f5e5e;
     -moz-border-radius: 7px 7px;
     -webkit-border-radius: 7px 7px;
@@ -80,7 +78,7 @@ body {
     -o-box-shadow: 1px 1px 4px #7A7A7A;
     -ms-box-shadow: 1px 1px 4px #7A7A7A;
     box-shadow: 1px 1px 4px #7A7A7A;
-    overflow: hidden;
+    clear: both;
 }
 
 #header-titles, #categories, #page-main {
