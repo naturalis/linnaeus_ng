@@ -9,7 +9,6 @@ function q ($v,$d=false)
     if ($d) die();
 }
 
-
 function markTime(&$list,$marker=null)
 {
 
@@ -23,13 +22,13 @@ function getTime(&$list,$output=true)
 	/*
 		usage:
 	
-		markTime($l,'waypoint 1');
-		markTime($l,'waypoint 2');
+		markTime($this->l,'waypoint 1');
+		markTime($this->l,'waypoint 2');
 
 		[...]
 
-		markTime($l,'waypoint n');
-		getTime($l); // includes final timestamp
+		markTime($this->l,'waypoint n');
+		getTime(($this->l); // includes final timestamp
 
 	*/
 
