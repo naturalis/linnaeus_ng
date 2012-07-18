@@ -13,21 +13,6 @@
 <div id="footer-container">
 </div ends="footer-container">
 </div ends="body-container">
-<div id="hint-balloon" 
-	style="
-	background-color:#FFFF99;
-	border:1px solid #bbbb00;
-	width:225px;height:100px;
-	padding:3px;
-	font-size:9px;
-	display:none;
-	overflow:hidden;
-	cursor:pointer;
-	position:absolute;
-	top:0px;
-	left:0px;
-	">
-</div>
 </form>
 {literal}
 <script type="text/JavaScript">

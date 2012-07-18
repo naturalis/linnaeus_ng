@@ -4416,7 +4416,8 @@ class ImportController extends Controller
 	{
 
 		if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
-
+			set_time_limit(120);
+				
 			$d = new XMLReader;
 			$r = array();
 			if ($d->open($_SESSION['admin']['system']['import']['file']['path'])) {

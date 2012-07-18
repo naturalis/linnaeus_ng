@@ -37,4 +37,5 @@
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
 {/section}
 {/if}
+
 </head>
