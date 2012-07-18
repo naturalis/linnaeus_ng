@@ -50,6 +50,7 @@
 				</tr>
 			{/section}
 			</table>
+			</div>
 		{/if}
 		</td>
 		<td id="legendCell">
