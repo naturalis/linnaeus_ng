@@ -14,6 +14,7 @@ class MapKeyController extends Controller
 		'diversity_index',
 		'l2_occurrence_taxon',
 		'l2_occurrence_taxon_combi',
+		'l2_diversity_index',
 		'l2_map'
 	);
     
@@ -195,7 +196,7 @@ class MapKeyController extends Controller
 		if (!$this->rHasVal('ref','search')) unset($_SESSION['app']['user']['map']['search']);
 
 		if (!$this->rHasVal('ref','diversity')) unset($_SESSION['app']['user']['map']['index']);
-
+			
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
 		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
@@ -205,12 +206,7 @@ class MapKeyController extends Controller
 		else
 			$mapId = $this->requestData['m'];
 
-//markTime($l,'waypoint 1');
-			
 		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
-
-//markTime($l,'waypoint 2');
-//getTime($l); // includes final timestamp
 
 		$this->smarty->assign('mapId',$mapId);
 
@@ -1112,9 +1108,12 @@ class MapKeyController extends Controller
 
 		$this->getTaxonTree(array('includeOrphans' => false));
 
+
 		$taxa = $this->l2GetTaxaOccurrenceCount($this->getTreeList());
-		
+
+
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+
 
 		return $taxa;
 	
@@ -1123,17 +1122,50 @@ class MapKeyController extends Controller
 	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
 	{
 
-		$ot = $this->models->L2OccurrenceTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-				),
-				'columns' => 'taxon_id,count(*) as total',
-				'group' => 'taxon_id',
-				'fieldAsIndex' => 'taxon_id'
-			)
-		);
+
+		if (!isset($_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'])) {
+	
+			if ($this->l2HasTaxonOccurrencesCompacted()) {
 		
+				$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+						),
+						'columns' => 'taxon_id,square_numbers',
+						'fieldAsIndex' => 'taxon_id'
+					)
+				);
+				
+				foreach((array)$ot as $key => $val) {
+				
+					$ot[$key]['total'] = count((array)explode(',',$val['square_numbers']));
+						
+				}
+
+			} else {
+		
+				$ot = $this->models->L2OccurrenceTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+						),
+						'columns' => 'taxon_id,count(*) as total',
+						'group' => 'taxon_id',
+						'fieldAsIndex' => 'taxon_id'
+					)
+				);
+		
+		
+		
+				
+			}
+			
+			$_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'] = $ot;
+			
+		}
+		
+		$ot = $_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'];
 		
 		if (isset($taxaToFilter)) {
 		
@@ -1163,16 +1195,33 @@ class MapKeyController extends Controller
 
 		if (!isset($id)) return;
 
-		$d = $this->models->L2OccurrenceTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $id
-				),
-				'columns' => 'map_id',
-				'limit' => 1
-			)
-		);
+		if ($this->l2HasTaxonOccurrencesCompacted()) {
+	
+			$d = $this->models->L2OccurrenceTaxonCombi->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $id
+					),
+					'columns' => 'map_id',
+					'limit' => 1
+				)
+			);
+
+		} else {
+	
+			$d = $this->models->L2OccurrenceTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $id
+					),
+					'columns' => 'map_id',
+					'limit' => 1
+				)
+			);
+			
+		}
 
 		return $d[0]['map_id'];
 
@@ -1182,7 +1231,7 @@ class MapKeyController extends Controller
 	{
 
 		$taxa = $this->l2GetTaxaWithOccurrences();
-		
+
 		reset($taxa);
 		
 		$prev = $next = null;
@@ -1211,7 +1260,7 @@ class MapKeyController extends Controller
 	private function l2GetMaps($id=null)
 	{
 
-		if (1==1 || !isset($_SESSION['app']['user']['map']['L2Maps'])) {
+		if (!isset($_SESSION['app']['user']['map']['l2Maps'])) {
 
 			$m = $this->models->L2Map->_get(
 				array(
@@ -1293,32 +1342,17 @@ class MapKeyController extends Controller
 
 			}
 			
-			$_SESSION['app']['user']['map']['L2Maps'] = $m;
+			$_SESSION['app']['user']['map']['l2Maps'] = $m;
 	
 		}
 
-		return isset($id) ? $_SESSION['app']['user']['map']['L2Maps'][$id] : $_SESSION['app']['user']['map']['L2Maps'];
+		return isset($id) ? $_SESSION['app']['user']['map']['l2Maps'][$id] : $_SESSION['app']['user']['map']['l2Maps'];
 	
 	}
 
 	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
 	{
-	
-		//return $this->l2GetTaxonOccurrencesV2($id,$mapId,$typeId);
-	
-/*
-	v1			v2
-	68.553ms	2.8732ms
-	45.755ms	2.8363ms
-	92.8979ms	2.7211ms
-	32.9481ms	3.212ms
-	1.9209ms	1.2671ms
-	66.4689ms	3.5623ms
 
-	factor 17!
-*/
-
-	
 		if (!isset($id) || !isset($mapId)) return;
 
 		$d = array(
@@ -1329,14 +1363,23 @@ class MapKeyController extends Controller
 		
 		if (isset($typeId)) $d['type_id'] = $typeId;
 
-		$ot = $this->models->L2OccurrenceTaxon->_get(
-			array(
-				'id' => $d,
-				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
-				'fieldAsIndex' => 'square_number'
-				
-			)
-		);
+
+		if ($this->l2HasTaxonOccurrencesCompacted()) 
+			$ot = $this->_l2GetTaxonOccurrencesCompacted($d);
+		else
+			$ot = $this->_l2GetTaxonOccurrencesPerSquare($d);
+
+		/*
+			v1			v2
+			68.553ms	2.8732ms
+			45.755ms	2.8363ms
+			92.8979ms	2.7211ms
+			32.9481ms	3.212ms
+			1.9209ms	1.2671ms
+			66.4689ms	3.5623ms
+		
+			factor 17!
+		*/
 
 		$dataTypes = array();
 		$dt = $this->getGeodataTypes();
@@ -1356,61 +1399,77 @@ class MapKeyController extends Controller
 
 	}
 
-	private function l2GetTaxonOccurrencesV2($id,$mapId,$typeId=null)
+	private function _l2GetTaxonOccurrencesPerSquare($d)
+	{
+
+		//echo '<!--using non-compacted data (bad news)-->';
+		
+		// all separate squares
+		$ot = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => $d,
+				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
+				'fieldAsIndex' => 'square_number'
+				
+			)
+		);
+
+		return $ot;
+
+	}
+
+	private function l2HasTaxonOccurrencesCompacted()
 	{
 	
-		if (!isset($id) || !isset($mapId)) return;
+		if (!isset($_SESSION['app']['user']['map']['l2CompactedData'])) {
+	
+			$combi = $this->models->L2OccurrenceTaxonCombi->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'columns' => '1 as data',
+					'limit' => 1
+				)
+			);
+			
+			$_SESSION['app']['user']['map']['l2CompactedData'] = (isset($combi[0]['data']) && $combi[0]['data']==1);
 
-		$d = array(
-			'project_id' => $this->getCurrentProjectId(),
-			'taxon_id' => $id,
-			'map_id' => $mapId
-		);
+		}
 		
-		if (isset($typeId)) $d['type_id'] = $typeId;
+		return $_SESSION['app']['user']['map']['l2CompactedData'];
+		
+	}
 
-		$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+	private function _l2GetTaxonOccurrencesCompacted($d)
+	{
+	
+		//echo '<!--using compacted data-->';
+	
+		// squares compacted to serialized text field per map/type/taxon-combi
+		$combi = $this->models->L2OccurrenceTaxonCombi->_get(
 			array(
 				'id' => $d,
 				'columns' => 'id,taxon_id,map_id,type_id,square_numbers'
 			)
 		);
 		
-		foreach((array)$ot as $key => $val) {
+		foreach((array)$combi as $key => $val) {
 		
 			$x = explode(',',$val['square_numbers']);
 			
 			foreach((array)$x as $val2) {
 			
-				$ot2[$val2]['taxon_id'] = $val['taxon_id'];
-				$ot2[$val2]['map_id'] = $val['map_id'];
-				$ot2[$val2]['type_id'] = $val['type_id'];
-				$ot2[$val2]['square_number'] = $val2;
+				$ot[$val2]['taxon_id'] = $val['taxon_id'];
+				$ot[$val2]['map_id'] = $val['map_id'];
+				$ot[$val2]['type_id'] = $val['type_id'];
+				$ot[$val2]['square_number'] = $val2;
 			
 			}
 		
 		}
 		
-
-		$dataTypes = array();
-		$dt = $this->getGeodataTypes();
-
-		foreach((array)$ot2 as $key => $val) {
-		
-			$dataTypes[$val['type_id']] = $val['type_id'];
-		
-			$d = $dt[$val['type_id']];
-			$ot2[$key]['type_title'] = $d['title'];
-			$ot2[$key]['colour'] = $d['colour'];
-
-		}
-
-		// why the count??
-		return array('occurrences' => $ot2, 'count' => count((array)$ot));
+		return isset($ot) ? $ot : null;
 
 	}
-
-
 
 
 	private function l2GetOverlap($id1,$id2,$mapId,$dataTypes)
@@ -1445,22 +1504,40 @@ class MapKeyController extends Controller
 	{
 	
 		if (!isset($mapId) || !isset($selectedCells)|| !isset($dataTypes)) return;
+
+		if ($this->l2HasTaxonOccurrencesCompacted()) {
+
+			$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+				array(
+					'where' =>
+						'project_id = '.$this->getCurrentProjectId(). ' and
+						 map_id = '.$mapId.' and
+						'.($dataTypes!='*' ? 'type_id in ('.implode(',',$dataTypes).') and' : '').'
+						concat(\',\',square_numbers,\',\') regexp \'(,'.implode(',|,',$selectedCells).',)\'',
+					'columns' => 'distinct taxon_id'
+					
+				)
+			);
+
+		} else {
+
+			$d =  array(
+					'project_id' => $this->getCurrentProjectId(),
+					'map_id' => $mapId,
+					'square_number in' => '('.implode(',',$selectedCells).')'
+				);
+				
+			if ($dataTypes!='*') $d['type_id in'] = '('.implode(',',$dataTypes).')';
 		
-		$d =  array(
-				'project_id' => $this->getCurrentProjectId(),
-				'map_id' => $mapId,
-				'square_number in' => '('.implode(',',$selectedCells).')'
+			$ot = $this->models->L2OccurrenceTaxon->_get(
+				array(
+					'id' => $d,
+					'columns' => 'distinct taxon_id'
+					
+				)
 			);
 			
-		if ($dataTypes!='*') $d['type_id in'] = '('.implode(',',$dataTypes).')';
-		
-		$ot = $this->models->L2OccurrenceTaxon->_get(
-			array(
-				'id' => $d,
-				'columns' => 'distinct taxon_id'
-				
-			)
-		);
+		}
 		
 		foreach((array)$ot as $val) $p[] = $this->getTaxonById($val['taxon_id']);
 
@@ -1489,15 +1566,36 @@ class MapKeyController extends Controller
 				
 			if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';
 		
-			$ot = $this->models->L2OccurrenceTaxon->_get(
-				array(
-					'id' => $d,
-					'columns' => 'count(*) as total, square_number',
-					'group' => 'square_number',
-					'order' => 'total desc',
-					'fieldAsIndex' => 'square_number',				
-				)
-			);
+		
+			if ($this->l2HasTaxonOccurrencesCompacted()) {
+				
+				//echo '<!--using compacted index-->';
+				
+				$ot = $this->models->L2DiversityIndex->_get(
+					array(
+						'id' => $d,
+						'columns' => 'sum(diversity_count) as total, square_number',
+						'group' => 'square_number',
+						'order' => 'total desc',
+						'fieldAsIndex' => 'square_number',				
+					)
+				);
+					
+			} else {
+
+				//echo '<!--using uncompacted index (bad news)-->';
+
+				$ot = $this->models->L2OccurrenceTaxon->_get(
+					array(
+						'id' => $d,
+						'columns' => 'count(*) as total, square_number',
+						'group' => 'square_number',
+						'order' => 'total desc',
+						'fieldAsIndex' => 'square_number',				
+					)
+				);
+				
+			}
 	
 			if ($ot) {
 				$d = current($ot);
