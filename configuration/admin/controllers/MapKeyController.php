@@ -26,6 +26,7 @@ class MapKeyController extends Controller
 		'geodata_type_title',
 		'l2_occurrence_taxon',
 		'l2_occurrence_taxon_combi',
+		'l2_diversity_index',
 		'l2_map'
 	);
     
@@ -714,6 +715,7 @@ class MapKeyController extends Controller
     
     }
 
+
     /**
      * AJAX interface for this class
      *
@@ -1346,6 +1348,40 @@ class MapKeyController extends Controller
 	
 	}
 
+	private function checkSettings()
+	{
+
+		if ($this->getSetting('maptype')==null) {
+
+			$this->saveSetting(
+				array(
+					'name' => 'maptype',
+					'value' => 'lng'
+				)
+			);		
+		
+		}
+
+	}	
+	
+	private function createStandardDataTypes()
+	{
+
+		$t = $this->models->GeodataType->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'count(*) as total'
+			)
+		);
+
+		if ($t[0]['total']>0) return;
+
+		$tp = $this->createGeodataType(_('Type locality'),$this->getDefaultProjectLanguage(),'marker');
+
+	}
+
+
+
 	public function plotTestAction()
 	{
 
@@ -1402,6 +1438,9 @@ class MapKeyController extends Controller
 	
 	}
 
+
+
+
 	public function l2SpeciesShowAction()
 	{
 
@@ -1447,6 +1486,28 @@ class MapKeyController extends Controller
         $this->printPage();
 
 	}
+
+    public function l2SpeedUpAction()
+    {
+
+		$this->checkAuthorisation();
+        
+        $this->setPageName( _('Store compacted Linnaeus 2 data'));
+		
+		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
+
+			$this->l2MakeCompactData();
+			
+			$this->addMessage(_('Compacted data saved'));
+
+		}
+
+		$this->smarty->assign('lastChangeDate',$this->l2GetCompactDataChangeDate());
+
+        $this->printPage();
+		
+    }
+
 
 	private function l2GetTaxonOccurrences($id,$mapId)
 	{
@@ -1611,43 +1672,8 @@ class MapKeyController extends Controller
 
 	}
 
-	private function checkSettings()
+	private function l2MakeCompactData()
 	{
-
-		if ($this->getSetting('maptype')==null) {
-
-			$this->saveSetting(
-				array(
-					'name' => 'maptype',
-					'value' => 'lng'
-				)
-			);		
-		
-		}
-
-	}	
-	
-	private function createStandardDataTypes()
-	{
-
-		$t = $this->models->GeodataType->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'count(*) as total'
-			)
-		);
-
-		if ($t[0]['total']>0) return;
-
-		$tp = $this->createGeodataType(_('Type locality'),$this->getDefaultProjectLanguage(),'marker');
-
-	}
-
-
-	private function l2MakeFasterData()
-	{
-
-		//$this->l2MakeFasterData();
 
 		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
 
@@ -1658,12 +1684,20 @@ class MapKeyController extends Controller
 				'order' => 'taxon_id,map_id,type_id'
 			)
 		);
-		
+
 		$b = null;
 		$prev = null;
+		$divIndex = array();
 
 		foreach((array)$ot as $key => $val) {
 		
+			// preparing diversity index
+			if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
+				$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
+			else
+				$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
+
+			// combined squares
 			if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
 			
 				$this->models->L2OccurrenceTaxonCombi->save(
@@ -1685,6 +1719,9 @@ class MapKeyController extends Controller
 			
 			$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
 
+
+
+
 		}
 
 		$this->models->L2OccurrenceTaxonCombi->save(
@@ -1697,12 +1734,55 @@ class MapKeyController extends Controller
 				'square_numbers' => trim($b,',')
 			)
 		);
-		
-		$this->addMessage('Done making faster L2-map data.');
 
-	
+
+		// saving diversity index	
+		$this->models->L2DiversityIndex->delete(array('project_id' => $this->getCurrentProjectId()));
+
+		foreach((array)$divIndex as $mapId => $squares) {
+
+			foreach((array)$squares as $squareId => $types) {
+
+				foreach((array)$types as $typeId => $count) {
+
+					if ($count > 0) {
+
+						$this->models->L2DiversityIndex->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getCurrentProjectId(),
+								'map_id' => $mapId,
+								'type_id' => $typeId,
+								'square_number' => $squareId,
+								'diversity_count' => $count
+							)
+						);
+						
+					}
+
+				}
+
+			}
+
+		}
+
 	}
+	
 
-
+	private function l2GetCompactDataChangeDate()
+	{
+	
+		$loctc = $this->models->L2OccurrenceTaxonCombi->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr',
+				'order' => 'last_change desc',
+				'limit' => 1
+			)
+		);
+		
+		return $loctc[0]['date_hr'];
+		
+	}
 	
 }

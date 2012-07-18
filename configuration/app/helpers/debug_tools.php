@@ -20,6 +20,10 @@ function getTime(&$list,$output=true)
 {
 
 	/*
+	
+(markTime).*(;)
+	
+	
 		usage:
 	
 		markTime($this->l,'waypoint 1');
@@ -28,7 +32,7 @@ function getTime(&$list,$output=true)
 		[...]
 
 		markTime($this->l,'waypoint n');
-		getTime(($this->l); // includes final timestamp
+		getTime($this->l); // includes final timestamp
 
 	*/
 
