@@ -1251,8 +1251,32 @@ class MapKeyController extends Controller
 
 				}
 
-				if ($m[$key]['mapExists']) $m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
-				
+				if ($m[$key]['mapExists']) {
+					
+					$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
+
+					if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
+							$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
+					
+						$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
+							
+						$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
+						$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
+							
+						// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
+						$m[$key]['width'] = $val['cols']*($m[$key]['cellWidth']+1);
+						$m[$key]['height'] = $val['rows']*($m[$key]['cellHeight']+1);
+							
+					} else {
+
+						$m[$key]['width'] = $m[$key]['size'][0];
+						$m[$key]['height'] = $m[$key]['size'][1];
+						$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
+						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
+
+					}
+				}
+
 				$d = json_decode($val['coordinates']);
 
 				$m[$key]['coordinates'] = array(

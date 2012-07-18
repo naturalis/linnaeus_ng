@@ -2,7 +2,7 @@ var l2MapCoordinates = '';
 var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
 var l2DataColours = Array();
-
+/*
 function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 
 	l2MapPxWidth = mapW;
@@ -26,6 +26,25 @@ function l2ScaleCells(w,h) {
 
 	$('td[col=1]').each(function (i) {
 		$(this).css('height',h+'px');
+	});
+}
+*/
+function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
+
+	$('#mapTable').css('width',(mapW)+'px');
+	$('#mapTable').css('height',(mapH)+'px');
+	l2ScaleCells(cellW,cellH);
+	$('#mapTable').css('background','url('+mapUrl+')');
+	$('#mapTable').css('background-size','cover');
+}
+
+function l2ScaleCells(w,h) {
+
+	$('#mapTable').find('tr').eq(0).children().each(function() {
+		$(this).css('width',w+'px');
+	});
+	$('#mapTable tr').each(function() {
+		$(this).find('td:first').css('width',w+'px').css('height',h+'px');
 	});
 }
 
