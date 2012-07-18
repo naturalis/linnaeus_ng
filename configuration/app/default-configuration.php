@@ -210,7 +210,7 @@ class configuration
 			'urlToCheckConnectivity' =>'http://maps.google.com/maps/api/js?sensor=false',
 			'SRID' => 4326,
 			'l2DiversityIndexNumOfClasses' => 8, // be aware that increasing this does *not* automatically create extra css classes
-			'l2MaxMapWidth' => 0 // maps exceeding this size are automatically resized, set to 0 to ignore
+			'l2MaxMapWidth' => 600 // maps exceeding this size are automatically resized, set to 0 to ignore
 		);
 
     }
