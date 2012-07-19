@@ -1267,7 +1267,7 @@ class MapKeyController extends Controller
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
 					'fieldAsIndex' => 'id',
-					'order' => 'name'
+					'order' => 'id'
 				)
 			);
 
