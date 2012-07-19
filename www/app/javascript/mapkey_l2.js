@@ -13,9 +13,9 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 	$('#mapTable').css('width',(mapW)+'px');
 	$('#mapTable').css('height',(mapH)+'px');
 	//l2ScaleCells(cellW,cellH);
-	$('#mapTable').css('background','url('+mapUrl+')');
 	
 	if (Modernizr.backgroundsize) {
+		$('#mapTable').css('background','url('+mapUrl+')');
 		$('#mapTable').css('background-size','cover');
 	} else {
 		$('#mapTable').css({
