@@ -12,7 +12,8 @@ l2SetMap(
     {$map.height},
     '{$map.coordinates.original}',
     {$map.cellWidth},
-    {$map.cellHeight}
+    {$map.cellHeight},
+    {$map.resized}
 );
 
 {/if}
