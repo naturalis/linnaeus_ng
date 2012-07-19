@@ -1,4 +1,3 @@
-
 #header-titles {
     height: 15px;
 	padding: 0;
@@ -71,6 +70,7 @@ a.selectIcon:hover {
 
 #mapTable  {
 	border: 1px solid #000;
+	visibility: hidden;
 }
 
 #mapTable td {

@@ -15,5 +15,4 @@ l2SetMap(
     {$map.cellHeight},
     {$map.resized}
 );
-
 {/if}

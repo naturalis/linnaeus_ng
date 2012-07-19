@@ -26,6 +26,7 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
 			});
 		}
 	}
+	$('#mapTable').css('visibility','visible');
 	
 }
 function l2ScaleCells(w,h) {
