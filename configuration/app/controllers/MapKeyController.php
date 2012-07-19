@@ -424,7 +424,7 @@ class MapKeyController extends Controller
 		
 		} else {
 
-			$d = current($maps);
+			$d = current((array)$maps);
 	
 			$mapId = $d['id'];
 			
@@ -1506,7 +1506,10 @@ class MapKeyController extends Controller
 	
 		if (!isset($mapId) || !isset($selectedCells)|| !isset($dataTypes)) return;
 
+		/*
 		if ($this->l2HasTaxonOccurrencesCompacted()) {
+		
+			// this statement turns out to be slower than the one beneath, more so as the number of selected cells increases
 
 			$ot = $this->models->L2OccurrenceTaxonCombi->_get(
 				array(
@@ -1521,6 +1524,7 @@ class MapKeyController extends Controller
 			);
 
 		} else {
+		*/
 
 			$d =  array(
 					'project_id' => $this->getCurrentProjectId(),
@@ -1538,7 +1542,7 @@ class MapKeyController extends Controller
 				)
 			);
 			
-		}
+		/*}*/
 		
 		foreach((array)$ot as $val) $p[] = $this->getTaxonById($val['taxon_id']);
 
