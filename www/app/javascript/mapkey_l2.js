@@ -3,7 +3,7 @@ var l2MapPxHeight = -1;
 var l2MapPxWidth = -1;
 var l2DataColours = Array();
 
-function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
+function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH, resized) {
 
 	l2MapPxWidth = mapW;
 	l2MapPxHeight = mapH;
@@ -13,16 +13,20 @@ function l2SetMap(mapUrl,mapW,mapH,mapCoord,cellW,cellH) {
 	$('#mapTable').css('width',(mapW)+'px');
 	$('#mapTable').css('height',(mapH)+'px');
 	//l2ScaleCells(cellW,cellH);
-	
-	if (Modernizr.backgroundsize) {
+	if (resized==0) {
 		$('#mapTable').css('background','url('+mapUrl+')');
-		$('#mapTable').css('background-size','cover');
 	} else {
-		$('#mapTable').css({
-	        "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')",
-	        "-ms-filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')"
-		});
+		if (Modernizr.backgroundsize) {
+			$('#mapTable').css('background','url('+mapUrl+')');
+			$('#mapTable').css('background-size','cover');
+		} else {
+			$('#mapTable').css({
+		        "filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')",
+		        "-ms-filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+mapUrl+"', sizingMethod='scale')"
+			});
+		}
 	}
+	
 }
 function l2ScaleCells(w,h) {
 

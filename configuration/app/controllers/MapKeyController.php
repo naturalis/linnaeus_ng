@@ -1261,7 +1261,7 @@ class MapKeyController extends Controller
 	private function l2GetMaps($id=null)
 	{
 
-		if (!isset($_SESSION['app']['user']['map']['l2Maps'])) {
+		if (1==1 || !isset($_SESSION['app']['user']['map']['l2Maps'])) {
 
 			$m = $this->models->L2Map->_get(
 				array(
@@ -1316,6 +1316,7 @@ class MapKeyController extends Controller
 						// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
 						$m[$key]['width'] = ($val['cols']*($m[$key]['cellWidth']+1))-1;
 						$m[$key]['height'] = ($val['rows']*($m[$key]['cellHeight']+1))-1;
+						$m[$key]['resized'] = 1;
 							
 					} else {
 
@@ -1323,7 +1324,7 @@ class MapKeyController extends Controller
 						$m[$key]['height'] = $m[$key]['size'][1];
 						$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
 						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
-
+						$m[$key]['resized'] = 0;
 					}
 				}
 
