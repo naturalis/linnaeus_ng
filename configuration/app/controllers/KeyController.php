@@ -135,36 +135,25 @@ class KeyController extends Controller
 
 		//$taxa = $this->getTaxonDivision();
 		//if (isset($taxa['list'][$step['id']])) $this->smarty->assign('taxa',$taxa['list'][$step['id']]);
-  		markTime($this->l,'waypoint 0');
+  		
 
 		$taxa = $this->getTaxonDivisionV2($step['id']);
-
-  		markTime($this->l,'waypoint 6b');
 
 		$this->smarty->assign('remaining',$taxa['remaining']);
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
-  		markTime($this->l,'waypoint 6c');
-
 		$this->getTaxonTree(array('includeOrphans' => false));// !isset($this->treeList)));
 
-  		markTime($this->l,'waypoint 6d');
-
 		$this->smarty->assign('taxa',$this->getTreeList());
-
-  		markTime($this->l,'waypoint 6e');
 
 		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
 		
 		$this->setCurrentKeyStepId($step['id']);
-  		markTime($this->l,'waypoint 7a');
-
+ 
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		// get step's choices
 		if (isset($step)) $choices = $this->getKeystepChoices($step['id']);
-
-  		markTime($this->l,'waypoint 7b');
 
 		if (isset($step)) $this->smarty->assign('step',$step);
 
@@ -172,16 +161,10 @@ class KeyController extends Controller
 
 		$this->smarty->assign('keypath',$this->getKeyPath());
 
-  		markTime($this->l,'waypoint 8');
-
 		if (isset($choices) && $this->choicesHaveL2Attributes($choices)) 
 	        $this->printPage('index_l2');
 		else
 	        $this->printPage();
-
-  		markTime($this->l,'waypoint 9');
-
-		getTime($this->l);  
 
     }
 
@@ -527,7 +510,7 @@ class KeyController extends Controller
 
 		if (!isset($_SESSION['app']['user']['key']['path'])) {
 
-			$this->setStoredKeypath($step);
+			//$this->setStoredKeypath($step);
 
 		}
 
@@ -683,16 +666,16 @@ class KeyController extends Controller
 	{
 
 		$d = array();
-		markTime($this->l,'waypoint 4b');
+		
 		$allTaxa = $this->getAllTaxaInKey();
-		markTime($this->l,'waypoint 4c');
+		
 		foreach((array)$allTaxa as $val) {
 
 			//if (!in_array($val['res_taxon_id'],$remainingTaxa)) $d[$val['res_taxon_id']] = $val['res_taxon_id']; // in_array is sloooow
 			if (!isset($remainingTaxa[$val['res_taxon_id']])) $d[$val['res_taxon_id']] = $val['res_taxon_id'];
 		
 		}
-		markTime($this->l,'waypoint 4d');
+		
 		
 		return $d;
 		
@@ -701,15 +684,15 @@ class KeyController extends Controller
 	private function getTaxonDivisionV2($step)
 	{
 	
-		markTime($this->l,'waypoint 1');
+		
 		if (is_null($this->getKeyTree2())) $this->setKeyTree();
-		markTime($this->l,'waypoint 2');
+		
 		$this->getStepBranch($step,$this->getKeyTree2());
-		markTime($this->l,'waypoint 3');
+		
 		$this->harvestTaxaFromBranch($this->tmp,$remainingTaxa);
-		markTime($this->l,'waypoint 4');
+		
 		$excludedTaxa = $this->getExcludedTaxa($remainingTaxa);
-		markTime($this->l,'waypoint 5 ('.(count($excludedTaxa)).')');
+		
 		//getTime($this->l);
 		return
 			array(
@@ -718,56 +701,6 @@ class KeyController extends Controller
 			);
 
 	}
-
-	private function setStoredKeypath($step)
-	{
-return;
-unset($this->_stepList);
-$this->cDva($this->getStoredChoiceList(),$step['id']);
-
-
-
-foreach(array_reverse((array)$this->_stepList) as $key => $val) {
-
-	$d[] = array(
-		'id' => $val['keystep_id'],
-		'step_number' => $val['keystep_id'],
-		'step_title' => $val['step_title'][$this->getCurrentLanguageId()]['title'],
-		'is_start' => isset($val['is_start']) ? $val['is_start'] : null,
-		'choice_marker' => $val['marker'],
-	);
-
-
-}
-
-q($d);
-
-die();
-
-
-//q($_SESSION['app']['user']['key']['path']);
-
-		$step = $params['step'];
-		$choice = isset($params['choice']) ? $params['choice'] : null;
-		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
-		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
-		
-		foreach((array)$_SESSION['app']['user']['key']['choiceKeysteps'] as $val) {
-		
-		}
-
-			$d[] = array(
-				'id' => $step['id'],
-				'step_number' => $step['number'],
-				'step_title' => $step['title'],
-				'is_start' => $step['is_start'],
-				'choice_marker' => null,
-			);
-
-
-	}
-
-
 
 
 }
