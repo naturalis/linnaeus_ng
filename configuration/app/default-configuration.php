@@ -24,7 +24,7 @@ class configuration
     {
         
         return array(
-            'host' => '127.0.0.1', 
+            'host' => 'localhost', 
             'user' => 'linnaeus_user', 
             'password' => 'car0lu5', 
             'database' => 'linnaeus_ng', 
