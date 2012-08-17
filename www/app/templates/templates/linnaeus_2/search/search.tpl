@@ -13,7 +13,9 @@
 		{else}
 			{t _s1=$search|replace:'"':'' _s2=$results.numOfResults _s3=$resultWord}Your search for "%s" produced %s results.{/t}
 		{/if}
-		<a id="toggle-all" class="collapsed" href="javascript:toggleAll()">{t}Expand all{/t}</a>.
+		{if $results.species.numOfResults > 0}
+			<a id="toggle-all" class="collapsed" href="javascript:toggleAll()">{t}Expand all{/t}</a>.
+		{/if}
 		</div>
 
 {if $results.species.numOfResults > 0}
