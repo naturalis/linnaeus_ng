@@ -96,7 +96,8 @@
 		<td class="media-cell">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}"> 
+			<a class="group1 image-wrap" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+			<div>
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
@@ -110,6 +111,7 @@
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
+			</div>
 		</a>
 		{elseif $v.category=='video'}
 				<img 
@@ -153,7 +155,7 @@
 	{math assign=rest equation="(x%$widthInCells)" x=$smarty.section.foo.index}
 	{if $rest > 0}
 	{section name=bar start=$rest loop=$widthInCells}
-	  <td></td>
+	  <td class=></td>
 	{/section}
 	{/if}
 	</tr>

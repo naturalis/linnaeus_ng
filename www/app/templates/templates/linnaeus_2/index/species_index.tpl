@@ -33,26 +33,6 @@
     {else}
         {include file="../index/_lower.tpl"}
     {/if}
-
-<!--
-
-	{if $useJavascriptLinks}
-		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
-		{/if}
-	{else}
-		{if $prevStart!=-1}
-		<a href="?start={$prevStart}&letter={$letter}">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<a href="?start={$nextStart}&letter={$letter}">{t}next{/t} ></span>
-		{/if}
-	{/if}
-	
--->
 </div>
 
 {include file="../shared/footer.tpl"}

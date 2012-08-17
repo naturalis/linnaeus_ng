@@ -69,7 +69,7 @@
 	{foreach from=$results.glossary.results key=cat item=res}
 	{if $res.data|@count>0  || $showZeroHeaders}
 	{assign var=resultCount value=$res.data|@count}
-	{if $results.glossary.subsetsWithResults>1}<div class="subset-header{if $resultCount==0}-zero{/if}">>{$res.label} ({$resultCount})</div>{/if}
+	{if $results.glossary.subsetsWithResults>1}<div class="subset-header{if $resultCount==0}-zero{/if}">{$res.label} ({$resultCount})</div>{/if}
 	<div class="subset">
 		{foreach from=$res.data key=k item=v name=r}
 		{if $smarty.foreach.r.first || $background=='c2'}

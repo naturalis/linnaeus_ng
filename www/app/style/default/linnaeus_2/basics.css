@@ -396,12 +396,10 @@ table#media-grid td.media-cell {
 	border-top: 1px solid #000;
 	border-bottom: 1px solid #000;
 }
-
 table#media-grid img.image-full {
 	border: 1px solid #000;
 	cursor: pointer;
 }
-
 table#media-grid img.image-full {
 	max-height: 125px;
 	max-width: 150px;
@@ -432,4 +430,3 @@ table#media-grid img.media-video-icon {
 table#media-grid td:first-child {
 	padding-left: 10px;
 }
-
