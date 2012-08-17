@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="keywords" CONTENT="{$session.app.project.keywords}">
-	<meta name="description" CONTENT="{$session.app.project.description}">
-	<meta name="ROBOTS" CONTENT="ALL">
-	<meta name="lng-project-id" content="{$session.app.project.id}">
+	<meta name="keywords" content="{$session.app.project.keywords}" />
+	<meta name="description" content="{$session.app.project.description}" />
+	<meta name="robots" content="all" />
+	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
 	<style type="text/css" media="all">
 	    @import url("{$session.app.project.urls.projectCSS}yui/cssreset-min.css");
@@ -20,6 +20,9 @@
     <![endif]-->
     <!--[if IE 8]>
         <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7-8.css";</style> 
+    <![endif]-->
+    <!--[if IE]>
+        <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie.css";</style> 
     <![endif]-->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>

@@ -10,15 +10,17 @@
 {/if}
 
 
-<div id="footer-container">
-</div ends="footer-container">
-</div ends="body-container">
+<div id="footer-container"></div>
+
+</div>
 </form>
+
+</div>
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	$('#body-container').height($(document).height());
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
 
 {foreach from=$requestData key=k item=v}
