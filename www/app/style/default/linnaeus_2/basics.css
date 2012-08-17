@@ -346,8 +346,6 @@ body {
 /* Navigation icons are included in utilities/dynamic-css.tpl */
 
 
-
-/* Bringing back stuff from the original basics.css */
 a, .internal-link {
     color: #400093;
     cursor: pointer;
@@ -400,6 +398,7 @@ table#media-grid img.image-full {
 	border: 1px solid #000;
 	cursor: pointer;
 }
+
 table#media-grid img.image-full {
 	max-height: 125px;
 	max-width: 150px;

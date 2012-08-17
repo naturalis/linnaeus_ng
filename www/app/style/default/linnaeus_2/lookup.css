@@ -61,13 +61,16 @@ td.allLookupListCell {
 .allLookupListRow, .allLookupListActiveRow, .row {
 	text-align: left;
 	cursor: pointer;
-	padding: 1px 5px; 
+	padding: 0 4px; 
+	border: 1px solid transparent;
 }
-
+/*
 .allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
-    color: #fff;
-    background: #555454;
+	color: #fff;
+	background: #3875d7;
+	border: 1px dotted #000;
 }
+*/
 
 .row a {
 	color: #000;
@@ -75,7 +78,13 @@ td.allLookupListCell {
 	display: block;
 }
 
-.row-selected a {
+.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row-selected {
+	color: #fff;
+	background: #3875d7;
+	border: 1px dotted #000;
+}
+
+.row-selected a, .row:hover * {
 	color: #fff;
 }
 

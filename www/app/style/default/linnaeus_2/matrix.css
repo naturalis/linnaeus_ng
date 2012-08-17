@@ -64,10 +64,6 @@ table#states tr:last-child, table#comparison tr:last-child {
 	border-bottom: 1px solid #f4f0f0;
 }
 
-.character-selected, .state-selected {
-	background-color: #f4f0f0;
-}
-
 td.compare-label {
 	width: 300px;	
 	height: 30px;
@@ -163,4 +159,21 @@ td.compare-label {
 	text-align:right;
 	padding-left:10px;
 }
+
+
+select option {
+	border: 1px solid transparent;
+}
+
+select option:hover {
+	background: #3875d7;
+	border: 1px dotted #000;
+	color: #fff;
+	cursor: pointer;
+}
+
+.character-selected, .state-selected {
+	background-color: #f4f0f0;
+}
+
 
