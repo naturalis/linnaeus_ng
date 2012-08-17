@@ -58,7 +58,6 @@
 {literal}
 #contents-icon {
 {/literal}
-    cursor: pointer; 
     background: url('{$systemMedia}contents.png') 5px 0 no-repeat;
 {literal}
 }
@@ -75,7 +74,6 @@
 {literal}
 #previous-icon {
 {/literal}
-    cursor: pointer; 
     background: url('{$systemMedia}previous.png') 5px 0 no-repeat;
 {literal}
 }
@@ -103,7 +101,6 @@
 #next-icon {
 {/literal}
     width: 40px;
-    cursor: pointer; 
     background: url('{$systemMedia}next.png') no-repeat;
 {literal}
 }
@@ -133,7 +130,6 @@
 #back-icon {
 {/literal}
     width: 40px;
-    cursor: pointer; 
     background: url('{$systemMedia}back.png') no-repeat;
 {literal}
 }
@@ -193,7 +189,6 @@
 #first-icon {
 {/literal}
     width: 40px;
-    cursor: pointer; 
     background: url('{$systemMedia}first.png') no-repeat;
 {literal}
 }
@@ -274,7 +269,6 @@
 #back-to-search-icon {
 {/literal}
     width: 85px;
-    cursor: pointer; 
     background: url('{$systemMedia}back_to_search.png') no-repeat center 0;
 {literal}
 }

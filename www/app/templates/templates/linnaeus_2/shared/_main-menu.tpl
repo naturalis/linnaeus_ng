@@ -16,8 +16,7 @@
         {if $useJavascriptLinks}
             <li><span class="main-menu{if $v.id == $module.id}-selected{/if}" onclick="goMenuModule({$v.id});">{t}{$v.module}{/t}</span></li>
         {else}
-            <li><a class="main-menu
-            {if $v.id == $module.id}-selected{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a></li>
+            <li><a class="main-menu{if $v.id == $module.id}-selected{/if}" href="../module/?modId={$v.id}">{t}{$v.module}{/t}</a></li>
         {/if}
         {assign var=first value=false}
     {/if}
