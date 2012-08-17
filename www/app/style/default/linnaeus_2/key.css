@@ -159,24 +159,32 @@
 	overflow: hidden;
 	background-color: #fff;
 	float: right;
-	padding: 5px;
 	overflow-y: scroll;
 }
 
 #taxa #header {
 	font-weight: bold;
 	margin-bottom: 8px;
+	padding: 5px;
 }
 
-#taxa a:link,#taxa a:visited,#taxa p.a:link,#taxa p.a:visited {
-	cursor: pointer;
+#taxa a {
+	display: block;
+	width: 240px;
+	text-align: left;
+	padding: 0 4px;
+}
+
+#taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
 	color: #000;
 	text-decoration: none;
+	border: 1px solid transparent;
 }
 
-#taxa a:hover,#taxa p.a:hover {
-	cursor: pointer;
-	color: red;
+#taxa a:hover, #taxa p.a:hover {
+	color: #fff;
+	background: #3875d7;
+	border: 1px dotted #000;
 }
 
 #taxa p:last-child {
