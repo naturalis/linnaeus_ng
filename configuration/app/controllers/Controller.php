@@ -1196,15 +1196,15 @@ class Controller extends BaseClass
 			case '74':
 				return '<span class="italics">'.$name.'</span>';
 			case '77':
-				return '<span class="italics">'.$g.' '.$s.'</span> subsp. <span class="italics">'.$i.'</span';
+				return '<span class="italics">'.$g.' '.$s.'</span> subsp. <span class="italics">'.$i.'</span>';
 			case '78':
-				return '<span class="italics">'.$g.' '.$s.'</span> var. <span class="italics">'.$i.'</span';
+				return '<span class="italics">'.$g.' '.$s.'</span> var. <span class="italics">'.$i.'</span>';
 			case '79':
-				return '<span class="italics">'.$g.' '.$s.'</span> subvar. <span class="italics">'.$i.'</span';
+				return '<span class="italics">'.$g.' '.$s.'</span> subvar. <span class="italics">'.$i.'</span>';
 			case '81':
-				return '<span class="italics">'.$g.' '.$s.'</span> f. <span class="italics">'.$i.'</span';
+				return '<span class="italics">'.$g.' '.$s.'</span> f. <span class="italics">'.$i.'</span>';
 			case '82':
-				return '<span class="italics">'.$g.' '.$s.'</span> subf. <span class="italics">'.$i.'</span';
+				return '<span class="italics">'.$g.' '.$s.'</span> subf. <span class="italics">'.$i.'</span>';
 			default:
 				return $rankName.' '.$name;
 		
