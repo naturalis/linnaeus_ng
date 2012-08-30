@@ -49,7 +49,7 @@
 					</div>
 	{/if}
 					<span class="marker">{$v.marker}</span>.
-					<span class="text">{$v.choice_txt|nl2br}</span>
+					<span class="text">{$v.choice_txt}</span>
 					<br />
 					<span class="target">
 					

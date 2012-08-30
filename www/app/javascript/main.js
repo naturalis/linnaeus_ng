@@ -68,6 +68,10 @@ function stripSlashes(str) {
 	return str;
 }
 
+function stripTags(str) {
+	return str.replace(/(<([^>]+)>)/ig,"");
+}
+
 function allGetTimestamp() {
 
 	var tsTimeStamp= new Date().getTime();
