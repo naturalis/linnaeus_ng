@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 date_default_timezone_set('Europe/Amsterdam');
+ini_set('session.gc_maxlifetime',86400);
 class configuration
 {
 

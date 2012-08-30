@@ -329,7 +329,7 @@ class MatrixKeyController extends Controller
 	private function getMatrices()
 	{
 
-		if (!isset($_SESSION['app']['user']['matrix']['matrices'])) {
+		if (empty($_SESSION['app']['user']['matrix']['matrices'])) {
 
 			$m = $this->models->Matrix->_get(
 				array(

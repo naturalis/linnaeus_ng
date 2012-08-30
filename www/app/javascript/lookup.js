@@ -168,7 +168,9 @@ function allLookupGetData(text,getAll) {
 
 			for(var i=0;i<allLookupData.results.length;i++) {
 				
-				if (getAll || allLookupData.results[i].label.match(eval(regExp))) {
+				var stripped = stripTags(allLookupData.results[i].label);
+				
+				if (getAll || stripped.match(eval(regExp))) {
 					
 					r[r.length] = allLookupData.results[i]
 					

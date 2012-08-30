@@ -61,7 +61,7 @@
 					</div>
 	{/if}
 					{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
-					<div class="text">{$v.choice_txt|nl2br}</div>
+					<div class="text">{$v.choice_txt}</div>
 					
 
 					<div class="target">

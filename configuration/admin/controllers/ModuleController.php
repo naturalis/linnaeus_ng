@@ -323,20 +323,24 @@ class ModuleController extends Controller
 		$this->setPageName(_('Management'));
 		
 		if ($this->rHasVal('submit')) {
-
-			$this->addMessage('Setting saved');
-
-			$this->models->FreeModuleProject->save(
-				array(
+		
+			$d = array(
 					'id' => $this->getCurrentModuleId(),
 					'project_id' => $this->getCurrentProjectId(),
-					'show_alpha' => $this->requestData['show_alpha']
-				)
-			);
+					'show_alpha' => $this->requestData['show_alpha'],
+				);
+				
+			$m = trim($this->requestData['module']);
+				
+			if (!empty($m)) $d['module'] = $m;
+
+			$this->models->FreeModuleProject->save($d);
 		
 			$module = $this->getFreeModule();
 
 			$this->setActiveModule($module);
+
+			$this->addMessage('Settings saved');
 
 		} else {
 
