@@ -71,13 +71,15 @@ class IntroductionController extends Controller
 
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
-		if (!$this->rHasVal('page')) {
+		if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
 
 			$this->redirect('topic.php?id='.$this->getFirstPageId());
 
 		} else {
+		
+			$id = $this->rHasVal('page') ? $this->requestData['page'] : $this->requestData['id'];
 
-			$this->redirect('topic.php?id='.$this->requestData['page']);
+			$this->redirect('topic.php?id='.$id);
 
 		}
 

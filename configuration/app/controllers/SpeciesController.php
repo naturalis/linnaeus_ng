@@ -247,14 +247,25 @@ class SpeciesController extends Controller
     private function _indexAction ()
     {
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => true));// !isset($this->treeList)));
+		if (!$this->rHasVal('id')) {
 
-		// get taxa
-		$taxa = $this->getTreeList();
+			$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => true));// !isset($this->treeList)));
+	
+			// get taxa
+			$taxa = $this->getTreeList();
+	
+			$d = current($taxa);
+			
+			$id = (isset($d['id']) ? $d['id'] : null);
+			
+		} else {
+			
+			$id = $this->requestData['id'];
+				
+		}
 
-		$d = current($taxa);
 
-		$this->redirect('taxon.php?id='.(isset($d['id']) ? $d['id'] : null));
+		$this->redirect('taxon.php?id='.$id);
 
 		/*
 		// max taxa to show per page
