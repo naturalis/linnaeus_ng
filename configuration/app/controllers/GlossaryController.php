@@ -84,11 +84,21 @@ class GlossaryController extends Controller
     public function indexAction()
     {
 
-		$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+		if (!$this->rHasVal('id')) {
+
+			$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+
+			$id = (isset($d['id']) ? $d['id'] : null);
+			
+		} else {
+			
+			$id = $this->requestData['id'];
+				
+		}
 
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 		
-		if (isset($d['id'])) $this->redirect('term.php?id='.(isset($d['id']) ? $d['id'] : null));
+		if ($id) $this->redirect('term.php?id='.$id);
 
 		/*
 

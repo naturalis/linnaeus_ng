@@ -85,34 +85,51 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+ 		if (!$this->rHasVal('id')) {
 
-		$this->getTaxonTree(array('includeOrphans' => false));
+			$this->getTaxonTree(array('includeOrphans' => false));
+
+			if ($this->_mapType=='l2') {
+			
+				$taxa = $this->l2GetTaxaWithOccurrences();
+			
+				$d = current($taxa);
+				
+				$id = $d['id'];
+		
+			} else {
+	
+				$taxa = $this->getTaxaWithOccurrences();
+	
+				$d = current($taxa);
+				
+				$id = $d['id'];
+			}
+			
+		} else {
+			
+			$id = $this->requestData['id'];
+				
+		}
+		
+
+		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if ($this->_mapType=='l2') {
 		
-			$taxa = $this->l2GetTaxaWithOccurrences();
-		
-			$d = current($taxa);
-
-			if (isset($d['id'])) 
-				$this->redirect('l2_examine_species.php?id='.$d['id']);
+			if (isset($id)) 
+				$this->redirect('l2_examine_species.php?id='.$id);
 			else
 				$this->redirect('l2_examine.php');
 		
 		} else {
 
-			$taxa = $this->getTaxaWithOccurrences();
-
-			$d = current($taxa);
-		
-			if (isset($d['id'])) 
-				$this->redirect('examine_species.php?id='.$d['id']);
+			if (isset($id)) 
+				$this->redirect('examine_species.php?id='.$id);
 			else
 				$this->redirect('examine.php');
 			
 		}
-
 	
 		/*
         $this->setPageName( _('Index'));

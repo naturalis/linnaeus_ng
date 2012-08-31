@@ -81,15 +81,16 @@ class ModuleController extends Controller
 
 		} else {
 
-			
-			if (!$this->rHasVal('page')) {
+			if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
 
 				$page = $this->getFirstModulePage();
 				$this->redirect('topic.php?id='.$page['id']);
 
 			} else {
+			
+				$id = $this->rHasVal('page') ? $this->requestData['page'] : $this->requestData['id'];
 
-				$this->redirect('topic.php?id='.$this->requestData['page']);
+				$this->redirect('topic.php?id='.$id);
 
 			}
 

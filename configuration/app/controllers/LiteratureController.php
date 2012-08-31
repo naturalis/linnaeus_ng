@@ -66,11 +66,21 @@ class LiteratureController extends Controller
     public function indexAction()
     {
  
- 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+ 		if (!$this->rHasVal('id')) {
 
-		$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+			$d = $this->getFirstReference($this->rHasVal('letter') ? $this->requestData['letter'] : null);
+
+			$id = (isset($d['id']) ? $d['id'] : null);
+			
+		} else {
+			
+			$id = $this->requestData['id'];
+				
+		}
 		
-		if (isset($d['id'])) $this->redirect('reference.php?id='.(isset($d['id']) ? $d['id'] : null));
+ 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		
+		if (isset($id)) $this->redirect('reference.php?id='.$id);
 
  		/*
  		$alpha = $this->getLiteratureAlphabet();

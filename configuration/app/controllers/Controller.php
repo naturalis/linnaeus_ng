@@ -4,6 +4,7 @@
 
 check setLocale
 
+
 */
 
 
@@ -107,6 +108,8 @@ class Controller extends BaseClass
         $this->setSmartySettings();
         
         $this->setRequestData();
+		
+		$this->restoreState();
 
         $this->setProjectLanguages();
 		
@@ -125,6 +128,8 @@ class Controller extends BaseClass
     {
 
 		$this->setBreadCrumb();
+
+		$this->storeState();
 
 		session_write_close();
 
@@ -2425,6 +2430,61 @@ class Controller extends BaseClass
 	
 		$this->storeHistory = $state;
 	
+	}
+
+
+	private function storeState()
+	{
+
+		unset($_SESSION['app']['user'][$this->controllerBaseName]['state']);
+		
+		$d = null;
+		
+		if ($this->rHasVal('id')) $d['id'] = $this->requestData['id'];
+		if ($this->rHasVal('cat')) $d['cat'] = $this->requestData['cat'];
+		if ($this->rHasVal('m')) $d['m'] = $this->requestData['m'];
+		if ($this->rHasVal('letter')) $d['letter'] = $this->requestData['letter'];
+		
+		$d['lastPage'] = $_SERVER['REQUEST_URI'];
+
+		$_SESSION['app']['user'][$this->getControllerBaseName()]['state'] = $d;
+
+		/*
+		key...
+		matrix...
+		*/
+	
+	}
+
+	private function restoreState()
+	{
+
+		// /app/views/mapkey/ vs /app/views/mapkey/index.php
+		$requestHasNoFileName = $this->getViewName()=='index' && ($_SERVER['REQUEST_URI'] !== $_SERVER['PHP_SELF']);
+
+		if (
+			($this->getControllerBaseName()=='mapkey' || $this->getControllerBaseName()=='index')  && 
+			$requestHasNoFileName && 
+			($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'] != $_SERVER['REQUEST_URI']) && 
+			isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'])
+		) {
+				
+		
+		die();
+			$this->redirect($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']);
+
+		}
+
+		if (isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) {
+		
+			foreach((array)$_SESSION['app']['user'][$this->getControllerBaseName()]['state'] as $key => $val) {
+			
+				if (!isset($this->requestData[$key])) $this->requestData[$key] = $val;
+			
+			}
+		
+		}
+		
 	}
 
 	
