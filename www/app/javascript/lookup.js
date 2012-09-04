@@ -400,7 +400,7 @@ function allLookupBindDialogKeyUp() {
 function allLookupShowDialog() {
 
 	showDialog(
-		_('Index'),
+		_('Contents'),
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
 	);
 
