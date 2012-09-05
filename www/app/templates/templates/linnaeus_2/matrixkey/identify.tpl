@@ -87,7 +87,11 @@ $(document).ready(function(){
 	showMatrixResults();
 	highlightSelected();
 {/if}
-	
+{if $storedShowState=='pattern'}
+	showMatrixPattern();
+{else}
+	showMatrixResults();
+{/if}
 {literal}
 });
 </script>

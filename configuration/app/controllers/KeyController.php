@@ -85,16 +85,16 @@ class KeyController extends Controller
 
         $this->setPageName( _('Index'));
 
-		if ($this->rHasVal('step')) {
 		// step points at a specific step, from keypath
+		if ($this->rHasVal('step')) {
 
 			$step = $this->getKeystep($this->requestData['step']);
 
 			$this->updateKeyPath(array('step' => $step,'fromPath' => true));
 
 		} else
-		if ($this->rHasVal('choice')) {
 		// choice is choice clicked by user
+		if ($this->rHasVal('choice')) {
 
 			$choice = $this->getKeystepChoice($this->requestData['choice']);
 
@@ -113,8 +113,9 @@ class KeyController extends Controller
 
 				$this->redirect('../taxon/taxon.id?id='.$choice['res_taxon_id']);
 
-			} else {
+			} 
 			// choice points to a next step
+			else {
   
 				$step = $this->getKeystep($choice['res_keystep_id']);
 
@@ -122,14 +123,22 @@ class KeyController extends Controller
 
 			}
 
-		} else {
+		} else
 		// no step or choice specified, must be the start of the key
+		if ($this->rHasVal('start','1')) {
 
 			$this->resetKeyPath();
 
 			$step = $this->getStartKeystep();
 
 			$this->updateKeyPath(array('step' => $step));
+
+		} 
+		// restore previous state
+		else {
+
+			$d = array_pop($this->getKeyPath());
+			$step = $this->getKeystep($d['id']);
 
 		}
 

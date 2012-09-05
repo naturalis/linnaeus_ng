@@ -24,7 +24,7 @@ function getData(action,id,postFunction) {
 		success : function (data) {
 			//alert(data);
 			obj = $.parseJSON(data);
-			eval(postFunction+'(obj,id)');
+			if (postFunction) eval(postFunction+'(obj,id)');
 		}
 	})
 	
@@ -470,6 +470,7 @@ function showMatrixResults() {
 
 	$('#search-pattern').css('display','none');
 	$('#search-results').css('display','block');
+	getData('store_showstate_results',-1);
 
 }
 
@@ -477,6 +478,7 @@ function showMatrixPattern() {
 
 	$('#search-pattern').css('display','block');
 	$('#search-results').css('display','none');
+	getData('store_showstate_pattern',-1);
 
 }
 
@@ -520,14 +522,22 @@ function fillTaxonStates(obj,char) {
 	$('#help-text').removeClass().addClass('invisible');
 }
 
-function goExamine() {
+function goExamine(id) {
+
+	if (id) $("#taxon-list option:[value="+id+"]").attr("selected", true);
 
 	getData('get_taxon_states',$('#taxon-list').val(),'fillTaxonStates');
+	getData('store_examine_val',$('#taxon-list').val());
 
 }
 
-function goCompare() {
+function goCompare(ids) {
 
+	if (ids) {
+		if (ids[0]) $("#taxon-list-1 option:[value="+ids[0]+"]").attr("selected", true);
+		if (ids[1]) $("#taxon-list-2 option:[value="+ids[1]+"]").attr("selected", true);
+	}
+	
 	var id1 = $('#taxon-list-1').val();
 	var id2 = $('#taxon-list-2').val();
 
@@ -544,6 +554,7 @@ function goCompare() {
 
 	}
 	getData('compare',[id1,id2],'fillCompareResults');
+	getData('store_compare_vals',[id1,id2]);
 
 }
 

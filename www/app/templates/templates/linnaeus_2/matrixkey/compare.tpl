@@ -57,6 +57,11 @@ $(document).ready(function(){
 {foreach from=$characteristics key=k item=v}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}');
 {/foreach}
+
+{if $compareSpeciesRecall}
+	goCompare([{$compareSpeciesRecall[0]},{$compareSpeciesRecall[1]}]);
+{/if}
+
 {literal}
 });
 </script>

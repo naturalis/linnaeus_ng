@@ -39,6 +39,12 @@ $(document).ready(function(){
 {foreach from=$characteristics key=k item=v}
 	storeCharacteristic({$v.id},'{$v.label|addslashes}');
 {/foreach}
+
+{if $examineSpeciesRecall}
+	goExamine({$examineSpeciesRecall});
+{/if}
+
+
 {literal}
 });
 </script>

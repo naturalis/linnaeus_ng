@@ -181,6 +181,8 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('storedStates',$this->stateMemoryRecall());
 
+		$this->smarty->assign('storedShowState',$this->showStateRecall());
+
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
@@ -220,6 +222,8 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('matrix',$matrix);
 
+		$this->smarty->assign('examineSpeciesRecall',$this->examineSpeciesRecall());
+
         $this->printPage();
 	
 	}
@@ -248,6 +252,8 @@ class MatrixKeyController extends Controller
 		$this->smarty->assign('matrixCount',$this->getMatrixCount());
 
 		$this->smarty->assign('matrix',$matrix);
+
+		$this->smarty->assign('compareSpeciesRecall',$this->compareSpeciesRecall());
 
         $this->printPage();
 	
@@ -281,7 +287,7 @@ class MatrixKeyController extends Controller
 			);
 		
 		} else
-			if ($this->rHasVal('action','get_taxon_states')) {
+		if ($this->rHasVal('action','get_taxon_states')) {
 
 			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonStates($this->requestData['id'])));
 		
@@ -290,6 +296,26 @@ class MatrixKeyController extends Controller
 
 			$this->smarty->assign('returnText',json_encode((array)$this->getTaxonComparison($this->requestData['id'])));
 		
+		} else
+		if ($this->rHasVal('action','store_showstate_results')) {
+		
+			$this->showStateStore('results');
+
+		}
+		if ($this->rHasVal('action','store_showstate_pattern')) {
+
+			$this->showStateStore('pattern');
+
+		} else
+		if ($this->rHasVal('action','store_examine_val')) {
+		
+			$this->examineSpeciesStore($this->requestData['id']);
+
+		} else
+		if ($this->rHasVal('action','store_compare_vals')) {
+		
+			$this->compareSpeciesStore($this->requestData['id']);
+
 		}
 
 		$this->allowEditPageOverlay = false;
@@ -1016,6 +1042,60 @@ class MatrixKeyController extends Controller
 		);
 	
 	}
+
+
+	private function showStateStore($state) 
+	{
+
+		$_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] = $state;
+
+	}
+
+	private function showStateRecall() 
+	{
+
+		return 
+			isset($_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()]) ?
+				$_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] :
+				'pattern';
+
+	}
+
+	private function examineSpeciesStore($id) 
+	{
+
+		$_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] = $id;
+
+	}
+
+	private function examineSpeciesRecall() 
+	{
+
+		return 
+			isset($_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()]) ?
+				$_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] :
+				null;
+
+	}
+		
+
+	private function compareSpeciesStore($id) 
+	{
+
+		$_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] = $id;
+
+	}
+
+	private function compareSpeciesRecall() 
+	{
+
+		return 
+			isset($_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()]) ?
+				$_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] :
+				null;
+
+	}
+
 
 	private function stateMemoryStore($data) 
 	{
