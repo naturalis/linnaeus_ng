@@ -14,8 +14,8 @@
 {else}
 
 <table id="mapGrid">
-    <tr id="topBar">
-    <td>
+    <tr id="grid-header">
+    <td colspan="2">
             <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span id="speciesNameA" class="selectIcon" onclick="
                 allLookupSetExtraVars('l2_must_have_geo','1');
@@ -33,8 +33,9 @@
             <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
         
 
-        <span id="coordinates"></span>
-    </td><td id="mapName">
+      
+	</td>
+    <td id="mapName">
 
         {if $maps|@count>1}
             <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
@@ -65,6 +66,7 @@
 			</table>
 		{/if}
 		</td>
+   		<td id="push"></td>
 		<td id="legendCell">
 		    <div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
@@ -83,6 +85,11 @@
             </div>
             <p><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}</p>
 		</td>
+	</tr>
+	<tr id="grid-footer">
+		<td><span id="coordinates"></span></td>
+		<td></td>
+		<td></td>
 	</tr>
 </table>
 </div>

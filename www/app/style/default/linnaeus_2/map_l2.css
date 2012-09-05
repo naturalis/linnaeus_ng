@@ -8,21 +8,20 @@
  	min-height: 411px;
 }
 
+#mapGrid {
+	width: 100%;
+}
+
 #mapGrid td {
     vertical-align: top;
 }
 
-#gridMapCell {
-	min-width: 601px;
-}
-
-#topBar td {
+#grid-header td {
     height: 30px;
 }
 
-#coordinates {
-	float: right;
-    padding-top: 3px;
+#grid-footer td {
+    height: 20px;
 }
 
 #species-number {
@@ -31,11 +30,23 @@
 }
 
 #taxonName, #mapName, #speciesNameA, #speciesNameB {
+    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
     color: #0303b2;
+}
+
+#mapName, #speciesNameA, #speciesNameB {
     font-size: 12px;
 	font-weight: bold;
 }
 
+#taxonName {
+    font-size: 16px;
+}
+
+#coordinates {
+	float: right;
+    padding-top: 3px;
+}
 a.selectIcon:link, a.selectIcon:visited {
     text-decoration: none;
 }
@@ -52,8 +63,12 @@ a.selectIcon:hover {
 	margin-bottom: 12px;
 }
 
+#push {
+	width: 90%;
+}
+
 #legendCell {
-    padding-top: 20px;
+    /*padding-top: 20px;*/
 }
 
 #legend {
