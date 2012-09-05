@@ -2433,8 +2433,20 @@ class Controller extends BaseClass
 	}
 
 
+	/*
+	
+		stores state my 'remembering' the value of four possible variables.
+		also remembers the last visited page, as some modules have other pages than index linked from
+		  the same tabs that in other modules link to the index with just different variables
+		 
+		the place in the keypath is stored in the KeyController itself
+		matrix states are stored in the MatrixController itself
+	
+	*/
 	private function storeState()
 	{
+	
+		if ($this->storeHistory===false) return;
 
 		unset($_SESSION['app']['user'][$this->controllerBaseName]['state']);
 		
@@ -2448,29 +2460,39 @@ class Controller extends BaseClass
 		$d['lastPage'] = $_SERVER['REQUEST_URI'];
 
 		$_SESSION['app']['user'][$this->getControllerBaseName()]['state'] = $d;
-
-		/*
-		key...
-		matrix...
-		*/
 	
 	}
 
+	/*
+	
+		restores state by recalling variable values and manipulating the corresponding values in $this->requestData
+		in some cases, redirects to another page within the module
+		restoration of the place in the keypath is done in KeyController::indexAction (when called without any parameters)
+		restoration of matrix states is done in MatrixController::identifyAction
+	
+	*/
 	private function restoreState()
 	{
+
+		if (!isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) return;
 
 		// /app/views/mapkey/ vs /app/views/mapkey/index.php
 		$requestHasNoFileName = $this->getViewName()=='index' && ($_SERVER['REQUEST_URI'] !== $_SERVER['PHP_SELF']);
 
 		if (
-			($this->getControllerBaseName()=='mapkey' || $this->getControllerBaseName()=='index')  && 
+			(
+				$this->getControllerBaseName()=='mapkey' || 
+				$this->getControllerBaseName()=='matrixkey' || 
+				$this->getControllerBaseName()=='index'
+			)  && 
 			$requestHasNoFileName && 
-			($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'] != $_SERVER['REQUEST_URI']) && 
-			isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'])
-		) {
-				
+			(
+				isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']) && 
+				$_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'] != $_SERVER['REQUEST_URI'])
+			
+			) 
+		{
 		
-		die();
 			$this->redirect($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']);
 
 		}
