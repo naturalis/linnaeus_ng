@@ -14,11 +14,11 @@
 {else}
 
 <table id="mapGrid">
-    <tr id="topBar">
+    <tr id="grid-header">
     <td>
-        <span id="taxonName">{$taxon.taxon}</span> 
-        <span id="coordinates"></span> <span id=species-number></span>
-    </td><td id="mapName">
+     </td>
+    <td id="push"></td>
+    <td id="mapName">
         {if $maps|@count>1}
             <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
                 showDialog('{t}Choose a map{/t}',
@@ -54,6 +54,7 @@
 			</table>
 			{/if}
 		</td>
+		<td></td>
 		<td id="legendCell">
 		<div id="legend">
 		{foreach from=$geoDataTypes key=k item=v name=x}
@@ -72,6 +73,14 @@
 		<input type="hidden" name="m" value="{$mapId}" />
 		</div>
 		</td>
+	</tr>
+	<tr id="grid-footer">
+		<td>
+			<span id="taxonName">{$taxon.taxon}</span> 
+       		<span id="coordinates"></span> <span id=species-number></span>
+		</td>
+		<td></td>
+		<td></td>
 	</tr>
 </table>
 </div>

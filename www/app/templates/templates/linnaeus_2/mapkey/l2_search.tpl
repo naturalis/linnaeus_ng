@@ -14,13 +14,15 @@
 {else}
 
 <table id="mapGrid">
-    <tr id="topBar">
+    <tr id="grid-header">
     <td>
             <input type="button" value="{t}Search{/t} &gt;&gt" onclick="l2DoSearchMap()" />&nbsp;
             <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
             <input type="hidden" name="mapId" value="{$mapId}" />
-        <span id="coordinates"></span>
-    </td><td id="mapName">
+        
+    </td>
+    <td id="push"></td>
+    <td id="mapName">
 
         {if $maps|@count>1}
             <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
@@ -55,6 +57,7 @@
 			</table>
 			{/if}
 		</td>
+		<td></td>
 		<td id="legendCell">
 		<div id="legend">
             {foreach from=$geoDataTypes key=k item=v name=x}
@@ -71,6 +74,11 @@
             <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
             <p>{t}When finished, click 'Search'.{/t}</p>
 		</td>
+	</tr>
+	<tr id="grid-footer">
+		<td><span id="coordinates"></span></td>
+		<td></td>
+		<td></td>
 	</tr>
 </table>
 </div>

@@ -69,3 +69,10 @@ div.set div.subset p {
 .c2 {
 	background: #f6f6f6;
 }
+
+#results .set img {
+	border: 1px solid black;
+	vertical-align: middle;
+	margin-right: 3px;
+	width: 50px;
+}

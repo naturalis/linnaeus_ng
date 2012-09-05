@@ -7,22 +7,20 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
-	<style type="text/css" media="all">
-	    @import url("{$session.app.project.urls.projectCSS}yui/cssreset-min.css");
+	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}yui/cssreset-min.css" />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
-	    @import url("{$cssToLoad[i]}");
+	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
 {/section}
 {/if}
-	</style>
     <!--[if IE]>
-        <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie.css";</style> 
+        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie.css" />
     <![endif]-->
     <!--[if IE 8]>
-        <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7-8.css";</style> 
+        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7-8.css" />
     <![endif]-->
     <!--[if IE 7]>
-        <style type="text/css">@import "{$session.app.project.urls.projectCSS}ie7.css";</style> 
+        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7.css" />
     <![endif]-->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>

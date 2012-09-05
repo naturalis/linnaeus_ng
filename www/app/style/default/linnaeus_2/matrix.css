@@ -21,6 +21,7 @@
 }
 
 #matrix-header {
+    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
 	color: #0303b2;
     font-size: 12px;
 	font-weight: bold;
