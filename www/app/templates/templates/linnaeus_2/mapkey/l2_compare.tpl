@@ -16,18 +16,16 @@
 <table id="mapGrid">
     <tr id="grid-header">
     <td colspan="2">
-            <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span id="speciesNameA" class="selectIcon" onclick="
+            <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameA" onclick="
                 allLookupSetExtraVars('l2_must_have_geo','1');
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
                 allLookupShowDialog()
-            ">{if $taxonA}{$taxonA.taxon}{else}{t}Taxon A{/t}{/if}</span>
-             <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span id="speciesNameB" class="selectIcon" onclick="
+            " class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
+            <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameB" onclick="
                 allLookupSetExtraVars('l2_must_have_geo','1');
                 allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
                 allLookupShowDialog()
-            ">{if $taxonB}{$taxonB.taxon}{else}{t}Taxon B{/t}{/if}</span>
+            " class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
             <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
             <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
             <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
