@@ -2477,7 +2477,8 @@ class Controller extends BaseClass
 		if (!isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) return;
 
 		// /app/views/mapkey/ vs /app/views/mapkey/index.php
-		$requestHasNoFileName = $this->getViewName()=='index' && ($_SERVER['REQUEST_URI'] !== $_SERVER['PHP_SELF']);
+		$d = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
+		$requestHasNoFileName = $this->getViewName()=='index' && ($d !== $_SERVER['PHP_SELF']);
 
 		if (
 			(
