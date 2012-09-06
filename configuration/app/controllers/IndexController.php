@@ -37,7 +37,7 @@ class IndexController extends Controller
      */
     public function __construct ($params=null)
     {
-
+	
 		$this->setControllerParams($params);
 
         parent::__construct();
