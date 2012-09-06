@@ -84,6 +84,8 @@ class KeyController extends Controller
     {
 
         $this->setPageName( _('Index'));
+		
+		$keyPath = $this->getKeyPath();
 
 		// step points at a specific step, from keypath
 		if ($this->rHasVal('step')) {
@@ -98,8 +100,8 @@ class KeyController extends Controller
 
 			$choice = $this->getKeystepChoice($this->requestData['choice']);
 
-			if (!empty($choice['res_taxon_id'])) {
 			// choice points to a taxon
+			if (!empty($choice['res_taxon_id'])) {
 
 				$this->updateKeyPath(
 					array(
@@ -124,8 +126,14 @@ class KeyController extends Controller
 			}
 
 		} else
+		// restore previous state
+		if (!$this->rHasVal('start','1') && !empty($keyPath)) {
+
+			$d = array_pop($keyPath);
+			$step = $this->getKeystep($d['id']);
+
+		} else {
 		// no step or choice specified, must be the start of the key
-		if ($this->rHasVal('start','1')) {
 
 			$this->resetKeyPath();
 
@@ -134,13 +142,7 @@ class KeyController extends Controller
 			$this->updateKeyPath(array('step' => $step));
 
 		} 
-		// restore previous state
-		else {
 
-			$d = array_pop($this->getKeyPath());
-			$step = $this->getKeystep($d['id']);
-
-		}
 
 		//$taxa = $this->getTaxonDivision();
 		//if (isset($taxa['list'][$step['id']])) $this->smarty->assign('taxa',$taxa['list'][$step['id']]);
