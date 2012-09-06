@@ -23,7 +23,8 @@ class KeyController extends Controller
 		'basics.css',
 		'key.css',
 		'lookup.css',
-		'colorbox/colorbox.css',
+		//'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
 
@@ -32,7 +33,8 @@ class KeyController extends Controller
 			'all' => array(
 				'main.js',
 				'key.js',
-				'colorbox/jquery.colorbox.js',
+				//'colorbox/jquery.colorbox.js',
+				'prettyPhoto/jquery.prettyPhoto.js',
 				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(

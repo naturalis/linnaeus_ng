@@ -26,16 +26,18 @@ class SpeciesController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'species.css',
-		'colorbox/colorbox.css',
+		//'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
-	); //'key-tree.css'
+	); 
 				
 	public $jsToLoad =
 		array(
 			'all' => array(
 				'main.js',
-				'colorbox/jquery.colorbox.js',
+				//'colorbox/jquery.colorbox.js',
+				'prettyPhoto/jquery.prettyPhoto.js',
 				'lookup.js',
 				'dialog/jquery.modaldialog.js'
 			),

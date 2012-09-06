@@ -24,7 +24,8 @@ class MatrixKeyController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'lookup.css',
-		'colorbox/colorbox.css',
+		//'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'dialog/jquery.modaldialog.css',
 		'matrix.css'
 	);
@@ -34,7 +35,8 @@ class MatrixKeyController extends Controller
 			'all' => array(
 				'main.js',
 				'matrix.js',
-				'colorbox/jquery.colorbox.js',
+				//'colorbox/jquery.colorbox.js',
+				'prettyPhoto/jquery.prettyPhoto.js',
 				'dialog/jquery.modaldialog.js'
 			),
 			'IE' => array(

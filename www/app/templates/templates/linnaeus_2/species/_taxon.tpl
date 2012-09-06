@@ -94,14 +94,15 @@
 			<tr>
 		{/if}
 		<td class="media-cell">
+		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.description}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-			<a class="group1 image-wrap" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 			<div>
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
 					alt="{$v.description}" 
+					t="{$v.description}" 
 					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
 					class="image-thumb" />
 			{else}
@@ -112,12 +113,11 @@
 					class="image-full" />
 			{/if}
 			</div>
-		</a>
 		{elseif $v.category=='video'}
 				<img 
 					id="media-{$k}"
 					alt="{$v.description}" 
-					src="{$session.app.project.urls.systemMedia}video.jpg" 
+					src="{$session.app.project.urls.systemMedia}video.png" 
 					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 					class="media-video-icon" />
 		{elseif $v.category=='audio'}
@@ -132,6 +132,7 @@
 					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 				</object>
 		{/if}
+		</a>
 		</td>
 	{assign var=mediaCat value=$v.category}
 	{if $requestData.disp==$v.id}
@@ -193,8 +194,8 @@ $(document).ready(function(){
 {/foreach}
 
 {literal}
-	$(".group1").colorbox({rel:'group1'});
-	
+	/* $(".group1").colorbox({rel:'group1'}); */
+
 	$('[id^=media-]').each(function(e){
 		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
 	});
