@@ -37,7 +37,7 @@
 				{else}
 					{capture name="src"}{$session.admin.project.urls.project_media}{$media.image[i].file_name}{/capture} 
 				{/if}
-				<a class="group1" title="{$media.image[i].original_name}" href="{$session.admin.project.urls.project_media}{$media.image[i].file_name}">
+				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.image[i].file_name}">
 					<img src="{$smarty.capture.src}" style="width:150px;cursor:pointer"/>
 				</a>
 				<p>
@@ -106,10 +106,15 @@
 		</tr>
 		{section name=i loop=$media.video}
 		<tr id="media-row-{$media.video[i].id}" class="tr-highlight" style="vertical-align:top">
+			<!-- 
 			<td style="cursor:pointer;width:260px;" onclick="window.open('{$session.admin.project.urls.project_media}{$media.video[i].file_name}','_video');">
+			-->
+			<td>
+				<a rel="prettyPhoto[gallery]" title="{$media.image[i].description}" href="{$session.admin.project.urls.project_media}{$media.video[i].file_name}">
 				<img 
 					src="{$baseUrl}admin/media/system/icons/video.jpg" 
 				/>
+				</a>
 				<p>
 				{$media.video[i].original_name}<br />
 				<span class="taxon-media-secondary-info">({$media.video[i].mime_type}; {$media.video[i].file_size} {t}kb{/t})</span>
@@ -211,8 +216,6 @@ $(document).ready(function(){
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
 {literal}	
-	 $(".group1").colorbox({rel:'group1'});	
-	
 });
 </script>
 {/literal}

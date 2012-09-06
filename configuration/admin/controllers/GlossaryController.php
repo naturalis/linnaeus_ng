@@ -43,7 +43,7 @@ class GlossaryController extends Controller
 
 	public $cssToLoad = array(
 		'glossary.css',
-		'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
 	);
@@ -51,7 +51,7 @@ class GlossaryController extends Controller
 	public $jsToLoad = array(
 		'all' => array(
 			'glossary.js',
-			'colorbox/jquery.colorbox.js',
+			'prettyPhoto/jquery.prettyPhoto.js',
 			'lookup.js',
 			'int-link.js',
 			'dialog/jquery.modaldialog.js'

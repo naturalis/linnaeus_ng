@@ -356,7 +356,7 @@ function allGeneralGetLabels(language,action,postFunction,id) {
 function allShowMedia(url,name) {
 
 	if (!url) return;
-
+/*
 	$.colorbox({
 		href:url,
 		title: name ? name : url,
@@ -365,6 +365,8 @@ function allShowMedia(url,name) {
 		width:"100%",
 		opacity:0
 	});
+*/
+	$.prettyPhoto.open(url,'',name);
 
 }
 
