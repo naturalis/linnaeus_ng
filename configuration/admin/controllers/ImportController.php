@@ -1101,10 +1101,10 @@ class ImportController extends Controller
         $this->printPage();
 
 	}
-
+	
  	public function l2AdditionalAction()
 	{
-	
+			
 		if ($this->rHasVal('action','errorlog')) $this->downloadErrorLog();
 	
 		if (
@@ -1161,7 +1161,6 @@ class ImportController extends Controller
 			}
 
 			$this->importPostProcessing();
-			$this->addMessage($this->storeError('Processed internal links.'));
 
 			$this->smarty->assign('processed',true);
 			
@@ -1173,7 +1172,25 @@ class ImportController extends Controller
 
 			$this->addMessage('No additional modules found.');
 			$this->importPostProcessing();
-			$this->addMessage($this->storeError('Processed internal links.'));
+
+		}
+		
+		if (isset($_SESSION['admin']['system']['import']['loaded']['embeddedMedia'])) {
+		
+			if (isset($_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['saved'])) 
+				$this->addMessage(
+					$this->storeError('Processed '.$_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['saved'].' embedded media files.')
+				);
+
+			if (isset($_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['failed'])) {
+			
+				foreach((array)$_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['failed'] as $val) {
+				
+					$this->addError($this->storeError('Embedded media: could not copy file "'.$val.'"'));
+
+				}
+			
+			}
 
 		}
 
@@ -1380,7 +1397,9 @@ class ImportController extends Controller
 			}
 		
 			$topic = trim($page[$titleField]);
-			$content = trim($page[$contentField]);
+			//$content = $this->replaceOldMarkUp(trim($page[$contentField]));
+			$content = $this->replaceOldMarkUp($this->replaceInternalLinks(trim($page[$contentField])));
+
 
 			if (!empty($topic)) {
 
@@ -1405,7 +1424,8 @@ class ImportController extends Controller
 						'language_id' => $this->getNewDefaultLanguageId(), 
 						'page_id' => $newPageId,
 						'topic' => $topic,
-						'content' => $this->replaceOldMarkUp($content)
+						'content' => $content
+
 					)
 				);
 				
@@ -2116,7 +2136,8 @@ class ImportController extends Controller
 					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'page_id' => $_SESSION['admin']['system']['import']['speciesOverviewCatId'],
-					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
+					//'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
+					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$taxon->description))),
 					'publish' => 1
 				)
 			);
@@ -2491,7 +2512,9 @@ class ImportController extends Controller
 				'multiple_authors' => $lit['multiple_authors']==true ? 1 : 0,
 				'year' => (isset($lit['year'])  && $lit['valid_year'] == true) ? $lit['year'].'-00-00' : '0000-00-00',
 				'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null,
-				'text' => isset($lit['text']) ? $lit['text'] : null,
+				//'text' => isset($lit['text']) ? $lit['text'] : null,
+				'text' => isset($lit['text']) ?  $this->replaceOldMarkUp($this->replaceInternalLinks(trim($lit['text']))) : null,
+
 			)
 		);
 
@@ -2695,7 +2718,9 @@ class ImportController extends Controller
 				'project_id' => $this->getNewProjectId(),
 				'language_id' => $this->getNewDefaultLanguageId(),
 				'term' => isset($gls['term']) ? $gls['term'] : null,
-				'definition' => isset($gls['definition']) ? $gls['definition'] : null
+				//'definition' => isset($gls['definition']) ? $gls['definition'] : null
+				'definition' => isset($gls['definition']) ? $this->replaceOldMarkUp($this->replaceInternalLinks(trim($gls['definition']))) : null
+
 			)
 		);
 		
@@ -2775,7 +2800,9 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Welcome',	
-					'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
+					//'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
+					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->projectintroduction)))
+
 				)
 			);
 
@@ -2802,7 +2829,8 @@ class ImportController extends Controller
 					'project_id' => $this->getNewProjectId(),	
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
-					'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
+					//'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
+					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->contributors)))
 				)
 			);
 
@@ -3043,9 +3071,10 @@ class ImportController extends Controller
 	
 					$txt = trim((string)$val->picturefilename);
 				}
-				
-				$txt = $this->replaceOldMarkUp($txt);
-				
+
+				//$txt = $this->replaceOldMarkUp($txt);
+				$txt = $this->replaceOldMarkUp($this->replaceInternalLinks($txt));
+
 				$stepId = ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]);
 				
 				$this->models->ChoiceKeystep->save(
@@ -3696,7 +3725,6 @@ class ImportController extends Controller
 
 	}
 	
-
 	private function saveLN2Cell($p)
 	{	
 
@@ -3869,7 +3897,7 @@ class ImportController extends Controller
 
 		} else {
 		
-			// unknown species
+			// unknown species (the first album by koi division)
 		
 		}
 
@@ -4096,6 +4124,8 @@ class ImportController extends Controller
 		//if (file_exists($_SESSION['admin']['system']['import']['paths']['project_media'].$filename))
 		
 		if ($type=='image') {
+		
+			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
 
 			return '<span
 				class="internal-link" 
@@ -4111,6 +4141,8 @@ class ImportController extends Controller
 		} else
 		if ($type=='movie') {
 
+			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
+
 			return '<span
 				class="internal-link" 
 				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
@@ -4123,6 +4155,8 @@ class ImportController extends Controller
 
 		} else
 		if ($type=='sound') {
+
+			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
 
 			return '<object type="application/x-shockwave-flash" data="'.
 						$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
@@ -4168,23 +4202,75 @@ class ImportController extends Controller
 		
 	}
 
+	private function copyEmbeddedMediaFiles()
+	{
+	
+		unset($_SESSION['admin']['system']['import']['loaded']['embeddedMedia']);
+
+		foreach($_SESSION['admin']['system']['import']['embeddedMedia'] as $basename) {
+			
+			if (empty($basename)) continue;
+
+			$fullname = $_SESSION['admin']['system']['import']['imagePath'].$basename;
+
+			if (!file_exists($fullname)) $fullname = $_SESSION['admin']['system']['import']['imagePath'].strtolower($basename);		
+
+			if (file_exists($fullname)) {
+
+				$this->cRename($fullname,$_SESSION['admin']['system']['import']['paths']['project_media'].$basename);
+				
+				$_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['saved']++;
+				
+			} else {
+
+				$_SESSION['admin']['system']['import']['loaded']['embeddedMedia']['failed'][] = $basename;
+
+			}
+
+		}
+					
+	}
+
 	private function importPostProcessing()
 	{
 	
 		$res = $this->fixOldInternalLinks();
 
+		$this->addMessage($this->storeError('Processed internal links.'));
+		
+		$this->copyEmbeddedMediaFiles();
+
+		$this->addMessage($this->storeError('Processed embedded images.'));
+
 		// additional texts
 		$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
 		$this->grantModuleAccessRights(MODCODE_CONTENT);
+
+		$this->addMessage($this->storeError('Added module "content".'));
 
 		// index
 		$this->addModuleToProject(MODCODE_INDEX,$this->getNewProjectId());
 		$this->grantModuleAccessRights(MODCODE_INDEX);
 
+		$this->addMessage($this->storeError('Added module "index".'));
+
 		// search
 		$this->addModuleToProject(MODCODE_UTILITIES,$this->getNewProjectId());
 		$this->grantModuleAccessRights(MODCODE_UTILITIES);
-	
+
+		$this->addMessage($this->storeError('Added module "search".'));
+
+//		return;
+
+		$this->models->Project->save(
+			array(
+				'id' => $this->getNewProjectId(),
+				'published' => '1'
+			)
+		);
+				
+		$this->addMessage($this->storeError('Published project.'));
+
 	}
 
 	private function createLookupArrays()
@@ -4464,16 +4550,22 @@ class ImportController extends Controller
 
 		foreach((array)$_SESSION['admin']['system']['import']['errorlog']['errors'] as $val) {
 		
-			if ($val[0]!==$prevMod) {
-			
+			$mod = @strtolower($val[0]);
+		
+			if ($mod!==$prevMod) {
+							
 				if (!is_null($prevMod)) echo chr(10);
-				echo 'while loading '.strtolower($val[0]).':'.chr(10);
+
+				if (empty($mod))
+					echo 'while post-processing:'.chr(10);
+				else
+					echo 'while loading '.$mod.':'.chr(10);
 			
 			}
 			
 			echo strip_tags($val[1]).chr(10);
 			
-			$prevMod = $val[0];
+			$prevMod = $mod;
 		
 		}
 		
@@ -4576,7 +4668,7 @@ class ImportController extends Controller
 	private function getRandomTestProjectName()
 	{
 
-		$animales = array('aardvark','albatross','alpaca','anteater','antelope','armadillo','baboon','badger','barracuda','bat','bear','beaver','bee','butterfly','camel','caribou','chinchilla','clam','cobra','cormorant','coyote','crab','crane','crow','dragonfly','dugong','eagle','echidna','eland','emu','falcon','ferret','finch','gazelle','gnat','guanaco','hawk','hedgehog','heron','hippopotamus','hummingbird','hyena','iguana','jackal','koala','komodo dragon','kouprey','kudu','lemur','leopard','llama','lobster','locust','lyrebird','manatee','meerkat','mole','moose','mouse','mule','narwhal','octopus','okapi','opossum','oryx','otter','owl','oyster','pelican','penguin','platypus','porcupine','quelea','rhinoceros','rook','serval','shark','sheep','squid','swallow','swan','tapir','vicuña','wasp','weasel','wolf','wombat','yak','zebra');
+		$animales = array('aardvark','albatross','alpaca','anteater','antelope','armadillo','baboon','badger','barracuda','bat','bear','beaver','bee','butterfly','camel','caribou','chinchilla','clam','cobra','cormorant','coyote','crab','crane','crow','dragonfly','donkey','dugong','eagle','echidna','eland','emu','falcon','ferret','finch','gazelle','gnat','guanaco','hawk','hedgehog','heron','hippopotamus','hummingbird','hyena','iguana','jackal','koala','komodo dragon','kouprey','kudu','lemur','leopard','llama','lobster','locust','lyrebird','manatee','meerkat','mole','moose','mouse','mule','narwhal','octopus','okapi','opossum','oryx','otter','owl','oyster','pelican','penguin','platypus','polar bear','porcupine','quelea','rhinoceros','rook','serval','shark','sheep','squid','swallow','swan','tapir','vicuña','wasp','weasel','wolf','wombat','yak','zebra');
 
 		return '-test project «'. ucwords($animales[rand(0,count($animales)-1)]).'» ('.date('c').')';
 		
