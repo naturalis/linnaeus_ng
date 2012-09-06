@@ -21,9 +21,9 @@ class MatrixKeyController extends Controller
 
     public $controllerPublicName = 'Matrix key';
 
-	public $cssToLoad = array('matrix.css','colorbox/colorbox.css');
+	public $cssToLoad = array('matrix.css','prettyPhoto/prettyPhoto.css');
 
-	public $jsToLoad = array('all' => array('matrix.js','colorbox/jquery.colorbox.js'));
+	public $jsToLoad = array('all' => array('matrix.js','prettyPhoto/jquery.prettyPhoto.js'));
 
 
     /**

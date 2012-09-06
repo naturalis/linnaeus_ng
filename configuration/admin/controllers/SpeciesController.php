@@ -79,7 +79,7 @@ class SpeciesController extends Controller
     );
 
 	public $cssToLoad = array(
-		'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'taxon.css',
 		'rank-list.css',
 		'dialog/jquery.modaldialog.css',
@@ -89,7 +89,7 @@ class SpeciesController extends Controller
 	public $jsToLoad = array(
 		'all' => array(
 			'taxon.js',
-			'colorbox/jquery.colorbox.js',
+			'prettyPhoto/jquery.prettyPhoto.js',
 			'front-end.js',
 			'int-link.js',
 			'dialog/jquery.modaldialog.js',
