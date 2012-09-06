@@ -30,9 +30,9 @@
 			<tr>
 		{/if}
 		<td class="media-cell">
+		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.description}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
-			<a class="group1" title="{$v.original_name}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
@@ -46,12 +46,11 @@
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
-			</a>
 		{elseif $v.category=='video'}
 				<img 
 					id="media-{$k}"
 					alt="{$v.description}" 
-					src="{$session.app.project.urls.systemMedia}video.jpg" 
+					src="{$session.app.project.urls.systemMedia}video.png" 
 					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 					class="media-video-icon" />
 		{elseif $v.category=='audio'}
@@ -66,6 +65,7 @@
 					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
 				</object>
 		{/if}
+		</a>
 		</td>
 	{assign var=mediaCat value=$v.category}
 	{if $requestData.disp==$v.id}

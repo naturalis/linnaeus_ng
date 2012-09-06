@@ -161,7 +161,7 @@ function _(text) {
 	return translation;
 
 }
-
+/*
 function showMedia(url,name) {
 
 	$.colorbox({
@@ -173,6 +173,10 @@ function showMedia(url,name) {
 		opacity:0
 	});
 
+}
+*/
+function showMedia(url,name) {
+	$.prettyPhoto.open(url,'',name);
 }
 
 function showVideo(url,name) {
