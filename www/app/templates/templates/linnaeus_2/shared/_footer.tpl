@@ -20,13 +20,19 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+	if(jQuery().prettyPhoto) {
+	 	$("a[rel^='prettyPhoto']").prettyPhoto({
+	 		opacity: 0.70, 
+			show_title: false,
+	 		overlay_gallery: false,
+	 		social_tools: false
+	 	});
+	}
 {/literal}
 	{if $search}onSearchBoxSelect('{$search|@addslashes}');{/if}
-
-{foreach from=$requestData key=k item=v}
-addRequestVar('{$k}','{$v|addslashes}')
-{/foreach}
-
+	{foreach from=$requestData key=k item=v}
+	addRequestVar('{$k}','{$v|addslashes}')
+	{/foreach}
 })
 {literal}
 </script>

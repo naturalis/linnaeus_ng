@@ -7,7 +7,7 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}yui/cssreset-min.css" />
+	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}yui/cssreset-min.css" " />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />

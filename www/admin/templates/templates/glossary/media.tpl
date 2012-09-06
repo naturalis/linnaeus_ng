@@ -202,7 +202,7 @@ $(document).ready(function(){
 	allHideLoadingDiv();
 	allLookupNavigateOverrideUrl('media.php?id=%s');
 {literal}	
-	$(".group1").colorbox({rel:'group1'});	
+	/* $(".group1").colorbox({rel:'group1'}); */
 });
 </script>
 {/literal}

@@ -110,7 +110,7 @@ $(document).ready(function(){
 
 
 {literal}
-	$(".group1").colorbox({rel:'group1'});
+	/* $(".group1").colorbox({rel:'group1'}); */
 	
 	$('[id^=media-]').each(function(e){
 		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));

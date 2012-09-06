@@ -16,7 +16,8 @@ class ModuleController extends Controller
 	public $cssToLoad = array(
 		'basics.css',
 		'module.css',
-		'colorbox/colorbox.css',
+		//'colorbox/colorbox.css',
+		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
 	); 
@@ -25,7 +26,8 @@ class ModuleController extends Controller
 		array(
 			'all' => array(
 				'main.js',
-				'colorbox/jquery.colorbox.js',
+				//'colorbox/jquery.colorbox.js',
+				'prettyPhoto/jquery.prettyPhoto.js',
 				'lookup.js',
 				'dialog/jquery.modaldialog.js'
 			),
