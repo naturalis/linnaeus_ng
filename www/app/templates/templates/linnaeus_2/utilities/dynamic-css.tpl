@@ -42,6 +42,7 @@
 	    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555454', endColorstr='#454444',GradientType=0 );
  {literal}
 }
+
 {/literal}
 
 {if $logo}
@@ -281,3 +282,87 @@
 {literal}
 }
 {/literal}
+
+
+{literal}
+#characteristics option.text {
+{/literal}
+	background: transparent url('{$systemMedia}matrix-text.png') no-repeat;
+	padding-left: 22px;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.media {
+{/literal}
+	background: transparent url('{$systemMedia}matrix-media.png') no-repeat;
+	padding-left: 22px;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.range {
+{/literal}
+	background: transparent url('{$systemMedia}matrix-range.png') no-repeat;
+	padding-left: 22px;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.distribution {
+{/literal}
+	background: transparent url('{$systemMedia}matrix-distribution.png') no-repeat;
+	padding-left: 22px;
+{literal}
+}
+{/literal}
+
+
+
+
+
+
+
+
+
+
+
+{literal}
+#characteristics option.text:hover {
+{/literal}
+	background: #3875d7 url('{$systemMedia}matrix-text-selected.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.media:hover {
+{/literal}
+	background: #3875d7 url('{$systemMedia}matrix-media-selected.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.range:hover {
+{/literal}
+	background: #3875d7 url('{$systemMedia}matrix-range-selected.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+#characteristics option.distribution:hover {
+{/literal}
+	background: #3875d7 url('{$systemMedia}matrix-distribution-selected.png') no-repeat;
+{literal}
+}
+{/literal}
+
+
+
+
+

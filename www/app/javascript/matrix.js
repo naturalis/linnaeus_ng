@@ -55,8 +55,8 @@ function sortCharacters(field) {
 	characters.sort(sortfunction);
 
 	$('#characteristics	').empty();
-
-	for (var i in characters) $('#characteristics').append('<option value="'+characters[i].id+'">'+characters[i].label+'</option>');
+	
+	for (var i in characters) $('#characteristics').append('<option value="'+characters[i].id+'" class="'+characters[i].type+'">'+characters[i].label+'</option>');
 
 }
 
