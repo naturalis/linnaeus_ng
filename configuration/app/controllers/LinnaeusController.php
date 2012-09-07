@@ -170,6 +170,17 @@ class LinnaeusController extends Controller
 	
 	}
 
+    public function noProjectAction()
+	{
+
+		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
+
+		$this->smarty->assign('excludeLogout',true);
+
+        $this->printPage();
+	
+	}
+
 	private function getContent($sub=null,$id=null)
 	{
 

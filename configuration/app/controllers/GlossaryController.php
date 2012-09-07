@@ -83,7 +83,7 @@ class GlossaryController extends Controller
      */
     public function indexAction()
     {
-
+	
 		if (!$this->rHasVal('id')) {
 
 			$d = $this->getFirstGlossaryTerm($this->rHasVal('letter') ? $this->requestData['letter'] : null);
@@ -97,7 +97,7 @@ class GlossaryController extends Controller
 		}
 
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
-		
+
 		if ($id) $this->redirect('term.php?id='.$id);
 
 		/*
@@ -133,7 +133,7 @@ class GlossaryController extends Controller
 
     public function termAction()
     {
-    
+
 		if ($this->rHasId() && !$this->didActiveLanguageChange()) {
 
 			$term = $this->getGlossaryTerm($this->requestData['id']);
