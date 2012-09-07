@@ -167,7 +167,7 @@ select option {
 }
 
 select option:hover {
-	background: #3875d7;
+	background-color: #3875d7;
 	border: 1px dotted #000;
 	color: #fff;
 	cursor: pointer;
@@ -176,5 +176,3 @@ select option:hover {
 .character-selected, .state-selected {
 	background-color: #f4f0f0;
 }
-
-
