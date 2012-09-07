@@ -4,7 +4,11 @@
 <ul>
 	{foreach from=$categories key=k item=v}
 		<li id="ctb-{$v.id}">
-			{$v.title}
+		{if $useJavascriptLinks}	
+		    <a href="javascript:goTaxon({$taxon.id},\'{$v.id}\');" class="{$v.className}">{$v.title}</a>
+		{else}
+			<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
+		{/if}
 		</li>
 		{if $activeCategory==$v.id && $k==0}{assign var=isTaxonStartPage value=true}{/if}
 	{/foreach}
@@ -184,14 +188,6 @@ $(document).ready(function(){
 {if $dispUrl && $dispName}
 	showMedia('{$dispUrl}','{$dispName}'); 
 {/if}
-
-{foreach from=$categories key=k item=v}
-{if $useJavascriptLinks}	
-    $('#ctb-{$v.id}').html('<a href="javascript:goTaxon({$taxon.id},\'{$v.id}\');" class="{$v.className}">'+$('#ctb-{$v.id}').html()+'</a>');
-{else}
-	$('#ctb-{$v.id}').html('<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">'+$('#ctb-{$v.id}').html()+'</a>');
-{/if}
-{/foreach}
 
 {literal}
 	/* $(".group1").colorbox({rel:'group1'}); */
