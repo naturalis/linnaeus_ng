@@ -137,13 +137,10 @@ class Controller extends BaseClass
     
     }
 
-	public function checkForProjectId ()
+	public function checkForProjectId()
 	{
-
-		if ($this->rHasVal('p'))
-			$this->resolveProjectId();
-		else
-			return;
+	
+		if ($this->rHasVal('p'))  $this->resolveProjectId();
 	
 		$d = $this->getCurrentProjectId();
 		
@@ -151,8 +148,8 @@ class Controller extends BaseClass
 		
 		$this->setCurrentProjectData();
 		$this->setUrls();
-        $this->setProjectLanguages();
-	
+		$this->setProjectLanguages();
+
 	}
 
 	public function resolveProjectId()
@@ -2493,7 +2490,7 @@ class Controller extends BaseClass
 			
 			) 
 		{
-		
+
 			$this->redirect($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']);
 
 		}
