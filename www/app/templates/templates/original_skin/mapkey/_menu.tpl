@@ -21,10 +21,10 @@
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 <span style="margin-left:10px;cursor:pointer;" onclick="allLookupShowDialog()">contents</span>
 &nbsp;&nbsp;
-<a href="compare.php">{t}Species comparison{/t}</a>
+<a href="compare.php{if $mapId}?mapId={$mapId}{/if}">{t}Species comparison{/t}</a>
 &nbsp;&nbsp;
-<a href="search.php">{t}Map search{/t}</a>
+<a href="search.php{if $mapId}?mapId={$mapId}{/if}">{t}Map search{/t}</a>
 &nbsp;&nbsp;
-<a href="diversity.php">{t}Diversity index{/t}</a>
+<a href="diversity.php{if $mapId}?mapId={$mapId}{/if}">{t}Diversity index{/t}</a>
 </div>
 

@@ -153,6 +153,7 @@ class KeyController extends Controller
 		$this->smarty->assign('remaining',$taxa['remaining']);
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
+		$this->showLowerTaxon=null;
 		$this->getTaxonTree(array('includeOrphans' => false));// !isset($this->treeList)));
 
 		$this->smarty->assign('taxa',$this->getTreeList());
@@ -699,7 +700,7 @@ class KeyController extends Controller
 		if (is_null($this->getKeyTree2())) $this->setKeyTree();
 		
 		$this->getStepBranch($step,$this->getKeyTree2());
-		
+
 		$this->harvestTaxaFromBranch($this->tmp,$remainingTaxa);
 		
 		$excludedTaxa = $this->getExcludedTaxa($remainingTaxa);
