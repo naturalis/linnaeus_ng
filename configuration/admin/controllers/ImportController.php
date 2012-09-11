@@ -1893,6 +1893,8 @@ class ImportController extends Controller
 	private function addSpecies($species,$ranks)
 	{
 
+		$d = array();
+
 		foreach((array)$species as $key => $val) {
 		
 			if (!isset($ranks[$val['rank_name']]['id'])) {
@@ -1935,12 +1937,12 @@ class ImportController extends Controller
 					'id' => array(
 						'project_id' => $this->getNewProjectId(),	
 						'taxon' => $val['parent'],
-						'rank_id' => $_SESSION['admin']['system']['import']['loaded']['ranks'][$val['parent_rank_name']]['rank_id']
+						'rank_id' => $_SESSION['admin']['system']['import']['loaded']['ranks'][$val['parent_rank_name']]['id']
 					),
 					'columns' => 'id'
 				)
 			);
-			
+
 			if ($t) {
 			
 				if ($t[0]['id']==$val['id']) {

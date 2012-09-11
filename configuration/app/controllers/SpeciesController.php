@@ -114,6 +114,7 @@ class SpeciesController extends Controller
 
 	}
 
+
     /**
      * Show a taxon
      *
@@ -121,12 +122,6 @@ class SpeciesController extends Controller
      */
     public function taxonAction ()
     {
-
-
-$d = $this->_getTaxonTree();
-q($d);
-
-die();
 
         if ($this->rHasId()) {
 		
