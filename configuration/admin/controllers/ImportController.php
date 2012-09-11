@@ -2164,15 +2164,15 @@ class ImportController extends Controller
 			
 			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 				
-			$fileName = trim((string)$taxon->multimedia->overview);
+			$overviewFileName = trim((string)$taxon->multimedia->overview);
 			
 			$imageCount = 0;
 
-			if (!empty($fileName)) {
+			if (!empty($overviewFileName)) {
 
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
-					$fileName,
+					$overviewFileName,
 					null,
 					true,
 					$imageCount++
@@ -2198,11 +2198,11 @@ class ImportController extends Controller
 				$fileName = trim((string)$vVal->filename);
 
 				if (empty($fileName)) continue;
+				if ($fileName==$overviewFileName) continue;
 
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-
 					//trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
 					isset($vVal->caption) ? trim((string)$vVal->caption) : null,
 					false,

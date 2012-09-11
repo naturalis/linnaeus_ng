@@ -1136,6 +1136,8 @@ class Controller extends BaseClass
 	public function setLocale ($language=false)
 	{
 
+//php_uname('s')=='Windows NT'
+
 		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
 
 		if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage']) return;
@@ -2846,7 +2848,7 @@ class Controller extends BaseClass
 
                 if (class_exists($t)) {
                     
-                    $this->models->$t = new $t();
+                    @$this->models->$t = new $t();
 					
 					if (isset($this->helpers->LoggingHelper)) $this->models->$t->setLogger($this->helpers->LoggingHelper);
                     
@@ -2909,7 +2911,7 @@ class Controller extends BaseClass
                 
                 if (class_exists($d)) {
 
-                    $this->helpers->$d = new $d();
+                    @$this->helpers->$d = new $d();
                 
                 }
             

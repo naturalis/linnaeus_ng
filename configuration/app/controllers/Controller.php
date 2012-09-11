@@ -215,16 +215,20 @@ class Controller extends BaseClass
 
 		foreach((array)$this->treeList as $key => $val) {
 
-			if ($this->showLowerTaxon) {
+			if ($this->showLowerTaxon==true) {
 
 				if ($val['lower_taxon']=='1')  $d[$key] = $val;
 			
-			} else {
+			} elseif ($this->showLowerTaxon==false) {
 
 				if ($val['lower_taxon']=='0')  $d[$key] = $val;
 
 				if ($val['lower_taxon']=='1')  continue;
 
+			} else {
+
+				$d[$key] = $val;
+			
 			}
 
 		}	
@@ -261,8 +265,8 @@ class Controller extends BaseClass
 	{
 
 		$pId = isset($p['pId']) ? $p['pId'] : null;
-		$ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
 		$depth = isset($p['depth']) ? $p['depth'] : 0;
+		$ranks = $this->newGetProjectRanks();
 
 		if (!isset($p['depth'])) unset($this->treeList);
 				
@@ -303,7 +307,6 @@ class Controller extends BaseClass
 			$t[$key]['children'] = $this->_getTaxonTree(
 				array(
 					'pId' => $val['id'],
-					'ranks' => $ranks,
 					'depth' => $depth+1
 				)
 			);
@@ -1859,7 +1862,7 @@ class Controller extends BaseClass
 
                 if (class_exists($t)) {
                     
-                    $this->models->$t = new $t();
+                    @$this->models->$t = new $t();
 					
 					if (isset($this->helpers->LoggingHelper)) $this->models->$t->setLogger($this->helpers->LoggingHelper);
                     
@@ -2134,18 +2137,18 @@ class Controller extends BaseClass
                 
                 require_once (dirname(__FILE__) . '/../helpers/' . $key . '.php');
                 
-                $d = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+                $c = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
                 
-                if (class_exists($d)) {
-                    
-                    $this->helpers->$d = new $d();
+                if (class_exists($c)) {
+
+                    @$this->helpers->$c = new $c();
                 
                 }
             
             }
         
         }
-    
+		
     }
 
 
@@ -2431,13 +2434,14 @@ class Controller extends BaseClass
 
 
 	/*
-	
+
 		stores state my 'remembering' the value of four possible variables.
 		also remembers the last visited page, as some modules have other pages than index linked from
 		  the same tabs that in other modules link to the index with just different variables
 		 
-		the place in the keypath is stored in the KeyController itself
-		matrix states are stored in the MatrixController itself
+		caveats
+		-> the place in the keypath is stored in the KeyController itself
+		-> matrix states are stored in the MatrixController itself
 	
 	*/
 	private function storeState()
@@ -2461,11 +2465,16 @@ class Controller extends BaseClass
 	}
 
 	/*
-	
+
 		restores state by recalling variable values and manipulating the corresponding values in $this->requestData
 		in some cases, redirects to another page within the module
-		restoration of the place in the keypath is done in KeyController::indexAction (when called without any parameters)
-		restoration of matrix states is done in MatrixController::identifyAction
+		
+		caveats
+		-> restoration of the place in the keypath is done in KeyController::indexAction (when called without any parameters)	
+		-> restoration of matrix states is done in MatrixController::identifyAction
+		-> the function SpeciesController::setLastViewedTaxonIdForTheBenefitOfTheMapkey in some cases destroys the value of
+		   $_SESSION['app']['user']['mapkey']['state'], so that the mapkey, when accesses from the main menu, automatically shows
+		   the distribution of the taxon last seen in the species module
 	
 	*/
 	private function restoreState()
@@ -2474,7 +2483,7 @@ class Controller extends BaseClass
 		if (!isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) return;
 
 		// /app/views/mapkey/ vs /app/views/mapkey/index.php
-		$d = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
+		$d = strpos($_SERVER['REQUEST_URI'],'?')==false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
 		$requestHasNoFileName = $this->getViewName()=='index' && ($d !== $_SERVER['PHP_SELF']);
 
 		if (

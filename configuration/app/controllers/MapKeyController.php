@@ -53,7 +53,7 @@ class MapKeyController extends Controller
      */
     public function __construct ()
     {
-        
+
         parent::__construct();
 
 		$this->checkForProjectId();
@@ -87,23 +87,31 @@ class MapKeyController extends Controller
 
  		if (!$this->rHasVal('id')) {
 
-			$this->getTaxonTree(array('includeOrphans' => false));
+			if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
 
-			if ($this->_mapType=='l2') {
-			
-				$taxa = $this->l2GetTaxaWithOccurrences();
-			
-				$d = current($taxa);
+				$id = $_SESSION['app']['user']['species']['lastTaxon'];
 				
-				$id = $d['id'];
-		
 			} else {
+
+				$this->getTaxonTree(array('includeOrphans' => false));
 	
-				$taxa = $this->getTaxaWithOccurrences();
-	
-				$d = current($taxa);
+				if ($this->_mapType=='l2') {
 				
-				$id = $d['id'];
+					$taxa = $this->l2GetTaxaWithOccurrences();
+				
+					$d = current($taxa);
+					
+					$id = $d['id'];
+			
+				} else {
+		
+					$taxa = $this->getTaxaWithOccurrences();
+		
+					$d = current($taxa);
+					
+					$id = $d['id'];
+				}
+				
 			}
 			
 		} else {
@@ -111,9 +119,6 @@ class MapKeyController extends Controller
 			$id = $this->requestData['id'];
 				
 		}
-		
-
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
 		if ($this->_mapType=='l2') {
 		
@@ -130,12 +135,6 @@ class MapKeyController extends Controller
 				$this->redirect('examine.php');
 			
 		}
-	
-		/*
-        $this->setPageName( _('Index'));
-		
-        $this->printPage();
-		*/
     
     }
 
@@ -264,6 +263,17 @@ class MapKeyController extends Controller
 
 			$countA = $d['count'];
 
+		} else		
+		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+
+			$taxonA = $this->getTaxonById($_SESSION['app']['user']['species']['lastTaxon']);
+
+			$d = $this->getTaxonOccurrences($taxonA['id']);
+
+			$occurrencesA = $d['occurrences'];
+
+			$countA = $d['count'];
+						
 		}
 
 		if ($this->rHasVal('idB')) {
@@ -341,15 +351,24 @@ class MapKeyController extends Controller
 		}
 			
 
-		if ($this->rHasVal('idA'))  $taxonA = $this->getTaxonById($this->requestData['idA']);
+		if ($this->rHasVal('idA'))  {
+
+			$taxonA = $this->getTaxonById($this->requestData['idA']);
+
+		} else
+		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+	
+			$taxonA = $this->getTaxonById($_SESSION['app']['user']['species']['lastTaxon']);
+
+		}
 
 		if ($this->rHasVal('idB')) $taxonB = $this->getTaxonById($this->requestData['idB']);
 
-		if ($this->rHasVal('idA') && $this->rHasVal('idB')) {
+		if (isset($taxonA) && isset($taxonB)) {
 		
 			$overlap = $this->l2GetOverlap(
-				$this->requestData['idA'],
-				$this->requestData['idB'],
+				$taxonA['id'],
+				$taxonB['id'],
 				$mapId,
 				$this->rHasVal('selectedDataTypes') ? $this->requestData['selectedDataTypes'] : null
 			);
@@ -381,7 +400,7 @@ class MapKeyController extends Controller
 	public function searchAction()
 	{
 
-		if ($this->_mapType=='l2') $this->redirect('l2_search.php');
+		if ($this->_mapType=='l2') $this->redirect('l2_search.php'.($this->rHasVal('mapId') ? '?mapId='.$this->requestData['mapId'] : '' ));
 
 		$this->setPageName(_('Search'));
 

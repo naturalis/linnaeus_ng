@@ -122,6 +122,12 @@ class SpeciesController extends Controller
     public function taxonAction ()
     {
 
+
+$d = $this->_getTaxonTree();
+q($d);
+
+die();
+
         if ($this->rHasId()) {
 		
 	        // get taxon
@@ -206,17 +212,21 @@ class SpeciesController extends Controller
 						)
 					)
 			);
+			
+			$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
 
 		} else {
 
 			$this->addError(_('No taxon ID specified.'));
-		
+
+			$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
+
 		}
 
         $this->printPage();
   
     }
-
+	
 	public function ajaxInterfaceAction()
 	{
 
@@ -342,7 +352,7 @@ class SpeciesController extends Controller
 				if ($val['def_page'] == 1) $_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
 			
 			}
-			
+
 			$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
 
 		}
@@ -374,29 +384,53 @@ class SpeciesController extends Controller
 
 			}
 
-			// std cats
-			$stdCats = 
-				array(
-					0 => array(
-						'id' => 'media',
-						'title' => _('Media')
-					),
-					1 => array(
-						'id' => 'classification',
-						'title' => _('Classification')
-					),
-					2 => array(
-						'id' => 'names',
-						'title' => _('Names')
-					)
+
+			$m = $this->getTaxonMedia($taxon,null);
+
+			if (count((array)$m)>0) {
+			
+				$stdCats[] = array(
+					'id' => 'media',
+					'title' => _('Media')
 				);
+				
+			}
+
+			//$c = $this->getTaxonClassification($taxon); // always exists!
+
+			//if (count((array)$c)>0) {
+			
+				$stdCats[] = array(
+					'id' => 'classification',
+					'title' => _('Classification')
+				);
+
+			//}
+
+			$n = $this->getTaxonNames($taxon);
+
+			if (count((array)$n)>0) {
+			
+				$stdCats[] = array(
+					'id' => 'names',
+					'title' => _('Names')
+				);
+
+			}
+				
 				
 			if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
 			
-				$stdCats[] = array(
-					'id' => 'literature',
-					'title' => _('Literature')
-				);
+				$l = $this->getTaxonLiterature($taxon);
+				
+				if (count((array)$l)>0) {
+			
+					$stdCats[] = array(
+						'id' => 'literature',
+						'title' => _('Literature')
+					);
+					
+				}
 
 			}
 
@@ -496,6 +530,7 @@ class SpeciesController extends Controller
 		
 		if (isset($taxon)) $d['taxon_id'] = $taxon;
 		if (isset($id)) $d['id'] = $id;
+		$d['overview_image'] = '0';
 
 		$mt = $this->models->MediaTaxon->_get(
 			array(
@@ -896,6 +931,23 @@ class SpeciesController extends Controller
 			)
 		);
 		
+	}
+
+	private function setLastViewedTaxonIdForTheBenefitOfTheMapkey($id)
+	{
+	
+		if (!is_null($id)) {
+		
+			$_SESSION['app']['user']['species']['lastTaxon'] = $id;
+			
+			unset($_SESSION['app']['user']['mapkey']['state']);
+		
+		} else {
+
+			unset($_SESSION['app']['user']['species']['lastTaxon']);
+			
+		}
+	
 	}
 
 }
