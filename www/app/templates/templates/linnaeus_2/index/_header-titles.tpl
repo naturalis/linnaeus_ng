@@ -9,7 +9,7 @@
 <li>
     <a class="category{if $taxonType=='higher'}-active{/if}" 
     href="javascript:window.open('higher.php','_self')">
-    {t}Higher Taxa{/t}</a>
+    {t}Higher taxa{/t}</a>
 </li>
 <li>
     <a class="category{if $taxonType=='common'}-active{/if} category-last" 
