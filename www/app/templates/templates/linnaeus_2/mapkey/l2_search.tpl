@@ -87,12 +87,10 @@
 
 {include file="_mapJquery-start.tpl"}
 {if $didSearch==true}
-showDialog(
-    _('Found {$taxa|@count} taxa'),
-	'<div id=\'lookup-DialogContent\'>'+
-    {foreach from=$taxa item=v}'<p class="row"><a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=search">{$v.taxon|escape:'htmlall'}</a></p>'+
-    {/foreach}'</div>'
-);
+
+allLookupNavigateOverrideDialogTitle('Found {$numOfTaxa} taxa');
+allLookupShowDialog('{$taxa}');
+
 {/if}
 {include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}

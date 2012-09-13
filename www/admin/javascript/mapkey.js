@@ -400,3 +400,10 @@ function mapDeleteType(id,value) {
 }
 
 
+function mapMoveType(id,action) {
+
+	$('#id').val(id);
+	$('#action').val(action);
+	$('#theForm').submit()
+
+}

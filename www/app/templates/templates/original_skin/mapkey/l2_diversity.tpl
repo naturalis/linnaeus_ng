@@ -59,6 +59,17 @@
 		</td>
 	</tr>
 </table>
+
+<table>
+{foreach from=$index.legend key=k item=v}
+	<tr>
+		<td class="mapCellDiversity{$k}" style="width:25px;height:25px;cursor:default">&nbsp;</td>
+		<td>{$v.min}-{$v.max}</td>
+	</tr>
+{/foreach}
+</table>
+
+
 </div>
 
 {literal}
@@ -77,12 +88,8 @@ l2SetMap(
 
 <!-- added ui dialog 2012.05.30 -->
 {if $taxa}
-showDialog(
-	_('Taxa in that cell'),
-	'<p style="height:250px;overflow-y:scroll">'+
-	{foreach from=$taxa item=v}'<a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon|escape:'htmlall'}</a><br />'+
-	{/foreach}'</p>'
-);
+allLookupNavigateOverrideDialogTitle('Taxa in that square');
+allLookupShowDialog('{$taxa}');
 {/if}
 <!-- /added ui dialog 2012.05.30 -->
 

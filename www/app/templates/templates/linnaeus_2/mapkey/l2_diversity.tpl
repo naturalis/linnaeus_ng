@@ -83,17 +83,24 @@
 		<td></td>
 	</tr>
 </table>
+
+<table>
+{foreach from=$index.legend key=k item=v}
+	<tr>
+		<td class="mapCellDiversity{$k}" style="width:25px;height:25px;cursor:default">&nbsp;</td>
+		<td>{$v.min}-{$v.max}</td>
+	</tr>
+{/foreach}
+</table>
+
+
 </div>
 {/if}
 
 {include file="_mapJquery-start.tpl"}
 {if $taxa}
-showDialog(
-    _('Taxa in that cell'), 
-	'<div id=\'lookup-DialogContent\'>'+
-    {foreach from=$taxa item=v}'<p class="row"><a href="l2_examine_species.php?id={$v.id}&m={$mapId}&ref=diversity">{$v.taxon|escape:'htmlall'}</a></p>'+
-    {/foreach}'</div>'
-);
+allLookupNavigateOverrideDialogTitle('Taxa in that square');
+allLookupShowDialog('{$taxa}');
 {/if}
 {include file="_mapJquery-end.tpl"}
 {include file="../shared/footer.tpl"}

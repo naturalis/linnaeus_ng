@@ -10,9 +10,9 @@
 	<td style="width:300px">
 		{$val.names[$activeLanguage].name}
 	</td>
-	<td>[<span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">{t}edit matrix{/t}</span>]</td>
-	<td>[<span class="a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span>]</td>
-	<td>[<span class="a" onclick="matrixMatrixDelete({$val.id},'{$val.names[$activeLanguage].name|@addslashes}')">{t}delete{/t}</span>]</td>
+	<td><span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">{t}edit matrix{/t}</span></td>
+	<td><span class="a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span></td>
+	<td><span class="a" onclick="matrixMatrixDelete({$val.id},'{$val.names[$activeLanguage].name|@addslashes}')">{t}delete{/t}</span></td>
 </tr>
 {/foreach}
 </table>

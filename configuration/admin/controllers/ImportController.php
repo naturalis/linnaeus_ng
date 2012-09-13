@@ -5,8 +5,14 @@
 	change the title in the xml file to %test% and a random (yet readable) project name will be assigned.
 
 	should add '_sawModule' to all modules
-
-
+	
+	DO NOT ADD $this->replaceInternalLinks() to anything outside the procedure fixOldInternalLinks(); it needs ALL data to be processed
+	first, before it can resolve and fix internal links
+	
+	species and higher taxa are strtolowered before parsed for the lookup arrays. OTHER MODULES ARE NOT, so:
+		[l][m]Glossary[/m][r]annihilation[/r][t]annihilated[/t][/l]
+	will only link correctly if the glosssary-entry is 'annihilation', and will not link when it is 'Annihilation'. that's
+	what you get when you don't do unique ID's.
 
 	keys als enige buiten de boom: nergens een los veld met de rank
 	ik wil alleen zeker weten dat er in alle projecten in de Tk en Pk ook ALTIJD de rank er bij staat voor de HT.
@@ -379,7 +385,7 @@ class ImportController extends Controller
 
 	public function l2SpeciesAction()
 	{
-
+	
 		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 		
 		set_time_limit(300);
@@ -1398,7 +1404,7 @@ class ImportController extends Controller
 		
 			$topic = trim($page[$titleField]);
 			//$content = $this->replaceOldMarkUp(trim($page[$contentField]));
-			$content = $this->replaceOldMarkUp($this->replaceInternalLinks(trim($page[$contentField])));
+			$content = $this->replaceOldMarkUp(trim($page[$contentField]));
 
 
 			if (!empty($topic)) {
@@ -2139,7 +2145,7 @@ class ImportController extends Controller
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'page_id' => $_SESSION['admin']['system']['import']['speciesOverviewCatId'],
 					//'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
-					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$taxon->description))),
+					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
 					'publish' => 1
 				)
 			);
@@ -2515,7 +2521,7 @@ class ImportController extends Controller
 				'year' => (isset($lit['year'])  && $lit['valid_year'] == true) ? $lit['year'].'-00-00' : '0000-00-00',
 				'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null,
 				//'text' => isset($lit['text']) ? $lit['text'] : null,
-				'text' => isset($lit['text']) ?  $this->replaceOldMarkUp($this->replaceInternalLinks(trim($lit['text']))) : null,
+				'text' => isset($lit['text']) ?  $this->replaceOldMarkUp(trim($lit['text'])) : null,
 
 			)
 		);
@@ -2721,7 +2727,7 @@ class ImportController extends Controller
 				'language_id' => $this->getNewDefaultLanguageId(),
 				'term' => isset($gls['term']) ? $gls['term'] : null,
 				//'definition' => isset($gls['definition']) ? $gls['definition'] : null
-				'definition' => isset($gls['definition']) ? $this->replaceOldMarkUp($this->replaceInternalLinks(trim($gls['definition']))) : null
+				'definition' => isset($gls['definition']) ? $this->replaceOldMarkUp(trim($gls['definition'])) : null
 
 			)
 		);
@@ -2803,7 +2809,7 @@ class ImportController extends Controller
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Welcome',	
 					//'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
-					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->projectintroduction)))
+					'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
 
 				)
 			);
@@ -2832,7 +2838,7 @@ class ImportController extends Controller
 					'language_id' => $this->getNewDefaultLanguageId(),	
 					'subject' => 'Contributors',	
 					//'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
-					'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->contributors)))
+					'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
 				)
 			);
 
@@ -2873,7 +2879,7 @@ class ImportController extends Controller
 				'language_id' => $this->getNewDefaultLanguageId(),
 				'page_id' => $id,
 				'topic' => $this->replaceOldMarkUp(trim((string)$obj->introduction_title),true),
-				'content' => $this->replaceOldMarkUp($this->replaceInternalLinks(trim((string)$obj->text)))
+				'content' => $this->replaceOldMarkUp(trim((string)$obj->text))
 			)
 		);
 
@@ -3075,7 +3081,7 @@ class ImportController extends Controller
 				}
 
 				//$txt = $this->replaceOldMarkUp($txt);
-				$txt = $this->replaceOldMarkUp($this->replaceInternalLinks($txt));
+				$txt = $this->replaceOldMarkUp($txt);
 
 				$stepId = ($step=='god' ? $stepIds['godId'] : $stepIds[trim((string)$step->pagenumber)]);
 				
@@ -3951,53 +3957,60 @@ class ImportController extends Controller
 
 		$controllers = 
 			array(
-				'Content pages' => array(
+				'content pages' => array(
 					'controller' => 'linnaeus',
 					'param' => 'id',
 				),
-				'Glossary' => // [m]Glossary[/m]
+				'glossary' => // [m]Glossary[/m]
 					array(
 						'controller' => 'glossary',
 						'url' => 'term.php',
 						'param' => 'id',
 					),
-				'Literature' => // [m]Literature[/m]
+				'literature' => // [m]Literature[/m]
 					array(
 						'controller' => 'literature',
 						'url' => 'reference.php',
 						'param' => 'id',
 					),
-				'Species' => // [m]Species[/m]
+				'species' => // [m]Species[/m]
 					array(
 						'controller' => 'species',
 						'url' => 'taxon.php',
 						'param' => 'id',
 					),
-				'Higher taxa' => // [m]Higher taxa[/m]
+				'higher taxa' => // [m]Higher taxa[/m]
 					array(
 						'controller' => 'highertaxa',
 						'url' => 'taxon.php',
 						'param' => 'id',
 					),
-				'Dichotomous key' => array(
+				'dichotomous key' => array(
 					'controller' => 'key',
 					'param' => 'id',
 				),
-				'Map key index' => array(
+				'map key index' => array(
 					'controller' => 'mapkey',
 					'param' => 'id',
 				),
-				'Matrix key index' => array(
+				'matrix key index' => array(
 					'controller' => 'matrixkey',
 					'url' => 'matrices.php',
 					'param' => 'id',
 				)
 			);
 
-
 //		$d = rtrim($s[count((array)$s)-1],'[/t]');
 		$d = preg_replace('/\[\/t\]$/','',$s[count((array)$s)-1]);
 		$d = preg_split('/(\[\/m\]\[[r]\])|(\[\/r\]\[[t]\])/iU',$d);
+		
+		$d[0] = strtolower($d[0]);
+		
+		if ($controllers[$d[0]]['controller']=='species' || $controllers[$d[0]]['controller']=='highertaxa') {
+			
+			$d[1] = strtolower($d[1]);
+			
+		}
 
 		if (isset($d[0]) && isset($controllers[$d[0]])) {
 
@@ -4174,10 +4187,10 @@ class ImportController extends Controller
 	{
 
 		// regular links
-		$d = preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/sU',array($this,'resolveInternalLinks'),$s);
+		$d = preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/isU',array($this,'resolveInternalLinks'),$s);
 
 		// embedded media
-		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/sU',array($this,'resolveEmbeddedLinks'),$d);
+		$d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU',array($this,'resolveEmbeddedLinks'),$d);
 
 		return $this->replaceOldMarkUp($d);
 
@@ -4233,6 +4246,36 @@ class ImportController extends Controller
 					
 	}
 
+	private function renumberGeoDataTypeOrder()
+	{
+
+		$s = $this->models->GeodataTypeTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getNewProjectId()
+				),
+				'columns' => 'type_id,title',
+				'order' => 'title'
+			)
+		);
+		
+		if (!$s) return false;
+
+		
+		foreach((array)$s as $key => $val) {
+
+			$this->models->GeodataType->update(
+				array('show_order' => $key),
+				array('id' => $val['type_id'],'project_id' => $this->getNewProjectId())
+			);
+			
+		
+		}
+		
+		return true;
+
+	}
+
 	private function importPostProcessing()
 	{
 	
@@ -4240,6 +4283,9 @@ class ImportController extends Controller
 
 		$this->addMessage($this->storeError('Processed internal links.'));
 		
+		if ($this->renumberGeoDataTypeOrder())
+			$this->addMessage($this->storeError('Re-ordened map datatype legend (alphabetically).'));
+
 		$this->copyEmbeddedMediaFiles();
 
 		$this->addMessage($this->storeError('Processed embedded images.'));
@@ -4282,8 +4328,16 @@ class ImportController extends Controller
 
 		if (isset($_SESSION['admin']['system']['import']['loaded']['species'])) {
 
-			foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $val) {
-				if (isset($val['taxon']) && isset($val['id'])) $s[$val['taxon']] = $val['id'];
+			foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $key => $val) {
+			
+				if (isset($val['id'])) {
+			
+					if (isset($val['taxon'])) $s[strtolower($val['taxon'])] = $val['id'];
+					if (isset($val['taxon'])) $s[strtolower($val['original_taxon'])] = $val['id']; // too tired to implicitly resolve all the original ranks
+					$s[strtolower($key)] = $val['id']; // too tired to implicitly resolve all the prefixed ranks
+					
+				}
+
 			}
 			
 		}
@@ -4379,6 +4433,22 @@ class ImportController extends Controller
 			);
 			
 		}
+
+
+		$d = $this->models->ContentIntroduction->_get(array('id' => array('project_id' => $this->getNewProjectId())));
+
+		foreach((array)$d as $val) {
+
+			$this->models->ContentIntroduction->save(
+				array(
+					'id' => $val['id'],
+					'project_id' => $this->getNewProjectId(),
+					'content' => $this->replaceInternalLinks($val['content'])
+				)
+			);
+			
+		}
+
 
 		$d = $this->models->ContentKeystep->_get(array('id' => array('project_id' => $this->getNewProjectId())));
 

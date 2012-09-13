@@ -85,8 +85,3 @@ config-files). 'dev_' was bedoeld om meerdere instances van LNG naast
 elkaar in dezelfde database te kunnen draaien - DEVelopment naast test
 naast productie etc. - maar momenteel is het de enige instance die er is.
 momenteel heet 'l2_maps' dus 'dev_l2_maps'.
-
-n.b. 3: in de L2-export van de flora zijn de coördinaten gesteld in
-Amersfoortcoördinaten. Het omzetten daarvan naar normale coördinaten valt
-buiten de specificaties van LNG, en zal handmatig moeten worden gedaan
-(door Ruud, neem ik aan). Dat is op dit moment nog niet gebeurd.
