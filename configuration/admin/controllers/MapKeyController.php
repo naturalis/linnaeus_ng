@@ -331,15 +331,50 @@ class MapKeyController extends Controller
         
             $tp = $this->createGeodataType($this->requestData['new_type'],$this->getDefaultProjectLanguage());
             
-            if ($tp !== true) $this->addError($tp);
+            if ($tp !== true)
+				$this->addError($tp);
+			else
+				$this->renumberGeoDataTypeOrder();
 
-        }
+        } else
+		if ($this->rHasVal('action','up') || $this->rHasVal('action','down')) {
 
-		$types = $this->models->GeodataType->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-			)
-		);
+			$s = $this->models->GeodataType->_get(
+				array(
+					'id' => array(
+						'id' => $this->requestData['id'],
+						'project_id' => $this->getCurrentProjectId(),
+					)
+				)
+			);
+
+			$this->models->GeodataType->update(
+				array('show_order' => $s[0]['show_order']),
+				array('project_id' => $this->getCurrentProjectId(),'show_order' =>
+					($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1))
+			);
+
+			$this->models->GeodataType->update(
+				array('show_order' => ($this->requestData['action']=='up' ? $s[0]['show_order']-1 : $s[0]['show_order']+1)),
+				array('id' => $this->requestData['id'],'project_id' => $this->getCurrentProjectId())
+			);
+			
+
+			
+			$this->renumberGeoDataTypeOrder();
+
+		}
+
+
+		$types =
+			$this->models->GeodataType->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+					),
+					'order' => 'show_order'
+				)
+			);
 
 		foreach ((array) $types as $key => $type) {
 
@@ -795,7 +830,8 @@ class MapKeyController extends Controller
 		$gt = $this->models->GeodataType->_get(
 			array(
 				'id' => $d,
-				'fieldAsIndex' => 'id'
+				'fieldAsIndex' => 'id',
+				'order' => 'show_order'
 			)
 		);
 
@@ -1784,5 +1820,31 @@ class MapKeyController extends Controller
 		return $loctc[0]['date_hr'];
 		
 	}
+	
+	private function renumberGeoDataTypeOrder()
+	{
+	
+		$s =
+			$this->models->GeodataType->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+					),
+					'order' => 'show_order'
+				)
+			);
+
+		foreach((array)$s as $key => $val) {
+
+			$this->models->GeodataType->update(
+				array('show_order' => $key),
+				array('id' => $val['id'],'project_id' => $this->getCurrentProjectId())
+			);
+			
+		
+		}
+
+	}
+
 	
 }

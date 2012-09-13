@@ -515,12 +515,26 @@ class MapKeyController extends Controller
 
 		}
 
+		if (isset($taxa)) {
+
+			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
+			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+
+			$this->smarty->assign('taxa',
+				$this->makeLookupList(
+					$taxa,
+					'species',
+					'../species/taxon.php?id=%s'
+				)
+			);
+			
+			$this->smarty->assign('numOfTaxa',count((array)$taxa));
+			
+		}
 
 		if (isset($selectedCells)) $this->smarty->assign('selectedCells',$selectedCells);
 
 		if (isset($selectedDataTypes)) $this->smarty->assign('selectedDataTypes',$selectedDataTypes);
-
-		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
 
 		$this->smarty->assign('didSearch',$didSearch);
 
@@ -567,9 +581,9 @@ class MapKeyController extends Controller
 		if (!$this->rHasVal('m')) {
 			$d = current($maps);
 			$mapId = $d['id'];
-		} else
+		} else {
 			$mapId = $this->requestData['m'];
-
+		}
 
 		if ($this->rHasVal('action','reindex') && isset($_SESSION['app']['user']['map']['index'])) {
 
@@ -603,7 +617,11 @@ class MapKeyController extends Controller
 	
 			if ($this->rHasVal('selectedCell')) {
 			
-				$taxa = $this->l2DoSearchMap($this->requestData['m'],(array)$this->requestData['selectedCell'],'*');
+				$taxa = $this->l2DoSearchMap(
+					$this->requestData['m'],
+					(array)$this->requestData['selectedCell'],
+					($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : '*')
+				);
 			
 				$selectedCell = $this->requestData['selectedCell'];
 	
@@ -613,8 +631,21 @@ class MapKeyController extends Controller
 			}
 			
 		}
-				
-		if (isset($taxa)) $this->smarty->assign('taxa',$taxa);
+
+		if (isset($taxa)) {
+
+			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
+			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+
+			$this->smarty->assign('taxa',
+				$this->makeLookupList(
+					$taxa,
+					'species',
+					'../species/taxon.php?id=%s'
+				)
+			);
+			
+		}
 
 		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
 
@@ -639,6 +670,11 @@ class MapKeyController extends Controller
 		if (!$this->rHasVal('action')) $this->smarty->assign('returnText','error');
 		
 		if ($this->rHasVal('action','get_lookup_list') && !empty($this->requestData['search'])) {
+
+            $this->getLookupList($this->requestData);
+			
+		} else
+		if ($this->rHasVal('action','get_l2_diversity_results') && !empty($this->requestData['search'])) {
 
             $this->getLookupList($this->requestData);
 			
@@ -785,7 +821,8 @@ class MapKeyController extends Controller
 			array(
 				'id' => $d,
 				'fieldAsIndex' => 'id',
-				'columns' => 'id,colour'
+				'columns' => 'id,colour',
+				'order' => 'show_order'
 			)
 		);
 		
@@ -1575,16 +1612,21 @@ class MapKeyController extends Controller
 				array(
 					'id' => $d,
 					'columns' => 'distinct taxon_id'
-					
 				)
 			);
 			
 		/*}*/
 		
-		foreach((array)$ot as $val) $p[] = $this->getTaxonById($val['taxon_id']);
+		foreach((array)$ot as $val) {
+			$d = $this->getTaxonById($val['taxon_id']);
+			$p[] = array(
+				'label' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+				'id' => $d['id']
+			);
+		}
 
 		$this->customSortArray($p,array(
-			'key' => 'taxon', 
+			'key' => 'label', 
 			'dir' => 'asc', 
 			'case' => 'i'
 			)
@@ -1606,9 +1648,8 @@ class MapKeyController extends Controller
 					'map_id' => $mapId
 				);
 				
-			if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';
-		
-		
+			if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';		
+
 			if ($this->l2HasTaxonOccurrencesCompacted()) {
 				
 				//echo '<!--using compacted index-->';
@@ -1622,7 +1663,7 @@ class MapKeyController extends Controller
 						'fieldAsIndex' => 'square_number',				
 					)
 				);
-					
+
 			} else {
 
 				//echo '<!--using uncompacted index (bad news)-->';
@@ -1648,22 +1689,49 @@ class MapKeyController extends Controller
 			} else {
 				$max = $min = 0;
 			}
+			
+			$legend = array();
 	
 			foreach((array)$ot as $key => $val) {
 			
 				$ot[$key]['pct'] = round(($val['total'] / $max) * 100);
-				$ot[$key]['class'] = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
-	
-			}
+				$x = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
+				$ot[$key]['class'] = $x;
+				$legend[$x] = $x;
 
+
+			}
+			
+			ksort($legend);
+
+			$prevmin = $min;
+			
+			foreach((array)$legend as $key => $val) {
+				$thisMax = 
+					$max + 
+					(
+						($val - $this->controllerSettings['l2DiversityIndexNumOfClasses']) *
+						($max / $this->controllerSettings['l2DiversityIndexNumOfClasses'])
+					);
+
+				$legend[$key] = 
+					array(
+						'min' => floor($prevmin),
+						'max' => floor($thisMax)
+					);
+					
+					$prevmin = $thisMax;
+			};
+			
 			$_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx] = array(
 				'index' => $ot,
 				'min' => $min,
-				'max' => $max
+				'max' => $max,
+				'legend' => $legend
 			);
 
 		}
-		
+
 		return $_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx];
 
 	}

@@ -23,6 +23,7 @@
 
 */
 
+var allLookupDialogTitle = 'Contents';
 var allLookupActiveRow = false;
 var allLookupRowCount = 0;
 var allLookupListName = 'allLookupList'; 
@@ -38,6 +39,12 @@ var allNavigateDefaultUrl = 'item.php?id=%s';
 var allNavigateTargetUrl = null;
 var allLookupContentUrl = 'ajax_interface.php';
 var allLookupSuppressKeyNavigation = false;
+
+function allLookupNavigateOverrideDialogTitle(title) {
+
+	allLookupDialogTitle = title;
+
+}
 
 function allLookupNavigateOverrideUrl(url) {
 
@@ -205,7 +212,7 @@ function allLookupBuildList(obj,txt) {
 	allLookupClearDialogDiv();
 
 	if (obj.results) {
-		
+
 		//var str = '<table id="allLookupListTable">';
 		var str = '';
 
@@ -397,10 +404,10 @@ function allLookupBindDialogKeyUp() {
 
 }
 
-function allLookupShowDialog() {
+function allLookupShowDialog(predefJSON) {
 
 	showDialog(
-		_('Contents'),
+		_(allLookupDialogTitle),
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
 	);
 
@@ -408,12 +415,22 @@ function allLookupShowDialog() {
 //	$('#'+allLookupDialogContentName).css('height','250px');
 
 	allLookupBindDialogKeyUp();
-	allLookupGetData('*',true);
+	
+	if (predefJSON) {
+
+		var tmp = $.parseJSON(predefJSON);
+		allLookupData = allLookupPostProcessing('',tmp,true);
+		allLookupGetData('',true);
+
+	} else {
+
+		allLookupGetData('*',true);
+
+	}
 
 	$('#'+allLookupDialogInputName).focus();
 
 }
-
 
 $(document).ready(function(){
 
@@ -430,3 +447,11 @@ $(document).ready(function(){
 	$('#'+allLookupBoxName).focus();
 
 });
+
+	
+	
+	
+	
+	
+	
+	

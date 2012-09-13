@@ -39,7 +39,29 @@
 			</td>
 			{/if}
 			<td><input id="color-{$types[i].id}" class="color" style="width:50px;font-size:inherit" onchange="mapSaveTypeColour({$types[i].id},this.value);"></td>
-			<td class="cell-page-delete" onclick="mapDeleteType({$types[i].id},$('#default-{$types[i].id}').val());"></td>
+
+		{if $smarty.section.i.first}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center;width:15px" 
+			class="a" 
+			onclick="mapMoveType({$types[i].id},'up');">
+			&uarr;
+		</td>
+		{/if}
+		{if $smarty.section.i.last}
+		<td></td>
+		{else}
+		<td
+			style="text-align:center;width:15px" 
+			class="a" 
+			onclick="mapMoveType({$types[i].id},'down');">
+			&darr;
+		</td>
+		{/if}
+
+			<td style="text-align:center;width:15px" class="a" onclick="mapDeleteType({$types[i].id},$('#default-{$types[i].id}').val());">x</td>
 		</tr>
 {/section}
 </table>
@@ -48,6 +70,8 @@
 {t}You have to define at least one language in your project before you can add any categories.{/t} <a href="../projects/data.php">{t}Define languages now.{/t}</a>
 {else}
 <form method="post" action="" id="theForm">
+<input type="hidden" name="id" value="" id="id" />
+<input type="hidden" name="action" value="" id="action" />
 {if $types|@count<$maxTypes}
 {t}Add a new data type:{/t} <input type="text" maxlength="32" id="new_type" name="new_type" value="" />
 <input type="hidden" name="rnd" value="{$rnd}" />
