@@ -375,9 +375,29 @@ class MapKeyController extends Controller
 	
 			$this->setPageName(sprintf(_('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
 
+		
+		// Ruud 14-09-12: set values for Taxon A and B if not yet entered
+		} else {
+			$taxa = $this->l2GetTaxaWithOccurrences();
+			// Default state
+			if (!isset($taxonA) && !isset($taxonB)) {
+				$taxonA = reset($taxa);
+				$taxonB = next($taxa);
+			// Taxon A has been set already
+			} else {
+				$taxonB = reset($taxa);
+				// Taxon B has already been selected in Species
+				if ($taxonA['taxon'] == $taxonB['taxon']) {
+					$taxonB = next($taxa);
+				}
+			}
 		}
+		
+		
 
 		if (isset($overlap)) $this->smarty->assign('overlap',$overlap);
+		
+		$taxa = $this->getTaxaWithOccurrences();
 
 		if (isset($taxonA)) $this->smarty->assign('taxonA',$taxonA);
 
