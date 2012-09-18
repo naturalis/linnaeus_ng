@@ -86,6 +86,7 @@ function taxonContentOpenLiteratureLink(id) {
 
 }
 
+// legacy function
 function taxonContentOpenMediaLink(id) {
 
 	$.ajax({
@@ -99,6 +100,8 @@ function taxonContentOpenMediaLink(id) {
 		success : function (data) {
 			//alert(data);
 			obj = $.parseJSON(data);
+			showMedia(bj[0].full_path,(obj[0].description ? obj[0].description : obj[0].file_name));
+			/*			
 			$.colorbox({
 				href:obj[0].full_path,
 				title:(obj[0].description ? obj[0].description : obj[0].file_name),
@@ -107,7 +110,7 @@ function taxonContentOpenMediaLink(id) {
 				width:"100%",
 				opacity:0
 			});
-
+			*/
 		}
 	})
 
