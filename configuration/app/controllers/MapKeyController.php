@@ -397,8 +397,6 @@ class MapKeyController extends Controller
 
 		if (isset($overlap)) $this->smarty->assign('overlap',$overlap);
 		
-		$taxa = $this->getTaxaWithOccurrences();
-
 		if (isset($taxonA)) $this->smarty->assign('taxonA',$taxonA);
 
 		if (isset($taxonB)) $this->smarty->assign('taxonB',$taxonB);
@@ -406,8 +404,6 @@ class MapKeyController extends Controller
 		$this->smarty->assign('selectedDataTypes',$this->rHasVal('selectedDataTypes') ? $this->requestData['selectedDataTypes'] : '*');
 
 		$this->smarty->assign('mapId',$mapId);
-
-		//$this->smarty->assign('taxa',$this->l2GetTaxaWithOccurrences());
 
 		$this->smarty->assign('maps',$maps);
 
