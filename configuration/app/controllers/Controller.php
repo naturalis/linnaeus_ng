@@ -215,11 +215,11 @@ class Controller extends BaseClass
 
 		foreach((array)$this->treeList as $key => $val) {
 
-			if ($this->showLowerTaxon==true) {
+			if ($this->showLowerTaxon===true) {
 
 				if ($val['lower_taxon']=='1')  $d[$key] = $val;
 			
-			} elseif ($this->showLowerTaxon==false) {
+			} elseif ($this->showLowerTaxon===false) {
 
 				if ($val['lower_taxon']=='0')  $d[$key] = $val;
 
