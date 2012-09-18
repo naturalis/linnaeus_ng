@@ -4085,7 +4085,6 @@ class ImportController extends Controller
 				
 		}
 
-
 		return isset($d[2]) ? trim($d[2]) : $s[0];
 	
 	}
@@ -4143,9 +4142,9 @@ class ImportController extends Controller
 			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
 
 			return '<span
-				class="internal-link" 
+				class="inline-image" 
 				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
-				$label.' [IMG]</span>';
+				$label.'</span>';
 
 //			NO INLINE
 //			return '<img
@@ -4159,9 +4158,9 @@ class ImportController extends Controller
 			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
 
 			return '<span
-				class="internal-link" 
+				class="inline-video" 
 				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
-				$label.' [VID]</span>';
+				$label.'</span>';
 
 //			return '<img
 //				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
@@ -4173,12 +4172,18 @@ class ImportController extends Controller
 
 			$_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
 
+			return '<span
+				class="inline-audio" 
+				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');">'.
+				$label.'</span>';
+
+			/*
 			return '<object type="application/x-shockwave-flash" data="'.
 						$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
 						<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
 						<param name="FlashVars" value="mp3='.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'">
 					</object>';
-
+			*/
 		} else return $s[0];
 	
 	}

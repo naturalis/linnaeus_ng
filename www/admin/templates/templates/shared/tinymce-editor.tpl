@@ -95,8 +95,8 @@ function initTinyMce(litRefs,mediaRefs) {
 						mlb.add('----------------------',null);
 						for (var i=0;i<obj.length;i++) {
 							mlb.add(
-								obj[i].file_name+' ('+obj[i].mime_type+')',
-								'<span style="text-decoration:underline;color:#CC0000;cursor:pointer;" onclick="taxonContentOpenMediaLink('+obj[i].id+');">'+obj[i].file_name+'</span>'
+								obj[i].file_name+' ('+obj[i].mime+')',
+								'<span class="inline-'+obj[i].mime+'" onclick="taxonContentOpenMediaLink('+obj[i].id+');">'+obj[i].file_name+'</span>'
 							);
 
 						}
