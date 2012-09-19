@@ -25,7 +25,7 @@ include_once ('Controller.php');
 class GlossaryController extends Controller
 {
 
-	private $_currentGlossatyId = false;
+	private $_currentGlossaryId = false;
 
     public $usedModels = array(
 		'glossary',
@@ -459,9 +459,9 @@ class GlossaryController extends Controller
                         }
 
 						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
-		
+
 							$_SESSION['admin']['system']['media']['newRef'] =
-								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
+								'<span class="inline-'.substr($file['mime_type'],0,strpos($file['mime_type'],'/')).'" onclick="showMedia(\''.addslashes($_SESSION['admin']['project']['urls']['project_media'].$file['name']).'\',\''.addslashes($file['name']).'\');">'.
 									$firstInsert['name'].
 								'</span>';
 		
@@ -751,7 +751,7 @@ class GlossaryController extends Controller
 
 		foreach((array)$wordlist as $key => $val) {
 		
-			$this->_currentGlossatyId = $val['id'];
+			$this->_currentGlossaryId = $val['id'];
 
 			$expr = '|\b('.$val['word'].')\b|i';
 		
@@ -773,7 +773,10 @@ class GlossaryController extends Controller
 	private function embedGlossaryLink($matches)
 	{
 
-		return '<span class="glossary-term-highlight" onclick="glossTextLink('.$this->_currentGlossatyId.')">'.$matches[0].'</span>';
+		if (trim($matches[0])=='')
+			return $matches[0];
+		else
+			return '<span class="glossary-term-highlight" onmouseover="glossTextOver('.$this->_currentGlossaryId.',this)">'.$matches[0].'</span>';
 
 	}
 

@@ -197,7 +197,7 @@ class LiteratureController extends Controller
 					$ref = $this->getReference($id);
 
 					$_SESSION['admin']['system']['literature']['newRef'] =
-						'<span class="taxonContentLiteratureLink" onclick="taxonContentOpenLiteratureLink('.$id.');">'.
+						'<span class="taxonContentLiteratureLink" onclick="goLiterature('.$id.');">'.
 							$ref['author_full'].', '.$ref['year'].$ref['suffix'].
 						'</span>';
 

@@ -5,9 +5,9 @@
 {assign var=spellchecker_languages value=$spellchecker_languages|cat:$languages[l].language|cat:'='|cat:$languages[l].iso2|cat:','}
 {/section}
 <script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
-{literal}
 <script type="text/javascript">
-
+var mediaPath = '{$session.admin.project.urls.project_media|@addslashes}';
+{literal}
 var inclLiteraryButtons = true;
 var inclMediaButtons = true;
 
@@ -50,7 +50,7 @@ function initTinyMce(litRefs,mediaRefs) {
 								) +
 								' ('+obj[i].year+')';
 						
-							mlb.add(l,'<span style="text-decoration:underline;color:#CC0000;cursor:pointer;" onclick="taxonContentOpenLiteratureLink('+obj[i].id+');">'+l+'</span>');
+							mlb.add(l,'<span style="text-decoration:underline;color:#CC0000;cursor:pointer;" onclick="goLiterature('+obj[i].id+');">'+l+'</span>');
 						}
 					}
 
@@ -96,7 +96,7 @@ function initTinyMce(litRefs,mediaRefs) {
 						for (var i=0;i<obj.length;i++) {
 							mlb.add(
 								obj[i].file_name+' ('+obj[i].mime+')',
-								'<span class="inline-'+obj[i].mime+'" onclick="taxonContentOpenMediaLink('+obj[i].id+');">'+obj[i].file_name+'</span>'
+								'<span class="inline-'+obj[i].mime+'" onclick="showMedia(\''+mediaPath+obj[i].file_name+'\',\''+obj[i].file_name+'\');">'+obj[i].file_name+'</span>'
 							);
 
 						}
