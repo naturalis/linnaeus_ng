@@ -306,9 +306,35 @@ body {
     border-bottom-right-radius: 6px 6px;
 }
 
+a, .internal-link {
+    color: #400093;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a:hover, .internal-link:hover {
+    text-decoration: underline;
+}
+
+.glossary-term-highlight {
+    background-color: #FFFF99;
+    color: #550000;
+}
+
+.clear {
+	clear: both;
+}
+
+.italics {
+	font-style: italic;
+}
 
 
-/* Navigation icons etc */
+
+/* 
+	Navigation icons, grid for multimedia, etc
+	Icons are also partly included in utilities/dynamic-css.tpl 
+*/
 .navigation-icon-wrapper {
     float: right;
     padding: 0 15px 0 0;
@@ -345,38 +371,12 @@ body {
 	margin-left: 5px;
 }
 
-/* Navigation icons are included in utilities/dynamic-css.tpl */
-
-
-a, .internal-link {
-    color: #400093;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-a:hover, .internal-link:hover {
-    text-decoration: underline;
-}
-
-.glossary-term-highlight {
-    background-color: #FFFF99;
-    color: #550000;
-}
-
 .introduction-img, #overview-image {
 	height: 281px;
     width: 241px;
     float: right;
     border: 1px solid #000;
     margin: 0 0 20px 25px;
-}
-
-.clear {
-	clear: both;
-}
-
-.italics {
-	font-style: italic;
 }
 
 table#media-grid td.media-cell, table#media-grid td.caption {
@@ -431,3 +431,15 @@ table#media-grid img.media-video-icon {
 table#media-grid td:first-child {
 	padding-left: 10px;
 }
+
+.inline-image, .inline-audio, .inline-video {
+    padding-left: 21px;
+	cursor: pointer;
+    color: #400093;
+}
+
+.inline-image:hover, .inline-audio:hover, .inline-video:hover {
+    text-decoration: underline;
+}
+
+

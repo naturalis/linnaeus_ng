@@ -12,5 +12,27 @@
 .internal-link {
 	cursor:pointer;
 	text-decoration:underline;
-	color:#009900;
+	color:#400093;
+}
+
+.inline-image, .inline-audio, .inline-video {
+    padding-left: 21px;
+	cursor: pointer;
+    color: #400093;
+}
+
+.inline-image:hover, .inline-audio:hover, .inline-video:hover {
+    text-decoration: underline;
+}
+
+.inline-image {
+    background: url('../media/system/icons/image-icon.png') no-repeat;
+}
+
+.inline-audio {
+    background: url('../media/system/icons/audio-icon.png') no-repeat;
+}
+
+.inline-video {
+    background: url('../media/system/icons/video-icon.png') no-repeat;
 }

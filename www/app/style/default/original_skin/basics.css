@@ -320,3 +320,12 @@ table#media-grid td:last-child {
 	padding-right: 10px;
 }
 
+.inline-image, .inline-audio, .inline-video {
+    padding-left: 21px;
+	cursor: pointer;
+}
+
+.inline-image:hover, .inline-audio:hover, .inline-video:hover {
+    text-decoration: underline;
+}
+

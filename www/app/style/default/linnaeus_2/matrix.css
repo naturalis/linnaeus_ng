@@ -175,3 +175,7 @@ select option:hover {
 .character-selected, .state-selected {
 	background-color: #f4f0f0;
 }
+
+.character-type {
+	font-size: 10px;
+}
