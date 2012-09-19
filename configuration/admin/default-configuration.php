@@ -109,7 +109,8 @@ class configuration
 			'soundPlayerPath' => '../../media/system/',
 			'soundPlayerName' => 'player_mp3.swf',
 			'useJavascriptLinks' => false,
-			'projectCssTemplateFile' => 'project-template.css'
+			'projectCssTemplateFile' => 'project-template.css',
+			'useJavascriptLinks' => false
         );
     
     }

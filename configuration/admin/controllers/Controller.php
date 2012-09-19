@@ -1006,7 +1006,7 @@ class Controller extends BaseClass
      * @return string    path
      * @access     public
      */
-    public function getProjectsMediaStorageDir ()
+    public function getProjectsMediaStorageDir()
     {
         
         return isset($_SESSION['admin']['project']['paths']['project_media']) ? $_SESSION['admin']['project']['paths']['project_media'] : null;
@@ -1020,7 +1020,7 @@ class Controller extends BaseClass
      * @return string    path
      * @access     public
      */
-    public function getProjectsThumbsStorageDir ()
+    public function getProjectsThumbsStorageDir()
     {
         
         return isset($_SESSION['admin']['project']['paths']['project_thumbs']) ? $_SESSION['admin']['project']['paths']['project_thumbs'] : null;
@@ -1034,7 +1034,7 @@ class Controller extends BaseClass
      * @access     public
      * @ return    string    url
      */
-    public function getLoggedInMainIndex ()
+    public function getLoggedInMainIndex()
     {
         
         return $this->baseUrl . $this->appName . '/admin-index.php';

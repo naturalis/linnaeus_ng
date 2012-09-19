@@ -1,13 +1,5 @@
 <?php
 
-/*
-
-check setLocale
-
-
-*/
-
-
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");

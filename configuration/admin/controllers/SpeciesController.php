@@ -25,7 +25,6 @@
 		- edit taxa
 		
 		- check project specific css
-		- check project specific JS (taxonContentOpenMediaLink etc.)
 
     tinyMCE
 		compressor php
@@ -90,7 +89,6 @@ class SpeciesController extends Controller
 		'all' => array(
 			'taxon.js',
 			'prettyPhoto/jquery.prettyPhoto.js',
-			'front-end.js',
 			'int-link.js',
 			'dialog/jquery.modaldialog.js',
 			'lookup.js',
@@ -1230,10 +1228,10 @@ class SpeciesController extends Controller
 						if (isset($_SESSION['admin']['system']['media']['newRef']) && $_SESSION['admin']['system']['media']['newRef'] == '<new>') {
 		
 							$_SESSION['admin']['system']['media']['newRef'] =
-								'<span class="taxonContentMediaLink" onclick="taxonContentOpenMediaLink('.$firstInsert['id'].');">'.
+								'<span class="inline-'.substr($file['mime_type'],0,strpos($file['mime_type'],'/')).'" onclick="showMedia(\''.addslashes($_SESSION['admin']['project']['urls']['project_media'].$file['name']).'\',\''.addslashes($file['name']).'\');">'.
 									$firstInsert['name'].
 								'</span>';
-		
+								
 							$this->redirect('../species/taxon.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
 		
 						}
@@ -4300,6 +4298,8 @@ class SpeciesController extends Controller
 			)
 		);
 	
+		foreach((array)$this->controllerSettings['media']['allowedFormats'] as $val) $mimes[$val['mime']] = $val;
+		
 		foreach((array)$d as $key => $val) {
 		
 			$d[$key]['media_type'] = $mimes[$val['mime_type']];
