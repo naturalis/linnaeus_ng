@@ -577,7 +577,7 @@ class SearchController extends Controller
 //					'language_id' => $this->getCurrentLanguageId(),
 					'file_name regexp' => $this->makeRegExpCompatSearchString($search)
 				),
-			'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat'
+			'columns' => 'id,taxon_id,id as media_id,file_name as label,\'media\' as cat, LEFT(mime_type,5) as mime'
 			)
 		);
 
