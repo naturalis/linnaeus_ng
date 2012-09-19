@@ -306,6 +306,8 @@ body {
     border-bottom-right-radius: 6px 6px;
 }
 
+
+/* Links  */
 a, .internal-link {
     color: #400093;
     cursor: pointer;
@@ -321,6 +323,8 @@ a:hover, .internal-link:hover {
     color: #550000;
 }
 
+
+/* Generic */
 .clear {
 	clear: both;
 }
@@ -328,8 +332,6 @@ a:hover, .internal-link:hover {
 .italics {
 	font-style: italic;
 }
-
-
 
 /* 
 	Navigation icons, grid for multimedia, etc

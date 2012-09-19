@@ -3,6 +3,8 @@
 
 {assign var=showZeroHeaders value=false}
 
+{$session.project.urls.systemMedia|print_r}
+
 <div id="page-main">
 	<div id="results">
 		<div id="header">
@@ -32,9 +34,11 @@
 		{else if $background=='c1'}
 			{assign var="background" value="c2"}
 		{/if}
+		
+
 		<p class="{$background}">
 		{if $res.label|@strtolower=='species media'}
-			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" />
+		<a href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}"><img alt="{$v.label}" src={if $v.mime=='image'}"{$session.app.project.urls.uploadedMedia}{$v.label}"{else}"{$session.app.project.urls.systemMedia}video.png" class="no-border"{/if} /></a>
 		{/if}
 
 {if $v.taxon}{$v.taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}: {/if}

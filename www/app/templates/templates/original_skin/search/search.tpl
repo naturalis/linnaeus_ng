@@ -24,7 +24,7 @@
 	<div class="subset">
 		{foreach from=$res.data key=k item=v}
 		{if $res.label|@strtolower=='species media'}
-			<img alt="{$v.label}" src="{$session.app.project.urls.uploadedMedia}{$v.label}" style="width:50px" />
+			<a href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}"><img alt="{$v.label}" src={if $v.mime=='image'}"{$session.app.project.urls.uploadedMedia}{$v.label}"{else}"{$session.app.project.urls.systemMedia}video.png"{/if} style="width:50px" /></a>
 		{/if}
 		{if $v.taxon}{$v.taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}: {/if}
 		{if $useJavascriptLinks}
