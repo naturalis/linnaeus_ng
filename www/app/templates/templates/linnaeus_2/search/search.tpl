@@ -3,8 +3,6 @@
 
 {assign var=showZeroHeaders value=false}
 
-{$session.project.urls.systemMedia|print_r}
-
 <div id="page-main">
 	<div id="results">
 		<div id="header">
