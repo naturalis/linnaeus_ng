@@ -283,6 +283,36 @@
 }
 {/literal}
 
+{literal}
+.inline-image {
+{/literal}
+    background: url('{$systemMedia}image-icon.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+.inline-audio {
+{/literal}
+    background: url('{$systemMedia}audio-icon.png') no-repeat;
+{literal}
+}
+{/literal}
+
+{literal}
+.inline-video {
+{/literal}
+    background: url('{$systemMedia}video-icon.png') no-repeat;
+{literal}
+}
+{/literal}
+
+
+
+
+
+
+/* Background image in select doesn't work in other browsers but Firefox...
 
 {literal}
 #characteristics option.text {
@@ -320,16 +350,6 @@
 }
 {/literal}
 
-
-
-
-
-
-
-
-
-
-
 {literal}
 #characteristics option.text:hover {
 {/literal}
@@ -362,7 +382,6 @@
 }
 {/literal}
 
-
-
+*/
 
 
