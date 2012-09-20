@@ -205,7 +205,7 @@ class IndexController extends Controller
 		$this->getTaxonTree(array('includeOrphans' => false));
 		
 		$names = $taxa = (array)$this->getTreeList();
-
+		
 		if ($this->getTaxonType()=='lower') {
 
 			$syn = $this->searchSynonyms();
@@ -386,6 +386,8 @@ class IndexController extends Controller
 	private function getFirstUsefulLetter($list,$field)
 	{
 
+		if (empty($list)) return;
+		
 		if ($this->rHasVal('letter')) {
 		
 			if ($this->requestData['letter']=='#') return '#';

@@ -377,7 +377,6 @@ class IndexController extends Controller
 	{
 
 		$d['project_id'] = $this->getCurrentProjectId();
-
 		if ($search) $d['taxon regexp'] = $this->makeRegExpCompatSearchString($search);
 
 		if ($ranks) $d['rank_id in'] = '('.implode(',',$ranks).')';
