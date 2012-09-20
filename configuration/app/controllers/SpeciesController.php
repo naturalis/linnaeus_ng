@@ -258,7 +258,7 @@ class SpeciesController extends Controller
 	
 			// get taxa
 			$taxa = $this->getTreeList();
-	
+				
 			$d = current($taxa);
 			
 			$id = (isset($d['id']) ? $d['id'] : null);
@@ -839,26 +839,29 @@ class SpeciesController extends Controller
 		$this->getTaxonTree();
 
 		$taxa = $this->getTreeList();
-
-		if ($taxa) reset($taxa);
 		
-		$prev = $next = null;
-
-		while (list($key, $val) = each($taxa)) {
-		
-			if ($key==$id) {
-
-				$next = current($taxa); // current = next because the pointer has already shifted forward
-
-				return array(
-					'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
-					'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
-				);
-
+		if ($taxa && !empty($taxa)) {
+			
+			reset($taxa);
+			
+			$prev = $next = null;
+	
+			while (list($key, $val) = each($taxa)) {
+			
+				if ($key==$id) {
+	
+					$next = current($taxa); // current = next because the pointer has already shifted forward
+	
+					return array(
+						'prev' => isset($prev) ? array('id' => $prev['id'],'label' => $prev['taxon']) : null,
+						'next' => isset($next) ? array('id' => $next['id'],'label' => $next['taxon']) : null
+					);
+	
+				}
+	
+				$prev = $val;
+	
 			}
-
-			$prev = $val;
-
 		}
 		
 		return null;

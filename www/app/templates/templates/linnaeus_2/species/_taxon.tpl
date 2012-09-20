@@ -23,10 +23,10 @@
 	{foreach from=$content key=k item=v name=classification}
 	{if $v.do_display}	
 		{if $useJavascriptLinks}			
-		<p {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
+		<p {if $smarty.foreach.classification.last || $v.is_empty==1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
 		{else}
 		<p>
-			{if $smarty.foreach.classification.last}
+			{if $smarty.foreach.classification.last || $v.is_empty==1}
 				{$v.label}
 			{else}
 				<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>

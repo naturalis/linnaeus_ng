@@ -2137,6 +2137,7 @@ class ImportController extends Controller
 
 		if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
 		
+			$content = $this->replaceOldMarkUp(trim((string)$taxon->description));
 			$this->models->ContentTaxon->save(
 				array(
 					'id' => null,
@@ -2144,11 +2145,20 @@ class ImportController extends Controller
 					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'],
 					'language_id' => $this->getNewDefaultLanguageId(),
 					'page_id' => $_SESSION['admin']['system']['import']['speciesOverviewCatId'],
-					//'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
-					'content' => $this->replaceOldMarkUp(trim((string)$taxon->description)),
+					'content' => $content,
 					'publish' => 1
 				)
 			);
+			
+			if (!empty($content)) {
+ 				$this->models->Taxon->update(
+					array('is_empty' => 0),
+					array(
+						'id' => $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'],
+						'project_id' => $this->getNewProjectId()
+					)
+				);
+			}
 			
 			$_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved']++;
 

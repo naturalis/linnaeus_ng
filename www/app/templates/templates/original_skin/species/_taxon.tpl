@@ -38,14 +38,14 @@
 	{if $v.do_display}
 		<tr>
 			{if $useJavascriptLinks}			
-			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</td>
+			<td {if $smarty.foreach.classification.index==$content|@count-1 || $v.is_empty==1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</td>
 			{else}
 			<td {if $smarty.foreach.classification.index==$content|@count-1}class="current-taxon"{/if}>
-				{if $v.lower_taxon==1}
-				<a href="../species/taxon.php?id={$v.id}">{$v.label}</a>
+				{if $smarty.foreach.classification.last || $v.is_empty==1}
+					{$v.label}
 				{else}
-				<a href="../highertaxa/taxon.php?id={$v.id}">{$v.label}</a>
-				{/if}
+					<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+				{/if}				
 			</td>
 			{/if}		
 			<td>({$v.rank})</td>

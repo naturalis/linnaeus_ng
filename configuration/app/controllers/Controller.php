@@ -200,12 +200,14 @@ class Controller extends BaseClass
 	
 	}
 
-	public function getTreeList()
+	public function getTreeList($params = null)
 	{
 
 		if (!isset($this->treeList)) return null;
 
 		foreach((array)$this->treeList as $key => $val) {
+			
+			if (!isset($params['includeEmpty']) && $params['includeEmpty']!==true && $val['is_empty']=='1') continue;
 
 			if ($this->showLowerTaxon===true) {
 
@@ -268,7 +270,7 @@ class Controller extends BaseClass
 					'project_id' => $this->getCurrentProjectId(),
 					'parent_id'.(is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
 				),
-				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty',
 				'fieldAsIndex' => 'id',
 				'order' => 'taxon_order,id'
 			)
@@ -580,7 +582,7 @@ class Controller extends BaseClass
 		$d = null;
 
 		$this->getTaxonTree();
-
+		
 		foreach((array)$this->treeList as $key => $val) {
 			
 			$d[$val['level']] = $val;
