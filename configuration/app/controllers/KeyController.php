@@ -57,9 +57,6 @@ class KeyController extends Controller
         $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
 		
 		$this->smarty->assign('keyType',$this->getSetting('keytype'));
-		
-		//$this->setStoredChoiceList();
-		//unset($_SESSION['app']['user']['key']['path']);
 
     }
 
@@ -74,6 +71,42 @@ class KeyController extends Controller
         parent::__destruct();
     
     }
+	
+	
+	private function satan($branch,$choice)
+	{
+	
+		if ($this->tmp['found']==true) return;
+	
+		foreach ((array)$branch as $val) {
+		
+			$this->tmp['results'][$val['level']] = array(
+				'id' => $val['keystep_id'],
+				'step_number' => $val['step_number'],
+				'step_title' => $val['step_title'],
+				'is_start' => $val['is_start'],
+				'choice_marker' => $val['choice_marker'],
+				'choice_id' => $val['choice_id'],
+			);
+
+			if ($val['choice_id']==$choice) {
+
+				$this->tmp['results'][$val['level']]['choice_marker'] = null;
+				
+				$this->tmp['found']=true;
+
+				return;
+
+			} else {
+			
+				if (isset($val['offspring'])) $this->satan($val['offspring'],$choice);
+
+			}
+
+		}
+		
+	
+	}
 
     /**
      * Main procedure for key
@@ -86,6 +119,27 @@ class KeyController extends Controller
         $this->setPageName( _('Index'));
 		
 		$keyPath = $this->getKeyPath();
+		
+		// direct link to a choice without a keypath: restore a possible path from stored tree
+		if (is_null($keyPath) && $this->rHasVal('choice')) {
+
+			$this->tmp = array();
+			$this->tmp['found'] = false;
+			$this->tmp['results'] = array();
+			$this->setKeyTree();
+q($_SESSION['app']['user']['key']['keyTree'],1);
+			$this->satan($_SESSION['app']['user']['key']['keyTree'],$this->requestData['choice']);
+			
+			q($this->tmp['results']);
+		
+		die();
+		
+/*
+
+*/		
+			
+		
+		}
 
 		// step points at a specific step, from keypath
 		if ($this->rHasVal('step')) {
@@ -586,21 +640,28 @@ class KeyController extends Controller
 			$step = $this->getStartKeystep();
 			$id = $step['id'];
 
+		} else {
+		
+			$step = $this->getKeystep($id);
 		}
 
 		$c = $this->getKeystepChoices($id);
-		
+
 		foreach((array)$c as $key => $val) {
 		
-			$d[$key]['keystep_id'] = $val['keystep_id'];
-			$d[$key]['res_keystep_id'] = $val['res_keystep_id'];
+			$d[$key]['id'] = $d[$key]['keystep_id'] = $val['keystep_id'];
+			$d[$key]['step_number'] = $step['number'];
+			$d[$key]['step_title'] = $step['title'];
+			$d[$key]['is_start'] = $step['is_start'];
+			$d[$key]['choice_marker'] = $val['marker'];
+			//$d[$key]['res_keystep_id'] = $val['res_keystep_id'];
 			$d[$key]['res_taxon_id'] = $val['res_taxon_id'];
 
 			if ($val['res_keystep_id']) $d[$key]['offspring'] = $this->generateKeyTree($val['res_keystep_id']);
 
 		}
 		
-		return $d;
+		return isset($d) ? $d : null;
 	
 	}
 		
@@ -613,7 +674,7 @@ class KeyController extends Controller
 			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree(); // hope not!
 		else
 			$_SESSION['app']['user']['key']['keyTree'] = unserialize($tree[0]['keytree']);
-			
+
 	}
 	
 	private function getKeyTree2()
@@ -628,7 +689,7 @@ class KeyController extends Controller
 
 		foreach((array)$branch as $key => $val) {
 		
-			if ($val['keystep_id']==$step) {
+			if (isset($val['keystep_id']) && $val['keystep_id']==$step) {
 				$this->tmp[] = $val;
 			} else {
 				if(isset($val['offspring'])) $this->getStepBranch($step,$val['offspring']);
@@ -716,3 +777,29 @@ class KeyController extends Controller
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

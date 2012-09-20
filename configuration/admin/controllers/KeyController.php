@@ -825,7 +825,7 @@ class KeyController extends Controller
         
         $this->setPageName( _('Store key tree'));
 		
-		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('action','store')) {// && !$this->isFormResubmit()) {
 
 			$k = $this->saveKeyTree();
 			
@@ -2339,7 +2339,7 @@ class KeyController extends Controller
 
 	}
 
-	private function generateKeyTree($id=null)
+	private function generateKeyTree($id=null,$level=0)
 	{
 
 		if (is_null($id)) {
@@ -2347,21 +2347,35 @@ class KeyController extends Controller
 			$step = $this->getStartKeystep();
 			$id = $step['id'];
 
-		}
-
-		$c = $this->getKeystepChoices($id);
+		} else {
 		
-		foreach((array)$c as $key => $val) {
-		
-			$d[$key]['keystep_id'] = $val['keystep_id'];
-			//$d[$key]['res_keystep_id'] = $val['res_keystep_id'];
-			$d[$key]['res_taxon_id'] = $val['res_taxon_id'];
-
-			if ($val['res_keystep_id']) $d[$key]['offspring'] = $this->generateKeyTree($val['res_keystep_id']);
-
+			$step = $this->getKeystep($id);
 		}
 		
-		return isset($d) ? $d : null;
+		$step = array(
+			'id' => $step['id'],
+			'number' => $step['number'],
+			'title' => $step['title'],
+			'is_start' => $step['is_start'],
+			'level' => $level
+		);		
+
+		$step['choices'] = $this->getKeystepChoices($id);
+  
+		foreach((array)$step['choices'] as $key => $val) {
+		
+			$d['choice_id'] = $val['id'];
+			$d['choice_marker'] = $val['marker'];
+			$d['res_keystep_id'] = $val['res_keystep_id'];
+			$d['res_taxon_id'] = $val['res_taxon_id'];
+
+			$step['choices'][$key] = $d;
+
+			if ($val['res_keystep_id']) $step['choices'][$key]['step'] = $this->generateKeyTree($val['res_keystep_id'],($level+1));
+
+		}
+		
+		return isset($step) ? $step : null;
 	
 	}
 
@@ -2369,7 +2383,7 @@ class KeyController extends Controller
 	{
 	
 		$tree = $this->generateKeyTree();
-		
+q($tree);
 		if ($tree) {
 
 			$this->models->Keytree->delete(
