@@ -458,3 +458,72 @@ function toggleHidden(id) {
 	}
 
 }
+
+
+function checkHrefsForPID(pid) {
+
+$('a').each(function() {
+	var h = $(this).attr('href');
+	var url = $.url(h); // pass in a URI as a string and parse that 
+/*
+
+    source - the whole url being parsed
+    protocol - eg. http, https, file, etc
+    host - eg. www.mydomain.com, localhost etc
+    port - eg. 80
+    relative - the relative path to the file including the querystring (eg. /folder/dir/index.html?item=value)
+    path - the path to the file (eg. /folder/dir/index.html)
+    directory - the directory part of the path (eg. /folder/dir/)
+    file - the basename of the file eg. index.html
+    query - the entire querystring if it exists, eg. item=value&item2=value2
+    fragment (also available as anchor) - the entire string after the # symbol
+*/
+	if (url.attr('query').length==0) {
+		$(this).attr('href',h+'?PID='+pid);
+	} else
+	if (url.attr('query').indexOf('&PID=')==-1) {
+		$(this).attr('href',h+'&PID='+pid);
+	}
+});
+						
+/*
+$('a').each(function() {
+	alert($(this).attr('href'));
+});
+*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
