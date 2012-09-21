@@ -4,6 +4,8 @@
 {assign var='totalSteps' value=$keypath|@count}
 {assign var='previousStep' value=$totalSteps-2}
 
+<span style="margin-left:10px;cursor:pointer;" onclick="allLookupShowDialog()">{t}contents{/t}</span>
+
 {if $useJavascriptLinks}
     <span
     {if $totalSteps > 1}
