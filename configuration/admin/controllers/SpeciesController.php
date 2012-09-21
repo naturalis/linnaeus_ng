@@ -2819,14 +2819,14 @@ class SpeciesController extends Controller
                 // must have a page name
                 if ($this->rHasVal('page')) {
                     
-                    if ($this->rHasVal('name') && !$this->rHasVal('content')) {
+                    if (!$this->rHasVal('name') && !$this->rHasVal('content')) {
                         
                         if (!$this->rHasVal('save_type'))
                             $this->requestData['save_type'] = 'auto';
                         
                         $this->models->ContentTaxon->setRetainBeforeAlter();
                         
-                        // no page title and no conten equals an empty page: delete
+                        // no page title and no content equals an empty page: delete
                         $ct = $this->models->ContentTaxon->delete(
                         array(
                             'project_id' => $this->getCurrentProjectId(), 
