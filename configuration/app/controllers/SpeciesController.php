@@ -155,6 +155,9 @@ class SpeciesController extends Controller
 				} else if ($key == count($categories['categories']) - 1) {
 				    $c[] ='category-last';
 				}
+				if ($val['is_empty']==1) {
+					$c[] ='category-no-content';
+				}
 				$categories['categories'][$key]['className'] = implode(' ', $c);
 			}
 
