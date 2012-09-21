@@ -541,7 +541,10 @@ class Controller extends BaseClass
 	
 	public function getTaxonById($id)
 	{
-
+		if (empty($id) || $id==0) {
+			return;
+		}
+		
 		if (!isset($_SESSION['app']['user']['species']['taxon']['id']) ||
 			$_SESSION['app']['user']['species']['taxon']['id']!=$id) {
 
