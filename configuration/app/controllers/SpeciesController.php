@@ -360,6 +360,8 @@ class SpeciesController extends Controller
 
 			foreach((array)$_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
 
+				$val['is_empty'] = 1;
+				
 				$ct = $this->models->ContentTaxon->_get(
 					array(
 						'id' => array(
@@ -371,8 +373,10 @@ class SpeciesController extends Controller
 						'columns' => 'page_id,publish,content'
 					)
 				);
-
-				if ($ct[0]['publish']=='1' || $allowUnpublished) $d[] = $val;
+				
+				if ($ct[0]['publish']=='1' || $allowUnpublished) $val['is_empty'] = 0;
+					
+				$d[] = $val;
 
 				if ($ct[0]['page_id']==$_SESSION['app']['user']['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
 					$defCat = $_SESSION['app']['user']['species']['defaultCategory'];
@@ -382,55 +386,40 @@ class SpeciesController extends Controller
 
 			$m = $this->getTaxonMedia($taxon,null);
 
-			if (count((array)$m)>0) {
-			
-				$stdCats[] = array(
+			$stdCats[] = array(
 					'id' => 'media',
-					'title' => _('Media')
-				);
-				
-			}
+					'title' => _('Media'),
+					'is_empty' => (count((array)$m)>0 ? 0 : 1)
+			);
 
-			//$c = $this->getTaxonClassification($taxon); // always exists!
-
-			//if (count((array)$c)>0) {
-			
-				$stdCats[] = array(
-					'id' => 'classification',
-					'title' => _('Classification')
-				);
-
-			//}
+			$stdCats[] = array(
+				'id' => 'classification',
+				'title' => _('Classification'),
+				'is_empty' => 0
+			);
 
 			$n = $this->getTaxonNames($taxon);
 
-			if (count((array)$n)>0) {
+			$stdCats[] = array(
+				'id' => 'names',
+				'title' => _('Names'),
+				'is_empty' => (count((array)$n)>0 ? 0 : 1)
+			);
 			
-				$stdCats[] = array(
-					'id' => 'names',
-					'title' => _('Names')
-				);
-
-			}
-				
-				
 			if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
-			
+		
 				$l = $this->getTaxonLiterature($taxon);
 				
-				if (count((array)$l)>0) {
-			
-					$stdCats[] = array(
-						'id' => 'literature',
-						'title' => _('Literature')
-					);
-					
-				}
+				$stdCats[] = array(
+					'id' => 'literature',
+					'title' => _('Literature'),
+					'is_empty' => (count((array)$l)>0 ? 0 : 1)
+				);
 
 			}
 
 			$d = array_merge($d,$stdCats);
-
+			
 			return array(
 				'categories' => $d,
 				'defaultCategory' => $defCat
@@ -438,6 +427,7 @@ class SpeciesController extends Controller
 
 		}
 
+		
 		return array(
 			'categories' => $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()],
 			'defaultCategory' => $_SESSION['app']['user']['species']['defaultCategory']
@@ -517,10 +507,11 @@ class SpeciesController extends Controller
 		}
 	
 	}
-
+	
 	private function getTaxonMedia($taxon=null,$id=null)
 	{
-
+		if ($mt = $this->getCache($taxon, 'media')) return $mt;
+		
 		$d = array('project_id' => $this->getCurrentProjectId());
 		
 		if (isset($taxon)) $d['taxon_id'] = $taxon;
@@ -568,6 +559,8 @@ class SpeciesController extends Controller
 		);
 
 		$this->customSortArray($mt, $sortBy);
+		
+		$this->setCache($taxon, 'media', $mt);
 
 		return $mt;
 
@@ -576,6 +569,8 @@ class SpeciesController extends Controller
 	private function getTaxonLiterature($taxon)
 	{
 
+		if ($refs = $this->getCache($taxon, 'literature')) return $refs;
+		
 		$lt =  $this->models->LiteratureTaxon->_get(
 			array(
 				'id' => array(
@@ -618,6 +613,8 @@ class SpeciesController extends Controller
 
 		$this->customSortArray($refs, $sortBy);
 
+		$this->setCache($taxon, 'literature', $refs);
+		
 		return $refs;
 
 	}
@@ -625,10 +622,16 @@ class SpeciesController extends Controller
 	private function getTaxonNames($taxon)
 	{
 
-		return array(
+		if ($names = $this->getCache($taxon, 'names')) return $names;
+		
+		$names = array(
 			'synonyms' => $this->getTaxonSynonyms($taxon),
 			'common' => $this->getTaxonCommonNames($taxon)
 		);
+		
+		$this->setCache($taxon, 'names', $names);
+		
+		return $names;
 
 	}
 
@@ -948,5 +951,27 @@ class SpeciesController extends Controller
 	
 	}
 
+
+	private function getCache ($taxon, $category) {
+		if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
+			return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
+		}
+	
+		if (isset($_SESSION['app']['user']['species']['last_visited'])) {
+	
+			$storedTaxon = key($_SESSION['app']['user']['species']['last_visited']);
+			if ($storedTaxon != $taxon) {
+				unset($_SESSION['app']['user']['species']['last_visited'][$storedTaxon]);
+			}
+		}
+	
+		return false;
+	}
+	
+	private function setCache ($taxon, $category, $d) {
+		$_SESSION['app']['user']['species']['last_visited'][$taxon][$category] = $d;
+	}
+	
+	
 }
 
