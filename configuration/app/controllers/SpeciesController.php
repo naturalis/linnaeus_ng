@@ -259,9 +259,9 @@ class SpeciesController extends Controller
 			// get taxa
 			$taxa = $this->getTreeList();
 				
-			$d = current($taxa);
+			$d = (!empty($taxa) ? current($taxa) : array());
 			
-			$id = (isset($d['id']) ? $d['id'] : null);
+			$id = (isset($d['id']) ? $d['id'] : 0);
 			
 		} else {
 			
