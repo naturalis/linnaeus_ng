@@ -2811,7 +2811,7 @@ class SpeciesController extends Controller
         }
         
         if ($d) {
-        // save of new taxon succeded, or existing taxon
+        // save of new taxon succeeded, or existing taxon
             
             // must have a language
             if ($this->rHasVal('language')) {
@@ -2870,6 +2870,12 @@ class SpeciesController extends Controller
                         
                         // save content
                         $d = $this->models->ContentTaxon->save($newdata);
+                        
+                        // Mark taxon as 'empty/not empty' depending on presence of contents
+                        $this->models->Taxon->update(
+							array('is_empty' => !empty($filteredContent['content']) ? 0 : 1),
+							array('id' => $taxonId)
+						);
                         
                         if ($id != null)
                             $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, 
