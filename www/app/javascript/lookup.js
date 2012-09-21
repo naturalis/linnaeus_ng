@@ -13,7 +13,7 @@
 				'url' => '../relative/url/to/item?id=%s',
 				'results' => array(
 					'id' => id of item,
-					'text' => 'text to display',
+					'label' => 'text to display',
 					'source' => 'data source (optional)'
 				)				   
 			)
@@ -40,90 +40,6 @@ var allNavigateTargetUrl = null;
 var allLookupContentUrl = 'ajax_interface.php';
 var allLookupSuppressKeyNavigation = false;
 
-function allLookupNavigateOverrideDialogTitle(title) {
-
-	allLookupDialogTitle = title;
-
-}
-
-function allLookupNavigateOverrideUrl(url) {
-
-	allLookupTargetUrl = allNavigateTargetUrl = url;
-
-}
-
-function allLookupContentOverrideUrl(url) {
-
-	allLookupContentUrl = url;
-
-}
-
-function allLookup() {
-
-	var text = $('#'+allLookupBoxName).val();
-
-	if (text == allLookupLastString) return;
-	
-	if (allLookupGetData(text)) {
-		allLookupPositionDiv();
-		allLookupShowDiv();
-	}
-
-	allLookupLastString = text;
-	
-}
-
-
-function allLookupPostProcessing(text,data,getAll) {
-
-	/*
-		the 'match start of word only' option was added later, and required restructuring 
-		of the corresponding lookup functions in the controller classes. in LinnaeusController
-		and GlossaryController, the required alterations were too extensive. its output was 
-		therefore left unchanged and is filtered here to meet the requirements of the 
-		allLookupMatchStartOnly setting.
-	*/
-	
-	if (allLookupMatchStartOnly  && !getAll) {
-
-		var regExp = '/^'+addSlashes(text)+'/ig';
-
-		//var d = eval (allLookupData.toSource());
-		var d = jQuery.extend(true, {}, data);
-		r = new Array();
-
-		for(var i=0;i<data.results.length;i++) {
-			
-			if (data.results[i].label.match(eval(regExp))) {
-				
-				r[r.length] = data.results[i]
-				
-			}
-
-		}
-
-		d.results = r;
-		
-		return d;
-
-	}
-
-	return data;
-
-}
-
-function allLookupDataShowLoading() {
-
-	$('#lookup-DialogContent').append('<div id="allLookupLoadingDiv"></div>');
-
-}
-
-function allLookupDataHideLoading() {
-
-	$('#allLookupLoadingDiv').remove();
-
-}
-
 function allLookupGetData(text,getAll) {
 
 	if (text.length==0 && getAll!=true) {
@@ -134,7 +50,7 @@ function allLookupGetData(text,getAll) {
 		return false;
 
 	}
-	
+
 	allLookupDataShowLoading();
 
 	if (allLookupData==null) {
@@ -195,6 +111,89 @@ function allLookupGetData(text,getAll) {
 
 	return true;
 
+}
+
+function allLookupPostProcessing(text,data,getAll) {
+
+	/*
+		the 'match start of word only' option was added later, and required restructuring 
+		of the corresponding lookup functions in the controller classes. in LinnaeusController
+		and GlossaryController, the required alterations were too extensive. its output was 
+		therefore left unchanged and is filtered here to meet the requirements of the 
+		allLookupMatchStartOnly setting.
+	*/
+	
+	if (allLookupMatchStartOnly  && !getAll) {
+
+		var regExp = '/^'+addSlashes(text)+'/ig';
+
+		//var d = eval (allLookupData.toSource());
+		var d = jQuery.extend(true, {}, data);
+		r = new Array();
+
+		for(var i=0;i<data.results.length;i++) {
+			
+			if (data.results[i].label.match(eval(regExp))) {
+				
+				r[r.length] = data.results[i]
+				
+			}
+
+		}
+
+		d.results = r;
+		
+		return d;
+
+	}
+
+	return data;
+
+}
+
+function allLookupDataShowLoading() {
+
+	$('#lookup-DialogContent').append('<div id="allLookupLoadingDiv"></div>');
+
+}
+
+function allLookupDataHideLoading() {
+
+	$('#allLookupLoadingDiv').remove();
+
+}
+
+function allLookupNavigateOverrideDialogTitle(title) {
+
+	allLookupDialogTitle = title;
+
+}
+
+function allLookupNavigateOverrideUrl(url) {
+
+	allLookupTargetUrl = allNavigateTargetUrl = url;
+
+}
+
+function allLookupContentOverrideUrl(url) {
+
+	allLookupContentUrl = url;
+
+}
+
+function allLookup() {
+
+	var text = $('#'+allLookupBoxName).val();
+
+	if (text == allLookupLastString) return;
+	
+	if (allLookupGetData(text)) {
+		allLookupPositionDiv();
+		allLookupShowDiv();
+	}
+
+	allLookupLastString = text;
+	
 }
 
 function allLookupSetExtraVars(name,value) {

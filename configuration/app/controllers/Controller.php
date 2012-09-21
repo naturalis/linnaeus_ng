@@ -1600,16 +1600,34 @@ class Controller extends BaseClass
 		}
 
 	}
-	
 
+
+	/*
+	
+		expected format of returned data:
+	
+			json_encode(
+				array(
+					'module' => 'module name (optional)',
+					'url' => '../relative/url/to/item?id=%s',
+					'results' => array(
+						'id' => id of item,
+						'label' => 'text to display',
+						'source' => 'data source (optional)'
+					)				   
+				)
+			);
+	
+	*/
 	public function makeLookupList($data,$module,$url,$sortData=false,$encode=true)
 	{
 
-		$sortBy = array(
-			'key' => 'label', 
-			'dir' => 'asc', 
-			'case' => 'i'
-		);
+		$sortBy =
+			array(
+				'key' => 'label', 
+				'dir' => 'asc', 
+				'case' => 'i'
+			);
 
 		if ($sortData) $this->customSortArray($data, $sortBy);
 

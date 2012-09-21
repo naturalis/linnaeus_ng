@@ -129,7 +129,6 @@ class IndexController extends Controller
 		$this->smarty->assign('taxonType',$this->getTaxonType());
 
         $this->printPage('index');
-
 		
 	}
 
@@ -213,9 +212,6 @@ class IndexController extends Controller
         $this->printPage();
 		
 	}
-	
-
-	
 	
     /**
      * AJAX interface for this class
@@ -400,7 +396,6 @@ class IndexController extends Controller
 
 	}
 
-
 	private function getSynonymLookupList($search=null)
 	{
 
@@ -416,7 +411,6 @@ class IndexController extends Controller
 		);
 
 	}
-
 
 	private function getCommonnameLookupList($search=null)
 	{

@@ -825,11 +825,11 @@ class KeyController extends Controller
         
         $this->setPageName( _('Store key tree'));
 		
-		if ($this->rHasVal('action','store')) {// && !$this->isFormResubmit()) {
+		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
 
 			$k = $this->saveKeyTree();
 			
-			if ($k==true)
+			if ($k===true)
 				$this->addMessage(_('Key tree saved'));
 			else
 				$this->addError($k);
@@ -2339,6 +2339,7 @@ class KeyController extends Controller
 
 	}
 
+	// be aware that this function also exists in the app controller and should have identical output there!
 	private function generateKeyTree($id=null,$level=0)
 	{
 
@@ -2352,20 +2353,21 @@ class KeyController extends Controller
 			$step = $this->getKeystep($id);
 		}
 		
-		$step = array(
-			'id' => $step['id'],
-			'number' => $step['number'],
-			'title' => $step['title'],
-			'is_start' => $step['is_start'],
-			'level' => $level
-		);		
+		$step = 
+			array(
+				'id' => $step['id'],
+				'number' => $step['number'],
+				'title' => utf8_decode($step['title']),
+				'is_start' => $step['is_start'],
+				'level' => $level
+			);		
 
 		$step['choices'] = $this->getKeystepChoices($id);
   
 		foreach((array)$step['choices'] as $key => $val) {
 		
 			$d['choice_id'] = $val['id'];
-			$d['choice_marker'] = $val['marker'];
+			$d['choice_marker'] = utf8_decode($val['marker']);
 			$d['res_keystep_id'] = $val['res_keystep_id'];
 			$d['res_taxon_id'] = $val['res_taxon_id'];
 
@@ -2383,7 +2385,7 @@ class KeyController extends Controller
 	{
 	
 		$tree = $this->generateKeyTree();
-q($tree);
+
 		if ($tree) {
 
 			$this->models->Keytree->delete(

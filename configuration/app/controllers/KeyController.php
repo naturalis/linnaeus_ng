@@ -33,7 +33,8 @@ class KeyController extends Controller
 				'main.js',
 				'key.js',
 				'prettyPhoto/jquery.prettyPhoto.js',
-				'dialog/jquery.modaldialog.js'
+				'dialog/jquery.modaldialog.js',
+				'lookup.js'
 			),
 			'IE' => array(
 			)
@@ -72,42 +73,6 @@ class KeyController extends Controller
     
     }
 	
-	
-	private function satan($branch,$choice)
-	{
-	
-		if ($this->tmp['found']==true) return;
-	
-		foreach ((array)$branch as $val) {
-		
-			$this->tmp['results'][$val['level']] = array(
-				'id' => $val['keystep_id'],
-				'step_number' => $val['step_number'],
-				'step_title' => $val['step_title'],
-				'is_start' => $val['is_start'],
-				'choice_marker' => $val['choice_marker'],
-				'choice_id' => $val['choice_id'],
-			);
-
-			if ($val['choice_id']==$choice) {
-
-				$this->tmp['results'][$val['level']]['choice_marker'] = null;
-				
-				$this->tmp['found']=true;
-
-				return;
-
-			} else {
-			
-				if (isset($val['offspring'])) $this->satan($val['offspring'],$choice);
-
-			}
-
-		}
-		
-	
-	}
-
     /**
      * Main procedure for key
      *
@@ -118,27 +83,24 @@ class KeyController extends Controller
 
         $this->setPageName( _('Index'));
 		
+		// set the stored key tree (= compact hierarchical representation of the entire key)
+		$this->setKeyTree();
+
+		// get user's decision path
 		$keyPath = $this->getKeyPath();
 		
-		// direct link to a choice without a keypath: restore a possible path from stored tree
-		if (is_null($keyPath) && $this->rHasVal('choice')) {
+		/*
+			if user directly access a specific step or choice while there is no keypath (thru bookmark),
+			a possible decision path is created from the key tree
+			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. user forcetree=1 to force
+		*/
+		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || $this->rHasVal('forcetree','1')) {
 
-			$this->tmp = array();
-			$this->tmp['found'] = false;
-			$this->tmp['results'] = array();
-			$this->setKeyTree();
-q($_SESSION['app']['user']['key']['keyTree'],1);
-			$this->satan($_SESSION['app']['user']['key']['keyTree'],$this->requestData['choice']);
-			
-			q($this->tmp['results']);
-		
-		die();
-		
-/*
-
-*/		
-			
-		
+			$this->createPathFromTree(
+				($this->rHasVal('step') ? $this->requestData['step'] : null),
+				($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+			);
+							
 		}
 
 		// step points at a specific step, from keypath
@@ -186,8 +148,9 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 			$d = array_pop($keyPath);
 			$step = $this->getKeystep($d['id']);
 
-		} else {
+		} 
 		// no step or choice specified, must be the start of the key
+		else {
 
 			$this->resetKeyPath();
 
@@ -197,17 +160,14 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 
 		} 
 
-
-		//$taxa = $this->getTaxonDivision();
-		//if (isset($taxa['list'][$step['id']])) $this->smarty->assign('taxa',$taxa['list'][$step['id']]);
-  		
-
-		$taxa = $this->getTaxonDivisionV2($step['id']);
+		$taxa = $this->getTaxonDivision($step['id']);
 
 		$this->smarty->assign('remaining',$taxa['remaining']);
+
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
 		$this->showLowerTaxon=null;
+
 		$this->getTaxonTree(array('includeOrphans' => false));// !isset($this->treeList)));
 
 		$this->smarty->assign('taxa',$this->getTreeList());
@@ -234,6 +194,21 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 
     }
 
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_lookup_list')) {
+
+            $this->getLookupList();
+
+        }
+		
+        $this->printPage();
+    
+    }
+
 	/* function exists sole for the benefit of the preview overlay's "back to editing"-button */
 	public function getCurrentKeyStepId()
 	{
@@ -242,29 +217,152 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 	
 	}
 
-	private function getKeytype()
+
+	/* it's in the trees */
+	private function getKeyTree()
 	{
 
-		return $this->getSetting('keytype');
-	
+		return (@is_null($_SESSION['app']['user']['key']['keyTree']) ? null : $_SESSION['app']['user']['key']['keyTree']);
+
+	}
+
+	private function setKeyTree()
+	{
+
+		// if tree already exists in session, do nothing	
+		if ($this->getKeyTree()!=null) return;
+
+		// get stored tree from database
+		$tree = $this->models->Keytree->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+		
+		// if it doesn't exist, generate it anew (shouldn't happen!)
+		if (empty($tree[0]['keytree']))
+			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree();
+		// store tree in session
+		else
+			$_SESSION['app']['user']['key']['keyTree'] = unserialize($tree[0]['keytree']);
+
 	}
 	
-	private function choicesHaveL2Attributes($choices)
+	private function findStepOrChoiceInTree($branch,$step=null,$choice=null)
+	{
+	
+		for($i=999;$i>$branch['level']+2;$i--)  unset($this->tmp['results'][$i]);
+
+		if ($this->tmp['found']==false) {
+	
+			$this->tmp['results'][$branch['level']] = array(
+				'id' => $branch['id'],
+				'step_number' => $branch['number'],
+				'step_title' => $branch['title'],
+				'is_start' => $branch['is_start'],
+				'choice_marker' => null
+			);
+			
+		}
+
+		foreach((array)$branch['choices'] as $val) {
+		
+			if ($this->tmp['found']==false) $this->tmp['results'][$branch['level']]['choice_marker'] = $val['choice_marker'];
+
+			if ($branch['id']==$step || $val['choice_id']==$choice) {
+			
+				$this->tmp['found'] = true;
+				
+				if ($val['choice_id']==$choice && isset($val['step'])) {
+
+					$this->tmp['results'][$val['step']['level']] = array(
+						'id' => $val['step']['id'],
+						'step_number' => $val['step']['number'],
+						'step_title' => $val['step']['title'],
+						'is_start' => $val['step']['is_start'],
+						'choice_marker' => null
+					);
+					
+				}
+				
+			} else
+			if (isset($val['res_taxon_id'])) {
+
+				$this->tmp['excluded'][$val['res_taxon_id']] = $val['res_taxon_id'];
+
+			}
+			if (isset($val['step'])) {
+
+				$this->findStepOrChoiceInTree(
+					$val['step'],
+					$step,
+					$choice
+				);
+				
+			}
+
+		}
+		
+	}
+	
+	private function createPathFromTree($step=null,$choice=null)
+	{
+		
+		$this->tmp = array();
+		$this->tmp['found'] = false;
+		$this->tmp['excluded'] = array();
+		$this->tmp['results'] = array();
+
+		$this->findStepOrChoiceInTree(
+			$_SESSION['app']['user']['key']['keyTree'],
+			($this->rHasVal('step') ? $this->requestData['step'] : null),
+			($this->rHasVal('choice') ? $this->requestData['choice'] : null)
+		);
+
+		$this->setKeyPath($this->tmp['results']);
+
+	}
+
+	// be aware that this function also exists in the admin controller and should have identical output there!
+	private function generateKeyTree($id=null)
 	{
 
-		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
+		if (is_null($id)) {
 
-		return false;	
+			$step = $this->getStartKeystep();
+			$id = $step['id'];
+
+		} else {
+		
+			$step = $this->getKeystep($id);
+		}
+		
+		$step = 
+			array(
+				'id' => $step['id'],
+				'number' => $step['number'],
+				'title' => $step['title'],
+				'is_start' => $step['is_start'],
+				'level' => $level
+			);		
+
+		$step['choices'] = $this->getKeystepChoices($id);
+  
+		foreach((array)$step['choices'] as $key => $val) {
+		
+			$d['choice_id'] = $val['id'];
+			$d['choice_marker'] = $val['marker'];
+			$d['res_keystep_id'] = $val['res_keystep_id'];
+			$d['res_taxon_id'] = $val['res_taxon_id'];
+
+			$step['choices'][$key] = $d;
+
+			if ($val['res_keystep_id']) $step['choices'][$key]['step'] = $this->generateKeyTree($val['res_keystep_id'],($level+1));
+
+		}
+		
+		return isset($step) ? $step : null;
 	
 	}
 		
-	private function setCurrentKeyStepId($id)
-	{
-	
-		$this->currentKeyStepId = $id;
-	
-	}
-		
+
+	/* steps and choices */
 	private function getKeystep($id)
 	{
 
@@ -303,6 +401,13 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 
 	}
 
+	private function setCurrentKeyStepId($id)
+	{
+	
+		$this->currentKeyStepId = $id;
+	
+	}
+		
 	private function getStartKeystep()
 	{
 
@@ -432,6 +537,260 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 	
 	}
 
+	
+	/* the path */
+	private function resetKeyPath()
+	{
+	
+		unset($_SESSION['app']['user']['key']['path']);
+
+	}
+
+	private function getKeyPath()
+	{
+	
+		return isset($_SESSION['app']['user']['key']['path']) ? $_SESSION['app']['user']['key']['path'] : null;
+	
+	}
+
+	private function setKeyPath($path)
+	{
+	
+		$this->resetKeyPath();
+	
+		$_SESSION['app']['user']['key']['path'] = $path;
+	
+	}
+
+	private function updateKeyPath($params) 
+	{
+
+		$step = $params['step'];
+		$choice = isset($params['choice']) ? $params['choice'] : null;
+		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
+		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
+
+		if (!isset($_SESSION['app']['user']['key']['path'])) {
+
+			//$this->setStoredKeypath($step);
+
+		}
+
+
+		if (isset($_SESSION['app']['user']['key']['path'])) {
+		// keypath already exists...
+
+			if ($fromPath) {
+			// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
+
+				foreach((array)$_SESSION['app']['user']['key']['path'] as $key => $val) {
+	
+					if ($val['id']==$step['id']) break;
+	
+					if (!empty($val['id'])) $d[] = $val;
+	
+				}
+
+			} else {
+			// user clicked a choice, existing path remains as it is
+			
+				$d = $_SESSION['app']['user']['key']['path'];
+			
+			}
+
+		}
+
+		if (!isset($d) || (isset($d) && $d[count((array)$d)-1]['id']!=$step['id'])) {
+		// if we have no path, or have a path whose previous step is not the same as the current one, we add the current step
+
+			$d[] = array(
+				'id' => $step['id'],
+				'step_number' => $step['number'],
+				'step_title' => $step['title'],
+				'is_start' => $step['is_start'],
+				'choice_marker' => null,
+			);
+
+		}
+
+
+		if (!empty($choice) && (count((array)$d)>1)) {
+		// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
+
+			$d[count((array)$d)-2]['choice_marker'] = $choice['marker'];
+
+		}
+
+		$_SESSION['app']['user']['key']['path'] = $d;
+
+	}
+
+
+	/* branches and fruits */
+	private function getTaxonDivision($step)
+	{
+
+		$this->tmp = null;
+		
+		$this->sawOffABranch($this->getKeyTree(),$step);
+		$this->reapFruits($this->tmp['branch']);
+
+		$excludedTaxa = array();
+	
+		$allTaxa = $this->getAllTaxaInKey();
+
+		foreach((array)$allTaxa as $val) {
+		
+			if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) $excludedTaxa[$val['res_taxon_id']] = $val['res_taxon_id'];
+		
+		}
+		
+		return
+			array(
+				'remaining' => $this->tmp['remaining'],
+				'excluded' => $excludedTaxa
+			);
+
+	}
+
+	private function sawOffABranch($branch,$step)
+	{
+	
+		if (isset($branch['id']) && $branch['id']==$step) {
+
+			$this->tmp['branch'] = $branch;
+			return;
+
+		}
+
+		foreach((array)$branch['choices'] as $val) {
+		
+			if (isset($val['step'])) $this->sawOffABranch($val['step'],$step);
+		
+		}
+	
+	}
+	
+	private function reapFruits($branch)
+	{
+
+		foreach((array)$branch['choices'] as $val) {
+		
+			if (isset($val['res_taxon_id'])) $this->tmp['remaining'][$val['res_taxon_id']] = $val['res_taxon_id'];
+
+			if (isset($val['step'])) $this->reapFruits($val['step']);
+		
+		}
+	
+	}
+
+	private function getAllTaxaInKey()
+	{
+	
+		if (!isset($_SESSION['app']['user']['key']['keyTaxa'])) {
+	
+			$_SESSION['app']['user']['key']['keyTaxa'] = $this->models->ChoiceKeystep->_get(
+				array('id' => 
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_taxon_id is not' => 'null'
+					),
+					'columns' => 'res_taxon_id'
+				)
+			);
+	
+		}
+		
+		return $_SESSION['app']['user']['key']['keyTaxa'];
+		
+	}
+	
+
+	/* the rest */
+	private function getKeytype()
+	{
+
+		return $this->getSetting('keytype');
+	
+	}
+	
+	private function choicesHaveL2Attributes($choices)
+	{
+
+		foreach((array)$choices as $val) if ($val['choice_image_params']!='') return true;
+
+		return false;	
+	
+	}
+	
+	private  function reapSteps($branch)
+	{
+
+		$this->tmp['results'][] =
+			array(
+				'id' => $branch['id'],
+				'label' => $branch['number'].'. '.$branch['title']
+			);
+
+		foreach((array)$branch['choices'] as $val) {
+
+			if (isset($val['step'])) $this->reapSteps($val['step']);
+		
+		}
+	
+	}
+
+	private function getLookupList()
+	{
+
+		$this->tmp = array();
+		$this->tmp['found'] = false;
+		$this->tmp['excluded'] = array();
+		$this->tmp['results'] = array();
+
+		// ploughs the entire key
+		$this->reapSteps($_SESSION['app']['user']['key']['keyTree']);
+
+		$this->smarty->assign(
+			'returnText',
+			$this->makeLookupList(
+				$this->tmp['results'],
+				'key',
+				'index.php?forcetree=1&step=%s',
+				false,
+				true
+			)
+		);	
+		
+	}
+		
+
+	/* graveyard */
+	/*
+	private function setStepsPerTaxon($choice)
+	{
+
+		$this->_taxaStepList[] = $choice['keystep_id'];
+
+		$cks = 
+			isset($_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']]) ? 
+				$_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']] : 
+				null;
+
+		//// get choices that have the keystep the choice belongs to as target
+		//$cks = $this->models->ChoiceKeystep->_get(
+		//	array('id' => 
+		//		array(
+		//			'project_id' => $this->getCurrentProjectId(),
+		//			'res_keystep_id' => $choice['keystep_id']
+		//		)
+		//	)
+		//);
+		
+		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
+	
+	}
+	
 	private function getTaxonDivision($forceLookup=false)
 	{
 
@@ -525,256 +884,7 @@ q($_SESSION['app']['user']['key']['keyTree'],1);
 		return $_SESSION['app']['user']['key']['taxonDivision'];
 
 	}
-
-	private function setStepsPerTaxon($choice)
-	{
-
-		$this->_taxaStepList[] = $choice['keystep_id'];
-
-		$cks = 
-			isset($_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']]) ? 
-				$_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']] : 
-				null;
-
-		/*	
-		// get choices that have the keystep the choice belongs to as target
-		$cks = $this->models->ChoiceKeystep->_get(
-			array('id' => 
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'res_keystep_id' => $choice['keystep_id']
-				)
-			)
-		);
-		*/
-		
-		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
-	
-	}
-
-	private function resetKeyPath()
-	{
-	
-		unset($_SESSION['app']['user']['key']['path']);
-
-	}
-
-	private function getKeyPath()
-	{
-	
-		return isset($_SESSION['app']['user']['key']['path']) ? $_SESSION['app']['user']['key']['path'] : null;
-	
-	}
-
-	private function updateKeyPath($params) 
-	{
-
-		$step = $params['step'];
-		$choice = isset($params['choice']) ? $params['choice'] : null;
-		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
-		$taxon = isset($params['taxon']) ? $params['taxon'] : null;
-
-		if (!isset($_SESSION['app']['user']['key']['path'])) {
-
-			//$this->setStoredKeypath($step);
-
-		}
-
-
-		if (isset($_SESSION['app']['user']['key']['path'])) {
-		// keypath already exists...
-
-			if ($fromPath) {
-			// ...user clicked somewhere in the path, so we copy the existing path up to the step he clicked
-
-				foreach((array)$_SESSION['app']['user']['key']['path'] as $key => $val) {
-	
-					if ($val['id']==$step['id']) break;
-	
-					if (!empty($val['id'])) $d[] = $val;
-	
-				}
-
-			} else {
-			// user clicked a choice, existing path remains as it is
-			
-				$d = $_SESSION['app']['user']['key']['path'];
-			
-			}
-
-		}
-
-		if (!isset($d) || (isset($d) && $d[count((array)$d)-1]['id']!=$step['id'])) {
-		// if we have no path, or have a path whose previous step is not the same as the current one, we add the current step
-
-			$d[] = array(
-				'id' => $step['id'],
-				'step_number' => $step['number'],
-				'step_title' => $step['title'],
-				'is_start' => $step['is_start'],
-				'choice_marker' => null,
-			);
-
-		}
-
-
-		if (!empty($choice) && (count((array)$d)>1)) {
-		// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
-
-			$d[count((array)$d)-2]['choice_marker'] = $choice['marker'];
-
-		}
-
-		$_SESSION['app']['user']['key']['path'] = $d;
-
-	}
-
-
-
-
-	private function generateKeyTree($id=null)
-	{
-
-		if (is_null($id)) {
-
-			$step = $this->getStartKeystep();
-			$id = $step['id'];
-
-		} else {
-		
-			$step = $this->getKeystep($id);
-		}
-
-		$c = $this->getKeystepChoices($id);
-
-		foreach((array)$c as $key => $val) {
-		
-			$d[$key]['id'] = $d[$key]['keystep_id'] = $val['keystep_id'];
-			$d[$key]['step_number'] = $step['number'];
-			$d[$key]['step_title'] = $step['title'];
-			$d[$key]['is_start'] = $step['is_start'];
-			$d[$key]['choice_marker'] = $val['marker'];
-			//$d[$key]['res_keystep_id'] = $val['res_keystep_id'];
-			$d[$key]['res_taxon_id'] = $val['res_taxon_id'];
-
-			if ($val['res_keystep_id']) $d[$key]['offspring'] = $this->generateKeyTree($val['res_keystep_id']);
-
-		}
-		
-		return isset($d) ? $d : null;
-	
-	}
-		
-	private function setKeyTree()
-	{
-
-		$tree = $this->models->Keytree->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
-		
-		if (empty($tree[0]['keytree']))
-			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree(); // hope not!
-		else
-			$_SESSION['app']['user']['key']['keyTree'] = unserialize($tree[0]['keytree']);
-
-	}
-	
-	private function getKeyTree2()
-	{
-
-		return (@is_null($_SESSION['app']['user']['key']['keyTree']) ? null : $_SESSION['app']['user']['key']['keyTree']);
-
-	}
-	
-	private function getStepBranch($step,$branch)
-	{
-
-		foreach((array)$branch as $key => $val) {
-		
-			if (isset($val['keystep_id']) && $val['keystep_id']==$step) {
-				$this->tmp[] = $val;
-			} else {
-				if(isset($val['offspring'])) $this->getStepBranch($step,$val['offspring']);
-			}
-		
-		}
-
-	}
-	
-	private function harvestTaxaFromBranch($branch,&$taxa)
-	{
-
-		foreach((array)$branch as $val) {
-
-			if (!empty($val['res_taxon_id']))
-				//$taxa[] = $val['res_taxon_id'];
-				$taxa[$val['res_taxon_id']] = $val['res_taxon_id'];
-			else
-				if(isset($val['offspring'])) $this->harvestTaxaFromBranch($val['offspring'],$taxa);
-		
-		}
-	
-	}
-	
-	private function getAllTaxaInKey()
-	{
-	
-		if (!isset($_SESSION['app']['user']['key']['keyTaxa'])) {
-	
-			$_SESSION['app']['user']['key']['keyTaxa'] = $this->models->ChoiceKeystep->_get(
-				array('id' => 
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'res_taxon_id is not' => 'null'
-					),
-					'columns' => 'res_taxon_id'
-				)
-			);
-	
-		}
-		
-		return $_SESSION['app']['user']['key']['keyTaxa'];
-		
-	}
-	
-	private function getExcludedTaxa($remainingTaxa)
-	{
-
-		$d = array();
-		
-		$allTaxa = $this->getAllTaxaInKey();
-		
-		foreach((array)$allTaxa as $val) {
-
-			//if (!in_array($val['res_taxon_id'],$remainingTaxa)) $d[$val['res_taxon_id']] = $val['res_taxon_id']; // in_array is sloooow
-			if (!isset($remainingTaxa[$val['res_taxon_id']])) $d[$val['res_taxon_id']] = $val['res_taxon_id'];
-		
-		}
-		
-		
-		return $d;
-		
-	}
-	
-	private function getTaxonDivisionV2($step)
-	{
-	
-		
-		if (is_null($this->getKeyTree2())) $this->setKeyTree();
-		
-		$this->getStepBranch($step,$this->getKeyTree2());
-
-		$this->harvestTaxaFromBranch($this->tmp,$remainingTaxa);
-		
-		$excludedTaxa = $this->getExcludedTaxa($remainingTaxa);
-		
-		//getTime($this->l);
-		return
-			array(
-				'remaining' => $remainingTaxa,
-				'excluded' => $excludedTaxa
-			);
-
-	}
-
+	*/
 
 }
 
