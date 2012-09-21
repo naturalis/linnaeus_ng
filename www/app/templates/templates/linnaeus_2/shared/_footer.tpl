@@ -34,6 +34,9 @@ $(document).ready(function(){
 	addRequestVar('{$k}','{$v|addslashes}')
 	{/foreach}
 })
+
+	checkHrefsForPID({$session.app.project.id});
+
 {literal}
 </script>
 {/literal}

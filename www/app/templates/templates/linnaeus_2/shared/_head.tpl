@@ -25,6 +25,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
 	
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
