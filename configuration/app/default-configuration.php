@@ -94,7 +94,8 @@ class configuration
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
 			),
 			'useJavascriptLinks' => false,
-			'useGlossaryPostIts' => false
+			'useGlossaryPostIts' => false,
+			'addedProjectIDParam' => 'epi'
         );
     
     }

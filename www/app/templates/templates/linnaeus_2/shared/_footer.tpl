@@ -33,10 +33,10 @@ $(document).ready(function(){
 	{foreach from=$requestData key=k item=v}
 	addRequestVar('{$k}','{$v|addslashes}')
 	{/foreach}
+
+	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
+
 })
-
-	checkHrefsForPID({$session.app.project.id});
-
 {literal}
 </script>
 {/literal}

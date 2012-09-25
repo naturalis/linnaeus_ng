@@ -42,6 +42,7 @@
 </form>
 {literal}
 <script type="text/JavaScript">
+
 $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
 	 	$("a[rel^='prettyPhoto']").prettyPhoto({
@@ -58,6 +59,8 @@ $(document).ready(function(){
 {foreach from=$requestData key=k item=v}
 addRequestVar('{$k}','{$v|addslashes}')
 {/foreach}
+
+	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
 
 })
 {literal}
