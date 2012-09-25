@@ -9,7 +9,7 @@ class IndexController extends Controller
 
     public $usedModels = array(
 		'synonym',
-		'commonname',
+		'commonname'
     );
 
     public $usedHelpers = array(
@@ -45,6 +45,8 @@ class IndexController extends Controller
 		$this->checkForProjectId();
 
 		$this->setCssFiles();
+		
+		$this->setIndexTabs();
 
     }
 
@@ -63,7 +65,7 @@ class IndexController extends Controller
 	public function indexAction()
 	{
 	
-        $this->setPageName(_('Index: species'));
+        $this->setPageName(_('Index: Species and lower taxa'));
 
 		$this->setTaxonType('lower');
 
@@ -79,7 +81,7 @@ class IndexController extends Controller
     public function higherAction ()
     {
 
-        $this->setPageName(_('Index: higher taxa'));
+        $this->setPageName(_('Index: Higher taxa'));
 
 		$this->setTaxonType('higher');
 
@@ -90,7 +92,7 @@ class IndexController extends Controller
     public function commonAction ()
     {
 
-        $this->setPageName(_('Index: comon names'));
+        $this->setPageName(_('Index: Common names'));
 		
 		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
@@ -288,7 +290,7 @@ class IndexController extends Controller
 		return $s;
 		
 	}
-
+	
 	private function searchCommonNames($search=null)
 	{
 
@@ -408,5 +410,35 @@ class IndexController extends Controller
 	
 	}
 
-
+	private function setIndexTabs ()
+	{
+		// Check if results have been stored in session; if so return
+		if(isset($_SESSION['app']['user']['indexModule']['hasSpecies'])) return;
+	
+		// Check taxa
+		$sp = $ht = 0;
+		$this->getTaxonTree(array('includeOrphans' => false));
+		$taxa = (array)$this->getTreeList();
+		foreach ($taxa as $taxon) {
+			if ($taxon['lower_taxon']==1 && $taxon['is_empty']==0) $sp = 1;
+			if ($taxon['lower_taxon']==0 && $taxon['is_empty']==0) $ht = 1;
+			if ($sp==1 && $ht==1) break;
+		}
+		$_SESSION['app']['user']['indexModule']['hasSpecies'] = $sp;
+		$_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = $ht;
+	
+		// Check common names
+		$_SESSION['app']['user']['indexModule']['hasCommonNames'] = ($this->countCommonNames() > 0 ? 1 : 0);
+	}
+	
+	private function countCommonNames ()
+	{
+		return $this->models->Commonname->_get(
+				array(
+						'where' => 'project_id = ' . $this->getCurrentProjectId(),
+						'columns' => 'COUNT(1)'
+				)
+		);
+	}
+		
 }
