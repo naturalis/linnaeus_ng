@@ -819,7 +819,7 @@ class Controller extends BaseClass
      * @param      string    $url    url to redirect to; can be false, in which case HTTP_REFERER is used
      * @access     public
      */
-    public function redirect($url = false)
+    public function redirect($url=false)
     {
         
         if (!$url && isset($_SERVER['HTTP_REFERER'])) {
@@ -837,6 +837,7 @@ class Controller extends BaseClass
 			if (isset($d['query']) && !empty($d['query']) && strpos($d['query'],$p)===false)
 				$url .= '&'.$p;
 			else
+			if (strpos($d['query'],$p)===false)
 				$url .= '?'.$p;
 
 			if (basename($url) == $url) {
