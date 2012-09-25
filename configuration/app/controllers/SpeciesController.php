@@ -155,7 +155,7 @@ class SpeciesController extends Controller
 				} else if ($key == count($categories['categories']) - 1) {
 				    $c[] ='category-last';
 				}
-				if ($val['is_empty']==1) {
+				if ($val['is_empty']==1 && $val['id']!=$activeCategory) {
 					$c[] ='category-no-content';
 				}
 				$categories['categories'][$key]['className'] = implode(' ', $c);
@@ -406,13 +406,13 @@ class SpeciesController extends Controller
 			$stdCats[] = array(
 				'id' => 'names',
 				'title' => _('Names'),
-				'is_empty' => (count((array)$n)>0 ? 0 : 1)
+				'is_empty' => (count((array)$n['synonyms'])==0 && count((array)$n['common'])==0 ? 1 : 0)
 			);
 			
 			if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
 		
 				$l = $this->getTaxonLiterature($taxon);
-				
+//print_r($l); die();				
 				$stdCats[] = array(
 					'id' => 'literature',
 					'title' => _('Literature'),
@@ -422,6 +422,7 @@ class SpeciesController extends Controller
 			}
 
 			$d = array_merge($d,$stdCats);
+//print_r($d); die();
 			
 			return array(
 				'categories' => $d,
@@ -583,6 +584,8 @@ class SpeciesController extends Controller
 				)
 			);
 
+		$refs = array();
+		
 		foreach((array)$lt as $key => $val) {
 
 			$l = $this->models->Literature->_get(
