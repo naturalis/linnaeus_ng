@@ -2959,7 +2959,7 @@ class ImportController extends Controller
 		);
 
 		$stepId = $stepIds[($step=='god' ? -1 : trim((string)$step->pagenumber))] = $this->models->Keystep->getNewId();
-
+		
 		$this->models->ContentKeystep->save(
 			array(
 				'id' => null,
@@ -2984,6 +2984,19 @@ class ImportController extends Controller
 					)
 			)
 		);
+
+		//[l][m]Text Key[/m][r]Pagina 2218: Salviniaceae - Vlotvarenfamilie[/r][t]Pagina 2218: [b]Salviniaceae - Vlotvarenfamilie[/b][/t][/l]
+		//[l][m]Text Key[/m][r]Pagina 1234[/r][t]Pagina 1234[/t][/l]
+		//[l][m]Text Key[/m][r]Page 23: Ursidae[/r][t]Page 23: [b]Ursidae[/b][/t][/l]
+		//[l][m]Text Key[/m][r]Page 66[/r][t]Page 66[/t][/l]
+
+		$d = (isset($step->pagetitle) ? 
+				' '.trim((string)$step->pagenumber).': '.trim((string)$step->pagetitle) :
+				' '.trim((string)$step->pagenumber)
+			);
+
+		$_SESSION['admin']['system']['import']['key'][] = array('id' => $stepId,'page' => strtolower('Pagina '.$d));
+		$_SESSION['admin']['system']['import']['key'][] = array('id' => $stepId,'page' => strtolower('Page '.$d));
 
 		return $stepIds;
 
@@ -3965,6 +3978,17 @@ class ImportController extends Controller
 	private function resolveInternalLinks($s)
 	{
 
+
+
+		//[l][m]Text Key[/m][r]Pagina 2218: Salviniaceae - Vlotvarenfamilie[/r][t]Pagina 2218: [b]Salviniaceae - Vlotvarenfamilie[/b][/t][/l]
+		//[l][m]Text Key[/m][r]Pagina 1234[/r][t]Pagina 1234[/t][/l]
+		//[l][m]Text Key[/m][r]Page 23: Ursidae[/r][t]Page 23: [b]Ursidae[/b][/t][/l]
+		//[l][m]Text Key[/m][r]Page 66[/r][t]Page 66[/t][/l]
+
+
+
+
+
 		$controllers = 
 			array(
 				'content pages' => array(
@@ -3995,10 +4019,12 @@ class ImportController extends Controller
 						'url' => 'taxon.php',
 						'param' => 'id',
 					),
-				'dichotomous key' => array(
-					'controller' => 'key',
-					'param' => 'id',
-				),
+				'Text Key' => // [m]Text Key[/m]
+					array(
+						'controller' => 'key',
+						'url' => 'index.php?forcetree=1',
+						'param' => 'step',
+					),
 				'map key index' => array(
 					'controller' => 'mapkey',
 					'param' => 'id',
@@ -4026,12 +4052,10 @@ class ImportController extends Controller
 
 			if ($controllers[$d[0]]['controller']=='glossary' && isset($_SESSION['admin']['system']['import']['lookupArrays']['glossary'][$d[1]])) {
 				$id = $_SESSION['admin']['system']['import']['lookupArrays']['glossary'][$d[1]];
-
 			}
 
 			if ($controllers[$d[0]]['controller']=='literature' && isset($_SESSION['admin']['system']['import']['lookupArrays']['literature'][$d[1]])) {
 				$id = $_SESSION['admin']['system']['import']['lookupArrays']['literature'][$d[1]];
-
 			}
 
 			if ($controllers[$d[0]]['controller']=='species' && isset($_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]])) {
@@ -4042,14 +4066,21 @@ class ImportController extends Controller
 				$id = $_SESSION['admin']['system']['import']['lookupArrays']['species'][$d[1]];
 			}
 	
+			if ($controllers[$d[0]]['controller']=='key' && isset($_SESSION['admin']['system']['import']['lookupArrays']['key'][$d[1]])) {
+				$id = $_SESSION['admin']['system']['import']['lookupArrays']['key'][$d[1]];
+			}
+
+
 			if (isset($id) && isset($d[2])) {
+			
+				$cnt = $controllers[$d[0]];
 
 				if ($this->generalSettings['useJavascriptLinks']) {	
 
 					$href =
-						"goIntLink('".$controllers[$d[0]]['controller']."',".
-						"'".(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php')."'".
-						(isset($controllers[$d[0]]['param']) ? ",['".$controllers[$d[0]]['param'].":".$id."']" : null).
+						"goIntLink('".$cnt['controller']."',".
+						"'".(isset($cnt['url']) ? $cnt['url'] : 'index.php')."'".
+						(isset($cnt['param']) ? ",['".$cnt['param'].":".$id."']" : null).
 						");";
 
 					return '<span class="internal-link" onclick="'.$href.'">'.trim($d[2]).'</span>';
@@ -4057,9 +4088,11 @@ class ImportController extends Controller
 				} else {
 
 					$href = 
-						'../'.$controllers[$d[0]]['controller'].'/'.
-						(isset($controllers[$d[0]]['url']) ? $controllers[$d[0]]['url'] : 'index.php').
-						(isset($controllers[$d[0]]['param']) ? '?'.$controllers[$d[0]]['param'].'='.$id : null);
+						'../'.$cnt['controller'].'/'.
+						(isset($cnt['url']) ? $controllers[$d[0]]['url'] : 'index.php').
+						(isset($cnt['param']) ? 
+							(strpos($cnt['url'],'?')===false ? '?' : '&').
+							$cnt['param'].'='.$id : null);
 						
 					return '<a class="internal-link" href="'.$href.'">'.trim($d[2]).'</a>';
 
@@ -4339,7 +4372,7 @@ class ImportController extends Controller
 	private function createLookupArrays()
 	{
 
-		$s = $g = $l = $m = null;
+		$s = $g = $l = $m = $k = null;
 
 		if (isset($_SESSION['admin']['system']['import']['loaded']['species'])) {
 
@@ -4379,18 +4412,27 @@ class ImportController extends Controller
 
 		}
 
+		if (isset($_SESSION['admin']['system']['import']['key'])) {
+		
+			foreach((array)$_SESSION['admin']['system']['import']['key'] as $val) {
+				if (isset($val['page']) && isset($val['id'])) $k[$val['page']] = $val['id'];
+			}
+
+		}
+
 		return array(
 			'species' => $s,
 			'glossary' => $g,
 			'literature' => $l,
 			'modules' => $m,
+			'key' => $k,
 		);
 
 	}
 
 	private function fixOldInternalLinks()
 	{
-
+		
 		$_SESSION['admin']['system']['import']['lookupArrays'] = $this->createLookupArrays();
 
 		$d = $this->models->ContentTaxon->_get(array('id' => array('project_id' => $this->getNewProjectId())));

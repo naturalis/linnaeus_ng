@@ -315,7 +315,7 @@ class SpeciesController extends Controller
 			$this->controllerBaseName = 'species';
 	
 	}
-
+	
 	private function getCategories($taxon=null,$allowUnpublished=false,$forcelookup=false)
 	{
 	
@@ -335,17 +335,8 @@ class SpeciesController extends Controller
 			);
 
 			foreach ((array) $tp as $key => $val) {
-		
-				// for each category, get the category title
-				$tpt = $this->models->PageTaxonTitle->_get(
-					array('id'=>array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $this->getCurrentLanguageId(), 
-						'page_id' => $val['id']
-					),
-					'columns'=>'title'));
-		
-				$tp[$key]['title'] = $tpt[0]['title'];
+
+				$tp[$key]['title'] = $this->getCategoryName($val['id']);
 		
 				if ($val['def_page'] == 1) $_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
 			
@@ -453,6 +444,17 @@ class SpeciesController extends Controller
 						'page_id' => $id
 					),
 					'columns'=>'title'));
+					
+				if (empty($tpt[0]['title'])) {
+
+					$tpt = $this->models->PageTaxon->_get(
+						array('id'=>array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'id' => $id
+						),
+						'columns'=>'page as title'));
+
+				}
 		
 				$_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = $tpt[0]['title'];
 
