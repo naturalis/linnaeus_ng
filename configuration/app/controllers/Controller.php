@@ -828,17 +828,7 @@ class Controller extends BaseClass
         
         } 
         
-        if (basename($url) == $url) {
-            
-            $circular = (basename($this->_fullPath) == $url);
-        
-        } else {
-
-            $circular = ($this->_fullPath == $url) || ($this->_fullPathRelative == $url);
-
-        }
-        
-        if ($url && !$circular) {
+        if ($url) {
 
 			$p = $this->generalSettings['addedProjectIDParam'].'='.$this->getCurrentProjectId();
   			$d = parse_url($url);
@@ -849,7 +839,18 @@ class Controller extends BaseClass
 			else
 				$url .= '?'.$p;
 
-            header('Location:' . $url);            
+			if (basename($url) == $url) {
+				
+				$circular = (basename($this->_fullPath) == $url);
+			
+			} else {
+		
+				$circular = ($this->_fullPath == $url) || ($this->_fullPathRelative == $url);
+		
+			}
+
+            if (!$circular) header('Location:' . $url);
+
             die();
         
         }
