@@ -819,7 +819,7 @@ class Controller extends BaseClass
      * @param      string    $url    url to redirect to; can be false, in which case HTTP_REFERER is used
      * @access     public
      */
-    public function redirect ($url = false)
+    public function redirect($url = false)
     {
         
         if (!$url && isset($_SERVER['HTTP_REFERER'])) {
@@ -839,9 +839,17 @@ class Controller extends BaseClass
         }
         
         if ($url && !$circular) {
-            
-            header('Location:' . $url);
-            
+
+			$p = $this->generalSettings['addedProjectIDParam'].'='.$this->getCurrentProjectId();
+  			$d = parse_url($url);
+
+			// let's ignore the possbilities of fragments, shall we?
+			if (isset($d['query']) && !empty($d['query']) && strpos($d['query'],$p)===false)
+				$url .= '&'.$p;
+			else
+				$url .= '?'.$p;
+
+            header('Location:' . $url);            
             die();
         
         }
@@ -1760,6 +1768,7 @@ class Controller extends BaseClass
         $this->smarty->assign('messages', $this->getMessages());
         $this->smarty->assign('pageName', $this->getPageName());
         $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
+        $this->smarty->assign('addedProjectIDParam', $this->generalSettings['addedProjectIDParam']);
 
     }
 
