@@ -433,10 +433,10 @@ class IndexController extends Controller
 	private function countCommonNames ()
 	{
 		return $this->models->Commonname->_get(
-				array(
-						'where' => 'project_id = ' . $this->getCurrentProjectId(),
-						'columns' => 'COUNT(1)'
-				)
+			array(
+				'where' => 'project_id = ' . $this->getCurrentProjectId(),
+				'columns' => 'COUNT(1)'
+			)
 		);
 	}
 		
