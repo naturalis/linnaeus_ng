@@ -233,14 +233,33 @@ class KeyController extends Controller
 		if ($this->getKeyTree()!=null) return;
 
 		// get stored tree from database
-		$tree = $this->models->Keytree->_get(array('id' => array('project_id' => $this->getCurrentProjectId())));
+		$d = $this->models->Keytree->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'chunk'
+			)
+		);
 		
 		// if it doesn't exist, generate it anew (shouldn't happen!)
-		if (empty($tree[0]['keytree']))
+		if (empty($d[0]['keytree'])) {
 			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree();
+		}
 		// store tree in session
-		else
-			$_SESSION['app']['user']['key']['keyTree'] = json_decode($tree[0]['keytree']);
+		else {
+
+			$tree = '';
+			
+			foreach((array)$d as $val) {
+			
+				$tree .= trim($val['keytree']);
+			
+			}
+			
+			$_SESSION['app']['user']['key']['keyTree'] = unserialize(utf8_decode($tree));
+
+		}
 
 	}
 	

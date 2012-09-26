@@ -132,7 +132,17 @@ class Controller extends BaseClass
 	public function checkForProjectId()
 	{
 	
-		if ($this->rHasVal('p'))  $this->resolveProjectId();
+		if ($this->rHasVal('p')) {
+
+			$this->resolveProjectId();
+
+		} elseif ($this->rHasVal($this->generalSettings['addedProjectIDParam'])) {
+
+			$this->requestData['p'] = $this->requestData[$this->generalSettings['addedProjectIDParam']];
+
+			$this->resolveProjectId();
+
+		}
 	
 		$d = $this->getCurrentProjectId();
 		

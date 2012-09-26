@@ -397,6 +397,11 @@ function taxonSaveData(id,language,page,content,editorName) {
 
 				alert(data.replace('<error>',''));
 
+			} else
+			if (data.indexOf('<msg>')>=0) {
+
+				allSetMessage(data.replace('<msg>',''));
+
 			} else {
 
 				obj = $.parseJSON(data);
