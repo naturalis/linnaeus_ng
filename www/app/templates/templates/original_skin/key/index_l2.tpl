@@ -78,6 +78,33 @@
 			</span>
 
 		</div>
+	{else}
+		<div style="text-align:left">
+			<span class="marker">{$v.marker}</span>.
+			<span class="text">{$v.choice_txt|nl2br}</span>
+
+			<span class="target">
+			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+				<span class="arrow">&rarr;</span>
+				<span class="target-step" onclick="keyDoChoice({$v.id})">{if $v.target_number}{t}Step{/t} {$v.target_number}: {/if}{$v.target}</span>
+			{elseif $v.res_taxon_id!=''}
+				<span class="arrow">&rarr;</span>
+				
+				{if $useJavascriptLinks}
+				<span class="target-taxon" onclick="goTaxon({$v.res_taxon_id})">
+					{t}Taxon:{/t} {$v.target}
+					{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+				</span>
+				{else}
+				<a class="target-taxon" href="../species/taxon.php?id={$v.res_taxon_id}">
+					{t}Taxon:{/t} {$v.target}
+				</a>
+				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+				{/if}
+			{/if}
+			</span>
+
+		</div>	
 	{/if}
 {/foreach}
 		</div>
