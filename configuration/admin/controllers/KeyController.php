@@ -2384,20 +2384,37 @@ class KeyController extends Controller
 	private function saveKeyTree()
 	{
 	
-		$tree = $this->generateKeyTree();
-
+		$tree = json_encode($this->generateKeyTree());
+		
 		if ($tree) {
-
+		
 			$this->models->Keytree->delete(
 				array('project_id' => $this->getCurrentProjectId())
 			);	
 
-			$k = $this->models->Keytree->save(
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'keytree' => serialize($tree)
-				)
-			);	
+			$d = str_split($tree,100000);
+			
+			foreach((array)$d as $key => $val) {
+			
+				if ($key==0) {
+
+					$k = $this->models->Keytree->save(
+						array(
+							'project_id' => $this->getCurrentProjectId(),
+							'keytree' => $val
+						)
+					);
+					
+				} else {
+
+					$this->models->Keytree->update(
+						array('keytree' => "#concat(keytree,'".addslashes($val)."')" ),
+						array('project_id' => $this->getCurrentProjectId())
+					);
+				
+				}
+				
+			}
 
 			return $k;
 
