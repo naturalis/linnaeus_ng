@@ -132,10 +132,12 @@ class Controller extends BaseClass
 	public function checkForProjectId()
 	{
 	
+		$pB = $this->getCurrentProjectId();
+
 		if ($this->rHasVal('p')) {
-
+		
 			$this->resolveProjectId();
-
+			
 		} elseif ($this->rHasVal($this->generalSettings['addedProjectIDParam'])) {
 
 			$this->requestData['p'] = $this->requestData[$this->generalSettings['addedProjectIDParam']];
@@ -143,10 +145,12 @@ class Controller extends BaseClass
 			$this->resolveProjectId();
 
 		}
-	
+
 		$d = $this->getCurrentProjectId();
 		
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
+
+		if ($pB != $d) unset($_SESSION['app']['user']);
 		
 		$this->setCurrentProjectData();
 		$this->setUrls();
@@ -955,7 +959,7 @@ class Controller extends BaseClass
 	public function didActiveLanguageChange()
 	{
 
-        return $_SESSION['app']['user']['languageChanged'];
+        return isset($_SESSION['app']['user']['languageChanged']) ? $_SESSION['app']['user']['languageChanged'] : false;
 
 	}
 
