@@ -1618,9 +1618,11 @@ class SpeciesController extends Controller
         
         if ($this->requestData['action'] == 'save_taxon') {
             
-            $this->ajaxActionSaveTaxon();
-        
-        } else if ($this->requestData['action'] == 'get_taxon') {
+            $c = $this->ajaxActionSaveTaxon();
+            
+            if (!$c) $this->smarty->assign('returnText', '<msg>Empty taxa are not shown');
+            
+         } else if ($this->requestData['action'] == 'get_taxon') {
             
             $this->ajaxActionGetTaxon();
 			
@@ -2800,6 +2802,8 @@ class SpeciesController extends Controller
             ));
             
             $taxonId = $this->models->Taxon->getNewId();
+            
+           	$new = true;
         
         } else {
         // existing taxon 
@@ -2807,6 +2811,8 @@ class SpeciesController extends Controller
             $d = true;
             
             $taxonId = $this->requestData['id'];
+            
+            $new = false;
         
         }
         
@@ -2957,7 +2963,16 @@ class SpeciesController extends Controller
             $this->addError(_('Could not save taxon.'));
         
         }
-    
+        
+        // Return if taxon has content in any language
+		$c = $this->models->ContentTaxon->_get(
+			array(
+				'where' => 'taxon_id = ' . $taxonId,
+			)
+		);
+		
+		return empty($c) && !$new ? false : true;
+
     }
 
     private function filterContent($content)
