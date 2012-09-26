@@ -486,12 +486,13 @@ class KeyController extends Controller
 					'columns' => 'choice_txt'
 				)
 			);
+			
 
-			if (isset($cck[0]['title'])) $choices[$key]['title'] = $cck[0]['title'];
+			if (isset($cck[0]['title'])) $choices[$key]['title'] = trim($cck[0]['title']);
 			
 			if (isset($cck[0]['choice_txt'])) {
 
-				$choices[$key]['choice_txt'] = $this->matchGlossaryTerms($cck[0]['choice_txt']);
+				$choices[$key]['choice_txt'] = $this->matchGlossaryTerms(trim($cck[0]['choice_txt']));
 				$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
 
 			}
