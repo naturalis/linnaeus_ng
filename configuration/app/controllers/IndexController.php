@@ -413,19 +413,18 @@ class IndexController extends Controller
 	private function setIndexTabs ()
 	{
 		// Check if results have been stored in session; if so return
-		if(isset($_SESSION['app']['user']['indexModule']['hasSpecies'])) return;
-	
+		if (isset($_SESSION['app']['user']['indexModule']['hasSpecies'])) return;
+
 		// Check taxa
-		$sp = $ht = 0;
+		$this->showLowerTaxon = null;
+		$_SESSION['app']['user']['indexModule']['hasSpecies'] = $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 0;
 		$this->getTaxonTree(array('includeOrphans' => false));
 		$taxa = (array)$this->getTreeList();
 		foreach ($taxa as $taxon) {
-			if ($taxon['lower_taxon']==1 && $taxon['is_empty']==0) $sp = 1;
-			if ($taxon['lower_taxon']==0 && $taxon['is_empty']==0) $ht = 1;
-			if ($sp==1 && $ht==1) break;
+			if ($taxon['lower_taxon']==1 && $taxon['is_empty']==0) $_SESSION['app']['user']['indexModule']['hasSpecies'] = 1;
+			if ($taxon['lower_taxon']==0 && $taxon['is_empty']==0) $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 1;
+			if ($_SESSION['app']['user']['indexModule']['hasSpecies']==1 && $_SESSION['app']['user']['indexModule']['hasHigherTaxa']==1) break;
 		}
-		$_SESSION['app']['user']['indexModule']['hasSpecies'] = $sp;
-		$_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = $ht;
 	
 		// Check common names
 		$_SESSION['app']['user']['indexModule']['hasCommonNames'] = ($this->countCommonNames() > 0 ? 1 : 0);
