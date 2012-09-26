@@ -2991,8 +2991,8 @@ class ImportController extends Controller
 		//[l][m]Text Key[/m][r]Page 66[/r][t]Page 66[/t][/l]
 
 		$d = (isset($step->pagetitle) ? 
-				' '.trim((string)$step->pagenumber).': '.trim((string)$step->pagetitle) :
-				' '.trim((string)$step->pagenumber)
+				trim((string)$step->pagenumber).': '.trim((string)$step->pagetitle) :
+				trim((string)$step->pagenumber)
 			);
 
 		$_SESSION['admin']['system']['import']['key'][] = array('id' => $stepId,'page' => strtolower('Pagina '.$d));
@@ -3294,7 +3294,7 @@ class ImportController extends Controller
 				'number =' => '1'
 			)
 		);
-
+		
 	}
 
 	// matrix key
@@ -3978,17 +3978,6 @@ class ImportController extends Controller
 	private function resolveInternalLinks($s)
 	{
 
-
-
-		//[l][m]Text Key[/m][r]Pagina 2218: Salviniaceae - Vlotvarenfamilie[/r][t]Pagina 2218: [b]Salviniaceae - Vlotvarenfamilie[/b][/t][/l]
-		//[l][m]Text Key[/m][r]Pagina 1234[/r][t]Pagina 1234[/t][/l]
-		//[l][m]Text Key[/m][r]Page 23: Ursidae[/r][t]Page 23: [b]Ursidae[/b][/t][/l]
-		//[l][m]Text Key[/m][r]Page 66[/r][t]Page 66[/t][/l]
-
-
-
-
-
 		$controllers = 
 			array(
 				'content pages' => array(
@@ -4019,7 +4008,7 @@ class ImportController extends Controller
 						'url' => 'taxon.php',
 						'param' => 'id',
 					),
-				'Text Key' => // [m]Text Key[/m]
+				'text key' => // [m]Text Key[/m]
 					array(
 						'controller' => 'key',
 						'url' => 'index.php?forcetree=1',
@@ -4036,13 +4025,15 @@ class ImportController extends Controller
 				)
 			);
 
-//		$d = rtrim($s[count((array)$s)-1],'[/t]');
+		//$d = rtrim($s[count((array)$s)-1],'[/t]');
 		$d = preg_replace('/\[\/t\]$/','',$s[count((array)$s)-1]);
 		$d = preg_split('/(\[\/m\]\[[r]\])|(\[\/r\]\[[t]\])/iU',$d);
 		
+		// $d[0] holds the L2 module name, which is also the key in the $controllers-array above
 		$d[0] = strtolower($d[0]);
-		
-		if ($controllers[$d[0]]['controller']=='species' || $controllers[$d[0]]['controller']=='highertaxa') {
+
+		// during the import of some modules, the referring "id's" (i.e., names we hope to be unique) have been lowercased
+		if ($d[0]=='species' || $d[0] =='higher taxa' || $d[0] =='text key') {
 			
 			$d[1] = strtolower($d[1]);
 			

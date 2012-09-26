@@ -2772,14 +2772,14 @@ class SpeciesController extends Controller
         
         if ($label) $d['save_label'] = $label;
         
-        $d['content_taxa_id'] = $d['id'];
+        if (isset($d['id'])) $d['content_taxa_id'] = $d['id'];
         
         $d['id'] = null;
         
-        $d['content_taxa_created'] = $d['created'];
+        if (isset($d['created'])) $d['content_taxa_created'] = $d['created'];
         unset($d['created']);
         
-        $d['content_last_change'] = $d['last_change'];
+        if (isset($d['last_change'])) $d['content_last_change'] = $d['last_change'];
         unset($d['last_change']);
         
         $this->models->ContentTaxonUndo->save($d);
