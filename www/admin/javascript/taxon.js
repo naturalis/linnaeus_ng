@@ -378,9 +378,6 @@ function taxonUpdateInterface() {
 
 function taxonSaveData(id,language,page,content,editorName) {
 
-
-alert(content);
-
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
