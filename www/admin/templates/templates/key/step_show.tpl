@@ -166,7 +166,7 @@ This is a list of the taxa that are a possible outcome of the key, computed from
 {/section}
 {if $remainingTaxa|@count==0}{t}(none){/t}{/if}
 {else}
-{t _s1='<a href="process.php">' _s2='</a>'}You need to reprocess your key to see the list of possible outcomes. Go %shere%s to do so.{/t}
+<a href="store.php?step={$step.id}">{t}You need to process and store your key tree to see the list of possible outcomes.{/t}</a>
 {/if}
 </fieldset>
 </div>
