@@ -240,7 +240,7 @@ class KeyController extends Controller
 			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree();
 		// store tree in session
 		else
-			$_SESSION['app']['user']['key']['keyTree'] = unserialize($tree[0]['keytree']);
+			$_SESSION['app']['user']['key']['keyTree'] = json_decode($tree[0]['keytree']);
 
 	}
 	
@@ -319,8 +319,8 @@ class KeyController extends Controller
 
 	}
 
-	// be aware that this function also exists in the admin controller and should have identical output there!
-	private function generateKeyTree($id=null)
+	// be aware that this function also exists in the app controller and should have identical output there!
+	private function generateKeyTree($id=null,$level=0)
 	{
 
 		if (is_null($id)) {
@@ -337,7 +337,7 @@ class KeyController extends Controller
 			array(
 				'id' => $step['id'],
 				'number' => $step['number'],
-				'title' => $step['title'],
+				'title' => utf8_decode($step['title']),
 				'is_start' => $step['is_start'],
 				'level' => $level
 			);		
@@ -347,7 +347,7 @@ class KeyController extends Controller
 		foreach((array)$step['choices'] as $key => $val) {
 		
 			$d['choice_id'] = $val['id'];
-			$d['choice_marker'] = $val['marker'];
+			$d['choice_marker'] = utf8_decode($val['marker']);
 			$d['res_keystep_id'] = $val['res_keystep_id'];
 			$d['res_taxon_id'] = $val['res_taxon_id'];
 
@@ -360,7 +360,7 @@ class KeyController extends Controller
 		return isset($step) ? $step : null;
 	
 	}
-		
+
 
 	/* steps and choices */
 	private function getKeystep($id)
