@@ -2789,7 +2789,7 @@ class SpeciesController extends Controller
     private function ajaxActionSaveTaxon ()
     {
 
-        // new taxon
+    	// new taxon
         if (!$this->rHasId()) {
             
             $d = $this->models->Taxon->save(
@@ -2837,6 +2837,12 @@ class SpeciesController extends Controller
 
                         $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $this->requestData['save_type']);
 
+                        // Mark taxon as 'empty'
+                        $this->models->Taxon->update(
+							array('is_empty' => 1),
+							array('id' => $taxonId)
+						);
+                        
                     } else {
                         
                         // see if such content already exists
@@ -2873,10 +2879,10 @@ class SpeciesController extends Controller
                         
                         // Mark taxon as 'empty/not empty' depending on presence of contents
                         $this->models->Taxon->update(
-							array('is_empty' => !empty($filteredContent['content']) ? 0 : 1),
+							array('is_empty' => !empty($this->requestData['content']) ? 0 : 1),
 							array('id' => $taxonId)
 						);
-                        
+  
                         if ($id != null)
                             $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, 
                             $this->requestData['save_type']);
