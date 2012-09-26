@@ -789,35 +789,6 @@ class KeyController extends Controller
 	
 	}
 
-	public function processAction()
-	{
-	
-		$this->checkAuthorisation();
-        
-        $this->setPageName( _('Compute taxon division'));
-		
-		if ($this->rHasVal('action','process') && !$this->isFormResubmit()) {
-
-			$d = $this->getTaxonDivision();
-
-			$_SESSION['admin']['system']['keyTaxaPerStep'] = $d['list'] ? $d['list'] : 'none';
-
-			$this->smarty->assign('processed',true);
-
-			$this->smarty->assign('taxonCount',$d['taxonCount']);
-
-			$this->smarty->assign('stepCount',count((array)$d['list']));
-
-		} elseif (isset($_SESSION['admin']['system']['keyTaxaPerStep'])) {
-
-			$this->addMessage(_('Be aware that you have already generated a taxon per step division, and have not changed your key since. It is not necessary to re-generate it.'));
-
-		}
-	
-        $this->printPage();
-
-	}
-
 	public function storeAction()
 	{
 	
@@ -829,12 +800,20 @@ class KeyController extends Controller
 
 			$k = $this->saveKeyTree();
 			
-			if ($k===true)
+			if ($k===true) {
+
 				$this->addMessage(_('Key tree saved'));
-			else
+				if ($this->rHasVal('step')) $this->addMessage('<a href="step_show.php?step='.$this->requestData['step'].'">'._('Back to key').'</a>');
+
+			} else {
+
 				$this->addError($k);
 
+			}
+
 		}
+
+		if ($this->rHasVal('step')) $this->smarty->assign('step',$this->requestData['step']);
 
 		$this->smarty->assign('keyinfo',$this->getKeyInfo());
 
@@ -928,63 +907,6 @@ class KeyController extends Controller
 		
 		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
 	
-	}
-
-	private function getTaxonDivision()
-	{
-
-		// get all choices that have a taxon as result
-		$ck = $this->models->ChoiceKeystep->_get(
-			array('id' => 
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'res_taxon_id is not' => 'null'
-				)
-			)
-		);
-
-		// for each...
-		foreach((array)$ck as $key => $val) {
-
-			unset($this->_taxaStepList);
-			
-			// ...work our way back to the top most step...
-			$this->setStepsPerTaxon($val);
-			
-			/// ...and save the results
-			$results[] =  array(
-				'taxon_id' => $val['res_taxon_id'],
-				'steps' => $this->_taxaStepList
-			);
-
-		}
-
-		if (isset($results)) {
-
-			// turn it from a list of taxa with their steps into a list of steps with their taxa
-			foreach((array)$results as $key => $val) {
-
-				foreach($val['steps'] as $key2 => $stepId) {
-
-					if (!isset($d[$stepId][$val['taxon_id']])) {
-
-						$d[$stepId][$val['taxon_id']] = true;
-	
-						$list[$stepId][] = $this->models->Taxon->_get(array('id'=>$val['taxon_id']));
-	
-					}
-	
-				}
-	
-			}
-
-		}
-
-		return array(
-			'list' => isset($list) ? $list : null,
-			'taxonCount' => isset($ck) ? count($ck) : 0
-		);
-
 	}
 
 	private function removeLastKeyPathEntry()
@@ -2458,5 +2380,85 @@ class KeyController extends Controller
 	
 	}
 
+
+	/* branches and fruits */
+	private function getTaxonDivision($step)
+	{
+
+		$this->tmp = null;
+		
+		$this->sawOffABranch($this->getKeyTree(),$step);
+		$this->reapFruits($this->tmp['branch']);
+
+		$excludedTaxa = array();
+	
+		$allTaxa = $this->getAllTaxaInKey();
+
+		foreach((array)$allTaxa as $val) {
+		
+			if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) $excludedTaxa[$val['res_taxon_id']] = $val['res_taxon_id'];
+		
+		}
+		
+		return
+			array(
+				'remaining' => $this->tmp['remaining'],
+				'excluded' => $excludedTaxa
+			);
+
+	}
+
+	private function sawOffABranch($branch,$step)
+	{
+	
+		if (isset($branch['id']) && $branch['id']==$step) {
+
+			$this->tmp['branch'] = $branch;
+			return;
+
+		}
+
+		foreach((array)$branch['choices'] as $val) {
+		
+			if (isset($val['step'])) $this->sawOffABranch($val['step'],$step);
+		
+		}
+	
+	}
+	
+	private function reapFruits($branch)
+	{
+
+		foreach((array)$branch['choices'] as $val) {
+		
+			if (isset($val['res_taxon_id'])) $this->tmp['remaining'][$val['res_taxon_id']] = $val['res_taxon_id'];
+
+			if (isset($val['step'])) $this->reapFruits($val['step']);
+		
+		}
+	
+	}
+
+	private function getAllTaxaInKey()
+	{
+	
+		if (!isset($_SESSION['admin']['system']['key']['keyTaxa'])) {
+	
+			$_SESSION['admin']['system']['key']['keyTaxa'] = $this->models->ChoiceKeystep->_get(
+				array('id' => 
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_taxon_id is not' => 'null'
+					),
+					'columns' => 'res_taxon_id'
+				)
+			);
+	
+		}
+		
+		return $_SESSION['admin']['system']['key']['keyTaxa'];
+		
+	}
+//$d = $this->getTaxonDivision();	
 
 }

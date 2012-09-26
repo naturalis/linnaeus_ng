@@ -28,6 +28,7 @@ Last change to a keystep choice on: {if $keyinfo.choice.date_hr}{$keyinfo.choice
 <form action="" method="post">
 <input type="hidden" name="action" value="store" />
 <input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="step" value="{$step}" />
 <input type="submit" value="{t}store key tree{/t}" />
 </form>
 {/if}
