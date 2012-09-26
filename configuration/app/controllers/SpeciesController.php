@@ -368,7 +368,7 @@ class SpeciesController extends Controller
 					)
 				);
 				
-				if ($ct[0]['publish']=='1' || $allowUnpublished) $val['is_empty'] = 0;
+				if (($ct[0]['publish']=='1' || $allowUnpublished) && strlen($ct[0]['content'])>0) $val['is_empty'] = 0;
 					
 				$d[] = $val;
 
