@@ -19,7 +19,7 @@
 Key tree last generated on: {if $keyinfo.keytree.date_hr}{$keyinfo.keytree.date_hr}{else}(never){/if}<br /><br />
 Last change to a keystep on: {if $keyinfo.keystep.date_hr}{$keyinfo.keystep.date_hr}{else}(never){/if} (deletes are not logged!)<br />
 Last change to a keystep choice on: {if $keyinfo.choice.date_hr}{$keyinfo.choice.date_hr}{else}(never){/if} (deletes are not logged!)<br />
-{if $keyinfo.keystep.date_x > $keyinfo.keytree.date_x || $keyinfo.choice.date_x > $keyinfo.keytree.date_x}
+{if $keyinfo.keystep.date_x > $keyinfo.keytree.date_x || $keyinfo.choice.date_x > $keyinfo.keytree.date_x || $didKeyTaxaChange}
 </p>
 <p>
 <span class="message-error">The key tree is older than the last edit to your key. It should be updated.</span>

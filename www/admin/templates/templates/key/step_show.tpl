@@ -155,20 +155,32 @@
 </form>
 
 <div id="key-taxa-list-remain">
-<fieldset>
-<legend id="key-taxa-list-remain-header">{t}Possible outcomes{/t}</legend>
-{if $remainingTaxa=='none'}
-{t}Your key currently has no taxa attached to it.{/t}
-{elseif $remainingTaxa || $choices|@count==0}
-This is a list of the taxa that are a possible outcome of the key, computed from the current step ({$remainingTaxa|@count}):<br />
-{section name=i loop=$remainingTaxa}
-&#149;&nbsp;{$remainingTaxa[i].taxon}<br />
-{/section}
-{if $remainingTaxa|@count==0}{t}(none){/t}{/if}
-{else}
-<a href="store.php?step={$step.id}">{t}You need to process and store your key tree to see the list of possible outcomes.{/t}</a>
-{/if}
-</fieldset>
+<table>
+	<tr style="vertical-align:top">
+		<td>
+
+	{if $didKeyTaxaChange}
+		<a href="store.php?step={$step.id}">{t}You need to process and store your key tree to see the list of possible outcomes.{/t}</a>
+	{else}
+		<fieldset style="width:300px">
+		<legend id="key-taxa-list-remain-header">{t}Remaining taxa{/t}</legend>
+		{foreach from=$taxonDivision.remaining item=v}
+		&#149;&nbsp;{$v.taxon}<br />
+		{/foreach}
+		</fieldset>
+				</td>
+				<td>
+		<fieldset style="width:300px">
+		<legend id="key-taxa-list-remain-header">{t}Excluded taxa{/t}</legend>
+		{foreach from=$taxonDivision.excluded item=v}
+		&#149;&nbsp;{$v.taxon}<br />
+		{/foreach}
+		</fieldset>
+	{/if}
+		</td>
+	</tr>
+</table>
+
 </div>
 
 {include file="../shared/admin-footer.tpl"}

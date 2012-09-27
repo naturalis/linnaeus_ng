@@ -166,29 +166,25 @@ class KeyController extends Controller
 
 		$this->setPageName(sprintf(_('Show key step %s'),$step['number']));
 
-		if (isset($_SESSION['admin']['system']['keyTaxaPerStep'])) {
+		$c = $this->didKeyTaxaChange();
 
-			if (isset($_SESSION['admin']['system']['keyTaxaPerStep'][$step['id']])) {
-	
-				$this->smarty->assign('remainingTaxa',$_SESSION['admin']['system']['keyTaxaPerStep'][$step['id']]);
-	
-			} else
-			if ($_SESSION['admin']['system']['keyTaxaPerStep']=='none') {
-	
-				$this->smarty->assign('remainingTaxa','none');
-	
-			}
+		if (!$c && isset($step['id'])) {
+
+			$div = $this->getTaxonDivision($step['id']);
+			$this->getTaxonTree();
+			
+			foreach ((array)$div['remaining'] as $key => $val) $div['remaining'][$key] = array('id' => $val, 'taxon' => $this->treeList[$val]['taxon']);
+			foreach ((array)$div['excluded'] as $key => $val) $div['excluded'][$key] = array('id' => $val, 'taxon' => $this->treeList[$val]['taxon']);
+			
+			$this->customSortArray($div['remaining'],array('key' => 'taxon'));
+			$this->customSortArray($div['excluded'],array('key' => 'taxon'));
+
+			$this->smarty->assign('taxonDivision',$div);
+
 
 		}
 
-		/*
-		if (isset($_SESSION['admin']['system']['insertAfterChoice']))
-			$this->addMessage(sprintf(
-				_('You are inserting this step between %s and %s.'),
-				$_SESSION['admin']['system']['insertAfterChoice']['keystep_number'].$_SESSION['admin']['system']['insertAfterChoice']['marker'],
-				$_SESSION['admin']['system']['insertAfterChoice']['target'])
-			);
-		*/
+		$this->smarty->assign('didKeyTaxaChange',$c);
 
 		$this->smarty->assign('keyPath',$this->getKeyPath());
 
@@ -457,9 +453,7 @@ class KeyController extends Controller
 
 				if ($this->requestData['res_taxon_id']!=='0') {
 
-					unset($_SESSION['admin']['system']['remainingTaxa']);
-
-					unset($_SESSION['admin']['system']['keyTaxaPerStep']);
+					$this->setKeyTaxaChanged();
 
 				}
 				
@@ -799,10 +793,13 @@ class KeyController extends Controller
 		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
 
 			$k = $this->saveKeyTree();
-			
+
 			if ($k===true) {
+			
+				$this->setKeyTaxaChanged();
 
 				$this->addMessage(_('Key tree saved'));
+
 				if ($this->rHasVal('step')) $this->addMessage('<a href="step_show.php?step='.$this->requestData['step'].'">'._('Back to key').'</a>');
 
 			} else {
@@ -817,6 +814,8 @@ class KeyController extends Controller
 
 		$this->smarty->assign('keyinfo',$this->getKeyInfo());
 
+		$this->smarty->assign('didKeyTaxaChange',$this->didKeyTaxaChange());
+		
         $this->printPage();
 
 	}
@@ -1386,9 +1385,10 @@ class KeyController extends Controller
 				'id' => $id
 			)
 		);
+		
+		$this->setKeyTaxaChanged();
 
 	}
-
 
 	private function deleteKeystep($id)
 	{
@@ -1402,11 +1402,17 @@ class KeyController extends Controller
 			)
 		);
 		
+		$hadTaxa = false;
+		
 		foreach((array)$ck as $key => $val) {
+		
+			$hadTaxa = $hadTaxa==true || !empty($val['res_taxon_id']);
 	
 			$this->deleteKeystepChoice($val['choice_id']);
 
 		}
+		
+		if ($hadTaxa) $this->setKeyTaxaChanged();
 
 		$this->models->ChoiceKeystep->update(
 			array(
@@ -1458,7 +1464,6 @@ class KeyController extends Controller
 		return $this->models->ChoiceKeystep->getNewId();
 	
 	}
-
 
 	private function getKeystepChoices($step,$formatHtml=false)
 	{
@@ -1683,7 +1688,6 @@ class KeyController extends Controller
 		);
 		
 	}
-
 
 	private function renumberKeystepChoices($step)
 	{
@@ -2235,7 +2239,9 @@ class KeyController extends Controller
 							'project_id' => $this->getCurrentProjectId(),
 							'id' => $val['id']
 						)
-					);			
+					);
+					
+					$this->setKeyTaxaChanged();		
 				
 				}		
 				
@@ -2261,7 +2267,50 @@ class KeyController extends Controller
 
 	}
 
-	// be aware that this function also exists in the app controller and should have identical output there!
+	private function getKeyInfo()
+	{
+
+		$d1 = $this->models->Keytree->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
+			)
+		);
+		
+		$d2 = $this->models->Keystep->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
+				'order' => 'last_change desc',
+				'limit' => 1
+			)
+		);
+
+		$d3 = $this->models->ChoiceKeystep->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
+				'order' => 'last_change desc',
+				'limit' => 1
+			)
+		);
+
+		return
+			array(
+				'keytree' => $d1[0],
+				'keystep' => $d2[0],
+				'choice' => $d3[0]	
+			);	
+	
+	
+	}
+	
+	/*
+		
+		this function is a late addition and also exists in the app controller and should have identical output there!
+		it more or less duplicates the functionality of getKeyTree(), but there has been no time to unify the two
+
+	*/
 	private function generateKeyTree($id=null,$level=0)
 	{
 
@@ -2309,6 +2358,8 @@ class KeyController extends Controller
 		$tree = $this->generateKeyTree();
 		
 		if ($tree) {
+		
+			$_SESSION['admin']['system']['keyTreeV2'] = $tree;
 
 			$tree = utf8_encode(serialize($tree));
 			
@@ -2342,41 +2393,33 @@ class KeyController extends Controller
 	
 	}
 
-	private function getKeyInfo()
+	private function setKeyTaxaChanged()
 	{
+	
+		$this->saveSetting(
+			array(
+				'name' => 'keyTaxaChanged',
+				'value' => time()
+			)
+		);
 
-		$d1 = $this->models->Keytree->_get(
+	}
+
+	private function didKeyTaxaChange()
+	{
+	
+		$d = $this->getSetting('keyTaxaChanged');
+		
+		if ($d==null) return true;
+
+		$k = $this->models->Keytree->_get(
 			array(
 				'id' => array('project_id' => $this->getCurrentProjectId()),
 				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x'
 			)
 		);
 		
-		$d2 = $this->models->Keystep->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-				'order' => 'last_change desc',
-				'limit' => 1
-			)
-		);
-
-		$d3 = $this->models->ChoiceKeystep->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'date_format(last_change,"%d-%m-%Y, %H:%i:%s") as date_hr, unix_timestamp(last_change) as date_x',
-				'order' => 'last_change desc',
-				'limit' => 1
-			)
-		);
-
-		return
-			array(
-				'keytree' => $d1[0],
-				'keystep' => $d2[0],
-				'choice' => $d3[0]	
-			);	
-	
+		return $k[0]['date_x'] < $d;
 	
 	}
 
@@ -2385,9 +2428,12 @@ class KeyController extends Controller
 	private function getTaxonDivision($step)
 	{
 
-		$this->tmp = null;
+		$this->tmp['branch'] = array();
 		
-		$this->sawOffABranch($this->getKeyTree(),$step);
+		if (!isset($_SESSION['admin']['system']['keyTreeV2']))
+			$_SESSION['admin']['system']['keyTreeV2'] = $this->generateKeyTree();
+		
+		$this->sawOffABranch($_SESSION['admin']['system']['keyTreeV2'],$step);
 		$this->reapFruits($this->tmp['branch']);
 
 		$excludedTaxa = array();
@@ -2410,7 +2456,7 @@ class KeyController extends Controller
 
 	private function sawOffABranch($branch,$step)
 	{
-	
+
 		if (isset($branch['id']) && $branch['id']==$step) {
 
 			$this->tmp['branch'] = $branch;
@@ -2459,6 +2505,5 @@ class KeyController extends Controller
 		return $_SESSION['admin']['system']['key']['keyTaxa'];
 		
 	}
-//$d = $this->getTaxonDivision();	
 
 }
