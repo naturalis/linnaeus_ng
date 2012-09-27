@@ -1,5 +1,4 @@
 {include file="../shared/admin-header.tpl"}
-
 {include file="_keypath.tpl"}
 
 <div id="page-main">
@@ -151,6 +150,7 @@
 {literal}
 $(document).ready(function(){
 {/literal}
+	initTinyMce(false,false);
 	allActiveView = 'choiceedit';
 {section name=i loop=$languages}
 	allAddLanguage([{$languages[i].language_id},'{$languages[i].language}',{if $languages[i].def_language=='1'}1{else}0{/if}]);
@@ -164,7 +164,6 @@ $(document).ready(function(){
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
-	initTinyMce(false,false);
 {literal}
 });
 {/literal}
