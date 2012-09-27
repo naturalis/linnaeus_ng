@@ -71,7 +71,7 @@ class MatrixKeyController extends Controller
 
     public function indexAction()
     {
-   
+
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
   
 		$this->checkMatrixIdOverride();
@@ -364,10 +364,10 @@ class MatrixKeyController extends Controller
 						'got_names' => 1
 					),
 					'fieldAsIndex' => 'id',
-					'columns' => 'id,got_names,\'matrix\' as type'
+					'columns' => 'id,got_names,\'matrix\' as type, `default`'
 				)
 			);
-			
+
 			foreach((array)$m as $key => $val) {
 	
 				$mn = $this->models->MatrixName->_get(
@@ -384,9 +384,10 @@ class MatrixKeyController extends Controller
 				$m[$key]['name'] = $mn[0]['name'];
 	
 			}
-			$this->customSortArray($m, array('key' => 'name', 'case' => 'i','maintainKeys' => true));
+
+			$this->customSortArray($m, array('key' => 'default', 'dir' => 'desc', 'case' => 'i','maintainKeys' => true));
 			$_SESSION['app']['user']['matrix']['matrices'] = $m;
-			
+
 		}
 
 		return $_SESSION['app']['user']['matrix']['matrices'];
