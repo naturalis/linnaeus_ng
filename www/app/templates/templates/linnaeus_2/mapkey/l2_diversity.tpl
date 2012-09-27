@@ -72,6 +72,19 @@
 		{/foreach}
 		<input type="hidden" name="m" value="{$mapId}" />
 		</div>
+		
+
+		<div id="legend">
+			{foreach from=$index.legend key=k item=v name=x}
+			<div class="mapCheckbox">
+				<label>
+					<span class="opacity"><span class="mapCellLegend mapCellDiversity{$k}">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>{$v.min}-{$v.max} {t}records{/t}
+				</label>
+			</div>
+			{/foreach}
+		</div>
+
+		
 		</td>
 	</tr>
 	<tr id="grid-footer">
@@ -83,16 +96,6 @@
 		<td></td>
 	</tr>
 </table>
-
-<table>
-{foreach from=$index.legend key=k item=v}
-	<tr>
-		<td class="mapCellDiversity{$k}" style="width:25px;height:25px;cursor:default">&nbsp;</td>
-		<td>{$v.min}-{$v.max}</td>
-	</tr>
-{/foreach}
-</table>
-
 
 </div>
 {/if}

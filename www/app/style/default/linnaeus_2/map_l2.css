@@ -93,8 +93,8 @@ a.selectIcon:hover {
     margin: 0;
     border-right: 1px dotted #777;
     border-bottom: 1px dotted #777;
-    opacity: .70;
-	filter: alpha(opacity=70);
+    opacity: .80;
+	filter: alpha(opacity=80);
 	position: relative;
 }
 
@@ -115,6 +115,8 @@ a.selectIcon:hover {
 	height: 7px;
 	padding: 0;
 	margin: 0 3px 0 0;
+    opacity: .80;
+	filter: alpha(opacity=80);
 }
 
 .mapPCheckbox, .mapCheckbox {
@@ -213,4 +215,8 @@ a.selectIcon:hover {
 #mapTaxaBox{
 	height:300px;
 	overflow-y:scroll;
+}
+.opacity {
+    opacity: .80;
+	filter: alpha(opacity=80);
 }
