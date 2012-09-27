@@ -35,6 +35,8 @@ class MatrixKeyController extends Controller
     {
         
         parent::__construct();
+		
+		$this->setDefaultMatrix();
 
 		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
 		
@@ -183,15 +185,15 @@ class MatrixKeyController extends Controller
 		
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 		
+		if ($this->rHasId() && $this->rHasVal('action','def') && !$this->isFormResubmit()) {
+			
+			$this->setDefaultMatrix($this->requestData['id']);
+
+		} 
+
 		$matrix = $this->getMatrix($this->getCurrentMatrixId());
 
         $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
-
-		$matrices = $this->getMatrices();
-		
-		$d = array();
-		
-		foreach((array)$matrices as $val)  if ($val['id']!=$this->getCurrentMatrixId()) array_push($d,$val);
 
 		if ($this->rHasVal('char')) $this->smarty->assign('activeCharacteristic',$this->requestData['char']);
 
@@ -201,7 +203,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('matrix',$matrix);
 
-		$this->smarty->assign('matrices',$d);
+		$this->smarty->assign('matrices',$this->getMatrices());
 
         $this->printPage();
     
@@ -829,6 +831,8 @@ class MatrixKeyController extends Controller
 			$m[$key]['default_name'] = $mn[$this->getDefaultProjectLanguage()]['name'];
 
 		}
+		
+		$this->customSortArray($m, array('key'=>'default_name','case'=>'i'));
 
 		return $m;
 	
@@ -1966,5 +1970,65 @@ class MatrixKeyController extends Controller
 		foreach((array)$c as $key => $val) $this->updateCharShowOrder($val['id'],$key);
 				
 	}
+	
+	private function setDefaultMatrix($id=null)
+	{
+	
+		if (isset($id)) {
 
+			$this->models->Matrix->update(
+				array(
+					'default' => '0'
+				),
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+				)
+			);
+
+			$this->models->Matrix->save(
+				array(
+					'id' => $id,
+					'default' => 1
+				)
+			);
+			
+			return;
+		
+		}
+
+		$m = $this->getMatrices();
+		
+		if (count((array)$m)<=1) {
+
+			$this->models->Matrix->save(
+				array(
+					'id' => $m[0]['id'],
+					'default' => 1
+				)
+			);
+
+			return;
+		}
+		
+		$hasDef = false;
+
+		foreach((array)$m as $val) {
+		
+			$hasDef = $hasDef==true || $val['default']==1;
+		
+		}
+		
+		if (!$hasDef) {
+
+			$this->models->Matrix->save(
+				array(
+					'id' => $m[0]['id'],
+					'default' => 1
+				)
+			);
+			
+		}
+		
+	}
+	
 }

@@ -432,24 +432,24 @@ function chkPIDInLinks(pid,par) {
 				hence the juggling with fragments below
 				
 			*/
-		
+
 			if (url.attr('fragment').length!==0) {
 			
 				h = h.replace('#'+url.attr('fragment'),'');
 			
 			}
 	
-			var d = String;
+			var d = h;
 	
 			if (url.attr('query').length==0) {
-				d = h+'?'+p;
+				d = d +'?'+p;
 			} else
 			if (url.attr('query').indexOf(p)==-1) {
-				d = h+'&'+p;
+				d = d +'&'+p;
 			}
-			
+
 			d = d + (url.attr('fragment').length!==0 ? '#'+url.attr('fragment') : '');
-			
+
 			$(this).attr('href',d);
 			
 		}
