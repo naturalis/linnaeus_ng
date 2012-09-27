@@ -410,6 +410,7 @@ function chkPIDInLinks(pid,par) {
 	var p = par+'='+pid;
 
 	$('a').each(function() {
+
 		var h = $(this).attr('href');
 
 		if (h && h.indexOf('javascript:')==-1) {
@@ -439,18 +440,16 @@ function chkPIDInLinks(pid,par) {
 			
 			}
 	
-			var d = h;
-	
 			if (url.attr('query').length==0) {
-				d = d +'?'+p;
+				h = h +'?'+p;
 			} else
 			if (url.attr('query').indexOf(p)==-1) {
-				d = d +'&'+p;
+				h = h +'&'+p;
 			}
 
-			d = d + (url.attr('fragment').length!==0 ? '#'+url.attr('fragment') : '');
+			h = h + (url.attr('fragment').length!==0 ? '#'+url.attr('fragment') : '');
 
-			$(this).attr('href',d);
+			$(this).attr('href',h);
 			
 		}
 		
