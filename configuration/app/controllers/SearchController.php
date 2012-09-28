@@ -10,7 +10,6 @@
 
 	*/
 
-
 include_once ('Controller.php');
 
 class SearchController extends Controller
@@ -207,7 +206,7 @@ class SearchController extends Controller
         }
 
 		$this->allowEditPageOverlay = false;
-				
+		
         $this->printPage();
     
     }
@@ -1448,11 +1447,10 @@ class SearchController extends Controller
 	
 	}	
 
-
 	// general
-	private function getLookupList($search)
+	public function getLookupList($search)
 	{
-	
+
 		$search = isset($p['search']) ? $p['search'] : null;
 	
 		/*

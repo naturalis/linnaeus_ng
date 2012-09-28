@@ -516,7 +516,7 @@ class SpeciesController extends Controller
 	
 	private function getTaxonMedia($taxon=null,$id=null)
 	{
-		if ($mt = $this->getCache($taxon, 'media')) return $mt;
+		if ($mt = $this->getTaxonCategoryCache($taxon, 'media')) return $mt;
 		
 		$d = array('project_id' => $this->getCurrentProjectId());
 		
@@ -575,7 +575,7 @@ class SpeciesController extends Controller
 	private function getTaxonLiterature($taxon)
 	{
 
-		if ($refs = $this->getCache($taxon, 'literature')) return $refs;
+		if ($refs = $this->getTaxonCategoryCache($taxon, 'literature')) return $refs;
 		
 		$lt =  $this->models->LiteratureTaxon->_get(
 			array(
@@ -630,7 +630,7 @@ class SpeciesController extends Controller
 	private function getTaxonNames($taxon)
 	{
 
-		if ($names = $this->getCache($taxon, 'names')) return $names;
+		if ($names = $this->getTaxonCategoryCache($taxon, 'names')) return $names;
 		
 		$names = array(
 			'synonyms' => $this->getTaxonSynonyms($taxon),
@@ -960,7 +960,7 @@ class SpeciesController extends Controller
 	}
 
 
-	private function getCache ($taxon, $category) {
+	private function getTaxonCategoryCache ($taxon, $category) {
 		if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
 			return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
 		}
