@@ -6,5 +6,5 @@
 {/if}
 {include file="../shared/_top-strip.tpl"}
 <div id="container">
-<form method="get" action="" id="theForm" onsubmit="return checkForm();">
+<form method="get" action="{$smarty.server.PHP_SELF}" id="theForm" onsubmit="return checkForm();">
 <input type="hidden" name="rnd" value="{$rnd}" />

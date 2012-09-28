@@ -2610,9 +2610,9 @@ class Controller extends BaseClass
      */
     private function startSession ()
     {
-	
+
 		//session_name('lng-administration');
-		session_start();
+		if (!isset($_SESSION)) session_start();
 
         /* DEBUG */        
         $_SESSION['admin']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];

@@ -64,7 +64,7 @@ class IndexController extends Controller
 
 	public function indexAction()
 	{
-	
+
         $this->setPageName(_('Index: Species and lower taxa'));
 
 		$this->setTaxonType('lower');

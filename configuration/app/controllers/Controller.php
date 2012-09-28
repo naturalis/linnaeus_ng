@@ -61,8 +61,7 @@ class Controller extends BaseClass
     );
 	
 	public $cssToLoad = array();
-
-
+	
     /**
      * Constructor, calls parent's constructor and all initialisation functions
      *
@@ -1319,9 +1318,9 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function printPage ($templateName = null)
+    public function printPage($templateName = null)
     {
- 
+
 		$this->preparePage();
 		
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
@@ -2528,6 +2527,7 @@ class Controller extends BaseClass
 		$d = strpos($_SERVER['REQUEST_URI'],'?')==false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
 		$requestHasNoFileName = $this->getViewName()=='index' && ($d !== $_SERVER['PHP_SELF']);
 
+		// most modules work with just one page (index) and a bunch of variables, but these three have different pages within the module
 		if (
 			(
 				$this->getControllerBaseName()=='mapkey' || 
