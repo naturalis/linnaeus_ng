@@ -233,6 +233,7 @@ class KeyController extends Controller
 
 
 	/* it's in the trees */
+/*
 	private function getKeyTree()
 	{
 
@@ -272,6 +273,51 @@ class KeyController extends Controller
 			}
 			
 			$_SESSION['app']['user']['key']['keyTree'] = unserialize(utf8_decode($tree));
+
+		}
+
+	}
+*/	
+
+	private function getKeyTree()
+	{
+
+		return !$this->getCache('tree-keytree') ? null : $this->getCache('tree-keytree');
+
+	}
+	
+	private function setKeyTree()
+	{
+
+		// if tree already exists in session, do nothing	
+		if ($this->getKeyTree()!=null) return;
+		
+		// get stored tree from database
+		$d = $this->models->Keytree->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'order' => 'chunk'
+			)
+		);
+		
+		// if it doesn't exist, generate it anew (shouldn't happen!)
+		if (empty($d[0]['keytree'])) {
+			$this->saveCache('tree-keytree', $this->generateKeyTree());
+		}
+		// store tree in session
+		else {
+
+			$tree = '';
+			
+			foreach((array)$d as $val) {
+			
+				$tree .= trim($val['keytree']);
+			
+			}
+			
+			$this->saveCache('tree-keytree', unserialize(utf8_decode($tree)));
 
 		}
 
