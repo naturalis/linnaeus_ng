@@ -61,7 +61,8 @@ class Controller extends BaseClass
     );
 	
 	public $cssToLoad = array();
-	
+
+
     /**
      * Constructor, calls parent's constructor and all initialisation functions
      *
@@ -1318,9 +1319,9 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function printPage($templateName = null)
+    public function printPage ($templateName = null)
     {
-
+ 
 		$this->preparePage();
 		
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
@@ -1537,6 +1538,7 @@ class Controller extends BaseClass
 		}
 
 		$u['uploadedMediaThumbs'] = $u['uploadedMedia'].'thumbs/';
+		$u['cache'] = $this->baseUrl.'admin/cache/'.$pCode.'/';
 
 		// urls of the directory containing project specific media part of the interface, but not of the content (background etc)
 		$u['projectMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
@@ -2527,7 +2529,6 @@ class Controller extends BaseClass
 		$d = strpos($_SERVER['REQUEST_URI'],'?')==false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
 		$requestHasNoFileName = $this->getViewName()=='index' && ($d !== $_SERVER['PHP_SELF']);
 
-		// most modules work with just one page (index) and a bunch of variables, but these three have different pages within the module
 		if (
 			(
 				$this->getControllerBaseName()=='mapkey' || 
@@ -2562,14 +2563,11 @@ class Controller extends BaseClass
 	
 	// Ruud cache opzetje
 
-	protected $cachePath = '../www/admin/cache/0559/';
-	
-	
 	// Timeout in seconds
 	// Key something like path in session
 	protected function getCache ($key, $timeOut = false) 
 	{
-		$cacheFile = $this->cachePath . $key;
+		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
 		if (file_exists($cacheFile)) {
 			// Timeout provided and expired
 			if ($timeOut && time()-$timeOut >= filemtime($cacheFile)) {
@@ -2577,25 +2575,25 @@ class Controller extends BaseClass
 				unlink($cacheFile);
 				return false;
 			}
-			return json_decode(file_get_contents($this->cachePath . $key));
+			return unserialize(file_get_contents($cacheFile));
 		}
 		return false;
 	}
 	
 	protected function saveCache ($key, $data)
 	{
-		$cacheFile = $this->cachePath . $key;
-		file_put_contents($cacheFile, json_encode($data));	
+		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
+		file_put_contents($cacheFile, serialize($data));	
 	}
 	
 	public function getTaxonTree($params=null)
 	{
 	
 		if (
-				(isset($params['forceLookup']) && $params['forceLookup']==true) ||
-				!$this->getCache('species-tree') ||
-				!$this->getCache('species-treeList') ||
-				$this->didActiveLanguageChange()
+			(isset($params['forceLookup']) && $params['forceLookup']==true) ||
+			!$this->getCache('species-tree') ||
+			!$this->getCache('species-treeList') ||
+			$this->didActiveLanguageChange()
 		) {
 	
 			$this->saveCache('species-tree', $this->_getTaxonTree($params));
@@ -2610,5 +2608,4 @@ class Controller extends BaseClass
 		return $this->getCache('species-tree');
 	
 	}
-	
 }
