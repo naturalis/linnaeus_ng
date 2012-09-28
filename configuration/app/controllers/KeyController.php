@@ -161,6 +161,8 @@ class KeyController extends Controller
 		} 
 
 		$taxa = $this->getTaxonDivision($step['id']);
+		
+		$this->smarty->assign('taxaState',$this->getTaxaState());
 
 		$this->smarty->assign('remaining',$taxa['remaining']);
 
@@ -204,7 +206,19 @@ class KeyController extends Controller
             $this->getLookupList();
 
         }
-		
+
+        if ($this->rHasVal('action','store_remaining')) {
+        
+        	$this->setTaxaState('remaining');
+        
+        }
+        
+        if ($this->rHasVal('action','store_excluded')) {
+        
+        	$this->setTaxaState('excluded');
+        
+        }
+        
         $this->printPage();
     
     }
@@ -784,7 +798,21 @@ class KeyController extends Controller
 		
 	}
 		
-
+	private function setTaxaState ($state)
+	{
+		$_SESSION['app']['user']['key']['taxaState'] = $state;
+	}
+	
+	private function getTaxaState ()
+	{
+		return isset($_SESSION['app']['user']['key']['taxaState']) ? $_SESSION['app']['user']['key']['taxaState'] :
+			'remaining';
+	}
+	
+	
+	
+	
+	
 	/* graveyard */
 	/*
 	private function setStepsPerTaxon($choice)

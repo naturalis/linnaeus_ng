@@ -35,3 +35,40 @@ function keyToggleFullPath() {
 	keyFullPathVisibility = !keyFullPathVisibility;
 
 }
+
+function getData(action) {
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			'action' : action 
+		}),
+		success : function (data) {
+			//alert(data);
+			obj = $.parseJSON(data);
+		}
+	})
+	
+}
+
+function showRemaining() {
+
+	$('#excluded').css('display','none');
+	$('#remaining').css('display','block');
+	$('#eLi').removeClass('category-active');
+	$('#rLi').addClass('category-active');
+	getData('store_remaining');
+
+}
+
+function showExcluded() {
+
+	$('#remaining').css('display','none');
+	$('#excluded').css('display','block');
+	$('#rLi').removeClass('category-active');
+	$('#eLi').addClass('category-active');
+	getData('store_excluded');
+
+}
+

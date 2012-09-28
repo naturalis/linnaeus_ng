@@ -154,12 +154,13 @@
 /* remaining taxa */
 #taxa {
 	width: 240px;
-	height: 426px;
+	height: 406px;
 	border: 1px solid #666;
 	overflow: hidden;
 	background-color: #fff;
 	float: right;
 	overflow-y: scroll;
+	margin-top: 20px;
 }
 
 #taxa #header {
@@ -190,3 +191,9 @@
 #taxa p:last-child {
 	margin-bottom: 10px;
 }
+
+#categories {  
+    background: transparent;
+	margin-left: 595px;
+}
+
