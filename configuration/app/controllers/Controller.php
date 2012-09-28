@@ -245,6 +245,7 @@ class Controller extends BaseClass
 	
 	}
 
+/*
     public function getTaxonTree($params=null) 
     {
 
@@ -267,11 +268,12 @@ class Controller extends BaseClass
 		return $_SESSION['app']['user']['species']['tree'];
 	
 	}
-
+*/
 
 	public function _getTaxonTree($p=null)
 	{
-
+		
+		
 		$pId = isset($p['pId']) ? $p['pId'] : null;
 		$depth = isset($p['depth']) ? $p['depth'] : 0;
 		$ranks = $this->newGetProjectRanks();
@@ -2555,6 +2557,58 @@ class Controller extends BaseClass
 		}
 		
 	}
+	
+	
+	
+	// Ruud cache opzetje
 
+	protected $cachePath = '../www/admin/cache/0559/';
+	
+	
+	// Timeout in seconds
+	// Key something like path in session
+	protected function getCache ($key, $timeOut = false) 
+	{
+		$cacheFile = $this->cachePath . $key;
+		if (file_exists($cacheFile)) {
+			// Timeout provided and expired
+			if ($timeOut && time()-$timeOut >= filemtime($cacheFile)) {
+				// Delete from cache
+				unlink($cacheFile);
+				return false;
+			}
+			return json_decode(file_get_contents($this->cachePath . $key));
+		}
+		return false;
+	}
+	
+	protected function saveCache ($key, $data)
+	{
+		$cacheFile = $this->cachePath . $key;
+		file_put_contents($cacheFile, json_encode($data));	
+	}
+	
+	public function getTaxonTree($params=null)
+	{
+	
+		if (
+				(isset($params['forceLookup']) && $params['forceLookup']==true) ||
+				!$this->getCache('species-tree') ||
+				!$this->getCache('species-treeList') ||
+				$this->didActiveLanguageChange()
+		) {
+	
+			$this->saveCache('species-tree', $this->_getTaxonTree($params));
+			$this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
+	
+		} else {
+	
+			$this->treeList = $this->getCache('species-treeList');
+	
+		}
+	
+		return $this->getCache('species-tree');
+	
+	}
 	
 }
