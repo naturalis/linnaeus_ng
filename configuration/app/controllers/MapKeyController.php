@@ -586,7 +586,7 @@ class MapKeyController extends Controller
 		$this->printPage();		
 	
 	}
-
+/*
 	public function l2DiversityAction()
 	{
 	
@@ -646,6 +646,8 @@ class MapKeyController extends Controller
 
 			}
 			
+			
+			
 		}
 
 		if (isset($taxa)) {
@@ -676,10 +678,77 @@ class MapKeyController extends Controller
 		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
 
 		$this->printPage();	
-
 	
 	}
+*/	
 
+	public function l2DiversityAction()
+	{
+	
+		$this->setPageName(sprintf(_('Diversity index')));
+		
+		$maps = $this->l2GetMaps();
+
+		if (!$this->rHasVal('m')) {
+			$d = current($maps);
+			$mapId = $d['id'];
+		} else {
+			$mapId = $this->requestData['m'];
+		}
+
+
+		$index = $this->l2GetDiversityIndex($mapId,($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : null));
+
+		if ($this->rHasVal('selectedDatatypes')) {
+
+			foreach((array)$this->requestData['selectedDatatypes'] as $val)
+				$selectedDatatypes[$val] = true;
+
+		}
+
+		if ($this->rHasVal('selectedCell')) {
+		
+			$taxa = $this->l2DoSearchMap(
+				$this->requestData['m'],
+				(array)$this->requestData['selectedCell'],
+				($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : '*')
+			);
+		
+			$selectedCell = $this->requestData['selectedCell'];
+
+		}
+			
+		if (isset($taxa)) {
+
+			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
+			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+
+			$this->smarty->assign('taxa',
+				$this->makeLookupList(
+					$taxa,
+					'species',
+					'../species/taxon.php?id=%s'
+				)
+			);
+			
+		}
+
+		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
+
+		if (isset($selectedDatatypes)) $this->smarty->assign('selectedDatatypes',$selectedDatatypes);
+
+		$this->smarty->assign('index',$index);
+
+		$this->smarty->assign('mapId',$mapId);
+
+		$this->smarty->assign('maps',$maps);
+
+		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
+
+		$this->printPage();	
+	
+	}
+	
 	public function ajaxInterfaceAction()
 	{
 
@@ -1208,7 +1277,7 @@ class MapKeyController extends Controller
 		return $taxa;
 	
 	}
-
+/*
 	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
 	{
 
@@ -1279,7 +1348,75 @@ class MapKeyController extends Controller
 		return isset($d) ? $d : null;
 	
 	}
+*/
 
+	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
+	{
+
+		$ot = $this->getCache('map-l2TaxaOccurrencesCount');
+		
+		if (!$ot) {
+	
+			if ($this->l2HasTaxonOccurrencesCompacted()) {
+		
+				$ot = $this->models->L2OccurrenceTaxonCombi->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+						),
+						'columns' => 'taxon_id,square_numbers',
+						'fieldAsIndex' => 'taxon_id'
+					)
+				);
+				
+				foreach((array)$ot as $key => $val) {
+				
+					$ot[$key]['total'] = count((array)explode(',',$val['square_numbers']));
+						
+				}
+
+			} else {
+		
+				$ot = $this->models->L2OccurrenceTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+						),
+						'columns' => 'taxon_id,count(*) as total',
+						'group' => 'taxon_id',
+						'fieldAsIndex' => 'taxon_id'
+					)
+				);
+		
+			}
+			
+			$this->saveCache('map-l2TaxaOccurrencesCount', $ot);
+			
+		}
+		
+		if (isset($taxaToFilter)) {
+		
+			foreach((array)$ot as $key => $val) {
+			
+				if ($val['total']!=0 && isset($taxaToFilter[$key])) {
+				
+					$d[$key] = $taxaToFilter[$key];
+					$d[$key]['total'] = $val['total'];
+
+				}
+			
+			}
+			
+		} else {
+		
+			$d = $ot;
+		
+		}
+
+		return isset($d) ? $d : null;
+	
+	}
+	
 	private function l2GetFirstOccurrenceMapId($id)
 	{
 
@@ -1529,7 +1666,7 @@ class MapKeyController extends Controller
 		return $_SESSION['app']['user']['map']['l2CompactedData'];
 		
 	}
-
+	
 	private function _l2GetTaxonOccurrencesCompacted($d)
 	{
 	
@@ -1651,7 +1788,7 @@ class MapKeyController extends Controller
 		return $p;
 
 	}
-
+/*
 	private function l2GetDiversityIndex($mapId,$typeId=null)
 	{
 
@@ -1750,6 +1887,108 @@ class MapKeyController extends Controller
 
 		return $_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx];
 
+	}
+*/	
+	
+	private function l2GetDiversityIndex($mapId,$typeId=null)
+	{
+	
+		$sessIdx = 	$mapId.'-'.(isset($typeId) ? implode('-',$typeId) : '');
+		
+		$storedData = $this->getCache('map-divIndex-'. $mapId. '-' . $sessIdx);
+		
+		if ($storedData) return $storedData;
+	
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(),
+				'map_id' => $mapId
+		);
+
+		if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';
+
+		if ($this->l2HasTaxonOccurrencesCompacted()) {
+
+			//echo '<!--using compacted index-->';
+
+			$ot = $this->models->L2DiversityIndex->_get(
+					array(
+							'id' => $d,
+							'columns' => 'sum(diversity_count) as total, square_number',
+							'group' => 'square_number',
+							'order' => 'total desc',
+							'fieldAsIndex' => 'square_number',
+					)
+			);
+
+		} else {
+
+			//echo '<!--using uncompacted index (bad news)-->';
+
+			$ot = $this->models->L2OccurrenceTaxon->_get(
+					array(
+							'id' => $d,
+							'columns' => 'count(*) as total, square_number',
+							'group' => 'square_number',
+							'order' => 'total desc',
+							'fieldAsIndex' => 'square_number',
+					)
+			);
+
+		}
+
+		if ($ot) {
+			$d = current($ot);
+			$max = $d['total'];
+			end($ot);
+			$d = current($ot);
+			$min = $d['total'];
+		} else {
+			$max = $min = 0;
+		}
+			
+		$legend = array();
+
+		foreach((array)$ot as $key => $val) {
+				
+			$ot[$key]['pct'] = round(($val['total'] / $max) * 100);
+			$x = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
+			$ot[$key]['class'] = $x;
+			$legend[$x] = $x;
+
+
+		}
+			
+		ksort($legend);
+
+		$prevmin = $min;
+			
+		foreach((array)$legend as $key => $val) {
+			$thisMax =
+			$max +
+			(
+					($val - $this->controllerSettings['l2DiversityIndexNumOfClasses']) *
+					($max / $this->controllerSettings['l2DiversityIndexNumOfClasses'])
+			);
+
+			$legend[$key] =
+			array(
+					'min' => floor($prevmin),
+					'max' => floor($thisMax)
+			);
+				
+			$prevmin = $thisMax;
+		};
+			
+		$dataToStore = array(
+				'index' => $ot,
+				'min' => $min,
+				'max' => $max,
+				'legend' => $legend
+		);
+	
+		$this->saveCache('map-divIndex-'. $mapId. '-' . $sessIdx, $dataToStore);
+		
+		return $dataToStore;
 	}
 	
 }

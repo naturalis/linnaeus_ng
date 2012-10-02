@@ -282,12 +282,9 @@ class KeyController extends Controller
 	private function getKeyTree()
 	{
 
-		if (!$this->getCache('tree-keyTree')) {
-			
-			return $this->setKeyTree();
-		}
+		$storedData = $this->getCache('tree-keyTree');
 		
-		return $this->getCache('tree-keyTree');
+		return $storedData ? $storedData : $this->setKeyTree();
 
 	}
 	
@@ -794,6 +791,31 @@ class KeyController extends Controller
 	}
 */	
 
+	private function getAllTaxaInKey()
+	{
+	
+		if (!$this->getCache('key-keyTaxa')) {
+	
+			 $d = $this->models->ChoiceKeystep->_get(
+					array('id' =>
+							array(
+									'project_id' => $this->getCurrentProjectId(),
+									'res_taxon_id is not' => 'null'
+							),
+							'columns' => 'res_taxon_id'
+					)
+			);
+			
+			 $this->saveCache('key-keyTaxa', $d);
+			 
+			 return $d;
+	
+		}
+	
+		return $this->getCache('key-keyTaxa');
+	
+	}
+	
 	/* the rest */
 	private function getKeytype()
 	{
@@ -861,31 +883,6 @@ class KeyController extends Controller
 	{
 		return isset($_SESSION['app']['user']['key']['taxaState']) ? $_SESSION['app']['user']['key']['taxaState'] :
 			'remaining';
-	}
-	
-	private function getAllTaxaInKey()
-	{
-	
-		if (!$this->getCache('key-keyTaxa')) {
-	
-			 $d = $this->models->ChoiceKeystep->_get(
-					array('id' =>
-							array(
-									'project_id' => $this->getCurrentProjectId(),
-									'res_taxon_id is not' => 'null'
-							),
-							'columns' => 'res_taxon_id'
-					)
-			);
-			
-			 $this->saveCache('key-keyTaxa', $d);
-			 
-			 return $d;
-	
-		}
-	
-		return $this->getCache('key-keyTaxa');
-	
 	}
 	
 	
