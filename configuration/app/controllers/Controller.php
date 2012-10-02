@@ -92,6 +92,10 @@ class Controller extends BaseClass
         $this->setUrls();
 		
 		$this->setPaths();
+
+		$this->createCacheFolder();
+		
+		$this->checkWriteableDirectories();
 		
         $this->loadModels();
 
@@ -1818,7 +1822,7 @@ class Controller extends BaseClass
      * 
      * Sets the following:
      * full path ('/admin/views/projects/collaborators.php')
-     * application name ('admin')
+     * application name ('app')
      * controller's base name ('projects' for 'ProjectsController')
      * view name ('collaborators')
      *
@@ -2608,4 +2612,37 @@ class Controller extends BaseClass
 		return $this->getCache('species-tree');
 	
 	}
+
+	private function createCacheFolder()
+	{
+
+		$p = $this->getCurrentProjectId();
+
+		if (!$p) return;
+		
+		$cachePath = $this->generalSettings['lngFileRoot'].'www/admin/cache/'.$this->getProjectFSCode($p);
+	
+		if (!file_exists($cachePath)) mkdir($cachePath);	
+	
+	}
+
+	private function checkWriteableDirectories()
+	{
+
+		$p = $this->getCurrentProjectId();
+
+		if (!$p) return;
+		
+		$paths = array(
+			$this->generalSettings['lngFileRoot'].'www/admin/cache/'.$this->getProjectFSCode($p)
+		);
+		
+		foreach((array)$paths as $val) {
+
+			if (file_exists($val) && !is_writable($val)) die('FATAL: cannot write to '.$val);
+		
+		}
+
+	}
+	
 }
