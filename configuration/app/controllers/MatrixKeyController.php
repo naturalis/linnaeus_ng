@@ -413,7 +413,7 @@ class MatrixKeyController extends Controller
 		return isset($m[$id]) ? $m[$id] : null;
 
 	}
-
+/*
 	private function getTaxaInMatrix()
 	{
 
@@ -456,7 +456,51 @@ class MatrixKeyController extends Controller
 		return $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
 
 	}
+*/
+	
+	private function getTaxaInMatrix()
+	{
+		
+		$storedData = $this->getCache('matrix-taxa-' . $this->getCurrentMatrixId());
+		
+		if ($storedData) return $storedData;
+			
+		$mt = $this->models->MatrixTaxon->_get(
+				array(
+						'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'matrix_id' => $this->getCurrentMatrixId()
+						),
+						'columns' => 'taxon_id'
+				)
+		);
 
+		foreach((array)$mt as $key => $val) {
+				
+			$t = $this->models->Taxon->_get(
+					array(
+							'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'id' => $val['taxon_id']
+							),
+							'columns' => 'id,taxon,is_hybrid,rank_id'
+					)
+			);
+
+
+			$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id']);
+			$taxa[] = $t[0];
+
+		}
+
+		$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
+		
+		$this->saveCache('matrix-taxa-' . $this->getCurrentMatrixId(), isset($taxa) ? $taxa : null);
+		
+		return $taxa;
+	
+	}
+	
 	private function getMatricesInMatrix()
 	{
 
