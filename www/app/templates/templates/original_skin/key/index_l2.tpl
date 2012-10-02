@@ -33,9 +33,9 @@
 			"/>
 		{else}
 			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-				<a href="../key/index.php?choice={$v.id}">
+				<a href="../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}">
 			{elseif $v.res_taxon_id!=''}
-				<a href="../species/taxon.php?id={$v.res_taxon_id}">
+				<a href="../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}">
 			{/if}
 			<img
 				alt="{$v.choice_img}" 
