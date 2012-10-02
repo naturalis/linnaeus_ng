@@ -2561,10 +2561,8 @@ class Controller extends BaseClass
 	
 	
 	
-	// Ruud cache opzetje
-
 	// Timeout in seconds
-	// Key something like path in session
+	// Key something like path in session, e.g. 'species-tree'
 	protected function getCache ($key, $timeOut = false) 
 	{
 		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
@@ -2583,7 +2581,9 @@ class Controller extends BaseClass
 	protected function saveCache ($key, $data)
 	{
 		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
-		file_put_contents($cacheFile, serialize($data));	
+		if (!file_put_contents($cacheFile, serialize($data))) {
+			die('Cannot write to cache folder '. $_SESSION['app']['project']['urls']['cache']);
+		}	
 	}
 	
 	public function getTaxonTree($params=null)

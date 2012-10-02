@@ -516,7 +516,7 @@ class SpeciesController extends Controller
 	
 	private function getTaxonMedia($taxon=null,$id=null)
 	{
-		if ($mt = $this->getTaxonCategoryCache($taxon, 'media')) return $mt;
+		if ($mt = $this->getTaxonCategoryLastVisited($taxon, 'media')) return $mt;
 		
 		$d = array('project_id' => $this->getCurrentProjectId());
 		
@@ -566,7 +566,7 @@ class SpeciesController extends Controller
 
 		$this->customSortArray($mt, $sortBy);
 		
-		$this->setCache($taxon, 'media', $mt);
+		$this->setlastVisited($taxon, 'media', $mt);
 
 		return $mt;
 
@@ -575,7 +575,7 @@ class SpeciesController extends Controller
 	private function getTaxonLiterature($taxon)
 	{
 
-		if ($refs = $this->getTaxonCategoryCache($taxon, 'literature')) return $refs;
+		if ($refs = $this->getTaxonCategoryLastVisited($taxon, 'literature')) return $refs;
 		
 		$lt =  $this->models->LiteratureTaxon->_get(
 			array(
@@ -621,7 +621,7 @@ class SpeciesController extends Controller
 
 		$this->customSortArray($refs, $sortBy);
 
-		$this->setCache($taxon, 'literature', $refs);
+		$this->setlastVisited($taxon, 'literature', $refs);
 		
 		return $refs;
 
@@ -630,14 +630,14 @@ class SpeciesController extends Controller
 	private function getTaxonNames($taxon)
 	{
 
-		if ($names = $this->getTaxonCategoryCache($taxon, 'names')) return $names;
+		if ($names = $this->getTaxonCategoryLastVisited($taxon, 'names')) return $names;
 		
 		$names = array(
 			'synonyms' => $this->getTaxonSynonyms($taxon),
 			'common' => $this->getTaxonCommonNames($taxon)
 		);
 		
-		$this->setCache($taxon, 'names', $names);
+		$this->setlastVisited($taxon, 'names', $names);
 		
 		return $names;
 
@@ -960,7 +960,7 @@ class SpeciesController extends Controller
 	}
 
 
-	private function getTaxonCategoryCache ($taxon, $category) {
+	private function getTaxonCategoryLastVisited ($taxon, $category) {
 		if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
 			return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
 		}
@@ -976,7 +976,7 @@ class SpeciesController extends Controller
 		return false;
 	}
 	
-	private function setCache ($taxon, $category, $d) {
+	private function setlastVisited ($taxon, $category, $d) {
 		$_SESSION['app']['user']['species']['last_visited'][$taxon][$category] = $d;
 	}
 	
