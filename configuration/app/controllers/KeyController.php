@@ -84,7 +84,7 @@ class KeyController extends Controller
         $this->setPageName( _('Index'));
 		
 		// set the stored key tree (= compact hierarchical representation of the entire key)
-		$this->setKeyTree();
+		$this->getKeyTree();
 
 		// get user's decision path
 		$keyPath = $this->getKeyPath();
@@ -282,18 +282,20 @@ class KeyController extends Controller
 	private function getKeyTree()
 	{
 
-		return !$this->getCache('tree-keytree') ? null : $this->getCache('tree-keytree');
+		if (!$this->getCache('tree-keyTree')) {
+			
+			return $this->setKeyTree();
+		}
+		
+		return $this->getCache('tree-keyTree');
 
 	}
 	
 	private function setKeyTree()
 	{
 
-		// if tree already exists in session, do nothing	
-		if ($this->getKeyTree()!=null) return;
-		
 		// get stored tree from database
-		$d = $this->models->Keytree->_get(
+		$kt = $this->models->Keytree->_get(
 			array(
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId()
@@ -303,24 +305,30 @@ class KeyController extends Controller
 		);
 		
 		// if it doesn't exist, generate it anew (shouldn't happen!)
-		if (empty($d[0]['keytree'])) {
-			$this->saveCache('tree-keytree', $this->generateKeyTree());
+		if (empty($kt[0]['keytree'])) {
+			
+			$d = $this->generateKeyTree();
+		
 		}
 		// store tree in session
 		else {
 
 			$tree = '';
 			
-			foreach((array)$d as $val) {
+			foreach((array)$kt as $val) {
 			
 				$tree .= trim($val['keytree']);
 			
 			}
 			
-			$this->saveCache('tree-keytree', unserialize(utf8_decode($tree)));
+			$d = unserialize(utf8_decode($tree));
 
 		}
-
+		
+		$this->saveCache('tree-keyTree', $d);
+		
+		return $d;
+		
 	}
 	
 	private function findStepOrChoiceInTree($branch,$step=null,$choice=null)
@@ -389,7 +397,7 @@ class KeyController extends Controller
 		$this->tmp['results'] = array();
 
 		$this->findStepOrChoiceInTree(
-			$_SESSION['app']['user']['key']['keyTree'],
+			$this->getKeyTree(),
 			($this->rHasVal('step') ? $this->requestData['step'] : null),
 			($this->rHasVal('choice') ? $this->requestData['choice'] : null)
 		);
@@ -763,7 +771,7 @@ class KeyController extends Controller
 		}
 	
 	}
-
+/*
 	private function getAllTaxaInKey()
 	{
 	
@@ -784,7 +792,7 @@ class KeyController extends Controller
 		return $_SESSION['app']['user']['key']['keyTaxa'];
 		
 	}
-	
+*/	
 
 	/* the rest */
 	private function getKeytype()
@@ -829,7 +837,7 @@ class KeyController extends Controller
 		$this->tmp['results'] = array();
 
 		// ploughs the entire key
-		$this->reapSteps($_SESSION['app']['user']['key']['keyTree']);
+		$this->reapSteps($this->getKeyTree());
 
 		$this->smarty->assign(
 			'returnText',
@@ -854,6 +862,32 @@ class KeyController extends Controller
 		return isset($_SESSION['app']['user']['key']['taxaState']) ? $_SESSION['app']['user']['key']['taxaState'] :
 			'remaining';
 	}
+	
+	private function getAllTaxaInKey()
+	{
+	
+		if (!$this->getCache('key-keyTaxa')) {
+	
+			 $d = $this->models->ChoiceKeystep->_get(
+					array('id' =>
+							array(
+									'project_id' => $this->getCurrentProjectId(),
+									'res_taxon_id is not' => 'null'
+							),
+							'columns' => 'res_taxon_id'
+					)
+			);
+			
+			 $this->saveCache('key-keyTaxa', $d);
+			 
+			 return $d;
+	
+		}
+	
+		return $this->getCache('key-keyTaxa');
+	
+	}
+	
 	
 	
 	
