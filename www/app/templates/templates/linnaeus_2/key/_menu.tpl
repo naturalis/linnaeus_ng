@@ -23,7 +23,7 @@
 
 {if $useJavascriptLinks}
     {if $totalSteps > 1}
-        <a class="navigation-icon" id="first-icon" href="../key/" title="{t}Return to first step{/t}">{t}First{/t}</a>
+        <a class="navigation-icon" id="first-icon" onclick="keyDoStep($keypath.0.id);" title="{t}Return to first step{/t}">{t}First{/t}</a>
     {else}
         <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
     {/if} 
@@ -37,7 +37,7 @@
     class="navigation-icon" />{t}Previous{/t}</span>
 {else}
     {if $totalSteps > 1}
-        <a class="navigation-icon" id="first-icon" href="../key/" title="{t}Return to first step{/t}">{t}First{/t}</a>
+        <a class="navigation-icon" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
         <a class="navigation-icon" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
         title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
         {t}Previous{/t}</a>
