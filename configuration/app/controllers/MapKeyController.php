@@ -1483,7 +1483,7 @@ class MapKeyController extends Controller
 		return null;
 
 	}
-
+/*
 	private function l2GetMaps($id=null)
 	{
 
@@ -1577,7 +1577,103 @@ class MapKeyController extends Controller
 		return isset($id) ? $_SESSION['app']['user']['map']['l2Maps'][$id] : $_SESSION['app']['user']['map']['l2Maps'];
 	
 	}
+*/
 
+	private function l2GetMaps($id=null)
+	{
+
+		$m = $this->getCache('map-l2Maps');
+		
+		if (!$m) {
+		
+			$m = $this->models->L2Map->_get(
+				array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'fieldAsIndex' => 'id',
+					'order' => 'id'
+				)
+			);
+	
+			foreach((array)$m as $key => $val) {
+			
+				$m[$key]['mapExists'] = false;
+	
+				if (!empty($val['image'])) {
+				
+					if (file_exists($_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'])) {
+	
+						$m[$key]['mapExists'] = true;
+					
+						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'];
+					
+					} else {
+	
+						$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['systemL2Maps'].$val['image']);
+	
+						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['systemL2Maps'].$val['image'];
+					
+					}
+				
+				} else {
+				
+					$mapName = strtolower($val['name']).'.gif';
+				
+					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['systemL2Maps'].$mapName);
+	
+					$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['systemL2Maps'].$mapName;
+	
+				}
+	
+				if ($m[$key]['mapExists']) {
+					
+					$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
+	
+					if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
+							$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
+					
+						$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
+							
+						$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
+						$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
+							
+						// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
+						$m[$key]['width'] = ($val['cols']*($m[$key]['cellWidth']+1))-1;
+						$m[$key]['height'] = ($val['rows']*($m[$key]['cellHeight']+1))-1;
+						$m[$key]['resized'] = 1;
+							
+					} else {
+	
+						$m[$key]['width'] = $m[$key]['size'][0];
+						$m[$key]['height'] = $m[$key]['size'][1];
+						$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
+						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
+						$m[$key]['resized'] = 0;
+					}
+				}
+	
+				$d = json_decode($val['coordinates']);
+	
+				$m[$key]['coordinates'] = array(
+					'topLeft' => array(
+						'lat' => (string)$d->topLeft->lat,
+						'long' => (string)$d->topLeft->long
+					),
+					'bottomRight' => array(
+						'lat' => (string)$d->bottomRight->lat,
+						'long' => (string)$d->bottomRight->long
+					),
+					'original' => $val['coordinates']
+				);
+			
+			}
+			
+			$this->saveCache('map-l2Maps', $m);
+		}
+		
+		return isset($id) ? $m[$id] : $m;
+	
+	}
+	
 	private function l2GetTaxonOccurrences($id,$mapId,$typeId=null)
 	{
 
