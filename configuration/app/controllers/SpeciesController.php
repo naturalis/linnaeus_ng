@@ -174,6 +174,9 @@ class SpeciesController extends Controller
 
 				$this->setPageName(sprintf(_('Species module: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
 
+				$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
+
+
 			} else {
 
 				$this->setPageName(sprintf(_('Higher taxa: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
@@ -211,7 +214,7 @@ class SpeciesController extends Controller
 					)
 			);
 			
-			$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
+			//$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
 
 		} else {
 

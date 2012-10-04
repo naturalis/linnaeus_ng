@@ -513,18 +513,6 @@ function chkPIDInLinks(pid,par) {
 		
 	});
 
-	$('[onclick^=window\\.location]').each(function() {
-
-//		var f = $(this).attr('onclick');
-//		alert($(this).val());
-
-//		var n = f.match(/\"*\"/g);
-//		alert(dumpObj(f));
-	
-//		chkPIDInLink(this,p);
-		
-	});
-
 }
 
 

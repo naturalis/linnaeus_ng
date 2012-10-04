@@ -1,5 +1,4 @@
-{$session|@print_r}
-
+{*$session|@print_r*}
 <div id="top-strip">
     <div id="language-change">
         {if $languages|@count>1}
