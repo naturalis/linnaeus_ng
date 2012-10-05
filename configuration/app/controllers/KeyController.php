@@ -168,12 +168,6 @@ class KeyController extends Controller
 
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
-		$this->showLowerTaxon=null;
-
-		$this->getTaxonTree(array('includeOrphans' => false));// !isset($this->treeList)));
-
-		$this->smarty->assign('taxa',$this->getTreeList());
-
 		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
 		
 		$this->setCurrentKeyStepId($step['id']);
@@ -720,19 +714,45 @@ class KeyController extends Controller
 		$this->sawOffABranch($this->getKeyTree(),$step);
 		$this->reapFruits($this->tmp['branch']);
 
-		$excludedTaxa = array();
+		$includedTaxa = $excludedTaxa = array();
 	
 		$allTaxa = $this->getAllTaxaInKey();
 
 		foreach((array)$allTaxa as $val) {
 		
-			if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) $excludedTaxa[$val['res_taxon_id']] = $val['res_taxon_id'];
+			if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) {
+
+				$d = $this->getTaxonById($val['res_taxon_id']);
+
+				$excludedTaxa[$val['res_taxon_id']] = 
+					array(
+						'id' => $d['id'],
+						'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+						'is_hybrid' => $d['is_hybrid']
+					);
+			}
 		
 		}
+
+		foreach((array)$this->tmp['remaining'] as $val) {
+
+			$d = $this->getTaxonById($val);
+
+			$includedTaxa[$val] = 
+				array(
+					'id' => $d['id'],
+					'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+					'is_hybrid' => $d['is_hybrid']
+				);
+		
+		}
+
+		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
+		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
 		
 		return
 			array(
-				'remaining' => $this->tmp['remaining'],
+				'remaining' => $includedTaxa,
 				'excluded' => $excludedTaxa
 			);
 
