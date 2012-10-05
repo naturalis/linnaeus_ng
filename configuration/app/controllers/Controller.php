@@ -2130,6 +2130,10 @@ class Controller extends BaseClass
 
 			if (is_array($d) && isset($d[$key])) $dir = $d[$key];
 
+			// should be parametrized
+			$a[$val] = strip_tags($a[$val]);
+			$b[$val] = strip_tags($b[$val]);
+
 			if ($c != 's') {
 				
 				$a[$val] = strtolower($a[$val]);
