@@ -92,7 +92,7 @@ allLookupNavigateOverrideDialogTitle('Taxa in that square');
 allLookupShowDialog('{$taxa}');
 {/if}
 <!-- /added ui dialog 2012.05.30 -->
-
+l2MapIEFix();
 {/if}
 {literal}
 $("#mapTable").mousemove(function(event) {

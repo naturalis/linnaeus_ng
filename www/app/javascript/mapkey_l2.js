@@ -183,5 +183,12 @@ function l2DiversityCellMouseOver(i) {
 
 }
 
+function l2MapIEFix() {
 
+	if (($.browser.msie && $.browser.version<=9)){
+	
+		$('td[id^=cell-]').removeClass('mapCell').addClass('mapCell-IElt9compat');
 
+	}
+
+}
