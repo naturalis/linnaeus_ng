@@ -476,3 +476,8 @@ a:hover,.a:hover {
 	padding:0px 5px 0px 5px;
 }
 
+#message-container {
+	color: red;
+	font-weight:bold;
+	padding-left:10px;
+}

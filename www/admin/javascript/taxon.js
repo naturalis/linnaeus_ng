@@ -400,7 +400,7 @@ function taxonSaveData(id,language,page,content,editorName) {
 			} else
 			if (data.indexOf('<msg>')>=0) {
 
-				allSetMessage(data.replace('<msg>',''));
+				allSetMessage(data.replace('<msg>',''),2000);
 
 			} else {
 
