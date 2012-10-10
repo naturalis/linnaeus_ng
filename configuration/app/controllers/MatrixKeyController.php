@@ -419,7 +419,7 @@ class MatrixKeyController extends Controller
 		
 		$storedData = $this->getCache('matrix-taxa-' . $this->getCurrentMatrixId());
 		
-//		if ($storedData) return $storedData;
+		if ($storedData) return $storedData;
 			
 		$mt = $this->models->MatrixTaxon->_get(
 				array(
