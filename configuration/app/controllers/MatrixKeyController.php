@@ -413,57 +413,13 @@ class MatrixKeyController extends Controller
 		return isset($m[$id]) ? $m[$id] : null;
 
 	}
-/*
-	private function getTaxaInMatrix()
-	{
 
-		if (!isset($_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()])) {
-
-			$mt = $this->models->MatrixTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'matrix_id' => $this->getCurrentMatrixId()
-					),
-					'columns' => 'taxon_id'
-				)
-			);
-	
-			foreach((array)$mt as $key => $val) {
-			
-				$t = $this->models->Taxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => $val['taxon_id']
-						),
-						'columns' => 'id,taxon,is_hybrid,rank_id'
-					)
-				);
-	
-				
-				$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id']);
-				$taxa[] = $t[0];
-	
-			}
-
-			$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
-
-			$_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()] = isset($taxa) ? $taxa : null;
-			
-		}
-
-		return $_SESSION['app']['user']['matrix']['taxa'][$this->getCurrentMatrixId()];
-
-	}
-*/
-	
 	private function getTaxaInMatrix()
 	{
 		
 		$storedData = $this->getCache('matrix-taxa-' . $this->getCurrentMatrixId());
 		
-		if ($storedData) return $storedData;
+//		if ($storedData) return $storedData;
 			
 		$mt = $this->models->MatrixTaxon->_get(
 				array(
@@ -487,9 +443,12 @@ class MatrixKeyController extends Controller
 					)
 			);
 
-
-			$t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id']);
-			$taxa[] = $t[0];
+			$taxa[] = 
+				array(
+					'id' => $t[0]['id'],
+					'h' => $t[0]['is_hybrid'],
+					'l' => $t[0]['taxon'] //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+				);
 
 		}
 
@@ -519,7 +478,16 @@ class MatrixKeyController extends Controller
 
 			$d = $this->getMatrix($val['ref_matrix_id']);
 			
-			if (isset($d)) $matrices[$val['ref_matrix_id']] = $d;
+			if (isset($d)) {
+
+				$matrices[$val['ref_matrix_id']] = 
+					array(
+						'id' => $d['id'],
+						'l' => $d['name'],
+						'type' => 'mtx'
+					);
+
+			}
 
 		}
 
@@ -739,7 +707,9 @@ class MatrixKeyController extends Controller
 
 		}
 
-		$item['score'] = round(($item['hits'] / count((array)$states)) * 100);
+		$item['s'] = round(($item['hits'] / count((array)$states)) * 100);
+		
+		unset($item['hits']);
 
 		return $item;
 	
@@ -784,7 +754,7 @@ class MatrixKeyController extends Controller
 	
 		usort($results,array($this,'sortMatrixScores'));
 
-		array_walk($results, create_function('&$v', '$v["score"] = $v["score"]."%";'));	
+		//array_walk($results, create_function('&$v', '$v["s"] = $v["s"]."%";'));	
 
 		return $results;
 
@@ -793,10 +763,10 @@ class MatrixKeyController extends Controller
 	private function sortMatrixScores($a,$b)
 	{
 	
-		if ($a['score'] == $b['score']) {
+		if ($a['s'] == $b['s']) {
 	
-			$aa = (isset($a['type']) && $a['type']=='matrix') ? strtolower($a['name']) : strtolower($a['taxon']);
-			$bb = (isset($b['type']) && $b['type']=='matrix') ? strtolower($b['name']) : strtolower($b['taxon']);
+			$aa = strtolower(strip_tags($a['l']));
+			$bb = strtolower(strip_tags($b['l']));
 		
 			if ($aa==$bb) return 0;
 	
@@ -804,7 +774,7 @@ class MatrixKeyController extends Controller
 	
 		}
 	
-		return ($a['score'] > $b['score']) ? -1 : 1;
+		return ($a['s'] > $b['s']) ? -1 : 1;
 	
 	}
 	

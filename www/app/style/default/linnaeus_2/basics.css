@@ -3,7 +3,7 @@ html {
     background: #edf4f9;
 }
 
-body { 
+body {
     text-align: center;
 }
 
@@ -12,11 +12,11 @@ body {
     font-size: 11px;
     width: 100%;
     height: 20px;
-    background: #707070; 
+    background: #707070;
     background: -moz-linear-gradient(top,  #707070 0%, #000000 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#707070), color-stop(100%,#000000)); 
-    background: -webkit-linear-gradient(top,  #707070 0%,#000000 100%); 
-    background: -o-linear-gradient(top,  #707070 0%,#000000 100%); 
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#707070), color-stop(100%,#000000));
+    background: -webkit-linear-gradient(top,  #707070 0%,#000000 100%);
+    background: -o-linear-gradient(top,  #707070 0%,#000000 100%);
     background: -ms-linear-gradient(top,  #707070 0%,#000000 100%);
     background: linear-gradient(top,  #707070 0%,#000000 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707070', endColorstr='#000000',GradientType=0 );
@@ -126,7 +126,7 @@ body {
     margin: 0 10px 2px 2px;
     vertical-align: bottom;
 	cursor: pointer;
-	height: 16px; 
+	height: 16px;
 	width: 16px;
 }
 
@@ -158,13 +158,13 @@ body {
     height: 22px;
     clear: both;
     background: #707070;
-    background: -moz-linear-gradient(top,  #707070 0%, #000000 100%); /
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#707070), color-stop(100%,#000000)); 
-    background: -webkit-linear-gradient(top,  #707070 0%,#000000 100%); 
-    background: -o-linear-gradient(top,  #707070 0%,#000000 100%); 
-    background: -ms-linear-gradient(top,  #707070 0%,#000000 100%); 
+    background: -moz-linear-gradient(top,  #707070 0%, #000000 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#707070), color-stop(100%,#000000));
+    background: -webkit-linear-gradient(top,  #707070 0%,#000000 100%);
+    background: -o-linear-gradient(top,  #707070 0%,#000000 100%);
+    background: -ms-linear-gradient(top,  #707070 0%,#000000 100%);
     background: linear-gradient(top,  #707070 0%,#000000 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707070', endColorstr='#000000',GradientType=0 ); 
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#707070', endColorstr='#000000',GradientType=0 );
 }
 
 #footer-container p {
@@ -177,7 +177,7 @@ body {
 
 /* Menus */
 
-#main-menu {  
+#main-menu {
     font-family: "Lucida Grande", "Lucida Sans", Tahoma, Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", sans-serif;
     font-size: 12px;
 }
@@ -196,8 +196,8 @@ body {
     border-bottom: 1px solid #000;
 }
 
-#main-menu ul li { 
-    float: left; 
+#main-menu ul li {
+    float: left;
 }
 
 #main-menu ul li a {
@@ -222,13 +222,13 @@ body {
 }
 
 #main-menu ul li a.home, #main-menu ul li a.home-selected {
-    cursor: pointer; 
+    cursor: pointer;
     width: 27px;
     height: 22px;
 	padding:0;
 }
 
-#categories {  
+#categories {
     font-family: "Lucida Grande", "Lucida Sans", Tahoma, Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", sans-serif;
     font-size: 11px;
     padding: 0 20px;
@@ -242,8 +242,8 @@ body {
     overflow: hidden;
 }
 
-#categories ul li { 
-    float: left; 
+#categories ul li {
+    float: left;
 }
 
 #categories ul li a, #categories ul li a.category-no-content:hover {
@@ -346,9 +346,9 @@ a:hover, .internal-link:hover {
 	font-style: italic;
 }
 
-/* 
+/*
 	Navigation icons, grid for multimedia, etc
-	Icons are also partly included in utilities/dynamic-css.tpl 
+	Icons are also partly included in utilities/dynamic-css.tpl
 */
 .navigation-icon-wrapper {
     float: right;
@@ -378,7 +378,7 @@ a:hover, .internal-link:hover {
 
 #allLookupDialogContentName {
 	overflow-y: scroll;
-	height: 300px;	
+	height: 300px;
 }
 
 #back-to-search {
@@ -456,5 +456,3 @@ table#media-grid td:first-child {
 .inline-image:hover, .inline-audio:hover, .inline-video:hover {
     text-decoration: underline;
 }
-
-
