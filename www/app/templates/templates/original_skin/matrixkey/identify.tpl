@@ -36,10 +36,10 @@
 			{t}Result of this combination of characters{/t}<br />
 			<select size="5" id="scores">
 			{foreach from=$taxa key=k item=v}{$v.label}
-			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
+			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
 			{/foreach}
 			{foreach from=$matrices key=k item=v}
-			<option ondblclick="goMatrix({$v.id})" value="{$v.id}">Matrix: {$v.name}</option>
+			<option ondblclick="goMatrix({$v.id})" value="{$v.id}">Matrix: {$v.l}</option>
 			{/foreach}
 			</select>
 		</div>
@@ -72,7 +72,7 @@ $(document).ready(function(){
 	setSelectedState('{$v.val}'{if $v.type=='c'},{$v.id},{$v.characteristic_id},'{$v.label|addslashes}'{/if});
 {/foreach}
 	getScores();
-	showMatrixResults();
+//	showMatrixResults();
 	highlightSelected();
 {/if}
 

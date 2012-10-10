@@ -291,7 +291,7 @@ function setFreeValues(vals) {
 	else
 		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c.label+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
 
-	getScores();
+	//getScores();
 
 }
 
@@ -338,8 +338,9 @@ function addSelected(caller) {
 	
 		}
 		
-		getScores();
-
+		//getScores();
+		highlightSelected();
+		
 	}
 	
 }
@@ -406,6 +407,7 @@ function deleteSelected() {
 	getScores($('#selected').children().length==0 ? 'clear' : null);
 	
 	removeHighlight();
+
 	highlightSelected();
 
 }
@@ -416,7 +418,7 @@ function clearSelected() {
 
 	selected = selected.splice(0,0);
 
-	getScores('clear');
+	//getScores('clear');
 	
 	removeHighlight();
 
@@ -437,7 +439,7 @@ function getScores(action) {
 		opt = -1;
 
 	}
-
+	
 	getData('get_taxa',opt,'fillScores');
 
 }
@@ -448,29 +450,34 @@ function fillScores(obj,char) {
 
 	if (!obj) return;
 
-	for(var i=0;i<obj.length;i++) {
+    var textToInsert = [];
 
-		$('#scores').
-			append('<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
-				(obj[i].score!=undefined ? obj[i].score+': ' : '')+
-				(obj[i].type=='matrix' ? _('Matrix: ')+obj[i].name : obj[i].taxon)+'</option>').
-			val(obj[i].id);
+	for (var i=0;i<obj.length;i++) {
+		
+        textToInsert[i++] =
+			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
+				(obj[i].s!=undefined ? obj[i].s+'%: ' : '')+
+				(obj[i].type=='mtx' ? _('Matrix: ') : '')+obj[i].l+'</option>';
+     
+    }
 
-	}
-	
+	$('#scores').append(textToInsert.join(''));
+
 	highlightSelected();
 	
 	$('#scores option').each(function(i){
 		$(this).attr('selected','');
 	});	
+	
+	showMatrixResults();
 
 }
 
 function showMatrixResults() {
-
+	
 	$('#search-pattern').css('display','none');
 	$('#search-results').css('display','block');
-	getData('store_showstate_results',-1);
+	getData('store_showstate_results',-1); // storing state
 
 }
 
@@ -478,7 +485,7 @@ function showMatrixPattern() {
 
 	$('#search-pattern').css('display','block');
 	$('#search-results').css('display','none');
-	getData('store_showstate_pattern',-1);
+	getData('store_showstate_pattern',-1); // storing state
 
 }
 
@@ -513,11 +520,24 @@ function fillTaxonStates(obj,char) {
 
 	if (!obj) return;
 
+	/*
 	for(var i in obj) {
 
 		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
 
 	}
+	*/
+	
+    var textToInsert = [];
+
+	for(var i in obj) {
+		
+        textToInsert[i++] = '<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>';
+     
+    }
+
+	$('#states').append(textToInsert.join(''));	
+	
 	$('#states').removeClass().addClass('visible');
 	$('#help-text').removeClass().addClass('invisible');
 }
