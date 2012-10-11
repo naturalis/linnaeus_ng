@@ -40,15 +40,11 @@ class LiteratureController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
         
-        parent::__construct();
+        parent::__construct($p);
 		
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-
     }
 
     /**

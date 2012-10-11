@@ -38,14 +38,10 @@ class IntroductionController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
 
-        parent::__construct();
-
-		$this->checkForProjectId();
-		
-		$this->setCssFiles();
+        parent::__construct($p);
 
     }
 

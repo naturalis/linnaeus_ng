@@ -35,17 +35,11 @@ class IndexController extends Controller
      *
      * @access     public
      */
-    public function __construct ($params=null)
+    public function __construct($p=null)
     {
 	
-		$this->setControllerParams($params);
+        parent::__construct($p);
 
-        parent::__construct();
-
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-		
 		$this->setIndexTabs();
 
     }
@@ -203,10 +197,8 @@ class IndexController extends Controller
 		}
 
 		$this->showLowerTaxon = ($this->getTaxonType()=='lower');
-
-		$this->getTaxonTree(array('includeOrphans' => false));
 		
-		$names = $taxa = (array)$this->getTreeList();
+		$names = $taxa = (array)$this->buildTaxonTree();
 		
 		if ($this->getTaxonType()=='lower') {
 
@@ -418,8 +410,7 @@ class IndexController extends Controller
 		// Check taxa
 		$this->showLowerTaxon = null;
 		$_SESSION['app']['user']['indexModule']['hasSpecies'] = $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 0;
-		$this->getTaxonTree(array('includeOrphans' => false));
-		$taxa = (array)$this->getTreeList();
+		$taxa = $this->buildTaxonTree();
 		foreach ($taxa as $taxon) {
 			if ($taxon['lower_taxon']==1 && $taxon['is_empty']==0) $_SESSION['app']['user']['indexModule']['hasSpecies'] = 1;
 			if ($taxon['lower_taxon']==0 && $taxon['is_empty']==0) $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 1;

@@ -43,19 +43,10 @@ class LinnaeusController extends Controller
      *
      * @access     public
      */
-    public function __construct ($params=null)
+    public function __construct($p=null)
     {
 
-		$this->setControllerParams($params);
-
-        parent::__construct();
-		
-		if ($this->getCheckForProjectId()) {
-
-			$this->checkForProjectId();
-			$this->setCssFiles();
-			
-		}
+        parent::__construct($p);
 
     }
 

@@ -2,7 +2,7 @@
 
 require_once ('../../../../configuration/app/controllers/UtilitiesController.php');
 
-$c = new UtilitiesController();
+$c = new UtilitiesController(array('checkForProjectId'=>false));
 
 $c->getNamesAction();
 

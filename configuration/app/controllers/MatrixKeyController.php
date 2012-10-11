@@ -46,14 +46,10 @@ class MatrixKeyController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
         
-        parent::__construct();
-
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
+        parent::__construct($p);
 
     }
 
@@ -331,28 +327,7 @@ class MatrixKeyController extends Controller
 
 	}
 
-	private function checkMatrixIdOverride()
-	{
-
-		if ($this->rHasVal('mtrx'))  $this->setCurrentMatrix($this->requestData['mtrx']);
-
-	}
-
-	private function getCurrentMatrix()
-	{
-	
-		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
-
-	}
-
-	private function setCurrentMatrix($id)
-	{
-	
-		$_SESSION['app']['user']['matrix']['active'] = $this->getMatrix($id);
-
-	}
-
-	private function getMatrices()
+	public function getMatrices()
 	{
 
 		if (empty($_SESSION['app']['user']['matrix']['matrices'])) {
@@ -394,30 +369,12 @@ class MatrixKeyController extends Controller
 	
 	}
 
-	private function getMatrixCount()
+	public function getTaxaInMatrix($matrixId=null)
 	{
-
-		$m = $this->getMatrices();
-
-		return count((array)$m);
 	
-	}
-
-	private function getMatrix($id)
-	{
-
-		if (!isset($id)) return;
+		$matrixId = is_null($matrixId) ? $this->getCurrentMatrixId() : $matrixId;
 		
-		$m = $this->getMatrices();
-		
-		return isset($m[$id]) ? $m[$id] : null;
-
-	}
-
-	private function getTaxaInMatrix()
-	{
-		
-		$storedData = $this->getCache('matrix-taxa-' . $this->getCurrentMatrixId());
+		$storedData = $this->getCache('matrix-taxa-' . $matrixId);
 		
 		if ($storedData) return $storedData;
 			
@@ -425,7 +382,7 @@ class MatrixKeyController extends Controller
 				array(
 						'id' => array(
 								'project_id' => $this->getCurrentProjectId(),
-								'matrix_id' => $this->getCurrentMatrixId()
+								'matrix_id' => $matrixId
 						),
 						'columns' => 'taxon_id'
 				)
@@ -454,12 +411,53 @@ class MatrixKeyController extends Controller
 
 		$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
 		
-		$this->saveCache('matrix-taxa-' . $this->getCurrentMatrixId(), isset($taxa) ? $taxa : null);
+		$this->saveCache('matrix-taxa-' . $matrixId, isset($taxa) ? $taxa : null);
 		
 		return $taxa;
 	
 	}
 	
+	private function checkMatrixIdOverride()
+	{
+
+		if ($this->rHasVal('mtrx'))  $this->setCurrentMatrix($this->requestData['mtrx']);
+
+	}
+
+	private function getCurrentMatrix()
+	{
+	
+		return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
+
+	}
+
+	private function setCurrentMatrix($id)
+	{
+	
+		$_SESSION['app']['user']['matrix']['active'] = $this->getMatrix($id);
+
+	}
+
+	private function getMatrixCount()
+	{
+
+		$m = $this->getMatrices();
+
+		return count((array)$m);
+	
+	}
+
+	private function getMatrix($id)
+	{
+
+		if (!isset($id)) return;
+		
+		$m = $this->getMatrices();
+		
+		return isset($m[$id]) ? $m[$id] : null;
+
+	}
+
 	private function getMatricesInMatrix()
 	{
 
