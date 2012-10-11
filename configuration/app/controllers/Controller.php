@@ -829,9 +829,9 @@ class Controller extends BaseClass
 	public function getCurrentLanguageId()
 	{
 
-		if (empty($_SESSION['app']['user']['activeLanguageId'])) $this->setCurrentLanguageId();
+		if (empty($_SESSION['app']['project']['activeLanguageId'])) $this->setCurrentLanguageId();
 
-        return $_SESSION['app']['user']['activeLanguageId'];
+        return $_SESSION['app']['project']['activeLanguageId'];
 
 	}
 
@@ -847,16 +847,16 @@ class Controller extends BaseClass
 
 		if ($l) {
 
-			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $l;
+			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['project']['activeLanguageId'] != $l;
 
-			$_SESSION['app']['user']['activeLanguageId'] = $l;
+			$_SESSION['app']['project']['activeLanguageId'] = $l;
 
 		} else
 		if ($this->rHasVal('languageId')) {
 
-			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['user']['activeLanguageId'] != $this->requestData['languageId'];
+			$_SESSION['app']['user']['languageChanged'] = $_SESSION['app']['project']['activeLanguageId'] != $this->requestData['languageId'];
 
-			$_SESSION['app']['user']['activeLanguageId'] = $this->requestData['languageId'];
+			$_SESSION['app']['project']['activeLanguageId'] = $this->requestData['languageId'];
 
 		} else {
 
@@ -864,9 +864,9 @@ class Controller extends BaseClass
 
 		}
 		
-		if (!isset($_SESSION['app']['user']['activeLanguageId'])) {
+		if (!isset($_SESSION['app']['project']['activeLanguageId'])) {
 
-			$_SESSION['app']['user']['activeLanguageId'] = $this->getDefaultLanguageId();
+			$_SESSION['app']['project']['activeLanguageId'] = $this->getDefaultLanguageId();
 			$_SESSION['app']['user']['languageChanged'] = true;
 
 		}
@@ -1063,7 +1063,7 @@ class Controller extends BaseClass
 		
 		$rankId = $r['ranks'][$projRankId]['rank_id'];
 		$rankName = ucfirst($r['ranks'][$projRankId]['labels'][$this->getCurrentLanguageId()]);
-		
+
 		$g = $s = $i = false;
 		$elements = explode(' ', $name);
 			if (count($elements) > 2) {
