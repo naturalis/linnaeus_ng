@@ -37,15 +37,11 @@ class ModuleController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
 
         parent::__construct();
 	
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-
     }
 
     /**
@@ -56,7 +52,7 @@ class ModuleController extends Controller
     public function __destruct ()
     {
         
-        parent::__destruct();
+        parent::__construct($p);
     
     }
 

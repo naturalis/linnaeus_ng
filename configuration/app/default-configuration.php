@@ -70,6 +70,7 @@ class configuration
 			//'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'urlNoProjectId' => '../../../app/views/linnaeus/no_project.php',
 			'urlUploadedProjectMedia' => '../../../admin/media/project/',
+			'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
 			'lngFileRoot' => $this->_appFileRoot,
             'maxSessionHistorySteps' => 10, 
             'controllerIndexNameExtension' => '-index.php', 
@@ -96,7 +97,8 @@ class configuration
 			),
 			'useJavascriptLinks' => false,
 			'useGlossaryPostIts' => false,
-			'addedProjectIDParam' => 'epi'
+			'addedProjectIDParam' => 'epi',
+			'splashDelay' => 5 //seconds
         );
     
     }

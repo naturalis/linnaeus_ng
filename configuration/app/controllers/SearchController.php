@@ -68,14 +68,10 @@ class SearchController extends Controller
      *
      * @access     public
      */
-    public function __construct ($params=null)
+    public function __construct($p=null)
     {
 
-        parent::__construct();
-
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
+       parent::__construct($p);
 
     }
 

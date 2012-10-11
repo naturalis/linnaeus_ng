@@ -46,19 +46,11 @@ class KeyController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
         
-        parent::__construct();
+        parent::__construct($p);
 		
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-
-        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
-		
-		$this->smarty->assign('keyType',$this->getSetting('keytype'));
-
     }
 
     /**
@@ -161,6 +153,10 @@ class KeyController extends Controller
 		} 
 
 		$taxa = $this->getTaxonDivision($step['id']);
+
+        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
+		
+		$this->smarty->assign('keyType',$this->getSetting('keytype'));
 		
 		$this->smarty->assign('taxaState',$this->getTaxaState());
 
@@ -212,6 +208,10 @@ class KeyController extends Controller
         	$this->setTaxaState('excluded');
         
         }
+
+        $this->smarty->assign('keyPathMaxItems', $this->controllerSettings['keyPathMaxItems']);
+		
+		$this->smarty->assign('keyType',$this->getSetting('keytype'));
         
         $this->printPage();
     
@@ -226,53 +226,7 @@ class KeyController extends Controller
 	}
 
 
-	/* it's in the trees */
-/*
-	private function getKeyTree()
-	{
-
-		return (@is_null($_SESSION['app']['user']['key']['keyTree']) ? null : $_SESSION['app']['user']['key']['keyTree']);
-
-	}
-
-	private function setKeyTree()
-	{
-
-		// if tree already exists in session, do nothing	
-		if ($this->getKeyTree()!=null) return;
-
-		// get stored tree from database
-		$d = $this->models->Keytree->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'order' => 'chunk'
-			)
-		);
-		
-		// if it doesn't exist, generate it anew (shouldn't happen!)
-		if (empty($d[0]['keytree'])) {
-			$_SESSION['app']['user']['key']['keyTree'] = $this->generateKeyTree();
-		}
-		// store tree in session
-		else {
-
-			$tree = '';
-			
-			foreach((array)$d as $val) {
-			
-				$tree .= trim($val['keytree']);
-			
-			}
-			
-			$_SESSION['app']['user']['key']['keyTree'] = unserialize(utf8_decode($tree));
-
-		}
-
-	}
-*/	
-
+	/* it's in the trees (it's coming this way!) */
 	private function getKeyTree()
 	{
 
@@ -282,7 +236,7 @@ class KeyController extends Controller
 
 	}
 	
-	private function setKeyTree()
+	public function setKeyTree()
 	{
 
 		// get stored tree from database
@@ -788,30 +742,8 @@ class KeyController extends Controller
 		}
 	
 	}
-/*
-	private function getAllTaxaInKey()
-	{
-	
-		if (!isset($_SESSION['app']['user']['key']['keyTaxa'])) {
-	
-			$_SESSION['app']['user']['key']['keyTaxa'] = $this->models->ChoiceKeystep->_get(
-				array('id' => 
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'res_taxon_id is not' => 'null'
-					),
-					'columns' => 'res_taxon_id'
-				)
-			);
-	
-		}
-		
-		return $_SESSION['app']['user']['key']['keyTaxa'];
-		
-	}
-*/	
 
-	private function getAllTaxaInKey()
+	public function getAllTaxaInKey()
 	{
 	
 		if (!$this->getCache('key-keyTaxa')) {
@@ -905,130 +837,4 @@ class KeyController extends Controller
 			'remaining';
 	}
 	
-	
-	
-	
-	
-	
-	/* graveyard */
-	/*
-	private function setStepsPerTaxon($choice)
-	{
-
-		$this->_taxaStepList[] = $choice['keystep_id'];
-
-		$cks = 
-			isset($_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']]) ? 
-				$_SESSION['app']['user']['key']['choiceKeysteps'][$choice['keystep_id']] : 
-				null;
-
-		//// get choices that have the keystep the choice belongs to as target
-		//$cks = $this->models->ChoiceKeystep->_get(
-		//	array('id' => 
-		//		array(
-		//			'project_id' => $this->getCurrentProjectId(),
-		//			'res_keystep_id' => $choice['keystep_id']
-		//		)
-		//	)
-		//);
-		
-		foreach((array)$cks as $key => $val) $this->setStepsPerTaxon($val);
-	
-	}
-	
-	private function getTaxonDivision($forceLookup=false)
-	{
-
-		if(!isset($_SESSION['app']['user']['key']['taxonDivision']) || $forceLookup) {
-
-			// get all choices that have a taxon as result
-			$ck = $this->models->ChoiceKeystep->_get(
-				array('id' => 
-					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'res_taxon_id is not' => 'null'
-					)
-				)
-			);
-			
-			if(!isset($_SESSION['app']['user']['key']['choiceKeysteps']) || $forceLookup) {
-			
-				unset($_SESSION['app']['user']['key']['choiceKeysteps']);
-	
-				$d = $this->models->ChoiceKeystep->_get(
-					array('id' => 
-						array(
-							'project_id' => $this->getCurrentProjectId()
-						)
-					)
-				);
-			
-				foreach((array)$d as $val) $_SESSION['app']['user']['key']['choiceKeysteps'][$val['res_keystep_id']][] = $val;
-
-			}
-			
-
-			// for each...
-			foreach((array)$ck as $key => $val) {
-	
-				unset($this->_taxaStepList);
-
-				// ...work our way back to the top-most step...
-				$this->setStepsPerTaxon($val);
-
-				/// ...and save the results
-				$results[] =  array(
-					'taxon_id' => $val['res_taxon_id'],
-					'steps' => $this->_taxaStepList
-				);
-
-			}
-
-			$taxa = $this->models->Taxon->_get(array('id'=>array('project_id'=>$this->getCurrentProjectId()),'fieldAsIndex' => 'id'));
-
-			if (isset($results)) {
-	
-				// turn it from a list of taxa with their steps into a list of steps with their taxa
-				foreach((array)$results as $key => $val) {
-
-					foreach($val['steps'] as $key2 => $stepId) {
-
-						if (!isset($d[$stepId][$val['taxon_id']])) {
-
-							$d[$stepId][$val['taxon_id']] = true;
-		
-							$taxa[$val['taxon_id']]['label'] = $this->formatSpeciesEtcNames($taxa[$val['taxon_id']]['taxon'],$taxa[$val['taxon_id']]['rank_id']);
-		
-							$list[$stepId][] = $taxa[$val['taxon_id']];
-
-						}
-		
-					}
-					
-				}
-
-			}
-
-			// sort by taxon name
-			foreach((array)$list as $key => $val) {
-
-				$this->customSortArray($val,array('key' => 'taxon'));
-				$d[$key] = $val;
-
-			}
-			
-			$list = $d;
-
-			$_SESSION['app']['user']['key']['taxonDivision'] = array(
-				'list' => isset($list) ? $list : null,
-				'taxonCount' => isset($ck) ? count($ck) : 0
-			);
-		
-		}
-
-		return $_SESSION['app']['user']['key']['taxonDivision'];
-
-	}
-	*/
-
 }

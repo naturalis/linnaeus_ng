@@ -51,14 +51,10 @@ class MapKeyController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
 
-        parent::__construct();
-
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
+        parent::__construct($p);
 
 		$this->smarty->assign('isOnline',$this->checkRemoteServerAccessibility());
 		
@@ -93,7 +89,7 @@ class MapKeyController extends Controller
 				
 			} else {
 
-				$this->getTaxonTree(array('includeOrphans' => false));
+				$this->buildTaxonTree();
 	
 				if ($this->_mapType=='l2') {
 				
@@ -218,16 +214,25 @@ class MapKeyController extends Controller
 
 		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
 
-		if (!$this->rHasVal('m'))
+		if (!$this->rHasVal('m')) {
+
 			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
-		else
+
+		} else {
+
 			$mapId = $this->requestData['m'];
+
+		}
+		
+		$maps = $this->l2GetMaps();
+		
+		if (empty($mapId)) $mapId = key($maps);
 
 		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
 
 		$this->smarty->assign('mapId',$mapId);
 
-		$this->smarty->assign('maps',$this->l2GetMaps());
+		$this->smarty->assign('maps',$maps);
 
 		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
 
@@ -428,9 +433,7 @@ class MapKeyController extends Controller
 
 			if ($results['count']['total']>0) {
 
-				$this->getTaxonTree(array('includeOrphans' => false));
-		
-				$taxa = $this->getTreeList();				
+				$taxa = $this->getTreeList($this->buildTaxonTree());				
 
 				$geoDataTypes = $this->getGeoDataTypes();
 
@@ -895,7 +898,7 @@ class MapKeyController extends Controller
 	
 	}
 
-	private function getGeodataTypes($id=null)
+	public function getGeodataTypes($id=null)
 	{
 
 		$d['project_id'] = $this->getCurrentProjectId();
@@ -1136,9 +1139,7 @@ class MapKeyController extends Controller
 	private function getTaxaWithOccurrences()
 	{
 
-		$this->getTaxonTree(array('includeOrphans' => false));
-
-		$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
+		$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
 		
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
 		
@@ -1175,12 +1176,10 @@ class MapKeyController extends Controller
 
 		$l = array();
 
-		$this->getTaxonTree(array('includeOrphans' => false));
-
 		if ($l2MustHaveGeo)
 			$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
 		else				
-			$taxa = $this->getTaxaOccurrenceCount($this->getTreeList());
+			$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
 
 		foreach((array)$taxa as $key => $val) {
 
@@ -1265,14 +1264,9 @@ class MapKeyController extends Controller
 	private function l2GetTaxaWithOccurrences()
 	{
 
-		$this->getTaxonTree(array('includeOrphans' => false));
-
-
-		$taxa = $this->l2GetTaxaOccurrenceCount($this->getTreeList());
-
+		$taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
 
 		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
-
 
 		return $taxa;
 	
@@ -1350,7 +1344,7 @@ class MapKeyController extends Controller
 	}
 */
 
-	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
+	public function l2GetTaxaOccurrenceCount($taxaToFilter=null)
 	{
 
 		$ot = $this->getCache('map-l2TaxaOccurrencesCount');
@@ -1394,7 +1388,7 @@ class MapKeyController extends Controller
 			
 		}
 		
-		if (isset($taxaToFilter)) {
+		if (!empty($taxaToFilter)) {
 		
 			foreach((array)$ot as $key => $val) {
 			
@@ -1483,105 +1477,10 @@ class MapKeyController extends Controller
 		return null;
 
 	}
-/*
-	private function l2GetMaps($id=null)
+
+	public function l2GetMaps($id=null)
 	{
-
-		if (!isset($_SESSION['app']['user']['map']['l2Maps'])) {
-
-			$m = $this->models->L2Map->_get(
-				array(
-					'id' => array('project_id' => $this->getCurrentProjectId()),
-					'fieldAsIndex' => 'id',
-					'order' => 'id'
-				)
-			);
-
-			foreach((array)$m as $key => $val) {
-			
-				$m[$key]['mapExists'] = false;
-
-				if (!empty($val['image'])) {
-				
-					if (file_exists($_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'])) {
-
-						$m[$key]['mapExists'] = true;
-					
-						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['projectL2Maps'].$val['image'];
-					
-					} else {
-
-						$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['systemL2Maps'].$val['image']);
 	
-						$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['systemL2Maps'].$val['image'];
-					
-					}
-				
-				} else {
-				
-					$mapName = strtolower($val['name']).'.gif';
-				
-					$m[$key]['mapExists'] = file_exists($_SESSION['app']['project']['urls']['systemL2Maps'].$mapName);
-
-					$m[$key]['imageFullName'] = $_SESSION['app']['project']['urls']['systemL2Maps'].$mapName;
-
-				}
-
-				if ($m[$key]['mapExists']) {
-					
-					$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
-
-					if ($this->controllerSettings['l2MaxMapWidth'] > 0 &&
-							$m[$key]['size'][0] > $this->controllerSettings['l2MaxMapWidth']) {
-					
-						$tmpHeight = $m[$key]['size'][1]*($this->controllerSettings['l2MaxMapWidth']/$m[$key]['size'][0]);
-							
-						$m[$key]['cellWidth'] = (floor($this->controllerSettings['l2MaxMapWidth']/$val['cols']))-1;
-						$m[$key]['cellHeight'] = (floor($tmpHeight/$val['rows']))-1;
-							
-						// Set map dimensions based on cell size in order to avoid rogue cells spoiling layout
-						$m[$key]['width'] = ($val['cols']*($m[$key]['cellWidth']+1))-1;
-						$m[$key]['height'] = ($val['rows']*($m[$key]['cellHeight']+1))-1;
-						$m[$key]['resized'] = 1;
-							
-					} else {
-
-						$m[$key]['width'] = $m[$key]['size'][0];
-						$m[$key]['height'] = $m[$key]['size'][1];
-						$m[$key]['cellWidth'] = (floor($m[$key]['width']/$val['cols']))-1;
-						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
-						$m[$key]['resized'] = 0;
-					}
-				}
-
-				$d = json_decode($val['coordinates']);
-
-				$m[$key]['coordinates'] = array(
-					'topLeft' => array(
-						'lat' => (string)$d->topLeft->lat,
-						'long' => (string)$d->topLeft->long
-					),
-					'bottomRight' => array(
-						'lat' => (string)$d->bottomRight->lat,
-						'long' => (string)$d->bottomRight->long
-					),
-					'original' => $val['coordinates']
-				);
-
-			}
-			
-			$_SESSION['app']['user']['map']['l2Maps'] = $m;
-	
-		}
-
-		return isset($id) ? $_SESSION['app']['user']['map']['l2Maps'][$id] : $_SESSION['app']['user']['map']['l2Maps'];
-	
-	}
-*/
-
-	private function l2GetMaps($id=null)
-	{
-
 		$m = $this->getCache('map-l2Maps');
 		
 		if (!$m) {
@@ -1884,111 +1783,10 @@ class MapKeyController extends Controller
 		return $p;
 
 	}
-/*
-	private function l2GetDiversityIndex($mapId,$typeId=null)
+	
+	public function l2GetDiversityIndex($mapId,$typeId=null)
 	{
 
-		$sessIdx = 	$mapId.':'.(isset($typeId) ? implode('-',$typeId) : '');	
-
-		if (!isset($_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx])) {
-
-			$d = array(
-					'project_id' => $this->getCurrentProjectId(),
-					'map_id' => $mapId
-				);
-				
-			if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';		
-
-			if ($this->l2HasTaxonOccurrencesCompacted()) {
-				
-				//echo '<!--using compacted index-->';
-				
-				$ot = $this->models->L2DiversityIndex->_get(
-					array(
-						'id' => $d,
-						'columns' => 'sum(diversity_count) as total, square_number',
-						'group' => 'square_number',
-						'order' => 'total desc',
-						'fieldAsIndex' => 'square_number',				
-					)
-				);
-
-			} else {
-
-				//echo '<!--using uncompacted index (bad news)-->';
-
-				$ot = $this->models->L2OccurrenceTaxon->_get(
-					array(
-						'id' => $d,
-						'columns' => 'count(*) as total, square_number',
-						'group' => 'square_number',
-						'order' => 'total desc',
-						'fieldAsIndex' => 'square_number',				
-					)
-				);
-				
-			}
-	
-			if ($ot) {
-				$d = current($ot);
-				$max = $d['total'];
-				end($ot);
-				$d = current($ot);
-				$min = $d['total'];
-			} else {
-				$max = $min = 0;
-			}
-			
-			$legend = array();
-	
-			foreach((array)$ot as $key => $val) {
-			
-				$ot[$key]['pct'] = round(($val['total'] / $max) * 100);
-				$x = ceil($ot[$key]['pct'] / (100 / $this->controllerSettings['l2DiversityIndexNumOfClasses']));
-				$ot[$key]['class'] = $x;
-				$legend[$x] = $x;
-
-
-			}
-			
-			ksort($legend);
-
-			$prevmin = $min;
-			
-			foreach((array)$legend as $key => $val) {
-				$thisMax = 
-					$max + 
-					(
-						($val - $this->controllerSettings['l2DiversityIndexNumOfClasses']) *
-						($max / $this->controllerSettings['l2DiversityIndexNumOfClasses'])
-					);
-
-				$legend[$key] = 
-					array(
-						'min' => floor($prevmin),
-						'max' => floor($thisMax)
-					);
-					
-					$prevmin = $thisMax;
-			};
-			
-			$_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx] = array(
-				'index' => $ot,
-				'min' => $min,
-				'max' => $max,
-				'legend' => $legend
-			);
-
-		}
-
-		return $_SESSION['app']['user']['map']['divIndex'][$mapId][$sessIdx];
-
-	}
-*/	
-	
-	private function l2GetDiversityIndex($mapId,$typeId=null)
-	{
-	
 		$sessIdx = 	$mapId.'-'.(isset($typeId) ? implode('-',$typeId) : '');
 		
 		$storedData = $this->getCache('map-divIndex-'. $mapId. '-' . $sessIdx);

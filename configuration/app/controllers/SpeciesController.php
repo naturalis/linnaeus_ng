@@ -54,10 +54,6 @@ class SpeciesController extends Controller
 
         parent::__construct();
 		
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-
     }
 
     /**
@@ -260,10 +256,7 @@ class SpeciesController extends Controller
 
 		if (!$this->rHasVal('id')) {
 
-			$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => true));// !isset($this->treeList)));
-	
-			// get taxa
-			$taxa = $this->getTreeList();
+			$taxa = $this->buildTaxonTree();
 				
 			$d = (!empty($taxa) ? current($taxa) : array());
 			
@@ -850,9 +843,7 @@ class SpeciesController extends Controller
 
 		$this->showLowerTaxon = ($this->getTaxonType() == 'lower');
 
-		$this->getTaxonTree();
-
-		$taxa = $this->getTreeList();
+		$taxa = $this->buildTaxonTree();
 		
 		if ($taxa && !empty($taxa)) {
 			
@@ -921,8 +912,7 @@ class SpeciesController extends Controller
 
 		$l = array();
 
-		$this->getTaxonTree(array('includeOrphans' => false,'forceLookup' => !isset($this->treeList)));
-		$taxa = $this->getTreeList();
+		$taxa = $this->buildTaxonTree();
 				
 		foreach((array)$taxa as $key => $val) {
 		

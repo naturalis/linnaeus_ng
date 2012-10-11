@@ -11,6 +11,7 @@ class Controller extends BaseClass
     private $_fullPath;
     private $_fullPathRelative;
 	private $_checkForProjectId = true;
+	private $_checkForSplash = true;
 	
 	private $_allowEditOverlay = false; // true
 
@@ -70,10 +71,12 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
  
         parent::__construct();
+
+		$this->setControllerParams($p);
 
         $this->setPhpIniVars();
 
@@ -112,6 +115,16 @@ class Controller extends BaseClass
 		$this->setCurrentLanguageId();
 
 		$this->checkBackStep();
+
+		if ($this->getCheckForProjectId()) {
+
+			$this->checkForProjectId();
+
+			$this->setCssFiles();
+			
+			$this->splashScreen();
+
+		}
 
     }
 
@@ -218,66 +231,9 @@ class Controller extends BaseClass
 	
 	}
 
-	public function getTreeList($params = null)
+	public function _buildTaxonTree($p=null)
 	{
 
-		if (!isset($this->treeList)) return null;
-
-		foreach((array)$this->treeList as $key => $val) {
-			
-			if (!isset($params['includeEmpty']) && $params['includeEmpty']!==true && $val['is_empty']=='1') continue;
-
-			if ($this->showLowerTaxon===true) {
-
-				if ($val['lower_taxon']=='1')  $d[$key] = $val;
-			
-			} elseif ($this->showLowerTaxon===false) {
-
-				if ($val['lower_taxon']=='0')  $d[$key] = $val;
-
-				if ($val['lower_taxon']=='1')  continue;
-
-			} else {
-
-				$d[$key] = $val;
-			
-			}
-
-		}	
-
-		return isset($d) ? $d : null;
-	
-	}
-
-/*
-    public function getTaxonTree($params=null) 
-    {
-
-		if (
-			(isset($params['forceLookup']) && $params['forceLookup']==true) ||
-			!isset($_SESSION['app']['user']['species']['tree']) ||
-			!isset($_SESSION['app']['user']['species']['treeList']) ||
-			$this->didActiveLanguageChange()
-		) {
-
-			$_SESSION['app']['user']['species']['tree'] = $this->_getTaxonTree($params);
-			$_SESSION['app']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
-
-		} else {
-
-			$this->treeList = $_SESSION['app']['user']['species']['treeList'];
-
-		}
-
-		return $_SESSION['app']['user']['species']['tree'];
-	
-	}
-*/
-
-	public function _getTaxonTree($p=null)
-	{
-		
-		
 		$pId = isset($p['pId']) ? $p['pId'] : null;
 		$depth = isset($p['depth']) ? $p['depth'] : 0;
 		$ranks = $this->newGetProjectRanks();
@@ -318,7 +274,7 @@ class Controller extends BaseClass
 
 			$this->treeList[$key] = $t[$key];
 
-			$t[$key]['children'] = $this->_getTaxonTree(
+			$t[$key]['children'] = $this->_buildTaxonTree(
 				array(
 					'pId' => $val['id'],
 					'depth' => $depth+1
@@ -333,113 +289,6 @@ class Controller extends BaseClass
 		return $t;
 	
 	}
-
-	/*
-    public function _getTaxonTree($params) 
-    {
-
-		// the parent_id to start with
-		$pId = isset($params['pId']) ? $params['pId'] : null;
-		// the current level of depth in the tree
-		$level = isset($params['level']) ? $params['level'] : 0;
-		// a specific rank_id to stop the recursion; taxa below this rank are omitted from the tree
-		$stopAtRankId = isset($params['stopAtRankId']) ? $params['stopAtRankId'] : null;
-		// taxa without a parent_id that are not of the uppermost rank are orphans; these can be excluded from the tree
-		$includeOrphans = isset($params['includeOrphans']) ? $params['includeOrphans'] : false;
-		// force lookup
-		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : null;
-
-		// get all ranks defined within the project	
-		$d = $this->getProjectRanks(array('idsAsIndex' => true,'forceLookup' => $forceLookup));
-		$pr = $d['ranks'];
-
-		// $this->treeList is an additional non-recursive list of taxa
-		if ($level==0) unset($this->treeList);
-
-		// setting the parameters for the taxon search
-		$id['project_id'] = $this->getCurrentProjectId();
-
-		if ($pId === null) {
-
-			$id['parent_id is'] = $pId;
-
-		} else {
-
-			$id['parent_id'] = $pId;
-
-		}
-
-		// decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually 'kingdom')
-		if ($pId === null && $includeOrphans === false) {
-
-			$id['rank_id'] = $d['topRankId'];
-
-		}
-
-		// get the child taxa of the current parent
-        $t = $this->models->Taxon->_get(
-				array(
-					'id' =>  $id,
-					'order' => 'taxon_order'
-				)
-			);
-
-        foreach((array)$t as $key => $val) {
-
-			// taxon name
-			$val['label'] = $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id']);
-
-			// for each taxon, look whether they belong to the lower taxa...
-			$val['lower_taxon'] = $pr[$val['rank_id']]['lower_taxon'];
-	
-			// ...and can be the endpoint of the key
-			$val['keypath_endpoint'] = $pr[$val['rank_id']]['keypath_endpoint'];
-
-			// level is effectively the recursive depth of the taxon within the tree
-			$val['level'] = $level;
-
-			// count taxa on the same level
-			$val['sibling_count'] = count((array)$t);
-
-			// sibling_pos reflects the position amongst taxa on the same level
-			$val['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
-
-			// get rank label
-			$val['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
-
-			// give do not display flag to taxa that are in brackets
-			$val['do_display'] = !preg_match('/^\(.*\)$/',$val['taxon']);
-
-			// fill the treelist (which is a global var)
-            $this->treeList[$val['id']] = $val;
-
-			$t[$key]['level'] = $level;
-			
-			// and call the next recursion for each of the children
-			if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId!=$val['rank_id'])) {
-
-				$children = $this->_getTaxonTree(
-					array(
-						'pId' => $val['id'],
-						'level' => $level+1,
-						'stopAtRankId' => $stopAtRankId
-					)
-				);
-
-	            $t[$key]['child_count'] = 
-					$this->treeList[$val['id']]['child_count'] = 
-					isset($children) ? count((array)$children) : 0;
-				
-				$t[$key]['children'] = $children;
-
-			}
-
-        }
-
-        return $t;
-
-    }
-	*/
 
 	public function newGetProjectRanks()
 	{
@@ -604,7 +453,7 @@ class Controller extends BaseClass
 
 		$d = null;
 
-		$this->getTaxonTree();
+		$this->buildTaxonTree();
 		
 		foreach((array)$this->treeList as $key => $val) {
 			
@@ -947,6 +796,14 @@ class Controller extends BaseClass
 //        if (isset($list)) $_SESSION['app']['project']['languageList'] = $list;
 		
     }
+	
+	public function getProjectLanguages()
+    {
+
+		return isset($_SESSION['app']['project']['languages']) ? $_SESSION['app']['project']['languages'] : null;
+	
+    }
+	
 
    /**
      * Sets the active project's id as class variable
@@ -1119,13 +976,6 @@ class Controller extends BaseClass
 	}
 
 
-	public function setControllerParams($params)
-	{
-	
-		if (isset($params['checkForProjectId'])) $this->setCheckForProjectId($params['checkForProjectId']);
-	
-	}
-
 	public function matchHotwords($text,$forceLookup=false)
 	{
 
@@ -1244,6 +1094,28 @@ class Controller extends BaseClass
 	
 	}
 	
+	private function setControllerParams($params)
+	{
+
+		if (isset($params['checkForSplash'])) $this->setCheckForSplash($params['checkForSplash']);
+		if (isset($params['checkForProjectId'])) $this->setCheckForProjectId($params['checkForProjectId']);
+	
+	}
+
+	private function setCheckForSplash($state)
+	{
+	
+		if (is_bool($state)) $this->_checkForSplash = $state;
+	
+	}
+
+	private function getCheckForSplash()
+	{
+
+		return $this->_checkForSplash;
+	
+	}
+
 	private function setCheckForProjectId($state)
 	{
 	
@@ -1251,7 +1123,7 @@ class Controller extends BaseClass
 	
 	}
 
-	public function getCheckForProjectId()
+	private function getCheckForProjectId()
 	{
 	
 		return $this->_checkForProjectId;
@@ -1323,7 +1195,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function printPage ($templateName = null)
+    public function printPage ($templateName=null)
     {
  
 		$this->preparePage();
@@ -1735,7 +1607,7 @@ class Controller extends BaseClass
     {
 
 		//session_name('lng-application');
-        session_start();
+		if (session_id()=='') session_start();
 
         /* DEBUG */        
         $_SESSION['app']['system']['server_addr'] = $_SERVER['SERVER_ADDR'];
@@ -2498,7 +2370,7 @@ class Controller extends BaseClass
 	private function storeState()
 	{
 	
-		if ($this->storeHistory===false) return;
+		if ($this->storeHistory===false || session_id()=='') return;
 
 		unset($_SESSION['app']['user'][$this->controllerBaseName]['state']);
 		
@@ -2567,11 +2439,9 @@ class Controller extends BaseClass
 		
 	}
 	
-	
-	
 	// Timeout in seconds
 	// Key something like path in session, e.g. 'species-tree'
-	protected function getCache ($key, $timeOut = false) 
+	protected function getCache($key, $timeOut = false) 
 	{
 		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
 		if (file_exists($cacheFile)) {
@@ -2586,34 +2456,63 @@ class Controller extends BaseClass
 		return false;
 	}
 	
-	protected function saveCache ($key, $data)
+	protected function saveCache($key, $data)
 	{
 		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
 		if (!file_put_contents($cacheFile, serialize($data))) {
 			die('Cannot write to cache folder '. $_SESSION['app']['project']['urls']['cache']);
 		}	
+		
+	}
+
+	public function getTreeList($p=null)
+	{
+
+		if (!isset($this->treeList)) return null;
+
+		foreach((array)$this->treeList as $key => $val) {
+			
+			if (!isset($p['includeEmpty']) && $p['includeEmpty']!==true && $val['is_empty']=='1') continue;
+
+			if ($this->showLowerTaxon===true) {
+
+				if ($val['lower_taxon']=='1')  $d[$key] = $val;
+			
+			} elseif ($this->showLowerTaxon===false) {
+
+				if ($val['lower_taxon']=='0')  $d[$key] = $val;
+
+				if ($val['lower_taxon']=='1')  continue;
+
+			} else {
+
+				$d[$key] = $val;
+			
+			}
+
+		}	
+
+		return isset($d) ? $d : null;
+	
 	}
 	
-	public function getTaxonTree($params=null)
+	public function buildTaxonTree($p=null)
 	{
+
+		if (!$this->getCache('species-treeList-'.$this->getCurrentLanguageId())) {
 	
-		if (
-			(isset($params['forceLookup']) && $params['forceLookup']==true) ||
-			!$this->getCache('species-tree') ||
-			!$this->getCache('species-treeList') ||
-			$this->didActiveLanguageChange()
-		) {
-	
-			$this->saveCache('species-tree', $this->_getTaxonTree($params));
-			$this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
+			$this->_buildTaxonTree();
+			$this->saveCache('species-treeList-'.$this->getCurrentLanguageId(), isset($this->treeList) ? $this->treeList : null);
 	
 		} else {
 	
-			$this->treeList = $this->getCache('species-treeList');
+			$this->treeList = $this->getCache('species-treeList-'.$this->getCurrentLanguageId());
 	
 		}
+		
+		return $this->getTreeList($p);
 	
-		return $this->getCache('species-tree');
+		//return $this->getCache('species-tree'); // return value is unused!
 	
 	}
 
@@ -2647,6 +2546,23 @@ class Controller extends BaseClass
 		
 		}
 
+	}
+	
+	public function splashScreen()
+	{
+	
+		if ($this->getCheckForSplash()==false) return;
+		
+		if (
+			(!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash']===false) &&
+			isset($this->generalSettings['urlSplashScreen'])) {
+
+// STORE CURRENT REQUEST! and redirect there afterwards
+		
+			$this->redirect($this->generalSettings['urlSplashScreen']);
+		
+		}
+	
 	}
 	
 }

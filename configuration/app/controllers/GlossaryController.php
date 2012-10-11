@@ -53,15 +53,11 @@ class GlossaryController extends Controller
      *
      * @access     public
      */
-    public function __construct ()
+    public function __construct($p=null)
     {
         
-        parent::__construct();
+        parent::__construct($p);
 		
-		$this->checkForProjectId();
-
-		$this->setCssFiles();
-
     }
 
     /**
@@ -96,35 +92,7 @@ class GlossaryController extends Controller
 				
 		}
 
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
-
 		if ($id) $this->redirect('term.php?id='.$id);
-
-		/*
-
-   		$alpha = $this->getGlossaryAlphabet($this->didActiveLanguageChange());
-
-		if (!$this->rHasVal('letter')) $this->requestData['letter'] = isset($alpha[0]) ? $alpha[0] : null;
-
-		if ($this->rHasVal('letter')) {
-		
-			$this->requestData['letter'] = strtolower($this->requestData['letter']);
-
-			$gloss = $this->getGlossaryTerms(array('term like' => $this->requestData['letter'].'%'));
-
-			$this->setPageName(sprintf(_('Glossary Index: %s'),strtoupper($this->requestData['letter'])));
-
-		}
-
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
-
-		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
-		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
-
-		if (isset($gloss)) $this->smarty->assign('gloss',$gloss);
-
-		*/
 
         $this->printPage();
 
@@ -336,8 +304,7 @@ class GlossaryController extends Controller
 
 		
 		}
-		
-		
+
 		return $gm;
 
 	}
