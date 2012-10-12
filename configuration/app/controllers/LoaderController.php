@@ -1,5 +1,32 @@
 <?php
 
+/*
+
+	beware!
+
+	calling the same procedure in an external class multiple times from a loop in 
+	this class based on the output from another function in the external class can cause 
+	strange results. in one example, a get()-call to the MatrixTaxon-model in the matrix-
+	class caused the model to lose the where-clause-variables, which were still intact in
+	the line before the get(). also, connection to the database appeared to fall away 
+	occasionally.
+
+	while not fully understood, this is probably to do with some kind of overlap between 
+	this class and the external one, as they both extend from the same controller.
+
+	if necessary, write a new procedure in the external class that performs all of the 
+	required work in one call, as in preloadMatrix(). not quite sure why the loop in 
+	preloadMap() doesn't cause trouble.
+
+
+	$data = $this->getCache('controller-cache_name');
+	if (!$data) {
+		$this->saveCache('controller-cache_name',$data);
+	}
+
+*/
+
+
 include_once ('Controller.php');
 
 class LoaderController extends Controller
@@ -23,7 +50,9 @@ class LoaderController extends Controller
 
     public function splashAction ()
     {
-
+	
+		//$this->doPreload();die();
+	
 		if ($this->rHasVal('go','load')) {
 
 			$this->doPreload();
@@ -32,9 +61,15 @@ class LoaderController extends Controller
 		
 		}
 
-		$_SESSION['app']['project']['showedSplash'] = true;
+		$url =
+			isset($_SESSION['app']['project']['splashEntryUrl']) ? 
+				$_SESSION['app']['project']['splashEntryUrl'] : 
+				'../'.$this->generalSettings['defaultController'].'/';
 
-		$this->smarty->assign('startUrl','../'.$this->generalSettings['defaultController'].'/');
+		$_SESSION['app']['project']['showedSplash'] = true;
+		unset($_SESSION['app']['project']['splashEntryUrl']);
+
+		$this->smarty->assign('startUrl',$url);
 
         $this->printPage('../linnaeus/splash');
 
@@ -45,14 +80,14 @@ class LoaderController extends Controller
 	{
 
 		$execStart = microtime(true);
-		
+
 		$this->preloadGlossary();
 		$this->preloadIndex();
 		$this->preloadIntroduction();
 		$this->preloadKey();
 		$this->preloadLinnaeus();
 		$this->preloadLiterature();
-//		$this->preloadMap();
+		$this->preloadMap();
 		$this->preloadMatrix();
 		$this->preloadModule();
 		$this->preloadSearch();
@@ -69,6 +104,8 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/GlossaryController.php');
 		$c = new GlossaryController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
@@ -79,6 +116,8 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/IndexController.php');
 		$c = new IndexController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
@@ -89,6 +128,8 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/IntroductionController.php');
 		$c = new IntroductionController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
@@ -102,8 +143,11 @@ class LoaderController extends Controller
 		
 		$c->setKeyTree();
 		$c->getAllTaxaInKey();
+		$c->getTaxonDivision($c->getStartKeystepId());
 
 		$c->loadControllerConfig();
+
+		unset($c);
 
 	}
 
@@ -114,6 +158,8 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/LinnaeusController.php');
 		$c = new LinnaeusController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
@@ -124,6 +170,8 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/LiteratureController.php');
 		$c = new LiteratureController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
@@ -140,10 +188,9 @@ class LoaderController extends Controller
 		//$t = $c->getGeodataTypes();
 		
 		foreach((array)$m  as $mVal) $c->l2GetDiversityIndex($mVal['id']);
-		
-		$c->l2GetTaxaOccurrenceCount();
 
-		$this->loadControllerConfig();
+		$c->l2GetTaxaOccurrenceCount();
+		$c->l2GetTaxaWithOccurrences();
 
 		unset($c);
 
@@ -155,10 +202,8 @@ class LoaderController extends Controller
 		require_once ('../../../../configuration/app/controllers/MatrixKeyController.php');
 		$c = new MatrixKeyController(array('checkForSplash'=>false));
 
-		$d = $c->getMatrices();
-		
-		foreach((array)$d as $val)  $c->getTaxaInMatrix($val['id']);
-		
+		$d = $c->cacheAllTaxaInMatrix();
+
 		unset($c);
 
 	}
@@ -170,16 +215,23 @@ class LoaderController extends Controller
 		
 		require_once ('../../../../configuration/app/controllers/ModuleController.php');
 		$c = new ModuleController(array('checkForSplash'=>false));
+		// code goes here
+		unset($c);
 
 	}
 
 	private function preloadSearch()
 	{
 
-		return; // nothing to preload
-		
 		require_once ('../../../../configuration/app/controllers/SearchController.php');
 		$c = new SearchController(array('checkForSplash'=>false));
+
+		$c->getGlossaryLookupList();
+		$c->getLiteratureLookupList();
+		//$c->getSpeciesLookupList(); // might be too complex (see remark at top of file)
+		$c->getModuleLookupList();  //idem
+
+		unset($c);
 
 	}
 
@@ -189,9 +241,9 @@ class LoaderController extends Controller
 		//require_once ('../../../../configuration/app/controllers/SpeciesController.php');
 		//$c = new SpeciesController();
 		
-		$d = $this->getCurrentLanguageId();
+		$this->loadControllerConfig('Species');
 		
-		$l = $this->getProjectLanguages();
+		$this->getProjectRanks();
 		
 		foreach((array)$l as $val) {
 
@@ -199,8 +251,6 @@ class LoaderController extends Controller
 			$this->buildTaxonTree();
 		
 		}
-		
-		$this->setCurrentLanguageId($d);
 
 	}
 

@@ -146,7 +146,7 @@ class KeyController extends Controller
 
 			$this->resetKeyPath();
 
-			$step = $this->getStartKeystep();
+			$step = $this->getKeystep($this->getStartKeystepId());
 
 			$this->updateKeyPath(array('step' => $step));
 
@@ -357,8 +357,7 @@ class KeyController extends Controller
 
 		if (is_null($id)) {
 
-			$step = $this->getStartKeystep();
-			$id = $step['id'];
+			$id = $this->getStartKeystepId();
 
 		} else {
 		
@@ -440,7 +439,7 @@ class KeyController extends Controller
 	
 	}
 		
-	private function getStartKeystep()
+	public function getStartKeystepId()
 	{
 
 		$k = $this->models->Keystep->_get(
@@ -452,7 +451,7 @@ class KeyController extends Controller
 			)
 		);
 		
-		if ($k) return $this->getKeystep($k[0]['id']);
+		if ($k) return $k[0]['id'];
 	
 	}
 
@@ -660,37 +659,47 @@ class KeyController extends Controller
 
 
 	/* branches and fruits */
-	private function getTaxonDivision($step)
+	public function getTaxonDivision($step)
 	{
 
-		$this->tmp = null;
+		$div = $this->getCache('key-taxonDivision-'.$step);
 		
-		$this->sawOffABranch($this->getKeyTree(),$step);
-		$this->reapFruits($this->tmp['branch']);
+		if (!$div) {
 
-		$includedTaxa = $excludedTaxa = array();
+			$this->tmp = null;
+
+			$this->sawOffABranch($this->getKeyTree(),$step);
+
+			$this->reapFruits($this->tmp['branch']);
 	
-		$allTaxa = $this->getAllTaxaInKey();
-
-		foreach((array)$allTaxa as $val) {
+			$excludedTaxa = array();
 		
-			if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) {
+			$allTaxa = $this->getAllTaxaInKey();
+			
+			foreach((array)$allTaxa as $val) {
+			
+				if (!isset($this->tmp['remaining'][$val['res_taxon_id']]))
+					$excludedTaxa[$val['res_taxon_id']] = null;
 
-				$d = $this->getTaxonById($val['res_taxon_id']);
-
-				$excludedTaxa[$val['res_taxon_id']] = 
-					array(
-						'id' => $d['id'],
-						'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
-						'is_hybrid' => $d['is_hybrid']
-					);
 			}
-		
+	
+			$div = 
+				array(
+					'remaining' => $this->tmp['remaining'],
+					'excluded' => $excludedTaxa
+				);
+				
+			$this->saveCache('key-taxonDivision-'.$step, $div);
+				
 		}
+		
+		$includedTaxa = $excludedTaxa = array();
 
-		foreach((array)$this->tmp['remaining'] as $val) {
+		$tree = $this->getTreeList();
+	
+		foreach((array)$div['remaining'] as $key => $val) {
 
-			$d = $this->getTaxonById($val);
+			$d = $tree[$key];
 
 			$includedTaxa[$val] = 
 				array(
@@ -701,14 +710,101 @@ class KeyController extends Controller
 		
 		}
 
-		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
-		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
+		foreach((array)$div['excluded'] as $key => $val) {
+
+			$d = $tree[$key];
+
+			$excludedTaxa[$val] = 
+				array(
+					'id' => $d['id'],
+					'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+					'is_hybrid' => $d['is_hybrid']
+				);
 		
-		return
-			array(
+		}
+		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
+
+		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
+
+		
+		return array(
 				'remaining' => $includedTaxa,
 				'excluded' => $excludedTaxa
 			);
+
+	}
+
+	/*
+		this gives the same output as getTaxonDivision(), but stores full taxon information in the cache, rather
+		than just ID's, as getTaxonDivision() does. because the division for *each* step is cached, the size of 
+		the cache will be considerably greater with this function (in heukels flora, the cache file sizes for the 
+		first step for each function was 246K and 43K, respectively). potential downside is that the new function
+		has to retrieve, and sort, full taxon data evertime it is called. nevertheless, it appears to be slightly 
+		fastet than this one. go figure.
+	*/
+	public function originalGetTaxonDivision($step)
+	{
+
+		$div = $this->getCache('key-taxonDivision-'.$step);
+		
+		if (!$div) {
+
+			$this->tmp = null;
+
+			$this->sawOffABranch($this->getKeyTree(),$step);
+
+			$this->reapFruits($this->tmp['branch']);
+	
+			$includedTaxa = $excludedTaxa = array();
+		
+			$allTaxa = $this->getAllTaxaInKey();
+			
+			$tree = $this->getTreeList();
+	
+			foreach((array)$allTaxa as $val) {
+			
+				if (!isset($this->tmp['remaining'][$val['res_taxon_id']])) {
+	
+					$d = $tree[$val['res_taxon_id']];
+	
+					$excludedTaxa[$val['res_taxon_id']] = 
+						array(
+							'id' => $d['id'],
+							'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+							'is_hybrid' => $d['is_hybrid']
+						);
+				}
+			
+			}
+	
+			foreach((array)$this->tmp['remaining'] as $val) {
+	
+				$d = $tree[$val];
+	
+				$includedTaxa[$val] = 
+					array(
+						'id' => $d['id'],
+						'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+						'is_hybrid' => $d['is_hybrid']
+					);
+			
+			}
+	
+			$this->customSortArray($includedTaxa,array('key' => 'taxon'));
+
+			$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
+
+			$div = 
+				array(
+					'remaining' => $includedTaxa,
+					'excluded' => $excludedTaxa
+				);
+				
+			$this->saveCache('key-taxonDivision-'.$step, $div);
+				
+		}
+		
+		return $div;
 
 	}
 

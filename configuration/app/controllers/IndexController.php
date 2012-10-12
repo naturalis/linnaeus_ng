@@ -187,9 +187,9 @@ class IndexController extends Controller
     private function _speciesIndexAction ()
     {
 
-		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+		$ranks = $this->getProjectRanks();
 
-		foreach((array)$ranks['ranks'] as $key => $val) {
+		foreach((array)$ranks as $key => $val) {
 
 			if ($val['lower_taxon']==1 && $this->getTaxonType()=='lower') $d[] = $val['id'];
 			if ($val['lower_taxon']==0 && $this->getTaxonType()=='higher') $d[] = $val['id'];
@@ -198,7 +198,7 @@ class IndexController extends Controller
 
 		$this->showLowerTaxon = ($this->getTaxonType()=='lower');
 		
-		$names = $taxa = (array)$this->buildTaxonTree();
+		$names = $taxa = $this->buildTaxonTree();
 		
 		if ($this->getTaxonType()=='lower') {
 
@@ -241,8 +241,6 @@ class IndexController extends Controller
 		$this->smarty->assign('hasNonAlpha',$d['hasNonAlpha']);
 
 		$this->smarty->assign('letter',$letterToShow);
-
-		$this->smarty->assign('ranks',$ranks);
 
 		$this->smarty->assign('names',$names);
 

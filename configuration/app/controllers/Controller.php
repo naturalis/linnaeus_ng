@@ -236,7 +236,7 @@ class Controller extends BaseClass
 
 		$pId = isset($p['pId']) ? $p['pId'] : null;
 		$depth = isset($p['depth']) ? $p['depth'] : 0;
-		$ranks = $this->newGetProjectRanks();
+		$ranks = $this->getProjectRanks();
 
 		if (!isset($p['depth'])) unset($this->treeList);
 				
@@ -290,121 +290,53 @@ class Controller extends BaseClass
 	
 	}
 
-	public function newGetProjectRanks()
+	public function getProjectRanks()
 	{
 
-		if (!isset($_SESSION['app']['user']['species']['projectRank'])) {
-
-			$_SESSION['app']['user']['species']['projectRank'] =
-				$this->models->ProjectRank->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId()
-						),
-						'fieldAsIndex' => 'id'
-					)
-				);
-
-		}
+		$pr = $this->getCache('tree-ranks');
 		
-		return $_SESSION['app']['user']['species']['projectRank'];
+		if (!$pr) {
 
-	}
-	
-
-	public function getProjectRanks($params=false)
-	{
-
-		$includeLanguageLabels = isset($params['includeLanguageLabels']) ? $params['includeLanguageLabels'] : true;
-		$lowerTaxonOnly = isset($params['lowerTaxonOnly']) ? $params['lowerTaxonOnly'] : false;
-		$forceLookup = isset($params['forceLookup']) ? $params['forceLookup'] : $this->didActiveLanguageChange();
-		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
-		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
-
-		if (!$forceLookup) $forceLookup = !isset($_SESSION['app']['user']['species']['ranks']['projectRanks']);
-
-		if (!$forceLookup) {
-
-			if (
-				!isset($_SESSION['app']['user']['species']['ranks']['includeLanguageLabels']) || 
-				$_SESSION['app']['user']['species']['ranks']['includeLanguageLabels']!=$includeLanguageLabels ||
-				!isset($_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly']) || 
-				$_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly']!=$lowerTaxonOnly ||
-				!isset($_SESSION['app']['user']['species']['ranks']['keypathEndpoint']) || 
-				$_SESSION['app']['user']['species']['ranks']['keypathEndpoint']!=$keypathEndpoint ||
-				!isset($_SESSION['app']['user']['species']['ranks']['idsAsIndex']) || 
-				$_SESSION['app']['user']['species']['ranks']['idsAsIndex']!=$idsAsIndex
+			$pr = $this->models->ProjectRank->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					),
+					'fieldAsIndex' => 'id',
+					'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
 				)
-
-				$forceLookup = true;
-
-		}
-
-		$_SESSION['app']['user']['species']['ranks']['includeLanguageLabels'] = $includeLanguageLabels;
-		$_SESSION['app']['user']['species']['ranks']['lowerTaxonOnly'] = $lowerTaxonOnly;
-		$_SESSION['app']['user']['species']['ranks']['keypathEndpoint'] = $keypathEndpoint;
-		$_SESSION['app']['user']['species']['ranks']['idsAsIndex'] = $idsAsIndex;
-
-		if ($forceLookup) {
-
-			if ($keypathEndpoint)
-				$d = array('project_id' => $this->getCurrentProjectId(),'keypath_endpoint' => 1);
-			elseif ($lowerTaxonOnly)
-				$d = array('project_id' => $this->getCurrentProjectId(),'lower_taxon' => 1);
-			else
-				$d = array('project_id' => $this->getCurrentProjectId());
-
-			$p = array('id' => $d,'order' => 'rank_id' ,'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint');
-			
-			if ($idsAsIndex) {
-
-				$p['fieldAsIndex'] = 'id';
-
-			}
-
-			$pr = $this->models->ProjectRank->_get($p);
-			
-			$topRankId = null;
+			);
 
 			foreach((array)$pr as $rankkey => $rank) {
 			
-				if ($topRankId==null) $topRankId = $rankkey;
+				if (empty($rank['rank_id'])) continue;
 	
 				$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
 	
 				$pr[$rankkey]['rank'] = $r['rank'];
 	
 				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-
-				if ($includeLanguageLabels) {
 	
-					$lpr = $this->models->LabelProjectRank->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'project_rank_id' => $rank['id'],
-								'language_id' => $this->getCurrentLanguageId()
-							),
-							'columns' => 'label'
-						)
-					);
-					
-					$pr[$rankkey]['labels'][$this->getCurrentLanguageId()] = $lpr[0]['label'];
-
-				}
+				$lpr = $this->models->LabelProjectRank->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'project_rank_id' => $rank['id'],
+							'language_id' => $this->getCurrentLanguageId()
+						),
+						'columns' => 'label'
+					)
+				);
+				
+				$pr[$rankkey]['labels'][$this->getCurrentLanguageId()] = $lpr[0]['label'];
 	
 			}
-			
-			$_SESSION['app']['user']['species']['ranks']['projectRanks'] = $pr;
-			$_SESSION['app']['user']['species']['ranks']['topRankId'] = $topRankId;
-			
-		}
 
-		return
-			array(
-				'ranks' => $_SESSION['app']['user']['species']['ranks']['projectRanks'],
-				'topRankId' => $_SESSION['app']['user']['species']['ranks']['topRankId']
-			);
+			$this->saveCache('tree-ranks', $pr);
+		
+		}
+		
+		return $pr;
 
 	}
 	
@@ -1059,10 +991,10 @@ class Controller extends BaseClass
 		
 		if ($projRankId=='synonym' || $projRankId=='syn' ) return '<span class="italics">'.$name.'</span>';
 	
-		$r = $this->getProjectRanks(array('idsAsIndex' => true));
+		$r = $this->getProjectRanks();
 		
-		$rankId = $r['ranks'][$projRankId]['rank_id'];
-		$rankName = ucfirst($r['ranks'][$projRankId]['labels'][$this->getCurrentLanguageId()]);
+		$rankId = $r[$projRankId]['rank_id'];
+		$rankName = ucfirst($r[$projRankId]['labels'][$this->getCurrentLanguageId()]);
 
 		$g = $s = $i = false;
 		$elements = explode(' ', $name);
@@ -2230,9 +2162,6 @@ class Controller extends BaseClass
     
     }
 
-
-
-
 	private function getHotwords($forceUpdate=false)
 	{
 
@@ -2459,21 +2388,25 @@ class Controller extends BaseClass
 	protected function saveCache($key, $data)
 	{
 		$cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
+
 		if (!file_put_contents($cacheFile, serialize($data))) {
 			die('Cannot write to cache folder '. $_SESSION['app']['project']['urls']['cache']);
-		}	
+		}
+		
 		
 	}
 
 	public function getTreeList($p=null)
 	{
 
-		if (!isset($this->treeList)) return null;
+		if (!isset($this->treeList)) $this->buildTaxonTree(); // return null;
+		
+		$d = array();
 
 		foreach((array)$this->treeList as $key => $val) {
 			
 			if (!isset($p['includeEmpty']) && $p['includeEmpty']!==true && $val['is_empty']=='1') continue;
-
+			/*
 			if ($this->showLowerTaxon===true) {
 
 				if ($val['lower_taxon']=='1')  $d[$key] = $val;
@@ -2485,10 +2418,12 @@ class Controller extends BaseClass
 				if ($val['lower_taxon']=='1')  continue;
 
 			} else {
+			*/
 
 				$d[$key] = $val;
-			
+			/*
 			}
+			*/
 
 		}	
 
@@ -2557,8 +2492,8 @@ class Controller extends BaseClass
 			(!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash']===false) &&
 			isset($this->generalSettings['urlSplashScreen'])) {
 
-// STORE CURRENT REQUEST! and redirect there afterwards
-		
+			$_SESSION['app']['project']['splashEntryUrl'] = $_SERVER['REQUEST_URI'];
+
 			$this->redirect($this->generalSettings['urlSplashScreen']);
 		
 		}

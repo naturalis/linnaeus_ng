@@ -1,12 +1,5 @@
 <?php
 
-/*
-
-	add rollover?
-
-*/
-
-
 class LoggingHelper
 {
 
@@ -128,7 +121,9 @@ class LoggingHelper
 		fwrite(
 			$this->_file,
 			date('r').
-			' - '.
+			' ('.
+			microtime(true).
+			') - '.
 			$this->_levels[$severity].
 			': '.
 			$msg.
