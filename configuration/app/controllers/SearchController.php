@@ -450,9 +450,9 @@ class SearchController extends Controller
 		
 			if ($val['isMatch']=='1') {
 		
-				$taxa[$key]['rank'] = $ranks['ranks'][$val['rank_id']]['rank'];
+				$taxa[$key]['rank'] = $ranks[$val['rank_id']]['rank'];
 
-				if ($ranks['ranks'][$val['rank_id']]['lower_taxon']==1)
+				if ($ranks[$val['rank_id']]['lower_taxon']==1)
 					$sp[] = $taxa[$key];
 				else
 					$ht[] = $taxa[$key];
@@ -616,7 +616,7 @@ class SearchController extends Controller
 	
 		$taxa = $synonyms = $commonnames = $content = $media = array();
 
-		$ranks = $this->getProjectRanks(array('idsAsIndex'=>true));
+		$ranks = $this->getProjectRanks();
 
 		$taxa = $this->_searchSpeciesGetTaxa($search);
 
@@ -686,10 +686,26 @@ class SearchController extends Controller
 
 	}
 
-	private function getSpeciesLookupList($search)
+	public function getSpeciesLookupList($search=null)
 	{
 
-		$s = $this->searchSpecies($search,false);
+		if (empty($search)) {
+
+			$s = $this->getCache('search-contentsSpecies');
+
+			if (!$s) {
+
+				$s = $this->searchSpecies($search,false);
+
+				$this->saveCache('search-contentsSpecies',$s);
+
+			}
+			
+		} else {
+
+			$s = $this->searchSpecies($search,false);
+	
+		}
 
 		$d = array();
 		
@@ -851,10 +867,26 @@ class SearchController extends Controller
 
 	}
 
-	private function getGlossaryLookupList($search)
+	public function getGlossaryLookupList($search=null)
 	{
 
-		$g = $this->searchGlossary($search,false);
+		if (empty($search)) {
+
+			$g = $this->getCache('search-contentsGlossary');
+
+			if (!$g) {
+
+				$g = $this->searchGlossary($search,false);
+
+				$this->saveCache('search-contentsGlossary',$g);
+
+			}
+			
+		} else {
+
+			$g = $this->searchGlossary($search,false);
+	
+		}
 
 		$d = array();
 		
@@ -929,10 +961,26 @@ class SearchController extends Controller
 
 	}
 
-	private function getLiteratureLookupList($search)
+	public function getLiteratureLookupList($search=null)
 	{
+
+		if (empty($search)) {
+
+			$l = $this->getCache('search-contentsLiterature');
+
+			if (!$l) {
+
+				$l = $this->searchLiterature($search,false);
+
+				$this->saveCache('search-contentsLiterature',$l);
+
+			}
+			
+		} else {
+
+			$l = $this->searchLiterature($search,false);
 	
-		$l = $this->searchLiterature($search,false);
+		}
 	
 		$d = array();
 		
@@ -1413,10 +1461,26 @@ class SearchController extends Controller
 
 	}
 	
-	private function getModuleLookupList($search)
+	public function getModuleLookupList($search=null)
 	{
+
+		if (empty($search)) {
+
+			$l = $this->getCache('search-contentsModules');
+
+			if (!$l) {
+
+				$l = $this->searchModules($search);
+
+				$this->saveCache('search-contentsModules',$l);
+
+			}
+			
+		} else {
+
+			$l = $this->searchModules($search);
 	
-		$l = $this->searchModules($search);
+		}
 	
 		$d = array();
 		

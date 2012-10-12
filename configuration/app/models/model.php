@@ -959,7 +959,7 @@ abstract class Model extends BaseClass
 
 	private function logQueryResult($set,$query,$type,$severity=1) {
 
-		$this->log('DEBUG: '.$query,1);
+		//$this->log('DEBUG: '.$query,1);
 
 		if (!$set) {
 

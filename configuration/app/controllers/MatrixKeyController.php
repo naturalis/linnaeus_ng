@@ -84,27 +84,14 @@ class MatrixKeyController extends Controller
 
 			$this->setCurrentMatrix($matrix['id']);
 
-			//$this->redirect('matrices.php');
 		}
 
 		$this->redirect('identify.php');
-
-		/*
-        $this->setPageName(sprintf(_('Matrix "%s"'),$matrix['name']));
-
-		$this->smarty->assign('matrixCount',$this->getMatrixCount());
-
-		$this->smarty->assign('matrix',$matrix);
-
-        $this->printPage();
-		*/
     
     }
 
     public function matricesAction()
     {
-
-        //$this->setPageName( _('Matrices'));
 
 		$matrices = $this->getMatrices();
 
@@ -121,7 +108,6 @@ class MatrixKeyController extends Controller
 
 			$this->setCurrentMatrix($matrix['id']);
 
-			//$this->redirect('index.php');
 			$this->redirect('identify.php');
 
 		} else {
@@ -145,7 +131,6 @@ class MatrixKeyController extends Controller
 
 			$this->setCurrentMatrix($this->requestData['id']);
 
-			//$this->redirect('index.php');
 			$this->redirect('identify.php');
 
 		} else {
@@ -327,10 +312,51 @@ class MatrixKeyController extends Controller
 
 	}
 
-	public function getMatrices()
+	public function cacheAllTaxaInMatrix()
 	{
 
-		if (empty($_SESSION['app']['user']['matrix']['matrices'])) {
+		$mt = $this->models->MatrixTaxon->_get(
+			array(
+				'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+				),
+				'columns' => 'taxon_id,matrix_id',
+				'order' => 'matrix_id'
+			)
+		);
+
+		$tree = $this->getTreeList();
+
+		foreach((array)$mt as $key => $val) {
+
+			$d = $tree[$val['taxon_id']];
+
+			$taxa[$val['matrix_id']][] = 
+				array(
+					'id' => $d['id'],
+					'h' => $d['is_hybrid'],
+					'l' => $d['taxon'] //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+				);
+
+		}
+		
+		foreach((array)$taxa as $key => $val) {
+			$dummy = array();
+			foreach((array)$val as $tVal) {
+				$dummy[] = $tVal;
+			}
+			$this->customSortArray($dummy, array('key' => 'taxon', 'case' => 'i'));
+			$this->saveCache('matrix-taxa-' . $key, isset($dummy) ? $dummy : null);
+		}
+		
+	}
+
+	private function getMatrices()
+	{
+
+		$m = $this->getCache('matrix-matrices');
+		
+		if (!$m) {
 
 			$m = $this->models->Matrix->_get(
 				array(
@@ -361,57 +387,56 @@ class MatrixKeyController extends Controller
 			}
 
 			$this->customSortArray($m, array('key' => 'default', 'dir' => 'desc', 'case' => 'i','maintainKeys' => true));
-			$_SESSION['app']['user']['matrix']['matrices'] = $m;
+			
+			$this->saveCache('matrix-matrices', $m);
 
 		}
 
-		return $_SESSION['app']['user']['matrix']['matrices'];
+		return $m;
 	
 	}
 
-	public function getTaxaInMatrix($matrixId=null)
+	private function getTaxaInMatrix($matrixId=null)
 	{
-	
+
 		$matrixId = is_null($matrixId) ? $this->getCurrentMatrixId() : $matrixId;
 		
-		$storedData = $this->getCache('matrix-taxa-' . $matrixId);
+		if (empty($matrixId)) return;
 		
-		if ($storedData) return $storedData;
-			
-		$mt = $this->models->MatrixTaxon->_get(
-				array(
-						'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'matrix_id' => $matrixId
-						),
-						'columns' => 'taxon_id'
-				)
-		);
+		$taxa = $this->getCache('matrix-taxa-' . $matrixId);
+		
+		if (!$taxa) {
 
-		foreach((array)$mt as $key => $val) {
-				
-			$t = $this->models->Taxon->_get(
-					array(
-							'id' => array(
-									'project_id' => $this->getCurrentProjectId(),
-									'id' => $val['taxon_id']
-							),
-							'columns' => 'id,taxon,is_hybrid,rank_id'
-					)
+			$mt = $this->models->MatrixTaxon->_get(
+				array(
+					'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'matrix_id' => $matrixId
+					),
+					'columns' => 'taxon_id'
+				)
 			);
 
-			$taxa[] = 
-				array(
-					'id' => $t[0]['id'],
-					'h' => $t[0]['is_hybrid'],
-					'l' => $t[0]['taxon'] //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
-				);
+			$tree = $this->getTreeList();
 
+			foreach((array)$mt as $key => $val) {
+
+				$d = $tree[$val['taxon_id']];
+	
+				$taxa[] = 
+					array(
+						'id' => $d['id'],
+						'h' => $d['is_hybrid'],
+						'l' => $d['taxon'] //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+					);
+	
+			}
+	
+			$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
+
+			$this->saveCache('matrix-taxa-' . $matrixId, isset($taxa) ? $taxa : null);
+			
 		}
-
-		$this->customSortArray($taxa, array('key' => 'taxon', 'case' => 'i'));
-		
-		$this->saveCache('matrix-taxa-' . $matrixId, isset($taxa) ? $taxa : null);
 		
 		return $taxa;
 	

@@ -40,7 +40,7 @@ class ModuleController extends Controller
     public function __construct($p=null)
     {
 
-        parent::__construct();
+        parent::__construct($p);
 	
     }
 
@@ -52,7 +52,7 @@ class ModuleController extends Controller
     public function __destruct ()
     {
         
-        parent::__construct($p);
+        parent::__destruct();
     
     }
 

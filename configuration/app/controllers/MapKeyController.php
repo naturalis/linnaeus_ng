@@ -6,8 +6,6 @@ class MapKeyController extends Controller
 {
     
     public $usedModels = array(
-		'map',
-		'map_name',
 		'occurrence_taxon',
 		'geodata_type',
 		'geodata_type_title',
@@ -433,7 +431,7 @@ class MapKeyController extends Controller
 
 			if ($results['count']['total']>0) {
 
-				$taxa = $this->getTreeList($this->buildTaxonTree());				
+				$taxa = $this->getTreeList();				
 
 				$geoDataTypes = $this->getGeoDataTypes();
 
@@ -1261,88 +1259,24 @@ class MapKeyController extends Controller
 		
 	}
 
-	private function l2GetTaxaWithOccurrences()
+	public function l2GetTaxaWithOccurrences()
 	{
 
-		$taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
+		$taxa = $this->getCache('map-L2OccurringTaxa');
+		
+		if (!$taxa) {
 
-		$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+			$taxa = $this->l2GetTaxaOccurrenceCount($this->buildTaxonTree());
+	
+			$this->customSortArray($taxa,array('key' => 'taxon','maintainKeys' => true));
+	
+			$this->saveCache('map-L2OccurringTaxa',$taxa);
+			
+		}
 
 		return $taxa;
 	
 	}
-/*
-	private function l2GetTaxaOccurrenceCount($taxaToFilter=null)
-	{
-
-
-		if (!isset($_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'])) {
-	
-			if ($this->l2HasTaxonOccurrencesCompacted()) {
-		
-				$ot = $this->models->L2OccurrenceTaxonCombi->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-						),
-						'columns' => 'taxon_id,square_numbers',
-						'fieldAsIndex' => 'taxon_id'
-					)
-				);
-				
-				foreach((array)$ot as $key => $val) {
-				
-					$ot[$key]['total'] = count((array)explode(',',$val['square_numbers']));
-						
-				}
-
-			} else {
-		
-				$ot = $this->models->L2OccurrenceTaxon->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-						),
-						'columns' => 'taxon_id,count(*) as total',
-						'group' => 'taxon_id',
-						'fieldAsIndex' => 'taxon_id'
-					)
-				);
-		
-		
-		
-				
-			}
-			
-			$_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'] = $ot;
-			
-		}
-		
-		$ot = $_SESSION['app']['user']['map']['l2TaxaOccurrencesCount'];
-		
-		if (isset($taxaToFilter)) {
-		
-			foreach((array)$ot as $key => $val) {
-			
-				if ($val['total']!=0 && isset($taxaToFilter[$key])) {
-				
-					$d[$key] = $taxaToFilter[$key];
-					$d[$key]['total'] = $val['total'];
-
-				}
-			
-			}
-			
-		} else {
-		
-			$d = $ot;
-		
-		}
-
-		return isset($d) ? $d : null;
-	
-	}
-*/
 
 	public function l2GetTaxaOccurrenceCount($taxaToFilter=null)
 	{
