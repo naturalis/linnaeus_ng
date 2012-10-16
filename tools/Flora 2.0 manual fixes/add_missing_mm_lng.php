@@ -7,13 +7,8 @@
 	ob_implicit_flush(1);
 
 	// $multimedia array with all multimedia files
-	require_once 'multimedia.php';
-	$projectId = 517;
-	$pathToMM = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/www/admin/media/project/0' . $projectId . '/';
+	require_once 'include_me.php';
 	
-	$connect = mysql_connect('localhost', 'root', 'root') or die(mysql_error());
-	mysql_select_db('linnaeus_ng') or die(mysql_error());
-
 	$n = 0;
 	foreach ($multimedia as $species => $speciesMultimedia) {
 		// Lookup species id
