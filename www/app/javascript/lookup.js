@@ -446,11 +446,3 @@ $(document).ready(function(){
 	$('#'+allLookupBoxName).focus();
 
 });
-
-	
-	
-	
-	
-	
-	
-	
