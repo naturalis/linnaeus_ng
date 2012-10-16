@@ -99,7 +99,7 @@ class IntroductionController extends Controller
 			$id = $this->requestData['id'];
 
 			$page = $this->getPage($id);
-		
+
 			$page['content'] = $this->matchGlossaryTerms($page['content']);
 
 			$page['content'] = $this->matchHotwords($page['content']);

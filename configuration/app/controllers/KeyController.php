@@ -48,7 +48,7 @@ class KeyController extends Controller
      */
     public function __construct($p=null)
     {
-        
+
         parent::__construct($p);
 		
     }
@@ -238,7 +238,7 @@ class KeyController extends Controller
 	
 	public function setKeyTree()
 	{
-
+return;
 		// get stored tree from database
 		$kt = $this->models->Keytree->_get(
 			array(
@@ -251,7 +251,7 @@ class KeyController extends Controller
 		
 		// if it doesn't exist, generate it anew (shouldn't happen!)
 		if (empty($kt[0]['keytree'])) {
-			
+
 			$d = $this->generateKeyTree();
 		
 		}
@@ -359,17 +359,16 @@ class KeyController extends Controller
 
 			$id = $this->getStartKeystepId();
 
-		} else {
-		
-			$step = $this->getKeystep($id);
 		}
+		
+		$d = $this->getKeystep($id);
 		
 		$step = 
 			array(
-				'id' => $step['id'],
-				'number' => $step['number'],
-				'title' => utf8_decode($step['title']),
-				'is_start' => $step['is_start'],
+				'id' => $d['id'],
+				'number' => $d['number'],
+				'title' => utf8_decode($d['title']),
+				'is_start' => $d['is_start'],
 				'level' => $level
 			);		
 

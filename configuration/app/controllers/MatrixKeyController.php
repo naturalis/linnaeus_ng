@@ -326,6 +326,8 @@ class MatrixKeyController extends Controller
 		);
 
 		$tree = $this->getTreeList();
+		
+		$taxa = array();
 
 		foreach((array)$mt as $key => $val) {
 
