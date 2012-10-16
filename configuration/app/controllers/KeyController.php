@@ -883,10 +883,12 @@ class KeyController extends Controller
 	private  function reapSteps($branch)
 	{
 
-		$this->tmp['results'][] =
+		$this->tmp['results'][(int)$branch['number']] =
 			array(
 				'id' => $branch['id'],
-				'label' => $branch['number'].'. '.$branch['title']
+				//'label' => $branch['number'].'. '.$branch['title'],
+				'label' => _('Step').' '.$branch['number'].(!empty($branch['title']) && $branch['title']!=$branch['number'] ? ': '.$branch['title'] : ''),
+				'number' => (int)$branch['number'],
 			);
 
 		foreach((array)$branch['choices'] as $val) {
@@ -907,6 +909,8 @@ class KeyController extends Controller
 
 		// ploughs the entire key
 		$this->reapSteps($this->getKeyTree());
+
+		$this->customSortArray($this->tmp['results'],array('key' => 'number'));
 
 		$this->smarty->assign(
 			'returnText',
