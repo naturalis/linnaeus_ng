@@ -3,6 +3,7 @@
 
 {assign var='totalSteps' value=$keypath|@count}
 {assign var='previousStep' value=$totalSteps-2}
+
 <script type="text/javascript">
     var tmp = '<div id="lookup-DialogContent">';
     {if $keypath|@count > 1}
@@ -20,6 +21,8 @@
     tmp = tmp + '</div>';
 </script>
 
+<span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon" />
+{t}Contents{/t}</span>
 
 {if $useJavascriptLinks}
     {if $totalSteps > 1}
