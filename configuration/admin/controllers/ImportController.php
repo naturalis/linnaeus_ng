@@ -2192,6 +2192,7 @@ class ImportController extends Controller
 					$taxonId,
 					$overviewFileName,
 					null,
+					null,
 					true,
 					$imageCount++
 				);
@@ -2221,7 +2222,7 @@ class ImportController extends Controller
 				$r = $this->doAddSpeciesMedia(
 					$taxonId,
 					$fileName,
-					//trim((isset($vVal->caption) ? ((string)$vVal->caption) : (isset($vVal->fullname) ? ((string)$vVal->fullname) : $fileName))),
+					isset($vVal->fullname) ? ((string)$vVal->fullname) : null,
 					isset($vVal->caption) ? trim((string)$vVal->caption) : null,
 					false,
 					$imageCount++
@@ -2246,7 +2247,7 @@ class ImportController extends Controller
 					
 	}
 
-	private function doAddSpeciesMedia($taxonId,$fileName,$caption,$isOverviewPicture,$sortOrder)
+	private function doAddSpeciesMedia($taxonId,$fileName,$fullName,$caption,$isOverviewPicture,$sortOrder)
 	{
 
 		if ($_SESSION['admin']['system']['import']['imagePath']==false)
@@ -2281,7 +2282,7 @@ class ImportController extends Controller
 						'taxon_id' => $taxonId,
 						'file_name' => $fileName,
 						'thumb_name' => $thumbName,
-						'original_name' => $fileName,
+						'original_name' => $fullName,
 						'mime_type' => $thisMIME,
 						'file_size' => filesize($_SESSION['admin']['system']['import']['imagePath'].$fileName),
 						'overview_image' => ($isOverviewPicture ? 1 : 0),

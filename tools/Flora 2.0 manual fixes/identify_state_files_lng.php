@@ -6,11 +6,8 @@
 	for ($i = 0; $i < ob_get_level(); $i++) { ob_end_flush(); }
 	ob_implicit_flush(1);
 
-	$projectId = 517;
-	$pathToMM = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/www/admin/media/project/0' . $projectId . '/';
+	require_once 'include_me.php';
 
-	$connect = mysql_connect('localhost', 'root', 'root') or die(mysql_error());
-	mysql_select_db('linnaeus_ng') or die(mysql_error());
 	mysql_query('update `dev_characteristics_states` set file_name = null where project_id = ' . $projectId) or die(mysql_error());
 	
 	$identify_files = array(
