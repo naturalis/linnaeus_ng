@@ -238,7 +238,7 @@ class KeyController extends Controller
 	
 	public function setKeyTree()
 	{
-return;
+
 		// get stored tree from database
 		$kt = $this->models->Keytree->_get(
 			array(

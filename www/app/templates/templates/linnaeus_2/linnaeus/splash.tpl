@@ -35,7 +35,7 @@ $(document).ready(function(){
 	$('#status').load('?go=load', function(response,status,xhr) {
 
 /* take me out for auto-forwarding after splash/preload */
-$('#status').html('[temp fix so ruud can SEE] <a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
+$('#status').html($('#status').html()+'<br />'+'[temp fix so ruud can SEE] <a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
 return;
 /* /take me out for auto-forwarding after splash/preload */
 
