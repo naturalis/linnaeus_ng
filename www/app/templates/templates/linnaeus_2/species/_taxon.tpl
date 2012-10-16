@@ -121,7 +121,7 @@
 		{elseif $v.category=='video'}
 				<img 
 					id="media-{$k}"
-					alt="{if $v.original_name!=''}{$v.original_name} - {elseif $v.file_name!=''}{$v.file_name} - {/if}{$v.description}" 
+					alt="{$v.description}"
 					title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
 					src="{$session.app.project.urls.systemMedia}video.png" 
 					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
