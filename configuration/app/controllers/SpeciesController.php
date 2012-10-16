@@ -82,10 +82,6 @@ class SpeciesController extends Controller
 
 		$this->setControllerBaseName();
 
-		$this->showLowerTaxon = true;
-		
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
-
 		$this->_indexAction();
 
 	}
@@ -103,8 +99,6 @@ class SpeciesController extends Controller
 		$this->setTaxonType('higher');
 
 		$this->setControllerBaseName();
-
-		$this->showLowerTaxon = false;
 
 		$this->_indexAction();
 
@@ -251,40 +245,48 @@ class SpeciesController extends Controller
 	
 	}
 
+	private function getFirstTaxonId()
+	{
+	
+		$taxa = $this->buildTaxonTree();
+		
+		if (empty($taxa)) return null;
+
+		$d = current($taxa);
+		
+		if ($this->getTaxonType() == 'higher') {
+				
+			return $d['id'];
+			
+		} else {
+		
+			while($d['lower_taxon']==0) {
+			
+				$d = next($taxa);
+			
+			}
+
+			return $d['id'];
+		
+		}
+	
+	}
+
+
     private function _indexAction ()
     {
 
 		if (!$this->rHasVal('id')) {
 
-			$taxa = $this->buildTaxonTree();
-				
-			$d = (!empty($taxa) ? current($taxa) : array());
-			
-			$id = (isset($d['id']) ? $d['id'] : 0);
-			
+			$id = $this->getFirstTaxonId();
+
 		} else {
-			
+
 			$id = $this->requestData['id'];
 				
 		}
 
-
 		$this->redirect('taxon.php?id='.$id);
-
-		/*
-		// max taxa to show per page
-		$taxaPerPage = $this->controllerSettings['speciesPerPage'];
-
-		$pagination = $this->getPagination($taxa,$taxaPerPage);
-
-		if (isset($pagination['items'])) $this->smarty->assign('taxa', $pagination['items']);
-
-		$this->smarty->assign('prevStart', $pagination['prevStart']);
-
-		$this->smarty->assign('nextStart', $pagination['nextStart']);
-
-        $this->printPage();
-		*/
   
     }
 
@@ -841,9 +843,22 @@ class SpeciesController extends Controller
 	private function getAdjacentItems($id)
 	{
 
-		$this->showLowerTaxon = ($this->getTaxonType() == 'lower');
-
 		$taxa = $this->buildTaxonTree();
+
+		$d = array();
+		
+		while (list($key, $val) = each($taxa)) {
+
+			if (
+				($this->getTaxonType() == 'higher' && $val['lower_taxon']==0) ||
+				($this->getTaxonType() == 'lower' && $val['lower_taxon']==1)
+				) {
+				$d[$key] = $val;
+			}
+			
+		}
+
+		$taxa = $d;
 		
 		if ($taxa && !empty($taxa)) {
 			
@@ -916,7 +931,10 @@ class SpeciesController extends Controller
 				
 		foreach((array)$taxa as $key => $val) {
 		
-			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
+			if (
+				($getAll || preg_match($regexp,$val['taxon']) == 1) &&
+				($this->getTaxonType() == 'higher' ? $val['lower_taxon']==0 : $val['lower_taxon']==1)
+				)
 				$l[] = array(
 					'id' => $val['id'],
 					'label' => 	$t[$key]['label'] = $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id'])

@@ -33,6 +33,7 @@ class LoaderController extends Controller
 {
 
 	public $cssToLoad = array('basics.css');
+	public $jsToLoad = array('all' => array('main.js'));
 
     public function __construct($p=null)
     {
@@ -51,7 +52,7 @@ class LoaderController extends Controller
     public function splashAction ()
     {
 	
-		//$this->doPreload();die();
+		//$this->doPreload();die(); // straight debug version (no ajax)
 	
 		if ($this->rHasVal('go','load')) {
 
@@ -140,7 +141,7 @@ class LoaderController extends Controller
 		$c = new KeyController(array('checkForSplash'=>false));
 
 		$c->loadControllerConfig('Key');
-		
+
 		$c->setKeyTree();
 		$c->getAllTaxaInKey();
 		$c->getTaxonDivision($c->getStartKeystepId());
@@ -240,17 +241,14 @@ class LoaderController extends Controller
 
 		//require_once ('../../../../configuration/app/controllers/SpeciesController.php');
 		//$c = new SpeciesController();
-		
-		$this->loadControllerConfig('Species');
-		
-		$this->getProjectRanks();
-		
-		foreach((array)$l as $val) {
 
-			$this->setCurrentLanguageId($val['id']);
-			$this->buildTaxonTree();
+		$this->loadControllerConfig('Species');
+
+		$this->getProjectRanks();
+
+		$this->buildTaxonTree();
 		
-		}
+		$this->loadControllerConfig();
 
 	}
 

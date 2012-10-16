@@ -2293,6 +2293,10 @@ class Controller extends BaseClass
 		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
 		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
 
+
+$forceLookup = true;
+
+
 		if (!$forceLookup) {
 
 			if (
@@ -2345,7 +2349,7 @@ class Controller extends BaseClass
 				if ($includeLanguageLabels) {
 	
 					foreach((array)$_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
-		
+
 						$lpr = $this->models->LabelProjectRank->_get(
 							array(
 								'id' => array(
@@ -2404,7 +2408,7 @@ class Controller extends BaseClass
 				'order' => 'def_language desc'
 			)
 		);
-        
+
         foreach ((array) $lp as $key => $val) {
             
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));

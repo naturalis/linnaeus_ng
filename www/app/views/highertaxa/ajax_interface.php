@@ -6,8 +6,6 @@ $c = new SpeciesController();
 
 $c->setTaxonType('higher');
 
-$c->showLowerTaxon = false;
-
 $c->setStoreHistory(false);
 
 $c->ajaxInterfaceAction();

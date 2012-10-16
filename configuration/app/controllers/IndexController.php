@@ -196,8 +196,6 @@ class IndexController extends Controller
 
 		}
 
-		$this->showLowerTaxon = ($this->getTaxonType()=='lower');
-		
 		$names = $taxa = $this->buildTaxonTree();
 		
 		if ($this->getTaxonType()=='lower') {
@@ -406,7 +404,6 @@ class IndexController extends Controller
 		if (isset($_SESSION['app']['user']['indexModule']['hasSpecies'])) return;
 
 		// Check taxa
-		$this->showLowerTaxon = null;
 		$_SESSION['app']['user']['indexModule']['hasSpecies'] = $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 0;
 		$taxa = $this->buildTaxonTree();
 		foreach ($taxa as $taxon) {

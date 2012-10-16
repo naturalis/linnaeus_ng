@@ -115,7 +115,6 @@ class LinnaeusController extends Controller
 		else
 			$this->redirect('../linnaeus/content.php?sub=Welcome');
 
-
     }
 
     /**

@@ -33,7 +33,6 @@ class Controller extends BaseClass
 	public $showBackToSearch = true;
 	public $storeHistory = true;
     public $treeList;
-    public $showLowerTaxon = true;
 	public $includeLocalMenu = true;
 	public $allowEditPageOverlay = true;
 	public $tmp;
@@ -148,7 +147,7 @@ class Controller extends BaseClass
 
 	public function checkForProjectId()
 	{
-	
+
 		$pB = $this->getCurrentProjectId();
 
 		if ($this->rHasVal('p')) {
@@ -162,7 +161,6 @@ class Controller extends BaseClass
 			$this->resolveProjectId();
 
 		}
-
 		$d = $this->getCurrentProjectId();
 		
 		if ($d==null) $this->redirect($this->generalSettings['urlNoProjectId']);
@@ -292,7 +290,7 @@ class Controller extends BaseClass
 
 	public function getProjectRanks()
 	{
-
+	
 		$pr = $this->getCache('tree-ranks');
 		
 		if (!$pr) {
@@ -306,6 +304,8 @@ class Controller extends BaseClass
 					'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
 				)
 			);
+			
+			$pl = $this->getProjectLanguages();
 
 			foreach((array)$pr as $rankkey => $rank) {
 			
@@ -316,19 +316,23 @@ class Controller extends BaseClass
 				$pr[$rankkey]['rank'] = $r['rank'];
 	
 				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-	
-				$lpr = $this->models->LabelProjectRank->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'project_rank_id' => $rank['id'],
-							'language_id' => $this->getCurrentLanguageId()
-						),
-						'columns' => 'label'
-					)
-				);
 				
-				$pr[$rankkey]['labels'][$this->getCurrentLanguageId()] = $lpr[0]['label'];
+				foreach((array)$pl as $val) {
+
+					$lpr = $this->models->LabelProjectRank->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'project_rank_id' => $rank['id'],
+								'language_id' => $val['language_id']
+							),
+							'columns' => 'label'
+						)
+					);
+					
+					$pr[$rankkey]['labels'][$val['id']] = $lpr[0]['label'];
+
+				}
 	
 			}
 
@@ -342,6 +346,7 @@ class Controller extends BaseClass
 	
 	public function getTaxonById($id)
 	{
+	
 		if (empty($id) || $id==0) {
 			return;
 		}
@@ -705,7 +710,7 @@ class Controller extends BaseClass
 				'order' => 'def_language desc'
 			)
 		);
-        
+
         foreach ((array) $lp as $key => $val) {
             
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));
@@ -992,9 +997,15 @@ class Controller extends BaseClass
 		if ($projRankId=='synonym' || $projRankId=='syn' ) return '<span class="italics">'.$name.'</span>';
 	
 		$r = $this->getProjectRanks();
-		
+
 		$rankId = $r[$projRankId]['rank_id'];
-		$rankName = ucfirst($r[$projRankId]['labels'][$this->getCurrentLanguageId()]);
+
+		if (isset($r[$projRankId]['labels'][$this->getCurrentLanguageId()]))
+			$d = $r[$projRankId]['labels'][$this->getCurrentLanguageId()];
+		else
+			$d = $r[$projRankId]['rank'];
+
+		$rankName = ucfirst($d);
 
 		$g = $s = $i = false;
 		$elements = explode(' ', $name);
@@ -2296,12 +2307,12 @@ class Controller extends BaseClass
 		-> matrix states are stored in the MatrixController itself
 	
 	*/
-	private function storeState()
+	public function storeState()
 	{
-	
+
 		if ($this->storeHistory===false || session_id()=='') return;
 
-		unset($_SESSION['app']['user'][$this->controllerBaseName]['state']);
+		unset($_SESSION['app']['user']['states'][$this->controllerBaseName]);
 		
 		$d = null;
 		
@@ -2312,7 +2323,7 @@ class Controller extends BaseClass
 		
 		$d['lastPage'] = $_SERVER['REQUEST_URI'];
 
-		$_SESSION['app']['user'][$this->getControllerBaseName()]['state'] = $d;
+		$_SESSION['app']['user']['states'][$this->getControllerBaseName()] = $d;
 	
 	}
 
@@ -2325,14 +2336,14 @@ class Controller extends BaseClass
 		-> restoration of the place in the keypath is done in KeyController::indexAction (when called without any parameters)	
 		-> restoration of matrix states is done in MatrixController::identifyAction
 		-> the function SpeciesController::setLastViewedTaxonIdForTheBenefitOfTheMapkey in some cases destroys the value of
-		   $_SESSION['app']['user']['mapkey']['state'], so that the mapkey, when accesses from the main menu, automatically shows
+		   $_SESSION['app']['user']['states']['mapkey'], so that the mapkey, when accesses from the main menu, automatically shows
 		   the distribution of the taxon last seen in the species module
 	
 	*/
 	private function restoreState()
 	{
 
-		if (!isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) return;
+		if (!isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()])) return;
 
 		// /app/views/mapkey/ vs /app/views/mapkey/index.php
 		$d = strpos($_SERVER['REQUEST_URI'],'?')==false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
@@ -2346,19 +2357,19 @@ class Controller extends BaseClass
 			)  && 
 			$requestHasNoFileName && 
 			(
-				isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']) && 
-				$_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage'] != $_SERVER['REQUEST_URI'])
+				isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']) && 
+				$_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $_SERVER['REQUEST_URI'])
 			
 			) 
 		{
 
-			$this->redirect($_SESSION['app']['user'][$this->getControllerBaseName()]['state']['lastPage']);
+			$this->redirect($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']);
 
 		}
 
-		if (isset($_SESSION['app']['user'][$this->getControllerBaseName()]['state'])) {
+		if (isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()])) {
 		
-			foreach((array)$_SESSION['app']['user'][$this->getControllerBaseName()]['state'] as $key => $val) {
+			foreach((array)$_SESSION['app']['user']['states'][$this->getControllerBaseName()] as $key => $val) {
 			
 				if (!isset($this->requestData[$key])) $this->requestData[$key] = $val;
 			
@@ -2406,42 +2417,26 @@ class Controller extends BaseClass
 		foreach((array)$this->treeList as $key => $val) {
 			
 			if (!isset($p['includeEmpty']) && $p['includeEmpty']!==true && $val['is_empty']=='1') continue;
-			/*
-			if ($this->showLowerTaxon===true) {
 
-				if ($val['lower_taxon']=='1')  $d[$key] = $val;
-			
-			} elseif ($this->showLowerTaxon===false) {
-
-				if ($val['lower_taxon']=='0')  $d[$key] = $val;
-
-				if ($val['lower_taxon']=='1')  continue;
-
-			} else {
-			*/
-
-				$d[$key] = $val;
-			/*
-			}
-			*/
+			$d[$key] = $val;
 
 		}	
 
 		return isset($d) ? $d : null;
 	
 	}
-	
+
 	public function buildTaxonTree($p=null)
 	{
 
-		if (!$this->getCache('species-treeList-'.$this->getCurrentLanguageId())) {
+		if (!$this->getCache('species-treeList')) {
 	
 			$this->_buildTaxonTree();
-			$this->saveCache('species-treeList-'.$this->getCurrentLanguageId(), isset($this->treeList) ? $this->treeList : null);
+			$this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
 	
 		} else {
 	
-			$this->treeList = $this->getCache('species-treeList-'.$this->getCurrentLanguageId());
+			$this->treeList = $this->getCache('species-treeList');
 	
 		}
 		
