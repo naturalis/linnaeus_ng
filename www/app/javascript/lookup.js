@@ -205,7 +205,6 @@ function allLookupSetExtraVars(name,value) {
 
 }
 
-
 function allLookupBuildList(obj,txt) {
 
 	allLookupRowCount = 0;
@@ -215,12 +214,8 @@ function allLookupBuildList(obj,txt) {
 
 	if (obj.results) {
 
-		//var str = '<table id="allLookupListTable">';
-		var str = '';
+		var textToAppend = Array();
 
-		$('#'+allLookupListName).append(str);
-		$('#'+allLookupDialogContentName).append(str);
-		
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
 		
 		for(var i=0;i<obj.results.length;i++) {
@@ -231,7 +226,7 @@ function allLookupBuildList(obj,txt) {
 
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
-				var str =
+				textToAppend[i] = 
 					'<p id="allLookupListCell-'+i+'" class="row'+
 						(allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' )+
 						'" lookupId="'+d.id+'" onclick="window.open(\''+
@@ -241,13 +236,13 @@ function allLookupBuildList(obj,txt) {
 						(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
 					'</p>';
 
-				$('#'+allLookupDialogContentName).append(str);
-
 				allLookupRowCount++;
 
 			}
 
 		}
+		
+		$('#'+allLookupDialogContentName).append(textToAppend.join(''));
 
 	}
 
@@ -257,6 +252,7 @@ function allLookupBuildList(obj,txt) {
 	if (allLookupIndicateSelectedId) allLookupScrollToSelectedId();
 
 }
+
 
 function allLookupClearDiv() {
 
