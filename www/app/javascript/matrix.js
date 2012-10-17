@@ -455,7 +455,7 @@ function fillScores(obj,char) {
 	for (var i=0;i<obj.length;i++) {
 		
         textToInsert[i] =
-			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
+			'<option ondblclick="'+(obj[i].type=='mtx' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
 				(obj[i].s!=undefined ? obj[i].s+'%: ' : '')+
 				(obj[i].type=='mtx' ? _('Matrix: ') : '')+obj[i].l+'</option>';
      
@@ -520,14 +520,6 @@ function fillTaxonStates(obj,char) {
 
 	if (!obj) return;
 
-	/*
-	for(var i in obj) {
-
-		$('#states').append('<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>');
-
-	}
-	*/
-	
     var textToInsert = [];
 
 	for(var i in obj) {
