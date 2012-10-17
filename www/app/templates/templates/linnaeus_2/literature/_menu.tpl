@@ -1,3 +1,7 @@
+<script type="text/javascript">
+	allLookupSetSelectedId({$ref.id});
+</script>
+
 <div id="allNavigationPane">
 {include file="../shared/_back-to-search.tpl"}
 <div class="navigation-icon-wrapper">
