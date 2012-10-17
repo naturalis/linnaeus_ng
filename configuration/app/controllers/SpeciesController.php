@@ -941,6 +941,8 @@ class SpeciesController extends Controller
 				);
 
 		}
+
+
 		
 		$this->smarty->assign(
 			'returnText',
