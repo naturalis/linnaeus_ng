@@ -1,3 +1,9 @@
+{assign var=selectedChoice value=$keypath|@end}
+<script type="text/javascript">
+	allLookupSetSelectedId({$selectedChoice.id});
+</script>
+
+
 <div id="allNavigationPane">
 <div class="navigation-icon-wrapper">
 
