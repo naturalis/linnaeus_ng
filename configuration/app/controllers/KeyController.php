@@ -713,7 +713,7 @@ class KeyController extends Controller
 
 			$d = $tree[$key];
 
-			$excludedTaxa[$val] = 
+			$excludedTaxa[$key] = 
 				array(
 					'id' => $d['id'],
 					'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
@@ -724,7 +724,6 @@ class KeyController extends Controller
 		$this->customSortArray($includedTaxa,array('key' => 'taxon'));
 
 		$this->customSortArray($excludedTaxa,array('key' => 'taxon'));
-
 		
 		return array(
 				'remaining' => $includedTaxa,
@@ -739,7 +738,7 @@ class KeyController extends Controller
 		the cache will be considerably greater with this function (in heukels flora, the cache file sizes for the 
 		first step for each function was 246K and 43K, respectively). potential downside is that the new function
 		has to retrieve, and sort, full taxon data evertime it is called. nevertheless, it appears to be slightly 
-		fastet than this one. go figure.
+		faster than this one. go figure.
 	*/
 	public function originalGetTaxonDivision($step)
 	{
