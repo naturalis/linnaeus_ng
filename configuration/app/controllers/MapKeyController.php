@@ -1145,52 +1145,62 @@ class MapKeyController extends Controller
 	
 	}
 
-	private function getLookupList($p)
+	public function getLookupList($p)
 	{
 
 		$search = isset($p['search']) ? $p['search'] : null;
 		$matchStartOnly = isset($p['match_start']) ? $p['match_start']=='1' : false;
 		$getAll = isset($p['get_all']) ? $p['get_all']=='1' : false;
 		$l2MustHaveGeo = false;
-
+	
 		if (isset($p['vars'])) {
-
+	
 			foreach((array)$p['vars'] as $val) {
-
+	
 				if ($val[0]=='l2_must_have_geo' && $val[1]=='1') $l2MustHaveGeo = true;
 			
 			}
 		
 		}
+		
+		$index = md5($search.':'.(int)$matchStartOnly.':'.(int)$getAll.':'.(int)$l2MustHaveGeo);
 
-		$search = str_replace(array('/','\\'),'',$search);
+		$l = $this->getCache('map-contents-'.$index);
+	
+		if (!$l) {
 
-		if (empty($search) && !$getAll) return;
-
-		if ($matchStartOnly)
-			$regexp = '/^'.preg_quote($search).'/i';
-		else
-			$regexp = '/'.preg_quote($search).'/i';
-
-		$l = array();
-
-		if ($l2MustHaveGeo)
-			$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
-		else				
-			$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
-
-		foreach((array)$taxa as $key => $val) {
-
-			if ($getAll || preg_match($regexp,$val['taxon']) == 1)
-				$l[] = array(
-					'id' => $val['id'],
-					'label' => $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id'])
-				);
+			$search = str_replace(array('/','\\'),'',$search);
+	
+			if (empty($search) && !$getAll) return;
+	
+			if ($matchStartOnly)
+				$regexp = '/^'.preg_quote($search).'/i';
+			else
+				$regexp = '/'.preg_quote($search).'/i';
+	
+			$l = array();
+	
+			if ($l2MustHaveGeo)
+				$taxa = $this->getTaxaOccurrenceCount($this->l2GetTaxaWithOccurrences());
+			else				
+				$taxa = $this->getTaxaOccurrenceCount($this->buildTaxonTree());
+	
+			foreach((array)$taxa as $key => $val) {
+	
+				if ($getAll || preg_match($regexp,$val['taxon']) == 1)
+					$l[] = array(
+						'id' => $val['id'],
+						'label' => $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id'])
+					);
+	
+			}
+	
+			$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
+			
+			$this->saveCache('map-contents-'.$index, $l);
 
 		}
 
-		$this->customSortArray($l,array('key' => 'taxon','maintainKeys' => true));
-		
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
