@@ -192,6 +192,13 @@ class LoaderController extends Controller
 
 		$c->l2GetTaxaOccurrenceCount();
 		$c->l2GetTaxaWithOccurrences();
+		$c->getLookupList(
+			array(
+				'search' => '*',
+				'match_start' => '1',
+				'get_all' => '1',
+			)
+		);
 
 		unset($c);
 
