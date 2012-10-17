@@ -41,6 +41,7 @@ var allLookupContentUrl = 'ajax_interface.php';
 var allLookupSuppressKeyNavigation = false;
 var allLookupSelectedId = null;
 var allLookupIndicateSelectedId = false;
+var allLookupSelectedElement = null;
 
 function allLookupGetData(text,getAll) {
 
@@ -204,6 +205,7 @@ function allLookupSetExtraVars(name,value) {
 
 }
 
+
 function allLookupBuildList(obj,txt) {
 
 	allLookupRowCount = 0;
@@ -221,31 +223,24 @@ function allLookupBuildList(obj,txt) {
 		
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
 		
-		var selectedElement = null;
-
 		for(var i=0;i<obj.results.length;i++) {
 			
 			var d = obj.results[i];
 			
 			if (d.id && d.label) {
 
-				//d.label.replace(eval('/'+txt+'/ig'),'<span class="allLookupListHighlight">'+txt+'</span>') +
-				
-				selectedElement = (allLookupIndicateSelectedId && allLookupSelectedId==d.id ? 'allLookupListCell-'+i : selectedElement);
+				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
 				var str =
 					'<p id="allLookupListCell-'+i+'" class="row'+
-							(allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' )+
-							'" lookupId="'+d.id+'" onclick="window.open(\''+
-							(d.url ? d.url : url.replace('%s',d.id)) +
-							'\',\'_self\')">'+
-(allLookupIndicateSelectedId && allLookupSelectedId==d.id ? '>' : '' )+
-							d.label +
-							(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
+						(allLookupIndicateSelectedId && allLookupSelectedId==d.id ? ' allLookupListCellSelected' : '' )+
+						'" lookupId="'+d.id+'" onclick="window.open(\''+
+						(d.url ? d.url : url.replace('%s',d.id)) +
+						'\',\'_self\');">'+
+						d.label +
+						(d.source ? ' <span class="allLookupListSource">('+d.source+')</span>' : '')+
 					'</p>';
 
-
-				$('#'+allLookupListName).append(str);
 				$('#'+allLookupDialogContentName).append(str);
 
 				allLookupRowCount++;
@@ -259,15 +254,8 @@ function allLookupBuildList(obj,txt) {
 	var dialogTop = Math.abs($(window).height() - $('#dialog').height()) / 2;
 	$('#dialog').css('top', (dialogTop >= 25) ? dialogTop : 25);
 
+	if (allLookupIndicateSelectedId) allLookupScrollToSelectedId();
 
-
-return;
-//alert(selectedElement);
-
-
-alert($("#"+selectedElement).position().top+'::'+$('#lookup-DialogContent').position().top);
-//$('#lookup-DialogContent').scrollTop($("#"+selectedElement).position().top);
-$("#"+selectedElement).scrollTop(-20);
 }
 
 function allLookupClearDiv() {
@@ -427,9 +415,6 @@ function allLookupShowDialog(predefJSON) {
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
 	);
 
-//	$('#'+allLookupDialogContentName).css('overflow-y','scroll');
-//	$('#'+allLookupDialogContentName).css('height','250px');
-
 	allLookupBindDialogKeyUp();
 	
 	if (predefJSON) {
@@ -456,8 +441,12 @@ function allLookupSetSelectedId(id) {
 
 }
 
+function allLookupScrollToSelectedId() {
 
+	var diff = $('#'+allLookupSelectedElement).offset().top - $('#lookup-DialogContent').offset().top;
+	$('#lookup-DialogContent').animate({scrollTop: diff},100);
 
+}
 
 $(document).ready(function(){
 
@@ -472,7 +461,8 @@ $(document).ready(function(){
 	allLookupBindKeyUp(allLookupBoxName);
 
 	$('#'+allLookupBoxName).focus();
-	
-	allLookupSetSelectedId(115054);
 
 });
+
+
+
