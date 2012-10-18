@@ -227,16 +227,23 @@ class KeyController extends Controller
 
 
 	/* it's in the trees (it's coming this way!) */
-	private function getKeyTree()
+	public function getKeyTree()
 	{
 
-		$storedData = $this->getCache('tree-keyTree');
+		$tree = $this->getCache('tree-keyTree');
 		
-		return $storedData ? $storedData : $this->setKeyTree();
+		if (!$tree) {
+
+			$tree = $this->setKeyTree();
+			$this->saveCache('tree-keyTree', $tree);
+
+		}
+		
+		return $tree;
 
 	}
 	
-	public function setKeyTree()
+	private function setKeyTree()
 	{
 
 		// get stored tree from database
@@ -269,8 +276,6 @@ class KeyController extends Controller
 			$d = unserialize(utf8_decode($tree));
 
 		}
-		
-		$this->saveCache('tree-keyTree', $d);
 		
 		return $d;
 		
