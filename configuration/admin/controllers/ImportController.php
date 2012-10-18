@@ -302,10 +302,12 @@ class ImportController extends Controller
 			 $errors = $this->lowercaseMediaFiles();
 			 
 			 if (!empty($errors)) {
+			 	
+			 	$this->addError('Errors renaming media files. Make sure '.$_SESSION['admin']['system']['import']['imagePath'].' is writable!');
 			 
 			 	foreach ($errors as $file) {
 			 		
-			 		$this->addError("Cannot convert media file $file to lowercase. Make sure path to images on server is writable.");
+			 		$this->addError("Cannot rename $file.");
 			 	
 			 	}
 		
