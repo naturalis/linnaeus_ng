@@ -246,6 +246,7 @@ class ImportController extends Controller
 			if (file_exists($this->requestData['imagePath'])) {
 
 				$_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'],'/').'/';
+				
 
 			} else {
 
@@ -296,6 +297,21 @@ class ImportController extends Controller
 	public function l2ProjectAction()
 	{
 
+		if (!empty($_SESSION['admin']['system']['import']['imagePath'])) {
+				
+			 $errors = $this->lowercaseMediaFiles();
+			 
+			 if (!empty($errors)) {
+			 
+			 	foreach ($errors as $file) {
+			 		
+			 		$this->addError("Cannot convert media file $file to lowercase. Make sure path to images on server is writable.");
+			 	
+			 	}
+		
+			 }
+		}
+		
 		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 
         $this->setPageName(_('Creating project'));
@@ -1387,14 +1403,14 @@ class ImportController extends Controller
 			if ($imageField===false) {
 		
 				$d = (array)$page['multimediafile'];
-				$image = trim($d['filename']);
+				$image = strtolower(trim($d['filename']));
 				//$thisCaption = trim($d['caption']);
 				
 		
 			} else 
 			if (!is_null($imageField)) {
 		
-				$image = trim($page[$imageField]);
+				$image = strtolower(trim($page[$imageField]));
 		
 			} else {
 
@@ -2182,8 +2198,8 @@ class ImportController extends Controller
 			
 			$taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
 				
-			$overviewFileName = trim((string)$taxon->multimedia->overview);
-			
+			$overviewFileName = strtolower(trim((string)$taxon->multimedia->overview));
+				
 			$imageCount = 0;
 
 			if (!empty($overviewFileName)) {
@@ -2199,8 +2215,8 @@ class ImportController extends Controller
 	
 				if ($r['saved']==true) {
 
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].$r['filename']);
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].strtolower($r['filename']));
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].strtolower($r['filename']));
 
 					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved']++;
 				
@@ -2214,7 +2230,7 @@ class ImportController extends Controller
 
 			foreach($taxon->multimedia->multimediafile as $vKey => $vVal) {
 			
-				$fileName = trim((string)$vVal->filename);
+				$fileName = strtolower(trim((string)$vVal->filename));
 
 				if (empty($fileName)) continue;
 				if ($fileName==$overviewFileName) continue;
@@ -2230,8 +2246,8 @@ class ImportController extends Controller
 
 				if ($r['saved']==true) {
 
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].$r['filename']);
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$_SESSION['admin']['system']['import']['paths']['project_media'].strtolower($r['filename']));
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$_SESSION['admin']['system']['import']['paths']['project_thumbs'].strtolower($r['filename']));
 					
 					$_SESSION['admin']['system']['import']['loaded']['speciesMedia']['saved']++;
 					
@@ -2600,7 +2616,7 @@ class ImportController extends Controller
 			foreach($obj->gloss_multimedia->gloss_multimediafile as $mKey => $mVal) {
 
 				$m[] = array(
-					'filename' => trim((string)$mVal->filename),
+					'filename' => strtolower(trim((string)$mVal->filename)),
 					'fullname' => trim((string)$mVal->fullname),
 					'caption' => trim((string)$mVal->caption),
 					'type' => trim((string)$mVal->multimedia_type),
@@ -2790,8 +2806,8 @@ class ImportController extends Controller
 
 				if ($r['saved']==true) {
 				
-					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].$r['filename']);
-					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].$r['filename']);
+					if (isset($r['full_path'])) $this->cRename($r['full_path'],$paths['project_media'].strtolower($r['filename']));
+					if (isset($r['thumb_path'])) $this->cRename($r['thumb_path'],$paths['project_thumbs'].strtolower($r['filename']));
 
 				} else
 				if ($r['saved']!=='skipped') {
@@ -2907,7 +2923,7 @@ class ImportController extends Controller
 
 		}
  
- 		$img = trim((string)$obj->overview);
+ 		$img = strtolower(trim((string)$obj->overview));
  
 		if ($_SESSION['admin']['system']['import']['imagePath'] && $img) {
 		
@@ -2944,9 +2960,9 @@ class ImportController extends Controller
 	
 		$paths = $_SESSION['admin']['system']['import']['paths'];
 	
-		$fileName = isset($step->keyoverviewpicture) ? (string)$step->keyoverviewpicture : null;
+		$fileName = isset($step->keyoverviewpicture) ? strtolower(trim((string)$step->keyoverviewpicture)) : null;
 
-		if ($fileName) $this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].$fileName);
+		if ($fileName) $this->cRename($_SESSION['admin']['system']['import']['imagePath'].$fileName,$paths['project_media'].strtolower($fileName));
 
 
 		$k = $this->models->Keystep->save(
@@ -3055,7 +3071,7 @@ class ImportController extends Controller
 								null
 							);
 	
-				$fileName = isset($val->picturefilename) ? trim((string)$val->picturefilename) : null;
+				$fileName = isset($val->picturefilename) ? strtolower(trim((string)$val->picturefilename)) : null;
 	
 				if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 	
@@ -3332,7 +3348,7 @@ class ImportController extends Controller
 					$statemax = trim((string)$stat->state_max);
 					$statemean = trim((string)$stat->state_mean);
 					$statesd = trim((string)$stat->state_sd);
-					$statefile = trim((string)$stat->state_file);
+					$statefile = strtolower(trim((string)$stat->state_file));
 
 					//stat->state_file; immer leeg
 
@@ -3459,7 +3475,7 @@ class ImportController extends Controller
 
 				foreach((array)$cVal['states'] as $sKey => $sVal) {
 
-					$fileName = isset($sVal['statefile']) ? $sVal['statefile'] : null;
+					$fileName = isset($sVal['statefile']) ? strtolower($sVal['statefile']) : null;
 		
 					if ($fileName && !file_exists($_SESSION['admin']['system']['import']['imagePath'].$fileName)) {
 		
@@ -4167,7 +4183,7 @@ class ImportController extends Controller
 
 		$d = preg_replace('/(\[\/im\]|\[\/mo\]|\[\/s\]|\[f\]|\[\/t\])/','',$d);
 
-		if (isset($d[0])) $filename = $d[0]; else return $s[0];
+		if (isset($d[0])) $filename = strtolower($d[0]); else return $s[0];
 		$label = isset($d[1]) ? $d[1] : $filename;
 
 		//if (file_exists($_SESSION['admin']['system']['import']['paths']['project_media'].$filename))
@@ -4617,6 +4633,32 @@ class ImportController extends Controller
 			return 'application/octet-stream';
 		}
 
+	}
+	
+	private function lowercaseMediaFiles ()
+	{
+		if (!isset($_SESSION['admin']['system']['import']['imagePath'])) return false;
+		
+		$path = $_SESSION['admin']['system']['import']['imagePath'];
+		
+		$dh = opendir($path);
+		
+		while (($file = readdir($dh)) !== false) { 
+		    
+			if ($file != "." && $file != "..") { 
+				
+		    	if (!rename($path . '/' . $file, $path . '/' . strtolower($file))) {
+		    		
+		    		$errors[] = $file; 
+		    	
+		    	}
+
+		    } 
+		} 
+		
+		closedir($dh);
+		
+		return isset($errors) ? $errors : array();
 	}
 
 	private function detectCustomModulesInXML()
