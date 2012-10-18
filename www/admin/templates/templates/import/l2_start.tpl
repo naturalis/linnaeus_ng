@@ -25,8 +25,8 @@
 		<fieldset>
 			<legend>MEDIA</legend>
 			<p>
-				Set the paths below where the media files and, if they exists, thumbnails can be found.<br />
-				These paths should be fully qualified and be accessible by the <i>webserver</i> (not the client from which you are viewing this page).<br />
+				Set the paths below where the media files and, if they exist, thumbnails can be found.<br />
+				These paths should be fully qualified and be <b>writable</b> by the <i>webserver</i> (not the client from which you are viewing this page).<br />
 				Please check the corresponding checkboxes if you do not wish to import images and/or thumbnails.
 			</p>
 			<p>

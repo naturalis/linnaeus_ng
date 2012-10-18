@@ -78,13 +78,13 @@ td.allLookupListCell {
 	display: block;
 }
 
-.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row-selected {
+.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row-selected, .allLookupListCellSelected {
 	color: #fff;
 	background: #3875d7;
 	border: 1px dotted #000;
 }
 
-.row-selected a, .row:hover * {
+.row-selected a, .row:hover *, .allLookupListCellSelected .allLookupListSource {
 	color: #fff;
 }
 
