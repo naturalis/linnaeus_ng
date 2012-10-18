@@ -52,4 +52,16 @@ $('#choices').height($('#choices').height()+height < $('#taxa').height() ? $('#t
 </script>
 {/literal}
 -->
+
+
+{literal}
+<script>
+$(".inline-image").click(function (e) {
+	alert(e);
+    e.stopPropagation();
+});
+</script>
+{/literal}
+
+
 {include file="../shared/footer.tpl"}
