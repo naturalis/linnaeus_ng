@@ -349,7 +349,9 @@ class MatrixKeyController extends Controller
 				$dummy[] = $tVal;
 			}
 			$this->customSortArray($dummy, array('key' => 'taxon', 'case' => 'i'));
-			$this->saveCache('matrix-taxa-' . $key, isset($dummy) ? $dummy : null);
+
+			if (!$this->getCache('matrix-taxa-' . $key)) $this->saveCache('matrix-taxa-' . $key, isset($dummy) ? $dummy : null);
+
 		}
 		
 	}
