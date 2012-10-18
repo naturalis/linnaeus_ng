@@ -1657,7 +1657,6 @@ class MapKeyController extends Controller
 	
 	}
 
-
 	private function l2GetFirstOccurringTaxonId()
 	{
 
@@ -1710,66 +1709,74 @@ class MapKeyController extends Controller
 
 	private function l2MakeCompactData()
 	{
-
+	
 		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
 
-		$ot = $this->models->L2OccurrenceTaxon->_get(
-			array(
-				'id' => array('project_id' => $this->getCurrentProjectId()),
-				'columns' => 'taxon_id,square_number,type_id,map_id',
-				'order' => 'taxon_id,map_id,type_id'
-			)
-		);
-
-		$b = null;
-		$prev = null;
-		$divIndex = array();
-
-		foreach((array)$ot as $key => $val) {
+		$t = $this->getGeodataTypes();
 		
-			// preparing diversity index
-			if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
-				$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
-			else
-				$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
-
-			// combined squares
-			if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
-			
-				$this->models->L2OccurrenceTaxonCombi->save(
-					array(
-						'id' => null,
+		foreach((array)$t as $key => $val) {
+	
+			$ot = $this->models->L2OccurrenceTaxon->_get(
+				array(
+					'id' => array(
 						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $ot[$key-1]['taxon_id'],
-						'map_id' => $ot[$key-1]['map_id'],
-						'type_id' => $ot[$key-1]['type_id'],
-						'square_numbers' => trim($b,',')
-					)
-				);			
+						'type_id' => $val['id']
+					),
+					'columns' => 'taxon_id,square_number,type_id,map_id',
+					'order' => 'taxon_id,map_id,type_id'
+				)
+			);
+	
+			$b = null;
+			$prev = null;
+			$divIndex = array();
+	
+			foreach((array)$ot as $key => $val) {
 			
-				$b = null;
-			
+				// preparing diversity index
+				if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
+					$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
+				else
+					$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
+	
+				// combined squares
+				if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
+				
+					$this->models->L2OccurrenceTaxonCombi->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $ot[$key-1]['taxon_id'],
+							'map_id' => $ot[$key-1]['map_id'],
+							'type_id' => $ot[$key-1]['type_id'],
+							'square_numbers' => trim($b,',')
+						)
+					);			
+				
+					$b = null;
+				
+				}
+	
+				$b .= $val['square_number'].',';
+				
+				$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
+		
 			}
+	
+			$this->models->L2OccurrenceTaxonCombi->save(
+				array(
+					'id' => null,
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $ot[$key-1]['taxon_id'],
+					'map_id' => $ot[$key-1]['map_id'],
+					'type_id' => $ot[$key-1]['type_id'],
+					'square_numbers' => trim($b,',')
+				)
+			);
 
-			$b .= $val['square_number'].',';
-			
-			$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
-
-
-
+			unset($ot);
 
 		}
-
-		$this->models->L2OccurrenceTaxonCombi->save(
-			array(
-				'id' => null,
-				'project_id' => $this->getCurrentProjectId(),
-				'taxon_id' => $ot[$key-1]['taxon_id'],
-				'map_id' => $ot[$key-1]['map_id'],
-				'type_id' => $ot[$key-1]['type_id'],
-				'square_numbers' => trim($b,',')
-			)
-		);
 
 
 		// saving diversity index	
