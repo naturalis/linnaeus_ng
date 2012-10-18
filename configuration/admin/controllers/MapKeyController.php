@@ -1709,6 +1709,117 @@ class MapKeyController extends Controller
 
 	private function l2MakeCompactData()
 	{
+
+		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
+		$this->models->L2DiversityIndex->delete(array('project_id' => $this->getCurrentProjectId()));
+
+		$maps = $this->l2GetMaps();
+		$types = $this->getGeodataTypes();
+
+		foreach((array)$maps as $mVal) {
+
+			foreach((array)$types as $tVal) {
+		
+				$ot = $this->models->L2OccurrenceTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(),
+							'type_id' => $tVal['id'],
+							'map_id' => $mVal['id']
+						),
+						'columns' => 'taxon_id,square_number,type_id,map_id',
+						'order' => 'taxon_id,map_id,type_id'
+					)
+				);
+		
+				$b = null;
+				$prev = null;
+				$divIndex = array();
+		
+				foreach((array)$ot as $key => $val) {
+				
+					// preparing diversity index
+					if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
+						$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
+					else
+						$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
+		
+					// combined squares
+					if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
+					
+						$this->models->L2OccurrenceTaxonCombi->save(
+							array(
+								'id' => null,
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon_id' => $ot[$key-1]['taxon_id'],
+								'map_id' => $ot[$key-1]['map_id'],
+								'type_id' => $ot[$key-1]['type_id'],
+								'square_numbers' => trim($b,',')
+							)
+						);			
+					
+						$b = null;
+					
+					}
+		
+					$b .= $val['square_number'].',';
+					
+					$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
+			
+				}
+	
+	
+				$this->models->L2OccurrenceTaxonCombi->save(
+					array(
+						'id' => null,
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $ot[$key-1]['taxon_id'],
+						'map_id' => $ot[$key-1]['map_id'],
+						'type_id' => $ot[$key-1]['type_id'],
+						'square_numbers' => trim($b,',')
+					)
+				);
+	
+				unset($ot);
+	
+				foreach((array)$divIndex as $mapId => $squares) {
+		
+					foreach((array)$squares as $squareId => $types) {
+		
+						foreach((array)$types as $typeId => $count) {
+		
+							if ($count > 0) {
+		
+								$this->models->L2DiversityIndex->save(
+									array(
+										'id' => null,
+										'project_id' => $this->getCurrentProjectId(),
+										'map_id' => $mapId,
+										'type_id' => $typeId,
+										'square_number' => $squareId,
+										'diversity_count' => $count
+									)
+								);
+								
+							}
+		
+						}
+		
+					}
+		
+				}
+				
+				unset($divIndex);
+	
+	
+			}
+			
+		}
+
+	}
+	
+	private function ORGl2MakeCompactData()
+	{
 	
 		$this->models->L2OccurrenceTaxonCombi->delete(array('project_id' => $this->getCurrentProjectId()));
 

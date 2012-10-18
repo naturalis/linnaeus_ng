@@ -90,6 +90,7 @@ function showMedia(url,name) {
 */
 function showMedia(url,name) {
 	$.prettyPhoto.open(url,'',name);
+	//return;
 }
 
 function showVideo(url,name) {
