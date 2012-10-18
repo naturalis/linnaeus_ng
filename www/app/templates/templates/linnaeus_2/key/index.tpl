@@ -92,4 +92,13 @@
 	</div>
 </div>
 
+
+{literal}
+<script>
+$(".inline-image").click(function (e) {
+    e.stopPropagation();
+});
+</script>
+{/literal}
+
 {include file="../shared/footer.tpl"}
