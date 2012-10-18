@@ -90,9 +90,6 @@ function showMedia(url,name) {
 */
 function showMedia(url,name) {
 	$.prettyPhoto.open(url,'',name);
-    var e = window.event;
-    e.cancelBubble = true;
-    if (e.stopPropagation) e.stopPropagation();
 }
 
 function showVideo(url,name) {
