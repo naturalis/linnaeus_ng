@@ -43,7 +43,8 @@
 				{section name=cols start=1 loop=$map.cols+1 step=1}
 					<td id="cell-{$cellNo}" row="{$smarty.section.rows.index}" col="{$smarty.section.cols.index}" 
 						{if $index.index[$cellNo]}class="mapCellDiversity{$index.index[$cellNo].class}{if $cellNo==$selectedCell} mapCellSelected{/if}"{/if}
-						onmouseover="l2DiversityCellMouseOver({$index.index[$cellNo].total})"
+						onmouseover="l2DiversityCellMouseOver(this)"
+						total="{$index.index[$cellNo].total}"
 						{if $index.index[$cellNo]}
 							onclick="l2DiversityCellClick(this)"
 						{/if}></td>
@@ -56,7 +57,7 @@
 		</td>
 		<td></td>
 		<td id="legendCell">
-		<div id="legend">
+		<div id="types">
 		{foreach from=$geoDataTypes key=k item=v name=x}
 			<div class="mapCheckbox">
 				<label>
@@ -65,12 +66,12 @@
 						name="selectedDatatypes[]" 
 						{if $selectedDatatypes[$v.id] || !$selectedDatatypes}checked="checked"{/if}
 						value="{$v.id}" 
-						onchange="$('#theForm').submit();"/>
+						onchange="l2DiversityTypeClick(this)"/>
 					{$v.title}
 				</label>
 			</div>
 		{/foreach}
-		<input type="hidden" name="m" value="{$mapId}" />
+		<input type="hidden" name="m" id="mapId" value="{$mapId}" />
 		</div>
 		
 

@@ -2057,7 +2057,7 @@ class Controller extends BaseClass
 	
 	}
 
-	public function addModuleToProject($mId,$pId=null)
+	public function addModuleToProject($mId,$pId=null,$showOrder=0)
 	{
 
 		/*
@@ -2080,7 +2080,8 @@ class Controller extends BaseClass
 				'id' => null,
 				'project_id' => is_null($pId) ? $this->getCurrentProjectId() : $pId,	
 				'module_id' => $mId,
-				'active' => 'y'
+				'active' => 'y',
+				'show_order' => $showOrder
 			)
 		);
 		

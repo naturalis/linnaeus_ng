@@ -152,8 +152,133 @@ function l2DoSearchMap() {
 
 }
 
+function l2DiversitySetSelectedCell(ele) {
+
+	$('[id^=cell-]').each(function() {
+		$(this).removeClass('mapCellSelected');
+	});
+
+	$(ele).addClass('mapCellSelected');
+}
+
+function l2DiversityGetSelectedTypes() {
+
+	var types = [];
+
+	$('[name^=selectedDatatypes]').each(function() {
+		if ($(this).attr('checked')==true) types[types.length] = $(this).val();
+	});
+	
+	return types;
+
+}
+
+function l2DiversityClearAll() {
+
+	$('[id^=cell-]').each(function() {
+		$(this).removeClass();
+		$(this).attr('total','0');
+	});
+
+}
+
+function l2DiversityClearLegend() {
+
+	$('#legend').empty();
+
+}
+
+function l2DiversityGiantOilSpill(data) {
+
+	l2DiversityClearAll();
+
+	for(var i=0;i<data.length;i++) {
+		
+		$('#cell-'+data[i].id).addClass('mapCellDiversity'+data[i].class);
+		$('#cell-'+data[i].id).attr('total',data[i].total);
+		
+	}
+
+}
+
+
+function l2DiversityUpdateLegend(data) {
+
+	l2DiversityClearLegend();
+
+	var textToAppend = [];
+
+	for(var i=0;i<data.length;i++) {
+
+		textToAppend[i] = 
+			'<div class="mapCheckbox"><label>'+
+			'<span class="opacity">'+
+			'<span class="mapCellLegend mapCellDiversity'+data[i].id+'">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>'+
+			data[i].min+'-'+data[i].max+' '+_('records')+
+			'</label></div>';
+
+	}
+
+	$('#legend').append(textToAppend.join(''));
+
+}
+
+function l2DiversityTypeClick() {
+		
+	var types = l2DiversityGetSelectedTypes();
+	
+	if (types.length==0)  {
+		l2DiversityClearAll();
+		l2DiversityClearLegend();
+		return;
+	}
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			'action' : 'get_diversity',
+			'm' : $('#mapId').val(),
+			'types' : types
+		}),
+		success : function (data) {
+			//alert(data);
+			var tmp = $.parseJSON(data);
+			if (tmp.index) l2DiversityGiantOilSpill(tmp.index);
+			if (tmp.legend) l2DiversityUpdateLegend(tmp.legend);
+		}
+	});
+	
+}
+
 function l2DiversityCellClick(ele) {
 
+	var types = l2DiversityGetSelectedTypes();
+
+	if ($(ele).attr('total')==0) return;
+
+	if (types.length==0) return;
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			'action' : 'get_cell_diversity',
+			'm' : $('#mapId').val(),
+			'id' : $(ele).attr('id').replace('cell-',''),
+			'types' : types
+		}),
+		success : function (data) {
+			//alert(data);
+			allLookupNavigateOverrideDialogTitle('Taxa in that square');
+			allLookupShowDialog(data);
+			l2DiversitySetSelectedCell(ele);			
+		}
+	});
+	
+
+	return;
+	//v1
 	$('<input type="hidden" name="selectedCell">').val($(ele).attr('id').replace('cell-','')).appendTo('#theForm');
 	$('#theForm').submit();
 
@@ -177,7 +302,9 @@ function l2SetCompareSpecies(i,j) {
 
 }
 
-function l2DiversityCellMouseOver(i) {
+function l2DiversityCellMouseOver(ele) {
+
+	var i = $(ele).attr('total');
 
 	$('#species-number').html((i ? i : 0) + _(' species'));
 

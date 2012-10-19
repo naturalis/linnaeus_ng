@@ -1,5 +1,24 @@
 <?php
 
+/*
+
+	order of modules in the icon grid and the main menu is determined by two fields:
+
+		ModuleProject.show_order
+		FreeModuleProject.show_order
+
+	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR 
+	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
+	tables. when changing these values, bear in mind that list of modules is ordered
+	after having been combined from the normal modules (ModuleProject) and possible
+	free modules (FreeModuleProject). this means that the values for show_order have
+	to be unique across two tables (an 'arc', as it used to be called in oracle);
+	again, these is at present no mechanism that actually enforces this - it is up
+	to the system administrator.
+
+*/
+
+
 include_once (dirname(__FILE__) . "/../BaseClass.php");
 
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
@@ -1214,8 +1233,8 @@ class Controller extends BaseClass
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'active' => 'y'
-				), 
-				'order' => 'module_id asc'
+				),
+				'columns' => 'id,module_id,show_order,active'
 			)
 		);
 		
@@ -1231,6 +1250,8 @@ class Controller extends BaseClass
 				$modules[$key]['module'] = _($mp['module']);
 				$modules[$key]['controller'] = $mp['controller'];
 				$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
+				$modules[$key]['show_order'] = $mp['show_order'];
+
 				$_SESSION['app']['project']['active-modules'][$mp['id']] = $mp['module'];
 
 			}
@@ -1242,7 +1263,8 @@ class Controller extends BaseClass
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'active' => 'y'
-				)
+				),
+				'columns' => 'id,module,description,show_order,show_alpha,active'
 			)
 		);
 		
@@ -1253,6 +1275,9 @@ class Controller extends BaseClass
 			$modules[] = $val;
 
 		}
+		
+		
+		$this->customSortArray($modules, array('key' => 'show_order', 'dir' => 'asc'));
 
 		return $modules;
 

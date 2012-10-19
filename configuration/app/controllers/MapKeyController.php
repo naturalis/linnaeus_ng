@@ -587,101 +587,6 @@ class MapKeyController extends Controller
 		$this->printPage();		
 	
 	}
-/*
-	public function l2DiversityAction()
-	{
-	
-		$this->setPageName(sprintf(_('Diversity index')));
-		
-		$maps = $this->l2GetMaps();
-
-		if (!$this->rHasVal('m')) {
-			$d = current($maps);
-			$mapId = $d['id'];
-		} else {
-			$mapId = $this->requestData['m'];
-		}
-
-		if ($this->rHasVal('action','reindex') && isset($_SESSION['app']['user']['map']['index'])) {
-
-			$d = $_SESSION['app']['user']['map']['index'];
-
-			$taxa = isset($d['taxa']) ? $d['taxa'] : null;
-			$selectedCell = isset($d['selectedCell']) ? $d['selectedCell'] : null;
-			$selectedDatatypes = isset($d['selectedDatatypes']) ? $d['selectedDatatypes'] : null;
-			$mapId = isset($d['mapId']) ? $d['mapId'] : null;
-			$index = isset($d['index']) ? $d['index'] : null;
-
-		} else {
-
-			unset($_SESSION['app']['user']['map']['index']);
-
-			$index = $this->l2GetDiversityIndex($mapId,($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : null));
-
-			$_SESSION['app']['user']['map']['index'] = array(
-				'mapId' => $mapId,
-				'index' => $index
-			);
-			
-			if ($this->rHasVal('selectedDatatypes')) {
-	
-				foreach((array)$this->requestData['selectedDatatypes'] as $val)
-					$selectedDatatypes[$val] = true;
-
-				$_SESSION['app']['user']['map']['index']['selectedDatatypes'] = $selectedDatatypes;
-
-			}
-	
-			if ($this->rHasVal('selectedCell')) {
-			
-				$taxa = $this->l2DoSearchMap(
-					$this->requestData['m'],
-					(array)$this->requestData['selectedCell'],
-					($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : '*')
-				);
-			
-				$selectedCell = $this->requestData['selectedCell'];
-	
-				$_SESSION['app']['user']['map']['index']['taxa'] = $taxa;
-				$_SESSION['app']['user']['map']['index']['selectedCell'] = $this->requestData['selectedCell'];
-
-			}
-			
-			
-			
-		}
-
-		if (isset($taxa)) {
-
-			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
-			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
-
-			$this->smarty->assign('taxa',
-				$this->makeLookupList(
-					$taxa,
-					'species',
-					'../species/taxon.php?id=%s'
-				)
-			);
-			
-		}
-
-		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
-
-		if (isset($selectedDatatypes)) $this->smarty->assign('selectedDatatypes',$selectedDatatypes);
-
-		$this->smarty->assign('index',$index);
-
-		$this->smarty->assign('mapId',$mapId);
-
-		$this->smarty->assign('maps',$maps);
-
-		$this->smarty->assign('geoDataTypes',$this->getGeoDataTypes());
-
-		$this->printPage();	
-	
-	}
-*/	
 
 	public function l2DiversityAction()
 	{
@@ -718,7 +623,7 @@ class MapKeyController extends Controller
 			$selectedCell = $this->requestData['selectedCell'];
 
 		}
-			
+
 		if (isset($taxa)) {
 
 			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
@@ -764,7 +669,19 @@ class MapKeyController extends Controller
 
             $this->getLookupList($this->requestData);
 			
+		} else
+		if ($this->rHasVal('action','get_cell_diversity')) {
+
+            $this->l2GetCellDiversity($this->requestData);
+			
+		} else
+		if ($this->rHasVal('action','get_diversity')) {
+
+            $this->l2GetDiversity($this->requestData);
+			
 		}
+		
+		
 
 		$this->allowEditPageOverlay = false;
 		
@@ -1638,7 +1555,6 @@ class MapKeyController extends Controller
 
 	}
 
-
 	private function l2GetOverlap($id1,$id2,$mapId,$dataTypes)
 	{
 
@@ -1736,10 +1652,10 @@ class MapKeyController extends Controller
 		$storedData = $this->getCache('map-divIndex-'. $mapId. '-' . $sessIdx);
 		
 		if ($storedData) return $storedData;
-	
+
 		$d = array(
-				'project_id' => $this->getCurrentProjectId(),
-				'map_id' => $mapId
+			'project_id' => $this->getCurrentProjectId(),
+			'map_id' => $mapId
 		);
 
 		if (isset($typeId)) $d['type_id in'] = '('.implode(',',$typeId).')';
@@ -1827,6 +1743,64 @@ class MapKeyController extends Controller
 		$this->saveCache('map-divIndex-'. $mapId. '-' . $sessIdx, $dataToStore);
 		
 		return $dataToStore;
+	}
+
+	private function l2GetDiversity($p)
+	{
+	
+		$index = $this->l2GetDiversityIndex($p['m'],(isset($p['types']) ? $p['types'] : null));
+
+		if (isset($index)) {
+
+			foreach((array)$index['index'] as $key => $val) {
+		
+				$d[] = array('id' => $key,'class' => $val['class'],'total' => $val['total']);
+				
+			}
+			
+			$index['index'] = $d;
+			
+			unset($d);
+
+			foreach((array)$index['legend'] as $key => $val) {
+		
+				$d[] = array('id' => $key,'min' => $val['min'],'max' => $val['max']);
+				
+			}
+			
+			$index['legend'] = $d;
+
+			$this->smarty->assign('returnText',json_encode($index));
+			
+		}
+	
+	}
+
+
+	private function l2GetCellDiversity($p)
+	{
+	
+		$taxa = $this->l2DoSearchMap(
+			$p['m'],
+			(array)$p['id'],
+			($this->rHasVal('types') ? $this->requestData['types'] : '*')
+		);
+		
+		if (isset($taxa)) {
+
+			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
+			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
+
+			$this->smarty->assign('returnText',
+				$this->makeLookupList(
+					$taxa,
+					'species',
+					'../species/taxon.php?id=%s'
+				)
+			);
+			
+		}
+	
 	}
 	
 }
