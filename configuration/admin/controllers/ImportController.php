@@ -342,6 +342,8 @@ class ImportController extends Controller
 					 'css_url' => $this->controllerSettings['defaultProjectCss']
 				)
 			);
+			
+			$_SESSION['admin']['system']['import']['moduleCount'] = 0;
 	
 			if (!$newId) {
 
@@ -443,8 +445,8 @@ class ImportController extends Controller
 			
 			$this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
 
-			$this->addModuleToProject(MODCODE_SPECIES,$this->getNewProjectId());
-			$this->addModuleToProject(MODCODE_HIGHERTAXA,$this->getNewProjectId());
+			$this->addModuleToProject(MODCODE_SPECIES,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
+			$this->addModuleToProject(MODCODE_HIGHERTAXA,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 			$this->grantModuleAccessRights(MODCODE_SPECIES);
 			$this->grantModuleAccessRights(MODCODE_HIGHERTAXA);
 			
@@ -703,7 +705,7 @@ class ImportController extends Controller
 			
 						}
 						
-						$this->addModuleToProject(MODCODE_LITERATURE,$this->getNewProjectId());
+						$this->addModuleToProject(MODCODE_LITERATURE,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 						$this->grantModuleAccessRights(MODCODE_LITERATURE);
 
 						$this->_sawModule = false;
@@ -751,7 +753,7 @@ class ImportController extends Controller
 	
 						unset($_SESSION['admin']['system']['import']['mimes']);
 	
-						$this->addModuleToProject(MODCODE_GLOSSARY,$this->getNewProjectId());
+						$this->addModuleToProject(MODCODE_GLOSSARY,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 						$this->grantModuleAccessRights(MODCODE_GLOSSARY);
 
 						$this->_sawModule = false;
@@ -814,7 +816,7 @@ class ImportController extends Controller
 					
 					$this->helpers->XmlParser->getNodes('project');
 
-					$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
+					$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 					$this->grantModuleAccessRights(MODCODE_CONTENT);
 
 
@@ -848,7 +850,7 @@ class ImportController extends Controller
 
 					$this->helpers->XmlParser->getNodes('topic');
 
-					$this->addModuleToProject(MODCODE_INTRODUCTION,$this->getNewProjectId());
+					$this->addModuleToProject(MODCODE_INTRODUCTION,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 					$this->grantModuleAccessRights(MODCODE_INTRODUCTION);
 
 
@@ -927,7 +929,7 @@ class ImportController extends Controller
 
 					if ($this->_sawModule) {
 
-						$this->addModuleToProject(MODCODE_KEY,$this->getNewProjectId());
+						$this->addModuleToProject(MODCODE_KEY,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 						$this->grantModuleAccessRights(MODCODE_KEY);
 						$this->saveSetting(
 							array(
@@ -992,7 +994,7 @@ class ImportController extends Controller
 
 						if ($this->_sawModule) {
 	
-							$this->addModuleToProject(MODCODE_MATRIXKEY,$this->getNewProjectId());
+							$this->addModuleToProject(MODCODE_MATRIXKEY,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 							$this->grantModuleAccessRights(MODCODE_MATRIXKEY);
 	
 							$this->_sawModule = false;
@@ -1075,7 +1077,7 @@ class ImportController extends Controller
 
 				if ($this->_sawModule) {
 
-					$this->addModuleToProject(MODCODE_DISTRIBUTION,$this->getNewProjectId());
+					$this->addModuleToProject(MODCODE_DISTRIBUTION,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 					$this->grantModuleAccessRights(MODCODE_DISTRIBUTION);				
 					$this->saveSetting(
 							array(
@@ -4349,19 +4351,19 @@ class ImportController extends Controller
 		$this->addMessage($this->storeError('Processed embedded images.'));
 
 		// additional texts
-		$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId());
+		$this->addModuleToProject(MODCODE_CONTENT,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 		$this->grantModuleAccessRights(MODCODE_CONTENT);
 
 		$this->addMessage($this->storeError('Added module "content".'));
 
 		// index
-		$this->addModuleToProject(MODCODE_INDEX,$this->getNewProjectId());
+		$this->addModuleToProject(MODCODE_INDEX,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 		$this->grantModuleAccessRights(MODCODE_INDEX);
 
 		$this->addMessage($this->storeError('Added module "index".'));
 
 		// search
-		$this->addModuleToProject(MODCODE_UTILITIES,$this->getNewProjectId());
+		$this->addModuleToProject(MODCODE_UTILITIES,$this->getNewProjectId(),$_SESSION['admin']['system']['import']['moduleCount']++);
 		$this->grantModuleAccessRights(MODCODE_UTILITIES);
 
 		$this->addMessage($this->storeError('Added module "search".'));

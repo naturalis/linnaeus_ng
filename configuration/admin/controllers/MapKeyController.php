@@ -1714,12 +1714,12 @@ class MapKeyController extends Controller
 		$this->models->L2DiversityIndex->delete(array('project_id' => $this->getCurrentProjectId()));
 
 		$maps = $this->l2GetMaps();
-		$types = $this->getGeodataTypes();
+		$geod = $this->getGeodataTypes();
 
 		foreach((array)$maps as $mVal) {
 
-			foreach((array)$types as $tVal) {
-		
+			foreach((array)$geod as $tVal) {
+
 				$ot = $this->models->L2OccurrenceTaxon->_get(
 					array(
 						'id' => array(
@@ -1727,33 +1727,33 @@ class MapKeyController extends Controller
 							'type_id' => $tVal['id'],
 							'map_id' => $mVal['id']
 						),
-						'columns' => 'taxon_id,square_number,type_id,map_id',
-						'order' => 'taxon_id,map_id,type_id'
+						'columns' => 'taxon_id,square_number',
+						'order' => 'taxon_id'
 					)
 				);
 		
 				$b = null;
-				$prev = null;
+				$prevTaxon = null;
 				$divIndex = array();
 		
 				foreach((array)$ot as $key => $val) {
 				
 					// preparing diversity index
-					if (isset($divIndex[$val['map_id']][$val['square_number']][$val['type_id']]))
-						$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]++;
+					if (isset($divIndex[$mVal['id']][$val['square_number']][$tVal['id']]))
+						$divIndex[$mVal['id']][$val['square_number']][$tVal['id']]++;
 					else
-						$divIndex[$val['map_id']][$val['square_number']][$val['type_id']]=1;
+						$divIndex[$mVal['id']][$val['square_number']][$tVal['id']]=1;
 		
 					// combined squares
-					if (!is_null($prev) && $prev != $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id']) {
+					if (!is_null($prevTaxon) && $prevTaxon != $val['taxon_id']) {
 					
 						$this->models->L2OccurrenceTaxonCombi->save(
 							array(
 								'id' => null,
 								'project_id' => $this->getCurrentProjectId(),
-								'taxon_id' => $ot[$key-1]['taxon_id'],
-								'map_id' => $ot[$key-1]['map_id'],
-								'type_id' => $ot[$key-1]['type_id'],
+								'taxon_id' => $prevTaxon,
+								'map_id' => $mVal['id'],
+								'type_id' => $tVal['id'],
 								'square_numbers' => trim($b,',')
 							)
 						);			
@@ -1764,18 +1764,17 @@ class MapKeyController extends Controller
 		
 					$b .= $val['square_number'].',';
 					
-					$prev = $val['taxon_id'].':'.$val['map_id'].':'.$val['type_id'];
+					$prevTaxon = $val['taxon_id'];
 			
 				}
-	
 	
 				$this->models->L2OccurrenceTaxonCombi->save(
 					array(
 						'id' => null,
 						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $ot[$key-1]['taxon_id'],
-						'map_id' => $ot[$key-1]['map_id'],
-						'type_id' => $ot[$key-1]['type_id'],
+						'taxon_id' => $prevTaxon,
+						'map_id' => $mVal['id'],
+						'type_id' => $tVal['id'],
 						'square_numbers' => trim($b,',')
 					)
 				);
