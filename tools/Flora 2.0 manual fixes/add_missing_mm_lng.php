@@ -16,6 +16,8 @@
 		if ($id) {
 			$i = 1;
 			foreach ($speciesMultimedia as $file => $caption) {
+				$file = strtolower($file);
+				
 				// Check overview; set if empty
 				if ($i == 1 && strtolower($file) != strtolower(getOverview($id)) && file_exists($pathToMM . $file)) {
 					setOverview($id, $projectId, $pathToMM, $file);

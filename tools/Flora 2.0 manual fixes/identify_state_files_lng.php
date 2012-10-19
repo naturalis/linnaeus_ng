@@ -65,6 +65,7 @@
 		echo "identify file <b>$identify_file_name</b><br><br>";
 		foreach ($identify_file as $character_state_file) {
 			list($character, $state, $file) = explode("@", $character_state_file);
+			$file = strtolower($file);
 			
 			echo "Character: '$character'<br>State: '$state'<br>File to add: '$file'";
 			$matrixId = getMatrixId($projectId, $identify_file_name);
