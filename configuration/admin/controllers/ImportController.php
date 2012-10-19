@@ -322,7 +322,7 @@ class ImportController extends Controller
 
 		$this->helpers->XmlParser->setDoReturnValues(true);
 		$d = $this->helpers->XmlParser->getNode('project');
-
+		
 		if (isset($d->title)) {
 		
 			$projectTitle = trim((string)$d->title);

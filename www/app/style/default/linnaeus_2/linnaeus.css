@@ -25,9 +25,9 @@ td.grid {
 	text-align: center;
 }
 
-img.module-icon {
-	width: 50px;
-	height: 50px;
+.module-icon {
+	width: 48px;
+	height: 48px;
 	border-right: 1px solid #8c8c8c;
 	border-bottom: 1px solid #5d5d5d;
 	-moz-box-shadow: 1px 1px 3px #7A7A7A;
@@ -35,6 +35,8 @@ img.module-icon {
 	-o-box-shadow: 1px 1px 3px #7A7A7A;
 	-ms-box-shadow: 1px 1px 3px #7A7A7A;
 	box-shadow: 1px 1px 3px #7A7A7A;
+	background-repeat: no-repeat;
+	margin: auto;
 	margin-bottom: 5px;
 }
 
@@ -45,7 +47,7 @@ a.menu-item {
 	text-decoration: none;
 }
 
-img.module-icon:active {
+.module-icon:active {
 	margin-top: 1px;
 }
 
@@ -56,4 +58,45 @@ a.menu-item:active {
 
 a.menu-item img:active {
 	margin-bottom: 4px;
+}
+
+/* Module icons */
+.introduction {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/introduction.png');	
+}
+
+.literature {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/literature.png');	
+}
+
+.glossary {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/glossary.png');		
+}
+
+.highertaxa {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/highertaxa.png');	
+}
+
+.species {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/species.png');		
+}
+
+.index {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/index.png');	
+}
+
+.key {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/dichotomouskey.png');	
+}
+
+.mapkey {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/mapkey.png');
+}
+
+.matrixkey {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/matrixkey.png');	
+}
+
+.custom {
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/module_icons/custom.png');	
 }
