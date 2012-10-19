@@ -9,7 +9,8 @@
         {if $v.type=='regular' && $v.show_in_public_menu==1}
         <td class="grid">
             <a class="menu-item" href="../{$v.controller}/">
-                <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/{$v.icon}" />
+                <!-- <div class="module-icon" style="background-image:url('{$session.app.project.urls.systemMedia}module_icons/{$v.icon}')"></div> -->
+                <div class="module-icon {$v.controller}"></div>
                 <div>{t}{$v.module}{/t}</div>
             </a>
         </td>
@@ -18,12 +19,12 @@
         <td class="grid">
             {if $useJavascriptLinks}
             <span class="a" onclick="goMenuModule({$v.id});">
-                <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/custom.png" />
+                <div class="module-icon custom custom-{$v.id}"></div>
                 <p>{t}{$v.module}{/t}</p>
             </span>
             {else}
             <a class="menu-item" href="../module/?modId={$v.id}">
-                <img alt="{$v.module}" class="module-icon" src="{$session.app.project.urls.systemMedia}module_icons/custom.png" />
+                <div class="module-icon custom custom-{$v.id}"></div>
                 <div>{t}{$v.module}{/t}</div>
             </a>
             {/if}

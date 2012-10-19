@@ -1,2 +1,61 @@
-body {
+/* Regular module icons 
+
+	To change the icons for a specific project, create a folder in www/app/media/project, e.g. with the project id.
+	If you have created a folder called '0001' and a custom icon 'species.png' for the Species module, 
+	the correct css would be 
+   
+	.species {
+		background-image:url('../../media/project/0001/species.png');	
+	}
+
+*/
+
+.introduction {
+}
+
+.literature {
+}
+
+.glossary {
+}
+
+.highertaxa {
+}
+
+.species {
+}
+
+.index {
+}
+
+.key {
+}
+
+.mapkey {
+}
+
+.matrixkey {
+}
+
+
+
+/* Custom module icons 
+
+	Custom module are a little more complicated to change, as you can have multiple custom modules per project.
+	The name therefore has to be appended with the id of the module. You can easily find the id by checking the
+	url to the module. Hover over the module's icon in the Navigator and note down the url to which to points,
+	which should be something like
+	
+	http://[path_to_lng]/app/views/module/?modId=[module_id]&epi=[project_id]
+	
+	The number representing the [module_id] should replace the [id] in the class below. E.g. if the [module_id]
+	is the example above is '101' and your icon is called 'my_custom_icon.png', the correct css is
+
+	.custom-101  {
+		background-image:url('../../media/project/0001/my_custom_icon.png');	
+	}
+
+*/
+
+.custom-[id] {
 }
