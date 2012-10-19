@@ -603,6 +603,9 @@ class MapKeyController extends Controller
 		}
 
 
+		$index = $this->l2GetDiversityIndex($mapId,null);
+
+		/*
 		$index = $this->l2GetDiversityIndex($mapId,($this->rHasVal('selectedDatatypes') ? $this->requestData['selectedDatatypes'] : null));
 
 		if ($this->rHasVal('selectedDatatypes')) {
@@ -624,6 +627,7 @@ class MapKeyController extends Controller
 
 		}
 
+		/*
 		if (isset($taxa)) {
 
 			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
@@ -638,6 +642,7 @@ class MapKeyController extends Controller
 			);
 			
 		}
+		*/
 
 		if (isset($selectedCell)) $this->smarty->assign('selectedCell',$selectedCell);
 
