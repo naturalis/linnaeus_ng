@@ -59,7 +59,7 @@
 		<td id="legendCell">
 		<div id="types">
 		{foreach from=$geoDataTypes key=k item=v name=x}
-			<div class="mapCheckbox">
+			<div class="mapPCheckbox">
 				<label>
 					<input 
 						type="checkbox" 
