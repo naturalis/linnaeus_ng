@@ -1781,7 +1781,6 @@ class MapKeyController extends Controller
 	
 	}
 
-
 	private function l2GetCellDiversity($p)
 	{
 	
@@ -1792,9 +1791,6 @@ class MapKeyController extends Controller
 		);
 		
 		if (isset($taxa)) {
-
-			// hell knows why, but $.parseJSON(data); started complaining about the "'s in the <span> all of a sudden
-			array_walk($taxa, create_function('&$v,$k', '$v[\'label\'] = addslashes($v[\'label\']);'));
 
 			$this->smarty->assign('returnText',
 				$this->makeLookupList(
