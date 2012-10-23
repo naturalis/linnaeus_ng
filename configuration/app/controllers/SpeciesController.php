@@ -514,6 +514,7 @@ class SpeciesController extends Controller
 	
 	private function getTaxonMedia($taxon=null,$id=null)
 	{
+
 		if ($mt = $this->getTaxonCategoryLastVisited($taxon, 'media')) return $mt;
 		
 		$d = array('project_id' => $this->getCurrentProjectId());
@@ -529,6 +530,8 @@ class SpeciesController extends Controller
 				'order' => 'mime, sort_order'
 			)
 		);
+
+		$this->loadControllerConfig('species');
 
 		foreach((array)$mt as $key => $val) {
 
@@ -549,12 +552,15 @@ class SpeciesController extends Controller
 					$this->controllerSettings['mime_types'][$val['mime_type']] :
 					null;
 
+					
 			$mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
 			$mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			$mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
 			$mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'].$mt[$key]['file_name'];
 
 		}
+
+		$this->loadControllerConfig();
 
 		$sortBy = array(
 			'key' => array('mime_show_order','sort_order'),
