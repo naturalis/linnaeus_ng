@@ -337,6 +337,16 @@ a:hover, .internal-link:hover {
 }
 
 
+/* Spash */
+
+#splash {
+	width: 599px;
+	height: 313px;
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/splash.png');
+}
+
+
+
 /* Generic */
 .clear {
 	clear: both;

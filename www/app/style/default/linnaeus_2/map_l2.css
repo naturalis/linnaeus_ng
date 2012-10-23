@@ -71,7 +71,7 @@ a.selectIcon:hover {
     
 }
 
-#legend {
+#legend, #types {
 	padding: 5px;
 	width: 220px;
 	background-color: #f6f6f6;
