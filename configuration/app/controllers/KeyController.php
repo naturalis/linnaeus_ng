@@ -84,11 +84,11 @@ class KeyController extends Controller
 		/*
 			if user directly access a specific step or choice while there is no keypath (thru bookmark),
 			a possible decision path is created from the key tree
-			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. user forcetree=1 to force
+			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. use forcetree=1 to force
 		*/
 		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || $this->rHasVal('forcetree','1')) {
 
-			$this->createPathFromTree(
+			$this->createPathInstantly(
 				($this->rHasVal('step') ? $this->requestData['step'] : null),
 				($this->rHasVal('choice') ? $this->requestData['choice'] : null)
 			);
@@ -225,7 +225,6 @@ class KeyController extends Controller
 	
 	}
 
-
 	/* it's in the trees (it's coming this way!) */
 	public function getKeyTree()
 	{
@@ -281,73 +280,124 @@ class KeyController extends Controller
 		
 	}
 	
-	private function findStepOrChoiceInTree($branch,$step=null,$choice=null)
+	private function _createPathInstantly($stepId=null,$choiceId=null)
 	{
-	
-		for($i=999;$i>$branch['level']+2;$i--)  unset($this->tmp['results'][$i]);
 
-		if ($this->tmp['found']==false) {
-	
-			$this->tmp['results'][$branch['level']] = array(
-				'id' => $branch['id'],
-				'step_number' => $branch['number'],
-				'step_title' => $branch['title'],
-				'is_start' => $branch['is_start'],
-				'choice_marker' => null
+		// choice ID present: probably a bookmarked step in the key
+		if (!is_null($choiceId)) {
+
+			// get choice requested
+			$d = $this->models->ChoiceKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $choiceId
+					)
+				)
 			);
-			
-		}
 
-		foreach((array)$branch['choices'] as $val) {
-		
-			if ($this->tmp['found']==false) $this->tmp['results'][$branch['level']]['choice_marker'] = $val['choice_marker'];
+			/*
+				the url of a specific step always contains the choice that leads to that step.
+				the line further down:
+					$step = $this->getKeystep($d[0]['keystep_id']);
+				will therefore resolve to the parent step of the choice that lead to the page
+				the user is looking at, i.e. the previous one. as the current step - the step
+				the user is looking at - also needs to be included in the keypath, the step 
+				that *follows* from the choice in the url is also added to the keypath. as this
+				function works backward, the adding of the last - current - step is the very
+				first action, done when the keypath is still empty.
+			*/
+			if (count((array)$this->tmp['results'])==0) {
 
-			if ($branch['id']==$step || $val['choice_id']==$choice) {
-			
-				$this->tmp['found'] = true;
+				$step = $this->getKeystep($d[0]['res_keystep_id']);
 				
-				if ($val['choice_id']==$choice && isset($val['step'])) {
-
-					$this->tmp['results'][$val['step']['level']] = array(
-						'id' => $val['step']['id'],
-						'step_number' => $val['step']['number'],
-						'step_title' => $val['step']['title'],
-						'is_start' => $val['step']['is_start'],
+				array_push(
+					$this->tmp['results'],
+					array(
+						'id' => $step['id'],
+						'step_number' => $step['number'],
+						'step_title' => $step['title'],
+						'is_start' => $step['is_start'],
 						'choice_marker' => null
-					);
-					
-				}
-				
-			} else
-			if (isset($val['res_taxon_id'])) {
-
-				$this->tmp['excluded'][$val['res_taxon_id']] = $val['res_taxon_id'];
-
-			}
-			if (isset($val['step'])) {
-
-				$this->findStepOrChoiceInTree(
-					$val['step'],
-					$step,
-					$choice
+					)
 				);
-				
+
 			}
 
+			// get the choice's parent step
+			$step = $this->getKeystep($d[0]['keystep_id']);
+
+			// add step & choice to the path
+			array_unshift(
+				$this->tmp['results'],
+				array(
+					'id' => $step['id'],
+					'step_number' => $step['number'],
+					'step_title' => $step['title'],
+					'is_start' => $step['is_start'],
+					'choice_marker' => $this->showOrderToMarker($d[0]['show_order'])
+				)
+			);
+
+			// find the choice that lead to this step, i.e., the previous step in the path
+			$prevChoice = $this->models->ChoiceKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_keystep_id' => $d[0]['keystep_id']
+					)
+				)
+			);
+
+			
+		} else
+		// no choice, just a step ID defined: most likely a link in the text migrated from L2
+		if (!is_null($stepId)) {
+
+			// get current step
+			$step = $this->getKeystep($stepId);
+
+			// add step to the path
+			array_unshift(
+				$this->tmp['results'],
+				array(
+					'id' => $step['id'],
+					'step_number' => $step['number'],
+					'step_title' => $step['title'],
+					'is_start' => $step['is_start'],
+					'choice_marker' => null
+				)
+			);
+
+			// find the choice that lead to this step, i.e., the previous step in the path
+			$prevChoice = $this->models->ChoiceKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'res_keystep_id' => $step['id']
+					)
+				)
+			);
+
+			
+		} else {
+
+			return null;
+		
 		}
-		
+
+		// and iterate to the previous choice
+		$this->_createPathInstantly(null,$prevChoice[0]['id']);
+
 	}
-	
-	private function createPathFromTree($step=null,$choice=null)
-	{
 		
+	private function createPathInstantly($step=null,$choice=null)
+	{
+
 		$this->tmp = array();
-		$this->tmp['found'] = false;
-		$this->tmp['excluded'] = array();
 		$this->tmp['results'] = array();
 
-		$this->findStepOrChoiceInTree(
-			$this->getKeyTree(),
+		$this->_createPathInstantly(
 			($this->rHasVal('step') ? $this->requestData['step'] : null),
 			($this->rHasVal('choice') ? $this->requestData['choice'] : null)
 		);
