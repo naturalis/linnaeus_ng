@@ -80,6 +80,23 @@
 
 
 
+/* Project title
+
+	You can change the font, size, etc. of the title by modifying the following:
+
+	#header-container #title a {
+	    font-size: 35px;
+		color: rgba(0,0,0,0.6);
+	    text-shadow: 2px 2px 3px rgba(255,255,255,0.1);
+	}
+
+*/
+
+#header-container #title a {
+}
+
+
+
 /* Background color
 
 	Example to change the background color to white:
