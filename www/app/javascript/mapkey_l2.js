@@ -269,7 +269,7 @@ function l2DiversityCellClick(ele) {
 			'types' : types
 		}),
 		success : function (data) {
-			alert(data);
+			//alert(data);
 			allLookupNavigateOverrideDialogTitle('Taxa in that square');
 			allLookupShowDialog(data);
 			l2DiversitySetSelectedCell(ele);			
