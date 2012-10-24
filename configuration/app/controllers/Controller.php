@@ -154,7 +154,7 @@ class Controller extends BaseClass
     public function __destruct ()
     {
 
-		$this->setBreadCrumb();
+		$this->storePageHistory();
 
 		$this->storeState();
 
@@ -2054,74 +2054,87 @@ class Controller extends BaseClass
 
 	}
 
-	private function getBackLink()
+	private function removeBackstepFromUrl($url)
 	{
-
-		$d = 
-			(isset($_SESSION['app']['user']['breadcrumbs']) &&
-			isset($_SESSION['app']['user']['breadcrumbs'][count($_SESSION['app']['user']['breadcrumbs'])-1])) ?
-				$_SESSION['app']['user']['breadcrumbs'][count($_SESSION['app']['user']['breadcrumbs'])-1] :
-				null;
-
-		if (isset($d['name'])) $d['name'] = str_replace('"', '', $d['name']);
-		if (isset($d['data'])) $d['data'] = json_encode($d['data']);
-		
-		return $d;
-
-	}
-
-	private function setBreadCrumb()
-	{
-
-		if (empty($this->pageName) || $this->storeHistory==false) return;
-
-		foreach((array)$this->requestData as $key => $val) {
-
-			$p[] = array('vari' => $key,'val' => $val); // IE takes exception to variables called 'var' in javascript, hence 'vari'
-
-		}
-
-		$_SESSION['app']['user']['breadcrumbs'][] = array(
-			'name' => $this->pageName,
-			'url' => $_SERVER['REQUEST_URI'],
-			'data' => isset($p) ? $p : null
-		);
-		
-		$d = count((array)$_SESSION['app']['user']['breadcrumbs']);
-
-		if (isset($_SESSION['app']['user']['breadcrumbs'][$d-2])) {
-		
-			if ($_SESSION['app']['user']['breadcrumbs'][$d-2]==$_SESSION['app']['user']['breadcrumbs'][$d-1]) {
-
-				array_pop($_SESSION['app']['user']['breadcrumbs']);
-				
-				$d--;
-
-			}
-		
-		}
-
-		if ($d>$this->generalSettings['maxBackSteps'])
-			$_SESSION['app']['user']['breadcrumbs'] = array_slice($_SESSION['app']['user']['breadcrumbs'],$d-$this->generalSettings['maxBackSteps']);
-
-		//q($_SESSION['app']['user']['breadcrumbs']);
-
+	
+		return str_replace(array('?backstep=1','&backstep=1'),'',$url);
+	
 	}
 
 	private function checkBackStep()
 	{
-	
+
+		// check whether this is a clicked "back"-link
 		if ($this->rHasVal('backstep','1')) {
 
-			array_pop($_SESSION['app']['user']['breadcrumbs']);
+			// take off the last page from the history (the one the user clicked "back" from)
+			array_pop($_SESSION['app']['user']['history']);
 			
-			$this->storeHistory = false;
-
+			// remove the variable from the requestdata to avoid its accidental inclusion in any constructed URL's
 			unset($this->requestData['backstep']);
+
+			// as this page was already retrieved from history, it should not be added again
+			$this->storeHistory = false;
 
 		}
 		
 	}
+
+	private function getBackLink()
+	{
+
+		// if there is no history, there is no going back
+		if (!isset($_SESSION['app']['user']['history'])) return;
+
+		// get the last history item (this does *not* include the current page, which is saved at destriction)
+		$page = end($_SESSION['app']['user']['history']);
+
+		// check whether the current page is the same as the previous (reload); if so, get on earlier from history
+		if ($page == array('name' => $this->pageName,'url' => $this->removeBackstepFromUrl($_SERVER['REQUEST_URI'])))
+			$page = prev($_SESSION['app']['user']['history']);
+
+		// clean up the name
+		if (isset($page['name'])) $page['name'] = str_replace('"', '', $page['name']);
+	
+		// add backstep=1 to the url to be able to identify it as a step back in history
+		if (isset($page['url'])) $page['url'] .= (strpos($page['url'],'?')===false ? '?' : '&' ).'backstep=1';
+
+		return $page;
+
+	}
+
+	private function storePageHistory()
+	{
+
+		// no pagename or explicit no storing: don't store
+		if (empty($this->pageName) || $this->storeHistory==false) return;
+		
+		// undocumented history reset for development purposes through ?reset=history
+		if ($this->rHasVal('reset','history')) unset($_SESSION['app']['user']['history']);
+		
+		// current page name & url (combination considered to be unique *after* stripping the backstep parameter)
+		$thisPage = array('name' => $this->pageName,'url' => $this->removeBackstepFromUrl($_SERVER['REQUEST_URI']));
+
+		// check if history exists, if so, get the last item: the previous visited page
+		if (isset($_SESSION['app']['user']['history'])) $prevPage = end($_SESSION['app']['user']['history']);
+		
+		// if there is no previous page (if there is no history) or there is and it is different from the current (no reload), store in history
+		if (!isset($prevPage) || $thisPage!=$prevPage) $_SESSION['app']['user']['history'][] = $thisPage;
+
+		// see if a maximum number of steps to store is defined; if so, slice off the excess
+		if (count((array)$_SESSION['app']['user']['history']) > $this->generalSettings['maxBackSteps']) {
+
+			$_SESSION['app']['user']['history'] = 
+				array_slice(
+					$_SESSION['app']['user']['history'],
+					count((array)$_SESSION['app']['user']['history']) - $this->generalSettings['maxBackSteps']
+				);
+				
+		}
+
+	}
+
+
 
 	private function getWordList($forceUpdate=false)
 	{
@@ -2166,13 +2179,6 @@ class Controller extends BaseClass
 
 	}
 	
-	private function getBreadcrumbs()
-	{
-
-		return isset($_SESSION['app']['user']['breadcrumbs']) ? $_SESSION['app']['user']['breadcrumbs'] : null;
-
-	}
-
     /**
      * Sets a random integer value for general use
      *
@@ -2369,9 +2375,11 @@ class Controller extends BaseClass
 	{
 
 		if (!isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()])) return;
+		
+		$thisUrl = $this->removeBackstepFromUrl($_SERVER['REQUEST_URI']);
 
 		// /app/views/mapkey/ vs /app/views/mapkey/index.php
-		$d = strpos($_SERVER['REQUEST_URI'],'?')==false ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
+		$d = strpos($thisUrl,'?')==false ? $thisUrl : substr($thisUrl,0,strpos($thisUrl,'?'));
 		$requestHasNoFileName = $this->getViewName()=='index' && ($d !== $_SERVER['PHP_SELF']);
 
 		if (
@@ -2383,7 +2391,7 @@ class Controller extends BaseClass
 			$requestHasNoFileName && 
 			(
 				isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']) && 
-				$_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $_SERVER['REQUEST_URI'])
+				$_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $thisUrl)
 			
 			) 
 		{
@@ -2502,7 +2510,7 @@ class Controller extends BaseClass
 		}
 
 	}
-	
+
 	public function splashScreen()
 	{
 	

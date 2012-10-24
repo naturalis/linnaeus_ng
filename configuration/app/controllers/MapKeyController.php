@@ -113,6 +113,8 @@ class MapKeyController extends Controller
 			$id = $this->requestData['id'];
 				
 		}
+		
+		$this->setStoreHistory(false);
 
 		if ($this->_mapType=='l2') {
 		
@@ -541,7 +543,7 @@ class MapKeyController extends Controller
 				$this->makeLookupList(
 					$taxa,
 					'species',
-					'../species/taxon.php?id=%s'
+					'../mapkey/l2_examine_species.php?id=%s'
 				)
 			);
 			

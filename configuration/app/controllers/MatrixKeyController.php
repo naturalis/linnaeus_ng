@@ -86,6 +86,8 @@ class MatrixKeyController extends Controller
 
 		}
 
+		$this->setStoreHistory(false);
+
 		$this->redirect('identify.php');
     
     }

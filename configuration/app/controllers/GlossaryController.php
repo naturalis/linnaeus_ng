@@ -92,7 +92,13 @@ class GlossaryController extends Controller
 				
 		}
 
-		if ($id) $this->redirect('term.php?id='.$id);
+		if ($id) {
+			
+			$this->setStoreHistory(false);
+		
+			$this->redirect('term.php?id='.$id);
+
+		}
 
         $this->printPage();
 

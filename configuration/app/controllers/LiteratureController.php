@@ -76,6 +76,8 @@ class LiteratureController extends Controller
 		
  		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 		
+		$this->setStoreHistory(false);
+		
 		if (isset($id)) $this->redirect('reference.php?id='.$id);
 
  		/*

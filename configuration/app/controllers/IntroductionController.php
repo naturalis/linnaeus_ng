@@ -66,6 +66,8 @@ class IntroductionController extends Controller
 	{
 
 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		
+		$this->setStoreHistory(false);
 
 		if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
 

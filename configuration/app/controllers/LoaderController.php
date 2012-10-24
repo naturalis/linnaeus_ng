@@ -39,6 +39,9 @@ class LoaderController extends Controller
     {
 
         parent::__construct($p);
+		
+		$this->setStoreHistory(false);
+
 
     }
 
