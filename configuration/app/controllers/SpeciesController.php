@@ -286,6 +286,8 @@ class SpeciesController extends Controller
 				
 		}
 
+		$this->setStoreHistory(false);
+
 		$this->redirect('taxon.php?id='.$id);
   
     }

@@ -76,10 +76,13 @@ class ModuleController extends Controller
 			$this->addError(_('Unknown module ID.'));
 
 		} else {
+		
+			$this->setStoreHistory(false);
 
 			if (!$this->rHasVal('page') && !$this->rHasVal('id')) {
 
 				$page = $this->getFirstModulePage();
+
 				$this->redirect('topic.php?id='.$page['id']);
 
 			} else {
@@ -90,37 +93,7 @@ class ModuleController extends Controller
 
 			}
 
-			/*
-			$alpha = $this->getPageAlphabet();
-
-			if (!$this->rHasVal('letter') && $alpha) $this->requestData['letter'] = current($alpha);
-
-			if ($this->rHasVal('letter')) {
-			
-				$this->requestData['letter'] = strtolower($this->requestData['letter']);
-
-				$refs = $this->getPagesByLetter($this->requestData['letter']);
-
-				$this->smarty->assign('letter', $this->requestData['letter']);
-
-			}
-			
-			$module = $this->getCurrentModule();
-
-			$this->setPageName(_($module['module']));
-
-			if (isset($alpha)) $this->smarty->assign('alpha',$alpha);
-			
-			if (isset($refs)) $this->smarty->assign('refs',$refs);
-
-			$this->smarty->assign('headerTitles',array('title' => $module['module']));
-
-			$this->smarty->assign('module',$module);
-			*/
-
 		}
-
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
 
         $this->printPage();
 	

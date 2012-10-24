@@ -40,5 +40,6 @@ $(document).ready(function(){
 {literal}
 </script>
 {/literal}
+
 </body>
 </html>
