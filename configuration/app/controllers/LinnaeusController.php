@@ -34,7 +34,8 @@ class LinnaeusController extends Controller
 	public $jsToLoad = array('all' => array(
 		'main.js',
 		'lookup.js',
-		'dialog/jquery.modaldialog.js'
+		'dialog/jquery.modaldialog.js',
+		'jquery.splashscreen.js'
 	));
 	
 		
@@ -178,7 +179,7 @@ class LinnaeusController extends Controller
 	
 	}
 
-	private function getContent($sub=null,$id=null)
+	public function getContent($sub=null,$id=null)
 	{
 
 		// see note at top of file
