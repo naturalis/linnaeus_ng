@@ -2098,7 +2098,7 @@ class Controller extends BaseClass
 	public function createProjectCssFile($id,$title)
 	{
 	
-		$s = $this->generalSettings['directories']['runtimeStyleRoot'].'default/'.$this->generalSettings['projectCssTemplateFile'];
+		$s = $this->generalSettings['directories']['runtimeStyleRoot'].'/default/'.$this->generalSettings['projectCssTemplateFile'];
 		$t = $this->makeCustomCssFileName($id,$title);
 			
 
@@ -2128,7 +2128,7 @@ class Controller extends BaseClass
 	{
 
 		return
-			$this->generalSettings['directories']['runtimeStyleRoot'].'custom/'.
+			$this->generalSettings['directories']['runtimeStyleRoot'].'/custom/'.
 			$this->getProjectFSCode($p).'--'.
 			strtolower(preg_replace(array('/\s/','/[^A-Za-z0-9-]/'),array('-',''),$title).'.css');
 
@@ -3000,7 +3000,7 @@ $forceLookup = true;
 				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/',
 				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/',
 				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/l2_maps/',
-				'media_url' => '../../../admin/media/project/' . $this->getProjectFSCode($p) . '/',				
+				'media_url' => $this->generalSettings['paths']['mediaBasePath'] . '/' . $this->getProjectFSCode($p) . '/',				
 			);
         else
 			return null;
@@ -3057,10 +3057,10 @@ $forceLookup = true;
         
         if ($p) {
 
-            $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . $this->getAppName() . '/media/project/'.$this->getProjectFSCode($p).'/';
+            $_SESSION['admin']['project']['urls']['project_media'] = $this->baseUrl . 'shared/media/project/'.$this->getProjectFSCode($p).'/';
             $_SESSION['admin']['project']['urls']['project_thumbs'] = $_SESSION['admin']['project']['urls']['project_media'].'thumbs/';
             $_SESSION['admin']['project']['urls']['project_media_l2_maps'] = $_SESSION['admin']['project']['urls']['project_media'].'l2_maps/';
-			$_SESSION['admin']['project']['urls']['system_media_l2_maps'] = $this->baseUrl . $this->getAppName() . '/media/system/l2_maps/';
+			$_SESSION['admin']['project']['urls']['system_media_l2_maps'] = $this->baseUrl . 'shared/media/system/l2_maps/';
 
         }
 

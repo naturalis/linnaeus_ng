@@ -90,13 +90,14 @@ class configuration
                 'logout' => '/views/users/logout.php', 
                 'chooseProject' => '/views/users/choose_project.php', 
                 'notAuthorized' => '/views/utilities/not_authorized.php', 
-                'moduleNotPresent' => '/views/utilities/module_not_present.php'
+                'moduleNotPresent' => '/views/utilities/module_not_present.php',
+                'mediaBasePath' => '../../../shared/media/project', 
             ), 
             'directories' => array(
-                'mediaDirProject' => $this->_appFileRoot . 'www/admin/media/project', 
+                'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project', 
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
-                'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style/'
+                'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style'
             ), 
             'maxCategories' => 10,
 			'defaultHybridMarker' => 'X',

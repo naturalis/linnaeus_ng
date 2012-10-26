@@ -1382,7 +1382,7 @@ class Controller extends BaseClass
 		}
 
 		$u['uploadedMediaThumbs'] = $u['uploadedMedia'].'thumbs/';
-		$u['cache'] = $this->baseUrl.'admin/cache/'.$pCode.'/';
+		$u['cache'] = $this->baseUrl.'shared/cache/'.$pCode.'/';
 
 		// urls of the directory containing project specific media part of the interface, but not of the content (background etc)
 		$u['projectMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
@@ -1391,7 +1391,7 @@ class Controller extends BaseClass
 
 		// urls of the directory containing media that are constant across projects (but can be skinned)
 		$u['systemMedia'] = $_SESSION['app']['system']['urls']['systemMedia'];
-		$u['systemL2Maps'] = $this->baseUrl.$this->getAppName().'/media/system/l2_maps/';
+		$u['systemL2Maps'] = $this->baseUrl.'shared/media/system/l2_maps/';
 
 		// urls of css-files, either project-specific - if they exist - or generic
 		$u['cssRootDir'] = $this->baseUrl.$this->getAppName().'/style/';
@@ -2486,7 +2486,7 @@ class Controller extends BaseClass
 
 		if (!$p) return;
 		
-		$cachePath = $this->generalSettings['lngFileRoot'].'www/admin/cache/'.$this->getProjectFSCode($p);
+		$cachePath = $this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($p);
 	
 		if (!file_exists($cachePath)) mkdir($cachePath);	
 	
@@ -2500,7 +2500,7 @@ class Controller extends BaseClass
 		if (!$p) return;
 		
 		$paths = array(
-			$this->generalSettings['lngFileRoot'].'www/admin/cache/'.$this->getProjectFSCode($p)
+			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($p)
 		);
 		
 		foreach((array)$paths as $val) {

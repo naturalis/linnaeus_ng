@@ -69,7 +69,7 @@ class configuration
 			'showEntryProgramLink' => true,
 			//'urlNoProjectId' => '../../../app/views/linnaeus/set_project.php',
 			'urlNoProjectId' => '../../../app/views/linnaeus/no_project.php',
-			'urlUploadedProjectMedia' => '../../../admin/media/project/',
+			'urlUploadedProjectMedia' => '../../../shared/media/project/',
 			'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
 			'lngFileRoot' => $this->_appFileRoot,
             'maxSessionHistorySteps' => 10, 
@@ -79,6 +79,7 @@ class configuration
             'directories' => array(
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
+				'cache' => $this->_appFileRoot . 'www/shared/cache'
             ),
 			'hybridMarker' => 'X',
 			'maxBackSteps' => 100,
