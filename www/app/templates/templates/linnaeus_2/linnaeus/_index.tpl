@@ -9,7 +9,6 @@
         {if $v.type=='regular' && $v.show_in_public_menu==1}
         <td class="grid">
             <a class="menu-item" href="../{$v.controller}/">
-                <!-- <div class="module-icon" style="background-image:url('{$session.app.project.urls.systemMedia}module_icons/{$v.icon}')"></div> -->
                 <div class="module-icon {$v.controller}"></div>
                 <div>{t}{$v.module}{/t}</div>
             </a>
