@@ -1,7 +1,7 @@
 <div id="categories">
 <ul>
 <li>
-    <a class="category{if $subject=='Welcome'}-active{/if} category-first" 
+    <a class="category{if $subject=='Welcome' || $subject==''}-active{/if} category-first" 
     {if $useJavascriptLinks}href="javascript:goContentPage('Welcome')"{else}href="../linnaeus/content.php?sub=Welcome"{/if}>
     {t}Welcome{/t}</a>
 </li>
