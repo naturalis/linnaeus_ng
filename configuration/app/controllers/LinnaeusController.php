@@ -34,8 +34,7 @@ class LinnaeusController extends Controller
 	public $jsToLoad = array('all' => array(
 		'main.js',
 		'lookup.js',
-		'dialog/jquery.modaldialog.js',
-		'jquery.splashscreen.js'
+		'dialog/jquery.modaldialog.js'
 	));
 	
 		
