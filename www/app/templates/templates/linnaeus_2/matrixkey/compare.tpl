@@ -8,15 +8,18 @@
 			<select id="taxon-list-1">
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
-			<option value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
+			{if $v.type=='tx'}
+			<option value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
+			{/if}
 			{/foreach}
 			</select>
 		
 			<select id="taxon-list-2">
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
-			<option value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}
-</option>
+			{if $v.type=='tx'}
+			<option value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
+			{/if}
 			{/foreach}
 			</select>
 		

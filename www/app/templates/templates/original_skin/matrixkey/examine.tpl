@@ -8,9 +8,11 @@
 	<div id="examine">
 		<p>
 			<select onchange="goExamine()" id="taxon-list">
-			<option disabled="disabled" selected="selected">{t}select a taxon{/t}</option>
+			<option disabled="disabled" selected="selected">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
-			<option value="{$v.id}">{$v.label}{if $v.is_hybrid==1} {$session.app.project.hybrid_marker}{/if}</option>
+			{if $v.type=='tx'}
+			<option value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
+			{/if}
 			{/foreach}
 			</select>
 		</p>
