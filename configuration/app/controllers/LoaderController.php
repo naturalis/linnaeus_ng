@@ -32,8 +32,8 @@ include_once ('Controller.php');
 class LoaderController extends Controller
 {
 
-	public $cssToLoad = array('basics.css');
-	public $jsToLoad = array('all' => array('main.js'));
+	public $cssToLoad = array('basics.css', 'linnaeus.css', 'splash.css');
+	public $jsToLoad = array('all' => array('main.js', 'dialog/jquery.modaldialog.js'));
 
     public function __construct($p=null)
     {
@@ -41,7 +41,6 @@ class LoaderController extends Controller
         parent::__construct($p);
 		
 		$this->setStoreHistory(false);
-
 
     }
 
@@ -75,7 +74,13 @@ class LoaderController extends Controller
 
 		$this->smarty->assign('startUrl',$url);
 
-        $this->printPage('../linnaeus/splash');
+
+		require_once ('../../../../configuration/app/controllers/LinnaeusController.php');
+		$c = new LinnaeusController();
+		$d = $c->getContent('Welcome');
+		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));		
+		
+		$this->printPage('../linnaeus/splash');
 
 
     }
