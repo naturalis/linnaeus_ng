@@ -15,7 +15,8 @@
 			</select>
 			<div id="buttons">
 				<input type="button" onclick="addSelected(this)" value="{t}Add{/t}" />
-				<input type="button" onclick="clearSelected()" value="{t}Clear all{/t}" />
+				<input type="button" onclick="deleteSelected($('#states').val())" value="{t}Delete{/t}" />
+				<input type="button" onclick="clearSelectedStates()" value="{t}Clear all{/t}" />
 				<input type="button" onclick="getScores()" value="{t}Search &gt;&gt;{/t}" />
 			</div>
 		</div>
@@ -36,8 +37,8 @@
 			<label for="inc_unknowns">{t}Treat unknowns as matches{/t}</label></div>
 			<div id="buttons">
 				<input type="button" onclick="showMatrixPattern(this)" value="{t}Add{/t}" />
-				<input type="button" onclick="deleteSelected()" value="{t}Delete{/t}" />
-				<input type="button" onclick="clearSelected(); showMatrixPattern();" value="{t}Clear all{/t}" />
+				<input type="button" onclick="deleteSelectedState()" value="{t}Delete{/t}" />
+				<input type="button" onclick="clearSelectedStates(); showMatrixPattern();" value="{t}Clear all{/t}" />
 			</div>
 		</div>
 

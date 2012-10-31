@@ -326,23 +326,40 @@ function addSelected(caller) {
 	} else {
 		
 		var s = states[$('#states').val()];
-
-		if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
+		
+		if (s) {
 			
-			var c = getCharacter(s.characteristic_id);
-	
-			$('#selected').
-				append('<option id="s'+s.id+'" value="c:'+s.characteristic_id+':'+s.id+'">'+c.label+': '+s.label+'</option>').
-				val(s.id);
-			selected[s.id] = true;
-	
+			if (s && (selected[s.id]==false || selected[s.id]==undefined)) {
+				
+				var c = getCharacter(s.characteristic_id);
+		
+				$('#selected').
+					append('<option id="s'+s.id+'" value="c:'+s.characteristic_id+':'+s.id+'">'+c.label+': '+s.label+'</option>').
+					val(s.id);
+				selected[s.id] = true;
+		
+			} else {
+
+				deleteSelected(s.id);
+
+			}
+			
 		}
 		
 		//getScores();
 		highlightSelected();
-		
+
 	}
 	
+}
+
+function deleteSelected(id) {
+
+	selected[id] = false;
+	$('#s'+id).remove();
+	removeHighlight();
+	highlightSelected();
+
 }
 
 function highlightSelected() {
@@ -392,15 +409,12 @@ function removeHighlight() {
 
 }
 
-function deleteSelected() {
+function deleteSelectedState(id) {
 
-	var id = $('#selected').val();
+	// anatomy of a selected element: type[f,c]:character id:state id
+	var id = $('#selected').val().split(':');
 
-	if (id.substr(0,1)!='f') {
-
-		selected[id] = false;
-
-	}
+	if (id[0]!='f') selected[id[2]] = false;
 
 	$('#selected').children(':selected').remove();
 
@@ -412,7 +426,7 @@ function deleteSelected() {
 
 }
 
-function clearSelected() {
+function clearSelectedStates() {
 
 	$('#selected').empty();
 
