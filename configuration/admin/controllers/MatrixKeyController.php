@@ -523,6 +523,92 @@ class MatrixKeyController extends Controller
 	
 	}
 
+		
+	private function updateStateShowOrder($id,$val)
+	{
+
+		$this->models->CharacteristicState->update(
+			array(
+				'show_order' => $val
+				),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $id
+			)
+		);	
+
+	}
+
+	private function renumberStateShowOrder($id)
+	{
+	
+		$c = $this->getCharacteristicStates($id);
+		
+		foreach((array)$c as $key => $val) $this->updateStateShowOrder($val['id'],$key);
+				
+	}
+
+    public function stateSortAction()
+    {
+    
+        $this->checkAuthorisation();
+		
+		$mId = $this->getCurrentMatrixId();
+		
+		if ($mId==null) $this->redirect('matrices.php');
+		
+		if (!$this->rHasVal('sId'))  $this->redirect('edit.php');
+		
+		if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {
+
+			$c = $this->getCharacteristicStates($this->requestData['sId']);
+		
+			foreach((array)$c as $key => $val) {
+
+				if ($this->requestData['id']==$val['id']) {
+				
+					if ($this->rHasVal('r','u')) {
+					
+						if (isset($c[$key-1])) $this->updateStateShowOrder($c[$key-1]['id'],$c[$key-1]['show_order']+1);
+						
+						$this->updateStateShowOrder($this->requestData['id'],$val['show_order']-1);
+						
+						break;
+
+								
+					} else
+					if ($this->rHasVal('r','d')) {
+
+						if (isset($c[$key+1])) $this->updateStateShowOrder($c[$key+1]['id'],$c[$key+1]['show_order']-1);
+						
+						$this->updateStateShowOrder($this->requestData['id'],$val['show_order']+1);
+						
+						break;
+
+								
+					}
+				
+				}
+			
+			} 
+			
+			$this->renumberStateShowOrder($this->requestData['sId']);
+
+		}
+		
+		$matrix = $this->getMatrix($mId);
+
+        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+
+		$this->smarty->assign('characteristic',$this->getCharacteristic($this->requestData['sId']));
+
+		$this->smarty->assign('states',$this->getCharacteristicStates($this->requestData['sId']));
+
+		$this->smarty->assign('matrix',$matrix);
+
+        $this->printPage();
+    
+    }
 
     public function linksAction ()
     {
@@ -1478,7 +1564,8 @@ class MatrixKeyController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'characteristic_id' => $id,
 				),
-				'columns' => 'id,characteristic_id'
+				'columns' => 'id,characteristic_id,show_order',
+				'order' => 'show_order'
 			)
 		);
 
@@ -1489,6 +1576,8 @@ class MatrixKeyController extends Controller
 		}
 
 		$this->smarty->assign('returnText', json_encode($cs));
+
+		return $cs;
 
 	}
 
@@ -1846,7 +1935,8 @@ class MatrixKeyController extends Controller
 						'id' => $val['state_id'],
 						'project_id' => $this->getCurrentProjectId(),
 					),
-					'columns' => 'characteristic_id'
+					'columns' => 'characteristic_id',
+					'order' => 'show_order'
 				)
 			);
 			

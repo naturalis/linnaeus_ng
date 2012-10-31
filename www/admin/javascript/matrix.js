@@ -471,3 +471,13 @@ function matrixSetActiveState(id) {
 	$('#char-'+id).attr('selected', 'selected');
 
 }
+
+function matrixShowSortStates() {
+	
+	var id = $("#characteristics :selected").val();
+	
+	if (id==undefined) return;
+	
+	window.open('state_sort.php?sId='+id,'_self');
+	
+}
