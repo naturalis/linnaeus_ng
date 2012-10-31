@@ -560,7 +560,8 @@ class MatrixKeyController extends Controller
 				'id' => array(
 					'project_id' => $this->getCurrentProjectId(),
 					'characteristic_id' => $id
-				)
+				),
+				'order' => 'show_order'
 			)
 		);
 
@@ -590,6 +591,7 @@ class MatrixKeyController extends Controller
 					'id' => $id
 				),
 				'columns' => 'id,characteristic_id,file_name,lower,upper,mean,sd,got_labels',
+				'order' => 'show_order'
 			)
 		);
 

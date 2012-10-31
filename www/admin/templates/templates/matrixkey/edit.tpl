@@ -56,7 +56,7 @@
 	</tr>		
 	<tr>
 		<td colspan="2">
-			{t}states{/t}
+			{t}states{/t} (<span class="a" onclick="matrixShowSortStates();">{t}sort states{/t}</span>)
 			<select size="100" id="states" class="matrix-list-select">
 			</select>
 		</td>
