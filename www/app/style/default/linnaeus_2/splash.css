@@ -1,3 +1,14 @@
+/* Splash */
+
+#splash {
+	width: 599px;
+	height: 313px;
+	background-image:url('../../../../app/media/system/skins/linnaeus_2/splash.png');
+}
+
+
+/* Frame and background */
+
 #dialog {
 	position: fixed;
 	padding: 0;

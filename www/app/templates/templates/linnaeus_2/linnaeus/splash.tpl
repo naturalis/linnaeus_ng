@@ -39,17 +39,32 @@
 	<div id="content">
 	{$content}
 	</div>
-
 </div>
+
+<div id="splash" style="display: none;"></div>
 
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
 
+alert($('#splash').width())
+
 	showDialog(
 		'{/literal}{t}Initializing{/t} {$session.app.project.title}{literal}...',
 		'<div id="splash"></div>', 
 		vars={width:{/literal}612{literal}});
+		
+	$('#dialog').click(function () {
+        return false;
+ 	});
+ 	
+	$('#dialog-mask').click(function () {
+        return false;
+ 	});
+
+	$('#dialog-header').click(function () {
+        return false;
+ 	});
 
 	$('#dialog').load('?go=load', function(response,status,xhr) {
 		if (status=='error') {
@@ -65,6 +80,8 @@ $(document).ready(function(){
 });
 </script>
 {/literal}
+
+
 
 
 {include file="../shared/footer.tpl"}
