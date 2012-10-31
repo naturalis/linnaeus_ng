@@ -70,7 +70,7 @@ $(document).ready(function(){
 		if (status=='error') {
 			$('#status').html('<a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
 		} else {			
-			$('#dialog').html('done').fadeOut(200, function() {
+			$('#dialog').fadeOut(200, function() {
 				window.location.href='{/literal}{$startUrl}{literal}';
 			});
 		}
