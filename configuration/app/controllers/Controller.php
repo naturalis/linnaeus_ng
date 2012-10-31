@@ -1385,7 +1385,7 @@ class Controller extends BaseClass
 		$u['cache'] = $this->baseUrl.'shared/cache/'.$pCode.'/';
 
 		// urls of the directory containing project specific media part of the interface, but not of the content (background etc)
-		$u['projectMedia'] = $this->baseUrl.$this->getAppName().'/media/project/'.$pCode.'/';
+		$u['projectMedia'] = $this->baseUrl.'shared/media/project/'.$pCode.'/';
 		$u['projectL2Maps'] = $u['projectMedia'].'l2_maps/';
 		$u['projectSystemOverride'] = $u['projectMedia'].'system_override/';
 

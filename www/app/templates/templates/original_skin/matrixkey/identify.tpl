@@ -19,8 +19,8 @@
 		</div>
 		<div id="buttons">
 			<input type="button" onclick="addSelected(this)" value="{t}add{/t}" />
-			<input type="button" onclick="deleteSelected()" value="{t}delete{/t}" />
-			<input type="button" onclick="clearSelected()" value="{t}clear all{/t}" />
+			<input type="button" onclick="deleteSelectedState()" value="{t}delete{/t}" />
+			<input type="button" onclick="clearSelectedStates()" value="{t}clear all{/t}" />
 		</div>
 		<div id="choices">
 			{t}Selected combination of characters{/t}
