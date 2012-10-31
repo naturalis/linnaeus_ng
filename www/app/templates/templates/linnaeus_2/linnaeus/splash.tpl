@@ -47,13 +47,13 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-alert($('#splash').width())
-
+	var splashWidth = $('#splash').width() + 12;
+	
 	showDialog(
 		'{/literal}{t}Initializing{/t} {$session.app.project.title}{literal}...',
 		'<div id="splash"></div>', 
-		vars={width:{/literal}612{literal}});
-		
+		vars={width:{/literal}splashWidth{literal}});
+	
 	$('#dialog').click(function () {
         return false;
  	});
@@ -75,7 +75,6 @@ alert($('#splash').width())
 			});
 		}
 	});
-
 	
 });
 </script>
