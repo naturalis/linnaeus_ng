@@ -523,30 +523,6 @@ class MatrixKeyController extends Controller
 	
 	}
 
-		
-	private function updateStateShowOrder($id,$val)
-	{
-
-		$this->models->CharacteristicState->update(
-			array(
-				'show_order' => $val
-				),
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'id' => $id
-			)
-		);	
-
-	}
-
-	private function renumberStateShowOrder($id)
-	{
-	
-		$c = $this->getCharacteristicStates($id);
-		
-		foreach((array)$c as $key => $val) $this->updateStateShowOrder($val['id'],$key);
-				
-	}
 
     public function stateSortAction()
     {
@@ -2119,6 +2095,30 @@ class MatrixKeyController extends Controller
 			
 		}
 		
+	}
+
+	private function updateStateShowOrder($id,$val)
+	{
+
+		$this->models->CharacteristicState->update(
+			array(
+				'show_order' => $val
+				),
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $id
+			)
+		);	
+
+	}
+
+	private function renumberStateShowOrder($id)
+	{
+	
+		$c = $this->getCharacteristicStates($id);
+		
+		foreach((array)$c as $key => $val) $this->updateStateShowOrder($val['id'],$key);
+				
 	}
 	
 }
