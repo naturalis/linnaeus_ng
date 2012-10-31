@@ -137,9 +137,13 @@ function l2DoClearSearch() {
 
 function l2DoSearchMap() {
 
+	var squares = false;
+	
 	$('td[id^="cell-"]').each(function(i) {
 
 		if ($(this).hasClass('mapCellTagged')) {
+			
+			squares = true;
 			
 			$('<input type="hidden" name="selectedCells[]">').val($(this).attr('id').replace('cell-','')).appendTo('#theForm');
 			
@@ -147,8 +151,15 @@ function l2DoSearchMap() {
 
 	});
 	
+	if (!squares) {
+		
+		alert(_('Please select at least one square'));
+		
+		return;
+		
+	} 
+	
 	$('#theForm').submit();
-
 
 }
 
