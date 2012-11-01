@@ -40,7 +40,6 @@
 	{$content}
 	</div>
 </div>
-
 <div id="splash" style="display: none;"></div>
 
 {literal}
@@ -48,9 +47,9 @@
 $(document).ready(function(){
 
 	var splashWidth = $('#splash').width() + 12;
-	
+
 	showDialog(
-		'{/literal}{t}Initializing{/t} {$session.app.project.title}{literal}...',
+		'{/literal}{$session.app.project.title}{literal}',
 		'<div id="splash"></div>', 
 		vars={width:{/literal}splashWidth{literal}});
 	
@@ -66,21 +65,18 @@ $(document).ready(function(){
         return false;
  	});
 
+	$('#dialog-button-container').html('{/literal}{t}Loading application{/t}{literal}...');
+
 	$('#dialog').load('?go=load', function(response,status,xhr) {
 		if (status=='error') {
 			$('#status').html('<a href="{/literal}{$startUrl}{literal}">'+_('Continue to ')+'{/literal}{$session.app.project.title}{literal}</a>');
-		} else {			
+		} else {
 			$('#dialog').fadeOut(200, function() {
 				window.location.href='{/literal}{$startUrl}{literal}';
 			});
 		}
 	});
-	
 });
 </script>
 {/literal}
-
-
-
-
 {include file="../shared/footer.tpl"}
