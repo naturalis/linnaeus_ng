@@ -90,7 +90,7 @@ class ModuleController extends Controller
 
         $this->checkAuthorisation();
 		
-		if ($this->getActiveModule==null || $this->rHasVal('freeId')) {
+		if ($this->getActiveModule()==null || $this->rHasVal('freeId')) {
 
 			$this->setActiveModule($this->getFreeModule());
 			
