@@ -1353,6 +1353,8 @@ class MapKeyController extends Controller
 		
 		if (!$m) {
 		
+			$writeCache = true;
+		
 			$m = $this->models->L2Map->_get(
 				array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
@@ -1416,7 +1418,8 @@ class MapKeyController extends Controller
 						$m[$key]['cellHeight'] = (floor($m[$key]['height']/$val['rows']))-1;
 						$m[$key]['resized'] = 0;
 					}
-				}
+				
+				} else $writeCache = false;
 	
 				$d = json_decode($val['coordinates']);
 	
@@ -1434,7 +1437,7 @@ class MapKeyController extends Controller
 			
 			}
 			
-			$this->saveCache('map-l2Maps', $m);
+			if ($writeCache) $this->saveCache('map-l2Maps', $m);
 		}
 		
 		return isset($id) ? $m[$id] : $m;
