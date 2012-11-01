@@ -773,11 +773,11 @@ class KeyController extends Controller
             'case' => 'i'
         ));
 
-		$this->smarty->assign('deadSteps',$deadSteps);
+		$this->smarty->assign('deadSteps', isset($deadSteps) ? $deadSteps : false);
 
-		$this->smarty->assign('sadSteps',$sadSteps);
+		$this->smarty->assign('sadSteps', isset($sadSteps) ? $sadSteps : false);
 
-		$this->smarty->assign('deadChoices',$deadChoices);
+		$this->smarty->assign('deadChoices', $deadChoices);
 
         $this->printPage();
 	
