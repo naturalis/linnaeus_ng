@@ -75,5 +75,9 @@ border-top-left-radius: 30px 30px;
 }
 
 #dialog-button-container {
-	display: none;
+	text-align: center;
+	margin: 8px 6px 6px 2px;
+	text-align: left;
 }
+
+
