@@ -74,14 +74,14 @@ class LoaderController extends Controller
 
 		$this->smarty->assign('startUrl',$url);
 
-
 		require_once ('../../../../configuration/app/controllers/LinnaeusController.php');
 		$c = new LinnaeusController();
 		$d = $c->getContent('Welcome');
 		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));		
+		$this->smarty->assign('splashDelay',$this->generalSettings['splashDelay']);		
+		unset($c);
 		
 		$this->printPage('../linnaeus/splash');
-
 
     }
 
@@ -101,7 +101,7 @@ class LoaderController extends Controller
 		$this->preloadModule();
 		$this->preloadSearch();
 		$this->preloadSpecies();
-
+		
 		sleep(max(0,($this->generalSettings['splashDelay']-((microtime(true) - $execStart) / 1000))));
 
 	}
