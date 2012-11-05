@@ -23,16 +23,26 @@ body {
     position: relative;
 }
 
-#top-strip p {
-    text-align: right;
+#top-strip p, #preview-overlay p {
     color: #fff;
     padding: 2px 10px;
 }
 
-#top-strip p a {
+#top-strip p {
+    text-align: right;
+}
+
+#top-strip p a, #preview-overlay p a {
     color: #fff;
 }
 
+#preview-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: #aaa;
+	font-weight: bold;
+}
 
 #header-container {
     width: 100%;
@@ -173,6 +183,7 @@ body {
     color: #fff;
     padding: 3px 10px;
 }
+
 
 
 
