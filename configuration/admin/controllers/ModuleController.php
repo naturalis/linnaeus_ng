@@ -190,7 +190,12 @@ class ModuleController extends Controller
     public function previewAction()
     {
 
-		$this->redirect('../../../app/views/module/topic.php?p='.$this->getCurrentProjectId().'&modId='.$this->getCurrentModuleId().'&id='.$this->requestData['id']);
+		$this->redirect(
+			'../../../app/views/module/topic.php?p='.$this->getCurrentProjectId().
+			'&modId='.$this->getCurrentModuleId().
+			'&id='.$this->requestData['id'].
+			'&lan='.$this->getDefaultProjectLanguage()
+		);
 
     }
 
