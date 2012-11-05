@@ -169,7 +169,11 @@ class IntroductionController extends Controller
     public function previewAction()
     {
 
-		$this->redirect('../../../app/views/introduction/topic.php?p='.$this->getCurrentProjectId().'&id='.$this->requestData['id']);
+		$this->redirect(
+			'../../../app/views/introduction/topic.php?p='.$this->getCurrentProjectId().
+			'&id='.$this->requestData['id'].
+			'&lan='.$this->getDefaultProjectLanguage()
+		);
 
 	}
 
