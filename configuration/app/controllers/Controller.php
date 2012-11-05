@@ -32,7 +32,7 @@ class Controller extends BaseClass
 	private $_checkForProjectId = true;
 	private $_checkForSplash = true;
 	
-	private $_allowEditOverlay = false; // true
+	private $_allowEditOverlay = true; // true
 
 	private $_currentGlossaryId = false;
 	private $_currentHotwordLink = false;

@@ -1,15 +1,12 @@
-<div id="preview-overlay" style="
-	position:absolute;
-	top:10px;
-	left:0px;
-	width:500px;
-	height:150px;
-	color:#aaa;
-	text-align:right;
-"
->
+<div id="preview-overlay">
+<!--
 <input type="button" value="edit page" onclick="window.open('{$urlBackToAdmin}','_self');" />
+-->
+
+<p><a href="{$urlBackToAdmin}">EDIT PAGE</a></p>
 </div>
+
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
