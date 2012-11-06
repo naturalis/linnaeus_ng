@@ -1267,7 +1267,7 @@ class Controller extends BaseClass
 				'columns' => 'id,module,description,show_order,show_alpha,active'
 			)
 		);
-		
+
 		foreach ((array) $freeModules as $key => $val) {
 
 			$val['type'] = 'free';
