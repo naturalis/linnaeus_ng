@@ -123,6 +123,8 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
 
         $this->setProjectLanguages();
+        
+        $this->clearCaches();
 
     }
 
@@ -3000,7 +3002,8 @@ $forceLookup = true;
 				'project_media' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/',
 				'project_thumbs' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/thumbs/',
 				'project_media_l2_maps' => $this->generalSettings['directories']['mediaDirProject'] . '/' . $this->getProjectFSCode($p) . '/l2_maps/',
-				'media_url' => $this->generalSettings['paths']['mediaBasePath'] . '/' . $this->getProjectFSCode($p) . '/',				
+				'media_url' => $this->generalSettings['paths']['mediaBasePath'] . '/' . $this->getProjectFSCode($p) . '/',	
+				'cache' => $this->generalSettings['directories']['cache']. '/' . $this->getProjectFSCode($p). '/'
 			);
         else
 			return null;
@@ -3026,6 +3029,8 @@ $forceLookup = true;
             $_SESSION['admin']['project']['paths']['project_thumbs'] = $paths['project_thumbs'];
 
             $_SESSION['admin']['project']['paths']['project_media_l2_maps'] = $paths['project_media_l2_maps'];
+            
+            $_SESSION['admin']['project']['paths']['cache'] = $paths['cache'];
 
             foreach ((array) $_SESSION['admin']['project']['paths'] as $key => $val) {
                 
@@ -3462,4 +3467,30 @@ $forceLookup = true;
 
     }
 
+    private function clearCaches () 
+	{
+		
+        if ($this->getCurrentProjectId()) {
+		
+        	$cacheDir = $_SESSION['admin']['project']['paths']['cache'];
+		
+			if (is_dir($cacheDir)) {
+				
+				$files = scandir($cacheDir);
+				
+				foreach ($files as $file) {
+					
+					if ($file != "." && $file != "..") {
+						
+						unlink($cacheDir . '/' . $file);
+						
+					}
+					
+				}
+			}
+		
+        }
+		
+	}
+        
 }
