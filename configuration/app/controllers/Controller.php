@@ -2437,7 +2437,6 @@ class Controller extends BaseClass
 			die('Cannot write to cache folder '. $_SESSION['app']['project']['urls']['cache']);
 		}
 		
-		
 	}
 
 	public function getTreeList($p=null)

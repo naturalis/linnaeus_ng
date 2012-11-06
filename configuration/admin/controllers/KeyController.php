@@ -667,7 +667,7 @@ class KeyController extends Controller
         
         $this->setPageName( _('Key map'));
 
-		$key = $_SESSION['admin']['system']['keyTree'] = $this->getKeyTree();
+		$key = $this->getKeyTree();
 
 		$this->smarty->assign('json',json_encode($key));
 
@@ -2389,8 +2389,7 @@ class KeyController extends Controller
 			return false;
 
 		}
-	
-	
+		
 	}
 
 	private function setKeyTaxaChanged()
@@ -2432,7 +2431,7 @@ class KeyController extends Controller
 		
 		if (!isset($_SESSION['admin']['system']['keyTreeV2']))
 			$_SESSION['admin']['system']['keyTreeV2'] = $this->generateKeyTree();
-		
+
 		$this->sawOffABranch($_SESSION['admin']['system']['keyTreeV2'],$step);
 		$this->reapFruits($this->tmp['branch']);
 
@@ -2487,7 +2486,6 @@ class KeyController extends Controller
 
 	private function getAllTaxaInKey()
 	{
-	
 		if (!isset($_SESSION['admin']['system']['key']['keyTaxa'])) {
 	
 			$_SESSION['admin']['system']['key']['keyTaxa'] = $this->models->ChoiceKeystep->_get(
@@ -2503,7 +2501,6 @@ class KeyController extends Controller
 		}
 		
 		return $_SESSION['admin']['system']['key']['keyTaxa'];
-		
 	}
 
 }

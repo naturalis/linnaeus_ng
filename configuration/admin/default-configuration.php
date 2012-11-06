@@ -97,7 +97,8 @@ class configuration
                 'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project', 
 				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
-                'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style'
+                'runtimeStyleRoot' => $this->_appFileRoot . 'www/app/style',
+				'cache' => $this->_appFileRoot . 'www/shared/cache'
             ), 
             'maxCategories' => 10,
 			'defaultHybridMarker' => 'X',
