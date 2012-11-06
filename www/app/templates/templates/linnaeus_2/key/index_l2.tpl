@@ -57,7 +57,6 @@ $('#choices').height($('#choices').height()+height < $('#taxa').height() ? $('#t
 {literal}
 <script>
 $(".inline-image").click(function (e) {
-	alert(e);
     e.stopPropagation();
 });
 </script>

@@ -103,6 +103,7 @@ class KeyController extends Controller
 			$this->updateKeyPath(array('step' => $step,'fromPath' => true));
 
 		} else
+			
 		// choice is choice clicked by user
 		if ($this->rHasVal('choice')) {
 
@@ -318,7 +319,8 @@ class KeyController extends Controller
 						'step_number' => $step['number'],
 						'step_title' => $step['title'],
 						'is_start' => $step['is_start'],
-						'choice_marker' => null
+						'choice_marker' => null,
+						'choice_txt' => null
 					)
 				);
 
@@ -326,18 +328,6 @@ class KeyController extends Controller
 
 			// get the choice's parent step
 			$step = $this->getKeystep($d[0]['keystep_id']);
-
-			// add step & choice to the path
-			array_unshift(
-				$this->tmp['results'],
-				array(
-					'id' => $step['id'],
-					'step_number' => $step['number'],
-					'step_title' => $step['title'],
-					'is_start' => $step['is_start'],
-					'choice_marker' => $this->showOrderToMarker($d[0]['show_order'])
-				)
-			);
 
 			// find the choice that lead to this step, i.e., the previous step in the path
 			$prevChoice = $this->models->ChoiceKeystep->_get(
@@ -348,7 +338,22 @@ class KeyController extends Controller
 					)
 				)
 			);
+			
+			$choice = $this->getKeystepChoice($choiceId);
+			$choiceMarker = $this->showOrderToMarker($d[0]['show_order']);
 
+			// add step & choice to the path
+			array_unshift(
+				$this->tmp['results'],
+				array(
+					'id' => $step['id'],
+					'step_number' => $step['number'],
+					'step_title' => $step['title'],
+					'is_start' => $step['is_start'],
+					'choice_marker' => $this->showOrderToMarker($d[0]['show_order']),
+					'choice_txt' => $this->formatPathChoice($choice)
+				)
+			);
 			
 		} else
 		// no choice, just a step ID defined: most likely a link in the text migrated from L2
@@ -356,7 +361,7 @@ class KeyController extends Controller
 
 			// get current step
 			$step = $this->getKeystep($stepId);
-
+			
 			// add step to the path
 			array_unshift(
 				$this->tmp['results'],
@@ -365,7 +370,8 @@ class KeyController extends Controller
 					'step_number' => $step['number'],
 					'step_title' => $step['title'],
 					'is_start' => $step['is_start'],
-					'choice_marker' => null
+					'choice_marker' => null,
+					'choice_txt' => null
 				)
 			);
 
@@ -378,8 +384,8 @@ class KeyController extends Controller
 					)
 				)
 			);
-
 			
+							
 		} else {
 
 			return null;
@@ -650,7 +656,6 @@ class KeyController extends Controller
 
 	private function updateKeyPath($params) 
 	{
-
 		$step = $params['step'];
 		$choice = isset($params['choice']) ? $params['choice'] : null;
 		$fromPath = isset($params['fromPath']) ? $params['fromPath'] : null;
@@ -704,7 +709,8 @@ class KeyController extends Controller
 		// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
 
 			$d[count((array)$d)-2]['choice_marker'] = $choice['marker'];
-
+			$d[count((array)$d)-2]['choice_txt'] = $this->formatPathChoice($choice);
+				
 		}
 
 		$_SESSION['app']['user']['key']['path'] = $d;
@@ -988,6 +994,11 @@ class KeyController extends Controller
 	{
 		return isset($_SESSION['app']['user']['key']['taxaState']) ? $_SESSION['app']['user']['key']['taxaState'] :
 			'remaining';
+	}
+	
+	private function formatPathChoice ($choice)
+	{
+		return strip_tags($choice['choice_txt']);
 	}
 	
 }

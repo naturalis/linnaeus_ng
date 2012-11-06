@@ -58,11 +58,15 @@ td.allLookupListCell {
 	width: 500px;
 }
 
-.allLookupListRow, .allLookupListActiveRow, .row {
+.allLookupListRow, .allLookupListActiveRow, .row, #lookup-DialogContent p {
 	text-align: left;
 	cursor: pointer;
 	padding: 0 4px; 
 	border: 1px solid transparent;
+}
+
+#lookup-DialogContent p {
+	cursor: default;
 }
 /*
 .allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
