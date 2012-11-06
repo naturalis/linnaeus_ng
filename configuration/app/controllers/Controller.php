@@ -140,7 +140,7 @@ class Controller extends BaseClass
 
 			$this->setCssFiles();
 			
-			$this->splashScreen();
+			if (!$this->isLoggedInAdmin()) $this->splashScreen();
 
 		}
 

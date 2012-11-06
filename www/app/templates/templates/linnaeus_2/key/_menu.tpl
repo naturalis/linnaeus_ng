@@ -11,20 +11,20 @@
 {assign var='previousStep' value=$totalSteps-2}
 
 <script type="text/javascript">
-    var tmp = '<div id="lookup-DialogContent">';
+    var decisionPath = '<div id="lookup-DialogContent">';
     {if $keypath|@count > 1}
         {foreach from=$keypath key=k item=v name=pathPopup}
             {if !$smarty.foreach.pathPopup.last}
-            tmp = tmp + 
+            decisionPath = decisionPath + 
                 '<p class="row">'+
-                '<a href="javascript:void(0);keyDoStep({$v.id})">{t}Step{/t} {$v.step_number|@escape}{if $v.choice_marker}{$v.choice_marker|@escape}{/if}{if $v.step_number!=$v.step_title}: {$v.step_title|@escape}{/if}</a>'+
+                '<a href="javascript:void(0);keyDoStep({$v.id})">{t}Step{/t} {$v.step_number|@escape}{if $v.choice_marker}{$v.choice_marker|@escape}{/if}{if $v.step_number!=$v.step_title}: {$v.step_title|@escape}{/if}{if $v.choice_txt}<br>{$v.choice_txt|@escape}{/if}</a>'+
                 '</p>';
             {/if}
         {/foreach}
     {else}
-        tmp = tmp + '<tr><td>{t}No choices made yet{/t}</td></tr>';
+        decisionPath = decisionPath + '<p>{t}No choices made yet{/t}</p>';
     {/if}
-    tmp = tmp + '</div>';
+    decisionPath = decisionPath + '</div>';
 </script>
 
 <span onclick="allLookupShowDialog()" id="contents-icon" title="{t}Contents{/t}" class="navigation-icon" />
@@ -67,7 +67,7 @@
 {include file="../shared/_back-to-search.tpl"}
 <a class="navigation-icon" id="decision-path-icon" 
 	
-	href='javascript:showDialog("{t}Decision path{/t}",tmp);' 
+	href='javascript:showDialog("{t}Decision path{/t}",decisionPath);' 
 	title="{t}Decision path{/t}">{t}Decision path{/t}</a>
 	
 </div>
