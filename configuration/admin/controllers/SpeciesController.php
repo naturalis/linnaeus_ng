@@ -4330,7 +4330,9 @@ class SpeciesController extends Controller
 		foreach((array)$d as $key => $val) {
 		
 			$d[$key]['media_type'] = $mimes[$val['mime_type']];
-			$d[$key]['dimensions'] = getimagesize($_SESSION['admin']['project']['urls']['project_media'].$val['file_name']);
+			if (file_exists($_SESSION['admin']['project']['urls']['project_media'].$val['file_name'])) {
+				$d[$key]['dimensions'] = getimagesize($_SESSION['admin']['project']['urls']['project_media'].$val['file_name']);
+			}
 			$d[$key]['hr_file_size'] = $this->helpers->HrFilesizeHelper->convert($val['file_size']);
 
 		}
