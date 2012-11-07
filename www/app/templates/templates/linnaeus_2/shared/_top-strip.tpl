@@ -1,5 +1,5 @@
 <div id="top-strip">
-    <div id="language-change">
+    <span id="language-change">
         {if $languages|@count>1}
         <select id="languageSelect" onchange="doLanguageChange()">
         {foreach from=$languages key=k item=v}
@@ -7,7 +7,7 @@
         {/foreach}
         </select>
         {/if}
-    </div>
+    </span>
 
     <p><a href="../../../">projects</a> | 
        <a href="../../../admin/views/users/login.php">login</a> | 
