@@ -1003,7 +1003,8 @@ class KeyController extends Controller
 	private function formatPathChoice ($choice, $step = null, $choiceMarker = null)
 	{
 		$remove = $step . $choiceMarker . '. ';
-		return trim(str_replace($remove, '', strip_tags($choice['choice_txt'])));
+		$toSpace = array('<br />', '<br>');
+		return str_replace($remove, '', strip_tags(str_replace($toSpace, ' ', $choice['choice_txt'])));
 	}
 	
 }
