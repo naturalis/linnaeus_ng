@@ -92,6 +92,7 @@
 #previous-icon-inactive {
 {/literal}
     background: url('{$systemMedia}previous.png') 5px 0 no-repeat;
+	cursor: default;
     opacity: 0.4;
     filter: alpha(opacity=40); 
 {literal}
@@ -120,6 +121,7 @@
 {/literal}
     width: 40px;
     background: url('{$systemMedia}next.png') no-repeat;
+	cursor: default;
     opacity: 0.4;
     filter: alpha(opacity=40); 
 {literal}
@@ -149,6 +151,7 @@
 {/literal}
     width: 40px;
     background: url('{$systemMedia}back.png') no-repeat;
+	cursor: default;
     opacity: 0.4;
     filter: alpha(opacity=40); 
 {literal}
@@ -179,6 +182,7 @@
 #decision-path-icon-inactive {
 {/literal}
     width: 80px;
+	cursor: default;
     background: url('{$systemMedia}decision-path.png') center top no-repeat;
     opacity: 0.4;
     filter: alpha(opacity=40); 
@@ -207,6 +211,7 @@
 #first-icon-inactive {
 {/literal}
     width: 40px;
+	cursor: default;
     background: url('{$systemMedia}first.png') no-repeat;
     opacity: 0.4;
     filter: alpha(opacity=40); 
