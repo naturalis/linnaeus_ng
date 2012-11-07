@@ -17,7 +17,7 @@
             {if !$smarty.foreach.pathPopup.last}
             decisionPath = decisionPath + 
                 '<p class="row">'+
-                '<a href="javascript:void(0);keyDoStep({$v.id})">{t}Step{/t} {$v.step_number|@escape}{if $v.choice_marker}{$v.choice_marker|@escape}{/if}{if $v.step_number!=$v.step_title}: {$v.step_title|@escape}{/if}{if $v.choice_txt}<br>{$v.choice_txt|@escape}{/if}</a>'+
+                '<a href="javascript:void(0);keyDoStep({$v.id})"><b>{t}Step{/t} {$v.step_number|@escape}{if $v.choice_marker}{$v.choice_marker|@escape}{/if}</b>{if $v.step_number!=$v.step_title} - {$v.step_title|@escape}{/if}{if $v.choice_txt}:<br>{$v.choice_txt|@escape}{/if}</a>'+
                 '</p>';
             {/if}
         {/foreach}
