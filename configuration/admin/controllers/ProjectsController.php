@@ -13,7 +13,7 @@ include_once ('Controller.php');
 
 class ProjectsController extends Controller
 {
-    
+
     public $usedModels = array(
         'project', 
         'module', 
@@ -61,7 +61,11 @@ class ProjectsController extends Controller
 		'geodata_type',
 		'geodata_type_title',
 		'l2_occurrence_taxon',
-		'l2_map'
+		'l2_map',
+		'content_introduction',
+		'introduction_page',
+		'introduction_media',
+		'user_taxon'
     );
     
     public $usedHelpers = array(
@@ -955,6 +959,7 @@ class ProjectsController extends Controller
 	private function doDeleteProjectAction($projectId)
 	{
 
+		$this->deleteIntroduction($projectId);
 		$this->deleteGeoData($projectId);
 		$this->deleteMatrices($projectId);
 		$this->deleteDichotomousKey($projectId);
@@ -976,6 +981,16 @@ class ProjectsController extends Controller
 		$this->deleteProjectSettings($projectId);		
 		$this->deleteProjectImagePaths($projectId);		
 		$this->deleteProject($projectId);
+
+	}
+
+
+	private function deleteIntroduction($id)
+	{
+
+		$this->models->ContentIntroduction->delete(array('project_id' => $id));
+		$this->models->IntroductionPage->delete(array('project_id' => $id));
+		$this->models->IntroductionMedia->delete(array('project_id' => $id));
 
 	}
 
@@ -1109,14 +1124,17 @@ class ProjectsController extends Controller
 	private function deleteProjectRanks($id)
 	{
 
+		$this->models->LabelProjectRank->delete(array('project_id' => $id));						
 		$this->models->ProjectRank->delete(array('project_id' => $id));
 
 	}
 
 	private function deleteProjectUsers($id)
 	{
-	
+
+		$this->models->UserTaxon->delete(array('project_id' => $id));
 		$this->models->ProjectRoleUser->delete(array('project_id' => $id));
+		$this->models->ModuleProjectUser->delete(array('project_id' => $id));
 
 	}
 
