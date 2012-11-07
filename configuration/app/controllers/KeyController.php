@@ -350,8 +350,8 @@ class KeyController extends Controller
 					'step_number' => $step['number'],
 					'step_title' => $step['title'],
 					'is_start' => $step['is_start'],
-					'choice_marker' => $this->showOrderToMarker($d[0]['show_order']),
-					'choice_txt' => $this->formatPathChoice($choice)
+					'choice_marker' => $choiceMarker,
+					'choice_txt' => $this->formatPathChoice($choice, $step['number'], $choiceMarker)
 				)
 			);
 			
@@ -709,7 +709,11 @@ class KeyController extends Controller
 		// the choice clicked to reach the current step belongs to the previous step, and ahs to be added there
 
 			$d[count((array)$d)-2]['choice_marker'] = $choice['marker'];
-			$d[count((array)$d)-2]['choice_txt'] = $this->formatPathChoice($choice);
+			$d[count((array)$d)-2]['choice_txt'] = $this->formatPathChoice(
+				$choice, 
+				$d[count((array)$d)-2]['step_number'], 
+				$d[count((array)$d)-2]['choice_marker']
+			);
 				
 		}
 
@@ -996,9 +1000,10 @@ class KeyController extends Controller
 			'remaining';
 	}
 	
-	private function formatPathChoice ($choice)
+	private function formatPathChoice ($choice, $step = null, $choiceMarker = null)
 	{
-		return strip_tags($choice['choice_txt']);
+		$remove = $step . $choiceMarker . '. ';
+		return trim(str_replace($remove, '', strip_tags($choice['choice_txt'])));
 	}
 	
 }
