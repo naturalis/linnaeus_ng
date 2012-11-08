@@ -31,6 +31,7 @@
 			</p>
 			<p>
 				Path to images:<br />
+			{if $isSharedMediaDirWritable}
 				{if $s.imagePath}
 					<b>"{$s.imagePath}"</b> (<span class="a" onclick="$('#clear').val('imagePath');$('#theForm').submit()">change</span>)
 				{elseif $s.imagePath===false}
@@ -39,7 +40,15 @@
 					<input type="text" name="imagePath" style="width:500px;"/>&nbsp;or&nbsp;
 					<label><input type="checkbox" name="noImages" value="1">do not load images</label>&nbsp;*<br />
 				{/if}
+			{else}
+				<span class="message-error">The project media parent directory "{$mediaDir}" is read only!</span><br />
+					<input type="hidden" name="noImages" value="1" />
+					<input type="hidden" name="noThumbs" value="1" />
+					<label><input type="checkbox" checked="checked" disabled="disabled">do not load images</label>&nbsp;<br />
+					<label><input type="checkbox" checked="checked" disabled="disabled">do not load thumbnails</label>&nbsp;
+			{/if}
 			</p>
+			{if $isSharedMediaDirWritable}
 			<p>
 				Path to thumbnails:<br />
 				{if $s.thumbsPath}
@@ -49,8 +58,9 @@
 				{else}
 					<input type="text" name="thumbsPath" style="width:500px;"/>&nbsp;or&nbsp;
 					<label><input type="checkbox" name="noThumbs" value="1">do not load thumbnails</label>&nbsp;*
-			{/if}
+				{/if}
 			</p>
+			{/if}
 		</fieldset>
 		
 		
