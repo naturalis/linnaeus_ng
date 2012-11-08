@@ -21,7 +21,12 @@ class MatrixKeyController extends Controller
 
     public $controllerPublicName = 'Matrix key';
 
-	public $cssToLoad = array('matrix.css','prettyPhoto/prettyPhoto.css');
+	public $cacheFiles = array(
+		'matrices' => 'matrix-matrices',
+		'taxa' => 'matrix-taxa-*'
+	);
+
+    public $cssToLoad = array('matrix.css','prettyPhoto/prettyPhoto.css');
 
 	public $jsToLoad = array('all' => array('matrix.js','prettyPhoto/jquery.prettyPhoto.js'));
 
@@ -113,6 +118,8 @@ class MatrixKeyController extends Controller
 
 		if ($this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
+			$this->clearCache($this->cacheFiles['matrices']);
+			
 			$this->deleteMatrix($this->requestData['id']);
 			
 			if ($this->getCurrentMatrixId()==$this->requestData['id']) $this->setCurrentMatrixId(null);
@@ -155,6 +162,8 @@ class MatrixKeyController extends Controller
 
 		} else {
 
+			$this->clearCache($this->cacheFiles['matrices']);
+			
 			$id = $this->createNewMatrix();
 
 			if ($id) {
@@ -373,6 +382,7 @@ class MatrixKeyController extends Controller
 
 		if ($this->rHasVal('taxon')) { 
 
+			$this->clearCache($this->cacheFiles['taxa']);
 
 			foreach((array)$this->requestData['taxon'] as $val) {
 
@@ -630,6 +640,8 @@ class MatrixKeyController extends Controller
         
         if ($this->requestData['action'] == 'save_matrix_name') {
 
+			$this->clearCache($this->cacheFiles);
+			
 			$this->ajaxSaveMatrixName();
 
         } else
@@ -670,6 +682,8 @@ class MatrixKeyController extends Controller
         } else
         if ($this->requestData['action'] == 'remove_taxon') {
 
+			$this->clearCache($this->cacheFiles);
+			
 			$this->removeTaxon();
 
 			$d = $this->getMatrices();

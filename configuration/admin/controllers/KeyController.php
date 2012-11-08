@@ -25,7 +25,20 @@ class KeyController extends Controller
 
     public $controllerPublicName = 'Dichotomous key';
 
-	public $cssToLoad = array('key.css','rank-list.css','key-tree.css','prettyPhoto/prettyPhoto.css','dialog/jquery.modaldialog.css',);
+	public $cacheFiles = array(
+		'key-keyTaxa',
+		'key-taxonDivision*',
+		'tree-KeyTree',
+		'tree-ranks'
+	);
+
+    public $cssToLoad = array(
+    	'key.css',
+    	'rank-list.css',
+    	'key-tree.css',
+    	'prettyPhoto/prettyPhoto.css',
+    	'dialog/jquery.modaldialog.css'
+    );
 
 	public $jsToLoad =
 		array(
@@ -71,7 +84,7 @@ class KeyController extends Controller
 
 		unset($_SESSION['admin']['system']['keyPath']);
        
-        $this->printPage();
+		$this->printPage();
     
     }
 
@@ -350,6 +363,8 @@ class KeyController extends Controller
 
 			}
 
+			$this->clearCache($this->cacheFiles);
+
 			$id = $this->createNewKeystepChoice($this->requestData['step']);
 
 			$this->renumberKeystepChoices($this->requestData['step']);
@@ -379,6 +394,8 @@ class KeyController extends Controller
 		if ($this->rHasVal('action','delete')) {
 		// delete the entire choice, incl image (if any)
 		
+			$this->clearCache($this->cacheFiles);
+
 			if (!empty($choice['choice_img']))
 				@unlink($_SESSION['admin']['project']['paths']['project_media'].$choice['choice_img']);
 
@@ -427,6 +444,8 @@ class KeyController extends Controller
 
 		if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit()) {		
 		// save new target
+
+			$this->clearCache($this->cacheFiles);
 
 			$ck = $this->models->ChoiceKeystep->update(
 				array(
@@ -534,9 +553,11 @@ class KeyController extends Controller
 
         $this->checkAuthorisation();
 
-		if ($this->rHasVal('step') && $this->rHasVal('action','insert') && !$this->isFormResubmit()) {
+        if ($this->rHasVal('step') && $this->rHasVal('action','insert') && !$this->isFormResubmit()) {
 		
-			$res = $this->insertKeyStepBeforeKeyStep($this->requestData['source'],$this->requestData['step']);
+			$this->clearCache($this->cacheFiles);
+
+        	$res = $this->insertKeyStepBeforeKeyStep($this->requestData['source'],$this->requestData['step']);
 
 			$this->renumberKeySteps(array(0 => $this->getKeyTree()));
 			
@@ -558,6 +579,8 @@ class KeyController extends Controller
 		
 		} else
 		if ($this->rHasVal('action','renumber') && !$this->isFormResubmit()) {
+
+			$this->clearCache($this->cacheFiles);
 
 			$this->renumberKeySteps(array(0 => $this->getKeyTree()));
 			
@@ -599,6 +622,8 @@ class KeyController extends Controller
 	{
 	
 		$this->checkAuthorisation();
+		
+		$this->clearCache($this->cacheFiles);
 
 		if ($this->rHasVal('action','setstart') && $this->rHasId()) {
 
@@ -858,6 +883,8 @@ class KeyController extends Controller
 
         } elseif ($this->requestData['action'] == 'save_keystep_content') {
 
+            $this->clearCache($this->cacheFiles);
+            
             $this->saveKeystepContent($this->requestData);
 
         } elseif ($this->requestData['action'] == 'get_keystep_undo') {
@@ -870,6 +897,8 @@ class KeyController extends Controller
 
         } elseif ($this->requestData['action'] == 'save_key_choice_content') {
 
+            $this->clearCache($this->cacheFiles);
+            
             $this->saveKeystepChoiceContent($this->requestData);
 
         } elseif ($this->requestData['action'] == 'get_key_choice_undo') {

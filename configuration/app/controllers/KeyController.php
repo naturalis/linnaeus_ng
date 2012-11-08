@@ -26,7 +26,7 @@ class KeyController extends Controller
 		'prettyPhoto/prettyPhoto.css',
 		'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
-
+	
 	public $jsToLoad =
 		array(
 			'all' => array(

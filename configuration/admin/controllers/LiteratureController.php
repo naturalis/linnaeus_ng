@@ -15,7 +15,11 @@ class LiteratureController extends Controller
    
     public $controllerPublicName = 'Literary references';
 
-	public $cssToLoad = array('literature.css','dialog/jquery.modaldialog.css','lookup.css');
+    public $cacheFiles = array(
+    	'search-contentsLiterature'
+    );
+    
+    public $cssToLoad = array('literature.css','dialog/jquery.modaldialog.css','lookup.css');
 
 	public $jsToLoad =
 		array(
@@ -130,6 +134,8 @@ class LiteratureController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
+			$this->clearCache($this->cacheFiles);
+			
 			$_SESSION['admin']['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
 			
 			$this->deleteReference($this->requestData['id']);
@@ -179,6 +185,8 @@ class LiteratureController extends Controller
 			} else
 			if ($this->models->Literature->save($data)) {
 
+				$this->clearCache($this->cacheFiles);
+				
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Literature->getNewId();
 
 				$this->deleteLiteratureTaxon($id);
@@ -406,8 +414,10 @@ class LiteratureController extends Controller
         } else
         if ($this->rHasVal('action','save_taxon')) {
 		
-           $this->saveLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
+        	$this->clearCache($this->cacheFiles);
 
+         	$this->saveLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
+           
         } else
         if ($this->rHasVal('action','save_order')) {
 		
@@ -416,7 +426,9 @@ class LiteratureController extends Controller
         } else
         if ($this->rHasVal('action','delete_taxon')) {
 
-           $this->deleteLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
+        	$this->clearCache($this->cacheFiles);
+
+        	$this->deleteLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
 
         }
 		

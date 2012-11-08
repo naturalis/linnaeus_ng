@@ -123,8 +123,6 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
 
         $this->setProjectLanguages();
-        
-        $this->clearCaches();
 
     }
 
@@ -3471,7 +3469,7 @@ $forceLookup = true;
 
     }
 
-    private function clearCaches () 
+    private function clearAllCaches () 
 	{
 		
         if ($this->getCurrentProjectId()) {
@@ -3496,5 +3494,41 @@ $forceLookup = true;
         }
 		
 	}
+
+	protected function clearCache ($files)
+	{
+	
+        $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
         
+        if (empty($files)) return;
+        
+        if (!is_array($files)) $files = array($files);
+		
+		if ($this->getCurrentProjectId()) {
+	
+			foreach ($files as $file) {
+				
+				// Wildcard * provided in file name; remove all
+				if (strpos($file, '*') !== false) {
+					
+					$wildCardFiles = glob($cacheDir . $file);
+					
+					foreach ($wildCardFiles as $wildcardFile) {
+						
+						unlink ($wildcardFile);
+					}					
+				
+				// Regular file
+				} else if (file_exists($cacheDir . '/' . $file)) {
+					
+					unlink($cacheDir . '/' . $file);
+					
+				}
+			
+			}
+
+		}
+	
+	}
+	
 }

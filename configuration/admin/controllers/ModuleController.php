@@ -19,7 +19,11 @@ class ModuleController extends Controller
 
     public $controllerPublicName = 'Free Modules';
 
-	public $cssToLoad = array(
+    public $cacheFiles = array(
+    	'search-contentsModules'
+    );
+    
+    public $cssToLoad = array(
 		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
 		'dialog/jquery.modaldialog.css'
@@ -137,6 +141,8 @@ class ModuleController extends Controller
 
 			if ($this->rHasVal('action','delete')) {
 
+				$this->clearCache($this->$cacheFiles);
+				
 				$this->deletePage();
 				
 				$this->redirect('index.php');
@@ -373,6 +379,8 @@ class ModuleController extends Controller
 
 		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
 		
+			$this->clearCache($this->$cacheFiles);
+			
 			$d = $this->getPages();
 			
 			$lowerNext = $prev = false;
@@ -460,6 +468,8 @@ class ModuleController extends Controller
         
         if ($this->requestData['action'] == 'save_content') {
             
+            $this->clearCache($this->$cacheFiles);
+        	
             $this->ajaxActionSaveContent();
         
         } else
@@ -558,7 +568,7 @@ class ModuleController extends Controller
             }
 			
 			unset($_SESSION['admin']['system']['freeModule'][$this->getCurrentModuleId()]['navList']);
-
+			
             $this->smarty->assign('returnText', 'saved');
         
         }
