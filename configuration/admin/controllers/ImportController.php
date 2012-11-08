@@ -290,6 +290,12 @@ class ImportController extends Controller
 
 		if (isset($_SESSION['admin']['system']['import'])) $this->smarty->assign('s',$_SESSION['admin']['system']['import']);
     
+		clearstatcache(true,$this->generalSettings['directories']['mediaDirProject']);
+
+		$this->smarty->assign('mediaDir',$this->generalSettings['directories']['mediaDirProject']);	
+
+		$this->smarty->assign('isSharedMediaDirWritable',is_writable($this->generalSettings['directories']['mediaDirProject']));	
+	
         $this->printPage();
 
     }

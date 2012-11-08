@@ -3017,7 +3017,7 @@ $forceLookup = true;
      * 
      * @access     private
      */
-    private function setPaths ()
+    private function setPaths()
     {
 
         $p = $this->getCurrentProjectId();
@@ -3057,7 +3057,7 @@ $forceLookup = true;
 	 * @todo	take out hard reference to /media/
      * @access     private
      */
-    private function setUrls ()
+    private function setUrls()
     {
         
         $p = $this->getCurrentProjectId();
