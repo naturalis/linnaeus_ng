@@ -77,7 +77,14 @@ class SpeciesController extends Controller
         'col_loader_helper','csv_parser_helper','file_upload_helper','image_thumber_helper','hr_filesize_helper'
     );
 
-	public $cssToLoad = array(
+	public $cacheFiles = array(
+		'key-keyTaxa',
+		'key-taxonDivision*',
+		'tree-KeyTree',
+		'list' => 'species-treeList'
+	);
+    
+    public $cssToLoad = array(
 		'prettyPhoto/prettyPhoto.css',
 		'taxon.css',
 		'rank-list.css',
@@ -237,6 +244,8 @@ class SpeciesController extends Controller
 		if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
 		// moving branches up and down the stem
 
+			$this->clearCache($this->cacheFiles['list']);
+			
 			$this->moveIdInTaxonOrder($this->requestData['id'],$this->requestData['move']);
 
 			if ($this->rHasVal('scroll')) $this->smarty->assign('scroll', $this->requestData['scroll']);
@@ -584,6 +593,8 @@ class SpeciesController extends Controller
 	
 						if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
 
+							$this->clearCache($this->cacheFiles);
+							
 							$this->models->Taxon->save(
 								array(
 									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
@@ -802,6 +813,8 @@ class SpeciesController extends Controller
 
 		if ($this->rHasVal('action','process') && $this->rHasId()) {
 		
+			$this->clearCache($this->cacheFiles);
+			
 			$taxon = $this->getTaxonById($this->requestData['id']);
 		
 			foreach((array)$this->requestData['child'] as $key => $val) {
@@ -887,6 +900,8 @@ class SpeciesController extends Controller
 
 		if ($this->rHasVal('child')) {
 
+			$this->clearCache($this->cacheFiles);
+			
 			foreach((array)$this->requestData['child'] as $key => $val) {
 			
 				if ($val=='delete') {
@@ -1630,6 +1645,8 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'delete_taxon') {
             
+            $this->clearCache($this->cacheFiles);
+            
             $this->ajaxActionDeleteTaxon();
         
         } else if ($this->requestData['action'] == 'delete_page') {
@@ -1662,6 +1679,8 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'save_col') {
 
+            $this->clearCache($this->cacheFiles);
+            
             $this->ajaxActionImportTaxa();
         
         } else if ($this->requestData['action'] == 'check_taxon_name') {
@@ -1687,6 +1706,8 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'save_taxon_name') {
 
+            $this->clearCache($this->cacheFiles['list']);
+            
             $this->ajaxActionSaveTaxonName();
         
         } else if ($this->requestData['action'] == 'save_media_desc') {

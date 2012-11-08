@@ -99,7 +99,7 @@ class configuration
 			'useJavascriptLinks' => false,
 			'useGlossaryPostIts' => false,
 			'addedProjectIDParam' => 'epi',
-			'splashDelay' => 5 //seconds
+			'splashDelay' => 3 //seconds
         );
     
     }

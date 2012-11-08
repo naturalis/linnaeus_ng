@@ -34,7 +34,11 @@ class MapKeyController extends Controller
 
     public $controllerPublicName = 'Distribution';
 
-	public $cssToLoad = array('map.css','lookup.css',);
+	public $cacheFiles = array(
+		'map-*'
+	);
+
+    public $cssToLoad = array('map.css','lookup.css',);
 
 	public $jsToLoad = array(
 		'all' => 

@@ -40,8 +40,11 @@ class GlossaryController extends Controller
 
     public $controllerPublicName = 'Glossary';
 
-
-	public $cssToLoad = array(
+    public $cacheFiles = array(
+    	'search-contentsGlossary'
+    );
+    
+    public $cssToLoad = array(
 		'glossary.css',
 		'prettyPhoto/prettyPhoto.css',
 		'lookup.css',
@@ -240,12 +243,14 @@ class GlossaryController extends Controller
 
 		if ($this->rHasId() && $this->rHasVal('action','delete') && !$this->isFormResubmit()) {
 
+			$this->clearCache($this->cacheFiles);
+
 			$_SESSION['admin']['system']['glossary']['activeLetter'] = strtolower(substr($this->requestData['term'],0,1));
 
 			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $this->requestData['language_id'];
 
 			$this->deleteGlossaryTerm($this->requestData['id']);
-
+			
 			$d = $this->getFirstGlossaryTerm();
 
 			$navList = $this->getGlossaryTermsNavList(true);
@@ -291,6 +296,8 @@ class GlossaryController extends Controller
 			} else
 			if ($this->models->Glossary->save($data)) {
 
+				$this->clearCache($this->cacheFiles);
+				
 				$navList = $this->getGlossaryTermsNavList(true);
 
 				$id = $this->rHasId() ? $this->requestData['id'] : $this->models->Glossary->getNewId();
