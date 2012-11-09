@@ -64,11 +64,11 @@ td.allLookupListCell {
 	padding: 0 4px; 
 	border: 1px solid transparent;
 }
-
+/*
 #lookup-DialogContent p {
 	cursor: default;
 }
-/*
+
 .allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
 	color: #fff;
 	background: #3875d7;
@@ -80,6 +80,7 @@ td.allLookupListCell {
 	color: #000;
 	text-decoration: none;
 	display: block;
+	cursor: pointer;
 }
 
 .allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row-selected, .allLookupListCellSelected {

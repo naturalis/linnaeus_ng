@@ -1805,7 +1805,7 @@ class MapKeyController extends Controller
 				$this->makeLookupList(
 					$taxa,
 					'species',
-					'../species/taxon.php?id=%s'
+					'../mapkey/l2_examine_species.php?id=%s'
 				)
 			);
 			
