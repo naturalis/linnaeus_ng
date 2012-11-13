@@ -8,7 +8,7 @@
 
 	require_once 'include_me.php';
 
-	mysql_query('update `dev_characteristics_states` set file_name = null where project_id = ' . $projectId) or die(mysql_error());
+	mysql_query('update `' . $tablePrefix . 'characteristics_states` set `file_name` = null where `project_id` = ' . $projectId) or die(mysql_error());
 	
 	$identify_files = array(
 		"kruidige.adm" => array(
@@ -82,14 +82,14 @@
 	}
 
 	function getMatrixId ($projectId, $matrix) {
-		$query = 'select `matrix_id` from `dev_matrices_names` where `project_id` = ' . $projectId . 
+		$query = 'select `matrix_id` from `' . $tablePrefix . 'matrices_names` where `project_id` = ' . $projectId . 
 			' and `name` = "' . mysql_real_escape_string($matrix) .'"';
 		$result = mysql_query($query) or die(mysql_error());
 		return mysql_result($result, 0, 0);
 	}
 
 	function getCharacterId ($projectId, $matrixId, $character) {
-		$query = 'select t1.`characteristic_id` from `dev_characteristics_labels` t1, `dev_characteristics_matrices` t2
+		$query = 'select t1.`characteristic_id` from `' . $tablePrefix . 'characteristics_labels` t1, `' . $tablePrefix . 'characteristics_matrices` t2
 			 where t1.`project_id` = ' . $projectId . ' and t1.`label` = "' . mysql_real_escape_string($character) .'" 
 			 and t2.`matrix_id` = ' . $matrixId . ' and t1.`characteristic_id` = t2.`characteristic_id`';
 		$result = mysql_query($query) or die(mysql_error());
@@ -97,7 +97,7 @@
 	}
 
 	function updateStateFile ($projectId, $characterId, $state, $file) {
-		$query = 'update `dev_characteristics_states` t1, `dev_characteristics_labels_states` t2 
+		$query = 'update `' . $tablePrefix . 'characteristics_states` t1, `' . $tablePrefix . 'characteristics_labels_states` t2 
 			set t1.`file_name` = "' . mysql_real_escape_string(strtoupper($file)) . 
 			'" where t1.`project_id` = ' . $projectId . ' and t2.`label` = "' . mysql_real_escape_string($state) .
 			'" and t1.`characteristic_id` = ' . $characterId . ' and t1.`id` = t2.`state_id`';
