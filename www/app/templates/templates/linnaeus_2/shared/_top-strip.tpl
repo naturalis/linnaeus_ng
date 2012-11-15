@@ -9,10 +9,10 @@
         {/if}
     </span>
 
-    <p><a href="../../../">projects</a> | 
-       <a href="../../../admin/views/users/login.php">login</a> | 
-    	help (not yet available) | 
-    	<a href="http://www.eti.uva.nl/support/contact.php">contact</a></p>
+    <p><a href="../../../">{t}projects{/t}</a> | 
+       <a href="../../../admin/views/users/login.php">{t}login{/t}</a> | 
+    	{t}help{/t} ({t}not yet available{/t}) | 
+    	<a href="http://www.eti.uva.nl/support/contact.php">{t}contact{/t}</a></p>
 </div>
 
 

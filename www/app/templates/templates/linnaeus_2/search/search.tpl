@@ -141,7 +141,7 @@
 	{assign var=resultCount value=$res.data|@count}
 	{if $results.dichkey.subsetsWithResults>1}<div class="subset-header{if $resultCount==0}-zero{/if}">{$resultCount} {t}in{/t} {$res.label|@strtolower}</div>{/if}
 	<div class="subset">
-		{t _s1='<a href="../key/">' _s2=</a>}<p class="c3"><span style="color: red;">It is not possible to jump directly to a specific step or choice of the dichotomous key</span>. %sStart the key from the start%s.{/t}</p>
+		<p class="c3"><span style="color: red;">{t}It is not possible to jump directly to a specific step or choice of the dichotomous key{/t}.</span> {t _s1='<a href="../key/">' _s2=</a>}%sStart the key from the start%s.{/t}</p>
 		{foreach from=$res.data key=k item=v name=r}
 		{if $smarty.foreach.r.first || $background=='c2'}
 			{assign var="background" value="c1"}
