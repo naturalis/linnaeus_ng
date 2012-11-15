@@ -1709,12 +1709,22 @@ class Controller extends BaseClass
 			
 
 	*/
-	public function newGetProjectRanks()
+	public function newGetProjectRanks($p=null)
 	{
 
-		if ($this->hasTableDataChanged('ProjectRank')==true || !isset($_SESSION['admin']['user']['species']['projectRank'])) {
+		$includeLanguageLabels = isset($p['includeLanguageLabels']) ? $p['includeLanguageLabels'] : false;
+		//$lowerTaxonOnly = isset($p['lowerTaxonOnly']) ? $p['lowerTaxonOnly'] : false;
+		//$forceLookup = isset($p['forceLookup']) ? $p['forceLookup'] : false;
+		//$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
+		$idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
 
-			$_SESSION['admin']['user']['species']['projectRank'] =
+		if (
+			$this->hasTableDataChanged('Rank')==true || 
+			$this->hasTableDataChanged('ProjectRank')==true || 
+			$this->hasTableDataChanged('LabelProjectRank')==true || 
+			!isset($_SESSION['admin']['user']['species']['projectRank'])) {
+
+			$pr =
 				$this->models->ProjectRank->_get(
 					array(
 						'id' => array(
@@ -1724,8 +1734,43 @@ class Controller extends BaseClass
 					)
 				);
 
+
+
+			foreach((array)$pr as $rankkey => $rank) {
+	
+				$r = $this->models->Rank->_get(array('id' => $rank['rank_id']));
+	
+				$pr[$rankkey]['rank'] = $r['rank'];
+	
+				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+				
+				if ($includeLanguageLabels) {
+	
+					foreach((array)$_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
+
+						$lpr = $this->models->LabelProjectRank->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'project_rank_id' => $rank['id'],
+									'language_id' => $language['language_id']
+								),
+								'columns' => 'label'
+							)
+						);
+
+						$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
+			
+					}
+	
+				}
+	
+			}
+			
+			$_SESSION['admin']['user']['species']['projectRank'] = $pr;
+
 		}
-		
+
 		return $_SESSION['admin']['user']['species']['projectRank'];
 
 	}
@@ -2299,7 +2344,7 @@ class Controller extends BaseClass
 		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
 
 
-$forceLookup = true;
+		$forceLookup = true;
 
 
 		if (!$forceLookup) {
