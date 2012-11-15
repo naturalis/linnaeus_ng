@@ -936,7 +936,7 @@ class Controller extends BaseClass
 	{
 
 		if (empty($text) || !is_string($text)) return $text;
-		
+
 		$wordlist = $this->getHotwords($forceLookup);
 
 		$processed = $text;
@@ -952,7 +952,7 @@ class Controller extends BaseClass
 			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
 
 			$expr = '|\b('.$val['hotword'].')\b|i';
-		
+	
 			$processed = preg_replace_callback($expr,array($this,'embedHotwordLink'),$processed);
 		
 		}

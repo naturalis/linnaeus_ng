@@ -436,15 +436,13 @@ class SpeciesController extends Controller
 
 		$data = $this->getTaxonById();
 	
+		$pr = $this->newGetProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
+
 		if ($this->maskAsHigherTaxa()) {
 
-			$pr = $this->newGetProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
-
-			$this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$data['rank_id']]['rank']),$data['taxon']));
+			$this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($pr[$data['rank_id']]['rank']),$data['taxon']));
 
 		} else {
-
-			$pr = $this->newGetProjectRanks();
 
 			$this->setPageName(sprintf(_('Editing "%s"'),$data['taxon']));
 

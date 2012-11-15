@@ -26,11 +26,11 @@
 		</td>
 		<td colspan="2">
 			<select name="rank_id" id="rank-id">
-			{section name=i loop=$projectRanks}
-				{if ($isHigherTaxa && $projectRanks[i].lower_taxon==0) || (!$isHigherTaxa && $projectRanks[i].lower_taxon==1)}
-				<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
+			{foreach item=v from=$projectRanks}
+				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
+				<option value="{$v.id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
 				{/if }
-			{/section}
+			{/foreach}
 			</select>
 		</td>
 	</tr>
@@ -87,11 +87,11 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-{section name=i loop=$projectRanks}
-{if $projectRanks[i].can_hybrid}
-taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
+{foreach item=v from=$projectRanks}
+{if $v.can_hybrid}
+taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$v.id};
 {/if}
-{/section}
+{/foreach}
 
 allSetHeartbeatFreq({$heartbeatFrequency});
 taxonSetHeartbeat(
