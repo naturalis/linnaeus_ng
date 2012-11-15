@@ -1,3 +1,6 @@
+#page-main p {
+	margin-bottom: 0;
+}
 #lookup-DialogContent, #dialog-content, #dialog-content-inner {
 	min-height: 0;
 	height: auto;
