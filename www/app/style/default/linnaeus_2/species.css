@@ -1,3 +1,6 @@
+#synonyms p, #synonyms td, #common p, #classification p {
+	margin-bottom: 0;
+}
 
 #index table {
 	border-collapse:collapse;
