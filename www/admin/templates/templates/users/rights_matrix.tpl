@@ -1,27 +1,26 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<table cellpadding="0" cellspacing="0">
+
+<p>This table can be used to change the default rights for types of users for specific modules. Click a square to apply the change. The rows marked * indicate all rights for that module.</p>
+
+<table cellpadding="0" cellspacing="0" class="rights_matrix">
 	<tr class="tr-highlight">
-		<td style="border-bottom:1px solid #999;">{$v.controller}</td>
-		<td style="border-bottom:1px solid #999;border-right:1px solid #999;">{$v.view}</td>
+		<td>{$v.controller}</td>
+		<td class="label">{$v.view}</td>
 	{foreach item=v from=$roles}
-		<td style="border-bottom:1px solid #999;border-right:1px solid #999;text-align:center;">{$v.abbrev}</td>
+		<td class="label" style="text-align:center;">{$v.abbrev}</td>
 	{/foreach}
 
 	</tr>
 {foreach item=v from=$rights}
 	<tr class="tr-highlight">
-		<td style="border-bottom:1px solid #999">{$v.controller}</td>
-		<td style="border-bottom:1px solid #999;border-right:1px solid #999;">
+		<td>{$v.controller}</td>
+		<td class="label">
 			<!--a href="../{$v.controller}/{if $v.view!='*'}{$v.view}.php{/if}"-->{$v.view}<!--/a-->
 		</td>
 	{foreach item=vv from=$v.roles}
-		<td style="
-			border-bottom:1px solid #999;
-			border-right:1px solid #999;
-			text-align:center;
-			cursor:pointer;
+		<td class="label YN" style="
 			background-color:{if $vv.state}#0F0;{else}#F44;{/if}"
 			id="r-{$v.id}-{$vv.id}"
 			onclick="userChangeRoleRight(this);">
