@@ -22,7 +22,7 @@
 	$maxLengthQuery = 50000;
 	// Tables in which project id is labeled other than project_id (table name => column name)
 	$exceptions = array(
-			$s['tablePrefix'] . 'projects' => 'id'
+		$s['tablePrefix'] . 'projects' => 'id'
 	);
 	// Fields that are dumped without quotes
 	$numericTypes = array(
@@ -30,13 +30,13 @@
 	);
 	// Fields that are dumped as text and converted back to geometries on import
 	$geoTypes = array(
-		'point', 'polygon', 'multipolygon', 'point', 'geometrycollection', 'geometry'
+		'point', 'polygon', 'multipolygon', 'geometrycollection', 'geometry'
 	);
 	
 
 	// Let's go
 	echo 'This script dumps all projects in the '.$s['database'].' database to individual .sql files.
-		These files can be used to restore as a backup.';
+		These files can be used to restore individual projects from a backup.';
 
  	$d = mysql_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
 	mysql_select_db($s['database'],$d) or die ('Cannot select database '.$s['database']);
