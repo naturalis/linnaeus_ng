@@ -20,7 +20,7 @@
 	
 	// Add a new insert statement after this many characters
 	$maxLengthQuery = 50000;
-	// Tables in which project id is labeled other than project_id
+	// Tables in which project id is labeled other than project_id (table name => column name)
 	$exceptions = array(
 			$s['tablePrefix'] . 'projects' => 'id'
 	);
@@ -30,7 +30,7 @@
 	);
 	// Fields that are dumped as text and converted back to geometries on import
 	$geoTypes = array(
-		'point', 'multipolygon', 'point', 'geometrycollection', 'geometry'
+		'point', 'polygon', 'multipolygon', 'point', 'geometrycollection', 'geometry'
 	);
 	
 
