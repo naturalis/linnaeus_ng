@@ -398,23 +398,24 @@ class Controller extends BaseClass
      */
     public function getCurrentUserProjects ()
     {
-        
+
         foreach ((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
             
             $r = array(
                 'id' => $val['project_id'], 
                 'name' => $val['project_name'],
-                'active' => $val['active']
+                'active' => $val['active'],
+                'member' => $val['member'],
             );
             
             if (!isset($cup) || !in_array($r, (array) $cup)) {
                 
-                $cup[] = $r;
+                $cup[$val['project_id']] = $r;
             
             }
         
         }
-
+		
 		$this->customSortArray($cup,array(
 			'key' => 'name', 
 			'dir' => 'asc', 
@@ -633,10 +634,40 @@ class Controller extends BaseClass
      * @return     array    array of roles, rights and the number of projects the user is involved with
      * @access     public
      */
-    public function getUserRights ($id = false)
+    public function getUserRights($id = false)
     {
 
-        $pru = $this->models->ProjectRoleUser->_get(array('id'=>array('user_id' => $id ? $id : $this->getCurrentUserId())));
+        $pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' =>
+					array(
+						'user_id' => $id ? $id : $this->getCurrentUserId()
+					),
+				'columns' => 'project_id,role_id,active,\'1\' as member',
+				'fieldAsIndex' => 'project_id'
+				)
+			);
+
+
+		if ($this->isCurrentUserSysAdmin()) {
+
+			$p = $this->models->Project->_get(array('id' => '*'));
+
+			foreach((array)$p as $val) {
+			
+				if (!isset($pru[$val['id']])) {
+				
+					$pru[$val['id']] = array(
+						'project_id' => $val['id'],
+						'role_id' => (string)ID_ROLE_SYS_ADMIN,
+						'active' => (string)1,
+						'member' => 0
+					);
+				
+				}
+			
+			}
+		}
 
         foreach ((array) $pru as $key => $val) {
             
@@ -884,7 +915,13 @@ class Controller extends BaseClass
     public function isCurrentUserSysAdmin()
     {
 
-		if (!isset($_SESSION['admin']['user'])) return false;
+		if (!isset($_SESSION['admin']['user'])) {
+
+			$u = $this->models->User->_get(array('id'=>$this->getCurrentUserId()));
+
+			return $u['superuser']=='1';
+		
+		}
 
 		if ($_SESSION['admin']['user']['superuser']==1) return true;
 
