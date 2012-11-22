@@ -6,10 +6,10 @@
 	ini_set('max_execution_time', 3600);
 	
 	// A few script settings...
-//	$cfg = 'configuration/admin/configuration.php';
-//	$dumpPath = 'dumps/'; // add trailing slash!
-	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
-	$dumpPath = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/dumps/'; // add trailing slash!
+	$cfg = 'configuration/admin/configuration.php';
+	$dumpPath = 'dumps/'; // add trailing slash!
+//	$cfg = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/configuration/admin/configuration.php';
+//	$dumpPath = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/dumps/'; // add trailing slash!
 
 	// Get external settings
 	if (!file_exists($cfg)) die("Unable to locate $cfg. This script should be in the root of a linnaeus NG-installation");
@@ -92,7 +92,8 @@
 		
 		foreach ($tables as $table) {
 			$columns = getColumns($s, $table);
-			if (array_key_exists('project_id', $columns)) {				fwrite($fp, "DELETE FROM `$table` WHERE `project_id` = $projectId;\n");;
+			if (array_key_exists('project_id', $columns)) {
+				fwrite($fp, "DELETE FROM `$table` WHERE `project_id` = $projectId;\n");;
 			} else if (array_key_exists($table, $exceptions)) {
 				fwrite($fp, "DELETE FROM `$table` WHERE `" . $exceptions[$table] . "` = $projectId;\n");
 			}
