@@ -3,9 +3,9 @@
 	$cfg = 'configuration/app/configuration.php';
 
 	file_exists($cfg) or die('
-  unable to locate configuration-file.
-  this script should be in the root of a linnaeus NG-installation.
-');
+	  unable to locate configuration-file.
+	  this script should be in the root of a linnaeus NG-installation.
+	');
 
 	include($cfg);
 

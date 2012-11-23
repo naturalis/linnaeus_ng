@@ -35,8 +35,8 @@
 	
 
 	// Let's go
-	echo 'This script dumps all projects in the '.$s['database'].' database to individual .sql files.
-		These files can be used to restore individual projects from a backup.';
+	echo 'This script dumps all projects in the '.$s['database'].' database to individual .sql files.' .
+	     'These files can be used to restore individual projects from a backup.';
 
  	$d = mysql_connect($s['host'],$s['user'],$s['password']) or die ('Cannot connect to '.$s['host']);
 	mysql_select_db($s['database'],$d) or die ('Cannot select database '.$s['database']);
