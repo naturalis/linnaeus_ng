@@ -183,9 +183,9 @@ class ModuleController extends Controller
     /**
      * Get the current active module's data
      *
-     * @access    private
+     * @access    public
      */
-	private function getCurrentModule()
+	public function getCurrentModule()
 	{
 
 		return isset($_SESSION['app']['user']['module']['activeModule']) ?
