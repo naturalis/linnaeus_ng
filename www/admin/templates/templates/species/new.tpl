@@ -9,13 +9,33 @@
 <table>
 	<tr>
 		<td>
-			{t}Taxon name:{/t}
+			{t}Parent taxon: {/t}
+		</td>
+		<td>				
+			{assign var=prev value=null}
+			{assign var=prevLevel value=-1}
+			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()" style="width:300px">
+			{if $taxa|@count==0 || $data.parent_id==''}
+			<option value="-1">{t}No parent{/t}</option>
+			{/if}
+			{foreach from=$taxa key=k item=v}
+			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
+				<option rank_id="{$v.rank_id}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
+				{section name=foo loop=$v.level-$taxa[0].level}
+				&nbsp;
+				{/section}		
+				{$v.taxon}
+				</option>
+			{/if}
+			{if $prevLevel!=$v.level}
+			{assign var=prev value=$v.id}
+			{/if}
+			{assign var=prevLevel value=$v.level}
+			{/foreach}
+			</select>
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
-		</td>
-		<td>
-			<span id="taxon-message" class=""></span>
+			<span id="rank-message" class=""></span> 
 		</td>
 	</tr>
 	<tr>
@@ -24,15 +44,29 @@
 		</td>
 		<td colspan="2">
 			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel()">
-			{section name=i loop=$projectRanks}
-				{if ($isHigherTaxa && $projectRanks[i].lower_taxon==0) || (!$isHigherTaxa && $projectRanks[i].lower_taxon==1)}
-				<option value="{$projectRanks[i].id}" {if $data.rank_id==$projectRanks[i].id}selected="selected"{/if}>{$projectRanks[i].rank}</option>
+			{foreach item=v from=$projectRanks}
+				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
+				<option xxxx value="{$v.id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>
+				{$v.rank}
+				</option>
 				{/if }
-			{/section}
+			{/foreach}
 			</select>
 		</td>
 	</tr>
-{if $session.admin.project.includes_hybrids==1}	<tr>
+	<tr>
+		<td style="width:100px">
+			{t}Taxon name:{/t}
+		</td>
+		<td>
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" Xonblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
+		</td>
+		<td>
+			<span id="taxon-message" class=""></span>
+		</td>
+	</tr>
+{if $session.admin.project.includes_hybrids==1}
+	<tr>
 		<td>
 			{t}This is a hybrid:{/t}
 		</td>
@@ -44,30 +78,6 @@
 		</td>
 	</tr>
 {/if}
-	<tr>
-		<td>
-			{t}Parent taxon: {/t}
-		</td>
-		<td>		
-	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
-	{if $taxa|@count==0 || $data.parent_id==''}
-	<option value="-1">{t}No parent{/t}</option>
-	{/if}
-	{foreach from=$taxa key=k item=v}
-	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-		<option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
-		{section name=foo loop=$v.level-$taxa[0].level}
-		&nbsp;
-		{/section}		
-		{$v.taxon}</option>
-	{/if}
-	{/foreach}
-	</select>
-		</td>
-		<td>
-			<span id="rank-message" class=""></span> 
-		</td>
-	</tr>
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>
@@ -97,6 +107,9 @@ allLookupNavigateOverrideUrl('edit.php?id=%s');
 //taxonGetRankByParent();
 //taxonCheckHybridCheck();
 taxonChangeSubmitButtonLabel();
+{if $isHigherTaxa}
+taxonHigherTaxa = true;
+{/if}
 
 {assign var=prev value=null}			
 {foreach from=$taxa key=k item=v}

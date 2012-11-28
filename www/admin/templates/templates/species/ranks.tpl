@@ -41,7 +41,7 @@ Once you have saved the selection, you can {/t}<a href="ranklabels.php">{t}chang
 	<td{if $v.in_col==1} class="col-rank"{/if}>
 		<span class="rank-name{if $v.in_col==1}-col{/if}" id="rank-{$v.id}">
 			{$v.rank}
-		</span>{if $v.additional!=''}<span class="rank-additional">({$v.additional})</span>{/if}
+		</span>{if $v.additional!=''}<span class="rank-additional">({$v.additional})</span>{/if}{* $v.ideal_parent_id *}
 	</td>
 	<td class="add-arrow" id="arrow-{$v.id}">
 		>
