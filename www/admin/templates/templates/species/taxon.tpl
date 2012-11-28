@@ -15,11 +15,11 @@
 		<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
 		<input type="hidden" name="activePage" value="{$activePage}" />  
 	<div style="border-bottom:1px dotted #ddd;padding-bottom:10px">
-		{* yes, i know, but for some reason the buttons refused to "see" the style sheet *}
-		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="padding-right:25px;width:150px;" />
+		{* yes, i know, but for some reason the buttons refuse to "see" the style sheet *}
+		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
 		<span id="message-container" style="margin-right:10px">&nbsp;</span>
 	</div>
 	<div style="padding:10px 0px 10px 0px">

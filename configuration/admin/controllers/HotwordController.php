@@ -23,6 +23,8 @@ class HotwordController extends Controller
    
     public $controllerPublicName = 'Hotwords';
 
+	public $jsToLoad = array('all' => array('hotwords.js'));
+
 
     /**
      * Constructor, calls parent's constructor
@@ -59,6 +61,16 @@ class HotwordController extends Controller
 		$this->checkAuthorisation();
 
 		$this->setPageName(_('Hotwords'));
+
+		$c = $this->models->Hotword->_get(
+			array('id'=>
+				array('project_id'=>$this->getCurrentProjectId()),
+				'columns'=>'count(*) as tot, controller',
+				'group' => 'controller'
+			)
+		);
+	
+		$this->smarty->assign('controllers',$c);
 
         $this->printPage();
 	
@@ -107,22 +119,48 @@ class HotwordController extends Controller
      *
      * @access    public
      */
-    public function deleteAction()
+    public function browseAction()
     {
     
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Delete hotwords'));
-
-		$h = $this->models->Hotword->_get(
-			array('id'=>
-				array('project_id'=>$this->getCurrentProjectId()),
-				'columns'=>'date_format(max(created),\'%d-%m-%Y %H:%i:%s\') as last_created'
-			)
-		);
+		$this->setPageName(_('Browse hotwords'));
 		
-		$this->smarty->assign('last_created',$h[0]['last_created']);
+		$id = array('project_id' => $this->getCurrentProjectId());
+						
+		if ($this->rHasVal('c')) {
 
+			$id['controller'] = $this->requestData['c'];
+
+			$this->smarty->assign('controller',$this->requestData['c']);
+
+		}
+				
+		if ($this->rHasVal('id') && $this->rHasVal('action','delete')) {
+
+			$this->models->Hotword->delete(array_merge($id,array('id' => $this->requestData['id'])));
+
+		} else
+		if ($this->rHasVal('action','delete_all')) {
+
+			$this->models->Hotword->delete($id);
+
+		}
+
+		$h = $this->models->Hotword->_get(array('id' => $id,'order' => 'hotword'));
+
+		$pagination = $this->getPagination($h,20);
+
+		$slice = $pagination['items'];
+
+		$this->smarty->assign('prevStart', $pagination['prevStart']);
+	
+		$this->smarty->assign('nextStart', $pagination['nextStart']);
+		
+		$this->smarty->assign('num',count((array)$h));
+
+		$this->smarty->assign('hotwords',$slice);
+		
         $this->printPage();
 	
 	}

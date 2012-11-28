@@ -1755,7 +1755,7 @@ class Controller extends BaseClass
 		//$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
 		$idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
 
-		if (
+		if (1==1||
 			$this->hasTableDataChanged('Rank')==true || 
 			$this->hasTableDataChanged('ProjectRank')==true || 
 			$this->hasTableDataChanged('LabelProjectRank')==true || 
@@ -1767,11 +1767,10 @@ class Controller extends BaseClass
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId()
 						),
+						'columns' => 'id,project_id,rank_id,parent_id,lower_taxon,keypath_endpoint',
 						'fieldAsIndex' => 'id'
 					)
 				);
-
-
 
 			foreach((array)$pr as $rankkey => $rank) {
 	
@@ -1780,6 +1779,25 @@ class Controller extends BaseClass
 				$pr[$rankkey]['rank'] = $r['rank'];
 	
 				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+
+				$pr[$rankkey]['ideal_parent_id'] = null;
+				
+				if (!empty($r['ideal_parent_id'])) {
+
+					$d =
+						$this->models->ProjectRank->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'rank_id' => $r['ideal_parent_id']
+								),
+								'columns' => 'id'
+							)
+						);
+					
+					if ($d) $pr[$rankkey]['ideal_parent_id'] = $d[0]['id'];
+					
+				} 
 				
 				if ($includeLanguageLabels) {
 	
@@ -1866,6 +1884,7 @@ class Controller extends BaseClass
 
 			$t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
 			$t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
+			$t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
 			$t[$key]['sibling_count'] = count((array)$t);
 			$t[$key]['depth'] = $t[$key]['level'] = $depth;
 
@@ -2008,6 +2027,23 @@ class Controller extends BaseClass
 
 	}
 
+	public function userHasTaxon($taxonId,$userId=null)
+	{
+	
+		$ut = $this->models->UserTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'user_id' => is_null($userId) ? $this->getCurrentUserId() : $userId,
+					'taxon_id' => $taxonId
+				),
+				'columns' => 'count(*) as tot'
+			)
+		);
+
+		return $ut[0]['tot']!=0;
+
+	}
 
 	public function getProjectUsers($pId=null)
 	{
@@ -2324,6 +2360,8 @@ class Controller extends BaseClass
 
 					$val['keypath_endpoint'] = $rank['keypath_endpoint'];
 
+					$val['ideal_parent_id'] = $rank['ideal_parent_id'];
+
 					break;	
 
 				}
@@ -2380,9 +2418,7 @@ class Controller extends BaseClass
 		$keypathEndpoint = isset($params['keypathEndpoint']) ? $params['keypathEndpoint'] : false;
 		$idsAsIndex = isset($params['idsAsIndex']) ? $params['idsAsIndex'] : false;
 
-
 		$forceLookup = true;
-
 
 		if (!$forceLookup) {
 
@@ -2432,6 +2468,8 @@ class Controller extends BaseClass
 				$pr[$rankkey]['rank'] = $r['rank'];
 	
 				$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+
+				$pr[$rankkey]['ideal_parent_id'] = $r['ideal_parent_id'];
 				
 				if ($includeLanguageLabels) {
 	

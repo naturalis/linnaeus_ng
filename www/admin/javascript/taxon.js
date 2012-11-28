@@ -373,6 +373,7 @@ function taxonUpdateInterface() {
 	taxonUpdatePageBlock();
 	taxonDrawPublishBlocks();
 	allHideLoadingDiv();
+	taxonEnableButtons();
 
 }
 
@@ -1228,6 +1229,8 @@ function taxonGetRankByParent(nomessage) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
+			
+			$('#taxon-name').val('');
 
 			if (data=='-1' && !nomessage) {
 				$('#rank-message').removeClass().addClass('message-error');
@@ -1235,7 +1238,8 @@ function taxonGetRankByParent(nomessage) {
 			} else {
 				if (!nomessage) {
 					$('#rank-message').removeClass().addClass('message-no-error');
-					$('#rank-message').html(_('Ok'))
+					//$('#rank-message').html(_('Ok'))
+					$('#rank-message').html('')
 				}
 				$('#rank-id').val(data);
 				taxonAddNamePart();
@@ -1424,11 +1428,16 @@ function taxonStoreCopyableTaxa(id) {
 
 function taxonAddNamePart() {
 	
+	if (taxonHigherTaxa) return;
+	
+	if ($('#parent-id :selected').attr('rank_id')!=$('#rank-id :selected').attr('ideal_parent_id')) return;
+
 	$('#taxon-name').val($('#parent-id :selected').text().trim()+' ');
 	$('#taxon-name').focus();
 
 	return;
 	
+	/*
 	if (taxonHasChangedNameManually) return;
 
 	if (jQuery.inArray($('#parent-id :selected').val(),taxonCopyableTaxa)!==-1) {
@@ -1452,6 +1461,7 @@ function taxonAddNamePart() {
 		}
 
 	}
+	*/
 
 }
 
@@ -1500,26 +1510,10 @@ function taxonChangeMediaOrder(id,mId,dir) {
 
 }
 
+function taxonEnableButtons() {
 
+	$('input[disabledOnLoad="1"]').each(function(){
+		$(this).attr('disabled','false');		
+	});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

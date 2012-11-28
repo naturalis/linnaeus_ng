@@ -937,12 +937,13 @@ class Controller extends BaseClass
 
 		if (empty($text) || !is_string($text)) return $text;
 
+		$processed = $text;
+
+		// get all hotwords from database
 		$wordlist = $this->getHotwords($forceLookup);
 
-		$processed = $text;
-		
+		// replace the not-to-be-linked words with a unique numbered string
 		$expr = '|(\[no\])(.*)(\[\/no\])|i';
-
 		$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
 
 		foreach((array)$wordlist as $key => $val) {
