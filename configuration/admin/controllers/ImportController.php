@@ -2417,17 +2417,26 @@ class ImportController extends Controller
 			
 			$i = 0;
 			
-
+			if (isset($taxon->syn_vern_description)) {
+				
+				$synVernDescription = $this->prepareSynVernDescription($taxon->syn_vern_description);
+				
+			}
+			
 			if(isset($taxon->synonyms->synonym)) {
 
 				foreach($taxon->synonyms->synonym as $vKey => $vVal) {
+					
+					$synonym = trim((string)$vVal->name);
 
 					$res = $this->models->Synonym->save(
 						array(
 							'id' => null,
 							'project_id' => $this->getNewProjectId(),
 							'taxon_id' => $taxonId,
-							'synonym' => trim((string)$vVal->name),
+							'synonym' => $synonym,
+							'remark' => isset($taxon->syn_vern_description) ?
+								$this->getSynonymAuthor($synonym, $synVernDescription) : null,
 							'show_order' => $i++
 						)
 					);
@@ -2447,6 +2456,64 @@ class ImportController extends Controller
 		}
 
 	}
+	
+	private function prepareSynVernDescription ($text)
+	{
+
+		$delete = array('[p]', '[/p]', '[b]', '[/b]', '[i]', '[/i]', '[u]', '[/u]');
+		$text = str_replace($delete, '', $text);
+
+		return explode('[br]', $text);
+
+	}
+	
+	private function getSynonymAuthor ($synonym, $synVernDescription) {
+		
+		foreach ($synVernDescription as $line) {
+		
+			// Synonym should be at start of line; if not continue
+			if (strpos(trim($line), $synonym) !== 0) continue;
+			
+			// No links in resulting string
+			if (strstr($line, '[l]') === false) {
+				$author = trim(str_replace($synonym, '', $line));
+			
+			// Links present, remove these
+			} else {
+				$author = trim(str_replace($synonym, '', $this->removeLinks($line)));
+			}
+			
+			// Clean up any preceeding characters
+			$cleanUp = array(':', '|');
+			if (in_array($author[0], $cleanUp)) $author = trim(substr($author, 1));
+			
+			return $author;
+
+		}
+	}
+
+	private function removeLinks ($line) {
+		
+		// Add counter for safety check to prevent endless loops; max 10 hits
+		$i = 0;
+		
+		while (strstr($line, '[l]') !== false || $i < 10) {
+			
+			$i++;
+
+			preg_match('/(\[l\]).*?(\[\/l\])/', $line, $matches);
+			$link = $matches[0];
+			
+			preg_match('/(\[t\]).*(\[\/t\])/', $link, $matches);
+			$author = substr($matches[0], 3, -4);
+			
+			$line = str_replace($link, $author, $line);
+				
+		}
+
+		return $line;
+		 
+	}	
 
 	// literature & glossary
 	private function fixAuthors($s)
