@@ -17,32 +17,9 @@
 {literal}
 #main-menu ul li a.home-selected, #main-menu ul li a.home:hover {
 {/literal}
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat;
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    -moz-linear-gradient(top,  #555454 0%, #454444 100%);
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555454), color-stop(100%,#454444));
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    -webkit-linear-gradient(top,  #555454 0%,#454444 100%);
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    -o-linear-gradient(top,  #555454 0%,#454444 100%);
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    -ms-linear-gradient(top,  #555454 0%,#454444 100%);
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    linear-gradient(top,  #555454 0%,#454444 100%);
-    background:
-    	url('{$systemMedia}navigator-selected.png') 5px 3px no-repeat,
-	    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555454', endColorstr='#454444',GradientType=0 );
+    background: url('{$systemMedia}navigator-selected.png') no-repeat;
  {literal}
 }
-
 {/literal}
 
 {if $logo}

@@ -240,8 +240,8 @@ body {
 #main-menu ul li a.home, #main-menu ul li a.home-selected {
     cursor: pointer;
     width: 27px;
-    height: 22px;
-	padding:0;
+	height: 22px;
+	padding: 0;
 }
 
 #categories {
