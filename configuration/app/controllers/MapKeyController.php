@@ -1764,7 +1764,7 @@ class MapKeyController extends Controller
 
 			foreach((array)$index['index'] as $key => $val) {
 		
-				$d[] = array('id' => $key,'class' => $val['class'],'total' => $val['total']);
+				$d[] = array('id' => $key,'css' => $val['class'],'total' => $val['total']);
 				
 			}
 			

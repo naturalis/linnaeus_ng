@@ -204,8 +204,7 @@ function l2DiversityGiantOilSpill(data) {
 	l2DiversityClearAll();
 
 	for(var i=0;i<data.length;i++) {
-		
-		$('#cell-'+data[i].id).addClass('mapCellDiversity'+data[i].class);
+		$('#cell-'+data[i].id).addClass('mapCellDiversity'+data[i].css);
 		$('#cell-'+data[i].id).attr('total',data[i].total);
 		
 	}

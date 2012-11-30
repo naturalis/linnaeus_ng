@@ -188,7 +188,7 @@ class SpeciesController extends Controller
 		}
 		
 
-		if (!isset($d['id'])) {
+		if (!isset($d['id']) || !$this->userHasTaxon($d['id'])) {
 		
 			// not sure why this was here...
 			//unset($_SESSION['admin']['system']['highertaxa']);
