@@ -2417,26 +2417,31 @@ class ImportController extends Controller
 			
 			$i = 0;
 			
-			foreach($taxon->synonyms as $vKey => $vVal) {
-			
-				$res = $this->models->Synonym->save(
-					array(
-						'id' => null,
-						'project_id' => $this->getNewProjectId(),
-						'taxon_id' => $taxonId,
-						'synonym' => trim((string)$vVal->synonym->name),
-						'show_order' => $i++
-					)
-				);
 
-				if ($res===true)
-					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
-				else
-					$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
-						'data' => trim((string)$taxon->name),
-						'cause' => 'Unable to save synonym "'.trim((string)$vVal->synonym->name).'" ('.$res.').'
+			if(isset($taxon->synonyms->synonym)) {
+
+				foreach($taxon->synonyms->synonym as $vKey => $vVal) {
+
+					$res = $this->models->Synonym->save(
+						array(
+							'id' => null,
+							'project_id' => $this->getNewProjectId(),
+							'taxon_id' => $taxonId,
+							'synonym' => trim((string)$vVal->name),
+							'show_order' => $i++
+						)
 					);
 	
+					if ($res===true)
+						$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
+					else
+						$_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
+							'data' => trim((string)$taxon->name),
+							'cause' => 'Unable to save synonym "'.trim((string)$vVal->name).'" ('.$res.').'
+						);
+	
+				}
+				
 			}
 	
 		}
