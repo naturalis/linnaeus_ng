@@ -2,10 +2,6 @@ input[type="button"] {
 	padding: 3px;
 }
 
-#main-menu ul li a.home, #main-menu ul li a.home-selected {
-	height: 21px;
-}
-
 #main-menu ul li a.home:hover, #main-menu ul li a.home-selected:hover {
 	filter: none;
 }

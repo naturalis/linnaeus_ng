@@ -214,6 +214,7 @@ body {
 
 #main-menu ul li {
     float: left;
+	height: 21px;
 }
 
 #main-menu ul li a {
@@ -240,7 +241,7 @@ body {
 #main-menu ul li a.home, #main-menu ul li a.home-selected {
     cursor: pointer;
     width: 27px;
-	height: 22px;
+	height: 21px;
 	padding: 0;
 }
 
