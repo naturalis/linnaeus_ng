@@ -553,7 +553,7 @@ class SpeciesController extends Controller
      *
      * @access    public
      */
-    public function newAction ()
+    public function newAction()
     {
 
 		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
@@ -563,7 +563,7 @@ class SpeciesController extends Controller
 		$this->setPageName(_('New taxon'));
 		
 		$pr = $this->newGetProjectRanks();
-
+	
 		if (count((array)$pr)==0) {
 
 			$this->addMessage(_('No ranks have been defined.'));
@@ -590,104 +590,105 @@ class SpeciesController extends Controller
 					
 				$newName = $this->requestData['taxon'];
 
-				$newName = trim(str_replace('  ',' ',$newName));
-				
-				$canSave = null;
-				
-				// 1. First letter is capitalized (could be changed silently without warning)
+				$newName = trim(preg_replace('/\s+/',' ',$newName));
+
+				// 1. First letter is capitalized (changed silently)
 				$newName = $this->fixNameCasting($newName);
+				
+				$hasErrorButCanSave = null;
 
 				//checks
 				/* LETHAL */
 				if (!$this->isTaxonNameUnique($newName)) {
 					$this->addError(sprintf(_('The name "%s" already exists.'),$newName));
-					$canSave = false;
+					$hasErrorButCanSave = false;
 				}
 
 				if (!$this->canParentHaveChildTaxa($this->requestData['parent_id'])  || $isEmptyTaxaList) {
 					$this->addError(_('The selected parent taxon can not have children.'));
-					$canSave = false;
+					$hasErrorButCanSave = false;
+				} else {
+					
+					// "Warning: [rank] [name] cannot be selected as a parent for [name]. Do you want to rename [name] to [name]?"
+					$parent = $this->getTaxonById($parentId);
+	
+					if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
+						$this->addError(sprintf(_('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
+						$hasErrorButCanSave = false;
+					}
+					
 				}
 				
-				// "Warning: [rank] [name] cannot be selected as a parent for [name]. Do you want to rename [name] to [name]?"
-				$parent = $this->getTaxonById($parentId);
-
-				if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
-					$this->addError(sprintf(_('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
-					$canSave = true;
-				}
-
+				if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+					$this->addError(_('Rank cannot be hybrid.'));				
+				}				
+				
+				
 				/* NON LETHAL */
 				//http://dev2.etibioinformatics.nl/fixit/browse/LINNG-740
 				// 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
-if (!$this->checkNameSpaces($newName,$this->requestData['rank_id'])) {
+				if (!$this->checkNameSpaces($newName,$this->requestData['rank_id'])) {
 					$this->addError(_('Only species and below can contain spaces in their names.'));
-					$canSave = true;
+					$hasErrorButCanSave = true;
 				}
 
 				// 3. Names are written in Latin and should not contain special characters or digits.
 				if (!$this->checkCharacters($newName)) {
 					$this->addError(_('The name you specified contains invalid characters.'));
-					$canSave = true;
+					$hasErrorButCanSave = true;
 				}
 
-				if (is_null($canSave)) {
-	
-					if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
-
-						$this->clearCache($this->cacheFiles);
-						
-						$this->models->Taxon->save(
+				// save as requested
+				if (is_null($hasErrorButCanSave)) {
+									
+					$this->clearCache($this->cacheFiles);
+				
+					$this->models->Taxon->save(
 							array(
-								'id' => ($this->rHasId() ? $this->requestData['id'] : null),
-								'project_id' => $this->getCurrentProjectId(),
-								'taxon' => $newName,
-								'parent_id' => $parentId,
-								'rank_id' => $this->requestData['rank_id'],
-								'is_hybrid' =>  ($isHybrid ? 1 : 0)
+									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon' => $newName,
+									'parent_id' => $parentId,
+									'rank_id' => $this->requestData['rank_id'],
+									'is_hybrid' =>  ($isHybrid ? 1 : 0)
 							)
-						);
+					);
+				
+					$newId = $this->models->Taxon->getNewId();
+				
+					if (empty($parentId))  $this->doAssignUserTaxon($this->getCurrentUserId(),$newId);
+				
+					$this->reOrderTaxonTree();
+				
+					if ($this->rHasVal('next','main')) $this->redirect('taxon.php?id='.$newId);
+								
+					$this->_newGetTaxonTree();
 
-						$newId = $this->models->Taxon->getNewId();
-
-						if (empty($parentId))  $this->doAssignUserTaxon($this->getCurrentUserId(),$newId);
-						
-						$this->reOrderTaxonTree();
-						
-						if ($this->rHasVal('next','main')) $this->redirect('taxon.php?id='.$newId);
-
-						$this->addMessage(sprintf(_('"%s" saved.'),$newName));
-
-						$this->_newGetTaxonTree();
-						
-					} else {
-		
-						$this->addError(_('Rank cannot be hybrid.'));
-						
-						$this->smarty->assign('data',$this->requestData);
-		
-					}
-	
+					$this->addMessage(sprintf(_('"%s" saved.'),$newName));
+				
 				} else {
 				
 					$this->requestData['taxon'] = $newName;
-	
-					$this->smarty->assign('canSave',$canSave);
-
-					$this->smarty->assign('data',$this->requestData);
-	
-				}
-			
-			}
-
-			$this->smarty->assign('allowed',true);
-
-			$this->smarty->assign('projectRanks',$pr);
-
-			if (isset($this->treeList))  $this->smarty->assign('taxa',$this->treeList);
 				
-		}
+					if ($hasErrorButCanSave) {
+						$this->addMessage('Errors but can be saved.');
+					} else {
+						$this->addError('Errors and cannot be saved.');
+					}
+						
+					$this->smarty->assign('hasErrorBuCanSave',$hasErrorButCanSave);
+					
+					$this->smarty->assign('data',$this->requestData);
+				
+				}				
+				
+			} // save
+			
+		}  // no ranks defined
 
+		$this->smarty->assign('projectRanks',$pr);
+		
+		if (isset($this->treeList))  $this->smarty->assign('taxa',$this->treeList);
 
 		$this->printPage();
 
@@ -701,7 +702,7 @@ if (!$this->checkNameSpaces($newName,$this->requestData['rank_id'])) {
      *
      * @access    public
      */
-    public function taxonAction ()
+    public function taxonAction()
     {
 
 		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
