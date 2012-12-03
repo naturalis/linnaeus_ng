@@ -1941,11 +1941,18 @@ class Controller extends BaseClass
 		$userTaxa = isset($p['userTaxa']) ? $p['userTaxa'] : null;
 		$prevAllowed = isset($p['prevAllowed']) ? $p['prevAllowed'] : false;
 		$prevDepth = isset($p['prevDepth']) ? $p['prevDepth'] : null;
-
-		if (is_null($taxa) || is_null($userTaxa)) return null;
+		$allowAll = isset($p['allowAll']) ? $p['allowAll'] : false;
+		
+		
+		if (is_null($taxa) || (is_null($userTaxa) && !$allowAll)) return null;
 
 		foreach((array)$taxa as $tKey => $tVal) {
 		
+			if ($allowAll) {
+
+				$this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = true;
+			
+			} else
 			if (isset($userTaxa[$tKey]) || ($prevAllowed==true && $tVal['depth'] > $prevDepth)) {
 
 				$this->treeList[$tKey]['user_allowed'] = $taxa[$tKey]['user_allowed'] = true;
@@ -1961,7 +1968,8 @@ class Controller extends BaseClass
 					'taxa' => $tVal['children'],
 					'userTaxa' => $userTaxa,
 					'prevAllowed' => $taxa[$tKey]['user_allowed'],
-					'prevDepth' => $tVal['depth']
+					'prevDepth' => $tVal['depth'],
+					'allowAll' => $allowAll
 				)
 			);
 
@@ -1978,7 +1986,13 @@ class Controller extends BaseClass
 
 		$userTaxa = $this->newGetUserTaxa();
 
-		$taxa = $this->newSetTaxaUserAllowable(array('taxa' => $taxa,'userTaxa' => $userTaxa));
+		$taxa = $this->newSetTaxaUserAllowable(
+			array(
+				'taxa' => $taxa,
+				'userTaxa' => $userTaxa,
+				'allowAll' => $this->isCurrentUserSysAdmin()
+			)
+		);
 
 		return $taxa;
 	
