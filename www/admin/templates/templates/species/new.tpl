@@ -1,7 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-{if $allowed}
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" id="action" name="action" value="save" />
@@ -89,7 +88,6 @@
 	</tr>
 </table>
 </form>
-{/if}
 </div>
 
 {literal}

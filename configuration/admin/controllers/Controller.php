@@ -937,6 +937,23 @@ class Controller extends BaseClass
 
     }
 
+    public function isCurrentUserLeadExpert()
+    {
+
+		if (!isset($_SESSION['admin']['user']['_roles'])) return false;
+
+		foreach((array)$_SESSION['admin']['user']['_roles'] as $key => $val) {
+
+			if ($val['project_id']==$this->getCurrentProjectId() && $val['role_id']==ID_ROLE_LEAD_EXPERT) return true;
+
+		}
+
+		return false;
+
+    }
+  
+    
+    
     /**
      * Re-initialises the user's projects and roles, without loggin out and in
      *
@@ -1990,7 +2007,7 @@ class Controller extends BaseClass
 			array(
 				'taxa' => $taxa,
 				'userTaxa' => $userTaxa,
-				'allowAll' => $this->isCurrentUserSysAdmin()
+				'allowAll' => $this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin()
 			)
 		);
 
@@ -2994,7 +3011,7 @@ class Controller extends BaseClass
 
                 if (class_exists($t)) {
                     
-                    @$this->models->$t = new $t();
+                    $this->models->$t = new $t();
 					
 					if (isset($this->helpers->LoggingHelper)) $this->models->$t->setLogger($this->helpers->LoggingHelper);
                     
