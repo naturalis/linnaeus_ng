@@ -243,11 +243,11 @@ function keySaveStepContent(type) {
 
 function keySaveStepSubmit() {
 
+	/*
 	if ($('#number').val().length==0) {
 		alert(_('A number is required.'));
 		$('#number').focus();
 	} else
-	/*
 	if ($('#titleDefault').val().length==0) {
 		alert(_('A title is required.'));
 		$('#titleDefault').focus();
@@ -256,7 +256,8 @@ function keySaveStepSubmit() {
 		alert(_('A title is required.'));
 		$('#titleOther').focus();
 
-	} else 	*/
+	} else 
+	*/
 	{
 		$('#theForm').submit();
 	}
