@@ -11,43 +11,6 @@
 <table>
 	<tr>
 		<td>
-			{t}Taxon name:{/t}
-		</td>
-		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}" />
-		</td>
-		<td>
-			<span id="taxon-message" class=""></span>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			{t}Rank:{/t}
-		</td>
-		<td colspan="2">
-			<select name="rank_id" id="rank-id">
-			{foreach item=v from=$projectRanks}
-				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
-				<option value="{$v.id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
-				{/if }
-			{/foreach}
-			</select>
-		</td>
-	</tr>
-{if $session.admin.project.includes_hybrids==1}	<tr>
-		<td>
-			{t}This is a hybrid:{/t}
-		</td>
-		<td>
-			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
-		</td>
-		<td>
-			<span id="hybrid-message" class=""></span>
-		</td>
-	</tr>
-{/if}
-	<tr>
-		<td>
 			{t}Parent taxon: {/t}
 		</td>
 		<td>		
@@ -70,6 +33,58 @@
 			<span id="rank-message" class=""></span>
 		</td>
 	</tr>
+
+	<tr>
+		<td>
+			{t}Rank:{/t}
+		</td>
+		<td colspan="2">
+			<select name="rank_id" id="rank-id">
+			{foreach item=v from=$projectRanks}
+				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
+				<option value="{$v.id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
+				{/if }
+			{/foreach}
+			</select>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			{t}Taxon name:{/t}
+		</td>
+		<td>
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
+		</td>
+		<td>
+			<span id="taxon-message" class=""></span>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			{t}Author:{/t}
+		</td>
+		<td>
+			<input type="text" name="author" id="author" value="{$data.author}" style="width:300px"/>
+		</td>
+		<td>
+			<span id="taxon-message" class=""></span>
+		</td>
+	</tr>
+	
+	{if $session.admin.project.includes_hybrids==1}	<tr>
+		<td>
+			{t}This is a hybrid:{/t}
+		</td>
+		<td>
+			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" style="width:300px" />
+		</td>
+		<td>
+			<span id="hybrid-message" class=""></span>
+		</td>
+	</tr>
+{/if}
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>

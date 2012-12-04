@@ -1391,7 +1391,7 @@ class Controller extends BaseClass
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
 				),
-				'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level'
+				'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
 			)
 		);
 

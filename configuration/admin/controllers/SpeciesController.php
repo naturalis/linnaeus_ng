@@ -437,7 +437,7 @@ class SpeciesController extends Controller
 		if (!$this->userHasTaxon($this->requestData['id'])) $this->redirect('index.php');
 
 		$data = $this->getTaxonById();
-	
+			
 		$pr = $this->newGetProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
 		if ($this->maskAsHigherTaxa()) {
@@ -485,6 +485,7 @@ class SpeciesController extends Controller
 									'id' => $this->requestData['id'],
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon' => $this->requestData['taxon'],
+									'author' => ($this->requestData['author'] ? $this->requestData['author'] : null),
 									'parent_id' => $parentId,
 									'rank_id' => $this->requestData['rank_id'],
 									'is_hybrid' =>  ($isHybrid ? 1 : 0)
@@ -648,6 +649,7 @@ class SpeciesController extends Controller
 									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
 									'project_id' => $this->getCurrentProjectId(),
 									'taxon' => $newName,
+									'author' => ($this->requestData['author'] ? $this->requestData['author'] : null),
 									'parent_id' => $parentId,
 									'rank_id' => $this->requestData['rank_id'],
 									'is_hybrid' =>  ($isHybrid ? 1 : 0)

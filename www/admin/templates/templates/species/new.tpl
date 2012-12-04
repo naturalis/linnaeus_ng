@@ -64,6 +64,19 @@
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
+
+	<tr>
+		<td style="width:100px">
+			{t}Author:{/t}
+		</td>
+		<td>
+			<input type="text" name="author" id="author" value="{$data.author}" style="width:300px"/>
+		</td>
+		<td>
+			<span id="taxon-message" class=""></span>
+		</td>
+	</tr>
+
 {if $session.admin.project.includes_hybrids==1}
 	<tr>
 		<td>
