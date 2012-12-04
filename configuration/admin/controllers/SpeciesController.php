@@ -2256,7 +2256,7 @@ class SpeciesController extends Controller
 						'taxon_id' => $this->requestData['id'],
 						'lit_ref_id' => $this->rHasVal('lit_ref_id') ? $this->requestData['lit_ref_id'] : null,
 						'synonym' => $this->requestData['synonym'],
-						'remark' => $this->rHasVal('remark') ? $this->requestData['remark'] : null,
+						'author' => $this->rHasVal('author') ? $this->requestData['author'] : null,
 						'show_order' => $show_order
 					)
 				);

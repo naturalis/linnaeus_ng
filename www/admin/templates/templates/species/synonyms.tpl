@@ -24,7 +24,7 @@
 	{section name=i loop=$synonyms}
 	<tr class="tr-highlight">
 		<td>{$synonyms[i].synonym}</td>
-		<td>{$synonyms[i].remark}</td>
+		<td>{$synonyms[i].author}</td>
 		{if $smarty.section.i.first}
 		<td></td>
 		{else}
@@ -64,7 +64,7 @@
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
 <tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="128" /></td></tr>
-<tr><td>{t}author:{/t}</td><td><input type="text" name="remark" maxlength="255" /></td></tr>
+<tr><td>{t}author:{/t}</td><td><input type="text" name="author" maxlength="255" /></td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><td colspan="2"><input type="submit" value="{t}save{/t}" /></td></tr>
 </table>
