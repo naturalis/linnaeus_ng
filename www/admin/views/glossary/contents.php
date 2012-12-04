@@ -4,5 +4,5 @@ require_once ('../../../../configuration/admin/controllers/GlossaryController.ph
 
 $c = new GlossaryController();
 
-$c->browseAction();
+$c->contentsAction();
 

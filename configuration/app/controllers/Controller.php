@@ -945,17 +945,22 @@ class Controller extends BaseClass
 		// replace the not-to-be-linked words with a unique numbered string
 		$expr = '|(\[no\])(.*)(\[\/no\])|i';
 		$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
-
+	
 		foreach((array)$wordlist as $key => $val) {
 		
 			if ($val['hotword']=='') continue;
-			
-			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
 
+			// replace the already linked words with a unique numbered string
+			$expr = '|(<a (.*)>)('.$val['hotword'].')(<\/a>)|i';
+			$processed = preg_replace_callback($expr,array($this,'embedNoLink'),$processed);
+				
+			$this->_currentHotwordLink = '../'.$val['controller'].'/'.$val['view'].'.php'.(!empty($val['params']) ? '?'.$val['params'] : '');
+			
 			$expr = '|\b('.$val['hotword'].')\b|i';
-	
+			//$expr = '|(\b)(?<!>)('.$val['hotword'].')(?!<)(\b)|i';
+				
 			$processed = preg_replace_callback($expr,array($this,'embedHotwordLink'),$processed);
-		
+				
 		}
 
 		$processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
@@ -1057,6 +1062,23 @@ class Controller extends BaseClass
 	
 	}
 	
+	public function splashScreen()
+	{
+	
+		if ($this->getCheckForSplash()==false) return;
+		
+		if (
+			(!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash']===false) &&
+			isset($this->generalSettings['urlSplashScreen'])) {
+
+			$_SESSION['app']['project']['splashEntryUrl'] = $_SERVER['REQUEST_URI'];
+
+			$this->redirect($this->generalSettings['urlSplashScreen']);
+		
+		}
+	
+	}
+
 	private function setControllerParams($params)
 	{
 
@@ -1942,7 +1964,6 @@ class Controller extends BaseClass
     
     }
 
-
     /**
      * Performs the actual usort; called by customSortArray
      *
@@ -2043,7 +2064,6 @@ class Controller extends BaseClass
 		
     }
 
-
 	private function initLogging()
 	{
 
@@ -2134,8 +2154,6 @@ class Controller extends BaseClass
 		}
 
 	}
-
-
 
 	private function getWordList($forceUpdate=false)
 	{
@@ -2241,10 +2259,14 @@ class Controller extends BaseClass
 			return $matches[0];
 
 		} else {
+			
+			$d = $this->generateRandomHexString();
+			
+			while (isset($this->_hotwordNoLinks[$d])) {
+				$this->generateRandomHexString();
+			}
 
-			$d = '~~@#@@#@'.count((array)$this->_hotwordNoLinks).'}}\\||';
-
-			$this->_hotwordNoLinks[] = array(
+			$this->_hotwordNoLinks[$d] = array(
 				'str' => $d,
 				'orig' => $matches[0]
 			);
@@ -2264,7 +2286,12 @@ class Controller extends BaseClass
 
 		} else {
 
-			$d = '~~&&^%%'.count((array)$this->_hotwordTempLinks).'||::--+';
+			$d = $this->generateRandomHexString();
+				
+			while (isset($this->_hotwordTempLinks[$d])) {
+				$this->generateRandomHexString();
+			}
+
 			$this->_hotwordTempLinks[] = array(
 				'str' => $d,
 				'link' => '<a href="'.$this->_currentHotwordLink.'">'.$matches[0].'</a>'
@@ -2511,21 +2538,12 @@ class Controller extends BaseClass
 
 	}
 
-	public function splashScreen()
+	private function generateRandomHexString()
 	{
 	
-		if ($this->getCheckForSplash()==false) return;
-		
-		if (
-			(!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash']===false) &&
-			isset($this->generalSettings['urlSplashScreen'])) {
-
-			$_SESSION['app']['project']['splashEntryUrl'] = $_SERVER['REQUEST_URI'];
-
-			$this->redirect($this->generalSettings['urlSplashScreen']);
-		
-		}
+		return substr(md5(rand()),0,16);
 	
 	}
+	
 	
 }

@@ -80,7 +80,7 @@ class KeyController extends Controller
 
 		// get user's decision path
 		$keyPath = $this->getKeyPath();
-		
+
 		/*
 			if user directly access a specific step or choice while there is no keypath (thru bookmark),
 			a possible decision path is created from the key tree
@@ -412,6 +412,7 @@ class KeyController extends Controller
 
 	}
 
+	
 	// be aware that this function also exists in the app controller and should have identical output there!
 	private function generateKeyTree($id=null,$level=0)
 	{
@@ -420,6 +421,7 @@ class KeyController extends Controller
 
 			$id = $this->getStartKeystepId();
 
+			
 		}
 		
 		$d = $this->getKeystep($id);
@@ -433,7 +435,7 @@ class KeyController extends Controller
 				'level' => $level
 			);		
 
-		$step['choices'] = $this->getKeystepChoices($id);
+		$step['choices'] = $this->getKeystepChoices($id,null,false);
   
 		foreach((array)$step['choices'] as $key => $val) {
 		
@@ -486,7 +488,7 @@ class KeyController extends Controller
 		$step['title'] = $ck[0]['title'];
 
 		$step['content'] = $this->matchGlossaryTerms($ck[0]['content']);
-		$step['content'] = $this->matchHotwords($step['content']);
+		//$step['content'] = $this->matchHotwords($step['content']);
 
 		return $step;
 
@@ -515,7 +517,7 @@ class KeyController extends Controller
 	
 	}
 
-	private function getKeystepChoices($step,$choice=null)
+	private function getKeystepChoices($step,$choice=null,$includeContent=true)
 	{
 
 		if ($choice == null) {
@@ -547,26 +549,31 @@ class KeyController extends Controller
 		
 		foreach((array)$choices as $key => $val) {
 			
-			// get the actual language-sensitive content for each choice
-			$cck = $this->models->ChoiceContentKeystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(), 
-						'choice_id' => $val['id'], 
-						'language_id' => $this->getCurrentLanguageId()
-						),
-					'columns' => 'choice_txt'
-				)
-			);
+			if ($includeContent) {
 			
-
-			if (isset($cck[0]['title'])) $choices[$key]['title'] = trim($cck[0]['title']);
-			
-			if (isset($cck[0]['choice_txt'])) {
-
-				$choices[$key]['choice_txt'] = $this->matchGlossaryTerms(trim($cck[0]['choice_txt']));
-				$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
-
+				// get the actual language-sensitive content for each choice
+				$cck = $this->models->ChoiceContentKeystep->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'choice_id' => $val['id'], 
+							'language_id' => $this->getCurrentLanguageId()
+							),
+						'columns' => 'choice_txt'
+					)
+				);
+				
+	
+				if (isset($cck[0]['title'])) $choices[$key]['title'] = trim($cck[0]['title']);
+				
+				if (isset($cck[0]['choice_txt'])) {
+	
+					$choices[$key]['choice_txt'] = $cck[0]['choice_txt'];
+					$choices[$key]['choice_txt'] = $this->matchGlossaryTerms(trim($choices[$key]['choice_txt']));
+					$choices[$key]['choice_txt'] = $this->matchHotwords($choices[$key]['choice_txt']);
+	
+				}
+				
 			}
 
 			// resolve the targets to either a next step or a taxon
@@ -590,14 +597,18 @@ class KeyController extends Controller
 			
 			} elseif (!empty($val['res_taxon_id'])) {
 			// target is a taxon
+			
+				if ($includeContent) {
 
-				$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
-
-				if (isset($t['taxon'])) {
-
-					$choices[$key]['target'] = $this->formatSpeciesEtcNames($t['taxon'],$t['rank_id']);
-					$choices[$key]['is_hybrid'] = $t['is_hybrid'];
-
+					$t = $this->models->Taxon->_get(array('id' => $val['res_taxon_id']));
+	
+					if (isset($t['taxon'])) {
+	
+						$choices[$key]['target'] = $this->formatSpeciesEtcNames($t['taxon'],$t['rank_id']);
+						$choices[$key]['is_hybrid'] = $t['is_hybrid'];
+	
+					}
+					
 				}
 
 			} else {
