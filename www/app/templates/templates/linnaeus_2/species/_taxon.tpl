@@ -54,7 +54,7 @@
 	<div class="title">{t}Synonyms{/t}</div>
 	<table>
 	{foreach from=$content.synonyms key=k item=v}
-		<p>{if $session.app.user.species.type=='lower'}<i>{/if}{$v.synonym}{if $session.app.user.species.type=='lower'}</i>{/if} {$v.remark}</p>
+		<p>{if $session.app.user.species.type=='lower'}<i>{/if}{$v.synonym}{if $session.app.user.species.type=='lower'}</i>{/if} {$v.author}</p>
 	{/foreach}
 	</table>
 </div>
