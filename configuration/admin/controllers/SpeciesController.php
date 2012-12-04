@@ -2267,7 +2267,7 @@ class SpeciesController extends Controller
 			
 		}
 		
-		$literature = $this->getAllLiterature();
+//		$literature = $this->getAllLiterature();
 
 		if (!isset($synonyms)) {
 
@@ -2280,7 +2280,7 @@ class SpeciesController extends Controller
 					'order' => 'show_order'
 				)
 			);
-
+/*
 			foreach((array)$synonyms as $key => $val) {
 
 				if($val['lit_ref_id']) {
@@ -2291,14 +2291,14 @@ class SpeciesController extends Controller
 				}
 
 			}
-
+*/
 		}
 
 		$this->smarty->assign('navList',$this->newGetUserAssignedTaxonTreeList(array('higherOnly'=>$this->maskAsHigherTaxa())));
 
 		$this->smarty->assign('navCurrentId',$taxon['id']);
 
-		$this->smarty->assign('literature', $literature);
+//		$this->smarty->assign('literature', $literature);
 
 		$this->smarty->assign('id',$this->requestData['id']);
 

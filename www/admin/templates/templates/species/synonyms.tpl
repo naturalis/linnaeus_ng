@@ -16,7 +16,7 @@
 <table>
 	<tr>
 		<th style="width:350px;">{t}synonym{/t}</td>
-		<th style="width:300px;">{t}literature{/t}</td>
+		<th style="width:300px;">{t}author{/t}</td>
 		<th style="width:55px;">{t}move up{/t}</td>
 		<th style="width:65px;">{t}move down{/t}</td>
 		<th>delete</td>
@@ -24,12 +24,7 @@
 	{section name=i loop=$synonyms}
 	<tr class="tr-highlight">
 		<td>{$synonyms[i].synonym}</td>
-		<td>
-			{if $synonyms[i].literature}
-			{$synonyms[i].literature.author_full}
-			{$synonyms[i].literature.year}{$synonyms[i].literature.suffix}
-			{/if}
-		</td>
+		<td>{$synonyms[i].remark}</td>
 		{if $smarty.section.i.first}
 		<td></td>
 		{else}
@@ -69,16 +64,7 @@
 <table>
 <tr><td colspan="2">{t}Add a new synonym:{/t}</td></tr>
 <tr><td>{t}synonym:{/t}</td><td><input type="text" name="synonym" maxlength="128" /></td></tr>
-<tr><td>{t}literature reference:{/t}</td><td>
-	<select name="lit_ref_id">
-	<option value="">{t}(none){/t}</option>
-{section name=i loop=$literature}
-	<option value="{$literature[i].id}">
-	{$literature[i].author_full} {$literature[i].year}{$literature[i].suffix}
-	</option>
-{/section}
-	</select>
-</td></tr>
+<tr><td>{t}author:{/t}</td><td><input type="text" name="remark" maxlength="255" /></td></tr>
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><td colspan="2"><input type="submit" value="{t}save{/t}" /></td></tr>
 </table>

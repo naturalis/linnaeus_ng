@@ -54,17 +54,7 @@
 	<div class="title">{t}Synonyms{/t}</div>
 	<table>
 	{foreach from=$content.synonyms key=k item=v}
-		<tr class="highlight">
-			<td>{$v.synonym}</td>
-			<td>{if $v.reference}
-			{if $useJavascriptLinks}
-			<span onclick="goLiterature({$v.reference.id});" class="a">{$v.reference.author_full}</span>
-			{else}
-			<a href="../literature/reference.php?id={$v.reference.id}">{$v.reference.author_full}</a>
-			{/if}
-			{/if}</td>
-		</tr>
-		{* $v.remark *}
+		<p>{if $session.app.user.species.type=='lower'}<i>{/if}{$v.synonym}{if $session.app.user.species.type=='lower'}</i>{/if} {$v.remark}</p>
 	{/foreach}
 	</table>
 </div>
