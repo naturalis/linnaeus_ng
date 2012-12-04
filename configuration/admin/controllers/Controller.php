@@ -2061,8 +2061,8 @@ class Controller extends BaseClass
 	public function userHasTaxon($taxonId,$userId=null)
 	{
 	
-		if ($this->isCurrentUserSysAdmin()) return true;
-
+		if ($this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin()) return true;
+		
 		$ut = $this->models->UserTaxon->_get(
 			array(
 				'id' => array(
