@@ -122,7 +122,7 @@ class GlossaryController extends Controller
      *
      * @access    public
      */
-    public function browseAction()
+    public function contentsAction()
     {
 
        $this->checkAuthorisation();

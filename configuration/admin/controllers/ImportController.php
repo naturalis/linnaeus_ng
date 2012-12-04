@@ -2524,7 +2524,7 @@ class ImportController extends Controller
 
 		$d = strrpos($s,',');		// comma position
 		$y = trim(substr($s,$d+1));	// year
-		$a = substr($s,0,$d);		// all but year = auhor(s)
+		$a = substr($s,0,$d);		// all but year = author(s)
 		$a2 = null;					// default no 2nd author
 		$m = false;					// defualt no multiple authors (>2 = et al.)
 		$d = strpos($a,'et al.');	// "et. al" position
@@ -2536,6 +2536,8 @@ class ImportController extends Controller
 			if ($d!==false) {
 				$a2 = trim(substr($a,$d+strlen(' and ')));
 				$a = trim(substr($a,0,$d));
+			} else {
+				$a = trim($s);
 			}
 		}
 		

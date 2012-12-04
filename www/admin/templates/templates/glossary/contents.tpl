@@ -1,9 +1,9 @@
 {include file="../shared/admin-header.tpl"}
 
 <form name="theForm" id="theForm" method="post" action="">
-<div id="alphabet">
 
 {if $languages|@count > 1}
+<div id="alphabet">
 {t}See glossary items in:{/t}&nbsp;
 <select name="activeLanguage" id="language" onchange="$('#theForm').submit();">
 {section name=i loop=$languages}
@@ -11,42 +11,20 @@
 	{/if}
 {/section}
 </select>
-{/if}
-
-<br />
-{if $alpha|@count==0}
-{t}(no terms have been defined){/t}
-{else}
-{t}Click to browse:{/t}&nbsp;
-{section name=i loop=$alpha}
-{if $alpha[i]==$letter}
-<span class="alphabet-active-letter">{$alpha[i]}</span>
-{else}
-<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#theForm').submit();">{$alpha[i]}</span>
-{/if}
-{/section}
-{/if}
-<input type="hidden" name="letter" id="letter" value="{$letter}"  />
-</form>
 </div>
+{/if}
 
 <div id="page-main">
 {if $alpha|@count>0}
 <table>
 	<tr>
 		<th style="width:175px">{t}term{/t}</th>
-		<th style="width:350px">{t}definition{/t}</th>
-		<th>{t}synonyms{/t}</th>
-		<th>{t}media{/t}</th>
-		<th></th>
+		<th style="width:450px">{t}definition{/t}</th>
 	</tr>
 {section name=i loop=$gloss}
 	<tr class="tr-highlight">
-		<td>{$gloss[i].term}</td>
-		<td>{$gloss[i].definition|@substr:0:50}{if $gloss[i].definition|@strlen>50}...{/if}</td>
-		<td style="text-align:right;padding-right:7px;">{$gloss[i].synonyms|@count}</td>
-		<td style="text-align:right;padding-right:7px;">{$gloss[i].media|@count}</td>
-		<td>[<a href="edit.php?id={$gloss[i].id}">{t}edit{/t}</a>]</td>
+		<td><a href="edit.php?id={$gloss[i].id}">{$gloss[i].term}</a></td>
+		<td>{$gloss[i].definition|@strip_tags:substr:0:100}{if $gloss[i].definition|@strlen>100}...{/if}</td>
 	</tr>
 {/section}
 </table>
