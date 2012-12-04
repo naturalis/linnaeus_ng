@@ -2483,10 +2483,11 @@ class ImportController extends Controller
 				$author = trim(str_replace($synonym, '', $this->removeLinks($line)));
 			}
 			
-			// Clean up any preceeding characters
-			$cleanUp = array(':', '|');
+			// Clean up any starting or closing characters
+			$cleanUp = array(':', '|', '.', ',');
 			if (in_array($author[0], $cleanUp)) $author = trim(substr($author, 1));
-			
+			if (in_array($author[strlen($author) - 1], $cleanUp)) $author = trim(substr($author, 0, strlen($author) - 1));
+				
 			return $author;
 
 		}
