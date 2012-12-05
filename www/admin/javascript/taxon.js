@@ -1513,7 +1513,9 @@ function taxonChangeMediaOrder(id,mId,dir) {
 function taxonEnableButtons() {
 
 	$('input[disabledOnLoad="1"]').each(function(){
-		$(this).attr('disabled','false');		
+		$(this).attr('disabled',null);		
 	});
+	
+	
 
 }
