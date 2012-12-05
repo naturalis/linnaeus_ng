@@ -185,7 +185,7 @@ function keyShowChoiceDetails(ele,id) {
 
 }
 
-function keySaveData(id,language,content,action) {
+function keySaveData(id,language,content,action,postFunction) {
 
 	$.ajax({
 		url : "ajax_interface.php",
@@ -200,6 +200,7 @@ function keySaveData(id,language,content,action) {
 		async: allAjaxAsynchMode ,
 		success: function (data) {
 			allSetMessage(data);
+			if (postFunction) eval(postFunction+'(data)');
 		}
 
 	});
@@ -273,7 +274,7 @@ function keyDeleteKeyStep() {
 
 }
 
-function keySaveChoiceContent(type) {
+function keySaveChoiceContent(type,postFunction) {
 
 	if (type=='default')
 		//content = ['',$('#contentDefault').val()];
@@ -286,7 +287,8 @@ function keySaveChoiceContent(type) {
 		keyChoiceId,
 		type=='default' ? allDefaultLanguage : allActiveLanguage,
 		content,
-		'save_key_choice_content'
+		'save_key_choice_content',
+		postFunction
 	);
 
 }
