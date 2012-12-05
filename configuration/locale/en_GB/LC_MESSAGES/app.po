@@ -1,0 +1,472 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Linnaeus NG app\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version:1.0\n"
+"Content-Type:text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding:8bit\n"
+"X-Generator:POEditor.com\n"
+
+#: 
+msgid "%s %s excluded:"
+msgstr "%s %s excluded:"
+
+#: 
+msgid "%s possible %s remaining:"
+msgstr "%s possible %s remaining:"
+
+#: 
+msgid "%sStart the key from the start%s."
+msgstr "%sStart the key from the start%s."
+
+#: 
+msgid "(This page has been published in this language. Click %shere%s to unpublish.)"
+msgstr "(This page has been published in this language. Click %shere%s to unpublish.)"
+
+#: 
+msgid "(This page has not been published in this language. Click %shere%s to publish.)"
+msgstr "(This page has not been published in this language. Click %shere%s to publish.)"
+
+#: 
+msgid "A definition is required."
+msgstr "A definition is required."
+
+#: 
+msgid "A term is required."
+msgstr "A term is required."
+
+#: 
+msgid "About ETI"
+msgstr "About ETI"
+
+#: 
+msgid "Add"
+msgstr "Add"
+
+#: 
+msgid "Add collaborator"
+msgstr "Add collaborator"
+
+#: 
+msgid "and"
+msgstr "and"
+
+#: 
+msgid "Are you sure you want to delete %s \"%s\"?"
+msgstr "Are you sure you want to delete %s \"%s\"?"
+
+#: 
+msgid "Are you sure?"
+msgstr "Are you sure?"
+
+#: 
+msgid "Back"
+msgstr "Back"
+
+#: 
+msgid "Back to "
+msgstr "Back to "
+
+#: 
+msgid "Back to Linnaeus NG root"
+msgstr "Back to Linnaeus NG root"
+
+#: 
+msgid "Back to search results"
+msgstr "Back to search results"
+
+#: 
+msgid "Character"
+msgstr "Character"
+
+#: 
+msgid "Characters"
+msgstr "Characters"
+
+#: 
+msgid "choice"
+msgstr "choice"
+
+#: 
+msgid "Choose a map"
+msgstr "Choose a map"
+
+#: 
+msgid "Clear all"
+msgstr "Clear all"
+
+#: 
+msgid "Clear map"
+msgstr "Clear map"
+
+#: 
+msgid "Common names"
+msgstr "Common names"
+
+#: 
+msgid "Compare"
+msgstr "Compare"
+
+#: 
+msgid "contact"
+msgstr "contact"
+
+#: 
+msgid "Contents"
+msgstr "Contents"
+
+#: 
+msgid "Contributors"
+msgstr "Contributors"
+
+#: 
+msgid "Decision path"
+msgstr "Decision path"
+
+#: 
+msgid "Delete"
+msgstr "Delete"
+
+#: 
+msgid "Deletion will be irreversible."
+msgstr "Deletion will be irreversible."
+
+#: 
+msgid "Dichotomous key"
+msgstr "Dichotomous key"
+
+#: 
+msgid "Displays overlap between two taxa."
+msgstr "Displays overlap between two taxa."
+
+#: 
+msgid "Distribution"
+msgstr "Distribution"
+
+#: 
+msgid "Diversity index"
+msgstr "Diversity index"
+
+#: 
+msgid "Examine"
+msgstr "Examine"
+
+#: 
+msgid "Excluded"
+msgstr "Excluded"
+
+#: 
+msgid "Expand all"
+msgstr "Expand all"
+
+#: 
+msgid "Final confirmation:"
+msgstr "Final confirmation:"
+
+#: 
+msgid "First"
+msgstr "First"
+
+#: 
+msgid "for"
+msgstr "for"
+
+#: 
+msgid "Glossary"
+msgstr "Glossary"
+
+#: 
+msgid "Go to this taxon"
+msgstr "Go to this taxon"
+
+#: 
+msgid "Habitat"
+msgstr "Habitat"
+
+#: 
+msgid "help"
+msgstr "help"
+
+#: 
+msgid "Higher taxa"
+msgstr "Higher taxa"
+
+#: 
+msgid "Identify"
+msgstr "Identify"
+
+#: 
+msgid "Index"
+msgstr "Index"
+
+#: 
+msgid "Introduction"
+msgstr "Introduction"
+
+#: 
+msgid "It is not possible to jump directly to a specific step or choice of the dichotomous key"
+msgstr "It is not possible to jump directly to a specific step or choice of the dichotomous key"
+
+#: 
+msgid "Language:"
+msgstr "Language:"
+
+#: 
+msgid "Literature"
+msgstr "Literature"
+
+#: 
+msgid "Loading application"
+msgstr "Loading application"
+
+#: 
+msgid "login"
+msgstr "login"
+
+#: 
+msgid "Matrix key"
+msgstr "Matrix key"
+
+#: 
+msgid "Matrix: \n"
+"\t\t\t\t\t<a class=\"selectIcon\" href=\"javascript:showMatrixSelect();void(0);\" title=\"Switch to another matrix\">%s</a>\n"
+"\t\t\t\t"
+msgstr "Matrix: \n"
+"\t\t\t\t\t<a class=\"selectIcon\" href=\"javascript:showMatrixSelect();void(0);\" title=\"Switch to another matrix\">%s</a>\n"
+"\t\t\t\t"
+
+#: 
+msgid "Next"
+msgstr "Next"
+
+#: 
+msgid "No choices made yet"
+msgstr "No choices made yet"
+
+#: 
+msgid "no data available"
+msgstr "no data available"
+
+#: 
+msgid "not yet available"
+msgstr "not yet available"
+
+#: 
+msgid "Number of available states:"
+msgstr "Number of available states:"
+
+#: 
+msgid "ok"
+msgstr "ok"
+
+#: 
+msgid "Other content"
+msgstr "Other content"
+
+#: 
+msgid "Password strength:"
+msgstr "Password strength:"
+
+#: 
+msgid "Previous"
+msgstr "Previous"
+
+#: 
+msgid "projects"
+msgstr "projects"
+
+#: 
+msgid "records"
+msgstr "records"
+
+#: 
+msgid "Referenced in the following taxa:"
+msgstr "Referenced in the following taxa:"
+
+#: 
+msgid "Remaining"
+msgstr "Remaining"
+
+#: 
+msgid "Remove collaborator"
+msgstr "Remove collaborator"
+
+#: 
+msgid "Result of this combination of characters"
+msgstr "Result of this combination of characters"
+
+#: 
+msgid "Return to first step"
+msgstr "Return to first step"
+
+#: 
+msgid "Return to step"
+msgstr "Return to step"
+
+#: 
+msgid "saved"
+msgstr "saved"
+
+#: 
+msgid "saved (could not save certain HTML-tags)"
+msgstr "saved (could not save certain HTML-tags)"
+
+#: 
+msgid "Search"
+msgstr "Search"
+
+#: 
+msgid "Search &gt;&gt;"
+msgstr "Search &gt;&gt;"
+
+#: 
+msgid "Search results"
+msgstr "Search results"
+
+#: 
+msgid "Search..."
+msgstr "Search..."
+
+#: 
+msgid "Select a different map"
+msgstr "Select a different map"
+
+#: 
+msgid "Select a taxon"
+msgstr "Select a taxon"
+
+#: 
+msgid "Select a taxon from the list to view characters and character states of this taxon. \n"
+"\t\t\tThese are used for the identification process under Identify."
+msgstr "Select a taxon from the list to view characters and character states of this taxon. \n"
+"\t\t\tThese are used for the identification process under Identify."
+
+#: 
+msgid "Select the area you want to search by clicking the relevant squares."
+msgstr "Select the area you want to search by clicking the relevant squares."
+
+#: 
+msgid "Select two taxa from the lists and click Compare to compare the characters and character states for both taxa. The results show the differences and similarities for both taxa."
+msgstr "Select two taxa from the lists and click Compare to compare the characters and character states for both taxa. The results show the differences and similarities for both taxa."
+
+#: 
+msgid "Selected combination of characters"
+msgstr "Selected combination of characters"
+
+#: 
+msgid "Shared character states:"
+msgstr "Shared character states:"
+
+#: 
+msgid "Show all"
+msgstr "Show all"
+
+#: 
+msgid "Sort"
+msgstr "Sort"
+
+#: 
+msgid "Species"
+msgstr "Species"
+
+#: 
+msgid "Species and lower taxa"
+msgstr "Species and lower taxa"
+
+#: 
+msgid "State"
+msgstr "State"
+
+#: 
+msgid "States"
+msgstr "States"
+
+#: 
+msgid "States present in both:"
+msgstr "States present in both:"
+
+#: 
+msgid "States present in neither:"
+msgstr "States present in neither:"
+
+#: 
+msgid "Step"
+msgstr "Step"
+
+#: 
+msgid "Switch to another matrix"
+msgstr "Switch to another matrix"
+
+#: 
+msgid "Synonym"
+msgstr "Synonym"
+
+#: 
+msgid "synonym of"
+msgstr "synonym of"
+
+#: 
+msgid "Synonyms"
+msgstr "Synonyms"
+
+#: 
+msgid "Taxon:"
+msgstr "Taxon:"
+
+#: 
+msgid "Taxonomic distance:"
+msgstr "Taxonomic distance:"
+
+#: 
+msgid "That taxon cannot have child taxa."
+msgstr "That taxon cannot have child taxa."
+
+#: 
+msgid "the page"
+msgstr "the page"
+
+#: 
+msgid "Treat unknowns as matches"
+msgstr "Treat unknowns as matches"
+
+#: 
+msgid "Type"
+msgstr "Type"
+
+#: 
+msgid "Unique character states for %s:"
+msgstr "Unique character states for %s:"
+
+#: 
+msgid "Unique states in"
+msgstr "Unique states in"
+
+#: 
+msgid "Unknown or no project ID."
+msgstr "Unknown or no project ID."
+
+#: 
+msgid "Welcome"
+msgstr "Welcome"
+
+#: 
+msgid "When finished, click 'Search'."
+msgstr "When finished, click 'Search'."
+
+#: 
+msgid "You need to enter a search term."
+msgstr "You need to enter a search term."
+
+#: 
+msgid "Your search for \"%s\" produced %s results."
+msgstr "Your search for \"%s\" produced %s results."
+
+#: 
+msgid "Your search for \"%s\" produced no results."
+msgstr "Your search for \"%s\" produced no results."
+
+#: 
+msgid "[syn.]"
+msgstr "[syn.]"
+
