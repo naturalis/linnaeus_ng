@@ -1197,7 +1197,7 @@ class Controller extends BaseClass
 //php_uname('s')=='Windows NT'
 
 		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
-
+		
 		if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage']) return;
 
 		$l = $this->models->Language->_get(array('id' => array('language'=> $language)));
