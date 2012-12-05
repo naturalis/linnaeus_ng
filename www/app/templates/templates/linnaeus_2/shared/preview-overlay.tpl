@@ -5,19 +5,3 @@
 
 <p><a href="{$urlBackToAdmin}">EDIT PAGE</a></p>
 </div>
-
-
-{literal}
-<script type="text/JavaScript">
-$(document).ready(function(){
-{/literal}
-
-	var pos = $('#body-container').position();
-	$('#preview-overlay').css('left',(pos.left + $('#body-container').width() - $('#preview-overlay').width()));
-
-{literal}
-
-	
-});
-</script>
-{/literal}
