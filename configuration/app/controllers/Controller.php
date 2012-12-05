@@ -2569,11 +2569,11 @@ class Controller extends BaseClass
 	    
 //	    die($this->models->Language->getLastQuery());
 
-	    putenv('LC_MESSAGES='.$l[0]['language']);
+	    putenv('LC_ALL='.$l[0]['language']);
 
-		if (!setlocale(LC_MESSAGES,$l[0]['locale_lin'])) {
+		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
 
-			if (!setlocale(LC_MESSAGES,$l[0]['locale_win'])) { 
+			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
 
 				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
 
