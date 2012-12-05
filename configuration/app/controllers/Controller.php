@@ -830,6 +830,8 @@ class Controller extends BaseClass
 		if (!isset($_SESSION['app']['user']['languageChanged'])) $_SESSION['app']['user']['languageChanged'] = true;
 		
 		unset($this->requestData['languageId']);
+		
+		$this->setLocale($_SESSION['app']['project']['activeLanguageId']);
 
 	}
 
@@ -2544,6 +2546,59 @@ class Controller extends BaseClass
 		return substr(md5(rand()),0,16);
 	
 	}
+	
+
+	public function setLocale ($language=false)
+	{
+/*
+//php_uname('s')=='Windows NT'
+
+		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
+
+		if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage']) return;
+
+		if (count((array)$l)==0) { 
+
+			$this->log('Tried to switch to illegal language "'.$language.'"',1);
+			
+			return;
+
+		}
+*/
+	    $l = $this->models->Language->_get(array('id' => array('id'=> $language)));
+	    
+//	    die($this->models->Language->getLastQuery());
+
+	    putenv('LC_MESSAGES='.$l[0]['language']);
+
+		if (!setlocale(LC_MESSAGES,$l[0]['locale_lin'])) {
+
+			if (!setlocale(LC_MESSAGES,$l[0]['locale_win'])) { 
+
+				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
+
+				return;
+
+			}
+
+		} 
+
+		//setlocale(LC_ALL,$l[0]['locale_win']);
+		
+//die($this->getAppName());
+
+		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
+
+		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
+
+		textdomain($this->getAppName());
+		
+//		echo getText('the page');
+
+		$_SESSION['admin']['user']['currentLanguage'] = $language;
+
+	}    
+	
 	
 	
 }
