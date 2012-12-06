@@ -831,7 +831,7 @@ class Controller extends BaseClass
 		
 		unset($this->requestData['languageId']);
 		
-		$this->setLocale($_SESSION['app']['project']['activeLanguageId']);
+		$_SESSION['app']['user']['currentLanguage'] = $_SESSION['app']['project']['activeLanguageId'];
 
 	}
 
@@ -1183,53 +1183,6 @@ class Controller extends BaseClass
 	
 	}
 	
-	public function setLocale ($language=false)
-	{
-
-		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
-
-		if (isset($_SESSION['app']['user']['currentLanguage']) && $language == $_SESSION['app']['user']['currentLanguage']) return;
-
-		if (count((array)$l)==0) { 
-
-			$this->log('Tried to switch to illegal language "'.$language.'"',1);
-			
-			return;
-
-		}
-
-		$_SESSION['app']['user']['currentLanguage'] = $language;
-		
-		
-		/*
-		
-	    $l = $this->models->Language->_get(array('id' => array('id'=> $language)));
-	    
-	    putenv('LC_ALL='.$l[0]['language']);
-
-		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
-
-			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
-
-				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
-
-				return;
-
-			}
-
-		} 
-
-		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
-
-		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
-
-		textdomain($this->getAppName());
-		
-		*/
-
-	}    
-	
-
 	/**
 	 * Gettext wrapper, to be called from javascript (through the utilities controller)
 	 *
