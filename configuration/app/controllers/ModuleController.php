@@ -73,7 +73,7 @@ class ModuleController extends Controller
 
 		if (!$this->getCurrentModuleId()) {
 
-			$this->addError(_('Unknown module ID.'));
+			$this->addError($this->translate('Unknown module ID.'));
 
 		} else {
 		
@@ -128,7 +128,7 @@ class ModuleController extends Controller
 
 		} else {
 
-			$this->addError(_('No page ID specified.'));
+			$this->addError($this->translate('No page ID specified.'));
 			
 			$id = null;
 
@@ -148,7 +148,7 @@ class ModuleController extends Controller
 		
 		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
 
-		$this->setPageName(sprintf(_($module['module'].': "%s"'),$page['topic']));
+		$this->setPageName(sprintf($this->translate($module['module'].': "%s"'),$page['topic']));
 
 		$this->smarty->assign('headerTitles',array('title' => $module['module'],'subtitle' => $page['topic']));
 	

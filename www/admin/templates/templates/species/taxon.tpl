@@ -111,7 +111,9 @@ $(document).ready(function(){
 });
 
 function onInitTinyMce() {
+
 	taxonGetDataAll();
+
 }
 
 </script>

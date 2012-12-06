@@ -19,12 +19,12 @@
 <table>
 	<tr>
 		<th style="width:175px">{t}term{/t}</th>
-		<th style="width:450px">{t}definition{/t}</th>
+		<!-- th style="width:450px">{t}definition{/t}</th -->
 	</tr>
 {section name=i loop=$gloss}
 	<tr class="tr-highlight">
 		<td><a href="edit.php?id={$gloss[i].id}">{$gloss[i].term}</a></td>
-		<td>{$gloss[i].definition|@strip_tags:substr:0:100}{if $gloss[i].definition|@strlen>100}...{/if}</td>
+		<!-- td>{$gloss[i].definition|@strip_tags:substr:0:100}{if $gloss[i].definition|@strlen>100}...{/if}</td -->
 	</tr>
 {/section}
 </table>
@@ -41,14 +41,9 @@
 </div>
 {/if}
 {/if}
-<p>
-[<span class="a" onclick="$('#newForm').submit();">{t}create new term{/t}</span>]
-[<a href="search.php">{t}search{/t}</a>]
-</p>
-<form method="post" action="edit.php" name="newForm" id="newForm">
-<input type="hidden" name="activeLanguage" value="{$activeLanguage}"  />
-</form>
 </div>
-
+<form action="" method="post" id="theForm" action="">
+<input type="hidden" name="letter" id="letter" value="" />
+</form>
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

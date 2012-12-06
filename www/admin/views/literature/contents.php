@@ -4,5 +4,5 @@ require_once ('../../../../configuration/admin/controllers/LiteratureController.
 
 $c = new LiteratureController();
 
-$c->browseAction();
+$c->contentsAction();
 

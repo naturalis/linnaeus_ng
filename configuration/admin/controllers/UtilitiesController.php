@@ -57,15 +57,15 @@ class UtilitiesController extends Controller
         
         $this->smarty->assign('hideControllerPublicName', true);
 
-        $this->addError(_('You are not authorized to do that.'));
+        $this->addError($this->translate('You are not authorized to do that.'));
 
 		if (count((array)$_SESSION['admin']['project']['lead_experts'])==1) {
 
-	        $this->addMessage(_('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
+	        $this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
 
 		} else {
 
-	        $this->addMessage(_('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
+	        $this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
 
 		}
 
@@ -93,7 +93,7 @@ class UtilitiesController extends Controller
         
         $this->smarty->assign('hideControllerPublicName', true);
         
-        $this->addError(sprintf(_('The module "%s" is not part of your project.'),$_SESSION['admin']['system']['last_module_name']));
+        $this->addError(sprintf($this->translate('The module "%s" is not part of your project.'),$_SESSION['admin']['system']['last_module_name']));
         
         $this->printPage();
     

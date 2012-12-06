@@ -2607,8 +2607,12 @@ class Controller extends BaseClass
 	
 	private function doTranslate ($content)
 	{
+
 	    return _($content);
+
+	    //$languageId = $this->getCurrentLanguageId()
+		//if (is_null($languageId)) $languageId = $this->getDefaultLanguageId();
+	    // return $this->doSomething($content,$languageId);
+	    
 	}
-	
-	
 }

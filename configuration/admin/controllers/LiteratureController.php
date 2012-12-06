@@ -60,19 +60,6 @@ class LiteratureController extends Controller
 		$d = $this->getFirstReference();
 		
 		$this->redirect('edit.php?id='.$d['id']);
-		//$this->redirect('edit.php');
-
-		/*
-
-        $this->checkAuthorisation();
-        
-        $this->setPageName( _('Index'));
-		
-		$this->clearTempValues();
-
-        $this->printPage();
-
-		*/    
 
     }
 
@@ -113,16 +100,16 @@ class LiteratureController extends Controller
 
     	    $this->setPageName(
 				sprintf(
-					_('Editing literature "%s (%s)"'),
+					$this->translate('Editing literature "%s (%s)"'),
 					$ref['author_first'].
-						($ref['multiple_authors']==1 ? ' '._('et al.') : ($ref['author_second'] ? ' &amp; '.$ref['author_second'] : '')),
+						($ref['multiple_authors']==1 ? ' '.$this->translate('et al.') : ($ref['author_second'] ? ' &amp; '.$ref['author_second'] : '')),
 					$ref['year'].$ref['suffix']
 				)
 			);
 		
 		} else {
 
-    	    $this->setPageName(_('New reference'));
+    	    $this->setPageName($this->translate('New reference'));
 			
 			if(isset($_SESSION['admin']['system']['activeTaxon'])) {
 
@@ -176,7 +163,7 @@ class LiteratureController extends Controller
 
 			if ($this->getReferences($test)) {
 
-				$this->addError(_('A reference with the same author(s), year and suffix already exists.'));
+				$this->addError($this->translate('A reference with the same author(s), year and suffix already exists.'));
 
 				$ref = $this->requestData;
 
@@ -235,7 +222,7 @@ class LiteratureController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not save reference.'));
+				$this->addError($this->translate('Could not save reference.'));
 
 			}
 
@@ -266,12 +253,12 @@ class LiteratureController extends Controller
 
     }
 
-    public function browseAction()
+    public function contentsAction()
     {
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Browsing literature'));
+		$this->setPageName($this->translate('Browsing literature'));
 		
 		$alpha = $this->getActualAlphabet();
 
@@ -326,7 +313,7 @@ class LiteratureController extends Controller
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Search for literature'));
+		$this->setPageName($this->translate('Search for literature'));
 		
 		if ($this->rHasVal('search')) {
 

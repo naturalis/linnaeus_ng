@@ -112,7 +112,7 @@ class ProjectsController extends Controller
     
         $this->checkAuthorisation();
         
-        $this->setPageName( _('Index'));
+        $this->setPageName( $this->translate('Index'));
         
         $this->printPage();
     
@@ -130,7 +130,7 @@ class ProjectsController extends Controller
 		
 		$this->includeLocalMenu = true;
 
-        $this->setPageName(_('Project overview'));
+        $this->setPageName($this->translate('Project overview'));
 
 		// get all modules activated in this project
 		$modules = $this->models->ModuleProject->_get(
@@ -201,7 +201,7 @@ class ProjectsController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Project modules'));
+        $this->setPageName($this->translate('Project modules'));
 
         if ($this->rHasVal('module_new')) {
             
@@ -222,7 +222,7 @@ class ProjectsController extends Controller
 
             } else {
 			
-				$this->addError(sprintf(_('There is a maximum of %s self-defined modules.'),$this->controllerSettings['freeModulesMax']));
+				$this->addError(sprintf($this->translate('There is a maximum of %s self-defined modules.'),$this->controllerSettings['freeModulesMax']));
 			
 			}
         
@@ -273,7 +273,7 @@ class ProjectsController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName(_('Assign collaborator to modules'));
+        $this->setPageName($this->translate('Assign collaborator to modules'));
 
         $modules = $this->models->ModuleProject->_get(
 			array(
@@ -376,7 +376,7 @@ class ProjectsController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Project settings'));
+        $this->setPageName($this->translate('Project settings'));
 		/*
 		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
 		// deleting the logo
@@ -394,7 +394,7 @@ class ProjectsController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not delete image.'));
+				$this->addError($this->translate('Could not delete image.'));
 
 			}
 
@@ -425,13 +425,13 @@ class ProjectsController extends Controller
 
 				if ($p) {
 				
-					$this->addMessage(_('Image saved.'));
+					$this->addMessage($this->translate('Image saved.'));
 
 				} else {
 
 					@unlink($_SESSION['admin']['project']['paths']['project_media'].$filesToSave[0]['name']);
 
-					$this->addError(_('Could not save image.'));
+					$this->addError($this->translate('Could not save image.'));
 
 				}
 
@@ -526,9 +526,9 @@ class ProjectsController extends Controller
 
         $this->checkAuthorisation(true);
         
-        $this->setPageName(_('Create new project'));
+        $this->setPageName($this->translate('Create new project'));
 
-		$this->setBreadcrumbRootName(_('System administration'));
+		$this->setBreadcrumbRootName($this->translate('System administration'));
 
 		$this->setSuppressProjectInBreadcrumbs();
 
@@ -536,9 +536,9 @@ class ProjectsController extends Controller
 				
 			if (!$this->rHasVal('title') || !$this->rHasVal('sys_description') || !$this->rHasVal('language')) {
 	
-				if (!$this->rHasVal('title')) $this->addError(_('A title is required.'));
-				if (!$this->rHasVal('sys_description')) $this->addError(_('A description is required.'));
-				if (!$this->rHasVal('language')) $this->addError(_('A default language is required.'));
+				if (!$this->rHasVal('title')) $this->addError($this->translate('A title is required.'));
+				if (!$this->rHasVal('sys_description')) $this->addError($this->translate('A description is required.'));
+				if (!$this->rHasVal('language')) $this->addError($this->translate('A default language is required.'));
 				
 			} else {
 	
@@ -574,12 +574,12 @@ class ProjectsController extends Controller
 					$this->setCurrentUserRoleId();
 
 					$this->smarty->assign('saved',true);
-					$this->addMessage(sprintf(_('Project \'%s\' saved.'),$this->requestData['title']));
+					$this->addMessage(sprintf($this->translate('Project \'%s\' saved.'),$this->requestData['title']));
 					$this->addMessage(sprintf('You have been assigned to the new project as system administrator.'));
 				
 				} else {
 
-					$this->addError(_('Could not save project (duplicate name?).'));
+					$this->addError($this->translate('Could not save project (duplicate name?).'));
 
 				}
 
@@ -601,9 +601,9 @@ class ProjectsController extends Controller
 
         $this->checkAuthorisation(true);
         
-        $this->setPageName(_('Delete a project'));
+        $this->setPageName($this->translate('Delete a project'));
 
-		$this->setBreadcrumbRootName(_('System administration'));
+		$this->setBreadcrumbRootName($this->translate('System administration'));
 
 		$this->setSuppressProjectInBreadcrumbs();
 
@@ -642,7 +642,7 @@ class ProjectsController extends Controller
 
         $this->checkAuthorisation(true);
         
-        $this->setPageName(_('Project info'));
+        $this->setPageName($this->translate('Project info'));
 
 		$this->smarty->assign('commonname',$this->models->Commonname->_get(
 			array('id' => array('project_id' => $this->getCurrentProjectId()),'columns' => 'count(*) as total')));
@@ -884,7 +884,7 @@ class ProjectsController extends Controller
             ));
             
             if ($this->models->LanguageProject->getNewId() == '')
-                $this->addError(_('Language already assigned.'));
+                $this->addError($this->translate('Language already assigned.'));
         
         } elseif ($action == 'default') {
             

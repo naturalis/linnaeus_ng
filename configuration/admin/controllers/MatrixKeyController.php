@@ -98,7 +98,7 @@ class MatrixKeyController extends Controller
 		}
 
 		/*
-        $this->setPageName( _('Index'));
+        $this->setPageName( $this->translate('Index'));
 
         $this->printPage();
 	    */
@@ -110,7 +110,7 @@ class MatrixKeyController extends Controller
     
         $this->checkAuthorisation();
         
-        $this->setPageName( _('Matrices'));
+        $this->setPageName( $this->translate('Matrices'));
 
 		$matrices = $this->getMatrices();
 		
@@ -152,11 +152,11 @@ class MatrixKeyController extends Controller
 			
 			if (isset($matrix['names'][$this->getDefaultProjectLanguage()]['name'])) {
 
-		        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['names'][$this->getDefaultProjectLanguage()]['name']));
+		        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'),$matrix['names'][$this->getDefaultProjectLanguage()]['name']));
 
 			} else {
 
-		        $this->setPageName(_('New matrix'));
+		        $this->setPageName($this->translate('New matrix'));
 
 			}
 
@@ -172,7 +172,7 @@ class MatrixKeyController extends Controller
 
 			} else {
 			
-				$this->addError(_('Could not create new matrix.'));			
+				$this->addError($this->translate('Could not create new matrix.'));			
 			
 			}
 		
@@ -202,7 +202,7 @@ class MatrixKeyController extends Controller
 
 		$matrix = $this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'),$matrix['matrix']));
 
 		if ($this->rHasVal('char')) $this->smarty->assign('activeCharacteristic',$this->requestData['char']);
 
@@ -264,7 +264,7 @@ class MatrixKeyController extends Controller
 		
 		$matrix = $this->getMatrix($this->getCurrentMatrixId());
 
-        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'),$matrix['matrix']));
 
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
@@ -294,7 +294,7 @@ class MatrixKeyController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not create character.'));
+				$this->addError($this->translate('Could not create character.'));
 
 			}
 
@@ -302,7 +302,7 @@ class MatrixKeyController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Matrix'), 
+                'name' => $this->translate('Matrix'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php'
             )
         );
@@ -337,11 +337,11 @@ class MatrixKeyController extends Controller
 			
 			if (isset($c['label'])) {
 
-		        $this->setPageName(sprintf(_('Editing character "%s"'),$c['label']));
+		        $this->setPageName(sprintf($this->translate('Editing character "%s"'),$c['label']));
 
 			} else {
 
-		        $this->setPageName( _('New character'));
+		        $this->setPageName( $this->translate('New character'));
 
 			}
 
@@ -378,7 +378,7 @@ class MatrixKeyController extends Controller
 
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
-		$this->setPageName(_('Adding taxa'));
+		$this->setPageName($this->translate('Adding taxa'));
 
 		if ($this->rHasVal('taxon')) { 
 
@@ -402,7 +402,7 @@ class MatrixKeyController extends Controller
 
 			}
 
-			$this->addMessage(sprintf(_('Taxon added.')));			
+			$this->addMessage(sprintf($this->translate('Taxon added.')));			
 
 		}
 			
@@ -451,7 +451,7 @@ class MatrixKeyController extends Controller
 
 				} else {
 
-					$this->addError(_('Cannot create new state.'));
+					$this->addError($this->translate('Cannot create new state.'));
 
 				}
 
@@ -461,7 +461,7 @@ class MatrixKeyController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Matrix'), 
+                'name' => $this->translate('Matrix'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php'
             )
         );
@@ -473,12 +473,12 @@ class MatrixKeyController extends Controller
 		if ($state['label']) {
 		// existing state
 
-			$this->setPageName(sprintf(_('Editing state for "%s"'),$characteristic['label']));
+			$this->setPageName(sprintf($this->translate('Editing state for "%s"'),$characteristic['label']));
 
 		} else {
 		// new state
 
-			$this->setPageName(sprintf(_('New state for "%s"'),$characteristic['label']));
+			$this->setPageName(sprintf($this->translate('New state for "%s"'),$characteristic['label']));
 
 		}
 
@@ -513,7 +513,7 @@ class MatrixKeyController extends Controller
 
 				}
 
-				$this->addMessage(sprintf(_('State "%s" saved.'),$this->requestData['label']));
+				$this->addMessage(sprintf($this->translate('State "%s" saved.'),$this->requestData['label']));
 
 				$state = $this->getCharacteristicState($this->createState());
 
@@ -584,7 +584,7 @@ class MatrixKeyController extends Controller
 		
 		$matrix = $this->getMatrix($mId);
 
-        $this->setPageName(sprintf(_('Editing matrix "%s"'),$matrix['matrix']));
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'),$matrix['matrix']));
 
 		$this->smarty->assign('characteristic',$this->getCharacteristic($this->requestData['sId']));
 
@@ -603,7 +603,7 @@ class MatrixKeyController extends Controller
 
 		if ($this->getCurrentMatrixId()==null) $this->redirect('matrices.php');
 
-		$this->setPageName(_('Taxon-state links'));
+		$this->setPageName($this->translate('Taxon-state links'));
 		
 		if ($this->rHasVal('taxon')) {
 		
@@ -1430,7 +1430,7 @@ class MatrixKeyController extends Controller
 		if (!isset($data['label']) || empty($data['label'])) {
 		// each state has a name, regardless of type
 
-			$this->addError(_('A name is required.'));
+			$this->addError($this->translate('A name is required.'));
 
 			$result = false;
 
@@ -1440,7 +1440,7 @@ class MatrixKeyController extends Controller
 
 			if (!isset($data['text']) || empty($data['text'])) {
 
-				$this->addError(_('Text is required.'));
+				$this->addError($this->translate('Text is required.'));
 
 				$result = false;
 
@@ -1452,13 +1452,13 @@ class MatrixKeyController extends Controller
 
 			if (!isset($data['lower']) || empty($data['lower']) && $data['lower']!=='0') {
 
-				$this->addError(_('The lower boundary is required.'));
+				$this->addError($this->translate('The lower boundary is required.'));
 
 				$result = false;
 
 			} elseif ($data['lower'] != strval(floatval($data['lower']))) {
 
-				$this->addError(_('Invalid value for the lower boundary (must be integer or real).'));
+				$this->addError($this->translate('Invalid value for the lower boundary (must be integer or real).'));
 
 				$result = false;
 
@@ -1466,13 +1466,13 @@ class MatrixKeyController extends Controller
 
 			if (!isset($data['upper']) || empty($data['upper']) && $data['upper']!=='0') {
 
-				$this->addError(_('The upper boundary is required.'));
+				$this->addError($this->translate('The upper boundary is required.'));
 
 				$result = false;
 
 			} elseif ($data['upper'] != strval(floatval($data['upper']))) {
 
-				$this->addError(_('Invalid value for the upper boundary (must be integer or real).'));
+				$this->addError($this->translate('Invalid value for the upper boundary (must be integer or real).'));
 
 				$result = false;
 
@@ -1480,13 +1480,13 @@ class MatrixKeyController extends Controller
 
 			if ($result  && (floatval($data['upper']) < floatval($data['lower']))) {
 
-				$this->addError(_('The upper boundary value must be larger than the lower boundary value.'));
+				$this->addError($this->translate('The upper boundary value must be larger than the lower boundary value.'));
 
 				$result = false;
 
 			} elseif ($result  && (floatval($data['upper']) == floatval($data['lower']))) {
 
-				$this->addError(_('The upper and lower boundary values cannot be the same.'));
+				$this->addError($this->translate('The upper and lower boundary values cannot be the same.'));
 
 				$result = false;
 
@@ -1498,13 +1498,13 @@ class MatrixKeyController extends Controller
 
 			if (!isset($data['mean']) || empty($data['mean']) && $data['mean']!=='0') {
 
-				$this->addError(_('The mean is required.'));
+				$this->addError($this->translate('The mean is required.'));
 
 				$result = false;
 
 			} elseif ($data['mean'] != strval(floatval($data['mean']))) {
 
-				$this->addError(_('Invalid value for the mean (must be integer or real).'));
+				$this->addError($this->translate('Invalid value for the mean (must be integer or real).'));
 
 				$result = false;
 
@@ -1512,13 +1512,13 @@ class MatrixKeyController extends Controller
 
 			if (!isset($data['sd']) || empty($data['sd']) && $data['sd']!=='0') {
 
-				$this->addError(_('The value for one standard deviation is required.'));
+				$this->addError($this->translate('The value for one standard deviation is required.'));
 
 				$result = false;
 
 			} elseif ($data['sd'] !=  strval(floatval($data['sd'])) && $data['mean']!=='0') {
 
-				$this->addError(_('Invalid value for one standard deviation (must be integer or real).'));
+				$this->addError($this->translate('Invalid value for one standard deviation (must be integer or real).'));
 
 				$result = false;
 
@@ -1529,7 +1529,7 @@ class MatrixKeyController extends Controller
 
 			if (!$file && !isset($data['existing_file'])) {
 			
-				$this->addError(_('A media file is required.'));
+				$this->addError($this->translate('A media file is required.'));
 				
 				$result = false;
 
