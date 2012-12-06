@@ -1183,19 +1183,52 @@ class Controller extends BaseClass
 	
 	}
 	
-	private function saveTranslateMe($content,$controller=null)
+	public function setLocale ($language=false)
 	{
+
+		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
+
+		if (isset($_SESSION['app']['user']['currentLanguage']) && $language == $_SESSION['app']['user']['currentLanguage']) return;
+
+		if (count((array)$l)==0) { 
+
+			$this->log('Tried to switch to illegal language "'.$language.'"',1);
+			
+			return;
+
+		}
+
+		$_SESSION['app']['user']['currentLanguage'] = $language;
 		
-	    @$this->models->TranslateMe->save(
-		    array(
-		    'id' => null,
-		    'controller' => is_null($controller) ? $this->getControllerBaseName() : $controller,
-		    'content' => $content,
-		    'env' => 'front'
-		    )
-	    );	    
+		
+		/*
+		
+	    $l = $this->models->Language->_get(array('id' => array('id'=> $language)));
 	    
-	}
+	    putenv('LC_ALL='.$l[0]['language']);
+
+		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
+
+			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
+
+				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
+
+				return;
+
+			}
+
+		} 
+
+		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
+
+		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
+
+		textdomain($this->getAppName());
+		
+		*/
+
+	}    
+	
 
 	/**
 	 * Gettext wrapper, to be called from javascript (through the utilities controller)
@@ -1209,7 +1242,7 @@ class Controller extends BaseClass
 
 	    $this->saveTranslateMe($content,'javascript');
 
-	    return _($content);
+	    return $this->doTranslate($content);
 	
 	}
 	
@@ -1228,7 +1261,7 @@ class Controller extends BaseClass
 
 		$this->saveTranslateMe($content);
 
-		$c = _($content);
+		$c = $this->doTranslate($content);
 	
 		if (isset($params)) {
 
@@ -1255,7 +1288,7 @@ class Controller extends BaseClass
 	
 		$this->saveTranslateMe($content);
 	    	
-	    return _($content);
+	    return $this->doTranslate($content);
 	
 	}
 	
@@ -2557,59 +2590,25 @@ class Controller extends BaseClass
 		return substr(md5(rand()),0,16);
 	
 	}
-	
 
-	public function setLocale ($language=false)
+	private function saveTranslateMe($content,$controller=null)
 	{
-/*
-//php_uname('s')=='Windows NT'
-
-		$language = $language ? $language :  $this->generalSettings['defaultLanguage'];
-
-		if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage']) return;
-
-		if (count((array)$l)==0) { 
-
-			$this->log('Tried to switch to illegal language "'.$language.'"',1);
-			
-			return;
-
-		}
-*/
-	    $l = $this->models->Language->_get(array('id' => array('id'=> $language)));
-	    
-//	    die($this->models->Language->getLastQuery());
-
-	    putenv('LC_ALL='.$l[0]['language']);
-
-		if (!setlocale(LC_ALL,$l[0]['locale_lin'])) {
-
-			if (!setlocale(LC_ALL,$l[0]['locale_win'])) { 
-
-				$this->log('Failed attempt to set locale "'.$l[0]['locale_lin'].'" / "'.$l[0]['locale_win'].'"',1);
-
-				return;
-
-			}
-
-		} 
-
-		//setlocale(LC_ALL,$l[0]['locale_win']);
-		
-//die($this->getAppName());
-
-		bindtextdomain($this->getAppName(), $this->generalSettings['directories']['locale']);			
-
-		bind_textdomain_codeset($this->getAppName(), 'UTF-8');
-
-		textdomain($this->getAppName());
-		
-//		echo getText('the page');
-
-		$_SESSION['admin']['user']['currentLanguage'] = $language;
-
-	}    
 	
+	    @$this->models->TranslateMe->save(
+	    array(
+	    'id' => null,
+	    'controller' => is_null($controller) ? $this->getControllerBaseName() : $controller,
+	    'content' => $content,
+	    'env' => 'front'
+	    )
+	    );
+	     
+	}
+	
+	private function doTranslate ($content)
+	{
+	    return _($content);
+	}
 	
 	
 }
