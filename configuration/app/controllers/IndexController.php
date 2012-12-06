@@ -59,7 +59,7 @@ class IndexController extends Controller
 	public function indexAction()
 	{
 
-        $this->setPageName(_('Index: Species and lower taxa'));
+        $this->setPageName($this->translate('Index: Species and lower taxa'));
 
 		$this->setTaxonType('lower');
 
@@ -75,7 +75,7 @@ class IndexController extends Controller
     public function higherAction ()
     {
 
-        $this->setPageName(_('Index: Higher taxa'));
+        $this->setPageName($this->translate('Index: Higher taxa'));
 
 		$this->setTaxonType('higher');
 
@@ -86,7 +86,7 @@ class IndexController extends Controller
     public function commonAction ()
     {
 
-        $this->setPageName(_('Index: Common names'));
+        $this->setPageName($this->translate('Index: Common names'));
 		
 		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
 

@@ -211,12 +211,12 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
 		
-        $this->setPageName(_('Species module overview'));
+        $this->setPageName($this->translate('Species module overview'));
         
 		if (count((array)$_SESSION['admin']['project']['languages'])==0)
 			$this->addError(
 				sprintf(
-					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
+					$this->translate('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
 					'<a href="../projects/data.php">','</a>')
 				);
 
@@ -237,7 +237,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Taxon list'));
+        $this->setPageName($this->translate('Taxon list'));
 
 		unset($_SESSION['admin']['system']['activeTaxon']);
 
@@ -318,7 +318,7 @@ class SpeciesController extends Controller
 			}
 			*/
 
-			if (count((array)$taxa)==0) $this->addMessage(_('There are no taxa for you to edit.'));
+			if (count((array)$taxa)==0) $this->addMessage($this->translate('There are no taxa for you to edit.'));
 
 
 			//if (true) {
@@ -338,7 +338,7 @@ class SpeciesController extends Controller
 
 		} else {
 				
-			$this->addMessage(_('No taxa have been assigned to you.'));
+			$this->addMessage($this->translate('No taxa have been assigned to you.'));
 		
 		}
 
@@ -356,7 +356,7 @@ class SpeciesController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Define categories'));
+        $this->setPageName($this->translate('Define categories'));
         
         // adding a new page
         if ($this->rHasVal('new_page') && !$this->isFormResubmit()) {
@@ -365,7 +365,7 @@ class SpeciesController extends Controller
             
             if ($tp !== true) {
                 
-                $this->addError(_('Could not save category.'),1);
+                $this->addError($this->translate('Could not save category.'),1);
                 $this->addError('(' . $tp . ')',1);
 				
             }
@@ -442,17 +442,17 @@ class SpeciesController extends Controller
 
 		if ($this->maskAsHigherTaxa()) {
 
-			$this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($pr[$data['rank_id']]['rank']),$data['taxon']));
+			$this->setPageName(sprintf($this->translate('Editing %s "%s"'),strtolower($pr[$data['rank_id']]['rank']),$data['taxon']));
 
 		} else {
 
-			$this->setPageName(sprintf(_('Editing "%s"'),$data['taxon']));
+			$this->setPageName(sprintf($this->translate('Editing "%s"'),$data['taxon']));
 
 		}
 
 		if (count((array)$pr)==0) {
 
-			$this->addMessage(_('No ranks have been defined.'));
+			$this->addMessage($this->translate('No ranks have been defined.'));
 
 		} else
 		
@@ -494,9 +494,9 @@ class SpeciesController extends Controller
 
 							$this->reOrderTaxonTree();
 	
-							//$this->addMessage(sprintf(_('"%s" saved.'),$this->requestData['taxon']));
+							//$this->addMessage(sprintf($this->translate('"%s" saved.'),$this->requestData['taxon']));
 							
-							//$this->setPageName(sprintf(_('Editing "%s"'),$this->requestData['taxon']));
+							//$this->setPageName(sprintf($this->translate('Editing "%s"'),$this->requestData['taxon']));
 
 							//unset($data['taxon']);
 							unset($_SESSION['admin']['species']['usertaxa']);
@@ -505,19 +505,19 @@ class SpeciesController extends Controller
 		
 						} else {
 			
-							$this->addError(_('Rank cannot be hybrid.'));
+							$this->addError($this->translate('Rank cannot be hybrid.'));
 			
 						}
 		
 					} else {
 		
-						$this->addError(_('Parent cannot have child taxa.'));
+						$this->addError($this->translate('Parent cannot have child taxa.'));
 		
 					}
 	
 				} else {
 	
-					$this->addError(_('Taxon name already in database.'));
+					$this->addError($this->translate('Taxon name already in database.'));
 	
 				}
 			
@@ -537,7 +537,7 @@ class SpeciesController extends Controller
 				'id' => -1
 			));
 			
-			$this->addError(_('Taxon is already being edited by another editor.'));
+			$this->addError($this->translate('Taxon is already being edited by another editor.'));
 
 		}
 
@@ -561,13 +561,13 @@ class SpeciesController extends Controller
 
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('New taxon'));
+		$this->setPageName($this->translate('New taxon'));
 		
 		$pr = $this->newGetProjectRanks();
 	
 		if (count((array)$pr)==0) {
 
-			$this->addMessage(_('No ranks have been defined.'));
+			$this->addMessage($this->translate('No ranks have been defined.'));
 
 		} else {
 
@@ -601,12 +601,12 @@ class SpeciesController extends Controller
 				//checks
 				/* LETHAL */
 				if (!$this->isTaxonNameUnique($newName)) {
-					$this->addError(sprintf(_('The name "%s" already exists.'),$newName));
+					$this->addError(sprintf($this->translate('The name "%s" already exists.'),$newName));
 					$hasErrorButCanSave = false;
 				}
 
 				if (!$this->canParentHaveChildTaxa($this->requestData['parent_id'])  || $isEmptyTaxaList) {
-					$this->addError(_('The selected parent taxon can not have children.'));
+					$this->addError($this->translate('The selected parent taxon can not have children.'));
 					$hasErrorButCanSave = false;
 				} else {
 					
@@ -614,14 +614,14 @@ class SpeciesController extends Controller
 					$parent = $this->getTaxonById($parentId);
 	
 					if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
-						$this->addError(sprintf(_('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
+						$this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
 						$hasErrorButCanSave = false;
 					}
 					
 				}
 				
 				if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
-					$this->addError(_('Rank cannot be hybrid.'));				
+					$this->addError($this->translate('Rank cannot be hybrid.'));				
 				}				
 				
 				
@@ -629,13 +629,13 @@ class SpeciesController extends Controller
 				//http://dev2.etibioinformatics.nl/fixit/browse/LINNG-740
 				// 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
 				if (!$this->checkNameSpaces($newName,$this->requestData['rank_id'])) {
-					$this->addError(_('Only species and below can contain spaces in their names.'));
+					$this->addError($this->translate('Only species and below can contain spaces in their names.'));
 					$hasErrorButCanSave = true;
 				}
 
 				// 3. Names are written in Latin and should not contain special characters or digits.
 				if (!$this->checkCharacters($newName)) {
-					$this->addError(_('The name you specified contains invalid characters.'));
+					$this->addError($this->translate('The name you specified contains invalid characters.'));
 					$hasErrorButCanSave = true;
 				}
 
@@ -666,7 +666,7 @@ class SpeciesController extends Controller
 								
 					$this->_newGetTaxonTree();
 
-					$this->addMessage(sprintf(_('"%s" saved.'),$newName));
+					$this->addMessage(sprintf($this->translate('"%s" saved.'),$newName));
 				
 				} else {
 				
@@ -713,7 +713,7 @@ class SpeciesController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Taxon list'), 
+                'name' => $this->translate('Taxon list'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
             )
         );
@@ -734,11 +734,11 @@ class SpeciesController extends Controller
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Editing %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Editing %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Editing "%s"'),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Editing "%s"'),$taxon['taxon']));
 
 			}
 
@@ -814,7 +814,7 @@ class SpeciesController extends Controller
 					'id' => -1
 				));
 				
-				$this->addError(_('Taxon is already being edited by another editor.'));
+				$this->addError($this->translate('Taxon is already being edited by another editor.'));
 			
 			}
 
@@ -825,7 +825,7 @@ class SpeciesController extends Controller
 				'id' => -1
 			));
 				
-			$this->addError(_('No taxon ID specified.'));
+			$this->addError($this->translate('No taxon ID specified.'));
 		
 		}
 
@@ -899,7 +899,7 @@ class SpeciesController extends Controller
 	
 				$this->getTaxonTree(array('pId' => $taxon['id']));
 	
-				$this->setPageName(sprintf(_('Deleting taxon "%s"'),$taxon['taxon']));
+				$this->setPageName(sprintf($this->translate('Deleting taxon "%s"'),$taxon['taxon']));
 				
 				$pr = $this->getProjectRanks(array('idsAsIndex' => true));
 
@@ -913,7 +913,7 @@ class SpeciesController extends Controller
 		
 			} else {
 
-				$this->addError(_('Non-existant ID.'));
+				$this->addError($this->translate('Non-existant ID.'));
 
 			}
 
@@ -937,7 +937,7 @@ class SpeciesController extends Controller
 
 		$this->checkAuthorisation();
 		
-		$this->setPageName(_('Orphaned taxa'));
+		$this->setPageName($this->translate('Orphaned taxa'));
 
 		if ($this->rHasVal('child')) {
 
@@ -1015,7 +1015,7 @@ class SpeciesController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Taxon list'), 
+                'name' => $this->translate('Taxon list'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
             )
         );
@@ -1031,11 +1031,11 @@ class SpeciesController extends Controller
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Literature for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Literature for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Literature for "%s"'),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Literature for "%s"'),$taxon['taxon']));
 
 			}
 			
@@ -1075,7 +1075,7 @@ class SpeciesController extends Controller
 
         } else {
 
-            $this->addError(_('No taxon specified.'));
+            $this->addError($this->translate('No taxon specified.'));
 
         } 
         
@@ -1097,7 +1097,7 @@ class SpeciesController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Taxon list'), 
+                'name' => $this->translate('Taxon list'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
             )
         );
@@ -1111,11 +1111,11 @@ class SpeciesController extends Controller
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Media for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Media for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Media for "%s"'),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Media for "%s"'),$taxon['taxon']));
 
 			}
 						
@@ -1164,7 +1164,7 @@ class SpeciesController extends Controller
 
         } else {
 
-            $this->addError(_('No taxon specified.'));
+            $this->addError($this->translate('No taxon specified.'));
 
         } 
 
@@ -1196,7 +1196,7 @@ class SpeciesController extends Controller
 
         $this->setBreadcrumbIncludeReferer(
             array(
-                'name' => _('Taxon list'), 
+                'name' => $this->translate('Taxon list'), 
                 'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
             )
         );
@@ -1217,7 +1217,7 @@ class SpeciesController extends Controller
             
             if ($taxon['id']) {
 
-                $this->setPageName(sprintf(_('New media for "%s"'),$taxon['taxon']));
+                $this->setPageName(sprintf($this->translate('New media for "%s"'),$taxon['taxon']));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
@@ -1271,11 +1271,11 @@ class SpeciesController extends Controller
                 
                             if ($mt) {
                                  
-                                $this->addMessage(sprintf(_('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
+                                $this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
     
                             } else {
     
-                                $this->addError(_('Failed writing uploaded file to database.'),1);
+                                $this->addError($this->translate('Failed writing uploaded file to database.'),1);
     
                             }
                 
@@ -1298,7 +1298,7 @@ class SpeciesController extends Controller
     
             } else {
 
-                $this->addError(_('Unknown taxon.'));
+                $this->addError($this->translate('Unknown taxon.'));
 
             }
 
@@ -1315,7 +1315,7 @@ class SpeciesController extends Controller
 
         } else {
 
-            $this->addError(_('No taxon specified.'));
+            $this->addError($this->translate('No taxon specified.'));
 
         }        
 
@@ -1334,7 +1334,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Taxon file upload'));
+        $this->setPageName($this->translate('Taxon file upload'));
         
 		// uploaded file detected: parse csv
         if ($this->requestDataFiles) {
@@ -1416,19 +1416,19 @@ class SpeciesController extends Controller
 					if (in_array($val[0],$prevNames)) {
 					// set whether the taxon can be imported, based on whether it has duplicates in the import
 
-						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Duplicate name');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Duplicate name');
 						
 					} else
 					if ($t[0]['total']!=0) {
 					// set whether the taxon can be imported, based on whether the name already exists
 					
-						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Name already exists in the database');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Name already exists in the database');
 					
 					} else
 					if (!(isset($val[1]) && in_array(strtolower($val[1]),$d))) {
 					// set whether the taxon can be imported, based on whether it has a legal rank
 
-						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = _('Unknown rank');
+						$r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Unknown rank');
 
 					} else {
 
@@ -1476,7 +1476,7 @@ class SpeciesController extends Controller
 
 							$this->addMessage(
 								sprintf(
-									_('The taxon or taxa of the rank "%s" will be connected as child to the already existing taxon "%s".'),
+									$this->translate('The taxon or taxa of the rank "%s" will be connected as child to the already existing taxon "%s".'),
 									$upperTaxonRank,
 									$t[0]['taxon']
 									)
@@ -1488,7 +1488,7 @@ class SpeciesController extends Controller
 
 							$this->addMessage(
 								sprintf(
-									_('There are multiple possible parents of the uppermost taxon or taxa. Please choose the appropriate one.')
+									$this->translate('There are multiple possible parents of the uppermost taxon or taxa. Please choose the appropriate one.')
 									)
 								);
 
@@ -1499,7 +1499,7 @@ class SpeciesController extends Controller
 					} else {
 					
 						$this->addError(sprintf(
-							_('Uppermost taxon is not a %s, and has a rank that has no immediate parent.'),$pr[0]['rank']));
+							$this->translate('Uppermost taxon is not a %s, and has a rank that has no immediate parent.'),$pr[0]['rank']));
 
 					}
 
@@ -1647,7 +1647,7 @@ class SpeciesController extends Controller
 
                 unset($_SESSION['admin']['system']['csv_data']);
                 
-                $this->addMessage(_('Data saved.'));
+                $this->addMessage($this->translate('Data saved.'));
 
             }
 
@@ -1732,7 +1732,7 @@ class SpeciesController extends Controller
 				
 				if ($d!==true) {
 				
-					$this->smarty->assign('returnText', sprintf(_('Warning: "%s" does not exist.'),$d));
+					$this->smarty->assign('returnText', sprintf($this->translate('Warning: "%s" does not exist.'),$d));
 
 				} else {
 
@@ -1742,7 +1742,7 @@ class SpeciesController extends Controller
 
 			} else {
 
-				$this->smarty->assign('returnText', _('Taxon name already in database.'));
+				$this->smarty->assign('returnText', $this->translate('Taxon name already in database.'));
 			}
         
         } else if ($this->requestData['action'] == 'save_taxon_name') {
@@ -1825,7 +1825,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Import from Catalogue Of Life'));
+        $this->setPageName($this->translate('Import from Catalogue Of Life'));
 
         $this->printPage();
     
@@ -1842,7 +1842,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Taxonomic ranks'));
+        $this->setPageName($this->translate('Taxonomic ranks'));
 
 		$pr = $this->models->ProjectRank->_get(
 			array(
@@ -1940,7 +1940,7 @@ class SpeciesController extends Controller
 			if (isset($_SESSION['admin']['project']['ranklist'])) unset($_SESSION['admin']['project']['ranklist']);
 			if (isset($_SESSION['admin']['user']['species']['tree'])) unset($_SESSION['admin']['user']['species']['tree']);
 			
-			$this->addMessage(_('Ranks saved.'));
+			$this->addMessage($this->translate('Ranks saved.'));
 
 		}
 
@@ -1983,7 +1983,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Taxonomic ranks: labels'));
+        $this->setPageName($this->translate('Taxonomic ranks: labels'));
 
 		$pr = $this->getProjectRanks(array('includeLanguageLabels'=>true));
 
@@ -2006,7 +2006,7 @@ class SpeciesController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Define sections'));
+        $this->setPageName($this->translate('Define sections'));
 
 		if ($this->rHasVal('new') && !$this->isFormResubmit()) {
 
@@ -2074,7 +2074,7 @@ class SpeciesController extends Controller
 
 		$this->checkAuthorisation();
 
-        $this->setPageName(_('Assign taxa to collaborators'));
+        $this->setPageName($this->translate('Assign taxa to collaborators'));
 
 		if (isset($this->requestData) && !$this->isFormResubmit()) {
 
@@ -2125,7 +2125,7 @@ class SpeciesController extends Controller
 		
 		} else {
 	
-			$this->addMessage(_('No taxa have been defined.'));
+			$this->addMessage($this->translate('No taxa have been defined.'));
 	
 		}
 
@@ -2154,11 +2154,11 @@ class SpeciesController extends Controller
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Synonyms for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Synonyms for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Synonyms for "%s"'),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Synonyms for "%s"'),$taxon['taxon']));
 
 			}
 			
@@ -2166,7 +2166,7 @@ class SpeciesController extends Controller
 /*
 			$this->setBreadcrumbIncludeReferer(
 				array(
-					'name' => _('Taxon list'), 
+					'name' => $this->translate('Taxon list'), 
 					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
 				)
 			);			
@@ -2333,18 +2333,18 @@ class SpeciesController extends Controller
 
 				$ranks = $this->getProjectRanks(array('includeLanguageLabels' => true,'idsAsIndex' => true));
 
-		        $this->setPageName(sprintf(_('Common names for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Common names for %s "%s"'),strtolower($ranks[$taxon['rank_id']]['rank']),$taxon['taxon']));
 
 			} else {
 
-		        $this->setPageName(sprintf(_('Common names for "%s"'),$taxon['taxon']));
+		        $this->setPageName(sprintf($this->translate('Common names for "%s"'),$taxon['taxon']));
 
 			}
 
 /*
 			$this->setBreadcrumbIncludeReferer(
 				array(
-					'name' => _('Taxon list'), 
+					'name' => $this->translate('Taxon list'), 
 					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
 				)
 			);
@@ -2611,7 +2611,7 @@ class SpeciesController extends Controller
 
             if ($tp[0]['total']==0) {
 
-                if ($this->createTaxonCategory(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+                if ($this->createTaxonCategory($this->translate($page['name']), $key, isset($page['default']) && $page['default'])) {
 
 	                $this->createTaxonCategorySections($page['sections'],  $this->models->PageTaxon->getNewId());
 	
@@ -2633,7 +2633,7 @@ class SpeciesController extends Controller
 
                     if ($d[0]['total']==0) {
         
-                        if ($this->createTaxonCategory(_($page['name']), $key, isset($page['default']) && $page['default'])) {
+                        if ($this->createTaxonCategory($this->translate($page['name']), $key, isset($page['default']) && $page['default'])) {
 
 							$this->createTaxonCategorySections($page['sections'],  $this->models->PageTaxon->getNewId());
 			
@@ -3002,27 +3002,27 @@ class SpeciesController extends Controller
                                             
                     } else {
                         
-                        $this->addError(_('Could not save taxon content.'));
+                        $this->addError($this->translate('Could not save taxon content.'));
                     
                     }
                 
                 }
                 else {
                     
-                    $this->addError(_('No page title specified.'));
+                    $this->addError($this->translate('No page title specified.'));
                 
                 }
             
             }
             else {
                 
-                $this->addError(_('No language specified.'));
+                $this->addError($this->translate('No language specified.'));
             
             }
         
         } else {
             
-            $this->addError(_('Could not save taxon.'));
+            $this->addError($this->translate('Could not save taxon.'));
         
         }
         
@@ -3293,7 +3293,7 @@ class SpeciesController extends Controller
 			!$this->rHasVal('page') || 
 			!$this->rHasVal('state')) {
             
-            $this->smarty->assign('returnText', _('Parameters incomplete.'));
+            $this->smarty->assign('returnText', $this->translate('Parameters incomplete.'));
         
         } else {
             
@@ -3328,13 +3328,13 @@ class SpeciesController extends Controller
                 
                 } else {
                     
-                    $this->smarty->assign('returnText', _('Could not save new publish state.'));
+                    $this->smarty->assign('returnText', $this->translate('Could not save new publish state.'));
                 
                 }
             
             } else {
                 
-                $this->smarty->assign('returnText', _('Content not found.'));
+                $this->smarty->assign('returnText', $this->translate('Content not found.'));
             
             }
         
@@ -3861,7 +3861,7 @@ class SpeciesController extends Controller
 
             } else {
             
-                if ($output) $this->addError(sprintf(_('Could not delete file: %s'),$mt[0]['file_name']));
+                if ($output) $this->addError(sprintf($this->translate('Could not delete file: %s'),$mt[0]['file_name']));
         
             }
     
@@ -4539,7 +4539,7 @@ class SpeciesController extends Controller
 				$l2[] = array(
 					'id' => $val['taxon_id'],
 					'label' => $val['commonname'],
-					'source' => _('common name')
+					'source' => $this->translate('common name')
 				);
 
 		}
@@ -4550,7 +4550,7 @@ class SpeciesController extends Controller
 				$l2[] = array(
 					'id' => $val['taxon_id'],
 					'label' => $val['synonym'],
-					'source' => _('synonym')
+					'source' => $this->translate('synonym')
 				);
 
 		}

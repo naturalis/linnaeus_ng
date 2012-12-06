@@ -157,7 +157,7 @@ class ImportController extends Controller
 
 		error_reporting(E_ERROR | E_PARSE);
 		
-		$this->setBreadcrumbRootName(_('Linnaeus 2 import'));
+		$this->setBreadcrumbRootName($this->translate('Linnaeus 2 import'));
         
 		$this->setSuppressProjectInBreadcrumbs();
 
@@ -183,7 +183,7 @@ class ImportController extends Controller
     public function indexAction()
     {
     
-        $this->setPageName(_('Data import options'));
+        $this->setPageName($this->translate('Data import options'));
 
         $this->printPage();
     
@@ -194,7 +194,7 @@ class ImportController extends Controller
 
 		if ($this->rHasVal('process','1')) $this->redirect('l2_project.php');
 
-        $this->setPageName(_('Choose file'));
+        $this->setPageName($this->translate('Choose file'));
 		
 		$this->setSuppressProjectInBreadcrumbs();
 
@@ -322,7 +322,7 @@ class ImportController extends Controller
 		
 		if (!isset($_SESSION['admin']['system']['import']['file']['path'])) $this->redirect('l2_start.php');
 
-        $this->setPageName(_('Creating project'));
+        $this->setPageName($this->translate('Creating project'));
 		
 		$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
@@ -418,7 +418,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Species and ranks for "'.$project['title'].'"'));
+        $this->setPageName($this->translate('Species and ranks for "'.$project['title'].'"'));
 
 		$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
 
@@ -492,7 +492,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Additional species data for "'.$project['title'].'"'));
+        $this->setPageName($this->translate('Additional species data for "'.$project['title'].'"'));
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -681,7 +681,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Literature and glossary for "'.$project['title'].'"'));
+        $this->setPageName($this->translate('Literature and glossary for "'.$project['title'].'"'));
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -801,7 +801,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Additional content for "'.$project['title'].'"'));
+        $this->setPageName($this->translate('Additional content for "'.$project['title'].'"'));
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -907,7 +907,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-        $this->setPageName(_('Keys for "'.$project['title'].'"'));
+        $this->setPageName($this->translate('Keys for "'.$project['title'].'"'));
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 
@@ -1052,7 +1052,7 @@ class ImportController extends Controller
 	
 		$project = $this->getProjects($this->getNewProjectId());
 	
-		$this->setPageName(_('Map data for "'.$project['title'].'"'));
+		$this->setPageName($this->translate('Map data for "'.$project['title'].'"'));
 	
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 	
@@ -1146,7 +1146,7 @@ class ImportController extends Controller
 
 		$project = $this->getProjects($this->getNewProjectId());
 
-		$this->setPageName(_('Additional data for "'.$project['title'].'"'));
+		$this->setPageName($this->translate('Additional data for "'.$project['title'].'"'));
 
 		if ($this->rHasVal('process','1') && !$this->isFormResubmit()) {
 	

@@ -116,7 +116,7 @@ class GlossaryController extends Controller
 
 				$letter = strtolower(substr($term['term'],0,1));
 
-				$this->setPageName(sprintf(_('Glossary: "%s"'),$term['term']));
+				$this->setPageName(sprintf($this->translate('Glossary: "%s"'),$term['term']));
 
 			}
 

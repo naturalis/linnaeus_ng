@@ -78,7 +78,7 @@ class LinnaeusController extends Controller
 
 		if (!$this->getCurrentProjectId()) {
 
-			$this->addError(_('Unknown project or invalid project ID.'));
+			$this->addError($this->translate('Unknown project or invalid project ID.'));
 
 	        $this->printPage();
 
@@ -144,7 +144,7 @@ class LinnaeusController extends Controller
 
 		}
 
-		$this->setPageName(_($d['subject']));
+		$this->setPageName($this->translate($d['subject']));
 
 		$this->smarty->assign('subject',$this->matchHotwords($this->matchGlossaryTerms($d['subject'])));
 		$this->smarty->assign('content',$this->matchHotwords($this->matchGlossaryTerms($d['content'])));

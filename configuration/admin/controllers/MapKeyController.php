@@ -97,7 +97,7 @@ class MapKeyController extends Controller
 
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Choose a species'));
+		$this->setPageName($this->translate('Choose a species'));
 
 		$this->getTaxonTree();
 		
@@ -138,7 +138,7 @@ class MapKeyController extends Controller
 		
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
-		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('"%s"'),$taxon['taxon']));
 
 		if ($this->rHasId() && $isOnline) {
 		
@@ -177,7 +177,7 @@ class MapKeyController extends Controller
 		
 		$taxon = $this->getTaxonById($this->requestData['id']);
 		
-        $this->setPageName(sprintf(_('Edit data for "%s"'),$taxon['taxon']));
+        $this->setPageName(sprintf($this->translate('Edit data for "%s"'),$taxon['taxon']));
 		
 		$saved = 0;
 		
@@ -283,11 +283,11 @@ class MapKeyController extends Controller
 
 		if ($this->rHasId()) {
 
-			$this->setPageName(_('Choose an occurrence'));
+			$this->setPageName($this->translate('Choose an occurrence'));
 	
 			$this->setBreadcrumbIncludeReferer(
 				array(
-					'name' => _('Choose a species'), 
+					'name' => $this->translate('Choose a species'), 
 					'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/species_select.php'
 				)
 			);
@@ -319,7 +319,7 @@ class MapKeyController extends Controller
 	
 		$this->checkAuthorisation();
 		
-		$this->setPageName(_('Data types'));
+		$this->setPageName($this->translate('Data types'));
 
 		$lp = $_SESSION['admin']['project']['languages'];
 		
@@ -418,7 +418,7 @@ class MapKeyController extends Controller
 
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Occurrence file upload'));
+		$this->setPageName($this->translate('Occurrence file upload'));
 
 		if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
@@ -486,7 +486,7 @@ class MapKeyController extends Controller
 											
 												$this->addMessage(
 													sprintf(
-														_('Row %s: saved marker for "%s".'),
+														$this->translate('Row %s: saved marker for "%s".'),
 														$line,
 														$val[1]
 													)
@@ -498,7 +498,7 @@ class MapKeyController extends Controller
 	
 												$this->addError(
 													sprintf(
-														_('Row %s: unable to save marker for "%s". Duplicate?'),
+														$this->translate('Row %s: unable to save marker for "%s". Duplicate?'),
 														$line,
 														$val[1]
 													)
@@ -510,10 +510,10 @@ class MapKeyController extends Controller
 										
 											$this->addError(
 												sprintf(
-													_('Row %s: marker for "%s" misses %s.'),
+													$this->translate('Row %s: marker for "%s" misses %s.'),
 													$line,
 													$val[1],
-													(empty($val[3]) ? _('latitude') : _('longitude') )
+													(empty($val[3]) ? $this->translate('latitude') : $this->translate('longitude') )
 												)
 											);
 										
@@ -541,7 +541,7 @@ class MapKeyController extends Controller
 												
 													$this->addError(
 														sprintf(
-															_('Row %s: polygon node for "%s" misses longitude'),
+															$this->translate('Row %s: polygon node for "%s" misses longitude'),
 															$line,
 															$val[1]
 														)
@@ -576,7 +576,7 @@ class MapKeyController extends Controller
 											
 												$this->addMessage(
 													sprintf(
-														_('Row %s: saved polygon for "%s".'),
+														$this->translate('Row %s: saved polygon for "%s".'),
 														$line,
 														$val[1]
 													)
@@ -588,7 +588,7 @@ class MapKeyController extends Controller
 	
 												$this->addError(
 													sprintf(
-														_('Row %s: unable to save polygon for "%s". Duplicate?'),
+														$this->translate('Row %s: unable to save polygon for "%s". Duplicate?'),
 														$line,
 														$val[1]
 													)
@@ -607,7 +607,7 @@ class MapKeyController extends Controller
 								
 									$this->addError(
 										sprintf(
-											_('Row %s: mismatch for taxa %s: "%s" (file) <=> "%s" (database)'),
+											$this->translate('Row %s: mismatch for taxa %s: "%s" (file) <=> "%s" (database)'),
 											$line,
 											$taxonId,
 											$val[1],
@@ -619,13 +619,13 @@ class MapKeyController extends Controller
 							
 							} else {
 
-								$this->addError(sprintf(_('Row %s: unknown data type ID %s'),$line,$geodataTypeId));
+								$this->addError(sprintf($this->translate('Row %s: unknown data type ID %s'),$line,$geodataTypeId));
 
 							}
 	
 						} else {
 						
-							$this->addError(sprintf(_('Row %s: unknown taxon ID %s'),$line,$taxonId));
+							$this->addError(sprintf($this->translate('Row %s: unknown taxon ID %s'),$line,$taxonId));
 						
 						}
 					
@@ -639,7 +639,7 @@ class MapKeyController extends Controller
 				
 				if ($saved==0 && count((array)$this->getErrors())==0) {
 
-					$this->addMessage(_('No data to process. Please check that your data is complete and that you are using the field delimiter you have specified above.'));
+					$this->addMessage($this->translate('No data to process. Please check that your data is complete and that you are using the field delimiter you have specified above.'));
 
 				}
 			
@@ -692,7 +692,7 @@ class MapKeyController extends Controller
 
 		$taxon = $this->treeList[$this->requestData['id']];
 	
-		$this->setPageName(sprintf(_('Copy occurrences from "%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('Copy occurrences from "%s"'),$taxon['taxon']));
 
 		$taxa = array();
 		
@@ -715,7 +715,7 @@ class MapKeyController extends Controller
 
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Management'));
+		$this->setPageName($this->translate('Management'));
 
 		$this->printPage();
 		
@@ -741,7 +741,7 @@ class MapKeyController extends Controller
 		
 		$this->smarty->assign('maptype',$this->getSetting('maptype'));
 
-		$this->setPageName(_('Set runtime map type'));
+		$this->setPageName($this->translate('Set runtime map type'));
 
 		$this->printPage();
 		
@@ -780,7 +780,7 @@ class MapKeyController extends Controller
 				)
 			);
 
-			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+			$this->smarty->assign('returnText',$d ? $this->translate('saved') : $this->translate('could not save'));
 
         } else
         if ($this->requestData['action'] == 'get_type_labels') {
@@ -797,7 +797,7 @@ class MapKeyController extends Controller
 				)
 			);
 
-			$this->smarty->assign('returnText',$d ? _('saved') : _('could not save'));
+			$this->smarty->assign('returnText',$d ? $this->translate('saved') : $this->translate('could not save'));
 
         } else
         if ($this->requestData['action'] == 'get_type_colours') {
@@ -1013,7 +1013,7 @@ class MapKeyController extends Controller
 				$l[] = array(
 					'id' => $val['id'],
 					'label' => $val['taxon'],
-					'source' => _('species')
+					'source' => $this->translate('species')
 				);
 
 		}
@@ -1038,7 +1038,7 @@ class MapKeyController extends Controller
 		$title = isset($params['title']) ? $params['title'] : null;
 		$type_id = isset($params['type_id']) ? $params['type_id'] : null;
 
-		if ($languageId==null || $type_id==null) return _('Insufficient data.');
+		if ($languageId==null || $type_id==null) return $this->translate('Insufficient data.');
 
 		if (empty($params['title'])) {
 
@@ -1110,7 +1110,7 @@ class MapKeyController extends Controller
 			)
 		);
 
-		if ($gtt[0]['total']>0) return _('A data type with that name already exists.');
+		if ($gtt[0]['total']>0) return $this->translate('A data type with that name already exists.');
 
 		$this->models->GeodataType->save(
 			array(
@@ -1416,7 +1416,7 @@ class MapKeyController extends Controller
 
 		if ($t[0]['total']>0) return;
 
-		$tp = $this->createGeodataType(_('Type locality'),$this->getDefaultProjectLanguage(),'marker');
+		$tp = $this->createGeodataType($this->translate('Type locality'),$this->getDefaultProjectLanguage(),'marker');
 
 	}
 
@@ -1490,7 +1490,7 @@ class MapKeyController extends Controller
 
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
-		$this->setPageName(sprintf(_('"%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('"%s"'),$taxon['taxon']));
 
 		if (!$this->rHasVal('mapId'))
 			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
@@ -1532,13 +1532,13 @@ class MapKeyController extends Controller
 
 		$this->checkAuthorisation();
         
-        $this->setPageName( _('Store compacted Linnaeus 2 data'));
+        $this->setPageName( $this->translate('Store compacted Linnaeus 2 data'));
 		
 		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
 
 			$this->l2MakeCompactData();
 			
-			$this->addMessage(_('Compacted data saved'));
+			$this->addMessage($this->translate('Compacted data saved'));
 
 		}
 

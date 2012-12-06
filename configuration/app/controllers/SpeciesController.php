@@ -76,7 +76,7 @@ class SpeciesController extends Controller
     public function indexAction ()
     {
 
-		$this->setPageName(_('Species module index'));
+		$this->setPageName($this->translate('Species module index'));
 
 		$this->setTaxonType('lower');
 
@@ -94,7 +94,7 @@ class SpeciesController extends Controller
 	public function higherSpeciesIndexAction()
 	{
 
-		$this->setPageName(_('Higher taxa index'));
+		$this->setPageName($this->translate('Higher taxa index'));
 
 		$this->setTaxonType('higher');
 
@@ -162,14 +162,14 @@ class SpeciesController extends Controller
 
 			if ($taxon['lower_taxon']==1) {
 
-				$this->setPageName(sprintf(_('Species module: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
+				$this->setPageName(sprintf($this->translate('Species module: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
 
 				$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
 
 
 			} else {
 
-				$this->setPageName(sprintf(_('Higher taxa: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
+				$this->setPageName(sprintf($this->translate('Higher taxa: "%s" (%s)'),$taxon['label'],$this->getCategoryName($activeCategory)));
 
 			}
 
@@ -196,7 +196,7 @@ class SpeciesController extends Controller
 					'title' =>
 						$taxon['label'].
 						($taxon['is_hybrid']=='1' ?
-							'<span class="hybrid-marker" title="'._('hybrid').'">'.
+							'<span class="hybrid-marker" title="'.$this->translate('hybrid').'">'.
 							(isset($_SESSION['app']['project']['hybrid_marker']) ? $_SESSION['app']['project']['hybrid_marker'] : 'X').
 							'</span>'
 							: ''
@@ -208,7 +208,7 @@ class SpeciesController extends Controller
 
 		} else {
 
-			$this->addError(_('No taxon ID specified.'));
+			$this->addError($this->translate('No taxon ID specified.'));
 
 			$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
 
@@ -382,13 +382,13 @@ class SpeciesController extends Controller
 
 			$stdCats[] = array(
 					'id' => 'media',
-					'title' => _('Media'),
+					'title' => $this->translate('Media'),
 					'is_empty' => (count((array)$m)>0 ? 0 : 1)
 			);
 
 			$stdCats[] = array(
 				'id' => 'classification',
-				'title' => _('Classification'),
+				'title' => $this->translate('Classification'),
 				'is_empty' => 0
 			);
 
@@ -396,7 +396,7 @@ class SpeciesController extends Controller
 
 			$stdCats[] = array(
 				'id' => 'names',
-				'title' => _('Names'),
+				'title' => $this->translate('Names'),
 				'is_empty' => (count((array)$n['synonyms'])==0 && count((array)$n['common'])==0 ? 1 : 0)
 			);
 			
@@ -406,7 +406,7 @@ class SpeciesController extends Controller
 //print_r($l); die();				
 				$stdCats[] = array(
 					'id' => 'literature',
-					'title' => _('Literature'),
+					'title' => $this->translate('Literature'),
 					'is_empty' => (count((array)$l)>0 ? 0 : 1)
 				);
 

@@ -248,7 +248,7 @@ class SearchController extends Controller
 
 			} else {
 			
-				$this->addMessage(sprintf(_('Search term too short. Minimum is %s characters.'),$this->controllerSettings['minimumSearchStringLength']));
+				$this->addMessage(sprintf($this->translate('Search term too short. Minimum is %s characters.'),$this->controllerSettings['minimumSearchStringLength']));
 				
 				return null;
 			
@@ -526,7 +526,7 @@ class SearchController extends Controller
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));
 			$d[$key]['language'] = $l['language'];
 			if (isset($taxa[$val['taxon_id']]['label']))
-				$d[$key]['post_script'] = sprintf(_('(common name of %s)'),$taxa[$val['taxon_id']]['label']);
+				$d[$key]['post_script'] = sprintf($this->translate('(common name of %s)'),$taxa[$val['taxon_id']]['label']);
 
 		}
 
@@ -637,32 +637,32 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Higher taxa'),
+					'label' => $this->translate('Higher taxa'),
 					'data' => $higherTaxa,
 					'numOfResults' => count((array)$higherTaxa)
 				),
 				array(
-					'label' => _('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
 					'data' => $species, //$taxa,
 					'numOfResults' => count((array)$species)//count((array)$taxa)
 				),
 				array(
-					'label' => _('Species descriptions'),
+					'label' => $this->translate('Species descriptions'),
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				),
 				array(
-					'label' => _('Species synonyms'),
+					'label' => $this->translate('Species synonyms'),
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
-					'label' => _('Species common names'),
+					'label' => $this->translate('Species common names'),
 					'data' => $commonnames,
 					'numOfResults' => count((array)$commonnames)
 				),
 				array(
-					'label' => _('Species media'),
+					'label' => $this->translate('Species media'),
 					'data' => $media,
 					'numOfResults' => count((array)$media)
 				),
@@ -843,17 +843,17 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Glossary terms'),
+					'label' => $this->translate('Glossary terms'),
 					'data' => $gloss,
 					'numOfResults' => count((array)$gloss)
 				),
 				array(
-					'label' => _('Glossary synonyms'),
+					'label' => $this->translate('Glossary synonyms'),
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
-					'label' => _('Glossary media'),
+					'label' => $this->translate('Glossary media'),
 					'data' => $media,
 					'numOfResults' => count((array)$media)
 				)
@@ -950,7 +950,7 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Literary references'),
+					'label' => $this->translate('Literary references'),
 					'data' => $books,
 					'numOfResults' => count((array)$books)
 				)
@@ -1115,12 +1115,12 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Dichotomous key steps'),
+					'label' => $this->translate('Dichotomous key steps'),
 					'data' => $steps,
 					'numOfResults' => count((array)$steps)
 				),
 				array(
-					'label' => _('Dichotomous key choices'),
+					'label' => $this->translate('Dichotomous key choices'),
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
 				)
@@ -1266,17 +1266,17 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Matrix key matrices'),
+					'label' => $this->translate('Matrix key matrices'),
 					'data' => $matrices,
 					'numOfResults' => count((array)$matrices)
 				),
 				array(
-					'label' => _('Matrix key characters'),
+					'label' => $this->translate('Matrix key characters'),
 					'data' => $characteristics,
 					'numOfResults' => count((array)$characteristics)
 				),
 				array(
-					'label' => _('Matrix key states'),
+					'label' => $this->translate('Matrix key states'),
 					'data' => $states,
 					'numOfResults' => count((array)$states)
 				)
@@ -1327,7 +1327,7 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('geographical data'),
+					'label' => $this->translate('geographical data'),
 					'data' => (isset($geo) ? $geo : null),
 					'numOfResults' => (isset($geo) ? count((array)$geo) : 0)
 				),
@@ -1396,7 +1396,7 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => _('Navigator'),
+					'label' => $this->translate('Navigator'),
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				)

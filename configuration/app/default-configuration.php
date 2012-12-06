@@ -93,6 +93,7 @@ class configuration
 				'module:topic' => '../../../admin/views/module/index.php?page=%s&freeId=%s',
 				'linnaeus:content' => '../../../admin/views/content/content.php?page=%s&freeId=%s',
 				'mapkey:examine_species' => '../../../admin/views/mapkey/species_edit.php?id=%s',
+				'mapkey:l2_examine_species' => '../../../admin/views/mapkey/choose_species.php',
 				'matrixkey:identify' => '../../../admin/views/matrixkey/index.php?id=%s',
 				'key:index' => '../../../admin/views/key/step_show.php?id=%s',
 			),

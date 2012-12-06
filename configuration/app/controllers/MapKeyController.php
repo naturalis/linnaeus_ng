@@ -139,7 +139,7 @@ class MapKeyController extends Controller
 
 		if ($this->_mapType=='l2') $this->redirect('l2_examine.php');
 
-		$this->setPageName(_('Choose a species'));
+		$this->setPageName($this->translate('Choose a species'));
 		
 		$pagination = $this->getPagination($this->getTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
 
@@ -156,7 +156,7 @@ class MapKeyController extends Controller
 	public function l2ExamineAction()
 	{
 
-		$this->setPageName(_('Choose a species'));
+		$this->setPageName($this->translate('Choose a species'));
 		
 		$pagination = $this->getPagination($this->l2GetTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
 
@@ -179,7 +179,7 @@ class MapKeyController extends Controller
 
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
-		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('Displaying "%s"'),$taxon['taxon']));
 
 		$d = $this->getTaxonOccurrences($taxon['id'],$this->rHasVal('o') ? $this->requestData['o'] : null);
 
@@ -212,7 +212,7 @@ class MapKeyController extends Controller
 			
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
-		$this->setPageName(sprintf(_('Displaying "%s"'),$taxon['taxon']));
+		$this->setPageName(sprintf($this->translate('Displaying "%s"'),$taxon['taxon']));
 
 		if (!$this->rHasVal('m')) {
 
@@ -293,13 +293,13 @@ class MapKeyController extends Controller
 
 		}
 
-		$this->setPageName(_('Comparing taxa'));
+		$this->setPageName($this->translate('Comparing taxa'));
 
 		if ($this->rHasVal('idA') && $this->rHasVal('idB')) {
 		
 			$overlap = $this->getOverlap($this->requestData['idA'],$this->requestData['idB']);
 	
-			$this->setPageName(sprintf(_('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
+			$this->setPageName(sprintf($this->translate('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
 
 		}
 
@@ -332,7 +332,7 @@ class MapKeyController extends Controller
 	public function L2CompareAction()
 	{
 
-		$this->setPageName(_('Comparing taxa'));
+		$this->setPageName($this->translate('Comparing taxa'));
 
 		$maps = $this->l2GetMaps();
 
@@ -378,7 +378,7 @@ class MapKeyController extends Controller
 				$this->rHasVal('selectedDataTypes') ? $this->requestData['selectedDataTypes'] : null
 			);
 	
-			$this->setPageName(sprintf(_('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
+			$this->setPageName(sprintf($this->translate('Comparing taxa "%s" and "%s"'),$taxonA['taxon'],$taxonB['taxon']));
 
 		
 		// Ruud 14-09-12: set values for Taxon A and B if not yet entered
@@ -423,7 +423,7 @@ class MapKeyController extends Controller
 
 		if ($this->_mapType=='l2') $this->redirect('l2_search.php'.($this->rHasVal('mapId') ? '?mapId='.$this->requestData['mapId'] : '' ));
 
-		$this->setPageName(_('Search'));
+		$this->setPageName($this->translate('Search'));
 
 		if ($this->rHasVal('coordinates')) {
 
@@ -469,7 +469,7 @@ class MapKeyController extends Controller
 	public function l2SearchAction()
 	{
 
-		$this->setPageName(_('Search'));
+		$this->setPageName($this->translate('Search'));
 		
 		$maps = $this->l2GetMaps();
 
@@ -572,7 +572,7 @@ class MapKeyController extends Controller
 
 		if ($this->_mapType=='l2') $this->redirect('l2_diversity.php');
 	
-		$this->setPageName(_('Diversity index'));
+		$this->setPageName($this->translate('Diversity index'));
 
 		$data = $this->getDiversityIndex();
 
@@ -593,7 +593,7 @@ class MapKeyController extends Controller
 	public function l2DiversityAction()
 	{
 	
-		$this->setPageName(sprintf(_('Diversity index')));
+		$this->setPageName(sprintf($this->translate('Diversity index')));
 		
 		$maps = $this->l2GetMaps();
 

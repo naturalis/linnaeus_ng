@@ -73,7 +73,9 @@ class KeyController extends Controller
     public function indexAction()
     {
 
-        $this->setPageName( _('Index'));
+    	$q = $this->getKeyTree();
+    	
+        $this->setPageName( $this->translate('Index'));
 		
 		// set the stored key tree (= compact hierarchical representation of the entire key)
 		$this->getKeyTree();
@@ -165,7 +167,7 @@ class KeyController extends Controller
 
 		$this->smarty->assign('excluded',$taxa['excluded']);
 
-		$this->setPageName(sprintf(_('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
+		$this->setPageName(sprintf($this->translate('Dichotomous key: step %s: "%s"'),$step['number'],$step['title']));
 		
 		$this->setCurrentKeyStepId($step['id']);
  
@@ -962,7 +964,7 @@ class KeyController extends Controller
 			array(
 				'id' => $branch['id'],
 				//'label' => $branch['number'].'. '.$branch['title'],
-				'label' => _('Step').' '.$branch['number'].(!empty($branch['title']) && $branch['title']!=$branch['number'] ? ': '.$branch['title'] : ''),
+				'label' => $this->translate('Step').' '.$branch['number'].(!empty($branch['title']) && $branch['title']!=$branch['number'] ? ': '.$branch['title'] : ''),
 				'number' => (int)$branch['number'],
 			);
 

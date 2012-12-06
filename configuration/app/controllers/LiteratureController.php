@@ -91,7 +91,7 @@ class LiteratureController extends Controller
 
 			$refs = $this->getReferences(array('author_first like' => $this->requestData['letter'].'%'));
 
-			$this->setPageName(sprintf(_('Literature Index: %s'),strtoupper($this->requestData['letter'])));
+			$this->setPageName(sprintf($this->translate('Literature Index: %s'),strtoupper($this->requestData['letter'])));
 
 		}
 
@@ -121,7 +121,7 @@ class LiteratureController extends Controller
 
 			$letter = strtolower(substr($ref['author_first'],0,1));
 
-			$this->setPageName(sprintf(_('Literature: "%s"'),$ref['author_full'].' ('.$ref['year'].')'));
+			$this->setPageName(sprintf($this->translate('Literature: "%s"'),$ref['author_full'].' ('.$ref['year'].')'));
 
 		} else {
 		

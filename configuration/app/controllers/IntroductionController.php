@@ -94,7 +94,7 @@ class IntroductionController extends Controller
 
 		if (!$this->rHasId()) {
 
-			$this->addError(_('No page ID specified.'));
+			$this->addError($this->translate('No page ID specified.'));
 
 		} else {
 
@@ -126,7 +126,7 @@ class IntroductionController extends Controller
 
 		$refs = $this->getPageHeaders();
 	
-		$this->setPageName(_('Introduction contents'));
+		$this->setPageName($this->translate('Introduction contents'));
 		
 		if (isset($refs)) $this->smarty->assign('refs',$refs);
 	

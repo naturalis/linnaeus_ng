@@ -81,7 +81,7 @@ class UsersController extends Controller
 
         }
 
-        $this->setPageName(_('Login'));
+        $this->setPageName($this->translate('Login'));
        
         $this->smarty->assign('excludeLogout', true);
 
@@ -104,7 +104,7 @@ class UsersController extends Controller
             if (count((array) $users) != 1) {
             // no user found
                 
-                $this->addError(_('Login failed.'));
+                $this->addError($this->translate('Login failed.'));
 
             } else {
             // user found
@@ -131,7 +131,7 @@ class UsersController extends Controller
     public function logoutAction ()
     {
         
-        $this->setPageName(_('Logout'));
+        $this->setPageName($this->translate('Logout'));
         
         $this->destroyUserSession();
         
@@ -151,7 +151,7 @@ class UsersController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName(_('Select a project to work on'));
+        $this->setPageName($this->translate('Select a project to work on'));
 		
 		$this->includeLocalMenu = false;
         
@@ -204,7 +204,7 @@ class UsersController extends Controller
 
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Create new collaborator'));
+        $this->setPageName($this->translate('Create new collaborator'));
 
         if ($this->rHasVal('action','create') && !$this->isFormResubmit()) {
 
@@ -231,7 +231,7 @@ class UsersController extends Controller
 
 				} else {
 
-					$this->addError(_('Failed to save user ('.$d.').'));	
+					$this->addError($this->translate('Failed to save user ('.$d.').'));	
 				
 				}
 				
@@ -280,7 +280,7 @@ class UsersController extends Controller
         
         $this->checkAuthorisation();
         
-        $this->setPageName(_('Project collaborator overview'));
+        $this->setPageName($this->translate('Project collaborator overview'));
         
         // get all collaborators for the current project
         $pru = $this->models->ProjectRoleUser->_get(
@@ -291,7 +291,7 @@ class UsersController extends Controller
 				),
 				'columns' => 'distinct user_id, role_id,
 					if(active=1,"active","blocked") as status,
-					concat(datediff(curdate(),created)," '._('days').'") as days_active,
+					concat(datediff(curdate(),created)," '.$this->translate('days').'") as days_active,
 					ifnull(date_format(last_project_select,\'%d-%m-%Y\'),"-") as last_login'
 			)
 		);
@@ -345,13 +345,13 @@ class UsersController extends Controller
 
         $this->smarty->assign('columnsToShow',
             array(
-                array('name'=> 'first_name', 'label' => _('first name'),'align' => 'left'),
-                array('name'=> 'last_name', 'label' => _('last name'),'align' => 'left'),
-                array('name'=> 'username', 'label' => _('username'),'align' => 'left'),
-                array('name'=> 'email_address', 'label' => _('e-mail'),'align' => 'left'),
-                array('name'=> 'role', 'label'  => _('role'),'align' => 'left'),
-                array('name'=> 'last_login', 'label'  => _('last access'),'align' => 'right'),
-                array('name'=> 'status', 'label' => _('status'),'align' => 'left'),
+                array('name'=> 'first_name', 'label' => $this->translate('first name'),'align' => 'left'),
+                array('name'=> 'last_name', 'label' => $this->translate('last name'),'align' => 'left'),
+                array('name'=> 'username', 'label' => $this->translate('username'),'align' => 'left'),
+                array('name'=> 'email_address', 'label' => $this->translate('e-mail'),'align' => 'left'),
+                array('name'=> 'role', 'label'  => $this->translate('role'),'align' => 'left'),
+                array('name'=> 'last_login', 'label'  => $this->translate('last access'),'align' => 'right'),
+                array('name'=> 'status', 'label' => $this->translate('status'),'align' => 'left'),
             )
         );
 
@@ -370,9 +370,9 @@ class UsersController extends Controller
         
 		$this->checkAuthorisation(true);
 		
-		if ($this->getCurrentProjectId()==null) $this->setBreadcrumbRootName(_('System administration'));
+		if ($this->getCurrentProjectId()==null) $this->setBreadcrumbRootName($this->translate('System administration'));
         
-        $this->setPageName(_('All users'));
+        $this->setPageName($this->translate('All users'));
         
 		$users = $this->models->User->_get(array('id'=>'*','order' => 'last_name,first_name'));
         
@@ -419,7 +419,7 @@ class UsersController extends Controller
         
         $this->checkAuthorisation($this->isCurrentUserSysAdmin());
         
-        $this->setPageName(_('Project collaborator data'));
+        $this->setPageName($this->translate('Project collaborator data'));
 
 		if ($this->rHasId()) {
 
@@ -544,15 +544,15 @@ class UsersController extends Controller
 
 				} else {
 
-					$this->addMessage(_('User removed from current project.'));
-					$this->addError(_('User could not be deleted, as he is active in other project(s).'));
+					$this->addMessage($this->translate('User removed from current project.'));
+					$this->addError($this->translate('User could not be deleted, as he is active in other project(s).'));
 
 				}
 
 			} else {
 
-				//$this->addError(_('User can only be deleted by system admin or user record\'s creator.'));
-				$this->addError(_('User can only be deleted by system admin.'));
+				//$this->addError($this->translate('User can only be deleted by system admin or user record\'s creator.'));
+				$this->addError($this->translate('User can only be deleted by system admin.'));
 
 			}
 		
@@ -577,13 +577,13 @@ class UsersController extends Controller
 
         $this->checkAuthorisation();
         
-		$this->setPageName(_('Edit project collaborator'));
+		$this->setPageName($this->translate('Edit project collaborator'));
 
 		if ($this->getCurrentUserRoleId() != ID_ROLE_SYS_ADMIN &&
 			$this->getCurrentUserRoleId() != ID_ROLE_LEAD_EXPERT && 
 			$this->getCurrentUserId() != $this->requestData['id']) {
 			
-			$this->addError(_('You are not authorized to edit that user.'));
+			$this->addError($this->translate('You are not authorized to edit that user.'));
 
 		} else {
 
@@ -648,7 +648,7 @@ class UsersController extends Controller
 					
 					//$this->requestData['active'] = $d;
 					
-					$this->addMessage(_('User data saved'));
+					$this->addMessage($this->translate('User data saved'));
 					
 					$user = $this->getUser($this->requestData['id']);
 					
@@ -739,7 +739,7 @@ class UsersController extends Controller
     public function passwordAction ()
     {
 
-        $this->setPageName(_('Reset password'));
+        $this->setPageName($this->translate('Reset password'));
 
 		if ($this->rHasVal('email') && !$this->isFormResubmit()) {
 
@@ -765,11 +765,11 @@ class UsersController extends Controller
 					)
 				);
 
-				$this->addMessage(_('Your password has been reset. An e-mail with a new password has been sent to you.'));
+				$this->addMessage($this->translate('Your password has been reset. An e-mail with a new password has been sent to you.'));
 
 			} else {
 
-				$this->addError(_('Invalid or unknown e-mail address.'));
+				$this->addError($this->translate('Invalid or unknown e-mail address.'));
 
 			}
 
@@ -831,13 +831,13 @@ class UsersController extends Controller
 
 			} else {
 	
-				$this->addError(_('Non-existant module ID specified.'));
+				$this->addError($this->translate('Non-existant module ID specified.'));
 	
 			}
 					
 		} else {
 
-			$this->addError(_('No user ID or module ID specified.'));
+			$this->addError($this->translate('No user ID or module ID specified.'));
 
 		}
 
@@ -897,13 +897,13 @@ class UsersController extends Controller
 
 			} else {
 	
-				$this->addError(_('Non-existant module ID specified.'));
+				$this->addError($this->translate('Non-existant module ID specified.'));
 	
 			}
 					
 		} else {
 
-			$this->addError(_('No user ID or module ID specified.'));
+			$this->addError($this->translate('No user ID or module ID specified.'));
 
 		}
 
@@ -917,9 +917,9 @@ class UsersController extends Controller
 	
         $this->checkAuthorisation(true);
 
-		$this->setBreadcrumbRootName(_('System administration'));
+		$this->setBreadcrumbRootName($this->translate('System administration'));
 
-        $this->setPageName(_('Rights matrix'));
+        $this->setPageName($this->translate('Rights matrix'));
 
 		if ($this->rHasVal('right') && $this->rHasVal('role') && !$this->isFormResubmit()) {
 
@@ -1006,7 +1006,7 @@ class UsersController extends Controller
 			
 		} else {
 
-			$this->addError(_('No user ID specified.'));
+			$this->addError($this->translate('No user ID specified.'));
 
 		}
 
@@ -1040,7 +1040,7 @@ class UsersController extends Controller
 			);
 			if (!$pru) {
 			
-				$this->addError(_('User is not part of current project.'));
+				$this->addError($this->translate('User is not part of current project.'));
 
 			} else {
 
@@ -1056,7 +1056,7 @@ class UsersController extends Controller
 			
 		} else {
 
-			$this->addError(_('No user ID specified.'));
+			$this->addError($this->translate('No user ID specified.'));
 
 		}
 
@@ -1132,7 +1132,7 @@ class UsersController extends Controller
 
 			if (in_array('f',$this->requestData['tests'])) {
 
-				if (strlen($this->requestData['values'][0]) == 0) $this->addError(_('Missing value.'));
+				if (strlen($this->requestData['values'][0]) == 0) $this->addError($this->translate('Missing value.'));
 			
 			}
         
@@ -1197,7 +1197,7 @@ MUST CHECK
 */
 		if (!$pru) {
 
-			$this->addError(_('Failed to connect user from session.'));
+			$this->addError($this->translate('Failed to connect user from session.'));
 
 		} else {
 
@@ -1216,7 +1216,7 @@ MUST CHECK
 
 		if (!$su) {
 
-			$this->addError(_('Failed to create user from session.'));
+			$this->addError($this->translate('Failed to create user from session.'));
 
 		} else {
 
@@ -1244,7 +1244,7 @@ MUST CHECK
 		
 		if ($r !== true) {
 			
-			$this->addError(_('Failed to save user.'),2);
+			$this->addError($this->translate('Failed to save user.'),2);
 
 			$this->log(serialize($data));
 			
@@ -1378,12 +1378,12 @@ MUST CHECK
 
 		if (strlen($password) > $max) {
 
-            $this->smarty->assign('returnText',sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
+            $this->smarty->assign('returnText',sprintf($this->translate('Password too long; should be between %s and %s characters.'),$min,$max));
 
 		} else
 		if (strlen($password) < $min) {
 
-            $this->smarty->assign('returnText',sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
+            $this->smarty->assign('returnText',sprintf($this->translate('Password too short; should be between %s and %s characters.'),$min,$max));
 
 		} else
 		if (strlen($password) < ($min + 3)) {
@@ -1596,7 +1596,7 @@ MUST CHECK
 					'user_id' => $userId, 
 					'project_id' => $projectId
 				),
-				'columns' => '*,ifnull(last_project_select,"'._('(has never worked on project)').'") as last_login'
+				'columns' => '*,ifnull(last_project_select,"'.$this->translate('(has never worked on project)').'") as last_login'
         	)
 		);
  
@@ -1645,21 +1645,21 @@ MUST CHECK
         
         if (!in_array('username',(array)$fieldsToIgnore) && $data['username'] == '') {
             
-            $this->addError(_('Missing username.'));
+            $this->addError($this->translate('Missing username.'));
             $result = false;
         
         }
         
         if (!in_array('password',(array)$fieldsToIgnore) && $data['password'] == '') {
             
-            $this->addError(_('Missing password.'));
+            $this->addError($this->translate('Missing password.'));
             $result = false;
         
         }
         
         if (!in_array('password_2',(array)$fieldsToIgnore) && $data['password_2'] == '') {
             
-            $this->addError(_('Missing password repeat.'));
+            $this->addError($this->translate('Missing password repeat.'));
             $result = false;
         
         }
@@ -1667,21 +1667,21 @@ MUST CHECK
 
         if (!in_array('first_name',(array)$fieldsToIgnore) && $data['first_name'] == '') {
             
-            $this->addError(_('Missing first name.'));
+            $this->addError($this->translate('Missing first name.'));
             $result = false;
         
         }
         
         if (!in_array('last_name',(array)$fieldsToIgnore) && $data['last_name'] == '') {
             
-            $this->addError(_('Missing last name.'));
+            $this->addError($this->translate('Missing last name.'));
             $result = false;
         
         }
         
         if (!in_array('email_address',(array)$fieldsToIgnore) && $data['email_address'] == '') {
             
-            $this->addError(_('Missing email address.'));
+            $this->addError($this->translate('Missing email address.'));
             $result = false;
         
         }
@@ -1714,14 +1714,14 @@ MUST CHECK
         
         if (strlen($username) < $min) {
             
-            $this->addError(sprintf(_('Username too short; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('Username too short; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
         } else
         if (strlen($username) > $max) {
             
-            $this->addError(sprintf(_('Username too long; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('Username too long; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
@@ -1731,7 +1731,7 @@ MUST CHECK
 			!preg_match($this->controllerSettings['dataChecks']['username']['regexp'],$username)
 		) {
             
-            $this->addError(_('Username has incorrect format.'));
+            $this->addError($this->translate('Username has incorrect format.'));
             
             $result = false;
         
@@ -1766,14 +1766,14 @@ MUST CHECK
         
         if (strlen($password) < $min) {
             
-            $this->addError(sprintf(_('Password too short; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('Password too short; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
         } else
         if (strlen($password) > $max) {
             
-            $this->addError(sprintf(_('Password too long; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('Password too long; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
@@ -1783,7 +1783,7 @@ MUST CHECK
 			!preg_match($this->controllerSettings['dataChecks']['password']['regexp'],$password)
 			)  {
 
-            $this->addError(_('Password has incorrect format.'));
+            $this->addError($this->translate('Password has incorrect format.'));
             
             $result = false;
         
@@ -1799,7 +1799,7 @@ MUST CHECK
 
         if ($password != $password_2) {
             
-            $this->addError(_('Passwords not the same.'));
+            $this->addError($this->translate('Passwords not the same.'));
             
 			return false;        
         }
@@ -1830,21 +1830,21 @@ MUST CHECK
         
         if (strlen($email_address) < $min) {
             
-            $this->addError(sprintf(_('E-mail adress too short; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('E-mail adress too short; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
         } else
         if (strlen($email_address) > $max) {
             
-            $this->addError(sprintf(_('E-mail adress too long; should be between %s and %s characters.'),$min,$max));
+            $this->addError(sprintf($this->translate('E-mail adress too long; should be between %s and %s characters.'),$min,$max));
             
             $result = false;
         
         } else
         if (!$this->verifyEmailAddress($email_address))  {
             
-            $this->addError(_('Invalid e-mail address.'));
+            $this->addError($this->translate('Invalid e-mail address.'));
             
             $result = false;
         
@@ -1908,7 +1908,7 @@ MUST CHECK
             
 		if (count((array) $users) != 0) {
 			
-			$this->addError(_('Username already exists.'));
+			$this->addError($this->translate('Username already exists.'));
 			
 			return false;
 		
@@ -1940,7 +1940,7 @@ MUST CHECK
             
 		if (count((array) $users) != 0) {
 
-			$this->addError(_('E-mail address already exists.'));
+			$this->addError($this->translate('E-mail address already exists.'));
 			
 			return false;
 		
@@ -1981,12 +1981,12 @@ MUST CHECK
 			$this->prepareEmail(
 				$user,
 				sprintf(
-					_($this->controllerSettings['email']['mails']['newuser']['plain']),
+					$this->translate($this->controllerSettings['email']['mails']['newuser']['plain']),
 					$user['username'],
 					$user['password']
 				),
 				sprintf(
-					_($this->controllerSettings['email']['mails']['newuser']['html']),
+					$this->translate($this->controllerSettings['email']['mails']['newuser']['html']),
 					$user['username'],
 					$user['password']
 				),
@@ -2003,11 +2003,11 @@ MUST CHECK
 			$this->prepareEmail(
 				$user,
 				sprintf(
-					_($this->controllerSettings['email']['mails']['resetpassword']['plain']),
+					$this->translate($this->controllerSettings['email']['mails']['resetpassword']['plain']),
 					$password
 				),
 				sprintf(
-					_($this->controllerSettings['email']['mails']['resetpassword']['html']),
+					$this->translate($this->controllerSettings['email']['mails']['resetpassword']['html']),
 					$password
 				),
 				'reset password'
@@ -2187,7 +2187,7 @@ MUST CHECK
 
 		if ($r['assignable']=='n') {
 
-			$this->addError(_('Unassignable role selected.'));
+			$this->addError($this->translate('Unassignable role selected.'));
 			return false;
 
 		} else {

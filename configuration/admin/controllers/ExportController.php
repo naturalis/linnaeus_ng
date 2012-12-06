@@ -89,7 +89,7 @@ class ExportController extends Controller
     public function exportAction()
     {
     
-        $this->setPageName(_('Select modules to export'));
+        $this->setPageName($this->translate('Select modules to export'));
 		
 		$pModules = $this->getProjectModules();
 
@@ -135,7 +135,7 @@ class ExportController extends Controller
 
 					} else {
 
-						$this->addError(_('Missing function "'.get_class($this).'::'.$d.'"'));
+						$this->addError($this->translate('Missing function "'.get_class($this).'::'.$d.'"'));
 
 					}
 						

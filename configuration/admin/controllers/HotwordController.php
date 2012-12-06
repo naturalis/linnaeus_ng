@@ -60,7 +60,7 @@ class HotwordController extends Controller
     
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Hotwords'));
+		$this->setPageName($this->translate('Hotwords'));
 
 		$c = $this->models->Hotword->_get(
 			array('id'=>
@@ -86,7 +86,7 @@ class HotwordController extends Controller
     
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Update hotwords'));
+		$this->setPageName($this->translate('Update hotwords'));
 
 		if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
 		
@@ -124,7 +124,7 @@ class HotwordController extends Controller
     
 		$this->checkAuthorisation();
 
-		$this->setPageName(_('Browse hotwords'));
+		$this->setPageName($this->translate('Browse hotwords'));
 		
 		$id = array('project_id' => $this->getCurrentProjectId());
 						

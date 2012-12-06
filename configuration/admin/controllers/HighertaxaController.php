@@ -48,7 +48,7 @@ class HighertaxaController extends Controller
 		$this->redirect('../species/index.php?higher=1');
 		
 		/*
-        $this->setPageName(_('Higher taxa overview'));
+        $this->setPageName($this->translate('Higher taxa overview'));
 
         $this->printPage();
   		*/

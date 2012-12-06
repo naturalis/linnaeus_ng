@@ -74,7 +74,7 @@ class IndexController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName(_('Index: species'));
+        $this->setPageName($this->translate('Index: species'));
 
 		$this->setTaxonType('lower');
 
@@ -92,7 +92,7 @@ class IndexController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName(_('Index: higher taxa'));
+        $this->setPageName($this->translate('Index: higher taxa'));
 
 		$this->setTaxonType('higher');
 
@@ -137,7 +137,7 @@ class IndexController extends Controller
 
         $this->checkAuthorisation();
 
-        $this->setPageName(_('Index: comon names'));
+        $this->setPageName($this->translate('Index: comon names'));
 		
 		$languages = $this->models->Language->_get(array('id' => '*','fieldAsIndex' => 'id'));
 

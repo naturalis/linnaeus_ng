@@ -99,7 +99,7 @@ class MatrixKeyController extends Controller
 
 		if (count((array)$matrices)==0) {
 	
-			$this->addError(_('No matrices have been defined.'));
+			$this->addError($this->translate('No matrices have been defined.'));
 
 		} else
 		if (count((array)$matrices)==1) {
@@ -160,7 +160,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('function','Identify');
 
-        $this->setPageName(sprintf(_('Matrix "%s": identify'),$matrix['name']));
+        $this->setPageName(sprintf($this->translate('Matrix "%s": identify'),$matrix['name']));
 
 		$this->smarty->assign('storedStates',$this->stateMemoryRecall());
 
@@ -197,7 +197,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('function','Examine');
 
-        $this->setPageName(sprintf(_('Matrix "%s": examine'),$matrix['name']));
+        $this->setPageName(sprintf($this->translate('Matrix "%s": examine'),$matrix['name']));
 
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
@@ -228,7 +228,7 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('function','Compare');
 
-        $this->setPageName(sprintf(_('Matrix "%s": compare'),$matrix['name']));
+        $this->setPageName(sprintf($this->translate('Matrix "%s": compare'),$matrix['name']));
 
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
@@ -1052,7 +1052,7 @@ class MatrixKeyController extends Controller
 
 		return array(
 			0 => array(
-				'name' => _('Simple dissimilarity coefficient'), 
+				'name' => $this->translate('Simple dissimilarity coefficient'), 
 				'value' => ($u1+$u2+$co+$ca)==0 ? 'NaN' : round(1-(($co+$ca)/($u1+$u2+$co+$ca)),$prec)
 			),
 			1 => array(

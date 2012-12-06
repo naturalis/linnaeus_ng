@@ -400,12 +400,12 @@ class InternalLinksController extends Controller
 		$i =
 			array(
 				array(
-					'label' => _('Content pages'),
+					'label' => $this->translate('Content pages'),
 					'controller' => 'linnaeus',
 					'params' =>
 						json_encode(array(
 							array(
-								'label' => _('Page:'),
+								'label' => $this->translate('Page:'),
 								'param' => 'id',
 								'values' => $this->intLinkGetContent()
 							)
@@ -413,12 +413,12 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Glossary alphabet'),
+					'label' => $this->translate('Glossary alphabet'),
 					'controller' => 'glossary',
 					'params' =>
 						json_encode(array(
 							array(
-								'label' => _('Letter:'),
+								'label' => $this->translate('Letter:'),
 								'param' => 'letter',
 								'values' => $this->intLinkGetGlossaryAlpha()
 							)
@@ -426,13 +426,13 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Glossary term'),
+					'label' => $this->translate('Glossary term'),
 					'controller' => 'glossary',
 					'url' => 'term.php',
 					'params' =>	json_encode(
 						array(
 							array(
-								'label' => _('Term:'),
+								'label' => $this->translate('Term:'),
 								'param' => 'id',
 								'values' => $this->intLinkGetGlossaryTerms()
 							)
@@ -440,16 +440,16 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Literature index'),
+					'label' => $this->translate('Literature index'),
 					'controller' => 'literature',
 				),
 				array(
-					'label' => _('Literature alphabet'),
+					'label' => $this->translate('Literature alphabet'),
 					'controller' => 'literature',
 					'params' =>
 						json_encode(array(
 							array(
-								'label' => _('Letter:'),
+								'label' => $this->translate('Letter:'),
 								'param' => 'letter',
 								'language_independent' => true,
 								'values' => $this->intLinkGetLiteratureAlpha()
@@ -458,13 +458,13 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Literature reference'),
+					'label' => $this->translate('Literature reference'),
 					'controller' => 'literature',
 					'url' => 'reference.php',
 					'params' =>	json_encode(
 						array(
 							array(
-								'label' => _('Reference:'),
+								'label' => $this->translate('Reference:'),
 								'param' => 'id',
 								'language_independent' => true,
 								'values' => $this->intLinkGetLiteratureReferences()
@@ -473,23 +473,23 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Species module index'),
+					'label' => $this->translate('Species module index'),
 					'controller' => 'species',
 				),
 				array(
-					'label' => _('Species module detail'),
+					'label' => $this->translate('Species module detail'),
 					'controller' => 'species',
 					'url' => 'taxon.php',
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Species:'),
+								'label' => $this->translate('Species:'),
 								'param' => 'id',
 								'language_independent' => true,
 								'values' => $this->intLinkGetSpecies()
 							),
 							array(
-								'label' => _('Category:'),
+								'label' => $this->translate('Category:'),
 								'param' => 'cat',
 								'values' => $this->intLinkGetSpeciesCategories()
 							)
@@ -497,23 +497,23 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Higher taxa index'),
+					'label' => $this->translate('Higher taxa index'),
 					'controller' => 'highertaxa',
 				),
 				array(
-					'label' => _('Higher taxa detail'),
+					'label' => $this->translate('Higher taxa detail'),
 					'controller' => 'highertaxa',
 					'url' => 'taxon.php',
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Taxa:'),
+								'label' => $this->translate('Taxa:'),
 								'param' => 'id',
 								'language_independent' => true,
 								'values' => $this->intLinkGetSpecies(true)
 							),
 							array(
-								'label' => _('Category:'),
+								'label' => $this->translate('Category:'),
 								'param' => 'cat',
 								'values' => $this->intLinkGetSpeciesCategories()
 							)
@@ -521,21 +521,21 @@ class InternalLinksController extends Controller
 					)
 				),
 				array(
-					'label' => _('Dichotomous key'),
+					'label' => $this->translate('Dichotomous key'),
 					'controller' => 'key',
 				),
 				array(
-					'label' => _('Distribution index'),
+					'label' => $this->translate('Distribution index'),
 					'controller' => 'mapkey',
 				),
 				array(
-					'label' => _('Distribution detail'),
+					'label' => $this->translate('Distribution detail'),
 					'controller' => 'mapkey',
 					'url' => 'examine_species.php',
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Species:'),
+								'label' => $this->translate('Species:'),
 								'param' => 'id',
 								'language_independent' => true,
 								'values' => $this->intLinkGetMapSpecies()
@@ -551,7 +551,7 @@ class InternalLinksController extends Controller
 
 			array_push($i,
 				array(
-					'label' => _('Matrix key index'),
+					'label' => $this->translate('Matrix key index'),
 					'controller' => 'matrixkey',
 					'url' => 'matrices.php'
 				)
@@ -559,17 +559,17 @@ class InternalLinksController extends Controller
 
 			array_push($i,
 				array(
-					'label' => _('Matrix keys'),
+					'label' => $this->translate('Matrix keys'),
 					'controller' => 'matrixkey',
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Matrix name:'),
+								'label' => $this->translate('Matrix name:'),
 								'param' => 'mtrx',
 								'values' => $this->intLinkGetMatrices()
 							),
 							array(
-								'label' => _('Element:'),
+								'label' => $this->translate('Element:'),
 								'param' => 'url',
 								'language_independent' => true,
 								'values' => array(
@@ -589,12 +589,12 @@ class InternalLinksController extends Controller
 
 			array_push($i,
 				array(
-					'label' => _('Matrix key'),
+					'label' => $this->translate('Matrix key'),
 					'controller' => 'matrixkey',
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Element:'),
+								'label' => $this->translate('Element:'),
 								'param' => 'url',
 								'language_independent' => true,
 								'values' => array(
@@ -617,7 +617,7 @@ class InternalLinksController extends Controller
 
 			array_push($i,
 				array(
-					'label' => _($val['label'].' index'),
+					'label' => $this->translate($val['label'].' index'),
 					'controller' => 'module',
 					'url' => 'index.php?modId='.$val['id']
 				)
@@ -625,13 +625,13 @@ class InternalLinksController extends Controller
 
 			array_push($i,
 				array(
-					'label' => _($val['label'].' topic'),
+					'label' => $this->translate($val['label'].' topic'),
 					'controller' => 'module',
 					'url' => 'topic.php?modId='.$val['id'],
 					'params' => json_encode(
 						array(
 							array(
-								'label' => _('Topic:'),
+								'label' => $this->translate('Topic:'),
 								'param' => 'id',
 								'values' => $this->intLinkGetFreeModuleTopics($val['id'])
 							)

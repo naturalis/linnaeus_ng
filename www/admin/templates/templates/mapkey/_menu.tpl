@@ -3,7 +3,7 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
-<a href="choose_species.php" class="allLookupLink">{t}Species list{/t}</a>
+<a href="choose_species.php" class="allLookupLink">{t}Contents{/t}</a>
 &nbsp;
 <a href="management.php" class="allLookupLink">{t}Management{/t}</a>
 {if $L2Maps|@count>0}

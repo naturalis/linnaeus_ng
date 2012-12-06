@@ -103,7 +103,7 @@ class GlossaryController extends Controller
 		/*
         $this->checkAuthorisation();
         
-        $this->setPageName( _('Index'));
+        $this->setPageName( $this->translate('Index'));
 
 		$this->clearTempValues();
 		
@@ -127,13 +127,13 @@ class GlossaryController extends Controller
 
        $this->checkAuthorisation();
 
-		$this->setPageName(_('Browsing glossary'));
+		$this->setPageName($this->translate('Browsing glossary'));
 		
         if (!isset($_SESSION['admin']['project']['languages'])) {
 		
 			$this->addError(
 				sprintf(
-					_('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
+					$this->translate('No languages have been defined. You need to define at least one language. Go %shere%s to define project languages.'),
 					'<a href="../projects/data.php">','</a>')
 				);
 		
@@ -142,7 +142,7 @@ class GlossaryController extends Controller
 
 			$this->addError(
 				sprintf(
-					_('No default language has been defined. Go %shere%s to set the default languages.'),
+					$this->translate('No default language has been defined. Go %shere%s to set the default languages.'),
 					'<a href="../projects/data.php">','</a>')
 				);
 
@@ -231,13 +231,13 @@ class GlossaryController extends Controller
 			
 			$_SESSION['admin']['system']['glossary']['activeLanguage'] = $gloss['language_id'];
 
-    	    $this->setPageName(sprintf(_('Editing glossary term "%s"'),$gloss['term']));
+    	    $this->setPageName(sprintf($this->translate('Editing glossary term "%s"'),$gloss['term']));
 
 			$navList = $this->getGlossaryTermsNavList();
 		
 		} else {
 
-    	    $this->setPageName(_('New glossary term'));
+    	    $this->setPageName($this->translate('New glossary term'));
 
 		}
 
@@ -287,7 +287,7 @@ class GlossaryController extends Controller
 
 			if ($data['id']==null && $this->getGlossaryTerms(array('term' => $data['term'],'language_id' => $data['language_id']))) {
 
-				$this->addError(_('Glossary term already exists.'));
+				$this->addError($this->translate('Glossary term already exists.'));
 
 				$gloss = $this->requestData;
 				
@@ -351,7 +351,7 @@ class GlossaryController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not save glossary term.'));
+				$this->addError($this->translate('Could not save glossary term.'));
 
 			}
 
@@ -397,12 +397,12 @@ class GlossaryController extends Controller
 
 				$this->setBreadcrumbIncludeReferer(
 					array(
-						'name' => _('Editing glossary term'), 
+						'name' => $this->translate('Editing glossary term'), 
 						'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
 					)
 				);
 
-                $this->setPageName(sprintf(_('New media for "%s"'),$gloss['term']));
+                $this->setPageName(sprintf($this->translate('New media for "%s"'),$gloss['term']));
 
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
 
@@ -455,11 +455,11 @@ class GlossaryController extends Controller
                 
                             if ($mt) {
                                  
-                                $this->addMessage(sprintf(_('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
+                                $this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
     
                             } else {
     
-                                $this->addError(_('Failed writing uploaded file to database.'),1);
+                                $this->addError($this->translate('Failed writing uploaded file to database.'),1);
     
                             }
                 
@@ -482,7 +482,7 @@ class GlossaryController extends Controller
     
             } else {
 
-                $this->addError(_('Unknown glossary term.'));
+                $this->addError($this->translate('Unknown glossary term.'));
 
             }
 
@@ -506,7 +506,7 @@ class GlossaryController extends Controller
 
         } else {
 
-            $this->addError(_('No glossary term specified.'));
+            $this->addError($this->translate('No glossary term specified.'));
 
         }        
 
@@ -527,12 +527,12 @@ class GlossaryController extends Controller
 
 		$this->setBreadcrumbIncludeReferer(
 			array(
-				'name' => _('Editing glossary term'), 
+				'name' => $this->translate('Editing glossary term'), 
 				'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/edit.php?id='.$gloss['id']
 			)
 		);
 
-		$this->setPageName(sprintf(_('Media for "%s"'),$gloss['term']));
+		$this->setPageName(sprintf($this->translate('Media for "%s"'),$gloss['term']));
 
         if ($this->rHasId()) {
 						
@@ -618,7 +618,7 @@ class GlossaryController extends Controller
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Search for glossary terms'));
+		$this->setPageName($this->translate('Search for glossary terms'));
 		
 		if ($this->rHasVal('search')) {
 

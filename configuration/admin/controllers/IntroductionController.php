@@ -103,7 +103,7 @@ class IntroductionController extends Controller
 
 			} else {
 
-				$this->addError(_('Could not create page.'));
+				$this->addError($this->translate('Could not create page.'));
 
 			}
 
@@ -131,11 +131,11 @@ class IntroductionController extends Controller
 
 			if ($page['got_content']==0) {
 
-		        $this->setPageName(_('Creating new page'));
+		        $this->setPageName($this->translate('Creating new page'));
 
 			} else {
 
-		        $this->setPageName(_('Editing page'));
+		        $this->setPageName($this->translate('Editing page'));
 
 			}
 
@@ -187,7 +187,7 @@ class IntroductionController extends Controller
     
         $this->checkAuthorisation();
 
-		$this->setPageName(_('Change page order'));
+		$this->setPageName($this->translate('Change page order'));
 		
 		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
 		
@@ -275,7 +275,7 @@ class IntroductionController extends Controller
 
 		$this->checkAuthorisation();
 		
-		$this->setPageName(_('New image'));
+		$this->setPageName($this->translate('New image'));
 		
 		$this->loadControllerConfig('Module');
 		
@@ -324,11 +324,11 @@ class IntroductionController extends Controller
 					
 					if ($fmm) {
 					
-						$this->addMessage(sprintf(_('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
+						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'),$file['original_name'],$file['media_name']));
 					
 					} else {
 					
-						$this->addError(_('Failed writing uploaded file to database.'),1);
+						$this->addError($this->translate('Failed writing uploaded file to database.'),1);
 					
 					}
 				
