@@ -1,21 +1,5 @@
 <div id="top-strip">
     <p>
- <!--		
-		{if $languages|@count>1}
-		
-	    <span id="language-change">
-	         <select id="languageSelect" onchange="doLanguageChange()">
-	        {foreach from=$languages key=k item=v}
-	            <option value="{$v.language_id}"{if $v.language_id==$currentLanguageId} selected="selected"{/if}>{$v.language} {if $v.def_language==1}*{/if}</option>
-	        {/foreach}
-	        </select>
-	    </span>
-		{/if}
-
- -->
-
-
-    
     	<a href="../../../">{t}projects{/t}</a> | 
 		<a href="../../../admin/views/users/login.php">{t}login{/t}</a> | 
     	{t}help{/t} ({t}not yet available{/t}) | 
@@ -28,8 +12,7 @@
         	{if $v.language_id!=$currentLanguageId}</span>{/if}
          {/foreach}
  		{/if}
- 		
-        </p>
+   </p>
 </div>
 
 
