@@ -882,31 +882,7 @@ class Controller extends BaseClass
 		}
 
 		if (!$this->helpers->LoggingHelper->write('('.$this->getCurrentProjectId().') '.$msg,$severity))
-			trigger_error(_('Logging not initialised'), E_USER_ERROR);
-
-	}
-
-    /**
-     * Gettext wrapper, to be called from javascript (through the utilities controller)
-     *
-     * @access     public
-     */
-	public function javascriptTranslate($content)
-	{
-
-		if (empty($content)) return;
-
-		/* DEBUG */
-		$this->models->TranslateMe->save(
-			array(
-				'id' => null,
-				'controller' => 'javascript',
-				'content' => $content,
-				'env' => 'front'
-			)
-		);
-
-		return _($content);
+			trigger_error($this->translate('Logging not initialised'), E_USER_ERROR);
 
 	}
 
@@ -1206,7 +1182,38 @@ class Controller extends BaseClass
         return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
 	
 	}
+	
+	private function saveTranslateMe($content,$controller=null)
+	{
+		
+	    @$this->models->TranslateMe->save(
+		    array(
+		    'id' => null,
+		    'controller' => is_null($controller) ? $this->getControllerBaseName() : $controller,
+		    'content' => $content,
+		    'env' => 'front'
+		    )
+	    );	    
+	    
+	}
 
+	/**
+	 * Gettext wrapper, to be called from javascript (through the utilities controller)
+	 *
+	 * @access     public
+	 */
+	public function javascriptTranslate($content)
+	{
+
+	    if (empty($content)) return;
+
+	    $this->saveTranslateMe($content,'javascript');
+
+	    return _($content);
+	
+	}
+	
+	
     /**
      * Gettext wrapper, to be called from a registered block function within Smarty
      *
@@ -1219,15 +1226,7 @@ class Controller extends BaseClass
 
 		if (empty($content)) return;
 
-		/* DEBUG */
-		@$this->models->TranslateMe->save(
-			array(
-				'id' => null,
-				'controller' => $this->getControllerBaseName(),
-				'content' => $content,
-				'env' => 'front'
-			)
-		);
+		$this->saveTranslateMe($content);
 
 		$c = _($content);
 	
@@ -1249,7 +1248,19 @@ class Controller extends BaseClass
 	
 	}
 
-
+	public function translate($content)
+	{
+	
+	    if (empty($content)) return;
+	
+		$this->saveTranslateMe($content);
+	    	
+	    return _($content);
+	
+	}
+	
+		
+	
 	public function getMainMenu()
 	{
 
@@ -1272,7 +1283,7 @@ class Controller extends BaseClass
 				$mp = $m[$val['module_id']];				
 				$modules[$key]['type'] = 'regular';
 				$modules[$key]['icon'] = $mp['icon'];
-				$modules[$key]['module'] = _($mp['module']);
+				$modules[$key]['module'] = $this->translate($mp['module']);
 				$modules[$key]['controller'] = $mp['controller'];
 				$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
 				$modules[$key]['show_order'] = $mp['show_order'];
