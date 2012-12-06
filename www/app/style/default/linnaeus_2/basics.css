@@ -36,6 +36,11 @@ body {
     color: #fff;
 }
 
+#top-strip p img {
+	vertical-align: middle;
+	margin-bottom: 3px;
+}
+
 #top-strip .flag_link {
 	cursor: pointer;
 	opacity: 0.8;

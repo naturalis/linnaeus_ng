@@ -335,9 +335,16 @@ function addRequestVar(key,val) {
 
 }
 
-function doLanguageChange() {
+function doLanguageChange(languageId) {
 
-	addFormVal('languageId',$('#languageSelect').val());
+	if (languageId) {
+		
+		addFormVal('languageId',languageId);
+	
+	} else {
+		
+		addFormVal('languageId',$('#languageSelect').val());
+	}
 
 	for(var i=0;i<requestVars.length;i++) {
 
