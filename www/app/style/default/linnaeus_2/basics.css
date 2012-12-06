@@ -36,6 +36,18 @@ body {
     color: #fff;
 }
 
+#top-strip .flag_link {
+	cursor: pointer;
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
+#top-strip .flag_link:hover {
+	cursor: pointer;
+	opacity: 1;
+	filter: alpha(opacity=100);
+}
+
 #preview-overlay {
 	position: absolute;
 	top: 0;
@@ -61,6 +73,7 @@ body {
 	letter-spacing: 0;
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7), -1px -1px 1px rgba(255, 255, 255, 0.5);
 	opacity: 0.8;
+	filter: alpha(opacity=80);
 }
 
 #header-container #title a {
