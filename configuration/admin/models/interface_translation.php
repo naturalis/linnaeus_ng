@@ -5,7 +5,7 @@ include_once ('model.php');
 class InterfaceTranslation extends Model
 {
 
-    const tableBaseName = 'interface_texts';
+    const tableBaseName = 'interface_translations';
 
 
     /**
