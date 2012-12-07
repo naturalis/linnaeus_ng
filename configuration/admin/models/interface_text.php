@@ -1,13 +1,11 @@
 <?php
 
-/* DEBUG */
-
 include_once ('model.php');
 
-class TranslateMe extends Model
+class InterfaceText extends Model
 {
 
-    const tableBaseName = 'translate_me';
+    const tableBaseName = 'interface_texts';
 
 
     /**
