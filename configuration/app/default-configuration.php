@@ -238,6 +238,8 @@ class configuration
 		if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
 		if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
 		
+		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
+	
 	}
 
 
