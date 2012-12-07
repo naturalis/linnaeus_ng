@@ -1158,7 +1158,7 @@ class Controller extends BaseClass
         if (empty($content))
             return;
         
-        $this->saveInterfaceText($content, 'javascript');
+        $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);
     }
@@ -1406,8 +1406,11 @@ class Controller extends BaseClass
 				{/if}
 			</div>
 		{/if}
-		
+
 		//goNavigate(val,formName) formname default = 'theForm'
+
+		<form action="" method="post" id="theForm" action="">
+		</form>
 		
 		*/
         if (!isset($items))
@@ -3415,29 +3418,6 @@ class Controller extends BaseClass
     }
 
 
-
-    private function saveInterfaceText ($content, $controller = null)
-    {
-        @$this->models->InterfaceText->save(array(
-            'id' => null, 
-            'controller' => isset($c) ? $c : '-', 
-            'text' => $content, 
-            'env' => 'admin'
-        ));
-    }
-
-
-
-    private function doTranslate ($content)
-    {
-        return _($content);
-
-        //$languageId = $this->getCurrentUiLanguage();
-        //return $this->doSomething($content,$languageId);
-    }
-
-
-
     protected function clearCache ($files)
     {
         $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
@@ -3473,4 +3453,53 @@ class Controller extends BaseClass
             }
         }
     }
+
+    private function saveInterfaceText($text)
+    {
+        @$this->models->InterfaceText->save(array(
+        'id' => null,
+        'text' => $text,
+        'env' => $this->getAppName()
+        ));
+    }
+    
+    private function doTranslate($text)
+    {
+    
+        // get id of the text
+        $i = $this->models->InterfaceText->_get(
+        array(
+        'id' => array(
+	        'text' => $text,
+	        'env' => $this->getAppName()
+        ),
+        'columns' => 'id'
+        ));
+    
+        // if not found, return unchanged
+        if (empty($i[0]['id'])) return $text;
+    
+        // resolve language id
+        $languageId = $this->getCurrentUiLanguage();
+    
+        // fetch appropriate translation
+        $it = $this->models->InterfaceTranslation->_get(
+        array(
+        'id' =>
+        array(
+        'interface_text_id' => $i[0]['id'],
+        'language_id' => $languageId
+        ),
+        'columns' => 'translation'
+        ));
+    
+        // if not found, return unchanged
+        if (empty($it[0]['translation'])) return $text;
+    
+        // return translation
+        return $it[0]['translation'];
+    
+    }
+    
+    
 }

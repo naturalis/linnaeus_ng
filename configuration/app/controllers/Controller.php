@@ -1218,7 +1218,7 @@ class Controller extends BaseClass
         if (empty($content))
             return;
         
-        $this->saveInterfaceText($content, 'javascript');
+        $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);
     }
@@ -2553,24 +2553,51 @@ class Controller extends BaseClass
 
 
 
-    private function saveInterfaceText ($content, $controller = null)
+    private function saveInterfaceText($text)
     {
         @$this->models->InterfaceText->save(array(
             'id' => null, 
-            'controller' => is_null($controller) ? $this->getControllerBaseName() : $controller, 
-            'text' => $content, 
-            'env' => 'app'
+            'text' => $text, 
+            'env' => $this->getAppName()
         ));
     }
 
-
-
-    private function doTranslate ($content)
+    private function doTranslate($text)
     {
-        return _($content);
         
-        //$languageId = $this->getCurrentLanguageId()
-        //if (is_null($languageId)) $languageId = $this->getDefaultLanguageId();
-        // return $this->doSomething($content,$languageId);
+		// get id of the text
+        $i = $this->models->InterfaceText->_get(
+	        array(
+	            'id' => array(
+	                'text' => $text,
+		            'env' => $this->getAppName()
+	            ), 
+	            'columns' => 'id'
+	        ));
+
+        // if not found, return unchanged
+		if (empty($i[0]['id'])) return $text;
+
+		// resolve language id
+		$languageId = $this->getCurrentLanguageId();
+		if (is_null($languageId)) $languageId = $this->getDefaultLanguageId();
+		
+		// fetch appropriate translation
+		$it = $this->models->InterfaceTranslation->_get(
+	        array(
+	            'id' => 
+		        	array(
+		                'interface_text_id' => $i[0]['id'],
+		                'language_id' => $languageId
+		            ), 
+	            'columns' => 'translation'
+	        ));
+		
+		// if not found, return unchanged				
+		if (empty($it[0]['translation'])) return $text;
+		
+		// return translation
+		return $it[0]['translation'];
+
     }
 }
