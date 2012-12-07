@@ -434,7 +434,7 @@ class MatrixKeyController extends Controller
 					array(
 						'id' => $d['id'],
 						'h' => $d['is_hybrid'],
-						'l' => $d['taxon'], //$this->formatTaxon($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+						'l' => $this->formatTaxon($d),
 						'type' => 'tx'
 					);
 	

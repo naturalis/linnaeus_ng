@@ -1024,7 +1024,7 @@ class Controller extends BaseClass
         }
         
         // Genus or subgenus; add italics
-        if ($rankId > GENUS_RANK_ID && count($e) == 1) {
+        if ($rankId >= GENUS_RANK_ID && count($e) == 1) {
             return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
         
@@ -1033,8 +1033,6 @@ class Controller extends BaseClass
             return '<span class="italics">' . $taxon['taxon'] . '</span>';
         }
 
-        // Abbreviation needed from hereon
-        
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
              return '<span class="italics">' . $e[0] . ' ' . $e[1] . 
@@ -1051,7 +1049,11 @@ class Controller extends BaseClass
             
         // We need the parent before continuing
         $parent = $this->getTaxonById($taxon['parent_id']);
-        $parentAbbreviation = $r[$taxon['rank_id']]['abbreviation'];
+        // Say goodbye to the orphans
+        if (empty($parent['rank_id'])) {
+            return $taxon['taxon'];
+        }
+        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
         
         // Double infraspecies
         if (count($e) == 4) {

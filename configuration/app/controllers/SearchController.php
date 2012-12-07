@@ -426,6 +426,7 @@ class SearchController extends Controller
 				'columns' =>
 					'id as taxon_id,
 					taxon,
+			        parent_id,
 					taxon as label,
 			        rank_id, 
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'contains').'\' as isMatch,

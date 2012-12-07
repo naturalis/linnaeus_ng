@@ -239,7 +239,8 @@ class configuration
 		if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
 		
 		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
-	
+		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
+		
 	}
 
 
