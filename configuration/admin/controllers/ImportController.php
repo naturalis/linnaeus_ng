@@ -1729,7 +1729,7 @@ class ImportController extends Controller
 		return $this->models->Rank->_get(array('id' => '*','fieldAsIndex' => 'id'));
 
 	}
-
+	
 	private function addProjectRank($label,$rank,$isLower,$parentId)
 	{
 
@@ -2064,7 +2064,8 @@ class ImportController extends Controller
 
 		if (count((array)$treetops)<2) return;
 
-		$d = $this->addProjectRank('(master rank)',array('rank_id' => -1,'parent_id' => null));
+		// rank_id 1 = domain or empire 
+		$d = $this->addProjectRank('(master rank)',array('rank_id' => 1,'parent_id' => null));
 
 		$this->models->ProjectRank->update(
 			array(

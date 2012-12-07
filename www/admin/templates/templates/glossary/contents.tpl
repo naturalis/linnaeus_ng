@@ -17,10 +17,6 @@
 <div id="page-main">
 {if $alpha|@count>0}
 <table>
-	<tr>
-		<th style="width:175px">{t}term{/t}</th>
-		<!-- th style="width:450px">{t}definition{/t}</th -->
-	</tr>
 {section name=i loop=$gloss}
 	<tr class="tr-highlight">
 		<td><a href="edit.php?id={$gloss[i].id}">{$gloss[i].term}</a></td>
@@ -28,7 +24,6 @@
 	</tr>
 {/section}
 </table>
-
 
 {if $prevStart!=-1 || $nextStart!=-1}
 <div id="navigation">

@@ -3,6 +3,8 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
+<a href="contents.php" class="allLookupLink">{t}Contents{/t}</a>
+&nbsp;
 <a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="order.php" class="allLookupLink">{t}Change page order{/t}</a>

@@ -19,7 +19,7 @@
 		{foreach name=taxonloop from=$taxa key=k item=v}
 		<tr class="highlight">
 			<td>
-				<a href="../{if $taxonType=='higher'}highertaxa{else}species{/if}/edit.php?id={$v.id}">{$v.label}</a>
+				<a href="../{if $taxonType=='higher'}highertaxa{else}species{/if}/taxon.php?id={$v.id}">{$v.label}</a>
 				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.admin.project.hybrid_marker}</span>{/if}
 			</td>
 			<td>({$ranks[$v.rank_id].rank})</td>
@@ -27,16 +27,7 @@
 		{/foreach}
 		</table>
 	</div>
-{if $prevStart!=-1 || $nextStart!=-1}
-	<div id="navigation">
-		{if $prevStart!=-1}
-		<span class="a" onclick="goNavigate({$prevStart});">< {t}previous{/t}</span>
-		{/if}
-		{if $nextStart!=-1}
-		<span class="a" onclick="goNavigate({$nextStart});">{t}next{/t} ></span>
-		{/if}
-	</div>
-{/if}
+
 </div>
 <form name="theForm" id="theForm" method="post" action="">
 <input type="hidden" id="letter" name="letter" value="{$letter}" />

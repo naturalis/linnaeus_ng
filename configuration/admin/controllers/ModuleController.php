@@ -69,6 +69,14 @@ class ModuleController extends Controller
 	public function checkAuthorisation()
 	{
 
+		// check if user is logged in, otherwise redirect to login page
+		if (!$this->isUserLoggedIn()) return false;
+		    
+		// check if there is an active project, otherwise redirect to choose project page
+		if (!$this->getCurrentProjectId() && !$allowNoProjectId) return false;
+		    
+		if ($this->isCurrentUserSysAdmin()) return true;	    
+	    
 		if ($this->rHasVal('freeId')) {
 
 			if (!$this->isUserAuthorizedForFreeModule())
@@ -112,6 +120,31 @@ class ModuleController extends Controller
 
     }
 
+    /**
+     * Contents (page overview)
+     *
+     * @access    public
+     */
+    public function contentsAction()
+    {
+    
+        $this->checkAuthorisation();
+    
+        $this->setPageName($this->translate('Contents'));
+
+        $pagination = $this->getPagination($this->getPages(),25);
+        
+        $this->smarty->assign('prevStart', $pagination['prevStart']);
+        
+        $this->smarty->assign('nextStart', $pagination['nextStart']);
+
+        $this->smarty->assign('pages',$pagination['items']);
+    
+        $this->printPage();
+    
+    }    
+    
+    
     /**
      * Create new page or edit existing
      *
@@ -468,7 +501,7 @@ class ModuleController extends Controller
         
         if ($this->requestData['action'] == 'save_content') {
             
-            $this->clearCache($this->$cacheFiles);
+            $this->clearCache($this->cacheFiles);
         	
             $this->ajaxActionSaveContent();
         
