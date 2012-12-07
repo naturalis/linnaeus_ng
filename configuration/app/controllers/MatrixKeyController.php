@@ -339,7 +339,7 @@ class MatrixKeyController extends Controller
 				array(
 					'id' => $d['id'],
 					'h' => $d['is_hybrid'],
-					'l' => $d['taxon'], //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+					'l' => $d['taxon'], 
 					'type' => 'tx'
 				);
 
@@ -434,7 +434,7 @@ class MatrixKeyController extends Controller
 					array(
 						'id' => $d['id'],
 						'h' => $d['is_hybrid'],
-						'l' => $d['taxon'], //$this->formatSpeciesEtcNames($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
+						'l' => $d['taxon'], //$this->formatTaxon($t[0]['taxon'],$t[0]['rank_id'])) (<option> does not display html-formatting)
 						'type' => 'tx'
 					);
 	

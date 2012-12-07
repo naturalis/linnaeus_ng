@@ -606,7 +606,7 @@ class KeyController extends Controller
 	
 					if (isset($t['taxon'])) {
 	
-						$choices[$key]['target'] = $this->formatSpeciesEtcNames($t['taxon'],$t['rank_id']);
+						$choices[$key]['target'] = $this->formatTaxon($t);
 						$choices[$key]['is_hybrid'] = $t['is_hybrid'];
 	
 					}
@@ -781,7 +781,7 @@ class KeyController extends Controller
 			$includedTaxa[$val] = 
 				array(
 					'id' => $d['id'],
-					'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+					'taxon' => $this->formatTaxon($d),
 					'is_hybrid' => $d['is_hybrid']
 				);
 		
@@ -794,7 +794,7 @@ class KeyController extends Controller
 			$excludedTaxa[$key] = 
 				array(
 					'id' => $d['id'],
-					'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+					'taxon' => $this->formatTaxon($d),
 					'is_hybrid' => $d['is_hybrid']
 				);
 		
@@ -846,7 +846,7 @@ class KeyController extends Controller
 					$excludedTaxa[$val['res_taxon_id']] = 
 						array(
 							'id' => $d['id'],
-							'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+							'taxon' => $this->formatTaxon($d),
 							'is_hybrid' => $d['is_hybrid']
 						);
 				}
@@ -860,7 +860,7 @@ class KeyController extends Controller
 				$includedTaxa[$val] = 
 					array(
 						'id' => $d['id'],
-						'taxon' => $this->formatSpeciesEtcNames($d['taxon'],$d['rank_id']),
+						'taxon' => $this->formatTaxon($d),
 						'is_hybrid' => $d['is_hybrid']
 					);
 			

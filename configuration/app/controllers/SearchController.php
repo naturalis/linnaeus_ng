@@ -425,8 +425,9 @@ class SearchController extends Controller
 				'fieldAsIndex' => 'taxon_id',
 				'columns' =>
 					'id as taxon_id,
+					taxon,
 					taxon as label,
-					rank_id, 
+			        rank_id, 
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'contains').'\' as isMatch,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
@@ -435,7 +436,7 @@ class SearchController extends Controller
 		);
 
 		foreach((array)$d as $key => $val)		
-			$d[$key]['label'] = $this->formatSpeciesEtcNames($val['label'],$val['rank_id']);
+			$d[$key]['label'] = $this->formatTaxon($val);
 			
 		return $d;
 	

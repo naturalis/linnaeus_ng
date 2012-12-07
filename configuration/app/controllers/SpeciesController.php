@@ -945,7 +945,7 @@ class SpeciesController extends Controller
 				)
 				$l[] = array(
 					'id' => $val['id'],
-					'label' => 	$t[$key]['label'] = $this->formatSpeciesEtcNames($val['taxon'],$val['rank_id'])
+					'label' => 	$t[$key]['label'] = $this->formatTaxon($val)
 				);
 
 		}
