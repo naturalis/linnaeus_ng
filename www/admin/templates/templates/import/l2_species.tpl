@@ -110,11 +110,11 @@ Found {$i} "healthy" species that will be loaded<br />
 <p>
 	{if $treetops|@count > 1}
 	<b>Tree conflicts</b><br />
-	The following species have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
+	The following taxa have no parent. It is possible that the taxon tree has several treetops for which no common parent has been defined - like Animalia and Plantae; the system will create a "master taxon" for these for technical purposes. Please specify which taxa are valid "treetops" and will have the master taxon as parent. The other taxa will be loaded, but will become orphans and will have to be attached to the taxon tree by hand. You can alter the name of the master taxon by hand after importing.
 	<table>
 	<tr>
 		<td style="border-bottom:1px solid #999">&nbsp;</td>
-		<td style="border-bottom:1px solid #999">Species</td>
+		<td style="border-bottom:1px solid #999">Taxon</td>
 		<td style="border-bottom:1px solid #999">source</td>
 		<td style="border-bottom:1px solid #999"><label><input type="checkbox" id="allTreetops" value="{$v.taxon}" onclick="toggleAllValid()" />select all</label></td>
 	</tr>

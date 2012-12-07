@@ -799,7 +799,7 @@ class Controller extends BaseClass
                 
                 // check if the user is authorised for the combination of current page / current project
                 if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin()) {
-                    
+
                     return true;
                 }
                 else {

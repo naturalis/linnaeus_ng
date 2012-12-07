@@ -588,43 +588,17 @@ class SpeciesController extends Controller
 							null :
 							$this->requestData['parent_id']
 					);
-					
+
 				$newName = $this->requestData['taxon'];
 
 				$newName = trim(preg_replace('/\s+/',' ',$newName));
 
 				// 1. First letter is capitalized (changed silently)
 				$newName = $this->fixNameCasting($newName);
-				
+
 				$hasErrorButCanSave = null;
 
 				//checks
-				/* LETHAL */
-				if (!$this->isTaxonNameUnique($newName)) {
-					$this->addError(sprintf($this->translate('The name "%s" already exists.'),$newName));
-					$hasErrorButCanSave = false;
-				}
-
-				if (!$this->canParentHaveChildTaxa($this->requestData['parent_id'])  || $isEmptyTaxaList) {
-					$this->addError($this->translate('The selected parent taxon can not have children.'));
-					$hasErrorButCanSave = false;
-				} else {
-					
-					// "Warning: [rank] [name] cannot be selected as a parent for [name]. Do you want to rename [name] to [name]?"
-					$parent = $this->getTaxonById($parentId);
-	
-					if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
-						$this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
-						$hasErrorButCanSave = false;
-					}
-					
-				}
-				
-				if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
-					$this->addError($this->translate('Rank cannot be hybrid.'));				
-				}				
-				
-				
 				/* NON LETHAL */
 				//http://dev2.etibioinformatics.nl/fixit/browse/LINNG-740
 				// 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
@@ -633,14 +607,47 @@ class SpeciesController extends Controller
 					$hasErrorButCanSave = true;
 				}
 
+				// no markers
+				$d = $this->removeMarkers($newName);
+				if ($d!=$newName) {
+					$this->addError($this->translate('Markers are inserted automatically.'));
+					$hasErrorButCanSave = true;
+					$newName = $d;
+				}
+
 				// 3. Names are written in Latin and should not contain special characters or digits.
 				if (!$this->checkCharacters($newName)) {
 					$this->addError($this->translate('The name you specified contains invalid characters.'));
 					$hasErrorButCanSave = true;
 				}
 
+				
+				/* LETHAL */
+				if (!$this->isTaxonNameUnique($newName)) {
+				    $this->addError(sprintf($this->translate('The name "%s" already exists.'),$newName));
+				    $hasErrorButCanSave = false;
+				}
+				
+				if (!$this->canParentHaveChildTaxa($this->requestData['parent_id'])  || $isEmptyTaxaList) {
+				    $this->addError($this->translate('The selected parent taxon can not have children.'));
+				    $hasErrorButCanSave = false;
+				} else {
+				    	
+				    $parent = $this->getTaxonById($parentId);
+				
+				    if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
+				        $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
+				        $hasErrorButCanSave = false;
+				    }
+				    	
+				}
+				
+				if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+				    $this->addError($this->translate('Rank cannot be hybrid.'));
+				}
+
 				// save as requested
-				if (is_null($hasErrorButCanSave)) {
+				if (is_null($hasErrorButCanSave) && 1==2) {
 									
 					$this->clearCache($this->cacheFiles);
 				
@@ -673,9 +680,9 @@ class SpeciesController extends Controller
 					$this->requestData['taxon'] = $newName;
 				
 					if ($hasErrorButCanSave) {
-						$this->addMessage('Errors but can be saved.');
+						$this->addMessage('Please be aware of the warnings above before saving.');
 					} else {
-						$this->addError('Errors and cannot be saved.');
+						$this->addError('Taxon not saved.');
 					}
 						
 					$this->smarty->assign('hasErrorBuCanSave',$hasErrorButCanSave);
@@ -1948,12 +1955,19 @@ class SpeciesController extends Controller
 			array_merge(
 				$this->models->Rank->_get(
 					array(
-						'id' => array('parent_id !=' => -1),
+						'id' => array('parent_id is' => 'null'),
 						'order' => 'parent_id',
 						'fieldAsIndex' => 'id'
 					)
 				),
 				$this->models->Rank->_get(
+					array(
+						'id' => array('parent_id !=' => -1),
+						'order' => 'parent_id',
+						'fieldAsIndex' => 'id'
+					)
+				),
+			$this->models->Rank->_get(
 					array(
 						'id' => array('parent_id' => -1),
 						'order' => 'parent_id',
@@ -4806,7 +4820,7 @@ class SpeciesController extends Controller
 	{
 
 		// 3. Names should not contain special characters or digits.
-		return (preg_match('/([^A-Za-z\s]+)/',$name)===0);
+		return (preg_match('/([^A-Za-z\s\(\)]+)/',$name)===0);
 		
 	}
 
@@ -4820,7 +4834,22 @@ class SpeciesController extends Controller
 		
 	}
 
+	private function removeMarkers($name)
+	{
+	    $m = array('ssp','subsp','var','subvar','subsubvar','f','subf','subsubf');
+	    
+	    foreach((array)$m as $val) {
+	        
+	        $name = preg_replace('|\b('.$val.')\b(\.){0,1}|','',$name);
+	         
+	    }
 
+	    $name = trim(preg_replace('/\s+/',' ',$name));
+
+	    return $name;
+			
+	}
+	
 
 	
 }

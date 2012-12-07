@@ -10,6 +10,9 @@ Show alphabet in runtime? <label><input name="show_alpha" type="radio" value="1"
 </p>
 <input type="submit" name="submit" value="save" />
 </form>
+<ul>
+<li><a href="order.php" class="allLookupLink">{t}Change page order{/t}</a></li>
+</ul>
 </div>
 
 {include file="../shared/admin-messages.tpl"}

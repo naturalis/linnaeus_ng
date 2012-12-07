@@ -61,6 +61,31 @@ class IntroductionController extends Controller
     }
 
     /**
+     * Contents (page overview)
+     *
+     * @access    public
+     */
+    public function contentsAction()
+    {
+    
+        $this->checkAuthorisation();
+    
+        $this->setPageName($this->translate('Contents'));
+    
+        $pagination = $this->getPagination($this->getPageHeaders(),25);
+    
+        $this->smarty->assign('prevStart', $pagination['prevStart']);
+    
+        $this->smarty->assign('nextStart', $pagination['nextStart']);
+    
+        $this->smarty->assign('pages',$pagination['items']);
+    
+        $this->printPage();
+    
+    }
+    
+    
+    /**
      * Module index
      *
      * @access    public
