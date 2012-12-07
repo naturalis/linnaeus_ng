@@ -57,8 +57,9 @@ class Controller extends BaseClass
         'module_project', 
         'free_module_project', 
         'language', 
-        'translate_me', 
-        'taxon', 
+        'interface_text', 
+    	'interface_translation',
+    	'taxon', 
         'project_rank', 
         'label_project_rank', 
         'rank', 
@@ -1217,7 +1218,7 @@ class Controller extends BaseClass
         if (empty($content))
             return;
         
-        $this->saveTranslateMe($content, 'javascript');
+        $this->saveInterfaceText($content, 'javascript');
         
         return $this->doTranslate($content);
     }
@@ -1236,7 +1237,7 @@ class Controller extends BaseClass
         if (empty($content))
             return;
         
-        $this->saveTranslateMe($content);
+        $this->saveInterfaceText($content);
         
         $c = $this->doTranslate($content);
         
@@ -1261,7 +1262,7 @@ class Controller extends BaseClass
         if (empty($content))
             return;
         
-        $this->saveTranslateMe($content);
+        $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);
     }
@@ -2552,13 +2553,13 @@ class Controller extends BaseClass
 
 
 
-    private function saveTranslateMe ($content, $controller = null)
+    private function saveInterfaceText ($content, $controller = null)
     {
-        @$this->models->TranslateMe->save(array(
+        @$this->models->InterfaceText->save(array(
             'id' => null, 
             'controller' => is_null($controller) ? $this->getControllerBaseName() : $controller, 
-            'content' => $content, 
-            'env' => 'front'
+            'text' => $content, 
+            'env' => 'app'
         ));
     }
 
