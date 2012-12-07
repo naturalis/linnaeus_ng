@@ -267,7 +267,7 @@ class Controller extends BaseClass
             // give do not display flag to taxa that are in brackets
             $t[$key]['do_display'] = !preg_match('/^\(.*\)$/', $val['taxon']);
             // taxon name
-            $t[$key]['label'] = $this->formatSpeciesEtcNames($val['taxon'], $val['rank_id']);
+            $t[$key]['label'] = $this->formatTaxon($val);
             
             //// level is effectively the recursive depth of the taxon within the tree
             //$t[$key]['level'] = $level;
@@ -326,6 +326,8 @@ class Controller extends BaseClass
                 
                 $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
                 
+                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
+                
                 foreach ((array) $pl as $val) {
                     
                     $lpr = $this->models->LabelProjectRank->_get(
@@ -365,7 +367,7 @@ class Controller extends BaseClass
                 )
             ));
             
-            $t[0]['label'] = $this->formatSpeciesEtcNames($t[0]['taxon'], $t[0]['rank_id']);
+            $t[0]['label'] = $this->formatTaxon($t[0]);
             
             $_SESSION['app']['user']['species']['taxon'] = $t[0];
             
@@ -951,34 +953,10 @@ class Controller extends BaseClass
     }
 
 
-
-    public function formatSpeciesEtcNames ($name, $projRankId)
+/*
+    public function formatTaxon ($name, $projRankId)
     {
-        /*
-		
-			In italics worden geschreven
-			
-			Genus
-			Subgenus
-			Species
-			Infraspecies
-			
-			De rest niet
-			In titel zou het dus worden
-			
-			Genus <span class="italics">Fuscus</span>
-			Subgenus (<span class="italics">Fuscus</span>) [subgenera worden altijd tussen haakjes geschreven]
-			Species <span class="italics">Fuscus fuscus</span>
-			Subspecies <span class="italics">Fuscus fuscus</span> ssp.  <span class="italics">fuscus</span>
-			
-			De rest is gewoon
-			Family Fuscidae [geen flauwekul met italics]
-			
-			PLEASE NOTE
-			the rank ID's are hardcoded, so the ranks-table should NEVER change
-		
-		*/
-        if (empty($projRankId))
+         if (empty($projRankId))
             return $name;
         
         if ($projRankId == 'synonym' || $projRankId == 'syn')
@@ -1023,7 +1001,85 @@ class Controller extends BaseClass
         }
     }
 
+*/
+    
+    public function formatTaxon ($taxon)
+    {
 
+        $e = explode(' ', $taxon['taxon']);
+        $r = $this->getProjectRanks();
+        
+        if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
+            $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
+        else
+            $d = $r[$taxon['rank_id']]['rank'];
+        
+        $rankId = $r[$taxon['rank_id']]['rank_id'];
+        $rankName = ucfirst($d);
+        $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
+        
+        // Rank level is above genus; no formatting
+        if ($rankId < GENUS_RANK_ID) {
+            return $rankName . ' ' . $taxon['taxon'];
+        }
+        
+        // Genus or subgenus; add italics
+        if ($rankId > GENUS_RANK_ID && count($e) == 1) {
+            return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+        }
+        
+        // Species
+        if ($rankName == 'Species') {
+            return '<span class="italics">' . $taxon['taxon'] . '</span>';
+        }
+
+        // Abbreviation needed from hereon
+        
+        // Regular infraspecies, name consists of three parts
+        if (count($e) == 3) {
+             return '<span class="italics">' . $e[0] . ' ' . $e[1] . 
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
+                $e[2] . '</span>';
+        }
+        
+        // Single infraspecies with subgenus
+        if (count($e) == 4 && $e[1][0] == '(') {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
+                $e[3] . '</span>';
+        }
+            
+        // We need the parent before continuing
+        $parent = $this->getTaxonById($taxon['parent_id']);
+        $parentAbbreviation = $r[$taxon['rank_id']]['abbreviation'];
+        
+        // Double infraspecies
+        if (count($e) == 4) {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . 
+                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . 
+                $e[2] .
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
+                $e[3] . '</span>';
+        }
+        
+        // Double infraspecies with subgenus
+        if (count($e) == 5 && $e[1][0] == '(') {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
+                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . 
+                $e[3] .
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
+                $e[4] . '</span>';
+        }
+        
+        // If we end up here something must be wrong, just return name sans formatting
+        return $taxon['taxon'];
+     }
+ 
+    public function formatSynonym ($name)
+    {
+        return '<span class="italics">' . $name . '</span>';
+    }
+  
 
     public function splashScreen ()
     {

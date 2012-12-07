@@ -271,7 +271,7 @@ class IndexController extends Controller
 		
 		foreach((array)$s as $key => $val) {
 		
-			$s[$key]['label'] = $this->formatSpeciesEtcNames($val['label'],'syn');
+			$s[$key]['label'] = $this->formatSynonym($val['label']);
 
 		}
 
