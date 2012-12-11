@@ -1,5 +1,7 @@
 var interfaceOldVals = Array();
 var interfaceBeingEdited = Array();
+var interfaceFinalCounter = null;
+var interfaceNextStart = -1;
 
 function interfaceSaveLabel(id,lId,newVal,msgId) {
 
@@ -54,6 +56,14 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 		}
 		$('#'+oId).html(newVal);
 		interfaceBeingEdited[idx]=false;
+		
+		var x = (parseInt(idx)+1);
+		if (x>interfaceFinalCounter && interfaceNextStart!=-1) {
+			$('<input type="hidden" name="immediateEdit">').val('1').appendTo('#theForm');
+			goNavigate(interfaceNextStart);
+		} else {
+			interfaceEnableTransEdit($('[counter='+x+']'));
+		}
 	} else
 	if (key==27) { //esc
 		$('#'+oId).html(interfaceOldVals[idx]);
