@@ -44,10 +44,10 @@
 {if $isMultiLingual}
 	<span style="float:right">
 	{section name=i loop=$uiLanguages}
-	{if $uiLanguages[i] == $uiCurrentLanguage}
-		<span class="active-language">{$uiLanguages[i]}</span>&nbsp;
+	{if $uiLanguages[i].id == $uiCurrentLanguage}
+		<span class="active-language">{$uiLanguages[i].language}</span>&nbsp;
 	{else}
-		<span class="a" onClick="$('#uiLang').val('{$uiLanguages[i]}');$('#langForm').submit()">{$uiLanguages[i]}</span>&nbsp;
+		<span class="a" onClick="$('#uiLang').val('{$uiLanguages[i].id}');$('#langForm').submit()">{$uiLanguages[i].language}</span>&nbsp;
 	{/if}
 	{/section}
 	</span>
