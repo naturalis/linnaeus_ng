@@ -1124,25 +1124,25 @@ class Controller extends BaseClass
 
 
 
-    public function setLocale($language)
+    public function setLocale($languageId)
     {
-        if (isset($_SESSION['admin']['user']['currentLanguage']) && $language == $_SESSION['admin']['user']['currentLanguage'])
+        if (isset($_SESSION['admin']['user']['currentLanguage']) && $languageId == $_SESSION['admin']['user']['currentLanguage'])
             return;
         
         $l = $this->models->Language->_get(array(
             'id' => array(
-                'language' => $language
+                'id' => $languageId
             )
         ));
         
         if (count((array) $l) == 0) {
             
-            $this->log('Tried to switch to illegal language "' . $language . '"', 1);
+            $this->log('Tried to switch to illegal language', 1);
             
             return;
         }
         
-        $_SESSION['admin']['user']['currentLanguage'] = $language;
+        $_SESSION['admin']['user']['currentLanguage'] = $languageId;
         
     }
 
@@ -2554,11 +2554,12 @@ class Controller extends BaseClass
         }
     }
 
-
-
     private function getCurrentUiLanguage ()
     {
-        return (isset($_SESSION['admin']['user']['currentLanguage']) ? $_SESSION['admin']['user']['currentLanguage'] : $this->uiLanguages[$this->uiDefaultLanguage]);
+        return
+        	(isset($_SESSION['admin']['user']['currentLanguage']) ? 
+        		$_SESSION['admin']['user']['currentLanguage'] :
+        	 	$this->uiDefaultLanguage);
     }
 
 
@@ -2904,9 +2905,21 @@ class Controller extends BaseClass
 
     private function setLanguages ()
     {
-        $this->uiLanguages = $this->generalSettings['uiLanguages'];
         
-        $this->uiDefaultLanguage = $this->generalSettings['uiDefaultLanguage'];
+        foreach((array)$this->generalSettings['uiLanguages'] as $key => $val) { 
+
+            if ($key==0) $this->uiDefaultLanguage = $val;
+            
+            $l = $this->models->Language->_get(
+            array(
+            'id' => array('id' => $val),
+            'columns' => 'id,language'
+            ));
+            
+            $this->uiLanguages[] = $l[0];
+            
+   		}
+      
     }
 
 
