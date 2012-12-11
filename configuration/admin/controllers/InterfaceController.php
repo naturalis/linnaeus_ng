@@ -40,19 +40,44 @@ class InterfaceController extends Controller
 
 
 
-    /**
-     * Index
-     *
-     * @access    public
-     */
     public function indexAction ()
     {
-        $this->setPageName($this->translate('Select modules to export'));
+        
+        $this->setPageName($this->translate('Interface translations'));
         
         $texts = $this->getAllTexts(array(
-            'lan' => 24
+        'lan' => 24
         ));
+                
+        $this->makeList($texts);
+
+        if ($this->rHasVal('immediateEdit','1')) $this->smarty->assign('immediateEdit', true);
         
+        $this->printPage();
+        
+    }
+        
+    public function untransAction ()
+    {
+        
+        $this->setPageName($this->translate('Interface translations'));
+        
+        $texts = $this->getAllTexts(array(
+        'lan' => 24,
+        'untranslatedOnly' => true
+        ));
+                
+        $this->makeList($texts);
+
+		if ($this->rHasVal('immediateEdit','1')) $this->smarty->assign('immediateEdit', true);
+        
+        $this->printPage('index');
+        
+    }
+        
+    private function makeList($texts)
+    {
+
         $pagination = $this->getPagination($texts, 25);
         
         $this->smarty->assign('prevStart', $pagination['prevStart']);
@@ -61,7 +86,6 @@ class InterfaceController extends Controller
         
         $this->smarty->assign('texts', $pagination['items']);
         
-        $this->printPage();
     }
 
 
@@ -70,6 +94,7 @@ class InterfaceController extends Controller
     {
         $env = isset($p['env']) ? $p['env'] : null;
         $lan = isset($p['lan']) ? $p['lan'] : null;
+        $untranslatedOnly = isset($p['untranslatedOnly']) ? $p['untranslatedOnly'] : null;
         
         $d = array(
             'project_id' => $this->getCurrentProjectId()
@@ -86,6 +111,8 @@ class InterfaceController extends Controller
             'columns' => 'id,text,env', 
             'order' => 'text'
         ));
+
+        if ($untranslatedOnly) $d = array();
         
         if (!is_null($lan)) {
             
@@ -102,8 +129,15 @@ class InterfaceController extends Controller
                 
                 $i[$key]['translation'] = empty($it[0]) ? null : $it[0]['translation'];
                 $i[$key]['translation_language_id'] = $lan;
+                
+                if ($untranslatedOnly) {
+                	if (empty($i[$key]['translation'])) $d[] = $i[$key]; 
+                }
+                
             }
         }
+
+        if ($untranslatedOnly) $i = $d;
         
         return $i;
     }

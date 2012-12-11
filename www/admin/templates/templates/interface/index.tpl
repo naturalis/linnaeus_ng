@@ -39,4 +39,19 @@
 <form action="" method="post" id="theForm" action="">
 </form>
 
+<script>
+
+{literal}	
+$(document).ready(function(){
+{/literal}
+	interfaceFinalCounter = {$n}; 
+	interfaceNextStart = {$nextStart};
+	{if $immediateEdit}interfaceEnableTransEdit($('[counter=0]'));
+	{/if}
+{literal}	
+});
+{/literal}	
+
+</script>
+
 {include file="../shared/admin-footer.tpl"}
