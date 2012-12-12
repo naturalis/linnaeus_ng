@@ -36,27 +36,34 @@
 <legend id="key-step-choices">{t}Choices{/t}</legend>
 <table>
 	<tr>
-		<th style="width:10px;text-align:right">#</th>
-		<th style="width:270px;">{t}choice title{/t}</th>
-		<th style="width:240px;" colspan="2">{t}choice leads to{/t}</th>
-		<th style="width:90px;">{t}change order{/t}</th>
+		<th style="text-align:right">#</th>
+		<th style="width:450px;">{t}choice title{/t}</th>
+		<th style="width:90px;">{t}image{/t}</th>
+		<th style="width:100px;">{t}choice leads to{/t}</th>
+		<th style="width:80px;" class="key-choice-arrow">{t}move{/t}</th>
 		<th style="width:30px;"><!-- span class="a" onclick="keyShowChoiceDetails(this,'all')">{t}(show all){/t}</span --></th>
-		<th style="width:60px;"></th>
-		{*<th style="width:130px;"></th>*}
+		<th style="width:30px;"></th>
 	</tr>
 {section name=i loop=$choices}
 	<tr class="tr-highlight" style="vertical-align:top">
+
 		<td class="key-choice-number">{$choices[i].marker}.</td>
-		<!-- td class="key-choice-title">{$choices[i].title}</td -->
+
 		<td class="key-choice-title">
-			{$choices[i].choice_txt}
-			{*
-				{$choices[i].choice_txt|@substr:0:50}{if $choices[i].choice_txt|@count_characters>50}...{/if}
-				<i><span class="a" onclick="keyShowChoiceDetails(this,{$smarty.section.i.index})">{t}show{/t}</span></i>
-			*}
+			{$choices[i].choice_txt|@strip_tags}
 		</td>
-		<td class="key-choice-leadsto">&rarr;</td>
+		
+		<td>
+			{if $choices[i].choice_img}
+			<img
+				onclick="allShowMedia('{$session.admin.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
+				src="{$session.admin.project.urls.project_media}{$choices[i].choice_img}"
+				class="key-choice-image-small" />
+			{/if}
+		</td>
+		
 		<td class="key-choice-target">
+		&rarr;
 		{if $choices[i].res_keystep_id!=''}
 			{if $choices[i].res_keystep_id!='-1'}
 			<span
@@ -93,27 +100,6 @@
 		<td class="key-choice-edit">[<span class="a" onclick="$('#id2').val({$choices[i].id});$('#choiceForm').submit();">{t}edit{/t}</span>]</td>
 		<td class="key-choice-edit">[<span class="a" onclick="keyChoiceDelete({$choices[i].id})">{t}delete{/t}</span>]</td>
 		{* <td class="key-choice-edit">[<a href="step_edit.php?insert={$choices[i].id}" title="{t}insert step between choice and target{/t}">{t}insert step{/t}</a>]</td> *}
-	</tr>
-	<tr id="choice-{$smarty.section.i.index}" class="key-choice-details-invisible">
-		<td>&nbsp;</td>
-		<td colspan="7">
-			<table>
-				<tr style="vertical-align:top">
-				{if $choices[i].choice_img}
-					<td{if !$choices[i].choice_txt} colspan="2"{/if}>
-						<img
-							onclick="allShowMedia('{$session.admin.project.urls.project_media}{$choices[i].choice_img}','{$choices[i].choice_img}');" 
-							src="{$session.admin.project.urls.project_media}{$choices[i].choice_img}"
-							class="key-choice-image-small" /></td>
-				{/if}
-				{if $choices[i].choice_txt}
-					<td{if !$choices[i].choice_img} colspan="2"{/if} class="key-choice-details">
-				{$choices[i].choice_txt}
-					</td>
-				{/if}
-				</tr>
-			</table>
-		</td>
 	</tr>
 {/section}
 {if $choices|@count==0}
