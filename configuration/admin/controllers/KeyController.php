@@ -92,8 +92,8 @@ class KeyController extends Controller
     public function stepShowAction ()
     {
         $this->checkAuthorisation();
-        
-        // node is an id of a step that is called directly, i.e. not through stepping
+
+       // node is the id of a step that is called directly, i.e. not through stepping
         if ($this->rHasVal('node')) {
             
             // generate a complete key tree
@@ -132,8 +132,8 @@ class KeyController extends Controller
                 )));
             }
         }
-        
-        if ($step) {
+
+		if ($step) {
             
             $this->cleanUpEmptyChoices();
 
@@ -211,11 +211,8 @@ class KeyController extends Controller
     {
         $this->checkAuthorisation();
         
+        // create a new step when no id is specified
         if (!$this->rHasId()) {
-            // create a new step when no id is specified
-            
-
-
 
             $id = $this->createNewKeystep();
             
@@ -231,9 +228,6 @@ class KeyController extends Controller
             if ($this->rHasVal('ref_choice')) {
                 // url was called from the 'new step' option of a choice: set
                 // the new referring step id
-                
-
-
 
                 $this->models->ChoiceKeystep->save(array(
                     'id' => $this->requestData['ref_choice'], 
@@ -249,13 +243,29 @@ class KeyController extends Controller
             // $this->redirect('step_edit.php?id='.$id);
             $this->redirect('step_show.php?id=' . $id . ($this->rHasVal('insert') ? '&insert=' . $this->requestData['insert'] : ''));
         }
+        // id has been specified
         else {
+
+            // delete L2-legacy image
+            if ($this->rHasVal('action', 'deleteImage')) {
             
-            if ($this->rHasVal('action', 'delete')) {
-                // deleting the step
+                 $step = $this->getKeystep($this->requestData['id']);
+
+                if (!empty($step['image']))
+                    @unlink($_SESSION['admin']['project']['paths']['project_media'] . $step['image']);
+            
+                $this->models->Keystep->save(array(
+                'id' => $this->requestData['id'],
+                'project_id' => $this->getCurrentProjectId(),
+                'number' => $this->requestData['number'],
+                'image' => 'null'
+                ));
                 
-
-
+                $this->redirect('step_show.php?id='.$step['id']);
+            
+            } else
+			// delete step
+            if ($this->rHasVal('action', 'delete')) {
 
                 $this->deleteKeystep($this->requestData['id']);
                 
@@ -264,38 +274,33 @@ class KeyController extends Controller
                 $this->redirect($entry ? 'step_show.php?id=' . $entry['id'] : 'index.php');
             }
             
+            
             // get step data
             $step = $this->getKeystep($this->requestData['id']);
             
             $this->setPageName(sprintf($this->translate('Edit step %s'), $step['number']));
             
-            // saving the number (all the rest is done through ajax)
+            //// saving the number (all the rest is done through ajax)
+            // number can now no longer be edited
             if ($this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
+            
+            	$this->redirect('step_show.php?id=' . $this->requestData['id']);
                 
-                // checking the number
+            	/*
+            	// no number specified
                 if (empty($this->requestData['number'])) {
-                    // no number specified
-                    
-
-
 
                     $next = $this->getNextLowestStepNumber();
                     
                     $this->addError(sprintf($this->translate('Step number is required. The saved number for this step is %s. The lowest unused number is %s.'), $step['number'], $next));
                 }
+                // non-numeric number specified
                 elseif (!is_numeric($this->requestData['number'])) {
-                    // non-numeric number specified
-                    
-
-
 
                     $this->addError(sprintf($this->translate('"%s" is not a number.'), $this->requestData['number']));
                 }
+                // existing number specified
                 else {
-                    // existing number specified
-                    
-
-
 
                     $k = $this->models->Keystep->_get(
                     array(
@@ -309,23 +314,13 @@ class KeyController extends Controller
                     
                     if ($k[0]['total'] != 0) {
                         // doublure
-                        
-
-
 
                         $this->addError(sprintf($this->translate('A step with number %s already exists. The lowest unused number is %s.'), $this->requestData['number'], $this->getNextLowestStepNumber()));
                     }
+                    // unique numeric number
                     else {
-                        // unique numeric number
-                        
-
-
-
+						// don't update if unchanged
                         if ($this->requestData['number'] != $step['number']) {
-                            // don't update if unchanged
-                            
-
-
 
                             $this->models->Keystep->save(
                             array(
@@ -343,8 +338,10 @@ class KeyController extends Controller
                         $this->redirect('step_show.php?id=' . $this->requestData['id']);
                     }
                 }
+	            */
             }
-        }
+
+		}
         
         if (isset($step))
             $this->smarty->assign('step', $step);
@@ -2270,7 +2267,7 @@ class KeyController extends Controller
             $_SESSION['admin']['system']['keyTreeV2'] = $this->generateKeyTree();
         
         $this->sawOffABranch($_SESSION['admin']['system']['keyTreeV2'], $step);
-        $this->reapFruits($this->tmp['branch']);
+        if (isset($this->tmp['branch'])) $this->reapFruits($this->tmp['branch']);
         
         $excludedTaxa = array();
         
@@ -2283,7 +2280,7 @@ class KeyController extends Controller
         }
         
         return array(
-            'remaining' => $this->tmp['remaining'], 
+            'remaining' => isset($this->tmp['remaining']) ? $this->tmp['remaining'] : null, 
             'excluded' => $excludedTaxa
         );
     }

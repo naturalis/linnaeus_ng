@@ -79,7 +79,12 @@
 	</tr>
 	<tr style="vertical-align:top">
 		<td colspan="2">
-			<input type="button" onclick="keySaveStepContent('default');{if $session.admin.project.languages|@count>1}keySaveStepContent('other');{/if}keySaveStepSubmit();" value="{t}save{/t}" />
+			<input
+				type="button"
+				onclick="
+					{if $session.admin.project.languages|@count>1}keySaveStepContent('other');{/if} 
+					keySaveStepContent('default','$(\'#theForm\').submit()');"
+					value="{t}save{/t}" />
 			<input type="button" onclick="$('#backForm').submit();" value="{t}back{/t}" />&nbsp;&nbsp;
 			<input type="button" onclick="keyStepUndo();"  value="{t}undo last save{/t}" />
 		</td>

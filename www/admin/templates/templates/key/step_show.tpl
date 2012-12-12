@@ -4,10 +4,6 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
-<form method="post" action="step_edit.php" id="delForm">
-<input type="hidden" name="action" id="action" value="delete" />
-<input type="hidden" name="id" value="{$step.id}" />
-</form>
 <form method="post" action="step_edit.php" id="theForm">
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="id" id="id" value="{$step.id}" />
@@ -17,7 +13,8 @@
 {$step.content}
 {if $step.image}<p><img src="{$session.admin.project.urls.project_media}{$step.image}" /><br />
 <span style="color:red">
-	Please note: this image is a legacay feature inherited from Linnaeus 2. It cannot be changed.
+	Please note: this image is a legacay feature inherited from Linnaeus 2. It cannot be changed.<br />
+	<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
 </span>
 </p>{/if}
 <p>

@@ -226,7 +226,7 @@ function keySetKeystepContent(obj,language) {
 
 }
 
-function keySaveStepContent(type) {
+function keySaveStepContent(type,postFunction) {
 
 	if (type=='default')
 		content = [$('#titleDefault').val(),$('#contentDefault').val()];
@@ -237,40 +237,18 @@ function keySaveStepContent(type) {
 		keyStepId,
 		type=='default' ? allDefaultLanguage : allActiveLanguage,
 		content,
-		'save_keystep_content'
+		'save_keystep_content',
+		postFunction
 	);
 
 }
-
-function keySaveStepSubmit() {
-
-	/*
-	if ($('#number').val().length==0) {
-		alert(_('A number is required.'));
-		$('#number').focus();
-	} else
-	if ($('#titleDefault').val().length==0) {
-		alert(_('A title is required.'));
-		$('#titleDefault').focus();
-	} else
-	if ($('#titleOther') && $('#titleOther').val().length==0) {
-		alert(_('A title is required.'));
-		$('#titleOther').focus();
-
-	} else 
-	*/
-	{
-		$('#theForm').submit();
-	}
-
-}
-
 
 function keyDeleteKeyStep() {
 
 	if (!allDoubleDeleteConfirm(_('keystep'),$('#key-step-title').html())) return;
 
-	$('#delForm').submit();
+	$('#action').val('delete');
+	$('#theForm').submit();
 
 }
 
