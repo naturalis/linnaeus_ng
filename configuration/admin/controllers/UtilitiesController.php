@@ -12,7 +12,11 @@ class UtilitiesController extends Controller
     
     public $controllerPublicName = 'Utilities';
 
+	public $cssToLoad = array();
 
+	public $jsToLoad = array();
+
+    
 
     /**
      * Constructor, calls parent's constructor
@@ -90,7 +94,7 @@ class UtilitiesController extends Controller
      */
     public function moduleNotPresentAction ()
     {
-        
+
         $this->smarty->assign('hideControllerPublicName', true);
         
         $this->addError(sprintf($this->translate('The module "%s" is not part of your project.'),$_SESSION['admin']['system']['last_module_name']));

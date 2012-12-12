@@ -34,26 +34,6 @@
 	</div>
 </div>
 
-<!--
-{literal}
-<script>
-var offset = $('#choices').offset();
-var height = 0;
-$("[id^='choice-img-']").each(function (i,e) {
-	var d = $(e).offset();
-	$(e).offset({ left: d.left + offset.left, top: d.top + offset.top });
-	height = ($(e).height() > height ? $(e).height() : height);
-
-	$('#txt-'+e.id).offset({ left: d.left + offset.left + 10, top: d.top + offset.top + height});
-});
-
-$('#choices').height($('#choices').height()+height < $('#taxa').height() ? $('#taxa').height() : $('#choices').height()+height);
-
-</script>
-{/literal}
--->
-
-
 {literal}
 <script>
 $(".inline-image").click(function (e) {

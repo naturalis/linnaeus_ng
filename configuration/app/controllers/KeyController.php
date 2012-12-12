@@ -24,7 +24,7 @@ class KeyController extends Controller
 		'key.css',
 		'lookup.css',
 		'prettyPhoto/prettyPhoto.css',
-		'dialog/jquery.modaldialog.css'
+	    'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
 	
 	public $jsToLoad =
@@ -32,7 +32,7 @@ class KeyController extends Controller
 			'all' => array(
 				'main.js',
 				'key.js',
-				'prettyPhoto/jquery.prettyPhoto.js',
+			    'prettyPhoto/jquery.prettyPhoto.js',
 				'dialog/jquery.modaldialog.js',
 				'lookup.js'
 			),
