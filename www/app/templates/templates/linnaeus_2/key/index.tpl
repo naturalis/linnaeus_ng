@@ -17,74 +17,62 @@
 		</div>
 		<div id="choices">
 
-{if $keyType=="l2" && $choices|@count > 2}
-    <table id="choice-grid"><tr><td>
-{/if}
-{foreach from=$choices key=k item=v}
-    {if $keyType=="l2" && $k==2}
-        </td><td>
-    {/if}
-
-    <div class="choice" 
-        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
-        {elseif $v.res_taxon_id!=''}
-            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
-        {/if}
-    >
-	           {if $v.choice_img}
-					<div class="choice-image-div">
-					{if $useJavascriptLinks}
-						<img
-							alt="{$v.choice_img}"
-							class="choice-image-small"
-							onclick="{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}keyDoChoice({$v.id}){elseif $v.res_taxon_id!=''}goTaxon({$v.res_taxon_id}){/if}" 
-							src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
-							/>
-					{else}
-					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-						<a href="../key/index.php?choice={$v.id}">
-					{elseif $v.res_taxon_id!=''}
-						<a href="../species/taxon.php?id={$v.res_taxon_id}">
-					{/if}
-						<img
-							alt="{$v.choice_img}"
-							class="choice-image-small"
-							src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+    <table id="choice-table">
+	{foreach from=$choices key=k item=v name=henk}
+		 <tr><td class="choice_image_cell">
+           {if $v.choice_img}
+				{if $useJavascriptLinks}
+					<img
+						alt="{t}Choice{/t} {$step.number}{$v.marker}"
+						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
+						class="choice-image-small"
+						onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
+						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
 						/>
-						</a>
-					{/if}						
-						
-						
-						<br />
-						<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">{t}(enlarge image){/t}</a>
-					</div>
-	{/if}
-					{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
-					<div class="text">{$v.choice_txt}</div>
-					
+				{else}
+					<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
+					<img
+						alt="{t}Choice{/t} {$step.number}{$v.marker}"
+						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
+						class="choice-image-small"
+						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+					/>
+					</a>
+				{/if}						
+			{/if}
+ 
+        </td><td class="choice_cell">
 
-					<div class="target">
-					{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-						{if $v.target_number}
-						<span class="arrow">&rarr;</span>
-						<span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
-						{/if}
-					{elseif $v.res_taxon_id!=''}
-						<span class="arrow">&rarr;</span>
-						<span>{$v.target}
-							{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-						</span>
+		    <div class="choice" 
+		        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+		            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+		        {elseif $v.res_taxon_id!=''}
+		            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
+		        {/if}
+		    >
+
+			{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
+			<div class="text">{$v.choice_txt}</div>
+				<div class="target">
+				{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+					{if $v.target_number}
+					<span class="arrow">&rarr;</span>
+					<span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
 					{/if}
-
-
-					</div>
-
+				{elseif $v.res_taxon_id!=''}
+					<span class="arrow">&rarr;</span>
+					<span>{$v.target}
+						{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+					</span>
+				{/if}
+				</div>
 			</div>
+	
+		{if not $smarty.foreach.henk.last}<tr><td colspan="2"><hr class="faded"></td></tr>{/if}
+
 {/foreach}
-{if $keyType=="l2" && $choices|@count > 2}
+   
     </td></tr></table>
-{/if}
 		
 		
 		
@@ -95,9 +83,19 @@
 
 {literal}
 <script>
-$(".inline-image").click(function (e) {
-    e.stopPropagation();
-});
+
+  $(document).ready(function(){
+	$(".inline-image").click(function (e) {
+	    e.stopPropagation();
+	});
+
+	var panelTop = $('#panel').offset().top;
+	$('#page-main').scroll(function() {
+		//alert(panelTop);  
+		$('#panel').offset({top: panelTop});
+	  });	
+  });
+
 </script>
 {/literal}
 

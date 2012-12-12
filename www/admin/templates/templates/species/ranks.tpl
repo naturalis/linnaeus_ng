@@ -50,7 +50,7 @@ Once you have saved the selection, you can {/t}<a href="ranklabels.php">{t}chang
 {/foreach}
 </table>
 
-<div id="floating-div" style="position:absolute;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />
+<div id="floating-div" style="position:absolute; top: 0; left: 0; visibility: hidden;">{t}Selected ranks{/t} <span ondblclick="taxonRemoveAll()">{t}(double click to delete){/t}</span>:<br />
 <div id="selected-ranks"></div>
 
 </form>
@@ -59,12 +59,12 @@ Once you have saved the selection, you can {/t}<a href="ranklabels.php">{t}chang
 {literal}
 
 $(document).ready(function(){
-
-	var f = $('#floating-div');
 	
+	var f = $('#floating-div');
 	var offset = $('#ranks-table').offset();
 	f.offset({left : offset.left + $('#ranks-table').width() + 25, top: offset.top});
-
+	f.css('visibility', 'visible');
+	
 	$(window).scroll(function() {
 
 		var offset = $('#ranks-table').offset();
@@ -74,6 +74,7 @@ $(document).ready(function(){
 
 	});
 {/literal}
+
 	taxonKingdom = [{$ranks[0].id},'{$ranks[0].rank}'];
 {section name=i loop=$ranks}
 {if $ranks[i].in_col==1}	taxonCoLRanks[taxonCoLRanks.length]=[{$ranks[i].id},'{$ranks[i].rank}'];

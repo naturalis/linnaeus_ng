@@ -100,8 +100,6 @@ class Controller extends BaseClass
         $this->loadModels();
         
         //$this->setHelpTexts();
-        
-
 
         $this->setRandomValue();
         
@@ -120,6 +118,7 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
         
         $this->setProjectLanguages();
+        
     }
 
 
@@ -2538,7 +2537,7 @@ class Controller extends BaseClass
         
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
-        
+
         if (isset($this->jsToLoad))
             $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
         

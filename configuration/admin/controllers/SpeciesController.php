@@ -716,7 +716,7 @@ class SpeciesController extends Controller
 
 		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
 
-        $this->checkAuthorisation();
+//        $this->checkAuthorisation();
 
         $this->setBreadcrumbIncludeReferer(
             array(
