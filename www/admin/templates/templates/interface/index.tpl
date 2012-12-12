@@ -6,6 +6,14 @@
 <option value="{$v.id}">{$v.language}</option>
 {/foreach}
 </select -->
+
+<select name="env">
+{foreach from=$envs item=v}
+<option value="{$v.id}">{$v.env}</option>
+{/foreach}
+</select>
+
+
 <table>
 <tr><th>{t}identifier (and English translation){/t}</th><th colspan=2>{t _s1='Dutch'}translation in %s{/t}</th></tr>
 {foreach from=$texts item=v key=n}

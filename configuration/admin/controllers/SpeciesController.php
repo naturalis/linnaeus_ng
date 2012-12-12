@@ -685,7 +685,7 @@ class SpeciesController extends Controller
 						$this->addError('Taxon not saved.');
 					}
 						
-					$this->smarty->assign('hasErrorBuCanSave',$hasErrorButCanSave);
+					$this->smarty->assign('hasErrorButCanSave',$hasErrorButCanSave);
 					
 					$this->smarty->assign('data',$this->requestData);
 				
