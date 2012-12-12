@@ -363,8 +363,8 @@ class KeyController extends Controller
     public function choiceEditAction ()
     {
         $this->checkAuthorisation();
-        
-        // create a new choice when no id is specified
+
+		// create a new choice when no id is specified
         if (!$this->rHasId()) {
             
             // need a step to which the choice belongs
@@ -416,12 +416,10 @@ class KeyController extends Controller
             
             unset($choice['choice_img']);
         }
+
         
         if (($this->rHasVal('res_keystep_id') || $this->rHasVal('res_taxon_id')) && !$this->isFormResubmit()) {
             // save new target
-            
-
-
 
             $this->clearCache($this->cacheFiles);
             
