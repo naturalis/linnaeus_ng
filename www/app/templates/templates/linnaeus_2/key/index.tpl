@@ -19,37 +19,17 @@
 
     <table id="choice-table">
 	{foreach from=$choices key=k item=v name=henk}
-		 <tr><td class="choice_image_cell">
-           {if $v.choice_img}
-				{if $useJavascriptLinks}
-					<img
-						alt="{t}Choice{/t} {$step.number}{$v.marker}"
-						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
-						class="choice-image-small"
-						onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
-						/>
-				{else}
-					<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
-					<img
-						alt="{t}Choice{/t} {$step.number}{$v.marker}"
-						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
-						class="choice-image-small"
-						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
-					/>
-					</a>
-				{/if}						
-			{/if}
- 
-        </td><td class="choice_cell">
-
-		    <div class="choice" 
+		 <tr><td class="choice_cell">
+			
+		    <div class="choice{if $v.choice_img} choice-picture"{else}"{/if} 
 		        {if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
 		            onclick="{if $useJavascriptLinks}keyDoChoice({$v.id}){else}window.location.href='../key/index.php?choice={$v.id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
 		        {elseif $v.res_taxon_id!=''}
 		            onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
 		        {/if}
 		    >
+
+           <table class="wrapper-choice{if $v.choice_img}-picture{/if}"><tr><td>
 
 			{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
 			<div class="text">{$v.choice_txt}</div>
@@ -67,8 +47,33 @@
 				{/if}
 				</div>
 			</div>
-	
-		{if not $smarty.foreach.henk.last}<tr><td colspan="2"><hr class="faded"></td></tr>{/if}
+		
+		</td>
+		{if $v.choice_img}
+			<td class="image-cell">
+				{if $useJavascriptLinks}
+					<img
+						alt="{t}Choice{/t} {$step.number}{$v.marker}"
+						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
+						class="choice-image"
+						onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
+						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+						/>
+				{else}
+					<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
+					<img
+						alt="{t}Choice{/t} {$step.number}{$v.marker}"
+						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
+						class="choice-image"
+						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+					/>
+					</a>
+				{/if}	
+			</td>
+		{/if}
+		</tr></table>
+		
+		{if not $smarty.foreach.henk.last}<tr><td class="separator"></td></tr>{/if}
 
 {/foreach}
    
@@ -86,6 +91,10 @@
 
   $(document).ready(function(){
 	$(".inline-image").click(function (e) {
+	    e.stopPropagation();
+	});
+
+	$(".choice-image").click(function (e) {
 	    e.stopPropagation();
 	});
 
