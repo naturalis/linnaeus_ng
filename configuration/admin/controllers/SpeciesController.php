@@ -554,7 +554,158 @@ class SpeciesController extends Controller
      *
      * @access    public
      */
-    public function newAction()
+	public function newAction()
+	{
+
+		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
+
+		$this->checkAuthorisation();
+
+		$this->setPageName($this->translate('New taxon'));
+		
+		$pr = $this->newGetProjectRanks();
+	
+		if (count((array)$pr)==0) {
+
+			$this->addMessage($this->translate('No ranks have been defined.'));
+
+		} else {
+
+			$this->_newGetTaxonTree();
+
+			$isEmptyTaxaList = !isset($this->treeList) || count((array)$this->treeList)==0;
+	
+			// save
+			if ($this->rHasVal('taxon') && $this->rHasVal('action','save')) { // && !$this->isFormResubmit()) {
+
+				$isHybrid = $this->rHasVal('is_hybrid','on');
+				
+				$parentId =
+					(
+						(isset($this->requestData['id']) && $this->requestData['id']==$this->requestData['parent_id']) || 
+						$isEmptyTaxaList || 
+						$this->requestData['parent_id']=='-1' ? 
+							null :
+							$this->requestData['parent_id']
+					);
+
+				$newName = $this->requestData['taxon'];
+
+				$newName = trim(preg_replace('/\s+/',' ',$newName));
+
+				// 1. First letter is capitalized (changed silently)
+				$newName = $this->fixNameCasting($newName);
+
+				$hasErrorButCanSave = null;
+
+				//checks
+				/* NON LETHAL */
+				//http://dev2.etibioinformatics.nl/fixit/browse/LINNG-740
+				// 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
+				if (!$this->checkNameSpaces($newName,$this->requestData['rank_id'],$this->requestData['parent_id'])) {
+					$this->addError($this->translate('Only species and below can contain spaces in their names.'));
+					$hasErrorButCanSave = true;
+				}
+
+				// no markers
+				$d = $this->removeMarkers($newName);
+				if ($d!=$newName) {
+					$this->addError($this->translate('Markers are inserted automatically.'));
+					$hasErrorButCanSave = true;
+					$newName = $d;
+				}
+
+				// 3. Names are written in Latin and should not contain special characters or digits.
+				if (!$this->checkCharacters($newName)) {
+					$this->addError($this->translate('The name you specified contains invalid characters.'));
+					$hasErrorButCanSave = true;
+				}
+
+				
+				/* LETHAL */
+				if (!$this->isTaxonNameUnique($newName)) {
+				    $this->addError(sprintf($this->translate('The name "%s" already exists.'),$newName));
+				    $hasErrorButCanSave = false;
+				}
+				
+				if (!$this->canParentHaveChildTaxa($this->requestData['parent_id'])  || $isEmptyTaxaList) {
+				    $this->addError($this->translate('The selected parent taxon can not have children.'));
+				    $hasErrorButCanSave = false;
+				} else {
+				    	
+				    $parent = $this->getTaxonById($parentId);
+				
+				    if (!$this->doNameAndParentMatch($newName,$parent['taxon'])) {
+				        $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'),$parent['taxon'],$newName));
+				        $hasErrorButCanSave = false;
+				    }
+				    	
+				}
+				
+				if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
+				    $this->addError($this->translate('Rank cannot be hybrid.'));
+				}
+
+				// save as requested
+				if (is_null($hasErrorButCanSave)) {
+									
+					$this->clearCache($this->cacheFiles);
+				
+					$this->models->Taxon->save(
+							array(
+									'id' => ($this->rHasId() ? $this->requestData['id'] : null),
+									'project_id' => $this->getCurrentProjectId(),
+									'taxon' => $newName,
+									'author' => ($this->requestData['author'] ? $this->requestData['author'] : null),
+									'parent_id' => $parentId,
+									'rank_id' => $this->requestData['rank_id'],
+									'is_hybrid' =>  ($isHybrid ? 1 : 0)
+							)
+					);
+				
+					$newId = $this->models->Taxon->getNewId();
+				
+					if (empty($parentId))  $this->doAssignUserTaxon($this->getCurrentUserId(),$newId);
+				
+					$this->reOrderTaxonTree();
+				
+					if ($this->rHasVal('next','main')) $this->redirect('taxon.php?id='.$newId);
+								
+					$this->_newGetTaxonTree();
+
+					$this->addMessage(sprintf($this->translate('"%s" saved.'),$newName));
+				
+				} else {
+				
+					$this->requestData['taxon'] = $newName;
+				
+					if ($hasErrorButCanSave) {
+						$this->addMessage('Please be aware of the warnings above before saving.');
+					} else {
+						$this->addError('Taxon not saved.');
+					}
+						
+					$this->smarty->assign('hasErrorButCanSave',$hasErrorButCanSave);
+					
+					$this->smarty->assign('data',$this->requestData);
+				
+				}				
+				
+			} // save
+			
+		}  // no ranks defined
+
+		$this->smarty->assign('projectRanks',$pr);
+		
+		if (isset($this->treeList))  $this->smarty->assign('taxa',$this->treeList);
+
+		$this->smarty->assign('rankIdSubgenus',$this->getProjectIdRankByname('Subgenus'));
+
+		$this->printPage();
+
+	}
+	
+    public function ORGnewAction()
     {
 
 		$this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
@@ -1784,8 +1935,16 @@ class SpeciesController extends Controller
         
         } else if ($this->requestData['action'] == 'get_rank_by_parent') {
 
-			$d = $this->getTaxonById();
-            $this->getRankByParent($d['rank_id']);
+            // get intel on the taxon that will be the parent
+			$d = $this->getTaxonById($this->requestData['id']);
+            
+			// get the project RANK that is the child of the parent taxon's RANK 
+			$rank = $this->getProjectRankByParentProjectRank($d['rank_id']);
+
+			// in some cases, certain children have to be skipped in favour of more likely progeny lower down the tree
+			$rank = $this->getCorrectedGenusAndSpeciesChildRanks($d['rank_id']);
+			
+            $this->smarty->assign('returnText',$rank);
 
         } else if ($this->requestData['action'] == 'save_section_title') {
 
@@ -1806,6 +1965,23 @@ class SpeciesController extends Controller
         } else if ($this->requestData['action'] == 'save_language_label') {
 
             $this->ajaxActionSaveLanguageLabel();
+
+        } else if ($this->requestData['action'] == 'get_subgenus_child_name_prefix') {
+
+            $this->smarty->assign('returnText',$this->getSubgenusChildNamePrefix($this->requestData['id'])); // phew!
+
+        } else if ($this->requestData['action'] == 'get_formatted_name') {
+            
+            $this->smarty->assign(
+            	'returnText',
+	            $this->formatTaxon(
+	            	array(
+	            		'taxon' => $this->requestData['name'],
+	            		'rank_id' => $this->requestData['rank_id'],
+						'parent_id' => $this->requestData['parent_id'],
+	            	)
+	            )
+            );
 
         } else if ($this->requestData['action'] == 'set_overview') {
 
@@ -3566,34 +3742,6 @@ class SpeciesController extends Controller
 		
     }
 
-    private function isTaxonNameFirstPartLegal($taxonName=null)
-    {
-	
-		$taxonName = trim($taxonName);
-
-        if (empty($taxonName)) return;
-		
-		$d = trim(substr($taxonName,0,strrpos($taxonName,' ')));
-		
-		if (empty($d)) return true;
-
-		$t = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'taxon' => $d
-				),
-				'columns' => 'count(*) as total'
-			)
-		);
-		
-		if ($t[0]['total']>0)
-			return true;
-		else
-			return $d;
-
-    }
-
     private function ajaxActionSaveTaxonName () 
     {
 
@@ -3963,7 +4111,7 @@ class SpeciesController extends Controller
 
 	}
 
-	private function getRankByParent($id = false,$output = true)
+	private function getProjectRankByParentProjectRank($id=false)
 	{
 
         if ($id === false) $id = $this->requestData['id'];
@@ -3973,10 +4121,26 @@ class SpeciesController extends Controller
 		$d = $this->models->ProjectRank->_get(array('id' => array('parent_id' => $id)));
 
 		$result = $d[0]['id'] ? $d[0]['id'] : -1;
-		
-		if ($output) $this->smarty->assign('returnText', $result);
 
 		return $result;
+
+	}
+
+	private function getProjectIdRankByname($name)
+	{
+
+	    $r = $this->models->Rank->_get(array('id' => array('rank' => $name)));
+	    $r = $this->models->ProjectRank->_get(
+		    	array(
+		    		'id' =>
+		    			array(
+		    				'project_id' => $this->getCurrentProjectId(),
+		    				'rank_id' => $r[0]['id']
+		    			)
+		    	)
+		    );
+	     
+		return $r[0]['id'];
 
 	}
 
@@ -3987,7 +4151,7 @@ class SpeciesController extends Controller
 		$d = $this->getTaxonById($parentId);
 
 		// ..and check whether its rank has any child ranks
-		return ($this->getRankByParent($d['rank_id'],false) != -1);
+		return ($this->getProjectRankByParentProjectRank($d['rank_id']) != -1);
 
 	}
 
@@ -4808,10 +4972,61 @@ class SpeciesController extends Controller
 	
 	}
 
-	private function checkNameSpaces($name,$rankId)
+	private function checkNameSpaces($name,$rankId,$parentId)
 	{
 
-		// 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
+	    // trim and replace accidental double spaces by single ones
+	    $name = trim(preg_replace('/\s+/',' ',$name));
+	    
+	    $species_rank_id = $this->getProjectIdRankByname('Species');
+	    
+		//Dit is 'm volgens mij
+		//[4:52:12 PM] Ruud Altenburg: 1. rank_id < species_rank_id
+		//geen spaties mogelijk
+		if ($rankId < $species_rank_id) return preg_match('/\s/', $name)==0;
+		
+		//2. rank_id == species_rank_id
+		//een spatie mogeljik
+		//twee spaties alleen mogelijk als eerste karakter van twee woord een ( is -> subgenus
+		//(dit kun je evt ook testen met parent_id = subgenus_rank_id)
+		if ($rankId == $species_rank_id) {
+		    if (preg_match('/\s/', $name)==1) return true;
+		    if (preg_match('/\s/', $name)==2) {
+		    	$d = explode(' ',$name);
+		    	return substr($d[1],0,1)=='(';
+		    }
+		    return false;
+		}
+		
+		//3. rank_id > species_rank_id
+		//hier moet de parent erbij gesleept worden
+		$parent = $this->getTaxonById($parentId);
+		
+		//parent_id = species_rank_id:
+		//twee spaties mogeljik
+		//drie spaties alleen mogelijk als eerste karakter van twee woord een ( is
+		if ($parent['rank_id'] == $species_rank_id) {
+		    if (preg_match('/\s/', $name)==2) return true;
+		    if (preg_match('/\s/', $name)==3) {
+		        $d = explode(' ',$name);
+		        return substr($d[2],0,1)=='(';
+		    }
+		    return false;
+		}
+		
+		//parent_id > species_rank_id
+		//drie spaties mogeljik
+		//vier spaties alleen mogelijk als eerste karakter van twee woord een ( is
+		if ($parent['rank_id'] > $species_rank_id) {
+		    if (preg_match('/\s/', $name)==3) return true;
+		    if (preg_match('/\s/', $name)==4) {
+		        $d = explode(' ',$name);
+		        return substr($d[3],0,1)=='(';
+		    }
+		    return false;
+		}	
+
+		// let's be tolerant
 		return true;
 
 	}
@@ -4819,11 +5034,38 @@ class SpeciesController extends Controller
 	private function checkCharacters($name)
 	{
 
-		// 3. Names should not contain special characters or digits.
-		return (preg_match('/([^A-Za-z\s\(\)]+)/',$name)===0);
+		// 3. Names should not contain special characters (except -) or digits. 
+		return (preg_match('/([^A-Za-z\s\(\)\-]+)/',$name)===0);
 		
 	}
 
+	private function isTaxonNameFirstPartLegal($taxonName=null)
+	{
+	
+	    $taxonName = trim($taxonName);
+	
+	    if (empty($taxonName)) return;
+	
+	    $d = trim(substr($taxonName,0,strrpos($taxonName,' ')));
+	
+	    if (empty($d)) return true;
+	
+	    $t = $this->models->Taxon->_get(
+	    array(
+	    'id' => array(
+	    'project_id' => $this->getCurrentProjectId(),
+	    'taxon' => $d
+	    ),
+	    'columns' => 'count(*) as total'
+	    )
+	    );
+	
+	    if ($t[0]['total']>0)
+	        return true;
+	    else
+	        return $d;
+	
+	}
 
 	private function doNameAndParentMatch($name,$parent)
 	{
@@ -4850,6 +5092,76 @@ class SpeciesController extends Controller
 			
 	}
 	
+	
+	private function getCorrectedGenusAndSpeciesChildRanks($rankId)
+	{
+
+       /*
+	    8. when choosing a parent, default rank of new taxon should be the parent rank's child, with two exceptions:
+	    
+	        genus should automatically select species, possibly bypassing subgenus (which can be subsequently selected by hand)
+	        species should automatically select subspecies, possibly bypassing variety etc (which can be subsequently selected by hand)
+	    */
+	    
+	    $d = null;
+
+	    $pr = $this->models->ProjectRank->_get(
+	    	array(
+	    		'id' => 
+	    		array(
+	    			'project_id' => $this->getCurrentProjectId(),
+	    			'id' => $rankId
+	    		)
+	    	)
+		);
+	    
+	    if (isset($pr) && $pr[0]['rank_id']==GENUS_RANK_ID) $d = SPECIES_RANK_ID;
+	    if (isset($pr) && $pr[0]['rank_id']==SPECIES_RANK_ID) $d = SUBSPECIES_RANK_ID;
+	    
+	    if (!is_null($d)) {
+
+		    $pr = $this->models->ProjectRank->_get(
+		    	array(
+		    		'id' => 
+		    		array(
+		    			'project_id' => $this->getCurrentProjectId(),
+		    			'rank_id' => $d
+		    		)
+		    	)
+			);
+
+		    if (!empty($pr[0]['id'])) return $pr[0]['id'];
+
+	    }
+	    
+	    return $rankId;
+	    
+	}
+	
+	private function getSubgenusChildNamePrefix($id)
+	{
+		
+	    /*
+	     10. when user selects subgenus as parent, the input box for the name automatically gets "genus (subgenus) ", which is editable, so the expert can remove the parenthese(s) as he sees fit.
+	     */
+	    
+	    $t = $this->getTaxonById($id);
+
+	    if ($t['rank_id'] == $this->getProjectIdRankByname('Subgenus')) {
+	         
+	        $p = $this->getTaxonById($t['parent_id']);
+         
+	        if ($p['rank_id'] == $this->getProjectIdRankByname('Genus')) {
+	            
+	            return $p['taxon'].' ('.$t['taxon'].') ';
+	            	            
+	        }
+	             
+
+	    }
+	    
+	    
+	}
 
 	
 }

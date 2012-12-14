@@ -16,7 +16,7 @@ var taxonCommonnameLanguages = Array();
 var taxonHigherTaxa = false;
 var taxonCopyableTaxa = Array();
 var taxonSubmitButtonLabel = null;;
-
+var taxonSubGenusRankId = null;
 
 //GENERAL
 function taxonGeneralDeleteLabels(id,action,name,itm) {
@@ -1215,9 +1215,7 @@ function taxonGetRankByParent(nomessage) {
 
 	var id = $('#parent-id option:selected').val();
 
-	if (id == -1) {
-		return;
-	}
+	if (id == -1) return;
 
 	$.ajax({
 		url : "ajax_interface.php",
@@ -1229,8 +1227,9 @@ function taxonGetRankByParent(nomessage) {
 		}),
 		async: allAjaxAsynchMode,
 		success : function (data) {
-			
+			//alert(data);
 			$('#taxon-name').val('');
+			$('#formatted-example').html('');
 
 			if (data=='-1' && !nomessage) {
 				$('#rank-message').removeClass().addClass('message-error');
@@ -1242,7 +1241,7 @@ function taxonGetRankByParent(nomessage) {
 					$('#rank-message').html('')
 				}
 				$('#rank-id').val(data);
-				taxonAddNamePart();
+				taxonAddNamePart(data);
 			}
 
 			if (!nomessage) taxonCheckHybridCheck();
@@ -1412,57 +1411,44 @@ function taxonDoPreview() {
 
 }
 
-var taxonHasChangedNameManually = false;
-
-function taxonRegisterManualInput() {
-
-	taxonHasChangedNameManually = ($('#taxon-name').val().length==0);
-
-}
-
 function taxonStoreCopyableTaxa(id) {
 
 	taxonCopyableTaxa.push(id);
 
 }
 
-function taxonAddNamePart() {
+function taxonAddNamePart(parentId) {
 	
 	if (taxonHigherTaxa) return;
-	
-	if ($('#parent-id :selected').attr('rank_id')!=$('#rank-id :selected').attr('ideal_parent_id')) return;
 
-	$('#taxon-name').val($('#parent-id :selected').text().trim()+' ');
 	$('#taxon-name').focus();
-
-	return;
 	
-	/*
-	if (taxonHasChangedNameManually) return;
+	if ($('#parent-id :selected').attr('rank_id')==$('#rank-id :selected').attr('ideal_parent_id')) {
 
-	if (jQuery.inArray($('#parent-id :selected').val(),taxonCopyableTaxa)!==-1) {
+		$('#taxon-name').val($('#parent-id :selected').attr('name').trim()+' ');
 		
-		var namePart = $('#parent-id :selected').text().trim();
+	} else
+	// hardcoded excpetion for subgenera!
+	if (parentId==taxonSubGenusRankId) {
 
-		if ($('#taxon-name').val().length!=0) {
-
-			var d = $('#taxon-name').val().split(' ');
-
-			if ($('#taxon-name').val().indexOf(namePart)===-1) {
-
-				alert('Mismatch');
-
+		allAjaxHandle = $.ajax({
+			url : "ajax_interface.php",
+			type: "POST",
+			data : ({
+				'action' : 'get_subgenus_child_name_prefix' ,
+				'id' : $('#parent-id').val() , 
+				'time' : allGetTimestamp()
+			}),
+			success : function (data) {
+				$('#taxon-name').val(data);
 			}
+		});		
+		
+	} else {
 
-		} else {
-
-			$('#taxon-name').val(namePart+' ');
-
-		}
-
+		return;
 	}
-	*/
-
+		
 }
 
 function taxonChangeOverviewPicture(ele) {
@@ -1516,6 +1502,26 @@ function taxonEnableButtons() {
 		$(this).attr('disabled',null);		
 	});
 	
-	
 
+}
+
+function taxonGetFormattedPreview() {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'get_formatted_name' ,
+			'name' : $('#taxon-name').val() ,
+			'rank_id' : $('#rank-id').val() ,
+			'parent_id' :$('#parent-id').val() ,
+			'time' : allGetTimestamp()
+		}),
+		success : function (data) {
+			$('#formatted-example').html(data);
+		}
+	});
+	
+	
+	
 }
