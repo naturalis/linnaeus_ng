@@ -1475,27 +1475,6 @@ class KeyController extends Controller
         return $choices;
     }
 
-    
-    private function getKeystepByChoiceId ($choiceId)
-    {
-        $ck = $this->models->ChoiceKeystep->_get(array(
-            'id' => array(
-                'id' => $choiceId, 
-                'project_id' => $this->getCurrentProjectId()
-            )
-        ));
-        
-        $k = $this->models->Keystep->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'id' => $ck[0]['keystep_id']
-            )
-        ));
-        
-        return $k ? $k[0] : false; 
-    }
-
-
     private function getKeystepChoice ($id)
     {
         $ck = $this->models->ChoiceKeystep->_get(array(
@@ -1589,9 +1568,6 @@ class KeyController extends Controller
             // save to undo buffer
             $this->saveOldKeyChoiceData($this->models->ChoiceContentKeystep->getRetainedData(), $d, 'manual');
             
-            // change runtime layout based on step_type
-            $step = $this->getKeystepByChoiceId($data['id']);
-                        
             $this->smarty->assign('returnText', $this->models->ChoiceContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
     }
