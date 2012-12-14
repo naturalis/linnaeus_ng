@@ -29,9 +29,9 @@
 		        {/if}
 		    >
 
-           <table class="wrapper-choice{if $v.choice_img}-picture{/if}"><tr><td>
+            <table class="wrapper-choice{if $v.choice_img}-picture{/if}"><tr><td>
 
-			{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
+			<span class="marker">{$v.marker}</span>.
 			<div class="text">{$v.choice_txt}</div>
 				<div class="target">
 				{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}

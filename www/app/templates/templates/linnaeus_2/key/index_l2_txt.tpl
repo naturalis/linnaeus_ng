@@ -5,15 +5,11 @@
     {include file="_taxa.tpl"}
 	<div id="step">
 		<div id="question">
-		{if $keyType=="lng"}
-            <div id="content">{$step.content}</div>
-	    {else}
-            {if $step.image}
-                <div id="step-image">
-                    <img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
-                </div>
-            {/if}
-	    {/if}
+        {if $step.image}
+            <div id="step-image">
+                <img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
+            </div>
+        {/if}
 		</div>
 		<div id="choices">
 
@@ -33,7 +29,7 @@
             onclick="{if $useJavascriptLinks}goTaxon({$v.res_taxon_id}){else}window.location.href='../species/taxon.php?id={$v.res_taxon_id}&{$addedProjectIDParam}={$session.app.project.id}'{/if}"
         {/if}
     >
-		{if $keyType=="lng"}<span class="marker">{$v.marker}</span>.{/if}
+		
 		<div class="l2_text">{$v.choice_txt}</div>
 			<div class="target">
 			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
