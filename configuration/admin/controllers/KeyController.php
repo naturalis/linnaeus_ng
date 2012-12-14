@@ -247,22 +247,14 @@ class KeyController extends Controller
         else {
 
             // delete L2-legacy image
-            if ($this->rHasVal('action', 'deleteImage')) {
+            if ($this->rHasVal('action', 'deleteImage') || $this->rHasVal('action', 'deleteAllImages')) {
             
-                 $step = $this->getKeystep($this->requestData['id']);
+                $step = $this->getKeystep($this->requestData['id']);
 
-                if (!empty($step['image']))
-                    @unlink($_SESSION['admin']['project']['paths']['project_media'] . $step['image']);
-            
-                $this->models->Keystep->save(array(
-                'id' => $this->requestData['id'],
-                'project_id' => $this->getCurrentProjectId(),
-                'number' => $this->requestData['number'],
-                'image' => 'null'
-                ));
+                $this->deleteLegacyImage($this->rHasVal('action', 'deleteImage') ? $step : 'all');
                 
                 $this->redirect('step_show.php?id='.$step['id']);
-            
+                                 
             } else
 			// delete step
             if ($this->rHasVal('action', 'delete')) {
@@ -368,7 +360,7 @@ class KeyController extends Controller
             if (!$this->rHasVal('step'))
                 $this->redirect('step_show.php');
                 
-                // cache becomes obsolete
+            // cache becomes obsolete
             $this->clearCache($this->cacheFiles);
             
             // create new choice & renumber
@@ -444,10 +436,6 @@ class KeyController extends Controller
             }
             
             if ($choice['id'] && isset($this->requestDataFiles) && !$this->isFormResubmit()) {
-                // save image
-                
-
-
 
                 // save choice image
                 $filesToSave = $this->getUploadedMediaFiles();
@@ -466,6 +454,7 @@ class KeyController extends Controller
                         $this->addMessage($this->translate('Image saved.'));
                         
                         $choice['choice_img'] = $filesToSave[0]['name'];
+                                                
                     }
                     else {
                         
@@ -1274,8 +1263,25 @@ class KeyController extends Controller
         }
     }
 
+    private function deleteLegacyImage ($step)
+    { 
+        $where['project_id'] = $this->getCurrentProjectId();
+        
+        if (is_array($step) && !empty($step['image'])) {
 
-
+            @unlink($_SESSION['admin']['project']['paths']['project_media'] . $step['image']);
+            
+            $where['id'] = $step['id'];
+            
+        }  
+      
+        $this->models->Keystep->update(
+            array('image' => 'null'), 
+            $where
+        );
+        
+    }
+       
     private function getNextLowestStepNumber ()
     {
         $k = $this->models->Keystep->_get(array(
@@ -1469,6 +1475,25 @@ class KeyController extends Controller
         return $choices;
     }
 
+    
+    private function getKeystepByChoiceId ($choiceId)
+    {
+        $ck = $this->models->ChoiceKeystep->_get(array(
+            'id' => array(
+                'id' => $choiceId, 
+                'project_id' => $this->getCurrentProjectId()
+            )
+        ));
+        
+        $k = $this->models->Keystep->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'id' => $ck[0]['keystep_id']
+            )
+        ));
+        
+        return $k ? $k[0] : false; 
+    }
 
 
     private function getKeystepChoice ($id)
@@ -1564,6 +1589,9 @@ class KeyController extends Controller
             // save to undo buffer
             $this->saveOldKeyChoiceData($this->models->ChoiceContentKeystep->getRetainedData(), $d, 'manual');
             
+            // change runtime layout based on step_type
+            $step = $this->getKeystepByChoiceId($data['id']);
+                        
             $this->smarty->assign('returnText', $this->models->ChoiceContentKeystep->getAffectedRows() > 0 ? $this->translate('saved') : '');
         }
     }
