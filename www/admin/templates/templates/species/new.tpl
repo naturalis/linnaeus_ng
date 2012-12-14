@@ -1,6 +1,7 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" id="action" name="action" value="save" />
@@ -19,11 +20,11 @@
 			{/if}
 			{foreach from=$taxa key=k item=v}
 			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-				<option rank_id="{$v.rank_id}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
+				<option rank_id="{$v.rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
 				{section name=foo loop=$v.level-$taxa[0].level}
 				&nbsp;
 				{/section}		
-				{$v.taxon}
+				{$v.taxon_formatted}
 				</option>
 			{/if}
 			{if $prevLevel!=$v.level}
@@ -58,13 +59,24 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" Xonblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
 
+	<tr>
+		<td>
+		Formatted example:
+		</td>
+		<td id="formatted-example">
+		</td>
+		<td>
+		</td>
+	</tr>
+	
+	
 	<tr>
 		<td style="width:100px">
 			{t}Author:{/t}
@@ -121,7 +133,7 @@ taxonChangeSubmitButtonLabel();
 {if $isHigherTaxa}
 taxonHigherTaxa = true;
 {/if}
-
+taxonSubGenusRankId = {$rankIdSubgenus};
 {assign var=prev value=null}			
 {foreach from=$taxa key=k item=v}
 {if ($v.lower_taxon==1 && $prev!==null)}

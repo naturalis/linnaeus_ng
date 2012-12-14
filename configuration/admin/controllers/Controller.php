@@ -1666,6 +1666,8 @@ class Controller extends BaseClass
                 
                 $pr[$rankkey]['rank'] = $r['rank'];
                 
+                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
+                
                 $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
                 
                 $pr[$rankkey]['ideal_parent_id'] = null;
@@ -1763,6 +1765,7 @@ class Controller extends BaseClass
             $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
             $t[$key]['sibling_count'] = count((array) $t);
             $t[$key]['depth'] = $t[$key]['level'] = $depth;
+            $t[$key]['taxon_formatted'] = $this->formatTaxon($val);
             
             $this->treeList[$key] = $t[$key];
             
@@ -2127,6 +2130,79 @@ class Controller extends BaseClass
     }
 
 
+    public function formatTaxon($taxon)
+    {
+
+        $e = explode(' ', $taxon['taxon']);
+        $r = $this->newGetProjectRanks();
+    
+        if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
+            $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
+        else
+            $d = $r[$taxon['rank_id']]['rank'];
+    
+        $rankId = $r[$taxon['rank_id']]['rank_id'];
+        $rankName = ucfirst($d);
+        $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
+    
+        // Rank level is above genus; no formatting
+        if ($rankId < GENUS_RANK_ID) {
+            return $rankName . ' ' . $taxon['taxon'];
+        }
+    
+        // Genus or subgenus; add italics
+        if ($rankId >= GENUS_RANK_ID && count($e) == 1) {
+            return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+        }
+    
+        // Species
+        if ($rankName == 'Species') {
+            return '<span class="italics">' . $taxon['taxon'] . '</span>';
+        }
+    
+        // Regular infraspecies, name consists of three parts
+        if (count($e) == 3) {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] .
+            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
+            $e[2] . '</span>';
+        }
+    
+        // Single infraspecies with subgenus
+        if (count($e) == 4 && $e[1][0] == '(') {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
+            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
+            $e[3] . '</span>';
+        }
+    
+        // We need the parent before continuing
+        $parent = $this->getTaxonById($taxon['parent_id']);
+        // Say goodbye to the orphans
+        if (empty($parent['rank_id'])) {
+            return $taxon['taxon'];
+        }
+        $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
+    
+        // Double infraspecies
+        if (count($e) == 4) {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] .
+            (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') .
+            $e[2] .
+            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
+            $e[3] . '</span>';
+        }
+    
+        // Double infraspecies with subgenus
+        if (count($e) == 5 && $e[1][0] == '(') {
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
+            (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') .
+            $e[3] .
+            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
+            $e[4] . '</span>';
+        }
+    
+        // If we end up here something must be wrong, just return name sans formatting
+        return $taxon['taxon'];
+    }
 
     private function getFrontEndMainMenu ()
     {
@@ -2326,6 +2402,8 @@ class Controller extends BaseClass
                 ));
                 
                 $pr[$rankkey]['rank'] = $r['rank'];
+                
+                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
                 
                 $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
                 

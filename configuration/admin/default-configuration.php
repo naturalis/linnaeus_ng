@@ -41,6 +41,8 @@ class configuration
 
 		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
+		if (!defined('SUBSPECIES_RANK_ID')) define('SUBSPECIES_RANK_ID',77);
+
 	}
 
     public function getDatabaseSettings ()
