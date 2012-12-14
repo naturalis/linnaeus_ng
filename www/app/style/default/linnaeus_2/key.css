@@ -15,20 +15,19 @@
 }
 
 #choice-grid, .wrapper-choice-picture {
-	width: 580px;
+	width: 560px;
 }
 
 .wrapper-choice {
-	width: 375px;
+	width: 355px;
 }
 
-#choice-table {
-	
+.wrapper-choice-picture td.text-cell, .wrapper-choice-picture td.target-cell {
+	width: 370px;
 }
 
-.wrapper-choice-picture td.image-cell {
-	width: 175px;
-	text-align: right;
+#step td.target-cell {
+	vertical-align: bottom;
 }
 
 #choice-grid td {
@@ -37,13 +36,17 @@
 	padding-right: 8px;
 }
 
-#choice-table td {
-	vertical-align: top;
+.image-cell {
+	text-align: center;
+	vertical-align: middle;
+	background: #555454;
+	padding: 6px;
+	border-top: 1px solid #000;
+	border-bottom: 1px solid #000;
 }
 
-#choice-table td.choice_image_cell {
-	text-align: right;
-	width: 150px;
+#choice-table .text, #choice-table .target {
+    margin-right: 10px;
 }
 
 #choice-table td.separator {
@@ -116,7 +119,7 @@
 }
 
 .choice {
-	width: 380px;
+	width: 360px;
 	cursor: pointer;
 	background-color: #eee;
 	padding: 10px;
@@ -139,9 +142,8 @@
 }
 
 #step .choice-image {
-	max-width: 175px;
-	max-height: 125px;
-	margin-left: 15px;
+	max-width: 180px;
+	max-height: 115px;
 	cursor: pointer;
 	border: 1px solid #666;
 }

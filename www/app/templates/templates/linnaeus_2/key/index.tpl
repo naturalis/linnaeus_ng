@@ -5,18 +5,10 @@
     {include file="_taxa.tpl"}
 	<div id="step">
 		<div id="question">
-		{if $keyType=="lng"}
-            <div id="content">{$step.content}</div>
-	    {else}
-            {if $step.image}
-                <div id="step-image">
-                    <img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
-                </div>
-            {/if}
-	    {/if}
+		{if $step.content && $step.content!=$step.title}<div id="content">{$step.content}</div>{/if}
 		</div>
 		<div id="choices">
-
+		
     <table id="choice-table">
 	{foreach from=$choices key=k item=v name=henk}
 		 <tr><td class="choice_cell">
@@ -29,28 +21,15 @@
 		        {/if}
 		    >
 
-            <table class="wrapper-choice{if $v.choice_img}-picture{/if}"><tr><td>
-
-			<span class="marker">{$v.marker}</span>.
-			<div class="text">{$v.choice_txt}</div>
-				<div class="target">
-				{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
-					{if $v.target_number}
-					<span class="arrow">&rarr;</span>
-					<span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
-					{/if}
-				{elseif $v.res_taxon_id!=''}
-					<span class="arrow">&rarr;</span>
-					<span>{$v.target}
-						{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-					</span>
-				{/if}
-				</div>
+            <table class="wrapper-choice{if $v.choice_img}-picture{/if}">
+            <tr><td class="text-cell">
+			<span class="marker">{$step.number}{$v.marker}</span>.
+				<div class="text">{$v.choice_txt}</div>
 			</div>
 		
 		</td>
 		{if $v.choice_img}
-			<td class="image-cell">
+			<td class="image-cell" rowspan="2">
 				{if $useJavascriptLinks}
 					<img
 						alt="{t}Choice{/t} {$step.number}{$v.marker}"
@@ -71,6 +50,23 @@
 				{/if}	
 			</td>
 		{/if}
+		</tr>
+		<tr><td class="target-cell">
+			<div class="target">
+			{if $v.res_keystep_id!='' && $v.res_keystep_id!='-1'}
+				{if $v.target_number}
+				<span class="arrow">&rarr;</span>
+				<span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
+				{/if}
+			{elseif $v.res_taxon_id!=''}
+				<span class="arrow">&rarr;</span>
+				<span>{$v.target}
+					{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
+				</span>
+			{/if}
+			</div>
+		</td>
+		{if $v.choice_img}<td></td>{/if}
 		</tr></table>
 		
 		{if not $smarty.foreach.henk.last}<tr><td class="separator"></td></tr>{/if}

@@ -182,8 +182,6 @@ class KeyController extends Controller
 
 		$this->smarty->assign('keypath',$this->getKeyPath());
 		
-		//die($this->setStepType($choices));
-		
 		$this->printPage($this->setStepType($choices));
 
     }
@@ -192,25 +190,29 @@ class KeyController extends Controller
     private function setStepType ($choices)
     {
         
-        if (count($choices) > 4) return null;
-        
         $type = 'index_l2_pct';
         
         foreach ($choices as $choice) {
             
-            if (empty($choice['choice_image_params'])) $type = 'index_l2_txt';
-            
-            break;
+            if (empty($choice['choice_image_params'])) {
+                
+                $type = 'index_l2_txt';
+                break;
+            }
             
         }
         
         if ($type == 'index_l2_pct') return $type;
         
+        if (count($choices) > 4) return null;
+        
         foreach ($choices as $choice) {
             
-            if (!empty($choice['choice_img'])) $type = null;
-            
-            break;
+            if (!empty($choice['choice_img'])) {
+                
+                $type = null;
+                break;
+            }
             
         }
         
