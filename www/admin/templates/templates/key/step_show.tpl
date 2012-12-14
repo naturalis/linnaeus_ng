@@ -13,8 +13,9 @@
 {$step.content}
 {if $step.image}<p><img src="{$session.admin.project.urls.project_media}{$step.image}" /><br />
 <span style="color:red">
-	Please note: this image is a legacay feature inherited from Linnaeus 2. It cannot be changed.<br />
-	<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span>
+	Please note: this image is a legacy feature inherited from Linnaeus 2. It cannot be changed.</span><br />
+	<span class="a" onclick="keyDeleteImage();">{t}delete image{/t}</span> | 
+	<span class="a" onclick="keyDeleteAllImages();">{t}delete all images{/t}</span>
 </span>
 </p>{/if}
 <p>

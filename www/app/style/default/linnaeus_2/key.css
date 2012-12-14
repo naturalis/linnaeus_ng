@@ -19,7 +19,7 @@
 }
 
 .wrapper-choice {
-	width: 430px;
+	width: 375px;
 }
 
 #choice-table {
@@ -99,7 +99,7 @@
 	position: relative;
 }
 
-#choice-grid .choice {
+.l2_choice {
 	cursor: pointer;
 	width: 270px;
 	min-height: 155px;
@@ -115,7 +115,7 @@
 	   inset 0 1px 2px rgba(0, 0, 0, 0.8); /*bottom internal shadow*/
 }
 
-#choice-table .choice {
+.choice {
 	width: 380px;
 	cursor: pointer;
 	background-color: #eee;
@@ -158,7 +158,7 @@
 	font-weight: bold;
 }
 
-#choice-grid .text {
+.l2_text {
 	min-height: 120px;
 }
 

@@ -59,6 +59,17 @@ function keyDeleteImage() {
 
 }
 
+function keyDeleteAllImages() {
+
+	if (confirm(_('Are you sure you want to delete all legacy images?'))) {
+
+		$('#action').val('deleteAllImages');
+		$('#theForm').submit();
+
+	}
+
+}
+
 function keyCheckTargetIntegrity(ele) {
 	
 	if (keyCurrentTargetStep!=null || keyCurrentTargetTaxon!=null) {

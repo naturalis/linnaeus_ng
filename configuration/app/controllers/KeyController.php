@@ -181,12 +181,14 @@ class KeyController extends Controller
 		if (isset($choices)) $this->smarty->assign('choices',$choices);
 
 		$this->smarty->assign('keypath',$this->getKeyPath());
-
+		
+		$this->printPage(empty($step['step_type']) ? null : 'index_' . $step['step_type']);
+/*
 		if (isset($choices) && $this->choicesHaveL2Attributes($choices)) 
 	        $this->printPage('index_l2');
 		else
 	        $this->printPage();
-
+*/
     }
 
     public function ajaxInterfaceAction ()
