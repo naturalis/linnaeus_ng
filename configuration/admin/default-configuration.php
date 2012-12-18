@@ -38,7 +38,8 @@ class configuration
 		if (!defined('MODCODE_CONTENT')) define('MODCODE_CONTENT',10);
 		if (!defined('MODCODE_INDEX')) define('MODCODE_INDEX',11);
 		if (!defined('MODCODE_UTILITIES')) define('MODCODE_UTILITIES',12);
-
+		
+		if (!defined('KINGDOM_RANK_ID')) define('KINGDOM_RANK_ID',2);
 		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
 		if (!defined('SUBSPECIES_RANK_ID')) define('SUBSPECIES_RANK_ID',77);

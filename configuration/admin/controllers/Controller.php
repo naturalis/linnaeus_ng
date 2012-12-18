@@ -51,9 +51,10 @@ class Controller extends BaseClass
         'free_module_project_user', 
         'language_project', 
         'module_project', 
+        'module_project_user', 
         'language', 
         'interface_text', 
-    	'interface_translation',
+        'interface_translation', 
         'taxon', 
         'rank', 
         'project_rank', 
@@ -100,6 +101,9 @@ class Controller extends BaseClass
         $this->loadModels();
         
         //$this->setHelpTexts();
+        
+
+
 
         $this->setRandomValue();
         
@@ -118,7 +122,6 @@ class Controller extends BaseClass
         $this->checkModuleActivationStatus();
         
         $this->setProjectLanguages();
-        
     }
 
 
@@ -529,11 +532,13 @@ class Controller extends BaseClass
             
 
 
+
             return;
             
             // old plan: if user has more roles, set the project in which he has the lowest role_id as the active project
             // (this assumes that the roles with the most permissions have the lowest ids)
             
+
 
 
             $t = false;
@@ -799,7 +804,7 @@ class Controller extends BaseClass
                 
                 // check if the user is authorised for the combination of current page / current project
                 if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin()) {
-
+                    
                     return true;
                 }
                 else {
@@ -1123,7 +1128,7 @@ class Controller extends BaseClass
 
 
 
-    public function setLocale($languageId)
+    public function setLocale ($languageId)
     {
         if (isset($_SESSION['admin']['user']['currentLanguage']) && $languageId == $_SESSION['admin']['user']['currentLanguage'])
             return;
@@ -1142,7 +1147,6 @@ class Controller extends BaseClass
         }
         
         $_SESSION['admin']['user']['currentLanguage'] = $languageId;
-        
     }
 
 
@@ -1368,7 +1372,7 @@ class Controller extends BaseClass
             $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
             $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
             $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-            
+
             $this->addError($this->helpers->FileUploadHelper->getErrors());
             
             return $this->helpers->FileUploadHelper->getResult();
@@ -2130,50 +2134,46 @@ class Controller extends BaseClass
     }
 
 
-    public function formatTaxon($taxon)
-    {
 
+    public function formatTaxon ($taxon)
+    {
         $e = explode(' ', $taxon['taxon']);
         $r = $this->newGetProjectRanks();
-    
+        
         if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
         else
             $d = $r[$taxon['rank_id']]['rank'];
-    
+        
         $rankId = $r[$taxon['rank_id']]['rank_id'];
         $rankName = ucfirst($d);
         $abbreviation = $r[$taxon['rank_id']]['abbreviation'];
-    
+        
         // Rank level is above genus; no formatting
         if ($rankId < GENUS_RANK_ID) {
             return $rankName . ' ' . $taxon['taxon'];
         }
-    
+        
         // Genus or subgenus; add italics
         if ($rankId >= GENUS_RANK_ID && count($e) == 1) {
             return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
-    
+        
         // Species
         if ($rankName == 'Species') {
             return '<span class="italics">' . $taxon['taxon'] . '</span>';
         }
-    
+        
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] .
-            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
-            $e[2] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
         }
-    
+        
         // Single infraspecies with subgenus
         if (count($e) == 4 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
-            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
-            $e[3] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
-    
+        
         // We need the parent before continuing
         $parent = $this->getTaxonById($taxon['parent_id']);
         // Say goodbye to the orphans
@@ -2181,28 +2181,50 @@ class Controller extends BaseClass
             return $taxon['taxon'];
         }
         $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
-    
+        
         // Double infraspecies
         if (count($e) == 4) {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] .
-            (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') .
-            $e[2] .
-            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
-            $e[3] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
-    
+        
         // Double infraspecies with subgenus
         if (count($e) == 5 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
-            (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') .
-            $e[3] .
-            (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .
-            $e[4] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
-    
+        
         // If we end up here something must be wrong, just return name sans formatting
         return $taxon['taxon'];
     }
+
+
+
+    public function grantModuleAccessRights ($mId, $pId, $uId = null)
+    {
+        $this->models->ModuleProjectUser->save(array(
+            'id' => null, 
+            'project_id' => $pId, 
+            'module_id' => $mId, 
+            'user_id' => isset($uId) ? $uId : $this->getCurrentUserId()
+        ));
+    }
+
+
+
+    public function addUserToProjectAsLeadExpert ($pId, $uId = null)
+    {
+        $this->models->ProjectRoleUser->save(
+        array(
+            'id' => null, 
+            'project_id' => $pId, 
+            'role_id' => ID_ROLE_LEAD_EXPERT, 
+            'user_id' => isset($uId) ? $uId : $this->getCurrentUserId(), 
+            'active' => 1
+        ));
+    }
+
+
 
     private function getFrontEndMainMenu ()
     {
@@ -2551,6 +2573,7 @@ class Controller extends BaseClass
             
 
 
+
             $this->setControllerMask('highertaxa', 'Higher taxa');
             
             return true;
@@ -2615,7 +2638,7 @@ class Controller extends BaseClass
         
         if (isset($this->cssToLoad))
             $this->smarty->assign('cssToLoad', $this->cssToLoad);
-
+        
         if (isset($this->jsToLoad))
             $this->smarty->assign('javascriptsToLoad', $this->jsToLoad);
         
@@ -2631,12 +2654,11 @@ class Controller extends BaseClass
         }
     }
 
+
+
     private function getCurrentUiLanguage ()
     {
-        return
-        	(isset($_SESSION['admin']['user']['currentLanguage']) ? 
-        		$_SESSION['admin']['user']['currentLanguage'] :
-        	 	$this->uiDefaultLanguage);
+        return (isset($_SESSION['admin']['user']['currentLanguage']) ? $_SESSION['admin']['user']['currentLanguage'] : $this->uiDefaultLanguage);
     }
 
 
@@ -2797,6 +2819,7 @@ class Controller extends BaseClass
             //$this->requestData = $_REQUEST; // also contains cookies
             $this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
             
+
 
 
             foreach ((array) $this->requestData as $key => $val) {
@@ -2982,21 +3005,20 @@ class Controller extends BaseClass
 
     private function setLanguages ()
     {
-        
-        foreach((array)$this->generalSettings['uiLanguages'] as $key => $val) { 
-
-            if ($key==0) $this->uiDefaultLanguage = $val;
+        foreach ((array) $this->generalSettings['uiLanguages'] as $key => $val) {
             
-            $l = $this->models->Language->_get(
-            array(
-            'id' => array('id' => $val),
-            'columns' => 'id,language'
+            if ($key == 0)
+                $this->uiDefaultLanguage = $val;
+            
+            $l = $this->models->Language->_get(array(
+                'id' => array(
+                    'id' => $val
+                ), 
+                'columns' => 'id,language'
             ));
             
             $this->uiLanguages[] = $l[0];
-            
-   		}
-      
+        }
     }
 
 
@@ -3266,6 +3288,7 @@ class Controller extends BaseClass
             
 
 
+
             $curl = $this->baseUrl . $this->appName . '/views/' . $controllerBaseName;
             
             $this->breadcrumbs[] = array(
@@ -3508,6 +3531,7 @@ class Controller extends BaseClass
     }
 
 
+
     protected function clearCache ($files)
     {
         $cacheDir = $_SESSION['admin']['project']['paths']['cache'];
@@ -3544,52 +3568,53 @@ class Controller extends BaseClass
         }
     }
 
-    private function saveInterfaceText($text)
+
+
+    private function saveInterfaceText ($text)
     {
         @$this->models->InterfaceText->save(array(
-        'id' => null,
-        'text' => $text,
-        'env' => $this->getAppName()
+            'id' => null, 
+            'text' => $text, 
+            'env' => $this->getAppName()
         ));
     }
-    
-    private function doTranslate($text)
+
+
+
+    private function doTranslate ($text)
     {
-    
+        
         // get id of the text
-        $i = $this->models->InterfaceText->_get(
-        array(
-        'id' => array(
-	        'text' => $text,
-	        'env' => $this->getAppName()
-        ),
-        'columns' => 'id'
+        $i = $this->models->InterfaceText->_get(array(
+            'id' => array(
+                'text' => $text, 
+                'env' => $this->getAppName()
+            ), 
+            'columns' => 'id'
         ));
-    
+        
         // if not found, return unchanged
-        if (empty($i[0]['id'])) return $text;
-    
-        // resolve language id
+        if (empty($i[0]['id']))
+            return $text;
+            
+            // resolve language id
         $languageId = $this->getCurrentUiLanguage();
-    
+        
         // fetch appropriate translation
         $it = $this->models->InterfaceTranslation->_get(
         array(
-        'id' =>
-        array(
-        'interface_text_id' => $i[0]['id'],
-        'language_id' => $languageId
-        ),
-        'columns' => 'translation'
+            'id' => array(
+                'interface_text_id' => $i[0]['id'], 
+                'language_id' => $languageId
+            ), 
+            'columns' => 'translation'
         ));
-    
+        
         // if not found, return unchanged
-        if (empty($it[0]['translation'])) return $text;
-    
-        // return translation
+        if (empty($it[0]['translation']))
+            return $text;
+            
+            // return translation
         return $it[0]['translation'];
-    
     }
-    
-    
 }

@@ -485,7 +485,7 @@ class MatrixKeyController extends Controller
 		if (($this->rHasVal('action','save') || $this->rHasVal('action','repeat')) && !$this->isFormResubmit()) {
 
 			$filesToSave = $this->getUploadedMediaFiles();
-
+			
 			if (!$this->verifyData($this->requestData,$filesToSave)) {
 
 				$state = $this->requestData;
