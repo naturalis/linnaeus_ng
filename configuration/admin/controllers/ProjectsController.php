@@ -69,8 +69,8 @@ class ProjectsController extends Controller
         'characteristic_chargroup', 
         'variation_label', 
         'taxon_variation', 
-        'related_taxa', 
-        'related_variations', 
+        'taxa_relations', 
+        'variation_relations', 
         'matrix_variation', 
         'nbc_extras'
     );
@@ -1420,10 +1420,10 @@ class ProjectsController extends Controller
         $this->models->VariationLabel->delete(array(
             'project_id' => $id
         ));
-        $this->models->RelatedTaxa->delete(array(
+        $this->models->TaxaRelations->delete(array(
             'project_id' => $id
         ));
-        $this->models->RelatedVariations->delete(array(
+        $this->models->VariationRelations->delete(array(
             'project_id' => $id
         ));
         $this->models->MatrixVariation->delete(array(

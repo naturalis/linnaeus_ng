@@ -2,10 +2,10 @@
 
 include_once ('model.php');
 
-class RelatedVariations extends Model
+class TaxaRelations extends Model
 {
 
-    const tableBaseName = 'related_variations';
+    const tableBaseName = 'taxa_relations';
 
 
     /**

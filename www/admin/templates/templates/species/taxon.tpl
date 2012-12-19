@@ -6,6 +6,14 @@
 <div id="page-main">
 {/if}
 
+{* yes, i know, but for some reason the buttons refuse to "see" the style sheet *}
+<style>
+.localButton {literal}{{/literal}
+	padding-right:25px;
+	width:{if $useVariations}140{else}150{/if}px;	
+{literal}}{/literal}
+</style>
+
 	<span id="debug-message"></span>
 	{if $taxon.id!=-1}
 	{* $taxon.taxon *}
@@ -15,21 +23,21 @@
 		<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
 		<input type="hidden" name="activePage" value="{$activePage}" />  
 	<div style="border-bottom:1px dotted #ddd;padding-bottom:10px">
-		{* yes, i know, but for some reason the buttons refuse to "see" the style sheet *}
-		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
-		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
-		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
-		<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" style="padding-right:25px;width:150px;" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
 		<span id="message-container" style="margin-right:10px">&nbsp;</span>
 	</div>
 	<div style="padding:10px 0px 10px 0px">
-		<input type="button" value="{t}name and parent{/t}" onclick="window.open('edit.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}literature{/t}" onclick="window.open('literature.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
-		<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" style="padding-right:25px;width:150px;" />
-	
-		<!-- input type="button" value="{t}taxon list{/t}" onclick="taxonClose()" style="" / -->
+		<input type="button" value="{t}name and parent{/t}" onclick="window.open('edit.php?id={$taxon.id}','_self')" class="localButton" />
+		<input type="button" value="{t}media{/t}" onclick="window.open('media.php?id={$taxon.id}','_self')" class="localButton" />
+		<input type="button" value="{t}literature{/t}" onclick="window.open('literature.php?id={$taxon.id}','_self')" class="localButton" />
+		<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" class="localButton" />
+		<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" class="localButton" />
+		{if $useVariations}
+		<input type="button" value="{t}variations{/t}" onclick="window.open('variations.php?id={$taxon.id}','_self')" class="localButton" />
+		{/if}
 	</div>
 
 

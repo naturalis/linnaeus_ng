@@ -20,7 +20,7 @@
 <table>
 	<tr>
 		<td colspan="2">
-			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>)
+			{t}characters{/t} (<a href="char_sort.php">{t}sort characters{/t}</a>{if $useCharacterGroups}; <a href="char_groups.php">{t}edit character groups{/t}</a>{/if})
 			<select size="100" class="matrix-list-select" id="characteristics" onchange="matrixCharacteristicsChange();" onclick="matrixGetLinks();">
 			{section name=i loop=$characteristics}
 			<option value="{$characteristics[i].id}" id="char-{$characteristics[i].id}" ondblclick="window.open('char.php?id={$characteristics[i].id}','_self');">{$characteristics[i].label} ({$characteristics[i].type.name})</option>
@@ -32,14 +32,22 @@
 		<td colspan="2">
 			{t}taxa{/t}  (<a href="links.php">{t}display current links per taxon{/t}{if $matrices} {t}& other matrices{/t}{/if}</a>)
 			<select size="100" id="taxa" class="matrix-list-select" onclick="matrixGetLinks();">
-			{section name=i loop=$taxa}
-			<option value="{$taxa[i].id}">{$taxa[i].taxon}</option>
-			{/section}
+			{foreach from=$taxa item=v}
+			<option id="tax-{$v.id}" value="{$v.id}">{$v.taxon}</option>
+			{/foreach}
+
+			{if $useVariations && $variations}
+			<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>
+			{foreach from=$variations item=v}
+			<option id="var-{$v.id}" value="var-{$v.id}">{$v.label}</option>
+			{/foreach}
+			{/if}
+			
 			{if $matrices}
 			<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>
-			{section name=i loop=$matrices}
-			<option value="mx-{$matrices[i].id}">{$matrices[i].default_name}</option>
-			{/section}
+			{foreach from=$matrices item=v}
+			<option id="mx-{$v.id}" value="mx-{$v.id}">{$v.default_name}</option>
+			{/foreach}
 			{/if}
 			</select>
 		</td>

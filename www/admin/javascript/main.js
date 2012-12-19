@@ -11,6 +11,11 @@ Array.prototype.inArray = function(value,key) {
 	return -1;
 }
 
+String.prototype.repeat = function( num )
+{
+    return new Array( num + 1 ).join( this );
+}
+
 function q(m) {
 
 	$('#debug-message').html(m);

@@ -1,3 +1,5 @@
+var matrixNextToSelect = undefined;
+
 function matrixGetMatrixContent(language, action, target) {
 
 	var id = $('#id').val();
@@ -181,7 +183,7 @@ function matrixSaveCharacteristic() {
 	} else {
 	
 		matrixSaveCharacteristicLabelAll();
-		$('#theForm').submit()
+		$('#theForm').submit();
 
 	}
 
@@ -278,7 +280,7 @@ function matrixCheckStateForm() {
 
 	} else {
 
-		$('#theForm').submit()
+		$('#theForm').submit();
 
 	}
 
@@ -302,10 +304,25 @@ function matrixSetTaxa(obj) {
 		
 	}
 
-	if (obj.matrices) {
+	if (obj.variations && obj.variations.length>0) {
 
 		$('#taxa').
-			append('<option disabled="disabled">----------------------------------------------------------------------------------------------------</option>');
+			append('<option disabled="disabled">'+('-'.repeat(100))+'</option>');
+
+		for(var i=0;i<obj.variations.length;i++) {
+	
+			$('#taxa').
+				append('<option value="var-'+obj.variations[i].id+'">'+obj.variations[i].label+'</option>').val('var-'+obj.variations[i].id);
+	
+		}
+		
+	}
+
+
+	if (obj.matrices && obj.matrices.length>0) {
+
+			$('#taxa').
+				append('<option disabled="disabled">'+('-'.repeat(100))+'</option>');
 
 		for(var i=0;i<obj.matrices.length;i++) {
 	
@@ -320,8 +337,8 @@ function matrixSetTaxa(obj) {
 
 function matrixDeleteTaxon() {
 
-	var id = $("#taxa :selected").val()
-
+	var id = $("#taxa :selected").val();
+	
 	if (id==undefined || !confirm(_('Are you sure?'))) return;
 
 	allAjaxHandle = $.ajax({
@@ -382,8 +399,8 @@ function matrixDeleteLink(id) {
 
 function matrixGetLinks() {
 
-	var characteristic = $("#characteristics :selected").val()
-	var taxon = $("#taxa :selected").val()
+	var characteristic = $("#characteristics :selected").val();
+	var taxon = $("#taxa :selected").val();
 
 	if (taxon==undefined || characteristic==undefined) return;
 
@@ -423,19 +440,19 @@ function matrixSetLinks(obj) {
 
 function matrixAddLinkClick() {
 
-	var characteristic = $("#characteristics :selected").val()
-	var state = $("#states :selected").val()
-	var taxonOrMatrix = $("#taxa :selected").val()
+	var characteristic = $("#characteristics :selected").val();
+	var state = $("#states :selected").val();
+	var taxon = $("#taxa :selected").val();
 
-	if (characteristic==undefined || taxonOrMatrix==undefined || state==undefined) return;
+	if (characteristic==undefined || taxon==undefined || state==undefined) return;
 	
-	matrixAddLink(characteristic,taxonOrMatrix,state);
+	matrixAddLink(characteristic,taxon,state);
 
 }
 
 function matrixRemoveLink() {
 
-	var id = $("#links :selected").val()
+	var id = $("#links :selected").val();
 
 	if (id==undefined || !confirm(_('Are you sure?'))) return;
 
@@ -479,5 +496,28 @@ function matrixShowSortStates() {
 	if (id==undefined) return;
 	
 	window.open('state_sort.php?sId='+id,'_self');
+	
+}
+
+function matrixDeleteStateImage() {
+	
+	if (!confirm(_('Are you sure?'))) return;
+
+	$('#action').val('deleteimage');
+	$('#theForm').submit();
+	
+	
+	
+}
+
+function matrixToggleGroupChars(id) {
+	
+	if ($('#chars-'+id).css('display')=='none') {
+		$('#chars-'+id).css('display','block');
+		$('#trigger-'+id).html('-');
+	} else {
+		$('#chars-'+id).css('display','none');
+		$('#trigger-'+id).html('+');
+	}
 	
 }

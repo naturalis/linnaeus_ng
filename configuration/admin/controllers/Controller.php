@@ -11,6 +11,7 @@ class Controller extends BaseClass
     private $_helpTexts;
     private $_prevTreeId = null;
     private $_breadcrumbRootName = null;
+    public $useVariations = false;
     public $tmp;
     public $smarty;
     public $requestData;
@@ -60,7 +61,9 @@ class Controller extends BaseClass
         'project_rank', 
         'label_project_rank', 
         'module', 
-        'free_module_project'
+        'free_module_project', 
+        'variation_label', 
+        'taxon_variation'
     );
     private $usedHelpersBase = array(
         'logging_helper', 
@@ -1372,7 +1375,7 @@ class Controller extends BaseClass
             $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
             $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
             $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
-
+            
             $this->addError($this->helpers->FileUploadHelper->getErrors());
             
             return $this->helpers->FileUploadHelper->getResult();
@@ -2226,6 +2229,40 @@ class Controller extends BaseClass
 
 
 
+    public function getVariations ($tId = null)
+    {
+        $d = array(
+            'project_id' => $this->getCurrentProjectId()
+        );
+        
+        if (isset($tId))
+            $d['taxon_id'] = $tId;
+        
+        $tv = $this->models->TaxonVariation->_get(array(
+            'id' => $d, 
+            'columns' => 'id,taxon_id,label', 
+            'order' => 'label'
+        ));
+        
+        foreach ((array) $tv as $key => $val) {
+            
+            $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
+            
+            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $val['id']
+                ), 
+                'columns' => 'id,language_id,label,label_type'
+            ));
+        }
+        
+        return $tv;
+    }
+
+
+
     private function getFrontEndMainMenu ()
     {
         $modules = $this->models->ModuleProject->_get(
@@ -2631,6 +2668,7 @@ class Controller extends BaseClass
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
+        $this->smarty->assign('useVariations', $this->_useVariations);
         
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
