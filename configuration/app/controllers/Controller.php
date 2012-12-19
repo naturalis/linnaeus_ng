@@ -254,7 +254,7 @@ class Controller extends BaseClass
                 'project_id' => $this->getCurrentProjectId(), 
                 'parent_id' . (is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
             ), 
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty', 
+            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author', 
             'fieldAsIndex' => 'id', 
             'order' => 'taxon_order,id'
         ));
@@ -269,6 +269,7 @@ class Controller extends BaseClass
             $t[$key]['do_display'] = !preg_match('/^\(.*\)$/', $val['taxon']);
             // taxon name
             $t[$key]['label'] = $this->formatTaxon($val);
+            $t[$key]['author'] = $val['author'];
             
             //// level is effectively the recursive depth of the taxon within the tree
             //$t[$key]['level'] = $level;
@@ -2498,6 +2499,7 @@ class Controller extends BaseClass
             
             $this->_buildTaxonTree();
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
+        
         }
         else {
             

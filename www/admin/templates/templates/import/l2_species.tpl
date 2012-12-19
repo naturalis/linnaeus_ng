@@ -41,7 +41,7 @@ Review the data below and press "save" to save it to the database. In the follow
 {if $ranks|@count==0}
 No ranks were found or could be resolved. Import cannot proceed.<br />
 Go to "Projects -> [project] -> Species module -> Taxonomic ranks" to see a list of valid ranks.<br />
-Alter import filre accordingly and try again.
+Alter import file accordingly and try again.
 {assign var=process value=false}
 {else}
 {assign var=i value=0}

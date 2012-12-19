@@ -43,7 +43,7 @@
 {if $contentCount.literature>0}
 <div id="literature">
 	{foreach from=$content key=k item=v}
-	<div class="text">{$v.text}</div>
+	{$v.text}
 	{/foreach}
 </div>
 {/if}

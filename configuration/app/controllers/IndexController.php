@@ -265,7 +265,7 @@ class IndexController extends Controller
 		$s = $this->models->Synonym->_get(
 			array(
 				'id' => $d,
-				'columns' => 'taxon_id as id,synonym as label,synonym as taxon,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url'
+				'columns' => 'taxon_id as id,synonym as label,synonym as taxon,\'synonym\' as source, concat(\'views/species/synonyms.php?id=\',taxon_id) as url,author'
 			)
 		);
 		
