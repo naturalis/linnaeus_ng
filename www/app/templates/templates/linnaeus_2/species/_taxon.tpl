@@ -39,6 +39,18 @@
 	{/foreach}
 	
 </div>
+{elseif $activeCategory=='list'}
+<div id="list">
+	{foreach from=$content key=k item=v name=list}
+		{if $useJavascriptLinks}			
+		<span class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})">{$v.label}</span>
+		{else}
+		<a href="../{if $v.lower_taxon==1}species{else}highertaxa{/if}/taxon.php?id={$v.id}">{$v.label}</a>
+	{/if}
+	{if $v.commonname} ({$v.commonname}){/if}
+	<br />
+	{/foreach}
+</div>
 {elseif $activeCategory=='literature'}
 {if $contentCount.literature>0}
 <div id="literature">
