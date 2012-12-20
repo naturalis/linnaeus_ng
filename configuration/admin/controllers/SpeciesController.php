@@ -559,10 +559,12 @@ class SpeciesController extends Controller
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
                 
-                $isHybrid = $this->rHasVal('is_hybrid', 'on');
+               $isHybrid = $this->rHasVal('is_hybrid', 'on');
                 
                 $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
-                
+
+                $parent = $this->getTaxonById($parentId);
+
                 $newName = $this->requestData['taxon'];
                 
                 $newName = trim(preg_replace('/\s+/', ' ', $newName));
@@ -574,10 +576,8 @@ class SpeciesController extends Controller
                 
                 //checks
                 /* NON LETHAL */
-                //http://dev2.etibioinformatics.nl/fixit/browse/LINNG-740
-                // 2. Only species and below (bionominals and trinominals) can contain spaces in their names. Genera and above should not contain spaces.
                 if (!$this->checkNameSpaces($newName, $this->requestData['rank_id'], $this->requestData['parent_id'])) {
-                    $this->addError($this->translate('Only species and below can contain spaces in their names.'));
+                    $this->addError($this->translate('The number of spaces in the name does not match the selected rank.'));
                     $hasErrorButCanSave = true;
                 }
                 
@@ -595,6 +595,20 @@ class SpeciesController extends Controller
                     $hasErrorButCanSave = true;
                 }
                 
+				// 2. Issue warning if a species is not linked to an ideal parent.
+                if ($parent['rank_id']!=$pr[$this->requestData['rank_id']]['ideal_parent_id']) {
+					$this->addError(
+						sprintf(
+							$this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
+							strtolower($pr[$this->requestData['rank_id']]['rank']),
+							strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']),
+							strtolower($pr[$parent['rank_id']]['rank'])
+						)
+					);
+                    $hasErrorButCanSave = true;
+                    
+                }
+                
 
                 /* LETHAL */
                 if (!$this->isTaxonNameUnique($newName)) {
@@ -608,8 +622,6 @@ class SpeciesController extends Controller
                 }
                 else {
                     
-                    $parent = $this->getTaxonById($parentId);
-                    
                     if (!$this->doNameAndParentMatch($newName, $parent['taxon'])) {
                         $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'), $parent['taxon'], $newName));
                         $hasErrorButCanSave = false;
@@ -618,10 +630,13 @@ class SpeciesController extends Controller
                 
                 if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
                     $this->addError($this->translate('Rank cannot be hybrid.'));
+                	$hasErrorButCanSave = false;
                 }
                 
                 // save as requested
-                if (is_null($hasErrorButCanSave)) {
+                if (is_null($hasErrorButCanSave) || $this->rHasVal('override','1')) {
+                    
+                    $this->clearErrors();
                     
                     $this->clearCache($this->cacheFiles);
                     
@@ -655,7 +670,9 @@ class SpeciesController extends Controller
                     $this->requestData['taxon'] = $newName;
                     
                     if ($hasErrorButCanSave) {
-                        $this->addMessage('Please be aware of the warnings above before saving.');
+                        $this->addMessage('
+                        	Please be aware of the warnings above before saving.<br />
+                        	<input type="button" onclick="taxonOverrideSaveNew()" value="'.$this->translate('save anyway').'" />');
                     }
                     else {
                         $this->addError('Taxon not saved.');
@@ -2640,7 +2657,7 @@ class SpeciesController extends Controller
         
         $this->smarty->assign('navCurrentId', $taxon['id']);
         
-        $this->smarty->assign('id',  $taxon['id']);
+        $this->smarty->assign('id', $taxon['id']);
         
         $this->smarty->assign('taxon', $taxon);
         
@@ -4832,16 +4849,16 @@ class SpeciesController extends Controller
         //[4:52:12 PM] Ruud Altenburg: 1. rank_id < species_rank_id
         //geen spaties mogelijk
         if ($rankId < $species_rank_id)
-            return preg_match('/\s/', $name) == 0;
+            return preg_match_all('/\s/', $name, $d) == 0;
             
             //2. rank_id == species_rank_id
             //een spatie mogeljik
             //twee spaties alleen mogelijk als eerste karakter van twee woord een ( is -> subgenus
             //(dit kun je evt ook testen met parent_id = subgenus_rank_id)
         if ($rankId == $species_rank_id) {
-            if (preg_match('/\s/', $name) == 1)
+            if (preg_match_all('/\s/', $name, $d) == 1)
                 return true;
-            if (preg_match('/\s/', $name) == 2) {
+            if (preg_match_all('/\s/', $name, $d) == 2) {
                 $d = explode(' ', $name);
                 return substr($d[1], 0, 1) == '(';
             }
@@ -4856,9 +4873,9 @@ class SpeciesController extends Controller
         //twee spaties mogeljik
         //drie spaties alleen mogelijk als eerste karakter van twee woord een ( is
         if ($parent['rank_id'] == $species_rank_id) {
-            if (preg_match('/\s/', $name) == 2)
+            if (preg_match_all('/\s/', $name, $d) == 2)
                 return true;
-            if (preg_match('/\s/', $name) == 3) {
+            if (preg_match_all('/\s/', $name, $d) == 3) {
                 $d = explode(' ', $name);
                 return substr($d[2], 0, 1) == '(';
             }
@@ -4869,9 +4886,9 @@ class SpeciesController extends Controller
         //drie spaties mogeljik
         //vier spaties alleen mogelijk als eerste karakter van twee woord een ( is
         if ($parent['rank_id'] > $species_rank_id) {
-            if (preg_match('/\s/', $name) == 3)
+            if (preg_match_all('/\s/', $name, $d) == 3)
                 return true;
-            if (preg_match('/\s/', $name) == 4) {
+            if (preg_match_all('/\s/', $name, $d) == 4) {
                 $d = explode(' ', $name);
                 return substr($d[3], 0, 1) == '(';
             }

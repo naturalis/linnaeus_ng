@@ -1525,3 +1525,10 @@ function taxonGetFormattedPreview() {
 	
 	
 }
+
+function taxonOverrideSaveNew() {
+	
+	$('<input type="hidden" name="override">').val('1').appendTo('#theForm');
+	$('#theForm').submit();
+	
+}
