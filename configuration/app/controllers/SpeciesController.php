@@ -118,10 +118,20 @@ class SpeciesController extends Controller
                 $this->setCurrentLanguageId($this->requestData['lan']);
                 
                 // get categories
-            $categories = $this->getCategories($this->requestData['id'], $this->isLoggedInAdmin(), $this->isLoggedInAdmin());
+            $categories = $this->getCategories(
+            	$this->requestData['id'], 
+            	$this->isLoggedInAdmin(), 
+            	$this->isLoggedInAdmin()
+            );
             
             // determine the page_id the page will open in
-            $activeCategory = $this->rHasVal('cat') ? ($categories['emptinessList'][$this->requestData['cat']] == 0 ? $this->requestData['cat'] : $categories['defaultCategory']) : $categories['defaultCategory'];
+            $activeCategory = 
+            	$this->rHasVal('cat') ? 
+	            	(isset($categories['emptinessList'][$this->requestData['cat']]) && $categories['emptinessList'][$this->requestData['cat']] == 0 ? 
+	            		$this->requestData['cat'] : 
+	            		$categories['defaultCategory']
+	            	) : 
+           		$categories['defaultCategory'];
             
             // setting the css classnames
             foreach ((array) $categories['categories'] as $key => $val) {
@@ -169,6 +179,7 @@ class SpeciesController extends Controller
                 $this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
                 
                 $this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
+           
             }
             
             $this->smarty->assign('categories', $categories['categories']);
@@ -360,13 +371,17 @@ class SpeciesController extends Controller
                 'is_empty' => 0
             );
             
-            $tnl = $this->getTaxonNextLevel($taxon);
+            if ($this->getTaxonType() == 'higher') {
             
-            $stdCats[] = array(
-                'id' => 'list', 
-                'title' => $this->translate('Taxon list'), 
-                'is_empty' => (count((array) $tnl) > 0 ? 0 : 1)
-            );
+	            $tnl = $this->getTaxonNextLevel($taxon);
+	            
+	            $stdCats[] = array(
+	                'id' => 'list', 
+	                'title' => $this->translate('Taxon list'), 
+	                'is_empty' => (count((array) $tnl) > 0 ? 0 : 1)
+	            );
+	            
+            }
             
             $n = $this->getTaxonNames($taxon);
             
@@ -838,23 +853,20 @@ class SpeciesController extends Controller
             
             reset($taxa);
             
-            $prev = $next = null;
+            $prev = $next = false;
             
             while (list ($key, $val) = each($taxa)) {
                 
                 if ($key == $id) {
                     
                     $next = current($taxa); // current = next because the pointer has already shifted forward
-                    
-
-
 
                     return array(
-                        'prev' => isset($prev) ? array(
+                        'prev' => $prev!==false ? array(
                             'id' => $prev['id'], 
                             'label' => $prev['taxon']
                         ) : null, 
-                        'next' => isset($next) ? array(
+                        'next' => $next!==false ? array(
                             'id' => $next['id'], 
                             'label' => $next['taxon']
                         ) : null
