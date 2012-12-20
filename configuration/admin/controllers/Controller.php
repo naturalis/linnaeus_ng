@@ -2668,7 +2668,7 @@ class Controller extends BaseClass
         $this->smarty->assign('uiLanguages', $this->uiLanguages);
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
-        $this->smarty->assign('useVariations', $this->_useVariations);
+        $this->smarty->assign('useVariations', $this->useVariations);
         
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
