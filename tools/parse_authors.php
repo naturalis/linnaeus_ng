@@ -10,14 +10,14 @@
     // Modify project settings
     $settings = array(
    		'projectId' => 584,
-   		'linesToCheck' => 10, // relevant only if author is not on a predetermined line
-        'includeHigherTaxa' => false, // false to skip higher taxa
-        'lineBreak' => '<br />', // default in L2 imports
-        'maxWordsInAuthorString' => 10, // dismiss author if string contains more this number of words
-        'yearCheck' => false, // year must be present in author string
+   		'linesToCheck' => 10, // How many lines should be considered holding the author string?
+        'includeHigherTaxa' => false, // Set to false to skip higher taxa
+        'lineBreak' => '<br />', // Default in L2 imports
+        'maxWordsInAuthorString' => 10, // Dismiss author if string contains more this number of words
+        'yearCheck' => false, // Year must be present in author string; relevant when preceededBy and followedBy are false
     
         'species' => array(
-            'preceededBy' => '[taxon]', // text string, [taxon], false
+            'preceededBy' => '[taxon]', // 'Text string', '[taxon]', false
             'followedBy' => false
         ),
         'higherTaxa' => array(
