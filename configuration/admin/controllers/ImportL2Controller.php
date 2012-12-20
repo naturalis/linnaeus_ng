@@ -2280,7 +2280,7 @@ class ImportL2Controller extends Controller
                         'project_id' => $this->getNewProjectId(), 
                         'taxon_id' => $taxonId, 
                         'synonym' => $synonym, 
-                        'remark' => isset($taxon->syn_vern_description) ? $this->getSynonymAuthor($synonym, $synVernDescription) : null, 
+                        'author' => isset($taxon->syn_vern_description) ? $this->getSynonymAuthor($synonym, $synVernDescription) : null, 
                         'show_order' => $i++
                     ));
                     
