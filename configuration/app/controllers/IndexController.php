@@ -318,7 +318,9 @@ class IndexController extends Controller
 		$letter = strtolower($letter);
 		
 		foreach((array)$names as $key => $val) {
-		
+		    
+		    if ($this->getTaxonType()=='higher' && $val['lower_taxon']==1) continue;
+	    
 			$x = strtolower(substr(strip_tags($val[$field]),0,1));
 
 			$a[$x] = $x;
