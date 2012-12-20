@@ -9,11 +9,12 @@
 <?php
     // Modify project settings
     $settings = array(
-   		'projectId' => 599,
+   		'projectId' => 584,
    		'linesToCheck' => 10, // relevant only if author is not on a predetermined line
         'includeHigherTaxa' => false, // false to skip higher taxa
         'lineBreak' => '<br />', // default in L2 imports
-        'maxWordsInAuthorString' => 5, // dismiss author if string contains more this number of words
+        'maxWordsInAuthorString' => 10, // dismiss author if string contains more this number of words
+        'yearCheck' => false, // year must be present in author string
     
         'species' => array(
             'preceededBy' => '[taxon]', // text string, [taxon], false
@@ -138,7 +139,7 @@
     		return false;
     	}
     	// No text preceeds or follows; check for year
-    	if (!preg_match('/(\s|,)(17|18|19|20)[0-9]{2}/', $author)) {
+    	if ($settings['yearCheck'] && !preg_match('/(\s|,)(17|18|19|20)[0-9]{2}/', $author)) {
     		return false;
     	}
     	// String contains year but contains too many words
