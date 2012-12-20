@@ -10,7 +10,7 @@
     // Modify project settings
     $settings = array(
    		'projectId' => 584,
-   		'linesToCheck' => 10, // How many lines should be considered holding the author string?
+   		'linesToCheck' => 10, // How many lines should be considered checked for the author?
         'includeHigherTaxa' => false, // Set to false to skip higher taxa
         'lineBreak' => '<br />', // Default in L2 imports
         'maxWordsInAuthorString' => 10, // Dismiss author if string contains more this number of words

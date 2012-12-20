@@ -41,6 +41,7 @@
 </div>
 {elseif $activeCategory=='list'}
 <div id="list">
+	<p>{$headerTitles.title} {t}contains the following taxa{/t}:</p>
 	{foreach from=$content key=k item=v name=list}
 		{if $useJavascriptLinks}			
 		<span class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})">{$v.label}</span>
