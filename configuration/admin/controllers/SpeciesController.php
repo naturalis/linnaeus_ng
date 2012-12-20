@@ -559,17 +559,20 @@ class SpeciesController extends Controller
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
                 
-               $isHybrid = $this->rHasVal('is_hybrid', 'on');
+
+                $isHybrid = $this->rHasVal('is_hybrid', 'on');
                 
                 $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
-
+                
                 $parent = $this->getTaxonById($parentId);
-
+                
                 $newName = $this->requestData['taxon'];
                 
                 $newName = trim(preg_replace('/\s+/', ' ', $newName));
                 
-                // first letter is capitalized (changed silently)
+                // remove ()'s from subgenus (changed silently)
+                $newName = $this->fixSubgenusParentheses($newName, $this->requestData['rank_id']);
+                // first letter is capitalized & subgenus parantheses are removed (changed silently)
                 $newName = $this->fixNameCasting($newName);
                 
                 $hasErrorButCanSave = null;
@@ -589,24 +592,22 @@ class SpeciesController extends Controller
                     $newName = $d;
                 }
                 
-                // 3. Names are written in Latin and should not contain special characters or digits.
+                // 3. Names are written in Latin (yeah right) and should not contain special characters or digits.
                 if (!$this->checkCharacters($newName)) {
                     $this->addError($this->translate('The name you specified contains invalid characters.'));
                     $hasErrorButCanSave = true;
                 }
                 
-				// 2. Issue warning if a species is not linked to an ideal parent.
-                if ($parent['rank_id']!=$pr[$this->requestData['rank_id']]['ideal_parent_id']) {
-					$this->addError(
-						sprintf(
-							$this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'),
-							strtolower($pr[$this->requestData['rank_id']]['rank']),
-							strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']),
-							strtolower($pr[$parent['rank_id']]['rank'])
-						)
-					);
+                // 2. Issue warning if a species is not linked to an ideal parent.
+                if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
+                    $this->addError(
+                    sprintf(
+                    	$this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'), 
+                    	strtolower($pr[$this->requestData['rank_id']]['rank']), 
+                    	strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), 
+                    	strtolower($pr[$parent['rank_id']]['rank']
+                    )));
                     $hasErrorButCanSave = true;
-                    
                 }
                 
 
@@ -630,11 +631,11 @@ class SpeciesController extends Controller
                 
                 if ($isHybrid && !$this->canRankBeHybrid($this->requestData['rank_id'])) {
                     $this->addError($this->translate('Rank cannot be hybrid.'));
-                	$hasErrorButCanSave = false;
+                    $hasErrorButCanSave = false;
                 }
                 
                 // save as requested
-                if (is_null($hasErrorButCanSave) || $this->rHasVal('override','1')) {
+                if (is_null($hasErrorButCanSave) || $this->rHasVal('override', '1')) {
                     
                     $this->clearErrors();
                     
@@ -670,9 +671,10 @@ class SpeciesController extends Controller
                     $this->requestData['taxon'] = $newName;
                     
                     if ($hasErrorButCanSave) {
-                        $this->addMessage('
+                        $this->addMessage(
+                        '
                         	Please be aware of the warnings above before saving.<br />
-                        	<input type="button" onclick="taxonOverrideSaveNew()" value="'.$this->translate('save anyway').'" />');
+                        	<input type="button" onclick="taxonOverrideSaveNew()" value="' . $this->translate('save anyway') . '" />');
                     }
                     else {
                         $this->addError('Taxon not saved.');
@@ -4826,6 +4828,16 @@ class SpeciesController extends Controller
             
             $parent = $this->models->ProjectRank->getNewId();
         }
+    }
+
+
+
+    private function fixSubgenusParentheses ($name, $rankId)
+    {
+        if ($rankId == $this->getProjectIdRankByname('Subgenus'))
+            return str_replace(array('(',')'),'',$name);
+        else
+            return ($name);
     }
 
 

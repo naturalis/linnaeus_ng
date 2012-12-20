@@ -15,9 +15,7 @@
 			{assign var=prev value=null}
 			{assign var=prevLevel value=-1}
 			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()" style="width:300px">
-			{if $taxa|@count==0 || $data.parent_id==''}
 			<option value="-1">{t}No parent{/t}</option>
-			{/if}
 			{foreach from=$taxa key=k item=v}
 			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
 				<option rank_id="{$v.rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
