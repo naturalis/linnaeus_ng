@@ -559,9 +559,6 @@ class SpeciesController extends Controller
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
                 
-
-
-
                 $isHybrid = $this->rHasVal('is_hybrid', 'on');
                 
                 $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
@@ -570,7 +567,7 @@ class SpeciesController extends Controller
                 
                 $newName = trim(preg_replace('/\s+/', ' ', $newName));
                 
-                // 1. First letter is capitalized (changed silently)
+                // first letter is capitalized (changed silently)
                 $newName = $this->fixNameCasting($newName);
                 
                 $hasErrorButCanSave = null;
@@ -4881,8 +4878,8 @@ class SpeciesController extends Controller
             return false;
         }
         
-        // let's be tolerant
-        return true;
+        // let's be intolerant
+        return false;
     }
 
 
