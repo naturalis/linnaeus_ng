@@ -84,10 +84,12 @@ function allLookupGetData(text,getAll) {
 		if (allLookupData && allLookupData.results) {
 			
 			if (allLookupMatchStartOnly)
-				var regExp = '/^'+addSlashes(text)+'/ig';
+				//var regExp = '/^'+addSlashes(text)+'/ig';
+				var regExp = '/\\b'+addSlashes(text)+'/ig';
 			else
 				var regExp = '/'+addSlashes(text)+'/ig';
-
+		
+			
 			//var d = eval (allLookupData.toSource());
 			var d = jQuery.extend(true, {}, allLookupData);
 			r = new Array();
@@ -128,7 +130,8 @@ function allLookupPostProcessing(text,data,getAll) {
 	
 	if (allLookupMatchStartOnly  && !getAll) {
 
-		var regExp = '/^'+addSlashes(text)+'/ig';
+		//var regExp = '/^'+addSlashes(text)+'/ig';
+		var regExp = '/\\b'+addSlashes(text)+'/ig';
 
 		//var d = eval (allLookupData.toSource());
 		var d = jQuery.extend(true, {}, data);
