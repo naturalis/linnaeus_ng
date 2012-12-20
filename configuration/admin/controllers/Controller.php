@@ -302,6 +302,10 @@ class Controller extends BaseClass
         return $this->errors;
     }
 
+    public function clearErrors ()
+    {
+        $this->errors = array();
+    }
 
 
     /**
