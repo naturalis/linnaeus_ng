@@ -9,19 +9,19 @@
 <?php
     // Modify project settings
     $settings = array(
-   		'projectId' => 597,
-        'authorOnFirstLine' => true,
-   		'linesToCheck' => 10, // relevant only if author is not on the first line
-        'includeHigherTaxa' => true, // skip higher taxa
+   		'projectId' => 588,
+   		'linesToCheck' => 10, // relevant only if author is not on a predetermined line
+        'includeHigherTaxa' => true, // false to skip higher taxa
         'lineBreak' => '<br />', // default in L2 imports
+        'maxWordsInAuthorString' => 5, // dismiss author if string contains more this number of words
     
         'species' => array(
-            'preceededBy' => 'Author:', // text string, [taxon], false
-            'followedBy' => false, // text string, [taxon], false
+            'preceededBy' => '[taxon]', // text string, [taxon], false
+            'followedBy' => false
         ),
         'higherTaxa' => array(
-            'preceededBy' => 'Author:', // text string, [taxon], false
-            'followedBy' => false, // text string, [taxon], false
+            'preceededBy' => false,
+            'followedBy' => false
         )
     );
     
@@ -75,8 +75,6 @@
 			if ($author) {
 				$message = $row['taxon'] . ' -- author: ' . $author . '<br>';
 			} else {
-			
-//	die(var_dump($authorResults));		
 				$message = '<span style="color: red; font-weight: bold;">' . $row['taxon'] . ': ';
 				$message .= count($authorResults) == 1 ? 'no author in "' . 
 					trim($authorResults[0]['author']) . '"' : 'could not locate author';
@@ -95,62 +93,58 @@
 	function getAuthor ($row) 
 	{
 	    global $settings;
-	    // If the author is on the first line, cut off the rest before continuing
-	    if ($settings['authorOnFirstLine']) {
-	        return array(extractAuthor(
-	        	strip_tags(substr($row['content'], 0, strpos($row['content'], $settings['lineBreak']))),
-	        	$row['taxon'], 
-	        	$settings[$row['module']]['preceededBy'],
-	        	$settings[$row['module']]['followedBy']
-	        ));
-	    }
-		// First replace line break with custom line break, then parse limited number of lines
 		$content = strip_tags(str_replace($settings['lineBreak'], '@@@', $row['content']));
 		$lines = explode('@@@', $content, $settings['linesToCheck'] + 1);
         for ($i = 0; $i < count($lines) - 1; $i++) {
-	        $r[$i] = extractAuthor(
-	        	$lines[$i], 
-	        	$row['taxon'], 
-	        	$settings[$row['module']]['preceededBy'],
-	        	$settings[$row['module']]['followedBy']
-	        );
+	        $r[$i] = extractAuthor($lines[$i], $row);
 	    }
 	    return $r;
 	}
 	
-	function extractAuthor ($line, $taxon, $preceededBy, $followedBy) 
+	function extractAuthor ($line, $row) 
 	{
+	    global $settings;
 	    $author = $line;
+	    $preceededBy = $settings[$row['module']]['preceededBy'];
+	    $followedBy = $settings[$row['module']]['followedBy'];
+	    
 	    if ($preceededBy) {
-	        if ($preceededBy == '[taxon]') $preceededBy = $taxon;
+	        if ($preceededBy == '[taxon]') $preceededBy = $row['taxon'];
 	        if (strpos($author, $preceededBy) !== false) {
 	            $author = trim(substr($author, strlen($preceededBy), strlen($author)));
 	        }
 	    }
 		if ($followedBy) {
-	        if ($followedBy == '[taxon]') $followedBy = $taxon;
+	        if ($followedBy == '[taxon]') $followedBy = $row['taxon'];
 	        if (strpos($author, $followedBy) !== false) {
 	            $author = trim(substr($author, 0, strpos($author, $followedBy)));
 	        }
 	    }
-	    if (!valideAuthor($line, $author, $preceededBy, $followedBy)) {
-	        return array(
-	            'author' => $line,
-	            'error' => true
-	        );
+	    if (!valideAuthor($line, $author, $preceededBy, $followedBy, $row['module'])) {
+	        return array('author' => $line, 'error' => true);
 	    }
-        return array(
-            'author' => trim($author),
-            'error' => false
-        );
+        return array('author' => trim($author), 'error' => false);
     }
     
-    function valideAuthor ($line, $author, $preceededBy, $followedBy)
+    function valideAuthor ($line, $author, $preceededBy, $followedBy, $taxonType)
     {
-    	// There should be text before or after, but the author matches the complete line: error
-    	if (($preceededBy || $followedBy) && $line == $author) return false;
-    	// Author consists of more than 10 words (this traps situations where no text preceeds or follows): error
-    	if (str_word_count($author) > 10) return false;
+    	global $settings;
+    	// Empty author string is not OK...
+    	if (empty($author)) {
+    		return false;
+    	}
+    	// There should be text before or after, but author matches the complete line; dismiss
+    	if (($preceededBy || $followedBy) && $line == $author) {
+    		return false;
+    	}
+    	// No text preceeds or follows; check for year
+    	if (!preg_match('/(\s|,)(17|18|19|20)[0-9]{2}/', $author)) {
+    		return false;
+    	}
+    	// String contains year but contains too many words
+    	if (str_word_count($author) >= $settings['maxWordsInAuthorString']) {
+    		return false;
+    	}
     	return true;
     }
     
