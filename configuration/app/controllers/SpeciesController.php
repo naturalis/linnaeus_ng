@@ -330,6 +330,14 @@ class SpeciesController extends Controller
             
             $defCat = 'classification';
             
+            $n = $this->getTaxonNames($taxon);
+            
+            $stdCats[] = array(
+                'id' => 'names', 
+                'title' => $this->translate('Names'), 
+                'is_empty' => (count((array) $n['synonyms']) == 0 && count((array) $n['common']) == 0 ? 1 : 0)
+            );
+            
             $d = array();
             
             foreach ((array) $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
@@ -355,16 +363,7 @@ class SpeciesController extends Controller
                 if ($ct[0]['page_id'] == $_SESSION['app']['user']['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
                     $defCat = $_SESSION['app']['user']['species']['defaultCategory'];
             }
-            
-
-            $m = $this->getTaxonMedia($taxon, null);
-            
-            $stdCats[] = array(
-                'id' => 'media', 
-                'title' => $this->translate('Media'), 
-                'is_empty' => (count((array) $m) > 0 ? 0 : 1)
-            );
-            
+                        
             $stdCats[] = array(
                 'id' => 'classification', 
                 'title' => $this->translate('Classification'), 
@@ -383,15 +382,7 @@ class SpeciesController extends Controller
 	            
             }
             
-            $n = $this->getTaxonNames($taxon);
-            
-            $stdCats[] = array(
-                'id' => 'names', 
-                'title' => $this->translate('Names'), 
-                'is_empty' => (count((array) $n['synonyms']) == 0 && count((array) $n['common']) == 0 ? 1 : 0)
-            );
-            
-            if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
+             if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
                 
                 $l = $this->getTaxonLiterature($taxon);
                 
@@ -401,6 +392,14 @@ class SpeciesController extends Controller
                     'is_empty' => (count((array) $l) > 0 ? 0 : 1)
                 );
             }
+            
+            $m = $this->getTaxonMedia($taxon, null);
+            
+            $stdCats[] = array(
+                'id' => 'media', 
+                'title' => $this->translate('Media'), 
+                'is_empty' => (count((array) $m) > 0 ? 0 : 1)
+            );
             
             $d = array_merge($d, $stdCats);
             //print_r($d); die();
