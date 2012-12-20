@@ -9,9 +9,9 @@
 <?php
     // Modify project settings
     $settings = array(
-   		'projectId' => 588,
+   		'projectId' => 599,
    		'linesToCheck' => 10, // relevant only if author is not on a predetermined line
-        'includeHigherTaxa' => true, // false to skip higher taxa
+        'includeHigherTaxa' => false, // false to skip higher taxa
         'lineBreak' => '<br />', // default in L2 imports
         'maxWordsInAuthorString' => 5, // dismiss author if string contains more this number of words
     
@@ -73,7 +73,7 @@
 		// Display only
 		} else {
 			if ($author) {
-				$message = $row['taxon'] . ' -- author: ' . $author . '<br>';
+				$message = $row['taxon'] . ': ' . $author . '<br>';
 			} else {
 				$message = '<span style="color: red; font-weight: bold;">' . $row['taxon'] . ': ';
 				$message .= count($authorResults) == 1 ? 'no author in "' . 
@@ -120,13 +120,13 @@
 	            $author = trim(substr($author, 0, strpos($author, $followedBy)));
 	        }
 	    }
-	    if (!valideAuthor($line, $author, $preceededBy, $followedBy, $row['module'])) {
+	    if (!valideAuthor($line, $author, $preceededBy, $followedBy)) {
 	        return array('author' => $line, 'error' => true);
 	    }
         return array('author' => trim($author), 'error' => false);
     }
     
-    function valideAuthor ($line, $author, $preceededBy, $followedBy, $taxonType)
+    function valideAuthor ($line, $author, $preceededBy, $followedBy)
     {
     	global $settings;
     	// Empty author string is not OK...
