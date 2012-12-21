@@ -116,7 +116,8 @@ class configuration
 			'soundPlayerName' => 'player_mp3.swf',
 			'useJavascriptLinks' => false,
 			'projectCssTemplateFile' => 'project-template.css',
-			'useJavascriptLinks' => false
+			'useJavascriptLinks' => false,
+        	'appNameFrontEnd' => 'app'
         );
     
     }
