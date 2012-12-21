@@ -20,7 +20,7 @@ function interfaceSaveLabel(id,lId,newVal,msgId) {
 		success : function (data) {
 			$('#'+msgId).html(data).fadeOut(1000);
 		}
-	})
+	});
 	
 }
 
@@ -35,7 +35,7 @@ function interfaceEnableTransEdit(ele) {
 	
 	interfaceOldVals[idx] = $(ele).html();
 	
-	$(ele).html('<input type="text" id="'+nId+'" value="'+interfaceOldVals[idx]+'" >');
+	$(ele).html('<input type="text" id="'+nId+'" value="'+interfaceOldVals[idx]+'" style="width:240px">');
 
 	$('#trans2-'+oId).keyup(function(e) {
 		interfaceDoKeyUp(e.which,idx,oId,nId);
@@ -70,4 +70,13 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 		interfaceBeingEdited[idx]=false;
 	}
 	
+}
+
+function interfaceDeleteTag(id) {
+
+	$('<input type="hidden" name="start">').val($('#currStart').val()).appendTo('#theForm');
+	$('<input type="hidden" name="action">').val('delete').appendTo('#theForm');
+	$('<input type="hidden" name="id">').val(id).appendTo('#theForm');
+	$('#theForm').submit();
+
 }

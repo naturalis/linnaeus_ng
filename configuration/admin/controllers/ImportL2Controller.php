@@ -413,7 +413,7 @@ class ImportL2Controller extends Controller
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Species and ranks for "' . $project['title'] . '"'));
+        $this->setPageName(sprintf($this->translate('Species and ranks for "%s"'),$project['title']));
         
         $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
         
@@ -486,7 +486,7 @@ class ImportL2Controller extends Controller
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Additional species data for "' . $project['title'] . '"'));
+        $this->setPageName(sprintf($this->translate('Additional species data for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
@@ -657,7 +657,7 @@ class ImportL2Controller extends Controller
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Literature and glossary for "' . $project['title'] . '"'));
+        $this->setPageName(sprintf($this->translate('Literature and glossary for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
@@ -773,7 +773,7 @@ class ImportL2Controller extends Controller
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Additional content for "' . $project['title'] . '"'));
+        $this->setPageName(sprintf($this->translate('Additional content for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
@@ -1017,7 +1017,7 @@ class ImportL2Controller extends Controller
         
         $project = $this->getProjects($this->getNewProjectId());
         
-        $this->setPageName($this->translate('Map data for "' . $project['title'] . '"'));
+        $this->setPageName(sprintf($this->translate('Map data for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             

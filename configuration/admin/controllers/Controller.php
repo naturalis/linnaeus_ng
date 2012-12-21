@@ -302,10 +302,13 @@ class Controller extends BaseClass
         return $this->errors;
     }
 
+
+
     public function clearErrors ()
     {
         $this->errors = array();
     }
+
 
 
     /**
@@ -1441,7 +1444,8 @@ class Controller extends BaseClass
         return array(
             'items' => $items, 
             'prevStart' => $prevStart, 
-            'nextStart' => $nextStart
+            'currStart' => $start,
+        	'nextStart' => $nextStart 
         );
     }
 
@@ -3619,6 +3623,13 @@ class Controller extends BaseClass
             'text' => $text, 
             'env' => $this->getAppName()
         ));
+        
+        /*        
+        $bt = debug_backtrace();
+        $caller = array_shift($bt);
+        $caller = array_shift($bt);
+        echo $caller['file'].'::'.$caller['line'];
+        */
     }
 
 
@@ -3626,6 +3637,7 @@ class Controller extends BaseClass
     private function doTranslate ($text)
     {
         
+        /*
         // get id of the text
         $i = $this->models->InterfaceText->_get(array(
             'id' => array(
@@ -3634,14 +3646,24 @@ class Controller extends BaseClass
             ), 
             'columns' => 'id'
         ));
+        */
+        
+        // get id of the text
+        $i = $this->models->InterfaceText->_get(
+        array(
+            'id' => 'select id
+						from %table%
+						where
+							text = "' . mysql_real_escape_string($text) . '"
+							and env = "' . $this->getAppName() . '"'
+        ));
         
         // if not found, return unchanged
         if (empty($i[0]['id']))
-            return $text;
+            return '!' . $text;
             
             // resolve language id
         $languageId = $this->getCurrentUiLanguage();
-        
         // fetch appropriate translation
         $it = $this->models->InterfaceTranslation->_get(
         array(
