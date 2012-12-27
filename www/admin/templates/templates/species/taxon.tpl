@@ -36,7 +36,7 @@
 		<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" class="localButton" />
 		<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" class="localButton" />
 	</div>
-	{if $useVariations || $useRelated}
+	{if $useVariations || $useRelated || $useNBCExtras}
 	<div style="padding:10px 0px 10px 0px">
 		{if $useVariations}
 		<input type="button" value="{t}variations{/t}" onclick="window.open('variations.php?id={$taxon.id}','_self')" class="localButton" />
@@ -44,7 +44,10 @@
 		{if $useRelated}
 		<input type="button" value="{t}related{/t}" onclick="window.open('related.php?id={$taxon.id}','_self')" class="localButton" />
 		{/if}
-		</div>
+		{if $useNBCExtras}
+		<input type="button" value="{t}NBC extras{/t}" onclick="window.open('nbc_extras.php?id={$taxon.id}','_self')" class="localButton" />
+		{/if}
+				</div>
 	{/if}
 
 	<div id="taxon-pages-table-div"></div>

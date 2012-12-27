@@ -49,6 +49,7 @@
 include_once ('Controller.php');
 class SpeciesController extends Controller
 {
+    private $_useNBCExtras = false;
     public $usedModels = array(
         'user', 
         'user_taxon', 
@@ -74,8 +75,9 @@ class SpeciesController extends Controller
         'literature_taxon', 
         'taxa_relations', 
         'variation_relations', 
-        'matrix_variation',
+        'matrix_variation', 
         'matrix_taxon_state', 
+        'nbc_extras'
     );
     public $usedHelpers = array(
         'col_loader_helper', 
@@ -2648,7 +2650,13 @@ class SpeciesController extends Controller
     {
         $this->checkAuthorisation();
         
-        $taxon = $this->getTaxonById();
+        if (!$this->rHasVal('id') && $this->rHasVal('var')) {
+            $d = $this->getVariation($this->requestData['var']);
+            $taxon = $this->getTaxonById($d['taxon_id']);
+        }
+        else {
+            $taxon = $this->getTaxonById();
+        }
         
         $this->setPageName(sprintf($this->translate('Variations for "%s"'), $taxon['taxon']));
         
@@ -2697,6 +2705,101 @@ class SpeciesController extends Controller
 
 
 
+    public function relatedAction ()
+    {
+        if (!$this->useRelated)
+            $this->redirect('index.php');
+        
+        $this->checkAuthorisation();
+        
+        $taxon = $this->getTaxonById();
+        
+        if ($this->useVariations)
+            $this->setPageName(sprintf($this->translate('Related taxa and variations for "%s"'), $taxon['taxon']));
+        else
+            $this->setPageName(sprintf($this->translate('Related taxa for "%s"'), $taxon['taxon']));
+        
+        $related = $this->getRelatedEntities($taxon['id']);
+        
+        $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
+            'higherOnly' => $this->maskAsHigherTaxa()
+        )));
+        
+        $this->smarty->assign('navCurrentId', $taxon['id']);
+        
+        $this->smarty->assign('id', $taxon['id']);
+        
+        $this->smarty->assign('taxon', $taxon);
+        
+        $this->smarty->assign('related', $related);
+        
+        $this->printPage();
+    }
+
+
+
+    public function nbcExtrasAction ()
+    {
+        if (!$this->_useNBCExtras)
+            $this->redirect('index.php');
+        
+        $this->checkAuthorisation();
+        
+        $taxon = $this->getTaxonById();
+        
+        $this->setPageName(sprintf($this->translate('Additional NBC data for "%s"'), $taxon['taxon']));
+        
+        $data = $this->models->NbcExtras->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'ref_id' => $taxon['id'], 
+                'ref_type' => 'taxon'
+            ), 
+            'order' => 'name'
+        ));
+        
+        $varData = $this->models->TaxonVariation->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'taxon_id' => $taxon['id']
+            )
+        ));
+        
+
+
+        foreach ((array) $varData as $key => $val) {
+            
+            $varData[$key]['data'] = $this->models->NbcExtras->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'ref_id' => $val['id'], 
+                    'ref_type' => 'variation'
+                ), 
+                'order' => 'name'
+            ));
+        }
+        
+        $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
+            'higherOnly' => $this->maskAsHigherTaxa()
+        )));
+        
+        $this->smarty->assign('navCurrentId', $taxon['id']);
+        
+        $this->smarty->assign('id', $taxon['id']);
+        
+        $this->smarty->assign('taxon', $taxon);
+        
+        $this->smarty->assign('data', $data);
+        
+        $this->smarty->assign('varData', $varData);
+        
+        $this->printPage();
+    }
+
+
+
     public function previewAction ()
     {
         $this->redirect('../../../app/views/species/taxon.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->requestData['taxon_id'] . '&cat=' . $this->requestData['activePage'] . '&lan=' . $this->getDefaultProjectLanguage());
@@ -2715,8 +2818,11 @@ class SpeciesController extends Controller
         $this->includeLocalMenu = true;
         
         // variations & related are only shown for NBC matrix projects
-        $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'NBC';
+        $this->_useNBCExtras = $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'NBC';
         
+        $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
+        $this->smarty->assign('useRelated', $this->useRelated);
+        $this->smarty->assign('useVariations', $this->useVariations);
     }
 
 
@@ -5106,5 +5212,59 @@ class SpeciesController extends Controller
             'project_id' => $this->getCurrentProjectId(), 
             'variation_id' => $id
         ));
+    }
+
+
+
+    private function getRelatedEntities ($tId)
+    {
+        $rel = $this->models->TaxaRelations->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'taxon_id' => $tId
+            )
+        ));
+        
+        foreach ((array) $rel as $key => $val) {
+            
+            if ($val['ref_type'] == 'taxon') {
+                $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id']));
+            }
+            else {
+                $d = $this->getVariation($vVal['relation_id']);
+                $var[$key]['relations'][$vKey]['label'] = $d['label'];
+                $var[$key]['relations'][$vKey]['labels'] = $d['labels'];
+            }
+        }
+        
+        $var = $this->getVariations($tId);
+        
+        foreach ((array) $var as $key => $val) {
+            
+            $var[$key]['relations'] = $this->models->VariationRelations->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $val['id']
+                )
+            ));
+            
+            foreach ((array) $var[$key]['relations'] as $vKey => $vVal) {
+                
+                if ($vVal['ref_type'] == 'taxon') {
+                    $var[$key]['relations'][$vKey]['label'] = $this->formatTaxon($d = $this->getTaxonById($vVal['relation_id']));
+                }
+                else {
+                    $d = $this->getVariation($vVal['relation_id']);
+                    $var[$key]['relations'][$vKey]['label'] = $d['label'];
+                    $var[$key]['relations'][$vKey]['labels'] = $d['labels'];
+                }
+            }
+        }
+        
+        return array(
+            'relations' => $rel, 
+            'variations' => $var
+        );
     }
 }

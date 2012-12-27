@@ -297,6 +297,12 @@ class ImportNBCController extends Controller
             'pId' => $this->getNewProjectId()
         ));
         
+        $this->saveSetting(array(
+            'name' => 'skin', 
+            'value' => 'nbc_default', 
+            'pId' => $this->getNewProjectId()
+        ));
+        
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
@@ -573,7 +579,8 @@ class ImportNBCController extends Controller
         
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariations($data);
-        
+
+
         // default kingdom
         $this->models->Taxon->save(
         array(
@@ -639,7 +646,7 @@ class ImportNBCController extends Controller
                     
                     $vId = $species[$key]['variations'][$vKey]['lng_id'] = $this->models->TaxonVariation->getNewId();
                     
-                    $tmpIndexVar[$vVal['id']] = array(
+                    $tmpIndex[$vVal['id']] = array(
                         'type' => 'var', 
                         'id' => $vId
                     );
@@ -666,16 +673,14 @@ class ImportNBCController extends Controller
             }
             else {
                 
-                $tmpIndexVar[$val['id']] = array(
+                $tmpIndex[$val['id']] = array(
                     'type' => 'sp', 
                     'id' => $species[$key]['id']
                 );
             }
         }
-        
 
-
-        foreach ((array) $species as $key => $val) {
+		foreach ((array) $species as $key => $val) {
             
             if (!isset($val['variations'])) {
                 
@@ -692,7 +697,7 @@ class ImportNBCController extends Controller
                             'project_id' => $this->getNewProjectId(), 
                             'taxon_id' => $val['lng_id'], 
                             'relation_id' => $tmpIndex[$rVal]['id'], 
-                            'relation_type' => $tmpIndex[$rVal] == 'var' ? 'variation' : 'taxon'
+                            'ref_type' => $tmpIndex[$rVal]['type'] == 'var' ? 'variation' : 'taxon'
                         ));
                     }
                 }
@@ -714,7 +719,7 @@ class ImportNBCController extends Controller
                                 'project_id' => $this->getNewProjectId(), 
                                 'variation_id' => $vVal['lng_id'], 
                                 'relation_id' => $tmpIndex[$rVal]['id'], 
-                                'relation_type' => $tmpIndex[$rVal] == 'var' ? 'variation' : 'taxon'
+                                'ref_type' => $tmpIndex[$rVal]['type'] == 'var' ? 'variation' : 'taxon'
                             ));
                         }
                     }

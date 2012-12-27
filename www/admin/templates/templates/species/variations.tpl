@@ -49,7 +49,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-allLookupNavigateOverrideUrl('synonyms.php?id=%s');
+allLookupNavigateOverrideUrl('variations.php?id=%s');
 {literal}
 });
 </script>

@@ -40,7 +40,7 @@ class configuration
     {
 
         return array(
-            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates/'.$this->_skinName, 
+            'dir_template' => $this->_appFileRoot . 'www/app/templates/templates/', 
             'dir_compile' => $this->_appFileRoot . 'www/app/templates/templates_c', 
             'dir_cache' => $this->_appFileRoot . 'www/app/templates/cache', 
             'dir_config' => $this->_appFileRoot . 'www/app/templates/configs', 

@@ -14,8 +14,12 @@ class MatrixKeyController extends Controller
 		'characteristic_matrix',
 		'characteristic_label',
 		'characteristic_state',
-		'characteristic_label_state'
-	);
+		'characteristic_label_state',
+        'chargroup_label', 
+        'chargroup', 
+        'characteristic_chargroup', 
+        'matrix_variation'
+    );
     
     public $usedHelpers = array();
 
@@ -168,6 +172,10 @@ class MatrixKeyController extends Controller
 
 		$this->smarty->assign('characteristics',$this->getCharacteristics());
 
+//IF IETS
+$this->smarty->assign('groups',$this->getCharacterGroups());
+		
+		
 		$this->smarty->assign('taxa',$this->getTaxaInMatrix());
 
 		$this->smarty->assign('matrices',$this->getMatricesInMatrix());
@@ -333,6 +341,8 @@ class MatrixKeyController extends Controller
 
 		foreach((array)$mt as $key => $val) {
 
+		    if (!isset($tree[$val['taxon_id']])) continue;
+		    
 			$d = $tree[$val['taxon_id']];
 
 			$taxa[$val['matrix_id']][] = 
@@ -1190,4 +1200,52 @@ class MatrixKeyController extends Controller
 
 	}
 
+	private function getCharacterGroups ($mId = null)
+	{
+	    $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
+	
+	    $cg = $this->models->Chargroup->_get(
+	    array(
+	    'id' => array(
+	    'project_id' => $this->getCurrentProjectId(),
+	    'matrix_id' => $mId
+	    ),
+	    'order' => 'show_order',
+	    'columns' => 'id,matrix_id,label,show_order'
+	    ));
+	
+	    foreach ((array) $cg as $key => $val) {
+	        $cg[$key]['label'] = $this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
+	
+	        $cc = $this->models->CharacteristicChargroup->_get(
+	        array(
+	        'id' => array(
+	        'project_id' => $this->getCurrentProjectId(),
+	        'chargroup_id' => $val['id']
+	        ),
+	        'order' => 'show_order'
+	        ));
+	
+	        foreach ((array) $cc as $cVal) {
+	            $cg[$key]['chars'][] = $this->getCharacteristic($cVal['characteristic_id']);
+	        }
+	    }
+	
+	    return $cg;
+	}
+	
+	private function getCharacterGroupLabel ($id, $lId)
+	{
+	    $cl = $this->models->ChargroupLabel->_get(
+	    array(
+	    'id' => array(
+	    'project_id' => $this->getCurrentProjectId(),
+	    'chargroup_id' => $id,
+	    'language_id' => $lId
+	    )
+	    ));
+	
+	    return $cl[0]['label'];
+	}
+	
 }

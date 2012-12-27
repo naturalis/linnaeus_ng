@@ -210,7 +210,7 @@ class MatrixKeyController extends Controller
         
         $this->smarty->assign('taxa', $this->getTaxa());
         
-        if ($this->_useVariations)
+        if ($this->useVariations)
             $this->smarty->assign('variations', $this->getVariationsInMatrix());
         
         $this->smarty->assign('matrix', $matrix);
@@ -446,7 +446,7 @@ class MatrixKeyController extends Controller
         if (isset($this->treeList))
             $this->smarty->assign('taxa', $this->treeList);
         
-        if ($this->_useVariations)
+        if ($this->useVariations)
             $this->smarty->assign('variations', $this->getVariations());
         
         $this->printPage();
@@ -777,7 +777,7 @@ class MatrixKeyController extends Controller
     {
         $this->setDefaultMatrix();
         
-		$this->_useCharacterGroups = $this->_useVariations = ($this->getSetting('matrixtype')=='NBC');
+		$this->_useCharacterGroups = $this->useVariations = ($this->getSetting('matrixtype')=='NBC');
         
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
         $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
@@ -2173,7 +2173,7 @@ class MatrixKeyController extends Controller
 
     private function getVariationsInMatrix ()
     {
-        if (!$this->_useVariations)
+        if (!$this->useVariations)
             return;
         
         $v = $this->getVariations();
