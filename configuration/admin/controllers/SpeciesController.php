@@ -2,6 +2,9 @@
 
 /*
 
+	variationsAction
+		saves all variations in project default language only!!!!
+
 	pre-check
 		make sure $iniSettings.upload_max_filesize and $iniSettings.post_max_size are sufficient (see config for allowed filesizes)
 
@@ -68,7 +71,11 @@ class SpeciesController extends Controller
         'label_language', 
         'choice_keystep', 
         'literature', 
-        'literature_taxon'
+        'literature_taxon', 
+        'taxa_relations', 
+        'variation_relations', 
+        'matrix_variation',
+        'matrix_taxon_state', 
     );
     public $usedHelpers = array(
         'col_loader_helper', 
@@ -560,6 +567,8 @@ class SpeciesController extends Controller
             if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
                 
 
+
+
                 $isHybrid = $this->rHasVal('is_hybrid', 'on');
                 
                 $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
@@ -601,12 +610,8 @@ class SpeciesController extends Controller
                 // 2. Issue warning if a species is not linked to an ideal parent.
                 if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
                     $this->addError(
-                    sprintf(
-                    	$this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'), 
-                    	strtolower($pr[$this->requestData['rank_id']]['rank']), 
-                    	strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), 
-                    	strtolower($pr[$parent['rank_id']]['rank']
-                    )));
+                    sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'), 
+                    strtolower($pr[$this->requestData['rank_id']]['rank']), strtolower($pr[$pr[$this->requestData['rank_id']]['ideal_parent_id']]['rank']), strtolower($pr[$parent['rank_id']]['rank'])));
                     $hasErrorButCanSave = true;
                 }
                 
@@ -1979,6 +1984,10 @@ class SpeciesController extends Controller
             
             $this->setOverviewImageState($this->requestData['taxon_id'], $this->requestData['id'], $this->requestData['state']);
         }
+        else if ($this->requestData['action'] == 'delete_variation') {
+            
+            $this->deleteVariation($this->requestData['id']);
+        }
         else if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
             
             $this->getLookupList($this->requestData['search']);
@@ -2643,14 +2652,32 @@ class SpeciesController extends Controller
         
         $this->setPageName(sprintf($this->translate('Variations for "%s"'), $taxon['taxon']));
         
-        if (!$this->isFormResubmit()) {
+        if (!$this->isFormResubmit() && $this->rHasVal('variation')) {
             
-            if ($this->rHasVal('action', 'delete')) {}
+            $v = $this->models->TaxonVariation->save(
+            array(
+                'id' => null, 
+                'project_id' => $this->getCurrentProjectId(), 
+                'taxon_id' => $this->requestData['id'], 
+                'label' => trim($this->requestData['variation'])
+            ));
             
-            if ($this->rHasVal('variation')) {}
+            if ($v) {
+                
+                $nId = $this->models->TaxonVariation->getNewId();
+                
+                $this->models->VariationLabel->save(
+                array(
+                    'id' => null, 
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $nId, 
+                    'language_id' => $this->getDefaultProjectLanguage(), 
+                    'label' => trim($this->requestData['variation']), 
+                    'label_type' => 'alternative'
+                ));
+            }
         }
         
-
         $variations = $this->getVariations($taxon['id']);
         
         $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
@@ -2687,8 +2714,9 @@ class SpeciesController extends Controller
         
         $this->includeLocalMenu = true;
         
-        // variations are only shown for NBC matrix projects
-        $this->_useVariations = $this->getSetting('matrixtype') == 'NBC';
+        // variations & related are only shown for NBC matrix projects
+        $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'NBC';
+        
     }
 
 
@@ -4835,7 +4863,10 @@ class SpeciesController extends Controller
     private function fixSubgenusParentheses ($name, $rankId)
     {
         if ($rankId == $this->getProjectIdRankByname('Subgenus'))
-            return str_replace(array('(',')'),'',$name);
+            return str_replace(array(
+                '(', 
+                ')'
+            ), '', $name);
         else
             return ($name);
     }
@@ -5044,5 +5075,36 @@ class SpeciesController extends Controller
                 return $p['taxon'] . ' (' . $t['taxon'] . ') ';
             }
         }
+    }
+
+
+
+    private function deleteVariation ($id)
+    {
+        $this->models->TaxaRelations->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'relation_id' => $id, 
+            'ref_type' => 'variation'
+        ));
+        $this->models->VariationRelations->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'variation_id' => $id
+        ));
+        $this->models->VariationLabel->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'variation_id' => $id
+        ));
+        $this->models->TaxonVariation->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'id' => $id
+        ));
+        $this->models->MatrixTaxonState->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'variation_id' => $id
+        ));
+        $this->models->MatrixVariation->delete(array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'variation_id' => $id
+        ));
     }
 }

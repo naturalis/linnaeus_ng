@@ -12,6 +12,7 @@ class Controller extends BaseClass
     private $_prevTreeId = null;
     private $_breadcrumbRootName = null;
     public $useVariations = false;
+    public $useRelated = false;
     public $tmp;
     public $smarty;
     public $requestData;
@@ -1444,8 +1445,8 @@ class Controller extends BaseClass
         return array(
             'items' => $items, 
             'prevStart' => $prevStart, 
-            'currStart' => $start,
-        	'nextStart' => $nextStart 
+            'currStart' => $start, 
+            'nextStart' => $nextStart
         );
     }
 
@@ -2269,8 +2270,6 @@ class Controller extends BaseClass
         return $tv;
     }
 
-
-
     private function getFrontEndMainMenu ()
     {
         $modules = $this->models->ModuleProject->_get(
@@ -2677,6 +2676,7 @@ class Controller extends BaseClass
         $this->smarty->assign('uiCurrentLanguage', $this->getCurrentUiLanguage());
         $this->smarty->assign('isMultiLingual', $this->isMultiLingual);
         $this->smarty->assign('useVariations', $this->useVariations);
+        $this->smarty->assign('useRelated', $this->useRelated);
         
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
