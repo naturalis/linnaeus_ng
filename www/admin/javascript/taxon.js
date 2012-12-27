@@ -1522,8 +1522,6 @@ function taxonGetFormattedPreview() {
 		}
 	});
 	
-	
-	
 }
 
 function taxonOverrideSaveNew() {
@@ -1531,4 +1529,24 @@ function taxonOverrideSaveNew() {
 	$('<input type="hidden" name="override">').val('1').appendTo('#theForm');
 	$('#theForm').submit();
 	
+}
+
+function taxonDeleteVariation(id,name) {
+
+	if (!confirm(sprintf(_('Are you sure you want to delete the variation "%s"?'),name))) return; 
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_variation' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			$('#var-row-'+id).remove();
+		}
+	});
+
 }
