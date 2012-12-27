@@ -16,6 +16,16 @@
 	again, these is at present no mechanism that actually enforces this - it is up
 	to the system administrator.
 
+
+	on skins:
+	if the setting (in the table 'settings') for 'skin' exists, that skin is used
+	providing the follwing directories exist ($this->doesSkinExist()):
+	- app/style/[skinname]/
+	- app/media/system/skins/[skinname]/
+	- [smarty template dir]/[skinname]/[controller basename]/
+	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is used.
+
+
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -58,8 +68,8 @@ class Controller extends BaseClass
         'free_module_project', 
         'language', 
         'interface_text', 
-    	'interface_translation',
-    	'taxon', 
+        'interface_translation', 
+        'taxon', 
         'project_rank', 
         'label_project_rank', 
         'rank', 
@@ -98,9 +108,15 @@ class Controller extends BaseClass
         
         $this->initLogging();
         
-        $this->setNames();
+        $this->loadModels();
         
         $this->loadControllerConfig();
+        
+        $this->loadSmartyConfig();
+        
+        $this->setNames();
+        
+        $this->setSkinName();
         
         $this->setUrls();
         
@@ -110,8 +126,8 @@ class Controller extends BaseClass
         
         $this->checkWriteableDirectories();
         
-        $this->loadModels();
-        
+        //$this->loadModels();
+
         $this->setRandomValue();
         
         $this->setSmartySettings();
@@ -275,13 +291,16 @@ class Controller extends BaseClass
             //$t[$key]['level'] = $level;
             
 
+
             //// sibling_pos reflects the position amongst taxa on the same level
             //$t[$key]['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
             
 
+
             //// get rank label
             //$t[$key]['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
             
+
 
             $this->treeList[$key] = $t[$key];
             
@@ -373,7 +392,8 @@ class Controller extends BaseClass
             
             $_SESSION['app']['user']['species']['taxon'] = $t[0];
             
-            $pr = $this->models->ProjectRank->_get(array(
+            $pr = $this->models->ProjectRank->_get(
+            array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'id' => $_SESSION['app']['user']['species']['taxon']['rank_id']
@@ -690,7 +710,8 @@ class Controller extends BaseClass
         }
         
         $_SESSION['app']['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
-        $_SESSION['app']['project']['filesys_name'] = strtolower(preg_replace(array(
+        $_SESSION['app']['project']['filesys_name'] = strtolower(
+        preg_replace(array(
             '/\s/', 
             '/[^A-Za-z0-9-]/'
         ), array(
@@ -924,6 +945,7 @@ class Controller extends BaseClass
             //$expr = '|(\b)(?<!>)('.$val['hotword'].')(?!<)(\b)|i';
             
 
+
             $processed = preg_replace_callback($expr, array(
                 $this, 
                 'embedHotwordLink'
@@ -939,7 +961,8 @@ class Controller extends BaseClass
 
     public function getSetting ($name)
     {
-        $s = $this->models->Settings->_get(array(
+        $s = $this->models->Settings->_get(
+        array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'setting' => $name
@@ -953,9 +976,9 @@ class Controller extends BaseClass
         else
             return null;
     }
+    
 
-
-/*
+    /*
     public function formatTaxon ($name, $projRankId)
     {
          if (empty($projRankId))
@@ -1004,10 +1027,8 @@ class Controller extends BaseClass
     }
 
 */
-    
     public function formatTaxon ($taxon)
     {
-
         $e = explode(' ', $taxon['taxon']);
         $r = $this->getProjectRanks();
         
@@ -1034,21 +1055,17 @@ class Controller extends BaseClass
         if ($rankName == 'Species') {
             return '<span class="italics">' . $taxon['taxon'] . '</span>';
         }
-
+        
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
-             return '<span class="italics">' . $e[0] . ' ' . $e[1] . 
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
-                $e[2] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
         }
         
         // Single infraspecies with subgenus
         if (count($e) == 4 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
-                $e[3] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
-            
+        
         // We need the parent before continuing
         $parent = $this->getTaxonById($taxon['parent_id']);
         // Say goodbye to the orphans
@@ -1059,31 +1076,28 @@ class Controller extends BaseClass
         
         // Double infraspecies
         if (count($e) == 4) {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . 
-                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . 
-                $e[2] .
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
-                $e[3] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
         
         // Double infraspecies with subgenus
         if (count($e) == 5 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] .
-                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . 
-                $e[3] .
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . 
-                $e[4] . '</span>';
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
         
         // If we end up here something must be wrong, just return name sans formatting
         return $taxon['taxon'];
-     }
- 
+    }
+
+
+
     public function formatSynonym ($name)
     {
         return '<span class="italics">' . $name . '</span>';
     }
-  
+
+
 
     public function splashScreen ()
     {
@@ -1170,8 +1184,7 @@ class Controller extends BaseClass
                 }
                 
                 $this->smarty->assign('urlBackToAdmin', 
-                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, 
-                (isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? $this->requestData['cat'] : ($this->controllerBaseName == 'module' ? $modId : null))));
+                sprintf($this->generalSettings['urlsToAdminEdit'][$d], $id, (isset($this->requestData['cat']) && is_numeric($this->requestData['cat']) ? $this->requestData['cat'] : ($this->controllerBaseName == 'module' ? $modId : null))));
                 $this->smarty->display('../shared/preview-overlay.tpl');
             }
         }
@@ -1272,7 +1285,8 @@ class Controller extends BaseClass
 
     public function getMainMenu ()
     {
-        $modules = $this->models->ModuleProject->_get(array(
+        $modules = $this->models->ModuleProject->_get(
+        array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
                 'active' => 'y'
@@ -1392,7 +1406,8 @@ class Controller extends BaseClass
                 }
             }
             
-            $array = $d;
+            if (isset($d))
+                $array = $d;
         }
     }
 
@@ -1406,7 +1421,7 @@ class Controller extends BaseClass
      */
     public function setUrls ()
     {
-        $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->generalSettings['app']['skinName'] . '/';
+        $_SESSION['app']['system']['urls']['systemMedia'] = $this->baseUrl . $this->getAppName() . '/media/system/skins/' . $this->getSkinName() . '/';
         
         $p = $this->getCurrentProjectId();
         
@@ -1442,11 +1457,17 @@ class Controller extends BaseClass
 		if (file_exists($projectCssDir.$pCode.'/basics.css')) {
 			$u['projectCSS'] = $u['cssRootDir'].$pCode.'/';
 		} else {
-			$u['projectCSS'] = $u['cssRootDir'].'default/'.$this->generalSettings['app']['skinName'].'/';
+			$u['projectCSS'] = $u['cssRootDir'].'default/'.$this->getSkinName().'/';
 		}
 		*/
+
+        if (file_exists($u['cssRootDir'].$this->getSkinName().'/basics.css')) {
+            $u['projectCSS'] = $u['cssRootDir'].$this->getSkinName().'/';
+        } else {
+            $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->getSkinName() . '/';
+        }
         
-        $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->generalSettings['app']['skinName'] . '/';
+        
         
         // home
         $u['projectHome'] = $this->baseUrl . $this->getAppName() . '/views/' . $this->generalSettings['defaultController'] . '/';
@@ -1628,7 +1649,7 @@ class Controller extends BaseClass
         
         $r = null;
         
-        $d = $this->_smartySettings['dir_template'] . '/' . 'shared/' . $this->getProjectFSCode($p) . '/';
+        $d = $this->_smartySettings['dir_template'] . $this->getSkinName() . '/' . 'shared/' . $this->getProjectFSCode($p) . '/';
         
         if (file_exists($d . '_header-container.tpl'))
             $r['header_container'] = $d . '_header-container.tpl';
@@ -1697,6 +1718,12 @@ class Controller extends BaseClass
     }
 
 
+    private function loadSmartyConfig()
+    {
+        $this->_smartySettings = $this->config->getSmartySettings();
+    }
+    
+    
 
     /**
      * Sets class variables, based on a page's url
@@ -1750,6 +1777,38 @@ class Controller extends BaseClass
             $this->log('No full path set', 2);
         if (empty($this->_fullPathRelative))
             $this->log('No relative full path set', 2);
+    }
+
+
+
+    private function setSkinName ()
+    {
+        $d = $this->getSetting('skin');
+        
+        if (isset($d) && $this->doesSkinExist($d))
+            $_SESSION['app']['system']['skinName'] = $d;
+        else
+            $_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
+    }
+
+
+    private function doesSkinExist ($skin)
+    {
+
+        return
+	        file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && 
+	        file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
+        	file_exists($this->_smartySettings['dir_template'] . $skin. '/' . $this->getControllerBaseName() . '/');
+        
+    }
+    
+
+    private function getSkinName ()
+    {
+        if (!isset($_SESSION['app']['system']['skinName']))
+            $this->setSkinName();
+        
+        return $_SESSION['app']['system']['skinName'];
     }
 
 
@@ -1821,20 +1880,22 @@ class Controller extends BaseClass
      */
     private function setSmartySettings ()
     {
-        $this->_smartySettings = $this->config->getSmartySettings();
+        
+        // this is now done in $this->loadSmartyConfig(); because some settings are needed earlier in the bootstrap
+        //$this->_smartySettings = $this->config->getSmartySettings();
         
         $this->smarty = new Smarty();
         
         /* DEBUG */
         $this->smarty->force_compile = true;
         
-        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . '/' . $this->getControllerBaseName() . '/';
+        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName(). '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-        
+
         $this->smarty->register_block('t', array(
             &$this, 
             'smartyTranslate'
@@ -1857,6 +1918,7 @@ class Controller extends BaseClass
             //$this->requestData = $_REQUEST; // also contains cookies
             $this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
             
+
 
             foreach ((array) $this->requestData as $key => $val) {
                 
@@ -2249,7 +2311,8 @@ class Controller extends BaseClass
             $d = $this->models->Hotword->_get(
             array(
                 'id' => 'select hotword,controller,view,params
-								from %table% where project_id = ' . $this->getCurrentProjectId() . ' ' . 'and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)'
+								from %table% where project_id = ' . $this->getCurrentProjectId() . ' ' . 'and (language_id = ' .
+                 $this->getCurrentLanguageId() . ' or language_id = 0)'
             ));
             
             foreach ((array) $d as $key => $val)
@@ -2478,6 +2541,7 @@ class Controller extends BaseClass
             $this->buildTaxonTree(); // return null;
         
 
+
         $d = array();
         
         foreach ((array) $this->treeList as $key => $val) {
@@ -2499,7 +2563,6 @@ class Controller extends BaseClass
             
             $this->_buildTaxonTree();
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
-        
         }
         else {
             
@@ -2555,7 +2618,7 @@ class Controller extends BaseClass
 
 
 
-    private function saveInterfaceText($text)
+    private function saveInterfaceText ($text)
     {
         @$this->models->InterfaceText->save(array(
             'id' => null, 
@@ -2564,42 +2627,44 @@ class Controller extends BaseClass
         ));
     }
 
-    private function doTranslate($text)
+
+
+    private function doTranslate ($text)
     {
         
-		// get id of the text
-        $i = $this->models->InterfaceText->_get(
-	        array(
-	            'id' => array(
-	                'text' => $text,
-		            'env' => $this->getAppName()
-	            ), 
-	            'columns' => 'id'
-	        ));
-
+        // get id of the text
+        $i = $this->models->InterfaceText->_get(array(
+            'id' => array(
+                'text' => $text, 
+                'env' => $this->getAppName()
+            ), 
+            'columns' => 'id'
+        ));
+        
         // if not found, return unchanged
-		if (empty($i[0]['id'])) return $text;
-
-		// resolve language id
-		$languageId = $this->getCurrentLanguageId();
-		if (is_null($languageId)) $languageId = $this->getDefaultLanguageId();
-		
-		// fetch appropriate translation
-		$it = $this->models->InterfaceTranslation->_get(
-	        array(
-	            'id' => 
-		        	array(
-		                'interface_text_id' => $i[0]['id'],
-		                'language_id' => $languageId
-		            ), 
-	            'columns' => 'translation'
-	        ));
-		
-		// if not found, return unchanged				
-		if (empty($it[0]['translation'])) return $text;
-		
-		// return translation
-		return $it[0]['translation'];
-
+        if (empty($i[0]['id']))
+            return $text;
+            
+            // resolve language id
+        $languageId = $this->getCurrentLanguageId();
+        if (is_null($languageId))
+            $languageId = $this->getDefaultLanguageId();
+            
+            // fetch appropriate translation
+        $it = $this->models->InterfaceTranslation->_get(
+        array(
+            'id' => array(
+                'interface_text_id' => $i[0]['id'], 
+                'language_id' => $languageId
+            ), 
+            'columns' => 'translation'
+        ));
+        
+        // if not found, return unchanged				
+        if (empty($it[0]['translation']))
+            return $text;
+            
+            // return translation
+        return $it[0]['translation'];
     }
 }

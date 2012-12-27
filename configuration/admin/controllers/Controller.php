@@ -2266,9 +2266,39 @@ class Controller extends BaseClass
                 'columns' => 'id,language_id,label,label_type'
             ));
         }
-        
+
         return $tv;
     }
+
+
+
+    public function getVariation ($id)
+    {
+        if (isset($tId))
+            $d['taxon_id'] = $tId;
+        
+        $tv = $this->models->TaxonVariation->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'id' => $id
+            ), 
+            'columns' => 'id,taxon_id,label'
+        ));
+        
+        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'variation_id' => $id
+            ), 
+            'columns' => 'id,language_id,label,label_type'
+        ));
+        
+        return $tv[0];
+    }
+
+
 
     private function getFrontEndMainMenu ()
     {
