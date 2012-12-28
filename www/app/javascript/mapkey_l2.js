@@ -151,6 +151,12 @@ function l2DoSearchMap() {
 
 	});
 	
+	var types = false;
+
+	$('[name^=dataTypes]').each(function() {
+		if ($(this).attr('checked')==true) types = true;
+	});
+	
 	if (!squares) {
 		
 		alert(_('Please select at least one square'));
@@ -158,7 +164,15 @@ function l2DoSearchMap() {
 		return;
 		
 	} 
-	
+
+	if (!types) {
+		
+		alert(_('Please select at least one datatype'));
+		
+		return;
+		
+	} 
+
 	$('#theForm').submit();
 
 }
