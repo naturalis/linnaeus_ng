@@ -348,6 +348,9 @@ class SearchController extends Controller
 		if ($containsOrStarts=='boundary')
 			$s = '[[:<:]]'.str_replace(' ','|[[:<:]]',$s);
 		else
+		if ($containsOrStarts=='full')
+			$s = $s;
+		else
 			$s = str_replace(' ','|',$s);
 
 		return '('.mysql_real_escape_string($s).')';
@@ -429,10 +432,11 @@ class SearchController extends Controller
 			        parent_id,
 					taxon as label,
 			        rank_id, 
+					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'full').'\' as fullMatch,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'contains').'\' as isMatch,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
-				'order' => 'sortA desc, sortB desc, taxon'
+				'order' => 'fullMatch desc, sortA desc, sortB desc, taxon'
 			)
 		);
 
