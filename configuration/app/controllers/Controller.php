@@ -1803,7 +1803,7 @@ class Controller extends BaseClass
     }
     
 
-    private function getSkinName ()
+    public function getSkinName ()
     {
         if (!isset($_SESSION['app']['system']['skinName']))
             $this->setSkinName();
