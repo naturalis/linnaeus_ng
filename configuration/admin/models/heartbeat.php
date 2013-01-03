@@ -46,5 +46,19 @@ class Heartbeat extends Model
     
     }
 
+    
+    public function cleanUp($pId,$ms)
+    {
+
+        if (empty($pId) || empty($ms) || !is_numeric($ms)) return;
+
+        // ppl probably get confused by milli and micro... 
+        if (log10($ms)<5) $ms *= 1000; // it were milliseconds!
+        if (log10($ms)<5) $ms *= 1000; // no, even worse! it were seconds!
+        
+		@$this->execute("delete from %table%  where project_id = ".$pId." and last_change <= TIMESTAMPADD(MICROSECOND ,-".($ms).",CURRENT_TIMESTAMP)");
+
+    }
+    
 }
 
