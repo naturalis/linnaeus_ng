@@ -1869,7 +1869,8 @@ MUST CHECK
                 return false;
             }
         }
-        if (!preg_match("/^\[?[0-9\.]+\]?$/", $email_array[1])) { // Check if domain is IP. If not, it should be valid domain name
+        if (!preg_match("/^\[?[0-9\.]+\]?$/", $email_array[1])) { 
+            // Check if domain is IP. If not, it should be valid domain name
             $domain_array = explode(".", $email_array[1]);
             if (sizeof($domain_array) < 2) {
                 return false; // Not enough parts to domain

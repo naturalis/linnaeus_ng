@@ -2988,6 +2988,8 @@ class Controller extends BaseClass
             return;
         }
         
+        $this->models = new stdClass();
+       
         foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
@@ -3048,6 +3050,8 @@ class Controller extends BaseClass
             return;
         }
         
+        $this->helpers = new stdClass();          
+        
         foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
@@ -3058,7 +3062,7 @@ class Controller extends BaseClass
                 
                 if (class_exists($d)) {
                     
-                    @$this->helpers->$d = new $d();
+                    $this->helpers->$d = new $d();
                 }
             }
         }
