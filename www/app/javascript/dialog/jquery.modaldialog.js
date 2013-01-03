@@ -115,7 +115,28 @@
 		$('#dialog-mask').live("click", function() {  $('#dialog-close').click(); } );
 				
 	};
+	
+	function reinitPosition(options) { 
 
+		$('#dialog').css('width', $('#dialog').css('width'));
+		
+		if (options.top==undefined)
+			var dialogTop = Math.abs($(window).height() - $('#dialog').height()) / 2;
+		else
+			var dialogTop = options.top;
+
+		$('#dialog').css('left', ($(window).width() - $('#dialog').width()) / 2);
+		$('#dialog').css('top', (dialogTop >= 25) ? dialogTop : 25);
+
+	}
+
+	modaldialog.reinitPosition = function $$modaldialog$error (options) {
+		if (typeof(options) == "undefined") {
+			options = { };
+		}
+		return(reinitPosition(options));
+	}	
+	
 	modaldialog.error = function $$modaldialog$error (msg, options) {
 		if (typeof(options) == "undefined") {
 			options = { };

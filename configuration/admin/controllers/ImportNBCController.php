@@ -22,6 +22,7 @@ class ImportNBCController extends Controller
     private $_defaultKingdom = 'Animalia';
     private $_defaultLanguageId = 24; // dutch, hardcoded
     private $_defaultImgExtension = 'jpg';
+    private $_defaultSkinName = 'nbc_default';
     private $_variantColumnHeaders = array();
     public $usedModels = array(
         'commonname', 
@@ -256,9 +257,9 @@ class ImportNBCController extends Controller
         
         $this->setPageName($this->translate('Saving matrix data'));
         
+        $data = $_SESSION['admin']['system']['import']['data'];
+        
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'matrix')) {
-            
-            $data = $_SESSION['admin']['system']['import']['data'];
             
             $mId = $this->createMatrix($_SESSION['admin']['system']['import']['project']['title']);
             $this->addMessage('Created matrix "' . $_SESSION['admin']['system']['import']['project']['title'] . '"');
@@ -266,7 +267,7 @@ class ImportNBCController extends Controller
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
             
-            $data = $this->storeCharacters($data, $mId);
+            $data = $this->storeCharacters($data, $mId, $this->requestData['char_type']);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['characters'] . ' characters.');
             
             $data = $this->storeStates($data);
@@ -277,6 +278,10 @@ class ImportNBCController extends Controller
             
             $this->smarty->assign('processed', true);
         }
+        
+        $this->smarty->assign('characters', $data['characters']);
+        
+        $this->smarty->assign('skinName', $this->_defaultSkinName);
         
         $this->printPage();
     }
@@ -298,8 +303,26 @@ class ImportNBCController extends Controller
         ));
         
         $this->saveSetting(array(
+            'name' => 'matrix_allow_empty_species', 
+            'value' => true, 
+            'pId' => $this->getNewProjectId()
+        ));
+        
+        $this->saveSetting(array(
+            'name' => 'matrix_use_character_groups', 
+            'value' => true, 
+            'pId' => $this->getNewProjectId()
+        ));
+
+        $this->saveSetting(array(
+            'name' => 'taxa_use_variations', 
+            'value' => true, 
+            'pId' => $this->getNewProjectId()
+        ));
+        
+        $this->saveSetting(array(
             'name' => 'skin', 
-            'value' => 'nbc_default', 
+            'value' => ($this->rHasVal('skinname') ? $this->requestData['skinname'] : $this->_defaultSkinName), 
             'pId' => $this->getNewProjectId()
         ));
         
@@ -392,10 +415,10 @@ class ImportNBCController extends Controller
                             // line "1", cell > 0: character labels
                         if ($line == 1 && $cKey > 0 && !empty($cVal))
                             $data['characters'][$cKey]['label'] = $cVal;
-                            /*
-                    	// line "2", cell > 0: character instructions (ignored)
-                    	if ($line==2 && $cKey>0 && !empty($cVal))
+                    	// line "2", cell > 0: character instructions
+                    	if ($line==2 && $cKey>0 && !empty($cVal) && $cVal!='…')
                     		$data['characters'][$cKey]['instruction'] = $cVal;
+                        /*
                     	// line "3", cell > 0: character unit (ignored)
                     	if ($line==3 && $cKey>0 && !empty($cVal))
                     		$data['characters'][$cKey]['unit'] = $cVal;
@@ -579,7 +602,7 @@ class ImportNBCController extends Controller
         
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariations($data);
-
+        
 
         // default kingdom
         $this->models->Taxon->save(
@@ -679,8 +702,8 @@ class ImportNBCController extends Controller
                 );
             }
         }
-
-		foreach ((array) $species as $key => $val) {
+        
+        foreach ((array) $species as $key => $val) {
             
             if (!isset($val['variations'])) {
                 
@@ -814,24 +837,7 @@ class ImportNBCController extends Controller
     }
 
 
-
-    private function resolveCharType ($t)
-    {
-        switch ($t) {
-            //return 'distribution';
-            //return 'media';
-            //return 'text';
-            case 'Lengte_mm':
-                return 'range';
-                break;
-            default:
-                return 'media';
-        }
-    }
-
-
-
-    private function storeCharacters ($data, $mId)
+    private function storeCharacters ($data, $mId, $types)
     {
         $showOrder1 = $showOrder2 = $_SESSION['admin']['system']['import']['loaded']['characters'] = 0;
         
@@ -840,7 +846,7 @@ class ImportNBCController extends Controller
             if ($cVal['group'] == 'hidden')
                 continue;
             
-            $type = $this->resolveCharType($cVal['code']);
+            $type = isset($types[$cVal['code']]) ? $types[$cVal['code']] : 'media';
             
             $this->models->Characteristic->save(array(
                 'id' => null, 
@@ -858,7 +864,8 @@ class ImportNBCController extends Controller
                 'project_id' => $this->getNewProjectId(), 
                 'characteristic_id' => $data['characters'][$cKey]['id'], 
                 'language_id' => $this->getNewDefaultLanguageId(), 
-                'label' => $cVal['label']
+                'label' => $cVal['label'].(isset($cVal['instruction']) ? '|'.$cVal['instruction'] : null)
+            
             ));
             
             $this->models->CharacteristicMatrix->save(
@@ -949,7 +956,7 @@ class ImportNBCController extends Controller
                         'lower' => isset($statemin) ? $statemin : null, 
                         'upper' => isset($statemax) ? $statemax : null, 
                         'got_labels' => 1, 
-                        'file_name' => $type == 'range' ? null : $cVal . $this->_defaultImgExtension
+                        'file_name' => $type == 'media' ? $cVal . '.' . $this->_defaultImgExtension : null
                     ));
                     
                     unset($statemin);
@@ -981,7 +988,7 @@ class ImportNBCController extends Controller
     function storeVariationStateConnections ($taxa, $mData, $mId)
     {
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
-
+        
         foreach ((array) $taxa as $tVal) {
             
             if (isset($tVal['variations'])) {
