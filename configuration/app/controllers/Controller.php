@@ -1876,7 +1876,9 @@ class Controller extends BaseClass
             return;
         }
         
-        foreach ((array) $d as $key) {
+         $this->models = new stdClass();
+         
+         foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
                 
@@ -1887,7 +1889,7 @@ class Controller extends BaseClass
 
                 if (class_exists($t)) {
                     
-                    @$this->models->$t = new $t();
+                    $this->models->$t = new $t();
                     
                     if (isset($this->helpers->LoggingHelper))
                         $this->models->$t->setLogger($this->helpers->LoggingHelper);
@@ -2152,6 +2154,8 @@ class Controller extends BaseClass
             return;
         }
         
+        $this->helpers = new stdClass();
+         
         foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
@@ -2162,7 +2166,7 @@ class Controller extends BaseClass
                 
                 if (class_exists($c)) {
                     
-                    @$this->helpers->$c = new $c();
+                    $this->helpers->$c = new $c();
                 }
             }
         }
