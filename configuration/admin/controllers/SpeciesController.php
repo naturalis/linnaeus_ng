@@ -24,7 +24,7 @@
 		- translate categories
 		- check and posibly change sections *
 		- translate sections *
-		  (must be done before editing taxa because they actively influence the content)
+		  (must be done before editing taxa because they actively `influence the content)
 		- edit taxa
 		
 		- check project specific css
@@ -247,7 +247,7 @@ class SpeciesController extends Controller
         $taxa = $this->newGetUserAssignedTaxonTreeList(array(
             'higherOnly' => $this->maskAsHigherTaxa()
         ));
-        
+
         if (isset($taxa) && count((array) $taxa) > 0) {
             
             $projectLanguages = $_SESSION['admin']['project']['languages'];
@@ -704,8 +704,6 @@ class SpeciesController extends Controller
         
         if (isset($this->treeList))
             $this->smarty->assign('taxa', $this->treeList);
-        
-        $this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
         
         $s = $this->getProjectIdRankByname('Subgenus');
         if ($s) $this->smarty->assign('rankIdSubgenus', $s);
@@ -2682,6 +2680,7 @@ class SpeciesController extends Controller
         $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
         $this->smarty->assign('useRelated', $this->useRelated);
         $this->smarty->assign('useVariations', $this->useVariations);
+        $this->smarty->assign('isHigherTaxa', $this->maskAsHigherTaxa());
     }
 
 
