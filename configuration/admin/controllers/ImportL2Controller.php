@@ -2396,9 +2396,6 @@ class ImportL2Controller extends Controller
                 $a2 = trim(substr($a, $d + strlen(' and ')));
                 $a = trim(substr($a, 0, $d));
             }
-            else {
-                $a = trim($s);
-            }
         }
         
         $f = null;
@@ -2406,12 +2403,12 @@ class ImportL2Controller extends Controller
         if (!is_numeric($y)) {
             
             $f = substr($y, -1);
-            $y2 = substr($y, 0, strlen($y) - 2);
+            $y2 = substr($y, 0, strlen($y) - 1);
             
             if (!is_numeric($y2)) {
                 
                 $f = substr($y, -2);
-                $y2 = substr($y, 0, strlen($y) - 3);
+                $y2 = substr($y, 0, strlen($y) - 2);
                 
                 if (!is_numeric($y2))
                     $f = null;
