@@ -1716,7 +1716,7 @@ class ImportL2Controller extends Controller
             $prevId = $d[$key]['id'];
         }
         
-        // if $isLower is still false (i.e., all ranks are higher taxa), set the last (=lowest) rank to being lower taxa	
+        // if $isLower is still false (i.e., all ranks are higher taxa), set the last (=lowest (is it?)) rank to being lower taxa	
         if ($isLower == false) {
             
             $this->models->ProjectRank->update(array(
