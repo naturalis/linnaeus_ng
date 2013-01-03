@@ -1,0 +1,184 @@
+#page-main p {
+	margin-bottom: 0;
+}
+#lookup-DialogContent, #dialog-content, #dialog-content-inner {
+	min-height: 0;
+	height: auto;
+}
+
+#header-titles {
+	height: 15px;
+	padding: 0;
+}
+
+#page-main {
+    height: 411px;
+}
+
+#search-results, #search-pattern {
+	margin-top: 15px 0;
+}
+
+#search-results {
+	display: none;
+}
+
+#matrix-header {
+    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
+	color: #0303b2;
+    font-size: 12px;
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+
+#help-text {
+	margin: 15px 0;
+	width: 700px;
+}
+
+#overview {
+	padding: 15px 0;
+}
+
+table#states {
+	margin-top: 15px;
+	width: 70%;
+}
+
+table#comparison {
+	width: 70%;
+}
+
+table#states th {
+	padding: 2px 15px 2px 0;
+	font-weight: bold;
+}
+
+table#states td, table#comparison td {
+	white-space: nowrap;
+	padding: 3px 30px 3px 0;
+	border-top: 1px solid #f4f0f0;
+}
+
+table#states td:last-child, table#comparison td {
+	width: 50%;
+}
+
+table#states tr:last-child, table#comparison tr:last-child {
+	border-bottom: 1px solid #f4f0f0;
+}
+
+td.compare-label {
+	width: 300px;	
+	height: 30px;
+}
+
+
+#char-states {
+	height: 270px;
+	float: left;
+}
+
+#char-states #characteristics, #char-states #states {
+	width: 320px;
+	height:125px;
+	margin-bottom:10px;
+}
+
+#info {
+	margin-right: 60px;
+	width: 400px;
+	height: 300px;
+	float: right;
+}
+
+#info-header {
+	font-weight:bold;
+	margin-bottom: 5px;
+}
+
+#info-footer {
+	margin-top: 5px;
+}
+
+#choices {
+	float: left;
+	width: 50%;
+}
+
+#choices #selected {
+	width: 450px;
+	height: 200px;
+}
+
+.select-header {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+#sort-menu {
+	float:right;
+	margin: 0;
+	cursor: pointer;
+}
+
+#unknowns {
+	margin: 5px 0 12px 0;
+}
+
+#buttons {
+}
+
+#scores-taxa {
+	margin-right: 40px;
+	float: right;
+}
+
+#scores {
+	width: 325px;
+	height: 335px;
+}
+
+.info-image {
+	border:1px solid #666;
+	cursor: pointer;
+}
+
+#taxon-list, #taxon-list-1, #taxon-list-2, #coefficients {
+	font-size:inherit;
+	height:25px;
+	width:250px;
+}
+
+.invisible {
+	display: none;
+}
+
+.visible {
+	display: block;
+}
+
+#count-both, #count-1, #count-2, #count-total, #coefficient, #count-neither {
+	text-align:right;
+	padding-left:10px;
+}
+
+select option {
+	border: 1px solid transparent;
+}
+
+select option:hover {
+	background-color: #3875d7;
+	border: 1px dotted #000;
+	color: #fff;
+	cursor: pointer;
+}
+
+.character-selected, .state-selected {
+	background-color: #f4f0f0;
+}
+
+.character-type {
+	font-size: 10px;
+}

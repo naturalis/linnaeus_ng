@@ -43,6 +43,7 @@ class Controller extends BaseClass
     private $_currentHotwordLink = false;
     private $_hotwordTempLinks = array();
     private $_hotwordNoLinks = array();
+    private $_useCache = true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
@@ -75,7 +76,9 @@ class Controller extends BaseClass
         'rank', 
         'glossary', 
         'glossary_synonym', 
-        'hotword'
+        'hotword',
+        'variation_label', 
+        'taxon_variation'
     );
     private $usedHelpersBase = array(
         'logging_helper', 
@@ -254,6 +257,37 @@ class Controller extends BaseClass
     }
 
 
+    public function getVariations ($tId = null)
+    {
+        $d = array(
+        'project_id' => $this->getCurrentProjectId()
+        );
+    
+        if (isset($tId))
+            $d['taxon_id'] = $tId;
+    
+        $tv = $this->models->TaxonVariation->_get(array(
+        'id' => $d,
+        'columns' => 'id,taxon_id,label',
+        'order' => 'label'
+        ));
+    
+        foreach ((array) $tv as $key => $val) {
+    
+            $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
+    
+            $tv[$key]['labels'] = $this->models->VariationLabel->_get(
+            array(
+            'id' => array(
+            'project_id' => $this->getCurrentProjectId(),
+            'variation_id' => $val['id']
+            ),
+            'columns' => 'id,language_id,label,label_type'
+            ));
+        }
+    
+        return $tv;
+    }
 
     public function _buildTaxonTree ($p = null)
     {
@@ -281,11 +315,12 @@ class Controller extends BaseClass
             $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
             $t[$key]['sibling_count'] = count((array) $t);
             $t[$key]['depth'] = $t[$key]['level'] = $depth;
-            // give do not display flag to taxa that are in brackets
+            // give do-not-display-flag to taxa that are in brackets
             $t[$key]['do_display'] = !preg_match('/^\(.*\)$/', $val['taxon']);
             // taxon name
             $t[$key]['label'] = $this->formatTaxon($val);
             $t[$key]['author'] = $val['author'];
+            $t[$key]['variations'] = $this->getVariations($val['id']);
             
             //// level is effectively the recursive depth of the taxon within the tree
             //$t[$key]['level'] = $level;
@@ -2509,6 +2544,9 @@ class Controller extends BaseClass
     // Key something like path in session, e.g. 'species-tree'
     protected function getCache ($key, $timeOut = false)
     {
+        
+        if ($this->_useCache==false) return false;
+        
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
         if (file_exists($cacheFile)) {
             // Timeout provided and expired
@@ -2526,6 +2564,9 @@ class Controller extends BaseClass
 
     protected function saveCache ($key, $data)
     {
+        
+        if ($this->_useCache==false) return;
+        
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
         
         if (!file_put_contents($cacheFile, serialize($data))) {
@@ -2540,8 +2581,6 @@ class Controller extends BaseClass
         if (!isset($this->treeList))
             $this->buildTaxonTree(); // return null;
         
-
-
         $d = array();
         
         foreach ((array) $this->treeList as $key => $val) {
@@ -2562,6 +2601,7 @@ class Controller extends BaseClass
         if (!$this->getCache('species-treeList')) {
             
             $this->_buildTaxonTree();
+            
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
         }
         else {

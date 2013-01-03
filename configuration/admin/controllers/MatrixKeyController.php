@@ -777,7 +777,8 @@ class MatrixKeyController extends Controller
     {
         $this->setDefaultMatrix();
         
-		$this->_useCharacterGroups = $this->useVariations = ($this->getSetting('matrixtype')=='NBC');
+		$this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups')=='1'; 
+		$this->useVariations = $this->getSetting('taxa_use_variations')=='1';
         
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
         $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
