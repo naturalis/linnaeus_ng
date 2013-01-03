@@ -36,7 +36,7 @@
 	</tr>
 
 	{assign var=prev_rank value=-1}
-{assign var=firstlevel value=-1}
+	{assign var=firstlevel value=-1}
 	{foreach item=taxon from=$taxa}
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
 		{assign var=t value=$taxon.id}

@@ -1007,6 +1007,7 @@ class ProjectsController extends Controller
         $this->deleteProjectCssFile($projectId);
         $this->deleteProjectSettings($projectId);
         $this->deleteProjectImagePaths($projectId);
+        $this->deleteOtherStuff($projectId);
         $this->deleteProject($projectId);
     }
 
@@ -1401,7 +1402,14 @@ class ProjectsController extends Controller
         ));
     }
 
-
+    private function deleteOtherStuff ($id)
+    {
+        $this->models->Heartbeat->delete(array(
+        'project_id' => $id
+        ));
+    }
+    
+    
 
     private function deleteNBCKeydata ($id)
     {

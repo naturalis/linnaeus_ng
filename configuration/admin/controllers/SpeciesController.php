@@ -2848,9 +2848,15 @@ class SpeciesController extends Controller
 
     private function doLockOutUser ($taxonId, $lockOutOfAllScreens = false)
     {
+        
         if (empty($taxonId))
             return false;
         
+        $this->models->Heartbeat->cleanUp(
+        	$this->getCurrentProjectId(),
+        	($this->generalSettings['heartbeatFrequency'])
+       	);
+
         $d = array(
             'project_id =' => $this->getCurrentProjectId(), 
             'app' => $this->getAppName(), 
@@ -2871,6 +2877,7 @@ class SpeciesController extends Controller
             'id' => $d
         ));
         
+       
         return isset($h) ? true : false;
     }
 
