@@ -14,7 +14,7 @@
 		<td>				
 			{assign var=prev value=null}
 			{assign var=prevLevel value=-1}
-			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()" style="width:300px">
+			<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent();taxonBlankOutRanks();" style="width:300px">
 			<option value="-1">{t}No parent{/t}</option>
 			{foreach from=$taxa key=k item=v}
 			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
@@ -42,12 +42,16 @@
 		</td>
 		<td colspan="2">
 			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel()">
+			{assign var=firstLower value=true}
 			{foreach item=v from=$projectRanks}
 				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
-				<option xxxx value="{$v.id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>
-				{$v.rank}
-				</option>
-				{/if }
+					{if (!$isHigherTaxa && $v.lower_taxon==1) && $firstLower}
+						<option value="{$prev.id}" ideal_parent_id="{$prev.ideal_parent_id}" {if $data.rank_id==$prev.id}selected="selected"{/if}>{$prev.rank}</option>
+					{/if}
+					<option value="{$v.id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
+					{if $v.lower_taxon==1}{assign var=firstLower value=false}{/if}
+				{/if}
+				{assign var=prev value=$v}
 			{/foreach}
 			</select>
 		</td>
@@ -57,7 +61,8 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
+			{*<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>*}
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" value="{$data.taxon}"  style="width:300px"/>
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>
@@ -131,7 +136,9 @@ taxonChangeSubmitButtonLabel();
 {if $isHigherTaxa}
 taxonHigherTaxa = true;
 {/if}
+{if $rankIdSubgenus}
 taxonSubGenusRankId = {$rankIdSubgenus};
+{/if}
 {assign var=prev value=null}			
 {foreach from=$taxa key=k item=v}
 {if ($v.lower_taxon==1 && $prev!==null)}

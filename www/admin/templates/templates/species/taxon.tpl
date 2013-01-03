@@ -27,6 +27,7 @@
 		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
 		<input type="button" value="{t}undo (auto)save{/t}" onclick="taxonGetUndo()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
 		<input type="button" value="{t}delete taxon{/t}" onclick="taxonDeleteData()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
+		<input type="button" value="{t}new taxon{/t}" onclick="window.open('new.php','_self')" class="localButton" disabledOnLoad="1" disabled="disabled"/>
 		<span id="message-container" style="margin-right:10px">&nbsp;</span>
 	</div>
 	<div style="padding:10px 0px 10px 0px">

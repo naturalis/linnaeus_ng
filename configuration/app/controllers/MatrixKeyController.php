@@ -343,6 +343,16 @@ class MatrixKeyController extends Controller
         }
     }
 
+	public function nbcAction()
+	{
+		
+	    /*
+		$this->requestData['char']
+		$this->requestData['range']
+		*/
+	    
+	    
+	}
 
 
     private function getMatrices ()

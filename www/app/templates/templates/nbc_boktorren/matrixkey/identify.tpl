@@ -39,7 +39,7 @@ function nbcShowStates(id) {
 				//alert(data);
 				showDialog(c.label,data);
 
-				$('#dialog').css('width', (c.type=='media' ? 600 : 425));
+				$('#dialog').css('width', (c.type=='media' ? 610 : 425));
 				$.modaldialog.reinitPosition({top:175});
 
 			}
@@ -55,6 +55,31 @@ function nbcShowStates(id) {
 }
 .visible {
 	display: block;	
+}
+
+#dialog-content, #dialog-content-inner {
+	background-color: #fff;
+}
+
+#dialog-content-inner-inner {
+	max-height:300px;
+	overflow-y:auto;
+}
+#state-header {
+	font-weight: bold;
+}
+.state-image-cell {
+	margin: 15px 15px 0px 15px;
+}
+.state-image-cell:hover {
+	color: #f00;
+}
+.state-image {
+	border:2px solid #eee;
+}
+.state-image:hover {
+	border:2px solid #666;
+	cursor: pointer;
 }
 </style>
 {/literal}

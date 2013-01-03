@@ -111,7 +111,7 @@ function taxonSaveEditedTaxonName(id) {
 				allSetMessage(_('saved'));
 			}
 		}
-	})
+	});
 
 	$('#namecell'+id).html(
 		'<span onclick="taxonEditTaxonName('+id+')" id="name'+id+'" class="a">'+
@@ -433,25 +433,18 @@ function taxonSaveData(id,language,page,content,editorName) {
 
 function taxonDeleteData(id,name) {
 
-	if (!id)
-		var thisId = taxonActiveTaxonId;
-	else
-		var thisId = id;
+	if (!id) id = taxonActiveTaxonId;
 
-	if (thisId.length==0) return;
+	if (id.length==0) return;
 
-	if (!name)
-		var thisName = $('#taxon-name').val();
-	else
-		var thisName = name;
+	if (!name) name = $('#taxon-name').val();
 
-
-	if (!allDoubleDeleteConfirm('all content in all languages for taxon',thisName)) return;
+	if (!allDoubleDeleteConfirm('all content in all languages for taxon',name)) return;
 
 	$.ajax({
 		url : "ajax_interface.php",
 		data : ({
-			'id' : thisId ,
+			'id' : id ,
 			'action' : 'delete_taxon' ,
 			'page' : taxonActivePage ,
 			'time': allGetTimestamp()	
@@ -461,7 +454,7 @@ function taxonDeleteData(id,name) {
 		success: function (data) {
 			//alert(data);
 			if (data=='<redirect>') {
-				window.open('delete.php?id='+thisId+'&time='+allGetTimestamp(),'_self');
+				window.open('delete.php?id='+id+'&time='+allGetTimestamp(),'_self');
 			} else {
 				window.open('list.php','_self');
 			}
@@ -633,7 +626,7 @@ function taxonGetUndo() {
 					taxonGetDataDefault(false);	
 				}
 
-				taxonUpdateInterface() 
+				taxonUpdateInterface();
 
 				allSetMessage(_('recovered'));
 
@@ -777,18 +770,18 @@ function taxonGetCoL(name,id,singlelevel,subdiv) {
 		}, 
 		success : function (data) {
 			if (data.indexOf('<error>')>=0) {
-				alert(data.replace('<error>',''))
+				alert(data.replace('<error>',''));
 			} else {
 				try {
 					$('#'+taxonTargetDiv).html(taxonParseCoLResult(data));
 					$('#col-result-instruction').css('visibility','visible');
 					if (subdiv) taxonRepositionResults();
 				} catch(err) {
-					if (!allAjaxAborted) alert(_('An unknown error occurred'))
+					if (!allAjaxAborted) alert(_('An unknown error occurred'));
 				}
   			}			
 		}
-	})
+	});
 
 }
 
@@ -813,12 +806,12 @@ function taxonSaveCoLTaxa(taxa) {
 		async: allAjaxAsynchMode,
 		success : function (data) {
 		if (data.indexOf('<error>')>=0) {
-				alert(data.replace('<error>',''))
+				alert(data.replace('<error>',''));
 			} else {
 				alert(_('Data saved'));
 			}
 		}
-	})
+	});
 
 }
 
@@ -1215,7 +1208,7 @@ function taxonGetRankByParent(nomessage) {
 
 	var id = $('#parent-id option:selected').val();
 
-	if (id == -1) return;
+	if (id==-1 || id==undefined) return;
 
 	$.ajax({
 		url : "ajax_interface.php",
@@ -1240,8 +1233,15 @@ function taxonGetRankByParent(nomessage) {
 					//$('#rank-message').html(_('Ok'))
 					$('#rank-message').html('')
 				}
+				
 				$('#rank-id').val(data);
-				taxonAddNamePart(data);
+				
+				if ($('#rank-id').val()==null) {
+					$('#rank-message').removeClass().addClass('message-error');
+					$('#rank-message').html(_('That taxon cannot have child taxa.'))
+				} else {			
+					taxonAddNamePart(data);
+				}
 			}
 
 			if (!nomessage) taxonCheckHybridCheck();
@@ -1549,4 +1549,26 @@ function taxonDeleteVariation(id,name) {
 		}
 	});
 
+}
+
+function taxonBlankOutRanks() {
+	
+	$('#rank-id > option').each(function(){
+
+		$(this).attr('disabled',false);		
+
+	});
+	
+	var d = $('#parent-id :selected').attr('rank_id');
+
+	if (d==undefined) return;
+	
+	var b = true;
+	
+	$('#rank-id > option').each(function(){
+		if (b) $(this).attr('disabled',true);
+		if ($(this).val()==d) b = false;
+
+	});
+	
 }
