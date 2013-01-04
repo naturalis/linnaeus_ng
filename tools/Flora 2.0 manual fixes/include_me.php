@@ -1,9 +1,9 @@
 <?php
-	$projectId = '0001'; // pad with zeroes
-	$tablePrefix = '';
-	$pathToMM = '/var/www/linnaeus_ng/www/shared/media/project/' . $projectId . '/';
+	$projectId = '0584'; // pad with zeroes
+	$tablePrefix = 'dev_';
+	$pathToMM = '/Users/ruud/ETI/Zend workbenches/Current/Linnaeus NG/www/shared/media/project/' . $projectId . '/';
 	
-	$connect = mysql_connect('localhost', 'root', 'dUra1dal') or die(mysql_error());
+	$connect = mysql_connect('localhost', 'root', 'root') or die(mysql_error());
 	mysql_select_db('linnaeus_ng') or die(mysql_error());
 
 	$multimedia = array(
