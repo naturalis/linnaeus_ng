@@ -39,6 +39,7 @@
 	echo "<br><br>Added $n multimedia files to Flora";
 	
 	function getSpeciesId($species) {
+		global $tablePrefix;
 		// Trim ssp marker from name
 		$elements = explode(' ', $species);
 		if (count($elements) > 2) {
@@ -54,6 +55,7 @@
 	}
 	
 	function getOverview($id) {
+		global $tablePrefix;
 		$query = 'select `file_name` from `' . $tablePrefix . 'media_taxon` where `taxon_id` = ' . mysql_real_escape_string($id) . ' and `overview_image` = 1';
 		$result = mysql_query($query) or die(mysql_error());
 		if (mysql_num_rows($result) == 1) {
@@ -63,6 +65,7 @@
 	}
 
 	function setOverview($id, $projectId, $pathToMM, $file) {
+		global $tablePrefix;
 		$query = 'insert into `' . $tablePrefix . 'media_taxon` (`project_id`, `taxon_id`, `file_name`, `original_name`, 
 			`mime_type`, `file_size`, `sort_order`, `overview_image`) values (' .
 			mysql_real_escape_string($projectId) . ', ' .
@@ -74,6 +77,7 @@
 	}
 	
 	function getMultimedia($id, $projectId, $file) {
+		global $tablePrefix;
 		$query = 'select `id` from `' . $tablePrefix . 'media_taxon` where `project_id` = ' . mysql_real_escape_string($projectId) .
 			' and `taxon_id` = ' . mysql_real_escape_string($id) . ' and file_name = "' . mysql_real_escape_string($file) . '"';
 		$result = mysql_query($query) or die(mysql_error());
@@ -84,6 +88,7 @@
 	}
 
 	function setMultimedia($id, $projectId, $pathToMM, $file, $caption) {
+		global $tablePrefix;
 		// First get highest sort order
 		$query = 'select max(`sort_order`) from `' . $tablePrefix . 'media_taxon` where `taxon_id` = ' . mysql_real_escape_string($id);
 		$result = mysql_query($query) or die(mysql_error());

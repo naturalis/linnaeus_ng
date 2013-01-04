@@ -82,6 +82,7 @@
 	}
 
 	function getMatrixId ($projectId, $matrix) {
+		global $tablePrefix;
 		$query = 'select `matrix_id` from `' . $tablePrefix . 'matrices_names` where `project_id` = ' . $projectId . 
 			' and `name` = "' . mysql_real_escape_string($matrix) .'"';
 		$result = mysql_query($query) or die(mysql_error());
@@ -89,6 +90,7 @@
 	}
 
 	function getCharacterId ($projectId, $matrixId, $character) {
+		global $tablePrefix;
 		$query = 'select t1.`characteristic_id` from `' . $tablePrefix . 'characteristics_labels` t1, `' . $tablePrefix . 'characteristics_matrices` t2
 			 where t1.`project_id` = ' . $projectId . ' and t1.`label` = "' . mysql_real_escape_string($character) .'" 
 			 and t2.`matrix_id` = ' . $matrixId . ' and t1.`characteristic_id` = t2.`characteristic_id`';
@@ -97,6 +99,7 @@
 	}
 
 	function updateStateFile ($projectId, $characterId, $state, $file) {
+		global $tablePrefix;
 		$query = 'update `' . $tablePrefix . 'characteristics_states` t1, `' . $tablePrefix . 'characteristics_labels_states` t2 
 			set t1.`file_name` = "' . mysql_real_escape_string(strtoupper($file)) . 
 			'" where t1.`project_id` = ' . $projectId . ' and t2.`label` = "' . mysql_real_escape_string($state) .
