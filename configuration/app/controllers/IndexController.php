@@ -239,7 +239,11 @@ class IndexController extends Controller
 		$this->smarty->assign('names',$names);
 
 		$this->smarty->assign('taxonType',$this->getTaxonType());
-
+		
+		$common = $this->searchCommonNames();
+		
+		empty($common) ? $this->smarty->assign('common',false) : $this->smarty->assign('common',true);
+		
         $this->printPage('species_index');
 
 	}
