@@ -72,7 +72,8 @@ class ProjectsController extends Controller
         'taxa_relations', 
         'variation_relations', 
         'matrix_variation', 
-        'nbc_extras'
+        'nbc_extras',
+        'heartbeat'
     );
     public $usedHelpers = array(
         'file_upload_helper'
