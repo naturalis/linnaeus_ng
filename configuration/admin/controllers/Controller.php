@@ -2234,8 +2234,8 @@ class Controller extends BaseClass
             return $marker . ' ' . $name;
         }
         
-        // interspecific hybrid
-        return implode(' ' . $marker . ' ', explode(' ', $name, 2));
+        // interspecific hybrid; string is already formatted so take second space!!
+        return implode(' ' . $marker . ' ', explode(' ', $name, 3));
         
     }
 
