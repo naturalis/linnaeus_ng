@@ -236,6 +236,7 @@ class SpeciesController extends Controller
         if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
             // moving branches up and down the stem
             
+
             $this->clearCache($this->cacheFiles['list']);
             
             $this->moveIdInTaxonOrder($this->requestData['id'], $this->requestData['move']);
@@ -247,7 +248,7 @@ class SpeciesController extends Controller
         $taxa = $this->newGetUserAssignedTaxonTreeList(array(
             'higherOnly' => $this->maskAsHigherTaxa()
         ));
-
+        
         if (isset($taxa) && count((array) $taxa) > 0) {
             
             $projectLanguages = $_SESSION['admin']['project']['languages'];
@@ -548,15 +549,14 @@ class SpeciesController extends Controller
     {
         $this->checkAuthorisation();
         
-    	if ($this->maskAsHigherTaxa()) {
+        if ($this->maskAsHigherTaxa()) {
             
-    	    $this->setPageName($this->translate('New higher taxon'));
+            $this->setPageName($this->translate('New higher taxon'));
         }
         else {
             
             $this->setPageName($this->translate('New taxon'));
-            
-        }        
+        }
         
         $pr = $this->newGetProjectRanks();
         
@@ -572,6 +572,7 @@ class SpeciesController extends Controller
             
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
+                
 
 
                 $isHybrid = $this->rHasVal('is_hybrid', 'on');
@@ -621,12 +622,21 @@ class SpeciesController extends Controller
                 }
                 
 
-                /* LETHAL */
-                if (!$this->isTaxonNameUnique($newName)) {
+                /* LETHAL / NON-LETHAL */
+                $dummy = $this->newIsTaxonNameUnique(array(
+                    'name' => $newName, 
+                    'rankId' => $this->requestData['rank_id'], 
+                    'parentId' => $parentId
+                ));
+
+                if (1 == 1) {
                     $this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
                     $hasErrorButCanSave = false;
                 }
                 
+
+
+                /* LETHAL */
                 if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
                     $this->addError($this->translate('The selected parent taxon can not have children.'));
                     $hasErrorButCanSave = false;
@@ -706,10 +716,12 @@ class SpeciesController extends Controller
             $this->smarty->assign('taxa', $this->treeList);
         
         $s = $this->getProjectIdRankByname('Subgenus');
-        if ($s) $this->smarty->assign('rankIdSubgenus', $s);
+        if ($s)
+            $this->smarty->assign('rankIdSubgenus', $s);
         
         $this->printPage();
     }
+
 
 
     /**
@@ -1800,9 +1812,10 @@ class SpeciesController extends Controller
             
             //// get the project RANK that is the child of the parent taxon's RANK 
             //$rank = $this->getProjectRankByParentProjectRank($d['rank_id']);
+            
 
             // in some cases, certain children have to be skipped in favour of more likely progeny lower down the tree
-			$rank = $this->getCorrectedProjectRankByParentProjectRank($d['rank_id']);
+            $rank = $this->getCorrectedProjectRankByParentProjectRank($d['rank_id']);
             
             $this->smarty->assign('returnText', $rank);
         }
@@ -2848,15 +2861,11 @@ class SpeciesController extends Controller
 
     private function doLockOutUser ($taxonId, $lockOutOfAllScreens = false)
     {
-        
         if (empty($taxonId))
             return false;
         
-        $this->models->Heartbeat->cleanUp(
-        	$this->getCurrentProjectId(),
-        	($this->generalSettings['heartbeatFrequency'])
-       	);
-
+        $this->models->Heartbeat->cleanUp($this->getCurrentProjectId(), ($this->generalSettings['heartbeatFrequency']));
+        
         $d = array(
             'project_id =' => $this->getCurrentProjectId(), 
             'app' => $this->getAppName(), 
@@ -2877,7 +2886,7 @@ class SpeciesController extends Controller
             'id' => $d
         ));
         
-       
+
         return isset($h) ? true : false;
     }
 
@@ -3637,6 +3646,31 @@ class SpeciesController extends Controller
                 return $t[0]['id'];
             }
         }
+    }
+
+
+
+    private function newIsTaxonNameUnique ($p)
+    {
+        $name = trim(isset($p['name']) ? $p['name'] : null);
+        $rankId = isset($p['rankId']) ? $p['rankId'] : null;
+        $parentId = isset($p['parentId']) ? $p['parentId'] : null;
+        $ignoreId = isset($p['ignoreId']) ? $p['ignoreId'] : null;
+        
+        if (empty($name))
+            return;
+
+        $d = array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'taxon' => trim($taxonName)
+        );
+        
+        if (!empty($idToIgnore))
+            $d['id !='] = $idToIgnore;
+        
+        $t = $this->models->Taxon->_get(array(
+            'id' => $d
+        ));
     }
 
 
@@ -5025,7 +5059,6 @@ class SpeciesController extends Controller
         }
         
         return $this->getProjectRankByParentProjectRank($rankId);
-
     }
 
 
