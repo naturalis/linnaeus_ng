@@ -240,7 +240,8 @@ class configuration
 		
 		if (!defined('GENUS_RANK_ID')) define('GENUS_RANK_ID',63);
 		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
-				
+		if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);
+		
 	}
 
 
