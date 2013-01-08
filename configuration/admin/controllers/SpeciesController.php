@@ -237,6 +237,8 @@ class SpeciesController extends Controller
             // moving branches up and down the stem
             
 
+
+
             $this->clearCache($this->cacheFiles['list']);
             
             $this->moveIdInTaxonOrder($this->requestData['id'], $this->requestData['move']);
@@ -571,7 +573,7 @@ class SpeciesController extends Controller
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
             // save
-            if ($this->rHasVal('taxon') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
+            if ($this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save')) { // && !$this->isFormResubmit()) {
                 
 
 
@@ -628,13 +630,15 @@ class SpeciesController extends Controller
                     'rankId' => $this->requestData['rank_id'], 
                     'parentId' => $parentId
                 ));
-
-                if (1 == 1) {
+                if ($dummy === false) {
                     $this->addError(sprintf($this->translate('The name "%s" already exists.'), $newName));
                     $hasErrorButCanSave = false;
                 }
+                else if ($dummy !== true) {
+                    $this->addError($dummy);
+                    $hasErrorButCanSave = true;
+                }
                 
-
 
                 /* LETHAL */
                 if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
@@ -1813,6 +1817,8 @@ class SpeciesController extends Controller
             //// get the project RANK that is the child of the parent taxon's RANK 
             //$rank = $this->getProjectRankByParentProjectRank($d['rank_id']);
             
+
+
 
             // in some cases, certain children have to be skipped in favour of more likely progeny lower down the tree
             $rank = $this->getCorrectedProjectRankByParentProjectRank($d['rank_id']);
@@ -3653,25 +3659,33 @@ class SpeciesController extends Controller
 
     private function newIsTaxonNameUnique ($p)
     {
-        $name = trim(isset($p['name']) ? $p['name'] : null);
+        $name = isset($p['name']) ? $p['name'] : null;
         $rankId = isset($p['rankId']) ? $p['rankId'] : null;
         $parentId = isset($p['parentId']) ? $p['parentId'] : null;
         $ignoreId = isset($p['ignoreId']) ? $p['ignoreId'] : null;
         
         if (empty($name))
             return;
-
+        
         $d = array(
             'project_id' => $this->getCurrentProjectId(), 
-            'taxon' => trim($taxonName)
+            'taxon' => $name
         );
         
-        if (!empty($idToIgnore))
-            $d['id !='] = $idToIgnore;
+        if (!empty($ignoreId))
+            $d['id !='] = $ignoreId;
         
         $t = $this->models->Taxon->_get(array(
             'id' => $d
         ));
+        
+        if (empty($t))
+            return true;
+        
+        if ($t[0]['parent_id'] != $parentId)
+            return $this->translate('That name already exists, albeit with a different parent.');
+        else
+            return false;
     }
 
 
@@ -4886,9 +4900,20 @@ class SpeciesController extends Controller
 
 
 
-    private function checkNameSpaces ($name, $rankId, $parentId)
+    private function checkNameSpaces ($name, $projRankId, $projRankId)
     {
         
+        // get id of the text
+        $i = $this->models->InterfaceText->_get(array(
+            'id' => 'select id,rank_id from %table% where
+					project_id = ' . $this->getCurrentProjectId() . '
+					and (id = ' . $projRankId . ' or id = ' . $projRankId . ')',
+	        'fieldAsIndex' => 'id'
+        ));
+        
+        $rankId = $i[$projRankId]['rank_id']; 
+        $parentId = $i[$projRankId]['rank_id']; 
+                
         // trim and replace accidental double spaces by single ones
         $name = trim(preg_replace('/\s+/', ' ', $name));
         

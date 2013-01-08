@@ -18,7 +18,7 @@
 			<option value="-1">{t}No parent{/t}</option>
 			{foreach from=$taxa key=k item=v}
 			{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-				<option rank_id="{$v.rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
+				<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
 				{section name=foo loop=$v.level-$taxa[0].level}
 				&nbsp;
 				{/section}		
@@ -46,9 +46,9 @@
 			{foreach item=v from=$projectRanks}
 				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
 					{if (!$isHigherTaxa && $v.lower_taxon==1) && $firstLower}
-						<option value="{$prev.id}" ideal_parent_id="{$prev.ideal_parent_id}" {if $data.rank_id==$prev.id}selected="selected"{/if}>{$prev.rank}</option>
+						<option value="{$prev.id}" root_rank_id="{$prev.rank_id}" ideal_parent_id="{$prev.ideal_parent_id}" {if $data.rank_id==$prev.id}selected="selected"{/if}>{$prev.rank}</option>
 					{/if}
-					<option value="{$v.id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
+					<option value="{$v.id}" root_rank_id="{$v.rank_id}" ideal_parent_id="{$v.ideal_parent_id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
 					{if $v.lower_taxon==1}{assign var=firstLower value=false}{/if}
 				{/if}
 				{assign var=prev value=$v}
