@@ -603,7 +603,6 @@ class ImportNBCController extends Controller
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariations($data);
         
-
         // default kingdom
         $this->models->Taxon->save(
         array(
@@ -698,7 +697,7 @@ class ImportNBCController extends Controller
                 
                 $tmpIndex[$val['id']] = array(
                     'type' => 'sp', 
-                    'id' => $species[$key]['id']
+                    'id' => $species[$key]['lng_id']
                 );
             }
         }
@@ -711,7 +710,7 @@ class ImportNBCController extends Controller
                     
                     foreach ((array) $val['related'] as $rKey => $rVal) {
                         
-                        if (!isset($tmpIndex[$rVal]))
+                        if (!isset($tmpIndex[$rVal]) || $val['lng_id']==$tmpIndex[$rVal]['id'])
                             continue;
                         
                         $this->models->TaxaRelations->save(
@@ -733,7 +732,7 @@ class ImportNBCController extends Controller
                         
                         foreach ((array) $vVal['related'] as $rKey => $rVal) {
                             
-                            if (!isset($tmpIndex[$rVal]))
+                            if (!isset($tmpIndex[$rVal]) || $vVal['lng_id']==$tmpIndex[$rVal]['id'])
                                 continue;
                             
                             $this->models->VariationRelations->save(
