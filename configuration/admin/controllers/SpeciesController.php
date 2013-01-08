@@ -454,7 +454,7 @@ class SpeciesController extends Controller
             
             if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
                 
-                $isHybrid = $this->rHasVal('is_hybrid', 'on');
+                $isHybrid = $this->rHasVal('is_hybrid');
                 
                 if ($this->requestData['id'] == $this->requestData['parent_id'])
                     $parentId = $this->requestData['org_parent_id'];
@@ -477,7 +477,7 @@ class SpeciesController extends Controller
                                 'author' => ($this->requestData['author'] ? $this->requestData['author'] : null), 
                                 'parent_id' => $parentId, 
                                 'rank_id' => $this->requestData['rank_id'], 
-                                'is_hybrid' => ($isHybrid ? 1 : 0)
+                                'is_hybrid' => $this->requestData['is_hybrid']
                             ));
                             
                             $this->reOrderTaxonTree();
