@@ -57,18 +57,28 @@
 		</td>
 	</tr>
 	<tr>
-		<td style="width:100px">
+		<td>
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			{*<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>*}
 			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" value="{$data.taxon}"  style="width:300px"/>
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
-
+	<tr>
+		<td>
+			{t}Hybrid:{/t}
+		</td>
+		<td colspan="2">
+			<select name="is_hybrid" id="is-hybrid" onchange="taxonGetFormattedPreview()">
+				<option value="0" {if $data.is_hybrid==0}selected="selected"{/if}>{t}no hybrid{/t}</option>
+				<option value="1" {if $data.is_hybrid==1}selected="selected"{/if}>{t}interspecific hybrid{/t}</option>
+				<option value="2" {if $data.is_hybrid==2}selected="selected"{/if}>{t}intergeneric hybrid{/t}</option>
+			</select>
+		</td>
+	</tr>
 	<tr>
 		<td>
 		Formatted example:
@@ -81,7 +91,7 @@
 	
 	
 	<tr>
-		<td style="width:100px">
+		<td>
 			{t}Author:{/t}
 		</td>
 		<td>
@@ -129,7 +139,6 @@ taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$projectRanks[i].id};
 {/section}
 allLookupNavigateOverrideUrl('edit.php?id=%s');
 //taxonGetRankByParent(true);
-//taxonCheckNewTaxonName();
 //taxonGetRankByParent();
 //taxonCheckHybridCheck();
 taxonChangeSubmitButtonLabel();
