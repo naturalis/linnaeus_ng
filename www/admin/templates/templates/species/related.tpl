@@ -28,6 +28,9 @@
 (none)
 {/if}
 {/foreach}
+{if $related.variations|@count==0}
+(none)
+{/if}
 </p>
 {/if}
 </div>
