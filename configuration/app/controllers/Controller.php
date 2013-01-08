@@ -1313,7 +1313,7 @@ class Controller extends BaseClass
     {
         if (empty($content))
             return;
-        
+
         $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);

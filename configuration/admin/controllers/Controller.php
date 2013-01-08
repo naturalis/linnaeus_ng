@@ -1217,7 +1217,7 @@ class Controller extends BaseClass
     {
         if (empty($content))
             return;
-        
+
         $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);
@@ -1788,7 +1788,7 @@ $this->log('a3');
 
 
 
-    public function _newGetTaxonTree ($p = null)
+    public function _newGetTaxonTreeXYZ ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
@@ -1839,7 +1839,7 @@ $this->log($pId.':'.count((array)$t));
 
 
 
-    public function _newGetTaxonTreeWORKING ($p = null)
+    public function _newGetTaxonTree ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
@@ -1860,14 +1860,15 @@ $this->log($pId.':'.count((array)$t));
         ));
         
         foreach ((array) $t as $key => $val) {
-            
+
             $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
             $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
             $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
             $t[$key]['sibling_count'] = count((array) $t);
             $t[$key]['depth'] = $t[$key]['level'] = $depth;
             $t[$key]['taxon_formatted'] = $this->formatTaxon($val);
-            
+            $t[$key]['root_rank_id'] = $ranks[$val['rank_id']]['rank_id'];
+
             $this->treeList[$key] = $t[$key];
             
             $t[$key]['children'] = $this->_newGetTaxonTree(array(
@@ -3775,12 +3776,12 @@ $this->log($pId.':'.count((array)$t));
 							text = "' . mysql_real_escape_string($text) . '"
 							and env = "' . $this->getAppName() . '"'
         ));
-        
+
         // if not found, return unchanged
         if (empty($i[0]['id']))
-            return '!' . $text;
+            return $text;
             
-            // resolve language id
+        // resolve language id
         $languageId = $this->getCurrentUiLanguage();
         // fetch appropriate translation
         $it = $this->models->InterfaceTranslation->_get(

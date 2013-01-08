@@ -1559,16 +1559,12 @@ function taxonBlankOutRanks() {
 
 	});
 	
-	var d = $('#parent-id :selected').attr('rank_id');
-
+	var d = $('#parent-id :selected').attr('root_rank_id');
+	
 	if (d==undefined) return;
 	
-	var b = true;
-	
 	$('#rank-id > option').each(function(){
-		if (b) $(this).attr('disabled',true);
-		if ($(this).val()==d) b = false;
-
+		if ($(this).attr('root_rank_id')<=d) $(this).attr('disabled',true);
 	});
 	
 }
