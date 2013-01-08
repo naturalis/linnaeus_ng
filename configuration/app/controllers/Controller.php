@@ -1139,8 +1139,8 @@ class Controller extends BaseClass
         }
         
         // interspecific hybrid
-        return str_replace(' ', ' ' . $marker . ' ', $taxon['taxon']);
-        
+        return implode(' ' . $marker . ' ', explode(' ', $taxon['taxon'], 2));
+                
     }
 
     
