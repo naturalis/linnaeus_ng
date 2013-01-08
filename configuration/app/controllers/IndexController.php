@@ -171,6 +171,8 @@ class IndexController extends Controller
 		$this->smarty->assign('activeLanguage',$activeLanguage);
 
 		$this->smarty->assign('taxonType','common');
+		
+		$this->smarty->assign('common',true);
 
         $this->printPage();
 
@@ -239,10 +241,6 @@ class IndexController extends Controller
 		$this->smarty->assign('names',$names);
 
 		$this->smarty->assign('taxonType',$this->getTaxonType());
-		
-		$common = $this->searchCommonNames();
-		
-		empty($common) ? $this->smarty->assign('common',false) : $this->smarty->assign('common',true);
 		
         $this->printPage('species_index');
 
@@ -433,12 +431,13 @@ class IndexController extends Controller
 	
 	private function countCommonNames ()
 	{
-		return $this->models->Commonname->_get(
+		$r = $this->models->Commonname->_get(
 			array(
 				'where' => 'project_id = ' . $this->getCurrentProjectId(),
-				'columns' => 'COUNT(1)'
+				'columns' => 'COUNT(1) AS c'
 			)
 		);
+		return $r[0]['c'];
 	}
 		
 }

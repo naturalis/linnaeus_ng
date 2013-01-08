@@ -10,7 +10,7 @@
     {t}Higher taxa{/t}</a>
  </li>
 <li>
-    <a class="category{if $taxonType=='common'}-active{/if} category-last{if $common}" href="common.php"{else} category-no-content"{/if}>
+    <a class="category{if $taxonType=='common'}-active{/if} category-last{if $session.app.user.indexModule.hasCommonNames==1}" href="common.php"{else} category-no-content"{/if}>
     {t}Common names{/t}</a>
 </li>
 </ul>
