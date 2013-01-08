@@ -1132,7 +1132,10 @@ class Controller extends BaseClass
         return '<span class="italics">' . $name . '</span>';
     }
 
-
+    private function setHybridMarker ($rankId)
+    {
+        
+    }
 
     public function splashScreen ()
     {
