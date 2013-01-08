@@ -76,7 +76,7 @@ class Controller extends BaseClass
         'rank', 
         'glossary', 
         'glossary_synonym', 
-        'hotword',
+        'hotword', 
         'variation_label', 
         'taxon_variation'
     );
@@ -130,6 +130,7 @@ class Controller extends BaseClass
         $this->checkWriteableDirectories();
         
         //$this->loadModels();
+        
 
         $this->setRandomValue();
         
@@ -257,37 +258,40 @@ class Controller extends BaseClass
     }
 
 
+
     public function getVariations ($tId = null)
     {
         $d = array(
-        'project_id' => $this->getCurrentProjectId()
+            'project_id' => $this->getCurrentProjectId()
         );
-    
+        
         if (isset($tId))
             $d['taxon_id'] = $tId;
-    
+        
         $tv = $this->models->TaxonVariation->_get(array(
-        'id' => $d,
-        'columns' => 'id,taxon_id,label',
-        'order' => 'label'
+            'id' => $d, 
+            'columns' => 'id,taxon_id,label', 
+            'order' => 'label'
         ));
-    
+        
         foreach ((array) $tv as $key => $val) {
-    
+            
             $tv[$key]['taxon'] = $this->getTaxonById($val['taxon_id']);
-    
+            
             $tv[$key]['labels'] = $this->models->VariationLabel->_get(
             array(
-            'id' => array(
-            'project_id' => $this->getCurrentProjectId(),
-            'variation_id' => $val['id']
-            ),
-            'columns' => 'id,language_id,label,label_type'
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $val['id']
+                ), 
+                'columns' => 'id,language_id,label,label_type'
             ));
         }
-    
+        
         return $tv;
     }
+
+
 
     public function _buildTaxonTree ($p = null)
     {
@@ -298,6 +302,9 @@ class Controller extends BaseClass
         if (!isset($p['depth']))
             unset($this->treeList);
         
+        $t = $this->getTaxonChildren($pId);
+        
+        /*
         $t = $this->models->Taxon->_get(
         array(
             'id' => array(
@@ -308,6 +315,7 @@ class Controller extends BaseClass
             'fieldAsIndex' => 'id', 
             'order' => 'taxon_order,id'
         ));
+        */
         
         foreach ((array) $t as $key => $val) {
             
@@ -327,14 +335,17 @@ class Controller extends BaseClass
             
 
 
+
             //// sibling_pos reflects the position amongst taxa on the same level
             //$t[$key]['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
             
 
 
+
             //// get rank label
             //$t[$key]['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
             
+
 
 
             $this->treeList[$key] = $t[$key];
@@ -981,6 +992,7 @@ class Controller extends BaseClass
             
 
 
+
             $processed = preg_replace_callback($expr, array(
                 $this, 
                 'embedHotwordLink'
@@ -1083,27 +1095,22 @@ class Controller extends BaseClass
         
         // Genus or subgenus; add italics
         if ($rankId >= GENUS_RANK_ID && count($e) == 1) {
-            return $this->setHybridMarker($rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>', 
-                $rankId, $taxon['is_hybrid']);
+            return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
         
         // Species
-        if (count($e) == 2) {
-            return $this->setHybridMarker('<span class="italics">' . $taxon['taxon'] . '</span>', $rankId, $taxon['is_hybrid']);
+        if ($rankName == 'Species') {
+            return '<span class="italics">' . $this->setHybridMarker($taxon) . '</span>';
         }
         
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
-            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . 
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>', 
-                $rankId, $taxon['is_hybrid']);
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
         }
         
         // Single infraspecies with subgenus
         if (count($e) == 4 && $e[1][0] == '(') {
-            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . 
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .  $e[3] . '</span>', 
-                $rankId, $taxon['is_hybrid']);
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
         
         // We need the parent before continuing
@@ -1116,48 +1123,47 @@ class Controller extends BaseClass
         
         // Double infraspecies
         if (count($e) == 4) {
-            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . 
-                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>', 
-                $rankId, $taxon['is_hybrid']);
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
         
         // Double infraspecies with subgenus
         if (count($e) == 5 && $e[1][0] == '(') {
-            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . 
-                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
-                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>', 
-                $rankId, $taxon['is_hybrid']);
+            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
+             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
         }
         
         // If we end up here something must be wrong, just return name sans formatting
         return $taxon['taxon'];
     }
-    
 
-    private function setHybridMarker ($name, $rankId, $isHybrid)
+
+
+    private function setHybridMarker ($taxon)
     {
-        $marker = ($rankId == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
-        
-        if ($isHybrid == 0) {
-            return $name;
+        if ($taxon['is_hybrid'] == 0) {
+            return $taxon['taxon'];
         }
         
+        $marker = ($taxon['rank_id'] == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
+        
         // intergeneric hybrid
-        if ($isHybrid == 2 || $rankId >= GENUS_RANK_ID) {
-            return $marker . ' ' . $name;
+        if ($taxon['is_hybrid'] == 2) {
+            return $marker . ' ' . $taxon['taxon'];
         }
         
         // interspecific hybrid
-        return implode(' ' . $marker . ' ', explode(' ', $name, 2));
-                
+        return implode(' ' . $marker . ' ', explode(' ', $taxon['taxon'], 2));
     }
 
-    
+
+
     public function formatSynonym ($name)
     {
         return '<span class="italics">' . $name . '</span>';
     }
+
+
 
     public function splashScreen ()
     {
@@ -1335,7 +1341,7 @@ class Controller extends BaseClass
     {
         if (empty($content))
             return;
-
+        
         $this->saveInterfaceText($content);
         
         return $this->doTranslate($content);
@@ -1520,15 +1526,16 @@ class Controller extends BaseClass
 			$u['projectCSS'] = $u['cssRootDir'].'default/'.$this->getSkinName().'/';
 		}
 		*/
-
-        if (file_exists($u['cssRootDir'].$this->getSkinName().'/basics.css')) {
-            $u['projectCSS'] = $u['cssRootDir'].$this->getSkinName().'/';
-        } else {
+        
+        if (file_exists($u['cssRootDir'] . $this->getSkinName() . '/basics.css')) {
+            $u['projectCSS'] = $u['cssRootDir'] . $this->getSkinName() . '/';
+        }
+        else {
             $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->getSkinName() . '/';
         }
         
-        
-        
+
+
         // home
         $u['projectHome'] = $this->baseUrl . $this->getAppName() . '/views/' . $this->generalSettings['defaultController'] . '/';
         
@@ -1778,12 +1785,13 @@ class Controller extends BaseClass
     }
 
 
-    private function loadSmartyConfig()
+
+    private function loadSmartyConfig ()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
     }
-    
-    
+
+
 
     /**
      * Sets class variables, based on a page's url
@@ -1852,16 +1860,14 @@ class Controller extends BaseClass
     }
 
 
+
     private function doesSkinExist ($skin)
     {
-
-        return
-	        file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && 
-	        file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
-        	file_exists($this->_smartySettings['dir_template'] . $skin. '/' . $this->getControllerBaseName() . '/');
-        
+        return file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
+         file_exists($this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/');
     }
-    
+
+
 
     public function getSkinName ()
     {
@@ -1901,9 +1907,9 @@ class Controller extends BaseClass
             return;
         }
         
-         $this->models = new stdClass();
-         
-         foreach ((array) $d as $key) {
+        $this->models = new stdClass();
+        
+        foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../models/' . $key . '.php')) {
                 
@@ -1945,19 +1951,18 @@ class Controller extends BaseClass
         
         // this is now done in $this->loadSmartyConfig(); because some settings are needed earlier in the bootstrap
         //$this->_smartySettings = $this->config->getSmartySettings();
-        
         $this->smarty = new Smarty();
         
         /* DEBUG */
         $this->smarty->force_compile = true;
         
-        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName(). '/' . $this->getControllerBaseName() . '/';
+        $this->smarty->template_dir = $this->_smartySettings['dir_template'] . $this->getSkinName() . '/' . $this->getControllerBaseName() . '/';
         $this->smarty->compile_dir = $this->_smartySettings['dir_compile'];
         $this->smarty->cache_dir = $this->_smartySettings['dir_cache'];
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-
+        
         $this->smarty->register_block('t', array(
             &$this, 
             'smartyTranslate'
@@ -1980,6 +1985,7 @@ class Controller extends BaseClass
             //$this->requestData = $_REQUEST; // also contains cookies
             $this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
             
+
 
 
             foreach ((array) $this->requestData as $key => $val) {
@@ -2180,7 +2186,7 @@ class Controller extends BaseClass
         }
         
         $this->helpers = new stdClass();
-         
+        
         foreach ((array) $d as $key) {
             
             if (file_exists(dirname(__FILE__) . '/../helpers/' . $key . '.php')) {
@@ -2375,8 +2381,7 @@ class Controller extends BaseClass
             $d = $this->models->Hotword->_get(
             array(
                 'id' => 'select hotword,controller,view,params
-								from %table% where project_id = ' . $this->getCurrentProjectId() . ' ' . 'and (language_id = ' .
-                 $this->getCurrentLanguageId() . ' or language_id = 0)'
+								from %table% where project_id = ' . $this->getCurrentProjectId() . ' ' . 'and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)'
             ));
             
             foreach ((array) $d as $key => $val)
@@ -2573,8 +2578,8 @@ class Controller extends BaseClass
     // Key something like path in session, e.g. 'species-tree'
     protected function getCache ($key, $timeOut = false)
     {
-        
-        if ($this->_useCache==false) return false;
+        if ($this->_useCache == false)
+            return false;
         
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
         if (file_exists($cacheFile)) {
@@ -2593,8 +2598,8 @@ class Controller extends BaseClass
 
     protected function saveCache ($key, $data)
     {
-        
-        if ($this->_useCache==false) return;
+        if ($this->_useCache == false)
+            return;
         
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
         
@@ -2610,6 +2615,7 @@ class Controller extends BaseClass
         if (!isset($this->treeList))
             $this->buildTaxonTree(); // return null;
         
+
         $d = array();
         
         foreach ((array) $this->treeList as $key => $val) {
@@ -2735,5 +2741,28 @@ class Controller extends BaseClass
             
             // return translation
         return $it[0]['translation'];
+    }
+
+
+
+    private function getTaxonChildren ($id)
+    {
+        if (is_null($this->tmp)) {
+            
+            $d = $this->models->Taxon->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId()
+                ), 
+                'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author'
+            ));
+            
+            foreach ((array) $d as $val) {
+                
+                $this->tmp[$val['parent_id']][$val['id']] = $val;
+            }
+        }
+        
+        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
     }
 }
