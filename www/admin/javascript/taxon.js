@@ -1173,37 +1173,6 @@ function taxonGetRankLabels(language) {
 	
 }
 
-function taxonCheckNewTaxonName() {
-
-	if ($('#taxon-name').val().length==0) {
-		$('#taxon-message').html('')
-		return;
-	}
-	
-	$.ajax({
-		url : "ajax_interface.php",
-		type: "POST",
-		data : ({
-			'action' : 'check_taxon_name' ,
-			'taxon_name' : $('#taxon-name').val() ,
-			'id' : $('#id').val() ,
-			'time' : allGetTimestamp()
-		}),
-		async: allAjaxAsynchMode,
-		success : function (data) {
-			//alert(data);
-			if(data=='<ok>') {
-				$('#taxon-message').removeClass().addClass('message-no-error');
-				$('#taxon-message').html('Ok')
-			} else {
-				$('#taxon-message').removeClass().addClass('message-error');
-				$('#taxon-message').html(data)
-			}
-		}
-	});
-
-}
-
 function taxonGetRankByParent(nomessage) {
 
 	var id = $('#parent-id option:selected').val();
@@ -1515,6 +1484,7 @@ function taxonGetFormattedPreview() {
 			'name' : $('#taxon-name').val() ,
 			'rank_id' : $('#rank-id').val() ,
 			'parent_id' :$('#parent-id').val() ,
+			'is_hybrid' :$('#is-hybrid').val() ,
 			'time' : allGetTimestamp()
 		}),
 		success : function (data) {

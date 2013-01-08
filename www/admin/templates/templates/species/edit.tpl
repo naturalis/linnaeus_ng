@@ -54,7 +54,7 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" onblur="taxonCheckNewTaxonName()" value="{$data.taxon}"  style="width:300px"/>
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" value="{$data.taxon}"  style="width:300px"/>
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>

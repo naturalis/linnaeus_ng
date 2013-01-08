@@ -108,19 +108,6 @@
 	</tr>
 	<tr>
 		<td>
-			{t}This project includes hybrid taxa:{/t}
-		</td>
-		<td>
-			<label>
-				<input type="radio" name="includes_hybrids" value="1" {if $data.includes_hybrids=='1'} checked="checked"{/if}/> {t}yes{/t}
-			</label>
-			<label>
-				<input type="radio" name="includes_hybrids" value="0" {if $data.includes_hybrids!='1'} checked="checked"{/if}/> {t}no{/t}
-			</label>
-		</td>
-	</tr>		
-	<tr>
-		<td>
 			{t}Publish project:{/t}
 		</td>
 		<td>

@@ -526,7 +526,8 @@ class MatrixKeyController extends Controller
 
     private function getImageDimensions ($state)
     {
-        if ($state['type']['name'] == 'media') {
+
+        if (isset($state['type']) && $state['type'] == 'media') {
             
             $f = $_SESSION['app']['project']['urls']['uploadedMedia'] . $state['file_name'];
             
@@ -880,12 +881,12 @@ class MatrixKeyController extends Controller
         foreach ((array) $mc as $key => $val) {
             
             $d = $this->getCharacteristic($val['characteristic_id']);
-            
+
             if ($d) {
                 $states = $this->getCharacteristicStates($val['characteristic_id']);
                 $d['sort_by']['alphabet'] = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $d['label']));
                 $d['sort_by']['separationCoefficient'] = -1 * $this->getCharacteristicHValue($val['characteristic_id'], $states); // -1 to avoid asc/desc hassles in JS-sorting
-                $d['sort_by']['characterType'] = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $d['type']['name']));
+                $d['sort_by']['characterType'] = strtolower(preg_replace('/[^A-Za-z0-9]/', '', $d['type']));
                 $d['sort_by']['numberOfStates'] = -1 * count((array) $states); // -1 to avoid asc/desc hassles in JS-sorting
                 $d['sort_by']['entryOrder'] = intval($val['show_order']);
                 $d['states'] = $states;
