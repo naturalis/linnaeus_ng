@@ -1663,7 +1663,7 @@ class Controller extends BaseClass
         //$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
         $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
         
-        if (1 == 1 || $this->hasTableDataChanged('Rank') == true || $this->hasTableDataChanged('ProjectRank') == true || $this->hasTableDataChanged('LabelProjectRank') == true || !isset($_SESSION['admin']['user']['species']['projectRank'])) {
+        if ($this->hasTableDataChanged('Rank') == true || $this->hasTableDataChanged('ProjectRank') == true || $this->hasTableDataChanged('LabelProjectRank') == true || !isset($_SESSION['admin']['user']['species']['projectRank'])) {
             
             $pr = $this->models->ProjectRank->_get(
             array(
@@ -1733,13 +1733,12 @@ class Controller extends BaseClass
     public function newGetTaxonTree ($p = null)
     {
         
-        $p['forceLookup']=true;
         if (!isset($_SESSION['admin']['user']['species']['tree']) || !isset($_SESSION['admin']['user']['species']['treeList']) || isset($p['forceLookup']) && $p['forceLookup'] === true) {
-$this->log('x');
+
             $_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
-$this->log('z');
+
             $_SESSION['admin']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
-$this->log('y');
+
         }
         else if ($this->hasTableDataChanged('Taxon')) {
             
@@ -1756,39 +1755,7 @@ $this->log('y');
 
 
 
-    private function getChildren($id)
-    {
-        if (is_null($this->tmp)) {
-
-$this->log('a1');
-           
-            $d = $this->models->Taxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
-            ));
-            
-$this->log('a2');
-            
-            foreach((array)$d as $val) {
-                
-                $this->tmp[$val['parent_id']][$val['id']] = $val;
-                
-            }
-            
-$this->log('a3');            
-            
-        }
-        
-        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
-            
-    }
-
-
-
-    public function _newGetTaxonTreeXYZ ($p = null)
+    public function _newGetTaxonTree ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
@@ -1797,10 +1764,8 @@ $this->log('a3');
         if (!isset($p['depth']))
             unset($this->treeList);
         
-        $t = $this->getChildren($pId);
-
-$this->log($pId.':'.count((array)$t));
-        
+        $t = $this->getTaxonChildren($pId);
+       
         /*
         $t = $this->models->Taxon->_get(
         array(
@@ -1836,53 +1801,6 @@ $this->log($pId.':'.count((array)$t));
         
         return $t;
     }
-
-
-
-    public function _newGetTaxonTree ($p = null)
-    {
-        $pId = isset($p['pId']) ? $p['pId'] : null;
-        $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
-        $depth = isset($p['depth']) ? $p['depth'] : 0;
-        
-        if (!isset($p['depth']))
-            unset($this->treeList);
-        
-        $t = $this->models->Taxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'parent_id' . (is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
-            ), 
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level', 
-            'fieldAsIndex' => 'id', 
-            'order' => 'taxon_order,id'
-        ));
-        
-        foreach ((array) $t as $key => $val) {
-
-            $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
-            $t[$key]['keypath_endpoint'] = $ranks[$val['rank_id']]['keypath_endpoint'];
-            $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
-            $t[$key]['sibling_count'] = count((array) $t);
-            $t[$key]['depth'] = $t[$key]['level'] = $depth;
-            $t[$key]['taxon_formatted'] = $this->formatTaxon($val);
-            $t[$key]['root_rank_id'] = $ranks[$val['rank_id']]['rank_id'];
-
-            $this->treeList[$key] = $t[$key];
-            
-            $t[$key]['children'] = $this->_newGetTaxonTree(array(
-                'pId' => $val['id'], 
-                'ranks' => $ranks, 
-                'depth' => $depth + 1
-            ));
-            
-            $this->treeList[$key]['child_count'] = count((array) $t[$key]['children']);
-        }
-        
-        return $t;
-    }
-
 
 
     public function newGetUserTaxa ()
@@ -3824,4 +3742,29 @@ $this->log($pId.':'.count((array)$t));
             // return translation
         return $it[0]['translation'];
     }
+
+    private function getTaxonChildren($id)
+    {
+        if (is_null($this->tmp)) {
+    
+            $d = $this->models->Taxon->_get(
+            array(
+            'id' => array(
+            'project_id' => $this->getCurrentProjectId()
+            ),
+            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+            ));
+    
+            foreach((array)$d as $val) {
+    
+                $this->tmp[$val['parent_id']][$val['id']] = $val;
+    
+            }
+    
+        }
+    
+        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
+    
+    }
+
 }
