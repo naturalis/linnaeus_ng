@@ -2565,15 +2565,15 @@ class SpeciesController extends Controller
         
         $this->checkAuthorisation();
         
-        $taxon = $this->getTaxonById();
-        
+        $taxon = $this->getTaxonById($this->requestData['id']);
+
         if ($this->useVariations)
             $this->setPageName(sprintf($this->translate('Related taxa and variations for "%s"'), $taxon['taxon']));
         else
             $this->setPageName(sprintf($this->translate('Related taxa for "%s"'), $taxon['taxon']));
         
         $related = $this->getRelatedEntities($taxon['id']);
-        
+
         $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
             'higherOnly' => $this->maskAsHigherTaxa()
         )));
@@ -5134,25 +5134,26 @@ class SpeciesController extends Controller
 
     private function getRelatedEntities ($tId)
     {
-        $rel = $this->models->TaxaRelations->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $tId
-            )
-        ));
         
+        $rel = $this->models->TaxaRelations->_get(array(
+        'id' => array(
+        'project_id' => $this->getCurrentProjectId(),
+        'taxon_id' => $tId
+        )
+        ));
+
         foreach ((array) $rel as $key => $val) {
-            /*
+            
             if ($val['ref_type'] == 'taxon') {
-                $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id']));
+                $rel[$key]['label'] = $this->formatTaxon($this->getTaxonById($val['relation_id']));
             }
             else {
                 $d = $this->getVariation($val['relation_id']);
-                $rel[$key]['relations'][$vKey]['label'] = $d['label'];
-                $rel[$key]['relations'][$vKey]['labels'] = $d['labels'];
+                $rel[$key]['label'] = $d['label'];
+                $rel[$key]['taxon_id'] = $d['taxon_id'];
             }
-            */
         }
+
         
         $var = $this->getVariations($tId);
         
@@ -5178,7 +5179,7 @@ class SpeciesController extends Controller
                 }
             }
         }
-        
+
         return array(
             'relations' => $rel, 
             'variations' => $var

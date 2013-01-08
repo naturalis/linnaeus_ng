@@ -7,6 +7,7 @@
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
 <p>
+
 <b>Related</b><br />
 {foreach from=$related.relations item=v key=k}
 <a href="{if $v.ref_type=='variation'}variation.php{else}taxon.php{/if}?id={$v.relation_id}">{$v.label}</a><br />
