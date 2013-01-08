@@ -1849,7 +1849,8 @@ class SpeciesController extends Controller
             $this->formatTaxon(array(
                 'taxon' => $this->requestData['name'], 
                 'rank_id' => $this->requestData['rank_id'], 
-                'parent_id' => $this->requestData['parent_id']
+                'parent_id' => $this->requestData['parent_id'],
+                'is_hybrid' =>  $this->requestData['is_hybrid']
             )));
         }
         else if ($this->requestData['action'] == 'set_overview') {
