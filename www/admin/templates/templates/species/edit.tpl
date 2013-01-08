@@ -114,6 +114,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+taxonGetFormattedPreview();
 {foreach item=v from=$projectRanks}
 {if $v.can_hybrid}
 taxonCanHaveHybrid[taxonCanHaveHybrid.length]={$v.id};
