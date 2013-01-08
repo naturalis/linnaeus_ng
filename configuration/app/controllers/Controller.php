@@ -1131,7 +1131,7 @@ class Controller extends BaseClass
             return $taxon['taxon'];
         }
         
-        $marker = ($taxon['rank_id'] == GRAFT_CHIMERA_RANK_ID ? '+' : '×');
+        $marker = ($taxon['rank_id'] == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
         
         // intergeneric hybrid
         if ($taxon['is_hybrid'] == 2) {
