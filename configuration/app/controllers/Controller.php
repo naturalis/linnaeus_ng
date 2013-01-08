@@ -1088,7 +1088,7 @@ class Controller extends BaseClass
         
         // Species
         if ($rankName == 'Species') {
-            return '<span class="italics">' . $taxon['taxon'] . '</span>';
+            return '<span class="italics">' . $this->setHybridMarker($taxon) . '</span>';
         }
         
         // Regular infraspecies, name consists of three parts
@@ -1125,16 +1125,28 @@ class Controller extends BaseClass
         return $taxon['taxon'];
     }
 
+    private function setHybridMarker ($taxon)
+    {
+        if ($taxon['is_hybrid'] == 0) {
+            return $taxon['taxon'];
+        }
+        
+        $marker = ($taxon['rank_id'] == GRAFT_CHIMERA_RANK_ID ? '+' : '×');
+        
+        // intergeneric hybrid
+        if ($taxon['is_hybrid'] == 2) {
+            return $marker . ' ' . $taxon['taxon'];
+        }
+        
+        // interspecific hybrid
+        return str_replace(' ', ' ' . $marker . ' ', $taxon['taxon']);
+        
+    }
 
-
+    
     public function formatSynonym ($name)
     {
         return '<span class="italics">' . $name . '</span>';
-    }
-
-    private function setHybridMarker ($rankId)
-    {
-        
     }
 
     public function splashScreen ()
