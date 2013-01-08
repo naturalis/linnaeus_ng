@@ -102,19 +102,6 @@
 		</td>
 	</tr>
 
-{if $session.admin.project.includes_hybrids==1}
-	<tr>
-		<td>
-			{t}This is a hybrid:{/t}
-		</td>
-		<td>
-			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" />
-		</td>
-		<td>
-			<span id="hybrid-message" class=""></span>
-		</td>
-	</tr>
-{/if}
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>

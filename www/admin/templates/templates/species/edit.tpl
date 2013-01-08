@@ -54,12 +54,26 @@
 			{t}Taxon name:{/t}
 		</td>
 		<td>
-			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonRegisterManualInput()" value="{$data.taxon}"  style="width:300px"/>
+			<input type="text" name="taxon" id="taxon-name" onkeyup="taxonGetFormattedPreview()" value="{$data.taxon}"  style="width:300px"/>
 		</td>
 		<td>
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
+
+	<tr>
+		<td>
+			{t}Hybrid:{/t}
+		</td>
+		<td colspan="2">
+			<select name="is_hybrid" id="is-hybrid" onchange="taxonGetFormattedPreview()">
+				<option value="0" {if $data.is_hybrid==0}selected="selected"{/if}>{t}no hybrid{/t}</option>
+				<option value="1" {if $data.is_hybrid==1}selected="selected"{/if}>{t}interspecific hybrid{/t}</option>
+				<option value="2" {if $data.is_hybrid==2}selected="selected"{/if}>{t}intergeneric hybrid{/t}</option>
+			</select>
+		</td>
+	</tr>
+
 	
 	<tr>
 		<td>
@@ -73,18 +87,16 @@
 		</td>
 	</tr>
 	
-	{if $session.admin.project.includes_hybrids==1}	<tr>
+	<tr>
 		<td>
-			{t}This is a hybrid:{/t}
+		Formatted example:
+		</td>
+		<td id="formatted-example">
 		</td>
 		<td>
-			<input type="checkbox" name="is_hybrid" id="hybrid" {if $data.is_hybrid=='on' || $data.is_hybrid=='1'}checked="checked"{/if} onchange="taxonCheckHybridCheck()" style="width:300px" />
-		</td>
-		<td>
-			<span id="hybrid-message" class=""></span>
 		</td>
 	</tr>
-{/if}
+	
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>
