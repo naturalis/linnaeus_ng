@@ -2236,10 +2236,10 @@ $this->log($pId.':'.count((array)$t));
     public function formatTaxon ($taxon)
     {
         $e = explode(' ', $taxon['taxon']);
-        $r = $this->newGetProjectRanks();
+        $r = $this->getProjectRanks();
         
-        if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
-            $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
+        if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
+            $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
         else
             $d = $r[$taxon['rank_id']]['rank'];
         
@@ -2254,22 +2254,27 @@ $this->log($pId.':'.count((array)$t));
         
         // Genus or subgenus; add italics
         if ($rankId >= GENUS_RANK_ID && count($e) == 1) {
-            return $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+            return $this->setHybridMarker($rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>', 
+                $rankId, $taxon['is_hybrid']);
         }
         
         // Species
-        if ($rankName == 'Species') {
-            return '<span class="italics">' . $this->setHybridMarker($taxon) . '</span>';
+        if (count($e) == 2) {
+            return $this->setHybridMarker('<span class="italics">' . $taxon['taxon'] . '</span>', $rankId, $taxon['is_hybrid']);
         }
         
         // Regular infraspecies, name consists of three parts
         if (count($e) == 3) {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>';
+            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . 
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[2] . '</span>', 
+                $rankId, $taxon['is_hybrid']);
         }
         
         // Single infraspecies with subgenus
         if (count($e) == 4 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . 
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') .  $e[3] . '</span>', 
+                $rankId, $taxon['is_hybrid']);
         }
         
         // We need the parent before continuing
@@ -2282,37 +2287,41 @@ $this->log($pId.':'.count((array)$t));
         
         // Double infraspecies
         if (count($e) == 4) {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
-             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
+            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . 
+                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>', 
+                $rankId, $taxon['is_hybrid']);
         }
         
         // Double infraspecies with subgenus
         if (count($e) == 5 && $e[1][0] == '(') {
-            return '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
-             (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>';
+            return $this->setHybridMarker('<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . 
+                (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .
+                (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[4] . '</span>', 
+                $rankId, $taxon['is_hybrid']);
         }
         
         // If we end up here something must be wrong, just return name sans formatting
         return $taxon['taxon'];
     }
+    
 
-
-    private function setHybridMarker ($taxon)
+    private function setHybridMarker ($name, $rankId, $isHybrid)
     {
-        if ($taxon['is_hybrid'] == 0) {
-            return $taxon['taxon'];
+        $marker = ($rankId == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
+        
+        if ($isHybrid == 0) {
+            return $name;
         }
         
-        $marker = ($taxon['rank_id'] == GRAFT_CHIMERA_RANK_ID ? '+' : '&#215;');
-        
         // intergeneric hybrid
-        if ($taxon['is_hybrid'] == 2) {
-            return $marker . ' ' . $taxon['taxon'];
+        if ($isHybrid == 2 || $rankId >= GENUS_RANK_ID) {
+            return $marker . ' ' . $name;
         }
         
         // interspecific hybrid
-        return implode(' ' . $marker . ' ', explode(' ', $taxon['taxon'], 2));
-        
+        return implode(' ' . $marker . ' ', explode(' ', $name, 2));
+                
     }
 
     
