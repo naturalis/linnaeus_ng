@@ -164,7 +164,6 @@ class MatrixKeyController extends Controller
         //IF IETS
         $this->smarty->assign('groups', $this->getCharacterGroups());
         
-
         $this->smarty->assign('taxa', $this->getTaxaInMatrix());
         
         $this->smarty->assign('matrices', $this->getMatricesInMatrix());
@@ -279,10 +278,16 @@ class MatrixKeyController extends Controller
             
             $this->compareSpeciesStore($this->requestData['id']);
         }
+        // "nbc-type" functions below
         else if ($this->rHasVal('action', 'get_formatted_states')) {
             
             $this->getFormattedStates($this->requestData['id']);
             $tpl = 'formatted_states';
+        }
+        else if ($this->rHasVal('action', 'get_results_nbc')) {
+        
+            $results = $this->getResultsNBC();
+
         }
         
         $this->allowEditPageOverlay = false;
@@ -1224,6 +1229,7 @@ class MatrixKeyController extends Controller
 
 
 
+    /* "NBC-style" functions below */
     private function getFormattedStates ($id)
     {
         $c = $this->getCharacteristic($id);
@@ -1234,4 +1240,15 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('s',$s);
         
     }
+
+	private function getResultsNBC()
+	{
+		
+		return $this->getTaxaInMatrix();	    
+	    
+	    
+	}
+
+
+
 }
