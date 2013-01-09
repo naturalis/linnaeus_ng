@@ -1,5 +1,11 @@
 <?php
 
+if (file_exists(dirname(__FILE__) . "/configuration.php")) {
+
+	include_once (dirname(__FILE__) . "/configuration.php");
+
+}
+
 class BaseClass
 {
     
@@ -25,17 +31,15 @@ class BaseClass
     private function loadConfiguration ()
     {
 
-        if (file_exists(dirname(__FILE__) . "/configuration.php") && class_exists('configuration')) {
+        if (class_exists('configuration')) {
             
-			   include_once (dirname(__FILE__) . "/configuration.php");
-
             $this->config = new configuration();
         
         } else {
             
-            die(_('Cannot load configuration file. Make sure the file config.php is present in both 
-            	configuration/admin and configuration/app. In both
-            	directories, the template file default-config.php can be adapted.'));
+            die(_('Cannot load admin configuration file. Make sure the file config.php is present in both 
+            	configuration/admin and configuration/app. In both directories, the template file 
+            	default-config.php can be adapted.'));
         
         }
     

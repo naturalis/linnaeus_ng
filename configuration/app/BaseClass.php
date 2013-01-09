@@ -1,6 +1,11 @@
 <?php
 
-include_once (dirname(__FILE__) . "/configuration.php");
+if (file_exists(dirname(__FILE__) . "/configuration.php")) {
+
+	include_once (dirname(__FILE__) . "/configuration.php");
+
+}
+
 
 class BaseClass
 {
@@ -33,7 +38,9 @@ class BaseClass
         
         } else {
             
-            die(_('FATAL: cannot load configuration'));
+            die(_('Cannot load app configuration file. Make sure the file config.php is present in both 
+            	configuration/admin and configuration/app. In both directories, the template file 
+            	default-config.php can be adapted.'));
         
         }
     
