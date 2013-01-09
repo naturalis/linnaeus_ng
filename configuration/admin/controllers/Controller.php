@@ -98,6 +98,10 @@ class Controller extends BaseClass
         
         $this->loadControllerConfig();
         
+        $this->loadSmartyConfig();
+        
+        $this->checkWriteableDirectories();
+
         $this->setPaths();
         
         $this->setUrls();
@@ -106,8 +110,6 @@ class Controller extends BaseClass
         
         //$this->setHelpTexts();
         
-
-
 
         $this->setRandomValue();
         
@@ -158,6 +160,8 @@ class Controller extends BaseClass
     {
         return isset($this->appName) ? $this->appName : false;
     }
+
+
 
 
 
@@ -3771,5 +3775,44 @@ class Controller extends BaseClass
         return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
     
     }
+    
+    
+    private function loadSmartyConfig ()
+    {
+        $this->_smartySettings = $this->config->getSmartySettings();
+    }
+
+
+    private function checkWriteableDirectories ()
+    {
+        $paths = array(
+            $this->_smartySettings['dir_compile'] => 'www/admin/templates/templates_c',
+            $this->_smartySettings['dir_cache'] => 'www/admin/templates/cache',
+            $this->generalSettings['directories']['cache'] => 'www/shared/cache',
+            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project'
+        );
+        
+        foreach ((array) $paths as $val => $display) {
+            
+            if (!file_exists($val) || !is_writable($val)) {
+                 $fixPaths[] = $display;
+            }
+        }
+        
+        if (isset($fixPaths)) {
+        
+        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot process until this is corrected:</p>';
+        
+        	foreach ($fixPaths as $message) {
+        	
+        		echo $message . '<br>';
+        	}
+        	
+        	die();
+        	
+        }
+        
+    }
+
 
 }
