@@ -26,7 +26,9 @@ abstract class Model extends BaseClass
         
         parent::__construct();
         
-        $this->connectToDatabase() or die(_('FATAL: cannot connect to database') . ' (' . mysql_error() . ')');
+        $this->connectToDatabase() or die(_('Failed to connect to database '.$this->databaseSettings['database'].
+        	' with user '.$this->databaseSettings['user'] . '. ' . mysql_error() . '. Correct the getDatabaseSettings() settings 
+        	in configuration/app/config.php.'));
         
         if (!$tableBaseName) {
             
@@ -591,7 +593,7 @@ abstract class Model extends BaseClass
 
         $this->databaseSettings = $this->config->getDatabaseSettings();
         
-        $this->databaseConnection = mysql_connect($this->databaseSettings['host'], $this->databaseSettings['user'], $this->databaseSettings['password']);
+        $this->databaseConnection = @mysql_connect($this->databaseSettings['host'], $this->databaseSettings['user'], $this->databaseSettings['password']);
         
         if (!$this->databaseConnection) {
 

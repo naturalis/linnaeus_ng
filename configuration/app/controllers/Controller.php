@@ -117,6 +117,8 @@ class Controller extends BaseClass
         
         $this->loadSmartyConfig();
         
+        $this->checkWriteableDirectories();
+
         $this->setNames();
         
         $this->setSkinName();
@@ -126,8 +128,6 @@ class Controller extends BaseClass
         $this->setPaths();
         
         $this->createCacheFolder();
-        
-        $this->checkWriteableDirectories();
         
         //$this->loadModels();
         
@@ -174,7 +174,6 @@ class Controller extends BaseClass
         
         parent::__destruct();
     }
-
 
 
     public function checkForProjectId ()
@@ -2679,20 +2678,40 @@ class Controller extends BaseClass
 
     private function checkWriteableDirectories ()
     {
-        $p = $this->getCurrentProjectId();
-        
-        if (!$p)
-            return;
-        
         $paths = array(
-            $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)
+            $this->_smartySettings['dir_compile'] => 'www/app/templates/templates_c',
+            $this->_smartySettings['dir_cache'] => 'www/app/templates/cache',
+            $this->generalSettings['directories']['cache'] => 'www/shared/cache',
+            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project'
         );
         
-        foreach ((array) $paths as $val) {
-            
-            if (file_exists($val) && !is_writable($val))
-                die('FATAL: cannot write to ' . $val);
+        $p = $this->getCurrentProjectId();
+        
+        if ($p) {
+        	$paths[] =  $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
+        
         }
+        
+        foreach ((array) $paths as $val => $display) {
+            
+            if (!file_exists($val) || !is_writable($val)) {
+                 $fixPaths[] = $display;
+            }
+        }
+        
+        if (isset($fixPaths)) {
+        
+        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot process until this is corrected:</p>';
+        
+        	foreach ($fixPaths as $message) {
+        	
+        		echo $message . '<br>';
+        	}
+        	
+        	die();
+        	
+        }
+        
     }
 
 
