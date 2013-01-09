@@ -2688,7 +2688,7 @@ class Controller extends BaseClass
         $p = $this->getCurrentProjectId();
         
         if ($p) {
-        	$paths[] =  $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
+        	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] = 'www/shared/media/project/' . $this->getProjectFSCode($p);
         
         }
         
