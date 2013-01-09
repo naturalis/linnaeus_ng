@@ -556,7 +556,8 @@ class ImportNBCController extends Controller
                 foreach ((array) $this->_variantColumnHeaders as $hVal) {
                     if (!isset($sVal[$hVal]))
                         continue;
-                    $str .= $this->translateStateCode($sVal[$hVal], $this->getNewDefaultLanguageId()) . ' ';
+                    //$str .= $this->translateStateCode($sVal[$hVal], $this->getNewDefaultLanguageId()) . ' ';
+                    $str .= $sVal[$hVal]. ' ';
                 }
                 
                 $d[$key]['variations'][$sKey]['add-on'] = trim($str);
@@ -900,11 +901,11 @@ class ImportNBCController extends Controller
     {
         $translations = array(
             'male' => array(
-                24 => 'mannetje', 
+                24 => 'mannelijk', 
                 26 => 'male'
             ), 
             'female' => array(
-                24 => 'vrouwtje', 
+                24 => 'vrouwelijk', 
                 26 => 'female'
             )
         );

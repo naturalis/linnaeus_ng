@@ -67,7 +67,7 @@ ul.sourceContainer li strong {display:block;margin:5px 0;}
 	}/*font-style:italic;*/
 
 #content div#results div.result a {text-decoration:none; font-size:11px; color:#555555;}
-#content div#results div.result a.similarBtn {position:absolute; top:273px; left:8px; background:transparent url(../images/url.gif) no-repeat 0 4px; padding-left:12px;}
+#content div#results div.result a.similarBtn {position:absolute; top:273px; left:8px; background:transparent url(http://determinatie.nederlandsesoorten.nl/images/url.gif) no-repeat 0 4px; padding-left:12px;}
 #content div#results div.result a:hover {color:#ff0000;}
 #content div#results div.result img.gender {position:absolute;top:221px;left:146px;}
 #content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}

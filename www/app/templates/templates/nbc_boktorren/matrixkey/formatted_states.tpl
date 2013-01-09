@@ -1,6 +1,7 @@
 <div style="padding:0px 10px 0px 10px;">
 
-	<form id="theForm" method="post" action="nbc.php">
+	<!-- form id="theForm" method="post" action="nbc.php" -->
+	<form id="theForm" method="post" action="identify.php">
 	<input type="hidden" id="char-id" name="char" value="{$c.id}" />
 	<input type="hidden" id="state-id" name="state" value="" />
 	
@@ -27,7 +28,7 @@
 						/><br /><br />
 						{$v.label}
 					</div>
-					(23)
+					(0)
 				</td>
 			{if ($k+1)%$stateImagesPerRow==0}
 			</tr><tr>
