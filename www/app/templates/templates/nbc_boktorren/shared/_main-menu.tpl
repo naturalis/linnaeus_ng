@@ -1,4 +1,3 @@
-
 <div id="main-menu">
 <ul>
 <li><a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/"></a></li>
