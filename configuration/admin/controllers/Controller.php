@@ -2311,9 +2311,7 @@ class Controller extends BaseClass
 
     public function getVariation ($id)
     {
-        if (isset($tId))
-            $d['taxon_id'] = $tId;
-        
+
         $tv = $this->models->TaxonVariation->_get(
         array(
             'id' => array(

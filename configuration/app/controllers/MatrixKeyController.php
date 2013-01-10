@@ -18,7 +18,9 @@ class MatrixKeyController extends Controller
         'chargroup', 
         'characteristic_chargroup', 
         'matrix_variation', 
-        'nbc_extras'
+        'nbc_extras', 
+        'taxa_relations', 
+        'variation_relations'
     );
     public $usedHelpers = array();
     public $controllerPublicName = 'Matrix key';
@@ -162,13 +164,11 @@ class MatrixKeyController extends Controller
         
         $this->smarty->assign('characteristics', $this->getCharacteristics());
         
-
-        $results = $this->getResultsNBC();
-        
-
-        //q($this->getCharacteristics(),1);
-        //IF IETS
+        /* NBC */
         $this->smarty->assign('groups', $this->getCharacterGroups());
+        $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
+        $this->smarty->assign('nbcImageRoot', 'http://determinatie.nederlandsesoorten.nl/images/');
+        /* /NBC */
         
         $this->smarty->assign('taxa', $this->getTaxaInMatrix());
         
@@ -287,7 +287,10 @@ class MatrixKeyController extends Controller
         else if ($this->rHasVal('action', 'save_session_setting')) {
             
             $this->saveSessionSetting($this->requestData['setting']);
+        }
+        else if ($this->rHasVal('action', 'get_session_setting')) {
             
+            $this->smarty->assign('returnText', $this->getSessionSetting($this->requestData['name']));
         }
         else if ($this->rHasVal('action', 'get_formatted_states')) {
             
@@ -296,7 +299,15 @@ class MatrixKeyController extends Controller
         }
         else if ($this->rHasVal('action', 'get_results_nbc')) {
             
-            $results = $this->getResultsNBC();
+            if (isset($this->requestData['params']) && $this->requestData['params']['action'] == 'similar') {
+                
+                $results = $this->getSimilarNBC($this->requestData['params']);
+            }
+            else {
+                
+                $results = $this->getResultsNBC();
+            }
+            
             $this->smarty->assign('returnText', 
             json_encode(
             array(
@@ -1258,6 +1269,29 @@ class MatrixKeyController extends Controller
 
 
     /* "NBC-style" functions below */
+    private function saveSessionSetting ($setting)
+    {
+        if (!isset($setting['name']))
+            return;
+        
+        if (empty($setting['value']))
+            unset($_SESSION['app']['user']['matrix']['settings'][$setting['name']]);
+        else
+            $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
+    }
+
+
+
+    private function getSessionSetting ($name)
+    {
+        if (!isset($name) || !isset($_SESSION['app']['user']['matrix']['settings'][$name]))
+            return;
+        
+        return $_SESSION['app']['user']['matrix']['settings'][$name];
+    }
+
+
+
     private function getFormattedStates ($id)
     {
         $c = $this->getCharacteristic($id);
@@ -1333,13 +1367,140 @@ class MatrixKeyController extends Controller
 
 
 
-    private function getResultsNBC ()
+    public function getVariation ($id)
     {
+        $tv = $this->models->TaxonVariation->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'id' => $id
+            ), 
+            'columns' => 'id,taxon_id,label'
+        ));
         
-        // getting everything
+        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'variation_id' => $id
+            ), 
+            'columns' => 'id,language_id,label,label_type'
+        ));
+        
+        return $tv[0];
+    }
+
+
+
+    private function getRelatedEntities ($p)
+    {
+        $tId = isset($p['tId']) ? $p['tId'] : null;
+        $vId = isset($p['vId']) ? $p['vId'] : null;
+        $includeSelf = isset($p['includeSelf']) ? $p['includeSelf'] : false;
+        
+        $rel = null;
+        
+        if ($tId) {
+            
+            $rel = $this->models->TaxaRelations->_get(array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'taxon_id' => $tId
+                )
+            ));
+            
+            if ($includeSelf)
+                array_unshift($rel,array('relation_id'=>$tId,'ref_type'=>'taxon'));
+            
+            foreach ((array) $rel as $key => $val) {
+                
+                if ($val['ref_type'] == 'taxon') {
+                    $rel[$key]['label'] = $this->formatTaxon($this->getTaxonById($val['relation_id']));
+                }
+                else {
+                    $d = $this->getVariation($val['relation_id']);
+                    $rel[$key]['label'] = $d['label'];
+                    $rel[$key]['taxon_id'] = $d['taxon_id'];
+                }
+            }
+        }
+        else if ($vId) {
+            
+            $rel = $this->models->VariationRelations->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $vId
+                )
+            ));
+
+            if ($includeSelf)
+                array_unshift($rel,array('relation_id'=>$vId,'ref_type'=>'variation'));
+            
+            
+            foreach ((array) $rel as $key => $val) {
+                
+                if ($val['ref_type'] == 'taxon') {
+                    $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id']));
+                }
+                else {
+                    $d = $this->getVariation($val['relation_id']);
+                    $rel[$key]['label'] = $d['label'];
+                }
+            }
+        }
+        
+        return $rel;
+    }
+
+
+
+    private function createDatasetEntry ($p)
+    {
+        $val = isset($p['val']) ? $p['val'] : null;
+        $nbc = isset($p['nbc']) ? $p['nbc'] : null;
+        $label = isset($p['label']) ? $p['label'] : null;
+        $gender = isset($p['gender']) ? $p['gender'] : null;
+        $related = isset($p['related']) ? $p['related'] : null;
+        $type = isset($p['type']) ? $p['type'] : null;
+        $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
+        
+        $d = array(
+            'i' => $val['id'], 
+            'l' => $label, 
+            'y' => $type, 
+            's' => strip_tags(($type == 't' ? $val['l'] : $val['taxon']['taxon'])), 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : 'http://determinatie.nederlandsesoorten.nl/images/noimage_Boktorren%20van%20NL.gif', 
+            'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
+            'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
+            'r' => count((array) $related)
+        );
+        
+        if (isset($val['taxon_id']))
+            $d['t'] = $val['taxon_id'];
+        if (isset($gender))
+            $d['g'] = $gender;
+        
+        if ($inclRelated)
+            $d['related'] = $rel;
+        
+        return $d;
+    }
+
+
+
+    private function getCompleteDatasetNBC ($p = null)
+    {
+        $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
+        $tId = isset($p['tId']) ? $p['tId'] : false;
+        $vId = isset($p['vId']) ? $p['vId'] : false;
+        
         $var = $this->getVariationsInMatrix();
         
         foreach ((array) $var as $val) {
+            
+            if ($vId && $val['id'] != $vId)
+                continue;
             
             $nbc = $this->models->NbcExtras->_get(
             array(
@@ -1353,6 +1514,7 @@ class MatrixKeyController extends Controller
             ));
             
             $label = $val['label'];
+            
             $gender = null;
             
             if (preg_match('/\s(male|female)$/', $label, $matches)) {
@@ -1360,16 +1522,18 @@ class MatrixKeyController extends Controller
                 $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
             }
             
-            $d[] = array(
-                'i' => $val['id'], 
-                't' => $val['taxon_id'], 
-                'l' => $label, 
-                'g' => $gender, 
-                's' => strip_tags($val['taxon']['taxon']), 
-                'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : 'http://determinatie.nederlandsesoorten.nl/images/noimage_Boktorren%20van%20NL.gif', 
-                'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
-                'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null
-            );
+            $res[] = $this->createDatasetEntry(
+            array(
+                'val' => $val, 
+                'nbc' => $nbc, 
+                'label' => $label, 
+                'gender' => $gender, 
+                'related' => $this->getRelatedEntities(array(
+                    'vId' => $val['id']
+                )), 
+                'type' => 'v', 
+                'inclRelated' => $inclRelated
+            ));
             
             $tmp[$val['taxon_id']] = true;
         }
@@ -1377,6 +1541,9 @@ class MatrixKeyController extends Controller
         $taxa = $this->getTaxaInMatrix();
         
         foreach ((array) $taxa as $val) {
+            
+            if ($tId && $val['id'] != $tId)
+                continue;
             
             if (!isset($tmp[$val['id']])) {
                 
@@ -1409,14 +1576,17 @@ class MatrixKeyController extends Controller
                     'fieldAsIndex' => 'name'
                 ));
                 
-                $d[] = array(
-                    'i' => $val['id'], 
-                    'l' => $common, 
-                    's' => strip_tags($val['l']), 
-                    'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : 'http://determinatie.nederlandsesoorten.nl/images/noimage_Boktorren%20van%20NL.gif', 
-                    'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
-                    'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null
-                );
+                $res[] = $this->createDatasetEntry(
+                array(
+                    'val' => $val, 
+                    'nbc' => $nbc, 
+                    'label' => $common, 
+                    'related' => $this->getRelatedEntities(array(
+                        'tId' => $val['id']
+                    )), 
+                    'type' => 't', 
+                    'inclRelated' => $inclRelated
+                ));
             }
         }
         
@@ -1425,21 +1595,105 @@ class MatrixKeyController extends Controller
             'case' => 'i'
         ));
         
-        return $d;
-    }
-    
-    private function saveSessionSetting($setting)
-    {
-        
-        $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
-        
+        return $res;
     }
 
-    private function getSessionSetting($setting)
+
+
+    private function getResultsNBC ()
     {
-    
-        $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
-    
+        $d = $this->getCompleteDatasetNBC();
+        
+        return $d;
     }
-    
+
+
+
+    private function getSimilarNBC ($p = null)
+    {
+        if (!isset($p['type']) || !isset($p['id']))
+            return;
+        
+        if ($p['type'] == 'v') {
+            $d['vId'] = $p['id'];
+        }
+        else if ($p['type'] == 't') {
+            $d['tId'] = $p['id'];
+        }
+        else
+            return;
+        
+        $d['includeSelf'] = true;
+
+        $rel = $this->getRelatedEntities($d);
+        
+        foreach ((array) $rel as $val) {
+
+            $var = $this->getVariation($val['relation_id']);
+            $var['taxon'] = $this->gettaxonById($var['taxon_id']);
+
+            $nbc = $this->models->NbcExtras->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'ref_id' => $var['id'], 
+                    'ref_type' => 'variation'
+                ), 
+                'columns' => 'name,value', 
+                'fieldAsIndex' => 'name'
+            ));
+            
+            if ($val['ref_type'] == 'variation') {
+                
+                $label = $val['label'];
+                
+                $gender = null;
+                
+                if (preg_match('/\s(male|female)$/', $label, $matches)) {
+                    $gender = $matches[1];
+                    $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
+                }
+                
+                $res[] = $this->createDatasetEntry(
+                array(
+                    'val' => $var, 
+                    'nbc' => $nbc, 
+                    'label' => $label, 
+                    'gender' => $gender, 
+                    'type' => 'v'
+                ));
+            }
+            else {
+                
+                $c = $this->models->Commonname->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'taxon_id' => $val['id'], 
+                        'language_id' => $this->getCurrentLanguageId()
+                    )
+                ));
+                
+
+                $common = $val['l'];
+                foreach ((array) $c as $cVal) {
+                    if ($cVal['commonname'] != $val['l']) {
+                        $common = $cVal['commonname'];
+                        break;
+                    }
+                }
+                
+
+                $res[] = $this->createDatasetEntry(
+                array(
+                    'val' => $val, 
+                    'nbc' => $nbc, 
+                    'label' => $common, 
+                    'type' => 't', 
+                ));
+            }
+        }
+        
+        return $res;
+    }
 }
