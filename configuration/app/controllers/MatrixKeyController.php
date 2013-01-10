@@ -1471,6 +1471,7 @@ class MatrixKeyController extends Controller
         $related = isset($p['related']) ? $p['related'] : null;
         $type = isset($p['type']) ? $p['type'] : null;
         $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
+        $highlight = isset($p['highlight']) ? $p['highlight'] : false;
         
         $d = array(
             'i' => $val['id'], 
@@ -1480,7 +1481,8 @@ class MatrixKeyController extends Controller
             'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : 'http://determinatie.nederlandsesoorten.nl/images/noimage_Boktorren%20van%20NL.gif', 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
-            'r' => count((array) $related)
+            'r' => count((array) $related),
+        	'h' => $highlight
         );
 
         if (isset($val['taxon_id']))
@@ -1671,7 +1673,8 @@ class MatrixKeyController extends Controller
                     'nbc' => $nbc, 
                     'label' => $label, 
                     'gender' => $gender, 
-                    'type' => 'v'
+                    'type' => 'v',
+                	'highlight' => $val['id'] ==$p['id']
                 ));
             }
             else {
@@ -1713,7 +1716,8 @@ class MatrixKeyController extends Controller
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $common, 
-                    'type' => 't', 
+                    'type' => 't',
+                	'highlight' => $val['id'] ==$p['id']
                 ));
             }
         }
