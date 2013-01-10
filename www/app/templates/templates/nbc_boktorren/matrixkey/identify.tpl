@@ -33,8 +33,8 @@
 			</li>
 		</ul>
 	</div> {* /facets *}
-	
-	<div id="results" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+
+	<div id="results">
 		<div id="resultsHeader">
 			<span>
 				<div id="result-count" class="headerSelectionLabel">
@@ -45,6 +45,9 @@
 				</div>
 			</span>
 		</div>
+
+		<div id="similarSpeciesHeader" class="hidden"></div>
+		
 		<div id="results-container">
 		</div>
 		
@@ -78,23 +81,15 @@ nbcAddCharacter({literal}{{/literal}id: {$v.id},type:'{$v.type}',label:'{$cLabel
         *}{literal}}{/literal});
 {/foreach}
 {/if}
-
-	nbcGetResults();
-
-
+{if $nbcStart}
+nbcStart = {$nbcStart};
+{/if}
+nbcGetResults();
+nbcImageRoot = '{$nbcImageRoot}';
 	
 {literal}
 });
 </script>
 {/literal}
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 {include file="../shared/footer.tpl"}

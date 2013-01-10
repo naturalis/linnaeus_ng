@@ -46,7 +46,7 @@ ul.sourceContainer li a {display:inline; margin-left:2px;}
 ul.sourceContainer li strong {display:block;margin:5px 0;}
 
 /* results */
-#similarSpeciesHeader {width:960px; margin:28px 0 0 0; background-color:#eee; color:#333; position:relative; font-weight:bold; -moz-box-sizing:border-box; -webkit-box-sizing:border-box;}
+#similarSpeciesHeader {width:701px; margin:18px 0 0 18px; padding:0 0 10px 0;background-color:#eee; color:#333; position:relative; font-weight:bold; -moz-box-sizing:border-box; -webkit-box-sizing:border-box;}
 #similarSpeciesHeader label {margin:8px 0 8px 5px; width:700px; float:left; display:block;}
 #similarSpeciesHeader img {float:right; height:50px; margin:8px;}
 #similarSpeciesHeader .clearSimilarSelection {float:left; clear:left; margin:8px 0 0 5px;  color:#888;}

@@ -4,6 +4,7 @@ var nbcPerPage = 0;
 var nbcData;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
+var nbcImageRoot;
 
 function nbcToggleGroup(id) {
 
@@ -51,16 +52,18 @@ function nbcShowStates(id) {
 
 }
 
-function nbcGetResults() {
+function nbcGetResults(p) {
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : 'get_results_nbc' ,
-			time : getTimestamp()
+			action : 'get_results_nbc',
+			params : p,
+			time : getTimestamp(),
 		}),
 		success : function (data) {
+			//alert(data);return;
 			nbcData = $.parseJSON(data);
 			nbcSetPageParameters();
 			nbcClearResults();
@@ -69,6 +72,8 @@ function nbcGetResults() {
 			if (nbcData.results) nbcPrintResults();
 			if (nbcData.count) nbcPrintOverhead(); 
 			if (nbcData.count) nbcPrintPaging();
+			if (p && p.action=='similar') nbcPrintSimilarHeader();
+
 		}
 	});
 	
@@ -88,16 +93,17 @@ function nbcFormatResult(data) {
 		data.
 			i = id 
 			t = taxon id (absent when not a variation) 
+			y = type: t(axon) or v(ariation)
 			l = label 
 			g = gender (absent when not a variation)
 			s = scientific name 
 			m = image url 
 			p = photographer credit 
 			u = remote url
+			r = number of similars
     */
 
-	var scientificName = (data.s!=data.l) ? data.s : '';
-	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="http://determinatie.nederlandsesoorten.nl/images/'+data.g+'.png" title="'+data.g+'" />' : '' );
+	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' );
 
 	return '<div class="result">'+
 			'<div class="resultImageHolder">'+
@@ -107,17 +113,14 @@ function nbcFormatResult(data) {
 			'</div>'+
 			'<div>'+
 				(data.u ? '<a href="'+(data.u)+'" target="_blanc">' : '') +
-					(data.l)+'<br />'+
-					'<span class="scientificName">'+(scientificName)+'</span>'+
+					(data.s!=data.l ? data.l+'<br />' : '')+
+					'<span class="scientificName">'+(data.s)+'</span>'+
 					(data.u ? '</a>' : '')  +
 			'</div>'+
-			(data.g ? '<img class="gender" height="17" width="8" src="http://determinatie.nederlandsesoorten.nl/images/'+data.g+'.png" title="'+data.g+'" />' : '' )+
-			'<a class="similarBtn" href="" target="_self">'+
-				'gelijkende soorten'+
-			'</a>'+
+			(data.g ? '<img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
+			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');" target="_self">gelijkende soorten</a>' : '' ) +
 		'</div>';
 }
-
 
 function nbcPrintResults() {
 
@@ -149,6 +152,8 @@ function nbcPrettyPhotoInit() {
 
 function nbcClearOverhead() {
 	$('#result-count').html('');
+	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
+	$('#similarSpeciesHeader').html('');
 }
 
 function nbcClearPaging() {
@@ -176,13 +181,17 @@ function nbcPrintPaging() {
 	if (nbcLastPage > 1 && nbcCurrPage!=0)
 		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\')">&lt;&lt;</a></li>');
 	
-	for (var i=0;i<nbcLastPage;i++) {
-
-		if (i==nbcCurrPage)
-			$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
-	    else
-			$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+')">'+(i+1)+'</a></li>');
-
+	if (nbcLastPage>1) { 
+	
+		for (var i=0;i<nbcLastPage;i++) {
+	
+			if (i==nbcCurrPage)
+				$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
+		    else
+				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+')">'+(i+1)+'</a></li>');
+	
+		}
+		
 	}
 
 	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
@@ -199,10 +208,11 @@ function nbcSaveSessionSetting(name,value) {
 		data : ({
 			action : 'save_session_setting' ,
 			setting : { name : name, value: value },
+			id : null,
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			alert(data);
+			//alert(data);
 		}
 	});
 	
@@ -210,14 +220,13 @@ function nbcSaveSessionSetting(name,value) {
 
 function nbcBrowse(id) {
 
-	if (id=='n') {
+	if (id=='n')
 	    nbcStart = nbcStart+nbcPerPage;
-	} else 
-	if (id=='p') {
+	else 
+	if (id=='p')
     	nbcStart = nbcStart-nbcPerPage;
-	} else {
+	else
 		nbcStart = id * nbcPerPage;
-	}
 			
 	nbcSaveSessionSetting('nbcStart',nbcStart);
 	nbcClearResults();
@@ -225,4 +234,22 @@ function nbcBrowse(id) {
 	nbcClearPaging();
 	nbcPrintPaging();
 
+}
+
+function nbcShowSimilar(id,type) {
+	
+	nbcGetResults({action: 'similar', id: id, type: type});
+	
+}
+
+
+function nbcPrintSimilarHeader() {
+
+	var label = nbcData.results[0].l;
+
+	$('#similarSpeciesHeader').html(
+		'<label>Gelijkende soorten van: '+label+'</label>'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcGetResults();">&lt;&lt; terug</a>'
+	);
+	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
