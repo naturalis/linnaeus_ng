@@ -432,6 +432,7 @@ class SearchController extends Controller
 			        parent_id,
 					taxon as label,
 			        rank_id, 
+			        is_hybrid,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'full').'\' as fullMatch,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'contains').'\' as isMatch,
 					taxon regexp \''.$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
@@ -532,7 +533,7 @@ class SearchController extends Controller
             $l = $this->models->Language->_get(array('id'=>$val['language_id']));
 			$d[$key]['language'] = $l['language'];
 			if (isset($taxa[$val['taxon_id']]['label']))
-				$d[$key]['post_script'] = sprintf($this->translate('(common name of %s)'),$taxa[$val['taxon_id']]['label']);
+				$d[$key]['post_script'] = '(' . sprintf($this->translate('common name of %s'),$taxa[$val['taxon_id']]['label']) . ')';
 
 		}
 
