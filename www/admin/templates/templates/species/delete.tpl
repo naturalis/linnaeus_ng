@@ -29,9 +29,6 @@
 	<tr>
 		<th>{t}Rank{/t}</th>
 		<th>{t}Taxon{/t}</th>
-		{if $session.admin.project.includes_hybrids==1}
-		<th>{t}Hybrid{/t}</th>
-		{/if}
 		<th>{t}Delete{/t}</th>
 		<th>{t}Orphan{/t}</th>
 		<th>{t}Attach to{/t} {$ranks[$x].rank} "{$parent.taxon}"</th>
@@ -45,11 +42,6 @@
 		<td style="padding-right:20px;">
 			{$v.taxon}
 		</td>
-		{if $session.admin.project.includes_hybrids==1}
-		<td style="padding-right:20px;">
-			{if $v.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
-		</td>
-		{/if}
 		{if $taxa[i].level==$y}
 		<td style="text-align:center">
 			<input type="radio" checked="checked" name="child[{$v.id}]" value="delete" />

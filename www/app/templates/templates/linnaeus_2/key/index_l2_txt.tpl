@@ -38,10 +38,7 @@
 				<span>{t}Step{/t} {$v.target_number}{if $v.target_number!=$v.target}: {$v.target}{/if}</span>
 				{/if}
 			{elseif $v.res_taxon_id!=''}
-				<span class="arrow">&rarr;</span>
-				<span>{$v.target}
-					{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-				</span>
+				<span class="arrow">&rarr;</span><span>{$v.target}</span>
 			{/if}
 			</div>
 		</div>

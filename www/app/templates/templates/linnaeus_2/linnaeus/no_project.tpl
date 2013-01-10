@@ -46,7 +46,7 @@
 <div id="page-main">
 {t}Unknown or no project ID.{/t}
 <p>
-<a href="{$baseUrl}">{t}Back to Linnaeus NG root{/t}</a>
+<a href="{$baseUrl}">{t}Back to{/t} {t}Linnaeus NG root{/t}</a>
 </p>
 </div>
 

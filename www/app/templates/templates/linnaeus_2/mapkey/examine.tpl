@@ -16,17 +16,9 @@
 		<tr class="highlight">
 
 			{if $useJavascriptLinks}
-			<td class="a" onclick="goMap({$v.id})" style="width:250px;">
-				{$v.taxon}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-			</td>
+			<td class="a" onclick="goMap({$v.id})" style="width:250px;">{$v.taxon}</td>
 			{else}
-			<td style="width:250px;">
-				<a href="../mapkey/examine_species.php?id={$v.id}">
-				{$v.taxon}
-				{if $v.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
-				</a>
-			</td>
+			<td style="width:250px;"><a href="../mapkey/examine_species.php?id={$v.id}">{$v.taxon}</a></td>
 			{/if}
 
 			<td style="text-align:right">

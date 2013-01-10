@@ -107,7 +107,6 @@ class configuration
 				'cache' => $this->_appFileRoot . 'www/shared/cache'
             ), 
             'maxCategories' => 10,
-			'defaultHybridMarker' => 'X',
             'login-cookie' => array(
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
