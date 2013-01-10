@@ -5,6 +5,7 @@ var nbcData;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
+var nbcPaginate = true;
 
 function nbcToggleGroup(id) {
 
@@ -63,7 +64,7 @@ function nbcGetResults(p) {
 			time : getTimestamp(),
 		}),
 		success : function (data) {
-			//alert(data);return;
+			//alert(data);
 			nbcData = $.parseJSON(data);
 			nbcSetPageParameters();
 			nbcClearResults();
@@ -128,7 +129,7 @@ function nbcPrintResults() {
 	var s = '';
 	
 	for(var i=0;i<results.length;i++) {
-		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
+		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
 			s = s + nbcFormatResult(results[i]);
 		}
 	}
@@ -236,9 +237,25 @@ function nbcBrowse(id) {
 
 }
 
-function nbcShowSimilar(id,type) {
+function nbcSetPaginate(state) {
+
+	nbcPaginate = state;
 	
+}
+
+function nbcShowSimilar(id,type) {
+
+	nbcSetPaginate(false);
 	nbcGetResults({action: 'similar', id: id, type: type});
+	nbcSaveSessionSetting('nbcSimilar',[id,type]);
+	
+}
+
+function nbcCloseSimilar() {
+
+	nbcSetPaginate(true);
+	nbcGetResults();
+	nbcSaveSessionSetting('nbcSimilar');
 	
 }
 
@@ -249,7 +266,7 @@ function nbcPrintSimilarHeader() {
 
 	$('#similarSpeciesHeader').html(
 		'<label>Gelijkende soorten van: '+label+'</label>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcGetResults();">&lt;&lt; terug</a>'
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar()">&lt;&lt; terug</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
