@@ -14,10 +14,8 @@
 			{t}Parent taxon: {/t}
 		</td>
 		<td>		
-	<select name="parent_id" id="parent-id" onchange="taxonGetRankByParent()">
-	{if $taxa|@count==0 || $data.parent_id==''}
+	<select name="parent_id" id="parent-id">
 	<option value="-1">{t}No parent{/t}</option>
-	{/if}
 	{foreach from=$taxa key=k item=v}
 	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
 		<option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
@@ -39,7 +37,7 @@
 			{t}Rank:{/t}
 		</td>
 		<td colspan="2">
-			<select name="rank_id" id="rank-id">
+			<select name="rank_id" id="rank-id" onchange="taxonGetFormattedPreview()">
 			{foreach item=v from=$projectRanks}
 				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
 				<option value="{$v.id}" {if $data.rank_id==$v.id}selected="selected"{/if}>{$v.rank}</option>
@@ -107,6 +105,8 @@
 	</tr>
 </table>
 </form>
+{else}
+hoer!
 {/if}
 </div>
 
