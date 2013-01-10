@@ -16,7 +16,6 @@
     };
 })(jQuery);
 
-
 function addSlashes(str) {
 	str=str.replace(/\\/g,'\\\\');
 	str=str.replace(/\'/g,'\\\'');
