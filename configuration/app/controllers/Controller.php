@@ -754,7 +754,6 @@ class Controller extends BaseClass
             $_SESSION['app']['project'][$key] = $val;
         }
         
-        $_SESSION['app']['project']['hybrid_marker'] = $this->generalSettings['hybridMarker'];
         $_SESSION['app']['project']['filesys_name'] = strtolower(
         preg_replace(array(
             '/\s/', 
@@ -2688,23 +2687,24 @@ class Controller extends BaseClass
         $p = $this->getCurrentProjectId();
         
         if ($p) {
-        	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] = 'www/shared/media/project/' . $this->getProjectFSCode($p);
-        
-        }
+        	$paths[$this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p)] = 
+        	    'www/shared/media/project/' . $this->getProjectFSCode($p);
+         }
         
         foreach ((array) $paths as $val => $display) {
             
-            if (!file_exists($val) || !is_writable($val)) {
+            if ((!file_exists($val) || !is_writable($val)) && !mkdir($val)) {
                  $fixPaths[] = $display;
             }
+            
         }
         
         if (isset($fixPaths)) {
         
-        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot process until this is corrected:</p>';
+        	echo '<p>Some required paths do not exist or are not writeable. 
+        	    Linnaeus NG cannot process until this is corrected:</p>';
         
         	foreach ($fixPaths as $message) {
-        	
         		echo $message . '<br>';
         	}
         	
