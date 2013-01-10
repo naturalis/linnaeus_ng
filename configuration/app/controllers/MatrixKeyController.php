@@ -166,9 +166,10 @@ class MatrixKeyController extends Controller
         
         /* NBC */
         $this->smarty->assign('groups', $this->getCharacterGroups());
-        $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
         $this->smarty->assign('nbcImageRoot', 'http://determinatie.nederlandsesoorten.nl/images/');
-        /* /NBC */
+		$this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
+		$this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
+		/* /NBC */
         
         $this->smarty->assign('taxa', $this->getTaxaInMatrix());
         
@@ -1410,7 +1411,10 @@ class MatrixKeyController extends Controller
             ));
             
             if ($includeSelf)
-                array_unshift($rel,array('relation_id'=>$tId,'ref_type'=>'taxon'));
+                array_unshift($rel, array(
+                    'relation_id' => $tId, 
+                    'ref_type' => 'taxon'
+                ));
             
             foreach ((array) $rel as $key => $val) {
                 
@@ -1433,11 +1437,14 @@ class MatrixKeyController extends Controller
                     'variation_id' => $vId
                 )
             ));
-
+            
             if ($includeSelf)
-                array_unshift($rel,array('relation_id'=>$vId,'ref_type'=>'variation'));
+                array_unshift($rel, array(
+                    'relation_id' => $vId, 
+                    'ref_type' => 'variation'
+                ));
             
-            
+
             foreach ((array) $rel as $key => $val) {
                 
                 if ($val['ref_type'] == 'taxon') {
@@ -1475,7 +1482,7 @@ class MatrixKeyController extends Controller
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related)
         );
-        
+
         if (isset($val['taxon_id']))
             $d['t'] = $val['taxon_id'];
         if (isset($gender))
@@ -1624,28 +1631,31 @@ class MatrixKeyController extends Controller
             return;
         
         $d['includeSelf'] = true;
-
+        
         $rel = $this->getRelatedEntities($d);
         
+
         foreach ((array) $rel as $val) {
-
-            $var = $this->getVariation($val['relation_id']);
-            $var['taxon'] = $this->gettaxonById($var['taxon_id']);
-
-            $nbc = $this->models->NbcExtras->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'ref_id' => $var['id'], 
-                    'ref_type' => 'variation'
-                ), 
-                'columns' => 'name,value', 
-                'fieldAsIndex' => 'name'
-            ));
             
             if ($val['ref_type'] == 'variation') {
                 
+                $variation = $this->getVariation($val['relation_id']);
+                $val['taxon'] = $this->getTaxonById($variation['taxon_id']);
+                $val['taxon_id'] = $variation['taxon_id'];
+                
+                $nbc = $this->models->NbcExtras->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'ref_id' => $val['relation_id'], 
+                        'ref_type' => 'variation'
+                    ), 
+                    'columns' => 'name,value', 
+                    'fieldAsIndex' => 'name'
+                ));
+                
                 $label = $val['label'];
+                $val['id'] = $val['relation_id'];
                 
                 $gender = null;
                 
@@ -1654,9 +1664,10 @@ class MatrixKeyController extends Controller
                     $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
                 }
                 
+                
                 $res[] = $this->createDatasetEntry(
                 array(
-                    'val' => $var, 
+                    'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $label, 
                     'gender' => $gender, 
@@ -1664,12 +1675,15 @@ class MatrixKeyController extends Controller
                 ));
             }
             else {
+
+                $taxon = $this->gettaxonById($val['relation_id']);
+                $val['l'] = $taxon['label'];
                 
                 $c = $this->models->Commonname->_get(
                 array(
                     'id' => array(
                         'project_id' => $this->getCurrentProjectId(), 
-                        'taxon_id' => $val['id'], 
+                        'taxon_id' => $taxon['id'], 
                         'language_id' => $this->getCurrentLanguageId()
                     )
                 ));
@@ -1683,7 +1697,17 @@ class MatrixKeyController extends Controller
                     }
                 }
                 
-
+                $nbc = $this->models->NbcExtras->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'ref_id' => $val['relation_id'], 
+                        'ref_type' => 'variation'
+                    ), 
+                    'columns' => 'name,value', 
+                    'fieldAsIndex' => 'name'
+                ));
+                
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 

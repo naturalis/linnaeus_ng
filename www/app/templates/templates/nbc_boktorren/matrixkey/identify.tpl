@@ -81,11 +81,15 @@ nbcAddCharacter({literal}{{/literal}id: {$v.id},type:'{$v.type}',label:'{$cLabel
         *}{literal}}{/literal});
 {/foreach}
 {/if}
+nbcImageRoot = '{$nbcImageRoot}';
 {if $nbcStart}
 nbcStart = {$nbcStart};
 {/if}
+{if $nbcSimilar}
+nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
+{else}
 nbcGetResults();
-nbcImageRoot = '{$nbcImageRoot}';
+{/if}
 	
 {literal}
 });
