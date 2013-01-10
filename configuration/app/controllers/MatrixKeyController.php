@@ -284,6 +284,11 @@ class MatrixKeyController extends Controller
             $this->compareSpeciesStore($this->requestData['id']);
         }
         // "nbc-type" functions below
+        else if ($this->rHasVal('action', 'save_session_setting')) {
+            
+            $this->saveSessionSetting($this->requestData['setting']);
+            
+        }
         else if ($this->rHasVal('action', 'get_formatted_states')) {
             
             $this->getFormattedStates($this->requestData['id']);
@@ -1422,4 +1427,19 @@ class MatrixKeyController extends Controller
         
         return $d;
     }
+    
+    private function saveSessionSetting($setting)
+    {
+        
+        $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
+        
+    }
+
+    private function getSessionSetting($setting)
+    {
+    
+        $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
+    
+    }
+    
 }

@@ -71,7 +71,6 @@ function nbcGetResults() {
 			if (nbcData.count) nbcPrintPaging();
 		}
 	});
-
 	
 }
 
@@ -192,6 +191,23 @@ function nbcPrintPaging() {
 	$("#paging-footer").html($("#paging-header").html());
 }
 
+function nbcSaveSessionSetting(name,value) {
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'save_session_setting' ,
+			setting : { name : name, value: value },
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			alert(data);
+		}
+	});
+	
+}
+
 function nbcBrowse(id) {
 
 	if (id=='n') {
@@ -203,6 +219,7 @@ function nbcBrowse(id) {
 		nbcStart = id * nbcPerPage;
 	}
 			
+	nbcSaveSessionSetting('nbcStart',nbcStart);
 	nbcClearResults();
 	nbcPrintResults();
 	nbcClearPaging();
