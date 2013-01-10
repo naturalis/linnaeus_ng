@@ -188,8 +188,7 @@ class SpeciesController extends Controller
             
             $this->smarty->assign('headerTitles', 
             array(
-                'title' => $taxon['label'] . ($taxon['is_hybrid'] == '1' ? '<span class="hybrid-marker" title="' . $this->translate('hybrid') . '">' .
-                 (isset($_SESSION['app']['project']['hybrid_marker']) ? $_SESSION['app']['project']['hybrid_marker'] : 'X') . '</span>' : '')
+                'title' => $taxon['label']
             ));
             
             //$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);

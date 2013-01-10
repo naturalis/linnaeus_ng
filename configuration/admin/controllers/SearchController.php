@@ -1366,12 +1366,12 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => $this->translate('Dichotomous key steps'),
+					'label' => $this->translate('Dichotomous key') . ' ' . $this->translate('steps'),
 					'data' => $steps,
 					'numOfResults' => $hitCountSteps
 				),
 				array(
-					'label' => $this->translate('Dichotomous key choices'),
+					'label' => $this->translate('Dichotomous key') . ' ' . $this->translate('choices'),
 					'data' => $choices,
 					'numOfResults' => $hitCountChoices
 				)

@@ -6,7 +6,7 @@
 {section name=i loop=$taxa}
 <li>
 {section name=j loop=$taxa[i].list_level-$taxa[0].list_level}.{/section}
- {$taxa[i].taxon}{if $taxa[i].is_hybrid==1} x{/if}</li>
+ {$taxa[i].taxon}</li>
 {/section}
 </ul>
 </div>

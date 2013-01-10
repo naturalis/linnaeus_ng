@@ -35,7 +35,7 @@
 		{if $showBackToSearch && $session.app.user.search.hasSearchResults}
 		<hr style="height:1px;color:#999" />
 		<p>
-		<span class="back-link" onclick="window.open('../search/redosearch.php','_self')">{t}back to search results{/t}</span>
+		<span class="back-link" onclick="window.open('../search/redosearch.php','_self')">{t}Back to{/t} {t}search results{/t}</span>
 		</p>
 		{/if}
 

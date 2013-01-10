@@ -9,7 +9,7 @@
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
 			{if $v.type=='tx'}
-			<option value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
+			<option value="{$v.id}">{$v.l}</option>
 			{/if}
 			{/foreach}
 			</select>
@@ -18,7 +18,7 @@
 			<option disabled="disabled" selected="selected" value="">{t}Select a taxon{/t}</option>
 			{foreach from=$taxa key=k item=v}
 			{if $v.type=='tx'}
-			<option value="{$v.id}">{$v.l}{if $v.h==1} {$session.app.project.hybrid_marker}{/if}</option>
+			<option value="{$v.id}">{$v.l}</option>
 			{/if}
 			{/foreach}
 			</select>

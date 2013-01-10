@@ -12,7 +12,6 @@
 				{else}
 				<a href="../species/taxon.php?id={$v.taxon.id}">{$v.taxon.label}</a>
 				{/if}
-				{if $v.taxon.is_hybrid==1}<span class="hybrid-marker" title="{t}hybrid{/t}">{$session.app.project.hybrid_marker}</span>{/if}
 			</div>
 		{/foreach}
 		</div>
