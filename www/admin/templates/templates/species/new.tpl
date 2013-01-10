@@ -41,7 +41,7 @@
 			{t}Rank:{/t}
 		</td>
 		<td colspan="2">
-			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel()">
+			<select name="rank_id" id="rank-id" onchange="taxonChangeSubmitButtonLabel();taxonGetFormattedPreview();">
 			{assign var=firstLower value=true}
 			{foreach item=v from=$projectRanks}
 				{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa && $v.lower_taxon==1)}
