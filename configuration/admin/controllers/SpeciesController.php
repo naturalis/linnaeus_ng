@@ -442,8 +442,7 @@ class SpeciesController extends Controller
 	        
 	        $this->smarty->assign('projectRanks', $pr);
 	        
-	        
-            $this->_newGetTaxonTree();
+            $this->newGetTaxonTree();
             
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
@@ -554,13 +553,11 @@ class SpeciesController extends Controller
                         'rank_id' => $this->requestData['rank_id'], 
                         'is_hybrid' => $isHybrid
                     ));
-                    
+
                     $this->reOrderTaxonTree();
                     
                     if ($this->rHasVal('next', 'main'))
                         $this->redirect('taxon.php?id=' . $this->requestData['id']);
-                    
-                    $this->_newGetTaxonTree();
                     
                     $d = $this->getTaxonById();
                     
@@ -767,6 +764,8 @@ class SpeciesController extends Controller
         }
         
         $pr = $this->newGetProjectRanks();
+
+        $this->newGetTaxonTree();
         
         if (count((array) $pr) == 0) {
             
@@ -774,14 +773,12 @@ class SpeciesController extends Controller
         }
         else {
             
-            $this->_newGetTaxonTree();
-            
             $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
             
             // save
             if ($this->rHasVal('taxon') && $this->rHasVal('rank_id') && $this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
                 
-                $isHybrid = $this->requestData['isHybrid'];
+                $isHybrid = $this->requestData['is_hybrid'];
                 
                 $parentId = ((isset($this->requestData['id']) && $this->requestData['id'] == $this->requestData['parent_id']) || $isEmptyTaxaList || $this->requestData['parent_id'] == '-1' ? null : $this->requestData['parent_id']);
                 
@@ -890,9 +887,12 @@ class SpeciesController extends Controller
                     if ($this->rHasVal('next', 'main'))
                         $this->redirect('taxon.php?id=' . $newId);
                     
-                    $this->_newGetTaxonTree();
+                    $d = $this->getTaxonById($newId);
                     
-                    $this->addMessage(sprintf($this->translate('"%s" saved.'), $newName));
+                    $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
+                    
+                    $this->smarty->assign('data', $d);
+                
                 }
                 else {
                     
