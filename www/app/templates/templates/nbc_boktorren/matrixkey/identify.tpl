@@ -66,7 +66,7 @@ $(document).ready(function(){
 {if $characteristics}
 {foreach from=$characteristics item=v}
 {assign var=foo value="|"|explode:$v.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$v.label}{assign var=cText value=''}{/if}
-storeCharacter({literal}{{/literal}id: {$v.id},type:'{$v.type}',label:'{$cLabel|addslashes}',text:'{$cText|addslashes|trim}'{*
+nbcAddCharacter({literal}{{/literal}id: {$v.id},type:'{$v.type}',label:'{$cLabel|addslashes}',text:'{$cText|addslashes|trim}'{*
 				states : [{if $v.states && $v.type!='range'}{foreach from=$v.states item=s key=k}
 			{literal}{{/literal}
 			id:{$s.id},
