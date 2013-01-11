@@ -163,7 +163,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('storedShowState', $this->showStateRecall());
         
         $this->smarty->assign('characteristics', $this->getCharacteristics());
-        
+//q($this->getCharacteristics(),1);
         /* NBC */
         $this->smarty->assign('groups', $this->getCharacterGroups());
         $this->smarty->assign('nbcImageRoot', 'http://determinatie.nederlandsesoorten.nl/images/');
@@ -385,24 +385,17 @@ class MatrixKeyController extends Controller
     public function nbcAction ()
     {
 
-
-        q($this->requestData);
-        
-        
         // anatomy of a selected element: type[f,c]:character id:state id
-        
+        $c = $this->getCharacteristic($this->requestData['char']);
+        $state = 
+	        ($c['type']=='media' || $c['type']=='text' ? 'c' : 'f').':'.
+	        $this->requestData['char'].':'.
+	        $this->requestData['state'];
 
-//        $this->stateMemoryStore($this->requestData['id']);
-        
-//		$this->getTaxaScores($this->requestData['id'],false);
+		$taxa = $this->getTaxaScores($state,false);
+		q($state);
+		q($taxa);
 
-        //c:857:11676
-        
-        
-        /*
-		$this->requestData['char']
-		$this->requestData['range']
-		*/
     }
 
 
@@ -500,9 +493,8 @@ class MatrixKeyController extends Controller
         
         return $taxa;
     }
-
-
-
+   
+ 
     private function checkMatrixIdOverride ()
     {
         if ($this->rHasVal('mtrx'))
@@ -806,6 +798,8 @@ class MatrixKeyController extends Controller
         $taxa = $this->getTaxaInMatrix();
         $mtcs = $this->getMatricesInMatrix();
         
+$vars = $this->getVariationsInMatrix();
+        
         if ($states == -1)
             return array_merge((array) $taxa, (array) $mtcs);
         
@@ -839,9 +833,6 @@ class MatrixKeyController extends Controller
         ));
         
         //array_walk($results, create_function('&$v', '$v["s"] = $v["s"]."%";'));	
-        
-
-
 
         return $results;
     }
@@ -947,7 +938,7 @@ class MatrixKeyController extends Controller
                 $c[] = $d;
             }
         }
-        
+
         return isset($c) ? $c : null;
     }
 
