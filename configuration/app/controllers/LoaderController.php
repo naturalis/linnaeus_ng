@@ -34,7 +34,7 @@ class LoaderController extends Controller
 
 	public $cssToLoad = array('basics.css', 'linnaeus.css', 'splash.css');
 	public $jsToLoad = array('all' => array('main.js', 'dialog/jquery.modaldialog.js'));
-
+	
     public function __construct($p=null)
     {
 

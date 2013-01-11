@@ -56,9 +56,6 @@
 	</div>
 </div>
 
-
-
-
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
@@ -67,7 +64,7 @@ $(document).ready(function(){
 	storeCharacter(
 		{$v.id},
 		'{$v.label|addslashes}',
-		'{$v.type.name}',
+		'{$v.type}',
 		{literal}{{/literal}
 			'alphabet':'{$v.sort_by.alphabet}',
 			'separationCoefficient':{$v.sort_by.separationCoefficient},
