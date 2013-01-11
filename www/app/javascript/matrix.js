@@ -38,6 +38,7 @@ function storeCharacter(id,label,type,sorts) {
 
 	characters[characters.length] = {id:id,label:label,type:type,sorts:sorts};
 
+
 }
 
 function sortfunction(a,b){
@@ -124,13 +125,12 @@ function goState() {
 	$('#info-footer').html(null);
 	
 	var title = ' ';
-	
-	switch (state.type.name) {
+
+	switch (state.type) {
 		case 'text':
 			var val = state.text;
 			break;
 		case 'media':
-		
 			if (state.img_dimensions==null) break;
 			
 			var c = getCharacter(state.characteristic_id);
@@ -454,7 +454,7 @@ function getScores(action) {
 
 	}
 	
-	//alert(opt);
+	alert(opt);
 	
 	getData('get_taxa',opt,'fillScores');
 
