@@ -1759,7 +1759,7 @@ class Controller extends BaseClass
 
 
 
-    public function _newGetTaxonTree ($p = null)
+    private function _newGetTaxonTree ($p = null)
     {
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();

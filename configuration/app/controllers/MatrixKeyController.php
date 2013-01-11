@@ -384,6 +384,20 @@ class MatrixKeyController extends Controller
 
     public function nbcAction ()
     {
+
+
+        q($this->requestData);
+        
+        
+        // anatomy of a selected element: type[f,c]:character id:state id
+        
+
+//        $this->stateMemoryStore($this->requestData['id']);
+        
+//		$this->getTaxaScores($this->requestData['id'],false);
+
+        //c:857:11676
+        
         
         /*
 		$this->requestData['char']
@@ -674,7 +688,7 @@ class MatrixKeyController extends Controller
         // go through all states that the user has chosen
         foreach ((array) $states as $sKey => $sVal) {
             
-            // format [f (rang or distro)|c (other)]:[charid]:[value]([: + or - times standard dev (distro only)])
+            // format [f (range or distro)|c (other)]:[charid]:[value]([: + or - times standard dev (distro only)])
             $d = explode(':', $sVal);
             
             $charId = isset($d[1]) ? $d[1] : null;

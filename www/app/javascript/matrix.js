@@ -26,7 +26,7 @@ function getData(action,id,postFunction) {
 			obj = $.parseJSON(data);
 			if (postFunction) eval(postFunction+'(obj,id)');
 		}
-	})
+	});
 	
 }
 
@@ -454,6 +454,8 @@ function getScores(action) {
 
 	}
 	
+	//alert(opt);
+	
 	getData('get_taxa',opt,'fillScores');
 
 }
@@ -659,7 +661,7 @@ function showCharacterSort() {
 			html = html + '<p class="row" onclick="sortCharacters(\''+characterOrders[i][0]+'\');closeDialog();">'+characterOrders[i][1]+'</p>';
 	}
 
-	html += '</div>'
+	html += '</div>';
 	showDialog(_('Sort characters by:'),html);
 
 }
