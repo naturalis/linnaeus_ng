@@ -454,7 +454,7 @@ function getScores(action) {
 
 	}
 	
-	alert(opt);
+	//alert(opt);
 	
 	getData('get_taxa',opt,'fillScores');
 
