@@ -434,6 +434,7 @@ class SpeciesController extends Controller
             
             $this->addMessage($this->translate('No ranks have been defined.'));
         }
+        
         else 
         if (!$this->doLockOutUser($this->requestData['id'], true)) {
 
@@ -470,6 +471,46 @@ class SpeciesController extends Controller
                 $newName = $this->fixNameCasting($newName);
                 
                 $hasErrorButCanSave = null;
+                
+                // Test if children have to be renamed; 
+                // only applies to genus and below and when name != newName
+                $dummy = $this->models->ProjectRank->_get(array(
+                    'id' => array(
+                        'id' => $this->requestData['rank_id'],
+                        'project_id' => $this->getCurrentProjectId()
+                    )
+                ));
+
+                if ($dummy[0]['rank_id'] >= GENUS_RANK_ID && $data['taxon'] != $newName) {
+
+                    $this->getTaxonTree(array('pId' => $this->requestData['id']));
+                    
+                    $children = isset($this->treeList) ? $this->treeList : false;
+                    
+                    $listOfChangedNames = '';
+                    
+                    if (!empty($children)) {
+                        
+                        foreach ($children as $child) {
+                            
+                            $listOfChangedNames .= $child['taxon'] . ' &rarr; ' . 
+                                preg_replace('/^('.$data['taxon'].')\b/', $newName, $child['taxon']). '<br>';
+                            
+                        }
+                        
+                    }
+                    
+                    if (!empty($listOfChangedNames)) {
+                    
+                        $this->addError($this->translate('The following children will be renamed as well:') . 
+                            '<br>' . substr($listOfChangedNames, 0, -4));
+                        $hasErrorButCanSave = true;
+                        
+                    }
+                
+                }
+                
+                
                 
                 //checks
                 /* NON LETHAL */
@@ -554,6 +595,21 @@ class SpeciesController extends Controller
                         'is_hybrid' => $isHybrid
                     ));
 
+                    if (!empty($children)) {
+                        
+                        foreach ($children as $child) {
+                            
+                            $this->models->Taxon->save(
+                            array(
+                                'id' => $child['id'], 
+                                'project_id' => $this->getCurrentProjectId(), 
+                                'taxon' => preg_replace('/^('.$data['taxon'].')\b/', $newName, $child['taxon'])
+                            ));
+                            
+                        }
+                        
+                    }
+                    
                     $this->reOrderTaxonTree();
                     
                     if ($this->rHasVal('next', 'main'))
@@ -616,134 +672,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    public function editActionORG ()
-    {
-        $this->checkAuthorisation();
-        
-        if (!$this->rHasId())
-            $this->redirect('new.php');
-        
-        if (!$this->userHasTaxon($this->requestData['id']))
-            $this->redirect('index.php');
-        
-        $data = $this->getTaxonById();
-        
-        $pr = $this->newGetProjectRanks(array(
-            'includeLanguageLabels' => true, 
-            'idsAsIndex' => true
-        ));
-        
-        if ($this->maskAsHigherTaxa()) {
-            
-            $this->setPageName(sprintf($this->translate('Editing %s "%s"'), strtolower($pr[$data['rank_id']]['rank']), $data['taxon']));
-        }
-        else {
-            
-            $this->setPageName(sprintf($this->translate('Editing "%s"'), $data['taxon']));
-        }
-        
-        if (count((array) $pr) == 0) {
-            
-            $this->addMessage($this->translate('No ranks have been defined.'));
-        }
-        else 
-
-        if (!$this->doLockOutUser($this->requestData['id'], true)) {
-            
-            $this->newGetTaxonTree();
-            
-            $isEmptyTaxaList = !isset($this->treeList) || count((array) $this->treeList) == 0;
-            
-            if ($this->rHasId() && $this->rHasVal('taxon') && $this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
-                
-                $isHybrid = $this->rHasVal('is_hybrid');
-                
-                if ($this->requestData['id'] == $this->requestData['parent_id'])
-                    $parentId = $this->requestData['org_parent_id'];
-                else if ($isEmptyTaxaList || $this->requestData['parent_id'] == '-1')
-                    $parentId = null;
-                else
-                    $parentId = $this->requestData['parent_id'];
-                
-                if ($this->isTaxonNameUnique($this->requestData['taxon'], $this->requestData['id'])) {
-                    
-                    if ($this->canParentHaveChildTaxa($parentId) || $isEmptyTaxaList) {
-                        
-                        if (!$isHybrid || ($isHybrid && $this->canRankBeHybrid($this->requestData['rank_id']))) {
-                            
-                            $this->models->Taxon->save(
-                            array(
-                                'id' => $this->requestData['id'], 
-                                'project_id' => $this->getCurrentProjectId(), 
-                                'taxon' => $this->requestData['taxon'], 
-                                'author' => ($this->requestData['author'] ? $this->requestData['author'] : null), 
-                                'parent_id' => $parentId, 
-                                'rank_id' => $this->requestData['rank_id'], 
-                                'is_hybrid' => $this->requestData['is_hybrid']
-                            ));
-                            
-                            $this->reOrderTaxonTree();
-                            
-                            //$this->addMessage(sprintf($this->translate('"%s" saved.'),$this->requestData['taxon']));
-                            
-
-
-
-                            //$this->setPageName(sprintf($this->translate('Editing "%s"'),$this->requestData['taxon']));
-                            
-
-
-
-                            //unset($data['taxon']);
-                            unset($_SESSION['admin']['species']['usertaxa']);
-                            
-                            $this->redirect('taxon.php?id=' . $this->requestData['id']);
-                        }
-                        else {
-                            
-                            $this->addError($this->translate('Rank cannot be hybrid.'));
-                        }
-                    }
-                    else {
-                        
-                        $this->addError($this->translate('Parent cannot have child taxa.'));
-                    }
-                }
-                else {
-                    
-                    $this->addError($this->translate('Taxon name already in database.'));
-                }
-            }
-            
-            $this->smarty->assign('allowed', true);
-            
-            if (isset($data))
-                $this->smarty->assign('data', $data);
-            
-            $this->smarty->assign('projectRanks', $pr);
-            
-            if (isset($this->treeList))
-                $this->smarty->assign('taxa', $this->treeList);
-        }
-        else {
-            
-            $this->smarty->assign('taxon', array(
-                'id' => -1
-            ));
-            
-            $this->addError($this->translate('Taxon is already being edited by another editor.'));
-        }
-        
-        $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
-            'higherOnly' => $this->maskAsHigherTaxa()
-        )));
-        $this->smarty->assign('navCurrentId', $data['id']);
-        
-        $this->printPage();
-    }
-
-
+       
 
     /**
      * Add new taxon
@@ -943,8 +872,6 @@ class SpeciesController extends Controller
      */
     public function taxonAction ()
     {
-        
-
         //        $this->checkAuthorisation();
         $this->setBreadcrumbIncludeReferer(array(
             'name' => $this->translate('Taxon list'), 
@@ -953,10 +880,7 @@ class SpeciesController extends Controller
         
         if ($this->rHasId()) {
             // get existing taxon
-            
-
-
-
+ 
             if (!$this->userHasTaxon($this->requestData['id']))
                 $this->redirect('index.php');
                 

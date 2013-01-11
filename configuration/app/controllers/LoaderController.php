@@ -84,7 +84,7 @@ class LoaderController extends Controller
 		$this->printPage('../linnaeus/splash');
 
     }
-
+    
 	private function doPreload()
 	{
 

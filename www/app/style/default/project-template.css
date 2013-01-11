@@ -1,3 +1,21 @@
+/* Splash screen
+
+	To change the splash screen for a specific project, create a folder in www/app/media/project.
+	If you have created a folder called 'my_project' and a custom icon 'splash.png' with the dimensions
+	600 x 300 px, the correct css would be 
+
+	#splash {
+		width: 600px;
+		height: 300px;
+		background-image:url('../../media/project/my_project/splash.png');
+	}
+
+*/
+
+#splash {
+}
+
+
 /* Regular module icons 
 
 	To change the icons for a specific project, create a folder in www/app/media/project.
