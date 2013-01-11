@@ -887,6 +887,8 @@ class SpeciesController extends Controller
                     if ($this->rHasVal('next', 'main'))
                         $this->redirect('taxon.php?id=' . $newId);
                     
+                    $this->newGetTaxonTree();
+                    
                     $d = $this->getTaxonById($newId);
                     
                     $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
