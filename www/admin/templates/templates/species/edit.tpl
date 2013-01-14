@@ -18,7 +18,7 @@
 	<option value="-1">{t}No parent{/t}</option>
 	{foreach from=$taxa key=k item=v}
 	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-		<option value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
+		<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
 		{section name=foo loop=$v.level-$taxa[0].level}
 		&nbsp;
 		{/section}		

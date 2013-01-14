@@ -1054,7 +1054,6 @@ class ImportNBCController extends Controller
                                 'state_id' => $mData['states'][$sKey][$state], 
                                 'taxon_id' => $tVal['lng_id']
                             ));
-                            
                             $_SESSION['admin']['system']['import']['loaded']['connections']++;
                         }
                     }

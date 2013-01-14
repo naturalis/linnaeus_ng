@@ -1,7 +1,6 @@
 <div style="padding:0px 10px 0px 10px;">
 
 	<form id="theForm" method="post" action="identify.php">
-	<input type="hidden" id="char-id" name="char" value="{$c.id}" />
 	<input type="hidden" id="state-id" name="state" value="" />
 	
 	<p>
@@ -9,7 +8,7 @@
 		<span id="state-header">{$cLabel}:</span>{if $cText}<br />
 		{$cText}{/if}
 	</p>
-
+	
 	<p>
 	{if $c.type=='range'}
 		<input id="range-value" value="range" type="text" value="">&nbsp;<a href="#">waarde wissen</a>
@@ -23,7 +22,7 @@
 						<img 
 							class="state-image" 
 							src="{$session.app.project.urls.projectMedia}{$v.file_name}" 
-							onclick="$('#state-id').val({$v.id});$('#theForm').submit();" 
+							onclick="$('#state-id').val('{$c.prefix}:{$c.id}:{$v.id}');$('#theForm').submit();" 
 						/><br /><br />
 						{$v.label}
 					</div>

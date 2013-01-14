@@ -42,7 +42,6 @@ function nbcShowStates(id) {
 			success : function (data) {
 				//alert(data);
 				showDialog(c.label,data);
-
 				$('#dialog').css('width', (c.type=='media' ? 610 : 425));
 				$.modaldialog.reinitPosition({top:175});
 
