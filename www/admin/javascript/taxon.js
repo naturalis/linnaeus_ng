@@ -1525,14 +1525,14 @@ function taxonBlankOutRanks() {
 	
 	$('#rank-id > option').each(function(){
 
-		$(this).attr('disabled',false);		
+		$(this).attr('disabled',false);
 
 	});
 	
 	var d = $('#parent-id :selected').attr('root_rank_id');
-	
+alert(d);
 	if (d==undefined) return;
-	
+
 	$('#rank-id > option').each(function(){
 		if ($(this).attr('root_rank_id')<=d) $(this).attr('disabled',true);
 	});

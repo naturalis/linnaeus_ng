@@ -142,6 +142,9 @@ taxonStoreCopyableTaxa('{$prev}');
 {/if}
 {assign var=prev value=$v.id}
 {/foreach}
+taxonGetRankByParent();
+taxonBlankOutRanks();
+
 {literal}
 });
 </script>

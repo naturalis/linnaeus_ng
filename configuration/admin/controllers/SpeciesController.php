@@ -822,7 +822,7 @@ class SpeciesController extends Controller
                     
                     $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
                     
-                    $this->smarty->assign('data', $d);
+                    $this->smarty->assign('data', array('parent_id' => $d['parent_id']));
                 
                 }
                 else {
