@@ -52,6 +52,18 @@ function nbcShowStates(id) {
 
 }
 
+function nbcProcessResults() {
+	
+	nbcSetPageParameters();
+	nbcClearResults();
+	nbcClearOverhead();
+	nbcClearPaging();
+	if (nbcData.results) nbcPrintResults();
+	if (nbcData.count) nbcPrintOverhead(); 
+	if (nbcData.count) nbcPrintPaging();	
+
+}
+
 function nbcGetResults(p) {
 
 	allAjaxHandle = $.ajax({
@@ -65,13 +77,7 @@ function nbcGetResults(p) {
 		success : function (data) {
 			//alert(data);
 			nbcData = $.parseJSON(data);
-			nbcSetPageParameters();
-			nbcClearResults();
-			nbcClearOverhead();
-			nbcClearPaging();
-			if (nbcData.results) nbcPrintResults();
-			if (nbcData.count) nbcPrintOverhead(); 
-			if (nbcData.count) nbcPrintPaging();
+			nbcProcessResults();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
 
 		}

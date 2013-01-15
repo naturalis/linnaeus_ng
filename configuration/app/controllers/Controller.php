@@ -430,7 +430,8 @@ class Controller extends BaseClass
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'id' => $id
-                )
+                ), 
+            	'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
             ));
             
             $t[0]['label'] = $this->formatTaxon($t[0]);
