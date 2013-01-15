@@ -2694,7 +2694,7 @@ class Controller extends BaseClass
         
         foreach ((array) $paths as $val => $display) {
             
-            if ((!file_exists($val) || !is_writable($val)) && !mkdir($val)) {
+            if ((!file_exists($val) || !is_writable($val)) && @!mkdir($val)) {
                  $fixPaths[] = $display;
             }
             
