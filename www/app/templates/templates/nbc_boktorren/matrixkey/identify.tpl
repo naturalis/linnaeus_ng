@@ -1,25 +1,40 @@
 {include file="../shared/header.tpl"}
-
+<form id="form2" method="post" action="identify.php">
+<input type="hidden" id="action2" name="action" value="" />
+<input type="hidden" id="id2" name="id" value="" />
+</form>
 <div id="content">
 	<div id="facets">
 		<ul class="facetCategories">
 		{foreach from=$groups item=v}
+			{assign var=openGroup value=false}
 			<li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id})">{$v.label}</a>
 				<ul id="character-group-{$v.id}" class="facets hidden">
 					{foreach from=$v.chars item=c}
 					{assign var=foo value="|"|explode:$c.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$c.label}{assign var=cText value=''}{/if}
 					<li><a class="facetLink" href="#" onclick="nbcShowStates({$c.id})">{$cLabel}</a>
-						{* <!-- span>
-							<div class="facetValueHolder">(value 1)<a href="#" class="removeBtn">(deselecteer)</a></div>
-							<div class="facetValueHolder">(value 2)<a href="#" class="removeBtn">(deselecteer)</a></div>
-						</span --> *}
+					{if $storedStates[$c.id]}
+					{assign var=openGroup value=true}
+					<span>
+					{foreach from=$storedStates[$c.id] item=s}
+					<div class="facetValueHolder">{$s.label}<a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$s.val}');$('#form2').submit();">(deselecteer)</a></div>
+					{/foreach}
+					</span>
+					{/if}
 					</li>
 					{/foreach}
 				</ul>
 			</li>
+			{if $openGroup}
+			<script>
+			nbcToggleGroup({$v.id});
+			</script>
+			{/if}
 		{/foreach}				
 		<ul class="facetCategories clearSelectionBtn">
-			<li class="closed"><span><a href="?set=Boktorren van NL&amp;lookup=Boktorren">wis geselecteerde eigenschappen</a></span></li>
+			<li class="closed">
+				<span><a href="#" onclick="$('#action2').val('clear');$('#form2').submit();">wis geselecteerde eigenschappen</a></span>
+			</li>
 		</ul>
 		<ul class="facetCategories sourceContainer">
 			<li class="closed">
@@ -62,7 +77,6 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-
 {if $characteristics}
 {foreach from=$characteristics item=v}
 {assign var=foo value="|"|explode:$v.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$v.label}{assign var=cText value=''}{/if}
@@ -88,9 +102,14 @@ nbcStart = {$nbcStart};
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
+{/if}
+{if $taxa}
+nbcData = $.parseJSON('{$taxa}');
+nbcProcessResults();
+{else}
 nbcGetResults();
 {/if}
-	
+
 {literal}
 });
 </script>
