@@ -37,7 +37,7 @@ ul.facets li a.removeBtn:hover {color:#ff0000!important;}
 ul.facets li span {margin-left:0px; display:block; width:230px; margin:3px 0 1px 0; line-height:26px; border-top:solid 1px #DDD;}
 ul.facets li span div.facetValueHolder {float:none!important; margin:0 0 3px 20px; color:#666;}
 ul.facets li span.facetLink_irrelevant {margin:0 0 0 5px; line-height:24px; width:220px; display:block; color:#999; border:none;}
-ul.clearSelectionBtn li {border-bottom:1px solid #BBBBBB; border-top:1px solid #BBBBBB; background:#fff url(/images/clearSelection.gif) no-repeat 4px 10px;}
+ul.clearSelectionBtn li {border-bottom:1px solid #BBBBBB; border-top:1px solid #BBBBBB; background:#fff url(http://determinatie.nederlandsesoorten.nl/images/clearSelection.gif) no-repeat 4px 10px;}
 ul.clearSelectionBtn li a {margin-left:16px;}
 ul.clearSelectionBtn li a:hover {color:#aa0000;}
 
