@@ -71,7 +71,7 @@ var allTranslations = Array();
 
 function _(text) {
 	
-	return text;
+	//return text;
 
 	/* TO BE DONE */
 	for(var i=0;i<allTranslations.length;i++) {
