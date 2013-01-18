@@ -39,7 +39,7 @@
     <span
     {if $totalSteps > 1}
         onclick="keyDoStep({$keypath.$previousStep.id});" id="previous-icon" 
-        title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}"
+        title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}"
     {else}
         id="previous-icon-inactive"
     {/if} 
@@ -48,7 +48,7 @@
     {if $totalSteps > 1}
         <a class="navigation-icon" id="first-icon" href="../key/index.php?step={$keypath.0.id}" title="{t}Return to first step{/t}">{t}First{/t}</a>
         <a class="navigation-icon" id="previous-icon" href="../key/index.php?step={$keypath.$previousStep.id}" 
-        title="{t}Return to step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
+        title="{t}Previous{/t} {t}step{/t} {$keypath.$previousStep.step_number}{if $v.choice_marker} ({$v.choice_marker}){/if}">
         {t}Previous{/t}</a>
     {else}
         <span class="navigation-icon" id="first-icon-inactive">{t}First{/t}</span>
@@ -57,7 +57,7 @@
 {/if}
 
 {if $backlink}
-    <a class="navigation-icon" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t}{$backlink.name}">{t}Back{/t}</a>
+    <a class="navigation-icon" id="back-icon" href="{$backlink.url}" title="{t}Back to {/t} {$backlink.name}">{t}Back{/t}</a>
 {else}
     <span class="navigation-icon" id="back-icon-inactive">{t}Back{/t}</span>
 {/if}

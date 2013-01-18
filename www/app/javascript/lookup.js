@@ -408,7 +408,9 @@ function allLookupBindDialogKeyUp() {
 }
 
 function allLookupShowDialog(predefJSON) {
-
+	
+	alert(_('Previous'));
+	
 	showDialog(
 		_(allLookupDialogTitle),
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'
