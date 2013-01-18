@@ -2275,7 +2275,7 @@ class Controller extends BaseClass
             
             // clean up the name
         if (isset($page['name']))
-            $page['name'] = str_replace('"', '', $page['name']);
+            $page['name'] = strip_tags(str_replace('"', '', $page['name']));
             
             // add backstep=1 to the url to be able to identify it as a step back in history
         if (isset($page['url']))
