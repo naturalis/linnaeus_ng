@@ -1,7 +1,7 @@
 <div style="padding:0px 10px 0px 10px;">
 
 	<form id="theForm" method="post" action="identify.php">
-	<input type="hidden" id="state-id" name="state" value="" />
+	<input type="hidden" id="state-id" name="state" value="{$c.prefix}:{$c.id}" />
 	
 	<p>
 		{assign var=foo value="|"|explode:$c.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$c.label}{assign var=cText value=''}{/if}
@@ -11,7 +11,7 @@
 	
 	<p>
 	{if $c.type=='range'}
-		<input id="range-value" value="range" type="text" value="">&nbsp;<a href="#">waarde wissen</a>
+		<input id="range-value" name="state-value" type="text" value="">&nbsp;<a href="#">waarde wissen</a>
 	{elseif $c.type=='media'}
 	<div id="dialog-content-inner-inner">
 		<table style="border:1px solid #111">
