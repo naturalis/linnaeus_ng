@@ -171,7 +171,12 @@ class MatrixKeyController extends Controller
             } else
             if ($this->rHasVal('state')) {
             
-                $this->stateMemoryStore($this->requestData['state']);
+            	if ($this->rHasVal('state-value'))
+            	    $state = $this->requestData['state'].':'.$this->requestData['value'];
+				else
+            	    $state = $this->requestData['state'];
+// OK DIT GAAAT DUS NIET WERKEN vvvvv VOOR RANGES ENZO            
+                $this->stateMemoryStore($state);
                 
                 $this->smarty->assign('nbcStart', $this->saveSessionSetting(array('name' => 'nbcStart')));
                 
@@ -331,9 +336,6 @@ class MatrixKeyController extends Controller
             
             $this->compareSpeciesStore($this->requestData['id']);
         }
-        
-
-
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'save_session_setting')) {
             
             $this->saveSessionSetting($this->requestData['setting']);
@@ -1614,109 +1616,118 @@ class MatrixKeyController extends Controller
 
     private function getCompleteDatasetNBC ($p = null)
     {
-        $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
-        $tId = isset($p['tId']) ? $p['tId'] : false;
-        $vId = isset($p['vId']) ? $p['vId'] : false;
         
-        $var = $this->getVariationsInMatrix();
-        
-        foreach ((array) $var as $val) {
-            
-            if ($vId && $val['id'] != $vId)
-                continue;
-            
-            $nbc = $this->models->NbcExtras->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'ref_id' => $val['id'], 
-                    'ref_type' => 'variation'
-                ), 
-                'columns' => 'name,value', 
-                'fieldAsIndex' => 'name'
-            ));
-            
-            $label = $val['label'];
-            
-            $gender = null;
-            
-            if (preg_match('/\s(male|female)$/', $label, $matches)) {
-                $gender = $matches[1];
-                $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
-            }
-            
-            $res[] = $this->createDatasetEntry(
-            array(
-                'val' => $val, 
-                'nbc' => $nbc, 
-                'label' => $label, 
-                'gender' => $gender, 
-                'related' => $this->getRelatedEntities(array(
-                    'vId' => $val['id']
-                )), 
-                'type' => 'v', 
-                'inclRelated' => $inclRelated
-            ));
-            
-            $tmp[$val['taxon_id']] = true;
-        }
-        
-        $taxa = $this->getTaxaInMatrix();
-        
-        foreach ((array) $taxa as $val) {
-            
-            if ($tId && $val['id'] != $tId)
-                continue;
-            
-            if (!isset($tmp[$val['id']])) {
-                
-                $c = $this->models->Commonname->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'taxon_id' => $val['id'], 
-                        'language_id' => $this->getCurrentLanguageId()
-                    )
-                ));
-                
+ 		$res = $this->getCache('matrix-nbc-data');
+ 		
+ 		if (!$res) {
 
-                $common = $val['l'];
-                foreach ((array) $c as $cVal) {
-                    if ($cVal['commonname'] != $val['l']) {
-                        $common = $cVal['commonname'];
-                        break;
-                    }
-                }
-                
-                $nbc = $this->models->NbcExtras->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'ref_id' => $val['id'], 
-                        'ref_type' => 'variation'
-                    ), 
-                    'columns' => 'name,value', 
-                    'fieldAsIndex' => 'name'
-                ));
-                
-                $res[] = $this->createDatasetEntry(
-                array(
-                    'val' => $val, 
-                    'nbc' => $nbc, 
-                    'label' => $common, 
-                    'related' => $this->getRelatedEntities(array(
-                        'tId' => $val['id']
-                    )), 
-                    'type' => 't', 
-                    'inclRelated' => $inclRelated
-                ));
-            }
-        }
-        
-        $this->customSortArray($d, array(
-            'key' => 'l', 
-            'case' => 'i'
-        ));
+			$inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
+	        $tId = isset($p['tId']) ? $p['tId'] : false;
+	        $vId = isset($p['vId']) ? $p['vId'] : false;
+	        
+	        $var = $this->getVariationsInMatrix();
+	        
+	        foreach ((array) $var as $val) {
+	            
+	            if ($vId && $val['id'] != $vId)
+	                continue;
+	            
+	            $nbc = $this->models->NbcExtras->_get(
+	            array(
+	                'id' => array(
+	                    'project_id' => $this->getCurrentProjectId(), 
+	                    'ref_id' => $val['id'], 
+	                    'ref_type' => 'variation'
+	                ), 
+	                'columns' => 'name,value', 
+	                'fieldAsIndex' => 'name'
+	            ));
+	            
+	            $label = $val['label'];
+	            
+	            $gender = null;
+	            
+	            if (preg_match('/\s(male|female)$/', $label, $matches)) {
+	                $gender = $matches[1];
+	                $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
+	            }
+	            
+	            $res[] = $this->createDatasetEntry(
+	            array(
+	                'val' => $val, 
+	                'nbc' => $nbc, 
+	                'label' => $label, 
+	                'gender' => $gender, 
+	                'related' => $this->getRelatedEntities(array(
+	                    'vId' => $val['id']
+	                )), 
+	                'type' => 'v', 
+	                'inclRelated' => $inclRelated
+	            ));
+	            
+	            $tmp[$val['taxon_id']] = true;
+	        }
+	        
+	        $taxa = $this->getTaxaInMatrix();
+	        
+	        foreach ((array) $taxa as $val) {
+	            
+	            if ($tId && $val['id'] != $tId)
+	                continue;
+	            
+	            if (!isset($tmp[$val['id']])) {
+	                
+	                $c = $this->models->Commonname->_get(
+	                array(
+	                    'id' => array(
+	                        'project_id' => $this->getCurrentProjectId(), 
+	                        'taxon_id' => $val['id'], 
+	                        'language_id' => $this->getCurrentLanguageId()
+	                    )
+	                ));
+	                
+	
+	                $common = $val['l'];
+	                foreach ((array) $c as $cVal) {
+	                    if ($cVal['commonname'] != $val['l']) {
+	                        $common = $cVal['commonname'];
+	                        break;
+	                    }
+	                }
+	                
+	                $nbc = $this->models->NbcExtras->_get(
+	                array(
+	                    'id' => array(
+	                        'project_id' => $this->getCurrentProjectId(), 
+	                        'ref_id' => $val['id'], 
+	                        'ref_type' => 'variation'
+	                    ), 
+	                    'columns' => 'name,value', 
+	                    'fieldAsIndex' => 'name'
+	                ));
+	                
+	                $res[] = $this->createDatasetEntry(
+	                array(
+	                    'val' => $val, 
+	                    'nbc' => $nbc, 
+	                    'label' => $common, 
+	                    'related' => $this->getRelatedEntities(array(
+	                        'tId' => $val['id']
+	                    )), 
+	                    'type' => 't', 
+	                    'inclRelated' => $inclRelated
+	                ));
+	            }
+	        }
+	        
+	        $this->customSortArray($res, array(
+	            'key' => 'l', 
+	            'case' => 'i'
+	        ));
+	        
+	        $this->saveCache('matrix-nbc-data',$res);
+	        
+ 		}	        
         
         return $res;
     }
@@ -1842,10 +1853,10 @@ class MatrixKeyController extends Controller
         if (count($states) == 0)
 			return $this->getCompleteDatasetNBC();
             
-            //calculate scores
+		// calculate scores
         $matches = $this->getTaxaScores($states, false);
         
-        // onky keep the 100% scores, no partial matches
+        // only keep the 100% scores, no partial matches
         $res = array();
         foreach ((array) $matches as $match) {
             if ($match['s'] == 100) {
