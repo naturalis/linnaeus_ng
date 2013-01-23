@@ -20,7 +20,7 @@ Data import is complete. You have been added as system administrator to the new 
 <b>Custom modules</b><br/>
 {foreach from=$modules item=v}
 <label>Import "{$v}"?&nbsp;&nbsp;<input type="checkbox" name="modules[{$v}]" checked="checked"></label>
-&nbsp;internal name:<input type="text" value="{$v}" name="modules-name[{$v}]" /> (as used in internal links; case-sensitive, so please make sure!)
+&nbsp;internal name:<input type="text" value="{$v}" name="modules-name[{$v}]" /> (as used in internal links; case-sensitive, so please make sure!)<br/>
 {/foreach}
 </p>
 <input type="submit" value="import" />
