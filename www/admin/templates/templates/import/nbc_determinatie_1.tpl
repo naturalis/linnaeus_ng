@@ -3,8 +3,8 @@
 <div id="page-main">
 	<form method="post" action="" id="theForm" enctype="multipart/form-data">
 		<p>
-			First, open the Excel XML file in MS Excel, and save the first sheet as CSV-file.
-			This effectively gets rid of all the superfluous Excel-related XML-code. <br />
+			First, open the Excel XML file in MS Excel, select the entire first sheet, and format is as 'text'.<br /> 
+			Then, save the first sheet as CSV-file; this effectively gets rid of all the superfluous Excel-related XML-code. <br />
 			Then, load the file below and click 'Parse file'.
 		</p>
 		<fieldset>

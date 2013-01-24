@@ -19,6 +19,7 @@ class MapKeyController extends Controller
     public $usedHelpers = array('csv_parser_helper');
 
     public $controllerPublicName = 'Distribution';
+    public $controllerBaseName = 'mapkey';
 
 	public $cssToLoad = array(
 		'basics.css',

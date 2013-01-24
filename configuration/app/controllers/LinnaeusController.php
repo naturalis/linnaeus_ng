@@ -37,6 +37,7 @@ class LinnaeusController extends Controller
 		'dialog/jquery.modaldialog.js'
 	));
 	
+	public $controllerBaseName = 'linnaeus';
 		
     /**
      * Constructor, calls parent's constructor
@@ -163,7 +164,7 @@ class LinnaeusController extends Controller
 		$this->smarty->assign('projects',$projects);
 		$this->smarty->assign('excludeLogout',true);
 
-        $this->printPage('linnaeus/root_index');
+        $this->printPage('root_index');
 	
 	}
 

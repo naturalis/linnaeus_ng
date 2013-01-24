@@ -19,6 +19,7 @@ class SpeciesController extends Controller
         'literature_taxon'
     );
     public $controllerPublicName = 'Species module';
+    public $controllerBaseName = 'species';
     public $cssToLoad = array(
         'basics.css', 
         'species.css', 
@@ -46,6 +47,7 @@ class SpeciesController extends Controller
     public function __construct ()
     {
         parent::__construct();
+
     }
 
 

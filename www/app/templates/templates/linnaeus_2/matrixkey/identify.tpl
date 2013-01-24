@@ -5,7 +5,7 @@
 
 {include file="_matrix-header.tpl"}
 
-	<div id="search-pattern">
+	<div id="search-pattern" style="display:{if $storedShowState!='results'}block{else}none{/if}">
 		<div id="char-states">
 			<div class="select-header">{t}Characters{/t}<span class="selectIcon" id="sort-menu" onclick="showCharacterSort();void(0);">{t}Sort{/t}</span></div>
 			<select size="5" id="characteristics" onclick="goCharacter()" ondblclick="addSelected(this)" >
@@ -23,11 +23,12 @@
 		<div id="info">
 			<div id="info-header"></div>
 			<div id="info-body"></div>
+			<div id="info-value"></div>
 			<div id="info-footer"></div>
 		</div>
 	</div>
 
-	<div id="search-results">
+	<div id="search-results" style="display:{if $storedShowState=='results'}block{else}none{/if}">
 		<div id="choices">
 			<div class="select-header">{t}Selected combination of characters{/t}</div>
 			<select size="25" id="selected">
@@ -79,16 +80,13 @@ $(document).ready(function(){
 	
 {if $storedStates}
 {foreach from=$storedStates key=k item=v}
-	setSelectedState('{$v.val}'{if $v.type=='c'},{$v.id},{$v.characteristic_id},'{$v.label|addslashes}'{/if});
+	setSelectedState('{$v.val}',{if $v.id}{$v.id}{else}-1{/if},{$v.characteristic_id},'{$v.label|addslashes}'{if $v.value},{$v.value}{/if});
 {/foreach}
 	getScores();
-//	showMatrixResults();
 	highlightSelected();
 {/if}
-{if $storedShowState=='pattern'}
-	showMatrixPattern();
-{else}
-	showMatrixResults();
+{if $storedShowState}
+	storedShowState='{$storedShowState}';
 {/if}
 {literal}
 });
