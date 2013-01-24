@@ -253,8 +253,8 @@ class ImportL2Controller extends Controller
                 
                 if (!is_writable($_SESSION['admin']['system']['import']['imagePath'])) {
                     
-                    $this->addError($_SESSION['admin']['system']['import']['imagePath'] . ' is not writable. This
-                        is required to change the file names to lowercase.');
+                    $this->addError($_SESSION['admin']['system']['import']['imagePath'] . ' is not writable.<br/>
+                        This is required to change the file names to lowercase.');
                 
                 }
                 
