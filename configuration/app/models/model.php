@@ -11,6 +11,7 @@ abstract class Model extends BaseClass
     public $databaseConnection;
     private $data;
     public $tableName;
+    private $_tablePrefix;
     private $id;
     public $newId;
     private $retainBeforeAlter;
@@ -37,8 +38,9 @@ abstract class Model extends BaseClass
         }
         else {
             
-            $this->tableName = $this->databaseSettings['tablePrefix'] . $tableBaseName;
-        
+            $this->_tablePrefix = $this->databaseSettings['tablePrefix'];
+            $this->tableName = $this->_tablePrefix . $tableBaseName;
+            
         }
         
         $this->getTableColumnInfo();
@@ -929,13 +931,13 @@ abstract class Model extends BaseClass
 
         } elseif (!is_null($id)) {
 
-			$query = str_replace('%table%', $this->tableName, $id);
+			$query = str_ireplace('%table%', $this->tableName, $id);
 
             $set = mysql_query($query);
 			
 			$this->logQueryResult($set,$query,'set,full query');
 
-            $this->setLastQuery(str_replace('%table%', $this->tableName, $id));
+            $this->setLastQuery($query);
 
             while ($row = @mysql_fetch_assoc($set)) {
                 
@@ -959,6 +961,56 @@ abstract class Model extends BaseClass
     
     }
 
+    public function freeQuery($params)
+    {
+    
+        if (is_array($params)) {
+        
+			$query = isset($params['query']) ? $params['query'] : null;
+			$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+			
+        } else {
+            
+            $query = isset($params) ? $params : null;
+            $fieldAsIndex = false;
+        
+        }
+		
+		if (empty($query)) {
+			
+			$this->log('Called freeQuery with an empty query',1);
+			return;
+		
+		};
+		
+        $query = str_ireplace('%table%', $this->tableName, $query);
+        $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
+		
+	    $set = mysql_query($query);
+            	
+		$this->logQueryResult($set,$query,'freeQuery');
+		$this->setLastQuery($query);
+
+		unset($this->data);
+		
+		while($row=@mysql_fetch_assoc($set)){
+		
+			if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
+			
+				$this->data[$row[$fieldAsIndex]]=$row;
+			
+			} else {
+			
+				$this->data[]=$row;
+			
+			}
+		
+		}
+
+		return isset($this->data) ? $this->data : null;
+    
+    }    
+    
 	private function logQueryResult($set,$query,$type,$severity=1) {
 
 		//$this->log('DEBUG: '.$query,1);

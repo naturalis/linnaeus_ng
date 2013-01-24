@@ -17,21 +17,21 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 {literal}
 <script>
-function bla(id,r) {
+function doMove(id,r) {
 	$('#id').val(id);
 	$('#r').val(r);
 	$('#theForm').submit();
 }
 </script>
 {/literal}
-
+(sort all at once: <span class="a" onclick="doMove(-1,'alph');">alphabetically</span> or <span class="a" onclick="doMove(-1,'num');">numerically</span>)
 <table>
 {foreach item=v key=k from=$states}
 	<tr>
 		<td>{$v.show_order+1}.</td>
 		<td>{$v.label}</td>
-		<td title="{t}move up{/t}">{if $k>0}<span class="a" onclick="bla({$v.id},'u');">&nbsp;&uarr;&nbsp;</span>{/if}</td>
-		<td title="{t}move down{/t}">{if $k<$states|@count-1}<span class="a" onclick="bla({$v.id},'d');">&nbsp;&darr;&nbsp;</span>{/if}</td>
+		<td title="{t}move up{/t}">{if $k>0}<span class="a" onclick="doMove({$v.id},'u');">&nbsp;&uarr;&nbsp;</span>{/if}</td>
+		<td title="{t}move down{/t}">{if $k<$states|@count-1}<span class="a" onclick="doMove({$v.id},'d');">&nbsp;&darr;&nbsp;</span>{/if}</td>
 	</tr>
 {/foreach}
 </table>

@@ -18,7 +18,8 @@ class KeyController extends Controller
     );
     
     public $controllerPublicName = 'Dichotomous key';
-
+    public $controllerBaseName = 'key';
+    
 	public $cssToLoad = array(
 		'basics.css',
 		'key.css',

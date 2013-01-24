@@ -12,12 +12,16 @@
 				<ul id="character-group-{$v.id}" class="facets hidden">
 					{foreach from=$v.chars item=c}
 					{assign var=foo value="|"|explode:$c.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$c.label}{assign var=cText value=''}{/if}
-					<li><a class="facetLink" href="#" onclick="nbcShowStates({$c.id})">{$cLabel}</a>
-					{if $storedStates[$c.id]}
+					<li><a class="facetLink" href="#" onclick="nbcShowStates({$c.id})">{$cLabel} {$c.value}</a>
+					{if $activeChars[$c.id]}
 					{assign var=openGroup value=true}
 					<span>
-					{foreach from=$storedStates[$c.id] item=s}
-					<div class="facetValueHolder">{$s.label}<a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$s.val}');$('#form2').submit();">(deselecteer)</a></div>
+					{foreach from=$storedStates item=s key=cK}
+					{if $s.characteristic_id==$c.id}
+						<div class="facetValueHolder">
+							{$s.value} {$s.label} <a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$cK}');$('#form2').submit();">(deselecteer)</a>
+						</div>
+					{/if}
 					{/foreach}
 					</span>
 					{/if}

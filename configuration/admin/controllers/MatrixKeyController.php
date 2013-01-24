@@ -594,32 +594,55 @@ class MatrixKeyController extends Controller
             
             $c = $this->getCharacteristicStates($this->requestData['sId']);
             
-            foreach ((array) $c as $key => $val) {
-                
-                if ($this->requestData['id'] == $val['id']) {
-                    
-                    if ($this->rHasVal('r', 'u')) {
-                        
-                        if (isset($c[$key - 1]))
-                            $this->updateStateShowOrder($c[$key - 1]['id'], $c[$key - 1]['show_order'] + 1);
-                        
-                        $this->updateStateShowOrder($this->requestData['id'], $val['show_order'] - 1);
-                        
-                        break;
-                    }
-                    else if ($this->rHasVal('r', 'd')) {
-                        
-                        if (isset($c[$key + 1]))
-                            $this->updateStateShowOrder($c[$key + 1]['id'], $c[$key + 1]['show_order'] - 1);
-                        
-                        $this->updateStateShowOrder($this->requestData['id'], $val['show_order'] + 1);
-                        
-                        break;
-                    }
+            if ($this->rHasVal('r', 'alph') || $this->rHasVal('r', 'num')) {
+
+                foreach((array)$c as $val) {
+                    $assoc[$val['label']] = $val['id'];
+                    $sort[] = $val['label'];
                 }
+
+	            if ($this->rHasVal('r', 'alph'))
+	            	sort($sort);
+
+	            if ($this->rHasVal('r', 'num'))
+	            	natcasesort($sort);
+            
+	            $i=0;
+	            foreach((array)$sort as $val)
+	                $this->updateStateShowOrder($assoc[$val],$i++);
+	            
+
+            } else {
+
+	            foreach ((array) $c as $key => $val) {
+	                
+	                if ($this->requestData['id'] == $val['id']) {
+	                    
+	                    if ($this->rHasVal('r', 'u')) {
+	                        
+	                        if (isset($c[$key - 1]))
+	                            $this->updateStateShowOrder($c[$key - 1]['id'], $c[$key - 1]['show_order'] + 1);
+	                        
+	                        $this->updateStateShowOrder($this->requestData['id'], $val['show_order'] - 1);
+	                        
+	                        break;
+	                    }
+	                    else if ($this->rHasVal('r', 'd')) {
+	                        
+	                        if (isset($c[$key + 1]))
+	                            $this->updateStateShowOrder($c[$key + 1]['id'], $c[$key + 1]['show_order'] - 1);
+	                        
+	                        $this->updateStateShowOrder($this->requestData['id'], $val['show_order'] + 1);
+	                        
+	                        break;
+	                    }
+	                }
+	            }
+	            
+	            $this->renumberStateShowOrder($this->requestData['sId']);
+
             }
             
-            $this->renumberStateShowOrder($this->requestData['sId']);
         }
         
         $matrix = $this->getMatrix($mId);

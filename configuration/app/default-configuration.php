@@ -173,38 +173,16 @@ class configuration
 
 	}
 
-    public function getControllerSettingsHighertaxa ()
-    {
-
-        return array(
-            'speciesPerPage' => 25
-		);
-
-	}
-
     public function getControllerSettingsMatrixKey()
     {
 
 		return array(
-			'characteristicTypes' => array(
-				array(
-					'name' => 'text',
-					'info' => 'a textual description.'
-				),
-				array(
-					'name' => 'media',
-					'info' => 'an image, video or soundfile.'
-				),
-				array(
-					'name' => 'range',
-					'info' => 'a value range, defined by a lowest and a highest value.'
-				),
-				array(
-					'name' => 'distribution',
-					'info' => 'a value distribution, defined by a mean and values for one and two standard deviations.'
-				)
-			),
-			'useCorrectedHValue' => true
+			'useCorrectedHValue' => true,
+			'nbc' => array(
+				'entitiesPerPage' => 16,
+				'statesPerLine' => 4,
+				'nbcImageRoot' => 'http://determinatie.nederlandsesoorten.nl/images/'
+			)
 		);
 
     }

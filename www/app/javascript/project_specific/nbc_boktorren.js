@@ -6,6 +6,7 @@ var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
 var nbcPaginate = true;
+var nbcPopupSizes = {small:350,medium:425,large:620};
 
 function nbcToggleGroup(id) {
 
@@ -42,7 +43,7 @@ function nbcShowStates(id) {
 			success : function (data) {
 				//alert(data);
 				showDialog(c.label,data);
-				$('#dialog').css('width', (c.type=='media' ? 610 : 425));
+				$('#dialog').css('width', (c.type=='media' ? nbcPopupSizes.large : nbcPopupSizes.medium));
 				$.modaldialog.reinitPosition({top:175});
 
 			}
@@ -133,7 +134,7 @@ function nbcPrintResults() {
 
 	var results = nbcData.results;
 	var s = '';
-	
+
 	for(var i=0;i<results.length;i++) {
 		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
 			s = s + nbcFormatResult(results[i]);

@@ -17,11 +17,16 @@ Data import is complete. You have been added as system administrator to the new 
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
-<b>Custom modules</b><br/>
+<table>
+<tr><td colspan="2"><b>Custom modules</b></td></tr>
 {foreach from=$modules item=v}
-<label>Import "{$v}"?&nbsp;&nbsp;<input type="checkbox" name="modules[{$v}]" checked="checked"></label>
-&nbsp;internal name:<input type="text" value="{$v}" name="modules-name[{$v}]" /> (as used in internal links; case-sensitive, so please make sure!)<br/>
+<tr>
+	<td><label><input type="checkbox" name="modules[{$v}]" checked="checked">import module "{$v}"</label></td>
+	<td>internal name: <input type="text" value="{$v}" name="modules-name[{$v}]" /></td>
+</tr>
 {/foreach}
+</table>
+"internal name" is the name as used in internal links; it is case-sensitive, so please make sure (by checking in the XML, for instance)!
 </p>
 <input type="submit" value="import" />
 </form>

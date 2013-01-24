@@ -22,7 +22,7 @@ function getData(action,id,postFunction) {
 			'time' : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);
+			//alert(data);return;
 			obj = $.parseJSON(data);
 			if (postFunction) eval(postFunction+'(obj,id)');
 		}
@@ -33,6 +33,9 @@ function getData(action,id,postFunction) {
 var characters = Array();
 var states = Array();
 var selected = Array();
+var freeValues = Array();
+var sdValues = Array();
+var storedShowState;
 
 function storeCharacter(id,label,type,sorts) {
 
@@ -71,13 +74,14 @@ function fillStates(obj,char) {
 
 	$('#states').empty();
 
-	setInfo('',' ');
+	setInfo('',' ',' ');
 
 	if (!obj) return;
+	
 
 	for(var i=0;i<obj.length;i++) {
 
-		if (obj[0].type.name != 'range' && obj[0].type.name != 'distribution') {
+		if (obj[i].type != 'range' && obj[i].type != 'distribution') {
 	
 			$('#states').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
 	
@@ -87,34 +91,37 @@ function fillStates(obj,char) {
 
 	}
 
-	if (obj[0].type.name != 'range' && obj[0].type.name != 'distribution') {
+	if (obj[0].type != 'range' && obj[0].type != 'distribution') {
 
 		$("#states :first").attr('selected','selected');
 
 		goState();
 
 	} else {
+		
+		var t = $('#characteristics :selected').text().replace(selectIndicator,'');
 
 		setInfo(
-			'<b>'+$('#characteristics :selected').text()+'</b><br />'+
+			'<b>'+t+'</b><br />',
 			sprintf(
 				_('Click %shere%s to specify a value; you can also double-click "%s" to do so.'),
-				'<span class="a" onclick="addSelected($(\'#characteristics\'))">',
+				'<span class="internal-link" onclick="addSelected($(\'#characteristics\'))">',
 				'</span>',
-				$('#characteristics :selected').text()
+				t
 			)
 		);
-
+	
 	}
 
 	highlightSelected();
 
 }
 
-function setInfo(h,b) {
+function setInfo(h,b,v) {
 
 	if (h) $('#info-header').html(h);
 	if (b) $('#info-body').html(b);
+	if (v) $('#info-value').html(v);
 
 }
 
@@ -129,6 +136,8 @@ function goState() {
 	switch (state.type) {
 		case 'text':
 			var val = state.text;
+			var c = getCharacter(state.characteristic_id);
+			if (c) title = c.label;
 			break;
 		case 'media':
 			if (state.img_dimensions==null) break;
@@ -255,7 +264,6 @@ var strRange =
 	strOpen +
 	strClose;
 
-
 function doDialog() {
 	
 	var v = $('#dialogValue').val();
@@ -279,18 +287,27 @@ function doDialog() {
 	setFreeValues([v,$('#dialogSD').val()]);
 
 	$('#dialog-close').click();
+	highlightSelected();
 
 }
+
+
 
 function setFreeValues(vals) {
 
 	var c = getCharacter($('#characteristics').val());
 
-	if (c.type=='range')
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c.label+': '+vals[0]+'</option>');
-	else
-		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c.label+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
+	freeValues[$('#characteristics').val()]=vals[0];
 
+	if (c.type=='range') {
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+'">'+c.label+': '+vals[0]+'</option>');
+	} else { 
+		$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+$('#characteristics').val()+':'+(vals[0])+':'+(vals[1])+'">'+c.label+': '+_('mean')+' '+vals[0]+' &plusmn; '+vals[1]+' '+_('sd')+'</option>');
+		sdValues[$('#characteristics').val()]=vals[1];
+	}
+
+	
+	
 	//getScores();
 
 }
@@ -315,13 +332,18 @@ function addSelected(caller) {
 	if (c.type=='distribution') {
 
 		showDialog(_('Enter a value'),sprintf(strDistro,sprintf(_('Enter the required values for "%s":'),c.label)));
+		$('#dialogSD').val(sdValues[$('#characteristics').val()]);
+		$('#dialogValue').val(freeValues[$('#characteristics').val()]);
 		$('#dialogValue').focus();
+		$('#dialogValue').select();
 
 	} else
 	if (c.type=='range') {
 
 		showDialog(_('Enter a value'),sprintf(strRange,sprintf(_('Enter the required value for "%s":'),c.label)));
+		$('#dialogValue').val(freeValues[$('#characteristics').val()]);
 		$('#dialogValue').focus();
+		$('#dialogValue').select();
 
 	} else {
 		
@@ -379,20 +401,38 @@ function highlightSelected() {
 		});
 		
 		if (e[1]==$('#characteristics :selected').val()) {
+			
+			if (e[0]=='f') {
+				
+				var preVal = '';
 
-			$('#states option').each(function(i){
+				$('#selected').children().each(function(){
+					var t = $(this).val().split(':');
+					if (t[1]==e[1]) {
+						preVal = e[2];
+						if (e[3]) preVal = 'mean '+preVal+' &plusmn; '+e[3]+' sd';
+					}
+				});	
+				
+				if (preVal) setInfo(null,null,'Current value: '+preVal);
+				
+			} else {
 
-				if (e[2]==$(this).val())  {
-					$(this).addClass('state-selected');
-					if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
-				}
+				$('#states option').each(function(i){
+	
+					if (e[2]==$(this).val())  {
+						$(this).addClass('state-selected');
+						if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
+					}
+	
+				});
 
-			});
+			}
 
 		}
 
 	});
-
+	
 }
 
 function removeHighlight() {
@@ -406,6 +446,8 @@ function removeHighlight() {
 		$(this).removeClass('state-selected');
 		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().substring(selectIndicator.length-1));
 	});
+	
+	setInfo('','',' ');
 
 }
 
@@ -484,8 +526,13 @@ function fillScores(obj,char) {
 	$('#scores option').each(function(i){
 		$(this).attr('selected','');
 	});	
-	
-	showMatrixResults();
+
+	if (storedShowState && storedShowState=='pattern') {
+		showMatrixPattern();
+		storedShowState='';
+	} else {
+		showMatrixResults();
+	}
 
 }
 
@@ -505,27 +552,27 @@ function showMatrixPattern() {
 
 }
 
-function setSelectedState(val,id,charId,label) {
+function setSelectedState(id,stateId,charId,label,value) {
 
-	var val = val.split(':');
-	
+	var val = id.split(':');
 	var c = getCharacter(charId);
-
+	
 	if (val[0]=='c') {
 		
-		$('#selected').append('<option id="s'+id+'" value="c:'+charId+':'+id+'">'+c.label+': '+label+'</option>').val(id);
+		$('#selected').append('<option id="s'+stateId+'" value="c:'+charId+':'+stateId+'">'+c.label+': '+label+'</option>').val(stateId);
 
-		selected[id] = true;
+		selected[stateId] = true;
 
 	} else {
 
-		var c = characters[val[1]];
-	
-		if (c[1]=='range')
-			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+'">'+c[0]+': '+val[2]+'</option>');
+		if (c.type=='range')
+			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="'+id+'">'+c.label+': '+val[2]+'</option>');
 		else
-			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="f:'+val[1]+':'+(val[2])+':'+(val[3])+'">'+c[0]+': '+_('mean')+' '+val[2]+' &plusmn; '+val[3]+' '+_('sd')+'</option>');
-			
+			$('#selected').append('<option id="f'+(Math.floor(Math.random()*11))+'" value="'+id+'">'+c.label+': '+_('mean')+' '+val[2]+' &plusmn; '+val[3]+' '+_('sd')+'</option>');
+		
+		freeValues[charId]=val[2];
+		sdValues[charId]=val[3];
+		
 	}
 
 }

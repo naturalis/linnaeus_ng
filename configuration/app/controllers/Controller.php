@@ -1784,7 +1784,7 @@ class Controller extends BaseClass
             $t = 'getControllerSettings' . $controllerBaseName;
         else
             $t = 'getControllerSettings' . $this->controllerBaseName;
-        
+       
         if (method_exists($this->config, $t)) {
             
             $this->controllerSettings = $this->config->$t();
