@@ -250,6 +250,14 @@ class ImportL2Controller extends Controller
             else if (file_exists($this->requestData['imagePath'])) {
                 
                 $_SESSION['admin']['system']['import']['imagePath'] = rtrim($this->requestData['imagePath'], '/') . '/';
+                
+                if (!is_writable($_SESSION['admin']['system']['import']['imagePath'])) {
+                    
+                    $this->addError($_SESSION['admin']['system']['import']['imagePath'] . ' is not writable. This
+                        is required to change the file names to lowercase.');
+                
+                }
+                
             }
             else {
                 
@@ -309,9 +317,7 @@ class ImportL2Controller extends Controller
             
             if (!empty($errors)) {
                 
-                $this->addError('Errors renaming media files. Make sure ' . $_SESSION['admin']['system']['import']['imagePath'] . ' is writable!');
-                
-                foreach ($errors as $file) {
+                 foreach ($errors as $file) {
                     
                     $this->addError("Cannot rename $file.");
                 }
