@@ -1,3 +1,19 @@
+/* value selector dialog - for images */
+div#graphicValueSelector { style="padding:0px 10px 0px 10px;"}
+
+div#graphicValueSelector #dialogHeader {top:5px;}
+div#graphicValueSelector #dialogSelectorWindow {}
+div#graphicValueSelector #resultsCounter {}
+div#graphicValueSelector #dialogFooter {border-top:1px dotted black;padding:10px 0px 0px 0px;text-align:center;}
+
+div#graphicValueSelector .selectedValue {background-color:#eee; border:dotted 1px #bbb;font-weight:bold}
+adiv#graphicValueSelector .selectedValue a {font-weight:bold; white-space:pre-wrap; width:104px; color:#000;}
+adiv#graphicValueSelector .selectedValue a img {border:solid 0px #ddffcc;} 
+adiv#graphicValueSelector .selectedValue a div {border:solid 2px #eee;}
+adiv#graphicValueSelector .selectedValue a:hover img {border:solid 0px #fff}
+adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
+
+
 .hidden {
 	display: none;	
 }
@@ -10,8 +26,9 @@
 }
 
 #dialog-content-inner-inner {
-	max-height:300px;
+	max-height:450px;
 	overflow-y:auto;
+	padding-bottom:40px;
 }
 #state-header {
 	font-weight: bold;
@@ -28,4 +45,7 @@
 .state-image:hover {
 	border:2px solid #666;
 	cursor: pointer;
+}
+.state-image-irrelevant {
+	cursor: default;
 }

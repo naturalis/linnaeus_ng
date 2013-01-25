@@ -44,7 +44,7 @@ function nbcShowStates(id) {
 				//alert(data);
 				showDialog(c.label,data);
 				$('#dialog').css('width', (c.type=='media' ? nbcPopupSizes.large : nbcPopupSizes.medium));
-				$.modaldialog.reinitPosition({top:175});
+				$.modaldialog.reinitPosition({top:175,height:400});
 
 			}
 		});

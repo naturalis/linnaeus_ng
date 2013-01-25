@@ -118,28 +118,6 @@ div.headerPagination { margin:0 0 0 17px; float:right!important;}
 	color:#888888;
 }
 
-/* value selector dialog - for images */
-div#graphicValueSelector {width:540px;position:relative;}
-div#graphicValueSelector #dialogHeader {top:10px;}
-div#graphicValueSelector #dialogSelectorWindow {top:30px;}
-div#graphicValueSelector #dialogFooter {top:517px;}
-div#graphicValueSelector .formSection {height:40px;left:10px;position:absolute;width:540px;}
-div#graphicValueSelector #resultsCounter {top:499px;}
-
-div#graphicValueSelector .scrollcontainer {border:solid 1px #aaa;width:540px;height:451px;overflow:auto; font-size:11px;}
-div#graphicValueSelector .scrollcontainer .imageHolder {padding:4px; border: dotted 1px #fff; float:left; margin:6px; height:160px; text-align:center; width:108px;}
-div#graphicValueSelector .scrollcontainer .imageHolder a {margin:0 auto 0 auto; width:104px;text-decoration:none; color:#888; overflow:hidden; display:block;}
-div#graphicValueSelector .scrollcontainer .imageHolder a:hover {color:#ff0000;}
-div#graphicValueSelector .scrollcontainer .imageHolder a img {border:solid 0px #ffffff;}
-div#graphicValueSelector .scrollcontainer .imageHolder a div {border:solid 2px #ffffff; }
-div#graphicValueSelector .scrollcontainer .imageHolder a:hover div{border:solid 2px #bbb;}
-div#graphicValueSelector .scrollcontainer .selectedValue {background-color:#eee; border:dotted 1px #bbb;}
-div#graphicValueSelector .scrollcontainer .selectedValue a {font-weight:bold; white-space:pre-wrap; width:104px; color:#000;}
-div#graphicValueSelector .scrollcontainer .selectedValue a img {border:solid 0px #ddffcc;} 
-div#graphicValueSelector .scrollcontainer .selectedValue a div {border:solid 2px #eee;}
-div#graphicValueSelector .scrollcontainer .selectedValue a:hover img {border:solid 0px #fff}
-div#graphicValueSelector .scrollcontainer .selectedValue a:hover div {border:solid 2px #bbb;}
-
 /* value selector dialog - range (text) */
 form#rangeSelector {margin-top:20px; margin-left:10px;}
 .rangeselectorText {position:relative; top:27px; margin-bottom:10px;}
