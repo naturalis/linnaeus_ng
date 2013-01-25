@@ -942,7 +942,7 @@ class MatrixKeyController extends Controller
         
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
-        //q($this->models->MatrixTaxonState->q(),1);
+        q($this->models->MatrixTaxonState->q(),1);
         //q($results,1);
         
         usort($results, array(
