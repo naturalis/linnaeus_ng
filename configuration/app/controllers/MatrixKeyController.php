@@ -941,10 +941,7 @@ class MatrixKeyController extends Controller
         	order by s desc";
         
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-        
-        die($this->models->MatrixTaxonState->q());
-        //q($results,1);
-        
+       
         usort($results, array(
             $this, 
             'sortMatrixScores'
