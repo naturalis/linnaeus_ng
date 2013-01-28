@@ -113,7 +113,7 @@ function nbcFormatResult(data) {
 
 	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' );
 
-	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'">'+
+	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+data.y+'-'+data.i+'">'+
 			'<div class="resultImageHolder">'+
 				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
 					'<img class="result" height="207" width="145" src="'+data.m+'" title="'+data.p+'" />'+
