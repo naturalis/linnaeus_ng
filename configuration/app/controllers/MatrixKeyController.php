@@ -147,7 +147,7 @@ class MatrixKeyController extends Controller
     public function identifyAction ()
     {
         
-        //$this->getRemainingStateCount(array('charId'=>1119));return;
+		//$this->getRemainingStateCount(array('charId'=>1119));return;
         
         $this->checkMatrixIdOverride();
         
@@ -186,7 +186,7 @@ class MatrixKeyController extends Controller
             )));
             
             $states = $this->stateMemoryRecall();
-            
+
             $results = $this->nbcGetTaxaScores($states);
             
             $taxa = json_encode(
@@ -681,6 +681,7 @@ class MatrixKeyController extends Controller
 
     private function stateMemoryRecall ($p=null)
     {
+
         if (isset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()])) {
 
             $charId = isset($p['charId']) ? $p['charId'] : null;
@@ -937,16 +938,17 @@ class MatrixKeyController extends Controller
 				        on _a.variation_id = _c.id
         			where _a.project_id = " . $this->getCurrentProjectId() . "
 	        			and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-	        		group by _a.variation_id" : "") . "
-        	order by s desc";
+	        		group by _a.variation_id" : "")
+					//."order by s desc"
+        ;
         
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-        
+
         usort($results, array(
             $this, 
             'sortMatrixScores'
         ));
-        
+
         return $results;
     }
 
@@ -1976,8 +1978,9 @@ class MatrixKeyController extends Controller
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall(array('charId' => $charId));
 
         $d='';
-        $i=0;
 
+        $i=0;
+		//q($p);
 		if (!empty($states)) {
 			//create a list of unique state id's
 			foreach((array)$states as $val) {
@@ -2003,7 +2006,7 @@ class MatrixKeyController extends Controller
 		*/	
         $q = 
         	"select count(distinct _a.taxon_id) as tot, _a.state_id as state_id from %PRE%matrices_taxa_states _a
-        	".(!empty($d) ? $d : "" )."        	
+        		".(!empty($d) ? $d : "" )."        	
 			where _a.characteristic_id = ".$charId."
 				and _a.project_id = ".$this->getCurrentProjectId()."
 				and _a.taxon_id not in (select taxon_id from %PRE%taxa_variations where project_id = ".$this->getCurrentProjectId().")
@@ -2012,37 +2015,29 @@ class MatrixKeyController extends Controller
         
         $results = $this->models->MatrixTaxonState->freeQuery($q);
 		//q($this->models->MatrixTaxonState->q());
-
+		
+		
         $all = array();
         
         foreach((array)$results as $val)
             $all[$val['state_id']] = intval($val['tot']);
 
         //q($all);
-        
-        if (!empty($d)) {
-            
-            $d = str_replace('variation_id is null','taxon_id is null',str_replace('taxon_id', 'variation_id', $d));
-            
-            // second query, for the variations
-			$q = 
-				"select count(distinct _a.variation_id) as tot, _a.state_id as state_id from %PRE%matrices_taxa_states _a
-				".$d."
-				where _a.characteristic_id = ".$charId."
-					and _a.project_id = ".$this->getCurrentProjectId()."
-				group by _a.state_id
-			";
-			
-				/*
-					right join %PRE%matrices_taxa_states _c 
-						on _a.variation_id = _c.variation_id
-						and _c.state_id in (".$d.") 
-						and _a.project_id = _c.project_id 
-						and (_a.variation_id is not null or _a.taxon_id is null) 
-				*/
-			
-			$results2 = $this->models->MatrixTaxonState->freeQuery($q);
 
+        
+        if (!empty($d))
+			$d = str_replace('variation_id is null','taxon_id is null',str_replace('taxon_id', 'variation_id', $d));
+            
+		// second query, for the variations
+		$q = 
+			"select count(distinct _a.variation_id) as tot, _a.state_id as state_id from %PRE%matrices_taxa_states _a
+				".(!empty($d) ? $d : "" )."
+			where _a.characteristic_id = ".$charId."
+				and _a.project_id = ".$this->getCurrentProjectId()."
+			group by _a.state_id
+			";
+
+			$results2 = $this->models->MatrixTaxonState->freeQuery($q);
 			//q($this->models->MatrixTaxonState->q());
 				
 			foreach((array)$results2 as $val) {
@@ -2052,7 +2047,6 @@ class MatrixKeyController extends Controller
 					$all[$val['state_id']] = intval($val['tot']);
 			}
 				
-		}
 		
 		//q($all,1);
 

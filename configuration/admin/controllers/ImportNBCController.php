@@ -1010,9 +1010,9 @@ class ImportNBCController extends Controller
                             
                             foreach ((array) $sVal as $state) {
                                 
-                                $this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+                                //$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
                                 
-                                $this->models->MatrixTaxonState->save(
+                                @$this->models->MatrixTaxonState->save(
                                 array(
                                     'project_id' => $this->getNewProjectId(), 
                                     'matrix_id' => $mId, 
