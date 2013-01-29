@@ -49,3 +49,8 @@ adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
 .state-image-irrelevant {
 	cursor: default;
 }
+
+.xxx {
+	font-size: 9px;
+	color:#666;
+}

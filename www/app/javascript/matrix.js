@@ -386,8 +386,6 @@ function deleteSelected(id) {
 
 function highlightSelected() {
 
-	var d = Array();
-
 	$('#selected option').each(function(i){
 		var e = $(this).val().split(':');
 
