@@ -109,29 +109,63 @@ function nbcFormatResult(data) {
 			u = remote url
 			r = number of similars
 			h = highlight (bool)
+			d = full species details (only when comparing or resultset has only one taxon/variation)
     */
 
 	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' );
+	
+	if (data.d) {
 
-	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+data.y+'-'+data.i+'">'+
-			'<div class="resultImageHolder">'+
+		var states = Array();
+		
+		for(var i in data.d) {
+			
+			if (data.d[i].characteristic.indexOf('|')!=false) {
+				var t = data.d[i].characteristic.split('|');
+				t = t[0];
+			} else {
+				var t = data.d[i].characteristic;
+			}
+			
+			states.push('<i>'+t +'</i>: '+data.d[i].state.label);
+		}
+
+	}
+
+	var id = data.y+'-'+data.i;
+	
+	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
+			'<div class="resultImageHolder" style="background-color:red">'+
 				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
 					'<img class="result" height="207" width="145" src="'+data.m+'" title="'+data.p+'" />'+
 				'</a>'+
 			'</div>'+
-			'<div>'+
-				(data.u ? '<a href="'+(data.u)+'" target="_blanc">' : '') +
+			'<div style="min-height:50px">'+
+				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') +
 					(data.s!=data.l ? data.l+'<br />' : '')+
 					'<span class="scientificName">'+(data.s)+'</span>'+
 					(data.u ? '</a>' : '')  +
 			'</div>'+
 			(data.g ? '<img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
 			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');" target="_self">gelijkende soorten</a>' : '' ) +
+			(states ?
+'<div id="det-'+id+'" style="padding:1px;background:#fff;border:1px dotted black;width:169px;display:none;z-index:999;left:-14px"><div style="width:160px;"><ul style="margin:0;padding:0px 0px 0px 15px;"><li>'+
+states.join('</li><li>')+'</li></ul></div><a href="#" onclick="veryTemporary(\''+id+'\',\'off\');">x</a></div><span id="tog-'+id+'">'+
+'<a style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="veryTemporary(\''+id+'\',\'on\');">details</a></span>' : '')+
+		'</div>'+
 		'</div>';
+	
+}
+
+function veryTemporary(id,state) {
+
+	$('#det-'+id).css('display',(state=='on' ? 'block' : 'none'));
+	$('#tog-'+id).css('display',(state=='off' ? 'block' : 'none'));
+
 }
 
 function nbcPrintResults() {
-
+	
 	var results = nbcData.results;
 	var s = '';
 

@@ -147,8 +147,8 @@ class MatrixKeyController extends Controller
     public function identifyAction ()
     {
         
-		//$this->getRemainingStateCount(array('charId'=>1119));return;
-        
+        //$this->getRemainingStateCount();return;
+
         $this->checkMatrixIdOverride();
         
         $matrix = $this->getCurrentMatrix();
@@ -161,7 +161,7 @@ class MatrixKeyController extends Controller
         }
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
-
+        
         if ($this->_matrixType == 'NBC') {
             
             if ($this->rHasVal('action', 'clear')) {
@@ -186,7 +186,7 @@ class MatrixKeyController extends Controller
             )));
             
             $states = $this->stateMemoryRecall();
-
+            
             $results = $this->nbcGetTaxaScores($states);
             
             $taxa = json_encode(
@@ -198,17 +198,17 @@ class MatrixKeyController extends Controller
                     'perpage' => $this->controllerSettings['nbc']['entitiesPerPage']
                 )
             ));
-
-            foreach((array)$states as $val)
-                $d[$val['characteristic_id']]=true;
-
-            if (isset($d)) $this->smarty->assign('activeChars', $d);
+            
+            foreach ((array) $states as $val)
+                $d[$val['characteristic_id']] = true;
+            
+            if (isset($d))
+                $this->smarty->assign('activeChars', $d);
             $this->smarty->assign('storedStates', $states);
             $this->smarty->assign('groups', $this->getCharacterGroups());
             $this->smarty->assign('nbcImageRoot', $this->controllerSettings['nbc']['nbcImageRoot']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
-
         }
         else {
             
@@ -345,34 +345,30 @@ class MatrixKeyController extends Controller
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_formatted_states')) {
             
-			$c = $this->getCharacteristic($this->requestData['id']);
-			$c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
-			
-			$s = $this->getCharacteristicStates($this->requestData['id']);
-			$s = $this->fixStateLabels($s); // temporary measure (hopefully!)
-			$s = $this->sortStates($s);
-
-			$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
-
-			$this->smarty->assign(
-				'remainingStateCount', 
-				$this->getRemainingStateCount(
-					array(
-						'charId' => $this->requestData['id'],
-						'states' => $states
-					)
-				)
-			);
-
-			$states = $this->nbcStateMemoryReformat($states);
-				
-			$this->smarty->assign('stateImagesPerRow', $this->controllerSettings['nbc']['statesPerLine']);
-			$this->smarty->assign('c', $c);
-			$this->smarty->assign('s', $s);
-			$this->smarty->assign('states', $states);
-			
+            $c = $this->getCharacteristic($this->requestData['id']);
+            $c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
+            
+            $s = $this->getCharacteristicStates($this->requestData['id']);
+            $s = $this->fixStateLabels($s); // temporary measure (hopefully!)
+            $s = $this->sortStates($s);
+            
+            $states = $this->stateMemoryRecall(array(
+                'charId' => $this->requestData['id']
+            ));
+            
+            $this->smarty->assign('remainingStateCount', $this->getRemainingStateCount(array(
+                'charId' => $this->requestData['id'], 
+                'states' => $states
+            )));
+            
+            $states = $this->nbcStateMemoryReformat($states);
+            
+            $this->smarty->assign('stateImagesPerRow', $this->controllerSettings['nbc']['statesPerLine']);
+            $this->smarty->assign('c', $c);
+            $this->smarty->assign('s', $s);
+            $this->smarty->assign('states', $states);
+            
             $tpl = 'formatted_states';
-
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
             
@@ -459,7 +455,7 @@ class MatrixKeyController extends Controller
 
 
 
-    private function initialize ($force=false)
+    private function initialize ($force = false)
     {
         $this->_matrixType = $this->getSetting('matrixtype');
         $this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups') == '1';
@@ -469,7 +465,7 @@ class MatrixKeyController extends Controller
         if ($this->_matrixType == 'NBC') {
             
             $this->_nbcTotEntities = $this->getSessionSetting('nbcTotEntities');
-
+            
             if ($force || empty($this->_nbcTotEntities)) {
                 $d = $this->getCompleteDatasetNBC();
                 $this->_nbcTotEntities = count((array) $d);
@@ -651,17 +647,17 @@ class MatrixKeyController extends Controller
     }
 
 
+
     private function stateMemoryStore ($data)
     {
         foreach ((array) $data as $key => $val) {
             
             $d = explode(':', $val);
-
-            if ($d[0]=='f') // f:x:n[:sd] (free values)
-            	$_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
-			else 			// c:x:y (fixed values)
-            	$_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
-
+            
+            if ($d[0] == 'f') // f:x:n[:sd] (free values)
+                $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
+            else // c:x:y (fixed values)
+                $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
         }
     }
 
@@ -669,25 +665,22 @@ class MatrixKeyController extends Controller
 
     private function stateMemoryUnset ($id = null)
     {
-
         if (empty($id))
             unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()]);
         else
             unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
-
     }
 
 
 
-    private function stateMemoryRecall ($p=null)
+    private function stateMemoryRecall ($p = null)
     {
-
         if (isset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()])) {
-
+            
             $charId = isset($p['charId']) ? $p['charId'] : null;
-
+            
             $states = array();
-
+            
             foreach ((array) $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key => $val) {
                 
                 $states[$key]['val'] = $val;
@@ -695,9 +688,9 @@ class MatrixKeyController extends Controller
                 $d = explode(':', $val);
                 
                 if ($d[0] == 'c' && isset($d[2])) {
-
+                    
                     $d = $this->getCharacteristicState($d[2]);
-
+                    
                     $states[$key]['type'] = 'c';
                     $states[$key]['id'] = $d['id'];
                     $states[$key]['characteristic_id'] = $d['characteristic_id'];
@@ -710,13 +703,11 @@ class MatrixKeyController extends Controller
                     $states[$key]['value'] = $d[2];
                 }
                 
-                if (!empty($charId) && !in_array($states[$key]['characteristic_id'],(array)$charId))
+                if (!empty($charId) && !in_array($states[$key]['characteristic_id'], (array) $charId))
                     unset($states[$key]);
-                
             }
             
             return !empty($states) ? $states : null;
-
         }
         else {
             
@@ -827,24 +818,23 @@ class MatrixKeyController extends Controller
 
     private function getTaxaScores ($states, $incUnknowns = false)
     {
-
         $s = $c = array();
         $stateCount = 0;
-
+        
         // we have to find out which states we are looking for
         foreach ((array) $states as $sKey => $sVal) {
             $d = explode(':', $sVal);
             
             $charId = isset($d[1]) ? $d[1] : null;
             $value = isset($d[2]) ? $d[2] : null;
-
+            
             // which is easy for the non-range characters...
             if ($d[0] != 'f') {
                 
-                if (isset($d[2])) $s[$d[2]] = $d[2];
+                if (isset($d[2]))
+                    $s[$d[2]] = $d[2];
                 $stateCount++;
-
-            } 
+            }
             // ...but requires calculation for the ranged ones
             else {
                 
@@ -883,10 +873,10 @@ class MatrixKeyController extends Controller
             
             $c[$charId] = $charId;
         }
-
+        
         if (empty($s))
             return;
-
+        
         $n = $stateCount + ($incUnknowns ? 1 : 0);
         $s = implode(',', $s);
         $c = implode(',', $c);
@@ -900,8 +890,7 @@ class MatrixKeyController extends Controller
         			on _a.project_id = _b.project_id
         			and _a.matrix_id = _b.matrix_id
         			and _a.taxon_id = _b.taxon_id
-        			and ((_b.state_id in (" . $s . "))" .
-         			($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
 		        left join %PRE%taxa _c
 			        on _a.taxon_id = _c.id
 		        where _a.project_id = " . $this->getCurrentProjectId() . "
@@ -915,8 +904,7 @@ class MatrixKeyController extends Controller
         		join %PRE%matrices_taxa_states _b
         			on _a.project_id = _b.project_id
         			and _a.id = _b.ref_matrix_id
-        			and ((_b.state_id in (" . $s . "))" .
-         			($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
 		        left join %PRE%matrices_names _c
 			        on _b.ref_matrix_id = _c.id
         			and _c.language_id = " . $this->getCurrentLanguageId() . "
@@ -932,23 +920,22 @@ class MatrixKeyController extends Controller
 	        			on _a.project_id = _b.project_id
 				        and _a.matrix_id = _b.matrix_id
 				        and _a.variation_id = _b.variation_id
-	        			and ((_b.state_id in (" . $s . "))" .
-         			($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+	        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
 			        left join %PRE%taxa_variations _c
 				        on _a.variation_id = _c.id
         			where _a.project_id = " . $this->getCurrentProjectId() . "
 	        			and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 	        		group by _a.variation_id" : "")
 					//."order by s desc"
-        ;
-        
-        $results = $this->models->MatrixTaxonState->freeQuery($q);
+        ;;
 
+        $results = $this->models->MatrixTaxonState->freeQuery($q);
+        
         usort($results, array(
             $this, 
             'sortMatrixScores'
         ));
-
+        
         return $results;
     }
 
@@ -964,7 +951,7 @@ class MatrixKeyController extends Controller
             if ($aa == $bb)
                 return 0;
             
-            return ($aa < $bb) ? -1 : 1;
+                return ($aa < $bb) ? -1 : 1;
         }
         
         return ($a['s'] > $b['s']) ? -1 : 1;
@@ -1006,12 +993,12 @@ class MatrixKeyController extends Controller
         if ($tot == 0)
             return 0;
         
-        $hValue = 0;
+            $hValue = 0;
         
         foreach ((array) $states as $val)
             $hValue += ($val['n'] / $tot) * log($val['n'] / $tot, 10);
         
-        $hValue = is_nan($hValue) ? 0 : -1 * $hValue;
+            $hValue = is_nan($hValue) ? 0 : -1 * $hValue;
         
         $uniqueTaxa = 0;
         
@@ -1019,7 +1006,7 @@ class MatrixKeyController extends Controller
             if ($val['states'] == 1)
                 $uniqueTaxa++;
         
-        $corrFactor = $uniqueTaxa / $tot;
+            $corrFactor = $uniqueTaxa / $tot;
         
         return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
     }
@@ -1028,7 +1015,6 @@ class MatrixKeyController extends Controller
 
     private function getCharacteristics ()
     {
-        
         $mc = $this->models->CharacteristicMatrix->_get(
         array(
             'id' => array(
@@ -1038,7 +1024,7 @@ class MatrixKeyController extends Controller
             'columns' => 'characteristic_id,show_order', 
             'order' => 'show_order'
         ));
-
+        
         foreach ((array) $mc as $key => $val) {
             
             $d = $this->getCharacteristic($val['characteristic_id']);
@@ -1077,39 +1063,48 @@ class MatrixKeyController extends Controller
         
         $char = $c[0];
         
-        if ($char['got_labels']==1) {
-        
-	        $cl = $this->models->CharacteristicLabel->_get(
-	        array(
-	            'id' => array(
-	                'project_id' => $this->getCurrentProjectId(), 
-	                'language_id' => $this->getCurrentLanguageId(), 
-	                'characteristic_id' => $id
-	            )
-	        ));
-
-	        $char['label'] = $cl[0]['label'];
-	        unset($char['got_labels']);
-	         
+        if ($char['got_labels'] == 1) {
+            
+            $cl = $this->models->CharacteristicLabel->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'language_id' => $this->getCurrentLanguageId(), 
+                    'characteristic_id' => $id
+                )
+            ));
+            
+            $char['label'] = $cl[0]['label'];
+            unset($char['got_labels']);
         }
-
+        
         return $char;
     }
 
 
 
-    private function getTaxonStates ($id)
+    private function getEntityStates ($id, $type)
     {
+        $d = array(
+            'project_id' => $this->getCurrentProjectId(), 
+            'matrix_id' => $this->getCurrentMatrixId()
+        );
+        
+        if ($type == 'variation')
+            $d['variation_id'] = $id;
+        else
+		if ($type == 'matrix')
+            $d['ref_matrix_id'] = $id;
+        else
+            $d['taxon_id'] = $id;
+        
         $mts = $this->models->MatrixTaxonState->_get(
         array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $this->getCurrentMatrixId(), 
-                'taxon_id' => $id
-            ), 
+            'id' => $d, 
             'columns' => 'characteristic_id,state_id', 
             'fieldAsIndex' => 'characteristic_id'
-        ));
+        ))
+        ;
         
         foreach ((array) $mts as $key => $val) {
             
@@ -1125,7 +1120,21 @@ class MatrixKeyController extends Controller
         return $mts;
     }
 
+    private function getTaxonStates ($id)
+    {
+        return $this->getEntityStates ($id,'taxon');
+    }
 
+    private function getVariationStates ($id)
+    {
+        return $this->getEntityStates ($id,'variation');
+    }
+    
+    private function getMatrixStates ($id)
+    {
+        return $this->getEntityStates ($id,'matrix');
+    }
+    
 
     private function getTaxonComparison ($id)
     {
@@ -1284,7 +1293,7 @@ class MatrixKeyController extends Controller
     private function getCharacterGroups ($mId = null)
     {
         $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
-
+        
         $cg = $this->models->Chargroup->_get(
         array(
             'id' => array(
@@ -1294,7 +1303,7 @@ class MatrixKeyController extends Controller
             'order' => 'show_order', 
             'columns' => 'id,matrix_id,label,show_order'
         ));
-
+        
         foreach ((array) $cg as $key => $val) {
             $cg[$key]['label'] = $this->getCharacterGroupLabel($val['id'], $this->getCurrentLanguageId());
             
@@ -1470,12 +1479,12 @@ class MatrixKeyController extends Controller
                     'taxon_id' => $tId
                 )
             ));
-
+            
             if ($includeSelf && isset($tId))
                 array_unshift($rel, array(
                     'id' => $tId, 
                     'relation_id' => $tId, 
-                	'ref_type' => 'taxon'
+                    'ref_type' => 'taxon'
                 ));
             
             foreach ((array) $rel as $key => $val) {
@@ -1504,7 +1513,7 @@ class MatrixKeyController extends Controller
                 array_unshift($rel, array(
                     'id' => $vId, 
                     'relation_id' => $vId, 
-                	'ref_type' => 'variation'
+                    'ref_type' => 'variation'
                 ));
             
 
@@ -1535,7 +1544,8 @@ class MatrixKeyController extends Controller
         $type = isset($p['type']) ? $p['type'] : null;
         $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
         $highlight = isset($p['highlight']) ? $p['highlight'] : false;
-
+        $details = isset($p['details']) ? $p['details'] : null;
+        
         $d = array(
             'i' => $val['id'], 
             'l' => trim($label), 
@@ -1545,7 +1555,8 @@ class MatrixKeyController extends Controller
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related), 
-            'h' => $highlight
+            'h' => $highlight, 
+            'd' => isset($details) ? $details : null
         );
         
         if (isset($val['taxon_id']))
@@ -1677,7 +1688,6 @@ class MatrixKeyController extends Controller
         return $res;
     }
 
-    
     private function getSimilarNBC ($p = null)
     {
         if (!isset($p['type']) || !isset($p['id']))
@@ -1724,7 +1734,6 @@ class MatrixKeyController extends Controller
                     $gender = $matches[1];
                     $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
                 }
-                
 
                 $res[] = $this->createDatasetEntry(
                 array(
@@ -1733,7 +1742,8 @@ class MatrixKeyController extends Controller
                     'label' => $label, 
                     'gender' => $gender, 
                     'type' => 'v', 
-                    'highlight' => $val['id'] == $p['id']
+                    'highlight' => $val['id'] == $p['id'], 
+                    'details' => $this->getVariationStates($val['relation_id'])
                 ));
             }
             else {
@@ -1769,14 +1779,15 @@ class MatrixKeyController extends Controller
                     'columns' => 'name,value', 
                     'fieldAsIndex' => 'name'
                 ));
-
+                
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $common, 
                     'type' => 't', 
-                    'highlight' => $val['relation_id'] == $p['id']
+                    'highlight' => $val['relation_id'] == $p['id'], 
+                    'details' => $this->getTaxonStates($taxon['id'])
                 ));
             }
         }
@@ -1784,9 +1795,7 @@ class MatrixKeyController extends Controller
         return $res;
     }
 
-
-
-    private function nbcGetTaxaScores ($selectedStates=null)
+    private function nbcGetTaxaScores ($selectedStates = null)
     {
         $states = array();
         
@@ -1795,13 +1804,13 @@ class MatrixKeyController extends Controller
         // get all stored selected states
         foreach ((array) $d as $val)
             $states[] = $val['val'];
-
+        
         if (count($states) == 0)
             return $this->getCompleteDatasetNBC();
             
             // calculate scores
         $matches = $this->getTaxaScores($states, false);
-
+        
         // only keep the 100% scores, no partial matches
         $res = array();
         foreach ((array) $matches as $match) {
@@ -1876,7 +1885,7 @@ class MatrixKeyController extends Controller
                         'fieldAsIndex' => 'name'
                     ));
                     
-                   
+
                     $res[] = $this->createDatasetEntry(
                     array(
                         'val' => $match, 
@@ -1891,167 +1900,155 @@ class MatrixKeyController extends Controller
                 }
             }
         }
+
+
         
-		$this->customSortArray($res, array(
-			'key' => 'l', 
-			'case' => 'i'
-		));
+        if (count((array)$res)==1) {
+            
+            $res[0]['d'] =
+            	$res[0]['y']=='t' ?
+	            	$this->getTaxonStates($res[0]['i']) :
+	            	$this->getVariationStates($res[0]['i']);
+            
+        } else {
+        
+	        $this->customSortArray($res, array(
+	            'key' => 'l', 
+	            'case' => 'i'
+	        ));
+
+        }
 
         return $res;
     }
 
-    private function nbcStateMemoryReformat($d)
+    private function nbcStateMemoryReformat ($d)
     {
-    
         $states = array();
-      
-	    foreach ((array) $d as $key => $val) {
-	        
-	        $states[$val['characteristic_id']][(isset($val['id']) ? $val['id'] : count((array)$states))] = array(
-	        'id' => isset($val['id']) ? $val['id'] : null,
-	        'label' => isset($val['label']) ? $val['label'] : null,
-	        'val' => isset($val['val']) ? $val['val'] : null,
-	        'value' => isset($val['value']) ? $val['value'] : null,
-	        'key' => $val['type']=='f' ?  $val['type'].':'.$val['characteristic_id'] : $val['val']
-	        );
-	    }
-
-	    return $states;
-	    
+        
+        foreach ((array) $d as $key => $val) {
+            
+            $states[$val['characteristic_id']][(isset($val['id']) ? $val['id'] : count((array) $states))] = array(
+                'id' => isset($val['id']) ? $val['id'] : null, 
+                'label' => isset($val['label']) ? $val['label'] : null, 
+                'val' => isset($val['val']) ? $val['val'] : null, 
+                'value' => isset($val['value']) ? $val['value'] : null, 
+                'key' => $val['type'] == 'f' ? $val['type'] . ':' . $val['characteristic_id'] : $val['val']
+            );
+        }
+        
+        return $states;
     }
-    
-    
-    function fixStateLabels($s) 
-    {
 
+    private function fixStateLabels ($s)
+    {
+        
         // from "hs_zijrand_1_zijdoorn" to "1 zijdoorn"
-      
-		$shortest=null;
-		foreach((array)$s as $val) {
-			if (is_null($shortest) || strlen($val['label'])<$shortest) $shortest = $val['label'];
-		}
+        $shortest = null;
+        foreach ((array) $s as $val) {
+            if (is_null($shortest) || strlen($val['label']) < $shortest)
+                $shortest = $val['label'];
+        }
+        
+        $prefix = '';
+        for ($i = strlen($shortest) - 1; $i >= 4; $i--) {
+            $bit = substr($shortest, 0, $i);
+            //echo $bit;
+            
 
-		$prefix = '';
-		for($i=strlen($shortest)-1;$i>=4;$i--) {
-			$bit = substr($shortest,0,$i);
-			//echo $bit;
-
-			$hit = true;
-			foreach((array)$s as $val) {
-			if (strpos($val['label'],$bit)!==0)
-				$hit = false;
-			}
-    
-			//echo ':'.($hit ? 1 : 0).'<br/>';
-			if ($hit && strlen($prefix) < strlen($bit)) {
-				$prefix=$bit;
-				//echo '<b>'.$prefix.'</b><br>';
-			}
-    
-		}
-
-		if (strlen($prefix)!=0)
-		    array_walk($s,create_function('&$elem','$elem["label"] = preg_replace("/_/"," ",preg_replace("/^('.$prefix.')/","",$elem["label"]));'));
-		
-		return $s;
-    
-    }    
-
-    private function sortStates($s)
-    {
-
-        uasort($s,create_function('$a,$b','return ($a["label"]>$b["label"]?1:($a["label"]<$b["label"]?-1:0));'));
-
+            $hit = true;
+            foreach ((array) $s as $val) {
+                if (strpos($val['label'], $bit) !== 0)
+                    $hit = false;
+            }
+            
+            //echo ':'.($hit ? 1 : 0).'<br/>';
+            if ($hit && strlen($prefix) < strlen($bit)) {
+                $prefix = $bit;
+                //echo '<b>'.$prefix.'</b><br>';
+            }
+        }
+        
+        if (strlen($prefix) != 0)
+            array_walk($s, create_function('&$elem', '$elem["label"] = preg_replace("/_/"," ",preg_replace("/^(' . $prefix . ')/","",$elem["label"]));'));
+        
         return $s;
-
     }
-    
-    private function getRemainingStateCount($p)
+
+    private function sortStates ($s)
     {
+        uasort($s, create_function('$a,$b', 'return ($a["label"]>$b["label"]?1:($a["label"]<$b["label"]?-1:0));'));
         
-        $charId = isset($p['charId']) ? $p['charId'] : null;
-        
-        // we're not doing this for *all* characters at once 
-        if (empty($charId)) return;
-        
-        // get the current user-selected states for the requested character
-        $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall(array('charId' => $charId));
+        return $s;
+    }
 
-        $d='';
-
-        $i=0;
-		//q($p);
-		if (!empty($states)) {
-			//create a list of unique state id's
-			foreach((array)$states as $val) {
-			    if ($val['type']!='f') {
-			        $d .= "right join %PRE%matrices_taxa_states _c".$i."
-						on _a.taxon_id = _c".$i.".taxon_id
-						and _c".$i.".state_id  = ".$val['id']."
-						and _a.project_id = _c".$i++.".project_id
+    private function getRemainingStateCount ($p=null)
+    {
+    
+        $charId = isset($p['charId']) ? $p['charId'] : 1134;
+        $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
+    
+        $dT = $dT = '';
+        $i = 0;
+    
+        if (!empty($states)) {
+            // we want all taxa/variations that have the already selected states so we create a list of unique state id's of those states
+            foreach ((array) $states as $val) {
+                if ($val['type'] != 'f') {
+                    $dT .= "right join %PRE%matrices_taxa_states _c" . $i . "
+						on _a.taxon_id = _c" . $i . ".taxon_id
+						and _a.matrix_id = _c" . $i . ".matrix_id
+						and _c" . $i . ".state_id  = " . $val['id'] . "
+						and _a.project_id = _c" . $i++ . ".project_id
 						and (_a.taxon_id is not null or _a.variation_id is null)
 						";
-			        
-			    }
-			}
-			    
-		
-		}
+                }
+            }
+        }
 
-        /* 
-			find the number of taxon-states that exist for this character, grouped by state.
-			if there are user-selected states, take out the taxa that do not also have that state; in that
-			case, there need to be two queries, one for taxa and one for variations (have not been able to
-			comnine that into a single query).    
-		*/	
-        $q = 
-        	"select count(distinct _a.taxon_id) as tot, _a.state_id as state_id from %PRE%matrices_taxa_states _a
-        		".(!empty($d) ? $d : "" )."        	
-			where _a.characteristic_id = ".$charId."
-				and _a.project_id = ".$this->getCurrentProjectId()."
-				and _a.taxon_id not in (select taxon_id from %PRE%taxa_variations where project_id = ".$this->getCurrentProjectId().")
-			group by _a.state_id
+        if (!empty($dT))
+            $dV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $dT));
+        
+        /*
+         find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
+        have the already selected states, unless no states have been selected at all, in which case we just
+        return them all
+        */
+        
+        $q = "
+        	select sum(tot) as tot, state_id, characteristic_id 
+        	from (
+        		select count(distinct _a.taxon_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
+	        		from %PRE%matrices_taxa_states _a
+	        		" . (!empty($dT) ? $dT : "") . "
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.taxon_id not in (select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
+					group by _a.state_id
+				union
+				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id from %PRE%matrices_taxa_states _a
+					" . (!empty($dV) ? $dV : "") . "
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+					group by _a.state_id
+			) as q1 
+			group by q1.state_id
 			";
-        
+
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-		//q($this->models->MatrixTaxonState->q());
-		
-		
-        $all = array();
+        //q($this->models->MatrixTaxonState->q());
         
-        foreach((array)$results as $val)
+        $all = array();
+    
+        foreach ((array) $results as $val) {
+    
+            if (!empty($charId) && $val['characteristic_id']!=$charId) continue;
+    
             $all[$val['state_id']] = intval($val['tot']);
+    
+        }
 
         //q($all);
-
-        
-        if (!empty($d))
-			$d = str_replace('variation_id is null','taxon_id is null',str_replace('taxon_id', 'variation_id', $d));
-            
-		// second query, for the variations
-		$q = 
-			"select count(distinct _a.variation_id) as tot, _a.state_id as state_id from %PRE%matrices_taxa_states _a
-				".(!empty($d) ? $d : "" )."
-			where _a.characteristic_id = ".$charId."
-				and _a.project_id = ".$this->getCurrentProjectId()."
-			group by _a.state_id
-			";
-
-			$results2 = $this->models->MatrixTaxonState->freeQuery($q);
-			//q($this->models->MatrixTaxonState->q());
-				
-			foreach((array)$results2 as $val) {
-			    if (isset($all[$val['state_id']]))
-			        $all[$val['state_id']] = intval($all[$val['state_id']]) + $val['tot'];
-				else
-					$all[$val['state_id']] = intval($val['tot']);
-			}
-				
-		
-		//q($all,1);
-
-    	return empty($all) ? '*' : $all;
     
+        return empty($all) ? '*' : $all;
     }
     
 }

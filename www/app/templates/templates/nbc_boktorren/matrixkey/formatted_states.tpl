@@ -12,7 +12,7 @@
 	{if $c.type=='range'}
 		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
 		<input style="text-align:right" id="range-value" name="state-value" type="text" value="{$prevRangeValue}">&nbsp;
-		<a href="#" class="removeBtn" onclick="$('#range-value').val('');$('#action2').val('clear');$('#id2').val('{$s.key}');$('#form2').submit();">waarde wissen</a>
+		<a href="#" class="clearRange" onclick="$('#range-value').val('');$('#action2').val('clear');$('#id2').val('{$s.key}');$('#form2').submit();">waarde wissen</a>
 		{elseif $c.type=='media'}
 		<div id="dialog-content-inner-inner">
 			<table style="border:1px solid #111">
@@ -46,23 +46,25 @@
 		{elseif $c.type=='text'}
 		<table>
 			{foreach from=$s item=v key=k}
+			{if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
 			<tr>
-				<td>
+				<td{if $irrelephant} style="opacity: 0.25;"{/if}>
 					<label><input onchange="window.open('identify.php?state={$c.prefix}:{$c.id}:{$v.id}','_self');" type="checkbox">{$v.label} </label>
+					{if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
 				</td>
 			</tr>
 			{/foreach}
 		</table>
 		{/if}
+		<p id="resultsCounter">
+			{$results|@count} resultaten in hudige selectie
+		</p>
 	</p>
-	
-	<p id="resultsCounter">
-		<span>{$results|@count} resultaten in hudige selectie</span>
-	</p>
-
-	<p id="dialogFooter">
-		[ <a href="#" onclick="$('#theForm').submit();">ok</a> | <a href="#" onclick="closeDialog();">sluiten</a> ]
-	</p>
+	<div id="dialogFooter">
+		<p>
+			<span class="toolBar">[ <a href="#" onclick="$('#theForm').submit();">ok</a> | <a href="#" onclick="closeDialog();">sluiten</a> ]</span>
+		</p>
+	</div>
 	</form>
 
 </div>
