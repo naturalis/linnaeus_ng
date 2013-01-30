@@ -81,6 +81,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+	
 {if $characteristics}
 {foreach from=$characteristics item=v}
 {assign var=foo value="|"|explode:$v.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$v.label}{assign var=cText value=''}{/if}
@@ -107,6 +108,7 @@ nbcStart = {$nbcStart};
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
 {/if}
+
 {if $taxa}
 nbcData = $.parseJSON('{$taxa}');
 nbcProcessResults();
@@ -115,8 +117,13 @@ nbcGetResults();
 {/if}
 
 {literal}
+
+
+
+
+
 });
 </script>
 {/literal}
-		
+
 {include file="../shared/footer.tpl"}

@@ -94,6 +94,8 @@ function nbcClearResults() {
 	$('#results-container').html('');
 }
 
+var tplNBCResult;
+
 function nbcFormatResult(data) {
 
 	/*
@@ -135,7 +137,7 @@ function nbcFormatResult(data) {
 	var id = data.y+'-'+data.i;
 	
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
-			'<div class="resultImageHolder" style="background-color:red">'+
+			'<div class="resultImageHolder">'+
 				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
 					'<img class="result" height="207" width="145" src="'+data.m+'" title="'+data.p+'" />'+
 				'</a>'+

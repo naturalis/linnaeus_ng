@@ -227,7 +227,7 @@ class ImportNBCController extends Controller
             $this->redirect('nbc_determinatie_3.php');
         
         $this->setPageName($this->translate('Storing ranks, species and variations'));
-        
+
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
             
             $ranks = $this->addRanks();
@@ -378,6 +378,8 @@ class ImportNBCController extends Controller
     {
         
         /*
+         	lines:
+         	
 	        l0: title          / character_codes
 	        l1:                / character labels
 	        l2:                / character instructions
