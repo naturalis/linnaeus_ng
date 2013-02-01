@@ -6,8 +6,11 @@
 Below is a sample of the data parsed from the input file. Please verify that it looks okay, and click 'Create project'.
 </p>
 <p>
-	Project title: "<b>{$title}</b>"
+	Project title: "<b>{$title}</b>"<br />
+    Soortgroep: {$soortgroep}<br />
 </p>
+
+
 
 <p>
 <b>First five characters (of {$characters|@count}):</b><br />

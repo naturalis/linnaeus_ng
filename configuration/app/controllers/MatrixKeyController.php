@@ -186,7 +186,7 @@ class MatrixKeyController extends Controller
             )));
             
             $states = $this->stateMemoryRecall();
-            
+
             $results = $this->nbcGetTaxaScores($states);
             
             $taxa = json_encode(
@@ -352,9 +352,8 @@ class MatrixKeyController extends Controller
             $s = $this->fixStateLabels($s); // temporary measure (hopefully!)
             $s = $this->sortStates($s);
             
-            $states = $this->stateMemoryRecall(array(
-                'charId' => $this->requestData['id']
-            ));
+            //$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
+            $states = $this->stateMemoryRecall();
             
             $this->smarty->assign('remainingStateCount', $this->getRemainingStateCount(array(
                 'charId' => $this->requestData['id'], 
@@ -372,7 +371,7 @@ class MatrixKeyController extends Controller
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
             
-            if (isset($this->requestData['params']) && $this->requestData['params']['action'] == 'similar') {
+            if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar') {
                 
                 $results = $this->getSimilarNBC($this->requestData['params']);
             }
@@ -392,11 +391,48 @@ class MatrixKeyController extends Controller
                 )
             )));
         }
-        
+        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'clear_state')) {
 
+			if (!$this->rHasVal('state'))
+				$this->stateMemoryUnset();
+			else
+				$this->stateMemoryUnset($this->requestData['state']);
+
+		}
+        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'set_state') && $this->rHasVal('state')) {
+
+			if ($this->rHasVal('value'))
+				$state = $this->requestData['state'] . ':' . $this->requestData['value'];
+			else
+				$state = $this->requestData['state'];
+		
+			$this->stateMemoryStore($state);
+			
+			return;
+
+		}
+        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_groups')) {
+
+
+            $states = $this->stateMemoryRecall();
+
+            foreach ((array) $states as $val)
+                $d[$val['characteristic_id']] = true;
+
+            $this->smarty->assign('returnText', 
+				json_encode(
+				array(
+					'groups' => $this->getCharacterGroups(),
+					'activeChars' => $d,
+					'storedStates' => $this->stateMemoryRecall()
+				)));
+
+		}
+		
         $this->allowEditPageOverlay = false;
         
         $this->printPage(isset($tpl) ? $tpl : null);
+
     }
 
 
@@ -463,17 +499,8 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
         
         if ($this->_matrixType == 'NBC') {
-            
-            $this->_nbcTotEntities = $this->getSessionSetting('nbcTotEntities');
-            
-            if ($force || empty($this->_nbcTotEntities)) {
-                $d = $this->getCompleteDatasetNBC();
-                $this->_nbcTotEntities = count((array) $d);
-                $this->saveSessionSetting(array(
-                    'name' => 'nbcTotEntities', 
-                    'value' => $this->_nbcTotEntities
-                ));
-            }
+            $d = $this->getCompleteDatasetNBC();
+            $this->_nbcTotEntities = count((array) $d);
         }
     }
 
@@ -659,6 +686,7 @@ class MatrixKeyController extends Controller
             else // c:x:y (fixed values)
                 $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
         }
+		
     }
 
 
@@ -1360,7 +1388,7 @@ class MatrixKeyController extends Controller
     {
         if (!isset($name) || !isset($_SESSION['app']['user']['matrix']['settings'][$name]))
             return;
-        
+
         return $_SESSION['app']['user']['matrix']['settings'][$name];
     }
 
@@ -1985,16 +2013,19 @@ class MatrixKeyController extends Controller
     private function getRemainingStateCount ($p=null)
     {
     
-        $charId = isset($p['charId']) ? $p['charId'] : 1134;
+        $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
     
-        $dT = $dT = '';
+        $dT = $dV = '';
         $i = 0;
+		$s = array();
     
         if (!empty($states)) {
             // we want all taxa/variations that have the already selected states so we create a list of unique state id's of those states
             foreach ((array) $states as $val) {
+				
                 if ($val['type'] != 'f') {
+
                     $dT .= "right join %PRE%matrices_taxa_states _c" . $i . "
 						on _a.taxon_id = _c" . $i . ".taxon_id
 						and _a.matrix_id = _c" . $i . ".matrix_id
@@ -2002,12 +2033,58 @@ class MatrixKeyController extends Controller
 						and _a.project_id = _c" . $i++ . ".project_id
 						and (_a.taxon_id is not null or _a.variation_id is null)
 						";
-                }
+
+                } else {
+                
+					$d = explode(':',$val['val']);
+					$value = $val['value'];
+
+					$sd = (isset($d[3]) ? $d[3] : null);
+					
+					$d = array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'characteristic_id' => $val['characteristic_id']
+					);
+					
+					if (isset($sd)) {
+						
+						$d['mean >=#'] = '(' . strval(intval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
+						$d['mean <=#'] = '(' . strval(intval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+					} else {
+						
+						$d['lower <='] = $d['upper >='] = intval($value);
+					}					
+
+					$cs = $this->models->CharacteristicState->_get(array(
+						'id' => $d
+					));
+
+					foreach ((array) $cs as $key => $cVal)
+						$s[] = $cVal['id'];
+	
+				}
             }
         }
+		
+		
+        if ($s) {
+
+			$s = implode(',', $s);
+
+			$fsT = "right join %PRE%matrices_taxa_states _s
+					on _s.project_id = _a.project_id 
+					and _s.matrix_id = _a.matrix_id
+					and _s.taxon_id = _a.taxon_id 
+					and _s.taxon_id is not null
+					and _s.state_id in (" . $s . ")";
+
+			$fsV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $fsT));
+
+		}
 
         if (!empty($dT))
             $dV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $dT));
+
         
         /*
          find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
@@ -2021,26 +2098,32 @@ class MatrixKeyController extends Controller
         		select count(distinct _a.taxon_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 	        		from %PRE%matrices_taxa_states _a
 	        		" . (!empty($dT) ? $dT : "") . "
+					" . (!empty($fsT) ?  $fsT : ""). "
 					where _a.project_id = " . $this->getCurrentProjectId() . "
-						and _a.taxon_id not in (select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+						and _a.taxon_id not in
+							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
 					group by _a.state_id
 				union
-				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id from %PRE%matrices_taxa_states _a
+				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
+					from %PRE%matrices_taxa_states _a
 					" . (!empty($dV) ? $dV : "") . "
+					" . (!empty($fsV) ? $fsV : "") . "
 					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 					group by _a.state_id
 			) as q1 
 			group by q1.state_id
 			";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-        //q($this->models->MatrixTaxonState->q());
+		//q($this->models->MatrixTaxonState->q());
         
         $all = array();
     
         foreach ((array) $results as $val) {
     
-            if (!empty($charId) && $val['characteristic_id']!=$charId) continue;
+            if (!empty($charIdToShow) && $val['characteristic_id']!=$charIdToShow) continue;
     
             $all[$val['state_id']] = intval($val['tot']);
     

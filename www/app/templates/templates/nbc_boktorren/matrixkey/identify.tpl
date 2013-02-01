@@ -6,6 +6,7 @@
 <div id="content">
 	<div id="facets">
 		<ul class="facetCategories">
+        <span id="facet-categories-menu">
 		{foreach from=$groups item=v}
 			{assign var=openGroup value=false}
 			<li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id})">{$v.label}</a>
@@ -19,7 +20,7 @@
 					{foreach from=$storedStates item=s key=cK}
 					{if $s.characteristic_id==$c.id}
 						<div class="facetValueHolder">
-							{$s.value} {$s.label} <a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$cK}');$('#form2').submit();">(deselecteer)</a>
+							{$s.value} {$s.label} <a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$cK}');$('#form2').submit();">{t}(deselecteer){/t}</a>
 						</div>
 					{/if}
 					{/foreach}
@@ -34,7 +35,8 @@
 			nbcToggleGroup({$v.id});
 			</script>
 			{/if}
-		{/foreach}				
+		{/foreach}		
+        </span>		
 		<ul class="facetCategories clearSelectionBtn">
 			<li class="closed">
 				<span><a href="#" onclick="$('#action2').val('clear');$('#form2').submit();">wis geselecteerde eigenschappen</a></span>

@@ -4,6 +4,7 @@
 
 {t _s1=$taxon[0].total}%s taxa, with:{/t}
 <ul>
+<li>{t _s1=$variations[0].total}%s variations{/t}</li>
 <li>{t _s1=$mediataxon[0].total}%s media files{/t}</li>
 <li>{t _s1=$commonname[0].total}%s common names{/t}</li>
 <li>{t _s1=$synonym[0].total}%s synonyms{/t}</li>

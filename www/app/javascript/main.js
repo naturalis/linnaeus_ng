@@ -43,7 +43,6 @@ function allGetTimestamp() {
 	return tsTimeStamp;
 
 }
-
 function glossTextOver(id,caller) {
 
 	if (!id) return;

@@ -73,7 +73,8 @@ class ProjectsController extends Controller
         'variation_relations', 
         'matrix_variation', 
         'nbc_extras',
-        'heartbeat'
+        'heartbeat',
+        'taxon_variation'	
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -728,6 +729,15 @@ class ProjectsController extends Controller
             ), 
             'columns' => 'count(*) as total'
         )));
+
+
+        $this->smarty->assign('variations', $this->models->TaxonVariation->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId()
+            ), 
+            'columns' => 'count(*) as total'
+        )));
+
         
         $this->printPage();
     }
