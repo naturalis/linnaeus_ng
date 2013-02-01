@@ -6,7 +6,8 @@ var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
 var nbcPaginate = true;
-var nbcPopupSizes = {small:350,medium:425,large:620};
+var nbcPopupWidths = {small:350,medium:425,large:620};
+var nbcStatevalue = String;
 
 function nbcToggleGroup(id) {
 
@@ -43,7 +44,7 @@ function nbcShowStates(id) {
 			success : function (data) {
 				//alert(data);
 				showDialog(c.label,data);
-				$('#dialog').css('width', (c.type=='media' ? nbcPopupSizes.large : nbcPopupSizes.medium));
+				$('#dialog').css('width', (c.type=='media' ? nbcPopupWidths.large : nbcPopupWidths.medium));
 				$.modaldialog.reinitPosition({top:175,height:400});
 
 			}
@@ -80,7 +81,8 @@ function nbcGetResults(p) {
 			nbcData = $.parseJSON(data);
 			nbcProcessResults();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
-
+			if (p && p.closeDialog==true) closeDialog();
+			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
 		}
 	});
 	
@@ -210,8 +212,18 @@ function nbcPrintOverhead() {
 	var count = nbcData.count;
 
 	$('#result-count').html(
-		'<strong style="color:#333">'+(count.results)+'</strong> (van <strong style="color:#777;">'+(count.all)+'</strong>) objecten in huidige selectie'
-	);
+		sprintf(
+			'<strong style="color:#333">%s</strong> %s',
+			count.results,
+			sprintf(
+				_('(van %s) objecten in huidige selectie'),
+					sprintf(
+						'<strong style="color:#777;">%s</strong>',
+						count.all
+					)
+				)
+			)
+		);
 
 }
 
@@ -312,4 +324,113 @@ function nbcPrintSimilarHeader() {
 		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar()">&lt;&lt; terug</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+}
+
+function nbcSetState(p) {
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
+			state : p.state,
+			value : p.value,
+			id : null,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			if (p.norefresh!==false)
+				nbcGetResults({closeDialog:true,refreshGroups:true,});
+		}
+	});
+	
+}
+
+function nbcSetStateValue(state) {
+	
+	var state = state ? state : $('#state-id').val();
+
+	nbcSetState({state:state,value:nbcStatevalue});
+		
+}
+
+function nbcClearStateValue(state) {
+
+	$('#range-value').val('');
+	nbcSetState({state:state,clearState:true});
+		
+}
+
+function nbcRefreshGroupMenu() {
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_groups' ,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			data = $.parseJSON(data);
+			if (data.groups) nbcBuildGroupMenu(data);
+		}
+	});
+
+	
+}
+
+function nbcBuildGroupMenu(data) {
+
+	$('#facet-categories-menu').html();
+	
+	var d= Array();
+	
+	//console.dir(data);
+	
+	for (var i in data.groups) {
+		var v = data.groups[i];
+		var openGroup = false;
+		var s = 
+			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+')">'+v.label+'</a>'+
+				'<ul id="character-group-'+v.id+'" class="facets hidden">';
+
+		for (var j in v.chars) {
+			var c = data.groups[i].chars[j];
+			var foo = c.label.split('|')
+			if (foo[0] && foo[1]) {
+				var cLabel = foo[0];
+				var cText = foo[1]
+			} else {
+				var cLabel = c.label
+				var cText = '';
+			}
+			
+			s = s + '<li><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+')">'+cLabel+' '+c.value+'</a>';
+			
+			if (data.activeChars[c.id]) {
+				openGroup = true;
+				s = s + '<span>';
+				var cK = 0;
+				for (k in data.storedStates) {
+					var s = data.storedStates[k];
+					if (s.characteristic_id==c.id) {
+						s = s + 
+							'<div class="facetValueHolder">'+s.value+' '+s.label+
+							'<a href="#" class="removeBtn" onclick="$(\'#action2\').val(\'clear\');$(\'#id2\').val(\''+cK+'\');$(\'#form2\').submit();">'+_('(deselecteer)')+'</a></div>';
+					}
+				}
+			}
+			
+			if (openGroup)
+				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+
+		}
+				
+		d.push(s);
+	}
+	
+	$('#facet-categories-menu').html(d.join('\n'));
+
 }

@@ -4,14 +4,12 @@
 
 	column headers, like 'naam SCI', are hardcoded! 
 
-	$_variantColumnHeaders needs to be user invulbaarable
+	$_stdVariantColumns needs to be user invulbaarable --> NOT! assume sekse and variant
 
 	need to implement!
-
 	private function translateStateCode($code)
 
 */
-
 
 include_once ('Controller.php');
 class ImportNBCController extends Controller
@@ -23,7 +21,10 @@ class ImportNBCController extends Controller
     private $_defaultLanguageId = 24; // dutch, hardcoded
     private $_defaultImgExtension = 'jpg';
     private $_defaultSkinName = 'nbc_default';
-    private $_variantColumnHeaders = array();
+	private $_defaultGroupName = 'NBC default soortgroep';
+
+    private $_stdVariantColumns = array('sekse','variant');
+	
     public $usedModels = array(
         'commonname', 
         'media_taxon', 
@@ -55,7 +56,6 @@ class ImportNBCController extends Controller
     public $controllerPublicName = 'NBC Dierendeterminatie Import';
     public $cssToLoad = array();
     public $jsToLoad = array();
-
 
 
     /**
@@ -158,7 +158,14 @@ class ImportNBCController extends Controller
         $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
         
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseData($raw);
+		
+		if (empty($data['project']['soortgroep'])) {
+			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
+			$data = $_SESSION['admin']['system']['import']['data'];
+		}
         
+        if (isset($data['project']['soortgroep']))
+            $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
         if (isset($data['project']['title']))
             $this->smarty->assign('title', $data['project']['title']);
         if (isset($data['species']))
@@ -181,13 +188,15 @@ class ImportNBCController extends Controller
         if (!$this->isFormResubmit() && !isset($_SESSION['admin']['system']['import']['project'])) {
             
             $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
+			$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
             
             $pId = $this->createProject(
             array(
                 'title' => $pTitle, 
                 'version' => '1', 
                 'sys_description' => 'Created by import from a NBC-export.', 
-                'css_url' => $this->controllerSettings['defaultProjectCss']
+                'css_url' => $this->controllerSettings['defaultProjectCss'],
+				'group' => $pGroup
             ));
             $this->addMessage('Created project "' . $pTitle . '" with id ' . $pId . '.');
             
@@ -227,15 +236,17 @@ class ImportNBCController extends Controller
             $this->redirect('nbc_determinatie_3.php');
         
         $this->setPageName($this->translate('Storing ranks, species and variations'));
-
+		
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
             
             $ranks = $this->addRanks();
             
             $_SESSION['admin']['system']['import']['project']['ranks'] = $ranks;
             
+            if ($this->rHasVal('variant_columns')) $_SESSION['admin']['system']['import']['variantColumns'] = $this->requestData['variant_columns'];
+
             $data = $_SESSION['admin']['system']['import']['data'];
-            
+           
             $data = $this->storeSpeciesAndVariations($data);
             
             $_SESSION['admin']['system']['import']['species_data'] = $data;
@@ -244,6 +255,11 @@ class ImportNBCController extends Controller
             $this->addMessage('Added ' . $_SESSION['admin']['system']['import']['loaded']['variations'] . ' variations.');
             $this->smarty->assign('processed', true);
         }
+		
+		$this->smarty->assign('variantColumns',$this->extractVariantColumns($_SESSION['admin']['system']['import']['data']));
+		$this->smarty->assign('stdVariantColumns',$this->_stdVariantColumns);
+		
+		
         
         $this->printPage();
     }
@@ -397,13 +413,13 @@ class ImportNBCController extends Controller
         foreach ((array) $raw as $key => $val) {
             
             $lineHasData = strlen(implode('', $val)) > 0;
-            
+			
             if ($lineHasData) {
-                
+
                 $line++;
                 
                 foreach ((array) $val as $cKey => $cVal) {
-                    
+
                     $cVal = trim($cVal);
                     
                     if (!empty($cVal)) {
@@ -411,10 +427,13 @@ class ImportNBCController extends Controller
                         // line "0", cell 0: title
                         if ($line == 0 && $cKey == 0)
                             $data['project']['title'] = $cVal;
-                            // line "0", cell > 0: character codes
+                        // line "0", cell > 0: character codes
                         if ($line == 0 && $cKey > 0 && !empty($cVal))
                             $data['characters'][$cKey]['code'] = $cVal;
-                            // line "1", cell > 0: character labels
+                        // line "1", cell 1: title
+                        if ($line == 1 && $cKey == 0)
+                            $data['project']['soortgroep'] = $cVal;
+                        // line "1", cell > 0: character labels
                         if ($line == 1 && $cKey > 0 && !empty($cVal))
                             $data['characters'][$cKey]['label'] = $cVal;
                     	// line "2", cell > 0: character instructions
@@ -475,7 +494,7 @@ class ImportNBCController extends Controller
                 }
             }
         }
-        
+
         return $data;
     }
 
@@ -538,8 +557,7 @@ class ImportNBCController extends Controller
 
     private function resolveSpeciesAndVariations ($data)
     {
-        array_push($this->_variantColumnHeaders, 'sekse');
-        
+
         $d = array();
         
         foreach ((array) $data['species'] as $key => $val) {
@@ -548,20 +566,22 @@ class ImportNBCController extends Controller
             $d[$val['naam SCI']]['id'] = $val['id'];
             $d[$val['naam SCI']]['variations'][] = $val;
         }
-        
+		
+		$variantColumns = isset($_SESSION['admin']['system']['import']['variantColumns']) ? $_SESSION['admin']['system']['import']['variantColumns'] : null;
+
         foreach ((array) $d as $key => $val) {
             
             foreach ((array) $val['variations'] as $sKey => $sVal) {
-                
+          
                 $str = null;
-                
-                foreach ((array) $this->_variantColumnHeaders as $hVal) {
-                    if (!isset($sVal[$hVal]))
+
+                foreach ((array) $variantColumns as $hVal) {
+                    if (!isset($sVal[$data['characters'][$hVal]['code']]))
                         continue;
-                    //$str .= $this->translateStateCode($sVal[$hVal], $this->getNewDefaultLanguageId()) . ' ';
-                    $str .= $sVal[$hVal]. ' ';
+                    $str .= $sVal[$data['characters'][$hVal]['code']]. ' ';
+					
                 }
-                
+
                 $d[$key]['variations'][$sKey]['add-on'] = trim($str);
                 $d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
             }
@@ -577,7 +597,7 @@ class ImportNBCController extends Controller
                 unset($d[$key]['variations']);
             }
         }
-        
+
         return $d;
     }
 
@@ -602,7 +622,7 @@ class ImportNBCController extends Controller
     {
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
-        
+
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariations($data);
         
@@ -1063,4 +1083,23 @@ class ImportNBCController extends Controller
             }
         }
     }
+	
+	private function extractVariantColumns($data)
+	{
+		
+		$d = array();
+		
+		foreach((array)$data['characters'] as $key => $val) {
+			
+			if ($val['group']=='hidden') {
+				
+				array_push($d,array('id'=>$key,'code'=>$val['code'],'label'=>$val['label']));
+				
+			}
+		}
+		
+		return $d;
+		
+	}
+
 }

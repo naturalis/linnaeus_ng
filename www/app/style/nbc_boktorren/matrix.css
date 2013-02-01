@@ -6,7 +6,7 @@ div#graphicValueSelector #dialogSelectorWindow {}
 div#graphicValueSelector #resultsCounter {}
 div#graphicValueSelector #dialogFooter {border-top:1px dotted black;padding:10px 0px 0px 0px;text-align:center;}
 
-div#graphicValueSelector .selectedValue {background-color:#eee; border:dotted 1px #bbb;font-weight:bold}
+div#graphicValueSelector .selectedValue {background-color:#eee; border:1px dotted red;font-weight:bold;margin:2px;}
 adiv#graphicValueSelector .selectedValue a {font-weight:bold; white-space:pre-wrap; width:104px; color:#000;}
 adiv#graphicValueSelector .selectedValue a img {border:solid 0px #ddffcc;} 
 adiv#graphicValueSelector .selectedValue a div {border:solid 2px #eee;}
