@@ -5,8 +5,7 @@
 		<span id="state-header">{$cLabel}:</span>{if $cText}<br />{$cText}{/if}
 	</p>
 
-	<form id="theForm" method="post" action="identify.php">
-	<input type="hidden" id="state-id" name="state" value="{$c.prefix}:{$c.id}" />
+	<span id="state-id" class="hidden">{$c.prefix}:{$c.id}</span>
 	
 	<p id="dialogSelectorWindow">
 	{if $c.type=='range'}
@@ -14,7 +13,7 @@
 		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
 
 		<div id="dialog-content-inner-inner">
-            <input style="text-align:right" id="range-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
+            <input style="text-align:right" id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
             <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val())">waarde wissen</a>
 		</div>
 
@@ -67,9 +66,9 @@
 		</div>
 	{/if}
 
-		<p id="resultsCounter">
-			{$results|@count} resultaten in hudige selectie
-		</p>
+		<!-- p id="resultsCounter">
+			0 resultaten in hudige selectie
+		</p -->
 
 	</p>
 
@@ -79,6 +78,15 @@
 		</p>
 	</div>
 
-	</form>
-
 </div>
+
+{literal}
+<script type="text/JavaScript">
+$(document).ready(function(){
+{/literal}
+nbcBindDialogKeyUp();
+$('#state-value').focus();
+{literal}
+});
+</script>
+{/literal}
