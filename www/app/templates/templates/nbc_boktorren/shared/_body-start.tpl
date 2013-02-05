@@ -11,7 +11,7 @@
 			<li><a href="http://determinatie.nederlandsesoorten.nl/natuur-om-de-hoek.aspx">natuur om de hoek</a></li>
 		</ul>
 		<ul class="siteMenu" style="float:right;">
-			<li id="build-info" style="text-align:right"><a><span style="font-weight:bold">Linnaeus v0.1 (build 1543)</span> <span style="color:#999;font-size:9px">(2013.01.29 15:07; pid{$session.app.project.id})</span></a></li>
+			<li id="build-info" style="text-align:right"><a><span style="font-weight:bold">Linnaeus v0.1 (build 1547)</span> <span style="color:#999;font-size:9px">(2013.02.05 14:54; pid{$session.app.project.id})</span></a></li>
 		</ul>
 	</div>
 	
