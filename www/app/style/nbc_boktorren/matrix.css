@@ -49,8 +49,17 @@ adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
 .state-image-irrelevant {
 	cursor: default;
 }
-
-.xxx {
-	font-size: 9px;
-	color:#666;
+div .resultRow .resultDetails {
+	display:none;
+}
+div .resultRow .resultDetails ul {
+	margin:0;
+	padding:5px 0px 0px 15px;
+	color:#000;
+}
+.ghosted {
+	filter:alpha(opacity=25);
+	-moz-opacity:0.25;
+	-khtml-opacity: 0.25;
+	opacity: 0.25;
 }

@@ -1,26 +1,27 @@
 {include file="../shared/header.tpl"}
-<form id="form2" method="post" action="identify.php">
-<input type="hidden" id="action2" name="action" value="" />
-<input type="hidden" id="id2" name="id" value="" />
-</form>
+
 <div id="content">
 	<div id="facets">
 		<ul class="facetCategories">
         <span id="facet-categories-menu">
+        
 		{foreach from=$groups item=v}
+
 			{assign var=openGroup value=false}
-			<li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id})">{$v.label}</a>
+			<li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id});return false;">{$v.label}</a>
 				<ul id="character-group-{$v.id}" class="facets hidden">
 					{foreach from=$v.chars item=c}
 					{assign var=foo value="|"|explode:$c.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$c.label}{assign var=cText value=''}{/if}
-					<li><a class="facetLink" href="#" onclick="nbcShowStates({$c.id})">{$cLabel} {$c.value}</a>
+					<li><a class="facetLink" href="#" onclick="nbcShowStates({$c.id});return false;">{$cLabel}{if $c.value} {$c.value}{/if}</a>
 					{if $activeChars[$c.id]}
 					{assign var=openGroup value=true}
 					<span>
 					{foreach from=$storedStates item=s key=cK}
 					{if $s.characteristic_id==$c.id}
 						<div class="facetValueHolder">
-							{$s.value} {$s.label} <a href="#" class="removeBtn" onclick="$('#action2').val('clear');$('#id2').val('{$cK}');$('#form2').submit();">{t}(deselecteer){/t}</a>
+							{if $s.value}{$s.value} {/if}{if $s.label}{$s.label} {/if}
+                            <!-- a href="#" class="removeBtn" onclick="nbcClearStateValue('{$cK}');return false;">{t}(deselecteer){/t}</a -->
+                            <a href="#" class="removeBtn" onclick="nbcClearStateValue('{$cK}');return false;"><img src="{$nbcImageRoot}clearSelection.gif"></a>
 						</div>
 					{/if}
 					{/foreach}
@@ -35,11 +36,14 @@
 			nbcToggleGroup({$v.id});
 			</script>
 			{/if}
-		{/foreach}		
-        </span>		
-		<ul class="facetCategories clearSelectionBtn">
+
+		{/foreach}	
+	
+        </span>	
+        
+		<ul id="clearSelectionContainer" class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
 			<li class="closed">
-				<span><a href="#" onclick="$('#action2').val('clear');$('#form2').submit();">wis geselecteerde eigenschappen</a></span>
+				<span><a id="clearSelectionLink" href="#" onclick="nbcClearStateValue();return false;">{t}wis geselecteerde eigenschappen{/t}</a></span>
 			</li>
 		</ul>
 		<ul class="facetCategories sourceContainer">
@@ -109,21 +113,15 @@ nbcStart = {$nbcStart};
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
-{/if}
-
 {if $taxa}
 nbcData = $.parseJSON('{$taxa}');
 nbcProcessResults();
 {else}
 nbcGetResults();
 {/if}
+{/if}
 
 {literal}
-
-
-
-
-
 });
 </script>
 {/literal}

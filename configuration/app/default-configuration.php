@@ -180,6 +180,7 @@ class configuration
 			'useCorrectedHValue' => true,
 			'nbc' => array(
 				'entitiesPerPage' => 16,
+				'entitiesPerLine' => 4,
 				'statesPerLine' => 4,
 				'nbcImageRoot' => 'http://determinatie.nederlandsesoorten.nl/images/'
 			)

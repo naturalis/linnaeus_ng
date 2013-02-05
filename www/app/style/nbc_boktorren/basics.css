@@ -53,11 +53,12 @@ ul.sourceContainer li strong {display:block;margin:5px 0;}
 
 #content div#results #resultsHeader {width:703px; height:27px; margin:28px 0 0 17px; position:relative; border-bottom:solid 1px #ddd; border-top:solid 1px #bbb; color: #666;}
 #content div#results #resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}/*float:left;*/
-#content div#results div.result {width:145px; height:275px; margin-top:27px; margin-left:17px; padding:8px; position:relative; border:solid 1px #ddd;}
+#content div#results div.result {width:145px; min-height:275px; margin-top:27px; margin-left:17px; padding:8px; position:relative; border:solid 1px #ddd;}
 #content div#results div.resultHighlight {border:dotted 1px #f44;}
 #content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
 #content div#results div.result .resultImageHolder img {border:none;}
 #content div#results div.result div {width:131px; font-size:11px; color:#aaaaaa;}
+#content div#results div.result div.scientificNameHolder {min-height:50px;}
 #content div#results div.result span.scientificName 
 {
 	font-style:italic; 
@@ -70,7 +71,7 @@ ul.sourceContainer li strong {display:block;margin:5px 0;}
 #content div#results div.result a {text-decoration:none; font-size:11px; color:#555555;}
 #content div#results div.result a.similarBtn {position:absolute; top:273px; left:8px; background:transparent url(http://determinatie.nederlandsesoorten.nl/images/url.gif) no-repeat 0 4px; padding-left:12px;}
 #content div#results div.result a:hover {color:#ff0000;}
-#content div#results div.result img.gender {position:absolute;top:221px;left:146px;}
+#content div#results div.result img.gender {position:absolute;top:221px;left:146px;height:17px;width:8px;}
 #content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
 
 /* pagination */

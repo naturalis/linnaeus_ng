@@ -164,27 +164,6 @@ class MatrixKeyController extends Controller
         
         if ($this->_matrixType == 'NBC') {
             
-            if ($this->rHasVal('action', 'clear')) {
-                
-                if (!$this->rHasid())
-                    $this->stateMemoryUnset();
-                else
-                    $this->stateMemoryUnset($this->requestData['id']);
-            }
-            else if ($this->rHasVal('state')) {
-                
-                if ($this->rHasVal('state-value'))
-                    $state = $this->requestData['state'] . ':' . $this->requestData['state-value'];
-                else
-                    $state = $this->requestData['state'];
-                
-                $this->stateMemoryStore($state);
-            }
-            
-            $this->smarty->assign('nbcStart', $this->saveSessionSetting(array(
-                'name' => 'nbcStart'
-            )));
-            
             $states = $this->stateMemoryRecall();
 
             $results = $this->nbcGetTaxaScores($states);
@@ -192,10 +171,12 @@ class MatrixKeyController extends Controller
             $taxa = json_encode(
             array(
                 'results' => $results, 
+				'paramCount' => count((array)$states),
                 'count' => array(
                     'results' => count((array) $results), 
                     'all' => $this->_nbcTotEntities, 
-                    'perpage' => $this->controllerSettings['nbc']['entitiesPerPage']
+                    'perLine' => $this->controllerSettings['nbc']['entitiesPerLine'],
+                    'perPage' => $this->controllerSettings['nbc']['entitiesPerPage']
                 )
             ));
             
@@ -371,25 +352,40 @@ class MatrixKeyController extends Controller
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
             
-            if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar') {
-                
+            if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar')                
                 $results = $this->getSimilarNBC($this->requestData['params']);
-            }
-            else {
-                
+            else                
                 $results = $this->nbcGetTaxaScores();
-            }
+
+
+            $states = $this->stateMemoryRecall();
+
+			$d = array();
+
+            foreach ((array) $states as $val)
+                $d[$val['characteristic_id']] = true;
             
             $this->smarty->assign('returnText', 
-            json_encode(
-            array(
-                'results' => $results, 
-                'count' => array(
-                    'results' => count((array) $results), 
-                    'all' => count((array) $results), 
-                    'perpage' => 16
-                )
-            )));
+				json_encode(
+					array(
+						'results' => $results, 
+						'paramCount' => count((array)$states),
+						'count' => array(
+							'results' => count((array) $results), 
+							'all' => count((array) $results), 
+							'perLine' => $this->controllerSettings['nbc']['entitiesPerLine'],
+							'perPage' => $this->controllerSettings['nbc']['entitiesPerPage']
+						),
+						'menu' => array(
+							'groups' => $this->getCharacterGroups(),
+							'activeChars' => $d,
+							'storedStates' => $this->stateMemoryRecall()
+						)
+					)
+				)
+			);
+	
+			
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'clear_state')) {
 
@@ -397,6 +393,7 @@ class MatrixKeyController extends Controller
 				$this->stateMemoryUnset();
 			else
 				$this->stateMemoryUnset($this->requestData['state']);
+				
 
 		}
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'set_state') && $this->rHasVal('state')) {
@@ -413,8 +410,9 @@ class MatrixKeyController extends Controller
 		}
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_groups')) {
 
-
             $states = $this->stateMemoryRecall();
+
+			$d = array();
 
             foreach ((array) $states as $val)
                 $d[$val['characteristic_id']] = true;
@@ -501,6 +499,7 @@ class MatrixKeyController extends Controller
         if ($this->_matrixType == 'NBC') {
             $d = $this->getCompleteDatasetNBC();
             $this->_nbcTotEntities = count((array) $d);
+			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->controllerSettings['nbc']['nbcImageRoot'];
         }
     }
 
@@ -1573,13 +1572,17 @@ class MatrixKeyController extends Controller
         $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
         $highlight = isset($p['highlight']) ? $p['highlight'] : false;
         $details = isset($p['details']) ? $p['details'] : null;
+
+
+
         
+	
         $d = array(
             'i' => $val['id'], 
             'l' => trim($label), 
             'y' => $type, 
             's' => strip_tags(($type == 't' ? $val['l'] : $val['taxon']['taxon'])), 
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : 'http://determinatie.nederlandsesoorten.nl/images/noimage_Boktorren%20van%20NL.gif', 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->controllerSettings['nbc']['nbcImageRoot'].'noimage_Boktorren%20van%20NL.gif', 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related), 

@@ -1,6 +1,7 @@
 var nbcCharacters = Array();
 var nbcStart = 0;
-var nbcPerPage = 0;
+var nbcPerPage = 16;
+var nbcPerLine = 4;
 var nbcData;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
@@ -8,6 +9,7 @@ var nbcImageRoot;
 var nbcPaginate = true;
 var nbcPopupWidths = {small:350,medium:425,large:620};
 var nbcStatevalue = String;
+var nbcDetailShowStates = Array();
 
 function nbcToggleGroup(id) {
 
@@ -54,18 +56,6 @@ function nbcShowStates(id) {
 
 }
 
-function nbcProcessResults() {
-	
-	nbcSetPageParameters();
-	nbcClearResults();
-	nbcClearOverhead();
-	nbcClearPaging();
-	if (nbcData.results) nbcPrintResults();
-	if (nbcData.count) nbcPrintOverhead(); 
-	if (nbcData.count) nbcPrintPaging();	
-
-}
-
 function nbcGetResults(p) {
 
 	allAjaxHandle = $.ajax({
@@ -88,15 +78,36 @@ function nbcGetResults(p) {
 	
 }
 
+function nbcProcessResults() {
+	nbcStart = 0;
+	nbcSetPageParameters();
+	nbcClearResults();
+	nbcClearOverhead();
+	nbcClearPaging();
+	if (nbcData.results) nbcPrintResults();
+	if (nbcData.count) nbcPrintOverhead(); 
+	if (nbcData.count) nbcPrintPaging();
+	//nbcResetClearButton(); // now called in nbcPrintResults()
+}
+
 function nbcSetPageParameters() {
-	nbcPerPage = nbcData.count.perpage;
+	nbcPerPage = nbcData.count.perPage && nbcData.count.perPage > 0 ? nbcData.count.perPage : nbcPerPage;
+	nbcPerLine = nbcData.count.perLine && nbcData.count.perLine > 0 ? nbcData.count.perLine : nbcPerLine;
+}
+
+function nbcResetClearButton() {
+
+	if (nbcData.paramCount==0) {
+		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
+	} else {
+		$('#clearSelectionContainer').removeClass('ghosted');
+	}
+
 }
 
 function nbcClearResults() {
 	$('#results-container').html('');
 }
-
-var tplNBCResult;
 
 function nbcFormatResult(data) {
 
@@ -141,47 +152,61 @@ function nbcFormatResult(data) {
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
-					'<img class="result" height="207" width="145" src="'+data.m+'" title="'+data.p+'" />'+
+					'<img class="resultImageHolder" src="'+data.m+'" title="'+data.p+'" />'+
 				'</a>'+
 			'</div>'+
-			'<div style="min-height:50px">'+
-				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') +
-					(data.s!=data.l ? data.l+'<br />' : '')+
+			'<div class="scientificNameHolder">'+
+				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') + (data.s!=data.l ? data.l+'<br />' : '')+
 					'<span class="scientificName">'+(data.s)+'</span>'+
-					(data.u ? '</a>' : '')  +
+				(data.u ? '</a>' : '')  +
 			'</div>'+
-			(data.g ? '<img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
-			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');" target="_self">gelijkende soorten</a>' : '' ) +
-			(states ?
-'<div id="det-'+id+'" style="padding:1px;background:#fff;border:1px dotted black;width:169px;display:none;z-index:999;left:-14px"><div style="width:160px;"><ul style="margin:0;padding:0px 0px 0px 15px;"><li>'+
-states.join('</li><li>')+'</li></ul></div><a href="#" onclick="veryTemporary(\''+id+'\',\'off\');">x</a></div><span id="tog-'+id+'">'+
-'<a style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="veryTemporary(\''+id+'\',\'on\');">details</a></span>' : '')+
-		'</div>'+
+			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
+			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+_('gelijkende soorten')+'</a>' : '' ) +
+			(states ? 
+				'<span>'+
+					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+_('details')+'</a>'+
+				'</span>' +
+				'<div id="det-'+id+'" class="resultDetails">'+
+					'<ul>'+
+						'<li>'+states.join('</li><li>')+'</li>'+
+					'</ul>'+
+				'</div>' 
+				: '')+
 		'</div>';
 	
 }
 
-function veryTemporary(id,state) {
+function nbcToggleSpeciesDetail(id) {
 
-	$('#det-'+id).css('display',(state=='on' ? 'block' : 'none'));
-	$('#tog-'+id).css('display',(state=='off' ? 'block' : 'none'));
-
+	nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
+	
+	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
+	$('#tog-'+id).html(nbcDetailShowStates[id] ? 'sluiten' : 'details');
+	
 }
 
 function nbcPrintResults() {
-	
+
 	var results = nbcData.results;
 	var s = '';
+	var d = 0;
+
+	s = '<div class="resultRow">';
 
 	for(var i=0;i<results.length;i++) {
 		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
 			s = s + nbcFormatResult(results[i]);
+			if (++d==nbcPerLine)
+				s = s + '</div><div class="resultRow">';
 		}
 	}
 
+	s = s + '</div>';
+
 	$('#results-container').html(s);
 
-	nbcPrettyPhotoInit();	
+	nbcPrettyPhotoInit();
+	nbcResetClearButton();	
 	
 }
 
@@ -235,7 +260,7 @@ function nbcPrintPaging() {
 	nbcCurrPage = Math.floor(nbcStart / nbcPerPage);
 
 	if (nbcLastPage > 1 && nbcCurrPage!=0)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\')">&lt;&lt;</a></li>');
+		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\');return false;">&lt;&lt;</a></li>');
 	
 	if (nbcLastPage>1) { 
 	
@@ -244,14 +269,14 @@ function nbcPrintPaging() {
 			if (i==nbcCurrPage)
 				$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
 		    else
-				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+')">'+(i+1)+'</a></li>');
+				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+');return false;">'+(i+1)+'</a></li>');
 	
 		}
 		
 	}
 
 	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\')">&gt;&gt;</a></li>');
+		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;">&gt;&gt;</a></li>');
 
 	$("#paging-footer").html($("#paging-header").html());
 }
@@ -321,7 +346,7 @@ function nbcPrintSimilarHeader() {
 
 	$('#similarSpeciesHeader').html(
 		'<label>Gelijkende soorten van: '+label+'</label>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar()">&lt;&lt; terug</a>'
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">&lt;&lt; terug</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
@@ -349,7 +374,7 @@ function nbcSetState(p) {
 
 function nbcSetStateValue(state) {
 	
-	var state = state ? state : $('#state-id').val();
+	var state = state ? state : $('#state-id').html();
 
 	nbcSetState({state:state,value:nbcStatevalue});
 		
@@ -357,13 +382,18 @@ function nbcSetStateValue(state) {
 
 function nbcClearStateValue(state) {
 
-	$('#range-value').val('');
+	$('#state-value').val('');
 	nbcSetState({state:state,clearState:true});
 		
 }
 
 function nbcRefreshGroupMenu() {
 
+	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
+
+	return;
+
+	// menu-data now comes bundled with the results for more even displaying
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -385,15 +415,15 @@ function nbcBuildGroupMenu(data) {
 
 	$('#facet-categories-menu').html();
 	
-	var d= Array();
-	
-	//console.dir(data);
-	
+	var d = Array();
+
 	for (var i in data.groups) {
+
 		var v = data.groups[i];
 		var openGroup = false;
+
 		var s = 
-			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+')">'+v.label+'</a>'+
+			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a>'+
 				'<ul id="character-group-'+v.id+'" class="facets hidden">';
 
 		for (var j in v.chars) {
@@ -407,30 +437,54 @@ function nbcBuildGroupMenu(data) {
 				var cText = '';
 			}
 			
-			s = s + '<li><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+')">'+cLabel+' '+c.value+'</a>';
+			s = s + '<li><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+cLabel+(c.value ? ' '+c.value : '')+'</a>';
 			
 			if (data.activeChars[c.id]) {
 				openGroup = true;
 				s = s + '<span>';
-				var cK = 0;
 				for (k in data.storedStates) {
-					var s = data.storedStates[k];
-					if (s.characteristic_id==c.id) {
+					var state = data.storedStates[k];
+					if (state.characteristic_id==c.id) {
+						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
 						s = s + 
-							'<div class="facetValueHolder">'+s.value+' '+s.label+
-							'<a href="#" class="removeBtn" onclick="$(\'#action2\').val(\'clear\');$(\'#id2\').val(\''+cK+'\');$(\'#form2\').submit();">'+_('(deselecteer)')+'</a></div>';
+							'<div class="facetValueHolder">'+
+								(state.value ? state.value+' ' : '')+
+								(state.label ? state.label+' ' : '')+
+								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+								'<img src="'+nbcImageRoot+'clearSelection.gif">'+//_('(deselecteer)')+
+								'</a>'+
+							'</div>';
 					}
 				}
+				
+				s = s + '</span>';
+
 			}
-			
-			if (openGroup)
-				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+
+			s = s  +'</li>';
 
 		}
+
+		s = s  +'</ul></li>';
+		
+		if (openGroup)
+			s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
 				
 		d.push(s);
 	}
 	
 	$('#facet-categories-menu').html(d.join('\n'));
+
+}
+
+function nbcBindDialogKeyUp() {
+
+	$('#state-value').keyup(function(e) {
+		if (e.keyCode==13) {
+			// return
+			nbcSetStateValue();
+		}
+		return;
+	});
 
 }
