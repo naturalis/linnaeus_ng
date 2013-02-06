@@ -24,6 +24,9 @@
 	still files in the directory. make sure to remove the "clearcache" from the URL
 	afterwards, otherwise it will propagate through your session, deleting the
 	cache-files at every next page.
+	to suppress caching, set the variable $_useCache to false. doing so will stop the
+	application from both storing and retrieving data from the cache. existing cache-
+	files will stay intact.
 
 
 	on translations:
