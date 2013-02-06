@@ -3,6 +3,7 @@ var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 4;		// default, reset in identify.php
 var nbcData;
+var nbcFullDatasetCount = 0;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
@@ -230,6 +231,8 @@ function nbcPrintOverhead() {
 
 	var count = nbcData.count;
 	
+	nbcFullDatasetCount = (nbcFullDatasetCount==0) ? count.all : nbcFullDatasetCount;
+	
 	$('#result-count').html(
 		sprintf(
 			'<strong style="color:#333">%s</strong> %s',
@@ -238,7 +241,7 @@ function nbcPrintOverhead() {
 				_('(van %s) objecten in huidige selectie'),
 					sprintf(
 						'<strong style="color:#777;">%s</strong>',
-						count.all
+						nbcFullDatasetCount
 					)
 				)
 			)

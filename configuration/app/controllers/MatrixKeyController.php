@@ -185,6 +185,7 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('storedStates', $states);
             $this->smarty->assign('groups', $this->getCharacterGroups());
             $this->smarty->assign('nbcImageRoot', $this->controllerSettings['nbc']['nbcImageRoot']);
+            $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix']['totalEntityCount']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
 			$this->smarty->assign('nbcPerLine', $this->controllerSettings['nbc']['entitiesPerLine']);
