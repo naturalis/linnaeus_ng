@@ -2,30 +2,56 @@
 
 /*
 
-	order of modules in the icon grid and the main menu is determined by two fields:
+	on skins:
+	if the setting (in the table 'settings') for 'skin' exists, that skin is used
+	providing the follwing directories exist ($this->doesSkinExist()):
+		app/style/[skinname]/
+		app/media/system/skins/[skinname]/
+		[smarty template dir]/[skinname]/[controller basename]/
+	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is
+	used.
 
+
+	on cache:
+	the cache-folder can be found at:
+		[htdocs]/linnaeus_ng/www/shared/cache/[project-code]/
+	'project-code' being the system project-code (formatted as '0023').
+	to clear the cache, add
+		clearcache=1
+	to the url. this will delete all the project's cache-files. please note that in
+	many cases, the application will immediately create one or more new cache-files, so 
+	don't be fooled into thinking clearing of the cache hasn't worked because there are
+	still files in the directory. make sure to remove the "clearcache" from the URL
+	afterwards, otherwise it will propagate through your session, deleting the
+	cache-files at every next page.
+
+
+	on translations:
+	after repeated problems with the getText() functions, the function has been replaced
+	with a custom one:
+		translate($str)
+	this function fetches the translation based on the current setting of the language id.
+	if no translation exists, it saves the string into the table of strings to be
+	translated, and returns it unchanged. the functions:
+		javascriptTranslate()
+		smartyTranslate()
+	are wrappers for accessing translate() from javascript - via the function _() in 
+	main.js - and smarty - via {t}{/t} - respectively.
+
+
+	on the icon grid:
+	order of modules in the icon grid and the main menu is determined by two fields:
 		ModuleProject.show_order
 		FreeModuleProject.show_order
-
 	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR 
 	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
 	tables. when changing these values, bear in mind that list of modules is ordered
 	after having been combined from the normal modules (ModuleProject) and possible
 	free modules (FreeModuleProject). this means that the values for show_order have
-	to be unique across two tables (an 'arc', as it used to be called in oracle);
-	again, these is at present no mechanism that actually enforces this - it is up
-	to the system administrator.
+	to be unique across two tables; again, these is at present no mechanism that
+	actually enforces this - it is up to the system administrator.
 
-
-	on skins:
-	if the setting (in the table 'settings') for 'skin' exists, that skin is used
-	providing the follwing directories exist ($this->doesSkinExist()):
-	- app/style/[skinname]/
-	- app/media/system/skins/[skinname]/
-	- [smarty template dir]/[skinname]/[controller basename]/
-	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is used.
-
-
+	
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -2784,12 +2810,12 @@ class Controller extends BaseClass
         if (empty($i[0]['id']))
             return $text;
             
-            // resolve language id
+		// resolve language id
         $languageId = $this->getCurrentLanguageId();
         if (is_null($languageId))
             $languageId = $this->getDefaultLanguageId();
             
-            // fetch appropriate translation
+		// fetch appropriate translation
         $it = $this->models->InterfaceTranslation->_get(
         array(
             'id' => array(

@@ -88,10 +88,15 @@
 $(document).ready(function(){
 {/literal}
 nbcImageRoot = '{$nbcImageRoot}';
-{if $nbcStart}nbcStart = {$nbcStart};{/if}
-{if $nbcPerPage}nbcPerPage = {$nbcPerPage};{/if}
-{if $nbcPerLine}nbcPerLine = {$nbcPerLine};{/if}
-	
+{if $nbcFullDatasetCount}nbcFullDatasetCount = {$nbcFullDatasetCount};
+{/if}
+{if $nbcStart}nbcStart = {$nbcStart};
+{/if}
+{if $nbcPerPage}nbcPerPage = {$nbcPerPage};
+{/if}
+{if $nbcPerLine}nbcPerLine = {$nbcPerLine};
+{/if}
+
 {if $characteristics}
 {foreach from=$characteristics item=v}
 {assign var=foo value="|"|explode:$v.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$v.label}{assign var=cText value=''}{/if}
