@@ -4,7 +4,6 @@ include_once ('Controller.php');
 class MatrixKeyController extends Controller
 {
     private $_matrixType = 'default';
-    private $_nbcTotEntities = null;
     public $usedModels = array(
         'matrix', 
         'matrix_name', 
@@ -174,9 +173,7 @@ class MatrixKeyController extends Controller
 				'paramCount' => count((array)$states),
                 'count' => array(
                     'results' => count((array) $results), 
-                    'all' => $this->_nbcTotEntities, 
-                    'perLine' => $this->controllerSettings['nbc']['entitiesPerLine'],
-                    'perPage' => $this->controllerSettings['nbc']['entitiesPerPage']
+                    'all' => $_SESSION['app']['system']['matrix']['totalEntityCount']
                 )
             ));
             
@@ -190,6 +187,9 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('nbcImageRoot', $this->controllerSettings['nbc']['nbcImageRoot']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
+			$this->smarty->assign('nbcPerLine', $this->controllerSettings['nbc']['entitiesPerLine']);
+			$this->smarty->assign('nbcPerPage', $this->controllerSettings['nbc']['entitiesPerPage']);
+
         }
         else {
             
@@ -364,7 +364,7 @@ class MatrixKeyController extends Controller
 
             foreach ((array) $states as $val)
                 $d[$val['characteristic_id']] = true;
-            
+
             $this->smarty->assign('returnText', 
 				json_encode(
 					array(
@@ -372,9 +372,7 @@ class MatrixKeyController extends Controller
 						'paramCount' => count((array)$states),
 						'count' => array(
 							'results' => count((array) $results), 
-							'all' => count((array) $results), 
-							'perLine' => $this->controllerSettings['nbc']['entitiesPerLine'],
-							'perPage' => $this->controllerSettings['nbc']['entitiesPerPage']
+							'all' => count((array) $results)
 						),
 						'menu' => array(
 							'groups' => $this->getCharacterGroups(),
@@ -495,12 +493,14 @@ class MatrixKeyController extends Controller
         $this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups') == '1';
         $this->useVariations = $this->getSetting('taxa_use_variations') == '1';
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
+
+		if (empty($_SESSION['app']['system']['matrix']['totalEntityCount']))
+			$_SESSION['app']['system']['matrix']['totalEntityCount'] = $this->getTotalEntityCount();
         
         if ($this->_matrixType == 'NBC') {
-            $d = $this->getCompleteDatasetNBC();
-            $this->_nbcTotEntities = count((array) $d);
 			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->controllerSettings['nbc']['nbcImageRoot'];
         }
+
     }
 
 
@@ -954,7 +954,7 @@ class MatrixKeyController extends Controller
 	        			and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 	        		group by _a.variation_id" : "")
 					//."order by s desc"
-        ;;
+        ;
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
@@ -1573,10 +1573,6 @@ class MatrixKeyController extends Controller
         $highlight = isset($p['highlight']) ? $p['highlight'] : false;
         $details = isset($p['details']) ? $p['details'] : null;
 
-
-
-        
-	
         $d = array(
             'i' => $val['id'], 
             'l' => trim($label), 
@@ -2136,5 +2132,47 @@ class MatrixKeyController extends Controller
     
         return empty($all) ? '*' : $all;
     }
+	
+	private function getTotalEntityCount()
+	{
+
+        if ($this->_matrixType == 'NBC')
+
+			$q = 
+			"select count(distinct _a.taxon_id) as tot
+					from %PRE%matrices_taxa _a
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _a.matrix_id = _b.matrix_id
+						and _a.taxon_id = _b.taxon_id
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				union
+				select count(distinct _a.variation_id) as tot
+					from  %PRE%matrices_variations _a        		
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _a.matrix_id = _b.matrix_id
+						and _a.variation_id = _b.variation_id
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId()
+				;
+		else
+			$q = 
+			"select count(distinct _a.taxon_id) as tot
+					from %PRE%matrices_taxa _a
+					left join %PRE%matrices_taxa_states _b
+						on _a.project_id = _b.project_id
+						and _a.matrix_id = _b.matrix_id
+						and _a.taxon_id = _b.taxon_id
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId();
+				;
+
+		$results = $this->models->MatrixTaxonState->freeQuery($q);
+
+		return $results[0]['tot']+(isset($results[1]['tot']) ? $results[1]['tot'] : 0);
+		
+	}
     
 }

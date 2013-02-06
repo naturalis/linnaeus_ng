@@ -87,6 +87,10 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+nbcImageRoot = '{$nbcImageRoot}';
+{if $nbcStart}nbcStart = {$nbcStart};{/if}
+{if $nbcPerPage}nbcPerPage = {$nbcPerPage};{/if}
+{if $nbcPerLine}nbcPerLine = {$nbcPerLine};{/if}
 	
 {if $characteristics}
 {foreach from=$characteristics item=v}
@@ -105,10 +109,6 @@ nbcAddCharacter({literal}{{/literal}id: {$v.id},type:'{$v.type}',label:'{$cLabel
           ]
         *}{literal}}{/literal});
 {/foreach}
-{/if}
-nbcImageRoot = '{$nbcImageRoot}';
-{if $nbcStart}
-nbcStart = {$nbcStart};
 {/if}
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');

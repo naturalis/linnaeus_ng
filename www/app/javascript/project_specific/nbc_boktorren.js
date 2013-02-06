@@ -1,7 +1,7 @@
 var nbcCharacters = Array();
 var nbcStart = 0;
-var nbcPerPage = 16;
-var nbcPerLine = 4;
+var nbcPerPage = 16;	// default, reset in identify.php
+var nbcPerLine = 4;		// default, reset in identify.php
 var nbcData;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
@@ -80,7 +80,6 @@ function nbcGetResults(p) {
 
 function nbcProcessResults() {
 	nbcStart = 0;
-	nbcSetPageParameters();
 	nbcClearResults();
 	nbcClearOverhead();
 	nbcClearPaging();
@@ -88,11 +87,6 @@ function nbcProcessResults() {
 	if (nbcData.count) nbcPrintOverhead(); 
 	if (nbcData.count) nbcPrintPaging();
 	//nbcResetClearButton(); // now called in nbcPrintResults()
-}
-
-function nbcSetPageParameters() {
-	nbcPerPage = nbcData.count.perPage && nbcData.count.perPage > 0 ? nbcData.count.perPage : nbcPerPage;
-	nbcPerLine = nbcData.count.perLine && nbcData.count.perLine > 0 ? nbcData.count.perLine : nbcPerLine;
 }
 
 function nbcResetClearButton() {
@@ -235,7 +229,7 @@ function nbcClearPaging() {
 function nbcPrintOverhead() {
 
 	var count = nbcData.count;
-
+	
 	$('#result-count').html(
 		sprintf(
 			'<strong style="color:#333">%s</strong> %s',
