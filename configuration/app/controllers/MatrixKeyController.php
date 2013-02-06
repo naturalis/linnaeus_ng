@@ -1602,10 +1602,11 @@ class MatrixKeyController extends Controller
 
     private function getCompleteDatasetNBC ($p = null)
     {
+		
         $res = $this->getCache('matrix-nbc-data');
         
         if (!$res) {
-            
+
             $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
             $tId = isset($p['tId']) ? $p['tId'] : false;
             $vId = isset($p['vId']) ? $p['vId'] : false;
@@ -1630,19 +1631,14 @@ class MatrixKeyController extends Controller
                 
                 $label = $val['label'];
                 
-                $gender = null;
-                
-                if (preg_match('/\s(male|female)$/', $label, $matches)) {
-                    $gender = $matches[1];
-                    $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
-                }
-                
+                $d = $this->nbcExtractGenderTag($label);
+				
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
-                    'label' => $label, 
-                    'gender' => $gender, 
+                    'label' => $d['label'], 
+                    'gender' => $d['gender'], 
                     'related' => $this->getRelatedEntities(array(
                         'vId' => $val['id']
                     )), 
@@ -1756,19 +1752,14 @@ class MatrixKeyController extends Controller
                 $label = $val['label'];
                 $val['id'] = $val['relation_id'];
                 
-                $gender = null;
-                
-                if (preg_match('/\s(male|female)$/', $label, $matches)) {
-                    $gender = $matches[1];
-                    $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
-                }
-
+				$d = $this->nbcExtractGenderTag($label);
+				
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
-                    'label' => $label, 
-                    'gender' => $gender, 
+                    'label' => $d['label'], 
+                    'gender' => $d['gender'], 
                     'type' => 'v', 
                     'highlight' => $val['id'] == $p['id'], 
                     'details' => $this->getVariationStates($val['relation_id'])
@@ -1861,19 +1852,14 @@ class MatrixKeyController extends Controller
                     
                     $label = $val['label'];
                     
-                    $gender = null;
-                    
-                    if (preg_match('/\s(male|female)$/', $label, $matches)) {
-                        $gender = $matches[1];
-                        $label = preg_replace('/(' . $matches[0] . ')$/', '', $label);
-                    }
+					$d = $this->nbcExtractGenderTag($label);
                     
                     $res[] = $this->createDatasetEntry(
                     array(
                         'val' => $val, 
                         'nbc' => $nbc, 
-                        'label' => $label, 
-                        'gender' => $gender, 
+                        'label' => $d['label'], 
+                        'gender' => $d['gender'], 
                         'related' => $this->getRelatedEntities(array(
                             'vId' => $val['id']
                         )), 
@@ -2173,6 +2159,21 @@ class MatrixKeyController extends Controller
 		$results = $this->models->MatrixTaxonState->freeQuery($q);
 
 		return $results[0]['tot']+(isset($results[1]['tot']) ? $results[1]['tot'] : 0);
+		
+	}
+ 
+	private function nbcExtractGenderTag($label)
+	{
+		if (preg_match('/\s(male|female)(\s|$)/', $label, $matches)) {
+			$gender = trim($matches[1]);
+			$label = preg_replace('/\s(' . $gender . ')(\s|$)/', ' ', $label);
+		} else
+			$gender = null;
+		
+		return array(
+			'gender' => $gender,
+			'label' => $label
+		);
 		
 	}
     
