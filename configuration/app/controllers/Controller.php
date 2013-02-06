@@ -130,14 +130,15 @@ class Controller extends BaseClass
         $this->createCacheFolder();
         
         //$this->loadModels();
-        
 
         $this->setRandomValue();
         
         $this->setSmartySettings();
         
         $this->setRequestData();
-        
+
+        $this->emptyCacheFolderByRequest();
+      
         $this->restoreState();
         
         $this->setProjectLanguages();
@@ -2661,18 +2662,49 @@ class Controller extends BaseClass
     }
 
 
+	private function makeCachePath() 
+	{
 
-    private function createCacheFolder ()
-    {
         $p = $this->getCurrentProjectId();
         
         if (!$p)
             return;
         
-        $cachePath = $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
-        
+        return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
+        		
+	}
+
+
+    private function createCacheFolder ()
+    {
+		
+		$cachePath = $this->makeCachePath();
+		
+		if (empty($cachePath))
+			return;
+		
         if (!file_exists($cachePath))
             mkdir($cachePath);
+    }
+
+
+
+    private function emptyCacheFolderByRequest ()
+    {
+
+		if (!$this->rHasVal('clearcache','1'))
+			return;
+
+		$cachePath = $this->makeCachePath();
+		
+		if (empty($cachePath))
+			return;
+		
+        if (file_exists($cachePath))
+			array_map('unlink', glob($cachePath.'/*'));
+		
+		unset($this->requestData['clearcache']);
+
     }
 
 
