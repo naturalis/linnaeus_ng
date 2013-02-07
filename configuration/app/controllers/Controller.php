@@ -8,8 +8,14 @@
 		app/style/[skinname]/
 		app/media/system/skins/[skinname]/
 		[smarty template dir]/[skinname]/[controller basename]/
+	please note they have to exist, even if they remain empty!
 	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is
-	used.
+	used. example, for a project with the skin "original_skin", the following 
+	directories have to exist:
+		"www/linnaeus_ng/www/app/style/original_skin/"
+		"www/linnaeus_ng/www/app/media/system/skins/original_skin/"
+		"www/linnaeus_ng/www/app/templates/templates/original_skin/matrixkey/"
+	otherwise, the default skin, "linnaeus_2", will be used.
 
 
 	on cache:
@@ -1893,7 +1899,7 @@ class Controller extends BaseClass
     private function setSkinName ()
     {
         $d = $this->getSetting('skin');
-        
+
         if (isset($d) && $this->doesSkinExist($d))
             $_SESSION['app']['system']['skinName'] = $d;
         else
@@ -1904,8 +1910,10 @@ class Controller extends BaseClass
 
     private function doesSkinExist ($skin)
     {
-        return file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
-         file_exists($this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/');
+        return 
+			file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && 
+			file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
+         	file_exists($this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/');
     }
 
 

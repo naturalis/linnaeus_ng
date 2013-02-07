@@ -1,3 +1,118 @@
+/* results */
+#content div#results {width:720px;padding:0px;}
+#content div#resultsHeader {width:703px; height:27px; margin:0px 0 0 0px; position:relative; border-bottom:solid 1px #666; color: #666;}
+#content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}/*float:left;*/
+#content div#results div.result {width:145px; min-height:275px; margin-top:27px; margin-right:17px; padding:8px; position:relative; border:solid 1px #ddd;}
+#content div#results div.resultHighlight {border:1px dotted #FA7001;}
+#content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
+#content div#results div.result .resultImageHolder img {border:none;}
+#content div#results div.result div {width:131px; font-size:11px; color:#aaaaaa;}
+#content div#results div.result div.scientificNameHolder {min-height:50px;}
+#content div#results div.result span.scientificName {font-style:italic; width:147px;line-height:14px; height:14px;}
+#content div#results div.result a {text-decoration:none; font-size:11px; color:#555555;}
+#content div#results div.result a.similarBtn {position:absolute; top:273px; left:8px; background:transparent url(http://determinatie.nederlandsesoorten.nl/images/url.gif) no-repeat 0 4px; padding-left:12px;}
+#content div#results div.result a:hover {color:#ff0000;}
+#content div#results div.result img.gender {position:absolute;top:221px;left:146px;height:17px;width:8px;}
+#content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
+#content div#results .resultRow .resultDetails {display:none;}
+#content div#results .resultRow .resultDetails ul {margin:0;padding:5px 0px 0px 7px;color:#999;list-style-type:square;}
+#content div#results .resultRow .resultDetails li .resultDetailLabel {color:#000;font-style:italic}
+#content div#results .resultRow .resultDetails li .resultDetailValue {color:#000;}
+
+
+/* similar species */
+#similarSpeciesHeader {width:inherit;margin:8px 0 0 0px;color:#333;}
+#similarSpeciesHeader #similarSpeciesName {font-weight:bold;}
+
+/* facets*/
+ul.facetCategories {padding-left:0px; margin-top:28px; margin-left:0px; list-style:none;}
+ul.facetCategories a {text-decoration:none; font-weight:bold; color:#333; display:block; margin-left:5px;}
+ul.facetCategories a:hover {text-decoration:underline;}
+ul.facetCategories li {width:230px; background-color:#ccc; padding:0 0 3px 0; border-top:solid 1px #ccc;}
+ul.facetCategories li.open {padding:5px 0 0 0; border-bottom:solid 0px #bbb;}
+ul.facetCategories li.closed {padding:5px 0 7px 0; border-bottom:solid 1px #bbb;}
+
+ul.facets {padding-left:0px; margin-left:0px; list-style:none; margin-top:7px; border-top:1px solid #EEEEEE;}
+ul.facets a {text-decoration:none; color:#666;}
+ul.facets li {background-color:#eee; border-bottom:solid 1px #dedede; border-top:none; padding-top:1px;}
+ul.facets li.opened {padding-bottom:0px;}
+ul.facets li a {margin:0 0 0 5px; line-height:24px; width:220px; display:block;}
+ul.facets li a.removeBtn {margin-left:3px; font-weight:normal; color:#666; display:inline;}
+ul.facets li a.removeBtn:hover {color:#ff0000!important;}
+ul.facets li span {margin-left:0px; display:block; width:230px; margin:3px 0 1px 0; line-height:26px; border-top:solid 1px #DDD;}
+ul.facets li span div.facetValueHolder {float:none!important; margin:0 0 3px 20px; color:#666;}
+ul.facets li span.facetLink_irrelevant {margin:0 0 0 5px; line-height:24px; width:220px; display:block; color:#999; border:none;}
+
+ul.clearSelectionBtn li {background:#fff url(http://determinatie.nederlandsesoorten.nl/images/clearSelection.gif) no-repeat 4px 10px;}
+ul.clearSelectionBtn li a {margin-left:16px;}
+ul.clearSelectionBtn li a:hover {color:#aa0000;}
+
+ul.sourceContainer li {padding:0px 5px 7px 5px!important;  width:220px; background-color:#f8f8f8;}
+ul.sourceContainer li a {display:inline; margin-left:2px;}
+ul.sourceContainer li strong {display:block;margin:5px 0;}
+
+/* pagination */
+
+
+
+div.headerPagination { margin:0 0 0 17px; float:right!important;}
+div.headerSelectionLabel {margin:5px 0 0 0; float:left;}
+div.footerPagination {height:27px; width:703px; margin:27px 0 0 0px;border-top: 1px solid #666666;}
+
+
+
+
+
+.paging {border: none; float: left;height:auto;}
+.paging li {margin-right: 0.5em;display: inline;}
+.paging li.previous a {text-decoration: none;}
+.paging li.next a {border: none;text-decoration: none;}
+.paging li a {color:#666; text-decoration:none;}
+.paging li a:hover {color:#ff0000;}
+.paging li strong{color:#ff0000;font-weight:normal;}
+.paging li.previous a {padding-left:0.5em; border-left:1px solid #DDDDDD;}
+.paging a, 
+.paging strong, .paging span {padding-right: 0.5em; border-right: solid 1px #ddd; color:#666;}
+.list, 
+.list li{margin: 0;padding: 0;list-style: none;}
+.list {padding-top: 5px; margin-bottom:5px; float:right;}
+.list li {margin-bottom: 1em; margin-right: 0.5em;}
+.list li h3 {margin: 0;font-size: 1.2em;	font-weight: normal;}
+.list li h3 .rank{float: left;width: 2em;height: 2em;color: #666;}
+.list li h3 .type{color: #666;font-size: 0.75em;}
+.list li p {margin: 0.5em 0;}
+.list li.next {margin-right:0;}
+.list li.next a {padding-right:0; padding-right: 0.5em; border-right: solid 1px #ddd; }
+
+
+
+.irrelevant 
+{
+	border:dotted 1px #444444!important;
+	filter:alpha(opacity=25);
+	-moz-opacity:0.25;
+	-khtml-opacity: 0.25;
+	opacity: 0.25;
+}
+.irrelevant a 
+{
+	color:#000000!important;
+	text-decoration:none; 
+	cursor:default;
+}
+.irrelevant a:hover div {border-color:#ffffff !important;}
+#resultsCounter {
+	left:9px;
+	position:absolute;
+	color:#888888;
+}
+
+
+
+
+
+
+
 /* value selector dialog - for images */
 div#graphicValueSelector { style="padding:0px 10px 0px 10px;"}
 
@@ -49,17 +164,52 @@ adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
 .state-image-irrelevant {
 	cursor: default;
 }
-div .resultRow .resultDetails {
-	display:none;
-}
-div .resultRow .resultDetails ul {
-	margin:0;
-	padding:5px 0px 0px 15px;
-	color:#000;
-}
 .ghosted {
 	filter:alpha(opacity=25);
 	-moz-opacity:0.25;
 	-khtml-opacity: 0.25;
 	opacity: 0.25;
+}
+
+
+#logo {
+    width: 928px;
+}
+	
+#quicksearch form {
+    background: none;
+	height: 20px;
+	padding: 2px 2px 0px 0px;
+}
+
+#quicksearch #inlineformsearchInput {
+	border: 2px solid #F9A555;
+	font-family:inherit;
+    font-size: 90%;
+}
+
+#quicksearch #inlineformsearchButton {
+	height:22px;
+	border:2px solid #F9A555;
+}
+
+
+#paging-header li .last, #paging-footer li .last {
+    border:none;
+	padding-right: 0px;
+}
+
+
+#paging-header li strong {
+	color:#000;
+    font-weight: bold;
+}
+
+#searchedForTerm{
+    font-weight: bold;
+}
+
+.seachStringHighlight {
+	color:#FA7001;
+	font-weight:bold;	
 }

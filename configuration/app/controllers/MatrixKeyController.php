@@ -55,6 +55,7 @@ class MatrixKeyController extends Controller
         parent::__construct($p);
         
         $this->initialize();
+
     }
 
 
@@ -274,11 +275,10 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function ajaxInterfaceAction ()
     {
-        if (!$this->rHasVal('action') || !$this->rHasId()) {
-            
+		
+		if (!$this->rHasVal('action')) {
             $this->smarty->assign('returnText', 'error');
         }
         else if ($this->rHasVal('action', 'get_states')) {
@@ -300,12 +300,13 @@ class MatrixKeyController extends Controller
         else if ($this->rHasVal('action', 'compare')) {
             
             $this->smarty->assign('returnText', json_encode((array) $this->getTaxonComparison($this->requestData['id'])));
+
         }
         else if ($this->rHasVal('action', 'store_showstate_results')) {
             
             $this->showStateStore('results');
         }
-        if ($this->rHasVal('action', 'store_showstate_pattern')) {
+        else if ($this->rHasVal('action', 'store_showstate_pattern')) {
             
             $this->showStateStore('pattern');
         }
@@ -316,6 +317,26 @@ class MatrixKeyController extends Controller
         else if ($this->rHasVal('action', 'store_compare_vals')) {
             
             $this->compareSpeciesStore($this->requestData['id']);
+        }
+        else if ($this->rHasVal('action', 'do_search')) {
+			
+			if ($this->_matrixType == 'NBC') {
+				
+				$results = $this->nbcDoSearch($this->requestData['params']);
+
+				$this->smarty->assign('returnText', 
+					json_encode(
+						array(
+							'results' => $results, 
+							'count' => array(
+								'results' => count((array) $results)
+							)
+						)
+					)
+				);
+
+			}
+
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'save_session_setting')) {
             
@@ -372,8 +393,7 @@ class MatrixKeyController extends Controller
 						'results' => $results, 
 						'paramCount' => count((array)$states),
 						'count' => array(
-							'results' => count((array) $results), 
-							'all' => count((array) $results)
+							'results' => count((array) $results)
 						),
 						'menu' => array(
 							'groups' => $this->getCharacterGroups(),
@@ -383,7 +403,6 @@ class MatrixKeyController extends Controller
 					)
 				)
 			);
-	
 			
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'clear_state')) {
@@ -939,29 +958,29 @@ class MatrixKeyController extends Controller
         		where _a.project_id = " . $this->getCurrentProjectId() . "
         			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
         		group by id" . ($this->_matrixType == 'NBC' ? "
-	        	union
-	        	select 'variation' as type, _a.variation_id as id, 
-        			count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
-        			0 as h, trim(_c.label) as l
-	        		from  %PRE%matrices_variations _a        		
-        			left join %PRE%matrices_taxa_states _b
-	        			on _a.project_id = _b.project_id
-				        and _a.matrix_id = _b.matrix_id
-				        and _a.variation_id = _b.variation_id
-	        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
-			        left join %PRE%taxa_variations _c
-				        on _a.variation_id = _c.id
-        			where _a.project_id = " . $this->getCurrentProjectId() . "
-	        			and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-	        		group by _a.variation_id" : "")
-					//."order by s desc"
+			union
+			select 'variation' as type, _a.variation_id as id, 
+				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
+				0 as h, trim(_c.label) as l
+				from  %PRE%matrices_variations _a        		
+				left join %PRE%matrices_taxa_states _b
+					on _a.project_id = _b.project_id
+					and _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+					and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+				left join %PRE%taxa_variations _c
+					on _a.variation_id = _c.id
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				group by _a.variation_id" : "")
+				//."order by s desc"
         ;
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
         usort($results, array(
             $this, 
-            'sortMatrixScores'
+            'sortQueryResultsByScoreThenLabel'
         ));
         
         return $results;
@@ -969,17 +988,18 @@ class MatrixKeyController extends Controller
 
 
 
-    private function sortMatrixScores ($a, $b)
+    private function sortQueryResultsByScoreThenLabel ($a, $b)
     {
+		
         if ($a['s'] == $b['s']) {
-            
-            $aa = strtolower(strip_tags($a['l']));
-            $bb = strtolower(strip_tags($b['l']));
-            
+
+			$aa = strtolower(strip_tags($a['l']));
+			$bb = strtolower(strip_tags($b['l']));
+
             if ($aa == $bb)
                 return 0;
             
-                return ($aa < $bb) ? -1 : 1;
+            return ($aa < $bb) ? -1 : 1;
         }
         
         return ($a['s'] > $b['s']) ? -1 : 1;
@@ -1462,8 +1482,6 @@ class MatrixKeyController extends Controller
         return $d;
     }
 
-
-
     public function getVariation ($id)
     {
         $tv = $this->models->TaxonVariation->_get(
@@ -1488,8 +1506,6 @@ class MatrixKeyController extends Controller
         
         return $tv[0];
     }
-
-
 
     private function getRelatedEntities ($p)
     {
@@ -1560,8 +1576,6 @@ class MatrixKeyController extends Controller
         return $rel;
     }
 
-
-
     private function createDatasetEntry ($p)
     {
         $val = isset($p['val']) ? $p['val'] : null;
@@ -1573,12 +1587,16 @@ class MatrixKeyController extends Controller
         $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
         $highlight = isset($p['highlight']) ? $p['highlight'] : false;
         $details = isset($p['details']) ? $p['details'] : null;
+		
+		$type = ($type=='variation' ? 'v' : ($type=='taxon' ? 't' : $type));
+
+		$sciName = strip_tags(($type == 't' ? $val['l'] : (isset($val['taxon']) && !is_array($val['taxon']) ? $val['taxon'] : (isset($val['taxon']['taxon']) ? $val['taxon']['taxon'] : null))));
 
         $d = array(
             'i' => $val['id'], 
             'l' => trim($label), 
             'y' => $type, 
-            's' => strip_tags(($type == 't' ? $val['l'] : $val['taxon']['taxon'])), 
+            's' => $sciName,
             'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->controllerSettings['nbc']['nbcImageRoot'].'noimage_Boktorren%20van%20NL.gif', 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
@@ -1597,8 +1615,6 @@ class MatrixKeyController extends Controller
         
         return $d;
     }
-
-
 
     private function getCompleteDatasetNBC ($p = null)
     {
@@ -1681,7 +1697,7 @@ class MatrixKeyController extends Controller
                         'id' => array(
                             'project_id' => $this->getCurrentProjectId(), 
                             'ref_id' => $val['id'], 
-                            'ref_type' => 'variation'
+                            'ref_type' => 'taxon'
                         ), 
                         'columns' => 'name,value', 
                         'fieldAsIndex' => 'name'
@@ -2176,5 +2192,131 @@ class MatrixKeyController extends Controller
 		);
 		
 	}
-    
+	
+	private function nbcDoSearch($p=null)
+    {
+        if (!isset($p['term']))
+            return;
+			
+		$term = mysql_real_escape_string(strtolower($p['term']));
+
+        $q = "
+        	select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s
+        		from %PRE%matrices_taxa _a
+        		left join %PRE%matrices_taxa_states _b
+        			on _a.project_id = _b.project_id
+        			and _a.matrix_id = _b.matrix_id
+        			and _a.taxon_id = _b.taxon_id
+		        left join %PRE%taxa _c
+			        on _a.taxon_id = _c.id
+		        where _a.project_id = " . $this->getCurrentProjectId() . "
+			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					and lower(_c.taxon) like '%". $term ."%'
+			union
+			select 'variation' as type, _a.variation_id as id, trim(_c.label) as label,trim(_c.label) as l, _c.taxon_id as taxon_id, _d.taxon as taxon, 1 as s
+				from  %PRE%matrices_variations _a        		
+				left join %PRE%matrices_taxa_states _b
+					on _a.project_id = _b.project_id
+					and _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+				left join %PRE%taxa_variations _c
+					on _a.variation_id = _c.id
+				left join %PRE%taxa _d
+					on _c.taxon_id = _d.id						
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
+				";
+
+        $results = $this->models->MatrixTaxonState->freeQuery($q);
+
+        if (!$results)
+			return null;
+		
+		usort($results, array($this, 'sortQueryResultsByScoreThenLabel'));
+
+		$res = $tmp = array();
+		$i = 0;
+		
+		foreach((array)$results as $val) {
+
+			if ($val['type']=='taxon' && isset($tmp[$val['id']]))
+				continue;
+
+			if ($val['type']=='variation') {
+				
+				$d = $this->nbcExtractGenderTag($val['label']);
+				$label = $d['label'];
+				$gender = $d['gender'];
+
+			} else {
+
+				$label = $val['label'];
+
+				$c = $this->models->Commonname->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'taxon_id' => $val['id'], 
+							'language_id' => $this->getCurrentLanguageId()
+						)
+					)
+				);
+				
+				foreach ((array) $c as $cVal) {
+					if ($cVal['commonname'] != $val['label']) {
+						$label = $cVal['commonname'];
+						break;
+					}
+				}
+
+				$gender = null;
+
+			}
+			
+			$res[$i] = $this->createDatasetEntry(
+				array(
+					'val' => $val, 
+					'nbc' => $this->models->NbcExtras->_get(
+						array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'ref_id' => $val['id'], 
+								'ref_type' => $val['type']
+							), 
+							'columns' => 'name,value', 'fieldAsIndex' => 'name'
+						)
+					), 
+					'label' => $label, 
+					'gender' => $gender, 
+					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
+					'type' => $val['type'], 
+					'inclRelated' => true
+				)
+			);
+
+			// post preocessing - createDatasetEntry() strips tages, hence.
+			$res[$i]['l'] = preg_replace_callback(
+				'/(' . $term . ')/i', 
+				create_function('$matches', 'if (trim($matches[0]) == "") return $matches[0]; else return "<span class=\"seachStringHighlight\">".$matches[0]."</span>";'), 
+				$res[$i]['l']
+			);
+
+			$res[$i]['s'] = preg_replace_callback(
+				'/(' . $term . ')/i', 
+				create_function('$matches', 'if (trim($matches[0]) == "") return $matches[0]; else return "<span class=\"seachStringHighlight\">".$matches[0]."</span>";'), 
+				$res[$i]['s']
+			);
+
+			if ($val['type']=='variation')
+				$tmp[$val['taxon_id']] = true;
+				
+			$i++;
+                    
+		}
+
+        return $res;
+		
+    }
+   
 }
