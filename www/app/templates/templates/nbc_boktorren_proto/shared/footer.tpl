@@ -7,7 +7,6 @@
             <a href="#top" class="up">naar boven</a>
         </div>
     </div>
-</div>
 <!-- div id="allLookupList" class="allLookupListInvisible"></div -->
 
 {literal}

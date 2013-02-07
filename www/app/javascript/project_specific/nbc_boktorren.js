@@ -9,8 +9,9 @@ var nbcLastPage = 0;
 var nbcImageRoot;
 var nbcPaginate = true;
 var nbcPopupWidths = {small:350,medium:425,large:620};
-var nbcStatevalue = String;
+var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
+var nbcSearchTerm = '';
 
 function nbcToggleGroup(id) {
 
@@ -79,8 +80,8 @@ function nbcGetResults(p) {
 	
 }
 
-function nbcProcessResults() {
-	nbcStart = 0;
+function nbcProcessResults(resetStart) {
+	if (resetStart!==false) nbcStart = 0;
 	nbcClearResults();
 	nbcClearOverhead();
 	nbcClearPaging();
@@ -137,7 +138,7 @@ function nbcFormatResult(data) {
 				var t = data.d[i].characteristic;
 			}
 			
-			states.push('<i>'+t +'</i>: '+data.d[i].state.label);
+			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+data.d[i].state.label+'</span>');
 		}
 
 	}
@@ -191,8 +192,10 @@ function nbcPrintResults() {
 	for(var i=0;i<results.length;i++) {
 		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
 			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine)
-				s = s + '</div><div class="resultRow">';
+			if (++d==nbcPerLine) {
+				s = s + '</div><br/><div class="resultRow">';
+				d=0;
+			}
 		}
 	}
 
@@ -273,7 +276,7 @@ function nbcPrintPaging() {
 	}
 
 	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;">&gt;&gt;</a></li>');
+		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;" class="last">&gt;&gt;</a></li>');
 
 	$("#paging-footer").html($("#paging-header").html());
 }
@@ -342,13 +345,15 @@ function nbcPrintSimilarHeader() {
 	var label = nbcData.results[0].l;
 
 	$('#similarSpeciesHeader').html(
-		'<label>Gelijkende soorten van: '+label+'</label>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">&lt;&lt; terug</a>'
+		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+'<br />'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+_('terug')+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
 
 function nbcSetState(p) {
+	
+	nbcSetPaginate(true);
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
@@ -362,7 +367,7 @@ function nbcSetState(p) {
 		}),
 		success : function (data) {
 			//alert(data);
-			if (p.norefresh!==false)
+			if (p.norefresh!==true)
 				nbcGetResults({closeDialog:true,refreshGroups:true,});
 		}
 	});
@@ -485,3 +490,90 @@ function nbcBindDialogKeyUp() {
 	});
 
 }
+
+function nbcClearSearchTerm() {
+	nbcSearchTerm='';
+	$('#inlineformsearchInput').val('');
+}
+
+function nbcDoSearch() {
+
+	var str = $('#inlineformsearchInput').val().trim();
+	
+	if ((str.length==0) || (str==nbcSearchTerm)) return false;
+	
+	nbcSearchTerm=str;
+	nbcSetPaginate(true);
+	nbcSetState({norefresh:true,clearState:true});
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'do_search',
+			params : {term: nbcSearchTerm},
+			time : getTimestamp(),
+		}),
+		success : function (data) {
+			//alert(data);
+			nbcData = $.parseJSON(data);
+			nbcProcessResults();
+			nbcPrintSearchHeader();
+			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
+		}
+	});
+
+	return false; // necessary to suppress submit of form
+
+}
+
+function nbcPrintSearchHeader() {
+
+	$('#similarSpeciesHeader').html(
+		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+_('terug')+'</a>'
+	);
+	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+}
+
+function nbcCloseSearch() {
+
+	nbcGetResults();
+	nbcSaveSessionSetting('nbcSearch');
+	$('#inlineformsearchInput').val('');
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,65 @@
+/* value selector dialog - for images */
+div#graphicValueSelector { style="padding:0px 10px 0px 10px;"}
+
+div#graphicValueSelector #dialogHeader {top:5px;}
+div#graphicValueSelector #dialogSelectorWindow {}
+div#graphicValueSelector #resultsCounter {}
+div#graphicValueSelector #dialogFooter {border-top:1px dotted black;padding:10px 0px 0px 0px;text-align:center;}
+
+div#graphicValueSelector .selectedValue {background-color:#eee; border:1px dotted red;font-weight:bold;margin:2px;}
+adiv#graphicValueSelector .selectedValue a {font-weight:bold; white-space:pre-wrap; width:104px; color:#000;}
+adiv#graphicValueSelector .selectedValue a img {border:solid 0px #ddffcc;} 
+adiv#graphicValueSelector .selectedValue a div {border:solid 2px #eee;}
+adiv#graphicValueSelector .selectedValue a:hover img {border:solid 0px #fff}
+adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
+
+
+.hidden {
+	display: none;	
+}
+.visible {
+	display: block;	
+}
+
+#dialog-content, #dialog-content-inner {
+	background-color: #fff;
+}
+
+#dialog-content-inner-inner {
+	max-height:450px;
+	overflow-y:auto;
+	padding-bottom:40px;
+}
+#state-header {
+	font-weight: bold;
+}
+.state-image-cell {
+	margin: 15px 15px 0px 15px;
+}
+.state-image-cell:hover {
+	color: #f00;
+}
+.state-image {
+	border:2px solid #eee;
+}
+.state-image:hover {
+	border:2px solid #666;
+	cursor: pointer;
+}
+.state-image-irrelevant {
+	cursor: default;
+}
+div .resultRow .resultDetails {
+	display:none;
+}
+div .resultRow .resultDetails ul {
+	margin:0;
+	padding:5px 0px 0px 15px;
+	color:#000;
+}
+.ghosted {
+	filter:alpha(opacity=25);
+	-moz-opacity:0.25;
+	-khtml-opacity: 0.25;
+	opacity: 0.25;
+}
