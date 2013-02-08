@@ -1,8 +1,7 @@
 <div id="graphicValueSelector">
 
 	<p id="dialogHeader">
-		{assign var=foo value="|"|explode:$c.label}{if $foo[0] && $foo[1]}{assign var=cLabel value=$foo[0]}{assign var=cText value=$foo[1]}{else}{assign var=cLabel value=$c.label}{assign var=cText value=''}{/if}
-		<span id="state-header">{$cLabel}:</span>{if $cText}<br />{$cText}{/if}
+		<span id="state-header">{$c.label}:</span>{if $c.info}<br />{$c.info}{/if}
 	</p>
 
 	<span id="state-id" class="hidden">{$c.prefix}:{$c.id}</span>

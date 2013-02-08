@@ -1,4 +1,3 @@
-var nbcCharacters = Array();
 var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 4;		// default, reset in identify.php
@@ -25,36 +24,24 @@ function nbcToggleGroup(id) {
 	
 } 
 
-function nbcAddCharacter(c) {
-
-	nbcCharacters[c.id] = c;
-	
-}
-
 function nbcShowStates(id) {
 
-	var c = nbcCharacters[id];
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_formatted_states' ,
+			id : id , 
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			data = $.parseJSON(data);
+			showDialog(data.character.label,data.page);
+			$('#dialog').css('width', (data.character.type=='media' ? nbcPopupWidths.large : nbcPopupWidths.medium));
+			$.modaldialog.reinitPosition({top:175,height:400});
 
-	if (c) {
-
-		allAjaxHandle = $.ajax({
-			url : 'ajax_interface.php',
-			type: 'POST',
-			data : ({
-				action : 'get_formatted_states' ,
-				id : id , 
-				time : getTimestamp()
-			}),
-			success : function (data) {
-				//alert(data);
-				showDialog(c.label,data);
-				$('#dialog').css('width', (c.type=='media' ? nbcPopupWidths.large : nbcPopupWidths.medium));
-				$.modaldialog.reinitPosition({top:175,height:400});
-
-			}
-		});
-
-	}
+		}
+	});
 
 }
 
@@ -144,7 +131,7 @@ function nbcFormatResult(data) {
 	}
 
 	var id = data.y+'-'+data.i;
-	
+
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
@@ -413,7 +400,70 @@ function nbcRefreshGroupMenu() {
 	
 }
 
+
 function nbcBuildGroupMenu(data) {
+
+	$('#facet-categories-menu').html('');
+	
+	var d = Array();
+
+	for (var i in data.groups) {
+
+		var v = data.groups[i];
+		var openGroup = false;
+
+		var s = 
+			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
+			'<ul id="character-group-'+v.id+'" class="hidden">';			
+
+		for (var j in v.chars) {
+
+			var c = data.groups[i].chars[j];
+
+			s = s + '<li class="inner'+(j==(v.chars.length-1) ? ' last' : '')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
+			
+			if (data.activeChars[c.id]) {
+				openGroup = true;
+				s = s + '<span>';
+				for (k in data.storedStates) {
+					var state = data.storedStates[k];
+					if (state.characteristic_id==c.id) {
+						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
+						s = s + 
+							'<div class="facetValueHolder">'+
+								(state.value ? state.value+' ' : '')+
+								(state.label ? state.label+' ' : '')+
+								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+								'<img src="'+nbcImageRoot+'clearSelection.gif">'+
+								'</a>'+
+							'</div>';
+
+					}
+				}
+				
+				s = s + '</span>';
+
+			}
+
+			s = s  +'</li>';
+
+		}
+
+		s = s  +'</ul>';
+		
+		if (openGroup)
+			s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+				
+		d.push(s);
+	}
+	
+	$('#facet-categories-menu').html('<ul>'+d.join('\n')+'</ul>');
+
+}
+
+
+
+function ORGnbcBuildGroupMenu(data) {
 
 	$('#facet-categories-menu').html();
 	

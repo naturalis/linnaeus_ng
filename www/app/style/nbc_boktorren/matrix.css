@@ -1,3 +1,27 @@
+/* left column */
+#quicksearch form {background:none;height:22px;padding: 2px 2px 0px 0px;}
+#quicksearch #inlineformsearchInput {border: 2px solid #F9A555;font-family:inherit;font-size:0.9em;height:20px;width:125px}
+#quicksearch #inlineformsearchButton {height:24px;border:2px solid #F9A555;font-size:0.9em;font-weight:normal;}
+
+#facet-categories-menu ul {margin-bottom:2px;}
+#facet-categories-menu ul li {background:none;background-color:#F9A555;margin:0 0 2px 0;padding: 4px 0px 4px 4px;}
+#facet-categories-menu ul li a {font-weight:bold;color:#333;}
+#facet-categories-menu ul li a:hover {color:#000;}
+#facet-categories-menu ul li.inner {padding:4px 0px 4px 10px;margin-bottom: 0px;background-color:#F9C777;border-bottom:1px solid #F9A555;}
+#facet-categories-menu ul li.last {border-bottom:1px solid #F9C777;}
+#facet-categories-menu .facetValueHolder {font-style:italic;padding-left:2px}
+
+#clearSelectionContainer {margin:10px 0 10px 0}
+#clearSelectionContainer .clearSelectionBtn {margin:10px 0px 10px 0px;}
+#clearSelectionContainer .clearSelectionBtn a:hover {color:#aa0000;}
+#clearSelectionContainer img {padding-right:5px;}
+
+#dataSourceContainer {font-size:0.9em;margin-bottom:10px;}
+#nbcLogoContainer{border:1px solid #eee;}
+
+
+
+
 /* results */
 #content div#results {width:720px;padding:0px;}
 #content div#resultsHeader {width:703px; height:27px; margin:0px 0 0 0px; position:relative; border-bottom:solid 1px #666; color: #666;}
@@ -42,10 +66,6 @@ ul.facets li a.removeBtn:hover {color:#ff0000!important;}
 ul.facets li span {margin-left:0px; display:block; width:230px; margin:3px 0 1px 0; line-height:26px; border-top:solid 1px #DDD;}
 ul.facets li span div.facetValueHolder {float:none!important; margin:0 0 3px 20px; color:#666;}
 ul.facets li span.facetLink_irrelevant {margin:0 0 0 5px; line-height:24px; width:220px; display:block; color:#999; border:none;}
-
-ul.clearSelectionBtn li {background:#fff url(http://determinatie.nederlandsesoorten.nl/images/clearSelection.gif) no-repeat 4px 10px;}
-ul.clearSelectionBtn li a {margin-left:16px;}
-ul.clearSelectionBtn li a:hover {color:#aa0000;}
 
 ul.sourceContainer li {padding:0px 5px 7px 5px!important;  width:220px; background-color:#f8f8f8;}
 ul.sourceContainer li a {display:inline; margin-left:2px;}
@@ -176,24 +196,6 @@ adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
     width: 928px;
 }
 	
-#quicksearch form {
-    background: none;
-	height: 20px;
-	padding: 2px 2px 0px 0px;
-}
-
-#quicksearch #inlineformsearchInput {
-	border: 2px solid #F9A555;
-	font-family:inherit;
-    font-size: 90%;
-}
-
-#quicksearch #inlineformsearchButton {
-	height:22px;
-	border:2px solid #F9A555;
-}
-
-
 #paging-header li .last, #paging-footer li .last {
     border:none;
 	padding-right: 0px;
@@ -213,3 +215,8 @@ adiv#graphicValueSelector .selectedValue a:hover div {border:solid 2px #bbb;}
 	color:#FA7001;
 	font-weight:bold;	
 }
+
+.copyright {
+	padding-left:15px;
+}
+
