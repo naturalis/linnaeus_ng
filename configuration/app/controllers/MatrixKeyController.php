@@ -191,6 +191,7 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
 			$this->smarty->assign('nbcPerLine', $this->controllerSettings['nbc']['entitiesPerLine']);
 			$this->smarty->assign('nbcPerPage', $this->controllerSettings['nbc']['entitiesPerPage']);
+			$this->smarty->assign('nbcDataSource', array('author' => $this->getSetting('source_author'),'title' => $this->getSetting('source_title')));
 
         }
         else {
@@ -370,7 +371,13 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('s', $s);
             $this->smarty->assign('states', $states);
             
-            $tpl = 'formatted_states';
+            $this->smarty->assign('returnText', 
+				json_encode(
+				array(
+					'character' => $c,
+					'page' => $this->fetchPage('formatted_states')
+				)));
+
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
             
@@ -1123,6 +1130,16 @@ class MatrixKeyController extends Controller
             ));
             
             $char['label'] = $cl[0]['label'];
+			
+			if (strpos($char['label'],'|')!==false) {
+				
+				$d = explode('|',$char['label'],2);
+
+				$char['label'] = $d[0];
+				$char['info'] = $d[1];
+				
+			}
+			
             unset($char['got_labels']);
         }
         

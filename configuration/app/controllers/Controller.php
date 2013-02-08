@@ -1331,6 +1331,8 @@ class Controller extends BaseClass
         $this->preparePage();
         
         return $this->smarty->fetch(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
+
+        //$this->previewOverlay(); // not implemented in (the rarely used) fetch
     }
 
 
