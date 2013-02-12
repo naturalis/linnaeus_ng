@@ -50,10 +50,7 @@ class SearchController extends Controller
     );
 
 	public $cssToLoad = array(
-		'basics.css',
-		'search.css',
-		'dialog/jquery.modaldialog.css',
-		'lookup.css',
+		'search.css'
 	);
 
 	public $jsToLoad = array('all' => array(

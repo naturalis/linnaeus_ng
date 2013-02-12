@@ -11,11 +11,7 @@ class ModuleController extends Controller
         'free_module_media'
     );
     public $cssToLoad = array(
-        'basics.css', 
-        'module.css', 
-        'prettyPhoto/prettyPhoto.css', 
-        'lookup.css', 
-        'dialog/jquery.modaldialog.css'
+        'module.css'
     );
     public $jsToLoad = array(
         'all' => array(

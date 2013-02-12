@@ -1,19 +1,23 @@
 {literal}
 <body id="body" class="conceptcard">
-	<div id="page-container">
-    <a name="top"></a>
+
     <div id="container">
+    <a name="top"></a>
+
+	<div id="body">
         <div id="header">
             <div id="logo">
-            	<span style="padding:0px 220px 25px 0px;display:inline;cursor:pointer;" onClick="window.open('http://www.nederlandsesoorten.nl/nsr/nsr/home.html','_self');" title="Soortenregister.nl"></span>
-                <span style="padding:0px 300px 25px 0px;display:inline;cursor:pointer;}" onClick="window.open('identify.php','_self');" title="Boktorren facetdeterminatie"></span>
+                <span id="soortenrgister-link" onClick="window.open('http://www.nederlandsesoorten.nl/nsr/nsr/home.html','_self');" title="Soortenregister.nl"></span>
+                <span id="home-link" onClick="window.open('identify.php','_self');" title="Boktorren facetdeterminatie"></span>
             </div>
+
             <h2 id="slogan">	
                 Overzicht van de Nederlandse biodiversiteit
             </h2>
+
             <div id="menucontainer">
                 <ul id="nav">
-                    <li style="background:none;">
+                    <li>
                         <a href="identify.php">Home</a>
                     </li>
                     <li>
@@ -33,4 +37,5 @@
                 </ul>
             </div>
         </div>
+
 {/literal}

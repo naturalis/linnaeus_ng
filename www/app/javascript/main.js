@@ -91,23 +91,9 @@ function _(text) {
 	return translation;
 
 }
-/*
-function showMedia(url,name) {
 
-	$.colorbox({
-		href:url,
-		title:name,
-		transition:"elastic", 
-		maxWidth:800,
-		width:"100%",
-		opacity:0
-	});
-
-}
-*/
 function showMedia(url,name) {
 	$.prettyPhoto.open(url,'',name);
-	//return;
 }
 
 function showVideo(url,name) {
@@ -122,8 +108,6 @@ function showVideo(url,name) {
 
 }
 
-
-
 function isArray(obj) {
    if (obj.constructor.toString().indexOf("Array") == -1)
       return false;
@@ -131,27 +115,70 @@ function isArray(obj) {
       return true;
 }
 
+var allIsDialogOpen = false;
+
 function showDialog(title,content,vars,resize) {
 
-	if (!vars) {
-		vars = {};
-		vars.width = 350;
+	if ($('#jDialog').length!=0) {
+
+		$('#jDialog').html(null);
+		
+		var buttons = {
+			// callback functions must exist in the dialog's html (or elsewhere within scope)
+			"ok": function() {jDialogOk();},
+			"sluiten": function() {jDialogCancel();}
+		};
+		
+		if (!vars.showOk) 
+			delete buttons.ok;
+
+		$("#jDialog").dialog({
+			resizable: false,
+			maxWidth: 300,
+			maxHeight: 700,
+			width: vars.width,
+			height: vars.height,
+			modal: true,
+			title: title,
+			open: function(event, ui) {$('#jDialog').html(content);},
+			buttons: buttons
+		});
+
+		$("#jDialog").dialog( "option", "position", { my: "center", at: "center" } );
+
+	} else {
+
+		if (!vars) {
+			vars = {};
+			vars.width = 350;
+		}
+	
+		vars.title = title ? title : '';
+	
+		$.modaldialog.prompt(content,vars);
+		if (resize) {
+			$('#dialog-content').css('min-height',0);
+			$('#dialog-content-inner').css('min-height',0);
+			$('#lookup-DialogContent').css('height','auto');
+		}
+		
 	}
 
-	vars.title = title ? title : '';
-
-	$.modaldialog.prompt(content,vars);
-	if (resize) {
-		$('#dialog-content').css('min-height',0);
-		$('#dialog-content-inner').css('min-height',0);
-		$('#lookup-DialogContent').css('height','auto');
-	}
+	allIsDialogOpen = true;
 
 }
 
 function closeDialog() {
 
-	$('#dialog-close').click()
+	if (!allIsDialogOpen) return;
+
+	if ($('#jDialog').length!=0)
+		$('#jDialog').dialog( "close" );
+	else
+		$('#dialog-close').click()
+
+	allIsDialogOpen = false;
+
 
 }
 
@@ -208,6 +235,7 @@ function goAlpha(letter,url) {
 function goLiterature(id) {
 	//!
 	addFormVal('id',id);
+
 	goForm('../literature/reference.php');
 
 }

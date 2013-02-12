@@ -1,3 +1,5 @@
+	</div>
+
     <div id="footer">
         <div id="footerInfo">
             <p class="copyright">
@@ -7,19 +9,28 @@
             <a href="#top" class="up">naar boven</a>
         </div>
     </div>
+
 </div>
 <!-- div id="allLookupList" class="allLookupListInvisible"></div -->
 
+<div id="jDialog" title="" class="ui-helper-hidden"></div>
+
 {literal}
 <script type="text/JavaScript">
+
+if (typeof nbcInit=='function') {
+	nbcInit();
+}
+
+
+
 $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
-	{/literal}
 //	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
+
 })
-{literal}
 </script>
 {/literal}
 

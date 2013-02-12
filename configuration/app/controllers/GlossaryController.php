@@ -28,11 +28,7 @@ class GlossaryController extends Controller
     public $controllerPublicName = 'Glossary';
 
 	public $cssToLoad = array(
-		'basics.css',
-		'glossary.css',
-		'prettyPhoto/prettyPhoto.css',
-		'lookup.css',
-		'dialog/jquery.modaldialog.css'
+		'glossary.css'
 	);
 
 	public $jsToLoad =

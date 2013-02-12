@@ -21,11 +21,7 @@ class SpeciesController extends Controller
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
     public $cssToLoad = array(
-        'basics.css', 
-        'species.css', 
-        'prettyPhoto/prettyPhoto.css', 
-        'lookup.css', 
-        'dialog/jquery.modaldialog.css'
+        'species.css'
     );
     public $jsToLoad = array(
         'all' => array(

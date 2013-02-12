@@ -1,5 +1,4 @@
 html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertical scrollbar/ when page content changes through JS without reload */
 body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
-#page-container {padding-left:15px;} /* contains all html and content of the page */
 #content {float:left;padding-top:10px}
 #content div {float:left; clear:none; position:relative;}
