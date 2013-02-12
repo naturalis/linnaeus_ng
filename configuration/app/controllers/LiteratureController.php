@@ -16,10 +16,7 @@ class LiteratureController extends Controller
     public $controllerPublicName = 'Literary references';
 
 	public $cssToLoad = array(
-		'basics.css',
-		'literature.css',
-		'lookup.css',
-		'dialog/jquery.modaldialog.css'
+		'literature.css'
 	);
 
 	public $jsToLoad =

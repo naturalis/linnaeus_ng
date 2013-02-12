@@ -7,10 +7,16 @@ var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
 var nbcPaginate = true;
-var nbcPopupWidths = {small:350,medium:425,large:620};
 var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
 var nbcSearchTerm = '';
+var nbcShownItems = Array();
+var nbcLabelShowAll = '';
+var nbcLabelHideAll = '';
+var nbcLabelClose = '';
+var nbcLabelDetails = '';
+var nbcLabelBack = '';
+var nbcLabelSimilarSpecies = '';
 
 function nbcToggleGroup(id) {
 
@@ -24,6 +30,20 @@ function nbcToggleGroup(id) {
 	
 } 
 
+// dialog button function, called from main.js::showDialog 
+function jDialogOk() {
+
+	nbcSetStateValue();
+
+}
+
+// dialog button function, called from main.js::showDialog 
+function jDialogCancel() {
+
+	closeDialog();
+
+}
+
 function nbcShowStates(id) {
 
 	allAjaxHandle = $.ajax({
@@ -35,11 +55,13 @@ function nbcShowStates(id) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
+			//alert(data);
 			data = $.parseJSON(data);
-			showDialog(data.character.label,data.page);
-			$('#dialog').css('width', (data.character.type=='media' ? nbcPopupWidths.large : nbcPopupWidths.medium));
-			$.modaldialog.reinitPosition({top:175,height:400});
-
+			showDialog(
+				data.character.label,
+				data.page,
+				{width:data.width,height:data.height,showOk:data.showOk}
+			);
 		}
 	});
 
@@ -60,7 +82,7 @@ function nbcGetResults(p) {
 			nbcData = $.parseJSON(data);
 			nbcProcessResults();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
-			if (p && p.closeDialog==true) closeDialog();
+			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
 		}
 	});
@@ -112,6 +134,8 @@ function nbcFormatResult(data) {
 
 	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' );
 	
+	var id = data.y+'-'+data.i;
+
 	if (data.d) {
 
 		var states = Array();
@@ -127,10 +151,10 @@ function nbcFormatResult(data) {
 			
 			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+data.d[i].state.label+'</span>');
 		}
+		
+		nbcShownItems.push(id);
 
 	}
-
-	var id = data.y+'-'+data.i;
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
@@ -144,10 +168,10 @@ function nbcFormatResult(data) {
 				(data.u ? '</a>' : '')  +
 			'</div>'+
 			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
-			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+_('gelijkende soorten')+'</a>' : '' ) +
+			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+nbcLabelSimilarSpecies+'</a>' : '' ) +
 			(states ? 
 				'<span>'+
-					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+_('details')+'</a>'+
+					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
 				'</span>' +
 				'<div id="det-'+id+'" class="resultDetails">'+
 					'<ul>'+
@@ -164,8 +188,20 @@ function nbcToggleSpeciesDetail(id) {
 	nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
 	
 	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
-	$('#tog-'+id).html(nbcDetailShowStates[id] ? 'sluiten' : 'details');
+	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
 	
+}
+
+function nbcToggleAllSpeciesDetail() {
+	
+	for (var i in nbcShownItems)
+		nbcToggleSpeciesDetail(nbcShownItems[i]);
+
+	if ($('#showAllLabel').html()==nbcLabelShowAll)
+		$('#showAllLabel').html(nbcLabelHideAll);
+	else
+		$('#showAllLabel').html(nbcLabelShowAll);
+
 }
 
 function nbcPrintResults() {
@@ -326,14 +362,16 @@ function nbcCloseSimilar() {
 	
 }
 
-
 function nbcPrintSimilarHeader() {
 
 	var label = nbcData.results[0].l;
 
 	$('#similarSpeciesHeader').html(
-		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+_('terug')+'</a>'
+		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
+		'<br />'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
+		' | '+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
@@ -353,7 +391,6 @@ function nbcSetState(p) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);
 			if (p.norefresh!==true)
 				nbcGetResults({closeDialog:true,refreshGroups:true,});
 		}
@@ -379,24 +416,6 @@ function nbcClearStateValue(state) {
 function nbcRefreshGroupMenu() {
 
 	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
-
-	return;
-
-	// menu-data now comes bundled with the results for more even displaying
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_groups' ,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			data = $.parseJSON(data);
-			if (data.groups) nbcBuildGroupMenu(data);
-		}
-	});
-
 	
 }
 
@@ -433,6 +452,7 @@ function nbcBuildGroupMenu(data) {
 							'<div class="facetValueHolder">'+
 								(state.value ? state.value+' ' : '')+
 								(state.label ? state.label+' ' : '')+
+								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
 								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
 								'<img src="'+nbcImageRoot+'clearSelection.gif">'+
 								'</a>'+
@@ -458,74 +478,6 @@ function nbcBuildGroupMenu(data) {
 	}
 	
 	$('#facet-categories-menu').html('<ul>'+d.join('\n')+'</ul>');
-
-}
-
-
-
-function ORGnbcBuildGroupMenu(data) {
-
-	$('#facet-categories-menu').html();
-	
-	var d = Array();
-
-	for (var i in data.groups) {
-
-		var v = data.groups[i];
-		var openGroup = false;
-
-		var s = 
-			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a>'+
-				'<ul id="character-group-'+v.id+'" class="facets hidden">';
-
-		for (var j in v.chars) {
-			var c = data.groups[i].chars[j];
-			var foo = c.label.split('|')
-			if (foo[0] && foo[1]) {
-				var cLabel = foo[0];
-				var cText = foo[1]
-			} else {
-				var cLabel = c.label
-				var cText = '';
-			}
-			
-			s = s + '<li><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+cLabel+(c.value ? ' '+c.value : '')+'</a>';
-			
-			if (data.activeChars[c.id]) {
-				openGroup = true;
-				s = s + '<span>';
-				for (k in data.storedStates) {
-					var state = data.storedStates[k];
-					if (state.characteristic_id==c.id) {
-						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-						s = s + 
-							'<div class="facetValueHolder">'+
-								(state.value ? state.value+' ' : '')+
-								(state.label ? state.label+' ' : '')+
-								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
-								'<img src="'+nbcImageRoot+'clearSelection.gif">'+//_('(deselecteer)')+
-								'</a>'+
-							'</div>';
-					}
-				}
-				
-				s = s + '</span>';
-
-			}
-
-			s = s  +'</li>';
-
-		}
-
-		s = s  +'</ul></li>';
-		
-		if (openGroup)
-			s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
-				
-		d.push(s);
-	}
-	
-	$('#facet-categories-menu').html(d.join('\n'));
 
 }
 
@@ -581,7 +533,7 @@ function nbcPrintSearchHeader() {
 
 	$('#similarSpeciesHeader').html(
 		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+_('terug')+'</a>'
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
@@ -594,9 +546,16 @@ function nbcCloseSearch() {
 
 }
 
+function nbcInit() {
 
+	nbcLabelClose = _('sluiten');
+	nbcLabelDetails = _('onderscheidende kenmerken');
+	nbcLabelBack = _('terug');
+	nbcLabelSimilarSpecies = _('gelijkende soorten');
+	nbcLabelShowAll = _('alle kenmerken tonen');
+	nbcLabelHideAll = _('alle kenmerken verbergen');
 
-
+}
 
 
 

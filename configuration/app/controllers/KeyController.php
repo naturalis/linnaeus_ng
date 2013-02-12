@@ -21,11 +21,7 @@ class KeyController extends Controller
     public $controllerBaseName = 'key';
     
 	public $cssToLoad = array(
-		'basics.css',
 		'key.css',
-		'lookup.css',
-		'prettyPhoto/prettyPhoto.css',
-	    'dialog/jquery.modaldialog.css'
 	); //'key-tree.css'
 	
 	public $jsToLoad =

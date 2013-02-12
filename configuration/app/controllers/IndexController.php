@@ -10,9 +10,7 @@ class IndexController extends Controller
     );
     public $usedHelpers = array();
     public $cssToLoad = array(
-        'basics.css', 
-        'index.css', 
-        'dialog/jquery.modaldialog.css'
+        'index.css'
     );
     public $jsToLoad = array(
         'all' => array(

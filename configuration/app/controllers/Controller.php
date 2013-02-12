@@ -18,7 +18,34 @@
 	otherwise, the default skin, "linnaeus_2", will be used.
 
 
-	on cache:
+	on stylesheets:
+	there are four location where included .css files and styles can be specified:
+		____source__________scope___________location_________________________________
+		1)	$cssToLoadBase	global			declared in Controller
+		2)	$cssToLoad		module			declared in [Module]Controller
+		3)	hardcoded		skin			printed in _head.tpl
+		4)	dynamic			skin/project	utilities\dynamic-css.tpl
+	ad 1: these files are always loaded, for every module, and loaded first. after
+	 being merged with $cssToLoad in Controller::setCssFiles(), they are printed in
+	 the skin's _head.tpl file.
+	ad 2: module-specific files, are always loaded, directly after $cssToLoadBase.
+	ad 3: skin-specific files, hardcoded (with project-parametrized paths) in
+	 _head.tpl. usually printed after the files in 2), but this can be changed if
+	 need be. note that these files do not *need* to change from one skin to the next
+	 but may do so. an example is the styling of the jQuery-ui dialog.
+	 most skins also include 'cssreset-min.css' and several css-files aimed
+	 specifically at internet explorer in the _head.tpl file.
+	ad 4: the function UtilitiesController::dynamicCssAction() makes it possible to
+	 create project-specific css-data. it prints the template file dynamic-css.tpl,
+	 which exists (and can be altered) in each skin. this smarty-template allows for
+	 conditional formatting based on project id and other variables that are
+	 available to it (in a somewhat cumbersome fashion, as the shared use of the
+	 accolade by css and smarty probably requires a lot of {literal}-tags). the file
+	 is printed with a 'Content-type:text/css'-header, and printed in all _head.tpl 
+	 files after being merged with $cssToLoad in Controller::setCssFiles().
+
+
+	on caching:
 	the cache-folder can be found at:
 		[htdocs]/linnaeus_ng/www/shared/cache/[project-code]/
 	'project-code' being the system project-code (formatted as '0023').
@@ -59,8 +86,8 @@
 	free modules (FreeModuleProject). this means that the values for show_order have
 	to be unique across two tables; again, these is at present no mechanism that
 	actually enforces this - it is up to the system administrator.
-
 	
+
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -119,7 +146,10 @@ class Controller extends BaseClass
         'logging_helper', 
         'debug_tools'
     );
-    public $cssToLoad = array();
+    public $cssToLoadBase = array(
+        'basics.css', 
+        'lookup.css'
+    );
 
 
 
@@ -1624,6 +1654,9 @@ class Controller extends BaseClass
 
     public function setCssFiles ()
     {
+		
+		$this->cssToLoad = array_merge($this->cssToLoadBase,$this->cssToLoad);
+		
         if (isset($_SESSION['app']['project']['urls']['projectCSS'])) {
             
             foreach ((array) $this->cssToLoad as $key => $val)

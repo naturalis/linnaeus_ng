@@ -22,11 +22,8 @@ class MapKeyController extends Controller
     public $controllerBaseName = 'mapkey';
 
 	public $cssToLoad = array(
-		'basics.css',
 		'map.css',
-		'map_l2.css',
-		'dialog/jquery.modaldialog.css',
-		'lookup.css'
+		'map_l2.css'
 	);
 
 	public $jsToLoad = array(

@@ -14,11 +14,7 @@ class IntroductionController extends Controller
     public $controllerPublicName = 'Introduction';
 
 	public $cssToLoad = array(
-		'basics.css',
-		'module.css',
-		'prettyPhoto/prettyPhoto.css',
-		'lookup.css',
-		'dialog/jquery.modaldialog.css'
+		'module.css'
 	);
 
 	public $jsToLoad =
