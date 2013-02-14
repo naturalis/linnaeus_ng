@@ -10,7 +10,7 @@
       <div class="pp_top"> \
        <div class="pp_left"></div> \
        <div class="pp_middle"></div> \
-       <div class="pp_right"></div> \
+       <div class="pp_right"><a class="pp_close" href="#">Close</a></div> \
       </div> \
       <div class="pp_content_container"> \
        <div class="pp_left"> \
@@ -32,7 +32,7 @@
            </div> \
            <p class="pp_description"></p> \
            <div class="pp_social">{pp_social}</div> \
-           <a class="pp_close" href="#">Close</a> \
+           <!-- a class="pp_close" href="#">Close</a--> \
           </div> \
          </div> \
         </div> \

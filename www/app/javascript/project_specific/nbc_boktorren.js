@@ -1,4 +1,6 @@
+var nbcBrowseStyle='paginate';
 var nbcStart = 0;
+var nbcExpandedShowing = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 4;		// default, reset in identify.php
 var nbcData;
@@ -7,28 +9,29 @@ var nbcCurrPage = 0;
 var nbcLastPage = 0;
 var nbcImageRoot;
 var nbcPaginate = true;
+var nbcExpandResults = false;
 var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
 var nbcSearchTerm = '';
-var nbcShownItems = Array();
 var nbcLabelShowAll = '';
 var nbcLabelHideAll = '';
 var nbcLabelClose = '';
 var nbcLabelDetails = '';
 var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
+var nbcPreviousBrowseStyles = {};
 
-function nbcToggleGroup(id) {
+function nbcSetPaginate(state) {
 
-	if ($('#character-group-'+id).css('display')=='none') {
-		$('#character-group-'+id).removeClass('hidden').addClass('visible');
-		$('#character-item-'+id).removeClass('closed').addClass('open');
-	} else {
-		$('#character-group-'+id).removeClass('visible').addClass('hidden');
-		$('#character-item-'+id).removeClass('open').addClass('closed');
-	}
+	nbcPaginate = state;
 	
-} 
+}
+
+function nbcSetExpandResults(state) {
+
+	nbcExpandResults = state;
+	
+}
 
 // dialog button function, called from main.js::showDialog 
 function jDialogOk() {
@@ -43,6 +46,18 @@ function jDialogCancel() {
 	closeDialog();
 
 }
+
+function nbcToggleGroup(id) {
+
+	if ($('#character-group-'+id).css('display')=='none') {
+		$('#character-group-'+id).removeClass('hidden').addClass('visible');
+		$('#character-item-'+id).removeClass('closed').addClass('open');
+	} else {
+		$('#character-group-'+id).removeClass('visible').addClass('hidden');
+		$('#character-item-'+id).removeClass('open').addClass('closed');
+	}
+	
+} 
 
 function nbcShowStates(id) {
 
@@ -89,15 +104,16 @@ function nbcGetResults(p) {
 	
 }
 
-function nbcProcessResults(resetStart) {
-	if (resetStart!==false) nbcStart = 0;
+function nbcProcessResults(p) {
+	if (p && p.resetStart!==false)
+		nbcStart = 0;
+	nbcExpandedShowing= 0;
 	nbcClearResults();
 	nbcClearOverhead();
 	nbcClearPaging();
 	if (nbcData.results) nbcPrintResults();
-	if (nbcData.count) nbcPrintOverhead(); 
+	if (nbcData.count) nbcPrintOverhead();
 	if (nbcData.count) nbcPrintPaging();
-	//nbcResetClearButton(); // now called in nbcPrintResults()
 }
 
 function nbcResetClearButton() {
@@ -114,6 +130,33 @@ function nbcClearResults() {
 	$('#results-container').html('');
 }
 
+function nbcToggleSpeciesDetail(id,state) {
+
+	if (state)
+		nbcDetailShowStates[id] = (state=='show');
+	else
+		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
+	
+	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
+	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
+	
+}
+
+function nbcToggleAllSpeciesDetail() {
+	
+	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
+	
+	$('[id^="tog-"]').each(function(){
+		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
+	});
+
+	if (currHiding)
+		$('#showAllLabel').html(nbcLabelHideAll);
+	else
+		$('#showAllLabel').html(nbcLabelShowAll);
+
+}
+
 function nbcFormatResult(data) {
 
 	/*
@@ -123,8 +166,10 @@ function nbcFormatResult(data) {
 			y = type: t(axon) or v(ariation)
 			l = label 
 			g = gender (absent when not a variation)
+			e = gender label (absent when not a variation)
 			s = scientific name 
-			m = image url 
+			n = had image?
+			m = image url (generic image when n==false)
 			p = photographer credit 
 			u = remote url
 			r = number of similars
@@ -132,7 +177,10 @@ function nbcFormatResult(data) {
 			d = full species details (only when comparing or resultset has only one taxon/variation)
     */
 
-	var photoLabel = data.l+(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' );
+	var photoLabel = 
+		data.l+
+		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
+		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')
 	
 	var id = data.y+'-'+data.i;
 
@@ -152,26 +200,24 @@ function nbcFormatResult(data) {
 			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+data.d[i].state.label+'</span>');
 		}
 		
-		nbcShownItems.push(id);
-
 	}
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
-				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
-					'<img class="resultImageHolder" src="'+data.m+'" title="'+data.p+'" />'+
-				'</a>'+
+				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" >' : '' )+
+					'<img class="resultImageHolder" src="'+data.m+'" />'+
+				(data.n ? '</a>': '' )+
 			'</div>'+
 			'<div class="scientificNameHolder">'+
 				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') + (data.s!=data.l ? data.l+'<br />' : '')+
 					'<span class="scientificName">'+(data.s)+'</span>'+
 				(data.u ? '</a>' : '')  +
 			'</div>'+
-			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
+			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+data.e+'" />' : '' )+
 			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+nbcLabelSimilarSpecies+'</a>' : '' ) +
 			(states ? 
 				'<span>'+
-					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-15' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
+					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-12' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
 				'</span>' +
 				'<div id="det-'+id+'" class="resultDetails">'+
 					'<ul>'+
@@ -183,28 +229,7 @@ function nbcFormatResult(data) {
 	
 }
 
-function nbcToggleSpeciesDetail(id) {
-
-	nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
-	
-	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
-	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
-	
-}
-
-function nbcToggleAllSpeciesDetail() {
-	
-	for (var i in nbcShownItems)
-		nbcToggleSpeciesDetail(nbcShownItems[i]);
-
-	if ($('#showAllLabel').html()==nbcLabelShowAll)
-		$('#showAllLabel').html(nbcLabelHideAll);
-	else
-		$('#showAllLabel').html(nbcLabelShowAll);
-
-}
-
-function nbcPrintResults() {
+function nbcPrintResultsPaginated() {
 
 	var results = nbcData.results;
 	var s = '';
@@ -225,32 +250,79 @@ function nbcPrintResults() {
 	s = s + '</div>';
 
 	$('#results-container').html(s);
+}
+
+function nbcPrintResultsExpanded() {
+
+	var results = nbcData.results;
+	var s = '';
+	var added = d = 0;
+
+	s = '<div class="resultRow">';
+
+	for(var i=0;i<results.length;i++) {
+		if ((i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)) {
+			s = s + nbcFormatResult(results[i]);
+			added++;
+			if (++d==nbcPerLine) {
+				s = s + '</div><br/><div class="resultRow">';
+				d=0;
+			}
+		}
+	}
+	
+	s = s + '</div>';
+
+	$('#results-container').html($('#results-container').html()+s);
+
+	nbcExpandedShowing = nbcExpandedShowing + added;
+
+	if (nbcExpandedShowing==added) {
+		$("#show-more-button").remove();
+		$("#footerPagination").removeClass('noline');
+	}
+
+	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
+//		$("#paging-footer").append('<li id="show-more-button"><a href="#" onclick="nbcPrintResultsExpanded();return false;" class="last">MORE</a></li>');
+		$("#paging-footer").append('<li ><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
+		$("#footerPagination").removeClass('noline').addClass('noline');
+	}
+
+	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results) {
+		$("#show-more-button").remove();
+		$("#footerPagination").removeClass('noline');
+	}
+
+}
+
+function nbcPrintResults() {
+
+	if (nbcExpandResults)
+		nbcPrintResultsExpanded();
+	else
+		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
 
 	nbcPrettyPhotoInit();
 	nbcResetClearButton();	
-	
-}
 
-function nbcPrettyPhotoInit() {
-
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
 
 }
 
 function nbcClearOverhead() {
+
 	$('#result-count').html('');
 	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
 	$('#similarSpeciesHeader').html('');
+
 }
 
 function nbcClearPaging() {
+
+	if (!nbcPaginate) return;
+
 	$('#paging-header').html('');	
 	$('#paging-footer').html('');	
+
 }
 
 function nbcPrintOverhead() {
@@ -276,6 +348,8 @@ function nbcPrintOverhead() {
 }
 
 function nbcPrintPaging() {
+
+	if (!nbcPaginate) return;
 
 	var count = nbcData.count;
 
@@ -340,23 +414,22 @@ function nbcBrowse(id) {
 
 }
 
-function nbcSetPaginate(state) {
-
-	nbcPaginate = state;
-	
-}
-
 function nbcShowSimilar(id,type) {
+	
+	nbcPreviousBrowseStyles.paginate = nbcPaginate;
+	nbcPreviousBrowseStyles.expand = nbcExpandResults;
 
 	nbcSetPaginate(false);
-	nbcGetResults({action: 'similar', id: id, type: type});
+	nbcSetExpandResults(false);
+	nbcGetResults({action:'similar',id:id,type:type});
 	nbcSaveSessionSetting('nbcSimilar',[id,type]);
 	
 }
 
 function nbcCloseSimilar() {
 
-	nbcSetPaginate(true);
+	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
+	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcGetResults();
 	nbcSaveSessionSetting('nbcSimilar');
 	
@@ -378,7 +451,7 @@ function nbcPrintSimilarHeader() {
 
 function nbcSetState(p) {
 	
-	nbcSetPaginate(true);
+	//nbcSetPaginate(true);
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
@@ -392,7 +465,7 @@ function nbcSetState(p) {
 		}),
 		success : function (data) {
 			if (p.norefresh!==true)
-				nbcGetResults({closeDialog:true,refreshGroups:true,});
+				nbcGetResults({closeDialog:true,refreshGroups:true});
 		}
 	});
 	
@@ -418,7 +491,6 @@ function nbcRefreshGroupMenu() {
 	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
 	
 }
-
 
 function nbcBuildGroupMenu(data) {
 
@@ -483,6 +555,24 @@ function nbcBuildGroupMenu(data) {
 
 function nbcBindDialogKeyUp() {
 
+    $("#state-value").keydown(function(event) {
+        // Allow: backspace, delete, tab, escape, and enter
+        if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 || 
+             // Allow: Ctrl+A
+            (event.keyCode == 65 && event.ctrlKey === true) || 
+             // Allow: home, end, left, right
+            (event.keyCode >= 35 && event.keyCode <= 39)) {
+                 // let it happen, don't do anything
+                 return;
+        }
+        else {
+            // Ensure that it is a number and stop the keypress
+            if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+                event.preventDefault(); 
+            }   
+        }
+    });
+
 	$('#state-value').keyup(function(e) {
 		if (e.keyCode==13) {
 			// return
@@ -494,8 +584,10 @@ function nbcBindDialogKeyUp() {
 }
 
 function nbcClearSearchTerm() {
+	
 	nbcSearchTerm='';
 	$('#inlineformsearchInput').val('');
+
 }
 
 function nbcDoSearch() {
@@ -546,6 +638,18 @@ function nbcCloseSearch() {
 
 }
 
+function nbcPrettyPhotoInit() {
+
+ 	$("a[rel^='prettyPhoto']").prettyPhoto({
+		animation_speed:50,
+ 		opacity: 0.70, 
+		show_title: false,
+ 		overlay_gallery: false,
+ 		social_tools: false
+ 	});
+
+}
+
 function nbcInit() {
 
 	nbcLabelClose = _('sluiten');
@@ -555,34 +659,16 @@ function nbcInit() {
 	nbcLabelShowAll = _('alle kenmerken tonen');
 	nbcLabelHideAll = _('alle kenmerken verbergen');
 
+	if (nbcBrowseStyle=='paginate') {
+		nbcSetPaginate(true);
+		nbcSetExpandResults(false);
+	} else
+	if (nbcBrowseStyle=='expand') {
+		nbcSetPaginate(false);
+		nbcSetExpandResults(true);
+	}
+
+	nbcPreviousBrowseStyles.paginate=nbcPaginate;
+	nbcPreviousBrowseStyles.expand=nbcExpandResults;
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -37,6 +37,7 @@
 #content div#results .resultRow .resultDetails ul {margin:0;padding:5px 0px 0px 7px;color:#999;list-style-type:square;}
 #content div#results .resultRow .resultDetails li .resultDetailLabel {color:#000;font-style:italic}
 #content div#results .resultRow .resultDetails li .resultDetailValue {color:#000;}
+.overlapState {color:#999;}
 
 /* similar species */
 #similarSpeciesHeader {width:inherit;margin:8px 0 0 0px;color:#333;}
@@ -56,6 +57,7 @@ ul.facets li.opened {padding-bottom:0px;}
 ul.facets li a {margin:0 0 0 5px; line-height:24px; width:220px; display:block;}
 ul.facets li a.removeBtn {margin-left:3px; font-weight:normal; color:#666; display:inline;}
 ul.facets li a.removeBtn:hover {color:#ff0000!important;}
+img.removeBtnImg {border:none}
 ul.facets li span {margin-left:0px; display:block; width:230px; margin:3px 0 1px 0; line-height:26px; border-top:solid 1px #DDD;}
 ul.facets li span div.facetValueHolder {float:none!important; margin:0 0 3px 20px; color:#666;}
 ul.facets li span.facetLink_irrelevant {margin:0 0 0 5px; line-height:24px; width:220px; display:block; color:#999; border:none;}
@@ -67,6 +69,7 @@ ul.sourceContainer li strong {display:block;margin:5px 0;}
 div.headerPagination { margin:0 0 0 17px; float:right!important;}
 div.headerSelectionLabel {margin:5px 0 0 0; float:left;}
 div.footerPagination {height:27px; width:703px; margin:27px 0 0 0px;border-top: 1px solid #666666;}
+div.footerPagination.noline {border-top:none;}
 .paging {border: none; float: left;height:auto;}
 .paging li {margin-right: 0.5em;display: inline;}
 .paging li.previous a {text-decoration: none;}
@@ -88,7 +91,8 @@ div.footerPagination {height:27px; width:703px; margin:27px 0 0 0px;border-top: 
 .list li.next {margin-right:0;}
 .list li.next a {padding-right:0; padding-right: 0.5em; border-right: solid 1px #ddd; }
 #paging-header li .last, #paging-footer li .last {border:none;padding-right: 0px;}
-#paging-header li strong {color:#000;font-weight: bold;}
+#paging-header li strong, #paging-footer li strong {color:#000;font-weight: bold;}
+#show-more-button{margin:0;width:705px;height:28px;color:#666;font-size:0.90em}
 
 /* value selector dialog - for images */
 div#graphicValueSelector {padding:0px 10px 0px 10px;text-align:left;background-color:#fff;font-family:Arial,Helvetica,Sans-serif;font-size:0.9em;}
@@ -97,7 +101,9 @@ div#graphicValueSelector #dialogSelectorWindow {margin-top:5px}
 div#graphicValueSelector #resultsCounter {}
 div#graphicValueSelector #dialogFooter {border-top:1px dotted black;padding:10px 0px 0px 0px;text-align:center;}
 div#graphicValueSelector .selectedValue {background-color:#eee; border:1px dotted red;font-weight:bold;margin:2px;}
-div#graphicValueSelector #graphicValuesTable {border:1px dotted #999;padding:5px;}
+div#graphicValueSelector #graphicValuesTable {border:none;padding:5px;}
+div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-align:top}
+
 
 /* footer */
 #footer {margin-left:25px;width:960px;}
@@ -122,16 +128,15 @@ div#graphicValueSelector #graphicValuesTable {border:1px dotted #999;padding:5px
 #dialog #dialogHeader {margin-bottom:10px}
 #dialog #dialogHeader #state-header {padding:5px 0 5px 0;font-size:12px;}
 #dialog-content, #dialog-content-inner {background-color: #fff;}
-#dialog-content-inner-inner {max-height:450px;padding-bottom:0px;}
 
 #state-header {font-weight: bold;}
-.state-image-cell {margin: 15px 15px 0px 15px;}
+.state-image-cell {padding:0 0 10px 0;margin: 15px 15px 0px 15px;}
 .state-image-cell:hover {color: #f00;}
 .state-image {border:2px solid #eee;}
 .state-image:hover {border:2px solid #666;cursor: pointer;}
 .state-image-irrelevant {cursor: default;}
 
-.irrelevant {border:dotted 1px #444444;filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
+.irrelevant {border:none;filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 .irrelevant a {color:#000000;text-decoration:none; cursor:default;}
 .irrelevant a:hover div {border-color:#ffffff;}
 .hidden {display: none;	}
@@ -139,7 +144,7 @@ div#graphicValueSelector #graphicValuesTable {border:1px dotted #999;padding:5px
 .ghosted {filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 
 ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;}
-ul.facetListType li {margin:0 0 4px 0;padding:0;}
+ul.facetListType li {margin:0 0 8px 0;padding:0;}
 ul.facetListType li .last {margin:0;color:orange}
 ul.facetListType li:hover {color:black;}
 ul.facetListType li.irrelevant {opacity: 0.25;border:none}
@@ -147,3 +152,20 @@ ul.facetListType li.selected {font-weight:bold;}
 
 .ui-widget-content{background:none;background-color:#fff;}
 .ui-widget-overlay {background:none;background-color:black;opacity: 0.5;}
+
+.ui-widget-content {
+	border: none;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+  color: #666;
+}
+
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
+  border: 1px solid #999;
+}
+
+.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+    font-family: Arial,Helvetica,Sans-serif;
+}
+

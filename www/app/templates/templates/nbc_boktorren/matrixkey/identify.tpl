@@ -17,7 +17,7 @@
             <div id="results-container"></div>
         </div>
 
-        <div class="footerPagination">
+        <div id="footerPagination" class="footerPagination">
             <ul id="paging-footer" class="list paging"></ul>
         </div>
         
@@ -28,6 +28,12 @@
 $(document).ready(function(){
 {/literal}
 nbcImageRoot = '{$nbcImageRoot}';
+nbcBrowseStyle = '{$nbcBrowseStyle}';
+{literal}
+if (typeof nbcInit=='function') {
+	nbcInit();
+}
+{/literal}
 {if $nbcFullDatasetCount}nbcFullDatasetCount = {$nbcFullDatasetCount};
 {/if}
 {if $nbcStart}nbcStart = {$nbcStart};
@@ -41,7 +47,7 @@ nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
 {if $taxa}
 nbcData = $.parseJSON('{$taxa}');
-nbcProcessResults(false);
+nbcProcessResults({literal}{resetStart:false}{/literal});
 {else}
 nbcGetResults();
 {/if}

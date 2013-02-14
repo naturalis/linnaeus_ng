@@ -134,17 +134,20 @@ function showDialog(title,content,vars,resize) {
 
 		$("#jDialog").dialog({
 			resizable: false,
-			maxWidth: 300,
-			maxHeight: 700,
+			maxWidth: 600,
+			maxHeight: 650,
 			width: vars.width,
-			height: vars.height,
+			//height: vars.width,
 			modal: true,
 			title: title,
-			open: function(event, ui) {$('#jDialog').html(content);},
+			open: function(event, ui) {
+				$(this).html(content);
+				$(this).dialog( "option", "position", { my: "center", at: "center" } );
+			},
 			buttons: buttons
 		});
 
-		$("#jDialog").dialog( "option", "position", { my: "center", at: "center" } );
+//		$("#jDialog").dialog( "option", "position", { my: "center", at: "center" } );
 
 	} else {
 
