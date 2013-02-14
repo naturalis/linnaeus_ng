@@ -166,7 +166,6 @@ function nbcFormatResult(data) {
 			y = type: t(axon) or v(ariation)
 			l = label 
 			g = gender (absent when not a variation)
-			e = gender label (absent when not a variation)
 			s = scientific name 
 			n = had image?
 			m = image url (generic image when n==false)
@@ -204,16 +203,16 @@ function nbcFormatResult(data) {
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
-				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" >' : '' )+
-					'<img class="resultImageHolder" src="'+data.m+'" />'+
-				(data.n ? '</a>': '' )+
+				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
+					'<img class="resultImageHolder" src="'+data.m+'" title="'+data.p+'" />'+
+				'</a>'+
 			'</div>'+
 			'<div class="scientificNameHolder">'+
 				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') + (data.s!=data.l ? data.l+'<br />' : '')+
 					'<span class="scientificName">'+(data.s)+'</span>'+
 				(data.u ? '</a>' : '')  +
 			'</div>'+
-			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+data.e+'" />' : '' )+
+			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
 			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+nbcLabelSimilarSpecies+'</a>' : '' ) +
 			(states ? 
 				'<span>'+
