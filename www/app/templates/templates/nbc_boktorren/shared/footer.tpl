@@ -17,19 +17,10 @@
 
 {literal}
 <script type="text/JavaScript">
-
-if (typeof nbcInit=='function') {
-	nbcInit();
-}
-
-
-
 $(document).ready(function(){
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
-//	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
-
 })
 </script>
 {/literal}

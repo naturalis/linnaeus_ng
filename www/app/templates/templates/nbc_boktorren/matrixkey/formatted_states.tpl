@@ -15,10 +15,16 @@
 	{if $c.type=='range'}
 
 		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
-
+			<p>
             <input style="text-align:right" id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
             <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">waarde wissen</a>
-
+            </p>
+			{if $c.min && $c.max}
+            <p style="margin-top:5px">
+            	{t _s1=$c.min_display _s2=$c.max_display _s3=$c.unit}Kies een waarde tussen %s en %s%s.{/t}
+			</p>
+           {/if}
+            
 	{elseif $c.type=='media'}
 
         <table id="graphicValuesTable">
@@ -28,12 +34,12 @@
                     {if $states[$c.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
                     {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
                     
-                    <td style="text-align:center;vertical-align:top"{if $selected} class="selectedValue"{/if}{if $irrelephant} class="irrelevant"{/if}>
+                    <td{if $selected} class="selectedValue"{/if}{if $irrelephant} class="irrelevant"{/if}>
                         {if !$irrelephant}<a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
                         <div class="state-image-cell">
                             <img class="state-image" src="{$session.app.project.urls.projectMedia}{$v.file_name}" />
                             {if !$irrelephant}</a>{/if}
-                            <br /><br />
+                            <br />
                             {$v.label}
                         </div>
                         {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
@@ -72,22 +78,15 @@
     </div>
 	<span id="state-id" class="hidden">{$c.prefix}:{$c.id}</span>
 	</p>
-	
-
-{*        
-
-	<div id="dialogFooter">
-		<p>
-			<span class="toolBar">[ <a href="#" onclick="nbcSetStateValue();return false;">ok</a> | <a href="#" onclick="closeDialog();return false;">sluiten</a> ]</span>
-		</p>
-	</div>
-*}
 
 </div>
 
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+	if (typeof nbcInit=='function') {
+		nbcInit();
+	}
 	nbcBindDialogKeyUp();
 	$('#state-value').focus();
 	$('#state-value').select();

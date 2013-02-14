@@ -1,5 +1,11 @@
 <?php
 
+/*
+	please remove or replace the following tag:
+
+	// added details for ALL results, may have to be removed again
+*/
+
 include_once ('Controller.php');
 class MatrixKeyController extends Controller
 {
@@ -138,11 +144,10 @@ class MatrixKeyController extends Controller
         }
     }
 
-
-
     public function identifyAction ()
     {
-       
+
+		//$this->nbcGetSimilar(array('id'=>3994,'type'=>'v'));die();
         //$this->getRemainingStateCount();return;
 
         $this->checkMatrixIdOverride();
@@ -184,13 +189,15 @@ class MatrixKeyController extends Controller
 			
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
-			
-            $this->smarty->assign('nbcImageRoot', $this->controllerSettings['nbc']['nbcImageRoot']);
+
+            $this->smarty->assign('nbcImageRoot', $this->getSetting('nbc_image_root'));
             $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix']['totalEntityCount']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
-			$this->smarty->assign('nbcPerLine', $this->controllerSettings['nbc']['entitiesPerLine']);
-			$this->smarty->assign('nbcPerPage', $this->controllerSettings['nbc']['entitiesPerPage']);
+			$this->smarty->assign('nbcPerLine', $this->getSetting('matrix_items_per_line'));
+			$this->smarty->assign('nbcPerPage', $this->getSetting('matrix_items_per_page'));
+			$this->smarty->assign('nbcBrowseStyle', $this->getSetting('matrix_browse_style'));
+			
 			$this->smarty->assign('nbcDataSource', 
 				array(
 					'author' => $this->getSetting('source_author'),
@@ -356,7 +363,7 @@ class MatrixKeyController extends Controller
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_formatted_states')) {
             
-            $c = $this->getCharacteristic($this->requestData['id']);
+            $c = $this->getCharacteristic(array('id'=>$this->requestData['id']));
             $c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
             
             $s = $this->getCharacteristicStates($this->requestData['id']);
@@ -365,26 +372,29 @@ class MatrixKeyController extends Controller
             
             //$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
             $states = $this->stateMemoryRecall();
-            
-            $this->smarty->assign('remainingStateCount', $this->getRemainingStateCount(array(
+            $countPerState = $this->getRemainingStateCount(array(
                 'charId' => $this->requestData['id'], 
                 'states' => $states
-            )));
-            
+            ));
+            $this->smarty->assign('remainingStateCount', $countPerState);
+
             $states = $this->nbcStateMemoryReformat($states);
-            
-            $this->smarty->assign('stateImagesPerRow', $this->controllerSettings['nbc']['statesPerLine']);
+		
+            $this->smarty->assign('stateImagesPerRow',$this->getSetting('matrix_state_image_per_row'));
             $this->smarty->assign('c', $c);
             $this->smarty->assign('s', $s);
             $this->smarty->assign('states', $states);
+
+			$dim = $this->nbcGetDialogDimensions(array('type'=>$c['type'],'stateCount'=>count((array)$s),'statesPerRow'=>$this->getSetting('matrix_state_image_per_row')));
             
             $this->smarty->assign('returnText', 
 				json_encode(
 				array(
 					'character' => $c,
-					'page' => $this->fetchPage('formatted_states'),
-					'height' => ($c['type'] == 'media' ? 625 : ($c['type'] == 'text' ? 375 : 200)),
-					'width' => ($c['type'] == 'media' ? 600 : ($c['type'] == 'text' ? 250 : 400)),
+					'page' => 
+					$this->fetchPage('formatted_states'),
+					'height' => $dim[0], // unused in the actual JS (which autosizes), but correct nonetheless
+					'width' => $dim[1],
 					'showOk' => ($c['type'] == 'media' || $c['type'] == 'text' ? false : true)
 				)));
 
@@ -410,7 +420,7 @@ class MatrixKeyController extends Controller
 						'results' => $results, 
 						'paramCount' => count((array)$states),
 						'count' => array(
-							'results' => count((array) $results)
+							'results' => count((array)$results)
 						),
 						'menu' => array(
 							'groups' => $this->getCharacterGroups(),
@@ -536,7 +546,7 @@ class MatrixKeyController extends Controller
 			$_SESSION['app']['system']['matrix']['totalEntityCount'] = $this->getTotalEntityCount();
         
         if ($this->_matrixType == 'NBC') {
-			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->controllerSettings['nbc']['nbcImageRoot'];
+			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->getSetting('nbc_image_root');
         }
 
     }
@@ -829,7 +839,7 @@ class MatrixKeyController extends Controller
         
         foreach ((array) $cs as $key => $val) {
             
-            $d = $this->getCharacteristic($val['characteristic_id']);
+            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
             $cs[$key]['type'] = $d['type'];
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
@@ -913,17 +923,20 @@ class MatrixKeyController extends Controller
                     'project_id' => $this->getCurrentProjectId(), 
                     'characteristic_id' => $charId
                 );
+				
+				$value = str_replace(',','.',$value);
+				$sd = str_replace(',','.',$sd);
                 
                 // calculate the spread around the mean...
                 if (isset($sd)) {
                     
-                    $d['mean >=#'] = '(' . strval(intval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
-                    $d['mean <=#'] = '(' . strval(intval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+                    $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
+                    $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
                 }
                 // or mark just mark the upper and lower boundaries of the value
                 else {
                     
-                    $d['lower <='] = $d['upper >='] = intval($value);
+                    $d['lower <='] = $d['upper >='] =  floatval($value);
                 }
                 
                 // get any states that correspond with these values
@@ -1095,7 +1108,7 @@ class MatrixKeyController extends Controller
         
         foreach ((array) $mc as $key => $val) {
             
-            $d = $this->getCharacteristic($val['characteristic_id']);
+            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
 		
             if ($d) {
                 $states = $this->getCharacteristicStates($val['characteristic_id']);
@@ -1115,8 +1128,15 @@ class MatrixKeyController extends Controller
 
 
 
-    private function getCharacteristic ($id)
+    private function getCharacteristic ($p)
     {
+		
+		$id = isset($p['id']) ? $p['id'] : null;
+		// states only used to avoid double queries when looking for min and max values
+		$states = isset($p['states']) ? $p['states'] : null;
+		
+		if (empty($id)) return;
+		
         $c = $this->models->Characteristic->_get(
         array(
             'id' => array(
@@ -1146,10 +1166,29 @@ class MatrixKeyController extends Controller
 			
 			if (strpos($char['label'],'|')!==false) {
 				
-				$d = explode('|',$char['label'],2);
+				$d = explode('|',$char['label'],3);
 
-				$char['label'] = $d[0];
-				$char['info'] = $d[1];
+				$char['label'] = isset($d[0]) ? $d[0] : null;
+				$char['info'] = isset($d[1]) ? $d[1] : null;
+				$char['unit'] = isset($d[2]) ? $d[2] : null;
+				
+			}
+						
+			if ($char['type']=='range' || $char['type']=='distribution') {
+
+				$cs = $this->models->CharacteristicState->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'characteristic_id' => $id
+						), 
+						'columns' => 'min(lower) as lowest,max(upper) as most_upper'
+					));
+
+				$char['min'] = 1.5;//$cs[0]['lowest'];
+				$char['max'] = $cs[0]['most_upper'];
+				$char['min_display'] = round($char['min'],(is_float($char['min']) ? 1 : 0));
+				$char['max_display'] = round($char['max'],(is_float($char['max']) ? 1 : 0));
 				
 			}
 			
@@ -1186,7 +1225,7 @@ class MatrixKeyController extends Controller
         
         foreach ((array) $mts as $key => $val) {
             
-            $d = $this->getCharacteristic($val['characteristic_id']);
+            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
             
             $mts[$key]['characteristic'] = $d['label'];
             
@@ -1395,14 +1434,12 @@ class MatrixKeyController extends Controller
             ));
 
             foreach ((array) $cc as $cVal) {
-                $cg[$key]['chars'][] = $this->getCharacteristic($cVal['characteristic_id']);
+                $cg[$key]['chars'][] = $this->getCharacteristic(array('id'=>$cVal['characteristic_id']));
             }
         }
         
         return $cg;
     }
-
-
 
     private function getCharacterGroupLabel ($id, $lId)
     {
@@ -1417,8 +1454,6 @@ class MatrixKeyController extends Controller
         
         return $cl[0]['label'];
     }
-    
-
 
     /* "NBC-style" functions below */
     private function saveSessionSetting ($setting)
@@ -1432,8 +1467,6 @@ class MatrixKeyController extends Controller
             $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
     }
 
-
-
     private function getSessionSetting ($name)
     {
         if (!isset($name) || !isset($_SESSION['app']['user']['matrix']['settings'][$name]))
@@ -1441,8 +1474,6 @@ class MatrixKeyController extends Controller
 
         return $_SESSION['app']['user']['matrix']['settings'][$name];
     }
-
-
 
     public function getVariations ($tId = null)
     {
@@ -1625,7 +1656,8 @@ class MatrixKeyController extends Controller
             'l' => trim($label), 
             'y' => $type, 
             's' => $sciName,
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->controllerSettings['nbc']['nbcImageRoot'].'noimage_Boktorren%20van%20NL.gif', 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage_Boktorren%20van%20NL.gif', 
+            'n' => isset($nbc['url_image']), 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related), 
@@ -1635,8 +1667,10 @@ class MatrixKeyController extends Controller
         
         if (isset($val['taxon_id']))
             $d['t'] = $val['taxon_id'];
-        if (isset($gender))
-            $d['g'] = $gender;
+        if (isset($gender)) {
+            $d['g'] = $gender[0];
+            $d['e'] = $gender[1];
+		}
         
         if ($inclRelated && !empty($related))
             $d['related'] = $related;
@@ -1817,7 +1851,7 @@ class MatrixKeyController extends Controller
         $all = array();
     
         foreach ((array) $results as $val) {
-    
+
             if (!empty($charIdToShow) && $val['characteristic_id']!=$charIdToShow) continue;
     
 			if ($groupByCharId) {
@@ -1914,12 +1948,13 @@ class MatrixKeyController extends Controller
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $d['label'], 
-                    'gender' => $d['gender'], 
+                    'gender' => array($d['gender'], $d['gender_label']),
                     'related' => $this->getRelatedEntities(array(
                         'vId' => $val['id']
                     )), 
                     'type' => 'v', 
-                    'inclRelated' => $inclRelated
+                    'inclRelated' => $inclRelated,
+					'details' => $this->getVariationStates($val['id']) // added details for ALL results, may have to be removed again
                 ));
                 
                 $tmp[$val['taxon_id']] = true;
@@ -1972,10 +2007,14 @@ class MatrixKeyController extends Controller
                             'tId' => $val['id']
                         )), 
                         'type' => 't', 
-                        'inclRelated' => $inclRelated
+                        'inclRelated' => $inclRelated,
+						'details' => $this->getTaxonStates($val['id']) // added details for ALL results, may have to be removed again
                     ));
                 }
             }
+
+			// added details for ALL results, may have to be removed again
+			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
             
             $this->customSortArray($res, array(
                 'key' => 'l', 
@@ -2035,7 +2074,7 @@ class MatrixKeyController extends Controller
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $d['label'], 
-                    'gender' => $d['gender'], 
+                    'gender' => array($d['gender'], $d['gender_label']),
                     'type' => 'v', 
                     'highlight' => $val['id'] == $p['id'], 
                     'details' => $this->getVariationStates($val['relation_id'])
@@ -2086,9 +2125,43 @@ class MatrixKeyController extends Controller
                 ));
             }
         }
+		
+		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
         
         return $res;
     }
+	
+	private function nbcHandleOverlappingItemsFromDetails($p)
+	{
+		
+        $data = isset($p['data']) ? $p['data'] : null;
+        $action = isset($p['action']) ? $p['action'] : 'remove';
+        $type = isset($p['keep']) ? $p['keep'] : 'difference';
+
+		$d = array();
+		foreach((array)$data as $key => $val1)	
+			foreach((array)$val1['d'] as $val2)	
+				$d[$key][] = $val2['characteristic_id'].':'.$val2['state_id'];
+
+		$common = call_user_func_array('array_intersect',$d);
+
+		foreach((array)$data as $key => $val) {
+			foreach((array)$val['d'] as $dKey => $dVal) {
+				if (in_array($dVal['characteristic_id'].':'.$dVal['state_id'],$common)) {
+					if ($action='remove') {
+						unset($data[$key]['d'][$dKey]);
+					} else
+					if ($action='tag') {
+						$data[$key]['d'][$dKey]['state']['label'] = '<span class="overlapState">'.$data[$key]['d'][$dKey]['state']['label'].'</span>';
+					}
+				}
+
+			}
+		}
+
+		return $data;
+		
+	}
 
     private function nbcGetTaxaScores ($selectedStates = null)
     {
@@ -2103,7 +2176,7 @@ class MatrixKeyController extends Controller
         if (count($states) == 0)
             return $this->nbcGetCompleteDataset();
             
-            // calculate scores
+		// calculate scores
         $matches = $this->getTaxaScores($states, false);
         
         // only keep the 100% scores, no partial matches
@@ -2135,12 +2208,13 @@ class MatrixKeyController extends Controller
                         'val' => $val, 
                         'nbc' => $nbc, 
                         'label' => $d['label'], 
-                        'gender' => $d['gender'], 
+                        'gender' => array($d['gender'], $d['gender_label']),
                         'related' => $this->getRelatedEntities(array(
                             'vId' => $val['id']
                         )), 
                         'type' => 'v', 
-                        'inclRelated' => false
+                        'inclRelated' => false,
+						'details' => $this->getVariationStates($val['id']) // added details for ALL results, may have to be removed again
                     ));
                 }
                 else {
@@ -2185,7 +2259,8 @@ class MatrixKeyController extends Controller
                             'tId' => $match['id']
                         )), 
                         'type' => 't', 
-                        'highlight' => 0
+                        'highlight' => 0,
+						'details' => $this->getTaxonStates($match['id'])
                     ));
                 }
             }
@@ -2222,7 +2297,8 @@ class MatrixKeyController extends Controller
 		
 		return array(
 			'gender' => $gender,
-			'label' => $label
+			'label' => $label,
+			'gender_label' => $this->translate($gender)
 		);
 		
 	}
@@ -2282,6 +2358,7 @@ class MatrixKeyController extends Controller
 				$d = $this->nbcExtractGenderTag($val['label']);
 				$label = $d['label'];
 				$gender = $d['gender'];
+				$gender_label = $d['gender_label'];
 
 			} else {
 
@@ -2304,7 +2381,7 @@ class MatrixKeyController extends Controller
 					}
 				}
 
-				$gender = null;
+				$gender = $gender_label = null;
 
 			}
 			
@@ -2322,14 +2399,15 @@ class MatrixKeyController extends Controller
 						)
 					), 
 					'label' => $label, 
-					'gender' => $gender, 
+					'gender' => array($gender,$gender_label), 
 					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
 					'type' => $val['type'], 
-					'inclRelated' => true
+					'inclRelated' => true,
+					'details' => ($val['type']=='variation' ? $this->getVariationStates($val['id']) : $this->getTaxonStates($val['id'])) // added details for ALL results, may have to be removed again
 				)
 			);
 
-			// post preocessing - createDatasetEntry() strips tages, hence.
+			// post processing; createDatasetEntry() strips tages, hence.
 			$res[$i]['l'] = preg_replace_callback(
 				'/(' . $term . ')/i', 
 				create_function('$matches', 'if (trim($matches[0]) == "") return $matches[0]; else return "<span class=\"seachStringHighlight\">".$matches[0]."</span>";'), 
@@ -2348,6 +2426,9 @@ class MatrixKeyController extends Controller
 			$i++;
                     
 		}
+		
+		// added details for ALL results, may have to be removed again
+		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 
         return $res;
 		
@@ -2363,7 +2444,7 @@ class MatrixKeyController extends Controller
 		$l1['s'] = $l2['s'] = $l3['s'] = ($smallIsSignificant ? 1 : 0);
 		
 		foreach ((array)$res as $key => $val) {
-			$c = $this->getCharacteristic($key);
+			$c = $this->getCharacteristic(array('id'=>$key));
 
             if ($c['type'] != 'media' && $c['type'] != 'text')
 				continue;
@@ -2394,6 +2475,35 @@ class MatrixKeyController extends Controller
 		return $res;
 
 	}
+
+	private function nbcGetDialogDimensions($p)
+	{
+
+		$type = isset($p['type']) ? $p['type'] : 'media';
+		$stateCount = isset($p['stateCount']) ? $p['stateCount'] : 16;
+		$statesPerRow = isset($p['statesPerRow']) ? $p['statesPerRow'] : 4;
+		
+		$h = $w = 400;
+		
+		// simple dialog, some text and an text-input.
+		if ($type=='range' || $type=='distribution') {
+			$h = 175;
+			$w = 400;
+		} else
+		if ($type=='text') {
+			$h = 140 + ($stateCount * 22);
+			$w = 250;
+		} else
+		if ($type=='media') {
+			$h = 150 + (ceil($stateCount/$statesPerRow) * 160);
+			$w = 600;
+		}
+		
+		return array($h,$w);
+			
+	}
+
+
 
    
 }

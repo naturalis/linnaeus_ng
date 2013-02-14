@@ -28,7 +28,7 @@
                                 {if $s.characteristic_id==$c.id}
                                 <div class="facetValueHolder">
                                     {if $s.value}{$s.value} {/if}{if $s.label}{$s.label} {/if}
-                                    <a href="#" class="removeBtn" onclick="nbcClearStateValue('{$cK}');return false;"><img src="{$nbcImageRoot}clearSelection.gif"></a>
+                                    <a href="#" class="removeBtn" onclick="nbcClearStateValue('{$cK}');return false;"><img class="removeBtnImg" src="{$nbcImageRoot}clearSelection.gif"></a>
                                 </div>
                                 {/if}
                                 {/foreach}
@@ -49,7 +49,7 @@
 			
             <div id="clearSelectionContainer" class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
                 <a id="clearSelectionLink" href="#" onclick="nbcClearStateValue();return false;">
-                <img src="{$nbcImageRoot}clearSelection.gif">{t}wis geselecteerde kenmerken{/t}</a>
+                <img class="removeBtnImg" src="{$nbcImageRoot}clearSelection.gif">{t}wis geselecteerde kenmerken{/t}</a>
             </div>
 
 		</div>
