@@ -203,8 +203,8 @@ function nbcFormatResult(data) {
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
-				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" title="'+escape(photoLabel)+'">'+
-					'<img class="resultImageHolder" src="'+data.m+'" title="'+data.p+'" />'+
+				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">'+
+					'<img class="resultImageHolder" src="'+data.m+'" title="" />'+
 				'</a>'+
 			'</div>'+
 			'<div class="scientificNameHolder">'+
@@ -224,7 +224,8 @@ function nbcFormatResult(data) {
 					'</ul>'+
 				'</div>' 
 				: '')+
-		'</div>';
+		'</div>'
+		;
 	
 }
 
@@ -637,14 +638,19 @@ function nbcCloseSearch() {
 
 }
 
+function bla() {
+
+}
+
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
+		allow_resize:false,
 		animation_speed:50,
  		opacity: 0.70, 
 		show_title: false,
  		overlay_gallery: false,
- 		social_tools: false
+ 		social_tools: false,
  	});
 
 }
@@ -671,3 +677,5 @@ function nbcInit() {
 	nbcPreviousBrowseStyles.expand=nbcExpandResults;
 
 }
+
+
