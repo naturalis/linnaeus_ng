@@ -167,7 +167,7 @@ function nbcFormatResult(data) {
 			l = label 
 			g = gender (absent when not a variation)
 			s = scientific name 
-			n = had image?
+			n = has image?
 			m = image url (generic image when n==false)
 			p = photographer credit 
 			u = remote url
@@ -203,9 +203,9 @@ function nbcFormatResult(data) {
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
-				'<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">'+
+				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
 					'<img class="resultImageHolder" src="'+data.m+'" title="" />'+
-				'</a>'+
+				(data.n ? '</a>' : '')+
 			'</div>'+
 			'<div class="scientificNameHolder">'+
 				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') + (data.s!=data.l ? data.l+'<br />' : '')+
