@@ -77,14 +77,13 @@
 {else}
 	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
 {/if}
-	<!-- customized version of prettyPhoto, spcifically altered for boktorren key; overwrites the prettyPhoto -->
-	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom"></script>
-
-
-
 {/section}
 {section name=i loop=$javascriptsToLoad.IE}
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
 {/section}
 {/if}
+
+<!-- customized version of prettyPhoto, spcifically altered for boktorren key; overwrites the prettyPhoto -->
+<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom"></script>
+
 </head>
