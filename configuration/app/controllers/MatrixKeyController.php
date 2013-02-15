@@ -2136,12 +2136,15 @@ class MatrixKeyController extends Controller
 		
         $data = isset($p['data']) ? $p['data'] : null;
         $action = isset($p['action']) ? $p['action'] : 'remove';
-        $type = isset($p['keep']) ? $p['keep'] : 'difference';
+		
+		if (count((array)$data)==1)
+			return $data;
 
 		$d = array();
 		foreach((array)$data as $key => $val1)	
 			foreach((array)$val1['d'] as $val2)	
 				$d[$key][] = $val2['characteristic_id'].':'.$val2['state_id'];
+
 
 		$common = call_user_func_array('array_intersect',$d);
 

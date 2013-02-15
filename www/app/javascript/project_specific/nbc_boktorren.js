@@ -62,6 +62,8 @@ function nbcToggleGroup(id) {
 
 function nbcShowStates(id) {
 
+	setCursor('wait');
+	
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -78,6 +80,7 @@ function nbcShowStates(id) {
 				data.page,
 				{width:data.width,height:data.height,showOk:data.showOk}
 			);
+			setCursor();
 		}
 	});
 
@@ -85,6 +88,8 @@ function nbcShowStates(id) {
 
 function nbcGetResults(p) {
 
+	setCursor('wait');
+	
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -100,6 +105,9 @@ function nbcGetResults(p) {
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
 			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
+
+			setCursor();
+
 		}
 	});
 	
@@ -256,6 +264,7 @@ function nbcPrintResultsPaginated() {
 }
 
 function nbcPrintResultsExpanded() {
+
 	var results = nbcData.results;
 	var s = '';
 	var added = d = 0;
@@ -472,6 +481,8 @@ function nbcPrintSimilarHeader() {
 function nbcSetState(p) {
 	
 	//nbcSetPaginate(true);
+	
+	setCursor('wait');
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
@@ -486,6 +497,7 @@ function nbcSetState(p) {
 		success : function (data) {
 			if (p.norefresh!==true)
 				nbcGetResults({closeDialog:true,refreshGroups:true});
+			setCursor();
 		}
 	});
 	
@@ -619,6 +631,8 @@ function nbcDoSearch() {
 	nbcSearchTerm=str;
 	nbcSetPaginate(true);
 	nbcSetState({norefresh:true,clearState:true});
+	
+	setCursor('wait');
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
@@ -634,6 +648,9 @@ function nbcDoSearch() {
 			nbcProcessResults();
 			nbcPrintSearchHeader();
 			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
+
+			setCursor();
+
 		}
 	});
 
@@ -655,10 +672,6 @@ function nbcCloseSearch() {
 	nbcGetResults();
 	nbcSaveSessionSetting('nbcSearch');
 	$('#inlineformsearchInput').val('');
-
-}
-
-function bla() {
 
 }
 
