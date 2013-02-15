@@ -368,7 +368,7 @@ class MatrixKeyController extends Controller
             
             $s = $this->getCharacteristicStates($this->requestData['id']);
             $s = $this->fixStateLabels($s); // temporary measure (hopefully!)
-            $s = $this->sortStates($s);
+			//$s = $this->sortStates($s);
             
             //$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
             $states = $this->stateMemoryRecall();
