@@ -68,6 +68,15 @@ function allGetTimestamp() {
 	return tsTimeStamp;
 
 }
+
+function setCursor(type,ele) {
+	
+	ele = ele ? '#'+ele.replace('#','') : 'body';
+
+	$(ele).css('cursor',type ? type : 'default' );
+	
+}
+
 function glossTextOver(id,caller) {
 
 	if (!id) return;
