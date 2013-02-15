@@ -16,6 +16,31 @@
     };
 })(jQuery);
 
+function rndStr(length) {
+	length = length ? length : 16;
+	var s ='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+	var d = '';
+	for(var i=0;i<length;i++) {
+		var n = Math.random()*s.length;
+		n = Math.floor(n);
+		d = d + s.substr(n,1);
+	}
+	return d;
+}
+
+//this function simply gets the window scroll position, works in all browsers
+function getPageScroll() {
+	var yScroll;
+	if (self.pageYOffset) {
+		yScroll = self.pageYOffset;
+	} else if (document.documentElement && document.documentElement.scrollTop) {
+		yScroll = document.documentElement.scrollTop;
+	} else if (document.body) {
+		yScroll = document.body.scrollTop;
+	}
+	return yScroll
+}
+
 function addSlashes(str) {
 	str=str.replace(/\\/g,'\\\\');
 	str=str.replace(/\'/g,'\\\'');

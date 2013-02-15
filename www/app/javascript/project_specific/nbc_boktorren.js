@@ -1,6 +1,7 @@
 var nbcBrowseStyle='paginate';
 var nbcStart = 0;
 var nbcExpandedShowing = 0;
+var nbcExpandedPrevious = null;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 4;		// default, reset in identify.php
 var nbcData;
@@ -107,7 +108,7 @@ function nbcGetResults(p) {
 function nbcProcessResults(p) {
 	if (p && p.resetStart!==false)
 		nbcStart = 0;
-	nbcExpandedShowing= 0;
+	nbcExpandedShowing = 0;
 	nbcClearResults();
 	nbcClearOverhead();
 	nbcClearPaging();
@@ -248,12 +249,13 @@ function nbcPrintResultsPaginated() {
 	}
 
 	s = s + '</div>';
+	
+	nbcRemoveShowMoreButton();
 
 	$('#results-container').html(s);
 }
 
 function nbcPrintResultsExpanded() {
-
 	var results = nbcData.results;
 	var s = '';
 	var added = d = 0;
@@ -261,7 +263,9 @@ function nbcPrintResultsExpanded() {
 	s = '<div class="resultRow">';
 
 	for(var i=0;i<results.length;i++) {
-		if ((i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)) {
+		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
+			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
+			) {
 			s = s + nbcFormatResult(results[i]);
 			added++;
 			if (++d==nbcPerLine) {
@@ -273,26 +277,36 @@ function nbcPrintResultsExpanded() {
 	
 	s = s + '</div>';
 
+	if (nbcExpandedShowing>0) {
+		var n = 'p'+rndStr();
+		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
+	}
+
 	$('#results-container').html($('#results-container').html()+s);
+
+	if (nbcExpandedShowing>0)
+		$('#'+n).show('normal');
 
 	nbcExpandedShowing = nbcExpandedShowing + added;
 
-	if (nbcExpandedShowing==added) {
-		$("#show-more-button").remove();
-		$("#footerPagination").removeClass('noline');
-	}
+	if (nbcExpandedShowing==added)
+		nbcRemoveShowMoreButton();
 
 	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-//		$("#paging-footer").append('<li id="show-more-button"><a href="#" onclick="nbcPrintResultsExpanded();return false;" class="last">MORE</a></li>');
-		$("#paging-footer").append('<li ><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
+		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
 		$("#footerPagination").removeClass('noline').addClass('noline');
 	}
 
-	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results) {
-		$("#show-more-button").remove();
-		$("#footerPagination").removeClass('noline');
-	}
+	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
+		nbcRemoveShowMoreButton();
+		
+	nbcExpandedPrevious = null;
 
+}
+
+function nbcRemoveShowMoreButton() {
+	$("#show-more").remove();
+	$("#footerPagination").removeClass('noline');	
 }
 
 function nbcPrintResults() {
@@ -304,7 +318,6 @@ function nbcPrintResults() {
 
 	nbcPrettyPhotoInit();
 	nbcResetClearButton();	
-
 
 }
 
@@ -322,7 +335,6 @@ function nbcClearPaging() {
 
 	$('#paging-header').html('');	
 	$('#paging-footer').html('');	
-
 }
 
 function nbcPrintOverhead() {
@@ -344,7 +356,6 @@ function nbcPrintOverhead() {
 				)
 			)
 		);
-
 }
 
 function nbcPrintPaging() {
@@ -418,6 +429,10 @@ function nbcShowSimilar(id,type) {
 	
 	nbcPreviousBrowseStyles.paginate = nbcPaginate;
 	nbcPreviousBrowseStyles.expand = nbcExpandResults;
+	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
+	nbcPreviousBrowseStyles.expandPrev = nbcExpandedShowing;
+	nbcPreviousBrowseStyles.lastPos = getPageScroll();
+	
 
 	nbcSetPaginate(false);
 	nbcSetExpandResults(false);
@@ -430,8 +445,13 @@ function nbcCloseSimilar() {
 
 	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
+	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
+	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
+
 	nbcGetResults();
 	nbcSaveSessionSetting('nbcSimilar');
+
+	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
 	
 }
 
@@ -658,7 +678,7 @@ function nbcPrettyPhotoInit() {
 function nbcInit() {
 
 	nbcLabelClose = _('sluiten');
-	nbcLabelDetails = _('onderscheidende kenmerken');
+	nbcLabelDetails = '<span class="detail-icon">i</span>' + _('distinctieve kenmerken');
 	nbcLabelBack = _('terug');
 	nbcLabelSimilarSpecies = _('gelijkende soorten');
 	nbcLabelShowAll = _('alle kenmerken tonen');

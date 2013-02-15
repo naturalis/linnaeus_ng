@@ -26,6 +26,7 @@
 #content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
 #content div#results div.result .resultImageHolder img {border:none;}
 #content div#results div.result div {width:131px; font-size:11px; color:#aaaaaa;}
+#content div#results div.result div {line-height:91%} /* // added details for ALL results, may have to be removed again */
 #content div#results div.result div.scientificNameHolder {min-height:50px;}
 #content div#results div.result span.scientificName {font-style:italic; width:147px;line-height:14px; height:14px;}
 #content div#results div.result a {text-decoration:none; font-size:11px; color:#555555;}
@@ -35,9 +36,11 @@
 #content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
 #content div#results .resultRow .resultDetails {display:none;}
 #content div#results .resultRow .resultDetails ul {margin:0;padding:5px 0px 0px 7px;color:#999;list-style-type:square;}
+#content div#results .resultRow .resultDetails ul li {padding:0 0 5px 0;}
 #content div#results .resultRow .resultDetails li .resultDetailLabel {color:#000;font-style:italic}
 #content div#results .resultRow .resultDetails li .resultDetailValue {color:#000;}
 .overlapState {color:#999;}
+.detail-icon {color:#990;font-weight:bold;padding:0 5.2px 0 4.8px;}
 
 /* similar species */
 #similarSpeciesHeader {width:inherit;margin:8px 0 0 0px;color:#333;}
@@ -92,6 +95,7 @@ div.footerPagination.noline {border-top:none;}
 .list li.next a {padding-right:0; padding-right: 0.5em; border-right: solid 1px #ddd; }
 #paging-header li .last, #paging-footer li .last {border:none;padding-right: 0px;}
 #paging-header li strong, #paging-footer li strong {color:#000;font-weight: bold;}
+#show-more-button{margin:0;width:705px;height:28px;color:#666;font-size:0.90em}
 #show-more-button{margin:0;width:705px;height:28px;color:#666;font-size:0.90em}
 
 /* value selector dialog - for images */
@@ -150,22 +154,10 @@ ul.facetListType li:hover {color:black;}
 ul.facetListType li.irrelevant {opacity: 0.25;border:none}
 ul.facetListType li.selected {font-weight:bold;}
 
+/* jQuery ui overrides */
 .ui-widget-content{background:none;background-color:#fff;}
 .ui-widget-overlay {background:none;background-color:black;opacity: 0.5;}
-
-.ui-widget-content {
-	border: none;
-}
-
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-  color: #666;
-}
-
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {
-  border: 1px solid #999;
-}
-
-.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
-    font-family: Arial,Helvetica,Sans-serif;
-}
-
+.ui-widget-content {border: none;}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {color: #666;}
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {border: 1px solid #999;}
+.ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {font-family: Arial,Helvetica,Sans-serif;}
