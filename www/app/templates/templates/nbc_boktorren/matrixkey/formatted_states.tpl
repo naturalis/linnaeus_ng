@@ -16,11 +16,11 @@
 
 		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
 			<p>
-            <input style="text-align:right" id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
+            <input id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
             <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">waarde wissen</a>
             </p>
 			{if $c.min && $c.max}
-            <p style="margin-top:5px">
+            <p id="state-value-extra">
             	{t _s1=$c.min_display _s2=$c.max_display _s3=$c.unit}Kies een waarde tussen %s en %s%s.{/t}
 			</p>
            {/if}
@@ -30,19 +30,17 @@
         <table id="graphicValuesTable">
             <tr>
                 {foreach from=$s item=v name=foo}
-                
                     {if $states[$c.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
                     {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
-                    
                     <td{if $selected} class="selectedValue"{/if}{if $irrelephant} class="irrelevant"{/if}>
-                        {if !$irrelephant}<a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
-                        <div class="state-image-cell">
+                        <div class="state-image-cell" style="padding:0">
+							{if !$irrelephant}<a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
                             <img class="state-image" src="{$session.app.project.urls.projectMedia}{$v.file_name}" />
-                            {if !$irrelephant}</a>{/if}
-                            <br />
-                            {$v.label}
+							{if !$irrelephant}</a>{/if}
+                            <p>{$v.label}</p>
                         </div>
                         {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
+
                     </td>
                 {if ($smarty.foreach.foo.index+1)%$stateImagesPerRow==0}
                 </tr><tr>

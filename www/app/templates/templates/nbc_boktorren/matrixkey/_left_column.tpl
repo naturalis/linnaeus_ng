@@ -59,19 +59,24 @@
         </div>
 
 		<div id="dataSourceContainer">   
-            <span id="sourceHeader">{t}Gebaseerd op{/t}</span><br />
+            <span id="sourceHeader">{t}Gebaseerd op{/t}</span>
+            <p>
             {$nbcDataSource.author}<br />
             {$nbcDataSource.title}<br />
-            {$nbcDataSource.photoCredit}<br />
             <a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>
+            </p>
+            <p>
+            {$nbcDataSource.photoCredit}
+            </p>
 		</div>   
         
         <div id="bannerRuler">
             <hr />
         </div>
  
-        <div id="nbcLogoContainer" class="banner">
-			<img src="{$session.app.system.urls.systemMedia}nbc-logo.png" />
+        <div id="nbcLogoContainer">
+			<a href="http://www.naturalis.nl/" target="_blank"><img id="logo-NBC" src="{$session.app.system.urls.systemMedia}nbc-logo.png" title="Naturalis Biodiversity Center" /></a>
+			<a href="http://www.eis-nederland.nl/" target="_blank"><img id="logo-EIS" src="{$session.app.system.urls.systemMedia}logo-eisDEF-CMYK.png" title="Stichting European Invertebrate Survey Nederland" /></a>
         </div>
 
 	</div>
