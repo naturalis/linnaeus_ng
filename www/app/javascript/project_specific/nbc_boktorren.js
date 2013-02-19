@@ -224,8 +224,9 @@ function nbcFormatResult(data) {
 			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
 			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+nbcLabelSimilarSpecies+'</a>' : '' ) +
 			(states ? 
-				'<span>'+
-					'<a id="tog-'+id+'" style="position:relative;top:'+(data.r ? '-12' : '0')+'px" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
+				'<span style="position:relative;top:'+(data.r ? '-12' : '0')+'px">'+
+					'<span class="detail-icon">i</span>' +
+					'<a class="detailsBtn" id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
 				'</span>' +
 				'<div id="det-'+id+'" class="resultDetails">'+
 					'<ul>'+
@@ -691,7 +692,7 @@ function nbcPrettyPhotoInit() {
 function nbcInit() {
 
 	nbcLabelClose = _('sluiten');
-	nbcLabelDetails = '<span class="detail-icon">i</span>' + _('distinctieve kenmerken');
+	nbcLabelDetails = _('distinctieve kenmerken');
 	nbcLabelBack = _('terug');
 	nbcLabelSimilarSpecies = _('gelijkende soorten');
 	nbcLabelShowAll = _('alle kenmerken tonen');
