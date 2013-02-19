@@ -43,6 +43,7 @@ class Controller extends BaseClass
     public $includeLocalMenu = true;
     public $printBreadcrumbs = true;
     private $usedModelsBase = array(
+		'dump', // debug!
         'settings', 
         'user', 
         'project', 
@@ -3813,5 +3814,21 @@ class Controller extends BaseClass
         
     }
 
+	// DEBUG!!!!!
+	// $this->dump($this->getNewProjectId(),null,'waypoint COMMON',$indexName);
+	public function dump($pId,$int=null,$var=null,$txt=null)
+	{
+		
+        $this->models->Dump->save(
+        array(
+            'id' => null, 
+            'p' => $pId,
+            'i_int' => $int,
+            'v_varchar' => $var, 
+            't_text' => $txt, 
+        ));
+
+	}
+	
 
 }

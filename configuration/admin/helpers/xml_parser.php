@@ -64,8 +64,25 @@ class XmlParser
 
 				$fixedNode = $this->fixNode($d->readOuterXML());
 
-				if ($xml = simplexml_load_string($fixedNode)) {
+				libxml_use_internal_errors(true);
 
+				$xml = simplexml_load_string($fixedNode);
+
+				if ($xml === false) {
+				
+					echo '<p><b>XML-parser failed</b></p><p>simplexml_load_string() returned the following error:<br/>';
+
+						foreach(libxml_get_errors() as $error)
+							echo '- '.$error->message.'<br />';
+						
+						$boom = explode(chr(10),$fixedNode);
+
+						echo 'at column '.$error->column.' in the line:<br /><pre>'.$boom[$error->line-1].'</pre></p>';
+					
+						die('(abnormal program termination)');
+				
+				} else {
+				
 					if (isset($this->_callbackFunction)) call_user_func($this->_callbackFunction,$xml,$this->_nodeName);
 
 					if ($this->_getSingleNode===true) {
@@ -100,7 +117,8 @@ class XmlParser
 		
 	}
 
-	private function fixNode ($str) {
+	private function fixNode ($str)
+	{
 
 		return $this->fixTags(html_entity_decode($str, ENT_QUOTES, "utf-8"));
 
