@@ -504,6 +504,7 @@ class ImportL2Controller extends Controller
                     
                     $_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = true;
                     $_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createStandardCat();
+                    $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'] = $this->createStandardCat('Nomenclature');
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved'] = 0;
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] = array();
                 }
@@ -770,8 +771,6 @@ class ImportL2Controller extends Controller
         $this->printPage();
     }
 
-
-
     public function l2ContentAction ()
     {
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
@@ -1029,8 +1028,6 @@ class ImportL2Controller extends Controller
             
             set_time_limit(1800); // RIGHT!
             
-
-
             if ($this->rHasVal('map_items', 'on')) {
                 
                 $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
@@ -1995,13 +1992,12 @@ class ImportL2Controller extends Controller
         return $species;
     }
     
-    //  species content, species media, common names, synoynms
-    private function createStandardCat ()
+    private function createStandardCat ($name='Description')
     {
         $pt = $this->models->PageTaxon->_get(array(
             'id' => array(
                 'project_id' => $this->getNewProjectId(), 
-                'page' => 'Description'
+                'page' => $name
             ), 
             'columns' => 'id'
         ));
@@ -2013,7 +2009,7 @@ class ImportL2Controller extends Controller
         array(
             'id' => null, 
             'project_id' => $this->getNewProjectId(), 
-            'page' => 'Description', 
+            'page' => $name, 
             'show_order' => 0, 
             'def_page' => 1
         ));
@@ -2026,21 +2022,20 @@ class ImportL2Controller extends Controller
             'project_id' => $this->getNewProjectId(), 
             'page_id' => $id, 
             'language_id' => $this->getNewDefaultLanguageId(), 
-            'title' => 'Description'
+            'title' => $name
         ));
         
         return $id;
     }
 
-
-
     private function addSpeciesContent ($taxon)
     {
         $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
-        
+
         if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
-            
+           
             $content = $this->replaceOldMarkUp(trim((string) $taxon->description));
+
             $this->models->ContentTaxon->save(
             array(
                 'id' => null, 
@@ -2051,7 +2046,24 @@ class ImportL2Controller extends Controller
                 'content' => $content, 
                 'publish' => 1
             ));
-            
+
+
+            if (isset($taxon->syn_vern_description)) {
+                
+				$this->models->ContentTaxon->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'taxon_id' => $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'], 
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'page_id' => $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'], 
+					'content' => $taxon->syn_vern_description,
+					'publish' => 1
+				));       
+	   
+			}	
+
+			
             if (!empty($content)) {
                 $this->models->Taxon->update(array(
                     'is_empty' => 0
@@ -2221,9 +2233,9 @@ class ImportL2Controller extends Controller
     private function addSpeciesCommonNames ($taxon)
     {
         $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
-        
+       
         if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
-            
+
             $taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
             
             if (isset($taxon->vernaculars->vernacular)) {
@@ -2256,71 +2268,6 @@ class ImportL2Controller extends Controller
             }
         }
     }
-
-
-
-    private function addSpeciesSynonyms ($taxon)
-    {
-        $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
-        
-        if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
-            
-            $taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
-            
-            $i = 0;
-            
-            if (isset($taxon->syn_vern_description)) {
-                
-                $synVernDescription = $this->prepareSynVernDescription($taxon->syn_vern_description);
-            }
-            
-            if (isset($taxon->synonyms->synonym)) {
-                
-                foreach ($taxon->synonyms->synonym as $vKey => $vVal) {
-                    
-                    $synonym = trim((string) $vVal->name);
-                    
-                    $res = $this->models->Synonym->save(
-                    array(
-                        'id' => null, 
-                        'project_id' => $this->getNewProjectId(), 
-                        'taxon_id' => $taxonId, 
-                        'synonym' => $synonym, 
-                        'author' => isset($taxon->syn_vern_description) ? $this->getSynonymAuthor($synonym, $synVernDescription) : null, 
-                        'show_order' => $i++
-                    ));
-                    
-                    if ($res === true)
-                        $_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
-                    else
-                        $_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
-                            'data' => trim((string) $taxon->name), 
-                            'cause' => 'Unable to save synonym "' . trim((string) $vVal->name) . '" (' . $res . ').'
-                        );
-                }
-            }
-        }
-    }
-
-
-
-    private function prepareSynVernDescription ($text)
-    {
-        $delete = array(
-            '[p]', 
-            '[/p]', 
-            '[b]', 
-            '[/b]', 
-            '[i]', 
-            '[/i]', 
-            '[u]', 
-            '[/u]'
-        );
-        $text = str_replace($delete, '', $text);
-        
-        return explode('[br]', $text);
-    }
-
 
 
     private function getSynonymAuthor ($synonym, $synVernDescription)
@@ -2358,6 +2305,67 @@ class ImportL2Controller extends Controller
     }
 
 
+
+    private function addSpeciesSynonyms($taxon)
+    {
+        $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
+
+        if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
+
+            $taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
+            
+            $i = 0;
+            
+            if (isset($taxon->syn_vern_description)) {
+                
+                $synVernDescription = $this->prepareSynVernDescription($taxon->syn_vern_description);
+            }
+            
+            if (isset($taxon->synonyms->synonym)) {
+                
+                foreach ($taxon->synonyms->synonym as $vKey => $vVal) {
+                    
+                    $synonym = trim((string) $vVal->name);
+                    
+                    $res = $this->models->Synonym->save(
+                    array(
+                        'id' => null, 
+                        'project_id' => $this->getNewProjectId(), 
+                        'taxon_id' => $taxonId, 
+                        'synonym' => $synonym, 
+                        'author' => isset($taxon->syn_vern_description) ? $this->getSynonymAuthor($synonym, $synVernDescription) : null, 
+                        'show_order' => $i++
+                    ));
+                    
+                    if ($res === true)
+                        $_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['saved']++;
+                    else
+                        $_SESSION['admin']['system']['import']['loaded']['taxon_synonym']['failed'][] = array(
+                            'data' => trim((string) $taxon->name), 
+                            'cause' => 'Unable to save synonym "' . trim((string) $vVal->name) . '" (' . $res . ').'
+                        );
+                }
+            }
+        }
+		
+    }
+
+    private function prepareSynVernDescription ($text)
+    {
+        $delete = array(
+            '[p]', 
+            '[/p]', 
+            '[b]', 
+            '[/b]', 
+            '[i]', 
+            '[/i]', 
+            '[u]', 
+            '[/u]'
+        );
+        $text = str_replace($delete, '', $text);
+        
+        return explode('[br]', $text);
+    }
 
     private function removeLinks ($line)
     {
@@ -4804,4 +4812,5 @@ array(
     {
         return $_SESSION['admin']['system']['import']['errorlog']['header']['test_project'];
     }
+
 }
