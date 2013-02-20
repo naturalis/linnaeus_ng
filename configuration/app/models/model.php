@@ -29,7 +29,7 @@ abstract class Model extends BaseClass
         
         $this->connectToDatabase() or die(_('Failed to connect to database '.$this->databaseSettings['database'].
         	' with user '.$this->databaseSettings['user'] . '. ' . mysql_error() . '. Correct the getDatabaseSettings() settings 
-        	in configuration/app/config.php.'));
+        	in configuration/admin/config.php.'));
         
         if (!$tableBaseName) {
             
@@ -40,7 +40,7 @@ abstract class Model extends BaseClass
             
             $this->_tablePrefix = $this->databaseSettings['tablePrefix'];
             $this->tableName = $this->_tablePrefix . $tableBaseName;
-            
+                    
         }
         
         $this->getTableColumnInfo();
@@ -69,6 +69,12 @@ abstract class Model extends BaseClass
 
 	}
 
+	public function getTablePrefix()
+	{
+
+		return $this->_tablePrefix;
+
+	}
 
     public function escapeString ($d)
     {
@@ -405,7 +411,7 @@ abstract class Model extends BaseClass
             return;
         
         }
-        
+
         $this->retainAlteredData($query);
         
         $this->setLastQuery($query);
@@ -440,7 +446,6 @@ abstract class Model extends BaseClass
 		$group = isset($params['group']) ? $params['group'] : false;
 		$limit = isset($params['limit']) ? $params['limit'] : false;
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
-		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 		$where = isset($params['where']) ? $params['where'] : false;
 
@@ -700,14 +705,17 @@ abstract class Model extends BaseClass
         
         unset($this->retainedData);
 
-        $query = strtolower($query);
-        
-        if (strpos($query, 'delete') === 0) {
-            
-            $q = str_replace('delete from', 'select * from', $query);
+        //$query = strtolower($query);
+
+        //if (strpos($query, 'delete') === 0) {
+        if (stripos($query, 'delete') === 0) {
+
+            //$q = str_replace('delete from', 'select * from', $query);
+            $q = str_ireplace('delete from', 'select * from', $query);
         
         }
-        else if (strpos($query, 'update') === 0) {
+        //else if (strpos($query, 'update') === 0) {
+        else if (stripos($query, 'update') === 0) {
             
 			/* this will fail if there is a string with the substring " where " somewhere in the where-clause*/
             $d = preg_split('/ where /', $query);
@@ -761,7 +769,7 @@ abstract class Model extends BaseClass
         $query = false;
         
         if (!$id && !$where) return;
-			
+	
         if (is_array($id)) {
 
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
@@ -807,19 +815,19 @@ abstract class Model extends BaseClass
                 
                 } elseif ($operator == 'like') {
 
-                    $query .= " and " . $col . " " . $operator . " '" . strtolower($val)."'";
+                    $query .= " and " . $col . " " . $operator . " '" . mb_strtolower($val,'UTF-8')."'";
                 
                 } elseif ($d['numeric'] == 1) {
 
-                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(strtolower($val));
+                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(mb_strtolower($val,'UTF-8'));
                 
                 } elseif ($d['type'] == 'datetime') {
                     
-                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(strtolower($val))."'";
+                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8'))."'";
                 
                 } elseif ($ignoreCase && is_string($val)) {
-                    
-                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(strtolower($val)) . "'";
+
+                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8')) . "'";
                 
                 } else {
                     
@@ -954,7 +962,7 @@ abstract class Model extends BaseClass
             }
         
         } else {
-			
+
 			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
 		
 		}
@@ -965,52 +973,52 @@ abstract class Model extends BaseClass
     {
     
         if (is_array($params)) {
-        
-			$query = isset($params['query']) ? $params['query'] : null;
-			$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
-			
+    
+            $query = isset($params['query']) ? $params['query'] : null;
+            $fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+            	
         } else {
-            
+    
             $query = isset($params) ? $params : null;
             $fieldAsIndex = false;
-        
+    
         }
-		
-		if (empty($query)) {
-			
-			$this->log('Called freeQuery with an empty query',1);
-			return;
-		
-		};
-		
+    
+        if (empty($query)) {
+            	
+            $this->log('Called freeQuery with an empty query',1);
+            return;
+    
+        };
+    
         $query = str_ireplace('%table%', $this->tableName, $query);
         $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
-		
-	    $set = mysql_query($query);
-            	
-		$this->logQueryResult($set,$query,'freeQuery');
-		$this->setLastQuery($query);
-
-		unset($this->data);
-		
-		while($row=@mysql_fetch_assoc($set)){
-		
-			if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
-			
-				$this->data[$row[$fieldAsIndex]]=$row;
-			
-			} else {
-			
-				$this->data[]=$row;
-			
-			}
-		
-		}
-
-		return isset($this->data) ? $this->data : null;
     
-    }    
+        $set = mysql_query($query);
+         
+        $this->logQueryResult($set,$query,'freeQuery');
+        $this->setLastQuery($query);
     
+        unset($this->data);
+    
+        while($row=@mysql_fetch_assoc($set)){
+    
+            if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
+                	
+                $this->data[$row[$fieldAsIndex]]=$row;
+                	
+            } else {
+                	
+                $this->data[]=$row;
+                	
+            }
+    
+        }
+    
+        return isset($this->data) ? $this->data : null;
+    
+    }
+
 	private function logQueryResult($set,$query,$type,$severity=1) {
 
 		//$this->log('DEBUG: '.$query,1);

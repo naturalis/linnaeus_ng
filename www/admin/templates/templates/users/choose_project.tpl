@@ -28,6 +28,7 @@
 <ul>
 	<li><a href="../../views/projects/create.php">{t}Create a project{/t}</a></li>
 	<li><a href="../../views/projects/delete.php">{t}Delete a project{/t}</a></li>
+	<li><a href="../../views/projects/delete_orphan.php">{t}Delete orphaned data{/t}</a></li>
 	<li><a href="../../views/import/index.php">{t}Import data{/t}</a></li>
 	<li><a href="../../views/users/all.php">{t}Collaborator overview{/t}</a></li>
 	<li><a href="../../views/users/rights_matrix.php">{t}Rights matrix{/t}</a></li>
