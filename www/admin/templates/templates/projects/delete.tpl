@@ -33,7 +33,7 @@ Are you sure you wish to continue?
 </p>
 {else}
 
-<a href="../users/choose_project.php">Continue</a>
+<a href="../users/choose_project.php">Back</a>
 
 {/if}
 </form>

@@ -69,6 +69,12 @@ abstract class Model extends BaseClass
 
 	}
 
+	public function getTablePrefix()
+	{
+
+		return $this->_tablePrefix;
+
+	}
 
     public function escapeString ($d)
     {

@@ -74,7 +74,13 @@ class ProjectsController extends Controller
         'matrix_variation', 
         'nbc_extras',
         'heartbeat',
-        'taxon_variation'	
+        'taxon_variation',
+		'hotword',
+        'content_taxon_undo', 
+		'choice_content_keystep_undo',
+        'section',
+		'keytree'
+
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -630,6 +636,31 @@ class ProjectsController extends Controller
 
 
 
+    public function deleteOrphanAction ()
+    {
+        $this->checkAuthorisation(true);
+        
+        $this->setPageName($this->translate('Delete orphaned project'));
+        
+        $this->setBreadcrumbRootName($this->translate('System administration'));
+        
+        $this->setSuppressProjectInBreadcrumbs();
+        
+        if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
+           
+			$this->doDeleteOrpahnedData();
+
+            $this->addMessage('Deleted orphaned data.');
+			$this->smarty->assign('processed',true);
+
+        }
+		
+        $this->printPage();
+
+    }
+
+
+
     public function getInfoAction ()
     {
         $this->checkAuthorisation(true);
@@ -1108,6 +1139,12 @@ class ProjectsController extends Controller
         $this->models->Keystep->delete(array(
             'project_id' => $id
         ));
+        $this->models->ChoiceContentKeystepUndo->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Keytree->delete(array(
+            'project_id' => $id
+        ));
     }
 
 
@@ -1227,8 +1264,13 @@ class ProjectsController extends Controller
         $this->models->ContentTaxon->delete(array(
             'project_id' => $id
         ));
+        $this->models->ContentTaxonUndo->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->Section->delete(array(
+            'project_id' => $id
+        ));
     }
-
 
 
     private function deleteSpecies ($id)
@@ -1418,6 +1460,10 @@ class ProjectsController extends Controller
         $this->models->Heartbeat->delete(array(
         'project_id' => $id
         ));
+        $this->models->Hotword->delete(array(
+        'project_id' => $id
+        ));
+
     }
     
     
@@ -1452,4 +1498,51 @@ class ProjectsController extends Controller
             'project_id' => $id
         ));
     }
+	
+	
+	private function doDeleteOrpahnedData()
+	{
+		
+		$data = $this->models->Project->freeQuery('show tables');
+
+		$key = key($data[0]);
+		$prefix = $this->models->Project->getTablePrefix();
+		$pInUse = array();
+		
+		$tablesToIgnore = array('');
+
+		foreach((array)$data as $val) {
+
+			$table = ($val[$key]);
+
+			if (substr($table,0,strlen($prefix))!==$prefix)
+				continue;
+
+			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
+	
+			foreach((array)$d as $dVal)
+				$pInUse[$dVal['project_id']]=$dVal['project_id'];
+				
+			//echo $table;q($d);
+
+		}
+
+		$d = $this->models->Project->_get(array('id' => '*'));
+		
+		foreach((array)$d as $val) {
+
+			unset($pInUse[$val['id']]);
+			$this->addMessage(sprintf('Not deleting data for "%s"',$val['sys_name']));
+
+		}
+		
+		foreach((array)$pInUse as $val) {
+	
+			$this->doDeleteProjectAction($val);
+			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
+
+		}
+		
+	}
+	
 }

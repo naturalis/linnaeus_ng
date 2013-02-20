@@ -57,7 +57,6 @@ class SpeciesController extends Controller
         'project_role_user', 
         'user_taxon', 
         'content_taxon', 
-        'content_taxon_undo', 
         'section', 
         'label_section', 
         'page_taxon', 
