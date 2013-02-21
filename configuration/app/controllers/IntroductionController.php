@@ -87,7 +87,7 @@ class IntroductionController extends Controller
      */
     public function topicAction()
     {
-
+		
 		if (!$this->rHasId()) {
 
 			$this->addError($this->translate('No page ID specified.'));

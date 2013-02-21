@@ -24,6 +24,7 @@ Click the button below to update the hotwords table. Last update: {if $last_crea
 <input type="submit" value="{t}Update hotwords table{/t}" />
 </form>
 </p>
+<a href="index.php">Back</a>
 </div>
 
 {include file="../shared/admin-messages.tpl"}

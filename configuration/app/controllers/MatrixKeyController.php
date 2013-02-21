@@ -147,7 +147,7 @@ class MatrixKeyController extends Controller
     public function identifyAction ()
     {
 
-		//$this->nbcGetSimilar(array('id'=>3994,'type'=>'v'));die();
+		$this->nbcGetSimilar(array('id'=>4231,'type'=>'v'));die();
         //$this->getRemainingStateCount();return;
 
         $this->checkMatrixIdOverride();
@@ -2134,19 +2134,42 @@ class MatrixKeyController extends Controller
 	private function nbcHandleOverlappingItemsFromDetails($p)
 	{
 		
+		
+//		return $p['data'];
+
+/*		
+//108	Grijze schorsboktor			115	15-Sep	dekschildzwart; dekschildbruin; dekschildschorskleur; dekschildgrijs;
+//115	Aegomorphus clavipes		108	17-Jul	dekschildzwart; dekschildbruin; dekschildschorskleur
+
+$Grijze_schorsboktor = array('dekschildzwart','dekschildbruin','dekschildschorskleur','dekschildgrijs');
+$Aegomorphus_clavipes = array('dekschildzwart','dekschildbruin','dekschildschorskleur');
+
+$x = array_intersect($Grijze_schorsboktor,$Aegomorphus_clavipes);
+
+16494:1416:dekschildgrijs.jpg
+
+
+q($x,1);
+*/
+
         $data = isset($p['data']) ? $p['data'] : null;
         $action = isset($p['action']) ? $p['action'] : 'remove';
-		
+
+		q($data);
+
 		if (count((array)$data)==1)
 			return $data;
 
 		$d = array();
-		foreach((array)$data as $key => $val1)	
-			foreach((array)$val1['d'] as $val2)	
+		foreach((array)$data as $key => $val1) {
+			foreach((array)$val1['d'] as $val2)	{
 				$d[$key][] = $val2['characteristic_id'].':'.$val2['state_id'];
-
+			}
+		}
 
 		$common = call_user_func_array('array_intersect',$d);
+
+//q($common); //somthing awry down below!
 
 		foreach((array)$data as $key => $val) {
 			foreach((array)$val['d'] as $dKey => $dVal) {
@@ -2506,7 +2529,4 @@ class MatrixKeyController extends Controller
 			
 	}
 
-
-
-   
 }
