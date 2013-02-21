@@ -1020,9 +1020,9 @@ class Controller extends BaseClass
     }
 
 
-
     public function matchHotwords ($text, $forceLookup = false)
-    {
+	{
+		
         if (empty($text) || !is_string($text))
             return $text;
         
@@ -1043,7 +1043,7 @@ class Controller extends BaseClass
             if ($val['hotword'] == '')
                 continue;
                 
-                // replace the already linked words with a unique numbered string
+            // replace the already linked words with a unique numbered string
             $expr = '|(<a (.*)>)(' . $val['hotword'] . ')(<\/a>)|i';
             $processed = preg_replace_callback($expr, array(
                 $this, 
@@ -1051,13 +1051,9 @@ class Controller extends BaseClass
             ), $processed);
             
             $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
-            
+
             $expr = '|\b(' . $val['hotword'] . ')\b|i';
-            //$expr = '|(\b)(?<!>)('.$val['hotword'].')(?!<)(\b)|i';
-            
-
-
-
+	
             $processed = preg_replace_callback($expr, array(
                 $this, 
                 'embedHotwordLink'
@@ -2460,27 +2456,35 @@ class Controller extends BaseClass
 
     private function getHotwords ($forceUpdate = false)
     {
-        if ($forceUpdate || !isset($_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()])) {
-            
+
+		$d = $this->getCache('hotwords-'.$this->getCurrentLanguageId());
+
+		if ($forceUpdate || !$d) {
+			            
             $d = $this->models->Hotword->_get(
             array(
-                'id' => 'select hotword,controller,view,params
-								from %table% where project_id = ' . $this->getCurrentProjectId() . ' ' . 'and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)'
+                'id' => 
+					'select 
+						hotword,
+						controller,
+						view,
+						params,
+						length(hotword) as `length`,
+						(length(hotword)-length(replace(trim(hotword),\' \',\'\'))+1) as num_of_words
+					from
+						%table% 
+					where 
+						project_id = ' . $this->getCurrentProjectId() .'
+						and (language_id = ' . $this->getCurrentLanguageId() . ' or language_id = 0)
+					order by
+						num_of_words desc,
+						`length` desc'
             ));
-            
-            foreach ((array) $d as $key => $val)
-                $d[$key]['num_of_words'] = substr_count($val['hotword'], ' ') + 1;
-            
-            $this->customSortArray($d, array(
-                'key' => 'num_of_words', 
-                'dir' => 'desc', 
-                'case' => 'i'
-            ));
-            
-            $_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()] = $d;
+
+            $this->saveCache('hotwords-'.$this->getCurrentLanguageId(),$d);
         }
         
-        return $_SESSION['app']['user']['hotwords'][$this->getCurrentLanguageId()];
+        return $d;
     }
 
 

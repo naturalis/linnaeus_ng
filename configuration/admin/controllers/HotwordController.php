@@ -62,6 +62,12 @@ class HotwordController extends Controller
 
 		$this->setPageName($this->translate('Hotwords'));
 
+		if ($this->rHasVal('action','delete_all') && !$this->isFormResubmit()) {
+
+			$this->clearHotwords();
+
+		}
+
 		$c = $this->models->Hotword->_get(
 			array('id'=>
 				array('project_id'=>$this->getCurrentProjectId()),
@@ -141,7 +147,7 @@ class HotwordController extends Controller
 			$this->models->Hotword->delete(array_merge($id,array('id' => $this->requestData['id'])));
 
 		} else
-		if ($this->rHasVal('action','delete_all')) {
+		if ($this->rHasVal('action','delete_module')) {
 
 			$this->models->Hotword->delete($id);
 

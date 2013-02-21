@@ -944,53 +944,50 @@ class Controller extends BaseClass
 
     public function getProjectModules ($params = null)
     {
-        if ($this->hasTableDataChanged('ModuleProject') || $this->hasTableDataChanged('FreeModuleProject') || $this->hasTableDataChanged('Module') || !isset($_SESSION['admin']['project']['modules'])) {
-            
-            $d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
-            
-            if (isset($params['active']) && ($params['active'] == 'y' || $params['active'] == 'n'))
-                $d['active'] = $params['active'];
-            
-            $p['id'] = $d;
-            
-            if (isset($params['order']))
-                $p['order'] = $params['order'];
-            
-            $modules = $this->models->ModuleProject->_get($p);
-            
-            foreach ((array) $modules as $key => $val) {
-                
-                $mp = $this->models->Module->_get(array(
-                    'id' => $val['module_id']
-                ));
-                
-                $modules[$key]['module'] = $mp['module'];
-                
-                $modules[$key]['description'] = $mp['description'];
-                
-                $modules[$key]['controller'] = $mp['controller'];
-                
-                $modules[$key]['show_order'] = $mp['show_order'];
-            }
-            
-            $this->customSortArray($modules, array(
-                'key' => 'show_order', 
-                'maintainKeys' => true
-            ));
-            
-            $freeModules = $this->models->FreeModuleProject->_get(array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                )
-            ));
-            
-            $_SESSION['admin']['project']['modules'] = array(
-                'modules' => $modules, 
-                'freeModules' => $freeModules
-            );
-        }
-        
-        return $_SESSION['admin']['project']['modules'];
+
+		$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
+		
+		if (isset($params['active']) && ($params['active'] == 'y' || $params['active'] == 'n'))
+			$d['active'] = $params['active'];
+		
+		$p['id'] = $d;
+		
+		if (isset($params['order']))
+			$p['order'] = $params['order'];
+		
+		$modules = $this->models->ModuleProject->_get($p);
+		
+		foreach ((array) $modules as $key => $val) {
+			
+			$mp = $this->models->Module->_get(array(
+				'id' => $val['module_id']
+			));
+			
+			$modules[$key]['module'] = $mp['module'];
+			
+			$modules[$key]['description'] = $mp['description'];
+			
+			$modules[$key]['controller'] = $mp['controller'];
+			
+			$modules[$key]['show_order'] = $mp['show_order'];
+		}
+		
+		$this->customSortArray($modules, array(
+			'key' => 'show_order', 
+			'maintainKeys' => true
+		));
+		
+		$freeModules = $this->models->FreeModuleProject->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			)
+		));
+		
+		return array(
+			'modules' => $modules, 
+			'freeModules' => $freeModules
+		);
+
     }
 
 

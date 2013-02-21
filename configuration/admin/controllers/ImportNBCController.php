@@ -2,6 +2,25 @@
 
 /*
 
+INSERT INTO `dev_settings` (`id`, `project_id`, `setting`, `value`, `created`, `last_change`) VALUES
+(47, 116, 'skin', 'nbc_boktorren', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
+(46, 116, 'taxa_use_variations', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
+(45, 116, 'matrix_use_character_groups', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
+(44, 116, 'matrix_allow_empty_species', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
+(43, 116, 'matrixtype', 'NBC', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
+(48, 116, 'source_author', 'Zeegers, Th. & Th. Heijerman 2008.', '2013-02-08 13:57:54', '2013-02-19 12:00:03'),
+(49, 116, 'source_title', 'De Nederlandse boktorren (Cerambycidae). Entomologische Tabellen 2.', '2013-02-08 13:57:54', '2013-02-19 12:00:03'),
+(50, 116, 'matrix_use_sc_as_weight', '1', '2013-02-11 12:41:26', '2013-02-12 16:56:15'),
+(51, 116, 'source_photocredit', 'Foto''s &copy; Theodoor Heijerman.', '2013-02-12 00:00:00', '2013-02-19 12:00:03'),
+(52, 116, 'source_url', 'http://science.naturalis.nl/research/publications/entomologische-tabellen/de-nederlandse-boktorren-(cerambycidae)', '2013-02-12 00:00:00', '2013-02-12 16:56:24'),
+(53, 116, 'matrix_browse_style', 'expand', '2013-02-13 00:00:00', '2013-02-13 14:39:41'),
+(54, 116, 'matrix_items_per_line', '4', '2013-02-13 00:00:00', '2013-02-13 14:41:00'),
+(55, 116, 'matrix_items_per_page', '16', '2013-02-13 00:00:00', '2013-02-13 14:41:00'),
+(56, 116, 'nbc_image_root', 'http://determinatie.nederlandsesoorten.nl/images/', '2013-02-13 00:00:00', '2013-02-13 14:46:26'),
+(57, 116, 'matrix_state_image_per_row', '4', '2013-02-13 00:00:00', '2013-02-13 14:46:26');
+
+
+
 	column headers, like 'naam SCI', are hardcoded! 
 
 	$_stdVariantColumns needs to be user invulbaarable --> NOT! assume sekse and variant
@@ -497,6 +516,120 @@ class ImportNBCController extends Controller
 
         return $data;
     }
+
+
+
+
+    private function parseDataNEW ($raw)
+    {
+        
+        /*
+         	excel lines:
+			NOTE: Excel starts counting lines at 1, but we - naturally - at 0.
+         	
+			Exc	PHP
+	        1	0: title (A1) / character_codes
+	        2	1: soortgroep (A2) / label of what follows (E2) / character instructions (mostly empty)
+	        3	2: label of what follows (E3) / character groups (+ hidden)
+	        4	3: label of what follows (E4) / instructions
+	        5	4: unit of measurement
+	        6	5: (empty)
+	        7	6: column headers / (empty)
+	        8	7 ev: data    
+			 
+        */
+        $data = array();
+        
+        foreach ((array) $raw as $line => $val) {
+            
+            $lineHasData = strlen(implode('', $val)) > 0;
+			
+            if ($lineHasData) {
+
+                foreach ((array) $val as $cKey => $cVal) {
+
+                    $cVal = trim($cVal);
+                    
+                    if (!empty($cVal)) {
+                        
+                        // line 0, cell 0: title
+                        if ($line == 0 && $cKey == 0)
+                            $data['project']['title'] = $cVal;
+                        // line 0, cell > 0: character codes
+                        if ($line == 0 && $cKey > 4 && !empty($cVal))
+                            $data['characters'][$cKey]['code'] = $cVal;
+
+                        // line 1, cell 0: title
+                        if ($line == 1 && $cKey == 0)
+                            $data['project']['soortgroep'] = $cVal;
+                        // line 1, cell > 0: character labels
+                        //if ($line == 1 && $cKey > 4 && !empty($cVal))
+                        //   $data['characters'][$cKey]['label'] = $cVal;
+
+                        // line 2, cell > 0: character group (or 'hidden')
+                        if ($line ==2 && $cKey > 4 && !empty($cVal))
+                            $data['characters'][$cKey]['group'] = $cVal;
+
+                    	// line 3, cell > 0: character instructions
+                    	if ($line==3 && $cKey>4 && !empty($cVal)) // && $cVal!='…')
+                    		$data['characters'][$cKey]['instruction'] = $cVal;
+
+
+                    	// line 4, cell > 0: character unit (not currently being saved)
+                    	if ($line==4 && $cKey>4 && !empty($cVal))
+                    		$data['characters'][$cKey]['unit'] = $cVal;
+                            
+						// line 6: species column headers
+                        if ($line==6 && !empty($cVal))
+                            $data['columns'][$cKey] = $cVal;
+                            
+						// line > 6: species records
+                        if ($line > 6) {
+                            
+                            if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
+                                $data['species'][$line]['id'] = $cVal;
+                            }
+                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'title') {
+                                $data['species'][$line]['label'] = $cVal;
+                            }
+                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'related') {
+                                if (strpos($cVal, $this->_valueSep) !== false) {
+                                    $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
+                                }
+                                else {
+                                    $data['species'][$line]['related'][] = trim($cVal);
+                                }
+                                array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+                            }
+                            else {
+                                
+
+                                if (isset($data['characters']) && $data['characters'][$cKey]['group'] == 'hidden') {
+                                    
+                                    $data['species'][$line][$data['characters'][$cKey]['label']] = $cVal;
+                                }
+                                else {
+                                    
+                                    if (strpos($cVal, $this->_valueSep) !== false) {
+                                        $data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
+                                    }
+                                    else {
+                                        $data['species'][$line]['states'][$cKey][] = trim($cVal);
+                                    }
+                                    array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return $data;
+    }
+
+
 
 
 
