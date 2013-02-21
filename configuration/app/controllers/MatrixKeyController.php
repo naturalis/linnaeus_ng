@@ -147,7 +147,7 @@ class MatrixKeyController extends Controller
     public function identifyAction ()
     {
 
-		$this->nbcGetSimilar(array('id'=>4231,'type'=>'v'));die();
+		//$this->nbcGetSimilar(array('id'=>4231,'type'=>'v'));die();
         //$this->getRemainingStateCount();return;
 
         $this->checkMatrixIdOverride();
