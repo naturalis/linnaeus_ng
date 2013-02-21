@@ -32,20 +32,6 @@ Unable to resolve name "Oenanthe peucedanifolia" to taxon id.
 
 Please be aware that these are six other taxa than the three mentioned earlier - Atropa belladonna, Genianella campestris & Nemesia melissaefolium - that appear in neither <tree>, nor <records>.
 	
-	[4:28:27 PM] maarten schermer: R E S U M é
-	[4:28:35 PM] Ruud Altenburg: É
-	[4:29:00 PM] maarten schermer: ALS in de naam GEEN spatie zit, dan is het HT en wordt de naam/index van mijn lookup array rank+' '+taxonnaam
-	[4:29:28 PM] maarten schermer: ANDERE gevallen wordt de index gewoon de naam, met vewijdering van tussenstukjes via jouw functe
-	[4:30:10 PM] maarten schermer: en impliciet ga ik er daarbij dus van uit dat op alle plaatsen (zie lijstje boven) verwijzingen naar HT *ATIJD* ook de rank bevatten.
-	[4:30:16 PM] Ruud Altenburg: Ja
-	[4:30:36 PM] maarten schermer: ok
-	[4:31:08 PM] Ruud Altenburg: Klopt het linken van ondersoorten dan altijd?
-	[4:31:35 PM] Ruud Altenburg: Ja als je consequent die marker verwijdert
-	[4:31:40 PM] maarten schermer: ja
-	[4:31:47 PM] Ruud Altenburg: OK, dan zijn we eruit
-	[4:32:10 PM] maarten schermer: ok
-
-
 	CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
 
 	q($_SESSION['admin']['system']['import']['loaded']['species']);
@@ -151,7 +137,7 @@ class ImportL2Controller extends Controller
         'diversity'
     );
     private $_sawModule = false;
-
+	private $_retainInternalLinks = false;
 
 
     /**
@@ -503,8 +489,8 @@ class ImportL2Controller extends Controller
                 if ($this->rHasVal('taxon_overview', 'on')) {
                     
                     $_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = true;
-                    $_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createStandardCat();
-                    $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'] = $this->createStandardCat('Nomenclature');
+                    $_SESSION['admin']['system']['import']['speciesOverviewCatId'] = $this->createCategory();
+                    $_SESSION['admin']['system']['import']['speciesNomenclatureCatId'] = $this->createCategory('Nomenclature');
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['saved'] = 0;
                     $_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] = array();
                 }
@@ -1992,7 +1978,7 @@ class ImportL2Controller extends Controller
         return $species;
     }
     
-    private function createStandardCat ($name='Description')
+    private function createCategory ($name='Description')
     {
         $pt = $this->models->PageTaxon->_get(array(
             'id' => array(
@@ -2011,7 +1997,7 @@ class ImportL2Controller extends Controller
             'project_id' => $this->getNewProjectId(), 
             'page' => $name, 
             'show_order' => 0, 
-            'def_page' => 1
+            'def_page' => ($name=='Description')
         ));
         
         $id = $this->models->PageTaxon->getNewId();
@@ -2465,7 +2451,6 @@ class ImportL2Controller extends Controller
                     continue;
                     
                     //[p][l][m]Species[/m][r]Emys orbicularis subsp. hellenica[/r][t][i]Emys orbicularis hellenica[/i][/t][/l][/p]
-                    //$speciesName = $this->replaceOldMarkUp($this->removeInternalLinks(trim((string)$kVal->name)),true);
                 $speciesName = $this->makeIndexName($this->extractLinkedSpeciesRatherThanDisplayed((string) $kVal->name));
                 
                 if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$speciesName])) {
@@ -3872,31 +3857,31 @@ class ImportL2Controller extends Controller
                 'param' => 'id'
             ), 
             'glossary' =>             // [m]Glossary[/m]
-array(
+			array(
                 'controller' => 'glossary', 
                 'url' => 'term.php', 
                 'param' => 'id'
             ), 
             'literature' =>             // [m]Literature[/m]
-array(
+			array(
                 'controller' => 'literature', 
                 'url' => 'reference.php', 
                 'param' => 'id'
             ), 
             'species' =>             // [m]Species[/m]
-array(
+			array(
                 'controller' => 'species', 
                 'url' => 'taxon.php', 
                 'param' => 'id'
             ), 
             'higher taxa' =>             // [m]Higher taxa[/m]
-array(
+			array(
                 'controller' => 'highertaxa', 
                 'url' => 'taxon.php', 
                 'param' => 'id'
             ), 
             'text key' =>             // [m]Text Key[/m]
-array(
+			array(
                 'controller' => 'key', 
                 'url' => 'index.php?forcetree=1', 
                 'param' => 'step'
@@ -4118,25 +4103,15 @@ array(
 
 
 
-    private function removeInternalLinks ($s)
+    function removeInternalLinks ($s)
     {
-        
-        // removes internal links without replacing them, just leavinf the linked text
-        if (strpos($s, '[l]') !== false && strpos($s, '[/l]') !== false) {
-            
-            $d = preg_split('/(\[t\]|\[\/t\])/', $s);
-            
-            $t = isset($d[1]) ? $d[1] : null;
-            
-            return preg_replace('/\[l\](.*)\[\/l\]/', $t, $s);
-        }
-        else {
-            
-            return $s;
-        }
+
+		$b=preg_split('/(\[\/l\])/',$s);
+		foreach((array)$b as $k => $v)
+			$b[$k]=preg_replace_callback('/(\[l\])(.*)(\[t\])(.*)(\[\/t\])/',function($m){return $m[4];},$v);
+		return implode('',$b);
+ 
     }
-
-
 
     private function copyEmbeddedMediaFiles ()
     {
@@ -4199,7 +4174,8 @@ array(
 
     private function importPostProcessing ()
     {
-        $res = $this->fixOldInternalLinks();
+		
+		$res = $this->fixOldInternalLinks();
         
         $this->addMessage($this->storeError('Processed internal links.'));
         
@@ -4300,10 +4276,21 @@ array(
     }
 
 
+	private function doFixOldInternalLinks($src)
+	{
+		if ($this->_retainInternalLinks) {
+			return $this->replaceInternalLinks($src);
+		} else {
+			return $this->removeInternalLinks($this->replaceOldMarkUp($src));
+		}
+			
+	}
 
     private function fixOldInternalLinks ()
     {
-        $_SESSION['admin']['system']['import']['lookupArrays'] = $this->createLookupArrays();
+	
+		if ($this->_retainInternalLinks)
+        	$_SESSION['admin']['system']['import']['lookupArrays'] = $this->createLookupArrays();
         
         $d = $this->models->ContentTaxon->_get(array(
             'id' => array(
@@ -4317,7 +4304,7 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->replaceInternalLinks($val['content'])
+                'content' => $this->doFixOldInternalLinks($val['content'])
             ));
         }
         
@@ -4332,7 +4319,7 @@ array(
             $this->models->Literature->save(array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'text' => $this->replaceInternalLinks($val['text'])
+                'text' => $this->doFixOldInternalLinks($val['text'])
             ));
         }
         
@@ -4348,7 +4335,7 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'definition' => $this->replaceInternalLinks($val['definition'])
+                'definition' => $this->doFixOldInternalLinks($val['definition'])
             ));
         }
         
@@ -4363,7 +4350,7 @@ array(
             $this->models->Content->save(array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->replaceInternalLinks($val['content'])
+                'content' => $this->doFixOldInternalLinks($val['content'])
             ));
         }
         
@@ -4380,7 +4367,7 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->replaceInternalLinks($val['content'])
+                'content' => $this->doFixOldInternalLinks($val['content'])
             ));
         }
         
@@ -4397,8 +4384,8 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'title' => $this->replaceInternalLinks($val['title']), 
-                'content' => $this->replaceInternalLinks($val['content'])
+                'title' => $this->doFixOldInternalLinks($val['title']), 
+                'content' => $this->doFixOldInternalLinks($val['content'])
             ));
         }
         
@@ -4414,7 +4401,7 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'choice_txt' => $this->replaceInternalLinks($val['choice_txt'])
+                'choice_txt' => $this->doFixOldInternalLinks($val['choice_txt'])
             ));
         }
         
@@ -4430,7 +4417,7 @@ array(
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->replaceInternalLinks($val['content'])
+                'content' => $this->doFixOldInternalLinks($val['content'])
             ));
         }
     }
@@ -4710,97 +4697,14 @@ array(
     private function getRandomTestProjectName ()
     {
         $animales = array(
-            'aardvark', 
-            'albatross', 
-            'alpaca', 
-            'anteater', 
-            'antelope', 
-            'armadillo', 
-            'baboon', 
-            'badger', 
-            'barracuda', 
-            'bat', 
-            'bear', 
-            'beaver', 
-            'bee', 
-            'butterfly', 
-            'camel', 
-            'caribou', 
-            'chinchilla', 
-            'clam', 
-            'cobra', 
-            'cormorant', 
-            'coyote', 
-            'crab', 
-            'crane', 
-            'crow', 
-            'dragonfly', 
-            'donkey', 
-            'dugong', 
-            'eagle', 
-            'echidna', 
-            'eland', 
-            'emu', 
-            'falcon', 
-            'ferret', 
-            'finch', 
-            'gazelle', 
-            'gnat', 
-            'guanaco', 
-            'hawk', 
-            'hedgehog', 
-            'heron', 
-            'hippopotamus', 
-            'hummingbird', 
-            'hyena', 
-            'iguana', 
-            'jackal', 
-            'koala', 
-            'komodo dragon', 
-            'kouprey', 
-            'kudu', 
-            'lemur', 
-            'leopard', 
-            'llama', 
-            'lobster', 
-            'locust', 
-            'lyrebird', 
-            'manatee', 
-            'meerkat', 
-            'mole', 
-            'moose', 
-            'mouse', 
-            'mule', 
-            'narwhal', 
-            'octopus', 
-            'okapi', 
-            'opossum', 
-            'oryx', 
-            'otter', 
-            'owl', 
-            'oyster', 
-            'pelican', 
-            'penguin', 
-            'platypus', 
-            'polar bear', 
-            'porcupine', 
-            'quelea', 
-            'rhinoceros', 
-            'rook', 
-            'serval', 
-            'shark', 
-            'sheep', 
-            'squid', 
-            'swallow', 
-            'swan', 
-            'tapir', 
-            'vicuña', 
-            'wasp', 
-            'weasel', 
-            'wolf', 
-            'wombat', 
-            'yak', 
-            'zebra'
+			'aardvark','albatross','alpaca','anteater','antelope','armadillo','baboon','badger','barracuda','bat','bear','beaver', 
+			'bee', 'butterfly', 'camel', 'caribou', 'chinchilla', 'clam', 'cobra', 'cormorant', 'coyote', 'crab', 'crane', 'crow',
+			'dragonfly', 'donkey', 'dugong', 'eagle', 'echidna', 'eland', 'emu', 'falcon', 'ferret', 'finch', 'gazelle', 'gnat', 
+			'guanaco', 'hawk', 'hedgehog', 'heron', 'hippopotamus', 'hummingbird', 'hyena', 'iguana', 'jackal', 'koala', 'komodo dragon', 
+			'kouprey', 'kudu', 'lemur', 'leopard', 'llama', 'lobster', 'locust', 'lyrebird', 'manatee', 'meerkat', 'mole', 'moose', 
+			'mouse', 'mule', 'narwhal', 'octopus', 'okapi', 'opossum', 'oryx', 'otter', 'owl', 'oyster', 'pelican', 'penguin', 
+			'platypus', 'polar_bear', 'porcupine', 'quelea', 'rhinoceros', 'rook', 'serval', 'shark', 'sheep', 'squid', 'swallow', 
+			'swan', 'tapir', 'vicuña','wasp','weasel','wolf','wombat', 'yak','zebra'
         );
         
         return '-test project «' . ucwords($animales[rand(0, count($animales) - 1)]) . '» (' . date('c') . ')';
