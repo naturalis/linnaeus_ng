@@ -82,13 +82,13 @@ $(document).ready(function(){
 {/section}
 {if $projectRanks|@count>0}
 {assign var=first value=true}
-{section name=i loop=$projectRanks}
-	taxonAddRank({$projectRanks[i].rank_id},false,false);
-	{if $projectRanks[i].lower_taxon==1 && $first==true}
-	taxonRankBorder = {$projectRanks[i].rank_id};
+{foreach from=$projectRanks item=v}
+	taxonAddRank({$v.rank_id},false,false);
+	{if $v.lower_taxon==1 && $first==true}
+	taxonRankBorder = {$v.rank_id};
 	{assign var=first value=false}
 	{/if}
-{/section}
+{/foreach}
 	taxonShowSelectedRanks();
 {else}
 	taxonAddRank(taxonKingdom[0]);

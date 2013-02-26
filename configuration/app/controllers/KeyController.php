@@ -789,7 +789,7 @@ class KeyController extends Controller
 	
 			$div = 
 				array(
-					'remaining' => $this->tmp['remaining'],
+					'remaining' => (isset($this->tmp['remaining']) ? $this->tmp['remaining'] : null),
 					'excluded' => $excludedTaxa
 				);
 				

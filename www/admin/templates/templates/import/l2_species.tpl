@@ -39,51 +39,74 @@ Review the data below and press "save" to save it to the database. In the follow
 <p>
 <b>Ranks</b><br />
 {if $ranks|@count==0}
-No ranks were found or could be resolved. Import cannot proceed.<br />
-Go to "Projects -> [project] -> Species module -> Taxonomic ranks" to see a list of valid ranks.<br />
-Alter import file accordingly and try again.
-{assign var=process value=false}
+    No ranks were found or could be resolved. Import cannot proceed.<br />
+    Go to "Projects -> [project] -> Species module -> Taxonomic ranks" to see a list of valid ranks.<br />
+    Alter import file accordingly and try again.
+    {assign var=process value=false}
 {else}
-{assign var=i value=0}
-{assign var=err value=false}
-{foreach from=$ranks key=k item=v}
-{if $v.rank_id==false}
-<span class="{if $substRanks[$k]!=''}fixed-{/if}error">Rank could not be resolved: "{$k}"{if $substRanks[$k]!=''}; substituting:{/if}</span>
-	<select name="substRanks[{$k}]" id="substRanks-{$i}">
-		<option value="">select appropriate rank:</option>
-		<option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
-		{foreach from=$projectRanks item=pr}
-		<option value="{$pr.id}" {if $substRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
-		{/foreach}
-	</select>
-<br />
-{assign var=err value=true}
+    {assign var=i value=0}
+    {assign var=err value=false}
+    {foreach from=$ranks key=k item=v}
+        {if $v.rank_id==false}
+        <span class="{if $substRanks[$k]!=''}fixed-{/if}error">Rank could not be resolved: "{$k}"{if $substRanks[$k]!=''}; substituting:{/if}</span>
+            <select name="substRanks[{$k}]" id="substRanks-{$i}">
+                <option value="">select appropriate rank:</option>
+                <option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
+                {foreach from=$projectRanks item=pr}
+                <option value="{$pr.id}" {if $substRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
+                {/foreach}
+            </select>
+        <br />
+        {assign var=err value=true}
+        {/if}
+        {if $v.parent_id===false}
+        <span class="{if $substParentRanks[$k]!=''}fixed-{/if}error">Parent rank of "{$k}" could not be resolved: "{$v.parent_name}"{if $substParentRanks[$k]!=''}; substituting:{/if}</span>
+            <select name="substParentRanks[{$k}]" id="substParentRanks-{$i}">
+                <option value="">select appropriate rank:</option>
+                <option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
+                {foreach from=$projectRanks item=pr}
+                <option value="{$pr.id}" {if $substParentRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
+                {/foreach}
+            </select>
+        <br />
+        {assign var=err value=true}
+        {/if}
+
+        {if $v.parent_id==null && $i>0}
+        	{* <span class="error">Parentless rank that is not top of the tree: {$k}</span><br /> {assign var=err value=true} *}
+	            Resolved rank: {$k}<br />
+        {/if}
+        
+        {if $v.rank_id!=false && (($v.parent_id!=false && $v.parent_id!=null) || $i==0)}
+            Resolved rank: {$k}<br />
+        {/if}
+        {assign var=i value=$i+1}
+    {/foreach}
+
+    {if $err}
+        <span class="info">(Ranks shown in red will not be imported, nor will species of that rank be imported.)</span>
+    {/if}
+
+    {if $multiples|@count>0}
+	<p>
+    The import contains one or more ambigious ranks. Select the correct match:<br />
+	<ul>
+    {foreach from=$multiples key=k item=v}
+		<li>{$k}
+        	<ul style="list-style-type:none;padding:0">
+    	    {foreach from=$v key=kk item=vv}
+                <li><label><input name="multiRankChoice[{$k}]" value="{$vv.id}" type="radio"{if $kk==0} checked="checked"{/if}>{$vv.rank|@strtolower}{if $vv.additional} ({$vv.additional}){/if} [child of {$vv.parent_rank|@strtolower}]</label></li>
+        	{/foreach}
+	        </ul>
+        </li>
+    {/foreach}
+    </ul>
+	</p>    
+    {/if}
+
 {/if}
-{if $v.parent_id===false}
-<span class="{if $substParentRanks[$k]!=''}fixed-{/if}error">Parent rank of "{$k}" could not be resolved: "{$v.parent_name}"{if $substParentRanks[$k]!=''}; substituting:{/if}</span>
-	<select name="substParentRanks[{$k}]" id="substParentRanks-{$i}">
-		<option value="">select appropriate rank:</option>
-		<option value="" disabled="disabled">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</option>
-		{foreach from=$projectRanks item=pr}
-		<option value="{$pr.id}" {if $substParentRanks[$k]==$pr.id}selected="selected"{/if}>{$pr.rank}</option>
-		{/foreach}
-	</select>
-<br />
-{assign var=err value=true}
-{/if}
-{if $v.parent_id==null && $i>0}
-	<span class="error">Parentless rank that is not top of the tree: {$k}</span><br />
-{assign var=err value=true}
-{/if}
-{if $v.rank_id!=false && (($v.parent_id!=false && $v.parent_id!=null) || $i==0)}
-	Resolved rank: {$k}<br />
-{/if}
-{assign var=i value=$i+1}
-{/foreach}
-{/if}
-{if $err}
-<span class="info">(Ranks shown in red will not be imported, nor will species of that rank be imported.)</span>
-{/if}
+
+
 </p>
 {if $substRanks|@count > 0 || $substParentRanks|@count > 0}
 <p>
@@ -93,6 +116,9 @@ PLEASE CHOOSE CAREFULLY. The application will <u>not</u> check the logic of your
 <input type="submit" value="{t}Update{/t}" />
 </p>
 {/if}
+
+	<hr />
+
 
 <p>
 <b>Species</b><br />

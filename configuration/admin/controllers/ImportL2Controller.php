@@ -6,13 +6,13 @@
 
 	should add '_sawModule' to all modules
 	
-	DO NOT ADD $this->replaceInternalLinks() to anything outside the procedure fixOldInternalLinks(); it needs ALL data to be processed
+	DO NOT ADD $this->replaceInternalLinks() to anything outside the procedure fixEmbeddedLinksAndMedia(); it needs ALL data to be processed
 	first, before it can resolve and fix internal links
 	
 	species and higher taxa are strtolowered before parsed for the lookup arrays. OTHER MODULES ARE NOT, so:
 		[l][m]Glossary[/m][r]annihilation[/r][t]annihilated[/t][/l]
 	will only link correctly if the glosssary-entry is 'annihilation', and will not link when it is 'Annihilation'. that's
-	what you get when you don't do unique ID's.
+	what you get when you don't use unique ID's.
 
 	keys als enige buiten de boom: nergens een los veld met de rank
 	ik wil alleen zeker weten dat er in alle projecten in de Tk en Pk ook ALTIJD de rank er bij staat voor de HT.
@@ -32,10 +32,6 @@ Unable to resolve name "Oenanthe peucedanifolia" to taxon id.
 
 Please be aware that these are six other taxa than the three mentioned earlier - Atropa belladonna, Genianella campestris & Nemesia melissaefolium - that appear in neither <tree>, nor <records>.
 	
-	CHECK $_SESSION['admin']['system']['import']['lookupArrays']!
-
-	q($_SESSION['admin']['system']['import']['loaded']['species']);
-
 	DOCUMENT resolveLanguage($l) !!!!
 
 	what is:
@@ -137,7 +133,7 @@ class ImportL2Controller extends Controller
         'diversity'
     );
     private $_sawModule = false;
-	private $_retainInternalLinks = false;
+	private $_retainInternalLinks = false; // keep false, as internal links are re-created by means of hotwords
 
 
     /**
@@ -424,21 +420,64 @@ class ImportL2Controller extends Controller
         ));
         
         $this->helpers->XmlParser->getNodes('treetaxon');
-        
+		
         $treetops = $this->checkTreeTops($_SESSION['admin']['system']['import']['loaded']['species']);
-        
+
+		$d = $this->models->Rank->_get(
+			array(
+				'id' =>'select lower(rank) as rank from %table% group by rank having count(*) > 1',
+				'fieldAsIndex' => 'rank'
+			)
+		);
+		
+		// sadly, several ranks occur in multiple positions with the same name
+		$multiples = array();
+		foreach((array)$_SESSION['admin']['system']['import']['loaded']['ranks'] as $key => $val) {
+
+			if (isset($d[$key])) {
+
+				$whatever = $this->models->Rank->_get(array('id' => array('rank'=>$key),'columns' => 'id,rank,additional,default_label,abbreviation,parent_id'));
+				foreach((array)$whatever as $tra => $lala) {
+					$dontcare = $this->models->Rank->_get(array('id' => array('id'=>$lala['parent_id']),'columns' => 'rank'));
+					$whatever[$tra]['parent_rank'] = $dontcare[0]['rank'];
+				}
+				
+				$multiples[$key] = $whatever;
+				
+			}
+
+		}
+
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
+			
+            $_SESSION['admin']['system']['import']['loaded']['ranks'] =
+				$this->addProjectRanks(
+					$_SESSION['admin']['system']['import']['loaded']['ranks'],
+					($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null), 
+		            ($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null),
+		            ($this->rHasVal('multiRankChoice') ? $this->requestData['multiRankChoice'] : null)
+				);
             
-            $_SESSION['admin']['system']['import']['loaded']['ranks'] = $this->addProjectRanks($_SESSION['admin']['system']['import']['loaded']['ranks'], ($this->rHasVal('substRanks') ? $this->requestData['substRanks'] : null), 
-            ($this->rHasVal('substParentRanks') ? $this->requestData['substParentRanks'] : null));
-            
-            $species = $_SESSION['admin']['system']['import']['loaded']['species'] = $this->addSpecies($_SESSION['admin']['system']['import']['loaded']['species'], $_SESSION['admin']['system']['import']['loaded']['ranks']);
+            $species = $_SESSION['admin']['system']['import']['loaded']['species'] = 
+				$this->addSpecies(
+					$_SESSION['admin']['system']['import']['loaded']['species'],
+					$_SESSION['admin']['system']['import']['loaded']['ranks']
+				);
             
             if (isset($this->requestData['treetops']))
                 $_SESSION['admin']['system']['import']['loaded']['species'] = $this->fixTreetops($species, $this->requestData['treetops']);
-            
+				
+			foreach((array)$_SESSION['admin']['system']['import']['loaded']['species'] as $key => $val) {
+				
+				if (empty($val['parent_id'])) 
+					$_SESSION['admin']['system']['import']['species-errors'][] = array(
+						'taxon' => $val['taxon'], 
+						'cause' => 'saved as orphan, could not resolve parent "' . $val['parent'] . '" with rank "' . $val['parent_rank_name'] . '".'
+					);
+
+            }			
+		
             $this->assignTopSpeciesToUser($_SESSION['admin']['system']['import']['loaded']['species']);
-            
             $this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
             $this->addModuleToProject(MODCODE_HIGHERTAXA, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
             $this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
@@ -457,13 +496,21 @@ class ImportL2Controller extends Controller
         }
         
         $this->smarty->assign('project', $project);
+
         $this->smarty->assign('ranks', $_SESSION['admin']['system']['import']['loaded']['ranks']);
+
         $this->smarty->assign('projectRanks', $this->getPossibleRanks());
+
+        $this->smarty->assign('multiples', $multiples);
+
         if ($this->rHasVal('substRanks'))
             $this->smarty->assign('substRanks', $this->requestData['substRanks']);
+
         if ($this->rHasVal('substParentRanks'))
             $this->smarty->assign('substParentRanks', $this->requestData['substParentRanks']);
+
         $this->smarty->assign('species', $_SESSION['admin']['system']['import']['loaded']['species']);
+
         $this->smarty->assign('treetops', $treetops);
         
         $this->printPage();
@@ -756,6 +803,8 @@ class ImportL2Controller extends Controller
         
         $this->printPage();
     }
+
+
 
     public function l2ContentAction ()
     {
@@ -1190,7 +1239,9 @@ class ImportL2Controller extends Controller
         
         $this->redirect($this->getLoggedInMainIndex());
     }
-    
+
+
+
     /* xml parser callback functions */
     public function xmlParserCallback_Species ($obj)
     {
@@ -1252,8 +1303,6 @@ class ImportL2Controller extends Controller
 
     public function xmlParserCallback_KeyMatrixResolve ($obj)
     {
-        $this->_sawModule = true;
-        
         $this->resolveMatrices($obj);
     }
 
@@ -1268,8 +1317,6 @@ class ImportL2Controller extends Controller
 
     public function xmlParserCallback_Map ($obj)
     {
-        $this->_sawModule = true;
-        
         $this->saveMapItem($obj);
     }
 
@@ -1368,8 +1415,7 @@ class ImportL2Controller extends Controller
             }
             
             $topic = trim($page[$titleField]);
-            //$content = $this->replaceOldMarkUp(trim($page[$contentField]));
-            $content = $this->replaceOldMarkUp(trim($page[$contentField]));
+            $content = trim($page[$contentField]);
             
 
             if (!empty($topic)) {
@@ -1561,16 +1607,19 @@ class ImportL2Controller extends Controller
         return ($l) ? $l[0]['id'] : false;
     }
     
+
     // ranks
     public function xmlParserCallback_ResolveRanks ($obj)
     {
         $importRank = trim((string) $obj->taxon);
         $parentRankParent = trim((string) $obj->parenttaxon);
-        
+
+		//echo ':'.$obj->name.':'.$importRank.':'.$parentRankParent.'<br />';
+
         if (empty($importRank))
             return;
-        
-        if (!isset($_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank])) {
+
+        if (1==1 || !isset($_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank])) {
             
             $r = $this->models->Rank->_get(array(
                 'id' => array(
@@ -1584,6 +1633,7 @@ class ImportL2Controller extends Controller
             if (isset($rankId)) {
                 
                 $_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['rank_id'] = $rankId;
+
                 
                 if ($parentRankParent != 'none' && $parentRankParent != 'unknown') {
                     
@@ -1596,10 +1646,11 @@ class ImportL2Controller extends Controller
                     ));
                     
                     $_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = isset($r[0]['id']) ? $r[0]['id'] : false;
+
+
                     $_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_name'] = $parentRankParent;
                 }
                 else {
-                    
                     $_SESSION['admin']['system']['import']['loaded']['ranks'][$importRank]['parent_id'] = null;
                 }
             }
@@ -1649,7 +1700,7 @@ class ImportL2Controller extends Controller
 
 
 
-    private function addProjectRanks ($ranks, $substituteRanks = null, $substituteParentRanks = null)
+    private function addProjectRanks ($ranks, $substituteRanks = null, $substituteParentRanks = null, $multiRankChoice = null)
     {
         if (isset($substituteRanks) || isset($substituteParentRanks))
             $possibleRanks = $this->getPossibleRanks();
@@ -1677,35 +1728,18 @@ class ImportL2Controller extends Controller
                     continue; // unresolvable rank
                 }
             }
-            /*
-			// no valid parent (except $key==0, top of the hierarchy)
-			if ((!isset($val['parent_id']) || $val['parent_id']===false) && count((array)$d) > 0) {
-
-				if (isset($substituteParentRanks) && isset($substituteParentRanks[$key])) {
-
-					$val['parent_id'] = $substituteParentRanks[$key]; // hand picked substitute parent rank
-				
-				} else {
-
-					continue; // unresolvable parent rank
-
-				}
-
-			}
-			*/
-            
-            //if (!isset($val['parent_id']) && $key > 0) continue; // parentless ranks (other then topmost)
-            
-
 
             if (!$isLower && (strtolower($key) == 'species'))
                 $isLower = true;
-            
+				
+			if (isset($multiRankChoice[$key]))
+				$val['rank_id'] = $multiRankChoice[$key];
+
             $d[$key] = $this->addProjectRank($key, $val, $isLower, $prevId);
             $prevId = $d[$key]['id'];
         }
-        
-        // if $isLower is still false (i.e., all ranks are higher taxa), set the last (=lowest (is it?)) rank to being lower taxa	
+
+        // if $isLower is still false (i.e., all ranks are higher taxa), set the last (=lowest (is it? (possibly not, but do we really care?))) rank to being lower taxa	
         if ($isLower == false) {
             
             $this->models->ProjectRank->update(array(
@@ -1875,16 +1909,6 @@ class ImportL2Controller extends Controller
                     $d[$key]['parent_id'] = $t[0]['id'];
                 }
             }
-            else {
-                
-                if ($key != 0) {
-                    
-                    $_SESSION['admin']['system']['import']['species-errors'][] = array(
-                        'taxon' => $val['taxon'], 
-                        'cause' => 'saved as orphan, could not resolve parent "' . $val['parent'] . '" with rank "' . $val['parent_rank_name'] . '".'
-                    );
-                }
-            }
         }
         
         return $d;
@@ -1933,7 +1957,7 @@ class ImportL2Controller extends Controller
         if (count((array) $treetops) < 2)
             return;
             
-            // rank_id 1 = domain or empire 
+		// rank_id 1 = domain or empire 
         $d = $this->addProjectRank('(master rank)', array(
             'rank_id' => 1, 
             'parent_id' => null
@@ -1974,7 +1998,7 @@ class ImportL2Controller extends Controller
                 $species[$key]['parent_id'] = $masterId;
             }
         }
-        
+
         return $species;
     }
     
@@ -2020,7 +2044,7 @@ class ImportL2Controller extends Controller
 
         if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
            
-            $content = $this->replaceOldMarkUp(trim((string) $taxon->description));
+            $content = trim((string) $taxon->description);
 
             $this->models->ContentTaxon->save(
             array(
@@ -2487,8 +2511,7 @@ class ImportL2Controller extends Controller
             'multiple_authors' => $lit['multiple_authors'] == true ? 1 : 0, 
             'year' => (isset($lit['year']) && $lit['valid_year'] == true) ? $lit['year'] . '-00-00' : '0000-00-00', 
             'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null, 
-            //'text' => isset($lit['text']) ? $lit['text'] : null,
-            'text' => isset($lit['text']) ? $this->replaceOldMarkUp(trim($lit['text'])) : null
+            'text' => isset($lit['text']) ? trim($lit['text']) : null
         ));
         
         if ($res === true) {
@@ -2547,7 +2570,7 @@ class ImportL2Controller extends Controller
             
             foreach ($obj->glossary_synonyms->glossary_synonym as $sKey => $sVal) {
                 
-                $s[] = $this->replaceOldMarkUp(trim((string) $sVal->name), true);
+                $s[] = trim((string) $sVal->name);
             }
         }
         
@@ -2684,8 +2707,7 @@ class ImportL2Controller extends Controller
             'project_id' => $this->getNewProjectId(), 
             'language_id' => $this->getNewDefaultLanguageId(), 
             'term' => isset($gls['term']) ? $gls['term'] : null, 
-            //'definition' => isset($gls['definition']) ? $gls['definition'] : null
-            'definition' => isset($gls['definition']) ? $this->replaceOldMarkUp(trim($gls['definition'])) : null
+            'definition' => isset($gls['definition']) ? trim($gls['definition']) : null
         ));
         
         if ($res === true) {
@@ -2760,8 +2782,7 @@ class ImportL2Controller extends Controller
                 'project_id' => $this->getNewProjectId(), 
                 'language_id' => $this->getNewDefaultLanguageId(), 
                 'subject' => 'Welcome', 
-                //'content' => $this->replaceOldMarkUp(trim((string)$obj->projectintroduction))
-                'content' => $this->replaceOldMarkUp(trim((string) $obj->projectintroduction))
+                'content' => trim((string) $obj->projectintroduction)
             ));
             
             if ($res === true) {
@@ -2786,8 +2807,7 @@ class ImportL2Controller extends Controller
                 'project_id' => $this->getNewProjectId(), 
                 'language_id' => $this->getNewDefaultLanguageId(), 
                 'subject' => 'Contributors', 
-                //'content' => $this->replaceOldMarkUp(trim((string)$obj->contributors))
-                'content' => $this->replaceOldMarkUp(trim((string) $obj->contributors))
+                'content' => trim((string) $obj->contributors)
             ));
             
             if ($res === true) {
@@ -2824,8 +2844,8 @@ class ImportL2Controller extends Controller
             'project_id' => $this->getNewProjectId(), 
             'language_id' => $this->getNewDefaultLanguageId(), 
             'page_id' => $id, 
-            'topic' => $this->replaceOldMarkUp(trim((string) $obj->introduction_title), true), 
-            'content' => $this->replaceOldMarkUp(trim((string) $obj->text))
+            'topic' => trim((string) $obj->introduction_title), 
+            'content' => trim((string) $obj->text)
         ));
         
         if ($res === true) {
@@ -2985,20 +3005,17 @@ class ImportL2Controller extends Controller
                 
                 if (isset($val->captiontext)) {
                     
-                    $txt = $this->replaceOldMarkUp(trim((string) $val->captiontext));
+                    $txt = trim((string) $val->captiontext);
                     $p = trim((string) $step->pagenumber) . trim((string) $val->choiceletter) . '.';
                     if (substr($txt, 0, strlen($p)) == $p)
                         $txt = trim(substr($txt, strlen($p)));
                     if (strlen($txt) == 0)
-                        $txt = $this->replaceOldMarkUp(trim((string) $val->captiontext));
+                        $txt = trim((string) $val->captiontext);
                 }
                 else if (isset($val->picturefilename)) {
                     
                     $txt = trim((string) $val->picturefilename);
                 }
-                
-                //$txt = $this->replaceOldMarkUp($txt);
-                $txt = $this->replaceOldMarkUp($txt);
                 
                 $stepId = ($step == 'god' ? $stepIds['godId'] : $stepIds[trim((string) $step->pagenumber)]);
                 
@@ -3194,8 +3211,8 @@ class ImportL2Controller extends Controller
             foreach ($chars as $char) {
                 
                 //character_type ?? welke mogelijkheden + resolvement: Text 
-                
-
+				
+				$this->_sawModule = true;
 
                 $charname = trim((string) $char->character_name);
                 $chartype = trim((string) $char->character_type);
@@ -3459,19 +3476,7 @@ class ImportL2Controller extends Controller
             )
         ));
         
-        $c = array(
-            'ee0000', 
-            '0033ff', 
-            '00ee00', 
-            'ffff00', 
-            'ff66ff', 
-            '990099', 
-            '669999', 
-            '666699', 
-            'cc9966', 
-            'ffcc00', 
-            '008700'
-        );
+        $c = array('ee0000','0033ff','00ee00','ffff00','ff66ff','990099','669999','666699','cc9966','ffcc00','008700');
         
         foreach ((array) $d as $key => $val) {
             $this->models->GeodataType->update(array(
@@ -3603,6 +3608,8 @@ class ImportL2Controller extends Controller
             
             if (!isset($obj->distribution))
                 return;
+				
+			 $this->_sawModule = true;
             
             $taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
             
@@ -3823,30 +3830,43 @@ class ImportL2Controller extends Controller
     }
 
 
-
-    private function replaceOldMarkUp ($s, $removeNotReplace = false)
+    private function importPostProcessing ()
     {
-        $r = array(
-            '<b>', 
-            '</b>', 
-            '<i>', 
-            '</i>', 
-            '<br />', 
-            '<p>', 
-            '</p>'
-        );
+		
+		$res = $this->fixEmbeddedLinksAndMedia();
         
-        return str_replace(array(
-            '[b]', 
-            '[/b]', 
-            '[i]', 
-            '[/i]', 
-            '[br]', 
-            '[p]', 
-            '[/p]'
-        ), ($removeNotReplace ? null : $r), $s);
+        if ($this->renumberGeoDataTypeOrder())
+            $this->addMessage($this->storeError('Re-ordened map datatype legend (alphabetically).'));
+        
+        $this->copyEmbeddedMediaFiles();
+        
+        $this->addMessage($this->storeError('Processed embedded images.'));
+        
+        // additional texts
+        $this->addModuleToProject(MODCODE_CONTENT, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
+        $this->grantModuleAccessRights(MODCODE_CONTENT, $this->getNewProjectId());
+        
+        $this->addMessage($this->storeError('Added module "content".'));
+        
+        // index
+        $this->addModuleToProject(MODCODE_INDEX, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
+        $this->grantModuleAccessRights(MODCODE_INDEX, $this->getNewProjectId());
+        
+        $this->addMessage($this->storeError('Added module "index".'));
+        
+        // search
+        $this->addModuleToProject(MODCODE_UTILITIES, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
+        $this->grantModuleAccessRights(MODCODE_UTILITIES, $this->getNewProjectId());
+        
+        $this->addMessage($this->storeError('Added module "search".'));
+        
+        $this->models->Project->save(array(
+            'id' => $this->getNewProjectId(), 
+            'published' => '1'
+        ));
+        
+        $this->addMessage($this->storeError('Published project.'));
     }
-
 
 
     private function resolveInternalLinks ($s)
@@ -3976,8 +3996,19 @@ class ImportL2Controller extends Controller
     }
 
 
+    private function replaceInternalLinks ($s)
+    {
+        
+        // regular links
+        return preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/isU', array(
+            $this, 
+            'resolveInternalLinks'
+        ), $s);
+        
+    }
 
-    private function resolveEmbeddedLinks ($s)
+
+    private function resolveEmbeddedMedia ($s)
     {
         
         /*
@@ -4082,36 +4113,45 @@ class ImportL2Controller extends Controller
     }
 
 
-
-    private function replaceInternalLinks ($s)
+    private function replaceEmbeddedMedia ($s)
     {
-        
-        // regular links
-        $d = preg_replace_callback('/(\[l\]\[m\](.*)\[\/l\])/isU', array(
-            $this, 
-            'resolveInternalLinks'
-        ), $s);
         
         // embedded media
-        $d = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
+        return preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
             $this, 
-            'resolveEmbeddedLinks'
-        ), $d);
+            'resolveEmbeddedMedia'
+        ), $s);
         
-        return $this->replaceOldMarkUp($d);
     }
 
 
-
-    function removeInternalLinks ($s)
+    private function removeInternalLinks ($s)
     {
 
-		$b=preg_split('/(\[\/l\])/',$s);
-		foreach((array)$b as $k => $v)
-			$b[$k]=preg_replace_callback('/(\[l\])(.*)(\[t\])(.*)(\[\/t\])/',function($m){return $m[4];},$v);
-		return implode('',$b);
- 
+		return preg_replace_callback('/(\[l\])(.*)(\[t\])(.*)(\[\/t\])(\[\/l\])/iU',function($m){return trim($m[4]);},$s);
+
     }
+
+
+    private function replaceOldExternalURLs ($s)
+    {
+	
+		return preg_replace_callback('/(\[u\])(http|https){1}(.*)(\[\/u\])/U',function ($m){$url = trim($m[2]).trim($m[3]); return '<a href="'.$url.'" target="_blank">'.$url.'</a>';},$s);
+
+    }
+
+
+    private function replaceOldMarkUp ($s, $removeNotReplace=false)
+    {
+
+        $s = str_replace(
+			array('[b]','[/b]','[i]','[/i]','[br]','[p]','[/p]','[u]','[/u]'),
+			($removeNotReplace ? null : array('<b>','</b>','<i>','</i>','<br />','<p>','</p>','<u>','</u>')), $s);
+
+        return preg_replace('/(\[)(\/)?(im|mo|s|f|t)(\])/U', '', $s);
+
+    }
+
 
     private function copyEmbeddedMediaFiles ()
     {
@@ -4139,83 +4179,6 @@ class ImportL2Controller extends Controller
             }
         }
     }
-
-
-
-    private function renumberGeoDataTypeOrder ()
-    {
-        $s = $this->models->GeodataTypeTitle->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getNewProjectId()
-            ), 
-            'columns' => 'type_id,title', 
-            'order' => 'title'
-        ));
-        
-        if (!$s)
-            return false;
-        
-
-        foreach ((array) $s as $key => $val) {
-            
-            $this->models->GeodataType->update(array(
-                'show_order' => $key
-            ), array(
-                'id' => $val['type_id'], 
-                'project_id' => $this->getNewProjectId()
-            ));
-        }
-        
-        return true;
-    }
-
-
-
-    private function importPostProcessing ()
-    {
-		
-		$res = $this->fixOldInternalLinks();
-        
-        $this->addMessage($this->storeError('Processed internal links.'));
-        
-        if ($this->renumberGeoDataTypeOrder())
-            $this->addMessage($this->storeError('Re-ordened map datatype legend (alphabetically).'));
-        
-        $this->copyEmbeddedMediaFiles();
-        
-        $this->addMessage($this->storeError('Processed embedded images.'));
-        
-        // additional texts
-        $this->addModuleToProject(MODCODE_CONTENT, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_CONTENT, $this->getNewProjectId());
-        
-        $this->addMessage($this->storeError('Added module "content".'));
-        
-        // index
-        $this->addModuleToProject(MODCODE_INDEX, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_INDEX, $this->getNewProjectId());
-        
-        $this->addMessage($this->storeError('Added module "index".'));
-        
-        // search
-        $this->addModuleToProject(MODCODE_UTILITIES, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
-        $this->grantModuleAccessRights(MODCODE_UTILITIES, $this->getNewProjectId());
-        
-        $this->addMessage($this->storeError('Added module "search".'));
-        
-        //		return;
-        
-
-
-        $this->models->Project->save(array(
-            'id' => $this->getNewProjectId(), 
-            'published' => '1'
-        ));
-        
-        $this->addMessage($this->storeError('Published project.'));
-    }
-
 
 
     private function createLookupArrays ()
@@ -4276,21 +4239,31 @@ class ImportL2Controller extends Controller
     }
 
 
-	private function doFixOldInternalLinks($src)
+	private function doFixEmbeddedLinksAndMedia($src,$removeMarkup=false)
 	{
-		if ($this->_retainInternalLinks) {
-			return $this->replaceInternalLinks($src);
-		} else {
-			return $this->removeInternalLinks($this->replaceOldMarkUp($src));
-		}
+
+		$src = $this->replaceEmbeddedMedia($src);
+
+		$src = $this->replaceOldExternalURLs($src);
+
+		if ($this->_retainInternalLinks)
+			$src = $this->replaceInternalLinks($src);
+		else
+			$src = $this->removeInternalLinks($src);
+
+		$src = $this->replaceOldMarkUp($src,$removeMarkup);
+
+		return $src;
 			
 	}
 
-    private function fixOldInternalLinks ()
+
+    private function fixEmbeddedLinksAndMedia ()
     {
 	
 		if ($this->_retainInternalLinks)
         	$_SESSION['admin']['system']['import']['lookupArrays'] = $this->createLookupArrays();
+
         
         $d = $this->models->ContentTaxon->_get(array(
             'id' => array(
@@ -4304,7 +4277,7 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->doFixOldInternalLinks($val['content'])
+                'content' => $this->doFixEmbeddedLinksAndMedia($val['content'])
             ));
         }
         
@@ -4319,7 +4292,7 @@ class ImportL2Controller extends Controller
             $this->models->Literature->save(array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'text' => $this->doFixOldInternalLinks($val['text'])
+                'text' => $this->doFixEmbeddedLinksAndMedia($val['text'])
             ));
         }
         
@@ -4335,9 +4308,26 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'definition' => $this->doFixOldInternalLinks($val['definition'])
+                'definition' => $this->doFixEmbeddedLinksAndMedia($val['definition'])
             ));
         }
+
+        $d = $this->models->GlossarySynonym->_get(array(
+            'id' => array(
+                'project_id' => $this->getNewProjectId()
+            )
+        ));
+        
+        foreach ((array) $d as $val) {
+            
+            $this->models->GlossarySynonym->save(
+            array(
+                'id' => $val['id'], 
+                'project_id' => $this->getNewProjectId(), 
+                'synonym' => $this->doFixEmbeddedLinksAndMedia($val['synonym'],true)
+            ));
+        }
+
         
         $d = $this->models->Content->_get(array(
             'id' => array(
@@ -4350,7 +4340,7 @@ class ImportL2Controller extends Controller
             $this->models->Content->save(array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->doFixOldInternalLinks($val['content'])
+                'content' => $this->doFixEmbeddedLinksAndMedia($val['content'])
             ));
         }
         
@@ -4367,7 +4357,7 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->doFixOldInternalLinks($val['content'])
+                'content' => $this->doFixEmbeddedLinksAndMedia($val['content'])
             ));
         }
         
@@ -4384,8 +4374,8 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'title' => $this->doFixOldInternalLinks($val['title']), 
-                'content' => $this->doFixOldInternalLinks($val['content'])
+                'title' => $this->doFixEmbeddedLinksAndMedia($val['title'],true), 
+                'content' => $this->doFixEmbeddedLinksAndMedia($val['content'])
             ));
         }
         
@@ -4401,7 +4391,7 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'choice_txt' => $this->doFixOldInternalLinks($val['choice_txt'])
+                'choice_txt' => $this->doFixEmbeddedLinksAndMedia($val['choice_txt'])
             ));
         }
         
@@ -4417,11 +4407,16 @@ class ImportL2Controller extends Controller
             array(
                 'id' => $val['id'], 
                 'project_id' => $this->getNewProjectId(), 
-                'content' => $this->doFixOldInternalLinks($val['content'])
+                'content' => $this->doFixEmbeddedLinksAndMedia($val['content'])
             ));
         }
-    }
 
+		if ($this->_retainInternalLinks)
+			$this->addMessage($this->storeError('Replaced internal links.'));
+		else		
+			$this->addMessage($this->storeError('Removed internal links.'));
+
+    }
 
 
     private function mimeContentType ($filename)
@@ -4498,6 +4493,34 @@ class ImportL2Controller extends Controller
     }
 
 
+    private function renumberGeoDataTypeOrder ()
+    {
+        $s = $this->models->GeodataTypeTitle->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getNewProjectId()
+            ), 
+            'columns' => 'type_id,title', 
+            'order' => 'title'
+        ));
+        
+        if (!$s)
+            return false;
+        
+
+        foreach ((array) $s as $key => $val) {
+            
+            $this->models->GeodataType->update(array(
+                'show_order' => $key
+            ), array(
+                'id' => $val['type_id'], 
+                'project_id' => $this->getNewProjectId()
+            ));
+        }
+        
+        return true;
+    }
+
 
     private function lowercaseMediaFiles ()
     {
@@ -4525,7 +4548,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function detectCustomModulesInXML ()
     {
         if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
@@ -4548,7 +4570,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function storeError ($err, $mod)
     {
         $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
@@ -4558,7 +4579,6 @@ class ImportL2Controller extends Controller
         
         return $err;
     }
-
 
 
     private function downloadErrorLog ()
@@ -4612,7 +4632,6 @@ class ImportL2Controller extends Controller
         
         die();
     }
-
 
 
     /**

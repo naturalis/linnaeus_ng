@@ -1027,6 +1027,9 @@ class ProjectsController extends Controller
 
     private function doDeleteProjectAction ($projectId)
     {
+		
+		set_time_limit(600);
+		
         $this->deleteNBCKeydata($projectId);
         $this->deleteIntroduction($projectId);
         $this->deleteGeoData($projectId);
@@ -1048,7 +1051,7 @@ class ProjectsController extends Controller
         $this->deleteModulesFromProject($projectId);
         $this->deleteProjectCssFile($projectId);
         $this->deleteProjectSettings($projectId);
-        $this->deleteProjectImagePaths($projectId);
+        $this->deleteProjectDirectories($projectId);
         $this->deleteOtherStuff($projectId);
         $this->deleteProject($projectId);
     }
@@ -1146,7 +1149,6 @@ class ProjectsController extends Controller
     }
 
 
-
     private function deleteGlossary ($id)
     {
         $paths = $this->makePathNames($id);
@@ -1176,6 +1178,7 @@ class ProjectsController extends Controller
         ));
     }
 
+
     private function deleteLiterature ($id)
     {
         $this->models->LiteratureTaxon->delete(array(
@@ -1185,6 +1188,7 @@ class ProjectsController extends Controller
             'project_id' => $id
         ));
     }
+
 
     private function deleteProjectContent ($id)
     {
@@ -1220,8 +1224,6 @@ class ProjectsController extends Controller
             'project_id' => $id
         ));
     }
-
-
 
     private function deleteCommonnames ($id)
     {
@@ -1397,14 +1399,28 @@ class ProjectsController extends Controller
     }
 
 
+	private function rrmdir($dir) {
+		if (!file_exists($dir)) return;
+		foreach(glob($dir . '/*') as $file) {
+			if(is_dir($file))
+				rrmdir($file);
+			else
+				unlink($file);
+		}
+		rmdir($dir);
+	}
 
-    private function deleteProjectImagePaths ($id)
+    private function deleteProjectDirectories ($id)
     {
         $paths = $this->makePathNames($id);
         
-        @rmdir($paths['project_media_l2_maps']);
-        @rmdir($paths['project_thumbs']);
-        @rmdir($paths['project_media']);
+        $this->rrmdir($paths['project_media_l2_maps']);
+        $this->rrmdir($paths['project_thumbs']);
+        $this->rrmdir($paths['project_media']);
+		
+		$this->clearAllCaches();
+		
+        $this->rrmdir($paths['cache']);
     }
 
 
@@ -1501,8 +1517,6 @@ class ProjectsController extends Controller
 		$key = key($data[0]);
 		$prefix = $this->models->Project->getTablePrefix();
 		$pInUse = array();
-		
-		$tablesToIgnore = array('');
 
 		foreach((array)$data as $val) {
 
@@ -1511,6 +1525,7 @@ class ProjectsController extends Controller
 			if (substr($table,0,strlen($prefix))!==$prefix)
 				continue;
 
+			// all user tables, infrastructural tables and the project table itself lack a project_id column.
 			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
 	
 			foreach((array)$d as $dVal)
@@ -1519,13 +1534,28 @@ class ProjectsController extends Controller
 			//echo $table;q($d);
 
 		}
+		
+		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
+			if(is_dir($file)) {
+				$boom = array_pop(explode('/',$file));
+				if (is_numeric($boom))
+					$pInUse[intval($boom)] = intval($boom);
+			}
+		}
+		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
+			if(is_dir($file)) {
+				$boom = array_pop(explode('/',$file));
+				if (is_numeric($boom))
+					$pInUse[intval($boom)] = intval($boom);
+			}
+		}
 
 		$d = $this->models->Project->_get(array('id' => '*'));
 		
 		foreach((array)$d as $val) {
 
 			unset($pInUse[$val['id']]);
-			$this->addMessage(sprintf('Not deleting data for "%s"',$val['sys_name']));
+			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
 
 		}
 		
@@ -1537,9 +1567,6 @@ class ProjectsController extends Controller
 		}
 		
 	}
-
-
-
 
 
     private function mergeIntroduction ($p)

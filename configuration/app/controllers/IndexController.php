@@ -199,7 +199,22 @@ class IndexController extends Controller
                 $d[] = $val['id'];
         }
         
-        $names = $taxa = $this->buildTaxonTree();
+        $taxa = $this->buildTaxonTree();
+		
+		$d = array();
+		
+		foreach((array)$taxa as $key => $val) {
+			
+			if(
+				($this->getTaxonType() == 'lower' && $val["lower_taxon"]==0) ||
+				($this->getTaxonType() == 'higher' && $val["lower_taxon"]==1)
+			) continue;
+			
+			$d[$key] = $val;
+
+		}
+		
+		$names = $taxa = $d;
         
         $syn = $this->searchSynonyms();
         
@@ -391,7 +406,7 @@ class IndexController extends Controller
     {
         if (empty($list))
             return;
-        
+
         if ($this->rHasVal('letter')) {
             
             if ($this->requestData['letter'] == '#')
@@ -400,7 +415,7 @@ class IndexController extends Controller
             $l = strtolower($this->requestData['letter']);
             
             foreach ((array) $list as $val) {
-                
+               
                 if (strtolower(substr($val[$field], 0, 1)) == $l)
                     return $l;
             }

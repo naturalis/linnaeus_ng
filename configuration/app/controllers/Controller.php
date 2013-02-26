@@ -104,6 +104,7 @@ class Controller extends BaseClass
     private $_currentGlossaryId = false;
     private $_currentHotwordLink = false;
     private $_hotwordTempLinks = array();
+    private $_hotwordMightBeHotwords = array();
     private $_hotwordNoLinks = array();
     private $_useCache = true;
     public $viewName;
@@ -167,7 +168,7 @@ class Controller extends BaseClass
         $this->setControllerParams($p);
         
         $this->setPhpIniVars();
-        
+
         $this->setDebugMode();
         
         $this->startSession();
@@ -368,7 +369,7 @@ class Controller extends BaseClass
             unset($this->treeList);
         
         $t = $this->getTaxonChildren($pId);
-        
+
         /*
         $t = $this->models->Taxon->_get(
         array(
@@ -1020,7 +1021,125 @@ class Controller extends BaseClass
     }
 
 
-    public function matchHotwords ($text, $forceLookup = false)
+	private function henk($m)
+	{
+
+		$d = $this->generateRandomHexString('%%%','%%%');
+
+		while (isset($this->_hotwordMightBeHotwords[$d]))
+			$d = $this->generateRandomHexString('%%%','%%%');
+
+		$this->_hotwordMightBeHotwords[$d]=$m[0]; 
+
+		return $d;
+		
+	}
+
+	public function matchHotwords ($text, $forceLookup = false)
+	{
+		
+        if (empty($text) || !is_string($text))
+            return $text;
+        
+        $processed = $text;
+        
+        // get all hotwords from database
+        $wordlist = $this->getHotwords($forceLookup);
+        
+
+        // replace the not-to-be-linked words with a unique numbered string
+        $exprNoLink = '|(\[no\])(.*)(\[\/no\])|i';
+        $processed = preg_replace_callback($exprNoLink, array(
+            $this, 
+            'embedNoLink'
+        ), $processed);
+        
+
+		// replace words that have tags inside them with a unique string, if present
+		$exprMaybe='/\b\w+(<\w+(.*)>)(\w)(<\/(.*)>)\w+\b/iU';
+		$hasPossibles = (preg_match($exprMaybe,$processed,$m)===1);
+		if ($hasPossibles) {
+			$processed = preg_replace_callback(
+				$exprMaybe,
+				array($this,'henk'),
+				$processed
+			);
+		
+		}
+	
+		// loop through wordlist
+        foreach ((array) $wordlist as $key => $val) {
+            
+            if ($val['hotword'] == '')
+                continue;
+                
+            // replace hotwords that are already linked words with a unique string
+            $expr = '|(<a (.*)>)(' . $val['hotword'] . ')(<\/a>)|i';
+            $processed = preg_replace_callback($expr, array(
+                $this, 
+                'embedNoLink'
+            ), $processed);
+            
+			// compile the link for the given hotword
+            $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
+
+			// replace occurrences of the hotword
+            $exprHot = '|\b(' . $val['hotword'] . ')\b|i';
+            $processed = preg_replace_callback($exprHot, array(
+                $this, 
+                'embedHotwordLink'
+            ), $processed);
+        }
+        
+        $processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
+
+		if ($hasPossibles) {
+
+			foreach($this->_hotwordMightBeHotwords as $tKey => $tVal) {
+			
+				foreach($wordlist as $wKey => $wVal) {
+
+					if (strtolower(strip_tags($tVal))==strtolower($wVal['hotword'])) {
+
+						// compile the link for the given hotword
+						$this->_currentHotwordLink = '../' . $wVal['controller'] . '/' . $wVal['view'] . '.php' . (!empty($wVal['params']) ? '?' . $wVal['params'] : '');
+
+						$processed = preg_replace('/'.$tKey.'/iU','<a href="'.$this->_currentHotwordLink.'">'.$tVal.'</a>',$processed);
+						
+					}
+			
+				}
+			
+			}
+
+		}
+			
+        return $processed;
+    }
+
+
+    public function getSetting ($name)
+    {
+        $s = $this->models->Settings->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'setting' => $name
+            ), 
+            'columns' => 'value', 
+            'limit' => 1
+        ));
+        
+        if (isset($s[0]))
+            return $s[0]['value'];
+        else
+            return null;
+    }
+    
+
+    /*
+
+    public function matchHotwordsOLD ($text, $forceLookup = false)
 	{
 		
         if (empty($text) || !is_string($text))
@@ -1065,29 +1184,7 @@ class Controller extends BaseClass
         return $processed;
     }
 
-
-
-    public function getSetting ($name)
-    {
-        $s = $this->models->Settings->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'setting' => $name
-            ), 
-            'columns' => 'value', 
-            'limit' => 1
-        ));
-        
-        if (isset($s[0]))
-            return $s[0]['value'];
-        else
-            return null;
-    }
-    
-
-    /*
-    public function formatTaxon ($name, $projRankId)
+    public function formatTaxonOLD ($name, $projRankId)
     {
          if (empty($projRankId))
             return $name;
@@ -1134,7 +1231,7 @@ class Controller extends BaseClass
         }
     }
 
-*/
+	*/
     public function formatTaxon ($taxon)
     {
         $e = explode(' ', $taxon['taxon']);
@@ -2497,10 +2594,10 @@ class Controller extends BaseClass
         }
         else {
             
-            $d = $this->generateRandomHexString();
+            $d = $this->generateRandomHexString('###','###');
             
             while (isset($this->_hotwordNoLinks[$d])) {
-                $this->generateRandomHexString();
+                $d = $this->generateRandomHexString('###','###');
             }
             
             $this->_hotwordNoLinks[$d] = array(
@@ -2522,10 +2619,10 @@ class Controller extends BaseClass
         }
         else {
             
-            $d = $this->generateRandomHexString();
+            $d = $this->generateRandomHexString('@@@','@@@');
             
             while (isset($this->_hotwordTempLinks[$d])) {
-                $this->generateRandomHexString();
+                $this->generateRandomHexString('@@@','@@@');
             }
             
             $this->_hotwordTempLinks[] = array(
@@ -2703,7 +2800,6 @@ class Controller extends BaseClass
         if (!isset($this->treeList))
             $this->buildTaxonTree(); // return null;
         
-
         $d = array();
         
         foreach ((array) $this->treeList as $key => $val) {
@@ -2724,7 +2820,7 @@ class Controller extends BaseClass
         if (!$this->getCache('species-treeList')) {
             
             $this->_buildTaxonTree();
-            
+			
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
         }
         else {
@@ -2826,9 +2922,9 @@ class Controller extends BaseClass
 
 
 
-    private function generateRandomHexString ()
+    public function generateRandomHexString ($pre=null,$post=null)
     {
-        return substr(md5(rand()), 0, 16);
+        return $pre.substr(md5(rand()), 0, 16).$post;
     }
 
 
