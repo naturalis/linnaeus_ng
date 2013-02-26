@@ -25,6 +25,10 @@ class HotwordController extends Controller
 
 	public $jsToLoad = array('all' => array('hotwords.js'));
 
+    public $cacheFiles = array(
+        'hotwords-*'
+    );
+
 
     /**
      * Constructor, calls parent's constructor
@@ -65,6 +69,7 @@ class HotwordController extends Controller
 		if ($this->rHasVal('action','delete_all') && !$this->isFormResubmit()) {
 
 			$this->clearHotwords();
+			$this->clearCache($this->cacheFiles);
 
 		}
 
@@ -97,6 +102,7 @@ class HotwordController extends Controller
 		if ($this->rHasVal('action','update') && !$this->isFormResubmit()) {
 		
 			$this->clearHotwords();
+			$this->clearCache($this->cacheFiles);
 			$this->addMessage('Deleted old hotwords.');
 			$this->addMessage('Added '.$this->updateIntroduction().' hotwords from Introduction.');
 			$this->addMessage('Added '.$this->updateGlossary().' hotwords from Glossary.');
@@ -145,11 +151,13 @@ class HotwordController extends Controller
 		if ($this->rHasVal('id') && $this->rHasVal('action','delete')) {
 
 			$this->models->Hotword->delete(array_merge($id,array('id' => $this->requestData['id'])));
+			$this->clearCache($this->cacheFiles);
 
 		} else
 		if ($this->rHasVal('action','delete_module')) {
 
 			$this->models->Hotword->delete($id);
+			$this->clearCache($this->cacheFiles);
 
 		}
 
