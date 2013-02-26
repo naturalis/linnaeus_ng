@@ -347,7 +347,7 @@ class HotwordController extends Controller
 
 		$res = 0;
 	
-		$d = $this->models->Taxon->_get(array('id' =>array('project_id' => $this->getCurrentProjectId())));
+		$d = $this->models->Taxon->_get(array('id' =>array('project_id' => $this->getCurrentProjectId(),'is_empty'=>0)));
 
 		foreach((array)$d as $key => $val) {
 
