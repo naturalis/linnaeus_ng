@@ -1665,7 +1665,12 @@ class Controller extends BaseClass
         //$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
         $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
         
-        if ($this->hasTableDataChanged('Rank') == true || $this->hasTableDataChanged('ProjectRank') == true || $this->hasTableDataChanged('LabelProjectRank') == true || !isset($_SESSION['admin']['user']['species']['projectRank'])) {
+        if (1==1||
+			$this->hasTableDataChanged('Rank') == true || 
+			$this->hasTableDataChanged('ProjectRank') == true || 
+			$this->hasTableDataChanged('LabelProjectRank') == true || 
+			!isset($_SESSION['admin']['user']['species']['projectRank'])
+		) {
             
             $pr = $this->models->ProjectRank->_get(
             array(
@@ -1673,9 +1678,10 @@ class Controller extends BaseClass
                     'project_id' => $this->getCurrentProjectId()
                 ), 
                 'columns' => 'id,project_id,rank_id,parent_id,lower_taxon,keypath_endpoint', 
-                'fieldAsIndex' => 'id'
+                'fieldAsIndex' => 'id',
+				'order' => 'rank_id'
             ));
-            
+			
             foreach ((array) $pr as $rankkey => $rank) {
                 
                 $r = $this->models->Rank->_get(array(
@@ -1723,7 +1729,7 @@ class Controller extends BaseClass
                     }
                 }
             }
-            
+
             $_SESSION['admin']['user']['species']['projectRank'] = $pr;
         }
         
@@ -3621,7 +3627,7 @@ class Controller extends BaseClass
 
 
 
-    private function clearAllCaches ()
+    public function clearAllCaches ()
     {
         if ($this->getCurrentProjectId()) {
             

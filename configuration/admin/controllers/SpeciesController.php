@@ -2002,7 +2002,7 @@ class SpeciesController extends Controller
 
 
     /**
-     * Enables the user to choose taxin ranks for the project
+     * Enables the user to choose taxon ranks for the project
      *
      * @access    public
      */
@@ -2012,17 +2012,10 @@ class SpeciesController extends Controller
         
         $this->setPageName($this->translate('Taxonomic ranks'));
         
-        $pr = $this->models->ProjectRank->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId()
-            ), 
-            'order' => 'parent_id', 
-            'fieldAsIndex' => 'rank_id'
-        ));
-        
         if ($this->rHasVal('ranks') && !$this->isFormResubmit()) {
             
+			$pr = $this->newGetProjectRanks();
+			
             $parent = 'null';
             
             $isLowerTaxon = false;
@@ -2123,7 +2116,7 @@ class SpeciesController extends Controller
             'fieldAsIndex' => 'id'
         )));
         
-        $pr = $this->getProjectRanks(array(
+        $pr = $this->newGetProjectRanks(array(
             'forceLookup' => true
         ));
         

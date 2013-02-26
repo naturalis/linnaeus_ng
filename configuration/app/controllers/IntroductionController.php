@@ -327,12 +327,12 @@ class IntroductionController extends Controller
 
 		if (empty($search) && !$getAll) return;
 
-		$d = array(
-				'project_id' => $this->getCurrentProjectId(),
-				'language_id' =>  $_SESSION['app']['project']['default_language_id'],
-			);
-		
 		if (!$getAll) {
+
+			$d = array(
+					'project_id' => $this->getCurrentProjectId(),
+					'language_id' =>  $_SESSION['app']['project']['default_language_id'],
+				);
 
 			if ($matchStartOnly)
 				$match = mysql_real_escape_string($search).'%';
@@ -341,19 +341,25 @@ class IntroductionController extends Controller
 
 			$d['topic like'] = $match;
 
+			$cfm = $this->models->ContentIntroduction->_get(
+				array(
+					'id' => $d,
+					'columns' => 'distinct page_id as id, topic as label',
+					'order' => 'label asc'
+				)
+			);
+			
+		} else {
+
+			$pages = $this->getPageHeaders();
+
 		}
 
-		$cfm = $this->models->ContentIntroduction->_get(
-			array(
-				'id' => $d,
-				'columns' => 'distinct page_id as id, topic as label',
-			)
-		);
 
 		$this->smarty->assign(
 			'returnText',
 			$this->makeLookupList(
-				$cfm,
+				$pages,
 				$this->controllerBaseName,
 				'../introduction/topic.php?id=%s'
 			)

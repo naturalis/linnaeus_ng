@@ -155,7 +155,7 @@ class MapKeyController extends Controller
 	{
 
 		$this->setPageName($this->translate('Choose a species'));
-		
+
 		$pagination = $this->getPagination($this->l2GetTaxaWithOccurrences(),$this->controllerSettings['speciesPerPage']);
 
 		$this->smarty->assign('prevStart', $pagination['prevStart']);
@@ -224,11 +224,17 @@ class MapKeyController extends Controller
 		
 		$maps = $this->l2GetMaps();
 		
-		if (empty($mapId)) $mapId = key($maps);
+		if (empty($mapId) && !empty($maps)) $mapId = key($maps);
+		
+		if ($mapId) {
 
-		$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
+			$d = $this->l2GetTaxonOccurrences($taxon['id'],$mapId);
+	
+			$this->smarty->assign('mapId',$mapId);
 
-		$this->smarty->assign('mapId',$mapId);
+			$this->smarty->assign('allLookupNavigateOverrideUrl', 'l2_examine_species.php?m='.$mapId.'&id=');
+
+		}
 
 		$this->smarty->assign('maps',$maps);
 
@@ -241,8 +247,6 @@ class MapKeyController extends Controller
 		$this->smarty->assign('occurrences',$d['occurrences']);
 
 		$this->smarty->assign('adjacentItems', $this->l2getAdjacentItems($taxon['id']));
-
-		$this->smarty->assign('allLookupNavigateOverrideUrl', 'l2_examine_species.php?m='.$mapId.'&id=');
 
 		$this->printPage();	
 		
@@ -1318,6 +1322,9 @@ class MapKeyController extends Controller
 	{
 
 		$taxa = $this->l2GetTaxaWithOccurrences();
+		
+		if (empty($taxa))
+			return;
 
 		reset($taxa);
 		
@@ -1340,7 +1347,7 @@ class MapKeyController extends Controller
 
 		}
 		
-		return null;
+		return;
 
 	}
 

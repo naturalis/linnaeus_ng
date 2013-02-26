@@ -234,22 +234,15 @@ class SpeciesController extends Controller
         
         if (empty($taxa))
             return null;
-        
+
         $d = current($taxa);
         
-        if ($this->getTaxonType() == 'higher') {
+		while ($d['lower_taxon'] == ($this->getTaxonType() == 'higher' ? 1 : 0)) {
+
+			$d = next($taxa);
+		}
             
-            return $d['id'];
-        }
-        else {
-            
-            while ($d['lower_taxon'] == 0) {
-                
-                $d = next($taxa);
-            }
-            
-            return $d['id'];
-        }
+		return $d['id'];
     }
 
 
@@ -259,6 +252,7 @@ class SpeciesController extends Controller
         if (!$this->rHasVal('id')) {
             
             $id = $this->getFirstTaxonId();
+
         }
         else {
             
