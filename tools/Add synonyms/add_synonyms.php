@@ -44,6 +44,8 @@
         insertSynonym (getTaxonId($name), $synonym);
     }
     
+    echo 'Done!</p>';
+    
     function getTaxonId ($name)
     {
 		global $settings, $s;
