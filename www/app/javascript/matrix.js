@@ -78,7 +78,6 @@ function fillStates(obj,char) {
 	setInfo('',' ',' ');
 
 	if (!obj) return;
-	
 
 	for(var i=0;i<obj.length;i++) {
 
@@ -138,7 +137,7 @@ function goState() {
 		case 'text':
 			var val = state.text;
 			var c = getCharacter(state.characteristic_id);
-			if (c) title = c.label;
+			if (val) title = c.label;
 			break;
 		case 'media':
 			if (state.img_dimensions==null) break;
@@ -586,7 +585,7 @@ function fillTaxonStates(obj,char) {
 
 	for(var i in obj) {
 		
-        textToInsert[i] = '<tr class="highlight"><td>'+obj[i].type.name+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>';
+        textToInsert[i] = '<tr class="highlight"><td>'+obj[i].type+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>';
      
     }
 
