@@ -2,7 +2,30 @@
 
 /*
 
-verwijderen
+	make sure that if there are multiple parameters, they are in alphabetical
+	order (this is assumed while matching with the current URL in the app)/
+	so: 
+
+		$this->saveHotword(
+			array(
+				'project_id' => $val['project_id'],
+				[...]
+				'params' => 'id='. $val['id'].'&modId='.$val['module_id']
+			)
+		)
+		
+	good,
+
+		$this->saveHotword(
+			array(
+				'project_id' => $val['project_id'],
+				[...]
+				'params' => 'modId='.$val['module_id'].'&id='. $val['id']
+			)
+		)
+		
+	bad.
+
 
 */
 
@@ -418,7 +441,7 @@ class HotwordController extends Controller
 					'hotword' => $val['topic'],
 					'controller' => 'module',
 					'view' => 'topic',
-					'params' => 'modId='.$val['module_id'].'&id='. $val['id']
+					'params' => 'id='. $val['id'].'&modId='.$val['module_id']
 				)
 			)===true) $res++;
 

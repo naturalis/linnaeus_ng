@@ -87,7 +87,6 @@
 	to be unique across two tables; again, these is at present no mechanism that
 	actually enforces this - it is up to the system administrator.
 	
-
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -195,8 +194,6 @@ class Controller extends BaseClass
         
         $this->createCacheFolder();
         
-        //$this->loadModels();
-
         $this->setRandomValue();
         
         $this->setSmartySettings();
@@ -1035,6 +1032,7 @@ class Controller extends BaseClass
 		
 	}
 
+
 	public function matchHotwords ($text, $forceLookup = false)
 	{
 		
@@ -1055,6 +1053,7 @@ class Controller extends BaseClass
         ), $processed);
         
 
+		/*
 		// replace words that have tags inside them with a unique string, if present
 		$exprMaybe='/\b\w+(<\w+(.*)>)(\w)(<\/(.*)>)\w+\b/iU';
 		$hasPossibles = (preg_match($exprMaybe,$processed,$m)===1);
@@ -1066,6 +1065,9 @@ class Controller extends BaseClass
 			);
 		
 		}
+		*/
+		
+		$currUrl = $this->getCurrentPathWithProjectlessQuery();
 	
 		// loop through wordlist
         foreach ((array) $wordlist as $key => $val) {
@@ -1082,7 +1084,11 @@ class Controller extends BaseClass
             
 			// compile the link for the given hotword
             $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
-
+			
+			// don't link if we're on that page already
+			if ($this->_currentHotwordLink==$currUrl)
+				continue;
+			
 			// replace occurrences of the hotword
             $exprHot = '|\b(' . $val['hotword'] . ')\b|i';
             $processed = preg_replace_callback($exprHot, array(
@@ -1093,6 +1099,7 @@ class Controller extends BaseClass
         
         $processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
 
+		/*
 		if ($hasPossibles) {
 
 			foreach($this->_hotwordMightBeHotwords as $tKey => $tVal) {
@@ -1113,6 +1120,7 @@ class Controller extends BaseClass
 			}
 
 		}
+		*/
 			
         return $processed;
     }
@@ -1984,7 +1992,7 @@ class Controller extends BaseClass
         $this->appName = $this->generalSettings['app']['pathName'];
         
         $this->_fullPath = $_SERVER['PHP_SELF'];
-        
+		
         $path = pathinfo($this->_fullPath);
         
         $_SESSION['app']['system']['path'] = $path;
@@ -2008,7 +2016,7 @@ class Controller extends BaseClass
             $this->viewName = $path['filename'];
         
         $this->_fullPathRelative = $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/' . $this->viewName . '.php';
-        
+
         if (empty($this->appName))
             $this->log('No application name set', 2);
         if (empty($this->viewName))
@@ -2023,6 +2031,23 @@ class Controller extends BaseClass
     }
 
 
+
+	private function getCurrentPathWithProjectlessQuery()
+	{
+
+		$d = array();
+		$boom = explode('&',$_SERVER['QUERY_STRING']);
+		$boom = array_map('strtolower', $boom);
+		foreach((array)$boom as $val) {
+			if (strpos($val,$this->generalSettings['addedProjectIDParam'].'=')===0)
+				continue;
+			$d[]=$val;
+		}
+		sort($d);
+		return '../' . $this->controllerBaseName . '/' . $this->viewName . '.php' . (count($d)>0 ? '?'.implode('&',$d) : '');
+		
+	}
+	
 
     private function setSkinName ()
     {

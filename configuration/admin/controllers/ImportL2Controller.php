@@ -308,7 +308,9 @@ class ImportL2Controller extends Controller
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('l2_start.php');
-        
+
+        set_time_limit(300);
+      
         $this->setPageName($this->translate('Creating project'));
         
         $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);

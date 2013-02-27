@@ -104,7 +104,7 @@ class SpeciesController extends Controller
     public function taxonAction ()
     {
         if ($this->rHasId()) {
-            
+
             // get taxon
             $taxon = $this->getTaxonById($this->requestData['id']);
             
@@ -150,10 +150,13 @@ class SpeciesController extends Controller
                 }
                 $categories['categories'][$key]['className'] = implode(' ', $c);
             }
-            
+
             $content = $this->getTaxonContent($taxon['id'], $activeCategory, $this->isLoggedInAdmin());
-            $content = $this->matchGlossaryTerms($content);
-            $content = $this->matchHotwords($content);
+
+			if ($activeCategory!='media') {
+				$content = $this->matchGlossaryTerms($content);
+				$content = $this->matchHotwords($content);
+			}
             
             if ($taxon['lower_taxon'] == 1) {
                 
@@ -506,6 +509,8 @@ class SpeciesController extends Controller
 
     private function getTaxonMedia ($taxon = null, $id = null)
     {
+		
+
         if ($mt = $this->getTaxonCategoryLastVisited($taxon, 'media'))
             return $mt;
         
@@ -525,7 +530,7 @@ class SpeciesController extends Controller
             'columns' => 'id,file_name,thumb_name,original_name,mime_type,sort_order,overview_image,substring(mime_type,1,locate(\'/\',mime_type)-1) as mime', 
             'order' => 'mime, sort_order'
         ));
-        
+
         $this->loadControllerConfig('species');
         
         foreach ((array) $mt as $key => $val) {
@@ -539,11 +544,12 @@ class SpeciesController extends Controller
                 ), 
                 'columns' => 'description'
             ));
+  
             
-            $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
+//            $mt[$key]['description'] = $mdt ? $this->matchHotwords($this->matchGlossaryTerms($mdt[0]['description'])) : null;
+			$mt[$key]['description'] = $mdt ? $mdt[0]['description'] : null;
             
             $t = isset($this->controllerSettings['mime_types'][$val['mime_type']]) ? $this->controllerSettings['mime_types'][$val['mime_type']] : null;
-            
 
             $mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
             $mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
