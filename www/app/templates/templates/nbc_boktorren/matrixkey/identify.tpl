@@ -36,11 +36,11 @@ if (typeof nbcInit=='function') {
 {/literal}
 {if $nbcFullDatasetCount}nbcFullDatasetCount = {$nbcFullDatasetCount};
 {/if}
-{if $nbcStart}nbcStart = {$nbcStart};
+{if $nbcStart}nbcStart={$nbcStart};
 {/if}
-{if $nbcPerPage}nbcPerPage = {$nbcPerPage};
+{if $nbcPerPage}nbcPerPage={$nbcPerPage};
 {/if}
-{if $nbcPerLine}nbcPerLine = {$nbcPerLine};
+{if $nbcPerLine}nbcPerLine={$nbcPerLine};
 {/if}
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');

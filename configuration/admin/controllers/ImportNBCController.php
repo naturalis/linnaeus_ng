@@ -315,12 +315,18 @@ class ImportNBCController extends Controller
         }
         
         $this->smarty->assign('characters', $data['characters']);
-        
-        $this->smarty->assign('skinName', $this->_defaultSkinName);
+
+       
+        $this->smarty->assign('skin', $this->_defaultSkinName);
+        $this->smarty->assign('matrix_state_image_per_row', 4);
+        $this->smarty->assign('matrix_items_per_page', 16);
+        $this->smarty->assign('matrix_items_per_line', 4);
+        $this->smarty->assign('matrix_use_sc_as_weight', 1);
+        $this->smarty->assign('matrix_browse_style', 'expand');//paginate|expand
+        $this->smarty->assign('nbc_image_root', 'http://determinatie.nederlandsesoorten.nl/images/');
         
         $this->printPage();
     }
-
 
 
     public function nbcDeterminatie6Action ()
@@ -330,36 +336,46 @@ class ImportNBCController extends Controller
         
         $this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
         $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
-        
-        $this->saveSetting(array(
-            'name' => 'matrixtype', 
-            'value' => 'NBC', 
-            'pId' => $this->getNewProjectId()
-        ));
-        
-        $this->saveSetting(array(
-            'name' => 'matrix_allow_empty_species', 
-            'value' => true, 
-            'pId' => $this->getNewProjectId()
-        ));
-        
-        $this->saveSetting(array(
-            'name' => 'matrix_use_character_groups', 
-            'value' => true, 
-            'pId' => $this->getNewProjectId()
-        ));
 
-        $this->saveSetting(array(
-            'name' => 'taxa_use_variations', 
-            'value' => true, 
-            'pId' => $this->getNewProjectId()
-        ));
-        
-        $this->saveSetting(array(
-            'name' => 'skin', 
-            'value' => ($this->rHasVal('skinname') ? $this->requestData['skinname'] : $this->_defaultSkinName), 
-            'pId' => $this->getNewProjectId()
-        ));
+		$settings = array(
+			'matrixtype' => 'NBC',
+			'matrix_allow_empty_species' => true,
+			'matrix_use_character_groups' => true,
+			'taxa_use_variations' => true,
+		);
+		
+		foreach((array)$settings as $key => $val) {
+			
+			if (!empty($val))
+				$this->saveSetting(array(
+					'name' => $key, 
+					'value' => $val, 
+					'pId' => $this->getNewProjectId()
+				));			
+		}
+
+		foreach((array)$this->requestData['settings'] as $key => $val) {
+			
+			if (!empty($val))
+				$this->saveSetting(array(
+					'name' => $key, 
+					'value' => $val, 
+					'pId' => $this->getNewProjectId()
+				));			
+		}
+		
+		
+		if (empty($this->requestData['settings']['skin'])) {
+
+			$this->saveSetting(array(
+				'name' => 'skin', 
+				'value' => $this->_defaultSkinName, 
+				'pId' => $this->getNewProjectId()
+			));
+			
+		}
+
+
         
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
@@ -409,7 +425,7 @@ class ImportNBCController extends Controller
 
 
 
-    private function parseData ($raw)
+    private function parseDataORIGINAL ($raw)
     {
         
         /*
@@ -520,7 +536,7 @@ class ImportNBCController extends Controller
 
 
 
-    private function parseDataNEW ($raw)
+    private function parseData ($raw)
     {
         
         /*
@@ -562,13 +578,27 @@ class ImportNBCController extends Controller
                         // line 1, cell 0: title
                         if ($line == 1 && $cKey == 0)
                             $data['project']['soortgroep'] = $cVal;
-                        // line 1, cell > 0: character labels
-                        //if ($line == 1 && $cKey > 4 && !empty($cVal))
-                        //   $data['characters'][$cKey]['label'] = $cVal;
 
                         // line 2, cell > 0: character group (or 'hidden')
                         if ($line ==2 && $cKey > 4 && !empty($cVal))
                             $data['characters'][$cKey]['group'] = $cVal;
+
+						/*
+							because it is easier for the ppl making the import-files,
+							two characters - gender and variant - are grouped
+							with the taxon's name, rather than with the other
+							characters.
+							i love the smell of exceptions in the morning.
+						*/
+						if ($line==6 && ($cKey==2 || $cKey==3) && !empty($cVal)) {
+	
+							$data['characters'][$cKey] = array(
+								'code' => $cVal,
+								'group' => 'hidden',
+								'unit' => 'string',
+							);
+	
+						}
 
                     	// line 3, cell > 0: character instructions
                     	if ($line==3 && $cKey>4 && !empty($cVal)) // && $cVal!='…')
@@ -582,17 +612,18 @@ class ImportNBCController extends Controller
 						// line 6: species column headers
                         if ($line==6 && !empty($cVal))
                             $data['columns'][$cKey] = $cVal;
-                            
+
+
 						// line > 6: species records
                         if ($line > 6) {
                             
                             if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
                                 $data['species'][$line]['id'] = $cVal;
                             }
-                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'title') {
+                            else if (isset($data['columns'][$cKey]) && ($data['columns'][$cKey] == 'title' || $data['columns'][$cKey] == 'titel')) {
                                 $data['species'][$line]['label'] = $cVal;
                             }
-                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'related') {
+                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'gelijkende soorten') {
                                 if (strpos($cVal, $this->_valueSep) !== false) {
                                     $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
                                 }
@@ -602,11 +633,10 @@ class ImportNBCController extends Controller
                                 array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
                             }
                             else {
-                                
 
-                                if (isset($data['characters']) && $data['characters'][$cKey]['group'] == 'hidden') {
-                                    
-                                    $data['species'][$line][$data['characters'][$cKey]['label']] = $cVal;
+                                if (isset($data['characters'][$cKey]['group']) && $data['characters'][$cKey]['group'] == 'hidden') {
+
+                                    $data['species'][$line][$data['characters'][$cKey]['code']] = $cVal;
                                 }
                                 else {
                                     
@@ -625,11 +655,10 @@ class ImportNBCController extends Controller
             }
         }
 
+		ksort($data['characters']);
 
         return $data;
     }
-
-
 
 
 
@@ -1019,7 +1048,7 @@ class ImportNBCController extends Controller
                 'project_id' => $this->getNewProjectId(), 
                 'characteristic_id' => $data['characters'][$cKey]['id'], 
                 'language_id' => $this->getNewDefaultLanguageId(), 
-                'label' => $cVal['label'].(isset($cVal['instruction']) ? '|'.$cVal['instruction'] : null)
+                'label' => $cVal['code'].(isset($cVal['instruction']) ? '|'.$cVal['instruction'] : null)
             
             ));
             
@@ -1220,13 +1249,14 @@ class ImportNBCController extends Controller
 	private function extractVariantColumns($data)
 	{
 		
+		
 		$d = array();
 		
 		foreach((array)$data['characters'] as $key => $val) {
 			
 			if ($val['group']=='hidden') {
 				
-				array_push($d,array('id'=>$key,'code'=>$val['code'],'label'=>$val['label']));
+				array_push($d,array('id'=>$key,'code'=>$val['code'],'label'=>$val['code']));
 				
 			}
 		}
