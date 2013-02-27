@@ -16,15 +16,15 @@ Below is a sample of the data parsed from the input file. Please verify that it 
 <b>First five characters (of {$characters|@count}):</b><br />
 {assign var=i value=0}
 {foreach from=$characters item=v}
-{if $i<5}
-{$v.label}<br />
+{if $i>1 && $i<7}
+{$v.code}<br />
 {/if}
 {assign var=i value=$i+1}
 {/foreach}
 </p>
 
 <p>
-<b>First five species (of {$species|@count}) with states:</b><br />
+<b>First five species (of {$species|@count}) with some states:</b><br />
 {assign var=i value=0}
 {foreach from=$species item=v}
 {if $i<5}

@@ -168,7 +168,7 @@ class MatrixKeyController extends Controller
             $states = $this->stateMemoryRecall();
 
             $results = $this->nbcGetTaxaScores($states);
-            
+
             $taxa = json_encode(
             array(
                 'results' => $results, 
@@ -607,6 +607,9 @@ class MatrixKeyController extends Controller
             return;
         
         $taxa = $this->getCache('matrix-taxa-' . $matrixId);
+
+		if ($taxa===false)
+			return;
         
         if (!$taxa) {
             
@@ -1912,8 +1915,8 @@ class MatrixKeyController extends Controller
  
     private function nbcGetCompleteDataset ($p = null)
     {
-		
-        $res = $this->getCache('matrix-nbc-data');
+
+        $res = null;//$this->getCache('matrix-nbc-data');
         
         if (!$res) {
 
@@ -1922,7 +1925,7 @@ class MatrixKeyController extends Controller
             $vId = isset($p['vId']) ? $p['vId'] : false;
             
             $var = $this->getVariationsInMatrix();
-            
+
             foreach ((array) $var as $val) {
                 
                 if ($vId && $val['id'] != $vId)
@@ -1961,9 +1964,9 @@ class MatrixKeyController extends Controller
             }
             
             $taxa = $this->getTaxaInMatrix();
-            
+
             foreach ((array) $taxa as $val) {
-                
+
                 if ($tId && $val['id'] != $tId)
                     continue;
                 
@@ -2023,7 +2026,7 @@ class MatrixKeyController extends Controller
             
             $this->saveCache('matrix-nbc-data', $res);
         }
-        
+
         return $res;
     }
 
@@ -2155,7 +2158,7 @@ q($x,1);
         $data = isset($p['data']) ? $p['data'] : null;
         $action = isset($p['action']) ? $p['action'] : 'remove';
 
-		q($data);
+//		q($data);
 
 		if (count((array)$data)==1)
 			return $data;

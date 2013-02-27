@@ -2766,7 +2766,7 @@ class ImportL2Controller extends Controller
                     
                     $_SESSION['admin']['system']['import']['loaded']['glossary']['failed'][] = array(
                         'data' => $gls, 
-                        'cause' => 'Could not save "' . $mVal['filename'] . '" (' . $r['cause'] . ').'
+                        'cause' => $gls['term'].': could not save "' . $mVal['filename'] . '" (' . $r['cause'] . ').'
                     );
                 }
             }
