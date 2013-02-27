@@ -204,7 +204,7 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, year(`year`) as `year`,
+					'columns' => '*,
 					 			concat(
 									author_first,
 									(
@@ -234,8 +234,7 @@ class LiteratureController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
 				),
-				'columns' => '*, year(`year`) as `year`,
-					 			concat(
+				'columns' => '*, concat(
 									author_first,
 									(
 										if(multiple_authors=1,
@@ -351,7 +350,7 @@ class LiteratureController extends Controller
 					'project_id' => $this->getCurrentProjectId()
 				),
 				'order' => 'author_first',
-				'columns' => 'id, year(`year`) as `year`,
+				'columns' => 'id,
 					 			concat(
 									author_first,
 									(
@@ -359,7 +358,7 @@ class LiteratureController extends Controller
 											\' et al.\',
 											if(author_second!=\'\',concat(\' & \',author_second),\'\')
 										)
-									),\', \',year(`year`),ifnull(suffix,\'\')
+									),\', \',`year`,ifnull(suffix,\'\')
 								) as label'
 			)
 		);
@@ -410,7 +409,7 @@ class LiteratureController extends Controller
 							)
 						),
 						\' (\',
-						year(`year`),
+						`year`,
 						(
 							if(isnull(suffix)!=1,
 									suffix,

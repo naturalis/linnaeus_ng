@@ -144,7 +144,7 @@ class LiteratureController extends Controller
 
 			$data['multiple_authors'] = $data['auths']=='n' ? 1 : 0;
 
-			$data['year'] = $data['year'].'-00-00';
+			//$data['year'] = $data['year'].'-00-00';
 			
             $data['text'] = $this->cleanUpRichContent($data['text']);
 
@@ -328,7 +328,7 @@ class LiteratureController extends Controller
 
 				$refs = $this->models->Literature->_get(
 					array('id' =>
-						'select *, year(`year`) as `year`, concat(author_first,author_second) as author_both
+						'select *, concat(author_first,author_second) as author_both
 						from %table%
 						where
 							(author_first like "%'.mysql_real_escape_string($this->requestData['search']).'%" or
@@ -434,7 +434,7 @@ class LiteratureController extends Controller
 					'project_id' => $this->getCurrentProjectId(),
 					'id' => $id
 				),
-				'columns' => '*, year(`year`) as `year`,'.$this->getSQLColumnFullAuthor(),
+				'columns' => '*,'.$this->getSQLColumnFullAuthor(),
 			)
 		);
 		
@@ -513,8 +513,7 @@ class LiteratureController extends Controller
 					'id' => $thisId
 				),
 				'columns' =>
-					'*,
-					year(`year`) as `year`,'.$this->getSQLColumnFullAuthor()
+					'*,'.$this->getSQLColumnFullAuthor()
 			)
 		);
 		
@@ -614,7 +613,7 @@ class LiteratureController extends Controller
 					'author_first like' => $thisStr.'%',
 					'fieldAsIndex' => 'author_first'
 				),
-				'columns' => '*, year(`year`) as `year`,'.$this->getSQLColumnFullAuthor()
+				'columns' => '*,'.$this->getSQLColumnFullAuthor()
 			)
 		);
 
@@ -662,7 +661,7 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, year(`year`) as `year`, concat(author_first,author_second) as author_both, '.$this->getSQLColumnFullAuthor(),
+					'columns' => '*, concat(author_first,author_second) as author_both, '.$this->getSQLColumnFullAuthor(),
 					'ignoreCase' => false
 				)
 			);
@@ -684,7 +683,7 @@ class LiteratureController extends Controller
 					'order' => 'author_first',
 					'ignoreCase' => true,
 					'limit' => 1,
-					'columns' => '*, year(`year`) as `year`'
+					'columns' => '*'
 				)
 			);
 
@@ -779,7 +778,7 @@ class LiteratureController extends Controller
 							)
 						),
 						\' (\',
-						year(`year`),
+						`year`,
 						(
 							if(isnull(suffix)!=1,
 									suffix,

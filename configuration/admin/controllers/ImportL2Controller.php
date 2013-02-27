@@ -2511,7 +2511,7 @@ class ImportL2Controller extends Controller
             'author_first' => isset($lit['author_1']) ? $lit['author_1'] : null, 
             'author_second' => (isset($lit['author_2']) && $lit['multiple_authors'] == false) ? $lit['author_2'] : null, 
             'multiple_authors' => $lit['multiple_authors'] == true ? 1 : 0, 
-            'year' => (isset($lit['year']) && $lit['valid_year'] == true) ? $lit['year'] . '-00-00' : '0000-00-00', 
+            'year' => (isset($lit['year']) && $lit['valid_year'] == true) ? $lit['year'] : '0000', 
             'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null, 
             'text' => isset($lit['text']) ? trim($lit['text']) : null
         ));
