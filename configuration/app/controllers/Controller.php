@@ -1764,7 +1764,7 @@ class Controller extends BaseClass
                 $this->cssToLoad[$key] = $_SESSION['app']['project']['urls']['projectCSS'] . $val;
         }
         
-        array_push($this->cssToLoad, '../utilities/dynamic-css.php');
+        array_unshift($this->cssToLoad, '../utilities/dynamic-css.php');
         
         if (!is_null($this->getCurrentProjectId())) {
             
