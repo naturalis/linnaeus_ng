@@ -1512,7 +1512,7 @@ class Controller extends BaseClass
     public function createProject ($d)
     {
         $d['id'] = null;
-        $d['sys_name'] = $d['title'] . (isset($d['version']) ? ' v' . $d['version'] : $d['version']);
+        $d['sys_name'] = $d['title'];// . (isset($d['version']) ? ' v' . $d['version'] : $d['version']);
         
         $p = $this->models->Project->save($d);
         

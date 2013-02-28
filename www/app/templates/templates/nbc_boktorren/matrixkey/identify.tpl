@@ -5,12 +5,13 @@
     
         <div id="resultsHeader">
             <span>
-                <div id="result-count" class="headerSelectionLabel"></div>
+	            <h2 style="width:100%">{t}Boktorren determineren{/t}</h2>
                 <div class="headerPagination">
                     <ul id="paging-header" class="list paging"></ul>
                 </div>
             </span>
         </div>
+                <div id="result-count" class="headerSelectionLabel"></div>
         
         <div id="results">
             <div id="similarSpeciesHeader" class="hidden"></div>
