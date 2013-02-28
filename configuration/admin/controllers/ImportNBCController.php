@@ -2,28 +2,9 @@
 
 /*
 
-INSERT INTO `dev_settings` (`id`, `project_id`, `setting`, `value`, `created`, `last_change`) VALUES
-(47, 116, 'skin', 'nbc_boktorren', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
-(46, 116, 'taxa_use_variations', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
-(45, 116, 'matrix_use_character_groups', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
-(44, 116, 'matrix_allow_empty_species', '1', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
-(43, 116, 'matrixtype', 'NBC', '2013-02-05 14:55:27', '2013-02-05 14:55:27'),
-(48, 116, 'source_author', 'Zeegers, Th. & Th. Heijerman 2008.', '2013-02-08 13:57:54', '2013-02-19 12:00:03'),
-(49, 116, 'source_title', 'De Nederlandse boktorren (Cerambycidae). Entomologische Tabellen 2.', '2013-02-08 13:57:54', '2013-02-19 12:00:03'),
-(50, 116, 'matrix_use_sc_as_weight', '1', '2013-02-11 12:41:26', '2013-02-12 16:56:15'),
-(51, 116, 'source_photocredit', 'Foto''s &copy; Theodoor Heijerman.', '2013-02-12 00:00:00', '2013-02-19 12:00:03'),
-(52, 116, 'source_url', 'http://science.naturalis.nl/research/publications/entomologische-tabellen/de-nederlandse-boktorren-(cerambycidae)', '2013-02-12 00:00:00', '2013-02-12 16:56:24'),
-(53, 116, 'matrix_browse_style', 'expand', '2013-02-13 00:00:00', '2013-02-13 14:39:41'),
-(54, 116, 'matrix_items_per_line', '4', '2013-02-13 00:00:00', '2013-02-13 14:41:00'),
-(55, 116, 'matrix_items_per_page', '16', '2013-02-13 00:00:00', '2013-02-13 14:41:00'),
-(56, 116, 'nbc_image_root', 'http://determinatie.nederlandsesoorten.nl/images/', '2013-02-13 00:00:00', '2013-02-13 14:46:26'),
-(57, 116, 'matrix_state_image_per_row', '4', '2013-02-13 00:00:00', '2013-02-13 14:46:26');
-
-
-
 	column headers, like 'naam SCI', are hardcoded! 
 
-	$_stdVariantColumns needs to be user invulbaarable --> NOT! assume sekse and variant
+	$_stdVariantColumns needs to be user invulbaarable --> NOT! assume sekse and variant (pwah)
 
 	need to implement!
 	private function translateStateCode($code)
@@ -85,6 +66,8 @@ class ImportNBCController extends Controller
     public function __construct ()
     {
         parent::__construct();
+		
+		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
         
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
         
@@ -118,11 +101,13 @@ class ImportNBCController extends Controller
     }
 
 
-
     public function nbcDeterminatie1Action ()
     {
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_determinatie_2.php');
+			
+		if (isset($_SESSION['admin']['system']['import']['type']) && $_SESSION['admin']['system']['import']['type']!='nbc_data')			
+			unset($_SESSION['admin']['system']['import']);
         
         $this->setPageName($this->translate('Choose file'));
         
@@ -137,8 +122,9 @@ class ImportNBCController extends Controller
                 $_SESSION['admin']['system']['import']['file'] = array(
                     'path' => $tmp, 
                     'name' => $this->requestDataFiles[0]['name'], 
-                    'src' => 'upload'
+                    'src' => 'upload',
                 );
+				$_SESSION['admin']['system']['import']['type']='nbc_data';
             }
             else {
                 
@@ -166,7 +152,6 @@ class ImportNBCController extends Controller
     }
 
 
-
     public function nbcDeterminatie2Action ()
     {
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
@@ -177,6 +162,7 @@ class ImportNBCController extends Controller
         $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
         
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseData($raw);
+		
 		
 		if (empty($data['project']['soortgroep'])) {
 			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
@@ -194,7 +180,6 @@ class ImportNBCController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function nbcDeterminatie3Action ()
@@ -248,7 +233,6 @@ class ImportNBCController extends Controller
     }
 
 
-
     public function nbcDeterminatie4Action ()
     {
         if (!isset($_SESSION['admin']['system']['import']['project']))
@@ -282,7 +266,6 @@ class ImportNBCController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function nbcDeterminatie5Action ()
@@ -322,8 +305,8 @@ class ImportNBCController extends Controller
         $this->smarty->assign('matrix_items_per_page', 16);
         $this->smarty->assign('matrix_items_per_line', 4);
         $this->smarty->assign('matrix_use_sc_as_weight', 1);
-        $this->smarty->assign('matrix_browse_style', 'expand');//paginate|expand
-        $this->smarty->assign('nbc_image_root', 'http://determinatie.nederlandsesoorten.nl/images/');
+        $this->smarty->assign('matrix_browse_style', 'expand');	//paginate|expand
+        $this->smarty->assign('nbc_image_root', '../../media/system/skins/'.$this->_defaultSkinName.'/');
         
         $this->printPage();
     }
@@ -387,6 +370,231 @@ class ImportNBCController extends Controller
         unset($_SESSION['admin']['project']['ranks']);
         
         $this->redirect($this->getLoggedInMainIndex());
+    }
+
+
+	public function nbcLabels1Action()
+    {
+        if ($this->rHasVal('process', '1'))
+            $this->redirect('nbc_labels_2.php');
+
+		if (isset($_SESSION['admin']['system']['import']['type']) && $_SESSION['admin']['system']['import']['type']!='nbc_labels')			
+			unset($_SESSION['admin']['system']['import']);
+       
+        $this->setPageName($this->translate('Choose file'));
+        
+        $this->setSuppressProjectInBreadcrumbs();
+        
+        if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file')) {
+            
+            $tmp = tempnam(sys_get_temp_dir(), 'lng');
+            
+            if (copy($this->requestDataFiles[0]['tmp_name'], $tmp)) {
+                
+                $_SESSION['admin']['system']['import']['file'] = array(
+                    'path' => $tmp, 
+                    'name' => $this->requestDataFiles[0]['name'], 
+                    'src' => 'upload'
+                );
+				$_SESSION['admin']['system']['import']['type']='nbc_labels';
+            }
+            else {
+                
+                unset($_SESSION['admin']['system']['import']['file']);
+            }
+        }
+        
+        $_SESSION['admin']['system']['import']['imagePath'] = false;
+        
+        if ($this->rHasVal('clear', 'file')) {
+            
+            unset($_SESSION['admin']['system']['import']['file']);
+            unset($_SESSION['admin']['system']['import']['raw']);
+        }
+        
+        if ($this->rHasVal('clear', 'imagePath'))
+            unset($_SESSION['admin']['system']['import']['imagePath']);
+        if ($this->rHasVal('clear', 'thumbsPath'))
+            unset($_SESSION['admin']['system']['import']['thumbsPath']);
+        
+        if (isset($_SESSION['admin']['system']['import']))
+            $this->smarty->assign('s', $_SESSION['admin']['system']['import']);
+        
+        $this->printPage();
+    }
+
+
+    public function nbcLabels2Action ()
+    {
+		
+        if (!isset($_SESSION['admin']['system']['import']['file']['path']))
+            $this->redirect('nbc_determinatie_1.php');
+        
+        $this->setPageName($this->translate('Parsed data'));
+        
+        $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
+        
+        $_SESSION['admin']['system']['import']['data'] = $data = $this->parseLabelData($raw);
+		
+		if (empty($data['project']['soortgroep'])) {
+			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
+			$data = $_SESSION['admin']['system']['import']['data'];
+		}
+        
+        if (isset($data['project']['soortgroep']))
+            $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
+        if (isset($data['project']['title']))
+            $this->smarty->assign('title', $data['project']['title']);
+        if (isset($data['states']))
+            $this->smarty->assign('states', $data['states']);
+        
+        $this->printPage();
+    }
+
+
+    public function nbcLabels3Action ()
+    {
+        if (!isset($_SESSION['admin']['system']['import']['data']))
+            $this->redirect('nbc_determinatie_2.php');
+        
+        $this->setPageName($this->translate('Saving labels'));
+        
+        if (!$this->isFormResubmit()) {
+
+            $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
+			//$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
+			
+			$d = $this->models->Project->_get(array(
+				'id' => array(
+				'sys_name' => $pTitle
+			)));
+			
+			if (!empty($d[0]['id'])) {
+				
+				$pId = $d[0]['id'];
+
+
+				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
+				
+					$d = $this->models->CharacteristicLabel->_get(array('id' =>
+						array(
+							'project_id' => $pId, 
+							'language_id' => LANGUAGECODE_DUTCH, 
+							'label' => $val[1]
+						
+						))
+					);
+					
+					if (!empty($d[0]['id'])) {
+
+						$cId = $d[0]['characteristic_id'];
+
+						$states = $this->models->CharacteristicState->_get(array(
+							'id' =>
+								array(
+									'project_id' => $pId, 
+									'characteristic_id' => $cId, 
+								),
+							'columns' => 'id'
+							)
+						);
+						
+						$d = array();
+
+						foreach((array)$states as $sVal) {
+							$d[]=$sVal['id'];
+						}
+						
+						$states = '('.implode(',',$d).')';
+
+						$l = $this->models->CharacteristicLabelState->_get(array(
+							'id' =>
+								array(
+									'project_id' => $pId, 
+									'state_id in' => $states, 
+									'language_id' => LANGUAGECODE_DUTCH, 
+									'label' => $val[2]
+								)
+							)
+						);
+
+						if (!empty($l[0]['state_id'])) {
+							
+							$sId = $l[0]['state_id'];
+							
+							if (!empty($val[3])) {
+
+								$l = $this->models->CharacteristicLabelState->update(
+									array(
+										'label' => $val[3]
+									),
+									array(
+										'project_id' => $pId, 
+										'state_id' => $sId, 
+										'language_id' => LANGUAGECODE_DUTCH
+									)
+								);								
+
+								$this->addMessage(sprintf($this->translate('Updated "%s" for %s.'),$val[2],$val[1]));
+								
+							} else {
+
+								$this->addMessage(sprintf($this->translate('Skipped state "%s" for %s (no translation).'),$val[2],$val[1]));
+
+							}
+	
+							if (!empty($val[4])) {
+
+								$this->models->CharacteristicState->update(
+									array(
+										'file_name' => $val[4]
+									),
+									array(
+										'project_id' => $pId, 
+										'id' => $sId, 
+									)
+								);				
+								
+								$this->addMessage(sprintf($this->translate('Updated image for "%s" to %s.'),$val[2],$val[4]));
+
+								
+							} else {
+
+								$this->addMessage(sprintf($this->translate('Skipped image for "%s" (not specified).'),$val[2]));
+
+							}
+
+						
+						} else {
+							
+							$this->addError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]));
+							
+						}
+
+
+					} else {
+
+			            $this->addError(sprintf($this->translate('Could not resolve character "%".'),$val[1]));
+
+					}
+					
+
+				}
+				
+			} else {
+				
+	            $this->addError(sprintf($this->translate('Project "%" not found in the database.'),$pTitle));
+	            $this->addError($this->translate('Import halted.'));
+				
+			}
+
+			unset($_SESSION['admin']['system']['import']);
+
+			$this->addMessage($this->translate('Done.'));
+
+        }
+        
+        $this->printPage();
     }
 
 
@@ -566,7 +774,7 @@ class ImportNBCController extends Controller
 
                     $cVal = trim($cVal);
                     
-                    if (!empty($cVal)) {
+                    if (is_numeric($cVal) || !empty($cVal)) {
                         
                         // line 0, cell 0: title
                         if ($line == 0 && $cKey == 0)
@@ -575,7 +783,7 @@ class ImportNBCController extends Controller
                         if ($line == 0 && $cKey > 4 && !empty($cVal))
                             $data['characters'][$cKey]['code'] = $cVal;
 
-                        // line 1, cell 0: title
+                        // line 1, cell 0: group
                         if ($line == 1 && $cKey == 0)
                             $data['project']['soortgroep'] = $cVal;
 
@@ -610,7 +818,7 @@ class ImportNBCController extends Controller
                     		$data['characters'][$cKey]['unit'] = $cVal;
                             
 						// line 6: species column headers
-                        if ($line==6 && !empty($cVal))
+                        if ($line==6  && $cKey<10 && !empty($cVal))
                             $data['columns'][$cKey] = $cVal;
 
 
@@ -821,6 +1029,20 @@ class ImportNBCController extends Controller
             ));
             
             $species[$key]['lng_id'] = $this->models->Taxon->getNewId();
+
+
+                    if (isset($vVal['foto id beeldbank']))
+                        $this->storeNbcExtra($vId, 'taxon', 'url_image', $vVal['foto id beeldbank']);
+                    if (isset($vVal['nsrpage']))
+                        $this->storeNbcExtra($vId, 'taxon', 'url_soortenregister', $vVal['nsrpage']);
+                    if (isset($vVal['fotograaf']))
+                        $this->storeNbcExtra($vId, 'taxon', 'photographer', $vVal['fotograaf']);
+                    if (isset($vVal['bronvermelding']))
+                        $this->storeNbcExtra($vId, 'taxon', 'source', $vVal['bronvermelding']);
+                    if (isset($vVal['sekse op foto']))
+                        $this->storeNbcExtra($vId, 'taxon', 'gender_photo', $vVal['sekse op foto']);
+                    
+
             
             $_SESSION['admin']['system']['import']['loaded']['species']++;
             
@@ -866,6 +1088,8 @@ class ImportNBCController extends Controller
                         $this->storeNbcExtra($vId, 'variation', 'photographer', $vVal['fotograaf']);
                     if (isset($vVal['bronvermelding']))
                         $this->storeNbcExtra($vId, 'variation', 'source', $vVal['bronvermelding']);
+                    if (isset($vVal['sekse op foto']))
+                        $this->storeNbcExtra($vId, 'variation', 'gender_photo', $vVal['sekse op foto']);
                     
                     $this->models->VariationLabel->save(
                     array(
@@ -1079,18 +1303,16 @@ class ImportNBCController extends Controller
         return $data;
     }
 
-
-
     private function translateStateCode ($code, $languageId)
     {
         $translations = array(
             'male' => array(
-                24 => 'mannelijk', 
-                26 => 'male'
+                LANGUAGECODE_DUTCH => 'mannelijk', 
+                LANGUAGECODE_ENGLISH => 'male'
             ), 
             'female' => array(
-                24 => 'vrouwelijk', 
-                26 => 'female'
+                LANGUAGECODE_DUTCH => 'vrouwelijk', 
+                LANGUAGECODE_ENGLISH => 'female'
             )
         );
         
@@ -1168,8 +1390,7 @@ class ImportNBCController extends Controller
     }
 
 
-
-    function storeVariationStateConnections ($taxa, $mData, $mId)
+    private function storeVariationStateConnections ($taxa, $mData, $mId)
     {
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
         
@@ -1246,6 +1467,7 @@ class ImportNBCController extends Controller
         }
     }
 	
+
 	private function extractVariantColumns($data)
 	{
 		
@@ -1264,5 +1486,49 @@ class ImportNBCController extends Controller
 		return $d;
 		
 	}
+
+
+    private function parseLabelData ($raw)
+    {
+        
+        $data = array();
+        
+        foreach ((array) $raw as $line => $val) {
+            
+            $lineHasData = strlen(implode('', $val)) > 0;
+			
+            if ($lineHasData) {
+
+                foreach ((array) $val as $cKey => $cVal) {
+
+                    $cVal = trim($cVal);
+                    
+                    if ($cKey<5) {
+                        
+                        // line 0, cell 0: title
+                        if ($line == 0 && $cKey == 0)
+                            $data['project']['title'] = $cVal;
+                        // line 1, cell 0: group
+                        if ($line == 1 && $cKey == 0)
+                            $data['project']['soortgroep'] = $cVal;
+
+						// line > 3: labels etc
+                        if ($line > 3) {
+							
+							$data['states'][$line][$cKey] = $cVal;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+
+
+
+
 
 }

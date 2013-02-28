@@ -28,6 +28,9 @@ class configuration
 
 		if (!defined('TIMEOUT_COL_RETRIEVAL')) define('TIMEOUT_COL_RETRIEVAL',600); // secs.
 
+		if (!defined('LANGUAGECODE_DUTCH')) define('LANGUAGECODE_DUTCH',24);
+		if (!defined('LANGUAGECODE_ENGLISH')) define('LANGUAGECODE_ENGLISH',26);
+
 		if (!defined('MODCODE_INTRODUCTION')) define('MODCODE_INTRODUCTION',1);
 		if (!defined('MODCODE_GLOSSARY')) define('MODCODE_GLOSSARY',2);
 		if (!defined('MODCODE_LITERATURE')) define('MODCODE_LITERATURE',3);
@@ -112,7 +115,7 @@ class configuration
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
             ),
-			'uiLanguages' => array(26,24), // english, dutch - first is default
+	        'uiLanguages' => array(LANGUAGECODE_ENGLISH,LANGUAGECODE_DUTCH),
 			'soundPlayerPath' => '../../media/system/',
 			'soundPlayerName' => 'player_mp3.swf',
 			'useJavascriptLinks' => false,

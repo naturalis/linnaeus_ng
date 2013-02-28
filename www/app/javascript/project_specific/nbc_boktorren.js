@@ -96,7 +96,7 @@ function nbcGetResults(p) {
 		data : ({
 			action : 'get_results_nbc',
 			params : p,
-			time : getTimestamp(),
+			time : getTimestamp()
 		}),
 		success : function (data) {
 			//alert(data);
@@ -184,6 +184,8 @@ function nbcFormatResult(data) {
 			h = highlight (bool)
 			d = full species details (only when comparing or resultset has only one taxon/variation)
     */
+	
+	var showDetails = nbcData.results.length <= nbcPerPage;
 
 	var photoLabel = 
 		data.l+
@@ -192,7 +194,7 @@ function nbcFormatResult(data) {
 	
 	var id = data.y+'-'+data.i;
 
-	if (data.d) {
+	if (showDetails && data.d) {
 
 		var states = Array();
 		
@@ -309,8 +311,10 @@ function nbcPrintResultsExpanded() {
 
 	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
 		nbcRemoveShowMoreButton();
-		
+
 	nbcExpandedPrevious = null;
+	
+	nbcPrintOverhead();
 
 }
 
@@ -348,6 +352,13 @@ function nbcClearPaging() {
 }
 
 function nbcPrintOverhead() {
+
+	if (nbcExpandResults) {
+
+		$('#result-count').html('1 - '+nbcExpandedShowing+_(' van ')+nbcFullDatasetCount);
+		return;
+
+	}
 
 	var count = nbcData.count;
 	
@@ -641,7 +652,7 @@ function nbcDoSearch() {
 		data : ({
 			action : 'do_search',
 			params : {term: nbcSearchTerm},
-			time : getTimestamp(),
+			time : getTimestamp()
 		}),
 		success : function (data) {
 			//alert(data);
@@ -684,7 +695,7 @@ function nbcPrettyPhotoInit() {
  		opacity: 0.70, 
 		show_title: false,
  		overlay_gallery: false,
- 		social_tools: false,
+ 		social_tools: false
  	});
 
 }

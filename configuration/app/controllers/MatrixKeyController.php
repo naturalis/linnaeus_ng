@@ -2318,7 +2318,7 @@ q($x,1);
 
 	private function nbcExtractGenderTag($label)
 	{
-		if (preg_match('/\s(male|female)(\s|$)/', $label, $matches)) {
+		if (preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches)) {
 			$gender = trim($matches[1]);
 			$label = preg_replace('/\s(' . $gender . ')(\s|$)/', ' ', $label);
 		} else
