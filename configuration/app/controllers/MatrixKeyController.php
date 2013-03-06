@@ -147,7 +147,7 @@ class MatrixKeyController extends Controller
     public function identifyAction ()
     {
 
-		//$this->nbcGetSimilar(array('id'=>4231,'type'=>'v'));die();
+		//$this->nbcGetSimilar(array('id'=>5032,'type'=>'v'));die();
         //$this->getRemainingStateCount();return;
 
         $this->checkMatrixIdOverride();
@@ -1221,23 +1221,29 @@ class MatrixKeyController extends Controller
         $mts = $this->models->MatrixTaxonState->_get(
         array(
             'id' => $d, 
-            'columns' => 'characteristic_id,state_id', 
-            'fieldAsIndex' => 'characteristic_id'
-        ))
-        ;
-        
+            'columns' => 'characteristic_id,state_id'
+        ));
+		
+		$res = array();
+
         foreach ((array) $mts as $key => $val) {
             
             $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
-            
+
+			/*            
             $mts[$key]['characteristic'] = $d['label'];
-            
             $mts[$key]['type'] = $d['type'];
-            
-            $mts[$key]['state'] = $this->getCharacteristicState($val['state_id']);
+            $mts[$key]['state'][$val['state_id']] = $this->getCharacteristicState($val['state_id']);
+			*/
+			
+			$res[$val['characteristic_id']]['characteristic'] = $d['label'];
+			$res[$val['characteristic_id']]['type'] = $d['type'];
+			$res[$val['characteristic_id']]['states'][$val['state_id']] = $this->getCharacteristicState($val['state_id']);
+			
         }
-        
-        return $mts;
+
+		return $res;        
+        //return $mts;
     }
 
     private function getTaxonStates ($id)
@@ -1659,7 +1665,7 @@ class MatrixKeyController extends Controller
             'l' => trim($label), 
             'y' => $type, 
             's' => $sciName,
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage_Boktorren%20van%20NL.gif', 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage_Boktorren van NL.gif', 
             'n' => isset($nbc['url_image']), 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
@@ -1916,7 +1922,7 @@ class MatrixKeyController extends Controller
     private function nbcGetCompleteDataset ($p = null)
     {
 
-        $res = null;//$this->getCache('matrix-nbc-data');
+        $res = $this->getCache('matrix-nbc-data');
         
         if (!$res) {
 
@@ -2137,54 +2143,45 @@ class MatrixKeyController extends Controller
 	private function nbcHandleOverlappingItemsFromDetails($p)
 	{
 		
-		
-//		return $p['data'];
-
-/*		
-//108	Grijze schorsboktor			115	15-Sep	dekschildzwart; dekschildbruin; dekschildschorskleur; dekschildgrijs;
-//115	Aegomorphus clavipes		108	17-Jul	dekschildzwart; dekschildbruin; dekschildschorskleur
-
-$Grijze_schorsboktor = array('dekschildzwart','dekschildbruin','dekschildschorskleur','dekschildgrijs');
-$Aegomorphus_clavipes = array('dekschildzwart','dekschildbruin','dekschildschorskleur');
-
-$x = array_intersect($Grijze_schorsboktor,$Aegomorphus_clavipes);
-
-16494:1416:dekschildgrijs.jpg
-
-
-q($x,1);
-*/
+		//return $p['data'];
 
         $data = isset($p['data']) ? $p['data'] : null;
         $action = isset($p['action']) ? $p['action'] : 'remove';
-
-//		q($data);
 
 		if (count((array)$data)==1)
 			return $data;
 
 		$d = array();
-		foreach((array)$data as $key => $val1) {
-			foreach((array)$val1['d'] as $val2)	{
-				$d[$key][] = $val2['characteristic_id'].':'.$val2['state_id'];
+		foreach((array)$data as $key => $dVal) {
+			foreach((array)$dVal['d'] as $characteristic_id => $cVal)	{
+				foreach((array)$cVal['states'] as $state)	{
+					$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
+				}
 			}
 		}
 
 		$common = call_user_func_array('array_intersect',$d);
 
-//q($common); //somthing awry down below!
+		foreach((array)$data as $key => $dVal) {
+			foreach((array)$dVal['d'] as $characteristic_id => $cVal) {
+				foreach((array)$cVal['states'] as $sVal => $state)	{
 
-		foreach((array)$data as $key => $val) {
-			foreach((array)$val['d'] as $dKey => $dVal) {
-				if (in_array($dVal['characteristic_id'].':'.$dVal['state_id'],$common)) {
-					if ($action='remove') {
-						unset($data[$key]['d'][$dKey]);
-					} else
-					if ($action='tag') {
-						$data[$key]['d'][$dKey]['state']['label'] = '<span class="overlapState">'.$data[$key]['d'][$dKey]['state']['label'].'</span>';
+					if (in_array($characteristic_id.':'.$state['id'],$common)) {
+						if ($action=='remove') {
+							unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
+						} else
+						if ($action=='tag') {
+							$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
+						}
 					}
+					
 				}
+				
+				if (count((array)$data[$key]['d'][$characteristic_id]['states'])==0 && $action=='remove') {
 
+					unset($data[$key]['d'][$characteristic_id]);
+
+				}
 			}
 		}
 
@@ -2321,6 +2318,7 @@ q($x,1);
 		if (preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches)) {
 			$gender = trim($matches[1]);
 			$label = preg_replace('/\s(' . $gender . ')(\s|$)/', ' ', $label);
+			$gender = ($gender=='beide' ? null : $gender);
 		} else
 			$gender = null;
 		

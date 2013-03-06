@@ -75,8 +75,9 @@
         </div>
  
         <div id="nbcLogoContainer">
+			<span id="logoHeader">Een initiatief van:</span>
 			<a href="http://www.naturalis.nl/" target="_blank"><img id="logo-NBC" src="{$session.app.system.urls.systemMedia}nbc-logo.png" title="Naturalis Biodiversity Center" /></a>
-			<a href="http://www.eis-nederland.nl/" target="_blank"><img id="logo-EIS" src="{$session.app.system.urls.systemMedia}logo-eisDEF-CMYK.png" title="Stichting European Invertebrate Survey Nederland" /></a>
+			<a href="http://www.eis-nederland.nl/" target="_blank"><img id="logo-EIS" src="{$session.app.system.urls.systemMedia}logo-eisDEF-CMYK-2.png" title="Stichting European Invertebrate Survey Nederland" /></a>
         </div>
 
 	</div>
