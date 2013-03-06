@@ -167,6 +167,7 @@ function showDialog(title,content,vars,resize) {
 			delete buttons.ok;
 
 		$("#jDialog").dialog({
+			dialogClass: "no-close",
 			resizable: false,
 			maxWidth: 600,
 			maxHeight: 650,

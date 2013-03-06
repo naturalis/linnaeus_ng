@@ -102,6 +102,8 @@ function nbcGetResults(p) {
 			//alert(data);
 			nbcData = $.parseJSON(data);
 			nbcProcessResults();
+			if (p && p.action!='similar') nbcPrintOverhead();
+			nbcPrintPaging();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
 			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
@@ -118,10 +120,16 @@ function nbcProcessResults(p) {
 		nbcStart = 0;
 	nbcExpandedShowing = 0;
 	nbcClearResults();
-	nbcClearOverhead();
-	nbcClearPaging();
 	if (nbcData.results) nbcPrintResults();
+}
+
+function nbcPrintOverhead() {
+	nbcClearOverhead();
 	if (nbcData.count) nbcPrintOverhead();
+}
+
+function nbcPrintPaging() {
+	nbcClearPaging();
 	if (nbcData.count) nbcPrintPaging();
 }
 
@@ -188,7 +196,7 @@ function nbcFormatResult(data) {
 	var showDetails = nbcData.results.length <= nbcPerPage;
 
 	var photoLabel = 
-		data.l+
+		(data.s==data.l || !data.s ? '<i>'+(data.l)+'</i>' : data.l)+
 		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
 		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')
 	
@@ -197,8 +205,10 @@ function nbcFormatResult(data) {
 	if (showDetails && data.d) {
 
 		var states = Array();
-		
+
 		for(var i in data.d) {
+			
+			var labels = Array();
 			
 			if (data.d[i].characteristic.indexOf('|')!=false) {
 				var t = data.d[i].characteristic.split('|');
@@ -207,7 +217,15 @@ function nbcFormatResult(data) {
 				var t = data.d[i].characteristic;
 			}
 			
-			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+data.d[i].state.label+'</span>');
+			for(var j in data.d[i].states)
+				labels.push(data.d[i].states[j].label);
+
+			if (labels.length>1)
+				var l = labels.join('; ');
+			else
+				var l = labels[0];
+
+			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+l+'</span>');
 		}
 		
 	}
@@ -353,9 +371,9 @@ function nbcClearPaging() {
 
 function nbcPrintOverhead() {
 
-	if (nbcExpandResults) {
+	if (nbcBrowseStyle=='expand') {
 
-		$('#result-count').html('1 - '+nbcExpandedShowing+_(' van ')+nbcFullDatasetCount);
+		$('#result-count').html((nbcExpandedShowing > 1 ? '1 - '+nbcExpandedShowing : nbcExpandedShowing)+_(' van ')+nbcFullDatasetCount);
 		return;
 
 	}
@@ -369,7 +387,7 @@ function nbcPrintOverhead() {
 			'<strong style="color:#333">%s</strong> %s',
 			count.results,
 			sprintf(
-				_('(van %s) objecten in huidige selectie'),
+				_('van %s'),
 					sprintf(
 						'<strong style="color:#777;">%s</strong>',
 						nbcFullDatasetCount
@@ -451,13 +469,12 @@ function nbcShowSimilar(id,type) {
 	nbcPreviousBrowseStyles.paginate = nbcPaginate;
 	nbcPreviousBrowseStyles.expand = nbcExpandResults;
 	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
-	nbcPreviousBrowseStyles.expandPrev = nbcExpandedShowing;
+	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
 	nbcPreviousBrowseStyles.lastPos = getPageScroll();
-	
 
 	nbcSetPaginate(false);
 	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type});
+	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
 	nbcSaveSessionSetting('nbcSimilar',[id,type]);
 	
 }
@@ -470,6 +487,7 @@ function nbcCloseSimilar() {
 	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
 
 	nbcGetResults();
+	nbcClearOverhead();
 	nbcSaveSessionSetting('nbcSimilar');
 
 	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
@@ -638,7 +656,8 @@ function nbcDoSearch() {
 
 	var str = $('#inlineformsearchInput').val().trim();
 	
-	if ((str.length==0) || (str==nbcSearchTerm)) return false;
+	//if ((str.length==0) || (str==nbcSearchTerm)) return false;
+	if (str.length==0) return false;
 	
 	nbcSearchTerm=str;
 	nbcSetPaginate(true);
@@ -658,6 +677,8 @@ function nbcDoSearch() {
 			//alert(data);
 			nbcData = $.parseJSON(data);
 			nbcProcessResults();
+			nbcPrintOverhead();
+			nbcPrintPaging();
 			nbcPrintSearchHeader();
 			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
 

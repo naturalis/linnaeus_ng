@@ -30,13 +30,18 @@
 #clearSelectionContainer img {padding-right:5px;}
 #dataSourceContainer {font-size:0.9em;margin-bottom:10px;}
 #dataSourceContainer #sourceHeader {font-weight:bold}
-#nbcLogoContainer #logo-NBC{margin-bottom:15px}
-#nbcLogoContainer #logo-EIS{width:175px;}
+#nbcLogoContainer {font-size:0.9em;margin-bottom:10px;}
+#nbcLogoContainer #logoHeader {display:block;font-weight:bold;margin-bottom:5px;}
+#nbcLogoContainer #logo-NBC {width:86px;margin-bottom:20px}
+#nbcLogoContainer #logo-EIS {width:92px;margin-left:5px;}
 
 /* results */
 #content div#results {width:720px;padding:0px;}
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
 #content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}/*float:left;*/
+
+#content div#result-count {font-size:0.95em;color:#333;}
+
 #content div#results div.result {width:145px; min-height:275px; margin-top:27px; margin-right:17px; padding:8px; position:relative; border:solid 1px #ddd;}
 #content div#results div.resultHighlight {border:1px dotted #FA7001;}
 #content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
@@ -181,3 +186,9 @@ ul.facetListType li.selected {font-weight:bold;}
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {color: #666;}
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus {border: 1px solid #999;}
 .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {font-family: Arial,Helvetica,Sans-serif;}
+.ui-widget-header {background: #eee;border: none;color: #333333;font-family: Georgia;font-size: 18px;font-weight: normal;}
+.ui-dialog .ui-dialog-title {float: none;}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {background: none;}
+.ui-state-default:hover {background: #eee;}
+.no-close .ui-dialog-titlebar-close {display:none;}
+
