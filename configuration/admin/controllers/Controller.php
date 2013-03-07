@@ -979,7 +979,7 @@ class Controller extends BaseClass
 		
 		$freeModules = $this->models->FreeModuleProject->_get(array(
 			'id' => array(
-				'project_id' => $this->getCurrentProjectId()
+				'project_id' => $d['project_id']
 			)
 		));
 		
@@ -1664,76 +1664,67 @@ class Controller extends BaseClass
         //$forceLookup = isset($p['forceLookup']) ? $p['forceLookup'] : false;
         //$keypathEndpoint = isset($p['keypathEndpoint']) ? $p['keypathEndpoint'] : false;
         $idsAsIndex = isset($p['idsAsIndex']) ? $p['idsAsIndex'] : false;
-        
-        if (1==1||
-			$this->hasTableDataChanged('Rank') == true || 
-			$this->hasTableDataChanged('ProjectRank') == true || 
-			$this->hasTableDataChanged('LabelProjectRank') == true || 
-			!isset($_SESSION['admin']['user']['species']['projectRank'])
-		) {
-            
-            $pr = $this->models->ProjectRank->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'columns' => 'id,project_id,rank_id,parent_id,lower_taxon,keypath_endpoint', 
-                'fieldAsIndex' => 'id',
-				'order' => 'rank_id'
-            ));
-			
-            foreach ((array) $pr as $rankkey => $rank) {
-                
-                $r = $this->models->Rank->_get(array(
-                    'id' => $rank['rank_id']
-                ));
-                
-                $pr[$rankkey]['rank'] = $r['rank'];
-                
-                $pr[$rankkey]['abbreviation'] = $r['abbreviation'];
-                
-                $pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
-                
-                $pr[$rankkey]['ideal_parent_id'] = null;
-                
-                if (!empty($r['ideal_parent_id'])) {
-                    
-                    $d = $this->models->ProjectRank->_get(
-                    array(
-                        'id' => array(
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'rank_id' => $r['ideal_parent_id']
-                        ), 
-                        'columns' => 'id'
-                    ));
-                    
-                    if ($d)
-                        $pr[$rankkey]['ideal_parent_id'] = $d[0]['id'];
-                }
-                
-                if ($includeLanguageLabels) {
-                    
-                    foreach ((array) $_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
-                        
-                        $lpr = $this->models->LabelProjectRank->_get(
-                        array(
-                            'id' => array(
-                                'project_id' => $this->getCurrentProjectId(), 
-                                'project_rank_id' => $rank['id'], 
-                                'language_id' => $language['language_id']
-                            ), 
-                            'columns' => 'label'
-                        ));
-                        
-                        $pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
-                    }
-                }
-            }
+        $pId = isset($p['pId']) ? $p['pId'] :  $this->getCurrentProjectId();
 
-            $_SESSION['admin']['user']['species']['projectRank'] = $pr;
-        }
+		$pr = $this->models->ProjectRank->_get(
+		array(
+			'id' => array(
+				'project_id' => $pId
+			), 
+			'columns' => 'id,project_id,rank_id,parent_id,lower_taxon,keypath_endpoint', 
+			'fieldAsIndex' => 'id',
+			'order' => 'rank_id'
+		));
+		
+		foreach ((array) $pr as $rankkey => $rank) {
+			
+			$r = $this->models->Rank->_get(array(
+				'id' => $rank['rank_id']
+			));
+			
+			$pr[$rankkey]['rank'] = $r['rank'];
+			
+			$pr[$rankkey]['abbreviation'] = $r['abbreviation'];
+			
+			$pr[$rankkey]['can_hybrid'] = $r['can_hybrid'];
+			
+			$pr[$rankkey]['ideal_parent_id'] = null;
+			
+			if (!empty($r['ideal_parent_id'])) {
+				
+				$d = $this->models->ProjectRank->_get(
+				array(
+					'id' => array(
+						'project_id' => $pId, 
+						'rank_id' => $r['ideal_parent_id']
+					), 
+					'columns' => 'id'
+				));
+				
+				if ($d)
+					$pr[$rankkey]['ideal_parent_id'] = $d[0]['id'];
+			}
+			
+			if ($includeLanguageLabels) {
+				
+				foreach ((array) $_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
+					
+					$lpr = $this->models->LabelProjectRank->_get(
+					array(
+						'id' => array(
+							'project_id' => $pId, 
+							'project_rank_id' => $rank['id'], 
+							'language_id' => $language['language_id']
+						), 
+						'columns' => 'label'
+					));
+					
+					$pr[$rankkey]['labels'][$language['language_id']] = $lpr[0]['label'];
+				}
+			}
+		}
         
-        return $_SESSION['admin']['user']['species']['projectRank'];
+        return $pr;
     }
 
 
