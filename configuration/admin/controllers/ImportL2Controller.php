@@ -2964,7 +2964,7 @@ class ImportL2Controller extends Controller
 					for access to all data of a taxon under consideration: name, rank, parent etc.
 					
 					the exception are the dichotomous keys, pict_key and text_key. at their endpoints, they
-					have a field called 'destinationtaxonname', which contains the taxon name (in case op species)
+					have a field called 'destinationtaxonname', which contains the taxon name (in case of species)
 					or the rank name plus the taxon name (in case of higher taxa). there is *no* separate field
 					that holds just the rank. we therefore cannot use $this->makeIndexName() to create an
 					accurate index name with which to lookup the correct species in the loaded species array.

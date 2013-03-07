@@ -6,7 +6,7 @@ echte geodata in Google Maps. L2 kan alleen losse blokjes exporteren; deze
 worden tijdens import in LNG wel (ook) omgezet naar vlakken met
 geografische coördinaten, maar er is geen werkbare manier voorhanden om
 aangrenzende vlakken te combineren tot één groot vlak. Gevolg is een
-Google Maps kaart die piept en kraakt van ellende omdat er in plaats van
+Google Maps-kaart die piept en kraakt van ellende omdat er in plaats van
 één groot vlak er soms honderden kleine vierkantjes moeten worden
 weergegeven. Derhalve is de manier van weergave van L2-legacy-projecten
 versimpeld.
