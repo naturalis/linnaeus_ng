@@ -22,70 +22,6 @@ var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
 
-function nbcSetPaginate(state) {
-
-	nbcPaginate = state;
-	
-}
-
-function nbcSetExpandResults(state) {
-
-	nbcExpandResults = state;
-	
-}
-
-// dialog button function, called from main.js::showDialog 
-function jDialogOk() {
-
-	nbcSetStateValue();
-
-}
-
-// dialog button function, called from main.js::showDialog 
-function jDialogCancel() {
-
-	closeDialog();
-
-}
-
-function nbcToggleGroup(id) {
-
-	if ($('#character-group-'+id).css('display')=='none') {
-		$('#character-group-'+id).removeClass('hidden').addClass('visible');
-		$('#character-item-'+id).removeClass('closed').addClass('open');
-	} else {
-		$('#character-group-'+id).removeClass('visible').addClass('hidden');
-		$('#character-item-'+id).removeClass('open').addClass('closed');
-	}
-	
-} 
-
-function nbcShowStates(id) {
-
-	setCursor('wait');
-	
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_formatted_states' ,
-			id : id , 
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			data = $.parseJSON(data);
-			showDialog(
-				data.character.label,
-				data.page,
-				{width:data.width,height:data.height,showOk:data.showOk}
-			);
-			setCursor();
-		}
-	});
-
-}
-
 function nbcGetResults(p) {
 
 	setCursor('wait');
@@ -101,9 +37,9 @@ function nbcGetResults(p) {
 		success : function (data) {
 			//alert(data);
 			nbcData = $.parseJSON(data);
-			nbcProcessResults();
-			if (p && p.action!='similar') nbcPrintOverhead();
-			nbcPrintPaging();
+			nbcDoResults();
+			if (p && p.action!='similar') nbcDoOverhead();
+			nbcDoPaging();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
 			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
@@ -115,62 +51,108 @@ function nbcGetResults(p) {
 	
 }
 
-function nbcProcessResults(p) {
+function nbcDoResults(p) {
+
 	if (p && p.resetStart!==false)
 		nbcStart = 0;
 	nbcExpandedShowing = 0;
 	nbcClearResults();
 	if (nbcData.results) nbcPrintResults();
-}
-
-function nbcPrintOverhead() {
-	nbcClearOverhead();
-	if (nbcData.count) nbcPrintOverhead();
-}
-
-function nbcPrintPaging() {
-	nbcClearPaging();
-	if (nbcData.count) nbcPrintPaging();
-}
-
-function nbcResetClearButton() {
-
-	if (nbcData.paramCount==0) {
-		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
-	} else {
-		$('#clearSelectionContainer').removeClass('ghosted');
-	}
 
 }
 
 function nbcClearResults() {
+
 	$('#results-container').html('');
+
 }
 
-function nbcToggleSpeciesDetail(id,state) {
+function nbcPrintResults() {
 
-	if (state)
-		nbcDetailShowStates[id] = (state=='show');
+	if (nbcExpandResults)
+		nbcPrintResultsExpanded();
 	else
-		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
-	
-	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
-	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
-	
+		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
+
+	nbcPrettyPhotoInit();
+	nbcResetClearButton();	
+
 }
 
-function nbcToggleAllSpeciesDetail() {
-	
-	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
-	
-	$('[id^="tog-"]').each(function(){
-		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
-	});
+function nbcPrintResultsPaginated() {
 
-	if (currHiding)
-		$('#showAllLabel').html(nbcLabelHideAll);
-	else
-		$('#showAllLabel').html(nbcLabelShowAll);
+	var results = nbcData.results;
+	var s = '';
+	var d = 0;
+
+	s = '<div class="resultRow">';
+
+	for(var i=0;i<results.length;i++) {
+		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
+			s = s + nbcFormatResult(results[i]);
+			if (++d==nbcPerLine) {
+				s = s + '</div><br/><div class="resultRow">';
+				d=0;
+			}
+		}
+	}
+
+	s = s + '</div>';
+	
+	nbcRemoveShowMoreButton();
+
+	$('#results-container').html(s);
+}
+
+function nbcPrintResultsExpanded() {
+
+	var results = nbcData.results;
+	var s = '';
+	var added = d = 0;
+
+	s = '<div class="resultRow">';
+
+	for(var i=0;i<results.length;i++) {
+		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
+			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
+			) {
+			s = s + nbcFormatResult(results[i]);
+			added++;
+			if (++d==nbcPerLine) {
+				s = s + '</div><br/><div class="resultRow">';
+				d=0;
+			}
+		}
+	}
+	
+	s = s + '</div>';
+
+	if (nbcExpandedShowing>0) {
+		var n = 'p'+rndStr();
+		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
+	}
+
+	$('#results-container').html($('#results-container').html()+s);
+
+	if (nbcExpandedShowing>0)
+		$('#'+n).show('normal');
+
+	nbcExpandedShowing = nbcExpandedShowing + added;
+
+	if (nbcExpandedShowing==added)
+		nbcRemoveShowMoreButton();
+
+	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
+		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
+		$("#footerPagination").removeClass('noline').addClass('noline');
+	}
+
+	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
+		nbcRemoveShowMoreButton();
+
+	nbcExpandedPrevious = null;
+	
+	nbcDoOverhead();
 
 }
 
@@ -259,81 +241,12 @@ function nbcFormatResult(data) {
 	
 }
 
-function nbcPrintResultsPaginated() {
-
-	var results = nbcData.results;
-	var s = '';
-	var d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++) {
-		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
-			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
+function nbcResetClearButton() {
+	if (nbcData.paramCount==0) {
+		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
+	} else {
+		$('#clearSelectionContainer').removeClass('ghosted');
 	}
-
-	s = s + '</div>';
-	
-	nbcRemoveShowMoreButton();
-
-	$('#results-container').html(s);
-}
-
-function nbcPrintResultsExpanded() {
-
-	var results = nbcData.results;
-	var s = '';
-	var added = d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++) {
-		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
-			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
-			) {
-			s = s + nbcFormatResult(results[i]);
-			added++;
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
-	}
-	
-	s = s + '</div>';
-
-	if (nbcExpandedShowing>0) {
-		var n = 'p'+rndStr();
-		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
-	}
-
-	$('#results-container').html($('#results-container').html()+s);
-
-	if (nbcExpandedShowing>0)
-		$('#'+n).show('normal');
-
-	nbcExpandedShowing = nbcExpandedShowing + added;
-
-	if (nbcExpandedShowing==added)
-		nbcRemoveShowMoreButton();
-
-	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
-		$("#footerPagination").removeClass('noline').addClass('noline');
-	}
-
-	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
-		nbcRemoveShowMoreButton();
-
-	nbcExpandedPrevious = null;
-	
-	nbcPrintOverhead();
-
 }
 
 function nbcRemoveShowMoreButton() {
@@ -341,39 +254,24 @@ function nbcRemoveShowMoreButton() {
 	$("#footerPagination").removeClass('noline');	
 }
 
-function nbcPrintResults() {
 
-	if (nbcExpandResults)
-		nbcPrintResultsExpanded();
-	else
-		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
 
-	nbcPrettyPhotoInit();
-	nbcResetClearButton();	
-
+function nbcDoOverhead() {
+	nbcClearOverhead();
+	if (nbcData.count) nbcPrintOverhead();
 }
 
 function nbcClearOverhead() {
-
 	$('#result-count').html('');
 	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
 	$('#similarSpeciesHeader').html('');
-
-}
-
-function nbcClearPaging() {
-
-	if (!nbcPaginate) return;
-
-	$('#paging-header').html('');	
-	$('#paging-footer').html('');	
 }
 
 function nbcPrintOverhead() {
 
 	if (nbcBrowseStyle=='expand') {
 
-		$('#result-count').html((nbcExpandedShowing > 1 ? '1 - '+nbcExpandedShowing : nbcExpandedShowing)+_(' van ')+nbcFullDatasetCount);
+		$('#result-count').html((nbcExpandedShowing > 1 ? '1 - '+nbcExpandedShowing : nbcExpandedShowing)+_(' van ')+nbcData.count.results);
 		return;
 
 	}
@@ -395,6 +293,21 @@ function nbcPrintOverhead() {
 				)
 			)
 		);
+}
+
+
+
+function nbcDoPaging() {
+	nbcClearPaging();
+	if (nbcData.count) nbcPrintPaging();
+}
+
+function nbcClearPaging() {
+
+	if (!nbcPaginate) return;
+
+	$('#paging-header').html('');	
+	$('#paging-footer').html('');	
 }
 
 function nbcPrintPaging() {
@@ -428,23 +341,117 @@ function nbcPrintPaging() {
 	$("#paging-footer").html($("#paging-header").html());
 }
 
-function nbcSaveSessionSetting(name,value) {
+
+
+function nbcShowSimilar(id,type) {
+	
+	nbcPreviousBrowseStyles.paginate = nbcPaginate;
+	nbcPreviousBrowseStyles.expand = nbcExpandResults;
+	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
+	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
+	nbcPreviousBrowseStyles.lastPos = getPageScroll();
+
+	nbcSetPaginate(false);
+	nbcSetExpandResults(false);
+	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
+	nbcSaveSessionSetting('nbcSimilar',[id,type]);
+	
+}
+
+function nbcPrintSimilarHeader() {
+
+	var label = nbcData.results[0].l;
+
+	$('#similarSpeciesHeader').html(
+		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
+		'<br />'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
+		' | '+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
+	);
+	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+}
+
+function nbcCloseSimilar() {
+
+	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
+	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
+	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
+	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
+
+	nbcGetResults();
+	nbcClearOverhead();
+	nbcSaveSessionSetting('nbcSimilar');
+
+	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
+	
+}
+
+
+function nbcDoSearch() {
+
+	var str = $('#inlineformsearchInput').val().trim();
+	
+	//if ((str.length==0) || (str==nbcSearchTerm)) return false;
+	if (str.length==0) return false;
+	
+	nbcSearchTerm=str;
+	nbcSetPaginate(true);
+	nbcSetState({norefresh:true,clearState:true});
+	
+	setCursor('wait');
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : 'save_session_setting' ,
-			setting : { name : name, value: value },
-			id : null,
+			action : 'do_search',
+			params : {term: nbcSearchTerm},
 			time : getTimestamp()
 		}),
 		success : function (data) {
 			//alert(data);
+			nbcData = $.parseJSON(data);
+			nbcDoResults();
+			nbcDoOverhead();
+			nbcDoPaging();
+			nbcPrintSearchHeader();
+			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
+
+			setCursor();
+
 		}
 	});
-	
+
+	return false; // necessary to suppress submit of form
+
 }
+
+function nbcClearSearchTerm() {
+	
+	nbcSearchTerm='';
+	$('#inlineformsearchInput').val('');
+
+}
+
+function nbcCloseSearch() {
+
+	nbcGetResults();
+	nbcSaveSessionSetting('nbcSearch');
+	$('#inlineformsearchInput').val('');
+
+}
+
+function nbcPrintSearchHeader() {
+
+	$('#similarSpeciesHeader').html(
+		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
+		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
+	);
+	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+}
+
+
 
 function nbcBrowse(id) {
 
@@ -464,88 +471,71 @@ function nbcBrowse(id) {
 
 }
 
-function nbcShowSimilar(id,type) {
+
+
+function nbcToggleSpeciesDetail(id,state) {
+
+	if (state)
+		nbcDetailShowStates[id] = (state=='show');
+	else
+		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
 	
-	nbcPreviousBrowseStyles.paginate = nbcPaginate;
-	nbcPreviousBrowseStyles.expand = nbcExpandResults;
-	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
-	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
-	nbcPreviousBrowseStyles.lastPos = getPageScroll();
-
-	nbcSetPaginate(false);
-	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
-	nbcSaveSessionSetting('nbcSimilar',[id,type]);
-	
-}
-
-function nbcCloseSimilar() {
-
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
-	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
-	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
-	nbcGetResults();
-	nbcClearOverhead();
-	nbcSaveSessionSetting('nbcSimilar');
-
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
+	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
+	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
 	
 }
 
-function nbcPrintSimilarHeader() {
+function nbcToggleAllSpeciesDetail() {
+	
+	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
+	
+	$('[id^="tog-"]').each(function(){
+		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
+	});
 
-	var label = nbcData.results[0].l;
+	if (currHiding)
+		$('#showAllLabel').html(nbcLabelHideAll);
+	else
+		$('#showAllLabel').html(nbcLabelShowAll);
 
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
-		'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		' | '+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
 
-function nbcSetState(p) {
+function nbcToggleGroup(id) {
+
+	if ($('#character-group-'+id).css('display')=='none') {
+		$('#character-group-'+id).removeClass('hidden').addClass('visible');
+		$('#character-item-'+id).removeClass('closed').addClass('open');
+	} else {
+		$('#character-group-'+id).removeClass('visible').addClass('hidden');
+		$('#character-item-'+id).removeClass('open').addClass('closed');
+	}
 	
-	//nbcSetPaginate(true);
-	
+} 
+
+function nbcShowStates(id) {
+
 	setCursor('wait');
-
+	
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
-			state : p.state,
-			value : p.value,
-			id : null,
+			action : 'get_formatted_states' ,
+			id : id , 
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			if (p.norefresh!==true)
-				nbcGetResults({closeDialog:true,refreshGroups:true});
+			//alert(data);
+			data = $.parseJSON(data);
+			showDialog(
+				data.character.label,
+				data.page,
+				{width:data.width,height:data.height,showOk:data.showOk}
+			);
 			setCursor();
 		}
 	});
-	
-}
 
-function nbcSetStateValue(state) {
-	
-	var state = state ? state : $('#state-id').html();
-
-	nbcSetState({state:state,value:nbcStatevalue});
-		
-}
-
-function nbcClearStateValue(state) {
-
-	$('#state-value').val('');
-	nbcSetState({state:state,clearState:true});
-		
 }
 
 function nbcRefreshGroupMenu() {
@@ -615,6 +605,66 @@ function nbcBuildGroupMenu(data) {
 
 }
 
+
+
+function nbcSaveSessionSetting(name,value) {
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'save_session_setting' ,
+			setting : { name : name, value: value },
+			id : null,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+		}
+	});
+	
+}
+
+function nbcSetState(p) {
+	
+	//nbcSetPaginate(true);
+	
+	setCursor('wait');
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
+			state : p.state,
+			value : p.value,
+			id : null,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			if (p.norefresh!==true)
+				nbcGetResults({closeDialog:true,refreshGroups:true});
+			setCursor();
+		}
+	});
+	
+}
+
+function nbcSetStateValue(state) {
+	
+	var state = state ? state : $('#state-id').html();
+
+	nbcSetState({state:state,value:nbcStatevalue});
+		
+}
+
+function nbcClearStateValue(state) {
+
+	$('#state-value').val('');
+	nbcSetState({state:state,clearState:true});
+		
+}
+
 function nbcBindDialogKeyUp() {
 
     $("#state-value").keydown(function(event) {
@@ -645,69 +695,6 @@ function nbcBindDialogKeyUp() {
 
 }
 
-function nbcClearSearchTerm() {
-	
-	nbcSearchTerm='';
-	$('#inlineformsearchInput').val('');
-
-}
-
-function nbcDoSearch() {
-
-	var str = $('#inlineformsearchInput').val().trim();
-	
-	//if ((str.length==0) || (str==nbcSearchTerm)) return false;
-	if (str.length==0) return false;
-	
-	nbcSearchTerm=str;
-	nbcSetPaginate(true);
-	nbcSetState({norefresh:true,clearState:true});
-	
-	setCursor('wait');
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'do_search',
-			params : {term: nbcSearchTerm},
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			nbcData = $.parseJSON(data);
-			nbcProcessResults();
-			nbcPrintOverhead();
-			nbcPrintPaging();
-			nbcPrintSearchHeader();
-			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
-
-			setCursor();
-
-		}
-	});
-
-	return false; // necessary to suppress submit of form
-
-}
-
-function nbcPrintSearchHeader() {
-
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
-}
-
-function nbcCloseSearch() {
-
-	nbcGetResults();
-	nbcSaveSessionSetting('nbcSearch');
-	$('#inlineformsearchInput').val('');
-
-}
-
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
@@ -718,6 +705,32 @@ function nbcPrettyPhotoInit() {
  		overlay_gallery: false,
  		social_tools: false
  	});
+
+}
+
+function nbcSetPaginate(state) {
+
+	nbcPaginate = state;
+	
+}
+
+function nbcSetExpandResults(state) {
+
+	nbcExpandResults = state;
+	
+}
+
+// dialog button function, called from main.js::showDialog 
+function jDialogOk() {
+
+	nbcSetStateValue();
+
+}
+
+// dialog button function, called from main.js::showDialog 
+function jDialogCancel() {
+
+	closeDialog();
 
 }
 

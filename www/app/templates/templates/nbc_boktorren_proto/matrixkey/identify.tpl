@@ -120,7 +120,7 @@ nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
 {if $taxa}
 nbcData = $.parseJSON('{$taxa}');
-nbcProcessResults();
+nbcDoResults();
 {else}
 nbcGetResults();
 {/if}
