@@ -592,8 +592,6 @@ class SpeciesController extends Controller
                         'is_hybrid' => $isHybrid
                     ));
 					
-					q($this->models->Taxon->q());
-
                     if (!empty($children)) {
                         
                         foreach ($children as $child) {
