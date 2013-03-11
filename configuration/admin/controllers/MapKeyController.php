@@ -66,6 +66,7 @@ class MapKeyController extends Controller
 		$this->createStandardDataTypes();
 
 		$this->smarty->assign('L2Maps',$this->l2GetMaps());
+		$this->smarty->assign('maptype',$this->getSetting('maptype'));
 		
     }
 
@@ -85,7 +86,8 @@ class MapKeyController extends Controller
     {
 
 		if ($this->getSetting('maptype')=='l2')
-			$this->redirect('l2_species_show.php?id='.$this->l2GetFirstOccurringTaxonId());
+			//$this->redirect('l2_species_show.php?id='.$this->l2GetFirstOccurringTaxonId());
+			$this->redirect('l2_species_edit.php?id='.$this->l2GetFirstOccurringTaxonId());
 		else
 			//$this->redirect('species_show.php?id='.$this->getFirstOccurringTaxonId());
 			$this->redirect('species_edit.php?id='.$this->getFirstOccurringTaxonId());
@@ -185,7 +187,7 @@ class MapKeyController extends Controller
 		
 			// delete all old items
 			$this->deleteTaxonOccurrences($this->requestData['id']);
-		
+
 			if ($this->rHasVal('mapItems')) {
 
 				foreach((array)$this->requestData['mapItems'] as $val) {
@@ -823,6 +825,14 @@ class MapKeyController extends Controller
 				from %table% where taxon_id='.$source.')'
 		);
 
+		$this->models->L2OccurrenceTaxon->execute(
+			'insert into %table% 
+				(project_id,taxon_id,type_id,map_id,square_number,created)
+				(select
+					project_id,'.$target.',type_id,map_id,square_number,CURRENT_TIMESTAMP
+				from %table% where taxon_id='.$source.')'
+		);
+
 	}
 
 	private function getGeodataTypes($id=null)
@@ -882,18 +892,29 @@ class MapKeyController extends Controller
 				'columns' => 'distinct taxon_id'
 			)
 		);
-		
-		if (!$ot) return null;
+
+		$l2 = $this->models->L2OccurrenceTaxon->_get(
+			array(
+				'id' => array('project_id' => $this->getCurrentProjectId()),
+				'columns' => 'distinct taxon_id'
+			)
+		);
+
+		if (!$ot && !$l2) return null;
 
 		$this->getTaxonTree();
 		
 		foreach((array)$ot as $key => $val) {
-
 			if (isset($this->treeList[$val['taxon_id']])) {
-			    $d = $this->treeList[$val['taxon_id']];
-                $t[$val['taxon_id']] = $d;
+                $t[$val['taxon_id']] = $this->treeList[$val['taxon_id']];
 			}
-			
+
+		}
+		foreach((array)$l2 as $key => $val) {
+			if (isset($this->treeList[$val['taxon_id']])) {
+                $t[$val['taxon_id']] = $this->treeList[$val['taxon_id']];
+			}
+
 		}
 
 		$this->customSortArray($t,array('key' => 'taxon','maintainKeys' => true));
@@ -1420,8 +1441,6 @@ class MapKeyController extends Controller
 
 	}
 
-
-
 	public function plotTestAction()
 	{
 
@@ -1478,9 +1497,6 @@ class MapKeyController extends Controller
 	
 	}
 
-
-
-
 	public function l2SpeciesShowAction()
 	{
 
@@ -1527,6 +1543,107 @@ class MapKeyController extends Controller
 
 	}
 
+
+
+	public function l2SpeciesEditAction()
+	{
+
+        $this->checkAuthorisation();
+
+		if (!$this->rHasId()) $this->redirect('species.php');
+
+		$taxon = $this->getTaxonById($this->requestData['id']);
+
+		$this->setPageName(sprintf($this->translate('"%s"'),$taxon['taxon']));
+
+		if (!$this->rHasVal('mapId'))
+			$mapId = $this->l2GetFirstOccurrenceMapId($this->requestData['id']);
+		else
+			$mapId = $this->requestData['mapId'];
+
+
+		if ($this->rHasVal('action','save') && $this->rHasVal('mapId') && $this->rHasVal('id') && !$this->isFormResubmit()) {
+		
+			$this->l2DeleteTaxonOccurrences($this->requestData['id'],$mapId);
+
+			if ($this->rHasVal('mapItems')) {
+
+				foreach((array)$this->requestData['mapItems'] as $val) {
+				
+					// type id|cell nr
+					$d = explode('|',$val);
+					$this->l2SaveTaxonOccurrence($this->requestData['id'],$mapId,$d[0],$d[1]);
+
+				}
+				
+			}
+			
+		}
+
+		if ($this->rHasId()) {
+
+			$occurrences = $this->l2GetTaxonOccurrences($this->requestData['id'],$mapId);
+
+			$this->smarty->assign('mapId',$mapId);
+
+			$this->smarty->assign('occurrences',$occurrences['occurrences']);
+
+			$this->smarty->assign('maps',$this->l2GetMaps());
+
+        }
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
+		if (isset($mapId)) $this->smarty->assign('mapId',$mapId);
+
+		if (isset($taxon)) $this->smarty->assign('taxon',$taxon);
+
+		$this->smarty->assign('geodataTypes',$this->getGeodataTypes());
+
+		$this->smarty->assign('navList',$this->getOccurringTaxonList());
+
+		$this->smarty->assign('navCurrentId',$taxon['id']);
+
+        $this->printPage();
+
+	}
+
+
+
+	private function l2DeleteTaxonOccurrences($id,$mapId)
+	{
+	
+		if (!isset($id) || !isset($mapId)) return;
+
+		$ot = $this->models->L2OccurrenceTaxon->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id,
+				'map_id' => $mapId
+			)
+		);
+
+	}
+
+	private function l2SaveTaxonOccurrence($id,$mapId,$typeId,$cellNr)
+	{
+	
+		if (!isset($id) || !isset($mapId) || !isset($cellNr)) return;
+
+		return $this->models->L2OccurrenceTaxon->save(
+			array(
+				'id' => null,
+				'project_id' => $this->getCurrentProjectId(),
+				'taxon_id' => $id,
+				'map_id' => $mapId,
+				'square_number' => $cellNr,
+				'type_id' => $typeId
+			)
+		);
+
+	}
+
+
     public function l2SpeedUpAction()
     {
 
@@ -1561,7 +1678,7 @@ class MapKeyController extends Controller
 					'taxon_id' => $id,
 					'map_id' => $mapId
 				),
-				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
+				'columns' => 'id,taxon_id,map_id,type_id,square_number',
 				'fieldAsIndex' => 'square_number'
 				
 			)

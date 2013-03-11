@@ -53,7 +53,9 @@ class MergeController extends Controller
         'geodata_type', 
         'geodata_type_title', 
         'l2_occurrence_taxon', 
-        'l2_map', 
+        'l2_map',
+		'l2_occurrence_taxon_combi',
+		'l2_diversity_index',
         'content_introduction', 
         'introduction_page', 
         'introduction_media', 
@@ -74,7 +76,6 @@ class MergeController extends Controller
 		'choice_content_keystep_undo',
         'section',
 		'keytree'
-
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -185,11 +186,6 @@ class MergeController extends Controller
 
     }
 
-
-
-
-
-
     private function mergeIntroduction ($p)
     {
 
@@ -199,12 +195,10 @@ class MergeController extends Controller
 			if (!empty($val['file_name'])) 
 				$this->_mediaToMove['files'][] = $val['file_name'];
 		}
-
         $this->models->ContentIntroduction->update(
 			array('project_id' => $p['t'],'topic' => '#concat(topic,\''.mysql_real_escape_string($p['p']).'\')'),
 			array('project_id' => $p['s'])
 		);
-		
         $this->models->IntroductionPage->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
@@ -278,26 +272,25 @@ class MergeController extends Controller
 				'id' => array('id' => $p['t'],'page' => $oldCat['page'])
 			));
 
-			// if so, we are going to give the pages in that category a new category (the matching one in the target) and delete the category in the source
-			if ($d[0]) {
-				$del[] = $oldCat['id'];
+			// if so, we are going to give the pages in that category a new category (the matching one in the target) and later on delete the category in the source
+			if ($d[0]['id']) {
+				$del[] = $oldCat;
 				$oldCats[$key]['id'] = $d[0]['id'];
 			}
 
 		}
-
-		if ($del) {
+		if (!empty($del)) {
 			// delete the duplicate categories in the source
-			$this->models->PageTaxon->delete(
+			$this->models->PageTaxonTitle->delete(
 				array(
 					'project_id' => $p['s'],
-					'id in'=> '('.implode(',',$del).')'
+					'page_id in'=> '('.implode(',',$del).')'
 				)
 			);
 			$this->models->PageTaxon->delete(
 				array(
 					'project_id' => $p['s'],
-					'page_id in'=> '('.implode(',',$del).')'
+					'id in'=> '('.implode(',',$del).')'
 				)
 			);
 		}
@@ -317,7 +310,7 @@ class MergeController extends Controller
 
 			// set new category for the pages of the now deleted source categories
 			$this->models->ContentTaxon->update(
-				array('page_id' => $val),
+				array('page_id' => $val['id']),
 				array(
 					'project_id' => $p['s'],
 					'page_id' => $key
@@ -690,7 +683,6 @@ class MergeController extends Controller
 
     }
 
-
     private function cRename ($from, $to)
     {
 
@@ -734,6 +726,8 @@ class MergeController extends Controller
 			return false;
 			
 		$p = array('s' => $sourceId,'t' => $targetId,'p' => $postfix);
+		
+		set_time_limit(900);
         
 		foreach((array)$modules as $val) {
 
@@ -778,51 +772,86 @@ class MergeController extends Controller
 				
 			}
 
-			$this->addModuleToProject($val,$targetId,99);
-			$this->grantModuleAccessRights($val,$targetId);
+	        $d = $this->models->ModuleProject->_get(array(
+				'id' =>
+					array(
+						'project_id' => $targetId, 
+						'module_id' => $val, 
+					)
+			));
+			
+			if (empty($d)) {
+			
+				$this->addModuleToProject($val,$targetId,99);
+				$this->grantModuleAccessRights($val,$targetId);
+				
+			}
 
 		}
 
 		foreach((array)$freeModules as $val) {
+			
+			
+			
 			$p['mId'] = $val;
 	        $this->mergeFreeModule($p);
-	        $this->grantFreeModuleAccessRights($val);
+			$this->models->FreeModuleProjectUser->save(
+			array(
+				'id' => null, 
+				'project_id' => $p['t'],
+				'free_module_id' => $p['mId'], 
+				'user_id' => $this->getCurrentUserId()
+			));
 		}
 		
 		$srcPaths = $this->makePathNames($sourceId);
 		$tgtPaths = $this->makePathNames($targetId);
+		
+		if (isset($this->_mediaToMove['files'])) {
 
-		$i=0;
-		foreach((array)$this->_mediaToMove['files'] as $file) {
-			if ($this->cRename(
-				$srcPaths['project_media'].$file,
-				$tgtPaths['project_media'].$file
-			)) $i++;
+			$i=0;
+			foreach((array)$this->_mediaToMove['files'] as $file) {
+				if ($this->cRename(
+					$srcPaths['project_media'].$file,
+					$tgtPaths['project_media'].$file
+				)) $i++;
+			}
+			
+			$this->addMessage(sprintf('Moved %s images.',$i));
+			
+		}
+
+
+		if (isset($this->_mediaToMove['thumbs'])) {
+
+			$i=0;
+			foreach((array)$this->_mediaToMove['thumbs'] as $file) {
+				if ($this->cRename(
+					$srcPaths['project_thumbs'].$file,
+					$tgtPaths['project_thumbs'].$file
+				)) $i++;
+			}
+	
+			$this->addMessage(sprintf('Moved %s thumbs.',$i));
+
+		}
+
+
+		if (isset($this->_mediaToMove['l2maps'])) {
+
+			$i=0;
+			foreach((array)$this->_mediaToMove['l2maps'] as $file) {
+				if ($this->cRename(
+					$srcPaths['project_media_l2_maps'].$file,
+					$tgtPaths['project_media_l2_maps'].$file
+				)) $i++;
+			}
+	
+			$this->addMessage(sprintf('Moved %s Linnaues 2-maps.',$i));
+
 		}
 		
-		$this->addMessage(sprintf('Moved %s images.',$i));
-
-
-		$i=0;
-		foreach((array)$this->_mediaToMove['thumbs'] as $file) {
-			if ($this->cRename(
-				$srcPaths['project_thumbs'].$file,
-				$tgtPaths['project_thumbs'].$file
-			)) $i++;
-		}
-
-		$this->addMessage(sprintf('Moved %s thumbs.',$i));
-
-
-		$i=0;
-		foreach((array)$this->_mediaToMove['l2maps'] as $file) {
-			if ($this->cRename(
-				$srcPaths['project_media_l2_maps'].$file,
-				$tgtPaths['project_media_l2_maps'].$file
-			)) $i++;
-		}
-
-		$this->addMessage(sprintf('Moved %s Linnaues 2-maps.',$i));
+		return true;
 
 	}
 

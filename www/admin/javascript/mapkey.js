@@ -407,3 +407,62 @@ function mapMoveType(id,action) {
 	$('#theForm').submit()
 
 }
+
+var lon1 = lon2 = lat1 = lat2 = mapWPx = mapHPx = mapW = mapH = 0;
+
+function mapL2bindMouseMove() {
+	
+	var offset = $('#map-overlay').offset();
+	
+	$('#map-overlay').mousemove(function(event){
+		
+		var x = event.pageX-offset.left;
+		var y = event.pageY-offset.top;
+		
+		var mapWDeg = (((x / mapWPx) * mapW) + lon1);
+		var mapHDeg = (((y / mapHPx) * mapH) + lat1);
+
+		mapWDeg = Math.floor(mapWDeg) + ((Math.round((mapWDeg - Math.floor(mapWDeg)) * 100))/100);
+		mapHDeg = Math.floor(mapHDeg) + ((Math.round((mapHDeg - Math.floor(mapHDeg)) * 100))/100);
+
+		$('#coordinates').html(mapWDeg+'x'+mapHDeg);
+
+	});
+
+}
+
+function mapClickCell(ele) {
+
+	var type = $('input[name=selectedType]:checked').val();
+	var col = $('#color-'+type).css('background-color');
+	var erase = $(ele).css('background-color')==col;
+	$(ele).css('background-color',(erase?'':col));
+	$(ele).attr('type_id',(erase?'':type));
+	
+}
+
+function mapl2ClearMap(type) {
+
+	$('td[id^=cell-]').each(function(){
+		if ((type && $(this).attr('type_id')==type) || !type) {
+			$(this).css('background-color','');
+			$(this).attr('type_id','');
+		}
+	})
+
+}
+
+function mapl2SaveMap() {
+
+	$('td[id^=cell-]').each(function(){
+		if ($(this).attr('type_id')!='') {
+
+			$('<input type="hidden" name="mapItems[]">').val($(this).attr('type_id')+'|'+$(this).attr('id').replace('cell-','')).appendTo('#theForm');
+
+		}
+	})
+	
+	$('#action').val('save');
+	$('#theForm').submit();
+
+}

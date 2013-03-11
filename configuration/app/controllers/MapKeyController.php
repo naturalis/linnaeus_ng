@@ -1507,7 +1507,7 @@ class MapKeyController extends Controller
 		$ot = $this->models->L2OccurrenceTaxon->_get(
 			array(
 				'id' => $d,
-				'columns' => 'id,taxon_id,map_id,type_id,square_number,legend,coordinates',
+				'columns' => 'id,taxon_id,map_id,type_id,square_number',
 				'fieldAsIndex' => 'square_number'
 				
 			)
