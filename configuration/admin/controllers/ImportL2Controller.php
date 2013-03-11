@@ -3592,8 +3592,8 @@ class ImportL2Controller extends Controller
             'type_id' => $p['type_id'], 
             'map_id' => $p['map_id'], 
             'square_number' => $p['square_number'], 
-            'legend' => $p['legend'], 
-            'coordinates' => $p['coordinates']
+            //'legend' => $p['legend'], 
+            //'coordinates' => $p['coordinates']
         ));
         
         if ($d !== true)

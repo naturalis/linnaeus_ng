@@ -14,7 +14,7 @@
 			{t}Parent taxon: {/t}
 		</td>
 		<td>		
-	<select name="parent_id" id="parent-id">
+	<select name="parent_id" id="parent-id" style="width:300px">
 	<option value="-1">{t}No parent{/t}</option>
 	{foreach from=$taxa key=k item=v}
 	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
@@ -22,7 +22,7 @@
 		{section name=foo loop=$v.level-$taxa[0].level}
 		&nbsp;
 		{/section}		
-		{$v.taxon}</option>
+		{$v.taxon_formatted}</option>
 	{/if}
 	{/foreach}
 	</select>

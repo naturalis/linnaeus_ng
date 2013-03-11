@@ -4,10 +4,10 @@
 <form method="post">
 {if $processed==true}
 <p>
-Data merge is complete.
+	Data merge is complete.
 </p>
 <p>
-<a href="../../admin/admin-index.php">Go to project index</a>
+	<a href="../projects/">Go to project index</a>
 </p>
 {elseif $merge}
 <p>
@@ -20,11 +20,11 @@ Select the modules you wish to merge:
 <table>
 {foreach from=$modules.modules item=v}
 {if !in_array($v.module_id,$modulesToIgnore)}
-<tr class="tr-highlight" style="vertical-align:top"><td><label style="cursor:pointer"><input type="checkbox" name="modules[]" value="{$v.module_id}" checked="checked"/>{$v.module}</label></td><td><span style="color:#999">{$moduleInfo[$v.module_id]}</span></td></tr>
+<tr class="tr-highlight" style="vertical-align:top"><td><label style="cursor:pointer"><input type="checkbox" name="modules[]" value="{$v.module_id}" -checked="checked"/>{$v.module}</label></td><td><span style="color:#999">{$moduleInfo[$v.module_id]}</span></td></tr>
 {/if}
 {/foreach}
 {foreach from=$modules.freeModules item=v}
-<tr class="tr-highlight" style="vertical-align:top"><td><label style="cursor:pointer"><input type="checkbox" name="freeModules[]" value="{$v.module_id}" checked="checked"/>{$v.module}</label></td><td><span style="color:#999">{$moduleInfo.free}</span></td></tr>
+<tr class="tr-highlight" style="vertical-align:top"><td><label style="cursor:pointer"><input type="checkbox" name="freeModules[]" value="{$v.id}" -checked="checked"/>{$v.module}</label></td><td><span style="color:#999">{$moduleInfo.free}</span></td></tr>
 {/foreach}
 </table>
 
@@ -61,9 +61,11 @@ Project to merge:
 </p>
 {/if}
 </form>
+{if $processed!=true}
 <p>
 <a href="../projects/">{t}Back{/t}</a>
 </p>
+{/if}
 
 </div>
 

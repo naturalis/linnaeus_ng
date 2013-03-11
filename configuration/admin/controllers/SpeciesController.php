@@ -234,9 +234,6 @@ class SpeciesController extends Controller
         
         if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
             // moving branches up and down the stem
-            
-
-
 
             $this->clearCache($this->cacheFiles['list']);
             
@@ -247,7 +244,8 @@ class SpeciesController extends Controller
         }
         
         $taxa = $this->newGetUserAssignedTaxonTreeList(array(
-            'higherOnly' => $this->maskAsHigherTaxa()
+            'higherOnly' => $this->maskAsHigherTaxa(),
+			'forceLookup' => true
         ));
         
         if (isset($taxa) && count((array) $taxa) > 0) {
@@ -589,10 +587,12 @@ class SpeciesController extends Controller
                         'project_id' => $this->getCurrentProjectId(), 
                         'taxon' => $newName, 
                         'author' => ($this->requestData['author'] ? $this->requestData['author'] : null), 
-                        'parent_id' => $parentId, 
+                        'parent_id' => (empty($parentId) ? 'null' : $parentId), 
                         'rank_id' => $this->requestData['rank_id'], 
                         'is_hybrid' => $isHybrid
                     ));
+					
+					q($this->models->Taxon->q());
 
                     if (!empty($children)) {
                         
@@ -619,6 +619,8 @@ class SpeciesController extends Controller
                     $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
                     
                     $this->smarty->assign('data', $d);
+					
+					$this->clearCache($this->cacheFiles['list']);
 
                 }
                 else {
@@ -2019,40 +2021,49 @@ class SpeciesController extends Controller
             $parent = 'null';
             
             $isLowerTaxon = false;
-            
+
             foreach ((array) $this->requestData['ranks'] as $key => $rank) {
                 
                 if ($this->requestData['higherTaxaBorder'] == $rank) {
                     
                     $isLowerTaxon = true;
+
                 }
-                
-                if (!empty($pr[$rank])) {
-                    
+
+                $d = $this->models->ProjectRank->_get(array(
+                    'id' => array(
+                        'rank_id' => $rank,
+                        'project_id' => $this->getCurrentProjectId()
+                    )
+                ));
+
+                if ($d) {
+
                     $this->models->ProjectRank->save(
-                    array(
-                        'id' => $pr[$rank]['id'], 
-                        'parent_id' => $parent, 
-                        'lower_taxon' => $isLowerTaxon ? 1 : 0
-                    ));
-                    
-                    $parent = $pr[$rank]['id'];
+						array(
+							'id' => $d[0]['id'], 
+							'parent_id' => $parent, 
+							'lower_taxon' => $isLowerTaxon ? '1' : '0'
+						));
+
+                    $parent = $d[0]['id'];
+					
                 }
                 else {
                     
-                    $this->models->ProjectRank->save(
-                    array(
-                        'id' => null, 
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'rank_id' => $rank, 
-                        'parent_id' => $parent, 
-                        'lower_taxon' => $isLowerTaxon ? 1 : 0
-                    ));
+					$this->models->ProjectRank->save(
+						array(
+							'id' => null, 
+							'project_id' => $this->getCurrentProjectId(), 
+							'rank_id' => $rank, 
+							'parent_id' => $parent, 
+							'lower_taxon' => $isLowerTaxon ? '1' : '0'
+						));
                     
                     $parent = $this->models->ProjectRank->getNewId();
                 }
             }
-            
+      
             $this->models->ProjectRank->update(array(
                 'keypath_endpoint' => 0
             ), array(
@@ -2790,7 +2801,9 @@ class SpeciesController extends Controller
         $this->createStandardCategories();
         
         $this->createStandardCoLRanks();
-        
+
+        $this->verifyProjectRanksRelations();
+	
         $this->smarty->assign('heartbeatFrequency', $this->generalSettings['heartbeatFrequency']);
         
         $this->includeLocalMenu = true;
@@ -4163,7 +4176,7 @@ class SpeciesController extends Controller
     }
 
 
-
+//NEE!
     private function getProjectRankByParentProjectRank ($id = false)
     {
         if ($id === false)
@@ -5320,4 +5333,34 @@ class SpeciesController extends Controller
             'variations' => $var
         );
     }
+	
+	private function verifyProjectRanksRelations()
+	{
+		
+        $pr = $this->newGetProjectRanks(array(
+            'forceLookup' => true
+        ));
+		
+		$pr = array_reverse($pr);
+		
+		foreach((array)$pr as $key => $val) {
+			
+			if (!isset($pr[$key+1]['id'])) continue;
+
+            $this->models->ProjectRank->update(array(
+                'parent_id' => $pr[$key+1]['id']
+            ), array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'id' => $val['id']
+            ));
+			
+		}
+		
+	}
+        
+
+	
+	
+	
+	
 }

@@ -1864,9 +1864,9 @@ class Controller extends BaseClass
 
 
 
-    public function newGetUserAssignedTaxonTree ()
+    public function newGetUserAssignedTaxonTree ($p)
     {
-        $taxa = $this->newGetTaxonTree();
+        $taxa = $this->newGetTaxonTree($p);
         
         $userTaxa = $this->newGetUserTaxa();
         
@@ -1883,7 +1883,7 @@ class Controller extends BaseClass
 
     public function newGetUserAssignedTaxonTreeList ($p = null)
     {
-        $this->newGetUserAssignedTaxonTree();
+        $this->newGetUserAssignedTaxonTree($p);
         
         if (!isset($this->treeList))
             return null;
@@ -2088,7 +2088,6 @@ class Controller extends BaseClass
 			10 | Additional texts
 			11 | Index
 			12 | Search
-				
 		*/
         $this->models->ModuleProject->save(
         array(
