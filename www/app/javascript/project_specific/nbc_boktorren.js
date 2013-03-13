@@ -219,17 +219,27 @@ function nbcFormatResult(data) {
 				(data.n ? '</a>' : '')+
 			'</div>'+
 			'<div class="scientificNameHolder">'+
-				(data.u ? '<a href="'+(data.u)+'" target="_blank">' : '') + (data.s!=data.l ? data.l+'<br />' : '')+
-					'<span class="scientificName">'+(data.s)+'</span>'+
-				(data.u ? '</a>' : '')  +
+				'<span class="scientificName">'+(data.s)+'</span>'+
+				(data.s!=data.l ? '<br />' + data.l : '')+
 			'</div>'+
 			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-			(data.r ? '<a class="similarBtn" href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self">'+nbcLabelSimilarSpecies+'</a>' : '' ) +
-			(states ? 
-				'<span style="position:relative;top:'+(data.r ? '-12' : '0')+'px">'+
-					'<span class="detail-icon">i</span>' +
-					'<a class="detailsBtn" id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;">'+nbcLabelDetails+'</a>'+
+				'<span astyle="position:relative;top:'+(data.r ? '-12' : '0')+'px">'+
+					'<span class="result-icons">'+
+						(states ? 
+							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
+							'<img class="result-icon" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'</a>' : '') +
+						(data.r ?
+							'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'">'+
+							'<img class="result-icon" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'</a>' : '') +
+						(data.u ?
+							'<a href="'+(data.u)+'" target="_blank" title="'+nbcLabelExternalLink+'">'+
+							'<img class="result-icon" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'</a>' : '')  +
+					'</span>' +
 				'</span>' +
+			(states ? 
 				'<div id="det-'+id+'" class="resultDetails">'+
 					'<ul>'+
 						'<li>'+states.join('</li><li>')+'</li>'+
@@ -238,7 +248,11 @@ function nbcFormatResult(data) {
 				: '')+
 		'</div>'
 		;
-	
+}
+
+function nbcSwitchImagename(ele,state) {
+	var p = '_grijs';
+	$(ele).attr('src',state==1 ? $(ele).attr('src').replace(p,'') :$(ele).attr('src').replace('.png',p+'.png'));	
 }
 
 function nbcResetClearButton() {
@@ -480,8 +494,13 @@ function nbcToggleSpeciesDetail(id,state) {
 	else
 		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
 	
-	$('#det-'+id).css('display',(nbcDetailShowStates[id] ? 'block' : 'none'));
-	$('#tog-'+id).html(nbcDetailShowStates[id] ? nbcLabelClose : nbcLabelDetails);
+	if (nbcDetailShowStates[id]) {
+		$('#det-'+id).css('display','block');
+		$('#tog-'+id).attr('title',nbcLabelClose);
+	} else {
+		$('#det-'+id).css('display','none');
+		$('#tog-'+id).attr('title',nbcLabelDetails);
+	}
 	
 }
 
@@ -742,6 +761,7 @@ function nbcInit() {
 	nbcLabelSimilarSpecies = _('gelijkende soorten');
 	nbcLabelShowAll = _('alle kenmerken tonen');
 	nbcLabelHideAll = _('alle kenmerken verbergen');
+	nbcLabelExternalLink = _('Nederlands Soortenregister');
 
 	if (nbcBrowseStyle=='paginate') {
 		nbcSetPaginate(true);

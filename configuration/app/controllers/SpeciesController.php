@@ -103,6 +103,7 @@ class SpeciesController extends Controller
      */
     public function taxonAction ()
     {
+
         if ($this->rHasId()) {
 
             // get taxon
@@ -201,7 +202,7 @@ class SpeciesController extends Controller
             $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
         }
         
-        $this->printPage();
+        $this->printPage('taxon');
     }
 
 
@@ -1003,5 +1004,40 @@ class SpeciesController extends Controller
         
         return $t;
     }
+
+
+
+
+
+	public function findByNameAction()
+	{
+	
+		//RewriteEngine on
+		//RewriteRule ^p/([\d]+)/([^/\.]+)/?$ /linnaeus_ng/app/views/species/find_by_name.php?epi=$1&name=$2
+		
+		$base = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/';
+		
+		$name = trim($this->requestData['name']);
+		
+		if (empty($name))
+			$this->redirect($base.'index.php');
+		
+		// try literal
+		$t = $this->models->Taxon->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon' => $name
+			), 
+			'columns' => 'id'
+		));
+
+		if ($t)
+			$this->redirect($base.'taxon.php?epi='.$this->requestData['epi'].'&id='.$t[0]['id']);
+	
+	}
+	
+
+
+
 }
 

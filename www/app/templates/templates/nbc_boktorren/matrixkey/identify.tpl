@@ -5,7 +5,7 @@
     
         <div id="resultsHeader">
             <span>
-	            <h2 style="width:100%">{t}Boktorren determineren{/t}</h2>
+	            <h1>{t}Boktorren determineren{/t}</h1>
                 <div class="headerPagination">
                     <ul id="paging-header" class="list paging"></ul>
                 </div>

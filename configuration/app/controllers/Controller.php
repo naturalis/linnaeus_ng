@@ -2028,6 +2028,7 @@ class Controller extends BaseClass
             $this->log('No full path set', 2);
         if (empty($this->_fullPathRelative))
             $this->log('No relative full path set', 2);
+		
     }
 
 

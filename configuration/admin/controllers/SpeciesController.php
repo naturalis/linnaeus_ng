@@ -453,9 +453,15 @@ class SpeciesController extends Controller
                     $parentId = $this->requestData['org_parent_id'];
                 else if ($isEmptyTaxaList || $this->requestData['parent_id'] == '-1')
                     $parentId = null;
-                else
+                else {
                     $parentId = $this->requestData['parent_id'];
-                
+					if ($parentId=-99)
+						$parentId = $this->requestData['id'];
+				}
+
+					
+
+
                 $parent = $this->getTaxonById($parentId);
                 
                 $newName = $this->requestData['taxon'];
@@ -580,7 +586,7 @@ class SpeciesController extends Controller
                     $this->clearErrors();
                     
                     $this->clearCache($this->cacheFiles);
-                    
+					
                     $this->models->Taxon->save(
                     array(
                         'id' => $this->requestData['id'], 
@@ -1024,6 +1030,8 @@ class SpeciesController extends Controller
         if ($this->rHasVal('action', 'process') && $this->rHasId()) {
             
             $this->clearCache($this->cacheFiles);
+			
+			set_time_limit(600);
             
             $taxon = $this->getTaxonById($this->requestData['id']);
             
@@ -1162,7 +1170,8 @@ class SpeciesController extends Controller
         
         $this->newGetTaxonTree();
         
-        $this->smarty->assign('tree', $this->treeList);
+        if (isset($this->treeList)) 
+			$this->smarty->assign('tree', $this->treeList);
         
         $this->smarty->assign('ranks', $pr);
         
