@@ -7,6 +7,7 @@
 <input type="hidden" id="action" name="action" value="save" />
 <input name="id" id="id" type="hidden" value="{$data.id}"  />
 <input name="org_parent_id" id="org_parent_id" type="hidden" value="{$data.parent_id}"  />
+
 {if $data.id}<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$data.id}','_top')" />{/if}
 <table>
 	<tr>
@@ -25,6 +26,7 @@
 		{$v.taxon_formatted}</option>
 	{/if}
 	{/foreach}
+	{*<option disabled="disabled"></option><option value="-99">{t}(orphan){/t}</option>*}
 	</select>
 		</td>
 		<td>
