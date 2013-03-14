@@ -55,7 +55,7 @@
 				{if $firstlevel==-1}{assign var=firstlevel value=$taxon.level}{/if}
 				{assign var=dots value=$taxon.level-$firstlevel}
 				{if $dots<0}{assign var=dots value=0}{/if}
-				{' . '|str_repeat:$dots}
+				{'.'|str_repeat:$dots}
 				{if $ranks[$taxon.rank_id].rank}{$ranks[$taxon.rank_id].rank}{/if}
 				<a href="edit.php?id={$taxon.id}">{$taxon.taxon}</a>{* {$taxon.id}::p{$taxon.parent_id *}
 			</td>
