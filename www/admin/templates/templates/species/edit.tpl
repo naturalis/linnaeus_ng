@@ -1,5 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-{literal}
+{* literal}
 <script>
 function bla() {
 
@@ -12,10 +12,8 @@ function bla() {
 	});
 	
 }
-
 </script>
-{/literal}
-
+{/literal *}
 <div id="page-main">
 {if $allowed}
 <form id="theForm" method="post" action="">
@@ -52,7 +50,7 @@ function bla() {
 		</td>
 		<td>
 			<span id="rank-message" class=""></span>
-            <span style="cursor:pointer" onclick="bla();">&xi;&Xi;&Xi;</span>
+            {* <span style="cursor:pointer" onclick="bla();">&xi;&Xi;&Xi;</span> *}
 		</td>
 	</tr>
 
