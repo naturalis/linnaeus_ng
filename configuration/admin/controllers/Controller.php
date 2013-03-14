@@ -390,11 +390,13 @@ class Controller extends BaseClass
      */
     public function getCurrentUserProjects ()
     {
+		
         foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
             
             $r = array(
                 'id' => $val['project_id'], 
                 'name' => $val['project_name'], 
+                'title' => $val['project_title'], 
                 'active' => $val['active'], 
                 'member' => $val['member']
             );
@@ -661,6 +663,7 @@ class Controller extends BaseClass
                     $userProjectRoles[] = array_merge($val, 
                     array(
                         'project_name' => $p['sys_name'], 
+                        'project_title' => $p['title'], 
                         'role_name' => $r['role'], 
                         'role_description' => $r['description']
                     ));

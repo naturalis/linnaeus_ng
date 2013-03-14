@@ -1,12 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-
-{if !empty($messages)}
-<div id="page-block-messages">
-{section name=i loop=$messages}
-<span class="admin-message">{$messages[i]}</span><br />
-{/section}
-</div>
-{/if}
+{include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
 {t}Select a project to work on:{/t}
@@ -14,7 +7,7 @@
 {section name=i loop=$projects}
 {if $projects[i].active == '1' && $projects[i].id != 0}
 <li>
-	<a href="?project_id={$projects[i].id}">{if $projects[i].name!=''}{$projects[i].name}{else}[untitled]{/if}</a>
+	<a href="?project_id={$projects[i].id}">{if $projects[i].title!=''}{$projects[i].title}{else}{$projects[i].name}{/if}</a>
 {if !$projects[i].member}<span title="you are not actually asssigned to this project">(*)</span>{/if}
 {if $session.admin.project.id==$projects[i].id}<span title="current active project">{t}(current){/t}</span>{/if}
 {/if}
