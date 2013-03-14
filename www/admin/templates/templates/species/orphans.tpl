@@ -25,7 +25,7 @@
 			{$ranks[$v.rank_id].rank}
 		</td>
 		<td style="padding-right:20px;">
-			{$v.taxon}
+			<a href="edit.php?id={$v.id}">{$v.taxon}</a>
 		</td>
 		{if $session.admin.project.includes_hybrids==1}
 		<td style="padding-right:20px;">

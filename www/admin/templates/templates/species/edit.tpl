@@ -8,6 +8,12 @@
 <input name="id" id="id" type="hidden" value="{$data.id}"  />
 <input name="org_parent_id" id="org_parent_id" type="hidden" value="{$data.parent_id}"  />
 
+{if $projectRanks[$data.rank_id].lower_taxon==1}
+{assign var=isHigherTaxa value=false}
+{else}
+{assign var=isHigherTaxa value=true}
+{/if}
+
 {if $data.id}<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$data.id}','_top')" />{/if}
 <table>
 	<tr>

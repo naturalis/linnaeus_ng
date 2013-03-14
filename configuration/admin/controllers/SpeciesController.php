@@ -414,7 +414,8 @@ class SpeciesController extends Controller
     public function editAction ()
     {
         $this->checkAuthorisation();
-        
+
+      
         if (!$this->rHasId())
             $this->redirect('new.php');
         
@@ -424,7 +425,7 @@ class SpeciesController extends Controller
         $data = $this->getTaxonById();
         
         $pr = $this->newGetProjectRanks();
-        
+
         $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
         
         if (count((array) $pr) == 0) {
@@ -2817,6 +2818,16 @@ class SpeciesController extends Controller
         
         // variations & related are only shown for NBC matrix projects
         $this->_useNBCExtras = $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'NBC';
+
+
+
+
+
+
+
+
+
+
         
         $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
         $this->smarty->assign('useRelated', $this->useRelated);

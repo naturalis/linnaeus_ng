@@ -2673,9 +2673,6 @@ class Controller extends BaseClass
     {
         if (isset($_SESSION['admin']['system']['highertaxa']) && $_SESSION['admin']['system']['highertaxa'] === true) {
             // "abusing" this controller for the higher taxa
-            
-
-
             $this->setControllerMask('highertaxa', 'Higher taxa');
             
             return true;
