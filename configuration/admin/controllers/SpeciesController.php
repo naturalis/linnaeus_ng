@@ -256,13 +256,13 @@ class SpeciesController extends Controller
             
             $contentCount = $this->getContentTaxaCount();
             
-            $synonymsCount = null;//$this->getSynonymCount();
+            $synonymsCount = $this->getSynonymCount();
             
-            $commonnameCount = null;//$this->getCommonnameCount();
+            $commonnameCount = $this->getCommonnameCount();
             
-            $mediaCount = null;//$this->getMediaTaxonCount();
+            $mediaCount = $this->getMediaTaxonCount();
             
-            $literatureCount = null;//$this->getLiteratureTaxonCount();
+            $literatureCount = $this->getLiteratureTaxonCount();
             
             foreach ((array) $taxa as $key => $taxon) {
                 
@@ -279,7 +279,6 @@ class SpeciesController extends Controller
             
             if (count((array) $taxa) == 0)
                 $this->addMessage($this->translate('There are no taxa for you to edit.'));
-                
 
                 //if (true) {
             if ($this->maskAsHigherTaxa()) {

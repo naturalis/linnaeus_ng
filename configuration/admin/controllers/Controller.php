@@ -1870,7 +1870,7 @@ class Controller extends BaseClass
     public function newGetUserAssignedTaxonTree ($p)
     {
         $taxa = $this->newGetTaxonTree($p);
-return $taxa;
+
         $userTaxa = $this->newGetUserTaxa();
         
         $taxa = $this->newSetTaxaUserAllowable(array(
