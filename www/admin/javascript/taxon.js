@@ -456,7 +456,8 @@ function taxonDeleteData(id,name) {
 			if (data=='<redirect>') {
 				window.open('delete.php?id='+id+'&time='+allGetTimestamp(),'_self');
 			} else {
-				window.open('list.php','_self');
+				//window.open('list.php','_self');
+				window.open('manage.php','_self');
 			}
 
 		}
