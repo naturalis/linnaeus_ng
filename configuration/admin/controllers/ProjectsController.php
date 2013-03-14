@@ -1569,305 +1569,135 @@ class ProjectsController extends Controller
 	}
 
 
-    private function mergeIntroduction ($p)
-    {
-        $this->models->ContentIntroduction->update(
-			array('project_id' => $p['t'],'topic' => '#concat(topic,\''.mysql_real_escape_string($p['p']).'\')'),
-			array('project_id' => $p['s'])
-		);
-		
-		
-        $this->models->IntroductionPage->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-        $this->models->IntroductionMedia->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-    }
-
-    private function mergeGlossary ($p)
-    {
-        $this->models->Glossary->update(
-			array('project_id' => $p['t']),//,'term' => '#concat(term,\''.mysql_real_escape_string($p['p']).'\')'),
-			array('project_id' => $p['s'])
-		);
-        $this->models->GlossarySynonym->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-        $this->models->GlossaryMedia->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-    }
-
-    private function mergeLiterature ($p)
-    {
-        $this->models->LiteratureTaxon->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-        $this->models->Literature->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-    }
-
-	private function mergeTaxonContent($p)
-	{
-
-		// all source categories
-        $oldCats = $this->models->PageTaxon->_get(array(
-            'id' => array('id' => $p['s']),
-			'fieldAsIndex' => 'id'
-        ));
-		
-		$del = array();
-		
-		// see if any source categories already exist by name in the target
-		foreach((array)$oldCats as $key => $oldCat) {
-
-			$d = $this->models->PageTaxon->_get(array(
-				'id' => array('id' => $p['t'],'page' => $oldCat['page'])
-			));
-
-			// if so, we are going to give the pages in that category a new category (the matching one in the target) and delete the category in the source
-			if ($d[0]) {
-				$del[] = $oldCat['id'];
-				$oldCats[$key]['id'] = $d[0]['id'];
-			}
-
-		}
-
-		if ($del) {
-			// delete the duplicate categories in the source
-			$this->models->PageTaxon->delete(
-				array(
-					'project_id' => $p['s'],
-					'id in'=> '('.implode(',',$del).')'
-				)
-			);
-			$this->models->PageTaxon->delete(
-				array(
-					'project_id' => $p['s'],
-					'page_id in'=> '('.implode(',',$del).')'
-				)
-			);
-		}
-				
-		// update the rest to the target
-		$this->models->PageTaxon->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-		
-		$this->models->PageTaxonTitle->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-		
-		foreach((array)$oldCats as $key => $val) {
-
-			// set new category for the pages of the now deleted source categories
-			$this->models->ContentTaxon->update(
-				array('page_id' => $val),
-				array(
-					'project_id' => $p['s'],
-					'page_id' => $key
-				)
-			);
-
-		}
-	
-		// update the rest to the target
-        $this->models->ContentTaxon->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-
-		// fuck the undo
-        $this->models->ContentTaxonUndo->delete(array(
-            'project_id' => $p['s']
-        ));
-
-		// and the sections (they're just templates anyway)
-        $this->models->Section->delete(array(
-            'project_id' => $p['s']
-        ));
-
-
-	}			
-
-    private function mergeTaxa ($p)
-    {
-
-        $this->models->Taxon->update(
-			array('project_id' => $p['t']),
-			array('project_id' => $p['s'])
-		);
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-	private function doMergeProject($sourceId,$targetId,$postfix)
-	{
-		
-		// get all (free)modules from the source project
-		$modules = $this->getProjectModules(array('project_id'=>$sourceId));
-
-		$sourceId = 100001;
-		$targetId = 666;
-
-		//prelim
-//$this->deleteProjectLanguage($projectId);		add other and resolve - oh no, they are literals everywhere. hurrah!
-
-
-		$p = array('s' => $sourceId,'t' => $targetId,'p' => $postfix);
-        
-		foreach((array)$modules['modules'] as $val) {
-
-//$this->deleteModulesFromProject($projectId);
-
-
-			switch($val['module_id']) {
-
-				case MODCODE_INTRODUCTION:
-					$this->mergeIntroduction($p);	// all get a suffix in the title
-					break;
-				case MODCODE_GLOSSARY:
-					$this->mergeGlossary($p);		// duplicates might occur, no solution (cannor be deleted becuase of internal links, need auto-forwarding)
-					break;
-				case MODCODE_LITERATURE:
-					$this->mergeLiterature($p);		// duplicates might occur, no solution (cannor be deleted becuase of internal links, need auto-forwarding)
-					break;
-				case MODCODE_SPECIES:
-					$this->mergeTaxonContent($p);
-					$this->mergeTaxa($p);
-					
-
-//$this->deleteCommonnames($projectId);
-//$this->deleteSynonyms($projectId);
-//$this->deleteSpeciesMedia($projectId);
-//$this->deleteSpeciesContent($projectId);
-//$this->deleteSpecies($projectId);
-//$this->deleteProjectRanks($projectId);
-
-					break;
-				case MODCODE_HIGHERTAXA:
-					break;
-				case MODCODE_KEY:
-					//$this->deleteDichotomousKey($projectId);
-					break;
-				case MODCODE_MATRIXKEY:
-					//$this->deleteMatrices($projectId);
-					break;
-				case MODCODE_DISTRIBUTION:
-					//$this->deleteGeoData($projectId);
-					break;
-				
-			}
-
-
-		}
-
-/*
-		// eXTEARS!
-		$this->mergeNBCKeydata($p);
-*/
-
-
-
-
-		foreach((array)$modules['freeModules'] as $val) {
-//        $this->deleteFreeModules($projectId);
-		}
-
-// move css
-// move media
-		
-		/*
-		
-			leads to possible doubles in (cannot be deleted due to internal links)
-				glossary
-				literature
-				(species)
-				
-			prepend name of duplicates
-				- introduction
-				- additional modules
-				- matrix
-				
-			we need a duplicate doorverwijs system
-
-
-		*/
-		
-	}
-
-	public function mergeAction()
+	public function changeIdAction()
     {
         $this->checkAuthorisation(true);
         
-        $this->setPageName($this->translate('Merge project'));
+        $this->setPageName($this->translate('Change a project ID'));
         
         $this->setBreadcrumbRootName($this->translate('System administration'));
         
-		die('in progress');
-		
         $this->setSuppressProjectInBreadcrumbs();
-        
-        if ($this->rHasVal('id')) {
 
-			$merge = $this->models->Project->_get(array(
-				'id' => array('id' => $this->requestData['id']),
-				'order' => 'title'
-			));        
-
-			$this->smarty->assign('merge',$merge[0]);
-
-        }		
-
-        if ($this->rHasVal('action', 'merge') && $this->rHasVal('id')) {// && !$this->isFormResubmit()) {
-
-			$this->doMergeProject($this->requestData['id'],$this->getCurrentProjectId(),' ('.$merge[0]['title'].')');
-        
-            $this->reInitUserRolesAndRights();
+		$projects = $this->models->Project->_get(array(
+			'id' => '*'
+		));
+		
+        if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
             
-            $this->addMessage('Project merged.');
+            $this->addMessage('Project deleted.');
+        }
+        else
+		if ($this->rHasVal('newId')) {
+                
+            $p = $this->models->Project->_get(array(
+                'id' => array('id' => $this->requestData['newId']),
+            ));
+			
+			if ($p) {
+				
+				 $this->addError(sprintf($this->translate('A project with ID %s already exists (%s).'),$this->requestData['newId'],$p[0]['title']));
 
+			} else {
+
+
+				if ($this->rHasVal('action','change')) {
+					
+					$this->doChangeProjectId($this->requestData['p'],$this->requestData['newId']);
+					
+					$this->addError('satan parties!');
+					
+				} else {
+					
+					$projects = $this->models->Project->_get(array(
+						'id' => array('id' => $this->requestData['p']),
+					));
+								
+					$this->smarty->assign('newId', $this->requestData['newId']);
+					
+				}
+				
+				$this->smarty->assign('oldId', $this->requestData['p']);
+				
+			}
+			
         }
 		
-		$projects = $this->models->Project->_get(array(
-			'id' => array('id !=' => $this->getCurrentProjectId()),
-			'order' => 'title'
-		));        
-
-		$this->smarty->assign('current', $_SESSION['admin']['project']['title']);
 		$this->smarty->assign('projects', $projects);
+        
         $this->printPage();
-    }
 
+    }
+	
+
+	private function doChangeProjectId($oldId,$newId)
+	{
+
+//q($oldId);q($newId);
+
+		
+		$data = $this->models->Project->freeQuery('show tables');
+
+		$key = key($data[0]);
+		$prefix = $this->models->Project->getTablePrefix();
+		$pInUse = array();
+
+		foreach((array)$data as $val) {
+
+			$table = ($val[$key]);
+
+			if (substr($table,0,strlen($prefix))!==$prefix)
+				continue;
+				
+			echo $table.'<br />';
+
+/*
+
+			// all user tables, infrastructural tables and the project table itself lack a project_id column.
+			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
+	
+			foreach((array)$d as $dVal)
+				$pInUse[$dVal['project_id']]=$dVal['project_id'];
+				
+			//echo $table;q($d);
+*/
+		}
+		
+		return;	
+		
+		
+		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
+			if(is_dir($file)) {
+				$boom = array_pop(explode('/',$file));
+				if (is_numeric($boom))
+					$pInUse[intval($boom)] = intval($boom);
+			}
+		}
+		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
+			if(is_dir($file)) {
+				$boom = array_pop(explode('/',$file));
+				if (is_numeric($boom))
+					$pInUse[intval($boom)] = intval($boom);
+			}
+		}
+
+		$d = $this->models->Project->_get(array('id' => '*'));
+		
+		foreach((array)$d as $val) {
+
+			unset($pInUse[$val['id']]);
+			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
+
+		}
+		
+		foreach((array)$pInUse as $val) {
+	
+			$this->doDeleteProjectAction($val);
+			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
+
+		}
+		
+	}
 
 	
 }
