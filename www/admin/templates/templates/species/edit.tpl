@@ -1,4 +1,20 @@
 {include file="../shared/admin-header.tpl"}
+{literal}
+<script>
+function bla() {
+
+	var b = $('#parent-id :selected').text();
+	b = b.trim();
+	
+	$('#parent-id > option').each(function(i){
+		var s = $(this).text();
+		if (s.trim()==b) $(this).text(s+' <-----------------------------');
+	});
+	
+}
+
+</script>
+{/literal}
 
 <div id="page-main">
 {if $allowed}
@@ -20,23 +36,23 @@
 		<td>
 			{t}Parent taxon: {/t}
 		</td>
-		<td>		
-	<select name="parent_id" id="parent-id" style="width:300px">
-	<option value="-1">{t}No parent{/t}</option>
-	{foreach from=$taxa key=k item=v}
-	{if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
-		<option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
-		{section name=foo loop=$v.level-$taxa[0].level}
-		&nbsp;
-		{/section}		
-		{$v.taxon_formatted}</option>
-	{/if}
-	{/foreach}
-	{*<option disabled="disabled"></option><option value="-99">{t}(orphan){/t}</option>*}
-	</select>
+		<td>
+            <select name="parent_id" id="parent-id" style="width:300px">
+            <option value="-1">{t}No parent{/t}</option>
+            {foreach from=$taxa key=k item=v}
+            {if ($isHigherTaxa && $v.lower_taxon==0) || (!$isHigherTaxa)}
+                <option rank_id="{$v.rank_id}" root_rank_id="{$v.root_rank_id}" name="{$v.taxon}" value="{$v.id}" {if $data.parent_id==$v.id}selected="selected"{/if} >
+                {section name=foo loop=$v.level-$taxa[0].level}
+                &nbsp;
+                {/section}		
+                {$v.taxon_formatted}</option>
+            {/if}
+            {/foreach}
+            </select>
 		</td>
 		<td>
 			<span id="rank-message" class=""></span>
+            <span style="cursor:pointer" onclick="bla();">&xi;&Xi;&Xi;</span>
 		</td>
 	</tr>
 
