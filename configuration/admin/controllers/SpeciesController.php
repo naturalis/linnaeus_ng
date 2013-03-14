@@ -456,8 +456,6 @@ class SpeciesController extends Controller
                     $parentId = null;
                 else {
                     $parentId = $this->requestData['parent_id'];
-					if ($parentId=-99)
-						$parentId = $this->requestData['id'];
 				}
 
 					
