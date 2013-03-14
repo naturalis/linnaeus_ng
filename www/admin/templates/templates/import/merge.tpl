@@ -45,7 +45,7 @@
     </table>
 </p>
 <p>
-	Other modules, like the index, are dynamically generated.
+	Other modules, like the index, are generated dynamically.
 </p>
 <p>
     <input type="hidden" name="action" value="merge">
