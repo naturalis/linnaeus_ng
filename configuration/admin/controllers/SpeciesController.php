@@ -221,10 +221,9 @@ class SpeciesController extends Controller
 
     private function knurft($pId=null,$level=0)
     {
-     
-	 
 	 
 		$id['project_id'] = $this->getCurrentProjectId();
+
         if ($pId === null)
 			$id['parent_id is'] = $pId;
         else
@@ -350,7 +349,7 @@ class SpeciesController extends Controller
      *
      * @access    public
      */
-    public function listAction ()
+    public function listActionTEST ()
     {
         $this->checkAuthorisation();
 	
@@ -445,7 +444,7 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
-    public function listActionORG ()
+    public function listAction ()
     {
         $this->checkAuthorisation();
         
