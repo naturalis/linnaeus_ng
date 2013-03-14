@@ -1870,7 +1870,7 @@ class Controller extends BaseClass
     public function newGetUserAssignedTaxonTree ($p)
     {
         $taxa = $this->newGetTaxonTree($p);
-        
+return $taxa;
         $userTaxa = $this->newGetUserTaxa();
         
         $taxa = $this->newSetTaxaUserAllowable(array(
@@ -2392,7 +2392,7 @@ class Controller extends BaseClass
         if ($level == 0)
             unset($this->treeList);
             
-            // setting the parameters for the taxon search
+        // setting the parameters for the taxon search
         $id['project_id'] = $this->getCurrentProjectId();
         
         if ($pId === null) {
