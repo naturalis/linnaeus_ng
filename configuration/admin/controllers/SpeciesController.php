@@ -454,15 +454,11 @@ class SpeciesController extends Controller
                     $parentId = $this->requestData['org_parent_id'];
                 else if ($isEmptyTaxaList || $this->requestData['parent_id'] == '-1')
                     $parentId = null;
-                else {
+                else
                     $parentId = $this->requestData['parent_id'];
-				}
-
-					
-
 
                 $parent = $this->getTaxonById($parentId);
-                
+				
                 $newName = $this->requestData['taxon'];
                 
                 $newName = trim(preg_replace('/\s+/', ' ', $newName));
@@ -536,6 +532,10 @@ class SpeciesController extends Controller
                 }
                 
                 // 2. Issue warning if a species is not linked to an ideal parent.
+				if (is_null($parent)) {
+                    $this->addError($this->translate('No parent selected (you can still save).'));
+                    $hasErrorButCanSave = true;
+                } else
 				if (isset($pr[$this->requestData['rank_id']]['ideal_parent_id']) && $parent['rank_id'] != $pr[$this->requestData['rank_id']]['ideal_parent_id']) {
                     $this->addError(
                     sprintf($this->translate('A %s should be linked to %s. This relationship is not enforced, so you can link to %s, but this may result in problems with the classification.'), 
@@ -562,11 +562,12 @@ class SpeciesController extends Controller
                 
 
                 /* LETHAL */
-                if (!$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
+                if (!is_null($parent) && !$this->canParentHaveChildTaxa($this->requestData['parent_id']) || $isEmptyTaxaList) {
                     $this->addError($this->translate('The selected parent taxon can not have children.'));
                     $hasErrorButCanSave = false;
                 }
-                else {
+                else
+				if(!is_null($parent)) {
                     
                     if (!$this->doNameAndParentMatch($newName, $parent['taxon'])) {
                         $this->addError(sprintf($this->translate('"%s" cannot be selected as a parent for "%s".'), $parent['taxon'], $newName));
@@ -5171,6 +5172,7 @@ class SpeciesController extends Controller
 
     private function doNameAndParentMatch ($name, $parent)
     {
+		
         if (strpos($name, ' ') == false)
             return true;
         

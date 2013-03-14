@@ -1301,7 +1301,7 @@ class Controller extends BaseClass
 
     public function getTaxonById ($id = false)
     {
-        $id = $id ? $id : (isset($this->requestData['id']) ? $this->requestData['id'] : null);
+        $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
 
         $t = $this->models->Taxon->_get(
         array(
