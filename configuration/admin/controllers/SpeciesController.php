@@ -256,13 +256,13 @@ class SpeciesController extends Controller
             
             $contentCount = $this->getContentTaxaCount();
             
-            $synonymsCount = $this->getSynonymCount();
+            $synonymsCount = null;//$this->getSynonymCount();
             
-            $commonnameCount = $this->getCommonnameCount();
+            $commonnameCount = null;//$this->getCommonnameCount();
             
-            $mediaCount = $this->getMediaTaxonCount();
+            $mediaCount = null;//$this->getMediaTaxonCount();
             
-            $literatureCount = $this->getLiteratureTaxonCount();
+            $literatureCount = null;//$this->getLiteratureTaxonCount();
             
             foreach ((array) $taxa as $key => $taxon) {
                 
@@ -276,32 +276,6 @@ class SpeciesController extends Controller
                 
                 $taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
             }
-            
-
-            /*
-			// user requested a sort of the table
-			if ($this->rHasVal('key')) {
-
-				$sortBy = array(
-					'key' => $this->requestData['key'], 
-					'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
-					'case' => 'i'
-				);
-			
-				// sort array of collaborators
-				$this->customSortArray($taxa, $sortBy);
-	
-			} else {
-			// default sort order
-				
-				$sortBy = array(
-					'key' => 'taxon', 
-					'dir' => 'asc', 
-					'case' => 'i'
-				);
-			
-			}
-			*/
             
             if (count((array) $taxa) == 0)
                 $this->addMessage($this->translate('There are no taxa for you to edit.'));
