@@ -1,19 +1,5 @@
 {include file="../shared/admin-header.tpl"}
-{* literal}
-<script>
-function bla() {
 
-	var b = $('#parent-id :selected').text();
-	b = b.trim();
-	
-	$('#parent-id > option').each(function(i){
-		var s = $(this).text();
-		if (s.trim()==b) $(this).text(s+' <-----------------------------');
-	});
-	
-}
-</script>
-{/literal *}
 <div id="page-main">
 {if $allowed}
 <form id="theForm" method="post" action="">
@@ -167,6 +153,21 @@ taxonStoreCopyableTaxa('{$prev}');
 </script>
 {/literal}
 
+{* literal}
+<script>
+function bla() {
+
+	var b = $('#parent-id :selected').text();
+	b = b.trim();
+	
+	$('#parent-id > option').each(function(i){
+		var s = $(this).text();
+		if (s.trim()==b) $(this).text(s+' <-----------------------------');
+	});
+	
+}
+</script>
+{/literal *}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
