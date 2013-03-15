@@ -18,6 +18,7 @@
 		<th colspan="2">{t}Attach to parent:{/t}</th>
 		<th>{t}Do nothing{/t}</th>
 	</tr>
+    
 	{foreach from=$taxa key=k item=v}
 	{assign var=x value=$v.rank_id}
 	<tr class="tr-highlight">
@@ -43,10 +44,8 @@
 		<select name="parent[{$v.id}]" id="parent-{$v.id}" onchange="taxonOrphanChangeSelect(this)">
 			{foreach from=$tree key=pk item=pv}
 			<option value="{$pv.id}" {if $data.parent_id==$v.id}selected="selected"{/if}>
-			{section name=foo loop=$pv.level}
-			&nbsp;
-			{/section}		
-			{$pv.taxon} ({$ranks[$pv.rank_id].rank})</option>
+            {'&nbsp;&nbsp;'|str_repeat:$pv.level}
+			{$pv.taxon_formatted}</option>
 			{/foreach}
 		</select>
 		</td>
