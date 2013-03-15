@@ -48,6 +48,7 @@
 			{$pv.taxon_formatted}</option>
 			{/foreach}
 		</select>
+        <input type="button" value="&larr;" onclick="bla('text-{$v.id}','parent-{$v.id}');"/><input id="text-{$v.id}" type="text" value="" />
 		</td>
 		<td style="text-align:center">
 			<input type="radio" checked="checked" name="child[{$v.id}]" value="ignore" />
@@ -89,6 +90,26 @@
 <a href="list.php">{t}Back{/t}</a>
 {/if}
 </div>
+
+
+{literal}
+<script>
+function bla(src,tgt) {
+
+	var b = $('#'+src).val();
+	b = b.trim();
+	
+	$('#'+tgt+' > option').each(function(i){
+		var s = $(this).text();
+		if (s.trim()==b) $(this).text(s+' <-----------------------------');
+	});
+	
+}
+</script>
+{/literal}
+
+
+
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}
