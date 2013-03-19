@@ -132,7 +132,6 @@
 	{assign var=resultCount value=$res.data|@count}
 	{if $results.dichkey.subsetsWithResults>1}<div class="subset-header{if $resultCount==0}-zero{/if}">{$resultCount} {t}in{/t} {$res.label|@strtolower}</div>{/if}
 	<div class="subset">
-		<p class="c3"><span style="color: red;">{t}It is not possible to jump directly to a specific step or choice of the dichotomous key{/t}.</span> {t _s1='<a href="../key/">' _s2=</a>}%sStart the key from the start%s.{/t}</p>
 		{foreach from=$res.data key=k item=v name=r}
 		{if $smarty.foreach.r.first || $background=='c2'}
 			{assign var="background" value="c1"}
@@ -140,9 +139,17 @@
 			{assign var="background" value="c2"}
 		{/if}
 		<p class="{$background}"><span>
+        {if $v.choice_id}
+        <a class="result" href="../key/index.php?forcetree=1&choice={$v.choice_id}">
+        {elseif $v.keystep_id}
+		<a class="result" href="../key/index.php?forcetree=1&step={$v.keystep_id}">
+        {/if}
 			{if $v.label}{t}Step{/t} {$v.number}:{h search=$search} {$v.label}{/h}
 			{elseif $v.content}{t}Step{/t} {$v.number} ("{$v.title}"){if $v.marker}, {t}choice{/t} {$v.marker}{/if}: "{foundContent search=$search}{$v.content}{/foundContent}"
 			{/if}
+        {if $v.choice_id || $v.keystep_id}
+        </a>
+        {/if}
 		</span></p>
 		{/foreach}
 	</div>

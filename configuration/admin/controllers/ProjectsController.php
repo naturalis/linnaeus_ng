@@ -49,7 +49,8 @@ class ProjectsController extends Controller
         'characteristic_label_state', 
         'glossary', 
         'glossary_synonym', 
-        'glossary_media', 
+        'glossary_media',
+		'glossary_media_captions',
         'free_module_project', 
         'free_module_project_user', 
         'free_module_page', 
@@ -58,8 +59,10 @@ class ProjectsController extends Controller
         'occurrence_taxon', 
         'geodata_type', 
         'geodata_type_title', 
-        'l2_occurrence_taxon', 
-        'l2_map', 
+		'l2_occurrence_taxon',
+		'l2_occurrence_taxon_combi',
+		'l2_diversity_index',
+		'l2_map',
         'content_introduction', 
         'introduction_page', 
         'introduction_media', 
@@ -1089,6 +1092,13 @@ class ProjectsController extends Controller
         $this->models->L2OccurrenceTaxon->delete(array(
             'project_id' => $id
         ));
+        $this->models->L2OccurrenceTaxonCombi->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->L2DiversityIndex->delete(array(
+            'project_id' => $id
+        ));
+
     }
 
 
@@ -1170,6 +1180,11 @@ class ProjectsController extends Controller
         $this->models->GlossaryMedia->delete(array(
             'project_id' => $id
         ));
+
+        $this->models->GlossaryMediaCaptions->delete(array(
+            'project_id' => $id
+        ));
+
         $this->models->GlossarySynonym->delete(array(
             'project_id' => $id
         ));
@@ -1314,7 +1329,7 @@ class ProjectsController extends Controller
 
 
 
-    private function deleteMedia ($projectId, $pageId, $paths)
+    private function deleteFreeModuleMedia ($projectId, $pageId, $paths)
     {
         if (empty($projectId) || empty($pageId))
             return;
@@ -1360,15 +1375,17 @@ class ProjectsController extends Controller
         $fmp = $this->models->FreeModulePage->_get(array(
             'id' => $d
         ));
-        
+
+
         $paths = $this->makePathNames($id);
         
         foreach ((array) $fmp as $key => $val) {
             
-            $this->deleteMedia($id, $val['id'], $paths);
+            $this->deleteFreeModuleMedia($id, $val['id'], $paths);
         }
         
         $this->models->FreeModulePage->delete($d);
+        $this->models->FreeModuleMedia->delete($d);
         
         unset($d);
         
@@ -1399,7 +1416,8 @@ class ProjectsController extends Controller
     }
 
 
-	private function rrmdir($dir) {
+	private function rrmdir($dir)
+	{
 		if (!file_exists($dir)) return;
 		foreach(glob($dir . '/*') as $file) {
 			if(is_dir($file))
@@ -1424,14 +1442,12 @@ class ProjectsController extends Controller
     }
 
 
-
     private function deleteProject ($id)
     {
         $p = $this->models->Project->delete(array(
             'id' => $id
         ));
     }
-
 
 
     private function addAllModulesToProject ($id)
@@ -1446,7 +1462,6 @@ class ProjectsController extends Controller
     }
 
 
-
     private function deleteProjectCssFile ($id)
     {
         $p = $this->models->Project->_get(array(
@@ -1457,13 +1472,13 @@ class ProjectsController extends Controller
     }
 
 
-
     private function deleteProjectSettings ($id)
     {
         $this->models->Settings->delete(array(
             'project_id' => $id
         ));
     }
+
 
     private function deleteOtherStuff ($id)
     {
@@ -1527,7 +1542,7 @@ class ProjectsController extends Controller
 
 			// all user tables, infrastructural tables and the project table itself lack a project_id column.
 			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
-	
+
 			foreach((array)$d as $dVal)
 				$pInUse[$dVal['project_id']]=$dVal['project_id'];
 				
@@ -1583,12 +1598,7 @@ class ProjectsController extends Controller
 			'id' => '*'
 		));
 		
-        if ($this->rHasVal('action', 'delete') && $this->rHasVal('id') && !$this->isFormResubmit()) {
-            
-            $this->addMessage('Project deleted.');
-        }
-        else
-		if ($this->rHasVal('newId')) {
+		if ($this->rHasVal('newId') && !$this->isFormResubmit()) {
                 
             $p = $this->models->Project->_get(array(
                 'id' => array('id' => $this->requestData['newId']),
@@ -1605,8 +1615,8 @@ class ProjectsController extends Controller
 					
 					$this->doChangeProjectId($this->requestData['p'],$this->requestData['newId']);
 					
-					$this->addError('satan parties!');
-					
+					$this->smarty->assign('done', true);
+
 				} else {
 					
 					$projects = $this->models->Project->_get(array(
@@ -1633,9 +1643,6 @@ class ProjectsController extends Controller
 	private function doChangeProjectId($oldId,$newId)
 	{
 
-//q($oldId);q($newId);
-
-		
 		$data = $this->models->Project->freeQuery('show tables');
 
 		$key = key($data[0]);
@@ -1648,55 +1655,39 @@ class ProjectsController extends Controller
 
 			if (substr($table,0,strlen($prefix))!==$prefix)
 				continue;
+
+			$d = $this->models->Project->freeQuery('select count(*) as total from '.$table.' where project_id = '.$oldId);
+			
+			if ($d[0]['total']>0) {
+			
+				$this->models->Project->freeQuery('update '.$table.' set project_id = '.$newId.' where project_id = '.$oldId);
+				$this->addMessage('Updated '.$table);
 				
-			echo $table.'<br />';
-
-/*
-
-			// all user tables, infrastructural tables and the project table itself lack a project_id column.
-			$d = $this->models->Project->freeQuery('select distinct project_id from '.$table);
-	
-			foreach((array)$d as $dVal)
-				$pInUse[$dVal['project_id']]=$dVal['project_id'];
-				
-			//echo $table;q($d);
-*/
-		}
-		
-		return;	
-		
-		
-		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = array_pop(explode('/',$file));
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
 			}
-		}
-		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
-			if(is_dir($file)) {
-				$boom = array_pop(explode('/',$file));
-				if (is_numeric($boom))
-					$pInUse[intval($boom)] = intval($boom);
-			}
-		}
-
-		$d = $this->models->Project->_get(array('id' => '*'));
-		
-		foreach((array)$d as $val) {
-
-			unset($pInUse[$val['id']]);
-			$this->addMessage(sprintf('Ignoring "%s"',$val['sys_name']));
 
 		}
-		
-		foreach((array)$pInUse as $val) {
 	
-			$this->doDeleteProjectAction($val);
-			$this->addMessage(sprintf('Deleted data for orphan ID %s',$val));
+		rename(
+			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($oldId),
+			$this->generalSettings['directories']['mediaDirProject'].'/'.$this->getProjectFSCode($newId)
+		);
 
-		}
-		
+		$this->addMessage('Renamed media directory');
+
+		rename(
+			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($oldId),
+			$this->generalSettings['directories']['cache'].'/'.$this->getProjectFSCode($newId)
+		);
+
+		$this->addMessage('Renamed cache directory');
+
+		$this->models->Project->update(
+			array('id'=>$newId),
+			array('id'=>$oldId)
+		);
+
+		$this->addMessage('Updated project table');
+	
 	}
 
 	
