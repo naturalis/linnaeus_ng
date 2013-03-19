@@ -932,7 +932,14 @@ class SpeciesController extends Controller
         
 
 
-        $this->smarty->assign('returnText', $this->makeLookupList($l, ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'), '../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'));
+        $this->smarty->assign(
+			'returnText', 
+			$this->makeLookupList(
+				$l, 
+				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
+			)
+		);
     }
 
 
