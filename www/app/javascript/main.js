@@ -107,11 +107,11 @@ function _(text) {
 	//return text;
 
 	/* TO BE DONE */
-	for(var i=0;i<allTranslations.length;i++) {
-		if (allTranslations[i][0]==text) {
-			return allTranslations[i][1];
-		}
-	}
+//	for(var i=0;i<allTranslations.length;i++) {
+//		if (allTranslations[i][0]==text) {
+//			return allTranslations[i][1];
+//		}
+//	}
 
 	var translation = $.ajax({
 	        type: "POST",
