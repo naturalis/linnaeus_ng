@@ -119,8 +119,6 @@ function _(text) {
 	        url: "../utilities/ajax_interface.php",
 	        data: ({text: text, action: 'translate'})
 	        }).responseText;
-alert(translation);
-
 
 	allTranslations[allTranslations.length]=[text,translation];
 
