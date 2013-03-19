@@ -74,7 +74,7 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 
 function interfaceDeleteTag(id) {
 
-	$('<input type="hidden" name="start">').val($('#currStart').val()).appendTo('#theForm');
+	if ($('#currStart').val()) $('<input type="hidden" name="start">').val($('#currStart').val()).appendTo('#theForm');
 	$('<input type="hidden" name="action">').val('delete').appendTo('#theForm');
 	$('<input type="hidden" name="id">').val(id).appendTo('#theForm');
 	$('#theForm').submit();
