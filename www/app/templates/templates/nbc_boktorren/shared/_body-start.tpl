@@ -21,16 +21,16 @@
                         <a href="identify.php">Home</a>
                     </li>
                     <li>
-                        <a href="http://www.nederlandsesoorten.nl/nsr/nsr/i000222.html">Over Boktorren Facetdeterminatie</a>
+                        <a href="http://www.nederlandsesoorten.nl/nsr/nsr/i000222.html">Over Boktorren Determineren</a>
                         <ul>
                             <li class=" first">
-                                <a href="#">Doel en uitgangspunten</a>
+                                <a target="_blank" href="http://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/recognition">Lichaamsbouw en herkenning</a>
                             </li>
                             <li class="">
-                                <a href="http://www.nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND">Taxonomie</a>
+                                <a target="_blank" href="ttp://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/biology">Levenswijze</a>
                             </li>
                             <li class="">
-                                <a href="#">...</a>
+                                <a target="_blank" href="http://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/research">Boktorren zoeken</a>
                             </li>
                         </ul>
                     </li>
