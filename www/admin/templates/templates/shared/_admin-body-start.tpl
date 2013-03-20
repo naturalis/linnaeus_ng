@@ -41,7 +41,7 @@
 			{/if}
 		{/if}
 	{/section}
-{if $isMultiLingual}
+{if $isMultiLingual && $uiLanguages|@count>1}
 	<span style="float:right">
 	{section name=i loop=$uiLanguages}
 	{if $uiLanguages[i].id == $uiCurrentLanguage}

@@ -37,7 +37,7 @@
                 <input id="free-{$v.id}" type="checkbox" name="freeModules[]" value="{$v.id}" -checked="checked"/>
             </td>
             <td>
-                <label for="free-{$v.id}" style="cursor:pointer"><span style="color:#999">{$moduleInfo.free}</span></label><br />
+                <label for="free-{$v.id}" style="cursor:pointer">{$v.module}</label><br />
                 <span style="color:#999">{$moduleInfo.free}</span>
             </td>
         </tr>
