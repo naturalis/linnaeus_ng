@@ -222,7 +222,6 @@ class Controller extends BaseClass
     }
 
 
-
     /**
      * Destroys!
      *
@@ -650,6 +649,11 @@ class Controller extends BaseClass
         return isset($this->appName) ? $this->appName : false;
     }
 
+
+    public function getfullPath ()
+    {
+        return isset($this->_fullPath) ? $this->_fullPath : null;
+    }
 
 
     /**
