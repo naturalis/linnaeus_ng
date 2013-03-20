@@ -3039,9 +3039,12 @@ class Controller extends BaseClass
 	{
 		
 		$d = $this->getSetting('suppress_splash');
+
 		if ($d==1) {
+
 			$this->setCheckForSplash(false);
 			$_SESSION['app']['project']['showedSplash']=true;
+
 		}
 		
 	}
