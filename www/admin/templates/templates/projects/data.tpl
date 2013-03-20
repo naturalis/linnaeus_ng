@@ -39,6 +39,14 @@
 	</tr>
 	<tr>
 		<td>
+			{t}Short name for URL:{/t}
+		</td>
+		<td colspan="2">
+			<input type="text" name="short_name" value="{$data.short_name}" style="width:300px;" />
+		</td>
+	</tr>
+	<tr>
+		<td>
 			{t}Group:{/t}
 		</td>
 		<td colspan="2">

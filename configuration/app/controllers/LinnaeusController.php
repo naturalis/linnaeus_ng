@@ -154,6 +154,14 @@ class LinnaeusController extends Controller
     public function rootIndexAction()
 	{
 
+		$id = $this->resolveProjectShortName();
+		
+		if ($id) {
+
+			$this->redirect('app/views/linnaeus/set_project.php?p='.$id);
+			
+		}
+		
 		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
 
 		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
@@ -205,6 +213,29 @@ class LinnaeusController extends Controller
 		return isset($c[0]) ? $c[0] : null;
 	
 	}
+
+
+	private function resolveProjectShortName()
+	{
+
+		$path = explode('/',$this->getfullPath());
+		$n = strtolower($path[1]);
+
+		if ($n!=$this->getAppName() && $n!='linnaeus_ng') {
+		
+			$p = $this->models->Project->_get(array(
+				'id' => array(
+					'short_name' => $n
+				)
+			));
+
+			return ((isset($p[0]['id']) &&  $p[0]['id'] != $this->getCurrentProjectId()) ? $p[0]['id'] : null);
+
+		}
+		
+	}
+
+
 
 
 }
