@@ -116,7 +116,8 @@ class configuration
                 'name' => 'linnaeus-login',
                 'lifetime' => 30, // days
             ),
-	        'uiLanguages' => array(LANGUAGECODE_ENGLISH,LANGUAGECODE_DUTCH),
+	        //'uiLanguages' => array(LANGUAGECODE_ENGLISH,LANGUAGECODE_DUTCH),
+	        'uiLanguages' => array(LANGUAGECODE_ENGLISH),
 			'soundPlayerPath' => '../../media/system/',
 			'soundPlayerName' => 'player_mp3.swf',
 			'useJavascriptLinks' => false,
