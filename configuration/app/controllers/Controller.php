@@ -156,7 +156,7 @@ class Controller extends BaseClass
     /**
      * Constructor, calls parent's constructor and all initialisation functions
      *
-     * The order in which the functions are called is relevant! Do not change without good reason and plan.
+     * The order in which the functions are called is relevant! Do not change without good reason, plan and extensive tests.
      *
      * @access     public
      */
@@ -209,6 +209,8 @@ class Controller extends BaseClass
         $this->setCurrentLanguageId();
         
         $this->checkBackStep();
+
+        $this->setOtherSettings();
         
         if ($this->getCheckForProjectId()) {
             
@@ -3031,4 +3033,17 @@ class Controller extends BaseClass
         
         return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
     }
+
+
+	private function setOtherSettings()
+	{
+		
+		$d = $this->getSetting('suppress_splash');
+		if ($d==1) {
+			$this->setCheckForSplash(false);
+			$_SESSION['app']['project']['showedSplash']=true;
+		}
+		
+	}
+
 }
