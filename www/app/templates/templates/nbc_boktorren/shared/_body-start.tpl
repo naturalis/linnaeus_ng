@@ -27,7 +27,7 @@
                                 <a target="_blank" href="http://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/recognition">Lichaamsbouw en herkenning</a>
                             </li>
                             <li class="">
-                                <a target="_blank" href="ttp://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/biology">Levenswijze</a>
+                                <a target="_blank" href="http://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/biology">Levenswijze</a>
                             </li>
                             <li class="">
                                 <a target="_blank" href="http://nederlandsesoorten.nl/nsr/concept/0AHCYFBROTND/research">Boktorren zoeken</a>
