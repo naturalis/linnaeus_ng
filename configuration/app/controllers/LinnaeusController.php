@@ -90,10 +90,20 @@ class LinnaeusController extends Controller
 			
 			$this->setCssFiles();
 		
-			if ($this->rHasVal('r')) 
-				$this->redirect($this->requestData['r']);
-			else
-				$this->redirect('index.php');
+			if ($this->rHasVal('r')) {
+
+				$url = $this->requestData['r'];
+
+			} else {
+				
+				$url = $this->getSetting('start_page');
+				
+				if (empty($url))
+					$url = 'index.php';
+
+			}
+			
+			$this->redirect($url);
 
 		}
 
@@ -229,7 +239,7 @@ class LinnaeusController extends Controller
 				)
 			));
 
-			return ((isset($p[0]['id']) &&  $p[0]['id'] != $this->getCurrentProjectId()) ? $p[0]['id'] : null);
+			return isset($p[0]['id']) ? $p[0]['id'] : null;
 
 		}
 		
