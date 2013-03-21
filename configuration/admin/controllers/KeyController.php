@@ -481,6 +481,7 @@ class KeyController extends Controller
         $this->smarty->assign('includeHtmlEditor', true);
         
         $this->printPage();
+
     }
 
     public function insertAction ()
@@ -917,7 +918,7 @@ class KeyController extends Controller
     {
 		
         $q = "
-				select _a.id, _a.taxon, _a.rank_id, _b.res_taxon_id, _d.rank, _c.lower_taxon, _c.keypath_endpoint
+				select distinct _a.id, _a.taxon, _a.rank_id, _b.res_taxon_id, _d.rank, _c.lower_taxon, _c.keypath_endpoint
 					from %PRE%taxa _a
 					left join %PRE%choices_keysteps _b
 						on _a.id = _b.res_taxon_id
