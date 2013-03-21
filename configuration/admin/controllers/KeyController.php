@@ -688,7 +688,7 @@ class KeyController extends Controller
 					
 				where _a.project_id = " . $this->getCurrentProjectId() ."
 					and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null 
-				order by number
+				order by _c.number, _a.show_order
 				
 			");
 //q($deadChoices,1);
