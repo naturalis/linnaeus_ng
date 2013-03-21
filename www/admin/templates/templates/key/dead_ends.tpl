@@ -29,8 +29,8 @@
 <ul>
 {foreach item=v from=$deadChoices}
 <li>{t}Step{/t} 
-	<span class="a" onclick="$('#step').val({$v.step.id});$('#stepForm').submit();">{$v.step.number}: "{$v.step.title}"</span>, 
-	<span class="a" onclick="$('#choice').val({$v.id});$('#choiceForm').submit();">{t}choice{/t} {$v.show_order}: "{$v.choice|@substr:0:50}{if $v.choice|@count_characters>50}...{/if}"</span></li>
+	<span class="a" onclick="$('#step').val({$v.step.id});$('#stepForm').submit();">{$v.number}: "{$v.title|@strip_tags}"</span>, 
+	<span class="a" onclick="$('#choice').val({$v.id});$('#choiceForm').submit();">{t}choice{/t} {$v.show_order}: "{$v.choice|@strip_tags|@trim|@substr:0:50}{if $v.choice|@count_characters>50}...{/if}"</span></li>
 {/foreach}
 </ul>
 {if $deadChoices|@count==0}There are currently no unconnected choices.{/if}

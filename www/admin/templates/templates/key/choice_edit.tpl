@@ -106,13 +106,11 @@
 					&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
 				</option>
 				{foreach from=$taxa key=k item=v}
-				{assign var=x value=$v.id}
 				{if $v.keypath_endpoint==1}
-				<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $remainingTaxa[$x]}-remain{/if}">
-					{$v.taxon}
-					{assign var=first value=false}{/if}
-					 ({$ranks[$v.rank_id].rank})
+				<option value="{$v.id}"{if $v.id==$data.res_taxon_id} selected="selected"{/if} class="key-taxa-list{if $v.id==$v.res_taxon_id}-remain{/if}">
+					{$v.taxon} ({$v.rank})
 				</option>
+                {/if}
 				{/foreach}
 			</select>
 			({t}taxon{/t})

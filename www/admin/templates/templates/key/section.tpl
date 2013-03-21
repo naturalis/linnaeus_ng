@@ -13,12 +13,12 @@
 {t}Available sections (click to edit):{/t}
 </p>
 <ul>
-{section name=i loop=$keySections}
+{foreach from=$keySections item=v}
 <li>
-	<a href="step_show.php?id={$keySections[i].id}">{t}Step{/t} {$keySections[i].number}: {$keySections[i].title}</a>
-&nbsp;(<a href="?action=setstart&id={$keySections[i].id}">set as key start</a>)
+	<a href="step_show.php?id={$v.id}">{t}Step{/t} {$v.number}: {$v.title}</a>
+&nbsp;(<a href="?action=setstart&id={$v.id}">set as key start</a>)
 </li>
-{/section}
+{/foreach}
 </ul>
 {/if}
 <a href="?action=new">{t}Start a new subsection{/t}</a>
