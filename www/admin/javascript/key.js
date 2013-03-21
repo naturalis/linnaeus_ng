@@ -373,3 +373,19 @@ function keyRestoreChoice(obj,language) {
 	allSetMessage(_('restored'));
 
 }
+
+function keyRemoveDeadEndChoice(id) {
+
+	$('#choice-'+id).remove();
+
+}
+
+function keyCallRemoveDeadEndChoice(id) {
+
+	if (
+		($('#res_taxon_id').val() > 0 || $('#res_keystep_id').val() > 0) &&
+		(typeof window.opener.keyRemoveDeadEndChoice == 'function')
+	)
+		window.opener.keyRemoveDeadEndChoice(id);
+
+}

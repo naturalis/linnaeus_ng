@@ -87,8 +87,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
-
     public function stepShowAction ()
     {
         $this->checkAuthorisation();
@@ -204,8 +202,6 @@ class KeyController extends Controller
         
         $this->printPage();
     }
-
-
 
     public function stepEditAction ()
     {
@@ -347,8 +343,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
-
     public function choiceEditAction ()
     {
         $this->checkAuthorisation();
@@ -489,7 +483,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
     public function insertAction ()
     {
         $this->checkAuthorisation();
@@ -561,7 +554,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
     public function sectionAction ()
     {
         $this->checkAuthorisation();
@@ -592,7 +584,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
     public function mapAction ()
     {
         $this->checkAuthorisation();
@@ -605,7 +596,6 @@ class KeyController extends Controller
         
         $this->printPage();
     }
-
 
     public function rankAction ()
     {
@@ -645,7 +635,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
     public function orphansAction ()
     {
         $this->checkAuthorisation();
@@ -657,7 +646,6 @@ class KeyController extends Controller
         $this->printPage();
     }
 
-
     public function deadEndsAction ()
     {
         $this->checkAuthorisation();
@@ -667,7 +655,9 @@ class KeyController extends Controller
 		$this->cleanUpChoices();
 
         $k = $this->getKeysteps();
-        
+		
+		$deadSteps =  $sadSteps = array();
+
         foreach ((array) $k as $key => $val) {
             
             $kc = $this->getKeystepChoices($val['id']);
@@ -679,24 +669,31 @@ class KeyController extends Controller
         }
 
 		$deadChoices = $this->models->ChoiceKeystep->freeQuery("
-			SELECT _a.*, _b.title, _c.number
+			SELECT _a.*, _b.title, _c.number, _d.choice_txt
 				from %PRE%choices_keysteps _a
+
 				left join %PRE%content_keysteps _b
 					on _b.keystep_id = _a.keystep_id
 					and _b.language_id = ".$this->getDefaultProjectLanguage()."
-					and _b.project_id = " . $this->getCurrentProjectId() ."
+					and _a.project_id = _b.project_id
+
 				left join %PRE%keysteps _c
 					on _c.id = _a.keystep_id
-					and _c.project_id = " . $this->getCurrentProjectId() ."
-				 where _a.project_id = " . $this->getCurrentProjectId() ."
-				 and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null 
-				 order by number
+					and _a.project_id = _c.project_id
+					
+				left join %PRE%choices_content_keysteps _d
+					on _a.id = _d.choice_id
+					and _a.project_id = _d.project_id
+					
+				where _a.project_id = " . $this->getCurrentProjectId() ."
+					and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null 
+				order by number
 				
 			");
-
-        $this->smarty->assign('deadSteps', isset($deadSteps) ? $deadSteps : false);
+//q($deadChoices,1);
+        $this->smarty->assign('deadSteps',$deadSteps);
         
-        $this->smarty->assign('sadSteps', isset($sadSteps) ? $sadSteps : false);
+        $this->smarty->assign('sadSteps',$sadSteps);
         
         $this->smarty->assign('deadChoices', $deadChoices);
         
@@ -835,14 +832,10 @@ class KeyController extends Controller
             $this->setStepsPerTaxon($val);
     }
 
-
-
     private function removeLastKeyPathEntry ()
     {
         return array_pop($_SESSION['admin']['system']['keyPath']);
     }
-
-
 
     private function updateKeyPath ($params)
     {

@@ -124,6 +124,7 @@
 			<input
 				type="button" 
 				onclick="
+					keyCallRemoveDeadEndChoice({$data.id});
 					if (keyChoiceContentCheck()){literal}{{/literal}
 						{if $session.admin.project.languages|@count>1}
 						keySaveChoiceContent('default');
