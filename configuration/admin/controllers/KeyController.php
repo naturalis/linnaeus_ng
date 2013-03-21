@@ -586,7 +586,7 @@ class KeyController extends Controller
         $this->setPageName($this->translate('Key sections'));
 
 		$keySections = $this->getKeySections();
-		
+
 		$this->smarty->assign('keySections', $keySections);
         
         $this->printPage();
@@ -656,23 +656,6 @@ class KeyController extends Controller
         
         $this->printPage();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public function deadEndsAction ()
@@ -834,8 +817,6 @@ class KeyController extends Controller
     {
         $this->redirect('../../../app/views/key/index.php?p=' . $this->getCurrentProjectId() . '&step=' . $this->requestData['step']);
     }
-
-
 
     private function setStepsPerTaxon ($choice)
     {
@@ -1965,7 +1946,7 @@ class KeyController extends Controller
 	
 		return
 			$this->models->Keystep->freeQuery("        
-				SELECT _a.id, _a.number, _a.step_type,_b.res_keystep_id,
+				SELECT _a.id, _a.number, _b.res_keystep_id,
 				_c.title, _c.content
 				from %PRE%keysteps _a
 				left join %PRE%choices_keysteps _b
