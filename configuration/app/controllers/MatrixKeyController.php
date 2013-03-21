@@ -403,7 +403,6 @@ class MatrixKeyController extends Controller
             else                
                 $results = $this->nbcGetTaxaScores();
 
-
             $states = $this->stateMemoryRecall();
 
 			$d = array();
@@ -904,7 +903,7 @@ class MatrixKeyController extends Controller
             
             $charId = isset($d[1]) ? $d[1] : null;
             $value = isset($d[2]) ? $d[2] : null;
-            
+
             // which is easy for the non-range characters...
             if ($d[0] != 'f') {
                 
@@ -914,7 +913,7 @@ class MatrixKeyController extends Controller
             }
             // ...but requires calculation for the ranged ones
             else {
-                
+
                 // is there a standard dev?
                 $sd = (isset($d[3]) ? $d[3] : null);
                 
@@ -925,10 +924,11 @@ class MatrixKeyController extends Controller
                 );
 				
 				$value = str_replace(',','.',$value);
-				$sd = str_replace(',','.',$sd);
-                
+
                 // calculate the spread around the mean...
                 if (isset($sd)) {
+
+					$sd = str_replace(',','.',$sd);
                     
                     $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
                     $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
@@ -943,7 +943,7 @@ class MatrixKeyController extends Controller
                 $cs = $this->models->CharacteristicState->_get(array(
                     'id' => $d
                 ));
-                
+
                 // and store them
                 foreach ((array) $cs as $key => $val)
                     $s[] = $val['id'];
@@ -1852,7 +1852,6 @@ class MatrixKeyController extends Controller
 			";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-		//q($this->models->MatrixTaxonState->q());
         
         $all = array();
     
@@ -1869,8 +1868,6 @@ class MatrixKeyController extends Controller
     
         }
 
-        //q($all);
-    
         return empty($all) ? '*' : $all;
     }
 	

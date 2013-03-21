@@ -25,7 +25,7 @@ var nbcPreviousBrowseStyles = {};
 function nbcGetResults(p) {
 
 	setCursor('wait');
-	
+
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
