@@ -13,7 +13,8 @@
     <link rel="search" title="Zoeken" href="http://www.nederlandsesoorten.nl/nsr/nsr/zoeken.html" />
     <link rel="Shortcut Icon" href="http://www.nederlandsesoorten.nl/sites/nsr/images/favicon.ico" type="image/x-icon" />
 
-	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
+	{*<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>*}
+	<title>Nederlands Soortenregister – Boktorren Determineren</title>
     
     <link rel="stylesheet" type="text/css" media="print" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_print.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_default.css" />

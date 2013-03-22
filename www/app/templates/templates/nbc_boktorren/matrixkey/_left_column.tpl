@@ -54,17 +54,31 @@
 
 		</div>
 
+        <div id="bannerRuler" class="invisible">
+            <hr />
+        </div>
+
+		<div id="legendContainer" class="invisible">   
+        	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
+            <table>
+                <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information.png" /></td><td id="legendDetails">distinctieve kenmerken</td></tr>
+                <tr><td><img class="result-icon icon-similar" src="{$nbcImageRoot}gelijkend.png" /></td><td id="legendSimilarSpecies">gelijkende soorten</td></tr>
+                <tr><td><img class="result-icon icon-sr" src="{$nbcImageRoot}sr_icon.png" /></td><td id="legendExternalLink">Nederlands Soortenregister</td></tr>
+			</table>
+		</div>  
+
         <div id="bannerRuler">
             <hr />
         </div>
 
 		<div id="dataSourceContainer">   
-            <span id="sourceHeader">{t}Gebaseerd op{/t}</span>
+            <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
             <p>
             {$nbcDataSource.author}<br />
-            {$nbcDataSource.title}<br />
+            {$nbcDataSource.title}
             <a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>
             </p>
+            <br />
             <p>
             {$nbcDataSource.photoCredit}
             </p>
@@ -78,6 +92,7 @@
 			<span id="logoHeader">Een initiatief van:</span>
 			<a href="http://www.naturalis.nl/" target="_blank"><img id="logo-NBC" src="{$session.app.system.urls.systemMedia}nbc-logo.png" title="Naturalis Biodiversity Center" /></a>
 			<a href="http://www.eis-nederland.nl/" target="_blank"><img id="logo-EIS" src="{$session.app.system.urls.systemMedia}logo-eisDEF-CMYK-2.png" title="Stichting European Invertebrate Survey Nederland" /></a>
+            <span id="logo-ETI">Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.</span>
         </div>
 
 	</div>
