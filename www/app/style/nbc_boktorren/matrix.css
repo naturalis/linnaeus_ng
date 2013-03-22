@@ -36,7 +36,7 @@
 #nbcLogoContainer #logo-EIS {width:92px;margin-left:5px;}
 #nbcLogoContainer #logo-ETI {display:block;font-size:8.5px;margin-top:5px}
 
-#legendContainer {font-size:10px;padding-bottom:10px}
+#legendContainer {font-size:11px;padding-bottom:10px}
 #legendContainer .result-icon {border:none}
 #legendContainer #legendHeader {font-weight:bold;font-size:11px}
 
@@ -76,9 +76,10 @@
 
 #content div#results div.result .result-icons {padding:0 6px 0 0px;}
 .result-icon {width:21px;margin-right:5px;height:21px;border:0px;border:1px solid #ccc;}
+
 #content div#results div.result .icon-info:hover {border:1px solid #44b7fd;}
-#content div#results div.result .icon-sr:hover {border:1px solid #f39bad;}
-#content div#results div.result .icon-similar:hover {border:1px solid #bac599;}
+#content div#results div.result .icon-sr:hover {border:1px solid #bac599;}
+#content div#results div.result .icon-similar:hover {border:1px solid #f39bad;}
 
 
 #content div#results div.result a {text-decoration:none; font-size:11px;} /* color:#555555;} */
@@ -192,8 +193,8 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 .irrelevant {border:none;filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 .irrelevant a {color:#000000;text-decoration:none; cursor:default;}
 .irrelevant a:hover div {border-color:#ffffff;}
-.hidden {display: none;	}
-.visible {display: block;	}
+.hidden {display: none;}
+.visible {display: block;}
 .ghosted {filter:alpha(opacity=25);-moz-opacity:0.25;-khtml-opacity: 0.25;opacity: 0.25;}
 
 ul.facetListType {padding:0;margin:0;list-style-position:outside;list-style-type:none;}
@@ -225,4 +226,3 @@ ul.facetListType li.selected {font-weight:bold;}
     font-weight: normal;
 }
 
-.invisible{display:none}

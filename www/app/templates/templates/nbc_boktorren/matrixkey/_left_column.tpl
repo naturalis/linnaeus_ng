@@ -54,11 +54,11 @@
 
 		</div>
 
-        <div id="bannerRuler" class="invisible">
+        <div id="bannerRuler" class="hidden">
             <hr />
         </div>
 
-		<div id="legendContainer" class="invisible">   
+		<div id="legendContainer" class="hidden">   
         	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
             <table>
                 <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information.png" /></td><td id="legendDetails">distinctieve kenmerken</td></tr>
