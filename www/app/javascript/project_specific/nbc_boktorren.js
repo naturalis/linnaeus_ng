@@ -227,15 +227,15 @@ function nbcFormatResult(data) {
 					'<span class="result-icons">'+
 						(states ? 
 							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
-							'<img class="result-icon" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'<img class="result-icon icon-info" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '') +
 						(data.r ?
 							'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'">'+
-							'<img class="result-icon" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'<img class="result-icon icon-similar" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '') +
 						(data.u ?
 							'<a href="'+(data.u)+'" target="_blank" title="'+nbcLabelExternalLink+'">'+
-							'<img class="result-icon" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
+							'<img class="result-icon icon-sr" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '')  +
 					'</span>' +
 				'</span>' +
@@ -763,6 +763,11 @@ function nbcInit() {
 	nbcLabelHideAll = _('alle kenmerken verbergen');
 	nbcLabelExternalLink = _('Nederlands Soortenregister');
 
+	$('#legendDetails').html(nbcLabelDetails);
+	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
+	$('#legendExternalLink').html(nbcLabelExternalLink);
+
+
 	if (nbcBrowseStyle=='paginate') {
 		nbcSetPaginate(true);
 		nbcSetExpandResults(false);
@@ -774,6 +779,14 @@ function nbcInit() {
 
 	nbcPreviousBrowseStyles.paginate=nbcPaginate;
 	nbcPreviousBrowseStyles.expand=nbcExpandResults;
+
+	if ("ontouchstart" in document) {
+		// touch only code (tablets)
+		$('#bannerRuler').removeClass('invisible'); // show icon legend
+		$('#legendContainer').removeClass('invisible'); // show icon legend
+	} else {
+		// "desktop" code
+	}
 
 }
 

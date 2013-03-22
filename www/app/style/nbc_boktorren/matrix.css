@@ -34,6 +34,11 @@
 #nbcLogoContainer #logoHeader {display:block;font-weight:bold;margin-bottom:5px;}
 #nbcLogoContainer #logo-NBC {width:86px;margin-bottom:20px}
 #nbcLogoContainer #logo-EIS {width:92px;margin-left:5px;}
+#nbcLogoContainer #logo-ETI {display:block;font-size:8.5px;margin-top:5px}
+
+#legendContainer {font-size:10px;padding-bottom:10px}
+#legendContainer .result-icon {border:none}
+#legendContainer #legendHeader {font-weight:bold;font-size:11px}
 
 /* results */
 #content div#results {width:720px;padding:0px;}
@@ -49,15 +54,15 @@
 #content div#results div.result div {width:131px; font-size:11px; color:#000000;}
 #content div#results div.result div {line-height:91%} /* // added details for ALL results, may have to be removed again */
 #content div#results div.result div.scientificNameHolder {
-		min-height:50px;
+	min-height:50px;
 	width:147px;
 	line-height:14px; 
 	height:14px;
-    font-family: Georgia;
+	font-family: Georgia;
 	-font-size-adjust: 0.54;
 }
 #content div#results div.result span.scientificName {
-font-weight:bold;	
+	font-weight:bold;	
 	font-style:italic; 
 }
 
@@ -69,8 +74,13 @@ font-weight:bold;
 #content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
 #content div#results div.result a.detailsBtn, #content div#results div.result a.similarBtn {font-size:0.85em}
 
-#content div#results div.result .result-icons {padding:0 6px 0 0px}
-#content div#results div.result .result-icon {width:21px;padding-right:5px;height:21px;border:0px}
+#content div#results div.result .result-icons {padding:0 6px 0 0px;}
+.result-icon {width:21px;margin-right:5px;height:21px;border:0px;border:1px solid #ccc;}
+#content div#results div.result .icon-info:hover {border:1px solid #44b7fd;}
+#content div#results div.result .icon-sr:hover {border:1px solid #f39bad;}
+#content div#results div.result .icon-similar:hover {border:1px solid #bac599;}
+
+
 #content div#results div.result a {text-decoration:none; font-size:11px;} /* color:#555555;} */
 
 #content div#results .resultRow .resultDetails {display:none;}
@@ -215,3 +225,4 @@ ul.facetListType li.selected {font-weight:bold;}
     font-weight: normal;
 }
 
+.invisible{display:none}
