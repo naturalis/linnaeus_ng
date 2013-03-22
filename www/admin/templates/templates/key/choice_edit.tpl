@@ -173,6 +173,11 @@ $(document).ready(function(){
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
+	
+	// temporarily for huub!
+	$('#res_taxon_id').focus();
+	
+	
 {literal}
 });
 {/literal}

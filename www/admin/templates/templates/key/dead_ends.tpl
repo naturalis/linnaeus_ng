@@ -50,9 +50,6 @@
 {/if}
 </p>
 
-<input type="button" onclick="window.open('index.php','_new')" value="bla" />
-
-
 </div>
 
 {include file="../shared/admin-footer.tpl"}
