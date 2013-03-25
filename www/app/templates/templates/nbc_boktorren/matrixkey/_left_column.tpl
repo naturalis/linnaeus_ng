@@ -61,9 +61,9 @@
 		<div id="legendContainer" class="hidden">   
         	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
             <table>
-                <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information.png" /></td><td id="legendDetails">distinctieve kenmerken</td></tr>
-                <tr><td><img class="result-icon icon-similar" src="{$nbcImageRoot}gelijkend.png" /></td><td id="legendSimilarSpecies">gelijkende soorten</td></tr>
-                <tr><td><img class="result-icon icon-sr" src="{$nbcImageRoot}sr_icon.png" /></td><td id="legendExternalLink">Nederlands Soortenregister</td></tr>
+                <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information_grijs.png" /></td><td id="legendDetails">onderscheidende kenmerken</td></tr>
+                <tr><td><img class="result-icon icon-similar" src="{$nbcImageRoot}gelijkend_grijs.png" /></td><td id="legendSimilarSpecies">gelijkende soorten</td></tr>
+                <tr><td><img class="result-icon icon-sr" src="{$nbcImageRoot}sr_icon_grijs.png" /></td><td id="legendExternalLink">Nederlands Soortenregister</td></tr>
 			</table>
 		</div>  
 
