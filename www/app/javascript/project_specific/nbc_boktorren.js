@@ -782,8 +782,8 @@ function nbcInit() {
 
 	if ("ontouchstart" in document) {
 		// touch only code (tablets)
-		$('#bannerRuler').removeClass('invisible'); // show icon legend
-		$('#legendContainer').removeClass('invisible'); // show icon legend
+		$('#bannerRuler').removeClass('hidden'); // show icon legend
+		$('#legendContainer').removeClass('hidden'); // show icon legend
 	} else {
 		// "desktop" code
 	}
