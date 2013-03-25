@@ -289,7 +289,7 @@ function keyGetChoiceContent(language) {
 }
 
 function keySetChoiceContent(obj,language) {
-
+	
 	if (language==allDefaultLanguage)
 		//$('#contentDefault').val(obj ? obj.choice_txt : '');
 		tinyMCE.get('contentDefault').setContent(obj ? obj.choice_txt : '');

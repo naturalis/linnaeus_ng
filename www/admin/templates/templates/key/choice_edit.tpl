@@ -167,12 +167,12 @@ $(document).ready(function(){
 	allActiveLanguage = {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	allDrawLanguages();
 	keyChoiceId = {if $data.id}{$data.id}{else}-1{/if};
-	if (allDefaultLanguage) keyGetChoiceContent(allDefaultLanguage);
-	if (allActiveLanguage) keyGetChoiceContent(allActiveLanguage);
 	{if $data.res_keystep_id!=null}keyCurrentTargetStep = {$data.res_keystep_id};{/if}
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
+	if (allDefaultLanguage) keyGetChoiceContent(allDefaultLanguage);
+	if (allActiveLanguage) keyGetChoiceContent(allActiveLanguage);
 	
 	// temporarily for huub's orchids!
 	$('#res_taxon_id').focus();
