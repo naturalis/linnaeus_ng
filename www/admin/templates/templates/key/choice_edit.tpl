@@ -171,15 +171,17 @@ $(document).ready(function(){
 	{if $data.res_taxon_id!=null}keyCurrentTargetTaxon = {$data.res_taxon_id};{/if}
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
-	if (allDefaultLanguage) keyGetChoiceContent(allDefaultLanguage);
-	if (allActiveLanguage) keyGetChoiceContent(allActiveLanguage);
 	
 	// temporarily for huub's orchids!
 	$('#res_taxon_id').focus();
 	
-	
 {literal}
 });
+
+function onInitTinyMce() {
+	if (allDefaultLanguage) keyGetChoiceContent(allDefaultLanguage);
+	if (allActiveLanguage) keyGetChoiceContent(allActiveLanguage);
+}
 {/literal}
 </script>
 
