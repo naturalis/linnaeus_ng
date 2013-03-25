@@ -174,7 +174,7 @@ $(document).ready(function(){
 	allPrevValSetUp('res_keystep_id');
 	allPrevValSetUp('res_taxon_id');
 	
-	// temporarily for huub!
+	// temporarily for huub's orchids!
 	$('#res_taxon_id').focus();
 	
 	
