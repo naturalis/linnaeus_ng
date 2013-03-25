@@ -756,7 +756,7 @@ function jDialogCancel() {
 function nbcInit() {
 
 	nbcLabelClose = _('sluiten');
-	nbcLabelDetails = _('distinctieve kenmerken');
+	nbcLabelDetails = _('onderscheidende kenmerken');
 	nbcLabelBack = _('terug');
 	nbcLabelSimilarSpecies = _('gelijkende soorten');
 	nbcLabelShowAll = _('alle kenmerken tonen');
