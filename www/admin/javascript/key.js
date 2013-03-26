@@ -384,6 +384,7 @@ function keyCallRemoveDeadEndChoice(id) {
 
 	if (
 		($('#res_taxon_id').val() > 0 || $('#res_keystep_id').val() > 0) &&
+		(window.opener) &&
 		(typeof window.opener.keyRemoveDeadEndChoice == 'function')
 	)
 		window.opener.keyRemoveDeadEndChoice(id);
