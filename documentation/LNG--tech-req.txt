@@ -1,0 +1,23 @@
+Linnaeus NG technical requirements
+
+Software
+• Apache v2.2, standaard installatie (iig met mod_rewrite en php5_module).
+• MySQL v5.5, standaard "large" configuratie (MyISAM only).
+• PHP v5.3, standaard libraries plus mbstring.
+
+Hardware
+• Min. 1GB intern geheugen.
+• Benodigde schijfruimte is zeer variabel. LNG-software zelf neemt ongeveer 50MB in beslag, maar verder is het afhankelijk van hoe grafisch intensief de ingevoerde projecten zijn. Voor een pilot met alleen de boktorren is 5MB al genoeg (slechts 130 soorten, vrijwel alle afbeeldingen staan remote in de beeldbank), maar veilig te zijn en de mogelijkheid open te houden om de komende twee, drie projecten ook in de pilotomgeving te kunnen draaien, ook zonder beeldbank: minimaal 5GB vrije schijfruimte.
+Ter illustratie:
+	• boktorren (afbeeldingen vrijwel allemaal remote): 1.5MB disk / 1MB MySQL
+	• orchideeën (gecombineerd): 1.3GB disk / 40MB MySQL
+
+Backup
+Gebackupt dienen te worden:
+• MySQL database (via mysqldump)
+• directory (en alles er in): __HTDOCS__/linnaeus_ng/www/shared/media/
+
+Overig
+• Er zijn momenteel geen geschedulde processen, maar ik sluit niet uit dat die wel een keer gaan komen, dus een crontab is noodzakelijk.
+• Het is wenselijk dat we zelf de virtual hosts-configuratie van Apache kunnen wijzigen (en php.ini ook, just in case), en Apache kunnen herstarten.
+• Omgeving kunnen benaderen via ssh.

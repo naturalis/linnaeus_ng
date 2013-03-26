@@ -1810,6 +1810,7 @@ class Controller extends BaseClass
 	*/
     public function makeLookupList ($data, $module, $url, $sortData = false, $encode = true)
     {
+		
         $sortBy = array(
             'key' => 'label', 
             'dir' => 'asc', 

@@ -479,7 +479,21 @@ class ModuleController extends Controller
         return null;
     }
 
-
+    private function checkPageInModule($id,$mId=null)
+    {
+        if (!isset($id))
+            return;
+        
+        $fmp = $this->models->FreeModulePage->_get(array(
+            'id' => array(
+                'id' => $id,
+                'project_id' => $this->getCurrentProjectId()
+            )
+        ));
+        
+        return ($fmp[0]['module_id']==(empty($mId) ? $this->getCurrentModuleId() : $mId) ? true : $fmp[0]['module_id']);
+        
+    }
 
     private function getLookupList ($p)
     {
@@ -517,21 +531,4 @@ class ModuleController extends Controller
         $this->smarty->assign('returnText', $this->makeLookupList($cfm, $this->controllerBaseName, '../module/topic.php?id=%s', true));
     }
 
-
-
-    private function checkPageInModule($id,$mId=null)
-    {
-        if (!isset($id))
-            return;
-        
-        $fmp = $this->models->FreeModulePage->_get(array(
-            'id' => array(
-                'id' => $id,
-                'project_id' => $this->getCurrentProjectId()
-            )
-        ));
-        
-        return ($fmp[0]['module_id']==(empty($mId) ? $this->getCurrentModuleId() : $mId) ? true : $fmp[0]['module_id']);
-        
-    }
 }
