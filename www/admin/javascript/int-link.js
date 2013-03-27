@@ -55,7 +55,7 @@ function intLinkModuleSelectorChange() {
 	$('tr[id*="flex"]').remove();
 
 	if (i[3]) {
-	
+
 		obj = $.parseJSON(i[3]);
 
 		for(var j=0;j<obj.length;j++) {
@@ -127,7 +127,7 @@ function intLinkInsertLink() {
 			'<a class="internal-link" href="../'+controller+'/'+url+(query ? (url.indexOf('?')==-1 ? '?' : '&') + query : '') +'">'+
 			(selection!='' ? selection : label) +
 			'</a>';
-		alert(newContent);
+		//alert(newContent);
 	}
 	
 

@@ -85,7 +85,7 @@ class KeyController extends Controller
 			a possible decision path is created from the key tree
 			caveat: in current set up, if a user does this while there *is* a keypath, this will do nothing. use forcetree=1 to force
 		*/
-		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || $this->rHasVal('forcetree','1')) {
+		if ((is_null($keyPath) && ($this->rHasVal('choice') || $this->rHasVal('step'))) || ($this->rHasVal('forcetree','1') || $this->rHasVal('r'))) {
 
 			$this->createPathInstantly(
 				($this->rHasVal('step') ? $this->requestData['step'] : null),
