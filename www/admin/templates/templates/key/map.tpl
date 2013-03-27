@@ -16,7 +16,7 @@
 $(document).ready(function(){
 {/literal}
 
-	init({$json});
+	keyTreeInit({$json});
 
 {literal}
 });

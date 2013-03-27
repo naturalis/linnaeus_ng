@@ -1302,7 +1302,7 @@ class Controller extends BaseClass
 
 
 
-    public function getTaxonById ($id = false)
+    public function getTaxonByIdOLD ($id = false)
     {
         $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
 
@@ -1319,6 +1319,40 @@ class Controller extends BaseClass
     }
 
 
+    public function getTaxonById ($id)
+    {
+
+        $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
+
+        if (empty($id) || $id == 0) {
+            return;
+        }
+        
+            
+		$t = $this->models->Taxon->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $id
+			), 
+			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
+		));
+		
+		$t[0]['label'] = $this->formatTaxon($t[0]);
+		
+		$pr = $this->models->ProjectRank->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $t[0]['rank_id']
+			)
+		));
+		
+		$t[0]['lower_taxon'] = $pr[0]['lower_taxon'];
+		
+		return $t[0];
+
+
+    }
 
     /**
      * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")

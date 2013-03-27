@@ -3988,7 +3988,9 @@ $jit.Graph = new Class({
      var edges = this.edges[obj.id] = {};
      this.nodes[obj.id] = new Graph.Node($.extend({
         'id': obj.id,
-        'name': obj.name,
+        'name': 
+			(obj.src_choice ? obj.src_choice:obj.name) +'<br />'+
+			(obj.data.taxon ? '<span style="color:#a00">&rarr; ' + obj.data.taxon + '</span>' : ''),
         'data': $.merge(obj.data || {}, {}),
         'adjacencies': edges 
       }, this.opt.Node), 

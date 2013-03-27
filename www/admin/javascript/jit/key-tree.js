@@ -36,7 +36,7 @@ function attachClick() {
 	//}
 }
 
-function init(treeData){
+function keyTreeInit(treeData){
     //init data
 	if (treeData) json = treeData;
     //end
@@ -61,8 +61,8 @@ function init(treeData){
         //nodes or edges
         Node: {
             overridable: true,
-            height: 34,
-            width: 140,
+            height: 65,
+            width: 200,
 			align: 'left',  
             type: 'rectangle',
             color: '#aaa'
@@ -96,7 +96,7 @@ function init(treeData){
             };
             //set label styles
             var style = label.style;
-            style.width = 120 + 'px';
+            style.width = 185 + 'px';
             style.height = 17 + 'px';            
             style.cursor = 'pointer';
             style.color = '#333';
