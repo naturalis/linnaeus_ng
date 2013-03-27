@@ -162,8 +162,9 @@ class ImportNBCController extends Controller
         $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
         
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseData($raw);
-		
-		
+
+//q($_SESSION['admin']['system']['import']['data']);
+
 		if (empty($data['project']['soortgroep'])) {
 			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
 			$data = $_SESSION['admin']['system']['import']['data'];
@@ -633,116 +634,6 @@ class ImportNBCController extends Controller
 
 
 
-    private function parseDataORIGINAL ($raw)
-    {
-        
-        /*
-         	lines:
-         	
-	        l0: title          / character_codes
-	        l1:                / character labels
-	        l2:                / character instructions
-	        l3:                / character units
-	        l4:                / character groups * (+ hidden)
-	        l5:	(empty)
-	        l6: (empty)
-	        l7: column headers /
-	        l8 ev: data     
-        */
-        $data = array();
-        
-        $line = -1;
-        
-        foreach ((array) $raw as $key => $val) {
-            
-            $lineHasData = strlen(implode('', $val)) > 0;
-			
-            if ($lineHasData) {
-
-                $line++;
-                
-                foreach ((array) $val as $cKey => $cVal) {
-
-                    $cVal = trim($cVal);
-                    
-                    if (!empty($cVal)) {
-                        
-                        // line "0", cell 0: title
-                        if ($line == 0 && $cKey == 0)
-                            $data['project']['title'] = $cVal;
-                        // line "0", cell > 0: character codes
-                        if ($line == 0 && $cKey > 0 && !empty($cVal))
-                            $data['characters'][$cKey]['code'] = $cVal;
-                        // line "1", cell 1: title
-                        if ($line == 1 && $cKey == 0)
-                            $data['project']['soortgroep'] = $cVal;
-                        // line "1", cell > 0: character labels
-                        if ($line == 1 && $cKey > 0 && !empty($cVal))
-                            $data['characters'][$cKey]['label'] = $cVal;
-                    	// line "2", cell > 0: character instructions
-                    	if ($line==2 && $cKey>0 && !empty($cVal) && $cVal!='…')
-                    		$data['characters'][$cKey]['instruction'] = $cVal;
-                        /*
-                    	// line "3", cell > 0: character unit (ignored)
-                    	if ($line==3 && $cKey>0 && !empty($cVal))
-                    		$data['characters'][$cKey]['unit'] = $cVal;
-                    	*/
-                            
-                        // line "4", cell > 0: character group (or 'hidden')
-                        if ($line == 4 && $cKey > 0 && !empty($cVal))
-                            $data['characters'][$cKey]['group'] = $cVal;
-                            
-                            // line "5": species column headers
-                        if ($line == 5 && !empty($cVal))
-                            $data['columns'][$cKey] = $cVal;
-                            
-                            // line > "5": species
-                        if ($line > 5) {
-                            
-                            if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
-                                $data['species'][$line]['id'] = $cVal;
-                            }
-                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'title') {
-                                $data['species'][$line]['label'] = $cVal;
-                            }
-                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'related') {
-                                if (strpos($cVal, $this->_valueSep) !== false) {
-                                    $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
-                                }
-                                else {
-                                    $data['species'][$line]['related'][] = trim($cVal);
-                                }
-                                array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
-                            }
-                            else {
-                                
-
-                                if (isset($data['characters']) && $data['characters'][$cKey]['group'] == 'hidden') {
-                                    
-                                    $data['species'][$line][$data['characters'][$cKey]['label']] = $cVal;
-                                }
-                                else {
-                                    
-                                    if (strpos($cVal, $this->_valueSep) !== false) {
-                                        $data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
-                                    }
-                                    else {
-                                        $data['species'][$line]['states'][$cKey][] = trim($cVal);
-                                    }
-                                    array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $data;
-    }
-
-
-
 
     private function parseData ($raw)
     {
@@ -929,8 +820,16 @@ class ImportNBCController extends Controller
     {
 
         $d = array();
-        
+
         foreach ((array) $data['species'] as $key => $val) {
+
+			if (empty($val['naam SCI'])) {
+				
+				$this->addError('Skipping species without scientific name ('.$val['label'].').');
+				continue;
+
+			}
+
             $d[$val['naam SCI']]['taxon'] = $val['naam SCI'];
             $d[$val['naam SCI']]['common name'] = $val['label'];
             $d[$val['naam SCI']]['id'] = $val['id'];
@@ -987,9 +886,28 @@ class ImportNBCController extends Controller
     }
 
 
+	private function resolveSimilarIdentifier($id,$lst)
+	{
+		
+		if (is_numeric($id))
+			return $id;
+
+		$id = trim($id);
+
+		foreach ((array)$lst as $key => $val) {
+		
+			if (trim($val['name'])==$id)
+				return $key;
+			
+		}
+		
+		return $id;
+
+	}
 
     private function storeSpeciesAndVariations ($data)
     {
+
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
 
@@ -1057,12 +975,19 @@ class ImportNBCController extends Controller
                     'commonname' => $val['common name']
                 ));
             }
-            
+			
             // if there's variations, save those as well 
             if (isset($val['variations'])) {
-                
+
                 foreach ((array) $val['variations'] as $vKey => $vVal) {
-                    
+
+					if (empty($vVal['variant'])) {
+						
+						$this->addError('Skipping variation without variant name ('.$vKey.').');
+						continue;
+		
+					}
+
                     $this->models->TaxonVariation->save(
                     array(
                         'id' => null, 
@@ -1077,7 +1002,8 @@ class ImportNBCController extends Controller
                     
                     $tmpIndex[$vVal['id']] = array(
                         'type' => 'var', 
-                        'id' => $vId
+                        'id' => $vId,
+						'name' => $vVal['variant'] // for Dierenzoeker
                     );
                     
                     if (isset($vVal['foto id beeldbank']))
@@ -1106,11 +1032,13 @@ class ImportNBCController extends Controller
                 
                 $tmpIndex[$val['id']] = array(
                     'type' => 'sp', 
-                    'id' => $species[$key]['lng_id']
+                    'id' => $species[$key]['lng_id'],
+					'name' => isset($val['common name']) ? $val['common name'] :  $key // for Dierenzoeker
                 );
             }
         }
         
+		// save relations
         foreach ((array) $species as $key => $val) {
             
             if (!isset($val['variations'])) {
@@ -1118,8 +1046,10 @@ class ImportNBCController extends Controller
                 if (isset($val['related'])) {
                     
                     foreach ((array) $val['related'] as $rKey => $rVal) {
+						
+						$rValId = $this->resolveSimilarIdentifier($rVal,$tmpIndex);
                         
-                        if (!isset($tmpIndex[$rVal]) || $val['lng_id']==$tmpIndex[$rVal]['id'])
+                        if (!isset($tmpIndex[$rValId]) || $val['lng_id']==$tmpIndex[$rValId]['id'])
                             continue;
                         
                         $this->models->TaxaRelations->save(
@@ -1127,8 +1057,8 @@ class ImportNBCController extends Controller
                             'id' => null, 
                             'project_id' => $this->getNewProjectId(), 
                             'taxon_id' => $val['lng_id'], 
-                            'relation_id' => $tmpIndex[$rVal]['id'], 
-                            'ref_type' => $tmpIndex[$rVal]['type'] == 'var' ? 'variation' : 'taxon'
+                            'relation_id' => $tmpIndex[$rValId]['id'], 
+                            'ref_type' => $tmpIndex[$rValId]['type'] == 'var' ? 'variation' : 'taxon'
                         ));
                     }
                 }
@@ -1141,7 +1071,9 @@ class ImportNBCController extends Controller
                         
                         foreach ((array) $vVal['related'] as $rKey => $rVal) {
                             
-                            if (!isset($tmpIndex[$rVal]) || $vVal['lng_id']==$tmpIndex[$rVal]['id'])
+							$rValId = $this->resolveSimilarIdentifier($rVal,$tmpIndex);
+
+                            if (!isset($tmpIndex[$rValId]) || $vVal['lng_id']==$tmpIndex[$rValId]['id'])
                                 continue;
                             
                             $this->models->VariationRelations->save(
@@ -1149,8 +1081,8 @@ class ImportNBCController extends Controller
                                 'id' => null, 
                                 'project_id' => $this->getNewProjectId(), 
                                 'variation_id' => $vVal['lng_id'], 
-                                'relation_id' => $tmpIndex[$rVal]['id'], 
-                                'ref_type' => $tmpIndex[$rVal]['type'] == 'var' ? 'variation' : 'taxon'
+                                'relation_id' => $tmpIndex[$rValId]['id'], 
+                                'ref_type' => $tmpIndex[$rValId]['type'] == 'var' ? 'variation' : 'taxon'
                             ));
                         }
                     }
@@ -1251,7 +1183,7 @@ class ImportNBCController extends Controller
         
         foreach ((array) $data['characters'] as $cKey => $cVal) {
             
-            if ($cVal['group'] == 'hidden')
+            if (isset($cVal['group']) && $cVal['group'] == 'hidden')
                 continue;
             
             $type = isset($types[$cVal['code']]) ? $types[$cVal['code']] : 'media';
@@ -1327,9 +1259,16 @@ class ImportNBCController extends Controller
         
         $states = array();
         
-        foreach ((array) $data['species'] as $sVal) {
+        foreach ((array)$data['species'] as $sVal) {
+
+			if (!isset($sVal['states'])) {
+
+				$this->addError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']));
+				continue;
+
+			}
             
-            foreach ((array) $sVal['states'] as $key => $val) {
+            foreach ((array)$sVal['states'] as $key => $val) {
                 
                 foreach ((array) $val as $cKey => $cVal) {
                     
@@ -1476,7 +1415,7 @@ class ImportNBCController extends Controller
 		
 		foreach((array)$data['characters'] as $key => $val) {
 			
-			if ($val['group']=='hidden') {
+			if (isset($val['group']) && $val['group']=='hidden') {
 				
 				array_push($d,array('id'=>$key,'code'=>$val['code'],'label'=>$val['code']));
 				
@@ -1527,8 +1466,113 @@ class ImportNBCController extends Controller
     }
 
 
-
-
+//    private function parseDataORIGINAL ($raw)
+//    {
+//        
+//        /*
+//         	lines:
+//         	
+//	        l0: title          / character_codes
+//	        l1:                / character labels
+//	        l2:                / character instructions
+//	        l3:                / character units
+//	        l4:                / character groups * (+ hidden)
+//	        l5:	(empty)
+//	        l6: (empty)
+//	        l7: column headers /
+//	        l8 ev: data     
+//        */
+//        $data = array();
+//        
+//        $line = -1;
+//        
+//        foreach ((array) $raw as $key => $val) {
+//            
+//            $lineHasData = strlen(implode('', $val)) > 0;
+//			
+//            if ($lineHasData) {
+//
+//                $line++;
+//                
+//                foreach ((array) $val as $cKey => $cVal) {
+//
+//                    $cVal = trim($cVal);
+//                    
+//                    if (!empty($cVal)) {
+//                        
+//                        // line "0", cell 0: title
+//                        if ($line == 0 && $cKey == 0)
+//                            $data['project']['title'] = $cVal;
+//                        // line "0", cell > 0: character codes
+//                        if ($line == 0 && $cKey > 0 && !empty($cVal))
+//                            $data['characters'][$cKey]['code'] = $cVal;
+//                        // line "1", cell 1: title
+//                        if ($line == 1 && $cKey == 0)
+//                            $data['project']['soortgroep'] = $cVal;
+//                        // line "1", cell > 0: character labels
+//                        if ($line == 1 && $cKey > 0 && !empty($cVal))
+//                            $data['characters'][$cKey]['label'] = $cVal;
+//                    	// line "2", cell > 0: character instructions
+//                    	if ($line==2 && $cKey>0 && !empty($cVal) && $cVal!='…')
+//                    		$data['characters'][$cKey]['instruction'] = $cVal;
+//                        /*
+//                    	// line "3", cell > 0: character unit (ignored)
+//                    	if ($line==3 && $cKey>0 && !empty($cVal))
+//                    		$data['characters'][$cKey]['unit'] = $cVal;
+//                    	*/
+//                            
+//                        // line "4", cell > 0: character group (or 'hidden')
+//                        if ($line == 4 && $cKey > 0 && !empty($cVal))
+//                            $data['characters'][$cKey]['group'] = $cVal;
+//                            
+//                            // line "5": species column headers
+//                        if ($line == 5 && !empty($cVal))
+//                            $data['columns'][$cKey] = $cVal;
+//                            
+//                            // line > "5": species
+//                        if ($line > 5) {
+//                            
+//                            if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
+//                                $data['species'][$line]['id'] = $cVal;
+//                            }
+//                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'title') {
+//                                $data['species'][$line]['label'] = $cVal;
+//                            }
+//                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'related') {
+//                                if (strpos($cVal, $this->_valueSep) !== false) {
+//                                    $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
+//                                }
+//                                else {
+//                                    $data['species'][$line]['related'][] = trim($cVal);
+//                                }
+//                                array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+//                            }
+//                            else {
+//                                
+//
+//                                if (isset($data['characters']) && $data['characters'][$cKey]['group'] == 'hidden') {
+//                                    
+//                                    $data['species'][$line][$data['characters'][$cKey]['label']] = $cVal;
+//                                }
+//                                else {
+//                                    
+//                                    if (strpos($cVal, $this->_valueSep) !== false) {
+//                                        $data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
+//                                    }
+//                                    else {
+//                                        $data['species'][$line]['states'][$cKey][] = trim($cVal);
+//                                    }
+//                                    array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return $data;
+//    }
 
 
 }

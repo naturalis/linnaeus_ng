@@ -539,7 +539,7 @@ class ModuleController extends Controller
 				
 				$p = array(
 					'id' => $this->createPage(),
-					'topic' => utf8_encode($val[0]),
+					'topic' => $val[0],
 					'content' => $val[1],
 					'language' => $_SESSION['admin']['system']['freeModules']['import']['language']
 				);

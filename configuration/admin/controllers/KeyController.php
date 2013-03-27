@@ -880,14 +880,10 @@ class KeyController extends Controller
         $_SESSION['admin']['system']['keyPath'] = $d;
     }
 
-
-
     private function getKeyPath ()
     {
         return isset($_SESSION['admin']['system']['keyPath']) ? $_SESSION['admin']['system']['keyPath'] : false;
     }
-
-
 
     private function getPreviousKeypathEntry ($id = false, $stepsBack = 1)
     {
@@ -913,8 +909,6 @@ class KeyController extends Controller
         }
     }
 
-
-
     private function getRemainingTaxa ()
     {
 		
@@ -938,8 +932,6 @@ class KeyController extends Controller
 
     }
 
-
-
     private function getKeyTree ($refId = null, $choice = null)
     {
         $s = $refId == null ? $this->getStartKeystep() : $this->getKeystep($refId);
@@ -947,6 +939,7 @@ class KeyController extends Controller
         $step = array(
             'id' => $s['id'], 
             'name' => (isset($choice['marker']) ? '(' . $choice['marker'] . ') ' : '') . $s['number'] . '. ' . $s['title'], 
+            'src_choice' => isset($choice['txt']) ? $choice['txt'] : null,
             'type' => 'step', 
             'data' => array(
                 'number' => $s['number'], 
@@ -972,14 +965,26 @@ class KeyController extends Controller
             ));
             
             foreach ((array) $ck as $key => $val) {
-                
+				
+				$cck = $this->models->ChoiceContentKeystep->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'choice_id' => $val['id'], 
+							'language_id' => $this->getDefaultProjectLanguage()
+						)
+					));
+				
+				if ($cck[0]['choice_txt'])
+					$txt = substr(strip_tags($cck[0]['choice_txt']),0,75).(strlen(strip_tags($cck[0]['choice_txt'])) > 75 ? '...' : '' );
+				else
+					$txt = null;
+
+				
                 if (isset($val['res_taxon_id'])) {
                     
-                    $t = $this->models->Taxon->_get(array(
-                        'id' => $val['res_taxon_id'], 
-                        'columns' => 'id,taxon'
-                    ));
-                    
+                    $t = $this->getTaxonById($val['res_taxon_id']);
+
                     $this->tmp = is_null($this->tmp) ? 0 : $this->tmp;
                     
                     $step['children'][] = array(
@@ -990,11 +995,12 @@ class KeyController extends Controller
                         // when
                         // the same id appears
                         // multiple times
+						'src_choice' => $txt,
                         'type' => 'taxon', 
                         'data' => array(
                             'number' => 't' . $t['id'], 
                             'title' => '&rarr; ' . $t['taxon'], 
-                            'taxon' => $t['taxon'], 
+                            'taxon' => $t['label'], 
                             'id' => $t['id']
                         ), 
                         'name' => '(' . $this->showOrderToMarker($val['show_order']) . ') ' . '<i>' . $t['taxon'] . '</i>'
@@ -1002,11 +1008,13 @@ class KeyController extends Controller
                 }
                 else if (isset($val['res_keystep_id']) && $val['res_keystep_id'] != -1) {
                     
-                    $step['children'][] = $this->getKeyTree($val['res_keystep_id'], 
-                    array(
-                        'id' => $val['id'], 
-                        'marker' => $this->showOrderToMarker($val['show_order'])
-                    ));
+                    $step['children'][] = $this->getKeyTree(
+						$val['res_keystep_id'], 
+						array(
+							'id' => $val['id'], 
+							'marker' => $this->showOrderToMarker($val['show_order']),
+							'txt' => $txt,
+						));
                 }
             }
         }

@@ -16,9 +16,13 @@
 		<tr><td>Items per line:</td><td><input type="text" name="settings[matrix_items_per_line]" value="{$matrix_items_per_line}" /></td></tr>
 		<tr><td>Items per page:</td><td><input type="text" name="settings[matrix_items_per_page]" value="{$matrix_items_per_page}" /></td></tr>
 		<tr><td>State images per row:</td><td><input type="text" name="settings[matrix_state_image_per_row]" value="{$matrix_state_image_per_row}" /></td></tr>
-		<tr><td>Browse style:</td><td>
-        	<input type="radio" name="settings[matrix_browse_style]" value="expand" checked="checked"/>expand
-            <input type="radio" name="settings[matrix_browse_style]" value="paginate" />paginate</td></tr>
+		<tr style="vertical-align:top"><td>Browse style:</td>
+        	<td>
+                <label><input type="radio" name="settings[matrix_browse_style]" value="expand" checked="checked"/>expand</label><br />
+                <label><input type="radio" name="settings[matrix_browse_style]" value="paginate" />paginate</label><br />
+                <label><input type="radio" name="settings[matrix_browse_style]" value="" />(ignore)</label>
+            </td>
+		</tr>
 	</table>
 	</p>
 	<p>
