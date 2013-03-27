@@ -1319,7 +1319,7 @@ class Controller extends BaseClass
     }
 
 
-    public function getTaxonById ($id)
+    public function getTaxonById ($id = false)
     {
 
         $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
