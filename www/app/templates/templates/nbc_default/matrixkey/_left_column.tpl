@@ -16,11 +16,11 @@
                 <ul>
                 {foreach from=$groups item=v}
                     {assign var=openGroup value=false}
-                    <li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id});return false;">{$v.label}</a></li>
+                    <li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id});return false;">{$v.label|strtolower|ucfirst}</a></li>
                     <ul id="character-group-{$v.id}" class="hidden">
                         {foreach from=$v.chars item=c key=k}
                         {assign var=foo value="|"|explode:$c.label}
-                        <li class="inner{if $k==$v.chars|@count-1} last{/if}"><a class="facetLink" href="#" onclick="nbcShowStates({$c.id});return false;">{$c.label}{if $c.value} {$c.value}{/if}</a>
+                        <li class="inner{if $k==$v.chars|@count-1} last{/if}"><a class="facetLink" href="#" onclick="nbcShowStates({$c.id});return false;">{$c.label|strtolower|ucfirst}{if $c.value} {$c.value}{/if}</a>
 			            {* {if $coefficients[$c.id].rank}{$coefficients[$c.id].rank}{/if} // needs to be tested with actual data! *}
                             {if $activeChars[$c.id]}{assign var=openGroup value=true}
                             <span>
@@ -70,28 +70,10 @@
         <div id="bannerRuler">
             <hr />
         </div>
-
-		<div id="dataSourceContainer">   
-            <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
-            <p>
-            {$nbcDataSource.author}<br />
-            {$nbcDataSource.title}
-            <a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>
-            </p>
-            <br />
-            <p>
-            {$nbcDataSource.photoCredit}
-            </p>
-		</div>   
-        
-        <div id="bannerRuler">
-            <hr />
-        </div>
  
         <div id="nbcLogoContainer">
 			<span id="logoHeader">Een initiatief van:</span>
 			<a href="http://www.naturalis.nl/" target="_blank"><img id="logo-NBC" src="{$session.app.system.urls.systemMedia}nbc-logo.png" title="Naturalis Biodiversity Center" /></a>
-			<a href="http://www.eis-nederland.nl/" target="_blank"><img id="logo-EIS" src="{$session.app.system.urls.systemMedia}logo-eisDEF-CMYK-2.png" title="Stichting European Invertebrate Survey Nederland" /></a>
             <span id="logo-ETI">Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.</span>
         </div>
 
