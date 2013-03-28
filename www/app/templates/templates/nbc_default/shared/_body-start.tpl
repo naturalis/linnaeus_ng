@@ -17,9 +17,6 @@
 
             <div id="menucontainer">
                 <ul id="nav">
-                    <li>
-                        <a href="identify.php">Home</a>
-                    </li>
                 </ul>
             </div>
         </div>
