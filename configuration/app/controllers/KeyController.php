@@ -6,7 +6,7 @@ class KeyController extends Controller
 {
 
     private $_taxaStepList;
-	private $_stepList = array();
+	private $_choiceList = array();
 	public $currentKeyStepId;
 
     public $usedModels = array(
@@ -260,11 +260,13 @@ class KeyController extends Controller
 	{
 
 		$tree = $this->getCache('tree-keyTree');
+		$this->_choiceList = $this->getCache('tree-choiceList');
 		
-		if (!$tree) {
+		if (!$tree || !$this->_choiceList) {
 
 			$tree = $this->setKeyTree();
 			$this->saveCache('tree-keyTree', $tree);
+			$this->saveCache('tree-choiceList', $this->_choiceList);
 
 		}
 		
@@ -294,14 +296,18 @@ class KeyController extends Controller
 		// store tree in session
 		else {
 
-			$tree = '';
+			$tree = $choiceList = '';
 			
 			foreach((array)$kt as $val) {
 			
-				$tree .= trim($val['keytree']);
+				if ($val['chunk']!=999)
+					$tree .= trim($val['keytree']);
+				else
+					$choiceList = $val['keytree'];
 			
 			}
 			
+			$this->_choiceList = unserialize(utf8_decode($choiceList));
 			$d = unserialize(utf8_decode($tree));
 
 		}
@@ -449,7 +455,6 @@ class KeyController extends Controller
 		if (is_null($id)) {
 
 			$id = $this->getStartKeystepId();
-
 			
 		}
 		
@@ -467,6 +472,8 @@ class KeyController extends Controller
 		$step['choices'] = $this->getKeystepChoices($id,null,false);
   
 		foreach((array)$step['choices'] as $key => $val) {
+			
+			$this->_choiceList[] = $val['id'];
 		
 			$d['choice_id'] = $val['id'];
 			$d['choice_marker'] = utf8_decode($val['marker']);
@@ -768,7 +775,7 @@ class KeyController extends Controller
 
 		$div = $this->getCache('key-taxonDivision-'.$step);
 		
-		if (!$div) {
+if (1==1 || !$div) {
 
 			$this->tmp = null;
 
@@ -942,21 +949,23 @@ class KeyController extends Controller
 	
 	}
 
+
 	public function getAllTaxaInKey()
 	{
-	
+
 		if (!$this->getCache('key-keyTaxa')) {
 	
 			 $d = $this->models->ChoiceKeystep->_get(
 					array('id' =>
 							array(
 									'project_id' => $this->getCurrentProjectId(),
-									'res_taxon_id is not' => 'null'
+									'res_taxon_id is not' => 'null',
+									'id in' => '('.implode(',',$this->_choiceList).')'
 							),
 							'columns' => 'res_taxon_id'
 					)
 			);
-			
+
 			 $this->saveCache('key-keyTaxa', $d);
 			 
 			 return $d;

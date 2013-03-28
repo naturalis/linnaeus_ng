@@ -5,12 +5,13 @@
 {if $processed}
 	<a href="nbc_determinatie_5.php">Import matrix data</a>
 {else}
+<form method="post" action="nbc_determinatie_4.php">
+<input type="hidden" name="rnd" value="{$rnd}" />
+<input type="hidden" name="action" value="species" />
 <p>
-	<form method="post" action="nbc_determinatie_4.php">
-	<input type="hidden" name="rnd" value="{$rnd}" />
-	<input type="hidden" name="action" value="species" />
 
 	Click the button to import ranks and species.
+</p>
     {if $variantColumns}
     <p>
     If your sheet contains data to differentiate between variations of the same species (gender, lifestage), please select
@@ -21,10 +22,10 @@
     </p>
     {/if}
     
-    
+</p>    
 	<input type="submit" value="Import ranks & species">
-	</form>
 </p>
+	</form>
 {/if}
 <p>
 	<a href="nbc_determinatie_2.php">Back</a>

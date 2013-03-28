@@ -7,7 +7,7 @@
 	providing the follwing directories exist ($this->doesSkinExist()):
 		app/style/[skinname]/
 		app/media/system/skins/[skinname]/
-		[smarty template dir]/[skinname]/[controller basename]/
+		app/templates/templates/[skinname]/[controller basename]/
 	please note they have to exist, even if they remain empty!
 	in all other cases, the skin named in $this->generalSettings['app']['skinName'] is
 	used. example, for a project with the skin "original_skin", the following 
