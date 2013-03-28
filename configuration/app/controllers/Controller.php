@@ -1250,6 +1250,9 @@ class Controller extends BaseClass
     {
         $e = explode(' ', $taxon['taxon']);
         $r = $this->getProjectRanks();
+		
+		if (!isset($taxon['rank_id'])) // shouldn't happen!
+			 return $taxon['taxon'];
         
         if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
@@ -2859,6 +2862,7 @@ class Controller extends BaseClass
         else {
             
             $this->treeList = $this->getCache('species-treeList');
+			
         }
         
         return $this->getTreeList($p);

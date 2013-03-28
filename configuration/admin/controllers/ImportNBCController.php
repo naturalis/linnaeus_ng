@@ -889,18 +889,23 @@ class ImportNBCController extends Controller
 	private function resolveSimilarIdentifier($id,$lst)
 	{
 		
+		$id = trim($id);
+		
+		if (empty($id))
+			return;
+
 		if (is_numeric($id))
 			return $id;
 
-		$id = trim($id);
-
 		foreach ((array)$lst as $key => $val) {
-		
-			if (trim($val['name'])==$id)
+			if (trim(strtolower($val['name']))==strtolower($id)) {
 				return $key;
+			}
 			
 		}
-		
+	
+		$this->addError(sprintf($this->translate('Could not resolve similar id "%s"'),$id));
+
 		return $id;
 
 	}
@@ -983,7 +988,7 @@ class ImportNBCController extends Controller
 
 					if (empty($vVal['variant'])) {
 						
-						$this->addError('Skipping variation without variant name ('.$vKey.').');
+						$this->addError(sprintf($this->translate('Skipping variation without variant name ("%s"; double entry?).'),$vKey));
 						continue;
 		
 					}
@@ -1037,7 +1042,7 @@ class ImportNBCController extends Controller
                 );
             }
         }
-        
+
 		// save relations
         foreach ((array) $species as $key => $val) {
             

@@ -799,8 +799,8 @@ class KeyController extends Controller
 		
 		$includedTaxa = $excludedTaxa = array();
 
-		$tree = $this->getTreeList();
-	
+		$tree = $this->getTreeList(array('includeEmpty'=>true));
+
 		foreach((array)$div['remaining'] as $key => $val) {
 
 			$d = $tree[$key];
