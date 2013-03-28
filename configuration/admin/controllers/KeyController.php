@@ -7,6 +7,7 @@ class KeyController extends Controller
     private $_stepList = array();
     private $_tempList = array();
     private $_counter = 0;
+	private $_choiceList = array();
     public $usedModels = array(
         'keystep', 
         'keytree', 
@@ -2136,6 +2137,8 @@ class KeyController extends Controller
         $step['choices'] = $this->getKeystepChoices($id);
         
         foreach ((array) $step['choices'] as $key => $val) {
+
+			$this->_choiceList[] = $val['id'];
             
             $d['choice_id'] = $val['id'];
             $d['choice_marker'] = utf8_decode($val['marker']);
@@ -2176,6 +2179,12 @@ class KeyController extends Controller
                     'keytree' => $val
                 ));
             }
+
+			$this->models->Keytree->save(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'chunk' => 999, 
+				'keytree' => utf8_encode(serialize($this->_choiceList))
+			));
             
             return true;
         }

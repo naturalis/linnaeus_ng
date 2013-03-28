@@ -161,7 +161,7 @@ class MatrixKeyController extends Controller
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
         
         if ($this->_matrixType == 'NBC') {
-            
+
             $states = $this->stateMemoryRecall();
 
             $results = $this->nbcGetTaxaScores($states);
@@ -601,12 +601,13 @@ class MatrixKeyController extends Controller
         
         if (empty($matrixId))
             return;
-        
+
         $taxa = $this->getCache('matrix-taxa-' . $matrixId);
 
-		if ($taxa===false)
-			return;
-        
+		// wtf!? (2013.03.28)
+		//if ($taxa===false)
+		//	return;
+
         if (!$taxa) {
             
             $mt = $this->models->MatrixTaxon->_get(
@@ -2195,7 +2196,7 @@ class MatrixKeyController extends Controller
         
         if (count($states) == 0)
             return $this->nbcGetCompleteDataset();
-            
+
 		// calculate scores
         $matches = $this->getTaxaScores($states, false);
         

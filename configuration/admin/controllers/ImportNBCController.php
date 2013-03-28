@@ -657,8 +657,10 @@ class ImportNBCController extends Controller
         
         foreach ((array) $raw as $line => $val) {
             
-            $lineHasData = strlen(implode('', $val)) > 0;
-			
+			$d = $val;
+			unset($d[0]);
+            $lineHasData = strlen(implode('', $d)) > 0;
+
             if ($lineHasData) {
 
                 foreach ((array) $val as $cKey => $cVal) {
@@ -714,45 +716,83 @@ class ImportNBCController extends Controller
 
 
 						// line > 6: species records
-                        if ($line > 6) {
-                            
-                            if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
-                                $data['species'][$line]['id'] = $cVal;
-                            }
-                            else if (isset($data['columns'][$cKey]) && ($data['columns'][$cKey] == 'title' || $data['columns'][$cKey] == 'titel')) {
-                                $data['species'][$line]['label'] = $cVal;
-                            }
-                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'gelijkende soorten') {
-                                if (strpos($cVal, $this->_valueSep) !== false) {
-                                    $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
-                                }
-                                else {
-                                    $data['species'][$line]['related'][] = trim($cVal);
-                                }
-                                array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
-                            }
-                            else {
+						if ($line > 6) {
+							
+							if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
+								$data['species'][$line]['id'] = $cVal;
+							}
+							else if (isset($data['columns'][$cKey]) && ($data['columns'][$cKey] == 'title' || $data['columns'][$cKey] == 'titel')) {
+								$data['species'][$line]['label'] = $cVal;
+							}
+							else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'gelijkende soorten') {
+								if (strpos($cVal, $this->_valueSep) !== false) {
+									$data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
+								}
+								else {
+									$data['species'][$line]['related'][] = trim($cVal);
+								}
+								array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+							}
+							else {
 
-                                if (isset($data['characters'][$cKey]['group']) && $data['characters'][$cKey]['group'] == 'hidden') {
+								if (isset($data['characters'][$cKey]['group']) && $data['characters'][$cKey]['group'] == 'hidden') {
 
-                                    $data['species'][$line][$data['characters'][$cKey]['code']] = $cVal;
-                                }
-                                else {
-                                    
-                                    if (strpos($cVal, $this->_valueSep) !== false) {
-                                        $data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
-                                    }
-                                    else {
-                                        $data['species'][$line]['states'][$cKey][] = trim($cVal);
-                                    }
-                                    array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
-                                }
-                            }
-                        }
+									$data['species'][$line][$data['characters'][$cKey]['code']] = $cVal;
+								}
+								else {
+									
+									if (strpos($cVal, $this->_valueSep) !== false) {
+										$data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
+									}
+									else {
+										$data['species'][$line]['states'][$cKey][] = trim($cVal);
+									}
+									array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
+								}
+							}
+						}
                     }
                 }
+				
+				// discarding species without ID in col 0
+				if (isset($data['species']) && isset ($data['species'][$line]) && empty($data['species'][$line]['id'])) {
+
+					unset($data['species'][$line]);
+					
+				} else
+				/*
+					when label (= 'title' column) has the scientific name, ppl tend to leave the 
+					'sci name'-column empty, but we are going to need it, so assumptions are made.
+				*/
+				if (isset($data['species']) && isset ($data['species'][$line]) && empty($data['species'][$line]['naam SCI'])) {
+
+					$data['species'][$line]['naam SCI'] = $data['species'][$line]['label'];
+					
+				}
+				
+				
             }
         }
+
+		foreach((array)$data['characters'] as $cKey => $cVal) {
+			
+			$unused = true;
+			
+			foreach((array)$data['species'] as $sKey => $sVal) {
+
+				if (!empty($sVal['states'][$cKey])) {
+					
+					$unused = false;
+					break;
+					
+				}
+				
+			}
+			
+			if ($unused)
+				unset($data['characters'][$cKey]);
+
+		}
 
 		ksort($data['characters']);
 
@@ -825,7 +865,7 @@ class ImportNBCController extends Controller
 
 			if (empty($val['naam SCI'])) {
 				
-				$this->addError('Skipping species without scientific name ('.$val['label'].').');
+				$this->addError('Skipping species without scientific name ('.@$val['label'].').');
 				continue;
 
 			}
