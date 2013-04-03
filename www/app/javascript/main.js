@@ -178,7 +178,7 @@ function showDialog(title,content,vars,resize) {
 			maxWidth: 700,
 			maxHeight: 600,
 			width: w + 10,
-			height: h + 120,
+			height: h + 130,
 			modal: true,
 			title: title,
 			//position: { my: "center top", at: "center top", of: '#dialogRidge' },
