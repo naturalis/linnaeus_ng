@@ -67,6 +67,24 @@
 			</table>
 		</div>  
 
+
+        <div id="bannerRuler">
+            <hr />
+        </div>
+
+		<div id="dataSourceContainer">   
+            <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
+            <p>
+            {$nbcDataSource.author}<br />
+            {$nbcDataSource.title}
+            <a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>
+            </p>
+            <br />
+            <p>
+            {$nbcDataSource.photoCredit}
+            </p>
+		</div>  
+
         <div id="bannerRuler">
             <hr />
         </div>
