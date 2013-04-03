@@ -26,7 +26,7 @@
 	</table>
 	</p>
 	<p>
-	<input type="submit" value="Finish import">
+	<input type="submit" value="{t}Save and finish import{/t}">
 	</p>
 	</form>
 	

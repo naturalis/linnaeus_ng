@@ -22,6 +22,17 @@ class ImportNBCController extends Controller
     private $_defaultImgExtension = 'jpg';
     private $_defaultSkinName = 'nbc_default';
 	private $_defaultGroupName = 'NBC default soortgroep';
+	private $_nbcColumns = array(
+		'sekse' => 'gender',
+		'variant' => '-',
+		'naam SCI' => '-',
+		'naam NL' => '-',
+		'foto id beeldbank' => 'url_image',
+		'nsrpage' => 'url_soortenregister',
+		'fotograaf' => 'photographer',
+		'bronvermelding' => 'source',
+		'sekse op foto' => 'gender_photo',
+	);
 
     private $_stdVariantColumns = array('sekse','variant');
 	
@@ -163,7 +174,7 @@ class ImportNBCController extends Controller
         
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseData($raw);
 
-//q($_SESSION['admin']['system']['import']['data']);
+		//q($_SESSION['admin']['system']['import']['data']);
 
 		if (empty($data['project']['soortgroep'])) {
 			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
@@ -178,7 +189,7 @@ class ImportNBCController extends Controller
             $this->smarty->assign('species', $data['species']);
         if (isset($data['characters']))
             $this->smarty->assign('characters', $data['characters']);
-        
+
         $this->printPage();
     }
 
@@ -189,8 +200,8 @@ class ImportNBCController extends Controller
             $this->redirect('nbc_determinatie_2.php');
         
         $this->setPageName($this->translate('Creating project'));
-        
-        if (!$this->isFormResubmit() && !isset($_SESSION['admin']['system']['import']['project'])) {
+		
+        if (!isset($_SESSION['admin']['system']['import']['project']) && !$this->isFormResubmit()) {
             
             $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
 			$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
@@ -236,13 +247,17 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie4Action ()
     {
+		
         if (!isset($_SESSION['admin']['system']['import']['project']))
             $this->redirect('nbc_determinatie_3.php');
         
         $this->setPageName($this->translate('Storing ranks, species and variations'));
-		
+
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
             
+			if ($this->rHasVal('nbcColumns'))
+				$_SESSION['admin']['system']['import']['data']['nbcColumns'] = $this->requestData['nbcColumns'];
+
             $ranks = $this->addRanks();
             
             $_SESSION['admin']['system']['import']['project']['ranks'] = $ranks;
@@ -260,11 +275,17 @@ class ImportNBCController extends Controller
             $this->smarty->assign('processed', true);
         }
 		
-		$this->smarty->assign('variantColumns',$this->extractVariantColumns($_SESSION['admin']['system']['import']['data']));
-		$this->smarty->assign('stdVariantColumns',$this->_stdVariantColumns);
+		//$this->smarty->assign('variantColumns',$this->extractVariantColumns($_SESSION['admin']['system']['import']['data']));
+		//$this->smarty->assign('stdVariantColumns',$this->_stdVariantColumns);
+
+
+        if (isset($_SESSION['admin']['system']['import']['data']['hidden']))
+            $this->smarty->assign('hidden', $_SESSION['admin']['system']['import']['data']['hidden']);
+
+		$this->smarty->assign('nbcColumns',$this->_nbcColumns);
 		
+		$this->smarty->assign('characters',$_SESSION['admin']['system']['import']['data']['characters']);
 		
-        
         $this->printPage();
     }
 
@@ -299,7 +320,6 @@ class ImportNBCController extends Controller
         }
         
         $this->smarty->assign('characters', $data['characters']);
-
        
         $this->smarty->assign('skin', $this->_defaultSkinName);
         $this->smarty->assign('matrix_state_image_per_row', 4);
@@ -474,7 +494,6 @@ class ImportNBCController extends Controller
 				
 				$pId = $d[0]['id'];
 
-
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
 				
 					$d = $this->models->CharacteristicLabel->_get(array('id' =>
@@ -606,12 +625,10 @@ class ImportNBCController extends Controller
     }
 
 
-
     private function getNewDefaultLanguageId ()
     {
         return $this->_defaultLanguageId;
     }
-
 
 
     private function getDataFromFile ($file)
@@ -631,8 +648,6 @@ class ImportNBCController extends Controller
         
         return $raw;
     }
-
-
 
 
     private function parseData ($raw)
@@ -681,8 +696,9 @@ class ImportNBCController extends Controller
                             $data['project']['soortgroep'] = $cVal;
 
                         // line 2, cell > 0: character group (or 'hidden')
-                        if ($line ==2 && $cKey > 4 && !empty($cVal))
+                        if ($line == 2 && $cKey > 4 && !empty($cVal)) {
                             $data['characters'][$cKey]['group'] = $cVal;
+						}
 
 						/*
 							because it is easier for the ppl making the import-files,
@@ -718,12 +734,15 @@ class ImportNBCController extends Controller
 						// line > 6: species records
 						if ($line > 6) {
 							
+							// line number (is uniq id during import)
 							if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
 								$data['species'][$line]['id'] = $cVal;
 							}
+							// species' main label
 							else if (isset($data['columns'][$cKey]) && ($data['columns'][$cKey] == 'title' || $data['columns'][$cKey] == 'titel')) {
 								$data['species'][$line]['label'] = $cVal;
 							}
+							// related species' main id's (or names) 
 							else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'gelijkende soorten') {
 								if (strpos($cVal, $this->_valueSep) !== false) {
 									$data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
@@ -733,11 +752,15 @@ class ImportNBCController extends Controller
 								}
 								array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
 							}
+							// character states per species
 							else {
 
 								if (isset($data['characters'][$cKey]['group']) && $data['characters'][$cKey]['group'] == 'hidden') {
 
 									$data['species'][$line][$data['characters'][$cKey]['code']] = $cVal;
+									$data['hidden'][$data['characters'][$cKey]['code']] = null;
+									
+									
 								}
 								else {
 									
@@ -769,22 +792,19 @@ class ImportNBCController extends Controller
 					$data['species'][$line]['naam SCI'] = $data['species'][$line]['label'];
 					
 				}
-				
-				
             }
         }
 
 		foreach((array)$data['characters'] as $cKey => $cVal) {
-			
+
 			$unused = true;
 			
 			foreach((array)$data['species'] as $sKey => $sVal) {
 
 				if (!empty($sVal['states'][$cKey])) {
-					
+
 					$unused = false;
-					break;
-					
+				
 				}
 				
 			}
@@ -798,7 +818,6 @@ class ImportNBCController extends Controller
 
         return $data;
     }
-
 
 
     private function addProjectRank ($label, $rankId, $isLower, $parentId)
@@ -825,7 +844,6 @@ class ImportNBCController extends Controller
         
         return $id;
     }
-
 
 
     private function addRanks ()
@@ -871,12 +889,13 @@ class ImportNBCController extends Controller
 			}
 
             $d[$val['naam SCI']]['taxon'] = $val['naam SCI'];
-            $d[$val['naam SCI']]['common name'] = $val['label'];
+            $d[$val['naam SCI']]['common name'] = $val['naam NL']; // $val['label'];
             $d[$val['naam SCI']]['id'] = $val['id'];
             $d[$val['naam SCI']]['variations'][] = $val;
         }
 		
-		$variantColumns = isset($_SESSION['admin']['system']['import']['variantColumns']) ? $_SESSION['admin']['system']['import']['variantColumns'] : null;
+		//$variantColumns = isset($_SESSION['admin']['system']['import']['variantColumns']) ? $_SESSION['admin']['system']['import']['variantColumns'] : null;
+		$variantColumns = $this->_stdVariantColumns;
 
         foreach ((array) $d as $key => $val) {
             
@@ -885,29 +904,49 @@ class ImportNBCController extends Controller
                 $str = null;
 
                 foreach ((array) $variantColumns as $hVal) {
-                    if (!isset($sVal[$data['characters'][$hVal]['code']]))
+
+                    //if (!isset($data['characters'][$hVal]['code']) || !isset($sVal[$data['characters'][$hVal]['code']]))
+                    if (!isset($sVal[$hVal]))
                         continue;
-                    $str .= $sVal[$data['characters'][$hVal]['code']]. ' ';
+
+                    $str .= $sVal[$hVal]. ' ';
 					
                 }
 
                 $d[$key]['variations'][$sKey]['add-on'] = trim($str);
                 $d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
             }
-            
 
-            // if a species has only one variation whose label is the same (empty addition), it should not be stored (ie, species & variation identical) 
-            if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0) {
+
+
+            // if a species has only one variation, it should not be stored (ie, species & variation identical)
+            //if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0) {
+            if (count((array) $d[$key]['variations']) == 1) {
+				
+				foreach((array)$d[$key]['variations'][0] as $vKey => $vVal) {
+					
+					if ($vKey=='id' || $vKey=='label' || $vKey=='add-on' || $vKey=='variant')
+						continue;
+					
+					$d[$key][$vKey] = $vVal;
+					
+				}
                 
+				/*
                 if (isset($d[$key]['variations'][0]['states']))
                     $d[$key]['states'] = $d[$key]['variations'][0]['states'];
+
                 if (isset($d[$key]['variations'][0]['related']))
                     $d[$key]['related'] = $d[$key]['variations'][0]['related'];
+				*/
+
                 unset($d[$key]['variations']);
+
             }
         }
 
         return $d;
+
     }
 
 
@@ -958,7 +997,7 @@ class ImportNBCController extends Controller
 
         $tmpIndex = array();
         $species = $this->resolveSpeciesAndVariations($data);
-        
+
         // default kingdom
         $this->models->Taxon->save(
         array(
@@ -975,8 +1014,8 @@ class ImportNBCController extends Controller
         $parent = $this->models->Taxon->getNewId();
         
         $i = 1;
-        
-        // save all taxa
+
+       // save all taxa
         foreach ((array) $species as $key => $val) {
             
             $this->models->Taxon->save(
@@ -993,19 +1032,12 @@ class ImportNBCController extends Controller
             
             $species[$key]['lng_id'] = $this->models->Taxon->getNewId();
 
-
-                    if (isset($vVal['foto id beeldbank']))
-                        $this->storeNbcExtra($vId, 'taxon', 'url_image', $vVal['foto id beeldbank']);
-                    if (isset($vVal['nsrpage']))
-                        $this->storeNbcExtra($vId, 'taxon', 'url_soortenregister', $vVal['nsrpage']);
-                    if (isset($vVal['fotograaf']))
-                        $this->storeNbcExtra($vId, 'taxon', 'photographer', $vVal['fotograaf']);
-                    if (isset($vVal['bronvermelding']))
-                        $this->storeNbcExtra($vId, 'taxon', 'source', $vVal['bronvermelding']);
-                    if (isset($vVal['sekse op foto']))
-                        $this->storeNbcExtra($vId, 'taxon', 'gender_photo', $vVal['sekse op foto']);
-                    
-
+			foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+			
+				if (!empty($cVal) && isset($val[$cKey]))
+					$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
+			
+			}
             
             $_SESSION['admin']['system']['import']['loaded']['species']++;
             
@@ -1050,17 +1082,13 @@ class ImportNBCController extends Controller
                         'id' => $vId,
 						'name' => $vVal['variant'] // for Dierenzoeker
                     );
-                    
-                    if (isset($vVal['foto id beeldbank']))
-                        $this->storeNbcExtra($vId, 'variation', 'url_image', $vVal['foto id beeldbank']);
-                    if (isset($vVal['nsrpage']))
-                        $this->storeNbcExtra($vId, 'variation', 'url_soortenregister', $vVal['nsrpage']);
-                    if (isset($vVal['fotograaf']))
-                        $this->storeNbcExtra($vId, 'variation', 'photographer', $vVal['fotograaf']);
-                    if (isset($vVal['bronvermelding']))
-                        $this->storeNbcExtra($vId, 'variation', 'source', $vVal['bronvermelding']);
-                    if (isset($vVal['sekse op foto']))
-                        $this->storeNbcExtra($vId, 'variation', 'gender_photo', $vVal['sekse op foto']);
+
+					foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+					
+						if (isset($vVal[$cKey]))
+							$this->storeNbcExtra($vId, 'variation', $cVal, $vVal[$cKey]);
+					
+					}
                     
                     $this->models->VariationLabel->save(
                     array(
@@ -1346,7 +1374,7 @@ class ImportNBCController extends Controller
                         'lower' => isset($statemin) ? $statemin : null, 
                         'upper' => isset($statemax) ? $statemax : null, 
                         'got_labels' => 1, 
-                        'file_name' => $type == 'media' ? $cVal . '.' . $this->_defaultImgExtension : null
+                        //'file_name' => $type == 'media' ? $cVal . '.' . $this->_defaultImgExtension : null
                     ));
                     
                     unset($statemin);
@@ -1354,14 +1382,20 @@ class ImportNBCController extends Controller
                     
                     $states[$key][$cVal] = $this->models->CharacteristicState->getNewId();
                     
-                    $this->models->CharacteristicLabelState->save(
-                    array(
-                        'id' => null, 
-                        'project_id' => $this->getNewProjectId(), 
-                        'state_id' => $states[$key][$cVal], 
-                        'language_id' => $this->getNewDefaultLanguageId(), 
-                        'label' => $this->translateStateCode($cVal, $this->getNewDefaultLanguageId())
-                    ));
+					if (!empty($val)) {
+					
+						$this->models->CharacteristicLabelState->save(
+						array(
+							'id' => null, 
+							'project_id' => $this->getNewProjectId(), 
+							'state_id' => $states[$key][$cVal], 
+							'language_id' => $this->getNewDefaultLanguageId(), 
+							'label' => $this->translateStateCode($cVal, $this->getNewDefaultLanguageId())
+						));
+						
+					} else {
+						//
+					}
                     
                     $_SESSION['admin']['system']['import']['loaded']['states']++;
                 }
@@ -1454,8 +1488,6 @@ class ImportNBCController extends Controller
 
 	private function extractVariantColumns($data)
 	{
-		
-		
 		$d = array();
 		
 		foreach((array)$data['characters'] as $key => $val) {

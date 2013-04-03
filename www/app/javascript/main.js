@@ -166,23 +166,29 @@ function showDialog(title,content,vars,resize) {
 		if (!vars.showOk) 
 			delete buttons.ok;
 
+		$('#footer').append('<div style="display:none;color:#fff;background-color:#fff" id="tmpcontent">'+content+'</div>');
+		var h = $('#tmpcontent').outerHeight();
+		var w = $('#tmpcontent').outerWidth();
+		$('#tmpcontent').remove();
+		//alert(h+':'+w);
+
 		$("#jDialog").dialog({
 			dialogClass: "no-close",
 			resizable: false,
-			maxWidth: 600,
-			maxHeight: 650,
-			width: vars.width,
-			//height: vars.width,
+			maxWidth: 700,
+			maxHeight: 600,
+			width: w + 10,
+			height: h + 120,
 			modal: true,
 			title: title,
+			//position: { my: "center top", at: "center top", of: '#dialogRidge' },
+			position: { my: "center", at: "center" },
 			open: function(event, ui) {
 				$(this).html(content);
-				$(this).dialog( "option", "position", { my: "center", at: "center" } );
 			},
 			buttons: buttons
 		});
 
-//		$("#jDialog").dialog( "option", "position", { my: "center", at: "center" } );
 
 	} else {
 

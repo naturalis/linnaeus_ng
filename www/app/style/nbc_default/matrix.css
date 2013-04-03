@@ -56,7 +56,7 @@
 #content div#results div.result div.scientificNameHolder {
 	min-height:50px;
 	width:147px;
-	line-height:14px; 
+	line-height:1.2em; 
 	height:14px;
 	font-family: Georgia;
 	-font-size-adjust: 0.54;
@@ -186,7 +186,7 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 #state-header {font-weight: bold;}
 .state-image-cell {padding:0 0 10px 0;margin: 15px 15px 0px 15px;}
 .state-image-cell:hover {color: #f00;}
-.state-image {border:2px solid #eee;}
+.state-image {border:2px solid #eee;max-width:190px;max-height:200px;text-align:center;vertical-align:middle;}
 .state-image:hover {border:2px solid #666;cursor: pointer;}
 .state-image-irrelevant {cursor: default;}
 

@@ -223,7 +223,7 @@ function nbcFormatResult(data) {
 				(data.s!=data.l ? '<br />' + data.l : '')+
 			'</div>'+
 			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-				'<span astyle="position:relative;top:'+(data.r ? '-12' : '0')+'px">'+
+				'<span style="position:relative;top:4px">'+
 					'<span class="result-icons">'+
 						(states ? 
 							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
