@@ -7,6 +7,9 @@
 
 	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
+
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui-1.10.0.custom.min.css" />
+
 	<style type="text/css" media="all">
 		@import url("{$baseUrl}admin/style/main.css");
 		@import url("{$baseUrl}admin/style/admin-inputs.css");
@@ -21,8 +24,10 @@
 {/if *}
 	</style>
 
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.4.2.min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui-1.9.1.min.js"></script>
+
+	<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/jquery.tools.min.js"></script -->
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/main.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/development.js"></script><!--this should be removed in production-->

@@ -1,3 +1,6 @@
+.sortable-drag-list  { list-style-type: none; margin: 0; padding: 0 0 2.5em; float: left; margin-right: 5px; }
+.sortable-drag-list li { margin: 0 4px 4px 4px; padding: 4px; font-size: 0.9em; width: 90px; cursor:pointer;}
+
 a,.a {
 	text-decoration: none;
 	color: #000099;

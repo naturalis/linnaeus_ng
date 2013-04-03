@@ -382,16 +382,12 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('s', $s);
             $this->smarty->assign('states', $states);
 
-			$dim = $this->nbcGetDialogDimensions(array('type'=>$c['type'],'stateCount'=>count((array)$s),'statesPerRow'=>$this->getSetting('matrix_state_image_per_row')));
-            
             $this->smarty->assign('returnText', 
 				json_encode(
 				array(
 					'character' => $c,
 					'page' => 
 					$this->fetchPage('formatted_states'),
-					'height' => $dim[0], // unused in the actual JS (which autosizes), but correct nonetheless
-					'width' => $dim[1],
 					'showOk' => ($c['type'] == 'media' || $c['type'] == 'text' ? false : true)
 				)));
 
@@ -409,6 +405,8 @@ class MatrixKeyController extends Controller
 
             foreach ((array) $states as $val)
                 $d[$val['characteristic_id']] = true;
+
+			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
 
             $this->smarty->assign('returnText', 
 				json_encode(
@@ -836,10 +834,16 @@ class MatrixKeyController extends Controller
             'order' => 'show_order', 
             'columns' => 'id,characteristic_id,file_name,lower,upper,mean,sd,got_labels,show_order'
         ));
-        
+
+		$d = $this->getCharacteristic(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'id' => $id
+			)
+		);
+
         foreach ((array) $cs as $key => $val) {
             
-            $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
             $cs[$key]['type'] = $d['type'];
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
@@ -1663,7 +1667,7 @@ class MatrixKeyController extends Controller
             'l' => trim($label), 
             'y' => $type, 
             's' => $sciName,
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage_Boktorren van NL.gif', 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage.gif', 
             'n' => isset($nbc['url_image']), 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
@@ -2496,33 +2500,6 @@ class MatrixKeyController extends Controller
 		
 		return $res;
 
-	}
-
-	private function nbcGetDialogDimensions($p)
-	{
-
-		$type = isset($p['type']) ? $p['type'] : 'media';
-		$stateCount = isset($p['stateCount']) ? $p['stateCount'] : 16;
-		$statesPerRow = isset($p['statesPerRow']) ? $p['statesPerRow'] : 4;
-		
-		$h = $w = 400;
-		
-		// simple dialog, some text and an text-input.
-		if ($type=='range' || $type=='distribution') {
-			$h = 175;
-			$w = 400;
-		} else
-		if ($type=='text') {
-			$h = 140 + ($stateCount * 22);
-			$w = 250;
-		} else
-		if ($type=='media') {
-			$h = 150 + (ceil($stateCount/$statesPerRow) * 160);
-			$w = 600;
-		}
-		
-		return array($h,$w);
-			
 	}
 
 }

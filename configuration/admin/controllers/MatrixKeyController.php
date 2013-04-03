@@ -39,12 +39,6 @@ class MatrixKeyController extends Controller
     );
 
 
-
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
         parent::__construct();
@@ -53,17 +47,10 @@ class MatrixKeyController extends Controller
     }
 
 
-
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
     }
-
 
 
     public function indexAction ()
@@ -106,7 +93,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function matricesAction ()
     {
         $this->checkAuthorisation();
@@ -140,7 +126,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function matrixAction ()
@@ -184,7 +169,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function editAction ()
     {
         $this->checkAuthorisation();
@@ -219,7 +203,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function charSortAction ()
@@ -287,18 +270,89 @@ class MatrixKeyController extends Controller
         $matrix = $this->getMatrix($this->getCurrentMatrixId());
         
         $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['matrix']));
-        
-        if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {}
-        
-        $this->smarty->assign('groups', $this->getCharacterGroups());
-        $this->smarty->assign('characteristics', $this->getCharacteristics());
-        
+
+        if ($this->rHasVal('delete') && !$this->isFormResubmit()) {
+			
+			$this->deleteCharacteristicFromGroup(array('groupId'=>$this->requestData['delete']));
+			$this->deleteCharacterGroup(array('groupId'=>$this->requestData['delete']));
+
+			$d = $this->getSetting('matrix-key-order');
+			
+			foreach((array)$d as $key => $val) {
+
+				if ($d=='g-'.$this->requestData['delete'])
+					unset($d[$key]);
+			
+			}
+			
+//			$this->saveSetting(array('name' => 'matrix-key-order','value' => serialize($d)));
+			
+		}
+
+        if ($this->rHasVal('chars') && !$this->isFormResubmit()) {
+			
+			$this->deleteCharacteristicFromGroup();
+			
+			foreach((array)$this->requestData['chars'] as $key => $val) {
+
+				$val = explode(':',$val);
+				if ($val[1]==0)
+					continue;
+				$this->saveCharacteristicToGroup(array('charId'=>$val[0],'groupId'=>$val[1],'showOrder'=>$key));
+
+			}
+			
+		}
+		        
+		if ($this->rHasVal('new') && !$this->isFormResubmit()) {
+			
+			$c = $this->getCharacterGroups(array('label'=>$this->requestData['new']));
+
+			if (!empty($c)) {
+				
+				$this->addError(sprintf($this->translate('A group named "%s" already exists.'),$this->requestData['new']));
+
+			} else {
+				
+				$this->saveCharacterGroup(array('label' => $this->requestData['new']));
+				
+			}
+			
+		}
+
+		if ($this->rHasVal('order') && !$this->isFormResubmit()) {
+/*			
+			$this->saveSetting(
+				array(
+					'name' => 'matrix-key-order',
+					'value' => serialize($this->requestData['order'])
+				)
+			);
+*/	
+		}
+
+
+//		$order = $this->getSetting('matrix-key-order');
+		
+		if ($order) {
+			
+			$order = unserialize($order);
+			
+			foreach((array)$order as $val) {
+				
+				echo $val;
+				
+			}
+			
+		}
+
+		$this->smarty->assign('groups', $this->getCharacterGroups());
+        $this->smarty->assign('characteristics', $this->getCharactersNotInGroups());
+       
         $this->smarty->assign('matrix', $matrix);
         
         $this->printPage();
     }
-
-
 
     public function charAction ()
     {
@@ -391,7 +445,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function taxaAction ()
     {
         $this->checkAuthorisation();
@@ -451,7 +504,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function stateAction ()
@@ -575,7 +627,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function stateSortAction ()
@@ -1211,9 +1262,15 @@ class MatrixKeyController extends Controller
             'columns' => 'id,characteristic_id,language_id,label'
         ));
         
+		if (strpos($cl[$this->getDefaultProjectLanguage()]['label'],'|')!==false)
+			$d = explode('|',$cl[$this->getDefaultProjectLanguage()]['label']);
+		else
+			$d = null;
+		
         return array(
             'labels' => $cl, 
-            'label' => $cl[$this->getDefaultProjectLanguage()]['label']
+            'label' => $cl[$this->getDefaultProjectLanguage()]['label'],
+			'short_label' => is_null($d) ? $cl[$this->getDefaultProjectLanguage()]['label'] : $d[0]
         );
     }
 
@@ -1242,6 +1299,8 @@ class MatrixKeyController extends Controller
         
         $char['labels'] = $d['labels'];
         $char['label'] = $d['label'];
+        $char['short_label'] = $d['short_label'];
+		
         
         return $char;
     }
@@ -2141,60 +2200,6 @@ class MatrixKeyController extends Controller
             $this->updateStateShowOrder($val['id'], $key);
     }
 
-
-
-    private function getCharacterGroupLabel ($id, $lId)
-    {
-        $cl = $this->models->ChargroupLabel->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'chargroup_id' => $id, 
-                'language_id' => $lId
-            )
-        ));
-        
-        return $cl[0]['label'];
-    }
-
-
-
-    private function getCharacterGroups ($mId = null)
-    {
-        $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
-        
-        $cg = $this->models->Chargroup->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $mId
-            ), 
-            'order' => 'show_order', 
-            'columns' => 'id,matrix_id,label,show_order'
-        ));
-        
-        foreach ((array) $cg as $key => $val) {
-            $cg[$key]['label'] = $this->getCharacterGroupLabel($val['id'], $this->getDefaultProjectLanguage());
-            
-            $cc = $this->models->CharacteristicChargroup->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'chargroup_id' => $val['id']
-                ), 
-                'order' => 'show_order'
-            ));
-            
-            foreach ((array) $cc as $cVal) {
-                $cg[$key]['chars'][] = $this->getCharacteristic($cVal['characteristic_id']);
-            }
-        }
-        
-        return $cg;
-    }
-
-
-
     private function getVariationsInMatrix ()
     {
         if (!$this->useVariations)
@@ -2224,4 +2229,220 @@ class MatrixKeyController extends Controller
         
         return $d;
     }
+
+    private function saveCharacterGroup($p=null)
+    {
+	
+        $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+        $label = isset($p['label']) ? trim($p['label']) : null;
+		
+		if (is_null($label)) {
+			$this->addError($this->translate('Cannot save a nameless group.'));
+			return; 
+		}
+
+        if ($this->models->Chargroup->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $matrixId,
+				'label' => $label,
+				'show_order' => 99
+		))) {
+
+			return $this->models->ChargroupLabel->save(
+				array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'chargroup_id' => $this->models->Chargroup->getNewId(),
+					'label' => $label,
+					'language_id' => $this->getDefaultProjectLanguage()
+			));		
+			
+		}
+
+    }
+
+
+    private function deleteCharacterGroup($p=null)
+    {
+		
+		if (!isset($p['groupId']))
+			return;
+		else
+			$groupId =  $p['groupId'];
+		
+		$this->models->ChargroupLabel->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'chargroup_id' => $groupId
+		));		
+
+        $this->models->Chargroup->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $groupId,
+		));
+
+    }
+
+
+    private function deleteCharacteristicFromGroup ($p=null)
+    {
+
+        $charId = isset($p['charId']) ? $p['charId'] : null;
+        $groupId = isset($p['groupId']) ? $p['groupId'] : null;
+        $matrixId = isset($p['matrixId']) ? $p['matrixId'] : $this->getCurrentMatrixId();
+		
+		if ($charId==null && $groupId==null) {
+
+			$cg = $this->models->Chargroup->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'matrix_id' => $matrixId
+				)
+			));
+			
+			foreach((array)$cg as $val) {
+
+				$this->deleteCharacteristicFromGroup(array('groupId' => $val['id']));
+
+			}
+			
+		} else {
+			
+			$d = array('project_id' => $this->getCurrentProjectId());
+			
+			if (!is_null($charId))
+				$d['characteristic_id'] = $charId;
+
+			if (!is_null($groupId))
+				$d['chargroup_id'] = $groupId;
+
+			$this->models->CharacteristicChargroup->delete($d);
+
+		}
+
+	}
+
+    private function saveCharacteristicToGroup ($p=null)
+    {
+
+        $charId = isset($p['charId']) ? $p['charId'] : null;
+        $groupId = isset($p['groupId']) ? $p['groupId'] : null;
+        $showOrder = isset($p['showOrder']) ? $p['showOrder'] : null;
+		
+		if ($charId==null && $groupId==null)
+			return null;
+		
+		$d = array('project_id' => $this->getCurrentProjectId());
+		
+		if (!is_null($charId))
+			$d['characteristic_id'] = $charId;
+
+		if (!is_null($groupId))
+			$d['chargroup_id'] = $groupId;
+
+		if (!is_null($showOrder))
+			$d['show_order'] = $showOrder;
+
+		$this->models->CharacteristicChargroup->save($d);
+
+	}
+
+    private function getCharacterGroupLabel ($p=null)
+    {
+
+        $groupId = isset($p['groupId']) ? $p['groupId'] : null;
+        $langId = isset($p['langId']) ? $p['langId'] : $this->getDefaultProjectLanguage();
+		
+		if (is_null($groupId) || is_null($langId))
+			return;
+
+        $cl = $this->models->ChargroupLabel->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'chargroup_id' => $groupId, 
+                'language_id' => $langId
+            )
+        ));
+        
+        return $cl[0]['label'];
+    }
+
+    private function getCharacterGroups ($p=null)
+    {
+	
+        $matrixId = isset($matrixId) ? $matrixId : $this->getCurrentMatrixId();
+        $groupId = isset($p['groupId']) ? $p['groupId'] : null;
+        $label = isset($p['label']) ? trim($p['label']) : null;
+		
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $matrixId
+            );
+			
+		if (!is_null($groupId))
+			$d['id'] = $groupId;
+
+		if (!is_null($label))
+			$d['label'] = $label;
+        
+        $cg = $this->models->Chargroup->_get(
+        array(
+            'id' => $d, 
+            'order' => 'show_order', 
+            'columns' => 'id,matrix_id,label,show_order'
+        ));
+        
+        foreach ((array) $cg as $key => $val) {
+            $cg[$key]['label'] = $this->getCharacterGroupLabel(array('groupId'=>$val['id']));
+            
+            $cc = $this->models->CharacteristicChargroup->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'chargroup_id' => $val['id']
+                ), 
+                'order' => 'show_order'
+            ));
+            
+            foreach ((array) $cc as $cVal) {
+                $cg[$key]['chars'][] = $this->getCharacteristic($cVal['characteristic_id']);
+            }
+        }
+        
+        return (!isset($groupId) ? $cg : (isset($cg[0]) ? $cg[0] : null));
+    }
+
+    private function getCharactersNotInGroups ($mId = null)
+    {
+
+        $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
+        
+        $mc = $this->models->CharacteristicMatrix->freeQuery(
+			'select _a.characteristic_id, _a.show_order, _c.id as characteristic_chargroup_id from %PRE%characteristics_matrices _a
+			left join %PRE%characteristics_chargroups _c
+				on _c.characteristic_id = _a.characteristic_id
+			where _a.matrix_id ='.$mId.'
+			and _c.id is null'
+        );
+		
+       
+        foreach ((array) $mc as $key => $val) {
+            
+            $labels = $this->getCharacteristicLabels($val['characteristic_id']);
+            
+            if (isset($labels['label'])) {
+                
+                $d[] = array_merge($this->getCharacteristic($val['characteristic_id']), $labels, array(
+                    'show_order' => $val['show_order']
+                ));
+            }
+        }
+        
+        return isset($d) ? $d : null;
+
+    }
+
 }

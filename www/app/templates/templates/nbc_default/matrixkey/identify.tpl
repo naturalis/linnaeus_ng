@@ -1,5 +1,8 @@
 {include file="../shared/header.tpl"}
-{include file="_left_column.tpl"}
+
+<div id="dialogRidge">
+
+	{include file="_left_column.tpl"}
     
     <div id="content" class="title-type4">
     
@@ -23,6 +26,8 @@
         </div>
         
     </div>
+
+</div>
     
 {literal}
 <script type="text/JavaScript">
