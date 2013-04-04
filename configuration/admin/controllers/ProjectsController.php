@@ -392,7 +392,7 @@ class ProjectsController extends Controller
     {
         $this->checkAuthorisation();
         
-        $this->setPageName($this->translate('Project settings'));
+        $this->setPageName($this->translate('Project data'));
         /*
 		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
 		// deleting the logo
@@ -484,6 +484,79 @@ class ProjectsController extends Controller
         $this->smarty->assign('data', $this->getCurrentProjectData());
         
         $this->smarty->assign('languages', $languages);
+        
+        $this->printPage();
+    }
+
+
+
+    public function settingsAction ()
+    {
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Project settings'));
+
+        if ($this->rHasVal('action','save') && !$this->isFormResubmit()) {
+			
+			$c=0;
+			
+			foreach((array)$this->requestData['setting'] as $key => $val) {
+				
+				$val = trim($val);
+				
+				if (empty($val)) {
+					
+					$c += $this->saveSetting(array('name' => $key,'delete' => true));
+					
+				} else {
+
+					$c += $this->saveSetting(array('name' => $key,'value' => $val));
+
+				}
+				
+			}
+
+			if ($this->rHasVal('new_setting')) {
+
+				$v = $this->getSetting($this->requestData['new_setting']);
+
+				if (is_null($v)) {
+			
+					if ($this->rHasVal('new_setting') && !$this->rHasVal('new_value')) {
+						$this->addError(sprintf($this->translate('A value is required for "%s".'),$this->requestData['new_setting']));
+						$this->smarty->assign('new_setting',$this->requestData['new_setting']);
+					} else
+					if ($this->rHasVal('new_setting') && $this->rHasVal('new_value')) {
+				
+						$c += $this->saveSetting(array('name' => $this->requestData['new_setting'],'value' => $this->requestData['new_value']));
+					
+					}
+
+				} else {
+	
+					$this->addError(sprintf($this->translate('A setting with the name "%s" already exists.'),$this->requestData['new_setting']));
+					$this->smarty->assign('new_setting',$this->requestData['new_setting']);
+					$this->smarty->assign('new_value',$this->requestData['new_value']);
+	
+				}
+
+			}
+			
+			if ($c>0)
+				$this->addMessage('Data saved.');
+
+        }
+		
+		$s = $this->models->Settings->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+            ),
+            'columns' => 'setting,value',
+			'order' => 'setting'
+        ));
+		
+        $this->smarty->assign('settings',$s);
         
         $this->printPage();
     }

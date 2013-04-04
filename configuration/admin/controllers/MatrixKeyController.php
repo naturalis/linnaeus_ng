@@ -103,6 +103,10 @@ class MatrixKeyController extends Controller
         
         if (count((array) $matrices) == 0)
             $this->redirect('matrix.php');
+			
+        if ($this->rHasVal('imgdim'))
+			$this->reacquireStateImageDimensions($this->requestData['imgdim']);
+
         
         if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
             
@@ -256,7 +260,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function charGroupsAction ()
     {
         $this->checkAuthorisation();
@@ -353,6 +356,7 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
+
 
     public function charAction ()
     {
@@ -532,12 +536,8 @@ class MatrixKeyController extends Controller
         }
         else {
             
+			// must have a characteristic to define a state for
             if (!$this->rHasVal('char')) {
-                // must have a characteristic to define a state for
-                
-
-
-
                 $this->redirect('edit.php');
             }
             else {
@@ -564,25 +564,19 @@ class MatrixKeyController extends Controller
         
         $state = $this->getCharacteristicState($this->requestData['id']);
         
+         // existing state
         if ($state['label']) {
-            // existing state
-            
-
-
 
             $this->setPageName(sprintf($this->translate('Editing state for "%s"'), $characteristic['label']));
         }
+        // new state
         else {
-            // new state
-            
-
-
 
             $this->setPageName(sprintf($this->translate('New state for "%s"'), $characteristic['label']));
         }
         
         if (($this->rHasVal('action', 'save') || $this->rHasVal('action', 'repeat')) && !$this->isFormResubmit()) {
-            
+			
             $filesToSave = $this->getUploadedMediaFiles();
             
             if (!$this->verifyData($this->requestData, $filesToSave)) {
@@ -602,6 +596,8 @@ class MatrixKeyController extends Controller
                     'mean' => isset($this->requestData['mean']) ? $this->requestData['mean'] : null, 
                     'sd' => isset($this->requestData['sd']) ? $this->requestData['sd'] : null
                 ));
+
+				$this->saveStateImageDimensions($state);
                 
                 unset($state);
                 
@@ -612,7 +608,9 @@ class MatrixKeyController extends Controller
                 
                 $this->addMessage(sprintf($this->translate('State "%s" saved.'), $this->requestData['label']));
                 
-                $state = $this->getCharacteristicState($this->createState());
+				$state = $this->getCharacteristicState($this->createState());
+				//$state = $this->getCharacteristicState($this->requestData['id']);
+				
             }
         }
         
@@ -710,7 +708,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function linksAction ()
     {
         $this->checkAuthorisation();
@@ -747,7 +744,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     /**
@@ -2130,8 +2126,6 @@ class MatrixKeyController extends Controller
             $this->updateCharShowOrder($val['id'], $key);
     }
 
-
-
     private function setDefaultMatrix ($id = null)
     {
         if (isset($id)) {
@@ -2178,8 +2172,6 @@ class MatrixKeyController extends Controller
         }
     }
 
-
-
     private function updateStateShowOrder ($id, $val)
     {
         $this->models->CharacteristicState->update(array(
@@ -2189,8 +2181,6 @@ class MatrixKeyController extends Controller
             'id' => $id
         ));
     }
-
-
 
     private function renumberStateShowOrder ($id)
     {
@@ -2261,7 +2251,6 @@ class MatrixKeyController extends Controller
 
     }
 
-
     private function deleteCharacterGroup($p=null)
     {
 		
@@ -2283,7 +2272,6 @@ class MatrixKeyController extends Controller
 		));
 
     }
-
 
     private function deleteCharacteristicFromGroup ($p=null)
     {
@@ -2444,5 +2432,72 @@ class MatrixKeyController extends Controller
         return isset($d) ? $d : null;
 
     }
+
+	private function saveStateImageDimensions($state)
+	{
+		
+		$path = $_SESSION['admin']['project']['urls']['project_media'];
+		$file = isset($state['file_name']) ? $state['file_name'] : null;
+		
+		// if there is a filename, and the file does exist...
+		if (!empty($file) && file_exists($path.$file)) {
+			
+			// ...try to get its dimensions...
+			$d = getimagesize($path.$file);
+
+			// ...if that works...
+			if ($d!==false) {
+
+				// ...save them as w:h...
+				$this->models->CharacteristicState->save(
+				array(
+					'id' => $state['id'], 
+					'project_id' => $this->getCurrentProjectId(), 
+					'file_dimensions' => $d[0].':'.$d[1]
+				));
+				
+				// ...and return
+				return;
+
+			}
+
+		} 
+
+		// if filename is empty, the file doesn't exist or we couldn't get any dimensions, reset the dimensions, if there were any in the database
+		if (!empty($state['file_dimensions'])) {
+
+			$this->models->CharacteristicState->save(
+			array(
+				'id' => $state['id'], 
+				'project_id' => $this->getCurrentProjectId(), 
+				'file_dimensions' => 'null'
+			));
+
+		}
+
+	}
+				
+	private function reacquireStateImageDimensions($id)
+	{
+		
+		$d = $this->getCharacteristics($id);
+		
+		foreach((array)$d as $dVal) {
+		
+			$v = $this->getCharacteristicStates($dVal['id']);
+
+			foreach((array)$v as $vVal) {
+			
+				$this->saveStateImageDimensions($this->getCharacteristicState($vVal['id']));
+				
+			}
+
+			$this->addMessage(sprintf($this->translate('Updated states for "%s".'),$dVal['label']));
+			
+		}
+
+		
+	}
+
 
 }

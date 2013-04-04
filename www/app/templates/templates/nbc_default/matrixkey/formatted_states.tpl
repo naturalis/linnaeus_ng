@@ -33,9 +33,9 @@
                     {if $states[$c.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
                     {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
                     <td{if $selected} class="selectedValue"{/if}{if $irrelephant} class="irrelevant"{/if}>
-                        <div class="state-image-cell" style="padding:0">
+                        <div class="state-image-cell" style="padding:0;">
 							{if !$irrelephant}<a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
-                            <img class="state-image" src="{if $v.file_name}{$session.app.project.urls.projectMedia}{$v.file_name}{else}{$session.app.project.urls.systemMedia}missing.jpg{/if}" />
+                            <img {if $v.img_dimensions}style="width:{$v.img_dimensions[0]}px;height:{$v.img_dimensions[1]}px;"{/if} class="state-image" src="{if $v.file_name}{$session.app.project.urls.projectMedia}{$v.file_name}{else}{$session.app.project.urls.systemMedia}missing.jpg{/if}" />
 							{if !$irrelephant}</a>{/if}
                             <p>{$v.label}</p>
                         </div>

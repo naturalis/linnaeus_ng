@@ -1003,6 +1003,13 @@ class Controller extends BaseClass
     }
 
 
+    public function rHasVar ($var)
+    {
+
+		return isset($this->requestData[$var]);
+
+    }
+
 
     public function rHasVal ($var, $val = null)
     {

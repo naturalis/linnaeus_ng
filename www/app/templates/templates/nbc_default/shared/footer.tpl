@@ -15,6 +15,7 @@
 <!-- div id="allLookupList" class="allLookupListInvisible"></div -->
 
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
+<div id="tmpcontent" title="" class="ui-helper-hidden"></div>
 
 {literal}
 <script type="text/JavaScript">

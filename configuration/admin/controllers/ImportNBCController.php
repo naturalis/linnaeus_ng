@@ -18,6 +18,7 @@
 
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'suppress_splash',1,now(),CURRENT_TIMESTAMP);
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'start_page','/kreeften/app/views/matrixkey/identify.php',now(),CURRENT_TIMESTAMP);
+	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'start_page','/kreeften/app/views/matrixkey/identify.php',now(),CURRENT_TIMESTAMP);
 
 */
 
@@ -333,6 +334,7 @@ class ImportNBCController extends Controller
        
         $this->smarty->assign('skin', $this->_defaultSkinName);
         $this->smarty->assign('matrix_state_image_per_row', 4);
+        $this->smarty->assign('matrix_state_image_max_height', 300);
         $this->smarty->assign('matrix_items_per_page', 16);
         $this->smarty->assign('matrix_items_per_line', 4);
         $this->smarty->assign('matrix_use_sc_as_weight', 1);
