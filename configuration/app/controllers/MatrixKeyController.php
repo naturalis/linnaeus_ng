@@ -11,6 +11,7 @@ class MatrixKeyController extends Controller
 {
     private $_matrixType = 'default';
 	private $_useSepCoeffAsWeight = false;
+	private $_matrixStateImageMaxHeight = null;
 
     public $usedModels = array(
         'matrix', 
@@ -535,6 +536,7 @@ class MatrixKeyController extends Controller
         $this->useVariations = $this->getSetting('taxa_use_variations') == '1';
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
         $this->_useSepCoeffAsWeight = false; // $this->getSetting('matrix_use_sc_as_weight');
+        $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
 
 		if (empty($_SESSION['app']['system']['matrix']['totalEntityCount']))
 			$_SESSION['app']['system']['matrix']['totalEntityCount'] = $this->getTotalEntityCount();
@@ -789,35 +791,16 @@ class MatrixKeyController extends Controller
             return null;
         }
     }
+	
+	private function scaleDimensions($d)
+	{
+		
+		if (is_null($this->_matrixStateImageMaxHeight))
+			return $d;
 
-
-
-    private function getImageDimensions ($state)
-    {
-        if (isset($state['type']) && $state['type'] == 'media') {
-            
-            $f = $_SESSION['app']['project']['urls']['uploadedMedia'] . $state['file_name'];
-            
-            if (!file_exists($f) || is_dir($f))
-                return null;
-            
-            $f = getimagesize($f);
-            
-            if ($f == false)
-                return null;
-            
-            return array(
-                'w' => $f[0], 
-                'h' => $f[1]
-            );
-        }
-        else {
-            
-            return null;
-        }
-    }
-
-
+		return array(round(($this->_matrixStateImageMaxHeight / $d[1]) * $d[0]),$this->_matrixStateImageMaxHeight);
+		
+	}
 
     private function getCharacteristicStates ($id)
     {
@@ -832,7 +815,7 @@ class MatrixKeyController extends Controller
                 'characteristic_id' => $id
             ), 
             'order' => 'show_order', 
-            'columns' => 'id,characteristic_id,file_name,lower,upper,mean,sd,got_labels,show_order'
+            'columns' => 'id,characteristic_id,file_name,file_dimensions,lower,upper,mean,sd,got_labels,show_order'
         ));
 
 		$d = $this->getCharacteristic(
@@ -843,11 +826,10 @@ class MatrixKeyController extends Controller
 		);
 
         foreach ((array) $cs as $key => $val) {
-            
             $cs[$key]['type'] = $d['type'];
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
-            $cs[$key]['img_dimensions'] = $this->getImageDimensions($cs[$key]);
+            $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h
         }
         
         return $cs;

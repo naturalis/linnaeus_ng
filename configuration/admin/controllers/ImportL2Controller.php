@@ -2,6 +2,14 @@
 
 /*
 
+	POST-PROCESSING
+	- compact keys
+	- make Diversity index
+	- matrix char state image dimensions
+
+
+
+
 	change the title in the xml file to %test% and a random (yet readable) project name will be assigned.
 
 	should add '_sawModule' to all modules

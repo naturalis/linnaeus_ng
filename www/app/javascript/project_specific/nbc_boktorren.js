@@ -717,7 +717,7 @@ function nbcBindDialogKeyUp() {
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:false,
+		allow_resize:true,
 		animation_speed:50,
  		opacity: 0.70, 
 		show_title: false,

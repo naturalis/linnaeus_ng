@@ -2106,6 +2106,9 @@ class Controller extends BaseClass
                 ));
             }
         }
+		
+		return $this->models->Settings->getAffectedRows();
+		
     }
 
 
@@ -2667,7 +2670,12 @@ class Controller extends BaseClass
         return isset($_SESSION['admin']['project']['default_language_id']) ? $_SESSION['admin']['project']['default_language_id'] : null;
     }
 
+    public function rHasVar ($var)
+    {
 
+		return isset($this->requestData[$var]);
+
+    }
 
     public function rHasVal ($var, $val = null)
     {
