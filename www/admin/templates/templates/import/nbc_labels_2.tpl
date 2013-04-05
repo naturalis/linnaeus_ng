@@ -3,7 +3,7 @@
 
 <div id="page-main">
 <p>
-Below is a sample of the data parsed from the input file. Please verify that it looks okay, and click 'Create project'.
+Below is a sample of the data parsed from the input file. Please verify that it looks okay, and click 'save'.
 </p>
 <p>
 	Project title: "<b>{$title}</b>"{if !$exists} <span class="message-error">(does not exist in database! no use importing!)</span>{/if}<br />
