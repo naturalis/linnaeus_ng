@@ -413,7 +413,7 @@ class ImportNBCController extends Controller
 
 		if (isset($_SESSION['admin']['system']['import']['type']) && $_SESSION['admin']['system']['import']['type']!='nbc_labels')			
 			unset($_SESSION['admin']['system']['import']);
-       
+			
         $this->setPageName($this->translate('Choose file'));
         
         $this->setSuppressProjectInBreadcrumbs();
@@ -466,14 +466,28 @@ class ImportNBCController extends Controller
         $this->setPageName($this->translate('Parsed data'));
         
         $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
-        
+      
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseLabelData($raw);
-		
+
 		if (empty($data['project']['soortgroep'])) {
 			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
-        
+
+
+		if ($data['project']['title']) {
+
+			$d = $this->models->Project->_get(array(
+					'id' => array(
+					'sys_name' => $data['project']['title']
+				)));
+				
+			//q($this->models->Project->q());
+
+            $this->smarty->assign('exists',$d!=false);
+
+		}
+		
         if (isset($data['project']['soortgroep']))
             $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
         if (isset($data['project']['title']))
@@ -507,7 +521,10 @@ class ImportNBCController extends Controller
 				$pId = $d[0]['id'];
 
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
-				
+					
+					if (empty($val[1]))
+						continue;
+					
 					$d = $this->models->CharacteristicLabel->_get(array('id' =>
 						array(
 							'project_id' => $pId, 
@@ -645,8 +662,9 @@ class ImportNBCController extends Controller
 
     private function getDataFromFile ($file)
     {
+
         $raw = array();
-        
+
         if (($handle = fopen($file, "r")) !== FALSE) {
             $i = 0;
             while (($dummy = fgetcsv($handle, 8192, $this->_delimiter, $this->_encloser)) !== FALSE) {
@@ -657,7 +675,7 @@ class ImportNBCController extends Controller
             }
             fclose($handle);
         }
-        
+
         return $raw;
     }
 
@@ -901,7 +919,7 @@ class ImportNBCController extends Controller
 			}
 
             $d[$val['naam SCI']]['taxon'] = $val['naam SCI'];
-            $d[$val['naam SCI']]['common name'] = $val['naam NL']; // $val['label'];
+            if (isset($val['naam NL'])) $d[$val['naam SCI']]['common name'] = $val['naam NL']; // $val['label'];
             $d[$val['naam SCI']]['id'] = $val['id'];
             $d[$val['naam SCI']]['variations'][] = $val;
         }

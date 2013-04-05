@@ -41,7 +41,7 @@
 	{foreach from=$characters item=v}
 	{if $v.group!='hidden'}
 	<tr class="tr-highlight">
-		<td>{$v.code}</td>
+		<td>{$v.group}: {$v.code}</td>
 		<td>
 			<select name="char_type[{$v.code}]">
 				<option value="media">media</option>
