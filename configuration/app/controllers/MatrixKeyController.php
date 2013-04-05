@@ -204,7 +204,7 @@ class MatrixKeyController extends Controller
 					'url' => $this->getSetting('source_url')
 				)
 			);
-
+			
         }
         else {
             
@@ -215,7 +215,7 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('storedStates', $this->stateMemoryRecall());
             $this->smarty->assign('storedShowState', $this->showStateRecall());
         }
-        
+
         $this->smarty->assign('taxa', $taxa);
         
         $this->smarty->assign('matrix', $matrix);
@@ -258,7 +258,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function compareAction ()
     {
         $this->checkMatrixIdOverride();
@@ -286,7 +285,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
     public function ajaxInterfaceAction ()
     {
@@ -394,8 +392,8 @@ class MatrixKeyController extends Controller
 
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
-            
-            if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar')                
+			
+ 			if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar')                
                 $results = $this->nbcGetSimilar($this->requestData['params']);
             else                
                 $results = $this->nbcGetTaxaScores();
@@ -409,7 +407,7 @@ class MatrixKeyController extends Controller
 
 			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
 
-            $this->smarty->assign('returnText', 
+			$result = 
 				json_encode(
 					array(
 						'results' => $results, 
@@ -423,8 +421,10 @@ class MatrixKeyController extends Controller
 							'storedStates' => $this->stateMemoryRecall()
 						)
 					)
-				)
-			);
+				);
+			
+            $this->smarty->assign('returnText', $result	);
+
 			
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'clear_state')) {

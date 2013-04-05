@@ -36,6 +36,7 @@ function nbcGetResults(p) {
 		}),
 		success : function (data) {
 			//alert(data);
+			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
 			if (p && p.action!='similar') nbcDoOverhead();

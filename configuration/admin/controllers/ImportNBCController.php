@@ -40,6 +40,7 @@ class ImportNBCController extends Controller
 		'naam NL' => '-',
 		'foto id beeldbank' => 'url_image',
 		'nsrpage' => 'url_soortenregister',
+		'nsrpage nieuw' => 'url_soortenregister',
 		'fotograaf' => 'photographer',
 		'bronvermelding' => 'source',
 		'sekse op foto' => 'gender_photo',
