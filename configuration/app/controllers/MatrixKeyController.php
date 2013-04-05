@@ -173,7 +173,7 @@ class MatrixKeyController extends Controller
 				'paramCount' => count((array)$states),
                 'count' => array(
                     'results' => count((array) $results), 
-                    'all' => $_SESSION['app']['system']['matrix']['totalEntityCount']
+                    'all' => $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']
                 )
             ));
 
@@ -189,7 +189,7 @@ class MatrixKeyController extends Controller
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
             $this->smarty->assign('nbcImageRoot', $this->getSetting('nbc_image_root'));
-            $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix']['totalEntityCount']);
+            $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
 			$this->smarty->assign('nbcPerLine', $this->getSetting('matrix_items_per_line'));
@@ -538,8 +538,8 @@ class MatrixKeyController extends Controller
         $this->_useSepCoeffAsWeight = false; // $this->getSetting('matrix_use_sc_as_weight');
         $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
 
-		if (empty($_SESSION['app']['system']['matrix']['totalEntityCount']))
-			$_SESSION['app']['system']['matrix']['totalEntityCount'] = $this->getTotalEntityCount();
+		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
+			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
         
         if ($this->_matrixType == 'NBC') {
 			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->getSetting('nbc_image_root');
