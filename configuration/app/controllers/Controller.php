@@ -1963,6 +1963,10 @@ class Controller extends BaseClass
         $this->smarty->assign('pageName', $this->getPageName());
         $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
         $this->smarty->assign('addedProjectIDParam', $this->generalSettings['addedProjectIDParam']);
+
+        $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
+		
+		
     }
 
 
