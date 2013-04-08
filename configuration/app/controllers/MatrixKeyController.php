@@ -1646,9 +1646,9 @@ class MatrixKeyController extends Controller
 
         $d = array(
             'i' => $val['id'], 
-            'l' => trim($label), 
+            'l' => trim(strip_tags($label)), 
             'y' => $type, 
-            's' => $sciName,
+            's' => trim(strip_tags($sciName)),
             'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage.gif', 
             'n' => isset($nbc['url_image']), 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
@@ -2319,7 +2319,7 @@ class MatrixKeyController extends Controller
 		$term = mysql_real_escape_string(strtolower($p['term']));
 
         $q = "
-			select 'variation' as type, _a.variation_id as id, trim(_c.label) as label,trim(_c.label) as l, _c.taxon_id as taxon_id, _d.taxon as taxon, 1 as s
+			select 'variation' as type, _a.variation_id as id, trim(_c.label) as label,trim(_c.label) as l, _c.taxon_id as taxon_id, _d.taxon as taxon, 1 as s, null as commonname
 				from  %PRE%matrices_variations _a        		
 				left join %PRE%matrices_taxa_states _b
 					on _a.project_id = _b.project_id
@@ -2333,7 +2333,7 @@ class MatrixKeyController extends Controller
 					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 				and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
 			union
-			select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s
+			select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s, _d.commonname as commonname
         		from %PRE%matrices_taxa _a
         		left join %PRE%matrices_taxa_states _b
         			on _a.project_id = _b.project_id
@@ -2341,9 +2341,12 @@ class MatrixKeyController extends Controller
         			and _a.taxon_id = _b.taxon_id
 		        left join %PRE%taxa _c
 			        on _a.taxon_id = _c.id
+		        left join %PRE%commonnames _d
+			        on _a.taxon_id = _d.taxon_id
+					and _d.language_id = ".$this->getCurrentLanguageId() ." 
 		        where _a.project_id = " . $this->getCurrentProjectId() . "
 			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					and lower(_c.taxon) like '%". $term ."%'
+					and (lower(_c.taxon) like '%". $term ."%' or lower(_d.commonname) like '%". $term ."%')
 				";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
@@ -2372,6 +2375,7 @@ class MatrixKeyController extends Controller
 
 				$label = $val['label'];
 
+				/*
 				$c = $this->models->Commonname->_get(
 					array(
 						'id' => array(
@@ -2388,6 +2392,10 @@ class MatrixKeyController extends Controller
 						break;
 					}
 				}
+				*/
+
+				if ($val['commonname'] != $val['label'])
+						$label = $val['commonname'];
 
 				$gender = $gender_label = null;
 
