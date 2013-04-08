@@ -55,7 +55,7 @@
 #content div#results div.result div {line-height:91%} /* // added details for ALL results, may have to be removed again */
 #content div#results div.result div.scientificNameHolder {
 	min-height:50px;
-	width:147px;
+	width:143px;
 	line-height:1.2em; 
 	height:14px;
 	font-family: Georgia;

@@ -391,14 +391,17 @@ class Controller extends BaseClass
     public function getCurrentUserProjects ()
     {
 		
+		$p = $this->models->Project->_get(array('id'=>'*','fieldAsIndex'=>'id'));
+		
         foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
-            
+
             $r = array(
                 'id' => $val['project_id'], 
                 'name' => $val['project_name'], 
                 'title' => $val['project_title'], 
                 'active' => $val['active'], 
-                'member' => $val['member']
+                'member' => $val['member'],
+				'published' => isset($p[$val['project_id']]['published']) ? $p[$val['project_id']]['published']=='1' : false
             );
             
             if (!isset($cup) || !in_array($r, (array) $cup)) {

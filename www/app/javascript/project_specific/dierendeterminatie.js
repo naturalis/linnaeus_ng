@@ -212,6 +212,9 @@ function nbcFormatResult(data) {
 		}
 		
 	}
+	
+	if (data.s=='Corymbia scutellata')
+		console.dir(data);
 
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
@@ -405,11 +408,11 @@ function nbcCloseSimilar() {
 
 function nbcDoSearch() {
 
-	var str = $('#inlineformsearchInput').val().trim();
-	
-	//if ((str.length==0) || (str==nbcSearchTerm)) return false;
+	var str = $('#inlineformsearchInput').val();
+	str = str.replace(/^\s+|\s+$/g, ''); 
+
 	if (str.length==0) return false;
-	
+
 	nbcSearchTerm=str;
 	nbcSetPaginate(true);
 	nbcSetState({norefresh:true,clearState:true});
@@ -434,6 +437,8 @@ function nbcDoSearch() {
 			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
 
 			setCursor();
+			
+			return false;
 
 		}
 	});
@@ -451,9 +456,18 @@ function nbcClearSearchTerm() {
 
 function nbcCloseSearch() {
 
-	nbcGetResults();
-	nbcSaveSessionSetting('nbcSearch');
+	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
+	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
+	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
+	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
+
 	$('#inlineformsearchInput').val('');
+
+	nbcGetResults();
+	nbcClearOverhead();
+	nbcSaveSessionSetting('nbcSearch');
+
+	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
 
 }
 
