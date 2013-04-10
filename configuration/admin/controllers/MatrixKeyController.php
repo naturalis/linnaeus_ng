@@ -17,7 +17,8 @@ class MatrixKeyController extends Controller
         'chargroup_label', 
         'chargroup', 
         'characteristic_chargroup', 
-        'matrix_variation'
+        'matrix_variation',
+		'gui_menu_order'
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -274,21 +275,11 @@ class MatrixKeyController extends Controller
         
         $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['matrix']));
 
+
         if ($this->rHasVal('delete') && !$this->isFormResubmit()) {
 			
 			$this->deleteCharacteristicFromGroup(array('groupId'=>$this->requestData['delete']));
 			$this->deleteCharacterGroup(array('groupId'=>$this->requestData['delete']));
-
-			$d = $this->getSetting('matrix-key-order');
-			
-			foreach((array)$d as $key => $val) {
-
-				if ($d=='g-'.$this->requestData['delete'])
-					unset($d[$key]);
-			
-			}
-			
-//			$this->saveSetting(array('name' => 'matrix-key-order','value' => serialize($d)));
 			
 		}
 
@@ -324,33 +315,34 @@ class MatrixKeyController extends Controller
 		}
 
 		if ($this->rHasVal('order') && !$this->isFormResubmit()) {
-/*			
-			$this->saveSetting(
-				array(
-					'name' => 'matrix-key-order',
-					'value' => serialize($this->requestData['order'])
-				)
-			);
-*/	
-		}
 
+			$this->deleteGUIMenuOrder();
+			
+			foreach((array)$this->requestData['order'] as $key => $val) {
 
-//		$order = $this->getSetting('matrix-key-order');
-		
-		if ($order) {
-			
-			$order = unserialize($order);
-			
-			foreach((array)$order as $val) {
-				
-				echo $val;
-				
+				$d = explode('-',$val);
+
+				if ($d[1]==1)
+					continue;
+					
+				$this->saveGUIMenuOrder(array('type'=>$d[1],'id'=>$d[2],'order'=>$key));
+
 			}
-			
+
+
 		}
 
-		$this->smarty->assign('groups', $this->getCharacterGroups());
-        $this->smarty->assign('characteristics', $this->getCharactersNotInGroups());
+		$g = $this->getCharacterGroups();
+		$c = $this->getCharactersNotInGroups();
+		$m = $this->getGUIMenuOrder();
+
+		$m = $this->effectuateGUIMenuOrder(array('groups'=>$g,'characters'=>$c,'menu'=>$m,));
+
+		$this->smarty->assign('groups', $g);
+
+        $this->smarty->assign('characteristics', $c);
+
+        $this->smarty->assign('menuorder', $m);
        
         $this->smarty->assign('matrix', $matrix);
         
@@ -2380,10 +2372,12 @@ class MatrixKeyController extends Controller
         array(
             'id' => $d, 
             'order' => 'show_order', 
-            'columns' => 'id,matrix_id,label,show_order'
+            'columns' => 'id,matrix_id,label,show_order',
+			'fieldAsIndex' => 'id'
         ));
         
         foreach ((array) $cg as $key => $val) {
+            $cg[$key]['type'] = 'group';
             $cg[$key]['label'] = $this->getCharacterGroupLabel(array('groupId'=>$val['id']));
             
             $cc = $this->models->CharacteristicChargroup->_get(
@@ -2408,13 +2402,14 @@ class MatrixKeyController extends Controller
 
         $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
         
-        $mc = $this->models->CharacteristicMatrix->freeQuery(
-			'select _a.characteristic_id, _a.show_order, _c.id as characteristic_chargroup_id from %PRE%characteristics_matrices _a
+        $mc = $this->models->CharacteristicMatrix->freeQuery(array(
+			'query' => 'select _a.characteristic_id, _a.show_order, _c.id as characteristic_chargroup_id from %PRE%characteristics_matrices _a
 			left join %PRE%characteristics_chargroups _c
 				on _c.characteristic_id = _a.characteristic_id
 			where _a.matrix_id ='.$mId.'
-			and _c.id is null'
-        );
+			and _c.id is null',
+			'fieldAsIndex' => 'characteristic_id'
+        ));
 		
        
         foreach ((array) $mc as $key => $val) {
@@ -2423,7 +2418,7 @@ class MatrixKeyController extends Controller
             
             if (isset($labels['label'])) {
                 
-                $d[] = array_merge($this->getCharacteristic($val['characteristic_id']), $labels, array(
+                $d[$key] = array_merge($this->getCharacteristic($val['characteristic_id']), $labels, array(
                     'show_order' => $val['show_order']
                 ));
             }
@@ -2499,5 +2494,84 @@ class MatrixKeyController extends Controller
 		
 	}
 
+	private function deleteGUIMenuOrder()
+	{
+
+		$this->models->GuiMenuOrder->delete(
+		array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'matrix_id' => $this->getCurrentMatrixId()
+		));
+
+	}
+
+	private function saveGUIMenuOrder($p=null)
+	{
+		
+		$id = isset($p['id']) ? $p['id'] : null;
+		$type = isset($p['type']) ? $p['type'] : null;
+		$order = isset($p['order']) ? $p['order'] : null;
+		
+		if (is_null($id) || is_null($type) || is_null($order))
+			return;
+
+		$this->models->GuiMenuOrder->save(
+		array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'matrix_id' => $this->getCurrentMatrixId(), 
+			'ref_id' => $id,
+			'ref_type' => $type,
+			'show_order' => $order,
+		));
+		
+	}
+
+
+	private function getGUIMenuOrder()
+	{
+
+		return $this->models->GuiMenuOrder->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $this->getCurrentMatrixId(), 
+			),
+			'order' => 'show_order'
+		));
+		
+	}
+
+	private function effectuateGUIMenuOrder($p=null)
+	{
+	
+		$g = isset($p['groups']) ? $p['groups'] : null;
+		$c = isset($p['characters']) ? $p['characters'] : null;
+		$m = isset($p['menu']) ? $p['menu'] : null;
+	
+		if (is_null($g) || is_null($c) || is_null($m))
+			return;
+			
+		$d = array();
+		
+		foreach((array)$m as $val) {
+			if ($val['ref_type']=='group') {
+				$d[] = $g[$val['ref_id']];
+				unset($g[$val['ref_id']]);
+			} else {
+				$d[] = $c[$val['ref_id']];
+				unset($c[$val['ref_id']]);
+			}
+		}
+	
+		// appand the items for some reason missing from the menu-order
+		foreach((array)$c as $val)
+			$d[] = $val;
+	
+		foreach((array)$g as $val)
+			$d[] = $val;
+			
+		return $d;
+
+	}
 
 }

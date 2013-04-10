@@ -2085,10 +2085,25 @@ class Controller extends BaseClass
 
     private function doesSkinExist ($skin)
     {
-        return 
-			file_exists($this->baseUrl . $this->getAppName() . '/style/' . $skin . '/') && 
-			file_exists($this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/') &&
-         	file_exists($this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/');
+		
+		$d = array(
+			$this->baseUrl . $this->getAppName() . '/style/' . $skin . '/',
+			$this->baseUrl . $this->getAppName() . '/media/system/skins/' . $skin . '/',
+			$this->_smartySettings['dir_template'] . $skin . '/' . $this->getControllerBaseName() . '/'
+		);
+
+		if (false) {
+			echo '<!-- template folders:'.chr(10);
+			foreach((array)$d as $val)
+				echo '  '.$val.': '.(file_exists($val) ? 'ok' : 'missing' ).chr(10);
+			echo '-->'.chr(10);
+		}
+
+		foreach((array)$d as $val)
+			if (!file_exists($val)) return false;
+		
+		return true;
+
     }
 
 

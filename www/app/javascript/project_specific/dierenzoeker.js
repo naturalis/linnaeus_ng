@@ -1,10 +1,136 @@
-var nbcBrowseStyle='paginate';
+var nbcData;
 var nbcStart = 0;
+var nbcPerPage = 16;	// default, reset in identify.php
+var nbcPerLine = 2;		// default, reset in identify.php
+
+function nbcDoResults(p) {
+
+	//if (p && p.resetStart!==false)
+	//		nbcStart = 0;
+	//nbcClearResults();
+	if (nbcData.results) {
+
+		nbcPrintResults();
+		nbcUpdateNavigation();
+
+	}
+
+}
+
+function nbcPrintResults() {
+
+	var s = '<ul>';
+
+	for(var i=0;i<nbcData.results.length;i++) {
+		var data = nbcData.results[i];
+		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
+			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.id+');return false;" style=""><img alt="" src="'+data.t+'">'+data.l+'</a></li>';
+		}
+	}
+
+	s = s + '</ul>';
+	
+	$('#result-list-container').html(s);
+	$('#result-count-container').html(nbcData.count.results);
+
+}
+
+function navigeren(dir) {
+
+	if (dir=='vorige')
+		nbcStart = nbcStart-nbcPerPage;
+	else
+		nbcStart = nbcStart+nbcPerPage;
+
+	if (nbcStart>nbcData.count.results)
+		nbcStart = nbcStart-nbcPerPage;
+	if (nbcStart<0)
+		nbcStart = 0;
+
+	nbcPrintResults();
+	nbcUpdateNavigation();
+
+}
+
+
+function nbcUpdateNavigation() {
+	
+	if (nbcStart==0)
+		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','hidden');
+	else
+		$('#prev-button-container-top,#prev-button-container-bottom').css('visibility','visible');
+
+	if (nbcStart+nbcPerPage>nbcData.count.results)
+		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
+	else
+		$('#next-button-container-top,#next-button-container-bottom').css('visibility','visible');
+
+}
+
+
+function toonDier(id) {
+
+	alert('soon!');
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var nbcBrowseStyle='paginate';
 var nbcExpandedShowing = 0;
 var nbcExpandedPrevious = null;
-var nbcPerPage = 16;	// default, reset in identify.php
-var nbcPerLine = 4;		// default, reset in identify.php
-var nbcData;
+
+
 var nbcFullDatasetCount = 0;
 var nbcCurrPage = 0;
 var nbcLastPage = 0;
@@ -52,57 +178,10 @@ function nbcGetResults(p) {
 	
 }
 
-function nbcDoResults(p) {
-
-	if (p && p.resetStart!==false)
-		nbcStart = 0;
-	nbcExpandedShowing = 0;
-	nbcClearResults();
-	if (nbcData.results) nbcPrintResults();
-
-}
-
 function nbcClearResults() {
 
 	$('#results-container').html('');
 
-}
-
-function nbcPrintResults() {
-
-	if (nbcExpandResults)
-		nbcPrintResultsExpanded();
-	else
-		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
-
-	nbcPrettyPhotoInit();
-	nbcResetClearButton();	
-
-}
-
-function nbcPrintResultsPaginated() {
-
-	var results = nbcData.results;
-	var s = '';
-	var d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++) {
-		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
-			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
-	}
-
-	s = s + '</div>';
-	
-	nbcRemoveShowMoreButton();
-
-	$('#results-container').html(s);
 }
 
 function nbcPrintResultsExpanded() {
@@ -157,117 +236,9 @@ function nbcPrintResultsExpanded() {
 
 }
 
-function nbcFormatResult(data) {
-
-	/*
-		data.
-			i : id 
-			t : taxon id (absent when not a variation) 
-			y : type: t(axon) or v(ariation)
-			l : label 
-			c : taxon
-			g : gender (absent when not a variation)
-			s : scientific name 
-			n :has image?
-			m : image url (generic image when n==false)
-			h : thumbnail
-			p : photographer credit 
-			u : remote url
-			r : number of similars
-			h : highlight (bool)
-			d : full species details (only when comparing or resultset has only one taxon/variation)
-    */
-	
-	var showDetails = nbcData.results.length <= nbcPerPage;
-	
-	if (data.l!=data.c && data.l.indexOf(data.c)===0) {
-		data.l = data.c + ' (' + data.l.replace(data.c,'').replace(/(^\s|\s$)/,'') + ')';
-	}
-
-	var photoLabel = 
-		(data.s==data.l || !data.s ? '<i>'+(data.l)+'</i>' : data.l)+
-		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
-		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')
-	
-	var id = data.y+'-'+data.i;
-
-	if (showDetails && data.d) {
-
-		var states = Array();
-
-		for(var i in data.d) {
-			
-			var labels = Array();
-			
-			if (data.d[i].characteristic.indexOf('|')!=false) {
-				var t = data.d[i].characteristic.split('|');
-				t = t[0];
-			} else {
-				var t = data.d[i].characteristic;
-			}
-			
-			for(var j in data.d[i].states)
-				labels.push(data.d[i].states[j].label);
-
-			if (labels.length>1)
-				var l = labels.join('; ');
-			else
-				var l = labels[0];
-
-			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+l+'</span>');
-		}
-		
-	}
-	
-	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
-			'<div class="resultImageHolder">'+
-				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-					'<img class="resultImageHolder" src="'+data.m+'" title="" />'+
-				(data.n ? '</a>' : '')+
-			'</div>'+
-			'<div class="scientificNameHolder">'+
-				'<span class="scientificName">'+(data.s)+'</span>'+
-				(data.s!=data.l ? '<br />' + data.l : '')+
-			'</div>'+
-			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-				'<span style="position:relative;top:4px;">'+
-					'<span class="result-icons">'+
-						(states ? 
-							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
-							'<img class="result-icon icon-info" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '') +
-						(data.r ?
-							'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'">'+
-							'<img class="result-icon icon-similar" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '') +
-						(data.u ?
-							'<a href="'+(data.u)+'" target="_blank" title="'+nbcLabelExternalLink+'">'+
-							'<img class="result-icon icon-sr" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '')  +
-					'</span>' +
-				'</span>' +
-			(states ? 
-				'<div id="det-'+id+'" class="resultDetails">'+
-					'<ul>'+
-						'<li>'+states.join('</li><li>')+'</li>'+
-					'</ul>'+
-				'</div>' 
-				: '')+
-		'</div>'
-		;
-}
-
 function nbcSwitchImagename(ele,state) {
 	var p = '_grijs';
 	$(ele).attr('src',state==1 ? $(ele).attr('src').replace(p,'') :$(ele).attr('src').replace('.png',p+'.png'));	
-}
-
-function nbcResetClearButton() {
-	if (nbcData.paramCount==0) {
-		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
-	} else {
-		$('#clearSelectionContainer').removeClass('ghosted');
-	}
 }
 
 function nbcRemoveShowMoreButton() {

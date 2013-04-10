@@ -44,6 +44,8 @@ class ImportNBCController extends Controller
 		'fotograaf' => 'photographer',
 		'bronvermelding' => 'source',
 		'sekse op foto' => 'gender_photo',
+		'thumbnail' => 'url_thumbnail',
+		'levensfase' => 'life_stage'
 	);
 
     private $_stdVariantColumns = array('sekse','variant');
@@ -504,7 +506,7 @@ class ImportNBCController extends Controller
     {
         if (!isset($_SESSION['admin']['system']['import']['data']))
             $this->redirect('nbc_determinatie_2.php');
-        
+
         $this->setPageName($this->translate('Saving labels'));
         
         if (!$this->isFormResubmit()) {
@@ -525,7 +527,7 @@ class ImportNBCController extends Controller
 					
 					if (empty($val[1]))
 						continue;
-					
+					/*					
 					$d = $this->models->CharacteristicLabel->_get(array('id' =>
 						array(
 							'project_id' => $pId, 
@@ -534,7 +536,21 @@ class ImportNBCController extends Controller
 						
 						))
 					);
-					
+					*/
+
+					$d = $this->models->CharacteristicLabel->_get(
+						array(
+							'where' =>
+								'project_id  = '.$pId. ' and
+								language_id = '.LANGUAGECODE_DUTCH. ' and
+								(
+									lower(label) = \''. mysql_real_escape_string(strtolower($val[1])) .'\' or
+									label like \'%'. mysql_real_escape_string(strtolower($val[1])) .'|%\'
+								)'
+						)
+					);	
+		
+							
 					if (!empty($d[0]['id'])) {
 
 						$cId = $d[0]['characteristic_id'];
@@ -616,15 +632,14 @@ class ImportNBCController extends Controller
 
 						
 						} else {
-							
+
 							$this->addError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]));
 							
 						}
 
-
 					} else {
 
-			            $this->addError(sprintf($this->translate('Could not resolve character "%".'),$val[1]));
+			            $this->addError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]));
 
 					}
 					
