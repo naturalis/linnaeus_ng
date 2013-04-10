@@ -30,13 +30,13 @@
     <div>
 
         <ul id="order-sort" class="sortable-drag-list">
-        {foreach from=$groups item=v key=k}
-            <li id="group-{$v.id}" class="ui-state-default">[{$v.label}]</li>
+
+        {foreach from=$menuorder item=v key=k}
+            <li id="order-{if $v.type=='group'}group{else}char{/if}-{$v.id}" class="ui-state-default">{if $v.type=='group'}[{/if}{if $v.short_label}{$v.short_label}{else}{$v.label}{/if}{if $v.type=='group'}]{/if}</li>
         {/foreach}
-        {foreach from=$characteristics item=c key=e}
-            <li id="character-{$c.id}" class="ui-state-default">{$c.short_label}</li>
-        {/foreach}
+
         </ul>
+
 
 	</div>
 

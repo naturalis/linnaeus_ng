@@ -30,7 +30,8 @@ class MatrixKeyController extends Controller
         'matrix_variation', 
         'nbc_extras', 
         'taxa_relations', 
-        'variation_relations'
+        'variation_relations',
+		'gui_menu_order'
     );
     public $usedHelpers = array();
     public $controllerPublicName = 'Matrix key';
@@ -98,7 +99,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function matricesAction ()
     {
         $matrices = $this->getMatrices();
@@ -126,7 +126,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
 
     public function useMatrixAction ()
@@ -160,30 +159,36 @@ class MatrixKeyController extends Controller
         }
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
+		
+		$characters = $this->getCharacteristics();
         
         if ($this->_matrixType == 'NBC') {
 
             $states = $this->stateMemoryRecall();
 
-            $results = $this->nbcGetTaxaScores($states);
+            $taxa = $this->nbcGetTaxaScores($states);
+			
+			$groups = $this->getCharacterGroups();
 
-            $taxa = json_encode(
+            $this->smarty->assign('taxaJSON', json_encode(
             array(
-                'results' => $results, 
+                'results' => $taxa, 
 				'paramCount' => count((array)$states),
                 'count' => array(
-                    'results' => count((array) $results), 
+                    'results' => count((array) $taxa), 
                     'all' => $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']
                 )
-            ));
+            ),JSON_HEX_APOS | JSON_HEX_QUOT));
 
             foreach ((array) $states as $val)
                 $d[$val['characteristic_id']] = true;
             
             if (isset($d))
                 $this->smarty->assign('activeChars', $d);
+
             $this->smarty->assign('storedStates', $states);
-            $this->smarty->assign('groups', $this->getCharacterGroups());
+            $this->smarty->assign('groups',$groups);
+            $this->smarty->assign('guiMenu', $this->getGUIMenu(array('groups'=>$groups,'characters'=>$characters,'appendExcluded'=>false)));
 			
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
@@ -216,17 +221,70 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('storedShowState', $this->showStateRecall());
         }
 
-        $this->smarty->assign('taxa', $taxa);
+        if (isset($taxa))
+			$this->smarty->assign('taxa', $taxa);
         
         $this->smarty->assign('matrix', $matrix);
         
         $this->smarty->assign('function', 'Identify');
-        
-        $this->smarty->assign('characteristics', $this->getCharacteristics());
-        
+
+        $this->smarty->assign('characteristics', $characters);
+		
         $this->printPage();
     }
 
+
+
+	private function getGUIMenu($p=null)
+	{
+
+        $g = isset($p['groups']) ? $p['groups'] : null;
+        $c = isset($p['characters']) ? $p['characters'] : null;
+		$m = $this->models->GuiMenuOrder->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $this->getCurrentMatrixId(), 
+			),
+			'order' => 'show_order'
+		));
+        $appendExcluded = isset($p['appendExcluded']) ? $p['appendExcluded'] : false;
+	
+		if (is_null($g) || is_null($c) || is_null($m))
+			return;
+
+		foreach ((array) $c as $val)
+			$d[$val['id']] = $val;
+		$c = $d;
+			
+		$d = array();
+		$i=0;		
+		foreach((array)$m as $val) {
+			if ($val['ref_type']=='group') {
+				$d[$i] = $g[$val['ref_id']];
+				unset($g[$val['ref_id']]);
+			} else {
+				$d[$i] = $c[$val['ref_id']];
+				unset($c[$val['ref_id']]);
+			}
+			$d[$i]['icon'] = '__menu'.preg_replace('/\W/','',ucwords($d[$i]['label'])).'.png';
+			$i++;
+		}
+		
+		if ($appendExcluded) {
+	
+			// append the items for some reason missing from the menu-order
+			foreach((array)$c as $val)
+				$d[] = $val;
+		
+			foreach((array)$g as $val)
+				$d[] = $val;
+
+		}
+
+		return $d;		
+		
+	}
 
 
     public function examineAction ()
@@ -285,6 +343,7 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
+
 
     public function ajaxInterfaceAction ()
     {
@@ -474,12 +533,10 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function getCurrentMatrixId ()
     {
         return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
     }
-
 
 
     public function cacheAllTaxaInMatrix ()
@@ -830,8 +887,9 @@ class MatrixKeyController extends Controller
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
             $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h
+
         }
-        
+
         return $cs;
     }
 
@@ -1400,18 +1458,18 @@ class MatrixKeyController extends Controller
 
 
 
-    private function getCharacterGroups ($mId = null)
+    private function getCharacterGroups ()
     {
-        $mId = isset($mId) ? $mId : $this->getCurrentMatrixId();
-        
+		
         $cg = $this->models->Chargroup->_get(
         array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
-                'matrix_id' => $mId
+                'matrix_id' => $this->getCurrentMatrixId()
             ), 
             'order' => 'show_order', 
-            'columns' => 'id,matrix_id,label,show_order'
+            'columns' => 'id,matrix_id,label,show_order',
+			'fieldAsIndex' => 'id'
         ));
         
         foreach ((array) $cg as $key => $val) {
@@ -1633,6 +1691,7 @@ class MatrixKeyController extends Controller
         $val = isset($p['val']) ? $p['val'] : null;
         $nbc = isset($p['nbc']) ? $p['nbc'] : null;
         $label = isset($p['label']) ? $p['label'] : null;
+        $common = isset($p['common']) ? $p['common'] : null;
         $gender = isset($p['gender']) ? $p['gender'] : null;
         $related = isset($p['related']) ? $p['related'] : null;
         $type = isset($p['type']) ? $p['type'] : null;
@@ -1647,17 +1706,19 @@ class MatrixKeyController extends Controller
         $d = array(
             'i' => $val['id'], 
             'l' => trim(strip_tags($label)), 
+			'c' => $common,
             'y' => $type, 
             's' => trim(strip_tags($sciName)),
             'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage.gif', 
             'n' => isset($nbc['url_image']), 
+            'h' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related), 
             'h' => $highlight, 
             'd' => isset($details) ? $details : null
         );
-        
+
         if (isset($val['taxon_id']))
             $d['t'] = $val['taxon_id'];
         if (isset($gender)) {
@@ -1938,6 +1999,7 @@ class MatrixKeyController extends Controller
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $d['label'], 
+					'common' => $this->getCommonname($val['taxon_id']),
                     'gender' => array($d['gender'], $d['gender_label']),
                     'related' => $this->getRelatedEntities(array(
                         'vId' => $val['id']
@@ -2064,6 +2126,7 @@ class MatrixKeyController extends Controller
                     'val' => $val, 
                     'nbc' => $nbc, 
                     'label' => $d['label'], 
+					'common' => $this->getCommonname($val['taxon_id']), 
                     'gender' => array($d['gender'], $d['gender_label']),
                     'type' => 'v', 
                     'highlight' => $val['id'] == $p['id'], 
@@ -2215,6 +2278,7 @@ class MatrixKeyController extends Controller
                         'val' => $val, 
                         'nbc' => $nbc, 
                         'label' => $d['label'], 
+						'common' => $this->getCommonname($val['taxon_id']),
                         'gender' => array($d['gender'], $d['gender_label']),
                         'related' => $this->getRelatedEntities(array(
                             'vId' => $val['id']
@@ -2367,40 +2431,24 @@ class MatrixKeyController extends Controller
 			if ($val['type']=='variation') {
 				
 				$d = $this->nbcExtractGenderTag($val['label']);
+				$d = $this->nbcExtractGenderTag($val['label']);
 				$label = $d['label'];
 				$gender = $d['gender'];
 				$gender_label = $d['gender_label'];
-
+				$common = $this->getCommonname($val['taxon_id']);
+			
 			} else {
 
 				$label = $val['label'];
 
-				/*
-				$c = $this->models->Commonname->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(), 
-							'taxon_id' => $val['id'], 
-							'language_id' => $this->getCurrentLanguageId()
-						)
-					)
-				);
-				
-				foreach ((array) $c as $cVal) {
-					if ($cVal['commonname'] != $val['label']) {
-						$label = $cVal['commonname'];
-						break;
-					}
-				}
-				*/
-
 				if ($val['commonname'] != $val['label'])
-						$label = $val['commonname'];
+					$label = $val['commonname'];
 
+				$common = $val['commonname'];
 				$gender = $gender_label = null;
 
 			}
-			
+
 			$res[$i] = $this->createDatasetEntry(
 				array(
 					'val' => $val, 
@@ -2415,6 +2463,7 @@ class MatrixKeyController extends Controller
 						)
 					), 
 					'label' => $label, 
+					'common' => $common,
 					'gender' => array($gender,$gender_label), 
 					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
 					'type' => $val['type'], 
@@ -2450,6 +2499,22 @@ class MatrixKeyController extends Controller
 		
     }
  
+	private function getCommonname($tId)
+	{
+
+		$c = $this->models->Commonname->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $tId, 
+				'language_id' => $this->getCurrentLanguageId()
+			)
+		));
+		
+		return $c[0]['commonname'];
+		
+	}
+
 	private function getRelevantCoefficients($states=null)
 	{
 

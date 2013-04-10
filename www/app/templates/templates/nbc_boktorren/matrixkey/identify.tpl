@@ -52,10 +52,10 @@ if (typeof nbcInit=='function') {
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
-{if $taxa}
+{if $taxaJSON}
 {literal}
 try {{/literal}
-	nbcData = $.parseJSON('{$taxa}');
+	nbcData = $.parseJSON('{$taxaJSON}');
 	nbcDoResults({literal}{resetStart:false}{/literal});
 	nbcDoOverhead();
 	nbcDoPaging();

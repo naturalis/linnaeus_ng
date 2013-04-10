@@ -971,7 +971,7 @@ abstract class Model extends BaseClass
 
     public function freeQuery($params)
     {
-    
+
         if (is_array($params)) {
     
             $query = isset($params['query']) ? $params['query'] : null;
@@ -983,7 +983,7 @@ abstract class Model extends BaseClass
             $fieldAsIndex = false;
     
         }
-    
+
         if (empty($query)) {
             	
             $this->log('Called freeQuery with an empty query',1);
@@ -1002,7 +1002,7 @@ abstract class Model extends BaseClass
         unset($this->data);
     
         while($row=@mysql_fetch_assoc($set)){
-    
+
             if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
                 	
                 $this->data[$row[$fieldAsIndex]]=$row;
@@ -1014,7 +1014,7 @@ abstract class Model extends BaseClass
             }
     
         }
-    
+
         return isset($this->data) ? $this->data : null;
     
     }
