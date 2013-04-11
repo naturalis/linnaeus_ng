@@ -1625,14 +1625,16 @@ class ProjectsController extends Controller
 		
 		foreach(glob($this->generalSettings['directories']['mediaDirProject'].'/*',GLOB_ONLYDIR) as $file) {
 			if(is_dir($file)) {
-				$boom = array_pop(explode('/',$file));
+				$boom = explode('/',$file);
+				$boom = array_pop($boom);
 				if (is_numeric($boom))
 					$pInUse[intval($boom)] = intval($boom);
 			}
 		}
 		foreach(glob($this->generalSettings['directories']['cache'].'/*',GLOB_ONLYDIR) as $file) {
 			if(is_dir($file)) {
-				$boom = array_pop(explode('/',$file));
+				$boom = explode('/',$file);
+				$boom = array_pop($boom);
 				if (is_numeric($boom))
 					$pInUse[intval($boom)] = intval($boom);
 			}
