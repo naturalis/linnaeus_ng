@@ -1711,7 +1711,7 @@ class MatrixKeyController extends Controller
             's' => trim(strip_tags($sciName)),
             'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage.gif', 
             'n' => isset($nbc['url_image']), 
-            'h' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
+            'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
             'r' => count((array) $related), 

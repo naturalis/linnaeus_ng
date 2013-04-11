@@ -24,7 +24,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.id+');return false;" style=""><img alt="" src="'+data.t+'">'+data.l+'</a></li>';
+			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.i+');return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
 		}
 	}
 
@@ -70,7 +70,22 @@ function nbcUpdateNavigation() {
 
 function toonDier(id) {
 
-	alert('soon!');
+	$.ajax({
+		url : '../species/taxon_overview.php',
+		type: 'POST',
+		data : ({
+			id : id,
+			hotwords: false,
+			navigation: false,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			if (data) {
+				$('#dier-content').html(data);
+				$('#dier-content-wrapper').css('visibility','visible');
+			}
+		}
+	});
 
 }
 
