@@ -2026,6 +2026,168 @@ class SpeciesController extends Controller
     }
 
 
+    public function importAction ()
+    {
+		
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Taxon file upload'));
+        
+        if ($this->requestDataFiles && !$this->isFormResubmit()) {
+
+			$raw = array();
+
+			$saved = $failed = $odd = $skipped = 0;
+	
+			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
+				$i = 0;
+				while (($dummy = fgetcsv($handle)) !== FALSE) {
+					foreach ((array) $dummy as $val) {
+						$raw[$i][] = $val;
+					}
+					$i++;
+				}
+				fclose($handle);
+			}
+
+			$cats = array();
+
+			foreach ((array) $raw as $key => $line) {
+				
+				$d = implode('',$line);
+				
+				if (empty($d))
+					continue;
+					
+				foreach((array)$line as $fKey => $fVal) {
+					
+					if (empty($fVal))
+						continue;
+					
+					if ($key==0) {
+
+						$cats[$fKey] = $fVal;
+						
+					} else {
+						
+						if ($fKey==0) {
+
+							$tId = $fVal;
+
+							if (!empty($tId)) {
+								$taxon = $this->models->Taxon->_get(
+									array(
+										'id' => array(
+											'project_id' => $this->getCurrentProjectId(), 
+											'id' => $tId
+										)
+									));
+
+								if ($taxon===false)
+									$tId = null;
+							}
+
+						} else
+						if ($fKey==1) {
+
+							$lId = $fVal;
+
+						} else {
+
+							$catId = isset($cats[$fKey]) ? $cats[$fKey] : null;
+							
+							if (empty($tId) || empty($lId) || empty($catId) || empty($fVal)) {
+								$skipped++;
+								continue;
+							}
+	
+							$this->models->ContentTaxon->delete(array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'taxon_id' => $tId, 
+								'language_id' => $lId,
+								'page_id' => $catId
+							));
+	
+							$d = $this->models->ContentTaxon->save(                        
+							array(
+								'id' => null, 
+								'project_id' => $this->getCurrentProjectId(), 
+								'taxon_id' => $tId, 
+								'language_id' => $lId,
+								'page_id' => $catId,
+								'content' => $fVal, 
+								'title' => '', 
+								'publish' => 1
+							));
+
+							if ($d) {
+
+								$argh = $this->models->ContentTaxon->_get(
+								array(
+									'id' => array(
+										'id' => $this->models->ContentTaxon->getNewId(),
+										'project_id' => $this->getCurrentProjectId(), 
+									),
+									'columns' => 'length(content) as l'
+								));
+								
+								if (intval($argh[0]['l']) != strlen($fVal))
+									$odd++;
+	
+								$saved++;
+							} else
+								$failed++;
+	
+						}
+						
+					}
+					
+				}
+				
+				if ($key==0) {
+
+					foreach((array)$cats as $cKey => $cVal) {
+						
+						if ($cKey>1) {
+							
+							$tp = $this->models->PageTaxon->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(),
+									'page' => $cVal
+								)
+							));
+							
+							if ($tp)
+								$cats[$cKey] = $tp[0]['id'];
+							else
+								$cats[$cKey] = null;
+							
+						}
+						
+					}
+
+				} 
+
+            }
+			
+			$this->addMessage(sprintf('Saved %s pages, skipped %s, failed %s.',$saved,$skipped,$failed));
+
+			if ($skipped)
+				$this->addMessage('Skipped pages are due to either missing or incorrect taxon id, or non-existent category.');
+			if ($failed)
+				$this->addMessage('Failed pages are due to botched inserts.');
+			if ($odd>0)
+				$this->addError(sprintf('%s inserted pages have different lengths than the data in your file. This might be due to an an encoding problem, please check and reload.',$odd));
+
+        }
+       
+        $this->smarty->assign('categories', $this->getCategories());
+        
+        $this->printPage();
+    }
+
+
 
     /**
      * AJAX interface for this class

@@ -66,10 +66,10 @@
                     </div>
                 </div>
                 
-                <div class="dier-wrapper">
+                <div class="dier-wrapper" id="dier-content-wrapper" style="visibility:hidden">
                     <div class="dier-header">
                         Dier
-                    </div><div class="dier-content">
+                    </div><div class="dier-content" id="dier-content">
                         <!-- Placeholder for pretty first-time loading. -->
                        <div style='height:650px;'>
                        </div>                        

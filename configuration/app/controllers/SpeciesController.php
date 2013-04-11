@@ -118,11 +118,13 @@ class SpeciesController extends Controller
                 
                 // get categories
             $categories = $this->getCategories(
-            	$this->requestData['id'], 
-            	$this->isLoggedInAdmin(), 
-            	$this->isLoggedInAdmin()
+				array(
+					'taxon' => $this->requestData['id'], 
+					'allowUnpublished' => $this->isLoggedInAdmin()
+				)
             );
-            
+
+			
             // determine the page_id the page will open in
             $activeCategory = 
             	$this->rHasVal('cat') ? 
@@ -203,6 +205,80 @@ class SpeciesController extends Controller
         }
         
         $this->printPage('taxon');
+    }
+
+
+    public function taxonOverviewAction ()
+    {
+
+        if ($this->rHasId()) {
+
+            // get taxon
+            $taxon = $this->getTaxonById($this->requestData['id']);
+            
+            $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
+            
+            $this->setControllerBaseName();
+            
+            if (isset($this->requestData['lan']))
+                $this->setCurrentLanguageId($this->requestData['lan']);
+                
+            // get categories
+            $categories = $this->getCategories(
+				array(
+					'taxon' => $this->requestData['id'], 
+					'allowUnpublished' => $this->isLoggedInAdmin()
+				)
+            );
+
+			foreach((array)$categories['categories'] as $val) {
+
+	            $content[$val['id']] = $this->getTaxonContent($taxon['id'], $val['id'], $this->isLoggedInAdmin());
+
+				if (!$this->rHasVal('hotwords',false)) {
+					$content = $this->matchGlossaryTerms($content);
+					$content = $this->matchHotwords($content);
+				}
+			
+			}
+
+			$content['media'] = $this->getTaxonMedia($taxon['id'],null,true);
+
+            if ($taxon['lower_taxon'] == 1) {
+                
+                $this->setPageName(sprintf($this->translate('Species module: "%s"'), $taxon['label']));
+                
+                $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
+            }
+            else {
+                
+                $this->setPageName(sprintf($this->translate('Higher taxa: "%s"'), $taxon['label']));
+            }
+            
+			$this->smarty->assign('taxon', $taxon);
+			
+			$this->smarty->assign('content', $content);
+                
+			if (!$this->rHasVal('navigation',false))
+				$this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
+           
+            $this->smarty->assign('categoryList', $categories['categoryList']);
+
+            $this->smarty->assign('headerTitles', 
+				array(
+					'title' => $content['names']['common'][0]['commonname'],
+					'subtitle' => $taxon['label']
+				));
+            
+        }
+        else {
+            
+            $this->addError($this->translate('No taxon ID specified.'));
+            
+            $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
+        }
+        
+        $this->printPage();
     }
 
 
@@ -294,33 +370,31 @@ class SpeciesController extends Controller
 
 
 
-    private function getCategories ($taxon = null, $allowUnpublished = false, $forcelookup = false)
+    private function getCategories ($p=null)
     {
-        $forcelookup = true;
-        
-        if (!isset($_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()]) || $forcelookup) {
-            
-            // get the defined categories (just the page definitions, no content yet)
-            $tp = $this->models->PageTaxon->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'order' => 'show_order', 
-                'fieldAsIndex' => 'page_id'
-            ));
-            
-            foreach ((array) $tp as $key => $val) {
-                
-                $tp[$key]['title'] = $this->getCategoryName($val['id']);
-                
-                if ($val['def_page'] == 1)
-                    $_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
-            }
-            
-            $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] = $tp;
-        }
-        
+		
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
+
+		// get the defined categories (just the page definitions, no content yet)
+		$tp = $this->models->PageTaxon->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			), 
+			'order' => 'show_order', 
+			'fieldAsIndex' => 'id'
+		));
+
+		foreach ((array) $tp as $key => $val) {
+			
+			$tp[$key]['title'] = $this->getCategoryName($val['id']);
+			
+			if ($val['def_page'] == 1)
+				$_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
+		}
+		
+
         if ($taxon) {
             
             $defCat = 'classification';
@@ -335,7 +409,7 @@ class SpeciesController extends Controller
             
             $d = array();
             
-            foreach ((array) $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()] as $key => $val) {
+            foreach ((array) $tp as $key => $val) {
                 
                 $val['is_empty'] = 1;
                 
@@ -353,12 +427,12 @@ class SpeciesController extends Controller
                 if (($ct[0]['publish'] == '1' || $allowUnpublished) && strlen($ct[0]['content']) > 0)
                     $val['is_empty'] = 0;
                 
-                $d[] = $val;
+                $d[$key] = $val;
                 
                 if ($ct[0]['page_id'] == $_SESSION['app']['user']['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
                     $defCat = $_SESSION['app']['user']['species']['defaultCategory'];
             }
-                        
+
             $stdCats[] = array(
                 'id' => 'classification', 
                 'title' => $this->translate('Classification'), 
@@ -395,26 +469,27 @@ class SpeciesController extends Controller
                 'title' => $this->translate('Media'), 
                 'is_empty' => (count((array) $m) > 0 ? 0 : 1)
             );
-            
+
+            foreach ((array) $d as $key => $val)
+                $categoryList[$key] = $val['title'];
+
             $d = array_merge($d, $stdCats);
-            //print_r($d); die();
-            
-
-
 
             foreach ((array) $d as $val)
-                $l[$val['id']] = $val['is_empty'];
+                $emptinessList[$val['id']] = $val['is_empty'];
+
             
             return array(
                 'categories' => $d, 
                 'defaultCategory' => $defCat, 
-                'emptinessList' => $l
+                'categoryList' => $categoryList,
+                'emptinessList' => $emptinessList,
             );
         }
         
 
         return array(
-            'categories' => $_SESSION['app']['user']['species']['categories'][$this->getCurrentLanguageId()], 
+            'categories' => $tp, 
             'defaultCategory' => $_SESSION['app']['user']['species']['defaultCategory']
         );
     }
@@ -423,41 +498,37 @@ class SpeciesController extends Controller
 
     private function getCategoryName ($id)
     {
-        if (!isset($_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id])) {
-            
-            if (is_numeric($id)) {
-                
-                $tpt = $this->models->PageTaxonTitle->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId(), 
-                        'language_id' => $this->getCurrentLanguageId(), 
-                        'page_id' => $id
-                    ), 
-                    'columns' => 'title'
-                ));
-                
-                if (empty($tpt[0]['title'])) {
-                    
-                    $tpt = $this->models->PageTaxon->_get(
-                    array(
-                        'id' => array(
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'id' => $id
-                        ), 
-                        'columns' => 'page as title'
-                    ));
-                }
-                
-                $_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = $tpt[0]['title'];
-            }
-            else {
-                
-                $_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id] = ucwords($id);
-            }
-        }
-        
-        return $_SESSION['app']['user']['species']['catnames'][$this->getCurrentLanguageId()][$id];
+		if (is_numeric($id)) {
+			
+			$tpt = $this->models->PageTaxonTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $this->getCurrentLanguageId(), 
+					'page_id' => $id
+				), 
+				'columns' => 'title'
+			));
+			
+			if (empty($tpt[0]['title'])) {
+				
+				$tpt = $this->models->PageTaxon->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $id
+					), 
+					'columns' => 'page as title'
+				));
+			}
+			
+			return $tpt[0]['title'];
+		}
+		else {
+			
+			return ucwords($id);
+		}
+
     }
 
 
@@ -508,7 +579,7 @@ class SpeciesController extends Controller
 
 
 
-    private function getTaxonMedia ($taxon = null, $id = null)
+    private function getTaxonMedia ($taxon = null, $id = null, $inclOverviewImage = false)
     {
 		
 
@@ -521,9 +592,12 @@ class SpeciesController extends Controller
         
         if (isset($taxon))
             $d['taxon_id'] = $taxon;
+
         if (isset($id))
             $d['id'] = $id;
-        $d['overview_image'] = '0';
+        
+		if (!$inclOverviewImage)
+			$d['overview_image'] = '0';
         
         $mt = $this->models->MediaTaxon->_get(
         array(
@@ -578,15 +652,15 @@ class SpeciesController extends Controller
 
 
 
-    private function getTaxonLiterature ($taxon)
+    private function getTaxonLiterature ($tId)
     {
-        if ($refs = $this->getTaxonCategoryLastVisited($taxon, 'literature'))
+        if ($refs = $this->getTaxonCategoryLastVisited($tId, 'literature'))
             return $refs;
         
         $lt = $this->models->LiteratureTaxon->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $taxon
+                'taxon_id' => $tId
             )
         ));
         
@@ -623,36 +697,36 @@ class SpeciesController extends Controller
         
         $this->customSortArray($refs, $sortBy);
         
-        $this->setlastVisited($taxon, 'literature', $refs);
+        $this->setlastVisited($tId, 'literature', $refs);
         
         return $refs;
     }
 
 
 
-    private function getTaxonNames ($taxon)
+    private function getTaxonNames ($tId)
     {
-        if ($names = $this->getTaxonCategoryLastVisited($taxon, 'names'))
+        if ($names = $this->getTaxonCategoryLastVisited($tId, 'names'))
             return $names;
         
         $names = array(
-            'synonyms' => $this->getTaxonSynonyms($taxon), 
-            'common' => $this->getTaxonCommonNames($taxon)
+            'synonyms' => $this->getTaxonSynonyms($tId), 
+            'common' => $this->getTaxonCommonNames($tId)
         );
         
-        $this->setlastVisited($taxon, 'names', $names);
+        $this->setlastVisited($tId, 'names', $names);
         
         return $names;
     }
 
 
 
-    private function getTaxonSynonyms ($taxon)
+    private function getTaxonSynonyms ($tId)
     {
         $s = $this->models->Synonym->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $taxon
+                'taxon_id' => $tId
             )
         ));
         
@@ -670,11 +744,11 @@ class SpeciesController extends Controller
 
 
 
-    private function getTaxonCommonNames ($taxon, $languageId = null)
+    private function getTaxonCommonNames ($tId, $languageId = null)
     {
         $d = array(
             'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $taxon
+            'taxon_id' => $tId
         );
         
         if (isset($languageId))
