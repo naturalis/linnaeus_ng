@@ -174,7 +174,7 @@ class Controller extends BaseClass
         
         $this->loadHelpers();
         
-        $this->initLogging();
+		$this->initLogging();
         
         $this->loadModels();
         
@@ -2445,13 +2445,30 @@ class Controller extends BaseClass
     }
 
 
-
     private function initLogging ()
     {
-        $fn = $this->getAppName() ? $this->getAppName() : 'general';
-        
-        $this->helpers->LoggingHelper->setLogFile($this->generalSettings['directories']['log'] . '/' . $fn . '.log');
-        
+
+		$logDir = $this->generalSettings['directories']['log'] . '/';
+        $logFile = $this->getAppName() ? $this->getAppName() : 'general.log';
+
+		if ((!file_exists($logDir) || !is_writable($logDir)) && @!mkdir($logDir)) {
+
+        	echo '<p>The log file path does not exist or is not writeable. 
+        	    Linnaeus NG cannot progress until this is corrected:</p>'.
+				$logDir;
+
+        	die();
+		} else
+		if (file_exists($logDir.$logFile) && !is_writable($logDir.$logFile)) {
+
+        	echo '<p>The main log file is not writeable. 
+        	    Linnaeus NG cannot progress until this is corrected:</p>'.
+				$logDir.$logFile;
+
+        	die();
+		}
+		
+        $this->helpers->LoggingHelper->setLogFile($logDir . $logFile );
         $this->helpers->LoggingHelper->setLevel(0);
     }
 
@@ -2975,7 +2992,7 @@ class Controller extends BaseClass
         if (isset($fixPaths)) {
         
         	echo '<p>Some required paths do not exist or are not writeable. 
-        	    Linnaeus NG cannot process until this is corrected:</p>';
+        	    Linnaeus NG cannot progress until this is corrected:</p>';
         
         	foreach ($fixPaths as $message) {
         		echo $message . '<br>';
