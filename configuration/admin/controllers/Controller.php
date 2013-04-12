@@ -3826,7 +3826,8 @@ class Controller extends BaseClass
             $this->_smartySettings['dir_compile'] => 'www/admin/templates/templates_c',
             $this->_smartySettings['dir_cache'] => 'www/admin/templates/cache',
             $this->generalSettings['directories']['cache'] => 'www/shared/cache',
-            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project'
+            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
+            $this->generalSettings['directories']['log'] => 'log'
         );
         
         foreach ((array) $paths as $val => $display) {
@@ -3839,7 +3840,7 @@ class Controller extends BaseClass
                 
         if (isset($fixPaths)) {
         
-        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot process until this is corrected:</p>';
+        	echo '<p>Some required paths do not exist or are not writeable. Linnaeus NG cannot progress until this is corrected:</p>';
         
         	foreach ($fixPaths as $message) {
         	
