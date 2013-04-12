@@ -51,6 +51,9 @@ class InterfaceController extends Controller
 
     public function untransAction ()
     {
+
+        $this->checkAuthorisation(true);
+        
         $this->setPageName($this->translate('Interface translations'));
         
         $this->printList(true);

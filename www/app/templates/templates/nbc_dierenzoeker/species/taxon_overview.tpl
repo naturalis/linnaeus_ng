@@ -2,6 +2,8 @@
 <h2>{$headerTitles.subtitle}</h2> 
 
 
+
+
 {foreach from=$content.media item=v}{if $v.overview_image==1}
 <div class="illustratie-wrapper">
     <div class="illustratie">
@@ -27,7 +29,7 @@
 	<ul>
 	{foreach from=$content.media item=v}{if $v.overview_image!=1}
     	<li>
-        	<a href="{$session.app.project.urls.uploadedMedia}{$v.file_name}" id="lightbox16" title="{$v.description}">
+        	<a rel="prettyPhoto[gallery]" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}" title="{$v.description}">
             	<img style="width:130px" title="{$v.description}" src="{$session.app.project.urls.uploadedMedia}{$v.file_name}" alt="">
            	</a>
 		</li>

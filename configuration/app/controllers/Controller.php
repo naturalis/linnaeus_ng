@@ -57,7 +57,7 @@
 	still files in the directory. make sure to remove the "clearcache" from the URL
 	afterwards, otherwise it will propagate through your session, deleting the
 	cache-files at every next page.
-	to suppress caching, set the variable $_useCache to false. doing so will stop the
+	to suppress caching, set the variable $useCache to false. doing so will stop the
 	application from both storing and retrieving data from the cache. existing cache-
 	files will stay intact.
 
@@ -94,6 +94,7 @@ include_once (dirname(__FILE__) . "/../BaseClass.php");
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
 class Controller extends BaseClass
 {
+
     private $_smartySettings;
     private $_fullPath;
     private $_fullPathRelative;
@@ -105,7 +106,8 @@ class Controller extends BaseClass
     private $_hotwordTempLinks = array();
     private $_hotwordMightBeHotwords = array();
     private $_hotwordNoLinks = array();
-    private $_useCache = true;
+
+    public $useCache = true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
@@ -2844,7 +2846,7 @@ class Controller extends BaseClass
     // Key something like path in session, e.g. 'species-tree'
     protected function getCache ($key, $timeOut = false)
     {
-        if ($this->_useCache == false)
+        if ($this->useCache == false)
             return false;
         
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
@@ -2864,7 +2866,7 @@ class Controller extends BaseClass
 
     protected function saveCache ($key, $data)
     {
-        if ($this->_useCache == false)
+        if ($this->useCache == false)
             return;
         
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;

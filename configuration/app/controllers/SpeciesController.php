@@ -154,7 +154,13 @@ class SpeciesController extends Controller
                 $categories['categories'][$key]['className'] = implode(' ', $c);
             }
 
-            $content = $this->getTaxonContent($taxon['id'], $activeCategory, $this->isLoggedInAdmin());
+            $content = $this->getTaxonContent(
+				array(
+					'taxon' => $taxon['id'], 
+					'category' => $activeCategory, 
+					'allowUnpublished' => $this->isLoggedInAdmin()
+				)
+			);
 
 			if ($activeCategory!='media') {
 				$content = $this->matchGlossaryTerms($content);
@@ -233,7 +239,14 @@ class SpeciesController extends Controller
 
 			foreach((array)$categories['categories'] as $val) {
 
-	            $content[$val['id']] = $this->getTaxonContent($taxon['id'], $val['id'], $this->isLoggedInAdmin());
+	            $content[$val['id']] = $this->getTaxonContent(
+					array(
+						'taxon' => $taxon['id'], 
+						'category' => $val['id'], 
+						'allowUnpublished' => $this->isLoggedInAdmin(),
+						'incOverviewImage' => true
+					)
+				);
 
 				if (!$this->rHasVal('hotwords',false)) {
 					$content = $this->matchGlossaryTerms($content);
@@ -241,8 +254,6 @@ class SpeciesController extends Controller
 				}
 			
 			}
-
-			$content['media'] = $this->getTaxonMedia($taxon['id'],null,true);
 
             if ($taxon['lower_taxon'] == 1) {
                 
@@ -256,7 +267,7 @@ class SpeciesController extends Controller
             }
             
 			$this->smarty->assign('taxon', $taxon);
-			
+		
 			$this->smarty->assign('content', $content);
                 
 			if (!$this->rHasVal('navigation',false))
@@ -533,12 +544,18 @@ class SpeciesController extends Controller
 
 
 
-    private function getTaxonContent ($taxon, $category, $allowUnpublished = false)
+    private function getTaxonContent ($p=null)
     {
+		
+		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
+		$category = isset($p['category']) ? $p['category'] : null;
+		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
+		$incOverviewImage = isset($p['incOverviewImage']) ? $p['incOverviewImage'] : false;
+		
         switch ($category) {
             
             case 'media':
-                return $this->getTaxonMedia($taxon);
+                return $this->getTaxonMedia($taxon,null,$incOverviewImage);
                 break;
             
             case 'classification':
@@ -1036,6 +1053,10 @@ class SpeciesController extends Controller
 
     private function getTaxonCategoryLastVisited ($taxon, $category)
     {
+		
+		if (!$this->useCache)
+			return false;
+		
         if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
             return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
         }
