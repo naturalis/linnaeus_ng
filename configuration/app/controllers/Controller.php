@@ -985,7 +985,7 @@ class Controller extends BaseClass
     {
         if (!isset($this->helpers->LoggingHelper))
             return;
-        
+
         if (is_array($msg)) {
             
             $d = '';

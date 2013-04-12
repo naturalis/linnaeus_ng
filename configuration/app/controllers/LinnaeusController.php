@@ -140,8 +140,6 @@ class LinnaeusController extends Controller
     public function contentAction ()
     {
 
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
-
 		if (!$this->rHasVal('sub')) {
 
 			$d = $this->getContent('Welcome');
