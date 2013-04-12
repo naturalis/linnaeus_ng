@@ -181,7 +181,7 @@ class ImportL2Controller extends Controller
      */
     public function indexAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         $this->setPageName($this->translate('Data import options'));
         
@@ -192,7 +192,7 @@ class ImportL2Controller extends Controller
 
     public function l2StartAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if ($this->rHasVal('process', '1'))
             $this->redirect('l2_project.php');
@@ -305,7 +305,7 @@ class ImportL2Controller extends Controller
 
     public function l2ProjectAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if (!empty($_SESSION['admin']['system']['import']['imagePath'])) {
             
@@ -410,7 +410,7 @@ class ImportL2Controller extends Controller
 
     public function l2SpeciesAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('l2_start.php');
@@ -538,7 +538,7 @@ class ImportL2Controller extends Controller
 
     public function l2SpeciesDataAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
@@ -712,7 +712,7 @@ class ImportL2Controller extends Controller
 
     public function l2LiteratureGlossaryAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
 		
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
@@ -831,7 +831,7 @@ class ImportL2Controller extends Controller
     public function l2ContentAction ()
     {
 		
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
 		
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
@@ -934,7 +934,7 @@ class ImportL2Controller extends Controller
     public function l2KeysAction ()
     {
 
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
@@ -1080,7 +1080,7 @@ class ImportL2Controller extends Controller
 
     public function l2MapAction ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
@@ -1167,7 +1167,7 @@ class ImportL2Controller extends Controller
     public function l2AdditionalAction ()
     {
 		
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
 		
         if ($this->rHasVal('action', 'errorlog'))
             $this->downloadErrorLog();
@@ -1261,7 +1261,7 @@ class ImportL2Controller extends Controller
 
     public function goNewProject ()
     {
-        $this->checkAuthorisation();
+        $this->checkAuthorisation(true);
         
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
