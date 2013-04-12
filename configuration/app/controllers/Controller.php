@@ -2948,11 +2948,13 @@ class Controller extends BaseClass
 
     private function checkWriteableDirectories ()
     {
+
         $paths = array(
             $this->_smartySettings['dir_compile'] => 'www/app/templates/templates_c',
             $this->_smartySettings['dir_cache'] => 'www/app/templates/cache',
             $this->generalSettings['directories']['cache'] => 'www/shared/cache',
-            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project'
+            $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
+            $this->generalSettings['directories']['log'] => 'log'
         );
         
         $p = $this->getCurrentProjectId();
