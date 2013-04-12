@@ -99,7 +99,7 @@
 		       </div>
        
                    
-       <div class="facetgrouppage-wrapper">     
+       <!-- div class="facetgrouppage-wrapper">     
            
             <div id="facetgrouppage0" class="facetgrouppage">
                 <img src="/app/webroot/img/desktop/facet-puntje.png" class="facetpage-puntje" alt="" />                <a href="#" class="no-text facetgrouppage-close-btn">Sluiten</a>             
@@ -274,7 +274,7 @@
                             <div class="facetgrouppage-bottom-shade"></div>
                                                 
             </div>         
-                </div>
+                </div -->
        
 
 {literal}
@@ -283,15 +283,15 @@ $(document).ready(function(){
 {/literal}
 
 {if $taxaJSON}
-nbcData = $.parseJSON('{$taxaJSON}');
-nbcDoResults({literal}{resetStart:true}{/literal});
-//nbcDoOverhead();
-//nbcDoPaging();
+	nbcData = $.parseJSON('{$taxaJSON}');
+	nbcDoResults({literal}{resetStart:true}{/literal});
 {else}
-//nbcGetResults();
+	nbcGetResults();
 {/if}
-
 {literal}
+	if(jQuery().prettyPhoto) {
+		nbcPrettyPhotoInit();
+	}
 });
 </script>
 {/literal}

@@ -4,14 +4,20 @@
 <form method="post" action="" enctype="multipart/form-data">
 	<input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
     <input type="hidden" name="rnd" value="{$rnd}" />
-	<input name="uploadedfile" type="file" /><br />
+    <p>
+	<input name="uploadedfile" type="file" />
+    </p>
+    <p>
+    <label><input type="checkbox" name="del_all" value="1" />replace all data, not just that for the categories in your file (see below).</label><br />
+    </p>
+    <p>
 	<input type="submit" value="{t}upload{/t}" />
+    </p>
 </form>
 </div>
 
 {include file="../shared/admin-messages.tpl"}
 
-<form method="post" action="" enctype="multipart/form-data">
 <div class="page-generic-div">
 <p>
 {t}To load taxa content from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'.{/t}
@@ -25,7 +31,7 @@
 		<ol>
             <li>{t}Taxon ID (currently there is no automated lookup - sorry){/t}</li>
             <li>{t}Language ID{/t}</li>
-            <li>{t}One or more fields containing the actual content, one field per category. All content will be loaded <i>as is</i>, any existent data for that combination of taxon and category will be overwritten without warning.{/t}</li>
+            <li>{t}One or more fields containing the actual content, one field per category. All content will be loaded <i>as is</i>, any existant data for that combination of taxon and category will be overwritten without warning.{/t}</li>
 		</ol>
 		{t}The first two fields are mandatory, all fields are expected in the order displayed above.{/t}
 	</li>
@@ -39,7 +45,10 @@
 	                <li>{$v.page}</li>
                 {/foreach}
                 </ol>
-            </li>
+                Please note: existant data for a category will be overwritten without warning. Existing data for a category for which <i>no</i> data has 
+                been specified in your sheet will remain untouched unless you check the checkbox above, in which case all old content for a taxon in the
+                specified language will be deleted before any new data is inserted. 
+			</li>
 		</ol>
 	</li>
 </ol>

@@ -120,6 +120,8 @@ class ImportNBCController extends Controller
      */
     public function indexAction ()
     {
+        $this->checkAuthorisation(true);
+        
         $this->setPageName($this->translate('Data import options'));
         
         $this->printPage();
@@ -128,6 +130,9 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie1Action ()
     {
+
+        $this->checkAuthorisation(true);
+        
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_determinatie_2.php');
 			
@@ -179,6 +184,8 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie2Action ()
     {
+        $this->checkAuthorisation(true);
+        
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
         
@@ -210,6 +217,8 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie3Action ()
     {
+        $this->checkAuthorisation(true);
+        
         if (!isset($_SESSION['admin']['system']['import']['data']))
             $this->redirect('nbc_determinatie_2.php');
         
@@ -262,6 +271,8 @@ class ImportNBCController extends Controller
     public function nbcDeterminatie4Action ()
     {
 		
+        $this->checkAuthorisation(true);
+        
         if (!isset($_SESSION['admin']['system']['import']['project']))
             $this->redirect('nbc_determinatie_3.php');
         
@@ -306,6 +317,8 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie5Action ()
     {
+        $this->checkAuthorisation(true);
+        
         if (!isset($_SESSION['admin']['system']['import']['species_data']))
             $this->redirect('nbc_determinatie_4.php');
         
@@ -350,6 +363,8 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie6Action ()
     {
+        $this->checkAuthorisation(true);
+        
         $this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
         $this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
         
@@ -411,6 +426,8 @@ class ImportNBCController extends Controller
 
 	public function nbcLabels1Action()
     {
+        $this->checkAuthorisation(true);
+        
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_labels_2.php');
 
@@ -462,6 +479,8 @@ class ImportNBCController extends Controller
 
     public function nbcLabels2Action ()
     {
+
+        $this->checkAuthorisation(true);
 		
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
@@ -504,6 +523,8 @@ class ImportNBCController extends Controller
 
     public function nbcLabels3Action ()
     {
+        $this->checkAuthorisation(true);
+        
         if (!isset($_SESSION['admin']['system']['import']['data']))
             $this->redirect('nbc_determinatie_2.php');
 

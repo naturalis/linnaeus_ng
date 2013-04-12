@@ -3,6 +3,55 @@ var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
 
+
+function nbcPrettyPhotoInit() {
+
+ 	$("a[rel^='prettyPhoto']").prettyPhoto({
+		allow_resize:true,
+		animation_speed:50,
+ 		opacity: 0.70, 
+		show_title: false,
+ 		overlay_gallery: false,
+ 		social_tools: false
+ 	});
+
+}
+
+
+function nbcGetResults(p) {
+
+	return;//not yet
+
+	setCursor('wait');
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_results_nbc',
+			params : p,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			//alert(data);
+			//console.log(data);
+			nbcData = $.parseJSON(data);
+			nbcDoResults();
+			if (p && p.action!='similar') nbcDoOverhead();
+			nbcDoPaging();
+			if (p && p.action=='similar') nbcPrintSimilarHeader();
+			if (p && p.closeDialog==true) jDialogCancel();
+			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
+
+			setCursor();
+
+		}
+	});
+	
+}
+
+
+
 function nbcDoResults(p) {
 
 	//if (p && p.resetStart!==false)
@@ -83,6 +132,8 @@ function toonDier(id) {
 			if (data) {
 				$('#dier-content').html(data);
 				$('#dier-content-wrapper').css('visibility','visible');
+				if(jQuery().prettyPhoto)
+					nbcPrettyPhotoInit();
 			}
 		}
 	});
@@ -162,36 +213,6 @@ var nbcLabelDetails = '';
 var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
-
-function nbcGetResults(p) {
-
-	setCursor('wait');
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_results_nbc',
-			params : p,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			//console.log(data);
-			nbcData = $.parseJSON(data);
-			nbcDoResults();
-			if (p && p.action!='similar') nbcDoOverhead();
-			nbcDoPaging();
-			if (p && p.action=='similar') nbcPrintSimilarHeader();
-			if (p && p.closeDialog==true) jDialogCancel();
-			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
-
-			setCursor();
-
-		}
-	});
-	
-}
 
 function nbcClearResults() {
 
@@ -715,19 +736,6 @@ function nbcBindDialogKeyUp() {
 		}
 		return;
 	});
-
-}
-
-function nbcPrettyPhotoInit() {
-
- 	$("a[rel^='prettyPhoto']").prettyPhoto({
-		allow_resize:true,
-		animation_speed:50,
- 		opacity: 0.70, 
-		show_title: false,
- 		overlay_gallery: false,
- 		social_tools: false
- 	});
 
 }
 

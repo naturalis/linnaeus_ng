@@ -2051,6 +2051,7 @@ class SpeciesController extends Controller
 			}
 
 			$cats = array();
+			$clearedTaxa = array();
 
 			foreach ((array) $raw as $key => $line) {
 				
@@ -2100,13 +2101,28 @@ class SpeciesController extends Controller
 								$skipped++;
 								continue;
 							}
-	
-							$this->models->ContentTaxon->delete(array(
-								'project_id' => $this->getCurrentProjectId(), 
-								'taxon_id' => $tId, 
-								'language_id' => $lId,
-								'page_id' => $catId
-							));
+
+							if($this->rHasVal('del_all','1') && !isset($clearedTaxa[$tId][$lId])) {
+
+								$this->models->ContentTaxon->delete(array(
+									'project_id' => $this->getCurrentProjectId(), 
+									'taxon_id' => $tId, 
+									'language_id' => $lId,
+								));
+								
+								$clearedTaxa[$tId][$lId] = true;
+								
+							} else
+							if(!$this->rHasVal('del_all','1')) {
+								
+								$this->models->ContentTaxon->delete(array(
+									'project_id' => $this->getCurrentProjectId(), 
+									'taxon_id' => $tId, 
+									'language_id' => $lId,
+									'page_id' => $catId
+								));
+
+							}
 	
 							$d = $this->models->ContentTaxon->save(                        
 							array(
