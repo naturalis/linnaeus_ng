@@ -1308,66 +1308,91 @@ class MatrixKeyController extends Controller
     {
         if (empty($id[0]) || empty($id[1]))
             return;
-        
-        $c = $this->getCharacteristics();
-        $t1 = $this->getTaxonStates($id[0]);
-        $t2 = $this->getTaxonStates($id[1]);
-        
-        $both = $neither = $t1_count = $t2_count = 0;
-        
-        foreach ((array) $c as $key => $val) {
-            
-            if (isset($t1[$val['id']]) && isset($t2[$val['id']]) && ($t1[$val['id']]['state_id'] == $t2[$val['id']]['state_id'])) {
-                
-                $both++;
-            }
-            else {
-                
-                if (isset($t1[$val['id']]))
-                    $t1_count++;
-                elseif (isset($t2[$val['id']]))
-                    $t2_count++;
-                else
-                    $neither++;
-            }
-        }
-        
+
+		$cl = $this->models->CharacteristicLabel->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'language_id' => $this->getCurrentLanguageId()
+			),
+			'fieldAsIndex' => 'characteristic_id'
+		));
+			        
+        $mts1 = $this->models->MatrixTaxonState->_get(
+        array(
+            'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'taxon_id' => $id[0]
+				), 
+            'columns' => 'taxon_id,characteristic_id,state_id',
+			'fieldAsIndex' => 'state_id'
+        ));
+
+        $mts2 = $this->models->MatrixTaxonState->_get(
+        array(
+            'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $this->getCurrentMatrixId(),
+				'taxon_id' => $id[1]
+				), 
+            'columns' => 'taxon_id,characteristic_id,state_id',
+			'fieldAsIndex' => 'state_id'
+        ));
 
         $overlap = $states1 = $states2 = array();
         
-        foreach ((array) $t1 as $key => $val) {
+        foreach ((array) $mts1 as $key => $val) {
+			
+			$state = $this->getCharacteristicState($key);
+			$state['characteristic'] = $cl[$val['characteristic_id']]['label'];
             
-            if (isset($t2[$key]) && $val == $t2[$key]) {
-                
-                $overlap[] = $val;
-            }
-            else {
-                
-                $states1[] = $val;
-            }
+            if (isset($mts2[$key]))
+                $overlap[] = $state;
+            else
+                $states1[] = $state;
         }
-        
-        foreach ((array) $t2 as $key => $val) {
-            
-            if (!isset($t1[$key]) || $val != $t1[$key])
-                $states2[] = $val;
+
+        foreach ((array) $mts2 as $key => $val) {
+
+            if (!isset($mts1[$key])) {
+				$state = $this->getCharacteristicState($key);
+				$state['characteristic'] = $cl[$val['characteristic_id']]['label'];
+                $states2[] = $state;
+			}
+
         }
+	
+		$t1 = $this->getTaxonById($id[0]);
+		$t2 = $this->getTaxonById($id[1]);
+		
+		$c = $this->getCharacteristics();
+
+		$total = 0;
+		foreach((array)$c as $cVal)
+			foreach((array)$cVal['states'] as $sVal)
+				$total++;
+		
+		
+		$count1 = count((array)$states1);
+		$count2 = count((array)$states2);
+		$both = count((array)$overlap);
+		$neither = $total - $both - $count1 - $count2;
         
         return array(
-            'taxon_1' => $this->getTaxonById($id[0]), 
-            'taxon_2' => $this->getTaxonById($id[1]), 
-            'count_1' => $t1_count, 
-            'count_2' => $t2_count, 
-            'neither' => $neither, 
-            'both' => $both, 
-            'total' => count((array) $c), 
-            'coefficients' => $this->calculateDistances($t1_count, $t2_count, $both, $neither), 
+            'taxon_1' => $t1['taxon'], 
+            'taxon_2' => $t2['taxon'], 
+            'count_1' => $count1, 
+            'count_2' => $count2, 
+			'neither' => $neither, 
+			'both' => $both, 
+            'total' => $total, 
+            'coefficients' => $this->calculateDistances($count1, $count2, $both, $neither), 
             'taxon_states_1' => $states1, 
             'taxon_states_2' => $states2, 
             'taxon_states_overlap' => $overlap
         );
     }
-
 
 
     private function calculateDistances ($u1, $u2, $co, $ca)
@@ -2556,5 +2581,76 @@ class MatrixKeyController extends Controller
 		return $res;
 
 	}
+
+/*
+
+    private function getTaxonComparisonORG ($id)
+    {
+        if (empty($id[0]) || empty($id[1]))
+            return;
+        
+        $c = $this->getCharacteristics();
+        $t1 = $this->getTaxonStates($id[0]);
+        $t2 = $this->getTaxonStates($id[1]);
+
+		$both = $neither = $t1_count = $t2_count = 0;
+        
+		// loop through all available states
+        foreach ((array) $c as $key => $val) {
+            
+			
+            if (isset($t1[$val['id']]) && isset($t2[$val['id']]) && ($t1[$val['id']]['states']['id'] == $t2[$val['id']]['states']['id'])) {
+                
+                $both++;
+            }
+            else {
+                
+                if (isset($t1[$val['id']]))
+                    $t1_count++;
+                elseif (isset($t2[$val['id']]))
+                    $t2_count++;
+                else
+                    $neither++;
+            }
+        }
+        
+
+        $overlap = $states1 = $states2 = array();
+        
+        foreach ((array) $t1 as $key => $val) {
+            
+            if (isset($t2[$key]) && $val == $t2[$key]) {
+                
+                $overlap[] = $val;
+            }
+            else {
+                
+                $states1[] = $val;
+            }
+        }
+        
+        foreach ((array) $t2 as $key => $val) {
+            
+            if (!isset($t1[$key]) || $val != $t1[$key])
+                $states2[] = $val;
+        }
+        
+        return array(
+            'taxon_1' => $this->getTaxonById($id[0]), 
+            'taxon_2' => $this->getTaxonById($id[1]), 
+            'count_1' => $t1_count, 
+            'count_2' => $t2_count, 
+            'neither' => $neither, 
+            'both' => $both, 
+            'total' => count((array) $c), 
+            'coefficients' => $this->calculateDistances($t1_count, $t2_count, $both, $neither), 
+            'taxon_states_1' => $states1, 
+            'taxon_states_2' => $states2, 
+            'taxon_states_overlap' => $overlap
+        );
+    }
+
+
+*/
 
 }
