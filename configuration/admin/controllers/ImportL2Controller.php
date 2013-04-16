@@ -4641,8 +4641,8 @@ class ImportL2Controller extends Controller
         echo 'version: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['version'] . chr(10);
         echo 'project id: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['id'] . chr(10);
         echo 'source file: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['imported_from'] . chr(10);
-        echo 'image path: ' . (isset($_SESSION['admin']['system']['import']['imagePath']) ? $_SESSION['admin']['system']['import']['imagePath'] : '(no image import)') . chr(10);
-        echo 'thumbs path: ' . (isset($_SESSION['admin']['system']['import']['thumbsPath']) ? $_SESSION['admin']['system']['import']['thumbsPath'] : '(no thumbs import)') . chr(10);
+        echo 'image path: ' . (!empty($_SESSION['admin']['system']['import']['imagePath']) ? $_SESSION['admin']['system']['import']['imagePath'] : '(no image import)') . chr(10);
+        echo 'thumbs path: ' . (!empty($_SESSION['admin']['system']['import']['thumbsPath']) ? $_SESSION['admin']['system']['import']['thumbsPath'] : '(no thumbs import)') . chr(10);
         echo 'created: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['createdate'] . chr(10);
 		echo 'server: '. $_SERVER['SERVER_NAME'] . chr(10);
         echo '--------------------------------------------------------------------------------' . chr(10);
