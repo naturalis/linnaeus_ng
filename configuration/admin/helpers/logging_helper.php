@@ -21,7 +21,9 @@ class LoggingHelper
 
 welcome to the end!
 this logger prepends, rather than appends, so the latest log lines are at the top of the file.
-on linux, use the \'less\' or \'head\' commands to see the beginning of the file.';
+on linux, use the \'less\' or \'head\' commands to see the beginning of the file.
+
+';
 
 	public function __destruct()
 	{

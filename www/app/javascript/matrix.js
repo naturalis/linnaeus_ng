@@ -157,8 +157,8 @@ function goState() {
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - headerHeight;
 
-			var imgW = state.img_dimensions.w;
-			var imgH = state.img_dimensions.h;
+			var imgW = state.img_dimensions[0];
+			var imgH = state.img_dimensions[1];
 
 			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
 
