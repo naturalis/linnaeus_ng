@@ -1014,17 +1014,17 @@ class ImportL2Controller extends Controller
                     ));
                     
                     $this->helpers->XmlParser->getNodes('taxondata');
-                    
+                   
                     if (isset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'])) {
                         
                         $m = $this->saveMatrices($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices']);
-                        
+
                         if (isset($m['failed']))
                             foreach ((array) $m['failed'] as $val)
                                 $this->addError($this->storeError($val['cause'], 'Matrix'));
                         
                         $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'] = $m['matrices'];
-                        
+
                         $this->helpers->XmlParser->setCallbackFunction(array(
                             $this, 
                             'xmlParserCallback_KeyMatrixConnect'
@@ -3231,17 +3231,10 @@ class ImportL2Controller extends Controller
         if ($matrixname) {
             
             //?? (string)$obj->identify->id_file->obj_link
-            
 
-
-            $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_replace('.adm', '', $matrixname);
+            $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['name'] = str_ireplace('.adm', '', $matrixname);
             
-            if (isset($obj->identify->id_file->characters->character_))
-                $chars = $obj->identify->id_file->characters->character_;
-            else if (isset($obj->identify->id_file->characters->character))
-                $chars = $obj->identify->id_file->characters->character;
-            else
-                $chars = null;
+			$chars = $this->resolveCharacterElement($obj->identify->id_file);
             
             foreach ($chars as $char) {
                 
@@ -3254,32 +3247,22 @@ class ImportL2Controller extends Controller
                 
                 foreach ($char->states->state as $stat) {
                     
-                    $statename = trim((string) $stat->state_name);
-                    $statemin = trim((string) $stat->state_min);
-                    $statemax = trim((string) $stat->state_max);
-                    $statemean = trim((string) $stat->state_mean);
-                    $statesd = trim((string) $stat->state_sd);
-                    $statefile = strtolower(trim((string) $stat->state_file));
-                    
-                    //stat->state_file; immer leeg
-                    
-
-
-                    $adHocIndex = md5($matrixname . $charname . $statename . $statemin . $statemax . $statemean . $statesd . $statefile);
-                    
+                    $adHocIndex = $this->createAdHocIndex($obj->identify->id_file->filename,$char,$stat);
+                   
                     $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['charname'] = $charname;
                     $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['chartype'] = $chartype;
                     $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$matrixname]['characteristics'][$charname]['states'][$adHocIndex] = array(
-                        'statename' => $statename, 
-                        'statemin' => $statemin, 
-                        'statemax' => $statemax, 
-                        'statemean' => $statemean, 
-                        'statesd' => $statesd, 
-                        'statefile' => $statefile
+                        'statename' => trim((string) $stat->state_name), 
+                        'statemin' => trim((string) $stat->state_min), 
+                        'statemax' => trim((string) $stat->state_max), 
+                        'statemean' => trim((string) $stat->state_mean), 
+                        'statesd' => trim((string) $stat->state_sd), 
+                        'statefile' => strtolower(trim((string) $stat->state_file))
                     );
                 }
             }
         }
+		
     }
 
 
@@ -3413,6 +3396,21 @@ class ImportL2Controller extends Controller
                 }
             }
         }
+
+		/*
+		
+			the matrices array is hereby reduced to the bare necessities for resolving the states to the correct id's:
+		
+			[27b2992b3873ba401ca9a84c887eb9c5] => Array
+				(
+					[matrix_id] => 208
+					[characteristic_id] => 2920
+					[state_id] => 27082
+				)
+				
+			the md5-hash identifies a specific state (see createAdHocIndex())
+
+		*/
         
         return array(
             'matrices' => $d, 
@@ -3433,19 +3431,19 @@ class ImportL2Controller extends Controller
             if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'])) {
                 
                 $taxonid = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
-                
-                foreach ($obj->identify->id_file->characters->character_ as $char) {
+				
+				$chars = $this->resolveCharacterElement($obj->identify->id_file);
+            
+	            foreach ($chars as $char) {
                     
                     $charname = trim((string) $char->character_name);
                     
                     foreach ($char->states->state as $stat) {
                         
-                        $adHocIndex = md5(
-                        $matrixname . $charname . trim((string) $stat->state_name) . trim((string) $stat->state_min) . trim((string) $stat->state_max) . trim((string) $stat->state_mean) . trim((string) $stat->state_sd) .
-                         trim((string) $stat->state_file));
-                        
+						$adHocIndex = $this->createAdHocIndex($obj->identify->id_file->filename,$char,$stat);
+
                         if (isset($_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'][$adHocIndex])) {
-                            
+
                             $this->models->MatrixTaxon->setNoKeyViolationLogging(true);
                             
                             $this->models->MatrixTaxon->save(
@@ -3469,13 +3467,19 @@ class ImportL2Controller extends Controller
                             ));
                         }
                     }
-                }
+                } 
             }
             else {
                 
                 $_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = 'Species "' . trim((string) $obj->name) . '" in matrix key does not exist and has been discarded';
             }
         } // not part of any matrix
+		else {
+			
+			$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = 'Encountered empty matrix name';
+			
+		}
+
     }
     
     // map
@@ -4770,5 +4774,37 @@ class ImportL2Controller extends Controller
     {
         return $_SESSION['admin']['system']['import']['errorlog']['header']['test_project'];
     }
+
+
+
+	private function createAdHocIndex($matrixname,$char,$stat)
+	{
+
+		return md5(	
+			$matrixname.
+			trim((string) $char->character_name).
+			trim((string) $stat->state_name).
+			trim((string) $stat->state_min).
+			trim((string) $stat->state_max).
+			trim((string) $stat->state_mean).
+			trim((string) $stat->state_sd).
+			trim((string) $stat->state_file)
+		);
+
+	}
+
+	private function resolveCharacterElement($file)
+	{
+
+		if (isset($file->characters->character_))
+			return $file->characters->character_;
+		else if (isset($file->characters->character))
+			return $file->characters->character;
+		else
+			return null;
+		
+	}
+				
+
 
 }
