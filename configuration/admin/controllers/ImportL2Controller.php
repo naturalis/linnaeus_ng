@@ -4627,10 +4627,10 @@ class ImportL2Controller extends Controller
 				preg_replace(
 					'/\W/',
 					'', 
-					$_SESSION['admin']['system']['import']['errorlog']['header']['project'].
-					'--'.
-					str_replace('.','-',$_SERVER['SERVER_NAME'])
-				)
+					$_SESSION['admin']['system']['import']['errorlog']['header']['project']
+				).
+				'--'.
+				str_replace('.','-',$_SERVER['SERVER_NAME'])
 			).
 			'.log'
 		);
