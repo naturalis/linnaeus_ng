@@ -22,7 +22,7 @@ function getData(action,id,postFunction) {
 			'time' : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);return;
+			//console.log(data);
 			obj = $.parseJSON(data);
 			if (postFunction) eval(postFunction+'(obj,id)');
 		}
@@ -583,9 +583,17 @@ function fillTaxonStates(obj,char) {
 
     var textToInsert = [];
 
+
 	for(var i in obj) {
-		
-        textToInsert[i] = '<tr class="highlight"><td>'+obj[i].type+'</td><td>'+obj[i].characteristic+'</td><td>'+obj[i].state.label+'</td><td></td></tr>';
+
+        var s = '<tr class="highlight" style="vertical-align:top"><td>'+obj[i].type+'</td><td>'+obj[i].characteristic+'</td><td>';
+
+		for(var j in obj[i].states)
+			s = s + obj[i].states[j].label+'<br />';
+
+		s = s + '</td><td></td></tr>';
+
+		textToInsert[i] = s;
      
     }
 
@@ -639,21 +647,21 @@ function fillCompareResults(obj) {
 }
 
 function fillTaxaStatesOverviews(obj) {
-	
-	$('#taxon_name_1').html(obj.taxon_1.taxon);
-	$('#taxon_name_2').html(obj.taxon_2.taxon);
+
+	$('#taxon_name_1').html(obj.taxon_1);
+	$('#taxon_name_2').html(obj.taxon_2);
 	
 	var s = '';
 	
-	if (obj.taxon_states_1) for (i in obj.taxon_states_1)  s = s + obj.taxon_states_1[i].characteristic+': '+obj.taxon_states_1[i].state.label+'<br />';
+	if (obj.taxon_states_1) for (i in obj.taxon_states_1)  s = s + obj.taxon_states_1[i].characteristic+': '+obj.taxon_states_1[i].label+'<br />';
 	$('#states1').html(s ? s : _('(none)'));
 	s = '';
 
-	if (obj.taxon_states_2) for (i in obj.taxon_states_2)  s = s + obj.taxon_states_2[i].characteristic+': '+obj.taxon_states_2[i].state.label+'<br />';
+	if (obj.taxon_states_2) for (i in obj.taxon_states_2)  s = s + obj.taxon_states_2[i].characteristic+': '+obj.taxon_states_2[i].label+'<br />';
 	$('#states2').html(s ? s : _('(none)'));
 	s = '';
 
-	if (obj.taxon_states_overlap) for (i in obj.taxon_states_overlap)  s = s + obj.taxon_states_overlap[i].characteristic+': '+obj.taxon_states_overlap[i].state.label+'<br />';
+	if (obj.taxon_states_overlap) for (i in obj.taxon_states_overlap)  s = s + obj.taxon_states_overlap[i].characteristic+': '+obj.taxon_states_overlap[i].label+'<br />';
 	$('#statesBoth').html(s ? s : _('(none)'));
 
 	$('#overview').removeClass('invisible').addClass('visible');
@@ -663,9 +671,9 @@ function fillTaxaStatesOverviews(obj) {
 function fillTaxaStates(obj) {
 			
 	$('#count-both').html(obj.both);
-	$('#taxon-1').html(obj.taxon_1.taxon);
+	$('#taxon-1').html(obj.taxon_1);
 	$('#count-1').html(obj.count_1);
-	$('#taxon-2').html(obj.taxon_2.taxon);
+	$('#taxon-2').html(obj.taxon_2);
 	$('#count-2').html(obj.count_2);
 	$('#count-total').html(obj.total);
 	$('#count-neither').html(obj.neither);
