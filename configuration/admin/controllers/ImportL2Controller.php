@@ -4642,7 +4642,7 @@ class ImportL2Controller extends Controller
         echo 'source file: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['imported_from'] . chr(10);
         echo 'created: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['createdate'] . chr(10);
         echo 'project id: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['id'] . chr(10);
-        
+		echo 'server: '. $_SERVER['SERVER_NAME'] . chr(10);
         echo '--------------------------------------------------------------------------------' . chr(10);
         
         $prevMod = null;
