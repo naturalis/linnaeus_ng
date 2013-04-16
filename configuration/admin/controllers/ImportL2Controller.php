@@ -4639,9 +4639,11 @@ class ImportL2Controller extends Controller
         
         echo 'project: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['project'] . chr(10);
         echo 'version: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['version'] . chr(10);
-        echo 'source file: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['imported_from'] . chr(10);
-        echo 'created: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['createdate'] . chr(10);
         echo 'project id: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['id'] . chr(10);
+        echo 'source file: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['imported_from'] . chr(10);
+        echo 'image path: ' . isset($_SESSION['admin']['system']['import']['imagePath']) ? $_SESSION['admin']['system']['import']['imagePath'] : '(no image import)' . chr(10);
+        echo 'thumbs path: ' . isset($_SESSION['admin']['system']['import']['thumbsPath']) ? $_SESSION['admin']['system']['import']['thumbsPath'] : '(no thumbs import)' . chr(10);
+        echo 'created: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['createdate'] . chr(10);
 		echo 'server: '. $_SERVER['SERVER_NAME'] . chr(10);
         echo '--------------------------------------------------------------------------------' . chr(10);
         
@@ -4762,8 +4764,6 @@ class ImportL2Controller extends Controller
         );
     }
 
-
-
     private function getRandomTestProjectName ()
     {
         $animales = array(
@@ -4780,14 +4780,10 @@ class ImportL2Controller extends Controller
         return '-test project «' . ucwords($animales[rand(0, count($animales) - 1)]) . '» (' . date('c') . ')';
     }
 
-
-
     private function isTest ()
     {
         return $_SESSION['admin']['system']['import']['errorlog']['header']['test_project'];
     }
-
-
 
 	private function createAdHocIndex($matrixname,$char,$stat)
 	{
