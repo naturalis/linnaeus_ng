@@ -193,7 +193,7 @@ class ImportL2Controller extends Controller
     public function l2StartAction ()
     {
         $this->checkAuthorisation(true);
-        
+
         if ($this->rHasVal('process', '1'))
             $this->redirect('l2_project.php');
         
@@ -4622,7 +4622,19 @@ class ImportL2Controller extends Controller
 
     private function downloadErrorLog ()
     {
-        header('Content-disposition:attachment;filename=import-' . strtolower(preg_replace('/\W/', '', $_SESSION['admin']['system']['import']['errorlog']['header']['project'])) . '-errors.log');
+        header('Content-disposition:attachment;filename=import-log--'.
+			strtolower(
+				preg_replace(
+					'/\W/',
+					'', 
+					$_SESSION['admin']['system']['import']['errorlog']['header']['project'].
+					'--'.
+					str_replace('.','-',$_SERVER['SERVER_NAME'])
+				)
+			).
+			'.log'
+		);
+
         header('Content-type:text/txt');
         
         echo 'project: ' . $_SESSION['admin']['system']['import']['errorlog']['header']['project'] . chr(10);
