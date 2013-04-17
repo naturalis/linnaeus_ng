@@ -241,6 +241,8 @@ class LinnaeusController extends Controller
 
 		}
 		
+		return null;
+		
 	}
 
 
