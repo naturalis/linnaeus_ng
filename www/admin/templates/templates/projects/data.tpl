@@ -10,7 +10,11 @@
 			{t}Internal project name:{/t}
 		</td>
 		<td colspan="2">
+        {if $isSysAdmin}
+        	<input type="text" name="sys_name" value="{$data.sys_name}" style="width:300px;" />
+        {else}
 			{$data.sys_name}
+		{/if}          
 		</td>
 	</tr>
 	<tr>
