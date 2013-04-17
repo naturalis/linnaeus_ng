@@ -1,18 +1,13 @@
 <h1>{$headerTitles.title}</h1>
 <h2>{$headerTitles.subtitle}</h2> 
 
-
-
-
-{foreach from=$content.media item=v}{if $v.overview_image==1}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}" title="{$v.description}">
-            <img style="width:280px" title="{$v.description}" src="{$session.app.project.urls.uploadedMedia}{$v.file_name}" alt="">
+        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage}" title="{$v.description}">
+            <img style="width:280px" title="{$v.description}" src="{$session.app.project.urls.uploadedMedia}{$overviewImage}" alt="">
         </a>
     </div>
 </div>
-{/if}{/foreach}
 
 {foreach from=$content item=v key=k}{if $categoryList[$k]}
 <p>

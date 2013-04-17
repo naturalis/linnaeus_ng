@@ -269,6 +269,8 @@ class SpeciesController extends Controller
 			$this->smarty->assign('taxon', $taxon);
 		
 			$this->smarty->assign('content', $content);
+
+			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
                 
 			if (!$this->rHasVal('navigation',false))
 				$this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
@@ -493,7 +495,7 @@ class SpeciesController extends Controller
             return array(
                 'categories' => $d, 
                 'defaultCategory' => $defCat, 
-                'categoryList' => $categoryList,
+                'categoryList' => isset($categoryList) ? $categoryList : null,
                 'emptinessList' => $emptinessList,
             );
         }

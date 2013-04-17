@@ -89,11 +89,11 @@ NOTICES
 -->
 <br />
 {t}Management tasks:{/t}
+
 <ul>
+	<li><a href="views/projects/">{t}Project administration{/t}</a></li>
 	<li><a href="views/hotwords/">{t}Hotwords{/t}</a></li>
 	<li><a href="views/users/">{t}User administration{/t}</a></li>
-	<li><a href="views/projects/">{t}Project administration{/t}</a></li>
-	<li><a href="views/users/choose_project.php">{t}Switch projects{/t}</a></li>
 </ul>
 
 {/if}

@@ -1,0 +1,309 @@
+"Dierenzoeker								",,,,
+"								",,,,
+"								",,,,
+KENMERKGROEP,KENMERK,KENMERKTOESTANDEN,VERTALING (EVENTUEEL),AFBEELDING
+poten,aantal poten,0,,__potenNr0.png
+poten,aantal poten,10,,__potenNr10.png
+poten,aantal poten,10+,,__potenNr10Plus.png
+poten,aantal poten,2,,__potenNr2.png
+poten,aantal poten,4,,__potenNr4.png
+poten,aantal poten,6,,__potenNr6.png
+poten,aantal poten,8,,__potenNr8.png
+poten,aantal poten,>10,,__potenNr10Plus.png
+lichaam,achterlijf,afgerond,,__achterAfgerond.png
+lichaam,achterlijf,drie draden,,__achterDrieDraden.png
+lichaam,achterlijf,eindigt in punt,,__achterEindigtInPunt.png
+lichaam,achterlijf,kort staart,,__achterKortStaart.png
+lichaam,achterlijf,korte staart,,__achterKorteStaart.png
+lichaam,achterlijf,lang staart,,__achterLangStaart.png
+lichaam,achterlijf,met stekel,,__achterMetStekel.png
+lichaam,achterlijf,puntig,,__achterPuntig.png
+lichaam,achterlijf,soort tang,,__achterSoortTang.png
+lichaam,achterlijf,staart kort,,__achterStaartKort.png
+lichaam,achterlijf,staart lang,,__achterStaartLang.png
+lichaam,achterlijf,steekt/bijt,,__achterSteektBijt.png
+lichaam,achterlijf,stekel,,__achterStekel.png
+lichaam,achterlijf,twee draden,,__achterTweeDraden.png
+,beginletter,A,,__letterA.png
+,beginletter,B,,__letterB.png
+,beginletter,C,,__letterC.png
+,beginletter,D,,__letterD.png
+,beginletter,E,,__letterE.png
+,beginletter,F,,__letterF.png
+,beginletter,G,,__letterG.png
+,beginletter,H,,__letterH.png
+,beginletter,I,,__letterI.png
+,beginletter,J,,__letterJ.png
+,beginletter,K,,__letterK.png
+,beginletter,L,,__letterL.png
+,beginletter,M,,__letterM.png
+,beginletter,N,,__letterN.png
+,beginletter,O,,__letterO.png
+,beginletter,P,,__letterP.png
+,beginletter,R,,__letterR.png
+,beginletter,S,,__letterS.png
+,beginletter,T,,__letterT.png
+,beginletter,U,,__letterU.png
+,beginletter,V,,__letterV.png
+,beginletter,W,,__letterW.png
+,beginletter,Z,,__letterZ.png
+kop,bek,geen bek,,__bekGeenBek.png
+kop,bek,geen zichtbare bek,,__bekGeenZichtbareBek.png
+kop,bek,geen zichtbare mond,,__bekGeenZichtbareMond.png
+kop,bek,mond,,__bekMond.png
+kop,bek,snavel dik,,__bekSnavelDik.png
+kop,bek,snavel dun,,__bekSnavelDun.png
+kop,bek,snavel kort,,__bekSnavelKort.png
+kop,bek,snavel krom,,__bekSnavelKrom.png
+kop,bek,snavel lang,,__bekSnavelLang.png
+kop,bek,snavel plat,,__bekSnavelPlat.png
+kop,bek,snuit,,__bekSnuit.png
+kop,bek,steeksnuit,,__bekSteeksnuit.png
+kop,bek,tanden,,__bekTanden.png
+kop,bek,tong,,__bekTong.png
+kop,bek,twee kaken,,__bekTweeKaken.png
+,lijkt op,spin,,__groepAchtpoter.png
+,lijkt op,amfibie,,__groepAmfibie.png
+,lijkt op,bij,,__groepBij.png
+,lijkt op,kever,,__groepKever.png
+,lijkt op,kriebeldier,,__groepKriebeldier.png
+,lijkt op,mier,,__groepMier.png
+,lijkt op,slak of schelp,,__groepSlak-schelp.png
+,lijkt op,vlieg,,__groepVlieg.png
+,lijkt op,vlinder,,__groepVlinder.png
+,lijkt op,vogel,,__groepVogel.png
+,lijkt op,worm,,__groepWorm.png
+,lijkt op,zoogdier,,__groepZoogdier.png
+,gedrag,beweegt niet,,__gedragBeweegtNiet.png
+,gedrag,geluid,,__gedragGeluid.png
+,gedrag,graaft,,__gedragGraaft.png
+,gedrag,hangt,,__gedragHangt.png
+,gedrag,kruip,,__gedragKruip.png
+,gedrag,kruipt,,__gedragKruipt.png
+,gedrag,lijkt dood,,__gedragLijktDood.png
+,gedrag,loopt,,__gedragLoopt.png
+,gedrag,rent,,__gedragRent.png
+,gedrag,rolt op,,__gedragRoltOp.png
+,gedrag,rolt zich op,,__gedragRoltZichOp.png
+,gedrag,schuilt,,__gedragSchuilt.png
+,gedrag,springt,,__gedragSpringt.png
+,gedrag,steekt/bijt,,__gedragSteektBijt.png
+,gedrag,verstopt zich,,__gedragVerstoptZich.png
+,gedrag,vliegt,,__gedragVliegt.png
+,gedrag,zit,,__gedragZit.png
+,gedrag,zit stil,,__gedragZitStil.png
+,gedrag,zwemt,,__gedragZwemt.png
+,grootte,duif,,__grootteDuif.png
+,grootte,euro,,__grootteEuro.png
+,grootte,fietssleutel,,__grootteFietssleutel.png
+,grootte,groter,,__grootteGroter.png
+,grootte,groter dan een kat,,__grootteGroterDanEenKat.png
+,grootte,huissleutel,,__grootteHuissleutel.png
+,grootte,kat,,__grootteKat.png
+,grootte,langgerekt,,__grootteLanggerekt.png
+,grootte,merel,,__grootteMerel.png
+,grootte,mier,,__grootteMier.png
+,grootte,mier,,__grootteMier.png
+,grootte,muis,,__grootteMuis.png
+,grootte,pinda,,__groottePinda.png
+,grootte,zandkorrel,,__grootteZandkorrel.png
+lichaam,huid,behaard,,__huidBehaard.png
+lichaam,huid,glad,,__huidGlad.png
+lichaam,huid,glanzend,,__huidGlanzend.png
+lichaam,huid,glibberig,,__huidGlibberig.png
+lichaam,huid,met haren,,__huidMetHaren.png
+lichaam,huid,met schubben,,__huidMetSchubben.png
+lichaam,huid,met veren,,__huidMetVeren.png
+lichaam,huid,naakt,,__huidNaakt.png
+lichaam,huid,ruw,,__huidRuw.png
+lichaam,huid,schubben,,__huidSchubben.png
+lichaam,huid,vacht,,__huidVacht.png
+lichaam,huid,veren,,__huidVeren.png
+kleur,kleur,beige,,__kleurBeige.png
+kleur,kleur,blauw,,__kleurBlauw.png
+kleur,kleur,bruin,,__kleurBruin.png
+kleur,kleur,doorzichtig,,__kleurDoorzichtig.png
+kleur,kleur,geel,,__kleurGeel.png
+kleur,kleur,goud,,__kleurGoud.png
+kleur,kleur,grijs,,__kleurGrijs.png
+kleur,kleur,groen,,__kleurGroen.png
+kleur,kleur,oranje,,__kleurOranje.png
+kleur,kleur,paars,,__kleurPaars.png
+kleur,kleur,rood,,__kleurRood.png
+kleur,kleur,roze,,__kleurRoze.png
+kleur,kleur,wit,,__kleurWit.png
+kleur,kleur,zilver,,__kleurZilver.png
+kleur,kleur,zwart,,__kleurZwart.png
+,leefgebied,bij het water,,__gebiedBijHetWater.png
+,leefgebied,bij of in het water,,__gebiedBijOfInHetWater.png
+,leefgebied,binnen,,__gebiedBinnen.png
+,leefgebied,dood blad,,__gebiedDoodBlad.png
+,leefgebied,ergens op,,__gebiedErgensOp.png
+,leefgebied,in boom,,__gebiedInBoom.png
+,leefgebied,in de grond,,__gebiedInGrond.png
+,leefgebied,in de lucht,,__gebiedInDeLucht.png
+,leefgebied,in de struiken,,__gebiedInStruik.png
+,leefgebied,in een boom,,__gebiedInEenBoom.png
+,leefgebied,in struik,,__gebiedInStruik.png
+,leefgebied,in struik of boom,,__gebiedInStruikOfBoom.png
+,leefgebied,onder steen of hout,,__gebiedOnderSteenOfHout.png
+,leefgebied,op bloem,,__gebiedOpBloem.png
+,leefgebied,op de grond,,__gebiedOpDeGrond.png
+,leefgebied,op een bloem,,__gebiedOpEenBloem.png
+,leefgebied,op een muur,,__gebiedOpMuur.png
+,leefgebied,op een plant,,__gebiedOpPlant.png
+,leefgebied,op plant,,__gebiedOpPlant.png
+,leefgebied,schuilplaats,,__gebiedSchuilplek.png
+,leefgebied,schuilplek,,__gebiedSchuilplek.png
+,leefgebied,tegen muur,,__gebiedTegenMuur.png
+,leefgebied,tussen bladeren,,__gebiedTussenBladeren.png
+,leefgebied,water,,__gebiedWater.png
+kop,ogen,geen,,__ogenGeen.png
+kop,ogen,geen ogen,,__ogenGeenOgen.png
+kop,ogen,geen ogen zichtbaar,,__ogenGeenOgenZichtbaar.png
+kop,ogen,geen pupil,,__ogenGeenPupil.png
+kop,ogen,geen zichtbare ogen,,__ogenGeenZichtbareOgen.png
+kop,ogen,insectenogen,,__ogenInsectenogen.png
+kop,ogen,insectenoog,,__ogenInsectenoog.png
+kop,ogen,met pupil,,__ogenMetPupil.png
+kop,ogen,ogen geen pupil,,__ogenOgenGeenPupil.png
+kop,ogen,ogen met pupil,,__ogenOgenMetPupil.png
+kop,ogen,ogen op steeltjes,,__ogenOgenOpSteeltjes.png
+kop,ogen,ogen zonder pupil,,__ogenOgenZonderPupil.png
+kop,ogen,op steeltje,,__ogenOpSteeltje.png
+kop,ogen,puntjes,,__ogenPuntjes.png
+kleur,patroon,bont,,__patroonBont.png
+kleur,patroon,effen,,__patroonEffen.png
+kleur,patroon,egaal,,__patroonEgaal.png
+kleur,patroon,geblokt,,__patroonGeblokt.png
+kleur,patroon,gestipt,,__patroonGestipt.png
+kleur,patroon,gestreept,,__patroonGestreept.png
+kleur,patroon,gevlekt,,__patroonGevlekt.png
+kleur,patroon,onduidelijk,,__patroonOnduidelijk.png
+poten,soort poten,behaard,,__pootVormBehaard.png
+poten,soort poten,geen,,__pootVormGeen.png
+poten,soort poten,geen poten,,__pootVormGeenPoten.png
+poten,soort poten,grijppoten,,__pootVormGrijppoten.png
+poten,soort poten,lang en dun,,__pootVormLangEnDun.png
+poten,soort poten,lange tenen,,__pootVormLangeTenen.png
+poten,soort poten,met haakjes,,__pootVormMetHaakjes.png
+poten,soort poten,met hoeven,,__pootVormMetHoeven.png
+poten,soort poten,met nagels,,__pootVormMetNagels.png
+poten,soort poten,met scharen,,__pootVormMetScharen.png
+poten,soort poten,nagels,,__pootVormNagels.png
+poten,soort poten,nvt,,__pootVormNvt.png
+poten,soort poten,plat,,__pootVormPlat.png
+poten,soort poten,scharen,,__pootVormScharen.png
+poten,soort poten,zwemvliezen,,__pootVormZwemvliezen.png
+kop,spriet,bult,,__kopBult.png
+kop,spriet,draden,,__kopDraden.png
+kop,spriet,geen,,__kopNiks.png
+kop,spriet,korte sprieten,,__kopSprietKort.png
+kop,spriet,kuif,,__kopKuif.png
+kop,spriet,lange sprieten,,__kopSprietLang.png
+kop,spriet,niks,,__kopNiks.png
+kop,spriet,spriet kort,,__kopSprietKort.png
+kop,spriet,spriet lang,,__kopSprietLang.png
+,vleugels,als kever,,__vleugelsAlsKever.png
+,vleugels,als vlinder,,__vleugelsAlsVlinder.png
+,vleugels,doorzichtig,,__vleugelsDoorzichtig.png
+,vleugels,doorzichtige vleugels,,__vleugelsDoorzichtigeVleugels.png
+,vleugels,geen,,__vleugelsGeen.png
+,vleugels,geen vleugels,,__vleugelsGeenVleugels.png
+,vleugels,gekleurd,,__vleugelsGekleurd.png
+,vleugels,gevlekt,,__vleugelsGevlekt.png
+,vleugels,met huid,,__vleugelsMetHuid.png
+,vleugels,met veren,,__vleugelsMetVeren.png
+,vleugels,niet doorzichtige vleugels,,__vleugelsNietDoorzichtigeVleugels.png
+,vleugels,nvt,,__vleugelsNvt.png
+,vleugels,schilden,,__vleugelsSchilden.png
+lichaam,vorm,bolletje,,__vormBolletje.png
+lichaam,vorm,dik,,__vormDik.png
+lichaam,vorm,drie delen,,__vormDrieDelen.png
+lichaam,vorm,driehoekig,,__vormDriehoekig.png
+lichaam,vorm,dun,,__vormDun.png
+lichaam,vorm,lang,,__vormLang.png
+lichaam,vorm,met huisje,,__vormMetHuisje.png
+lichaam,vorm,met schelp,,__vormMetSchelp.png
+lichaam,vorm,plat,,__vormPlat.png
+lichaam,vorm,rond,,__vormRond.png
+lichaam,vorm,segmenten,,__vormSegmenten.png
+lichaam,vorm,twee delen,,__vormTweeDelen.png
+lichaam,vorm,uit segmenten,,__vormUitSegmenten.png
+,seizoen,hele jaar,,__tijdHeleJaar.png
+,seizoen,herfst,,__tijdHerfst.png
+,seizoen,lente,,__tijdLente.png
+,seizoen,voorjaar,,__tijdVoorjaar.png
+,seizoen,winter,,__tijdWinter.png
+,seizoen,zomer,,__tijdZomer.png
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,
+"								",,,,

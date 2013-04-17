@@ -825,7 +825,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function previewAction ()
     {
         $this->redirect('../../../app/views/matrixkey/use_matrix.php?p=' . $this->getCurrentProjectId() . '&id=' . $this->getCurrentMatrixId());
@@ -2013,8 +2012,6 @@ class MatrixKeyController extends Controller
         return $mts;
     }
 
-
-
     private function cleanUpEmptyVariables ()
     {
         $this->models->Matrix->delete('delete from %table% 
@@ -2091,8 +2088,6 @@ class MatrixKeyController extends Controller
             }
         }
     }
-
-
 
     private function updateCharShowOrder ($id, $val)
     {
@@ -2523,15 +2518,14 @@ class MatrixKeyController extends Controller
 
 	private function getGUIMenuOrder()
 	{
-
 		return $this->models->GuiMenuOrder->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'matrix_id' => $this->getCurrentMatrixId(), 
-			),
-			'order' => 'show_order'
-		));
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'matrix_id' => $this->getCurrentMatrixId(), 
+				),
+				'order' => 'show_order'
+			));
 		
 	}
 
@@ -2542,7 +2536,7 @@ class MatrixKeyController extends Controller
 		$c = isset($p['characters']) ? $p['characters'] : null;
 		$m = isset($p['menu']) ? $p['menu'] : null;
 	
-		if (is_null($g) || is_null($c) || is_null($m))
+		if (is_null($g) || is_null($c))
 			return;
 			
 		$d = array();

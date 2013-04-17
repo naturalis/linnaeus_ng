@@ -1,7 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<title>Dierenzoeker</title>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dierenzoeker</title>
+
+	<link rel="image_src" href="/app/webroot/img/dierenzoeker-logo.png" />
+
 	<meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker."/>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="/app/webroot/img/dierenzoeker-logo.png" />
 	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}basics.css" />
