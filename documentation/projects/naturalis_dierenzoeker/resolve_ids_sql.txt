@@ -1,0 +1,27 @@
+select taxon_id,commonname from dev_commonnames where project_id = 220 and lower(commonname) in (
+	'aalscholver','bergeend','blauwe reiger','boomkruiper','buizerd','canadese gans','ekster','fazant','fuut','gaai','gierzwaluw','groenling','halsbandparkiet','heggenmus','houtduif','huismus','kauw','kleine mantelmeeuw','knobbelzwaan','kokmeeuw','koolmees','meerkoet','merel','nijlgans','pimpelmees','putter','ringmus','roodborst','scholekster',
+	'spreeuw','staartmees','turkse tortel','vink','waterhoen','wilde eend','winterkoning','zanglijster','zilvermeeuw','zwarte kraai','zwartkop','stadsduif','boerenzwaluw','grauwe gans','ooievaar','witte kwikstaart','torenvalk','aardkruiper','gewone duizendpoot','gewone miljoenpoot ','gewone platrug','gewone oprolpissebed','kelderpissebed','zwartkoppissebed','paars drieoogje','mospissebed','ruwe pissebed','wespspin','kruisspin','dwergspin','tuinwolfspin','platte wielwebspin','brugspin','gewone strekspin',
+	'grote trilspin','zebraspringspin','schorsmarpissa','gewone tandkaak','muurkaardespin','gewone huisspin','venstersectorspin','koffieboonspin','labyrintspin','meidoornboorvlieg','roodwangbromvlieg','grote dansvlieg','gewone goudoogdaas','gewone regendaas','gewone snuitvlieg','langpootmug','keizersvlieg','fruitvlieg','maartse vlieg','wc-motmugje','huisvlieg','snavelvlieg','dambordvlieg','drekvlieg','blaaskopvlieg','ringpootroofvlieg','ringpootmuskiet','hulstvlieg','tijgermug','wapenvlieg','kleine vos','boomblauwtje','icarusblauwtje','dagpauwoog','kleine vuurvlinder','bruin zandoogje','zwartsprietdikkopje',
+	'bont zandoogje','groot koolwitje','klein geaderd witje','klein koolwitje','oranjetipje','gehakkelde aurelia','atalanta','distelvlinder','sint-jacobsvlinder','muntvlindertje','bonte brandnetelroller','bonte bessenvlinder','piramidevlinder','grote beer','rood weeskind','gamma-uil','kleine wintervlinder','kleine zomervlinder','hagedoornvlinder','bruine snuituil','kolibrievlinder','ligusterpijlstaart','groot avondrood','huismoeder','witvlakvlinder','agaatvlinder','pauwoogpijlstaart','witte tijger','lieveling','zwartbandspanner','stippelmot','bosmier','glanzende houtmier','wegmier','steekmier','gewone pad','groene kikker','bruine kikker','kleine watersalamander',
+	'kikkervisje','salamanderlarve','grote bonte specht','papiervisje','gegroefde watertor','gewone snelzwemmer','tuimelaar','geelgerande waterroofkever','watertreder','grote spinnende watertor','pieptor','eironde watertor','larve tuimelaar','larve geelgerande waterroofkever','larve spinnende watertor','larve gegroefde watertor','kokerjuffer','haagse hopjeskever','zoetwaterpissebed','eenoogkreeftje','mosselkreeftje','gewone aasgarnaal','watervlo','vlokreeft','waterschorpioen','achtogige bloedegel','witbaardzandbij','honingbij ','boomhommel','steenhommel','akkerhommel','tuinhommel','aardhommel','gewone maskerbij','roodpotige groefbij',
+	'vosje','roodgatje','signaalwespbij','rosse metselbij','grote bladsnijder','blauwe metselbij','grote klokjesbij','gewone geurgroefbij','park-bronsgroefbij','duinzijdebij','dikkopbloedbij','grote wolbij','gewone sachembij','zevenstippelig lieveheersbeestje ','tweestippelig lieveheersbeestje ','veelkleurig aziatisch lieveheersbeestje ','citroenlieveheersbeestje','bronblaashoren','gewone poelslak','grote diepslak','ovale poelslak','posthorenslak','spitse moerasslak','jenkins\' brakwaterhorentje','gewone schijfhoren','barnsteenslak','grote clausilia','gewone tuinslak','witgerande tuinslak','segrijnslak','wijngaardslak','gewone duikerwants','gewone driehoeksmossel','schildersmossel','vijvermossel','citroenvlinder','landkaartje','gewoon bootsmannetje','schaatsenrijder','vijverloper','dwergbootsmannetje',
+	'gewone sigaar','platte waterwants','staafwants','toegeknepen korfmossel','lugubere glijer','melkwitte platworm','paardenbloedzuiger','brede bloedzuiger','haft larve (caenis robusta)','haft larve (cloeon dipterum)','haft (cloeon dipterum)','steenvlieg larve (n. cinerea)','heesterslak','gewone wegslak','agaathoren','boerenknoopje','gevlekte akkerslak','gewone haarslak','grote aardslak','grote glansslak','larve lieveheersbeestje','geknobbelde amerikaanse rivierkreeft','rode amerikaanse rivierkreeft','gevlekte amerikaanse rivierkreeft','argusvlinder','koninginnenpage','oranje zandoogje','gewone regenworm','goudhaan','tjiftjaf','fitis','stinkende kortschildkever','egel','gewone dwergvleermuis','laatvlieger','bosmestkever','doodgraver','glansloopkever','kniptor','leliehaantje',
+	'meikever','rozenkever','hennepnetelgoudhaantje','roodvlekweekkever','gegroefde lapsnuitkever','tuinschalebijter','zandloopkever','kleine wespenboktor','groene struiksnuittor','gewone kortnek','bosmuis','bruine rat','eekhoorn','veldmuis','gewone bosspitsmuis','huismuis','huisspitsmuis','mol','vos','ree','konijn','haas','tapijtkever','soldaatje','schildpadkever','coloradokever','berkensigarenmaker','schijnboktor'
+);
+
+/*
+	define categories
+		Description -> Meer
+		Appearance -> Uiterlijk
+		Behaviour -> Gedrag
+		Where and when -> Waar en wanneer
+	
+	set show_order by hand in
+		dev_pages_taxa
+		
+	
+	
+	paste english names in headers csv, so that they become:
+		taxon_id	language_id	Appearance	Behaviour	Where and when	Description
+	
+*/

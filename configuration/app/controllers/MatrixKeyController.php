@@ -187,10 +187,22 @@ class MatrixKeyController extends Controller
             if (isset($d))
                 $this->smarty->assign('activeChars', $d);
 
-            $this->smarty->assign('storedStates', $states);
+//q($this->getGUIMenu(array('groups'=>$groups,'characters'=>$characters,'appendExcluded'=>false,'addStatesToCharacters'=>true,'checkImages'=>true)),1);
+
+			$this->smarty->assign('storedStates', $states);
             $this->smarty->assign('groups',$groups);
-            $this->smarty->assign('guiMenu', $this->getGUIMenu(array('groups'=>$groups,'characters'=>$characters,'appendExcluded'=>false)));
-			
+            $this->smarty->assign('guiMenu',
+				$this->getGUIMenu(
+					array(
+						'groups'=>$groups,
+						'characters'=>$characters,
+						'appendExcluded'=>false,
+						'addStatesToCharacters'=>true,
+						'checkImages'=>true
+					)
+				)
+			);
+		
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
@@ -233,59 +245,6 @@ class MatrixKeyController extends Controller
 		
         $this->printPage();
     }
-
-
-
-	private function getGUIMenu($p=null)
-	{
-
-        $g = isset($p['groups']) ? $p['groups'] : null;
-        $c = isset($p['characters']) ? $p['characters'] : null;
-		$m = $this->models->GuiMenuOrder->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'matrix_id' => $this->getCurrentMatrixId(), 
-			),
-			'order' => 'show_order'
-		));
-        $appendExcluded = isset($p['appendExcluded']) ? $p['appendExcluded'] : false;
-	
-		if (is_null($g) || is_null($c) || is_null($m))
-			return;
-
-		foreach ((array) $c as $val)
-			$d[$val['id']] = $val;
-		$c = $d;
-			
-		$d = array();
-		$i=0;		
-		foreach((array)$m as $val) {
-			if ($val['ref_type']=='group') {
-				$d[$i] = $g[$val['ref_id']];
-				unset($g[$val['ref_id']]);
-			} else {
-				$d[$i] = $c[$val['ref_id']];
-				unset($c[$val['ref_id']]);
-			}
-			$d[$i]['icon'] = '__menu'.preg_replace('/\W/','',ucwords($d[$i]['label'])).'.png';
-			$i++;
-		}
-		
-		if ($appendExcluded) {
-	
-			// append the items for some reason missing from the menu-order
-			foreach((array)$c as $val)
-				$d[] = $val;
-		
-			foreach((array)$g as $val)
-				$d[] = $val;
-
-		}
-
-		return $d;		
-		
-	}
 
 
     public function examineAction ()
@@ -2607,6 +2566,86 @@ class MatrixKeyController extends Controller
 		return $res;
 
 	}
+
+	private function getGUIMenu($p=null)
+	{
+
+        $checkImages = isset($p['checkImages']) ? $p['checkImages'] : false;
+
+        $g = isset($p['groups']) ? $p['groups'] : null;
+        $c = isset($p['characters']) ? $p['characters'] : null;
+        $addStates = isset($p['addStatesToCharacters']) ? $p['addStatesToCharacters'] : false;
+
+		$m = $this->models->GuiMenuOrder->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'matrix_id' => $this->getCurrentMatrixId(), 
+			),
+			'order' => 'show_order'
+		));
+
+        $appendExcluded = isset($p['appendExcluded']) ? $p['appendExcluded'] : false;
+	
+		if (is_null($g) || is_null($c))
+			return;
+
+		foreach ((array) $c as $val)
+			$d[$val['id']] = $val;
+
+		$c = $d;
+		
+		$d = array();
+		$i=0;		
+		foreach((array)$m as $val) {
+			if ($val['ref_type']=='group') {
+				$d[$i] = $g[$val['ref_id']];
+				unset($g[$val['ref_id']]);
+			} else {
+				$d[$i] = $c[$val['ref_id']];
+				unset($c[$val['ref_id']]);
+			}
+			$d[$i]['icon'] = '__menu'.preg_replace('/\W/','',ucwords($d[$i]['label'])).'.png';
+			if ($checkImages)
+				$d[$i]['icon_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$d[$i]['icon']);
+			$i++;
+		}
+		
+		if ($appendExcluded) {
+	
+			// append the items for some reason missing from the menu-order
+			foreach((array)$c as $val)
+				$d[] = $val;
+		
+			foreach((array)$g as $val)
+				$d[] = $val;
+
+		}
+		
+		if ($addStates) {
+			
+			die('must add missing states');
+			
+		}
+
+		if ($checkImages) {
+			
+			foreach((array)$d as $key => $val) {
+				if (isset($val['states'])) {
+					foreach((array)$val['states'] as $sKey => $sVal) {
+						$d[$key]['states'][$sKey]['file_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$sVal["file_name"]);
+					}
+				}
+			}
+
+		}
+		
+		return $d;		
+		
+	}
+
+
+
 
 /*
 
