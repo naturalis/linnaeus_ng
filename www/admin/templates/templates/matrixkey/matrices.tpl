@@ -11,10 +11,11 @@
 		{$val.names[$activeLanguage].name}
 		{if $val.default==1}<span title="default">*</span>{/if}
 	</td>
-	<td><span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">{t}edit matrix{/t}</span></td>
-	<td><span class="a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span></td>
-	<td><span class="a" onclick="matrixMatrixDelete({$val.id},'{$val.names[$activeLanguage].name|@addslashes}')">{t}delete{/t}</span></td>
-	<td><a href="?imgdim={$val.id}">{t}reacquire state image dimensions{/t}</a></td>
+	<td>[<span class="a" onclick="$('#id').val({$val.id});$('#action').val('activate');$('#theForm').submit()">{t}edit matrix{/t}</span>]</td>
+	<td>[<span class="a" onclick="window.open('matrix.php?id={$val.id}','_self')">{t}edit name{/t}</span>]</td>
+    <td>[<a href="?default={$val.id}">{t}set as default{/t}</a>]</td>
+	<td>[<span class="a" onclick="matrixMatrixDelete({$val.id},'{$val.names[$activeLanguage].name|@addslashes}')">{t}delete{/t}</span>]</td>
+	<td>[<a href="?imgdim={$val.id}">{t}acquire state image dimensions{/t}</a>]</td>
 </tr>
 {/foreach}
 </table>
