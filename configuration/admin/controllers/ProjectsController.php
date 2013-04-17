@@ -393,70 +393,18 @@ class ProjectsController extends Controller
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Project data'));
-        /*
-		if (isset($this->requestData['deleteLogo']) && $this->requestData['deleteLogo']=='1' && !$this->isFormResubmit()) {
-		// deleting the logo
-			
-			$data = $this->models->Project->_get(array('id' => $this->getCurrentProjectId()));
 
-			if (@unlink($this->getProjectsMediaStorageDir().$data['logo'])) {
-
-				$p = $this->models->Project->save(
-					array(
-						'id' => $this->getCurrentProjectId(), 
-						'logo' => 'null'
-					)
-				);
-
-			} else {
-
-				$this->addError($this->translate('Could not delete image.'));
-
-			}
-
-		} else
-		*/
         if (isset($this->requestData) && !$this->isFormResubmit()) {
             // saving all data (except the logo image)
-            
-
-
 
             $this->requestData['id'] = $this->getCurrentProjectId();
+			
+			if (!$this->isCurrentUserSysAdmin() && isset($this->requestData['sys_name'])) {
+				unset($this->requestData['sys_name']);
+			}
             
             $this->models->Project->save($this->requestData);
         }
-        /*
-        if (isset($this->requestDataFiles)) {
-		// saving the logo
-
-			$filesToSave =  $this->getUploadedMediaFiles();
-
-			if ($filesToSave) {
-
-				$p = $this->models->Project->save(
-					array(
-						'id' => $this->getCurrentProjectId(), 
-						'logo' => $filesToSave[0]['name']
-					)
-				);
-
-				if ($p) {
-				
-					$this->addMessage($this->translate('Image saved.'));
-
-				} else {
-
-					@unlink($_SESSION['admin']['project']['paths']['project_media'].$filesToSave[0]['name']);
-
-					$this->addError($this->translate('Could not save image.'));
-
-				}
-
-			}
-
-        }
-		*/
         
         $this->setCurrentProjectData();
         
