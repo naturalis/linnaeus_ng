@@ -100,6 +100,9 @@ class MatrixKeyController extends Controller
         
         $this->setPageName($this->translate('Matrices'));
         
+        if ($this->rHasVal('default'))
+            $this->setDefaultMatrix($this->requestData['default']);
+        
         $matrices = $this->getMatrices();
         
         if (count((array) $matrices) == 0)
@@ -108,7 +111,6 @@ class MatrixKeyController extends Controller
         if ($this->rHasVal('imgdim'))
 			$this->reacquireStateImageDimensions($this->requestData['imgdim']);
 
-        
         if ($this->rHasVal('action', 'delete') && !$this->isFormResubmit()) {
             
             $this->clearCache($this->cacheFiles['matrices']);
@@ -182,11 +184,6 @@ class MatrixKeyController extends Controller
         
         if ($this->getCurrentMatrixId() == null)
             $this->redirect('matrices.php');
-        
-        if ($this->rHasId() && $this->rHasVal('action', 'def') && !$this->isFormResubmit()) {
-            
-            $this->setDefaultMatrix($this->requestData['id']);
-        }
         
         $matrix = $this->getMatrix($this->getCurrentMatrixId());
         
@@ -2108,8 +2105,6 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
     private function renumberCharShowOrder ()
     {
         $c = $this->getCharacteristics();
@@ -2525,7 +2520,6 @@ class MatrixKeyController extends Controller
 		));
 		
 	}
-
 
 	private function getGUIMenuOrder()
 	{
