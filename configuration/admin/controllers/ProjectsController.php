@@ -1726,6 +1726,36 @@ class ProjectsController extends Controller
 			),
 			array('id'=>$data['id'])
 		);
+		
+		if (isset($data['sys_name'])) {
+
+            $p = $this->models->Project->_get(array(
+                'id' => array('id !=' => $data['id'],'sys_name'=>$data['sys_name']),
+            ));
+			
+			if ($p) {
+				
+				$this->addError('A project with that internal name alreasy exists.');
+				unset($this->requestData['sys_name']);
+				
+			}
+
+		}
+
+		if (isset($data['short_name'])) {
+
+            $p = $this->models->Project->_get(array(
+                'id' => array('id !=' => $data['id'],'short_name'=>$data['short_name']),
+            ));
+			
+			if ($p) {
+				
+				$this->addError(sprintf('A project with that short name name alreasy exists (%s).',$p[0]['sys_name']));
+				unset($this->requestData['short_name']);
+				
+			}
+
+		}
 
 		$this->models->Project->save($data);
 		
