@@ -396,14 +396,8 @@ class ProjectsController extends Controller
 
         if (isset($this->requestData) && !$this->isFormResubmit()) {
             // saving all data (except the logo image)
-
-            $this->requestData['id'] = $this->getCurrentProjectId();
 			
-			if (!$this->isCurrentUserSysAdmin() && isset($this->requestData['sys_name'])) {
-				unset($this->requestData['sys_name']);
-			}
-            
-            $this->models->Project->save($this->requestData);
+			$this->saveProjectData($this->requestData);
         }
         
         $this->setCurrentProjectData();
@@ -1711,6 +1705,30 @@ class ProjectsController extends Controller
 
 		$this->addMessage('Updated project table');
 	
+	}
+
+	private function saveProjectData($data)
+	{
+
+		$data['id'] = $this->getCurrentProjectId();
+			
+		if (!$this->isCurrentUserSysAdmin() && isset($data['sys_name'])) {
+			unset($this->requestData['sys_name']);
+		}
+			
+		$p = $this->models->Project->update(
+			array(
+				'short_name' => 'null',
+				'css_url' => 'null',
+				'keywords' => 'null',
+				'description' => 'null',
+				'group' => 'null'
+			),
+			array('id'=>$data['id'])
+		);
+
+		$this->models->Project->save($data);
+		
 	}
 
 	
