@@ -75,7 +75,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     public function indexAction ()
     {
 		
@@ -97,30 +96,6 @@ class MatrixKeyController extends Controller
 			$this->redirect('identify.php');
 		}
         
-    }
-
-
-
-    public function indexActionORG ()
-    {
-        $this->checkMatrixIdOverride();
-        
-        $matrix = $this->getCurrentMatrix();
-        
-        if (!isset($matrix)) {
-            
-            $this->storeHistory = false;
-            
-            $matrices = $this->getMatrices();
-            
-            $matrix = array_shift($matrices);
-            
-            $this->setCurrentMatrix($matrix['id']);
-        }
-        
-        $this->setStoreHistory(false);
-        
-        $this->redirect('identify.php');
     }
 
 
@@ -168,6 +143,7 @@ class MatrixKeyController extends Controller
             $this->redirect('matrices.php');
         }
     }
+
 
     public function identifyAction ()
     {
