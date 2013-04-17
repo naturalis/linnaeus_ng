@@ -3270,6 +3270,8 @@ class ImportL2Controller extends Controller
     private function resolveCharType ($t)
     {
         
+		echo ':'.$t.':';
+		
         // ??? HAVE ONLY SEEN Long Text, Text & Picture
         switch ($t) {
             case 'Long Text':
