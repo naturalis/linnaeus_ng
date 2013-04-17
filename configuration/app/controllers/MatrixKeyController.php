@@ -78,6 +78,31 @@ class MatrixKeyController extends Controller
 
     public function indexAction ()
     {
+		
+        $this->checkMatrixIdOverride();
+		$this->setStoreHistory(false);
+        
+        $m = $this->getCurrentMatrix();
+		if (isset($m)) $this->redirect('identify.php');
+
+        $m = $this->getDefaultMatrixId();
+		if (isset($m)) {
+			$this->setCurrentMatrix($m);
+			$this->redirect('identify.php');
+		}
+
+        $m = $this->getFirstMatrixId();
+		if (isset($m)) {
+			$this->setCurrentMatrix($m);
+			$this->redirect('identify.php');
+		}
+        
+    }
+
+
+
+    public function indexActionORG ()
+    {
         $this->checkMatrixIdOverride();
         
         $matrix = $this->getCurrentMatrix();
@@ -150,7 +175,7 @@ class MatrixKeyController extends Controller
         $this->checkMatrixIdOverride();
         
         $matrix = $this->getCurrentMatrix();
-        
+
         if (!isset($matrix)) {
             
             $this->storeHistory = false;
@@ -605,7 +630,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     private function getMatrices ()
     {
         $m = $this->getCache('matrix-matrices');
@@ -651,6 +675,32 @@ class MatrixKeyController extends Controller
     }
 
 
+    private function getDefaultMatrixId ()
+    {
+
+		$m = $this->models->Matrix->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'got_names' => 1,
+				'default' => 1
+			), 
+			'columns' => 'id'
+		));
+		
+		return isset($m[0]['id']) ? $m[0]['id'] : null;
+
+    }
+
+
+    private function getFirstMatrixId ()
+    {
+
+		$m = $this->getMatrices();
+		$m = array_shift($m);
+		return $m['id'];
+
+    }
 
     private function getTaxaInMatrix ($matrixId = null)
     {

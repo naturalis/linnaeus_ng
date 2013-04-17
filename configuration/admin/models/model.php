@@ -807,31 +807,31 @@ abstract class Model extends BaseClass
 				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
                 if (substr($operator,-1) == '#') {
 
-                    $query .= " and " . $col . " " . substr($operator,0,-1) . " " . $val;
+                    $query .= " and `" . $col . "` " . substr($operator,0,-1) . " " . $val;
                 
                 } elseif ($val===null) {
                 
-                    $query .= " and " . $col . " " . $operator . " null ";
+                    $query .= " and `" . $col . "` " . $operator . " null ";
                 
                 } elseif ($operator == 'like') {
 
-                    $query .= " and " . $col . " " . $operator . " '" . mb_strtolower($val,'UTF-8')."'";
+                    $query .= " and `" . $col . "` " . $operator . " '" . mb_strtolower($val,'UTF-8')."'";
                 
                 } elseif ($d['numeric'] == 1) {
 
-                    $query .= " and " . $col . " " . $operator . " " . $this->escapeString(mb_strtolower($val,'UTF-8'));
+                    $query .= " and `" . $col . "` " . $operator . " " . $this->escapeString(mb_strtolower($val,'UTF-8'));
                 
                 } elseif ($d['type'] == 'datetime') {
                     
-                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8'))."'";
+                    $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8'))."'";
                 
                 } elseif ($ignoreCase && is_string($val)) {
 
-                    $query .= " and lower(" . $col . ") " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8')) . "'";
+                    $query .= " and lower(`" . $col . "`) " . $operator . " '" . $this->escapeString(mb_strtolower($val,'UTF-8')) . "'";
                 
                 } else {
                     
-                    $query .= " and " . $col . " " . $operator . " '" . $this->escapeString($val) . "'";
+                    $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
                 
                 }
             
