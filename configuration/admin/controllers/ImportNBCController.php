@@ -361,10 +361,21 @@ class ImportNBCController extends Controller
     }
 
 
+
     public function nbcDeterminatie6Action ()
     {
+	
         $this->checkAuthorisation(true);
         
+		if ($this->rHasVal('action','download')) {
+			$this->doDownload();
+			die();
+		}
+		if ($this->rHasVal('action','errorlog')) {
+			$this->downloadErrorLog();
+			die();
+		}
+	
         $this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
         $this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
         
@@ -409,8 +420,16 @@ class ImportNBCController extends Controller
 			
 		}
 
+        $this->printPage();
 
-        
+    }
+
+
+    public function nbcDeterminatie7Action ()
+    {
+	
+        $this->checkAuthorisation(true);
+
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
@@ -654,13 +673,13 @@ class ImportNBCController extends Controller
 						
 						} else {
 
-							$this->addError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]));
+							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]), 'Matrix import'));
 							
 						}
 
 					} else {
 
-			            $this->addError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]));
+			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]), 'Matrix import'));
 
 					}
 					
@@ -950,7 +969,7 @@ class ImportNBCController extends Controller
 
 			if (empty($val['naam SCI'])) {
 				
-				$this->addError('Skipping species without scientific name ('.@$val['label'].').');
+				$this->addError($this->storeError('Skipping species without scientific name ('.@$val['label'].').', 'Species import'));
 				continue;
 
 			}
@@ -1050,7 +1069,7 @@ class ImportNBCController extends Controller
 			
 		}
 	
-		$this->addError(sprintf($this->translate('Could not resolve similar id "%s"'),$id));
+		$this->addError($this->storeError(sprintf($this->translate('Could not resolve similar species "%s"'),$id), 'Species import'));
 
 		return $id;
 
@@ -1127,7 +1146,7 @@ class ImportNBCController extends Controller
 
 					if (empty($vVal['variant'])) {
 						
-						$this->addError(sprintf($this->translate('Skipping variation without variant name ("%s"; double entry?).'),$vKey));
+						$this->addError($this->storeError(sprintf($this->translate('Skipping variation without variant name ("%s"; double entry?).'),$vKey), 'Species import'));
 						continue;
 		
 					}
@@ -1403,7 +1422,7 @@ class ImportNBCController extends Controller
 
 			if (!isset($sVal['states'])) {
 
-				$this->addError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']));
+				$this->addError($this->storeError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']), 'Matrix import'));
 				continue;
 
 			}
@@ -1609,114 +1628,104 @@ class ImportNBCController extends Controller
         return $data;
     }
 
+	private function doDownload()
+	{
+	
+		define('FIELD_SEP',',');
 
-//    private function parseDataORIGINAL ($raw)
-//    {
-//        
-//        /*
-//         	lines:
-//         	
-//	        l0: title          / character_codes
-//	        l1:                / character labels
-//	        l2:                / character instructions
-//	        l3:                / character units
-//	        l4:                / character groups * (+ hidden)
-//	        l5:	(empty)
-//	        l6: (empty)
-//	        l7: column headers /
-//	        l8 ev: data     
-//        */
-//        $data = array();
-//        
-//        $line = -1;
-//        
-//        foreach ((array) $raw as $key => $val) {
-//            
-//            $lineHasData = strlen(implode('', $val)) > 0;
-//			
-//            if ($lineHasData) {
-//
-//                $line++;
-//                
-//                foreach ((array) $val as $cKey => $cVal) {
-//
-//                    $cVal = trim($cVal);
-//                    
-//                    if (!empty($cVal)) {
-//                        
-//                        // line "0", cell 0: title
-//                        if ($line == 0 && $cKey == 0)
-//                            $data['project']['title'] = $cVal;
-//                        // line "0", cell > 0: character codes
-//                        if ($line == 0 && $cKey > 0 && !empty($cVal))
-//                            $data['characters'][$cKey]['code'] = $cVal;
-//                        // line "1", cell 1: title
-//                        if ($line == 1 && $cKey == 0)
-//                            $data['project']['soortgroep'] = $cVal;
-//                        // line "1", cell > 0: character labels
-//                        if ($line == 1 && $cKey > 0 && !empty($cVal))
-//                            $data['characters'][$cKey]['label'] = $cVal;
-//                    	// line "2", cell > 0: character instructions
-//                    	if ($line==2 && $cKey>0 && !empty($cVal) && $cVal!='…')
-//                    		$data['characters'][$cKey]['instruction'] = $cVal;
-//                        /*
-//                    	// line "3", cell > 0: character unit (ignored)
-//                    	if ($line==3 && $cKey>0 && !empty($cVal))
-//                    		$data['characters'][$cKey]['unit'] = $cVal;
-//                    	*/
-//                            
-//                        // line "4", cell > 0: character group (or 'hidden')
-//                        if ($line == 4 && $cKey > 0 && !empty($cVal))
-//                            $data['characters'][$cKey]['group'] = $cVal;
-//                            
-//                            // line "5": species column headers
-//                        if ($line == 5 && !empty($cVal))
-//                            $data['columns'][$cKey] = $cVal;
-//                            
-//                            // line > "5": species
-//                        if ($line > 5) {
-//                            
-//                            if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
-//                                $data['species'][$line]['id'] = $cVal;
-//                            }
-//                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'title') {
-//                                $data['species'][$line]['label'] = $cVal;
-//                            }
-//                            else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'related') {
-//                                if (strpos($cVal, $this->_valueSep) !== false) {
-//                                    $data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
-//                                }
-//                                else {
-//                                    $data['species'][$line]['related'][] = trim($cVal);
-//                                }
-//                                array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
-//                            }
-//                            else {
-//                                
-//
-//                                if (isset($data['characters']) && $data['characters'][$cKey]['group'] == 'hidden') {
-//                                    
-//                                    $data['species'][$line][$data['characters'][$cKey]['label']] = $cVal;
-//                                }
-//                                else {
-//                                    
-//                                    if (strpos($cVal, $this->_valueSep) !== false) {
-//                                        $data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
-//                                    }
-//                                    else {
-//                                        $data['species'][$line]['states'][$cKey][] = trim($cVal);
-//                                    }
-//                                    array_walk($data['species'][$line]['states'][$cKey], create_function('&$val', '$val = trim($val);'));
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        return $data;
-//    }
+        header('Content-disposition:attachment;filename=combined-ids--'.
+			strtolower(
+				preg_replace(
+					'/\W/',
+					'', 
+					$_SESSION['admin']['system']['import']['data']['project']['title']
+				).
+				'--'.
+				str_replace('.','-',$_SERVER['SERVER_NAME'])
+			).
+			'.csv'
+		);
 
+        header('Content-type:text/csv');
+
+		$t = $v = '';
+
+		foreach((array)$_SESSION['admin']['system']['import']['species_data'] as $val) {
+		
+			$t .= $val['id'].FIELD_SEP.'"'.$val['common name'].'"'.FIELD_SEP.$val['lng_id'].chr(10);
+
+			if (!isset($val['variations'])) continue;
+	
+			foreach((array)$val['variations'] as $vVal) {
+			
+				$v .= $vVal['id'].FIELD_SEP.'"'.$vVal['label'].'"'.FIELD_SEP.$vVal['lng_id'].FIELD_SEP.$val['lng_id'].chr(10);
+			
+			}
+		
+		}
+		
+		echo 'TAXA'.chr(10);
+		echo 'id'.FIELD_SEP.'common_name'.FIELD_SEP.'lng_id'.chr(10);
+		echo $t;
+		echo chr(10).chr(10);
+		echo 'VARIATIONS'.chr(10);
+		echo 'id'.FIELD_SEP.'label'.FIELD_SEP.'lng_id'.FIELD_SEP.'taxon_id'.chr(10);
+		echo $v;
+
+	}
+
+    private function storeError ($err, $mod)
+    {
+        $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
+            $mod, 
+            $err
+        );
+        
+        return $err;
+    }
+
+    private function downloadErrorLog ()
+    {
+        header('Content-disposition:attachment;filename=import-log--'.
+			strtolower(
+				preg_replace(
+					'/\W/',
+					'', 
+					$_SESSION['admin']['system']['import']['data']['project']['title']
+				).
+				'--'.
+				str_replace('.','-',$_SERVER['SERVER_NAME'])
+			).
+			'.log'
+		);
+
+        header('Content-type:text/txt');
+        
+        echo 'project: ' . $_SESSION['admin']['system']['import']['data']['project']['title'] . chr(10);
+        echo 'created: ' . date('c') . chr(10);
+		echo 'server: '. $_SERVER['SERVER_NAME'] . chr(10);
+        echo '--------------------------------------------------------------------------------' . chr(10);
+        
+        $prevMod = null;
+        
+        foreach ((array) $_SESSION['admin']['system']['import']['errorlog']['errors'] as $val) {
+            
+            $mod = @strtolower($val[0]);
+            
+            if ($mod !== $prevMod) {
+                
+                if (!is_null($prevMod))
+                    echo chr(10);
+                
+				echo 'while loading ' . $mod . ':' . chr(10);
+            }
+            
+            echo strip_tags($val[1]) . chr(10);
+            
+            $prevMod = $mod;
+        }
+                
+        die();
+    }
 
 }
