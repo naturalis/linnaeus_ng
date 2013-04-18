@@ -2,7 +2,7 @@ var nbcData;
 var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
-
+var initData;
 
 function nbcPrettyPhotoInit() {
 
@@ -17,10 +17,7 @@ function nbcPrettyPhotoInit() {
 
 }
 
-
 function nbcGetResults(p) {
-
-	return;//not yet
 
 	setCursor('wait');
 
@@ -33,30 +30,18 @@ function nbcGetResults(p) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);
-			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
-			if (p && p.action!='similar') nbcDoOverhead();
-			nbcDoPaging();
-			if (p && p.action=='similar') nbcPrintSimilarHeader();
-			if (p && p.closeDialog==true) jDialogCancel();
-			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
-
 			setCursor();
-
+			updateChoicesMade();
+		   $('.facetgrouppage-close-btn').click();
 		}
 	});
 	
 }
 
-
-
 function nbcDoResults(p) {
 
-	//if (p && p.resetStart!==false)
-	//		nbcStart = 0;
-	//nbcClearResults();
 	if (nbcData.results) {
 
 		nbcPrintResults();
@@ -73,7 +58,7 @@ function nbcPrintResults() {
 	for(var i=0;i<nbcData.results.length;i++) {
 		var data = nbcData.results[i];
 		if (i>=nbcStart && i<nbcStart+nbcPerPage) {
-			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.i+');return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
+			s = s + '<li class="result0"><a href="#" onclick="toonDier('+data.i+',\''+data.y+'\');return false;" style=""><img alt="" src="'+data.b+'">'+data.l+'</a></li>';
 		}
 	}
 
@@ -101,7 +86,6 @@ function navigeren(dir) {
 
 }
 
-
 function nbcUpdateNavigation() {
 	
 	if (nbcStart==0)
@@ -116,14 +100,48 @@ function nbcUpdateNavigation() {
 
 }
 
+function nbcSetState(p) {
+	
+	setCursor('wait');
 
-function toonDier(id) {
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
+			state : p.state,
+			id : null,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			if (p.norefresh!==true)
+				nbcGetResults({closeDialog:true,refreshGroups:true});
+			setCursor();
+		}
+	});
+	
+}
+
+function nbcSetStateValue(state) {
+	
+	nbcSetState({state:state});
+   		
+}
+
+function nbcClearStateValue(state) {
+
+	nbcSetState({state:state,clearState:true});
+		
+}
+
+function toonDier(id,type) {
 
 	$.ajax({
 		url : '../species/taxon_overview.php',
 		type: 'POST',
 		data : ({
 			id : id,
+			type : type,
 			hotwords: false,
 			navigation: false,
 			time : getTimestamp()
@@ -140,12 +158,52 @@ function toonDier(id) {
 
 }
 
+function getInitialValues() {
 
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'get_initial_values' ,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			initData = $.parseJSON(data);
+			console.dir(initData);
+		}
+	});
+}
 
+function updateChoicesMade() {
 
+	$('#gemaakte-keuzes').html('');
 
+	var d = Array();
 
+	for (var i in nbcData.menu.storedStates) {
 
+		var state = nbcData.menu.storedStates[i];
+		var characterInfo = initData.characterNames[state.characteristic_id].label.split('|');
+
+		d.push('<li><div class="ui-block-a"><a href="#" class="chosen-facet" onclick="nbcClearStateValue(\''+(state.val)+'\');return false;">'+
+        	'<div class="grid-iconbox"><div style="color:white;font-style:italic;margin-top:-15px;padding-bottom:5px;" class="grid-labelbox">'+characterInfo[0]+'</div>'+
+            '<img alt="" style="top:25px;" class="grid-icon" src="'+initData.stateImageUrls.baseUrl+initData.stateImageUrls.fileNames[state.id].file_name+'">'+
+            '<img alt="" style="position:relative;top:-5px;left:0px;margin-left:-73px;" src="'+initData.stateImageUrls.baseUrlSystem+'button-close-shadow-overlay.png">'+
+			'</div><div style="margin-top:-5px;" class="grid-labelbox">'+state.label+'</div></a></div></li>');
+
+		if (d.length<nbcData.results.count)
+			d.push('<li class="lijn no-text">|</li>');
+
+	}
+
+	$('#gemaakte-keuzes').html(d.join(''));
+	
+	if (d.length==0)
+		$('.sub-header-wrapper').css('display','none');
+	else
+		$('.sub-header-wrapper').css('display','block');
+
+}
 
 
 
@@ -667,46 +725,6 @@ function nbcSaveSessionSetting(name,value) {
 		}
 	});
 	
-}
-
-function nbcSetState(p) {
-	
-	//nbcSetPaginate(true);
-	
-	setCursor('wait');
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
-			state : p.state,
-			value : p.value,
-			id : null,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			if (p.norefresh!==true)
-				nbcGetResults({closeDialog:true,refreshGroups:true});
-			setCursor();
-		}
-	});
-	
-}
-
-function nbcSetStateValue(state) {
-	
-	var state = state ? state : $('#state-id').html();
-
-	nbcSetState({state:state,value:nbcStatevalue});
-		
-}
-
-function nbcClearStateValue(state) {
-
-	$('#state-value').val('');
-	nbcSetState({state:state,clearState:true});
-		
 }
 
 function nbcBindDialogKeyUp() {

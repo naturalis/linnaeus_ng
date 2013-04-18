@@ -162,7 +162,7 @@ class MatrixKeyController extends Controller
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 		
 		$characters = $this->getCharacteristics();
-        
+
         if ($this->_matrixType == 'NBC') {
 
             $states = $this->stateMemoryRecall();
@@ -187,8 +187,6 @@ class MatrixKeyController extends Controller
             if (isset($d))
                 $this->smarty->assign('activeChars', $d);
 
-//q($this->getGUIMenu(array('groups'=>$groups,'characters'=>$characters,'appendExcluded'=>false,'addStatesToCharacters'=>true,'checkImages'=>true)),1);
-
 			$this->smarty->assign('storedStates', $states);
             $this->smarty->assign('groups',$groups);
             $this->smarty->assign('guiMenu',
@@ -197,7 +195,6 @@ class MatrixKeyController extends Controller
 						'groups'=>$groups,
 						'characters'=>$characters,
 						'appendExcluded'=>false,
-						'addStatesToCharacters'=>true,
 						'checkImages'=>true
 					)
 				)
@@ -309,7 +306,9 @@ class MatrixKeyController extends Controller
     {
 		
 		if (!$this->rHasVal('action')) {
+			
             $this->smarty->assign('returnText', 'error');
+
         }
         else if ($this->rHasVal('action', 'get_states')) {
             
@@ -411,13 +410,13 @@ class MatrixKeyController extends Controller
 
         }
         else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
-			
+
+            $states = $this->stateMemoryRecall();
+
  			if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar')                
                 $results = $this->nbcGetSimilar($this->requestData['params']);
             else                
-                $results = $this->nbcGetTaxaScores();
-
-            $states = $this->stateMemoryRecall();
+                $results = $this->nbcGetTaxaScores($states);
 
 			$d = array();
 
@@ -483,6 +482,43 @@ class MatrixKeyController extends Controller
 					'activeChars' => $d,
 					'storedStates' => $this->stateMemoryRecall()
 				)));
+
+		}
+        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_initial_values')) {
+
+			// state image urls
+			$cs = $this->models->CharacteristicState->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					), 
+					'columns' => 'id,file_name',
+					'fieldAsIndex' => 'id'
+				));
+
+			$cl = $this->models->CharacteristicLabel->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->getCurrentLanguageId()
+					),
+					'columns' => 'characteristic_id,label',
+					'fieldAsIndex' => 'characteristic_id'
+				));
+
+            $this->smarty->assign('returnText', 
+				json_encode(
+				array(
+					'stateImageUrls' => 
+						array(
+							'baseUrl' => $_SESSION['app']['project']['urls']['projectMedia'],
+							'baseUrlSystem' => $_SESSION['app']['project']['urls']['systemMedia'],
+							'fileNames' => $cs
+						),
+					'characterNames' => $cl
+					)
+				)
+			);
 
 		}
 		
@@ -645,10 +681,6 @@ class MatrixKeyController extends Controller
             return;
 
         $taxa = $this->getCache('matrix-taxa-' . $matrixId);
-
-		// wtf!? (2013.03.28)
-		//if ($taxa===false)
-		//	return;
 
         if (!$taxa) {
             
@@ -1141,6 +1173,7 @@ class MatrixKeyController extends Controller
             $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
 		
             if ($d) {
+				$d['prefix'] = ($d['type'] == 'media' || $d['type'] == 'text' ? 'c' : 'f');
                 $states = $this->getCharacteristicStates($val['characteristic_id']);
                 $d['sort_by']['alphabet'] = isset($d['label']) ? strtolower(preg_replace('/[^A-Za-z0-9]/', '', $d['label'])) : '';
                 $d['sort_by']['separationCoefficient'] = -1 * $this->getCharacteristicHValue($val['characteristic_id'], $states); // -1 to avoid asc/desc hassles in JS-sorting
@@ -1232,37 +1265,31 @@ class MatrixKeyController extends Controller
 
     private function getEntityStates ($id, $type)
     {
-        $d = array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'matrix_id' => $this->getCurrentMatrixId()
-        );
-        
-        if ($type == 'variation')
-            $d['variation_id'] = $id;
-        else
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(), 
+			'matrix_id' => $this->getCurrentMatrixId()
+		);
+		
+		if ($type == 'variation')
+			$d['variation_id'] = $id;
+		else
 		if ($type == 'matrix')
-            $d['ref_matrix_id'] = $id;
-        else
-            $d['taxon_id'] = $id;
-        
-        $mts = $this->models->MatrixTaxonState->_get(
-        array(
-            'id' => $d, 
-            'columns' => 'characteristic_id,state_id'
-        ));
+			$d['ref_matrix_id'] = $id;
+		else
+			$d['taxon_id'] = $id;
+
+		$mts = $this->models->MatrixTaxonState->_get(
+		array(
+			'id' => $d, 
+			'columns' => 'characteristic_id,state_id'
+		));
 		
 		$res = array();
-
+			
         foreach ((array) $mts as $key => $val) {
             
             $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
-
-			/*            
-            $mts[$key]['characteristic'] = $d['label'];
-            $mts[$key]['type'] = $d['type'];
-            $mts[$key]['state'][$val['state_id']] = $this->getCharacteristicState($val['state_id']);
-			*/
-			
 			$res[$val['characteristic_id']]['characteristic'] = $d['label'];
 			$res[$val['characteristic_id']]['type'] = $d['type'];
 			$res[$val['characteristic_id']]['states'][$val['state_id']] = $this->getCharacteristicState($val['state_id']);
@@ -1270,7 +1297,6 @@ class MatrixKeyController extends Controller
         }
 
 		return $res;        
-        //return $mts;
     }
 
     private function getTaxonStates ($id)
@@ -2258,6 +2284,15 @@ class MatrixKeyController extends Controller
 
 		// calculate scores
         $matches = $this->getTaxaScores($states, false);
+
+		$fullhits = 0;
+		foreach((array)$matches as $match)
+			if ($match['s']) $fullhits++;
+		
+		$itemsPerPage = $this->getSetting('matrix_items_per_page');
+		if ($itemsPerPage) {
+			$fetchDetails = $fullhits <= $itemsPerPage;
+		}
         
         // only keep the 100% scores, no partial matches
         $res = array();
@@ -2267,7 +2302,7 @@ class MatrixKeyController extends Controller
                 if ($match['type'] == 'variation') {
                     
                     $val = $this->getVariation($match['id']);
-                    
+
                     $nbc = $this->models->NbcExtras->_get(
                     array(
                         'id' => array(
@@ -2278,7 +2313,7 @@ class MatrixKeyController extends Controller
                         'columns' => 'name,value', 
                         'fieldAsIndex' => 'name'
                     ));
-                    
+
                     $label = $val['label'];
                     
 					$d = $this->nbcExtractGenderTag($label);
@@ -2295,13 +2330,11 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 'v', 
                         'inclRelated' => false,
-						'details' => $this->getVariationStates($val['id']) // added details for ALL results, may have to be removed again
+						'details' => ($fetchDetails ? $this->getVariationStates($val['id']) : null)
                     ));
                 }
                 else {
-                    
-                    $taxon = $this->getTaxonById($match['id']);
-                    
+
                     $c = $this->models->Commonname->_get(
                     array(
                         'id' => array(
@@ -2312,6 +2345,7 @@ class MatrixKeyController extends Controller
                     ));
                     
                     $common = $match['l'];
+
                     foreach ((array) $c as $cVal) {
                         if ($cVal['commonname'] != $match['l']) {
                             $common = $cVal['commonname'];
@@ -2341,7 +2375,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 't', 
                         'highlight' => 0,
-						'details' => $this->getTaxonStates($match['id'])
+						'details' => ($fetchDetails ? $this->getTaxonStates($val['id']) : null)
                     ));
                 }
             }
@@ -2574,7 +2608,19 @@ class MatrixKeyController extends Controller
 
         $g = isset($p['groups']) ? $p['groups'] : null;
         $c = isset($p['characters']) ? $p['characters'] : null;
-        $addStates = isset($p['addStatesToCharacters']) ? $p['addStatesToCharacters'] : false;
+
+		if ($checkImages) {
+
+			foreach((array)$c as $key => $val) {
+				if (isset($val['states'])) {
+					foreach((array)$val['states'] as $sKey => $sVal) {
+						$c[$key]['states'][$sKey]['file_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$sVal["file_name"]);
+					}
+				}
+			}
+
+		}
+
 
 		$m = $this->models->GuiMenuOrder->_get(
 		array(
@@ -2582,6 +2628,7 @@ class MatrixKeyController extends Controller
 				'project_id' => $this->getCurrentProjectId(), 
 				'matrix_id' => $this->getCurrentMatrixId(), 
 			),
+			'columns' => 'ref_id,ref_type,show_order',
 			'order' => 'show_order'
 		));
 
@@ -2597,8 +2644,11 @@ class MatrixKeyController extends Controller
 		
 		$d = array();
 		$i=0;		
+
 		foreach((array)$m as $val) {
 			if ($val['ref_type']=='group') {
+				foreach((array)$g[$val['ref_id']]['chars'] as $ckey => $char)
+					$g[$val['ref_id']]['chars'][$ckey]['states'] = $c[$char['id']]['states'];
 				$d[$i] = $g[$val['ref_id']];
 				unset($g[$val['ref_id']]);
 			} else {
@@ -2610,7 +2660,7 @@ class MatrixKeyController extends Controller
 				$d[$i]['icon_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$d[$i]['icon']);
 			$i++;
 		}
-		
+
 		if ($appendExcluded) {
 	
 			// append the items for some reason missing from the menu-order
@@ -2621,25 +2671,7 @@ class MatrixKeyController extends Controller
 				$d[] = $val;
 
 		}
-		
-		if ($addStates) {
-			
-			die('must add missing states');
-			
-		}
 
-		if ($checkImages) {
-			
-			foreach((array)$d as $key => $val) {
-				if (isset($val['states'])) {
-					foreach((array)$val['states'] as $sKey => $sVal) {
-						$d[$key]['states'][$sKey]['file_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$sVal["file_name"]);
-					}
-				}
-			}
-
-		}
-		
 		return $d;		
 		
 	}

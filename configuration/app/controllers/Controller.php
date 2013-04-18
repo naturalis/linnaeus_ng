@@ -487,9 +487,8 @@ class Controller extends BaseClass
 
     public function getTaxonById ($id)
     {
-        if (empty($id) || $id == 0) {
+        if (empty($id) || $id == 0)
             return;
-        }
         
         if (!isset($_SESSION['app']['user']['species']['taxon']['id']) || $_SESSION['app']['user']['species']['taxon']['id'] != $id) {
             
@@ -500,7 +499,7 @@ class Controller extends BaseClass
                 ), 
             	'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
             ));
-            
+
             $t[0]['label'] = $this->formatTaxon($t[0]);
             
             $_SESSION['app']['user']['species']['taxon'] = $t[0];

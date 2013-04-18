@@ -1327,11 +1327,9 @@ class Controller extends BaseClass
 
         $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
 
-        if (empty($id) || $id == 0) {
+        if (empty($id) || $id == 0)
             return;
-        }
-        
-            
+           
 		$t = $this->models->Taxon->_get(array(
 			'id' => array(
 				'project_id' => $this->getCurrentProjectId(), 
@@ -1339,6 +1337,10 @@ class Controller extends BaseClass
 			), 
 			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
 		));
+		
+
+        if (empty($t))
+            return;
 		
 		$t[0]['label'] = $this->formatTaxon($t[0]);
 		
@@ -2194,6 +2196,10 @@ class Controller extends BaseClass
 
     public function formatTaxon ($taxon)
     {
+		
+		if (empty($taxon))
+			return;
+
         $e = explode(' ', $taxon['taxon']);
         $r = $this->newGetProjectRanks();
         

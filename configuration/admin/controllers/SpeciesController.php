@@ -1086,108 +1086,116 @@ class SpeciesController extends Controller
             $this->filterInternalTags($this->requestData['id']);
             
             $taxon = $this->getTaxonById();
+
+			if (!empty($taxon['id'])) {
             
-            $_SESSION['admin']['system']['activeTaxon'] = array(
-                'taxon_id' => $taxon['id'], 
-                'taxon' => $taxon['taxon']
-            );
-            
-            if ($this->maskAsHigherTaxa()) {
-                
-                $ranks = $this->getProjectRanks(array(
-                    'includeLanguageLabels' => true, 
-                    'idsAsIndex' => true
-                ));
-                
-                $this->setPageName(sprintf($this->translate('Editing %s "%s"'), strtolower($ranks[$taxon['rank_id']]['rank']), $taxon['taxon']));
+				$_SESSION['admin']['system']['activeTaxon'] = array(
+					'taxon_id' => $taxon['id'], 
+					'taxon' => $taxon['taxon']
+				);
+				
+				if ($this->maskAsHigherTaxa()) {
+					
+					$ranks = $this->getProjectRanks(array(
+						'includeLanguageLabels' => true, 
+						'idsAsIndex' => true
+					));
+					
+					$this->setPageName(sprintf($this->translate('Editing %s "%s"'), strtolower($ranks[$taxon['rank_id']]['rank']), $taxon['taxon']));
+				}
+				else {
+					
+					$this->setPageName(sprintf($this->translate('Editing "%s"'), $taxon['taxon']));
+				}
+				
+				if (!$this->doLockOutUser($this->requestData['id'])) {
+					// if new taxon OR existing taxon not being edited by someone else, get languages and content
+					
+	
+	
+	
+					// get available languages
+					$lp = $_SESSION['admin']['project']['languages'];
+					
+					// determine the language the page will open in
+					$startLanguage = $this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultProjectLanguage();
+					
+					// get the defined categories (just the page definitions, no content yet)
+					$tp = $this->models->PageTaxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId()
+						), 
+						'order' => 'show_order'
+					));
+					
+					foreach ((array) $tp as $key => $val) {
+						
+						foreach ((array) $lp as $k => $language) {
+							
+							// for each category in each language, get the category title
+							$tpt = $this->models->PageTaxonTitle->_get(
+							array(
+								'id' => array(
+									'project_id' => $this->getCurrentProjectId(), 
+									'language_id' => $language['language_id'], 
+									'page_id' => $val['id']
+								)
+							));
+							
+							$tp[$key]['titles'][$language['language_id']] = $tpt[0];
+						}
+						
+						if ($val['def_page'] == 1)
+							$defaultPage = $val['id'];
+					}
+					
+					// determine the page_id the page will open in
+					$startPage = $this->rHasVal('page') ? $this->requestData['page'] : (isset($_SESSION['admin']['system']['lastActivePage']) ? $_SESSION['admin']['system']['lastActivePage'] : $defaultPage);
+					
+					if (isset($taxon)) {
+						
+						$this->smarty->assign('taxon', $taxon);
+						
+						$this->smarty->assign('media', addslashes(json_encode($this->getTaxonMedia($taxon['id']))));
+						
+						$this->smarty->assign('literature', addslashes(json_encode($this->getTaxonLiterature($taxon['id']))));
+					}
+					
+					$this->smarty->assign('pages', $tp);
+					
+					$this->smarty->assign('languages', $lp);
+					
+					$this->smarty->assign('includeHtmlEditor', true);
+					
+					$this->smarty->assign('activeLanguage', $startLanguage);
+					
+					$this->smarty->assign('activePage', $startPage);
+
+				} else {
+
+					// existing taxon already being edited by someone else
+	
+					$this->smarty->assign('taxon', array(
+						'id' => -1
+					));
+					
+					$this->addError($this->translate('Taxon is already being edited by another editor.'));	               
+
+				}
+
             }
             else {
-                
-                $this->setPageName(sprintf($this->translate('Editing "%s"'), $taxon['taxon']));
-            }
-            
-            if (!$this->doLockOutUser($this->requestData['id'])) {
-                // if new taxon OR existing taxon not being edited by someone else, get languages and content
-                
 
+				 $this->addError($this->translate('Illegal taxon ID'));
+				$this->smarty->assign('taxon', array(
+					'id' => -1
+				));
 
-
-                // get available languages
-                $lp = $_SESSION['admin']['project']['languages'];
-                
-                // determine the language the page will open in
-                $startLanguage = $this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultProjectLanguage();
-                
-                // get the defined categories (just the page definitions, no content yet)
-                $tp = $this->models->PageTaxon->_get(
-                array(
-                    'id' => array(
-                        'project_id' => $this->getCurrentProjectId()
-                    ), 
-                    'order' => 'show_order'
-                ));
-                
-                foreach ((array) $tp as $key => $val) {
-                    
-                    foreach ((array) $lp as $k => $language) {
-                        
-                        // for each category in each language, get the category title
-                        $tpt = $this->models->PageTaxonTitle->_get(
-                        array(
-                            'id' => array(
-                                'project_id' => $this->getCurrentProjectId(), 
-                                'language_id' => $language['language_id'], 
-                                'page_id' => $val['id']
-                            )
-                        ));
-                        
-                        $tp[$key]['titles'][$language['language_id']] = $tpt[0];
-                    }
-                    
-                    if ($val['def_page'] == 1)
-                        $defaultPage = $val['id'];
-                }
-                
-                // determine the page_id the page will open in
-                $startPage = $this->rHasVal('page') ? $this->requestData['page'] : (isset($_SESSION['admin']['system']['lastActivePage']) ? $_SESSION['admin']['system']['lastActivePage'] : $defaultPage);
-                
-                if (isset($taxon)) {
-                    
-                    $this->smarty->assign('taxon', $taxon);
-                    
-                    $this->smarty->assign('media', addslashes(json_encode($this->getTaxonMedia($taxon['id']))));
-                    
-                    $this->smarty->assign('literature', addslashes(json_encode($this->getTaxonLiterature($taxon['id']))));
-                }
-                
-                $this->smarty->assign('pages', $tp);
-                
-                $this->smarty->assign('languages', $lp);
-                
-                $this->smarty->assign('includeHtmlEditor', true);
-                
-                $this->smarty->assign('activeLanguage', $startLanguage);
-                
-                $this->smarty->assign('activePage', $startPage);
-            }
-            else {
-                // existing taxon already being edited by someone else
-                
-
-
-
-                $this->smarty->assign('taxon', array(
-                    'id' => -1
-                ));
-                
-                $this->addError($this->translate('Taxon is already being edited by another editor.'));
             }
         }
         else {
             // no id
-            
-
-
 
             $this->smarty->assign('taxon', array(
                 'id' => -1
@@ -1200,7 +1208,8 @@ class SpeciesController extends Controller
             'higherOnly' => $this->maskAsHigherTaxa()
         )));
         
-        $this->smarty->assign('navCurrentId', $taxon['id']);
+        if (isset($taxon))
+			$this->smarty->assign('navCurrentId', $taxon['id']);
         
         $this->smarty->assign('soundPlayerPath', $this->generalSettings['soundPlayerPath']);
         
