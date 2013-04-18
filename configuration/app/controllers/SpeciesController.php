@@ -108,7 +108,7 @@ class SpeciesController extends Controller
 
             // get taxon
             $taxon = $this->getTaxonById($this->requestData['id']);
-            
+			
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
             
             $this->setControllerBaseName();
@@ -218,10 +218,25 @@ class SpeciesController extends Controller
     {
 
         if ($this->rHasId()) {
+			
+			if ($this->rHasVal('type','v')) {
+			
+				$tv = $this->models->TaxonVariation->_get(array(
+					'id' => array('project_id'=>$this->getCurrentProjectId(),'id'=> $this->requestData['id']),
+					'columns' => 'taxon_id,label'
+				));
+				
+				$taxonVariation = $tv[0];
+				
+				$tId = $taxonVariation['taxon_id'];
+			
+			} else {
+				$tId = $this->requestData['id'];
+			}
 
             // get taxon
-            $taxon = $this->getTaxonById($this->requestData['id']);
-            
+            $taxon = $this->getTaxonById($tId);
+
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
             
             $this->setControllerBaseName();
@@ -277,11 +292,25 @@ class SpeciesController extends Controller
            
             $this->smarty->assign('categoryList', $categories['categoryList']);
 
-            $this->smarty->assign('headerTitles', 
-				array(
-					'title' => $content['names']['common'][0]['commonname'],
-					'subtitle' => $taxon['label']
-				));
+			if ($this->rHasVal('type','v')) {
+				
+				$this->smarty->assign('headerTitles', 
+					array(
+						'title' => $taxonVariation['label'],
+						'subtitle' => $taxon['label']
+					));
+
+			} else { 
+
+				$this->smarty->assign('headerTitles', 
+					array(
+						'title' => $content['names']['common'][0]['commonname'],
+						'subtitle' => $taxon['label']
+					));
+					
+			}
+
+
             
         }
         else {

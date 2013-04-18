@@ -3,10 +3,10 @@
     <head>
         <title>Dierenzoeker</title>
 
-	<link rel="image_src" href="/app/webroot/img/dierenzoeker-logo.png" />
+	<link rel="image_src" href="{$session.app.project.urls.systemMedia}dierenzoeker-logo.png" />
 
 	<meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker."/>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="/app/webroot/img/dierenzoeker-logo.png" />
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="{$session.app.project.urls.systemMedia}dierenzoeker-logo.png" />
 	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}basics.css" />
 	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
     <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}prettyPhoto/prettyPhoto.css" />

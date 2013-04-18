@@ -663,10 +663,10 @@ a img {
 	display: 	block;
 	width: 		96px;
 	height:		19px;
-	background: url(./../media/system/skins/nbc_dierenzoeker/alles-wissen.png);
+	background: url(../../media/system/skins/nbc_dierenzoeker/alles-wissen.png);
 }
 .alles-wissen:hover {
-	background: url(./../media/system/skins/nbc_dierenzoeker/alles-wissen-over.png);
+	background: url(../../media/system/skins/nbc_dierenzoeker/alles-wissen-over.png);
 }
 
 .extra-inner h1 {
