@@ -3003,8 +3003,11 @@ class SpeciesController extends Controller
             }
         }
         
-        $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList());
-        $this->smarty->assign('navCurrentId', $taxon['id']);
+        $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
+            'higherOnly' => $this->maskAsHigherTaxa()
+        )));
+        
+        $this->smarty->assign('navCurrentId', $this->requestData['id']);
         
         $this->smarty->assign('id', $this->requestData['id']);
         

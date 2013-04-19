@@ -3,32 +3,6 @@
 
     <div id="page-main">
 
-{if $session.admin.system.server_addr=='127.0.0.1'}
-
-	Choose your module:
-
-	<ul>
-    {foreach from=$modules item=v}
-    {if $v._rights && $v.show_in_menu==1}
-		<li>
-        	<a href="views/{$v.controller}/">{$v.module}</a>{if $v.active=='y'} *{/if}
-		</li>
-    {/if}
-    {/foreach}
-
-
-    {foreach from=$currentUserRights item=v}
-    {if $v._rights && $v.show_in_menu==1}
-		<li>
-        	<span class="a" onclick="$('#freeId').val('{$v.id}');$('#freeForm').submit();">{$v.module}</span>{if $v.active=='y'} *{/if}
-		</li>
-    {/if}
-    {/foreach}
-    </ul>
-
-
-{else}
-
     <table>
         <tr>
     {assign var=i value=1}
@@ -73,7 +47,6 @@
         </tr>
     </table>
     
-{/if}
 
 <form method="post" id="freeForm" action="views/module/">
 <input type="hidden" id="freeId" name="freeId" value="" />

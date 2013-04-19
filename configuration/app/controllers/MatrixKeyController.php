@@ -29,7 +29,6 @@ class MatrixKeyController extends Controller
         'characteristic_chargroup', 
         'matrix_variation', 
         'nbc_extras', 
-        'taxa_relations', 
         'variation_relations',
 		'gui_menu_order'
     );
@@ -1634,31 +1633,6 @@ class MatrixKeyController extends Controller
         return $d;
     }
 
-    public function getVariation ($id)
-    {
-        $tv = $this->models->TaxonVariation->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'id' => $id
-            ), 
-            'columns' => 'id,taxon_id,label'
-        ));
-        
-        $tv[0]['labels'] = $this->models->VariationLabel->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'variation_id' => $id
-            ), 
-            'columns' => 'id,language_id,label,label_type'
-        ));
-        
-        $tv[0]['taxon'] = $this->getTaxonById($tv[0]['taxon_id']);
-        
-        return $tv[0];
-    }
-
     private function getRelatedEntities ($p)
     {
         $tId = isset($p['tId']) ? $p['tId'] : null;
@@ -2549,22 +2523,6 @@ class MatrixKeyController extends Controller
 		
     }
  
-	private function getCommonname($tId)
-	{
-
-		$c = $this->models->Commonname->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'taxon_id' => $tId, 
-				'language_id' => $this->getCurrentLanguageId()
-			)
-		));
-		
-		return $c[0]['commonname'];
-		
-	}
-
 	private function getRelevantCoefficients($states=null)
 	{
 

@@ -16,7 +16,11 @@ class SpeciesController extends Controller
         'commonname', 
         'label_language', 
         'literature', 
-        'literature_taxon'
+        'literature_taxon',
+		'nbc_extras',
+		'content_free_module',
+        'taxa_relations', 
+        'variation_relations',
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -229,9 +233,51 @@ class SpeciesController extends Controller
 				$taxonVariation = $tv[0];
 				
 				$tId = $taxonVariation['taxon_id'];
-			
+
+				$related = $this->getRelatedEntities(array(
+					'vId' => $tId
+				));
+
+				$freePageId = $this->getNbcExtras(array('id'=>$this->requestData['id'],'name' => 'free_page_id','type'=>'variation'));
+							
 			} else {
+
 				$tId = $this->requestData['id'];
+
+				$related = $this->getRelatedEntities(array(
+					'tId' => $tId 
+				));
+				
+
+				$freePageId = $this->getNbcExtras(array('id'=>$this->requestData['id'],'name' => 'free_page_id'));
+
+			}
+
+			foreach((array)$related as $key => $val) {
+
+				if($val['ref_type']=='variation'){
+					$d = $this->getVariation($val['relation_id']);
+					$related[$key]['label'] = $d['label'];
+					$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image','type'=>'variation'));
+				} else {
+					$d = $this->getCommonname($val['relation_id']);
+					$related[$key]['label'] = $d;
+					$related[$key]['url_image'] = $this->getNbcExtras(array('id'=>$val['relation_id'],'name' => 'url_image'));
+				}
+					
+			}
+			
+			if (!empty($freePageId)) {
+
+				$cfm = $this->models->ContentFreeModule->_get(array(
+					'id' => array(
+						'page_id' => $freePageId, 
+						'project_id' => $this->getCurrentProjectId()
+					)
+				));
+				
+				$freePageContent = $cfm[0];
+				
 			}
 
             // get taxon
@@ -292,6 +338,14 @@ class SpeciesController extends Controller
            
             $this->smarty->assign('categoryList', $categories['categoryList']);
 
+			if (isset($freePageContent))
+				$this->smarty->assign('freePageContent', $freePageContent);
+
+			if (isset($related))
+				$this->smarty->assign('related', $related);
+
+			$this->smarty->assign('type', ($this->rHasVal('type') ? $this->requestData['type'] : 't' ));
+
 			if ($this->rHasVal('type','v')) {
 				
 				$this->smarty->assign('headerTitles', 
@@ -307,10 +361,8 @@ class SpeciesController extends Controller
 						'title' => $content['names']['common'][0]['commonname'],
 						'subtitle' => $taxon['label']
 					));
-					
+
 			}
-
-
             
         }
         else {
@@ -1139,9 +1191,6 @@ class SpeciesController extends Controller
     }
 
 
-
-
-
 	public function findByNameAction()
 	{
 	
@@ -1170,7 +1219,73 @@ class SpeciesController extends Controller
 	}
 	
 
+    private function getRelatedEntities ($p)
+    {
+        $tId = isset($p['tId']) ? $p['tId'] : null;
+        $vId = isset($p['vId']) ? $p['vId'] : null;
+        $includeSelf = isset($p['includeSelf']) ? $p['includeSelf'] : false;
+        
+        $rel = null;
+        
+        if ($tId) {
+            
+            $rel = $this->models->TaxaRelations->_get(array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'taxon_id' => $tId
+                )
+            ));
+            
+            if ($includeSelf && isset($tId))
+                array_unshift($rel, array(
+                    'id' => $tId, 
+                    'relation_id' => $tId, 
+                    'ref_type' => 'taxon'
+                ));
+            
+            foreach ((array) $rel as $key => $val) {
+                
+                if ($val['ref_type'] == 'taxon') {
+                    $rel[$key]['label'] = $this->formatTaxon($this->getTaxonById($val['relation_id']));
+                }
+                else {
+                    $d = $this->getVariation($val['relation_id']);
+                    $rel[$key]['label'] = $d['label'];
+                    $rel[$key]['taxon_id'] = $d['taxon_id'];
+                }
+            }
+        }
+        else if ($vId) {
+            
+            $rel = $this->models->VariationRelations->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'variation_id' => $vId
+                )
+            ));
+            
+            if ($includeSelf && isset($vId))
+                array_unshift($rel, array(
+                    'id' => $vId, 
+                    'relation_id' => $vId, 
+                    'ref_type' => 'variation'
+                ));
+            
 
+            foreach ((array) $rel as $key => $val) {
+                
+                if ($val['ref_type'] == 'taxon') {
+                    $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id']));
+                }
+                else {
+                    $d = $this->getVariation($val['relation_id']);
+                    $rel[$key]['label'] = $d['label'];
+                }
+            }
+        }
+        
+        return $rel;
+    }
 
 }
-

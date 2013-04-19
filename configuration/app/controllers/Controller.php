@@ -142,7 +142,8 @@ class Controller extends BaseClass
         'glossary_synonym', 
         'hotword', 
         'variation_label', 
-        'taxon_variation'
+        'taxon_variation',
+        'taxa_relations',
     );
     private $usedHelpersBase = array(
         'logging_helper', 
@@ -1029,6 +1030,47 @@ class Controller extends BaseClass
     public function rHasId ()
     {
         return $this->rHasVal('id');
+    }
+
+	public function getCommonname($tId)
+	{
+
+		$c = $this->models->Commonname->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon_id' => $tId, 
+				'language_id' => $this->getCurrentLanguageId()
+			)
+		));
+		
+		return $c[0]['commonname'];
+		
+	}
+
+    public function getVariation ($id)
+    {
+        $tv = $this->models->TaxonVariation->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'id' => $id
+            ), 
+            'columns' => 'id,taxon_id,label'
+        ));
+        
+        $tv[0]['labels'] = $this->models->VariationLabel->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'variation_id' => $id
+            ), 
+            'columns' => 'id,language_id,label,label_type'
+        ));
+        
+        $tv[0]['taxon'] = $this->getTaxonById($tv[0]['taxon_id']);
+        
+        return $tv[0];
     }
 
 
@@ -3101,5 +3143,41 @@ class Controller extends BaseClass
 		}
 		
 	}
+
+	public function getNbcExtras($p=null)
+	{
+		
+        $id = isset($p['id']) ? $p['id'] : null;
+        $type = isset($p['type']) ? $p['type'] : 'taxon';
+        $name = isset($p['name']) ? $p['name'] : null;
+		
+		if (is_null($id) || is_null($type))
+			return;
+
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'ref_id' => $id, 
+				'ref_type' => $type
+			);
+			
+		if (isset($name))
+			$d['name'] = $name;
+
+		$extras = $this->models->NbcExtras->_get(
+			array(
+				'id' => $d, 
+				'columns' => 'name,value',
+			));
+
+		if (isset($name))
+			return $extras[0]['value'];
+			
+		foreach((array)$extras as $val)
+			$extras[$val['name']] = $val['value'];
+			
+		return $extras;
+		
+	}
+
 
 }

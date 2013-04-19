@@ -106,6 +106,7 @@ class ModuleController extends Controller
      */
     public function topicAction ()
     {
+		
         if ($this->rHasVal('modId')) {
             
             $this->setCurrentModule($this->getFreeModule($this->requestData['modId']));
@@ -130,19 +131,20 @@ class ModuleController extends Controller
             $id = null;
         }
         
-
         if ($id) {
             $mId = $this->checkPageInModule($id);
+			
             if ($mId!==true) {
-                $this->setCurrentModule($mId);
+				
+				$this->setCurrentModule($this->getFreeModule($mId));
             	$module = $this->getCurrentModule();
             }
         }
-        
+
         if (!is_null($id)) {
             
             $page = $this->getPage($id);
-            
+
             $this->smarty->assign('page', $page);
             
             $this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
@@ -163,7 +165,10 @@ class ModuleController extends Controller
         
         $this->smarty->assign('module', $module);
         
-        $this->printPage();
+		if ($this->rHasVal('style','inner'))
+	        $this->printPage('_topic');
+		else
+	        $this->printPage();
     }
 
 
@@ -305,7 +310,7 @@ class ModuleController extends Controller
                 'project_id' => $this->getCurrentProjectId()
             )
         ));
-        
+
         if (!$fmp) {
             
             return;
