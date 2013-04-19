@@ -425,6 +425,11 @@ class MatrixKeyController extends Controller
 
 			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
 
+			$countPerState = $this->getRemainingStateCount(array(
+				'states' => $states
+			));
+
+
 			$result = 
 				json_encode(
 					array(
@@ -437,7 +442,8 @@ class MatrixKeyController extends Controller
 							'groups' => $this->getCharacterGroups(),
 							'activeChars' => $d,
 							'storedStates' => $this->stateMemoryRecall()
-						)
+						),
+						'countPerState' => $countPerState
 					)
 				);
 			

@@ -13,16 +13,17 @@
                         <li><a href="" class="no-text" id="tv-btn">Dierenzoeker op TV</a></li>
                         <li><a href="" class="no-text" id="onderwijs-btn">Onderwijs</a></li>                                                
                     </ul>
-                    <a href='http://www.naturalis.nl' class="no-text" target="_blank"       style='border:0px solid black;display:block;position:absolute;left:890px;top:2px;width:70px;height:90px;'>Naturalis</a>
-                    <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank"    style='border:0px solid black;display:block;position:absolute;left:818px;top:2px;width:67px;height:62px;'>Klokhuis</a>
+                    <a href='http://www.naturalis.nl' class="no-text" target="_blank" style='border:0px solid black;display:block;position:absolute;left:890px;top:2px;width:70px;height:90px;'>Naturalis</a>
+                    <a href='http://www.hetklokhuis.nl' class="no-text"  target="_blank" style='border:0px solid black;display:block;position:absolute;left:818px;top:2px;width:67px;height:62px;'>Klokhuis</a>
                     <div class="clearer"></div>
                     
                     <ul class="wat-weet-je-list">      
                         <li class="wat-weet-je-arrow no-text">Wat weet je van het dier?</li>
                         {foreach from=$guiMenu item=v key=k}
+                        {capture name=chars}{if $v.chars}{foreach from=$v.chars item=vC}{$vC.id} {/foreach}{else}{$v.id} {/if}{/capture}
                         <li class='facetgroup-btn'>
                             <div class="facet-btn ui-block-d">
-                                <a data-facetgrouppageid="facetgrouppage{$k}" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="">
+                                <a data-facetgrouppageid="facetgrouppage{$k}" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}">
                                     <div class="grid-iconbox" >
                                         <img src="{$session.app.project.urls.projectMedia}{$v.icon}" class="grid-icon" alt="" />
                                     </div>
@@ -34,14 +35,13 @@
                         </li>
                         {/foreach}
                     </ul>                
-                </div><!-- /header-inder -->            
-            </div><!-- /header -->        
-
+                </div>
+            </div>
 
 			<div class="sub-header-wrapper" style="display:none" >
                 <div class="sub-header">
                     <div class="sub-header-inner">
-                        <a href="#" class="no-text alles-wissen" onclick="nbcClearStateValue();return false;">Alles wissen</a>
+                        <a href="#" class="no-text alles-wissen" onClick="nbcClearStateValue();return false;">Alles wissen</a>
                         <div class="dit-weet-je-arrow no-text">
                                 Dit weet je van het dier:
                         </div>
@@ -138,7 +138,7 @@
                             {if $sV.file_name && $sV.file_exists}                            
                        
                             <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
-                                <a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;">
+                                <a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
                                 <div class="grid-iconbox">
                                     <img alt="" class="grid-icon" src="{$session.app.project.urls.projectMedia}{$sV.file_name}">
                                 </div>
@@ -172,7 +172,7 @@
                             {if $sV.file_name && $sV.file_exists}                            
                        
                             <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
-                                <a href="#" onClick="nbcSetStateValue('c:{$v.id}:{$sV.id}');return false;">
+                                <a href="#" onClick="nbcSetStateValue('c:{$v.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
                                 <div class="grid-iconbox">
                                     <img alt="" class="grid-icon" src="{$session.app.project.urls.projectMedia}{$sV.file_name}">
                                 </div>
@@ -202,36 +202,29 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-{/literal}
-
-{if $taxaJSON}
-	nbcData = $.parseJSON('{$taxaJSON}');
-	nbcDoResults({literal}{resetStart:true}{/literal});
-{else}
-	nbcGetResults();
-{/if}
-	getInitialValues();
-
-{literal}
 
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
-
-   $('.facetgrouppage-close-btn').click(function(e){
-	   e.preventDefault();
-	   // Hide all facet group pages:
-	   $(".facetgrouppage").css("display", "none");
-	   return false;           
-   });
-              
-   $('[data-facetgrouppageid^="facetgrouppage"]').click(function(e){
-	   e.preventDefault();
-	   // Show facet group page:
-	   $(".facetgrouppage").css("display", "none");
-	   $("#"+$(this).attr('data-facetgrouppageid')).css("display", "block");
-	   return false;           
-   });
+	getInitialValues();
+	nbcGetResults();
+	
+	$('.facetgrouppage-close-btn').click(function(e){
+		e.preventDefault();
+		// Hide all facet group pages:
+		$(".facetgrouppage").css("display", "none");
+		return false;           
+	});
+	  
+	$('[data-facetgrouppageid^="facetgrouppage"]').click(function(e){
+		e.preventDefault();
+		updateStates($(this).attr('characters'));
+		// Close all facet group pages (cleanup):
+		$(".facetgrouppage").css("display", "none");
+		// Show facet group page:
+		$("#"+$(this).attr('data-facetgrouppageid')).css("display", "block");
+		return false;           
+	});
 
 });
 </script>

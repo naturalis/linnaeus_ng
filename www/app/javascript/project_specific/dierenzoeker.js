@@ -4,6 +4,7 @@ var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
 var initData;
 
+
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
@@ -44,8 +45,9 @@ function nbcDoResults(p) {
 
 	if (nbcData.results) {
 
+		verbergDier();
+		nbcResetNavigation();
 		nbcPrintResults();
-		nbcUpdateNavigation();
 
 	}
 
@@ -86,6 +88,13 @@ function navigeren(dir) {
 
 }
 
+function nbcResetNavigation() {
+
+	nbcStart=0;
+	nbcUpdateNavigation();
+
+}
+
 function nbcUpdateNavigation() {
 	
 	if (nbcStart==0)
@@ -97,7 +106,6 @@ function nbcUpdateNavigation() {
 		$('#next-button-container-top,#next-button-container-bottom').css('visibility','hidden');
 	else
 		$('#next-button-container-top,#next-button-container-bottom').css('visibility','visible');
-
 }
 
 function nbcSetState(p) {
@@ -134,42 +142,18 @@ function nbcClearStateValue(state) {
 		
 }
 
-function toonDier(id,type) {
-
-	$.ajax({
-		url : '../species/taxon_overview.php',
-		type: 'POST',
-		data : ({
-			id : id,
-			type : type,
-			hotwords: false,
-			navigation: false,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			if (data) {
-				$('#dier-content').html(data);
-				$('#dier-content-wrapper').css('visibility','visible');
-				if(jQuery().prettyPhoto)
-					nbcPrettyPhotoInit();
-			}
-		}
-	});
-
-}
-
 function getInitialValues() {
 
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
+		async : false,
 		data : ({
 			action : 'get_initial_values' ,
 			time : getTimestamp()
 		}),
 		success : function (data) {
 			initData = $.parseJSON(data);
-			console.dir(initData);
 		}
 	});
 }
@@ -205,619 +189,45 @@ function updateChoicesMade() {
 
 }
 
+function updateStates(id) {
 
+	$('a[id^="state-"]').addClass('ui-disabled');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var nbcBrowseStyle='paginate';
-var nbcExpandedShowing = 0;
-var nbcExpandedPrevious = null;
-
-
-var nbcFullDatasetCount = 0;
-var nbcCurrPage = 0;
-var nbcLastPage = 0;
-var nbcImageRoot;
-var nbcPaginate = true;
-var nbcExpandResults = false;
-var nbcStatevalue = '';
-var nbcDetailShowStates = Array();
-var nbcSearchTerm = '';
-var nbcLabelShowAll = '';
-var nbcLabelHideAll = '';
-var nbcLabelClose = '';
-var nbcLabelDetails = '';
-var nbcLabelBack = '';
-var nbcLabelSimilarSpecies = '';
-var nbcPreviousBrowseStyles = {};
-
-function nbcClearResults() {
-
-	$('#results-container').html('');
+	var keys = Object.keys(nbcData.countPerState);
+	for (var i in keys) {
+		
+		$('#state-'+keys[i]).removeClass('ui-disabled');
+	}
 
 }
 
-function nbcPrintResultsExpanded() {
+function toonDier(id,type) {
 
-	var results = nbcData.results;
-	var s = '';
-	var added = d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++) {
-		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
-			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
-			) {
-			s = s + nbcFormatResult(results[i]);
-			added++;
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
+	$.ajax({
+		url : '../species/taxon_overview.php',
+		type: 'POST',
+		data : ({
+			id : id,
+			type : type,
+			hotwords: false,
+			navigation: false,
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			if (data) {
+				$('#dier-content').html(data);
+				$('#dier-content-wrapper').css('visibility','visible');
+				if(jQuery().prettyPhoto)
+					nbcPrettyPhotoInit();
 			}
 		}
-	}
-	
-	s = s + '</div>';
-
-	if (nbcExpandedShowing>0) {
-		var n = 'p'+rndStr();
-		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
-	}
-
-	$('#results-container').html($('#results-container').html()+s);
-
-	if (nbcExpandedShowing>0)
-		$('#'+n).show('normal');
-
-	nbcExpandedShowing = nbcExpandedShowing + added;
-
-	if (nbcExpandedShowing==added)
-		nbcRemoveShowMoreButton();
-
-	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
-		$("#footerPagination").removeClass('noline').addClass('noline');
-	}
-
-	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
-		nbcRemoveShowMoreButton();
-
-	nbcExpandedPrevious = null;
-	
-	nbcDoOverhead();
-
-}
-
-function nbcSwitchImagename(ele,state) {
-	var p = '_grijs';
-	$(ele).attr('src',state==1 ? $(ele).attr('src').replace(p,'') :$(ele).attr('src').replace('.png',p+'.png'));	
-}
-
-function nbcRemoveShowMoreButton() {
-	$("#show-more").remove();
-	$("#footerPagination").removeClass('noline');	
-}
-
-
-
-function nbcDoOverhead() {
-	nbcClearOverhead();
-	if (nbcData.count) nbcPrintOverhead();
-}
-
-function nbcClearOverhead() {
-	$('#result-count').html('');
-	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
-	$('#similarSpeciesHeader').html('');
-}
-
-function nbcPrintOverhead() {
-
-	if (nbcBrowseStyle=='expand') {
-
-		$('#result-count').html((nbcExpandedShowing > 1 ? '1 - '+nbcExpandedShowing : nbcExpandedShowing)+_(' van ')+nbcData.count.results);
-		return;
-
-	}
-
-	var count = nbcData.count;
-	
-	nbcFullDatasetCount = (nbcFullDatasetCount==0) ? count.all : nbcFullDatasetCount;
-	
-	$('#result-count').html(
-		sprintf(
-			'<strong style="color:#333">%s</strong> %s',
-			count.results,
-			sprintf(
-				_('van %s'),
-					sprintf(
-						'<strong style="color:#777;">%s</strong>',
-						nbcFullDatasetCount
-					)
-				)
-			)
-		);
-}
-
-
-
-function nbcDoPaging() {
-	nbcClearPaging();
-	if (nbcData.count) nbcPrintPaging();
-}
-
-function nbcClearPaging() {
-
-	if (!nbcPaginate) return;
-
-	$('#paging-header').html('');	
-	$('#paging-footer').html('');	
-}
-
-function nbcPrintPaging() {
-
-	if (!nbcPaginate) return;
-
-	var count = nbcData.count;
-
-	nbcLastPage = Math.ceil(count.results / nbcPerPage);
-	nbcCurrPage = Math.floor(nbcStart / nbcPerPage);
-
-	if (nbcLastPage > 1 && nbcCurrPage!=0)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\');return false;">&lt;&lt;</a></li>');
-	
-	if (nbcLastPage>1) { 
-	
-		for (var i=0;i<nbcLastPage;i++) {
-	
-			if (i==nbcCurrPage)
-				$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
-		    else
-				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+');return false;">'+(i+1)+'</a></li>');
-	
-		}
-		
-	}
-
-	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;" class="last">&gt;&gt;</a></li>');
-
-	$("#paging-footer").html($("#paging-header").html());
-}
-
-
-
-function nbcShowSimilar(id,type) {
-	
-	nbcPreviousBrowseStyles.paginate = nbcPaginate;
-	nbcPreviousBrowseStyles.expand = nbcExpandResults;
-	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
-	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
-	nbcPreviousBrowseStyles.lastPos = getPageScroll();
-
-	nbcSetPaginate(false);
-	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
-	nbcSaveSessionSetting('nbcSimilar',[id,type]);
-	
-}
-
-function nbcPrintSimilarHeader() {
-
-	var label = nbcData.results[0].l;
-
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
-		'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		' | '+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
-}
-
-function nbcCloseSimilar() {
-
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
-	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
-	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
-	nbcGetResults();
-	nbcClearOverhead();
-	nbcSaveSessionSetting('nbcSimilar');
-
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
-	
-}
-
-
-function nbcDoSearch() {
-
-	var str = $('#inlineformsearchInput').val();
-	str = str.replace(/^\s+|\s+$/g, ''); 
-
-	if (str.length==0) return false;
-
-	nbcSearchTerm=str;
-	nbcSetPaginate(true);
-	nbcSetState({norefresh:true,clearState:true});
-	
-	setCursor('wait');
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'do_search',
-			params : {term: nbcSearchTerm},
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			nbcData = $.parseJSON(data);
-			nbcDoResults();
-			nbcDoOverhead();
-			nbcDoPaging();
-			nbcPrintSearchHeader();
-			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
-
-			setCursor();
-			
-			return false;
-
-		}
-	});
-
-	return false; // necessary to suppress submit of form
-
-}
-
-function nbcClearSearchTerm() {
-	
-	nbcSearchTerm='';
-	$('#inlineformsearchInput').val('');
-
-}
-
-function nbcCloseSearch() {
-
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
-	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
-	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
-	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
-	$('#inlineformsearchInput').val('');
-
-	nbcGetResults();
-	nbcClearOverhead();
-	nbcSaveSessionSetting('nbcSearch');
-
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
-
-}
-
-function nbcPrintSearchHeader() {
-
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
-}
-
-
-
-function nbcBrowse(id) {
-
-	if (id=='n')
-	    nbcStart = nbcStart+nbcPerPage;
-	else 
-	if (id=='p')
-    	nbcStart = nbcStart-nbcPerPage;
-	else
-		nbcStart = id * nbcPerPage;
-			
-	nbcSaveSessionSetting('nbcStart',nbcStart);
-	nbcClearResults();
-	nbcPrintResults();
-	nbcClearPaging();
-	nbcPrintPaging();
-
-}
-
-
-
-function nbcToggleSpeciesDetail(id,state) {
-
-	if (state)
-		nbcDetailShowStates[id] = (state=='show');
-	else
-		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
-	
-	if (nbcDetailShowStates[id]) {
-		$('#det-'+id).css('display','block');
-		$('#tog-'+id).attr('title',nbcLabelClose);
-	} else {
-		$('#det-'+id).css('display','none');
-		$('#tog-'+id).attr('title',nbcLabelDetails);
-	}
-	
-}
-
-function nbcToggleAllSpeciesDetail() {
-	
-	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
-	
-	$('[id^="tog-"]').each(function(){
-		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
-	});
-
-	if (currHiding)
-		$('#showAllLabel').html(nbcLabelHideAll);
-	else
-		$('#showAllLabel').html(nbcLabelShowAll);
-
-}
-
-function nbcToggleGroup(id) {
-
-	if ($('#character-group-'+id).css('display')=='none') {
-		$('#character-group-'+id).removeClass('hidden').addClass('visible');
-		$('#character-item-'+id).removeClass('closed').addClass('open');
-	} else {
-		$('#character-group-'+id).removeClass('visible').addClass('hidden');
-		$('#character-item-'+id).removeClass('open').addClass('closed');
-	}
-	
-} 
-
-function nbcShowStates(id) {
-
-	setCursor('wait');
-	
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'get_formatted_states' ,
-			id : id , 
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			data = $.parseJSON(data);
-			showDialog(
-				data.character.label,
-				data.page,
-				{width:data.width,height:data.height,showOk:data.showOk}
-			);
-			setCursor();
-		}
 	});
 
 }
 
-function nbcRefreshGroupMenu() {
+function verbergDier() {
 
-	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
-	
-}
-
-function nbcBuildGroupMenu(data) {
-
-	$('#facet-categories-menu').html('');
-	
-	var d = Array();
-
-	for (var i in data.groups) {
-
-		var v = data.groups[i];
-		var openGroup = false;
-
-		var s = 
-			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
-			'<ul id="character-group-'+v.id+'" class="hidden">';			
-
-		for (var j in v.chars) {
-
-			var c = data.groups[i].chars[j];
-
-			s = s + '<li class="inner'+(j==(v.chars.length-1) ? ' last' : '')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
-			
-			if (data.activeChars[c.id]) {
-				openGroup = true;
-				s = s + '<span>';
-				for (k in data.storedStates) {
-					var state = data.storedStates[k];
-					if (state.characteristic_id==c.id) {
-						var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-						s = s + 
-							'<div class="facetValueHolder">'+
-								(state.value ? state.value+' ' : '')+
-								(state.label ? state.label+' ' : '')+
-								(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-								'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
-								'<img src="'+nbcImageRoot+'clearSelection.gif">'+
-								'</a>'+
-							'</div>';
-
-					}
-				}
-				
-				s = s + '</span>';
-
-			}
-
-			s = s  +'</li>';
-
-		}
-
-		s = s  +'</ul>';
-		
-		if (openGroup)
-			s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
-				
-		d.push(s);
-	}
-	
-	$('#facet-categories-menu').html('<ul>'+d.join('\n')+'</ul>');
+	$('#dier-content').html('');
+	$('#dier-content-wrapper').css('visibility','hidden');
 
 }
-
-
-
-function nbcSaveSessionSetting(name,value) {
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'save_session_setting' ,
-			setting : { name : name, value: value },
-			id : null,
-			time : getTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-		}
-	});
-	
-}
-
-function nbcBindDialogKeyUp() {
-
-    $("#state-value").keydown(function(event) {
-        // Allow: backspace, delete, tab, escape, and enter
-        if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 || 
-             // Allow: Ctrl+A
-            (event.keyCode == 65 && event.ctrlKey === true) || 
-             // Allow: home, end, left, right
-            (event.keyCode >= 35 && event.keyCode <= 39)) {
-                 // let it happen, don't do anything
-                 return;
-        }
-        else {
-            // Ensure that it is a number and stop the keypress
-            if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
-                event.preventDefault(); 
-            }   
-        }
-    });
-
-	$('#state-value').keyup(function(e) {
-		if (e.keyCode==13) {
-			// return
-			nbcSetStateValue();
-		}
-		return;
-	});
-
-}
-
-function nbcSetPaginate(state) {
-
-	nbcPaginate = state;
-	
-}
-
-function nbcSetExpandResults(state) {
-
-	nbcExpandResults = state;
-	
-}
-
-// dialog button function, called from main.js::showDialog 
-function jDialogOk() {
-
-	nbcSetStateValue();
-
-}
-
-// dialog button function, called from main.js::showDialog 
-function jDialogCancel() {
-
-	closeDialog();
-
-}
-
-function nbcInit() {
-
-	nbcLabelClose = _('sluiten');
-	nbcLabelDetails = _('onderscheidende kenmerken');
-	nbcLabelBack = _('terug');
-	nbcLabelSimilarSpecies = _('gelijkende soorten');
-	nbcLabelShowAll = _('alle kenmerken tonen');
-	nbcLabelHideAll = _('alle kenmerken verbergen');
-	nbcLabelExternalLink = _('Nederlands Soortenregister');
-
-	$('#legendDetails').html(nbcLabelDetails);
-	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
-	$('#legendExternalLink').html(nbcLabelExternalLink);
-
-
-	if (nbcBrowseStyle=='paginate') {
-		nbcSetPaginate(true);
-		nbcSetExpandResults(false);
-	} else
-	if (nbcBrowseStyle=='expand') {
-		nbcSetPaginate(false);
-		nbcSetExpandResults(true);
-	}
-
-	nbcPreviousBrowseStyles.paginate=nbcPaginate;
-	nbcPreviousBrowseStyles.expand=nbcExpandResults;
-
-	if ("ontouchstart" in document) {
-		// touch only code (tablets)
-		$('#bannerRuler').removeClass('hidden'); // show icon legend
-		$('#legendContainer').removeClass('hidden'); // show icon legend
-	} else {
-		// "desktop" code
-	}
-
-}
-
-
