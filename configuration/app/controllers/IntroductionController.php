@@ -93,7 +93,7 @@ class IntroductionController extends Controller
 			$this->addError($this->translate('No page ID specified.'));
 
 		} else {
-
+			
 			$id = $this->requestData['id'];
 
 			$page = $this->getPage($id);

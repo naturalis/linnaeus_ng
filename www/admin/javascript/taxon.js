@@ -1531,7 +1531,7 @@ function taxonBlankOutRanks() {
 	});
 	
 	var d = $('#parent-id :selected').attr('root_rank_id');
-alert(d);
+
 	if (d==undefined) return;
 
 	$('#rank-id > option').each(function(){

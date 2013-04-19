@@ -12,8 +12,6 @@
     <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}prettyPhoto/prettyPhoto.css" />
 	<link href="{$session.app.project.urls.projectMedia}favicon.ico" type="image/x-icon" rel="icon" />
     <link href="{$session.app.project.urls.projectMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
-	<!-- link rel="stylesheet" type="text/css" href="/app/webroot/css/jquery.lightbox-0.5.css" />
-	<link rel="stylesheet" type="text/css" href="/app/webroot/css/../js/fancybox/jquery.fancybox-1.3.4.css" / -->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
 
@@ -31,7 +29,6 @@
 {/section}
 {/if}
 
-<!-- customized version of prettyPhoto, spcifically altered for boktorren key; overwrites the prettyPhoto -->
 <script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
 
 </head>

@@ -4,7 +4,6 @@ var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
 var initData;
 
-
 function nbcPrettyPhotoInit() {
 
  	$("a[rel^='prettyPhoto']").prettyPhoto({
@@ -229,5 +228,29 @@ function verbergDier() {
 
 	$('#dier-content').html('');
 	$('#dier-content-wrapper').css('visibility','hidden');
+
+}
+
+function openDiergroep(pId,tId,type) {
+
+	var pre = '<a href="#" class="no-text terug-naar-het-dier" onclick="toonDier('+tId+',\''+type+'\');return false;">Terug naar het dier</a>';
+
+	$.ajax({
+		url : '../module/topic.php',
+		type: 'POST',
+		data : ({
+			id : pId,
+			style : 'inner',
+			time : getTimestamp()
+		}),
+		success : function (data) {
+			if (data) {
+				$('#dier-content').html(pre + data);
+				$('#dier-content-wrapper').css('visibility','visible');
+				if(jQuery().prettyPhoto)
+					nbcPrettyPhotoInit();
+			}
+		}
+	});
 
 }

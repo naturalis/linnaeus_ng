@@ -3,8 +3,8 @@
 
 <div class="illustratie-wrapper">
     <div class="illustratie">
-        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage}" title="{$v.description}">
-            <img style="width:280px" title="{$v.description}" src="{$session.app.project.urls.uploadedMedia}{$overviewImage}" alt="">
+        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage}" title="">
+            <img style="width:280px" title="" src="{$session.app.project.urls.uploadedMedia}{$overviewImage}" alt="">
         </a>
     </div>
 </div>
@@ -34,20 +34,24 @@
 	<div class="clearer"></div>
 
 </div>
-
-<a href="/index.php/show/aHR0cDovL3d3dy5ybmFwcm9qZWN0Lm9yZy9kYXRhLzIwYWIwZjllLTNlYTUtNDNiOS04MzA1LWVmODEwM2Q4MDJiZg==/group" class="grouplink group-container">Vogels</a>   
-
+{if $freePageContent}
+<a href="#" onclick="openDiergroep({$freePageContent.page_id},{$taxon.id},'{$type}');return false;" class="grouplink group-container">{$freePageContent.topic|@ucfirst}</a>   
+{/if}
+{if $related}
 <div class="related">
-    <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>
-    <ul>
-        <li>
-        <a href="/index.php/show/aHR0cDovL3d3dy5ybmFwcm9qZWN0Lm9yZy9kYXRhL2FkNWUyN2FiLTE1ZmItNDQ3Ni04MmQ3LTZjYzBhNGM3NDgxYQ==" class="resultlink">
-            <img src="http://images.ncbnaturalis.nl/80x80/194873.jpg">
-            Gierzwaluw                     
-        </a>
-        </li>
-    </ul>
-    <div class="clearer"></div>
-</div>
+        <span style="font-weight:bold;padding-left:40px;font-size:14px;position:relative;top:10px;">Lijkt op</span>
+        <ul>
+        {foreach from=$related item=v}
+            <li class="">
+                <a href="#" onclick="toonDier({$v.relation_id},'{if $v.ref_type=='variation'}v{else}t{/if}');return false;" class="resultlink">
+                <img src="{$v.url_image}" style="padding-top:10px">
+                {$v.label}                    
+                </a>
+            </li>
+		{/foreach}
+        </ul>
+        <div class="clearer"></div>
+</div>    
+                    
+{/if}
 
-</div>
