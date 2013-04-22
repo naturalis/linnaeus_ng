@@ -1587,23 +1587,16 @@ class SpeciesController extends Controller
             'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
         ));
         
+		// referred from the taxon content editing page
         if ($this->rHasVal('add', 'hoc') && !isset($_SESSION['admin']['system']['media']['newRef'])) {
-            // referred from the taxon content editing page
-            
-
-
 
             $_SESSION['admin']['system']['media']['newRef'] = '<new>';
             
             $this->requestData['id'] = $_SESSION['admin']['system']['activeTaxon']['taxon_id'];
         }
         
+		// get existing taxon name
         if ($this->rHasId()) {
-            // get existing taxon name
-            
-
-
-
             $taxon = $this->getTaxonById();
             
             if ($taxon['id']) {
@@ -1613,7 +1606,7 @@ class SpeciesController extends Controller
                 if ($this->requestDataFiles && !$this->isFormResubmit()) {
                     
                     $filesToSave = $this->getUploadedMediaFiles();
-                    
+
                     $firstInsert = false;
                     
                     if ($filesToSave) {

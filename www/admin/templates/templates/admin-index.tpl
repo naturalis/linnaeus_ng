@@ -46,7 +46,6 @@
     {/section}
         </tr>
     </table>
-    
 
 <form method="post" id="freeForm" action="views/module/">
 <input type="hidden" id="freeId" name="freeId" value="" />
@@ -56,7 +55,7 @@
 <!--
 NOTICES
 - acquire images for matrix
-- compress dick key
+- compress dich key
 - define /shortname/
 - project ubpublished
 -->
@@ -66,6 +65,8 @@ NOTICES
 <ul>
 	<li><a href="views/projects/">{t}Project administration{/t}</a></li>
 	<li><a href="views/hotwords/">{t}Hotwords{/t}</a></li>
+	<li><a href="views/utilities/mass_upload.php">{t}Mass upload images{/t}</a></li>
+	<li><a href="views/projects/clear_cache.php">{t}Clear cache{/t}</a></li>
 	<li><a href="views/users/">{t}User administration{/t}</a></li>
 </ul>
 

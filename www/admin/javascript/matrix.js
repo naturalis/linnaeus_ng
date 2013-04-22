@@ -521,3 +521,48 @@ function matrixToggleGroupChars(id) {
 	}
 	
 }
+
+function matrixSaveCharGroupOrder() {
+
+	$('li[id^=char-]').each(function () {
+		var z = $(this).parent().children().first().attr('id').replace('group-','');
+		var val = $(this).attr('id').replace('char-','')+': '+z;
+		$('#theForm').append('<input type="hidden" name="chars[]" value="'+val+'">').val(val);
+	})
+
+	$('#order-sort').children().each(function () {
+		$('#theForm').append('<input type="hidden" name="order[]" value="'+$(this).attr('id')+'">').val($(this).attr('id'));
+	})
+
+	$('#theForm').submit();
+	
+}
+
+function matrixDeleteGroup(id) {
+
+	if (confirm(_('Are you sure?'))) {
+		$('#theForm').append('<input type="hidden" name="delete" value="'+id+'">').val(id);
+		$('#theForm').submit();
+	}
+
+}
+
+function matrixDoMoveState(id,r) {
+
+	$('#id').val(id);
+	$('#r').val(r);
+	$('#theForm').submit();
+
+}
+
+function matrixSaveStateOrder() {
+
+	$('li[id^=state-]').each(function () {
+		var val = $(this).attr('id').replace('state-','');
+		$('#theForm').append('<input type="hidden" name="states[]" value="'+val+'">').val(val);
+	})
+
+	$('#theForm').submit();
+	
+}
+

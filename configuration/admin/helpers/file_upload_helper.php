@@ -15,6 +15,7 @@ class FileUploadHelper
 	private $_currentMimeType = false;
     private $_tempDir = false;
     private $_storageDir = false;
+	private $_overwrite = 'rename'; // overwrite / rename / skip
     private $_mime_types = array(          
             'txt' => 'text/plain', 
             'htm' => 'text/html', 
@@ -75,6 +76,22 @@ class FileUploadHelper
     {
 
         $this->_tempDir = $dir;
+    
+    }
+
+    public function setOverwrite($state)
+    {
+
+		/*
+			overwrite (overwrites when exists)
+			rename (rename when exists to "file (1)")
+			skip (skips when exists)
+		*/
+		
+		if ($state!=='overwrite' && $state!=='rename' && $state!=='skip')
+			return;
+		
+        $this->_overwrite = $state;
     
     }
 
@@ -298,8 +315,29 @@ class FileUploadHelper
 
     }
 
-    private function createUniqueFileName($dir,$filename,$extension)
+    private function ensureUniqueFileName($dir,$filename,$extension)
     {
+	
+		if (file_exists($dir.$filename.'.'.$extension)) {
+			
+			if ($this->_overwrite=='overwrite') {
+
+				$d = unlink($dir.$filename.'.'.$extension);
+				
+				if ($d===false) {
+					$this->addError(_('Could not delete existing file '.$filename.'.'.$extension));
+					return false;
+				}
+			} else
+			if ($this->_overwrite=='skip') {
+
+				return null;
+	
+			} else
+			if ($this->_overwrite=='rename') {
+				// default behaviour below
+			} 
+		}
 
 		$extraBit = '';
 		$i = 1;
@@ -392,29 +430,42 @@ class FileUploadHelper
 					$pi = pathinfo($currentFileName);
 	
 					//$fn = $this->createUniqueNewFileName($pi['extension']);
-					$fn = $this->createUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
-	
-					// move the file to the project's media directory
-					//if (rename($oldFileName,$this->_storageDir.$fn)) {
-					if ($this->cRename($oldFileName,$this->_storageDir.$fn)) {
-		
-						// store data to save in temporary array
-						$fileToSave = array(
-							'name' => $fn,
-							'full_path' => $this->_storageDir.$fn,
-							'original_name' => $currentFileName,
-							'mime_type' => $t,
-							'media_name' => $this->_currentMimeType['media_name'],
-							'size' => $fs
-						); 
+					$fn = $this->ensureUniqueFileName($this->_storageDir,$pi['filename'],$pi['extension']);
+
+					if ($fn===null && $this->_overwrite=='skip') {
 						
-						return $fileToSave;
-	
-					} else {
-	
-						$this->addError(_('Could not move file:').' '.$currentFileName);
-	
+						return null;
+						
 					}
+					if ($fn!==false) {
+	
+						// move the file to the project's media directory
+						//if (rename($oldFileName,$this->_storageDir.$fn)) {
+						if ($this->cRename($oldFileName,$this->_storageDir.$fn)) {
+			
+							// store data to save in temporary array
+							$fileToSave = array(
+								'name' => $fn,
+								'full_path' => $this->_storageDir.$fn,
+								'original_name' => $currentFileName,
+								'mime_type' => $t,
+								'media_name' => $this->_currentMimeType['media_name'],
+								'size' => $fs
+							); 
+							
+							return $fileToSave;
+		
+						} else {
+		
+							$this->addError(_('Could not move file:').' '.$currentFileName);
+		
+						}
+						
+						} else {
+
+							$this->addError(_('Could not overwrite file:').' '.$currentFileName);
+
+						}
 	
 				} else {
 	
