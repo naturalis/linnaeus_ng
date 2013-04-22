@@ -155,7 +155,7 @@ class ImportL2Controller extends Controller
         
         error_reporting(E_ERROR | E_PARSE);
         
-        $this->setBreadcrumbRootName($this->translate('Linnaeus 2 import'));
+        $this->setBreadcrumbRootName($this->translate('Data import'));
         
         $this->setSuppressProjectInBreadcrumbs();
     }

@@ -627,7 +627,16 @@ class MatrixKeyController extends Controller
         
         if (!$this->rHasVal('sId'))
             $this->redirect('edit.php');
-        
+
+        if ($this->rHasVal('states') && !$this->isFormResubmit()) {
+
+			$i=0;
+			foreach((array)$this->requestData['states'] as $val)
+				$this->updateStateShowOrder($val,$i++);
+			
+			$this->addMessage('New state order saved.');
+			
+		} else
         if ($this->rHasId() && $this->rHasVal('r') && !$this->isFormResubmit()) {
             
             $c = $this->getCharacteristicStates($this->requestData['sId']);
@@ -648,6 +657,8 @@ class MatrixKeyController extends Controller
 	            $i=0;
 	            foreach((array)$sort as $val)
 	                $this->updateStateShowOrder($assoc[$val],$i++);
+					
+				$this->addMessage('Re-sorted state.');
 	            
 
             } else {
@@ -2535,7 +2546,7 @@ class MatrixKeyController extends Controller
 		$g = isset($p['groups']) ? $p['groups'] : null;
 		$c = isset($p['characters']) ? $p['characters'] : null;
 		$m = isset($p['menu']) ? $p['menu'] : null;
-	
+
 		if (is_null($g) || is_null($c))
 			return;
 			

@@ -7,8 +7,6 @@
 	$_stdVariantColumns needs to be user invulbaarable --> NOT! assuming sekse and variant (pwah)
 
 
-
-
 	insert into settings 
 		(id, project_id, setting, value, created, last_change) 
 	values 
@@ -18,11 +16,11 @@
 
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'suppress_splash',1,now(),CURRENT_TIMESTAMP);
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'start_page','/kreeften/app/views/matrixkey/identify.php',now(),CURRENT_TIMESTAMP);
-	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'start_page','/kreeften/app/views/matrixkey/identify.php',now(),CURRENT_TIMESTAMP);
 
 */
 
 include_once ('Controller.php');
+include_once ('ProjectDeleteController.php');
 class ImportNBCController extends Controller
 {
     private $_delimiter = ',';
@@ -78,7 +76,7 @@ class ImportNBCController extends Controller
     public $usedHelpers = array(
         'file_upload_helper'
     );
-    public $controllerPublicName = 'NBC Dierendeterminatie Import';
+    public $controllerPublicName = 'NBC multi-entry key import';
     public $cssToLoad = array();
     public $jsToLoad = array();
 
@@ -100,7 +98,6 @@ class ImportNBCController extends Controller
     }
 
 
-
     /**
      * Destroys
      *
@@ -110,7 +107,6 @@ class ImportNBCController extends Controller
     {
         parent::__destruct();
     }
-
 
 
     /**
@@ -130,13 +126,13 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie1Action ()
     {
-
+		
         $this->checkAuthorisation(true);
         
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_determinatie_2.php');
 			
-		if (isset($_SESSION['admin']['system']['import']['type']) && $_SESSION['admin']['system']['import']['type']!='nbc_data')			
+		if ((isset($_SESSION['admin']['system']['import']['type']) && $_SESSION['admin']['system']['import']['type']!='nbc_data') || $this->rHasVal('action','new'))
 			unset($_SESSION['admin']['system']['import']);
         
         $this->setPageName($this->translate('Choose file'));
@@ -184,6 +180,7 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie2Action ()
     {
+		
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
@@ -201,13 +198,53 @@ class ImportNBCController extends Controller
 			$_SESSION['admin']['system']['import']['data']['project']['soortgroep'] = $this->_defaultGroupName;
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
+
+		if (isset($data['project']['title'])) {
+
+			$d = $this->models->Project->_get(array(
+					'id' => array(
+					'sys_name' => $data['project']['title']
+			)));
+				
+			$exists = ($d!=false);
+
+            $this->smarty->assign('exists',$exists);
+			
+			if ($exists) {
+
+				$_SESSION['admin']['system']['import']['existingProjectId'] = $d[0]['id'];
+
+				$i=1;
+				while ($d!=false) {
+					$suggestedTitle = $data['project']['title'].' ('.$i++.')';
+					$d = $this->models->Project->_get(array(
+							'id' => array(
+							'sys_name' => $suggestedTitle
+					)));
+				}
+
+	            $this->smarty->assign('suggestedTitle',$suggestedTitle);
+
+				$_SESSION['admin']['system']['import']['projectExists'] = true;
+				$_SESSION['admin']['system']['import']['newProjectTitle'] = $suggestedTitle;
+				
+			} else {
+				
+				$_SESSION['admin']['system']['import']['projectExists'] = false;
+				
+			}
+
+		}
         
         if (isset($data['project']['soortgroep']))
             $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
+
         if (isset($data['project']['title']))
             $this->smarty->assign('title', $data['project']['title']);
+
         if (isset($data['species']))
             $this->smarty->assign('species', $data['species']);
+
         if (isset($data['characters']))
             $this->smarty->assign('characters', $data['characters']);
 
@@ -225,45 +262,83 @@ class ImportNBCController extends Controller
         $this->setPageName($this->translate('Creating project'));
 		
         if (!isset($_SESSION['admin']['system']['import']['project']) && !$this->isFormResubmit()) {
-            
-            $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
-			$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
-            
-            $pId = $this->createProject(
-            array(
-                'title' => $pTitle, 
-                'version' => '1', 
-                'sys_description' => 'Created by import from a NBC-export.', 
-                'css_url' => $this->controllerSettings['defaultProjectCss'],
-				'group' => $pGroup
-            ));
-            $this->addMessage('Created project "' . $pTitle . '" with id ' . $pId . '.');
-            
-            $_SESSION['admin']['system']['import']['project'] = array(
-                'id' => $pId, 
-                'title' => $pTitle
-            );
-            
-            $this->addUserToProjectAsLeadExpert($this->getNewProjectId());
-            $this->addMessage('Added current user as lead expert.');
-            
-            $this->models->LanguageProject->save(
-            array(
-                'id' => null, 
-                'language_id' => $this->getNewDefaultLanguageId(), 
-                'project_id' => $this->getNewProjectId(), 
-                'def_language' => 1, 
-                'active' => 'y', 
-                'tranlation_status' => 1
-            ));
-            
-            $this->addMessage('Added default language.');
+
+			if (!$_SESSION['admin']['system']['import']['projectExists'] ||
+				($_SESSION['admin']['system']['import']['projectExists'] && $this->rHasVal('action','new_project'))) {
+					
+				if ($_SESSION['admin']['system']['import']['projectExists'])
+					$pTitle = $_SESSION['admin']['system']['import']['newProjectTitle'];
+				else
+					$pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
+
+				$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
+				
+				$pId = $this->createProject(
+				array(
+					'title' => $pTitle, 
+					'version' => '1', 
+					'sys_description' => 'Created by import from a NBC-export.', 
+					'css_url' => $this->controllerSettings['defaultProjectCss'],
+					'group' => $pGroup
+				));
+				$this->addMessage('Created project "' . $pTitle . '" with id ' . $pId . '.');
+				
+				$_SESSION['admin']['system']['import']['project'] = array(
+					'id' => $pId, 
+					'title' => $pTitle
+				);
+				
+				$pId = $this->getNewProjectId();
+
+				$this->models->LanguageProject->save(
+				array(
+					'id' => null, 
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'project_id' => $pId, 
+					'def_language' => 1, 
+					'active' => 'y', 
+					'tranlation_status' => 1
+				));
+				
+				$this->addMessage('Added default language.');
+				
+			} else {
+
+				$pId = $_SESSION['admin']['system']['import']['project']['id'] = $_SESSION['admin']['system']['import']['existingProjectId'];
+				$_SESSION['admin']['system']['import']['project']['title'] = $_SESSION['admin']['system']['import']['data']['project']['title'];
+				$this->addMessage('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.');
+				
+			}
+
+            $this->addUserToProjectAsLeadExpert($pId);
+
+            $this->addMessage('Added current user as lead expert to project.');
+
+			if ($this->rHasVal('action')) {
+
+				$_SESSION['admin']['system']['import']['existingDataTreatment'] = $this->requestData['action'];
+
+				if ($this->rHasVal('action','replace_data')) {
+
+					$pDel = new ProjectDeleteController;
+
+					$pDel->deleteNBCKeydata($pId);
+					$pDel->deleteMatrices($pId);
+					$pDel->deleteCommonnames($pId);
+					$pDel->deleteSynonyms($pId);
+					$pDel->deleteSpeciesMedia($pId);
+					$pDel->deleteSpeciesContent($pId);
+					$pDel->deleteStandardCat($pId);
+					$pDel->deleteSpecies($pId);
+					$pDel->deleteProjectRanks($pId);
+
+				}
+
+			}
+
+
         }
-        else if (isset($_SESSION['admin']['system']['import']['project'])) {
-            
-            $this->addMessage('Using project "' . $_SESSION['admin']['system']['import']['project']['title'] . '" with id ' . $_SESSION['admin']['system']['import']['project']['id']);
-        }
-        
+
         $this->printPage();
     }
 
@@ -287,7 +362,8 @@ class ImportNBCController extends Controller
             
             $_SESSION['admin']['system']['import']['project']['ranks'] = $ranks;
             
-            if ($this->rHasVal('variant_columns')) $_SESSION['admin']['system']['import']['variantColumns'] = $this->requestData['variant_columns'];
+            if ($this->rHasVal('variant_columns'))
+				$_SESSION['admin']['system']['import']['variantColumns'] = $this->requestData['variant_columns'];
 
             $data = $_SESSION['admin']['system']['import']['data'];
            
@@ -361,7 +437,6 @@ class ImportNBCController extends Controller
     }
 
 
-
     public function nbcDeterminatie6Action ()
     {
 	
@@ -375,48 +450,53 @@ class ImportNBCController extends Controller
 			$this->downloadErrorLog();
 			die();
 		}
+
+		if (!$_SESSION['admin']['system']['import']['projectExists']) {
+
+
+			$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
+			$this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
+			
+			$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
+			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 	
-        $this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
-        $this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
-        
-        $this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
-        $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
-
-		$settings = array(
-			'matrixtype' => 'NBC',
-			'matrix_allow_empty_species' => true,
-			'matrix_use_character_groups' => true,
-			'taxa_use_variations' => true,
-		);
-		
-		foreach((array)$settings as $key => $val) {
+			$settings = array(
+				'matrixtype' => 'NBC',
+				'matrix_allow_empty_species' => true,
+				'matrix_use_character_groups' => true,
+				'taxa_use_variations' => true,
+			);
 			
-			if (!empty($val))
-				$this->saveSetting(array(
-					'name' => $key, 
-					'value' => $val, 
-					'pId' => $this->getNewProjectId()
-				));			
-		}
-
-		foreach((array)$this->requestData['settings'] as $key => $val) {
+			foreach((array)$settings as $key => $val) {
+				
+				if (!empty($val))
+					$this->saveSetting(array(
+						'name' => $key, 
+						'value' => $val, 
+						'pId' => $this->getNewProjectId()
+					));			
+			}
+	
+			foreach((array)$this->requestData['settings'] as $key => $val) {
+				
+				if (!empty($val))
+					$this->saveSetting(array(
+						'name' => $key, 
+						'value' => $val, 
+						'pId' => $this->getNewProjectId()
+					));			
+			}
 			
-			if (!empty($val))
+			
+			if (empty($this->requestData['settings']['skin'])) {
+	
 				$this->saveSetting(array(
-					'name' => $key, 
-					'value' => $val, 
+					'name' => 'skin', 
+					'value' => $this->_defaultSkinName, 
 					'pId' => $this->getNewProjectId()
-				));			
-		}
-		
-		
-		if (empty($this->requestData['settings']['skin'])) {
-
-			$this->saveSetting(array(
-				'name' => 'skin', 
-				'value' => $this->_defaultSkinName, 
-				'pId' => $this->getNewProjectId()
-			));
+				));
+				
+			}
 			
 		}
 
@@ -456,7 +536,7 @@ class ImportNBCController extends Controller
         $this->setPageName($this->translate('Choose file'));
         
         $this->setSuppressProjectInBreadcrumbs();
-        
+		
         if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file')) {
             
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
@@ -542,6 +622,7 @@ class ImportNBCController extends Controller
 
     public function nbcLabels3Action ()
     {
+		
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['data']))
@@ -549,7 +630,7 @@ class ImportNBCController extends Controller
 
         $this->setPageName($this->translate('Saving labels'));
         
-        if (!$this->isFormResubmit()) {
+        if (1==1 || !$this->isFormResubmit()) {
 
             $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
 			//$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
@@ -562,22 +643,15 @@ class ImportNBCController extends Controller
 			if (!empty($d[0]['id'])) {
 				
 				$pId = $d[0]['id'];
+				
+				$dummy = array();
 
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
 					
 					if (empty($val[1]))
 						continue;
-					/*					
-					$d = $this->models->CharacteristicLabel->_get(array('id' =>
-						array(
-							'project_id' => $pId, 
-							'language_id' => LANGUAGECODE_DUTCH, 
-							'label' => $val[1]
-						
-						))
-					);
-					*/
 
+					// get the character that matches the 'kenmerk'-label (col 2; col 1 is the group, which is ignored here)
 					$d = $this->models->CharacteristicLabel->_get(
 						array(
 							'where' =>
@@ -590,11 +664,12 @@ class ImportNBCController extends Controller
 						)
 					);	
 		
-							
+					// if a char is found...					
 					if (!empty($d[0]['id'])) {
 
 						$cId = $d[0]['characteristic_id'];
 
+						// ...find all its states
 						$states = $this->models->CharacteristicState->_get(array(
 							'id' =>
 								array(
@@ -607,12 +682,12 @@ class ImportNBCController extends Controller
 						
 						$d = array();
 
-						foreach((array)$states as $sVal) {
+						foreach((array)$states as $sVal)
 							$d[]=$sVal['id'];
-						}
 						
 						$states = '('.implode(',',$d).')';
 
+						// in those states, find one that matches the state's label (col 3)
 						$l = $this->models->CharacteristicLabelState->_get(array(
 							'id' =>
 								array(
@@ -628,6 +703,7 @@ class ImportNBCController extends Controller
 							
 							$sId = $l[0]['state_id'];
 							
+							// if there is a translation, save it
 							if (!empty($val[3])) {
 
 								$l = $this->models->CharacteristicLabelState->update(
@@ -641,14 +717,15 @@ class ImportNBCController extends Controller
 									)
 								);								
 
-								$this->addMessage(sprintf($this->translate('Updated "%s" for %s.'),$val[2],$val[1]));
+								$this->addMessage(sprintf($this->translate('Saved translation "%s".'),$val[3]));
 								
 							} else {
 
-								$this->addMessage(sprintf($this->translate('Skipped state "%s" for %s (no translation).'),$val[2],$val[1]));
+								//$this->addMessage(sprintf($this->translate('Skipped "%s" for %s (no translation).'),$val[2],$val[1]));
 
 							}
 	
+							// if there is an image, save it
 							if (!empty($val[4])) {
 
 								$this->models->CharacteristicState->update(
@@ -661,16 +738,22 @@ class ImportNBCController extends Controller
 									)
 								);				
 								
-								$this->addMessage(sprintf($this->translate('Updated image for "%s" to %s.'),$val[2],$val[4]));
+								$this->addMessage(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]));
+		
+								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'all_images' : ($dummy[$cId]['state']=='all_images' ? 'all_images' : ($dummy[$cId]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
 
-								
+								$dummy[$cId]['label'] = $val[1];
+
 							} else {
 
-								$this->addMessage(sprintf($this->translate('Skipped image for "%s" (not specified).'),$val[2]));
+								//$this->addMessage(sprintf($this->translate('Skipped image for "%s" (not specified).'),$val[2]));
+
+								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'no_images' : ($dummy[$cId]['state']=='all_images' ? 'partial_images' : ($dummy[$cId]['state']=='no_images' ? 'no_images' : 'partial_images' )));
+
+								$dummy[$cId]['label'] = $val[1];
 
 							}
 
-						
 						} else {
 
 							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]), 'Matrix import'));
@@ -685,6 +768,35 @@ class ImportNBCController extends Controller
 					
 
 				}
+				
+				
+				if ($this->rHasval('re_type_chars','all') || $this->rHasval('re_type_chars','partial')) {
+
+					$this->addMessage($this->translate('Re-evaluating character types (using setting "'.($this->rHasval('re_type_chars','partial') ? 'need some' : 'need all' ).'").'));
+	
+					foreach((array)$dummy as $cId => $char) {
+						
+						$type = 
+							(($this->rHasval('re_type_chars','partial') && ($char['state']=='all_images' || $char['state'] =='partial_images')) ||
+							($this->rHasval('re_type_chars','all') && $char['state']=='all_images')) ? 'media' : 'text';
+						
+						$this->models->Characteristic->update(array(
+							'type' => $type
+						), array(
+							'id' => $cId, 
+							'project_id' => $pId
+						));
+						
+						$this->addMessage(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type));
+						
+					}
+
+				} else {
+					
+					$this->addMessage($this->translate('Skipped re-evaluating character types.'));
+					
+				}
+			
 				
 			} else {
 				

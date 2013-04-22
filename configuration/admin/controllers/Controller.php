@@ -44,28 +44,28 @@ class Controller extends BaseClass
     public $printBreadcrumbs = true;
     private $usedModelsBase = array(
 		'dump', // debug!
-        'settings', 
-        'user', 
-        'project', 
-        'role', 
-        'right', 
-        'right_role', 
-        'project_role_user', 
+        'free_module_project', 
         'free_module_project_user', 
-        'language_project', 
-        'module_project', 
-        'module_project_user', 
-        'language', 
         'interface_text', 
         'interface_translation', 
-        'taxon', 
-        'rank', 
-        'project_rank', 
         'label_project_rank', 
+        'language', 
+        'language_project', 
         'module', 
-        'free_module_project', 
+        'module_project', 
+        'module_project_user', 
+        'project', 
+        'project_rank', 
+        'project_role_user', 
+        'rank', 
+        'right', 
+        'right_role', 
+        'role', 
+        'settings', 
+        'taxon', 
+        'taxon_variation',
+        'user', 
         'variation_label', 
-        'taxon_variation'
     );
     private $usedHelpersBase = array(
         'logging_helper', 
@@ -1419,13 +1419,19 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function getUploadedMediaFiles ()
+    public function getUploadedMediaFiles ($p=null)
     {
-        if (isset($this->helpers->FileUploadHelper) && isset($this->controllerSettings['media']['allowedFormats']) && isset($this->requestDataFiles)) {
+		
+		$allowedFormats = isset($p['allowedFormats']) ? $p['allowedFormats'] : $this->controllerSettings['media']['allowedFormats'];
+		$storageDir = isset($p['storageDir']) ? $p['storageDir'] : $this->getProjectsMediaStorageDir();
+		$overwrite = isset($p['overwrite']) ? $p['overwrite'] : 'rename';
+		
+        if (isset($this->helpers->FileUploadHelper) && isset($allowedFormats) && isset($this->requestDataFiles)) {
             
-            $this->helpers->FileUploadHelper->setLegalMimeTypes($this->controllerSettings['media']['allowedFormats']);
+            $this->helpers->FileUploadHelper->setLegalMimeTypes($allowedFormats);
             $this->helpers->FileUploadHelper->setTempDir($this->getDefaultImageUploadDir());
-            $this->helpers->FileUploadHelper->setStorageDir($this->getProjectsMediaStorageDir());
+            $this->helpers->FileUploadHelper->setStorageDir($storageDir);
+            $this->helpers->FileUploadHelper->setOverwrite($overwrite);
             $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
             
             $this->addError($this->helpers->FileUploadHelper->getErrors());
@@ -2756,6 +2762,19 @@ class Controller extends BaseClass
         }
     }
 
+	public function makeCachePath() 
+	{
+
+        $p = $this->getCurrentProjectId();
+        
+        if (!$p)
+            return;
+        
+        return $this->generalSettings['directories']['cache'] . '/' . $this->getProjectFSCode($p);
+        		
+	}
+
+
 
 
     /**
@@ -3688,8 +3707,6 @@ class Controller extends BaseClass
             }
         }
     }
-
-
 
     protected function clearCache ($files)
     {

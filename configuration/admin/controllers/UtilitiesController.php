@@ -16,6 +16,9 @@ class UtilitiesController extends Controller
 
 	public $jsToLoad = array();
 
+    public $usedHelpers = array(
+        'file_upload_helper', 
+    );
     
 
     /**
@@ -120,6 +123,56 @@ class UtilitiesController extends Controller
 
 		$this->printPage('utilities/root_index');
 	
+	}
+	
+	public function massUploadAction()
+	{
+
+        $this->checkAuthorisation();
+		
+		$this->setPageName('Mass upload');
+
+		if ($this->requestDataFiles && !$this->isFormResubmit()) {
+
+			$this->loadControllerConfig('Species');
+			$filesToSave = $this->getUploadedMediaFiles(array('overwrite'=>$this->requestData['overwrite']));
+			$this->loadControllerConfig();
+
+			if ($filesToSave) {
+                        
+				foreach ((array) $filesToSave as $key => $file) {
+					
+					$this->addMessage(sprintf('Uploaded %s','<code>'.$file['name'].'</code>'));
+
+                }
+				
+			}
+			
+		}
+
+		$this->loadControllerConfig('Species');
+
+		$this->smarty->assign('allowedFormats', $this->controllerSettings['media']['allowedFormats']);
+            
+		$this->smarty->assign('iniSettings', array(
+			'upload_max_filesize' => ini_get('upload_max_filesize'), 
+			'post_max_size' => ini_get('post_max_size')
+		));
+
+		
+        $this->printPage();
+		
+	}
+
+
+	public function browseMediaAction()
+	{
+
+
+		foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file)   
+		{  
+			echo "filename: $file : filetype: " . filetype($file) . "<br />";  
+		} 			
 	}
 
 
