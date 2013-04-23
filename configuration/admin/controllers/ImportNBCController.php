@@ -1820,22 +1820,26 @@ class ImportNBCController extends Controller
         
         $prevMod = null;
         
-        foreach ((array) $_SESSION['admin']['system']['import']['errorlog']['errors'] as $val) {
-            
-            $mod = @strtolower($val[0]);
-            
-            if ($mod !== $prevMod) {
-                
-                if (!is_null($prevMod))
-                    echo chr(10);
-                
-				echo 'while loading ' . $mod . ':' . chr(10);
-            }
-            
-            echo strip_tags($val[1]) . chr(10);
-            
-            $prevMod = $mod;
-        }
+		if ($_SESSION['admin']['system']['import']['errorlog']) {
+		
+			foreach ((array) $_SESSION['admin']['system']['import']['errorlog']['errors'] as $val) {
+				
+				$mod = @strtolower($val[0]);
+				
+				if ($mod !== $prevMod) {
+					
+					if (!is_null($prevMod))
+						echo chr(10);
+					
+					echo 'while loading ' . $mod . ':' . chr(10);
+				}
+				
+				echo strip_tags($val[1]) . chr(10);
+				
+				$prevMod = $mod;
+			}
+		
+		}
                 
         die();
     }

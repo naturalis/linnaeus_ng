@@ -68,24 +68,28 @@ class UtilitiesController extends Controller
      */
     public function notAuthorizedAction ()
     {
-        
+
         $this->smarty->assign('hideControllerPublicName', true);
 
         $this->addError($this->translate('You are not authorized to do that.'));
 
-		if (count((array)$_SESSION['admin']['project']['lead_experts'])==1) {
+		if (isset($_SESSION['admin']['project']['lead_experts'])) {
 
-	        $this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
-
-		} else {
-
-	        $this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
-
-		}
-
-		foreach((array)$_SESSION['admin']['project']['lead_experts'] as $key => $val) {
-
-	        $this->addMessage($val['first_name'].' '.$val['last_name'].' (<a href="mailto:'.$val['email_address'].'">'.$val['email_address'].'</a>)');
+			if (count((array)$_SESSION['admin']['project']['lead_experts'])==1) {
+	
+				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact the lead expert of your project:'));
+	
+			} else {
+	
+				$this->addMessage($this->translate('To gain access to the page you were attempting to view, please contact one of the lead experts of your project:'));
+	
+			}
+	
+			foreach((array)$_SESSION['admin']['project']['lead_experts'] as $key => $val) {
+	
+				$this->addMessage($val['first_name'].' '.$val['last_name'].' (<a href="mailto:'.$val['email_address'].'">'.$val['email_address'].'</a>)');
+			}
+			
 		}
         
         $this->printPage();
