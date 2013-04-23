@@ -96,6 +96,14 @@ function enableTitleEditing(ele,id) {
 </script>
 {/literal}
 
+<div id="page-header-localmenu">
+<div id="page-header-localmenu-content">
+    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
+    &nbsp;&nbsp;
+    <a href="mass_upload.php" class="allLookupLink">{t}Mass upload images{/t}</a>
+</div>
+</div>
+
 <div id="page-main">
 <p>
 Please be aware that these images are very likely referred to from various modules in your project: species, matrix, introduction, etc. 
