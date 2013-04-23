@@ -24,6 +24,8 @@
     {/if}
     {/section}
         </tr>
+        
+	{if $freeModules|@count>0}
         <tr><td colspan="2">&nbsp;</td></tr>
         <tr>
     {assign var=i value=1}
@@ -45,13 +47,13 @@
     {/if}
     {/section}
         </tr>
+	{/if}
     </table>
 
-<form method="post" id="freeForm" action="views/module/">
-<input type="hidden" id="freeId" name="freeId" value="" />
-</form>
-
-{if $currentUserRoleId==1 || $currentUserRoleId==2 || $session.admin.user.superuser==1}
+    <form method="post" id="freeForm" action="views/module/">
+    <input type="hidden" id="freeId" name="freeId" value="" />
+    </form>
+{if $currentUserRole<=2 || $isSysAdmin}
 <!--
 NOTICES
 - acquire images for matrix
@@ -69,7 +71,6 @@ NOTICES
 	<li><a href="views/projects/clear_cache.php">{t}Clear cache{/t}</a></li>
 	<li><a href="views/users/">{t}User administration{/t}</a></li>
 </ul>
-
 {/if}
 </div>
 

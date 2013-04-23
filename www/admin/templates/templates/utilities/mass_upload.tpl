@@ -1,11 +1,19 @@
 {include file="../shared/admin-header.tpl"}
 
+<div id="page-header-localmenu">
+<div id="page-header-localmenu-content">
+    <a href="browse_media.php" class="allLookupLink">{t}Browse images{/t}</a>
+    &nbsp;&nbsp;
+    <a href="mass_upload.php" class="allLookupLink">{t}Mass upload images{/t}</a>
+</div>
+</div>
+
 <div id="page-main">
 
 
 <form enctype="multipart/form-data" action="" method="post">
 <p>
-This function allows you to upload files to your projects media directoty, including mutiple files within a ZIP-file.
+This function allows you to upload files to your projects media directory, including mutiple files within a ZIP-file.
 </p>
 <p>
 <input type="hidden" name="id" value="{$id}" />  

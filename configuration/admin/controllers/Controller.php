@@ -2807,6 +2807,8 @@ class Controller extends BaseClass
         $this->smarty->assign('useRelated', $this->useRelated);
         
         $this->smarty->assign('isSysAdmin', $this->isCurrentUserSysAdmin());
+        $this->smarty->assign('currentUserRole', $this->getCurrentUserRole());
+
         $this->smarty->assign('useJavascriptLinks', $this->generalSettings['useJavascriptLinks']);
         $this->smarty->assign('autoSaveFrequency', $this->generalSettings['autoSaveFrequency']);
         
@@ -3835,8 +3837,27 @@ class Controller extends BaseClass
         return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
     
     }
-    
-    
+	
+	private function getCurrentUserRole()
+	{
+
+		$pId = $this->getCurrentProjectId();
+		
+		if (empty($pId))
+			return;
+
+		   $pru = $this->models->ProjectRoleUser->_get(
+			array(
+				'id' => array(
+					'project_id' => $pId,
+					'user_id' => $this->getCurrentUserId()
+				)
+			));	
+			
+		return $pru[0]['role_id'];
+		
+	}
+
     private function loadSmartyConfig ()
     {
         $this->_smartySettings = $this->config->getSmartySettings();
