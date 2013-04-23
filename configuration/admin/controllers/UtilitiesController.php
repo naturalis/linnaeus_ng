@@ -12,13 +12,20 @@ class UtilitiesController extends Controller
     
     public $controllerPublicName = 'Utilities';
 
-	public $cssToLoad = array();
+	public $cssToLoad = array('prettyPhoto/prettyPhoto.css');
 
-	public $jsToLoad = array();
+    public $jsToLoad = array(
+        'all' => array(
+            'main.js', 
+            'prettyPhoto/jquery.prettyPhoto.js', 
+        ), 
+        'IE' => array()
+    );
 
     public $usedHelpers = array(
         'file_upload_helper', 
     );
+
     
 
     /**
@@ -164,17 +171,88 @@ class UtilitiesController extends Controller
 		
 	}
 
-
 	public function browseMediaAction()
 	{
 
+        $this->checkAuthorisation();
+		
+		$this->setPageName('Browse media');
 
-		foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file)   
-		{  
-			echo "filename: $file : filetype: " . filetype($file) . "<br />";  
-		} 			
+		function deleteFile($id) {
+
+			if (isset($_SESSION['admin']['system']['mediaFiles']['files'][$id])) {
+
+				return unlink(UtilitiesController::getProjectsMediaStorageDir().$_SESSION['admin']['system']['mediaFiles']['files'][$id]);
+
+			} else {
+				
+				$this->addError('Unknown file index.');
+
+				return false;
+				
+			}
+
+		}
+
+		if ($this->rHasVal('action','delete') && $this->rHasId()) {
+		
+			if (deleteFile($this->requestData['id'])) {
+
+				$this->redirect('browse_media.php#');
+
+			}
+			
+		} else
+		if ($this->rHasVal('action','delete') && $this->rHasVal('delete') && !$this->isFormResubmit()) {
+			
+			foreach((array)$this->requestData['delete'] as $val) {
+
+				deleteFile($val);
+
+			}
+
+		}
+
+		foreach(glob($this->getProjectsMediaStorageDir().'/*') as $file) {  
+
+			if (filetype($file)=='dir')
+					$r['dirs'][] = basename($file);
+			else
+			if (filetype($file)=='file')
+					$r['files'][] = basename($file);
+		
+		}
+		
+		$_SESSION['admin']['system']['mediaFiles'] = $r;
+
+		$this->smarty->assign('files',$r);
+
+		$this->printPage();
+	
 	}
 
+
+	private function renameMedia($p)
+	{
+
+		$id = isset($p['id']) ? $p['id'] : null;
+		$name = isset($p['name']) ? $p['name'] : null;
+		
+		if (!isset($id) || !isset($name))
+			return false;
+
+		if (isset($_SESSION['admin']['system']['mediaFiles']['files'][$id])) {
+			if (file_exists($this->getProjectsMediaStorageDir().$name))
+				return false;
+			return rename(
+				$this->getProjectsMediaStorageDir().$_SESSION['admin']['system']['mediaFiles']['files'][$id],
+				$this->getProjectsMediaStorageDir().$name
+			);
+		} else {
+			return false;
+		}
+	
+	}
 
     /**
      * AJAX interface for this class
@@ -199,6 +277,11 @@ class UtilitiesController extends Controller
         else if ($this->requestData['action'] == 'translate') {
             
 			$this->smarty->assign('returnText',$this->javascriptTranslate($this->requestData['text']));
+
+        }
+        else if ($this->requestData['action'] == 'change_media_name') {
+            
+			$this->smarty->assign('returnText',$this->renameMedia($this->requestData));
 
         }
         

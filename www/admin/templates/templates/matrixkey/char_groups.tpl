@@ -2,7 +2,10 @@
 
 <div id="page-main">
 
-	Drag characters to the appropriate group and place within the group, and press 'save' to store.
+	<p>
+        Drag characters to the appropriate group and place within the group, and press 'save' to store.<br />
+        Characters that should appear by themselves can be placed under 'Not in any group'.
+    </p>
     
     <div>
 
@@ -15,8 +18,10 @@
     </ul>
     {/foreach}
 
+	<div style="clear:both;"></div>
+
     <ul id="sortable0" class="sortable-drag-list connectedSortable">
-        <li id="group-0" class="ui-state-disabled">{t}not in any group{/t}</li>
+        <li id="group-0" class="ui-state-disabled">{t}Not in any group{/t}</li>
         {foreach from=$characteristics item=c key=e}
             <li id="char-{$c.id}" class="ui-state-default">{$c.short_label}</li>
         {/foreach}
@@ -24,30 +29,14 @@
 
 	<div style="clear:both;border-bottom:1px dotted #ddd;width:500px;margin-bottom:10px"></div>
     
-	<p>
-	Drag and drop to alter display order of groups and non-grouped characters:
-    </p>
-    <div>
-
-        <ul id="order-sort" class="sortable-drag-list">
-
-        {foreach from=$menuorder item=v key=k}
-            <li id="order-{if $v.type=='group'}group{else}char{/if}-{$v.id}" class="ui-state-default">{if $v.type=='group'}[ {/if}{if $v.short_label}{$v.short_label}{else}{$v.label}{/if}{if $v.type=='group'} ]{/if}</li>
-        {/foreach}
-
-        </ul>
-	
-	</div>
-
-	<div style="clear:both;border-bottom:1px dotted #ddd;width:500px;margin-bottom:10px"></div>
-
-    
     <form id="theForm" method="post">
-	new group: <input type="text" name="new" />
+	Create new group: <input type="text" name="new" />
     <p>
 	    <input type="button" value="save" onclick="matrixSaveCharGroupOrder()"/>
     </p>
     </form>
+
+    <a href="char_groups_sort.php">Change the display order of groups</a>
     
     </div>
 

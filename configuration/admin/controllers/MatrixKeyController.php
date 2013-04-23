@@ -272,11 +272,11 @@ class MatrixKeyController extends Controller
         
         $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['matrix']));
 
-
         if ($this->rHasVal('delete') && !$this->isFormResubmit()) {
 			
 			$this->deleteCharacteristicFromGroup(array('groupId'=>$this->requestData['delete']));
 			$this->deleteCharacterGroup(array('groupId'=>$this->requestData['delete']));
+			$this->deleteGUIMenuOrder();
 			
 		}
 
@@ -292,6 +292,8 @@ class MatrixKeyController extends Controller
 				$this->saveCharacteristicToGroup(array('charId'=>$val[0],'groupId'=>$val[1],'showOrder'=>$key));
 
 			}
+
+			$this->deleteGUIMenuOrder();
 			
 		}
 		        
@@ -309,7 +311,36 @@ class MatrixKeyController extends Controller
 				
 			}
 			
+			$this->deleteGUIMenuOrder();
+			
 		}
+
+		$g = $this->getCharacterGroups();
+		$c = $this->getCharactersNotInGroups();
+
+		$this->smarty->assign('groups', $g);
+
+        $this->smarty->assign('characteristics', $c);
+
+        $this->smarty->assign('matrix', $matrix);
+        
+        $this->printPage();
+    }
+
+
+    public function charGroupsSortAction ()
+    {
+        $this->checkAuthorisation();
+        
+        if (!$this->_useCharacterGroups)
+            redirect('edit.php');
+        
+        if ($this->getCurrentMatrixId() == null)
+            $this->redirect('matrices.php');
+        
+        $matrix = $this->getMatrix($this->getCurrentMatrixId());
+        
+        $this->setPageName(sprintf($this->translate('Editing matrix "%s"'), $matrix['matrix']));
 
 		if ($this->rHasVal('order') && !$this->isFormResubmit()) {
 
@@ -334,10 +365,6 @@ class MatrixKeyController extends Controller
 		$m = $this->getGUIMenuOrder();
 
 		$m = $this->effectuateGUIMenuOrder(array('groups'=>$g,'characters'=>$c,'menu'=>$m,));
-
-		$this->smarty->assign('groups', $g);
-
-        $this->smarty->assign('characteristics', $c);
 
         $this->smarty->assign('menuorder', $m);
        
@@ -1499,9 +1526,6 @@ class MatrixKeyController extends Controller
         
         if (!isset($data['label']) || empty($data['label'])) {
             // each state has a name, regardless of type
-            
-
-
 
             $this->addError($this->translate('A name is required.'));
             
@@ -1945,8 +1969,6 @@ class MatrixKeyController extends Controller
         ));
     }
 
-
-
     private function deleteLinks ($params = null)
     {
         if (isset($params['id']))
@@ -1969,8 +1991,6 @@ class MatrixKeyController extends Controller
         
         $this->models->MatrixTaxonState->delete($d);
     }
-
-
 
     private function getLinks ($params = null)
     {
@@ -2547,12 +2567,15 @@ class MatrixKeyController extends Controller
 		$c = isset($p['characters']) ? $p['characters'] : null;
 		$m = isset($p['menu']) ? $p['menu'] : null;
 
-		if (is_null($g) || is_null($c))
+		if (is_null($g) && is_null($c))
 			return;
-			
+
 		$d = array();
 		
 		foreach((array)$m as $val) {
+			if ($val['ref_id']==0)
+				continue;
+
 			if ($val['ref_type']=='group') {
 				$d[] = $g[$val['ref_id']];
 				unset($g[$val['ref_id']]);
@@ -2561,7 +2584,7 @@ class MatrixKeyController extends Controller
 				unset($c[$val['ref_id']]);
 			}
 		}
-	
+
 		// appand the items for some reason missing from the menu-order
 		foreach((array)$c as $val)
 			$d[] = $val;

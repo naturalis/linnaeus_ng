@@ -21,6 +21,7 @@ var nbcLabelDetails = '';
 var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
+var baseUrlProjectImages = null;
 
 function nbcGetResults(p) {
 
@@ -218,7 +219,13 @@ function nbcFormatResult(data) {
 		}
 		
 	}
-	
+
+	if (!data.m.match(/^(http:\/\/|https:\/\/)/i)) {
+		
+		data.m = baseUrlProjectImages + data.m;
+		
+	}
+
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
