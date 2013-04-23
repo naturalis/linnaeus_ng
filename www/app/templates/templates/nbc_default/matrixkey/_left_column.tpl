@@ -16,7 +16,8 @@
             <h2>{t}Zoek op kenmerken{/t}</h2>
             <span id="facet-categories-menu">
                 <ul>
-                {foreach from=$groups item=v}
+                {*foreach from=$groups item=v*}
+                {foreach from=$guiMenu item=v}
                     {assign var=openGroup value=false}
                     <li id="character-item-{$v.id}" class="closed"><a href="#" onclick="nbcToggleGroup({$v.id});return false;">{$v.label|strtolower|ucfirst}</a></li>
                     <ul id="character-group-{$v.id}" class="hidden">

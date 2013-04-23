@@ -428,6 +428,15 @@ class MatrixKeyController extends Controller
 				'states' => $states
 			));
 
+			$GUIMenu = $this->getGUIMenu(
+				array(
+					'groups' => $this->getCharacterGroups(),
+					'characters' => $this->getCharacteristics(),
+					'appendExcluded' => false,
+					'checkImages' => true
+				)
+			);
+
 
 			$result = 
 				json_encode(
@@ -438,7 +447,7 @@ class MatrixKeyController extends Controller
 							'results' => count((array)$results)
 						),
 						'menu' => array(
-							'groups' => $this->getCharacterGroups(),
+							'groups' => $GUIMenu,
 							'activeChars' => $d,
 							'storedStates' => $this->stateMemoryRecall()
 						),
