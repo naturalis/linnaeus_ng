@@ -783,7 +783,9 @@ class ProjectsController extends Controller
 			$this->emptyCacheFolder();
 			
 			$this->addMessage('Cleared project cache.');
-			
+
+	        $this->smarty->assign('cleared', true);
+
         }
 		
         $this->printPage();
