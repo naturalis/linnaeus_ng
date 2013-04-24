@@ -174,41 +174,50 @@ class FileUploadHelper
         
                             if ($zip->open($file['tmp_name']) === true) {
 								
-                                $zip->extractTo($d);
+                                if ($zip->extractTo($d)) {
         
-                                $zip->close();
-                                
-                                $iterator = new DirectoryIterator($d);
+									$zip->close();
+									
+									$iterator = new DirectoryIterator($d);
+			
+									// iterate through extracted fild and see whether files are allowed
+									while($iterator->valid()) {
+			
+										$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
+			
+										if ($dmtu) $this->_result[] = $dmtu;
+			
+										$iterator->next();
+			
+									}
+			
+									// delete all remaining files in the temp upload dir
+									$iterator->rewind();
+			
+									while($iterator->valid()) {
+			
+										if ($iterator->getType()=='file')
+											unlink($d.$iterator->getFilename());
+			
+										$iterator->next();
+			
+									}
+			
+									// as well as the temp dir itself
+									$this->rmDirAndFiles($d);
+									
+								} else {
+
+	                                $this->addError(_('Could not extract files. ('.$zip->getStatusString().')'));
+									 
+									$zip->close();
+
+								}
         
-                                // iterate through extracted fild and see whether files are allowed
-                                while($iterator->valid()) {
-        
-                                    $dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
-        
-                                    if ($dmtu) $this->_result[] = $dmtu;
-        
-                                    $iterator->next();
-        
-                                }
-        
-                                // delete all remaining files in the temp upload dir
-                                $iterator->rewind();
-        
-                                while($iterator->valid()) {
-        
-                                    if ($iterator->getType()=='file')
-                                        unlink($d.$iterator->getFilename());
-        
-                                    $iterator->next();
-        
-                                }
-        
-                                // as well as the temp dir itself
-                                $this->rmDirAndFiles($d);
-        
+		
                             } else {
 
-                                $this->addError(_('Could not extract files from archive.'));
+                                $this->addError(_('Could not open archive. ('.$zip->getStatusString().')'));
         
                             }
         
