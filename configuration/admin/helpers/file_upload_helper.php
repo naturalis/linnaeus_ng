@@ -243,7 +243,7 @@ class FileUploadHelper
             $finfo = finfo_open(FILEINFO_MIME);
             $mimetype = finfo_file($finfo, $tmpFileName!==false ? $tmpFileName : $filename);
             finfo_close($finfo);
-            
+var_dump($mimetype);
             $result = $mimetype;
 
         } else {
