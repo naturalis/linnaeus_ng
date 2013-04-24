@@ -245,11 +245,10 @@ class FileUploadHelper
             finfo_close($finfo);
 
             $result = $mimetype;
-echo '1';
         }
 		
 		if (!function_exists('finfo_open') || strpos($result,'application/octet-stream')===0) {
-echo '2';
+
 	        $ext = strtolower(array_pop(explode('.', $filename)));
 
 			if (array_key_exists($ext, $this->_mime_types)) {
