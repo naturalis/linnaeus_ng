@@ -251,7 +251,7 @@ class FileUploadHelper
 		if (!function_exists('finfo_open') || $result =='application/octet-stream') {
 
 	        $ext = strtolower(array_pop(explode('.', $filename)));
-
+var_dump($ext);
 			if (array_key_exists($ext, $this->_mime_types)) {
 
         	    $result = $this->_mime_types[$ext];
