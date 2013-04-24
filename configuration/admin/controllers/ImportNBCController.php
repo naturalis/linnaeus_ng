@@ -451,6 +451,8 @@ class ImportNBCController extends Controller
 			die();
 		}
 
+        $this->setPageName($this->translate('Import finished'));
+
 		if (!$_SESSION['admin']['system']['import']['projectExists']) {
 
 
@@ -831,6 +833,31 @@ class ImportNBCController extends Controller
     private function getDataFromFile ($file)
     {
 
+		// counting possible field separators to find the (very likely) one in this particular flavour of CSV
+		$buffer = file_get_contents($file);
+		
+		$separators = 
+			array(
+				'tab' => array('count'=>0,'str'=>chr(9)),
+				'comma' => array('count'=>0,'str'=>','),
+				'semicolon' => array('count'=>0,'str'=>';')
+			);
+		
+		foreach($separators as $key => $val)
+			$separators[$key]['count'] = substr_count($buffer,$val['str']);
+
+		$prev = -1;
+
+		foreach($separators as $key => $val) {
+
+			if ($val['count']>$prev) {
+				$prev = $val['count'];
+				$this->_delimiter = $val['str'];
+
+			}
+
+		}
+		
         $raw = array();
 
         if (($handle = fopen($file, "r")) !== FALSE) {
@@ -869,7 +896,7 @@ class ImportNBCController extends Controller
         $data = array();
         
         foreach ((array) $raw as $line => $val) {
-            
+ 
 			$d = $val;
 			unset($d[0]);
             $lineHasData = strlen(implode('', $d)) > 0;
@@ -986,33 +1013,47 @@ class ImportNBCController extends Controller
 					'sci name'-column empty, but we are going to need it, so assumptions are made.
 				*/
 				if (isset($data['species']) && isset ($data['species'][$line]) && empty($data['species'][$line]['naam SCI'])) {
+				
+					if (!isset($data['species'][$line]['label'])) {
 
-					$data['species'][$line]['naam SCI'] = $data['species'][$line]['label'];
+						$this->addError('Ignoring line '.($line+1).': lacks value for \'title\'.<br />("'.implode(',', $val).'")');
+
+						unset($data['species'][$line]);
+
+					} else {
+
+						$data['species'][$line]['naam SCI'] = $data['species'][$line]['label'];
+
+					}
 					
 				}
             }
         }
 
-		foreach((array)$data['characters'] as $cKey => $cVal) {
+		if (isset($data['characters'])) {
 
-			$unused = true;
-			
-			foreach((array)$data['species'] as $sKey => $sVal) {
-
-				if (!empty($sVal['states'][$cKey])) {
-
-					$unused = false;
+			foreach((array)$data['characters'] as $cKey => $cVal) {
+	
+				$unused = true;
 				
+				foreach((array)$data['species'] as $sKey => $sVal) {
+	
+					if (!empty($sVal['states'][$cKey])) {
+	
+						$unused = false;
+					
+					}
+					
 				}
 				
+				if ($unused)
+					unset($data['characters'][$cKey]);
+	
 			}
+	
+			ksort($data['characters']);
 			
-			if ($unused)
-				unset($data['characters'][$cKey]);
-
 		}
-
-		ksort($data['characters']);
 
         return $data;
     }
