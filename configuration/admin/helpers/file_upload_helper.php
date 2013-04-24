@@ -245,13 +245,14 @@ class FileUploadHelper
             finfo_close($finfo);
 
             $result = $mimetype;
+var_dump($result);
+
         }
 		
 		if (!function_exists('finfo_open') || strpos($result,'application/octet-stream')===0) {
 
 	        $ext = strtolower(array_pop(explode('.', $filename)));
-var_dump($ext);
-var_dump($this->_mime_types);
+
 			if (array_key_exists($ext, $this->_mime_types)) {
 
         	    $result = $this->_mime_types[$ext];
