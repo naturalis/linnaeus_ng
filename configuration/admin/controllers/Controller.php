@@ -1421,7 +1421,7 @@ class Controller extends BaseClass
      */
     public function getUploadedMediaFiles ($p=null)
     {
-		
+		q(sys_get_temp_dir(),1);
 		$allowedFormats = isset($p['allowedFormats']) ? $p['allowedFormats'] : $this->controllerSettings['media']['allowedFormats'];
 		$storageDir = isset($p['storageDir']) ? $p['storageDir'] : $this->getProjectsMediaStorageDir();
 		$overwrite = isset($p['overwrite']) ? $p['overwrite'] : 'rename';
