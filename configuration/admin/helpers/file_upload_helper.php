@@ -243,10 +243,12 @@ class FileUploadHelper
             $finfo = finfo_open(FILEINFO_MIME);
             $mimetype = finfo_file($finfo, $tmpFileName!==false ? $tmpFileName : $filename);
             finfo_close($finfo);
-var_dump($mimetype);
+
             $result = $mimetype;
 
-        } else {
+        }
+		
+		if (function_exists('finfo_open') || $result =='application/octet-stream') {
 
 	        $ext = strtolower(array_pop(explode('.', $filename)));
 
