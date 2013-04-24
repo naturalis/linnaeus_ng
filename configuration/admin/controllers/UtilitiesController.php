@@ -138,7 +138,7 @@ class UtilitiesController extends Controller
 	
 	public function massUploadAction()
 	{
-
+phpinfo();
         $this->checkAuthorisation();
 		
 		$this->setPageName('Mass upload');
