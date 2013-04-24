@@ -248,7 +248,7 @@ class FileUploadHelper
 
         }
 		
-		if (function_exists('finfo_open') || $result =='application/octet-stream') {
+		if (!function_exists('finfo_open') || $result =='application/octet-stream') {
 
 	        $ext = strtolower(array_pop(explode('.', $filename)));
 
