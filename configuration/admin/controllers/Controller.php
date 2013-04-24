@@ -1422,8 +1422,6 @@ class Controller extends BaseClass
     public function getUploadedMediaFiles ($p=null)
     {
 
-
-
 		$allowedFormats = isset($p['allowedFormats']) ? $p['allowedFormats'] : $this->controllerSettings['media']['allowedFormats'];
 		$storageDir = isset($p['storageDir']) ? $p['storageDir'] : $this->getProjectsMediaStorageDir();
 		$overwrite = isset($p['overwrite']) ? $p['overwrite'] : 'rename';
@@ -3025,7 +3023,7 @@ class Controller extends BaseClass
                 }
             }
         }
-        
+
         foreach ((array) $_FILES as $key => $val) {
             
             if (isset($val['size']) && $val['size'] > 0) {

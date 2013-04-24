@@ -37,6 +37,9 @@ How to handle files that already exist:<br />
 
 <div class="page-generic-div">
 <p>
+</p>
+Current server-limited maximum on file uploads: {$iniSettings.maximum}MB
+<p>
 <b>{t}Allowed MIME-types{/t}</b><br />
 {t}Files of the following MIME-types are allowed:{/t}<ul>
 {section name=i loop=$allowedFormats}
