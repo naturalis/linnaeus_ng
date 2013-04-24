@@ -22,7 +22,7 @@ function getData(action,id,postFunction) {
 			'time' : getTimestamp()
 		}),
 		success : function (data) {
-			console.log(data);
+			//console.log(data);
 			obj = $.parseJSON(data);
 			if (postFunction) eval(postFunction+'(obj,id)');
 		}
