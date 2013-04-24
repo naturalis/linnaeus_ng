@@ -160,6 +160,59 @@ class FileUploadHelper
                     $this->addError(_('No temporary directory specified (required for deflating archive).'));
 
                 } else {
+var_dump(PHP_OS);
+//WINNT
+                    if ($mt == 'application/zip') {
+
+						$d = $this->createTemporaryUploadDir();
+$this->addError('Trying method phardata');						
+try {
+    $phar = new PharData($file['tmp_name']);
+    $phar->extractTo($d); // extract all files
+	
+
+		$iterator = new DirectoryIterator($d);
+
+		// iterate through extracted fild and see whether files are allowed
+		while($iterator->valid()) {
+
+			$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
+
+			if ($dmtu) $this->_result[] = $dmtu;
+
+			$iterator->next();
+
+		}
+
+		// delete all remaining files in the temp upload dir
+		$iterator->rewind();
+
+		while($iterator->valid()) {
+
+			if ($iterator->getType()=='file')
+				unlink($d.$iterator->getFilename());
+
+			$iterator->next();
+
+		}
+
+		// as well as the temp dir itself
+		$this->rmDirAndFiles($d);
+			
+} catch (Exception $e) {
+	var_dump($e);
+    // handle errors
+}						
+						
+
+
+						
+
+					}
+
+
+
+
 
                     if ($mt == 'XXXapplication/zip') {
                     // zip file
@@ -167,7 +220,7 @@ class FileUploadHelper
 $this->addError('Using zip_open');
                     
                         // create temp upload dir
-                        $d = $this->createTemporaryUploadDir();
+                        
                         
                         if ($d) {
 
@@ -245,7 +298,7 @@ $this->addError('Using zip_open');
                         }
         
                     } else
-                    if ($mt == 'application/zip') {
+                    if ($mt == 'YYYapplication/zip') {
 
 $this->addError('Using commandline');
 
@@ -282,7 +335,7 @@ $this->addError('Using commandline');
 									$this->rmDirAndFiles($d);
 						
 					} else
-                    if ($mt == 'application/zip') {
+                    if ($mt == 'ZZZapplication/zip') {
                     // zip file
                     
                         // create temp upload dir
