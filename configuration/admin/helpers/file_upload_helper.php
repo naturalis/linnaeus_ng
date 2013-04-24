@@ -168,7 +168,7 @@ class FileUploadHelper
 
 						if (PHP_OS=='Linux') {
 
-							system('unzip '.$file['tmp_name'].' -d '.$d);
+							exec('unzip '.$file['tmp_name'].' -d '.$d);
 
 						} else {
 
