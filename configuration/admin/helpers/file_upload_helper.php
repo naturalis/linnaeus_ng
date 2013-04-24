@@ -277,7 +277,7 @@ class FileUploadHelper
     {
 
         $d =  $this->_tempDir.substr(md5(uniqid(rand(), true)), 0, 8).'/';
-        
+		
         if (mkdir($d)) {
         
             return $d;
