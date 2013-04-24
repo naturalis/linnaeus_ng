@@ -245,7 +245,6 @@ class FileUploadHelper
             finfo_close($finfo);
 
             $result = $mimetype;
-var_dump($result);
 
         }
 		
