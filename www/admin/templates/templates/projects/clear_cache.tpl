@@ -2,7 +2,7 @@
 {include file="../shared/admin-messages.tpl"}
 
 <div id="page-main">
-{if $cleared}
+{if !$cleared}
 <p>
 Click button to clear all runtime caches for this project.
 <form method="post" name="theForm">
@@ -12,6 +12,6 @@ Click button to clear all runtime caches for this project.
 </form>
 </p>
 {/if}
-<a href="../users/choose_project.php">Back</a>
+<a href="../../admin-index.php">Back</a>
 </div>
 {include file="../shared/admin-footer.tpl"}
