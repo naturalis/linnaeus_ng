@@ -160,248 +160,72 @@ class FileUploadHelper
                     $this->addError(_('No temporary directory specified (required for deflating archive).'));
 
                 } else {
-var_dump(PHP_OS);
-//WINNT
+
+
                     if ($mt == 'application/zip') {
 
 						$d = $this->createTemporaryUploadDir();
-$this->addError('Trying method phardata');						
-try {
-    $phar = new PharData($file['tmp_name']);
-    $phar->extractTo($d); // extract all files
-	
 
-		$iterator = new DirectoryIterator($d);
+						if (PHP_OS=='Linux') {
 
-		// iterate through extracted fild and see whether files are allowed
-		while($iterator->valid()) {
+							system('unzip '.$file['tmp_name'].' -d '.$d);
 
-			$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
+						} else {
 
-			if ($dmtu) $this->_result[] = $dmtu;
+							try {
 
-			$iterator->next();
+								$phar = new PharData($file['tmp_name']);
+								$phar->extractTo($d); // extract all files
+							
+							} catch (Exception $e) {
 
-		}
+								$this->addError($e->getMessage());
 
-		// delete all remaining files in the temp upload dir
-		$iterator->rewind();
+								$this->addError('Failed PharData, attempting ZipArchive-method...');
 
-		while($iterator->valid()) {
-
-			if ($iterator->getType()=='file')
-				unlink($d.$iterator->getFilename());
-
-			$iterator->next();
-
-		}
-
-		// as well as the temp dir itself
-		$this->rmDirAndFiles($d);
+								// extract all the files
+								$zip = new ZipArchive;
 			
-} catch (Exception $e) {
-	var_dump($e);
-    // handle errors
-}						
+								if ($zip->open($file['tmp_name'])===true) {
+									if ($zip->extractTo($d)) {
+										$zip->close();
+									} else {
+										$this->addError(_('Could not extract files ('.$zip->getStatusString().').'));
+										$zip->close();
+									}
+								} else {
+									$this->addError('Cannot open zip-file');
+								}
+
+							}
+
+						}
+
+
+						$iterator = new DirectoryIterator($d);
 						
-
-
+						// iterate through extracted fild and see whether files are allowed
+						while($iterator->valid()) {
+							$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
+							if ($dmtu) 
+								$this->_result[] = $dmtu;
+							$iterator->next();
+						}
+						
+						// delete all remaining files in the temp upload dir
+						$iterator->rewind();
+						
+						while($iterator->valid()) {
+							if ($iterator->getType()=='file')
+								unlink($d.$iterator->getFilename());
+							$iterator->next();
+						}
+						
+						// as well as the temp dir itself
+						$this->rmDirAndFiles($d);
 						
 
 					}
-
-
-
-
-
-                    if ($mt == 'XXXapplication/zip') {
-                    // zip file
-
-$this->addError('Using zip_open');
-                    
-                        // create temp upload dir
-                        
-                        
-                        if ($d) {
-
-	// extract all the files
-	$zip = zip_open($file['tmp_name']);
-        
-	if ($zip) {
-
-	    while ($zip_entry = zip_read($zip)) {
-        echo "Name:               " . zip_entry_name($zip_entry) . "\n";
-        echo "Actual Filesize:    " . zip_entry_filesize($zip_entry) . "\n";
-        echo "Compressed Size:    " . zip_entry_compressedsize($zip_entry) . "\n";
-        echo "Compression Method: " . zip_entry_compressionmethod($zip_entry) . "\n";
-
-	        if (zip_entry_open($zip, $zip_entry, "r")) {
-				echo zip_entry_name($zip_entry).'<br />';
-//        	    echo "File Contents:\n";
-  //  	        $buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-	//            echo "$buf\n";
-
-        	    zip_entry_close($zip_entry);
-    	    } else {
-
-	                                $this->addError(_('Could not extract file '.zip_entry_name($zip_entry)));
-									 
-									$zip->close();
-
-								}
-    	}                            
-
-		$iterator = new DirectoryIterator($d);
-
-		// iterate through extracted fild and see whether files are allowed
-		while($iterator->valid()) {
-
-			$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
-
-			if ($dmtu) $this->_result[] = $dmtu;
-
-			$iterator->next();
-
-		}
-
-		// delete all remaining files in the temp upload dir
-		$iterator->rewind();
-
-		while($iterator->valid()) {
-
-			if ($iterator->getType()=='file')
-				unlink($d.$iterator->getFilename());
-
-			$iterator->next();
-
-		}
-
-		// as well as the temp dir itself
-		$this->rmDirAndFiles($d);
-
-	} else {
-	
-		$this->addError(_('Could not open archive ('.$zip->getStatusString().').'));
-	
-	}
-	
-	       
-								
-        
-		
-
-        
-                        } else {
-        
-                            $this->addError(_('Could not create temporary directory in '.$this->_tempDir));
-        
-                        }
-        
-                    } else
-                    if ($mt == 'YYYapplication/zip') {
-
-$this->addError('Using commandline');
-
-						$d = $this->createTemporaryUploadDir();
-						echo 'unzip '.$file['tmp_name'].' -d '.$d;
-							echo system('unzip '.$file['tmp_name'].' -d '.$d);
-
-									$iterator = new DirectoryIterator($d);
-			
-									// iterate through extracted fild and see whether files are allowed
-									while($iterator->valid()) {
-			
-										$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
-			
-										if ($dmtu) $this->_result[] = $dmtu;
-			
-										$iterator->next();
-			
-									}
-			
-									// delete all remaining files in the temp upload dir
-									$iterator->rewind();
-			
-									while($iterator->valid()) {
-			
-										if ($iterator->getType()=='file')
-											unlink($d.$iterator->getFilename());
-			
-										$iterator->next();
-			
-									}
-			
-									// as well as the temp dir itself
-									$this->rmDirAndFiles($d);
-						
-					} else
-                    if ($mt == 'ZZZapplication/zip') {
-                    // zip file
-                    
-                        // create temp upload dir
-                        $d = $this->createTemporaryUploadDir();
-                        
-                        if ($d) {
-        
-                            // extract all the files
-                            $zip = new ZipArchive;
-        
-                            if ($zip->open($file['tmp_name']) === true) {
-								
-                                if ($zip->extractTo($d)) {
-        
-									$zip->close();
-									
-									$iterator = new DirectoryIterator($d);
-			
-									// iterate through extracted fild and see whether files are allowed
-									while($iterator->valid()) {
-			
-										$dmtu = $this->doFileUpload($d.$iterator->getFilename(),$iterator->getFilename());
-			
-										if ($dmtu) $this->_result[] = $dmtu;
-			
-										$iterator->next();
-			
-									}
-			
-									// delete all remaining files in the temp upload dir
-									$iterator->rewind();
-			
-									while($iterator->valid()) {
-			
-										if ($iterator->getType()=='file')
-											unlink($d.$iterator->getFilename());
-			
-										$iterator->next();
-			
-									}
-			
-									// as well as the temp dir itself
-									$this->rmDirAndFiles($d);
-									
-								} else {
-
-	                                $this->addError(_('Could not extract files ('.$zip->getStatusString().').'));
-									 
-									$zip->close();
-
-								}
-        
-		
-                            } else {
-
-                                $this->addError(_('Could not open archive ('.$zip->getStatusString().').'));
-        
-                            }
-        
-                        } else {
-        
-                            $this->addError(_('Could not create temporary directory in '.$this->_tempDir));
-        
-                        }
-        
-                    }
 
                 }
             
