@@ -1431,7 +1431,7 @@ class Controller extends BaseClass
         if (isset($this->helpers->FileUploadHelper) && isset($allowedFormats) && isset($this->requestDataFiles)) {
             
             $this->helpers->FileUploadHelper->setLegalMimeTypes($allowedFormats);
-            $this->helpers->FileUploadHelper->setTempDir(trim(sys_get_temp_dir(),'/').'/');
+            $this->helpers->FileUploadHelper->setTempDir(rtrim(sys_get_temp_dir(),'/').'/');
             $this->helpers->FileUploadHelper->setStorageDir($storageDir);
             $this->helpers->FileUploadHelper->setOverwrite($overwrite);
             $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
