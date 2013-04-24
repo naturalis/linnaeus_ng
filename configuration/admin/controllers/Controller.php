@@ -1421,7 +1421,9 @@ class Controller extends BaseClass
      */
     public function getUploadedMediaFiles ($p=null)
     {
-		die(sys_get_temp_dir());
+
+
+
 		$allowedFormats = isset($p['allowedFormats']) ? $p['allowedFormats'] : $this->controllerSettings['media']['allowedFormats'];
 		$storageDir = isset($p['storageDir']) ? $p['storageDir'] : $this->getProjectsMediaStorageDir();
 		$overwrite = isset($p['overwrite']) ? $p['overwrite'] : 'rename';
@@ -1429,7 +1431,7 @@ class Controller extends BaseClass
         if (isset($this->helpers->FileUploadHelper) && isset($allowedFormats) && isset($this->requestDataFiles)) {
             
             $this->helpers->FileUploadHelper->setLegalMimeTypes($allowedFormats);
-            $this->helpers->FileUploadHelper->setTempDir('/tmp/');
+            $this->helpers->FileUploadHelper->setTempDir(trim(sys_get_temp_dir(),'/').'/');
             $this->helpers->FileUploadHelper->setStorageDir($storageDir);
             $this->helpers->FileUploadHelper->setOverwrite($overwrite);
             $this->helpers->FileUploadHelper->handleTaxonMediaUpload($this->requestDataFiles);
