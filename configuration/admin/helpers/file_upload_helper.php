@@ -173,7 +173,7 @@ class FileUploadHelper
                             $zip = new ZipArchive;
         
                             if ($zip->open($file['tmp_name']) === true) {
-        
+								
                                 $zip->extractTo($d);
         
                                 $zip->close();
@@ -207,7 +207,7 @@ class FileUploadHelper
                                 $this->rmDirAndFiles($d);
         
                             } else {
-        
+
                                 $this->addError(_('Could not extract files from archive.'));
         
                             }
