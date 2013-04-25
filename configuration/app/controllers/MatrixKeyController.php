@@ -170,14 +170,30 @@ class MatrixKeyController extends Controller
 			
 			$groups = $this->getCharacterGroups();
 
+			$d = array();
+
+            foreach ((array) $states as $val)
+                $d[$val['characteristic_id']] = true;
+
+//			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
+
+			$countPerState = $this->getRemainingStateCount(array(
+				'states' => $states
+			));
+
             $this->smarty->assign('taxaJSON', json_encode(
             array(
                 'results' => $taxa, 
 				'paramCount' => count((array)$states),
                 'count' => array(
-                    'results' => count((array) $taxa), 
-                    'all' => $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']
-                )
+                    'results' => count((array) $taxa),
+                ),
+				'menu' => array(
+					'groups' => $groups,
+					'activeChars' => $d,
+					'storedStates' => $states
+				),
+				'countPerState' => $countPerState
             ),JSON_HEX_APOS | JSON_HEX_QUOT));
 
             foreach ((array) $states as $val)
@@ -198,7 +214,8 @@ class MatrixKeyController extends Controller
 					)
 				)
 			);
-		
+			
+						
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
@@ -218,6 +235,7 @@ class MatrixKeyController extends Controller
 					'url' => $this->getSetting('source_url')
 				)
 			);
+
 			
         }
         else {

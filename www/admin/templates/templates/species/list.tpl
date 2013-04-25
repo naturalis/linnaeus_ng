@@ -14,7 +14,9 @@
 {if $isHigherTaxa}
 	{t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
 {/if}
-{t}You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows.{/t}
+{* t}You can change the order of presentation of taxa on the same level - such as two genera - by moving taxa up- or downward by clicking the arrows.{/t *}
+
+<!-- a href="list.php?sort=alpha">Sort alphabetically</a -->
 
 <br/>
 	<span id="message-container" style="margin-left:175px">&nbsp;</span>
@@ -30,7 +32,7 @@
 		<th style="width:60px;">{t}Literature{/t}</th>
 		<th style="width:60px;">{t}Synonyms{/t}</th>
 		<th style="width:90px;">{t}Common names{/t}</th>
-		<th style="width:40px;text-align:center">{t}Move{/t}</th>
+		<!-- th style="width:40px;text-align:center">{t}Move{/t}</th -->
 		<th style="width:20px;text-align:center">{t}Delete{/t}</th>
 		<th>{t}Is being edited by:{/t}</th>
 	</tr>
@@ -82,7 +84,7 @@
 				<span class="a" onclick="window.open('common.php?id={$t}','_self');">{$taxon.commonnameCount} {if $taxon.commonnameCount==1}{t}name{/t}{else}{t}names{/t}{/if}</span>
 			</td>
 	
-			<td style="text-align:center">
+			<!-- td style="text-align:center">
 			{if $arrowBuffer}&nbsp;&nbsp;{/if}
 			{if $taxon.sibling_count>1}
 				{if $taxon.sibling_pos=='last'}
@@ -102,7 +104,7 @@
 				{/if}
 			{/if}
 			{if !$arrowBuffer}&nbsp;&nbsp;{/if}
-			</td>
+			</td -->
 			<td
 				class="a" 
 				style="text-align:center" 

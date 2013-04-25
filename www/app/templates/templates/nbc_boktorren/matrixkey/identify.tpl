@@ -59,6 +59,7 @@ try {{/literal}
 	nbcDoResults({literal}{resetStart:false}{/literal});
 	nbcDoOverhead();
 	nbcDoPaging();
+	nbcRefreshGroupMenu();
 {literal}} catch(err){
 	nbcGetResults();
 }

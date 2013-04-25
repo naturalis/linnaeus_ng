@@ -201,7 +201,6 @@ class SpeciesController extends Controller
     }
 
 
-
     public function manageAction ()
     {
         
@@ -218,232 +217,6 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function knurft($pId=null,$level=0)
-    {
-	 
-		$id['project_id'] = $this->getCurrentProjectId();
-
-        if ($pId === null)
-			$id['parent_id is'] = $pId;
-        else
-            $id['parent_id'] = $pId;
- 
-        $t = $this->models->Taxon->_get(array(
-            'id' => $id,
-			'columns' => 'id,parent_id,taxon,author,rank_id'
-        ));
-		
-		foreach((array)$t as $key => $val) {
-			
-			$this->treeList[$val['id']] = $val;
-			$this->treeList[$val['id']]['level'] = $level;
-
-			$t[$key]['c'] = $this->knurft($val['id'],$level+1);
-
-		}
-	 
-	 	return $t;
-		
-		
-		die();
-	 
-	 
-	    
-        // the parent_id to start with
-        $pId = isset($params['pId']) ? $params['pId'] : null;
-        // the current level of depth in the tree
-        $level = isset($params['level']) ? $params['level'] : 0;
-        // a specific rank_id to stop the recursion; taxa below this rank are omitted from the tree
-        $stopAtRankId = isset($params['stopAtRankId']) ? $params['stopAtRankId'] : null;
-        // taxa without a parent_id that are not of the uppermost rank are orphans; these can be excluded from the tree
-        $includeOrphans = isset($params['includeOrphans']) ? $params['includeOrphans'] : true;
-        
-        // get all ranks defined within the project	
-        $pr = $this->getProjectRanks();
-        
-        // $this->treeList an additional non-recursive list of taxa
-        if ($level == 0)
-            unset($this->treeList);
-            
-        // setting the parameters for the taxon search
-        $id['project_id'] = $this->getCurrentProjectId();
-        
-        if ($pId === null) {
-            
-            $id['parent_id is'] = $pId;
-        }
-        else {
-            
-            $id['parent_id'] = $pId;
-        }
-        
-        // decide whether or not to include orphans, taxa with no parent_id that are not the topmost taxon (which is usually 'kingdom')
-        if ($pId === null && $includeOrphans === false) {
-            
-            $id['rank_id'] = $pr[0]['id'];
-        }
-        
-        // get the child taxa of the current parent
-        $t = $this->models->Taxon->_get(array(
-            'id' => $id, 
-            'order' => 'taxon_order'
-        ));
-        
-        foreach ((array) $t as $key => $val) {
-            
-            // for each taxon, look whether they a) belong to the lower taxa, and b) can be the endpoint of the key
-            foreach ((array) $pr as $rankkey => $rank) {
-                
-                if ($rank['id'] == $val['rank_id']) {
-                    
-                    $val['rank'] = $rank['rank'];
-                    
-                    $val['lower_taxon'] = $rank['lower_taxon'];
-                    
-                    $val['keypath_endpoint'] = $rank['keypath_endpoint'];
-                    
-                    $val['ideal_parent_id'] = $rank['ideal_parent_id'];
-                    
-                    break;
-                }
-            }
-            
-            // level is effectively the recursive depth of the taxon within the tree
-            $val['level'] = $level;
-            
-            // count taxa on the same level
-            $val['sibling_count'] = count((array) $t);
-            
-            // sibling_pos reflects the position amongst taxa on the same level
-            $val['sibling_pos'] = ($key == 0 ? 'first' : ($key == count((array) $t) - 1 ? 'last' : '-'));
-            
-            // fill the treelist (which is a global var)
-            $this->treeList[$val['id']] = $val;
-            
-            $t[$key]['level'] = $level;
-            
-            // and call the next recursion for each of the children
-            if (!isset($stopAtRankId) || (isset($stopAtRankId) && $stopAtRankId != $val['rank_id'])) {
-                
-                $children = $this->getTaxonTree(array(
-                    'pId' => $val['id'], 
-                    'level' => $level + 1, 
-                    'stopAtRankId' => $stopAtRankId
-                ));
-                
-                $t[$key]['child_count'] = $this->treeList[$val['id']]['child_count'] = isset($children) ? count((array) $children) : 0;
-                
-                $t[$key]['children'] = $children;
-            }
-        }
-        
-
-        return $t;
-    }
-
-
-
-    /**
-     * List existing taxa
-     *
-     * @access    public
-     */
-    public function listActionTEST ()
-    {
-        $this->checkAuthorisation();
-	
-		$this->knurft();
-		
-		$taxa = $this->treeList;
-		
-//		q($taxa,1);		
-		
-
-        $this->setPageName($this->translate('Taxon list'));
-        
-        unset($_SESSION['admin']['system']['activeTaxon']);
-        
-        if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
-            // moving branches up and down the stem
-
-            $this->clearCache($this->cacheFiles['list']);
-            
-            $this->moveIdInTaxonOrder($this->requestData['id'], $this->requestData['move']);
-            
-            if ($this->rHasVal('scroll'))
-                $this->smarty->assign('scroll', $this->requestData['scroll']);
-        }
-        /*
-        $taxa = $this->newGetUserAssignedTaxonTreeList(array(
-            'higherOnly' => $this->maskAsHigherTaxa(),
-			'forceLookup' => true
-        ));
-		*/
-        
-        if (isset($taxa) && count((array) $taxa) > 0) {
-            
-            $projectLanguages = $_SESSION['admin']['project']['languages'];
-            
-
-            $pageCount = $this->getPageTaxonCount();
-            
-            $contentCount = $this->getContentTaxaCount();
-            
-            $synonymsCount = $this->getSynonymCount();
-            
-            $commonnameCount = $this->getCommonnameCount();
-            
-            $mediaCount = $this->getMediaTaxonCount();
-            
-            $literatureCount = $this->getLiteratureTaxonCount();
-            
-            foreach ((array) $taxa as $key => $taxon) {
-                
-                $taxa[$key]['pctFinished'] = isset($contentCount[$taxon['id']]) ? round(((isset($contentCount[$taxon['id']]) ? $contentCount[$taxon['id']] : 0) / (count((array) $projectLanguages) * $pageCount)) * 100) : 0;
-                
-                $taxa[$key]['synonymCount'] = isset($synonymsCount[$taxon['id']]) ? $synonymsCount[$taxon['id']] : 0;
-                
-                $taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
-                
-                $taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
-                
-                $taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
-            }
-            
-            if (count((array) $taxa) == 0)
-                $this->addMessage($this->translate('There are no taxa for you to edit.'));
-
-                //if (true) {
-            if ($this->maskAsHigherTaxa()) {
-                
-                $ranks = $this->getProjectRanks(array(
-                    'includeLanguageLabels' => true, 
-                    'idsAsIndex' => true
-                ));
-                
-                if (isset($ranks))
-                    $this->smarty->assign('ranks', $ranks);
-            }
-			
-            if (isset($taxa))
-                $this->smarty->assign('taxa', $taxa);
-                
-                //$this->smarty->assign('sortBy', $sortBy);
-            
-
-
-
-            $this->smarty->assign('languages', $projectLanguages);
-        }
-        else {
-            
-            $this->addMessage($this->translate('No taxa have been assigned to you.'));
-        }
-        
-        $this->printPage();
-    }
-
     public function listAction ()
     {
         $this->checkAuthorisation();
@@ -452,6 +225,27 @@ class SpeciesController extends Controller
         
         unset($_SESSION['admin']['system']['activeTaxon']);
         
+        if ($this->rHasVal('sort','alpha') && !$this->isFormResubmit()) {
+			
+			$taxa = $this->newGetUserAssignedTaxonTreeList(array(
+				'higherOnly' => $this->maskAsHigherTaxa()
+			));			
+
+			uasort($taxa,function($a,$b){return strcmp($a['taxon'],$b['taxon']);});
+			
+			$i=0;
+			foreach((array)$taxa as $key => $val) {
+
+				$this->models->Taxon->update(array(
+					'taxon_order' => $i++
+				), array(
+					'id' => $key, 
+					'project_id' => $this->getCurrentProjectId()
+				));
+				
+			}
+			
+		} else
         if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
             // moving branches up and down the stem
 

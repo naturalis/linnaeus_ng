@@ -200,7 +200,7 @@ class IndexController extends Controller
         }
         
         $taxa = $this->buildTaxonTree();
-		
+q($taxa);	// where is 17736?	
 		$d = array();
 		
 		foreach((array)$taxa as $key => $val) {
@@ -217,7 +217,7 @@ class IndexController extends Controller
 		$names = $taxa = $d;
         
         $syn = $this->searchSynonyms();
-        
+q($names,1);      
         $taxa = array_merge((array) $taxa, (array) $syn);
         
         $this->customSortArray($taxa, array(
@@ -295,7 +295,9 @@ class IndexController extends Controller
             
             if (($d['lower_taxon'] == '0' && $this->getTaxonType() == 'higher') || ($d['lower_taxon'] == '1' && $this->getTaxonType() == 'lower')) {
                 
+                //$s[$key]['label'] = $this->formatSynonym($val['label']);
                 $s[$key]['label'] = $this->formatSynonym($val['label']);
+
             }
             else {
                 
