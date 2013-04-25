@@ -140,6 +140,7 @@ class SearchController extends Controller
 		if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
 
 		$this->smarty->assign('modules',$this->getProjectModules());
+		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 
         $this->printPage();
   
@@ -461,7 +462,7 @@ class SearchController extends Controller
     private function _searchAction ($search,$modules,$freeModules)
     {
 
-		if (strlen($search)>2) { 
+		if (strlen($search)>=$this->controllerSettings['minSearchLength']) { 
 		
 			if (
 				!isset($_SESSION['admin']['user']['search'][$search]) || 

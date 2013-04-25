@@ -48,6 +48,7 @@
 $(document).ready(function(){
 	searchReplaceValue = '{/literal}{$search.replacement|@escape}{literal}';
 	searchToggleReplace();
+	searchSetMinSearchLength({/literal}{$minSearchLength}{literal});
 });
 </script>
 {/literal}

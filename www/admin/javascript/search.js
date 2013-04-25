@@ -1,4 +1,9 @@
 var searchReplaceValue = null;
+var searchMinSearchLength = 3;
+
+function searchSetMinSearchLength(s) {
+	searchMinSearchLength = s;
+}
 
 function searchToggleReplace() {
 
@@ -37,9 +42,9 @@ function searchDoSearchForm() {
 		return false;
 
 	} else
-	if ($('#search').val().length<2) {
+	if ($('#search').val().length<searchMinSearchLength) {
 
-		alert(_('The search term needs to be at least three characters.'));
+		alert(_('The search term needs to be at least '+searchMinSearchLength+' characters.'));
 		$('#search').focus();
 		return false;
 
