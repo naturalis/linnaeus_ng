@@ -37,7 +37,7 @@ function searchDoSearchForm() {
 		return false;
 
 	} else
-	if ($('#search').val().length<3) {
+	if ($('#search').val().length<2) {
 
 		alert(_('The search term needs to be at least three characters.'));
 		$('#search').focus();
