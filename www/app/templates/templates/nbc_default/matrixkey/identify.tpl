@@ -53,11 +53,17 @@ if (typeof nbcInit=='function') {
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
 {if $taxaJSON}
-nbcData = $.parseJSON('{$taxaJSON}');
-nbcDoResults({literal}{resetStart:true}{/literal});
-nbcDoOverhead();
-nbcDoPaging();
-nbcRefreshGroupMenu();
+{literal}
+try {{/literal}
+	nbcData = $.parseJSON('{$taxaJSON}');
+	nbcDoResults({literal}{resetStart:false}{/literal});
+	nbcDoOverhead();
+	nbcDoPaging();
+	nbcRefreshGroupMenu();
+{literal}} catch(err){
+	nbcGetResults();
+}
+{/literal}
 {else}
 nbcGetResults();
 {/if}

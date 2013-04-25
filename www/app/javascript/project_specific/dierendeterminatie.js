@@ -583,7 +583,7 @@ function nbcShowStates(id) {
 }
 
 function nbcRefreshGroupMenu() {
-
+console.dir(nbcData);
 	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
 	
 }
