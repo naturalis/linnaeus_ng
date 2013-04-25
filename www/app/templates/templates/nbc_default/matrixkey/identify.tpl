@@ -52,23 +52,15 @@ if (typeof nbcInit=='function') {
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
-{* if $taxaJSON}
+{if $taxaJSON}
 nbcData = $.parseJSON('{$taxaJSON}');
 nbcDoResults({literal}{resetStart:true}{/literal});
 nbcDoOverhead();
 nbcDoPaging();
+nbcRefreshGroupMenu();
 {else}
 nbcGetResults();
-{/if *}
-
-nbcGetResults();
-
-
-
-
-
-
-
+{/if}
 {/if}
 
 {literal}
