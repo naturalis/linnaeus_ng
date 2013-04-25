@@ -294,6 +294,7 @@ class GlossaryController extends Controller
 			);	
 			
 			$gm[$key]['caption'] = isset($gmc[0]['caption']) ? $this->matchHotwords($gmc[0]['caption']) : null;
+			$gm[$key]['alt'] = $gmc[0]['caption'];
 
 			$t = isset($mimes[$val['mime_type']]) ?
 					$mimes[$val['mime_type']] :

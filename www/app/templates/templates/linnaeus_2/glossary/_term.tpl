@@ -36,13 +36,13 @@
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
-					alt="{$v.caption}" 
+					alt="{$v.alt}" 
 					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
 					class="image-thumb" />
 			{else}
 				<img
 					id="media-{$k}"
-					alt="{$v.caption}" 
+					alt="{$v.alt}" 
 					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
