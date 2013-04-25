@@ -1426,7 +1426,7 @@ function taxonChangeOverviewPicture(ele) {
 	var isChecked = ele.checked;
 	$('[id^=overview-]').attr('checked',false);
 	$(ele).attr('checked',isChecked);
-	
+
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
 		type: "POST",
@@ -1434,7 +1434,7 @@ function taxonChangeOverviewPicture(ele) {
 			'action' : 'set_overview' ,
 			'id' : ele.id.replace('overview-','') ,
 			'taxon_id' : $('#taxon_id').val() ,
-			'state' : isChecked,
+			'state' : isChecked ? '1' : '0',
 			'time' : allGetTimestamp()
 		}),
 		async: allAjaxAsynchMode,
