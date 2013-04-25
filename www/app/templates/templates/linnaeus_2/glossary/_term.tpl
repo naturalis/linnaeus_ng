@@ -30,7 +30,7 @@
 			<tr>
 		{/if}
 		<td class="media-cell">
-		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.description}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.alt}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
 		{if $v.category=='image'}
 			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
 			{if $v.thumb_name != ''}
