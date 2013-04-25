@@ -2145,7 +2145,8 @@ class SpeciesController extends Controller
         }
         else if ($this->requestData['action'] == 'set_overview') {
             
-            $this->setOverviewImageState($this->requestData['taxon_id'], $this->requestData['id'], $this->requestData['state']);
+			$r = $this->setOverviewImageState($this->requestData['taxon_id'], $this->requestData['id'], $this->requestData['state']);
+            $this->smarty->assign('returnText', $r ? '<ok>' : 'error' );
         }
         else if ($this->requestData['action'] == 'delete_variation') {
             
@@ -5022,9 +5023,9 @@ class SpeciesController extends Controller
             'project_id' => $this->getCurrentProjectId(), 
             'taxon_id' => $taxon
         ));
-        
-        if ($state == true) {
-            
+
+        if ($state==1) {
+
             return $this->models->MediaTaxon->update(array(
                 'overview_image' => 1
             ), array(
@@ -5033,10 +5034,9 @@ class SpeciesController extends Controller
                 'taxon_id' => $taxon
             ));
         }
-        else {
-            
-            return $mt;
-        }
+		
+		return true;		
+		
     }
 
 
