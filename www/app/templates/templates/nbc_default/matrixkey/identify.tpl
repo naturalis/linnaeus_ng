@@ -52,14 +52,29 @@ if (typeof nbcInit=='function') {
 {if $nbcSimilar}
 nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {else}
-{if $taxaJSON}
+{* if $taxaJSON}
 nbcData = $.parseJSON('{$taxaJSON}');
 nbcDoResults({literal}{resetStart:true}{/literal});
 nbcDoOverhead();
 nbcDoPaging();
 {else}
 nbcGetResults();
-{/if}
+{/if *}
+
+try {{/literal}
+	nbcData = $.parseJSON('{$taxaJSON}');
+	nbcDoResults({literal}{resetStart:false}{/literal});
+	nbcDoOverhead();
+	nbcDoPaging();
+{literal}} catch(err){
+	nbcGetResults();
+}
+
+
+
+
+
+
 {/if}
 
 {literal}
