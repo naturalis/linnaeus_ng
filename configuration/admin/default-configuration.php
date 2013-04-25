@@ -629,7 +629,8 @@ class configuration
 
 		return array(
 			'excerptLengthLeft' => 100,
-			'excerptLengthRight' => 100
+			'excerptLengthRight' => 100,
+			'minSearchLength' => 2
 		);
 
     }
