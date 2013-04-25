@@ -61,16 +61,8 @@ nbcDoPaging();
 nbcGetResults();
 {/if *}
 
-{literal}
-try {{/literal}
-	nbcData = $.parseJSON('{$taxaJSON}');
-	nbcDoResults({literal}{resetStart:false}{/literal});
-	nbcDoOverhead();
-	nbcDoPaging();
-{literal}} catch(err){
-	nbcGetResults();
-}
-{/literal}
+nbcGetResults();
+
 
 
 
