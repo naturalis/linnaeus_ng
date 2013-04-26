@@ -1,6 +1,6 @@
 <h1>{$headerTitles.title}</h1>
 <h2>{$headerTitles.subtitle}</h2> 
-
+{if $overviewImage}
 <div class="illustratie-wrapper">
     <div class="illustratie">
         <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage}" title="">
@@ -8,6 +8,7 @@
         </a>
     </div>
 </div>
+{/if}
 
 {foreach from=$content item=v key=k}{if $categoryList[$k]}
 <p>
