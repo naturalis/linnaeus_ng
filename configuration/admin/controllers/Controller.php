@@ -1196,6 +1196,7 @@ class Controller extends BaseClass
      */
     public function smartyTranslate ($params, $content, &$smarty, &$repeat)
     {
+		
         if (empty($content))
             return;
         
@@ -1775,32 +1776,39 @@ class Controller extends BaseClass
         return $pr;
     }
 
-
-
     public function newGetTaxonTree ($p = null)
     {
-        
-        if (!isset($_SESSION['admin']['user']['species']['tree']) || !isset($_SESSION['admin']['user']['species']['treeList']) || isset($p['forceLookup']) && $p['forceLookup'] === true) {
 
-            $_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
+		$d = $this->_newGetTaxonTree();
+		uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
+		return $d;
 
-            $_SESSION['admin']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
-
-        }
-        else if ($this->hasTableDataChanged('Taxon')) {
-            
-            $_SESSION['admin']['user']['species']['tree'] = $this->_newGetTaxonTree();
-            $_SESSION['admin']['user']['species']['treeList'] = isset($this->treeList) ? $this->treeList : null;
-        }
-        else {
-            
-            $this->treeList = $_SESSION['admin']['user']['species']['treeList'];
-        }
-        
-        return $_SESSION['admin']['user']['species']['tree'];
     }
 
-
+    private function getTaxonChildren($id)
+    {
+        if (is_null($this->tmp)) {
+    
+            $d = $this->models->Taxon->_get(
+            array(
+            'id' => array(
+            'project_id' => $this->getCurrentProjectId()
+            ),
+            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+//			'order' => 'taxon_order'
+            ));
+    
+            foreach((array)$d as $val) {
+    
+                $this->tmp[$val['parent_id']][$val['id']] = $val;
+    
+            }
+    
+        }
+    
+        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
+    
+    }
 
     private function _newGetTaxonTree ($p = null)
     {
@@ -1833,7 +1841,7 @@ class Controller extends BaseClass
             $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
             $t[$key]['sibling_count'] = count((array) $t);
             $t[$key]['depth'] = $t[$key]['level'] = $depth;
-            $t[$key]['taxon_formatted'] = $this->formatTaxon($val);
+            $t[$key]['taxon_formatted'] = $this->formatTaxon($val,$ranks);
             
             $this->treeList[$key] = $t[$key];
             
@@ -1849,26 +1857,19 @@ class Controller extends BaseClass
         return $t;
     }
 
-
     public function newGetUserTaxa ()
     {
-        if ($this->hasTableDataChanged('UserTaxon') || $this->hasTableDataChanged('ProjectRank') || $this->hasTableDataChanged('Taxon') || !isset($_SESSION['admin']['user']['species']['userTaxa'])) {
-            
-            $_SESSION['admin']['user']['species']['userTaxa'] = $this->models->UserTaxon->_get(
+
+		return $this->models->UserTaxon->_get(
             array(
                 'id' => array(
                     'project_id' => $this->getCurrentProjectId(), 
                     'user_id' => $this->getCurrentUserId()
                 ), 
-                //'order' => 'taxon_id',
                 'fieldAsIndex' => 'taxon_id'
             ));
-        }
-        
-        return $_SESSION['admin']['user']['species']['userTaxa'];
+
     }
-
-
 
     public function newSetTaxaUserAllowable ($p)
     {
@@ -1877,7 +1878,6 @@ class Controller extends BaseClass
         $prevAllowed = isset($p['prevAllowed']) ? $p['prevAllowed'] : false;
         $prevDepth = isset($p['prevDepth']) ? $p['prevDepth'] : null;
         $allowAll = isset($p['allowAll']) ? $p['allowAll'] : false;
-        
 
         if (is_null($taxa) || (is_null($userTaxa) && !$allowAll))
             return null;
@@ -1910,24 +1910,20 @@ class Controller extends BaseClass
         return $taxa;
     }
 
-
-
     public function newGetUserAssignedTaxonTree ($p)
     {
         $taxa = $this->newGetTaxonTree($p);
 
         $userTaxa = $this->newGetUserTaxa();
-        
+
         $taxa = $this->newSetTaxaUserAllowable(array(
             'taxa' => $taxa, 
             'userTaxa' => $userTaxa, 
             'allowAll' => $this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin()
-        ));
+	        ));
         
         return $taxa;
     }
-
-
 
     public function newGetUserAssignedTaxonTreeList ($p = null)
     {
@@ -1935,7 +1931,7 @@ class Controller extends BaseClass
         
         if (!isset($this->treeList))
             return null;
-        
+
         $incHigher = isset($p['includeHigher']) ? $p['includeHigher'] : false;
         $higherOnly = isset($p['higherOnly']) ? $p['higherOnly'] : false;
         
@@ -1948,15 +1944,8 @@ class Controller extends BaseClass
                 $d[$key] = $val;
                 
                 if (isset($prevId)) {
-                    
-                    $d[$key]['prev'] = array(
-                        'id' => $prevId, 
-                        'title' => $prevTitle
-                    );
-                    $d[$prevId]['next'] = array(
-                        'id' => $key, 
-                        'title' => $val['taxon']
-                    );
+                    $d[$key]['prev'] = array('id' => $prevId, 'title' => $prevTitle);
+                    $d[$prevId]['next'] = array('id' => $key, 'title' => $val['taxon']);
                 }
                 
                 $prevId = $key;
@@ -2200,14 +2189,14 @@ class Controller extends BaseClass
 
 
 
-    public function formatTaxon ($taxon)
+    public function formatTaxon ($taxon,$ranks=null)
     {
 		
 		if (empty($taxon))
 			return;
 
         $e = explode(' ', $taxon['taxon']);
-        $r = $this->newGetProjectRanks();
+        $r = is_null($ranks) ? $this->newGetProjectRanks() : $ranks;
         
         if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
@@ -3814,29 +3803,7 @@ class Controller extends BaseClass
         return $it[0]['translation'];
     }
 
-    private function getTaxonChildren($id)
-    {
-        if (is_null($this->tmp)) {
-    
-            $d = $this->models->Taxon->_get(
-            array(
-            'id' => array(
-            'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
-            ));
-    
-            foreach((array)$d as $val) {
-    
-                $this->tmp[$val['parent_id']][$val['id']] = $val;
-    
-            }
-    
-        }
-    
-        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
-    
-    }
+
 	
 	private function getCurrentUserRole()
 	{

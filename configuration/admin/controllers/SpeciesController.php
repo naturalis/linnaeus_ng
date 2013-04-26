@@ -219,6 +219,7 @@ class SpeciesController extends Controller
 
     public function listAction ()
     {
+		
         $this->checkAuthorisation();
         
         $this->setPageName($this->translate('Taxon list'));
@@ -231,8 +232,8 @@ class SpeciesController extends Controller
 				'higherOnly' => $this->maskAsHigherTaxa()
 			));			
 
-			uasort($taxa,function($a,$b){return strcmp($a['taxon'],$b['taxon']);});
-			
+			uasort($taxa,function($a,$b){ return strcmp($a['taxon'],$b['taxon']);});
+
 			$i=0;
 			foreach((array)$taxa as $key => $val) {
 
@@ -242,9 +243,12 @@ class SpeciesController extends Controller
 					'id' => $key, 
 					'project_id' => $this->getCurrentProjectId()
 				));
-				
+
 			}
 			
+			$this->redirect('list.php#');
+
+		
 		} else
         if ($this->rHasId() && $this->rHasVal('move') && !$this->isFormResubmit()) {
             // moving branches up and down the stem
@@ -261,7 +265,7 @@ class SpeciesController extends Controller
             'higherOnly' => $this->maskAsHigherTaxa(),
 			'forceLookup' => true
         ));
-        
+
         if (isset($taxa) && count((array) $taxa) > 0) {
             
             $projectLanguages = $_SESSION['admin']['project']['languages'];
@@ -287,14 +291,19 @@ class SpeciesController extends Controller
                 $taxa[$key]['commonnameCount'] = isset($commonnameCount[$taxon['id']]) ? $commonnameCount[$taxon['id']] : 0;
                 
                 $taxa[$key]['mediaCount'] = isset($mediaCount[$taxon['id']]) ? $mediaCount[$taxon['id']] : 0;
+                $taxa[$key]['mediaCount_label'] = $taxa[$key]['mediaCount']==1 ? $this->translate('file') : $this->translate('files');
                 
                 $taxa[$key]['literatureCount'] = isset($literatureCount[$taxon['id']]) ? $literatureCount[$taxon['id']] : 0;
+                $taxa[$key]['literatureCount_label'] = $taxa[$key]['literatureCount']==1 ? $this->translate('name') : $this->translate('names');
+
+				if ($_SESSION['admin']['project']['includes_hybrids']!=1) 
+					$taxa[$key]['is_hybrid'] = -1;
+
             }
             
             if (count((array) $taxa) == 0)
                 $this->addMessage($this->translate('There are no taxa for you to edit.'));
 
-                //if (true) {
             if ($this->maskAsHigherTaxa()) {
                 
                 $ranks = $this->getProjectRanks(array(
@@ -308,11 +317,6 @@ class SpeciesController extends Controller
             
             if (isset($taxa))
                 $this->smarty->assign('taxa', $taxa);
-                
-                //$this->smarty->assign('sortBy', $sortBy);
-            
-
-
 
             $this->smarty->assign('languages', $projectLanguages);
         }
@@ -320,7 +324,7 @@ class SpeciesController extends Controller
             
             $this->addMessage($this->translate('No taxa have been assigned to you.'));
         }
-        
+
         $this->printPage();
     }
 
