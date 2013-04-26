@@ -1094,13 +1094,13 @@ class SpeciesController extends Controller
         $l = array();
         
         $taxa = $this->buildTaxonTree();
-        
+
         foreach ((array) $taxa as $key => $val) {
-            
+
             if (($getAll || preg_match($regexp, $val['taxon']) == 1) && ($this->getTaxonType() == 'higher' ? $val['lower_taxon'] == 0 : $val['lower_taxon'] == 1))
                 $l[] = array(
                     'id' => $val['id'], 
-                    'label' => $t[$key]['label'] = $this->formatTaxon($val)
+                    'label' => $val['label']
                 );
         }
         

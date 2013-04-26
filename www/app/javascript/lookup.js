@@ -226,7 +226,7 @@ function allLookupBuildList(obj,txt) {
 			var d = obj.results[i];
 			
 			if (d.id && d.label) {
-
+//alert(d.label);
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
 				textToAppend[i] = 
