@@ -74,8 +74,6 @@ class IndexController extends Controller
         $this->_speciesIndexAction();
     }
 
-
-
     public function commonAction ()
     {
         $this->setPageName($this->translate('Index: Common names'));
@@ -178,14 +176,10 @@ class IndexController extends Controller
         $this->printPage();
     }
 
-
-
     private function setTaxonType ($type)
     {
         $this->_taxonType = ($type == 'higher') ? 'higher' : 'lower';
     }
-
-
 
     private function _speciesIndexAction ()
     {
@@ -199,8 +193,8 @@ class IndexController extends Controller
                 $d[] = $val['id'];
         }
         
-        $taxa = $this->buildTaxonTree();
-//q($taxa);	// where is 17736?	
+        $taxa = $this->buildTaxonTree(array('includeEmpty'=>true));
+
 		$d = array();
 		
 		foreach((array)$taxa as $key => $val) {
@@ -217,7 +211,7 @@ class IndexController extends Controller
 		$names = $taxa = $d;
         
         $syn = $this->searchSynonyms();
-//q($names,1);      
+
         $taxa = array_merge((array) $taxa, (array) $syn);
         
         $this->customSortArray($taxa, array(
@@ -268,14 +262,10 @@ class IndexController extends Controller
         $this->printPage('species_index');
     }
 
-
-
     private function getTaxonType ()
     {
         return isset($this->_taxonType) ? $this->_taxonType : 'lower';
     }
-
-
 
     private function searchSynonyms ($search = null)
     {
