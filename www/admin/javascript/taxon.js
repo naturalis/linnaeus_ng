@@ -1539,3 +1539,10 @@ function taxonBlankOutRanks() {
 	});
 	
 }
+
+function taxonSortTaxaAlpha() {
+
+	if (confirm(_('Are you sure you want to permanently sort the taxa alphabetically?')))
+		window.open('list.php?sort=alpha','_self');
+
+}

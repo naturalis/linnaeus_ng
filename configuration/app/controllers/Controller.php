@@ -1200,107 +1200,15 @@ class Controller extends BaseClass
             return null;
     }
     
-
-    /*
-
-    public function matchHotwordsOLD ($text, $forceLookup = false)
-	{
+    public function formatTaxon ($taxon,$ranks=null)
+    {
 		
-        if (empty($text) || !is_string($text))
-            return $text;
-        
-        $processed = $text;
-        
-        // get all hotwords from database
-        $wordlist = $this->getHotwords($forceLookup);
-        
-        // replace the not-to-be-linked words with a unique numbered string
-        $expr = '|(\[no\])(.*)(\[\/no\])|i';
-        $processed = preg_replace_callback($expr, array(
-            $this, 
-            'embedNoLink'
-        ), $processed);
-        
-        foreach ((array) $wordlist as $key => $val) {
-            
-            if ($val['hotword'] == '')
-                continue;
-                
-            // replace the already linked words with a unique numbered string
-            $expr = '|(<a (.*)>)(' . $val['hotword'] . ')(<\/a>)|i';
-            $processed = preg_replace_callback($expr, array(
-                $this, 
-                'embedNoLink'
-            ), $processed);
-            
-            $this->_currentHotwordLink = '../' . $val['controller'] . '/' . $val['view'] . '.php' . (!empty($val['params']) ? '?' . $val['params'] : '');
+		if (empty($taxon))
+			return;
 
-            $expr = '|\b(' . $val['hotword'] . ')\b|i';
-	
-            $processed = preg_replace_callback($expr, array(
-                $this, 
-                'embedHotwordLink'
-            ), $processed);
-        }
-        
-        $processed = $this->restoreNoLinks($this->effectuateHotwordLinks($processed));
-        
-        return $processed;
-    }
-
-    public function formatTaxonOLD ($name, $projRankId)
-    {
-         if (empty($projRankId))
-            return $name;
-        
-        if ($projRankId == 'synonym' || $projRankId == 'syn')
-            return '<span class="italics">' . $name . '</span>';
-        
-        $r = $this->getProjectRanks();
-        
-        $rankId = $r[$projRankId]['rank_id'];
-        
-        if (isset($r[$projRankId]['labels'][$this->getCurrentLanguageId()]))
-            $d = $r[$projRankId]['labels'][$this->getCurrentLanguageId()];
-        else
-            $d = $r[$projRankId]['rank'];
-        
-        $rankName = ucfirst($d);
-        
-        $g = $s = $i = false;
-        $elements = explode(' ', $name);
-        if (count($elements) > 2) {
-            list ($g, $s, $i) = $elements;
-        }
-        
-        switch ($rankId) {
-            case '63':
-                return $rankName . ' <span class="italics">' . $name . '</span>';
-            case '64':
-                return $rankName . ' <span class="italics">' . $name . '</span>';
-            case '74':
-                return '<span class="italics">' . $name . '</span>';
-            case '77':
-                return '<span class="italics">' . $g . ' ' . $s . '</span> subsp. <span class="italics">' . $i . '</span>';
-            case '78':
-                return '<span class="italics">' . $g . ' ' . $s . '</span> var. <span class="italics">' . $i . '</span>';
-            case '79':
-                return '<span class="italics">' . $g . ' ' . $s . '</span> subvar. <span class="italics">' . $i . '</span>';
-            case '81':
-                return '<span class="italics">' . $g . ' ' . $s . '</span> f. <span class="italics">' . $i . '</span>';
-            case '82':
-                return '<span class="italics">' . $g . ' ' . $s . '</span> subf. <span class="italics">' . $i . '</span>';
-            default:
-                return $rankName . ' ' . $name;
-        }
-    }
-
-	*/
-    public function formatTaxon ($taxon)
-    {
         $e = explode(' ', $taxon['taxon']);
-        $r = $this->getProjectRanks();
-		
+        $r = is_null($ranks) ? $this->getProjectRanks() : $ranks;
+
 		if (!isset($taxon['rank_id'])) // shouldn't happen!
 			 return $taxon['taxon'];
         
