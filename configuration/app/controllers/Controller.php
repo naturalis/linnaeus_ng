@@ -2835,6 +2835,8 @@ class Controller extends BaseClass
         if (!$this->getCache('species-treeList')) {
 
             $this->_buildTaxonTree();
+			
+			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
 
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
         }
