@@ -20,7 +20,7 @@
     
 	<table>
         <tr style="vertical-align:bottom">
-            <th style="width:240px;">{t}Taxon{/t}</th>
+            <th style="width:270px;">{t}Taxon{/t}</th>
 	    {if $session.admin.project.includes_hybrids==1}
     		<th style="width:25px;">{t}Hybrid{/t}</th>
 		{/if}
@@ -40,10 +40,10 @@
 	{assign var=firstlevel value=-1}
 	{foreach from=$taxa item=taxon key=k}
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
-		<tr>
+		<tr class="tr-highlight">
 			<td>
 				{if $firstlevel==-1}{assign var=firstlevel value=$taxon.level}{/if}
-				{assign var=dots value=$taxon.level-$firstlevel}
+				{assign var=dots value=$taxon.level-$firstlevel+1}
 				{if $dots<0}{assign var=dots value=0}{/if}
 				{'.'|str_repeat:$dots}
 

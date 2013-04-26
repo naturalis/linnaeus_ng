@@ -393,27 +393,9 @@ class Controller extends BaseClass
             // give do-not-display-flag to taxa that are in brackets
             $t[$key]['do_display'] = !preg_match('/^\(.*\)$/', $val['taxon']);
             // taxon name
-            $t[$key]['label'] = $this->formatTaxon($val);
+            $t[$key]['label'] = $this->formatTaxon($val,$ranks);
             $t[$key]['author'] = $val['author'];
             $t[$key]['variations'] = $this->getVariations($val['id']);
-            
-            //// level is effectively the recursive depth of the taxon within the tree
-            //$t[$key]['level'] = $level;
-            
-
-
-
-            //// sibling_pos reflects the position amongst taxa on the same level
-            //$t[$key]['sibling_pos'] = ($key==0 ? 'first' : ($key==count((array)$t)-1 ? 'last' : '-' ));
-            
-
-
-
-            //// get rank label
-            //$t[$key]['rank'] = $pr[$val['rank_id']]['labels'][$this->getCurrentLanguageId()];
-            
-
-
 
             $this->treeList[$key] = $t[$key];
             
@@ -526,7 +508,7 @@ class Controller extends BaseClass
         $d = null;
         
         $this->buildTaxonTree();
-        
+
         foreach ((array) $this->treeList as $key => $val) {
             
             $d[$val['level']] = $val;
@@ -2849,8 +2831,9 @@ class Controller extends BaseClass
 
     public function buildTaxonTree ($p = null)
     {
+		
         if (!$this->getCache('species-treeList')) {
-            
+
             $this->_buildTaxonTree();
 
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
