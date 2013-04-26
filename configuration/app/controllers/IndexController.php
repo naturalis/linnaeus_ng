@@ -200,7 +200,7 @@ class IndexController extends Controller
         }
         
         $taxa = $this->buildTaxonTree();
-q($taxa);	// where is 17736?	
+//q($taxa);	// where is 17736?	
 		$d = array();
 		
 		foreach((array)$taxa as $key => $val) {
@@ -217,7 +217,7 @@ q($taxa);	// where is 17736?
 		$names = $taxa = $d;
         
         $syn = $this->searchSynonyms();
-q($names,1);      
+//q($names,1);      
         $taxa = array_merge((array) $taxa, (array) $syn);
         
         $this->customSortArray($taxa, array(
