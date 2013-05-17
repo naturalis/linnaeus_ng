@@ -145,7 +145,7 @@ function nbcPrintResultsExpanded() {
 		nbcRemoveShowMoreButton();
 
 	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResultsExpanded();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
+		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResults();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
 		$("#footerPagination").removeClass('noline').addClass('noline');
 	}
 
@@ -174,6 +174,7 @@ function nbcFormatResult(data) {
 			h : thumbnail
 			p : photographer credit 
 			u : remote url
+			v : remote url target
 			r : number of similars
 			h : highlight (bool)
 			d : full species details (only when comparing or resultset has only one taxon/variation)
@@ -225,7 +226,7 @@ function nbcFormatResult(data) {
 		data.m = baseUrlProjectImages + data.m;
 		
 	}
-
+console.dir(data);
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
@@ -248,7 +249,7 @@ function nbcFormatResult(data) {
 							'<img class="result-icon icon-similar" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '') +
 						(data.u ?
-							'<a href="'+(data.u)+'" target="_blank" title="'+nbcLabelExternalLink+'">'+
+							'<a href="'+(data.u)+'" target="'+(data.v)+'" title="'+nbcLabelExternalLink+'">'+
 							'<img class="result-icon icon-sr" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '')  +
 					'</span>' +
