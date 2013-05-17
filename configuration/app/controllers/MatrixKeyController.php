@@ -1760,7 +1760,7 @@ class MatrixKeyController extends Controller
             'n' => isset($nbc['url_image']), 
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
-            'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
+            'u' => isset($nbc['url_external_page']) ? $nbc['url_external_page']['value'] : null, 
 			'v' => $this->_externalSpeciesUrlTarget,  // default _blank
             'r' => count((array) $related), 
             'h' => $highlight, 
