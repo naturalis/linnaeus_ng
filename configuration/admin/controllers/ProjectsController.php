@@ -377,18 +377,22 @@ class ProjectsController extends Controller
 			
 			$c=0;
 			
-			foreach((array)$this->requestData['setting'] as $key => $val) {
-				
-				$val = trim($val);
-				
-				if (empty($val)) {
+			if ($this->rHasVar('setting')) {
+			
+				foreach((array)$this->requestData['setting'] as $key => $val) {
 					
-					$c += $this->saveSetting(array('name' => $key,'delete' => true));
+					$val = trim($val);
 					
-				} else {
-
-					$c += $this->saveSetting(array('name' => $key,'value' => $val));
-
+					if (empty($val)) {
+						
+						$c += $this->saveSetting(array('name' => $key,'delete' => true));
+						
+					} else {
+	
+						$c += $this->saveSetting(array('name' => $key,'value' => $val));
+	
+					}
+					
 				}
 				
 			}

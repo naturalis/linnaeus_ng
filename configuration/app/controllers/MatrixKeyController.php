@@ -12,6 +12,7 @@ class MatrixKeyController extends Controller
     private $_matrixType = 'default';
 	private $_useSepCoeffAsWeight = false;
 	private $_matrixStateImageMaxHeight = null;
+	private $_externalSpeciesUrlTarget = '_blank';
 
     public $usedModels = array(
         'matrix', 
@@ -624,6 +625,7 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
         $this->_useSepCoeffAsWeight = false; // $this->getSetting('matrix_use_sc_as_weight');
         $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
+        $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
 
 		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
 			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
@@ -1759,6 +1761,7 @@ class MatrixKeyController extends Controller
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => isset($nbc['url_soortenregister']) ? $nbc['url_soortenregister']['value'] : null, 
+			'v' => $this->_externalSpeciesUrlTarget,  // default _blank
             'r' => count((array) $related), 
             'h' => $highlight, 
             'd' => isset($details) ? $details : null
