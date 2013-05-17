@@ -226,7 +226,7 @@ function nbcFormatResult(data) {
 		data.m = baseUrlProjectImages + data.m;
 		
 	}
-console.dir(data);
+
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
