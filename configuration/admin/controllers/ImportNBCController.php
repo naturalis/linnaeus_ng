@@ -2,17 +2,9 @@
 
 /*
 
-	column headers, like 'naam SCI', are hardcoded! 
+	column headers, like 'naam SCI', are hardcoded (see array '_nbcColumns' below)! 
 
 	$_stdVariantColumns needs to be user invulbaarable --> NOT! assuming sekse and variant (pwah)
-
-
-	insert into settings 
-		(id, project_id, setting, value, created, last_change) 
-	values 
-		(NULL,123, 'setting', 'value', now(), CURRENT_TIMESTAMP)
-
-
 
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'suppress_splash',1,now(),CURRENT_TIMESTAMP);
 	insert into settings (id, project_id, setting, value, created, last_change) values (null,3,'start_page','/kreeften/app/views/matrixkey/identify.php',now(),CURRENT_TIMESTAMP);

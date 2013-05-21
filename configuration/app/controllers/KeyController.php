@@ -960,7 +960,7 @@ if (1==1 || !$div) {
 							array(
 									'project_id' => $this->getCurrentProjectId(),
 									'res_taxon_id is not' => 'null',
-									'id in' => '('.implode(',',$this->_choiceList).')'
+									'id in' => '('.implode(',',(array)$this->_choiceList).')'
 							),
 							'columns' => 'res_taxon_id'
 					)

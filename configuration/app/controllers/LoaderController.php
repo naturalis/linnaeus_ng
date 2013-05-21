@@ -4,7 +4,7 @@
 
 	beware!
 
-	calling the same procedure in an external class multiple times from a loop in 
+	calling the same procedure in an external class multiple times from inside a loop in 
 	this class based on the output from another function in the external class can cause 
 	strange results. in one example, a get()-call to the MatrixTaxon-model in the matrix-
 	class caused the model to lose the where-clause-variables, which were still intact in
@@ -17,7 +17,6 @@
 	if necessary, write a new procedure in the external class that performs all of the 
 	required work in one call, as in preloadMatrix(). not quite sure why the loop in 
 	preloadMap() doesn't cause trouble.
-
 
 	$data = $this->getCache('controller-cache_name');
 	if (!$data) {
@@ -53,7 +52,7 @@ class LoaderController extends Controller
 
     public function splashAction ()
     {
-	
+
 		//$this->doPreload();die(); // straight debug version (no ajax)
 	
 		if ($this->rHasVal('go','load')) {
@@ -90,17 +89,18 @@ class LoaderController extends Controller
 
 		$execStart = microtime(true);
 
-		$this->preloadGlossary();
-		$this->preloadIndex();
-		$this->preloadIntroduction();
-		$this->preloadKey();
+		if($this->doesProjectHaveModule(MODCODE_GLOSSARY)) $this->preloadGlossary();
+		if($this->doesProjectHaveModule(MODCODE_INDEX)) $this->preloadIndex();
+		if($this->doesProjectHaveModule(MODCODE_INTRODUCTION)) $this->preloadIntroduction();
+		if($this->doesProjectHaveModule(MODCODE_KEY)) $this->preloadKey();
+		if($this->doesProjectHaveModule(MODCODE_LITERATURE)) $this->preloadLiterature();
+		if($this->doesProjectHaveModule(MODCODE_DISTRIBUTION)) $this->preloadMap();
+		if($this->doesProjectHaveModule(MODCODE_MATRIXKEY)) $this->preloadMatrix();
+		if($this->doesProjectHaveModule(MODCODE_SPECIES)||$this->doesProjectHaveModule(MODCODE_HIGHERTAXA)) $this->preloadSpecies();
+
 		$this->preloadLinnaeus();
-		$this->preloadLiterature();
-		$this->preloadMap();
-		$this->preloadMatrix();
-		$this->preloadModule();
 		$this->preloadSearch();
-		$this->preloadSpecies();
+		$this->preloadModule();
 		
 		sleep(max(0,($this->generalSettings['splashDelay']-((microtime(true) - $execStart) / 1000))));
 

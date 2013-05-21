@@ -100,19 +100,10 @@ function glossTextOver(id,caller) {
 
 }
 
-var allTranslations = Array();
-
 function _(text) {
 	
-	//return text;
-
-	/* TO BE DONE */
-//	for(var i=0;i<allTranslations.length;i++) {
-//		if (allTranslations[i][0]==text) {
-//			return allTranslations[i][1];
-//		}
-//	}
-
+	// can be single string or array; returns single string or array.
+	// needs local caching.
 	var translation = $.ajax({
 	        type: "POST",
 	        async: false,
@@ -120,9 +111,7 @@ function _(text) {
 	        data: ({text: text, action: 'translate'})
 	        }).responseText;
 
-	allTranslations[allTranslations.length]=[text,translation];
-
-	return translation;
+	return $.parseJSON(translation);
 
 }
 
@@ -280,7 +269,6 @@ function goAlpha(letter,url) {
 function goLiterature(id) {
 	//!
 	addFormVal('id',id);
-
 	goForm('../literature/reference.php');
 
 }
@@ -347,8 +335,6 @@ function goIconGrid() {
 	goForm('../linnaeus/index.php');
 
 }
-
-
 
 function goNavigate(id,field,url) {
 	//!
