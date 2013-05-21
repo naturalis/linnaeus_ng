@@ -502,7 +502,7 @@ class ImportL2Controller extends Controller
             $this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $this->getNewProjectId());
             
             $this->addMessage('Saved ' . count((array) $_SESSION['admin']['system']['import']['loaded']['ranks']) . ' ranks');
-            $this->addMessage('Saved ' . count((array) $_SESSION['admin']['system']['import']['loaded']['species']) . ' species');
+            $this->addMessage('Saved ' . count((array) $_SESSION['admin']['system']['import']['loaded']['species']) . ' taxa');
             
             if (count((array) $_SESSION['admin']['system']['import']['species-errors']) !== 0) {
                 
@@ -1007,6 +1007,7 @@ class ImportL2Controller extends Controller
                     
                     $_SESSION['admin']['system']['import']['loaded']['key_matrix']['matrices'] = null;
                     $_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] = array();
+                    $_SESSION['admin']['system']['import']['loaded']['key_matrix']['taxaNotPresent'] = 0;
                     
                     $this->helpers->XmlParser->setCallbackFunction(array(
                         $this, 
@@ -1037,7 +1038,10 @@ class ImportL2Controller extends Controller
                             foreach ((array) $_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'] as $val)
                                 $this->addError($this->storeError($val, 'Matrix'));
                         }
-                        
+						
+						if ($_SESSION['admin']['system']['import']['loaded']['key_matrix']['taxaNotPresent']!=0)
+							$this->addError($this->storeError('Note: '.$_SESSION['admin']['system']['import']['loaded']['key_matrix']['taxaNotPresent'].' taxa do not appear in any matrix (due to empty \'identify\' tag or missing matrix name).', 'Matrix'));
+
                         if ($this->_sawModule) {
                             
                             $this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), $_SESSION['admin']['system']['import']['moduleCount']++);
@@ -3270,7 +3274,7 @@ class ImportL2Controller extends Controller
     private function resolveCharType ($t)
     {
         
-		echo ':'.$t.':';
+		//echo ':'.$t.':';
 		
         // ??? HAVE ONLY SEEN Long Text, Text & Picture
         switch ($t) {
@@ -3478,7 +3482,8 @@ class ImportL2Controller extends Controller
         } // not part of any matrix
 		else {
 			
-			$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = 'Encountered empty matrix name';
+			//$_SESSION['admin']['system']['import']['loaded']['key_matrix']['failed'][] = 'Encountered empty matrix name';
+			$_SESSION['admin']['system']['import']['loaded']['key_matrix']['taxaNotPresent']++;
 			
 		}
 

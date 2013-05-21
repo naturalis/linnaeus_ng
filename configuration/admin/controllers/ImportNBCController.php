@@ -37,6 +37,7 @@ class ImportNBCController extends Controller
 		'naam SCI' => '-',
 		'naam NL' => '-',
 		'foto id beeldbank' => 'url_image',
+		'url image' => 'url_image',
 		'nsrpage' => 'url_external_page',
 		'nsrpage nieuw' => 'url_external_page',
 		'url' => 'url_external_page',
