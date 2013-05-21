@@ -467,9 +467,9 @@ class ExportController extends Controller
 			foreach((array)$c as $cKey => $cVal) {
 			
 				$synonym['synonym'.$cKey] = array(
-					'synonym' => $cVal['synonym'],
-					'remark' => $cVal['remark'],
-					'literature_id' => $cVal['lit_ref_id'],
+					'synonym' => isset($cVal['synonym']) ? $cVal['synonym'] : null,
+					'remark' => isset($cVal['remark']) ? $cVal['remark'] : null,
+					'literature_id' => isset($cVal['lit_ref_id']) ? $cVal['lit_ref_id'] : null,
 				);
 			
 			}
