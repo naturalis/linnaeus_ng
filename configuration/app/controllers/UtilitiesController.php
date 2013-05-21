@@ -48,8 +48,8 @@ class UtilitiesController extends Controller
         if (!isset($this->requestData['action'])) return;
         
 		if ($this->requestData['action'] == 'translate') {
-            
-			$this->smarty->assign('returnText',$this->javascriptTranslate($this->requestData['text']));
+			
+			$this->smarty->assign('returnText',json_encode($this->javascriptTranslate($this->requestData['text'])));
 
         }
         

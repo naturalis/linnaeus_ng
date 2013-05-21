@@ -2,13 +2,20 @@ var imagePath;
 var selectIndicator = '\u2022 ';
 var characterOrders =
 	Array(
-		['alphabet',_('Alphabet')],
-		['separationCoefficient',_('Separation coefficient')],
-		['characterType',_('Character type')],
-		['numberOfStates',_('Number of states')],
-		['entryOrder',_('Entry order')]
+		['alphabet','Alphabet'],
+		['separationCoefficient','Separation coefficient'],
+		['characterType','Character type'],
+		['numberOfStates','Number of states'],
+		['entryOrder','Entry order']
 	);
+
 var sortField = null;
+var characters = Array();
+var states = Array();
+var selected = Array();
+var freeValues = Array();
+var sdValues = Array();
+var storedShowState;
 
 function getData(action,id,postFunction) {
 
@@ -30,17 +37,9 @@ function getData(action,id,postFunction) {
 	
 }
 
-var characters = Array();
-var states = Array();
-var selected = Array();
-var freeValues = Array();
-var sdValues = Array();
-var storedShowState;
-
 function storeCharacter(id,label,type,sorts) {
 
 	characters[characters.length] = {id:id,label:label,type:type,sorts:sorts};
-
 
 }
 
@@ -306,10 +305,6 @@ function setFreeValues(vals) {
 		sdValues[$('#characteristics').val()]=vals[1];
 	}
 
-	
-	
-	//getScores();
-
 }
 
 function getCharacter(id) {
@@ -368,7 +363,6 @@ function addSelected(caller) {
 			
 		}
 		
-		//getScores();
 		highlightSelected();
 
 	}
@@ -472,8 +466,6 @@ function clearSelectedStates() {
 
 	selected = selected.splice(0,0);
 
-	//getScores('clear');
-	
 	removeHighlight();
 
 }
@@ -487,15 +479,15 @@ function getScores(action) {
 		$('#selected').children().each(function(){
 			opt[opt.length] = ($(this).val());
 		});
+		
+		storedShowState='';
 
 	} else {
 
 		opt = -1;
 
 	}
-	
-	//alert(opt);
-	
+
 	getData('get_taxa',opt,'fillScores');
 
 }
@@ -718,3 +710,21 @@ function showCharacterSort() {
 	showDialog(_('Sort characters by:'),html);
 
 }
+
+function translateCharacterOrders() {
+
+	var chrs = _(['Alphabet','Separation coefficient','Character type','Number of states','Entry order']);
+
+	characterOrders =
+		Array(
+			['alphabet',chrs[0]],
+			['separationCoefficient',chrs[1]],
+			['characterType',chrs[2]],
+			['numberOfStates',chrs[3]],
+			['entryOrder',chrs[4]]
+		);
+
+}
+
+
+translateCharacterOrders();

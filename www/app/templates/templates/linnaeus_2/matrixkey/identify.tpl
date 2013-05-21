@@ -46,12 +46,6 @@
 		<div id="scores-taxa">
 			<div class="select-header">{t}Result of this combination of characters{/t}</div>
 			<select size="5" id="scores">
-			{* foreach from=$taxa key=k item=v}
-			<option ondblclick="goTaxon({$v.id})" value="{$v.id}">{$v.l}</option>
-			{/foreach}
-			{foreach from=$matrices key=k item=v}
-			<option ondblclick="goMatrix({$v.id})" value="{$v.id}">Matrix: {$v.l}</option>
-			{/foreach *}
 			</select>
 		</div>
 	</div>
@@ -61,6 +55,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
+
 {foreach from=$characteristics key=k item=v}
 	storeCharacter(
 		{$v.id},
@@ -88,6 +83,7 @@ $(document).ready(function(){
 {if $storedShowState}
 	storedShowState='{$storedShowState}';
 {/if}
+
 {literal}
 });
 </script>

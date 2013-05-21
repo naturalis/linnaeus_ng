@@ -1430,10 +1430,28 @@ class Controller extends BaseClass
     {
         if (empty($content))
             return;
+
+		if (is_array($content)) {
+
+			$results = array();
+
+			foreach((array)$content as $val) {
+
+				$this->saveInterfaceText($val);
+			
+				$results[] = $this->doTranslate($val);
+			}
+
+			return $results;
+		
+		} else  {
         
-        $this->saveInterfaceText($content);
-        
-        return $this->doTranslate($content);
+			$this->saveInterfaceText($content);
+			
+			return $this->doTranslate($content);
+
+		}
+
     }
 
 
@@ -2966,7 +2984,9 @@ class Controller extends BaseClass
 
     private function doTranslate ($text)
     {
-        
+		// test (returns reversed strings)
+        //return strrev($text);
+
         // get id of the text
         $i = $this->models->InterfaceText->_get(array(
             'id' => array(
