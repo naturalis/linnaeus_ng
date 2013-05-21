@@ -5,7 +5,7 @@
 <script>
 function toggleAllValid() {
 
-	$("input[@name='treetops*'][type='checkbox']").attr('checked',$('#allTreetops').is(':checked'));
+	$('input[name*="treetops"][type="checkbox"]').attr('checked',$('#allTreetops').is(':checked'));
 
 }
 
@@ -130,7 +130,7 @@ PLEASE CHOOSE CAREFULLY. The application will <u>not</u> check the logic of your
 {assign var=i value=$i+1}
 {/if}
 {/foreach}
-Found {$i} "healthy" species that will be loaded<br />
+Found {$i} "healthy" taxa that will be loaded<br />
 </p>
 
 <p>
