@@ -39,8 +39,15 @@ class ArrayToXml
 			}
 		 
 		}
+		/*
+		$dom = new DOMDocument('1.0');
+		$dom->preserveWhiteSpace = false;
+		$dom->formatOutput = true;
+		$dom->loadXML($xml->asXML());
+		return $dom->saveXML();
+		*/
 		// pass back as string. or simple xml object if you want!
-		return $xml->asXML();		
+		return str_replace('><','>'.chr(10).'<',$xml->asXML());
 
 	}
 
