@@ -70,6 +70,14 @@ Please be aware that these are six other taxa than the three mentioned earlier -
 
 	MATRIX KEY: never saw all types
 
+
+
+Common names: $taxon->vernaculars->vernacular
+Synonyms: $taxon->synonyms->synonym
+ContentTaxon: $taxon->syn_vern_description
+
+
+
 */
 
 

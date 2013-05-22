@@ -1006,7 +1006,7 @@ class Controller extends BaseClass
             return isset($this->requestData[$var]) && $this->requestData[$var] === $val;
         }
         else {
-            
+
             return isset($this->requestData[$var]) && $this->requestData[$var] !== '';
         }
     }

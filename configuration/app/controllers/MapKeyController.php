@@ -107,11 +107,11 @@ class MapKeyController extends Controller
 			}
 			
 		} else {
-			
+
 			$id = $this->requestData['id'];
 				
 		}
-		
+
 		$this->setStoreHistory(false);
 
 		if ($this->_mapType=='l2') {
@@ -234,6 +234,14 @@ class MapKeyController extends Controller
 
 			$this->smarty->assign('allLookupNavigateOverrideUrl', 'l2_examine_species.php?m='.$mapId.'&id=');
 
+		}
+		
+		if ($d['count']==0) {
+			
+			unset($_SESSION['app']['user']['species']['lastTaxon']);
+
+			$this->redirect('index.php?id=');
+			
 		}
 
 		$this->smarty->assign('maps',$maps);
