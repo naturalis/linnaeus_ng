@@ -3,7 +3,7 @@ var interfaceBeingEdited = Array();
 var interfaceFinalCounter = null;
 var interfaceNextStart = -1;
 
-function interfaceSaveLabel(id,lId,newVal,msgId) {
+function interfaceSaveLabel(id,lId,newVal,msgId,postFunction) {
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
@@ -19,6 +19,7 @@ function interfaceSaveLabel(id,lId,newVal,msgId) {
 		}),
 		success : function (data) {
 			$('#'+msgId).html(data).fadeOut(1000);
+			if (postFunction) eval(postFunction);
 		}
 	});
 	
@@ -49,6 +50,26 @@ function interfaceEnableTransEdit(ele) {
 function interfaceDoKeyUp(key,idx,oId,nId) {
 	
 	if (key==13) { // return
+
+		var x = (parseInt(idx)+1);
+		if (x>interfaceFinalCounter && interfaceNextStart!=-1) {
+			$('<input type="hidden" name="immediateEdit">').val('1').appendTo('#theForm');
+			var postFunction = 'goNavigate(interfaceNextStart);';
+		} else {
+			var postFunction = 'interfaceEnableTransEdit($(\'[counter='+x+']\'));';
+		}
+
+		var newVal = $('#'+nId).val();
+		if (newVal != interfaceOldVals[idx]) {
+			var bits = oId.split('-');
+			interfaceSaveLabel(bits[1],bits[2],newVal,'msg-'+idx,postFunction);
+		}
+		$('#'+oId).html(newVal);
+		interfaceBeingEdited[idx]=false;
+
+	} else
+	/*
+	if (key==13) { // return
 		var newVal = $('#'+nId).val();
 		if (newVal != interfaceOldVals[idx]) {
 			var bits = oId.split('-');
@@ -56,7 +77,7 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 		}
 		$('#'+oId).html(newVal);
 		interfaceBeingEdited[idx]=false;
-		
+
 		var x = (parseInt(idx)+1);
 		if (x>interfaceFinalCounter && interfaceNextStart!=-1) {
 			$('<input type="hidden" name="immediateEdit">').val('1').appendTo('#theForm');
@@ -65,6 +86,7 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 			interfaceEnableTransEdit($('[counter='+x+']'));
 		}
 	} else
+	*/
 	if (key==27) { //esc
 		$('#'+oId).html(interfaceOldVals[idx]);
 		interfaceBeingEdited[idx]=false;
