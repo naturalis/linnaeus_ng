@@ -967,17 +967,9 @@ class MatrixKeyController extends Controller
             ), 
             'fieldAsIndex' => 'language_id'
         ));
-        
 
-		if (isset($m[0]['names'][$this->getDefaultProjectLanguage()]['name']))
-			$d = $m[0]['names'][$this->getDefaultProjectLanguage()]['name'];
-		else {
-			$d = current($m[0]['names']);
-			$d = $d['name'];
-		}
-		
         $m[0]['names'] = $mn;
-        $m[0]['matrix'] = $d;
+        $m[0]['matrix'] = $m[0]['names'][$this->getDefaultProjectLanguage()]['name'];
         
         return $m[0];
     }
