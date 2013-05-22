@@ -1036,7 +1036,7 @@ class MatrixKeyController extends Controller
 			}
             
             $m[$key]['names'] = $mn;
-            $m[$key]['default_name'] = $mn[$this->getDefaultProjectLanguage()]['name'];
+            $m[$key]['default_name'] = $d;
         }
         
         $this->customSortArray($m, array(
