@@ -1027,6 +1027,13 @@ class MatrixKeyController extends Controller
                 ), 
                 'fieldAsIndex' => 'language_id'
             ));
+			
+			if (isset($mn[$this->getDefaultProjectLanguage()]['name']))
+				$d = $mn[$this->getDefaultProjectLanguage()]['name'];
+			else {
+				$d = current($mn);
+				$d = $d['name'];
+			}
             
             $m[$key]['names'] = $mn;
             $m[$key]['default_name'] = $mn[$this->getDefaultProjectLanguage()]['name'];
