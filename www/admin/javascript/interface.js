@@ -68,25 +68,7 @@ function interfaceDoKeyUp(key,idx,oId,nId) {
 		interfaceBeingEdited[idx]=false;
 
 	} else
-	/*
-	if (key==13) { // return
-		var newVal = $('#'+nId).val();
-		if (newVal != interfaceOldVals[idx]) {
-			var bits = oId.split('-');
-			interfaceSaveLabel(bits[1],bits[2],newVal,'msg-'+idx);
-		}
-		$('#'+oId).html(newVal);
-		interfaceBeingEdited[idx]=false;
 
-		var x = (parseInt(idx)+1);
-		if (x>interfaceFinalCounter && interfaceNextStart!=-1) {
-			$('<input type="hidden" name="immediateEdit">').val('1').appendTo('#theForm');
-			goNavigate(interfaceNextStart);
-		} else {
-			interfaceEnableTransEdit($('[counter='+x+']'));
-		}
-	} else
-	*/
 	if (key==27) { //esc
 		$('#'+oId).html(interfaceOldVals[idx]);
 		interfaceBeingEdited[idx]=false;
