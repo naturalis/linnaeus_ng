@@ -972,7 +972,7 @@ class MatrixKeyController extends Controller
 		if (isset($m[0]['names'][$this->getDefaultProjectLanguage()]['name']))
 			$d = $m[0]['names'][$this->getDefaultProjectLanguage()]['name'];
 		else {
-			$d = current($m);
+			$d = current($m[0]['names']);
 			$d = $d['name'];
 		}
 		
