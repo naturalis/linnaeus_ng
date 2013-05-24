@@ -119,8 +119,8 @@ class SpeciesController extends Controller
             
             if (isset($this->requestData['lan']))
                 $this->setCurrentLanguageId($this->requestData['lan']);
-                
-                // get categories
+
+            // get categories
             $categories = $this->getCategories(
 				array(
 					'taxon' => $this->requestData['id'], 
@@ -128,7 +128,6 @@ class SpeciesController extends Controller
 				)
             );
 
-			
             // determine the page_id the page will open in
             $activeCategory = 
             	$this->rHasVal('cat') ? 
@@ -137,7 +136,7 @@ class SpeciesController extends Controller
 	            		$categories['defaultCategory']
 	            	) : 
            		$categories['defaultCategory'];
-            
+
             // setting the css classnames
             foreach ((array) $categories['categories'] as $key => $val) {
                 $c = array(

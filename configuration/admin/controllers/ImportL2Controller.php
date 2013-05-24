@@ -7,9 +7,6 @@
 	- make Diversity index
 	- matrix char state image dimensions
 
-
-
-
 	change the title in the xml file to %test% and a random (yet readable) project name will be assigned.
 
 	should add '_sawModule' to all modules
@@ -150,6 +147,8 @@ class ImportL2Controller extends Controller
     );
     private $_sawModule = false;
 	private $_retainInternalLinks = false; // keep false, as internal links are re-created by means of hotwords
+	
+	private $_tempTeller = 0;
 
 
     /**
@@ -1910,13 +1909,16 @@ class ImportL2Controller extends Controller
                     'taxon' => $val['taxon'], 
                     'parent_id' => 'null', 
                     'rank_id' => $ranks[$val['rank_name']]['id'], 
-                    'taxon_order' => ($key + 1), 
+                    'taxon_order' => ($this->_tempTeller++), 
                     'is_hybrid' => 0, 
                     'list_level' => 0
                 ));
-                
+
+				//echo $this->_tempTeller.' '.$val['taxon'].'<br />';
+
                 $val['id'] = $this->models->Taxon->getNewId();
                 $d[$key] = $val;
+
             }
         }
         

@@ -6,7 +6,7 @@
 <div id="page-main">
 {/if}
 
-{* yes, i know, but for some reason the buttons refuse to "see" the style sheet *}
+{* for some reason the buttons refuse to "see" the style sheet *}
 <style>
 .localButton {literal}{{/literal}
 	padding-right:25px;
@@ -90,11 +90,16 @@ $(document).ready(function(){
 	allActiveLanguage =  {if $languages[1].language_id!=''}{$languages[1].language_id}{else}false{/if};
 	taxonDrawTaxonLanguages();
 
+{* // taxonAddPage([id,[names],default?]);
+   // names[-1] contains the system label, names[x] the name in language x 
+*}
 {section name=i loop=$pages}
 	var pagenames = new Array();
 	pagenames[-1] = '{$pages[i].page|addslashes}';
-	{section name=j loop=$languages}{assign var=n value=$languages[j].language_id}pagenames[{$n}] = '{$pages[i].titles[$n].title|addslashes}';
-{/section}
+	{section name=j loop=$languages}
+		{assign var=n value=$languages[j].language_id}
+		pagenames[{$n}] = '{$pages[i].titles[$n].title|addslashes}';
+	{/section}
 	taxonAddPage([{$pages[i].id},pagenames,{if $pages[i].def_page=='1'}1{else}0{/if}]);
 {/section}
 

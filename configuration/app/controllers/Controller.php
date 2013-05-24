@@ -484,7 +484,7 @@ class Controller extends BaseClass
                     'project_id' => $this->getCurrentProjectId(), 
                     'id' => $id
                 ), 
-            	'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
+            	'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty'
             ));
 
             $t[0]['label'] = $this->formatTaxon($t[0]);
@@ -506,9 +506,31 @@ class Controller extends BaseClass
     }
 
 
+	private function _getTaxonClassification($id) {
+			
+		$taxon = $this->getTaxonById($id);
+		$taxon['do_display'] = !preg_match('/^\(.*\)$/', $taxon['taxon']);
 
+		array_unshift($this->tmp,$taxon);
+	
+		if (!empty($taxon['parent_id'])) {
+			$this->_getTaxonClassification($taxon['parent_id']);
+		}
+	
+	}
+		
     public function getTaxonClassification ($taxonId)
     {
+		
+		$this->tmp = array();
+
+		$this->_getTaxonClassification($taxonId);
+
+		return $this->tmp;
+		
+
+		
+
         $d = null;
         
         $this->buildTaxonTree();
@@ -524,8 +546,52 @@ class Controller extends BaseClass
                 break;
             }
         }
-        
+
         return $d;
+/*
+
+  [0]=>
+  array(18) {
+    ["id"]=>
+    string(6) "101516"
+    ["taxon"]=>
+    string(8) "Animalia"
+    ["parent_id"]=>
+    NULL
+    ["rank_id"]=>
+    string(5) "11736"
+    ["taxon_order"]=>
+    string(1) "0"
+    ["is_hybrid"]=>
+    string(1) "0"
+    ["list_level"]=>
+    string(1) "0"
+    ["is_empty"]=>
+    string(1) "0"
+    ["author"]=>
+    NULL
+    ["lower_taxon"]=>
+    string(1) "0"
+    ["keypath_endpoint"]=>
+    string(1) "0"
+    ["sibling_count"]=>
+    int(1)
+    ["level"]=>
+    int(0)
+    ["depth"]=>
+    int(0)
+    ["do_display"]=>
+    bool(true)
+    ["label"]=>
+    string(16) "Kingdom Animalia"
+    ["variations"]=>
+    NULL
+    ["child_count"]=>
+    int(1)
+  }
+  
+*/
+
     }
 
 

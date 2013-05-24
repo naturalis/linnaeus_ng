@@ -1,20 +1,5 @@
 <?php
 
-/*
-
-dus:
-- full screen map optie
-- mogelijkheid om met een toets het laatst gezette punt te verwijderen
-- verschillende cursoren
-?
-
-make default central point configurable
-		$this->smarty->assign('middelLat',24.886436490787712);
-		$this->smarty->assign('middelLng',-70.2685546875);
-		$this->smarty->assign('initZoom',5);
-
-*/
-
 include_once ('Controller.php');
 
 class MapKeyController extends Controller
@@ -30,7 +15,7 @@ class MapKeyController extends Controller
 		'l2_map'
 	);
     
-    public $usedHelpers = array('csv_parser_helper');
+    public $usedHelpers = array('csv_parser_helper','file_upload_helper');
 
     public $controllerPublicName = 'Distribution';
 
@@ -2084,5 +2069,46 @@ class MapKeyController extends Controller
 
 	}
 
+
+	public function l2MapsShowAction()
+	{
+
+		if ($this->requestDataFiles && !$this->isFormResubmit()) {
+			
+			$this->loadControllerConfig('Projects');
+			$filesToSave = $this->getUploadedMediaFiles(array('storageDir' =>  $_SESSION['admin']['project']['paths']['project_media_l2_maps']));
+			$this->loadControllerConfig();
+	
+			if ($filesToSave) {
+
+				foreach ((array) $filesToSave as $key => $file) {
+
+					$mt = $this->models->L2Map->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'name' => $file['original_name'], 
+						'image' => $file['name'], 
+						'coordinates' => '{"topLeft":{"lat":90,"long":180},"bottomRight":{"lat":-90,"long":-180}}', 
+						'rows' => 10, 
+						'cols' => 20,
+					));
+					
+					if ($mt) {
+						
+						$this->addMessage(sprintf($this->translate('Saved: %s (%s)'), $file['original_name'], $file['media_name']));
+					}
+					else {
+						
+						$this->addError($this->translate('Failed writing uploaded file to database.'), 1);
+					}
+				}
+			}
+		}
+				
+		$this->smarty->assign('maps',$this->l2GetMaps());	
+		$this->printPage();	
+		
+	}
 	
 }

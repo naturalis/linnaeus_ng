@@ -21,60 +21,6 @@
 	padding-right:7px;
 }
 
-.taxon-list-row {
-	background-color: #fff;
-}
-
-.taxon-list-row:hover {
-	background-color: #eee;
-}
-
-.taxon-list-cell-rank {
-	width: 75px;
-}
-
-.taxon-list-cell-name {
-	width: 200px;
-}
-
-.taxon-list-cell-language,.taxon-list-cell-language-empty,.taxon-list-cell-language-done {
-	width: 75px;
-	text-align: right;
-	background-color: #fcc;
-	cursor: pointer;
-	color: #000099;
-}
-
-.taxon-list-cell-media,.taxon-list-cell-media-empty {
-	cursor: pointer;
-	color: #000099;	
-	width:20px;
-	text-align: right;
-	padding-right:5px;
-	background-color:#cfc;
-}
-
-.taxon-list-cell-media-empty {
-	background-color:#f1f1f1;
-}
-
-.taxon-list-cell-language {
-	background-color: #fe0;
-}
-
-.taxon-list-cell-language-done {
-	background-color: #bfb
-}
-
-#taxon-pages-table-div {
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-
-#taxon-languages-other {
-	margin-top: 2px;
-}
-
 .taxon-language-table {
 	margin: 0px;
 	padding: 0px;
@@ -223,3 +169,31 @@
 	margin-right:115px;
 	font-size:36px;
 }
+
+
+#taxon-list td, #taxon-list th {
+	text-align:right;
+}
+
+#taxon-list td {
+	border-right:1px dotted #bbb;
+}
+
+#taxon-list th {
+	border-bottom:1px dotted #bbb;
+}
+
+#taxon-list tr {
+	vertical-align:bottom;
+}
+
+
+#taxon-pages-table-div {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+#taxon-languages-other {
+	margin-top: 2px;
+}
+
