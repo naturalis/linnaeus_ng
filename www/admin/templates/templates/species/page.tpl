@@ -51,7 +51,7 @@
 {else}
 <form method="post" action="" id="theForm">
 {if $pages|@count<$maxCategories}
-{t}Add a new category:{/t}
+{t}Add a new category:{/t} 
 <input type="text" maxlength="32" id="new_page" name="new_page" value="" />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="show_order" value="{$nextShowOrder}" />

@@ -838,7 +838,7 @@ abstract class Model extends BaseClass
             }
 
             $query .= $group ? " group by " . $group : '';
-            
+
             $query .= $order ? " order by " . $order : '';
 
             $query .= $limit ? " limit " . $limit : '';

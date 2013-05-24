@@ -1776,27 +1776,34 @@ class Controller extends BaseClass
         return $pr;
     }
 
-    public function newGetTaxonTree ($p = null)
+    public function newGetTaxonTree ($p=null)
     {
 
-		$d = $this->_newGetTaxonTree();
-		uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
+		$d = $this->_newGetTaxonTree($p);
+
+		if (isset($p['alphabeticalTree']) && $p['alphabeticalTree']==true) {
+			// do nothing
+		} else {
+			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
+		}
+
 		return $d;
 
     }
 
-    private function getTaxonChildren($id)
+    private function getTaxonChildren($id,$alphabeticalTree)
     {
         if (is_null($this->tmp)) {
-    
-            $d = $this->models->Taxon->_get(
-            array(
-            'id' => array(
-            'project_id' => $this->getCurrentProjectId()
-            ),
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
-//			'order' => 'taxon_order'
-            ));
+
+			$p = array(
+					'id' => array('project_id' => $this->getCurrentProjectId()),
+					'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+				);
+				
+			if ($alphabeticalTree)
+				$p['order'] = 'taxon';
+	
+            $d = $this->models->Taxon->_get($p);
     
             foreach((array)$d as $val) {
     
@@ -1815,24 +1822,12 @@ class Controller extends BaseClass
         $pId = isset($p['pId']) ? $p['pId'] : null;
         $ranks = isset($p['ranks']) ? $p['ranks'] : $this->newGetProjectRanks();
         $depth = isset($p['depth']) ? $p['depth'] : 0;
+        $alphabeticalTree = isset($p['alphabeticalTree']) ? $p['alphabeticalTree'] : false;
         
         if (!isset($p['depth']))
             unset($this->treeList);
         
-        $t = $this->getTaxonChildren($pId);
-       
-        /*
-        $t = $this->models->Taxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'parent_id' . (is_null($pId) ? ' is' : '') => (is_null($pId) ? 'null' : $pId)
-            ), 
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level', 
-            'fieldAsIndex' => 'id', 
-            'order' => 'taxon_order,id'
-        ));
-        */
+        $t = $this->getTaxonChildren($pId,$alphabeticalTree);
         
         foreach ((array) $t as $key => $val) {
             
@@ -1848,7 +1843,8 @@ class Controller extends BaseClass
             $t[$key]['children'] = $this->_newGetTaxonTree(array(
                 'pId' => $val['id'], 
                 'ranks' => $ranks, 
-                'depth' => $depth + 1
+                'depth' => $depth + 1,
+				'alphabeticalTree' => $alphabeticalTree
             ));
             
             $this->treeList[$key]['child_count'] = count((array) $t[$key]['children']);
@@ -1955,8 +1951,6 @@ class Controller extends BaseClass
         
         return isset($d) ? $d : null;
     }
-
-
 
     public function userHasTaxon ($taxonId, $userId = null)
     {

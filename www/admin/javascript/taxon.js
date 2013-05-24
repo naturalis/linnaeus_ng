@@ -131,7 +131,7 @@ function taxonEditTaxonName(id) {
 
 function taxonAddPage(page) {
 	//[id,[names],default?]
-	// names[-1] contains the system label, [x] the name in language x
+	// names[-1] contains the system label, names[x] the name in language x
 	taxonPages[taxonPages.length] = page;
 }
 
@@ -456,7 +456,6 @@ function taxonDeleteData(id,name) {
 			if (data=='<redirect>') {
 				window.open('delete.php?id='+id+'&time='+allGetTimestamp(),'_self');
 			} else {
-				//window.open('list.php','_self');
 				window.open('manage.php','_self');
 			}
 
@@ -1542,7 +1541,35 @@ function taxonBlankOutRanks() {
 
 function taxonSortTaxaAlpha() {
 
-	if (confirm(_('Are you sure you want to permanently sort the taxa alphabetically?')))
-		window.open('list.php?sort=alpha','_self');
+	if (!confirm(_('Are you sure you want to permanently sort the taxa alphabetically?')))
+		return;
+
+	$('tr[type="taxon"]').each(function(i){
+		$('#theForm').append('<input type="hidden" name="newOrder[]" value="'+$(this).attr('taxon-id')+'">').val($(this).attr('taxon-id'));
+	});
+
+	$('#theForm').append('<input type="hidden" name="sortAlpha" value="1">').val('1');
+	$('#theForm').submit();
 
 }
+
+
+function taxonSortTaxaTaxonomic() {
+
+	if (!confirm(_('Are you sure you want to permanently sort the taxa alphabetically per taxonomic level?')))
+		return;
+
+	$('#theForm').append('<input type="hidden" name="sortTaxonLevel" value="1">').val('1');
+	$('#theForm').submit();
+
+}
+
+function taxonDoSaveOrder() {
+
+	$('tr[type="taxon"]').each(function(i){
+		$('#theForm').append('<input type="hidden" name="newOrder[]" value="'+$(this).attr('taxon-id')+'">').val($(this).attr('taxon-id'));
+	});
+
+	$('#theForm').submit();
+}
+

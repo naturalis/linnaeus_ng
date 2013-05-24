@@ -21,7 +21,7 @@
 {if $activeCategory=='classification'}
 <div id="classification">
 	{foreach from=$content key=k item=v name=classification}
-	{if $v.do_display}	
+	{if $v.do_display}
 		{if $useJavascriptLinks}			
 		<p {if $smarty.foreach.classification.last || $v.is_empty==1}class="current-taxon"{else}class="a" onclick="{if $v.lower_taxon==1}goTaxon{else}goHigherTaxon{/if}({$v.id})"{/if}>{$v.label}</p>
 		{else}

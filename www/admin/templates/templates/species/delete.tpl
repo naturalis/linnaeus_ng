@@ -61,7 +61,7 @@
 </table>
 <p>
 <input type="submit" value="{t}save{/t}" />&nbsp;
-<input type="button" value="{t}back{/t}" onclick="window.open('list.php','_self');"
+<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self');"
 </form>
 </p>
 {/if}
