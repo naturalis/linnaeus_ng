@@ -24,7 +24,7 @@
             <th style="width:60px;">{t}Literature{/t}</th>
             <th style="width:60px;">{t}Synonyms{/t}</th>
             <th style="width:90px;">{t}Common names{/t}</th>
-            <th style="width:20px;text-align:center">{t}Delete{/t}</th>
+            {*<th style="width:20px;text-align:center">{t}Delete{/t}</th>*}
             <th>{t}Is being edited by{/t}</th>
         </tr>
 	</thead>
@@ -33,6 +33,7 @@
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
 		<tr class="tr-highlight" type="taxon" taxon-id="{$taxon.id}">
 			<td style="text-align:left;cursor:move">
+	            {*' . '|str_repeat:$taxon.depth*}
             	<a href="edit.php?id={$taxon.id}">{$taxon.taxon_formatted}</a>
                 {if $session.admin.project.includes_hybrids==1}
                     {if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
@@ -53,9 +54,9 @@
 			<td ondblclick="window.open('common.php?id={$taxon.id}','_self');">
             	<a type="common" href="common.php?id={$taxon.id}">{if $commonnameCount[$taxon.id]}{$commonnameCount[$taxon.id]}{else}0{/if}</a>
 			</td>
-			<td class="a" style="text-align:center;" onclick="taxonDeleteData({$taxon.id},'{$taxon.taxon}');">
+			{*<td class="a" style="text-align:center;" onclick="taxonDeleteData({$taxon.id},'{$taxon.taxon}');">
 				x
-			</td>
+			</td>*}
 			<td id="usage-{$taxon.id}"></td>
         </tr>
 	{/if}

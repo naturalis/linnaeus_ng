@@ -92,23 +92,16 @@
 			<span id="taxon-message" class=""></span>
 		</td>
 	</tr>
-	
 	<tr>
-		<td>
-		Formatted example:
-		</td>
-		<td id="formatted-example">
-		</td>
-		<td>
-		</td>
+    	<td>Formatted example:</td><td id="formatted-example"></td><td></td>
 	</tr>
-	
 	<tr>
 		<td colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td colspan="3">
 			<input type="submit" value="{t}save{/t}" />
+			<input type="button" value="{t}delete{/t}" onclick="$('#theForm').attr('action','delete.php').submit();" />
 		</td>
 	</tr>
 </table>

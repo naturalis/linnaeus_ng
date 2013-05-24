@@ -1305,24 +1305,6 @@ class Controller extends BaseClass
     }
 
 
-
-    public function getTaxonByIdOLD ($id = false)
-    {
-        $id = $id===false ? (isset($this->requestData['id']) ? $this->requestData['id'] : null) : $id;
-
-        $t = $this->models->Taxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'id' => $id
-            ), 
-            'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level'
-        ));
-        
-        return $t[0];
-    }
-
-
     public function getTaxonById ($id = false)
     {
 
@@ -1653,52 +1635,6 @@ class Controller extends BaseClass
 
 
 
-    public function hasTableDataChanged ($table)
-    {
-        if (!isset($this->models->{$table}))
-            return true;
-        
-        if (isset($_SESSION['admin']['system']['cacheControl'][$table])) {
-            
-            $t = $this->models->{$table}->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'columns' => 'max(last_change) > "' . mysql_real_escape_string($_SESSION['admin']['system']['cacheControl'][$table]['timestamp']) . '" as changed,
-						count(*) as total,
-						current_timestamp'
-            ));
-            
-            $result = ($t[0]['changed'] == 1 || $_SESSION['admin']['system']['cacheControl'][$table]['count'] != $t[0]['total']);
-            
-            $_SESSION['admin']['system']['cacheControl'][$table] = array(
-                'timestamp' => $t[0]['current_timestamp'], 
-                'count' => $t[0]['total']
-            );
-            
-            return $result;
-        }
-        else {
-            
-            $t = $this->models->{$table}->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId()
-                ), 
-                'columns' => 'current_timestamp,count(*) as total'
-            ));
-            
-            $_SESSION['admin']['system']['cacheControl'][$table] = array(
-                'timestamp' => $t[0]['current_timestamp'], 
-                'count' => $t[0]['total']
-            );
-            
-            return true;
-        }
-    }
-    
-
     /*
 
 		"new" functions below are replacements for the "taxon tree"-functions, with improved
@@ -1971,7 +1907,6 @@ class Controller extends BaseClass
     }
 
 
-
     public function getProjectUsers ($pId = null)
     {
         $pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
@@ -2020,7 +1955,6 @@ class Controller extends BaseClass
         
         return $users;
     }
-
 
 
     public function setBreadcrumbRootName ($name)
