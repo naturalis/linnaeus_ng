@@ -36,8 +36,6 @@ function nbcGetResults(p) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);
-			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
 			if (p && p.action!='similar') nbcDoOverhead();
@@ -584,7 +582,7 @@ function nbcShowStates(id) {
 }
 
 function nbcRefreshGroupMenu() {
-console.dir(nbcData);
+
 	if (nbcData.menu) nbcBuildGroupMenu(nbcData.menu);
 	
 }

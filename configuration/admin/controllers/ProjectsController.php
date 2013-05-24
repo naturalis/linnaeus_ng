@@ -100,7 +100,7 @@ class ProjectsController extends Controller
             ), 
             'order' => 'module_id asc'
         ));
-        
+
         foreach ((array) $modules as $key => $val) {
             
             // get info per module
