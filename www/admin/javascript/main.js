@@ -413,3 +413,37 @@ function prettyPhotoInit() {
  	});
 
 }
+
+function allSaveDragOrder(form,vari) {
+	/*
+		usage:
+
+		<table id="drag-list" class="grid">
+		<tr type="drag-row" drag-id="{id}">
+
+		$(document).ready(function(){
+		
+			var fixHelper = function(e, ui) {
+				ui.children().each(function() {
+					$(this).width($(this).width());
+				});
+				return ui;
+			};
+		
+			$("#drag-list tbody").sortable({
+				helper: fixHelper
+			}).disableSelection();
+		
+		})
+
+	*/
+	form = form ? form : 'theForm';
+	vari = vari ? vari : 'newOrder';
+
+	$('tr[type="drag-row"]').each(function(i){
+		$('#'+form).append('<input type="hidden" name="'+vari+'[]" value="'+$(this).attr('drag-id')+'">').val($(this).attr('drag-id'));
+	});
+
+	$('#'+form).submit();
+}
+

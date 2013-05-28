@@ -487,3 +487,7 @@ a:hover,.a:hover {
 .italics {
 	font-style: italic;
 }
+
+tr[type=drag-row] {
+	cursor:move;
+}

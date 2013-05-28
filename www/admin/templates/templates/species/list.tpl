@@ -15,7 +15,7 @@
         {/if}
     </p>
     
-<table id="taxon-list" class="grid">
+<table id="drag-list" class="grid">
 	<thead>
         <tr>
             <th style="width:270px;text-align:left">{t}Taxon{/t}</th>
@@ -31,7 +31,7 @@
 	<tbody>
 	{foreach from=$taxa item=taxon key=k}
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
-		<tr class="tr-highlight" type="taxon" taxon-id="{$taxon.id}">
+		<tr class="tr-highlight" type="drag-row" drag-id="{$taxon.id}">
 			<td style="text-align:left;cursor:move">
 	            {*' . '|str_repeat:$taxon.depth*}
             	<a href="edit.php?id={$taxon.id}">{$taxon.taxon_formatted}</a>
@@ -66,7 +66,7 @@
 	<p>
         <form method="post" action="" id="theForm">
         <input type="hidden" name="rnd" value="{$rnd}" />
-        <input type="button" value="save taxon order" onclick="taxonDoSaveOrder()"/>
+        <input type="button" value="save taxon order" onclick="allSaveDragOrder()"/>
         </form>
     </p>
     <p>
@@ -92,7 +92,7 @@ $(document).ready(function(){
 		return ui;
 	};
 
-	$("#taxon-list tbody").sortable({
+	$("#drag-list tbody").sortable({
 		helper: fixHelper
 	}).disableSelection();
 
