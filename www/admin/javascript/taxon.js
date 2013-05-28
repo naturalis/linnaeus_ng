@@ -1563,13 +1563,3 @@ function taxonSortTaxaTaxonomic() {
 	$('#theForm').submit();
 
 }
-
-function taxonDoSaveOrder() {
-
-	$('tr[type="taxon"]').each(function(i){
-		$('#theForm').append('<input type="hidden" name="newOrder[]" value="'+$(this).attr('taxon-id')+'">').val($(this).attr('taxon-id'));
-	});
-
-	$('#theForm').submit();
-}
-

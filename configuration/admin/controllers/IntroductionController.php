@@ -214,72 +214,23 @@ class IntroductionController extends Controller
 
 		$this->setPageName($this->translate('Change page order'));
 		
-		if ($this->rHasVal('dir') && $this->rHasId() && !$this->isFormResubmit()) {
+		if ($this->rHasVal('newOrder') && !$this->isFormResubmit()) {
 		
-			$d = $this->getPageHeaders();
+			foreach((array)$this->requestData['newOrder'] as $key => $val) {
 			
-			$lowerNext = $prev = false;
-			
-			foreach((array)$d as $key => $val) {
-			
-				$newOrder = $key;
-
-				if ($val['id'] == $this->requestData['id']) {
-
-					if (($this->requestData['dir']=='up') && $prev) {
-
-						$newOrder = $key - 1;
-
-						 $this->models->IntroductionPage->update(
-							array(
-								'show_order' => 'show_order + 1',
-							),
-							array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $prev
-							)
-						);
-
-					} else
-					if ($this->requestData['dir']=='down') {
-
-						$newOrder = $key + 1;
-						
-					} else {
-
-						$newOrder = $key;
-
-					}
-
-				}
-				
-				if ($lowerNext) {
-
-					$newOrder = $key - 1;
-
-					$lowerNext = false;
-
-				}
-
 				 $this->models->IntroductionPage->update(
-				 	array(
-						'show_order' => $newOrder,
+					array(
+						'show_order' => $key,
 					),
 					array(
 						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['id']
+						'id' => $val
 					)
 				);
 
-				if ($val['id'] == $this->requestData['id'] && $this->requestData['dir']=='down') {
-
-					$lowerNext = true;
-
-				} 
-									
-				$prev = $val['id'];
-
 			}
+			
+			$this->addMessage($this->translate('New order saved.'));
 
 		}
 

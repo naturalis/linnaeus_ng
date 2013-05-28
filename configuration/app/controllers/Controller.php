@@ -20,15 +20,11 @@
 
 	on stylesheets:
 	there are four location where included .css files and styles can be specified:
-		____source__________scope___________location_________________________________
+		____source__________scope___________location_____________________________
 		1)	$cssToLoadBase	global			declared in Controller
 		2)	$cssToLoad		module			declared in [Module]Controller
 		3)	hardcoded		skin			printed in _head.tpl
 		4)	dynamic			skin/project	utilities\dynamic-css.tpl
-		
-		5)!
-		
-		
 	ad 1: these files are always loaded, for every module, and loaded first. after
 	 being merged with $cssToLoad in Controller::setCssFiles(), they are printed in
 	 the skin's _head.tpl file.
