@@ -48,10 +48,12 @@ projectspecifiek is) in de algemene map:
   /www/shared/media/system/l2_maps/
 relatief t.o.v. de htdocs-bestandsroot.
 Als in voorgaand voorbeeld de kaart niet gevonden kan worden, dan wordt
-vervolgens gezocht naar:
-  /www/shared/media/system/l2_maps/Limburg.GIF
-Als de kaart in kwestie daar ok niet gevonden wordt, volgt een foutmelding
-in het scherm.
+achtereenvolgens gezocht naar:
+  /www/shared/media/system/l2_maps/Limburg.gif (letterlijke naam)
+en
+  /www/shared/media/system/l2_maps/limburg.gif (naam lowercased)
+Als de kaart in kwestie daar ook niet gevonden wordt, volgt een foutmelding
+in het scherm ("The image file for the map "Limburg" is missing.").
 
 
 -- GENERIEKE KAART --

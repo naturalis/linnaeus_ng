@@ -23,13 +23,14 @@ class MapKeyController extends Controller
 		'map-*'
 	);
 
-    public $cssToLoad = array('map.css','lookup.css',);
+    public $cssToLoad = array('map.css','lookup.css','prettyPhoto/prettyPhoto.css');
 
 	public $jsToLoad = array(
 		'all' => 
 			array(
 				'mapkey.js',
 				'jscolor/jscolor.js',
+	            'prettyPhoto/jquery.prettyPhoto.js', 
 				'http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing',
 				'lookup.js'
 			)
@@ -1727,8 +1728,14 @@ class MapKeyController extends Controller
 			} else {
 			
 				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif');
+				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif';
 
-				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
+				if (!$m[$key]['mapExists']) {
+
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif');
+					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
+
+				}
 
 			}
 
@@ -2063,8 +2070,6 @@ class MapKeyController extends Controller
 
 	public function l2MapsShowAction()
 	{
-
-		return;
 
 		if ($this->requestDataFiles && !$this->isFormResubmit()) {
 			

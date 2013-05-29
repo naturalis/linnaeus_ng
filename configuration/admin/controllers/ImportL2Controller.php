@@ -2578,6 +2578,7 @@ class ImportL2Controller extends Controller
         }
         
         $id = $this->models->Literature->getNewId();
+		
         $_SESSION['admin']['system']['import']['literature'][] = array(
             'id' => $id, 
             'original' => $lit['original']
@@ -2587,13 +2588,14 @@ class ImportL2Controller extends Controller
             
             if (empty($kV))
                 continue;
-            
+
             $this->models->LiteratureTaxon->save(array(
                 'id' => null, 
                 'project_id' => $this->getNewProjectId(), 
                 'taxon_id' => $kV, 
                 'literature_id' => $id
             ));
+			
         }
         
         foreach ((array) $lit['references']['unknown_species'] as $kV) {
