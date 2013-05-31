@@ -30,7 +30,8 @@
             <hr />
         </div>
 
-		<div id="legendContainer" class="hidden">   
+		{*<div id="legendContainer" class="hidden">*}
+		<div id="legendContainer">
         	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
             <table>
                 <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information_grijs.png" /></td><td id="legendDetails">onderscheidende kenmerken</td></tr>
