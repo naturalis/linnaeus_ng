@@ -7,16 +7,3 @@
 	height:350px;
 }
 
-#synonyms-container {
-}
-
-#synonyms {
-	border:1px solid #bbf;
-	padding:5px;
-	width:250px;
-}
-
-#add {
-	padding: 0px 10px 0px 10px;
-	cursor:pointer;
-}

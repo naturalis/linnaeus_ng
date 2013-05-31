@@ -179,7 +179,7 @@ function nbcFormatResult(data) {
     */
 	
 	var showDetails = nbcData.results.length <= nbcPerPage;
-	
+
 	if (data.l!=data.c && data.l.indexOf(data.c)===0) {
 		data.l = data.c + ' (' + data.l.replace(data.c,'').replace(/(^\s|\s$)/,'') + ')';
 	}
@@ -238,7 +238,7 @@ function nbcFormatResult(data) {
 			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
 				'<span style="position:relative;top:4px;">'+
 					'<span class="result-icons">'+
-						(states ? 
+						(states && states.length > 0 ? 
 							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
 							'<img class="result-icon icon-info" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
 							'</a>' : '') +
@@ -252,7 +252,7 @@ function nbcFormatResult(data) {
 							'</a>' : '')  +
 					'</span>' +
 				'</span>' +
-			(states ? 
+			(states && states.length > 0 ? 
 				'<div id="det-'+id+'" class="resultDetails">'+
 					'<ul>'+
 						'<li>'+states.join('</li><li>')+'</li>'+

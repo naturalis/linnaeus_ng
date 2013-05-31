@@ -85,16 +85,7 @@ $(document).ready(function(){
 	$('a[type="synonyms"]').each(function(i){$(this).html($(this).html()+' syn'+($(this).html()!=1 ? 's' : '')+'.')});
 	$('a[type="common"]').each(function(i){$(this).html($(this).html()+' name'+($(this).html()!=1 ? 's' : ''))});
 
-	var fixHelper = function(e, ui) {
-		ui.children().each(function() {
-			$(this).width($(this).width());
-		});
-		return ui;
-	};
-
-	$("#drag-list tbody").sortable({
-		helper: fixHelper
-	}).disableSelection();
+	allInitDragtable();
 
 })
 </script>

@@ -740,12 +740,19 @@ class GlossaryController extends Controller
 
             $this->getLookupList($this->requestData['search']);
 
+        } else if ($this->rHasVal('action','save_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
+
+			$this->saveSynonym($this->requestData['id'],$this->requestData['language_id'],$this->requestData['synonym']);
+
+        } else if ($this->rHasVal('action','delete_synonym') && $this->rHasId() && $this->rHasVal('synonym')) {
+
+			$this->deleteSynonymByName($this->requestData['id'],$this->requestData['language_id'],$this->requestData['synonym']);
+
         }
 		
         $this->printPage();
     
     }
-
 
 	public function matchTerms($text,$languageId)
 	{
@@ -1245,21 +1252,6 @@ class GlossaryController extends Controller
 
     }
 
-/*
-	private function getGlossaryMedia($id)
-	{
-
-		return $this->models->GlossaryMedia->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'glossary_id' => $id
-				)
-			)
-		);
-
-	}	
-	*/
     private function ajaxActionGetMediaDescriptions()
     {
 
@@ -1318,6 +1310,35 @@ class GlossaryController extends Controller
         return array('content' => $modified, 'modified' => $content!=$modified);
 
     }
+
+	private function saveSynonym($id,$languageId,$synonym)
+	{
+
+		$this->models->GlossarySynonym->save(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'glossary_id' => $id,
+				'language_id' => !empty($languageId) ? $languageId : $this->getDefaultProjectLanguage(),
+				'synonym' => $synonym
+			)
+		);
+		
+	}
+
+
+	private function deleteSynonymByName($id,$languageId,$synonym)
+	{
+
+		$this->models->GlossarySynonym->delete(
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'glossary_id' => $id,
+				'language_id' => !empty($languageId) ? $languageId : $this->getDefaultProjectLanguage(),
+				'synonym' => $synonym
+			)
+		);
+		
+	}
 
 
 

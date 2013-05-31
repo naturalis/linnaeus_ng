@@ -54,7 +54,7 @@
 	src="{$session.admin.project.urls.project_media}{$page.image.file_name}" /><br />
 	<span class="a" onclick="freemodDeletePageImage('{$id}')">{t}(click to delete image){/t}</span>
 {else}
-<span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}add an image to this page{/t}</span>
+<span class="a" onclick="freemodSaveContentAll();$('#imgForm').submit();">{t}Add an image to this page{/t}</span>
 {/if}
 </p>
 </form>

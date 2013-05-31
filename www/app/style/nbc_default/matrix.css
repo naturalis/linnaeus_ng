@@ -1,5 +1,5 @@
 /* top */
-#body #header #logo {width:928px;left:9px;}
+#body #header #logo {width:700px;left:9px;}
 #body #header #logo #soortenrgister-link {padding:0px 210px 25px 0px;display:inline;cursor:pointer;}
 #body #header #logo #home-link {padding:0px 310px 25px 0px;display:inline;cursor:pointer;}
 #body #header #menucontainer {left: 235px;}
@@ -30,11 +30,10 @@
 #clearSelectionContainer img {padding-right:5px;}
 #dataSourceContainer {font-size:0.9em;margin-bottom:10px;}
 #dataSourceContainer #sourceHeader {font-weight:bold}
-#nbcLogoContainer {font-size:0.9em;margin-bottom:10px;}
-#nbcLogoContainer #logoHeader {display:block;font-weight:bold;margin-bottom:5px;}
-#nbcLogoContainer #logo-NBC {width:86px;margin-bottom:20px}
-#nbcLogoContainer #logo-EIS {width:92px;margin-left:5px;}
-#nbcLogoContainer #logo-ETI {display:block;font-size:8.5px;margin-top:5px}
+
+#logo-container {float:right;margin:35px 45px 0px 0px}
+#logo-NBC {height:93px;}
+#logo-EIS {height:93px;margin-left:5px;}
 
 #legendContainer {font-size:11px;padding-bottom:10px}
 #legendContainer .result-icon {border:none}
@@ -75,7 +74,7 @@
 #content div#results div.result a.detailsBtn, #content div#results div.result a.similarBtn {font-size:0.85em}
 
 #content div#results div.result .result-icons {padding:0 6px 0 0px;}
-.result-icon {width:21px;margin-right:5px;height:21px;border:0px;border:1px solid #ccc;}
+.result-icon {width:21px;margin-right:12px;height:21px;border:0px;border:1px solid #ccc;}
 
 #content div#results div.result .icon-info:hover {border:1px solid #44b7fd;}
 #content div#results div.result .icon-sr:hover {border:1px solid #bac599;}
@@ -163,6 +162,7 @@ div#graphicValueSelector #graphicValuesTable td {text-align:center;vertical-alig
 
 #state-value{text-align:right;}
 #state-value-extra{margin-top:5px;}
+#state-info{margin-bottom:10px;}
 
 
 /* footer */

@@ -232,6 +232,33 @@ class IntroductionController extends Controller
 			
 			$this->addMessage($this->translate('New order saved.'));
 
+		} else
+		if ($this->rHasVal('sortAlpha')   ) { // && !$this->isFormResubmit()) {
+
+			$d = $this->getPageHeaders();
+
+			$this->customSortArray($d, array(
+				'label' => 'name', 
+				'dir' => 'asc', 
+				'case' => 'i'
+			));
+			
+			foreach((array)$d as $key => $val) {
+			
+				 $this->models->IntroductionPage->update(
+					array(
+						'show_order' => $key,
+					),
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['id']
+					)
+				);
+
+			}
+			
+			$this->addMessage($this->translate('Alphabetic order saved.'));
+
 		}
 
 		$this->smarty->assign('pages',$this->getPageHeaders());

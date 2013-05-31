@@ -147,3 +147,10 @@ function freemodRunAutoSave() {
 	setTimeout("freemodRunAutoSave()", autoSaveFreq);
 
 }
+
+function freemodSortAlpha() {
+
+	$('#theForm').append('<input type="hidden" name="sortAlpha" value="1">').val('1');
+	$('#theForm').submit();
+
+}
