@@ -1,10 +1,43 @@
 var glossAddedSynonyms = Array();
 var glossThisTerm;
 
+function glossAjaxAction(p) {
+
+	p.time = allGetTimestamp();
+
+	$.ajax({
+		url : "ajax_interface.php",
+		data : (p),
+		success : function (data) {
+			//alert(data);
+		}
+	});
+
+}
+
+
+function glossDoAddSynonym() {
+
+	glossAjaxAction({'action':'save_synonym','id':$('#id').val(),'synonym':$('#synonym').val(),'language_id':$('#language_id').val()});
+	glossAddSynonymToList();
+
+}
+
+
+function glossDoDeleteSynonym(d) {
+
+	glossAjaxAction({'action':'delete_synonym','id':$('#id').val(),'synonym':d,'language_id':$('#language_id').val()});
+
+}
+
 
 function glossAddSynonymToList(synonym) {
 
-	if (!synonym) synonym = $('#synonym').val().trim();
+	if (!synonym) synonym = $('#synonym').val();
+
+	synonym = synonym.trim();
+
+	if (synonym.length==0) return false;
 
 	var add = true;
 
@@ -29,20 +62,25 @@ function glossAddSynonymToList(synonym) {
 		$('#synonym').val('');
 
 	}
+	
+	return true;
 
 }
 
 function glossUpdateSynonyms() {
 
+
+	glossAddedSynonyms.sort();
+
 	var b = '';
 	
-	for(var i=0;i<glossAddedSynonyms.length;i++) {
+	for(i=0;i<glossAddedSynonyms.length;i++) {
 	
-		b = b + '<span style="cursor:pointer" ondblclick="glossRemoveSynonymFromList('+i+')">'+glossAddedSynonyms[i]+'</span><br />';
+		b = b + glossAddedSynonyms[i]+'<span class="delete-x" onclick="glossRemoveSynonymFromList('+i+');">x</span><br />';
 	
 	}
 	
-	$('#synonyms').html(b);
+	$('#synonyms').html(b ? b : _('(none)'));
 
 }
 
@@ -51,6 +89,7 @@ function glossRemoveSynonymFromList(id) {
 	if (!confirm('Are you sure?')) return;
 
 	var t = Array();
+	var d = String;
 
 	for(var i=0;i<glossAddedSynonyms.length;i++) {
 
@@ -58,17 +97,23 @@ function glossRemoveSynonymFromList(id) {
 
 			t[t.length] = glossAddedSynonyms[i];
 
+		} else {
+			
+			d = glossAddedSynonyms[i]
+			
 		}
 
 	}
 	
+	glossDoDeleteSynonym(d);
+	
 	glossAddedSynonyms = t;
 
 	glossUpdateSynonyms();
-
+	
 }
 
-function glossCheckForm(ele) {
+function glossCheckForm() {
 
 	if ($('#term').val().length==0) {
 
@@ -93,7 +138,7 @@ function glossCheckForm(ele) {
 
 		$("#definition").val(tinyMCE.get('definition').getContent());
 
-		$(ele).closest("form").submit();
+		$("#theForm").submit();
 
 	}
 

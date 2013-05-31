@@ -423,16 +423,7 @@ function allSaveDragOrder(form,vari) {
 
 		$(document).ready(function(){
 		
-			var fixHelper = function(e, ui) {
-				ui.children().each(function() {
-					$(this).width($(this).width());
-				});
-				return ui;
-			};
-		
-			$("#drag-list tbody").sortable({
-				helper: fixHelper
-			}).disableSelection();
+			allInitDragtable();
 		
 		})
 
@@ -447,3 +438,25 @@ function allSaveDragOrder(form,vari) {
 	$('#'+form).submit();
 }
 
+function allInitDragtable(functionOnDrop) {
+
+	var fixHelper = function(e, ui) {
+		ui.children().each(function() {
+			$(this).width($(this).width());
+		});
+		return ui;
+	};
+
+	$("#drag-list tbody").sortable({
+		helper: fixHelper
+	}).disableSelection();
+	
+	if (functionOnDrop) {
+		$("#drag-list tbody").sortable({
+			deactivate:function(event,ui) {
+				functionOnDrop();
+			}
+		});
+	}
+	
+}

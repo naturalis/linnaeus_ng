@@ -396,9 +396,7 @@ function mapDeleteType(id,value) {
 	$('<input type="hidden" name="del_type">').val(id).appendTo('#theForm');
 	$('#theForm').submit();
 
-
 }
-
 
 function mapMoveType(id,action) {
 
@@ -414,18 +412,19 @@ function mapL2bindMouseMove() {
 	
 	var offset = $('#map-overlay').offset();
 	
-	$('#map-overlay').mousemove(function(event){
+	$('#map-overlay').mousemove(function(event) {
 		
 		var x = event.pageX-offset.left;
 		var y = event.pageY-offset.top;
 		
-		var mapWDeg = (((x / mapWPx) * mapW) + lon1);
-		var mapHDeg = (((y / mapHPx) * mapH) + lat1);
+		var mapWDeg = (((x / mapWPx) * mapW) + lon2);
+		var mapHDeg = (((y / mapHPx) * mapH) + lat2);
 
 		mapWDeg = Math.floor(mapWDeg) + ((Math.round((mapWDeg - Math.floor(mapWDeg)) * 100))/100);
 		mapHDeg = Math.floor(mapHDeg) + ((Math.round((mapHDeg - Math.floor(mapHDeg)) * 100))/100);
 
-		$('#coordinates').html(mapWDeg+'x'+mapHDeg);
+		$('#coordinates').html(mapWDeg+' x '+mapHDeg);
+
 
 	});
 

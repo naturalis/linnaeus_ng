@@ -1,1 +1,0 @@
-<body id="body"><form method="get" action="" id="theForm" onsubmit="return checkForm();"><input type="hidden" name="rnd" value="{$rnd}" /><div id="body-container">

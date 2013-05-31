@@ -1,82 +1,76 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
 <form action="" method="post" id="theForm" action="edit.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="id" value="{$gloss.id}" />
+<input type="hidden" name="id" id="id" value="{$gloss.id}" />
 <input type="hidden" name="action" id="action" value="" />
 <input type="hidden" name="letter" id="letter" value="" />
 {if $languages|@count==1}
-<input type="hidden" name="language_id" value="{$languages[0].language_id}" />
+<input type="hidden" name="language_id" id="language_id" value="{$languages[0].language_id}" />
 {/if}
-<table>
-	<tr>
-		<td colspan="2">
-			<input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm(this)" />
-			<input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm(this)" />
-			<!-- input type="button" value="{t}back{/t}" onclick="window.open('{$backUrl}','_top')" / -->
-			{if $gloss.id}
-			<input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
-			{/if}
-		</td>
-	</tr>
-	<tr><td colspan="2">&nbsp;</td></tr>		
+    <table>
+        <tr>
+            <td colspan="2">
+                <input type="button" value="{t}save{/t}" onclick="$('#action').val('save');glossCheckForm();" />
+                <input type="button" value="{t}save and preview{/t}" onclick="$('#action').val('preview');glossCheckForm();" />
+                {if $gloss.id}
+                <input type="button" value="{t}delete{/t}" onclick="glossDelete()" />
+                {/if}
+            </td>
+        </tr>
+        <tr><td colspan="2">&nbsp;</td></tr>		
+    
+    {if $languages|@count > 1}
+        <tr>
+            <td>{t}Language:{/t}</td>
+            <td>
+                <select name="language_id" id="language">
+                {section name=i loop=$languages}
+                    {if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
+                    {/if}
+                {/section}
+                </select> *
+            </td>
+        </tr>
+    {/if}
+        <tr>
+            <td>
+                {t}Term:{/t}
+            </td>
+            <td>
+                <input
+                    type="text"
+                    name="term"
+                    id="term"
+                    value="{$gloss.term}"
+                    maxlength="255"/> *
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr style="vertical-align:top">
+            <td>{t}Definition:{/t} *</td>
+        </tr>
+        <tr style="vertical-align:top">
+            <td>
+                <textarea
+                    name="definition"
+                    id="definition">{$gloss.definition}</textarea>
+            </td>
+        </tr>
+    </table>
+<p>
+	{t}Synonyms:{/t}
+</p>
+<p id="synonyms"></p>
+<p>
+    <input type="text" name="synonym" id="synonym" value="" />
+    <input type="button" onclick="glossDoAddSynonym();" value="{t}add synonym{/t}">
+</p>
 
-{if $languages|@count > 1}
-	<tr>
-		<td>{t}Language:{/t}</td>
-		<td>
-			<select name="language_id" id="language">
-			{section name=i loop=$languages}
-				{if $languages[i].language!=''}<option value="{$languages[i].language_id}"{if $languages[i].language_id==$activeLanguage} selected="selected"{/if}>{$languages[i].language}{if $languages[i].language_id==$defaultLanguage} *{/if}</option>
-				{/if}
-			{/section}
-			</select> *
-		</td>
-	</tr>
-{/if}
-	<tr>
-		<td>
-			{t}Term:{/t}
-		</td>
-		<td>
-			<input
-				type="text"
-				name="term"
-				id="term"
-				value="{$gloss.term}"
-				maxlength="255"/> *
-		</td>
-	</tr>
-</table>
-<table>
-	<tr style="vertical-align:top">
-		<td>{t}Definition:{/t} *</td>
-	</tr>
-	<tr style="vertical-align:top">
-		<td>
-			<textarea
-				name="definition"
-				id="definition">{$gloss.definition}</textarea>
-		</td>
-	</tr>
-</table>
-<br />
-<table>
-	<tr style="vertical-align:top">
-		<td>{t}Synonyms:{/t}</td>
-		<td>
-			<input type="text" name="synonym" id="synonym" value=""/>
-			<span class="a" id="add" onclick="glossAddSynonymToList()">{t}add{/t}</span>
-			<div id="synonyms-container">
-			<div id="synonyms"></div>
-			{t}(double-click a synonym to remove it from the list){/t}
-			</div>
-		</td>
-	</tr>
-</table>
-
-<span class="a" onclick="$('#action').val('media');glossCheckForm(this);">{t}Edit media files{/t}</span>
+<span class="a" onclick="$('#action').val('media');glossCheckForm();">{t}Edit multimedia{/t}</span>
 
 </form>
 </div>
@@ -84,28 +78,21 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-
-var f = $('#synonyms-container');
-
-var off = $('#add').offset();
-f.offset({left : off.left + $('#add').width() + 30, top: off.top});
 {/literal}
 {if $useJavascriptLinks}intLinkUseJSLinks = true;{/if}
-{literal}
-initTinyMce(false,false);
-
-
-});
-
-{/literal}
-
+{if $gloss.synonyms}
 {section name=i loop=$gloss.synonyms}
 glossAddSynonymToList('{$gloss.synonyms[i].synonym|@addslashes}');
 {/section}
-
+{else}
+glossUpdateSynonyms();
+{/if}
 glossThisTerm = '{$gloss.term|@addslashes}';
-
+{literal}
+initTinyMce(false,false);
+});
 </script>
+{/literal}
 
 {include file="../shared/admin-messages.tpl"}
 {include file="../shared/admin-footer.tpl"}

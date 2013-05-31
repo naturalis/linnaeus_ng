@@ -215,7 +215,6 @@ class MatrixKeyController extends Controller
 					)
 				)
 			);
-			
 						
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
@@ -905,7 +904,7 @@ class MatrixKeyController extends Controller
 	private function scaleDimensions($d)
 	{
 		
-		if (is_null($this->_matrixStateImageMaxHeight))
+		if (is_null($this->_matrixStateImageMaxHeight) || ($d[1] < $this->_matrixStateImageMaxHeight))
 			return $d;
 
 		return array(round(($this->_matrixStateImageMaxHeight / $d[1]) * $d[0]),$this->_matrixStateImageMaxHeight);
@@ -989,8 +988,11 @@ class MatrixKeyController extends Controller
     }
 
 
-
-    private function getTaxaScores ($states, $incUnknowns = false)
+	/*
+		each selected state further restricts the result set
+		example: red AND black AND round
+	*/
+    private function _getTaxaScoresRestrictive ($states, $incUnknowns = false)
     {
         $s = $c = array();
         $stateCount = 0;
@@ -1113,11 +1115,173 @@ class MatrixKeyController extends Controller
             $this, 
             'sortQueryResultsByScoreThenLabel'
         ));
+
+        return $results;
+    }
+	
+
+	/*
+	
+		DOES NOT WORK YET - WORK IN PROGRESS
+	
+		states within the same charachters expand the result set,
+		selected states across characters restrict the result set
+		example: (red OR black) AND round
+	*/
+    private function _getTaxaScoresLiberal ($states, $incUnknowns = false)
+    {
+        $s = $c = array();
+        $stateCount = 0;
         
+        // we have to find out which states we are looking for
+        foreach ((array) $states as $sKey => $sVal) {
+            $d = explode(':', $sVal);
+            
+            $charId = isset($d[1]) ? $d[1] : null;
+            $value = isset($d[2]) ? $d[2] : null;
+
+            // which is easy for the non-range characters...
+            if ($d[0] != 'f') {
+                
+                if (isset($d[2]))
+                    $s[$d[2]] = $d[2];
+                $stateCount++;
+            }
+            // ...but requires calculation for the ranged ones
+            else {
+
+                // is there a standard dev?
+                $sd = (isset($d[3]) ? $d[3] : null);
+                
+                // where-clause basics
+                $d = array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'characteristic_id' => $charId
+                );
+				
+				$value = str_replace(',','.',$value);
+
+                // calculate the spread around the mean...
+                if (isset($sd)) {
+
+					$sd = str_replace(',','.',$sd);
+                    
+                    $d['mean >=#'] = '(' . strval(floatval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
+                    $d['mean <=#'] = '(' . strval(floatval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+                }
+                // or mark just mark the upper and lower boundaries of the value
+                else {
+                    
+                    $d['lower <='] = $d['upper >='] =  floatval($value);
+                }
+                
+                // get any states that correspond with these values
+                $cs = $this->models->CharacteristicState->_get(array(
+                    'id' => $d
+                ));
+
+                // and store them
+                foreach ((array) $cs as $key => $val)
+                    $s[] = $val['id'];
+                
+                $stateCount++;
+            }
+            
+            $c[$charId] = $charId;
+        }
+        
+        if (empty($s))
+            return;
+        
+        $n = $stateCount + ($incUnknowns ? 1 : 0);
+        $s = implode(',', $s);
+        $c = implode(',', $c);
+        
+        $q = "
+        	select 'taxon' as type, _a.taxon_id as id, _b.state_id, _b.characteristic_id,
+       				_c.is_hybrid as h, trim(_c.taxon) as l
+        		from %PRE%matrices_taxa _a
+        		left join %PRE%matrices_taxa_states _b
+        			on _a.project_id = _b.project_id
+        			and _a.matrix_id = _b.matrix_id
+        			and _a.taxon_id = _b.taxon_id
+        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+		        left join %PRE%taxa _c
+			        on _a.taxon_id = _c.id
+		        where _a.project_id = " . $this->getCurrentProjectId() . "
+			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+        		group by _a.taxon_id
+        	union
+        	select 'matrix' as type, _a.id as id, _b.state_id, _b.characteristic_id,
+			        0 as h, trim(_c.name) as l
+        		from  %PRE%matrices _a
+        		join %PRE%matrices_taxa_states _b
+        			on _a.project_id = _b.project_id
+        			and _a.id = _b.ref_matrix_id
+        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+		        left join %PRE%matrices_names _c
+			        on _b.ref_matrix_id = _c.id
+        			and _c.language_id = " . $this->getCurrentLanguageId() . "
+        		where _a.project_id = " . $this->getCurrentProjectId() . "
+        			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
+        		group by id" . ($this->_matrixType == 'NBC' ? "
+			union
+			select 'variation' as type, _a.variation_id as id, _b.state_id, _b.characteristic_id,
+				0 as h, trim(_c.label) as l
+				from  %PRE%matrices_variations _a        		
+				left join %PRE%matrices_taxa_states _b
+					on _a.project_id = _b.project_id
+					and _a.matrix_id = _b.matrix_id
+					and _a.variation_id = _b.variation_id
+					and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+				left join %PRE%taxa_variations _c
+					on _a.variation_id = _c.id
+				where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				group by _a.variation_id" : "")."
+			order by characteristic_id"
+        ;
+
+        $results = $this->models->MatrixTaxonState->freeQuery($q);
+
+		$d = array();
+		$prevChar = -99;
+		foreach((array)$results as $val) {
+
+			if (!isset($d[$val['id']]))
+				$d[$val['id']] = $val;
+
+			if (!isset($d[$val['id']]['s']))
+				$d[$val['id']]['s'] = 0;
+				
+			if (!empty($val['state_id'])) {
+				if ($val['state_id']==$prevChar)
+					$d[$val['id']]['s']++;
+				else
+					$d[$val['id']]['s']++;
+			}
+			
+			$prevChar = $val['characteristic_id'];
+
+		}
+
+        usort($results, array(
+            $this, 
+            'sortQueryResultsByScoreThenLabel'
+        ));
+
         return $results;
     }
 
+    private function getTaxaScores ($states, $incUnknowns = false)
+	{
 
+		$res = $this->_getTaxaScoresRestrictive ($states,$incUnknowns);
+		//$res = $this->_getTaxaScoresLiberal ($states,$incUnknowns);
+
+		return $res;
+
+	}
 
     private function sortQueryResultsByScoreThenLabel ($a, $b)
     {
@@ -1135,7 +1299,6 @@ class MatrixKeyController extends Controller
         
         return ($a['s'] > $b['s']) ? -1 : 1;
     }
-
 
 
     private function getCharacteristicHValue ($charId, $states = null)
@@ -1191,7 +1354,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     private function getCharacteristics ()
     {
         $mc = $this->models->CharacteristicMatrix->_get(
@@ -1224,7 +1386,6 @@ class MatrixKeyController extends Controller
         
         return isset($c) ? $c : null;
     }
-
 
 
     private function getCharacteristic ($p)
@@ -1298,7 +1459,6 @@ class MatrixKeyController extends Controller
     }
 
 
-
     private function getEntityStates ($id, $type)
     {
 
@@ -1335,16 +1495,19 @@ class MatrixKeyController extends Controller
 		return $res;        
     }
 
+
     private function getTaxonStates ($id)
     {
         return $this->getEntityStates ($id,'taxon');
     }
+
 
     private function getVariationStates ($id)
     {
         return $this->getEntityStates ($id,'variation');
     }
     
+
     private function getMatrixStates ($id)
     {
         return $this->getEntityStates ($id,'matrix');
@@ -1735,6 +1898,7 @@ class MatrixKeyController extends Controller
 
     private function createDatasetEntry ($p)
     {
+		
         $val = isset($p['val']) ? $p['val'] : null;
         $nbc = isset($p['nbc']) ? $p['nbc'] : null;
         $label = isset($p['label']) ? $p['label'] : null;
@@ -2113,7 +2277,6 @@ class MatrixKeyController extends Controller
                 }
             }
 
-			// added details for ALL results, may have to be removed again
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
             
             $this->customSortArray($res, array(
@@ -2232,55 +2395,6 @@ class MatrixKeyController extends Controller
         return $res;
     }
 	
-	private function nbcHandleOverlappingItemsFromDetails($p)
-	{
-		
-		//return $p['data'];
-
-        $data = isset($p['data']) ? $p['data'] : null;
-        $action = isset($p['action']) ? $p['action'] : 'remove';
-
-		if (count((array)$data)==1)
-			return $data;
-
-		$d = array();
-		foreach((array)$data as $key => $dVal) {
-			foreach((array)$dVal['d'] as $characteristic_id => $cVal)	{
-				foreach((array)$cVal['states'] as $state)	{
-					$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
-				}
-			}
-		}
-
-		$common = call_user_func_array('array_intersect',$d);
-
-		foreach((array)$data as $key => $dVal) {
-			foreach((array)$dVal['d'] as $characteristic_id => $cVal) {
-				foreach((array)$cVal['states'] as $sVal => $state)	{
-
-					if (in_array($characteristic_id.':'.$state['id'],$common)) {
-						if ($action=='remove') {
-							unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
-						} else
-						if ($action=='tag') {
-							$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
-						}
-					}
-					
-				}
-				
-				if (count((array)$data[$key]['d'][$characteristic_id]['states'])==0 && $action=='remove') {
-
-					unset($data[$key]['d'][$characteristic_id]);
-
-				}
-			}
-		}
-
-		return $data;
-		
-	}
-
     private function nbcGetTaxaScores ($selectedStates = null)
     {
         $states = array();
@@ -2301,11 +2415,6 @@ class MatrixKeyController extends Controller
 		foreach((array)$matches as $match)
 			if ($match['s']) $fullhits++;
 		
-		$itemsPerPage = $this->getSetting('matrix_items_per_page');
-		if ($itemsPerPage) {
-			$fetchDetails = $fullhits <= $itemsPerPage;
-		}
-        
         // only keep the 100% scores, no partial matches
         $res = array();
         foreach ((array) $matches as $match) {
@@ -2342,7 +2451,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 'v', 
                         'inclRelated' => false,
-						'details' => ($fetchDetails ? $this->getVariationStates($val['id']) : null)
+						'details' => $this->getVariationStates($val['id'])
                     ));
                 }
                 else {
@@ -2387,7 +2496,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 't', 
                         'highlight' => 0,
-						'details' => ($fetchDetails ? $this->getTaxonStates($val['id']) : null)
+						'details' => $this->getTaxonStates($match['id'])
                     ));
                 }
             }
@@ -2410,6 +2519,8 @@ class MatrixKeyController extends Controller
 	        ));
 
         }
+		
+		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 
         return $res;
     }
@@ -2524,7 +2635,7 @@ class MatrixKeyController extends Controller
 					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
 					'type' => $val['type'], 
 					'inclRelated' => true,
-					'details' => ($val['type']=='variation' ? $this->getVariationStates($val['id']) : $this->getTaxonStates($val['id'])) // added details for ALL results, may have to be removed again
+					'details' => ($val['type']=='variation' ? $this->getVariationStates($val['id']) : $this->getTaxonStates($val['id']))
 				)
 			);
 
@@ -2548,13 +2659,61 @@ class MatrixKeyController extends Controller
                     
 		}
 		
-		// added details for ALL results, may have to be removed again
 		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 
         return $res;
 		
     }
  
+ 	private function nbcHandleOverlappingItemsFromDetails($p)
+	{
+		
+		//return $p['data'];
+
+        $data = isset($p['data']) ? $p['data'] : null;
+        $action = isset($p['action']) ? $p['action'] : 'remove';
+
+		if (count((array)$data)==1)
+			return $data;
+
+		$d = array();
+		foreach((array)$data as $key => $dVal) {
+			foreach((array)$dVal['d'] as $characteristic_id => $cVal)	{
+				foreach((array)$cVal['states'] as $state)	{
+					$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
+				}
+			}
+		}
+
+		$common = call_user_func_array('array_intersect',$d);
+
+		foreach((array)$data as $key => $dVal) {
+			foreach((array)$dVal['d'] as $characteristic_id => $cVal) {
+				foreach((array)$cVal['states'] as $sVal => $state)	{
+
+					if (in_array($characteristic_id.':'.$state['id'],$common)) {
+						if ($action=='remove') {
+							unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
+						} else
+						if ($action=='tag') {
+							$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
+						}
+					}
+					
+				}
+				
+				if (count((array)$data[$key]['d'][$characteristic_id]['states'])==0 && $action=='remove') {
+
+					unset($data[$key]['d'][$characteristic_id]);
+
+				}
+			}
+		}
+
+		return $data;
+		
+	}
+
 	private function getRelevantCoefficients($states=null)
 	{
 
@@ -2671,79 +2830,5 @@ class MatrixKeyController extends Controller
 		return $d;		
 		
 	}
-
-
-
-
-/*
-
-    private function getTaxonComparisonORG ($id)
-    {
-        if (empty($id[0]) || empty($id[1]))
-            return;
-        
-        $c = $this->getCharacteristics();
-        $t1 = $this->getTaxonStates($id[0]);
-        $t2 = $this->getTaxonStates($id[1]);
-
-		$both = $neither = $t1_count = $t2_count = 0;
-        
-		// loop through all available states
-        foreach ((array) $c as $key => $val) {
-            
-			
-            if (isset($t1[$val['id']]) && isset($t2[$val['id']]) && ($t1[$val['id']]['states']['id'] == $t2[$val['id']]['states']['id'])) {
-                
-                $both++;
-            }
-            else {
-                
-                if (isset($t1[$val['id']]))
-                    $t1_count++;
-                elseif (isset($t2[$val['id']]))
-                    $t2_count++;
-                else
-                    $neither++;
-            }
-        }
-        
-
-        $overlap = $states1 = $states2 = array();
-        
-        foreach ((array) $t1 as $key => $val) {
-            
-            if (isset($t2[$key]) && $val == $t2[$key]) {
-                
-                $overlap[] = $val;
-            }
-            else {
-                
-                $states1[] = $val;
-            }
-        }
-        
-        foreach ((array) $t2 as $key => $val) {
-            
-            if (!isset($t1[$key]) || $val != $t1[$key])
-                $states2[] = $val;
-        }
-        
-        return array(
-            'taxon_1' => $this->getTaxonById($id[0]), 
-            'taxon_2' => $this->getTaxonById($id[1]), 
-            'count_1' => $t1_count, 
-            'count_2' => $t2_count, 
-            'neither' => $neither, 
-            'both' => $both, 
-            'total' => count((array) $c), 
-            'coefficients' => $this->calculateDistances($t1_count, $t2_count, $both, $neither), 
-            'taxon_states_1' => $states1, 
-            'taxon_states_2' => $states2, 
-            'taxon_states_overlap' => $overlap
-        );
-    }
-
-
-*/
 
 }

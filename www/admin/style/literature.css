@@ -24,11 +24,6 @@
 .lit-dropdown-invisible{
 	display:none;
 }
-#selected-taxa {
-	border:1px solid #bbf;
-	padding:5px;
-	width:250px;
-}
 #text {
 	width:500px;
 	height:250px;

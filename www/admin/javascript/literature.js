@@ -1,10 +1,9 @@
-var litAddedTaxa = Array();
 var litAuthors = Array();
 var litThisReference = '';
 var litDropDownVisible = false;
 var litDropDownType = 'reference'; // 'authors';
 var litTaxonNames = Array();
-
+var litCurrentTaxa = Array();
 
 function litToggleAuthorTwo() {
 	
@@ -66,7 +65,6 @@ function litShowAuthList(ele) {
 	});	
 
 }
-
 
 function litSetAuthorFromList(eleId,id) {
 
@@ -198,178 +196,31 @@ function litCheckForm(ele) {
 
 	} else {
 
-		for(var i=0;i<litAddedTaxa.length;i++) {
-
-			$("#theForm").append('<input type="hidden" name="selectedTaxa[]" value="'+litAddedTaxa[i]+'">');
-
-		}
+		$('tr[type="drag-row"]').each(function(i){
+			$("#theForm").append('<input type="hidden" name="selectedTaxa[]" value="'+$(this).attr('drag-id')+'">').val($(this).attr('drag-id'));
+		});
 
 		$('#text').val(tinyMCE.get('text').getContent());
-		
-//		$(ele).closest("form").submit();
+
 		$("#theForm").submit();
 
 	}
 
 }
 
-function litGetTaxonName(taxonId) {
+function litGetTaxonName(id) {
 
-	if (!litTaxonNames[taxonId]) {
+	if (!litTaxonNames[id]) {
 
 		$("#taxa > option").each(function() {
-			if (this.value==taxonId) { 
-				litTaxonNames[taxonId] = this.text.trim();
+			if (this.value==id) { 
+				litTaxonNames[id] = this.text.trim();
 			}
 		});
 		
 	}
 	
-	return litTaxonNames[taxonId];
-
-}
-
-function litUpdateTaxonSelection() {
-		
-	var b = '<table style="border-collapse:collapse;width:100%"">';
-	
-	for(var i=0;i<litAddedTaxa.length;i++) {
-	
-		b = b + 
-			'<tr class="tr-highlight"><td style="width:97%">'+
-			litGetTaxonName(litAddedTaxa[i])+
-			'</td>'+
-			(i>0 ? '<td class="a" onclick="litTaxonMove('+i+','+(i-1)+');litUpdateTaxonSelection();">&uarr;</td>' : '<td></td>')+
-			(i<litAddedTaxa.length-1 ? '<td class="a" onclick="litTaxonMove('+i+','+(i+1)+');litUpdateTaxonSelection();">&darr;</td>' : '<td></td>')+
-			'<td class="a" onclick="litDeleteTaxon('+litAddedTaxa[i]+');litRemoveTaxonFromList('+litAddedTaxa[i]+');">x</td>'+
-			'</tr>';
-	
-	}
-
-	b = b + '</table>';
-
-	$('#selected-taxa').html(b);
-
-}
-
-function litRemoveTaxonFromList(id) {
-
-	var t = Array();
-
-	for(var i=0;i<litAddedTaxa.length;i++) {
-
-		if (litAddedTaxa[i] != id) {
-
-			t[t.length] = litAddedTaxa[i];
-
-		}
-
-	}
-	
-	litAddedTaxa = t;
-
-	litUpdateTaxonSelection();
-
-}
-
-function litCheckTaxonList(taxonId) {
-
-	var add = true;
-
-	// check if it's not aready in the list
-	for(var i=0;i<litAddedTaxa.length;i++) {
-
-		if (litAddedTaxa[i] == taxonId) {
-			add = false;
-			break;
-		}
-
-	}
-	
-	return add;
-
-}
-
-
-function litAddTaxonToList(taxonId,noupdate,nosave) {
-
-	if (!taxonId) {
-		
-		$('#taxa option:selected').each(function () {
-
-			if (litCheckTaxonList($(this).val())) {
-				
-				litAddedTaxa[litAddedTaxa.length] = $(this).val();
-				if (!nosave) litSaveTaxon($(this).val());
-				if (!noupdate) litUpdateTaxonSelection();
-				
-			}
-
-		});
-
-	} else {
-
-		if (litCheckTaxonList(taxonId)) {
-			
-			litAddedTaxa[litAddedTaxa.length] = taxonId;
-			if (!nosave) litSaveTaxon(taxonId);
-			if (!noupdate) litUpdateTaxonSelection();
-			
-		}
-
-	}
-	
-}
-
-function litSaveTaxonOrder() {
-
-	$.ajax({
-		url : "ajax_interface.php",
-		data : ({
-			'action' : 'save_order',
-			'id' : $('#id').val(),
-			'taxa' : litAddedTaxa,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-		}
-	});
-
-}
-
-function litSaveTaxon(taxonId) {
-
-	$.ajax({
-		url : "ajax_interface.php",
-		data : ({
-			'action' : 'save_taxon',
-			'id' : $('#id').val(),
-			'taxon' : taxonId,
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-			litSaveTaxonOrder();
-		}
-	});	
-
-}
-
-function litDeleteTaxon(taxonId) {
-
-	$.ajax({
-		url : "ajax_interface.php",
-		data : ({
-			'id' : $('#id').val(),
-			'taxon' : taxonId,
-			'action' : 'delete_taxon',
-			'time' : allGetTimestamp()
-		}),
-		success : function (data) {
-			//alert(data);
-		}
-	});	
+	return litTaxonNames[id];
 
 }
 
@@ -383,26 +234,104 @@ function litDelete() {
 
 }
 
-function litTaxonMove(from,to) {
+function litTaxonListExists(id) {
 
-	var t = litAddedTaxa[to];
-	litAddedTaxa[to] = litAddedTaxa[from];
-	litAddedTaxa[from] = t;
-	litSaveTaxonOrder();
-	litUpdateTaxonSelection();
+	for(var i=0;i<litCurrentTaxa.length;i++) {
+
+		if (litCurrentTaxa[i] == id)
+			return true;
+
+	}
+	
+	return false;
 
 }
 
+function litTaxonListAdd(id) {
 
+	litCurrentTaxa.push(id);
+	
+}
 
+function litTaxonListRemove(id) {
+	
+	var t = Array();
 
+	for(var i=0;i<litCurrentTaxa.length;i++) {
 
+		if (litCurrentTaxa[i]!=id)
+			t[t.length] = litCurrentTaxa[i];
+	}
+	
+	litCurrentTaxa=t;
+}
 
+function litTaxonListShow() {
 
+	var b = '<table id="drag-list" class="grid"><tbody>';
+	
+	for(var i=0;i<litCurrentTaxa.length;i++) {
+	
+		b = b + 
+			'<tr class="tr-highlight" type="drag-row" drag-id="'+litCurrentTaxa[i]+'">'+
+			'<td style="width:450px">'+
+			litGetTaxonName(litCurrentTaxa[i])+
+			'<span class="delete-x" onclick="litDeleteTaxon('+litCurrentTaxa[i]+');">x</span>'+
+			'</td></tr>';
+	
+	}
 
+	b = b + '</tbody></table>';
 
+	$('#selected-taxa').html(litCurrentTaxa.length==0 ? _('(none)') : b);
+}
 
+function litAddTaxon() {
 
+	$('#taxa option:selected').each(function () {
 
+		if (!litTaxonListExists($(this).val())) {
+			
+			litTaxonListAdd($(this).val());
 
+		}
 
+	});
+	
+	litTaxonListShow();
+	litTaxonListSave();
+	allInitDragtable(litTaxonListSave);
+	
+}
+
+function litDeleteTaxon(id) {
+
+	litTaxonListRemove(id);
+	litTaxonListShow();
+	allInitDragtable(litTaxonListSave);
+	litTaxonListSave();
+
+}
+
+function litTaxonListSave() {
+
+	var data = {};
+	data.taxa = Array();
+	data.id = $('#id').val();
+	data.action = 'save_taxa';
+	data.time = allGetTimestamp();
+
+	$('tr[type="drag-row"]').each(function(i){
+		data.taxa.push($(this).attr('drag-id'));
+	});
+
+		
+	$.ajax({
+		url : "ajax_interface.php",
+		data : data,
+		success : function (data) {
+			//alert(data);
+		}
+	});
+
+}

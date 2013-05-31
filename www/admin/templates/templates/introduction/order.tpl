@@ -9,7 +9,7 @@
         <tbody>
         {foreach from=$pages key=k item=v}
             <tr class="tr-highlight" type="drag-row" drag-id="{$v.id}">
-                <td>{$v.topic}</td>
+                <td style="width:450px">{$v.topic}</td>
             </tr>
         {/foreach}
         </tbody>
@@ -21,6 +21,10 @@
         </form>
     </p>
 
+    <p>
+    	<a href="javascript:freemodSortAlpha();">Sort topics alphabetically</a><br />
+    </p>
+
 </div>
 
 
@@ -28,16 +32,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 
-	var fixHelper = function(e, ui) {
-		ui.children().each(function() {
-			$(this).width($(this).width());
-		});
-		return ui;
-	};
-
-	$("#drag-list tbody").sortable({
-		helper: fixHelper
-	}).disableSelection();
+	allInitDragtable();
 
 })
 </script>

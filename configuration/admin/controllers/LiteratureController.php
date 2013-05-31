@@ -179,9 +179,12 @@ class LiteratureController extends Controller
 				$this->deleteLiteratureTaxon($id);
 
 				if ($this->rHasVal('selectedTaxa')) {
-
-					foreach((array)$this->requestData['selectedTaxa'] as $key => $val)
-						$this->saveLiteratureTaxon($id,$val,$key);
+				
+					foreach((array)$this->requestData['selectedTaxa'] as $key => $val) {
+	
+						$this->saveLiteratureTaxon($this->requestData['id'],$val,$key);
+	
+					}
 
 				}
 				
@@ -399,29 +402,78 @@ class LiteratureController extends Controller
             $this->getLookupList($this->requestData['search']);
 
         } else
-        if ($this->rHasVal('action','save_taxon')) {
+        if ($this->rHasVal('action','save_taxa')) {
 		
-        	$this->clearCache($this->cacheFiles);
+			if ($this->rHasId()) {
+				
+				$this->deleteLiteratureTaxon($this->requestData['id']);
+				
+				foreach((array)$this->requestData['taxa'] as $key => $val) {
 
-         	$this->saveLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
-           
-        } else
-        if ($this->rHasVal('action','save_order')) {
-		
-		   $this->updateLiteratureTaxonOrder($this->requestData['id'],$this->requestData['taxa']);
+					$this->saveLiteratureTaxon($this->requestData['id'],$val,$key);
 
-        } else
-        if ($this->rHasVal('action','delete_taxon')) {
+				}
+				
+	        	$this->clearCache($this->cacheFiles);
 
-        	$this->clearCache($this->cacheFiles);
-
-        	$this->deleteLiteratureTaxon($this->requestData['id'],$this->requestData['taxon']);
+			}
 
         }
 		
         $this->printPage();
     
     }
+
+
+
+
+	private function deleteLiteratureTaxon($id,$taxonId=null)
+	{
+
+		if (!isset($id)) return;
+
+		$d = array(
+			'project_id' => $this->getCurrentProjectId(),
+			'literature_id' => $id
+		);
+		
+		if (!is_null($taxonId)) $d['taxon_id'] = $taxonId;
+
+		return $this->models->LiteratureTaxon->delete($d);
+				
+	}
+
+	private function saveLiteratureTaxon($id,$taxonId,$sortOrder=null)
+	{
+	
+		if (empty($id) || empty($taxonId)) return;
+
+		$d = array(
+			'id' => null,
+			'project_id' => $this->getCurrentProjectId(),
+			'literature_id' => $id,
+			'taxon_id' => $taxonId
+		);
+
+		if (!is_null($sortOrder)) $d['sort_order'] = $sortOrder;
+
+		$x =  $this->models->LiteratureTaxon->save($d);
+	
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	private function getReference($id)
 	{
@@ -827,62 +879,7 @@ class LiteratureController extends Controller
 	
 	}
 
-	private function saveLiteratureTaxon($id,$taxonId,$sortOrder=null)
-	{
-	
-		if (empty($id) || empty($taxonId)) return;
 
-		$d = array(
-			'id' => null,
-			'project_id' => $this->getCurrentProjectId(),
-			'literature_id' => $id,
-			'taxon_id' => $taxonId
-		);
-
-		if (!is_null($sortOrder)) $d['sort_order'] = $sortOrder;
-
-		$x =  $this->models->LiteratureTaxon->save($d);
-	
-	}
-
-	private function updateLiteratureTaxonOrder($id,$taxa)
-	{
-	
-		if (empty($id) || empty($taxa)) return;
-		
-		foreach((array)$taxa as $key => $val) {
-
-			$this->models->LiteratureTaxon->update(
-				array(
-					'sort_order' => $key
-				),
-				array(
-					'project_id' => $this->getCurrentProjectId(),
-					'literature_id' => $id,
-					'taxon_id' => $val
-				)
-			);
-
-		}
-	
-	}
-
-
-	private function deleteLiteratureTaxon($id,$taxonId=null)
-	{
-
-		if (!isset($id)) return;
-
-		$d = array(
-			'project_id' => $this->getCurrentProjectId(),
-			'literature_id' => $id
-		);
-		
-		if (!is_null($taxonId)) $d['taxon_id'] = $taxonId;
-
-		return $this->models->LiteratureTaxon->delete($d);
-				
-	}
 
 
 }

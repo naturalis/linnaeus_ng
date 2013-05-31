@@ -3,18 +3,20 @@
 	{*<p id="dialogHeader">
 		<span id="state-header">{$c.label}:</span>{if $c.info}<br />{$c.info}{/if}
 	</p>*}
-	{if $c.info}
-	<p id="dialogHeader">
-		{$c.info}
-	</p>
-    {/if}
 
 	<p id="dialogSelectorWindow">
     <div id="dialog-content-inner-inner">
-
+    
+        {if $c.info}
+        <p id="state-info">
+            {$c.info}
+        </p>
+        {/if}
+    
 	{if $c.type=='range'}
 
 		{if $states[$c.id][0].value}{assign var=prevRangeValue value=$states[$c.id][0].value}{/if}
+
 			<p>
             <input id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
             <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">waarde wissen</a>
