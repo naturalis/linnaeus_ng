@@ -74,8 +74,7 @@
 #content div#results div.result a.detailsBtn, #content div#results div.result a.similarBtn {font-size:0.85em}
 
 #content div#results div.result .result-icons {padding:0 6px 0 0px;}
-.result-icon {width:21px;margin-right:12px;height:21px;border:0px;border:1px solid #ccc;}
-
+.result-icon {width:21px;margin-right:15px;height:21px;border:0px;border:1px solid #ccc;}
 #content div#results div.result .icon-info:hover {border:1px solid #44b7fd;}
 #content div#results div.result .icon-sr:hover {border:1px solid #bac599;}
 #content div#results div.result .icon-similar:hover {border:1px solid #f39bad;}

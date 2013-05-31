@@ -225,6 +225,7 @@ function nbcFormatResult(data) {
 		
 	}
 
+
 	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
 			'<div class="resultImageHolder">'+
 				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
@@ -261,6 +262,7 @@ function nbcFormatResult(data) {
 				: '')+
 		'</div>'
 		;
+
 }
 
 function nbcSwitchImagename(ele,state) {
