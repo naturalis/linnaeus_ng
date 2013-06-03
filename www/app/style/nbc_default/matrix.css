@@ -245,6 +245,11 @@ ul.facetListType li.selected {font-weight:bold;}
 	padding:8px 8px 0 8px;
 }
 
+.result-image-container {
+	width:144px;
+	height:207px;
+}
+
 .result-image {
 	border:1px solid #aaa;
 	width:144px;

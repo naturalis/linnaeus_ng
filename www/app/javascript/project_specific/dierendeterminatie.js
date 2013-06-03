@@ -226,11 +226,13 @@ function nbcFormatResult(data) {
 	}
 
  	return '<div class="result'+(data.h ? ' result-highlight' : '')+'" id="res-'+id+'"> \
-        <div class="result-result">'+
-			(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-			'<img class="result-image" src="'+data.m+'" />' +
-			(data.n ? '</a>' : '' )+
-            '<div class="result-labels">'+
+        <div class="result-result"> \
+			<div class="result-image-container">'+
+				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
+				'<img class="result-image" src="'+data.m+'" />' +
+				(data.n ? '</a>' : '' )+
+            '</div> \
+			<div class="result-labels">'+
 				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
                 '<span class="result-name-scientific">'+data.s+'</span> \
                 <span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
