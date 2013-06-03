@@ -19,13 +19,12 @@
 
 
 	on stylesheets:
-	there are five location where included .css files and styles can be specified:
+	there are four location where included .css files and styles can be specified:
 		____source__________scope___________location_____________________________
 		1)	$cssToLoadBase	global			declared in Controller
 		2)	$cssToLoad		module			declared in [Module]Controller
 		3)	hardcoded		skin			printed in _head.tpl
 		4)	dynamic			skin/project	utilities\dynamic-css.tpl
-		5)  dynamic			project			app/style/custom/[pId].css or app/style/custom/[pId]--[project name].css or 
 	ad 1: these files are always loaded, for every module, and loaded first. after
 	 being merged with $cssToLoad in Controller::setCssFiles(), they are printed in
 	 the skin's _head.tpl file.
@@ -37,16 +36,13 @@
 	 most skins also include 'cssreset-min.css' and several css-files aimed
 	 specifically at internet explorer in the _head.tpl file.
 	ad 4: the function UtilitiesController::dynamicCssAction() makes it possible to
-	 create dynamic css-data. it prints the template file dynamic-css.tpl,
+	 create project-specific css-data. it prints the template file dynamic-css.tpl,
 	 which exists (and can be altered) in each skin. this smarty-template allows for
 	 conditional formatting based on project id and other variables that are
 	 available to it (in a somewhat cumbersome fashion, as the shared use of the
 	 accolade by css and smarty probably requires a lot of {literal}-tags). the file
 	 is printed with a 'Content-type:text/css'-header, and printed in all _head.tpl 
 	 files after being merged with $cssToLoad in Controller::setCssFiles().
-	ad 5: the last thing Controller::setCssFiles() looks for is an optional project-
-	 specific stylesheet either called "0023.css" or "0023--imaginary-beings.css",
-	 where 23 is the project ID and "imaginary beings" is the project's system name.
 
 
 	on caching:
@@ -1806,7 +1802,7 @@ class Controller extends BaseClass
         if (!is_null($this->getCurrentProjectId())) {
             
             $d = $this->makeCustomCssFileName();
-
+            
             if (file_exists($d)) {
                 
                 array_push($this->cssToLoad, $d);

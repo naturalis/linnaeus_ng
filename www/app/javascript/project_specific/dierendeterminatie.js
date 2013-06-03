@@ -167,7 +167,7 @@ function nbcFormatResult(data) {
 			c : taxon
 			g : gender (absent when not a variation)
 			s : scientific name 
-			n :has image?
+			n : has image?
 			m : image url (generic image when n==false)
 			h : thumbnail
 			p : photographer credit 
@@ -214,7 +214,7 @@ function nbcFormatResult(data) {
 			else
 				var l = labels[0];
 
-			states.push('<span class="resultDetailLabel">'+t +':</span> <span class="resultDetailValue">'+l+'</span>');
+			states.push('<span class="result-detail-label">'+t +':</span> <span class="result-detail-value">'+l+'</span>');
 		}
 		
 	}
@@ -225,43 +225,45 @@ function nbcFormatResult(data) {
 		
 	}
 
-
-	return '<div class="result'+(data.h ? ' resultHighlight' : '')+'" id="res-'+id+'">'+
-			'<div class="resultImageHolder">'+
-				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-					'<img class="resultImageHolder" src="'+data.m+'" title="" />'+
-				(data.n ? '</a>' : '')+
-			'</div>'+
-			'<div class="scientificNameHolder">'+
-				'<span class="scientificName">'+(data.s)+'</span>'+
-				(data.s!=data.l ? '<br />' + data.l : '')+
-			'</div>'+
-			(data.g ? '<img class="gender" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-				'<span style="position:relative;top:4px;">'+
-					'<span class="result-icons">'+
-						(states && states.length > 0 ? 
-							'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'">'+
-							'<img class="result-icon icon-info" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '') +
-						(data.r ?
-							'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'">'+
-							'<img class="result-icon icon-similar" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '') +
-						(data.u ?
-							'<a href="'+(data.u)+'" target="'+(data.v)+'" title="'+nbcLabelExternalLink+'">'+
-							'<img class="result-icon icon-sr" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)">'+
-							'</a>' : '')  +
-					'</span>' +
-				'</span>' +
-			(states && states.length > 0 ? 
-				'<div id="det-'+id+'" class="resultDetails">'+
-					'<ul>'+
-						'<li>'+states.join('</li><li>')+'</li>'+
-					'</ul>'+
-				'</div>' 
-				: '')+
-		'</div>'
-		;
+ 	return '<div class="result'+(data.h ? ' result-highlight' : '')+'" id="res-'+id+'"> \
+        <div class="result-result">'+
+			(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
+			'<img class="result-image" src="'+data.m+'" />' +
+			(data.n ? '</a>' : '' )+
+            '<div class="result-labels">'+
+				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
+                '<span class="result-name-scientific">'+data.s+'</span> \
+                <span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
+            </div> \
+        </div> \
+        <div class="result-icons"> \
+			<div class="result-icon">'+
+				(states && states.length > 0 ? 
+					'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"> \
+						<img class="result-icon-image" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
+					</a>' : '' ) +
+			'</div> \
+			<div class="result-icon">'+
+				(data.r ?
+					'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'"> \
+						<img class="result-icon-image" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
+					</a>' : '' ) +
+			'</div> \
+			<div class="result-icon">'+
+				(data.u ?
+					'<a href="'+(data.u)+'" target="'+(data.v)+'" title="'+nbcLabelExternalLink+'"> \
+						<img class="result-icon-image" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
+					</a>' : '' ) +
+			'</div> \
+        </div>'+
+		(states && states.length > 0 ? 
+			'<div id="det-'+id+'" class="result-detail hidden"> \
+				<ul> \
+					<li>'+states.join('</li><li>')+'</li> \
+				</ul> \
+			</div> ' : '' ) + '\
+    </div> \
+	';
 
 }
 

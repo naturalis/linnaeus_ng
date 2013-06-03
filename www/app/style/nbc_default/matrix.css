@@ -40,18 +40,18 @@
 #legendContainer #legendHeader {font-weight:bold;font-size:11px}
 
 /* results */
-#content div#results {width:720px;padding:0px;}
+#content div#results {width:720px;padding:0px; }
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
-#content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}/*float:left;*/
+#content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}
+#content div#result-count {font-size:0.9em;color:#333;}
 
-#content div#result-count {font-size:0.95em;color:#333;}
-
+/*
 #content div#results div.result {width:145px; min-height:275px; margin-top:27px; margin-right:17px; padding:8px; position:relative; border:solid 1px #ddd;}
 #content div#results div.resultHighlight {border:1px dotted #FA7001;}
 #content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
 #content div#results div.result .resultImageHolder img {border:none;}
 #content div#results div.result div {width:131px; font-size:11px; color:#000000;}
-#content div#results div.result div {line-height:91%} /* // added details for ALL results, may have to be removed again */
+#content div#results div.result div {line-height:91%}
 #content div#results div.result div.scientificNameHolder {
 	min-height:50px;
 	width:143px;
@@ -66,9 +66,9 @@
 }
 
 
-#content div#results div.result a {text-decoration:none; font-size:11px;} /* color:#555555;} */
+#content div#results div.result a {text-decoration:none; font-size:11px;}
 #content div#results div.result a.similarBtn {background:transparent url(http://determinatie.nederlandsesoorten.nl/images/url.gif) no-repeat 0 4px; padding-left:12px;}
-#content div#results div.result a:hover {text-decoration:underline;}/*color:#ff0000;}*/
+#content div#results div.result a:hover {text-decoration:underline;}
 #content div#results div.result img.gender {position:absolute;top:221px;left:146px;height:17px;width:8px;}
 #content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
 #content div#results div.result a.detailsBtn, #content div#results div.result a.similarBtn {font-size:0.85em}
@@ -80,13 +80,14 @@
 #content div#results div.result .icon-similar:hover {border:1px solid #f39bad;}
 
 
-#content div#results div.result a {text-decoration:none; font-size:11px;} /* color:#555555;} */
+#content div#results div.result a {text-decoration:none; font-size:11px;}
 
 #content div#results .resultRow .resultDetails {display:none;}
 #content div#results .resultRow .resultDetails ul {margin:0;padding:5px 0px 0px 7px;color:#999;list-style-type:square;}
 #content div#results .resultRow .resultDetails ul li {padding:0 0 5px 0;}
 #content div#results .resultRow .resultDetails li .resultDetailLabel {color:#000;font-style:italic}
 #content div#results .resultRow .resultDetails li .resultDetailValue {color:#000;}
+*/
 .overlapState {color:#999;}
 
 /* similar species */
@@ -224,4 +225,128 @@ ul.facetListType li.selected {font-weight:bold;}
     font-size: 30px;
     font-weight: normal;
 }
+
+
+
+
+/* results restyle for better compat with landscape pictures*/
+.result {
+	float:left;
+    border: 1px solid #ddd;
+    width: 161px;
+	margin:15px 15px 10px 0;
+}
+
+.result-highlight {
+	border: 1px dotted #FA7001;
+}
+
+.result-result {
+	padding:8px 8px 0 8px;
+}
+
+.result-image {
+	border:1px solid #aaa;
+	width:144px;
+	height:207px;
+}
+
+.result-labels {
+    color: #000000;
+    font-size: 11px;
+	font-family: Georgia;
+    line-height: 1.2em;
+	height:55px;
+	margin-top:5px;
+	width:100%;
+}
+
+.result-gender-icon {
+	float:right;
+}
+
+.result-name-scientific {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.result-name-common {
+
+}
+	
+.result-icons {
+	border-top:1px solid #ddd;
+	height:29px;
+	width:100%;
+}
+
+.result-icon {
+	position:relative;
+	display: inline-block;
+	width:32%;
+	border-right:1px solid #ddd;
+	height:inherit;/*29px;*/
+	text-align:center;
+}
+
+.result-icon:last-child {
+	border:none;
+	width:33%;
+}
+.result-icon-image {
+	margin-top:3px;
+	width:23px;	
+}
+
+.result-detail {
+    list-style-type: square;
+    margin-top: 0;
+    padding: 5px 5px 5px 5px;
+	border-top:1px solid #ddd;
+    font-size: 11px;
+    line-height: 1.2em;
+}
+
+.result-detail ul li, ol li {
+    color: #999999;
+    list-style-type: square;
+    margin-left:15px;
+}
+
+.result-detail .result-detail-label, .result-detail-value {
+    color: #000000;
+    font-style: italic;
+}
+
+.result-detail .result-detail-value {
+    font-style: normal;
+}
+
+
+/* landscape overrides 
+.result {
+    min-height: 140px;
+    width: 222px;
+}
+
+.result-result {
+    min-height: 140px;
+}
+
+.result-image-container {
+	width:145px;
+	height:207px;
+}
+
+.result-image {
+	width:207px;
+	height:145px;
+	margin-bottom:2px;
+}
+
+.result-labels {
+    line-height: 1.25em;
+	height:45px;
+}
+*/
 
