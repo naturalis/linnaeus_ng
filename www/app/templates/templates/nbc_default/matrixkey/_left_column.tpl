@@ -23,27 +23,18 @@
                 <a id="clearSelectionLink" href="#" onclick="nbcClearStateValue();return false;">
                 <img class="removeBtnImg" src="{$nbcImageRoot}clearSelection.gif">{t}wis geselecteerde kenmerken{/t}</a>
             </div>
-
 		</div>
 
-        <div id="bannerRuler" class="hidden">
-            <hr />
-        </div>
+        <div class="left-divider"></div>
 
-		{*<div id="legendContainer" class="hidden">*}
 		<div id="legendContainer">
         	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
-            <table>
-                <tr><td><img class="result-icon icon-info" src="{$nbcImageRoot}information_grijs.png" /></td><td id="legendDetails">onderscheidende kenmerken</td></tr>
-                <tr><td><img class="result-icon icon-similar" src="{$nbcImageRoot}gelijkend_grijs.png" /></td><td id="legendSimilarSpecies">gelijkende soorten</td></tr>
-                <tr><td><img class="result-icon icon-sr" src="{$nbcImageRoot}sr_icon_grijs.png" /></td><td id="legendExternalLink">Nederlands Soortenregister</td></tr>
-			</table>
+            <div><img class="result-icon-image" src="{$nbcImageRoot}information_grijs.png" /><span class="icon-legend-label">onderscheidende kenmerken</span></div>
+            <div><img class="result-icon-image" src="{$nbcImageRoot}gelijkend_grijs.png" /><span class="icon-legend-label">gelijkende soorten</span></div>
+            <div><img class="result-icon-image" src="{$nbcImageRoot}sr_icon_grijs.png" /><span class="icon-legend-label">Nederlands Soortenregister</span></div>
 		</div>  
 
-
-        <div id="bannerRuler">
-            <hr />
-        </div>
+        <div class="left-divider"></div>
 
 		<div id="dataSourceContainer">   
             <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
@@ -62,10 +53,6 @@
 			</p>
 		</div>  
 
-        <div id="bannerRuler">
-            <hr />
-        </div>
- 
-
+        <div class="left-divider"></div>
 
 	</div>
