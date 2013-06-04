@@ -254,6 +254,7 @@ ul.facetListType li.selected {font-weight:bold;}
 	border:1px solid #aaa;
 	width:144px;
 	height:207px;
+	height:auto;
 }
 
 .result-labels {
