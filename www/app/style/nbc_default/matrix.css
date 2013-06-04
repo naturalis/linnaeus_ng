@@ -44,50 +44,6 @@
 #content div#resultsHeader {width:703px; height:27px; margin:4px 0 0 0; position:relative;}
 #content div#resultsHeader span {margin:5px 0 7px 0;  color:#aaa;}
 #content div#result-count {font-size:0.9em;color:#333;}
-
-/*
-#content div#results div.result {width:145px; min-height:275px; margin-top:27px; margin-right:17px; padding:8px; position:relative; border:solid 1px #ddd;}
-#content div#results div.resultHighlight {border:1px dotted #FA7001;}
-#content div#results div.result .resultImageHolder {height:207px; width:145px; border:solid 1px #aaa; margin-bottom:5px;}
-#content div#results div.result .resultImageHolder img {border:none;}
-#content div#results div.result div {width:131px; font-size:11px; color:#000000;}
-#content div#results div.result div {line-height:91%}
-#content div#results div.result div.scientificNameHolder {
-	min-height:50px;
-	width:143px;
-	line-height:1.2em; 
-	height:14px;
-	font-family: Georgia;
-	-font-size-adjust: 0.54;
-}
-#content div#results div.result span.scientificName {
-	font-weight:bold;	
-	font-style:italic; 
-}
-
-
-#content div#results div.result a {text-decoration:none; font-size:11px;}
-#content div#results div.result a.similarBtn {background:transparent url(http://determinatie.nederlandsesoorten.nl/images/url.gif) no-repeat 0 4px; padding-left:12px;}
-#content div#results div.result a:hover {text-decoration:underline;}
-#content div#results div.result img.gender {position:absolute;top:221px;left:146px;height:17px;width:8px;}
-#content div#results div.result span.genderUnknown {position:absolute;top:221px;left:150px;color:#aaaaaa;}
-#content div#results div.result a.detailsBtn, #content div#results div.result a.similarBtn {font-size:0.85em}
-
-#content div#results div.result .result-icons {padding:0 6px 0 0px;}
-.result-icon {width:21px;margin-right:15px;height:21px;border:0px;border:1px solid #ccc;}
-#content div#results div.result .icon-info:hover {border:1px solid #44b7fd;}
-#content div#results div.result .icon-sr:hover {border:1px solid #bac599;}
-#content div#results div.result .icon-similar:hover {border:1px solid #f39bad;}
-
-
-#content div#results div.result a {text-decoration:none; font-size:11px;}
-
-#content div#results .resultRow .resultDetails {display:none;}
-#content div#results .resultRow .resultDetails ul {margin:0;padding:5px 0px 0px 7px;color:#999;list-style-type:square;}
-#content div#results .resultRow .resultDetails ul li {padding:0 0 5px 0;}
-#content div#results .resultRow .resultDetails li .resultDetailLabel {color:#000;font-style:italic}
-#content div#results .resultRow .resultDetails li .resultDetailValue {color:#000;}
-*/
 .overlapState {color:#999;}
 
 /* similar species */
@@ -227,13 +183,17 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 
+.left-divider {
+	border-top:1px solid #ddd;
+	margin-bottom:10px;
+}
 
 
 /* results restyle for better compat with landscape pictures*/
 .result {
 	float:left;
     border: 1px solid #ddd;
-    width: 161px;
+    width: 162px;
 	margin:15px 15px 10px 0;
 }
 
@@ -289,7 +249,7 @@ ul.facetListType li.selected {font-weight:bold;}
 .result-icon {
 	position:relative;
 	display: inline-block;
-	width:32%;
+	width:53px;
 	border-right:1px solid #ddd;
 	height:inherit;/*29px;*/
 	text-align:center;
@@ -297,11 +257,17 @@ ul.facetListType li.selected {font-weight:bold;}
 
 .result-icon:last-child {
 	border:none;
-	width:33%;
 }
+
 .result-icon-image {
 	margin-top:3px;
 	width:23px;	
+}
+
+.icon-legend-label {
+	position:relative;
+	top:-7px;
+	margin-left:3px;
 }
 
 .result-detail {
