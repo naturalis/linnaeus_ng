@@ -32,8 +32,8 @@
 #dataSourceContainer #sourceHeader {font-weight:bold}
 
 #logo-container {float:right;margin:35px 45px 0px 0px}
-#logo-NBC {height:93px;}
-#logo-EIS {height:93px;margin-left:5px;}
+#logo-NBC {height:93px;margin-left:5px;}
+#logo-EIS {height:93px;}
 
 #legendContainer {font-size:11px;padding-bottom:10px}
 #legendContainer .result-icon {border:none}
@@ -189,6 +189,33 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 
+/* icon legend */
+.legend-icon-cell {
+	height:15px;
+	padding:1px 0 3px 0;
+}
+
+.legend-icon-image  {
+	max-height:25px;
+	max-width:25px;
+	padding-right:5px;
+}
+
+.legend-icon-image.icon-nsr  {
+	margin-left:2px;
+}
+
+.legend-icon-image.icon-info  {
+	margin-left:5px;
+}
+
+.legend-icon-image.icon-similar  {
+	max-width:21px;
+}
+
+
+
+
 /* results restyle for better compat with landscape pictures*/
 .result {
 	float:left;
@@ -241,7 +268,6 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 .result-name-common {
-
 }
 	
 .result-icons {
@@ -257,6 +283,7 @@ ul.facetListType li.selected {font-weight:bold;}
 	border-right:1px solid #ddd;
 	height:inherit;/*29px;*/
 	text-align:center;
+	cursor:pointer;
 }
 
 .result-icon:last-child {
@@ -264,14 +291,14 @@ ul.facetListType li.selected {font-weight:bold;}
 }
 
 .result-icon-image {
-	margin-top:3px;
-	width:23px;	
+	margin-top:7.5px;
 }
 
-.icon-legend-label {
-	position:relative;
-	top:-7px;
-	margin-left:3px;
+.result-icon-image.icon-info {
+	margin-top:6px;
+}
+
+.result-icon-image.icon-similar {
 }
 
 .result-detail {
@@ -291,7 +318,7 @@ ul.facetListType li.selected {font-weight:bold;}
 
 .result-detail .result-detail-label, .result-detail-value {
     color: #000000;
-    font-style: italic;
+    -font-style: italic;
 }
 
 .result-detail .result-detail-value {

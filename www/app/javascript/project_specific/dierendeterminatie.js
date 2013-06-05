@@ -221,6 +221,8 @@ function nbcFormatResult(data) {
 		}
 		
 	}
+	
+	var showStates = states && states.length > 0;
 
 	if (!data.m.match(/^(http:\/\/|https:\/\/)/i)) {
 		
@@ -242,23 +244,23 @@ function nbcFormatResult(data) {
             </div> \
         </div> \
         <div class="result-icons"> \
-			<div class="result-icon">'+
-				(data.u ?
-					'<a href="'+(data.u)+'" target="'+(data.v)+'" title="'+nbcLabelExternalLink+'"> \
-						<img class="result-icon-image" src="'+nbcImageRoot+'sr_icon_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
-					</a>' : '' ) +
+			<div class="result-icon"'+
+				( data.u ? 
+					' onclick="window.open(\''+data.u+'\',\''+data.v+'\');" title="'+nbcLabelExternalLink+'"'+
+					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
+				(data.u ? '<img class="result-icon-image" src="'+nbcImageRoot+'sr_icon_grijs.png">' : '' ) +
 			'</div> \
-			<div class="result-icon">'+
-				(states && states.length > 0 ? 
-					'<a id="tog-'+id+'" href="#" onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"> \
-						<img class="result-icon-image" src="'+nbcImageRoot+'information_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
-					</a>' : '' ) +
+			<div class="result-icon" id="tog-'+id+'" '+
+				( showStates ?
+					' onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"' +
+					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"': '' )+'>'+
+				(showStates ? '<img class="result-icon-image icon-info" src="'+nbcImageRoot+'information_grijs.png">' : '' ) +
 			'</div> \
-			<div class="result-icon">'+
-				(data.r ?
-					'<a href="#" onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;" target="_self" title="'+nbcLabelSimilarSpecies+'"> \
-						<img class="result-icon-image" src="'+nbcImageRoot+'gelijkend_grijs.png" onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"> \
-					</a>' : '' ) +
+			<div class="result-icon" '+
+				( data.r ? 
+					' onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;"  title="'+nbcLabelSimilarSpecies+'"' +
+					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
+				( data.r ? '<img class="result-icon-image icon-similar" src="'+nbcImageRoot+'gelijkend_grijs.png">' : '' ) +
 			'</div> \
         </div>'+
 		(states && states.length > 0 ? 
@@ -274,7 +276,7 @@ function nbcFormatResult(data) {
 
 function nbcSwitchImagename(ele,state) {
 	var p = '_grijs';
-	$(ele).attr('src',state==1 ? $(ele).attr('src').replace(p,'') :$(ele).attr('src').replace('.png',p+'.png'));	
+	$(ele).find('img').attr('src',state==1 ? $(ele).find('img').attr('src').replace(p,'') : $(ele).find('img').attr('src').replace('.png',p+'.png'));	
 }
 
 function nbcResetClearButton() {
