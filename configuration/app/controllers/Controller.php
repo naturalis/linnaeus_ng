@@ -886,7 +886,7 @@ class Controller extends BaseClass
         ), array(
             '-', 
             ''
-        ), $_SESSION['app']['project']['title']));
+        ), $_SESSION['app']['project']['sys_name']));
     }
 
 
