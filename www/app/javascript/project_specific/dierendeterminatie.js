@@ -244,19 +244,19 @@ function nbcFormatResult(data) {
             </div> \
         </div> \
         <div class="result-icons"> \
-			<div class="result-icon"'+
+			<div class="result-icon'+( data.u ? '' : ' no-content')+'"'+
 				( data.u ? 
 					' onclick="window.open(\''+data.u+'\',\''+data.v+'\');" title="'+nbcLabelExternalLink+'"'+
 					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
 				(data.u ? '<img class="result-icon-image" src="'+nbcImageRoot+'sr_icon_grijs.png">' : '' ) +
 			'</div> \
-			<div class="result-icon" id="tog-'+id+'" '+
+			<div class="result-icon'+( showStates ? '' : ' no-content')+'" id="tog-'+id+'" '+
 				( showStates ?
 					' onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"' +
 					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"': '' )+'>'+
 				(showStates ? '<img class="result-icon-image icon-info" src="'+nbcImageRoot+'information_grijs.png">' : '' ) +
 			'</div> \
-			<div class="result-icon" '+
+			<div class="result-icon'+( data.r ? '' : ' no-content')+'" '+
 				( data.r ? 
 					' onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;"  title="'+nbcLabelSimilarSpecies+'"' +
 					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
