@@ -28,26 +28,32 @@
         <div class="left-divider"></div>
 
 		<div id="legendContainer">
-        	<span id="legendHeader">{t}Betekenis iconen:{/t}</span><br />
-            <div><img class="result-icon-image" src="{$nbcImageRoot}information_grijs.png" /><span class="icon-legend-label">onderscheidende kenmerken</span></div>
-            <div><img class="result-icon-image" src="{$nbcImageRoot}gelijkend_grijs.png" /><span class="icon-legend-label">gelijkende soorten</span></div>
-            <div><img class="result-icon-image" src="{$nbcImageRoot}sr_icon_grijs.png" /><span class="icon-legend-label">Nederlands Soortenregister</span></div>
+        	{*<span id="legendHeader">{t}Legenda:{/t}</span><br />*}
+            <table>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-nsr" src="{$nbcImageRoot}sr_icon_grijs.png" /></td><td>Nederlands Soortenregister</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-info" src="{$nbcImageRoot}information_grijs.png" /></td><td>onderscheidende kenmerken</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$nbcImageRoot}gelijkend_grijs.png" /></td><td>gelijkende soorten</td></tr>
+            </table>
 		</div>  
 
         <div class="left-divider"></div>
 
 		<div id="dataSourceContainer">   
+		{if $nbcDataSource.author || $nbcDataSource.title || $nbcDataSource.url}
             <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
             <p>
-            {$nbcDataSource.author}<br />
+            {$nbcDataSource.author}{if $nbcDataSource.author && $nbcDataSource.title}<br />{/if}
             {$nbcDataSource.title}
-            <a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>
+            {if $nbcDataSource.url}<a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>{/if}
             </p>
             <br />
+        {/if}
+		{if $nbcDataSource.photoCredit}
             <p>
             {$nbcDataSource.photoCredit}
             </p>
             <br />
+        {/if}
             <p>
 	            <span id="logo-ETI">Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.</span>
 			</p>
