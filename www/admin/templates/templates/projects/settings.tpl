@@ -13,8 +13,24 @@ Current settings:
 
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr><th colspan="2">new setting:</th></tr>
-<tr><td><input type="text" name="new_setting" value="{$new_setting}" maxlength=32 style="width:150px" /></td><td><input type="text" maxlength=255 name="new_value" value="{$new_value}" style="width:200px" /></td></tr>
-
+<tr>
+	<td>
+		<input type="text" name="new_setting" id="new_setting" value="{$new_setting}" maxlength=32 style="width:150px" />
+   	</td>
+    <td>
+    	<input type="text" maxlength=255 name="new_value" id="new_value" value="{$new_value}" style="width:200px" />
+	</td>
+    {if $isSysAdmin}
+	<td>
+    	<span style="cursor:pointer;font-size:15px" onclick="{literal}$('#new_setting').val($('#settings :selected').attr('id'));$('#new_value').val($('#settings :selected').attr('default'));{/literal}">&larr;</span>
+    	<select id="settings">
+		{foreach from=$settingsAvailable item=v}
+       	<option id="{$v[0]}" default="{$v[2]}">{$v[0]}{if $v[3]} ({$v[3]}){/if}: {$v[1]}{if $v[2]} ({$v[2]}){/if}</option>
+        {/foreach}
+        </select>
+	</td>
+    {/if}
+</tr>
 </table>
 <input type="submit" value="save" />
 </form>
