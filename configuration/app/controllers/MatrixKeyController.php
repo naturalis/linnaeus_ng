@@ -163,7 +163,7 @@ class MatrixKeyController extends Controller
 		
 		$characters = $this->getCharacteristics();
 
-        if ($this->_matrixType == 'NBC') {
+        if ($this->_matrixType == 'nbc') {
 
             $states = $this->stateMemoryRecall();
 
@@ -366,7 +366,7 @@ class MatrixKeyController extends Controller
         }
         else if ($this->rHasVal('action', 'do_search')) {
 			
-			if ($this->_matrixType == 'NBC') {
+			if ($this->_matrixType == 'nbc') {
 				
 				$results = $this->nbcDoSearch($this->requestData['params']);
 
@@ -384,15 +384,15 @@ class MatrixKeyController extends Controller
 			}
 
         }
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'save_session_setting')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'save_session_setting')) {
             
             $this->saveSessionSetting($this->requestData['setting']);
         }
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_session_setting')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_session_setting')) {
             
             $this->smarty->assign('returnText', $this->getSessionSetting($this->requestData['name']));
         }
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_formatted_states')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_formatted_states')) {
             
             $c = $this->getCharacteristic(array('id'=>$this->requestData['id']));
             $c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
@@ -426,7 +426,7 @@ class MatrixKeyController extends Controller
 				)));
 
         }
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_results_nbc')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_results_nbc')) {
 
             $states = $this->stateMemoryRecall();
 
@@ -479,7 +479,7 @@ class MatrixKeyController extends Controller
 
 			
         }
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'clear_state')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'clear_state')) {
 
 			if (!$this->rHasVal('state'))
 				$this->stateMemoryUnset();
@@ -488,7 +488,7 @@ class MatrixKeyController extends Controller
 				
 
 		}
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'set_state') && $this->rHasVal('state')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'set_state') && $this->rHasVal('state')) {
 
 			if ($this->rHasVal('value'))
 				$state = $this->requestData['state'] . ':' . $this->requestData['value'];
@@ -500,7 +500,7 @@ class MatrixKeyController extends Controller
 			return;
 
 		}
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_groups')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_groups')) {
 
             $states = $this->stateMemoryRecall();
 
@@ -518,7 +518,7 @@ class MatrixKeyController extends Controller
 				)));
 
 		}
-        else if ($this->_matrixType == 'NBC' && $this->rHasVal('action', 'get_initial_values')) {
+        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_initial_values')) {
 
 			// state image urls
 			$cs = $this->models->CharacteristicState->_get(
@@ -618,7 +618,7 @@ class MatrixKeyController extends Controller
 
     private function initialize ($force = false)
     {
-        $this->_matrixType = $this->getSetting('matrixtype');
+        $this->_matrixType = strtolower($this->getSetting('matrixtype'));
         $this->_useCharacterGroups = $this->getSetting('matrix_use_character_groups') == '1';
         $this->useVariations = $this->getSetting('taxa_use_variations') == '1';
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
@@ -629,7 +629,7 @@ class MatrixKeyController extends Controller
 		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
 			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
         
-        if ($this->_matrixType == 'NBC') {
+        if ($this->_matrixType == 'nbc') {
 			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->getSetting('nbc_image_root');
         }
 
@@ -1090,7 +1090,7 @@ class MatrixKeyController extends Controller
         			and _c.language_id = " . $this->getCurrentLanguageId() . "
         		where _a.project_id = " . $this->getCurrentProjectId() . "
         			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
-        		group by id" . ($this->_matrixType == 'NBC' ? "
+        		group by id" . ($this->_matrixType == 'nbc' ? "
 			union
 			select 'variation' as type, _a.variation_id as id, 
 				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
@@ -1224,7 +1224,7 @@ class MatrixKeyController extends Controller
         			and _c.language_id = " . $this->getCurrentLanguageId() . "
         		where _a.project_id = " . $this->getCurrentProjectId() . "
         			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
-        		group by id" . ($this->_matrixType == 'NBC' ? "
+        		group by id" . ($this->_matrixType == 'nbc' ? "
 			union
 			select 'variation' as type, _a.variation_id as id, _b.state_id, _b.characteristic_id,
 				0 as h, trim(_c.label) as l
@@ -2134,7 +2134,7 @@ class MatrixKeyController extends Controller
 	private function getTotalEntityCount()
 	{
 
-        if ($this->_matrixType == 'NBC')
+        if ($this->_matrixType == 'nbc')
 
 			$q = 
 			"select count(distinct _a.taxon_id) as tot
