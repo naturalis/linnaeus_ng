@@ -316,6 +316,15 @@ ul.facetListType li.selected {font-weight:bold;}
 .result-image {
 	width:200px;
 	height:auto;
+
+	width:auto;
+	max-width:202px;
+	height:auto;
+	max-height:150px;
+	margin-left:auto;
+	margin-right:auto;
+	display: block;
+
 	margin-bottom:2px;
 }
 
@@ -328,6 +337,8 @@ ul.facetListType li.selected {font-weight:bold;}
 .result-icon {
 	width:74px;
 }
+
+
 
 */
 
