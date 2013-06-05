@@ -38,7 +38,29 @@ class ProjectsController extends Controller
         )
     );
 
-
+	private $_availableProjectSettings = array(
+		array('keytype','l2 / lng','lng','single access-key type'),
+		array('maptype','l2 / lng','l2','map type: L2 or Google'),
+		array('matrixtype','lng / nbc','nbc','multi entry-key type'),					
+		array('matrix_use_character_groups','bool',0),
+		array('taxa_use_variations','bool',0),
+		array('skin','[name]','nbc_default'),
+		array('suppress_splash','bool',0,'bypass splash screen'),
+		array('start_page','[url]',null,'default start page of project'),
+		array('nbc_image_root','[url]',null,'for system images'),
+		array('matrix_browse_style','paginate / expand','expand'),
+		array('matrix_items_per_line','int',4),
+		array('matrix_items_per_page','int',16),
+		array('matrix_state_image_per_row','int',4,'number of images on a line in NBC character pop up'),
+		array('matrix_state_image_max_height','[size in px]',200),
+		array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
+		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
+		array('source_author','[name]',null,'only implemented in certain skins'),
+		array('source_title','[title]',null,'only implemented in certain skins'),
+		array('source_photocredit','[name]',null,'only implemented in certain skins'),
+		array('source_url','[url]',null,'only implemented in certain skins'),
+		array('external_species_url_target','[_self|_blank|name]','_blank','in NBC-style matrices'),
+	);
 
     /**
      * Constructor, calls parent's constructor
@@ -436,7 +458,9 @@ class ProjectsController extends Controller
             'columns' => 'setting,value',
 			'order' => 'setting'
         ));
-		
+
+
+        $this->smarty->assign('settingsAvailable',$this->_availableProjectSettings);
         $this->smarty->assign('settings',$s);
         
         $this->printPage();
