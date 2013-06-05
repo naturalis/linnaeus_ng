@@ -212,9 +212,13 @@ ul.facetListType li.selected {font-weight:bold;}
 
 .result-image {
 	border:1px solid #aaa;
-	width:144px;
-	height:207px;
+	width:auto;
+	max-width:144px;
 	height:auto;
+	max-height:207px;
+	margin-left:auto;
+	margin-right:auto;
+	display: block;
 }
 
 .result-labels {
@@ -296,29 +300,34 @@ ul.facetListType li.selected {font-weight:bold;}
 
 
 /* landscape overrides 
-.result {
-    min-height: 140px;
-    width: 222px;
-}
 
-.result-result {
-    min-height: 140px;
+.result {
+    width: 222px;
+	margin:15px 15px 10px 0;
+	float:left;
+    border: 1px solid #ddd;
 }
 
 .result-image-container {
-	width:145px;
-	height:207px;
+	width:202px;
+	height:150px;
 }
 
 .result-image {
-	width:207px;
-	height:145px;
+	width:200px;
+	height:auto;
 	margin-bottom:2px;
 }
 
 .result-labels {
-    line-height: 1.25em;
+	width:100%;
 	height:45px;
+	margin-top:6px;
 }
+
+.result-icon {
+	width:74px;
+}
+
 */
 

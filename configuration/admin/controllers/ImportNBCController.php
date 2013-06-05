@@ -457,7 +457,7 @@ class ImportNBCController extends Controller
 			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 	
 			$settings = array(
-				'matrixtype' => 'NBC',
+				'matrixtype' => 'nbc',
 				'matrix_allow_empty_species' => true,
 				'matrix_use_character_groups' => true,
 				'taxa_use_variations' => true,

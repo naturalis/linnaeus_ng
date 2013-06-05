@@ -2971,7 +2971,7 @@ class SpeciesController extends Controller
         $this->includeLocalMenu = true;
         
         // variations & related are only shown for NBC matrix projects
-        $this->_useNBCExtras = $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'NBC';
+        $this->_useNBCExtras = $this->useRelated = $this->useVariations = $this->getSetting('matrixtype') == 'nbc';
         
         $this->smarty->assign('useNBCExtras', $this->_useNBCExtras);
         $this->smarty->assign('useRelated', $this->useRelated);

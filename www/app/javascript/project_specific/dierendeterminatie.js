@@ -197,6 +197,9 @@ function nbcFormatResult(data) {
 
 		for(var i in data.d) {
 			
+			if (data.d[i].characteristic==undefined)
+				continue;
+			
 			var labels = Array();
 			
 			if (data.d[i].characteristic.indexOf('|')!=false) {
