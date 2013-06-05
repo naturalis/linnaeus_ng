@@ -286,6 +286,10 @@ ul.facetListType li.selected {font-weight:bold;}
 	cursor:pointer;
 }
 
+.result-icon.no-content {
+	cursor:default;
+}
+
 .result-icon:last-child {
 	border:none;
 }
