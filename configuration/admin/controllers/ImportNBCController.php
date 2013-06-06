@@ -395,7 +395,7 @@ class ImportNBCController extends Controller
         $this->setPageName($this->translate('Saving matrix data'));
         
         $data = $_SESSION['admin']['system']['import']['data'];
-        
+
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'matrix')) {
             
             $mId = $this->createMatrix($_SESSION['admin']['system']['import']['project']['title']);
@@ -1265,11 +1265,15 @@ class ImportNBCController extends Controller
             
             $species[$key]['lng_id'] = $this->models->Taxon->getNewId();
 
-			foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
-			
-				if (!empty($cVal) && isset($val[$cKey]))
-					$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
-			
+			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+	
+				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+				
+					if (!empty($cVal) && isset($val[$cKey]))
+						$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
+				
+				}
+				
 			}
             
             $_SESSION['admin']['system']['import']['loaded']['species']++;
@@ -1419,7 +1423,7 @@ class ImportNBCController extends Controller
             'language_id' => $this->getNewDefaultLanguageId(), 
             'name' => $name
         ));
-        
+
         return $id;
     }
 

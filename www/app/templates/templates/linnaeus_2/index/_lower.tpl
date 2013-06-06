@@ -1,9 +1,10 @@
 <div id="content">
 {foreach name=taxonloop from=$taxa key=k item=v}
     {if
-        ($v.source =='synonym' && $taxonType=='lower') ||
+        (($v.source =='synonym' && $taxonType=='lower') ||
         ($v.lower_taxon==1 && $taxonType=='lower') ||
-        ($v.lower_taxon==0 && $taxonType=='higher')
+        ($v.lower_taxon==0 && $taxonType=='higher')) && 
+        $v.is_empty!=1
     }
     <p>
     <a class="internal-link" href="{if $useJavascriptLinks}javascript:goTaxon({$v.id}){else}../species/taxon.php?id={$v.id}{/if}">{$v.label}</a> {$v.author}
