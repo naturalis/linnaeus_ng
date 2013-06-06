@@ -22,7 +22,7 @@ Current settings:
 	</td>
     {if $isSysAdmin}
 	<td>
-    	<span style="cursor:pointer;font-size:15px" onclick="{literal}$('#new_setting').val($('#settings :selected').attr('id'));$('#new_value').val($('#settings :selected').attr('id'));{/literal}">&larr;</span>
+    	<span style="cursor:pointer;font-size:15px" onclick="{literal}$('#new_setting').val($('#settings :selected').attr('id'));$('#new_value').val($('#settings :selected').attr('value'));{/literal}">&larr;</span>
     	<select id="settings">
 		{foreach from=$settingsAvailable item=v}
        	<option id="{$v[0]}" default="{$v[2]}">{$v[0]}{if $v[3]} ({$v[3]}){/if}: {$v[1]}{if $v[2]} ({$v[2]}){/if}</option>
