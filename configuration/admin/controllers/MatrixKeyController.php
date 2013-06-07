@@ -1341,7 +1341,7 @@ class MatrixKeyController extends Controller
         
         if (!isset($id))
             return;
-        
+
         $this->deleteLinks(array(
             'characteristic_id' => $id, 
             'matrix_id' => $this->getCurrentMatrixId()
