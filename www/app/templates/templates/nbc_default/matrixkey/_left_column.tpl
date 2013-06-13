@@ -21,7 +21,8 @@
 			
             <div id="clearSelectionContainer" class="facetCategories clearSelectionBtn{if $activeChars|@count==0} ghosted{/if}">
                 <a id="clearSelectionLink" href="#" onclick="nbcClearStateValue();return false;">
-                <img class="removeBtnImg" src="{$nbcImageRoot}clearSelection.gif">{t}wis geselecteerde kenmerken{/t}</a>
+                	<img class="reloadBtnImg" src="{$nbcImageRoot}reload-icon.png" style="margin-bottom:-4px">{t}opnieuw beginnen{/t}
+                </a>
             </div>
 		</div>
 
