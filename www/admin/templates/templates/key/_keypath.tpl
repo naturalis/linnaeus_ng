@@ -1,6 +1,6 @@
 <div id="keypath">
 	<span style="color:#888;cursor:pointer" onclick="keyToggleFullKeyPath()" title="{t}show entire path{/t}">&nabla;</span>
-	<span id="keypath-title">{t}Keypath{if $keyPath[0].is_start==0} {t}(subsection){/t}{/if}{/t}: </span>
+	<span id="keypath-title">{t}Decision path{if $keyPath[0].is_start==0} {t}(subsection){/t}{/if}{/t}: </span>
 {assign var=first value=true}
 {section name=i loop=$keyPath}
 	{if $smarty.section.i.index==$keyPath|@count-1}

@@ -56,7 +56,7 @@
 {if $contentCount.literature>0}
 <div id="literature">
 	{foreach from=$content key=k item=v}
-	{$v.text}
+	<b>{$v.author_full}, {$v.year_full}:</b> {$v.text}
 	{/foreach}
 </div>
 {/if}

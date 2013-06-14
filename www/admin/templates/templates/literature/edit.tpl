@@ -85,6 +85,50 @@
                     value="{$ref.suffix}" 
                     maxlength="3" 
                     style="width:25px" />
+
+				<span id="year2_stuff" style="display:none">
+                
+                <input type="hidden" name="use_year_range" id="use_year_range" value="0" />
+
+                <select name="year_separator" id="year_separator" style="width:35px">
+                	<option value="-"{if $ref.year_separator=='-'} selected="selected"{/if}>-</option>
+                	<option value="&"{if $ref.year_separator=='&'} selected="selected"{/if}>&</option>
+				</select> 
+                    
+                <input
+                    type="text" 
+                    name="year_2" 
+                    id="year_2" 
+                    value="{$ref.year_2}" 
+                    maxlength="4" 
+                    style="width:50px" 
+                    onfocus="litHideAuthList();" 
+                    onkeyup="litCheckYear(this)"/>
+                <input
+                    type="text" 
+                    name="suffix_2" 
+                    id="suffix_2" 
+                    value="{$ref.suffix_2}" 
+                    maxlength="3" 
+                    style="width:25px" />
+
+	                <a href="#" onclick="$('#year2_stuff').hide();$('#range_link').show();$('#use_year_range').val('0');return false;">hide year range</a>
+
+				</span>
+                {literal}
+	                <a id="range_link" href="#" onclick="$('#year2_stuff').show();$(this).hide();$('#use_year_range').val('1');return false;">year range</a>
+                {/literal}
+				<script>
+				{if $ref.year_2!=''}
+                {literal}
+					$('#use_year_range').val('1');
+	                $('#year2_stuff').show();
+					$('#range_link').hide();
+                {/literal}
+				{/if}
+				</script>
+                                        
+                    
                 <span id="msgYear"></span>
             </td>
         </tr>

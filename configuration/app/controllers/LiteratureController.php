@@ -213,7 +213,28 @@ class LiteratureController extends Controller
 											if(author_second!=\'\',concat(\' & \',author_second),\'\')
 										)
 									)
-								) as author_full',
+								) as author_full,
+							concat(
+								if(isnull(`year`)!=1,`year`,\'\'),
+								if(isnull(suffix)!=1,suffix,\'\'),
+								if(isnull(year_2)!=1,
+									concat(
+										if(year_separator!=\'-\',
+											concat(
+												\' \',
+												year_separator,
+												\' \'
+											),
+											year_separator
+										),
+										year_2,
+										if(isnull(suffix_2)!=1,
+											suffix_2,
+											\'\')
+										)
+										,\'\'
+									)
+							) as year_full',
 					'ignoreCase' => false
 				)
 			);
@@ -242,7 +263,28 @@ class LiteratureController extends Controller
 											if(author_second!=\'\',concat(\' & \',author_second),\'\')
 										)
 									)
-								) as author_full',
+								) as author_full,
+								concat(
+									if(isnull(`year`)!=1,`year`,\'\'),
+									if(isnull(suffix)!=1,suffix,\'\'),
+									if(isnull(year_2)!=1,
+										concat(
+											if(year_separator!=\'-\',
+												concat(
+													\' \',
+													year_separator,
+													\' \'
+												),
+												year_separator
+											),
+											year_2,
+											if(isnull(suffix_2)!=1,
+												suffix_2,
+												\'\')
+											)
+											,\'\'
+										)
+								) as year_full',
 			)
 		);
 		
@@ -408,15 +450,26 @@ class LiteratureController extends Controller
 								if(author_second!=\'\',concat(\' & \',author_second),\'\')
 							)
 						),
-						\' (\',
-						`year`,
-						(
-							if(isnull(suffix)!=1,
-									suffix,
-									\'\'
+						\', \',
+						if(isnull(`year`)!=1,`year`,\'\'),
+						if(isnull(suffix)!=1,suffix,\'\'),
+						if(isnull(year_2)!=1,
+							concat(
+								if(year_separator!=\'-\',
+									concat(
+										\' \',
+										year_separator,
+										\' \'
+									),
+									year_separator
+								),
+								year_2,
+								if(isnull(suffix_2)!=1,
+									suffix_2,
+									\'\')
 								)
-						),
-						\')\'
+								,\'\'
+							)
 					) as label,
 					lower(author_first) as _a1,
 					lower(author_second) as _a2,

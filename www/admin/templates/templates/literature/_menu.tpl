@@ -16,7 +16,7 @@
 {if $alpha[i]==$letter}
 <span class="alphabet-active-letter">{$alpha[i]}</span>
 {else}
-<span class="alphabet-letter" onclick="$('#letter').val('{$alpha[i]}');$('#action').val('browse');$('#alphaForm').submit();">{$alpha[i]}</span>
+<span class="alphabet-letter"><a href="?letter={$alpha[i]}&action=browse">{$alpha[i]}</a></span>
 {/if}
 {/section}
 <form id="alphaForm" method="post" action="">

@@ -3,7 +3,7 @@
 /*
 
 	make sure that if there are multiple parameters, they are in alphabetical
-	order (this is assumed while matching with the current URL in the app)/
+	order (this is assumed while matching with the current URL in the app).
 	so: 
 
 		$this->saveHotword(

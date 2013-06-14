@@ -2447,18 +2447,58 @@ class ImportL2Controller extends Controller
         
         return $line;
     }
-    
+
+
+	private function extractSuffix($y)
+	{
+
+		// there is no suffix
+		if (is_numeric($y)) {
+
+			return array($y,null);
+
+		} else {
+
+			//might be 1991c
+			$f = substr($y, -1);
+			$y2 = substr($y, 0, strlen($y) - 1);
+			
+			if (!is_numeric($y2)) {
+				
+				//should be 1991ab
+				$f = substr($y, -2);
+				$y2 = substr($y, 0, strlen($y) - 2);
+				
+				//not even that!? you're on your own
+				if (!is_numeric($y2))
+					$f = null;
+				else
+					$y = $y2;
+			}
+			else {
+				
+				$y = $y2;
+			}
+
+			return array($y,$f);			
+			
+		}
+		
+	}
+		
+		    
     // literature & glossary
     private function fixAuthors ($s)
     {
         
-        // Antezana et al., 1976b
+        // Antezana et al., 1976b-1978c
         $d = strrpos($s, ','); // comma position
-        $y = trim(substr($s, $d + 1)); // year
-        $a = substr($s, 0, $d); // all but year = author(s)
-        $a2 = null; // default no 2nd author
-        $m = false; // defualt no multiple authors (>2 = et al.)
-        $d = strpos($a, 'et al.'); // "et. al" position
+        $y = str_replace(' ','',substr($s, $d + 1)); // year(s), all spaces removed
+        $a = substr($s, 0, $d); // everything but the year(s) = author(s)
+        $a2 = null; // default: no 2nd author
+        $m = false; // defualt: no multiple authors (>2 = 'et al.')
+        $d = strpos($a, 'et al.'); // 'et. al' position
+
         if ($d !== false) {
             $a = trim(substr($a, 0, $d));
             $m = true;
@@ -2471,33 +2511,44 @@ class ImportL2Controller extends Controller
             }
         }
         
-        $f = null;
+        $f = $f2 = $y2 = $separator = null;
         
         if (!is_numeric($y)) {
-            
-            $f = substr($y, -1);
-            $y2 = substr($y, 0, strlen($y) - 1);
-            
-            if (!is_numeric($y2)) {
-                
-                $f = substr($y, -2);
-                $y2 = substr($y, 0, strlen($y) - 2);
-                
-                if (!is_numeric($y2))
-                    $f = null;
-                else
-                    $y = $y2;
-            }
-            else {
-                
-                $y = $y2;
-            }
+			$separator=false;
+			if (strpos($y,'&amp;')!==false) {
+				$separator='&amp;';
+			} else
+			if (strpos($y,'&')!==false) {
+				$separator='&';
+			} else
+			if (strpos($y,'-')!==false) {
+				$separator='-';
+			}
+			if ($separator) {
+				$boom=explode($separator,$y);
+				$d = $this->extractSuffix($boom[0]);
+				$y = $d[0];
+				$f = $d[1];
+				$d = $this->extractSuffix($boom[1]);
+				$y2 = $d[0];
+				$f2 = $d[1];
+				if ($separator=='&amp;') $separator='&';
+			} else {
+				$d = $this->extractSuffix($y);
+				$y = $d[0];
+				$f = $d[1];
+				$separator=null;
+			}
+
         }
         
         return array(
             'year' => $y, 
             'valid_year' => is_numeric($y), 
+            'year_2' => $y2, 
+			'separator' => $separator,
             'suffix' => $f, 
+            'suffix_2' => $f2, 
             'author_1' => $a, 
             'author_2' => $a2, 
             'multiple_authors' => $m, 
@@ -2560,12 +2611,16 @@ class ImportL2Controller extends Controller
             'multiple_authors' => $lit['multiple_authors'] == true ? 1 : 0, 
             'year' => (isset($lit['year']) && $lit['valid_year'] == true) ? $lit['year'] : '0000', 
             'suffix' => isset($lit['suffix']) ? $lit['suffix'] : null, 
-            'text' => isset($lit['text']) ? trim($lit['text']) : null
+            'text' => isset($lit['text']) ? trim($lit['text']) : null,
+            'year_2' => isset($lit['year_2']) ? $lit['year_2'] : null, 
+            'suffix_2' => isset($lit['suffix_2']) ? $lit['suffix_2'] : null, 
+            'year_separator' => isset($lit['separator']) ? $lit['separator'] : null, 
         ));
-        
+
         if ($res === true) {
-            
+
             $_SESSION['admin']['system']['import']['loaded']['literature']['saved']++;
+
         }
         else {
             
