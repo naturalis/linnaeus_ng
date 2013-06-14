@@ -1051,6 +1051,7 @@ if (1==1 || !$div) {
 	
 	private function formatPathChoice ($choice, $step = null, $choiceMarker = null)
 	{
+		if (!isset($choice['choice_txt'])) return;
 		$remove = $step . $choiceMarker . '. ';
 		$toSpace = array('<br />', '<br>');
 		return str_replace($remove, '', strip_tags(str_replace($toSpace, ' ', $choice['choice_txt'])));
