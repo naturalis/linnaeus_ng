@@ -3391,6 +3391,3 @@ INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `e
 (32, 'gideon', 'a623c702154bcdb66dfce443a02c06e0', 'Gideon', 'Gijswijt', 'ggyswyt@eti.uva.nl', 1, 0, 28, NULL, 1, '2010-12-14 11:23:44', 19, NULL, 0, '2010-12-14 10:23:44', '2010-11-18 09:45:07'),
 (36, 'henk', '6a7259238ba5989e49f0ea5f75dd4cd0', 'henk', 'henk', 'ha@enk.com', 1, 0, 1, NULL, 1, '2013-01-03 15:43:19', 19, NULL, 0, '2013-01-03 14:43:19', '2011-02-14 14:37:17');
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
