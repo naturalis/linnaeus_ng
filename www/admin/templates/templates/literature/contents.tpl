@@ -6,21 +6,21 @@
 {else}
 <table>
 	<tr>
-		<th style="width:200px" onclick="allTableColumnSort('author_both');">{t}authors{/t}</th>
-		<th style="width:50px" onclick="allTableColumnSort('year');">{t}year{/t}</th>
+		<th style="width:200px" {*onclick="allTableColumnSort('author_both');"*}>{t}authors{/t}</th>
+		<th style="width:75px" {*onclick="allTableColumnSort('year');"*}>{t}year{/t}</th>
 		<th style="width:500px">{t}reference{/t}</th>
 	</tr>
-{section name=i loop=$refs}
+	{section name=i loop=$refs}
 	<tr class="tr-highlight" style="vertical-align:top;">
 		<td><a href="edit.php?id={$refs[i].id}">
 			{$refs[i].author_first}
 			{if $refs[i].multiple_authors==1}{t}et al.{/t}{else}{if $refs[i].author_second!=''}&amp; {$refs[i].author_second}{/if}{/if}
 			</a>
 		</td>
-		<td>{$refs[i].year}{$refs[i].suffix}</td>
+		<td>{$refs[i].year_full}</td>
 		<td>{$refs[i].text|@strip_tags:substr:0:75}{if $refs[i].text|@strlen>75}...{/if}</td>
 	</tr>
-{/section}
+	{/section}
 </table>
 <form method="post" action="" name="sortForm" id="sortForm">
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />

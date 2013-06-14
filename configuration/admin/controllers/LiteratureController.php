@@ -156,10 +156,17 @@ class LiteratureController extends Controller
 				'suffix' => $data['suffix']
 			);
 
+			//$data['author_second'] = $test['author_second'] = empty($data['author_second']) || $data['multiple_authors']==0 ? 'null' : $data['author_second'];
+
+			$data['year_separator'] = $test['year_separator'] = empty($data['year_separator']) || $data['use_year_range']=='0' ? 'null' : $data['year_separator'];
+			$data['year_2'] = $test['year_2'] = empty($data['year_2']) || $data['use_year_range']=='0' ? 'null' : $data['year_2'];
+			$data['suffix_2'] = $test['suffix_2'] = empty($data['suffix_2']) || $data['use_year_range']=='0' ? 'null' : $data['suffix_2'];
+
 			if ($this->rHasId())
 				$test['id !='] = $data['id'];
 			else
 				$test['id'] = 'null';
+
 
 			if ($this->getReferences($test)) {
 
@@ -461,20 +468,6 @@ class LiteratureController extends Controller
 	
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	private function getReference($id)
 	{
 
@@ -713,7 +706,7 @@ class LiteratureController extends Controller
 				array(
 					'id' => $d,
 					'order' => !empty($order) ? $order : 'author_first',
-					'columns' => '*, concat(author_first,author_second) as author_both, '.$this->getSQLColumnFullAuthor(),
+					'columns' => '*, concat(author_first,author_second) as author_both, '.$this->getSQLColumnFullAuthor().', '.$this->getSQLColumnFullYear(),
 					'ignoreCase' => false
 				)
 			);
@@ -829,6 +822,35 @@ class LiteratureController extends Controller
 								if(author_second!=\'\',concat(\' & \',author_second),\'\')
 							)
 						),
+						\', \',
+						if(isnull(`year`)!=1,`year`,\'\'),
+						if(isnull(suffix)!=1,suffix,\'\'),
+						if(isnull(year_2)!=1,
+							concat(
+								if(year_separator!=\'-\',
+									concat(
+										\' \',
+										year_separator,
+										\' \'
+									),
+									year_separator
+								),
+								year_2,
+								if(isnull(suffix_2)!=1,
+									suffix_2,
+									\'\')
+								)
+								,\'\'
+							)
+					) as label,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						),
 						\' (\',
 						`year`,
 						(
@@ -838,11 +860,11 @@ class LiteratureController extends Controller
 								)
 						),
 						\')\'
-					) as label,
+					) as label2,
 					lower(author_first) as _a1,
 					lower(author_second) as _a2,
-					`year`					
-				from %table%
+					`year`
+					from %table%
 				where
 					(author_first like "%'.mysql_real_escape_string($search).'%" or
 					author_second like "%'.mysql_real_escape_string($search).'%" or
@@ -879,7 +901,31 @@ class LiteratureController extends Controller
 	
 	}
 
-
-
+	private function getSQLColumnFullYear()
+	{
+	
+		return '
+			concat(
+				if(isnull(`year`)!=1,`year`,\'\'),
+				if(isnull(suffix)!=1,suffix,\'\'),
+				if(isnull(year_2)!=1,
+					concat(
+						if(year_separator!=\'-\',
+							concat(
+								\' \',
+								year_separator,
+								\' \'
+							),
+							year_separator
+						),
+						year_2,
+						if(isnull(suffix_2)!=1,
+							suffix_2,
+							\'\')
+						)
+						,\'\'
+					)
+			) as year_full';
+	}
 
 }

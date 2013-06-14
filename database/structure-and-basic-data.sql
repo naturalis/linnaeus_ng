@@ -3,18 +3,12 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 14, 2013 at 11:32 AM
+-- Generation Time: Jun 14, 2013 at 02:26 PM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.3.13
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `linnaeus_ng`
@@ -24,7 +18,6 @@ DELIMITER $$
 --
 -- Functions
 --
-DROP FUNCTION IF EXISTS `fnStripTags`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(4000) ) RETURNS varchar(4000) CHARSET utf8
     DETERMINISTIC
 BEGIN
@@ -51,7 +44,6 @@ DELIMITER ;
 -- Table structure for table `characteristics`
 --
 
-DROP TABLE IF EXISTS `characteristics`;
 CREATE TABLE IF NOT EXISTS `characteristics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -69,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `characteristics` (
 -- Table structure for table `characteristics_chargroups`
 --
 
-DROP TABLE IF EXISTS `characteristics_chargroups`;
 CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -87,7 +78,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
 -- Table structure for table `characteristics_labels`
 --
 
-DROP TABLE IF EXISTS `characteristics_labels`;
 CREATE TABLE IF NOT EXISTS `characteristics_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -107,7 +97,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels` (
 -- Table structure for table `characteristics_labels_states`
 --
 
-DROP TABLE IF EXISTS `characteristics_labels_states`;
 CREATE TABLE IF NOT EXISTS `characteristics_labels_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -127,7 +116,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels_states` (
 -- Table structure for table `characteristics_matrices`
 --
 
-DROP TABLE IF EXISTS `characteristics_matrices`;
 CREATE TABLE IF NOT EXISTS `characteristics_matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -146,7 +134,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_matrices` (
 -- Table structure for table `characteristics_states`
 --
 
-DROP TABLE IF EXISTS `characteristics_states`;
 CREATE TABLE IF NOT EXISTS `characteristics_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -171,7 +158,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_states` (
 -- Table structure for table `chargroups`
 --
 
-DROP TABLE IF EXISTS `chargroups`;
 CREATE TABLE IF NOT EXISTS `chargroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -189,7 +175,6 @@ CREATE TABLE IF NOT EXISTS `chargroups` (
 -- Table structure for table `chargroups_labels`
 --
 
-DROP TABLE IF EXISTS `chargroups_labels`;
 CREATE TABLE IF NOT EXISTS `chargroups_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -207,7 +192,6 @@ CREATE TABLE IF NOT EXISTS `chargroups_labels` (
 -- Table structure for table `choices_content_keysteps`
 --
 
-DROP TABLE IF EXISTS `choices_content_keysteps`;
 CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -226,7 +210,6 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
 -- Table structure for table `choices_content_keysteps_undo`
 --
 
-DROP TABLE IF EXISTS `choices_content_keysteps_undo`;
 CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `choice_content_id` int(11) NOT NULL,
@@ -248,7 +231,6 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
 -- Table structure for table `choices_keysteps`
 --
 
-DROP TABLE IF EXISTS `choices_keysteps`;
 CREATE TABLE IF NOT EXISTS `choices_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -272,7 +254,6 @@ CREATE TABLE IF NOT EXISTS `choices_keysteps` (
 -- Table structure for table `commonnames`
 --
 
-DROP TABLE IF EXISTS `commonnames`;
 CREATE TABLE IF NOT EXISTS `commonnames` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -296,7 +277,6 @@ CREATE TABLE IF NOT EXISTS `commonnames` (
 -- Table structure for table `content`
 --
 
-DROP TABLE IF EXISTS `content`;
 CREATE TABLE IF NOT EXISTS `content` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -315,7 +295,6 @@ CREATE TABLE IF NOT EXISTS `content` (
 -- Table structure for table `content_free_modules`
 --
 
-DROP TABLE IF EXISTS `content_free_modules`;
 CREATE TABLE IF NOT EXISTS `content_free_modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -337,7 +316,6 @@ CREATE TABLE IF NOT EXISTS `content_free_modules` (
 -- Table structure for table `content_introduction`
 --
 
-DROP TABLE IF EXISTS `content_introduction`;
 CREATE TABLE IF NOT EXISTS `content_introduction` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -358,7 +336,6 @@ CREATE TABLE IF NOT EXISTS `content_introduction` (
 -- Table structure for table `content_keysteps`
 --
 
-DROP TABLE IF EXISTS `content_keysteps`;
 CREATE TABLE IF NOT EXISTS `content_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -378,7 +355,6 @@ CREATE TABLE IF NOT EXISTS `content_keysteps` (
 -- Table structure for table `content_keysteps_undo`
 --
 
-DROP TABLE IF EXISTS `content_keysteps_undo`;
 CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `keystep_content_id` int(11) NOT NULL,
@@ -401,7 +377,6 @@ CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
 -- Table structure for table `content_taxa`
 --
 
-DROP TABLE IF EXISTS `content_taxa`;
 CREATE TABLE IF NOT EXISTS `content_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -424,7 +399,6 @@ CREATE TABLE IF NOT EXISTS `content_taxa` (
 -- Table structure for table `content_taxa_undo`
 --
 
-DROP TABLE IF EXISTS `content_taxa_undo`;
 CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_taxa_id` int(11) NOT NULL,
@@ -450,7 +424,6 @@ CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
 -- Table structure for table `diversity_index`
 --
 
-DROP TABLE IF EXISTS `diversity_index`;
 CREATE TABLE IF NOT EXISTS `diversity_index` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(10) unsigned NOT NULL,
@@ -471,7 +444,6 @@ CREATE TABLE IF NOT EXISTS `diversity_index` (
 -- Table structure for table `diversity_index_old`
 --
 
-DROP TABLE IF EXISTS `diversity_index_old`;
 CREATE TABLE IF NOT EXISTS `diversity_index_old` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(10) unsigned NOT NULL,
@@ -490,7 +462,6 @@ CREATE TABLE IF NOT EXISTS `diversity_index_old` (
 -- Table structure for table `dump`
 --
 
-DROP TABLE IF EXISTS `dump`;
 CREATE TABLE IF NOT EXISTS `dump` (
   `p` int(11) DEFAULT NULL,
   `i_int` int(11) DEFAULT NULL,
@@ -505,7 +476,6 @@ CREATE TABLE IF NOT EXISTS `dump` (
 -- Table structure for table `free_modules_pages`
 --
 
-DROP TABLE IF EXISTS `free_modules_pages`;
 CREATE TABLE IF NOT EXISTS `free_modules_pages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -526,7 +496,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_pages` (
 -- Table structure for table `free_modules_projects`
 --
 
-DROP TABLE IF EXISTS `free_modules_projects`;
 CREATE TABLE IF NOT EXISTS `free_modules_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -547,7 +516,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects` (
 -- Table structure for table `free_modules_projects_users`
 --
 
-DROP TABLE IF EXISTS `free_modules_projects_users`;
 CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -563,7 +531,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
 -- Table structure for table `free_module_media`
 --
 
-DROP TABLE IF EXISTS `free_module_media`;
 CREATE TABLE IF NOT EXISTS `free_module_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -585,7 +552,6 @@ CREATE TABLE IF NOT EXISTS `free_module_media` (
 -- Table structure for table `geodata_types`
 --
 
-DROP TABLE IF EXISTS `geodata_types`;
 CREATE TABLE IF NOT EXISTS `geodata_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -604,7 +570,6 @@ CREATE TABLE IF NOT EXISTS `geodata_types` (
 -- Table structure for table `geodata_types_titles`
 --
 
-DROP TABLE IF EXISTS `geodata_types_titles`;
 CREATE TABLE IF NOT EXISTS `geodata_types_titles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -623,7 +588,6 @@ CREATE TABLE IF NOT EXISTS `geodata_types_titles` (
 -- Table structure for table `glossary`
 --
 
-DROP TABLE IF EXISTS `glossary`;
 CREATE TABLE IF NOT EXISTS `glossary` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -643,7 +607,6 @@ CREATE TABLE IF NOT EXISTS `glossary` (
 -- Table structure for table `glossary_media`
 --
 
-DROP TABLE IF EXISTS `glossary_media`;
 CREATE TABLE IF NOT EXISTS `glossary_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -666,7 +629,6 @@ CREATE TABLE IF NOT EXISTS `glossary_media` (
 -- Table structure for table `glossary_media_captions`
 --
 
-DROP TABLE IF EXISTS `glossary_media_captions`;
 CREATE TABLE IF NOT EXISTS `glossary_media_captions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -685,7 +647,6 @@ CREATE TABLE IF NOT EXISTS `glossary_media_captions` (
 -- Table structure for table `glossary_synonyms`
 --
 
-DROP TABLE IF EXISTS `glossary_synonyms`;
 CREATE TABLE IF NOT EXISTS `glossary_synonyms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -705,7 +666,6 @@ CREATE TABLE IF NOT EXISTS `glossary_synonyms` (
 -- Table structure for table `gui_menu_order`
 --
 
-DROP TABLE IF EXISTS `gui_menu_order`;
 CREATE TABLE IF NOT EXISTS `gui_menu_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -725,7 +685,6 @@ CREATE TABLE IF NOT EXISTS `gui_menu_order` (
 -- Table structure for table `heartbeats`
 --
 
-DROP TABLE IF EXISTS `heartbeats`;
 CREATE TABLE IF NOT EXISTS `heartbeats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -747,7 +706,6 @@ CREATE TABLE IF NOT EXISTS `heartbeats` (
 -- Table structure for table `helptexts`
 --
 
-DROP TABLE IF EXISTS `helptexts`;
 CREATE TABLE IF NOT EXISTS `helptexts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `controller` varchar(32) NOT NULL,
@@ -766,7 +724,6 @@ CREATE TABLE IF NOT EXISTS `helptexts` (
 -- Table structure for table `hotwords`
 --
 
-DROP TABLE IF EXISTS `hotwords`;
 CREATE TABLE IF NOT EXISTS `hotwords` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -788,7 +745,6 @@ CREATE TABLE IF NOT EXISTS `hotwords` (
 -- Table structure for table `hybrids`
 --
 
-DROP TABLE IF EXISTS `hybrids`;
 CREATE TABLE IF NOT EXISTS `hybrids` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `hybrid` varchar(128) NOT NULL,
@@ -804,7 +760,6 @@ CREATE TABLE IF NOT EXISTS `hybrids` (
 -- Table structure for table `interface_texts`
 --
 
-DROP TABLE IF EXISTS `interface_texts`;
 CREATE TABLE IF NOT EXISTS `interface_texts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `text` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
@@ -820,7 +775,6 @@ CREATE TABLE IF NOT EXISTS `interface_texts` (
 -- Table structure for table `interface_translations`
 --
 
-DROP TABLE IF EXISTS `interface_translations`;
 CREATE TABLE IF NOT EXISTS `interface_translations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `interface_text_id` int(11) NOT NULL,
@@ -835,7 +789,6 @@ CREATE TABLE IF NOT EXISTS `interface_translations` (
 -- Table structure for table `introduction_media`
 --
 
-DROP TABLE IF EXISTS `introduction_media`;
 CREATE TABLE IF NOT EXISTS `introduction_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -857,7 +810,6 @@ CREATE TABLE IF NOT EXISTS `introduction_media` (
 -- Table structure for table `introduction_pages`
 --
 
-DROP TABLE IF EXISTS `introduction_pages`;
 CREATE TABLE IF NOT EXISTS `introduction_pages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -875,7 +827,6 @@ CREATE TABLE IF NOT EXISTS `introduction_pages` (
 -- Table structure for table `keysteps`
 --
 
-DROP TABLE IF EXISTS `keysteps`;
 CREATE TABLE IF NOT EXISTS `keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -896,7 +847,6 @@ CREATE TABLE IF NOT EXISTS `keysteps` (
 -- Table structure for table `keytrees`
 --
 
-DROP TABLE IF EXISTS `keytrees`;
 CREATE TABLE IF NOT EXISTS `keytrees` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -914,7 +864,6 @@ CREATE TABLE IF NOT EXISTS `keytrees` (
 -- Table structure for table `l2_diversity_index`
 --
 
-DROP TABLE IF EXISTS `l2_diversity_index`;
 CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -936,7 +885,6 @@ CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
 -- Table structure for table `l2_maps`
 --
 
-DROP TABLE IF EXISTS `l2_maps`;
 CREATE TABLE IF NOT EXISTS `l2_maps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -957,7 +905,6 @@ CREATE TABLE IF NOT EXISTS `l2_maps` (
 -- Table structure for table `l2_occurrences_taxa`
 --
 
-DROP TABLE IF EXISTS `l2_occurrences_taxa`;
 CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -982,7 +929,6 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa` (
 -- Table structure for table `l2_occurrences_taxa_combi`
 --
 
-DROP TABLE IF EXISTS `l2_occurrences_taxa_combi`;
 CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa_combi` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1004,7 +950,6 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa_combi` (
 -- Table structure for table `labels_languages`
 --
 
-DROP TABLE IF EXISTS `labels_languages`;
 CREATE TABLE IF NOT EXISTS `labels_languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1023,7 +968,6 @@ CREATE TABLE IF NOT EXISTS `labels_languages` (
 -- Table structure for table `labels_projects_ranks`
 --
 
-DROP TABLE IF EXISTS `labels_projects_ranks`;
 CREATE TABLE IF NOT EXISTS `labels_projects_ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1043,7 +987,6 @@ CREATE TABLE IF NOT EXISTS `labels_projects_ranks` (
 -- Table structure for table `labels_sections`
 --
 
-DROP TABLE IF EXISTS `labels_sections`;
 CREATE TABLE IF NOT EXISTS `labels_sections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1063,7 +1006,6 @@ CREATE TABLE IF NOT EXISTS `labels_sections` (
 -- Table structure for table `languages`
 --
 
-DROP TABLE IF EXISTS `languages`;
 CREATE TABLE IF NOT EXISTS `languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `language` varchar(32) NOT NULL,
@@ -1086,7 +1028,6 @@ CREATE TABLE IF NOT EXISTS `languages` (
 -- Table structure for table `languages_projects`
 --
 
-DROP TABLE IF EXISTS `languages_projects`;
 CREATE TABLE IF NOT EXISTS `languages_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `language_id` int(11) NOT NULL,
@@ -1106,15 +1047,17 @@ CREATE TABLE IF NOT EXISTS `languages_projects` (
 -- Table structure for table `literature`
 --
 
-DROP TABLE IF EXISTS `literature`;
 CREATE TABLE IF NOT EXISTS `literature` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `author_first` varchar(64) NOT NULL,
   `author_second` varchar(64) DEFAULT NULL,
   `multiple_authors` tinyint(1) NOT NULL DEFAULT '0',
-  `year` varchar(24) NOT NULL,
+  `year` year(4) DEFAULT NULL,
   `suffix` varchar(3) DEFAULT NULL,
+  `year_separator` varchar(8) DEFAULT NULL,
+  `year_2` year(4) DEFAULT NULL,
+  `suffix_2` varchar(3) DEFAULT NULL,
   `text` text NOT NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1128,7 +1071,6 @@ CREATE TABLE IF NOT EXISTS `literature` (
 -- Table structure for table `literature_taxa`
 --
 
-DROP TABLE IF EXISTS `literature_taxa`;
 CREATE TABLE IF NOT EXISTS `literature_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1147,7 +1089,6 @@ CREATE TABLE IF NOT EXISTS `literature_taxa` (
 -- Table structure for table `matrices`
 --
 
-DROP TABLE IF EXISTS `matrices`;
 CREATE TABLE IF NOT EXISTS `matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1165,7 +1106,6 @@ CREATE TABLE IF NOT EXISTS `matrices` (
 -- Table structure for table `matrices_names`
 --
 
-DROP TABLE IF EXISTS `matrices_names`;
 CREATE TABLE IF NOT EXISTS `matrices_names` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1184,7 +1124,6 @@ CREATE TABLE IF NOT EXISTS `matrices_names` (
 -- Table structure for table `matrices_taxa`
 --
 
-DROP TABLE IF EXISTS `matrices_taxa`;
 CREATE TABLE IF NOT EXISTS `matrices_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1202,7 +1141,6 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa` (
 -- Table structure for table `matrices_taxa_states`
 --
 
-DROP TABLE IF EXISTS `matrices_taxa_states`;
 CREATE TABLE IF NOT EXISTS `matrices_taxa_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1236,7 +1174,6 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa_states` (
 -- Table structure for table `matrices_variations`
 --
 
-DROP TABLE IF EXISTS `matrices_variations`;
 CREATE TABLE IF NOT EXISTS `matrices_variations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1254,7 +1191,6 @@ CREATE TABLE IF NOT EXISTS `matrices_variations` (
 -- Table structure for table `media_descriptions_taxon`
 --
 
-DROP TABLE IF EXISTS `media_descriptions_taxon`;
 CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1273,7 +1209,6 @@ CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
 -- Table structure for table `media_taxon`
 --
 
-DROP TABLE IF EXISTS `media_taxon`;
 CREATE TABLE IF NOT EXISTS `media_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1298,7 +1233,6 @@ CREATE TABLE IF NOT EXISTS `media_taxon` (
 -- Table structure for table `modules`
 --
 
-DROP TABLE IF EXISTS `modules`;
 CREATE TABLE IF NOT EXISTS `modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(64) NOT NULL,
@@ -1320,7 +1254,6 @@ CREATE TABLE IF NOT EXISTS `modules` (
 -- Table structure for table `modules_projects`
 --
 
-DROP TABLE IF EXISTS `modules_projects`;
 CREATE TABLE IF NOT EXISTS `modules_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1339,7 +1272,6 @@ CREATE TABLE IF NOT EXISTS `modules_projects` (
 -- Table structure for table `modules_projects_users`
 --
 
-DROP TABLE IF EXISTS `modules_projects_users`;
 CREATE TABLE IF NOT EXISTS `modules_projects_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1356,7 +1288,6 @@ CREATE TABLE IF NOT EXISTS `modules_projects_users` (
 -- Table structure for table `nbc_extras`
 --
 
-DROP TABLE IF EXISTS `nbc_extras`;
 CREATE TABLE IF NOT EXISTS `nbc_extras` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1375,7 +1306,6 @@ CREATE TABLE IF NOT EXISTS `nbc_extras` (
 -- Table structure for table `occurrences_taxa`
 --
 
-DROP TABLE IF EXISTS `occurrences_taxa`;
 CREATE TABLE IF NOT EXISTS `occurrences_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1400,7 +1330,6 @@ CREATE TABLE IF NOT EXISTS `occurrences_taxa` (
 -- Table structure for table `pages_taxa`
 --
 
-DROP TABLE IF EXISTS `pages_taxa`;
 CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1419,7 +1348,6 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
 -- Table structure for table `pages_taxa_titles`
 --
 
-DROP TABLE IF EXISTS `pages_taxa_titles`;
 CREATE TABLE IF NOT EXISTS `pages_taxa_titles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1438,7 +1366,6 @@ CREATE TABLE IF NOT EXISTS `pages_taxa_titles` (
 -- Table structure for table `projects`
 --
 
-DROP TABLE IF EXISTS `projects`;
 CREATE TABLE IF NOT EXISTS `projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sys_name` varchar(64) NOT NULL,
@@ -1464,7 +1391,6 @@ CREATE TABLE IF NOT EXISTS `projects` (
 -- Table structure for table `projects_ranks`
 --
 
-DROP TABLE IF EXISTS `projects_ranks`;
 CREATE TABLE IF NOT EXISTS `projects_ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1486,7 +1412,6 @@ CREATE TABLE IF NOT EXISTS `projects_ranks` (
 -- Table structure for table `projects_roles_users`
 --
 
-DROP TABLE IF EXISTS `projects_roles_users`;
 CREATE TABLE IF NOT EXISTS `projects_roles_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1506,7 +1431,6 @@ CREATE TABLE IF NOT EXISTS `projects_roles_users` (
 -- Table structure for table `ranks`
 --
 
-DROP TABLE IF EXISTS `ranks`;
 CREATE TABLE IF NOT EXISTS `ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `rank` varchar(128) NOT NULL,
@@ -1530,7 +1454,6 @@ CREATE TABLE IF NOT EXISTS `ranks` (
 -- Table structure for table `rights`
 --
 
-DROP TABLE IF EXISTS `rights`;
 CREATE TABLE IF NOT EXISTS `rights` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `controller` varchar(32) NOT NULL,
@@ -1547,7 +1470,6 @@ CREATE TABLE IF NOT EXISTS `rights` (
 -- Table structure for table `rights_roles`
 --
 
-DROP TABLE IF EXISTS `rights_roles`;
 CREATE TABLE IF NOT EXISTS `rights_roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `right_id` int(11) NOT NULL,
@@ -1564,7 +1486,6 @@ CREATE TABLE IF NOT EXISTS `rights_roles` (
 -- Table structure for table `roles`
 --
 
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(32) NOT NULL,
@@ -1583,7 +1504,6 @@ CREATE TABLE IF NOT EXISTS `roles` (
 -- Table structure for table `sections`
 --
 
-DROP TABLE IF EXISTS `sections`;
 CREATE TABLE IF NOT EXISTS `sections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1602,7 +1522,6 @@ CREATE TABLE IF NOT EXISTS `sections` (
 -- Table structure for table `settings`
 --
 
-DROP TABLE IF EXISTS `settings`;
 CREATE TABLE IF NOT EXISTS `settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1621,7 +1540,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
 -- Table structure for table `synonyms`
 --
 
-DROP TABLE IF EXISTS `synonyms`;
 CREATE TABLE IF NOT EXISTS `synonyms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1643,7 +1561,6 @@ CREATE TABLE IF NOT EXISTS `synonyms` (
 -- Table structure for table `taxa`
 --
 
-DROP TABLE IF EXISTS `taxa`;
 CREATE TABLE IF NOT EXISTS `taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1671,7 +1588,6 @@ CREATE TABLE IF NOT EXISTS `taxa` (
 -- Table structure for table `taxa_relations`
 --
 
-DROP TABLE IF EXISTS `taxa_relations`;
 CREATE TABLE IF NOT EXISTS `taxa_relations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1688,7 +1604,6 @@ CREATE TABLE IF NOT EXISTS `taxa_relations` (
 -- Table structure for table `taxa_variations`
 --
 
-DROP TABLE IF EXISTS `taxa_variations`;
 CREATE TABLE IF NOT EXISTS `taxa_variations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1706,7 +1621,6 @@ CREATE TABLE IF NOT EXISTS `taxa_variations` (
 -- Table structure for table `timezones`
 --
 
-DROP TABLE IF EXISTS `timezones`;
 CREATE TABLE IF NOT EXISTS `timezones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `timezone` varchar(9) NOT NULL,
@@ -1722,7 +1636,6 @@ CREATE TABLE IF NOT EXISTS `timezones` (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(32) NOT NULL,
@@ -1754,7 +1667,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Table structure for table `users_taxa`
 --
 
-DROP TABLE IF EXISTS `users_taxa`;
 CREATE TABLE IF NOT EXISTS `users_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1773,7 +1685,6 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
 -- Table structure for table `variations_labels`
 --
 
-DROP TABLE IF EXISTS `variations_labels`;
 CREATE TABLE IF NOT EXISTS `variations_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1792,7 +1703,6 @@ CREATE TABLE IF NOT EXISTS `variations_labels` (
 -- Table structure for table `variation_relations`
 --
 
-DROP TABLE IF EXISTS `variation_relations`;
 CREATE TABLE IF NOT EXISTS `variation_relations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1804,14 +1714,6 @@ CREATE TABLE IF NOT EXISTS `variation_relations` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 
-
-
-
-INSERT INTO `helptexts` (`id`, `controller`, `view`, `subject`, `helptext`, `show_order`, `created`, `last_change`) VALUES
-(1, 'users', 'login', 'Logging in', 'To log in, fill in your Linnaeus NG-username and password, and press the button labeled "Login".', 0, '2010-08-26 10:51:15', '2010-08-26 06:51:15'),
-(2, 'users', 'login', 'Problems logging in?', 'If you cannot login, please <a href="mailto:helpdesk@linnaeus.eti.uva.nl">contact the helpdesk</a>.', 1, '2010-08-26 10:51:15', '2010-08-26 06:51:15'),
-(3, 'users', 'edit', 'Role', 'The ''role'' indicates the role this user will have in the current project. Hover your mouse over the role''s names to see a short description.', 0, '2010-08-26 10:51:15', '2010-08-26 06:51:15'),
-(4, 'users', 'edit', 'Active', '''Active'' indicates whether a user is actively working on the current project. When set to ''n'', the user can no longer log in or work on the project. It allows you to temporarily disable users without deleting them outright.<br />Users that have the role of ''Lead expert'' cannot change role, or be made in-active, as they are the lead manager of a project.', 1, '2010-08-26 10:51:15', '2010-08-26 06:51:15');
 
 INSERT INTO `hybrids` (`id`, `hybrid`, `created`, `last_change`) VALUES
 (1, 'x Genus', '2010-10-14 12:02:03', '2010-10-14 10:02:03'),
