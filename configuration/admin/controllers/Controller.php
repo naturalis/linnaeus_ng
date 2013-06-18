@@ -1971,7 +1971,7 @@ class Controller extends BaseClass
 
 
 
-    public function getSetting ($name)
+    public function getSetting ($name,$default=null)
     {
         $s = $this->models->Settings->_get(
         array(
@@ -1986,7 +1986,7 @@ class Controller extends BaseClass
         if (isset($s[0]))
             return $s[0]['value'];
         else
-            return null;
+            return isset($default) ? $default : null;
     }
 
 

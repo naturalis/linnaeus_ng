@@ -13,6 +13,7 @@ class MatrixKeyController extends Controller
 	private $_useSepCoeffAsWeight = false;
 	private $_matrixStateImageMaxHeight = null;
 	private $_externalSpeciesUrlTarget = '_blank';
+	private $_matrixSuppressDetails = false;
 
     public $usedModels = array(
         'matrix', 
@@ -625,6 +626,7 @@ class MatrixKeyController extends Controller
         $this->_useSepCoeffAsWeight = false; // $this->getSetting('matrix_use_sc_as_weight');
         $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
         $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
+        $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
 
 		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
 			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
@@ -829,8 +831,6 @@ class MatrixKeyController extends Controller
         return isset($matrices) ? $matrices : null;
     }
 
-
-
     private function stateMemoryStore ($data)
     {
         foreach ((array) $data as $key => $val) {
@@ -845,8 +845,6 @@ class MatrixKeyController extends Controller
 		
     }
 
-
-
     private function stateMemoryUnset ($id = null)
     {
         if (empty($id))
@@ -854,8 +852,6 @@ class MatrixKeyController extends Controller
         else
             unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
     }
-
-
 
     private function stateMemoryRecall ($p = null)
     {
@@ -945,8 +941,6 @@ class MatrixKeyController extends Controller
         return $cs;
     }
 
-
-
     private function getCharacteristicState ($id)
     {
         if (!isset($id))
@@ -967,8 +961,6 @@ class MatrixKeyController extends Controller
         return $cs[0];
     }
 
-
-
     private function getCharacteristicStateLabelOrText ($id, $type = 'label')
     {
         if (!isset($id))
@@ -986,7 +978,6 @@ class MatrixKeyController extends Controller
         
         return $type == 'text' ? $cls[0]['text'] : $cls[0]['label'];
     }
-
 
 	/*
 		each selected state further restricts the result set
@@ -1300,7 +1291,6 @@ class MatrixKeyController extends Controller
         return ($a['s'] > $b['s']) ? -1 : 1;
     }
 
-
     private function getCharacteristicHValue ($charId, $states = null)
     {
         $states = is_null($states) ? $this->getCharacteristicStates($charId) : $states;
@@ -1353,7 +1343,6 @@ class MatrixKeyController extends Controller
         return $hValue * ($this->controllerSettings['useCorrectedHValue'] == true ? $corrFactor : 1);
     }
 
-
     private function getCharacteristics ()
     {
         $mc = $this->models->CharacteristicMatrix->_get(
@@ -1386,7 +1375,6 @@ class MatrixKeyController extends Controller
         
         return isset($c) ? $c : null;
     }
-
 
     private function getCharacteristic ($p)
     {
@@ -1458,7 +1446,6 @@ class MatrixKeyController extends Controller
         return $char;
     }
 
-
     private function getEntityStates ($id, $type)
     {
 
@@ -1480,7 +1467,7 @@ class MatrixKeyController extends Controller
 			'id' => $d, 
 			'columns' => 'characteristic_id,state_id'
 		));
-		
+
 		$res = array();
 			
         foreach ((array) $mts as $key => $val) {
@@ -1495,24 +1482,20 @@ class MatrixKeyController extends Controller
 		return $res;        
     }
 
-
     private function getTaxonStates ($id)
     {
         return $this->getEntityStates ($id,'taxon');
     }
-
 
     private function getVariationStates ($id)
     {
         return $this->getEntityStates ($id,'variation');
     }
     
-
     private function getMatrixStates ($id)
     {
         return $this->getEntityStates ($id,'matrix');
     }
-    
 
     private function getTaxonComparison ($id)
     {
@@ -1604,7 +1587,6 @@ class MatrixKeyController extends Controller
         );
     }
 
-
     private function calculateDistances ($u1, $u2, $co, $ca)
     {
         $prec = 3;
@@ -1649,49 +1631,35 @@ class MatrixKeyController extends Controller
         );
     }
 
-
-
     private function showStateStore ($state)
     {
         $_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] = $state;
     }
-
-
 
     private function showStateRecall ()
     {
         return isset($_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] : 'pattern';
     }
 
-
-
     private function examineSpeciesStore ($id)
     {
         $_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] = $id;
     }
-
-
 
     private function examineSpeciesRecall ()
     {
         return isset($_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] : null;
     }
 
-
-
     private function compareSpeciesStore ($id)
     {
         $_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] = $id;
     }
 
-
-
     private function compareSpeciesRecall ()
     {
         return isset($_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] : null;
     }
-
-
 
     private function getCharacterGroups ()
     {
@@ -2451,7 +2419,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 'v', 
                         'inclRelated' => false,
-						'details' => $this->getVariationStates($val['id'])
+						'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['id'])
                     ));
                 }
                 else {
@@ -2496,7 +2464,7 @@ class MatrixKeyController extends Controller
                         )), 
                         'type' => 't', 
                         'highlight' => 0,
-						'details' => $this->getTaxonStates($match['id'])
+						'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($match['id'])
                     ));
                 }
             }
@@ -2520,7 +2488,8 @@ class MatrixKeyController extends Controller
 
         }
 		
-		$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
+		if ($this->_matrixSuppressDetails!=true)
+			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 
         return $res;
     }
