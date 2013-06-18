@@ -17,23 +17,40 @@
 	Data to be imported:
 </p>
 <p>
-	Project title: "<b>{$title}</b>"<br />
+	Project: "<b>{$title}</b>"<br />
     Soortgroep: {$soortgroep}<br />
+    Matrix: {if $matrix_name}{$matrix_name}{else}{$title}{/if}<br />
+
+
+
 </p>
-{if $exists}
+{if $exists && 1==2}
 <p>
 	<span class="message-error">A project with that name already exists. Project names need to be unique; please specify how to treat this import:</span><br />
 	<input type="radio" id="id1" name="action" value="replace_data" checked="checked" /></td><td><label for="id1">import into existing project, replacing existing data</label><br />
-	<!-- input type="radio" id="id2" name="action" value="merge_data" /></td><td><label for="id2">import into existing project, merging with existing data</label><br / -->
+	<input type="radio" id="id2" name="action" value="merge_data" /></td><td><label for="id2">import into existing project, merging with existing data (if any)</label><br />
 	<input type="radio" id="id3" name="action" value="new_project" /></td><td><label for="id3">create a new project with the title "{$suggestedTitle}"</label><br />
 	If you wish to create a new project with a different title, alter the title in your CSV-file and <a href="nbc_determinatie_1.php?action=new">reload the file</a>.<br />
 </p>
 {/if}
 <p>
+	<label>
+    	<input 
+        	type="checkbox" 
+            name="meta_matrix" 
+            value="1" 
+            onchange="{literal}$('#meta-warning').css('display',$(this).attr('checked') ? 'inline' : 'none');{/literal}"
+		/>This is a "meta matrix": instead of species, there are names of other matrices in column B of your sheet.</label> [NOT YET IMPLEMENTED]<br />
+	<span id="meta-warning" class="message-error" style="display:none">
+    	Please note: the matrices the meta-matrix refers to <i>must</i> all already exist before you import it.
+	</span>
+</p>
+
+<p>
 	Below is a sample of the data parsed from the input file. Please verify that it looks okay, and click 'Next'.
 </p>
 <p>
-    <b>First five species (of {$species|@count}) with some states:</b><br />
+    <b>First five units (of {$species|@count}) with some states:</b><br />
     {assign var=i value=0}
     {foreach from=$species item=v}
     {if $i<5}
