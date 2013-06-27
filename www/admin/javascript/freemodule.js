@@ -124,7 +124,14 @@ function freemodDeletePage(id) {
 
 function freemodDoPreview() {
 
-	freemodSaveContentAll();
+//	freemodSaveContentAll();
+
+	if (allDefaultLanguage)
+		$('#theForm').append('<input type="hidden" name="language-default" value="'+allDefaultLanguage+'">').val(allDefaultLanguage);
+
+	if (allActiveLanguage)
+		$('#theForm').append('<input type="hidden" name="language-other" value="'+allActiveLanguage+'">').val(allActiveLanguage);
+
 	$("#action").val('preview');
 	$('#theForm').submit();
 
