@@ -165,6 +165,9 @@ class ImportL2Controller extends Controller
         $this->setBreadcrumbRootName($this->translate('Data import'));
         
         $this->setSuppressProjectInBreadcrumbs();
+
+		set_time_limit(2400); // RIGHT!
+
     }
 
 
@@ -330,8 +333,6 @@ class ImportL2Controller extends Controller
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('l2_start.php');
 
-        set_time_limit(300);
-      
         $this->setPageName($this->translate('Creating project'));
         
         $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
@@ -421,8 +422,6 @@ class ImportL2Controller extends Controller
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('l2_start.php');
-        
-        set_time_limit(300);
         
         $project = $this->getProjects($this->getNewProjectId());
         
@@ -555,8 +554,6 @@ class ImportL2Controller extends Controller
         $this->setPageName(sprintf($this->translate('Additional species data for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
-            
-            set_time_limit(900);
             
             if ($this->rHasVal('taxon_overview', 'on') || $this->rHasVal('taxon_media', 'on') || $this->rHasVal('taxon_common', 'on') || $this->rHasVal('taxon_synonym', 'on')) {
                 
@@ -730,8 +727,6 @@ class ImportL2Controller extends Controller
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
-            set_time_limit(900);
-            
             if ($this->rHasVal('literature', 'on') || $this->rHasVal('glossary', 'on')) {
                 
                 $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
@@ -849,8 +844,6 @@ class ImportL2Controller extends Controller
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
-            set_time_limit(900);
-            
             if ($this->rHasVal('welcome', 'on') || $this->rHasVal('introduction', 'on')) {
                 
                 $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
@@ -951,8 +944,6 @@ class ImportL2Controller extends Controller
         $this->setPageName($this->translate('Keys for "' . $project['title'] . '"'));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
-            
-            set_time_limit(900);
             
             if ($this->rHasVal('key_dich', 'on') || $this->rHasVal('key_matrix', 'on')) {
                 
@@ -1102,8 +1093,6 @@ class ImportL2Controller extends Controller
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
-            set_time_limit(1800); // RIGHT!
-            
             if ($this->rHasVal('map_items', 'on')) {
                 
                 $this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
@@ -1191,8 +1180,6 @@ class ImportL2Controller extends Controller
         $this->setPageName($this->translate('Additional data for "' . $project['title'] . '"'));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
-            
-            set_time_limit(900);
             
             if ($this->rHasVal('modules')) {
                 
@@ -4664,7 +4651,6 @@ class ImportL2Controller extends Controller
     private function detectCustomModulesInXML ()
     {
         if (!isset($_SESSION['admin']['system']['import']['additionalModules'])) {
-            set_time_limit(120);
             
             $d = new XMLReader();
             $r = array();
