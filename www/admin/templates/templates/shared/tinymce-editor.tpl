@@ -151,7 +151,8 @@ function initTinyMce(litRefs,mediaRefs) {
 		theme_advanced_statusbar_location : "bottom",
 	{/literal}{if $session.admin.project.css_url!=''}  content_css : "{$session.admin.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
-		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}" //(n.b. no trailing comma in last line of code)
+		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}", //(n.b. no trailing comma in last line of code)
+		extended_valid_elements : "b/strong,i/em"
 	};
 
 	if (inclLiteraryButtons && inclMediaButtons) {

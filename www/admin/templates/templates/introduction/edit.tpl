@@ -19,7 +19,7 @@
 		</span>
 	</div>
 	<div style="width:100%;padding:10px">
-		{t}Topic:{/t} <input type="text" id="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" />
+		{t}Topic:{/t} <input type="text" id="topic-default" name="topic-default" style="margin-bottom:10px" onblur="freemodSaveContentDefault()" />
 		<textarea
 			name="content-default"
 			style="width:870px;height:500px;"
@@ -36,7 +36,7 @@
 		</div>
 	</div>
 	<div style="width:100%;padding:10px">
-		{t}Topic:{/t} <input type="text" id="topic-other" style="margin-bottom:10px" onblur="freemodSaveContentActive()" />
+		{t}Topic:{/t} <input type="text" id="topic-other" name="topic-other" style="margin-bottom:10px" onblur="freemodSaveContentActive()" />
 		<textarea
 			name="content-other"
 			style="width:870px;height:500px;"

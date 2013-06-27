@@ -148,6 +148,8 @@ class IntroductionController extends Controller
 			} else
 			if ($this->rHasVal('action','preview')) {
 
+				$this->saveAllContent($this->requestData);
+
 				$this->redirect('preview.php?id='.$this->requestData['id']);
 
 			}
@@ -369,7 +371,8 @@ class IntroductionController extends Controller
         
         if ($this->requestData['action'] == 'save_content') {
             
-            $this->ajaxActionSaveContent();
+            if ($this->saveContent($this->requestData))
+				$this->smarty->assign('returnText', 'saved');
         
         } else
         if ($this->requestData['action'] == 'get_content') {
@@ -389,26 +392,63 @@ class IntroductionController extends Controller
     
     }
 
-	private function ajaxActionSaveContent()
+	private function saveAllContent($p=null)
 	{
 
-       if (!$this->rHasId() || !$this->rHasVal('language')) {
+		if (!isset($p['id']) || !isset($p['language-default']))
+			return;
+
+		$this->saveContent(
+			array(
+				'id' => $p['id'],
+				'language' => $p['language-default'],
+				'topic' => $p['topic-default'],
+				'content' => $p['content-default']
+			)
+		);
+		
+		if (isset($p['language-other'])) {
+
+			$this->saveContent(
+				array(
+					'id' => $p['id'],
+					'language' => $p['language-other'],
+					'topic' => $p['topic-other'],
+					'content' => $p['content-other']
+				)
+			);
+					
+		}
+		
+		return true;
+		
+	}
+
+	private function saveContent($p=null)
+	{
+		
+		$id = isset($p['id']) ? $p['id'] : null;
+		$language = isset($p['language']) ? $p['language'] : null;
+		$topic = isset($p['topic']) ? $p['topic'] : null;
+		$content = isset($p['content']) ? $p['content'] : null;
+
+       if (!isset($id) || !isset($language)) {
             
             return;
         
         } else {
             
-            if (!$this->rHasVal('topic') && !$this->rHasVal('content')) {
+            if (!isset($topic) && !isset($content)) {
                 
                 $this->models->ContentIntroduction->delete(
 					array(
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->requestData['language'], 
-						'page_id' => $this->requestData['id']
+						'language_id' => $language, 
+						'page_id' => $id
 					)
                 );
 				
-				$this->setPageGotContent($this->requestData['id']);
+				$this->setPageGotContent($id);
             
             } else {
 
@@ -416,8 +456,8 @@ class IntroductionController extends Controller
 					array(
 						'id' => array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'language_id' => $this->requestData['language'], 
-							'page_id' => $this->requestData['id']
+							'language_id' => $language, 
+							'page_id' => $id
 						)
 					)
 				);
@@ -426,21 +466,21 @@ class IntroductionController extends Controller
 					array(
 						'id' => isset($cfm[0]['id']) ? $cfm[0]['id'] : null, 
 						'project_id' => $this->getCurrentProjectId(),
-						'language_id' => $this->requestData['language'], 
-						'page_id' => $this->requestData['id'],
-						'topic' => trim($this->requestData['topic']),
-						'content' => trim($this->requestData['content'])
+						'language_id' => $language, 
+						'page_id' => $id,
+						'topic' => trim($topic),
+						'content' => trim($content)
 					)
 				);
 
-				$this->setPageGotContent($this->requestData['id'],true);
+				$this->setPageGotContent($id,true);
 
             }
 			
 			unset($_SESSION['admin']['system']['introduction']['navList']);
+			
+			return true;
 
-            $this->smarty->assign('returnText', 'saved');
-        
         }
 
 	}
