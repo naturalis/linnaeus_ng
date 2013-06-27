@@ -1859,7 +1859,7 @@ class MatrixKeyController extends Controller
         
         foreach ((array) $cs as $key => $val) {
             
-            if ($val['file_name']) {
+            if (isset($val['file_name'])) {
                 
                 @unlink($_SESSION['admin']['project']['paths']['project_media'] . $val['file_name']);
             }

@@ -1100,6 +1100,8 @@ class MatrixKeyController extends Controller
 				//."order by s desc"
         ;
 
+		//q($q,1);
+
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
         usort($results, array(
