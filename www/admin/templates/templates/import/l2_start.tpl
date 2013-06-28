@@ -48,7 +48,7 @@
 					<label><input type="checkbox" checked="checked" disabled="disabled">do not load thumbnails</label>&nbsp;
 			{/if}
 			</p>
-			{if $isSharedMediaDirWritable}
+			{* if $isSharedMediaDirWritable}
 			<p>
 				Path to thumbnails:<br />
 				{if $s.thumbsPath}
@@ -60,7 +60,7 @@
 					<label><input type="checkbox" name="noThumbs" value="1">do not load thumbnails</label>&nbsp;*
 				{/if}
 			</p>
-			{/if}
+			{/if *}
 		</fieldset>
 		
 		

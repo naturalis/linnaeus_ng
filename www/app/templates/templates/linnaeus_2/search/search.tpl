@@ -158,7 +158,7 @@
 </div>
 {/if}
 
-{if $results.matrixkey.numOfResults > 0}
+{* if $results.matrixkey.numOfResults > 0}
 <div class="set">
 	<div class="set-header{if $results.matrixkey.subsetsWithResults==1}-clickable{/if}">{t}Matrix key{/t} ({$results.matrixkey.numOfResults})</div>
 	{foreach from=$results.matrixkey.results key=cat item=res}
@@ -196,7 +196,7 @@
 	{/if}
 	{/foreach}
 </div>
-{/if}
+{/if *}
 
 {if $results.map.numOfResults > 0}
 <div class="set">
@@ -217,6 +217,37 @@
 		<span class="result" onclick="goMap({$v.id})">{h search=$search}{$v.content}{/h}</span> ({$v.number} occurrences)
 		{else}
 		<a href="../mapkey/examine_species.php?id={$v.id}">{h search=$search}{$v.content}{/h}</a> ({$v.number} occurrences)
+		{/if}
+		</p>
+		{/foreach}
+	</div>
+	{/if}
+	{/foreach}
+</div>
+{/if}
+
+{if $results.introduction.numOfResults > 0}
+<div class="set">
+	<div class="set-header{if $results.introduction.subsetsWithResults==1}-clickable{/if}">{t}Introduction{/t} ({$results.introduction.numOfResults})</div>
+	{foreach from=$results.introduction.results key=cat item=res}
+	{if $res.data|@count>0  || $showZeroHeaders}
+	{assign var=resultCount value=$res.data|@count}
+	<div class="subset">
+		{foreach from=$res.data key=k item=v name=r}
+		{if $smarty.foreach.r.first || $background=='c2'}
+			{assign var="background" value="c1"}
+		{else if $background=='c1'}
+			{assign var="background" value="c2"}
+		{/if}
+		<p class="{$background}">
+		{if $useJavascriptLinks}
+		<span class="result" onclick="goContent({$v.id})">
+			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
+		</span>
+		{else}
+		<a class="result" href="../linnaeus/?id={$v.id}">
+			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
+		</a>
 		{/if}
 		</p>
 		{/foreach}
