@@ -270,6 +270,7 @@ class ImportL2Controller extends Controller
             }
         }
         
+		/*
         if ($this->rHasVal('thumbsPath') || $this->rHasVal('noThumbs')) {
             
             if ($this->rHasVal('noThumbs')) {
@@ -286,6 +287,9 @@ class ImportL2Controller extends Controller
                 unset($_SESSION['admin']['system']['import']['thumbsPath']);
             }
         }
+		*/
+		
+		$_SESSION['admin']['system']['import']['thumbsPath'] = false;
         
         if ($this->rHasVal('clear', 'file')) {
             

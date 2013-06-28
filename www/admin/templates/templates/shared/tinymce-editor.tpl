@@ -144,15 +144,16 @@ function initTinyMce(litRefs,mediaRefs) {
 		mode : "textareas",
 		oninit : tMCEOnInit ,
 		theme : "advanced",
-		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,-example",	
-		theme_advanced_buttons1 : "cut,copy,paste,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
+		plugins : "media,fullscreen,spellchecker,advhr,preview,print,advimage,searchreplace,table,directionality,paste,-example",	
+		theme_advanced_buttons1 : "cut,copy,pastetext,pasteword,|,undo,redo,|,search,replace,|,bold,italic,underline,forecolor,formatselect,|,ltr,rtl,|,link,unlink,|,bullist,numlist,hr,|,indent,table,|,spellchecker,removeformat,charmap,|,code,visualaid,fullscreen,print",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "left",
 		theme_advanced_statusbar_location : "bottom",
 	{/literal}{if $session.admin.project.css_url!=''}  content_css : "{$session.admin.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
 		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}", //(n.b. no trailing comma in last line of code)
-		extended_valid_elements : "b/strong,i/em"
+		extended_valid_elements : "b/strong,i/em",
+        paste_auto_cleanup_on_paste : true	
 	};
 
 	if (inclLiteraryButtons && inclMediaButtons) {

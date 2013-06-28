@@ -14,7 +14,6 @@
 
 </div>
 </form>
-
 </div>
 
 {literal}

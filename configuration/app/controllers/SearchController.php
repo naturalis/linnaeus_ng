@@ -26,6 +26,7 @@ class SearchController extends Controller
         'media_descriptions_taxon',
 		'synonym',
 		'commonname',
+		'content_introduction',
 		'literature',
 		'content_free_module',
 		'choice_content_keystep',
@@ -197,6 +198,13 @@ class SearchController extends Controller
             $this->getLookupList($this->requestData);
 
         }
+        if ($this->rHasVal('action','get_search_result_index')) {
+
+			$this->smarty->assign(
+				'returnText',json_encode($this->getSearchResultIndex())
+			);
+            
+        }
 
 		$this->allowEditPageOverlay = false;
 		
@@ -217,14 +225,17 @@ class SearchController extends Controller
 					) {
 
 					$results = $this->doSearch($this->requestData['search']);
-		
+
+					$_SESSION['app']['user']['search']['lastResultSetIndex'] = $this->makeLastResultSetIndex($results);
+
 					$results['numOfResults'] =
 						$results['species']['numOfResults'] +
 						$results['modules']['numOfResults'] +
 						$results['dichkey']['numOfResults'] +
 						$results['literature']['numOfResults'] +
 						$results['glossary']['numOfResults'] +
-						$results['matrixkey']['numOfResults'] +
+						//$results['matrixkey']['numOfResults'] +
+						$results['introduction']['numOfResults'] +
 						$results['content']['numOfResults'] +
 						$results['map']['numOfResults']
 						;
@@ -308,8 +319,9 @@ class SearchController extends Controller
 			'dichkey' => $this->searchDichotomousKey($search),
 			'literature' => $this->searchLiterature($search),
 			'glossary' => $this->searchGlossary($search),
-			'matrixkey' => $this->searchMatrixKey($search),
+			//'matrixkey' => $this->searchMatrixKey($search),
 			'content' => $this->searchContent($search),
+			'introduction' => $this->searchIntroduction($search),
 			'map' => $this->searchMap($species)
 			
 		);
@@ -1346,33 +1358,6 @@ class SearchController extends Controller
 	// content
 	private function searchContent($search)
 	{
-		/*
-		$content1 = $this->models->Content->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'subject regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,subject as label'
-			)
-
-		);
-
-		$content2 = $this->models->Content->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'language_id' => $this->getCurrentLanguageId(),
-					'content regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,subject as label,content'
-			)
-
-		);
-
-		$content = array_merge((array)$content1,(array)$content2);
-		*/
 
 		$content = $this->models->Content->_get(
 			array(
@@ -1380,8 +1365,8 @@ class SearchController extends Controller
 					'project_id  = '.$this->getCurrentProjectId(). ' and
 					language_id = '.$this->getCurrentLanguageId(). ' and
 					(
-						subject regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						content regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+						subject regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						content regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\'
 					)',
 				'columns' => 
 					'id,
@@ -1411,6 +1396,44 @@ class SearchController extends Controller
 
 	}
 
+	// introduction
+	private function searchIntroduction($search)
+	{
+
+		$content = $this->models->ContentIntroduction->_get(
+			array(
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId(). ' and
+					language_id = '.$this->getCurrentLanguageId(). ' and
+					(
+						topic regexp \''.$this->models->ContentIntroduction->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
+						content regexp \''.$this->models->ContentIntroduction->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+					)',
+				'columns' => 
+					'page_id,
+					topic as label,
+					content,
+					if(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\',topic,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'begins').'\' as sortA,
+					if(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\',topic,content) regexp \''.
+						$this->makeRegExpCompatSearchString($search,'boundary').'\' as sortB',
+				'order' => 'sortA desc, sortB desc, label'
+			)
+		);	
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Introduction'),
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				)
+			),
+			'numOfResults' => count((array)$content),
+			'subsetsWithResults' => count((array)$content) > 0 ? 1 : 0
+		);	
+
+	}
 
 	// modules
 	private function searchModules($search)
@@ -1539,6 +1562,190 @@ class SearchController extends Controller
 				true
 			)
 		);
+
+	}
+
+
+	private function makeLastResultSetIndex($results)
+	{
+
+		$data = null;		
+
+		foreach ((array)$results['species']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				if (strtolower($res['label'])=='species media')
+					$label = (isset($v['label']) ? $v['label'] : (isset($v['content']) ? $v['content'] : '?'));
+				else
+					$label = $v['taxon'];
+
+				$link = '../species/taxon.php?id='.$v['taxon_id'].(!empty($v['cat']) ? '&cat='.$v['cat'] : '');
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['glossary']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['label'] . (isset($v['synonym']) && $v['synonym']!=$v['label'] ? sprintf($this->translate('(synonym of %s)'),$v['synonym']) : '');
+				$link = '../glossary/term.php?id='.$v['id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['literature']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['author_full'].' ('.$v['year'].')';
+				$link = '../literature/reference.php?id='.$v['id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['dichkey']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				if (isset($v['choice_id']))
+					$link = '../key/index.php?forcetree=1&choice='.$v['choice_id'];
+				elseif (isset($v['keystep_id']))
+					$link = '../key/index.php?forcetree=1&step='.$v['keystep_id'];
+				else
+					continue;
+
+				if (isset($v['label'])) {
+					$label = sprintf($this->translate('Step %s: %s'),$v['number'],$v['label']);
+				} elseif (isset($v['content']))
+					$label = 
+						sprintf($this->translate('Step %s%s'),$v['number'],(isset($v['marker']) ? $v['marker'] : ''));
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['map']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['content'];
+				$link = '../mapkey/examine_species.php?id='.$v['id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['content']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['label'];
+				$link = '../linnaeus/?id='.$v['id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['introduction']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['label'];
+				$link = '../introduction/topic.php?id='.$v['page_id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		foreach ((array)$results['modules']['results'] as $res) {
+
+			if (!isset($res['data']) || count((array)$res['data'])==0)
+				continue;
+
+			foreach ((array)$res['data'] as $v) {
+
+				$label = $v['label'];
+				$link = '../module/topic.php?modId='.$v['module_id'].'&id='.$v['page_id'];
+
+				$data[] = array(
+					'l' => $res['label'].': '.$label,
+					'u' => $link
+				);
+	
+			}
+			
+		}
+
+		return $data;
+		
+	}
+
+
+	private function getSearchResultIndex()
+	{
+
+		return $_SESSION['app']['user']['search']['lastResultSetIndex'];
 
 	}
 
