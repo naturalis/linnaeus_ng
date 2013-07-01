@@ -870,15 +870,33 @@ class SpeciesController extends Controller
      */
     public function taxonAction ()
     {
-        //        $this->checkAuthorisation();
+
+		//$this->checkAuthorisation();
         $this->setBreadcrumbIncludeReferer(array(
             'name' => $this->translate('Taxon list'), 
             'url' => $this->baseUrl . $this->appName . '/views/' . $this->controllerBaseName . '/list.php'
         ));
-        
+
         if ($this->rHasId()) {
             // get existing taxon
- 
+
+			 if ($this->rHasVal('action','save_and_preview')) {
+
+				$p['id'] = $this->requestData['id'];
+				$p['page'] = $this->requestData['activePage'];
+				$p['language'] = $this->requestData['language-default'];
+				$p['content'] = $this->requestData['content-default'];
+				$this->saveTaxon($p);
+				if ($this->rHasVal('language-other') && $this->rHasVal('content-other')) {
+					$p['language'] = $this->requestData['language-other'];
+					$p['content'] = $this->requestData['content-other'];
+					$this->saveTaxon($p);
+				}
+
+				$this->previewAction();
+
+			 }
+			
             if (!$this->userHasTaxon($this->requestData['id']))
                 $this->redirect('index.php');
                 
@@ -2014,7 +2032,7 @@ class SpeciesController extends Controller
         
         if ($this->requestData['action'] == 'save_taxon') {
             
-            $c = $this->ajaxActionSaveTaxon();
+            $c = $this->saveTaxon($this->requestData);
             
             if (!$c)
                 $this->smarty->assign('returnText', '<msg>Empty taxa are not shown');
@@ -3310,52 +3328,46 @@ class SpeciesController extends Controller
 
 
 
-    private function ajaxActionSaveTaxon ()
+    private function saveTaxon($p=null)
     {
-        
+
+		$id = isset($p['id']) ? $p['id'] : null;
+		$name = isset($p['name']) ? $p['name'] : null;
+		$language = isset($p['language']) ? $p['language'] : null;
+		$page = isset($p['page']) ? $p['page'] : null;
+		$content = isset($p['content']) ? $p['content'] : null;
+		$save_type = isset($p['save_type']) ? $p['save_type'] : 'auto';
+
         // new taxon
-        if (!$this->rHasId()) {
+        if (empty($id)) {
             
             $d = $this->models->Taxon->save(
             array(
-                'id' => $this->rHasId() ? $this->requestData['id'] : null, 
+                'id' => null, 
                 'project_id' => $this->getCurrentProjectId(), 
-                'taxon' => $this->rHasVal('name') ? $this->requestData['name'] : '?'
+                'taxon' => !empty($name) ? $name : '?'
             ));
             
             $taxonId = $this->models->Taxon->getNewId();
-            
             $new = true;
         }
         else {
             // existing taxon 
-            
-
-
-
             $d = true;
-            
-            $taxonId = $this->requestData['id'];
-            
+            $taxonId = $id;
             $new = false;
         }
         
         if ($d) {
             // save of new taxon succeeded, or existing taxon
-            
-
-
 
             // must have a language
-            if ($this->rHasVal('language')) {
+            if (!empty($language)) {
                 
                 // must have a page name
-                if ($this->rHasVal('page')) {
+                if (!empty($page)) {
                     
-                    if (!$this->rHasVal('name') && !$this->rHasVal('content')) {
-                        
-                        if (!$this->rHasVal('save_type'))
-                            $this->requestData['save_type'] = 'auto';
+                    if (empty($name) && empty($content)) {
                         
                         $this->models->ContentTaxon->setRetainBeforeAlter();
                         
@@ -3364,11 +3376,11 @@ class SpeciesController extends Controller
                         array(
                             'project_id' => $this->getCurrentProjectId(), 
                             'taxon_id' => $taxonId, 
-                            'language_id' => $this->requestData['language'], 
-                            'page_id' => $this->requestData['page']
+                            'language_id' => $language, 
+                            'page_id' => $page
                         ));
                         
-                        $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $this->requestData['save_type']);
+                        $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), false, $save_type);
                         
                         // Mark taxon as 'empty'
                         $this->models->Taxon->update(array(
@@ -3385,26 +3397,26 @@ class SpeciesController extends Controller
                             'id' => array(
                                 'project_id' => $this->getCurrentProjectId(), 
                                 'taxon_id' => $taxonId, 
-                                'language_id' => $this->requestData['language'], 
-                                'page_id' => $this->requestData['page']
+                                'language_id' => $language, 
+                                'page_id' => $page
                             )
                         ));
                         
-                        $id = count((array) $ct) != 0 ? $ct[0]['id'] : null;
+                        $oldId = count((array) $ct) != 0 ? $ct[0]['id'] : null;
                         
-                        if ($id != null)
+                        if ($oldId != null)
                             $this->models->ContentTaxon->setRetainBeforeAlter();
                         
-                        $filteredContent = $this->filterContent($this->requestData['content']);
+                        $filteredContent = $this->filterContent($content);
                         
                         $newdata = array(
-                            'id' => $id, 
+                            'id' => $oldId, 
                             'project_id' => $this->getCurrentProjectId(), 
                             'taxon_id' => $taxonId, 
-                            'language_id' => $this->requestData['language'], 
+                            'language_id' => $language, 
                             'content' => !empty($filteredContent['content']) ? $filteredContent['content'] : '', 
-                            'title' => $this->rHasVal('name') ? $this->requestData['name'] : '', 
-                            'page_id' => $this->requestData['page']
+                            'title' => !empty($name) ? $name : '', 
+                            'page_id' => $page
                         );
                         
                         // save content
@@ -3412,58 +3424,24 @@ class SpeciesController extends Controller
                         
                         // Mark taxon as 'empty/not empty' depending on presence of contents
                         $this->models->Taxon->update(array(
-                            'is_empty' => !empty($this->requestData['content']) ? 0 : 1
+                            'is_empty' => empty($content) ? 1 : 0
                         ), array(
                             'id' => $taxonId
                         ));
                         
-                        if ($id != null)
-                            $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, $this->requestData['save_type']);
+                        if ($oldId != null)
+                            $this->saveOldTaxonContentData($this->models->ContentTaxon->getRetainedData(), $newdata, $save_type);
                     }
                     
                     if ($d) {
-                        
-                        /* the block below changed the taxon's name in the taxon table to whatever the user had 
-                           entrered as category title of the default page in the default language, but the assumption
-                           that that is the place where the leading name of a taxon is entered might be faulty
-
-                        // if succesful, get the projects default language
-                        $lp = $_SESSION['admin']['project']['languages'];
-                        
-                        $defaultLanguage = $this->getDefaultProjectLanguage();
-
-                        // get the main page content for the default language
-                        $ct = $this->models->ContentTaxon->_get(
-							array(
-								'id' => array(
-									'project_id' => $this->getCurrentProjectId(), 
-									'taxon_id' => $taxonId, 
-									'language_id' => $defaultLanguage
-								)
-							)
-						);
-                        
-                        // save the title of that page as taxon name in the taxon table
-                        $this->models->Taxon->save(
-                        array(
-                            'id' => $taxonId, 
-                            'project_id' => $this->getCurrentProjectId(), 
-                            'taxon' => !empty($ct[0]['title']) ? $ct[0]['title'] : '?'
-                        ));
-                        */
-                        
-                        //$this->smarty->assign('returnText', 'id=' . $taxonId);
-                        
-
-
 
                         $this->smarty->assign('returnText', 
                         json_encode(
-                        array(
-                            'id' => $taxonId, 
-                            'content' => isset($filteredContent) ? $filteredContent['content'] : null, 
-                            'modified' => isset($filteredContent) ? $filteredContent['modified'] : null
-                        )));
+							array(
+								'id' => $taxonId, 
+								'content' => isset($filteredContent) ? $filteredContent['content'] : null, 
+								'modified' => isset($filteredContent) ? $filteredContent['modified'] : null
+							)));
                     }
                     else {
                         
@@ -3485,12 +3463,13 @@ class SpeciesController extends Controller
             $this->addError($this->translate('Could not save taxon.'));
         }
         
-        // Return if taxon has content in any language
+        // return if taxon has content in any language
         $c = $this->models->ContentTaxon->_get(array(
             'where' => 'taxon_id = ' . $taxonId
         ));
         
         return empty($c) && !$new ? false : true;
+
     }
 
 
@@ -3549,7 +3528,7 @@ class SpeciesController extends Controller
                 
                 $c = $ct[0];
             }
-            
+
             $this->smarty->assign('returnText', json_encode($c));
         }
     }

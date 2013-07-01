@@ -451,7 +451,7 @@ class MergeController extends Controller
 	{
 
 		$d = $this->models->MediaTaxon->_get(array('id' => array('project_id' => $p['s'])));
-		
+	
 		foreach((array)$d as $val) {
 			if (!empty($val['file_name'])) 
 				$this->_mediaToMove['files'][] = $val['file_name'];
@@ -468,6 +468,10 @@ class MergeController extends Controller
 			array('project_id' => $p['s'])
 		);
         $this->models->MediaTaxon->update(
+			array('project_id' => $p['t']),
+			array('project_id' => $p['s'])
+		);
+        $this->models->MediaDescriptionsTaxon->update(
 			array('project_id' => $p['t']),
 			array('project_id' => $p['s'])
 		);

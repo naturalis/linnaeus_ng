@@ -1374,8 +1374,13 @@ function taxonOrphanChangeSelect(ele) {
 
 function taxonDoPreview() {
 
-	taxonSaveDataAll();
-	$('#theForm').attr('action','preview.php')
+	if (allDefaultLanguage)
+		$('#theForm').append('<input type="hidden" name="language-default" value="'+allDefaultLanguage+'">').val(allDefaultLanguage);
+
+	if (allActiveLanguage)
+		$('#theForm').append('<input type="hidden" name="language-other" value="'+allActiveLanguage+'">').val(allActiveLanguage);
+
+	$("#action").val('save_and_preview');
 	$('#theForm').submit();
 
 }

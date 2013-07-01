@@ -18,6 +18,7 @@
 	{if $taxon.id!=-1}
 	{* $taxon.taxon *}
 	<form name="theForm" id="theForm" method="post">
+		<input type="hidden" name="action" id="action" value="" />  
 		<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 		<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
 		<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  

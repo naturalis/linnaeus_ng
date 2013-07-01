@@ -151,9 +151,10 @@ function initTinyMce(litRefs,mediaRefs) {
 		theme_advanced_statusbar_location : "bottom",
 	{/literal}{if $session.admin.project.css_url!=''}  content_css : "{$session.admin.project.css_url}?rnd={$rnd}",
 	{/if}{literal}
-		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}", //(n.b. no trailing comma in last line of code)
-		extended_valid_elements : "b/strong,i/em",
-        paste_auto_cleanup_on_paste : true	
+		spellchecker_languages : "{/literal}{$spellchecker_languages}{literal}",
+		valid_elements : '*[*]', // allow it all - i've had enough of disappearing spans and images
+		extended_valid_elements : "b/strong,i/em", // change strong to b, em to i
+        paste_auto_cleanup_on_paste : true // cleanup pasted ms word xml
 	};
 
 	if (inclLiteraryButtons && inclMediaButtons) {
