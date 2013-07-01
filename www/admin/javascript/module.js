@@ -328,7 +328,7 @@ function moduleBuildModuleUserBlock(type) {
 
 function moduleChangeModuleUserStatus(module,user,action,type) {
 
-$.ajax({
+	$.ajax({
 		url:"ajax_interface.php",
 		data: {
 			view : 'collaborators' ,
