@@ -7,6 +7,14 @@
         designed for Naturalis Biodiversity Centre. <a href="{$baseUrl}admin/media/system/sample-nbc-matrix.csv">{t}Download a sample CSV-file{/t}</a>.
 	</p>
     <p>
+    	The name in cell A1 is treated as project name. If it already exists in the database, the matrix is created under that
+        project. In that case, if the (optional) matrix name in cell A3 exists, you will be asked how to treat existing data: delete
+        it, or create a new matrix next to the existing one.<br />
+        Also, when you create a matrix into an existing project, the names in column B will first be matched against existing species
+        names (or variations, depending on your data). Next, against existing matrix names (can be used for "stacked" matrix keys). And
+        if that fails, a new species or variation is created.
+	</p>
+    <p>
         To create an import file, save the relevant sheet of your Excel-file as CSV-file. Make sure the program treats 
         all columns as text, and does not convert text values to something els (like for instance interpreting ranges as dates, 
         turning a value of "10-20" into "October 20th").

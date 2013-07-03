@@ -34,19 +34,6 @@
 </p>
 {/if}
 <p>
-	<label>
-    	<input 
-        	type="checkbox" 
-            name="meta_matrix" 
-            value="1" 
-            onchange="{literal}$('#meta-warning').css('display',$(this).attr('checked') ? 'inline' : 'none');{/literal}"
-		/>This is a "meta matrix": instead of species, there are names of other matrices in column B of your sheet.</label> [NOT YET IMPLEMENTED]<br />
-	<span id="meta-warning" class="message-error" style="display:none">
-    	Please note: the matrices the meta-matrix refers to <i>must</i> all already exist before you import it.
-	</span>
-</p>
-
-<p>
 	Below is a sample of the data parsed from the input file. Please verify that it looks okay, and click 'Next'.
 </p>
 <p>
