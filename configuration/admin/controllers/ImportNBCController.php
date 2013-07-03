@@ -191,42 +191,42 @@ class ImportNBCController extends Controller
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
 
-			if (isset($data['project']['title'])) {
-	
-				$d = $this->models->Project->_get(array(
-						'id' => array(
-						'sys_name' => $data['project']['title']
-				)));
-					
-				$exists = ($d!=false);
-	
-				$this->smarty->assign('exists',$exists);
+		if (isset($data['project']['title'])) {
+
+			$d = $this->models->Project->_get(array(
+					'id' => array(
+					'sys_name' => $data['project']['title']
+			)));
 				
-				if ($exists) {
-	
-					$_SESSION['admin']['system']['import']['existingProjectId'] = $d[0]['id'];
-	
-					$i=1;
-					while ($d!=false) {
-						$suggestedTitle = $data['project']['title'].' ('.$i++.')';
-						$d = $this->models->Project->_get(array(
-								'id' => array(
-								'sys_name' => $suggestedTitle
-						)));
-					}
-	
-					$this->smarty->assign('suggestedTitle',$suggestedTitle);
-	
-					$_SESSION['admin']['system']['import']['projectExists'] = true;
-					$_SESSION['admin']['system']['import']['newProjectTitle'] = $suggestedTitle;
-					
-				} else {
-					
-					$_SESSION['admin']['system']['import']['projectExists'] = false;
-					
+			$exists = ($d!=false);
+
+			$this->smarty->assign('exists',$exists);
+			
+			if ($exists) {
+
+				$_SESSION['admin']['system']['import']['existingProjectId'] = $d[0]['id'];
+
+				$i=1;
+				while ($d!=false) {
+					$suggestedTitle = $data['project']['title'].' ('.$i++.')';
+					$d = $this->models->Project->_get(array(
+							'id' => array(
+							'sys_name' => $suggestedTitle
+					)));
 				}
-	
+
+				$this->smarty->assign('suggestedTitle',$suggestedTitle);
+
+				$_SESSION['admin']['system']['import']['projectExists'] = true;
+				$_SESSION['admin']['system']['import']['newProjectTitle'] = $suggestedTitle;
+				
+			} else {
+				
+				$_SESSION['admin']['system']['import']['projectExists'] = false;
+				
 			}
+
+		}
 
         if (isset($data['project']['soortgroep']))
             $this->smarty->assign('soortgroep', $data['project']['soortgroep']);
@@ -304,7 +304,7 @@ class ImportNBCController extends Controller
 				$this->addMessage('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.');
 				
 			}
-
+			
             $this->addUserToProjectAsLeadExpert($pId);
 
             $this->addMessage('Added current user as lead expert to project.');
@@ -330,8 +330,7 @@ class ImportNBCController extends Controller
 				}
 
 			}
-
-
+			
         }
 
         $this->printPage();
@@ -1349,7 +1348,10 @@ class ImportNBCController extends Controller
 
 		// save all taxa
         foreach ((array) $species as $key => $val) {
+
+			$species[$key]['is_matrix'] = false;
             
+			// does taxon already exist?
 			$d = $this->models->Taxon->_get(array('id' =>
 				array(
 					'project_id' => $this->getNewProjectId(), 
@@ -1362,28 +1364,45 @@ class ImportNBCController extends Controller
 				$species[$key]['lng_id'] = $d[0]['id'];
 			
 			} else {
-	
-				$this->models->Taxon->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getNewProjectId(), 
-					'taxon' => $key, 
-					'parent_id' => $parent, 
-					'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['species'], 
-					'taxon_order' => $i++, 
-					'is_hybrid' => 0, 
-					'list_level' => 0
-				));
-				
-				$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
-				
-				if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+
+				// taxon does not exist, but maybe it's another matrix
+				$d = $this->models->MatrixNames->_get(array('id' =>
+					array(
+						'project_id' => $this->getNewProjectId(), 
+						'language_id' => $this->getNewDefaultLanguageId(), 
+						'name' => $key
+					)));
+
+				if ($d) { 
 		
-					foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+					$species[$key]['is_matrix'] = true;
+					$species[$key]['lng_id'] = $d[0]['matrix_id'];
+				
+				} else {
+
+					$this->models->Taxon->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getNewProjectId(), 
+						'taxon' => $key, 
+						'parent_id' => $parent, 
+						'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['species'], 
+						'taxon_order' => $i++, 
+						'is_hybrid' => 0, 
+						'list_level' => 0
+					));
 					
-						if (!empty($cVal) && isset($val[$cKey]))
-							$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
+					$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
 					
+					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+			
+						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+						
+							if (!empty($cVal) && isset($val[$cKey]))
+								$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
+						
+						}
+						
 					}
 					
 				}
@@ -1392,7 +1411,7 @@ class ImportNBCController extends Controller
 
             $_SESSION['admin']['system']['import']['loaded']['species']++;
             
-            if (isset($val['common name'])) {
+            if (isset($val['common name']) && $species[$key]['is_matrix']!=true) {
                 
                 $d = $this->models->Commonname->_get(array('id' =>
                 array(
@@ -1418,7 +1437,7 @@ class ImportNBCController extends Controller
             }
 			
             // if there's variations, save those as well 
-            if (isset($val['variations'])) {
+            if (isset($val['variations']) && $species[$key]['is_matrix']!=true) {
 
                 foreach ((array) $val['variations'] as $vKey => $vVal) {
 
@@ -1836,6 +1855,10 @@ class ImportNBCController extends Controller
 
     private function storeVariationStateConnections ($taxa, $mData, $mId)
     {
+		
+//&& $species[$key]['is_matrix']!=true
+		
+		
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
         
         foreach ((array) $taxa as $tVal) {
