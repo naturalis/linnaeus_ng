@@ -15,7 +15,6 @@
     {else}
         <div>
             {t _s1=$map.name}The image file for the map "%s" is missing.{/t}
-            {$map|@var_dump}
         </div>
     {/if}
     
