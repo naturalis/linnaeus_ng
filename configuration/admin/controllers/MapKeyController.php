@@ -1717,32 +1717,24 @@ class MapKeyController extends Controller
 			)
 		);
 
-		$p = $_SESSION['admin']['project']['urls']['project_media_l2_maps'];
-	
 		foreach((array)$m as $key => $val) {
 
 			if (!empty($val['image'])) {
 
-				$m[$key]['imageFullName'] = $p.$val['image'];
-				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image']);
+				
+				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image'];
 
 			} else {
 			
-				$m[$key]['imageFullName'] = $p.strtolower($val['image']);
-				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif');
+				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif';
 
 				if (!$m[$key]['mapExists']) {
 
-					$m[$key]['imageFullName'] = $p.'.gif';
-					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-	
-					if (!$m[$key]['mapExists']) {
-	
-						$m[$key]['imageFullName'] = $p.strtolower($val['name']).'.gif';
-						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
-	
-					}
-				
+					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif');
+					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
+
 				}
 
 			}
