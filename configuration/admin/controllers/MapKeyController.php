@@ -1717,43 +1717,55 @@ class MapKeyController extends Controller
 			)
 		);
 
+		$p = $_SESSION['admin']['project']['urls']['project_media_l2_maps'];
+	
 		foreach((array)$m as $key => $val) {
 
 			if (!empty($val['image'])) {
 
-				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image']);
-				
-				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image'];
+				$m[$key]['imageFullName'] = $p.$val['image'];
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
 			} else {
 			
-				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif');
-				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif';
+				$m[$key]['imageFullName'] = $p.strtolower($val['image']);
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
 				if (!$m[$key]['mapExists']) {
 
-					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif');
-					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
-
+					$m[$key]['imageFullName'] = $p.'.gif';
+					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+	
+					if (!$m[$key]['mapExists']) {
+	
+						$m[$key]['imageFullName'] = $p.strtolower($val['name']).'.gif';
+						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+	
+					}
+				
 				}
 
 			}
 
-			if ($m[$key]['mapExists']) $m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
-			
-			$d = json_decode($val['coordinates']);
+			if ($m[$key]['mapExists']) {
 
-			$m[$key]['coordinates'] = array(
-				'topLeft' => array(
-					'lat' => (string)$d->topLeft->lat,
-					'long' => (string)$d->topLeft->long
-				),
-				'bottomRight' => array(
-					'lat' => (string)$d->bottomRight->lat,
-					'long' => (string)$d->bottomRight->long
-				),
-				'original' => $val['coordinates']
-			);
+				$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
+			
+				$d = json_decode($val['coordinates']);
+	
+				$m[$key]['coordinates'] = array(
+					'topLeft' => array(
+						'lat' => (string)$d->topLeft->lat,
+						'long' => (string)$d->topLeft->long
+					),
+					'bottomRight' => array(
+						'lat' => (string)$d->bottomRight->lat,
+						'long' => (string)$d->bottomRight->long
+					),
+					'original' => $val['coordinates']
+				);
+				
+			}
 
 		}
 		
