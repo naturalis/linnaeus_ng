@@ -1747,25 +1747,21 @@ class MapKeyController extends Controller
 
 			}
 
-			if ($m[$key]['mapExists']) {
-
-				$m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
+			if ($m[$key]['mapExists']) $m[$key]['size'] = getimagesize($m[$key]['imageFullName']);
 			
-				$d = json_decode($val['coordinates']);
-	
-				$m[$key]['coordinates'] = array(
-					'topLeft' => array(
-						'lat' => (string)$d->topLeft->lat,
-						'long' => (string)$d->topLeft->long
-					),
-					'bottomRight' => array(
-						'lat' => (string)$d->bottomRight->lat,
-						'long' => (string)$d->bottomRight->long
-					),
-					'original' => $val['coordinates']
-				);
-				
-			}
+			$d = json_decode($val['coordinates']);
+
+			$m[$key]['coordinates'] = array(
+				'topLeft' => array(
+					'lat' => (string)$d->topLeft->lat,
+					'long' => (string)$d->topLeft->long
+				),
+				'bottomRight' => array(
+					'lat' => (string)$d->bottomRight->lat,
+					'long' => (string)$d->bottomRight->long
+				),
+				'original' => $val['coordinates']
+			);
 
 		}
 		
