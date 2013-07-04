@@ -42,32 +42,39 @@ met de naam 'Limburg' en voor 'image' de waarde 'Limburg.GIF'. Het
 betreffende bestand is dan:
   /www/app/media/project/0241/l2_maps/Limburg.GIF
 
-2) Wordt de kaart niet op de betreffende project-specifieke lokatie gevonden,
+2) Wordt de kaart niet gevonden, dan probeert de applicatie dezelfde locatie
+maar een lowercased naam:
+  /www/app/media/project/0241/l2_maps/limburg.gif
+
+
+3) Wordt de kaart niet op de betreffende project-specifieke lokatie gevonden,
 dan zoekt het systeem naar een kaart met de naam uit het veld 'image' (die
 projectspecifiek is) in de algemene map:
   /www/shared/media/system/l2_maps/
-relatief t.o.v. de htdocs-bestandsroot.
-Als in voorgaand voorbeeld de kaart niet gevonden kan worden, dan wordt
-achtereenvolgens gezocht naar:
-  /www/shared/media/system/l2_maps/Limburg.gif (letterlijke naam)
-en
+relatief t.o.v. de htdocs-bestandsroot. Achtereenvolgens wordt gezocht naar:
+  /www/shared/media/system/l2_maps/Limburg.GIF (letterlijke naam)
+
+4) en
   /www/shared/media/system/l2_maps/limburg.gif (naam lowercased)
 Als de kaart in kwestie daar ook niet gevonden wordt, volgt een foutmelding
 in het scherm ("The image file for the map "Limburg" is missing.").
 
 
 -- GENERIEKE KAART --
-Is voor een kaart het veld 'image' in l2_maps leeg, dan neemt LNG de waarde
-van het veld 'name' in l2_maps voor de betreffende kaart, maakt daar lowercase
-van en plakt er '.gif'. Een
-bestand met die naam wordt vervolgens gezocht in
+5) Is voor een kaart het veld 'image' in l2_maps leeg, dan neemt LNG de waarde
+van het veld 'name' in l2_maps voor de betreffende kaart, en maakt daar lowercase
+van en plakt er '.gif' achter. Een bestand met die naam wordt vervolgens gezocht 
+in
   /www/shared/media/system/l2_maps/
 relatief t.o.v. de htdocs-bestandsroot.
 Voorbeeld: staat er in 'l2_maps' een kaart met de naam 'South Pacific' en
 geen waarde (null) voor het veld 'image', dan is het pad van het
 betreffende bestand:
   /www/shared/media/system/l2_maps/south pacific.gif
-(dus incluis de spatie)
+(dus incluis de spatie, in L2 was me niet zo van de underscores). 
+6) En omdat we  toch bezig zijn proberen we als dat ook faalt tenslotte nog:
+  /www/shared/media/system/l2_maps/south pacific.GIF
+
 Let er op dat de bestanden in /www/app/media/system/l2_maps/ dus zeer
 waarschijnlijk door verschillende projecten gebruikt worden. Een
 aanpassing aan de kaart zelf - denk bijvoorbeeld aan een watermerk, of een

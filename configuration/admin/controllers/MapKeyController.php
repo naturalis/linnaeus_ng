@@ -1709,6 +1709,59 @@ class MapKeyController extends Controller
 
 	private function l2GetMaps($id=null)
 	{
+		
+		/*
+
+			Kaarten van Linnaeus 2-imports
+			
+			LNG zoekt als volgt naar de juiste kaart:
+			
+			Van een gevraagde soort worden per kaart (map_id) alle gegevens
+			opgevraagd. In 'l2_maps' wordt daar de juiste kaart bij gezocht.
+			Vervolgens geldt:
+			
+			-- PROJECTSPECIFIEKE KAART --
+			1) Is voor die kaart het veld 'image' ingevuld, dan is de waarde van dat veld
+			de naam van de kaart. Die naam dient een volledige bestandsnaam te zijn,
+			dus mét extensie, maar zonder pad. Sommige bestandssystemen zijn
+			case-sensitive dus verifieer dat deze naam klopt met de werkelijke
+			bestandsnaam.
+			Het bestand dient te staan in de directory:
+			  /www/app/media/project/xxxx/l2_maps/
+			relatief t.o.v. de htdocs-bestandsroot. Voorbeeld, als in tabel 'Limburg.GIF' 
+			staat:
+			  /www/app/media/project/0241/l2_maps/Limburg.GIF
+			
+			2) Wordt de kaart niet gevonden, dan probeert de applicatie dezelfde locatie
+			maar een lowercased naam:
+			  /www/app/media/project/0241/l2_maps/limburg.gif
+			
+			3) Wordt de kaart niet op de betreffende project-specifieke lokatie gevonden,
+			dan zoekt het systeem naar een kaart met de naam uit het veld 'image' (die
+			projectspecifiek is) in de algemene map:
+			  /www/shared/media/system/l2_maps/
+			relatief t.o.v. de htdocs-bestandsroot. Achtereenvolgens wordt gezocht naar:
+			  /www/shared/media/system/l2_maps/Limburg.GIF (letterlijke naam)
+			
+			4) en
+			  /www/shared/media/system/l2_maps/limburg.gif (naam lowercased)
+			
+			
+			-- GENERIEKE KAART --
+			5) Is voor een kaart het veld 'image' in l2_maps leeg, dan neemt LNG de waarde
+			van het veld 'name' in l2_maps voor de betreffende kaart, en maakt daar lowercase
+			van en plakt er '.gif' achter. Een bestand met die naam wordt vervolgens gezocht 
+			in
+			  /www/shared/media/system/l2_maps/
+			relatief t.o.v. de htdocs-bestandsroot.
+			Voorbeeld: staat er in 'l2_maps' een kaart met de naam 'South Pacific' en
+			geen waarde (null) voor het veld 'image', dan is het pad van het
+			betreffende bestand:
+			  /www/shared/media/system/l2_maps/south pacific.gif
+			(dus incluis de spatie, in L2 was me niet zo van de underscores). 
+			6) En omdat we  toch bezig zijn proberen we als dat ook faalt tenslotte nog:
+			  /www/shared/media/system/l2_maps/south pacific.GIF		
+		*/
 
 		$m = $this->models->L2Map->_get(
 			array(
@@ -1716,24 +1769,55 @@ class MapKeyController extends Controller
 				'fieldAsIndex' => 'id'
 			)
 		);
-
+		
+		$projectMediaL2maps = $_SESSION['admin']['project']['urls']['project_media_l2_maps'];
+		$systemMediaL2Maps = $_SESSION['admin']['project']['urls']['system_media_l2_maps'];
+		
 		foreach((array)$m as $key => $val) {
+			
+			$m[$key]['mapExists'] = false;
 
 			if (!empty($val['image'])) {
-
-				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image']);
 				
-				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['project_media_l2_maps'].$val['image'];
-
-			} else {
-			
-				$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif');
-				$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].$val['name'].'.gif';
+				// 1)
+				$m[$key]['imageFullName'] = $projectMediaL2maps.$val['image'];
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
 				if (!$m[$key]['mapExists']) {
+					
+					// 2)
+					$m[$key]['imageFullName'] = $projectMediaL2maps.strtolower($val['image']);
+					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
-					$m[$key]['mapExists'] = file_exists($_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif');
-					$m[$key]['imageFullName'] = $_SESSION['admin']['project']['urls']['system_media_l2_maps'].strtolower($val['name']).'.gif';
+					if (!$m[$key]['mapExists']) {
+						
+						// 3)
+						$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['image'];
+						$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+						if (!$m[$key]['mapExists']) {
+							
+							// 4)
+							$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['image']);
+							$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+		
+						}
+						
+					}
+
+				}
+
+			} else {
+
+				// 5)
+				$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.gif';
+				$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+				
+				if (!$m[$key]['mapExists']) {
+
+					// 6)
+					$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.GIF';
+					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
 
 				}
 
