@@ -90,7 +90,10 @@ class IntroductionController extends Controller
 		
 		if (!$this->rHasId()) {
 
-			$this->addError($this->translate('No page ID specified.'));
+			$page = array(
+				'content' => $this->translate('No ID specified, or no content available.')
+			);
+			$this->smarty->assign('page', $page);
 
 		} else {
 			
