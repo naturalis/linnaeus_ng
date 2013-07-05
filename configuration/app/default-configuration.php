@@ -77,10 +77,9 @@ class configuration
             'paths' => array(
             ), 
             'directories' => array(
-				'locale' => $this->_appFileRoot . 'configuration/locale',
 				'log' => $this->_appFileRoot . 'log',
 				'cache' => $this->_appFileRoot . 'www/shared/cache',
-              	     'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project'
+          	     'mediaDirProject' => $this->_appFileRoot . 'www/shared/media/project'
             ),
 			'maxBackSteps' => 100,
 			'urlsToAdminEdit' => array(

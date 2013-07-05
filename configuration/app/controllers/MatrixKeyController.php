@@ -81,20 +81,32 @@ class MatrixKeyController extends Controller
 		
         $this->checkMatrixIdOverride();
 		$this->setStoreHistory(false);
+		
+		$matrices = $this->getMatrices();
+
+		if (count((array)$matrices)>0) {
         
-        $m = $this->getCurrentMatrix();
-		if (isset($m)) $this->redirect('identify.php');
+			$m = $this->getCurrentMatrix();
+			if (isset($m)) $this->redirect('identify.php');
+	
+			$m = $this->getDefaultMatrixId();
+			if (isset($m)) {
+				$this->setCurrentMatrix($m);
+				$this->setTotalEntityCount();
+				$this->redirect('identify.php');
+			}
+	
+			$m = $this->getFirstMatrixId();
+			if (isset($m)) {
+				$this->setCurrentMatrix($m);
+				$this->setTotalEntityCount();
+				$this->redirect('identify.php');
+			}
+			
+		} else {
 
-        $m = $this->getDefaultMatrixId();
-		if (isset($m)) {
-			$this->setCurrentMatrix($m);
-			$this->redirect('identify.php');
-		}
-
-        $m = $this->getFirstMatrixId();
-		if (isset($m)) {
-			$this->setCurrentMatrix($m);
-			$this->redirect('identify.php');
+			$this->printGenericError($this->translate('No matrices have been defined.'));
+			
 		}
         
     }
@@ -102,46 +114,34 @@ class MatrixKeyController extends Controller
 
     public function matricesAction ()
     {
-        $matrices = $this->getMatrices();
-        
-        if (count((array) $matrices) == 0) {
-            
-            $this->addError($this->translate('No matrices have been defined.'));
-        }
-        else if (count((array) $matrices) == 1) {
-            
-            $this->storeHistory = false;
-            
-            $matrix = array_shift($matrices);
-            
-            $this->setCurrentMatrix($matrix['id']);
-            
-            $this->redirect('identify.php');
-        }
-        else {
-            
-            $this->smarty->assign('matrices', $matrices);
-            
-            $this->smarty->assign('currentMatrixId', $this->getCurrentMatrixId());
-        }
-        
+		
+		$this->storeHistory = false;
+
+		if (!$this->rHasVal('action','popup'))
+			$this->redirect('identify.php');
+
+		$matrices = $this->getMatrices();
+		$this->smarty->assign('matrices', $matrices);
+		$this->smarty->assign('currentMatrixId', $this->getCurrentMatrixId());
         $this->printPage();
+
     }
 
 
     public function useMatrixAction ()
     {
         if ($this->rHasId()) {
-            
+
             $this->storeHistory = false;
-            
+
             $this->setCurrentMatrix($this->requestData['id']);
-            
+			$this->setTotalEntityCount();
+
             $this->redirect('identify.php');
         }
         else {
-            
-            $this->redirect('matrices.php');
+
+            $this->printGenericError($this->translate('Missing matrix ID.'));
         }
     }
 
@@ -157,7 +157,7 @@ class MatrixKeyController extends Controller
             
             $this->storeHistory = false;
             
-            $this->redirect('matrices.php');
+            $this->redirect('index.php');
         }
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
@@ -628,9 +628,6 @@ class MatrixKeyController extends Controller
         $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
         $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
 
-		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
-			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
-        
         if ($this->_matrixType == 'nbc') {
 			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->getSetting('nbc_image_root');
         }
@@ -761,8 +758,12 @@ class MatrixKeyController extends Controller
 
     private function checkMatrixIdOverride ()
     {
-        if ($this->rHasVal('mtrx'))
-            $this->setCurrentMatrix($this->requestData['mtrx']);
+        if (!$this->rHasVal('mtrx'))
+			return;
+		
+		$this->setCurrentMatrix($this->requestData['mtrx']);
+		$this->setTotalEntityCount();
+			
     }
 
 
@@ -779,7 +780,13 @@ class MatrixKeyController extends Controller
         $_SESSION['app']['user']['matrix']['active'] = $this->getMatrix($id);
     }
 
+    private function setTotalEntityCount ($id)
+    {
 
+		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
+			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
+
+    }
 
     private function getMatrixCount ()
     {

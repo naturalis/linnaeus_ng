@@ -1638,6 +1638,8 @@ class MapKeyController extends Controller
         $this->setPageName( $this->translate('Store compacted Linnaeus 2 data'));
 		
 		if ($this->rHasVal('action','store') && !$this->isFormResubmit()) {
+			
+			set_time_limit(1200); // EAT THAT!
 
 			$this->l2MakeCompactData();
 			

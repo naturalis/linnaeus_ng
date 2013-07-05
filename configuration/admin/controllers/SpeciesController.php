@@ -420,11 +420,9 @@ class SpeciesController extends Controller
             $this->redirect('index.php');
         
         $data = $this->getTaxonById();
-        
+
         $pr = $this->newGetProjectRanks();
 
-        $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
-        
         if (count((array) $pr) == 0) {
             
             $this->addMessage($this->translate('No ranks have been defined.'));
@@ -617,6 +615,8 @@ class SpeciesController extends Controller
                     
                     $this->addMessage(sprintf($this->translate('"%s" saved.'), $this->formatTaxon($d)));
                     
+					$data = $this->getTaxonById();
+				
                     $this->smarty->assign('data', $d);
 					
 					$this->clearCache($this->cacheFiles['list']);
@@ -661,7 +661,9 @@ class SpeciesController extends Controller
             
             $this->addError($this->translate('Taxon is already being edited by another editor.'));
         }
-        
+
+        $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
+       
         $this->smarty->assign('navList', $this->newGetUserAssignedTaxonTreeList(array(
             'higherOnly' => $this->maskAsHigherTaxa()
         )));
@@ -3619,23 +3621,20 @@ class SpeciesController extends Controller
     {
         if (!$id)
             return;
-
             
-            // get entire branch beneath the taxon
+        // get entire branch beneath the taxon
         $this->newGetTaxonTree(array(
             'pId' => $id
-        ));echo $id;
-q($this->treeList,1);        
+        ));
+
         if (isset($this->treeList)) {
             
             // delete from the bottom up
             foreach ((array) array_reverse($this->treeList) as $treeKey => $val) {
-echo $val['taxon'].'<br />';                
-//                $this->deleteTaxon($val['id']);
+
+                $this->deleteTaxon($val['id']);
             }
         }
-		
-//		die();
 		
     }
 

@@ -110,6 +110,7 @@ class Controller extends BaseClass
     private $_hotwordTempLinks = array();
     private $_hotwordMightBeHotwords = array();
     private $_hotwordNoLinks = array();
+    private $_tmpTree = null;
 
     public $useCache = true;
     public $viewName;
@@ -217,7 +218,7 @@ class Controller extends BaseClass
         
         $this->checkBackStep();
 
-        $this->setOtherSettings();
+        $this->setOtherStuff();
         
         if ($this->getCheckForProjectId()) {
             
@@ -228,6 +229,7 @@ class Controller extends BaseClass
             if (!$this->isLoggedInAdmin())
                 $this->splashScreen();
         }
+		
     }
 
 
@@ -387,7 +389,7 @@ class Controller extends BaseClass
             'order' => 'taxon_order,id'
         ));
         */
-        
+
         foreach ((array) $t as $key => $val) {
             
             $t[$key]['lower_taxon'] = $ranks[$val['rank_id']]['lower_taxon'];
@@ -477,34 +479,34 @@ class Controller extends BaseClass
         if (empty($id) || $id == 0)
             return;
         
-        if (!isset($_SESSION['app']['user']['species']['taxon']['id']) || $_SESSION['app']['user']['species']['taxon']['id'] != $id) {
-            
-            $t = $this->models->Taxon->_get(array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                ), 
-            	'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty'
-            ));
+		$t = $this->models->Taxon->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $id
+			), 
+			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty'
+		));
 
-            $t[0]['label'] = $this->formatTaxon($t[0]);
-            
-            $_SESSION['app']['user']['species']['taxon'] = $t[0];
-            
-            $pr = $this->models->ProjectRank->_get(
-            array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $_SESSION['app']['user']['species']['taxon']['rank_id']
-                )
-            ));
-            
-            $_SESSION['app']['user']['species']['taxon']['lower_taxon'] = $pr[0]['lower_taxon'];
-        }
-        
-        return $_SESSION['app']['user']['species']['taxon'];
+		$t[0]['label'] = $this->formatTaxon($t[0]);
+		
+		$pr = $this->models->ProjectRank->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $t[0]['rank_id']
+			)
+		));
+		
+		$t[0]['lower_taxon'] = $pr[0]['lower_taxon'];
+
+        return $t[0];
     }
 
+	public function printGenericError($message=null)
+	{
+        $this->smarty->assign('message',(!empty($message) ? $message : $this->translate('An error occurred.')));
+        $this->printPage('../shared/generic-error');
+	}
 
 	private function _getTaxonClassification($id) {
 			
@@ -1984,6 +1986,7 @@ class Controller extends BaseClass
         $this->smarty->assign('pageName', $this->getPageName());
         $this->smarty->assign('showBackToSearch', $this->showBackToSearch);
         $this->smarty->assign('addedProjectIDParam', $this->generalSettings['addedProjectIDParam']);
+        $this->smarty->assign('searchResultIndexActive', $this->getSearchResultIndexActive());
 
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
 		
@@ -2924,7 +2927,8 @@ class Controller extends BaseClass
 
             $this->_buildTaxonTree();
 			
-			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
+			if (isset($this->treeList))
+				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
 
             $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
         }
@@ -3093,7 +3097,7 @@ class Controller extends BaseClass
 
     private function getTaxonChildren ($id)
     {
-        if (is_null($this->tmp)) {
+        if (is_null($this->_tmpTree)) {
             
             $d = $this->models->Taxon->_get(
             array(
@@ -3102,18 +3106,18 @@ class Controller extends BaseClass
                 ), 
                 'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author'
             ));
-            
+      
             foreach ((array) $d as $val) {
                 
-                $this->tmp[$val['parent_id']][$val['id']] = $val;
+                $this->_tmpTree[$val['parent_id']][$val['id']] = $val;
             }
         }
         
-        return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
+        return isset($this->_tmpTree[$id]) ? $this->_tmpTree[$id] : null;
     }
 
 
-	private function setOtherSettings()
+	private function setOtherStuff()
 	{
 		
 		$d = $this->getSetting('suppress_splash');
@@ -3125,7 +3129,29 @@ class Controller extends BaseClass
 
 		}
 		
+		if ($this->rHasVar('sidx')) {
+
+			$this->setSearchResultIndexActive($this->requestData['sidx']);
+
+		}
+		
 	}
+
+
+	public function setSearchResultIndexActive($id)
+	{
+
+		$_SESSION['app']['user']['search']['lastResultSetIndexActive'] = $id;
+
+	}
+
+	public function getSearchResultIndexActive()
+	{
+
+		return isset($_SESSION['app']['user']['search']['lastResultSetIndexActive']) ? $_SESSION['app']['user']['search']['lastResultSetIndexActive'] : null;
+
+	}
+
 
 	public function getNbcExtras($p=null)
 	{

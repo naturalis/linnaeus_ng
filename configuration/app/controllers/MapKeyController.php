@@ -1360,7 +1360,7 @@ class MapKeyController extends Controller
 	}
 
 
-	private function l2GetMaps($id=null)
+	public function l2GetMaps($id=null)
 	{
 		
 		/*

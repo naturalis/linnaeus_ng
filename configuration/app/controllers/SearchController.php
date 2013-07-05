@@ -201,9 +201,15 @@ class SearchController extends Controller
         if ($this->rHasVal('action','get_search_result_index')) {
 
 			$this->smarty->assign(
-				'returnText',json_encode($this->getSearchResultIndex())
+				'returnText',
+				$this->makeLookupList(
+					(array)$this->getSearchResultIndex(),
+					$this->controllerBaseName,
+					null,
+					false
+				)
 			);
-            
+
         }
 
 		$this->allowEditPageOverlay = false;
@@ -947,13 +953,34 @@ class SearchController extends Controller
 				'columns' => 
 					'id,
 					concat(year(`year`),ifnull(suffix,\'\')) as year,
+					concat(
+									if(isnull(`year`)!=1,`year`,\'\'),
+									if(isnull(suffix)!=1,suffix,\'\'),
+									if(isnull(year_2)!=1,
+										concat(
+											if(year_separator!=\'-\',
+												concat(
+													\' \',
+													year_separator,
+													\' \'
+												),
+												year_separator
+											),
+											year_2,
+											if(isnull(suffix_2)!=1,
+												suffix_2,
+												\'\')
+											)
+											,\'\'
+										)
+								) as year_full,					
 					text as content,
 					concat(
 						author_first,
-						(
-							if(multiple_authors=1,
-								\' et al.\',
-								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							(
+								if(multiple_authors=1,
+									\' et al.\',
+									if(author_second!=\'\',concat(\' & \',author_second),\'\')
 							)
 						)
 					) as author_full,
@@ -966,7 +993,7 @@ class SearchController extends Controller
 		return array(
 			'results' => array(
 				array(
-					'label' => $this->translate('Literary references'),
+					'label' => $this->translate('Literature'),
 					'data' => $books,
 					'numOfResults' => count((array)$books)
 				)
@@ -977,6 +1004,7 @@ class SearchController extends Controller
 
 	}
 
+	
 	public function getLiteratureLookupList($search=null)
 	{
 
@@ -1566,83 +1594,94 @@ class SearchController extends Controller
 	}
 
 
-	private function makeLastResultSetIndex($results)
+	private function makeLastResultSetIndex(&$results)
 	{
 
-		$data = null;		
+		$data = null;
+		$counter = 1;
 
-		foreach ((array)$results['species']['results'] as $res) {
+		foreach ((array)$results['species']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				if (strtolower($res['label'])=='species media')
 					$label = (isset($v['label']) ? $v['label'] : (isset($v['content']) ? $v['content'] : '?'));
-				else
-					$label = $v['taxon'];
+				else {
+					$label = (isset($v['taxon']) ? $v['taxon'] : (isset($v['label']) ? $v['label'] : '?'));
+				}
 
-				$link = '../species/taxon.php?id='.$v['taxon_id'].(!empty($v['cat']) ? '&cat='.$v['cat'] : '');
+				$link = '../species/taxon.php?id='.$v['taxon_id'].(!empty($v['cat']) ? '&cat='.$v['cat'] : '').'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['species']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['glossary']['results'] as $res) {
+		foreach ((array)$results['glossary']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				$label = $v['label'] . (isset($v['synonym']) && $v['synonym']!=$v['label'] ? sprintf($this->translate('(synonym of %s)'),$v['synonym']) : '');
-				$link = '../glossary/term.php?id='.$v['id'];
+				$link = '../glossary/term.php?id='.$v['id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+
+				$results['glossary']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['literature']['results'] as $res) {
+		foreach ((array)$results['literature']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
-				$label = $v['author_full'].' ('.$v['year'].')';
-				$link = '../literature/reference.php?id='.$v['id'];
+				$label = $v['author_full'].' ('.$v['year_full'].')';
+				$link = '../literature/reference.php?id='.$v['id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['literature']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['dichkey']['results'] as $res) {
+		foreach ((array)$results['dichkey']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				if (isset($v['choice_id']))
-					$link = '../key/index.php?forcetree=1&choice='.$v['choice_id'];
+					$link = '../key/index.php?forcetree=1&choice='.$v['choice_id'].'&sidx='.$counter;
 				elseif (isset($v['keystep_id']))
-					$link = '../key/index.php?forcetree=1&step='.$v['keystep_id'];
+					$link = '../key/index.php?forcetree=1&step='.$v['keystep_id'].'&sidx='.$counter;
 				else
 					continue;
 
@@ -1653,85 +1692,100 @@ class SearchController extends Controller
 						sprintf($this->translate('Step %s%s'),$v['number'],(isset($v['marker']) ? $v['marker'] : ''));
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['dichkey']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['map']['results'] as $res) {
+		foreach ((array)$results['map']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				$label = $v['content'];
-				$link = '../mapkey/examine_species.php?id='.$v['id'];
+				$link = '../mapkey/examine_species.php?id='.$v['id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['map']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['content']['results'] as $res) {
+		foreach ((array)$results['content']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				$label = $v['label'];
-				$link = '../linnaeus/?id='.$v['id'];
+				$link = '../linnaeus/?id='.$v['id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['content']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['introduction']['results'] as $res) {
+		foreach ((array)$results['introduction']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				$label = $v['label'];
-				$link = '../introduction/topic.php?id='.$v['page_id'];
+				$link = '../introduction/topic.php?id='.$v['page_id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['introduction']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
 		}
 
-		foreach ((array)$results['modules']['results'] as $res) {
+		foreach ((array)$results['modules']['results'] as $rKey => $res) {
 
 			if (!isset($res['data']) || count((array)$res['data'])==0)
 				continue;
 
-			foreach ((array)$res['data'] as $v) {
+			foreach ((array)$res['data'] as $vKey => $v) {
 
 				$label = $v['label'];
-				$link = '../module/topic.php?modId='.$v['module_id'].'&id='.$v['page_id'];
+				$link = '../module/topic.php?modId='.$v['module_id'].'&id='.$v['page_id'].'&sidx='.$counter;
 
 				$data[] = array(
-					'l' => $res['label'].': '.$label,
-					'u' => $link
+					'label' => $res['label'].': '.$label,
+					'url' => $link,
+					'id' => $counter
 				);
+				
+				$results['modules']['results'][$rKey]['data'][$vKey]['sIndex'] = $counter++;
 	
 			}
 			
