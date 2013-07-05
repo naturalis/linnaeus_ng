@@ -178,8 +178,8 @@ class KeyController extends Controller
 		if (isset($choices)) $this->smarty->assign('choices',$choices);
 
 		$this->smarty->assign('keypath',$this->getKeyPath());
-		
-		$this->printPage($this->setStepType($choices));
+
+		$this->printPage($this->setStepType(isset($choices) ? $choices : null));
 
     }
     
@@ -189,7 +189,7 @@ class KeyController extends Controller
         
         $type = 'index_l2_pct';
         
-        foreach ($choices as $choice) {
+        foreach ((array)$choices as $choice) {
             
             if (empty($choice['choice_image_params'])) {
                 
@@ -201,9 +201,9 @@ class KeyController extends Controller
         
         if ($type == 'index_l2_pct') return $type;
         
-        if (count($choices) > 4) return null;
+        if (count((array)$choices) > 4) return null;
         
-        foreach ($choices as $choice) {
+        foreach ((array)$choices as $choice) {
             
             if (!empty($choice['choice_img'])) {
                 
