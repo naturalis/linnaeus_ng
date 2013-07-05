@@ -13,6 +13,7 @@
         {if $isHigherTaxa}
             {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
         {/if}
+        <a href="#" onclick="$('[class=indent-dots]').css('display',$('[class=indent-dots]').css('display')=='none' ? 'inline' : 'none');">Toggle indentation</a>
     </p>
     
 <table id="drag-list" class="grid">
@@ -33,7 +34,7 @@
 	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
 		<tr class="tr-highlight" type="drag-row" drag-id="{$taxon.id}">
 			<td style="text-align:left;cursor:move">
-	            {*' . '|str_repeat:$taxon.depth*}
+	            <span class="indent-dots" style="display:none">{' . '|str_repeat:$taxon.depth}</span>
             	<a href="edit.php?id={$taxon.id}">{$taxon.taxon_formatted}</a>
                 {if $session.admin.project.includes_hybrids==1}
                     {if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}

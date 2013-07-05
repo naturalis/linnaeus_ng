@@ -4112,7 +4112,7 @@ class ImportL2Controller extends Controller
     }
 
 
-    private function resolveEmbeddedMedia ($s)
+    private function replaceEmbeddedMedia ($s)
     {
         
         /*
@@ -4163,7 +4163,6 @@ class ImportL2Controller extends Controller
         $label = isset($d[1]) ? $d[1] : $filename;
         
         //if (file_exists($_SESSION['admin']['system']['import']['paths']['project_media'].$filename))
-        
 
 
         if ($type == 'image') {
@@ -4174,12 +4173,7 @@ class ImportL2Controller extends Controller
 				class="inline-image" 
 				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
              '</span>';
-            
-            //			NO INLINE
-            //			return '<img
-            //				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');"
-            //				src="'.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'"
-            //				class="media-image">';
+
         }
         else if ($type == 'movie') {
             
@@ -4189,11 +4183,7 @@ class ImportL2Controller extends Controller
 				class="inline-video" 
 				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
              '</span>';
-            
-            //			return '<img
-            //				onclick="showMedia(\''.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'\',\''.addslashes($label).'\');" 
-            //				src="../../media/system/video.jpg" 
-            //				class="media-image">';
+
         }
         else if ($type == 'sound') {
             
@@ -4204,28 +4194,9 @@ class ImportL2Controller extends Controller
 				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
              '</span>';
             
-            /*
-			return '<object type="application/x-shockwave-flash" data="'.
-						$this->generalSettings['soundPlayerPath'].$this->generalSettings['soundPlayerName'].'" height="20" width="130">
-						<param name="movie" value="'.$this->generalSettings['soundPlayerName'].'">
-						<param name="FlashVars" value="mp3='.$_SESSION['admin']['system']['import']['paths']['media_url'].$filename.'">
-					</object>';
-			*/
         }
         else
             return $s[0];
-    }
-
-
-    private function replaceEmbeddedMedia ($s)
-    {
-        
-        // embedded media
-        return preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
-            $this, 
-            'resolveEmbeddedMedia'
-        ), $s);
-        
     }
 
 
@@ -4343,10 +4314,12 @@ class ImportL2Controller extends Controller
     }
 
 
-	private function doFixEmbeddedLinksAndMedia($src,$removeMarkup=false)
+	private function doFixEmbeddedLinksAndMedia($src,$removeMarkup=false,$taxonId=null)
 	{
-
-		$src = $this->replaceEmbeddedMedia($src);
+		$src = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
+            $this, 
+            'resolveEmbeddedMedia'
+        ),$src);
 
 		$src = $this->replaceOldExternalURLs($src);
 

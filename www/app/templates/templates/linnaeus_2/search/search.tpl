@@ -35,10 +35,7 @@
 		<p class="{$background}">
 		{if $res.label|@strtolower=='species media'}
 		<a href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}"><img alt="{$v.label}" src={if $v.mime=='image'}"{$session.app.project.urls.uploadedMedia}{$v.label}"{else}"{$session.app.project.urls.systemMedia}video.png" class="no-border"{/if} /></a>
-		{/if}
-
-{if $v.taxon}{$v.taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}: {/if}
-
+		{/if}{if $v.taxon}{$v.taxon}{if $results.species.categoryList[$v.cat]} ({$results.species.categoryList[$v.cat].title|@strtolower}){/if}: {/if}
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goTaxon({$v.taxon_id}{if $v.cat},'{$v.cat}'{/if})">
 		{if $v.label}{h search=$search}{$v.label}{/h}
@@ -46,9 +43,12 @@
 		{/if}
 		</span>
 		{else}
-		<a class="result" href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}">{t}Taxon:{/t} {$v.target}{if $v.label}{h search=$search}{$v.label}{/h}{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}</a>
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}&sidx={$v.sIndex}">{t}Taxon:{/t} {$v.target}{if $v.label}{h search=$search}{$v.label}{/h}{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}</a>
 		{/if}
 		{if $v.post_script}{$v.post_script}{/if}</p>
+        
+        
+        
 		{/foreach}
 	</div>
 	{/if}
@@ -78,7 +78,7 @@
 			{if $v.synonym && $v.synonym!=$v.label} ({t}synonym of{/t} {$v.synonym}){/if}
 		</span>
 		{else}
-		<a class="result" href="../glossary/term.php?id={$v.id}">
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../glossary/term.php?id={$v.id}&sidx={$v.sIndex}">
 			{if $v.term && $v.term!=$v.label}{$v.term}: {/if}
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 			{if $v.synonym && $v.synonym!=$v.label} ({t}synonym of{/t} {$v.synonym}){/if}
@@ -109,11 +109,11 @@
 		<p class="{$background}">
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goLiterature({$v.id})">
-			{h search=$search}{$v.author_full} ({$v.year}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
+			{h search=$search}{$v.author_full} ({$v.year_full}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span>
 		{else}
-		<a class="result" href="../literature/reference.php?id={$v.id}">
-			{h search=$search}{$v.author_full} ({$v.year}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../literature/reference.php?id={$v.id}&sidx={$v.sIndex}">
+			{h search=$search}{$v.author_full} ({$v.year_full}){/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</a>
 		{/if}
 		</p>
@@ -142,7 +142,7 @@
         {if $v.choice_id}
         <a class="result" href="../key/index.php?forcetree=1&choice={$v.choice_id}">
         {elseif $v.keystep_id}
-		<a class="result" href="../key/index.php?forcetree=1&step={$v.keystep_id}">
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../key/index.php?forcetree=1&step={$v.keystep_id}&sidx={$v.sIndex}">
         {/if}
 			{if $v.label}{t}Step{/t} {$v.number}:{h search=$search} {$v.label}{/h}
 			{elseif $v.content}{t}Step{/t} {$v.number} ("{$v.title}"){if $v.marker}, {t}choice{/t} {$v.marker}{/if}: "{foundContent search=$search}{$v.content}{/foundContent}"
@@ -187,7 +187,7 @@
 			{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 			{if $v.characteristic}(of characteris "{$v.characteristic}"{if !$v.matrices}){/if}{/if}
 			{if $v.matrices}{if !$v.characteristic}({/if}{if $v.matrices|@count==1}in matrix{else}in matrices{/if}
-			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<a class="result" href="../matrixkey/use_matrix.php?id={$m.matrix_id}">{$results.matrixkey.matrices[$m.matrix_id].name}</a>"{/foreach}){/if}
+			{foreach from=$v.matrices key=k item=m name=matrices}{if $smarty.foreach.matrices.index!==0}, {/if}"<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../matrixkey/use_matrix.php?id={$m.matrix_id}&sidx={$v.sIndex}">{$results.matrixkey.matrices[$m.matrix_id].name}</a>"{/foreach}){/if}
 		{if !$v.matrices && $v.matrix_id}</a>{/if}
 		{/if}
 		</p>
@@ -216,7 +216,7 @@
 		{if $useJavascriptLinks}
 		<span class="result" onclick="goMap({$v.id})">{h search=$search}{$v.content}{/h}</span> ({$v.number} occurrences)
 		{else}
-		<a href="../mapkey/examine_species.php?id={$v.id}">{h search=$search}{$v.content}{/h}</a> ({$v.number} occurrences)
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../mapkey/examine_species.php?id={$v.id}&sidx={$v.sIndex}">{h search=$search}{$v.content}{/h}</a> ({$v.number} occurrences)
 		{/if}
 		</p>
 		{/foreach}
@@ -245,7 +245,7 @@
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span>
 		{else}
-		<a class="result" href="../linnaeus/?id={$v.id}">
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../linnaeus/?id={$v.id}&sidx={$v.sIndex}">
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</a>
 		{/if}
@@ -277,7 +277,7 @@
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span>
 		{else}
-		<a class="result" href="../linnaeus/?id={$v.id}">
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../linnaeus/?id={$v.id}&sidx={$v.sIndex}">
 			{h search=$search}{$v.label}{/h}{if $v.content}: "{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</a>
 		{/if}
@@ -311,7 +311,7 @@
 			{if $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}
 		</span>
 		{else}
-		<a class="result" href="../module/topic.php?modId={$v.module_id}&id={$v.page_id}">
+		<a class="result" onclick="storeClickedSearchIndexNr({$v.sIndex});" href="../module/topic.php?modId={$v.module_id}&id={$v.page_id}&sidx={$v.sIndex}">
 			{if $v.label}{h search=$search}{$v.label}{/h}{/if}
 			{if $v.label && $v.content}: {/if}
 			{if $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}

@@ -70,7 +70,7 @@ function allLookupGetData(text,getAll) {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-				//alert(data);
+				//console.log(data);
 				var tmp = $.parseJSON(data);
 				allLookupData = allLookupPostProcessing(text,tmp,getAll);
 				if (data) allLookupBuildList(allLookupData,text);
@@ -220,12 +220,12 @@ function allLookupBuildList(obj,txt) {
 		var textToAppend = Array();
 
 		var url = allLookupTargetUrl ? allLookupTargetUrl : obj.url;
-		
+
 		for(var i=0;i<obj.results.length;i++) {
 			
 			var d = obj.results[i];
-			
-			if (d.id && d.label) {
+
+			if ((d.id || d.url) && d.label) {
 
 				if (allLookupSelectedId==d.id)  allLookupSelectedElement = 'allLookupListCell-'+i ;
 
@@ -408,7 +408,7 @@ function allLookupBindDialogKeyUp() {
 }
 
 function allLookupShowDialog(predefJSON) {
-	
+
 	showDialog(
 		_(allLookupDialogTitle),
 		'<div id="lookupDialog"><input type="text" id="'+allLookupDialogInputName+'"></div><div id="'+allLookupDialogContentName+'"></div>'

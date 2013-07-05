@@ -112,7 +112,7 @@ class SpeciesController extends Controller
 
             // get taxon
             $taxon = $this->getTaxonById($this->requestData['id']);
-			
+
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
             
             $this->setControllerBaseName();

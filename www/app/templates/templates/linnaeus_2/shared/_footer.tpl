@@ -33,9 +33,11 @@ $(document).ready(function(){
 	{foreach from=$requestData key=k item=v}
 	addRequestVar('{$k}','{$v|addslashes}')
 	{/foreach}
-
 	chkPIDInLinks({$session.app.project.id},'{$addedProjectIDParam}');
-
+	{if $searchResultIndexActive}
+	searchResultIndexActive = {$searchResultIndexActive};
+	{/if}
+				
 })
 {literal}
 </script>

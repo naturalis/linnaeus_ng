@@ -84,6 +84,10 @@ $(document).ready(function(){
 	storedShowState='{$storedShowState}';
 {/if}
 
+{if $showMatrixSelect}
+	showMatrixSelect();
+{/if}
+
 {literal}
 });
 </script>

@@ -1474,6 +1474,7 @@ MUST CHECK
         $_SESSION['admin']['user'] = $userData;
         $_SESSION['admin']['user']['_login']['time'] = time();
         $_SESSION['admin']['user']['_said_welcome'] = false;
+        $_SESSION['admin']['user']['_logged_in'] = true;
 		
         //$_SESSION['admin']['user']['_roles'] = $roles;
         //$_SESSION['admin']['user']['_rights'] = $rights;
@@ -1481,7 +1482,7 @@ MUST CHECK
 		$this->setUserSessionRights($rights);
 		$this->setUserSessionRoles($roles);
 		$this->setUserSessionNumberOfProjects($numberOfProjects);
-    
+   
     }
 
     /**
@@ -1491,10 +1492,10 @@ MUST CHECK
      */
     private function destroyUserSession ()
     {
-        
+
 		unset($_SESSION['admin']);
         session_destroy();
-    
+
     }
 
 
