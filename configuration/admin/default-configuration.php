@@ -201,7 +201,7 @@ class configuration
 					),
 				'email' =>
 					array(
-						'smtp_server' => '132.229.167.153', // 'smtp.eti.uva.nl',
+						'smtp_server' => 'mail.naturalis.nl',
 						'mailfrom_address' => 'linnaeus@eti.uva.nl',
 						'mailfrom_name' => 'linnaeus-system',
 						'mails' =>

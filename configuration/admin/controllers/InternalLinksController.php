@@ -396,28 +396,22 @@ class InternalLinksController extends Controller
 
 	private function intLinkGetKeySteps()
 	{
-
+		
 		$l = $this->models->Project->freeQuery("
 			SELECT _a.*, _b.title, _c.number, _d.choice_txt
 				from %PRE%choices_keysteps _a
-
 				left join %PRE%content_keysteps _b
 					on _b.keystep_id = _a.keystep_id
 					and _b.language_id = ".$this->getDefaultProjectLanguage()."
 					and _a.project_id = _b.project_id
-
 				left join %PRE%keysteps _c
 					on _c.id = _a.keystep_id
 					and _a.project_id = _c.project_id
-					
 				left join %PRE%choices_content_keysteps _d
 					on _a.id = _d.choice_id
 					and _a.project_id = _d.project_id
-					
 				where _a.project_id = " . $this->getCurrentProjectId() ."
-					and (_a.res_keystep_id = -1 or _a.res_keystep_id is null) and _a.res_taxon_id is null 
 				order by _a.keystep_id, title
-				
 			");
 
 		foreach((array)$l as $key => $val) {
