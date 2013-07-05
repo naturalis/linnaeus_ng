@@ -429,7 +429,7 @@ class IndexController extends Controller
             // Check taxa
         $_SESSION['app']['user']['indexModule']['hasSpecies'] = $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 0;
         $taxa = $this->buildTaxonTree();
-        foreach ($taxa as $taxon) {
+        foreach ((array)$taxa as $taxon) {
             if ($taxon['lower_taxon'] == 1 && $taxon['is_empty'] == 0)
                 $_SESSION['app']['user']['indexModule']['hasSpecies'] = 1;
             if ($taxon['lower_taxon'] == 0 && $taxon['is_empty'] == 0)
