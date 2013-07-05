@@ -2899,9 +2899,12 @@ class Controller extends BaseClass
     }
 
 
-
     public function getTreeList ($p = null)
     {
+		
+		if (!$this->projectHasTaxa())
+			return;
+		
         if (!isset($this->treeList))
             $this->buildTaxonTree(); // return null;
         
@@ -2924,7 +2927,7 @@ class Controller extends BaseClass
     {
 		
         if (!$this->getCache('species-treeList')) {
-
+			
             $this->_buildTaxonTree();
 			
 			if (isset($this->treeList))
@@ -3094,6 +3097,11 @@ class Controller extends BaseClass
     }
 
 
+	private function projectHasTaxa()
+	{
+		$t = $this->models->Taxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()), 'columns' => 'count(*) as total'));
+		return ($t[0]['total']>0);
+	}
 
     private function getTaxonChildren ($id)
     {
