@@ -40,13 +40,13 @@ class KeyController extends Controller
             'jit/jit.js', 
             'jit/key-tree.js', 
             'prettyPhoto/jquery.prettyPhoto.js', 
-            'int-link.js'
+            'int-link.js',
+			'dialog/jquery.modaldialog.js'
         ), 
         'IE' => array(
             'jit/Extras/excanvas.js'
         )
     );
-
 
 
     /**

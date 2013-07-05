@@ -1487,7 +1487,7 @@ class Controller extends BaseClass
 
     public function sendEmail ($params)
     {
-        
+
         /*
 			params:
 
