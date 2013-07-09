@@ -408,10 +408,16 @@ class KeyController extends Controller
 
             $this->clearCache($this->cacheFiles);
             
+			if ($this->rHasVal('res_keystep_id','-1'))
+				$newStepId = $this->createNewKeystep();
+			else 
+				$newStepId = $this->requestData['res_keystep_id'];
+			
+			
             $ck = $this->models->ChoiceKeystep->update(
             array(
-                'res_keystep_id' => $this->requestData['res_keystep_id'] === '0' ? 'null' : $this->requestData['res_keystep_id'], 
-                'res_taxon_id' => $this->requestData['res_keystep_id'] !== '0' ? 'null' : ($this->requestData['res_taxon_id'] === '0' ? 'null' : $this->requestData['res_taxon_id'])
+                'res_keystep_id' => $newStepId === '0' ? 'null' : $newStepId, 
+                'res_taxon_id' => $newStepId !== '0' ? 'null' : ($this->requestData['res_taxon_id'] === '0' ? 'null' : $this->requestData['res_taxon_id'])
             ), array(
                 'id' => $this->requestData['id'], 
                 'project_id' => $this->getCurrentProjectId()
