@@ -301,7 +301,7 @@ class SpeciesController extends Controller
         }
 
 		$this->newGetTaxonTree();
-		$taxa = $this->treeList;
+		$taxa = isset($this->treeList) ? $this->treeList : null;
 
 		$projectLanguages = $_SESSION['admin']['project']['languages'];
 		$pageCount = $this->getPageTaxonCount();
@@ -1111,7 +1111,7 @@ class SpeciesController extends Controller
                 
                 $this->smarty->assign('parent', $parent);
                 
-                $this->smarty->assign('taxa', $this->treeList);
+                $this->smarty->assign('taxa', isset($this->treeList) ? $this->treeList : null);
             }
             else {
                 
@@ -1597,25 +1597,16 @@ class SpeciesController extends Controller
 
                     if (in_array($val[0], $prevNames)) {
                         // set whether the taxon can be imported, based on whether it has duplicates in the import
-                        
-
-
 
                         $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Duplicate name');
                     }
                     else if ($t[0]['total'] != 0) {
                         // set whether the taxon can be imported, based on whether the name already exists
-                        
-
-
 
                         $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Name already exists in the database');
                     }
                     else if (!(isset($val[1]) && in_array(strtolower($val[1]), $d))) {
                         // set whether the taxon can be imported, based on whether it has a legal rank
-                        
-
-
 
                         $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Unknown rank');
                     }
@@ -1679,6 +1670,7 @@ class SpeciesController extends Controller
                 $_SESSION['admin']['system']['csv_data'] = $r;
                 
                 $this->smarty->assign('results', $r);
+				
             }
         }
         else if (isset($this->requestData)) {
@@ -1716,13 +1708,9 @@ class SpeciesController extends Controller
                     $rank = $_SESSION['admin']['system']['csv_data'][$val][1];
                     $hybrid = $_SESSION['admin']['project']['includes_hybrids'] ? $_SESSION['admin']['system']['csv_data'][$val][2] : false;
                     $parentName = null;
-                    
+
                     if ($key == 0) {
                         // first one never has a parent (top of the tree) unless actively set or chosen
-                        
-
-
-
                         $predecessors[] = array(
                             $rank, 
                             $name, 
@@ -1775,9 +1763,6 @@ class SpeciesController extends Controller
                                 if ($rank == $val[0] && $key != count((array) $predecessors) - 1) {
                                     // found a previous occurrence
                                     
-
-
-
                                     if (isset($predecessors[$key - 1])) {
                                         
                                         // get the name of the previous occurrence's parent
@@ -1800,9 +1785,6 @@ class SpeciesController extends Controller
                             
                             if ($parentName == null) {
                                 // did not find a previous occurrence of the current rank, so the previous taxon must be the parent
-                                
-
-
 
                                 $parentName = $predecessors[count((array) $predecessors) - 1][1];
                                 
@@ -3787,6 +3769,8 @@ class SpeciesController extends Controller
 
 
 
+                    
+
     private function importTaxon ($taxon)
     {
         if (empty($taxon['taxon_name']))
@@ -3855,7 +3839,7 @@ class SpeciesController extends Controller
                 
                 $pId = null;
             }
-            
+         
             // save taxon
             $this->models->Taxon->save(
             array(
@@ -3864,16 +3848,13 @@ class SpeciesController extends Controller
                 'taxon' => $taxon['taxon_name'], 
                 'parent_id' => $pId, 
                 'rank_id' => $rankId, 
-                'is_hybrid' => isset($taxon['hybrid']) && $this->canRankBeHybrid($rankId) ? 1 : 0
+                'is_hybrid' => isset($taxon['hybrid']) && $taxon['hybrid']===true && $this->canRankBeHybrid($rankId) ? 1 : 0
             ));
             
             return $this->models->Taxon->getNewId();
         }
         else {
             // taxon does exist in database
-            
-
-
 
             if (empty($t[0]['rank']) || empty($t[0]['parent_id'])) {
                 
@@ -3902,7 +3883,7 @@ class SpeciesController extends Controller
                     'project_id' => $this->getCurrentProjectId(), 
                     'parent_id' => (empty($t[0]['parent_id']) ? $pId : $t[0]['parent_id']), 
                     'rank_id' => $rankId, 
-                    'is_hybrid' => isset($taxon['hybrid']) && $this->canRankBeHybrid($rankId) ? 1 : 0
+                    'is_hybrid' => isset($taxon['hybrid']) && $taxon['hybrid']===true && $this->canRankBeHybrid($rankId) ? 1 : 0
                 ));
                 
 

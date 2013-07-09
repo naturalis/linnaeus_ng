@@ -13,6 +13,7 @@
         {if $isHigherTaxa}
             {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
         {/if}
+        <a href="#" onclick="$('tr[isHigher=1]').css('visibility',$('tr[isHigher=1]').css('visibility')=='collapse' ? 'visible' : 'collapse');">Toggle higher taxa</a> | 
         <a href="#" onclick="$('[class=indent-dots]').css('display',$('[class=indent-dots]').css('display')=='none' ? 'inline' : 'none');">Toggle indentation</a>
     </p>
     
@@ -25,14 +26,12 @@
             <th style="width:60px;">{t}Literature{/t}</th>
             <th style="width:60px;">{t}Synonyms{/t}</th>
             <th style="width:90px;">{t}Common names{/t}</th>
-            {*<th style="width:20px;text-align:center">{t}Delete{/t}</th>*}
             <th>{t}Is being edited by{/t}</th>
         </tr>
 	</thead>
 	<tbody>
 	{foreach from=$taxa item=taxon key=k}
-	{if (!$isHigherTaxa && $taxon.lower_taxon==1) || ($isHigherTaxa && $taxon.lower_taxon==0)}
-		<tr class="tr-highlight" type="drag-row" drag-id="{$taxon.id}">
+		<tr class="tr-highlight" {if $taxon.lower_taxon==0} style="visibility:collapse" isHigher="1"{/if} type="drag-row" drag-id="{$taxon.id}">
 			<td style="text-align:left;cursor:move">
 	            <span class="indent-dots" style="display:none">{' . '|str_repeat:$taxon.depth}</span>
             	<a href="edit.php?id={$taxon.id}">{$taxon.taxon_formatted}</a>
@@ -60,7 +59,6 @@
 			</td>*}
 			<td id="usage-{$taxon.id}"></td>
         </tr>
-	{/if}
     {/foreach}
 	</tbody>
     </table>
