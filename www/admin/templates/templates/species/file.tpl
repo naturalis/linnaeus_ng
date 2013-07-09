@@ -89,7 +89,11 @@ The contents of the file will be displayed so you can review them before they ar
 		<li>{t}Hybrid ('y'; optional){/t}</li>
 {/if}
 		</ol>
+{if $session.admin.project.includes_hybrids==1}
 		{t}in that order. The first two are mandatory. {/t}
+{else}
+		{t}in that order. Both are mandatory. {/t}
+{/if}
 {if $session.admin.project.includes_hybrids==1}
 		{t}Other values for the field 'Hybrid' than 'y' are ignored.{/t}
 {/if}		
