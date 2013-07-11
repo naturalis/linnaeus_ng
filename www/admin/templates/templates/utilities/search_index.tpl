@@ -1,12 +1,22 @@
 {include file="../shared/admin-header.tpl"}
 
-<div id="page-main">
-	<form id="theForm" method="post" action="" onsubmit="return searchDoSearchForm()" >
-	<p>
-		<!-- fieldset><legend>{t}Find{/t}</legend -->
+<form id="theForm" method="post" action="" -onsubmit="return searchDoSearchForm()" >
+
+FULL TEXT, so: <a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-stopwords.html">lots of words are ignored</a><br /> and
+<a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-fine-tuning.html">min length = 4 </a>
+
+<div class="page-generic-div">
+    <p>
         {t}Search for:{/t} <input type="text" id="search" name="search" value="{$search.search|@escape}" />
-		<i>{t}Enclose multiple words with double quotes (") to search for the literal string.{/t}</i>
-	</p>
+        <i>{t}Enclose multiple words with double quotes (") to search for the literal string.{/t}</i>
+    </p>
+</div>
+
+{include file="../shared/admin-messages.tpl"}
+
+
+
+<div id="page-main">
     <p>
         {t}In modules:{/t}<br />
         {foreach from=$modules.modules item=v}
@@ -27,7 +37,7 @@
         {foreach from=$modules.freeModules item=v}
         <label><input type="checkbox" name="freeModules[{$v.id}]" value="{$v.id}" {if $search.freeModules[$v.id]==$v.id || $search.modules==null}checked="checked"{/if} />{t}{$v.module}{/t}</label><br />
         {/foreach}
-		<!-- /fieldset -->
+
 	</p>
 	{*<p>
 	<fieldset>

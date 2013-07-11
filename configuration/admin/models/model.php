@@ -767,6 +767,7 @@ abstract class Model extends BaseClass
 		$where = isset($params['where']) ? $params['where'] : false;
 
         $query = false;
+		
         
         if (!$id && !$where) return;
 	
@@ -775,6 +776,8 @@ abstract class Model extends BaseClass
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
             
             foreach ((array) $id as $col => $val) {
+				
+				$match = false;
                 
                 if (strpos($col, ' ') === false) {
                     
@@ -798,12 +801,23 @@ abstract class Model extends BaseClass
 
 	            	$d = $this->columns[$col];
 
-				} else {
+				} else
+				if (stripos(trim($col),'match')===0) {  // match(col) against ('val' [in boolean mode])
+
+	            	$match = true;
+
+				} 
+				else {
 
 					continue;
 
 				}
 
+				if ($match) {
+
+                    $query .= " and " . $col . " " . $val;
+
+				} else
 				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
                 if (substr($operator,-1) == '#') {
 

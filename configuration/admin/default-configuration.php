@@ -627,9 +627,11 @@ class configuration
     {
 
 		return array(
-			'excerptLengthLeft' => 100,
-			'excerptLengthRight' => 100,
-			'minSearchLength' => 2
+			'excerptPreMatchLength' => 25,
+			'excerptPostMatchLength' => 25,
+			'minSearchLength' => 4,
+			'maxSearchLength' => 50,
+			'excerptPrePostMatchString' => '...'
 		);
 
     }
