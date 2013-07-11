@@ -767,6 +767,7 @@ abstract class Model extends BaseClass
 		$where = isset($params['where']) ? $params['where'] : false;
 
         $query = false;
+		
         
         if (!$id && !$where) return;
 	
@@ -775,6 +776,8 @@ abstract class Model extends BaseClass
             $query = 'select ' . (!$cols ? '*' : $cols) . ' from ' . $this->tableName . ' where 1=1 ';
             
             foreach ((array) $id as $col => $val) {
+				
+				$match = false;
                 
                 if (strpos($col, ' ') === false) {
                     
@@ -798,12 +801,23 @@ abstract class Model extends BaseClass
 
 	            	$d = $this->columns[$col];
 
-				} else {
+				} else
+				if (stripos(trim($col),'match')===0) {  // match(col) against ('val' [in boolean mode])
+
+	            	$match = true;
+
+				} 
+				else {
 
 					continue;
 
 				}
 
+				if ($match) {
+
+                    $query .= " and " . $col . " " . $val;
+
+				} else
 				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
                 if (substr($operator,-1) == '#') {
 
@@ -838,7 +852,7 @@ abstract class Model extends BaseClass
             }
 
             $query .= $group ? " group by " . $group : '';
-            
+
             $query .= $order ? " order by " . $order : '';
 
             $query .= $limit ? " limit " . $limit : '';
@@ -971,7 +985,7 @@ abstract class Model extends BaseClass
 
     public function freeQuery($params)
     {
-    
+
         if (is_array($params)) {
     
             $query = isset($params['query']) ? $params['query'] : null;
@@ -983,7 +997,7 @@ abstract class Model extends BaseClass
             $fieldAsIndex = false;
     
         }
-    
+
         if (empty($query)) {
             	
             $this->log('Called freeQuery with an empty query',1);
@@ -1002,7 +1016,7 @@ abstract class Model extends BaseClass
         unset($this->data);
     
         while($row=@mysql_fetch_assoc($set)){
-    
+
             if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
                 	
                 $this->data[$row[$fieldAsIndex]]=$row;
@@ -1014,7 +1028,7 @@ abstract class Model extends BaseClass
             }
     
         }
-    
+
         return isset($this->data) ? $this->data : null;
     
     }
