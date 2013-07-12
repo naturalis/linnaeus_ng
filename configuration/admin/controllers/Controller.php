@@ -960,10 +960,15 @@ class Controller extends BaseClass
 		
 		if (isset($params['order']))
 			$p['order'] = $params['order'];
+
+		if (isset($params['ignore']))
+			$p['ignore'] = $params['ignore'];
 		
 		$modules = $this->models->ModuleProject->_get($p);
 		
 		foreach ((array) $modules as $key => $val) {
+			
+			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
 			
 			$mp = $this->models->Module->_get(array(
 				'id' => $val['module_id']

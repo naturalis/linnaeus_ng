@@ -768,6 +768,8 @@ abstract class Model extends BaseClass
 
         $query = false;
 		
+		if ($fieldAsIndex!=false && $cols!=false && $cols!='*' && stripos(','.$cols.',',','.$fieldAsIndex.',')===false)
+			$cols .= ','.$fieldAsIndex;
         
         if (!$id && !$where) return;
 	
@@ -777,7 +779,7 @@ abstract class Model extends BaseClass
             
             foreach ((array) $id as $col => $val) {
 				
-				$match = false;
+				$colLiteral	= false;
                 
                 if (strpos($col, ' ') === false) {
                     
@@ -802,9 +804,9 @@ abstract class Model extends BaseClass
 	            	$d = $this->columns[$col];
 
 				} else
-				if (stripos(trim($col),'match')===0) {  // match(col) against ('val' [in boolean mode])
+				if (strtolower(trim($col))=='%literal%') {
 
-	            	$match = true;
+	            	$colLiteral = true;
 
 				} 
 				else {
@@ -813,9 +815,9 @@ abstract class Model extends BaseClass
 
 				}
 
-				if ($match) {
+				if ($colLiteral) {
 
-                    $query .= " and " . $col . " " . $val;
+                    $query .= " and " . $val;
 
 				} else
 				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"

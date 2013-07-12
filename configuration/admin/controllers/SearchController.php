@@ -2,7 +2,12 @@
 
 /*
 
-STRIP TAGS AND SHIT FROM SEARCH STRING!!!
+we are now doing LIKE instead of MATCH (as MATCH ignores wildcards at the beginning: *olar only matches olar, not polar)  - do the same limitations still apply? think not.
+
+
+WE WILL NOT SEARCH THE MATRIX!
+
+STRIP TAGS AND SHIT FROM SEARCH STRING!!! (als0 + and - and * which fuck up the fulltext)
 
 
 	search is case-insensitive! 
@@ -107,6 +112,644 @@ class SearchController extends Controller
         parent::__destruct();
     
     }
+
+
+	private function doSearch($search,$modules,$freeModules)
+	{
+
+		q($search);
+		
+		$tokenized = $this->tokenizeSearchString($search);
+		//$fulltext = $this->prefabFullTextMatchString($tokenized);
+		$liketxt = $this->prefabFullTextLikeString($tokenized);
+		$containsLiterals = $this->doesSearchStringContainLiterals($tokenized);
+
+		$p = array(
+			S_TOKENIZED_TERMS => $tokenized,
+			//S_FULLTEXT_STRING => $fulltext,
+			S_LIKETEXT_STRING => $liketxt,
+			S_CONTAINS_LITERALS => $containsLiterals,
+			S_IS_CASE_SENSITIVE => false,
+			S_RESULT_LIMIT_PER_CAT => 200,
+			S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
+		);
+
+		$results =
+			array(
+				'content' => 
+					(is_array($modules) && in_array('content',$modules) ? $this->searchContent($p) : null),
+				'map' => 
+					(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap($p) : null),
+				'matrixkey' => 
+					(is_array($modules) && in_array('matrixkey',$modules) ? $this->searchMatrixKey($p) : null), // stub
+				'dichkey' => 
+					(is_array($modules) && in_array('key',$modules) ? $this->searchDichotomousKey($p) : null),
+				'literature' => 
+					(is_array($modules) && in_array('literature',$modules) ? $this->searchLiterature($p) : null),
+				'glossary' =>
+					(is_array($modules) && in_array('glossary',$modules) ? $this->searchGlossary($p) : null),
+				'introduction' =>
+					(is_array($modules) && in_array('introduction',$modules) ? $this->searchIntroduction($p) : null),
+				'species' => 
+					(is_array($modules) && in_array('species',$modules) ? $this->searchSpecies($p) : null),
+				'modules' => 
+					$this->searchModules($p,$freeModules)	
+			);
+		
+		$totalcount = 0;
+		
+		foreach((array)$results as $val)
+			$totalcount += $val['numOfResults'];
+		
+		echo '<h2>'.$totalcount.'</h2>';
+		
+		return $results;
+
+	}
+
+
+
+	private function searchSpecies($p)
+	{
+		
+		// taxa
+		$taxa = $this->models->Taxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(taxon) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('taxon'))
+				),
+				'columns' => 'id,taxon as label,rank_id,is_hybrid,taxon as '.__CONCAT_RESULT__ ,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$taxa = $this->filterResultsWithTokenizedSearch(array($p,$taxa));
+		$taxa = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$taxa));
+
+		$ranks = $this->newGetProjectRanks();
+
+		foreach((array)$taxa as $key => $val)  {
+			$taxa[$key]['label'] = $this->formatTaxon(array('taxon' => $val['label'],'rank_id' => $val['rank_id'],'is_hybrid' => $val['is_hybrid']),$ranks);
+			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
+		}
+
+
+
+		// taxon content
+		$content = $this->models->ContentTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('content')),
+					'publish' => 1
+				),
+				'columns' => 'id,taxon_id,content,page_id,content as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
+		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+
+
+		// synonyms
+		$synonyms = $this->models->Synonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(synonym) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('synonym')),
+				),
+				'columns' => 'id,taxon_id,synonym as label,synonym as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$synonyms = $this->filterResultsWithTokenizedSearch(array($p,$synonyms));
+		$synonyms = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonyms));
+
+
+
+		// common names
+		$commonnames = $this->models->Commonname->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(commonname,transliteration) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('commonname','transliteration')),
+				),
+				'columns' => 'id,language_id,taxon_id,commonname,transliteration,concat(ifnull(commonname,\'\'),\' \',ifnull(transliteration,\'\')) as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);	
+
+		$commonnames = $this->filterResultsWithTokenizedSearch(array($p,$commonnames,array('commonname','transliteration')));
+
+		foreach((array)$commonnames as $key => $val) {
+			
+			$commonnames[$key]['label'] = 
+				(!empty($val['transliteration']) ?
+					($val['transliteration']).
+					(!empty($val['commonname']) ? 
+						' '.sprintf($this->translate('(transliteration of "%s")'),$val['commonname']) :
+						'') :
+					$val['commonname']
+				);
+
+		}
+
+		$commonnames = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false));
+
+
+
+		// media
+		$media = $this->models->MediaDescriptionsTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(description) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('description')),
+				),
+				'columns' => 'id,media_id,description as content,description as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+		$media = $this->filterResultsWithTokenizedSearch(array($p,$media));
+		$media = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$media));
+
+		$d = $this->models->MediaTaxon->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns' => 'taxon_id,file_name',
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+		foreach((array)$media as $key => $val) {
+
+			$media[$key]['taxon_id'] = $d[$val['media_id']]['taxon_id'];
+			$media[$key]['label'] = $d[$val['media_id']]['file_name'];
+
+		}
+
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'url' => '../species/edit.php?id=%s',
+					'data' => $taxa,
+					'numOfResults' => count((array)$taxa)
+				),
+				array(
+					'label' => $this->translate('Species descriptions'),
+					'url' => '../species/taxon.php?id=%s&page=%s',
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				),
+				array(
+					'label' => $this->translate('Species synonyms'),
+					'url' => '../species/synonyms.php?id=%s',
+					'data' => $synonyms,
+					'numOfResults' => count((array)$synonyms)
+				),
+				array(
+					'label' => $this->translate('Species common names'),
+					'url' => '../species/common.php?id=%s',
+					'data' => $commonnames,
+					'numOfResults' => count((array)$commonnames)
+				),
+				array(
+					'label' => $this->translate('Species media'),
+					'url' => '../species/media.php?id=%s',
+					'data' => $media,
+					'numOfResults' => count((array)$media)
+				),
+			),
+			'numOfResults' => count((array)$taxa)+count((array)$content)+count((array)$synonyms)+count((array)$commonnames)+count((array)$media)
+		);
+
+	}
+
+
+	private function searchIntroduction($p)
+	{
+
+		$content = $this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('topic','content')),
+				),
+				'columns' => 'id,topic as label,content,content as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
+		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Introduction'),
+					'url' =>'../introduction/edit.php?id=%s',
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				)
+			),
+			'numOfResults' => count((array)$content)
+		);
+
+	}
+	
+
+	private function searchGlossary($p)
+	{
+
+		// glossary items
+		$gloss = $this->models->Glossary->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(term,definition) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('term','definition')),
+				),
+				'columns' => 'id,term as label,definition as content,concat(ifnull(term,\'\'),\' \',ifnull(definition,\'\')) as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$gloss = $this->filterResultsWithTokenizedSearch(array($p,$gloss));
+		$gloss = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$gloss));
+
+
+
+		// glossary synonyms
+		$synonym = $this->models->GlossarySynonym->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(synonym) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('synonym')),
+				),
+				'columns' => 'id,glossary_id,synonym,language_id,synonym as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$synonym = $this->filterResultsWithTokenizedSearch(array($p,$synonym));
+		$synonym = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonym));
+
+ 
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Items'),
+					'url' =>'../glossary/edit.php?id=%s',
+					'data' => $gloss,
+					'numOfResults' => count((array)$gloss)
+				),
+				array(
+					'label' => $this->translate('Synonyms'),
+					'url' =>'../glossary/edit.php?id=%s',
+					'data' => $synonym,
+					'numOfResults' => count((array)$synonym)
+				)
+			),
+			'numOfResults' => count((array)$gloss)+count((array)$synonym)
+		);
+
+	}
+
+
+	private function searchLiterature($p)
+	{
+
+		$c = 'id,
+					concat(
+						author_first,
+						(
+							if(multiple_authors=1,
+								\' et al.\',
+								if(author_second!=\'\',concat(\' & \',author_second),\'\')
+							)
+						),
+						\', \',
+						if(isnull(`year`)!=1,`year`,\'\'),
+						if(isnull(suffix)!=1,suffix,\'\'),
+						if(isnull(year_2)!=1,
+							concat(
+								if(year_separator!=\'-\',
+									concat(
+										\' \',
+										year_separator,
+										\' \'
+									),
+									year_separator
+								),
+								year_2,
+								if(isnull(suffix_2)!=1,
+									suffix_2,
+									\'\')
+								)
+								,\'\'
+							)
+					) as label,
+					text as content,
+					concat(ifnull(text,\'\'),\' \',ifnull(author_first,\'\'),\' \',ifnull(author_second,\'\'),\' \',ifnull(year,\'\'),\' \',ifnull(year_2,\'\')) as '.__CONCAT_RESULT__;
+
+		// literature
+		$books = $this->models->Literature->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(text) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('text')),
+				),
+				'columns' => $c,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT],
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+
+
+		// literature by year (numbers, cannot be full text indexed)
+		$more = $this->models->Literature->_get(
+			array(
+				'where' => 
+					"project_id = ".$this->getCurrentProjectId()."
+					and (year like '%".implode("%' or year like '%",$p[S_TOKENIZED_TERMS])."%')",
+				'columns' => $c,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT],
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+		foreach((array)$books as $key => $val)
+			if (isset($more[$key])) unset($more[$key]);
+
+		$books = array_merge((array)$books,(array)$more); // and resets the keys as well. how neat.
+		$books = $this->filterResultsWithTokenizedSearch(array($p,$books));
+
+		$books = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$books));
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Literature'),
+					'url' => '../literature/edit.php?id=%s',
+					'data' => $books,
+					'numOfResults' => count((array)$books)
+				)
+			),
+			'numOfResults' => count((array)$books)
+		);
+
+	}
+
+
+	private function searchDichotomousKey($p)
+	{
+
+		$keysteps = $this->models->Keystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'columns' => 'number',
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+
+		// choices
+		$choices = $this->models->ChoiceContentKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(choice_txt) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('choice_txt')),
+				),
+				'columns' => 'id,choice_id,choice_txt as content,choice_txt as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+ 		$choices = $this->filterResultsWithTokenizedSearch(array($p,$choices));
+		$choices = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$choices));
+
+		foreach((array)$choices as $key => $val) {
+
+			$step = $this->models->ChoiceKeystep->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['choice_id'],
+					),
+					'columns' => 'keystep_id,show_order'
+				)
+			);
+
+			$choices[$key]['label'] = sprintf($this->translate('Step %s, choice %s'),$keysteps[$step[0]['keystep_id']]['number'],$step[0]['show_order']);
+
+		}
+
+
+
+		// steps
+		$steps = $this->models->ContentKeystep->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(title,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('title','content')),
+				),
+				'columns' => 'id,keystep_id,title as label,content,concat(ifnull(title,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__
+			)
+		);
+
+		$steps = $this->filterResultsWithTokenizedSearch(array($p,$steps));
+		$steps = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$steps));
+
+		foreach((array)$steps as $key => $val)
+			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['keystep_id']]['number']);
+
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Steps'),
+					'url' =>'../key/step_show.php?id=%s',
+					'data' => $steps,
+					'numOfResults' => count((array)$steps)
+				),
+				array(
+					'label' => $this->translate('Choices'),
+					'url' =>'../key/choice_edit.php?id=%s',
+					'data' => $choices,
+					'numOfResults' => count((array)$choices)
+				)
+			),
+			'numOfResults' => count((array)$choices)+count((array)$steps)
+		);
+
+	}
+
+
+	private function searchMatrixKey($p)
+	{
+		// DENIED!!
+		return null;
+
+	}
+
+
+	private function searchMap($p)
+	{
+
+		// data types
+		$titles = $this->models->GeodataTypeTitle->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(title) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('title')),
+				),
+				'columns' => 'id,title as label,title as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$titles = $this->filterResultsWithTokenizedSearch(array($p,$titles));
+		$titles = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$titles));
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Datatypes'),
+					'url' => '../mapkey/data_types.php',
+					'data' => $titles,
+					'numOfResults' => count((array)$titles)
+				),
+			),
+			'numOfResults' => count((array)$titles)
+		);
+
+	}
+
+
+	private function searchContent($p)
+	{
+
+		// content
+		$content = $this->models->Content->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					//'%LITERAL%' => "MATCH(subject,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('subject','content')),
+				),
+				'columns' => 'id,subject as label,content,language_id,concat(ifnull(subject,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+
+		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
+		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+
+		return array(
+			'results' => array(
+				array(
+					'label' => $this->translate('Navigator'),
+					'url' => '../content/content.phpid=%s',
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				),
+			),
+			'numOfResults' => count((array)$content)
+		);
+
+	}
+
+
+	private function searchModules($p,$freeModules=null)
+	{
+
+		if ($freeModules!==false)
+			$d['module_id in']  = implode(',',$freeModules).')';					
+		else
+			return null;
+
+		$d['project_id'] = $this->getCurrentProjectId();	
+
+		// get appropriate free modules
+		$modules = $this->models->FreeModuleProject->_get(
+			array(
+				'id' => $d,
+				'columns' => 'id,module',
+				'fieldAsIndex' => 'id'
+			)
+		);
+
+
+		$content = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'module_id in' => '('.implode(',',$freeModules).')',
+					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('topic','content')),
+				),
+				'columns' => 'page_id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__,
+				'order' => 'module_id'
+			)
+		);
+
+		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
+		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+		
+		$r = array();
+		
+		foreach((array)$content as $val) {
+			$m = $modules[$val['module_id']]['module'];
+			if (isset($r[$m]) && count((array)$r[$m])>=$p[S_RESULT_LIMIT_PER_CAT]) continue;
+			$r[$m][] = $val;
+		}
+		
+		$content = array();
+		$t = 0;
+		
+		foreach((array)$r as $key => $val) {
+			
+			$content[] = array(
+				'label' => $key,
+				'url' => '../module/edit.php?id=%s',
+				'data' => $val,
+				'numOfResults' => count((array)$val)
+			);
+
+			$t += count((array)$val);
+			
+		}
+		
+		return array(
+			'results' => $content,
+			'numOfResults' => $t
+		);
+
+	}
+	
+
+
 	
 	
 	private function validateSearchString($s)
@@ -162,8 +805,19 @@ class SearchController extends Controller
 		$r = '';
 		foreach((array)$s as $val) {
 			foreach(explode(' ',$val) as $b)
-				$r .= '*'.$b.'* ';
+				$r .= 	$b.'* ';
 		}
+		return trim($r);
+	}
+
+
+	private function prefabFullTextLikeString($s)
+	{
+		array_walk($s,function(&$n){$n=str_replace(array("'","%","_"),array("\'","\%","\_"),$n);});
+		
+		// make tokens into a single string for mysql LIKE statement; add ### to replace with column name
+		$r = "(".S_LIKETEXT_REPLACEMENT." like '%".implode("%' or ".S_LIKETEXT_REPLACEMENT." like '%",$s)."%')";
+
 		return trim($r);
 	}
 
@@ -177,6 +831,7 @@ class SearchController extends Controller
 		return false;
 	}
 
+
 	private function stripTagsForSearchExcerpt($s)
 	{
 		// replace <br> and ends of block elements with spaces to avoid words being concatenated
@@ -187,9 +842,17 @@ class SearchController extends Controller
 	private function filterResultsWithTokenizedSearch($p)
 	{
 
+		//OVERRIDE: the use of LIKE rather than MATCH make the post-filtering in PHP superfluous (i think)
+		foreach((array)$p[1] as $key => $val) {
+			if (isset($p[1][$key][__CONCAT_RESULT__])) unset($p[1][$key][__CONCAT_RESULT__]);
+		}
+		return $p[1];		
+		//OVERRIDE
+
+		
 		/*
 			$p[0] : array of search parameters:
-				$s[S_TOKENIZED_SEARCH]	: array of tokens
+				$s[S_TOKENIZED_TERMS]	: array of tokens
 				$s[S_FULLTEXT_STRING]	: string for fulltext search (not used in this function)
 				$s[S_CONTAINS_LITERALS]	: boolean, indicates the presence of literal token(s) ("aa bb")
 			$p[1] : array of results
@@ -199,23 +862,31 @@ class SearchController extends Controller
 		$s = isset($p[0]) ? $p[0] : null;
 		$r = isset($p[1]) ? $p[1] : null;
 
-		if (!isset($s) || !isset($s[S_CONTAINS_LITERALS]) || !isset($s[S_TOKENIZED_SEARCH]) ||$s[S_CONTAINS_LITERALS]==false) return $r;
+		if (!isset($s) || !isset($s[S_CONTAINS_LITERALS]) || !isset($s[S_TOKENIZED_TERMS]) ||$s[S_CONTAINS_LITERALS]==false) return $r;
+		
+		// really shouldn't happen but just in case someone should forget to add the __CONCAT_RESULT__ field in the query
+		if (isset($r[0][__CONCAT_RESULT__]))
+			$concatField = __CONCAT_RESULT__;
+		else
+			$concatField = 'content';
+			
 
 		if ($s[S_CONTAINS_LITERALS]) {
 			
 			$filtered = array();
 
 			// loop all results
-			foreach((array)$r as $result) {
+			foreach((array)$r as $key => $result) {
 
-				if (!isset($result[__CONCAT_RESULT__])) continue;
+				if (!isset($result[$concatField])) continue;
+			
 
-				$d = $this->stripTagsForSearchExcerpt($result[__CONCAT_RESULT__]);
+				$d = $this->stripTagsForSearchExcerpt($result[$concatField]);
 				
 				$match = false;
 
 				// loop through all tokens
-				foreach((array)$s[S_TOKENIZED_SEARCH] as $token) {
+				foreach((array)$s[S_TOKENIZED_TERMS] as $token) {
 
 					if ($match==true) break;
 
@@ -225,7 +896,10 @@ class SearchController extends Controller
 				}
 				
 				if ($match) {
-					unset($result[__CONCAT_RESULT__]);
+					if ($concatField== __CONCAT_RESULT__)
+						unset($result[__CONCAT_RESULT__]);
+					else
+						$result['warning'] = 'you forgot to add __CONCAT_RESULT__ to your query! these results based on matches in the assumed \'content\' column.';
 					array_push($filtered,$result);
 				}
 
@@ -244,14 +918,17 @@ class SearchController extends Controller
 	private function getExcerptsSurroundingMatches($p)
 	{
 
-		$s = isset($p[0]) ? $p[0] : null;
-		$r = isset($p[1]) ? $p[1] : null;
-		$f = isset($p[2]) ? $p[2] : array('label','content');
-		
-		if (!isset($s) || !isset($s[S_TOKENIZED_SEARCH]) ) return $r;
+		$s = isset($p['param']) ? $p['param'] : null;						// search parameters
+		$r = isset($p['results']) ? $p['results'] : null;					// results array
+		$f = isset($p['fields']) ? $p['fields'] : array('label','content');	// fields to match
+		$x = isset($p['excerpt']) ? $p['excerpt'] : array('content');		// fields to excerpted (rather than return completely)
+
+		if (!is_array($x)) $x = array(); // for when called with 'excerpt' => false (excerpt none of the fields)
+
+		if (!isset($s) || !isset($s[S_TOKENIZED_TERMS]) ) return $r;
 
 		foreach((array)$r as $rKey => $result) {
-
+			
 			foreach((array)$f as $fKey => $field) {
 
 				$fullmatches = array();
@@ -260,7 +937,7 @@ class SearchController extends Controller
 
 					$stripped = $this->stripTagsForSearchExcerpt($result[$field]);
 
-					foreach((array)$s[S_TOKENIZED_SEARCH] as $token) {
+					foreach((array)$s[S_TOKENIZED_TERMS] as $token) {
 
 						$matches=array();
 						preg_match_all('/'.$token.'/'.($s[S_IS_CASE_SENSITIVE] ? '' : 'i'),$stripped,$matches,PREG_OFFSET_CAPTURE);
@@ -276,16 +953,30 @@ class SearchController extends Controller
 					}
 
 					foreach((array)$fullmatches as $match) {
-						$start = ($match[1] < $this->_excerptPreMatchLength ? 0 : ($match[1] - $this->_excerptPreMatchLength));
-						$length = strlen($match[0]) + $this->_excerptPostMatchLength;
-						$excerpt = 
-							($match[1]>0 ? $this->_excerptPrePostMatchString : '').
-							substr($stripped,$start,$this->_excerptPreMatchLength).
-							'<span class="searchResultMatch">'.$match[0].'</span>'.
-							substr($stripped,$match[1]+strlen($match[0]),$this->_excerptPostMatchLength).
-							($match[1]+strlen($match[0])+$this->_excerptPostMatchLength<strlen($stripped) ? $this->_excerptPrePostMatchString : '');
-						$r[$rKey]['excerpts'][]=$excerpt;
+
+						if (in_array($field,$x)) {
+
+							$start = ($match[1] < $this->_excerptPreMatchLength ? 0 : ($match[1] - $this->_excerptPreMatchLength));
+							$r[$rKey]['matches'][]= 
+								($match[1]>0 ? $this->_excerptPrePostMatchString : '').
+								substr($stripped,$start,($match[1]-$start)).
+								'<span class="searchResultMatch">'.$match[0].'</span>'.
+								substr($stripped,$match[1]+strlen($match[0]),$this->_excerptPostMatchLength).
+								($match[1]+strlen($match[0])+$this->_excerptPostMatchLength<strlen($stripped) ? $this->_excerptPrePostMatchString : '');
+
+						} else {
+
+							$r[$rKey]['matches'][]= 
+								substr($stripped,0,$match[1]).
+								'<span class="searchResultMatch">'.$match[0].'</span>'.
+								substr($stripped,$match[1]+strlen($match[0]));
+
+						}
+
 					}
+
+					if ($s[S_UNSET_ORIGINAL_CONTENT] && in_array($field,$x))
+						unset($r[$rKey][$field]);
 				
 				}
 			
@@ -297,287 +988,23 @@ class SearchController extends Controller
 
 
 	}
-
-
-
-
-	private function highlightMatches($p)
-	{
-
-		$s = isset($p[0]) ? $p[0] : null;
-		$r = isset($p[1]) ? $p[1] : null;
-		$f = isset($p[2]) ? $p[2] : array('label','content');
-
-		return $r;
-
-	}
-
-
-
-
-	private function doSearch($search,$modules,$freeModules)
-	{
-		
-		$tokenized = $this->tokenizeSearchString($search);
-		$fulltext = $this->prefabFullTextMatchString($tokenized);
-		$containsLiterals = $this->doesSearchStringContainLiterals($tokenized);
-
-		$p = array(
-			S_TOKENIZED_SEARCH => $tokenized,
-			S_FULLTEXT_STRING => $fulltext,
-			S_CONTAINS_LITERALS => $containsLiterals,
-			S_IS_CASE_SENSITIVE => false,
-			S_RESULT_LIMIT_PER_CAT => 125 // performance tweak. this is per category - might be made dependable on the (number of) modules selected
-		);
-
-		// species first, as the results are needed for knowing what to look for in the map
-		if (is_array($modules) && (in_array('species',$modules) || in_array('mapkey',$modules)))
-			$species = $this->searchSpecies($p); 
-		else
-			$species = null;
-
-		return array(
-			'introduction' =>
-null,//				(is_array($modules) && in_array('introduction',$modules) ? $this->searchIntroduction($tokenized) : null),
-			'glossary' =>
-null,//				(is_array($modules) && in_array('glossary',$modules) ? $this->searchGlossary($tokenized) : null),
-			'literature' => 
-null,//				(is_array($modules) && in_array('literature',$modules) ? $this->searchLiterature($tokenized) : null),
-			'species' => 
-				$species,
-			'dichkey' => 
-null,//				(is_array($modules) && in_array('key',$modules) ? $this->searchDichotomousKey($tokenized) : null),
-			'matrixkey' => 
-null,//				(is_array($modules) && in_array('matrixkey',$modules) ? $this->searchMatrixKey($tokenized) : null),
-			'map' => 
-null,//				(is_array($modules) && in_array('mapkey',$modules) ? $this->searchMap($tokenized,$species['taxonList']) : null),
-			'content' => 
-null,//				(is_array($modules) && in_array('content',$modules) ? $this->searchContent($tokenized) : null),
-			'modules' => 
-null,//				$this->searchModules($search,$freeModules)	
-		);
-
-	}
-
-
-
-	private function searchSpecies($p)
-	{
-
-		// taxa
-		$taxa = $this->models->Taxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'MATCH(taxon)' => "AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
-				),
-				'columns' => 'id,taxon as label,rank_id,is_hybrid,taxon as '.__CONCAT_RESULT__ ,
-				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-			)
-		);
-
-		$taxa = $this->filterResultsWithTokenizedSearch(array($p,$taxa));
-		$taxa = $this->highlightMatches(array($p,$taxa));
-
-		$ranks = $this->newGetProjectRanks();
-
-		foreach((array)$taxa as $key => $val)  {
-			$taxonList[$val['id']] = $val['label'];
-			$taxa[$key]['label'] = $this->formatTaxon(array('taxon' => $val['label'],'rank_id' => $val['rank_id'],'is_hybrid' => $val['is_hybrid']),$ranks);
-			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
-		}
-
-
-
-		// taxon content
-		$content = $this->models->ContentTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'MATCH(content)' => "AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
-					'publish' => 1
-				),
-				'columns' => 'id,taxon_id,content,page_id,content as '.__CONCAT_RESULT__,
-				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-			)
-		);
-
-		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
-		$content = $this->getExcerptsSurroundingMatches(array($p,$content));  // includes highlighting
-
-
-
-		// synonyms
-		$synonyms = $this->models->Synonym->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'MATCH(synonym)' => "AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
-				),
-				'columns' => 'id,taxon_id,synonym as label,synonym as '.__CONCAT_RESULT__,
-				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-			)
-		);
-
-		$synonyms = $this->filterResultsWithTokenizedSearch(array($p,$synonyms));
-		$synonyms = $this->highlightMatches(array($p,$synonyms));
-
-
-
-
-		// common names
-		$commonnames = $this->models->Commonname->_get(
-			array(
-				'id' => array(
-					'project_id  = '.$this->getCurrentProjectId(),
-					'MATCH(commonname,transliteration)' => "AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
-				),
-				'columns' => 'id,language_id,taxon_id,commonname,transliteration,concat(commonname,\' \',transliteration) as '.__CONCAT_RESULT__,
-				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-			)
-		);	
-
-		$commonnames = $this->filterResultsWithTokenizedSearch(array($p,$commonnames,array('commonname','transliteration')));
-
-		foreach((array)$commonnames as $key => $val) {
-			
-			$commonnames[$key]['label'] = 
-				(!empty($val['transliteration']) ?
-					!empty($val['transliteration']).
-					(!empty($val['commonname']) ? 
-						' '.sprintf($this->translate('(transliteration of "%s"'),$val['commonname']) :
-						'') :
-					$val['commonname']
-				);
-
-		}
-
-		$commonnames = $this->highlightMatches(array($p,$commonnames));
-
-
-
-		// media
-		$media = $this->models->MediaDescriptionsTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'MATCH(description)' => "AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)"
-				),
-				'columns' => 'id,media_id,description as content,description as '.__CONCAT_RESULT__,
-				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-			)
-		);
-		
-		$media = $this->filterResultsWithTokenizedSearch(array($p,$media));
-		$media = $this->getExcerptsSurroundingMatches(array($p,$media));  // includes highlighting
-
-		foreach((array)$media as $key => $val) {
-
-			$d = $this->models->MediaTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['media_id']
-					),
-					'columns' => 'id,taxon_id,file_name,taxon as '.__CONCAT_RESULT__,
-					'limit' => $p[S_RESULT_LIMIT_PER_CAT]
-				)
-			);
-
-			$media[$key]['taxon_id'] = $d[0]['taxon_id'];
-			$media[$key]['label'] = $d[0]['file_name'];
-
-		}
-
-
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
-					'url' => '../species/edit.php?id=%s',
-					'data' => $taxa,
-					'numOfResults' => count((array)$taxa)
-				),
-				array(
-					'label' => $this->translate('Species descriptions'),
-					'url' => '../species/taxon.php?id=%s&page=%s',
-					'data' => $content,
-					'numOfResults' => count((array)$content)
-				),
-				array(
-					'label' => $this->translate('Species synonyms'),
-					'url' => '../species/synonyms.php?id=%s',
-					'data' => $synonyms,
-					'numOfResults' => count((array)$synonyms)
-				),
-				array(
-					'label' => $this->translate('Species common names'),
-					'url' => '../species/common.php?id=%s',
-					'data' => $commonnames,
-					'numOfResults' => count((array)$commonnames)
-				),
-				array(
-					'label' => $this->translate('Species media'),
-					'url' => '../species/media.php?id=%s',
-					'data' => $media,
-					'numOfResults' => count((array)$media)
-				),
-			),
-			'taxonList' => $taxonList,
-			'numOfResults' => count((array)$taxa)+count((array)$content)+count((array)$synonyms)+count((array)$commonnames)+count((array)$media)
-		);
-
-	}
-
-
-
-
-	private function searchIntroduction($search=null)
-	{
-
-		$content = $this->models->ContentIntroduction->_get(
-			array(
-				'where' => 
-				"project_id = ".$this->getCurrentProjectId()." and
-					MATCH(topic, content) AGAINST ('".$search."' in boolean mode)",
-				'columns' => 'id,topic,content'
-			)
-		);
-
-q($this->models->ContentIntroduction->q());
-
-
-die('screaming');
-		$hitCount = 0;
-
-		foreach((array)$content as $key => $val)  {
-
-			$content[$key]['replace'] = array(
-				'model' => $this->models->ContentIntroduction->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $this->getColumnMatches($search,$val,array('topic','content'),$hitCount),
-				'label' => sprintf($this->translate('Page "%s"'),$val['topic'])
-			);
-			
-			$content[$key]['url'] = '../introduction/edit.php?id='.$val['id'];
-
-		}
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Introduction'),
-					'data' => $content,
-					'numOfResults' => $hitCount
-				)
-			),
-			'numOfResults' => $hitCount
-		);
-
-	}
 	
+
+	private function _s($s,$c)
+	{
+		$r=array();
+		foreach((array)$c as $v)
+			$r[] = str_replace(S_LIKETEXT_REPLACEMENT,$v,$s);
+
+		return '('.implode(' or ',$r).')';
+	}
+
+
+
+
+
 	
+			
 
 
     public function searchIndexAction ()
@@ -671,7 +1098,7 @@ die('screaming');
 			
 
 			/*
-
+-
 
 
 			$_SESSION['admin']['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
@@ -697,7 +1124,7 @@ die('screaming');
 		}
 
 		if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
-		$this->smarty->assign('modules',$this->getProjectModules());
+		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 
         $this->printPage();
@@ -1293,93 +1720,7 @@ die('screaming');
 
 	}
 
-	private function searchModules($search,$freeModules=null)
-	{
 
-		$d['project_id'] = $this->getCurrentProjectId();	
-	
-		if ($freeModules!==false)
-			$d['module_id in']  = implode(',',$freeModules).')';					
-		else
-			return null;
-
-		// get appropriate free modules
-		$modules = $this->models->FreeModuleProject->_get(
-			array(
-				'id' => $d,
-				'columns' => 'id,module',
-				'fieldAsIndex' => 'id'
-			)
-		);
-
-		// get all matching content in all appropriate free modules
-		$content = $this->models->ContentFreeModule->_get(
-			array(
-				'where' => 
-					'project_id = '.$this->getCurrentProjectId().' and
-					(topic regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
-					content regexp \''.$this->makeRegExpCompatSearchString($search).'\')'.
-					($freeModules!==false ? ' and module_id in ('.implode(',',$freeModules).')' : ''),
-				'columns' => 'id,page_id,module_id,topic,content',
-				'order' => 'module_id'
-			)
-		);
-		
-		$hitCountTot = array();
-		$hitCountTotTot = $resultCountTot = 0;
-
-		foreach((array)$content as $key => $val) {
-
-			$matches = $this->getColumnMatches($search,$val,array('topic','content'));
-
-			if (!is_null($matches)) {
-
-				$val['replace'] = array(
-					'model' => $this->models->ContentFreeModule->getClassName(),
-					'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-					'matches' => $matches,
-					'label' => sprintf($this->translate('Page "%s"'),$val['topic'])
-				);
-				
-				$val['url'] = '../module/edit.php?id='.$val['page_id'];
-				
-				$hitCountTot[$modules[$val['module_id']]['module']] = 
-					(isset($hitCountTot[$modules[$val['module_id']]['module']]) ? $hitCountTot[$modules[$val['module_id']]['module']] : 0) + 
-					count((array)$matches);
-					
-				$hitCountTotTot = $hitCountTotTot + count((array)$matches);
-
-			}
-		
-			$resultCountTot++;
-
-			$results[$modules[$val['module_id']]['module']][] = $val;
-
-		}
-
-		$r = null;
-
-		if (isset($results)) {
-
-			foreach ($results as $key => $val)
-
-				 $r[] = array(
-					'label' => $key, 
-					'data' => $val, 
-					'numOfResults' => count((array)$val), 
-					'numOfReplacements' => $hitCountTot[$key]
-				);
-
-		}
-
-		return array(
-			'results' => isset($r) ? $r : null,
-			'numOfResults' => $resultCountTot,
-			'numOfReplacements' => $hitCountTotTot
-		);
-
-	}
-	
 	private function getModuleLookupList($search)
 	{
 	
@@ -1410,364 +1751,6 @@ die('screaming');
 	
 	}	
 
-	private function searchMatrixKey($search)
-	{
-
-		$hitCountMatrices = $hitCountChars = $hitCountStates = 0;
-
-		$matrices = $this->models->MatrixName->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'name regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,matrix_id,name'
-			)
-		);
-
-		foreach((array)$matrices as $key => $val) {
-
-			$matrices[$key]['replace'] = array(
-				'model' => $this->models->MatrixName->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('name'),$hitCountMatrices),
-				'label' => sprintf($this->translate('Matrix "%s"'),$val['name'])
-			);
-			
-			$matrices[$key]['url'] = '../matrixkey/matrix.php?id='.$val['matrix_id'];
-
-		}
-
-		$characteristics = $this->models->CharacteristicLabel->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'label regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,characteristic_id,label'
-			)
-		);
-
-		foreach((array)$characteristics as $key => $val) {
-
-			$characteristics[$key]['replace'] = array(
-				'model' => $this->models->CharacteristicLabel->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('label'),$hitCountChars),
-				'label' => sprintf($this->translate('Character "%s"'),$val['label'])
-			);
-			
-			$characteristics[$key]['url'] = '../matrixkey/char.php?id='.$val['characteristic_id'];
-
-			$cm = $this->models->CharacteristicMatrix->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $val['characteristic_id'],
-					),
-					'columns' => 'matrix_id'
-				)
-			);
-
-			$characteristics[$key]['matrices'] = $cm;
-		
-		}
-
-
-		$states = $this->models->CharacteristicLabelState->_get(
-			array(
-				'where' => 
-					'project_id = '.$this->getCurrentProjectId().' and 
-					(label regexp \''.$this->makeRegExpCompatSearchString($search).'\' or
-					text regexp \''.$this->makeRegExpCompatSearchString($search).'\')',
-				'columns' => 'id,state_id,label,text'
-			)
-		);
-
-		foreach((array)$states as $key => $val) {
-
-			$states[$key]['replace'] = array(
-				'model' => $this->models->CharacteristicLabelState->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('label','text'),$hitCountStates),
-				'label' => sprintf($this->translate('State "%s"'),$val['label'])
-			);
-			
-			$cs = $this->models->CharacteristicState->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['state_id'],
-					),
-					'columns' => 'characteristic_id'
-				)
-			);
-
-			$states[$key]['url'] = '../matrixkey/state.php?char='.$cs[0]['characteristic_id'].'&id='.$val['state_id'];
-
-			$cl = $this->models->CharacteristicLabel->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $cs[0]['characteristic_id']
-					),
-					'columns' => 'label'
-				)
-			);
-			
-			$states[$key]['characteristic'] = $cl[0]['label'];
-
-			$cm = $this->models->CharacteristicMatrix->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'characteristic_id' => $cs[0]['characteristic_id']
-					),
-					'columns' => 'matrix_id'
-				)
-			);
-			
-			$states[$key]['matrices'] = $cm;
-
-		}
-
-
-		$matrixNames = $this->models->MatrixName->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-				),
-				'columns' => 'matrix_id,name',
-				'fieldAsIndex' => 'matrix_id'
-			)
-		);
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Matrix key matrices'),
-					'data' => $matrices,
-					'numOfResults' => $hitCountMatrices
-				),
-				array(
-					'label' => $this->translate('Matrix key characters'),
-					'data' => $characteristics,
-					'numOfResults' => $hitCountChars
-				),
-				array(
-					'label' => $this->translate('Matrix key states'),
-					'data' => $states,
-					'numOfResults' => $hitCountStates
-				)
-			),
-			'numOfResults' => $hitCountMatrices+$hitCountChars+$hitCountStates,
-			'matrices' => $matrixNames,
-		);
-
-	}
-
-	private function searchDichotomousKey($search)
-	{
-
-		$hitCountSteps = $hitCountChoices = 0;
-		
-		$choices = $this->models->ChoiceContentKeystep->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'choice_txt regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,choice_id,choice_txt as content,choice_txt'
-			)
-		);
-
-		foreach((array)$choices as $key => $val) {
-
-			$choices[$key]['replace'] = array(
-				'model' => $this->models->ChoiceContentKeystep->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('choice_txt'),$hitCountChoices),
-				'label' => '"'.substr($val['content'],0,25).'..."'
-			);
-
-			$step = $this->models->ChoiceKeystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['choice_id'],
-					),
-					'columns' => 'keystep_id,show_order'
-				)
-			);
-
-			if ($step) {
-
-				$choices[$key]['url'] = '../key/step_show.php?id='.$step[0]['keystep_id'];
-
-				$ck = $this->models->ContentKeystep->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'keystep_id' => $step[0]['keystep_id']
-						),
-						'columns' => 'keystep_id,title,content'
-					)
-				);
-
-				$choices[$key]['title'] = $ck[0]['title'];
-				//$choices[$key]['marker'] = $this->showOrderToMarker($step[0]['show_order']);
-
-				$step = $this->models->Keystep->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							'id' => $step[0]['keystep_id']
-						),
-						'columns' => 'number'
-					)
-				);
-
-				$choices[$key]['number'] = $step[0]['number'];
-
-			}
-		
-		}
-
-
-		$steps = $this->models->ContentKeystep->_get(
-			array(
-				'where' => 
-					'project_id = '. $this->getCurrentProjectId().' and
-					(title regexp \''. $this->makeRegExpCompatSearchString($search).'\' or
-					content regexp \''. $this->makeRegExpCompatSearchString($search).'\')',
-				'columns' => 'id,keystep_id,title,content'
-			)
-		);
-
-		foreach((array)$steps as $key => $val) {
-
-			$steps[$key]['replace'] = array(
-				'model' => $this->models->ContentKeystep->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('title','content'),$hitCountSteps)
-			);
-			
-			$steps[$key]['url'] = '../key/step_show.php?id='.$val['keystep_id'];
-
-			$step = $this->models->Keystep->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['keystep_id']
-					),
-					'columns' => 'number'
-				)
-			);
-
-			$steps[$key]['number'] = $step[0]['number'];
-			$steps[$key]['replace']['label'] =sprintf($this->translate('Step %s'),$step[0]['number']);
-
-		}
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Dichotomous key') . ' ' . $this->translate('steps'),
-					'data' => $steps,
-					'numOfResults' => $hitCountSteps
-				),
-				array(
-					'label' => $this->translate('Dichotomous key') . ' ' . $this->translate('choices'),
-					'data' => $choices,
-					'numOfResults' => $hitCountChoices
-				)
-			),
-			'numOfResults' => $hitCountSteps+$hitCountChoices
-		);
-
-	}
-
-	private function searchLiterature($search,$extensive=true)
-	{
-
-		/*
-		$books = $this->models->Literature->_get(
-			array(
-				'where' => 
-					'project_id = '.$this->getCurrentProjectId().'
-					and (
-						author_first regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						author_second regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						year regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\' '.
-						($extensive ? 'or text regexp \''.$this->models->Literature->escapeString($this->makeRegExpCompatSearchString($search)).'\'' : '').
-						')',
-				'columns' => 
-					'id,author_first,
-					concat(year(`year`),ifnull(suffix,\'\')) as year,
-					text as content,
-					concat(
-						author_first,
-						(
-							if(multiple_authors=1,
-								\' et al.\',
-								if(author_second!=\'\',concat(\' & \',author_second),\'\')
-							)
-						)
-					) as author_full',
-			)
-		);
-		*/
-		
-		$books = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'text regexp ' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 
-					'id,author_first,
-					concat(year(`year`),ifnull(suffix,\'\')) as year,
-					text,
-					concat(
-						author_first,
-						(
-							if(multiple_authors=1,
-								\' et al.\',
-								if(author_second!=\'\',concat(\' & \',author_second),\'\')
-							)
-						)
-					) as author_full',
-			)
-		);
-		
-		$hitCount = 0;
-		
-		foreach((array)$books as $key => $val) {
-
-			$books[$key]['replace'] = array(
-				'model' => $this->models->Literature->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('text','author_full'),$hitCount),
-				'label' => $val['author_full'].' '.$val['year']
-			);
-			
-			$books[$key]['url'] = '../literature/edit.php?id='.$val['id'];
-
-		}
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Literary references'),
-					'data' => $books,
-					'numOfResults' => $hitCount
-				)
-			),
-			'numOfResults' => $hitCount
-		);
-
-	}
-	
 	private function getLiteratureLookupList($search)
 	{
 	
@@ -1798,142 +1781,7 @@ die('screaming');
 	
 	}
 
-	private function searchGlossary($search,$extensive=true)
-	{
 
-		$replaceCountGloss = $replaceCountSynonym = 0;
-
-		$gloss = $this->models->Glossary->_get(
-			array(
-				'where' =>
-					'project_id = '.$this->getCurrentProjectId().' and
-					(
-						term regexp \''.$this->makeRegExpCompatSearchString($search).'\''.
-						($extensive ? 'or definition regexp \''.$this->makeRegExpCompatSearchString($search).'\'' : '').	
-					')'
-				,
-				'columns' => 'id,term,definition'
-			)
-		);
-		
-		$hitCountGloss = $hitCountSynonym = 0;
-
-		foreach((array)$gloss as $key => $val) {
-		
-			$gloss[$key]['replace'] = array(
-				'model' => $this->models->Glossary->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('term','definition'),$hitCountGloss),
-				'label' => sprintf($this->translate('Term "%s"'),$val['term'])
-			);
-
-			$gloss[$key]['url'] = '../glossary/edit.php?id='.$val['id'];
-			
-		}
-
-		$synonyms = $this->models->GlossarySynonym->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					//'language_id' => $this->getCurrentLanguageId(), 
-					'synonym regexp' => $this->makeRegExpCompatSearchString($search)
-				),
-				'columns' => 'id,glossary_id,synonym,language_id'
-			)
-		);
-
-		foreach((array)$synonyms as $key => $val) {
-		
-			$g = $this->models->Glossary->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'id' => $val['glossary_id']
-					),
-					'columns' => 'id,term'
-				)
-			);
-	
-			$synonyms[$key]['synonym'] = $g[0]['term'];
-
-			$synonyms[$key]['replace'] = array(
-				'model' => $this->models->GlossarySynonym->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('synonym'),$hitCountSynonym),
-				'label' => sprintf($this->translate('Synonym "%s"'),$val['synonym'])
-			);
-
-			$synonyms[$key]['url'] = '../glossary/edit.php?id='.$g[0]['id'];
-
-		}
-
-		/*
-
-		if ($extensive) {
-
-			$media = $this->models->GlossaryMedia->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'file_name regexp' => $this->makeRegExpCompatSearchString($search)
-					),
-					'columns' => 'glossary_id as id,file_name as label'
-				)
-			);
-	
-			foreach((array)$media as $key => $val) {
-			
-				$g = $this->models->Glossary->_get(
-					array(
-						'id' => array(
-							'project_id' => $this->getCurrentProjectId(),
-							//'language_id' => $this->getCurrentLanguageId(), 
-							'id' => $val['id']
-						),
-						'columns' => 'term'
-					)
-				);
-		
-				if (isset($g)) {
-	
-					$d[$key] = $val;
-					$d[$key]['term'] = $g[0]['term'];
-	
-				}
-	
-			}
-			
-		}
-
-		$media = isset($d) ? $d : null;
-		
-		*/
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Glossary terms'),
-					'data' => $gloss,
-					'numOfResults' => $hitCountGloss
-				),
-				array(
-					'label' => $this->translate('Glossary synonyms'),
-					'data' => $synonyms,
-					'numOfResults' => $hitCountSynonym
-				)
-				/*					,
-				array(
-					'label' => $this->translate('Glossary media'),
-					'data' => $media,
-					'numOfResults' => count((array)$media)
-				)
-				*/
-			),
-			'numOfResults' => $hitCountGloss  + $hitCountSynonym
-		);
-
-	}
-	
 	private function getGlossaryLookupList($search)
 	{
 
@@ -1961,128 +1809,6 @@ die('screaming');
 		}
 		
 		return $d;
-
-	}
-
-	private function searchContent($search)
-	{
-
-		$content = $this->models->Content->_get(
-			array(
-				'where' =>
-					'project_id = '. $this->getCurrentProjectId().' and
-					(
-						subject regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\' or
-						content regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\'
-					)',
-				'columns' => 'id,subject,content,language_id'
-			)
-
-		);
-		
-		$hitCount = 0;
-
-		foreach((array)$content as $key => $val) {
-
-			$content[$key]['replace'] = array(
-				'model' => $this->models->Content->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('subject','content'),$hitCount),
-				'label' => sprintf($this->translate('Page "%s"'),$val['subject'])
-			);
-			
-			$content[$key]['url'] = '../content/content.php?id='.$val['id'];
-
-		}
-
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Navigator'),
-					'data' => $content,
-					'numOfResults' => $hitCount
-				)
-			),
-			'numOfResults' =>$hitCount
-		);
-
-	}
-
-	private function searchMap($search,$taxonList)
-	{
-
-		$titles = $this->models->GeodataTypeTitle->_get(
-			array(
-				'where' =>
-					'project_id = '. $this->getCurrentProjectId().' and
-					title regexp \''.$this->models->Content->escapeString($this->makeRegExpCompatSearchString($search)).'\'',
-				'columns' => 'id,title'
-			)
-		);
-
-		$hitCountOccurrences = $hitCountTypes = 0;
-		
-		foreach((array)$titles as $key => $val) {
-
-			$titles[$key]['replace'] = array(
-				'model' => $this->models->GeodataTypeTitle->getClassName(),
-				'id' => array('project_id' => $this->getCurrentProjectId(),'id' => $val['id']),
-				'matches' => $this->getColumnMatches($search,$val,array('title'),$hitCountTypes),
-				'label' => sprintf($this->translate('Datatype "%s"'),$val['title'])
-			);
-
-			$titles[$key]['url'] =  '../mapkey/data_types.php';
-
-		}
-
-
-		$d = $this->models->OccurrenceTaxon->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId()
-				),
-				'columns' => 'distinct taxon_id'
-			)
-		);
-		
-		$occurrences = array();
-		
-		foreach((array)$d as $key => $val) {
-
-			if (isset($taxonList[$val['taxon_id']])) {
-			
-				$val['taxon'] = $taxonList[$val['taxon_id']];
-			
-				$occurrences[$key]['replace'] = array(
-					'model' => $this->models->GeodataTypeTitle->getClassName(),
-					'id' => null,
-					'matches' => $this->getColumnMatches($search,$val,array('taxon'),$hitCountOccurrences),
-					'label' => $val['taxon']
-				);
-
-				$occurrences[$key]['url'] =  '../mapkey/species.php?id='.$val['taxon_id'];
-
-			}
-
-		}		
-		
-		return array(
-			'results' => array(
-				array(
-					'label' => $this->translate('Distribution datatype'),
-					'data' => $titles,
-					'numOfResults' => $hitCountTypes
-				),
-				array(
-					'label' => $this->translate('Distribution'),
-					'data' => $occurrences,
-					'numOfResults' => $hitCountOccurrences,
-					'canReplace' => false
-				),
-			),
-			'numOfResults' => $hitCountTypes+$hitCountOccurrences,
-			'numOfReplacements' => $hitCountTypes
-		);
 
 	}
 
@@ -2269,11 +1995,14 @@ die('screaming');
 	private function initialize()
 	{
 
-		define('S_TOKENIZED_SEARCH',0);
+		define('S_TOKENIZED_TERMS',0);
 		define('S_FULLTEXT_STRING',1);
 		define('S_CONTAINS_LITERALS',2);
 		define('S_IS_CASE_SENSITIVE',3);
 		define('S_RESULT_LIMIT_PER_CAT',4);
+		define('S_LIKETEXT_STRING',5);
+		define('S_UNSET_ORIGINAL_CONTENT',6);
+		define('S_LIKETEXT_REPLACEMENT','###');
 		
 		define('__CONCAT_RESULT__','__CONCAT_RESULT__');
 
