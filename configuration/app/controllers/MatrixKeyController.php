@@ -150,7 +150,7 @@ class MatrixKeyController extends Controller
     {
 
         $this->checkMatrixIdOverride();
-        
+
         $matrix = $this->getCurrentMatrix();
 
         if (!isset($matrix)) {
@@ -172,16 +172,23 @@ class MatrixKeyController extends Controller
 			
 			$groups = $this->getCharacterGroups();
 
-			$d = array();
+			$activeChars = array();
 
             foreach ((array) $states as $val)
-                $d[$val['characteristic_id']] = true;
-
-//			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
+                $activeChars[$val['characteristic_id']] = true;
 
 			$countPerState = $this->getRemainingStateCount(array(
 				'states' => $states
 			));
+
+			$menu = $this->getGUIMenu(
+					array(
+						'groups'=>$groups,
+						'characters'=>$characters,
+						'appendExcluded'=>false,
+						'checkImages'=>true
+					)
+				);
 
             $this->smarty->assign('taxaJSON', json_encode(
             array(
@@ -191,32 +198,15 @@ class MatrixKeyController extends Controller
                     'results' => count((array) $taxa),
                 ),
 				'menu' => array(
-					'groups' => $groups,
-					'activeChars' => $d,
+					'groups' => $menu,
+					'activeChars' => $activeChars,
 					'storedStates' => $states
 				),
 				'countPerState' => $countPerState
             ),JSON_HEX_APOS | JSON_HEX_QUOT));
 
-            foreach ((array) $states as $val)
-                $d[$val['characteristic_id']] = true;
-            
-            if (isset($d))
-                $this->smarty->assign('activeChars', $d);
+            $this->smarty->assign('guiMenu',$menu);
 
-			$this->smarty->assign('storedStates', $states);
-            $this->smarty->assign('groups',$groups);
-            $this->smarty->assign('guiMenu',
-				$this->getGUIMenu(
-					array(
-						'groups'=>$groups,
-						'characters'=>$characters,
-						'appendExcluded'=>false,
-						'checkImages'=>true
-					)
-				)
-			);
-						
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
@@ -236,6 +226,8 @@ class MatrixKeyController extends Controller
 					'url' => $this->getSetting('source_url')
 				)
 			);
+			
+
 
 			
         }
@@ -795,8 +787,6 @@ class MatrixKeyController extends Controller
         return count((array) $m);
     }
 
-
-
     private function getMatrix ($id)
     {
         if (!isset($id))
@@ -806,8 +796,6 @@ class MatrixKeyController extends Controller
         
         return isset($m[$id]) ? $m[$id] : null;
     }
-
-
 
     private function getMatricesInMatrix ()
     {
@@ -2742,6 +2730,11 @@ class MatrixKeyController extends Controller
         $g = isset($p['groups']) ? $p['groups'] : null;
         $c = isset($p['characters']) ? $p['characters'] : null;
 
+		if (is_null($g) || is_null($c))
+			return;
+
+        $appendExcluded = (isset($p['appendExcluded']) ? $p['appendExcluded'] : false);
+
 		if ($checkImages) {
 
 			foreach((array)$c as $key => $val) {
@@ -2765,16 +2758,10 @@ class MatrixKeyController extends Controller
 			'order' => 'show_order'
 		));
 
-        $appendExcluded = isset($p['appendExcluded']) ? $p['appendExcluded'] : false;
-	
-		if (is_null($g) || is_null($c))
-			return;
-
 		foreach ((array) $c as $val)
 			$d[$val['id']] = $val;
 
 		$c = $d;
-		
 		$d = array();
 		$i=0;		
 
@@ -2791,11 +2778,12 @@ class MatrixKeyController extends Controller
 			$d[$i]['icon'] = '__menu'.preg_replace('/\W/','',ucwords($d[$i]['label'])).'.png';
 			if ($checkImages)
 				$d[$i]['icon_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$d[$i]['icon']);
+			$d[$i]['type'] = $val['ref_type'];
 			$i++;
 		}
 
 		if ($appendExcluded) {
-	
+
 			// append the items for some reason missing from the menu-order
 			foreach((array)$c as $val)
 				$d[] = $val;
@@ -2805,7 +2793,7 @@ class MatrixKeyController extends Controller
 
 		}
 
-		return $d;		
+		return $d;
 		
 	}
 

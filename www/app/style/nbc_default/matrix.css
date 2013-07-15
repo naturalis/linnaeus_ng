@@ -18,8 +18,8 @@
 #facet-categories-menu ul li a {font-weight:bold;color:#333;}
 #facet-categories-menu ul li a:hover {color:#000;}
 
-#facet-categories-menu ul li.inner {padding:4px 0px 4px 10px;margin-bottom: 0px;background-color:#F9C777;border-bottom:1px solid #F9A555;}
 #facet-categories-menu ul li.inner {padding:4px 0px 4px 10px;margin-bottom: 0px;background-color:#fff;border-bottom:1px solid #F9A555;}
+#facet-categories-menu ul li.ungrouped {padding:4px 0px 4px 0px;}
 
 
 #facet-categories-menu ul li.last {border-bottom:1px solid #F9C777;}

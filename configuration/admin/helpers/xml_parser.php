@@ -61,7 +61,7 @@ class XmlParser
 			while ($d->read() && $d->name !== $this->_nodeName);
 			
 			while ($d->name === $this->_nodeName) {
-
+				
 				$fixedNode = $this->fixNode($d->readOuterXML());
 
 				libxml_use_internal_errors(true);
@@ -73,13 +73,9 @@ class XmlParser
 					echo '<p><b>XML-parser failed</b></p><p>simplexml_load_string() returned the following error:<br/>';
 
 						foreach(libxml_get_errors() as $error)
-							echo '- '.$error->message.'<br />';
-						
-						$boom = explode(chr(10),$fixedNode);
-
-						echo 'at column '.$error->column.' in the line:<br /><pre>'.$boom[$error->line-1].'</pre></p>';
+							echo '&#149; "'.$error->message.'" in line '.$error->line.' at column '.$error->column.'<br />';
 					
-						die('(abnormal program termination)');
+					die('</p><p>(abnormal program termination)</p>');
 				
 				} else {
 				
