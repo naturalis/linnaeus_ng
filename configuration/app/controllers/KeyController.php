@@ -484,10 +484,10 @@ class KeyController extends Controller
 		$d = $this->getKeystep($id);
 
 
-		if (!isset($this->_tempList[$step['id']])) {
-			$this->_tempList[$step['id']] = true;
+		if (!isset($this->_tempList[$d['id']])) {
+			$this->_tempList[$d['id']] = true;
 		} else {
-			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$step['id']));
+			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$d['id']));
 			return null;
 		}
 	
