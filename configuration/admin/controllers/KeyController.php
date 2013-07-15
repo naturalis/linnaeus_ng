@@ -2131,7 +2131,14 @@ class KeyController extends Controller
             
             $step = $this->getKeystep($id);
         }
-        
+
+		if (!isset($this->_tempList[$step['id']])) {
+			$this->_tempList[$step['id']] = true;
+		} else {
+			$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$step['id']));
+			return null;
+		}
+
         $step = array(
             'id' => $step['id'], 
             'number' => $step['number'], 
@@ -2163,8 +2170,13 @@ class KeyController extends Controller
 
     private function saveKeyTree ()
     {
+		
+		unset($this->_tempList);
+
         $tree = $this->generateKeyTree();
-        
+
+		unset($this->_tempList);
+
         if ($tree) {
             
             $_SESSION['admin']['system']['keyTreeV2'] = $tree;

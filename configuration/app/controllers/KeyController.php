@@ -7,6 +7,7 @@ class KeyController extends Controller
 
     private $_taxaStepList;
 	private $_choiceList = array();
+    private $_tempList = array();
 	public $currentKeyStepId;
 
     public $usedModels = array(
@@ -186,9 +187,21 @@ class KeyController extends Controller
    
     private function setStepType ($choices)
     {
+		/*
+		
+			this type overrides the type set in the settings (l2 or lng)
+			and decides on how to display the key based on the actual available
+			values.
+			index_l2_txt: text choices based on the name and text of the step 
+						  and choices
+			index_l2_pct: l2 picture key, clickable pictures without *any* text, 
+						  even if there is some
+		
+		*/
+		
         
         $type = 'index_l2_pct';
-        
+     	$hasImages=false;   
         foreach ((array)$choices as $choice) {
             
             if (empty($choice['choice_image_params'])) {
@@ -196,10 +209,16 @@ class KeyController extends Controller
                 $type = 'index_l2_txt';
                 break;
             }
-            
+			
+			$hasImages = $hasImages or !is_null($choice['choice_img']);
+
         }
         
-        if ($type == 'index_l2_pct') return $type;
+        if ($type == 'index_l2_pct') {
+			// overrides if there aren't any images -> probably imported without media
+			if (!$hasImages) return 'index_l2_txt';
+			return $type;
+		}
         
         if (count((array)$choices) > 4) return null;
         
@@ -290,7 +309,11 @@ class KeyController extends Controller
 		// if it doesn't exist, generate it anew (shouldn't happen!)
 		if (empty($kt[0]['keytree'])) {
 
+			unset($this->_tempList);
+	
 			$d = $this->generateKeyTree();
+	
+			unset($this->_tempList);
 		
 		}
 		// store tree in session
@@ -459,7 +482,15 @@ class KeyController extends Controller
 		}
 		
 		$d = $this->getKeystep($id);
-		
+
+
+		if (!isset($this->_tempList[$step['id']])) {
+			$this->_tempList[$step['id']] = true;
+		} else {
+			//$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$step['id']));
+			return null;
+		}
+	
 		$step = 
 			array(
 				'id' => $d['id'],

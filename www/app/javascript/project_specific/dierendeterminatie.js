@@ -609,15 +609,58 @@ function nbcBuildGroupMenu(data) {
 		var v = data.groups[i];
 		var openGroup = false;
 
-		var s = 
-			'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
-			'<ul id="character-group-'+v.id+'" class="hidden">';			
+		if (v.type=='group') {
 
-		for (var j in v.chars) {
+			var s = 
+				'<li id="character-item-'+v.id+'" class="closed"><a href="#" onclick="nbcToggleGroup('+v.id+');return false;">'+v.label+'</a></li>'+
+				'<ul id="character-group-'+v.id+'" class="hidden">';			
+	
+			for (var j in v.chars) {
+	
+				var c = data.groups[i].chars[j];
+	
+				s = s + '<li class="inner'+(j==(v.chars.length-1) ? ' last' : '')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
+				
+				if (data.activeChars[c.id]) {
+					openGroup = true;
+					s = s + '<span>';
+					for (k in data.storedStates) {
+						var state = data.storedStates[k];
+						if (state.characteristic_id==c.id) {
+							var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
+							s = s + 
+								'<div class="facetValueHolder">'+
+									(state.value ? state.value+' ' : '')+
+									(state.label ? state.label+' ' : '')+
+									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
+									'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
+									'<img src="'+nbcImageRoot+'clearSelection.gif">'+
+									'</a>'+
+								'</div>';
+	
+						}
+					}
+					
+					s = s + '</span>';
+	
+				}
+	
+				s = s  +'</li>';
+	
+			}
+	
+			s = s  +'</ul>';
+			
+			if (openGroup)
+				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+					
+			d.push(s);
 
-			var c = data.groups[i].chars[j];
+		} else {
+			
+			var c = v;
 
-			s = s + '<li class="inner'+(j==(v.chars.length-1) ? ' last' : '')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
+			s = '<li class="inner ungrouped last"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
 			
 			if (data.activeChars[c.id]) {
 				openGroup = true;
@@ -644,19 +687,16 @@ function nbcBuildGroupMenu(data) {
 			}
 
 			s = s  +'</li>';
+			
+			d.push(s);
+
 
 		}
 
-		s = s  +'</ul>';
-		
-		if (openGroup)
-			s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
-				
-		d.push(s);
 	}
 	
 	$('#facet-categories-menu').html('<ul>'+d.join('\n')+'</ul>');
-
+	
 }
 
 
