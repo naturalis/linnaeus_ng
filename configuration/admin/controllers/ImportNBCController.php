@@ -1366,7 +1366,7 @@ class ImportNBCController extends Controller
 			} else {
 
 				// taxon does not exist, but maybe it's another matrix
-				$d = $this->models->MatrixNames->_get(array('id' =>
+				$d = $this->models->MatrixName->_get(array('id' =>
 					array(
 						'project_id' => $this->getNewProjectId(), 
 						'language_id' => $this->getNewDefaultLanguageId(), 

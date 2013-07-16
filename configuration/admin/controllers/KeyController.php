@@ -2135,7 +2135,8 @@ class KeyController extends Controller
 		if (!isset($this->_tempList[$step['id']])) {
 			$this->_tempList[$step['id']] = true;
 		} else {
-			$this->addError(sprintf($this->translate('Prevented loop in generateKeyTree for step #%s'),$step['id']));
+			$this->addError(sprintf($this->translate('possible loop detected: %s &rarr; id %s'),$this->tmp,$step['id']));
+			$this->tmp=null;
 			return null;
 		}
 
@@ -2160,8 +2161,11 @@ class KeyController extends Controller
             
             $step['choices'][$key] = $d;
             
-            if ($val['res_keystep_id'])
+            if ($val['res_keystep_id']) {
+				$this->tmp =  $step['number'].$d['choice_marker'];
+				//$this->addMessage($step['number'].$d['choice_marker'].' &rarr; '.$val['res_keystep_id']);
                 $step['choices'][$key]['step'] = $this->generateKeyTree($val['res_keystep_id'], ($level + 1));
+			}
         }
         
         return isset($step) ? $step : null;
