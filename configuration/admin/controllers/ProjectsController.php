@@ -75,28 +75,7 @@ class ProjectsController extends Controller
     {
         parent::__construct();
 
-		foreach((array)$this->_availableProjectSettings as $key=>$val) {
-			
-			$this->_availableProjectSettings[$key][2] = 
-				preg_replace_callback(
-					'/\%(.*)\%/',
-					function($m)
-					{
-						switch ($m[1]) {
-							case 'MEDIA_DIR' : 
-								return $_SESSION['admin']['project']['urls']['project_media'];
-								break;
-							case 'ID' : 
-								return $_SESSION['admin']['project']['id'];
-								break;
-							default:
-								return $m[1];
-						}	
-					},
-					$val[2]);
-
-	    }
-
+		$this->initialize();
 
 	}
 
@@ -1329,4 +1308,30 @@ class ProjectsController extends Controller
 			array_map('unlink', glob($cachePath.'/*'));
 		
     }	
+
+	private function initialize()
+	{
+
+		foreach((array)$this->_availableProjectSettings as $key=>$val) {
+			
+			$this->_availableProjectSettings[$key][2] = 
+				preg_replace_callback(
+					'/\%(.*)\%/',
+					function($m)
+					{
+						switch ($m[1]) {
+							case 'MEDIA_DIR' : 
+								return $_SESSION['admin']['project']['urls']['project_media'];
+								break;
+							case 'ID' : 
+								return $_SESSION['admin']['project']['id'];
+								break;
+							default:
+								return $m[1];
+						}	
+					},
+					$val[2]);
+	    }
+		
+	}
 }

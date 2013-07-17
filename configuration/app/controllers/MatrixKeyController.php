@@ -1882,6 +1882,16 @@ class MatrixKeyController extends Controller
 
 		$sciName = strip_tags(($type == 't' ? $val['l'] : (isset($val['taxon']) && !is_array($val['taxon']) ? $val['taxon'] : (isset($val['taxon']['taxon']) ? $val['taxon']['taxon'] : null))));
 
+		if (isset($nbc['url_external_page'])) {
+			if (preg_match('/^(https?|ftps?):\/\//i',trim($nbc['url_external_page']['value']))===1)
+				$urlExternalPage = $nbc['url_external_page']['value'];
+			else
+				$urlExternalPage = $this->_externalSpeciesUrlPrefix.$nbc['url_external_page']['value'];
+		} else {
+			$urlExternalPage = null;
+		}
+
+
         $d = array(
             'i' => $val['id'], 
             'l' => trim(strip_tags($label)), 
@@ -1892,7 +1902,7 @@ class MatrixKeyController extends Controller
             'n' => isset($nbc['url_image']), 
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
-            'u' => isset($nbc['url_external_page']) ? $this->_externalSpeciesUrlPrefix.$nbc['url_external_page']['value'] : null, 
+            'u' => $urlExternalPage, 
 			'v' => $this->_externalSpeciesUrlTarget,  // default _blank
             'r' => count((array) $related), 
             'h' => $highlight, 
