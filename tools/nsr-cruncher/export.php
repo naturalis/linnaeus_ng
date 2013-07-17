@@ -1,7 +1,57 @@
 <?php
 
 
-die('nsr data file cruncher dies at line 3');
+	ini_set('max_execution_time',900);
+
+	mysql_connect('localhost','nsr','nsr') or die(mysql_error());
+	mysql_select_db('nsr_import') or die(mysql_error());
+	mysql_query('SET NAMES utf8');
+	mysql_query('SET CHARACTER SET utf8');
+/*
+
+"4c5640cf-750c-4f15-9a95-1be7edef02ee","regnum"
+"e2e25d70-d625-4ddb-aa47-e23adaace8b1","phylum"
+"a49b7478-2239-4b01-97a9-36e592dc7b67","classis"
+"9531366a-9755-4099-baf9-e0e9d8243988","subclassis"
+"c61dbd3b-2bd7-416b-bf57-4ccb2ddb5a84","ordo"
+"2ddf3454-a922-4949-9999-85bab260bde7","familia"
+"f0ee48f5-d4fc-456d-8ca3-5ba418a6abad","genus"
+"8b5a42d6-dee7-45b7-860b-bf19d89aaf63","subfamilia"
+"39870865-7291-4133-9d34-1e2585500b35","superfamilia"
+"4349df69-6c75-4632-acd7-1bf4c4ff8aa3","subordo"
+"bed1b752-56e7-48d7-93f4-54252551e768","subgenus"
+
+"b7808c0e-725c-4bf7-a2a5-e4d2de262e12","species"
+"60a38a8c-cdcb-42a4-8d8a-b9b4d86e75d6","subspecies"
+"d2e448f8-cbeb-4a1d-a9c1-e7f525f521ae","varietas"
+"f484a72a-b3e8-47c6-be60-1955150b88d9","forma"
+"09f76bd2-30d9-4109-bb12-c8111225b6c1","forma_specialis"
+"5e7f7365-3622-4599-87ff-59388d0333ab","cultivar"
+
+*/
+
+	$ranks = array(
+		"b7808c0e-725c-4bf7-a2a5-e4d2de262e12",
+		"60a38a8c-cdcb-42a4-8d8a-b9b4d86e75d6",
+		"d2e448f8-cbeb-4a1d-a9c1-e7f525f521ae",
+		"f484a72a-b3e8-47c6-be60-1955150b88d9",
+		"09f76bd2-30d9-4109-bb12-c8111225b6c1",
+		"5e7f7365-3622-4599-87ff-59388d0333ab"
+	);
+
+	$qConcepts = 'select * from nsr_taxon_concepten where hasTaxonRank_resource in ("'.implode('","',$ranks).'") limit 100';
+	
+	$sql = mysql_query($qConcepts);
+	
+	while ($row = mysql_fetch_assoc($sql)) {
+		
+		echo $row[''];
+		
+	}
+
+
+
+die('nsr exporter dies');
 
 	$fPath = 'C:\Users\mschermer\Desktop\nsr\nsr data export\\';
 
