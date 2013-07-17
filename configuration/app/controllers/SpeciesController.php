@@ -849,7 +849,7 @@ class SpeciesController extends Controller
                 'taxon_id' => $tId
             )
         ));
-        
+
         if (isset($s)) {
             
             foreach ((array) $s as $key => $val) {
