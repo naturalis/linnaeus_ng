@@ -345,6 +345,12 @@ class configuration
 							'media_name' => 'TIFF image', 
 							'media_type'  => 'image', 
 							'maxSize' => 2000000
+						  ),
+						  array(
+							'mime' => 'application/pdf', 
+							'media_name' => 'PDF document', 
+							'media_type'  => 'document', 
+							'maxSize' => 2000000
 						  )
                         ),
                     'defaultUploadMaxSize' => 50000000 //50 mb (h264!?)

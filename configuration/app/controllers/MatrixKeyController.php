@@ -14,6 +14,8 @@ class MatrixKeyController extends Controller
 	private $_matrixStateImageMaxHeight = null;
 	private $_externalSpeciesUrlTarget = '_blank';
 	private $_matrixSuppressDetails = false;
+	private $_nbcImageRoot = null;
+	private $_externalSpeciesUrlPrefix = null;
 
     public $usedModels = array(
         'matrix', 
@@ -210,7 +212,7 @@ class MatrixKeyController extends Controller
 			if ($this->_useSepCoeffAsWeight)
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
-            $this->smarty->assign('nbcImageRoot', $this->getSetting('nbc_image_root'));
+            $this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
             $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
@@ -619,9 +621,10 @@ class MatrixKeyController extends Controller
         $this->_matrixStateImageMaxHeight = $this->getSetting('matrix_state_image_max_height');
         $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
         $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
+		$this->_externalSpeciesUrlPrefix = $this->getSetting('external_species_url_prefix');
 
         if ($this->_matrixType == 'nbc') {
-			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->getSetting('nbc_image_root');
+			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->_nbcImageRoot = $this->getSetting('nbc_image_root');
         }
 
     }
@@ -1885,11 +1888,11 @@ class MatrixKeyController extends Controller
 			'c' => $common,
             'y' => $type, 
             's' => trim(strip_tags($sciName)),
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->getSetting('nbc_image_root').'noimage.gif', 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->_nbcImageRoot.'noimage.gif', 
             'n' => isset($nbc['url_image']), 
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
-            'u' => isset($nbc['url_external_page']) ? $nbc['url_external_page']['value'] : null, 
+            'u' => isset($nbc['url_external_page']) ? $this->_externalSpeciesUrlPrefix.$nbc['url_external_page']['value'] : null, 
 			'v' => $this->_externalSpeciesUrlTarget,  // default _blank
             'r' => count((array) $related), 
             'h' => $highlight, 
