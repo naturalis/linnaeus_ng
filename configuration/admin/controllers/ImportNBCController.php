@@ -347,7 +347,8 @@ class ImportNBCController extends Controller
 
         $this->setPageName($this->translate('Storing ranks, species and variations'));
 
-        if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
+//        if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
+        if ($this->rHasVal('action', 'species')) {
             
 			if ($this->rHasVal('nbcColumns'))
 				$_SESSION['admin']['system']['import']['data']['nbcColumns'] = $this->requestData['nbcColumns'];
@@ -1269,19 +1270,6 @@ class ImportNBCController extends Controller
 
     }
 
-    private function storeNbcExtra ($id, $type, $name, $value)
-    {
-        $this->models->NbcExtras->save(
-        array(
-            'id' => null, 
-            'project_id' => $this->getNewProjectId(), 
-            'ref_id' => $id, 
-            'ref_type' => $type, 
-            'name' => $name, 
-            'value' => $value
-        ));
-    }
-
 	private function resolveSimilarIdentifier($id,$lst)
 	{
 		
@@ -1365,7 +1353,7 @@ class ImportNBCController extends Controller
 			
 			} else {
 
-				// taxon does not exist, but maybe it's another matrix
+				// taxon does not exist, but maybe it's not a taxon but another matrix
 				$d = $this->models->MatrixName->_get(array('id' =>
 					array(
 						'project_id' => $this->getNewProjectId(), 
@@ -1380,6 +1368,7 @@ class ImportNBCController extends Controller
 				
 				} else {
 
+					// save new taxon
 					$this->models->Taxon->save(
 					array(
 						'id' => null, 
@@ -1393,21 +1382,38 @@ class ImportNBCController extends Controller
 					));
 					
 					$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
-					
-					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
-			
-						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
-						
-							if (!empty($cVal) && isset($val[$cKey]))
-								$this->storeNbcExtra($species[$key]['lng_id'], 'taxon', $cVal, $val[$cKey]);
-						
-						}
-						
-					}
-					
+
 				}
 
 			}
+			
+			// if it's not a matrix and if NBC-data columns have been defined, save the NBC-data
+			if ($species[$key]['is_matrix']!=true && isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+
+				$this->models->NbcExtras->delete(
+					array(
+						'project_id' => $this->getNewProjectId(), 
+						'ref_id' => $species[$key]['lng_id'], 
+						'ref_type' => 'taxon'
+					));
+				
+				foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+				
+					if (!empty($cVal) && isset($val[$cKey]))
+						$this->models->NbcExtras->save(
+							array(
+								'id' => null, 
+								'project_id' => $this->getNewProjectId(), 
+								'ref_id' => $species[$key]['lng_id'], 
+								'ref_type' => 'taxon', 
+								'name' => $cVal, 
+								'value' => $val[$cKey]
+							));
+				
+				}
+				
+			}
+
 
             $_SESSION['admin']['system']['import']['loaded']['species']++;
             
@@ -1471,13 +1477,6 @@ class ImportNBCController extends Controller
 						
 						$vId = $species[$key]['variations'][$vKey]['lng_id'] = $this->models->TaxonVariation->getNewId();
 
-						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
-						
-							if (isset($vVal[$cKey]))
-								$this->storeNbcExtra($vId, 'variation', $cVal, $vVal[$cKey]);
-						
-						}
-	
 						$this->models->VariationLabel->save(
 						array(
 							'id' => null, 
@@ -1487,6 +1486,32 @@ class ImportNBCController extends Controller
 							'label' => $vVal['variant'], 
 							'label_type' => 'alternative'
 						));						
+
+					}
+					
+					if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+
+						$this->models->NbcExtras->delete(
+							array(
+								'project_id' => $this->getNewProjectId(), 
+								'ref_id' => $vId, 
+								'ref_type' => 'variation'
+							));
+				
+						foreach((array)$_SESSION['admin']['system']['import']['data']['nbcColumns'] as $cKey => $cVal) {
+						
+							if (isset($vVal[$cKey]))
+								$this->models->NbcExtras->save(
+									array(
+										'id' => null, 
+										'project_id' => $this->getNewProjectId(), 
+										'ref_id' => $vId, 
+										'ref_type' => 'variation', 
+										'name' => $cVal, 
+										'value' => $vVal[$cKey]
+									));
+						
+						}
 
 					}
 

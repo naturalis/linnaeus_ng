@@ -61,6 +61,9 @@ class ProjectsController extends Controller
 		array('source_photocredit','[name]',null,'only implemented in certain skins'),
 		array('source_url','[url]',null,'only implemented in certain skins'),
 		array('external_species_url_target','[_self|_blank|name]','_blank','in NBC-style matrices'),
+		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
+		
+		
 	);
 
     /**
@@ -71,8 +74,31 @@ class ProjectsController extends Controller
     public function __construct ()
     {
         parent::__construct();
-    }
 
+		foreach((array)$this->_availableProjectSettings as $key=>$val) {
+			
+			$this->_availableProjectSettings[$key][2] = 
+				preg_replace_callback(
+					'/\%(.*)\%/',
+					function($m)
+					{
+						switch ($m[1]) {
+							case 'MEDIA_DIR' : 
+								return $_SESSION['admin']['project']['urls']['project_media'];
+								break;
+							case 'ID' : 
+								return $_SESSION['admin']['project']['id'];
+								break;
+							default:
+								return $m[1];
+						}	
+					},
+					$val[2]);
+
+	    }
+
+
+	}
 
 
     /**
