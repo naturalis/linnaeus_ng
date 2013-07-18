@@ -310,11 +310,13 @@ class KeyController extends Controller
 						// don't update if unchanged
                         if ($this->requestData['number'] != $step['number']) {
 
-                            $this->models->Keystep->save(
+                            $this->models->Keystep->update(
                             array(
+                                'number' => $this->requestData['number']
+                            ),
+							array(
                                 'id' => $this->requestData['id'], 
                                 'project_id' => $this->getCurrentProjectId(), 
-                                'number' => $this->requestData['number']
                             ));
                             
                             // two steps below unnecessary because of redirect
