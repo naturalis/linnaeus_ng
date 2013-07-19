@@ -4,7 +4,6 @@
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
-<!-- span id="message-container" style="float:right;"></span><br / -->
 {if $commonnames|@count==0}
 {t}No common names have been defined for this taxon.{/t}
 {else}

@@ -1,7 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<span id="message-container" style="float:right;"></span>
 <p>
 <form id="theForm" method="post" action="">
 <input type="hidden" name="rnd" value="{$rnd}" />

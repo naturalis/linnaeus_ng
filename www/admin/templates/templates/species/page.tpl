@@ -1,9 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-<span id="message-container" style="float:right;"></span><br />
-
 {t _s1=$maxCategories _s2=$pages[0].page}Each taxon page consists of one or more categories, with a maximum of %s. The first category, '%s', is mandatory.{/t}<br />
 {t}Below, you can specify the correct label of each category in the language or languages defined in your project. On the left hand side, the labels in the default language are displayed. On the right hand side, the labels in the other languages are displayed. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />
 {t}Text you enter is automatically saved when you leave the input field.{/t}

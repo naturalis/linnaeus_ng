@@ -2,10 +2,21 @@
 
 /*
 
+	L2 file crappiness
+	- replace > with >\n (new lines)
+	- make sure (add) DTD at the top
+	- change <title>Linnaeus II</title> to something appropriate
+
+	
+
+
+
 	POST-PROCESSING
 	- compact keys
 	- make Diversity index
 	- matrix char state image dimensions
+	- save Group + Group order in matrix
+	- check syn-vern-description-style synonyms + common names
 
 	change the title in the xml file to %test% and a random (yet readable) project name will be assigned.
 
@@ -66,13 +77,6 @@ Please be aware that these are six other taxa than the three mentioned earlier -
 	ignored: literary references to glossary terms
 
 	MATRIX KEY: never saw all types
-
-
-
-Common names: $taxon->vernaculars->vernacular
-Synonyms: $taxon->synonyms->synonym
-ContentTaxon: $taxon->syn_vern_description
-
 
 
 */
@@ -554,13 +558,18 @@ class ImportL2Controller extends Controller
             $this->redirect('l2_start.php');
         
         $project = $this->getProjects($this->getNewProjectId());
-        
+
         $this->setPageName(sprintf($this->translate('Additional species data for "%s"'),$project['title']));
         
         if ($this->rHasVal('process', '1') && !$this->isFormResubmit()) {
             
-            if ($this->rHasVal('taxon_overview', 'on') || $this->rHasVal('taxon_media', 'on') || $this->rHasVal('taxon_common', 'on') || $this->rHasVal('taxon_synonym', 'on')) {
-                
+            if (
+				$this->rHasVal('taxon_overview', 'on') || 
+				$this->rHasVal('taxon_media', 'on') || 
+				$this->rHasVal('taxon_common', 'on') || 
+				$this->rHasVal('taxon_synonym', 'on') || 
+				!$this->rHasVal('syn_vern_description', 'off')) {
+
                 if ($this->rHasVal('taxon_overview', 'on')) {
                     
                     $_SESSION['admin']['system']['import']['elementsToLoad']['taxon_overview'] = true;
@@ -698,9 +707,56 @@ class ImportL2Controller extends Controller
                     
                     $this->addMessage($this->storeError('Skipped synonyms.'));
                 }
-                
+				
 
+
+                if (!$this->rHasVal('syn_vern_description', 'off')) {
+
+					$_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'] = array();
+					$_SESSION['admin']['system']['import']['synVernDescription']['synonymCount'] = 
+					$_SESSION['admin']['system']['import']['synVernDescription']['commonCount'] = 0;
+                    $_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description'] = $this->requestData['syn_vern_description'];
+                    
+					$this->helpers->XmlParser->setCallbackFunction(array(
+						$this, 
+						'xmlParserCallback_SynVernDescription'
+					));
+					
+					$this->helpers->XmlParser->getNodes('taxondata');
+					
+					
+					if ($_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='synonyms') {
+	
+	                    $this->addMessage('Skipped common names from syn_vern_description.');
+	
+					} else {
+	
+	                    $this->addMessage(sprintf('Syn_vern_description: parsed %s common names.',$_SESSION['admin']['system']['import']['synVernDescription']['commonCount']));
+						foreach((array)$_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'] as $language => $count)
+							$this->addError(sprintf('Syn_vern_description: skipped common names for unknown language "%s" (%sx)',$language,$count));
+
+					}
+
+
+					if ($_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='common') {
+
+	                    $this->addMessage('Skipped synonyms from syn_vern_description.');
+
+					} else {
+
+	                    $this->addMessage(sprintf('Syn_vern_description: parsed %s synonyms.',$_SESSION['admin']['system']['import']['synVernDescription']['synonymCount']));
+					}
+
+
+                }
+                else {
+                    
+                    $this->addMessage($this->storeError('Skipped syn_vern_description.'));
+                }
+				
                 unset($_SESSION['admin']['system']['import']['elementsToLoad']);
+                unset($_SESSION['admin']['system']['import']['synVernDescription']);
+
             }
             else {
                 
@@ -711,10 +767,29 @@ class ImportL2Controller extends Controller
             }
             
             $this->smarty->assign('processed', true);
-        }
+        } else {
+
+			$_SESSION['admin']['system']['import']['hasSynVernDescription'] =
+			$_SESSION['admin']['system']['import']['hasSynonyms'] = 
+			$_SESSION['admin']['system']['import']['hasCommonNames'] = false;
+
+			$this->helpers->XmlParser->setFileName($_SESSION['admin']['system']['import']['file']['path']);
+	
+			$this->helpers->XmlParser->setCallbackFunction(array(
+				$this, 
+				'xmlParserCallback_SynVernDescriptionCheck'
+			));	
+			$this->helpers->XmlParser->getNodes('taxondata');	
+			
+			$this->smarty->assign('hasCommonNames',$_SESSION['admin']['system']['import']['hasCommonNames']);
+			$this->smarty->assign('hasSynVernDescription',$_SESSION['admin']['system']['import']['hasSynVernDescription']);
+			$this->smarty->assign('hasSynonyms',$_SESSION['admin']['system']['import']['hasSynonyms']);
+
+		}
         
         $this->printPage();
     }
+
 
 
 
@@ -1828,6 +1903,162 @@ class ImportL2Controller extends Controller
     }
 
 
+	// that lovely field called "syn_vern_description "
+    public function xmlParserCallback_SynVernDescriptionCheck ($taxon)
+    {
+		
+		if (isset($taxon->vernaculars->vernacular))
+			$_SESSION['admin']['system']['import']['hasCommonNames'] = true;
+                
+		if (isset($taxon->syn_vern_description))
+			$_SESSION['admin']['system']['import']['hasSynVernDescription'] = true;
+            
+		if (isset($taxon->synonyms->synonym))
+			$_SESSION['admin']['system']['import']['hasSynonyms'] = true;
+                
+
+    }
+
+
+    public function xmlParserCallback_SynVernDescription ($taxon)
+    {
+		
+		//$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']
+		// off / common / synonyms / both
+
+        $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
+
+        if (isset($_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id']))
+            $taxonId = $_SESSION['admin']['system']['import']['loaded']['species'][$indexName]['id'];
+		else
+			return;
+					
+		if (!isset($taxon->syn_vern_description) || $_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='off')
+			return;
+			
+		// data is split in single lines based on [br]
+        $lines = explode('[br]', $taxon->syn_vern_description);
+		
+		$synonyms = $commons = $unknownLanguages = array();
+		
+		foreach((array)$lines as $line) {
+
+			// links ([l][/l]) are removed, lines are trimmed
+			$line = trim(preg_replace(array('/(\[l\])(.*)(\[\/l\])/','/(\[p\]|\[\/p\])/'),'',$line));
+		
+			// if what remains is shorter than 10 characters, or has no spaces (single word), the line is ignored
+			if (strlen($line)<10 || strpos($line,' ')===false)
+				continue;
+
+			// if what remains starts with [b],[u],[i], the line is ignored (header) (not the ending as well: "[b]Synonymy[/b] (of subgenus Isocladius)")
+			if (preg_match('/^(\[b\]|\[u\]|\[i\])(.*)(\[\/b\]|\[\/u\]|\[\/i\])$/',$line)==1)
+				continue;
+			
+			// ignoring Type Species
+			if (stripos($line,'Type species')!==false)
+				continue;
+
+			// Common names: if they end with a valid Dutch or English language name in brackets (straight or curved) ("Dansemyg (Danish)")
+			if (preg_match('/(.*)((\(|\[)([a-zA-Z-\/]*)(\)|\]))$/',$line,$m)==1) {
+
+				$pNames = trim($m[1]);
+				$language = trim($m[4]);
+
+				$l = $this->models->Language->_get(array(
+					'id' => array(
+						'language' => $language
+					), 
+					'columns' => 'id'
+				));
+				
+				// valid language
+				if ($l[0]['id']) {
+					
+					if (strpos($pNames,';')!==false) {
+						$names = explode(';',$names);
+						foreach((array)$names as $val) {
+							$val = trim($val);
+							if (!empty($val)) $commons[] = array($l[0]['id'],$val,$language);
+						}
+					} else {
+						$commons[] = array($l[0]['id'],$pNames,$language);
+					}
+
+				} 
+				// invalid language
+				else {
+				
+					//$this->addError(sprintf($this->translate('Could not resolve language "%s" of common name(s) "%s"'),$language,$pNames));
+					$_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'][$language] = 
+						isset($_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'][$language]) ? 
+						($_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'][$language]+1) : 1;
+					
+				}
+
+			} else {
+
+				$synonyms[] = trim($line);
+				
+			}
+
+		}
+
+
+		if (
+			$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='common' ||
+			$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='both') {
+
+
+			foreach((array)$commons as $key => $val) {
+	
+				$this->models->Commonname->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'taxon_id' => $taxonId, 
+					'language_id' => $val[0],
+					'commonname' => str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val[1])
+				));
+				
+				$this->addMessage(sprintf('Added common name "%s" (%s)',$val[1],$val[2]));
+				$_SESSION['admin']['system']['import']['synVernDescription']['commonCount']++;
+				
+			}
+			
+		}
+
+		if (
+			$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='synonyms' ||
+			$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='both') {
+
+			foreach((array)$synonyms as $key => $val) {
+	
+				$res = $this->models->Synonym->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'taxon_id' => $taxonId, 
+					'synonym' => str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val),
+					'author' => null, 
+					'show_order' => $key
+				));
+				
+				$this->addMessage(sprintf('Added synonym "%s"',$val));
+				$_SESSION['admin']['system']['import']['synVernDescription']['synonymCount']++;
+	
+			}
+
+		}
+
+
+    }
+
+
+
+
+
+
+
 
     private function cleanL2Name ($taxon)
     {
@@ -2311,7 +2542,7 @@ class ImportL2Controller extends Controller
                         
                         $_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'][] = array(
                             'data' => trim((string) $taxon->name), 
-                            'cause' => 'Unknown language "' . trim((string) $vVal->language) . ' (common name "' . trim((string) $vVal->name) . '").'
+                            'cause' => 'Unknown language "' . trim((string) $vVal->language) . '" (common name "' . trim((string) $vVal->name) . '").'
                         );
                     }
                 }

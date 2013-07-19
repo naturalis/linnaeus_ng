@@ -1,30 +1,26 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-
 <p>
 	<input type="hidden" name="taxon_id" id="taxon_id" value="{$id}" />
 	<input type="button" value="{t}main page{/t}" onclick="window.open('taxon.php?id={$taxon.id}','_top')" />
 </p>
-
-
-
 {if $synonyms|@count==0}
 {t}No synonyms have been defined for this taxon.{/t}
 {else}
+<p>
 <table>
 	<tr>
-		<th style="width:350px;">{t}synonym{/t}</td>
-		<th style="width:300px;">{t}author{/t}</td>
-		<th style="width:55px;">{t}move up{/t}</td>
-		<th style="width:65px;">{t}move down{/t}</td>
-		<th>delete</td>
+		<th style="width:350px;">{t}synonym{/t}</th>
+		<th style="width:300px;">{t}author{/t}</th>
+		<th style="width:55px;">{t}move up{/t}</th>
+		<th style="width:65px;">{t}move down{/t}</th>
+		<th>delete</th>
 	</tr>
 	{section name=i loop=$synonyms}
 	<tr class="tr-highlight">
-		<td>{$synonyms[i].synonym}</td>
-		<td>{$synonyms[i].author}</td>
+		<td ondblclick="taxonSynonymEditSyn(this,{$synonyms[i].id});">{$synonyms[i].synonym}</td>
+		<td ondblclick="taxonSynonymEditAuth(this,{$synonyms[i].id});">{$synonyms[i].author}</td>
 		{if $smarty.section.i.first}
 		<td></td>
 		{else}
@@ -54,6 +50,10 @@
 	</tr>
 	{/section}
 </table>
+</p>
+<p class="instruction-text">
+Double-click a synonym or author (of the empty cell where the author should be) to edit. When editing, Enter saves the new entry, Escape cancels the edit.
+</p>
 {/if}
 <hr style="color:#eee;height:1px" />
 <form method="post" action="" id="theForm">

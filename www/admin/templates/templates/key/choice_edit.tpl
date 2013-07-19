@@ -8,8 +8,6 @@
 <input type="hidden" name="action" id="action" value="" />
 
 <span class="key-step-title">
-<span id="message-container" style="float:right;"></span><br />
-
 <fieldset>
 <legend>{t}Editing choice{/t} "<span id="default-choice-title">...</span>"</legend>
 <table style="border-collapse:collapse">

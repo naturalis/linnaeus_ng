@@ -8,3 +8,4 @@
 <a href="edit.php" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="order.php" class="allLookupLink">{t}Change page order{/t}</a>
+<span id="message-container" style="float:right"></span>

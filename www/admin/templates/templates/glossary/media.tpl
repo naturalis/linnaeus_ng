@@ -3,10 +3,6 @@
 
 {if $id}
 <div id="page-main">
-
-<span style="float:right">
-	<span id="message-container" style="margin-right:0px">&nbsp;</span>
-</span>
 <p>
 <form id="theForm" method="post">
 	<input type="hidden" name="gloss_id" id="gloss_id" value="{$id}" />
