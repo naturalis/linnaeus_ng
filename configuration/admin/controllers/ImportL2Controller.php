@@ -1440,7 +1440,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function addCustomModule ($module, $data)
     {
         
@@ -1613,7 +1612,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function setNewProjectId ($id)
     {
         if ($id == null)
@@ -1623,12 +1621,10 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function getNewProjectId ()
     {
         return (isset($_SESSION['admin']['system']['import']['newProjectId'])) ? $_SESSION['admin']['system']['import']['newProjectId'] : null;
     }
-
 
 
     private function grantFreeModuleAccessRights ($id)
@@ -1664,7 +1660,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function setNewDefaultLanguageId ($id)
     {
         if ($id == null)
@@ -1674,12 +1669,10 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function getNewDefaultLanguageId ()
     {
         return (isset($_SESSION['admin']['system']['import']['newLanguageId'])) ? $_SESSION['admin']['system']['import']['newLanguageId'] : null;
     }
-
 
 
     private function resolveLanguage ($l)
@@ -1774,7 +1767,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function getPossibleRanks ()
     {
         return $this->models->Rank->_get(array(
@@ -1782,7 +1774,6 @@ class ImportL2Controller extends Controller
             'fieldAsIndex' => 'id'
         ));
     }
-
 
 
     private function addProjectRank ($label, $rank, $isLower, $parentId)
@@ -1809,7 +1800,6 @@ class ImportL2Controller extends Controller
         
         return $rank;
     }
-
 
 
     private function addProjectRanks ($ranks, $substituteRanks = null, $substituteParentRanks = null, $multiRankChoice = null)
@@ -1866,7 +1856,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function makeIndexName ($name, $rank)
     {
         $name = trim($name);
@@ -1877,7 +1866,8 @@ class ImportL2Controller extends Controller
         else
             return strtolower($this->cleanL2Name($name));
     }
-    
+
+
     // species (& treetops)
     public function xmlParserCallback_ResolveSpecies ($obj)
     {
@@ -1943,8 +1933,11 @@ class ImportL2Controller extends Controller
 		
 		foreach((array)$lines as $line) {
 
-			// links ([l][/l]) are removed, lines are trimmed
-			$line = trim(preg_replace(array('/(\[l\])(.*)(\[\/l\])/','/(\[p\]|\[\/p\])/'),'',$line));
+			// links ([l][/l]) are replaced with just their text part (between [t][/t])
+			$line = preg_replace_callback('/(\[l\])(.*)((\[t\]){1})(.*)(\[\/t\]){1}(\[\/l\])/',function($n){return $n[5];},$line);
+
+			// remaining links (apparently without any text), and paragraph starts and ends ([p][/p]) are removed, lines are trimmed
+			$line = trim(preg_replace(array('/(\[p\]|\[\/p\])/','/(\[l\])(.*)(\[\/l\])/'),'',$line));
 		
 			// if what remains is shorter than 10 characters, or has no spaces (single word), the line is ignored
 			if (strlen($line)<10 || strpos($line,' ')===false)
@@ -2054,12 +2047,7 @@ class ImportL2Controller extends Controller
     }
 
 
-
-
-
-
-
-
+	// auxiliry functions
     private function cleanL2Name ($taxon)
     {
         $l2Markers = array(
@@ -2083,7 +2071,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function removeRankFromTaxonName ($taxon)
     {
         $ranks = array_keys($_SESSION['admin']['system']['import']['loaded']['ranks']);
@@ -2101,12 +2088,10 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function extractLinkedSpeciesRatherThanDisplayed ($whatever)
     {
         return trim(preg_replace('/(\[m\](.*)\[\/m\])|(\[t\](.*)\[\/t\])|(\[r\]|\[l\]|\[p\]|\[\/r\]|\[\/l\]|\[\/p\])/', '', trim($whatever)));
     }
-
 
 
     private function addSpecies ($species, $ranks)
@@ -2186,7 +2171,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function assignTopSpeciesToUser ($species)
     {
         foreach ((array) $species as $key => $val) {
@@ -2205,7 +2189,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function checkTreeTops ($d)
     {
         $treetops = false;
@@ -2220,7 +2203,6 @@ class ImportL2Controller extends Controller
         
         return $treetops;
     }
-
 
 
     private function fixTreetops ($species, $treetops)
@@ -2272,7 +2254,8 @@ class ImportL2Controller extends Controller
 
         return $species;
     }
-    
+
+
     private function createCategory ($name='Description')
     {
         $pt = $this->models->PageTaxon->_get(array(
@@ -2308,6 +2291,7 @@ class ImportL2Controller extends Controller
         
         return $id;
     }
+
 
     private function addSpeciesContent ($taxon)
     {
@@ -2364,7 +2348,6 @@ class ImportL2Controller extends Controller
             );
         }
     }
-
 
 
     private function addSpeciesMedia ($taxon)
@@ -2425,7 +2408,6 @@ class ImportL2Controller extends Controller
             }
         }
     }
-
 
 
     private function doAddSpeciesMedia ($taxonId, $fileName, $fullName, $caption, $isOverviewPicture, $sortOrder)
@@ -2510,7 +2492,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function addSpeciesCommonNames ($taxon)
     {
         $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
@@ -2586,7 +2567,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function addSpeciesSynonyms($taxon)
     {
         $indexName = $this->makeIndexName((string) $taxon->name, (string) $taxon->taxon);
@@ -2631,6 +2611,7 @@ class ImportL2Controller extends Controller
 		
     }
 
+
     private function prepareSynVernDescription ($text)
     {
         $delete = array(
@@ -2647,6 +2628,7 @@ class ImportL2Controller extends Controller
         
         return explode('[br]', $text);
     }
+
 
     private function removeLinks ($line)
     {
@@ -2779,7 +2761,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function resolveLiterature ($obj)
     {
         $lit = $this->fixAuthors(trim((string) $obj->literature_title));
@@ -2817,7 +2798,6 @@ class ImportL2Controller extends Controller
         
         return $lit;
     }
-
 
 
     private function addLiterature ($obj)
@@ -2888,7 +2868,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function resolveGlossary ($obj)
     {
         $t = trim((string) $obj->glossary_title);
@@ -2922,7 +2901,6 @@ class ImportL2Controller extends Controller
             'multimedia' => isset($m) ? $m : null
         );
     }
-
 
 
     private function addGlossaryMedia ($id, $data)
@@ -3022,7 +3000,6 @@ class ImportL2Controller extends Controller
             );
         }
     }
-
 
 
     private function addGlossary ($obj)
@@ -3154,7 +3131,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function addIntroduction ($obj)
     {
         $this->models->IntroductionPage->save(
@@ -3208,7 +3184,8 @@ class ImportL2Controller extends Controller
             }
         }
     }
-    
+
+
     // dichotomous key
     private function createKeyStep ($step, $stepIds, $stepAdd = 0)
     {
@@ -3261,7 +3238,6 @@ class ImportL2Controller extends Controller
         
         return $stepIds;
     }
-
 
 
     private function createKeyStepChoices ($step, $stepIds)
@@ -3385,7 +3361,6 @@ class ImportL2Controller extends Controller
             }
         }
     }
-
 
 
     private function addKeyDichotomous ($obj, $node)
@@ -3515,7 +3490,8 @@ class ImportL2Controller extends Controller
             'number =' => '1'
         ));
     }
-    
+
+
     // matrix key
     private function resolveMatrices ($obj)
     {
@@ -3559,7 +3535,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function resolveCharType ($t)
     {
         
@@ -3582,7 +3557,6 @@ class ImportL2Controller extends Controller
                 break;
         }
     }
-
 
 
     private function saveMatrices ($m)
@@ -3714,7 +3688,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function connectMatrices ($obj)
     {
         $matrixname = !empty($obj->identify->id_file->filename) ? trim((string) $obj->identify->id_file->filename) : null;
@@ -3802,7 +3775,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function updateMapTypeColours ()
     {
         $d = $this->models->GeodataType->_get(array(
@@ -3822,7 +3794,6 @@ class ImportL2Controller extends Controller
             ));
         }
     }
-
 
 
     private function doSaveMapItem ($occurrence)
@@ -3875,7 +3846,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function saveL2Map ($p)
     {
         $d = $this->models->L2Map->save(
@@ -3914,7 +3884,6 @@ class ImportL2Controller extends Controller
     }
 
 
-
     private function saveLN2Cell ($p)
     {
         $d = $this->models->L2OccurrenceTaxon->save(
@@ -3932,7 +3901,6 @@ class ImportL2Controller extends Controller
         if ($d !== true)
             $this->addError('While saving L2-cell: ' . $d);
     }
-
 
 
     private function saveMapItem ($obj)
@@ -4149,7 +4117,6 @@ class ImportL2Controller extends Controller
             return false;
         }
     }
-
 
 
     private function makeMediaTargetPaths ()

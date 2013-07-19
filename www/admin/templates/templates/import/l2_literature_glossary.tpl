@@ -13,8 +13,8 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
 <b>Literature and glossary</b><br />
-<label>Import literary references?&nbsp;&nbsp;<input type="checkbox" name="literature" checked="checked"></label><br />
-<label>Import glossary items?&nbsp;&nbsp;<input type="checkbox" name="glossary" checked="checked"></label>
+<label><input type="checkbox" name="literature" checked="checked">&nbsp;Import literary references</label><br />
+<label><input type="checkbox" name="glossary" checked="checked">&nbsp;Import glossary items</label>
 </p>
 <input type="submit" value="import" />
 </form>
