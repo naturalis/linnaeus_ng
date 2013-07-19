@@ -260,6 +260,54 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
+    public function allSynonyms2Action ()
+    {
+        
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('All synonyms'));
+
+		$s = $this->models->Synonym->freeQuery("        
+			select _a.*,_b.taxon
+			from %PRE%synonyms _a
+			left join %PRE%taxa _b
+				on _a.taxon_id = _b.id
+				and _a.project_id = _b.project_id
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			order by synonym limit 1");
+
+		$splitpoint = '<span 
+				splitpoint="%s" 
+				onmouseover="$(this).css(\'background-color\',\'orange\');" 
+				onmouseout="$(this).css(\'background-color\',\'transparent\');"
+				ondblclick="alert(\'you clicked at \'+$(this).attr(\'splitpoint\'))"
+				style="cursor:pointer"
+			>&nbsp;&nbsp;&nbsp;</span>';
+
+		foreach((array)$s as $key => $val) {
+			$str = $val['synonym'];
+			$str = preg_replace('/(\s+)/',' ',$str);
+			$buffer = '';
+			$start = 0;
+			if (preg_match_all('/(\s)/',$str,$m,PREG_OFFSET_CAPTURE)!==false) {
+				foreach((array)$m[0] as $val) {
+					$end=$val[1];
+					$buffer.=($start!=0 ? sprintf($splitpoint,$start) : '').trim(substr($str,$start,$end-$start));
+					$start=$end;
+				}
+				$buffer.=sprintf($splitpoint,$start).trim(substr($str,$start));
+			}
+	
+			$s[$key]['splitter']= $buffer;
+			
+		}
+
+				
+		$this->smarty->assign('synonyms',$s);
+				       
+        $this->printPage();
+    }
+	
 
 
     public function allCommonAction ()
