@@ -56,18 +56,18 @@ Parsing is done as follows:
     <li>if the line contains the word "Type species" (case insensitive)), it is ignored (neither a synonym or common name)</li>
     <li>remaining lines will be judged to be:<ul>
     	<li>
-        	Common names: if they end with a valid English language name in brackets (straight or curved) ("Dansemyg (Danish)"). If the
+        	<i>common names</i>: if they end with a valid English language name in brackets (straight or curved) ("Dansemyg (Danish)"). If the
             word between the brackets cannot be resolved as a language, an error is raised and the name is not stored. If the first part of the line (everything minus the 
             language) contains semi-colons, they will be considered separate names in the same language.
         </li>
     	<li>
-        	Synonyms: in all other cases. Synonyms are stored in their entirety as a synonym; no attempt is made to split off the author part.
+        	<i>synonyms</i>: in all other cases. Synonyms are stored in their entirety as a synonym; no attempt is made to split off the author part.
         </li>
      </ul>
-	<li><i>Some</i> cleaning up of the strings is attempted before they are stored, but the output of Linnaeus 2 does not adhere to any obvious formatting standards, so no guarantees. If you're afraid things will be messed up, skip this option.</li>
-    <li>Idem if you're in a hurry (and files are big).</li>
+	<li><i>some</i> cleaning up of the strings is attempted before they are stored, but the output of Linnaeus 2 does not adhere to any obvious formatting standards, so no guarantees. If you're afraid things will be messed up, skip this option.</li>
+    <li>idem if you're in a hurry (and files are big).</li>
     {if $hasSynonyms||$hasCommonNames}<li><i>No attempt is made to match these entries against the properly stored ones. Again, if you're afraid things will be messed up, skip this option.</i></li>{/if}
-    <li>In the Species-module, there is an easy-access list for both synonyms and common names to see and optionally delete erroneous entries.</li>
+    <li>in the Species-module, there is an easy-access list for both synonyms and common names to see and optionally delete erroneous entries.</li>
 </ul>
 <u>Please note</u> that every occurrence of the "syn_vern_description" field is <i>always</i> (also) stored  for the corresponding taxon in an automatically generated content page called "Nomenclature". So the data is never lost, even if you choose "do not import", but it <i>is</i> treated as "just content", and won't show up in the index. Additionally, when true synonyms are present as well as syn_vern_description for the same taxon, an attempt is made to parse the synonym's author from syn_vern_description and save it in the proper place.
 </p>
