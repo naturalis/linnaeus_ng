@@ -21,7 +21,7 @@ Data import is complete. You have been added as system administrator to the new 
 <tr><td colspan="2"><b>Custom modules</b></td></tr>
 {foreach from=$modules item=v}
 <tr>
-	<td><label><input type="checkbox" name="modules[{$v}]" checked="checked">import module "{$v}"</label></td>
+	<td><label><input type="checkbox" name="modules[{$v}]" checked="checked">&nbsp;import module "{$v}"</label></td>
 	<td>internal name: <input type="text" value="{$v}" name="modules-name[{$v}]" /></td>
 </tr>
 {/foreach}

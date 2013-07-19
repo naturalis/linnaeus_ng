@@ -13,8 +13,8 @@
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
 <b>Welcome, contributors and introduction.</b><br />
-<label>Import welcome and contributors text?&nbsp;&nbsp;<input type="checkbox" name="welcome" checked="checked"></label><br />
-<label>Import introduction?&nbsp;&nbsp;<input type="checkbox" name="introduction" checked="checked"></label><br />
+<label><input type="checkbox" name="welcome" checked="checked">&nbsp;Import welcome and contributors text</label><br />
+<label><input type="checkbox" name="introduction" checked="checked">&nbsp;Import introduction</label><br />
 </p>
 
 <input type="submit" value="import" />

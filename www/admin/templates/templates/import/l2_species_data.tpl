@@ -13,27 +13,31 @@ are importing media files.
 <input type="hidden" name="process" value="1"  />
 <input type="hidden" name="rnd" value="{$rnd}" />
 <p>
-<b>Species data</b><br/>
-<label>Import general species descriptions?&nbsp;&nbsp;<input type="checkbox" name="taxon_overview" checked="checked"></label><br />
-<label>Import media?&nbsp;&nbsp;
-{if $session.admin.system.import.imagePath===false}
-You specified no media import.</span>
-{else}
-<input type="checkbox" name="taxon_media" checked="checked">
-{/if}
-</label><br />
-{if $hasCommonNames}
-<label>Import common names?&nbsp;&nbsp;<input type="checkbox" name="taxon_common" checked="checked"></label><br />
-{else}
-No common names found.<input type="hidden" name="taxon_common" value="off"><br />
-{/if}
-{if $hasSynonyms}
-<label>Import synonyms?&nbsp;&nbsp;<input type="checkbox" name="taxon_synonym" checked="checked"></label><br />
-{else}
-No synonyms found.<input type="hidden" name="taxon_synonym" value="off"><br />
-{/if}
+	<b>Species data</b><br/>
+
+	<label><input type="checkbox" name="taxon_overview" checked="checked">&nbsp;Import general species descriptions</label><br />
+
+    {if $session.admin.system.import.imagePath===false}
+	    You specified no media import.<br />
+    {else}
+    	<label><input type="checkbox" name="taxon_media" checked="checked">&nbsp;Import media</label><br />
+    {/if}
+
+    {if $hasCommonNames}
+	    <label><input type="checkbox" name="taxon_common" checked="checked">&nbsp;Import common names</label><br />
+    {else}
+	    No common names found.<input type="hidden" name="taxon_common" value="off"><br />
+    {/if}
+
+    {if $hasSynonyms}
+	    <label><input type="checkbox" name="taxon_synonym" checked="checked">&nbsp;Import synonyms</label><br />
+    {else}
+	    No synonyms found.<input type="hidden" name="taxon_synonym" value="off"><br />
+    {/if}
 </p>
+
 {if $hasSynVernDescription}
+
 <hr  />
 <p>
 This project has a field called "syn_vern_description". It holds collected data on synonyms, common names
@@ -50,7 +54,7 @@ to treat this data:</p>
 Parsing is done as follows:
 <ul>
 	<li>data is split in single lines based on [br]</li>
-    <li>links ([l][/l]) are removed, lines are trimmed</li>
+    <li>links ([l][/l]) that have a text part ([t][/t]) ar replaced with just the text, other links are removed entirely, [p] and [/p] tags are removed, lines are trimmed</li>
     <li>if what remains starts with [b],[u],[i], the line is ignored (header)</li>
     <li>if what remains is shorter than 10 characters, or has no spaces (single word), the line is ignored</li>
     <li>if the line contains the word "Type species" (case insensitive)), it is ignored (neither a synonym or common name)</li>

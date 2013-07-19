@@ -14,8 +14,8 @@
 <p>
 <b>Map data</b><br/>
 {literal}
-<label>Import map items?&nbsp;&nbsp;<input type="checkbox" name="map_items" onchange="$('#afoort').attr('disabled',($(this).is(':checked') ? '' : 'disabled'));$('#afoort-label').css('color',($(this).is(':checked') ? '#000' : '#999'));" checked="checked"></label><br />
-<label id="afoort-label">Map uses "Amersfoort"-coordinates&nbsp;&nbsp;<input type="checkbox" name="afoort" id="afoort"></label>
+<label><input type="checkbox" name="map_items" onchange="$('#afoort').attr('disabled',($(this).is(':checked') ? '' : 'disabled'));$('#afoort-label').css('color',($(this).is(':checked') ? '#000' : '#999'));" checked="checked">&nbsp;Import map items</label><br />
+<label id="afoort-label"><input type="checkbox" name="afoort" id="afoort">&nbsp;Map uses "Amersfoort"-coordinates</label>
 {/literal}
 </p>
 <input type="submit" value="import" />
