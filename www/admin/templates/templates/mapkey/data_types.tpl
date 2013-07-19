@@ -1,9 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-<span id="message-container" style="float:right;"></span><br />
-
 {t}Below, you can define up to ten types of geographically organised data. Once defined, you can specify locations on the map for each species, for every data type.{/t} {t}Text you enter is automatically saved when you leave the input field.{/t}
 <br /><br />
 <table>

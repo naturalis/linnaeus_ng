@@ -24,6 +24,10 @@
 	<li><a href="collaborators.php">{t}Assign taxa to collaborators{/t}</a></li>
 	<li><a href="ranklabels.php">{t}Label taxonomic ranks{/t}</a></li>
 </ul>
+<ul class="admin-list">
+	<li><a href="all_synonyms.php">{t}List all synonyms{/t}</a></li>
+	<li><a href="all_common.php">{t}List all common names{/t}</a></li>
+</ul>
 {/if}
 </div>
 

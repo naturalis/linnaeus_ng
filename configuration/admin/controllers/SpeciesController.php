@@ -238,6 +238,61 @@ class SpeciesController extends Controller
 
 	}
 
+
+    public function allSynonymsAction ()
+    {
+        
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('All synonyms'));
+
+		$s = $this->models->Synonym->freeQuery("        
+			select _a.*,_b.taxon
+			from %PRE%synonyms _a
+			left join %PRE%taxa _b
+				on _a.taxon_id = _b.id
+				and _a.project_id = _b.project_id
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			order by synonym");
+				
+		$this->smarty->assign('synonyms',$s);
+				       
+        $this->printPage();
+    }
+
+
+
+    public function allCommonAction ()
+    {
+        
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('All common names'));
+
+		$c = $this->models->Commonname->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+			), 
+			'order' => 'commonname'
+		));
+		
+		$c = $this->models->Commonname->freeQuery("        
+			select _a.*,_b.taxon
+			from %PRE%commonnames _a
+			left join %PRE%taxa _b
+				on _a.taxon_id = _b.id
+				and _a.project_id = _b.project_id
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			order by commonname");
+				
+		$this->smarty->assign('commonnames',$c);
+				       
+        $this->printPage();
+    }
+
+
+
     private function _listAction ()
     {
 		
@@ -2158,6 +2213,46 @@ class SpeciesController extends Controller
         else if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
             
             $this->getLookupList($this->requestData['search']);
+        }
+        else if ($this->rHasVal('action', 'delete_synonym') && !empty($this->requestData['id'])) {
+
+			$d = $this->models->Synonym->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $this->requestData['id']
+			)); 
+			$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );         
+
+        }
+        else if ($this->rHasVal('action', 'delete_common') && !empty($this->requestData['id'])) {
+
+			$d = $this->models->Commonname->delete(array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'id' => $this->requestData['id']
+			)); 
+			$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );         
+
+        }
+		 else if ($this->rHasVal('action', 'save_synonym_data') && !empty($this->requestData['id']) && !empty($this->requestData['val']) && !empty($this->requestData['col'])) {
+            
+            $this->clearCache($this->cacheFiles['list']);
+			
+			if ($this->requestData['col']=='s')
+				$what = array('synonym' => trim($this->requestData['val']));
+			elseif ($this->requestData['col']=='a')
+				$what = array('author' => trim($this->requestData['val']));
+			else
+				$what = null;
+		
+			if (isset($what)) {
+				$d = $this->models->Synonym->update(
+					$what, 
+					array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'id' => $this->requestData['id']
+				));
+				$this->smarty->assign('returnText', $d ? '<ok>' : 'error' );         
+			}
+
         }
         
         $this->printPage();

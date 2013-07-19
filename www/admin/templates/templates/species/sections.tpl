@@ -1,8 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-
-<span id="message-container" style="float:right;"></span><br/>
 {t}You can define a set of sections for each category. These sections will automatically appear as paragraph headers on the corresponding category-page when you edit a taxon for the first time. A standard set of sections has been provided; these can be altered as you see fit.{/t}<br />
 {t}Below, you can specify the correct label of each section in the language or languages defined in your project.{/t}<br />
 {t}On the left hand side, the labels in the default language are displayed; on the right hand side, the labels in the other languages. These are shown a language at a time; you can switch between languages by clicking its name at the top of the column. The current active language is shown underlined.{/t}<br />

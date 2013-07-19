@@ -12,7 +12,6 @@
 
 <fieldset>
 <legend>{t}Editing keystep{/t} "<span id="default-key-title">...</span>"</legend>
-<span id="message-container" style="float:right;"></span><br />
 <table style="border-collapse:collapse">
 	<tr style="vertical-align:top;">
 		<td>

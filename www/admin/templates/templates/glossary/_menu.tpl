@@ -8,6 +8,7 @@
 <a href="edit.php?action=new" class="allLookupLink">{t}Create new{/t}</a>
 &nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>
+<span id="message-container" style="float:right"></span>
 <p>
 {if $alpha|@count==0}
 {t}(no terms have been defined){/t}

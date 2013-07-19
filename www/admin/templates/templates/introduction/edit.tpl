@@ -1,6 +1,5 @@
 {include file="../shared/admin-header.tpl"}
 <div id="page-main">
-<span id="message-container" style="float:right;"></span>
 <form name="theForm" id="theForm" method="post" action="edit.php" >
 <input type="button" value="{t}save{/t}" onclick="freemodSaveContentAll()" style="margin-right:5px" />
 <input type="button" value="{t}save and preview{/t}" onclick="freemodDoPreview()" style="margin-right:5px" />

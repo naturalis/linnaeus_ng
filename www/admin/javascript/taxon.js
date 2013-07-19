@@ -1568,3 +1568,128 @@ function taxonSortTaxaTaxonomic() {
 	$('#theForm').submit();
 
 }
+
+
+
+function taxonEasySynonymDelete(id) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_synonym' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if(data=='<ok>')
+				$('#syn-'+id).remove();
+			else
+				alert('An error occurred.');
+		}
+	});
+
+}
+
+function taxonEasyCommonDelete(id) {
+
+	allAjaxHandle = $.ajax({
+		url : "ajax_interface.php",
+		type: "POST",
+		data : ({
+			'action' : 'delete_common' ,
+			'id' : id , 
+			'time' : allGetTimestamp()
+		}),
+		async: allAjaxAsynchMode,
+		success : function (data) {
+			if(data=='<ok>')
+				$('#com-'+id).remove();
+			else
+				alert('An error occurred.');
+		}
+	});
+
+}
+
+
+var sEditModes = aEditModes = Array();
+var sOldVals = aOldVals = Array();
+
+function saveEditVal(event,ele) {
+
+	if (event.keyCode!==13 && event.keyCode!==27) return;
+	
+	var col = $(ele).attr('col');
+	var id = $(ele).attr('synid');
+
+	if (col=='s' && sEditModes[id]==false) return;
+	if (col=='a' && aEditModes[id]==false) return;
+
+	if (col=='s') {
+		sEditModes[id]=false;
+		oldVal=sOldVals[id];
+	} else
+	if (col=='a') {
+		aEditModes[id]=false;
+		oldVal=aOldVals[id];
+	}
+
+	if (event.keyCode==13) {
+
+		var newVal = $(ele).val();
+	
+		$(ele).parent().html(newVal);
+	
+		allAjaxHandle = $.ajax({
+			url : "ajax_interface.php",
+			type: "POST",
+			data : ({
+				'action' : 'save_synonym_data' ,
+				'id' : id , 
+				'val' : newVal , 
+				'col' : col , 
+				'time' : allGetTimestamp()
+			}),
+			async: allAjaxAsynchMode,
+			success : function (data) {
+				allSetMessage(data=='<ok>' ? _('saved') : _('an error occurred'));
+			}
+		});	
+		
+	} else {
+
+		$(ele).parent().html(oldVal);
+		
+	}
+
+}
+
+function taxonSynonymEditSyn(ele,id) {
+
+	if (sEditModes[id]==true) return;
+	var oldVal = $(ele).html();
+	var x = $(ele).html('<input type="text" id="s'+id+'" col="s" synid="'+id+'" value="" style="width:100%" onkeyup="saveEditVal(event,this)">');
+	$('#s'+id).val(oldVal).focus();
+	sEditModes[id]=true;
+	sOldVals[id]=oldVal;
+
+}
+
+function taxonSynonymEditAuth(ele,id) {
+
+	if (aEditModes[id]==true) return;
+	var oldVal = $(ele).html();
+	var x = $(ele).html('<input type="text" id="a'+id+'" col="a" synid="'+id+'" value="" style="width:100%" onkeyup="saveEditVal(event,this)">');
+	$('#a'+id).val(oldVal).focus();
+	aEditModes[id]=true;
+	aOldVals[id]=oldVal;
+
+}
+
+
+
+
+
+

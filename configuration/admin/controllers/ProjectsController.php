@@ -1321,10 +1321,10 @@ class ProjectsController extends Controller
 					{
 						switch ($m[1]) {
 							case 'MEDIA_DIR' : 
-								return $_SESSION['admin']['project']['urls']['project_media'];
+								return isset($_SESSION['admin']['project']['urls']['project_media']) ? $_SESSION['admin']['project']['urls']['project_media'] : $m[1];
 								break;
 							case 'ID' : 
-								return $_SESSION['admin']['project']['id'];
+								return isset($_SESSION['admin']['project']['id']) ? $_SESSION['admin']['project']['id'] : $m[1];
 								break;
 							default:
 								return $m[1];

@@ -5,7 +5,6 @@
 	<input type="button" value="{t}save and preview{/t}" onclick="contentPreviewContent()" style="margin-right:5px" />
 	{*<input type="button" value="{t}back{/t}" onclick="window.open('index.php','_self')" />*}
 	<input type="hidden" name="subject" id="subject" value="{$subject}" />
-	<span id="message-container" style="padding-left:10px"></span>
 </form>
 <form>
 <div style="width:890px;height:560px;border:1px solid #aaf;margin-top:10px;">

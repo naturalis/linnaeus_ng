@@ -1,7 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
-<span id="message-container" style="float:right;"></span>
 <form enctype="multipart/form-data" id="theForm" method="post" action="state.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
 <input type="hidden" name="action" id="action" value="save" />
