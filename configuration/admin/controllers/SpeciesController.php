@@ -274,15 +274,10 @@ class SpeciesController extends Controller
 				on _a.taxon_id = _b.id
 				and _a.project_id = _b.project_id
 			where _a.project_id = ".$this->getCurrentProjectId()."
-			order by synonym limit 1");
+			order by synonym limit 10");
 
-		$splitpoint = '<span 
-				splitpoint="%s" 
-				onmouseover="$(this).css(\'background-color\',\'orange\');" 
-				onmouseout="$(this).css(\'background-color\',\'transparent\');"
-				ondblclick="alert(\'you clicked at \'+$(this).attr(\'splitpoint\'))"
-				style="cursor:pointer"
-			>&nbsp;&nbsp;&nbsp;</span>';
+//		$splitpoint = '<span splitpoint="%s" onmouseover="highlightSplit(this,true)" onmouseout="highlightSplit(this,false)" ondblclick="splitClick(this)" style="cursor:pointer">&nbsp; &nbsp;</span>';
+		$splitpoint = '<split p="%s"></split>';
 
 		foreach((array)$s as $key => $val) {
 			$str = $val['synonym'];
