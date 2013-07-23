@@ -1380,6 +1380,8 @@ function taxonDoPreview() {
 	if (allActiveLanguage)
 		$('#theForm').append('<input type="hidden" name="language-other" value="'+allActiveLanguage+'">').val(allActiveLanguage);
 
+	$('#theForm').append('<input type="hidden" name="activePage" value="'+taxonActivePage+'">').val(taxonActivePage);
+
 	$("#action").val('save_and_preview');
 	$('#theForm').submit();
 
@@ -1687,9 +1689,3 @@ function taxonSynonymEditAuth(ele,id) {
 	aOldVals[id]=oldVal;
 
 }
-
-
-
-
-
-
