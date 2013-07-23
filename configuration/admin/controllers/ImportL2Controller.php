@@ -2013,7 +2013,7 @@ class ImportL2Controller extends Controller
 					'commonname' => str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val[1])
 				));
 				
-				$this->addMessage(sprintf('Added common name "%s" (%s)',$val[1],$val[2]));
+				//$this->addMessage(sprintf('Added common name "%s" (%s)',$val[1],$val[2]));
 				$_SESSION['admin']['system']['import']['synVernDescription']['commonCount']++;
 				
 			}
@@ -2036,7 +2036,7 @@ class ImportL2Controller extends Controller
 					'show_order' => $key
 				));
 				
-				$this->addMessage(sprintf('Added synonym "%s"',$val));
+				//$this->addMessage(sprintf('Added synonym "%s"',$val));
 				$_SESSION['admin']['system']['import']['synVernDescription']['synonymCount']++;
 	
 			}
