@@ -2,15 +2,6 @@
 
 /*
 
-	L2 file crappiness
-	- replace > with >\n (new lines)
-	- make sure (add) DTD at the top
-	- change <title>Linnaeus II</title> to something appropriate
-
-	
-
-
-
 	POST-PROCESSING
 	- compact keys
 	- make Diversity index
