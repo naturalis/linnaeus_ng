@@ -2480,7 +2480,7 @@ class MatrixKeyController extends Controller
 						'file_dimensions' => $d[0].':'.$d[1]
 					));
 					
-					echo '<!--'.$file.'::'.$d[0].':'.$d[1].'-->'.chr(10);
+					$this->addMessage($file.'::'.$d[0].':'.$d[1]);;
 					
 					// ...and return
 					return;
