@@ -45,6 +45,7 @@ class MatrixKeyController extends Controller
         parent::__construct();
         
         $this->initialize();
+
     }
 
 
@@ -2479,8 +2480,6 @@ class MatrixKeyController extends Controller
 						'project_id' => $this->getCurrentProjectId(), 
 						'file_dimensions' => $d[0].':'.$d[1]
 					));
-					
-					$this->addMessage($file.'::'.$d[0].':'.$d[1]);;
 					
 					// ...and return
 					return;

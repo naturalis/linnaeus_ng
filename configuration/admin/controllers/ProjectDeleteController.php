@@ -170,6 +170,12 @@ class ProjectDeleteController extends Controller
 
     public function deleteMatrices ($id)
     {
+        $this->models->GuiMenuOrder->delete(array(
+            'project_id' => $id
+        ));
+        $this->models->MatrixVariation->delete(array(
+            'project_id' => $id
+        ));
         $this->models->MatrixTaxonState->delete(array(
             'project_id' => $id
         ));
@@ -197,6 +203,7 @@ class ProjectDeleteController extends Controller
         $this->models->Matrix->delete(array(
             'project_id' => $id
         ));
+		
     }
 
 
