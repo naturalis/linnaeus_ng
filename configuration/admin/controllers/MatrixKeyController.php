@@ -2495,7 +2495,7 @@ class MatrixKeyController extends Controller
 			
 		} else {
 			
-			q($state,1);
+			var_dump($state);
 			
 		}
 
