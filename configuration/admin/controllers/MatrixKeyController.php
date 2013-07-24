@@ -2493,10 +2493,6 @@ class MatrixKeyController extends Controller
 
 			}
 			
-		} else {
-			
-			var_dump($state);
-			
 		}
 
 		// if filename is empty, the file doesn't exist or we couldn't get any dimensions, reset the dimensions, if there were any in the database
