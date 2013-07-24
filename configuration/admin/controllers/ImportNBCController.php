@@ -426,7 +426,7 @@ class ImportNBCController extends Controller
 						'project_id' => $this->getNewProjectId(), 
 						'matrix_id' => $matrixExists
 					));
-					
+
 					$mId = $matrixExists;
 
 				} else {
@@ -735,7 +735,7 @@ class ImportNBCController extends Controller
 								language_id = '.LANGUAGECODE_DUTCH. ' and
 								(
 									lower(label) = \''. mysql_real_escape_string(strtolower($val[1])) .'\' or
-									label like \'%'. mysql_real_escape_string(strtolower($val[1])) .'|%\'
+									label like \''. mysql_real_escape_string(strtolower($val[1])) .'|%\'
 								)'
 						)
 					);	
@@ -831,10 +831,6 @@ class ImportNBCController extends Controller
 							}
 
 						} else {
-
-						echo '<!--'. $this->models->CharacteristicLabelState->q().'-->'.chr(10).chr(10);
-
-
 
 							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for "%s".'),$val[2],$val[1]), 'Matrix import'));
 							

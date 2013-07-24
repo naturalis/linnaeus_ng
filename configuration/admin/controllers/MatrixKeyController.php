@@ -2483,7 +2483,11 @@ class MatrixKeyController extends Controller
 
 			}
 
-		} 
+		} else {
+			
+			$this->addError($path.$file.' doesn\t seem to exist.');
+			
+		}
 
 		// if filename is empty, the file doesn't exist or we couldn't get any dimensions, reset the dimensions, if there were any in the database
 		if (!empty($state['file_dimensions'])) {
