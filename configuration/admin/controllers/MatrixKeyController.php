@@ -2462,30 +2462,36 @@ class MatrixKeyController extends Controller
 		$file = isset($state['file_name']) ? $state['file_name'] : null;
 		
 		// if there is a filename, and the file does exist...
-		if (!empty($file) && file_exists($path.$file)) {
+		if (!empty($file)) {
 			
-			// ...try to get its dimensions...
-			$d = getimagesize($path.$file);
-
-			// ...if that works...
-			if ($d!==false) {
-
-				// ...save them as w:h...
-				$this->models->CharacteristicState->save(
-				array(
-					'id' => $state['id'], 
-					'project_id' => $this->getCurrentProjectId(), 
-					'file_dimensions' => $d[0].':'.$d[1]
-				));
+			if (file_exists($path.$file)) {
+			
+				// ...try to get its dimensions...
+				$d = getimagesize($path.$file);
+	
+				// ...if that works...
+				if ($d!==false) {
+	
+					// ...save them as w:h...
+					$this->models->CharacteristicState->save(
+					array(
+						'id' => $state['id'], 
+						'project_id' => $this->getCurrentProjectId(), 
+						'file_dimensions' => $d[0].':'.$d[1]
+					));
+					
+					echo '<!--'.$file.'::'.$d[0].':'.$d[1].'-->'.chr(10);
+					
+					// ...and return
+					return;
+	
+				}
+	
+			} else {
 				
-				// ...and return
-				return;
+				$this->addError($path.$file.' doesn\'t seem to exist.');
 
 			}
-
-		} else {
-			
-			$this->addError($path.$file.' doesn\t seem to exist.');
 			
 		}
 
