@@ -400,6 +400,8 @@ class ImportNBCController extends Controller
 		$matrixName = isset($data['project']['matrix_name']) ? $data['project']['matrix_name'] : $data['project']['title'];
 
         if (!$this->isFormResubmit() && $this->rHasVal('action', 'matrix')) {
+			
+			$mId = null;
 
 			$matrixExists = $this->doesMatrixExist($matrixName);
 			
@@ -423,6 +425,8 @@ class ImportNBCController extends Controller
 						'project_id' => $this->getNewProjectId(), 
 						'matrix_id' => $matrixExists
 					));
+					
+					$mId = $matrixExists;
 
 				} else {
 
@@ -432,15 +436,17 @@ class ImportNBCController extends Controller
 
 			}
 
-            $m = $this->createMatrix($matrixName);
+			if (is_null($mId)) {
 
-			$mId = $m['id'];
+	            $m = $this->createMatrix($matrixName);
+				$mId = $m['id'];
+				$this->addMessage('Created matrix "' . $m['name'] . '"');
 
-			if ($m['type']=='new')
-	            $this->addMessage('Created matrix "' . $m['name'] . '"');
-			else
-	            $this->addMessage('Using matrix "' . $m['name'] . '"');
+			} else {
 
+				$this->addMessage('Using matrix "' .$matrixName . '"');
+
+			}
            
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
