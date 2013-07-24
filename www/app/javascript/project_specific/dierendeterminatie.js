@@ -168,7 +168,8 @@ function nbcFormatResult(data) {
 			g : gender (absent when not a variation)
 			s : scientific name 
 			n : has image?
-			m : image url (generic image when n==false)
+			m : image url
+			x : generic image (only when n==false, and even then still optional)
 			h : thumbnail
 			p : photographer credit 
 			u : remote url
@@ -224,10 +225,10 @@ function nbcFormatResult(data) {
 	
 	var showStates = states && states.length > 0;
 
-	if (!data.m.match(/^(http:\/\/|https:\/\/)/i)) {
-		
-		data.m = baseUrlProjectImages + data.m;
-		
+	if (data.n) {
+		if (!data.m.match(/^(http:\/\/|https:\/\/)/i)) data.m = baseUrlProjectImages + data.m;
+	} else {
+		if (data.x) data.m = data.x;
 	}
 
  	return '<div class="result'+(data.h ? ' result-highlight' : '')+'" id="res-'+id+'"> \

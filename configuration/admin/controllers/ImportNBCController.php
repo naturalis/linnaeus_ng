@@ -37,7 +37,8 @@ class ImportNBCController extends Controller
 		'bronvermelding' => 'source',
 		'sekse op foto' => 'gender_photo',
 		'thumbnail' => 'url_thumbnail',
-		'levensfase' => 'life_stage'
+		'levensfase' => 'life_stage',
+		'Sexe op foto' => 'gender_photo'
 	);
 
     private $_stdVariantColumns = array('sekse','variant');

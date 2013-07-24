@@ -51,8 +51,7 @@ fixSplitElements();
 {t}No synonyms have been defined.{/t}
 {else}
 <p class="instruction-text">
-Double-click a synonym or author (of the empty cell where the author should be) to edit. When editing, Enter saves the new entry, Escape cancels the edit.
-<span class="message-error">Be aware: clicking the delete button immediately deletes the synonym, without confirmation.</span>
+Double-click on the spaces between words to split a synonym in a synonym and an author 
 </p>
 <table id="syn-table">
 	<tr>

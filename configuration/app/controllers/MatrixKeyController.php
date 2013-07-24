@@ -1891,15 +1891,15 @@ class MatrixKeyController extends Controller
 			$urlExternalPage = null;
 		}
 
-
         $d = array(
             'i' => $val['id'], 
             'l' => trim(strip_tags($label)), 
 			'c' => $common,
             'y' => $type, 
             's' => trim(strip_tags($sciName)),
-            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : $this->_nbcImageRoot.'noimage.gif', 
-            'n' => isset($nbc['url_image']), 
+            'm' => isset($nbc['url_image']) ? $nbc['url_image']['value'] : null, 
+            'n' => isset($nbc['url_image']),
+			'x' => isset($nbc['url_image']) ? null : $this->_nbcImageRoot.'noimage.gif',
             'b' => isset($nbc['url_thumbnail']) ? $nbc['url_thumbnail']['value'] : null, 
             'p' => isset($nbc['source']) ? $nbc['source']['value'] : null, 
             'u' => $urlExternalPage, 
@@ -2738,16 +2738,19 @@ class MatrixKeyController extends Controller
 	private function getGUIMenu($p=null)
 	{
 
-        $checkImages = isset($p['checkImages']) ? $p['checkImages'] : false;
 
         $g = isset($p['groups']) ? $p['groups'] : null;
         $c = isset($p['characters']) ? $p['characters'] : null;
 
+		// need groups or isolated characters, otherwise nothing to show
 		if (is_null($g) || is_null($c))
 			return;
-
+			
+		// check if images actually exist
+        $checkImages = isset($p['checkImages']) ? $p['checkImages'] : false;
+		// append characters that do not appear in the menu order
         $appendExcluded = (isset($p['appendExcluded']) ? $p['appendExcluded'] : false);
-
+		
 		if ($checkImages) {
 
 			foreach((array)$c as $key => $val) {
@@ -2759,6 +2762,13 @@ class MatrixKeyController extends Controller
 			}
 
 		}
+		
+		foreach ((array) $c as $val)
+			$dummy[$val['id']] = $val;
+
+		$c = $dummy;
+
+
 
 
 		$m = $this->models->GuiMenuOrder->_get(
@@ -2770,11 +2780,29 @@ class MatrixKeyController extends Controller
 			'columns' => 'ref_id,ref_type,show_order',
 			'order' => 'show_order'
 		));
+		
+		if (!$m) {
+			$i=0;
+			foreach((array)$g as $val)
+				$m[] = array('ref_id'=>$val['id'],'ref_type'=>'group','show_order'=>$i++);
 
-		foreach ((array) $c as $val)
-			$d[$val['id']] = $val;
+			$dummy = $this->models->Characteristic->freeQuery("
+				select _a.id 
+				from %PRE%characteristics _a
+				left join %PRE%characteristics_chargroups _b
+					on _a.id = _b.characteristic_id
+				left join %PRE%characteristics_matrices _c
+					on _a.id = _c.characteristic_id
+				where _a.project_id = ".$this->getCurrentProjectId()."  
+				and _b.id is null 
+				and _c.matrix_id = ".$this->getCurrentMatrixId()
+			);
 
-		$c = $d;
+			foreach((array)$dummy as $val)
+				$m[] = array('ref_id'=>$val['id'],'ref_type'=>'char','show_order'=>$i++);
+			
+		}
+
 		$d = array();
 		$i=0;		
 
