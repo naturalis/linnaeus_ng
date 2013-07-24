@@ -774,7 +774,7 @@ class ImportNBCController extends Controller
 								)
 							)
 						);
-
+						
 						if (!empty($l[0]['state_id'])) {
 							
 							$sId = $l[0]['state_id'];
@@ -832,7 +832,11 @@ class ImportNBCController extends Controller
 
 						} else {
 
-							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for %s.'),$val[2],$val[1]), 'Matrix import'));
+						echo '<!--'. $this->models->CharacteristicLabelState->q().'-->'.chr(10).chr(10);
+
+
+
+							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for "%s".'),$val[2],$val[1]), 'Matrix import'));
 							
 						}
 
