@@ -399,15 +399,16 @@ class ImportNBCController extends Controller
         $data = $_SESSION['admin']['system']['import']['data'];
 		$matrixName = isset($data['project']['matrix_name']) ? $data['project']['matrix_name'] : $data['project']['title'];
 
-        if (!$this->isFormResubmit() && $this->rHasVal('action', 'matrix')) {
+
+        if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
 			
 			$mId = null;
 
 			$matrixExists = $this->doesMatrixExist($matrixName);
-			
+
 			if ($matrixExists!==false) {
 
-				if ($this->rHasVal('action','replace_data')) {
+				if ($this->rHasVal('data_treatment','replace_data')) {
 
 					$this->models->MatrixTaxonState->delete(array(
 						'project_id' => $this->getNewProjectId(), 

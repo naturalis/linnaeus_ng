@@ -39,8 +39,8 @@
     {if $matrixExists}
     <p>
         <span class="message-error">A matrix with the name "{$matrix}" already exists. Matrix names need to be unique; please specify how to treat this import:</span><br />
-        <input type="radio" id="id1" name="action" value="replace_data" checked="checked" /></td><td><label for="id1">import into existing matrix, replacing existing data</label><br />
-        <input type="radio" id="id3" name="action" value="new_matrix" /></td><td><label for="id3">create a new matrix with the title "{$suggestedTitle}"</label><br />
+        <input type="radio" id="id1" name="data_treatment" value="replace_data" checked="checked" /></td><td><label for="id1">import into existing matrix, replacing existing data</label><br />
+        <input type="radio" id="id3" name="data_treatment" value="new_matrix" /></td><td><label for="id3">create a new matrix with the title "{$suggestedTitle}"</label><br />
         If you wish to create a new project with a different title, alter the title in your CSV-file and <a href="nbc_determinatie_1.php?action=new">reload the file</a>.<br />
     </p>
     {/if}
