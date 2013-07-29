@@ -21,7 +21,7 @@ abstract class Model extends BaseClass
 	private $_projectId=false;
 	public $doLog = true;
 	private $_affectedRows = 0;
-
+	
     public function __construct ($tableBaseName = false)
     {
         
@@ -532,6 +532,64 @@ abstract class Model extends BaseClass
 	}
 
 
+	public function getTableName()
+	{
+	
+		return $this->tableName;
+		
+	}
+
+
+    public function freeQuery($params)
+    {
+
+        if (is_array($params)) {
+    
+            $query = isset($params['query']) ? $params['query'] : null;
+            $fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
+            	
+        } else {
+    
+            $query = isset($params) ? $params : null;
+            $fieldAsIndex = false;
+    
+        }
+
+        if (empty($query)) {
+            	
+            $this->log('Called freeQuery with an empty query',1);
+            return;
+    
+        };
+    
+        $query = str_ireplace('%table%', $this->tableName, $query);
+        $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
+    
+        $set = mysql_query($query);
+         
+        $this->logQueryResult($set,$query,'freeQuery');
+        $this->setLastQuery($query);
+    
+        unset($this->data);
+    
+        while($row=@mysql_fetch_assoc($set)){
+
+            if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
+                	
+                $this->data[$row[$fieldAsIndex]]=$row;
+                	
+            } else {
+                	
+                $this->data[]=$row;
+                	
+            }
+    
+        }
+
+        return isset($this->data) ? $this->data : null;
+    
+    }
+
 	/* DEBUG */
     public function q ()
     {
@@ -539,7 +597,6 @@ abstract class Model extends BaseClass
         return $this->getLastQuery();
     
     }
-
 
 	private function log($msg,$level=0)
 	{
@@ -982,56 +1039,6 @@ abstract class Model extends BaseClass
 			$this->log('Called _get with an empty query (poss. cause: "...\'id\' => \'null\' " instead of " => null ")',1);
 		
 		}
-    
-    }
-
-    public function freeQuery($params)
-    {
-
-        if (is_array($params)) {
-    
-            $query = isset($params['query']) ? $params['query'] : null;
-            $fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
-            	
-        } else {
-    
-            $query = isset($params) ? $params : null;
-            $fieldAsIndex = false;
-    
-        }
-
-        if (empty($query)) {
-            	
-            $this->log('Called freeQuery with an empty query',1);
-            return;
-    
-        };
-    
-        $query = str_ireplace('%table%', $this->tableName, $query);
-        $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
-    
-        $set = mysql_query($query);
-         
-        $this->logQueryResult($set,$query,'freeQuery');
-        $this->setLastQuery($query);
-    
-        unset($this->data);
-    
-        while($row=@mysql_fetch_assoc($set)){
-
-            if($fieldAsIndex!==false && isset($row[$fieldAsIndex])) {
-                	
-                $this->data[$row[$fieldAsIndex]]=$row;
-                	
-            } else {
-                	
-                $this->data[]=$row;
-                	
-            }
-    
-        }
-
-        return isset($this->data) ? $this->data : null;
     
     }
 

@@ -66,10 +66,20 @@ NOTICES
 
 <ul>
 	<li><a href="views/projects/">{t}Project administration{/t}</a></li>
+	<li><a href="views/users/">{t}User administration{/t}</a></li>
+</ul>
+<ul>
 	<li><a href="views/hotwords/">{t}Hotwords{/t}</a></li>
 	<li><a href="views/utilities/mass_upload.php">{t}Mass upload images{/t}</a></li>
 	<li><a href="views/projects/clear_cache.php">{t}Clear cache{/t}</a></li>
-	<li><a href="views/users/">{t}User administration{/t}</a></li>
+</ul>
+<ul>
+	<li><a href="views/import/export.php">{t}Generic export{/t}</a></li>
+	<li><a href="views/import/matrix_app_export.php">{t}Export multi-entry key for Linnaeus Mobile{/t}</a></li>
+    
+    
+    
+    
 </ul>
 {/if}
 </div>

@@ -46,15 +46,30 @@ class ExportController extends Controller
 		'introduction_page',
 		'introduction_media',
 		'user_taxon',
+		'nbc_extras',
+		'taxa_relations',
+		'matrix_variation',
+		'variation_relations',
+		'chargroup',
+		'characteristic_chargroup',
+		'chargroup_label',
+		'gui_menu_order'
     );
    
     public $controllerPublicName = 'Export';
 
-    public $usedHelpers = array('array_to_xml');
+    public $usedHelpers = array('array_to_xml','mysql_2_sqlite');
 //    public $usedHelpers = array('xml_parser');
 
 	public $cssToLoad = array();
 	public $jsToLoad = array();
+
+	private $_appExpSkipCols = array('created','last_change');
+	private $_exportDump=null;
+	private $_sqliteQueries=null;
+	private $_removePrefix=false;
+	private $_includeCode=true;
+	private $_dataSize=0;
 
 
     /**
@@ -89,6 +104,8 @@ class ExportController extends Controller
     public function exportAction()
     {
     
+        $this->checkAuthorisation();
+        
         $this->setPageName($this->translate('Select modules to export'));
 		
 		$pModules = $this->getProjectModules();
@@ -174,10 +191,71 @@ class ExportController extends Controller
     
     }
 	
-	private function makeFileName($projectName)
+	public function actionMatrixAppExport()
 	{
 
-		return strtolower(preg_replace('/\W/','',$projectName)).'.xml';
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Export matrix key database for Linnaeus Mobile'));
+		
+		$pModules = $this->getProjectModules();
+		
+		$matrices = $this->getMatrices();
+
+		$config = new configuration;
+		$dbSettings = $config->getDatabaseSettings();
+
+		if ($this->rHasVal('action','export')) {
+			
+			$this->_removePrefix = isset($this->requestData['removePrefix']) && $this->requestData['removePrefix']=='y' ? $dbSettings['tablePrefix'] : false;
+			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
+
+			
+			$d = explode('-',$this->requestData['id']);
+			$matrixId = $d[0];
+			$languageId = $d[1];
+
+			$this->_filename = $this->makeFileName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language'],'sql');
+			$this->_dbname = $this->makeDatabaseName($matrices[$matrixId]['names'][$languageId]['name'].' '.$matrices[$matrixId]['names'][$languageId]['language']);
+			$this->_projectName = $matrices[$matrixId]['names'][$languageId]['name'];
+
+			$this->makeMatrixDump($matrixId,$languageId);
+			$this->convertDumpToSQLite();
+			$this->downloadSQLite();
+			
+		}
+
+        $d = $this->models->ModuleProject->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'active' => 'y',
+					'module_id' => MODCODE_MATRIXKEY
+				), 
+				'columns' => 'id'
+			));
+			
+		if ($d[0]['id']) {
+
+			$this->smarty->assign('dbSettings',$dbSettings);
+			$this->smarty->assign('matrices',$matrices);
+			$this->smarty->assign('default_langauge',$this->getDefaultProjectLanguage());
+			
+		} else {
+
+			$this->smarty->assign('matrices',false);
+		}
+		
+        $this->printPage();
+		
+	}
+
+
+	// GENERIC EXPORT
+	private function makeFileName($projectName,$ext='xml')
+	{
+
+		return strtolower(preg_replace('/\W/','_',$projectName)).(is_null($ext) ? null : '.'.$ext);
 
 	}
 
@@ -1134,5 +1212,312 @@ class ExportController extends Controller
 	
 	}
 
+
+	// MATRIX EXPORT
+    private function getMatrices ()
+    {
+		$m = $this->models->Matrix->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'got_names' => 1
+			), 
+			'fieldAsIndex' => 'id', 
+			'columns' => 'id,got_names,\'matrix\' as type, `default`'
+		));
+		
+		foreach ((array) $m as $key => $val) {
+			
+			$mn = $this->models->MatrixName->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'matrix_id' => $val['id']
+				), 
+				'columns' => 'name,language_id',
+				'fieldAsIndex' => 'language_id'
+			));
+
+			foreach((array)$mn as $mKey =>$mVal)
+				$mn[$mKey]['language'] = $_SESSION['admin']['project']['languageList'][$mVal['language_id']]['language'];
+		
+
+			$m[$key]['names']= $mn;
+
+		}
+
+        return $m;
+    }
+
+	private function removeUnwantedColumns($s)
+	{
+		$d = explode(chr(10),$s);
+		foreach((array)$d as $key => $val) {
+			if (preg_match('/^(\s*)(`?)('.implode('|',$this->_appExpSkipCols).')(`?)/',$val)==1)
+				unset($d[$key]);
+		}
+		return implode(chr(10),$d);
+	}
+	
+	private function fixTablePrefix($s,$table=null)
+	{
+
+		if ($this->_removePrefix===false) return $s;
+		
+		if (is_null($table))
+			return str_ireplace($this->_removePrefix,'',$s);
+		else
+			return preg_replace('/(`'.$table.'`)/','`'.str_ireplace($this->_removePrefix,'',$table).'`',$s);
+		
+	}
+
+    private function makeMatrixDump ($matrixId,$languageId)
+	{
+		
+		$d = 
+			array(
+				'project_id' => $this->getCurrentProjectId(),
+				'matrix_id' => $matrixId,
+				'language_id' => $languageId
+			);
+
+		$NbcExtrasT = $this->models->NbcExtras->_get(array('id' => array_merge($d,array('ref_type'=>'taxon')),'fieldAsIndex' => 'ref_id'));
+		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
+		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $d));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
+
+		foreach((array)$this->_exportDump->Taxon as $key => $val) {
+			if (!isset($this->_exportDump->MatrixTaxon[$val['id']])) {
+				unset($this->_exportDump->Taxon[$key]);			
+				unset($this->_exportDump->Commonname[$key]);			
+				unset($this->_exportDump->TaxaRelations[$key]);
+				unset($NbcExtrasT[$key]);
+			}
+		}
+
+		$NbcExtrasV = $this->models->NbcExtras->_get(array('id' => array_merge($d,array('ref_type'=>'variation')),'fieldAsIndex' => 'ref_id'));
+		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
+		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $d));
+		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
+		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
+
+		foreach((array)$this->_exportDump->TaxonVariation as $key => $val) {
+			if (!isset($this->_exportDump->MatrixVariation[$val['id']])) {
+				unset($this->_exportDump->TaxonVariation[$key]);			
+				unset($this->_exportDump->VariationRelations[$key]);			
+				unset($this->_exportDump->VariationLabel[$key]);			
+				unset($NbcExtrasV[$key]);
+			}
+		}
+		
+		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $d));
+		$this->_exportDump->NbcExtras = array_merge($NbcExtrasT,$NbcExtrasV);
+
+		$this->_exportDump->Characteristic = $this->models->Characteristic->_get(array('id' => $d));
+		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $d));
+		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $d));
+		$this->_exportDump->CharacteristicLabelState = $this->models->CharacteristicLabelState->_get(array('id' => $d));
+		$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $d));
+		$this->_exportDump->Chargroup = $this->models->Chargroup->_get(array('id' => $d));
+		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $d));
+		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $d));
+
+		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $d));
+		
+	}
+	
+	private function convertDumpToSQLite()
+	{
+
+		$setsPerInsert = 1; // phonegap webdb doesn't seem to support inserting multiple sets at once
+		
+		$this->helpers->Mysql2Sqlite->setRemoveUniqueConstraints(true);
+		
+		foreach((array)$this->_exportDump as $class => $data) {
+
+			$table = $this->models->$class->getTableName();
+			$inserts = array();
+			
+			$c = $this->models->Taxon->freeQuery('show create table '.$table);
+			$this->helpers->Mysql2Sqlite->convert($this->fixTablePrefix($this->removeUnwantedColumns($c[0]['Create Table'].';'),$table));
+
+			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();
+			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
+
+			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlTable();
+			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlKeys());
+			
+			$this->dataCount[$this->fixTablePrefix($table)] = count((array)$data);
+
+			foreach((array)$data as $row) {
+
+				foreach((array)$row as $column => $value) {
+					if (in_array($column,$this->_appExpSkipCols))
+						unset($row[$column]);
+				}
+				
+				$inserts[] = "('".implode("','",array_map(function($str){return trim(preg_replace(array('/\\\'/','/\\\"/'),array("''",'"'), $str));},$row))."')";
+				
+				if (count((array)$inserts)>=$setsPerInsert) {
+					$d = implode(',',$inserts);
+					$this->_sqliteQueries[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
+					$this->_dataSize += strlen($d);
+					$inserts = array();
+				}
+
+			}
+
+			if (count((array)$inserts)!=0) {
+				$d = implode(',',$inserts);
+				$this->_sqliteQueries[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
+				$this->_dataSize += strlen($d);
+			}
+			
+			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlReindexKeys());
+
+		}
+		
+		unset($this->_exportDump);
+		
+	}
+
+	private function makeDatabaseName($projectName,$ext='xml')
+	{
+
+		return strtolower(preg_replace(array('/\W/','/[aeiouy]/i'),array('_',''),$projectName));
+
+	}
+	
+	private function downloadSQLite()
+	{
+
+		header('Cache-Control: public');
+		header('Content-Description: File Transfer');
+		header('Content-Disposition: attachment; filename='.$this->_dbname.'-app-installer.js');
+		header('Content-Type: text/javascript ');
+
+		if ($this->_includeCode) {
+			$mostRecords = array(null,0);
+			foreach((array)$this->dataCount as $table => $rowCount) {
+				if ($rowCount>$mostRecords[1])
+					$mostRecords = array($table,$rowCount);
+			}
+			
+			//echo '<pre>';
+			echo '/*
+
+    // to be included in the appController-class in app-controller.js:
+
+	var credentials = {
+		dbName:\''.$this->_dbname.'\',
+		dbVersion: \'1.0\', 
+		dbDisplayName: \''.$this->_projectName.'\', 
+		dbEstimatedSize: '.floor($this->_dataSize * 1.2).'
+	};
+	var pId = '.$this->getCurrentProjectId().';
+
+
+    // installer is called from main program file:
+
+	var db = appController.connect();
+	if (db) {
+		installDb(db);
+		if (debugging_in_an_actual_browser) {
+			console.log(installMsg);
+			console.dir(installErrors);
+		}
+	}
+	
+    // rename this file to app-installer.js, remove these lines and the lines above,
+    // and place it in the app\'s javascript-directory.
+    // alternatively, copy all the lines below this comment block and paste them over
+    // the contents of an existing app-installer.js that is already in place.
+
+*/
+
+var installMsg;
+var installErrors=Array();
+			
+function installDb(db,callback)
+{
+
+  var forceInstall=false;
+  var queryCount='.count((array)$this->_sqliteQueries).';
+  var queriesExecuted=0;
+  var installResult=true;
+
+  if (forceInstall) {
+
+    installMsg="installing (forced)";
+    loadRecords();
+
+  } else {
+
+    db.transaction(function (tx) {
+      tx.executeSql(
+        "select count(*) as total from '.$mostRecords[0].'",[],
+        function(tx,r) {
+          if(r.rows.item(0).total!='.$mostRecords[1].') {
+            installMsg="installing (`'.$mostRecords[0].'`recordcount mismatch)";
+            loadRecords();
+          } else {
+            installMsg="skipped install (`'.$mostRecords[0].'` recordcount match)";
+            callback(null);
+          }
+        },
+        function(tx,e){
+          installMsg="installing (recordcount failure; assuming tables don\'t exist)";
+          loadRecords();
+        }
+      )
+    });
+  }
+
+  function s()
+  {
+      queriesExecuted++;
+      finished();
+  }
+
+  function e(e)
+  {
+    installResult=false;
+    installErrors.push(e.message);
+    queriesExecuted++;
+    finished();
+  }
+
+  function finished()
+  {
+    if (queriesExecuted>=queryCount)
+      callback(installResult);
+  }
+
+
+  function loadRecords()
+  {
+
+    db.transaction(function (tx) {
+';
+	foreach ((array)$this->_sqliteQueries as $key => $val) {
+		echo '      tx.executeSql("'.$val.'",[],function(tx,r){s(r);},function(tx,e){e(e);});'.chr(10);
+	}
+echo '
+    });
+  }
+
+}
+';
+
+		} else {
+
+			echo nl2br(implode(chr(10),$this->_sqliteQueries));
+
+		}
+		
+		die();
+	
+	}
 
 }
