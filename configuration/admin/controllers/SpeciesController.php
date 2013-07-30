@@ -138,7 +138,6 @@ class SpeciesController extends Controller
     }
 
 
-
     /**
      * Index of the species module
      *
@@ -303,8 +302,6 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 	
-
-
     public function allCommonAction ()
     {
         
@@ -420,6 +417,8 @@ class SpeciesController extends Controller
 				'includeLanguageLabels' => true, 
 				'idsAsIndex' => true
 			));
+			
+			$this->smarty->assign('higherOnly', true);	
 
 		}
 

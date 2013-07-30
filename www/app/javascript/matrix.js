@@ -1,5 +1,6 @@
 var imagePath;
-var selectIndicator = '\u2022 ';
+var emptyIndicator = '\u2610'+' ';
+var selectIndicator = '\u2611'+' ';//'\u2022 ';
 var characterOrders =
 	Array(
 		['alphabet','Alphabet'],
@@ -60,7 +61,7 @@ function sortCharacters(field) {
 	$('#characteristics	').empty();
 	
 	for (var i in characters)
-		$('#characteristics').append('<option value="'+characters[i].id+'" class="'+characters[i].type+'">'+characters[i].label+' ['+characters[i].type+']</option>');
+		$('#characteristics').append('<option value="'+characters[i].id+'" class="'+characters[i].type+'">'+emptyIndicator+characters[i].label+' ['+characters[i].type+']</option>');
 
 }
 
@@ -82,7 +83,7 @@ function fillStates(obj,char) {
 
 		if (obj[i].type != 'range' && obj[i].type != 'distribution') {
 	
-			$('#states').append('<option value="'+obj[i].id+'">'+obj[i].label+'</option>').val(obj[i].id);
+			$('#states').append('<option value="'+obj[i].id+'">'+emptyIndicator+obj[i].label+'</option>').val(obj[i].id);
 	
 		}
 		
@@ -98,7 +99,7 @@ function fillStates(obj,char) {
 
 	} else {
 		
-		var t = $('#characteristics :selected').text().replace(selectIndicator,'');
+		var t = $('#characteristics :selected').text().replace(selectIndicator,emptyIndicator);
 
 		setInfo(
 			'<b>'+t+'</b><br />',
@@ -290,8 +291,6 @@ function doDialog() {
 
 }
 
-
-
 function setFreeValues(vals) {
 
 	var c = getCharacter($('#characteristics').val());
@@ -341,7 +340,7 @@ function addSelected(caller) {
 		$('#dialogValue').select();
 
 	} else {
-		
+
 		var s = states[$('#states').val()];
 		
 		if (s) {
@@ -387,7 +386,7 @@ function highlightSelected() {
 
 			if ($(this).val()==e[1]) {
 				$(this).addClass('character-selected');
-				if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
+				if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text($(this).text().replace(emptyIndicator,selectIndicator));
 			}
 
 		});
@@ -414,7 +413,7 @@ function highlightSelected() {
 	
 					if (e[2]==$(this).val())  {
 						$(this).addClass('state-selected');
-						if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text(selectIndicator + $(this).text());
+						if ($(this).text().substring(0,selectIndicator.length) != selectIndicator) $(this).text($(this).text().replace(emptyIndicator,selectIndicator));
 					}
 	
 				});
@@ -431,12 +430,12 @@ function removeHighlight() {
 
 	$('#characteristics option').each(function(i){
 		$(this).removeClass('character-selected');
-		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().substring(selectIndicator.length-1));
+		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
 	});
 	
 	$('#states option').each(function(i){
 		$(this).removeClass('state-selected');
-		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().substring(selectIndicator.length-1));
+		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
 	});
 	
 	setInfo('','',' ');

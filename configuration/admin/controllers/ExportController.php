@@ -59,7 +59,6 @@ class ExportController extends Controller
     public $controllerPublicName = 'Export';
 
     public $usedHelpers = array('array_to_xml','mysql_2_sqlite');
-//    public $usedHelpers = array('xml_parser');
 
 	public $cssToLoad = array();
 	public $jsToLoad = array();

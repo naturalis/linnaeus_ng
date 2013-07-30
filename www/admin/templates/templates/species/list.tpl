@@ -3,17 +3,13 @@
 <div id="page-main">
 
     <p>
-        {if $isHigherTaxa}
-            {t _s1='<a href="../species/sp_list.php">' _s2='</a>'}Below are all taxa in your project that are part of the higher taxa. All lower taxa can be found in the %sspecies module%s.{/t}
-        {else}
-            {t _s1='<a href="../species/ht_list.php">' _s2='</a>'}Below are all taxa in your project that are part of the species module. All higher taxa can be found in the %shigher taxa module%s.{/t}
-        {/if}
-        <br />
         {t}To edit a name, rank or parent, click the taxon's name. To edit a taxon's pages, click the percentage-indicator for that taxon in the 'content' column. To edit media files, synoyms or common names, click the cell in the corresponding column.{/t}<br />
         {if $isHigherTaxa}
             {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
         {/if}
-        <a href="#" onclick="$('tr[isHigher=1]').css('visibility',$('tr[isHigher=1]').css('visibility')=='collapse' ? 'visible' : 'collapse');">Toggle higher taxa</a> | 
+        {if !$isHigherTaxa}
+        <a href="#" onclick="$('tr[isHigher=1]').css('display',$('tr[isHigher=1]').css('display')=='none' ? '' : 'none');">Toggle higher taxa</a> | 
+        {/if}
         <a href="#" onclick="$('[class=indent-dots]').css('display',$('[class=indent-dots]').css('display')=='none' ? 'inline' : 'none');">Toggle indentation</a>
     </p>
     
@@ -31,7 +27,8 @@
 	</thead>
 	<tbody>
 	{foreach from=$taxa item=taxon key=k}
-		<tr class="tr-highlight" {if $taxon.lower_taxon==0} style="visibility:collapse" isHigher="1"{/if} type="drag-row" drag-id="{$taxon.id}">
+	    {if ($isHigherTaxa==1 && $taxon.lower_taxon==0) || !$isHigherTaxa}
+		<tr class="tr-highlight" {if $taxon.lower_taxon==0 && !$isHigherTaxa} style="display:none" isHigher="1"{/if} type="drag-row" drag-id="{$taxon.id}">
 			<td style="text-align:left;cursor:move">
 	            <span class="indent-dots" style="display:none">{' . '|str_repeat:$taxon.depth}</span>
             	<a href="edit.php?id={$taxon.id}">{$taxon.taxon_formatted}</a>
@@ -59,6 +56,7 @@
 			</td>*}
 			<td id="usage-{$taxon.id}"></td>
         </tr>
+        {/if}
     {/foreach}
 	</tbody>
     </table>
