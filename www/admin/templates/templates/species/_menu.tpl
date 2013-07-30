@@ -3,7 +3,11 @@
 &nbsp;
 {t}Type to find:{/t} <input type="text" id="allLookupBox" autocomplete="off" />
 &nbsp;
+{if $isHigherTaxa}
 <a href="sp_list.php" class="allLookupLink">{t}Taxon list{/t}</a>
+{else}
+<a href="ht_list.php" class="allLookupLink">{t}Higher taxa list{/t}</a>
+{/if}
 <a href="manage.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
 <a href="../utilities/search_index.php">Extensive search</a>
