@@ -7,6 +7,11 @@
         {if $isHigherTaxa}
             {t}Please note that you can only delete taxa that have no children, in order to maintain a correct taxon structure in the species module.{/t}<br />
         {/if}
+        {if $isHigherTaxa}
+			<a href="sp_list.php">{t}Switch to taxon list{/t}</a> |
+       	{else}
+			<a href="ht_list.php">{t}Switch to higher taxa list{/t}</a> |
+        {/if}
         {if !$isHigherTaxa}
         <a href="#" onclick="$('tr[isHigher=1]').css('display',$('tr[isHigher=1]').css('display')=='none' ? '' : 'none');">Toggle higher taxa</a> | 
         {/if}
@@ -82,7 +87,7 @@ $(document).ready(function(){
 	$('a[type="synonyms"]').each(function(i){$(this).html($(this).html()+' syn'+($(this).html()!=1 ? 's' : '')+'.')});
 	$('a[type="common"]').each(function(i){$(this).html($(this).html()+' name'+($(this).html()!=1 ? 's' : ''))});
 
-	allInitDragtable();
+//	allInitDragtable();
 
 })
 </script>
