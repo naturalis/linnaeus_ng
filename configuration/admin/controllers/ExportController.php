@@ -66,9 +66,12 @@ class ExportController extends Controller
 	private $_appExpSkipCols = array('created','last_change');
 	private $_exportDump=null;
 	private $_sqliteQueries=null;
+	private $_sqliteDropQueries=null;
 	private $_removePrefix=false;
 	private $_includeCode=true;
 	private $_dataSize=0;
+
+	private $_projectVersion='1.0';
 
 
     /**
@@ -208,7 +211,8 @@ class ExportController extends Controller
 			
 			$this->_removePrefix = isset($this->requestData['removePrefix']) && $this->requestData['removePrefix']=='y' ? $dbSettings['tablePrefix'] : false;
 			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
-
+			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
+			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
 			
 			$d = explode('-',$this->requestData['id']);
 			$matrixId = $d[0];
@@ -220,7 +224,10 @@ class ExportController extends Controller
 
 			$this->makeMatrixDump($matrixId,$languageId);
 			$this->convertDumpToSQLite();
-			$this->downloadSQLite();
+			$output = $this->downloadSQLite();
+
+			if (!$this->_downloadFile)
+				$this->smarty->assign('output',$output);
 			
 		}
 
@@ -345,6 +352,8 @@ class ExportController extends Controller
 					concat(
 						author_first,
 						(
+
+
 							if(multiple_authors=1,
 								\' et al.\',
 								if(author_second!=\'\',concat(\' & \',author_second),\'\')
@@ -1317,7 +1326,7 @@ class ExportController extends Controller
 		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $d));
 		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $d));
 		$this->_exportDump->CharacteristicLabelState = $this->models->CharacteristicLabelState->_get(array('id' => $d));
-		$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $d));
+		//$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $d));  // exporting one matrix at a time
 		$this->_exportDump->Chargroup = $this->models->Chargroup->_get(array('id' => $d));
 		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $d));
 		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $d));
@@ -1343,9 +1352,13 @@ class ExportController extends Controller
 
 			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();
 			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
-
 			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlTable();
 			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlKeys());
+
+			if ($this->_separateDrop) {
+				$this->_sqliteDropQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();			
+				$this->_sqliteDropQueries = array_merge($this->_sqliteDropQueries,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
+			}
 			
 			$this->dataCount[$this->fixTablePrefix($table)] = count((array)$data);
 
@@ -1390,132 +1403,125 @@ class ExportController extends Controller
 	
 	private function downloadSQLite()
 	{
+		
+		$output = '';
+		
+		if ($this->_downloadFile) {
 
-		header('Cache-Control: public');
-		header('Content-Description: File Transfer');
-		header('Content-Disposition: attachment; filename='.$this->_dbname.'-app-installer.js');
-		header('Content-Type: text/javascript ');
+			header('Cache-Control: public');
+			header('Content-Description: File Transfer');
+			header('Content-Disposition: attachment; filename='.$this->_dbname.'-app-installer.js');
+			header('Content-Type: text/javascript ');
 
-		if ($this->_includeCode) {
+		}
+
+		if (!$this->_includeCode) {
+
+			if ($this->_separateDrop)
+				$output .= implode(chr(10),$this->_sqliteDropQueries).chr(10).chr(10);
+
+			$output .= implode(chr(10),$this->_sqliteQueries);
+
+		} else {
+			
 			$mostRecords = array(null,0);
 			foreach((array)$this->dataCount as $table => $rowCount) {
 				if ($rowCount>$mostRecords[1])
 					$mostRecords = array($table,$rowCount);
 			}
-			
-			//echo '<pre>';
-			echo '/*
 
-    // to be included in the appController-class in app-controller.js:
-
-	var credentials = {
-		dbName:\''.$this->_dbname.'\',
-		dbVersion: \'1.0\', 
-		dbDisplayName: \''.$this->_projectName.'\', 
-		dbEstimatedSize: '.floor($this->_dataSize * 1.2).'
-	};
-	var pId = '.$this->getCurrentProjectId().';
+			$buffer='';
+			foreach ((array)$this->_sqliteQueries as $val) {
+				$buffer.=$val.chr(10);
+			}
+			$buffer=base64_encode(bzcompress($buffer));
 
 
-    // installer is called from main program file:
+			if ($this->_separateDrop) {
+				$drop='';
+				foreach ((array)$this->_sqliteDropQueries as $val) {
+					$drop.=$val.chr(10);
+				}
+				$drop=base64_encode(bzcompress($drop));
+			}
 
-	var db = appController.connect();
-	if (db) {
-		installDb(db);
-		if (debugging_in_an_actual_browser) {
-			console.log(installMsg);
-			console.dir(installErrors);
-		}
-	}
-	
-    // rename this file to app-installer.js, remove these lines and the lines above,
-    // and place it in the app\'s javascript-directory.
-    // alternatively, copy all the lines below this comment block and paste them over
-    // the contents of an existing app-installer.js that is already in place.
+		
+			$output .= "/*
 
+    // cut & paste the block below to the appController-class in app-controller.js:
+    // ----------------------------------------------------------------------------
+
+    var credentials = {
+        dbName:'".$this->_dbname."',
+        dbVersion: '".$this->_projectVersion."', 
+        dbDisplayName: '".$this->_projectName."', 
+        dbEstimatedSize: ".floor($this->_dataSize * 1.2)."
+    };
+
+    var pId = ".$this->getCurrentProjectId().";
+
+    // ----------------------------------------------------------------------------
+
+    // to add the project data to your PhoneGap app:
+    // - remove this entire comment block
+    // - copy and paste the remaining code into
+    //     /js/data/app-data.js
+    //   overwriting any existing code if the file already exists.
+    //
+    // a new download is always installed on the phone, as installConfig.exportID
+    // always has a new value (you can force a re-install of the same file by manually
+    // altering the value of installConfig.exportID)
+".($this->_separateDrop ? "
+    // there is a separate variable \"encodedDropQueries\" in the script that holds
+    // compressed drop table & index queries. these are *not* automatically
+    // executed in the install script; you'll have to do this manually by setting
+    // forceInstall to true and changing 
+    //   window.atob(installConfig.encodedData)
+    // to
+    //   window.atob(installConfig.encodedDropQueries)
+    // in the function loadRecords()
+" : '' )."
+    //  fyi, the installer is called from main program file:
+    //
+    //  var db = appController.connect();
+    //  if (db) {
+    //    installDb(db,main);
+    //    if (debugging) {
+    //      console.log(installMsg);
+    //      console.dir(installErrors);
+    //    }
+    //  } else {
+    //    if (debugging)
+    //      console.log('failed install (couldn't access database)');
+    //    main();
+    //  }
 */
-
-var installMsg;
-var installErrors=Array();
-			
-function installDb(db,callback)
-{
-
-  var forceInstall=false;
-  var queryCount='.count((array)$this->_sqliteQueries).';
-  var queriesExecuted=0;
-  var installResult=true;
-
-  if (forceInstall) {
-
-    installMsg="installing (forced)";
-    loadRecords();
-
-  } else {
-
-    db.transaction(function (tx) {
-      tx.executeSql(
-        "select count(*) as total from '.$mostRecords[0].'",[],
-        function(tx,r) {
-          if(r.rows.item(0).total!='.$mostRecords[1].') {
-            installMsg="installing (`'.$mostRecords[0].'`recordcount mismatch)";
-            loadRecords();
-          } else {
-            installMsg="skipped install (`'.$mostRecords[0].'` recordcount match)";
-            callback(null);
-          }
-        },
-        function(tx,e){
-          installMsg="installing (recordcount failure; assuming tables don\'t exist)";
-          loadRecords();
-        }
-      )
-    });
-  }
-
-  function s()
-  {
-      queriesExecuted++;
-      finished();
-  }
-
-  function e(e)
-  {
-    installResult=false;
-    installErrors.push(e.message);
-    queriesExecuted++;
-    finished();
-  }
-
-  function finished()
-  {
-    if (queriesExecuted>=queryCount)
-      callback(installResult);
-  }
-
-
-  function loadRecords()
-  {
-
-    db.transaction(function (tx) {
-';
-	foreach ((array)$this->_sqliteQueries as $key => $val) {
-		echo '      tx.executeSql("'.$val.'",[],function(tx,r){s(r);},function(tx,e){e(e);});'.chr(10);
-	}
-echo '
-    });
-  }
-
+var installConfig = {
+  installProject:'".$this->_projectName."',
+  installDbName:'".$this->_dbname."',
+  installDbVersion:'".$this->_projectVersion."',".
+//  testQuery:'select count(*) as total from ".$mostRecords[0]."',
+//  testQueryResult:".$mostRecords[1].",
+"
+  queryCount:".count((array)$this->_sqliteQueries).",
+  exportID:'".md5(time())."',  
+  encodedData:'".$buffer."'".($this->_separateDrop ? ",\n  encodedDropQueries:'".$drop."'": '')."
 }
-';
+//file end
+";
+		}
+
+		if (!$this->_downloadFile) {
+
+			return $output;
 
 		} else {
-
-			echo nl2br(implode(chr(10),$this->_sqliteQueries));
-
+			
+			echo $output;
+			
+			die();
 		}
-		
-		die();
+	
 	
 	}
 
