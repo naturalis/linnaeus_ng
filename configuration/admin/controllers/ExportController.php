@@ -1297,9 +1297,9 @@ class ExportController extends Controller
 
 		foreach((array)$this->_exportDump->Taxon as $key => $val) {
 			if (!isset($this->_exportDump->MatrixTaxon[$val['id']])) {
-				unset($this->_exportDump->Taxon[$key]);			
-				unset($this->_exportDump->Commonname[$key]);			
-				unset($this->_exportDump->TaxaRelations[$key]);
+				unset($this->_exportDump->Taxon[$val['id']]);			
+				unset($this->_exportDump->Commonname[$val['id']]);			
+				unset($this->_exportDump->TaxaRelations[$val['id']]);
 				unset($NbcExtrasT[$key]);
 			}
 		}
@@ -1312,9 +1312,9 @@ class ExportController extends Controller
 
 		foreach((array)$this->_exportDump->TaxonVariation as $key => $val) {
 			if (!isset($this->_exportDump->MatrixVariation[$val['id']])) {
-				unset($this->_exportDump->TaxonVariation[$key]);			
-				unset($this->_exportDump->VariationRelations[$key]);			
-				unset($this->_exportDump->VariationLabel[$key]);			
+				unset($this->_exportDump->TaxonVariation[$val['id']]);			
+				unset($this->_exportDump->VariationRelations[$val['id']]);			
+				unset($this->_exportDump->VariationLabel[$val['id']]);			
 				unset($NbcExtrasV[$key]);
 			}
 		}
