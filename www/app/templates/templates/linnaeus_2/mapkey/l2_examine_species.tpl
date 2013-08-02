@@ -46,7 +46,8 @@
 					<td 
 						id="cell-{$cellNo}"
 						{if $occurrences[$cellNo].type_id}datatype="{$occurrences[$cellNo].type_id}"{/if}
-						{if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}></td>
+						{if $occurrences[$cellNo].square_number==$cellNo}style="background-color:#{$occurrences[$cellNo].colour}"{/if}
+                        ></td>
 					{assign var=cellNo value=$cellNo+1}
 				{/section}
 				</tr>
@@ -67,6 +68,9 @@
 			</div>
 			{/foreach}
 		</div>
+        <p>
+	    	<a href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Grid verbergen{/t}</span><span style="display:none">{t}Grid tonen{/t}</span></a>
+        </p>
 		</td>
 	</tr>
 	<tr id="grid-footer">

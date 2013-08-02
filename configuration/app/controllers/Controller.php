@@ -2833,10 +2833,16 @@ class Controller extends BaseClass
 		-> the function SpeciesController::setLastViewedTaxonIdForTheBenefitOfTheMapkey in some cases destroys the value of
 		   $_SESSION['app']['user']['states']['mapkey'], so that the mapkey, when accesses from the main menu, automatically shows
 		   the distribution of the taxon last seen in the species module
+		   
+		update: the matrix has now been removed from this function
 	
 	*/
     private function restoreState ()
     {
+		
+		if ($this->getControllerBaseName() == 'mapkey')
+			return;
+		
         if (!isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]))
             return;
         
@@ -2846,9 +2852,11 @@ class Controller extends BaseClass
         $d = strpos($thisUrl, '?') == false ? $thisUrl : substr($thisUrl, 0, strpos($thisUrl, '?'));
         $requestHasNoFileName = $this->getViewName() == 'index' && ($d !== $_SERVER['PHP_SELF']);
         
-        if (($this->getControllerBaseName() == 'mapkey' || $this->getControllerBaseName() == 'matrixkey' || $this->getControllerBaseName() == 'index') && $requestHasNoFileName && (isset(
-        $_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']) && $_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $thisUrl)) 
-
+        if (
+			($this->getControllerBaseName() == 'mapkey' || $this->getControllerBaseName() == 'matrixkey' || $this->getControllerBaseName() == 'index') && 
+			$requestHasNoFileName && 
+			(isset($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']) && $_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage'] != $thisUrl)
+		) 
         {
             
             $this->redirect($_SESSION['app']['user']['states'][$this->getControllerBaseName()]['lastPage']);

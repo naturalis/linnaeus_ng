@@ -337,3 +337,8 @@ function l2MapIEFix() {
 	}
 
 }
+
+function l2ToggleGrid(caller) {
+	$('td[id^=cell-]').toggleClass('nogrid');
+	$(caller).children().each(function(){$(this).css('display',($(this).css('display')=='block'?'none':'block'));});
+}
