@@ -98,6 +98,11 @@ a.selectIcon:hover {
 	position: relative;
 }
 
+#mapTable td.nogrid {
+    border-right: 1px dotted transparent;
+    border-bottom: 1px dotted transparent;
+}
+
 .mapCellAxis {
 	background-color: #fff;
 	border-right: 0;

@@ -140,13 +140,14 @@ function goState() {
 			if (val) title = c.label;
 			break;
 		case 'media':
+
 			if (state.img_dimensions==null) break;
-			
+
 			var c = getCharacter(state.characteristic_id);
 			
 			if (c) var label = c.label;
 
-			title  = label+': '+$('#states :selected').text();
+			title  = label+': '+$('#states :selected').text().replace(emptyIndicator,'').replace(selectIndicator,'');
 
 			var file = encodeURIComponent(state.file_name);
 
@@ -208,7 +209,6 @@ function goState() {
 					'height:'+imgH+'px;width:'+imgW+'px;"/>';
 				
 			}
-
 			break;
 		case 'range':
 			var val = 	

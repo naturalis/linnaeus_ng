@@ -615,6 +615,7 @@ class MatrixKeyController extends Controller
                 ));
 
 				$this->saveStateImageDimensions($state);
+				$this->reacquireStateImageDimensions();
                 
                 unset($state);
                 
@@ -2508,8 +2509,10 @@ class MatrixKeyController extends Controller
 
 	}
 				
-	private function reacquireStateImageDimensions($id)
+	private function reacquireStateImageDimensions($id=null)
 	{
+		
+		$id = isset($id) ? $id : $this->getCurrentMatrixId();
 		
 		$d = $this->getCharacteristics($id);
 		

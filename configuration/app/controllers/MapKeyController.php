@@ -77,59 +77,15 @@ class MapKeyController extends Controller
     public function indexAction()
     {
 
- 		if (!$this->rHasVal('id')) {
-
-			if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
-
-				$id = $_SESSION['app']['user']['species']['lastTaxon'];
-				
-			} else {
-
-				$this->buildTaxonTree();
-	
-				if ($this->_mapType=='l2') {
-				
-					$taxa = $this->l2GetTaxaWithOccurrences();
-				
-					$d = current($taxa);
-					
-					$id = $d['id'];
-			
-				} else {
-		
-					$taxa = $this->getTaxaWithOccurrences();
-		
-					$d = current($taxa);
-					
-					$id = $d['id'];
-				}
-				
-			}
-			
-		} else {
-
-			$id = $this->requestData['id'];
-				
-		}
-
 		$this->setStoreHistory(false);
 
-		if ($this->_mapType=='l2') {
-		
-			if (isset($id)) 
-				$this->redirect('l2_examine_species.php?id='.$id);
-			else
-				$this->redirect('l2_examine.php');
-		
-		} else {
+		$id = $this->getIdToDisplay();
 
-			if (isset($id)) 
-				$this->redirect('examine_species.php?id='.$id);
-			else
-				$this->redirect('examine.php');
-			
-		}
-    
+		if (isset($id)) 
+			$this->redirect(($this->_mapType=='l2' ? 'l2_examine_species.php?id=' : 'examine_species.php?id=').$id);
+		else
+			$this->redirect(($this->_mapType=='l2' ? 'l2_examine.php' : 'examine.php'));
+   
     }
 
 	public function examineAction()
@@ -207,7 +163,7 @@ class MapKeyController extends Controller
 		if (!$this->rHasVal('ref','search')) unset($_SESSION['app']['user']['map']['search']);
 
 		if (!$this->rHasVal('ref','diversity')) unset($_SESSION['app']['user']['map']['index']);
-			
+
 		$taxon = $this->getTaxonById($this->requestData['id']);
 
 		$this->setPageName(sprintf($this->translate('Displaying "%s"'),$taxon['taxon']));
@@ -1899,6 +1855,56 @@ class MapKeyController extends Controller
 			
 		}
 	
+	}
+
+	private function getIdToDisplay()
+	{
+
+ 		if ($this->rHasVal('id')) {
+			
+			return $this->requestData['id'];
+			
+		} else {
+
+			if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+				
+				$d = 
+					array(
+						'project_id' => $this->getCurrentProjectId(),
+						'taxon_id' => $_SESSION['app']['user']['species']['lastTaxon']
+					);
+
+				if ($this->_mapType=='l2')
+					$ot = $this->models->L2OccurrenceTaxon->_get(array('id'=>$d,'columns'=>'count(*) as total'));
+				else
+					$ot = $this->models->OccurrenceTaxon->_get(array('id' =>$d,'columns'=>'count(*) as total'));
+				
+				if ($ot[0]['total']!=0)
+					return $_SESSION['app']['user']['species']['lastTaxon'];
+					
+			}
+			
+			$this->buildTaxonTree();
+
+			if ($this->_mapType=='l2') {
+			
+				$taxa = $this->l2GetTaxaWithOccurrences();
+			
+				$d = current($taxa);
+				
+				return $d['id'];
+		
+			} else {
+	
+				$taxa = $this->getTaxaWithOccurrences();
+	
+				$d = current($taxa);
+				
+				return $d['id'];
+			}
+				
+		}
+				
 	}
 	
 }
