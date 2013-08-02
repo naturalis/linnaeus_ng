@@ -5,9 +5,71 @@
 we are now doing LIKE instead of MATCH (as MATCH ignores wildcards at the beginning: *olar only matches olar, not polar)  - do the same limitations still apply? think not.
 
 
+
+
+
+flow:
+
+search
+	string
+	(no parameters)
+validateSearchString
+
+doSearch:
+
+		$p = array(
+			S_TOKENIZED_TERMS => tokenizeSearchString($search),
+			S_LIKETEXT_STRING => prefabFullTextLikeString($tokenized),
+			S_CONTAINS_LITERALS => doesSearchStringContainLiterals($tokenized),
+			S_IS_CASE_SENSITIVE => false,
+			S_RESULT_LIMIT_PER_CAT => 200,
+			S_UNSET_ORIGINAL_CONTENT => true // if true, unsets the potentially large content fields after they've been excerpted
+		);
+
+		$this->searchSpecies($p) etc:
+
+
+		// taxon content
+		$content = $this->models->Table->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'%LITERAL%' => $this->_s($p[S_LIKETEXT_STRING],array('content')), // _s  --> creates like-clause  ((taxon like '%phyllum a%' or taxon like '%orchid%'))
+					'publish' => 1
+				),
+				'columns' => 'id,taxon_id,content,page_id,content as '.__CONCAT_RESULT__,
+				'limit' => $p[S_RESULT_LIMIT_PER_CAT]
+			)
+		);
+
+		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
+			currently bypassed, because use of LIKE rather than MATCH
+		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+			implements <span class="searchResultMatch"> around hits			
+		$content = $this->sortResultsByMostTokensFound($content);
+
+
+
+
+	private function _s($s,$c)
+	{
+		$r=array();
+		foreach((array)$c as $v)
+			$r[] = str_replace(S_LIKETEXT_REPLACEMENT,$v,$s);
+
+		return '('.implode(' or ',$r).')';
+	}
+
+
+
+
+
+
+
+
 WE WILL NOT SEARCH THE MATRIX!
 
-STRIP TAGS AND SHIT FROM SEARCH STRING!!! (als0 + and - and * which fuck up the fulltext)
+STRIP TAGS AND SHIT FROM SEARCH STRING!!! (also + and - and * which fuck up the fulltext)
 
 
 	search is case-insensitive! 
@@ -39,8 +101,8 @@ class SearchController extends Controller
 	private $_minSearchLength = 3;
 	private $_maxSearchLength = 25;
 	private $_searchStringGroupDelimiter = '"';
-	private $_excerptPreMatchLength = 25;
-	private $_excerptPostMatchLength = 25;
+	private $_excerptPreMatchLength;
+	private $_excerptPostMatchLength;
 	private $_excerptPrePostMatchString = '...';
 
 	/*
@@ -117,8 +179,6 @@ class SearchController extends Controller
 	private function doSearch($search,$modules,$freeModules)
 	{
 
-		q($search);
-		
 		$tokenized = $this->tokenizeSearchString($search);
 		//$fulltext = $this->prefabFullTextMatchString($tokenized);
 		$liketxt = $this->prefabFullTextLikeString($tokenized);
@@ -155,23 +215,23 @@ class SearchController extends Controller
 				'modules' => 
 					$this->searchModules($p,$freeModules)	
 			);
-		
+
+		/*		
 		$totalcount = 0;
 		
 		foreach((array)$results as $val)
 			$totalcount += $val['numOfResults'];
 		
 		echo '<h2>'.$totalcount.'</h2>';
+		*/
 		
 		return $results;
 
 	}
 
-
-
 	private function searchSpecies($p)
 	{
-		
+
 		// taxa
 		$taxa = $this->models->Taxon->_get(
 			array(
@@ -187,6 +247,7 @@ class SearchController extends Controller
 
 		$taxa = $this->filterResultsWithTokenizedSearch(array($p,$taxa));
 		$taxa = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$taxa));
+		$taxa = $this->sortResultsByMostTokensFound($taxa);
 
 		$ranks = $this->newGetProjectRanks();
 
@@ -213,7 +274,7 @@ class SearchController extends Controller
 
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
-
+		$content = $this->sortResultsByMostTokensFound($content);
 
 		// synonyms
 		$synonyms = $this->models->Synonym->_get(
@@ -230,8 +291,7 @@ class SearchController extends Controller
 
 		$synonyms = $this->filterResultsWithTokenizedSearch(array($p,$synonyms));
 		$synonyms = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonyms));
-
-
+		$synonyms = $this->sortResultsByMostTokensFound($synonyms);
 
 		// common names
 		$commonnames = $this->models->Commonname->_get(
@@ -262,8 +322,7 @@ class SearchController extends Controller
 		}
 
 		$commonnames = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false));
-
-
+		$commonnames = $this->sortResultsByMostTokensFound($commonnames);
 
 		// media
 		$media = $this->models->MediaDescriptionsTaxon->_get(
@@ -279,6 +338,7 @@ class SearchController extends Controller
 		);
 		$media = $this->filterResultsWithTokenizedSearch(array($p,$media));
 		$media = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$media));
+		$media = $this->sortResultsByMostTokensFound($media);
 
 		$d = $this->models->MediaTaxon->_get(
 			array(
@@ -354,6 +414,7 @@ class SearchController extends Controller
 
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
 			'results' => array(
@@ -388,8 +449,7 @@ class SearchController extends Controller
 
 		$gloss = $this->filterResultsWithTokenizedSearch(array($p,$gloss));
 		$gloss = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$gloss));
-
-
+		$gloss = $this->sortResultsByMostTokensFound($gloss);
 
 		// glossary synonyms
 		$synonym = $this->models->GlossarySynonym->_get(
@@ -406,8 +466,8 @@ class SearchController extends Controller
 
 		$synonym = $this->filterResultsWithTokenizedSearch(array($p,$synonym));
 		$synonym = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonym));
+		$synonym = $this->sortResultsByMostTokensFound($synonym);
 
- 
 		return array(
 			'results' => array(
 				array(
@@ -498,8 +558,8 @@ class SearchController extends Controller
 
 		$books = array_merge((array)$books,(array)$more); // and resets the keys as well. how neat.
 		$books = $this->filterResultsWithTokenizedSearch(array($p,$books));
-
 		$books = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$books));
+		$books = $this->sortResultsByMostTokensFound($books);
 
 		return array(
 			'results' => array(
@@ -545,6 +605,7 @@ class SearchController extends Controller
 
  		$choices = $this->filterResultsWithTokenizedSearch(array($p,$choices));
 		$choices = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$choices));
+		$choices = $this->sortResultsByMostTokensFound($choices);
 
 		foreach((array)$choices as $key => $val) {
 
@@ -578,6 +639,7 @@ class SearchController extends Controller
 
 		$steps = $this->filterResultsWithTokenizedSearch(array($p,$steps));
 		$steps = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$steps));
+		$steps = $this->sortResultsByMostTokensFound($steps);
 
 		foreach((array)$steps as $key => $val)
 			$steps[$key]['label'] = sprintf($this->translate('Step %s'),$keysteps[$val['keystep_id']]['number']);
@@ -630,6 +692,7 @@ class SearchController extends Controller
 
 		$titles = $this->filterResultsWithTokenizedSearch(array($p,$titles));
 		$titles = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$titles));
+		$titles = $this->sortResultsByMostTokensFound($titles);
 
 		return array(
 			'results' => array(
@@ -665,6 +728,7 @@ class SearchController extends Controller
 
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
 			'results' => array(
@@ -716,6 +780,7 @@ class SearchController extends Controller
 
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
+		$content = $this->sortResultsByMostTokensFound($content);
 		
 		$r = array();
 		
@@ -749,9 +814,29 @@ class SearchController extends Controller
 	}
 	
 
+	private function initialize()
+	{
 
-	
-	
+		define('S_TOKENIZED_TERMS',0);
+		define('S_FULLTEXT_STRING',1);
+		define('S_CONTAINS_LITERALS',2);
+		define('S_IS_CASE_SENSITIVE',3);
+		define('S_RESULT_LIMIT_PER_CAT',4);
+		define('S_LIKETEXT_STRING',5);
+		define('S_UNSET_ORIGINAL_CONTENT',6);
+		define('S_LIKETEXT_REPLACEMENT','###');
+		
+		define('__CONCAT_RESULT__','__CONCAT_RESULT__');
+
+		$this->_minSearchLength = isset($this->controllerSettings['minSearchLength']) ? $this->controllerSettings['minSearchLength'] : $this->_minSearchLength;
+		$this->_maxSearchLength = isset($this->controllerSettings['maxSearchLength']) ? $this->controllerSettings['maxSearchLength'] : $this->_maxSearchLength;
+		$this->_excerptPreMatchLength = isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
+		$this->_excerptPostMatchLength = isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
+		$this->_excerptPrePostMatchString = isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
+		
+	}
+
+
 	private function validateSearchString($s)
 	{
 		return
@@ -921,7 +1006,7 @@ class SearchController extends Controller
 		$s = isset($p['param']) ? $p['param'] : null;						// search parameters
 		$r = isset($p['results']) ? $p['results'] : null;					// results array
 		$f = isset($p['fields']) ? $p['fields'] : array('label','content');	// fields to match
-		$x = isset($p['excerpt']) ? $p['excerpt'] : array('content');		// fields to excerpted (rather than return completely)
+		$x = isset($p['excerpt']) ? $p['excerpt'] : array('content');		// fields to be excerpted (rather than return completely)
 
 		if (!is_array($x)) $x = array(); // for when called with 'excerpt' => false (excerpt none of the fields)
 
@@ -938,14 +1023,19 @@ class SearchController extends Controller
 					$stripped = $this->stripTagsForSearchExcerpt($result[$field]);
 
 					foreach((array)$s[S_TOKENIZED_TERMS] as $token) {
+						
+						$r[$rKey]['tokens_found'][$token]=!isset($r[$rKey]['tokens_found'][$token]) ? 0 : $r[$rKey]['tokens_found'][$token];
 
 						$matches=array();
 						preg_match_all('/'.$token.'/'.($s[S_IS_CASE_SENSITIVE] ? '' : 'i'),$stripped,$matches,PREG_OFFSET_CAPTURE);
 
 						if (isset($matches[0])) {
 							foreach((array)$matches[0] as $match) {
-								if (isset($match[0])) $fullmatches[]=$match;
-							}	
+								if (isset($match[0])) {
+									$fullmatches[]=$match;
+									$r[$rKey]['tokens_found'][$token]++;
+								}
+							}
 						}
 						
 						unset($matches);
@@ -958,7 +1048,7 @@ class SearchController extends Controller
 
 							$start = ($match[1] < $this->_excerptPreMatchLength ? 0 : ($match[1] - $this->_excerptPreMatchLength));
 							$r[$rKey]['matches'][]= 
-								($match[1]>0 ? $this->_excerptPrePostMatchString : '').
+								($start>0 ? $this->_excerptPrePostMatchString : '').
 								substr($stripped,$start,($match[1]-$start)).
 								'<span class="searchResultMatch">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]),$this->_excerptPostMatchLength).
@@ -987,6 +1077,28 @@ class SearchController extends Controller
 		return $r;
 
 
+	}
+
+
+	private function sortResultsByMostTokensFound($data)
+	{	
+	
+		if (count((array)$data)<2)
+			return $data;
+	
+		foreach((array)$data as $key=>$val) {
+			$scores[$key]=0;
+			if (isset($val['tokens_found'])) {
+				foreach((array)$val['tokens_found'] as $token)
+					if ($token>0) $scores[$key]++;
+			}
+		}
+		uasort($scores,function($a,$b){return($a>$b?-1:($a<$b?1:0));});
+		$res=array();
+		foreach((array)$scores as $key => $val) {
+			$res[]=$data[$key];
+		}
+		return $res;
 	}
 	
 
@@ -1020,7 +1132,6 @@ class SearchController extends Controller
 
 		if ($this->rHasVal('search')) {
 			
-
 			$_SESSION['admin']['user']['search']['search'] = array(
 				'search' => $this->requestData['search'],
 				//'replacement' => $this->rHasVal('replacement') ? $this->requestData['replacement'] : null,
@@ -1042,9 +1153,8 @@ class SearchController extends Controller
 				$_SESSION['admin']['user']['search'][$this->requestData['search']]['results'] = $results;
 
 				$this->addMessage('Searched for '.$this->requestData['search']);
+				$this->smarty->assign('results',$results);
 				
-				q($results);
-
 			} else {
 
 				$this->addError(sprintf($this->translate('Search string must be between %s and %s characters in length.'),$this->_minSearchLength,$this->_maxSearchLength));
@@ -1053,7 +1163,7 @@ class SearchController extends Controller
 			
 			
 
-		if (1==2) { 
+if (1==2) { 
 		
 			if (
 				!isset($_SESSION['admin']['user']['search'][$search]) || 
@@ -1093,35 +1203,9 @@ class SearchController extends Controller
 			return $results;
 			
 		}
-						
-			
-			
+					
 
-			/*
--
-
-
-			$_SESSION['admin']['user']['search']['replace']['index'] = $this->_replaceStatusIndex;
-
-			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','all')) {
-			
-				$_SESSION['admin']['user']['search']['results']['replace_all'] = true;
-
-				$this->redirect('search_replace_all.php');
-
-			} else
-			if ($this->rHasVal('doReplace','on') && $this->rHasVal('replacement') && $this->rHasVal('options','perOccurrence')) {
-
-				$this->redirect('search_replace.php');
-
-			} else {
-
-				$this->redirect('search_results.php');
-
-			}	
-			*/	
-
-		}
+}
 
 		if (isset($_SESSION['admin']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['admin']['user']['search']['search']);
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
@@ -1992,27 +2076,7 @@ class SearchController extends Controller
 
 	}
 
-	private function initialize()
-	{
 
-		define('S_TOKENIZED_TERMS',0);
-		define('S_FULLTEXT_STRING',1);
-		define('S_CONTAINS_LITERALS',2);
-		define('S_IS_CASE_SENSITIVE',3);
-		define('S_RESULT_LIMIT_PER_CAT',4);
-		define('S_LIKETEXT_STRING',5);
-		define('S_UNSET_ORIGINAL_CONTENT',6);
-		define('S_LIKETEXT_REPLACEMENT','###');
-		
-		define('__CONCAT_RESULT__','__CONCAT_RESULT__');
-
-		$this->_minSearchLength = isset($this->controllerSettings['minSearchLength']) ? $this->controllerSettings['minSearchLength'] : $this->_minSearchLength;
-		$this->_maxSearchLength = isset($this->controllerSettings['maxSearchLength']) ? $this->controllerSettings['maxSearchLength'] : $this->_maxSearchLength;
-		$this->_excerptPreMatchLength = isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 25;
-		$this->_excerptPostMatchLength = isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 25;
-		$this->_excerptPrePostMatchString = isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
-		
-	}
 
 
 

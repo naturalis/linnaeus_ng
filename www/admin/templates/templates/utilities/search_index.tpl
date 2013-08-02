@@ -1,9 +1,6 @@
 {include file="../shared/admin-header.tpl"}
 
-<form id="theForm" method="post" action="" -onsubmit="return searchDoSearchForm()" >
-
-FULL TEXT, so: <a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-stopwords.html">lots of words are ignored</a><br /> and
-<a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-fine-tuning.html">min length = 4 </a>
+<form id="theForm" method="post" action="" onsubmit="return searchDoSearchForm()" >
 
 <div class="page-generic-div">
     <p>
@@ -20,39 +17,40 @@ FULL TEXT, so: <a href="http://dev.mysql.com/doc/refman/5.0/en/fulltext-stopword
     <p>
         {t}In modules:{/t}<br />
         {foreach from=$modules.modules item=v}
-        {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search'}
+        {if $v.module!='Higher taxa' && $v.module!='Index' && $v.module!='Search' && $v.module!=''}
         <label>
             <input
                 type="checkbox" 
                 name="modules[{$v.id}]" 
                 value="{$v.controller}" {if $search.modules[$v.id]==$v.controller || $search.modules==null}checked="checked"{/if}
              />
-            {if $v.module=='Species module'} {t}Species module{/t} / {t}Higher taxa{/t}
-            {elseif $v.module=='Additional texts'}{t}Navigator{/t}{else}
-            {t}{$v.module}{/t}{/if}
+             {if $v.module=='Species module'} {t}Species module{/t} / {t}Higher taxa{/t}{elseif $v.module=='Additional texts'}{t}Navigator{/t}{else}{t}{$v.module}{/t}{/if}
         </label><br />
         {/if}
         {/foreach}
-        <br />
         {foreach from=$modules.freeModules item=v}
-        <label><input type="checkbox" name="freeModules[{$v.id}]" value="{$v.id}" {if $search.freeModules[$v.id]==$v.id || $search.modules==null}checked="checked"{/if} />{t}{$v.module}{/t}</label><br />
+        <label>
+        	<input type="checkbox" name="freeModules[{$v.id}]" value="{$v.id}" {if $search.freeModules[$v.id]==$v.id || $search.modules==null}checked="checked"{/if} />
+	        {t}{$v.module}{/t}
+		</label><br />
         {/foreach}
 
 	</p>
-	{*<p>
-	<fieldset>
-	<legend><label><input name="doReplace" type="checkbox" id="replaceToggle" onchange="searchToggleReplace()" {if $search.doReplace=='on'}checked="checked"{/if} />{t}Replace{/t}</label></legend>
-	<div id="replaceParameters" class="replaceBlankedOut">
-	{t}Replace with:{/t} <input type="text" id="replacement" name="replacement" value="" disabled="disabled" /><br />
-	<i>{t}Do not enclose multiple words with double quotes, unless you want them as part of the actual replacement string.{/t}</i><br /><br />
-	{t}Replace options:{/t}<br />
-	<label><input type="radio" name="options" id="optionsShow" value="perOccurrence" {if $search.options!='optionsAll'}checked="checked"{/if} disabled="disabled" />{t}Confirm per match{/t}</label><br />
-	<label><input type="radio" name="options" id="optionsAll" value="all" {if $search.options=='optionsAll'}checked="checked"{/if} disabled="disabled" />{t}Replace all without confirmation{/t}</label><br />
-	</div>
-	</fieldset>
-	</p>*}
 	<input type="submit" id="searchButton" value="{t}search{/t}" />
 	</form>
+{if $results}
+<p>
+{foreach from=$results item=v}
+	{foreach from=$v.results item=r}
+		<h3>{$r.label}</h3>
+		{foreach from=$r.data item=d}
+			<h4>{$d.label}</h4>
+		{/foreach}
+	{/foreach}
+{/foreach}
+</p>
+{/if}    
+    
 </div>
 
 {literal}
