@@ -213,6 +213,7 @@ class ExportController extends Controller
 			$this->_includeCode = isset($this->requestData['includeCode']) && $this->requestData['includeCode']=='y' ? true : false;
 			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
 			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
+			$this->_reduceURLs = isset($this->requestData['reduceURLs']) && $this->requestData['reduceURLs']=='y' ? true : false;
 			
 			$d = explode('-',$this->requestData['id']);
 			$matrixId = $d[0];
@@ -1282,18 +1283,18 @@ class ExportController extends Controller
     private function makeMatrixDump ($matrixId,$languageId)
 	{
 		
-		$d = 
+		$where = 
 			array(
 				'project_id' => $this->getCurrentProjectId(),
 				'matrix_id' => $matrixId,
 				'language_id' => $languageId
 			);
 
-		$NbcExtrasT = $this->models->NbcExtras->_get(array('id' => array_merge($d,array('ref_type'=>'taxon')),'fieldAsIndex' => 'ref_id'));
-		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
-		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $d));
-		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
-		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $d,'fieldAsIndex' => 'taxon_id'));
+		$NbcExtrasT = $this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')),'fieldAsIndex' => 'ref_id'));
+		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
+		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
 
 		foreach((array)$this->_exportDump->Taxon as $key => $val) {
 			if (!isset($this->_exportDump->MatrixTaxon[$val['id']])) {
@@ -1304,11 +1305,11 @@ class ExportController extends Controller
 			}
 		}
 
-		$NbcExtrasV = $this->models->NbcExtras->_get(array('id' => array_merge($d,array('ref_type'=>'variation')),'fieldAsIndex' => 'ref_id'));
-		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
-		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $d));
-		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
-		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $d,'fieldAsIndex' => 'variation_id'));
+		$NbcExtrasV = $this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation')),'fieldAsIndex' => 'ref_id'));
+		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
+		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
+		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
+		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
 
 		foreach((array)$this->_exportDump->TaxonVariation as $key => $val) {
 			if (!isset($this->_exportDump->MatrixVariation[$val['id']])) {
@@ -1319,19 +1320,26 @@ class ExportController extends Controller
 			}
 		}
 		
-		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $d));
+		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
 		$this->_exportDump->NbcExtras = array_merge($NbcExtrasT,$NbcExtrasV);
+		if ($this->_reduceURLs) {
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
+				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && (stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)) {
+					$d=pathinfo($val['value']);
+					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
+				}
+			}
+		}
+		$this->_exportDump->Characteristic = $this->models->Characteristic->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicLabelState = $this->models->CharacteristicLabelState->_get(array('id' => $where));
+		//$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $where));  // exporting one matrix at a time
+		$this->_exportDump->Chargroup = $this->models->Chargroup->_get(array('id' => $where));
+		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $where));
+		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $where));
 
-		$this->_exportDump->Characteristic = $this->models->Characteristic->_get(array('id' => $d));
-		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $d));
-		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $d));
-		$this->_exportDump->CharacteristicLabelState = $this->models->CharacteristicLabelState->_get(array('id' => $d));
-		//$this->_exportDump->CharacteristicMatrix = $this->models->CharacteristicMatrix->_get(array('id' => $d));  // exporting one matrix at a time
-		$this->_exportDump->Chargroup = $this->models->Chargroup->_get(array('id' => $d));
-		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $d));
-		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $d));
-
-		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $d));
+		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
 		
 	}
 	
