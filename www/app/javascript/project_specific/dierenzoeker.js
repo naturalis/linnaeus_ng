@@ -30,7 +30,7 @@ function nbcGetResults(p) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			console.log(data);
+			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
 			setCursor();
@@ -222,7 +222,6 @@ function toonDier(id,type) {
 			}
 		}
 	});
-
 }
 
 function verbergDier() {

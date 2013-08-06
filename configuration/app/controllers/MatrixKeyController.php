@@ -1759,7 +1759,7 @@ class MatrixKeyController extends Controller
         return $tv;
     }
 
-    private function getVariationsInMatrix ($style = 'long')
+    private function getVariationsInMatrix ($style='long')
     {
         $mv = $this->models->MatrixVariation->_get(
         array(
@@ -1982,7 +1982,7 @@ class MatrixKeyController extends Controller
 
     private function getRemainingStateCount ($p=null)
     {
-    
+
         $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
         $groupByCharId = isset($p['groupByCharId']) ? $p['groupByCharId'] : false;
@@ -2021,6 +2021,7 @@ class MatrixKeyController extends Controller
 						
 						$d['mean >=#'] = '(' . strval(intval($value)) . ' - (' . strval(intval($sd)) . ' * sd))';
 						$d['mean <=#'] = '(' . strval(intval($value)) . ' + (' . strval(intval($sd)) . ' * sd))';
+
 					} else {
 						
 						$d['lower <='] = $d['upper >='] = intval($value);
@@ -2058,7 +2059,7 @@ class MatrixKeyController extends Controller
 
         
         /*
-         find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
+        find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
         have the already selected states, unless no states have been selected at all, in which case we just
         return them all
         */
