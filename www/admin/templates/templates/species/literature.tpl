@@ -14,16 +14,14 @@
 		<th style="width:500px">{t}reference{/t}</th>
 		<th></th>
 	</tr>
-{section name=i loop=$refs}
+{foreach from=$refs item=v}
 	<tr class="tr-highlight">
-		<td>
-			{$refs[i].author_first}
-			{if $refs[i].multiple_authors==1}{t}et al.{/t}{else}{if $refs[i].author_second!=''}&amp; {$refs[i].author_second}{/if}{/if}</td>
-		<td>{$refs[i].year}</td>
-		<td>{$refs[i].text|@substr:0:75}{if $refs[i].text|@strlen>75}...{/if}</td>
+		<td>{$v.author_full}</td>
+		<td>{$v.year_full}</td>
+		<td>{$v.text|@substr:0:75}{if $refs[i].text|@strlen>75}...{/if}</td>
 		<td>[<a href="../literature/edit.php?id={$refs[i].id}">{t}edit{/t}</a>]</td>
 	</tr>
-{/section}
+{/foreach}
 </table>
 <form method="post" action="" name="sortForm" id="sortForm">
 <input type="hidden" name="key" id="key" value="{$sortBy.key}" />
