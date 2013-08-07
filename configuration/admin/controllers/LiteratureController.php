@@ -124,8 +124,10 @@ class LiteratureController extends Controller
 			$this->clearCache($this->cacheFiles);
 			
 			$_SESSION['admin']['system']['literature']['activeLetter'] = strtolower(substr($ref['author_first'],0,1));
-			
+
 			$this->deleteReference($this->requestData['id']);
+
+			$this->clearCache($this->cacheFiles);
 
 			$navList = $this->getReferencesNavList(true);
 
@@ -189,7 +191,7 @@ class LiteratureController extends Controller
 				
 					foreach((array)$this->requestData['selectedTaxa'] as $key => $val) {
 	
-						$this->saveLiteratureTaxon($this->requestData['id'],$val,$key);
+						$this->saveLiteratureTaxon($id,$val,$key);
 	
 					}
 
@@ -668,7 +670,7 @@ class LiteratureController extends Controller
 
 	private function deleteReference($id)
 	{
-
+q($id);
 		if (empty($id)) return false;
 
 		$this->models->LiteratureTaxon->delete(
