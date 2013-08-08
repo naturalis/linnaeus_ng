@@ -65,8 +65,6 @@ class MatrixKeyController extends Controller
 
     }
 
-
-
     /**
      * Destroys
      *
@@ -76,7 +74,6 @@ class MatrixKeyController extends Controller
     {
         parent::__destruct();
     }
-
 
     public function indexAction ()
     {
@@ -113,7 +110,6 @@ class MatrixKeyController extends Controller
         
     }
 
-
     public function matricesAction ()
     {
 		
@@ -128,7 +124,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
 
     }
-
 
     public function useMatrixAction ()
     {
@@ -146,7 +141,6 @@ class MatrixKeyController extends Controller
             $this->printGenericError($this->translate('Missing matrix ID.'));
         }
     }
-
 
     public function identifyAction ()
     {
@@ -255,7 +249,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-
     public function examineAction ()
     {
         $this->checkMatrixIdOverride();
@@ -284,7 +277,6 @@ class MatrixKeyController extends Controller
         $this->printPage();
     }
 
-
     public function compareAction ()
     {
         $this->checkMatrixIdOverride();
@@ -312,7 +304,6 @@ class MatrixKeyController extends Controller
         
         $this->printPage();
     }
-
 
     public function ajaxInterfaceAction ()
     {
@@ -557,12 +548,10 @@ class MatrixKeyController extends Controller
 
     }
 
-
     public function getCurrentMatrixId ()
     {
         return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
     }
-
 
     public function cacheAllTaxaInMatrix ()
     {
@@ -609,8 +598,6 @@ class MatrixKeyController extends Controller
         }
     }
 
-
-
     private function initialize ($force = false)
     {
         $this->_matrixType = strtolower($this->getSetting('matrixtype'));
@@ -628,7 +615,6 @@ class MatrixKeyController extends Controller
         }
 
     }
-
 
     private function getMatrices ()
     {
@@ -674,7 +660,6 @@ class MatrixKeyController extends Controller
         return $m;
     }
 
-
     private function getDefaultMatrixId ()
     {
 
@@ -691,7 +676,6 @@ class MatrixKeyController extends Controller
 		return isset($m[0]['id']) ? $m[0]['id'] : null;
 
     }
-
 
     private function getFirstMatrixId ()
     {
@@ -749,8 +733,6 @@ class MatrixKeyController extends Controller
         return $taxa;
     }
 
-
-
     private function checkMatrixIdOverride ()
     {
         if (!$this->rHasVal('mtrx'))
@@ -761,14 +743,10 @@ class MatrixKeyController extends Controller
 			
     }
 
-
-
     private function getCurrentMatrix ()
     {
         return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
     }
-
-
 
     private function setCurrentMatrix ($id)
     {
@@ -1097,6 +1075,8 @@ class MatrixKeyController extends Controller
 				group by _a.variation_id" : "")
 				//."order by s desc"
         ;
+
+		q($q,1);
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
@@ -1983,6 +1963,31 @@ class MatrixKeyController extends Controller
     private function getRemainingStateCount ($p=null)
     {
 
+		/*
+		
+		sleeker statement from app!
+		
+		select state_id, sum(tot) as tot from (
+				select state_id, count(taxon_id) as tot
+				from dev_matrices_taxa_states
+				where project_id=219
+				and state_id not in (25772) --> optionally take out states that already have been selected (doesn't happen in the current statement below)
+				and taxon_id in (91207,...,91182) --> restrict to already selected taxa
+				group by state_id
+			union
+				select state_id, count(variation_id) as tot
+				from dev_matrices_taxa_states
+				where project_id=219
+				and state_id not in (25772) --> optionally take out states that already have been selected (doesn't happen in the current statement below)
+				and variation_id in (5598,...,5582) --> restrict to already selected variations
+				group by state_id
+		) as unionized
+		group by state_id
+		order by state_id
+		
+		*/
+
+
         $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
         $groupByCharId = isset($p['groupByCharId']) ? $p['groupByCharId'] : false;
@@ -2736,7 +2741,6 @@ class MatrixKeyController extends Controller
 
 	private function getGUIMenu($p=null)
 	{
-
 
         $g = isset($p['groups']) ? $p['groups'] : null;
         $c = isset($p['characters']) ? $p['characters'] : null;

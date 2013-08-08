@@ -500,8 +500,6 @@ class LiteratureController extends Controller
 				)
 			);
 
-			$tc = 'id,taxon,rank_id,list_level,is_hybrid';
-
 			foreach((array)$lt as $key => $val) {
 
 				if (isset($val['taxon_id'])) {
@@ -512,7 +510,7 @@ class LiteratureController extends Controller
 								'project_id' => $this->getCurrentProjectId(),
 								'id' => $val['taxon_id']
 							),
-							'columns' => $tc
+							'columns' => 'id,taxon,rank_id,list_level,is_hybrid'
 						)
 					);
 
