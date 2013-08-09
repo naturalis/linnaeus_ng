@@ -214,6 +214,7 @@ class ExportController extends Controller
 			$this->_downloadFile = isset($this->requestData['downloadFile']) && $this->requestData['downloadFile']=='y' ? true : false;
 			$this->_separateDrop = isset($this->requestData['separateDrop']) && $this->requestData['separateDrop']=='y' ? true : false;
 			$this->_reduceURLs = isset($this->requestData['reduceURLs']) && $this->requestData['reduceURLs']=='y' ? true : false;
+			$this->_makeImageList = isset($this->requestData['imageList']) && $this->requestData['imageList']=='y' ? true : false;
 			
 			$d = explode('-',$this->requestData['id']);
 			$matrixId = $d[0];
@@ -224,6 +225,7 @@ class ExportController extends Controller
 			$this->_projectName = $matrices[$matrixId]['names'][$languageId]['name'];
 
 			$this->makeMatrixDump($matrixId,$languageId);
+			if ($this->_makeImageList) $this->makeImageList();
 			$this->convertDumpToSQLite();
 			$output = $this->downloadSQLite();
 
@@ -1289,47 +1291,17 @@ class ExportController extends Controller
 				'matrix_id' => $matrixId,
 				'language_id' => $languageId
 			);
+			
+		/*
+			theoretically, we could be exporting too much data: taxa that are not in MatrixTaxon should
+			be ignored when querying Commonname, ContentTaxon, MediaTaxon etc. the most transparent way
+			of doing this would be filtering all data of all elements in the _exportDump object and 
+			deleting each set of values that has a taxon_id that is not in _exportDump->MatrixTaxon.
+			however, once we're exporting complete LNG-projects, we're going to need all data anyway,
+			and the "matrix-only"-projects - dierenzoeker, boktorren - hardly have any data beyond that
+			needed in the matrix.
+		*/
 
-		$NbcExtrasT = $this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')),'fieldAsIndex' => 'ref_id'));
-		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
-		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
-		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
-		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where,'fieldAsIndex' => 'taxon_id'));
-
-		foreach((array)$this->_exportDump->Taxon as $key => $val) {
-			if (!isset($this->_exportDump->MatrixTaxon[$val['id']])) {
-				unset($this->_exportDump->Taxon[$val['id']]);			
-				unset($this->_exportDump->Commonname[$val['id']]);			
-				unset($this->_exportDump->TaxaRelations[$val['id']]);
-				unset($NbcExtrasT[$key]);
-			}
-		}
-
-		$NbcExtrasV = $this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation')),'fieldAsIndex' => 'ref_id'));
-		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
-		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
-		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
-		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where,'fieldAsIndex' => 'variation_id'));
-
-		foreach((array)$this->_exportDump->TaxonVariation as $key => $val) {
-			if (!isset($this->_exportDump->MatrixVariation[$val['id']])) {
-				unset($this->_exportDump->TaxonVariation[$val['id']]);			
-				unset($this->_exportDump->VariationRelations[$val['id']]);			
-				unset($this->_exportDump->VariationLabel[$val['id']]);			
-				unset($NbcExtrasV[$key]);
-			}
-		}
-		
-		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
-		$this->_exportDump->NbcExtras = array_merge($NbcExtrasT,$NbcExtrasV);
-		if ($this->_reduceURLs) {
-			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
-				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && (stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)) {
-					$d=pathinfo($val['value']);
-					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
-				}
-			}
-		}
 		$this->_exportDump->Characteristic = $this->models->Characteristic->_get(array('id' => $where));
 		$this->_exportDump->CharacteristicLabel = $this->models->CharacteristicLabel->_get(array('id' => $where));
 		$this->_exportDump->CharacteristicState = $this->models->CharacteristicState->_get(array('id' => $where));
@@ -1339,8 +1311,60 @@ class ExportController extends Controller
 		$this->_exportDump->ChargroupLabel = $this->models->ChargroupLabel->_get(array('id' => $where));
 		$this->_exportDump->CharacteristicChargroup = $this->models->CharacteristicChargroup->_get(array('id' => $where));
 
-		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
+		$this->_exportDump->MatrixTaxon = $this->models->MatrixTaxon->_get(array('id' => $where));
+		$this->_exportDump->Taxon = $this->models->Taxon->_get(array('id' => $where));
+		$this->_exportDump->Commonname = $this->models->Commonname->_get(array('id' => $where));
+		$this->_exportDump->TaxaRelations = $this->models->TaxaRelations->_get(array('id' => $where));
+		$this->_exportDump->ContentTaxon = $this->models->ContentTaxon->_get(array('id' => $where));
+		$this->_exportDump->MediaTaxon = $this->models->MediaTaxon->_get(array('id' => $where));
+
+		$this->_exportDump->MatrixVariation = $this->models->MatrixVariation->_get(array('id' => $where));
+		$this->_exportDump->TaxonVariation = $this->models->TaxonVariation->_get(array('id' => $where));
+		$this->_exportDump->VariationRelations = $this->models->VariationRelations->_get(array('id' => $where));
+		$this->_exportDump->VariationLabel = $this->models->VariationLabel->_get(array('id' => $where));
+
+		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
+
+		$this->_exportDump->NbcExtras = array_merge(
+			$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')))),
+			$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation'))))
+		);
+
+		if ($this->_reduceURLs) {
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
+				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && (stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)) {
+					$d=pathinfo($val['value']);
+					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
+				}
+			}
+		}
 		
+		$this->_exportDump->GuiMenuOrder = $this->models->GuiMenuOrder->_get(array('id' => $where));
+		$this->_exportDump->PageTaxon = $this->models->PageTaxon->_get(array('id' => $where));
+		$this->_exportDump->PageTaxonTitle = $this->models->PageTaxonTitle->_get(array('id' => $where));
+		
+	}
+	
+	private function makeImageList()
+	{
+		
+		if (isset($this->_exportDump->MediaTaxon)) {
+			foreach((array)$this->_exportDump->MediaTaxon as $key => $val)
+				$this->_imageList[]=$val['file_name'];
+		}
+
+		if (isset($this->_exportDump->CharacteristicState)) {
+			foreach((array)$this->_exportDump->CharacteristicState as $key => $val)
+				if (!empty($val['file_name'])) $this->_imageList[]=$val['file_name'];
+		}
+		
+		if (isset($this->_exportDump->NbcExtras)) {
+			foreach((array)$this->_exportDump->NbcExtras as $key => $val) {
+				if ($val['name']=='url_thumbnail'||$val['name']=='url_image')
+					$this->_imageList[]=$val['value'];
+			}
+		}		
+
 	}
 	
 	private function convertDumpToSQLite()
@@ -1503,6 +1527,12 @@ class ExportController extends Controller
     //      console.log('failed install (couldn't access database)');
     //    main();
     //  }
+    //
+".($this->_makeImageList ? "
+    //    below is a list of images referred to in the data:
+    //
+    //    ".implode(chr(10).'    //    ',$this->_imageList)."
+" : '')."    //
 */
 var installConfig = {
   installProject:'".$this->_projectName."',
