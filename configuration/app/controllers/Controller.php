@@ -152,7 +152,8 @@ class Controller extends BaseClass
     );
     private $usedHelpersBase = array(
         'logging_helper', 
-        'debug_tools'
+        'debug_tools',
+		'user_agent'
     );
     public $cssToLoadBase = array(
         'basics.css', 
@@ -247,6 +248,19 @@ class Controller extends BaseClass
         session_write_close();
         
         parent::__destruct();
+    }
+
+
+   protected function saveCache ($key, $data)
+    {
+        if ($this->useCache == false)
+            return;
+        
+        $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
+        
+        if (!file_put_contents($cacheFile, serialize($data))) {
+            die('Cannot write to cache folder ' . $_SESSION['app']['project']['urls']['cache']);
+        }
     }
 
 
@@ -507,6 +521,111 @@ class Controller extends BaseClass
         $this->smarty->assign('message',(!empty($message) ? $message : $this->translate('An error occurred.')));
         $this->printPage('../shared/generic-error');
 	}
+
+
+	public function setSearchResultIndexActive($id)
+	{
+
+		$_SESSION['app']['user']['search']['lastResultSetIndexActive'] = $id;
+
+	}
+
+	public function getSearchResultIndexActive()
+	{
+
+		return isset($_SESSION['app']['user']['search']['lastResultSetIndexActive']) ? $_SESSION['app']['user']['search']['lastResultSetIndexActive'] : null;
+
+	}
+
+
+	public function getNbcExtras($p=null)
+	{
+		
+        $id = isset($p['id']) ? $p['id'] : null;
+        $type = isset($p['type']) ? $p['type'] : 'taxon';
+        $name = isset($p['name']) ? $p['name'] : null;
+		
+		if (is_null($id) || is_null($type))
+			return;
+
+		$d = array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'ref_id' => $id, 
+				'ref_type' => $type
+			);
+			
+		if (isset($name))
+			$d['name'] = $name;
+
+		$extras = $this->models->NbcExtras->_get(
+			array(
+				'id' => $d, 
+				'columns' => 'name,value',
+			));
+
+		if (isset($name))
+			return $extras[0]['value'];
+			
+		foreach((array)$extras as $val)
+			$extras[$val['name']] = $val['value'];
+			
+		return $extras;
+		
+	}
+
+    public function generateRandomHexString ($pre=null,$post=null)
+    {
+        return $pre.substr(md5(rand()), 0, 16).$post;
+    }
+
+
+    public function getTreeList ($p = null)
+    {
+		
+		if (!$this->projectHasTaxa())
+			return;
+		
+        if (!isset($this->treeList))
+            $this->buildTaxonTree(); // return null;
+        
+        $d = array();
+        
+        foreach ((array) $this->treeList as $key => $val) {
+            
+            if (!isset($p['includeEmpty']) && $p['includeEmpty'] !== true && $val['is_empty'] == '1')
+                continue;
+            
+            $d[$key] = $val;
+        }
+        
+        return isset($d) ? $d : null;
+    }
+
+
+
+    public function buildTaxonTree ($p = null)
+    {
+		
+        if (!$this->getCache('species-treeList')) {
+			
+            $this->_buildTaxonTree();
+			
+			if (isset($this->treeList))
+				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
+
+            $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
+        }
+        else {
+            
+            $this->treeList = $this->getCache('species-treeList');
+			
+        }
+        
+        return $this->getTreeList($p);
+        
+        //return $this->getCache('species-tree'); // return value is unused!
+    }
+
 
 	private function _getTaxonClassification($id) {
 			
@@ -2097,12 +2216,27 @@ class Controller extends BaseClass
 
     private function setSkinName ()
     {
-        $d = $this->getSetting('skin');
+		
+		if (isset($this->helpers->UserAgent)) {
+	
+			if ($this->helpers->UserAgent->isMobileDevice()) {
+
+		        $d = $this->getSetting('skin_mobile');
+
+				if (isset($d))
+					$d = $this->doesSkinExist($d) ? $d : null;
+
+			}
+
+		}
+
+        $d = empty($d) ? $this->getSetting('skin') : $d;
 
         if (isset($d) && $this->doesSkinExist($d))
             $_SESSION['app']['system']['skinName'] = $d;
         else
             $_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
+
     }
 
 
@@ -2894,68 +3028,7 @@ class Controller extends BaseClass
 
 
 
-    protected function saveCache ($key, $data)
-    {
-        if ($this->useCache == false)
-            return;
-        
-        $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
-        
-        if (!file_put_contents($cacheFile, serialize($data))) {
-            die('Cannot write to cache folder ' . $_SESSION['app']['project']['urls']['cache']);
-        }
-    }
-
-
-    public function getTreeList ($p = null)
-    {
-		
-		if (!$this->projectHasTaxa())
-			return;
-		
-        if (!isset($this->treeList))
-            $this->buildTaxonTree(); // return null;
-        
-        $d = array();
-        
-        foreach ((array) $this->treeList as $key => $val) {
-            
-            if (!isset($p['includeEmpty']) && $p['includeEmpty'] !== true && $val['is_empty'] == '1')
-                continue;
-            
-            $d[$key] = $val;
-        }
-        
-        return isset($d) ? $d : null;
-    }
-
-
-
-    public function buildTaxonTree ($p = null)
-    {
-		
-        if (!$this->getCache('species-treeList')) {
-			
-            $this->_buildTaxonTree();
-			
-			if (isset($this->treeList))
-				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
-
-            $this->saveCache('species-treeList', isset($this->treeList) ? $this->treeList : null);
-        }
-        else {
-            
-            $this->treeList = $this->getCache('species-treeList');
-			
-        }
-        
-        return $this->getTreeList($p);
-        
-        //return $this->getCache('species-tree'); // return value is unused!
-    }
-
-
-	private function makeCachePath() 
+ 	private function makeCachePath() 
 	{
 
         $p = $this->getCurrentProjectId();
@@ -3043,12 +3116,6 @@ class Controller extends BaseClass
         
     }
 
-
-
-    public function generateRandomHexString ($pre=null,$post=null)
-    {
-        return $pre.substr(md5(rand()), 0, 16).$post;
-    }
 
 
 
@@ -3153,56 +3220,6 @@ class Controller extends BaseClass
 		
 	}
 
-
-	public function setSearchResultIndexActive($id)
-	{
-
-		$_SESSION['app']['user']['search']['lastResultSetIndexActive'] = $id;
-
-	}
-
-	public function getSearchResultIndexActive()
-	{
-
-		return isset($_SESSION['app']['user']['search']['lastResultSetIndexActive']) ? $_SESSION['app']['user']['search']['lastResultSetIndexActive'] : null;
-
-	}
-
-
-	public function getNbcExtras($p=null)
-	{
-		
-        $id = isset($p['id']) ? $p['id'] : null;
-        $type = isset($p['type']) ? $p['type'] : 'taxon';
-        $name = isset($p['name']) ? $p['name'] : null;
-		
-		if (is_null($id) || is_null($type))
-			return;
-
-		$d = array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'ref_id' => $id, 
-				'ref_type' => $type
-			);
-			
-		if (isset($name))
-			$d['name'] = $name;
-
-		$extras = $this->models->NbcExtras->_get(
-			array(
-				'id' => $d, 
-				'columns' => 'name,value',
-			));
-
-		if (isset($name))
-			return $extras[0]['value'];
-			
-		foreach((array)$extras as $val)
-			$extras[$val['name']] = $val['value'];
-			
-		return $extras;
-		
-	}
 
 
 }

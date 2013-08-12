@@ -4,8 +4,9 @@
 
 <div id="page-main">
 {if $processed}
-	<form method="post" action="nbc_determinatie_6.php">
+	<form method="post" id="theForm" action="nbc_determinatie_6.php">
 	<input type="hidden" name="rnd" value="{$rnd}" />
+	<input type="hidden" id="action" name="action" value="save" />
 	<p>
     <table>
 		<tr><td>Author:</td><td><input type="text" name="settings[source_author]" value="{$source_author}" /></td></tr>
@@ -29,6 +30,7 @@
 	</p>
 	<p>
 	<input type="submit" value="{t}Save{/t}">
+    {if $usingExisting}or <input type="button" onclick="$('#action').val('skip');$('#theForm').submit();" value="{t}Skip and keep current settings{/t}">{/if}
 	</p>
 	</form>
 	

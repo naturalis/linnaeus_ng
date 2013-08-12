@@ -45,6 +45,7 @@ class ProjectsController extends Controller
 		array('matrix_use_character_groups','bool',0),
 		array('taxa_use_variations','bool',0),
 		array('skin','[name]','nbc_default'),
+		array('skin_mobile','[name]','nbc_default_mobile'),
 		array('suppress_splash','bool',0,'bypass splash screen'),
 		array('start_page','[url]',null,'default start page of project'),
 		array('nbc_image_root','[url]',null,'for system images'),

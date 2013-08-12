@@ -40,6 +40,7 @@ class ImportNBCController extends Controller
 		'levensfase' => 'life_stage',
 		'Sexe op foto' => 'gender_photo'
 	);
+	private $_lastErrorMod=null;
 
     private $_stdVariantColumns = array('sekse','variant');
 	
@@ -277,7 +278,7 @@ class ImportNBCController extends Controller
 					'css_url' => $this->controllerSettings['defaultProjectCss'],
 					'group' => $pGroup
 				));
-				$this->addMessage('Created project "' . $pTitle . '" with id ' . $pId . '.');
+				$this->addMessage($this->storeError('Created project "' . $pTitle . '" with id ' . $pId . '.'));
 				
 				$_SESSION['admin']['system']['import']['project'] = array(
 					'id' => $pId, 
@@ -302,7 +303,7 @@ class ImportNBCController extends Controller
 
 				$pId = $_SESSION['admin']['system']['import']['project']['id'] = $_SESSION['admin']['system']['import']['existingProjectId'];
 				$_SESSION['admin']['system']['import']['project']['title'] = $_SESSION['admin']['system']['import']['data']['project']['title'];
-				$this->addMessage('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.');
+				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.'));
 				
 			}
 			
@@ -422,7 +423,27 @@ class ImportNBCController extends Controller
 						'project_id' => $this->getNewProjectId(), 
 						'matrix_id' => $matrixExists
 					));
+					$this->models->CharacteristicLabelState->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $matrixExists
+					));
+					$this->models->CharacteristicState->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $matrixExists
+					));
+					$this->models->CharacteristicChargroup->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $matrixExists
+					));
 					$this->models->CharacteristicMatrix->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $matrixExists
+					));
+					$this->models->CharacteristicLabel->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $matrixExists
+					));
+					$this->models->Characteristic->delete(array(
 						'project_id' => $this->getNewProjectId(), 
 						'matrix_id' => $matrixExists
 					));
@@ -441,14 +462,15 @@ class ImportNBCController extends Controller
 
 	            $m = $this->createMatrix($matrixName);
 				$mId = $m['id'];
-				$this->addMessage('Created matrix "' . $m['name'] . '"');
+				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"'));
 
 			} else {
 
-				$this->addMessage('Using matrix "' .$matrixName . '"');
+				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"'));
+				$this->smarty->assign('usingExisting', true);
 
 			}
-           
+ 
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
             
@@ -535,42 +557,51 @@ class ImportNBCController extends Controller
 			
 			$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
 			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
-	
-			$settings = array(
-				'matrixtype' => 'nbc',
-				'matrix_allow_empty_species' => true,
-				'matrix_use_character_groups' => true,
-				'taxa_use_variations' => true,
-			);
 			
-			foreach((array)$settings as $key => $val) {
+// HIER!			
+			if ($this->rHasVar('action','skip')) {
 				
-				if (!empty($val))
-					$this->saveSetting(array(
-						'name' => $key, 
-						'value' => $val, 
-						'pId' => $this->getNewProjectId()
-					));			
-			}
-	
-			foreach((array)$this->requestData['settings'] as $key => $val) {
+				$this->addMessage('Skipping new settings.');
 				
-				if (!empty($val))
-					$this->saveSetting(array(
-						'name' => $key, 
-						'value' => $val, 
-						'pId' => $this->getNewProjectId()
-					));			
-			}
-			
-			
-			if (empty($this->requestData['settings']['skin'])) {
+			} else {
 	
-				$this->saveSetting(array(
-					'name' => 'skin', 
-					'value' => $this->_defaultSkinName, 
-					'pId' => $this->getNewProjectId()
-				));
+				$settings = array(
+					'matrixtype' => 'nbc',
+					'matrix_allow_empty_species' => true,
+					'matrix_use_character_groups' => true,
+					'taxa_use_variations' => true,
+				);
+				
+				foreach((array)$settings as $key => $val) {
+					
+					if (!empty($val))
+						$this->saveSetting(array(
+							'name' => $key, 
+							'value' => $val, 
+							'pId' => $this->getNewProjectId()
+						));			
+				}
+		
+				foreach((array)$this->requestData['settings'] as $key => $val) {
+					
+					if (!empty($val))
+						$this->saveSetting(array(
+							'name' => $key, 
+							'value' => $val, 
+							'pId' => $this->getNewProjectId()
+						));			
+				}
+				
+				
+				if (empty($this->requestData['settings']['skin'])) {
+		
+					$this->saveSetting(array(
+						'name' => 'skin', 
+						'value' => $this->_defaultSkinName, 
+						'pId' => $this->getNewProjectId()
+					));
+					
+				}
 				
 			}
 			
@@ -706,7 +737,7 @@ class ImportNBCController extends Controller
 
         $this->setPageName($this->translate('Saving labels'));
         
-        if (1==1 || !$this->isFormResubmit()) {
+        if (!$this->isFormResubmit()) {
 
             $pTitle = $_SESSION['admin']['system']['import']['data']['project']['title'];
 			//$pGroup = $_SESSION['admin']['system']['import']['data']['project']['soortgroep'];
@@ -793,7 +824,7 @@ class ImportNBCController extends Controller
 									)
 								);								
 
-								$this->addMessage(sprintf($this->translate('Saved translation "%s".'),$val[3]));
+								$this->addMessage($this->storeError(sprintf($this->translate('Saved translation "%s".'),$val[3])));
 								
 							} else {
 
@@ -814,7 +845,7 @@ class ImportNBCController extends Controller
 									)
 								);				
 								
-								$this->addMessage(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]));
+								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4])));
 		
 								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'all_images' : ($dummy[$cId]['state']=='all_images' ? 'all_images' : ($dummy[$cId]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
 
@@ -863,13 +894,13 @@ class ImportNBCController extends Controller
 							'project_id' => $pId
 						));
 						
-						$this->addMessage(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type));
+						$this->addMessage($this->storeError(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type)));
 						
 					}
 
 				} else {
 					
-					$this->addMessage($this->translate('Skipped re-evaluating character types.'));
+					$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.')));
 					
 				}
 			
@@ -897,12 +928,10 @@ class ImportNBCController extends Controller
         return (isset($_SESSION['admin']['system']['import']['project']['id'])) ? $_SESSION['admin']['system']['import']['project']['id'] : null;
     }
 
-
     private function getNewDefaultLanguageId ()
     {
         return $this->_defaultLanguageId;
     }
-
 
     private function getDataFromFile ($file)
     {
@@ -948,7 +977,6 @@ class ImportNBCController extends Controller
         return $raw;
     }
 
-
     private function parseData ($raw)
     {
         
@@ -968,6 +996,8 @@ class ImportNBCController extends Controller
 			 
         */
         $data = array();
+		
+		$isReadyColumn=$diergroepColumn=-1;
         
         foreach ((array) $raw as $line => $val) {
  
@@ -1028,21 +1058,34 @@ class ImportNBCController extends Controller
                     	// line 4, cell > 0: character unit (not currently being saved)
                     	if ($line==4 && $cKey>4 && !empty($cVal))
                     		$data['characters'][$cKey]['unit'] = $cVal;
-                            
+
+						// line 6: home of the optional "ready?" toggle (no toggle? everyone ready!)
+                        if ($line==6  && in_array(strtolower($cVal),array('klaar','klaar?')))
+                            $isReadyColumn=$cKey;
+						else
+						// line 6: ...and of the optional "diergroep"
+                        if ($line==6  && strtolower($cVal)=='diergroep')
+                            $diergroepColumn=$cKey;
+						else
 						// line 6: species column headers
                         if ($line==6  && $cKey<10 && !empty($cVal))
                             $data['columns'][$cKey] = $cVal;
 
-
 						// line > 6: species records
 						if ($line > 6) {
 							
+							if ($isReadyColumn>0 && preg_match('/(ja|yes|j|y)/i',$val[$isReadyColumn])!==1) {
+								if ($cKey==0)
+									$this->addMessage($this->storeError('Skipping line '.($line+1).' (ready="'.$val[$isReadyColumn].'")'));
+								continue;
+							}
+							
 							// line number (is uniq id during import)
-							if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'id') {
+							if (isset($data['columns'][$cKey]) && preg_match('/id/i',$data['columns'][$cKey])===1) {
 								$data['species'][$line]['id'] = $cVal;
 							}
 							// species' main label
-							else if (isset($data['columns'][$cKey]) && ($data['columns'][$cKey] == 'title' || $data['columns'][$cKey] == 'titel')) {
+							else if (isset($data['columns'][$cKey]) && preg_match('/(title|titel|name|naam)/i',$data['columns'][$cKey])===1) {
 								$data['species'][$line]['label'] = $cVal;
 							}
 							// related species' main id's (or names) 
@@ -1054,6 +1097,13 @@ class ImportNBCController extends Controller
 									$data['species'][$line]['related'][] = trim($cVal);
 								}
 								array_walk($data['species'][$line]['related'], create_function('&$val', '$val = trim($val);'));
+							}
+							// catch optional group (will turn into parent of rank family)
+							else if ($diergroepColumn>0 && $cKey==$diergroepColumn) {
+								$data['species'][$line]['inGroup'] = trim($cVal);
+							}
+							else if ($cKey==$isReadyColumn) {
+								// do nothing, just skip
 							}
 							// character states per species
 							else {
@@ -1136,7 +1186,6 @@ class ImportNBCController extends Controller
         return $data;
     }
 
-
     private function addProjectRank ($label, $rankId, $isLower, $parentId)
     {
 
@@ -1195,11 +1244,15 @@ class ImportNBCController extends Controller
                 $projectSpeciesId = $id;
             if ($val['id'] == KINGDOM_RANK_ID)
                 $projectKingdomId = $id;
+            if ($val['id'] == FAMILY_RANK_ID)
+                $projectFamilyId = $id;
+				
         }
         
         return array(
             'kingdom' => $projectKingdomId, 
-            'species' => $projectSpeciesId
+            'species' => $projectSpeciesId,
+            'family' => $projectFamilyId
         );
     }
 
@@ -1220,6 +1273,7 @@ class ImportNBCController extends Controller
             $d[$val['naam SCI']]['taxon'] = $val['naam SCI'];
             if (isset($val['naam NL'])) $d[$val['naam SCI']]['common name'] = $val['naam NL']; // $val['label'];
             $d[$val['naam SCI']]['id'] = $val['id'];
+            if (isset($val['inGroup'])) $d[$val['naam SCI']]['parent_name'] = $val['inGroup'];
             $d[$val['naam SCI']]['variations'][] = $val;
         }
 		
@@ -1319,7 +1373,7 @@ class ImportNBCController extends Controller
 			
 		if ($d) { 
 
-			$parent = $d[0]['id'];
+			$kingdomId = $d[0]['id'];
 		
 		} else {
 
@@ -1336,7 +1390,7 @@ class ImportNBCController extends Controller
 				'list_level' => 0
 			));
 			
-			$parent = $this->models->Taxon->getNewId();
+			$kingdomId = $this->models->Taxon->getNewId();
 			
 		}
         
@@ -1344,6 +1398,42 @@ class ImportNBCController extends Controller
 
 		// save all taxa
         foreach ((array) $species as $key => $val) {
+
+			if (isset($val['parent_name'])) {
+
+				$d = $this->models->Taxon->_get(array('id' =>
+					array(
+						'project_id' => $this->getNewProjectId(), 
+						'taxon' => $val['parent_name']
+					)));
+					
+				if ($d) { 
+		
+					$parent = $d[0]['id'];
+				
+				} else {
+
+					$this->models->Taxon->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getNewProjectId(), 
+						'taxon' => $val['parent_name'], 
+						'parent_id' => $kingdomId, 
+						'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['family'], 
+						'taxon_order' => 0, 
+						'is_hybrid' => 0, 
+						'list_level' => 0
+					));
+					
+					$parent = $this->models->Taxon->getNewId();
+
+				}
+
+			} else {
+				
+				$parent = $kingdomId;
+				
+			}
 
 			$species[$key]['is_matrix'] = false;
             
@@ -1944,10 +2034,13 @@ class ImportNBCController extends Controller
                 
 
                 if (isset($tVal['states'])) {
-                    
+
                     foreach ((array) $tVal['states'] as $sKey => $sVal) {
                         
                         foreach ((array) $sVal as $state) {
+							
+							if (!isset($mData['characters'][$sKey]['id']))
+								continue;
                             
                             $this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
                             
@@ -2068,12 +2161,17 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function storeError ($err, $mod)
+    private function storeError ($err, $mod=null)
     {
+		
+		if (is_null($mod)) $mod = $this->_lastErrorMod;
+		
         $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
             $mod, 
             $err
         );
+		
+		$this->_lastErrorMod=$mod;
         
         return $err;
     }
