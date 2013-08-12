@@ -1,0 +1,264 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #323232;	
+}
+
+.ui-content {
+	background-color: #FFFFFF;
+	padding: 0;
+}
+
+.ui-header .ui-title {
+	font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+	font-size: 18px;
+	color: #35373B;
+	text-shadow: none;
+}
+
+.ui-header {
+	background: #000;
+	border-width: 0;
+}
+.logo {
+	width: 320px;
+	position: relative;
+	left: 50%;
+	margin-left: -160px;
+}
+
+.facetgrouppage .ui-header {
+/*	background: #3C3E42; klopt niet */
+	background: #000;
+}
+
+h4.tagline {
+	font-family: "Arial", "Helvetica", sans-serif;
+	
+	text-shadow: none;
+	padding: 0px; /*16px;*/
+		
+	text-align: center;
+	color: white;
+	font-size: 18px;
+	/*margin: 0px 5px 5px 5px;*/
+}
+
+.eraseall {
+	position: absolute;
+	left: -11px;
+	top: -11px;
+}
+
+
+/* soortpagina */
+.soortpagina {
+	margin:0 auto;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+
+.soortpagina p {
+	text-align: left;
+}
+
+#filter {
+	background-color: #1aacdb;
+
+	background-image: url('../img/verbeterslag/bg_blauwestreep.jpg');
+
+	padding-top: 0px;
+	padding-bottom:10px;
+}
+
+#results, #filter, #facet-page-items, .results {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+
+#results-tab {
+	position: relative;
+	size: 16px;
+}
+
+.headerbirdlogo {
+	float: right;
+	margin-top: 7px;
+	margin-right: 35px;
+}
+
+div.selectedfacets {
+	/* overflow: hidden; weggehaald omdat je anders geen delete icon kan tonen */
+	border: 3px solid #FF6700;
+	/*margin: 15px;*/
+	padding: 0;	
+	position: relative;
+}
+
+.selectedfacets table {
+	width: 100%; border-spacing: 0; margin: 0; padding: 0; border: 0 none;
+}
+
+.selectedfacets tr {
+	border-bottom: 2px solid #ccc;
+}
+
+.selectedfacets .facetgroup {
+	width: 30%; border-right: 2px dashed #FF6700; padding: 0;
+}
+
+.selectedfacets .facetvalues {
+	width: 70%; padding:0px;
+}
+
+/* custom i icon */
+.ui-icon-dierenzoeker-info {
+	background-image: url("../img/info_button.png");
+}
+
+
+
+.grid-iconbox {	
+	width: 70px;
+	height: 70px;
+/*	position: relative;*/
+}
+
+.grid-labelbox {
+	margin-top:-3px;
+	width: 70px;
+	font-family: arial;
+	font-size: 12px;
+	font-weight: bold;
+	color: black;
+}
+.grid-labelbox.selected {
+	position: relative;
+	color: white;
+}
+
+.grid-icon {
+	position: absolute;
+	top: 4px;
+	left: 5px;
+}
+
+.selected-icon-overlay-check {
+	position: absolute;
+	left: -2px;
+	top: -5px;
+	/* margin-left: -70px; top: -5px; */
+}
+
+.selected-icon-overlay-border {
+	position: absolute;
+	left: 3px;
+	top: 5px;
+}
+
+/* feedback div used to provide feedback on the number of remaining options */
+.facet-value-choice-feedback {
+	width: 75%;
+	size: 20px;
+	text-align: center;
+	background-color: #FFFFFF;
+	border: 3px solid #FF6700;
+	border-radius: 24px;
+	font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+	padding: 10px;
+	margin-left: 10%;
+	position: absolute;
+	z-index: 99;
+	top: 230px;
+}
+.soortpagina {
+	margin-top: -18px;
+	background: url("../img/verbeterslag/bg_wittestreep.jpg");
+	color: black;
+}
+.soortpagina .soortpagina-inner {
+	background: url("../img/verbeterslag/soort-white-background.png") top repeat-x;
+	padding: 0 14px;
+}
+.soortpagina .soortpagina-list {
+	background: url("../img/verbeterslag/bg_donkergrijzestreep.jpg");
+	padding: 0 14px 14px 14px;
+}
+.soortpagina h4 {
+	color:white;
+	text-align:left;
+}
+
+.soortpagina p {
+	padding-bottom: 5px;	
+}
+
+.soortpagina span.label {
+	font-weight: bold;
+}
+
+img.result {
+	width: 80px;
+	height: 80px;
+}
+
+.soortpagina .illustratie {
+	padding: 10px 0;
+	width: 280px;
+}
+
+.soortpagina .fotos {
+	width: 280px;
+	text-align: left;
+}
+
+.soortpagina .fotos img {
+}
+
+.ui-btn-corner-all {
+	-moz-border-radius: 0em;
+	-webkit-border-radius: 0em;
+	border-radius: 0em;
+}
+
+.ui-btn-active-c {
+	background-color:black !important;
+	color: purple !important;
+}
+
+.ui-btn-up-c, .ui-btn-up-c:hover  {
+	text-shadow: none;
+}
+
+.ui-body-d, .ui-dialog.ui-overlay-d {
+	border: 0px solid #CCC;
+}
+
+a img {
+	border-width:0px;
+}
+
+#colofon-content {	
+	color:black;
+	background: url(../img/verbeterslag/bg_wittestreep.jpg);	
+}
+.stippellijn {
+	height:	6px;
+	width: 	100%;
+	background: url(../img/verbeterslag/stippellijn.png);
+}
+.keuze-content .ui-collapsible-content {	
+	background: url(../img/verbeterslag/keuze-collapsable-background.png) bottom repeat-x;
+}
+.keuze-content h4 a {
+	height:30px;
+	padding-top:8px;
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 16px;
+	background-color: #1aacdb !important;
+	background-image: url(../img/verbeterslag/collapsable-arrow.png) !important;
+	background-repeat: no-repeat !important;
+	background-position-x: 16px !important;
+	background-position-y: 10px !important; 
+}

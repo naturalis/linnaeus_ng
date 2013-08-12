@@ -80,6 +80,7 @@ class ProjectDeleteController extends Controller
 		'user_taxon', 
 		'variation_label', 
 		'variation_relations', 
+		'gui_menu_order'
     );
 
     public function __construct ()

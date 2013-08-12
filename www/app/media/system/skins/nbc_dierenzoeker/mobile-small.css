@@ -1,0 +1,13 @@
+/* css for devices smaller than 320px */
+
+@media screen and (max-width: 319px) {
+
+	.ui-mobile a img.grid-icon {
+		/* border: 2px solid #00AA00; */
+		width: 50px;
+	}
+	
+	img#logo {
+		width: 150px;
+	}
+}
