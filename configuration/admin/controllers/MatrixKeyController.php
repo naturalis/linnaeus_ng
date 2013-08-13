@@ -2404,11 +2404,11 @@ class MatrixKeyController extends Controller
             'columns' => 'id,matrix_id,label,show_order',
 			'fieldAsIndex' => 'id'
         ));
-        
+
         foreach ((array) $cg as $key => $val) {
             $cg[$key]['type'] = 'group';
             $cg[$key]['label'] = $this->getCharacterGroupLabel(array('groupId'=>$val['id']));
-            
+
             $cc = $this->models->CharacteristicChargroup->_get(
             array(
                 'id' => array(

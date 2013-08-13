@@ -394,7 +394,16 @@ abstract class Model extends BaseClass
 				
 				}
 
-                $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
+				// operator ending with # signals to use val literally (for queries like: "mean = (23 + (sd * 2))"
+                if (substr($operator,-1) == '#') {
+
+                    $query .= " and `" . $col . "` " . substr($operator,0,-1) . " " . $val;
+                
+                } else {
+
+	                $query .= " and `" . $col . "` " . $operator . " '" . $this->escapeString($val) . "'";
+
+				}
             
             }
         
@@ -847,7 +856,7 @@ abstract class Model extends BaseClass
                     $operator = trim(substr($col, strpos($col, ' ')));
                     
                     $col = trim(substr($col, 0, strpos($col, ' ')));
-                
+
                 }
 
 				if ($col=='project_id') {

@@ -40,8 +40,6 @@ class ImportNBCController extends Controller
 		'levensfase' => 'life_stage',
 		'Sexe op foto' => 'gender_photo'
 	);
-	private $_lastErrorMod=null;
-
     private $_stdVariantColumns = array('sekse','variant');
 	
     public $usedModels = array(
@@ -278,7 +276,7 @@ class ImportNBCController extends Controller
 					'css_url' => $this->controllerSettings['defaultProjectCss'],
 					'group' => $pGroup
 				));
-				$this->addMessage($this->storeError('Created project "' . $pTitle . '" with id ' . $pId . '.'));
+				$this->addMessage($this->storeError('Created project "' . $pTitle . '" with id ' . $pId . '.','Project'));
 				
 				$_SESSION['admin']['system']['import']['project'] = array(
 					'id' => $pId, 
@@ -303,7 +301,7 @@ class ImportNBCController extends Controller
 
 				$pId = $_SESSION['admin']['system']['import']['project']['id'] = $_SESSION['admin']['system']['import']['existingProjectId'];
 				$_SESSION['admin']['system']['import']['project']['title'] = $_SESSION['admin']['system']['import']['data']['project']['title'];
-				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.'));
+				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.','Project'));
 				
 			}
 			
@@ -423,29 +421,42 @@ class ImportNBCController extends Controller
 						'project_id' => $this->getNewProjectId(), 
 						'matrix_id' => $matrixExists
 					));
+
+					// cleaning up orphaned characters
+					$l = $this->models->CharacteristicMatrix->_get(array(
+						'id' =>
+							array(
+								'project_id' => $this->getNewProjectId(), 
+								'matrix_id' => $matrixExists
+							),
+						'columns' => 'characteristic_id'
+						)
+					);
+					
+					$d=array(0=>-1);
+					foreach((array)$l as $key => $val)
+						$d[]=$val['characteristic_id'];
+					$d=implode(',',$d);
+					
 					$this->models->CharacteristicLabelState->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'characteristic_id not in#' => '('.$d.')'
 					));
 					$this->models->CharacteristicState->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'characteristic_id not in#' => '('.$d.')'
 					));
 					$this->models->CharacteristicChargroup->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
-					));
-					$this->models->CharacteristicMatrix->delete(array(
-						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'characteristic_id not in#' => '('.$d.')'
 					));
 					$this->models->CharacteristicLabel->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'characteristic_id not in#' => '('.$d.')'
 					));
 					$this->models->Characteristic->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'characteristic_id not in#' => '('.$d.')'
 					));
 
 					$mId = $matrixExists;
@@ -462,11 +473,11 @@ class ImportNBCController extends Controller
 
 	            $m = $this->createMatrix($matrixName);
 				$mId = $m['id'];
-				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"'));
+				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
 			} else {
 
-				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"'));
+				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"','Matrix'));
 				$this->smarty->assign('usingExisting', true);
 
 			}
@@ -518,7 +529,8 @@ class ImportNBCController extends Controller
 			
 		$this->smarty->assign('matrix',$matrixName);
 		$this->smarty->assign('matrixExists',$matrixExists);
-        
+		$this->smarty->assign('projectExists',$_SESSION['admin']['system']['import']['projectExists']);
+		
         $this->smarty->assign('characters', $data['characters']);
         $this->smarty->assign('skin', $this->_defaultSkinName);
         $this->smarty->assign('matrix_state_image_per_row', 4);
@@ -551,59 +563,56 @@ class ImportNBCController extends Controller
 
 		if (!$_SESSION['admin']['system']['import']['projectExists']) {
 
-
 			$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
 			$this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
 			
+			$this->addModuleToProject(MODCODE_HIGHERTAXA, $this->getNewProjectId(), 0);
+			$this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $this->getNewProjectId());
+			
 			$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
 			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
+
+			$settings = array(
+				'matrixtype' => 'nbc',
+				'matrix_allow_empty_species' => true,
+				'matrix_use_character_groups' => true,
+				'taxa_use_variations' => true,
+			);
 			
-// HIER!			
-			if ($this->rHasVar('action','skip')) {
+			foreach((array)$settings as $key => $val) {
 				
-				$this->addMessage('Skipping new settings.');
-				
-			} else {
-	
-				$settings = array(
-					'matrixtype' => 'nbc',
-					'matrix_allow_empty_species' => true,
-					'matrix_use_character_groups' => true,
-					'taxa_use_variations' => true,
-				);
-				
-				foreach((array)$settings as $key => $val) {
-					
-					if (!empty($val))
-						$this->saveSetting(array(
-							'name' => $key, 
-							'value' => $val, 
-							'pId' => $this->getNewProjectId()
-						));			
-				}
-		
-				foreach((array)$this->requestData['settings'] as $key => $val) {
-					
-					if (!empty($val))
-						$this->saveSetting(array(
-							'name' => $key, 
-							'value' => $val, 
-							'pId' => $this->getNewProjectId()
-						));			
-				}
-				
-				
-				if (empty($this->requestData['settings']['skin'])) {
-		
+				if (!empty($val))
 					$this->saveSetting(array(
-						'name' => 'skin', 
-						'value' => $this->_defaultSkinName, 
+						'name' => $key, 
+						'value' => $val, 
 						'pId' => $this->getNewProjectId()
-					));
-					
-				}
+					));			
+			}
+	
+			foreach((array)$this->requestData['settings'] as $key => $val) {
+				
+				if (!empty($val))
+					$this->saveSetting(array(
+						'name' => $key, 
+						'value' => $val, 
+						'pId' => $this->getNewProjectId()
+					));			
+			}
+			
+			
+			if (empty($this->requestData['settings']['skin'])) {
+	
+				$this->saveSetting(array(
+					'name' => 'skin', 
+					'value' => $this->_defaultSkinName, 
+					'pId' => $this->getNewProjectId()
+				));
 				
 			}
+			
+		} else  {
+			
+			$this->addMessage('Existing project, skipping settings.');
 			
 		}
 
@@ -824,7 +833,7 @@ class ImportNBCController extends Controller
 									)
 								);								
 
-								$this->addMessage($this->storeError(sprintf($this->translate('Saved translation "%s".'),$val[3])));
+								$this->addMessage($this->storeError(sprintf($this->translate('Saved translation "%s".'),$val[3]),'Matrix characters'));
 								
 							} else {
 
@@ -845,7 +854,7 @@ class ImportNBCController extends Controller
 									)
 								);				
 								
-								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4])));
+								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]),'Matrix characters'));
 		
 								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'all_images' : ($dummy[$cId]['state']=='all_images' ? 'all_images' : ($dummy[$cId]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
 
@@ -863,13 +872,13 @@ class ImportNBCController extends Controller
 
 						} else {
 
-							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for "%s".'),$val[2],$val[1]), 'Matrix import'));
+							$this->addError($this->storeError(sprintf($this->translate('Could not resolve state "%s" for "%s".'),$val[2],$val[1]),'Matrix states'));
 							
 						}
 
 					} else {
 
-			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]), 'Matrix import'));
+			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]),'Matrix states'));
 
 					}
 					
@@ -894,13 +903,13 @@ class ImportNBCController extends Controller
 							'project_id' => $pId
 						));
 						
-						$this->addMessage($this->storeError(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type)));
+						$this->addMessage($this->storeError(sprintf($this->translate('Set character type for "%s" to %s.'),$char['label'],$type),'Matrix characters'));
 						
 					}
 
 				} else {
 					
-					$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.')));
+					$this->addMessage($this->storeError($this->translate('Skipped re-evaluating character types.'),'Matrix characters'));
 					
 				}
 			
@@ -1076,7 +1085,7 @@ class ImportNBCController extends Controller
 							
 							if ($isReadyColumn>0 && preg_match('/(ja|yes|j|y)/i',$val[$isReadyColumn])!==1) {
 								if ($cKey==0)
-									$this->addMessage($this->storeError('Skipping line '.($line+1).' (ready="'.$val[$isReadyColumn].'")'));
+									$this->addMessage($this->storeError('Skipping line '.($line+1).' (ready="'.$val[$isReadyColumn].'")','Species import'));
 								continue;
 							}
 							
@@ -1302,8 +1311,10 @@ class ImportNBCController extends Controller
 
 
 
-            // if a species has only one variation, it should not be stored (ie, species & variation identical)
-            //if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0) {
+            /*
+				if a species has only one variation, it should not be stored (ie, species & variation identical)
+	           if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0)
+			*/
             if (count((array) $d[$key]['variations']) == 1) {
 				
 				foreach((array)$d[$key]['variations'][0] as $vKey => $vVal) {
@@ -1905,7 +1916,7 @@ class ImportNBCController extends Controller
 
 			if (!isset($sVal['states'])) {
 
-				$this->addError($this->storeError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']), 'Matrix import'));
+				$this->addError($this->storeError(sprintf($this->translate('Found no states for "%s"'),$sVal['label']), 'Matrix states'));
 				continue;
 
 			}
@@ -2161,18 +2172,14 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function storeError ($err, $mod=null)
+    private function storeError ($err, $mod)
     {
-		
-		if (is_null($mod)) $mod = $this->_lastErrorMod;
 		
         $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
             $mod, 
             $err
         );
 		
-		$this->_lastErrorMod=$mod;
-        
         return $err;
     }
 
