@@ -28,12 +28,13 @@
 {include file="../shared/admin-messages.tpl"}
 {/if}
 
-<form method="post" action="" enctype="multipart/form-data">
+<form method="post" action="">
+<input type="hidden" name="rnd" value="{$rnd}" />
 <div class="page-generic-div">
 {if $results}
 <p>
 {t}Check the results of the import below. You can exclude specific taxa by unchecking the checkbox. If instead of a checkbox there an error message, you are attempting to load a taxon that can not be loaded.{/t}<br />
-{t}If the results look OK, click 'save':{/t} <input type="submit" value="{t}save{/t}" />
+{t}If the results look OK, click 'save':{/t}
 </p>
 </div>
 
@@ -57,19 +58,25 @@
 {if $session.admin.project.includes_hybrids==1}
 <th>{t}Hybrid{/t}</th></tr>
 {/if}
+<th>{t _s=$session.admin.project.languageList[$session.admin.project.default_language_id].language}Common name in %s{/t}</th></tr>
 {section name=i loop=$results}
 <tr class="tr-highlight">
-<td><label for="chk{$smarty.section.i.index}">{$results[i][0]}</label></td>
-<td><label for="chk{$smarty.section.i.index}">{$results[i][1]}</label></td>
+<td>{$results[i][0]}</td>
+<td>{$results[i][1]}</td>
 {if $session.admin.project.includes_hybrids==1}
 <td><label for="chk{$smarty.section.i.index}">{if $results[i][2]==1}x{/if}</label></td>
-<td>{if $results[i][3]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][3]}</span>{/if}</td>
+<td>{$results[i][3]}</td>
+<td>{if $results[i][4]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][4]}</span>{/if}</td>
 {else}
-<td>{if $results[i][2]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][2]}</span>{/if}</td>
+<td>{$results[i][2]}</td>
+<td>{if $results[i][3]=='ok'}<input  type="checkbox" name="rows[]" id="chk{$smarty.section.i.index}" value="{$smarty.section.i.index}" checked="checked"/>{else}<span class="message-error">{$results[i][3]}</span>{/if}</td>
 {/if}
 </tr>
 {/section}
 </table>
+
+<input type="submit" value="{t}save{/t}" />
+ 
 {else}
 <p>
 {t}To load a list of taxa from file, click the 'browse'-button above, select the file to load from your computer and click 'upload'.
@@ -84,16 +91,13 @@ The contents of the file will be displayed so you can review them before they ar
 	<li>{t}Each taxon consists of the following fields:{/t}
 		<ol>
 		<li>{t}Taxon name{/t}</li>
-		<li>{t}Taxon rank{/t}</li>
-{if $session.admin.project.includes_hybrids==1}
-		<li>{t}Hybrid ('y'; optional){/t}</li>
-{/if}
+            <li>{t}Taxon rank{/t}</li>
+        {if $session.admin.project.includes_hybrids==1}
+	        <li>{t}Hybrid ('y'; optional){/t}</li>
+        {/if}
+            <li>{t _s=$session.admin.project.languageList[$session.admin.project.default_language_id].language}Common name in %s (optional){/t}</li>
 		</ol>
-{if $session.admin.project.includes_hybrids==1}
 		{t}in that order. The first two are mandatory. {/t}
-{else}
-		{t}in that order. Both are mandatory. {/t}
-{/if}
 {if $session.admin.project.includes_hybrids==1}
 		{t}Other values for the field 'Hybrid' than 'y' are ignored.{/t}
 {/if}		

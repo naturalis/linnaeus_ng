@@ -1644,7 +1644,7 @@ class SpeciesController extends Controller
                     break;
             }
             
-            $this->helpers->CsvParserHelper->setFieldMax($_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2);
+            $this->helpers->CsvParserHelper->setFieldMax($_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3);
             
             $this->helpers->CsvParserHelper->parseFile($this->requestDataFiles[0]["tmp_name"]);
             
@@ -1668,14 +1668,14 @@ class SpeciesController extends Controller
                 $upperTaxonRank = false;
                 
                 $prevNames = array();
-                
+
                 foreach ((array) $r as $key => $val) {
                     
                     // check whether 'has hybrid' is present and legal
                     if ($_SESSION['admin']['project']['includes_hybrids'])
                         $r[$key][2] = (isset($val[2]) && strtolower($val[2]) == 'y' && in_array(strtolower($val[1]), $h));
                     
-                    $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = 'ok';
+                    $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3] = 'ok';
                     
 
                     // check whether the taxon name doesn't already exist
@@ -1692,24 +1692,23 @@ class SpeciesController extends Controller
                     if (in_array($val[0], $prevNames)) {
                         // set whether the taxon can be imported, based on whether it has duplicates in the import
 
-                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Duplicate name');
+                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3] = $this->translate('Duplicate name');
                     }
                     else if ($t[0]['total'] != 0) {
                         // set whether the taxon can be imported, based on whether the name already exists
 
-                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Name already exists in the database');
+                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3] = $this->translate('Name already exists in the database');
                     }
                     else if (!(isset($val[1]) && in_array(strtolower($val[1]), $d))) {
                         // set whether the taxon can be imported, based on whether it has a legal rank
 
-                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] = $this->translate('Unknown rank');
+                        $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3] = $this->translate('Unknown rank');
                     }
                     else {
-                        
                         $prevNames[] = $val[0];
                     }
                     
-                    if ($upperTaxonRank == false && $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 3 : 2] == 'ok')
+                    if ($upperTaxonRank == false && $r[$key][$_SESSION['admin']['project']['includes_hybrids'] ? 4 : 3] == 'ok')
                         $upperTaxonRank = $val[1];
                 }
                 
@@ -1767,11 +1766,8 @@ class SpeciesController extends Controller
 				
             }
         }
-        else if (isset($this->requestData)) {
-            // list of taxa and ranks to be saved deteceted: save taxa
-            
-
-
+        else if (isset($this->requestData) && !$this->isFormResubmit()) {
+            // list of taxa and ranks to be saved detected: save taxa
 
             if ($this->rHasVal('rows') && isset($_SESSION['admin']['system']['csv_data'])) {
                 
@@ -1801,6 +1797,11 @@ class SpeciesController extends Controller
                     $name = $_SESSION['admin']['system']['csv_data'][$val][0];
                     $rank = $_SESSION['admin']['system']['csv_data'][$val][1];
                     $hybrid = $_SESSION['admin']['project']['includes_hybrids'] ? $_SESSION['admin']['system']['csv_data'][$val][2] : false;
+                    $common = 
+						$_SESSION['admin']['project']['includes_hybrids'] ? 
+							(isset($_SESSION['admin']['system']['csv_data'][$val][3]) ? $_SESSION['admin']['system']['csv_data'][$val][3] : null) : 
+							(isset($_SESSION['admin']['system']['csv_data'][$val][2]) ? $_SESSION['admin']['system']['csv_data'][$val][2] : null);
+
                     $parentName = null;
 
                     if ($key == 0) {
@@ -1898,7 +1899,32 @@ class SpeciesController extends Controller
                         'parent_taxon_name' => $parentName, 
                         'hybrid' => $hybrid
                     ));
-                    
+					
+					if (!empty($common)) {
+
+						$d = $this->models->Commonname->_get(array('id' =>
+						array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'taxon_id' => $newId, 
+							'language_id' => $this->getDefaultProjectLanguage(), 
+							'commonname' => $common
+						)));
+						
+						if (!$d) {
+		
+							$this->models->Commonname->save(
+							array(
+								'id' => null, 
+								'project_id' => $this->getCurrentProjectId(),
+								'taxon_id' => $newId, 
+								'language_id' => $this->getDefaultProjectLanguage(), 
+								'commonname' => $common
+							));
+							
+						}
+
+					}
+                   
                     if (!empty($newId) && empty($taxon['parent_taxon_name'])) {
                         
                         $this->doAssignUserTaxon($this->getCurrentUserId(), $newId);
@@ -1926,7 +1952,7 @@ class SpeciesController extends Controller
         
         $this->setPageName($this->translate('Taxon file upload'));
         
-        if ($this->requestDataFiles && !$this->isFormResubmit()) {
+        if ($this->requestDataFiles) { // && !$this->isFormResubmit()) {
 
 			$raw = array();
 
@@ -1966,19 +1992,41 @@ class SpeciesController extends Controller
 						
 						if ($fKey==0) {
 
-							$tId = $fVal;
+							$tIdOrName = $fVal;
 
-							if (!empty($tId)) {
-								$taxon = $this->models->Taxon->_get(
-									array(
-										'id' => array(
-											'project_id' => $this->getCurrentProjectId(), 
-											'id' => $tId
-										)
-									));
+							if (!empty($tIdOrName)) {
+								
+								if (is_numeric($tIdOrName)) {
+								
+									$t = $this->models->Taxon->_get(
+										array(
+											'id' => array(
+												'project_id' => $this->getCurrentProjectId(), 
+												'id' => (int)$tIdOrName
+											)
+										));
 
-								if ($taxon===false)
-									$tId = null;
+									if ($t[0]['id']!=$tIdOrName)
+										$tId = null;
+								
+								} else {
+
+									$t = $this->models->Taxon->_get(
+										array(
+											'id' => array(
+												'project_id' => $this->getCurrentProjectId(), 
+												'taxon' => trim($tIdOrName)
+											)
+										));
+
+									if (empty($t[0]['id']))
+										$tId = null;
+									else
+										$tId = $t[0]['id'];
+
+								}
+
+
 							}
 
 						} else
@@ -1991,6 +2039,9 @@ class SpeciesController extends Controller
 							$catId = isset($cats[$fKey]) ? $cats[$fKey] : null;
 							
 							if (empty($tId) || empty($lId) || empty($catId) || empty($fVal)) {
+								
+								if ((empty($tId) || empty($lId)) && $fKey==2)
+									$this->addError(sprintf('Could not resolve taxon "%s" and/or language ID "%s".',$tIdOrName,$lId));
 								$skipped++;
 								continue;
 							}

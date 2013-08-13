@@ -222,10 +222,7 @@ class MatrixKeyController extends Controller
 					'url' => $this->getSetting('source_url')
 				)
 			);
-			
 
-
-			
         }
         else {
             
@@ -887,7 +884,6 @@ class MatrixKeyController extends Controller
     {
         if (!isset($id))
             return;
-        
 
         $cs = $this->models->CharacteristicState->_get(
         array(
@@ -905,13 +901,12 @@ class MatrixKeyController extends Controller
 				'id' => $id
 			)
 		);
-
+		
         foreach ((array) $cs as $key => $val) {
             $cs[$key]['type'] = $d['type'];
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
             $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h
-
         }
 
         return $cs;
@@ -933,7 +928,7 @@ class MatrixKeyController extends Controller
         ));
         
         $cs[0]['label'] = $this->getCharacteristicStateLabelOrText($cs[0]['id']);
-        
+
         return $cs[0];
     }
 
@@ -1076,7 +1071,7 @@ class MatrixKeyController extends Controller
 				//."order by s desc"
         ;
 
-		q($q,1);
+		//q($q,1);
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
         
@@ -2806,7 +2801,7 @@ class MatrixKeyController extends Controller
 			
 		}
 
-		$d = array();
+		$d=array();
 		$i=0;		
 
 		foreach((array)$m as $val) {
