@@ -874,10 +874,7 @@ class ImportNBCController extends Controller
 										'id' => $sId, 
 									)
 								);				
-echo '<!--';
-echo $this->models->CharacteristicState->q();
-echo '-->
-';
+
 								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]),'Matrix characters'));
 		
 								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'all_images' : ($dummy[$cId]['state']=='all_images' ? 'all_images' : ($dummy[$cId]['state']=='no_images' ? 'partial_images' : 'partial_images' )));
@@ -885,8 +882,7 @@ echo '-->
 								$dummy[$cId]['label'] = $val[1];
 
 							} else {
-echo '<!--?-->
-';
+
 								//$this->addMessage(sprintf($this->translate('Skipped image for "%s" (not specified).'),$val[2]));
 
 								$dummy[$cId]['state'] = (!isset($dummy[$cId]['state']) ? 'no_images' : ($dummy[$cId]['state']=='all_images' ? 'partial_images' : ($dummy[$cId]['state']=='no_images' ? 'no_images' : 'partial_images' )));
