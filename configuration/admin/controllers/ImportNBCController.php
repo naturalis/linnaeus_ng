@@ -875,7 +875,7 @@ class ImportNBCController extends Controller
 									)
 								);				
 echo '<!--';
-q($this->models->CharacteristicState->q());								
+echo $this->models->CharacteristicState->q();
 echo '-->
 ';
 								$this->addMessage($this->storeError(sprintf($this->translate('Updated image for "%s" to \'%s\'.'),$val[2],$val[4]),'Matrix characters'));
