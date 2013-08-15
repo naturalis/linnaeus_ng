@@ -7,7 +7,7 @@
 {else}
 <form method="post" action="nbc_determinatie_4.php">
 <input type="hidden" name="rnd" value="{$rnd}" />
-<input type="hidden" name="action" value="species" />
+<input type="hidden" name="action" value="save" />
 <p>
 Map extra fields:
 <table cellpadding="0" cellspacing="0">
