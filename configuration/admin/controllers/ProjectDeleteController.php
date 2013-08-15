@@ -169,7 +169,7 @@ class ProjectDeleteController extends Controller
 
 
 
-    public function deleteMatrices ($id)
+    public function deleteMatrices ($id,$keepFiles=false)
     {
         $this->models->GuiMenuOrder->delete(array(
             'project_id' => $id
@@ -186,6 +186,25 @@ class ProjectDeleteController extends Controller
         $this->models->CharacteristicLabelState->delete(array(
             'project_id' => $id
         ));
+		
+		if (!$keepFiles) {
+		
+			$cs = $this->models->CharacteristicState->_get(array(
+				'id' => array(
+					'project_id' => $id
+				)
+			));
+	
+			foreach ((array) $cs as $key => $val) {
+				
+				if (isset($val['file_name'])) {
+					
+					@unlink($_SESSION['admin']['project']['paths']['project_media'] . $val['file_name']);
+				}
+			}
+			
+		}
+        
         $this->models->CharacteristicState->delete(array(
             'project_id' => $id
         ));
@@ -232,23 +251,27 @@ class ProjectDeleteController extends Controller
     }
 
 
-    public function deleteGlossary ($id)
+    public function deleteGlossary ($id, $keepFiles=false)
     {
         $paths = $this->makePathNames($id);
         
-        $mt = $this->models->GlossaryMedia->_get(array(
-            'id' => array(
-                'project_id' => $id
-            )
-        ));
-        
-        foreach ((array) $mt as $val) {
-            
-            if (isset($val['file_name']))
-                @unlink($paths['project_media'] . $val['file_name']);
-            if (isset($val['thumb_name']))
-                @unlink($paths['project_thumbs'] . $val['thumb_name']);
-        }
+		if (!$keepFiles) {
+		
+			$mt = $this->models->GlossaryMedia->_get(array(
+				'id' => array(
+					'project_id' => $id
+				)
+			));
+			
+			foreach ((array) $mt as $val) {
+				
+				if (isset($val['file_name']))
+					@unlink($paths['project_media'] . $val['file_name']);
+				if (isset($val['thumb_name']))
+					@unlink($paths['project_thumbs'] . $val['thumb_name']);
+			}
+			
+		}
         
         $this->models->GlossaryMedia->delete(array(
             'project_id' => $id
@@ -287,23 +310,27 @@ class ProjectDeleteController extends Controller
 
 
 
-    public function deleteSpeciesMedia ($id)
+    public function deleteSpeciesMedia ($id,$keepFiles=false)
     {
         $paths = $this->makePathNames($id);
         
-        $mt = $this->models->MediaTaxon->_get(array(
-            'id' => array(
-                'project_id' => $id
-            )
-        ));
+		if (!$keepFiles) {
         
-        foreach ((array) $mt as $val) {
-            
-            if (isset($val['file_name']))
-                @unlink($paths['project_media'] . $val['file_name']);
-            if (isset($val['thumb_name']))
-                @unlink($paths['project_thumbs'] . $val['thumb_name']);
-        }
+			$mt = $this->models->MediaTaxon->_get(array(
+				'id' => array(
+					'project_id' => $id
+				)
+			));
+			
+			foreach ((array) $mt as $val) {
+				
+				if (isset($val['file_name']))
+					@unlink($paths['project_media'] . $val['file_name']);
+				if (isset($val['thumb_name']))
+					@unlink($paths['project_thumbs'] . $val['thumb_name']);
+			}
+		
+		}
         
         $this->models->MediaTaxon->delete(array(
             'project_id' => $id
@@ -402,28 +429,32 @@ class ProjectDeleteController extends Controller
 
 
 
-    public function deleteFreeModuleMedia ($projectId, $pageId, $paths)
+    public function deleteFreeModuleMedia ($projectId, $pageId, $paths, $keepFiles=false)
     {
         if (empty($projectId) || empty($pageId))
             return;
         
-        $fmm = $this->models->FreeModuleMedia->_get(array(
-            'id' => array(
-                'project_id' => $projectId, 
-                'page_id' => $pageId
-            )
-        ));
+		if (!$keepFiles) {
         
-        if (file_exists($paths['project_media'] . $fmm[0]['file_name'])) {
-            
-            if (@unlink($paths['project_media'] . $fmm[0]['file_name'])) {
-                
-                if ($fmm[0]['thumb_name'] && file_exists($paths['project_thumbs'] . $fmm[0]['thumb_name'])) {
-                    
-                    @unlink($paths['project_thumbs'] . $fmm[0]['thumb_name']);
-                }
-            }
-        }
+			$fmm = $this->models->FreeModuleMedia->_get(array(
+				'id' => array(
+					'project_id' => $projectId, 
+					'page_id' => $pageId
+				)
+			));
+			
+			if (file_exists($paths['project_media'] . $fmm[0]['file_name'])) {
+				
+				if (@unlink($paths['project_media'] . $fmm[0]['file_name'])) {
+					
+					if ($fmm[0]['thumb_name'] && file_exists($paths['project_thumbs'] . $fmm[0]['thumb_name'])) {
+						
+						@unlink($paths['project_thumbs'] . $fmm[0]['thumb_name']);
+					}
+				}
+			}
+			
+		}
         
         $this->models->FreeModuleMedia->delete(array(
             'project_id' => $projectId, 

@@ -411,17 +411,28 @@ class MatrixKeyController extends Controller
         }
         else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_results_nbc')) {
 
+			$includeGroups = isset($this->requestData['params']['noGroups']) ? $this->requestData['params']['noGroups']!='1' : true;
+			$includeActiveChars = isset($this->requestData['params']['noActiveChars']) ? $this->requestData['params']['noActiveChars']!='1' : true;
+
             $states = $this->stateMemoryRecall();
 
  			if (isset($this->requestData['params']['action']) && $this->requestData['params']['action'] == 'similar')                
                 $results = $this->nbcGetSimilar($this->requestData['params']);
             else                
                 $results = $this->nbcGetTaxaScores($states);
+				
+			if ($includeActiveChars) {
 
-			$d = array();
-
-            foreach ((array) $states as $val)
-                $d[$val['characteristic_id']] = true;
+				$d = array();
+	
+				foreach ((array) $states as $val)
+					$d[$val['characteristic_id']] = true;
+					
+			} else {
+				
+				$d=null;
+				
+			}
 
 			array_walk($results, create_function('&$v,$k', '$v["l"] = ucfirst($v["l"]);'));
 
@@ -429,17 +440,26 @@ class MatrixKeyController extends Controller
 				'states' => $states
 			));
 
-			$groups = $this->getGUIMenu(
-				array(
-					'groups' => $this->getCharacterGroups(),
-					'characters' => $this->getCharacteristics(),
-					'appendExcluded' => false,
-					'checkImages' => true
-				)
-			);
-
-			if (empty($groups))
-				$groups = $this->getCharacterGroups();
+			
+			if ($includeGroups) {
+			
+				$groups = $this->getGUIMenu(
+					array(
+						'groups' => $this->getCharacterGroups(),
+						'characters' => $this->getCharacteristics(),
+						'appendExcluded' => false,
+						'checkImages' => true
+					)
+				);
+	
+				if (empty($groups))
+					$groups = $this->getCharacterGroups();
+					
+			} else {
+				
+				$groups=null;
+				
+			}
 
 			$result = 
 				json_encode(
@@ -459,7 +479,6 @@ class MatrixKeyController extends Controller
 				);
 			
             $this->smarty->assign('returnText', $result	);
-
 			
         }
         else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'clear_state')) {

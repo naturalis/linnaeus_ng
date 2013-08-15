@@ -1659,7 +1659,7 @@ class SpeciesController extends Controller
                 // get all ranks for this project
                 foreach ((array) $pr as $key => $val) {
                     
-                    $d[] = trim(strtolower($val['rank']));
+                    $d[] = trim(strtolower($val['rank']),chr(239).chr(187).chr(191).chr(9).chr(32).chr(10).chr(13));
                     
                     if ($_SESSION['admin']['project']['includes_hybrids'] && $val['can_hybrid'] == 1)
                         $h[] = trim(strtolower($val['rank']));
@@ -1980,6 +1980,8 @@ class SpeciesController extends Controller
 					continue;
 					
 				foreach((array)$line as $fKey => $fVal) {
+					
+					$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
 					
 					if (empty($fVal))
 						continue;

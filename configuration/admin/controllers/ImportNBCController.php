@@ -30,6 +30,7 @@ class ImportNBCController extends Controller
 		'naam NL' => '-',
 		'foto id beeldbank' => 'url_image',
 		'url image' => 'url_image',
+		'illustratie soortpagina' => 'url_image',
 		'nsrpage' => 'url_external_page',
 		'nsrpage nieuw' => 'url_external_page',
 		'url' => 'url_external_page',
@@ -65,7 +66,8 @@ class ImportNBCController extends Controller
         'taxa_relations', 
         'variation_relations', 
         'matrix_variation', 
-        'nbc_extras'
+        'nbc_extras', 
+		'gui_menu_order'
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -82,6 +84,7 @@ class ImportNBCController extends Controller
      */
     public function __construct ()
     {
+
         parent::__construct();
 		
 		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
@@ -147,7 +150,6 @@ class ImportNBCController extends Controller
 				$_SESSION['admin']['system']['import']['type']='nbc_data';
             }
             else {
-                
                 unset($_SESSION['admin']['system']['import']['file']);
             }
         }
@@ -174,7 +176,7 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie2Action ()
     {
-		
+
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
@@ -194,10 +196,10 @@ class ImportNBCController extends Controller
 		if (isset($data['project']['title'])) {
 
 			$d = $this->models->Project->_get(array(
-					'id' => array(
-					'sys_name' => $data['project']['title']
+				'id' => array(
+				'sys_name' => strtolower($data['project']['title'])
 			)));
-				
+
 			$exists = ($d!=false);
 
 			$this->smarty->assign('exists',$exists);
@@ -258,9 +260,11 @@ class ImportNBCController extends Controller
 
         if (!isset($_SESSION['admin']['system']['import']['project']) && !$this->isFormResubmit()) {
 
+			// create a new project
 			if (!$_SESSION['admin']['system']['import']['projectExists'] ||
 				($_SESSION['admin']['system']['import']['projectExists'] && $this->rHasVal('action','new_project'))) {
-					
+				
+
 				if ($_SESSION['admin']['system']['import']['projectExists'])
 					$pTitle = $_SESSION['admin']['system']['import']['newProjectTitle'];
 				else
@@ -276,6 +280,7 @@ class ImportNBCController extends Controller
 					'css_url' => $this->controllerSettings['defaultProjectCss'],
 					'group' => $pGroup
 				));
+
 				$this->addMessage($this->storeError('Created project "' . $pTitle . '" with id ' . $pId . '.','Project'));
 				
 				$_SESSION['admin']['system']['import']['project'] = array(
@@ -297,7 +302,9 @@ class ImportNBCController extends Controller
 				
 				$this->addMessage('Added default language.');
 				
-			} else {
+			} 
+			// use an existing project
+			else {
 
 				$pId = $_SESSION['admin']['system']['import']['project']['id'] = $_SESSION['admin']['system']['import']['existingProjectId'];
 				$_SESSION['admin']['system']['import']['project']['title'] = $_SESSION['admin']['system']['import']['data']['project']['title'];
@@ -310,14 +317,21 @@ class ImportNBCController extends Controller
             $this->addMessage('Added current user as lead expert to project.');
 
 			if ($this->rHasVal('action')) {
-
-				$_SESSION['admin']['system']['import']['existingDataTreatment'] = $this->requestData['action'];
+				/*
+					action:
+					replace_data: 	import into existing project, replacing existing data (delete all data except the project itself)
+					merge_data:		import into existing project, merging with existing data (if any) (leave it as it is)
+					new_project:	create a new project (happens higher up in this function)
+				*/
+	
+				$_SESSION['admin']['system']['import']['existingProjectTreatment'] = $this->requestData['action'];
 
 				if ($this->rHasVal('action','replace_data')) {
 
 					$pDel = new ProjectDeleteController;
 
 					$pDel->deleteNBCKeydata($pId);
+
 					$pDel->deleteMatrices($pId);
 					$pDel->deleteCommonnames($pId);
 					$pDel->deleteSynonyms($pId);
@@ -347,8 +361,7 @@ class ImportNBCController extends Controller
 
         $this->setPageName($this->translate('Storing ranks, species and variations'));
 
-//        if (!$this->isFormResubmit() && $this->rHasVal('action', 'species')) {
-        if ($this->rHasVal('action', 'species')) {
+        if ($this->rHasVal('action', 'save') && !$this->isFormResubmit()) {
             
 			if ($this->rHasVal('nbcColumns'))
 				$_SESSION['admin']['system']['import']['data']['nbcColumns'] = $this->requestData['nbcColumns'];
@@ -398,44 +411,54 @@ class ImportNBCController extends Controller
         $data = $_SESSION['admin']['system']['import']['data'];
 		$matrixName = isset($data['project']['matrix_name']) ? $data['project']['matrix_name'] : $data['project']['title'];
 
+		// does a matrix with this name already exist?
+		$mId = $this->getExistingMatrixId($matrixName);
 
-        if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
-			
-			$mId = null;
+//        if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
+        if ($this->rHasVal('action', 'matrix')) {
+	
+			// it does...
+			if (!is_null($mId)) {
 
-			$matrixExists = $this->doesMatrixExist($matrixName);
+				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"','Matrix'));
+				$this->smarty->assign('usingExisting', true);
 
-			if ($matrixExists!==false) {
-
+				// ...and we want to replace it, so we delete all existing matrix-data first
 				if ($this->rHasVal('data_treatment','replace_data')) {
 
 					$this->models->MatrixTaxonState->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'matrix_id' => $mId
 					));
 					$this->models->MatrixTaxon->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'matrix_id' => $mId
 					));
 					$this->models->MatrixVariation->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'matrix_id' => $matrixExists
+						'matrix_id' => $mId
+					));
+					$this->models->CharacteristicMatrix->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $mId
 					));
 
-					// cleaning up orphaned characters
 					$l = $this->models->CharacteristicMatrix->_get(array(
 						'id' =>
 							array(
 								'project_id' => $this->getNewProjectId(), 
-								'matrix_id' => $matrixExists
+								'matrix_id !=' => $mId
 							),
 						'columns' => 'characteristic_id'
 						)
 					);
 					
+
 					$d=array(0=>-1);
+
 					foreach((array)$l as $key => $val)
 						$d[]=$val['characteristic_id'];
+
 					$d=implode(',',$d);
 					
 					$this->models->CharacteristicLabelState->delete(array(
@@ -456,32 +479,31 @@ class ImportNBCController extends Controller
 					));
 					$this->models->Characteristic->delete(array(
 						'project_id' => $this->getNewProjectId(), 
-						'characteristic_id not in#' => '('.$d.')'
+						'id not in#' => '('.$d.')'
 					));
+					$this->models->GuiMenuOrder->delete(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $mId
+					));
+				} 
+				// ...but we don't want to overwrite it, so we create a matrix with a new name
+				else {
 
-					$mId = $matrixExists;
-
-				} else {
-
-					$matrixName = $_SESSION['admin']['system']['import']['newMatrixTitle'];
+					$m = $this->createMatrix($_SESSION['admin']['system']['import']['newMatrixTitle']);
+					$mId = $m['id'];
+					$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
 				}
 
-			}
+			} else {
 
-			if (is_null($mId)) {
-
+				// a matrix with this name does not exist yet, so we create one
 	            $m = $this->createMatrix($matrixName);
 				$mId = $m['id'];
 				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
-			} else {
-
-				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"','Matrix'));
-				$this->smarty->assign('usingExisting', true);
-
 			}
- 
+
             $data = $this->storeCharacterGroups($_SESSION['admin']['system']['import']['data'], $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['chargroups'] . ' character groups.');
             
@@ -497,11 +519,11 @@ class ImportNBCController extends Controller
             $this->smarty->assign('processed', true);
         }
 
-		$matrixExists = $this->doesMatrixExist($matrixName);
+		
+		// a matrix with this name already exists, so we fabricate a new unique name
+		if (!is_null($mId)) {
 
-		if ($matrixExists!==false) {
-
-			$_SESSION['admin']['system']['import']['existingMatrixId'] = $matrixExists;
+			$_SESSION['admin']['system']['import']['existingMatrixId'] = $mId;
 
 			$i=1;
 			$d=true;
@@ -523,12 +545,12 @@ class ImportNBCController extends Controller
 			
 		} else {
 			
-			$_SESSION['admin']['system']['import']['projectExists'] = false;
+			$_SESSION['admin']['system']['import']['matrixExists'] = false;
 			
 		}
-			
+		
 		$this->smarty->assign('matrix',$matrixName);
-		$this->smarty->assign('matrixExists',$matrixExists);
+		$this->smarty->assign('matrixExists',!is_null($mId));
 		$this->smarty->assign('projectExists',$_SESSION['admin']['system']['import']['projectExists']);
 		
         $this->smarty->assign('characters', $data['characters']);
@@ -1018,7 +1040,8 @@ class ImportNBCController extends Controller
 
                 foreach ((array) $val as $cKey => $cVal) {
 
-                    $cVal = trim($cVal);
+					$cVal=trim($cVal,chr(239).chr(187).chr(191).chr(9).chr(32).chr(10).chr(13));
+					// that's BOM, tab, space, returnz
                     
                     if (is_numeric($cVal) || !empty($cVal)) {
                         
@@ -1047,7 +1070,7 @@ class ImportNBCController extends Controller
 							two characters - gender and variant - are grouped
 							with the taxon's name, rather than with the other
 							characters.
-							i love the smell of exceptions in the morning.
+							we love the smell of exceptions in the morning.
 						*/
 						if ($line==6 && ($cKey==2 || $cKey==3) && !empty($cVal)) {
 	
@@ -1094,11 +1117,11 @@ class ImportNBCController extends Controller
 								$data['species'][$line]['id'] = $cVal;
 							}
 							// species' main label
-							else if (isset($data['columns'][$cKey]) && preg_match('/(title|titel|name|naam)/i',$data['columns'][$cKey])===1) {
+							else if (isset($data['columns'][$cKey]) && preg_match('/^(title|titel|name|naam)$/i',$data['columns'][$cKey])===1) {
 								$data['species'][$line]['label'] = $cVal;
 							}
 							// related species' main id's (or names) 
-							else if (isset($data['columns'][$cKey]) && $data['columns'][$cKey] == 'gelijkende soorten') {
+							else if (isset($data['columns'][$cKey]) && preg_match('/^gelijkende(.*)/i',$data['columns'][$cKey])==1) {
 								if (strpos($cVal, $this->_valueSep) !== false) {
 									$data['species'][$line]['related'] = explode($this->_valueSep, $cVal);
 								}
@@ -1381,7 +1404,8 @@ class ImportNBCController extends Controller
 				'project_id' => $this->getNewProjectId(), 
 				'taxon' => $this->_defaultKingdom
 			)));
-			
+
+
 		if ($d) { 
 
 			$kingdomId = $d[0]['id'];
@@ -1722,17 +1746,20 @@ class ImportNBCController extends Controller
         return $species;
     }
 
-	private function doesMatrixExist($name)
+	private function getExistingMatrixId($name)
 	{
 
-        $d = $this->models->MatrixName->_get(array('id' =>
-        array(
-            'project_id' => $this->getNewProjectId(), 
-            'language_id' => $this->getNewDefaultLanguageId(), 
-            'name' => $name
-        )));
-		
-		return !empty($d[0]['matrix_id']) ? $d[0]['matrix_id'] : false;
+        $d = $this->models->MatrixName->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getNewProjectId(), 
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'name' => $name
+				)
+			)
+		);
+
+		return isset($d[0]['matrix_id']) ? $d[0]['matrix_id'] : null;
 
 	}
 
@@ -1924,9 +1951,17 @@ class ImportNBCController extends Controller
             foreach ((array)$sVal['states'] as $key => $val) {
                 
                 foreach ((array) $val as $cKey => $cVal) {
+					
+					$cVal=trim($cVal);
                     
                     if (isset($states[$key][$cVal]))
                         continue;
+
+                    if (empty($cVal))
+                        continue;
+						
+					if (!isset($data['characters'][$key]['id']) || !isset($data['characters'][$key]['type']))
+						continue;
 
                     $cId = $data['characters'][$key]['id'];
                     $type = $data['characters'][$key]['type'];

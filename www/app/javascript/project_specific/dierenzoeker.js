@@ -21,6 +21,11 @@ function nbcGetResults(p) {
 
 	setCursor('wait');
 
+	if (p==undefined) var p={};
+
+	p.noGroups=1;
+	p.noActiveChars=1;
+
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -30,7 +35,6 @@ function nbcGetResults(p) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			//console.log(data);
 			nbcData = $.parseJSON(data);
 			nbcDoResults();
 			setCursor();

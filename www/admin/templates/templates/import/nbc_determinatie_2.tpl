@@ -24,11 +24,11 @@
 
 
 </p>
-{if $exists && 1==2}
+{if $exists}
 <p>
 	<span class="message-error">A project with that name already exists. Project names need to be unique; please specify how to treat this import:</span><br />
-	<input type="radio" id="id1" name="action" value="replace_data" checked="checked" /></td><td><label for="id1">import into existing project, replacing existing data</label><br />
-	<input type="radio" id="id2" name="action" value="merge_data" /></td><td><label for="id2">import into existing project, merging with existing data (if any)</label><br />
+	<input type="radio" id="id1" name="action" value="replace_data" /></td><td><label for="id1">import into existing project, replacing existing data (take note: this is ALL data, not just the matrix)</label><br />
+	<input type="radio" id="id2" name="action" value="merge_data" checked="checked" /></td><td><label for="id2">import into existing project, merging with existing data (if any; please note you'll get the chance to overwrite just the matrix data later on)</label><br />
 	<input type="radio" id="id3" name="action" value="new_project" /></td><td><label for="id3">create a new project with the title "{$suggestedTitle}"</label><br />
 	If you wish to create a new project with a different title, alter the title in your CSV-file and <a href="nbc_determinatie_1.php?action=new">reload the file</a>.<br />
 </p>
