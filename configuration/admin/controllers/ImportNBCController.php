@@ -414,7 +414,7 @@ class ImportNBCController extends Controller
 		// does a matrix with this name already exist?
 		$mId = $this->getExistingMatrixId($matrixName);
 
-        if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
+		if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
 	
 			// it does...
 			if (!is_null($mId)) {
@@ -497,7 +497,7 @@ class ImportNBCController extends Controller
 			} else {
 
 				// a matrix with this name does not exist yet, so we create one
-	            $m = $this->createMatrix($matrixName);
+				$m = $this->createMatrix($matrixName);
 				$mId = $m['id'];
 				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
@@ -1041,7 +1041,7 @@ class ImportNBCController extends Controller
 
 					$cVal=trim($cVal,chr(239).chr(187).chr(191).chr(9).chr(32).chr(10).chr(13));
 					// that's BOM, tab, space, returnz
-                    
+
                     if (is_numeric($cVal) || !empty($cVal)) {
                         
                         // line 0, cell 0: title
@@ -1147,9 +1147,8 @@ class ImportNBCController extends Controller
 									
 								}
 								else {
-									
 									if (strpos($cVal, $this->_valueSep) !== false) {
-										$data['species'][$line]['states'][$cKey] = explode($this->_valueSep, $cVal);
+										$data['species'][$line]['states'][$cKey] = preg_split('/'.$this->_valueSep.'/', $cVal,-1,PREG_SPLIT_NO_EMPTY);
 									}
 									else {
 										$data['species'][$line]['states'][$cKey][] = trim($cVal);
@@ -1404,7 +1403,6 @@ class ImportNBCController extends Controller
 				'taxon' => $this->_defaultKingdom
 			)));
 
-
 		if ($d) { 
 
 			$kingdomId = $d[0]['id'];
@@ -1442,24 +1440,39 @@ class ImportNBCController extends Controller
 					)));
 					
 				if ($d) { 
-		
+
 					$parent = $d[0]['id'];
 				
 				} else {
 
-					$this->models->Taxon->save(
+					$d = $this->models->Commonname->_get(array('id' =>
 					array(
-						'id' => null, 
 						'project_id' => $this->getNewProjectId(), 
-						'taxon' => $val['parent_name'], 
-						'parent_id' => $kingdomId, 
-						'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['family'], 
-						'taxon_order' => 0, 
-						'is_hybrid' => 0, 
-						'list_level' => 0
-					));
+						'language_id' => $this->getNewDefaultLanguageId(), 
+						'commonname' => $val['parent_name']
+					)));					
 					
-					$parent = $this->models->Taxon->getNewId();
+					if ($d) {
+
+						$parent = $d[0]['taxon_id'];
+
+					} else {
+
+						$this->models->Taxon->save(
+						array(
+							'id' => null, 
+							'project_id' => $this->getNewProjectId(), 
+							'taxon' => $val['parent_name'], 
+							'parent_id' => $kingdomId, 
+							'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['family'], 
+							'taxon_order' => 0, 
+							'is_hybrid' => 0, 
+							'list_level' => 0
+						));
+						
+						$parent = $this->models->Taxon->getNewId();
+						
+					}
 
 				}
 
@@ -1480,7 +1493,7 @@ class ImportNBCController extends Controller
 				)));
 				
 			if ($d) { 
-	
+
 				$species[$key]['lng_id'] = $d[0]['id'];
 			
 			} else {
@@ -1499,7 +1512,7 @@ class ImportNBCController extends Controller
 					$species[$key]['lng_id'] = $d[0]['matrix_id'];
 				
 				} else {
-
+					
 					// save new taxon
 					$this->models->Taxon->save(
 					array(
@@ -1934,6 +1947,7 @@ class ImportNBCController extends Controller
 
     private function storeStates ($data)
     {
+
         $_SESSION['admin']['system']['import']['loaded']['states'] = 0;
         
         $states = array();
@@ -1950,15 +1964,15 @@ class ImportNBCController extends Controller
             foreach ((array)$sVal['states'] as $key => $val) {
                 
                 foreach ((array) $val as $cKey => $cVal) {
-					
+
 					$cVal=trim($cVal);
                     
                     if (isset($states[$key][$cVal]))
                         continue;
 
-                    if (empty($cVal))
+                    if (empty($cVal) && !is_numeric($cVal))
                         continue;
-						
+
 					if (!isset($data['characters'][$key]['id']) || !isset($data['characters'][$key]['type']))
 						continue;
 
@@ -2023,10 +2037,7 @@ class ImportNBCController extends Controller
 
     private function storeVariationStateConnections ($taxa, $mData, $mId)
     {
-		
-//&& $species[$key]['is_matrix']!=true
-		
-		
+
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
         
         foreach ((array) $taxa as $tVal) {
@@ -2076,7 +2087,7 @@ class ImportNBCController extends Controller
                     'matrix_id' => $mId, 
                     'taxon_id' => $tVal['lng_id']
                 ));
-                
+
 
                 if (isset($tVal['states'])) {
 
@@ -2088,7 +2099,7 @@ class ImportNBCController extends Controller
 								continue;
                             
                             $this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
-                            
+
                             $this->models->MatrixTaxonState->save(
                             array(
                                 'project_id' => $this->getNewProjectId(), 

@@ -2217,9 +2217,11 @@ class Controller extends BaseClass
     private function setSkinName ()
     {
 		
-		if (isset($this->helpers->UserAgent)) {
-	
-			if ($this->helpers->UserAgent->isMobileDevice()) {
+		$force = $this->getSetting('force_skin_mobile')==1;
+
+		if ($force || isset($this->helpers->UserAgent)) {
+
+			if ($force || $this->helpers->UserAgent->isMobileDevice()) {
 
 		        $d = $this->getSetting('skin_mobile');
 
