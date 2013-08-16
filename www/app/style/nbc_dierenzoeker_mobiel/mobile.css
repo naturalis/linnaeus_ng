@@ -1,0 +1,251 @@
+.ios-scroll-fix {
+  height: 101%;
+  overflow: hidden;
+  background-color:yellow;
+}
+
+#filter {
+	/* width: 100%; */
+}
+
+#filter.filtersset {
+	display: none;
+}
+
+
+.ui-grid-a .ui-btn,
+.ui-grid-b .ui-btn, 
+.ui-grid-c .ui-btn,
+.ui-grid-d .ui-btn {
+	font-size: 8pt;
+	font-weight: normal;
+	margin: 0;
+}
+.ui-grid-a .ui-btn-inner, 
+.ui-grid-b .ui-btn-inner, 
+.ui-grid-c .ui-btn-inner,
+.ui-grid-d .ui-btn-inner {
+	padding: 2px;
+	border: 0 none;
+}
+.ui-grid-a .ui-btn-up-a, .ui-grid-b .ui-btn-up-a, .ui-grid-c .ui-btn-up-a, .ui-grid-d .ui-btn-up-a,
+.ui-grid-a .ui-btn-hover-a, .ui-grid-b .ui-btn-hover-a, .ui-grid-c .ui-btn-hover-a, .ui-grid-d .ui-btn-hover-a, 
+.ui-grid-a .ui-btn-down-a, .ui-grid-b .ui-btn-down-a, .ui-grid-c .ui-btn-down-a, .ui-grid-d .ui-btn-down-a, 
+.ui-grid-a .ui-btn-up-b, .ui-grid-b .ui-btn-up-b, .ui-grid-c .ui-btn-up-b, .ui-grid-d .ui-btn-up-b, 
+.ui-grid-a .ui-btn-hover-b, .ui-grid-b .ui-btn-hover-b, .ui-grid-c .ui-btn-hover-b, .ui-grid-d .ui-btn-hover-b, 
+.ui-grid-a .ui-btn-down-b, .ui-grid-b .ui-btn-down-b, .ui-grid-c .ui-btn-down-b, .ui-grid-d .ui-btn-down-b, 
+.ui-grid-a .ui-btn-up-c, .ui-grid-b .ui-btn-up-c, .ui-grid-c .ui-btn-up-c, .ui-grid-d .ui-btn-up-c, 
+.ui-grid-a .ui-btn-hover-c, .ui-grid-b .ui-btn-hover-c, .ui-grid-c .ui-btn-hover-c, .ui-grid-d .ui-btn-hover-c, 
+.ui-grid-a .ui-btn-down-c, .ui-grid-b .ui-btn-down-c, .ui-grid-c .ui-btn-down-c, .ui-grid-d .ui-btn-down-c, 
+.ui-grid-a .ui-btn-up-d, .ui-grid-b .ui-btn-up-d, .ui-grid-c .ui-btn-up-d, .ui-grid-d .ui-btn-up-d, 
+.ui-grid-a .ui-btn-hover-d, .ui-grid-b .ui-btn-hover-d, .ui-grid-c .ui-btn-hover-d, .ui-grid-d .ui-btn-hover-d, 
+.ui-grid-a .ui-btn-down-d, .ui-grid-b .ui-btn-down-d, .ui-grid-c .ui-btn-down-d, .ui-grid-d .ui-btn-down-d {
+	background: none;
+	border: 0 none;
+}
+.ui-selected {
+}
+.ui-disabled {
+	opacity: 0.1 !important;
+}
+
+
+#infobutton, .menu-button, .info-button {
+	/* Turn off some jquery-mobile styling: */
+	border-width: 0px;
+	background: transparent !important;
+	background-image: none !important;	
+	
+	-moz-box-shadow: 	0 0px 0 rgba(255,255,255,0) !important;
+	-webkit-box-shadow: 0 0px 0 rgba(255,255,255,0) !important;
+	box-shadow: 		0 0px 0 rgba(255,255,255,0) !important;
+}
+#infobutton .ui-btn-inner, .menu-button .ui-btn-inner, .info-button .ui-btn-inner {
+	/* Turn off jquery-mobile styling within #infobutton */
+	border-top-width: 	0px !important;
+}
+
+.menu-button-img {
+	margin-top:-6px;
+	text-decoration: none;
+	font-size:18px !important;
+}
+
+#tab {
+	background-image: url('/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/Tab.png');
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+
+.clearer {
+	line-height: 1px;
+	font-size:1px;
+	clear:both;
+}
+
+.facetgrouppage .tagline {
+	margin-top: 0px;
+}
+
+.facetgrouppage .tagline .ui-btn-up-c, .facetgrouppage .tagline .ui-btn-hover-c,
+.facetgrouppage .tagline .ui-btn-down-c {
+	color: #FFFFFF;
+	background: #1aacdb;
+	border: none;
+	margin-left:3px;
+}
+
+.facetgrouppage .tagline .ui-corner-top, .facetgrouppage .tagline .ui-corner-bottom {
+	border: none;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.facetgrouppage .tagline .ui-btn-inner {
+	padding: 2px 2px 2px 40px;
+	overflow: visible;
+	border-top-width: 0px;
+}
+
+.facetgrouppage .taglineconnector {
+	position: absolute;
+	height: 12px;
+	width: 12px;
+	top: -17px;
+	left: 290px;
+	background-position: left top;
+}
+.lefttaglineconnector {
+	background-image: url('/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/puntje_vraag_vogel.png');
+	background-repeat: no-repeat;
+	height: 12px;
+	width: 12px;
+	position:relative;
+	top:3px;
+}
+
+.ui-header .ui-title, .ui-footer .ui-title {
+	margin-right: 2.5em !important;
+}
+
+.ui-body-c, .ui-dialog.ui-overlay-c {
+	background-color: #fff;
+	background: none;		
+}
+
+.ui-content {
+	background-color: transparent;
+}
+
+.facetheadercontainer {
+	background-color:#1aacdb;
+	padding:1px;
+	height: 25px;	
+}
+.ui-body-c, .ui-dialog.ui-overlay-c {
+	color: #fff;
+	text-shadow: none;
+}
+.ui-btn-up-c {
+	background-image:none;
+	background: #ffffff;
+}
+
+
+.ui-btn-active {
+	background: black !important;	
+	border-color: black !important;
+}
+
+.ui-btn-hover-c {
+	background: #ffffff;
+	text-shadow:none;	
+} 
+
+.colofon-close-btn {	
+	position:absolute;
+	top: 47px;
+	right: 10px;
+}
+
+.colofon-close-large-btn {	
+	position:relative;	
+	left: 50%;
+	margin-left: -72px;
+} 
+
+#bottom-bar {
+	height: 57px;
+	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background.png") top repeat-x;
+	/*background-color: black;*/
+	color: white; 
+	font-size: 12px; 
+	position: fixed;
+	bottom: -30px;
+	z-index: 99; 
+	width: 100%; 
+	text-align: center;
+	padding: 5px;
+	cursor: hand;
+	padding-top:25px;
+}
+#bottom-bar.down {
+	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background-down.png") top repeat-x;
+}
+.collapsible-set-wrapper .ui-collapsible {
+	margin:0;	
+}
+.ui-icon {
+	left: auto !important;
+	right: 20px;
+}
+
+.keuze-content {
+	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bg_blauwestreep.jpg");
+}
+.ui-collapsible-content-wrapper {
+	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;
+}
+.block-container ul {
+	margin-top:15px;
+}
+h3 {
+	margin-top: -22px;
+	font-size: 18px;
+	font-style: italic;
+	font-weight:normal;
+	color: #25aad5;
+}
+
+
+.faq-question {
+	text-align:left;
+	min-height: 30px;
+	padding-top: 11px;
+	padding-bottom: 11px;
+	margin-bottom: 10px;
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 16px;
+	color: white;
+	padding-left: 35px;	
+	background-color: #1AACDB !important;
+	background-image: url(collapsable-arrow.png) !important;
+	background-repeat: no-repeat !important;
+	background-position-x: 16px !important;
+	background-position-y: 10px !important;
+}
+.faq-answer {
+	display:none;
+	text-align:left;
+	background-color: white;
+	padding: 10px;
+	padding-left: 35px;
+	padding-right: 35px;
+	margin-top: -10px;
+	margin-bottom: 10px;
+}
+

@@ -243,7 +243,7 @@ class MatrixKeyController extends Controller
 
         $this->smarty->assign('characteristics', $characters);
 		
-        $this->printPage();
+        $this->printPage('identify');
     }
 
     public function examineAction ()
@@ -613,6 +613,192 @@ class MatrixKeyController extends Controller
                 $this->saveCache('matrix-taxa-' . $key, isset($dummy) ? $dummy : null);
         }
     }
+
+
+
+
+
+
+
+
+	private function _appControllerGetStates($data)
+	{
+
+		function makeCharacterIconName($label)
+		{
+			return '__menu'.preg_replace('/\W/i','',ucwords($label)).'.png';
+		}
+		
+		$res_taxa = isset($data['results']['taxa']) ? $data['results']['taxa'] : array();
+		$res_var = isset($data['results']['variations']) ? $data['results']['variations'] : array();
+
+		$count = $this->models->MatrixTaxonState->freeQuery(
+			array(
+				'query' =>
+					"select state_id, sum(tot), if(sum(tot)=0, -1, if(sum(tot)=-99, 1, 0)) as can_select from
+					(
+						select state_id, -99 as tot
+							from %TABLE%
+							where state_id in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+						union
+						select state_id, count(taxon_id) as tot
+							from %TABLE%
+							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+							".(count($res_taxa)==0 ? "" :  "and taxon_id in (".$res_taxa.") " )."
+							group by state_id
+						union 
+						select state_id, count(variation_id) as tot 
+							from %TABLE% 
+							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+							".(count($res_var)==0 ? "" : "and variation_id in (".$res_var.") " )."
+							group by state_id
+					) as unionized
+					group by state_id order by state_id",
+				'fieldAsIndex' => 'state_id'
+			)
+		);
+
+		$menu = $this->models->GuiMenuOrder->freeQuery(
+			"select 
+				_a.ref_id as id,'character' as type,_a.show_order as show_order,
+				if(locate('|',_b.label)=0,_b.label,substring(_b.label,1,locate('|',_b.label)-1)) as label,
+			if(locate('|',_b.label)=0,_b.label,substring(_b.label,locate('|',_b.label)+1)) as description
+			from %TABLE% _a
+			left join %PRE%characteristics_labels _b on _b.characteristic_id = _a.ref_id and _b.language_id = ".$data['language']."
+			where 
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.matrix_id = ".$data['matrix']."
+				and _a.ref_type='char'
+			union
+			select 
+				_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
+			left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$data['language']."
+			where
+				_a.project_id = ".$this->getCurrentProjectId()."
+				and _a.matrix_id = ".$data['matrix']."
+				and _a.ref_type='group'
+			order by show_order,label"
+		);
+		
+		foreach((array)$menu as $key=>$val) {
+
+			unset($menu[$key]['show_order']);
+
+			$menu[$key]['img']=makeCharacterIconName($val['label']);
+
+			if ($val['type']=='character') {
+
+				$menu[$key]['img']=makeCharacterIconName($val['label']);
+	
+				$menu[$key]['states']=$this->models->CharacteristicState->freeQuery(
+					"select _a.id,_c.label,_a.file_name as img,'0' as select_state, _a.show_order
+					from %TABLE% _a
+					left join %PRE%characteristics_labels_states _c on _a.id = _c.state_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
+					where _a.characteristic_id = ".$val['id']." and _a.project_id = ".$this->getCurrentProjectId()."
+					order by _a.show_order,_c.label"
+				);
+
+				foreach((array)$menu[$key]['states'] as $sKey => $sVal) {
+					unset($menu[$key]['states'][$sKey]['show_order']);
+					$menu[$key]['states'][$sKey]['select_state'] = $count[$sVal['id']]['can_select'];
+					if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
+						unset($menu[$key]['states'][$sKey]);
+				}
+				
+				$menu[$key]['hasStates']=count((array)$menu[$key]['states'])>0;
+
+			} else
+			if ($val['type']=='c_group') {
+				
+				$c = $this->models->CharacteristicChargroup->freeQuery(
+					"select _a.characteristic_id as id,'character' as type,_a.show_order as show_order,
+					if(locate('|',_c.label)=0,_c.label,substring(_c.label,1,locate('|',_c.label)-1)) as label,
+					if(locate('|',_c.label)=0,_c.label,substring(_c.label,locate('|',_c.label)+1)) as description					
+					from %TABLE% _a
+					left join %PRE%characteristics _b on _a.characteristic_id = _b.id
+					left join %PRE%characteristics_labels _c on _a.characteristic_id = _c.characteristic_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
+					where _a.chargroup_id = ".$val['id']. " and _a.project_id = ".$this->getCurrentProjectId()."
+					order by label"
+				);
+
+				foreach((array)$c as $cKey=>$cVal) {
+
+					$c[$cKey]['img']=makeCharacterIconName($val['label']);
+
+					$c[$cKey]['states']=$this->models->CharacteristicState->freeQuery(
+						"select _a.id,_c.label,_a.file_name as img,'0' as select_state, _a.show_order
+						from %TABLE% _a
+						left join %PRE%characteristics_labels_states _c on _a.id = _c.state_id and _c.language_id = ".$data['language']." and _c.project_id = ".$this->getCurrentProjectId()."
+						where _a.characteristic_id = ".$cVal['id']." and _a.project_id = ".$this->getCurrentProjectId()."
+						order by _a.show_order,_c.label"
+					);
+					
+					foreach((array)$c[$cKey]['states'] as $sKey => $sVal) {
+						unset($c[$cKey]['states'][$sKey]['show_order']);
+						$c[$cKey]['states'][$sKey]['select_state'] = $count[$sVal['id']]['can_select'];
+
+						if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
+							unset($c[$cKey]['states'][$sKey]);
+					}
+					
+					$c[$cKey]['hasStates']=count((array)$c[$cKey]['states'])>0;
+
+				}
+				
+				$menu[$key]['characters']=$c;
+				$menu[$key]['hasCharacters']=count((array)$c)>0;
+				
+			}
+		
+		}
+
+		return $menu;
+
+	}
+			
+	public function appControllerInterfaceAction()
+	{
+		
+		/*
+			used exclusively by the Javascript app-controller object
+			implemented in the web-enabled version of the linnaeus mobile-app
+
+			[request]
+			action: action to execute (query)
+			query: query to execute (states)
+			language: language ID for labels (24)
+			matrix: active matrix ID (542
+			states: imploded list of state ID's (28037,28062,28267)
+			force: force states to have images, discard them if not (1|0)
+			time: timestamp against caching of Ajax-calls
+
+		*/
+		
+		$res=null;
+
+	
+		if (!$this->rHasVal('action')) {
+			
+            $res='error (request lacks an action)';
+	
+        }
+        else if ($this->rHasVal('action', 'query')) {
+			
+			$data = $this->requestData;
+			
+
+  			
+			$functions = array(
+				'states' => '_appControllerGetStates'
+			);
+
+			$res=$this->$functions[$data['query']]($data);
+			
+		}
+		
+		echo json_encode($res);
+	
+	}
 
     private function initialize ($force = false)
     {

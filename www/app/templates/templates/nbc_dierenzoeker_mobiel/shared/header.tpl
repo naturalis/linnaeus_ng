@@ -1,34 +1,29 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Dierenzoeker</title>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html class="ui-mobile" xmlns="http://www.w3.org/1999/xhtml"><head><!-- base href="http://www.dierenzoeker.nl/" -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	<title>Dierenzoeker</title>
+    <meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker.">
+    <link rel="image_src" href="img/dierenzoeker-logo.png">
+    <link href="img/favicon.ico" type="image/x-icon" rel="icon"><link href="img/favicon.ico" type="image/x-icon" rel="shortcut icon">	
+    {*
+	<script type="text/javascript">
+    // Important global vars:
+	var images_url = '';
+    var requestmore_url = "/index.php/identify/more";
+    </script>
+    <script src="js/shared.js"></script>
+	*}
 
-	<link rel="image_src" href="{$session.app.project.urls.systemMedia}dierenzoeker-logo.png" />
+    <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery.js"></script>	
+	<script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery-mobile.js"></script>
+    <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery-ui.js"></script>
 
-	<meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker."/>
-	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />	<link rel="image_src" href="{$session.app.project.urls.systemMedia}dierenzoeker-logo.png" />
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}basics.css" />
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}prettyPhoto/prettyPhoto.css" />
-	<link href="{$session.app.project.urls.projectMedia}favicon.ico" type="image/x-icon" rel="icon" />
-    <link href="{$session.app.project.urls.projectMedia}favicon.ico" type="image/x-icon" rel="shortcut icon" />        
-	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierenzoeker.js"></script>
-
-
-{if $javascriptsToLoad}
-{section name=i loop=$javascriptsToLoad.all}
-{if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
-	<script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.all[i]}"></script>
-    {else}
-	<script type="text/javascript" src="{$javascriptsToLoad.all[i]}"></script>
-{/if}
-{/section}
-{section name=i loop=$javascriptsToLoad.IE}
-	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
-{/section}
-{/if}
-
-<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
-
+    <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller.js"></script>	
+    <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller-implementation.js"></script>	
+    
+    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}jquery.css">
+    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}shared.css"> 
+    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile.css"> 
+    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile-small.css"> 
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
