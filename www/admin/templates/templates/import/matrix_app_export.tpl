@@ -27,7 +27,7 @@ Output:
     </p>
     <p>
     options:<br />
-    <label><input type="checkbox" name="reduceURLs" value="y" checked="checked"/>reduce image URL's to filenames only</label><br />
+    <label><input type="checkbox" name="reduceURLs" value="y" checked="checked"/>reduce image URLs to filenames only</label><br />
     {if $dbSettings.tablePrefix!=''}
     <label><input type="checkbox" name="removePrefix" value="y" checked="checked"/>remove table prefix "{$dbSettings.tablePrefix}"</label><br />
     {else}

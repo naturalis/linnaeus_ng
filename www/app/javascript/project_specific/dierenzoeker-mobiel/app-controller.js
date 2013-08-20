@@ -5,16 +5,18 @@ var STATE = 'state';
 
 var appController = (function() {
 
-	var error = null;
-	var query = null;
-	var variables = {};
-	var db = null;
-	var results = {taxa:{},variations:{}};
-	var id = null;
-	var matrixId = null;
-	var languageId = null;
-	var isVariation = false;
-	var forceStateImages = true;
+	var error=null;
+	var query=null;
+	var callbacks=Array();
+	var variables={};
+	var db=null;
+	var results={taxa:{},variations:{}};
+	var id=null;
+	var matrixId=null;
+	var languageId=null;
+	var isVariation=false;
+	var forceStateImages=true;
+	var imgRoot=null;
 
 	// extensions
 	Object.size = function(obj) {
@@ -79,6 +81,31 @@ var appController = (function() {
 	function getId()
 	{
 		return id;
+	}
+
+
+	function setImgRoot(i)
+	{
+		imgRoot=i;
+	}
+
+
+	function getImgRoot()
+	{
+		return imgRoot;
+	}
+
+
+	function setCallback(c)
+	{
+		callbacks.push(c);
+		return callbacks.length-1;
+	}
+
+
+	function getCallback(i)
+	{
+		return callbacks[i];
 	}
 
 
@@ -157,7 +184,7 @@ var appController = (function() {
 		query=q;
 	};
 
-	function getData(callback) {
+	function getData(callback,index) {
 
 		$.ajax({
 			url : 'app_controller_interface.php',
@@ -173,10 +200,8 @@ var appController = (function() {
 				'time' : new Date().getTime()
 			}),
 			success : function (data) {
-				//console.dir(data);
-				data = $.extend({}, $.parseJSON(data));
-				//console.dir(data);
-				if (callback) callback();
+				//console.log(data);
+				callback($.parseJSON(data),index);
 			}
 		});
 		
@@ -186,7 +211,39 @@ var appController = (function() {
 	function getStates(callbackSuccess)
 	{
 		setQuery('states');
-		getData(callbackSuccess);
+		getData(formatStates,setCallback(callbackSuccess));
+	}
+
+	function getResults(callbackSuccess)
+	{
+		setQuery('results');
+		getData(storeResults,setCallback(callbackSuccess));
+	}
+	
+	function formatStates(data,index)
+	{
+		var c=getCallback(index);
+		if (c) c($.extend({},data.all),data.active);
+	}
+
+	function storeResults(data,index)
+	{
+		results = {taxa:{},variations:{}};
+
+		if (Object.size(getSelectedState())>0) {
+
+			for (var i=0; i<data.length; i++){
+				var row = data[i];		
+				if (row.type!="taxon")
+					results.variations[Object.size(results.variations)]=row.id;
+				else
+					results.taxa[Object.size(results.taxa)]=row.id;
+			}
+			
+		}
+		
+		var c=getCallback(index);
+		if (c) c(data);
 	}
 
 /*
@@ -276,9 +333,7 @@ var appController = (function() {
 		})	
 	}
 
-
-	
-	*/
+*/
 
 
 	// public interface functions
@@ -294,6 +349,16 @@ var appController = (function() {
 			setLanguageId(i);
 		},
 
+		setimgroot: function(i)
+		{
+			setImgRoot(i);
+		},
+
+		setimgroot: function(i)
+		{
+			setImgRoot(i);
+		},
+
 		geterror: function()
 		{
 			return getError()==null ? null : 'appController::'+getError();
@@ -306,20 +371,24 @@ var appController = (function() {
 			}
 			catch(err)  {
 				setError(err);
-				callbackError();
+				if (callbackError) callbackError();
 			}			
 		},
 
-		set: function(vars)
+		set: function(vars,callbackSuccess,callbackError)
 		{
 			try {
 				for(var property in vars)
 					setSelectedState(property,vars[property]);
-				return true;
+
+				if (callbackSuccess)
+					callbackSuccess();
+				else
+					true;
 			}
 			catch(err)  {
 				setError(err);
-				return false;
+				if (callbackError) callbackError();
 			}
 		},
 	
@@ -328,34 +397,27 @@ var appController = (function() {
 			return getSelectedState(v);
 		},
 		
-		reinitialise: function()
+		reinitialise: function(callbackSuccess,callbackError)
 		{
 			try {
 				doReinitialise();
-				return true;
+				callbackSuccess();
 			}
 			catch(err)  {
 				setError(err);
-				return false;
+				if (callbackError) callbackError();
 			}
 		},
 
 		result: function(callbackSuccess,callbackError)
 		{
 			try {
-				var numofstates=Object.size(this.get());
-
-				if (numofstates==0)
-					setQuery(queries.alltaxa);
-				else
-					setQuery(queries.results.replace(/%STATES%/g,getImplodedStates()).replace(/%SELECTED_STATE_COUNT%/g,numofstates));
-
-				executeQuery(callbackSuccess,callbackError,setResults);
+				getResults(callbackSuccess);
 			}
 			catch(err)  {
 				setError(err);
-				callbackError();
-			}		
+				if (callbackError) callbackError();
+			}	
 		},
 	
 		detail: function(callbackSuccess,callbackError,id,isvari)
@@ -367,7 +429,7 @@ var appController = (function() {
 			}
 			catch(err)  {
 				setError(err);
-				callbackError();
+				if (callbackError) callbackError();
 			}
 		},
 			

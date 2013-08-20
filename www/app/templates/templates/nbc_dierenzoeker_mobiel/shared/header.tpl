@@ -24,6 +24,6 @@
     <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}shared.css"> 
     <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile.css"> 
     <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile-small.css"> 
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>

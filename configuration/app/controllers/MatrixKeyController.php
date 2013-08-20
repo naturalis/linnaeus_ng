@@ -629,8 +629,11 @@ class MatrixKeyController extends Controller
 			return '__menu'.preg_replace('/\W/i','',ucwords($label)).'.png';
 		}
 		
-		$res_taxa = isset($data['results']['taxa']) ? $data['results']['taxa'] : array();
-		$res_var = isset($data['results']['variations']) ? $data['results']['variations'] : array();
+		$resTaxa = isset($data['results']['taxa']) ? $data['results']['taxa'] : array();
+		$resVar = isset($data['results']['variations']) ? $data['results']['variations'] : array();
+	
+		$selStates=isset($data['states']) ? explode(',',$data['states']) : array();
+		$stateList=array();
 
 		$count = $this->models->MatrixTaxonState->freeQuery(
 			array(
@@ -644,13 +647,13 @@ class MatrixKeyController extends Controller
 						select state_id, count(taxon_id) as tot
 							from %TABLE%
 							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
-							".(count($res_taxa)==0 ? "" :  "and taxon_id in (".$res_taxa.") " )."
+							".(count($resTaxa)==0 ? "" :  "and taxon_id in (".implode(',',$resTaxa).") " )."
 							group by state_id
 						union 
 						select state_id, count(variation_id) as tot 
 							from %TABLE% 
 							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
-							".(count($res_var)==0 ? "" : "and variation_id in (".$res_var.") " )."
+							".(count($resVar)==0 ? "" : "and variation_id in (".implode(',',$resVar).") " )."
 							group by state_id
 					) as unionized
 					group by state_id order by state_id",
@@ -698,14 +701,20 @@ class MatrixKeyController extends Controller
 					order by _a.show_order,_c.label"
 				);
 
+				$hasSelected=false;
 				foreach((array)$menu[$key]['states'] as $sKey => $sVal) {
 					unset($menu[$key]['states'][$sKey]['show_order']);
-					$menu[$key]['states'][$sKey]['select_state'] = $count[$sVal['id']]['can_select'];
+					$menu[$key]['states'][$sKey]['select_state']=isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+					if ($menu[$key]['states'][$sKey]['select_state']=='1') $hasSelected=true;
 					if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
 						unset($menu[$key]['states'][$sKey]);
+					if (in_array($sVal['id'],$selStates)) {
+						array_push($stateList,array_merge($sVal,array('character'=>array('id'=>$val['id'],'label'=>$val['label']))));
+					}
 				}
 				
 				$menu[$key]['hasStates']=count((array)$menu[$key]['states'])>0;
+				$menu[$key]['hasSelected']=$hasSelected;
 
 			} else
 			if ($val['type']=='c_group') {
@@ -721,8 +730,10 @@ class MatrixKeyController extends Controller
 					order by label"
 				);
 
-				foreach((array)$c as $cKey=>$cVal) {
+				$hasSelectedGroup=false;
 
+				foreach((array)$c as $cKey=>$cVal) {
+					
 					$c[$cKey]['img']=makeCharacterIconName($val['label']);
 
 					$c[$cKey]['states']=$this->models->CharacteristicState->freeQuery(
@@ -733,27 +744,92 @@ class MatrixKeyController extends Controller
 						order by _a.show_order,_c.label"
 					);
 					
+					$hasSelected=false;
 					foreach((array)$c[$cKey]['states'] as $sKey => $sVal) {
 						unset($c[$cKey]['states'][$sKey]['show_order']);
-						$c[$cKey]['states'][$sKey]['select_state'] = $count[$sVal['id']]['can_select'];
-
+						$c[$cKey]['states'][$sKey]['select_state']=isset($count[$sVal['id']]['can_select']) ? $count[$sVal['id']]['can_select'] : 0;
+						if ($c[$cKey]['states'][$sKey]['select_state']=='1') $hasSelected=true;
 						if (isset($data['force']) && $data['force']=='1' && empty($sVal['img']))
 							unset($c[$cKey]['states'][$sKey]);
+						if (in_array($sVal['id'],$selStates))
+							array_push($stateList,array_merge($sVal,array('character'=>array('id'=>$val['id'],'label'=>$val['label']))));
 					}
 					
 					$c[$cKey]['hasStates']=count((array)$c[$cKey]['states'])>0;
+					$c[$cKey]['hasSelected']=$hasSelected;
+					
+					if ($hasSelected) $hasSelectedGroup=true;
 
 				}
 				
 				$menu[$key]['characters']=$c;
 				$menu[$key]['hasCharacters']=count((array)$c)>0;
+				$menu[$key]['hasSelected']=$hasSelectedGroup;
 				
 			}
 		
 		}
 
-		return $menu;
+		return array('all'=>$menu,'active'=>$stateList);
 
+	}
+	
+	private function _appControllerGetResults($data)
+	{
+		
+		$selStateCount=count(isset($data['states']) ? preg_split('/,/', $data['states'],-1,PREG_SPLIT_NO_EMPTY) : array());
+
+		if ($selStateCount==0) {
+			
+			$res=$this->models->MatrixTaxon->freeQuery("
+				select 'taxon' as type, _a.taxon_id as id, 0 as total_states, 100 as score,_c.is_hybrid as is_hybrid, trim(_c.taxon) as sci_name, trim(_d.commonname) as label,_e.value as url_thumbnail
+				from %TABLE% _a
+				left join %PRE%taxa _c on _a.taxon_id = _c.id and _c.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%commonnames _d on _d.taxon_id = _a.taxon_id and _d.project_id = ".$this->getCurrentProjectId()." and _d.language_id = ".$data['language']." 
+				left join %PRE%nbc_extras _e on _c.id = _e.ref_id and _e.ref_type='taxon' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
+				where _a.project_id = ".$this->getCurrentProjectId()."
+				group by _a.taxon_id
+				union
+				select 'variation' as type, _a.variation_id as id, 0 as total_states, 100 as score,0 as is_hybrid, trim(_d.taxon) as sci_name, trim(_c.label) as label, _e.value as url_thumbnail
+				from  %PRE%matrices_variations _a
+				left join %PRE%taxa_variations _c on _a.variation_id = _c.id and _c.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%taxa _d on _c.taxon_id = _d.id and _d.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%nbc_extras _e on _a.variation_id = _e.ref_id and _e.ref_type='variation' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
+				where _a.project_id = ".$this->getCurrentProjectId()."
+				group by _a.variation_id
+				order by label"
+			);
+
+		} else {
+
+			$res=$this->models->MatrixTaxon->freeQuery("
+				select 'taxon' as type, _a.taxon_id as id, count(_b.state_id) as total_states,
+				round((case when count(_b.state_id)>".$selStateCount." then ".$selStateCount." else count(_b.state_id) end/".$selStateCount.")*100,0) as score,
+				_c.is_hybrid as is_hybrid, trim(_c.taxon) as sci_name, trim(_d.commonname) as label,_e.value as url_thumbnail
+				from %TABLE% _a
+				left join %PRE%matrices_taxa_states _b on _a.project_id = _b.project_id and _a.matrix_id = _b.matrix_id and _a.taxon_id = _b.taxon_id and (_b.state_id in (".$data['states'].")) and _b.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%taxa _c on _a.taxon_id = _c.id  and _c.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%commonnames _d on _d.taxon_id = _a.taxon_id and _d.project_id = ".$this->getCurrentProjectId()." and _d.language_id = ".$data['language']." 
+				left join %PRE%nbc_extras _e on _c.id = _e.ref_id and _e.ref_type='taxon' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
+				where _a.project_id = ".$this->getCurrentProjectId()."
+				group by _a.taxon_id having score=100
+				union
+				select 'variation' as type, _a.variation_id as id, count(_b.state_id) as total_states,
+				round((case when count(_b.state_id)>".$selStateCount." then ".$selStateCount." else count(_b.state_id) end/".$selStateCount.")*100,0) as score,
+				0 as is_hybrid, trim(_d.taxon) as sci_name, trim(_c.label) as label, _e.value as url_thumbnail
+				from  %PRE%matrices_variations _a
+				left join %PRE%matrices_taxa_states _b on _a.project_id = _b.project_id and _a.matrix_id = _b.matrix_id and _a.variation_id = _b.variation_id and (_b.state_id in (".$data['states'].")) and _b.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%taxa_variations _c on _a.variation_id = _c.id and _c.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%taxa _d on _c.taxon_id = _d.id and _d.project_id = ".$this->getCurrentProjectId()."
+				left join %PRE%nbc_extras _e on _a.variation_id = _e.ref_id and _e.ref_type='variation' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
+				where _a.project_id = ".$this->getCurrentProjectId()."
+				group by _a.variation_id having score=100
+				order by score,label"
+			);
+		}
+		
+		return $res;
+					
 	}
 			
 	public function appControllerInterfaceAction()
@@ -785,11 +861,10 @@ class MatrixKeyController extends Controller
         else if ($this->rHasVal('action', 'query')) {
 			
 			$data = $this->requestData;
-			
-
   			
 			$functions = array(
-				'states' => '_appControllerGetStates'
+				'states' => '_appControllerGetStates',
+				'results' => '_appControllerGetResults'
 			);
 
 			$res=$this->$functions[$data['query']]($data);
