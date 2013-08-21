@@ -121,31 +121,7 @@ var appController = (function() {
 		return isVariation;
 	}
 
-/*
 
-	function setResults(r)
-	{
-		results = {taxa:{},variations:{}};
-		for (var i=0; i<r.rows.length; i++){
-			var row = r.rows.item(i);		
-			if (row.type!="taxon")
-				results.variations[Object.size(results.variations)]=row.id;
-			else
-				results.taxa[Object.size(results.taxa)]=row.id;
-		}
-
-		return r;
-	}
-
-
-	function getResults()
-	{
-		return results;
-	}
-
-
-
-*/
 	function doReinitialise()
 	{
 		for(var property in variables) delete variables[property];
@@ -184,7 +160,8 @@ var appController = (function() {
 		query=q;
 	};
 
-	function getData(callback,index) {
+	function getData(callback,index)
+	{
 
 		$.ajax({
 			url : 'app_controller_interface.php',
@@ -200,7 +177,7 @@ var appController = (function() {
 				'time' : new Date().getTime()
 			}),
 			success : function (data) {
-				//console.log(data);
+				console.log(data);
 				callback($.parseJSON(data),index);
 			}
 		});
@@ -223,14 +200,15 @@ var appController = (function() {
 	function formatStates(data,index)
 	{
 		var c=getCallback(index);
-		if (c) c($.extend({},data.all),data.active);
+		if (typeof c=="function") c($.extend({},data.all),data.active);
 	}
 
 	function storeResults(data,index)
 	{
+		
 		results = {taxa:{},variations:{}};
 
-		if (Object.size(getSelectedState())>0) {
+		if (Object.size(getSelectedState())>0 && data) {
 
 			for (var i=0; i<data.length; i++){
 				var row = data[i];		
@@ -420,9 +398,10 @@ var appController = (function() {
 			}	
 		},
 	
-		detail: function(callbackSuccess,callbackError,id,isvari)
+		detail: function(id,isvari,callbackSuccess,callbackError)
 		{
 			try {
+
 				setId(id);
 				setIsVariation(isvari);
 				getDetail(callbackSuccess,callbackError);

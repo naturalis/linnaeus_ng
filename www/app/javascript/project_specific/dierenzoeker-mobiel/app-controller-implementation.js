@@ -6,13 +6,16 @@ function init(p)
 	if (p.language) appController.setlanguage(p.language);	
 	if (p.imgroot) appController.setimgroot(p.imgroot);	
 
-	appController.set({47671:true,47532:true});
+//	appController.set({47671:true,47532:true});
 }
 
 function main() 
 {
-	appController.states(states);
-	appController.result(results);
+	
+	appController.detail(158310,false,detail);
+		
+//	appController.states(states);
+//	appController.result(results);
 }
 
 function setActive(a)
@@ -33,6 +36,9 @@ function errorHandler()
 
 function states(states,active)
 {
+	
+	console.dir(active);
+	
 	var buffer=Array();
 	for (var i in states) {
 		var element=states[i];
@@ -97,21 +103,26 @@ function toggleScreens()
 
 function _character(c)
 {
-	var buffer=states=Array();
+	var buffer=Array();
+	var states=Array();
 	for (var i in c.states) {
+
 		var element=c.states[i];
-		var tpl = (element.state=='-1' ? templates.statedisabled : (element.state=='1' ? templates.stateselected : templates.state));
+		var tpl = (element.select_state=='-1' ? templates.statedisabled : (element.select_state=='1' ? templates.stateselected : templates.state));
+		var onclick = element.select_state=='0' ? 'state({%id%:true})' : 'state({%id%:null})';
+		var letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
+
 		letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
-		states.push(tpl.
-			replace(/\%onclick\%/g,'toggleScreens();appController.set({%id%:true},main);').
+			states.push(tpl.
+			replace(/\%onclick\%/g,onclick).
 			replace(/\%letter\%/g,letter).
 			replace(/\%label\%/g,element.label).
 			replace(/\%image\%/g,element.img).
 			replace(/\%id\%/g,element.id)
 		);
 	}
-	buffer.push(templates.character.replace(/\%description\%/g,c.description).replace(/\%states\%/g,states.join('')));
-	return buffer;
+
+	return templates.character.replace(/\%description\%/g,c.description).replace(/\%states\%/g,states.join(''));
 }
 
 function character(results)
@@ -123,17 +134,60 @@ function character(results)
 		if (element.id==act.id && element.type==act.type) {
 			if (element.type=='c_group' && element.hasCharacters) {
 				for(var j in element.characters) {
-					buffer=buffer.concat(_character(element.characters[j]));
+					buffer.push(_character(element.characters[j]));
 				}
 			} else 
 			if (element.hasStates) {
-				buffer=buffer.concat(_character(element));
+				buffer.push(_character(element));
 			}
 		}
 
 	}
 
 	$('#expanded-characters').html(buffer.join(''));
-
 	toggleScreens();
+
+}
+
+function state(id)
+{
+	toggleScreens();
+	appController.set(id);
+	appController.states(states);
+	appController.result(results);
+
+}
+
+function detail(data)
+{
+	//console.dir(data);
+
+	var group=null;
+	if (data.group.id && data.group.name_nl)
+		group=templates.speciesgroup.replace(/\%onclick\%/,'alert('+data.group.id+')').replace(/\%label\%/,data.group.name_nl);
+
+	var similar=null;
+	if (data.similar) {
+		var buffer=Array();
+		for (var i in data.similar) {
+			var element=data.similar[i];
+			buffer.push(templates.speciessimilaritem.
+				replace(/\%onclick\%/,'appController.detail(%id%,false,detail);').
+				replace(/\%image\%/,element.img).
+				replace(/\%label\%/,element.label).replace(/\%id\%/,element.id)
+			);
+		}
+		similar=templates.speciessimilar.replace(/\%specieslist\%/,buffer.join(''));
+	}
+
+	$('#species-detail-content').html(templates.speciesdetail.
+		replace(/\%title\%/g,data.name_nl).
+		replace(/\%subtitle\%/g,data.name_sci).
+		replace(/\%image\%/g,data.img_main.file).
+		replace(/\%image_copyright\%/g,data.img_main.copyright).
+		replace(/\%text\%/g,data.text).
+		replace(/\%group\%/g,group).
+		replace(/\%similar\%/g,similar)
+	);
+
 }
