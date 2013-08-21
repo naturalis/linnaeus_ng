@@ -1438,6 +1438,9 @@ class ExportController extends Controller
 		
 		$output = '';
 		
+		array_unshift($this->_sqliteQueries,'begin;');
+		array_push($this->_sqliteQueries,'end;');
+		
 		if ($this->_downloadFile) {
 
 			header('Cache-Control: public');
