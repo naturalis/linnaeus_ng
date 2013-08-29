@@ -1326,8 +1326,8 @@ class ExportController extends Controller
 		$this->_exportDump->MatrixTaxonState = $this->models->MatrixTaxonState->_get(array('id' => $where));
 
 		$this->_exportDump->NbcExtras = array_merge(
-			$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')))),
-			$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation'))))
+			(array)$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'taxon')))),
+			(array)$this->models->NbcExtras->_get(array('id' => array_merge($where,array('ref_type'=>'variation'))))
 		);
 
 		if ($this->_reduceURLs) {
@@ -1335,6 +1335,13 @@ class ExportController extends Controller
 				if (($val['name']=='url_image' || $val['name']=='url_thumbnail') && (stripos($val['value'],'http://')!==false || stripos($val['value'],'https://')!==false)) {
 					$d=pathinfo($val['value']);
 					$this->_exportDump->NbcExtras[$key]['value']=$d['basename'];
+				}
+			}
+
+			foreach((array)$this->_exportDump->MediaTaxon as $key => $val) {
+				if (stripos($val['file_name'],'http://')!==false || stripos($val['file_name'],'https://')!==false) {
+					$d=pathinfo($val['file_name']);
+					$this->_exportDump->MediaTaxon[$key]['file_name']=$d['basename'];
 				}
 			}
 		}
@@ -1438,8 +1445,8 @@ class ExportController extends Controller
 		
 		$output = '';
 		
-		array_unshift($this->_sqliteQueries,'begin;');
-		array_push($this->_sqliteQueries,'end;');
+		//array_unshift($this->_sqliteQueries,'begin;');
+		//array_push($this->_sqliteQueries,'end;');
 		
 		if ($this->_downloadFile) {
 

@@ -90,24 +90,28 @@ class MatrixKeyController extends Controller
 	
 			$m = $this->getDefaultMatrixId();
 			if (isset($m)) {
+				$m = $this->getMatrix($m);
 				$this->setCurrentMatrix($m);
-				$this->setTotalEntityCount();
-				$this->redirect('identify.php');
+				if (!is_null($m)) {
+					$this->setTotalEntityCount();
+					$this->redirect('identify.php');
+				}
 			}
 	
 			$m = $this->getFirstMatrixId();
 			if (isset($m)) {
+				$m = $this->getMatrix($m);
 				$this->setCurrentMatrix($m);
-				$this->setTotalEntityCount();
-				$this->redirect('identify.php');
+				if (!is_null($m)) {
+					$this->setTotalEntityCount();
+					$this->redirect('identify.php');
+				}
 			}
 			
-		} else {
-
-			$this->printGenericError($this->translate('No matrices have been defined.'));
-			
 		}
-        
+
+		$this->printGenericError($this->translate('No matrices have been defined.'));
+
     }
 
     public function matricesAction ()
@@ -131,7 +135,7 @@ class MatrixKeyController extends Controller
 
             $this->storeHistory = false;
 
-            $this->setCurrentMatrix($this->requestData['id']);
+            $this->setCurrentMatrix($this->getMatrix($this->requestData['id']));
 			$this->setTotalEntityCount();
 
             $this->redirect('identify.php');
@@ -632,9 +636,9 @@ class MatrixKeyController extends Controller
 		$resTaxa = isset($data['results']['taxa']) ? $data['results']['taxa'] : array();
 		$resVar = isset($data['results']['variations']) ? $data['results']['variations'] : array();
 	
-		$selStates=isset($data['states']) ? explode(',',$data['states']) : array();
+		$selStates=isset($data['states']) ? preg_split('/,/',$data['states'],-1,PREG_SPLIT_NO_EMPTY) : array();
 		$stateList=array();
-
+/*
 		$count = $this->models->MatrixTaxonState->freeQuery(
 			array(
 				'query' =>
@@ -642,17 +646,17 @@ class MatrixKeyController extends Controller
 					(
 						select state_id, -99 as tot
 							from %TABLE%
-							where state_id in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
 						union
 						select state_id, count(taxon_id) as tot
 							from %TABLE%
-							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
 							".(count($resTaxa)==0 ? "" :  "and taxon_id in (".implode(',',$resTaxa).") " )."
 							group by state_id
 						union 
 						select state_id, count(variation_id) as tot 
 							from %TABLE% 
-							where state_id not in (".$data['states'].") and project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
+							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
 							".(count($resVar)==0 ? "" : "and variation_id in (".implode(',',$resVar).") " )."
 							group by state_id
 					) as unionized
@@ -660,7 +664,32 @@ class MatrixKeyController extends Controller
 				'fieldAsIndex' => 'state_id'
 			)
 		);
-		//q($this->models->MatrixTaxonState->q());
+*/
+
+		$count = $this->models->MatrixTaxonState->freeQuery(
+			array(
+				'query' =>
+					"select case count(1) when 0 then -1 else 0 end as can_select, state_id
+			from %TABLE%
+			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
+			(count($resTaxa)!=0 ? " and taxon_id in (".implode(',',$resTaxa).") " : "" ).
+			(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "").
+			" group by state_id
+			union
+			select -1 as can_select, state_id
+			from %TABLE%
+			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
+			(count($resTaxa)!=0 ? " and taxon_id not in (".implode(',',$resTaxa).") " : "" )."
+			union
+			select 1 as can_select, id as state_id
+			from %PRE%characteristics_states
+			where project_id = ".$this->getCurrentProjectId().
+			(count($selStates)!=0 ?  " and id in (".$data['states'].") " : ""),
+				'fieldAsIndex' => 'state_id'
+			)
+		);
+				
+		//q($this->models->MatrixTaxonState->q(),1);
 		$menu = $this->models->GuiMenuOrder->freeQuery(
 			"select 
 				_a.ref_id as id,'character' as type,_a.show_order as show_order,
@@ -773,7 +802,7 @@ class MatrixKeyController extends Controller
 		return array('all'=>$menu,'active'=>$stateList);
 
 	}
-	
+
 	private function _appControllerGetResults($data)
 	{
 		
@@ -1015,7 +1044,7 @@ class MatrixKeyController extends Controller
         if (!$this->rHasVal('mtrx'))
 			return;
 		
-		$this->setCurrentMatrix($this->requestData['mtrx']);
+		$this->setCurrentMatrix($this->getMatrix($this->requestData['mtrx']));
 		$this->setTotalEntityCount();
 			
     }
@@ -1025,13 +1054,17 @@ class MatrixKeyController extends Controller
         return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
     }
 
-    private function setCurrentMatrix ($id)
+    private function setCurrentMatrix ($m)
     {
-        $_SESSION['app']['user']['matrix']['active'] = $this->getMatrix($id);
+        $_SESSION['app']['user']['matrix']['active'] = $m;
     }
 
-    private function setTotalEntityCount ($id)
+    private function setTotalEntityCount ($id=null)
     {
+		
+		if (is_null($id)) $id=$this->getCurrentMatrixId();
+		
+		if (is_null($id)) return;
 
 		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
 			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
@@ -1049,9 +1082,9 @@ class MatrixKeyController extends Controller
     {
         if (!isset($id))
             return;
-        
+
         $m = $this->getMatrices();
-        
+		
         return isset($m[$id]) ? $m[$id] : null;
     }
 

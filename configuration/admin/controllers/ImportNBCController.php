@@ -13,6 +13,7 @@
 
 include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
+include_once ('SpeciesController.php');
 class ImportNBCController extends Controller
 {
     private $_delimiter = ',';
@@ -251,6 +252,8 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie3Action ()
     {
+		
+		
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['data']))
@@ -258,7 +261,7 @@ class ImportNBCController extends Controller
         
         $this->setPageName($this->translate('Creating project'));
 
-        if (!isset($_SESSION['admin']['system']['import']['project']) && !$this->isFormResubmit()) {
+        if (!isset($_SESSION['admin']['system']['import']['project'])) {// && !$this->isFormResubmit()) {
 
 			// create a new project
 			if (!$_SESSION['admin']['system']['import']['projectExists'] ||
@@ -311,35 +314,55 @@ class ImportNBCController extends Controller
 				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.','Project'));
 				
 			}
-			
-            $this->addUserToProjectAsLeadExpert($pId);
 
+            $this->addUserToProjectAsLeadExpert($pId);
+			
             $this->addMessage('Added current user as lead expert to project.');
 
 			if ($this->rHasVal('action')) {
-				/*
-					action:
-					replace_data: 	import into existing project, replacing existing data (delete all data except the project itself)
-					merge_data:		import into existing project, merging with existing data (if any) (leave it as it is)
-					new_project:	create a new project (happens higher up in this function)
-				*/
-	
+
 				$_SESSION['admin']['system']['import']['existingProjectTreatment'] = $this->requestData['action'];
 
-				if ($this->rHasVal('action','replace_data')) {
+				if ($this->rHasVal('action','replace_data') || $this->rHasVal('action','replace_species_data')) {
 
 					$pDel = new ProjectDeleteController;
+					$pDel->deleteMatrices($pId,true);
 
-					$pDel->deleteNBCKeydata($pId);
+					if ($this->rHasVal('action','replace_data')) {
 
-					$pDel->deleteMatrices($pId);
-					$pDel->deleteCommonnames($pId);
-					$pDel->deleteSynonyms($pId);
-					$pDel->deleteSpeciesMedia($pId);
-					$pDel->deleteSpeciesContent($pId);
-					$pDel->deleteStandardCat($pId);
-					$pDel->deleteSpecies($pId);
-					$pDel->deleteProjectRanks($pId);
+						$pDel->deleteNBCKeydata($pId);
+						$pDel->deleteCommonnames($pId);
+						$pDel->deleteSynonyms($pId);
+						$pDel->deleteSpeciesMedia($pId,true);
+						$pDel->deleteSpeciesContent($pId,false);
+						$pDel->deleteSpecies($pId);
+						$pDel->deleteProjectRanks($pId);
+						
+					} else
+					if ($this->rHasVal('action','replace_species_data')) {
+
+						$pr = $this->models->ProjectRank->_get(array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'rank_id' => SPECIES_RANK_ID
+							)
+						));
+						
+						$taxa = $this->models->Taxon->_get(array(
+							'id' => array(
+								'project_id' => $this->getCurrentProjectId(),
+								'rank_id' => $pr[0]['id']
+							)
+						));
+						
+						$d=0;
+
+						foreach((array)$taxa as $key => $val) {
+							if ($this->deleteTaxon($val['id'])) $d++;
+						}
+						$this->addMessage(sprintf('Deleted %s species.',$d));
+
+					}
 
 				}
 
@@ -1040,7 +1063,7 @@ class ImportNBCController extends Controller
                 foreach ((array) $val as $cKey => $cVal) {
 
 					$cVal=trim($cVal,chr(239).chr(187).chr(191).chr(9).chr(32).chr(10).chr(13));
-					// that's BOM, tab, space, returnz
+					// that's BOM, tab, space, returns
 
                     if (is_numeric($cVal) || !empty($cVal)) {
                         
@@ -1216,7 +1239,7 @@ class ImportNBCController extends Controller
         return $data;
     }
 
-    private function addProjectRank ($label, $rankId, $isLower, $parentId)
+    private function addProjectRank($label, $rankId, $isLower, $parentId)
     {
 
         $d = $this->models->ProjectRank->_get(array('id' =>
@@ -1256,7 +1279,7 @@ class ImportNBCController extends Controller
         return $id;
     }
 
-    private function addRanks ()
+    private function addRanks()
     {
         $r = $this->models->Rank->_get(array(
             'id' => array(
@@ -1775,7 +1798,7 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function createMatrix ($name)
+    private function createMatrix($name)
     {
 
         $this->models->MatrixName->_get(array('id' =>
@@ -1814,7 +1837,7 @@ class ImportNBCController extends Controller
 
     }
 
-    private function storeCharacterGroups ($data, $mId)
+    private function storeCharacterGroups($data, $mId)
     {
         $_SESSION['admin']['system']['import']['loaded']['chargroups'] = 0;
         
@@ -1871,7 +1894,7 @@ class ImportNBCController extends Controller
         return $data;
     }
 
-    private function storeCharacters ($data, $mId, $types)
+    private function storeCharacters($data, $mId, $types)
     {
         $showOrder1 = $showOrder2 = $_SESSION['admin']['system']['import']['loaded']['characters'] = 0;
         
@@ -1945,7 +1968,7 @@ class ImportNBCController extends Controller
         return isset($translations[$code][$languageId]) ? $translations[$code][$languageId] : $code;
     }
 
-    private function storeStates ($data)
+    private function storeStates($data)
     {
 
         $_SESSION['admin']['system']['import']['loaded']['states'] = 0;
@@ -2035,7 +2058,7 @@ class ImportNBCController extends Controller
         return $data;
     }
 
-    private function storeVariationStateConnections ($taxa, $mData, $mId)
+    private function storeVariationStateConnections($taxa, $mData, $mId)
     {
 
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
@@ -2133,7 +2156,7 @@ class ImportNBCController extends Controller
 		
 	}
 
-    private function parseLabelData ($raw)
+    private function parseLabelData($raw)
     {
         
         $data = array();
@@ -2146,7 +2169,8 @@ class ImportNBCController extends Controller
 
                 foreach ((array) $val as $cKey => $cVal) {
 
-                    $cVal = trim($cVal);
+					$cVal=trim($cVal,chr(239).chr(187).chr(191).chr(9).chr(32).chr(10).chr(13));
+					// that's BOM, tab, space, returns
                     
                     if ($cKey<5) {
                         
@@ -2217,7 +2241,7 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function storeError ($err, $mod)
+    private function storeError($err, $mod)
     {
 		
         $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
@@ -2228,7 +2252,7 @@ class ImportNBCController extends Controller
         return $err;
     }
 
-    private function downloadErrorLog ()
+    private function downloadErrorLog()
     {
         header('Content-disposition:attachment;filename=import-log--'.
 			strtolower(

@@ -16,7 +16,7 @@
 	</p>
     <p>
         To create an import file, save the relevant sheet of your Excel-file as CSV-file. Make sure the program treats 
-        all columns as text, and does not convert text values to something els (like for instance interpreting ranges as dates, 
+        all columns as text, and does not convert text values to something else (like for instance interpreting ranges as dates, 
         turning a value of "10-20" into "October 20th").
 	</p>
     <p>        
