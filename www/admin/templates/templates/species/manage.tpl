@@ -15,6 +15,7 @@
 	<li><a href="file.php">{t}Import taxon tree from file{/t}</a></li>
 	<li><a href="col.php">{t}Import taxon tree from Catalogue Of Life (experimental){/t}</a></li>
 	<li><a href="import.php">{t}Import taxon content from file{/t}</a></li>
+	<li><a href="remote_img_file.php">{t}Import remote images from file{/t}</a> (temporary)</li>
 </ul>
 {t}Management tasks:{/t}
 <ul class="admin-list">

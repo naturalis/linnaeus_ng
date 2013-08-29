@@ -370,7 +370,7 @@ class ProjectDeleteController extends Controller
 
 
 
-    public function deleteSpeciesContent ($id)
+    public function deleteSpeciesContent ($id,$deleteGeneralData=true)
     {
         $this->models->ContentTaxon->delete(array(
             'project_id' => $id
@@ -378,9 +378,12 @@ class ProjectDeleteController extends Controller
         $this->models->ContentTaxonUndo->delete(array(
             'project_id' => $id
         ));
-        $this->models->Section->delete(array(
-            'project_id' => $id
-        ));
+		
+		if ($deleteGeneralData) {
+			$this->models->Section->delete(array(
+				'project_id' => $id
+			));
+		}
     }
 
 

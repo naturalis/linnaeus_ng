@@ -120,6 +120,7 @@ class SpeciesController extends Controller
      */
     public function __construct ()
     {
+		
         parent::__construct();
         
         $this->initialize();
@@ -2095,8 +2096,10 @@ class SpeciesController extends Controller
 									'columns' => 'length(content) as l'
 								));
 								
-								if (intval($argh[0]['l']) != strlen($fVal))
+								if (intval($argh[0]['l']) != strlen($fVal)) {
 									$odd++;
+									$this->addMessage(sprintf('mismatched content size for %s (%s)',$tIdOrName,$this->models->ContentTaxon->getNewId()));
+								}
 	
 								$saved++;
 							} else
@@ -2148,6 +2151,195 @@ class SpeciesController extends Controller
        
         $this->smarty->assign('categories', $this->getCategories());
         
+        $this->printPage();
+    }
+
+
+	private function resolveTaxonByIdOrname($whatisit)
+	{
+		
+		$tId=null;
+		
+		
+		if (!empty($whatisit)) {
+
+			if (is_numeric($whatisit)) {
+			
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'id' => (int)$whatisit
+						)
+					));
+		
+				if ($t[0]['id']!=$whatisit)
+					$tId = null;
+			
+			} else {
+		
+				$t = $this->models->Taxon->_get(
+					array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'taxon' => trim($whatisit)
+						)
+					));
+		
+				if (empty($t[0]['id']))
+					$tId = null;
+				else
+					$tId = $t[0]['id'];
+		
+			}
+			
+		}
+		
+		return $tId;
+										
+	}
+
+
+    public function remoteImgFileAction ()
+    {
+		
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Remote image file file upload'));
+        
+        if ($this->requestDataFiles) { // && !$this->isFormResubmit()) {
+			
+			set_time_limit(2400);
+
+			$raw = array();
+
+			$saved = $failed = $odd = $skipped = 0;
+	
+			if (($handle = fopen($this->requestDataFiles[0]["tmp_name"], "r")) !== FALSE) {
+				$i = 0;
+				while (($dummy = fgetcsv($handle)) !== FALSE) {
+					foreach ((array) $dummy as $val) {
+						$raw[$i][] = $val;
+					}
+					$i++;
+				}
+				fclose($handle);
+			}
+
+			$clearedTaxa = array();
+
+			foreach ((array) $raw as $key => $line) {
+				
+				$d = implode('',$line);
+				
+				if (empty($d))
+					continue;
+					
+				foreach((array)$line as $fKey => $fVal) {
+					
+					$fVal = trim($fVal,chr(239).chr(187).chr(191));  //BOM!
+					
+					if (empty($fVal))
+						continue;
+						
+					if ($fKey==0) {
+
+						$tIdOrName=$fVal;
+						$tId = $this->resolveTaxonByIdOrname($tIdOrName);
+
+					} else {
+
+						if (empty($tId)) {
+							
+							if (empty($tId))
+								$this->addError(sprintf('Could not resolve taxon "%s".',$tIdOrName));
+							$skipped++;
+							continue;
+						}
+
+						if($this->rHasVal('del_existing','1') && !isset($clearedTaxa[$tId])) {
+
+							$this->models->MediaTaxon->delete(array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'taxon_id' => $tId,
+								'file_name like' => 'http://%'
+							));
+
+							$this->models->MediaTaxon->delete(array(
+								'project_id' => $this->getCurrentProjectId(), 
+								'taxon_id' => $tId,
+								'file_name like' => 'https://%'
+							));
+							
+							$clearedTaxa[$tId] = true;
+							
+						}
+						
+						$images=array_map('trim',explode(';',$fVal));
+
+						foreach((array)$images as $iKey => $iVal) {
+							
+							if (empty($iVal)) continue;
+							
+							$mime=null;
+							
+							/*
+							$headers = get_headers($iVal);
+							
+							if ($headers!==false) {
+								foreach((array)$headers as $hVal) {
+									if (stripos($hVal,'Content-Type:')!==false)
+										$mime=trim(str_ireplace('Content-Type:','',$hVal));
+								}
+							}
+							
+							*/
+
+							if ($mime==null) {
+								$mimes=array('jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','bmp'=>'image/bmp');
+								$d=pathinfo($iVal);
+								$mime=isset($mimes[strtolower($d['extension'])]) ? $mimes[strtolower($d['extension'])] : '?';
+								//$odd++;
+							}
+
+
+							$mt = $this->models->MediaTaxon->save(
+							array(
+								'id' => null, 
+								'project_id' => $this->getCurrentProjectId(), 
+								'taxon_id' => $tId, 
+								'file_name' => $iVal, 
+								'original_name' => $iVal, 
+								'mime_type' => $mime, 
+								'file_size' => 0, 
+								'thumb_name' => null, 
+								'sort_order' => $this->getNextMediaSortOrder($tId)
+							));
+							
+							if ($mt)
+								$saved++;
+							else
+								$failed++;
+							
+						}
+						
+					}
+					
+				}
+				
+            }
+			
+			$this->addMessage(sprintf('Saved %s images, skipped %s line, failed %s image.',$saved,$skipped,$failed));
+
+			if ($skipped)
+				$this->addMessage('Skipped lines are due to missing or incorrect taxon id.');
+			if ($failed)
+				$this->addMessage('Failed pages are due to botched inserts.');
+			if ($odd>0)
+				$this->addError(sprintf('%s images could not be resolved, but were saved anyway.',$odd));
+
+        }
+       
         $this->printPage();
     }
 
@@ -3706,88 +3898,6 @@ class SpeciesController extends Controller
         }
     }
 
-
-
-    private function deleteTaxon ($id)
-    {
-        if (!$id)
-            return;
-            
-            // delete literary references
-        $this->models->LiteratureTaxon->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $id
-        ));
-        
-        // reset keychoice end-points
-        $this->models->ChoiceKeystep->update(array(
-            'res_taxon_id' => 'null'
-        ), array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'res_taxon_id' => $id
-        ));
-        
-        // delete commonnames
-        $this->models->Commonname->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $id
-        ));
-        
-        // delete synonyms
-        $this->models->Synonym->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $id
-        ));
-        
-        // purge undo
-        $this->models->ContentTaxonUndo->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $id
-        ));
-        
-        // delete taxon tree branch rights
-        $this->models->UserTaxon->delete(array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'taxon_id' => $id
-        ));
-        
-        // detele media
-        $mt = $this->models->MediaTaxon->_get(array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'taxon_id' => $id
-            )
-        ));
-        
-        foreach ((array) $mt as $key => $val) {
-            
-            $this->deleteTaxonMedia($val['id'], false);
-        }
-        
-        // reset parentage
-        $this->models->Taxon->update(array(
-            'parent_id' => 'null'
-        ), array(
-            'project_id' => $this->getCurrentProjectId(), 
-            'parent_id' => $id
-        ));
-        
-        // delete content
-        $this->models->ContentTaxon->delete(array(
-            'taxon_id' => $id, 
-            'project_id' => $this->getCurrentProjectId()
-        ));
-        
-        // delete taxon
-        $this->models->Taxon->delete(array(
-            'id' => $id, 
-            'project_id' => $this->getCurrentProjectId()
-        ));
-        
-    }
-
-
-
     private function deleteTaxonBranch ($id)
     {
         if (!$id)
@@ -3808,8 +3918,6 @@ class SpeciesController extends Controller
         }
 		
     }
-
-
 
     private function ajaxActionDeleteTaxon ()
     {
