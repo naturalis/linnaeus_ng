@@ -172,7 +172,7 @@ class Controller extends BaseClass
     public function __construct ($p = null)
     {
         parent::__construct();
-        
+
         $this->setControllerParams($p);
         
         $this->setPhpIniVars();
@@ -219,14 +219,16 @@ class Controller extends BaseClass
         
         $this->checkBackStep();
 
-        $this->setOtherStuff();
+        //$this->setOtherStuff();
         
         if ($this->getCheckForProjectId()) {
             
             $this->checkForProjectId();
             
             $this->setCssFiles();
-            
+
+			 $this->setOtherStuff();            
+
             if (!$this->isLoggedInAdmin())
                 $this->splashScreen();
         }
@@ -1485,9 +1487,9 @@ class Controller extends BaseClass
 
     public function splashScreen ()
     {
-        if ($this->getCheckForSplash() == false)
+        if ($this->getCheckForSplash()==false)
             return;
-        
+
         if ((!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash'] === false) && isset($this->generalSettings['urlSplashScreen'])) {
             
             $_SESSION['app']['project']['splashEntryUrl'] = $_SERVER['REQUEST_URI'];
@@ -3204,7 +3206,7 @@ class Controller extends BaseClass
 
 	private function setOtherStuff()
 	{
-		
+
 		$d = $this->getSetting('suppress_splash');
 
 		if ($d==1) {
