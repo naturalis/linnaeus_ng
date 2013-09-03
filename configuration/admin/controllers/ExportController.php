@@ -65,7 +65,8 @@ class ExportController extends Controller
 
 	private $_appExpSkipCols = array('created','last_change');
 	private $_exportDump=null;
-	private $_sqliteQueries=null;
+	private $_sqliteQueriesDDL=null;
+	private $_sqliteQueriesDML=null;
 	private $_sqliteDropQueries=null;
 	private $_removePrefix=false;
 	private $_includeCode=true;
@@ -1389,10 +1390,10 @@ class ExportController extends Controller
 			$c = $this->models->Taxon->freeQuery('show create table '.$table);
 			$this->helpers->Mysql2Sqlite->convert($this->fixTablePrefix($this->removeUnwantedColumns($c[0]['Create Table'].';'),$table));
 
-			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();
-			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
-			$this->_sqliteQueries[] = $this->helpers->Mysql2Sqlite->getSqlTable();
-			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlKeys());
+			$this->_sqliteQueriesDDL[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();
+			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$this->helpers->Mysql2Sqlite->getSqlDropKeys());
+			$this->_sqliteQueriesDDL[] = $this->helpers->Mysql2Sqlite->getSqlTable();
+			$this->_sqliteQueriesDDL = array_merge($this->_sqliteQueriesDDL,$this->helpers->Mysql2Sqlite->getSqlKeys());
 
 			if ($this->_separateDrop) {
 				$this->_sqliteDropQueries[] = $this->helpers->Mysql2Sqlite->getSqlDropTable();			
@@ -1412,7 +1413,7 @@ class ExportController extends Controller
 				
 				if (count((array)$inserts)>=$setsPerInsert) {
 					$d = implode(',',$inserts);
-					$this->_sqliteQueries[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
+					$this->_sqliteQueriesDML[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
 					$this->_dataSize += strlen($d);
 					$inserts = array();
 				}
@@ -1421,11 +1422,14 @@ class ExportController extends Controller
 
 			if (count((array)$inserts)!=0) {
 				$d = implode(',',$inserts);
-				$this->_sqliteQueries[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
+				$this->_sqliteQueriesDML[] = $this->fixTablePrefix('insert into `'.$table.'` values '.$d.';',$table);
 				$this->_dataSize += strlen($d);
 			}
 			
-			$this->_sqliteQueries = array_merge($this->_sqliteQueries,$this->helpers->Mysql2Sqlite->getSqlReindexKeys());
+			/*
+				// skipping the possibly redundant re-indexing of the tables
+				$this->_sqliteQueriesDML = array_merge($this->_sqliteQueriesDML,$this->helpers->Mysql2Sqlite->getSqlReindexKeys());
+			*/
 
 		}
 		
@@ -1444,17 +1448,15 @@ class ExportController extends Controller
 	{
 		
 		$output = '';
+		$exportId = md5(time());
 		
 		function entitizeThis(&$item1, $key)
 		{
 			$item1 = htmlentities($item1,ENT_NOQUOTES,'UTF-8');
 		}
 
-		array_walk($this->_sqliteQueries, 'entitizeThis');
+		array_walk($this->_sqliteQueriesDML, 'entitizeThis');
 
-		//array_unshift($this->_sqliteQueries,'begin;');
-		//array_push($this->_sqliteQueries,'end;');
-		
 		if ($this->_downloadFile) {
 
 			header('Cache-Control: public');
@@ -1469,21 +1471,22 @@ class ExportController extends Controller
 			if ($this->_separateDrop)
 				$output .= implode(chr(10),$this->_sqliteDropQueries).chr(10).chr(10);
 
-			$output .= implode(chr(10),$this->_sqliteQueries);
+			$output .= implode(chr(10),$this->_sqliteQueriesDDL) . implode(chr(10),$this->_sqliteQueriesDML);
 
 		} else {
 			
-			$mostRecords = array(null,0);
-			foreach((array)$this->dataCount as $table => $rowCount) {
-				if ($rowCount>$mostRecords[1])
-					$mostRecords = array($table,$rowCount);
+			$bufferDDL='';
+			foreach ((array)$this->_sqliteQueriesDDL as $val) {
+				$bufferDDL.=$val.chr(10);
 			}
+			$bufferDDL=base64_encode(bzcompress($bufferDDL));
 
-			$buffer='';
-			foreach ((array)$this->_sqliteQueries as $val) {
-				$buffer.=$val.chr(10);
+			$bufferDML='';
+			foreach ((array)$this->_sqliteQueriesDML as $val) {
+				$bufferDML.=$val.chr(10);
 			}
-			$buffer=base64_encode(bzcompress($buffer));
+			$bufferDML=base64_encode(bzcompress($bufferDML));
+
 
 
 			if ($this->_separateDrop) {
@@ -1495,6 +1498,26 @@ class ExportController extends Controller
 			}
 
 		
+	/*
+		please note: "dbEstimatedSize" is used when opening the database, and is required to be as large
+		or larger than the acrtual database, at least on android. if not, the installer will fail, but
+		most likely succeed the next time around, as android-apps seem to remember lack of storage space
+		in previous sessions, and in response make available more space to the application (1mb at a
+		time).
+		"$this->_dataSize" roughly corresponds to the size of the data (value is based on prepared insert 
+		statements), which is multiplied bij 5 to account for SQLite indexes (1-to-5 ratio based on 
+		native SQLite databases with the same data and both with, and without keys)
+
+		the installer is called from main program file:
+
+			db = appController.connect();
+			if (db)
+				installDb(db,main);
+			else
+				main();
+
+	*/
+		
 			$output .= "/*
 
     // cut & paste the block below to the appController-class in app-controller.js:
@@ -1504,7 +1527,8 @@ class ExportController extends Controller
         dbName:'".$this->_dbname."',
         dbVersion: '".$this->_projectVersion."', 
         dbDisplayName: '".$this->_projectName."', 
-        dbEstimatedSize: ".floor($this->_dataSize * 1.2)."
+        dbEstimatedSize: ".floor($this->_dataSize * 5).",
+        exportId:'".$exportId."'
     };
 
     var pId = ".$this->getCurrentProjectId().";
@@ -1517,9 +1541,9 @@ class ExportController extends Controller
     //     /js/data/app-data.js
     //   overwriting any existing code if the file already exists.
     //
-    // a new download is always installed on the phone, as installConfig.exportID
+    // a new download is always installed on the phone, as exportID
     // always has a new value (you can force a re-install of the same file by manually
-    // altering the value of installConfig.exportID)
+    // altering the value of exportID IN THE CONTROLLER, not the data file)
 ".($this->_separateDrop ? "
     // there is a separate variable \"encodedDropQueries\" in the script that holds
     // compressed drop table & index queries. these are *not* automatically
@@ -1530,20 +1554,6 @@ class ExportController extends Controller
     //   window.atob(installConfig.encodedDropQueries)
     // in the function loadRecords()
 " : '' )."
-    //  fyi, the installer is called from main program file:
-    //
-    //  var db = appController.connect();
-    //  if (db) {
-    //    installDb(db,main);
-    //    if (debugging) {
-    //      console.log(installMsg);
-    //      console.dir(installErrors);
-    //    }
-    //  } else {
-    //    if (debugging)
-    //      console.log('failed install (couldn't access database)');
-    //    main();
-    //  }
     //
 ".($this->_makeImageList ? "
     //    below is a list of images referred to in the data:
@@ -1555,13 +1565,13 @@ var installConfig = {
   installProject:'".$this->_projectName."',
   installDbName:'".$this->_dbname."',
   installDbVersion:'".$this->_projectVersion."',".
-//  testQuery:'select count(*) as total from ".$mostRecords[0]."',
-//  testQueryResult:".$mostRecords[1].",
 "
-  queryCount:".count((array)$this->_sqliteQueries).",
+  queryCountDDL:".count((array)$this->_sqliteQueriesDDL).",
+  queryCountDML:".count((array)$this->_sqliteQueriesDML).",
   exportVersion:'1.0 (".date("Y-m-d H:i:s").")',  
-  exportID:'".md5(time())."',  
-  encodedData:'".$buffer."'".($this->_separateDrop ? ",\n  encodedDropQueries:'".$drop."'": '')."
+  exportID:'".$exportId."',  
+  encodedDataDDL:'".$bufferDDL."',
+  encodedDataDML:'".$bufferDML."'".($this->_separateDrop ? ",\n  encodedDropQueries:'".$drop."'": '')."
 }
 //file end
 ";
