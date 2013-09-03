@@ -1445,6 +1445,13 @@ class ExportController extends Controller
 		
 		$output = '';
 		
+		function entitizeThis(&$item1, $key)
+		{
+			$item1 = htmlentities($item1,ENT_NOQUOTES,'UTF-8');
+		}
+
+		array_walk($this->_sqliteQueries, 'entitizeThis');
+
 		//array_unshift($this->_sqliteQueries,'begin;');
 		//array_push($this->_sqliteQueries,'end;');
 		
@@ -1552,6 +1559,7 @@ var installConfig = {
 //  testQueryResult:".$mostRecords[1].",
 "
   queryCount:".count((array)$this->_sqliteQueries).",
+  exportVersion:'1.0 (".date("Y-m-d H:i:s").")',  
   exportID:'".md5(time())."',  
   encodedData:'".$buffer."'".($this->_separateDrop ? ",\n  encodedDropQueries:'".$drop."'": '')."
 }

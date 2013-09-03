@@ -68,7 +68,27 @@ class ImportNBCController extends Controller
         'variation_relations', 
         'matrix_variation', 
         'nbc_extras', 
-		'gui_menu_order'
+		'gui_menu_order',
+		'content_taxon', 
+		'content_taxon_undo', 
+		'user_taxon', 
+		'variation_label', 
+		'variation_relations', 
+		'synonym', 
+		'taxa_relations', 
+		'taxon_variation',
+		'commonname', 
+		'l2_occurrence_taxon',
+		'l2_occurrence_taxon_combi',
+		'literature_taxon', 
+		'matrix_taxon', 
+		'matrix_taxon_state', 
+		'matrix_variation', 
+		'media_descriptions_taxon', 
+		'media_taxon', 
+		'nbc_extras',
+		'occurrence_taxon', 
+		'choice_keystep', 
     );
     public $usedHelpers = array(
         'file_upload_helper'
@@ -252,8 +272,7 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie3Action ()
     {
-		
-		
+
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['data']))
@@ -343,23 +362,27 @@ class ImportNBCController extends Controller
 
 						$pr = $this->models->ProjectRank->_get(array(
 							'id' => array(
-								'project_id' => $this->getCurrentProjectId(), 
+								'project_id' => $pId, 
 								'rank_id' => SPECIES_RANK_ID
 							)
 						));
-						
+
 						$taxa = $this->models->Taxon->_get(array(
 							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
+								'project_id' => $pId,
 								'rank_id' => $pr[0]['id']
 							)
 						));
 						
 						$d=0;
 
+						$pDel->deleteMatrices($pId,true);
+
 						foreach((array)$taxa as $key => $val) {
-							if ($this->deleteTaxon($val['id'])) $d++;
+							$this->deleteTaxon($val['id'],$pId,false);
+							$d++;
 						}
+
 						$this->addMessage(sprintf('Deleted %s species.',$d));
 
 					}
@@ -2300,4 +2323,149 @@ class ImportNBCController extends Controller
         die();
     }
 
+    public function deleteTaxon($id,$pId,$deleteMedia=true)
+    {
+        if (!$id)
+            return;
+			
+        $this->models->L2OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->L2OccurrenceTaxonCombi->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxonState->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->TaxaRelations->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $tv = $this->models->TaxonVariation->delete(
+			array('id' =>
+					array(
+						'project_id' => $pId,
+						'taxon_id' => $id
+					)
+				)
+		);
+		
+		foreach((array)$tv as $key => $val) {
+
+			$this->models->VariationLabel->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->VariationRelations->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->MatrixVariation->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->NbcExtras->delete(array(
+				'project_id' => $pId,
+				'ref_type' => 'variation',
+				'ref_id' => $val['id']
+			));
+			$this->models->TaxonVariation->delete(array(
+				'project_id' => $pId,
+				'id' => $val['id']
+			));
+		}
+
+		$this->models->NbcExtras->delete(array(
+			'project_id' => $pId,
+			'ref_type' => 'taxon',
+			'ref_id' => $id
+		));
+           
+        // delete literary references
+        $this->models->LiteratureTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // reset keychoice end-points
+        $this->models->ChoiceKeystep->update(array(
+            'res_taxon_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'res_taxon_id' => $id
+        ));
+        
+        // delete commonnames
+        $this->models->Commonname->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete synonyms
+        $this->models->Synonym->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // purge undo
+        $this->models->ContentTaxonUndo->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete taxon tree branch rights
+        $this->models->UserTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // detele media
+        $mt = $this->models->MediaTaxon->_get(array(
+            'id' => array(
+                'project_id' => $pId,
+                'taxon_id' => $id
+            )
+        ));
+        
+		if ($deleteMedia) {
+		
+			foreach ((array) $mt as $key => $val) {
+				
+				$this->deleteTaxonMedia($val['id'], false);
+			}
+			
+		}
+        
+        // reset parentage
+        $this->models->Taxon->update(array(
+            'parent_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'parent_id' => $id
+        ));
+        
+        // delete content
+        $this->models->ContentTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id, 
+        ));
+        
+        // delete taxon
+        $this->models->Taxon->delete(array(
+            'project_id' => $pId,
+            'id' => $id, 
+        ));
+        
+    }
 }
