@@ -76,7 +76,12 @@ class SpeciesController extends Controller
         'variation_relations', 
         'matrix_variation', 
         'matrix_taxon_state', 
-        'nbc_extras'
+        'nbc_extras',
+        'occurrence_taxon', 
+        'l2_occurrence_taxon', 
+		'l2_occurrence_taxon_combi',
+        'matrix_taxon', 
+        'matrix_taxon_state', 
     );
     public $usedHelpers = array(
         'col_loader_helper', 
@@ -120,7 +125,6 @@ class SpeciesController extends Controller
      */
     public function __construct ()
     {
-		
         parent::__construct();
         
         $this->initialize();
@@ -4449,65 +4453,6 @@ class SpeciesController extends Controller
         }
     }
 
-
-
-    private function deleteTaxonMedia ($id = false, $output = true)
-    {
-        if ($id === false) {
-            
-            $id = $this->requestData['id'];
-        }
-        
-        if (empty($id)) {
-            
-            return;
-        }
-        else {
-            
-            $mt = $this->models->MediaTaxon->_get(array(
-                'id' => array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                )
-            ));
-            
-            $delRecords = true;
-            
-            if (file_exists($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name'])) {
-                
-                $delRecords = unlink($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name']);
-            }
-            
-            if ($delRecords) {
-                
-                if ($mt[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name'])) {
-                    unlink($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name']);
-                }
-                
-                $this->models->MediaDescriptionsTaxon->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'media_id' => $id
-                ));
-                
-
-                $this->models->MediaTaxon->delete(array(
-                    'project_id' => $this->getCurrentProjectId(), 
-                    'id' => $id
-                ));
-                
-                if ($output)
-                    $this->smarty->assign('returnText', '<ok>');
-            }
-            else {
-                
-                if ($output)
-                    $this->addError(sprintf($this->translate('Could not delete file: %s'), $mt[0]['file_name']));
-            }
-        }
-    }
-
-
-
     private function ajaxActionSaveRankLabel ()
     {
         if (!$this->rHasId() || !$this->rHasVal('language')) {
@@ -5712,7 +5657,205 @@ class SpeciesController extends Controller
 		
 	}
         
+    private function deleteTaxonMedia ($id=false,$output=true)
+    {
+        if ($id === false) {
+            
+            $id = $this->requestData['id'];
+        }
+        
+        if (empty($id)) {
+            
+            return;
+        }
+        else {
+            
+            $mt = $this->models->MediaTaxon->_get(array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'id' => $id
+                )
+            ));
+            
+            $delRecords = true;
+            
+            if (file_exists($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name'])) {
+                
+                $delRecords = unlink($_SESSION['admin']['project']['paths']['project_media'] . $mt[0]['file_name']);
+            }
+            
+            if ($delRecords) {
+                
+                if ($mt[0]['thumb_name'] && file_exists($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name'])) {
+                    unlink($_SESSION['admin']['project']['paths']['project_thumbs'] . $mt[0]['thumb_name']);
+                }
+                
+                $this->models->MediaDescriptionsTaxon->delete(array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'media_id' => $id
+                ));
+                
 
+                $this->models->MediaTaxon->delete(array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'id' => $id
+                ));
+                
+                if ($output)
+                    $this->smarty->assign('returnText', '<ok>');
+            }
+            else {
+                
+                if ($output)
+                    $this->addError(sprintf($this->translate('Could not delete file: %s'), $mt[0]['file_name']));
+            }
+        }
+    }
+
+
+    public function deleteTaxon ($id,$pId=null)
+    {
+        if (!$id)
+            return;
+			
+		$pId = is_null($pId) ? $this->getCurrentProjectId() : $pId;
+
+        $this->models->L2OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->L2OccurrenceTaxonCombi->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxonState->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->MatrixTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->OccurrenceTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $this->models->TaxaRelations->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        $tv = $this->models->TaxonVariation->delete(
+			array('id' =>
+					array(
+						'project_id' => $pId,
+						'taxon_id' => $id
+					)
+				)
+		);
+		
+		foreach((array)$tv as $key => $val) {
+
+			$this->models->VariationLabel->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->VariationRelations->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->MatrixVariation->delete(array(
+				'project_id' => $pId,
+				'variation_id' => $val['id']
+			));
+			$this->models->NbcExtras->delete(array(
+				'project_id' => $pId,
+				'ref_type' => 'variation',
+				'ref_id' => $val['id']
+			));
+			$this->models->TaxonVariation->delete(array(
+				'project_id' => $pId,
+				'id' => $val['id']
+			));
+		}
+
+		$this->models->NbcExtras->delete(array(
+			'project_id' => $pId,
+			'ref_type' => 'taxon',
+			'ref_id' => $id
+		));
+           
+        // delete literary references
+        $this->models->LiteratureTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // reset keychoice end-points
+        $this->models->ChoiceKeystep->update(array(
+            'res_taxon_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'res_taxon_id' => $id
+        ));
+        
+        // delete commonnames
+        $this->models->Commonname->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete synonyms
+        $this->models->Synonym->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // purge undo
+        $this->models->ContentTaxonUndo->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // delete taxon tree branch rights
+        $this->models->UserTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id
+        ));
+        
+        // detele media
+        $mt = $this->models->MediaTaxon->_get(array(
+            'id' => array(
+                'project_id' => $pId,
+                'taxon_id' => $id
+            )
+        ));
+        
+		foreach ((array) $mt as $key => $val) {
+			
+			$this->deleteTaxonMedia($val['id'], false);
+		}
+        
+        // reset parentage
+        $this->models->Taxon->update(array(
+            'parent_id' => 'null'
+        ), array(
+            'project_id' => $pId,
+            'parent_id' => $id
+        ));
+        
+        // delete content
+        $this->models->ContentTaxon->delete(array(
+            'project_id' => $pId,
+            'taxon_id' => $id, 
+        ));
+        
+        // delete taxon
+        $this->models->Taxon->delete(array(
+            'project_id' => $pId,
+            'id' => $id, 
+        ));
+        
+    }
 	
 	
 	
