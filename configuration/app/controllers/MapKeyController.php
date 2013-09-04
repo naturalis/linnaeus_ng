@@ -192,6 +192,8 @@ class MapKeyController extends Controller
 
 		}
 		
+		/*
+		// no we don't, too confusing (and causes endless redirects)
 		if ($d['count']==0) {
 			
 			unset($_SESSION['app']['user']['species']['lastTaxon']);
@@ -199,6 +201,7 @@ class MapKeyController extends Controller
 			$this->redirect('index.php?id=');
 			
 		}
+		*/
 
 		$this->smarty->assign('maps',$maps);
 
@@ -1861,50 +1864,71 @@ class MapKeyController extends Controller
 	{
 
  		if ($this->rHasVal('id')) {
-			
-			return $this->requestData['id'];
-			
-		} else {
 
-			if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
-				
-				$d = 
+			if ($this->_mapType=='l2') {
+				$ot = $this->models->L2OccurrenceTaxon->_get(
 					array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon_id' => $_SESSION['app']['user']['species']['lastTaxon']
+						'id'=>array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns'=>'count(*) as total')
 					);
-
-				if ($this->_mapType=='l2')
-					$ot = $this->models->L2OccurrenceTaxon->_get(array('id'=>$d,'columns'=>'count(*) as total'));
-				else
-					$ot = $this->models->OccurrenceTaxon->_get(array('id' =>$d,'columns'=>'count(*) as total'));
-				
-				if ($ot[0]['total']!=0)
-					return $_SESSION['app']['user']['species']['lastTaxon'];
+			} else {
+				$ot = $this->models->OccurrenceTaxon->_get(
+					array(
+						'id' =>array(
+							'project_id' => $this->getCurrentProjectId(),
+							'taxon_id' => $this->requestData['id']
+						),
+						'columns'=>'count(*) as total')
+					);
 					
 			}
 			
-			$this->buildTaxonTree();
+			if ($ot[0]['total']!=0)
+				return $this->requestData['id'];
+			
+		}
 
-			if ($this->_mapType=='l2') {
+		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
 			
-				$taxa = $this->l2GetTaxaWithOccurrences();
+			$d = 
+				array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon_id' => $_SESSION['app']['user']['species']['lastTaxon']
+				);
+
+			if ($this->_mapType=='l2')
+				$ot = $this->models->L2OccurrenceTaxon->_get(array('id'=>$d,'columns'=>'count(*) as total'));
+			else
+				$ot = $this->models->OccurrenceTaxon->_get(array('id' =>$d,'columns'=>'count(*) as total'));
 			
-				$d = current($taxa);
-				
-				return $d['id'];
-		
-			} else {
-	
-				$taxa = $this->getTaxaWithOccurrences();
-	
-				$d = current($taxa);
-				
-				return $d['id'];
-			}
+			if ($ot[0]['total']!=0)
+				return $_SESSION['app']['user']['species']['lastTaxon'];
 				
 		}
-				
+		
+		$this->buildTaxonTree();
+
+		if ($this->_mapType=='l2') {
+		
+			$taxa = $this->l2GetTaxaWithOccurrences();
+		
+			$d = current($taxa);
+			
+			return $d['id'];
+	
+		} else {
+
+			$taxa = $this->getTaxaWithOccurrences();
+
+			$d = current($taxa);
+			
+			return $d['id'];
+		}
+			
 	}
+				
 	
 }
