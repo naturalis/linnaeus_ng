@@ -4,7 +4,10 @@
 {/if}
 {assign var=spellchecker_languages value=$spellchecker_languages|cat:$languages[l].language|cat:'='|cat:$languages[l].iso2|cat:','}
 {/section}
-<script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script >
+<!-- script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce/tiny_mce.js" ></script -->
+<script type="text/javascript" src="{$baseUrl}admin/javascript/tinymce/jscripts/tiny_mce_3.5.8/tiny_mce.js" ></script>
+
+
 <script type="text/javascript">
 var mediaPath = '{$session.admin.project.urls.project_media|@addslashes}';
 {literal}

@@ -4391,9 +4391,7 @@ class ImportL2Controller extends Controller
 
     private function removeInternalLinks ($s)
     {
-
-		return preg_replace_callback('/(\[l\])(.*)(\[t\])(.*)(\[\/t\])(\[\/l\])/iU',function($m){return trim($m[4]);},$s);
-
+		return preg_replace_callback('/(\[l\])(.*)(\[t\])(.*)(\[\/t\])(.*)(\[\/l\])/iU',function($m){return trim($m[4]);},$s);
     }
 
 
@@ -4505,10 +4503,12 @@ class ImportL2Controller extends Controller
 
 	private function doFixEmbeddedLinksAndMedia($src,$removeMarkup=false,$taxonId=null)
 	{
+		/* removed dd 2013.09.04, when i discovered resolveEmbeddedMedia() doesn't actually exist. hm.
 		$src = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
             $this, 
             'resolveEmbeddedMedia'
         ),$src);
+		*/
 
 		$src = $this->replaceOldExternalURLs($src);
 
