@@ -193,7 +193,7 @@ class MapKeyController extends Controller
 		}
 		
 		/*
-		// no we don't, too confusing (and causes endless redirects)
+		// no we don't, too confusing (and incidentally causes endless redirect loops, apparently)
 		if ($d['count']==0) {
 			
 			unset($_SESSION['app']['user']['species']['lastTaxon']);
