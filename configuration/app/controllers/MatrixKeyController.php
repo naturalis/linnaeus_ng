@@ -638,58 +638,36 @@ class MatrixKeyController extends Controller
 	
 		$selStates=isset($data['states']) ? preg_split('/,/',$data['states'],-1,PREG_SPLIT_NO_EMPTY) : array();
 		$stateList=array();
-/*
-		$count = $this->models->MatrixTaxonState->freeQuery(
-			array(
-				'query' =>
-					"select state_id, sum(tot), if(sum(tot)=0, -1, if(sum(tot)=-99, 1, 0)) as can_select from
-					(
-						select state_id, -99 as tot
-							from %TABLE%
-							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
-						union
-						select state_id, count(taxon_id) as tot
-							from %TABLE%
-							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
-							".(count($resTaxa)==0 ? "" :  "and taxon_id in (".implode(',',$resTaxa).") " )."
-							group by state_id
-						union 
-						select state_id, count(variation_id) as tot 
-							from %TABLE% 
-							where ".(!empty($data['states']) ? "state_id in (".$data['states'].") and " : "")." project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']."
-							".(count($resVar)==0 ? "" : "and variation_id in (".implode(',',$resVar).") " )."
-							group by state_id
-					) as unionized
-					group by state_id order by state_id",
-				'fieldAsIndex' => 'state_id'
-			)
-		);
-*/
 
 		$count = $this->models->MatrixTaxonState->freeQuery(
 			array(
 				'query' =>
-					"select case count(1) when 0 then -1 else 0 end as can_select, state_id
+			"select case count(1) when 0 then -1 else 0 end as can_select, state_id
 			from %TABLE%
 			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
 			(count($resTaxa)!=0 ? " and taxon_id in (".implode(',',$resTaxa).") " : "" ).
-			(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "").
-			" group by state_id
-			union
-			select -1 as can_select, state_id
+			(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "")."
+			group by state_id
+				union
+			select distinct -1 as can_select, state_id
 			from %TABLE%
-			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
-			(count($resTaxa)!=0 ? " and taxon_id not in (".implode(',',$resTaxa).") " : "" )."
-			union
+			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']." 
+			and taxon_id not in (".(count($resTaxa)!=0 ? implode(',',$resTaxa) : "" ).") 
+			and state_id not in (
+				select state_id from %TABLE%
+				where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix'].
+				(count($resTaxa)!=0 ? " and taxon_id in (".implode(',',$resTaxa).") " : "" ).
+				(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "").
+			")
+				union
 			select 1 as can_select, id as state_id
 			from %PRE%characteristics_states
-			where project_id = ".$this->getCurrentProjectId().
-			(count($selStates)!=0 ?  " and id in (".$data['states'].") " : ""),
+			where project_id = ".$this->getCurrentProjectId()." 
+			and id in (".(count($selStates)!=0 ?  $data['states'] : '-1' ).") ",
 				'fieldAsIndex' => 'state_id'
 			)
 		);
-				
-		//q($this->models->MatrixTaxonState->q(),1);
+
 		$menu = $this->models->GuiMenuOrder->freeQuery(
 			"select 
 				_a.ref_id as id,'character' as type,_a.show_order as show_order,
@@ -861,6 +839,105 @@ class MatrixKeyController extends Controller
 					
 	}
 			
+	private function _appControllerGetDetail($data)
+	{
+
+		$t=$this->models->Taxon->freeQuery("
+			select t.id,trim(replace(t.taxon,'%VAR%','')) as name_sci, c.commonname as name_nl, 
+				p.id as group_id, p.taxon as groupname_sci, pc.commonname as groupname_nl, 'taxon' as type 
+			from %PRE%taxa t
+			left join %PRE%commonnames c 
+				on c.taxon_id = t.id 
+				and c.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%taxa p 
+				on t.parent_id = p.id 
+				and p.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%commonnames pc 
+				on pc.taxon_id = p.id 
+				and pc.project_id = ".$this->getCurrentProjectId()."
+			where t.id = ".$data['id']."
+			and t.project_id = ".$this->getCurrentProjectId()
+		);
+		$res=$t[0];
+
+
+		$t=$this->models->Taxon->freeQuery("
+			select _b.title,_a.content, _c.page 
+			from %PRE%content_taxa _a
+			left join %PRE%pages_taxa_titles _b 
+				on _a.page_id = _b.page_id 
+				and _b.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%pages_taxa _c 
+				on _a.page_id = _c.id 
+				and _c.project_id = ".$this->getCurrentProjectId()."
+			where _a.taxon_id = ".$data['id']."
+			and _a.project_id = ".$this->getCurrentProjectId()
+		);
+		$res['content']=$t;
+
+
+		$t=$this->models->Taxon->freeQuery("
+			select _a.value as file_name,_b.value as copyright, '1' as overview_image 
+			from %PRE%nbc_extras _a
+			left join %PRE%nbc_extras _b 
+				on _b.ref_type = 'taxon' 
+				and _b.ref_id=_a.ref_id 
+				and _b.name='photographer' 
+				and _b.project_id = ".$this->getCurrentProjectId()."
+			where _a.ref_id = ".$data['id']." 
+				and _a.ref_type='taxon' 
+				and _a.name='url_image'
+			and _a.project_id = ".$this->getCurrentProjectId()
+		);
+		$res['img_main']=$t;
+
+
+		$t=$this->models->Taxon->freeQuery("
+			select file_name from %PRE%media_taxon where taxon_id = ".$data['id']." and project_id = ".$this->getCurrentProjectId()
+		);
+		$res['img_other']=$t;
+
+
+		$t=$this->models->Taxon->freeQuery("
+			select 'taxon' as type, _b.id as id, _b.taxon as taxon,_c.commonname as label, _n.value as img 
+			from %PRE%taxa_relations _a 
+			left join %PRE%taxa _b 
+				on _b.id = _a.relation_id 
+				and _b.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%commonnames _c 
+				on _c.taxon_id = _b.id 
+				and _c.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%nbc_extras _n 
+				on _b.id = _n.ref_id 
+				and _n.ref_type='taxon' 
+				and _n.name='url_thumbnail' 
+				and _n.project_id = ".$this->getCurrentProjectId()."
+			where _a.ref_type='taxon' and _a.taxon_id = ".$data['id']." 
+			and _a.project_id = ".$this->getCurrentProjectId()."
+			union 
+			select 'variation' as type, _e.id as id,  _f.taxon as taxon, _e.label as label, _n.value as img 
+			from %PRE%taxa_relations _d 
+			left join %PRE%taxa_variations _e 
+				on _e.id = _d.relation_id 
+				and _e.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%taxa _f 
+				on _f.id = _d.taxon_id 
+				and _f.project_id = ".$this->getCurrentProjectId()."
+			left join %PRE%nbc_extras _n 
+				on _d.taxon_id = _n.ref_id 
+				and _n.ref_type='taxon' 
+				and _n.name='url_thumbnail' 
+				and _n.project_id = ".$this->getCurrentProjectId()."
+			where _d.ref_type='variation'  
+			and _d.taxon_id =".$data['id']." 
+			and _d.project_id = ".$this->getCurrentProjectId()
+		);
+		$res['similar']=$t;
+
+		return $res;
+					
+	}
+			
 	public function appControllerInterfaceAction()
 	{
 		
@@ -893,7 +970,8 @@ class MatrixKeyController extends Controller
   			
 			$functions = array(
 				'states' => '_appControllerGetStates',
-				'results' => '_appControllerGetResults'
+				'results' => '_appControllerGetResults',
+				'detail' => '_appControllerGetDetail'
 			);
 
 			$res=$this->$functions[$data['query']]($data);

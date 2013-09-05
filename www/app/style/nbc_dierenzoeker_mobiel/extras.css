@@ -1,0 +1,12 @@
+.content-species-detail-para-header {
+	display:block;
+	font-weight:bold;
+}
+.content-species-detail-content-para {
+	display:block;
+	margin-bottom:1em;	
+}
+
+.ui-mobile [data-role="page"], .ui-mobile [data-role="dialog"], .ui-page {
+    display:block;
+}
