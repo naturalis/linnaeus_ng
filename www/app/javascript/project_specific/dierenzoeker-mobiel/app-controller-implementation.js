@@ -1,4 +1,4 @@
-var resultBatchSize=3;
+var resultBatchSize=15;
 
 var activeState={};
 var activeTaxon={};

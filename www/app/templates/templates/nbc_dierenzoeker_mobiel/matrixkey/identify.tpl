@@ -152,6 +152,9 @@
 <script>
 $(document).ready(function() {
 	init({{/literal}matrix:{$matrix.id},language:{$currentLanguageId}{literal}});
+{/literal}
+	resultBatchSize={$matrix_items_per_page};
+{literal}
 });
 {/literal}
 {literal}
