@@ -217,6 +217,9 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('nbcPerLine', $this->getSetting('matrix_items_per_line'));
 			$this->smarty->assign('nbcPerPage', $this->getSetting('matrix_items_per_page'));
 			$this->smarty->assign('nbcBrowseStyle', $this->getSetting('matrix_browse_style'));
+			$this->smarty->assign('matrix_items_per_page', $this->getSetting('matrix_items_per_page'));
+
+
 			
 			$this->smarty->assign('nbcDataSource', 
 				array(
