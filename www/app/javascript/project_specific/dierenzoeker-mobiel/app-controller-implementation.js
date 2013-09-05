@@ -1,23 +1,91 @@
+var resultBatchSize=3;
+
 var activeState={};
 var activeTaxon={};
-var resultBatchSize=15;
 var stack=Array();
+var activePage=selection;
+var resultsVisible=0;
+var forceScrollTop=false;
 
 function init(p)
 {
 	if (p.matrix) appController.setmatrix(p.matrix);	
 	if (p.language) appController.setlanguage(p.language);	
-	if (p.imgroot) appController.setimgroot(p.imgroot);	
+	main();
 }
 
-function main(inst) 
+function main() 
 {
 	$('#moreRowsButton-text').html('Volgende '+resultBatchSize+' tonen');
-	appController.states(states);
+	setVisible();
+	appController.result(resultlist);
 }
 
-function states(states,active)
+function resultlist(results)
 {
+	var buffer=Array();
+
+	for (var i=0; i<results.length; i++){
+
+		var element=results[i];
+		var img = element.url_thumbnail;
+		var tpl=templates.result.tpl;
+		
+		var initialrows=getVisible()!=0?getVisible():resultBatchSize;
+			
+		tpl=(i==0?tpl.replace('%class%',templates.result.class_0):(i<initialrows-1?tpl.replace('%class%',templates.result.class_1):tpl.replace('%class%',templates.result.class_n)));
+
+		buffer.push(tpl.
+			replace('%content%',templates.resultcontent.
+				replace('%onclick%','appController.detail(%id%,'+(element.type=='taxon' ? 'false' : 'true')+',detail)').
+				replace('%label%',element.label).
+				replace(/\%id\%/g,element.id).
+				replace('%image%',img)
+		).replace('%n%',i).replace('%style%',(i>initialrows-1 ? 'display:none' : '')));
+	}
+
+	document.getElementById('resultsListView').innerHTML = buffer.join('');
+
+	document.getElementById('num-of-results-top').innerHTML = 
+		document.getElementById('num-of-results-bottom').innerHTML = results.length;
+	document.getElementById('num-of-results-label-top').innerHTML = 
+		document.getElementById('num-of-results-label-bottom').innerHTML = ' '+(results.length==1 ? 'dier' : 'dieren')+' gevonden';
+		
+	appController.states(activePage);
+}
+
+function resultsexpand()
+{
+	var i=0;
+	$('li[content-type=result]').each(function(e){
+		$(this).removeClass('ui-corner-bottom');
+		if($(this).css('display')!='none') return;
+		if(i>=resultBatchSize) return;
+		$(this).css('display','block').slideDown();
+		i++;
+	});
+	
+	$('#scrollUpButton').toggle(true);
+
+	redrawresults();
+}
+
+function setVisible(i)
+{
+	if (i)
+		resultsVisible=i;
+	else
+		resultsVisible=0;
+}
+
+function getVisible()
+{
+	return resultsVisible;
+}
+
+function selection(states,active)
+{
+	// all options
 	var buffer=Array();
 	for (var i in states) {
 		var element=states[i];
@@ -35,13 +103,14 @@ function states(states,active)
 
 	$('#filtergrid').html(buffer.join(''));
 
+	// selected options
 	var buffer=Array();
 	for (var i in active) {
 		var element=active[i];
 		var tpl = templates.selectedstate;
 		letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
 		buffer.push(tpl.
-			replace(/\%onclick\%/g,'appController.set({%id%:null},main)').
+			replace(/\%onclick\%/g,'activePage=selection;setVisible();appController.set({%id%:null},main);$(this).attr(\'onclick\',\'void(0);\');').
 			replace(/\%letter\%/g,letter).
 			replace(/\%label\%/g,element.label).
 			replace(/\%image\%/g,element.img).
@@ -52,74 +121,47 @@ function states(states,active)
 
 	$('#selectiongrid').html(buffer.join(''));
 	$('#x-menu-selection').css('display',(active.length>0 ? 'block' : 'none'));
-
-	appController.result(results);
-
-}
-
-function results(results)
-{
 	
-	/*
-	
-	var buffer=Array();
-
-	for (var i=0; i<results.rows.length; i++){
-
-		var element=results.rows.item(i);
-		var img = element.url_thumbnail;
-
-		var tpl=templates.result.tpl;
-		tpl=(i==0?tpl.replace('%class%',templates.result.class_0):(i<resultBatchSize-1?tpl.replace('%class%',templates.result.class_1):tpl.replace('%class%',templates.result.class_n)));
-
-		buffer.push(tpl.
-			replace('%content%',templates.resultcontent.
-				replace('%onclick%','appController.detail(%id%,'+(element.type=='taxon' ? 'false' : 'true')+',detail)').
-				replace('%label%',element.label).
-				replace(/\%id\%/g,element.id).
-				replace('%image%',img)
-		).replace('%n%',i).replace('%style%',(i>resultBatchSize-1 ? 'display:none' : '')));
-	}
-
-	document.getElementById('resultsListView').innerHTML = buffer.join('');
-	
-	document.getElementById('num-of-results-top').innerHTML = 
-		document.getElementById('num-of-results-bottom').innerHTML = results.rows.length;
-	document.getElementById('num-of-results-label-top').innerHTML = 
-		document.getElementById('num-of-results-label-bottom').innerHTML = ' '+(results.rows.length==1 ? 'dier' : 'dieren')+' gevonden';
-
-	*/
-
 	hideall();
 
 	$('#selectioncontent').css('display','block');
 	$('#resultcontent').css('display','block');
 	$('#moreRowsButton').css('display','block');
-	
+	$('#bottom-bar').css('display','block');
+
 	redrawresults();
 	stackreset();
+	resetclearallbutton();
 
+	if (Object.size(appController.get())>0 && !forceScrollTop)
+		scrollselected();
+	else
+		scrolltop();
+		
+	forceScrollTop=false;
+	
 }
 
-function resultsshow()
+function characterstates(character)
 {
-	var i=0;
-	$('li[content-type=result]').each(function(e){
-		$(this).removeClass('ui-corner-bottom');
-		if($(this).css('display')!='none') return;
-		if(i>=resultBatchSize) return;
-		$(this).css('display','block');
-		i++;
-	});
-	
-	$('#scrollUpButton').toggle(true);
-	$('html, body').animate({ 
-	   scrollTop: $(document).height()-$(window).height()}, 
-	   1200, 
-	   "easeOutQuint",function() {
-		   redrawresults();
-	   }
-	);
+	var states=Array();
+	for (var i in character.states) {
+
+		var element=character.states[i];
+		var tpl = (element.select_state=='-1' ? templates.statedisabled : (element.select_state=='1' ? templates.stateselected : templates.state));
+		var onclick = (element.select_state=='0' ? 'state({%id%:true});' : 'state({%id%:null});')+"$(this).attr('onclick','void(0);');";
+		var letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
+
+		states.push(tpl.
+			replace(/\%onclick\%/g,onclick).
+			replace(/\%letter\%/g,letter).
+			replace(/\%label\%/g,element.label).
+			replace(/\%image\%/g,element.img).
+			replace(/\%id\%/g,element.id)
+		);
+	}
+
+	return templates.character.replace(/\%description\%/g,(character.description ? character.description : character.label.ucwords())).replace(/\%states\%/g,states.join(''));
 }
 
 function character(results)
@@ -141,38 +183,29 @@ function character(results)
 	}
 	
 	$('#expanded-characters').html(buffer.join(''));
+
 	hideall();
+
 	$('#charactercontent').css('display','block');
 	$('#resultcontent').css('display','block');
+	$('#bottom-bar').css('display','block');
 	
+	scrolltop();
+	redrawresults();
+	resetclearallbutton();
+
 }
 
-function characterstates(c)
+function state(id)
 {
-	var buffer=Array();
-	var states=Array();
-	for (var i in c.states) {
-
-		var element=c.states[i];
-		var tpl = (element.select_state=='-1' ? templates.statedisabled : (element.select_state=='1' ? templates.stateselected : templates.state));
-		var onclick = element.select_state=='0' ? 'state({%id%:true})' : 'state({%id%:null})';
-		var letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
-
-		states.push(tpl.
-			replace(/\%onclick\%/g,onclick).
-			replace(/\%letter\%/g,letter).
-			replace(/\%label\%/g,element.label).
-			replace(/\%image\%/g,element.img).
-			replace(/\%id\%/g,element.id)
-		);
-	}
-
-	return templates.character.replace(/\%description\%/g,(c.description ? c.description : c.label.ucwords())).replace(/\%states\%/g,states.join(''));
+	appController.set(id);
+	setVisible();
+	//activePage=character; // remove this to always return to home screen after (de)selecting a state
+	appController.result(resultlist);
 }
 
 function detail(data)
 {
-
 	setactivetaxon([data.id,data.type]);
 	
 	var group='';
@@ -185,7 +218,12 @@ function detail(data)
 		for (var i in data.similar) {
 			var element=data.similar[i];
 			var tpl=templates.speciessimilaritem.tpl;
-			tpl=(i==0?tpl.replace('%class%',templates.speciessimilaritem.class_0):(i<Object.size(data.similar)-1?tpl.replace('%class%',templates.speciessimilaritem.class_1):tpl.replace('%class%',templates.speciessimilaritem.class_n)));
+			
+			if (Object.size(data.similar)==1)
+				tpl=tpl.replace('%class%',templates.speciessimilaritem.class_single);
+			else
+				tpl=(i==0?tpl.replace('%class%',templates.speciessimilaritem.class_0):(i<Object.size(data.similar)-1?tpl.replace('%class%',templates.speciessimilaritem.class_1):tpl.replace('%class%',templates.speciessimilaritem.class_n)));
+
 			buffer.push(tpl.
 				replace('%onclick%','appController.detail(%id%,false,detail);').
 				replace('%image%',element.img).
@@ -207,7 +245,7 @@ function detail(data)
 			var element=data.img_add[i];
 			var tpl=templates.extraimage.tpl;
 			tpl=(i==0?tpl.replace('%style%',templates.extraimage.style_0):tpl.replace('%style%',templates.extraimage.style_n));
-			if (element.file) buffer.push(tpl.replace('%image%',element.file));
+			if (element.file) buffer.push(tpl.replace(/\%image\%/g,element.file));
 			if (element.copyright) buffer2.push(element.copyright);
 		}
 		var credits='';
@@ -215,13 +253,14 @@ function detail(data)
 	
 		extraimages = templates.extraimages.replace('%images%',buffer.join('')).replace('%credits%',credits);
 	}
-		
+
 	$('#species-detail-content').html(templates.speciesdetail.
 		replace('%title%',data.name_nl ? data.name_nl : '').
 		replace('%subtitle%',data.name_sci ? data.name_sci : '').
 		replace('%image%',img).
 		replace('%image_copyright%',data.img_main.copyright ? data.img_main.copyright : '').
 		replace('%text%',data.text ? data.text : '').
+		replace('%text%','').
 		replace('%extra_images%',extraimages).
 		replace('%group%',group).
 		replace('%similar%',similar)
@@ -231,6 +270,7 @@ function detail(data)
 	$('#speciescontent').css('display','block');
 	$('#go-to-top-link').click();
 	scrolltop();
+
 	stackadd(data.id);
 }
 
@@ -243,58 +283,17 @@ function detailback()
 		appController.detail(id,false,detail);
 }
 
-function detailswipe(direction)
-{
-	var results=appController.getcachedresult();
-	var curr=getactivetaxon();
-
-	for (var i=0; i<Object.size(results); i++) {
-
-		if (results[i].id==curr.id) {
-			
-			if (results[i-1])
-				var prev=results[i-1];
-			else
-				var prev=null;
-
-			if (results[i+1])
-				var next=results[i+1];
-			else
-				var next=null;
-				
-			break;
-		} 	
-	}
-	
-	if (direction=='right' && prev)
-		appController.detail(prev.id,prev.type!='taxon',detail)
-	else 
-	if (direction=='left' && next)
-		appController.detail(next.id,next.type!='taxon',detail)
-
-}
-
 function loadpage(page)
 {
 	if (page) $('#secondary-content').load(page+'.html');
 
 	$('#secondary').toggle(page);
 	$('#main').toggle(!page);	
+
+	$('#bottom-bar').css('display',(page ? 'none' : 'block'));
+
+	scrolltop();
 }
-
-var dots = 0;
-
-function installerdots()
-{
-	if(dots < 5) {
-		$('#installerdots').append('.');
-		dots++;
-	} else {
-		$('#installerdots').html('');
-		dots = 0;
-	}
-}
-
 
 function stackadd(i)
 {
@@ -342,7 +341,7 @@ function errorhandler()
 
 function hideall()
 {
-	var pages = ['speciescontent','charactercontent','selectioncontent','resultcontent','installmessage'];
+	var pages = ['speciescontent','charactercontent','selectioncontent','resultcontent','bottom-bar'];
 	
 	for (var i in pages)
 		$('#'+pages[i]).css('display','none');
@@ -353,10 +352,14 @@ function scrolltop()
   $("html, body").animate({ scrollTop: 0 }, "easeOutCubic");
 }
 
-function state(id)
+function scrollresults()
 {
-	appController.set(id);
-	appController.states(states);
+	$("html, body").animate({ scrollTop: $("#result-top").offset().top }, 200, "easeOutCubic");
+}
+
+function scrollselected()
+{
+	$("html, body").animate({ scrollTop: $("#x-menu-selection").offset().top }, 1000, "easeOutCubic");
 }
 
 function redrawresults()
@@ -373,6 +376,29 @@ function redrawresults()
 		$('#moreRowsButton-text').html('Laatste '+remaining+' tonen');
 	else
 		$('#moreRowsButton-text').html('Volgende '+resultBatchSize+' tonen');
+	
+	setVisible($('li[content-type=result]:visible').length);
+}
+
+function clearall()
+{
+	$('#clear-all-button').attr('onclick','void(0);');
+	activePage=selection;
+	setVisible();
+	appController.reinitialise(main);
+}
+
+function resetclearallbutton()
+{
+	$('#clear-all-button').attr('onclick','clearall();');
+}
+
+function rprt(msg)
+{
+	if (typeof msg=="Object")
+		console.dir(msg);
+	else
+		console.log(msg);
 }
 
 
