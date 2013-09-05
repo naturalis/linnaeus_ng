@@ -276,8 +276,6 @@ var appController = (function() {
 		}
 
 
-		console.dir(res);
-		
 		var c=getCallback(index);
 		if (c) c(res);
 	}
