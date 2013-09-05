@@ -16,7 +16,6 @@
 
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery-ui.js"></script>
-  <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-installer.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/app-controller-implementation.js"></script>
 
