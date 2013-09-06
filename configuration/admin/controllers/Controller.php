@@ -390,7 +390,8 @@ class Controller extends BaseClass
      */
     public function getCurrentUserProjects ()
     {
-		
+
+		$this->reInitUserRolesAndRights();
 		$p = $this->models->Project->_get(array('id'=>'*','fieldAsIndex'=>'id'));
 		
         foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
@@ -411,11 +412,11 @@ class Controller extends BaseClass
         }
         
         $this->customSortArray($cup, array(
-            'key' => 'name', 
+            'key' => 'title', 
             'dir' => 'asc', 
             'case' => 'i'
         ));
-        
+
         return isset($cup) ? $cup : false;
     }
 

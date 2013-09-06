@@ -172,7 +172,12 @@ class LinnaeusController extends Controller
 			
 		}
 		
-		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
+		$projects = $this->models->Project->_get(
+			array(
+				'id' => array('published' => 1),
+				'order' => 'title'
+			)
+		);
 
 		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
 		$this->smarty->assign('showEntryProgramLink',$this->generalSettings['showEntryProgramLink']);
