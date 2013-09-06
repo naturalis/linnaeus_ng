@@ -40,21 +40,8 @@
         <div class="left-divider"></div>
 
 		<div id="dataSourceContainer">   
-		{if $nbcDataSource.author || $nbcDataSource.title || $nbcDataSource.url}
-            <span id="sourceHeader">{t}Gebaseerd op:{/t}</span>
-            <p>
-            {$nbcDataSource.author}{if $nbcDataSource.author && $nbcDataSource.title}<br />{/if}
-            {$nbcDataSource.title}
-            {if $nbcDataSource.url}<a href="{$nbcDataSource.url}" target="_blank">{t}meer info{/t}</a>{/if}
-            </p>
-            <br />
-        {/if}
-		{if $nbcDataSource.photoCredit}
-            <p>
-            {$nbcDataSource.photoCredit}
-            </p>
-            <br />
-        {/if}
+		{snippet}colofon.html{/snippet}
+
             <p>
 	            <span id="logo-ETI">Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.</span>
 			</p>
