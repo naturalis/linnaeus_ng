@@ -72,7 +72,7 @@
 }
 
 #tab {
-	background-image: url('/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/Tab.png');
+	background-image: url('../../media/system/skins/nbc_dierenzoeker_mobiel/Tab.png');
 	background-repeat: no-repeat;
 	background-position: right top;
 }
@@ -120,7 +120,7 @@
 	background-position: left top;
 }
 .lefttaglineconnector {
-	background-image: url('/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/puntje_vraag_vogel.png');
+	background-image: url('../../media/system/skins/nbc_dierenzoeker_mobiel/puntje_vraag_vogel.png');
 	background-repeat: no-repeat;
 	height: 12px;
 	width: 12px;
@@ -180,7 +180,7 @@
 
 #bottom-bar {
 	height: 57px;
-	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background.png") top repeat-x;
+	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background.png") top repeat-x;
 	/*background-color: black;*/
 	color: white; 
 	font-size: 12px; 
@@ -194,7 +194,7 @@
 	padding-top:25px;
 }
 #bottom-bar.down {
-	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background-down.png") top repeat-x;
+	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/bottom-bar-background-down.png") top repeat-x;
 }
 .collapsible-set-wrapper .ui-collapsible {
 	margin:0;	
@@ -205,10 +205,10 @@
 }
 
 .keuze-content {
-	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/bg_blauwestreep.jpg");
+	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/bg_blauwestreep.jpg");
 }
 .ui-collapsible-content-wrapper {
-	background: url("/linnaeus_ng/app/media/system/skins/nbc_dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;
+	background: url("../../media/system/skins/nbc_dierenzoeker_mobiel/keuze-collapsable-shadow-top.png") top repeat-x;
 }
 .block-container ul {
 	margin-top:15px;
