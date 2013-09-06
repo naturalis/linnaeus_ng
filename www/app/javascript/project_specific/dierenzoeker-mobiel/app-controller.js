@@ -12,6 +12,7 @@ var appController = (function() {
 	var db=null;
 	var results={taxa:{},variations:{}};
 	var id=null;
+	var projectId=null;
 	var matrixId=null;
 	var languageId=null;
 	var isVariation=false;
@@ -49,14 +50,14 @@ var appController = (function() {
 		return error;
 	}
 
-	function setLanguageId(i)
+	function setProjectId(i)
 	{
-		languageId=i;
+		projectId=i;
 	}
 
-	function getLanguageId()
+	function getProjectId()
 	{
-		return languageId;
+		return projectId;
 	}
 
 	function setMatrixId(i)
@@ -67,6 +68,16 @@ var appController = (function() {
 	function getMatrixId()
 	{
 		return matrixId;
+	}
+
+	function setLanguageId(i)
+	{
+		languageId=i;
+	}
+
+	function getLanguageId()
+	{
+		return languageId;
 	}
 
 	function setId(i)
@@ -284,6 +295,16 @@ var appController = (function() {
 	// public interface functions
 	return {
 
+		setproject: function(i)
+		{
+			setProjectId(i);
+		},
+
+		getproject: function()
+		{
+			return getProjectId();
+		},
+
 		setmatrix: function(i)
 		{
 			setMatrixId(i);
@@ -292,6 +313,16 @@ var appController = (function() {
 		setlanguage: function(i)
 		{
 			setLanguageId(i);
+		},
+
+		getmatrix: function()
+		{
+			return getMatrixId();
+		},
+
+		getlanguage: function()
+		{
+			return getLanguageId();
 		},
 
 		geterror: function()

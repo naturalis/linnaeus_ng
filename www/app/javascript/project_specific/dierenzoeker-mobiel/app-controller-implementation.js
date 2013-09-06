@@ -9,6 +9,7 @@ var forceScrollTop=false;
 
 function init(p)
 {
+	if (p.project) appController.setproject(p.project);	
 	if (p.matrix) appController.setmatrix(p.matrix);	
 	if (p.language) appController.setlanguage(p.language);	
 	main();
@@ -285,7 +286,8 @@ function detailback()
 
 function loadpage(page)
 {
-	if (page) $('#secondary-content').load(page+'.html');
+
+	if (page) $('#secondary-content').load('../introduction/topic.php?p='+appController.getproject()+'&id='+page+'&lan='+appController.getlanguage());
 
 	$('#secondary').toggle(page);
 	$('#main').toggle(!page);	

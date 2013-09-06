@@ -2550,7 +2550,7 @@ class MatrixKeyController extends Controller
 		$id = isset($p['id']) ? $p['id'] : null;
 		$type = isset($p['type']) ? $p['type'] : null;
 		$order = isset($p['order']) ? $p['order'] : null;
-		
+
 		if (is_null($id) || is_null($type) || is_null($order))
 			return;
 
