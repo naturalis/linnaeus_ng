@@ -57,14 +57,9 @@ class ProjectsController extends Controller
 		array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
 		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
-		array('source_author','[name]',null,'only implemented in certain skins'),
-		array('source_title','[title]',null,'only implemented in certain skins'),
-		array('source_photocredit','[name]',null,'only implemented in certain skins'),
-		array('source_url','[url]',null,'only implemented in certain skins'),
 		array('external_species_url_target','[_self|_blank|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
-		
-		
+	
 	);
 
     /**

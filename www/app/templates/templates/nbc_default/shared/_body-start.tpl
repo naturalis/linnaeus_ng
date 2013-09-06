@@ -1,3 +1,4 @@
+
 <body id="body" class="conceptcard">
 
     <div id="container">
@@ -17,8 +18,7 @@
             </h2>
 
             <div id="menucontainer">
-                <ul id="nav">
-                </ul>
+			{snippet}matrix_main_menu.html{/snippet}
            </div>
 
             <div id="logo-container">

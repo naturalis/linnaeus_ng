@@ -91,6 +91,18 @@
 	to be unique across two tables; again, these is at present no mechanism that
 	actually enforces this - it is up to the system administrator.
 	
+	
+	on snippets:
+	to allow for the inclusion of project-dependent bits of html into general templates,
+	there is the concept of a snippet. snippets are bit of html-code that are included
+	in template if they exist for the current project. they are included like this:
+		{snippet}matrix_main_menu.html{/snippet}
+	after which the function smartyTranslateGetSnippet searches for the specified file
+	in the projects snippet-folder, which is
+		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
+	if the file (or the directory) doesn't exist, sheer blankness is included.
+	please note the files are included "as is"; smarty-codes won't work.
+	
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -1676,6 +1688,16 @@ class Controller extends BaseClass
     }
 
 
+	public function smartyTranslateGetSnippet($params, $content, &$smarty, &$repeat)
+	{
+		if (file_exists($_SESSION['app']['project']['urls']['projectSnippets'].$content)) {
+			return @file_get_contents($_SESSION['app']['project']['urls']['projectSnippets'].$content);
+		} else {
+			return;
+		}
+	}
+	
+
 
     public function translate ($content)
     {
@@ -1851,7 +1873,7 @@ class Controller extends BaseClass
         $u['projectMedia'] = $this->baseUrl . 'shared/media/project/' . $pCode . '/';
         $u['projectL2Maps'] = $u['projectMedia'] . 'l2_maps/';
         $u['projectSystemOverride'] = $u['projectMedia'] . 'system_override/';
-        
+
         // urls of the directory containing media that are constant across projects (but can be skinned)
         $u['systemMedia'] = $_SESSION['app']['system']['urls']['systemMedia'];
         $u['systemL2Maps'] = $this->baseUrl . 'shared/media/system/l2_maps/';
@@ -1874,6 +1896,7 @@ class Controller extends BaseClass
             $u['projectCSS'] = $u['cssRootDir'] . 'default/' . $this->getSkinName() . '/';
         }
         
+        $u['projectSnippets'] =  $this->baseUrl . 'app/media/project/_snippets/' . $pCode . '/';
 
 
         // home
@@ -2363,11 +2386,17 @@ class Controller extends BaseClass
         $this->smarty->config_dir = $this->_smartySettings['dir_config'];
         $this->smarty->caching = $this->_smartySettings['caching'];
         $this->smarty->compile_check = $this->_smartySettings['compile_check'];
-        
+       
         $this->smarty->register_block('t', array(
             &$this, 
             'smartyTranslate'
         ));
+
+        $this->smarty->register_block('snippet', array(
+            &$this, 
+            'smartyTranslateGetSnippet'
+        ));
+
     }
 
 

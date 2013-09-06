@@ -10,10 +10,10 @@
 	<p>
     {if !$projectExists}
     <table>
-		<tr><td>Author:</td><td><input type="text" name="settings[source_author]" value="{$source_author}" /></td></tr>
+		<!-- tr><td>Author:</td><td><input type="text" name="settings[source_author]" value="{$source_author}" /></td></tr>
 		<tr><td>Title of source:</td><td><input type="text" name="settings[source_title]" value="{$source_title}" /></td></tr>
 		<tr><td>Photo credit:</td><td><input type="text" name="settings[source_photocredit]" value="{$source_photocredit}" /></td></tr>
-		<tr><td>Source URL:</td><td><input type="text" name="settings[source_url]" value="{$source_url}" /></td></tr>
+		<tr><td>Source URL:</td><td><input type="text" name="settings[source_url]" value="{$source_url}" /></td></tr -->
 		<tr><td>NBC image root:</td><td><input type="text" name="settings[nbc_image_root]" value="{$nbc_image_root}" /></td></tr>
 		<tr><td>Skin name:</td><td><input type="text" name="settings[skin]" value="{$skin}" /></td></tr>
 		<tr><td>Items per line:</td><td><input type="text" name="settings[matrix_items_per_line]" value="{$matrix_items_per_line}" /></td></tr>
