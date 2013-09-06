@@ -80,6 +80,24 @@ class IntroductionController extends Controller
 	}
 
 
+	private function resolvePageName($name,$languageId)
+	{
+
+		$d =  $this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'language_id' => $languageId,
+					'topic' => $name
+				)
+			)
+		);
+
+		return $d ? $d[0]['page_id'] : null;
+
+	}
+
+
     /**
      * Create new page or edit existing
      *
@@ -97,7 +115,14 @@ class IntroductionController extends Controller
 
 		} else {
 			
-			$id = $this->requestData['id'];
+			if (!is_numeric($this->requestData['id'])) {
+				$id = $this->resolvePageName(
+					$this->requestData['id'],
+					($this->rHasVal('lan') ? $this->requestData['lan'] : $this->getDefaultLanguageId())
+				);
+			} else {
+				$id = $this->requestData['id'];
+			}
 
 			$page = $this->getPage($id);
 
@@ -186,7 +211,7 @@ class IntroductionController extends Controller
 				array(
 					'id' => array(
 						'project_id' => $this->getCurrentProjectId(), 
-						'language_id' => $_SESSION['app']['project']['default_language_id'], 
+						'language_id' => $this->getDefaultLanguageId(),
 						'page_id' => $val['id']
 					),
 					'columns' => 'topic',
