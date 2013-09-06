@@ -394,7 +394,7 @@ function nbcShowSimilar(id,type) {
 	nbcSetExpandResults(false);
 	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
 	nbcSaveSessionSetting('nbcSimilar',[id,type]);
-	
+
 }
 
 function nbcPrintSimilarHeader() {
@@ -405,10 +405,15 @@ function nbcPrintSimilarHeader() {
 		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
 		'<br />'+
 		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		' | '+
+		'<span id="show-all-divider"> | </span>'+
 		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+
+	var t=$('.icon-info:visible').not('.legend-icon-image').length!=0;
+	$('#showAllLabel').toggle(t);
+	$('#show-all-divider').toggle(t);
+
 }
 
 function nbcCloseSimilar() {
