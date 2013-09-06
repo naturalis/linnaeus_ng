@@ -1180,6 +1180,8 @@ class ImportL2Controller extends Controller
                 ));
                 
                 $this->loadControllerConfig('MapKey');
+				
+				set_time_limit(4800); // RIGHT!
                 
                 $this->helpers->XmlParser->getNodes('taxondata');
                 
