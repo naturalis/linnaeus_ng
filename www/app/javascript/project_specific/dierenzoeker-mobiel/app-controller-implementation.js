@@ -1,11 +1,20 @@
 var resultBatchSize=15;
 
+var pages=[selection,character];
+var activePage=pages[0];
+
 var activeState={};
 var activeTaxon={};
 var stack=Array();
-var activePage=selection;
 var resultsVisible=0;
 var forceScrollTop=false;
+
+function setactivepage(id)
+{
+	if (!id) id=0;
+	activePage=pages[id];
+}
+
 
 function init(p)
 {
@@ -111,7 +120,7 @@ function selection(states,active)
 		var tpl = templates.selectedstate;
 		letter='abcdefghijklmnopqrstuvwxyz'.charAt(i%4);
 		buffer.push(tpl.
-			replace(/\%onclick\%/g,'activePage=selection;setVisible();appController.set({%id%:null},main);$(this).attr(\'onclick\',\'void(0);\');').
+			replace(/\%onclick\%/g,'setactivepage(0);setVisible();appController.set({%id%:null},main);$(this).attr(\'onclick\',\'void(0);\');').
 			replace(/\%letter\%/g,letter).
 			replace(/\%label\%/g,element.label).
 			replace(/\%image\%/g,element.img).
@@ -201,7 +210,7 @@ function state(id)
 {
 	appController.set(id);
 	setVisible();
-	//activePage=character; // remove this to always return to home screen after (de)selecting a state
+	//setactivepage(1); // uncomment this to always return to home screen after (de)selecting a state
 	appController.result(resultlist);
 }
 
@@ -286,7 +295,6 @@ function detailback()
 
 function loadpage(page)
 {
-
 	if (page) $('#secondary-content').load('../introduction/topic.php?p='+appController.getproject()+'&id='+page+'&lan='+appController.getlanguage());
 
 	$('#secondary').toggle(page);

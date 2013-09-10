@@ -7,7 +7,7 @@
 
 		<div>
 			<div data-role="header" class="header">
-				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="activePage=selection;forceScrollTop=true;main()">
+				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="detailback()" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
 				</a>
@@ -24,7 +24,7 @@
 		<div id="x-menu-header-back">
 
 			<div data-role="header" class="header">
-				<img src="{$session.app.project.urls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="activePage=selection;forceScrollTop=true;main()">
+				<img src="{$session.app.project.urls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="appController.states(selection);" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
 				</a>
@@ -133,7 +133,7 @@
 
 		<div>
 			<div data-role="header" class="header" style="background-color:black">
-				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="activePage=selection;forceScrollTop=true;loadpage();">
+				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;loadpage();">
 				<a href="#" onClick="loadpage()" data-transition="slide" data-direction="reverse" data-role="none">
 					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
 				</a>
