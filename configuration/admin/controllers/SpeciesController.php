@@ -257,7 +257,7 @@ class SpeciesController extends Controller
 				on _a.taxon_id = _b.id
 				and _a.project_id = _b.project_id
 			where _a.project_id = ".$this->getCurrentProjectId()."
-			order by synonym");
+			order by taxon,synonym");
 				
 		$this->smarty->assign('synonyms',$s);
 				       
@@ -329,7 +329,7 @@ class SpeciesController extends Controller
 				on _a.taxon_id = _b.id
 				and _a.project_id = _b.project_id
 			where _a.project_id = ".$this->getCurrentProjectId()."
-			order by commonname");
+			order by taxon,commonname");
 				
 		$this->smarty->assign('commonnames',$c);
 				       
