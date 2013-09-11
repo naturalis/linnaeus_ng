@@ -1886,7 +1886,7 @@ class ImportL2Controller extends Controller
     }
 
 
-	// that lovely field called "syn_vern_description "
+	// that lovely field called "syn_vern_description"
     public function xmlParserCallback_SynVernDescriptionCheck ($taxon)
     {
 		
@@ -1996,6 +1996,8 @@ class ImportL2Controller extends Controller
 
 
 			foreach((array)$commons as $key => $val) {
+				
+				$dummy = $this->replaceOldMarkUp(str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val[1]));
 	
 				$this->models->Commonname->save(
 				array(
@@ -2003,7 +2005,7 @@ class ImportL2Controller extends Controller
 					'project_id' => $this->getNewProjectId(), 
 					'taxon_id' => $taxonId, 
 					'language_id' => $val[0],
-					'commonname' => str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val[1])
+					'commonname' => $dummy
 				));
 				
 				//$this->addMessage(sprintf('Added common name "%s" (%s)',$val[1],$val[2]));
@@ -2018,13 +2020,15 @@ class ImportL2Controller extends Controller
 			$_SESSION['admin']['system']['import']['elementsToLoad']['syn_vern_description']=='both') {
 
 			foreach((array)$synonyms as $key => $val) {
+				
+				$dummy = $this->replaceOldMarkUp(str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val));
 	
 				$res = $this->models->Synonym->save(
 				array(
 					'id' => null, 
 					'project_id' => $this->getNewProjectId(), 
 					'taxon_id' => $taxonId, 
-					'synonym' => str_replace(array('  ',' :','::',' :'),array(' ',':',':',':'),$val),
+					'synonym' => $dummy,
 					'author' => null, 
 					'show_order' => $key
 				));
