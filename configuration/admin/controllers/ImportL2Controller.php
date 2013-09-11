@@ -636,7 +636,7 @@ class ImportL2Controller extends Controller
                         foreach ((array) $_SESSION['admin']['system']['import']['loaded']['speciesContent']['failed'] as $val)
                             $this->addError($this->storeError($val['cause'], 'Species content'));
                         
-                        $this->addError($this->storeError('(probable cause: the taxa above are present in <records> but not in <tree>)', 'Species content'));
+                        $this->addError($this->storeError('(probable cause: the taxa above are present in &lt;records&gt; but not in &lt;tree&gt;)', 'Species content'));
                     }
                     
                     unset($_SESSION['admin']['system']['import']['speciesOverviewCatId']);
@@ -4505,12 +4505,11 @@ class ImportL2Controller extends Controller
 
 	private function doFixEmbeddedLinksAndMedia($src,$removeMarkup=false,$taxonId=null)
 	{
-		/* removed dd 2013.09.04, when i discovered resolveEmbeddedMedia() doesn't actually exist. hm.
+
 		$src = preg_replace_callback('/((\[l\]\[im\]|\[l\]\[mo\]|\[l\]\[s\])(.*)\[\/l\])/isU', array(
             $this, 
-            'resolveEmbeddedMedia'
+            'replaceEmbeddedMedia'
         ),$src);
-		*/
 
 		$src = $this->replaceOldExternalURLs($src);
 
