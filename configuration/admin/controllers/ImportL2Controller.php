@@ -722,7 +722,7 @@ class ImportL2Controller extends Controller
 	
 					} else {
 	
-	                    $this->addMessage(sprintf('Syn_vern_description: parsed %s common names.',$_SESSION['admin']['system']['import']['synVernDescription']['commonCount']));
+						$this->addMessage(sprintf('Syn_vern_description: parsed %s common names.',$_SESSION['admin']['system']['import']['synVernDescription']['commonCount']));
 						foreach((array)$_SESSION['admin']['system']['import']['synVernDescription']['unknownlanguages'] as $language => $count)
 							$this->addError(sprintf('Syn_vern_description: skipped common names for unknown language "%s" (%sx)',$language,$count));
 
@@ -1632,12 +1632,24 @@ class ImportL2Controller extends Controller
     }
     
     // languages
+    private function addLanguage ($language)
+	{
+		
+		$this->models->Language->save(
+			array(
+				'id' => null, 
+				'language' => $language
+			));
+				
+		return $this->models->Language->getNewId();
+		
+	}
+
     private function addProjectLanguage ($language)
     {
         $l = $this->resolveLanguage($language);
         
-        if (!$l)
-            return false;
+        if (!$l) $l = $this->addLanguage($language);
         
         $p = $this->models->LanguageProject->save(
         array(
@@ -2500,29 +2512,26 @@ class ImportL2Controller extends Controller
             if (isset($taxon->vernaculars->vernacular)) {
                 
                 foreach ($taxon->vernaculars->vernacular as $vKey => $vVal) {
+					
+					$lang=trim((string) $vVal->language);
                     
-                    $languagId = $this->resolveLanguage(trim((string) $vVal->language));
+                    $langId = $this->resolveLanguage($lang);
                     
-                    if ($languagId) {
+                    if (!$langId) {
+						$langId = $this->addLanguage($lang);
+						$this->addMessage('Added language "'.$lang.'")');
+					}
                         
-                        $this->models->Commonname->save(
-                        array(
-                            'id' => null, 
-                            'project_id' => $this->getNewProjectId(), 
-                            'taxon_id' => $taxonId, 
-                            'language_id' => $languagId, 
-                            'commonname' => trim((string) $vVal->name)
-                        ));
-                        
-                        $_SESSION['admin']['system']['import']['loaded']['taxon_common']['saved']++;
-                    }
-                    else {
-                        
-                        $_SESSION['admin']['system']['import']['loaded']['taxon_common']['failed'][] = array(
-                            'data' => trim((string) $taxon->name), 
-                            'cause' => 'Unknown language "' . trim((string) $vVal->language) . '" (common name "' . trim((string) $vVal->name) . '").'
-                        );
-                    }
+					$this->models->Commonname->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getNewProjectId(), 
+						'taxon_id' => $taxonId, 
+						'language_id' => $langId, 
+						'commonname' => trim((string) $vVal->name)
+					));
+					
+					$_SESSION['admin']['system']['import']['loaded']['taxon_common']['saved']++;
                 }
             }
         }
