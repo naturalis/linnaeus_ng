@@ -402,7 +402,7 @@ class Controller extends BaseClass
         
         if (!isset($p['depth']))
             unset($this->treeList);
-
+        
         $t = $this->getTaxonChildren($pId);
 
         /*
@@ -448,7 +448,7 @@ class Controller extends BaseClass
 
     public function getProjectRanks ()
     {
-        $pr = false;//$this->getCache('tree-ranks');
+        $pr = $this->getCache('tree-ranks');
         
         if (!$pr) {
             
@@ -460,7 +460,7 @@ class Controller extends BaseClass
                 'fieldAsIndex' => 'id', 
                 'columns' => 'id,rank_id,parent_id,lower_taxon,keypath_endpoint'
             ));
-
+            
             $pl = $this->getProjectLanguages();
             
             foreach ((array) $pr as $rankkey => $rank) {
