@@ -2519,7 +2519,7 @@ class ImportL2Controller extends Controller
                     
                     if (!$langId) {
 						$langId = $this->addLanguage($lang);
-						$this->addMessage('Added language "'.$lang.'")');
+						$this->addMessage('Added language "'.$lang.'"');
 					}
                         
 					$this->models->Commonname->save(

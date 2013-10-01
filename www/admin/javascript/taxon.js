@@ -1546,14 +1546,13 @@ function taxonBlankOutRanks() {
 	
 }
 
-function taxonSortTaxaAlpha() {
+function taxonSortTaxaAlpha(sortAll) {
 
 	if (!confirm(_('Are you sure you want to permanently sort the taxa alphabetically?')))
 		return;
 
-	$('tr[type="taxon"]').each(function(i){
-		$('#theForm').append('<input type="hidden" name="newOrder[]" value="'+$(this).attr('taxon-id')+'">').val($(this).attr('taxon-id'));
-	});
+	if (sortAll==true)
+		$('#theForm').append('<input type="hidden" name="sortAll" value="1">').val('1');
 
 	$('#theForm').append('<input type="hidden" name="sortAlpha" value="1">').val('1');
 	$('#theForm').submit();

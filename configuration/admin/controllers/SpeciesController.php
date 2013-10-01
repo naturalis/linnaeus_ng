@@ -336,45 +336,50 @@ class SpeciesController extends Controller
         $this->printPage();
     }
 
+	public function sortTaxaAction()
+	{
 
-
-    private function _listAction ()
-    {
-		
         $this->checkAuthorisation();
-        
-        $this->setPageName($this->translate('Taxon list'));
-        
-        unset($_SESSION['admin']['system']['activeTaxon']);
 
-        if ($this->rHasVal('sortTaxonLevel','1') && !$this->isFormResubmit()) {
+		// sorting alphabetically within a rank, and the entire ranks in descending hierarchical order 
+        if ($this->rHasVal('sortTaxonLevel','1')  && !$this->isFormResubmit()) {
 
-			$this->newGetTaxonTree(array('alphabeticalTree'=>true));
-			$i=0;
-			foreach((array)$this->treeList as $val) {
-				
-				$this->models->Taxon->update(array(
-					'taxon_order' => $i++
-				), array(
-					'project_id' => $this->getCurrentProjectId(), 
-					'id' => $val['id']
-				));
-			}
+			$this->newGetTaxonTree();
 
-        } else
-        if ($this->rHasVal('newOrder') && $this->rHasVal('sortAlpha','1') && !$this->isFormResubmit()) {
+			if ($this->treeList) {
+				uasort($this->treeList,function($a,$b){ return ($a['level'] > $b['level'] ? 1 : ($a['level'] < $b['level'] ? -1 : 0)); });
 
-			$taxa = $this->models->Taxon->_get(array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(), 
-				),
-				'order' => 'taxon'
-			));
-			
-			$i=0;
 
-			foreach((array)$taxa as $key => $val) {
-				if (in_array($val['id'],$this->requestData['newOrder'])) {
+				$prevlevel=-1;		
+				$dummy=$sorted=array();
+	
+				foreach((array)$this->treeList as $key => $val) {
+	
+					if ($prevlevel!=$val['level']) {
+						
+						if (count($dummy)>1)
+							uasort($dummy,function($a,$b){ return ($a['taxon'] > $b['taxon'] ? 1 : ($a['taxon'] < $b['taxon'] ? -1 : 0)); });
+						
+						foreach((array)$dummy as $dKey=>$dVal)
+							$sorted[$dKey]=$dVal;
+	
+						$dummy=array();
+					}
+	
+					$dummy[$key]=$val;
+	
+					$prevlevel=$val['level'];
+				}
+	
+	
+				if (count($dummy)>1)
+					uasort($dummy,function($a,$b){ return ($a['taxon'] > $b['taxon'] ? 1 : ($a['taxon'] < $b['taxon'] ? -1 : 0)); });
+	
+				foreach((array)$dummy as $dKey=>$dVal)
+					$sorted[$dKey]=$dVal;
+
+				$i=0;
+				foreach((array)$sorted as $key => $val) {
 					$this->models->Taxon->update(array(
 						'taxon_order' => $i++
 					), array(
@@ -382,10 +387,61 @@ class SpeciesController extends Controller
 						'id' => $val['id']
 					));
 				}
+
+				$this->treeList=$sorted;
+
 			}
-		
+
         } else
-        if ($this->rHasVal('newOrder') && !$this->isFormResubmit()) {
+
+        if ($this->rHasVal('sortAlpha','1') && !$this->isFormResubmit())
+		{
+
+			$this->newGetTaxonTree();
+
+			if ($this->treeList)
+				uasort($this->treeList,function($a,$b){ return ($a['taxon'] > $b['taxon'] ? 1 : ($a['taxon'] < $b['taxon'] ? -1 : 0)); });
+
+			$i=0;
+
+			foreach((array)$this->treeList as $key => $val) {
+				if ($this->rHasVal('sortAll','1') || (($val['lower_taxon']=='1' && $this->rHasVal('taxatype','Sp')) || ($val['lower_taxon']=='0' && $this->rHasVal('taxatype','Ht')))) {
+					$this->models->Taxon->update(array(
+						'taxon_order' => $i++ + ($this->rHasVal('sortAll','1') ? 0 : 999999)
+						//'taxon_order' => $val['id'] // for resetting!
+					), array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $val['id']
+					));
+
+				}
+			}
+			
+			if (!$this->rHasVal('sortAll','1')) {
+			
+				$taxa = $this->models->Taxon->_get(array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId()
+					), 
+					'order' => 'taxon_order',
+					'columns' => 'id,taxon_order'
+				));
+	
+				foreach((array)$taxa as $key => $val) {
+					$this->models->Taxon->update(array(
+						'taxon_order' => $key
+					), array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'id' => $val['id']
+					));
+				}
+				
+			}
+			
+        } else
+
+        if ($this->rHasVal('newOrder') && !$this->isFormResubmit())
+		{
 
 			foreach((array)$this->requestData['newOrder'] as $key => $val) {
 
@@ -397,8 +453,25 @@ class SpeciesController extends Controller
 				));
 
 			}
-		
+	
         }
+
+		$this->clearCache('tree-KeyTree');
+		$this->clearCache('species-treeList');
+		
+		$this->redirect('list.php');
+				
+	}
+
+
+    private function _listAction ()
+    {
+		
+        $this->checkAuthorisation();
+        
+        $this->setPageName($this->translate('Taxon list'));
+        
+        unset($_SESSION['admin']['system']['activeTaxon']);
 
 		$this->newGetTaxonTree();
 		$taxa = isset($this->treeList) ? $this->treeList : null;

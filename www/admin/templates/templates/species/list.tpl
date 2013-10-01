@@ -18,7 +18,8 @@
         <a href="#" onclick="$('[class=indent-dots]').css('display',$('[class=indent-dots]').css('display')=='none' ? 'inline' : 'none');">Toggle indentation</a>
     </p>
     
-<table id="drag-list" class="grid">
+<!-- table id="drag-list" class="grid" -->
+<table>
 	<thead>
         <tr>
             <th style="width:270px;text-align:left">{t}Taxon{/t}</th>
@@ -66,13 +67,15 @@
 	</tbody>
     </table>
 	<p>
-        <form method="post" action="" id="theForm">
+        <form method="post" action="sort_taxa.php" id="theForm">
         <input type="hidden" name="rnd" value="{$rnd}" />
+        <input type="hidden" name="taxatype" value="{if $isHigherTaxa}Ht{else}Sp{/if}" />
         <input type="button" value="save taxon order" onclick="allSaveDragOrder()"/>
         </form>
     </p>
     <p>
-    	<a href="javascript:taxonSortTaxaAlpha();">Sort taxa alphabetically</a> (affects this list only)<br />
+    	<a href="javascript:taxonSortTaxaAlpha();">Sort taxa alphabetically (this list only)</a><br />
+    	<a href="javascript:taxonSortTaxaAlpha(true);">Sort taxa alphabetically (all taxa)</a><br />
     	<a href="javascript:taxonSortTaxaTaxonomic();">Sort taxa alphabetically per taxonomic level</a> (affects both species and higher taxa)
     </p>
 

@@ -1723,12 +1723,8 @@ class Controller extends BaseClass
 
 		$d = $this->_newGetTaxonTree($p);
 
-		if (isset($p['alphabeticalTree']) && $p['alphabeticalTree']==true) {
-			// do nothing
-		} else {
-			if(!empty($this->treeList))
-				uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
-		}
+		if(!empty($this->treeList))
+			uasort($this->treeList,function($a,$b){ return ($a['taxon_order'] > $b['taxon_order'] ? 1 : ($a['taxon_order'] < $b['taxon_order'] ? -1 : 0)); });
 
 		return $d;
 
