@@ -21,9 +21,6 @@
 </table>
 {if $k==-1}{t}No matrices have been defined.{/t}{/if}
 </p>
-<p>
-[<a href="matrix.php">{t}create a new matrix{/t}</a>]
-</p>
 <form id="theForm" method="post" action="">
 <input type="hidden" name="id" id="id" value="" />
 <input type="hidden" name="action" id="action" value="" />

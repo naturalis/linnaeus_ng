@@ -18,7 +18,8 @@ class InternalLinksController extends Controller
 		'matrix_name',
 		'free_module_project',
 		'content_free_module',
-		'occurrence_taxon'
+		'occurrence_taxon',
+		'content_introduction'
     );
     
     public $controllerPublicName = 'Internal Links';
@@ -414,6 +415,7 @@ class InternalLinksController extends Controller
 				order by _a.keystep_id, title
 			");
 
+		$d=array();
 		foreach((array)$l as $key => $val) {
 
 			if (!isset($d[$val['keystep_id']])) {
@@ -441,234 +443,369 @@ class InternalLinksController extends Controller
 
 	}
 
+	private function intLinkGetIntroduction()
+	{
+
+		$c = $this->models->ContentIntroduction->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId()
+				),
+				'id,language_id,topic'
+			)
+		);
+
+		foreach((array)$c as $key => $val) {
+
+			$l[$val['language_id']][] = array('id' => $val['id'],'label' => $val['topic']);
+
+		}
+	
+		return isset($l) ? $l : null;
+	
+	}
+
 
 	private function makeInternalLinksStructure()
 	{
 
-		$i =
-			array(
-				array(
-					'label' => $this->translate('Content pages'),
-					'controller' => 'linnaeus',
-					'params' =>
-						json_encode(array(
-							array(
-								'label' => $this->translate('Page:'),
-								'param' => 'id',
-								'values' => $this->intLinkGetContent()
+		$modules = $this->models->ModuleProject->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId()
+			),
+			'columns' => 'module_id',
+			'fieldAsIndex' => 'module_id'
+		));
+		
+
+		$i = array();
+
+		if (isset($modules[MODCODE_INTRODUCTION]))
+		{
+			
+			$d=$this->intLinkGetIntroduction();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Content pages'),
+						'controller' => 'linnaeus',
+						'params' =>
+							json_encode(array(
+								array(
+									'label' => $this->translate('Page:'),
+									'param' => 'id',
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
-				array(
-					'label' => $this->translate('Glossary alphabet'),
-					'controller' => 'glossary',
-					'params' =>
-						json_encode(array(
-							array(
-								'label' => $this->translate('Letter:'),
-								'param' => 'letter',
-								'values' => $this->intLinkGetGlossaryAlpha()
+				);
+			
+		}
+
+
+		if (isset($modules[MODCODE_GLOSSARY]))
+		{
+
+			$d=$this->intLinkGetGlossaryAlpha();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Glossary alphabet'),
+						'controller' => 'glossary',
+						'params' =>
+							json_encode(array(
+								array(
+									'label' => $this->translate('Letter:'),
+									'param' => 'letter',
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
-				array(
-					'label' => $this->translate('Glossary term'),
-					'controller' => 'glossary',
-					'url' => 'term.php',
-					'params' =>	json_encode(
-						array(
+				);
+	
+			$d=$this->intLinkGetGlossaryTerms();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Glossary term'),
+						'controller' => 'glossary',
+						'url' => 'term.php',
+						'params' =>	json_encode(
 							array(
-								'label' => $this->translate('Term:'),
-								'param' => 'id',
-								'values' => $this->intLinkGetGlossaryTerms()
+								array(
+									'label' => $this->translate('Term:'),
+									'param' => 'id',
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
+				);
+				
+		}
+
+
+		if (isset($modules[MODCODE_LITERATURE]))
+		{
+
+			array_push($i,
 				array(
 					'label' => $this->translate('Literature index'),
 					'controller' => 'literature',
-				),
-				array(
-					'label' => $this->translate('Literature alphabet'),
-					'controller' => 'literature',
-					'params' =>
-						json_encode(array(
-							array(
-								'label' => $this->translate('Letter:'),
-								'param' => 'letter',
-								'language_independent' => true,
-								'values' => $this->intLinkGetLiteratureAlpha()
+				)
+			);
+	
+			$d=$this->intLinkGetLiteratureAlpha();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Literature alphabet'),
+						'controller' => 'literature',
+						'params' =>
+							json_encode(array(
+								array(
+									'label' => $this->translate('Letter:'),
+									'param' => 'letter',
+									'language_independent' => true,
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
-				array(
-					'label' => $this->translate('Literature reference'),
-					'controller' => 'literature',
-					'url' => 'reference.php',
-					'params' =>	json_encode(
-						array(
+				);
+	
+			$d=$this->intLinkGetLiteratureReferences();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Literature reference'),
+						'controller' => 'literature',
+						'url' => 'reference.php',
+						'params' =>	json_encode(
 							array(
-								'label' => $this->translate('Reference:'),
-								'param' => 'id',
-								'language_independent' => true,
-								'values' => $this->intLinkGetLiteratureReferences()
+								array(
+									'label' => $this->translate('Reference:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
+				);
+			
+		}
+
+
+		if (isset($modules[MODCODE_SPECIES]))
+		{
+
+			array_push($i,
 				array(
 					'label' => $this->translate('Species module index'),
 					'controller' => 'species',
-				),
-				array(
-					'label' => $this->translate('Species module detail'),
-					'controller' => 'species',
-					'url' => 'taxon.php',
-					'params' => json_encode(
-						array(
+				)
+			);
+
+			$d=$this->intLinkGetSpecies();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Species module detail'),
+						'controller' => 'species',
+						'url' => 'taxon.php',
+						'params' => json_encode(
 							array(
-								'label' => $this->translate('Species:'),
-								'param' => 'id',
-								'language_independent' => true,
-								'values' => $this->intLinkGetSpecies()
-							),
-							array(
-								'label' => $this->translate('Category:'),
-								'param' => 'cat',
-								'values' => $this->intLinkGetSpeciesCategories()
+								array(
+									'label' => $this->translate('Species:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
+								),
+								array(
+									'label' => $this->translate('Category:'),
+									'param' => 'cat',
+									'values' => $this->intLinkGetSpeciesCategories()
+								)
 							)
 						)
 					)
-				),
+				);
+			
+		}
+			
+
+		if (isset($modules[MODCODE_HIGHERTAXA]))
+		{
+
+			array_push($i,
 				array(
 					'label' => $this->translate('Higher taxa index'),
 					'controller' => 'highertaxa',
-				),
-				array(
-					'label' => $this->translate('Higher taxa detail'),
-					'controller' => 'highertaxa',
-					'url' => 'taxon.php',
-					'params' => json_encode(
-						array(
+				)
+			);
+	
+			$d=$this->intLinkGetSpecies(true);
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Higher taxa detail'),
+						'controller' => 'highertaxa',
+						'url' => 'taxon.php',
+						'params' => json_encode(
 							array(
-								'label' => $this->translate('Taxa:'),
-								'param' => 'id',
-								'language_independent' => true,
-								'values' => $this->intLinkGetSpecies(true)
-							),
-							array(
-								'label' => $this->translate('Category:'),
-								'param' => 'cat',
-								'values' => $this->intLinkGetSpeciesCategories()
+								array(
+									'label' => $this->translate('Taxa:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
+								),
+								array(
+									'label' => $this->translate('Category:'),
+									'param' => 'cat',
+									'values' => $this->intLinkGetSpeciesCategories()
+								)
 							)
 						)
 					)
-				),
-				array(
-					'label' => $this->translate('Dichotomous key'),
-					'controller' => 'key',
-					'url' => 'index.php?r',
-					'params' => json_encode(
-						array(
+				);
+
+		}
+
+
+		if (isset($modules[MODCODE_KEY]))
+		{
+
+			$d=$this->intLinkGetKeySteps(true);
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Dichotomous key'),
+						'controller' => 'key',
+						'url' => 'index.php?r',
+						'params' => json_encode(
 							array(
-								'label' => $this->translate('Step:'),
-								'param' => 'step',
-								'language_independent' => true,
-								'values' => $this->intLinkGetKeySteps()
+								array(
+									'label' => $this->translate('Step:'),
+									'param' => 'step',
+									'language_independent' => true,
+									'values' => $d
+								)
 							)
 						)
 					)
-				),
+				);
+			
+		}
+
+
+		if (isset($modules[MODCODE_DISTRIBUTION]))
+		{
+
+			array_push($i,
 				array(
 					'label' => $this->translate('Distribution index'),
 					'controller' => 'mapkey',
-				),
-				array(
-					'label' => $this->translate('Distribution detail'),
-					'controller' => 'mapkey',
-					'url' => 'examine_species.php',
-					'params' => json_encode(
-						array(
-							array(
-								'label' => $this->translate('Species:'),
-								'param' => 'id',
-								'language_independent' => true,
-								'values' => $this->intLinkGetMapSpecies()
-							)
-						)
-					)
-				),
+				)
 			);
-
-		$mc = $this->intLinkGetMatricexCount();
 	
-		if ($mc>1) {
-
-			array_push($i,
-				array(
-					'label' => $this->translate('Matrix key index'),
-					'controller' => 'matrixkey',
-					'url' => 'matrices.php'
-				)
-			);
-
-			array_push($i,
-				array(
-					'label' => $this->translate('Matrix keys'),
-					'controller' => 'matrixkey',
-					'params' => json_encode(
-						array(
+			$d=$this->intLinkGetMapSpecies(true);
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Distribution detail'),
+						'controller' => 'mapkey',
+						'url' => 'examine_species.php',
+						'params' => json_encode(
 							array(
-								'label' => $this->translate('Matrix name:'),
-								'param' => 'mtrx',
-								'values' => $this->intLinkGetMatrices()
-							),
-							array(
-								'label' => $this->translate('Element:'),
-								'param' => 'url',
-								'language_independent' => true,
-								'values' => array(
-									array('id' => 'index.php', 'label' => 'Index', 'untranslated' => 1),
-									array('id' => 'identify.php', 'label' => 'Identify', 'untranslated' => 1),
-									array('id' => 'examine.php', 'label' => 'Examine', 'untranslated' => 1),
-									array('id' => 'compare.php', 'label' => 'Compare', 'untranslated' => 1),
+								array(
+									'label' => $this->translate('Species:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
 								)
 							)
 						)
 					)
-				)
-			);
-
-		} else
-		if ($mc==1) {
-
-			array_push($i,
-				array(
-					'label' => $this->translate('Matrix key'),
-					'controller' => 'matrixkey',
-					'params' => json_encode(
-						array(
-							array(
-								'label' => $this->translate('Element:'),
-								'param' => 'url',
-								'language_independent' => true,
-								'values' => array(
-									array('id' => 'index.php', 'label' => 'Index', 'untranslated' => 1),
-									array('id' => 'identify.php', 'label' => 'Identify', 'untranslated' => 1),
-									array('id' => 'examine.php', 'label' => 'Examine', 'untranslated' => 1),
-									array('id' => 'compare.php', 'label' => 'Compare', 'untranslated' => 1),
-								)
-							)
-						)
-					)
-				)
-			);
-
+				);
+			
 		}
+
+
+		if (isset($modules[MODCODE_MATRIXKEY]))
+		{
+			
+			$mc = $this->intLinkGetMatricexCount();
+		
+			if ($mc>1) {
+	
+				array_push($i,
+					array(
+						'label' => $this->translate('Matrix key index'),
+						'controller' => 'matrixkey',
+						'url' => 'matrices.php'
+					)
+				);
+	
+
+				array_push($i,
+					array(
+						'label' => $this->translate('Matrix keys'),
+						'controller' => 'matrixkey',
+						'params' => json_encode(
+							array(
+								array(
+									'label' => $this->translate('Matrix name:'),
+									'param' => 'mtrx',
+									'values' => $this->intLinkGetMatrices()
+								),
+								array(
+									'label' => $this->translate('Element:'),
+									'param' => 'url',
+									'language_independent' => true,
+									'values' => array(
+										array('id' => 'index.php', 'label' => 'Index', 'untranslated' => 1),
+										array('id' => 'identify.php', 'label' => 'Identify', 'untranslated' => 1),
+										array('id' => 'examine.php', 'label' => 'Examine', 'untranslated' => 1),
+										array('id' => 'compare.php', 'label' => 'Compare', 'untranslated' => 1),
+									)
+								)
+							)
+						)
+					)
+				);
+	
+			} else
+			if ($mc==1) {
+	
+				array_push($i,
+					array(
+						'label' => $this->translate('Matrix key'),
+						'controller' => 'matrixkey',
+						'params' => json_encode(
+							array(
+								array(
+									'label' => $this->translate('Element:'),
+									'param' => 'url',
+									'language_independent' => true,
+									'values' => array(
+										array('id' => 'index.php', 'label' => 'Index', 'untranslated' => 1),
+										array('id' => 'identify.php', 'label' => 'Identify', 'untranslated' => 1),
+										array('id' => 'examine.php', 'label' => 'Examine', 'untranslated' => 1),
+										array('id' => 'compare.php', 'label' => 'Compare', 'untranslated' => 1),
+									)
+								)
+							)
+						)
+					)
+				);
+	
+			}
+			
+		}
+
 
 		$mods = $this->intLinkGetFreeModules();
 		
@@ -682,23 +819,48 @@ class InternalLinksController extends Controller
 				)
 			);
 
-			array_push($i,
-				array(
-					'label' => $this->translate($val['label'].' topic'),
-					'controller' => 'module',
-					'url' => 'topic.php?modId='.$val['id'],
-					'params' => json_encode(
-						array(
+			$d=$this->intLinkGetFreeModuleTopics($val['id']);
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate($val['label'].' topic'),
+						'controller' => 'module',
+						'url' => 'topic.php?modId='.$val['id'],
+						'params' => json_encode(
 							array(
-								'label' => $this->translate('Topic:'),
-								'param' => 'id',
-								'values' => $this->intLinkGetFreeModuleTopics($val['id'])
+								array(
+									'label' => $this->translate('Topic:'),
+									'param' => 'id',
+									'values' => $d
+								)
 							)
 						)
 					)
-				)
-			);
+				);
 
+		}
+
+		if (isset($modules[MODCODE_CONTENT]))
+		{
+			
+			$d=$this->intLinkGetContent();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Content pages'),
+						'controller' => 'linnaeus',
+						'params' =>
+							json_encode(array(
+								array(
+									'label' => $this->translate('Page:'),
+									'param' => 'id',
+									'values' => $d
+								)
+							)
+						)
+					)
+				);
+			
 		}
 
 		return $i;

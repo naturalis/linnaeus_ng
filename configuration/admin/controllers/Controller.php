@@ -1348,6 +1348,24 @@ class Controller extends BaseClass
 
     }
 
+
+    public function getTaxonByName($name)
+    {
+		$name=trim($name);
+        if (empty($name))
+            return;
+           
+		$t=$this->models->Taxon->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon' => $name
+			)
+		));
+		return $t[0];
+
+    }
+	
+	
     /**
      * Retrieves all taxa in the form of a recursive array based om parent-child relations (the "tree")
      *
