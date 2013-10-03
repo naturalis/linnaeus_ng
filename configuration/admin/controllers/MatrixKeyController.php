@@ -3,20 +3,23 @@
 /*
 
 	NEXUS IMPORT
+	
+	while exporting from L2, choose the version with tabs, not the "standard"
+	
 	multiple states are assigned in the matrix as {023} for 0,2,3. i have no idea what 
 	happens when characters have more than 9 states. the import simply assumes 
 	it doesn't happen.
 
 	also, in the header:
 	FORMAT MISSING=?  GAP=- SYMBOLS= " 0 1 2 3";
-	is ignored
+	is ignored. the application uses ? as symbol for missing values (hardcoded).
 	
 	for cleaning up names before resolving (reducing "Genus Flickingeria" to "Flickingeria")
 	program blindly assumes english ranks names. ranks are not checked to be valid when names are
 	found. obviously, the taxa already need to exist to be found! the import does NOT create
 	any taxa. if resolvement fails, the user is notified and the taxon is ignored.
 	
-	no check for existing matrix name in place!
+	there is no check if there is another matrix with the same name (but import will work nonetheless)
 
 */
 
@@ -2652,18 +2655,15 @@ class MatrixKeyController extends Controller
 	
         $this->checkAuthorisation();
         
-        $this->setPageName($this->translate('Taxon file upload'));
+        $this->setPageName($this->translate('Nexus file upload'));
         
-        // uploaded file detected: parse csv
         if ($this->requestDataFiles) {
             
-            unset($_SESSION['admin']['system']['csv_data']);
-
 			$buffer=trim(file_get_contents($this->requestDataFiles[0]["tmp_name"]));
 			
 			if (substr($buffer,0,strlen(NEXUS_START_TAG))!==NEXUS_START_TAG) {
 
-				$this->addError('not a valid nexus-file (missing start-tag "'.NEXUS_START_TAG.'")');
+				$this->addError('not a valid nexus-file (files lacks start-tag "'.NEXUS_START_TAG.'")');
 
 			} else {
 
@@ -2868,6 +2868,9 @@ class MatrixKeyController extends Controller
 					foreach((array)$val['states'] as $sKey=>$sVal) {
 						
 						foreach((array)$sVal as $tKey=>$tVal) {
+							
+							if ($tVal=='?') //missing value
+								continue;
 					
 							$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
 
