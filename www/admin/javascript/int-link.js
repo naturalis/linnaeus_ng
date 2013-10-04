@@ -13,7 +13,7 @@ function intLinkShowSelector(language) {
 	showDialog(_('Insert internal link'));
 
 	$('#dialog-content-inner').load('../utilities/int_links.php'+(language ? '?language='+language : ''));
-
+	
 }
 
 function intLinkStoreLinks(label,controller,url,params) {
@@ -46,9 +46,12 @@ function intLinkMakeValueList(param) {
 }
 
 
-function intLinkModuleSelectorChange() {
+function intLinkModuleSelectorChange(index) {
 
-	i = intLinks[$('#module-selector').val()];
+	if (!index)
+		i = intLinks[$('#module-selector').val()];
+	else
+		i = intLinks[index];
 
 	if (!i) return;
 	

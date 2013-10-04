@@ -480,6 +480,82 @@ class InternalLinksController extends Controller
 
 		$i = array();
 
+		if (isset($modules[MODCODE_SPECIES]))
+		{
+
+			array_push($i,
+				array(
+					'label' => $this->translate('Species module index'),
+					'controller' => 'species',
+				)
+			);
+
+			$d=$this->intLinkGetSpecies();
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Species module detail'),
+						'controller' => 'species',
+						'url' => 'taxon.php',
+						'params' => json_encode(
+							array(
+								array(
+									'label' => $this->translate('Species:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
+								),
+								array(
+									'label' => $this->translate('Category:'),
+									'param' => 'cat',
+									'values' => $this->intLinkGetSpeciesCategories()
+								)
+							)
+						)
+					)
+				);
+			
+		}
+			
+
+		if (isset($modules[MODCODE_HIGHERTAXA]))
+		{
+
+			array_push($i,
+				array(
+					'label' => $this->translate('Higher taxa index'),
+					'controller' => 'highertaxa',
+				)
+			);
+	
+			$d=$this->intLinkGetSpecies(true);
+			if (count($d)>0)
+				array_push($i,
+					array(
+						'label' => $this->translate('Higher taxa detail'),
+						'controller' => 'highertaxa',
+						'url' => 'taxon.php',
+						'params' => json_encode(
+							array(
+								array(
+									'label' => $this->translate('Taxa:'),
+									'param' => 'id',
+									'language_independent' => true,
+									'values' => $d
+								),
+								array(
+									'label' => $this->translate('Category:'),
+									'param' => 'cat',
+									'values' => $this->intLinkGetSpeciesCategories()
+								)
+							)
+						)
+					)
+				);
+
+		}
+
+
 		if (isset($modules[MODCODE_INTRODUCTION]))
 		{
 			
@@ -487,8 +563,8 @@ class InternalLinksController extends Controller
 			if (count($d)>0)
 				array_push($i,
 					array(
-						'label' => $this->translate('Content pages'),
-						'controller' => 'linnaeus',
+						'label' => $this->translate('Introduction'),
+						'controller' => 'introduction',
 						'params' =>
 							json_encode(array(
 								array(
@@ -596,82 +672,6 @@ class InternalLinksController extends Controller
 					)
 				);
 			
-		}
-
-
-		if (isset($modules[MODCODE_SPECIES]))
-		{
-
-			array_push($i,
-				array(
-					'label' => $this->translate('Species module index'),
-					'controller' => 'species',
-				)
-			);
-
-			$d=$this->intLinkGetSpecies();
-			if (count($d)>0)
-				array_push($i,
-					array(
-						'label' => $this->translate('Species module detail'),
-						'controller' => 'species',
-						'url' => 'taxon.php',
-						'params' => json_encode(
-							array(
-								array(
-									'label' => $this->translate('Species:'),
-									'param' => 'id',
-									'language_independent' => true,
-									'values' => $d
-								),
-								array(
-									'label' => $this->translate('Category:'),
-									'param' => 'cat',
-									'values' => $this->intLinkGetSpeciesCategories()
-								)
-							)
-						)
-					)
-				);
-			
-		}
-			
-
-		if (isset($modules[MODCODE_HIGHERTAXA]))
-		{
-
-			array_push($i,
-				array(
-					'label' => $this->translate('Higher taxa index'),
-					'controller' => 'highertaxa',
-				)
-			);
-	
-			$d=$this->intLinkGetSpecies(true);
-			if (count($d)>0)
-				array_push($i,
-					array(
-						'label' => $this->translate('Higher taxa detail'),
-						'controller' => 'highertaxa',
-						'url' => 'taxon.php',
-						'params' => json_encode(
-							array(
-								array(
-									'label' => $this->translate('Taxa:'),
-									'param' => 'id',
-									'language_independent' => true,
-									'values' => $d
-								),
-								array(
-									'label' => $this->translate('Category:'),
-									'param' => 'cat',
-									'values' => $this->intLinkGetSpeciesCategories()
-								)
-							)
-						)
-					)
-				);
-
 		}
 
 

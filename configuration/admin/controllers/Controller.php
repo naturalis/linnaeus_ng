@@ -1064,7 +1064,7 @@ class Controller extends BaseClass
      */
     public function getLoggedInMainIndex ()
     {
-        return $this->baseUrl . $this->appName . '/admin-index.php';
+        return $this->baseUrl . $this->appName . '/views/utilities/admin_index.php';
     }
 
 
@@ -2766,6 +2766,10 @@ class Controller extends BaseClass
             
             $_SESSION['admin']['user']['_said_welcome'] = true;
         }
+		
+		if (isset($_SESSION['admin']['user']['search']) && $_SESSION['admin']['user']['search']['results']['count']>0)
+            $this->smarty->assign('userSearch',$_SESSION['admin']['user']['search']);
+
     }
 
 
@@ -3439,7 +3443,7 @@ class Controller extends BaseClass
     {
         $controllerBaseName = ($this->controllerBaseNameMask ? $this->controllerBaseNameMask : $this->getControllerBaseName());
         
-        // is no controller base name is set, we are in /admin/admin-index.php which is the portal to the modules
+        // is no controller base name is set, we are in /admin/views/utilities/admin_index.php, which is the portal to the modules
         if ($controllerBaseName == '')
             return true;
         

@@ -2023,7 +2023,7 @@ class Controller extends BaseClass
         
         // ofcourse just these three aren't nowhere near sufficient to run the admin, but it's a good indication
         return (file_exists($this->generalSettings['lngFileRoot'] . 'configuration/admin/configuration.php') && file_exists($this->generalSettings['lngFileRoot'] . 'configuration/admin/controllers/Controller.php') &&
-         file_exists($this->generalSettings['lngFileRoot'] . 'www/admin/admin-index.php'));
+         file_exists($this->generalSettings['lngFileRoot'] . 'www/admin/views/utilities/admin_index.php'));
     }
 
 

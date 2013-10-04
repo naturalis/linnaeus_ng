@@ -85,7 +85,7 @@ function searchDoReplaceAction(id,action) {
 	if (!id) return;
 
 	$.ajax({
-		url : "ajax_interface_search.php",
+		url : "ajax_interface.php",
 		type: "POST",
 		data : ({
 			'action' : action ,
