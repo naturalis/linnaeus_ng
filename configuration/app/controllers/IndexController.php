@@ -204,6 +204,17 @@ class IndexController extends Controller
 				($this->getTaxonType() == 'higher' && $val["lower_taxon"]==1)
 			) continue;
 			
+			if ($this->getTaxonType() == 'higher' && !empty($val['parent_id'])) {
+			    
+			    list($rank) = explode(' ', $val['label']);
+			    $taxon = $val['taxon'];
+			    if (strpos($val['label'], 'italics') !== false) {
+			        $taxon = '<span class="italics">' . $taxon . '</span>';
+			    }
+			    $val['label'] = $taxon . ', '. strtolower($rank);
+
+			}
+			
 			$d[$key] = $val;
 
 		}
