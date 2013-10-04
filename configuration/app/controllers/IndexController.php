@@ -208,7 +208,7 @@ class IndexController extends Controller
 			    
 			    list($rank) = explode(' ', $val['label']);
 			    $taxon = $val['taxon'];
-			    if (strpos($val['label'], 'italics') !== false) {
+			    if (strpos($val['label'], '"italics"') !== false) {
 			        $taxon = '<span class="italics">' . $taxon . '</span>';
 			    }
 			    $val['label'] = $taxon . ', '. strtolower($rank);
