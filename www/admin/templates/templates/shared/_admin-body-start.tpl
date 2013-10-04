@@ -1,6 +1,6 @@
 <body><div id="body-container"><a name="body-top"></a>
 <div id="header-container">
-	<a href="{$baseUrl}admin/admin-index.php"><img src="{$baseUrl}admin/media/system/linnaeus_logo.png" id="lng-logo" />
+	<a href="{$baseUrl}admin/views/utilities/admin_index.php"><img src="{$baseUrl}admin/media/system/linnaeus_logo.png" id="lng-logo" />
 	<img src="{$baseUrl}admin/media/system/eti_logo.png" id="eti-logo" /></a>
 
 {if !$excludeLogout && $session.admin.user._logged_in}

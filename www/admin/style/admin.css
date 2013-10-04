@@ -505,3 +505,10 @@ tr[type=drag-row] {
 .instruction-text {
 	color:#666;
 }
+.searched-term {
+	color:#06F;
+}
+.searchResultMatch {
+	color:#b00;
+	font-weight:bold;
+}

@@ -12,6 +12,6 @@ Click button to clear all runtime caches for this project.
 </form>
 </p>
 {/if}
-<a href="../../admin-index.php">Back</a>
+<a href="../utilities/admin_index.php">Back</a>
 </div>
 {include file="../shared/admin-footer.tpl"}

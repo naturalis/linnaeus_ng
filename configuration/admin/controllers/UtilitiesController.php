@@ -96,6 +96,69 @@ class UtilitiesController extends Controller
     
     }
 
+    /**
+	* Project wide index, showing start screen with module icons
+	*
+	* @access     public
+	*/
+    public function adminIndexAction ()
+    {
+        $this->checkAuthorisation();
+        
+        $this->includeLocalMenu = true;
+        
+        $this->setPageName($this->translate('Project overview'));
+        
+        // get all modules activated in this project
+        $modules = $this->models->ModuleProject->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId()
+            ), 
+            'order' => 'module_id asc'
+        ));
+
+        foreach ((array) $modules as $key => $val) {
+            
+            // get info per module
+            $mp = $this->models->Module->_get(array(
+                'id' => $val['module_id']
+            ));
+            
+            $modules[$key]['icon'] = $mp['icon'];
+            $modules[$key]['module'] = $mp['module'];
+            $modules[$key]['controller'] = $mp['controller'];
+            $modules[$key]['show_in_menu'] = $mp['show_in_menu'];
+            
+            // see if the current user has any rights within the module
+            if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]) || $this->isCurrentUserSysAdmin())
+                $modules[$key]['_rights'] = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
+        }
+        
+        $freeModules = $this->models->FreeModuleProject->_get(array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId()
+            )
+        ));
+        
+        foreach ((array) $freeModules as $key => $val) {
+            
+            // see if the current user has any rights within the module
+            if ((isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) && $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']] === true) ||
+             $this->isCurrentUserSysAdmin())
+                $freeModules[$key]['currentUserRights'] = true;
+        }
+        
+        unset($_SESSION['admin']['user']['freeModules']['activeModule']);
+        
+        $this->smarty->assign('modules', $modules);
+        
+        $this->smarty->assign('freeModules', $freeModules);
+        
+        $this->smarty->assign('currentUserRoleId', $this->getCurrentUserRoleId());
+        
+        $this->printPage();
+    }
+
 
 
     /**
@@ -292,6 +355,16 @@ class UtilitiesController extends Controller
 			$this->smarty->assign('returnText',$this->renameMedia($this->requestData));
 
         }
+        else if ($this->requestData['action'] == 'set_something') {
+            
+			$this->setSomething($this->requestData['name'],$this->requestData['value']);
+
+        }
+        else if ($this->requestData['action'] == 'get_something') {
+            
+			$this->smarty->assign('returnText',$this->getSomething($this->requestData['name']));
+
+        }
         
         $this->printPage();
     
@@ -398,5 +471,19 @@ class UtilitiesController extends Controller
         $this->smarty->assign('returnText', isset($h) ? json_encode($h) : null);
     
     }
+
+    private function setSomething($name,$value)
+	{
+		if ($value==null)
+			unset($_SESSION['admin']['system']['arbitrary'][$name]);
+		else
+			$_SESSION['admin']['system']['arbitrary'][$name]=$value;
+
+	}
+	
+    private function getSomething($name)
+	{
+		return @$_SESSION['admin']['system']['arbitrary'][$name];
+	}
 
 }

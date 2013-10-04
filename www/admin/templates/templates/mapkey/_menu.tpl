@@ -7,5 +7,5 @@
 &nbsp;
 <a href="management.php" class="allLookupLink">{t}Management{/t}</a>
 &nbsp;
-<a href="../utilities/search_index.php">Extensive search</a>
+<a href="../search/search_index.php">Extensive search</a>
 <span id="message-container" style="float:right"></span>
