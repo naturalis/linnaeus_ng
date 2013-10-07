@@ -5,10 +5,11 @@
 <div id="loadingdiv" style="background-image:url(../../media/system/ajax-loader.gif);" class="loadingdiv-invisible"></div>
 <span id="dummy-element"></span>
 <div id="allLookupList" class="allLookupList"></div>
+
 {if $userSearch}
-<div id="search-float" style="width:350px;height:450px;overflow-y:scroll;overflow-x:hidden;border:1px solid #666;background-color:#fff;">
-	<div style="width:100%;background-color:#eee;padding:10px 4px 10px 4px;cursor:move;">search: <span class="searched-term">{$userSearch.term}</span></div>
-	<div style="padding:4px;">
+<div id="search-float" style="width:350px;height:450px;overflow-y:scroll;overflow-x:hidden;border:1px solid #666;background-color:#fff;position:absolute">
+	<div id="search-float-header" style="width:100%;background-color:#eee;padding:10px 4px 10px 4px;cursor:move;">search: <span class="searched-term">{$userSearch.term}</span></div>
+	<div id="werwerwerwe" style="padding:4px;">
 	{foreach from=$userSearch.results.data item=v}
 		{if $v.numOfResults>0}
 			{foreach from=$v.results item=r}
@@ -45,15 +46,18 @@ $(document).ready(function(){
 	 		social_tools: false
 	 	});
 	}
-	
 	if (hasSearchResults===true) {
-		var pos=allGetSomething('search-float-position');
-		if (!pos) pos=[10,300];
-		$('#search-float').offset({top:pos[0],left:pos[1]}).draggable({stop: function(event, ui) {
-    	// Show dropped position.
-    	var pos = $(this).position();
-		allSetSomething('search-float-position',[pos.top,pos.left]);
-    }});
+	
+		function positionSearchFloat(pos) {
+			if(!pos || pos[0]<0 || pos[1]<0) pos=[115,568];
+			$('#search-float').css({top:pos[0]+'px',left:pos[1]+'px'});
+		}
+		var pos=allGetSomething('search-float-position',positionSearchFloat);
+
+		$('#search-float').draggable({stop: function(event, ui) {
+			var pos = $(this).position();
+			allSetSomething('search-float-position',[pos.top,pos.left]);
+		}, cancel:'#werwerwerwe'});
 	}
 	
 })

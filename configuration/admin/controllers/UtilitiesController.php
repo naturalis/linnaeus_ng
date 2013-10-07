@@ -362,7 +362,7 @@ class UtilitiesController extends Controller
         }
         else if ($this->requestData['action'] == 'get_something') {
             
-			$this->smarty->assign('returnText',$this->getSomething($this->requestData['name']));
+			$this->smarty->assign('returnText',json_encode($this->getSomething($this->requestData['name'])));
 
         }
         

@@ -463,8 +463,7 @@ function allInitDragtable(functionOnDrop) {
 
 
 function allSetSomething(name,value) {
-return;
-	alert(value);
+
 	$.ajax({
 		type: "POST",
 		async: false,
@@ -473,14 +472,13 @@ return;
 	}).success();
 
 }
-function allGetSomething(name) {
-return;
 
+function allGetSomething(name,callback) {
 	$.ajax({
 		type: "POST",
 		async: false,
 		url: "../utilities/ajax_interface.php",
 		data: ({name: name, action: 'get_something'})
-	}).success(function(data){alert(data[0]+','+data[1]);return data;});
+	}).success(function(data){callback($.parseJSON(data));});
 	
 }
