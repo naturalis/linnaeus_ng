@@ -183,6 +183,7 @@ class Controller extends BaseClass
      */
     public function __construct ($p = null)
     {
+
         parent::__construct();
 
         $this->setControllerParams($p);
@@ -639,8 +640,8 @@ class Controller extends BaseClass
         
         //return $this->getCache('species-tree'); // return value is unused!
     }
-
-
+	
+	
 	private function _getTaxonClassification($id) {
 			
 		$taxon = $this->getTaxonById($id);
@@ -1369,7 +1370,7 @@ class Controller extends BaseClass
     }
 
 
-    public function getSetting ($name)
+    public function getSetting ($name,$substitute=null)
     {
         $s = $this->models->Settings->_get(
         array(
@@ -1384,12 +1385,12 @@ class Controller extends BaseClass
         if (isset($s[0]))
             return $s[0]['value'];
         else
-            return null;
+            return isset($substitute) ? $substitute : null;
     }
     
     public function formatTaxon ($taxon,$ranks=null)
     {
-		
+	
 		if (empty($taxon))
 			return;
 
@@ -1417,7 +1418,7 @@ class Controller extends BaseClass
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
             $name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
-        
+
         // Species
         if ($rankId > GENUS_RANK_ID && count($e) == 2) {
             $name = '<span class="italics">' . $taxon['taxon'] . '</span>';
@@ -1438,7 +1439,6 @@ class Controller extends BaseClass
             return $this->setHybridMarker($name, $rankId, $taxon['is_hybrid']);
         }
         
-        
         // Now we're handling more complicated cases. We need the parent before continuing
         $parent = $this->getTaxonById($taxon['parent_id']);
         // Say goodbye to the orphans
@@ -1446,7 +1446,7 @@ class Controller extends BaseClass
             return $taxon['taxon'];
         }
         $parentAbbreviation = $r[$parent['rank_id']]['abbreviation'];
-        
+       
         // Double infraspecies
         if (count($e) == 4) {
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .

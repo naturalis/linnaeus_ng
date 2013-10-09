@@ -73,7 +73,6 @@ class configuration
 			'urlSplashScreen' => '../../../app/views/linnaeus/splash.php',
 			'lngFileRoot' => $this->_appFileRoot,
             'maxSessionHistorySteps' => 10, 
-            'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(
             ), 
             'directories' => array(

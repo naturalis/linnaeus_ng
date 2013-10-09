@@ -103,6 +103,7 @@ class UtilitiesController extends Controller
 	*/
     public function adminIndexAction ()
     {
+
         $this->checkAuthorisation();
         
         $this->includeLocalMenu = true;
@@ -131,7 +132,7 @@ class UtilitiesController extends Controller
             
             // see if the current user has any rights within the module
             if (isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']]) || $this->isCurrentUserSysAdmin())
-                $modules[$key]['_rights'] = $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
+                $modules[$key]['_rights'] = @$_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()][$mp['controller']];
         }
         
         $freeModules = $this->models->FreeModuleProject->_get(array(
@@ -143,9 +144,12 @@ class UtilitiesController extends Controller
         foreach ((array) $freeModules as $key => $val) {
             
             // see if the current user has any rights within the module
-            if ((isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) && $_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']] === true) ||
-             $this->isCurrentUserSysAdmin())
-                $freeModules[$key]['currentUserRights'] = true;
+            if (
+				(
+					isset($_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']]) && 
+					$_SESSION['admin']['user']['_rights'][$this->getCurrentProjectId()]['_freeModules'][$val['id']] === true
+				) ||  $this->isCurrentUserSysAdmin()
+			) $freeModules[$key]['currentUserRights'] = true;
         }
         
         unset($_SESSION['admin']['user']['freeModules']['activeModule']);

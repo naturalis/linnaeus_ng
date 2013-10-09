@@ -208,43 +208,6 @@ class KeyController extends Controller
 		
 		return 'index_l2_txt';
 
-
-
-
-
-        $type = 'index_l2_pct';
-     	$hasImages=false;   
-        foreach ((array)$choices as $choice) {
-            
-            if (empty($choice['choice_image_params'])) {
-                
-                $type = 'index_l2_txt';
-                break;
-            }
-			
-			$hasImages = $hasImages or !is_null($choice['choice_img']);
-
-        }
-        
-        if ($type == 'index_l2_pct') {
-			// overrides if there aren't any images -> probably imported without media
-			if (!$hasImages) return 'index_l2_txt';
-			return $type;
-		}
-        
-        if (count((array)$choices) > 4) return null;
-        
-        foreach ((array)$choices as $choice) {
-            
-            if (!empty($choice['choice_img'])) {
-                
-                $type = null;
-                break;
-            }
-            
-        }
-        
-        return $type;
     }
 
     public function ajaxInterfaceAction ()

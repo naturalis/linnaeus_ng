@@ -1725,7 +1725,7 @@ class MatrixKeyController extends Controller
         foreach ((array) $mc as $key => $val) {
             
             $d = $this->getCharacteristic(array('id'=>$val['characteristic_id']));
-		
+	
             if ($d) {
 				$d['prefix'] = ($d['type'] == 'media' || $d['type'] == 'text' ? 'c' : 'f');
                 $states = $this->getCharacteristicStates($val['characteristic_id']);

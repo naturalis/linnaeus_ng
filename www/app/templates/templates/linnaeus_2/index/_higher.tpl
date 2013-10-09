@@ -1,4 +1,5 @@
     <div id="content">
+
         {foreach name=taxonloop from=$taxa key=k item=v}
         {if
             ($v.source =='synonym' && $taxonType=='lower') ||

@@ -3,6 +3,7 @@
 include_once ('Controller.php');
 class SpeciesController extends Controller
 {
+	private $_lookupListMaxResults=100;
     public $usedModels = array(
         'content_taxon', 
         'section', 
@@ -21,6 +22,8 @@ class SpeciesController extends Controller
 		'content_free_module',
         'taxa_relations', 
         'variation_relations',
+		'names',
+		'name_types'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -38,37 +41,48 @@ class SpeciesController extends Controller
     );
 
 
+	/* init */
 
-    /**
-     * Constructor, calls parent's constructor
-     *
-     * @access     public
-     */
     public function __construct ()
     {
         parent::__construct();
+		$this->initialise();
 
     }
 
 
-
-    /**
-     * Destroys
-     *
-     * @access     public
-     */
     public function __destruct ()
     {
         parent::__destruct();
     }
 
 
+    private function initialise ()
+    {
 
-    /**
-     * Index of the species module
-     *
-     * @access    public
-     */
+		define('PREDICATE_VALID_NAME',$this->getSetting('predicate_isValidNameOf','isValidNameOf'));
+		define('PREDICATE_PREFERRED_NAME',$this->getSetting('predicate_isPreferredNameOf','isPreferredNameOf'));
+
+        $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+
+    }
+
+
+
+
+	/* public set/get */
+
+    public function setTaxonType ($type)
+    {
+		//public as it needs to be callable from the view
+        $_SESSION['app']['user']['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+    }
+
+
+
+
+	/* public actions */
+	
     public function indexAction ()
     {
         $this->setPageName($this->translate('Species module index'));
@@ -81,12 +95,6 @@ class SpeciesController extends Controller
     }
 
 
-
-    /**
-     * Index of the higher taxa
-     *
-     * @access    public
-     */
     public function higherSpeciesIndexAction ()
     {
         $this->setPageName($this->translate('Higher taxa index'));
@@ -99,12 +107,6 @@ class SpeciesController extends Controller
     }
 
 
-
-    /**
-     * Show a taxon
-     *
-     * @access    public
-     */
     public function taxonAction ()
     {
 
@@ -123,7 +125,7 @@ class SpeciesController extends Controller
             // get categories
             $categories = $this->getCategories(
 				array(
-					'taxon' => $this->requestData['id'], 
+					'taxon' => $taxon['id'], 
 					'allowUnpublished' => $this->isLoggedInAdmin()
 				)
             );
@@ -180,18 +182,20 @@ class SpeciesController extends Controller
                 
                 $this->setPageName(sprintf($this->translate('Higher taxa: "%s" (%s)'), $taxon['label'], $this->getCategoryName($activeCategory)));
             }
-            
+
             if (isset($taxon)) {
                 
                 $this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
                 
-                $this->smarty->assign('taxon', $taxon);
+                $this->smarty->assign('taxon',$taxon);
+
+                $this->smarty->assign('names',$this->getNames($taxon['id']));
                 
                 $this->smarty->assign('content', $content);
-                
+
                 $this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
                 
-                $this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
+                $this->smarty->assign('adjacentItems', $this->getAdjacentTaxa($taxon['id']));
            
             }
             
@@ -217,8 +221,34 @@ class SpeciesController extends Controller
     }
 
 
+    public function ajaxInterfaceAction ()
+    {
+		$return='error';
+        
+        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
+            
+            $return=$this->getLookupList($this->requestData);
+			
+        }
+        else 
+		if ($this->rHasVal('action', 'get_media_info') && !empty($this->requestData['id'])) {
+            
+			$return=json_encode($this->getTaxonMedia(null, $this->requestData['id']));
+
+        }
+        
+        $this->allowEditPageOverlay = false;
+		
+		$this->smarty->assign('returnText',$return);
+        
+        $this->printPage();
+    }
+
+	
     public function taxonOverviewAction ()
     {
+		
+		//sec overview of taxon without header, menu's etc (created for dierenzoeker, fetched through ajax)
 
         if ($this->rHasId()) {
 			
@@ -333,7 +363,7 @@ class SpeciesController extends Controller
 			$this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
                 
 			if (!$this->rHasVal('navigation',false))
-				$this->smarty->assign('adjacentItems', $this->getAdjacentItems($taxon['id']));
+				$this->smarty->assign('adjacentItems', $this->getAdjacentTaxa($taxon['id']));
            
             $this->smarty->assign('categoryList', $categories['categoryList']);
 
@@ -376,84 +406,19 @@ class SpeciesController extends Controller
 
 
 
-    public function ajaxInterfaceAction ()
-    {
-        if (!$this->rHasVal('action'))
-            $this->smarty->assign('returnText', 'error');
-        
-        if ($this->rHasVal('action', 'get_lookup_list') && !empty($this->requestData['search'])) {
-            
-            $this->getLookupList($this->requestData);
-        }
-        else if (!$this->rHasVal('action') || !$this->rHasId()) {
-            
-            $this->smarty->assign('returnText', 'error');
-        }
-        else if ($this->rHasVal('action', 'get_media_info')) {
-            
-            $this->smarty->assign('returnText', json_encode($this->getTaxonMedia(null, $this->requestData['id'])));
-        }
-        
-        $this->allowEditPageOverlay = false;
-        
-        $this->printPage();
-    }
 
 
 
-    private function getFirstTaxonId ()
-    {
-        $taxa = $this->buildTaxonTree();
-        
-        if (empty($taxa))
-            return null;
 
-        $d = current($taxa);
-        
-		while ($d['lower_taxon'] == ($this->getTaxonType() == 'higher' ? 1 : 0)) {
+	/* private set/get */
 
-			$d = next($taxa);
-		}
-            
-		return $d['id'];
-    }
-
-
-
-    private function _indexAction ()
-    {
-        if (!$this->rHasVal('id')) {
-            
-            $id = $this->getFirstTaxonId();
-
-        }
-        else {
-            
-            $id = $this->requestData['id'];
-        }
-        
-        $this->setStoreHistory(false);
-        
-        $this->redirect('taxon.php?id=' . $id);
-    }
-
-
-
-    public function setTaxonType ($type)
-    {
-        $_SESSION['app']['user']['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
-    }
-
-
-
-    private function getTaxonType ()
+    private function getTaxonType()
     {
         return isset($_SESSION['app']['user']['species']['type']) ? $_SESSION['app']['user']['species']['type'] : 'lower';
     }
 
 
-
-    private function setControllerBaseName ()
+    private function setControllerBaseName()
     {
         if ($this->getTaxonType() == 'higher')
             $this->controllerBaseName = 'highertaxa';
@@ -461,9 +426,145 @@ class SpeciesController extends Controller
             $this->controllerBaseName = 'species';
     }
 
+    private function setLastViewedTaxonIdForTheBenefitOfTheMapkey($id)
+    {
+        if (!is_null($id)) {
+            
+            $_SESSION['app']['user']['species']['lastTaxon'] = $id;
+            
+            unset($_SESSION['app']['user']['mapkey']['state']);
+        }
+        else {
+            
+            unset($_SESSION['app']['user']['species']['lastTaxon']);
+        }
+    }
 
 
-    private function getCategories ($p=null)
+    private function getlastVisitedCategory($taxon,$category)
+    {
+		
+		if (!$this->useCache)
+			return false;
+		
+        if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
+            return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
+        }
+        
+        if (isset($_SESSION['app']['user']['species']['last_visited'])) {
+            
+            $storedTaxon = key($_SESSION['app']['user']['species']['last_visited']);
+            if ($storedTaxon != $taxon) {
+                unset($_SESSION['app']['user']['species']['last_visited'][$storedTaxon]);
+            }
+        }
+        
+        return false;
+    }
+
+
+    private function setlastVisitedCategory($taxon,$category,$d)
+    {
+        $_SESSION['app']['user']['species']['last_visited'][$taxon][$category] = $d;
+    }
+
+
+    private function getFirstTaxonId()
+    {
+
+        $t = $this->models->Taxon->freeQuery(
+        array(
+			'query' => '
+				select _a.id
+				from %PRE%taxa _a 
+				left join %PRE%projects_ranks _b on _a.rank_id=_b.id
+				left join %PRE%ranks _c on _b.rank_id=_c.id
+				where _a.project_id = '.$this->getCurrentProjectId().'
+				and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
+				order by _a.taxon_order, _a.taxon
+				limit 1'
+        ));
+
+		return isset($t) ? $t[0]['id'] : null;
+    }
+	
+	
+	private function getAdjacentTaxa($id)
+    {
+
+		if (!isset($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()])) {
+
+			$_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()]=
+				$this->models->Taxon->freeQuery(
+					array(
+						'query' => '
+							select _a.id,_a.taxon
+							from %PRE%taxa _a 
+							left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
+							where _a.project_id = '.$this->getCurrentProjectId().'
+							and _b.lower_taxon = '.($this->getTaxonType() == 'higher' ? 0 : 1).'
+							order by _a.taxon_order, _a.taxon
+							'
+					));
+
+		}
+
+		$prev=$next=false;
+		while (list ($key, $val) = each($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()])) {
+
+			if ($val['id']==$id) {
+
+				// current = next because the pointer has already shifted forward
+				$next = current($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()]);
+
+				return array(
+					'prev' => $prev!==false ? array(
+						'id' => $prev['id'], 
+						'label' => $prev['taxon']
+					) : null, 
+					'next' => $next!==false ? array(
+						'id' => $next['id'], 
+						'label' => $next['taxon']
+					) : null
+				);
+			}
+			
+			$prev=$val;
+            
+		}
+
+        return null;
+    }
+
+
+    private function getTaxonNextLevel($id)
+    {
+        $t = $this->models->Taxon->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'parent_id' => $id
+            ), 
+            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author', 
+            'fieldAsIndex' => 'id', 
+            'order' => 'taxon_order,id'
+        ));
+        
+        foreach ((array) $t as $key => $val) {
+            
+            $t[$key]['label'] = $this->formatTaxon($val);
+            
+            $names = $this->getTaxonCommonNames($val['id'], $this->getCurrentLanguageId());
+            
+            if (isset($names[0]['commonname']))
+                $t[$key]['commonname'] = $names[0]['commonname'];
+        }
+        
+        return $t;
+    }
+
+
+    private function getCategories($p=null)
     {
 		
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -588,8 +689,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getCategoryName ($id)
+    private function getCategoryName($id)
     {
 		if (is_numeric($id)) {
 			
@@ -625,8 +725,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonContent ($p=null)
+    private function getTaxonContent($p=null)
     {
 		
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
@@ -677,12 +776,10 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonMedia ($taxon = null, $id = null, $inclOverviewImage = false)
+    private function getTaxonMedia($taxon=null,$id=null,$inclOverviewImage=false)
     {
-		
 
-        if ($mt = $this->getTaxonCategoryLastVisited($taxon, 'media'))
+        if ($mt = $this->getlastVisitedCategory($taxon, 'media'))
             return $mt;
         
         $d = array(
@@ -744,16 +841,15 @@ class SpeciesController extends Controller
         
         $this->customSortArray($mt, $sortBy);
         
-        $this->setlastVisited($taxon, 'media', $mt);
+        $this->setlastVisitedCategory($taxon, 'media', $mt);
         
         return $mt;
     }
 
 
-
-    private function getTaxonLiterature ($tId)
+    private function getTaxonLiterature($tId)
     {
-        if ($refs = $this->getTaxonCategoryLastVisited($tId, 'literature'))
+        if ($refs = $this->getlastVisitedCategory($tId, 'literature'))
             return $refs;
         
         $lt = $this->models->LiteratureTaxon->_get(array(
@@ -817,16 +913,15 @@ class SpeciesController extends Controller
         
         $this->customSortArray($refs, $sortBy);
         
-        $this->setlastVisited($tId, 'literature', $refs);
+        $this->setlastVisitedCategory($tId, 'literature', $refs);
         
         return $refs;
     }
 
 
-
-    private function getTaxonNames ($tId)
+    private function getTaxonNames($tId)
     {
-        if ($names = $this->getTaxonCategoryLastVisited($tId, 'names'))
+        if ($names = $this->getlastVisitedCategory($tId, 'names'))
             return $names;
         
         $names = array(
@@ -834,14 +929,13 @@ class SpeciesController extends Controller
             'common' => $this->getTaxonCommonNames($tId)
         );
         
-        $this->setlastVisited($tId, 'names', $names);
+        $this->setlastVisitedCategory($tId, 'names', $names);
         
         return $names;
     }
 
 
-
-    private function getTaxonSynonyms ($tId)
+    private function getTaxonSynonyms($tId)
     {
         $s = $this->models->Synonym->_get(array(
             'id' => array(
@@ -863,8 +957,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonCommonNames ($tId, $languageId = null)
+    private function getTaxonCommonNames($tId, $languageId = null)
     {
         $d = array(
             'project_id' => $this->getCurrentProjectId(), 
@@ -924,8 +1017,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getReference ($id)
+    private function getReference($id)
     {
         $l = $this->models->Literature->_get(
         array(
@@ -949,8 +1041,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getContentCount ($id)
+    private function getContentCount($id)
     {
         return array(
             'names' => $this->getTaxonSynonymCount($id) + $this->getTaxonCommonnameCount($id), 
@@ -960,8 +1051,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonSynonymCount ($id)
+    private function getTaxonSynonymCount($id)
     {
         $s = $this->models->Synonym->_get(
         array(
@@ -976,8 +1066,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonCommonnameCount ($id)
+    private function getTaxonCommonnameCount($id)
     {
         $c = $this->models->Commonname->_get(
         array(
@@ -992,8 +1081,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonMediaCount ($id)
+    private function getTaxonMediaCount($id)
     {
         $mt = $this->models->MediaTaxon->_get(
         array(
@@ -1008,8 +1096,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getTaxonLiteratureCount ($id)
+    private function getTaxonLiteratureCount($id)
     {
         $lt = $this->models->LiteratureTaxon->_get(
         array(
@@ -1024,56 +1111,7 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getAdjacentItems ($id)
-    {
-        $taxa = $this->buildTaxonTree();
-        
-        $d = array();
-        
-        while (list ($key, $val) = each($taxa)) {
-            
-            if (($this->getTaxonType() == 'higher' && $val['lower_taxon'] == 0) || ($this->getTaxonType() == 'lower' && $val['lower_taxon'] == 1)) {
-                $d[$key] = $val;
-            }
-        }
-        
-        $taxa = $d;
-        
-        if ($taxa && !empty($taxa)) {
-            
-            reset($taxa);
-            
-            $prev = $next = false;
-            
-            while (list ($key, $val) = each($taxa)) {
-                
-                if ($key == $id) {
-                    
-                    $next = current($taxa); // current = next because the pointer has already shifted forward
-
-                    return array(
-                        'prev' => $prev!==false ? array(
-                            'id' => $prev['id'], 
-                            'label' => $prev['taxon']
-                        ) : null, 
-                        'next' => $next!==false ? array(
-                            'id' => $next['id'], 
-                            'label' => $next['taxon']
-                        ) : null
-                    );
-                }
-                
-                $prev = $val;
-            }
-        }
-        
-        return null;
-    }
-
-
-
-    private function getTaxonOverviewImage ($id)
+    private function getTaxonOverviewImage($id)
     {
         $mt = $this->models->MediaTaxon->_get(
         array(
@@ -1091,155 +1129,53 @@ class SpeciesController extends Controller
     }
 
 
-
-    private function getLookupList ($p)
+    private function getLookupList($p)
     {
+
         $search = isset($p['search']) ? $p['search'] : null;
         $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
         $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
-        
-        $search = str_replace(array(
-            '/', 
-            '\\'
-        ), '', $search);
-        
+
         if (empty($search) && !$getAll)
             return;
+
+		$regexp = ($matchStartOnly?'^':'').preg_quote($search);
         
-        if ($matchStartOnly)
-            $regexp = '/^' . preg_quote($search) . '/i';
-        else
-            $regexp = '/' . preg_quote($search) . '/i';
-        
-        $l = array();
-        
-        $taxa = $this->buildTaxonTree();
+        $taxa = $this->models->Taxon->freeQuery(
+			array(
+				'query' => "
+					select _a.id, _a.taxon
+					from %PRE%taxa _a 
+					left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
+					where _a.project_id = ".$this->getCurrentProjectId()."
+					and _b.lower_taxon = ".($this->getTaxonType() == 'higher' ? 0 : 1)."
+					".($getAll ? "" : "and _a.taxon REGEXP '".$regexp."'")."
+					limit ".$this->_lookupListMaxResults
+			));
 
         foreach ((array) $taxa as $key => $val) {
+			$taxa[$key]['label'] = $this->formatTaxon($val);
+			unset($taxa[$key]['taxon']);
+		}
 
-            if (($getAll || preg_match($regexp, $val['taxon']) == 1) && ($this->getTaxonType() == 'higher' ? $val['lower_taxon'] == 0 : $val['lower_taxon'] == 1))
-                $l[] = array(
-                    'id' => $val['id'], 
-                    'label' => $val['label']
-                );
-        }
-        
-
-
-        $this->smarty->assign(
-			'returnText', 
-			$this->makeLookupList(
-				$l, 
-				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
-				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
-			)
-		);
-    }
-
-
-
-    private function setLastViewedTaxonIdForTheBenefitOfTheMapkey ($id)
-    {
-        if (!is_null($id)) {
-            
-            $_SESSION['app']['user']['species']['lastTaxon'] = $id;
-            
-            unset($_SESSION['app']['user']['mapkey']['state']);
-        }
-        else {
-            
-            unset($_SESSION['app']['user']['species']['lastTaxon']);
-        }
-    }
-
-
-
-    private function getTaxonCategoryLastVisited ($taxon, $category)
-    {
-		
-		if (!$this->useCache)
-			return false;
-		
-        if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
-            return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
-        }
-        
-        if (isset($_SESSION['app']['user']['species']['last_visited'])) {
-            
-            $storedTaxon = key($_SESSION['app']['user']['species']['last_visited']);
-            if ($storedTaxon != $taxon) {
-                unset($_SESSION['app']['user']['species']['last_visited'][$storedTaxon]);
-            }
-        }
-        
-        return false;
-    }
-
-
-
-    private function setlastVisited ($taxon, $category, $d)
-    {
-        $_SESSION['app']['user']['species']['last_visited'][$taxon][$category] = $d;
-    }
-
-
-
-    private function getTaxonNextLevel ($id)
-    {
-        $t = $this->models->Taxon->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'parent_id' => $id
-            ), 
-            'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty,author', 
-            'fieldAsIndex' => 'id', 
-            'order' => 'taxon_order,id'
-        ));
-        
-        foreach ((array) $t as $key => $val) {
-            
-            $t[$key]['label'] = $this->formatTaxon($val);
-            
-            $names = $this->getTaxonCommonNames($val['id'], $this->getCurrentLanguageId());
-            
-            if (isset($names[0]['commonname']))
-                $t[$key]['commonname'] = $names[0]['commonname'];
-        }
-        
-        return $t;
-    }
-
-
-	public function findByNameAction()
-	{
-	
-		//RewriteEngine on
-		//RewriteRule ^p/([\d]+)/([^/\.]+)/?$ /linnaeus_ng/app/views/species/find_by_name.php?epi=$1&name=$2
-		
-		$base = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/';
-		
-		$name = trim($this->requestData['name']);
-		
-		if (empty($name))
-			$this->redirect($base.'index.php');
-		
-		// try literal
-		$t = $this->models->Taxon->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'taxon' => $name
-			), 
-			'columns' => 'id'
+        $this->customSortArray($taxa, array(
+            'key' => 'label', 
+            'dir' => 'asc', 
+            'case' => 'i'
 		));
 
-		if ($t)
-			$this->redirect($base.'taxon.php?epi='.$this->requestData['epi'].'&id='.$t[0]['id']);
-	
+
+
+		return $this->makeLookupList(
+				$taxa, 
+				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
+			);
+    
 	}
 	
 
-    private function getRelatedEntities ($p)
+    private function getRelatedEntities($p)
     {
         $tId = isset($p['tId']) ? $p['tId'] : null;
         $vId = isset($p['vId']) ? $p['vId'] : null;
@@ -1307,5 +1243,207 @@ class SpeciesController extends Controller
         
         return $rel;
     }
+	
+	
+	private function getNames($id)
+	{
+
+        $names=$this->models->Names->freeQuery(
+			array(
+				'query' => '
+					select _a.id, _a.name,_a.uninomial,_a.specific_epithet,_a.name_author,_a.authorship_year,_a.reference,
+					_a.reference_id,_a.reference_id,_a.expert,_a.expert_id,_a.organisation,_a.organisation_id, _b.nametype,
+					_a.language_id,_c.language,_d.label as language_label
+					from %PRE%names _a 
+					left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id = _b.project_id
+					left join %PRE%languages _c on _a.language_id=_c.id
+					left join %PRE%labels_languages _d on _a.language_id=_d.language_id
+						and _d.label_language_id='.$this->getDefaultLanguageId().'
+					where _a.project_id = '.$this->getCurrentProjectId().'
+					and _a.taxon_id='.$id,
+				'fieldAsIndex' => 'id'
+			)
+		);
+		
+		$sci=$pref=null;
+
+		foreach((array)$names as $key=>$val) {
+			if ($val['nametype']==PREDICATE_VALID_NAME)
+				$sci=$key;
+			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
+				$pref=$key;
+		}
+
+		return array(
+			'sciId'=>$sci,
+			'prefId'=>$pref,
+			'list'=>$names
+		);
+		
+	}
+
+
+
+	/* private other */
+	
+    private function _indexAction ()
+    {
+        if (!$this->rHasVal('id')) {
+
+            $id = $this->getFirstTaxonId();
+
+        }
+        else {
+            
+            $id = $this->requestData['id'];
+        }
+        
+        $this->setStoreHistory(false);
+		
+        $this->redirect('taxon.php?id=' . $id);
+    }
+
+
+	public function findByNameAction()
+	{
+	
+		//RewriteEngine on
+		//RewriteRule ^p/([\d]+)/([^/\.]+)/?$ /linnaeus_ng/app/views/species/find_by_name.php?epi=$1&name=$2
+		
+		$base = $this->baseUrl.$this->appName.'/views/'.$this->controllerBaseName.'/';
+		
+		$name = trim($this->requestData['name']);
+		
+		if (empty($name))
+			$this->redirect($base.'index.php');
+		
+		// try literal
+		$t = $this->models->Taxon->_get(array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'taxon' => $name
+			), 
+			'columns' => 'id'
+		));
+
+		if ($t)
+			$this->redirect($base.'taxon.php?epi='.$this->requestData['epi'].'&id='.$t[0]['id']);
+	
+	}
+	
 
 }
+
+/*
+	//i remember when we still had trees around here:
+    private function getFirstTaxonId ()
+    {
+        $taxa = $this->buildTaxonTree();
+        
+        if (empty($taxa))
+            return null;
+
+        $d = current($taxa);
+        
+		while ($d['lower_taxon'] == ($this->getTaxonType() == 'higher' ? 1 : 0)) {
+
+			$d = next($taxa);
+		}
+            
+		return $d['id'];
+
+    }
+
+	private function getAdjacentItems ($id)
+    {
+		
+        $taxa = $this->buildTaxonTree();
+        
+        $d = array();
+        
+        while (list ($key, $val) = each($taxa)) {
+            
+            if (($this->getTaxonType() == 'higher' && $val['lower_taxon'] == 0) || ($this->getTaxonType() == 'lower' && $val['lower_taxon'] == 1)) {
+                $d[$key] = $val;
+            }
+        }
+        
+        $taxa = $d;
+        
+        if ($taxa && !empty($taxa)) {
+            
+            reset($taxa);
+            
+            $prev = $next = false;
+            
+            while (list ($key, $val) = each($taxa)) {
+                
+                if ($key == $id) {
+                    
+                    $next = current($taxa); // current = next because the pointer has already shifted forward
+
+                    return array(
+                        'prev' => $prev!==false ? array(
+                            'id' => $prev['id'], 
+                            'label' => $prev['taxon']
+                        ) : null, 
+                        'next' => $next!==false ? array(
+                            'id' => $next['id'], 
+                            'label' => $next['taxon']
+                        ) : null
+                    );
+                }
+                
+                $prev = $val;
+            }
+        }
+        
+        return null;
+    }
+
+    private function getLookupList($p)
+    {
+        $search = isset($p['search']) ? $p['search'] : null;
+        $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
+        $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
+        
+        $search = str_replace(array(
+            '/', 
+            '\\'
+        ), '', $search);
+        
+        if (empty($search) && !$getAll)
+            return;
+        
+        if ($matchStartOnly)
+            $regexp = '/^' . preg_quote($search) . '/i';
+        else
+            $regexp = '/' . preg_quote($search) . '/i';
+        
+        $l = array();
+        
+        $taxa = $this->buildTaxonTree();
+
+        foreach ((array) $taxa as $key => $val) {
+
+            if (($getAll || preg_match($regexp, $val['taxon']) == 1) && ($this->getTaxonType() == 'higher' ? $val['lower_taxon'] == 0 : $val['lower_taxon'] == 1))
+                $l[] = array(
+                    'id' => $val['id'], 
+                    'label' => $val['label']
+                );
+        }
+        
+
+
+        $this->smarty->assign(
+			'returnText', 
+			$this->makeLookupList(
+				$l, 
+				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
+				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
+			)
+		);
+    }
+	
+
+*/

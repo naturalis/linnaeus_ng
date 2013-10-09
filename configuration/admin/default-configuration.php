@@ -95,11 +95,11 @@ class configuration
             'maxSessionHistorySteps' => 10, 
             'heartbeatFrequency' => 30000,  // milliseconds
             'autoSaveFrequency' => 300000,  // milliseconds
-            'controllerIndexNameExtension' => '-index.php', 
             'paths' => array(
                 'login' => '/views/users/login.php', 
                 'logout' => '/views/users/logout.php', 
                 'chooseProject' => '/views/users/choose_project.php', 
+                'projectIndex' => '/views/utilities/admin_index.php', 
                 'notAuthorized' => '/views/utilities/not_authorized.php', 
                 'moduleNotPresent' => '/views/utilities/module_not_present.php',
                 'mediaBasePath' => '../../../shared/media/project', 
