@@ -198,8 +198,20 @@ class KeyController extends Controller
 						  even if there is some
 		
 		*/
+
+        foreach ((array)$choices as $choice) {
+            
+            if (!empty($choice['choice_image_params']))
+                return 'index_l2_pct';
+	
+        }
 		
-        
+		return 'index_l2_txt';
+
+
+
+
+
         $type = 'index_l2_pct';
      	$hasImages=false;   
         foreach ((array)$choices as $choice) {
