@@ -3546,7 +3546,7 @@ class ImportL2Controller extends Controller
         
 		//echo ':'.$t.':';
 		
-        // ??? HAVE ONLY SEEN Long Text, Text & Picture
+        // ??? HAVE ONLY SEEN Long Text, Text & Picture & sound
         switch ($t) {
             case 'Long Text':
             case 'Text':
@@ -3556,6 +3556,7 @@ class ImportL2Controller extends Controller
                 return 'distribution';
                 break;
             case 'Picture':
+            case 'Sound':
                 return 'media';
                 break;
             case 'Range':
