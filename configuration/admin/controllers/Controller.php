@@ -84,7 +84,9 @@ class Controller extends BaseClass
     public function __construct ()
     {
         parent::__construct();
-        
+
+
+
         $this->setTimeZone();
         
         $this->setDebugMode();
@@ -593,20 +595,22 @@ class Controller extends BaseClass
     public function getLoginStartPage ($includeDomain = false)
     {
         if (!empty($_SESSION['admin']['login_start_page'])) {
+
+            $script=$_SESSION['admin']['login_start_page'];
+
+        } else {
+
+			$script=$this->baseUrl.$this->getAppName();
             
-            return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '') . $_SESSION['admin']['login_start_page'];
+			if (isset($_SESSION['admin']['user']) && $_SESSION['admin']['user']['_number_of_projects'] == 1)
+				$script.=$this->generalSettings['paths']['projectIndex'];
+			else
+				$script.=$this->generalSettings['paths']['chooseProject'];
+
         }
-        else {
-            
-            if (isset($_SESSION['admin']["user"]) && $_SESSION['admin']["user"]["_number_of_projects"] == 1) {
-                
-                return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '') . $this->baseUrl . $this->getAppName() . '/' . $this->getAppName() . $this->generalSettings['controllerIndexNameExtension'];
-            }
-            else {
-                
-                return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '') . $this->baseUrl . $this->appName . $this->generalSettings['paths']['chooseProject'];
-            }
-        }
+
+		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
+		
     }
 
 
@@ -1761,7 +1765,7 @@ class Controller extends BaseClass
 				$p['order'] = 'taxon';
 	
             $d = $this->models->Taxon->_get($p);
-    
+
             foreach((array)$d as $val) {
     
                 $this->tmp[$val['parent_id']][$val['id']] = $val;
@@ -1769,7 +1773,7 @@ class Controller extends BaseClass
             }
     
         }
-    
+
         return isset($this->tmp[$id]) ? $this->tmp[$id] : null;
     
     }
@@ -1881,7 +1885,7 @@ class Controller extends BaseClass
     public function newGetUserAssignedTaxonTreeList ($p = null)
     {
         $this->newGetUserAssignedTaxonTree($p);
-        
+
         if (!isset($this->treeList))
             return null;
 
@@ -2188,8 +2192,13 @@ class Controller extends BaseClass
         
         
         // Now we're handling more complicated cases. We need the parent before continuing
+        // say goodbye to the orphans
+		if (empty($taxon['parent_id'])) {
+            return $taxon['taxon'];
+        }
+
         $parent = $this->getTaxonById($taxon['parent_id']);
-        // Say goodbye to the orphans
+        // say goodbye to the misguided orphans
         if (empty($parent['rank_id'])) {
             return $taxon['taxon'];
         }

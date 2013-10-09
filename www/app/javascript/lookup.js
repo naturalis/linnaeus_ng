@@ -42,6 +42,7 @@ var allLookupSuppressKeyNavigation = false;
 var allLookupSelectedId = null;
 var allLookupIndicateSelectedId = false;
 var allLookupSelectedElement = null;
+var allLookupAlwaysFetch=false; // suppresses local storage of initial results
 
 function allLookupGetData(text,getAll) {
 
@@ -56,7 +57,7 @@ function allLookupGetData(text,getAll) {
 
 	allLookupDataShowLoading();
 
-	if (allLookupData==null) {
+	if (allLookupData==null || allLookupAlwaysFetch) {
 
 		$.ajax({
 			url : allLookupContentUrl,

@@ -150,6 +150,7 @@ class SpeciesController extends Controller
      */
     public function indexAction ()
     {
+		
         unset($_SESSION['admin']['system']['activeTaxon']);
         
         if ($this->rHasVal('higher', '1')) {
@@ -173,9 +174,9 @@ class SpeciesController extends Controller
         else {
             
             unset($_SESSION['admin']['system']['highertaxa']);
-            
+
             $d = $this->newGetUserAssignedTaxonTreeList();
-            
+
             foreach ((array) $d as $val) {
                 
                 if ($val['lower_taxon'] == 1) {
@@ -196,7 +197,7 @@ class SpeciesController extends Controller
             $this->redirect('collaborators.php');
         }
         else {
-            
+
             $this->redirect('taxon.php?id=' . $d['id']);
         }
     }

@@ -2,7 +2,7 @@
 
 /*
 
-	we are now doing LIKE instead of MATCH (as MATCH ignores wildcards at the beginning: *olar only matches olar, not polar)  - do the same limitations still apply? think not.
+	we are now doing LIKE instead of MATCH (as MATCH ignores wildcards at the beginning: *olar only matches olar, not polar) - do the same limitations still apply? think not.
 
 	flow:
 

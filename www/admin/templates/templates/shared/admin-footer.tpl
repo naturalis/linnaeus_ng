@@ -7,7 +7,7 @@
 <div id="allLookupList" class="allLookupList"></div>
 
 {if $userSearch}
-<div id="search-float" style="width:350px;height:450px;overflow-y:scroll;overflow-x:hidden;border:1px solid #666;background-color:#fff;position:absolute">
+<div id="search-float" style="width:350px;height:450px;overflow-y:scroll;overflow-x:hidden;border:1px solid #666;background-color:#fff;position:absolute;visibility:hidden">
 	<div id="search-float-header" style="width:100%;background-color:#eee;padding:10px 4px 10px 4px;cursor:move;">search: <span class="searched-term">{$userSearch.term}</span></div>
 	<div id="werwerwerwe" style="padding:4px;">
 	{foreach from=$userSearch.results.data item=v}
@@ -53,6 +53,7 @@ $(document).ready(function(){
 			$('#search-float').css({top:pos[0]+'px',left:pos[1]+'px'});
 		}
 		var pos=allGetSomething('search-float-position',positionSearchFloat);
+		$('#search-float').css('visibility','visible');
 
 		$('#search-float').draggable({stop: function(event, ui) {
 			var pos = $(this).position();
