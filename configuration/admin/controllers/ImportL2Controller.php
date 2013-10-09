@@ -4372,31 +4372,19 @@ class ImportL2Controller extends Controller
         if ($type == 'image') {
             
             $_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
-            
-            return '<span
-				class="inline-image" 
-				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
-             '</span>';
+            return '<span class="inline-image" onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">'.$label.'</span>';
 
         }
         else if ($type == 'movie') {
             
             $_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
-            
-            return '<span
-				class="inline-video" 
-				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
-             '</span>';
+            return '<span class="inline-video" onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">'.$label.'</span>';
 
         }
         else if ($type == 'sound') {
             
             $_SESSION['admin']['system']['import']['embeddedMedia'][md5($filename)] = $filename;
-            
-            return '<span
-				class="inline-audio" 
-				onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">' . $label .
-             '</span>';
+            return '<span class="inline-audio" onclick="showMedia(\'' . $_SESSION['admin']['system']['import']['paths']['media_url'] . $filename . '\',\'' . addslashes($label) . '\');">'.$label.'</span>';
             
         }
         else
