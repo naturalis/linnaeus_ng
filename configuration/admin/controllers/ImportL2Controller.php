@@ -1956,6 +1956,10 @@ class ImportL2Controller extends Controller
 			if (stripos($line,'Type species')!==false)
 				continue;
 
+			// ignoring inline Common name headers
+			if (stripos($line,'Common names')!==false)
+				continue;
+
 			// Common names: if they end with a valid Dutch or English language name in brackets (straight or curved) ("Dansemyg (Danish)")
 			if (preg_match('/(.*)((\(|\[)([a-zA-Z-\/]*)(\)|\]))$/',$line,$m)==1) {
 
