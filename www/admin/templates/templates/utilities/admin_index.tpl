@@ -50,7 +50,7 @@
 	{/if}
     </table>
 
-    <form method="post" id="freeForm" action="views/module/">
+    <form method="post" id="freeForm" action="../module/">
     <input type="hidden" id="freeId" name="freeId" value="" />
     </form>
 {if $currentUserRole<=2 || $isSysAdmin}
