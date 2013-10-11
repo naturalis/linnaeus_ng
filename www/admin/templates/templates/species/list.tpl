@@ -42,8 +42,8 @@
                     {if $taxon.is_hybrid==1}<span class="taxon-hybrid-x">x</span>{/if}
                 {/if}
 			</td>
-			<td>
-				<a href="taxon.php?id={$taxon.id}">{$contentCount[$taxon.id].pctFinished}%</a>
+			<td style="text-align:right">
+				<a href="taxon.php?id={$taxon.id}">{if $contentCount[$taxon.id].pctFinished}{$contentCount[$taxon.id].pctFinished}{else}0{/if}%</a>
 			</td>
 			<td ondblclick="window.open('media.php?id={$taxon.id}','_self');">
 				<a type="media" href="media.php?id={$taxon.id}">{if $mediaCount[$taxon.id]}{$mediaCount[$taxon.id]}{else}0{/if}</a>
