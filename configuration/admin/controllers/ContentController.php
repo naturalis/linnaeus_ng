@@ -159,7 +159,7 @@ class ContentController extends Controller
 
 		$this->smarty->assign('subjects', $this->_subjects);
 
-		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+		$this->smarty->assign('languages', $this->getProjectLanguages());
 
 		$this->smarty->assign('activeLanguage', $_SESSION['admin']['project']['default_language_id']);
 

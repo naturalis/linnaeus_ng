@@ -44,7 +44,8 @@ class SearchController extends Controller
 		'characteristic_matrix',
 		'characteristic_label_state',
 		'characteristic_state',
-		'occurrence_taxon'
+		'occurrence_taxon',
+		'names'
     );
 
     public $usedHelpers = array(
@@ -68,9 +69,7 @@ class SearchController extends Controller
      */
     public function __construct($p=null)
     {
-
        parent::__construct($p);
-
     }
 
     /**
@@ -80,11 +79,9 @@ class SearchController extends Controller
      */
     public function __destruct ()
     {
-        
         parent::__destruct();
-    
     }
-
+	
     public function searchAction()
 	{
 	
@@ -317,18 +314,21 @@ class SearchController extends Controller
 	private function doSearch($search)
 	{
 
-		$species = $this->searchSpecies($search);
+		$species = 
+			($this->doesProjectHaveModule(MODCODE_SPECIES) || $this->doesProjectHaveModule(MODCODE_HIGHERTAXA)) ?
+				 $this->searchSpecies($search) :
+				 null;
 
 		return array(
-			'species' => $species,
-			'modules' => $this->searchModules($search),
-			'dichkey' => $this->searchDichotomousKey($search),
-			'literature' => $this->searchLiterature($search),
-			'glossary' => $this->searchGlossary($search),
-			//'matrixkey' => $this->searchMatrixKey($search),
-			'content' => $this->searchContent($search),
-			'introduction' => $this->searchIntroduction($search),
-			'map' => $this->searchMap($species)
+			'species' 		=> $species,
+			'modules' 		=> $this->searchModules($search),
+			'dichkey' 		=> ($this->doesProjectHaveModule(MODCODE_KEY) ? $this->searchDichotomousKey($search) : null),
+			'literature' 	=> ($this->doesProjectHaveModule(MODCODE_LITERATURE) ? $this->searchLiterature($search) : null),
+			'glossary' 		=> ($this->doesProjectHaveModule(MODCODE_GLOSSARY) ? $this->searchGlossary($search) : null),
+			//'matrixkey'		=> ($this->doesProjectHaveModule(MODCODE_MATRIXKEY) ? $this->searchMatrixKey($search) : null),
+			'content' 		=> ($this->doesProjectHaveModule(MODCODE_CONTENT) ? $this->searchContent($search) : null),
+			'introduction'	=> ($this->doesProjectHaveModule(MODCODE_INTRODUCTION) ? $this->searchIntroduction($search) : null),
+			'map' 			=> ($this->doesProjectHaveModule(MODCODE_DISTRIBUTION) && !empty($species) ? $this->searchMap($species) : null)
 			
 		);
 
@@ -636,7 +636,7 @@ class SearchController extends Controller
 	private function searchSpecies($search,$extensive=true)
 	{
 	
-		$taxa = $synonyms = $commonnames = $content = $media = array();
+		$taxa = $synonyms = $commonnames = $content = $media = $names = array();
 
 		$ranks = $this->getProjectRanks();
 
@@ -648,6 +648,10 @@ class SearchController extends Controller
 		
 		$synonyms = $this->_searchSpeciesGetSynonyms($search,$taxa);
 		$commonnames = $this->_searchSpeciesGetCommonnames($search,$taxa);
+		
+		if (isset($this->models->Names)) {
+			$names = $this->_searchSpeciesGetNames($search,$taxa);
+		}
 
 		if ($extensive) {
 
@@ -656,35 +660,41 @@ class SearchController extends Controller
 
 		}
 
-		return array(
+		$results = array(
 			'results' => array(
 				array(
 					'label' => $this->translate('Higher taxa'),
+					'syslabel' => 'higher_taxa',
 					'data' => $higherTaxa,
 					'numOfResults' => count((array)$higherTaxa)
 				),
 				array(
-					'label' => $this->translate('Species names'), // when changing the label 'Species names', do the same in searchMap()
+					'label' => $this->translate('Species names'),
+					'syslabel' => 'species_names',
 					'data' => $species, //$taxa,
 					'numOfResults' => count((array)$species)//count((array)$taxa)
 				),
 				array(
 					'label' => $this->translate('Species descriptions'),
+					'syslabel' => 'species_descriptions',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				),
 				array(
 					'label' => $this->translate('Species synonyms'),
+					'syslabel' => 'species_synonyms',
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
 					'label' => $this->translate('Species common names'),
+					'syslabel' => 'species_common_names',
 					'data' => $commonnames,
 					'numOfResults' => count((array)$commonnames)
 				),
 				array(
 					'label' => $this->translate('Species media'),
+					'syslabel' => 'species_media',
 					'data' => $media,
 					'numOfResults' => count((array)$media)
 				),
@@ -705,6 +715,20 @@ class SearchController extends Controller
 				(count((array)$media) > 0 ? 1 : 0)
 			
 		);
+
+		if (isset($this->models->Names)) {
+			$results['results'][]=
+				array(
+					'label' => $this->translate('Taxon names'),
+					'syslabel' => 'taxon_names',
+					'data' => $names,
+					'numOfResults' => count((array)$names)
+				);
+			$results['numOfResults']+=count((array)$names);
+			$results['subsetsWithResults']+=(count((array)$names) > 0 ? 1 : 0);
+		}
+				
+		return $results;
 
 	}
 
@@ -736,9 +760,9 @@ class SearchController extends Controller
 			if (
 				is_array($val['data']) &&
 					(
-						$val['label']=='Species names' ||
-						$val['label']=='Species synonyms' ||
-						$val['label']=='Species common names'	
+						$val['syslabel']=='species_names' ||
+						$val['syslabel']=='species_synonyms' ||
+						$val['syslabel']=='species_common_names'	
 					)
 				) {
 
@@ -866,16 +890,19 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Glossary terms'),
+					'syslabel' => 'glossary_terms',
 					'data' => $gloss,
 					'numOfResults' => count((array)$gloss)
 				),
 				array(
 					'label' => $this->translate('Glossary synonyms'),
+					'syslabel' => 'glossary_synonyms',
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				),
 				array(
 					'label' => $this->translate('Glossary media'),
+					'syslabel' => 'glossary_media',
 					'data' => $media,
 					'numOfResults' => count((array)$media)
 				)
@@ -994,6 +1021,7 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Literature'),
+					'syslabel' => 'literature',
 					'data' => $books,
 					'numOfResults' => count((array)$books)
 				)
@@ -1004,7 +1032,6 @@ class SearchController extends Controller
 
 	}
 
-	
 	public function getLiteratureLookupList($search=null)
 	{
 
@@ -1050,7 +1077,6 @@ class SearchController extends Controller
 		return $d;
 	
 	}
-
 
 	// dich. key
 	private function searchDichotomousKey($search)
@@ -1160,11 +1186,13 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Dichotomous key steps'),
+					'syslabel' => 'key_steps',
 					'data' => $steps,
 					'numOfResults' => count((array)$steps)
 				),
 				array(
 					'label' => $this->translate('Dichotomous key choices'),
+					'syslabel' => 'key_choices',
 					'data' => $choices,
 					'numOfResults' => count((array)$choices)
 				)
@@ -1176,7 +1204,6 @@ class SearchController extends Controller
 		);
 
 	}
-
 
 	// matrix key
 	private function searchMatrixKey($search)
@@ -1311,16 +1338,19 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Matrix key matrices'),
+					'syslabel' => 'matrix_key_matrices',
 					'data' => $matrices,
 					'numOfResults' => count((array)$matrices)
 				),
 				array(
 					'label' => $this->translate('Matrix key characters'),
+					'syslabel' => 'matrix_key_characters',
 					'data' => $characteristics,
 					'numOfResults' => count((array)$characteristics)
 				),
 				array(
 					'label' => $this->translate('Matrix key states'),
+					'syslabel' => 'matrix_key_states',
 					'data' => $states,
 					'numOfResults' => count((array)$states)
 				)
@@ -1335,14 +1365,13 @@ class SearchController extends Controller
 
 	}
 
-
 	// distribution
 	private function searchMap($species)
 	{
 
 		foreach((array)$species['results'] as $key => $val) {
 		
-			if ($val['label']=='Species names') {
+			if ($val['syslabel']=='species_names') {
 
 				foreach((array)$val['data'] as $dKey => $dVal) {
 
@@ -1372,6 +1401,7 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('geographical data'),
+					'syslabel' => 'geodata',
 					'data' => (isset($geo) ? $geo : null),
 					'numOfResults' => (isset($geo) ? count((array)$geo) : 0)
 				),
@@ -1381,7 +1411,6 @@ class SearchController extends Controller
 		);
 
 	}
-
 
 	// content
 	private function searchContent($search)
@@ -1414,6 +1443,7 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Navigator'),
+					'syslabel' => 'navigator',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				)
@@ -1453,6 +1483,7 @@ class SearchController extends Controller
 			'results' => array(
 				array(
 					'label' => $this->translate('Introduction'),
+					'syslabel' => 'introduction',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				)
@@ -1592,7 +1623,6 @@ class SearchController extends Controller
 		);
 
 	}
-
 
 	private function makeLastResultSetIndex(&$results)
 	{
@@ -1795,7 +1825,6 @@ class SearchController extends Controller
 		
 	}
 
-
 	private function getSearchResultIndex()
 	{
 
@@ -1803,5 +1832,38 @@ class SearchController extends Controller
 
 	}
 
- 
+	private function _searchSpeciesGetNames($search,$taxa)
+	{
+
+		$d = $this->models->Names->_get(
+			array(
+				'where' =>
+					'project_id  = '.$this->getCurrentProjectId(). ' and
+					(
+						name regexp \''.$this->models->Commonname->escapeString($this->makeRegExpCompatSearchString($search)).'\'
+					)',
+				'columns' => 
+					'id,
+					language_id,
+					taxon_id,
+					name as label,
+					\'names2\' as cat',
+				'order' => 'label'
+			)
+		);	
+
+		foreach((array)$d as $key => $val) {
+
+            //$l = $this->models->Language->_get(array('id'=>$val['language_id']));
+			//$d[$key]['language'] = $l['language'];
+			$taxon=$this->getTaxonById($val['taxon_id']);
+			$d[$key]['post_script']=$val['label'];
+			$d[$key]['label']=$taxon['taxon'];
+
+		}
+
+		return $d;
+	
+	}
+	 
 }

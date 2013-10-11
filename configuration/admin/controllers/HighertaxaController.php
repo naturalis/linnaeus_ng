@@ -43,16 +43,8 @@ class HighertaxaController extends Controller
 
         $this->checkAuthorisation();
 
-		//$_SESSION['admin']['system']['highertaxa'] = true;
-		
 		$this->redirect('../species/index.php?higher=1');
-		
-		/*
-        $this->setPageName($this->translate('Higher taxa overview'));
 
-        $this->printPage();
-  		*/
-  
     }
 
     public function editAction ()
@@ -60,9 +52,9 @@ class HighertaxaController extends Controller
 
         $this->checkAuthorisation();
 
-		$_SESSION['admin']['system']['highertaxa'] = true;
+//		$_SESSION['admin']['system']['highertaxa'] = true;
 		
-		$this->redirect('../species/edit.php?id='.$this->requestData['id']);
+		$this->redirect('../species/edit.php?higher=1&id='.$this->requestData['id']);
 
     }
 

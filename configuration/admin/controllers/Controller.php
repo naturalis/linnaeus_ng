@@ -1720,7 +1720,7 @@ class Controller extends BaseClass
 			
 			if ($includeLanguageLabels) {
 				
-				foreach ((array) $_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
+				foreach ((array) $this->getProjectLanguages() as $langaugekey => $language) {
 					
 					$lpr = $this->models->LabelProjectRank->_get(
 					array(
@@ -1751,6 +1751,19 @@ class Controller extends BaseClass
 		return $d;
 
     }
+	
+	public function setActiveTaxonId($id=null)
+	{
+		if (is_null($id))
+			unset($_SESSION['admin']['system']['activeTaxon']);
+		else
+			$_SESSION['admin']['system']['activeTaxon'] = $id;
+	}
+
+	public function getActiveTaxonId()
+	{
+		return isset($_SESSION['admin']['system']['activeTaxon']) ? $_SESSION['admin']['system']['activeTaxon'] : null;
+	}
 
     private function getTaxonChildren($id,$alphabeticalTree)
     {
@@ -1758,7 +1771,7 @@ class Controller extends BaseClass
 
 			$p = array(
 					'id' => array('project_id' => $this->getCurrentProjectId()),
-					'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level',
+					'columns' => 'id,taxon,parent_id,rank_id,taxon_order,is_hybrid,list_level'
 				);
 				
 			if ($alphabeticalTree)
@@ -1915,6 +1928,10 @@ class Controller extends BaseClass
 
     public function userHasTaxon ($taxonId, $userId = null)
     {
+		
+		return true;
+		
+		
         if ($this->isCurrentUserLeadExpert() || $this->isCurrentUserSysAdmin())
             return true;
         
@@ -2150,7 +2167,7 @@ class Controller extends BaseClass
 
         $e = explode(' ', $taxon['taxon']);
         $r = is_null($ranks) ? $this->newGetProjectRanks() : $ranks;
-        
+
         if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
         else
@@ -2538,7 +2555,7 @@ class Controller extends BaseClass
                 
                 if ($includeLanguageLabels) {
                     
-                    foreach ((array) $_SESSION['admin']['project']['languages'] as $langaugekey => $language) {
+                    foreach ((array) $this->getProjectLanguages() as $langaugekey => $language) {
                         
                         $lpr = $this->models->LabelProjectRank->_get(
                         array(
@@ -2587,7 +2604,7 @@ class Controller extends BaseClass
 
 
 
-    public function setProjectLanguages ()
+    public function setProjectLanguages()
     {
         $lp = $this->models->LanguageProject->_get(array(
             'id' => array(
@@ -2625,6 +2642,10 @@ class Controller extends BaseClass
             $_SESSION['admin']['project']['languageList'] = $list;
     }
 
+    public function getProjectLanguages()
+	{
+		return isset($_SESSION['admin']['project']['languages']) ? $_SESSION['admin']['project']['languages'] : null;
+	}
 
 
     public function getDefaultProjectLanguage ()
@@ -2673,23 +2694,6 @@ class Controller extends BaseClass
         
         $this->controllerPublicNameMask = $controllerPublicName;
     }
-
-
-
-    public function maskAsHigherTaxa ()
-    {
-        if (isset($_SESSION['admin']['system']['highertaxa']) && $_SESSION['admin']['system']['highertaxa']===true) {
-            // "abusing" this controller for the higher taxa
-            $this->setControllerMask('highertaxa', 'Higher taxa');
-            
-            return true;
-        }
-        else {
-            
-            return false;
-        }
-    }
-
 
 
     public function loadControllerConfig ($controllerBaseName = null)
@@ -2793,10 +2797,14 @@ class Controller extends BaseClass
     private function getModuleActivationStatus ()
     {
         
+		// NEEDS TO BE REPAIRED!
+		return 1;
+		
+				
         // if a controller has no module id, it is accessible at all times
-        if (!isset($this->controllerModuleId))
+        if (!isset($this->controllerBaseName))
             return 1;
-        
+
         $mp = $this->models->ModuleProject->_get(array(
             'id' => array(
                 'project_id' => $this->getCurrentProjectId(), 

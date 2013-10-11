@@ -309,7 +309,7 @@ class MapKeyController extends Controller
 		
 		$this->setPageName($this->translate('Data types'));
 
-		$lp = $_SESSION['admin']['project']['languages'];
+		$lp = $this->getProjectLanguages();
 		
         if ($this->rHasVal('del_type') && !$this->isFormResubmit()) {
 		// deleting a type

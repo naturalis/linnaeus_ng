@@ -43,6 +43,8 @@ class ProjectsController extends Controller
 		array('maptype','l2 / lng','l2','map type: L2 or Google'),
 		array('matrixtype','lng / nbc','nbc','multi entry-key type'),					
 		array('taxa_use_variations','bool',0),
+		array('taxon_tree_type','[recursive*|unfolding]','unfolding'),
+		array('taxon_page_ext_classification','bool',1),
 		array('skin','[name]','nbc_default'),
 		array('skin_mobile','[name]','nbc_default_mobile'),
 		array('suppress_splash','bool',0,'bypass splash screen'),
@@ -57,7 +59,7 @@ class ProjectsController extends Controller
 		array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
 		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
-		array('external_species_url_target','[_self|_blank|name]','_blank','in NBC-style matrices'),
+		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
 	
 	);

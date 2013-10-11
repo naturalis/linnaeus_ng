@@ -129,7 +129,7 @@ class GlossaryController extends Controller
 
 		$this->setPageName($this->translate('Browsing glossary'));
 		
-        if (!isset($_SESSION['admin']['project']['languages'])) {
+        if (is_null($this->getProjectLanguages())) {
 		
 			$this->addError(
 				sprintf(
@@ -181,7 +181,7 @@ class GlossaryController extends Controller
 		
 			$this->smarty->assign('nextStart', $pagination['nextStart']);
 		
-			$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+			$this->smarty->assign('languages', $this->getProjectLanguages());
 	
 			$this->smarty->assign('activeLanguage', $this->requestData['activeLanguage']);
 	
@@ -361,7 +361,7 @@ class GlossaryController extends Controller
 
         if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
 
-        if ($_SESSION['admin']['project']['languages']) $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        if ($this->getProjectLanguages()) $this->smarty->assign('languages', $this->getProjectLanguages());
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);
@@ -572,7 +572,7 @@ class GlossaryController extends Controller
 
             if (isset($r)) $this->smarty->assign('media',$r);
 
-            $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+            $this->smarty->assign('languages', $this->getProjectLanguages());
             
             $this->smarty->assign('defaultLanguage',$this->getDefaultProjectLanguage());
 
@@ -582,7 +582,7 @@ class GlossaryController extends Controller
 
         if (isset($gloss)) $this->smarty->assign('gloss', $gloss);
 
-        if ($_SESSION['admin']['project']['languages']) $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        if ($this->getProjectLanguages()) $this->smarty->assign('languages', $this->getProjectLanguages());
 
 		if (isset($navList)) $this->smarty->assign('navList', $navList);
 		if (isset($gloss)) $this->smarty->assign('navCurrentId',$gloss['id']);

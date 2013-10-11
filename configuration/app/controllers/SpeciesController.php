@@ -59,12 +59,10 @@ class SpeciesController extends Controller
 
     private function initialise ()
     {
-
 		define('PREDICATE_VALID_NAME',$this->getSetting('predicate_isValidNameOf','isValidNameOf'));
 		define('PREDICATE_PREFERRED_NAME',$this->getSetting('predicate_isPreferredNameOf','isPreferredNameOf'));
 
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
-
     }
 
 
@@ -189,7 +187,35 @@ class SpeciesController extends Controller
                 
                 $this->smarty->assign('taxon',$taxon);
 
-                $this->smarty->assign('names',$this->getNames($taxon['id']));
+				/*
+					NSR add on
+				*/
+				if (isset($this->models->Names) && $this->getSetting('taxon_page_ext_classification',0)) {
+					
+		            $activeCategory =  $this->rHasVal('cat') ? $this->requestData['cat']: $categories['defaultCategory'];
+	
+					$names=$this->getNames($taxon['id']);
+					$classification=$this->getTaxonClassification($taxon['id']);
+					
+					$this->smarty->assign('names',$names);
+
+					foreach((array)$classification as $key=>$val) {
+
+						$d=
+							$this->getName(array(
+								'taxonId' => $val['id'],
+								'languageId' => $this->getCurrentLanguageId(),
+								'predicateType' => PREDICATE_PREFERRED_NAME
+							));
+							
+						$classification[$key]['preferredName']=$d[0]['name'];
+
+					}
+
+					$this->smarty->assign('classification',$classification);
+					$this->smarty->assign('ranks',$this->getProjectRanks());
+	
+				}
                 
                 $this->smarty->assign('content', $content);
 
@@ -200,8 +226,10 @@ class SpeciesController extends Controller
             }
             
             $this->smarty->assign('categories', $categories['categories']);
-            
+
             $this->smarty->assign('activeCategory', $activeCategory);
+
+            $this->smarty->assign('categorySysList', $categories['categorySysList']);
             
             $this->smarty->assign('headerTitles', 
             array(
@@ -484,7 +512,7 @@ class SpeciesController extends Controller
 				order by _a.taxon_order, _a.taxon
 				limit 1'
         ));
-
+		
 		return isset($t) ? $t[0]['id'] : null;
     }
 	
@@ -569,6 +597,7 @@ class SpeciesController extends Controller
 		
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
+		$showAlways = isset($p['showAlways']) ? $p['showAlways'] : null;
 
 		// get the defined categories (just the page definitions, no content yet)
 		$tp = $this->models->PageTaxon->_get(
@@ -664,8 +693,10 @@ class SpeciesController extends Controller
                 'is_empty' => (count((array) $m) > 0 ? 0 : 1)
             );
 
-            foreach ((array) $d as $key => $val)
+            foreach ((array) $d as $key => $val) {
                 $categoryList[$key] = $val['title'];
+                $categorySysList[$key] = $val['page'];
+			}
 
             $d = array_merge($d, $stdCats);
 
@@ -677,6 +708,7 @@ class SpeciesController extends Controller
                 'categories' => $d, 
                 'defaultCategory' => $defCat, 
                 'categoryList' => isset($categoryList) ? $categoryList : null,
+                'categorySysList' => isset($categorySysList) ? $categorySysList : null,
                 'emptinessList' => $emptinessList,
             );
         }
@@ -732,7 +764,7 @@ class SpeciesController extends Controller
 		$category = isset($p['category']) ? $p['category'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
 		$incOverviewImage = isset($p['incOverviewImage']) ? $p['incOverviewImage'] : false;
-		
+
         switch ($category) {
             
             case 'media':
@@ -1278,6 +1310,34 @@ class SpeciesController extends Controller
 			'sciId'=>$sci,
 			'prefId'=>$pref,
 			'list'=>$names
+		);
+		
+	}
+
+	private function getName($p)
+	{
+		
+		$taxonId=isset($p['taxonId']) ? $p['taxonId'] : null;
+		$languageId=isset($p['languageId']) ? $p['languageId'] : null;
+		$predicateType=isset($p['predicateType']) ? $p['predicateType'] : null;
+	
+		if (empty($taxonId) || empty($languageId) || empty($predicateType)) return;
+
+        return $this->models->Names->freeQuery(
+			array(
+				'query' => "
+					select _a.id, _a.name,_a.uninomial,_a.specific_epithet,_a.name_author,_a.authorship_year,_a.reference,
+					_a.reference_id,_a.reference_id,_a.expert,_a.expert_id,_a.organisation,_a.organisation_id, _b.nametype,
+					_a.language_id,_c.language,_d.label as language_label
+					from %PRE%names _a 
+					left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id = _b.project_id
+					left join %PRE%languages _c on _a.language_id=_c.id
+					left join %PRE%labels_languages _d on _a.language_id=_d.language_id
+						and _d.label_language_id=".$languageId."
+					where _a.project_id = ".$this->getCurrentProjectId()."
+					and _a.taxon_id=".$taxonId."
+					and _b.nametype='".$predicateType."'"
+			)
 		);
 		
 	}

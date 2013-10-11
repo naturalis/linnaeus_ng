@@ -1,28 +1,17 @@
 {include file="../shared/admin-header.tpl"}
 
-{if $taxon.id!=-1}
-<div id="page-main" style="height:{if $languages|@count > 1}1200px{else}670px{/if}">
-{else}
-<div id="page-main">
-{/if}
+{if $taxon}
 
-{* for some reason the buttons refuse to "see" the style sheet *}
-<style>
-.localButton {literal}{{/literal}
-	padding-right:25px;
-	width:150px;	
-{literal}}{/literal}
-</style>
+<div id="page-main">
 
 	<span id="debug-message"></span>
-	{if $taxon.id!=-1}
-	{* $taxon.taxon *}
+
 	<form name="theForm" id="theForm" method="post">
 		<input type="hidden" name="action" id="action" value="" />  
 		<input type="hidden" name="taxon_id" id="taxon_id" value="{$taxon.id}" />  
 		<input type="hidden" name="taxon_name" id="taxon-name" value="{$taxon.taxon}" />  
 		<input type="hidden" name="activeLanguage" value="{$activeLanguage}" />  
-		<input type="hidden" name="activePage" value="{$activePage}" />  
+		<input type="hidden" name="activePage" value="{$activePage}" /> 
 	<div style="border-bottom:1px dotted #ddd;padding-bottom:10px">
 		<input type="button" value="{t}save{/t}" onclick="taxonSaveDataManual()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
 		<input type="button" value="{t}save and preview{/t}" onclick="taxonDoPreview()" class="localButton" disabledOnLoad="1" disabled="disabled"/>
@@ -37,23 +26,19 @@
 		<input type="button" value="{t}synonyms{/t}" onclick="window.open('synonyms.php?id={$taxon.id}','_self')" class="localButton" />
 		<input type="button" value="{t}common names{/t}" onclick="window.open('common.php?id={$taxon.id}','_self')" class="localButton" />
 	</div>
+
 	{if $useVariations || $useRelated || $useNBCExtras}
 	<div style="padding:10px 0px 10px 0px">
-		{if $useVariations}
-		<input type="button" value="{t}variations{/t}" onclick="window.open('variations.php?id={$taxon.id}','_self')" class="localButton" />
-		{/if}
-		{if $useRelated}
-		<input type="button" value="{t}related{/t}" onclick="window.open('related.php?id={$taxon.id}','_self')" class="localButton" />
-		{/if}
-		{if $useNBCExtras}
-		<input type="button" value="{t}NBC extras{/t}" onclick="window.open('nbc_extras.php?id={$taxon.id}','_self')" class="localButton" />
-		{/if}
-				</div>
+		{if $useVariations}<input type="button" value="{t}variations{/t}" onclick="window.open('variations.php?id={$taxon.id}','_self')" class="localButton" />{/if}
+		{if $useRelated}<input type="button" value="{t}related{/t}" onclick="window.open('related.php?id={$taxon.id}','_self')" class="localButton" />{/if}
+		{if $useNBCExtras}<input type="button" value="{t}NBC extras{/t}" onclick="window.open('nbc_extras.php?id={$taxon.id}','_self')" class="localButton" />{/if}
+	</div>
 	{/if}
+
 
 	<div id="taxon-pages-table-div"></div>
 
-	<div style="width:780px;height:610px;">
+	<div>
 	
 		<div id="taxon-language-default">
 			<span id="taxon-language-default-language"></span>
@@ -73,10 +58,14 @@
 
 	</div>
 
-</form>
+	</form>
+</div>
+{else}
+<div id="page-main">
+</div>
 {/if}
 
-</div>
+
 
 {literal}
 <script type="text/JavaScript">

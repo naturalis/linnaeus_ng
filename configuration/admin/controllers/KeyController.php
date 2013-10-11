@@ -340,7 +340,7 @@ class KeyController extends Controller
         if (isset($step))
             $this->smarty->assign('step', $step);
         
-        $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        $this->smarty->assign('languages', $this->getProjectLanguages());
         
         $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
         
@@ -478,7 +478,7 @@ class KeyController extends Controller
         if (isset($choice))
             $this->smarty->assign('data', $choice);
         
-        $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        $this->smarty->assign('languages', $this->getProjectLanguages());
         
         $this->smarty->assign('defaultLanguage', $_SESSION['admin']['project']['languageList'][$this->getDefaultProjectLanguage()]);
         

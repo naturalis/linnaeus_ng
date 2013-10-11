@@ -53,7 +53,7 @@ class LiteratureController extends Controller
     public function indexAction()
     {
       
-		unset($_SESSION['admin']['system']['activeTaxon']);
+		$this->setActiveTaxonId(null);
     
 		$this->clearTempValues();
 
@@ -111,9 +111,14 @@ class LiteratureController extends Controller
 
     	    $this->setPageName($this->translate('New reference'));
 			
-			if(isset($_SESSION['admin']['system']['activeTaxon'])) {
-
-				$ref['taxa'][] = $_SESSION['admin']['system']['activeTaxon'];
+			if(!is_null($this->getActiveTaxonId())) {
+				
+				$taxon=$this->getTaxonById($this->getActiveTaxonId());
+				
+				$ref['taxa'][] = array(
+						'taxon_id' => $taxon['id'],
+						'taxon' => $taxon['taxon']
+				);
 
 			}
 
@@ -208,12 +213,12 @@ class LiteratureController extends Controller
 							$ref['author_full'].', '.$ref['year'].$ref['suffix'].
 						'</span>';
 
-					$this->redirect('../species/taxon.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
+					$this->redirect('../species/taxon.php?id='.$this->getActiveTaxonId());
 
 				} else
-				if(isset($_SESSION['admin']['system']['activeTaxon'])) {
+				if(!is_null($this->getActiveTaxonId())) {
 
-					$this->redirect('../species/literature.php?id='.$_SESSION['admin']['system']['activeTaxon']['taxon_id']);
+					$this->redirect('../species/literature.php?id='.$this->getActiveTaxonId());
 
 				} else
 				if ($this->rHasVal('action','preview')) {
