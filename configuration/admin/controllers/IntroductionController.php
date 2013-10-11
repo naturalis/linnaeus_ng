@@ -177,7 +177,7 @@ class IntroductionController extends Controller
 
 		if (isset($page)) $this->smarty->assign('page', $page);
 
-		$this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+		$this->smarty->assign('languages', $this->getProjectLanguages());
 		
 		$this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
 

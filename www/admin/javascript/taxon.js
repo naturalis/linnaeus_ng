@@ -186,6 +186,10 @@ function taxonDrawPageBlock() {
 			'<br /><span class="taxon-page-publish-state">' +
 			(taxonPageStates[taxonPages[i][0]]==1 ? 'published' : (taxonPageStates[taxonPages[i][0]] == 0 ? 'unpublished' : 'empty')) +
 			'</span></td>';
+			
+		if ((i+1)%8==0) {
+			buffer=buffer+'</tr><tr>';
+		}
 		
 		if (taxonHigherTaxa && i==0) break;
 	}

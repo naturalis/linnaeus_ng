@@ -197,3 +197,15 @@
 	margin-top: 2px;
 }
 
+.localButton {
+	padding-right:25px;
+	width:150px;	
+}
+
+#page-main .page-single-language {
+	height:540px;
+}
+
+#page-main .page-multi-language {
+	height:1200px;
+}

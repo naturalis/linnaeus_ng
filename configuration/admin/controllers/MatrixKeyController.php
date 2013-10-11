@@ -478,7 +478,7 @@ class MatrixKeyController extends Controller
             $this->redirect('edit.php');
         }
         
-        $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        $this->smarty->assign('languages', $this->getProjectLanguages());
         
         $this->smarty->assign('matrix', $matrix);
         
@@ -903,7 +903,7 @@ class MatrixKeyController extends Controller
 		$this->useVariations = $this->getSetting('taxa_use_variations')=='1';
         
         $this->smarty->assign('useCharacterGroups', $this->_useCharacterGroups);
-        $this->smarty->assign('languages', $_SESSION['admin']['project']['languages']);
+        $this->smarty->assign('languages', $this->getProjectLanguages());
         $this->smarty->assign('activeLanguage', $this->getDefaultProjectLanguage());
     }
 
