@@ -157,19 +157,6 @@ class SpeciesController extends Controller
                 $categories['categories'][$key]['className'] = implode(' ', $c);
             }
 
-            $content = $this->getTaxonContent(
-				array(
-					'taxon' => $taxon['id'], 
-					'category' => $activeCategory, 
-					'allowUnpublished' => $this->isLoggedInAdmin()
-				)
-			);
-
-			if ($activeCategory!='media') {
-				$content = $this->matchGlossaryTerms($content);
-				$content = $this->matchHotwords($content);
-			}
-            
             if ($taxon['lower_taxon'] == 1) {
                 
                 $this->setPageName(sprintf($this->translate('Species module: "%s" (%s)'), $taxon['label'], $this->getCategoryName($activeCategory)));
@@ -191,7 +178,12 @@ class SpeciesController extends Controller
 					NSR add on
 				*/
 				if (isset($this->models->Names) && $this->getSetting('taxon_page_ext_classification',0)) {
-					
+
+					/*
+						do this again, as the original method refuses empty categories as active ones,
+						whereas the NSR has several automatically generated pages that are empty in the
+						database.
+					*/
 		            $activeCategory =  $this->rHasVal('cat') ? $this->requestData['cat']: $categories['defaultCategory'];
 	
 					$names=$this->getNames($taxon['id']);
@@ -201,14 +193,22 @@ class SpeciesController extends Controller
 
 					foreach((array)$classification as $key=>$val) {
 
-						$d=
-							$this->getName(array(
+						$d=$this->getName(array(
 								'taxonId' => $val['id'],
 								'languageId' => $this->getCurrentLanguageId(),
 								'predicateType' => PREDICATE_PREFERRED_NAME
-							));
-							
+						));
+
 						$classification[$key]['preferredName']=$d[0]['name'];
+
+						$d=$this->getName(array(
+								'taxonId' => $val['id'],
+								'languageId' => $this->getCurrentLanguageId(),
+								'predicateType' => PREDICATE_VALID_NAME
+						));
+
+						$classification[$key]['uninomial']=$d[0]['uninomial'];
+						$classification[$key]['specificEpithet']=$d[0]['specific_epithet'];
 
 					}
 
@@ -216,7 +216,20 @@ class SpeciesController extends Controller
 					$this->smarty->assign('ranks',$this->getProjectRanks());
 	
 				}
-                
+
+				$content = $this->getTaxonContent(
+					array(
+						'taxon' => $taxon['id'], 
+						'category' => $activeCategory, 
+						'allowUnpublished' => $this->isLoggedInAdmin()
+					)
+				);
+	
+				if ($activeCategory!='media') {
+					$content = $this->matchGlossaryTerms($content);
+					$content = $this->matchHotwords($content);
+				}
+            
                 $this->smarty->assign('content', $content);
 
                 $this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
