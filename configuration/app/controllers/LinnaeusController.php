@@ -237,7 +237,7 @@ class LinnaeusController extends Controller
 		$n = strtolower($path[1]);
 
 		if ($n!=$this->getAppName() && $n!='linnaeus_ng') {
-		
+
 			$p = $this->models->Project->_get(array(
 				'id' => array(
 					'short_name' => $n

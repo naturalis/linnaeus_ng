@@ -187,7 +187,7 @@ class Controller extends BaseClass
         parent::__construct();
 
         $this->setControllerParams($p);
-        
+    
         $this->setPhpIniVars();
 
         $this->setDebugMode();
@@ -225,7 +225,7 @@ class Controller extends BaseClass
         $this->emptyCacheFolderByRequest();
       
         $this->restoreState();
-        
+
         $this->setProjectLanguages();
         
         $this->setCurrentLanguageId();
@@ -642,8 +642,8 @@ class Controller extends BaseClass
     }
 	
 	
-	private function _getTaxonClassification($id) {
-			
+	private function _getTaxonClassification($id)
+	{
 		$taxon = $this->getTaxonById($id);
 		$taxon['do_display'] = !preg_match('/^\(.*\)$/', $taxon['taxon']);
 		
