@@ -37,6 +37,7 @@ function nbcGetResults(p) {
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
+			nbcFilterEmergingCharacters();
 			nbcDoResults();
 			if (p && p.action!='similar') nbcDoOverhead();
 			nbcDoPaging();
@@ -625,7 +626,10 @@ function nbcBuildGroupMenu(data) {
 	
 				var c = data.groups[i].chars[j];
 	
-				s = s + '<li class="inner'+(j==(v.chars.length-1) ? ' last' : '')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value ? ' '+c.value : '')+'</a>';
+				if (c.disabled===true)
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
+				else
+					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value?' '+c.value:'')+'</a>';
 				
 				if (data.activeChars[c.id]) {
 					openGroup = true;
@@ -818,6 +822,23 @@ function nbcSetExpandResults(state) {
 
 	nbcExpandResults = state;
 	
+}
+
+function nbcFilterEmergingCharacters() {
+
+	for(var i in nbcData.menu.groups) {
+		for (var j in nbcData.menu.groups[i].chars) {
+			var countremain=0;
+			var char=nbcData.menu.groups[i].chars[j];
+			if (char.type != 'range' && char.type != 'distribution') {
+				for (var k in char.states) {
+					countremain=countremain+nbcData.countPerState[char.states[k].id];
+				}
+				nbcData.menu.groups[i].chars[j].disabled=(countremain<nbcData.results.length);
+			}
+		}
+	}
+
 }
 
 // dialog button function, called from main.js::showDialog 

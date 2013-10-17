@@ -20,6 +20,8 @@
 
 #facet-categories-menu ul li.inner {padding:4px 0px 4px 10px;margin-bottom: 0px;background-color:#fff;border-bottom:1px solid #F9A555;}
 #facet-categories-menu ul li.ungrouped {padding:4px 0px 4px 0px;}
+#facet-categories-menu ul li.disabled {color:#999;}
+
 
 
 #facet-categories-menu ul li.last {border-bottom:1px solid #F9C777;}
