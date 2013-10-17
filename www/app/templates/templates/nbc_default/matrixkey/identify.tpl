@@ -56,6 +56,7 @@ nbcShowSimilar({$nbcSimilar[0]},'{$nbcSimilar[1]}');
 {literal}
 try {{/literal}
 	nbcData = $.parseJSON('{$taxaJSON}');
+	nbcFilterEmergingCharacters();
 	nbcDoResults({literal}{resetStart:false}{/literal});
 	nbcDoOverhead();
 	nbcDoPaging();
