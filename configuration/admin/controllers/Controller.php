@@ -1365,7 +1365,7 @@ class Controller extends BaseClass
 				'taxon' => $name
 			)
 		));
-		return $t[0];
+		return isset($t[0]) ? $t[0] : null;
 
     }
 	
