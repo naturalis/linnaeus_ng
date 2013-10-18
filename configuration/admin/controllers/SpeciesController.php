@@ -1002,7 +1002,7 @@ class SpeciesController extends Controller
 
         $this->setPageName(sprintf($this->translate('Editing "%s"'), $this->formatTaxon($data)));
        
-        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($taxon['id']));
+        $this->smarty->assign('adjacentTaxa',$this->getAdjacentTaxa($data['id']));
         
         $this->printPage();
     }

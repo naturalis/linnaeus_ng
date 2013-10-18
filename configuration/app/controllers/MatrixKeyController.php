@@ -169,7 +169,7 @@ class MatrixKeyController extends Controller
             $states = $this->stateMemoryRecall();
 
             $taxa = $this->nbcGetTaxaScores($states);
-			
+
 			$groups = $this->getCharacterGroups();
 
 			$activeChars = array();
@@ -651,7 +651,7 @@ class MatrixKeyController extends Controller
 			(count($resTaxa)!=0 ? " and taxon_id in (".implode(',',$resTaxa).") " : "" ).
 			(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "")."
 			group by state_id
-				union
+				union all
 			select distinct -1 as can_select, state_id
 			from %TABLE%
 			where project_id = ".$this->getCurrentProjectId()." and matrix_id = ".$data['matrix']." 
@@ -662,7 +662,7 @@ class MatrixKeyController extends Controller
 				(count($resTaxa)!=0 ? " and taxon_id in (".implode(',',$resTaxa).") " : "" ).
 				(count($selStates)!=0 ? " and state_id not in (".$data['states'].") " : "").
 			")
-				union
+				union all
 			select 1 as can_select, id as state_id
 			from %PRE%characteristics_states
 			where project_id = ".$this->getCurrentProjectId()." 
@@ -682,7 +682,7 @@ class MatrixKeyController extends Controller
 				_a.project_id = ".$this->getCurrentProjectId()."
 				and _a.matrix_id = ".$data['matrix']."
 				and _a.ref_type='char'
-			union
+			union all
 			select 
 				_a.ref_id as id,'c_group' as type,_a.show_order as show_order, _c.label as label, null as description from %TABLE% _a
 			left join %PRE%chargroups_labels _c on _c.chargroup_id = _a.ref_id and _c.language_id = ".$data['language']."
@@ -799,7 +799,7 @@ class MatrixKeyController extends Controller
 				left join %PRE%nbc_extras _e on _c.id = _e.ref_id and _e.ref_type='taxon' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
 				where _a.project_id = ".$this->getCurrentProjectId()."
 				group by _a.taxon_id
-				union
+				union all
 				select 'variation' as type, _a.variation_id as id, 0 as total_states, 100 as score,0 as is_hybrid, trim(_d.taxon) as sci_name, trim(_c.label) as label, _e.value as url_thumbnail
 				from  %PRE%matrices_variations _a
 				left join %PRE%taxa_variations _c on _a.variation_id = _c.id and _c.project_id = ".$this->getCurrentProjectId()."
@@ -823,7 +823,7 @@ class MatrixKeyController extends Controller
 				left join %PRE%nbc_extras _e on _c.id = _e.ref_id and _e.ref_type='taxon' and _e.name='url_thumbnail' and _e.project_id = ".$this->getCurrentProjectId()."
 				where _a.project_id = ".$this->getCurrentProjectId()."
 				group by _a.taxon_id having score=100
-				union
+				union all
 				select 'variation' as type, _a.variation_id as id, count(_b.state_id) as total_states,
 				round((case when count(_b.state_id)>".$selStateCount." then ".$selStateCount." else count(_b.state_id) end/".$selStateCount.")*100,0) as score,
 				0 as is_hybrid, trim(_d.taxon) as sci_name, trim(_c.label) as label, _e.value as url_thumbnail
@@ -917,7 +917,7 @@ class MatrixKeyController extends Controller
 				and _n.project_id = ".$this->getCurrentProjectId()."
 			where _a.ref_type='taxon' and _a.taxon_id = ".$data['id']." 
 			and _a.project_id = ".$this->getCurrentProjectId()."
-			union 
+			union all
 			select 'variation' as type, _e.id as id,  _f.taxon as taxon, _e.label as label, _n.value as img 
 			from %PRE%taxa_relations _d 
 			left join %PRE%taxa_variations _e 
@@ -1432,7 +1432,7 @@ class MatrixKeyController extends Controller
 		        where _a.project_id = " . $this->getCurrentProjectId() . "
 			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
         		group by _a.taxon_id
-        	union
+        	union all
         	select 'matrix' as type, _a.id as id, 
 			        count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
 			        0 as h, trim(_c.name) as l
@@ -1447,7 +1447,7 @@ class MatrixKeyController extends Controller
         		where _a.project_id = " . $this->getCurrentProjectId() . "
         			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
         		group by id" . ($this->_matrixType == 'nbc' ? "
-			union
+			union all
 			select 'variation' as type, _a.variation_id as id, 
 				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
 				0 as h, trim(_c.label) as l
@@ -1569,7 +1569,7 @@ class MatrixKeyController extends Controller
 		        where _a.project_id = " . $this->getCurrentProjectId() . "
 			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
         		group by _a.taxon_id
-        	union
+        	union all
         	select 'matrix' as type, _a.id as id, _b.state_id, _b.characteristic_id,
 			        0 as h, trim(_c.name) as l
         		from  %PRE%matrices _a
@@ -1583,7 +1583,7 @@ class MatrixKeyController extends Controller
         		where _a.project_id = " . $this->getCurrentProjectId() . "
         			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
         		group by id" . ($this->_matrixType == 'nbc' ? "
-			union
+			union all
 			select 'variation' as type, _a.variation_id as id, _b.state_id, _b.characteristic_id,
 				0 as h, trim(_c.label) as l
 				from  %PRE%matrices_variations _a        		
@@ -2444,7 +2444,7 @@ class MatrixKeyController extends Controller
 						and _a.taxon_id not in
 							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
 					group by _a.state_id
-				union
+				union all
 				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 					from %PRE%matrices_taxa_states _a
 					" . (!empty($dV) ? $dV : "") . "
@@ -2490,7 +2490,7 @@ class MatrixKeyController extends Controller
 						and _a.taxon_id = _b.taxon_id
 					where _a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-				union
+				union all
 				select count(distinct _a.variation_id) as tot
 					from  %PRE%matrices_variations _a        		
 					left join %PRE%matrices_taxa_states _b
@@ -2522,7 +2522,7 @@ class MatrixKeyController extends Controller
     {
 
         $res = $this->getCache('matrix-nbc-data');
-        
+
         if (!$res) {
 
             $inclRelated = isset($p['inclRelated']) ? $p['inclRelated'] : false;
@@ -2532,7 +2532,7 @@ class MatrixKeyController extends Controller
             $var = $this->getVariationsInMatrix();
 
             foreach ((array) $var as $val) {
-                
+
                 if ($vId && $val['id'] != $vId)
                     continue;
                 
@@ -2568,7 +2568,7 @@ class MatrixKeyController extends Controller
                 
                 $tmp[$val['taxon_id']] = true;
             }
-            
+
             $taxa = $this->getTaxaInMatrix();
 
             foreach ((array) $taxa as $val) {
@@ -2623,7 +2623,7 @@ class MatrixKeyController extends Controller
             }
 
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
-            
+
             $this->customSortArray($res, array(
                 'key' => 'l', 
                 'case' => 'i'
@@ -2749,7 +2749,7 @@ class MatrixKeyController extends Controller
         // get all stored selected states
         foreach ((array) $d as $val)
             $states[] = $val['val'];
-        
+
         if (count($states) == 0)
             return $this->nbcGetCompleteDataset();
 
@@ -2909,7 +2909,7 @@ class MatrixKeyController extends Controller
 				where _a.project_id = " . $this->getCurrentProjectId() . "
 					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 				and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
-			union
+			union all
 			select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s, _d.commonname as commonname
         		from %PRE%matrices_taxa _a
         		left join %PRE%matrices_taxa_states _b

@@ -16,6 +16,7 @@ include_once ('ProjectDeleteController.php');
 include_once ('SpeciesController.php');
 class ImportNBCController extends Controller
 {
+
     private $_delimiter = ',';
     private $_encloser = '"';
     private $_valueSep = ';'; // used to separate values within a single cell
@@ -96,7 +97,7 @@ class ImportNBCController extends Controller
     public $controllerPublicName = 'NBC multi-entry key import';
     public $cssToLoad = array();
     public $jsToLoad = array();
-
+	
 
     /**
      * Constructor, calls parent's constructor
@@ -108,8 +109,10 @@ class ImportNBCController extends Controller
 
         parent::__construct();
 		
-		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
+		define('MATRIX_SCIENTIFIC_NAME_STUB','(matrix)');
         
+		$this->_defaultLanguageId = LANGUAGECODE_DUTCH;
+
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
         
         $this->setSuppressProjectInBreadcrumbs();
@@ -144,7 +147,6 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie1Action ()
     {
-		
         $this->checkAuthorisation(true);
         
         if ($this->rHasVal('process', '1'))
@@ -197,7 +199,6 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie2Action ()
     {
-
         $this->checkAuthorisation(true);
         
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
@@ -421,12 +422,13 @@ class ImportNBCController extends Controller
 
             $data = $_SESSION['admin']['system']['import']['data'];
            
-            $data = $this->storeSpeciesAndVariations($data);
+            $data = $this->storeSpeciesAndVariationsAndMatrices($data);
             
             $_SESSION['admin']['system']['import']['species_data'] = $data;
             
             $this->addMessage('Added ' . count((array) $_SESSION['admin']['system']['import']['species_data']) . ' species.');
             $this->addMessage('Added ' . $_SESSION['admin']['system']['import']['loaded']['variations'] . ' variations.');
+
             $this->smarty->assign('processed', true);
         }
 		
@@ -534,7 +536,7 @@ class ImportNBCController extends Controller
 				// ...but we don't want to overwrite it, so we create a matrix with a new name
 				else {
 
-					$m = $this->createMatrix($_SESSION['admin']['system']['import']['newMatrixTitle']);
+					$m = $this->createMatrixIfNotExists($_SESSION['admin']['system']['import']['newMatrixTitle']);
 					$mId = $m['id'];
 					$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
@@ -543,7 +545,7 @@ class ImportNBCController extends Controller
 			} else {
 
 				// a matrix with this name does not exist yet, so we create one
-				$m = $this->createMatrix($matrixName);
+				$m = $this->createMatrixIfNotExists($matrixName);
 				$mId = $m['id'];
 				$this->addMessage($this->storeError('Created matrix "' . $m['name'] . '"','Matrix'));
 
@@ -778,7 +780,7 @@ class ImportNBCController extends Controller
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
 
-
+q($data,1);
 		if ($data['project']['title']) {
 
 			$d = $this->models->Project->_get(array(
@@ -1332,7 +1334,7 @@ class ImportNBCController extends Controller
         );
     }
 
-    private function resolveSpeciesAndVariations ($data)
+    private function resolveSpeciesAndVariationsAndMatrices ($data)
     {
 
         $d = array();
@@ -1340,17 +1342,30 @@ class ImportNBCController extends Controller
         foreach ((array) $data['species'] as $key => $val) {
 
 			if (empty($val['naam SCI'])) {
-				
+
 				$this->addError($this->storeError('Skipping species without scientific name ('.@$val['label'].').', 'Species import'));
 				continue;
 
 			}
+			
+			if ($val['naam SCI']==MATRIX_SCIENTIFIC_NAME_STUB) {
+				
+				$sciName = $val['label'];
+				$d[$sciName]['isMatrix'] = true;
 
-            $d[$val['naam SCI']]['taxon'] = $val['naam SCI'];
-            if (isset($val['naam NL'])) $d[$val['naam SCI']]['common name'] = $val['naam NL']; // $val['label'];
-            $d[$val['naam SCI']]['id'] = $val['id'];
-            if (isset($val['inGroup'])) $d[$val['naam SCI']]['parent_name'] = $val['inGroup'];
-            $d[$val['naam SCI']]['variations'][] = $val;
+			} else {
+				
+				$sciName = $val['naam SCI'];
+				$d[$sciName]['isMatrix'] = false;
+
+			}
+
+			$d[$sciName]['taxon'] = $sciName;
+			if (isset($val['naam NL'])) $d[$sciName]['common name'] = $val['naam NL']; // $val['label'];
+			$d[$sciName]['id'] = $val['id'];
+			if (isset($val['inGroup'])) $d[$sciName]['parent_name'] = $val['inGroup'];
+			$d[$sciName]['variations'][] = $val;
+
         }
 		
 		//$variantColumns = isset($_SESSION['admin']['system']['import']['variantColumns']) ? $_SESSION['admin']['system']['import']['variantColumns'] : null;
@@ -1358,52 +1373,56 @@ class ImportNBCController extends Controller
 
         foreach ((array) $d as $key => $val) {
             
-            foreach ((array) $val['variations'] as $sKey => $sVal) {
-          
-                $str = null;
-
-                foreach ((array) $variantColumns as $hVal) {
-
-                    //if (!isset($data['characters'][$hVal]['code']) || !isset($sVal[$data['characters'][$hVal]['code']]))
-                    if (!isset($sVal[$hVal]))
-                        continue;
-
-                    $str .= $sVal[$hVal]. ' ';
-					
-                }
-
-                $d[$key]['variations'][$sKey]['add-on'] = trim($str);
-                $d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
-            }
-
-
-
-            /*
-				if a species has only one variation, it should not be stored (ie, species & variation identical)
-	           if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0)
-			*/
-            if (count((array) $d[$key]['variations']) == 1) {
-				
-				foreach((array)$d[$key]['variations'][0] as $vKey => $vVal) {
-					
-					if ($vKey=='id' || $vKey=='label' || $vKey=='add-on' || $vKey=='variant')
-						continue;
-					
-					$d[$key][$vKey] = $vVal;
-					
+			
+			if (isset($val['variations'])) {
+			
+				foreach ((array)$val['variations'] as $sKey => $sVal) {
+			  
+					$str = null;
+	
+					foreach ((array) $variantColumns as $hVal) {
+	
+						//if (!isset($data['characters'][$hVal]['code']) || !isset($sVal[$data['characters'][$hVal]['code']]))
+						if (!isset($sVal[$hVal]))
+							continue;
+	
+						$str .= $sVal[$hVal]. ' ';
+						
+					}
+	
+					$d[$key]['variations'][$sKey]['add-on'] = trim($str);
+					$d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
 				}
-                
+				
+
 				/*
-                if (isset($d[$key]['variations'][0]['states']))
-                    $d[$key]['states'] = $d[$key]['variations'][0]['states'];
-
-                if (isset($d[$key]['variations'][0]['related']))
-                    $d[$key]['related'] = $d[$key]['variations'][0]['related'];
+					if a species has only one variation, it should not be stored (ie, species & variation identical)
+				   if (count((array) $d[$key]['variations']) == 1 && strlen($d[$key]['variations'][0]['add-on']) == 0)
 				*/
-
-                unset($d[$key]['variations']);
-
-            }
+				if (count((array) $d[$key]['variations']) == 1) {
+					
+					foreach((array)$d[$key]['variations'][0] as $vKey => $vVal) {
+						
+						if ($vKey=='id' || $vKey=='label' || $vKey=='add-on' || $vKey=='variant')
+							continue;
+						
+						$d[$key][$vKey] = $vVal;
+						
+					}
+					
+					/*
+					if (isset($d[$key]['variations'][0]['states']))
+						$d[$key]['states'] = $d[$key]['variations'][0]['states'];
+	
+					if (isset($d[$key]['variations'][0]['related']))
+						$d[$key]['related'] = $d[$key]['variations'][0]['related'];
+					*/
+	
+					unset($d[$key]['variations']);
+	
+				}
+				
+			}
         }
 
         return $d;
@@ -1434,14 +1453,15 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function storeSpeciesAndVariations ($data)
+    private function storeSpeciesAndVariationsAndMatrices ($data)
     {
 
         $_SESSION['admin']['system']['import']['loaded']['species'] = 0;
         $_SESSION['admin']['system']['import']['loaded']['variations'] = 0;
+        $_SESSION['admin']['system']['import']['loaded']['matrices'] = 0;
 
         $tmpIndex = array();
-        $species = $this->resolveSpeciesAndVariations($data);
+        $species = $this->resolveSpeciesAndVariationsAndMatrices($data);
 
         $d = $this->models->Taxon->_get(array('id' =>
 			array(
@@ -1476,14 +1496,21 @@ class ImportNBCController extends Controller
 
 		// save all taxa
         foreach ((array) $species as $key => $val) {
-
+			
+			if ($val['isMatrix']==true) {
+				
+				$d=$this->createMatrixIfNotExists($key);
+				$species[$key]['lng_id'] = $d['id'];
+				if ($d['type']=='new')
+					$this->addMessage(sprintf('Added new referenced matrix "%s" (name only)',$key));
+				continue;
+				
+			}
+			
 			if (isset($val['parent_name'])) {
 
-				$d = $this->models->Taxon->_get(array('id' =>
-					array(
-						'project_id' => $this->getNewProjectId(), 
-						'taxon' => $val['parent_name']
-					)));
+				// find parent by sci name
+				$d = $this->getTaxonByName($val['parent_name']);
 					
 				if ($d) { 
 
@@ -1491,6 +1518,7 @@ class ImportNBCController extends Controller
 				
 				} else {
 
+					// find taxon by common name
 					$d = $this->models->Commonname->_get(array('id' =>
 					array(
 						'project_id' => $this->getNewProjectId(), 
@@ -1504,6 +1532,7 @@ class ImportNBCController extends Controller
 
 					} else {
 
+						// create the parent taxon
 						$this->models->Taxon->save(
 						array(
 							'id' => null, 
@@ -1524,12 +1553,11 @@ class ImportNBCController extends Controller
 
 			} else {
 				
+				// give the topmost the default uppermost parent
 				$parent = $kingdomId;
 				
 			}
-
-			$species[$key]['is_matrix'] = false;
-            
+	
 			// does taxon already exist?
 			$d = $this->models->Taxon->_get(array('id' =>
 				array(
@@ -1537,49 +1565,32 @@ class ImportNBCController extends Controller
 					'parent_id' => $parent, 
 					'taxon' => $key
 				)));
-				
+					
 			if ($d) { 
 
 				$species[$key]['lng_id'] = $d[0]['id'];
 			
 			} else {
 
-				// taxon does not exist, but maybe it's not a taxon but another matrix
-				$d = $this->models->MatrixName->_get(array('id' =>
-					array(
-						'project_id' => $this->getNewProjectId(), 
-						'language_id' => $this->getNewDefaultLanguageId(), 
-						'name' => $key
-					)));
-
-				if ($d) { 
-		
-					$species[$key]['is_matrix'] = true;
-					$species[$key]['lng_id'] = $d[0]['matrix_id'];
+				// save new taxon
+				$this->models->Taxon->save(
+				array(
+					'id' => null, 
+					'project_id' => $this->getNewProjectId(), 
+					'taxon' => $key, 
+					'parent_id' => $parent, 
+					'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['species'], 
+					'taxon_order' => $i++, 
+					'is_hybrid' => 0, 
+					'list_level' => 0
+				));
 				
-				} else {
-					
-					// save new taxon
-					$this->models->Taxon->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getNewProjectId(), 
-						'taxon' => $key, 
-						'parent_id' => $parent, 
-						'rank_id' => $_SESSION['admin']['system']['import']['project']['ranks']['species'], 
-						'taxon_order' => $i++, 
-						'is_hybrid' => 0, 
-						'list_level' => 0
-					));
-					
-					$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
-
-				}
+				$species[$key]['lng_id'] = $this->models->Taxon->getNewId();
 
 			}
-			
+				
 			// if it's not a matrix and if NBC-data columns have been defined, save the NBC-data
-			if ($species[$key]['is_matrix']!=true && isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
+			if (isset($_SESSION['admin']['system']['import']['data']['nbcColumns'])) {
 
 				$this->models->NbcExtras->delete(
 					array(
@@ -1605,18 +1616,17 @@ class ImportNBCController extends Controller
 				
 			}
 
-
-            $_SESSION['admin']['system']['import']['loaded']['species']++;
-            
-            if (isset($val['common name']) && $species[$key]['is_matrix']!=true) {
-                
-                $d = $this->models->Commonname->_get(array('id' =>
-                array(
-                    'project_id' => $this->getNewProjectId(), 
-                    'taxon_id' => $species[$key]['lng_id'], 
-                    'language_id' => $this->getNewDefaultLanguageId(), 
-                    'commonname' => $val['common name']
-                )));
+			$_SESSION['admin']['system']['import']['loaded']['species']++;
+				
+			if (isset($val['common name'])) {
+				
+				$d = $this->models->Commonname->_get(array('id' =>
+				array(
+					'project_id' => $this->getNewProjectId(), 
+					'taxon_id' => $species[$key]['lng_id'], 
+					'language_id' => $this->getNewDefaultLanguageId(), 
+					'commonname' => $val['common name']
+				)));
 				
 				if (!$d) {
 
@@ -1631,12 +1641,12 @@ class ImportNBCController extends Controller
 					
 				}
 
-            }
-			
-            // if there's variations, save those as well 
-            if (isset($val['variations']) && $species[$key]['is_matrix']!=true) {
+			}
+				
+			// if there's variations, save those as well 
+			if (isset($val['variations'])) {
 
-                foreach ((array) $val['variations'] as $vKey => $vVal) {
+				foreach ((array) $val['variations'] as $vKey => $vVal) {
 
 					if (empty($vVal['variant'])) {
 						
@@ -1645,7 +1655,7 @@ class ImportNBCController extends Controller
 		
 					}
 
-                    $d = $this->models->TaxonVariation->_get(array('id'=>
+					$d = $this->models->TaxonVariation->_get(array('id'=>
 						array(
 							'project_id' => $this->getNewProjectId(), 
 							'taxon_id' => $species[$key]['lng_id'], 
@@ -1707,24 +1717,24 @@ class ImportNBCController extends Controller
 					}
 
 					$_SESSION['admin']['system']['import']['loaded']['variations']++;
-                    
-                    $tmpIndex[$vVal['id']] = array(
-                        'type' => 'var', 
-                        'id' => $vId,
+					
+					$tmpIndex[$vVal['id']] = array(
+						'type' => 'var', 
+						'id' => $vId,
 						'name' => $vVal['variant'] // for Dierenzoeker
-                    );
+					);
 
-                }
-            }
-            else {
-                
-                $tmpIndex[$val['id']] = array(
-                    'type' => 'sp', 
-                    'id' => $species[$key]['lng_id'],
+				}
+
+			} else {
+					
+				$tmpIndex[$val['id']] = array(
+					'type' => 'sp', 
+					'id' => $species[$key]['lng_id'],
 					'name' => isset($val['common name']) ? $val['common name'] :  $key // for Dierenzoeker
-                );
-            }
-        }
+				);
+			}
+		}
 
 		// save relations
         foreach ((array) $species as $key => $val) {
@@ -1821,10 +1831,10 @@ class ImportNBCController extends Controller
 
 	}
 
-    private function createMatrix($name)
+    private function createMatrixIfNotExists($name)
     {
 
-        $this->models->MatrixName->_get(array('id' =>
+        $d=$this->models->MatrixName->_get(array('id' =>
         array(
             'project_id' => $this->getNewProjectId(), 
             'language_id' => $this->getNewDefaultLanguageId(), 
@@ -1834,7 +1844,7 @@ class ImportNBCController extends Controller
 		if (!empty($d[0]['matrix_id']))
 			  return 
 			  	array(
-					'id' => $d['matrix_id'], 
+					'id' => $d[0]['matrix_id'], 
 					'type' => 'existing',
 					'name' => $name
 				);
@@ -1859,6 +1869,7 @@ class ImportNBCController extends Controller
 	  return array('id' => $id, 'type' => 'new', 'name' => $name);
 
     }
+
 
     private function storeCharacterGroups($data, $mId)
     {
@@ -1916,6 +1927,7 @@ class ImportNBCController extends Controller
         
         return $data;
     }
+
 
     private function storeCharacters($data, $mId, $types)
     {
@@ -1975,6 +1987,7 @@ class ImportNBCController extends Controller
         return $data;
     }
 
+
     private function translateStateCode ($code, $languageId)
     {
         $translations = array(
@@ -1990,6 +2003,7 @@ class ImportNBCController extends Controller
         
         return isset($translations[$code][$languageId]) ? $translations[$code][$languageId] : $code;
     }
+
 
     private function storeStates($data)
     {
@@ -2127,13 +2141,16 @@ class ImportNBCController extends Controller
             else {
                 
                 $this->models->MatrixTaxon->setNoKeyViolationLogging(true);
+				
+				if ($tVal['isMatrix']==false) {
                 
-                $this->models->MatrixTaxon->save(array(
-                    'project_id' => $this->getNewProjectId(), 
-                    'matrix_id' => $mId, 
-                    'taxon_id' => $tVal['lng_id']
-                ));
-
+					$this->models->MatrixTaxon->save(array(
+						'project_id' => $this->getNewProjectId(), 
+						'matrix_id' => $mId, 
+						'taxon_id' => $tVal['lng_id']
+					));
+					
+				}
 
                 if (isset($tVal['states'])) {
 
@@ -2145,15 +2162,21 @@ class ImportNBCController extends Controller
 								continue;
                             
                             $this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+							
+								$d=array(
+									'project_id' => $this->getNewProjectId(), 
+									'matrix_id' => $mId, 
+									'characteristic_id' => $mData['characters'][$sKey]['id'], 
+									'state_id' => $mData['states'][$sKey][$state]
+								);
+							
+								if ($tVal['isMatrix']==false)
+									$d['taxon_id']=$tVal['lng_id'];
+								else
+									$d['ref_matrix_id']=$tVal['lng_id'];
 
-                            $this->models->MatrixTaxonState->save(
-                            array(
-                                'project_id' => $this->getNewProjectId(), 
-                                'matrix_id' => $mId, 
-                                'characteristic_id' => $mData['characters'][$sKey]['id'], 
-                                'state_id' => $mData['states'][$sKey][$state], 
-                                'taxon_id' => $tVal['lng_id']
-                            ));
+								$this->models->MatrixTaxonState->save($d);
+
                             $_SESSION['admin']['system']['import']['loaded']['connections']++;
                         }
                     }
