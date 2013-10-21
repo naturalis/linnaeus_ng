@@ -24,6 +24,11 @@
                 	<img class="reloadBtnImg" src="{$nbcImageRoot}reload-icon.png" style="margin-bottom:-4px">{t}opnieuw beginnen{/t}
                 </a>
             </div>
+			{if $master_matrix_id}
+            <div class="facetCategories" style="margin-bottom:6px">
+				<a href="?mtrx={$master_matrix_id}">Terug naar de hoofdsleutel</a>
+            </div>
+			{/if}
 		</div>
 
         <div class="left-divider"></div>
