@@ -612,8 +612,6 @@ class MatrixKeyController extends Controller
 
 
 
-
-
 	private function _appControllerGetStates($data)
 	{
 
@@ -970,6 +968,7 @@ class MatrixKeyController extends Controller
 		echo json_encode($res);
 	
 	}
+
 
 
 
@@ -2371,15 +2370,15 @@ class MatrixKeyController extends Controller
         $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
         $groupByCharId = isset($p['groupByCharId']) ? $p['groupByCharId'] : false;
-    
-        $dT = $dV = '';
+
+        $dT = $dV = $dM = '';
         $i = 0;
 		$s = array();
     
         if (!empty($states)) {
             // we want all taxa/variations that have the already selected states so we create a list of unique state id's of those states
             foreach ((array) $states as $val) {
-				
+	
                 if ($val['type'] != 'f') {
 
                     $dT .= "right join %PRE%matrices_taxa_states _c" . $i . "
@@ -2387,7 +2386,7 @@ class MatrixKeyController extends Controller
 						and _a.matrix_id = _c" . $i . ".matrix_id
 						and _c" . $i . ".state_id  = " . $val['id'] . "
 						and _a.project_id = _c" . $i++ . ".project_id
-						and (_a.taxon_id is not null or _a.variation_id is null)
+						and (_a.taxon_id is not null or _a.variation_id is null or _a.ref_matrix_id is null)
 						";
 
                 } else {
@@ -2423,7 +2422,6 @@ class MatrixKeyController extends Controller
             }
         }
 		
-		
         if ($s) {
 
 			$s = implode(',', $s);
@@ -2439,8 +2437,10 @@ class MatrixKeyController extends Controller
 
 		}
 
-        if (!empty($dT))
+        if (!empty($dT)) {
             $dV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $dT));
+            $dM = str_replace('ref_matrix_id is null', 'variation_id is null', str_replace('taxon_id', 'ref_matrix_id', $dT));
+		}
 
         
         /*
@@ -2461,7 +2461,9 @@ class MatrixKeyController extends Controller
 						and _a.taxon_id not in
 							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
 					group by _a.state_id
+
 				union all
+
 				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 					from %PRE%matrices_taxa_states _a
 					" . (!empty($dV) ? $dV : "") . "
@@ -2469,6 +2471,8 @@ class MatrixKeyController extends Controller
 					where _a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 					group by _a.state_id
+
+
 				union all
 				select count(distinct _a.ref_matrix_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 					from %PRE%matrices_taxa_states _a
@@ -2477,6 +2481,8 @@ class MatrixKeyController extends Controller
 					where _a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 					group by _a.state_id
+
+
 			) as q1 
 			group by q1.state_id
 			";
