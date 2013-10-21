@@ -780,7 +780,7 @@ class ImportNBCController extends Controller
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
 
-q($data,1);
+
 		if ($data['project']['title']) {
 
 			$d = $this->models->Project->_get(array(
@@ -2226,6 +2226,9 @@ q($data,1);
                         // line 1, cell 0: group
                         if ($line == 1 && $cKey == 0)
                             $data['project']['soortgroep'] = $cVal;
+                        // line 2, cell 0: matrix (optional)
+                        if ($line == 2 && $cKey == 0)
+                            $data['project']['matrix']['label'] = $cVal;
 
 						// line > 3: labels etc
                         if ($line > 3) {
