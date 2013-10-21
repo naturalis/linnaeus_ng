@@ -296,7 +296,6 @@ class MatrixKeyController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-		
 		if (!$this->rHasVal('action')) {
 			
             $this->smarty->assign('returnText', 'error');
@@ -378,6 +377,7 @@ class MatrixKeyController extends Controller
             
             //$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
             $states = $this->stateMemoryRecall();
+
             $countPerState = $this->getRemainingStateCount(array(
                 'charId' => $this->requestData['id'], 
                 'states' => $states
@@ -2488,6 +2488,7 @@ class MatrixKeyController extends Controller
 			";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
+		//q($this->models->MatrixTaxonState->q(),1);
         
         $all = array();
     
@@ -2812,14 +2813,14 @@ class MatrixKeyController extends Controller
 		$fullhits = 0;
 		foreach((array)$matches as $match)
 			if ($match['s']) $fullhits++;
-		
+
         // only keep the 100% scores, no partial matches for naturalis
         $res = array();
         foreach ((array) $matches as $match) {
             if ($match['s'] == 100) {
 
                 if ($match['type'] == 'variation') {
-                    
+
                     $val = $this->getVariation($match['id']);
 
                     $nbc = $this->models->NbcExtras->_get(
@@ -2851,7 +2852,7 @@ class MatrixKeyController extends Controller
                         'inclRelated' => false,
 						'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['id'])
                     ));
-                }
+                } else
                 if ($match['type'] == 'matrix') {
 					
 					$image = $match['l'].'.jpg';
@@ -2915,7 +2916,6 @@ class MatrixKeyController extends Controller
             }
         }
 
-
         
         if (count((array)$res)==1) {
             
@@ -2934,7 +2934,7 @@ class MatrixKeyController extends Controller
 
         }
 		
-		if ($this->_matrixSuppressDetails!=true)
+		if ($this->_matrixSuppressDetails!=true && count((array)$res)!=0)
 			$res = $this->nbcHandleOverlappingItemsFromDetails(array('data'=>$res,'action'=>'remove'));
 
         return $res;

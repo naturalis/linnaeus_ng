@@ -37,6 +37,7 @@ function nbcGetResults(p) {
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
+			//console.dir(nbcData);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
 			if (p && p.action!='similar') nbcDoOverhead();
@@ -587,7 +588,7 @@ function nbcShowStates(id) {
 			time : getTimestamp()
 		}),
 		success : function (data) {
-			//alert(data);
+			//console.log(data);
 			data = $.parseJSON(data);
 			showDialog(
 				data.character.label,
@@ -834,7 +835,8 @@ function nbcFilterEmergingCharacters() {
 			var char=nbcData.menu.groups[i].chars[j];
 			if (char.type != 'range' && char.type != 'distribution') {
 				for (var k in char.states) {
-					countremain=countremain+nbcData.countPerState[char.states[k].id];
+					var count = nbcData.countPerState[char.states[k].id] ? nbcData.countPerState[char.states[k].id] : 0;
+					countremain=countremain+count;
 				}
 				nbcData.menu.groups[i].chars[j].disabled=(countremain<nbcData.results.length);
 			}

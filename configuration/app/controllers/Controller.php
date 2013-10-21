@@ -124,7 +124,7 @@ class Controller extends BaseClass
     private $_hotwordNoLinks = array();
     private $_tmpTree = null;
 
-    public $useCache = false;//true;
+    public $useCache = true;
     public $viewName;
     public $controllerBaseName;
     public $controllerBaseNameMask = false;
