@@ -163,7 +163,7 @@ function nbcFormatResult(data) {
 		data.
 			i : id 
 			t : taxon id (absent when not a variation) 
-			y : type: t(axon) or v(ariation)
+			y : type: t(axon) or v(ariation) or m(atrix)
 			l : label 
 			c : taxon
 			g : gender (absent when not a variation)
@@ -241,8 +241,9 @@ function nbcFormatResult(data) {
             '</div> \
 			<div class="result-labels">'+
 				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-                '<span class="result-name-scientific">'+data.s+'</span> \
-                <span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
+                '<span class="result-name-scientific">'+data.s+'</span> '+
+				(data.y=='m'? '<br /><a href="?mtrx='+data.i+'&main='+nbcData.matrix+'">Ga naar sleutel '+data.s+'</a>' : '' )+
+                '<span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
             </div> \
         </div> \
         <div class="result-icons"> \
@@ -614,7 +615,8 @@ function nbcBuildGroupMenu(data) {
 	for (var i in data.groups) {
 
 		var v = data.groups[i];
-		var openGroup = false;
+
+		var openGroup = data.groups.length==1 ? true : false;
 
 		if (v.type=='group') {
 
