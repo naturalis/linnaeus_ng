@@ -2644,6 +2644,10 @@ class MatrixKeyController extends Controller
     {
         $this->checkAuthorisation();
         
+        $this->setPageName($this->translate('Management'));
+
+        $this->checkAuthorisation();
+        
         $this->printPage();
     }
 
