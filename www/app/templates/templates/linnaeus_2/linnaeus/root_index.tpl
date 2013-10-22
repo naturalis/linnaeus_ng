@@ -38,7 +38,7 @@ To use an application, follow one of the following links:<br />
 </div>
 <form method="post" id="theForm" action="app/views/linnaeus/set_project.php">
 <input type="hidden" name="p" id="p" value="" />
-<input type="hidden" name="rnd" value="<?php echo uniqid(null,true); ?>" />
+<input type="hidden" name="rnd" value="{1|rand:99999999}" />
 </form>
 
 </div ends="page-container">
