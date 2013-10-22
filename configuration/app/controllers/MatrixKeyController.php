@@ -2550,10 +2550,11 @@ class MatrixKeyController extends Controller
 		
 	}
  
+
     private function nbcGetCompleteDataset ($p = null)
     {
 
-        $res = $this->getCache('matrix-nbc-data');
+        $res = $this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
 
         if (!$res) {
 
@@ -2683,11 +2684,12 @@ class MatrixKeyController extends Controller
 				'dir' => 'asc'
             ));
 			
-            $this->saveCache('matrix-nbc-data', $res);
+            $this->saveCache('matrix-nbc-data-'.$this->getCurrentMatrixId(), $res);
         }
 
         return $res;
     }
+
 
     private function nbcGetSimilar ($p = null)
     {
@@ -2794,6 +2796,7 @@ class MatrixKeyController extends Controller
         return $res;
     }
 	
+
     private function nbcGetTaxaScores ($selectedStates = null)
     {
         $states = array();
