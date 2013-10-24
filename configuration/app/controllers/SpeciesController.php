@@ -39,6 +39,8 @@ class SpeciesController extends Controller
         ), 
         'IE' => array()
     );
+	
+	public $useCache=false;
 
 
 	/* init */
@@ -59,9 +61,6 @@ class SpeciesController extends Controller
 
     private function initialise ()
     {
-		define('PREDICATE_VALID_NAME',$this->getSetting('predicate_isValidNameOf','isValidNameOf'));
-		define('PREDICATE_PREFERRED_NAME',$this->getSetting('predicate_isPreferredNameOf','isPreferredNameOf'));
-
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
     }
 
@@ -699,7 +698,7 @@ class SpeciesController extends Controller
             }
             
             $m = $this->getTaxonMedia($taxon, null);
-            
+
             $stdCats[] = array(
                 'id' => 'media', 
                 'title' => $this->translate('Media'), 
@@ -772,7 +771,7 @@ class SpeciesController extends Controller
 
     private function getTaxonContent($p=null)
     {
-		
+
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$category = isset($p['category']) ? $p['category'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
@@ -1167,9 +1166,20 @@ class SpeciesController extends Controller
             )
         ));
         
-        if ($mt)
-            return $mt[0]['file_name'];
-        else
+        if ($mt) {
+			
+            $mdt = $this->models->MediaDescriptionsTaxon->_get(
+            array(
+                'id' => array(
+                    'project_id' => $this->getCurrentProjectId(), 
+                    'language_id' => $this->getCurrentLanguageId(), 
+                    'media_id' => $mt[0]['id']
+                ), 
+                'columns' => 'description'
+            ));			
+			
+            return array('image' => $mt[0]['file_name'],'label' => $mdt[0]['description']);
+		} else
             return null;
     }
 
@@ -1326,6 +1336,7 @@ class SpeciesController extends Controller
 		);
 		
 	}
+
 
 	private function getName($p)
 	{

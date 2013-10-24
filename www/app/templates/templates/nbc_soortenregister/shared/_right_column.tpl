@@ -4,7 +4,6 @@
             <h2>{t}Zoek op naam{/t}</h2>
             
             <form id="inlineformsearch" name="inlineformsearch" action="../search/search.php" method="post">
-                <label for="search" accesskey="t"></label>
                 <input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="" />
                 <input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" />
             </form>

@@ -2,3 +2,40 @@ html {overflow-y: scroll;} /* fixes page-shift problem of (dis)appearing vertica
 body {font-family:Arial,Helvetica,Sans-serif; font-size:75%;}
 #content {float:left;padding-top:10px}
 #content div {float:left; clear:none; position:relative;}
+.searchResultMatch {background-color:#ffa;}
+
+#left li {
+	list-style:inside;
+	list-style-type:none;
+    background:none;
+    margin-bottom: 5px;
+    margin-left: 0;
+    padding-left: 0px;
+    position: relative;
+}
+#left #categories {
+	margin-bottom:25px;
+}
+
+table tr td {
+	padding-right:25px;
+}
+.classification-name.smaller {
+	font-size:10px;
+}
+.classification-connector {
+	color:#666;
+}
+.classification-connector-invisible {
+	visibility:hidden;
+}
+.classification-rank {
+	font-size:9px;
+	padding-left:2px;
+}
+.classification-rank .smaller{
+	font-size:9px;
+}
+.classification-preffered-name {
+	font-size:11px;
+}

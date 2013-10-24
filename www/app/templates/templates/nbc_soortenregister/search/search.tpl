@@ -10,30 +10,25 @@
 		<div id="results">
 			<p>
 				<h2>
-				Gezocht op "{$search}": <span id="resultcount-header"></span>
+				Gezocht op "{$search.search}": <span id="resultcount-header"></span>
 				</h2>
 			</p>
-		{assign var=resultcount value=0}
-		{if $results.species.numOfResults > 0}
 			<p>
-			<ol>
-			{foreach from=$results.species.results key=cat item=res index=x}
-				{if $res.syslabel=='higher_taxa' || $res.syslabel=='species_names' || $res.syslabel=='taxon_names'}
-				{math equation="x + y" x=$resultcount y=$res.numOfResults assign=resultcount}
-				{foreach from=$res.data key=k item=v name=r}
-					<li style="margin-bottom:5px"><a class="result"href="../species/taxon.php?id={$v.taxon_id}{if $v.cat}&cat={$v.cat}{/if}&sidx={$v.sIndex}">
-						{$v.target}
-						{if $v.label}{h search=$search}{$v.label}{/h}
-						{elseif $v.content}"{foundContent search=$search}{$v.content}{/foundContent}"{/if}
+				{if $results}
+				<ol>
+					{foreach from=$results.data item=res}
+					<li style="margin-bottom:5px">
+					<a class="result"href="../species/taxon.php?id={$res.taxon_id}">
+					{if $res.subject.label}{$res.subject.label}{elseif $res.label}{$res.label}{else}{$res.matches[0]}{/if}
 					</a>
-					{if $v.post_script}<br />{$v.post_script}{/if}
+					{if $res.preferredName}<br />{$res.preferredName}{elseif $res.label}<br />{$res.label}{/if}
 					</li>
-				{/foreach}
+					{/foreach}
+				</ol>
+				{else}
+				Niets gevonden.
 				{/if}
-			{/foreach}
-			</ol>
 			</p>
-		{/if}
 		</div>
 		
 	</div>
@@ -46,7 +41,7 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	$('#resultcount-header').html('{$resultcount} '+({$resultcount}==1 ? 'resultaat' : 'resultaten'));
+	$('#resultcount-header').html('{$results.count} '+({$results.count}==1 ? 'resultaat' : 'resultaten'));
 {literal}
 });
 </script>

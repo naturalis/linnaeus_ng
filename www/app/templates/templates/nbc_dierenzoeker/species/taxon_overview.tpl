@@ -3,8 +3,8 @@
 {if $overviewImage}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage}" title="">
-            <img style="width:280px" title="" src="{$session.app.project.urls.uploadedMedia}{$overviewImage}" alt="">
+        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage.image}" title="">
+            <img style="width:280px" title="" src="{$session.app.project.urls.uploadedMedia}{$overviewImage.image}" alt="">
         </a>
     </div>
 </div>
