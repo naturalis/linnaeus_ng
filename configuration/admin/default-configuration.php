@@ -49,6 +49,9 @@ class configuration
 		if (!defined('SPECIES_RANK_ID')) define('SPECIES_RANK_ID',74);
 		if (!defined('SUBSPECIES_RANK_ID')) define('SUBSPECIES_RANK_ID',77);
 		if (!defined('GRAFT_CHIMERA_RANK_ID')) define('GRAFT_CHIMERA_RANK_ID',88);
+
+		if (!defined('PREDICATE_VALID_NAME')) define('PREDICATE_VALID_NAME','isValidNameOf');
+		if (!defined('PREDICATE_PREFERRED_NAME')) define('PREDICATE_PREFERRED_NAME','isPreferredNameOf');
 		
 	}
 

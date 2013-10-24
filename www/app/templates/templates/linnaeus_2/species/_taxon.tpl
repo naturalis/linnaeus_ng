@@ -178,7 +178,7 @@
 {else}
 <div id="content">
 {if $isTaxonStartPage && $overviewImage}
-<div id="overview-image" style="background: url('{$session.app.project.urls.uploadedMedia}{$overviewImage}');"></div>
+<div id="overview-image" style="background: url('{$session.app.project.urls.uploadedMedia}{$overviewImage.image}');"></div>
 {/if}
 {$content}
 </div>

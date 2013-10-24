@@ -71,7 +71,7 @@ Voorbeeld: staat er in 'l2_maps' een kaart met de naam 'South Pacific' en
 geen waarde (null) voor het veld 'image', dan is het pad van het
 betreffende bestand:
   /www/shared/media/system/l2_maps/south pacific.gif
-(dus incluis de spatie, in L2 was me niet zo van de underscores). 
+(dus incluis de spatie, in L2 was men niet zo van de underscores). 
 6) En omdat we  toch bezig zijn proberen we als dat ook faalt tenslotte nog:
   /www/shared/media/system/l2_maps/south pacific.GIF
 

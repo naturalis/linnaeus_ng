@@ -161,6 +161,7 @@ class Controller extends BaseClass
         'variation_label', 
         'taxon_variation',
         'taxa_relations',
+		'names'
     );
     private $usedHelpersBase = array(
         'logging_helper', 
@@ -642,19 +643,6 @@ class Controller extends BaseClass
     }
 	
 	
-	private function _getTaxonClassification($id)
-	{
-		$taxon = $this->getTaxonById($id);
-		$taxon['do_display'] = !preg_match('/^\(.*\)$/', $taxon['taxon']);
-		
-		array_unshift($this->tmp,$taxon);
-	
-		if (!empty($taxon['parent_id'])) {
-			$this->_getTaxonClassification($taxon['parent_id']);
-		}
-	
-	}
-		
     public function getTaxonClassification ($taxonId)
     {
 		$this->tmp = array();
@@ -1170,6 +1158,25 @@ class Controller extends BaseClass
 		
 	}
 
+	public function getPreferredName($id)
+	{
+
+		$name = $this->models->Names->freeQuery(
+			"select * from %PRE%names _a
+			  left join %PRE%name_types _b
+			  	on _a.type_id=_b.id 
+				and _a.project_id=_b.project_id
+				and _b.nametype = '".PREDICATE_PREFERRED_NAME."'
+			  where _a.project_id =".$this->getCurrentProjectId()."
+			    and _a.taxon_id =".$id."
+				and language_id =".$this->getCurrentLanguageId()."
+				limit 1"
+		);
+		
+		return $name[0]['name'];
+		
+	}
+
     public function getVariation ($id)
     {
         $tv = $this->models->TaxonVariation->_get(
@@ -1324,7 +1331,7 @@ class Controller extends BaseClass
     
     public function formatTaxon ($taxon,$ranks=null)
     {
-	
+
 		if (empty($taxon))
 			return;
 
@@ -1446,6 +1453,29 @@ class Controller extends BaseClass
 
 
 
+    private function getMainMenu ()
+    {
+		$modules=$this->getProjectModules();
+
+		if (isset($modules['modules'])) array_walk($modules['modules'],function(&$value) {$value['type']='regular';});
+		if (isset($modules['freeModules'])) array_walk($modules['freeModules'],function(&$value) {$value['show_in_public_menu']='1';});
+		
+		return array_merge(isset($modules['modules']) ? $modules['modules']:array(),isset($modules['freeModules'])?$modules['freeModules']:array());
+    }
+
+	private function _getTaxonClassification($id)
+	{
+		$taxon = $this->getTaxonById($id);
+		$taxon['do_display'] = !preg_match('/^\(.*\)$/', $taxon['taxon']);
+		
+		array_unshift($this->tmp,$taxon);
+	
+		if (!empty($taxon['parent_id'])) {
+			$this->_getTaxonClassification($taxon['parent_id']);
+		}
+	
+	}
+		
     private function setControllerParams ($params)
     {
         if (isset($params['checkForSplash']))
@@ -1602,7 +1632,7 @@ class Controller extends BaseClass
     {
         if (empty($content))
             return;
-        
+
         $this->saveInterfaceText($content);
         
         $c = $this->doTranslate($content);
@@ -1644,63 +1674,57 @@ class Controller extends BaseClass
     }
 
 
-
-    public function getMainMenu ()
+    public function getProjectModules ($params = null)
     {
-        $modules = $this->models->ModuleProject->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'active' => 'y'
-            ), 
-            'columns' => 'id,module_id,show_order,active'
-        ));
-        
-        $m = $this->models->Module->_get(array(
-            'id' => '*', 
-            'fieldAsIndex' => 'id'
-        ));
-        
-        foreach ((array) $modules as $key => $val) {
-            
-            if (isset($m[$val['module_id']])) {
-                
-                $mp = $m[$val['module_id']];
-                $modules[$key]['type'] = 'regular';
-                $modules[$key]['icon'] = $mp['icon'];
-                $modules[$key]['module'] = $this->translate($mp['module']);
-                $modules[$key]['controller'] = $mp['controller'];
-                $modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
-                $modules[$key]['show_order'] = $mp['show_order'];
-                
-                $_SESSION['app']['project']['active-modules'][$mp['id']] = $mp['module'];
-            }
-        }
-        
-        $freeModules = $this->models->FreeModuleProject->_get(
-        array(
-            'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
-                'active' => 'y'
-            ), 
-            'columns' => 'id,module,description,show_order,show_alpha,active'
-        ));
-        
-        foreach ((array) $freeModules as $key => $val) {
-            
-            $val['type'] = 'free';
-            $val['show_in_public_menu'] = 1;
-            $modules[] = $val;
-        }
-        
 
-        $this->customSortArray($modules, array(
-            'key' => 'show_order', 
-            'dir' => 'asc'
-        ));
-        
-        return $modules;
+		$d['project_id'] = isset($params['project_id']) ? $params['project_id'] : $this->getCurrentProjectId();
+		
+		if (isset($params['active']) && ($params['active'] == 'y' || $params['active'] == 'n'))
+			$d['active'] = $params['active'];
+		
+		$p['id'] = $d;
+		
+		if (isset($params['order']))
+			$p['order'] = $params['order'];
+
+		if (isset($params['ignore']))
+			$p['ignore'] = $params['ignore'];
+		
+		$modules = $this->models->ModuleProject->_get($p);
+		
+		foreach ((array) $modules as $key => $val) {
+			
+			if (isset($p['ignore']) && in_array($val['module_id'],(array)$p['ignore'])) continue;
+			
+			$mp = $this->models->Module->_get(array(
+				'id' => $val['module_id']
+			));
+
+			$modules[$key]['module'] = $mp['module'];
+			$modules[$key]['description'] = $mp['description'];
+			$modules[$key]['controller'] = $mp['controller'];
+			$modules[$key]['show_order'] = $mp['show_order'];
+			$modules[$key]['show_in_public_menu'] = $mp['show_in_public_menu'];
+		}
+		
+		$this->customSortArray($modules, array(
+			'key' => 'show_order', 
+			'maintainKeys' => true
+		));
+		
+		$freeModules = $this->models->FreeModuleProject->_get(array(
+			'id' => array(
+				'project_id' => $d['project_id']
+			)
+		));
+		
+		return array(
+			'modules' => $modules, 
+			'freeModules' => $freeModules
+		);
+
     }
+
 
 
 

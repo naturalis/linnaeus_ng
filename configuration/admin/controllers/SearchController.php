@@ -519,6 +519,9 @@ class SearchController extends Controller
 
 	private function doSearch($search,$modules,$freeModules)
 	{
+
+		$searchAll=($modules=='*');
+
 		$tokenized = $this->tokenizeSearchString($search);
 		//$fulltext = $this->prefabFullTextMatchString($tokenized);
 		$liketxt = $this->prefabFullTextLikeString($tokenized);
@@ -1079,34 +1082,31 @@ class SearchController extends Controller
 
 	private function searchModules($p,$freeModules=null)
 	{
-
-		if ($freeModules!==false)
-			$d['module_id in']  = implode(',',$freeModules).')';					
-		else
+		if ($freeModules==false)
 			return null;
 
-		$d['project_id'] = $this->getCurrentProjectId();	
+		$d=array(
+			'project_id' => $this->getCurrentProjectId(),
+			'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('topic','content')),
+		);
+
+		if ($freeModules!='*')
+			$d['module_id in']='('.implode(',',$freeModules).')';
+
+		$content = $this->models->ContentFreeModule->_get(
+			array(
+				'id' => $d,
+				'columns' => 'page_id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__,
+				'order' => 'module_id'
+			)
+		);
 
 		// get appropriate free modules
 		$modules = $this->models->FreeModuleProject->_get(
 			array(
-				'id' => $d,
+				'project_id' => $this->getCurrentProjectId(),
 				'columns' => 'id,module',
 				'fieldAsIndex' => 'id'
-			)
-		);
-
-
-		$content = $this->models->ContentFreeModule->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'module_id in' => '('.implode(',',$freeModules).')',
-					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[S_FULLTEXT_STRING]."' in boolean mode)",
-					'%LITERAL%' => $this->makeLikeClause($p[S_LIKETEXT_STRING],array('topic','content')),
-				),
-				'columns' => 'page_id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.__CONCAT_RESULT__,
-				'order' => 'module_id'
 			)
 		);
 

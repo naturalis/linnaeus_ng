@@ -1,48 +1,16 @@
 {include file="../shared/header.tpl"}
 {literal}
 <style>
-#left li {
-	list-style:inside;
-	list-style-type:none;
-    background:none;
-    margin-bottom: 5px;
-    margin-left: 0;
-    padding-left: 0px;
-    position: relative;
-}
-#left #categories {
-	margin-bottom:25px;
-}
-
-table tr td {
-	padding-right:25px;
-}
-.classification-name.smaller {
-	font-size:10px;
-}
-.classification-connector {
+.taxon-image-table {
+	font-size:9px;
 	color:#666;
-}
-.classification-connector-invisible {
-	visibility:hidden;
-}
-.classification-rank {
-	font-size:9px;
-	padding-left:2px;
-}
-.classification-rank .smaller{
-	font-size:9px;
-}
-.classification-preffered-name {
-	font-size:11px;
 }
 </style>
 {/literal}
-
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
-    
+	
 	<div id="content">
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="">
@@ -56,17 +24,44 @@ table tr td {
 				{/if}
 				</h1>
 				{if $names.list[$names.prefId] && $names.list[$names.sciId]}
-					<h2><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
+					<h2 style="width:510px"><i>{$names.list[$names.sciId].uninomial} {$names.list[$names.sciId].specific_epithet}</i></h2>
+				{else}
+					<h2 style="width:510px">&nbsp;</h2>
 				{/if}
 			</div>
+			{if $overviewImage.image}
 			<div id="taxonImage">
-				<img src="http://images.ncbnaturalis.nl/510x272/236381.jpg" />
+				<img src="{$overviewImage.image}" />
 				<div id="taxonImageCredits">
 					<span class="photographer-title">Foto</span>
-					Wijnand van Buuren, 5 juni 2013, Ermelo, Groevenbeekse heide
+					{assign var=name value=", "|explode:$overviewImage.label} 
+					{$name[1]} {$name[0]}
 				</div>
 			</div>
+			{/if}
 		</div>
+
+		{if $activeCategory=='media'}
+
+			<h4>Afbeelding{if $content|@count!=1}en{/if}: {$content|@count}</h4>
+			<div>
+				{foreach from=$content item=v}
+				{assign var=name value=", "|explode:$v.description} 
+				<div class="thumbholder">
+					<div class="thumbnail">
+						<a class="zoomimage" href="{$v.file_name}">
+							<img src="{$v.thumb_name}" title="foto {$name[1]} {$name[0]}" alt="foto {$name[1]} {$name[0]}">
+						</a>
+					</div>
+					<p class="author">
+						<span class="photographer-title">Foto</span>
+						{$name[1]} {$name[0]}
+					</p>
+				</div>
+				{/foreach}
+			</div>
+
+		{else}
 		<p>
 		
 			{if $categorySysList[$activeCategory]=='Nomenclature'}
@@ -109,7 +104,6 @@ table tr td {
 						{/foreach}			
 					</table>
 				</p>
-
 			{/if}
 		
 			{if $content|@is_array}
@@ -119,7 +113,9 @@ table tr td {
 			{/foreach}
 			</ul>
 			{else}
+			<p>
 			{$content}
+			</p>
 			{/if}
 		</p>
 		<h2>Bron</h2>
@@ -132,6 +128,7 @@ table tr td {
 				<li></li>
 			</ul>
 		</p>
+		{/if}
 	</div>
 
 	{include file="../shared/_right_column.tpl"}
