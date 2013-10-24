@@ -490,3 +490,11 @@ table#media-grid td:first-child {
 .inline-image:hover, .inline-audio:hover, .inline-video:hover {
     text-decoration: underline;
 }
+
+ul {
+    list-style: disc inside none;
+}
+
+li {
+	padding:0 0 0 10px;
+}
