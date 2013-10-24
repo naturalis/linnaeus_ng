@@ -491,10 +491,10 @@ table#media-grid td:first-child {
     text-decoration: underline;
 }
 
-ul {
+#page-main ul {
     list-style: disc inside none;
 }
 
-li {
+#page-main li {
 	padding:0 0 0 10px;
 }
