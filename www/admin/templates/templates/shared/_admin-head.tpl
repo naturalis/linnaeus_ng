@@ -1,28 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-	<title>{$session.admin.project.name}{if $session.admin.project.name!='' && $pageName != ''} - {/if}{$pageName|@strip_tags}</title>
+		<title>{$session.admin.project.name}{if $session.admin.project.name!='' && $pageName != ''} - {/if}{$pageName|@strip_tags}</title>
 
-	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-	<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon" />
+		<link href="{$baseUrl}admin/media/system/favicon.ico" rel="shortcut icon" type="image/x-icon">
+		<link href="{$baseUrl}admin/media/system/favicon.ico" rel="icon" type="image/x-icon">
 
-	<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui-1.10.0.custom.min.css" />
+		<link rel="stylesheet" type="text/css" href="editing_species_files/jquery-ui-1.css">
 
-	<style type="text/css" media="all">
-		@import url("{$baseUrl}admin/style/main.css");
-		@import url("{$baseUrl}admin/style/admin-inputs.css");
-		@import url("{$baseUrl}admin/style/admin-help.css");
-		@import url("{$baseUrl}admin/style/admin.css");
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/main.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin-inputs.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin-help.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/admin.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/prettyPhoto/prettyPhoto.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/taxon.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/rank-list.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/dialog/jquery.modaldialog.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/lookup.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/ui.css">
+		<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/jquery-ui-1.10.0.custom.min.css">
+
 {if $cssToLoad}
+		<style type="text/css" media="all">
 {section name=i loop=$cssToLoad}
 		@import url("{$baseUrl}admin/style/{$cssToLoad[i]}");
 {/section}
+		</style>
 {/if}
-{* if $session.admin.project.css_url!=''}		@import url("{$session.admin.project.css_url}");
-{/if *}
-	</style>
 
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-1.8.3.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}admin/javascript/jquery-ui/jquery-ui-1.9.1.min.js"></script>
