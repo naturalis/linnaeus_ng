@@ -1,17 +1,25 @@
 <body><div id="body-container"><a name="body-top"></a>
-<div id="header-container">
-	<a href="{$baseUrl}admin/views/utilities/admin_index.php"><img src="{$baseUrl}admin/media/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="{$baseUrl}admin/media/system/eti_logo.png" id="eti-logo" /></a>
 
-{if !$excludeLogout && $session.admin.user._logged_in}
-	<div style="text-align:right;position:relative;top:-20px">
-		{t}Logged in as{/t}
-        <a href="{$baseUrl}admin/views/users/edit.php?id={$session.admin.user.id}">
-            {$session.admin.user.first_name} {$session.admin.user.last_name}
-        </a> (<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>)
+<div id="header-container">
+	<a href="{$baseUrl}admin/views/utilities/admin_index.php">
+		<img src="{$baseUrl}admin/media/system/logo_linnaeus_ng.png" id="lng-logo">
+	</a>
+
+	<div class="header-branding">
+		Linnæus NG&trade; administration
 	</div>
-{/if}
+
+	<div class="header-user">
+		{if !$excludeLogout && $session.admin.user._logged_in}
+		{t}Logged in as{/t}
+		<a href="{$baseUrl}admin/views/users/edit.php?id={$session.admin.user.id}">
+            {$session.admin.user.first_name} {$session.admin.user.last_name}
+        </a> 
+        (<a href="{$baseUrl}admin/views/users/logout.php">{t}Log out{/t}</a>)
+		{/if}
+	</div>
 </div>
+
 <div id="page-container">
 
 <div id="page-header-titles">
