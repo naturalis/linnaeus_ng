@@ -460,19 +460,21 @@ class ColLoaderHelper
     
             $result['taxon'] = $t;
 
-            // children
-            foreach ($dataFull['results'][0]['child_taxa'] as $t) {
-
-                if ($this->_conciseResults) {
-                    unset($t['name_html']);
-                    unset($t['url']);
-                }
-
-                if (!in_array($t['id'],$this->_includedIds)) $children[] = $t;
-                $this->_includedIds[] = $t['id'];
-                unset($t);
- 
-            }
+			if (isset($dataFull['results'][0]['child_taxa'])) {
+				// children
+				foreach ($dataFull['results'][0]['child_taxa'] as $t) {
+	
+					if ($this->_conciseResults) {
+						unset($t['name_html']);
+						unset($t['url']);
+					}
+	
+					if (!in_array($t['id'],$this->_includedIds)) $children[] = $t;
+					$this->_includedIds[] = $t['id'];
+					unset($t);
+	 
+				}
+			}
 
             // preserving memory
             unset($dataFull);
