@@ -24,9 +24,9 @@
 <div id="header-container">
 	<img src="admin/media/system/logo_linnaeus_ng.png" id="lng-logo">
 
-	<div class="header-branding">
+	<!-- div class="header-branding">
 		Linnæus NG&trade;
-	</div>
+	</div -->
 
 	<div class="header-user">
 	</div>
