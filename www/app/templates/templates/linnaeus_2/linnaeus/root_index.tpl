@@ -20,10 +20,18 @@
 	<script type="text/javascript" src="admin/javascript/main.js"></script>	
 </head>
 <body><div id="body-container">
+
 <div id="header-container">
-	<img src="admin/media/system/linnaeus_logo.png" id="lng-logo" />
-	<img src="admin/media/system/eti_logo.png" id="eti-logo" /></a>
+	<img src="admin/media/system/logo_linnaeus_ng.png" id="lng-logo">
+
+	<div class="header-branding">
+		Linnæus NG&trade;
+	</div>
+
+	<div class="header-user">
+	</div>
 </div>
+
 <div id="page-main">Welcome to Linnaeus NG.<br />
 <br />
 {if $hasEntryProgram && $showEntryProgramLink}
