@@ -29,7 +29,7 @@ How to handle files that already exist:<br />
 </p>
 <p>
 <input type="submit" value="{t}upload{/t}" />&nbsp;
-<input type="button" value="{t}back{/t}" onclick="window.open('media.php?id={$id}','_top')" />
+<input type="button" value="{t}back{/t}" onclick="window.open('admin_index.php','_top')" />
 </p>
 </form>
 </div>

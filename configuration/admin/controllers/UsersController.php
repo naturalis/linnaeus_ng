@@ -698,7 +698,7 @@ class UsersController extends Controller
 	
 			}
 	
-			$canDelete = ($user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
+			$canDelete = (isset($user['created_by']) && $user['created_by']==$this->getCurrentUserId() || $this->isCurrentUserSysAdmin());
 	
 			$upr = $this->getUserProjectRole($this->requestData['id'], $this->getCurrentProjectId());
 			
