@@ -9,7 +9,7 @@
 <script type="text/JavaScript">
 var hasSearchResults=false;
 </script>
-{if $userSearch}
+{* if $userSearch}
 <div id="search-float" style="width:350px;height:450px;overflow-y:scroll;overflow-x:hidden;border:1px solid #666;background-color:#fff;position:absolute;visibility:hidden">
 	<div id="search-float-header" style="width:100%;background-color:#eee;padding:10px 4px 10px 4px;cursor:move;">search: <span class="searched-term">{$userSearch.term}</span></div>
 	<div id="werwerwerwe" style="padding:4px;">
@@ -35,7 +35,7 @@ var hasSearchResults=false;
 <script type="text/JavaScript">
 var hasSearchResults=true;
 </script>
-{/if}
+{/if *}
 
 {literal}
 <script type="text/JavaScript">

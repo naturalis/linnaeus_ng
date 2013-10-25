@@ -81,7 +81,7 @@ function allLookupGetData(text) {
 				'time' : allGetTimestamp()
 			}),
 			success : function (data) {
-console.log(data);
+				//console.log(data);
 				allLookupData = $.parseJSON(data);
 				if (data) allLookupBuildList(allLookupData,text);
 
