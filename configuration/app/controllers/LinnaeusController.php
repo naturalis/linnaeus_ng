@@ -232,19 +232,26 @@ class LinnaeusController extends Controller
 
 	private function resolveProjectShortName()
 	{
-
 		$path = explode('/',$this->getfullPath());
 		$n = strtolower($path[1]);
 
 		if ($n!=$this->getAppName() && $n!='linnaeus_ng') {
 
-			$p = $this->models->Project->_get(array(
-				'id' => array(
-					'short_name' => $n
-				)
-			));
+            $p = $this->models->Project->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
 
-			return isset($p[0]['id']) ? $p[0]['id'] : null;
+			if ($p) {
+				foreach((array)$p as $val) {
+					if (empty($val['short_name']))
+						continue;
+					$d=explode(';',$val['short_name']);
+					array_walk($d,function(&$a,$b){$a=trim($a);});
+					if (in_array($n,$d)) {
+						return $val['id'];
+						exit;
+					}
+				}
+			}
+
 
 		}
 		
