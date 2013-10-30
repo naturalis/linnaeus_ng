@@ -328,21 +328,23 @@ class Controller extends BaseClass
         else {
             
             $pName = str_replace('_', ' ', strtolower($this->requestData['p']));
-            
-            $p = $this->models->Project->_get(array(
-                'id' => array(
-                    'sys_name' => $pName
-                )
-            ));
-            
-            if (!$p[0]) {
-                
-                $this->setCurrentProjectId(null);
-            }
-            else {
-                
-                $this->setCurrentProjectId(intval($p[0]['id']));
-            }
+
+			$this->setCurrentProjectId(null);
+			 
+            $p = $this->models->Project->_get(array('id'=>array('short_name !='=>'null'),'columns'=>'id,short_name'));
+
+			if ($p) {
+				foreach((array)$p as $val) {
+					if (empty($val['short_name']))
+						continue;
+					$d=explode(';',$val['short_name']);
+					array_walk($d,function(&$a,$b){$a=trim($a);});
+					if (in_array($pName,$d)) {
+						$this->setCurrentProjectId($val['id']);
+						exit;
+					}
+				}
+			}
         }
     }
 
