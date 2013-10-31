@@ -3,6 +3,8 @@ var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
 var initData;
+var nbcMatrixId=null;
+var nbcProjectId=null;
 
 function nbcPrettyPhotoInit() {
 
@@ -32,7 +34,9 @@ function nbcGetResults(p) {
 		data : ({
 			action : 'get_results_nbc',
 			params : p,
-			time : getTimestamp()
+			time : getTimestamp(),
+			key : nbcMatrixId,
+			p : nbcProjectId
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
@@ -123,7 +127,9 @@ function nbcSetState(p) {
 			action : (p && p.clearState) ? 'clear_state' : 'set_state' ,
 			state : p.state,
 			id : null,
-			time : getTimestamp()
+			time : getTimestamp(),
+			key : nbcMatrixId,
+			p : nbcProjectId
 		}),
 		success : function (data) {
 			if (p.norefresh!==true)
@@ -154,7 +160,9 @@ function getInitialValues() {
 		async : false,
 		data : ({
 			action : 'get_initial_values' ,
-			time : getTimestamp()
+			time : getTimestamp(),
+			key : nbcMatrixId,
+			p : nbcProjectId
 		}),
 		success : function (data) {
 			initData = $.parseJSON(data);
@@ -208,7 +216,7 @@ function updateStates(id) {
 
 function toonDier(id,type) {
 
-	$.ajax({
+	allAjaxHandle = $.ajax({
 		url : '../species/taxon_overview.php',
 		type: 'POST',
 		data : ({
@@ -240,7 +248,7 @@ function openDiergroep(pId,tId,type) {
 
 	var pre = '<a href="#" class="no-text terug-naar-het-dier" onclick="toonDier('+tId+',\''+type+'\');return false;">Terug naar het dier</a>';
 
-	$.ajax({
+	allAjaxHandle = $.ajax({
 		url : '../module/topic.php',
 		type: 'POST',
 		data : ({

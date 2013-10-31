@@ -52,5 +52,7 @@
 {if $includeHtmlEditor}
 {include file="../shared/tinymce-editor.tpl"}
 {/if}
-
+{if $session.admin.system.server_addr=='127.0.0.1'}
+	<link rel="stylesheet" type="text/css" href="{$baseUrl}admin/style/localhost.css">
+{/if}
 </head>

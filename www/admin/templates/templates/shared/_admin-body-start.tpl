@@ -85,14 +85,3 @@
 </div>
 {/if}
 
-{if $helpTexts}
-<div id="block-inline-help">
-	<div id="title" onClick="allToggleHelpVisibility();">{t}Help{/t}</div>
-	<div class="body-collapsed" id="body-visible">
-{section name=i loop=$helpTexts}
-		<div class="subject">{$helpTexts[i].subject}</div>
-		<div class="text">{$helpTexts[i].helptext}</div>
-{/section}
-	</div>
-</div>
-{/if}

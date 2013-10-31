@@ -17,7 +17,7 @@ class UtilitiesController extends Controller
     public $jsToLoad = array(
         'all' => array(
             'main.js', 
-            'prettyPhoto/jquery.prettyPhoto.js', 
+            'prettyPhoto/jquery.prettyPhoto.js'
         ), 
         'IE' => array()
     );

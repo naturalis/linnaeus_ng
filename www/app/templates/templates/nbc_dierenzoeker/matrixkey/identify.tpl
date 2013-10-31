@@ -202,7 +202,10 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-
+{/literal}
+	nbcMatrixId = {$matrix.id};
+	nbcProjectId = {$session.app.project.id};
+{literal}
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();
 	}
