@@ -285,7 +285,7 @@ class Controller extends BaseClass
         $pB = $this->getCurrentProjectId();
         
         if ($this->rHasVal('p')) {
-            
+
             $this->resolveProjectId();
         }
         elseif ($this->rHasVal($this->generalSettings['addedProjectIDParam'])) {

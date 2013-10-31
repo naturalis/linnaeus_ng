@@ -39,6 +39,8 @@ $(document).ready(function(){
 nbcImageRoot = '{$nbcImageRoot}';
 baseUrlProjectImages = '{$session.app.project.urls.projectMedia}';
 nbcBrowseStyle = '{$nbcBrowseStyle}';
+nbcMatrixId = {$matrix.id};
+nbcProjectId = {$session.app.project.id};
 {literal}
 if (typeof nbcInit=='function') {
 	nbcInit();

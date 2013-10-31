@@ -69,14 +69,14 @@ class MatrixKeyController extends Controller
 
 		if (count((array)$matrices)>0) {
         
-			$m = $this->getCurrentMatrix();
+			$m = $this->getCurrentMatrixId();
 			if (isset($m)) $this->redirect('identify.php');
 	
 			$m = $this->getDefaultMatrixId();
 			if (isset($m)) {
-				$m = $this->getMatrix($m);
-				$this->setCurrentMatrix($m);
-				if (!is_null($m)) {
+				$matrix = $this->getMatrix($m);
+				if (!is_null($matrix)) {
+					$this->setCurrentMatrixId($m);
 					$this->setTotalEntityCount();
 					$this->redirect('identify.php');
 				}
@@ -84,9 +84,9 @@ class MatrixKeyController extends Controller
 	
 			$m = $this->getFirstMatrixId();
 			if (isset($m)) {
-				$m = $this->getMatrix($m);
-				$this->setCurrentMatrix($m);
-				if (!is_null($m)) {
+				$matrix = $this->getMatrix($m);
+				if (!is_null($matrix)) {
+					$this->setCurrentMatrixId($m);
 					$this->setTotalEntityCount();
 					$this->redirect('identify.php');
 				}
@@ -119,7 +119,8 @@ class MatrixKeyController extends Controller
 
             $this->storeHistory = false;
 
-            $this->setCurrentMatrix($this->getMatrix($this->requestData['id']));
+            $this->setCurrentMatrix($this->requestData['id']);
+
 			$this->setTotalEntityCount();
 
             $this->redirect('identify.php');
@@ -132,19 +133,20 @@ class MatrixKeyController extends Controller
 
     public function identifyAction ()
     {
-
         $this->checkMatrixIdOverride();
         $this->checkMasterMatrixId();
 
-        $matrix = $this->getCurrentMatrix();
+        $id = $this->getCurrentMatrixId();
 
-        if (!isset($matrix)) {
+        if (!isset($id)) {
             
             $this->storeHistory = false;
             
             $this->redirect('index.php');
         }
         
+		$matrix = $this->getMatrix($id);
+
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 		
 		$characters = $this->getCharacteristics();
@@ -242,15 +244,17 @@ class MatrixKeyController extends Controller
     {
         $this->checkMatrixIdOverride();
         
-        $matrix = $this->getCurrentMatrix();
-        
-        if (!isset($matrix)) {
+        $id = $this->getCurrentMatrixId();
+
+        if (!isset($id)) {
             
             $this->storeHistory = false;
             
             $this->redirect('matrices.php');
         }
         
+		$matrix = $this->getMatrix($id);
+
         $this->smarty->assign('function', 'Examine');
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": examine'), $matrix['name']));
@@ -270,15 +274,17 @@ class MatrixKeyController extends Controller
     {
         $this->checkMatrixIdOverride();
         
-        $matrix = $this->getCurrentMatrix();
+        $id = $this->getCurrentMatrixId();
         
-        if (!isset($matrix)) {
+        if (!isset($id)) {
             
             $this->storeHistory = false;
             
             $this->redirect('matrices.php');
         }
         
+		$matrix = $this->getMatrix($id);
+
         $this->smarty->assign('function', 'Compare');
         
         $this->setPageName(sprintf($this->translate('Matrix "%s": compare'), $matrix['name']));
@@ -296,86 +302,97 @@ class MatrixKeyController extends Controller
 
     public function ajaxInterfaceAction ()
     {
-		if (!$this->rHasVal('action')) {
-			
+		if (!$this->rHasVal('action'))
+		{
             $this->smarty->assign('returnText', 'error');
-
-        }
-        else if ($this->rHasVal('action', 'get_states')) {
-            
+        } else
+		if ($this->rHasVal('action', 'get_states'))
+		{
             $this->smarty->assign('returnText', json_encode($this->getCharacteristicStates($this->requestData['id'])));
-        }
-        else if ($this->rHasVal('action', 'get_taxa')) {
-            
+        } else 
+		if ($this->rHasVal('action', 'get_taxa'))
+		{
             $this->stateMemoryUnset();
             
             $this->stateMemoryStore($this->requestData['id']);
             
-            $this->smarty->assign('returnText', json_encode((array) $this->getTaxaScores($this->requestData['id'], isset($this->requestData['inc_unknowns']) ? ($this->requestData['inc_unknowns'] == '1') : false)));
+            $this->smarty->assign(
+				'returnText',
+				json_encode(
+					(array)$this->getTaxaScores($this->requestData['id'],
+					isset($this->requestData['inc_unknowns']) ? ($this->requestData['inc_unknowns'] == '1') : false)
+				)
+			);
         }
-        else if ($this->rHasVal('action', 'get_taxon_states')) {
+        else
+		if ($this->rHasVal('action', 'get_taxon_states'))
+		{
             
             $this->smarty->assign('returnText', json_encode((array) $this->getTaxonStates($this->requestData['id'])));
         }
-        else if ($this->rHasVal('action', 'compare')) {
-            
+        else
+		if ($this->rHasVal('action', 'compare'))
+		{
             $this->smarty->assign('returnText', json_encode((array) $this->getTaxonComparison($this->requestData['id'])));
-
         }
-        else if ($this->rHasVal('action', 'store_showstate_results')) {
-            
+        else
+		if ($this->rHasVal('action', 'store_showstate_results'))
+		{
             $this->showStateStore('results');
         }
-        else if ($this->rHasVal('action', 'store_showstate_pattern')) {
-            
+        else
+		if ($this->rHasVal('action', 'store_showstate_pattern'))
+		{
             $this->showStateStore('pattern');
         }
-        else if ($this->rHasVal('action', 'store_examine_val')) {
-            
+        else
+		if ($this->rHasVal('action', 'store_examine_val'))
+		{
             $this->examineSpeciesStore($this->requestData['id']);
         }
-        else if ($this->rHasVal('action', 'store_compare_vals')) {
-            
+        else
+		if ($this->rHasVal('action', 'store_compare_vals'))
+		{
             $this->compareSpeciesStore($this->requestData['id']);
         }
-        else if ($this->rHasVal('action', 'do_search')) {
-			
-			if ($this->_matrixType == 'nbc') {
+        else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','do_search'))
+		{
 				
-				$results = $this->nbcDoSearch($this->requestData['params']);
+			$this->setCurrentMatrixId($this->requestData['key']);
+			
+			$results = $this->nbcDoSearch($this->requestData['params']);
 
-				$this->smarty->assign('returnText', 
-					json_encode(
-						array(
-							'results' => $results, 
-							'count' => array(
-								'results' => count((array) $results)
-							)
+			$this->smarty->assign('returnText', 
+				json_encode(
+					array(
+						'results' => $results, 
+						'count' => array(
+							'results' => count((array) $results)
 						)
 					)
-				);
-
-			}
+				)
+			);
 
         }
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'save_session_setting')) {
-            
+        else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','save_session_setting'))
+		{
+			$this->setCurrentMatrixId($this->requestData['key']);
             $this->saveSessionSetting($this->requestData['setting']);
         }
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_session_setting')) {
-            
-            $this->smarty->assign('returnText', $this->getSessionSetting($this->requestData['name']));
-        }
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_formatted_states')) {
-            
+        else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_formatted_states'))
+		{
+            $this->setCurrentMatrixId($this->requestData['key']);
+			
             $c = $this->getCharacteristic(array('id'=>$this->requestData['id']));
+
             $c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
             
             $s = $this->getCharacteristicStates($this->requestData['id']);
             $s = $this->fixStateLabels($s); // temporary measure (hopefully!)
-			//$s = $this->sortStates($s);
-            
-            //$states = $this->stateMemoryRecall(array('charId' => $this->requestData['id']));
+
             $states = $this->stateMemoryRecall();
 
             $countPerState = $this->getRemainingStateCount(array(
@@ -401,7 +418,10 @@ class MatrixKeyController extends Controller
 				)));
 
         }
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_results_nbc')) {
+		else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_results_nbc'))
+		{
+			$this->setCurrentMatrixId($this->requestData['key']);
 
 			$includeGroups = isset($this->requestData['params']['noGroups']) ? $this->requestData['params']['noGroups']!='1' : true;
 			$includeActiveChars = isset($this->requestData['params']['noActiveChars']) ? $this->requestData['params']['noActiveChars']!='1' : true;
@@ -474,7 +494,11 @@ class MatrixKeyController extends Controller
             $this->smarty->assign('returnText', $result	);
 			
         }
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'clear_state')) {
+        else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','clear_state'))
+		{
+
+			$this->setCurrentMatrixId($this->requestData['key']);
 
 			if (!$this->rHasVal('state'))
 				$this->stateMemoryUnset();
@@ -483,7 +507,11 @@ class MatrixKeyController extends Controller
 				
 
 		}
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'set_state') && $this->rHasVal('state')) {
+        else 
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','set_state') && $this->rHasVal('state'))
+		{
+			
+			$this->setCurrentMatrixId($this->requestData['key']);
 
 			if ($this->rHasVal('value'))
 				$state = $this->requestData['state'] . ':' . $this->requestData['value'];
@@ -495,25 +523,11 @@ class MatrixKeyController extends Controller
 			return;
 
 		}
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_groups')) {
-
-            $states = $this->stateMemoryRecall();
-
-			$d = array();
-
-            foreach ((array) $states as $val)
-                $d[$val['characteristic_id']] = true;
-
-            $this->smarty->assign('returnText', 
-				json_encode(
-				array(
-					'groups' => $this->getCharacterGroups(),
-					'activeChars' => $d,
-					'storedStates' => $this->stateMemoryRecall()
-				)));
-
-		}
-        else if ($this->_matrixType == 'nbc' && $this->rHasVal('action', 'get_initial_values')) {
+        else
+		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_initial_values'))
+		{
+			
+			$this->setCurrentMatrixId($this->requestData['key']);
 
 			// state image urls
 			$cs = $this->models->CharacteristicState->_get(
@@ -557,9 +571,14 @@ class MatrixKeyController extends Controller
 
     }
 
+    public function setCurrentMatrixId($id)
+    {
+        $_SESSION['app']['user']['matrix']['active'] = $id;
+    }
+
     public function getCurrentMatrixId ()
     {
-        return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active']['id'] : null;
+        return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
     }
 
     public function cacheAllTaxaInMatrix ()
@@ -1115,7 +1134,8 @@ class MatrixKeyController extends Controller
         if (!$this->rHasVal('mtrx'))
 			return;
 
-		$this->setCurrentMatrix($this->getMatrix($this->requestData['mtrx']));
+		$this->setCurrentMatrixId($this->requestData['mtrx']);
+
 		$this->setTotalEntityCount();
 			
     }
@@ -1141,16 +1161,6 @@ class MatrixKeyController extends Controller
 			$this->setMasterMatrixId(null);
     }
 
-    private function getCurrentMatrix ()
-    {
-        return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
-    }
-
-    private function setCurrentMatrix ($m)
-    {
-        $_SESSION['app']['user']['matrix']['active'] = $m;
-    }
-
     private function setTotalEntityCount ($id=null)
     {
 		
@@ -1170,7 +1180,7 @@ class MatrixKeyController extends Controller
         return count((array) $m);
     }
 
-    private function getMatrix ($id)
+    private function getMatrix($id)
     {
         if (!isset($id))
             return;
@@ -1754,7 +1764,7 @@ class MatrixKeyController extends Controller
 
     private function getCharacteristic ($p)
     {
-		
+
 		$id = isset($p['id']) ? $p['id'] : null;
 		// states only used to avoid double queries when looking for min and max values
 		$states = isset($p['states']) ? $p['states'] : null;
@@ -2363,6 +2373,7 @@ class MatrixKeyController extends Controller
         uasort($s, create_function('$a,$b', 'return ($a["label"]>$b["label"]?1:($a["label"]<$b["label"]?-1:0));'));
         
         return $s;
+
     }
 
     private function getRemainingStateCount ($p=null)
@@ -2461,9 +2472,7 @@ class MatrixKeyController extends Controller
 						and _a.taxon_id not in
 							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
 					group by _a.state_id
-
 				union all
-
 				select count(distinct _a.variation_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 					from %PRE%matrices_taxa_states _a
 					" . (!empty($dV) ? $dV : "") . "
@@ -2471,8 +2480,6 @@ class MatrixKeyController extends Controller
 					where _a.project_id = " . $this->getCurrentProjectId() . "
 						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 					group by _a.state_id
-
-
 				union all
 				select count(distinct _a.ref_matrix_id) as tot, _a.state_id as state_id, _a.characteristic_id as characteristic_id
 					from %PRE%matrices_taxa_states _a
@@ -2498,7 +2505,8 @@ class MatrixKeyController extends Controller
     
 			if ($groupByCharId) {
 	            $all[$val['characteristic_id']]['states'][$val['state_id']] = intval($val['tot']);
-	            $all[$val['characteristic_id']]['tot'] = (isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + intval($val['tot']);
+	            $all[$val['characteristic_id']]['tot'] =
+					(isset($all[$val['characteristic_id']]['tot']) ? $all[$val['characteristic_id']]['tot'] : 0) + intval($val['tot']);
 			} else {
 	            $all[$val['state_id']] = intval($val['tot']);
 			}
@@ -2690,7 +2698,6 @@ class MatrixKeyController extends Controller
         return $res;
     }
 
-
     private function nbcGetSimilar ($p = null)
     {
         if (!isset($p['type']) || !isset($p['id']))
@@ -2715,6 +2722,7 @@ class MatrixKeyController extends Controller
                 
                 $variation = $this->getVariation($val['relation_id']);
                 $val['taxon'] = $this->getTaxonById($variation['taxon_id']);
+
                 $val['taxon_id'] = $variation['taxon_id'];
                 
                 $nbc = $this->models->NbcExtras->_get(
@@ -2795,7 +2803,6 @@ class MatrixKeyController extends Controller
         
         return $res;
     }
-	
 
     private function nbcGetTaxaScores ($selectedStates = null)
     {
@@ -3273,4 +3280,4 @@ class MatrixKeyController extends Controller
 		
 	}
 
-}
+}	
