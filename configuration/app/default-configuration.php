@@ -62,7 +62,8 @@ class configuration
 				'pathName' => 'app',
 				'fileRoot' => $this->_appFileRoot.'www/app/',
 				//'skinName' => 'original_skin'
-				'skinName' => 'linnaeus_2'
+				'skinName' => 'linnaeus_2',
+				'skinNameWebservices' => 'webservices'
 			),
 			'defaultController' => 'linnaeus',
 			'startUpUrl' => '/index.php',

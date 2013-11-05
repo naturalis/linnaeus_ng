@@ -16,6 +16,10 @@
 		"www/linnaeus_ng/www/app/media/system/skins/original_skin/"
 		"www/linnaeus_ng/www/app/templates/templates/original_skin/matrixkey/"
 	otherwise, the default skin, "linnaeus_2", will be used.
+	one exception to all this are the webservices. all views in
+		app/views/webservices/
+	have no design, therefore no skin. their templates all reside in:
+		app/templates/templates/webservices
 
 
 	on stylesheets:
@@ -1564,7 +1568,7 @@ class Controller extends BaseClass
     public function printPage ($templateName = null)
     {
         $this->preparePage();
-        
+
         $this->smarty->display(strtolower((!empty($templateName) ? $templateName : $this->getViewName()) . '.tpl'));
         
         $this->previewOverlay();
@@ -2202,27 +2206,35 @@ class Controller extends BaseClass
     private function setSkinName ()
     {
 		
-		$force = $this->getSetting('force_skin_mobile')==1;
+		if ($this->controllerBaseName=='webservices') {
 
-		if ($force || isset($this->helpers->UserAgent)) {
+			$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinNameWebservices'];
 
-			if ($force || $this->helpers->UserAgent->isMobileDevice()) {
-
-		        $d = $this->getSetting('skin_mobile');
-
-				if (isset($d))
-					$d = $this->doesSkinExist($d) ? $d : null;
-
+		} else {
+		
+			$force = $this->getSetting('force_skin_mobile')==1;
+	
+			if ($force || isset($this->helpers->UserAgent)) {
+	
+				if ($force || $this->helpers->UserAgent->isMobileDevice()) {
+	
+					$d = $this->getSetting('skin_mobile');
+	
+					if (isset($d))
+						$d = $this->doesSkinExist($d) ? $d : null;
+	
+				}
+	
 			}
+	
+			$d = empty($d) ? $this->getSetting('skin') : $d;
 
+			if (isset($d) && $this->doesSkinExist($d))
+				$_SESSION['app']['system']['skinName'] = $d;
+			else
+				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
+				
 		}
-
-        $d = empty($d) ? $this->getSetting('skin') : $d;
-
-        if (isset($d) && $this->doesSkinExist($d))
-            $_SESSION['app']['system']['skinName'] = $d;
-        else
-            $_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
 
     }
 
