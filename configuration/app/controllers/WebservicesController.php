@@ -157,7 +157,7 @@ parameters:
 		$result=array(
 			'pId'=>$project['id'],
 			'project'=>$project['title'],
-			'from'=>$fromDate
+			'from'=>$fromDate,
 		);
 		
 		if (!is_null($rowcount))
@@ -171,6 +171,7 @@ parameters:
 		if ($onlyCount) {
 			$result['count']=$names[0]['total'];
 		} else {
+			$result['count']=count((array)$names);
 			$result['names']=$names;
 		}
 			
