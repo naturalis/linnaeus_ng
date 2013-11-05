@@ -156,7 +156,6 @@ parameters:
 
 		$result=array(
 			'pId'=>$project['id'],
-			'project'=>$project['title'],
 			'from'=>$fromDate,
 		);
 		
@@ -166,6 +165,7 @@ parameters:
 		if (!is_null($rowcount) && !is_null($offset))
 			$result['offset']=$offset;
 
+		$result['project']=$project['title'];
 		$result['exported']=date('c');
 		
 		if ($onlyCount) {
