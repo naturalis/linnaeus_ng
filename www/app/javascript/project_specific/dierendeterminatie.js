@@ -850,6 +850,7 @@ function nbcFilterEmergingCharacters() {
 					var count = nbcData.countPerState[char.states[k].id] ? nbcData.countPerState[char.states[k].id] : 0;
 					countremain=countremain+count;
 				}
+				
 				nbcData.menu.groups[i].chars[j].disabled=(countremain<nbcData.results.length);
 			}
 		}

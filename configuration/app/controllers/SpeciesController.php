@@ -23,7 +23,10 @@ class SpeciesController extends Controller
         'taxa_relations', 
         'variation_relations',
 		'names',
-		'name_types'
+		'name_types',
+		'actors',
+		'dna_barcodes',
+		'presence_taxa'
     );
     public $controllerPublicName = 'Species module';
     public $controllerBaseName = 'species';
@@ -62,9 +65,11 @@ class SpeciesController extends Controller
     private function initialise ()
     {
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+		
+		include_once ('RdfController.php');
+		$this->Rdf = new RdfController;
+		
     }
-
-
 
 
 	/* public set/get */
@@ -74,8 +79,6 @@ class SpeciesController extends Controller
 		//public as it needs to be callable from the view
         $_SESSION['app']['user']['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
     }
-
-
 
 
 	/* public actions */
@@ -143,6 +146,9 @@ class SpeciesController extends Controller
                 );
                 if ($val['id'] == $activeCategory) {
                     $c[] = 'category-active';
+
+					$activeCategory_label=$val['page'];
+
                 }
                 if ($key == 0) {
                     $c[] = 'category-first';
@@ -154,6 +160,7 @@ class SpeciesController extends Controller
                     $c[] = 'category-no-content';
                 }
                 $categories['categories'][$key]['className'] = implode(' ', $c);
+								
             }
 
             if ($taxon['lower_taxon'] == 1) {
@@ -216,20 +223,32 @@ class SpeciesController extends Controller
 	
 				}
 
-				$content = $this->getTaxonContent(
+				$d=$this->getTaxonContent(
 					array(
 						'taxon' => $taxon['id'], 
 						'category' => $activeCategory, 
 						'allowUnpublished' => $this->isLoggedInAdmin()
 					)
 				);
+				
+				$content=$d['content'];
+				$rdf=$d['rdf'];
 	
 				if ($activeCategory!='media') {
 					$content = $this->matchGlossaryTerms($content);
 					$content = $this->matchHotwords($content);
 				}
+				
+				if ($activeCategory_label=='Presence') {
+					
+					$presenceData=$this->getPresence($taxon['id']);
+					$this->smarty->assign('presenceData', $presenceData);
+
+				}
             
                 $this->smarty->assign('content', $content);
+
+                $this->smarty->assign('rdf', $rdf);
 
                 $this->smarty->assign('contentCount', $this->getContentCount($taxon['id']));
                 
@@ -369,7 +388,7 @@ class SpeciesController extends Controller
 
 			foreach((array)$categories['categories'] as $val) {
 
-	            $content[$val['id']] = $this->getTaxonContent(
+	            $d=$this->getTaxonContent(
 					array(
 						'taxon' => $taxon['id'], 
 						'category' => $val['id'], 
@@ -377,6 +396,8 @@ class SpeciesController extends Controller
 						'incOverviewImage' => true
 					)
 				);
+				
+				$content[$val['id']]=$d['content'];
 
 				if (!$this->rHasVal('hotwords',false)) {
 					$content = $this->matchGlossaryTerms($content);
@@ -621,7 +642,8 @@ class SpeciesController extends Controller
 			'fieldAsIndex' => 'id'
 		));
 
-		foreach ((array) $tp as $key => $val) {
+		foreach ((array) $tp as $key => $val)
+		{
 			
 			$tp[$key]['title'] = $this->getCategoryName($val['id']);
 			
@@ -630,7 +652,8 @@ class SpeciesController extends Controller
 		}
 		
 
-        if ($taxon) {
+        if ($taxon)
+		{
             
             $defCat = 'classification';
             
@@ -674,7 +697,8 @@ class SpeciesController extends Controller
                 'is_empty' => 0
             );
             
-            if ($this->getTaxonType() == 'higher') {
+            if ($this->getTaxonType() == 'higher')
+			{
             
 	            $tnl = $this->getTaxonNextLevel($taxon);
 	            
@@ -686,7 +710,8 @@ class SpeciesController extends Controller
 	            
             }
             
-             if ($this->doesProjectHaveModule(MODCODE_LITERATURE)) {
+             if ($this->doesProjectHaveModule(MODCODE_LITERATURE))
+			 {
                 
                 $l = $this->getTaxonLiterature($taxon);
                 
@@ -710,6 +735,26 @@ class SpeciesController extends Controller
                 $categorySysList[$key] = $val['page'];
 			}
 
+
+			if (isset($this->models->DnaBarcodes))
+			{			
+		
+				$dna = $this->models->DnaBarcodes->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon_id' => $taxon
+					),
+					'columns' => 'count(*) as tot'
+				));
+				
+				$stdCats[] = array(
+					'id' => 'dna barcodes', 
+					'title' => $this->translate('DNA barcodes'), 
+					'is_empty' => $dna[0]['tot']==0
+				);
+			}
+			
             $d = array_merge($d, $stdCats);
 
             foreach ((array) $d as $val)
@@ -777,26 +822,32 @@ class SpeciesController extends Controller
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
 		$incOverviewImage = isset($p['incOverviewImage']) ? $p['incOverviewImage'] : false;
 
+		$content=$rdf=null;
+
         switch ($category) {
             
             case 'media':
-                return $this->getTaxonMedia($taxon,null,$incOverviewImage);
+                $content=$this->getTaxonMedia($taxon,null,$incOverviewImage);
                 break;
             
             case 'classification':
-                return $this->getTaxonClassification($taxon);
+                $content=$this->getTaxonClassification($taxon);
                 break;
             
             case 'list':
-                return $this->getTaxonNextLevel($taxon);
+                $content=$this->getTaxonNextLevel($taxon);
                 break;
             
             case 'literature':
-                return $this->getTaxonLiterature($taxon);
+                $content=$this->getTaxonLiterature($taxon);
                 break;
             
             case 'names':
-                return $this->getTaxonNames($taxon);
+                $content=$this->getTaxonNames($taxon);
+                break;
+            
+            case 'dna barcodes':
+                $content=$this->getDNABarcodes($taxon);
                 break;
             
             default:
@@ -812,11 +863,16 @@ class SpeciesController extends Controller
                 
                 $ct = $this->models->ContentTaxon->_get(array(
                     'id' => $d, 
-                    'columns' => 'content'
                 ));
-                
-                return isset($ct) ? $ct[0]['content'] : null;
+				
+				$content = isset($ct) ? $ct[0] : null;
+				
+				$rdf=$this->Rdf->getRdfValues($content['id']);
+
+                $content=$content['content'];
         }
+		
+		return array('content'=>$content,'rdf'=>$rdf);
     }
 
 
@@ -1299,7 +1355,19 @@ class SpeciesController extends Controller
         return $rel;
     }
 	
-	
+
+	private function getActor($id)
+	{
+		$data=$this->models->Actors->_get(array(
+			'id' => array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'id'=>$id
+			)
+		));	
+		return $data[0];
+	}
+
+
 	private function getNames($id)
 	{
 
@@ -1327,6 +1395,13 @@ class SpeciesController extends Controller
 				$sci=$key;
 			if ($val['nametype']==PREDICATE_PREFERRED_NAME && $val['language_id']==$this->getDefaultLanguageId())
 				$pref=$key;
+			if (!empty($val['expert_id']))
+				$names[$key]['expert']=$this->getActor($val['expert_id']);
+			if (!empty($val['organisation_id']))
+				$names[$key]['organisation']=$this->getActor($val['organisation_id']);
+
+			$names[$key]['nametype']=sprintf($this->Rdf->translatePredicate($val['nametype']),$val['language_label']);
+						
 		}
 
 		return array(
@@ -1364,6 +1439,54 @@ class SpeciesController extends Controller
 			)
 		);
 		
+	}
+	
+
+	private function getDNABarcodes($id)
+	{
+		return $this->models->DnaBarcodes->_get(
+			array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'taxon_id' => $id
+				)
+			));		
+	}
+
+
+	private function getPresence($id)
+	{
+		$data=$this->models->PresenceTaxa->freeQuery(
+			"select
+				ifnull(_a.is_indigeneous,0) as is_indigeneous,
+				_a.presence_id,
+				_a.presence82_id,
+				_a.reference_id,
+				_b.label as presence,
+				_c.label as presence82,
+				_d.label as habitat,
+				_e.name as actor,
+				_f.name as organisation,
+				_g.label as reference,
+				_g.author as reference_author,
+				_g.date as reference_date
+			from %PRE%presence_taxa _a
+			left join %PRE%presence_labels _b
+				on _a.presence_id = _b.presence_id and _a.project_id=_b.project_id and _b.language_id=".$this->getCurrentLanguageId()."
+			left join %PRE%presence_labels _c
+				on _a.presence82_id = _c.presence_id and _a.project_id=_c.project_id and _c.language_id=".$this->getCurrentLanguageId()."
+			left join %PRE%habitat_labels _d
+				on _a.habitat_id = _d.habitat_id and _a.project_id=_d.project_id and _d.language_id=".$this->getCurrentLanguageId()."
+			left join %PRE%actors _e
+				on _a.actor_id = _e.id and _a.project_id=_e.project_id
+			left join %PRE%actors _f
+				on _a.actor_org_id = _f.id and _a.project_id=_f.project_id
+			left join %PRE%literature2 _g
+				on _a.reference_id = _g.id and _a.project_id=_g.project_id
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			and _a.taxon_id =".$id
+		);	
+		return $data[0];
 	}
 
 
