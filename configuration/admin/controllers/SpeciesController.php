@@ -4781,7 +4781,7 @@ class SpeciesController extends Controller
         
         foreach ((array) $d as $key => $val) {
             
-            $d[$key]['media_type'] = $mimes[$val['mime_type']];
+            if ($val['mime_type']) $d[$key]['media_type'] = $mimes[$val['mime_type']];
             if (file_exists($_SESSION['admin']['project']['urls']['project_media'] . $val['file_name'])) {
                 $d[$key]['dimensions'] = getimagesize($_SESSION['admin']['project']['urls']['project_media'] . $val['file_name']);
             }

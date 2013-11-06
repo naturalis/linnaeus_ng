@@ -2,6 +2,14 @@
 /*
 
 
+	quit working on 4 november due to more pressing obligations
+	import works, except states of range characters are somehow 
+	saved with the wrong charcater id. fuck knows why.
+
+
+
+
+
 // vermoeden dat er dingen ontbreken die wel in het lucid file staan
 //hierarchy => q($xml->Dataset->TaxonHierarchies,1); // there is none - for now...
 //		q($xml->Dataset->CharacterTrees,1); ignoring character tree, defaulting to group -> char -> state
@@ -14,55 +22,13 @@ measurement lables &units get lost
 
 */
 
-include_once ('Controller.php');
+include_once ('ImportController.php');
 
-class ImportSDDController extends Controller
+class ImportSDDController extends ImportController
 {
-    public $usedModels = array(
-        'matrix', 
-        'matrix_name', 
-        'matrix_taxon', 
-        'matrix_taxon_state', 
-        'characteristic', 
-        'characteristic_matrix', 
-        'characteristic_label', 
-        'characteristic_state', 
-        'characteristic_label_state', 
-        'chargroup_label', 
-        'chargroup', 
-        'characteristic_chargroup', 
-        'matrix_variation',
-		'gui_menu_order',
-		'nbc_extras',
-		'media_taxon'
-    );
-    public $usedHelpers = array(
-        'file_upload_helper', 
-        'xml_parser'
-    );
-    public $controllerPublicName = 'Linnaeus 2 Import';
-    public $cssToLoad = array(
-        'import.css'
-    );
-    public $jsToLoad = array();
-    private $_deleteOldMediaAfterImport = false; // might become a switch later, but let's not overdo it
-    private $_knownModules = array(
-        'file', 
-        'project', 
-        'proj_literature', 
-        'glossary', 
-        'introduction', 
-        'tree', 
-        'records', 
-        'text_key', 
-        'pict_key', 
-        'diversity'
-    );
-    private $_sawModule = false;
-	private $_retainInternalLinks = false; // keep false, as internal links are re-created by means of hotwords
-	
-	private $_tempTeller = 0;
 
+	private $_defaultKingdom = '(import generated master taxon)';
+    public $controllerPublicName = 'SDD file Import';
 
     /**
      * Constructor, calls parent's constructor
@@ -71,11 +37,14 @@ class ImportSDDController extends Controller
      */
     public function __construct ()
     {
+		
+		die('not implemented');
+
         parent::__construct();
         
         error_reporting(E_ERROR | E_PARSE);
         
-        $this->setBreadcrumbRootName($this->translate('Data import'));
+		set_time_limit(2400); // RIGHT!
         
     }
 
@@ -100,7 +69,9 @@ class ImportSDDController extends Controller
 
         if ($this->rHasVal('process', '1'))
             $this->redirect('sdd_import_2.php');
-        
+
+        $this->setPageName($this->translate('Specify file'));
+       
         if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file')) {
             
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
@@ -188,14 +159,15 @@ class ImportSDDController extends Controller
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('sdd_import_1.php');
 
-        $this->setPageName($this->translate('SDD file upload'));
+        $this->setPageName($this->translate('Results'));
         
-        if ($_SESSION['admin']['system']['import']['file']['path']) {
+        if ($_SESSION['admin']['system']['import']['file']['path']  && !$this->isFormResubmit()) {
 		
 			$xml=simplexml_load_file($_SESSION['admin']['system']['import']['file']['path']);
 			
 			$matrixname=(string)$xml->Dataset->Representation->Label;
 			$taxa=array();
+			$files_to_copy=array();
 	
 			foreach($xml->Dataset->TaxonNames->TaxonName as $val)
 			{
@@ -332,55 +304,52 @@ class ImportSDDController extends Controller
 	
 			foreach($xml->Dataset->MediaObjects->MediaObject as $val)
 			{
+				$file=basename((string)$val->Source['href']);
 				$media_objects[(string)$val['id']]=array(
 					'label'=>(string)$val->Representation->Label,
 					'detail'=>(string)$val->Representation->Detail,
 					'type'=>(string)$val->Type,
 					'href'=>(string)$val->Source['href'],
-					'basename'=>basename ((string)$val->Source['href'])
+					'basename'=>$file
 				);
-	
 			}
 	
+			$pr = $this->models->ProjectRank->_get(array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(), 
+					'rank_id' => SPECIES_RANK_ID
+				)
+			));
+
+			$speciesRankId=$pr[0]['id'];
 
 			if (count($taxa)==0)
 			{
 
-				$this->addError('found no taxa (import stopped)');
+				$this->addError('Found no taxa (import stopped)');
+
+			} else
+			if (empty($speciesRankId))
+			{
+
+				$this->addError('Project has no Species rank (import stopped)');
 
 			} else
 			if (count($characters)==0)
 			{
 
-				$this->addError('found no characters (import stopped)');
+				$this->addError('Found no characters (import stopped)');
 
 			} else
 			if (count($coded_descriptions)==0)
 			{
 
-				$this->addError('found no taxon/state-relations (import stopped)');
+				$this->addError('Found no taxon/state-relations (import stopped)');
 
 			} else {
 
-				//creating matrix
-				$this->models->Matrix->save(array(
-					'id' => null, 
-					'project_id' => $this->getCurrentProjectId(), 
-					'got_names' => 1
-				));
-            
-				$mId = $this->models->Matrix->getNewId();
-
-				$this->models->MatrixName->save(
-				array(
-					'id' => null, 
-					'project_id' => $this->getCurrentProjectId(), 
-					'matrix_id' => $mId, 
-					'language_id' => $this->getDefaultProjectLanguage(), 
-					'name' => $matrixname 
-				));
-
-				$this->addMessage('created matrix "'.$matrixname.'"');
+				$mId=$this->createMatrix(array('matrixname'=>$matrixname));
+				$this->addMessage('Created matrix "'.$matrixname.'"');
 
 				foreach((array)$groups as $key => $val)
 				{
@@ -403,7 +372,7 @@ class ImportSDDController extends Controller
 							'language_id' => $this->getDefaultProjectLanguage()
 					));	
 					
-					$this->addMessage('created group "'.$val['label'].'"');	
+					$this->addMessage('Created group "'.$val['label'].'"');	
 					
 				}
 				
@@ -412,35 +381,16 @@ class ImportSDDController extends Controller
 				$state_list=array();
 				foreach ((array)$characters as $key => $val)
 				{
-					
-					$this->models->Characteristic->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'type' => $val['type'], 
-						'got_labels' => 1
-					));
-	
-					$characters[$key]['id'] = $this->models->Characteristic->getNewId();
 
-					$this->models->CharacteristicLabel->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'characteristic_id' => $characters[$key]['id'], 
-						'language_id' => $this->getDefaultProjectLanguage(), 
-						'label' => $val['label']
-					));
-					
-					$this->models->CharacteristicMatrix->save(
-					array(
-						'id' => null, 
-						'project_id' => $this->getCurrentProjectId(), 
-						'matrix_id' => $mId, 
-						'characteristic_id' => $characters[$key]['id'], 
-						'show_order' => $show_order++
-					));
-					
+					$characters[$key]['id'] = $this->createMatrixCharacter(
+						array(
+							'type'=>$val['type'], 
+							'label'=>$val['label'],
+							'matrix_id'=>$mId,
+							'showOrder'=>$show_order++
+						)
+					);
+				
 					if (isset($val['group'])) {
 
 						$this->models->CharacteristicChargroup->save(array(
@@ -469,7 +419,7 @@ class ImportSDDController extends Controller
 								// why loop? we can only store one image per state! but... who knows what the future will bring.
 								foreach((array)$sVal['media'] as $mkey=>$mVal) {
 									// we're not checking existence just dumbly copying image names. pwah.
-									$d['file_name']=basename($mVal);
+									$files_to_copy[]=$d['file_name']=basename($mVal);
 								}
 							}
 		
@@ -491,14 +441,54 @@ class ImportSDDController extends Controller
 		
 						}
 						
+						$this->addMessage('Created character "'.$val['label'].'" with '.count((array)$val['states']).' states');
+						
+					} else {
+						
+						$this->addMessage('Created character "'.$val['label'].'"');
 					}
 					
-					$this->addMessage('created charater "'.$val['label'].'" with '.count((array)$val['states']).' states');
+					
 					
 				}
 
+				$d = $this->models->Taxon->_get(array('id' =>
+					array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon' => $this->_defaultKingdom
+					)));
+		
+				if ($d) { 
+		
+					$kingdomId = $d[0]['id'];
+				
+				} else {
 
-				$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+					$pr = $this->models->ProjectRank->_get(array(
+						'id' => array(
+							'project_id' => $this->getCurrentProjectId(), 
+							'rank_id' => KINGDOM_RANK_ID
+						)
+					));		
+
+					// default kingdom
+					$this->models->Taxon->save(
+					array(
+						'id' => null, 
+						'project_id' => $this->getCurrentProjectId(), 
+						'taxon' => $this->_defaultKingdom, 
+						'parent_id' => 'null', 
+						'rank_id' => $pr[0]['id'],
+						'taxon_order' => 0, 
+						'is_hybrid' => 0, 
+						'list_level' => 0
+					));
+					
+					$kingdomId = $this->models->Taxon->getNewId();
+					
+				}
+		
+							
 				$taxon_list=array();
 				foreach((array)$taxa as $key=>$val)
 				{
@@ -515,11 +505,13 @@ class ImportSDDController extends Controller
 						array(
 							'id' => null, 
 							'project_id' => $this->getCurrentProjectId(), 
-							'taxon' => $val['label']
+							'taxon' => $val['label'],
+							'rank_id' => $speciesRankId,
+							'parent_id' => $kingdomId
 						));
-						
+
 						$taxonId=$this->models->Taxon->getNewId();
-						$this->addMessage('created taxon "'.$val['label'].'"');
+						$this->addMessage('Created taxon "'.$val['label'].'"');
 
 					} else {
 						
@@ -556,74 +548,89 @@ class ImportSDDController extends Controller
 							
 						} else {
 							
-							$mime=finfo_file($finfo,basename($mVal));
+							$file=basename($mVal);
+							$mime=$this->mimeContentType($file);
+							
 	
 							$mt = $this->models->MediaTaxon->save(
 							array(
 								'id' => null, 
 								'project_id' => $this->getCurrentProjectId(), 
 								'taxon_id' => $taxonId, 
-								'file_name' => basename($mVal),
-								'original_name' => basename($mVal),
+								'file_name' => $file,
+								'original_name' => $file,
 								'mime_type' => $mime, 
 								'file_size' => -1, 
 								'thumb_name' => null, 
 								'sort_order' => $o++
-							));					
+							));	
+							
+							$files_to_copy[]=$file;
 	
 						}
-
 
 					}
 				
 				}
-				finfo_close($finfo);
 
+				$this->models->MatrixTaxon->setNoKeyViolationLogging(true);
+				$this->models->MatrixTaxonState->setNoKeyViolationLogging(true);
+
+				$i=0;
 				foreach ((array)$coded_descriptions as $taxon => $val)
 				{
 
 					if (!isset($taxon_list[$taxon]))
 						continue;
-
-					foreach ((array)$val['categorical_states'] as $sKey => $sVal)
+						
+					$tId = $taxon_list[$taxon];
+						
+					foreach ($val['categorical_states'] as $char => $states)
 					{
 						
-						if (!isset($characters[$sKey]['id']))
-							continue;
-
-						foreach ((array)$sVal as $WHATEVER)
-						{
+						$cId=$characters[$char]['id'];
+						
+						if (is_array($states)) {
 							
-							$this->models->MatrixTaxonState->save(
-							array(
-								'id' => null, 
-								'project_id' => $this->getCurrentProjectId(), 
-								'matrix_id' => $mId, 
-								'characteristic_id' => $characters[$sKey]['id'],
-								'state_id' => $state_list[$WHATEVER],
-								'taxon_id' => $taxon_list[$taxon]
-							));	
+							foreach ($states as $state)
+							{
+								
+								$sId=$state_list[$state];
 
+								$this->models->MatrixTaxonState->insert(
+									array(
+										'project_id' => $this->getCurrentProjectId(), 
+										'matrix_id' => $mId, 
+										'characteristic_id' => $cId,
+										'state_id' => $sId,
+										'taxon_id' => $tId
+									));
+									
+								$i++;
+							
+							}
+							
 						}
 						
 					}
 					
-					foreach ((array)$val['quantitative_states'] as $sKey => $sVal)
+					foreach ($val['quantitative_states'] as $char => $sVal)
 					{
-	
-						if (!isset($characters[$sKey]['id']) || !isset($sVal['min']) || !isset($sVal['max']))
+						
+						if (!isset($characters[$char]['id']) || !isset($sVal['min']) || !isset($sVal['max']))
 							continue;
 							
+						$cId=$characters[$char]['id'];
+						
 						$cs = $this->models->CharacteristicState->_get(array(
 							'id' => array(
 								'project_id' => $this->getCurrentProjectId(),
-								'characteristic_id' => $characters[$sKey]['id'], 
+								'characteristic_id' => $cId, 
 								'lower' => $sVal['min'],
 								'upper' => $sVal['max']
 							)
 						));
-						
-					
+
 						if ($cs) {
 
 							$sId=$cs[0]['id'];
@@ -634,13 +641,11 @@ class ImportSDDController extends Controller
 							array(
 								'id' => null,
 								'project_id' => $this->getCurrentProjectId(), 
-								'characteristic_id' => $characters[$sKey]['id'], 
+								'characteristic_id' => $cId, 
 								'lower' => $sVal['min'],
 								'upper' => $sVal['max']
 							));
-							
 						
-							
 							$sId=$this->models->CharacteristicState->getNewId();
 
 							$this->models->CharacteristicLabelState->save(
@@ -653,27 +658,47 @@ class ImportSDDController extends Controller
 							));
 									
 						}
-						
+
 						$this->models->MatrixTaxonState->save(
 						array(
 							'id' => null, 
 							'project_id' => $this->getCurrentProjectId(), 
 							'matrix_id' => $mId, 
-							'characteristic_id' => $characters[$sKey]['id'],
-							'state_id' =>$sId,
-							'taxon_id' =>$taxon_list[$taxon]
-						));	
+							'characteristic_id' => $cId,
+							'state_id' => $sId,
+							'taxon_id' => $tId
+						));
 						
-
+						
+						$i++;
+						
 					}
-
-						
 					
 				}
+				
+				if (isset($_SESSION['admin']['system']['import']['imagePath'])) {
+					$j=0;
+					foreach((array)$files_to_copy as $val) {
+						$src=$_SESSION['admin']['system']['import']['imagePath'].$val;
+						$tgt=$this->getProjectsMediaStorageDir().$val;
+						if (file_exists($src)) {
+							if (copy($src,$tgt))
+								$j++;
+							else
+								$this->addError(sprintf('Could not copy "%s"',$val));
+							
+						} else {
+							$this->addError(sprintf('File does not exist: %s',$src));
+						}
+					}
+				} else {
+					$this->addMessage('Skipped copying images');
+				}
 
-				//$media_objects;
-			
-			
+				$this->smarty->assign('matrix',$mId);
+				$this->addMessage('Created '.$i.' taxon/state-connections');
+				$this->addMessage('Copied '.$j.' images');
+
 			}
 
 	    } else {

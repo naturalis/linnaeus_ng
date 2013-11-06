@@ -237,20 +237,28 @@ class Controller extends BaseClass
         
         $this->checkBackStep();
 
-        //$this->setOtherStuff();
+        ////$this->setOtherStuff();
         
         if ($this->getCheckForProjectId()) {
             
             $this->checkForProjectId();
             
+			$this->setSkinName();
+
+			$this->setUrls();
+			
+			$this->setPaths();
+			
+			$this->setSmartySettings();
+
             $this->setCssFiles();
 
-			 $this->setOtherStuff();            
+			$this->setOtherStuff();            
 
             if (!$this->isLoggedInAdmin())
                 $this->splashScreen();
         }
-		
+
     }
 
 
@@ -287,7 +295,7 @@ class Controller extends BaseClass
     public function checkForProjectId ()
     {
         $pB = $this->getCurrentProjectId();
-        
+		
         if ($this->rHasVal('p')) {
 
             $this->resolveProjectId();
@@ -2226,13 +2234,14 @@ class Controller extends BaseClass
 				}
 	
 			}
-	
+
 			$d = empty($d) ? $this->getSetting('skin') : $d;
 
-			if (isset($d) && $this->doesSkinExist($d))
+			if (isset($d) && $this->doesSkinExist($d)) {
 				$_SESSION['app']['system']['skinName'] = $d;
-			else
+			} else {
 				$_SESSION['app']['system']['skinName'] = $this->generalSettings['app']['skinName'];
+			}
 				
 		}
 
@@ -3224,7 +3233,6 @@ class Controller extends BaseClass
 		}
 		
 	}
-
 
 
 }

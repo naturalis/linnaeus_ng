@@ -1,8 +1,8 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/MatrixKeyController.php');
+require_once ('../../../../configuration/admin/controllers/ImportNexusController.php');
 
-$c = new MatrixKeyController();
+$c = new ImportNexusController();
 
-$c->nexusImportAction();
+$c->indexAction();
 

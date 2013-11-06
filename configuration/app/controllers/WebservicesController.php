@@ -8,7 +8,8 @@ class WebservicesController extends Controller
     private $_usage=null;
 
 	private $_taxonUrls=array(
-		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
+//		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
+		1=>'http://localhost/linnaeus_ng/app/views/species/taxon.php?epi=1&id='
 	);
 	
     public $usedModels = array(
@@ -122,8 +123,7 @@ parameters:
 					_a.uninomial,
 					_a.specific_epithet,
 					_a.infra_specific_epithet,
-					_a.name_author,
-					_a.authorship_year,
+					_a.authorship,
 					_c.language,
 					_c.iso3 as language_iso3,
 					if(_a.last_change='0000-00-00 00:00:00',_a.created,_a.last_change) as last_change,
@@ -131,14 +131,20 @@ parameters:
 					_a.taxon_id, 
 					_d.taxon, 
 					_f.default_label as rank,
-					concat('".$url."',_a.taxon_id) as url
+					concat('".$url."',_a.taxon_id) as url,
+
+					_h.id as taxon_valid_name_id
+
 				from %PRE%names _a
 				
 				left join %PRE%name_types _b on _a.type_id=_b.id and _a.project_id=_b.project_id
 				left join %PRE%languages _c on _a.language_id=_c.id
 				left join %PRE%taxa _d on _a.taxon_id=_d.id and _a.project_id=_d.project_id
-				left join %PRE%projects_ranks _e on _d.rank_id=_e.id and _a.project_id=_d.project_id
+				left join %PRE%projects_ranks _e on _d.rank_id=_e.id and _a.project_id=_e.project_id
 				left join %PRE%ranks _f on _e.rank_id=_f.id
+				
+				left join %PRE%name_types _g on _a.project_id=_g.project_id and _g.nametype='isValidNameOf'
+				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
 
 				where _a.project_id=".$project['id']."
 				and (
@@ -174,7 +180,7 @@ parameters:
 			$result['count']=count((array)$names);
 			$result['names']=$names;
 		}
-			
+
 		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
@@ -188,7 +194,19 @@ parameters:
 	}
 
 
+/*
 
+
+multimedia:
+	uri to image in NSR
+	link to img
+	caption
+	creator
+
+
+OOK METEEN URENM BOEKEN!
+
+*/
 
 
 

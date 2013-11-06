@@ -1,11 +1,10 @@
 {include file="../shared/admin-header.tpl"}
 
 <div id="page-main">
+
 	<form method="post" action="" id="theForm" enctype="multipart/form-data">
 		<p>
-			This module allows you to import data from an existing Linnaeus 2-project. In order to do so, export the data of the project as a standard 
-			Linnaeus 2 XML export file and upload that file in the form below. If you wish to import media files as well, save them to a location that 
-			can be accessed by this webserver.
+			This module allows you to import data from an SDD-file.
 		</p>
 		<fieldset>
 			<legend>DATA</legend>
@@ -19,6 +18,10 @@
 					Specify the location of your file on the server:
 					<input type="text" name="serverFile" style="width:500px;" />&nbsp;*
 				{/if}
+			</p>
+			<p>
+				Please note: the importer will attempt to match taxa in the file to those in the Species module. Matching will be literal, albeit
+				not case-sensitive. For instance, "meles meles" will not match "Meles meles (Linnaeus, 1758)", but will match "Meles meles".
 			</p>
 		</fieldset>
 		<br />
@@ -42,32 +45,17 @@
 					<label><input type="checkbox" checked="checked" disabled="disabled">do not load images</label>&nbsp;<br />
 			{/if}
 			</p>
-			{* if $isSharedMediaDirWritable}
-			<p>
-				Path to thumbnails:<br />
-				{if $s.thumbsPath}
-					<b>"{$s.thumbsPath}"</b> (<span class="a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">change</span>)
-				{elseif $s.thumbsPath===false}
-					<b>Do not load thumbnails</b> (<span class="a" onclick="$('#clear').val('thumbsPath');$('#theForm').submit()">change</span>)
-				{else}
-					<input type="text" name="thumbsPath" style="width:500px;"/>&nbsp;or&nbsp;
-					<label><input type="checkbox" name="noThumbs" value="1">do not load thumbnails</label>&nbsp;*
-				{/if}
-			</p>
-			{/if *}
 		</fieldset>
 		
 		
 		<p>
 		<input type="hidden" name="clear" id="clear" value="" />
 		<input type="hidden" name="process" id="process" value="0" />
+		<input type="hidden" name="rnd" value="{$rnd}" />
 		{if $s.file && isset($s.imagePath) && isset($s.thumbsPath)}
-		<p>
-		Press the button to create the new project. In the steps after that, the project data will be loaded.
-		</p>
-		<input type="button" onclick="$('#process').val('1');$('#theForm').submit()" value="import" />
+		<input type="button" onclick="$('#process').val('1');$('#theForm').submit()" value="import matrix" />
 		{else}
-		<input type="submit" value="Save" />
+		<input type="submit" value="save" />
 		{/if}
 		</p>
 	</form>
