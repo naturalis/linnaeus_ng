@@ -6,7 +6,7 @@ class UserAgent {
 	
 	public function __construct()
 	{
-		$this->agent=$_SERVER['HTTP_USER_AGENT'];
+		$this->agent=isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'command_line';
 	}
 	
 	public function getAgent()
