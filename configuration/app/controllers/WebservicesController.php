@@ -204,8 +204,6 @@ multimedia:
 	creator
 
 
-OOK METEEN URENM BOEKEN!
-
 */
 
 
