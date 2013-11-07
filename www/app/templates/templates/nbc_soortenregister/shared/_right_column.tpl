@@ -6,6 +6,12 @@
             <form id="inlineformsearch" name="inlineformsearch" action="../search/search.php" method="post">
                 <input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="" />
                 <input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" />
+				<p>
+					<a href="../search/search_extended.php"><b>Uitgebreid zoeken ></b></a>
+				</p>
+				<p>
+					<a href=""><b>Foto's zoeken ></b></a>
+				</p>
             </form>
 
         </div>
