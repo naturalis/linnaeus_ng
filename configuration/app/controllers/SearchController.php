@@ -140,7 +140,8 @@ class SearchController extends Controller
 		'geodata_type_title',
 		'occurrence_taxon',
 		'content_introduction',
-		'name_types'
+		'name_types',
+		'presence'
     );
 
     public $controllerPublicName = 'Search';
@@ -250,6 +251,39 @@ class SearchController extends Controller
   
     }
 
+	/*
+
+		final aim would be to create a search function that will react to 
+		anything you throw at it, so we can fully configure what to
+		search for through the form elements in the template (which
+		is skinnable!).
+		
+	
+	*/
+    public function searchExtendedAction ()
+    {
+
+		$presences=$this->getPresences();
+		
+		$this->smarty->assign('presences',$presences);
+		
+        $this->printPage();
+  
+    }
+
+	private function getPresences()
+	{
+		$data=$this->models->Presence->freeQuery(
+			"select
+				_a.id,
+				_b.label as label
+			from %PRE%presence  _a
+			left join %PRE%presence_labels _b
+				on _a.id = _b.presence_id and _a.project_id=_b.project_id and _b.language_id=".$this->getCurrentLanguageId()."
+			where _a.project_id = ".$this->getCurrentProjectId()
+		);	
+		return $data;
+	}
 
 
 
