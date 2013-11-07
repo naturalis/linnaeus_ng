@@ -147,7 +147,7 @@ class SpeciesController extends Controller
                 if ($val['id'] == $activeCategory) {
                     $c[] = 'category-active';
 
-					$activeCategory_label=$val['page'];
+					$activeCategory_label=isset($val['page']) ? $val['page'] : $val['title'];
 
                 }
                 if ($key == 0) {
