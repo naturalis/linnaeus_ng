@@ -9,7 +9,7 @@ class WebservicesController extends Controller
 	private $_fromDate=null;
 	private $_taxonId=null;
 	private $_project=null;
-	private $_fuzzy=null;
+	private $_matchType=null;
 	
 	private $_taxonUrls=array(
 //		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
@@ -156,12 +156,10 @@ parameters:
 	public function taxonAction()
 	{
 		$this->_usage=
-"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&taxon=<scientific name>[&fuzzy=1]
+"url: http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?pid=<id>&taxon=<scientific name>
 parameters:
   pid".chr(9)." : project id (mandatory)
   taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
-  fuzzy".chr(9)." : when set to 1, your search will be matched to just the start of taxon names ('like taxon%') (optional)
-       ".chr(9)."   be aware that if this matches multiple taxa, only the first will be returned (ordered arbitrarily)
 ";
 
 		$this->checkProject();
@@ -170,8 +168,6 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-
-		$this->setFuzzy(isset($this->requestData['fuzzy']) && $this->requestData['fuzzy']==='1');
 
 		$this->checkTaxonId();
 		
@@ -245,12 +241,10 @@ parameters:
 
 		$result=array(
 			'pId'=>$this->getCurrentProjectId(),
-			'taxon'=>$this->requestData['fuzzy'],
+			'search'=>$this->requestData['taxon'],
+			'match'=>$this->getMatchType()
 		);
 		
-		if ($this->getFuzzy())
-			$result['fuzzy']=1;
-
 		$p=$this->getProject();
 
 		$result['project']=$p['title'];
@@ -264,7 +258,7 @@ parameters:
 			'names'=>$names,
 			'media'=>$media
 		);
-		
+
 		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
@@ -344,30 +338,37 @@ parameters:
 
 		} else {
 			
-			$t=trim($this->requestData['taxon']);
+			$taxon=trim($this->requestData['taxon']);
 			
-			if ($this->getFuzzy()) {
+			$this->setMatchType('literal');
+
+			$t = $this->models->Taxon->_get(array(
+				'id' => array(
+					'project_id' => $this->getCurrentProjectId(),
+					'taxon' => $taxon
+				)
+			));
+
+			if (!$t) {
 				
-				$t = $this->models->Taxon->_get(array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon like' => $t.'%'
-					)
-				));
+				$this->setMatchType('name only');
 
-			} else {
-
-				$t = $this->models->Taxon->_get(array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'taxon' => $t
-					)
-				));
+				$t = $this->models->Names->freeQuery("
+					select
+						_a.taxon_id as id, _a.name
+					from %PRE%names _a
+					left join %PRE%name_types _b 
+						on _a.type_id=_b.id and _a.project_id=_b.project_id
+					where
+						_a.project_id = ".$this->getCurrentProjectId()."
+						and trim(REPLACE(_a.name,_a.authorship,''))='". mysql_real_escape_string($taxon) ."'
+						and _b.nametype = 'isValidNameOf'"
+				);
 
 			}
 		
 			if (!$t) {
-				$this->addError('taxon name "'.$this->requestData['taxon'].'" not found in this project (try fuzzy=1 to match without author and year).');
+				$this->addError('taxon name "'.$this->requestData['taxon'].'" not found in this project.');
 			} else {
 				$this->setTaxonId($t[0]['id']);
 				return $t;
@@ -386,14 +387,14 @@ parameters:
 		return $this->_taxonId;
 	}
 	
-	private function setFuzzy($state)
+	private function setMatchType($t)
 	{
-		$this->_fuzzy=$state;
+		$this->_matchType=$t;
 	}
 
-	private function getFuzzy()
+	private function getMatchType()
 	{
-		return $this->_fuzzy;
+		return $this->_matchType;
 	}
 	
 	private function sendErrors()
@@ -402,63 +403,5 @@ parameters:
 		$this->printPage('template');
 	}
 
-
-
-
-
-
-
-
-
-
-
-/*
-	public function searchAction()
-	{
-		
-		if (!$this->rHasVal('s'))
-			die('no search string');
-			
-		$s = $this->requestData['s'];
-		
-		if (strlen($s) < 3)
-			die('search string too short');
-
-		//	- must check if project and module is published at all!		
-		//	- *REAL* stable URI's!
-		
-		$taxa = $this->models->Taxon->_get(
-			array(
-				'id' => array('taxon like' => '%'.$s.'%'),
-				'columns' => 'project_id,id,taxon,rank_id',
-			)
-		);
-		
-		$res = array();
-		
-		foreach((array)$taxa as $key => $val) {
-			
-			$d = $this->models->Project->_get(
-				array(
-					'id' => array('id' => $val['project_id']),
-				)
-			);
-
-			$res[$key] = array(
-			'scientific_name' => $val['taxon'],
-			'taxon_id' => $val['id'],
-			'project' => $d[0]['title'],
-			'project_id' => $d[0]['id'],
-			'rank_id' => $val['rank_id'],
-			'LSID' => 'urn:lsid:etibioinformatics.nl:'.$d[0]['sys_name'].':'.md5('')
-			);
-
-		}
-		
-		echo '<pre>';
-		print_r($res);
-		
-	}
-*/
 
 }
