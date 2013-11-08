@@ -843,16 +843,8 @@ function nbcFilterEmergingCharacters() {
 
 	for(var i in nbcData.menu.groups) {
 		for (var j in nbcData.menu.groups[i].chars) {
-			var countremain=0;
-			var char=nbcData.menu.groups[i].chars[j];
-			if (char.type != 'range' && char.type != 'distribution') {
-				for (var k in char.states) {
-					var count = nbcData.countPerState[char.states[k].id] ? nbcData.countPerState[char.states[k].id] : 0;
-					countremain=countremain+count;
-				}
-				
-				nbcData.menu.groups[i].chars[j].disabled=(countremain<nbcData.results.length);
-			}
+			var id=nbcData.menu.groups[i].chars[j].id;
+			nbcData.menu.groups[i].chars[j].disabled=(nbcData.countPerCharacter[id]<nbcData.results.length);
 		}
 	}
 
