@@ -168,6 +168,8 @@ class MatrixKeyController extends Controller
 				'states' => $states
 			));
 
+			$countPerCharacter = $this->getRemainingCharacterCount();
+
 			$menu = $this->getGUIMenu(
 					array(
 						'groups'=>$groups,
@@ -190,6 +192,7 @@ class MatrixKeyController extends Controller
 					'storedStates' => $states
 				),
 				'countPerState' => $countPerState,
+				'countPerCharacter' => $countPerCharacter,
 				'matrix' => $this->getCurrentMatrixId()
             ),JSON_HEX_APOS | JSON_HEX_QUOT));
 
@@ -451,6 +454,8 @@ class MatrixKeyController extends Controller
 			$countPerState = $this->getRemainingStateCount(array(
 				'states' => $states
 			));
+			
+			$countPerCharacter = $this->getRemainingCharacterCount();
 
 			
 			if ($includeGroups) {
@@ -487,11 +492,12 @@ class MatrixKeyController extends Controller
 							'storedStates' => $this->stateMemoryRecall()
 						),
 						'countPerState' => $countPerState,
+						'countPerCharacter' => $countPerCharacter,
 						'matrix' => $this->getCurrentMatrixId()	
 					)
 				);
 			
-            $this->smarty->assign('returnText', $result	);
+			$this->smarty->assign('returnText', $result	);
 			
         }
         else
@@ -625,10 +631,6 @@ class MatrixKeyController extends Controller
                 $this->saveCache('matrix-taxa-' . $key, isset($dummy) ? $dummy : null);
         }
     }
-
-
-
-
 
 
 	private function _appControllerGetStates($data)
@@ -2376,7 +2378,9 @@ class MatrixKeyController extends Controller
 
     }
 
-    private function getRemainingStateCount ($p=null)
+
+
+    private function makeRemainingCountClauses ($p=null)
     {
         $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
         $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
@@ -2452,8 +2456,37 @@ class MatrixKeyController extends Controller
             $dV = str_replace('variation_id is null', 'taxon_id is null', str_replace('taxon_id', 'variation_id', $dT));
             $dM = str_replace('ref_matrix_id is null', 'variation_id is null', str_replace('taxon_id', 'ref_matrix_id', $dT));
 		}
+		
+		return
+			array(
+				'dT' => isset($dT) ? $dT : null,
+				'fsT' => isset($fsT) ? $fsT : null,
+				'dV' => isset($dV) ? $dV : null,
+				'fsV' => isset($fsV) ? $fsV : null,
+				'dM' => isset($dM) ? $dM : null,
+				'fsM' => isset($fsM) ? $fsM : null
+			);
+						
+	}
 
-        
+    private function getRemainingStateCount ($p=null)
+    {
+        $charIdToShow = isset($p['charId']) ? $p['charId'] : null;
+        $states = isset($p['states']) ? $p['states'] : $this->stateMemoryRecall();
+        $groupByCharId = isset($p['groupByCharId']) ? $p['groupByCharId'] : false;
+
+		$s = array();
+    
+		$c=$this->makeRemainingCountClauses($p);
+
+		$dT = $c['dT'];
+		$fsT = $c['fsT'];
+		$dV = $c['dV'];
+		$fsV = $c['fsV'];
+		$dM = $c['dM'];
+		$fsM = $c['fsM'];
+
+       
         /*
         find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
         have the already selected states, unless no states have been selected at all, in which case we just
@@ -2515,7 +2548,72 @@ class MatrixKeyController extends Controller
 
         return empty($all) ? '*' : $all;
     }
-	
+
+    private function getRemainingCharacterCount ($p=null)
+    {
+
+		$c=$this->makeRemainingCountClauses($p);
+
+		$dT = $c['dT'];
+		$fsT = $c['fsT'];
+		$dV = $c['dV'];
+		$fsV = $c['fsV'];
+		$dM = $c['dM'];
+		$fsM = $c['fsM'];
+        
+        /*
+        find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
+        have the already selected states, unless no states have been selected at all, in which case we just
+        return them all
+        */
+        
+        $q = "
+        	select sum(tot) as tot, characteristic_id 
+        	from (
+        		select count(distinct _a.taxon_id) as tot, _a.characteristic_id as characteristic_id
+	        		from %PRE%matrices_taxa_states _a
+	        		" . (!empty($dT) ? $dT : "") . "
+					" . (!empty($fsT) ?  $fsT : ""). "
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+						and _a.taxon_id not in
+							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
+					group by _a.characteristic_id
+				union all
+				select count(distinct _a.variation_id) as tot, _a.characteristic_id as characteristic_id
+					from %PRE%matrices_taxa_states _a
+					" . (!empty($dV) ? $dV : "") . "
+					" . (!empty($fsV) ? $fsV : "") . "
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					group by _a.characteristic_id
+				union all
+				select count(distinct _a.ref_matrix_id) as tot, _a.characteristic_id as characteristic_id
+					from %PRE%matrices_taxa_states _a
+					" . (!empty($dM) ? $dM : "") . "
+					" . (!empty($fsM) ? $fsM : "") . "
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					group by _a.characteristic_id
+
+
+			) as q1 
+			group by q1.characteristic_id
+			";
+
+        $results = $this->models->MatrixTaxonState->freeQuery($q);
+        
+        $characteristics = array();
+    
+        foreach ((array) $results as $val) {
+
+           $characteristics[$val['characteristic_id']]=$val['tot'];
+    
+        }
+
+        return $characteristics;
+    }
+
 	private function getTotalEntityCount()
 	{
 
@@ -2557,7 +2655,6 @@ class MatrixKeyController extends Controller
 		return $results[0]['tot']+(isset($results[1]['tot']) ? $results[1]['tot'] : 0);
 		
 	}
- 
 
     private function nbcGetCompleteDataset ($p = null)
     {
