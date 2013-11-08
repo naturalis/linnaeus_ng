@@ -1,6 +1,5 @@
 <?php
 
-
 include_once ('Controller.php');
 
 class WebservicesController extends Controller
@@ -10,23 +9,18 @@ class WebservicesController extends Controller
 	private $_taxonId=null;
 	private $_project=null;
 	private $_matchType=null;
-	
+	private $_useOldNsrLinks=true;
 	private $_taxonUrls=array(
-//		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
-		1=>'http://localhost/linnaeus_ng/app/views/species/taxon.php?epi=1&id='
+		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
 	);
 
-	private $_imageUrls=array(
-		1=>'http://localhost/linnaeus_ng/app/views/species/taxon.php?epi=1&id='
-	);
-	
     public $usedModels = array(
 		'commonname',
 		'synonym',
 		'names',
 		'media_taxon'
     );
-    
+
     public $controllerPublicName = 'Webservices';
 
     public function __construct($p=null)
@@ -81,8 +75,8 @@ parameters:
 
 		} else {
 			
-			$url=$this->_taxonUrls[$this->getCurrentProjectId()];
-			
+			$url=$this->_taxonUrls[$this->getCurrentProjectId()].$this->getTaxonId();
+
 			$query="
 				select
 					_a.id as name_id,
@@ -97,8 +91,12 @@ parameters:
 					_b.nametype,
 					_a.taxon_id, 
 					_d.taxon, 
-					_f.default_label as rank,
-					concat('".$url."',_a.taxon_id) as url,
+					_f.default_label as rank,".
+				($this->_useOldNsrLinks ?
+					"concat('http://www.nederlandsesoorten.nl/',replace(_i.nsr_id,'tn.nlsr.','nsr/'))" :
+					"concat('".$url."',_a.taxon_id)"
+				)."
+					 as url,
 					_h.id as taxon_valid_name_id
 				from %PRE%names _a
 				
@@ -110,6 +108,8 @@ parameters:
 				
 				left join %PRE%name_types _g on _a.project_id=_g.project_id and _g.nametype='isValidNameOf'
 				left join %PRE%names _h on _h.taxon_id=_a.taxon_id and _h.type_id=_g.id and _a.project_id=_h.project_id
+
+				left join %PRE%ids _i on _a.project_id=_i.project_id and _a.taxon_id=_i.lng_id and _i.item_type='taxon'
 
 				where _a.project_id=".$this->getCurrentProjectId()."
 				and (
@@ -175,7 +175,6 @@ parameters:
 			$this->sendErrors();
 			return;
 		}
-		
 
 		$taxon=$this->getTaxonById($this->getTaxonId());
 
@@ -191,8 +190,8 @@ parameters:
 
 		$ranklabel=$ranklabel[0]['label'];
 				
-		$url=$this->_taxonUrls[$this->getCurrentProjectId()].$this->getTaxonId();
-		
+		$url=$this->makeNsrLink();
+
 		$query="
 			select
 				_a.id as name_id,
@@ -262,7 +261,6 @@ parameters:
 		$this->smarty->assign('json',json_encode($result));
 		
 		$this->printPage('template');
-
 	}
 
 
@@ -403,5 +401,28 @@ parameters:
 		$this->printPage('template');
 	}
 
+	private function makeNsrLink()
+	{
+
+		if (!$this->_useOldNsrLinks) {
+
+			return $this->_taxonUrls[$this->getCurrentProjectId()].$this->getTaxonId();
+
+		} else {
+
+			$query="
+				select *
+				from %PRE%ids _a
+				where _a.project_id=".$this->getCurrentProjectId()."
+				and _a.lng_id =".$this->getTaxonId()."
+				and _a.item_type='taxon'"
+				;
+				
+			$ids = $this->models->Names->freeQuery($query);
+		
+			return 'http://www.nederlandsesoorten.nl/'.str_replace('tn.nlsr.','nsr/',$ids[0]['nsr_id']);
+		}
+
+	}
 
 }
