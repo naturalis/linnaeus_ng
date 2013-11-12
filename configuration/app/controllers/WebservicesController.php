@@ -190,6 +190,39 @@ parameters:
 
 		$ranklabel=$ranklabel[0]['label'];
 				
+
+		$query="
+			select
+				_a.content, _b.page
+			from %PRE%content_taxa _a, %PRE%pages_taxa _b
+			where _a.project_id=".$this->getCurrentProjectId()."
+			and _a.taxon_id =".$this->getTaxonId()."
+			and _a.language_id =".LANGUAGE_ID_DUTCH."
+			and _b.project_id=".$this->getCurrentProjectId()."
+			and _a.page_id=_b.id
+			and _b.page='Summary_dutch'
+			"
+			;
+
+		$descriptions = $this->models->Names->freeQuery($query);
+
+		$summary=strip_tags($descriptions[0]['content']);
+		
+		if (empty($summary)) $summary=null;
+		
+
+		/*
+		//and (_b.page='Summary_dutch' or _b.page='Description')
+		//order by _b.page desc"
+
+		foreach((array)$descriptions as $val) {
+			if (($val['page']=='Description' && empty($description)) || $val['page']=='Summary_dutch')
+			$description=$val['content'];
+		}
+		
+		$description = strip_tags($description);
+		*/
+		
 		$url=$this->makeNsrLink();
 
 		$query="
@@ -213,7 +246,7 @@ parameters:
 			and _a.taxon_id =".$this->getTaxonId()
 			;
 
-		$names = $this->models->Names->freeQuery($query);
+		$names=$this->models->Names->freeQuery($query);
 
         $media=$this->models->MediaTaxon->freeQuery("
 			select
@@ -254,6 +287,7 @@ parameters:
 			'scientific name'=>$taxon['taxon'],
 			'rank'=>$ranklabel,
 			'url'=>$url,
+			'summary'=>$summary,
 			'names'=>$names,
 			'media'=>$media
 		);
