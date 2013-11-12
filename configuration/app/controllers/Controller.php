@@ -120,7 +120,7 @@ class Controller extends BaseClass
     private $_fullPathRelative;
     private $_checkForProjectId = true;
     private $_checkForSplash = true;
-    private $_allowEditOverlay = true;
+    private $_allowEditOverlay = true; // true
     private $_currentGlossaryId = false;
     private $_currentHotwordLink = false;
     private $_hotwordTempLinks = array();
@@ -3026,10 +3026,7 @@ class Controller extends BaseClass
     {
         if ($this->useCache == false)
             return false;
-        
-		if (!isset($_SESSION['app']['project']['urls']['cache']))
-			return false;
-		
+
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
 		
         if (file_exists($cacheFile)) {
