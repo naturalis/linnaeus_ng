@@ -3028,6 +3028,9 @@ class Controller extends BaseClass
             return false;
         
         $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
+		
+		var_dump($_SESSION['app']['project']);die();
+		
         if (file_exists($cacheFile)) {
             // Timeout provided and expired
             if ($timeOut && time() - $timeOut >= filemtime($cacheFile)) {
