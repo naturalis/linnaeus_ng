@@ -26,6 +26,7 @@ class WebservicesController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
+		$this->useCache=false;
     }
 
     public function __destruct ()
