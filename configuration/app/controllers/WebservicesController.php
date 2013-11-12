@@ -285,7 +285,7 @@ parameters:
 		
 		$result['taxon']=array(
 			'id'=>$taxon['id'],
-			'scientific name'=>$taxon['taxon'],
+			'scientific_name'=>$taxon['taxon'],
 			'rank'=>$ranklabel,
 			'url'=>$url,
 			'summary'=>$summary,
