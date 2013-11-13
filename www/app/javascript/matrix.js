@@ -90,7 +90,7 @@ function fillStates(obj,char) {
 
 	$('#states').empty();
 
-	setInfo(null,null,null);
+	setInfo(' ',' ',' ',' ');
 
 	if (!obj) {
 		console.dir(characters);
@@ -239,7 +239,7 @@ function goState() {
 		break;
 	}
 
-	setInfo(title,val,null);
+	setInfo(title,val,' ',' ');
 
 }
 
@@ -422,7 +422,7 @@ function highlightSelected() {
 					}
 				});	
 				
-				if (preVal) setInfo(null,null,'Current value: '+preVal);
+				if (preVal) setInfo(null,null,'Current value: '+preVal,null);
 				
 			} else {
 
@@ -455,7 +455,7 @@ function removeHighlight() {
 		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
 	});
 	
-	setInfo('&nbsp;','&nbsp;','&nbsp;','&nbsp;');
+	setInfo(' ',' ',' ',' ');
 
 }
 
