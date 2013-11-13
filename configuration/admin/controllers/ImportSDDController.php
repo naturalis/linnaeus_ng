@@ -2,7 +2,7 @@
 /*
 
 
-	quit working on 4 november due to more pressing obligations
+	quit working on 4 november due to more pressing obligations.
 	import works, except states of range characters are somehow 
 	saved with the wrong charcater id. fuck knows why.
 
@@ -20,6 +20,8 @@ EVERYTHING IS SPECIES!
 min/ Umethmin (whatever) reduced to one value (idem max)
 measurement lables &units get lost
 
+multi-level characters reduced to a single character, top level to group
+
 */
 
 include_once ('ImportController.php');
@@ -29,6 +31,7 @@ class ImportSDDController extends ImportController
 
 	private $_defaultKingdom = '(import generated master taxon)';
     public $controllerPublicName = 'SDD file Import';
+	private $_useGroupsAsUpperTreeLevel = false;//true;
 
     /**
      * Constructor, calls parent's constructor
@@ -38,8 +41,6 @@ class ImportSDDController extends ImportController
     public function __construct ()
     {
 		
-		die('not implemented');
-
         parent::__construct();
         
         error_reporting(E_ERROR | E_PARSE);
@@ -165,10 +166,14 @@ class ImportSDDController extends ImportController
 		
 			$xml=simplexml_load_file($_SESSION['admin']['system']['import']['file']['path']);
 			
+			// matrix name
 			$matrixname=(string)$xml->Dataset->Representation->Label;
+
+
+
+			// taxa [t1]
 			$taxa=array();
 			$files_to_copy=array();
-	
 			foreach($xml->Dataset->TaxonNames->TaxonName as $val)
 			{
 	
@@ -184,17 +189,21 @@ class ImportSDDController extends ImportController
 				);
 	
 			}
-			
-			$groups=array();
-		
+
+
+
+			// descriptive concepts (labels) [dc1]
+			$DescriptiveConcepts=array();
 			foreach($xml->Dataset->DescriptiveConcepts->DescriptiveConcept as $val)
 			{
 				// ignoring q($val->Modifiers);
-				$groups[(string)$val['id']]['label']=(string)$val->Representation->Label;
+				$DescriptiveConcepts[(string)$val['id']]['label']=(string)$val->Representation->Label;
 			}
-	
+
+
+
+			// characters [c1] & states
 			$characters=array();
-		
 			foreach($xml->Dataset->Characters->CategoricalCharacter as $val)
 			{
 	
@@ -236,26 +245,101 @@ class ImportSDDController extends ImportController
 				);
 	
 			}
-	
-			$parentage=array();
-	
+
+
+
+			// nodes - but as we don't have a tree in LNG, we'll transform the character's names (and later turn level 1 into a group)
+			$nodes=$characterindex=array();
+			$i=0;
 			foreach($xml->Dataset->CharacterTrees->CharacterTree as $val)
 			{
-				foreach($val->Nodes->Node as $nVal)
-				{
-					$parentage[(string)$nVal['id']]=(string)$nVal->DescriptiveConcept['ref'];
+
+				foreach($val->Nodes->children() as $nVal) {
+					$charref=(string)$nVal->Character['ref'];
+					$dcref=(string)$nVal->DescriptiveConcept['ref'];
+					$attr=$nVal->attributes();
+					$nodes[$i]=array(
+						'id'=>(string)$nVal['id'],
+						'label'=>(string)$nVal['debuglabel'],
+						'ref'=>$dcref,
+						'char'=>$charref,
+						'parent'=>(string)$nVal->Parent['ref'],
+					);
+					
+					if (isset($DescriptiveConcepts[$dcref]['label'])) {
+						$nodes[$i]['label']=$DescriptiveConcepts[$dcref]['label'];
+					}
+					
+					if (!empty($charref))
+						$characterindex[$charref]=$i;
+					$i++;
+					
 				}
-				foreach($val->Nodes->CharNode as $nVal)
-				{
-					if (isset($parentage[(string)$nVal->Parent['ref']]))
-						$characters[(string)$nVal->Character['ref']]['group']=$parentage[(string)$nVal->Parent['ref']];
-					else
-						$characters[(string)$nVal->Character['ref']]['group']=null;
+
+			}
+
+			function getNodeById($nodes,$id)
+			{
+				foreach((array)$nodes as $node) {
+					if ($node['id']==$id) {
+						return $node;
+					}
 				}
 			}
+
+			//transform the character's names (and later turn level 1 into a group)
+			foreach((array)$characters as $key=>$char)
+			{
+				$thisnode=$nodes[$characterindex[$key]];
+
+				$parent=$thisnode['parent'];
+				$prefix='';
+				while(!empty($parent)) {
+					$d=getNodeById($nodes,$parent);
+					$parent=$d['parent'];
+					$prefix=$d['label'].chr(31).$prefix;
+				}
+				$characters[$key]['prefix']=$prefix;
+			}
+			
+			$groups=array();
+
+			if ($this->_useGroupsAsUpperTreeLevel)
+			{
+
+				// ah well, let's turn the first bit into groups (and fix the separators)
+				foreach((array)$characters as $key=>$char)
+				{
+					$d=explode(chr(31),$char['prefix']);
+					
+					if (count($d)>0) {
+						$g=array_shift($d);
+						$characters[$key]['prefix']=trim(implode(':',$d));
 	
+						if (!empty($g))
+							$characters[$key]['group']=$groups[$g]=$g;
+						else
+							$characters[$key]['group']=null;
+	
+					} else {
+						$characters[$key]['prefix']=null;
+						$characters[$key]['group']=null;
+					}
+					
+				}
+				
+			} else {
+
+				foreach((array)$characters as $key=>$char)
+				{
+					$characters[$key]['prefix']=str_replace(chr(31),':',$char['prefix']);
+				}
+
+			}
+
+
+			// taxon / state relations
 			$coded_descriptions=array();
-	
 			foreach($xml->Dataset->CodedDescriptions->CodedDescription as $val)
 			{
 	
@@ -296,12 +380,13 @@ class ImportSDDController extends ImportController
 				}
 				
 				$coded_descriptions[$taxon]['quantitative_states']=$quantitative_states;
-				
 	
 			}
 	
+
+
+			// media
 			$media_objects=array();
-	
 			foreach($xml->Dataset->MediaObjects->MediaObject as $val)
 			{
 				$file=basename((string)$val->Source['href']);
@@ -320,6 +405,7 @@ class ImportSDDController extends ImportController
 					'rank_id' => SPECIES_RANK_ID
 				)
 			));
+
 
 			$speciesRankId=$pr[0]['id'];
 
@@ -346,7 +432,8 @@ class ImportSDDController extends ImportController
 
 				$this->addError('Found no taxon/state-relations (import stopped)');
 
-			} else {
+			} else
+			{
 
 				$mId=$this->createMatrix(array('matrixname'=>$matrixname));
 				$this->addMessage('Created matrix "'.$matrixname.'"');
@@ -358,21 +445,21 @@ class ImportSDDController extends ImportController
 						array(
 							'project_id' => $this->getCurrentProjectId(), 
 							'matrix_id' => $mId,
-							'label' => $val['label'],
+							'label' => $key,
 							'show_order' => 99
 					));
 					
-					$groups[$key]['id']=$this->models->Chargroup->getNewId();
+					$groups[$key]=$this->models->Chargroup->getNewId();
 		
 					$this->models->ChargroupLabel->save(
 						array(
 							'project_id' => $this->getCurrentProjectId(), 
-							'chargroup_id' => $groups[$key]['id'],
-							'label' => $label,
+							'chargroup_id' => $groups[$key],
+							'label' => $key,
 							'language_id' => $this->getDefaultProjectLanguage()
 					));	
 					
-					$this->addMessage('Created group "'.$val['label'].'"');	
+					$this->addMessage('Created group "'.$key.'"');	
 					
 				}
 				
@@ -385,7 +472,7 @@ class ImportSDDController extends ImportController
 					$characters[$key]['id'] = $this->createMatrixCharacter(
 						array(
 							'type'=>$val['type'], 
-							'label'=>$val['label'],
+							'label'=>$val['prefix'].$val['label'],
 							'matrix_id'=>$mId,
 							'showOrder'=>$show_order++
 						)
@@ -396,7 +483,7 @@ class ImportSDDController extends ImportController
 						$this->models->CharacteristicChargroup->save(array(
 							'id' => null, 
 							'project_id' => $this->getCurrentProjectId(), 
-							'chargroup_id' => $groups[$val['group']]['id'], 
+							'chargroup_id' => $groups[$val['group']], 
 							'characteristic_id' =>$characters[$key]['id'],
 							'show_order' => $show_order
 						));
@@ -441,11 +528,11 @@ class ImportSDDController extends ImportController
 		
 						}
 						
-						$this->addMessage('Created character "'.$val['label'].'" with '.count((array)$val['states']).' states');
+						$this->addMessage('Created character "'.$val['prefix'].$val['label'].'" with '.count((array)$val['states']).' states');
 						
 					} else {
 						
-						$this->addMessage('Created character "'.$val['label'].'"');
+						$this->addMessage('Created character "'.$val['prefix'].$val['label'].'"');
 					}
 					
 					
@@ -616,7 +703,7 @@ class ImportSDDController extends ImportController
 					
 					foreach ($val['quantitative_states'] as $char => $sVal)
 					{
-						
+
 						if (!isset($characters[$char]['id']) || !isset($sVal['min']) || !isset($sVal['max']))
 							continue;
 							

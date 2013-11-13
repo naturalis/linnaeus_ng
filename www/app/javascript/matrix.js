@@ -71,13 +71,39 @@ function goCharacter() {
 
 }
 
+function konijn() {
+			
+	var t = $('#characteristics :selected').text().replace(selectIndicator,'').replace(emptyIndicator,'');
+
+	setInfo(
+		'<b>'+t+'</b><br />',
+		sprintf(
+			_('%sClick here to specify a value%s; you can also click the "Add" button.'),
+			'<span class="internal-link" onclick="addSelected($(\'#characteristics\'))">',
+			'</span>'
+		),'&nbsp;','&nbsp;'
+	);
+
+}
+
 function fillStates(obj,char) {
 
 	$('#states').empty();
 
-	setInfo('',' ',' ');
+	setInfo(null,null,null);
 
-	if (!obj) return;
+	if (!obj) {
+		console.dir(characters);
+		for(var i in characters) {
+			var c=characters[i];
+			if (c.id==$('#characteristics').val()) {
+				if(c.type=='range'||c.type=='distribution')
+					konijn();
+			}
+		}
+		return;
+	}
+
 
 	for(var i=0;i<obj.length;i++) {
 
@@ -98,30 +124,21 @@ function fillStates(obj,char) {
 		goState();
 
 	} else {
-		
-		var t = $('#characteristics :selected').text().replace(selectIndicator,emptyIndicator);
 
-		setInfo(
-			'<b>'+t+'</b><br />',
-			sprintf(
-				_('Click %shere%s to specify a value; you can also double-click "%s" to do so.'),
-				'<span class="internal-link" onclick="addSelected($(\'#characteristics\'))">',
-				'</span>',
-				t
-			)
-		);
-	
+		konijn();
+
 	}
 
 	highlightSelected();
 
 }
 
-function setInfo(h,b,v) {
+function setInfo(h,b,v,f) {
 
 	if (h) $('#info-header').html(h);
 	if (b) $('#info-body').html(b);
 	if (v) $('#info-value').html(v);
+	if (f) $('#info-footer').html(f);
 
 }
 
@@ -222,7 +239,7 @@ function goState() {
 		break;
 	}
 
-	setInfo(title,val);
+	setInfo(title,val,null);
 
 }
 
@@ -438,7 +455,7 @@ function removeHighlight() {
 		if ($(this).text().substring(0,selectIndicator.length) == selectIndicator) $(this).text($(this).text().replace(selectIndicator,emptyIndicator));
 	});
 	
-	setInfo('','',' ');
+	setInfo('&nbsp;','&nbsp;','&nbsp;','&nbsp;');
 
 }
 
