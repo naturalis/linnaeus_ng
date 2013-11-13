@@ -119,7 +119,7 @@ class MatrixKeyController extends Controller
 
             $this->storeHistory = false;
 
-            $this->setCurrentMatrix($this->requestData['id']);
+            $this->setCurrentMatrixId($this->requestData['id']);
 
 			$this->setTotalEntityCount();
 
@@ -406,7 +406,7 @@ class MatrixKeyController extends Controller
 
             $states = $this->nbcStateMemoryReformat($states);
 		
-            $this->smarty->assign('stateImagesPerRow',$this->getSetting('matrix_state_image_per_row'));
+            $this->smarty->assign('stateImagesPerRow',$this->getSetting('matrix_state_image_per_row',4));
             $this->smarty->assign('c', $c);
             $this->smarty->assign('s', $s);
             $this->smarty->assign('states', $states);
@@ -2561,12 +2561,6 @@ class MatrixKeyController extends Controller
 		$dM = $c['dM'];
 		$fsM = $c['fsM'];
         
-        /*
-        find the number of taxon/state-connections that exist, grouped by state, but only for taxa that
-        have the already selected states, unless no states have been selected at all, in which case we just
-        return them all
-        */
-        
         $q = "
         	select sum(tot) as tot, characteristic_id 
         	from (
@@ -3202,7 +3196,8 @@ class MatrixKeyController extends Controller
 		foreach((array)$data as $key => $dVal) {
 			foreach((array)$dVal['d'] as $characteristic_id => $cVal)	{
 				foreach((array)$cVal['states'] as $state)	{
-					$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
+					if (isset($state['id']))
+						$d[$key][] = $characteristic_id.':'.$state['id']; // characteristic_id:state_id
 				}
 			}
 		}
@@ -3212,14 +3207,18 @@ class MatrixKeyController extends Controller
 		foreach((array)$data as $key => $dVal) {
 			foreach((array)$dVal['d'] as $characteristic_id => $cVal) {
 				foreach((array)$cVal['states'] as $sVal => $state)	{
+					
+					if (isset($state['id'])) {
 
-					if (in_array($characteristic_id.':'.$state['id'],$common)) {
-						if ($action=='remove') {
-							unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
-						} else
-						if ($action=='tag') {
-							$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
+						if (in_array($characteristic_id.':'.$state['id'],$common)) {
+							if ($action=='remove') {
+								unset($data[$key]['d'][$characteristic_id]['states'][$sVal]);
+							} else
+							if ($action=='tag') {
+								$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'] = '<span class="overlapState">'.$data[$key]['d'][$characteristic_id]['states'][$sVal]['label'].'</span>';
+							}
 						}
+						
 					}
 					
 				}
