@@ -100,12 +100,11 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 						{foreach from=$names.list item=v}
 						{if $v.expert.name}
 							{assign var=expert value=$v.expert.name}
-							{assign var=organisation value=$v.organisation.name}
 						{/if}
 							<tr><td>{$v.nametype}</td><td><a>{$v.name}</a></td></tr>
 						{/foreach}
 						{if $expert}
-						<tr><td>Expert</td><td colspan="2">{$expert} {if $organisation}({$organisation}){/if}</td></tr>
+						<tr><td>Expert</td><td colspan="2">{$expert}</td></tr>
 						{/if}
 					</table>
 				</p>
@@ -143,8 +142,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				{if $presenceData.habitat}<tr><td>Habitat</td><td>{$presenceData.habitat}</td></tr>{/if}
 				{if $presenceData.reference}<tr><td>Referentie</td><td><a href="">{$presenceData.reference} {$presenceData.reference_date}</a></td></tr>{/if}
 				{if $presenceData.presence82}<tr><td>Status 1982</td><td>{$presenceData.presence82}</td></tr>{/if}
-				{if $presenceData.presence}<tr><td>Expert</td><td>{$presenceData.actor} {if $presenceData.organisation} ({$presenceData.organisation}){/if}</td></tr>{/if}
-				<tr><td>Status rode lijst</td><td>...</td></tr>
+				{if $presenceData.presence}<tr><td>Expert</td><td>{$presenceData.actor}</td></tr>{/if}
 			</table>
 			{/if}
 		
@@ -187,9 +185,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 	{include file="../shared/_right_column.tpl"}
 
 </div>
-	
-	
-    
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
