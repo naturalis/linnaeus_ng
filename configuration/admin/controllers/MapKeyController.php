@@ -1763,6 +1763,9 @@ class MapKeyController extends Controller
 			(dus incluis de spatie, in L2 was me niet zo van de underscores). 
 			6) En omdat we  toch bezig zijn proberen we als dat ook faalt tenslotte nog:
 			  /www/shared/media/system/l2_maps/south pacific.GIF		
+			Linnaeus 2 AARGH!
+			7) /www/shared/media/system/l2_maps/South Pacific.gif
+			8) /www/shared/media/system/l2_maps/South Pacific.GIF
 		*/
 
 		$m = $this->models->L2Map->_get(
@@ -1820,6 +1823,22 @@ class MapKeyController extends Controller
 					// 6)
 					$m[$key]['imageFullName'] = $systemMediaL2Maps.strtolower($val['name']).'.GIF';
 					$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+						if (!$m[$key]['mapExists']) {
+		
+							// 7)
+							$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.gif';
+							$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+
+							if (!$m[$key]['mapExists']) {
+			
+								// 8)
+								$m[$key]['imageFullName'] = $systemMediaL2Maps.$val['name'].'.GIF';
+								$m[$key]['mapExists'] = file_exists($m[$key]['imageFullName']);
+			
+							}							
+		
+						}
 
 				}
 
