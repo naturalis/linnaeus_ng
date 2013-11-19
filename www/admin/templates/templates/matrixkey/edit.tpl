@@ -13,6 +13,8 @@
 		{/if}
 		<br />
 	{/if}
+	<a href="matrices.php?imgdim={$matrix.id}">{t}Get and save state image dimensions (for newly imported matrices){/t}</a>
+
 
 
 </span>
