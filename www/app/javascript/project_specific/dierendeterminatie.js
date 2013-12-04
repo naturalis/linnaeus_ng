@@ -844,7 +844,7 @@ function nbcFilterEmergingCharacters() {
 	for(var i in nbcData.menu.groups) {
 		for (var j in nbcData.menu.groups[i].chars) {
 			var id=nbcData.menu.groups[i].chars[j].id;
-			if (nbcData.countPerCharacter[id])
+			if (nbcData.countPerCharacter)
 				nbcData.menu.groups[i].chars[j].disabled=(nbcData.countPerCharacter[id]<nbcData.results.length);
 			else
 				nbcData.menu.groups[i].chars[j].disabled=false;
