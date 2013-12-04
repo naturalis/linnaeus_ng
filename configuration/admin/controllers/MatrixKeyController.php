@@ -2532,8 +2532,8 @@ class MatrixKeyController extends Controller
 		}
 
 	}
-				
-	private function reacquireStateImageDimensions($id=null)
+
+	public function reacquireStateImageDimensions($id=null)
 	{
 		
 		$id = isset($id) ? $id : $this->getCurrentMatrixId();
