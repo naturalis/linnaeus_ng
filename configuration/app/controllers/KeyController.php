@@ -781,7 +781,7 @@ class KeyController extends Controller
 
 		$div = $this->getCache('key-taxonDivision-'.$step);
 		
-if (1==1 || !$div) {
+		if (!$div) {
 
 			$this->tmp = null;
 

@@ -67,12 +67,12 @@
 	cache-files at every next page.
 	to suppress caching, set the variable $useCache to false. doing so will stop the
 	application from both storing and retrieving data from the cache. existing cache-
-	files will stay intact.
+	files will remain intact.
 
 
 	on translations:
-	after repeated problems with the getText() functions, the function has been replaced
-	with a custom one:
+	after repeated problems with the "official" getText() functions, the function has
+	been replaced with a custom one:
 		translate($str)
 	this function fetches the translation based on the current setting of the language id.
 	if no translation exists, it saves the string into the table of strings to be
@@ -80,7 +80,7 @@
 		javascriptTranslate()
 		smartyTranslate()
 	are wrappers for accessing translate() from javascript - via the function _() in 
-	main.js - and smarty - via {t}{/t} - respectively.
+	main.js - and smarty - via the registered block function {t}{/t} - respectively.
 
 
 	on the icon grid:
@@ -89,23 +89,23 @@
 		FreeModuleProject.show_order
 	or just the first one, if there are no free modules. THERE IS NO INTERFACE FOR 
 	CHANGING THESE VALUES, so changes will have to be made by hand, directly in the
-	tables. when changing these values, bear in mind that list of modules is ordered
-	after having been combined from the normal modules (ModuleProject) and possible
-	free modules (FreeModuleProject). this means that the values for show_order have
-	to be unique across two tables; again, these is at present no mechanism that
-	actually enforces this - it is up to the system administrator.
+	tables. when changing these values, bear in mind that your list of modules is
+	ordered after having been combined from the normal modules (ModuleProject) and
+	possible free modules (FreeModuleProject). this means that the values for
+	show_order have to be unique across two tables; again, these is at present no
+	mechanism that actually enforces this - it is up to the system administrator.
 	
 	
 	on snippets:
 	to allow for the inclusion of project-dependent bits of html into general templates,
-	there is the concept of a snippet. snippets are bit of html-code that are included
+	there is the concept of the snippet. snippets are bit of html-code that are included
 	in template if they exist for the current project. they are included like this:
 		{snippet}matrix_main_menu.html{/snippet}
 	after which the function smartyTranslateGetSnippet searches for the specified file
 	in the projects snippet-folder, which is
 		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
 	if the file (or the directory) doesn't exist, sheer blankness is included.
-	please note the files are included "as is"; smarty-codes won't work.
+	please note the files are included "as is"; php or smarty-codes won't work.
 	
 */
 
@@ -3099,6 +3099,8 @@ class Controller extends BaseClass
             $this->generalSettings['directories']['cache'] => 'www/shared/cache',
             $this->generalSettings['directories']['mediaDirProject'] => 'www/shared/media/project',
             $this->generalSettings['directories']['log'] => 'log'
+
+//D:\www\linnaeus_ng\www\app\style\custom
         );
         
         $p = $this->getCurrentProjectId();

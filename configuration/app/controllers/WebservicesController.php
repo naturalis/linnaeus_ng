@@ -9,10 +9,8 @@ class WebservicesController extends Controller
 	private $_taxonId=null;
 	private $_project=null;
 	private $_matchType=null;
-	private $_useOldNsrLinks=true;
-	private $_taxonUrls=array(
-		1=>'http://dev2.etibioinformatics.nl/linnaeus_ng_nsr/app/views/species/taxon.php?epi=1&id='
-	);
+	private $_useOldNsrLinks=false;
+	private $_taxonUrl=null;
 
     public $usedModels = array(
 		'commonname',
@@ -26,7 +24,7 @@ class WebservicesController extends Controller
     public function __construct($p=null)
     {
         parent::__construct($p);
-		$this->useCache=false;
+		$this->initialise();
     }
 
     public function __destruct ()
@@ -76,7 +74,7 @@ parameters:
 
 		} else {
 			
-			$url=$this->_taxonUrls[$this->getCurrentProjectId()].$this->getTaxonId();
+			$url=sprintf($this->_taxonUrl,$this->getTaxonId());
 
 			$query="
 				select
@@ -298,7 +296,12 @@ parameters:
 		$this->printPage('template');
 	}
 
-
+    private function initialise()
+    {
+		$this->useCache=false;
+		$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
+		$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
+    }
 
 	private function checkProject()
 	{
@@ -436,12 +439,17 @@ parameters:
 		$this->printPage('template');
 	}
 
+	/*
+	
+		NSR project specific, should be changed once NSR migration is complete
+	
+	*/
 	private function makeNsrLink()
 	{
 
 		if (!$this->_useOldNsrLinks) {
 
-			return $this->_taxonUrls[$this->getCurrentProjectId()].$this->getTaxonId();
+			return sprintf($this->_taxonUrl,$this->getTaxonId());
 
 		} else {
 
