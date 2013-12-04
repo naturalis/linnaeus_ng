@@ -875,7 +875,7 @@ function nbcInit() {
 	nbcLabelSimilarSpecies = _('gelijkende soorten');
 	nbcLabelShowAll = _('alle kenmerken tonen');
 	nbcLabelHideAll = _('alle kenmerken verbergen');
-	nbcLabelExternalLink = _('Informatie op Nederlands Soortenregister');
+	nbcLabelExternalLink = _('Meer informatie over soort/taxon');
 
 	$('#legendDetails').html(nbcLabelDetails);
 	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
