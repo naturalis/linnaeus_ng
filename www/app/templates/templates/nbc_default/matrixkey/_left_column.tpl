@@ -36,7 +36,7 @@
 		<div id="legendContainer">
         	{*<span id="legendHeader">{t}Legenda:{/t}</span><br />*}
             <table>
-                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-nsr" src="{$nbcImageRoot}information_grijs.png" /></td><td>Meer informatie</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-nsr" src="{$nbcImageRoot}information_grijs.png" /></td><td>meer informatie</td></tr>
                 <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-info" src="{$nbcImageRoot}lijst_grijs.png" /></td><td>onderscheidende kenmerken</td></tr>
                 <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$nbcImageRoot}gelijk_grijs.png" /></td><td>gelijkende soorten</td></tr>
             </table>
