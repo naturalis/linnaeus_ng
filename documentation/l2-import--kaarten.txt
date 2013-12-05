@@ -74,6 +74,12 @@ betreffende bestand:
 (dus incluis de spatie, in L2 was men niet zo van de underscores). 
 6) En omdat we  toch bezig zijn proberen we als dat ook faalt tenslotte nog:
   /www/shared/media/system/l2_maps/south pacific.GIF
+  
+Linnaeus 2 AARGH!
+7) /www/shared/media/system/l2_maps/South Pacific.gif
+8) /www/shared/media/system/l2_maps/South Pacific.GIF
+
+  
 
 Let er op dat de bestanden in /www/app/media/system/l2_maps/ dus zeer
 waarschijnlijk door verschillende projecten gebruikt worden. Een

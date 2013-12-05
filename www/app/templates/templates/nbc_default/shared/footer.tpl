@@ -4,10 +4,10 @@
 <div id="footer">
     <div id="footerInfo">
         <p class="copyright">
-            © Naturalis 2005 - {$currdate.year}  -  <a href="http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html" title="Disclaimer">
-            Colofon &amp; Disclaimer</a>
+            © Naturalis 2005 - {$currdate.year}  -  <a href="http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html" title="{t}Disclaimer{/t}">
+            {t}Colofon &amp; Disclaimer{/t}</a>
         </p>
-        <a href="#top" class="up">naar boven</a>
+        <a href="#top" class="up">{t}naar boven{/t}</a>
     </div>
 </div>
 

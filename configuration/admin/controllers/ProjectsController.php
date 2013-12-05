@@ -55,7 +55,7 @@ class ProjectsController extends Controller
 		array('matrix_items_per_line','int',4),
 		array('matrix_items_per_page','int',16),
 		array('matrix_state_image_per_row','int',4,'number of images on a line in NBC character pop up'),
-		array('matrix_state_image_max_height','[size in px]',200),
+		//array('matrix_state_image_max_height','[size in px]',200), // should be done through project specific stylesheet
 		array('matrix_use_sc_as_weight','bool',0,'use separation coefficient as character weight; experimental'),
 		array('matrix_allow_empty_species','bool',1,'make species without content available in matrix'),
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),

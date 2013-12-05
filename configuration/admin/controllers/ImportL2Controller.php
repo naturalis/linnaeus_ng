@@ -74,6 +74,7 @@ Please be aware that these are six other taxa than the three mentioned earlier -
 
 
 include_once ('Controller.php');
+
 class ImportL2Controller extends Controller
 {
     public $usedModels = array(
@@ -3572,7 +3573,10 @@ class ImportL2Controller extends Controller
 
     private function saveMatrices ($m)
     {
-        $paths = isset($_SESSION['admin']['system']['import']['paths']) ? $_SESSION['admin']['system']['import']['paths'] : $this->makePathNames($this->getNewProjectId());
+        $paths = 
+			isset($_SESSION['admin']['system']['import']['paths']) ? 
+				$_SESSION['admin']['system']['import']['paths'] : 
+				$this->makePathNames($this->getNewProjectId());
         
         $d = $error = null;
         

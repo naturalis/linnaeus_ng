@@ -19,7 +19,7 @@
         <div id="results">
             <div id="similarSpeciesHeader" class="hidden"></div>
 			{if $master_matrix_id}
-			<div id="mastermatrixHeader"><a href="?mtrx={$master_matrix_id}">Terug naar de hoofdsleutel</a></div>
+			<div id="mastermatrixHeader"><a href="?mtrx={$master_matrix_id}">{t}Terug naar de hoofdsleutel{/t}</a></div>
 			{/if}
             <div id="results-container"></div>
         </div>

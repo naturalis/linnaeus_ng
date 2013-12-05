@@ -1323,7 +1323,8 @@ class MatrixKeyController extends Controller
             $cs[$key]['type'] = $d['type'];
             $cs[$key]['label'] = $this->getCharacteristicStateLabelOrText($val['id']);
             $cs[$key]['text'] = $this->getCharacteristicStateLabelOrText($val['id'], 'text');
-            $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h
+//            $cs[$key]['img_dimensions'] = empty($val['file_dimensions']) ? null : $this->scaleDimensions(explode(':',$val['file_dimensions'])); // gives w, h // should be done through project specific stylesheet
+
         }
 
         return $cs;

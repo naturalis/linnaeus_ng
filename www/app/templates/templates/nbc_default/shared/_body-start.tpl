@@ -14,7 +14,7 @@
             </div>
 
             <h2 id="slogan">	
-                Overzicht van de Nederlandse biodiversiteit
+                {t}Overzicht van de Nederlandse biodiversiteit{/t}
             </h2>
 
             <div id="menucontainer">
