@@ -3080,7 +3080,7 @@ class MatrixKeyController extends Controller
 				where _a.project_id = " . $this->getCurrentProjectId() . "
 					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
 				and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
-			union all
+			union
 			select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s, _d.commonname as commonname
         		from %PRE%matrices_taxa _a
         		left join %PRE%matrices_taxa_states _b
