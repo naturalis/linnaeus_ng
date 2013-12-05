@@ -39,7 +39,7 @@
 							{if !$irrelephant}<a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
                             <img class="state-image" src="{if $v.file_name}{$session.app.project.urls.projectMedia}{$v.file_name}{else}{$session.app.project.urls.systemMedia}missing.jpg{/if}" />
 							{if !$irrelephant}</a>{/if}
-                            <p>{$v.label}</p>
+                            <p class="state-image-caption">{$v.label}</p>
                         </div>
                         {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
 
