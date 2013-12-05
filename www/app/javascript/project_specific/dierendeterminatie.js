@@ -317,7 +317,7 @@ function nbcPrintOverhead() {
 
 	if (nbcBrowseStyle=='expand') {
 
-		$('#result-count').html((nbcExpandedShowing > 1 ? '1 - '+nbcExpandedShowing : nbcExpandedShowing)+_(' van ')+nbcData.count.results);
+		$('#result-count').html((nbcExpandedShowing > 1 ? '1-'+nbcExpandedShowing : nbcExpandedShowing)+'&nbsp;'+_('van')+'&nbsp;'+nbcData.count.results);
 		return;
 
 	}
