@@ -1391,7 +1391,8 @@ class ImportNBCController extends Controller
 					}
 	
 					$d[$key]['variations'][$sKey]['add-on'] = trim($str);
-					$d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
+					//$d[$key]['variations'][$sKey]['variant'] = (isset($sVal['naam NL']) ? $sVal['naam NL'] : $key) . ' ' . $d[$key]['variations'][$sKey]['add-on'];
+					$d[$key]['variations'][$sKey]['variant'] = $d[$key]['variations'][$sKey]['add-on'];
 				}
 				
 

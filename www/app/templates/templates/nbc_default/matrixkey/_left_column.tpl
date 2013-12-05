@@ -26,7 +26,7 @@
             </div>
 			{if $master_matrix_id}
             <div class="facetCategories" style="margin-bottom:6px">
-				<a href="?mtrx={$master_matrix_id}">Terug naar de hoofdsleutel</a>
+				<a href="?mtrx={$master_matrix_id}">{t}Terug naar de hoofdsleutel{/t}</a>
             </div>
 			{/if}
 		</div>
@@ -36,9 +36,9 @@
 		<div id="legendContainer">
         	{*<span id="legendHeader">{t}Legenda:{/t}</span><br />*}
             <table>
-                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-nsr" src="{$nbcImageRoot}information_grijs.png" /></td><td>meer informatie</td></tr>
-                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-info" src="{$nbcImageRoot}lijst_grijs.png" /></td><td>onderscheidende kenmerken</td></tr>
-                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$nbcImageRoot}gelijk_grijs.png" /></td><td>gelijkende soorten</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-nsr" src="{$nbcImageRoot}information_grijs.png" /></td><td>{t}meer informatie{/t}</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-info" src="{$nbcImageRoot}lijst_grijs.png" /></td><td>{t}onderscheidende kenmerken{/t}</td></tr>
+                <tr><td class="legend-icon-cell"><img class="legend-icon-image icon-similar" src="{$nbcImageRoot}gelijk_grijs.png" /></td><td>{t}gelijkende soorten{/t}</td></tr>
             </table>
 		</div>  
 
@@ -48,7 +48,7 @@
 		{snippet}colofon.html{/snippet}
 
             <p>
-	            <span id="logo-ETI">Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.</span>
+	            <span id="logo-ETI">{t}Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.{/t}</span>
 			</p>
 		</div>  
 

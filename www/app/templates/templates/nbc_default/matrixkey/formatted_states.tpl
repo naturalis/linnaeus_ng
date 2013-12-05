@@ -19,7 +19,7 @@
 
 			<p>
             <input id="state-value" name="state-value" type="text" value="{$prevRangeValue}" onkeyup="nbcStatevalue=$(this).val();">&nbsp;
-            <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">waarde wissen</a>
+            <a href="#" class="clearRange" onclick="nbcClearStateValue($('#state-id').val());return false;">{t}waarde wissen{/t}</a>
             </p>
 			{if $c.min && $c.max}
             <p id="state-value-extra">
@@ -61,13 +61,8 @@
             {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
             <li {if $irrelephant}class="irrelevant"{/if}>
                 <span class="selected" style="{if $selected}font-weight:bold{/if}">
-
                     <a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');closeDialog();return false;">
-                    <img 
-                    	src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png"
-                        style="margin-right:10px"
-                        >{$v.label}</a>
-
+                    <img src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png" style="margin-right:10px">{$v.label}</a>
                 </span>
                 {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
             </li>

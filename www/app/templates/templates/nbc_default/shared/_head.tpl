@@ -13,7 +13,7 @@
     <link rel="search" title="Zoeken" href="http://www.nederlandsesoorten.nl/nsr/nsr/zoeken.html" />
     <link rel="Shortcut Icon" href="http://www.nederlandsesoorten.nl/sites/nsr/images/favicon.ico" type="image/x-icon" />
 
-	<title>Nederlands Soortenregister - {$session.app.project.title|@strip_tags:false}</title>
+	<title>{t}Nederlands Soortenregister{/t} - {$session.app.project.title|@strip_tags:false}</title>
     
     <link rel="stylesheet" type="text/css" media="print" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_print.css" />
     <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_default.css" />
@@ -66,9 +66,6 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.urlparser.2.1.1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/dierendeterminatie.js"></script>
-	{* <script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script> "unofficial" library, seems to mess up jquery-ui *}
-
-
 
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
