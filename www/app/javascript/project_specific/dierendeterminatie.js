@@ -57,14 +57,60 @@ function nbcGetResults(p) {
 	
 }
 
+function nbcDoSearch() {
+
+	var str = $('#inlineformsearchInput').val();
+	str = str.replace(/^\s+|\s+$/g, ''); 
+
+	if (str.length==0) return false;
+
+	nbcSearchTerm=str;
+	nbcSetState({norefresh:true,clearState:true});
+	
+	setCursor('wait');
+
+	allAjaxHandle = $.ajax({
+		url : 'ajax_interface.php',
+		type: 'POST',
+		data : ({
+			action : 'do_search',
+			params : {term: nbcSearchTerm},
+			time : getTimestamp(),
+			key : nbcMatrixId,
+			p : nbcProjectId
+		}),
+		success : function (data) {
+			//console.log(data);
+			nbcData = $.parseJSON(data);
+			nbcDoResults();
+			nbcDoOverhead();
+			nbcDoPaging();
+			nbcPrintSearchHeader();
+			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
+
+			setCursor();
+			
+			return false;
+
+		}
+	});
+
+	return false; // suppress submit of form
+
+}
+
+
 function nbcDoResults(p) {
 
 	if (p && p.resetStart!==false)
 		nbcStart = 0;
 	nbcExpandedShowing = 0;
 	nbcClearResults();
-	if (nbcData.results) nbcPrintResults();
-
+	if (nbcData.results)
+		nbcPrintResults();
+	else 
+		nbcRemoveShowMoreButton()
+	
 }
 
 function nbcClearResults() {
@@ -301,7 +347,6 @@ function nbcRemoveShowMoreButton() {
 }
 
 
-
 function nbcDoOverhead() {
 	nbcClearOverhead();
 	if (nbcData.count) nbcPrintOverhead();
@@ -340,8 +385,6 @@ function nbcPrintOverhead() {
 			)
 		);
 }
-
-
 
 function nbcDoPaging() {
 	nbcClearPaging();
@@ -387,10 +430,8 @@ function nbcPrintPaging() {
 	$("#paging-footer").html($("#paging-header").html());
 }
 
-
-
 function nbcShowSimilar(id,type) {
-	
+
 	nbcPreviousBrowseStyles.paginate = nbcPaginate;
 	nbcPreviousBrowseStyles.expand = nbcExpandResults;
 	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
@@ -438,49 +479,6 @@ function nbcCloseSimilar() {
 	
 }
 
-
-function nbcDoSearch() {
-
-	var str = $('#inlineformsearchInput').val();
-	str = str.replace(/^\s+|\s+$/g, ''); 
-
-	if (str.length==0) return false;
-
-	nbcSearchTerm=str;
-	nbcSetPaginate(true);
-	nbcSetState({norefresh:true,clearState:true});
-	
-	setCursor('wait');
-
-	allAjaxHandle = $.ajax({
-		url : 'ajax_interface.php',
-		type: 'POST',
-		data : ({
-			action : 'do_search',
-			params : {term: nbcSearchTerm},
-			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
-		}),
-		success : function (data) {
-			//alert(data);
-			nbcData = $.parseJSON(data);
-			nbcDoResults();
-			nbcDoOverhead();
-			nbcDoPaging();
-			nbcPrintSearchHeader();
-			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
-
-			setCursor();
-			
-			return false;
-
-		}
-	});
-
-	return false; // necessary to suppress submit of form
-
-}
 
 function nbcClearSearchTerm() {
 	
