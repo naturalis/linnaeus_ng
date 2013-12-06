@@ -193,6 +193,7 @@ class MatrixKeyController extends Controller
 				),
 				'countPerState' => $countPerState,
 				'countPerCharacter' => $countPerCharacter,
+				'selectedStates' => $states,
 				'matrix' => $this->getCurrentMatrixId()
             ),JSON_HEX_APOS | JSON_HEX_QUOT));
 
@@ -235,7 +236,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('taxa', $taxa);
         
         $this->smarty->assign('matrix', $matrix);
-        
+
         $this->smarty->assign('function', 'Identify');
 
         $this->smarty->assign('characteristics', $characters);
@@ -493,6 +494,7 @@ class MatrixKeyController extends Controller
 						),
 						'countPerState' => $countPerState,
 						'countPerCharacter' => $countPerCharacter,
+						'selectedStates' => $states,
 						'matrix' => $this->getCurrentMatrixId()	
 					)
 				);
@@ -2561,49 +2563,74 @@ class MatrixKeyController extends Controller
 		$fsV = $c['fsV'];
 		$dM = $c['dM'];
 		$fsM = $c['fsM'];
-        
+
         $q = "
-        	select sum(tot) as tot, characteristic_id 
+        	select
+				sum(taxon_count) as taxon_count, 
+				sum(distinct_state_count) as distinct_state_count, 
+				characteristic_id 
         	from (
-        		select count(distinct _a.taxon_id) as tot, _a.characteristic_id as characteristic_id
-	        		from %PRE%matrices_taxa_states _a
-	        		" . (!empty($dT) ? $dT : "") . "
+        		select
+					_a.characteristic_id as characteristic_id,
+					count(distinct _a.taxon_id) as taxon_count, 
+					count(distinct _a.state_id) as distinct_state_count
+				from
+					%PRE%matrices_taxa_states _a
+					" . (!empty($dT) ? $dT : "") . "
 					" . (!empty($fsT) ?  $fsT : ""). "
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-						and _a.taxon_id not in
-							(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
-					group by _a.characteristic_id
-				union all
-				select count(distinct _a.variation_id) as tot, _a.characteristic_id as characteristic_id
-					from %PRE%matrices_taxa_states _a
+				where
+					_a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+					and _a.taxon_id not in
+						(select taxon_id from %PRE%taxa_variations where project_id = " . $this->getCurrentProjectId() . ")
+				group by
+					_a.characteristic_id
+				
+				union
+
+				select 
+					_a.characteristic_id as characteristic_id,
+					count(distinct _a.variation_id) as taxon_count, 
+					count(distinct _a.state_id) as distinct_state_count
+				from
+					%PRE%matrices_taxa_states _a
 					" . (!empty($dV) ? $dV : "") . "
 					" . (!empty($fsV) ? $fsV : "") . "
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					group by _a.characteristic_id
-				union all
-				select count(distinct _a.ref_matrix_id) as tot, _a.characteristic_id as characteristic_id
-					from %PRE%matrices_taxa_states _a
+				where
+					_a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				group by
+					_a.characteristic_id
+
+				union
+
+				select 
+					_a.characteristic_id as characteristic_id,
+					count(distinct _a.ref_matrix_id) as taxon_count, 
+					count(distinct _a.state_id) as distinct_state_count
+				from
+					%PRE%matrices_taxa_states _a
 					" . (!empty($dM) ? $dM : "") . "
 					" . (!empty($fsM) ? $fsM : "") . "
-					where _a.project_id = " . $this->getCurrentProjectId() . "
-						and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					group by _a.characteristic_id
-
+				where
+					_a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				group by
+					_a.characteristic_id
 
 			) as q1 
 			group by q1.characteristic_id
 			";
+			
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);
-        
+
         $characteristics = array();
     
         foreach ((array) $results as $val) {
 
-           $characteristics[$val['characteristic_id']]=$val['tot'];
-    
+           $characteristics[$val['characteristic_id']]=array('taxon_count'=>$val['taxon_count'],'distinct_state_count'=>$val['distinct_state_count']);
+
         }
 
         return $characteristics;

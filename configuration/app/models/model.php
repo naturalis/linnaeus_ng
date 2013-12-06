@@ -575,7 +575,7 @@ abstract class Model extends BaseClass
         $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
     
         $set = mysql_query($query);
-         
+
         $this->logQueryResult($set,$query,'freeQuery');
         $this->setLastQuery($query);
     
