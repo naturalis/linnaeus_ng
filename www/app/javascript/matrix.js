@@ -518,10 +518,13 @@ function fillScores(obj,char) {
 
 	for (var i=0;i<obj.length;i++) {
 		
+		console.dir(obj[i]);
+		
+		
         textToInsert[i] =
-			'<option ondblclick="'+(obj[i].type=='mtx' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
+			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
 				(obj[i].s!=undefined ? obj[i].s+'%: ' : '')+
-				(obj[i].type=='mtx' ? _('Matrix: ') : '')+obj[i].l+'</option>';
+				(obj[i].type=='matrix' ? _('Matrix: ') : '')+obj[i].l+'</option>';
      
     }
 
