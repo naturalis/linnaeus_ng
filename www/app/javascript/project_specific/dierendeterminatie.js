@@ -41,7 +41,6 @@ function nbcGetResults(p) {
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
-			//console.dir(nbcData);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
 			if (p && p.action!='similar') nbcDoOverhead();
@@ -639,7 +638,7 @@ function nbcBuildGroupMenu(data) {
 					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+' disabled">'+c.label+(c.value?' '+c.value:'');
 				else
 					s=s+'<li class="inner'+(j==(v.chars.length-1)?' last':'')+'"><a class="facetLink" href="#" onclick="nbcShowStates('+c.id+');return false;">'+c.label+(c.value?' '+c.value:'')+'</a>';
-				
+					
 				if (data.activeChars[c.id]) {
 					openGroup = true;
 					s = s + '<span>';
@@ -839,13 +838,69 @@ function nbcSetExpandResults(state) {
 
 function nbcFilterEmergingCharacters() {
 
+	var charactersWithAnActiveState=Array();
+	for(var i in nbcData.selectedStates) {
+		charactersWithAnActiveState[nbcData.selectedStates[i].characteristic_id]=true;
+	}
+
 	for(var i in nbcData.menu.groups) {
 		for (var j in nbcData.menu.groups[i].chars) {
-			var id=nbcData.menu.groups[i].chars[j].id;
-			if (nbcData.countPerCharacter)
-				nbcData.menu.groups[i].chars[j].disabled=(nbcData.countPerCharacter[id]<nbcData.results.length);
-			else
+			var char=nbcData.menu.groups[i].chars[j];
+			var id=char.id;
+
+			/*
+				[ disabling non-distinctive characters ]
+
+				we are setting disabled to false regardless of the
+				remaining number of states:
+				
+				1. if there was no count per character in the data set
+				(if (nbcData.countPerCharacter))
+				
+				2. for types other than text or media (i.e., for are
+				"free-entry types", 'range' etc.)
+				(char.type=='media' || char.type=='text')
+				
+				3. if the character has states that are already selected
+				(charactersWithAnActiveState[id]!==true)
+
+				next, characters are disabled when:
+
+				4. within it, there are no selectable states left
+				(nbcData.countPerCharacter[id]==undefined)
+				
+				5. the total taxon count for all its states taken is
+				together is smaller than the current result set. put
+				differently: there are remaining species that have
+				no defined state for this particular character
+				(nbcData.countPerCharacter[id]<nbcData.results.length)
+				
+				6. there is only one state left in a character, even
+				if there is more than one species that "has" it.
+				choosing the one last state would leave the size of
+				the result set unchanged, and is therefore no
+				longer distinctive.
+				(nbcData.countPerCharacter[id].distinct_state_count<=1)
+				
+
+			*/
+
+			if (nbcData.countPerCharacter && (char.type=='media' || char.type=='text') && charactersWithAnActiveState[id]!==true) {
+
+				nbcData.menu.groups[i].chars[j].disabled=
+					(
+					nbcData.countPerCharacter[id]==undefined || 
+					nbcData.countPerCharacter[id].taxon_count<nbcData.results.length ||
+					nbcData.countPerCharacter[id].distinct_state_count<=1
+					);
+
+			} else {
+
 				nbcData.menu.groups[i].chars[j].disabled=false;
+
+			}
+			
+			//nbcData.menu.groups[i].chars[j].label=nbcData.menu.groups[i].chars[j].label+'::'+nbcData.menu.groups[i].chars[j].id;
 		}
 	}
 
