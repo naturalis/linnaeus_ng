@@ -4,6 +4,7 @@ include_once ('Controller.php');
 class SpeciesController extends Controller
 {
 	private $_lookupListMaxResults=100;
+	private $_includeOverviewImageInMedia=true;
     public $usedModels = array(
         'content_taxon', 
         'section', 
@@ -65,6 +66,7 @@ class SpeciesController extends Controller
     private function initialise ()
     {
         $this->_lookupListMaxResults=$this->getSetting('lookup_list_species_max_results',$this->_lookupListMaxResults);
+        $this->_includeOverviewImageInMedia=$this->getSetting('include_overview_in_media',true);
 		
 		include_once ('RdfController.php');
 		$this->Rdf = new RdfController;
@@ -230,7 +232,7 @@ class SpeciesController extends Controller
 						'allowUnpublished' => $this->isLoggedInAdmin()
 					)
 				);
-				
+
 				$content=$d['content'];
 				$rdf=$d['rdf'];
 	
@@ -820,7 +822,7 @@ class SpeciesController extends Controller
 		$taxon = isset($p['taxon']) ? $p['taxon'] : null;
 		$category = isset($p['category']) ? $p['category'] : null;
 		$allowUnpublished = isset($p['allowUnpublished']) ? $p['allowUnpublished'] : false;
-		$incOverviewImage = isset($p['incOverviewImage']) ? $p['incOverviewImage'] : false;
+		$incOverviewImage = isset($p['incOverviewImage']) ? $p['incOverviewImage'] : $this->_includeOverviewImageInMedia;
 
 		$content=$rdf=null;
 
@@ -887,13 +889,13 @@ class SpeciesController extends Controller
         );
         
         if (isset($taxon))
-            $d['taxon_id'] = $taxon;
+            $d['taxon_id']=$taxon;
 
         if (isset($id))
-            $d['id'] = $id;
+            $d['id']=$id;
         
 		if (!$inclOverviewImage)
-			$d['overview_image'] = '0';
+			$d['overview_image']='0';
         
         $mt = $this->models->MediaTaxon->_get(
         array(
@@ -942,7 +944,7 @@ class SpeciesController extends Controller
         $this->customSortArray($mt, $sortBy);
         
         $this->setlastVisitedCategory($taxon, 'media', $mt);
-        
+
         return $mt;
     }
 
