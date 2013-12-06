@@ -3066,35 +3066,58 @@ class MatrixKeyController extends Controller
 			
 		$term = mysql_real_escape_string(strtolower($p['term']));
 
+		// n.b. don't change to 'union all'
         $q = "
-			select 'variation' as type, _a.variation_id as id, trim(_c.label) as label,trim(_c.label) as l, _c.taxon_id as taxon_id, _d.taxon as taxon, 1 as s, null as commonname
-				from  %PRE%matrices_variations _a        		
-				left join %PRE%matrices_taxa_states _b
-					on _a.project_id = _b.project_id
-					and _a.matrix_id = _b.matrix_id
-					and _a.variation_id = _b.variation_id
-				left join %PRE%taxa_variations _c
-					on _a.variation_id = _c.id
-				left join %PRE%taxa _d
-					on _c.taxon_id = _d.id						
-				where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-				and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
+			select
+				'variation' as type,
+				_a.variation_id as id,
+				trim(_c.label) as label,
+				trim(_c.label) as l,
+				_c.taxon_id as taxon_id,
+				_d.taxon as taxon, 
+				1 as s, 
+				null as commonname
+			from  %PRE%matrices_variations _a        		
+			left join %PRE%matrices_taxa_states _b
+				on _a.matrix_id = _b.matrix_id
+				and _a.variation_id = _b.variation_id
+				and _b.project_id = " . $this->getCurrentProjectId() . "
+			left join %PRE%taxa_variations _c
+				on _a.variation_id = _c.id
+				and _c.project_id = " . $this->getCurrentProjectId() . "
+			left join %PRE%taxa _d
+				on _c.taxon_id = _d.id						
+				and _d.project_id = " . $this->getCurrentProjectId() . "
+			where _a.project_id = " . $this->getCurrentProjectId() . "
+				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+			and (lower(_c.label) like '%". $term ."%' or lower(_d.taxon) like '%". $term ."%')
+
 			union
-			select 'taxon' as type, _a.taxon_id as id, trim(_c.taxon) as label, trim(_c.taxon) as l, _a.taxon_id as taxon_id, _c.taxon as taxon, 1 as s, _d.commonname as commonname
-        		from %PRE%matrices_taxa _a
-        		left join %PRE%matrices_taxa_states _b
-        			on _a.project_id = _b.project_id
-        			and _a.matrix_id = _b.matrix_id
-        			and _a.taxon_id = _b.taxon_id
-		        left join %PRE%taxa _c
-			        on _a.taxon_id = _c.id
-		        left join %PRE%commonnames _d
-			        on _a.taxon_id = _d.taxon_id
-					and _d.language_id = ".$this->getCurrentLanguageId() ." 
-		        where _a.project_id = " . $this->getCurrentProjectId() . "
-			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-					and (lower(_c.taxon) like '%". $term ."%' or lower(_d.commonname) like '%". $term ."%')
+
+			select 
+				'taxon' as type,
+				_a.taxon_id as id, 
+				trim(_c.taxon) as label, 
+				trim(_c.taxon) as l, 
+				_a.taxon_id as taxon_id,
+				_c.taxon as taxon, 
+				1 as s, 
+				_d.commonname as commonname
+			from %PRE%matrices_taxa _a
+			left join %PRE%matrices_taxa_states _b
+				on _a.matrix_id = _b.matrix_id
+				and _a.taxon_id = _b.taxon_id
+				and _b.project_id = " . $this->getCurrentProjectId() . "
+			left join %PRE%taxa _c
+				on _a.taxon_id = _c.id
+				and _c.project_id = " . $this->getCurrentProjectId() . "
+			left join %PRE%commonnames _d
+				on _a.taxon_id = _d.taxon_id
+				and _d.language_id = ".$this->getCurrentLanguageId() ." 
+				and _d.project_id = " . $this->getCurrentProjectId() . "
+			where _a.project_id = " . $this->getCurrentProjectId() . "
+				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+				and (lower(_c.taxon) like '%". $term ."%' or lower(_d.commonname) like '%". $term ."%')
 				";
 
         $results = $this->models->MatrixTaxonState->freeQuery($q);

@@ -48,7 +48,8 @@
 		{snippet}colofon.html{/snippet}
 
             <p>
-	            <span id="logo-ETI">{t}Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.{/t}</span>
+	            <span id="logo-ETI">{t}Geïmplementeerd door ETI BioInformatics. Gebaseerd op Linnaeus NG&trade;.{/t}</span><br />
+				v1.01 beta (feb 2013)
 			</p>
 		</div>  
 
