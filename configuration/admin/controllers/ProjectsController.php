@@ -61,6 +61,10 @@ class ProjectsController extends Controller
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
+		array('include_overview_in_media','bool',0,'show overview image in species media'),
+		
+		
+		
 	
 	);
 
