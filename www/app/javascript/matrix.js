@@ -93,7 +93,6 @@ function fillStates(obj,char) {
 	setInfo(' ',' ',' ',' ');
 
 	if (!obj) {
-		console.dir(characters);
 		for(var i in characters) {
 			var c=characters[i];
 			if (c.id==$('#characteristics').val()) {
@@ -517,9 +516,6 @@ function fillScores(obj,char) {
     var textToInsert = [];
 
 	for (var i=0;i<obj.length;i++) {
-		
-		console.dir(obj[i]);
-		
 		
         textToInsert[i] =
 			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
