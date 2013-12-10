@@ -520,7 +520,7 @@ function fillScores(obj,char) {
         textToInsert[i] =
 			'<option ondblclick="'+(obj[i].type=='matrix' ? 'goMatrix' : 'goTaxon')+'('+obj[i].id+');" value="'+obj[i].id+'">'+
 				(obj[i].s!=undefined ? obj[i].s+'%: ' : '')+
-				(obj[i].type=='matrix' ? _('Matrix: ') : '')+obj[i].l+'</option>';
+				(obj[i].type=='matrix' ? sprintf(_('Key "%s"'),obj[i].l) : obj[i].l)+'</option>';
      
     }
 

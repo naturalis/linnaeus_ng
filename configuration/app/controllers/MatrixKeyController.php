@@ -1447,50 +1447,56 @@ class MatrixKeyController extends Controller
         	select 'taxon' as type, _a.taxon_id as id,
        				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
        				_c.is_hybrid as h, trim(_c.taxon) as l
-        		from %PRE%matrices_taxa _a
-        		left join %PRE%matrices_taxa_states _b
-        			on _a.project_id = _b.project_id
-        			and _a.matrix_id = _b.matrix_id
-        			and _a.taxon_id = _b.taxon_id
-        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
-		        left join %PRE%taxa _c
-			        on _a.taxon_id = _c.id
-		        where _a.project_id = " . $this->getCurrentProjectId() . "
-			        and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-        		group by _a.taxon_id
+			from %PRE%matrices_taxa _a
+			left join %PRE%matrices_taxa_states _b
+				on _a.project_id = _b.project_id
+				and _a.matrix_id = _b.matrix_id
+				and _a.taxon_id = _b.taxon_id
+				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+			left join %PRE%taxa _c
+				on _a.taxon_id = _c.id
+			where _a.project_id = " . $this->getCurrentProjectId() . "
+				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+			group by _a.taxon_id
+
         	union all
+
         	select 'matrix' as type, _a.id as id, 
-			        count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
-			        0 as h, trim(_c.name) as l
-        		from  %PRE%matrices _a
-        		join %PRE%matrices_taxa_states _b
-        			on _a.project_id = _b.project_id
-        			and _a.id = _b.ref_matrix_id
-        			and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
-		        left join %PRE%matrices_names _c
-			        on _b.ref_matrix_id = _c.matrix_id
-        			and _c.language_id = " . $this->getCurrentLanguageId() . "
-        		where _a.project_id = " . $this->getCurrentProjectId() . "
-        			and _b.matrix_id = " . $this->getCurrentMatrixId() . "
-        		group by id" . ($this->_matrixType == 'nbc' ? "
+				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
+				0 as h, trim(_c.name) as l
+			from  %PRE%matrices _a
+			left join %PRE%matrices_taxa_states _b
+				on _a.project_id = _b.project_id
+				and _b.matrix_id = " . $this->getCurrentMatrixId() . "
+				and _a.id = _b.ref_matrix_id
+				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+			left join %PRE%matrices_names _c
+				on _a.id = _c.matrix_id
+				and _c.language_id = " . $this->getCurrentLanguageId() . "
+			where _a.project_id = " . $this->getCurrentProjectId() . "
+				and _a.id != " . $this->getCurrentMatrixId() . "
+			group by id" . ($this->_matrixType == 'nbc' ? "
+
 			union all
+
 			select 'variation' as type, _a.variation_id as id, 
 				count(_b.state_id) as tot, round((if(count(_b.state_id)>" . $n . "," . $n . ",count(_b.state_id))/" . $n . ")*100,0) as s,
 				0 as h, trim(_c.label) as l
-				from  %PRE%matrices_variations _a        		
-				left join %PRE%matrices_taxa_states _b
-					on _a.project_id = _b.project_id
-					and _a.matrix_id = _b.matrix_id
-					and _a.variation_id = _b.variation_id
-					and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
-				left join %PRE%taxa_variations _c
-					on _a.variation_id = _c.id
-				where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.matrix_id = " . $this->getCurrentMatrixId() . "
-				group by _a.variation_id" : "")
+			from  %PRE%matrices_variations _a        		
+			left join %PRE%matrices_taxa_states _b
+				on _a.project_id = _b.project_id
+				and _a.matrix_id = _b.matrix_id
+				and _a.variation_id = _b.variation_id
+				and ((_b.state_id in (" . $s . "))" . ($incUnknowns ? "or (_b.state_id not in (" . $s . ") and _b.characteristic_id in (" . $c . "))" : "") . ")
+			left join %PRE%taxa_variations _c
+				on _a.variation_id = _c.id
+			where _a.project_id = " . $this->getCurrentProjectId() . "
+				and _a.matrix_id = " . $this->getCurrentMatrixId() . "
+			group by _a.variation_id" : "")
 				//."order by s desc"
         ;
 
+	
         $results = $this->models->MatrixTaxonState->freeQuery($q);
 
         usort($results, array(
@@ -2380,8 +2386,6 @@ class MatrixKeyController extends Controller
         return $s;
 
     }
-
-
 
     private function makeRemainingCountClauses ($p=null)
     {
