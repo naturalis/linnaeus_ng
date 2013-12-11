@@ -328,7 +328,9 @@ class ImportSDDController extends ImportController
 					
 				}
 				
-			} else {
+			}
+				else
+			{
 
 				foreach((array)$characters as $key=>$char)
 				{
@@ -344,9 +346,9 @@ class ImportSDDController extends ImportController
 			{
 	
 				$taxon=(string)$val->Scope->TaxonName['ref']; // local taxon id
-				
+
 				$coded_descriptions[$taxon]=array();
-				$quantitative_states=array();
+				$quantitative_states[$taxon]=array();
 	
 				foreach($val->SummaryData->Categorical as $cVal)
 				{
@@ -359,6 +361,7 @@ class ImportSDDController extends ImportController
 				}
 				
 				$coded_descriptions[$taxon]['categorical_states']=$categorical_states;
+				unset($categorical_states);
 	
 				foreach($val->SummaryData->Quantitative as $cVal)
 				{
@@ -380,10 +383,9 @@ class ImportSDDController extends ImportController
 				}
 				
 				$coded_descriptions[$taxon]['quantitative_states']=$quantitative_states;
+				unset($quantitative_states);
 	
 			}
-	
-
 
 			// media
 			$media_objects=array();
