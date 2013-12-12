@@ -180,6 +180,8 @@ class LinnaeusController extends Controller
 			)
 		);
 
+		if ($this->rHasVar('nopid'))
+			$this->smarty->assign('error',$this->translate('No or illegal project ID specified.'));
 		$this->smarty->assign('hasEntryProgram',$this->doesEntryProgramExist());
 		$this->smarty->assign('showEntryProgramLink',$this->generalSettings['showEntryProgramLink']);
 		$this->smarty->assign('projects',$projects);
@@ -192,11 +194,14 @@ class LinnaeusController extends Controller
     public function noProjectAction()
 	{
 
+		$this->redirect($this->baseUrl.'?nopid');
+		/*
 		$projects = $this->models->Project->_get(array('id' => array('published' => 1)));
 
 		$this->smarty->assign('excludeLogout',true);
 
         $this->printPage();
+		*/
 	
 	}
 

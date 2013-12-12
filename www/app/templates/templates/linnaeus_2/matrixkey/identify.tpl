@@ -56,8 +56,9 @@
 $(document).ready(function(){
 {/literal}
 
-matrixId = {$matrix.id};
-projectId = {$projectId};
+matrixId={$matrix.id};
+projectId={$projectId};
+nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 
 {foreach from=$characteristics key=k item=v}
 	storeCharacter(

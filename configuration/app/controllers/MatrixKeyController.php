@@ -211,6 +211,7 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('nbcBrowseStyle', $this->getSetting('matrix_browse_style'));
 			$this->smarty->assign('matrix_items_per_page', $this->getSetting('matrix_items_per_page'));
 			$this->smarty->assign('master_matrix_id', $this->getMasterMatrixId());
+			$this->smarty->assign('matrix_use_emerging_characters', $this->getSetting('matrix_use_emerging_characters',true));
 			
 			$this->smarty->assign('nbcDataSource', 
 				array(
@@ -234,7 +235,7 @@ class MatrixKeyController extends Controller
 
         if (isset($taxa))
 			$this->smarty->assign('taxa', $taxa);
-        
+
         $this->smarty->assign('matrix', $matrix);
 
         $this->smarty->assign('projectId', $this->getCurrentProjectId());
@@ -245,6 +246,7 @@ class MatrixKeyController extends Controller
 		
         $this->printPage('identify');
     }
+
 
     public function examineAction ()
     {

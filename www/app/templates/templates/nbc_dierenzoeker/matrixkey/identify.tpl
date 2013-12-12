@@ -203,8 +203,9 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	matrixId = {$matrix.id};
-	projectId = {$projectId};
+matrixId={$matrix.id};
+projectId={$projectId};
+nbcUseEmergingCharacters={$matrix_use_emerging_characters};
 {literal}
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();

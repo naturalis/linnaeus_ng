@@ -22,6 +22,7 @@ var nbcLabelBack = '';
 var nbcLabelSimilarSpecies = '';
 var nbcPreviousBrowseStyles = {};
 var baseUrlProjectImages = null;
+var nbcUseEmergingCharacters=true;
 
 function nbcGetResults(p) {
 
@@ -835,6 +836,8 @@ function nbcSetExpandResults(state) {
 }
 
 function nbcFilterEmergingCharacters() {
+
+	if (nbcUseEmergingCharacters==false) return;
 
 	var charactersWithAnActiveState=Array();
 	for(var i in nbcData.selectedStates) {

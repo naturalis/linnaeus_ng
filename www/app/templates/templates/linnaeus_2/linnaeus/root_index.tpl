@@ -32,6 +32,13 @@
 	</div>
 </div>
 
+{if !empty($error)}
+<div id="page-block-errors">
+<span class="message-error">{$error}</span><br />
+</div>
+{/if}
+
+
 <div id="page-main">Welcome to Linnaeus NG.<br />
 <br />
 {if $hasEntryProgram && $showEntryProgramLink}
