@@ -101,23 +101,23 @@
 			<tr>
 		{/if}
 		<td class="media-cell">
-		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.description}" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}">
+		<a rel="prettyPhoto[gallery]" class="image-wrap" title="{$v.description}" href="{$projectUrls.uploadedMedia}{$v.file_name}">
 		{if $v.category=='image'}
-			{capture name="fullImgUrl"}{$session.app.project.urls.uploadedMedia}{$v.file_name}{/capture}
+			{capture name="fullImgUrl"}{$projectUrls.uploadedMedia}{$v.file_name}{/capture}
 			<div>
 			{if $v.thumb_name != ''}
 				<img
 					id="media-{$k}"
 					alt="{$v.description}" 
 					title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
-					src="{$session.app.project.urls.uploadedMediaThumbs}{$v.thumb_name}"
+					src="{$projectUrls.uploadedMediaThumbs}{$v.thumb_name}"
 					class="image-thumb" />
 			{else}
 				<img
 					id="media-{$k}"
 					alt="{$v.description}" 
 					title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
-					src="{$session.app.project.urls.uploadedMedia}{$v.file_name}"
+					src="{$projectUrls.uploadedMedia}{$v.file_name}"
 					class="image-full" />
 			{/if}
 			</div>
@@ -126,8 +126,8 @@
 					id="media-{$k}"
 					alt="{$v.description}"
 					title="{if $v.original_name!=''}{$v.original_name}{elseif $v.file_name!=''}{$v.file_name}{/if}" 
-					src="{$session.app.project.urls.systemMedia}video.png" 
-					onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
+					src="{$projectUrls.systemMedia}video.png" 
+					onclick="showMedia('{$projectUrls.uploadedMedia}{$v.file_name}','{$v.original_name}');" 
 					class="media-video-icon" />
 		{elseif $v.category=='audio'}
 				<object 
@@ -139,7 +139,7 @@
 					width="130" 
 					height="20">
 					<param name="movie" value="{$soundPlayerName}" />
-					<param name="FlashVars" value="mp3={$session.app.project.urls.uploadedMedia}{$v.file_name}" />
+					<param name="FlashVars" value="mp3={$projectUrls.uploadedMedia}{$v.file_name}" />
 				</object>
 		{/if}
 		</a>
@@ -178,7 +178,7 @@
 {else}
 <div id="content">
 {if $isTaxonStartPage && $overviewImage}
-<div id="overview-image" style="background: url('{$session.app.project.urls.uploadedMedia}{$overviewImage}');"></div>
+<div id="overview-image" style="background: url('{$projectUrls.uploadedMedia}{$overviewImage}');"></div>
 {/if}
 {$content}
 </div>

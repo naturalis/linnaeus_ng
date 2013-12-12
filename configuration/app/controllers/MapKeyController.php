@@ -196,7 +196,7 @@ class MapKeyController extends Controller
 		// no we don't, too confusing (and incidentally causes endless redirect loops, apparently)
 		if ($d['count']==0) {
 			
-			unset($_SESSION['app']['user']['species']['lastTaxon']);
+			unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
 
 			$this->redirect('index.php?id=');
 			
@@ -238,9 +238,9 @@ class MapKeyController extends Controller
 			$countA = $d['count'];
 
 		} else		
-		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+		if (isset($_SESSION['app'][$this->spid()]['species']['lastTaxon'])) {
 
-			$taxonA = $this->getTaxonById($_SESSION['app']['user']['species']['lastTaxon']);
+			$taxonA = $this->getTaxonById($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
 
 			$d = $this->getTaxonOccurrences($taxonA['id']);
 
@@ -330,9 +330,9 @@ class MapKeyController extends Controller
 			$taxonA = $this->getTaxonById($this->requestData['idA']);
 
 		} else
-		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+		if (isset($_SESSION['app'][$this->spid()]['species']['lastTaxon'])) {
 	
-			$taxonA = $this->getTaxonById($_SESSION['app']['user']['species']['lastTaxon']);
+			$taxonA = $this->getTaxonById($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
 
 		}
 
@@ -1393,8 +1393,8 @@ class MapKeyController extends Controller
 				)
 			);
 							
-			$projectMediaL2maps = $_SESSION['app']['project']['urls']['projectL2Maps'];
-			$systemMediaL2Maps = $_SESSION['app']['project']['urls']['systemL2Maps'];
+			$projectMediaL2maps=$this->getProjectUrl('projectL2Maps');
+			$systemMediaL2Maps=$this->getProjectUrl('systemL2Maps');
 			
 			foreach((array)$m as $key => $val) {
 				
@@ -1911,12 +1911,12 @@ class MapKeyController extends Controller
 			
 		}
 
-		if (isset($_SESSION['app']['user']['species']['lastTaxon'])) {
+		if (isset($_SESSION['app'][$this->spid()]['species']['lastTaxon'])) {
 			
 			$d = 
 				array(
 					'project_id' => $this->getCurrentProjectId(),
-					'taxon_id' => $_SESSION['app']['user']['species']['lastTaxon']
+					'taxon_id' => $_SESSION['app'][$this->spid()]['species']['lastTaxon']
 				);
 
 			if ($this->_mapType=='l2')
@@ -1925,7 +1925,7 @@ class MapKeyController extends Controller
 				$ot = $this->models->OccurrenceTaxon->_get(array('id' =>$d,'columns'=>'count(*) as total'));
 			
 			if ($ot[0]['total']!=0)
-				return $_SESSION['app']['user']['species']['lastTaxon'];
+				return $_SESSION['app'][$this->spid()]['species']['lastTaxon'];
 				
 		}
 		

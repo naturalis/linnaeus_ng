@@ -68,7 +68,7 @@ class LoaderController extends Controller
 				$_SESSION['app']['project']['splashEntryUrl'] : 
 				'../'.$this->generalSettings['defaultController'].'/';
 
-		$_SESSION['app']['project']['showedSplash'] = true;
+		$_SESSION['app']['project']['showedSplash']=true;
 		unset($_SESSION['app']['project']['splashEntryUrl']);
 
 		$this->smarty->assign('startUrl',$url);
@@ -242,10 +242,10 @@ class LoaderController extends Controller
 		require_once ('../../../../configuration/app/controllers/SearchController.php');
 		$c = new SearchController(array('checkForSplash'=>false));
 
-		$c->getGlossaryLookupList();
-		$c->getLiteratureLookupList();
+		//$c->getGlossaryLookupList();		// didn't survive the SearchController re-engineering, for some reason
+		//$c->getLiteratureLookupList();	// idem
 		//$c->getSpeciesLookupList(); // might be too complex (see remark at top of file)
-		$c->getModuleLookupList();  //idem
+		//$c->getModuleLookupList();  //idem
 
 		unset($c);
 

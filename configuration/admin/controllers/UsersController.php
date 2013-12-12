@@ -117,7 +117,7 @@ class UsersController extends Controller
             }
         
         }
-        
+
         $this->printPage();
     
     }

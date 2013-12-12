@@ -7,7 +7,7 @@
 $(document).ready(function(){
 {/literal}
 	$('body').css('background-position-y','115px');
-	$('body').css('background','url(\'{$session.app.project.urls.systemMedia}background_blurry.jpg\')');
+	$('body').css('background','url(\'{$projectUrls.systemMedia}background_blurry.jpg\')');
 {literal}
 });
 </script>

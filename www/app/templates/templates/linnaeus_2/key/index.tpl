@@ -35,16 +35,16 @@
 						alt="{t}Choice{/t} {$step.number}{$v.marker}"
 						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
 						class="choice-image"
-						onclick="showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
-						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+						onclick="showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');" 
+						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
 						/>
 				{else}
-					<a href="javascript:showMedia('{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
+					<a href="javascript:showMedia('{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}','{$v.choice_img}');">
 					<img
 						alt="{t}Choice{/t} {$step.number}{$v.marker}"
 						title="{t}Choice{/t} {$step.number}{$v.marker} - {t}Click to enlarge{/t}"
 						class="choice-image"
-						src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}"
+						src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}"
 					/>
 					</a>
 				{/if}	

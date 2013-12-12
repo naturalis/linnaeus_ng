@@ -2,6 +2,9 @@
 
 /*
 
+	major restructuring of the constructor and splash-logic between revisions 1980 and 1981
+
+
 	on skins:
 	if the setting (in the table 'settings') for 'skin' exists, that skin is used
 	providing the follwing directories exist ($this->doesSkinExist()):
@@ -186,7 +189,7 @@ class Controller extends BaseClass
      *
      * @access     public
      */
-    public function __construct ($p = null)
+    public function __construct ($p=null)
     {
 
         parent::__construct();
@@ -213,21 +216,15 @@ class Controller extends BaseClass
 
         $this->setNames();
         
-        $this->setSkinName();
-        
-        $this->setUrls();
-        
-        $this->setPaths();
-        
-        $this->createCacheFolder();
-        
-        $this->setRandomValue();
-        
-        $this->setSmartySettings();
-        
         $this->setRequestData();
 
-        $this->emptyCacheFolderByRequest();
+        if ($this->getCheckForProjectId()) {
+            
+            $this->checkForProjectId();
+            
+        }
+		
+		$this->emptyCacheFolderByRequest();
       
         $this->restoreState();
 
@@ -237,27 +234,19 @@ class Controller extends BaseClass
         
         $this->checkBackStep();
 
-        ////$this->setOtherStuff();
-        
-        if ($this->getCheckForProjectId()) {
-            
-            $this->checkForProjectId();
-            
-			$this->setSkinName();
+		$this->setSkinName();
 
-			$this->setUrls();
-			
-			$this->setPaths();
-			
-			$this->setSmartySettings();
+		$this->setUrls();
 
-            $this->setCssFiles();
+		$this->createCacheFolder();
 
-			$this->setOtherStuff();            
+		$this->setSmartySettings();
 
-            if (!$this->isLoggedInAdmin())
-                $this->splashScreen();
-        }
+		$this->setCssFiles();
+
+		$this->setOtherStuff(); 
+
+		$this->splashScreen();
 
     }
 
@@ -277,19 +266,29 @@ class Controller extends BaseClass
         
         parent::__destruct();
     }
+	
+	protected function spid()
+	{
+		$p=$this->getCurrentProjectId();
+
+		if (empty($p))
+			return 'p-general';
+		else
+			return 'p-'.$p;
+	}
 
 
-   protected function saveCache ($key, $data)
-    {
-        if ($this->useCache == false)
-            return;
-        
-        $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
-        
-        if (!file_put_contents($cacheFile, serialize($data))) {
-            die('Cannot write to cache folder ' . $_SESSION['app']['project']['urls']['cache']);
-        }
-    }
+	protected function saveCache ($key, $data)
+	{
+		if ($this->useCache == false)
+		return;
+		
+		$cacheFile=$this->getProjectUrl('cache').$key;
+		
+		if (!file_put_contents($cacheFile, serialize($data))) {
+			die('Cannot write to cache folder '.$this->getProjectUrl('cache'));
+		}
+	}
 
 
     public function checkForProjectId ()
@@ -311,8 +310,8 @@ class Controller extends BaseClass
         if ($d == null)
             $this->redirect($this->generalSettings['urlNoProjectId']);
         
-        if ($pB != $d)
-            unset($_SESSION['app']['user']);
+		if ($pB != $d)
+			unset($_SESSION['app']['user']);
         
         $this->setCurrentProjectData();
         $this->setUrls();
@@ -520,7 +519,7 @@ class Controller extends BaseClass
 
     public function getTaxonById ($id)
     {
-        if (empty($id) || $id == 0)
+        if (empty($id) || $id==0)
             return;
         
 		$t = $this->models->Taxon->_get(array(
@@ -530,6 +529,9 @@ class Controller extends BaseClass
 			), 
 			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty'
 		));
+		
+		if (is_null($t))
+			return;
 
 		$t[0]['label'] = $this->formatTaxon($t[0]);
 		
@@ -556,14 +558,14 @@ class Controller extends BaseClass
 	public function setSearchResultIndexActive($id)
 	{
 
-		$_SESSION['app']['user']['search']['lastResultSetIndexActive'] = $id;
+		$_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] = $id;
 
 	}
 
 	public function getSearchResultIndexActive()
 	{
 
-		return isset($_SESSION['app']['user']['search']['lastResultSetIndexActive']) ? $_SESSION['app']['user']['search']['lastResultSetIndexActive'] : null;
+		return isset($_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive']) ? $_SESSION['app'][$this->spid()]['search']['lastResultSetIndexActive'] : null;
 
 	}
 
@@ -1454,15 +1456,41 @@ class Controller extends BaseClass
 
     public function splashScreen ()
     {
-        if ($this->getCheckForSplash()==false)
+		
+		// admin editors that are previewing get no splash
+		if ($this->isLoggedInAdmin()) {
+			$_SESSION['app']['project']['showedSplash']=true;
             return;
+		}
+		
+		// systematically suppressed splash, which is set in view (so the splash screen won't redirect to itself)
+        if ($this->getCheckForSplash()==false) {
+			$_SESSION['app']['project']['showedSplash']=true;
+            return;
+		}
 
-        if ((!isset($_SESSION['app']['project']['showedSplash']) || $_SESSION['app']['project']['showedSplash'] === false) && isset($this->generalSettings['urlSplashScreen'])) {
-            
-            $_SESSION['app']['project']['splashEntryUrl'] = $_SERVER['REQUEST_URI'];
-            
-            $this->redirect($this->generalSettings['urlSplashScreen']);
+		// already showed splash screen
+        if (isset($_SESSION['app']['project']['showedSplash']) && $_SESSION['app']['project']['showedSplash']===true) {
+            return;
         }
+
+		// no splash screen has been defined
+        if (!isset($this->generalSettings['urlSplashScreen'])) {
+			return;
+		}
+
+		// optionally suppressed splash, set in project settings
+		if ($this->getSetting('suppress_splash')==1) {
+			$_SESSION['app']['project']['showedSplash']=true;
+            return;
+		}
+
+		// saving the current url for post-splash redirectingh
+		$_SESSION['app']['project']['splashEntryUrl']=$_SERVER['REQUEST_URI'];
+		$_SESSION['app']['project']['showedSplash']=true;
+
+		$this->redirect($this->generalSettings['urlSplashScreen']);
+
     }
 
 
@@ -1668,8 +1696,8 @@ class Controller extends BaseClass
 
 	public function smartyTranslateGetSnippet($params, $content, &$smarty, &$repeat)
 	{
-		if (file_exists($_SESSION['app']['project']['urls']['projectSnippets'].$content)) {
-			return @file_get_contents($_SESSION['app']['project']['urls']['projectSnippets'].$content);
+		if (file_exists($this->getProjectUrl('projectSnippets').$content)) {
+			return @file_get_contents($this->getProjectUrl('projectSnippets').$content);
 		} else {
 			return;
 		}
@@ -1874,29 +1902,17 @@ class Controller extends BaseClass
         // home
         $u['projectHome'] = $this->baseUrl . $this->getAppName() . '/views/' . $this->generalSettings['defaultController'] . '/';
         
-        $_SESSION['app']['project']['urls'] = $u;
+        $_SESSION['app']['project'][$this->spid()]['urls'] = $u;
     }
 
-
-
-    /**
-     * Sets project paths for image uploads etc. and makes sure they actually exist
-     * 
-     * @access     public
-     */
-    public function setPaths ()
+    public function getProjectUrl($type=null)
     {
-        $_SESSION['app']['project']['paths']['defaultCSS'] = $this->generalSettings['app']['fileRoot'] . 'style/default/';
-        
-        $p = $this->getCurrentProjectId();
-        
-        if ($p) {
-            
-            $_SESSION['app']['project']['paths']['defaultCSS'] = $this->generalSettings['app']['fileRoot'] . 'style/default/';
-        }
+		if (is_null($type) && isset($_SESSION['app']['project'][$this->spid()]['urls']))
+			return $_SESSION['app']['project'][$this->spid()]['urls'];
+
+		if (isset($_SESSION['app']['project'][$this->spid()]['urls'][$type]))
+			return $_SESSION['app']['project'][$this->spid()]['urls'][$type];
     }
-
-
 
     public function makeCustomCssFileName ($incProjectName = true, $p = null)
     {
@@ -1911,12 +1927,12 @@ class Controller extends BaseClass
     public function setCssFiles ()
     {
 		
-		$this->cssToLoad = array_merge($this->cssToLoadBase,$this->cssToLoad);
-		
-        if (isset($_SESSION['app']['project']['urls']['projectCSS'])) {
-            
+		$this->cssToLoad=array_merge($this->cssToLoadBase,$this->cssToLoad);
+
+        if (!is_null($this->getProjectUrl('projectCSS'))) {
+
             foreach ((array) $this->cssToLoad as $key => $val)
-                $this->cssToLoad[$key] = $_SESSION['app']['project']['urls']['projectCSS'] . $val;
+                $this->cssToLoad[$key] = $this->getProjectUrl('projectCSS').$val;
         }
         
         array_unshift($this->cssToLoad, '../utilities/dynamic-css.php');
@@ -2094,6 +2110,7 @@ class Controller extends BaseClass
         $this->smarty->assign('rnd', $this->getRandomValue());
         $this->smarty->assign('requestData', $this->requestData);
         $this->smarty->assign('baseUrl', $this->baseUrl);
+        $this->smarty->assign('projectUrls', $this->getProjectUrl());
         $this->smarty->assign('controllerBaseName', $this->controllerBaseName);
         $this->smarty->assign('controllerPublicName', $this->controllerPublicName);
         $this->smarty->assign('backlink', $this->getBackLink());
@@ -2396,9 +2413,6 @@ class Controller extends BaseClass
             //$this->requestData = $_REQUEST; // also contains cookies
             $this->requestData = array_merge((array) $_GET, (array) $_POST); // don't want no cookies!
             
-
-
-
             foreach ((array) $this->requestData as $key => $val) {
                 
                 if (is_array($val)) {
@@ -3027,7 +3041,7 @@ class Controller extends BaseClass
         if ($this->useCache == false)
             return false;
 
-        $cacheFile = $_SESSION['app']['project']['urls']['cache'] . $key;
+        $cacheFile=$this->getProjectUrl('cache').$key;
 		
         if (file_exists($cacheFile)) {
             // Timeout provided and expired
@@ -3219,22 +3233,14 @@ class Controller extends BaseClass
 
 	private function setOtherStuff()
 	{
-
-		$d = $this->getSetting('suppress_splash');
-
-		if ($d==1) {
-
-			$this->setCheckForSplash(false);
-			$_SESSION['app']['project']['showedSplash']=true;
-
-		}
+		
+        $this->setRandomValue();
 		
 		if ($this->rHasVar('sidx')) {
 
 			$this->setSearchResultIndexActive($this->requestData['sidx']);
 
 		}
-		
 	}
 
 

@@ -25,7 +25,7 @@
                             <div class="facet-btn ui-block-d">
                                 <a data-facetgrouppageid="facetgrouppage{$k}" href="#" data-role="button" data-corners="false" data-shadow="false" class="" onClick="" characters="{$smarty.capture.chars|@trim}">
                                     <div class="grid-iconbox" >
-                                        <img src="{$session.app.project.urls.projectMedia}{$v.icon}" class="grid-icon" alt="" />
+                                        <img src="{$projectUrls.projectMedia}{$v.icon}" class="grid-icon" alt="" />
                                     </div>
                                     <div class="grid-labelbox ">
                                         {$v.label}
@@ -140,7 +140,7 @@
                             <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
                                 <a href="#" onClick="nbcSetStateValue('c:{$vC.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
                                 <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{$session.app.project.urls.projectMedia}{$sV.file_name}">
+                                    <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
                                 </div>
                                 <div class="grid-labelbox ">
                                     {$sV.label}
@@ -174,7 +174,7 @@
                             <div class="facet-btn ui-block-{if $sK+1%4==0}d{elseif $sK+1%3==0}c{elseif $sK+1%2==0}b{else}a{/if}">
                                 <a href="#" onClick="nbcSetStateValue('c:{$v.id}:{$sV.id}');return false;" class="" id="state-{$sV.id}">
                                 <div class="grid-iconbox">
-                                    <img alt="" class="grid-icon" src="{$session.app.project.urls.projectMedia}{$sV.file_name}">
+                                    <img alt="" class="grid-icon" src="{$projectUrls.projectMedia}{$sV.file_name}">
                                 </div>
                                 <div class="grid-labelbox ">
                                     {$sV.label}
@@ -203,8 +203,8 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	nbcMatrixId = {$matrix.id};
-	nbcProjectId = {$session.app.project.id};
+	matrixId = {$matrix.id};
+	projectId = {$projectId};
 {literal}
 	if(jQuery().prettyPhoto) {
 		nbcPrettyPhotoInit();

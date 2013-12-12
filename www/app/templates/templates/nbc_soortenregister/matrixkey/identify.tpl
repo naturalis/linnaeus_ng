@@ -34,7 +34,7 @@
 $(document).ready(function(){
 {/literal}
 nbcImageRoot = '{$nbcImageRoot}';
-baseUrlProjectImages = '{$session.app.project.urls.projectMedia}';
+baseUrlProjectImages = '{$projectUrls.projectMedia}';
 nbcBrowseStyle = '{$nbcBrowseStyle}';
 {literal}
 if (typeof nbcInit=='function') {

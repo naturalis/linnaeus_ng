@@ -2,7 +2,7 @@
 <div id="page-main">
 	<div id="content">
 		{if $page.image.file_name}
-			<div class="introduction-img" style="background: url('{$session.app.project.urls.uploadedMedia}{$page.image.file_name|escape:'url'}');"></div>
+			<div class="introduction-img" style="background: url('{$projectUrls.uploadedMedia}{$page.image.file_name|escape:'url'}');"></div>
 		{/if}
 		{$page.content}
 	</div>

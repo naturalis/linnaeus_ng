@@ -56,6 +56,9 @@
 $(document).ready(function(){
 {/literal}
 
+matrixId = {$matrix.id};
+projectId = {$projectId};
+
 {foreach from=$characteristics key=k item=v}
 	storeCharacter(
 		{$v.id},
@@ -71,7 +74,7 @@ $(document).ready(function(){
 	);
 {/foreach}
 	sortCharacters('entryOrder');
-	imagePath = '{$session.app.project.urls.uploadedMedia}';
+	imagePath = '{$projectUrls.uploadedMedia}';
 	
 {if $storedStates}
 {foreach from=$storedStates key=k item=v}

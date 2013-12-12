@@ -5,14 +5,14 @@
   <title>Dierenzoeker</title>
   <meta property="og:description" content="Zie je een dier in je huis of tuin, en weet je niet wat het is? Kijk goed en ontdek het in de Dierenzoeker.">
   <link rel="image_src" href="img/dierenzoeker-logo.png">
-  <link href="{$session.app.project.urls.systemMedia}favicon.ico" type="image/x-icon" rel="icon">
-  <link href="{$session.app.project.urls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon">
+  <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="icon">
+  <link href="{$projectUrls.systemMedia}favicon.ico" type="image/x-icon" rel="shortcut icon">
 
-  <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}jquery.css">
-  <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}shared.css">
-  <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile.css">
-  <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}mobile-small.css">
-  <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}extras.css">
+  <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery.css">
+  <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}shared.css">
+  <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}mobile.css">
+  <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}mobile-small.css">
+  <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}extras.css">
 
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery.js"></script>
   <script src="{$baseUrl}app/javascript/project_specific/dierenzoeker-mobiel/jquery-ui.js"></script>

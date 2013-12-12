@@ -61,7 +61,7 @@ class IntroductionController extends Controller
 	public function indexAction()
 	{
 
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
 		
 		$this->setStoreHistory(false);
 

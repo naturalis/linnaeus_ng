@@ -1,3 +1,53 @@
+#search-header {
+	margin-bottom:10px;
+}
+
+#search-header #results-string {
+	margin-bottom:10px;
+}
+
+
+#search-results h2 {
+	font-weight:bold;
+	margin-bottom:5px;
+}
+
+#search-results h3 {
+	font-weight:bold;
+	margin-bottom:2px;
+}
+
+#search-results h4 {
+
+}
+
+#search-results h5 {
+	font-style:italic;
+}
+
+#search-results .result-count {
+	font-weight:normal;	
+}
+
+#search-results .result {
+	margin-bottom:5px;
+}
+
+#search-results .module {
+	margin-bottom:15px;
+}
+
+#search-results .search-match {
+	background-color:#ffa;
+}
+
+#search-results {
+
+}
+
+
+
+/*
 #page-main {
 	height: 440px;
 }
@@ -85,3 +135,4 @@ div.set div.subset p {
 	border: 1px transparent;
 }
 
+*/

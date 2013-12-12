@@ -20,7 +20,7 @@
             top: {$v.choice_image_params.toppos}px;
             width: {$v.choice_image_params.width}px;">
         <img 
-            src="{$session.app.project.urls.uploadedMedia}{$v.choice_img|escape:'url'}" 
+            src="{$projectUrls.uploadedMedia}{$v.choice_img|escape:'url'}" 
             width="{$v.choice_image_params.width}"
             height="{$v.choice_image_params.height}" />
 		<div id="txt-choice-img-{$v.id}" style="width:{$v.choice_image_params.width}px;">

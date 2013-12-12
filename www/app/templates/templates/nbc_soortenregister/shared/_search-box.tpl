@@ -9,4 +9,4 @@
     onfocus="onSearchBoxSelect()" 
     results="5" 
     autosave="linnaeus_ng" />
-<img onclick="doSearch()" src="{$session.app.project.urls.systemMedia}search.gif" class="search-icon" />
+<img onclick="doSearch()" src="{$projectUrls.systemMedia}search.gif" class="search-icon" />

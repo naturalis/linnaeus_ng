@@ -42,8 +42,8 @@
 	    <link rel="stylesheet" type="text/css" media="screen" title="default" href="http://www.nederlandsesoorten.nl/sites/nsr/css/20120928_conceptcardIeOnly.css" />
     <![endif]-->
     
-    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}prettyPhoto/prettyPhoto.css" />
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
+    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
+	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
@@ -51,13 +51,13 @@
 {/if}
     
     <!--[if IE]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie.css" />
     <![endif]-->
     <!--[if IE 8]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7-8.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7-8.css" />
     <![endif]-->
     <!--[if IE 7]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
     <![endif]-->
     
 

@@ -71,7 +71,7 @@ class LiteratureController extends Controller
 				
 		}
 		
- 		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+ 		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
 		
 		$this->setStoreHistory(false);
 		
@@ -92,7 +92,7 @@ class LiteratureController extends Controller
 
 		}
 
-		//unset($_SESSION['app']['user']['search']['hasSearchResults']);
+		//unset($_SESSION['app'][$this->spid()]['search']['hasSearchResults']);
 
 		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
 
