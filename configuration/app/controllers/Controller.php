@@ -1927,7 +1927,10 @@ class Controller extends BaseClass
     public function setCssFiles ()
     {
 		
-		$this->cssToLoad=array_merge($this->cssToLoadBase,$this->cssToLoad);
+		if (isset($this->cssToLoad))
+			$this->cssToLoad=array_merge($this->cssToLoadBase,$this->cssToLoad);
+		else
+			$this->cssToLoad=$this->cssToLoadBase;
 
         if (!is_null($this->getProjectUrl('projectCSS'))) {
 
@@ -2755,7 +2758,7 @@ class Controller extends BaseClass
 
     private function getWordList ($forceUpdate = false)
     {
-        if ($forceUpdate || !isset($_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
+        if ($forceUpdate || !isset($_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'])) {
             
             $terms = $this->models->Glossary->_get(
             array(
@@ -2775,10 +2778,10 @@ class Controller extends BaseClass
                 'columns' => 'glossary_id as id,synonym as word,\'synonym\' as source'
             ));
             
-            $_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array) $terms, (array) $synonyms);
+            $_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'] = array_merge((array) $terms, (array) $synonyms);
         }
         
-        return $_SESSION['app']['user']['glossary'][$this->getCurrentLanguageId()]['wordlist'];
+        return $_SESSION['app'][$this->spid()]['glossary'][$this->getCurrentLanguageId()]['wordlist'];
     }
 
 

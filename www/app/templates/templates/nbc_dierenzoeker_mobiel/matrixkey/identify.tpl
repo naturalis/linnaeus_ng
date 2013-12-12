@@ -151,6 +151,7 @@
 {literal}
 <script>
 $(document).ready(function() {
+	//use_emerging_characters={$use_emerging_characters};
 	init({{/literal}project:{$projectId},matrix:{$matrix.id},language:{$currentLanguageId}{literal}});
 {/literal}
 	resultBatchSize={$matrix_items_per_page};

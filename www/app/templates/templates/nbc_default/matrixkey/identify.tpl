@@ -42,11 +42,13 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-nbcImageRoot = '{$nbcImageRoot}';
-baseUrlProjectImages = '{$projectUrls.projectMedia}';
-nbcBrowseStyle = '{$nbcBrowseStyle}';
-matrixId = {$matrix.id};
-projectId = {$projectId};
+nbcImageRoot='{$nbcImageRoot}';
+baseUrlProjectImages='{$projectUrls.projectMedia}';
+nbcBrowseStyle='{$nbcBrowseStyle}';
+matrixId={$matrix.id};
+projectId={$projectId};
+nbcUseEmergingCharacters={$matrix_use_emerging_characters};
+
 {literal}
 if (typeof nbcInit=='function') {
 	nbcInit();
