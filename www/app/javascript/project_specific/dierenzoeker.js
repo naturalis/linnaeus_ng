@@ -3,8 +3,8 @@ var nbcStart = 0;
 var nbcPerPage = 16;	// default, reset in identify.php
 var nbcPerLine = 2;		// default, reset in identify.php
 var initData;
-var nbcMatrixId=null;
-var nbcProjectId=null;
+var matrixId=null;
+var projectId=null;
 
 function nbcPrettyPhotoInit() {
 
@@ -35,8 +35,8 @@ function nbcGetResults(p) {
 			action : 'get_results_nbc',
 			params : p,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
@@ -128,8 +128,8 @@ function nbcSetState(p) {
 			state : p.state,
 			id : null,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			if (p.norefresh!==true)
@@ -161,8 +161,8 @@ function getInitialValues() {
 		data : ({
 			action : 'get_initial_values' ,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			initData = $.parseJSON(data);

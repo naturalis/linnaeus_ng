@@ -3,8 +3,8 @@
 {if $overviewImage}
 <div class="illustratie-wrapper">
     <div class="illustratie">
-        <a id="lightbox905" href="{$session.app.project.urls.uploadedMedia}{$overviewImage.image}" title="">
-            <img style="width:280px" title="" src="{$session.app.project.urls.uploadedMedia}{$overviewImage.image}" alt="">
+        <a id="lightbox905" href="{$projectUrls.uploadedMedia}{$overviewImage.image}" title="">
+            <img style="width:280px" title="" src="{$projectUrls.uploadedMedia}{$overviewImage.image}" alt="">
         </a>
     </div>
 </div>
@@ -25,8 +25,8 @@
 	<ul>
 	{foreach from=$content.media item=v}{if $v.overview_image!=1}
     	<li>
-        	<a rel="prettyPhoto[gallery]" href="{$session.app.project.urls.uploadedMedia}{$v.file_name}" title="{$v.description}">
-            	<img style="width:130px" title="{$v.description}" src="{$session.app.project.urls.uploadedMedia}{$v.file_name}" alt="">
+        	<a rel="prettyPhoto[gallery]" href="{$projectUrls.uploadedMedia}{$v.file_name}" title="{$v.description}">
+            	<img style="width:130px" title="{$v.description}" src="{$projectUrls.uploadedMedia}{$v.file_name}" alt="">
            	</a>
 		</li>
 	{/if}{/foreach}

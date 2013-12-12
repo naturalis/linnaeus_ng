@@ -357,12 +357,15 @@ function checkForm() {
 
 function doSearch() {
 
-	if (!searchBoxSelected) return false;
 	if ($('#search').val()=='') return false;
 
-	$('#theForm').attr('action','../search/search.php');
-	$('#theForm').submit();
-
+	$('body').append('<form id="tempform"></form>');
+    $('#tempform').
+        attr('action','../search/search.php').attr('method','post').
+        append('<input type="hidden" name="modules" value="*">').
+        append('<input type="hidden" name="freeModules" value="*">').
+        append('<input type="hidden" name="search" value="'+$('#search').val()+'">');
+	$('#tempform').submit();
 }
 
 function onSearchBoxSelect(txt) {

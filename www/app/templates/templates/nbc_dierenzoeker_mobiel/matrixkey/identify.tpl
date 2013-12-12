@@ -1,5 +1,5 @@
 {include file="../shared/header.tpl"}
-<title>{$session.app.project.urls.systemMedia}</title>
+<title>{$projectUrls.systemMedia}</title>
 <body class="ui-mobile-viewport">
 <div tabindex="0" data-url="main" id="main" class="main-page ui-page ui-body-c ui-page-active" data-role="page" style="background-image: none; min-height: 920px;">
 
@@ -7,9 +7,9 @@
 
 		<div>
 			<div data-role="header" class="header">
-				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
+				<img src="{$projectUrls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="detailback()" data-transition="slide" data-direction="reverse" data-role="none">
-					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
+					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
 				</a>
 			</div>
 
@@ -24,9 +24,9 @@
 		<div id="x-menu-header-back">
 
 			<div data-role="header" class="header">
-				<img src="{$session.app.project.urls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
+				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;main()">
 				<a href="#" onClick="appController.states(selection);" data-transition="slide" data-direction="reverse" data-role="none">
-					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
+					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:-4px;" alt="">
 				</a>
 			</div>
 
@@ -46,10 +46,10 @@
 		<div id="x-menu-header">
 
 			<div role="banner" class="ui-header ui-bar-a" data-role="header" id="mainheader">
-				<img src="{$session.app.project.urls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" style="display:block" id="mainlogo">
+				<img src="{$projectUrls.systemMedia}header_speech.png" alt="Dierenzoeker" class="logo" style="display:block" id="mainlogo">
 				<a data-theme="a" id="infobutton" href="#" onClick="loadpage('colofon');" data-role="button" data-inline="true" data-transition="none" class="ui-btn-left ui-btn ui-btn-inline ui-btn-corner-all ui-shadow ui-btn-up-a" style="top:50%;margin-top:-17px;height:24px;">
 				<span aria-hidden="true" class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">
-					<img src="{$session.app.project.urls.systemMedia}info.png" alt="">
+					<img src="{$projectUrls.systemMedia}info.png" alt="">
 				</span></span></a>
 			</div>
 
@@ -76,7 +76,7 @@
 				<div id="" class="filterset" style="background:none">
 					<h4 style="margin: 0px;margin-left:9px;padding-top: 10px;">Dit weet je:</h4>
 					<span style="position:absolute;right:22px;top:3px;">
-					   <img id="clear-all-button" src="{$session.app.project.urls.systemMedia}delete-all-choices-btn.png" onClick="clearall()" alt="">
+					   <img id="clear-all-button" src="{$projectUrls.systemMedia}delete-all-choices-btn.png" onClick="clearall()" alt="">
 					</span>
 					<div id="selectiongrid" class="ui-grid-c">
 					<!-- selected states -->
@@ -133,9 +133,9 @@
 
 		<div>
 			<div data-role="header" class="header" style="background-color:black">
-				<img src="{$session.app.project.urls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;loadpage();">
+				<img src="{$projectUrls.systemMedia}header-show.png" alt="Dierenzoeker" class="logo" onClick="setactivepage(0);forceScrollTop=true;loadpage();">
 				<a href="#" onClick="loadpage()" data-transition="slide" data-direction="reverse" data-role="none">
-					<img src="{$session.app.project.urls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
+					<img src="{$projectUrls.systemMedia}back.png" class="info-button" style="position:absolute;left:-10px;top:2px;" alt="">
 				</a>
 			</div>
 
@@ -151,7 +151,7 @@
 {literal}
 <script>
 $(document).ready(function() {
-	init({{/literal}project:{$session.app.project.id},matrix:{$matrix.id},language:{$currentLanguageId}{literal}});
+	init({{/literal}project:{$projectId},matrix:{$matrix.id},language:{$currentLanguageId}{literal}});
 {/literal}
 	resultBatchSize={$matrix_items_per_page};
 {literal}
@@ -161,9 +161,9 @@ $(document).ready(function() {
 var templates = {
 {/literal}
 	character : '<h4 class="tagline left-tagline ie-rounded keuze-tagline ui-collapsible-heading"><span aria-hidden="true" class="ui-btn-inner ui-corner-top ui-corner-bottom"><span class="ui-btn-text">%description%</span><span class="ui-icon ui-icon-shadow ui-icon-minus"></span></span></h4><div class="ui-collapsible-content-wrapper"><div aria-hidden="false" class="ui-collapsible-content"><div class="ui-grid-c">%states%</div></div></div>',
-	state : '<div class="facet-btn ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$session.app.project.urls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox">%label%</div></span></span></a></div>',
-	stateselected : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$session.app.project.urls.projectMedia}selected-background.png" class="selected-icon-overlay-border" alt=""><img src="{$session.app.project.urls.projectMedia}%image%" class="grid-icon" alt=""><img src="{$session.app.project.urls.projectMedia}selected-badge.png" class="selected-icon-overlay-check" alt=""></div><div class="grid-labelbox selected">%label%</div></span></span></a></div>',
-	statedisabled : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-disabled ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$session.app.project.urls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox ">%label%</div></span></span></a></div>',
+	state : '<div class="facet-btn ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox">%label%</div></span></span></a></div>',
+	stateselected : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}selected-background.png" class="selected-icon-overlay-border" alt=""><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""><img src="{$projectUrls.projectMedia}selected-badge.png" class="selected-icon-overlay-check" alt=""></div><div class="grid-labelbox selected">%label%</div></span></span></a></div>',
+	statedisabled : '<div class="facet-btn ui-block-%letter% ui-selected"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-disabled ui-btn ui-btn-up-c" onclick="%onclick%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" alt=""></div><div class="grid-labelbox ">%label%</div></span></span></a></div>',
 	resultcontent : '<div class="ui-btn-text"><a class="resultlink ui-link-inherit" onclick="%onclick%"><img src="%image%" class="result ui-li-thumb ui-corner-tl" alt="">%label%</a></div><span class="pijltje"></span>',
 	resultfirst : '<li data-theme="c" class="result%n% ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-top ui-btn-up-c"><div aria-hidden="true" class="ui-btn-inner ui-li ui-corner-top">%content%</div></li>',
 	resultrest : '<li data-theme="c" class="result%n% ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb"><div aria-hidden="true" class="ui-btn-inner ui-li">%content%</div></li>',
@@ -174,7 +174,7 @@ var templates = {
 		class_1 : 'ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb',
 		class_n : 'ui-btn ui-btn-up-c ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-corner-bottom'
 	{literal}}{/literal},
-	selectedstate : '<div class="ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%" facetlabel="%label%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;padding-top:5px;font-style:italic">%charlabel%</div><img src="{$session.app.project.urls.projectMedia}%image%" class="grid-icon" style="top:25px;" alt=""><img src="{$session.app.project.urls.projectMedia}button-close-shadow-overlay.png" style="position:relative;top:0px;left:-5px;" alt=""></div><div class="grid-labelbox" style="padding-top:23px;">%label%</div></span></span></a></div>',
+	selectedstate : '<div class="ui-block-%letter%"><a data-theme="c" href="#" data-role="button" data-corners="false" data-shadow="false" class="ui-btn ui-btn-up-c" onclick="%onclick%" facetlabel="%label%"><span aria-hidden="true" class="ui-btn-inner"><span class="ui-btn-text"><div class="grid-iconbox"><div class="grid-labelbox" style="color:white;padding-top:5px;font-style:italic">%charlabel%</div><img src="{$projectUrls.projectMedia}%image%" class="grid-icon" style="top:25px;" alt=""><img src="{$projectUrls.projectMedia}button-close-shadow-overlay.png" style="position:relative;top:0px;left:-5px;" alt=""></div><div class="grid-labelbox" style="padding-top:23px;">%label%</div></span></span></a></div>',
 	speciesdetail : '<div role="main" data-role="content" class="soortpagina ui-content" id="species-default"><div class="soortpagina-inner"><h2>%title%</h2><h3>%subtitle%</h3>%image% %text% %extra_images%</div><p style="font-style:italic;color:#6d6d6d;"></p></div>%group% %similar%</div>',
 	speciesdetailimage : '<div class="illustratie" style="margin-left:auto;margin-right:auto;"><img src="%image%" alt=""></div>',
 	extraimages: '<div class="fotos">%images%</div>%credits%',

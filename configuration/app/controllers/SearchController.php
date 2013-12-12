@@ -42,7 +42,7 @@
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 				currently bypassed, because use of LIKE rather than MATCH
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
-				implements <span class="searchResultMatch"> around hits			
+				implements <span class="search-match"> around hits			
 			$content = $this->sortResultsByMostTokensFound($content);
 
 
@@ -79,6 +79,7 @@ class SearchController extends Controller
 	private $_excerptPreMatchLength;
 	private $_excerptPostMatchLength;
 	private $_excerptPrePostMatchString = '...';
+	private $_moduleNames;
 
 	const S_TOKENIZED_TERMS=0;
 	const S_FULLTEXT_STRING=1;
@@ -141,7 +142,8 @@ class SearchController extends Controller
 		'occurrence_taxon',
 		'content_introduction',
 		'name_types',
-		'presence'
+		'presence',
+		'page_taxon_title'
     );
 
     public $controllerPublicName = 'Search';
@@ -156,14 +158,13 @@ class SearchController extends Controller
 	public $jsToLoad = array('all' => array(
 		'search.js'
 	));
-	
+
 
     public function __construct ()
     {
         parent::__construct();
 		$this->initialize();
     }
-
 
     public function __destruct ()
     {
@@ -172,32 +173,30 @@ class SearchController extends Controller
 
     public function searchResetAction ()
     {
-		unset($_SESSION['app']['user']['search']);
+		unset($_SESSION['app'][$this->spid()]['search']);
 		$this->redirect('search.php');
 	}
 
     public function searchAction ()
     {
-
 		if ($this->rHasVal('search')) {
-			
-			$_SESSION['app']['user']['search'] = array(
+
+			$_SESSION['app'][$this->spid()]['search'] = array(
 				'search' => $this->requestData['search'],
 				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
 				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
 				);
-			
+				
 			if ($this->validateSearchString($this->requestData['search'])) {
 				
-
-				if ($this->rHasVal('extended','1')) {
+				if (1==1 || $this->rHasVal('extended','1')) {
 
 					$results =
 						$this->doSearch(
 							array(
 								'search'=>$this->requestData['search'],
-								'modules'=>$this->rHasVal('modules') ? $this->requestData['modules'] : false ,
-								'freeModules'=>$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : false,
+								'modules'=>$this->rHasVal('modules') ? $this->requestData['modules'] : null ,
+								'freeModules'=>$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
 								'extended'=>true
 							)
 						);
@@ -218,14 +217,18 @@ class SearchController extends Controller
 							)
 						);
 
-					$d=isset($results['data']['species']['results'][self::C_TAXA_ALL_NAMES]) ? $results['data']['species']['results'][self::C_TAXA_ALL_NAMES] : null;
+					$d=
+						isset($results['data']['species']['results'][self::C_TAXA_ALL_NAMES]) ? 
+							$results['data']['species']['results'][self::C_TAXA_ALL_NAMES] : null;
+
 					$this->smarty->assign('results',$d);
 
 				}
-				
-				$_SESSION['app']['user']['search']['results']=$results;
+
+				$_SESSION['app'][$this->spid()]['search']['results']=$results;
 
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
+				$this->smarty->assign('results',$results);
 
 			} else {
 
@@ -241,51 +244,13 @@ class SearchController extends Controller
 			
 		}
 
-		if (isset($_SESSION['app']['user']['search']['search'])) $this->smarty->assign('search',$_SESSION['app']['user']['search']['search']);
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
-		$this->smarty->assign('search',isset($_SESSION['app']['user']['search']) ? $_SESSION['app']['user']['search'] : null);
-
+		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
 
         $this->printPage();
   
     }
-
-	/*
-
-		final aim would be to create a search function that will react to 
-		anything you throw at it, so we can fully configure what to
-		search for through the form elements in the template (which
-		is skinnable!).
-		
-	
-	*/
-    public function searchExtendedAction ()
-    {
-
-		$presences=$this->getPresences();
-		
-		$this->smarty->assign('presences',$presences);
-		
-        $this->printPage();
-  
-    }
-
-	private function getPresences()
-	{
-		$data=$this->models->Presence->freeQuery(
-			"select
-				_a.id,
-				_b.label as label
-			from %PRE%presence  _a
-			left join %PRE%presence_labels _b
-				on _a.id = _b.presence_id and _a.project_id=_b.project_id and _b.language_id=".$this->getCurrentLanguageId()."
-			where _a.project_id = ".$this->getCurrentProjectId()
-		);	
-		return $data;
-	}
-
-
 
 	private function initialize()
 	{
@@ -455,7 +420,6 @@ class SearchController extends Controller
 
 	private function getExcerptsSurroundingMatches($p)
 	{
-
 		$s = isset($p['param']) ? $p['param'] : null;						// search parameters
 		$r = isset($p['results']) ? $p['results'] : null;					// results array
 		$f = isset($p['fields']) ? $p['fields'] : array('label','content');	// fields to match
@@ -466,7 +430,7 @@ class SearchController extends Controller
 		if (!isset($s) || !isset($s[self::S_TOKENIZED_TERMS]) ) return $r;
 
 		foreach((array)$r as $rKey => $result) {
-			
+
 			foreach((array)$f as $fKey => $field) {
 
 				$fullmatches = array();
@@ -503,7 +467,7 @@ class SearchController extends Controller
 							$r[$rKey]['matches'][]= 
 								($start>0 ? $this->_excerptPrePostMatchString : '').
 								substr($stripped,$start,($match[1]-$start)).
-								'<span class="searchResultMatch">'.$match[0].'</span>'.
+								'<span class="search-match">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]),$this->_excerptPostMatchLength).
 								($match[1]+strlen($match[0])+$this->_excerptPostMatchLength<strlen($stripped) ? $this->_excerptPrePostMatchString : '');
 
@@ -511,7 +475,7 @@ class SearchController extends Controller
 
 							$r[$rKey]['matches'][]= 
 								substr($stripped,0,$match[1]).
-								'<span class="searchResultMatch">'.$match[0].'</span>'.
+								'<span class="search-match">'.$match[0].'</span>'.
 								substr($stripped,$match[1]+strlen($match[0]));
 
 						}
@@ -562,6 +526,18 @@ class SearchController extends Controller
 		return '('.implode(' or ',$r).')';
 	}
 
+	private function getModuleName($id)
+	{
+		if (is_null($this->_moduleNames)) {
+			$d=$this->getProjectModules();
+			foreach((array)$d['modules'] as $val) {
+				if (!isset($val['module_id'])) continue;
+				$this->_moduleNames[$val['module_id']]=$val['module'];
+			}
+		}
+
+		return $this->_moduleNames[$id];
+	}
 
 
 
@@ -576,7 +552,6 @@ class SearchController extends Controller
 			return null;
 
 		$searchAll=($modules=='*');
-		
 		
 		$tokenized = $this->tokenizeSearchString($search);
 		//$fulltext = $this->prefabFullTextMatchString($tokenized);
@@ -600,39 +575,37 @@ class SearchController extends Controller
 		
 		$results =
 			array(
-				'content' => 
-					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent($p) : null),
-				'map' => 
-					($searchAll || (is_array($modules) && in_array('mapkey',$modules)) ? $this->searchMap($p) : null),
-				'matrixkey' => 
-					($searchAll || (is_array($modules) && in_array('matrixkey',$modules)) ? $this->searchMatrixKey($p) : null), // stub
-				'dichkey' => 
-					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey($p) : null),
-				'literature' => 
-					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature($p) : null),
-				'glossary' =>
-					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary($p) : null),
 				'introduction' =>
 					($searchAll || (is_array($modules) && in_array('introduction',$modules)) ? $this->searchIntroduction($p) : null),
+				'glossary' =>
+					($searchAll || (is_array($modules) && in_array('glossary',$modules)) ? $this->searchGlossary($p) : null),
+				'literature' => 
+					($searchAll || (is_array($modules) && in_array('literature',$modules)) ? $this->searchLiterature($p) : null),
 				'species' => 
 					($searchAll || (is_array($modules) && in_array('species',$modules)) ? $this->searchSpecies($p) : null),
-				'modules' => 
-					$this->searchModules($p,$freeModules)	
+				'dichkey' => 
+					($searchAll || (is_array($modules) && in_array('key',$modules)) ? $this->searchDichotomousKey($p) : null),
+				'matrixkey' => 
+					($searchAll || (is_array($modules) && in_array('matrixkey',$modules)) ? $this->searchMatrixKey($p) : null), // stub
+				'map' => 
+					($searchAll || (is_array($modules) && in_array('mapkey',$modules)) ? $this->searchMap($p) : null),
+				'content' => 
+					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent($p) : null),
 			);
+			
+		$d=$this->searchModules($p,$freeModules);
+		$results=array_merge($results,(array)$d);
 
-		$totalcount = 0;
+		$totalcount=0;
 		
 		foreach((array)$results as $val)
 			$totalcount += $val['numOfResults'];
-		
-		//echo '<h2>'.$totalcount.'</h2>';
 		
 		return array('data'=>$results,'count'=>$totalcount);
 	}
 
 	private function searchSpecies($p)
 	{
-		
 		// taxa
 		$taxa = $this->models->Taxon->_get(
 			array(
@@ -654,7 +627,15 @@ class SearchController extends Controller
 
 		foreach((array)$taxa as $key => $val)  {
 			$taxa[$key]['label']=
-				$this->formatTaxon(array('taxon' => $val['label'],'parent_id'=>$val['parent_id'],'rank_id' => $val['rank_id'],'is_hybrid' => $val['is_hybrid']),$ranks);
+				$this->formatTaxon(
+					array(
+						'taxon' => $val['label'],
+						'parent_id'=>$val['parent_id'],
+						'rank_id' => $val['rank_id'],
+						'is_hybrid' => $val['is_hybrid']
+					),
+					$ranks
+				);
 			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
 		}
 
@@ -670,7 +651,7 @@ class SearchController extends Controller
 						'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('content')),
 						'publish' => 1
 					),
-					'columns' => 'id,taxon_id,content,page_id,content as '.self::__CONCAT_RESULT__,
+					'columns' => 'taxon_id as id,taxon_id,content,page_id as cat,content as '.self::__CONCAT_RESULT__,
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 				)
 			);
@@ -678,6 +659,22 @@ class SearchController extends Controller
 			$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 			$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 			$content = $this->sortResultsByMostTokensFound($content);
+
+			$pagenames=array();			
+			foreach((array)$content as $key=>$val) {
+				$t=$this->getTaxonById($val['taxon_id']);
+                $ct = $this->models->PageTaxonTitle->_get(
+                array(
+                    'id' => array(
+                        'project_id' => $this->getCurrentProjectId(), 
+                        'language_id' => $this->getCurrentLanguageId(), 
+                        'taxon_id' => $val['taxon_id'], 
+                        'page_id' => $val['cat']
+                    ), 
+                    'columns' => 'title'
+                ));				
+				$content[$key]['label']=$t['taxon'].' ('.strtolower($ct[0]['title']).')';
+			}
 			
 		}
 
@@ -706,7 +703,9 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(commonname,transliteration) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('commonname','transliteration')),
 				),
-				'columns' => 'id,language_id,taxon_id,commonname,transliteration,concat(ifnull(commonname,\'\'),\' \',ifnull(transliteration,\'\')) as '.self::__CONCAT_RESULT__,
+				'columns' =>
+					'taxon_id as id,language_id,taxon_id,commonname,transliteration,
+					concat(ifnull(commonname,\'\'),\' \',ifnull(transliteration,\'\')) as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);	
@@ -726,9 +725,10 @@ class SearchController extends Controller
 
 		}
 
-		$commonnames = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false));
+		$commonnames = $this->getExcerptsSurroundingMatches(
+			array('param'=>$p,'results'=>$commonnames,'fields'=>array('commonname','transliteration'),'excerpt'=>false)
+		);
 		$commonnames = $this->sortResultsByMostTokensFound($commonnames);
-		
 		
 		
 		if (isset($this->models->Names)) {
@@ -749,7 +749,7 @@ class SearchController extends Controller
 						'project_id' => $this->getCurrentProjectId(),
 						'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('name')),
 					),
-					'columns' => 'id,language_id,taxon_id,name,type_id,name as '.self::__CONCAT_RESULT__,
+					'columns' => 'taxon_id as id,language_id,taxon_id,name,type_id,name as '.self::__CONCAT_RESULT__,
 					'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 				)
 			);	
@@ -831,7 +831,7 @@ class SearchController extends Controller
 			$results[self::C_TAXA_DESCRIPTIONS]=
 				array(
 					'label' => $this->translate('Species descriptions'),
-					'url' => '../species/taxon.php?id=%s',
+					'url' => '../species/taxon.php?id=%s&cat=#CAT#',
 					'data' => $content,
 					'numOfResults' => count((array)$content)
 				);
@@ -845,7 +845,7 @@ class SearchController extends Controller
 			$results[self::C_TAXA_SYNONYMS]=
 				array(
 					'label' => $this->translate('Species synonyms'),
-					'url' => '../species/taxon.php?id=%s&cat=names',
+					'url' => '../species/taxon.php?cat=names&id=%s',
 					'data' => $synonyms,
 					'numOfResults' => count((array)$synonyms)
 				);
@@ -859,7 +859,7 @@ class SearchController extends Controller
 			$results[self::C_TAXA_VERNACULARS]=
 				array(
 					'label' => $this->translate('Species common names'),
-					'url' => '../species/taxon.php?id=%s&cat=names',
+					'url' => '../species/taxon.php?cat=names&id=%s',
 					'data' => $commonnames,
 					'numOfResults' => count((array)$commonnames)
 				);
@@ -873,7 +873,7 @@ class SearchController extends Controller
 			$results[self::C_TAXA_ALL_NAMES]=
 				array(
 					'label' => $this->translate('Taxon names'),
-					'url' => '../species/taxon.php?id=%s&cat=names',
+					'url' => '../species/taxon.php?cat=names&id=%s',
 					'data' => $names,
 					'numOfResults' => count((array)$names)
 				);
@@ -905,7 +905,12 @@ class SearchController extends Controller
 			}
 		}
 
-		return array('results'=>$results,'numOfResults'=>$numOfResults);
+		return 
+			array(
+				'label'=> $this->getModuleName(MODCODE_SPECIES),
+				'results'=>$results,
+				'numOfResults'=>$numOfResults
+			);
 
 	}
 
@@ -919,7 +924,7 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(topic,content) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','content')),
 				),
-				'columns' => 'id,topic as label,content,content as '.self::__CONCAT_RESULT__,
+				'columns' => 'page_id as id,topic as label,content,content as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);
@@ -929,6 +934,7 @@ class SearchController extends Controller
 		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
+			'label'=> $this->getModuleName(MODCODE_INTRODUCTION),
 			'results' => array(
 				array(
 					'label' => $this->translate('Introduction'),
@@ -970,7 +976,7 @@ class SearchController extends Controller
 					//'%LITERAL%' => "MATCH(synonym) AGAINST ('".$p[self::S_FULLTEXT_STRING]."' in boolean mode)",
 					'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('synonym')),
 				),
-				'columns' => 'id,glossary_id,synonym,language_id,synonym as '.self::__CONCAT_RESULT__,
+				'columns' => 'id,glossary_id,synonym as label,language_id,synonym as '.self::__CONCAT_RESULT__,
 				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]
 			)
 		);
@@ -979,7 +985,24 @@ class SearchController extends Controller
 		$synonym = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$synonym));
 		$synonym = $this->sortResultsByMostTokensFound($synonym);
 
+		foreach((array)$synonym as $key => $val)
+		{
+			$d = $this->models->Glossary->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $val['glossary_id']
+					),
+					'columns' => 'term'
+				)
+			);
+			$synonym[$key]['label'].=' '.sprintf($this->translate('(synonym of "%s")'),$d[0]['term']);
+			$synonym[$key]['id']=$val['glossary_id'];
+			unset($synonym[$key]['glossary_id']);
+		}
+		
 		return array(
+			'label'=> $this->getModuleName(MODCODE_GLOSSARY),
 			'results' => array(
 				array(
 					'label' => $this->translate('Items'),
@@ -1072,6 +1095,7 @@ class SearchController extends Controller
 		$books = $this->sortResultsByMostTokensFound($books);
 
 		return array(
+			'label'=> $this->getModuleName(MODCODE_LITERATURE),
 			'results' => array(
 				array(
 					'label' => $this->translate('Literature'),
@@ -1155,6 +1179,7 @@ class SearchController extends Controller
 
 
 		return array(
+			'label'=> $this->getModuleName(MODCODE_KEY),
 			'results' => array(
 				array(
 					'label' => $this->translate('Steps'),
@@ -1202,6 +1227,7 @@ class SearchController extends Controller
 		$titles = $this->sortResultsByMostTokensFound($titles);
 
 		return array(
+			'label'=> $this->getModuleName(MODCODE_DISTRIBUTION),
 			'results' => array(
 				array(
 					'label' => $this->translate('Datatypes'),
@@ -1217,7 +1243,6 @@ class SearchController extends Controller
 
 	private function searchContent($p)
 	{
-
 		// content
 		$content = $this->models->Content->_get(
 			array(
@@ -1236,6 +1261,7 @@ class SearchController extends Controller
 		$content = $this->sortResultsByMostTokensFound($content);
 
 		return array(
+			'label'=> $this->translate('Navigator'),
 			'results' => array(
 				array(
 					'label' => $this->translate('Navigator'),
@@ -1249,70 +1275,82 @@ class SearchController extends Controller
 
 	}
 
-	private function searchModules($p,$freeModules=null)
+	private function searchModule($p)
 	{
+		$id=isset($p['module']['id']) ? $p['module']['id'] : null;
+		$name=isset($p['module']['name']) ? $p['module']['name'] : null;
 
-		if ($freeModules==false)
+		if (is_null($id))
 			return null;
 
 		$d=array(
 			'project_id' => $this->getCurrentProjectId(),
+			'module_id' => $id,
 			'%LITERAL%' => $this->makeLikeClause($p[self::S_LIKETEXT_STRING],array('topic','content')),
 		);
 
-		if ($freeModules!='*')
-			$d['module_id in']='('.implode(',',$freeModules).')';
-	
 		$content = $this->models->ContentFreeModule->_get(
 			array(
 				'id' => $d,
-				'columns' => 'page_id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__,
-				'order' => 'module_id'
-			)
-		);
-
-		// get appropriate free modules
-		$modules = $this->models->FreeModuleProject->_get(
-			array(
-				'project_id' => $this->getCurrentProjectId(),
-				'columns' => 'id,module',
-				'fieldAsIndex' => 'id'
+				'columns' => 'page_id as id,module_id,topic as label,content,concat(ifnull(topic,\'\'),\' \',ifnull(content,\'\')) as '.self::__CONCAT_RESULT__,
+				'order' => 'module_id',
+				'limit' => $p[self::S_RESULT_LIMIT_PER_CAT]				
 			)
 		);
 
 		$content = $this->filterResultsWithTokenizedSearch(array($p,$content));
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
-		
-		$r = array();
-		
-		foreach((array)$content as $val) {
-			$m = $modules[$val['module_id']]['module'];
-			if (isset($r[$m]) && count((array)$r[$m])>=$p[self::S_RESULT_LIMIT_PER_CAT]) continue;
-			$r[$m][] = $val;
-		}
-		
-		$content = array();
-		$t = 0;
-		
-		foreach((array)$r as $key => $val) {
-			
-			$content[] = array(
-				'label' => $key,
-				'url' => '../module/topic.php?id=%s',
-				'data' => $val,
-				'numOfResults' => count((array)$val)
-			);
 
-			$t += count((array)$val);
-			
-		}
-		
 		return array(
-			'results' => $content,
-			'numOfResults' => $t
+			'label'=> $name,
+			'results' => array(
+				array(
+					'label' => $name,
+					'url' => '../module/topic.php?modId='.$id.'&id=%s',
+					'data' => $content,
+					'numOfResults' => count((array)$content)
+				),
+			),
+			'numOfResults' => count((array)$content)
 		);
 
 	}
+
+	private function searchModules($p,$fMod=null)
+	{
+	
+		if (is_null($fMod))
+			return null;
+			
+		if ($fMod=='*') {
+			$fMod=array();
+			$m=$this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId()),'columns' => 'id'));
+			foreach((array)$m as $val) {
+				$fMod[]=$val['id'];
+			}
+		}
+		
+		foreach((array)$fMod as $mod) {
+			$m=$this->models->FreeModuleProject->_get(
+				array(
+					'id'=>array(
+						'project_id' => $this->getCurrentProjectId(),
+						'id' => $mod
+					),
+					'columns' => 'module',
+				)
+			);
+			$p['module']=array(
+				'id'=>$mod,
+				'name'=>$m[0]['module']
+			);
+			$r[$m[0]['module']]=$this->searchModule($p);
+		}
+
+		return $r;
+	
+	}
+
 
 }

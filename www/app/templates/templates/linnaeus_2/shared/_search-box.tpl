@@ -3,10 +3,9 @@
     name="search"
     id="search"
     class="search-box"
-    value="{if $search}{$search}{else}{t}Search...{/t}{/if}"
-    onkeydown="setSearchKeyed(true);"
-    onblur="setSearchKeyed(false);"
-    onfocus="onSearchBoxSelect()" 
-    results="5" 
-    autosave="linnaeus_ng" />
-<img onclick="doSearch()" src="{$session.app.project.urls.systemMedia}search.gif" class="search-icon" />
+	placeholder="{t}Search...{/t}"
+    value="{if $search.search}{$search.search}{/if}"
+	onkeyup="if (event.keyCode==13){literal}{doSearch();}{/literal}"
+	required
+/>
+<img onclick="doSearch()" src="{$projectUrls.systemMedia}search.gif" class="search-icon" />

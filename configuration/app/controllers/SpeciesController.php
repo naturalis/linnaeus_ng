@@ -79,7 +79,7 @@ class SpeciesController extends Controller
     public function setTaxonType ($type)
     {
 		//public as it needs to be callable from the view
-        $_SESSION['app']['user']['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
+        $_SESSION['app'][$this->spid()]['species']['type'] = ($type == 'higher') ? 'higher' : 'lower';
     }
 
 
@@ -111,14 +111,15 @@ class SpeciesController extends Controller
 
     public function taxonAction ()
     {
-
         if ($this->rHasId()) {
 
             // get taxon
             $taxon = $this->getTaxonById($this->requestData['id']);
+		}
+        if (!empty($taxon)) {
 
             $this->setTaxonType($taxon['lower_taxon'] == 1 ? 'lower' : 'higher');
-            
+
             $this->setControllerBaseName();
             
             if (isset($this->requestData['lan']))
@@ -273,7 +274,7 @@ class SpeciesController extends Controller
         }
         else {
             
-            $this->addError($this->translate('No taxon ID specified.'));
+            $this->addError($this->translate('No or unknown taxon ID specified.'));
             
             $this->setLastViewedTaxonIdForTheBenefitOfTheMapkey(null);
         }
@@ -477,7 +478,7 @@ class SpeciesController extends Controller
 
     private function getTaxonType()
     {
-        return isset($_SESSION['app']['user']['species']['type']) ? $_SESSION['app']['user']['species']['type'] : 'lower';
+        return isset($_SESSION['app'][$this->spid()]['species']['type']) ? $_SESSION['app'][$this->spid()]['species']['type'] : 'lower';
     }
 
 
@@ -493,13 +494,13 @@ class SpeciesController extends Controller
     {
         if (!is_null($id)) {
             
-            $_SESSION['app']['user']['species']['lastTaxon'] = $id;
+            $_SESSION['app'][$this->spid()]['species']['lastTaxon'] = $id;
             
             unset($_SESSION['app']['user']['mapkey']['state']);
         }
         else {
             
-            unset($_SESSION['app']['user']['species']['lastTaxon']);
+            unset($_SESSION['app'][$this->spid()]['species']['lastTaxon']);
         }
     }
 
@@ -510,15 +511,15 @@ class SpeciesController extends Controller
 		if (!$this->useCache)
 			return false;
 		
-        if (isset($_SESSION['app']['user']['species']['last_visited'][$taxon][$category])) {
-            return $_SESSION['app']['user']['species']['last_visited'][$taxon][$category];
+        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category])) {
+            return $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category];
         }
         
-        if (isset($_SESSION['app']['user']['species']['last_visited'])) {
+        if (isset($_SESSION['app'][$this->spid()]['species']['last_visited'])) {
             
-            $storedTaxon = key($_SESSION['app']['user']['species']['last_visited']);
+            $storedTaxon = key($_SESSION['app'][$this->spid()]['species']['last_visited']);
             if ($storedTaxon != $taxon) {
-                unset($_SESSION['app']['user']['species']['last_visited'][$storedTaxon]);
+                unset($_SESSION['app'][$this->spid()]['species']['last_visited'][$storedTaxon]);
             }
         }
         
@@ -528,7 +529,7 @@ class SpeciesController extends Controller
 
     private function setlastVisitedCategory($taxon,$category,$d)
     {
-        $_SESSION['app']['user']['species']['last_visited'][$taxon][$category] = $d;
+        $_SESSION['app'][$this->spid()]['species']['last_visited'][$taxon][$category] = $d;
     }
 
 
@@ -555,9 +556,9 @@ class SpeciesController extends Controller
 	private function getAdjacentTaxa($id)
     {
 
-		if (!isset($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()])) {
+		if (!isset($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
-			$_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()]=
+			$_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]=
 				$this->models->Taxon->freeQuery(
 					array(
 						'query' => '
@@ -573,12 +574,12 @@ class SpeciesController extends Controller
 		}
 
 		$prev=$next=false;
-		while (list ($key, $val) = each($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()])) {
+		while (list ($key, $val) = each($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()])) {
 
 			if ($val['id']==$id) {
 
 				// current = next because the pointer has already shifted forward
-				$next = current($_SESSION['app']['user']['species']['browse_order'][$this->getTaxonType()]);
+				$next = current($_SESSION['app'][$this->spid()]['species']['browse_order'][$this->getTaxonType()]);
 
 				return array(
 					'prev' => $prev!==false ? array(
@@ -650,7 +651,7 @@ class SpeciesController extends Controller
 			$tp[$key]['title'] = $this->getCategoryName($val['id']);
 			
 			if ($val['def_page'] == 1)
-				$_SESSION['app']['user']['species']['defaultCategory'] = $val['id'];
+				$_SESSION['app'][$this->spid()]['species']['defaultCategory'] = $val['id'];
 		}
 		
 
@@ -689,8 +690,8 @@ class SpeciesController extends Controller
                 
                 $d[$key] = $val;
                 
-                if ($ct[0]['page_id'] == $_SESSION['app']['user']['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
-                    $defCat = $_SESSION['app']['user']['species']['defaultCategory'];
+                if ($ct[0]['page_id'] == $_SESSION['app'][$this->spid()]['species']['defaultCategory']) // && ($ct[0]['publish']=='1' || $allowUnpublished)) 
+                    $defCat = $_SESSION['app'][$this->spid()]['species']['defaultCategory'];
             }
 
             $stdCats[] = array(
@@ -775,7 +776,7 @@ class SpeciesController extends Controller
 
         return array(
             'categories' => $tp, 
-            'defaultCategory' => $_SESSION['app']['user']['species']['defaultCategory']
+            'defaultCategory' => $_SESSION['app'][$this->spid()]['species']['defaultCategory']
         );
     }
 
@@ -927,7 +928,7 @@ class SpeciesController extends Controller
             $mt[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
             $mt[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
             $mt[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-            $mt[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'] . $mt[$key]['file_name'];
+            $mt[$key]['full_path'] = $this->getProjectUrl('uploadedMedia').$mt[$key]['file_name'];
         }
         
         $this->loadControllerConfig();

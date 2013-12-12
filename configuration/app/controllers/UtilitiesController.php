@@ -10,7 +10,7 @@ class UtilitiesController extends Controller
 		'commonname',
 		'synonym'
     );
-    
+    public $cssToLoad = array();
     public $controllerPublicName = 'Utilities';
 
     /**
@@ -153,8 +153,8 @@ class UtilitiesController extends Controller
 	{
 	
 		$cssVariables = array(
-			'projectMedia' => $_SESSION['app']['project']['urls']['projectMedia'],
-			'systemMedia' => $_SESSION['app']['project']['urls']['systemMedia']
+			'projectMedia' => $this->getProjectUrl('projectMedia'),
+			'systemMedia' => $this->getProjectUrl('systemMedia')
 		);
 		
 		foreach ($cssVariables as $k => $v) {

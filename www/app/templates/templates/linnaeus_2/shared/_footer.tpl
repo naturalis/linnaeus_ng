@@ -13,7 +13,7 @@
 <div id="footer-container"></div>
 
 </div>
-</form>
+<!-- /form -->
 </div>
 
 {literal}

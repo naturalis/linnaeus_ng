@@ -43,10 +43,10 @@
 $(document).ready(function(){
 {/literal}
 nbcImageRoot = '{$nbcImageRoot}';
-baseUrlProjectImages = '{$session.app.project.urls.projectMedia}';
+baseUrlProjectImages = '{$projectUrls.projectMedia}';
 nbcBrowseStyle = '{$nbcBrowseStyle}';
-nbcMatrixId = {$matrix.id};
-nbcProjectId = {$session.app.project.id};
+matrixId = {$matrix.id};
+projectId = {$projectId};
 {literal}
 if (typeof nbcInit=='function') {
 	nbcInit();

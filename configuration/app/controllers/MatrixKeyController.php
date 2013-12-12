@@ -203,7 +203,7 @@ class MatrixKeyController extends Controller
 				$this->smarty->assign('coefficients', $this->getRelevantCoefficients($states));
 
             $this->smarty->assign('nbcImageRoot', $this->_nbcImageRoot);
-            $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']);
+            $this->smarty->assign('nbcFullDatasetCount', $_SESSION['app'][$this->spid()]['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']);
             $this->smarty->assign('nbcStart', $this->getSessionSetting('nbcStart'));
             $this->smarty->assign('nbcSimilar', $this->getSessionSetting('nbcSimilar'));
 			$this->smarty->assign('nbcPerLine', $this->getSetting('matrix_items_per_line'));
@@ -236,6 +236,8 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('taxa', $taxa);
         
         $this->smarty->assign('matrix', $matrix);
+
+        $this->smarty->assign('projectId', $this->getCurrentProjectId());
 
         $this->smarty->assign('function', 'Identify');
 
@@ -306,6 +308,9 @@ class MatrixKeyController extends Controller
 
     public function ajaxInterfaceAction ()
     {
+		
+		if ($this->rHasVar('key')) $this->setCurrentMatrixId($this->requestData['key']);
+		
 		if (!$this->rHasVal('action'))
 		{
             $this->smarty->assign('returnText', 'error');
@@ -362,9 +367,6 @@ class MatrixKeyController extends Controller
         else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','do_search'))
 		{
-				
-			$this->setCurrentMatrixId($this->requestData['key']);
-			
 			$results = $this->nbcDoSearch($this->requestData['params']);
 
 			$this->smarty->assign('returnText', 
@@ -382,14 +384,11 @@ class MatrixKeyController extends Controller
         else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','save_session_setting'))
 		{
-			$this->setCurrentMatrixId($this->requestData['key']);
             $this->saveSessionSetting($this->requestData['setting']);
         }
         else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_formatted_states'))
 		{
-            $this->setCurrentMatrixId($this->requestData['key']);
-			
             $c = $this->getCharacteristic(array('id'=>$this->requestData['id']));
 
             $c['prefix'] = ($c['type'] == 'media' || $c['type'] == 'text' ? 'c' : 'f');
@@ -425,8 +424,6 @@ class MatrixKeyController extends Controller
 		else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_results_nbc'))
 		{
-			$this->setCurrentMatrixId($this->requestData['key']);
-
 			$includeGroups = isset($this->requestData['params']['noGroups']) ? $this->requestData['params']['noGroups']!='1' : true;
 			$includeActiveChars = isset($this->requestData['params']['noActiveChars']) ? $this->requestData['params']['noActiveChars']!='1' : true;
 
@@ -506,8 +503,6 @@ class MatrixKeyController extends Controller
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','clear_state'))
 		{
 
-			$this->setCurrentMatrixId($this->requestData['key']);
-
 			if (!$this->rHasVal('state'))
 				$this->stateMemoryUnset();
 			else
@@ -518,8 +513,6 @@ class MatrixKeyController extends Controller
         else 
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','set_state') && $this->rHasVal('state'))
 		{
-			
-			$this->setCurrentMatrixId($this->requestData['key']);
 
 			if ($this->rHasVal('value'))
 				$state = $this->requestData['state'] . ':' . $this->requestData['value'];
@@ -534,9 +527,6 @@ class MatrixKeyController extends Controller
         else
 		if ($this->_matrixType=='nbc' && $this->rHasVal('action','get_initial_values'))
 		{
-			
-			$this->setCurrentMatrixId($this->requestData['key']);
-
 			// state image urls
 			$cs = $this->models->CharacteristicState->_get(
 				array(
@@ -562,8 +552,8 @@ class MatrixKeyController extends Controller
 				array(
 					'stateImageUrls' => 
 						array(
-							'baseUrl' => $_SESSION['app']['project']['urls']['projectMedia'],
-							'baseUrlSystem' => $_SESSION['app']['project']['urls']['systemMedia'],
+							'baseUrl' => $this->getProjectUrl('projectMedia'),
+							'baseUrlSystem' => $this->getProjectUrl('systemMedia'),
 							'fileNames' => $cs
 						),
 					'characterNames' => $cl
@@ -581,12 +571,12 @@ class MatrixKeyController extends Controller
 
     public function setCurrentMatrixId($id)
     {
-        $_SESSION['app']['user']['matrix']['active'] = $id;
+        $_SESSION['app'][$this->spid()]['matrix']['active'] = $id;
     }
 
     public function getCurrentMatrixId ()
     {
-        return isset($_SESSION['app']['user']['matrix']['active']) ? $_SESSION['app']['user']['matrix']['active'] : null;
+        return isset($_SESSION['app'][$this->spid()]['matrix']['active']) ? $_SESSION['app'][$this->spid()]['matrix']['active'] : null;
     }
 
     public function cacheAllTaxaInMatrix ()
@@ -1009,7 +999,7 @@ class MatrixKeyController extends Controller
 		$this->_externalSpeciesUrlPrefix = $this->getSetting('external_species_url_prefix');
 
         if ($this->_matrixType == 'nbc') {
-			$_SESSION['app']['system']['urls']['nbcImageRoot'] = $this->_nbcImageRoot = $this->getSetting('nbc_image_root');
+			$_SESSION['app']['system']['urls']['nbcImageRoot']=$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
         }
 
     }
@@ -1147,14 +1137,14 @@ class MatrixKeyController extends Controller
     private function setMasterMatrixId ($id=null)
     {
 		if (is_null($id))
-			unset($_SESSION['app']['user']['matrix']['masterId']);
+			unset($_SESSION['app'][$this->spid()]['matrix']['masterId']);
 		else
-			$_SESSION['app']['user']['matrix']['masterId']=$id;
+			$_SESSION['app'][$this->spid()]['matrix']['masterId']=$id;
     }
 
     private function getMasterMatrixId ()
     {
-        return isset($_SESSION['app']['user']['matrix']['masterId']) ? $_SESSION['app']['user']['matrix']['masterId'] : null;
+        return isset($_SESSION['app'][$this->spid()]['matrix']['masterId']) ? $_SESSION['app'][$this->spid()]['matrix']['masterId'] : null;
     }
 
     private function checkMasterMatrixId ()
@@ -1172,8 +1162,8 @@ class MatrixKeyController extends Controller
 		
 		if (is_null($id)) return;
 
-		if (empty($_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
-			$_SESSION['app']['system']['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
+		if (empty($_SESSION['app'][$this->spid()]['matrix'][$this->getCurrentMatrixId()]['totalEntityCount']))
+			$_SESSION['app'][$this->spid()]['matrix'][$this->getCurrentMatrixId()]['totalEntityCount'] = $this->getTotalEntityCount();
 
     }
 
@@ -1230,9 +1220,9 @@ class MatrixKeyController extends Controller
             $d = explode(':', $val);
             
             if ($d[0] == 'f') // f:x:n[:sd] (free values)
-                $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
+                $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$d[0] . ':' . $d[1]] = $val;
             else // c:x:y (fixed values)
-                $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
+                $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$val] = $val;
         }
 		
     }
@@ -1240,20 +1230,20 @@ class MatrixKeyController extends Controller
     private function stateMemoryUnset ($id = null)
     {
         if (empty($id))
-            unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()]);
+            unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()]);
         else
-            unset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
+            unset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()][$id]);
     }
 
     private function stateMemoryRecall ($p = null)
     {
-        if (isset($_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()])) {
+        if (isset($_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()])) {
             
             $charId = isset($p['charId']) ? $p['charId'] : null;
             
             $states = array();
             
-            foreach ((array) $_SESSION['app']['user']['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key => $val) {
+            foreach ((array) $_SESSION['app'][$this->spid()]['matrix']['storedStates'][$this->getCurrentMatrixId()] as $key => $val) {
                 
                 $states[$key]['val'] = $val;
                 
@@ -1336,14 +1326,14 @@ class MatrixKeyController extends Controller
     {
         if (!isset($id))
             return;
-        
+
         $cs = $this->models->CharacteristicState->_get(
         array(
             'id' => array(
-                'project_id' => $this->getCurrentProjectId(), 
+				'project_id' => $this->getCurrentProjectId(), 
                 'id' => $id
             ), 
-            'columns' => 'id,characteristic_id,file_name,lower,upper,mean,sd,got_labels', 
+            'columns' => 'project_id,id,characteristic_id,file_name,lower,upper,mean,sd,got_labels', 
             'order' => 'show_order'
         ));
         
@@ -2030,32 +2020,32 @@ class MatrixKeyController extends Controller
 
     private function showStateStore ($state)
     {
-        $_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] = $state;
+        $_SESSION['app'][$this->spid()]['matrix']['storesShowState'][$this->getCurrentMatrixId()] = $state;
     }
 
     private function showStateRecall ()
     {
-        return isset($_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['storesShowState'][$this->getCurrentMatrixId()] : 'pattern';
+        return isset($_SESSION['app'][$this->spid()]['matrix']['storesShowState'][$this->getCurrentMatrixId()]) ? $_SESSION['app'][$this->spid()]['matrix']['storesShowState'][$this->getCurrentMatrixId()] : 'pattern';
     }
 
     private function examineSpeciesStore ($id)
     {
-        $_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] = $id;
+        $_SESSION['app'][$this->spid()]['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] = $id;
     }
 
     private function examineSpeciesRecall ()
     {
-        return isset($_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] : null;
+        return isset($_SESSION['app'][$this->spid()]['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app'][$this->spid()]['matrix']['examineSpeciesState'][$this->getCurrentMatrixId()] : null;
     }
 
     private function compareSpeciesStore ($id)
     {
-        $_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] = $id;
+        $_SESSION['app'][$this->spid()]['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] = $id;
     }
 
     private function compareSpeciesRecall ()
     {
-        return isset($_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app']['user']['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] : null;
+        return isset($_SESSION['app'][$this->spid()]['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()]) ? $_SESSION['app'][$this->spid()]['matrix']['compareSpeciesState'][$this->getCurrentMatrixId()] : null;
     }
 
     private function getCharacterGroups ()
@@ -2113,17 +2103,17 @@ class MatrixKeyController extends Controller
             return;
         
         if (empty($setting['value']))
-            unset($_SESSION['app']['user']['matrix']['settings'][$setting['name']]);
+            unset($_SESSION['app'][$this->spid()]['matrix']['settings'][$setting['name']]);
         else
-            $_SESSION['app']['user']['matrix']['settings'][$setting['name']] = $setting['value'];
+            $_SESSION['app'][$this->spid()]['matrix']['settings'][$setting['name']] = $setting['value'];
     }
 
     private function getSessionSetting ($name)
     {
-        if (!isset($name) || !isset($_SESSION['app']['user']['matrix']['settings'][$name]))
+        if (!isset($name) || !isset($_SESSION['app'][$this->spid()]['matrix']['settings'][$name]))
             return;
 
-        return $_SESSION['app']['user']['matrix']['settings'][$name];
+        return $_SESSION['app'][$this->spid()]['matrix']['settings'][$name];
     }
 
     public function getVariations ($tId = null)
@@ -2802,7 +2792,7 @@ class MatrixKeyController extends Controller
                     'type' => 'm', 
                     'inclRelated' => false,
 					'details' => $this->getMatrixStates($val['id']),
-					'image' => file_exists($_SESSION['app']['project']['urls']['projectMedia'].$image) ? $image : null,
+					'image' => file_exists($this->getProjectUrl('projectMedia').$image) ? $image : null,
                 ));
                 
             }
@@ -2995,7 +2985,7 @@ class MatrixKeyController extends Controller
                         'val' => $match, 
                         'label' => $match['l'], 
                         'type' => 'm', 
-						'image' => file_exists($_SESSION['app']['project']['urls']['projectMedia'].$image) ? $image : null,
+						'image' => file_exists($this->getProjectUrl('projectMedia').$image) ? $image : null,
                         'inclRelated' => false,
 						'details' => $this->_matrixSuppressDetails ? null : $this->getMatrixStates($match['id'])
                     ));
@@ -3352,7 +3342,8 @@ class MatrixKeyController extends Controller
 			foreach((array)$c as $key => $val) {
 				if (isset($val['states'])) {
 					foreach((array)$val['states'] as $sKey => $sVal) {
-						$c[$key]['states'][$sKey]['file_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$sVal["file_name"]);
+						$c[$key]['states'][$sKey]['file_exists'] = 
+							file_exists($this->getProjectUrl('projectMedia').$sVal["file_name"]);
 					}
 				}
 			}
@@ -3411,7 +3402,7 @@ class MatrixKeyController extends Controller
 			}
 			$d[$i]['icon'] = '__menu'.preg_replace('/\W/','',ucwords($d[$i]['label'])).'.png';
 			if ($checkImages)
-				$d[$i]['icon_exists'] = file_exists($_SESSION['app']['project']['urls']['projectMedia'].$d[$i]['icon']);
+				$d[$i]['icon_exists'] = file_exists($this->getProjectUrl('projectMedia').$d[$i]['icon']);
 			$d[$i]['type'] = $val['ref_type'];
 			$i++;
 		}

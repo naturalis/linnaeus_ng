@@ -145,9 +145,11 @@ class ModuleController extends Controller
             
             $page = $this->getPage($id);
 
-            $this->smarty->assign('page', $page);
-            
-            $this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
+			if (!empty($page)) {
+				$this->smarty->assign('page', $page);
+				$this->smarty->assign('adjacentItems', $this->getAdjacentPages($id));
+			}
+
         }
         
         if ($module['show_alpha'] == '1')
@@ -156,12 +158,15 @@ class ModuleController extends Controller
         if ($this->rHasVal('letter'))
             $this->smarty->assign('letter', $this->requestData['letter']);
         
-        $this->setPageName(sprintf($this->translate($module['module'] . ': "%s"'), $page['topic']));
+		if (!empty($page)) {
+	        $this->setPageName(sprintf($this->translate($module['module'] . ': "%s"'), $page['topic']));
         
-        $this->smarty->assign('headerTitles', array(
-            'title' => $module['module'], 
-            'subtitle' => $page['topic']
-        ));
+			$this->smarty->assign('headerTitles', array(
+				'title' => $module['module'], 
+				'subtitle' => $page['topic']
+			));
+			
+		}
         
         $this->smarty->assign('module', $module);
         

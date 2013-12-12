@@ -7,22 +7,22 @@
 	<meta name="robots" content="all" />
 	<meta name="lng-project-id" content="{$session.app.project.id}" />
 	<title>{$session.app.project.title|@strip_tags:false}{if $pageName}: {$pageName|@strip_tags:false}{/if}</title>
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}yui/cssreset-min.css" />
-	<link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}dialog/jquery.modaldialog.css" />
-    <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}prettyPhoto/prettyPhoto.css" />
+	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}yui/cssreset-min.css" />
+	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}dialog/jquery.modaldialog.css" />
+    <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 {if $cssToLoad}
 {section name=i loop=$cssToLoad}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
 {/section}
 {/if}
     <!--[if IE]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie.css" />
     <![endif]-->
     <!--[if IE 8]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7-8.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7-8.css" />
     <![endif]-->
     <!--[if IE 7]>
-        <link rel="stylesheet" type="text/css" href="{$session.app.project.urls.projectCSS}ie7.css" />
+        <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}ie7.css" />
     <![endif]-->
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery.tools.min.js"></script>

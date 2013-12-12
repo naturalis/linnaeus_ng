@@ -1,3 +1,5 @@
+var matrixId=null;
+var projectId=null;
 var imagePath;
 var emptyIndicator = '\u2610'+' ';
 var selectIndicator = '\u2611'+' ';//'\u2022 ';
@@ -24,10 +26,12 @@ function getData(action,id,postFunction) {
 		url : 'ajax_interface.php',
 		type: 'POST',
 		data : ({
-			'action' : action ,
-			'id' : id , 
-			'inc_unknowns' : $('#inc_unknowns').attr('checked') ? 1 : 0 , 
-			'time' : getTimestamp()
+			action : action ,
+			id : id , 
+			inc_unknowns : $('#inc_unknowns').attr('checked') ? 1 : 0 , 
+			time : getTimestamp(),
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			//console.log(data);

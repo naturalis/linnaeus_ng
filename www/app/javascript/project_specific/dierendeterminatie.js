@@ -1,5 +1,3 @@
-var nbcMatrixId = null;
-var nbcProjectId=null;
 var nbcBrowseStyle='paginate';
 var nbcStart = 0;
 var nbcExpandedShowing = 0;
@@ -36,8 +34,8 @@ function nbcGetResults(p) {
 			action : 'get_results_nbc',
 			params : p,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			nbcData = $.parseJSON(data);
@@ -75,8 +73,8 @@ function nbcDoSearch() {
 			action : 'do_search',
 			params : {term: nbcSearchTerm},
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			//console.log(data);
@@ -589,8 +587,8 @@ function nbcShowStates(id) {
 			action : 'get_formatted_states' ,
 			id : id , 
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			//console.log(data);
@@ -729,8 +727,8 @@ function nbcSaveSessionSetting(name,value) {
 			setting : { name : name, value: value },
 			id : null,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			//alert(data);
@@ -754,8 +752,8 @@ function nbcSetState(p) {
 			value : p.value,
 			id : null,
 			time : getTimestamp(),
-			key : nbcMatrixId,
-			p : nbcProjectId
+			key : matrixId,
+			p : projectId
 		}),
 		success : function (data) {
 			if (p.norefresh!==true)

@@ -84,8 +84,6 @@ class LinnaeusController extends Controller
 
 	        $this->setUrls();
 
-			$this->setPaths();
-
 			$this->setCurrentProjectData();
 			
 			$this->setCssFiles();
@@ -140,13 +138,16 @@ class LinnaeusController extends Controller
     public function contentAction ()
     {
 
-		if (!$this->rHasVal('sub')) {
+		if (!$this->rHasVal('sub') && !$this->rHasVal('id')) {
 
 			$d = $this->getContent('Welcome');
 
 		} else {
 		
-			$d = $this->getContent($this->requestData['sub']);
+			$d = $this->getContent(
+				(isset($this->requestData['sub']) ? $this->requestData['sub'] : null),
+				(isset($this->requestData['id']) ? $this->requestData['id'] : null)
+			);
 
 		}
 

@@ -303,7 +303,7 @@ class GlossaryController extends Controller
 			$gm[$key]['category'] = isset($t['type']) ? $t['type'] : 'other';
 			$gm[$key]['category_label'] = isset($t['label']) ? $t['label'] : 'Other';
 			//$gm[$key]['mime_show_order'] = isset($t['type']) ? $this->controllerSettings['mime_show_order'][$t['type']] : 99;
-			$gm[$key]['full_path'] = $_SESSION['app']['project']['urls']['uploadedMedia'].$gm[$key]['file_name'];
+			$gm[$key]['full_path']=$this->getProjectUrl('uploadedMedia').$gm[$key]['file_name'];
 
 		
 		}

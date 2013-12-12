@@ -7,7 +7,7 @@
 		<div id="question">
         {if $step.image}
             <div id="step-image">
-                <img alt="{$step.image}" src="{$session.app.project.urls.uploadedMedia}{$step.image}" />
+                <img alt="{$step.image}" src="{$projectUrls.uploadedMedia}{$step.image}" />
             </div>
         {/if}
 		</div>

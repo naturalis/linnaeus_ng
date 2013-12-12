@@ -8,7 +8,7 @@
  		{if $languages|@count>1} | 
         {foreach from=$languages key=k item=v}
         	{if $v.language_id!=$currentLanguageId}<span class="flag_link" onclick="doLanguageChange({$v.language_id})">{/if}
-        	<img src="{$session.app.project.urls.systemMedia}language_flags/{$v.iso2}.png">
+        	<img src="{$projectUrls.systemMedia}language_flags/{$v.iso2}.png">
         	{if $v.language_id!=$currentLanguageId}</span>{/if}
          {/foreach}
  		{/if}
