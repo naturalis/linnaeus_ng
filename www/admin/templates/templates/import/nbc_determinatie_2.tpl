@@ -27,10 +27,19 @@
 {if $exists}
 <p>
 	<span class="message-error">A project with that name already exists. Project names need to be unique; please specify how to treat this import:</span><br />
-	<input type="radio" id="id1" name="action" value="replace_data" /></td><td><label for="id1">import into existing project, replacing all existing taxon and matrix data</label><br />
-	<input type="radio" id="id4" name="action" value="replace_species_data"  checked="checked" /></td><td><label for="id4">import into existing project, replacing existing matrix and species data (taxa other than species remain untouched)</label><br />
-	<input type="radio" id="id2" name="action" value="merge_data"/></td><td><label for="id2">import into existing project, merging with existing data (if any; please note you'll get the chance to overwrite just the matrix data later on)</label><br />
-	<input type="radio" id="id3" name="action" value="new_project" /></td><td><label for="id3">create a new project with the title "{$suggestedTitle}"</label><br />
+		<input type="radio" id="id4" name="action" value="replace_species_data"  checked="checked" />
+			<label for="id4">Keep the project, just delete matrix-data before importing new data (choose this when first uploading a new matrix into an existing project).
+		</label><br />
+		<input type="radio" id="id2" name="action" value="merge_data"/>
+			<label for="id2">Keep the project and keep all data (choose this when uploading the next matrices from a multi-matrix key)<br />
+			(you'll get the chance to replace the specific matrix later on in this wizard)
+		</label><br />
+		<input type="radio" id="id1" name="action" value="replace_data" />
+			<label for="id1">Keep the project, but delete <i>all</i> data before importing new data.
+		</label><br />
+		<input type="radio" id="id3" name="action" value="new_project" />
+			<label for="id3">Create a whole new project titled "{$suggestedTitle}".
+		</label><br />
 	If you wish to create a new project with a different title, alter the title in your CSV-file and <a href="nbc_determinatie_1.php?action=new">reload the file</a>.<br />
 </p>
 {/if}

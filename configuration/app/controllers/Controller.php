@@ -2,9 +2,6 @@
 
 /*
 
-	major restructuring of the constructor and splash-logic between revisions 1980 and 1981
-
-
 	on skins:
 	if the setting (in the table 'settings') for 'skin' exists, that skin is used
 	providing the follwing directories exist ($this->doesSkinExist()):

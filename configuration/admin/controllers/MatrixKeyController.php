@@ -91,10 +91,13 @@ class MatrixKeyController extends Controller
             
             $this->redirect('edit.php');
         }
-        else if ($this->getCurrentMatrixId() == null) {
+		
+		$this->setCurrentMatrixId($this->getDefaultMatrixId());
+		
+        if ($this->getCurrentMatrixId() == null) {
             
             $matrices = $this->getMatrices();
-            
+           
             if (count((array) $matrices) > 0) {
                 
                 $this->setCurrentMatrixId($matrices[0]['id']);
@@ -2215,6 +2218,23 @@ class MatrixKeyController extends Controller
                 'default' => 1
             ));
         }
+    }
+
+    private function getDefaultMatrixId ()
+    {
+
+		$m = $this->models->Matrix->_get(
+		array(
+			'id' => array(
+				'project_id' => $this->getCurrentProjectId(), 
+				'got_names' => 1,
+				'default' => 1
+			), 
+			'columns' => 'id'
+		));
+		
+		return isset($m[0]['id']) ? $m[0]['id'] : null;
+
     }
 
     private function updateStateShowOrder ($id, $val)
