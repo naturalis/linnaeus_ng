@@ -172,6 +172,8 @@ class IndexController extends Controller
         $this->smarty->assign('taxonType', 'common');
         
         $this->smarty->assign('common', true);
+		
+		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['index']['hasSpecies']);
         
         $this->printPage();
     }
@@ -258,6 +260,8 @@ class IndexController extends Controller
             $this->smarty->assign('alphaNav', $d['alphaNav']);
         }
         
+		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['index']['hasSpecies']);
+		
         $this->smarty->assign('showSpeciesIndexMenu', true);
         
         $this->smarty->assign('alpha', $d['alpha']);
@@ -434,23 +438,23 @@ class IndexController extends Controller
     private function setIndexTabs ()
     {
         // Check if results have been stored in session; if so return
-        if (isset($_SESSION['app']['user']['indexModule']['hasSpecies']))
+        if (isset($_SESSION['app'][$this->spid()]['index']['hasSpecies']))
             return;
             
             // Check taxa
-        $_SESSION['app']['user']['indexModule']['hasSpecies'] = $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 0;
+        $_SESSION['app'][$this->spid()]['index']['hasSpecies'] = $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] = 0;
         $taxa = $this->buildTaxonTree();
         foreach ((array)$taxa as $taxon) {
             if ($taxon['lower_taxon'] == 1 && $taxon['is_empty'] == 0)
-                $_SESSION['app']['user']['indexModule']['hasSpecies'] = 1;
+                $_SESSION['app'][$this->spid()]['index']['hasSpecies'] = 1;
             if ($taxon['lower_taxon'] == 0 && $taxon['is_empty'] == 0)
-                $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] = 1;
-            if ($_SESSION['app']['user']['indexModule']['hasSpecies'] == 1 && $_SESSION['app']['user']['indexModule']['hasHigherTaxa'] == 1)
+                $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] = 1;
+            if ($_SESSION['app'][$this->spid()]['index']['hasSpecies'] == 1 && $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] == 1)
                 break;
         }
         
         // Check common names
-        $_SESSION['app']['user']['indexModule']['hasCommonNames'] = ($this->countCommonNames() > 0 ? 1 : 0);
+        $_SESSION['app'][$this->spid()]['index']['hasCommonNames'] = ($this->countCommonNames() > 0 ? 1 : 0);
     }
 
 

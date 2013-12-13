@@ -1,3 +1,5 @@
+var projectId=null;
+
 (function($)
 {
     $.fn.removeClassRegEx = function(regex)
