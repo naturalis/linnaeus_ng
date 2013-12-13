@@ -61,7 +61,9 @@ class MatrixKeyController extends Controller
 
     public function indexAction ()
     {
-		
+		// reset session-saved matrix id
+		$this->setCurrentMatrixId();
+		// check for presence of 'mtrx' variable
         $this->checkMatrixIdOverride();
 		$this->setStoreHistory(false);
 		
@@ -571,9 +573,12 @@ class MatrixKeyController extends Controller
 
     }
 
-    public function setCurrentMatrixId($id)
+    public function setCurrentMatrixId($id=null)
     {
-        $_SESSION['app'][$this->spid()]['matrix']['active'] = $id;
+		if (is_null($id))
+			unset($_SESSION['app'][$this->spid()]['matrix']['active']);
+		else
+	        $_SESSION['app'][$this->spid()]['matrix']['active'] = $id;
     }
 
     public function getCurrentMatrixId ()
