@@ -141,13 +141,17 @@ class MatrixKeyController extends Controller
         $id = $this->getCurrentMatrixId();
 
         if (!isset($id)) {
-            
             $this->storeHistory = false;
-            
             $this->redirect('index.php');
         }
         
 		$matrix = $this->getMatrix($id);
+
+        if (empty($matrix)) {
+            $this->storeHistory = false;
+            $this->redirect('index.php');
+        }
+
 
         $this->setPageName(sprintf($this->translate('Matrix "%s": identify'), $matrix['name']));
 		
