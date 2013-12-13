@@ -63,12 +63,12 @@ function allLookupGetData(text,getAll) {
 			url : allLookupContentUrl,
 			type: "POST",
 			data : ({
-				'action' : 'get_lookup_list' ,
-				'search' : (getAll==true ? '*' : text) ,
-				'match_start' : (allLookupMatchStartOnly ? '1' : '0') ,
-				'get_all' : (getAll==true ? '1' : '0') ,
-				'vars' : allLookupExtraVars,
-				'time' : allGetTimestamp()
+				action : 'get_lookup_list' ,
+				search : (getAll==true ? '*' : text) ,
+				match_start : (allLookupMatchStartOnly ? '1' : '0') ,
+				get_all : (getAll==true ? '1' : '0') ,
+				vars : allLookupExtraVars,
+				time : allGetTimestamp()
 			}),
 			success : function (data) {
 				//console.log(data);

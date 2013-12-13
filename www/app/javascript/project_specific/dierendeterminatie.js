@@ -291,7 +291,7 @@ function nbcFormatResult(data) {
 			<div class="result-labels">'+
 				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
                 '<span class="result-name-scientific">'+data.s+'</span> '+
-				(data.y=='m'? '<br /><a href="?mtrx='+data.i+'&main='+nbcData.matrix+'">Ga naar sleutel '+data.s+'</a>' : '' )+
+				(data.y=='m'? '<br /><a href="?mtrx='+data.i+'&main='+nbcData.matrix+'">Ga naar sleutel</a>' : '' )+
                 '<span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
             </div> \
         </div> \

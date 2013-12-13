@@ -2,7 +2,7 @@
 <div id="categories">
 <ul>
 <li>
-    <a class="category{if $taxonType=='lower'}-active{/if} category-first{if $session.app.user.indexModule.hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
+    <a class="category{if $taxonType=='lower'}-active{/if} category-first{if $hasSpecies==1}" href="index.php"{else} category-no-content"{/if}>
     {t}Species and lower taxa{/t}</a>
 </li>
 <li>

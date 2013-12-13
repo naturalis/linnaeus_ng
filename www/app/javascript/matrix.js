@@ -1,5 +1,4 @@
 var matrixId=null;
-var projectId=null;
 var imagePath;
 var emptyIndicator = '\u2610'+' ';
 var selectIndicator = '\u2611'+' ';//'\u2022 ';
