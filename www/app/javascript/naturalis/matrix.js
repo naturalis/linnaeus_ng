@@ -1,15 +1,10 @@
-var nbcBrowseStyle='paginate';
 var nbcStart = 0;
 var nbcExpandedShowing = 0;
 var nbcExpandedPrevious = null;
 var nbcPerPage = 16;
-var nbcPerLine = 4;
 var nbcData;
 var nbcFullDatasetCount = 0;
-var nbcCurrPage = 0;
-var nbcLastPage = 0;
 var nbcImageRoot;
-var nbcPaginate = true;
 var nbcExpandResults = false;
 var nbcStatevalue = '';
 var nbcDetailShowStates = Array();
@@ -43,14 +38,15 @@ function nbcGetResults(p) {
 			nbcData = $.parseJSON(data);
 			nbcFilterEmergingCharacters();
 			nbcDoResults();
+
+			if (p && p.clearOverhead==true) nbcClearOverhead();
 			if (p && p.action!='similar') nbcDoOverhead();
-			nbcDoPaging();
 			if (p && p.action=='similar') nbcPrintSimilarHeader();
 			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
+			if (p && p.scrollWindow==true) window.scroll(0,nbcPreviousBrowseStyles.lastPos);
 
 			setCursor();
-
 		}
 	});
 	
@@ -81,14 +77,12 @@ function nbcDoSearch() {
 		success : function (data) {
 			//console.log(data);
 			nbcData = $.parseJSON(data);
+			//nbcRemoveShowMoreButton();
 			nbcDoResults();
 			nbcDoOverhead();
-			nbcDoPaging();
 			nbcPrintSearchHeader();
 			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
-
 			setCursor();
-			
 			return false;
 
 		}
@@ -107,8 +101,7 @@ function nbcDoResults(p) {
 	nbcClearResults();
 	if (nbcData.results)
 		nbcPrintResults();
-	else 
-		nbcRemoveShowMoreButton()
+	//else nbcRemoveShowMoreButton();
 	
 }
 
@@ -120,86 +113,43 @@ function nbcClearResults() {
 
 function nbcPrintResults() {
 
-	if (nbcExpandResults)
-		nbcPrintResultsExpanded();
-	else
-		nbcPrintResultsPaginated(); // also for non-paginated, non-expanded
-
+	nbcPrintResultsExpanded();
 	nbcPrettyPhotoInit();
-	nbcResetClearButton();	
 
-}
-
-function nbcPrintResultsPaginated() {
-
-	var results = nbcData.results;
-	var s = '';
-	var d = 0;
-
-	s = '<div class="resultRow">';
-
-	for(var i=0;i<results.length;i++) {
-		if ((i>=nbcStart && i<nbcStart+nbcPerPage) || nbcPaginate==false) {
-			s = s + nbcFormatResult(results[i]);
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
-		}
-	}
-
-	s = s + '</div>';
-	
-	nbcRemoveShowMoreButton();
-
-	$('#results-container').html(s);
 }
 
 function nbcPrintResultsExpanded() {
 
 	var results = nbcData.results;
 	var s = '';
-	var added = d = 0;
-
-	s = '<div class="resultRow">';
+	var added = 0;
 
 	for(var i=0;i<results.length;i++) {
-		if ((nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
+		if (
+			(nbcExpandedPrevious!=null && i<nbcExpandedPrevious) ||
 			(i>=nbcExpandedShowing && i<nbcExpandedShowing+nbcPerPage)
-			) {
+		) {
 			s = s + nbcFormatResult(results[i]);
 			added++;
-			if (++d==nbcPerLine) {
-				s = s + '</div><br/><div class="resultRow">';
-				d=0;
-			}
 		}
-	}
-	
-	s = s + '</div>';
-
-	if (nbcExpandedShowing>0) {
-		var n = 'p'+rndStr();
-		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
 	}
 
 	$('#results-container').html($('#results-container').html()+s);
 
-	if (nbcExpandedShowing>0)
-		$('#'+n).show('normal');
-
+/*
+	if (nbcExpandedShowing>0) {
+		var n = 'p'+rndStr();
+		s = '<div id="'+n+'" style="display:none">'+s+'</div>';
+	}
+*/
 	nbcExpandedShowing = nbcExpandedShowing + added;
 
-	if (nbcExpandedShowing==added)
-		nbcRemoveShowMoreButton();
-
 	if (nbcExpandedShowing==added && nbcExpandedShowing < nbcData.count.results) {
-		$("#paging-footer").append('<li id="show-more"><input type="button" id="show-more-button" onclick="nbcPrintResults();return false;" value="'+_('meer resultaten laden')+'" class="ui-button"></li>');
-		$("#footerPagination").removeClass('noline').addClass('noline');
+		$("#paging-footer").html("<input class='ui-button' id='show-more-button' onclick='nbcPrintResults();return false;' type='button' value='"+_('meer resultaten laden')+"'>");
 	}
 
-	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
-		nbcRemoveShowMoreButton();
+//	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
+//		nbcRemoveShowMoreButton();
 
 	nbcExpandedPrevious = null;
 	
@@ -282,67 +232,44 @@ function nbcFormatResult(data) {
 		if (data.x) data.m = data.x;
 	}
 
- 	return '<div class="result'+(data.h ? ' result-highlight' : '')+'" id="res-'+id+'"> \
-        <div class="result-result"> \
-			<div class="result-image-container">'+
-				(data.n ? '<a rel="prettyPhoto[gallery]" href="'+data.m+'" pTitle="'+escape(photoLabel)+'" title="">' : '')+
-				'<img class="result-image" src="'+data.m+'" />' +
-				(data.n ? '</a>' : '' )+
-            '</div> \
-			<div class="result-labels">'+
-				(data.g ? '<img class="result-gender-icon" src="'+nbcImageRoot+data.g+'.png" title="'+(data.e ? data.e : '')+'" />' : '' )+
-                '<span class="result-name-scientific">'+data.s+'</span> '+
-				(data.y=='m'? '<br /><a href="?mtrx='+data.i+'&main='+nbcData.matrix+'">Ga naar sleutel</a>' : '' )+
-                '<span class="result-name-common">'+(data.s!=data.l ? '<br />' + data.l : '')+'</span> \
-            </div> \
-        </div> \
-        <div class="result-icons"> \
-			<div class="result-icon'+( data.u ? '' : ' no-content')+'"'+
-				( data.u ? 
-					' onclick="window.open(\''+data.u+'\',\''+data.v+'\');" title="'+nbcLabelExternalLink+'"'+
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
-				(data.u ? '<img class="result-icon-image" src="'+nbcImageRoot+'information_grijs.png">' : '' ) +
-			'</div> \
-			<div class="result-icon'+( showStates ? '' : ' no-content')+'" id="tog-'+id+'" '+
-				( showStates ?
-					' onclick="nbcToggleSpeciesDetail(\''+id+'\');return false;" title="'+nbcLabelDetails+'"' +
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"': '' )+'>'+
-				(showStates ? '<img class="result-icon-image icon-info" src="'+nbcImageRoot+'lijst_grijs.png">' : '' ) +
-			'</div> \
-			<div class="result-icon'+( data.r ? '' : ' no-content')+'" '+
-				( data.r ? 
-					' onclick="nbcShowSimilar('+(data.i)+',\''+(data.t ? 'v' : 't')+'\');return false;"  title="'+nbcLabelSimilarSpecies+'"' +
-					' onmouseover="nbcSwitchImagename(this,1)" onmouseout="nbcSwitchImagename(this)"' : '' )+'>'+
-				( data.r ? '<img class="result-icon-image icon-similar" src="'+nbcImageRoot+'gelijk_grijs.png">' : '' ) +
-			'</div> \
-        </div>'+
-		(states && states.length > 0 ? 
-			'<div id="det-'+id+'" class="result-detail hidden"> \
-				<ul> \
-					<li>'+states.join('</li><li>')+'</li> \
-				</ul> \
-			</div> ' : '' ) + '\
-    </div> \
-	';
+	var book=details=resemblance="<div class='result-icon no-content'></div>";
 
-}
+	if (data.u)
+		book="<div class='result-icon icon-book' onClick='window.open(\""+data.u+"\",\""+data.v+"\");' title='"+nbcLabelExternalLink+"'></div>";
+	if (showStates)
+		details="<div class='result-icon icon-details' id='tog-"+id+"' onClick='nbcToggleSpeciesDetail(\""+id+"\");return false;' title='"+nbcLabelDetails+"'></div>";
+	if (data.r)
+		resemblance="<div class='result-icon icon-resemblance' onClick='nbcShowSimilar("+(data.i)+",\""+(data.t ? "v" : "t")+"\");return false;' title='"+nbcLabelSimilarSpecies+"'></div>";
+	
+	return "<div class='result' id='res-"+id+"'> \
+		  <div class='result-result'> \
+			<div class='result-image-container passepartout'>"+
+			  (data.n ? "<a href='"+data.m+"' ptitle='"+escape(photoLabel)+"' rel='prettyPhoto[gallery]' title=''>" : "" )+" \
+				<img class='result-image' src='"+data.m+"'>"+
+			  (data.n ? "</a>" : "" )+" \
+			</div> \
+			<div class='result-labels'>"+
+			(data.g ? "<img class='result-gender-icon' src='"+nbcImageRoot+data.g+".png' title='"+(data.e ? data.e : '')+"' />" : "" )+" \
+			  <span class='result-name-scientific'>"+data.s+"</span>"+
+			(data.y=='m'? "<br /><a href='?mtrx="+data.i+"&main="+nbcData.matrix+"'>"+_('Ga naar sleutel')+"</a>" : "" )+" \
+			  <span class='result-name-common'>"+(data.s!=data.l ? '<br />' + data.l : '')+"</span> \
+			</div> \
+		  </div> \
+		  <div class='result-icons'>"+book+details+resemblance+" \
+		  </div>"+
+		  (states && states.length > 0 ? 
+			  "<div class='result-detail hidden' id='det-"+id+"' style='display: block;'> \
+					<ul> \
+					  <li>"+states.join('</li><li>')+"</li> \
+					</ul> \
+				</div>"
+				: "")+
+		"</div>";
 
-function nbcSwitchImagename(ele,state) {
-	var p = '_grijs';
-	$(ele).find('img').attr('src',state==1 ? $(ele).find('img').attr('src').replace(p,'') : $(ele).find('img').attr('src').replace('.png',p+'.png'));	
-}
-
-function nbcResetClearButton() {
-	if (nbcData.paramCount==0) {
-		$('#clearSelectionContainer').removeClass('ghosted').addClass('ghosted');
-	} else {
-		$('#clearSelectionContainer').removeClass('ghosted');
-	}
 }
 
 function nbcRemoveShowMoreButton() {
-	$("#show-more").remove();
-	$("#footerPagination").removeClass('noline');	
+	$("#show-more-button").remove();
 }
 
 
@@ -354,106 +281,35 @@ function nbcDoOverhead() {
 function nbcClearOverhead() {
 	$('#result-count').html('');
 	$('#similarSpeciesHeader').removeClass('visible').addClass('hidden');
-	$('#similarSpeciesHeader').html('');
+	$('#similarSpeciesName').html('');
 }
 
 function nbcPrintOverhead() {
-
-	if (nbcBrowseStyle=='expand') {
-
-		$('#result-count').html((nbcExpandedShowing > 1 ? '1-'+nbcExpandedShowing : nbcExpandedShowing)+'&nbsp;'+_('van')+'&nbsp;'+nbcData.count.results);
-		return;
-
-	}
-
-	var count = nbcData.count;
-	
-	nbcFullDatasetCount = (nbcFullDatasetCount==0) ? count.all : nbcFullDatasetCount;
-	
-	$('#result-count').html(
-		sprintf(
-			'<strong style="color:#333">%s</strong> %s',
-			count.results,
-			sprintf(
-				_(' van %s '),
-					sprintf(
-						'<strong style="color:#777;">%s</strong>',
-						nbcFullDatasetCount
-					)
-				)
-			)
-		);
-}
-
-function nbcDoPaging() {
-	nbcClearPaging();
-	if (nbcData.count) nbcPrintPaging();
-}
-
-function nbcClearPaging() {
-
-	if (!nbcPaginate) return;
-
-	$('#paging-header').html('');	
-	$('#paging-footer').html('');	
-}
-
-function nbcPrintPaging() {
-
-	if (!nbcPaginate) return;
-
-	var count = nbcData.count;
-
-	nbcLastPage = Math.ceil(count.results / nbcPerPage);
-	nbcCurrPage = Math.floor(nbcStart / nbcPerPage);
-
-	if (nbcLastPage > 1 && nbcCurrPage!=0)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'p\');return false;">&lt;&lt;</a></li>');
-	
-	if (nbcLastPage>1) { 
-	
-		for (var i=0;i<nbcLastPage;i++) {
-	
-			if (i==nbcCurrPage)
-				$("#paging-header").append('<li><strong>'+(i+1)+'</strong></li>');
-		    else
-				$("#paging-header").append('<li><a href="#" onclick="nbcBrowse('+i+');return false;">'+(i+1)+'</a></li>');
-	
-		}
-		
-	}
-
-	if (nbcLastPage > 1 && nbcCurrPage<nbcLastPage-1)
-		$("#paging-header").append('<li><a href="#" onclick="nbcBrowse(\'n\');return false;" class="last">&gt;&gt;</a></li>');
-
-	$("#paging-footer").html($("#paging-header").html());
+	$('#result-count').html((nbcExpandedShowing > 1 ? '1-'+nbcExpandedShowing : nbcExpandedShowing)+'&nbsp;'+_('van')+'&nbsp;'+nbcData.count.results);
 }
 
 function nbcShowSimilar(id,type) {
 
-	nbcPreviousBrowseStyles.paginate = nbcPaginate;
 	nbcPreviousBrowseStyles.expand = nbcExpandResults;
 	nbcPreviousBrowseStyles.expandShow = nbcExpandedShowing;
 	nbcPreviousBrowseStyles.expandPrev = nbcExpandedPrevious;
 	nbcPreviousBrowseStyles.lastPos = getPageScroll();
 
-	nbcSetPaginate(false);
 	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type,refreshCount:false});
+	nbcGetResults({action:'similar',id:id,type:type,refreshGroups:true});
 	nbcSaveSessionSetting('nbcSimilar',[id,type]);
 
 }
 
 function nbcPrintSimilarHeader() {
 
-	var label = nbcData.results[0].l;
-
+	var label = nbcData.results[0].s+' '+nbcData.results[0].l;
+	
 	$('#similarSpeciesHeader').html(
 		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
 		'<br />'+
 		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		'<span id="show-all-divider"> | </span>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">'+nbcLabelShowAll+'</a>'
+		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">!'+nbcLabelShowAll+'</a>'
 	);
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 
@@ -465,16 +321,15 @@ function nbcPrintSimilarHeader() {
 
 function nbcCloseSimilar() {
 
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
 	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
 
-	nbcGetResults();
-	nbcClearOverhead();
+	nbcGetResults({clearOverhead:true,scrollWindow:true});	
+//	nbcClearOverhead();
 	nbcSaveSessionSetting('nbcSimilar');
 
-	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
+//	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
 	
 }
 
@@ -488,7 +343,6 @@ function nbcClearSearchTerm() {
 
 function nbcCloseSearch() {
 
-	nbcSetPaginate(nbcPreviousBrowseStyles.paginate);
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
 	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
@@ -505,34 +359,11 @@ function nbcCloseSearch() {
 
 function nbcPrintSearchHeader() {
 
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Zoekresultaten voor %s'),'<span id="searchedForTerm">'+nbcSearchTerm+'</span>')+'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>'
-	);
+	$('#similarSpeciesLabel').html(_('Zoekresultaten voor'));
+	$('#similarSpeciesName').html('<span id="searchedForTerm">'+nbcSearchTerm+'</span>');
+//	$('#similarSpeciesBack').html('<a class="clearSimilarSelection" href="#" onclick="nbcCloseSearch();return false;">'+nbcLabelBack+'</a>');
 	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
 }
-
-
-
-function nbcBrowse(id) {
-
-	if (id=='n')
-	    nbcStart = nbcStart+nbcPerPage;
-	else 
-	if (id=='p')
-    	nbcStart = nbcStart-nbcPerPage;
-	else
-		nbcStart = id * nbcPerPage;
-			
-	nbcSaveSessionSetting('nbcStart',nbcStart);
-	nbcClearResults();
-	nbcPrintResults();
-	nbcClearPaging();
-	nbcPrintPaging();
-
-}
-
-
 
 function nbcToggleSpeciesDetail(id,state) {
 
@@ -542,10 +373,10 @@ function nbcToggleSpeciesDetail(id,state) {
 		nbcDetailShowStates[id] = nbcDetailShowStates[id] ? !nbcDetailShowStates[id] : true;
 	
 	if (nbcDetailShowStates[id]) {
-		$('#det-'+id).css('display','block');
+		$('#det-'+id).removeClass('hidden');
 		$('#tog-'+id).attr('title',nbcLabelClose);
 	} else {
-		$('#det-'+id).css('display','none');
+		$('#det-'+id).addClass('hidden');
 		$('#tog-'+id).attr('title',nbcLabelDetails);
 	}
 	
@@ -581,18 +412,14 @@ function nbcShowStates(id) {
 			p : projectId
 		}),
 		success : function (data) {
-			console.log(data);
+			//console.log(data);
 			data = $.parseJSON(data);
-			$('#dialog-title').html(data.character.label);
-			$('#dialog-data').html(data.page);
-			
-/*
 			showDialog(
 				data.character.label,
 				data.page,
 				{width:data.width,height:data.height,showOk:data.showOk}
 			);
-*/			
+			
 			setCursor();
 		}
 	});
@@ -681,6 +508,9 @@ function nbcRefreshGroupMenu() {
 	
 			s = s  +"</ul>";
 
+			if (openGroup)
+				s = s + '<script> \n nbcToggleGroup('+v.id+'); \n </script>';
+
 			d.push(s);
 
 		} else {
@@ -760,6 +590,8 @@ function nbcSetState(p) {
 
 	setCursor('wait');
 
+//	jDialogCancel();
+
 	allAjaxHandle = $.ajax({
 		url : 'ajax_interface.php',
 		type: 'POST',
@@ -837,12 +669,6 @@ function nbcPrettyPhotoInit() {
  		social_tools: false
  	});
 
-}
-
-function nbcSetPaginate(state) {
-
-	nbcPaginate = state;
-	
 }
 
 function nbcSetExpandResults(state) {
@@ -951,17 +777,8 @@ function nbcInit() {
 	$('#legendSimilarSpecies').html(nbcLabelSimilarSpecies);
 	$('#legendExternalLink').html(nbcLabelExternalLink);
 
+	nbcSetExpandResults(true);
 
-	if (nbcBrowseStyle=='paginate') {
-		nbcSetPaginate(true);
-		nbcSetExpandResults(false);
-	} else
-	if (nbcBrowseStyle=='expand') {
-		nbcSetPaginate(false);
-		nbcSetExpandResults(true);
-	}
-
-	nbcPreviousBrowseStyles.paginate=nbcPaginate;
 	nbcPreviousBrowseStyles.expand=nbcExpandResults;
 
 	/*
@@ -973,7 +790,5 @@ function nbcInit() {
 		// "desktop" code
 	}
 	*/
-	$('.ui-widget-overlay').hide();
-	$('.ui-widget-dialog').hide();
 
 }

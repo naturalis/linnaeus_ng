@@ -1,5 +1,11 @@
 <?php
 
+/*
+
+	!!!! needs optimization: $this->getVariationStates($val['id'])
+
+*/
+
 include_once ('Controller.php');
 class MatrixKeyController extends Controller
 {
@@ -462,7 +468,6 @@ class MatrixKeyController extends Controller
 			));
 			
 			$countPerCharacter = $this->getRemainingCharacterCount();
-
 			
 			if ($includeGroups) {
 			
@@ -1865,7 +1870,7 @@ class MatrixKeyController extends Controller
 			'id' => $d, 
 			'columns' => 'characteristic_id,state_id'
 		));
-
+		
 		$res = array();
 			
         foreach ((array) $mts as $key => $val) {
@@ -2951,6 +2956,7 @@ class MatrixKeyController extends Controller
         // only keep the 100% scores, no partial matches for naturalis
         $res = array();
         foreach ((array) $matches as $match) {
+
             if ($match['s'] == 100) {
 
                 if ($match['type'] == 'variation') {
@@ -2986,9 +2992,10 @@ class MatrixKeyController extends Controller
                         'inclRelated' => false,
 						'details' => $this->_matrixSuppressDetails ? null : $this->getVariationStates($val['id'])
                     ));
+					
                 } else
                 if ($match['type'] == 'matrix') {
-					
+
 					$image = $match['l'].'.jpg';
 
                     $res[] = $this->createDatasetEntry(
@@ -3000,7 +3007,7 @@ class MatrixKeyController extends Controller
                         'inclRelated' => false,
 						'details' => $this->_matrixSuppressDetails ? null : $this->getMatrixStates($match['id'])
                     ));
-					
+
                 }
                 else {
 
@@ -3046,11 +3053,11 @@ class MatrixKeyController extends Controller
                         'highlight' => 0,
 						'details' => $this->_matrixSuppressDetails ? null : $this->getTaxonStates($match['id'])
                     ));
+
                 }
             }
         }
 
-        
         if (count((array)$res)==1) {
             
             $res[0]['d'] =
