@@ -1,4 +1,4 @@
-      <div id='graphicValueSelector'>
+	  <div id='graphicValueSelector'>
 		{*<p id="dialogHeader">{$c.label} - {if $c.info}{$c.info}{/if}</p>*}
         <p id='dialogSelectorWindow'></p>
         <div id='dialog-content-inner-inner'>
@@ -24,27 +24,29 @@
            {/if}
             
 	{elseif $c.type=='media'}
-	          <table id='graphicValuesTable'>
-            <tbody>
 
-            <tr>
+        <div id='dialog-content-inner-inner'>
+          <div id='graphicValues'>
+
                 {foreach from=$s item=v name=foo}
                     {if $states[$c.id][$v.id]}{assign var=active value=true}{else}{assign var=active value=false}{/if}
                     {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=disabled value=true}{else}{assign var=disabled value=false}{/if}
-                    <td class={if $active}'active'{elseif $disabled}'disabled'{else}'selectable'{/if}>
-                        <div class='state-image-cell' style='padding:0;'>
-							{if !$disabled}<a href="#" onclick="{if $active}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');return false;">{/if}
-                            <img class="state-image" src="{if $v.file_name}{$projectUrls.projectMedia}{$v.file_name}{else}{$projectUrls.systemMedia}missing.jpg{/if}" />
-							{if !$disabled}</a>{/if}
-                            <p class="state-image-caption">{$v.label}</p>
-                        </div>
-						<p class='state-count'>{if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}</p>
 
-                    </td>
+<div class="state-image-cell {if $active}active{elseif $disabled}disabled{else}selectable{/if}" onclick="{if $active}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');">
+<img class="state-image" src="{if $v.file_name}{$projectUrls.projectMedia}{$v.file_name}{else}{$projectUrls.systemMedia}missing.jpg{/if}" />
+<p class="state-image-caption">
+{$v.label}
+</p>
+<p class='state-count'>
+{if !$active}({if $remainingStateCount[$v.id]}{$remainingStateCount[$v.id]}{else}0{/if}){/if}
+</p>
+</div>
+
     	        {/foreach}
-	            </tr>
-            </tbody>
-          </table>
+
+        </div>
+      </div>
+
        
 	{elseif $c.type=='text'}
    
