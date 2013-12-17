@@ -1,22 +1,15 @@
 {include file="../shared/head.tpl"}
 
   <body class='theme-bruin' style='cursor: default;'>
-    <!-- ***changes*** Added class for color of the facets. Use any of geel a oranje, rood, blauw, groen, paars, bruin, grijs -->
     
 {include file="../shared/navbar.tpl"}
 	
     <div id='container'>
       <a name='top'></a>
       <div id='main'>
-        <header class='header-grijs' id='header'>
-          <h1>
-            {$session.app.project.title}
-            <small>
-              {t}identification key{/t}
-            </small>
-          </h1>
-        </header>
-        <div id='dialogRidge'>
+
+		{snippet language=$currentLanguageId}titles.html{/snippet}
+
           <div id='left'>
             <div id='quicksearch'>
               <h2>{t}Zoek op naam{/t}</h2>
@@ -48,8 +41,7 @@
 		</div>
 		{/if}
 						
-            <div class='left-divider'></div>
-            <div id='legendContainer'>
+            <div id='legend'>
               <h2>{t}Legenda:{/t}</h2>
               <div class='legend-icon-cell'>
                 <span class='icon icon-book'></span>
@@ -84,29 +76,29 @@
               </h2>
               <div class='headerSelectionLabel' id='result-count'></div>
               <div id='similarSpeciesNav' class='hidden'>
-                <a href='#' id='clearSimilarSelection'>
+                <a href='#' id='clearSimilarSelection' onclick='nbcCloseSimilar()'>
                   <span class='icon icon-arrow-left'></span>
-                  back
+                  {t}terug{/t}
                 </a>
-                <a href='#' id='showAllLabel' class='hidden'>
+                <a href='#' id='showAllLabel' onclick='nbcToggleAllSpeciesDetail();return false;'>
                   <span class='icon icon-details'></span>
-                  hide all character states
+                  <span id='showAllLabelLabel'>{t}alle onderscheidende kenmerken tonen{/t}</span>
                 </a>
               </div>
             </div>
             <div id='results'>
-              <div class='hidden' id='similarSpeciesHeader'></div>
+              <div class='hidden'></div>
               <div class='layout-landscapes' id='results-container'></div>
             </div>
             <div class='footerPagination noline' id='footerPagination'>
-              <input class='ui-button' id='show-more-button' onclick='nbcPrintResults();return false;' type='button' value='show more results'>
+              <input class='ui-button' id='show-more-button' onclick='nbcPrintResults();return false;' type='button' value='show more results' class='hidden'>
             </div>
           </div>
         </div>
-      </div>
+
       <div id='row-sender'>
-        <a href='http:/www.naturalis.nl'>
-          <img src='images/logo-naturalis.png'>
+        <a href='http:/www.naturalis.nl' tagreg='_blank'>
+          <img src='{$baseUrl}app/style/naturalis/images/logo-naturalis.png'>
         </a>
       </div>
     </div>
@@ -114,13 +106,13 @@
       <div class='navbar-container'>
         <p class='navbar-text navbar-left'>
           &copy; Naturalis 2005 - 2013  -
-          <a href='http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html' title='Disclaimer'>Colofon &amp; Disclaimer</a>
+          <a href='http://www.nederlandsesoorten.nl/nsr/nsr/colofon.html' title='Disclaimer'>{t}Colofon &amp; Disclaimer{/t}</a>
         </p>
-        <a class='up' href='#top'>up</a>
+        <a class='up' href='#top'>{t}up{/t}</a>
         <p class='navbar-text navbar-right' id='lng'>
-          Powered by
+          {t}Powered by{/t}
           <a href='#'>
-            <img src='images/lng.png'>
+            <img src='{$baseUrl}app/style/naturalis/images/lng.png'>
             Linnaeus NG
           </a>
         </p>

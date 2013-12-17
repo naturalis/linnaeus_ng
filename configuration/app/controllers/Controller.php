@@ -104,9 +104,25 @@
 	after which the function smartyTranslateGetSnippet searches for the specified file
 	in the projects snippet-folder, which is
 		[htdocs]/linnaeus_ng/www/app/media/project/_snippets/[project-code]/
-	if the file (or the directory) doesn't exist, sheer blankness is included.
-	please note the files are included "as is"; php or smarty-codes won't work.
-	
+	if the file (or the directory) doesn't exist, nothing is included, and no error is
+	generated.
+	if a snippet contains text and a project is multi-lingual, the snippet code can be
+	parametrized with the language ID, like this:
+		{snippet language=$currentLanguageId}titles.html{/snippet}
+	the smarty variable '$currentLanguageId' is assigned by default (in preparePage()),
+	and is always available. when the language ID is thus specified, the system looks
+	for a file with that ID (formatted in a similar fashion as the pId, preceded by '--')
+	added after the	file's name, before the extension. if that file does not exist,
+	the system looks a file with a regular name (without the added ID) instead. so, if
+	this is included:
+		{snippet language=$currentLanguageId}titles.html{/snippet}
+	and $currentLanguageId is '24', the system will first look in the snippet-folder for
+		titles--0024.html
+	and if that doesn't exist, for
+		titles.html
+	please note the files are included "as is"; php or smarty-codes won't work. javascript
+	will, but is discouraged.
+
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
@@ -1693,8 +1709,21 @@ class Controller extends BaseClass
 
 	public function smartyTranslateGetSnippet($params, $content, &$smarty, &$repeat)
 	{
-		if (file_exists($this->getProjectUrl('projectSnippets').$content)) {
-			return @file_get_contents($this->getProjectUrl('projectSnippets').$content);
+		
+		if (is_null($content)) return;
+		
+		$file=$this->getProjectUrl('projectSnippets').$content;
+
+		if(isset($params['language'])) {
+			$d=pathinfo($file);
+			$translated=$this->getProjectUrl('projectSnippets').$d["filename"].'--'.sprintf('%04s',$params['language']).'.'.$d["extension"];
+			if (file_exists($translated)) {
+				$file=$translated;
+			}
+		}
+
+		if (file_exists($file)) {
+			return @file_get_contents($file);
 		} else {
 			return;
 		}
