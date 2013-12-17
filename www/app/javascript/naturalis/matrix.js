@@ -45,6 +45,7 @@ function nbcGetResults(p) {
 			if (p && p.closeDialog==true) jDialogCancel();
 			if (p && p.refreshGroups==true) nbcRefreshGroupMenu();
 			if (p && p.scrollWindow==true) window.scroll(0,nbcPreviousBrowseStyles.lastPos);
+			if (p && p.scrollTop==true) window.scroll(0,0);
 
 			setCursor();
 		}
@@ -77,12 +78,12 @@ function nbcDoSearch() {
 		success : function (data) {
 			//console.log(data);
 			nbcData = $.parseJSON(data);
-			//nbcRemoveShowMoreButton();
 			nbcDoResults();
 			nbcDoOverhead();
 			nbcPrintSearchHeader();
 			nbcSaveSessionSetting('nbcSearch',nbcSearchTerm);
 			setCursor();
+			nbcShowShowMoreButton(false);
 			return false;
 
 		}
@@ -101,7 +102,7 @@ function nbcDoResults(p) {
 	nbcClearResults();
 	if (nbcData.results)
 		nbcPrintResults();
-	//else nbcRemoveShowMoreButton();
+	//else nbcShowShowMoreButton();
 	
 }
 
@@ -112,13 +113,6 @@ function nbcClearResults() {
 }
 
 function nbcPrintResults() {
-
-	nbcPrintResultsExpanded();
-	nbcPrettyPhotoInit();
-
-}
-
-function nbcPrintResultsExpanded() {
 
 	var results = nbcData.results;
 	var s = '';
@@ -148,12 +142,14 @@ function nbcPrintResultsExpanded() {
 		$("#paging-footer").html("<input class='ui-button' id='show-more-button' onclick='nbcPrintResults();return false;' type='button' value='"+_('meer resultaten laden')+"'>");
 	}
 
-//	if (nbcExpandedShowing>added && nbcExpandedShowing >= nbcData.count.results)
-//		nbcRemoveShowMoreButton();
+	if (nbcExpandedShowing<nbcData.count.results)
+		nbcShowShowMoreButton(true);
+	else
+		nbcShowShowMoreButton(false);
 
 	nbcExpandedPrevious = null;
-	
 	nbcDoOverhead();
+	nbcPrettyPhotoInit();
 
 }
 
@@ -219,7 +215,7 @@ function nbcFormatResult(data) {
 			else
 				var l = labels[0];
 
-			states.push('<span class="result-detail-label">'+t +':</span> <span class="result-detail-value">'+l+'</span>');
+			states.push('<span class="result-detail-label">'+t +': </span><span class="result-detail-value">'+l+'</span>');
 		}
 		
 	}
@@ -232,33 +228,38 @@ function nbcFormatResult(data) {
 		if (data.x) data.m = data.x;
 	}
 
-	var book=details=resemblance="<div class='result-icon no-content'></div>";
+	var gender='';//' &#9794;'
+	var book=details=resemblance="<div class='icon no-content'></div>";
 
+	if (data.g) {
+		if (data.g=='m') gender="<span class='gender'>&#9794;</span>";
+		else
+		if (data.g=='f') gender="<span class='gender'>&#9792;</span>"
+	}
 	if (data.u)
-		book="<div class='result-icon icon-book' onClick='window.open(\""+data.u+"\",\""+data.v+"\");' title='"+nbcLabelExternalLink+"'></div>";
+		book="<div class='icon icon-book' onclick='window.open(\""+data.u+"\",\""+data.v+"\");' title='"+nbcLabelExternalLink+"'></div>";
 	if (showStates)
-		details="<div class='result-icon icon-details' id='tog-"+id+"' onClick='nbcToggleSpeciesDetail(\""+id+"\");return false;' title='"+nbcLabelDetails+"'></div>";
+		details="<div class='icon icon-details' id='tog-"+id+"' onclick='nbcToggleSpeciesDetail(\""+id+"\");return false;' title='"+nbcLabelDetails+"'></div>";
 	if (data.r)
-		resemblance="<div class='result-icon icon-resemblance' onClick='nbcShowSimilar("+(data.i)+",\""+(data.t ? "v" : "t")+"\");return false;' title='"+nbcLabelSimilarSpecies+"'></div>";
+		resemblance="<div class='icon icon-resemblance' onclick='nbcShowSimilar("+(data.i)+",\""+(data.t ? "v" : "t")+"\");return false;' title='"+nbcLabelSimilarSpecies+"'></div>";
 	
 	return "<div class='result' id='res-"+id+"'> \
 		  <div class='result-result'> \
-			<div class='result-image-container passepartout'>"+
+			<div class='result-image-container'>"+
 			  (data.n ? "<a href='"+data.m+"' ptitle='"+escape(photoLabel)+"' rel='prettyPhoto[gallery]' title=''>" : "" )+" \
 				<img class='result-image' src='"+data.m+"'>"+
 			  (data.n ? "</a>" : "" )+" \
 			</div> \
-			<div class='result-labels'>"+
-			(data.g ? "<img class='result-gender-icon' src='"+nbcImageRoot+data.g+".png' title='"+(data.e ? data.e : '')+"' />" : "" )+" \
-			  <span class='result-name-scientific'>"+data.s+"</span>"+
+			<div class='result-labels'> \
+			  <span class='result-name-scientific'>"+data.s+gender+"</span>"+
 			(data.y=='m'? "<br /><a href='?mtrx="+data.i+"&main="+nbcData.matrix+"'>"+_('Ga naar sleutel')+"</a>" : "" )+" \
-			  <span class='result-name-common'>"+(data.s!=data.l ? '<br />' + data.l : '')+"</span> \
+			  <span class='result-name-common'>"+(data.s!=data.l ? data.l : '')+"</span> \
 			</div> \
 		  </div> \
 		  <div class='result-icons'>"+book+details+resemblance+" \
 		  </div>"+
 		  (states && states.length > 0 ? 
-			  "<div class='result-detail hidden' id='det-"+id+"' style='display: block;'> \
+			  "<div class='result-detail hidden' id='det-"+id+"'> \
 					<ul> \
 					  <li>"+states.join('</li><li>')+"</li> \
 					</ul> \
@@ -268,8 +269,11 @@ function nbcFormatResult(data) {
 
 }
 
-function nbcRemoveShowMoreButton() {
-	$("#show-more-button").remove();
+function nbcShowShowMoreButton(state) {
+	if (state)
+		$("#show-more-button").removeClass('hidden');
+	else
+		$("#show-more-button").addClass('hidden');
 }
 
 
@@ -296,7 +300,7 @@ function nbcShowSimilar(id,type) {
 	nbcPreviousBrowseStyles.lastPos = getPageScroll();
 
 	nbcSetExpandResults(false);
-	nbcGetResults({action:'similar',id:id,type:type,refreshGroups:true});
+	nbcGetResults({action:'similar',id:id,type:type,refreshGroups:true,scrollTop:true});
 	nbcSaveSessionSetting('nbcSimilar',[id,type]);
 
 }
@@ -304,32 +308,23 @@ function nbcShowSimilar(id,type) {
 function nbcPrintSimilarHeader() {
 
 	var label = nbcData.results[0].s+' '+nbcData.results[0].l;
-	
-	$('#similarSpeciesHeader').html(
-		sprintf(_('Gelijkende soorten van %s'),'<span id="similarSpeciesName">'+label+'</span>')+
-		'<br />'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcCloseSimilar();return false;">'+nbcLabelBack+'</a>'+
-		'<a class="clearSimilarSelection" href="#" onclick="nbcToggleAllSpeciesDetail();return false;" id="showAllLabel">!'+nbcLabelShowAll+'</a>'
-	);
-	$('#similarSpeciesHeader').removeClass('hidden').addClass('visible');
+	$('#similarSpeciesLabel').html(_('Soorten gelijkend op'));
+	$('#similarSpeciesName').html(label);
+	$('#similarSpeciesHeader').removeClass('hidden');
 
-	var t=$('.icon-info:visible').not('.legend-icon-image').length!=0;
-	$('#showAllLabel').toggle(t);
-	$('#show-all-divider').toggle(t);
+	$('#showAllLabelLabel').html(nbcLabelShowAll);
+	$('#similarSpeciesNav').removeClass('hidden');
 
 }
 
 function nbcCloseSimilar() {
 
+	$('#similarSpeciesNav').addClass('hidden');
 	nbcSetExpandResults(nbcPreviousBrowseStyles.expand);
 	nbcExpandedShowing = nbcPreviousBrowseStyles.expandShow;
 	nbcExpandedPrevious = nbcPreviousBrowseStyles.expandPrev;
-
 	nbcGetResults({clearOverhead:true,scrollWindow:true});	
-//	nbcClearOverhead();
 	nbcSaveSessionSetting('nbcSimilar');
-
-//	window.scroll(0,nbcPreviousBrowseStyles.lastPos);
 	
 }
 
@@ -383,17 +378,14 @@ function nbcToggleSpeciesDetail(id,state) {
 }
 
 function nbcToggleAllSpeciesDetail() {
-	
-	var currHiding = ($('#showAllLabel').html()==nbcLabelShowAll);
+
+	var currHiding = ($('#showAllLabelLabel').html()==nbcLabelShowAll);
 	
 	$('[id^="tog-"]').each(function(){
 		nbcToggleSpeciesDetail($(this).attr('id').replace(/(tog-)/,''), currHiding ? 'show' : 'hide' );
 	});
 
-	if (currHiding)
-		$('#showAllLabel').html(nbcLabelHideAll);
-	else
-		$('#showAllLabel').html(nbcLabelShowAll);
+	$('#showAllLabelLabel').html(currHiding ? nbcLabelHideAll : nbcLabelShowAll);
 
 }
 

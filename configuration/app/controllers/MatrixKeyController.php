@@ -2325,7 +2325,7 @@ class MatrixKeyController extends Controller
             $d['g'] = $gender[0];
             $d['e'] = $gender[1];
 		}
-        
+
         if ($inclRelated && !empty($related))
             $d['related'] = $related;
         
@@ -3083,13 +3083,15 @@ class MatrixKeyController extends Controller
 
 	private function nbcExtractGenderTag($label)
 	{
-		if (preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches)) {
+		if (
+			preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches) ||
+			preg_match('/\s(male|female|both)(\s|$)/', $label, $matches)
+			) {
 			$gender = trim($matches[1]);
 			$label = preg_replace('/\s(' . $gender . ')(\s|$)/', ' ', $label);
-			$gender = ($gender=='beide' ? null : $gender);
+			$gender = ($gender=='beide' ? null : $gender=='man' || $gender=='male' ? 'm' : 'f');
 		} else
 			$gender = null;
-		
 		return array(
 			'gender' => $gender,
 			'label' => $label,

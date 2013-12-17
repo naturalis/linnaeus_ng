@@ -228,7 +228,6 @@ function nbcFormatResult(data) {
 			h : highlight (bool)
 			d : full species details (only when comparing or resultset has only one taxon/variation)
     */
-	
 	var showDetails = nbcData.results.length <= nbcPerPage;
 
 	if (data.l!=data.c && data.l.indexOf(data.c)===0) {
