@@ -97,7 +97,7 @@
         </div>
 
       <div id='row-sender'>
-        <a href='http:/www.naturalis.nl' tagreg='_blank'>
+        <a href='http://www.naturalis.nl' tagreg='_blank'>
           <img src='{$baseUrl}app/style/naturalis/images/logo-naturalis.png'>
         </a>
       </div>

@@ -2,7 +2,7 @@
       <!-- ***changes*** ADDED TOPBAR ELEMENT with CLASSES and descendants -->
       <div class='navbar-container'>
         <div class='navbar-header'>
-          <a class='navbar-brand' href='#'>
+          <a class='navbar-brand' href='http://www.naturalis.nl/'>
             <span class='icon icon-arrow-left'></span>
             go to Naturalis
           </a>
