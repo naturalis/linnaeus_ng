@@ -307,7 +307,7 @@ function nbcShowSimilar(id,type) {
 
 function nbcPrintSimilarHeader() {
 
-	var label = nbcData.results[0].s+' '+nbcData.results[0].l;
+	var label = nbcData.results[0].s+(nbcData.results[0].l ? ', '+nbcData.results[0].l : '');
 	$('#similarSpeciesLabel').html(_('Soorten gelijkend op'));
 	$('#similarSpeciesName').html(label);
 	$('#similarSpeciesHeader').removeClass('hidden');

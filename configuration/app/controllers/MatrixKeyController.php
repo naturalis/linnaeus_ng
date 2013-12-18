@@ -145,6 +145,7 @@ class MatrixKeyController extends Controller
         $this->checkMasterMatrixId();
 
         $id = $this->getCurrentMatrixId();
+		$this->setTotalEntityCount();
 
         if (!isset($id)) {
             $this->storeHistory = false;
@@ -323,7 +324,10 @@ class MatrixKeyController extends Controller
     public function ajaxInterfaceAction ()
     {
 		
-		if ($this->rHasVar('key')) $this->setCurrentMatrixId($this->requestData['key']);
+		if ($this->rHasVar('key')) {
+			$this->setCurrentMatrixId($this->requestData['key']);
+			$this->setTotalEntityCount();
+		}
 		
 		if (!$this->rHasVal('action'))
 		{
@@ -1145,7 +1149,6 @@ class MatrixKeyController extends Controller
 			return;
 
 		$this->setCurrentMatrixId($this->requestData['mtrx']);
-
 		$this->setTotalEntityCount();
 			
     }
