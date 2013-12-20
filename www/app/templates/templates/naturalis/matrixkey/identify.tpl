@@ -107,7 +107,7 @@
 
   </body>
 
-<div id="jDialog" title="" class="ui-helper-hidden"></div>
+<div id="jDialog" title="" class="ui-helper-hidden"  style="overflow-y:scroll"></div>
 
 
 {literal}
