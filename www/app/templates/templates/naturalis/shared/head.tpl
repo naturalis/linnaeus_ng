@@ -23,4 +23,5 @@
 {/if}
 <!-- customized version of prettyPhoto, spcifically altered for boktorren key; overwrites the prettyPhoto -->
 <script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
+<link rel="shortcut icon" href="{$baseUrl}app/style/naturalis/images/favicon.ico">
   </head>
