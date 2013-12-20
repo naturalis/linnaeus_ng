@@ -21,6 +21,10 @@
 	<!--[if IE]><script type="text/javascript" src="{$baseUrl}app/javascript/{$javascriptsToLoad.IE[i]}"></script><![endif]-->
 {/section}
 {/if}
+    <!--[if lt IE 9]>
+		<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/html5shiv.js"></script>
+		<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/respond.js"></script>
+    <![endif]-->
 <!-- customized version of prettyPhoto, spcifically altered for boktorren key; overwrites the prettyPhoto -->
 <script type="text/javascript" src="{$baseUrl}app/javascript/project_specific/jquery.prettyPhoto.custom.js"></script>
 <link rel="shortcut icon" href="{$baseUrl}app/style/naturalis/images/favicon.ico">
