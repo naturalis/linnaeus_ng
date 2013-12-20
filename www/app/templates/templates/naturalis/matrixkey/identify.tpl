@@ -29,7 +29,7 @@
 
           <div class='control'>
             <span class='icon icon-reload'></span>
-            <a href='#' onclick='nbcClearStateValue();nbcClearSearchTerm();return false;'>
+            <a href='#' onclick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();return false;">
               {t}Opnieuw beginnen{/t}
             </a>
           </div>
@@ -76,7 +76,7 @@
               </h2>
               <div class='headerSelectionLabel' id='result-count'></div>
               <div id='similarSpeciesNav' class='hidden'>
-                <a href='#' id='clearSimilarSelection' onclick='nbcCloseSimilar()'>
+                <a href='#' id='clearSimilarSelection' onclick='nbcCloseSimilar();'>
                   <span class='icon icon-arrow-left'></span>
                   {t}terug{/t}
                 </a>
