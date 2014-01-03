@@ -63,11 +63,17 @@ class ProjectsController extends Controller
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
-		
-		
-		
-	
 	);
+
+/*
+
+		array('matrixtype','lng / nbc','nbc','multi entry-key type'),
+			should use
+		if (!defined('MATRIX_STYLE_LNG')) define('MATRIX_STYLE_LNG','lng');
+		if (!defined('MATRIX_STYLE_NBC')) define('MATRIX_STYLE_NBC','nbc');
+
+*/
+
 
     /**
      * Constructor, calls parent's constructor

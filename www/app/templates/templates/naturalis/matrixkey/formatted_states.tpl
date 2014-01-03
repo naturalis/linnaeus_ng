@@ -52,13 +52,20 @@
    
         <ul class="facetListType">
             {foreach from=$s item=v key=k}
+			
             {if $states[$c.id][$v.id]}{assign var=selected value=true}{else}{assign var=selected value=false}{/if}
             {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=irrelephant value=true}{else}{assign var=irrelephant value=false}{/if}
-            <li {if $irrelephant}class="irrelevant"{/if}>
-                <span class="selected" style="{if $selected}font-weight:bold{/if}">
+
+            <li {if $selected}class="active"{elseif $irrelephant}class="irrelevant"{/if}>
+
+				{if $irrelephant && !$selected}
+					<a>{$v.label}</a>
+				{else}
                     <a href="#" onclick="{if $selected}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');closeDialog();return false;">
-                    <img src="{$session.app.system.urls.systemMedia}orange_checkbox_{if $selected}on{else}off{/if}.png" style="margin-right:10px">{$v.label}</a>
-                </span>
+					{$v.label}
+					</a>
+				{/if}
+
                 {if $remainingStateCount[$v.id] && !$selected}({$remainingStateCount[$v.id]}){/if}
             </li>
             {/foreach}

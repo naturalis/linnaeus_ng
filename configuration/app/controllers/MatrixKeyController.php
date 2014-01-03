@@ -1168,10 +1168,28 @@ class MatrixKeyController extends Controller
 
     private function checkMasterMatrixId ()
     {
+
+        $mts = $this->models->MatrixTaxonState->_get(
+        array(
+            'id' => array(
+                'project_id' => $this->getCurrentProjectId(), 
+                'matrix_id !=' => $this->getCurrentMatrixId(), 
+                'ref_matrix_id' => $this->getCurrentMatrixId()
+            ), 
+            'columns' => 'distinct matrix_id'
+        ));		
+		
+		if ($mts)
+			$this->setMasterMatrixId($mts[0]['matrix_id']);
+		else
+			$this->setMasterMatrixId(null);
+
+		/*		
         if ($this->rHasVal('main'))
 			$this->setMasterMatrixId($this->requestData['main']);
 		else
 			$this->setMasterMatrixId(null);
+		*/
     }
 
     private function setTotalEntityCount ($id=null)
