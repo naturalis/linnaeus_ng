@@ -147,15 +147,24 @@ function showDialog(title,content,vars,resize) {
 	if ($('#jDialog').length!=0) {
 
 		$('#jDialog').html(null);
-		
+
+		/*		
 		var buttons = {
 			// callback functions must exist in the dialog's html (or elsewhere within scope)
 			"ok": function() {jDialogOk();},
-			"sluiten": function() {jDialogCancel();}
+			"close": function() {jDialogCancel();}
 		};
 		
 		if (!vars.showOk) 
 			delete buttons.ok;
+		*/
+
+		var buttons = [];
+
+		if (vars.showOk)
+			buttons = [{text:_("ok"), click: function() {jDialogOk();}}];
+
+		buttons.push({text:_("sluiten"), click: function() {jDialogCancel();}});
 
 		$("#jDialog").dialog({
 			dialogClass: "no-close",

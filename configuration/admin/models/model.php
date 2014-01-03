@@ -21,6 +21,7 @@ abstract class Model extends BaseClass
 	private $_projectId=false;
 	public $doLog = true;
 	private $_affectedRows = 0;
+	private $_currentWhereArray=null;
 	
     public function __construct ($tableBaseName = false)
     {
@@ -457,6 +458,8 @@ abstract class Model extends BaseClass
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 		$where = isset($params['where']) ? $params['where'] : false;
+		
+		$this->setCurrentWhereArray($id);
 
         unset($this->data);
         
@@ -575,7 +578,7 @@ abstract class Model extends BaseClass
         $query = str_ireplace('%pre%', $this->_tablePrefix, $query);
     
         $set = mysql_query($query);
-         
+
         $this->logQueryResult($set,$query,'freeQuery');
         $this->setLastQuery($query);
     
@@ -598,6 +601,31 @@ abstract class Model extends BaseClass
         return isset($this->data) ? $this->data : null;
     
     }
+	
+	public function makeWhereString ($p=null,$alias=null)
+	{
+		if (!is_null($p))
+			$this->setCurrentWhereArray($p);
+
+		if (!is_array($this->getCurrentWhereArray()))
+			return;
+
+		$d=
+			implode(' and ', 
+				array_map(
+					function ($v, $k)
+					{
+						$d=is_numeric($v)?"%s":"'%s'";
+						return sprintf(chr(21)."%s=$d", $k, $v);
+					}, 
+					$this->getCurrentWhereArray(), 
+					array_keys($this->getCurrentWhereArray()
+					)
+				)
+			);
+
+		return str_replace(chr(21),(is_null($alias)?null:$alias.'.'),$d);
+	}
 
 	/* DEBUG */
     public function q ()
@@ -606,6 +634,17 @@ abstract class Model extends BaseClass
         return $this->getLastQuery();
     
     }
+
+	private function setCurrentWhereArray($p=null)
+	{
+		if (is_array($p))
+			$this->_currentWhereArray=$p;
+	}
+
+	private function getCurrentWhereArray()
+	{
+		return $this->_currentWhereArray;
+	}
 
 	private function log($msg,$level=0)
 	{
@@ -831,6 +870,8 @@ abstract class Model extends BaseClass
 		$ignoreCase = isset($params['ignoreCase']) ? $params['ignoreCase'] : true;
 		$fieldAsIndex = isset($params['fieldAsIndex']) ? $params['fieldAsIndex'] : false;
 		$where = isset($params['where']) ? $params['where'] : false;
+		
+		$this->setCurrentWhereArray($id);
 
         $query = false;
 		
@@ -1063,7 +1104,5 @@ abstract class Model extends BaseClass
 		}
 
 	}
-
-
 
 }

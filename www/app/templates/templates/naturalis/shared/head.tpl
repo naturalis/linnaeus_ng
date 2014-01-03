@@ -4,11 +4,16 @@
 	<meta charset='utf-8'>
     <link href='{$baseUrl}app/style/naturalis/style.css' rel='stylesheet' title='default' type='text/css'>
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/naturalis/prettyPhoto/prettyPhoto.css" />
+{if $cssToLoad}
+{section name=i loop=$cssToLoad}
+	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
+{/section}
+{/if}
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-ui/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/matrix.js"></script>
-	<script type="text/javascript" src="{$baseUrl}app/javascript/dialog/jquery.modaldialog.js"></script>	
+	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/dialog/jquery.modaldialog.js"></script -->
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
 {if $javascriptsToLoad.all[i]|strpos:"http:"===false && $javascriptsToLoad.all[i]|strpos:"https:"===false}
