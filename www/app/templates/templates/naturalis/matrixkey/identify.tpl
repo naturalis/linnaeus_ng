@@ -29,7 +29,7 @@
 
           <div class='control'>
             <span class='icon icon-reload'></span>
-            <a href='#' onclick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();return false;">
+            <a href='#' onClick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();return false;">
               {t}Opnieuw beginnen{/t}
             </a>
           </div>
@@ -107,7 +107,7 @@
 
   </body>
 
-<div id="jDialog" title="" class="ui-helper-hidden"  style="overflow-y:scroll"></div>
+<div id="jDialog" title="" class="ui-helper-hidden"  style="overflow-y:scroll;"></div>
 
 
 {literal}
