@@ -45,7 +45,8 @@ parameters:
   count".chr(9)." : when set to 1, only the number of records in the resultset are returned (optional)
 ";
 
-		$this->checkProject();
+		// pid is mandatory, now checked in initialise()
+		//$this->checkProject();
 		$this->checkFromDate();
 		
 		if (is_null($this->getCurrentProjectId())||is_null($this->getFromDate())) {
@@ -162,7 +163,8 @@ parameters:
   taxon".chr(9)." : scientific name of the taxon to retrieve (mandatory)
 ";
 
-		$this->checkProject();
+		// pid is mandatory, now checked in initialise()
+		//$this->checkProject();
 		
 		if (is_null($this->getCurrentProjectId())) {
 			$this->sendErrors();
@@ -300,8 +302,19 @@ parameters:
     private function initialise()
     {
 		$this->useCache=false;
-		$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
-		$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
+		$this->checkProject();
+
+		if (is_null($this->getCurrentProjectId())) {
+
+			$this->addError('cannot get project settings.');
+
+		} else {
+
+			$this->_taxonUrl = $this->getSetting('ws_names_taxon_url');
+			$this->_useOldNsrLinks = $this->getSetting('ws_use_old_nsr_links')==1;
+
+		}
+
     }
 
 	private function checkProject()
