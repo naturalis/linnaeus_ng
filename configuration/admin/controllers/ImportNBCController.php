@@ -761,7 +761,7 @@ class ImportNBCController extends Controller
     }
 
 
-    public function nbcLabels2Action ()
+    public function nbcLabels2Action()
     {
 
         $this->checkAuthorisation(true);
@@ -805,7 +805,7 @@ class ImportNBCController extends Controller
     }
 
 
-    public function nbcLabels3Action ()
+    public function nbcLabels3Action()
     {
 		
         $this->checkAuthorisation(true);
@@ -1001,13 +1001,33 @@ class ImportNBCController extends Controller
 
 
 
-    private function getNewProjectId ()
+    private function getNewProjectId()
     {
         return (isset($_SESSION['admin']['system']['import']['project']['id'])) ? $_SESSION['admin']['system']['import']['project']['id'] : null;
     }
 
     private function getNewDefaultLanguageId ()
     {
+		
+        $lp = $this->models->LanguageProject->_get(array(
+            'id' => array(
+                'project_id' => $this->getNewProjectId(),
+				'def_language' => 1
+            )
+        ));
+
+		if ($lp)
+			return $lp[0]['language_id'];
+
+        $lp = $this->models->LanguageProject->_get(array(
+            'id' => array(
+                'project_id' => $this->getNewProjectId(),
+            )
+        ));
+		
+		if ($lp)
+			return $lp[0]['language_id'];
+			
         return $this->_defaultLanguageId;
     }
 

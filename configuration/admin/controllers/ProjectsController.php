@@ -63,6 +63,7 @@ class ProjectsController extends Controller
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
+		array('app_search_result_sort','alpha / token_count','token_count','show overview image in species media'),
 	);
 
 /*
