@@ -162,8 +162,11 @@ class SearchController extends Controller
 
     public function __construct ()
     {
+
         parent::__construct();
+
 		$this->initialize();
+
     }
 
     public function __destruct ()
@@ -189,7 +192,7 @@ class SearchController extends Controller
 				
 			if ($this->validateSearchString($this->requestData['search'])) {
 				
-				if (1==1 || $this->rHasVal('extended','1')) {
+				if ($this->rHasVal('extended','1')) {
 
 					$results =
 						$this->doSearch(
@@ -200,8 +203,6 @@ class SearchController extends Controller
 								'extended'=>true
 							)
 						);
-
-					$this->smarty->assign('results',$results);
 
 				} else {
 
@@ -217,15 +218,7 @@ class SearchController extends Controller
 							)
 						);
 
-					$d=
-						isset($results['data']['species']['results'][self::C_TAXA_ALL_NAMES]) ? 
-							$results['data']['species']['results'][self::C_TAXA_ALL_NAMES] : null;
-
-					$this->smarty->assign('results',$d);
-
 				}
-
-				$_SESSION['app'][$this->spid()]['search']['results']=$results;
 
 				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
 				$this->smarty->assign('results',$results);
@@ -244,6 +237,17 @@ class SearchController extends Controller
 			
 		}
 
+		$this->smarty->assign('CONSTANTS',
+			array(
+				'C_TAXA_SCI_NAMES'=>self::C_TAXA_SCI_NAMES,
+				'C_TAXA_DESCRIPTIONS'=>self::C_TAXA_DESCRIPTIONS,
+				'C_TAXA_SYNONYMS'=>self::C_TAXA_SYNONYMS,
+				'C_TAXA_VERNACULARS'=>self::C_TAXA_VERNACULARS,
+				'C_TAXA_ALL_NAMES'=>self::C_TAXA_ALL_NAMES,
+				'C_SPECIES_MEDIA'=>self::C_SPECIES_MEDIA,
+			)
+		);
+	
 		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
 		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
@@ -259,6 +263,8 @@ class SearchController extends Controller
 		$this->_excerptPreMatchLength = isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
 		$this->_excerptPostMatchLength = isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
 		$this->_excerptPrePostMatchString = isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
+
+		$this->_searchResultSort = $this->getSetting('app_search_result_sort','alpha');
 	
 	}
 
@@ -592,7 +598,7 @@ class SearchController extends Controller
 				'content' => 
 					($searchAll || (is_array($modules) && in_array('content',$modules)) ? $this->searchContent($p) : null),
 			);
-			
+	
 		$d=$this->searchModules($p,$freeModules);
 		$results=array_merge($results,(array)$d);
 
@@ -765,7 +771,7 @@ class SearchController extends Controller
 			}
 	
 			$names = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$names,'fields'=>array('name'),'excerpt'=>false));
-			$names = $this->sortResultsByMostTokensFound($names);
+//			$names = $this->sortResultsByMostTokensFound($names);
 
 		
 		}

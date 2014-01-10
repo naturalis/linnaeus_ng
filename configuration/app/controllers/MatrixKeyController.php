@@ -16,6 +16,7 @@ class MatrixKeyController extends Controller
 	private $_matrixSuppressDetails = false;
 	private $_nbcImageRoot = null;
 	private $_externalSpeciesUrlPrefix = null;
+	private $_matrix_use_emerging_characters = null;
 
     public $usedModels = array(
         'matrix', 
@@ -55,7 +56,7 @@ class MatrixKeyController extends Controller
     public function __construct ($p = null)
     {
         parent::__construct($p);
-        
+
         $this->initialize();
 
     }
@@ -164,7 +165,8 @@ class MatrixKeyController extends Controller
 		
 		$characters = $this->getCharacteristics();
 
-        if ($this->_matrixType == 'nbc') {
+        if ($this->_matrixType == 'nbc')
+		{
 
             $states = $this->stateMemoryRecall();
 
@@ -224,7 +226,6 @@ class MatrixKeyController extends Controller
 			$this->smarty->assign('nbcBrowseStyle', $this->getSetting('matrix_browse_style'));
 			$this->smarty->assign('matrix_items_per_page', $this->getSetting('matrix_items_per_page'));
 			$this->smarty->assign('master_matrix_id', $this->getMasterMatrixId());
-			$this->smarty->assign('matrix_use_emerging_characters', $this->getSetting('matrix_use_emerging_characters',true));
 			
 			$this->smarty->assign('nbcDataSource', 
 				array(
@@ -256,6 +257,8 @@ class MatrixKeyController extends Controller
         $this->smarty->assign('function', 'Identify');
 
         $this->smarty->assign('characteristics', $characters);
+
+		$this->smarty->assign('matrix_use_emerging_characters', $this->_matrix_use_emerging_characters);
 		
         $this->printPage('identify');
     }
@@ -1017,6 +1020,7 @@ class MatrixKeyController extends Controller
         $this->_externalSpeciesUrlTarget = $this->getSetting('external_species_url_target');
         $this->_matrixSuppressDetails = $this->getSetting('matrix_suppress_details','0')=='1';
 		$this->_externalSpeciesUrlPrefix = $this->getSetting('external_species_url_prefix');
+		$this->_matrix_use_emerging_characters = $this->getSetting('matrix_use_emerging_characters',true);
 
         if ($this->_matrixType == 'nbc') {
 			$_SESSION['app']['system']['urls']['nbcImageRoot']=$this->_nbcImageRoot = $this->getSetting('nbc_image_root');
@@ -2712,7 +2716,7 @@ class MatrixKeyController extends Controller
     private function nbcGetCompleteDataset ($p = null)
     {
 
-        $res = $this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
+        $res = false;//$this->getCache('matrix-nbc-data-'.$this->getCurrentMatrixId());
 
         if (!$res) {
 
@@ -2741,12 +2745,12 @@ class MatrixKeyController extends Controller
                 $label = $val['label'];
                 
                 $d = $this->nbcExtractGenderTag($label);
-				
+
                 $res[] = $this->createDatasetEntry(
                 array(
                     'val' => $val, 
                     'nbc' => $nbc, 
-                    'label' => $d['label'], 
+                    'label' => $val['label'], 
 					'common' => $this->getCommonname($val['taxon_id']),
                     'gender' => array($d['gender'], $d['gender_label']),
                     'related' => $this->getRelatedEntities(array(
@@ -3003,7 +3007,7 @@ class MatrixKeyController extends Controller
                     array(
                         'val' => $val, 
                         'nbc' => $nbc, 
-                        'label' => $d['label'], 
+                        'label' => $val['label'], 
 						'common' => $this->getCommonname($val['taxon_id']),
                         'gender' => array($d['gender'], $d['gender_label']),
                         'related' => $this->getRelatedEntities(array(
@@ -3104,20 +3108,34 @@ class MatrixKeyController extends Controller
 
 	private function nbcExtractGenderTag($label)
 	{
+
+		$gender=$gender_label=null;
+
 		if (
 			preg_match('/\s(man|vrouw|beide)(\s|$)/', $label, $matches) ||
 			preg_match('/\s(male|female|both)(\s|$)/', $label, $matches)
 			) {
-			$gender = trim($matches[1]);
-			$label = preg_replace('/\s(' . $gender . ')(\s|$)/', ' ', $label);
-			$gender = ($gender=='beide' ? null : $gender=='man' || $gender=='male' ? 'm' : 'f');
-		} else
-			$gender = null;
-		return array(
-			'gender' => $gender,
-			'label' => $label,
-			'gender_label' => $this->translate($gender)
-		);
+			
+			switch($matches[1]) {
+				case 'man' :
+				case 'male':
+					$gender='m';
+					$gender_label='man';
+					break;
+				case 'vrouw' :
+				case 'female':
+					$gender='f';
+					$gender_label='vrouw';
+					break;
+			}
+				
+		}
+
+		return
+			array(
+				'gender' => $gender,
+				'gender_label' => $this->translate($gender_label)
+			);
 		
 	}
 	
@@ -3199,22 +3217,22 @@ class MatrixKeyController extends Controller
 
 			if ($val['type']=='variation') {
 				
-				$d = $this->nbcExtractGenderTag($val['label']);
-				$d = $this->nbcExtractGenderTag($val['label']);
-				$label = $d['label'];
-				$gender = $d['gender'];
-				$gender_label = $d['gender_label'];
+				//$label = $d['label']; ???
+
+				$gender = $this->nbcExtractGenderTag($val['label']);
+
 				$common = $this->getCommonname($val['taxon_id']);
 			
 			} else {
 
-				$label = $val['label'];
+				//$label = $val['label']; ???
+
+				$gender = array();
 
 				if ($val['commonname'] != $val['label'])
 					$label = $val['commonname'];
 
 				$common = $val['commonname'];
-				$gender = $gender_label = null;
 
 			}
 
@@ -3231,9 +3249,9 @@ class MatrixKeyController extends Controller
 							'columns' => 'name,value', 'fieldAsIndex' => 'name'
 						)
 					), 
-					'label' => $label, 
+					'label' => $val['label'], 
 					'common' => $common,
-					'gender' => array($gender,$gender_label), 
+					'gender' => $gender,
 					'related' => $this->getRelatedEntities(array(($val['type']=='variation' ? 'vId' : 'tId') => $val['id'])), 
 					'type' => $val['type'], 
 					'inclRelated' => true,
