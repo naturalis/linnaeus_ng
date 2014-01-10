@@ -167,17 +167,12 @@ function showDialog(title,content,vars,resize) {
 		buttons.push({text:_("sluiten"), click: function() {jDialogCancel();}});
 
 		$("#jDialog").dialog({
-			dialogClass: "no-close",
 			resizable: false,
-			maxWidth: 700,
-			maxHeight: 600,
-			width: "auto",
-			height: "auto",
 			modal: true,
 			title: title,
 			autoOpen: false,
-			position: { my: "center", at: "center" },
-			buttons: buttons
+			buttons: buttons,
+			width: "auto"
 		});
 		
 		$("#jDialog").html(content);
@@ -373,6 +368,7 @@ function doSearch() {
 	$('body').append('<form id="tempform"></form>');
     $('#tempform').
         attr('action','../search/search.php').attr('method','post').
+        append('<input type="hidden" name="extended" value="1">').
         append('<input type="hidden" name="modules" value="*">').
         append('<input type="hidden" name="freeModules" value="*">').
         append('<input type="hidden" name="search" value="'+$('#search').val()+'">');

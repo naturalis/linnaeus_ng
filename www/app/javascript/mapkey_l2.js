@@ -120,7 +120,6 @@ function l2TagMapCell(ele) {
 		$(ele).addClass('mapCellTagged');
 
 	}
-	
 
 }
 

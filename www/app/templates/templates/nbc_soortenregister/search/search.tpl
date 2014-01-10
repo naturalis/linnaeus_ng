@@ -6,7 +6,6 @@
     
 	<div id="content">
 
-
 		<div id="results">
 			<p>
 				<h2>
@@ -14,14 +13,14 @@
 				</h2>
 			</p>
 			<p>
-				{if $results}
+				{if $results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data}
 				<ol>
-					{foreach from=$results.data item=res}
+					{foreach from=$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].data item=res}
 					<li style="margin-bottom:5px">
 					<a class="result"href="../species/taxon.php?id={$res.taxon_id}">
-					{if $res.subject.label}{$res.subject.label}{elseif $res.label}{$res.label}{else}{$res.matches[0]}{/if}
+					{if $res.label}{$res.label}{else}{$res.matches[0]}{/if}
 					</a>
-					{if $res.preferredName}<br />{$res.preferredName}{elseif $res.label}<br />{$res.label}{/if}
+					{if $res.preferredName}<br />{$res.preferredName}{/if}
 					</li>
 					{/foreach}
 				</ol>
