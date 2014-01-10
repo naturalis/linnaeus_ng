@@ -830,6 +830,8 @@ class ImportNBCController extends Controller
 				$pId = $d[0]['id'];
 				
 				$dummy = array();
+				
+				$thisLanguage=$this->getNewDefaultLanguageId($pId);
 
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
 					
@@ -841,7 +843,7 @@ class ImportNBCController extends Controller
 						array(
 							'where' =>
 								'project_id  = '.$pId. ' and
-								language_id = '.LANGUAGECODE_DUTCH. ' and
+								language_id = '.$thisLanguage. ' and
 								(
 									lower(label) = \''. mysql_real_escape_string(strtolower($val[1])) .'\' or
 									label like \''. mysql_real_escape_string(strtolower($val[1])) .'|%\'
@@ -878,7 +880,7 @@ class ImportNBCController extends Controller
 								array(
 									'project_id' => $pId, 
 									'state_id in' => $states, 
-									'language_id' => LANGUAGECODE_DUTCH, 
+									'language_id' => $thisLanguage, 
 									'label' => $val[2]
 								)
 							)
@@ -898,7 +900,7 @@ class ImportNBCController extends Controller
 									array(
 										'project_id' => $pId, 
 										'state_id' => $sId, 
-										'language_id' => LANGUAGECODE_DUTCH
+										'language_id' => $thisLanguage
 									)
 								);								
 
@@ -946,7 +948,7 @@ class ImportNBCController extends Controller
 						}
 
 					} else {
-
+q($this->models->CharacteristicLabel->q(),1);
 			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]),'Matrix states'));
 
 					}
@@ -1006,12 +1008,14 @@ class ImportNBCController extends Controller
         return (isset($_SESSION['admin']['system']['import']['project']['id'])) ? $_SESSION['admin']['system']['import']['project']['id'] : null;
     }
 
-    private function getNewDefaultLanguageId ()
+    private function getNewDefaultLanguageId($pId=null)
     {
+		
+		$pId=is_null($pId) ? $this->getNewProjectId() : $pId;
 		
         $lp = $this->models->LanguageProject->_get(array(
             'id' => array(
-                'project_id' => $this->getNewProjectId(),
+                'project_id' => $pId,
 				'def_language' => 1
             )
         ));
@@ -1021,7 +1025,7 @@ class ImportNBCController extends Controller
 
         $lp = $this->models->LanguageProject->_get(array(
             'id' => array(
-                'project_id' => $this->getNewProjectId(),
+                'project_id' => $pId,
             )
         ));
 		
