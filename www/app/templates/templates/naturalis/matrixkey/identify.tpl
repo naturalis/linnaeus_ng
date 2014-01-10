@@ -27,11 +27,9 @@
               <span id='facet-categories-menu'></span>
             </div>
 
-          <div class='control'>
+          <div class='control' onClick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();">
             <span class='icon icon-reload'></span>
-            <a href='#' onClick="$('#similarSpeciesNav').addClass('hidden');nbcClearSearchTerm();nbcClearStateValue();return false;">
-              {t}Opnieuw beginnen{/t}
-            </a>
+              <a href="">{t}Opnieuw beginnen{/t}</a>
           </div>
 
 		{if $master_matrix_id}
@@ -107,7 +105,7 @@
 
   </body>
 
-<div id="jDialog" title="" class="ui-helper-hidden"  style="overflow-y:scroll;"></div>
+<div id="jDialog" title="" class="ui-helper-hidden"></div>
 
 
 {literal}

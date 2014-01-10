@@ -1,7 +1,6 @@
-	  <div id='graphicValueSelector'>
-		{*<p id="dialogHeader">{$c.label} - {if $c.info}{$c.info}{/if}</p>*}
+	  <div id="graphicValueSelector{if $c.type=='media'} layout-grid{else} layout-list{/if}">
+
         <p id='dialogSelectorWindow'></p>
-        <div id='dialog-content-inner-inner'>
 
         {if $c.info}
         <p id="state-info">
@@ -32,15 +31,15 @@
                     {if $states[$c.id][$v.id]}{assign var=active value=true}{else}{assign var=active value=false}{/if}
                     {if $remainingStateCount!='*' && !$remainingStateCount[$v.id]}{assign var=disabled value=true}{else}{assign var=disabled value=false}{/if}
 
-<div class="state-image-cell {if $active}active{elseif $disabled}disabled{else}selectable{/if}" onclick="{if $active}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');">
-<img class="state-image" src="{if $v.file_name}{$projectUrls.projectMedia}{$v.file_name}{else}{$projectUrls.systemMedia}missing.jpg{/if}" />
-<p class="state-image-caption">
-{$v.label}
-</p>
-<p class='state-count'>
-{if !$active}({if $remainingStateCount[$v.id]}{$remainingStateCount[$v.id]}{else}0{/if}){/if}
-</p>
-</div>
+			<div class="state-image-cell {if $active}active{elseif $disabled}disabled{else}selectable{/if}" onclick="{if $active}nbcClearStateValue{else}nbcSetStateValue{/if}('{$c.prefix}:{$c.id}:{$v.id}');">
+				<img class="state-image" src="{if $v.file_name}{$projectUrls.projectMedia}{$v.file_name}{else}{$projectUrls.systemMedia}missing.jpg{/if}" />
+				<p class="state-image-caption">
+					{$v.label}
+				</p>
+				<p class='state-count'>
+					{if !$active}({if $remainingStateCount[$v.id]}{$remainingStateCount[$v.id]}{else}0{/if}){/if}
+				</p>
+			</div>
 
     	        {/foreach}
 
@@ -72,7 +71,6 @@
         </ul>
 
 	{/if}
-    </div>
 	<span id='state-id' class='hidden'>{$c.prefix}:{$c.id}</span>
 </div>
 

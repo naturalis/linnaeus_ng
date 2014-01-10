@@ -236,7 +236,7 @@ function nbcFormatResult(data) {
 
 	var photoLabel = 
 		(data.s==data.l || !data.s ? '<i>'+(data.l)+'</i>' : data.l)+
-		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.g+'" />' : '' )+
+		(data.g ? ' <img class="gender" height="17" width="8" src="'+nbcImageRoot+data.g+'.png" title="'+data.e+'" />' : '' )+
 		(data.s!=data.l ? '<br /><i>'+(data.s)+'</i>' : '')
 	
 	var id = data.y+'-'+data.i;
