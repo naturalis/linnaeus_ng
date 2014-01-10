@@ -1,3 +1,15 @@
+/*
+
+ P O W E R E D    B Y 
+ _     _                                    _   _  ____ 
+| |   (_)_ __  _ __   __ _  ___ _   _ ___  | \ | |/ ___|
+| |   | | '_ \| '_ \ / _` |/ _ \ | | / __| |  \| | |  _ 
+| |___| | | | | | | | (_| |  __/ |_| \__ \ | |\  | |_| |
+|_____|_|_| |_|_| |_|\__,_|\___|\__,_|___/ |_| \_|\____|
+
+
+*/
+
 @charset "UTF-8";
 /* BOOTSTRAP STYLES */
 /* --- bootstrap: RESET */
@@ -1828,19 +1840,19 @@ input[type="button"].btn-block {
 .icon-book:before {
   content: "\e603"; }
 
-.icon-arrow_right:before {
+.icon-arrow-right:before {
   content: "\e604"; }
 
-.icon-arrow_left:before {
+.icon-arrow-left:before {
   content: "\e605"; }
 
 .icon-search:before {
   content: "\e606"; }
 
-.icon-arrow_down_left:before {
+.icon-arrow-down-left:before {
   content: "\e608"; }
 
-.icon-arrow_left_up:before {
+.icon-arrow-left-up:before {
   content: "\e609"; }
 
 .icon-nav-prev:before {
@@ -1849,7 +1861,7 @@ input[type="button"].btn-block {
 .icon-nav-next:before {
   content: "\e60b"; }
 
-.icon-arrow_up_left:before {
+.icon-arrow-up-left:before {
   content: "\e607"; }
 
 .icon-close:before {
@@ -1928,6 +1940,7 @@ body {
   background-image: url(../images/banner-image.png);
   background-position: right center;
   background-repeat: no-repeat;
+  background-size: auto 100%;
   padding: 30px;
   color: white; }
   #header small {
@@ -2072,6 +2085,10 @@ button, input, select, textarea {
   margin: 2em auto;
   display: block; }
 
+/* --- --- CHROME RESET --- */
+*:focus {
+  outline: none; }
+
 /* --- DIALOGUE RIDGE --- */
 #left {
   position: relative;
@@ -2191,10 +2208,11 @@ button, input, select, textarea {
   text-align: center;
   font-size: 25px;
   line-height: 24px;
-  color: #009ee0;
-  cursor: pointer; }
+  color: #009ee0; }
   #results .icon:hover {
     color: #e3004a; }
+  #results .icon .icon-details, #results .icon .icon-book, #results .icon .icon-resemblance {
+    cursor: pointer; }
 
 .control {
   background-color: #eeede9;
@@ -2202,9 +2220,12 @@ button, input, select, textarea {
   margin-top: 0.75em;
   border: 1px solid #cccccc;
   border-radius: 3px;
-  font-weight: bold; }
+  font-weight: bold;
+  cursor: pointer; }
   .control:hover {
     background-color: #e6e6e6; }
+    .control:hover a {
+      text-decoration: underline; }
   .control a {
     color: #333333;
     line-height: 24px;
@@ -2379,7 +2400,7 @@ button, input, select, textarea {
 
 /* --- jQuery DIALOGUE --- */
 .ui-widget-overlay {
-  background: none repeat scroll 0 0 #000000;
+  background: none repeat scroll 0 0 #b2b1a8;
   opacity: 0.7;
   height: 100%;
   left: 0;
@@ -2391,7 +2412,10 @@ button, input, select, textarea {
 .ui-dialog {
   z-index: 100;
   position: absolute;
-  background-color: white; }
+  background-color: white;
+  overflow-y: hidden;
+  max-height: 700px;
+  max-width: 90%; }
   .ui-dialog button {
     background-color: #b2b1a8; }
 
@@ -2413,7 +2437,9 @@ button, input, select, textarea {
   display: none; }
 
 .ui-dialog-content {
-  margin: 30px; }
+  margin: 30px;
+  max-height: 550px;
+  overflow: auto; }
 
 .ui-dialog-buttonpane {
   text-align: right; }
@@ -2435,9 +2461,10 @@ button, input, select, textarea {
     background-color: #eeede9;
     padding-bottom: 1em;
     transition: background-color 300ms;
-    margin: 0 1%;
+    margin: 0 10px 20px;
     padding: 0 0 10px;
-    display: table-cell; }
+    float: left;
+    display: block; }
     #graphicValues .state-image-cell a {
       width: 100%; }
     #graphicValues .state-image-cell img {
