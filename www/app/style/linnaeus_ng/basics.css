@@ -1,0 +1,3032 @@
+@charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300italic,300&subset=latin,latin-ext);
+/*
+ _     _                                    _   _  ____ 
+| |   (_)_ __  _ __   __ _  ___ _   _ ___  | \ | |/ ___|
+| |   | | '_ \| '_ \ / _` |/ _ \ | | / __| |  \| | |  _ 
+| |___| | | | | | | | (_| |  __/ |_| \__ \ | |\  | |_| |
+|_____|_|_| |_|_| |_|\__,_|\___|\__,_|___/ |_| \_|\____|
+                                                        
+
+*/
+/* BOOTSTRAP STYLES */
+/* --- bootstrap: RESET */
+/* --- bootstrap: normalize --- */
+/*! normalize.css v2.1.0 | MIT License | git.io/normalize */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000322}}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+  display: block; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000332}}
+audio,
+canvas,
+video {
+  display: inline-block; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000341}}
+audio:not([controls]) {
+  display: none;
+  height: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000350}}
+[hidden] {
+  display: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000364}}
+html {
+  font-family: sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000374}}
+body {
+  margin: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000386}}
+a:focus {
+  outline: thin dotted; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\0000395}}
+a:active,
+a:hover {
+  outline: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003108}}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003117}}
+abbr[title] {
+  border-bottom: 1px dotted; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003126}}
+b,
+strong {
+  font-weight: bold; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003134}}
+dfn {
+  font-style: italic; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003142}}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003152}}
+mark {
+  background: #ff0;
+  color: #000; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003164}}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, serif;
+  font-size: 1em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003173}}
+pre {
+  white-space: pre-wrap; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003181}}
+q {
+  quotes: "\201C" "\201D" "\2018" "\2019"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003189}}
+small {
+  font-size: 80%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003198}}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003205}}
+sup {
+  top: -0.5em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003209}}
+sub {
+  bottom: -0.25em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003221}}
+img {
+  border: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003229}}
+svg:not(:root) {
+  overflow: hidden; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003241}}
+figure {
+  margin: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003253}}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003264}}
+legend {
+  border: 0;
+  padding: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003278}}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003290}}
+button,
+input {
+  line-height: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003302}}
+button,
+select {
+  text-transform: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003317}}
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003327}}
+button[disabled],
+html input[disabled] {
+  cursor: default; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003337}}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003348}}
+input[type="search"] {
+  -webkit-appearance: textfield;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003361}}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003370}}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003380}}
+textarea {
+  overflow: auto;
+  vertical-align: top; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_normalize\.scss}line{font-family:\00003393}}
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* --- bootstrap: CORE CSS */
+/* --- ---  bootstrap: scaffolding --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000310}}
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000317}}
+html {
+  font-size: 62.5%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000322}}
+body {
+  font-family: "Arial", sans-serif;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: black;
+  background-color: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000334}}
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000347}}
+button,
+input,
+select[multiple],
+textarea {
+  background-image: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000354}}
+a {
+  color: #009ee0;
+  text-decoration: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000359}}
+  a:hover, a:focus {
+    color: #e3004a;
+    text-decoration: underline; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000364}}
+  a:focus {
+    outline: thin dotted #333;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000372}}
+img {
+  vertical-align: middle; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000377}}
+.img-responsive {
+  display: block;
+  max-width: 100%;
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000382}}
+.img-rounded {
+  border-radius: 6px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\0000389}}
+.img-thumbnail {
+  padding: 4px;
+  line-height: 1.42857;
+  background-color: white;
+  border: 1px solid #dddddd;
+  border-radius: 2px;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  max-width: 100%;
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\00003102}}
+.img-circle {
+  border-radius: 50%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\00003109}}
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 0;
+  border-top: 1px solid #eeeeee; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_scaffolding\.scss}line{font-family:\00003121}}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0; }
+
+/* --- --- bootstrap: type --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\000039}}
+p {
+  margin: 0 0 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000312}}
+.lead {
+  margin-bottom: 20px;
+  font-size: 16.1px;
+  font-weight: 200;
+  line-height: 1.4; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000312}}
+    .lead {
+      font-size: 21px; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000328}}
+small {
+  font-size: 85%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000331}}
+cite {
+  font-style: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000334}}
+.text-muted {
+  color: #999999; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000335}}
+.text-primary {
+  color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000336}}
+.text-warning {
+  color: #c09853; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000337}}
+.text-danger {
+  color: #b94a48; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000338}}
+.text-success {
+  color: #468847; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000339}}
+.text-info {
+  color: #3a87ad; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000342}}
+.text-left {
+  text-align: left; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000343}}
+.text-right {
+  text-align: right; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000344}}
+.text-center {
+  text-align: center; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000351}}
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: "Platform Alternate";
+  font-weight: 500;
+  line-height: 1.1; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000355}}
+  h1 small, h2 small, h3 small, h4 small, h5 small, h6 small,
+  .h1 small, .h2 small, .h3 small, .h4 small, .h5 small, .h6 small {
+    font-weight: normal;
+    line-height: 1;
+    color: #999999; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000364}}
+h1,
+h2,
+h3 {
+  margin-top: 20px;
+  margin-bottom: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000370}}
+h4,
+h5,
+h6 {
+  margin-top: 10px;
+  margin-bottom: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000375}}
+h1, .h1 {
+  font-size: 36px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000376}}
+h2, .h2 {
+  font-size: 30px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000377}}
+h3, .h3 {
+  font-size: 24px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000378}}
+h4, .h4 {
+  font-size: 18px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000379}}
+h5, .h5 {
+  font-size: 14px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000380}}
+h6, .h6 {
+  font-size: 12px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000382}}
+h1 small, .h1 small {
+  font-size: 24px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000383}}
+h2 small, .h2 small {
+  font-size: 18px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000385}}
+h3 small, .h3 small,
+h4 small, .h4 small {
+  font-size: 14px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\0000391}}
+.page-header {
+  padding-bottom: 9px;
+  margin: 40px 0 20px;
+  border-bottom: 1px solid #eeeeee; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003104}}
+ul,
+ol {
+  margin-top: 0;
+  margin-bottom: 10px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003108}}
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol {
+    margin-bottom: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003116}}
+.list-unstyled, .list-inline {
+  padding-left: 0;
+  list-style: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003123}}
+.list-inline > li {
+  display: inline-block;
+  padding-left: 5px;
+  padding-right: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003131}}
+dl {
+  margin-bottom: 20px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003135}}
+dt,
+dd {
+  line-height: 1.42857; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003138}}
+dt {
+  font-weight: bold; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003141}}
+dd {
+  margin-left: 0; }
+
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003152}}
+  .dl-horizontal dt {
+    float: left;
+    width: 160px;
+    clear: left;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003159}}
+  .dl-horizontal dd {
+    margin-left: 180px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+    .dl-horizontal dd:before, .dl-horizontal dd:after {
+      content: " ";
+      /* 1 */
+      display: table;
+      /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+    .dl-horizontal dd:after {
+      clear: both; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003172}}
+abbr[title],
+abbr[data-original-title] {
+  cursor: help;
+  border-bottom: 1px dotted #999999; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003176}}
+abbr.initialism {
+  font-size: 90%;
+  text-transform: uppercase; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003182}}
+blockquote {
+  padding: 10px 20px;
+  margin: 0 0 20px;
+  border-left: 5px solid #eeeeee; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003186}}
+  blockquote p {
+    font-size: 17.5px;
+    font-weight: 300;
+    line-height: 1.25; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003191}}
+  blockquote p:last-child {
+    margin-bottom: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003194}}
+  blockquote small {
+    display: block;
+    line-height: 1.42857;
+    color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003198}}
+    blockquote small:before {
+      content: '\2014 \00A0'; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003204}}
+  blockquote.pull-right {
+    padding-right: 15px;
+    padding-left: 0;
+    border-right: 5px solid #eeeeee;
+    border-left: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003210}}
+    blockquote.pull-right p,
+    blockquote.pull-right small {
+      text-align: right; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003214}}
+    blockquote.pull-right small:before {
+      content: ''; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003217}}
+    blockquote.pull-right small:after {
+      content: '\00A0 \2014'; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003228}}
+q:before,
+q:after,
+blockquote:before,
+blockquote:after {
+  content: ""; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_type\.scss}line{font-family:\00003233}}
+address {
+  display: block;
+  margin-bottom: 20px;
+  font-style: normal;
+  line-height: 1.42857; }
+
+/* --- --- bootstrap: grid --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_grid\.scss}line{font-family:\000037}}
+.container {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 0.5px;
+  padding-right: 0.5px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .container:before, .container:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .container:after {
+    clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_grid\.scss}line{font-family:\0000312}}
+.row {
+  margin-left: -0.5px;
+  margin-right: -0.5px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .row:before, .row:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .row:after {
+    clear: both; }
+
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_grid\.scss}line{font-family:\0000345}}
+  .container {
+    max-width: 721px; } }
+@media (min-width: 992px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_grid\.scss}line{font-family:\0000362}}
+  .container {
+    max-width: 941px; } }
+@media (min-width: 1200px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_grid\.scss}line{font-family:\0000384}}
+  .container {
+    max-width: 1141px; } }
+/* --- --- bootstrap: forms --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000310}}
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000316}}
+legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 20px;
+  font-size: 21px;
+  line-height: inherit;
+  color: #333333;
+  border: 0;
+  border-bottom: 1px solid #e5e5e5; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000328}}
+label {
+  display: inline-block;
+  margin-bottom: 5px;
+  font-weight: bold; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000338}}
+input[type="search"] {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000344}}
+input[type="radio"],
+input[type="checkbox"] {
+  margin: 4px 0 0;
+  margin-top: 1px \9;
+  /* IE8-9 */
+  line-height: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000351}}
+input[type="file"] {
+  display: block; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000357}}
+select[multiple],
+select[size] {
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000362}}
+select optgroup {
+  font-size: inherit;
+  font-style: inherit;
+  font-family: inherit; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000371}}
+input[type="file"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\0000380}}
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000357}}
+.form-control:-moz-placeholder {
+  color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000358}}
+.form-control::-moz-placeholder {
+  color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000359}}
+.form-control:-ms-input-placeholder {
+  color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000360}}
+.form-control::-webkit-input-placeholder {
+  color: #333333; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003117}}
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: #555555;
+  vertical-align: middle;
+  background-color: white;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003702}}
+  .form-control:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6); }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003141}}
+  .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    cursor: not-allowed;
+    background-color: #eeeeee; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003150}}
+textarea.form-control {
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003160}}
+.form-group {
+  margin-bottom: 15px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003170}}
+.radio,
+.checkbox {
+  display: block;
+  min-height: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 20px;
+  vertical-align: middle; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003177}}
+  .radio label,
+  .checkbox label {
+    display: inline;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003187}}
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  float: left;
+  margin-left: -20px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003192}}
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: -5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003198}}
+.radio-inline,
+.checkbox-inline {
+  display: inline-block;
+  padding-left: 20px;
+  margin-bottom: 0;
+  vertical-align: middle;
+  font-weight: normal;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003207}}
+.radio-inline + .radio-inline,
+.checkbox-inline + .checkbox-inline {
+  margin-top: 0;
+  margin-left: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003222}}
+input[type="radio"][disabled], fieldset[disabled] input[type="radio"],
+input[type="checkbox"][disabled], fieldset[disabled]
+input[type="checkbox"],
+.radio[disabled], fieldset[disabled]
+.radio,
+.radio-inline[disabled], fieldset[disabled]
+.radio-inline,
+.checkbox[disabled], fieldset[disabled]
+.checkbox,
+.checkbox-inline[disabled], fieldset[disabled]
+.checkbox-inline {
+  cursor: not-allowed; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003717}}
+.input-sm, .input-group-sm > .form-control,
+.input-group-sm > .input-group-addon,
+.input-group-sm > .input-group-btn > .btn {
+  height: 30px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003722}}
+select.input-sm, .input-group-sm > select.form-control,
+.input-group-sm > select.input-group-addon,
+.input-group-sm > .input-group-btn > select.btn {
+  height: 30px;
+  line-height: 30px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003727}}
+textarea.input-sm, .input-group-sm > textarea.form-control,
+.input-group-sm > textarea.input-group-addon,
+.input-group-sm > .input-group-btn > textarea.btn {
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003717}}
+.input-lg, .input-group-lg > .form-control,
+.input-group-lg > .input-group-addon,
+.input-group-lg > .input-group-btn > .btn {
+  height: 45px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003722}}
+select.input-lg, .input-group-lg > select.form-control,
+.input-group-lg > select.input-group-addon,
+.input-group-lg > .input-group-btn > select.btn {
+  height: 45px;
+  line-height: 45px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003727}}
+textarea.input-lg, .input-group-lg > textarea.form-control,
+.input-group-lg > textarea.input-group-addon,
+.input-group-lg > .input-group-btn > textarea.btn {
+  height: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003666}}
+.has-warning .help-block,
+.has-warning .control-label {
+  color: #c09853; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003670}}
+.has-warning .form-control {
+  border-color: #c09853;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003673}}
+  .has-warning .form-control:focus {
+    border-color: #a47e3c;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #dbc59e; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003680}}
+.has-warning .input-group-addon {
+  color: #c09853;
+  border-color: #c09853;
+  background-color: #fcf8e3; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003666}}
+.has-error .help-block,
+.has-error .control-label {
+  color: #b94a48; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003670}}
+.has-error .form-control {
+  border-color: #b94a48;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003673}}
+  .has-error .form-control:focus {
+    border-color: #953b39;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003680}}
+.has-error .input-group-addon {
+  color: #b94a48;
+  border-color: #b94a48;
+  background-color: #f2dede; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003666}}
+.has-success .help-block,
+.has-success .control-label {
+  color: #468847; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003670}}
+.has-success .form-control {
+  border-color: #468847;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003673}}
+  .has-success .form-control:focus {
+    border-color: #356635;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #7aba7b; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003680}}
+.has-success .input-group-addon {
+  color: #468847;
+  border-color: #468847;
+  background-color: #dff0d8; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003257}}
+.form-control-static {
+  margin-bottom: 0;
+  padding-top: 7px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003268}}
+.help-block {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #404040; }
+
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003293}}
+  .form-inline .form-group, .navbar-form .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003300}}
+  .form-inline .form-control, .navbar-form .form-control {
+    display: inline-block; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003308}}
+  .form-inline .radio, .navbar-form .radio,
+  .form-inline .checkbox,
+  .navbar-form .checkbox {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003315}}
+  .form-inline .radio input[type="radio"], .navbar-form .radio input[type="radio"],
+  .form-inline .checkbox input[type="checkbox"],
+  .navbar-form .checkbox input[type="checkbox"] {
+    float: none;
+    margin-left: 0; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003335}}
+.form-horizontal .control-label,
+.form-horizontal .radio,
+.form-horizontal .checkbox,
+.form-horizontal .radio-inline,
+.form-horizontal .checkbox-inline {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003342}}
+.form-horizontal .form-group {
+  margin-left: -0.5px;
+  margin-right: -0.5px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .form-horizontal .form-group:before, .form-horizontal .form-group:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .form-horizontal .form-group:after {
+    clear: both; }
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_forms\.scss}line{font-family:\00003348}}
+  .form-horizontal .control-label {
+    text-align: right; } }
+
+/* --- --- bootstrap: buttons --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000310}}
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.42857;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000325}}
+  .btn:focus {
+    outline: thin dotted #333;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000330}}
+  .btn:hover, .btn:focus {
+    color: #666666;
+    text-decoration: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000336}}
+  .btn:active, .btn.active {
+    outline: 0;
+    background-image: none;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125); }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000344}}
+  .btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000357}}
+.btn-default {
+  color: #666666;
+  background-color: white;
+  border-color: #e6e6e6; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active {
+    color: #666666;
+    background-color: #ebebeb;
+    border-color: #c7c7c7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-default.dropdown-toggle {
+    color: #666666;
+    background-color: #ebebeb;
+    border-color: #c7c7c7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-default:active, .btn-default.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-default.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-default.disabled, .btn-default.disabled:hover, .btn-default.disabled:focus, .btn-default.disabled:active, .btn-default.disabled.active, .btn-default[disabled], .btn-default[disabled]:hover, .btn-default[disabled]:focus, .btn-default[disabled]:active, .btn-default[disabled].active, fieldset[disabled] .btn-default, fieldset[disabled] .btn-default:hover, fieldset[disabled] .btn-default:focus, fieldset[disabled] .btn-default:active, fieldset[disabled] .btn-default.active {
+    background-color: white;
+    border-color: #e6e6e6; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000360}}
+.btn-primary {
+  color: white;
+  background-color: #009ee0;
+  border-color: #008cc7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active {
+    color: white;
+    background-color: #0081b7;
+    border-color: #006189; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-primary.dropdown-toggle {
+    color: white;
+    background-color: #0081b7;
+    border-color: #006189; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-primary:active, .btn-primary.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-primary.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-primary.disabled, .btn-primary.disabled:hover, .btn-primary.disabled:focus, .btn-primary.disabled:active, .btn-primary.disabled.active, .btn-primary[disabled], .btn-primary[disabled]:hover, .btn-primary[disabled]:focus, .btn-primary[disabled]:active, .btn-primary[disabled].active, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary:hover, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary.active {
+    background-color: #009ee0;
+    border-color: #008cc7; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000364}}
+.btn-warning {
+  color: white;
+  background-color: #f29400;
+  border-color: #d88400; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active {
+    color: white;
+    background-color: #c97b00;
+    border-color: #9b5f00; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-warning.dropdown-toggle {
+    color: white;
+    background-color: #c97b00;
+    border-color: #9b5f00; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-warning:active, .btn-warning.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-warning.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-warning.disabled, .btn-warning.disabled:hover, .btn-warning.disabled:focus, .btn-warning.disabled:active, .btn-warning.disabled.active, .btn-warning[disabled], .btn-warning[disabled]:hover, .btn-warning[disabled]:focus, .btn-warning[disabled]:active, .btn-warning[disabled].active, fieldset[disabled] .btn-warning, fieldset[disabled] .btn-warning:hover, fieldset[disabled] .btn-warning:focus, fieldset[disabled] .btn-warning:active, fieldset[disabled] .btn-warning.active {
+    background-color: #f29400;
+    border-color: #d88400; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000368}}
+.btn-danger {
+  color: white;
+  background-color: #e3004a;
+  border-color: #ca0042; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active {
+    color: white;
+    background-color: #ba003d;
+    border-color: #8c002e; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-danger.dropdown-toggle {
+    color: white;
+    background-color: #ba003d;
+    border-color: #8c002e; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-danger:active, .btn-danger.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-danger.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-danger.disabled, .btn-danger.disabled:hover, .btn-danger.disabled:focus, .btn-danger.disabled:active, .btn-danger.disabled.active, .btn-danger[disabled], .btn-danger[disabled]:hover, .btn-danger[disabled]:focus, .btn-danger[disabled]:active, .btn-danger[disabled].active, fieldset[disabled] .btn-danger, fieldset[disabled] .btn-danger:hover, fieldset[disabled] .btn-danger:focus, fieldset[disabled] .btn-danger:active, fieldset[disabled] .btn-danger.active {
+    background-color: #e3004a;
+    border-color: #ca0042; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000372}}
+.btn-success {
+  color: white;
+  background-color: #009932;
+  border-color: #00802a; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active {
+    color: white;
+    background-color: #007025;
+    border-color: #004216; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-success.dropdown-toggle {
+    color: white;
+    background-color: #007025;
+    border-color: #004216; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-success:active, .btn-success.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-success.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-success.disabled, .btn-success.disabled:hover, .btn-success.disabled:focus, .btn-success.disabled:active, .btn-success.disabled.active, .btn-success[disabled], .btn-success[disabled]:hover, .btn-success[disabled]:focus, .btn-success[disabled]:active, .btn-success[disabled].active, fieldset[disabled] .btn-success, fieldset[disabled] .btn-success:hover, fieldset[disabled] .btn-success:focus, fieldset[disabled] .btn-success:active, fieldset[disabled] .btn-success.active {
+    background-color: #009932;
+    border-color: #00802a; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000376}}
+.btn-info {
+  color: white;
+  background-color: #009ee0;
+  border-color: #008cc7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003414}}
+  .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active {
+    color: white;
+    background-color: #0081b7;
+    border-color: #006189; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003419}}
+  .open .btn-info.dropdown-toggle {
+    color: white;
+    background-color: #0081b7;
+    border-color: #006189; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003425}}
+  .btn-info:active, .btn-info.active {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003428}}
+  .open .btn-info.dropdown-toggle {
+    background-image: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\00003438}}
+  .btn-info.disabled, .btn-info.disabled:hover, .btn-info.disabled:focus, .btn-info.disabled:active, .btn-info.disabled.active, .btn-info[disabled], .btn-info[disabled]:hover, .btn-info[disabled]:focus, .btn-info[disabled]:active, .btn-info[disabled].active, fieldset[disabled] .btn-info, fieldset[disabled] .btn-info:hover, fieldset[disabled] .btn-info:focus, fieldset[disabled] .btn-info:active, fieldset[disabled] .btn-info.active {
+    background-color: #009ee0;
+    border-color: #008cc7; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000385}}
+.btn-link {
+  color: #009ee0;
+  font-weight: normal;
+  cursor: pointer;
+  border-radius: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\0000394}}
+  .btn-link, .btn-link:active, .btn-link[disabled], fieldset[disabled] .btn-link {
+    background-color: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003101}}
+  .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+    border-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003105}}
+  .btn-link:hover, .btn-link:focus {
+    color: #e3004a;
+    text-decoration: underline;
+    background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003113}}
+  .btn-link[disabled]:hover, .btn-link[disabled]:focus, fieldset[disabled] .btn-link:hover, fieldset[disabled] .btn-link:focus {
+    color: #999999;
+    text-decoration: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003124}}
+.btn-lg, .btn-group-lg > .btn {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003129}}
+.btn-sm, .btn-group-sm > .btn,
+.btn-xs,
+.btn-group-xs > .btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003133}}
+.btn-xs, .btn-group-xs > .btn {
+  padding: 1px 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003141}}
+.btn-block {
+  display: block;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003149}}
+.btn-block + .btn-block {
+  margin-top: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_buttons\.scss}line{font-family:\00003157}}
+input[type="submit"].btn-block,
+input[type="reset"].btn-block,
+input[type="button"].btn-block {
+  width: 100%; }
+
+/* --- bootstrap: COMPONENTS */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000310}}
+.btn-default .caret {
+  border-top-color: #666666; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000317}}
+.btn-primary .caret, .btn-success .caret, .btn-warning .caret, .btn-danger .caret, .btn-info .caret {
+  border-top-color: #fff; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000322}}
+.dropup .btn-default .caret {
+  border-bottom-color: #666666; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000330}}
+.dropup .btn-primary .caret,
+.dropup .btn-success .caret,
+.dropup .btn-warning .caret,
+.dropup .btn-danger .caret,
+.dropup .btn-info .caret {
+  border-bottom-color: #fff; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000338}}
+.btn-group,
+.btn-group-vertical {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000342}}
+  .btn-group > .btn,
+  .btn-group-vertical > .btn {
+    position: relative;
+    float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000349}}
+    .btn-group > .btn:hover, .btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,
+    .btn-group-vertical > .btn:hover,
+    .btn-group-vertical > .btn:focus,
+    .btn-group-vertical > .btn:active,
+    .btn-group-vertical > .btn.active {
+      z-index: 2; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000352}}
+    .btn-group > .btn:focus,
+    .btn-group-vertical > .btn:focus {
+      outline: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000364}}
+.btn-group .btn + .btn,
+.btn-group .btn + .btn-group,
+.btn-group .btn-group + .btn,
+.btn-group .btn-group + .btn-group {
+  margin-left: -1px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+.btn-toolbar:before, .btn-toolbar:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+.btn-toolbar:after {
+  clear: both; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000373}}
+.btn-toolbar .btn-group {
+  float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000380}}
+.btn-toolbar > .btn + .btn,
+.btn-toolbar > .btn + .btn-group,
+.btn-toolbar > .btn-group + .btn,
+.btn-toolbar > .btn-group + .btn-group {
+  margin-left: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000386}}
+.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  border-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000391}}
+.btn-group > .btn:first-child {
+  margin-left: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000393}}
+  .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\0000399}}
+.btn-group > .btn:last-child:not(:first-child),
+.btn-group > .dropdown-toggle:not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003104}}
+.btn-group > .btn-group {
+  float: left; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003107}}
+.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+  border-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003112}}
+.btn-group > .btn-group:first-child > .btn:last-child,
+.btn-group > .btn-group:first-child > .dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003116}}
+.btn-group > .btn-group:last-child > .btn:first-child {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003122}}
+.btn-group .dropdown-toggle:active,
+.btn-group.open .dropdown-toggle {
+  outline: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003140}}
+.btn-group > .btn + .dropdown-toggle {
+  padding-left: 8px;
+  padding-right: 8px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003144}}
+.btn-group > .btn-lg + .dropdown-toggle, .btn-group-lg.btn-group > .btn + .dropdown-toggle {
+  padding-left: 12px;
+  padding-right: 12px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003151}}
+.btn-group.open .dropdown-toggle {
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125); }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003157}}
+.btn .caret {
+  margin-left: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003161}}
+.btn-lg .caret, .btn-group-lg > .btn .caret {
+  border-width: 5px 5px 0;
+  border-bottom-width: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003166}}
+.dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret {
+  border-width: 0 5px 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003176}}
+.btn-group-vertical > .btn,
+.btn-group-vertical > .btn-group {
+  display: block;
+  float: none;
+  width: 100%;
+  max-width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+.btn-group-vertical > .btn-group:before, .btn-group-vertical > .btn-group:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+.btn-group-vertical > .btn-group:after {
+  clear: both; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003186}}
+.btn-group-vertical > .btn-group > .btn {
+  float: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003194}}
+.btn-group-vertical > .btn + .btn,
+.btn-group-vertical > .btn + .btn-group,
+.btn-group-vertical > .btn-group + .btn,
+.btn-group-vertical > .btn-group + .btn-group {
+  margin-top: -1px;
+  margin-left: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003201}}
+.btn-group-vertical > .btn:not(:first-child):not(:last-child) {
+  border-radius: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003204}}
+.btn-group-vertical > .btn:first-child:not(:last-child) {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003208}}
+.btn-group-vertical > .btn:last-child:not(:first-child) {
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003213}}
+.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
+  border-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003218}}
+.btn-group-vertical > .btn-group:first-child > .btn:last-child,
+.btn-group-vertical > .btn-group:first-child > .dropdown-toggle {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003222}}
+.btn-group-vertical > .btn-group:last-child > .btn:first-child {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003231}}
+.btn-group-justified {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003236}}
+  .btn-group-justified .btn {
+    float: none;
+    display: table-cell;
+    width: 1%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_button-groups\.scss}line{font-family:\00003246}}
+[data-toggle="buttons"] > .btn > input[type="radio"],
+[data-toggle="buttons"] > .btn > input[type="checkbox"] {
+  display: none; }
+
+/* --- --- bootstrap: input-groups --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\000037}}
+.input-group {
+  position: relative;
+  display: table;
+  border-collapse: separate; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000313}}
+  .input-group.col {
+    float: none;
+    padding-left: 0;
+    padding-right: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000319}}
+  .input-group .form-control {
+    width: 100%;
+    margin-bottom: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000342}}
+.input-group-addon,
+.input-group-btn,
+.input-group .form-control {
+  display: table-cell; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000345}}
+  .input-group-addon:not(:first-child):not(:last-child),
+  .input-group-btn:not(:first-child):not(:last-child),
+  .input-group .form-control:not(:first-child):not(:last-child) {
+    border-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000351}}
+.input-group-addon,
+.input-group-btn {
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000359}}
+.input-group-addon {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1;
+  text-align: center;
+  background-color: #eeeeee;
+  border: 1px solid #cccccc;
+  border-radius: 2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000370}}
+  .input-group-addon.input-sm,
+  .input-group-sm > .input-group-addon,
+  .input-group-sm > .input-group-btn > .input-group-addon.btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 3px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000375}}
+  .input-group-addon.input-lg,
+  .input-group-lg > .input-group-addon,
+  .input-group-lg > .input-group-btn > .input-group-addon.btn {
+    padding: 10px 16px;
+    font-size: 18px;
+    border-radius: 6px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000383}}
+  .input-group-addon input[type="radio"],
+  .input-group-addon input[type="checkbox"] {
+    margin-top: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000393}}
+.input-group .form-control:first-child,
+.input-group-addon:first-child,
+.input-group-btn:first-child > .btn,
+.input-group-btn:first-child > .dropdown-toggle,
+.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\0000396}}
+.input-group-addon:first-child {
+  border-right: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003103}}
+.input-group .form-control:last-child,
+.input-group-addon:last-child,
+.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .dropdown-toggle,
+.input-group-btn:first-child > .btn:not(:first-child) {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003106}}
+.input-group-addon:last-child {
+  border-left: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003112}}
+.input-group-btn {
+  position: relative;
+  white-space: nowrap; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003116}}
+.input-group-btn > .btn {
+  position: relative; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003119}}
+  .input-group-btn > .btn + .btn {
+    margin-left: -4px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_input-groups\.scss}line{font-family:\00003124}}
+  .input-group-btn > .btn:hover, .input-group-btn > .btn:active {
+    z-index: 2; }
+
+/* --- --- bootstrap: navs --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\000039}}
+.nav {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .nav:before, .nav:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .nav:after {
+    clear: both; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000315}}
+  .nav > li {
+    position: relative;
+    display: block; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000319}}
+    .nav > li > a {
+      position: relative;
+      display: block;
+      padding: 10px 15px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000324}}
+      .nav > li > a:hover, .nav > li > a:focus {
+        text-decoration: none;
+        background-color: #eeeeee; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000331}}
+    .nav > li.disabled > a {
+      color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000335}}
+      .nav > li.disabled > a:hover, .nav > li.disabled > a:focus {
+        color: #999999;
+        text-decoration: none;
+        background-color: transparent;
+        cursor: not-allowed; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000348}}
+  .nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+    background-color: #eeeeee;
+    border-color: #009ee0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000355}}
+  .nav .nav-divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000361}}
+  .nav > li > a > img {
+    max-width: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000371}}
+.nav-tabs {
+  border-bottom: 1px solid #dddddd; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000373}}
+  .nav-tabs > li {
+    float: left;
+    margin-bottom: -1px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000379}}
+    .nav-tabs > li > a {
+      margin-right: 2px;
+      line-height: 1.42857;
+      border: 1px solid transparent;
+      border-radius: 2px 2px 0 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000384}}
+      .nav-tabs > li > a:hover {
+        border-color: #eeeeee #eeeeee #dddddd; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\0000393}}
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+      color: #555555;
+      background-color: white;
+      border: 1px solid #dddddd;
+      border-bottom-color: transparent;
+      cursor: default; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003113}}
+.nav-pills > li {
+  float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003117}}
+  .nav-pills > li > a {
+    border-radius: 5px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003120}}
+  .nav-pills > li + li {
+    margin-left: 2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003128}}
+  .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: white;
+    background-color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003139}}
+.nav-stacked > li {
+  float: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003141}}
+  .nav-stacked > li + li {
+    margin-top: 2px;
+    margin-left: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003155}}
+.nav-justified, .nav-tabs.nav-justified {
+  width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003158}}
+  .nav-justified > li, .nav-tabs.nav-justified > li {
+    float: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003160}}
+    .nav-justified > li > a, .nav-tabs.nav-justified > li > a {
+      text-align: center; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003166}}
+    .nav-justified > li, .nav-tabs.nav-justified > li {
+      display: table-cell;
+      width: 1%; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003174}}
+.nav-tabs-justified, .nav-tabs.nav-justified {
+  border-bottom: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003176}}
+  .nav-tabs-justified > li > a, .nav-tabs.nav-justified > li > a {
+    border-bottom: 1px solid #dddddd;
+    margin-right: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003182}}
+  .nav-tabs-justified > .active > a, .nav-tabs.nav-justified > .active > a {
+    border-bottom-color: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+.tabbable:before, .tabbable:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+.tabbable:after {
+  clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003198}}
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003203}}
+.tab-content > .active,
+.pill-content > .active {
+  display: block; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003214}}
+.nav .caret {
+  border-top-color: #009ee0;
+  border-bottom-color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003218}}
+.nav a:hover .caret {
+  border-top-color: #e3004a;
+  border-bottom-color: #e3004a; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navs\.scss}line{font-family:\00003224}}
+.nav-tabs .dropdown-menu {
+  margin-top: -1px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0; }
+
+/* --- --- navbar --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000311}}
+.navbar {
+  position: relative;
+  z-index: 1000;
+  min-height: 50px;
+  margin-bottom: 20px;
+  border: 1px solid transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .navbar:before, .navbar:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .navbar:after {
+    clear: both; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000311}}
+    .navbar {
+      border-radius: 2px; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+.navbar-header:before, .navbar-header:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+.navbar-header:after {
+  clear: both; }
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000332}}
+  .navbar-header {
+    float: left; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000351}}
+.navbar-collapse {
+  max-height: 340px;
+  overflow-x: visible;
+  padding-right: 0px;
+  padding-left: 0px;
+  border-top: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  -webkit-overflow-scrolling: touch; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  .navbar-collapse:before, .navbar-collapse:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  .navbar-collapse:after {
+    clear: both; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000361}}
+  .navbar-collapse.in {
+    overflow-y: auto; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000351}}
+    .navbar-collapse {
+      width: auto;
+      border-top: 0;
+      box-shadow: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000370}}
+      .navbar-collapse.collapse {
+        display: block !important;
+        height: auto !important;
+        padding-bottom: 0;
+        overflow: visible !important; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000377}}
+      .navbar-collapse.in {
+        overflow-y: visible; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000382}}
+      .navbar-collapse .navbar-nav.navbar-left:first-child {
+        margin-left: 0px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000385}}
+      .navbar-collapse .navbar-nav.navbar-right:last-child {
+        margin-right: 0px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\0000388}}
+      .navbar-collapse .navbar-text:last-child {
+        margin-right: 0; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003100}}
+.container > .navbar-header,
+.container > .navbar-collapse {
+  margin-right: 0px;
+  margin-left: 0px; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003100}}
+    .container > .navbar-header,
+    .container > .navbar-collapse {
+      margin-right: 0;
+      margin-left: 0; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003118}}
+.navbar-static-top {
+  border-width: 0 0 1px; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003118}}
+    .navbar-static-top {
+      border-radius: 0; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003127}}
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  position: fixed;
+  right: 0;
+  left: 0;
+  border-width: 0 0 1px; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003127}}
+    .navbar-fixed-top,
+    .navbar-fixed-bottom {
+      border-radius: 0; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003138}}
+.navbar-fixed-top {
+  z-index: 1030;
+  top: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003142}}
+.navbar-fixed-bottom {
+  bottom: 0;
+  margin-bottom: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003150}}
+.navbar-brand {
+  float: left;
+  padding: 15px 0px;
+  font-size: 18px;
+  line-height: 20px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003156}}
+  .navbar-brand:hover, .navbar-brand:focus {
+    text-decoration: none; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003161}}
+    .navbar > .container .navbar-brand {
+      margin-left: 0px; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003173}}
+.navbar-toggle {
+  position: relative;
+  float: right;
+  margin-right: 0px;
+  padding: 9px 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003184}}
+  .navbar-toggle .icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003190}}
+  .navbar-toggle .icon-bar + .icon-bar {
+    margin-top: 4px; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003173}}
+    .navbar-toggle {
+      display: none; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003205}}
+.navbar-nav {
+  margin: 7.5px 0px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003208}}
+  .navbar-nav > li > a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 20px; }
+  @media (max-width: 767px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003216}}
+    .navbar-nav .open .dropdown-menu {
+      position: static;
+      float: none;
+      width: auto;
+      margin-top: 0;
+      background-color: transparent;
+      border: 0;
+      box-shadow: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003225}}
+      .navbar-nav .open .dropdown-menu > li > a,
+      .navbar-nav .open .dropdown-menu .dropdown-header {
+        padding: 5px 15px 5px 25px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003228}}
+      .navbar-nav .open .dropdown-menu > li > a {
+        line-height: 20px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003231}}
+        .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-nav .open .dropdown-menu > li > a:focus {
+          background-image: none; } }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003205}}
+    .navbar-nav {
+      float: left;
+      margin: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003243}}
+      .navbar-nav > li {
+        float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003245}}
+        .navbar-nav > li > a {
+          padding-top: 15px;
+          padding-bottom: 15px; } }
+
+@media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003262}}
+  .navbar-left {
+    float: left !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003265}}
+  .navbar-right {
+    float: right !important; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003276}}
+.navbar-form {
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 10px 0px;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  margin-bottom: 8px; }
+  @media (max-width: 767px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003288}}
+    .navbar-form .form-group {
+      margin-bottom: 5px; } }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003276}}
+    .navbar-form {
+      width: auto;
+      border: 0;
+      margin-left: 0;
+      margin-right: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      -webkit-box-shadow: none;
+      box-shadow: none; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003313}}
+.navbar-nav > li > .dropdown-menu {
+  margin-top: 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003318}}
+.navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003324}}
+.navbar-nav.pull-right > li > .dropdown-menu,
+.navbar-nav > li > .dropdown-menu.pull-right {
+  left: auto;
+  right: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003334}}
+.navbar-btn {
+  margin-top: 8px;
+  margin-bottom: 8px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003343}}
+.navbar-text {
+  float: left;
+  margin-top: 15px;
+  margin-bottom: 15px; }
+  @media (min-width: 768px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003343}}
+    .navbar-text {
+      margin-left: 0px;
+      margin-right: 0px; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003357}}
+.navbar-default {
+  background-color: #f8f8f8;
+  border-color: #e7e7e7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003361}}
+  .navbar-default .navbar-brand {
+    color: #777777; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003364}}
+    .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+      color: #5e5e5e;
+      background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003370}}
+  .navbar-default .navbar-text {
+    color: #777777; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003375}}
+  .navbar-default .navbar-nav > li > a {
+    color: #777777; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003379}}
+    .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+      color: #333333;
+      background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003387}}
+  .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+    color: #555555;
+    background-color: #e7e7e7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003395}}
+  .navbar-default .navbar-nav > .disabled > a, .navbar-default .navbar-nav > .disabled > a:hover, .navbar-default .navbar-nav > .disabled > a:focus {
+    color: #cccccc;
+    background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003402}}
+  .navbar-default .navbar-toggle {
+    border-color: #dddddd; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003405}}
+    .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+      background-color: #dddddd; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003408}}
+    .navbar-default .navbar-toggle .icon-bar {
+      background-color: #cccccc; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003414}}
+  .navbar-default .navbar-collapse,
+  .navbar-default .navbar-form {
+    border-color: #e6e6e6; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003422}}
+  .navbar-default .navbar-nav > .dropdown > a:hover .caret,
+  .navbar-default .navbar-nav > .dropdown > a:focus .caret {
+    border-top-color: #333333;
+    border-bottom-color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003431}}
+  .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #e7e7e7;
+    color: #555555; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003434}}
+    .navbar-default .navbar-nav > .open > a .caret, .navbar-default .navbar-nav > .open > a:hover .caret, .navbar-default .navbar-nav > .open > a:focus .caret {
+      border-top-color: #555555;
+      border-bottom-color: #555555; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003440}}
+  .navbar-default .navbar-nav > .dropdown > a .caret {
+    border-top-color: #777777;
+    border-bottom-color: #777777; }
+  @media (max-width: 767px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003449}}
+    .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+      color: #777777; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003452}}
+      .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+        color: #333333;
+        background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003460}}
+    .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+      color: #555555;
+      background-color: #e7e7e7; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003468}}
+    .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a, .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+      color: #cccccc;
+      background-color: transparent; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003482}}
+  .navbar-default .navbar-link {
+    color: #777777; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003484}}
+    .navbar-default .navbar-link:hover {
+      color: #333333; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003493}}
+.navbar-inverse {
+  background-color: #222222;
+  border-color: #090909; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003497}}
+  .navbar-inverse .navbar-brand {
+    color: white; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003500}}
+    .navbar-inverse .navbar-brand:hover, .navbar-inverse .navbar-brand:focus {
+      color: white;
+      background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003506}}
+  .navbar-inverse .navbar-text {
+    color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003511}}
+  .navbar-inverse .navbar-nav > li > a {
+    color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003515}}
+    .navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+      color: white;
+      background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003523}}
+  .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+    color: white;
+    background-color: #090909; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003531}}
+  .navbar-inverse .navbar-nav > .disabled > a, .navbar-inverse .navbar-nav > .disabled > a:hover, .navbar-inverse .navbar-nav > .disabled > a:focus {
+    color: #444444;
+    background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003539}}
+  .navbar-inverse .navbar-toggle {
+    border-color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003542}}
+    .navbar-inverse .navbar-toggle:hover, .navbar-inverse .navbar-toggle:focus {
+      background-color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003545}}
+    .navbar-inverse .navbar-toggle .icon-bar {
+      background-color: white; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003551}}
+  .navbar-inverse .navbar-collapse,
+  .navbar-inverse .navbar-form {
+    border-color: #101010; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003560}}
+  .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: #090909;
+    color: white; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003565}}
+  .navbar-inverse .navbar-nav > .dropdown > a:hover .caret {
+    border-top-color: white;
+    border-bottom-color: white; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003569}}
+  .navbar-inverse .navbar-nav > .dropdown > a .caret {
+    border-top-color: #999999;
+    border-bottom-color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003577}}
+  .navbar-inverse .navbar-nav > .open > a .caret, .navbar-inverse .navbar-nav > .open > a:hover .caret, .navbar-inverse .navbar-nav > .open > a:focus .caret {
+    border-top-color: white;
+    border-bottom-color: white; }
+  @media (max-width: 767px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003587}}
+    .navbar-inverse .navbar-nav .open .dropdown-menu > .dropdown-header {
+      border-color: #090909; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003590}}
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+      color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003593}}
+      .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:focus {
+        color: white;
+        background-color: transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003601}}
+    .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a, .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-inverse .navbar-nav .open .dropdown-menu > .active > a:focus {
+      color: white;
+      background-color: #090909; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003609}}
+    .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a, .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:hover, .navbar-inverse .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+      color: #444444;
+      background-color: transparent; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003618}}
+  .navbar-inverse .navbar-link {
+    color: #999999; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_navbar\.scss}line{font-family:\00003620}}
+    .navbar-inverse .navbar-link:hover {
+      color: white; }
+
+/* --- bootstrap: UTILITY CLASSES */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+.clearfix:before, .clearfix:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+.clearfix:after {
+  clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000312}}
+.pull-right {
+  float: right !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000315}}
+.pull-left {
+  float: left !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000323}}
+.hide {
+  display: none !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000326}}
+.show {
+  display: block !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000329}}
+.invisible {
+  visibility: hidden; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000332}}
+.text-hide {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_utilities\.scss}line{font-family:\0000340}}
+.affix {
+  position: fixed; }
+
+/* NATURALIS - LINNÆUS  */
+/* --- FONT */
+/* --- --- PLATFORM --- */
+@font-face {
+  font-family: 'Platform Alternate';
+  src: url("fonts/platform-regular-alternate-webfont.eot");
+  src: url("fonts/platform-regular-alternate-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/platform-regular-alternate-webfont.woff") format("woff"), url("fonts/platform-regular-alternate-webfont.ttf?5") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+
+/* --- --- GOOGLE OPEN SANS --- */
+/* --- --- ICONS --- */
+@font-face {
+  font-family: 'naturalis-lng-icons';
+  src: url("fonts/naturalis-lng-icons.eot");
+  src: url("fonts/naturalis-lng-icons.eot?#iefix") format("embedded-opentype"), url("fonts/naturalis-lng-icons.ttf?6") format("truetype"), url("fonts/naturalis-lng-icons.woff") format("woff"), url("fonts/naturalis-lng-icons.svg#naturalis-lng-icons") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003238}}
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'naturalis-lng-icons';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003250}}
+.icon-resemblance:before {
+  content: "\e600"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003253}}
+.icon-reload:before {
+  content: "\e601"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003256}}
+.icon-details2:before {
+  content: "\e602"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003259}}
+.icon-book:before {
+  content: "\e603"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003262}}
+.icon-arrow_right:before {
+  content: "\e604"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003265}}
+.icon-arrow_left:before {
+  content: "\e605"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003268}}
+.icon-search:before {
+  content: "\e606"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003271}}
+.icon-arrow_down_left:before {
+  content: "\e608"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003274}}
+.icon-arrow_left_up:before {
+  content: "\e609"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003277}}
+.icon-nav-prev:before {
+  content: "\e60a"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003280}}
+.icon-nav-next:before {
+  content: "\e60b"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003283}}
+.icon-arrow_up_left:before {
+  content: "\e607"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003287}}
+.icon-close:before {
+  content: "\e60c"; }
+
+/* --- STYLING --- */
+/* --- --- TITLE BAR --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003296}}
+#header-container {
+  background: none;
+  height: 50px;
+  margin: 0;
+  background-color: black; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003303}}
+#title {
+  font-size: 32px;
+  font-family: "Platform Alternate";
+  margin: 0 auto;
+  line-height: 50px; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003303}}
+    #title {
+      margin-left: 0.25em;
+      font-size: 24px; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003310}}
+  #title a {
+    color: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003315}}
+#mini-header-title {
+  font-size: 18px;
+  margin-bottom: 1em; }
+
+/* --- --- TOP STRIP --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003321}}
+#top-strip {
+  height: 50px;
+  margin-bottom: -65px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003324}}
+  #top-strip p {
+    position: relative;
+    top: -50px;
+    width: 1080px;
+    margin: 0 auto;
+    color: #666666;
+    text-align: right;
+    font-size: 16px;
+    margin-top: 15px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003335}}
+  #top-strip a {
+    color: #eeede9; }
+
+/* --- --- BOTTOMBAR --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003346}}
+#bottombar {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: bold;
+  height: 50px;
+  margin: 0;
+  overflow: hidden; }
+
+/* --- --- MAIN MENU --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003359}}
+#main-menu {
+  font-size: 18px;
+  line-height: 1.8;
+  background-color: #542e08; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003359}}
+    #main-menu {
+      font-size: 12px; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003369}}
+  #main-menu ul {
+    width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003373}}
+  #main-menu li {
+    list-style: none inside none; }
+    @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003377}}
+      #main-menu li:after {
+        content: "|";
+        color: white; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003385}}
+  #main-menu a {
+    color: white; }
+
+/* --- --- TITLE --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003393}}
+#header-title {
+  display: block;
+  clear: both;
+  width: 100%;
+  font-size: 32px;
+  color: #009ee0;
+  font-family: "Platform Alternate"; }
+
+/* --- --- CONTENT --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003404}}
+#content {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #302c22;
+  font-weight: 300;
+  font-family: 'Open Sans', sans-serif;
+  padding-top: 1em;
+  background-color: #f9f9f7;
+  padding: 1em 5.88235%; }
+  @media (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003404}}
+    #content {
+      font-size: 14px; } }
+  @media print {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003404}}
+    #content {
+      background-color: white;
+      color: black;
+      font-size: 10pt; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003425}}
+  #content a {
+    border-bottom: thin dotted #cccccc;
+    color: #666666; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003429}}
+    #content a:hover {
+      text-decoration: none;
+      border-bottom: solid #009ee0 2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003435}}
+  #content b {
+    font-weight: 400; }
+
+/* --- --- CATEGORIES (tabs) --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003443}}
+#categories {
+  margin-top: 2em;
+  font-size: 14px; }
+  @media (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003443}}
+    #categories {
+      text-align: center;
+      font-size: 12px; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003452}}
+  #categories ul {
+    margin: 0;
+    padding: 0;
+    display: block; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003458}}
+  #categories li {
+    list-style: none inside none;
+    display: block;
+    float: left; }
+    @media (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003458}}
+      #categories li {
+        margin-right: 0.5em; } }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003471}}
+  #categories a {
+    display: block;
+    color: #e3004a;
+    padding: 0.25em 0.75em 0.5em; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003476}}
+    #categories a:hover {
+      text-decoration: none;
+      color: #009ee0;
+      border-color: #009ee0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003482}}
+    #categories a.category-active {
+      background-color: #f9f9f7;
+      color: #666666; }
+
+/* --- --- NAVIGATION PANE --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003492}}
+.navigation-icon {
+  width: 0;
+  height: 0;
+  font-size: 0;
+  overflow: hidden;
+  color: #542e08; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003496}}
+  .navigation-icon:before {
+    width: 30px;
+    height: 30px;
+    display: block;
+    float: right;
+    font-size: 24px;
+    font-family: 'naturalis-lng-icons'; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003506}}
+#back-icon:before, #back-icon-inactive:before {
+  content: "\e60a"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003510}}
+#next-icon:before, #next-icon-inactive:before {
+  content: "\e60b"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003515}}
+#contents-icon:before, #contents-icon-inactive:before {
+  content: "\e603"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003519}}
+#previous-icon:before, #previous-icon-inactive:before {
+  content: "\e607"; }
+
+/* --- --- LOOKUP DIALOGUE --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003525}}
+#lookup-DialogContent {
+  margin-top: 0.5em;
+  height: 400px;
+  overflow-y: auto;
+  padding-left: 1em;
+  border-left: 1px solid #eeede9; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003533}}
+  #lookup-DialogContent p {
+    margin: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003537}}
+  #lookup-DialogContent .row {
+    padding: 0.125em; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003541}}
+    #lookup-DialogContent .row a {
+      color: #e3004a;
+      border-bottom: 1px dotted #e3004a;
+      text-decoration: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003546}}
+      #lookup-DialogContent .row a:hover {
+        color: #009ee0;
+        border-bottom-color: #009ee0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003552}}
+    #lookup-DialogContent .row:hover {
+      background-color: #eeede9; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003558}}
+  #lookup-DialogContent .row-selected a {
+    color: #542e08;
+    border-bottom-color: #542e08; }
+
+/* --- --- INDEX (inhoudsopgave) --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003570}}
+.alphabet-letter,
+.alphabet-letter-ghosted,
+.alphabet-active-letter {
+  display: block;
+  float: left;
+  width: 3.84615%;
+  text-align: center;
+  font-size: 18px;
+  font-family: 'Open Sans',sans-serif;
+  font-weight: 300; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003580}}
+.alphabet-letter {
+  color: #302c22; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003584}}
+.alphabet-letter-ghosted {
+  color: #cccccc; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003588}}
+.alphabet-active-letter {
+  color: #e3004a;
+  font-weight: 400;
+  background-color: #f9f9f7; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003594}}
+#commonname-languages {
+  position: absolute;
+  right: 1em;
+  top: 3em; }
+
+/* --- FORM-ELEMENTS --- */
+/* --- --- FORM-ELEMENTS: GENERAL --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003607}}
+.btn-group-justified .btn .btn {
+  display: block;
+  float: left;
+  width: 33%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003615}}
+.btn.active {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  background-color: #e6e6e6;
+  color: #333333;
+  border-color: #e6e6e6; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003623}}
+label {
+  color: #333333;
+  font-weight: 500; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003628}}
+textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"], input[type="password"] {
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-radius: 4px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3) inset;
+  padding: 8px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003634}}
+button, input {
+  line-height: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003637}}
+button, input, select, textarea {
+  color: #222222;
+  font-family: sans-serif;
+  font-size: 100%;
+  margin: 0;
+  vertical-align: baseline; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003645}}
+.button:visited, .button:link, .button, input[type="button"], input[type="reset"], input[type="submit"], button {
+  -moz-user-select: none;
+  background-color: #f9f9f7;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  color: #666666;
+  display: inline-block;
+  font-size: 1.25em;
+  font-weight: bold;
+  padding: 6px 20px;
+  position: relative;
+  text-align: center; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003658}}
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003661}}
+button, input {
+  line-height: normal; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003664}}
+button, input, select, textarea {
+  color: #222222;
+  font-family: sans-serif;
+  font-size: 100%;
+  margin: 0;
+  vertical-align: baseline;
+  background-color: white;
+  border-color: #cccccc; }
+
+/* --- jQUERY DIALOGUE --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003675}}
+#dialog {
+  position: fixed;
+  padding: 0;
+  z-index: 200;
+  height: 400px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003682}}
+#dialog-header {
+  background: #009ee0;
+  display: block;
+  position: relative;
+  padding: 5px;
+  height: 2em;
+  font-weight: bold;
+  color: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003692}}
+#dialog-title {
+  float: left;
+  margin: 0;
+  overflow: hidden; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003698}}
+#dialog-close {
+  float: right;
+  cursor: pointer;
+  height: 20px;
+  width: 25px;
+  font-weight: normal;
+  text-align: center;
+  font-family: 'naturalis-lng-icons';
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -2px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003709}}
+  #dialog-close:after {
+    content: "\e60c"; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003715}}
+#dialog-content {
+  display: block;
+  padding: 1em;
+  min-height: 160px;
+  background: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003723}}
+#dialog-content-inner {
+  min-height: 128px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003727}}
+#dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  opacity: 0.6;
+  z-index: 100; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003738}}
+#dialog-button-container {
+  text-align: center;
+  margin: 2px 6px 6px 2px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003743}}
+.error {
+  background: #fff;
+  border: 1px solid #e3004a;
+  border-top: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003749}}
+.errorheader {
+  color: #6f2c2c;
+  border: 1px solid #e3004a;
+  border-bottom: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003755}}
+.errorbutton {
+  border: 1px solid #e3004a;
+  color: #fff;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003761}}
+.warning {
+  background: #fff;
+  border: 1px solid #f29400;
+  border-top: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003767}}
+.warningheader {
+  color: #957c17;
+  border: 1px solid #f29400;
+  border-bottom: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003773}}
+.warningbutton {
+  background-color: #eFcC47;
+  border: 1px solid #f29400;
+  color: #957C17;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003780}}
+.success {
+  background: #fff;
+  border: 1px solid #60a174;
+  border-top: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003786}}
+.successheader {
+  color: #3c7f51;
+  border: 1px solid #60a174;
+  border-bottom: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003792}}
+.successbutton {
+  background-color: #3c7f51;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003799}}
+.promptbutton {
+  text-decoration: none;
+  color: #CC0000;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003805}}
+.promptbutton:hover {
+  text-decoration: underline; }
+
+/* --- LAYOUT --- */
+/* --- --- GENERAL --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003814}}
+#title {
+  width: 1080px;
+  max-width: 100%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003823}}
+html {
+  height: 100%;
+  outline: 2px solid red; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003828}}
+body {
+  background-color: #eeede9; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003832}}
+#container {
+  background-color: white;
+  min-height: 1000px;
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+  #container:before, #container:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+  #container:after {
+    clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003844}}
+.navbar-container {
+  max-width: 1080px;
+  margin: 0 auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003848}}
+#theForm {
+  overflow: auto; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003852}}
+.row {
+  padding-top: 30px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000321}}
+#main:before, #main:after {
+  content: " ";
+  /* 1 */
+  display: table;
+  /* 2 */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/bootstrap\/_mixins\.scss}line{font-family:\0000325}}
+#main:after {
+  clear: both; }
+
+/* --- --- TOP-STRIP --- */
+@media (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003861}}
+  #top-strip {
+    clear: both;
+    float: none;
+    width: 100%;
+    display: none; } }
+
+/* --- --- MAIN MENU --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003872}}
+#main-menu {
+  display: block;
+  float: left;
+  width: 20.83333%;
+  padding-left: 2.08333%;
+  margin-right: 2.08333%;
+  padding-top: 4em; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003872}}
+    #main-menu {
+      width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003880}}
+      #main-menu li {
+        display: inline-block; } }
+
+/* --- --- PAGE CONTENT --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003887}}
+#page-container {
+  clear: both; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003897}}
+#page-main,
+#search-main-no-tabs,
+#header-titles,
+#search-main,
+#categories,
+#alphabet {
+  display: block;
+  float: left;
+  width: 75%; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003897}}
+    #page-main,
+    #search-main-no-tabs,
+    #header-titles,
+    #search-main,
+    #categories,
+    #alphabet {
+      width: 100%;
+      text-align: center; } }
+  @media print {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003897}}
+    #page-main,
+    #search-main-no-tabs,
+    #header-titles,
+    #search-main,
+    #categories,
+    #alphabet {
+      width: 100%; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003911}}
+#overview-image,
+.introduction-img {
+  width: 241px;
+  max-width: 50%;
+  float: right;
+  height: 281px;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  outline: 1px solid white;
+  background-color: #eeede9 !important;
+  background-size: contain !important;
+  margin-left: 1em; }
+  @media print {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003911}}
+    #overview-image,
+    .introduction-img {
+      display: none; } }
+
+/* --- --- CATEGORIES (tabs) --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003929}}
+#categories {
+  padding: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003934}}
+.page-type-index #categories {
+  margin-top: 3em;
+  margin-bottom: -2em; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003939}}
+.page-type-index #content {
+  padding-top: 3em; }
+
+/* --- --- SEARCH --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003947}}
+#search-main,
+#search-main-no-tabs {
+  position: absolute;
+  left: 2.08333%;
+  margin: 0;
+  display: block;
+  float: left;
+  width: 20.83333%; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003947}}
+    #search-main,
+    #search-main-no-tabs {
+      font-size: 12px;
+      width: 50%;
+      margin-top: 0.75em; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003960}}
+#search {
+  max-width: 95%;
+  margin-top: 1.5em; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003960}}
+    #search {
+      padding: 5px; } }
+
+@media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003968}}
+  .search-icon {
+    height: 8px;
+    margin-left: -15px !important; } }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003971}}
+#search-main-no-tabs {
+  width: 100%;
+  clear: both; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003975}}
+  #search-main-no-tabs #search {
+    display: block;
+    float: left;
+    width: 16.66667%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003979}}
+  #search-main-no-tabs .search-icon {
+    float: left;
+    position: relative;
+    top: 32px;
+    margin-right: -16px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003986}}
+  #search-main-no-tabs #header-titles-small {
+    display: block;
+    float: left;
+    width: 70.83333%;
+    margin-left: 6.25%; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003992}}
+#search-main-no-tabs + #page-main {
+  position: relative;
+  top: 50px;
+  margin-bottom: 50px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\00003999}}
+.search-icon {
+  margin-left: -30px; }
+
+@media (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031003}}
+  #header-title {
+    margin-top: 0.25em;
+    font-size: 14px;
+    margin-bottom: 1em; } }
+
+/* --- --- NAVIGATION PANE --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031014}}
+#allNavigationPane {
+  position: absolute;
+  top: 1em;
+  right: 4.16667%; }
+  @media screen and (max-width: 799px) {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031014}}
+    #allNavigationPane {
+      top: 0.25em; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031020}}
+      #allNavigationPane a, #allNavigationPane span {
+        color: white; } }
+
+/* --- --- MODULE GRID --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031028}}
+#module-grid {
+  display: none; }
+
+/* --- --- INDEX (inhoudsopgave) --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031034}}
+#alphabet {
+  position: relative;
+  top: 40px; }
+
+/* --- --- FOOTER  --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031041}}
+#lng {
+  margin-top: 0; }
+
+/* --- --- ROW-SENDER --- */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031046}}
+#row-sender {
+  background-color: #D6D5D1;
+  height: 210px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 30px; }
+
+/* --- PRINT OVERRIDES --- */
+@media print {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031063}}
+  #main-menu,
+  #search-main,
+  #search-main-no-tabs,
+  #categories,
+  #allNavigationPane,
+  #top-strip {
+    display: none; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031067}}
+  #header-title {
+    font-size: 32pt;
+    margin-left: 4.16667%;
+    font-weight: 300;
+    color: black !important; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031074}}
+  #title {
+    font-size: 16pt;
+    color: silver; } }
+/* OVERRIDES (to be taken into customstyles.php) */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031084}}
+#main-menu {
+  background-color: #009ee0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031087}}
+  #main-menu a {
+    color: white; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031092}}
+#dialog-header {
+  background-color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031096}}
+#header-title {
+  color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/basics\.scss}line{font-family:\000031100}}
+#buttons input[value="Search >>"] {
+  background-color: #009ee0 !important; }

@@ -1,0 +1,24 @@
+#page-main .topic {
+	cursor: pointer;
+}
+
+#page-main .topic:hover {
+	text-decoration: underline;
+}
+
+#page-main #content {
+}
+
+#page-main #content #image-thumb, #image-full {
+	float:left;
+	margin:0px 5px 5px 0px;
+	cursor:pointer;
+}
+
+#page-main #content #image-full {
+	width: 150px;
+}
+
+
+
+
