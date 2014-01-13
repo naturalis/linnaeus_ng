@@ -1,0 +1,20 @@
+#header-titles-small {
+	margin-top: -23px;
+}
+
+#page-main {
+    margin-top: -1px;
+    border-top: 1px dotted #0303b2;
+}
+
+#categories ul li a {
+    zoom: 1;
+}
+
+#allNavigationPane {
+	height: 68px;
+}
+
+#header-container #title {
+	left:0;
+}

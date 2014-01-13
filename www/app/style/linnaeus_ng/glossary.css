@@ -1,0 +1,23 @@
+#page-main #definition {
+	text-align: justify;
+	width: 450px;
+	float: left;
+	padding-right: 15px;
+}
+
+#page-main #synonyms {
+	margin-top: 12px;
+}
+
+#page-main #synonyms-title, #media-title {
+	font-weight:bold;
+}
+
+#page-main .synonym {
+}
+
+#page-main #media {
+	float: right;
+	padding-left: 20px;
+	border-left: 1px dotted #0303b2;
+}
