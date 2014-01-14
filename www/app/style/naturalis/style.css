@@ -2336,7 +2336,7 @@ button, input, select, textarea {
   line-height: 24px; }
   #results .icon:hover {
     color: #e3004a; }
-  #results .icon .icon-details, #results .icon .icon-book, #results .icon .icon-resemblance {
+  #results .icon.icon-details, #results .icon.icon-book, #results .icon.icon-resemblance {
     cursor: pointer; }
 
 .control {
