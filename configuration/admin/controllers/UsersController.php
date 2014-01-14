@@ -1160,10 +1160,10 @@ class UsersController extends Controller
     /**
      * Returns the page to redirect to after logging in
      *
-     * @return     string    path if page to redirect to
-     * @access     public
+     * @return     string    path of page to redirect to
+     * @access     private
      */
-    private function getLoginStartPage ($includeDomain = false)
+    private function getLoginStartPage ($includeDomain=false)
     {
         if (!empty($_SESSION['admin']['login_start_page'])) {
 
@@ -1180,6 +1180,17 @@ class UsersController extends Controller
 				$script.=$this->generalSettings['paths']['chooseProject'];
 
         }
+
+echo
+	$this->generalSettings['paths']['projectIndex'],
+	"\n",
+	$this->generalSettings['paths']['chooseProject'],
+	"\n",
+	$script,
+	"\n",
+	($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
+
+die();
 
 		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
 		
