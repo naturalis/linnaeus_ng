@@ -1,4 +1,4 @@
-	  <div id="graphicValueSelector{if $c.type=='media'} layout-grid{else} layout-list{/if}">
+	  <div id="graphicValueSelector" class="{if $c.type=='media'}layout-grid{else}layout-list{/if}">
 
         <p id='dialogSelectorWindow'></p>
 
@@ -77,6 +77,10 @@
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
+
+
+	  
+	  
 	if (typeof nbcInit=='function') {
 		nbcInit();
 	}
