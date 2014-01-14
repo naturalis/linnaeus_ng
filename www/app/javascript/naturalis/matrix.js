@@ -420,10 +420,10 @@ function nbcShowStates(id) {
 			$('#value-selector').modal({show:true}).ready(function() {
 
 				$('#graphicValueSelector.layout-list').parents(".modal-dialog").css("width", "400px");
-				$('#graphicValueSelector.layout-grid').parents(".modal-dialog").css("width", "90%");
+				$('#graphicValueSelector.layout-grid').parents(".modal-dialog").css("width", "75%");
 			
 				if ($("#graphicValues").length>0) {
-					$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 5)+50)
+					//$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 5)+50)
 				}
 	
 			});
