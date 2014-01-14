@@ -428,7 +428,7 @@ console.log($("#graphicValues").width());
 console.log($('.state-image-cell').length); 
 				
 				if ($("#graphicValues").length>0) {
-					$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 4)+150)
+					$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 4)+100)
 				}
 	
 			});
