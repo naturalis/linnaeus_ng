@@ -5,9 +5,9 @@
     <link href='{$baseUrl}app/style/naturalis/style.css' rel='stylesheet' title='default' type='text/css'>
     <link rel="stylesheet" type="text/css" href="{$baseUrl}app/style/naturalis/prettyPhoto/prettyPhoto.css" />
 {if $cssToLoad}
-{section name=i loop=$cssToLoad}
+{section name=i loop=$cssToLoad}{if file_exists($cssToLoad[i])}
 	<link rel="stylesheet" type="text/css" href="{$cssToLoad[i]}" />
-{/section}
+{/if}{/section}
 {/if}
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-ui/jquery-ui-1.10.3.custom.min.js"></script>
