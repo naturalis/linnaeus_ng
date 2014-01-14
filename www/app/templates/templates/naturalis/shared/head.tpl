@@ -13,6 +13,7 @@
 	<script type="text/javascript" src="{$baseUrl}app/javascript/jquery-ui/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/sprintf-0.7-beta1.js"></script>
 	<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/matrix.js"></script>
+	<script type="text/javascript" src="{$baseUrl}app/javascript/naturalis/bootstrap.min.js"></script>
 	<!-- script type="text/javascript" src="{$baseUrl}app/javascript/dialog/jquery.modaldialog.js"></script -->
 {if $javascriptsToLoad}
 {section name=i loop=$javascriptsToLoad.all}
