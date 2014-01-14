@@ -1157,6 +1157,37 @@ class UsersController extends Controller
 
     }
 
+    /**
+     * Returns the page to redirect to after logging in
+     *
+     * @return     string    path if page to redirect to
+     * @access     public
+     */
+    private function getLoginStartPage ($includeDomain = false)
+    {
+        if (!empty($_SESSION['admin']['login_start_page'])) {
+
+            $script=$_SESSION['admin']['login_start_page'];
+			unset($_SESSION['admin']['login_start_page']);
+
+        } else {
+
+			$script=$this->baseUrl.$this->getAppName();
+            
+			if (isset($_SESSION['admin']['user']) && $_SESSION['admin']['user']['_number_of_projects'] == 1)
+				$script.=$this->generalSettings['paths']['projectIndex'];
+			else
+				$script.=$this->generalSettings['paths']['chooseProject'];
+
+        }
+
+		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
+		
+    }
+
+
+
+
 	private function ajaxActionConnectExistingUser()
 	{
 
