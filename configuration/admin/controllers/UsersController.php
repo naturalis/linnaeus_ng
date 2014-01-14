@@ -1181,17 +1181,6 @@ class UsersController extends Controller
 
         }
 
-echo
-	$this->generalSettings['paths']['projectIndex'],
-	"\n",
-	$this->generalSettings['paths']['chooseProject'],
-	"\n",
-	$script,
-	"\n",
-	($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
-
-die();
-
 		return ($includeDomain ? 'http://' . $_SERVER['HTTP_HOST'] . '/' : '').$script;
 		
     }
