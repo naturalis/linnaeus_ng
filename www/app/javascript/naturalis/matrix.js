@@ -423,7 +423,7 @@ function nbcShowStates(id) {
 				$('#graphicValueSelector.layout-grid').parents(".modal-dialog").css("width", "90%");
 			
 				if ($("#graphicValues").length>0) {
-					$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 4)+50)
+					$(".modal-dialog").first().width($("#graphicValues").width()+($('.state-image-cell').length * 5)+50)
 				}
 	
 			});
