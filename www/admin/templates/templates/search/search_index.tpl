@@ -23,6 +23,7 @@
 					{foreach from=$r.data item=d}
 <!--
 
+	{$r|@var_dump}
 	{$d|@var_dump}
 
 -->
