@@ -14,6 +14,12 @@
 
 {if $results.count>0}
 
+<!--
+
+	{$results.data|@var_dump}
+
+-->
+
 	{foreach from=$results.data item=v}
 		{if $v.numOfResults>0}
 			{foreach from=$v.results item=r}
