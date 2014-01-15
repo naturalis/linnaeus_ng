@@ -1258,7 +1258,7 @@ class SpeciesController extends Controller
         $taxa = $this->models->Taxon->freeQuery(
 			array(
 				'query' => "
-					select _a.id, _a.taxon
+					select _a.id, _a.taxon, _a.rank_id, _a.is_hybrid
 					from %PRE%taxa _a 
 					left join %PRE%projects_ranks _b on _a.rank_id=_b.id 
 					where _a.project_id = ".$this->getCurrentProjectId()."
@@ -1268,7 +1268,7 @@ class SpeciesController extends Controller
 			));
 
         foreach ((array) $taxa as $key => $val) {
-			$taxa[$key]['label'] = $this->formatTaxon($val);
+			$taxa[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'rankpos'=>'post'));
 			unset($taxa[$key]['taxon']);
 		}
 
@@ -1277,8 +1277,6 @@ class SpeciesController extends Controller
             'dir' => 'asc', 
             'case' => 'i'
 		));
-
-
 
 		return $this->makeLookupList(
 				$taxa, 
@@ -1543,117 +1541,3 @@ class SpeciesController extends Controller
 	
 
 }
-
-/*
-	//i remember when we still had trees around here:
-    private function getFirstTaxonId ()
-    {
-        $taxa = $this->buildTaxonTree();
-        
-        if (empty($taxa))
-            return null;
-
-        $d = current($taxa);
-        
-		while ($d['lower_taxon'] == ($this->getTaxonType() == 'higher' ? 1 : 0)) {
-
-			$d = next($taxa);
-		}
-            
-		return $d['id'];
-
-    }
-
-	private function getAdjacentItems ($id)
-    {
-		
-        $taxa = $this->buildTaxonTree();
-        
-        $d = array();
-        
-        while (list ($key, $val) = each($taxa)) {
-            
-            if (($this->getTaxonType() == 'higher' && $val['lower_taxon'] == 0) || ($this->getTaxonType() == 'lower' && $val['lower_taxon'] == 1)) {
-                $d[$key] = $val;
-            }
-        }
-        
-        $taxa = $d;
-        
-        if ($taxa && !empty($taxa)) {
-            
-            reset($taxa);
-            
-            $prev = $next = false;
-            
-            while (list ($key, $val) = each($taxa)) {
-                
-                if ($key == $id) {
-                    
-                    $next = current($taxa); // current = next because the pointer has already shifted forward
-
-                    return array(
-                        'prev' => $prev!==false ? array(
-                            'id' => $prev['id'], 
-                            'label' => $prev['taxon']
-                        ) : null, 
-                        'next' => $next!==false ? array(
-                            'id' => $next['id'], 
-                            'label' => $next['taxon']
-                        ) : null
-                    );
-                }
-                
-                $prev = $val;
-            }
-        }
-        
-        return null;
-    }
-
-    private function getLookupList($p)
-    {
-        $search = isset($p['search']) ? $p['search'] : null;
-        $matchStartOnly = isset($p['match_start']) ? $p['match_start'] == '1' : false;
-        $getAll = isset($p['get_all']) ? $p['get_all'] == '1' : false;
-        
-        $search = str_replace(array(
-            '/', 
-            '\\'
-        ), '', $search);
-        
-        if (empty($search) && !$getAll)
-            return;
-        
-        if ($matchStartOnly)
-            $regexp = '/^' . preg_quote($search) . '/i';
-        else
-            $regexp = '/' . preg_quote($search) . '/i';
-        
-        $l = array();
-        
-        $taxa = $this->buildTaxonTree();
-
-        foreach ((array) $taxa as $key => $val) {
-
-            if (($getAll || preg_match($regexp, $val['taxon']) == 1) && ($this->getTaxonType() == 'higher' ? $val['lower_taxon'] == 0 : $val['lower_taxon'] == 1))
-                $l[] = array(
-                    'id' => $val['id'], 
-                    'label' => $val['label']
-                );
-        }
-        
-
-
-        $this->smarty->assign(
-			'returnText', 
-			$this->makeLookupList(
-				$l, 
-				($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species'),
-				'../' . ($this->getTaxonType() == 'higher' ? 'highertaxa' : 'species') . '/taxon.php?id=%s'
-			)
-		);
-    }
-	
-
-*/

@@ -455,7 +455,7 @@ class Controller extends BaseClass
             // give do-not-display-flag to taxa that are in brackets
             $t[$key]['do_display'] = !preg_match('/^\(.*\)$/', $val['taxon']);
             // taxon name
-            $t[$key]['label'] = $this->formatTaxon($val,$ranks);
+            $t[$key]['label'] = $this->formatTaxon(array('taxon'=>$val,'ranks'=>$ranks));
             $t[$key]['author'] = $val['author'];
             $t[$key]['variations'] = $this->getVariations($val['id']);
 
@@ -1357,9 +1357,27 @@ class Controller extends BaseClass
         else
             return isset($substitute) ? $substitute : null;
     }
-    
-    public function formatTaxon ($taxon,$ranks=null)
+	
+    public function formatTaxon($p=null) //($taxon,$ranks=null)
     {
+		
+		if (is_null($p))
+			return;
+		
+		// switching between $p being an array of parameters (taxon, ranks, rankpos) and $p just being the taxon (which is an array in itself)
+		if (isset($p['taxon']) && is_array($p['taxon'])) {
+
+			$taxon=$p['taxon'];
+			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
+			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
+
+		} else {
+
+			$taxon=$p;
+			$ranks=null;
+			$rankpos='pre';
+
+		}
 
 		if (empty($taxon))
 			return;
@@ -1369,7 +1387,7 @@ class Controller extends BaseClass
 
 		if (!isset($taxon['rank_id'])) // shouldn't happen!
 			 return $taxon['taxon'];
-        
+
         if (isset($r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
         else
@@ -1381,12 +1399,14 @@ class Controller extends BaseClass
         
         // Rank level is above genus; no formatting
         if ($rankId < GENUS_RANK_ID) {
-            return $rankName . ' ' . $taxon['taxon'];
+			return ($rankpos=='post' ? $taxon['taxon'].', '.$rankName : $rankName . ' ' . $taxon['taxon']);
+            //return $rankName . ' ' . $taxon['taxon'];
         }
         
         // Genus or subgenus; add italics
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-            $name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+			$name = ($rankpos=='post' ? '<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName : $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>');
+            //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
 
         // Species
@@ -1403,10 +1423,10 @@ class Controller extends BaseClass
         if (count($e) == 4 && $e[1][0] == '(') {
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
-        
+
         // Return now if name has been set
         if (isset($name)) {
-            return $this->setHybridMarker($name, $rankId, $taxon['is_hybrid']);
+            return $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
         
         // Now we're handling more complicated cases. We need the parent before continuing
@@ -1422,7 +1442,7 @@ class Controller extends BaseClass
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[2] .
              (!empty($abbreviation) ? '</span> ' . $abbreviation . ' <span class="italics">' : ' ') . $e[3] . '</span>';
         }
-        
+
         // Double infraspecies with subgenus
         if (count($e) == 5 && $e[1][0] == '(') {
             $name = '<span class="italics">' . $e[0] . ' ' . $e[1] . ' ' . $e[2] . (!empty($parentAbbreviation) ? '</span> ' . $parentAbbreviation . ' <span class="italics">' : ' ') . $e[3] .

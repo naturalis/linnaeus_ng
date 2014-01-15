@@ -1781,7 +1781,7 @@ class Controller extends BaseClass
             $t[$key]['ideal_parent_id'] = $ranks[$val['rank_id']]['ideal_parent_id'];
             $t[$key]['sibling_count'] = count((array) $t);
             $t[$key]['depth'] = $t[$key]['level'] = $depth;
-            $t[$key]['taxon_formatted'] = $this->formatTaxon($val,$ranks);
+            $t[$key]['taxon_formatted'] = $this->formatTaxon(array('taxon'=>$val,'ranks'=>$ranks));
             
             $this->treeList[$key] = $t[$key];
             
@@ -2128,16 +2128,35 @@ class Controller extends BaseClass
         ), $title) . '.css');
     }
 
-
-
-    public function formatTaxon ($taxon,$ranks=null)
+    public function formatTaxon($p=null) //($taxon,$ranks=null)
     {
+		
+		if (is_null($p))
+			return;
+		
+		// switching between $p being an array of parameters (taxon, ranks, rankpos) and $p just being the taxon (which is an array in itself)
+		if (isset($p['taxon']) && is_array($p['taxon'])) {
+
+			$taxon=$p['taxon'];
+			$ranks=isset($p['ranks']) ? $p['ranks'] : null;
+			$rankpos=(isset($p['rankpos']) && in_array($p['rankpos'],array('pre','post')) ? $p['rankpos'] : 'pre');
+
+		} else {
+
+			$taxon=$p;
+			$ranks=null;
+			$rankpos='pre';
+
+		}
 		
 		if (empty($taxon))
 			return;
 
         $e = explode(' ', $taxon['taxon']);
         $r = is_null($ranks) ? $this->newGetProjectRanks() : $ranks;
+
+		if (!isset($taxon['rank_id'])) // shouldn't happen!
+			 return $taxon['taxon'];
 
         if (isset($r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()]))
             $d = $r[$taxon['rank_id']]['labels'][$this->getDefaultProjectLanguage()];
@@ -2150,12 +2169,14 @@ class Controller extends BaseClass
         
         // Rank level is above genus; no formatting
         if ($rankId < GENUS_RANK_ID) {
-            return $rankName . ' ' . $taxon['taxon'];
+			return ($rankpos=='post' ? $taxon['taxon'].', '.$rankName : $rankName . ' ' . $taxon['taxon']);
+            //return $rankName . ' ' . $taxon['taxon'];
         }
         
         // Genus or subgenus; add italics
         if ($rankId < SPECIES_RANK_ID && count($e) == 1) {
-            $name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
+			$name = ($rankpos=='post' ? '<span class="italics">' . $taxon['taxon'] . '</span>, '.$rankName : $rankName . '  <span class="italics">' . $taxon['taxon'] . '</span>');
+            //$name = $rankName . ' <span class="italics">' . $taxon['taxon'] . '</span>';
         }
         
         // Species
@@ -2175,7 +2196,7 @@ class Controller extends BaseClass
         
         // Return now if name has been set
         if (isset($name)) {
-            return $this->setHybridMarker($name, $rankId, $taxon['is_hybrid']);
+			return $this->setHybridMarker($name, $rankId, isset($taxon['is_hybrid']) ? $taxon['is_hybrid'] : 0);
         }
         
         
