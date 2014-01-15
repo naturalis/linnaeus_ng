@@ -635,12 +635,15 @@ class SearchController extends Controller
 			$taxa[$key]['label']=
 				$this->formatTaxon(
 					array(
-						'taxon' => $val['label'],
-						'parent_id'=>$val['parent_id'],
-						'rank_id' => $val['rank_id'],
-						'is_hybrid' => $val['is_hybrid']
-					),
-					$ranks
+						'taxon' =>
+							array(
+								'taxon' => $val['label'],
+								'parent_id'=>$val['parent_id'],
+								'rank_id' => $val['rank_id'],
+								'is_hybrid' => $val['is_hybrid']
+							),
+						'ranks'=> $ranks
+					)
 				);
 			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
 		}

@@ -2283,7 +2283,7 @@ class MatrixKeyController extends Controller
             foreach ((array) $rel as $key => $val) {
                 
                 if ($val['ref_type'] == 'taxon') {
-                    $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id']));
+                    $rel[$key]['label'] = $this->formatTaxon($d = $this->getTaxonById($val['relation_id'])); // is that even legal, semantically?
                 }
                 else {
                     $d = $this->getVariation($val['relation_id']);

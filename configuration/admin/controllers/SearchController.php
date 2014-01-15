@@ -595,7 +595,13 @@ class SearchController extends Controller
 		$ranks = $this->newGetProjectRanks();
 
 		foreach((array)$taxa as $key => $val)  {
-			$taxa[$key]['label'] = $this->formatTaxon(array('taxon' => $val['label'],'rank_id' => $val['rank_id'],'is_hybrid' => $val['is_hybrid']),$ranks);
+			$taxa[$key]['label'] =
+			$this->formatTaxon(
+				array(
+					'taxon'=>array('taxon' => $val['label'],'rank_id' => $val['rank_id'],'is_hybrid' => $val['is_hybrid']),
+					'ranks'=>$ranks
+				)
+			);
 			unset($taxa[$key]['rank_id'],$taxa[$key]['is_hybrid']);
 		}
 
@@ -632,7 +638,12 @@ class SearchController extends Controller
 				));
 			$taxon=$this->getTaxonById($val['taxon_id']);
 			$content[$key]['label'] =
-				$this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks).' ('.$tpt[0]['title'].')';
+				$this->formatTaxon(
+					array(
+						'taxon' => array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),
+						'ranks' => $ranks
+					)
+				).' ('.$tpt[0]['title'].')';
 
 		}
 
