@@ -19,15 +19,13 @@
 		{if $v.numOfResults>0}
 			{foreach from=$v.results item=r}
 				{if $r.numOfResults>0}
-
+					<h3>{$r.label} ({$r.data|@count})</h3>
+					{foreach from=$r.data item=d}
 <!--
 
 	{$r|@var_dump}
 
 -->
-
-					<h3>{$r.label} ({$r.data|@count})</h3>
-					{foreach from=$r.data item=d}
 						<h4><a href="{$r.url|sprintf:$d.id}">{$d.label}</a> ({$d.matches|@count})</h4>
 						{foreach from=$d.matches item=match}
 						<h5>{$match}</h5>
