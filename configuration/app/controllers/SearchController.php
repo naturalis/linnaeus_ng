@@ -1329,6 +1329,8 @@ class SearchController extends Controller
 		if (is_null($fMod))
 			return null;
 			
+		$r=array();
+
 		if ($fMod=='*') {
 			$fMod=array();
 			$m=$this->models->FreeModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId()),'columns' => 'id'));
