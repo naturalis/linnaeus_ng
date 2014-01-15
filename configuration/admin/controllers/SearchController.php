@@ -619,6 +619,13 @@ class SearchController extends Controller
 		$content = $this->getExcerptsSurroundingMatches(array('param'=>$p,'results'=>$content));
 		$content = $this->sortResultsByMostTokensFound($content);
 
+		foreach((array)$content as $key => $val)  {
+			$taxon=$this->getTaxonById($val['taxon_id']);
+			$content[$key]['label'] = $this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks);
+		}
+
+
+
 		// synonyms
 		$synonyms = $this->models->Synonym->_get(
 			array(
