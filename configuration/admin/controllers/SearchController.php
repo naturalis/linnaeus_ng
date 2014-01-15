@@ -632,8 +632,8 @@ class SearchController extends Controller
 				));
 			$taxon=$this->getTaxonById($val['taxon_id']);
 			$content[$key]['label'] =
-				$this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks).
-				' '.$tpt[0]['title'];
+				$this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks).' ('.$tpt[0]['title'].')';
+
 		}
 
 
