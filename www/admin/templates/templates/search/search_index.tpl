@@ -23,7 +23,7 @@
 					{foreach from=$r.data item=d}
 <!--
 
-	{$r|@var_dump}
+	{$d|@var_dump}
 
 -->
 						<h4><a href="{$r.url|sprintf:$d.id}">{$d.label}</a> ({$d.matches|@count})</h4>
