@@ -620,8 +620,20 @@ class SearchController extends Controller
 		$content = $this->sortResultsByMostTokensFound($content);
 
 		foreach((array)$content as $key => $val)  {
+
+			$tpt = $this->models->PageTaxonTitle->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'language_id' => $this->getDefaultProjectLanguage(),
+						'page_id' => $val['page_id']
+					),
+					'column' => 'title'
+				));
 			$taxon=$this->getTaxonById($val['taxon_id']);
-			$content[$key]['label'] = $this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks);
+			$content[$key]['label'] =
+				$this->formatTaxon(array('taxon' => $taxon['taxon'],'rank_id' => $taxon['rank_id'],'is_hybrid' => $taxon['is_hybrid']),$ranks).
+				' '.$tpt[0]['title'];
 		}
 
 
