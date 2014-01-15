@@ -27,7 +27,8 @@
 	{$d|@var_dump}
 
 -->
-						<h4><a href="{$r.url|sprintf:$d.id}">{$d.label}</a> ({$d.matches|@count})</h4>
+						<h4>
+						{if $d.page_id}<a href="{$r.url|sprintf:$d.id:$id.page_id}">{else}<a href="{$r.url|sprintf:$d.id}">{/if}{$d.label}</a> ({$d.matches|@count})</h4>
 						{foreach from=$d.matches item=match}
 						<h5>{$match}</h5>
 						{/foreach}
