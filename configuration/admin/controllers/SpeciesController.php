@@ -2741,19 +2741,33 @@ class SpeciesController extends Controller
         $this->setPageName($this->translate('Define sections'));
         
         if ($this->rHasVal('new') && !$this->isFormResubmit()) {
-            
+
             foreach ((array) $this->requestData['new'] as $key => $val) {
+				
+				if (empty($val)) continue;
                 
+				$d = $this->models->Section->_get(
+				array(
+					'id' => array(
+						'project_id' => $this->getCurrentProjectId(), 
+						'page_id' => $key
+					), 
+					'columns' => 'max(show_order) as max_show_order', 
+				));
+
+				$d = $d ? $d[0]['max_show_order']+1 : 0;
+							
                 $this->models->Section->save(
                 array(
                     'id' => null, 
                     'project_id' => $this->getCurrentProjectId(), 
                     'page_id' => $key, 
-                    'section' => $val
+                    'section' => $val,
+                    'show_order' => $d
                 ));
             }
         }
-        
+      
         $lp = $this->getProjectLanguages();
         
         $pages = $this->models->PageTaxon->_get(

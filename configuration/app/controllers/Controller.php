@@ -2170,6 +2170,8 @@ class Controller extends BaseClass
         $this->smarty->assign('addedProjectIDParam', $this->generalSettings['addedProjectIDParam']);
         $this->smarty->assign('searchResultIndexActive', $this->getSearchResultIndexActive());
 
+        $this->smarty->assign('spid', $this->spid());
+		
         $this->smarty->assign('currdate', array('year'=>date('Y'),'month'=>date('m'),'day'=>date('d')));
 		
 		
