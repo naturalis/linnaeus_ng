@@ -40,7 +40,7 @@
 			{$pages[i].page}
 		</td>
 	{/if}
-		<td>{$pages[i].sections[j].section}{$pages[i].sections[j].show_order}</td>
+		<td>{$pages[i].sections[j].section}</td>
 		<td>
 			<input 
 				type="text" 
