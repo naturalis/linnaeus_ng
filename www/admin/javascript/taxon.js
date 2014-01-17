@@ -19,9 +19,7 @@ var taxonSubmitButtonLabel = null;;
 var taxonSubGenusRankId = null;
 
 //GENERAL
-function taxonGeneralDeleteLabels(id,action,name,itm) {
-
-	if (!allDoubleDeleteConfirm(itm,name)) return;
+function taxonGeneralDeleteLabels(id,action) {
 
 	allAjaxHandle = $.ajax({
 		url : "ajax_interface.php",
@@ -89,7 +87,9 @@ function taxonCheckLockOutStates() {
 //CATEGORIES
 function taxonPageDelete(page,name) {
 
-	taxonGeneralDeleteLabels(page,'delete_page',name,_('the page'));
+	if (!allDoubleDeleteConfirm(_('the page'),name)) return;
+
+	taxonGeneralDeleteLabels(page,'delete_page');
 
 }
 
@@ -1268,8 +1268,11 @@ function taxonSaveSectionTitle(id,label,type) {
 }
 
 function taxonSectionDelete(id,name) {
-	
-	taxonGeneralDeleteLabels(id,'delete_section_title',name,'the section');
+
+	if (!confirm(sprintf(_('Are you sure you want to delete %s "%s"?'),'the section',name)))
+		return;
+
+	taxonGeneralDeleteLabels(id,'delete_section_title');
 
 }
 

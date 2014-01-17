@@ -173,7 +173,7 @@ class IndexController extends Controller
         
         $this->smarty->assign('common', true);
 		
-		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['index']['hasSpecies']);
+		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']);
         
         $this->printPage();
     }
@@ -260,7 +260,7 @@ class IndexController extends Controller
             $this->smarty->assign('alphaNav', $d['alphaNav']);
         }
         
-		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['index']['hasSpecies']);
+		$this->smarty->assign('hasSpecies', $_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']);
 		
         $this->smarty->assign('showSpeciesIndexMenu', true);
         
@@ -438,33 +438,39 @@ class IndexController extends Controller
     private function setIndexTabs ()
     {
         // Check if results have been stored in session; if so return
-        if (isset($_SESSION['app'][$this->spid()]['index']['hasSpecies']))
+        if (
+			isset($_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']) &&
+			isset($_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa']) &&
+			isset($_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'])
+			)
             return;
-            
-            // Check taxa
-        $_SESSION['app'][$this->spid()]['index']['hasSpecies'] = $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] = 0;
-        $taxa = $this->buildTaxonTree();
-        foreach ((array)$taxa as $taxon) {
-            if ($taxon['lower_taxon'] == 1 && $taxon['is_empty'] == 0)
-                $_SESSION['app'][$this->spid()]['index']['hasSpecies'] = 1;
-            if ($taxon['lower_taxon'] == 0 && $taxon['is_empty'] == 0)
-                $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] = 1;
-            if ($_SESSION['app'][$this->spid()]['index']['hasSpecies'] == 1 && $_SESSION['app'][$this->spid()]['index']['hasHigherTaxa'] == 1)
-                break;
-        }
-        
-        // Check common names
-        $_SESSION['app'][$this->spid()]['index']['hasCommonNames'] = ($this->countCommonNames() > 0 ? 1 : 0);
-    }
 
-
-
-    private function countCommonNames ()
-    {
-        $r = $this->models->Commonname->_get(array(
+		$t = $this->models->Taxon->freeQuery(
+			array(
+				'query'=>
+					"select count(_a.id)>0 as has_values, _c.lower_taxon
+					from %PRE%taxa _a
+					left join %PRE%projects_ranks _c
+						on _a.rank_id = _c.id
+						and _a.project_id = _c.project_id 
+					where _a.project_id = " . $this->getCurrentProjectId() . "
+					and _a.is_empty = 0
+					group by _c.lower_taxon",
+				'fieldAsIndex'=>'lower_taxon'
+			)
+		);
+					
+        $c = $this->models->Commonname->_get(array(
             'where' => 'project_id = ' . $this->getCurrentProjectId(), 
-            'columns' => 'COUNT(1) AS c'
+            'columns' => 'count(1)>0 as has_values'
         ));
-        return $r[0]['c'];
+		
+		$_SESSION['app'][$this->spid()]['indexModule']['hasSpecies'] = $t[1]['has_values'];
+		$_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa'] = $t[0]['has_values'];
+        $_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'] = $c[0]['has_values'];
+
     }
+
+
+
 }
