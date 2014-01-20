@@ -1,0 +1,100 @@
+//
+// Grid system
+// --------------------------------------------------
+
+
+// Set the container width, and override it for fixed navbars in media queries
+.container {
+  @include container-fixed();
+}
+
+// mobile first defaults
+.row {
+  @include make-row();
+}
+
+// Common styles for small and large grid columns
+
+// Grid system
+// --------------------------------------------------
+
+// Number of columns in the grid system
+$grid-columns:              12 !default;
+// Padding, to be divided by two and applied to the left and right of all columns
+$grid-gutter-width:         30px !default;
+// Point at which the navbar stops collapsing
+$grid-float-breakpoint:     $screen-tablet !default;
+
+// Extra Small Grid
+
+// @for $i from 1 through $grid-columns {
+//   .col-xs-#{$i}, .col-sm-#{$i}, .col-md-#{$i}, .col-lg-#{$i} {
+//     position: relative;
+//     min-height: 1px;
+//     padding-left:  ($grid-gutter-width / 2);
+//     padding-right: ($grid-gutter-width / 2);
+//   }
+
+//   .col-xs-#{$i} {float: left; width: percentage(( $i / $grid-columns)); } 
+// }
+
+
+// Small grid
+
+@media (min-width: $screen-tablet) {
+  .container {
+    max-width: $container-tablet;
+  }
+
+  // @for $i from 1 through $grid-columns {
+  //   .col-sm-#{$i} {float: left; width: percentage(($i / $grid-columns)); }
+  //   .col-sm-push-#{$i}  { left: percentage(($i / $grid-columns)); }
+  //   .col-sm-pull-#{$i}  { right: percentage(($i / $grid-columns)); }
+  //   .col-sm-offset-#{$i}  { margin-left: percentage(($i / $grid-columns)); }
+  // }
+}
+
+ 
+// Medium grid
+
+
+@media (min-width: $screen-desktop) {
+  .container {
+    max-width: $container-desktop;
+  }
+
+  // .col-md-push-0  { left: auto; }
+  // .col-md-pull-0  { right: auto; }
+  // .col-md-offset-0  { margin-left: 0; }
+
+  // @for $i from 1 through $grid-columns {
+  //   .col-md-#{$i}  { width: percentage(($i / $grid-columns)); float: left;}    
+  //   .col-md-push-#{$i}  { left: percentage(($i / $grid-columns)); }    
+  //   .col-md-pull-#{$i}  { right: percentage(($i / $grid-columns)); }
+  //   .col-md-offset-#{$i}  { margin-left: percentage(($i / $grid-columns)); }
+   
+  // }
+
+}
+
+
+// Large grid
+
+@media (min-width: $screen-lg-desktop) {
+  .container {
+    max-width: $container-lg-desktop;
+  }
+  // .col-lg-push-0  { left: auto; }
+  // .col-lg-pull-0  { right: auto; }
+  // .col-lg-offset-0  { margin-left: 0; }
+
+  // @for $i from 1 through $grid-columns {
+
+  //   .col-lg-#{$i} {float: left;  width: percentage(($i / $grid-columns)); }
+  //   .col-lg-push-#{$i}  { left: percentage(($i / $grid-columns)); }
+  //   .col-lg-pull-#{$i}  { right: percentage(($i / $grid-columns)); }
+  //   .col-lg-offset-#{$i}  { margin-left: percentage(($i / $grid-columns)); }
+    
+  // }
+
+}

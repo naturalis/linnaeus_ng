@@ -1,310 +1,231 @@
 /* LAYOUT */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\000036}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\000037}}
+#page-container {
+  background-color: #bbb; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000311}}
 #page-main {
-  overflow: auto;
-  margin-top: 1em; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000311}}
-  #page-main #panel, #page-main #step, #page-main #question, #page-main #choices {
-    display: block;
-    float: right; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000316}}
-  #page-main #panel {
-    width: 25%;
-    margin-left: 2.77778%; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000322}}
-  #page-main #step {
-    width: 72.22222%;
-    position: relative; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000328}}
-  #page-main #img-choices {
-    position: relative; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000333}}
-  #page-main .choice-image-wrapper {
-    max-width: 100%  !important;
-    width: 40% !important; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000337}}
-    #page-main .choice-image-wrapper img {
-      max-width: 150px !important; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000342}}
-  #page-main #question {
-    width: 50%; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000346}}
-  #page-main #choices {
-    width: 50%; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000350}}
-  #page-main .l2_choice + .l2_choice {
-    width: 50%;
-    position: absolute;
-    top: 50%; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000356}}
-  #page-main #taxa {
-    clear: both;
-    font-size: 12px;
-    padding: 0 5px;
-    height: 406px; }
-
-/* STYLING */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000368}}
-#page-main #categories {
-  overflow: auto;
-  width: 100%;
-  margin-top: 0; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000373}}
-  #page-main #categories ul {
-    display: block;
-    margin: 0;
-    padding: 0;
-    outline: 1px solid green;
-    overflow: auto; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000381}}
-  #page-main #categories li {
-    display: block;
-    overflow: hidden;
-    list-style: none inside none;
-    float: left;
-    font-size: 14px; }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000391}}
-.target {
-  color: #999; }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000395}}
-#taxa {
   background-color: #f9f9f7; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\0000398}}
-  #taxa p {
-    margin: 0; }
 
-@media none {
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003105}}
-  #page-container {
-    background-color: #bbb; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000315}}
+#step-image {
+  border: 1px solid #666;
+  float: right;
+  margin: 38px 35px 0 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003109}}
-  #page-main {
-    background-color: #bbb;
-    height: 440px;
-    overflow: auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000321}}
+#choice-grid, .wrapper-choice-picture {
+  width: 560px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003115}}
-  #step-image {
-    border: 1px solid #666;
-    float: right;
-    margin: 38px 35px 0 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000325}}
+.wrapper-choice {
+  width: 355px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003121}}
-  #choice-grid, .wrapper-choice-picture {
-    width: 560px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000329}}
+.wrapper-choice-picture td.text-cell, .wrapper-choice-picture td.target-cell {
+  width: 370px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003125}}
-  .wrapper-choice {
-    width: 355px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000333}}
+#step td.target-cell {
+  vertical-align: bottom; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003129}}
-  .wrapper-choice-picture td.text-cell, .wrapper-choice-picture td.target-cell {
-    width: 370px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000337}}
+#choice-grid td {
+  width: 50%;
+  vertical-align: top;
+  padding-right: 8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003133}}
-  #step td.target-cell {
-    vertical-align: bottom; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000343}}
+.image-cell {
+  text-align: center;
+  vertical-align: middle;
+  background: #555454;
+  padding: 6px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003137}}
-  #choice-grid td {
-    width: 50%;
-    vertical-align: top;
-    padding-right: 8px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000352}}
+#choice-table .text, #choice-table .target {
+  margin-right: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003143}}
-  .image-cell {
-    text-align: center;
-    vertical-align: middle;
-    background: #555454;
-    padding: 6px;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000356}}
+#choice-table td.separator {
+  height: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003152}}
-  #choice-table .text, #choice-table .target {
-    margin-right: 10px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000360}}
+#decision-path-icon {
+  margin-left: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003156}}
-  #choice-table td.separator {
-    height: 10px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000364}}
+#back-to-search-icon {
+  margin-right: -8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003160}}
-  #decision-path-icon {
-    margin-left: 15px; }
+/* step */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000370}}
+#step {
+  text-align: justify; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003164}}
-  #back-to-search-icon {
-    margin-right: -8px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000378}}
+#step #question #head {
+  font-size: 14px;
+  color: #0303b2; }
 
-  /* step */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003170}}
-  #step {
-    text-align: justify; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000387}}
+#step-title {
+  font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
+  font-size: 16px;
+  color: #0303b2; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003178}}
-  #step #question #head {
-    font-size: 14px;
-    color: #0303b2; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\0000393}}
+#step #question #content {
+  margin-bottom: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003187}}
-  #step-title {
-    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
-    font-size: 16px;
-    color: #0303b2; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003101}}
+#step #choices {
+  margin-bottom: 15px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003193}}
-  #step #question #content {
-    margin-bottom: 15px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003105}}
+#step #img-choices {
+  position: relative; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003201}}
-  #step #choices {
-    margin-bottom: 15px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003109}}
+.l2_choice {
+  cursor: pointer;
+  width: 270px;
+  min-height: 155px;
+  background-color: #eeede9;
+  margin-bottom: 8px;
+  padding: 5px;
+  margin: 5px;
+  font-size: 90%; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003205}}
-  #step #img-choices {
-    position: relative; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003122}}
+#choice-table .choice-picture {
+  width: auto; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003209}}
-  .l2_choice {
-    cursor: pointer;
-    width: 270px;
-    min-height: 155px;
-    background-color: #eee;
-    margin-bottom: 8px;
-    padding: 10px;
-    webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px #666666, 0 -1px 1px white, inset 0 -1px 1px rgba(255, 255, 255, 0.8), inset 0 1px 2px rgba(0, 0, 0, 0.8);
-    /*bottom internal shadow*/ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003127}}
+#step .choice-image-div {
+  float: left; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003225}}
-  .choice {
-    width: 360px;
-    cursor: pointer;
-    background-color: #eee;
-    padding: 10px;
-    webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px #666666, 0 -1px 1px white, inset 0 -1px 1px rgba(255, 255, 255, 0.8), inset 0 1px 2px rgba(0, 0, 0, 0.8);
-    /*bottom internal shadow*/ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003131}}
+#step .choice-image {
+  max-width: 180px;
+  max-height: 115px;
+  cursor: pointer;
+  border: 1px solid #666; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003239}}
-  #choice-table .choice-picture {
-    width: auto; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003138}}
+#step .choice-img-wrapper {
+  cursor: pointer; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003244}}
-  #step .choice-image-div {
-    float: left; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003142}}
+.choice-img-wrapper img {
+  border: 1px solid #000; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003248}}
-  #step .choice-image {
-    max-width: 180px;
-    max-height: 115px;
-    cursor: pointer;
-    border: 1px solid #666; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003146}}
+#step .marker {
+  font-weight: bold; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003255}}
-  #step .choice-img-wrapper {
-    cursor: pointer; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003150}}
+.l2_text {
+  min-height: 120px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003259}}
-  .choice-img-wrapper img {
-    border: 1px solid #000; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003154}}
+#step .text-choice-img {
+  text-align: center;
+  font-size: 10px;
+  margin-top: 3px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003263}}
-  #step .marker {
-    font-weight: bold; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003160}}
+#step .text-choice-img p {
+  line-height: 130%;
+  text-align: center; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003267}}
-  .l2_text {
-    min-height: 120px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003165}}
+#step .target {
+  margin-top: 15px;
+  font-style: italic;
+  cursor: pointer; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003271}}
-  #step .text-choice-img {
-    text-align: center;
-    font-size: 10px;
-    margin-top: 3px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003171}}
+#step .arrow {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003277}}
-  #step .text-choice-img p {
-    line-height: 130%;
-    text-align: center; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003176}}
+#step .target-step, #step .target-taxon {
+  color: #006; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003282}}
-  #step .target {
-    margin-top: 15px;
-    font-style: italic;
-    cursor: pointer; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003180}}
+#step .target-step:hover, .target-taxon:hover {
+  text-decoration: underline; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003288}}
-  #step .arrow {
-    font-family: "Times New Roman", Times, serif;
-    font-size: 16px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003184}}
+#step .hr-choice {
+  height: 1px;
+  color: #ddd; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003293}}
-  #step .target-step, #step .target-taxon {
-    color: #006; }
+/* remaining taxa */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003193}}
+#taxa {
+  width: 240px;
+  overflow: auto;
+  background-color: #eeede9;
+  float: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  max-height: 500px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003297}}
-  #step .target-step:hover, .target-taxon:hover {
-    text-decoration: underline; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003206}}
+#taxa #header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  padding: 5px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003301}}
-  #step .hr-choice {
-    height: 1px;
-    color: #ddd; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003212}}
+#taxa a {
+  display: block;
+  width: 240px;
+  text-align: left;
+  padding: 0 4px; }
 
-  /* remaining taxa */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003310}}
-  #taxa {
-    width: 240px;
-    height: 406px;
-    border: 1px solid #666;
-    overflow: hidden;
-    background-color: #fff;
-    float: right;
-    overflow-y: scroll;
-    margin-top: 20px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003219}}
+#taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
+  color: #000;
+  text-decoration: none;
+  border: 1px solid transparent; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003321}}
-  #taxa #header {
-    font-weight: bold;
-    margin-bottom: 8px;
-    padding: 5px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003225}}
+#taxa p {
+  margin-bottom: 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003327}}
-  #taxa a {
-    display: block;
-    width: 240px;
-    text-align: left;
-    padding: 0 4px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003229}}
+#taxa a:hover, #taxa p.a:hover {
+  color: #009ee0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003334}}
-  #taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
-    color: #000;
-    text-decoration: none;
-    border: 1px solid transparent; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003233}}
+#taxa p:last-child {
+  margin-bottom: 10px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003340}}
-  #taxa p {
-    margin-bottom: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003237}}
+#categories {
+  position: relative;
+  left: 570px;
+  top: 10px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003243}}
+  #categories a.category-active {
+    background-color: #eeede9 !important; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003344}}
-  #taxa a:hover, #taxa p.a:hover {
-    color: #fff;
-    background: #3875d7;
-    border: 1px dotted #000; }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003350}}
-  #taxa p:last-child {
-    margin-bottom: 10px; }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Documents\/naturalis\/LNG\%20skin\/source2\/app\/style\/default\/naturalis\/scss\/key\.scss}line{font-family:\00003354}}
-  #categories {
-    background: transparent;
-    margin-left: 595px; } }
+/* Decision path */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003252}}
+.module-key #lookup-DialogContent a {
+  border-bottom: none; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003256}}
+.module-key #lookup-DialogContent a b {
+  border-bottom: 1px dotted #e3004a; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003260}}
+.module-key #lookup-DialogContent a:hover b {
+  border-bottom: 1px dotted #009ee0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003264}}
+.module-key #lookup-DialogContent .row {
+  margin-bottom: 1em; }

@@ -1,0 +1,1240 @@
+// TODO:
+// Kleine verspringing in vergrootglas tussen verschillende pagina's
+// 'search'
+
+// 
+// Needs HTML:
+// - frontpage withOUT thumbnails
+// - frontpage with graphic
+// - andere pijltjes in matrixes
+// - verwijder referentie naar jQeury dialogue
+// - rethinking matrix keys
+// - Zwarte balk onderin
+
+/*
+ _     _                                   _   _  ____ 
+| |   (_)_ __  _ __   __ _ ___ _   _ ___  | \ | |/ ___|
+| |   | | '_ \| '_ \ / _` / _ \ | | / __| |  \| | |  _ 
+| |___| | | | | | | | (_|   __/ |_| \__ \ | |\  | |_| |
+|_____|_|_| |_|_| |_|\__,_\___|\__,_|___/ |_| \_|\____|
+                                                       
+*/
+
+// SETTINGS 
+			@import "settings";
+
+
+/* BOOTSTRAP STYLES */
+
+	// --- bootstrap: SETTINGS 
+
+			// --- bootstrap: variables
+			@import "bootstrap/variables";
+
+			// --- bootstrap: mixins --- */
+			@import "bootstrap/mixins";
+
+	/* --- bootstrap: RESET */
+
+			/* --- bootstrap: normalize --- */
+			@import "bootstrap/normalize";
+
+			// --- bootstrap: print ---
+			// @import "bootstrap/print";
+
+	/* --- bootstrap: CORE CSS */
+
+			/* --- ---  bootstrap: scaffolding --- */
+			@import "bootstrap/scaffolding";
+
+			/* --- --- bootstrap: type --- */
+			@import "bootstrap/type";
+
+			// /* --- --- bootstrap: code --- */
+			// @import "bootstrap/code";
+
+			/* --- --- bootstrap: grid --- */
+			@import "bootstrap/grid";
+
+			///* --- --- bootstrap: tables --- */
+			// @import "bootstrap/tables";
+
+			/* --- --- bootstrap: forms --- */
+			@import "bootstrap/forms";
+
+			/* --- --- bootstrap: buttons --- */
+			@import "bootstrap/buttons";
+
+	/* --- bootstrap: COMPONENTS */
+
+			// @import "bootstrap/component-animations";
+
+			// @import "bootstrap/glyphicons";
+
+			// --- --- bootstrap: dropdown --- 
+			// @import "bootstrap/dropdowns";
+
+			// --- --- bootstrap: button-groups ---
+			@import "bootstrap/button-groups";
+
+			/* --- --- bootstrap: input-groups --- */
+			@import "bootstrap/input-groups";
+
+			/* --- --- bootstrap: navs --- */
+			@import "bootstrap/navs";
+
+			/* --- --- navbar --- */
+			@import "bootstrap/navbar";
+
+			// @import "bootstrap/breadcrumbs";
+
+			///* --- --- "pagination" */
+			//@import "bootstrap/pagination";
+
+			// @import "bootstrap/pager";
+
+			// @import "bootstrap/labels";
+
+			// @import "bootstrap/badges";
+
+			// @import "bootstrap/jumbotron";
+
+			// @import "bootstrap/thumbnails";
+
+			// /* --- --- alerts --- */
+			// @import "bootstrap/alerts";
+
+			// /* --- --- progress-bars --- */
+			// @import "bootstrap/progress-bars";
+
+			// @import "bootstrap/media";
+
+			// @import "bootstrap/list-group";
+
+			// @import "bootstrap/panels";
+
+			// @import "bootstrap/wells";
+
+			// @import "bootstrap/close";
+
+	//  bootstrap: COMPONENTS W/ JAVASCRIPT
+
+			// @import "bootstrap/modals";
+
+			// @import "bootstrap/tooltip";
+
+			// @import "bootstrap/popovers";
+
+			// @import "bootstrap/carousel"; 
+
+	/* --- bootstrap: UTILITY CLASSES */
+
+			@import "bootstrap/utilities";
+
+			// @import "bootstrap/responsive-utilities";
+
+/* NATURALIS - LINNÆUS  */
+
+	//  --- MIXINS --- 
+
+			@mixin container{
+				max-width: $page-width;
+				margin: 0 auto;	
+			}
+
+			@mixin cols( $cols ){
+				display: block;
+				float: left;
+				width: percentage( $cols / $grid-columns);
+			}
+
+			@mixin margin-left($cols){
+				margin-left: percentage( $cols / $grid-columns);
+			}			
+
+			@mixin margin-right($cols){
+				margin-right: percentage( $cols / $grid-columns);
+			}
+
+			@mixin padding-left($cols){
+				padding-left: percentage( $cols / $grid-columns);
+			}			
+
+			@mixin padding-right($cols){
+				padding-right: percentage( $cols / $grid-columns);
+			}
+
+			@mixin background-grid(){
+				$col-width: percentage(1 / $grid-columns);
+				$gutter-perc: percentage($grid-gutter-width / $page-width);
+				$line-color: #eff;
+
+				background-image: repeating-linear-gradient(90deg, 
+					$line-color, 
+					$line-color $gutter-perc,
+					white $gutter-perc,
+					white $col-width - $gutter-perc,
+					$line-color $col-width - $gutter-perc,
+					$line-color $col-width
+				);
+			}
+
+			@mixin outline(){
+				outline: 1px solid #8ff;
+			}
+
+			@mixin hidetext(){
+				width: 0;
+				height: 0;
+				font-size: 0;
+				overflow: hidden;
+			}
+
+			@mixin proze-palentino{
+				font: {
+					family: Palatino Linotype,Book Antiqua,Palatino,serif;
+					size: 20px;
+					weight: 400;
+					style: normal;
+				}
+
+				b {
+					font-weight: bold;
+				}
+			}
+
+			@mixin proze-slab{
+				font: {
+					family: "Roboto Slab", Palatino Linotype,Book Antiqua,Palatino,serif;
+					size: 18px;
+					weight: 400;
+					style: normal;
+				}
+
+				b {
+					font-weight: 700;
+				}
+			}
+
+			@mixin proze-serif{
+				font: {
+					family: "Merriweather", Palatino Linotype,Book Antiqua,Palatino,serif;
+					size: 18px;
+					weight: 300;
+					style: normal;
+				}
+
+				b {
+					font-weight: 700;
+				}
+			}
+
+			@mixin proze-sans{
+				font: {
+					family: $font-family-sans-serif;
+					size: 18px;
+					weight: 400;
+					style: normal;
+				}
+
+				line-height: 1.5;
+
+				b {
+					font-weight: bold;
+				}
+
+			}
+
+			@mixin proze-humanist{
+				font: {
+					family: "Open Sans";
+					size: 18px;
+					weight: 400;
+					style: normal;
+				}
+
+				b {
+					font-weight: 700;
+				}				
+			}
+
+	/* --- FONT */
+
+		/* --- --- PLATFORM --- */
+
+			// @font-face {
+			//     font-family: 'Platform Alternate';
+			//     src: url('fonts/platform-medium-alternate-webfont.eot');
+			//     src: url('fonts/platform-medium-alternate-webfont.eot?#iefix') format('embedded-opentype'),
+			//          url('fonts/platform-medium-alternate-webfont.woff') format('woff'),
+			//          url('fonts/platform-medium-alternate-webfont.ttf?5') format('truetype');
+			//     font-weight: bold;
+			//     font-style: normal;
+			// }
+
+			@font-face {
+			    font-family: 'Platform Alternate';
+			    src: url('fonts/platform-regular-alternate-webfont.eot');
+			    src: url('fonts/platform-regular-alternate-webfont.eot?#iefix') format('embedded-opentype'),
+			         url('fonts/platform-regular-alternate-webfont.woff') format('woff'),
+			         url('fonts/platform-regular-alternate-webfont.ttf?5') format('truetype');
+			    font-weight: normal;
+			    font-style: normal;
+			}
+
+		/* --- --- GOOGLE OPEN SANS --- */
+			
+			// @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic);		
+
+		/* --- --- ICONS --- */
+
+			@font-face {
+				font-family: 'naturalis-lng-icons';
+				src:url('fonts/naturalis-lng-icons.eot');
+				src:url('fonts/naturalis-lng-icons.eot?#iefix') format('embedded-opentype'),
+					url('fonts/naturalis-lng-icons.ttf?7') format('truetype'),
+					url('fonts/naturalis-lng-icons.woff') format('woff'),
+					url('fonts/naturalis-lng-icons.svg#naturalis-lng-icons') format('svg');
+				font-weight: normal;
+				font-style: normal;
+			}
+
+			[class^="icon-"], [class*=" icon-"] {
+				font-family: 'naturalis-lng-icons';
+				speak: none;
+				font-style: normal;
+				font-weight: normal;
+				font-variant: normal;
+				text-transform: none;
+				line-height: 1;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			.icon-resemblance:before {
+				content: "\e600";
+			}
+			.icon-reload:before {
+				content: "\e601";
+			}
+			.icon-details2:before {
+				content: "\e602";
+			}
+			.icon-book:before {
+				content: "\e603";
+			}
+			.icon-arrow_right:before {
+				content: "\e604";
+			}
+			.icon-arrow_left:before {
+				content: "\e605";
+			}
+			.icon-search:before {
+				content: "\e606";
+			}
+			.icon-arrow_down_left:before {
+				content: "\e608";
+			}
+			.icon-arrow_left_up:before {
+				content: "\e609";
+			}
+			.icon-nav-prev:before {
+				content: "\e60a";
+			}
+			.icon-nav-next:before {
+				content: "\e60b";
+			}
+			.icon-arrow_up_left:before {
+				content: "\e607";
+			}
+
+			.icon-close:before {
+				content: "\e60c";
+			}
+
+			.icon-hierarchy_path:before {
+				content: "\e60f";
+			}
+
+
+		/* --- --- GOOGLE ROBOTO SLAB --- */
+			
+			@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300,700); 
+
+		/* --- --- GOOGLE MERRIWEATHER --- */
+
+			//@import url(http://fonts.googleapis.com/css?family=Merriweather:300,300italic,700);
+
+	/* --- STYLING --- */
+
+		/* --- --- TITLE BAR --- */
+
+			#header-container{
+				background: none;
+				height: 50px;
+				margin: 0;
+				background-color: black; 
+			}
+
+			#title, #mini-header-title {
+				font-size: 32px;
+				font-family: $headings-font-family;
+				margin: 0 auto;
+				line-height: 50px;
+				@media screen and (max-width:$medium-width){ margin-left: 0.25em; font-size: 24px;}
+
+				a{
+					color: white;
+					line-height: 50px;
+					&:hover{
+						color: $theme-color;
+					}
+				}
+			}
+
+		/* --- --- TOP STRIP (SERVICE MENU) --- */
+			
+			#top-strip {
+				p{ 	
+
+					color: $grijs-2;
+					text-align: right;
+					font-size: 17px;
+					font-weight: 700;
+					margin-top: 15px;
+				}
+
+				a{
+					color: $grijs-7;
+				}
+			}
+
+		/* --- --- BOTTOMBAR --- */
+
+			.navbar-container{
+
+			}
+
+			#bottombar {
+			    background-color: #000000;
+			    color: #FFFFFF;
+			    font-size: 16px;
+			    font-weight: bold;
+			    height: 50px;
+			    margin: 0;
+			    overflow: hidden;
+			}
+
+		/* --- --- MAIN MENU --- */
+
+			#main-menu{
+
+				font-size: 18px;
+				line-height: 1.8;
+				background-color: $bruin;
+
+				@media screen and (max-width:$medium-width){
+					font-size: 12px;
+				}
+
+				ul {
+					width: 100%;
+				}
+
+				li {
+					list-style: none inside none;
+				
+					@media screen and (max-width:$medium-width){
+						&:after {
+							content: "|";
+							color: $wit;
+						}
+					}
+
+				}
+
+				a {
+					color: $wit;
+				}
+
+			}
+
+		/* --- --- TITLE --- */
+			
+			#header-title{
+				display: block;
+				clear: both;
+				width: 100%;
+				font-size: 32px;
+				color: $blauw;
+			}
+
+		/* --- --- CONTENT --- */
+
+			#content, 
+			#common, 
+			#classification,
+			#media,
+			#search-results,
+			#definition,
+			#list
+			{				
+				padding-top: 1em;
+				background-color: $proze-background;
+				padding: 1em percentage(1/17);
+				line-height: 1.9;
+				color: $proze-text;
+
+				@media (max-width: $medium-width){
+					font-size: 75%;
+				}
+
+				@media print{
+					background-color: white;
+					color: black;
+					font-size: 10pt;
+				}
+
+				a{
+					border-bottom: thin dotted $grijs-5;
+					color: $grijs-2;
+
+					&:hover{
+						text-decoration: none;
+						border-bottom: solid $blauw 2px;
+					}
+				}
+
+				b, .title {
+					font-weight: 400;
+				}
+
+			}
+
+			#content,
+			#description{
+				@include proze-sans;
+			}
+
+
+			.common-name {
+				color: $grijs-2;
+				font-size: 80%;
+
+				&:before{
+					content: "(";
+				}	
+
+				&:after{
+					content: ")";
+				}
+
+			}
+
+			.inline-image{
+				color: $theme-color;
+				cursor: pointer;
+				border-bottom: 1px dashed $theme-color;
+			}
+
+		/* --- --- CATEGORIES (tabs) --- */
+			
+			#categories{
+
+				@media (max-width: $medium-width){
+					text-align: center;
+					font-size: 12px;
+				}
+
+				ul {
+					margin: 0;
+					padding: 0;
+					display: block;
+				}
+
+				li {
+					list-style: none inside none;
+					display: block;
+					float: left;
+
+					@media (max-width: $medium-width){
+						margin-right: 0.5em;
+					}
+				}
+
+				a{
+					display: block;
+					color: $rood;
+					padding: 0.25em 0.75em 0.5em;
+					
+					&:hover{
+						text-decoration: none;
+						color: $blauw;
+						border-color: $blauw;
+					}
+
+					&.category-active {
+						background-color: $proze-background;
+						color: $grijs-2;
+					}
+
+					&.category-no-content {
+						color: $grijs-7;
+					}
+				}
+
+			}
+	
+		/* --- --- NAVIGATION PANE --- */
+
+			.navigation-icon{
+				@include hidetext();
+				color: $bruin;
+
+				&:before {
+					width: 30px;
+					height: 30px;
+					display: block;
+					float: right;
+					font-size: 24px;
+					font-family: 'naturalis-lng-icons';
+					cursor: pointer;
+				}
+			}
+
+			.navigation-icon-wrapper{
+				display: block;
+				float: right;
+			}
+			
+			#back-icon, #back-icon-inactive{ &:before {
+					content: "\e60a";
+			} }
+
+			#next-icon, #next-icon-inactive { &:before {
+					content: "\e60b";
+			} }
+			
+			
+			#contents-icon, #contents-icon-inactive{ &:before {
+					content: "\e603";
+			} }
+			
+			#previous-icon, #previous-icon-inactive{ &:before {
+					content: "\e607";
+			} }
+
+			#decision-path-icon, #decision-path-icon-inactive{ &:before {
+					content: "\e60f";
+					margin-right: 0.5em;
+			} }
+
+			[id$=icon-inactive]{
+				&:before {
+					cursor: default;
+				}
+			}
+
+
+
+		/* --- --- LOOKUP DIALOGUE --- */
+			
+			#lookup-DialogContent{
+				
+				margin-top: 0.5em;
+				height: 400px;
+				overflow-y: auto;
+				padding-left: 1em;
+				border-left: 1px solid $grijs-7;
+				
+				p{
+					margin: 0;
+				}
+
+				.row {
+					padding: 0.125em;
+
+
+					a {
+						color: $rood;
+						border-bottom: 1px dotted $rood;
+						text-decoration: none;
+					
+						&:hover{
+							color: $blauw;
+							border-bottom-color: $blauw;
+						}
+					}
+
+					&:hover{
+						background-color: $grijs-7;
+					}
+				}
+
+				.row-selected{
+					a{
+						color: $bruin;
+						border-bottom-color: $bruin;
+					}
+				}
+
+			}
+		
+		/* --- --- INDEX (inhoudsopgave) --- */
+
+			.alphabet-letter,
+			.alphabet-letter-ghosted,
+			.alphabet-active-letter {
+				text-align: center;
+				font-size: 18px;
+				font-family: $font-family-proze;
+				font-weight: 300;
+				border-bottom: 1px solid $proze-background;
+			}
+
+			.alphabet-letter{
+				color: $proze-text;
+				cursor: pointer;
+				transition: color 200ms;
+
+				&:hover{
+					color: $rood;
+					border-bottom: 1px solid $rood;
+				}
+			}
+
+			.alphabet-letter-ghosted{
+				color: $grijs-5;
+				cursor: default;
+			}
+
+			.alphabet-active-letter{
+				color: $rood;
+				font-weight: 400;
+				background-color: $proze-background;
+			}
+
+			#commonname-languages{
+				position: absolute;
+				right: 1em;
+				top: 3em;
+			}
+
+	/* --- FORM-ELEMENTS --- */
+
+		/* --- --- FORM-ELEMENTS: GENERAL --- */
+			
+			.btn-group-justified .btn {
+		    	.btn {
+			    	display: block;
+			    	float: left;
+		    		width: 33%;
+		    	}
+			}
+
+			.btn {
+				&.active{
+					@include box-shadow(none);	// override Bootstraps' shadow
+					background-color : $btn-active-bg; 
+					color            : $btn-active-color;
+					border-color     : $btn-active-border;
+				}
+			}
+
+			label {
+				color: $grijs-1;
+				font-weight: 500;
+			}
+
+			textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"], input[type="password"] {
+			    border: 1px solid rgba(0, 0, 0, 0);
+			    border-radius: 4px;
+			    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3) inset;
+			    padding: 8px;
+			}
+			button, input {
+			    line-height: normal;
+			}
+			button, input, select, textarea {
+			    color: #222222;
+			    font-family: sans-serif;
+			    font-size: 100%;
+			    margin: 0;
+			    vertical-align: baseline;
+			}
+
+			.button:visited, .button:link, .button, input[type="button"], input[type="reset"], input[type="submit"], button {
+			    -moz-user-select: none;
+			    background-color: $proze-background;
+			    border: 1px solid $grijs-5;
+			    border-radius: 4px;
+			    color: $grijs-2;
+			    display: inline-block;
+			    font-size: 1em;
+			    font-weight: bold;
+			    padding: 6px 20px;
+			    position: relative;
+			    text-align: center; 
+			}
+			button, input[type="button"], input[type="reset"], input[type="submit"] {
+			    cursor: pointer;
+			}
+			button, input {
+			    line-height: normal;
+			}
+			button, input, select, textarea {
+			    color: #222222;
+			    font-family: sans-serif;
+			    font-size: 100%;
+			    margin: 0;
+			    vertical-align: baseline;
+			    background-color: $wit;
+			    border-color: $grijs-5;
+			}
+
+	/* --- jQUERY DIALOGUE --- */
+			#dialog {
+				position: fixed;
+				padding: 0;
+				z-index: 200;
+				height: 400px;
+			}
+
+			#dialog-header {
+				background: $blauw;
+				display: block;
+				position: relative;
+				padding: 5px;
+				height: 2em;
+				font-weight: bold;
+				color: $wit;
+			}
+
+			#dialog-title {
+				float: left;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			#dialog-close {
+				float: right;
+				cursor: pointer;
+				height: 20px;
+				width: 25px;
+				font-weight: normal;
+				text-align: center;
+				font-family:  'naturalis-lng-icons';
+				font-size: 24px;
+				line-height: 24px;
+				margin-top: -2px;
+				&:after{
+					
+					content: "\e60c";
+				}
+			}
+
+			#dialog-content {
+				display: block;
+				padding: 1em;
+				min-height: 160px;
+				background: $wit;
+
+			}
+
+			#dialog-content-inner {
+				min-height: 128px;
+			}
+
+			#dialog-mask {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				background-color: #000;
+				opacity: 0.6;
+				z-index: 100;
+			}
+
+			#dialog-button-container {
+				text-align: center;
+				margin: 2px 6px 6px 2px;
+			}
+
+			.error {
+				background: #fff;
+				border: 1px solid $brand-danger;
+				border-top: none
+			}
+
+			.errorheader {
+				color: #6f2c2c;
+				border: 1px solid $brand-danger;
+				border-bottom: none
+			}
+
+			.errorbutton {
+				border: 1px solid $brand-danger;
+				color: #fff;
+				cursor: pointer;
+			}
+
+			.warning {
+				background: #fff;
+				border: 1px solid $brand-warning;
+				border-top: none
+			}
+
+			.warningheader {
+				color: #957c17;
+				border: 1px solid $brand-warning;;
+				border-bottom: none
+			}
+
+			.warningbutton {
+				background-color: #eFcC47;
+				border: 1px solid $brand-warning;
+				color: #957C17;
+				cursor: pointer;
+			}
+
+			.success {
+				background: #fff;
+				border: 1px solid #60a174;
+				border-top: none
+			}
+
+			.successheader {
+				color: #3c7f51;
+				border: 1px solid #60a174;
+				border-bottom: none
+			}
+
+			.successbutton {
+				background-color: #3c7f51;
+				border: 1px solid #fff;
+				color: #fff;
+				cursor: pointer;
+			}
+
+			.promptbutton {
+				text-decoration: none;
+				color: #CC0000;
+				cursor: pointer;
+			}
+
+			.promptbutton:hover {
+				text-decoration: underline;
+			}
+
+	/* --- LAYOUT --- */
+
+		/* --- --- GENERAL --- */
+
+			#title{
+				width: $page-width;
+
+				@media (max-width: $medium-width){
+				}
+
+			}
+
+			html{ 
+				height:100%; 
+			}
+
+			body {
+				background-color: $grijs-7;
+			}
+
+			#container{
+				background-color: $wit;
+				min-height: 1000px;
+				position: relative;
+				@include container;
+				@include clearfix;
+
+				@if $show-grid{
+					@include background-grid();
+				}
+			}
+
+			.navbar-container{
+				@include container;
+			}
+
+			#theForm {
+				overflow: auto;
+			}
+
+			.row{ 
+				padding-top: 30px;
+			}
+
+			#main{
+				@include clearfix;
+			}
+
+		/* --- --- TOP-STRIP --- */
+			#top-strip{
+				
+				height: 50px;
+				margin-bottom: -50px;
+				width: $page-width;
+				margin-left: auto;
+				margin-right: auto;
+				text-align: right;
+				padding-top: 15px;
+				
+				p{ 					
+					position: relative;
+					top: -50px;
+					text-align: right;
+					margin-top: 15px;
+					display: inline;
+
+				}
+
+				@media (max-width: $medium-width){
+					clear: both;
+					float: none;
+					width: 100%;
+					display: none;
+				}
+
+			}
+
+		/* --- --- MAIN MENU --- */
+
+			#main-menu{
+				@include cols(5);
+				@include padding-left(0.5);
+				@include margin-right(0.5);
+				padding-top: 4em;
+
+				@media screen and (max-width:$medium-width){
+					width: 100%;
+					li {
+						display: inline-block;
+					}
+				}
+			}
+
+		/* --- --- PAGE CONTENT --- */
+			#page-container{
+				clear: both;
+			}
+
+			#page-main,
+			#search-main-no-tabs,
+			#header-titles,
+			#search-main,
+			#categories,
+			#alphabet
+			{
+				@include cols(18);
+				@media screen and (max-width:$medium-width){
+					width: 100%;
+					text-align: center;
+				}
+
+				@media print{
+					width: 100%;
+				}
+			}
+
+			#header-titles{
+				height: 4em;
+			}
+
+
+			#overview-image, 
+			.introduction-img{
+				width: 241px;
+				max-width: 50%;
+				float: right;
+				height: 281px;
+				background-repeat: no-repeat !important;
+				background-position: center center !important;
+				outline: 1px solid white;
+				background-color: $grijs-7 !important;
+				background-size: contain !important;
+				margin-left: 1em;
+				@media print {
+					display: none;
+				}
+			}
+
+		/* --- --- CATEGORIES (tabs) --- */
+		
+			#categories{
+				padding: 0;
+			}
+
+		/* --- --- SEARCH --- */
+			#search-main,
+			#search-main-no-tabs
+			{
+				position: absolute;
+				left: percentage(0.5/ $grid-columns);
+				margin:  0;
+				@include cols(5);
+				
+				@media screen and (max-width:$medium-width){
+					font-size: 12px;
+					width: 50%;
+					margin-top: 0.75em;
+				}
+			}
+
+			#search{
+				max-width: 95%;
+				margin-top: 1.5em;
+				@media screen and (max-width:$medium-width){
+					padding: 5px;
+				}
+			}
+
+			.search-icon { @media screen and (max-width:$medium-width){ height: 8px; margin-left: -15px !important; }}
+
+			// TODO: find more elegant solution.
+			#search-main-no-tabs{
+				width: 100%;
+				clear: both;
+				
+				#search{
+					@include cols(4);
+				}
+
+				.search-icon{
+					float: left;
+					position: relative;
+					top: 32px;
+					margin-right: -16px;					
+				}
+
+				#header-titles-small{
+					@include cols(17);
+					@include margin-left(1.5);
+				}
+			}
+
+			#search-main-no-tabs + #page-main {
+				position: relative;
+				top: 50px;
+				margin-bottom: 50px;
+
+			}
+
+			.search-icon{
+				margin-left: -30px;
+			}
+
+			#header-title{
+
+				@media (max-width: $medium-width){
+					margin-top: 0.25em;
+					font-size: 14px;
+					margin-bottom: 1em;
+				}
+			}
+
+		/* --- --- NAVIGATION PANE --- */
+
+			#allNavigationPane{
+				position: absolute;
+				top: 1em;
+				right: percentage(1/$grid-columns);
+				@media screen and (max-width:$medium-width){
+					top: 0.25em;
+					a, span{
+						color: $wit;
+					}
+				}
+			
+			}
+
+		/* --- --- MODULE GRID --- */
+			#module-grid {
+				display: none;
+			}
+
+		/* --- --- INDEX (inhoudsopgave) --- */
+
+			#alphabet{
+				background-color: $proze-background;
+			}
+
+			.alphabet-letter,
+			.alphabet-letter-ghosted,
+			.alphabet-active-letter {
+				padding-top: 0.25em;
+				display: block;
+				float: left;
+				width: percentage(1/26);
+			}
+
+		/* --- --- FOOTER  --- */
+
+			#lng {
+				margin-top: 0;
+			}
+
+		/* --- --- ROW-SENDER --- */
+			
+			#row-sender {
+			    background-color: #D6D5D1;
+			    height: 210px;
+			    position: absolute;
+			    bottom: 0;
+			    width: 100%; //$page-width;
+			    padding: 30px;
+			}
+
+	/* --- PRINT OVERRIDES --- */
+			@media print {
+				#main-menu,
+				#search-main,
+				#search-main-no-tabs,
+				#categories,
+				#allNavigationPane,
+				#top-strip {
+					display: none;
+				}
+
+				#header-title{
+					font-size: 32pt;
+					margin-left: percentage(1/24);
+					font-weight: 300;
+					color: black !important;
+				}
+
+				#title {
+					font-size: 16pt;
+					color: silver;
+				}
+
+			}
+
+/* OVERRIDES (to be taken into customstyles.php) */
+
+
+			#main-menu{
+				background-color: $theme-color;
+
+				a {
+					color: $wit;
+				}
+			}
+
+			#dialog-header {
+				background-color: $theme-color;
+			}
+
+			#header-title, #header-titles-small{
+				color: $theme-color;
+			} 
+
+			#buttons input[value="Search >>"] {
+    			background-color:$theme-color !important;
+			}

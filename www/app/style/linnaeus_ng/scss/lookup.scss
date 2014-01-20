@@ -1,0 +1,109 @@
+//
+//	#allNavigationPane {
+//		overflow: hidden;
+//		width: 200px;
+//	}
+//
+//	#allLookupList {
+//		position: absolute;
+//		top: 0px;
+//		left: 0px;
+//		border: 1px dotted black;
+//		width: 350px;
+//		height: 400px;
+//		background-color: #fff;
+//		display: block;
+//		overflow-y: scroll;
+//		overflow-x: hide;
+//		z-index: 50000;
+//		display: none;
+//		padding: 2px;
+//		font-size: 10px;
+//	}
+//
+//	#allLookupLoadingDiv {
+//		height: 100%;
+//		width: 100%;
+//		background-image:
+//			url(../../../media/system/skins/original_skin/loading.gif);
+//		background-position: center;
+//		background-repeat: no-repeat;
+//	}
+//
+//	#lookupDialog {
+//		text-align: left;
+//		margin: 5px;
+//		padding: 0 0 8px 2px;
+//		border-bottom: 1px dotted #0303b2;
+//	}
+//
+//	#lookup-DialogContent {
+//		margin: 5px;
+//		background: #fff;
+//		border: 1px solid #999;
+//		height: 350px;
+//		overflow-y: auto;
+//	}
+//
+//	.allLookupListHighlight {
+//		font-weight: bold;
+//	}
+//
+//	.allLookupListCell {
+//		padding: 1px 5px; 
+//	}
+//
+//	td.allLookupListCell {
+//		padding: 1px 5px; 
+//		width: 500px;
+//	}
+//
+//	.allLookupListRow, .allLookupListActiveRow, .row, #lookup-DialogContent p {
+//		text-align: left;
+//		cursor: pointer;
+//		padding: 0 4px; 
+//		border: 1px solid transparent;
+//	}
+//
+//	#lookup-DialogContent p {
+//		cursor: default;
+//	}
+//
+//	.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row:hover *, .row-selected {
+//		color: #fff;
+//		background: #3875d7;
+//		border: 1px dotted #000;
+//	}
+//
+//	.row a {
+//		color: #000;
+//		text-decoration: none;
+//		display: block;
+//		cursor: pointer;
+//	}
+//
+//	.allLookupListRow:hover, .allLookupListRow:hover *, .row:hover, .row-selected, .allLookupListCellSelected {
+//		color: #fff;
+//		background: #3875d7;
+//		border: 1px dotted #000;
+//	}
+//
+//	.row-selected a, .row:hover *, .allLookupListCellSelected .allLookupListSource {
+//		color: #fff;
+//	}
+//
+//	.allLookupListActiveRow {
+//		background-color: #eee;
+//	}
+//
+//	.allLookupListSource, .source {
+//		color: #666;
+//	}
+//
+//	.allLookupButton {
+//		
+//	}
+//
+//	.allLookupLink {
+//		margin-right: 10px;
+//	}

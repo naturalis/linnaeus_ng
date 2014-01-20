@@ -1,0 +1,85 @@
+// Override Bootstrap Variables
+	//Grid system	
+			$grid-columns            : 24 !default;// Number of columns in the grid system	
+			$grid-gutter-width       : 1px !default;// Padding, to be divided by two and applied to the left and right of all columns
+			$page-width              : 1080px;
+			$font-size-h2            : 14px;
+
+			$grid-background	 	 : TRUE;
+      
+	//Palette      
+			$geel                    : #ffed00;
+			$oranje                  : #f29400;
+			$oranje-2                : #ef6d14;
+			$rood                    : #e3004a;
+			$blauw                   : #009ee0;
+			$groen                   : #009932;
+			$paars                   : #3e2782;
+			$bruin                   : #542e08;
+			$grijs                   : #b2b1a8;
+			$zwart                   : #000000;
+			$wit                     : #ffffff;	
+
+	//Grays
+			$grijs-0				 : #222;
+			$grijs-1                 : #333;
+			$grijs-2                 : #666;
+			$grijs-3                 : #999;
+			$grijs-4                 : #aaa;
+			$grijs-5                 : #ccc;
+			$grijs-6				 : #e6e6e6;
+			$grijs-7                 : #eeede9;
+
+	//Brandcolors
+			$brand-primary           : $blauw;
+			$brand-success           : $groen;
+			$brand-warning           : $oranje;
+			$brand-danger            : $rood;
+			$brand-info              : $blauw;
+
+	//Scaffolding
+			$body-bg                 : $wit;
+			$text-color              : $zwart;
+
+	// LNG-SKIN EXTRA COLORS
+			$proze-background		 : lighten($grijs-7, 5%);
+			$proze-text				 : #302c22;
+
+	//Links
+			$link-color              : $blauw;
+			$link-hover-color        : $rood;
+
+	//Layout
+			$image-height		     : 170px;
+
+	//Forms
+			$input-border-radius     : 2px;			//inputs
+			$border-radius-base      : 2px;			//buttons
+			$input-color-placeholder : $grijs-1;
+			$btn-default-color       : $grijs-2;
+			$btn-default-bg          : $wit;
+			$btn-default-border      : $grijs-6;
+			$btn-active-bg           : $grijs-6;
+			$btn-active-color        : $grijs-1;
+			$btn-active-border       : $grijs-6;
+
+	//Navbar
+			$navbar-inverse-brand-color: $wit;
+
+	//Font
+			$font-family-sans-serif  : "Arial", sans-serif;
+			$headings-font-family    : "Platform Alternate";
+			$theme-color             : $blauw;
+			$font-family-proze : $font-family-sans-serif;
+			$font-family-proze		 : "Open Sans", Arial, sans-serif;
+			// $font-family-proze		 : "Constantia", "Lucida Bright", "Lucidabright", "Lucida Serif", "Lucida", "DejaVu Serif", "Bitstream Vera Serif", "Liberation Serif", "Georgia", "serif";
+
+	//Debugging
+		$show-grid                  : false;
+
+	// Breakpoints
+			$medium-width 			: 799px;
+			$small-width	 		: 480px;
+
+
+
