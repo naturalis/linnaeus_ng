@@ -1,138 +1,58 @@
-#search-header {
-	margin-bottom:10px;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\000036}}
+h3, h4, h5, h6 {
+  font-family: "Open Sans", Arial, sans-serif;
+  font-weight: 400; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000311}}
+.result {
+  margin-top: 1em; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000315}}
+#search-results h4 a {
+  color: #009ee0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000320}}
 #search-header #results-string {
-	margin-bottom:10px;
-}
+  font-size: 150%;
+  color: #333333; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000325}}
+#search-header #buttons {
+  margin: 1em 0; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000333}}
+#search-header {
+  margin-bottom: 10px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000337}}
+#search-header #results-string {
+  margin-bottom: 10px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000342}}
 #search-results h2 {
-	font-weight:bold;
-	margin-bottom:5px;
-}
+  font-weight: bold;
+  margin-bottom: 5px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000347}}
 #search-results h3 {
-	font-weight:bold;
-	margin-bottom:2px;
-}
+  font-weight: bold;
+  margin-bottom: 2px; }
 
-#search-results h4 {
-
-}
-
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000356}}
 #search-results h5 {
-	font-style:italic;
-}
+  font-style: italic; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000360}}
 #search-results .result-count {
-	font-weight:normal;	
-}
+  font-weight: normal; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000364}}
 #search-results .result {
-	margin-bottom:5px;
-}
+  margin-bottom: 5px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000368}}
 #search-results .module {
-	margin-bottom:15px;
-}
+  margin-bottom: 15px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/search\.scss}line{font-family:\0000372}}
 #search-results .search-match {
-	background-color:#ffa;
-}
-
-#search-results {
-
-}
-
-
-
-/*
-#page-main {
-	height: 440px;
-}
-
-#page-main p {
-	margin-bottom: 0;
-}
-
-#results {
-}
-
-#results .highlight {
-	color: red;
-}
-
-#results #header {
-	margin-bottom: 15px;
-}
-
-#results .set {
-	margin-bottom: 10px;
-}
-
-div.set div.subset p {
-	margin-left: 16px;
-}
-
-#results .set-header, #results .set-header-clickable {
-	color: #0303B2;
-	padding: 3px;
-    border-bottom: 1px solid #b8b8b8;
-	font-weight: bold;
-	font-size: 12px;
-}
-
-#results .subset-header, .subset-header-zero {
-	cursor: pointer;
-	border-bottom: 1px dotted #ddd;
-	padding: 2px 18px;
-}
-
-#results .set-header, #results .set-header-clickable, #results .subset-header {
-	padding-left: 18px;
-}
-
-#results .set-header-clickable {
-	cursor: pointer;
-}
-
-#page-main p:last-child, #content p:last-child {
-    margin-bottom: 3px;
-}
-
-#results .result {
-	cursor: pointer;
-}
-
-#results .result:hover {
-	text-decoration: underline;
-}
-#results .subset-header-zero {
-	cursor:default;
-}
-
-.c1, .c2, .c3 {
-	padding: 3px 2px;
-}
-
-.c1, .c3 {
-	background: #fff;
-}
-
-.c2 {
-	background: #f6f6f6;
-}
-
-#results .set img {
-	border: 1px solid #000;
-	vertical-align: middle;
-	margin-right: 3px;
-	width: 50px;
-}
-
-#results .set img.no-border {
-	border: 1px transparent;
-}
-
-*/
+  background-color: #ffa; }

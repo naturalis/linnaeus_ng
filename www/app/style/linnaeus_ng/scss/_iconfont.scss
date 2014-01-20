@@ -1,0 +1,68 @@
+@font-face {
+  font-family: 'icomoon';
+  src:url('#{$icon-font-path}#{$icon-font-name}.eot');
+  src:url('#{$icon-font-path}#{$icon-font-name}.eot?#iefix') format('embedded-opentype'),
+      url('#{$icon-font-path}#{$icon-font-name}.ttf?10') format('truetype'),
+      url('#{$icon-font-path}#{$icon-font-name}.woff?10') format('woff'),
+      url('#{$icon-font-path}#{$icon-font-name}.svg#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+// Catchall baseclass
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'icomoon';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-double-angle-right       { &:before { content: "\e600"; } }
+.icon-double-angle-up          { &:before { content: "\e601"; } }
+.icon-double-angle-down        { &:before { content: "\e602"; } }
+.icon-angle-left               { &:before { content: "\e603"; } }
+.icon-angle-up                 { &:before { content: "\e604"; } }
+.icon-angle-down               { &:before { content: "\e605"; } }
+.icon-angle-right              { &:before { content: "\e606"; } }
+.icon-sort-by-alphabet         { &:before { content: "\e607"; } }
+.icon-sort-by-alphabet-alt     { &:before { content: "\e608"; } }
+.icon-sort-by-attributes       { &:before { content: "\e609"; } }
+.icon-sort-by-attributes-alt   { &:before { content: "\e60a"; } }
+.icon-sort-by-order            { &:before { content: "\e60b"; } }
+.icon-sort-by-order-alt        { &:before { content: "\e60c"; } }
+.icon-long-arrow-down          { &:before { content: "\e60d"; } }
+.icon-long-arrow-up            { &:before { content: "\e60e"; } }
+.icon-long-arrow-left          { &:before { content: "\e60f"; } }
+.icon-long-arrow-right         { &:before { content: "\e610"; } }
+.icon-share-alt                { &:before { content: "\e611"; } }
+.icon-sort                     { &:before { content: "\e612"; } }
+.icon-sort-down                { &:before { content: "\e613"; } }
+.icon-sort-up                  { &:before { content: "\e614"; } }
+.icon-cogs                     { &:before { content: "\e615"; } }
+.icon-user                     { &:before { content: "\e616"; } }
+.icon-envelope                 { &:before { content: "\e617"; } }
+.icon-envelope-alt             { &:before { content: "\e618"; } }
+.icon-search                   { &:before { content: "\e619"; } }
+.icon-arrow-left               { &:before { content: "\e61a"; } }
+.icon-arrow-right, .icon-arrow { &:before { content: "\e61b"; } }
+.icon-arrow-up                 { &:before { content: "\e61c"; } }
+.icon-arrow-down               { &:before { content: "\e61d"; } }
+.icon-link                     { &:before { content: "\e61e"; } }
+.icon-external-link            { &:before { content: "\e61f"; } }
+.icon-signin                   { &:before { content: "\e620"; } }
+.icon-external-link-sign       { &:before { content: "\e621"; } }
+.icon-ellipsis-horizontal      { &:before { content: "\e622"; } }
+.icon-ellipsis-vertical        { &:before { content: "\e623"; } }
+.icon-th-list                  { &:before { content: "\e624"; } }
+.icon-irregular-area           { &:before { content: "\e625"; } }
+.icon-rectangle-area           { &:before { content: "\e626"; } }
+.icon-pan                      { &:before { content: "\e627"; } }
+.icon-map-marker               { &:before { content: "\e62a"; } }
+.icon-globe                    { &:before { content: "\e62b"; } }
+.icon-tags                     { &:before { content: "\e62c"; } }
+.icon-tag                      { &:before { content: "\e62d"; } }

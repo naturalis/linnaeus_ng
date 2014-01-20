@@ -1,0 +1,272 @@
+// SETTINGS
+	@import "settings";
+
+/* LAYOUT */
+
+
+	#page-container {
+		background-color: #bbb;
+	}
+
+	#page-main {
+		background-color: $proze-background;
+	}
+
+	#step-image {
+		border: 1px solid #666;
+		float: right;
+		margin: 38px 35px 0 0;
+	}
+
+	#choice-grid, .wrapper-choice-picture {
+		width: 560px;
+	}
+
+	.wrapper-choice {
+		width: 355px;
+	}
+
+	.wrapper-choice-picture td.text-cell, .wrapper-choice-picture td.target-cell {
+		width: 370px;
+	}
+
+	#step td.target-cell {
+		vertical-align: bottom;
+	}
+
+	#choice-grid td {
+		width: 50%;
+		vertical-align: top;
+		padding-right: 8px;
+	}
+
+	.image-cell {
+		text-align: center;
+		vertical-align: middle;
+		background: #555454;
+		padding: 6px;
+		border-top: 1px solid #000;
+		border-bottom: 1px solid #000;
+	}
+
+	#choice-table .text, #choice-table .target {
+	    margin-right: 10px;
+	}
+
+	#choice-table td.separator {
+	    height: 10px;
+	}
+
+	#decision-path-icon {
+		margin-left: 15px;
+	}
+
+	#back-to-search-icon {
+		margin-right: -8px;
+	}
+
+
+	/* step */
+	#step {
+		text-align: justify;
+	}
+
+	#step #question {
+		
+	}
+
+	#step #question #head {
+		font-size: 14px;
+		color: #0303b2;
+	}
+
+	#step #question #head #step-nr {
+		
+	}
+
+	#step-title {
+	    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
+	    font-size: 16px;
+	    color: #0303b2;
+	}
+
+	#step #question #content {
+		margin-bottom: 15px;
+	}
+
+	#step #question hr {
+		
+	}
+
+	#step #choices {
+		margin-bottom: 15px;
+	}
+
+	#step #img-choices {
+		position: relative;
+	}
+
+	.l2_choice {
+		cursor: pointer;
+		width: 270px;
+		min-height: 155px;
+		background-color: $grijs-7;
+		margin-bottom: 8px;
+		padding: 5px;
+		margin: 5px;
+		font-size: 90%;
+
+
+	}
+
+	#choice-table .choice-picture {
+		width: auto;
+	}
+
+
+	#step .choice-image-div {
+		float: left;
+	}
+
+	#step .choice-image {
+		max-width: 180px;
+		max-height: 115px;
+		cursor: pointer;
+		border: 1px solid #666;
+	}
+
+	#step .choice-img-wrapper {
+		cursor: pointer;
+	}
+
+	.choice-img-wrapper img {
+		border: 1px solid #000;
+	}
+
+	#step .marker {
+		font-weight: bold;
+	}
+
+	.l2_text {
+		min-height: 120px;
+	}
+
+	#step .text-choice-img {
+		text-align: center; 
+		font-size: 10px;
+		margin-top: 3px;
+	}
+
+	#step .text-choice-img p {
+		line-height: 130%;
+		text-align: center;
+	}
+
+	#step .target {
+		margin-top: 15px;
+		font-style: italic;
+		cursor: pointer;
+	}
+
+	#step .arrow {
+		font-family: "Times New Roman", Times, serif;
+		font-size: 16px;
+	}
+
+	#step .target-step,#step .target-taxon {
+		color: #006;
+	}
+
+	#step .target-step:hover,.target-taxon:hover {
+		text-decoration: underline;
+	}
+
+	#step .hr-choice {
+		height: 1px;
+		color: #ddd;
+	}
+
+	/* remaining taxa */
+	#panel {
+	}
+
+	#taxa {
+		width: 240px;
+		overflow: auto;
+		background-color: $grijs-7;
+		float: right;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		max-height: 500px;
+
+	}
+
+
+
+	#taxa #header {
+		font-weight: bold;
+		margin-bottom: 8px;
+		padding: 5px;
+	}
+
+	#taxa a {
+		display: block;
+		width: 240px;
+		text-align: left;
+		padding: 0 4px;
+	}
+
+	#taxa a:link, #taxa a:visited, #taxa p.a:link, #taxa p.a:visited {
+		color: #000;
+		text-decoration: none;
+		border: 1px solid transparent;
+	}
+
+	#taxa p {
+	    margin-bottom: 0;
+	}
+
+	#taxa a:hover, #taxa p.a:hover {
+		color: $blauw;
+	}
+
+	#taxa p:last-child {
+		margin-bottom: 10px;
+	}
+
+	#categories{
+		position: relative;
+		left: 570px;
+		top: 10px;
+		// outline: 1px solid green;
+		a{
+			&.category-active{
+				background-color: $grijs-7 !important;
+			}
+		}
+	}
+
+	/* Decision path */
+	.module-key{
+		#lookup-DialogContent{
+			a{
+				border-bottom: none;
+			}
+
+			a b{ 
+				border-bottom: 1px dotted $rood;
+			}
+
+			a:hover b{ 
+				border-bottom: 1px dotted $blauw;
+			}
+
+			.row{
+				margin-bottom: 1em;
+			}
+		}
+	}
+
+
+
+

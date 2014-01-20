@@ -1,0 +1,168 @@
+// SETTINGS
+		@import "settings";
+
+// STYLING
+
+	h3, h4, h5, h6{
+		font-family: $font-family-proze;
+		font-weight: 400;
+	}
+
+	.result{
+		margin-top: 1em;
+	}
+
+	#search-results  h4 a{
+		color: $blauw;
+	}
+
+	#search-header {
+		#results-string {
+			font-size: 150%;
+			color: $grijs-1;
+		}
+
+		#buttons{
+			margin: 1em 0;
+		}
+	}
+
+
+
+
+	#search-header {
+		margin-bottom:10px;
+	}
+
+	#search-header #results-string {
+		margin-bottom:10px;
+	}
+
+
+	#search-results h2 {
+		font-weight:bold;
+		margin-bottom:5px;
+	}
+
+	#search-results h3 {
+		font-weight:bold;
+		margin-bottom:2px;
+	}
+
+	#search-results h4 {
+
+	}
+
+	#search-results h5 {
+		font-style:italic;
+	}
+
+	#search-results .result-count {
+		font-weight:normal;	
+	}
+
+	#search-results .result {
+		margin-bottom:5px;
+	}
+
+	#search-results .module {
+		margin-bottom:15px;
+	}
+
+	#search-results .search-match {
+		background-color:#ffa;
+	}
+
+//
+//
+//
+//
+//	#page-main {
+//		height: 440px;
+//	}
+//
+//	#page-main p {
+//		margin-bottom: 0;
+//	}
+//
+//	#results {
+//	}
+//
+//	#results .highlight {
+//		color: red;
+//	}
+//
+//	#results #header {
+//		margin-bottom: 15px;
+//	}
+//
+//	#results .set {
+//		margin-bottom: 10px;
+//	}
+//
+//	div.set div.subset p {
+//		margin-left: 16px;
+//	}
+//
+//	#results .set-header, #results .set-header-clickable {
+//		color: #0303B2;
+//		padding: 3px;
+//	    border-bottom: 1px solid #b8b8b8;
+//		font-weight: bold;
+//		font-size: 12px;
+//	}
+//
+//	#results .subset-header, .subset-header-zero {
+//		cursor: pointer;
+//		border-bottom: 1px dotted #ddd;
+//		padding: 2px 18px;
+//	}
+//
+//	#results .set-header, #results .set-header-clickable, #results .subset-header {
+//		padding-left: 18px;
+//	}
+//
+//	#results .set-header-clickable {
+//		cursor: pointer;
+//	}
+//
+//	#page-main p:last-child, #content p:last-child {
+//	    margin-bottom: 3px;
+//	}
+//
+//	#results .result {
+//		cursor: pointer;
+//	}
+//
+//	#results .result:hover {
+//		text-decoration: underline;
+//	}
+//	#results .subset-header-zero {
+//		cursor:default;
+//	}
+//
+//	.c1, .c2, .c3 {
+//		padding: 3px 2px;
+//	}
+//
+//	.c1, .c3 {
+//		background: #fff;
+//	}
+//
+//	.c2 {
+//		background: #f6f6f6;
+//	}
+//
+//	#results .set img {
+//		border: 1px solid #000;
+//		vertical-align: middle;
+//		margin-right: 3px;
+//		width: 50px;
+//	}
+//
+//	#results .set img.no-border {
+//		border: 1px transparent;
+//	}
+//
+//
+//
