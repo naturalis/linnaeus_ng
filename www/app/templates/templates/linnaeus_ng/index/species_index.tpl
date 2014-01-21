@@ -10,7 +10,7 @@
 		{if $l < 97 || $l > 122}
 		<span class="alphabet-active-letter">#</span>
 		{else}
-		<span class="alphabet-letter" onclick="$('#letter').val('#');$('#theForm').submit();">#</span>
+		<a href="index.php?letter=#">#</a>
 		{/if}
 	{/if}
 
@@ -19,7 +19,7 @@
 		{if $l==$letter}
 		<span class="alphabet-active-letter">{$l|upper}</span>
 		{elseif $alpha[$l]}
-		<span class="alphabet-letter" onclick="$('#letter').val('{$l}');$('#theForm').submit();">{$l|upper}</span>
+		<a href="index.php?letter={$l}">{$l|upper}</a>
 		{else}
 		<span class="alphabet-letter-ghosted">{$l|upper}</span>
 		{/if}
