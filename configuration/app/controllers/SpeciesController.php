@@ -48,7 +48,6 @@ class SpeciesController extends Controller
 
 
 	/* init */
-
     public function __construct ()
     {
         parent::__construct();
@@ -70,6 +69,18 @@ class SpeciesController extends Controller
 		
 		include_once ('RdfController.php');
 		$this->Rdf = new RdfController;
+		
+
+		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
+		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
+			
+			$p=trim(strtoupper(str_replace(' ','_',$page['page'])));
+		
+			if (!defined('TAB_'.$p)) {
+				define('TAB_'.$p,$page['id']);
+			}
+			
+		}
 		
     }
 
@@ -132,7 +143,7 @@ class SpeciesController extends Controller
 					'allowUnpublished' => $this->isLoggedInAdmin()
 				)
             );
-
+			
             // determine the page_id the page will open in
             $activeCategory = 
             	$this->rHasVal('cat') ? 
@@ -189,7 +200,7 @@ class SpeciesController extends Controller
 				if (isset($this->models->Names) && $this->getSetting('taxon_page_ext_classification',0)) {
 
 					/*
-						do this again, as the original method refuses empty categories as active ones,
+						must redesign this, as the original method refuses empty categories as active ones,
 						whereas the NSR has several automatically generated pages that are empty in the
 						database.
 					*/
@@ -223,6 +234,14 @@ class SpeciesController extends Controller
 
 					$this->smarty->assign('classification',$classification);
 					$this->smarty->assign('ranks',$this->getProjectRanks());
+					
+					// verspreiding
+					if ($activeCategory==TAB_DISTRIBUTION) {
+
+						$presenceData=$this->getPresence($taxon['id']);
+						$this->smarty->assign('presenceData', $presenceData);
+//	q($presenceData,1);
+					}
 	
 				}
 
@@ -242,12 +261,7 @@ class SpeciesController extends Controller
 					$content = $this->matchHotwords($content);
 				}
 				
-				if ($activeCategory_label=='Presence') {
-					
-					$presenceData=$this->getPresence($taxon['id']);
-					$this->smarty->assign('presenceData', $presenceData);
 
-				}
             
                 $this->smarty->assign('content', $content);
 
@@ -1463,34 +1477,44 @@ class SpeciesController extends Controller
 				_a.presence_id,
 				_a.presence82_id,
 				_a.reference_id,
-				_b.label as presence,
-				_c.label as presence82,
-				_d.label as habitat,
-				_e.name as actor,
-				_f.name as organisation,
-				_g.label as reference,
+				_b.label as presence_label,
+				_b.information as presence_information,
+				_b.information_title as presence_information_title,
+				_b.index_label as presence_index_label,
+				_c.label as presence82_label,
+				_d.label as habitat_label,
+				_e.name as expert_name,
+				_f.name as organisation_name,
+				_g.label as reference_label,
 				_g.author as reference_author,
 				_g.date as reference_date
 			from %PRE%presence_taxa _a
 			left join %PRE%presence_labels _b
-				on _a.presence_id = _b.presence_id and _a.project_id=_b.project_id and _b.language_id=".$this->getCurrentLanguageId()."
+				on _a.presence_id = _b.presence_id 
+				and _a.project_id=_b.project_id 
+				and _b.language_id=".$this->getCurrentLanguageId()."
 			left join %PRE%presence_labels _c
-				on _a.presence82_id = _c.presence_id and _a.project_id=_c.project_id and _c.language_id=".$this->getCurrentLanguageId()."
+				on _a.presence82_id = _c.presence_id 
+				and _a.project_id=_c.project_id 
+				and _c.language_id=".$this->getCurrentLanguageId()."
 			left join %PRE%habitat_labels _d
-				on _a.habitat_id = _d.habitat_id and _a.project_id=_d.project_id and _d.language_id=".$this->getCurrentLanguageId()."
+				on _a.habitat_id = _d.habitat_id 
+				and _a.project_id=_d.project_id 
+				and _d.language_id=".$this->getCurrentLanguageId()."
 			left join %PRE%actors _e
-				on _a.actor_id = _e.id and _a.project_id=_e.project_id
+				on _a.actor_id = _e.id 
+				and _a.project_id=_e.project_id
 			left join %PRE%actors _f
-				on _a.actor_org_id = _f.id and _a.project_id=_f.project_id
+				on _a.actor_org_id = _f.id 
+				and _a.project_id=_f.project_id
 			left join %PRE%literature2 _g
-				on _a.reference_id = _g.id and _a.project_id=_g.project_id
+				on _a.reference_id = _g.id 
+				and _a.project_id=_g.project_id
 			where _a.project_id = ".$this->getCurrentProjectId()."
 			and _a.taxon_id =".$id
 		);	
 		return $data[0];
 	}
-
-
 
 	/* private other */
 	
