@@ -1,4 +1,4 @@
-<body id="body">
+<body id="body" class="module-{$controllerBaseName}">
 {if $customTemplatePaths.header_container}
     {include file=$customTemplatePaths.header_container}
 {else}
