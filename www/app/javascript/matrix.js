@@ -160,7 +160,7 @@ function goState() {
 			break;
 		case 'media':
 
-			if (state.file_dimensions==null) break;
+			if (state.img_dimensions==null) break;
 
 			var c = getCharacter(state.characteristic_id);
 			
@@ -177,8 +177,8 @@ function goState() {
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - headerHeight;
 
-			var imgW = state.file_dimensions[0];
-			var imgH = state.file_dimensions[1];
+			var imgW = state.img_dimensions[0];
+			var imgH = state.img_dimensions[1];
 
 			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
 
