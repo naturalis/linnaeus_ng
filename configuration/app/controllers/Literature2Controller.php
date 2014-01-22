@@ -2,9 +2,8 @@
 
 include_once ('Controller.php');
 
-class LiteratureController extends Controller
+class Literature2Controller extends Controller
 {
-    
 
     public $usedModels = array(
 		'literature2'
@@ -53,8 +52,92 @@ class LiteratureController extends Controller
     
     }
 
+	private function getReference($id)
+	{
+		
+		$data=$this->models->Literature2->freeQuery(
+			"select
+				_a.label,
+				_a.date,
+				_a.author,
+				_a.actor_id,
+				_b.name as actor_name,
+				_a.publication_type,
+				_a.order_number,
+				_a.citation,
+				_a.source,
+				_a.publishedin,
+				_a.publishedin_actor_id,
+				_c.name as publishedin_actor_name,
+				_a.pages,
+				_a.volume,
+				_a.periodical,
+				_a.periodical_actor_id,
+				_d.name as periodical_actor_name,
+				_a.language_id,
+				_e.label as language_name
+			from %PRE%literature2 _a
+
+			left join %PRE%actors _b
+				on _a.actor_id = _b.id 
+				and _a.project_id=_b.project_id
+
+			left join %PRE%actors _c
+				on _a.publishedin_actor_id = _c.id 
+				and _a.project_id=_c.project_id
+				
+			left join %PRE%actors _d
+				on _a.periodical_actor_id = _d.id 
+				and _a.project_id=_d.project_id
+				
+			left join %PRE%labels_languages _e
+				on _a.language_id = _e.language_id 
+				and _a.project_id=_e.project_id
+				and _e.label_language_id = ".$this->getCurrentLanguageId()."
+
+			where _a.project_id = ".$this->getCurrentProjectId()."
+			and _a.id =".$id
+		);	
+	
+		return $data[0];
+
+	}
+
+
+
+    public function referenceAction()
+    {
+
+		if (!$this->rHasId()) $this->redirect('index.php');
+
+		$ref = $this->getReference($this->requestData['id']);
+
+		if (!$ref) $this->redirect('index.php');
+		
+		$this->setPageName($ref['label'].', '.$ref['source']);
+
+		$this->smarty->assign('ref', $ref);
+
+        $this->printPage();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function indexAction()
     {
+ 
+ 		die('index');
  
  		if (!$this->rHasVal('id')) {
 
@@ -99,41 +182,6 @@ class LiteratureController extends Controller
 
 		*/
    
-        $this->printPage();
-
-    }
-
-    public function referenceAction()
-    {
-
-		if ($this->rHasId()) {
-
-			$ref = $this->getReference($this->requestData['id']);
-			
-			$ref['text'] = $this->matchGlossaryTerms($ref['text']);
-			$ref['text'] = $this->matchHotwords($ref['text']);
-
-			$letter = strtolower(substr($ref['author_first'],0,1));
-
-			$this->setPageName(sprintf($this->translate('Literature: "%s"'),$ref['author_full'].' ('.$ref['year'].')'));
-
-		} else {
-		
-			$this->redirect('index.php');
-		
-		}
-
-
-		$alpha = $this->getLiteratureAlphabet();
-
-		if (isset($alpha)) $this->smarty->assign('alpha', $alpha);
-
-		if (isset($letter)) $this->smarty->assign('letter', $letter);
-
-		if (isset($ref)) $this->smarty->assign('ref', $ref);
-
-		if (isset($ref)) $this->smarty->assign('adjacentItems', $this->getAdjacentItems($ref['id']));
-
         $this->printPage();
 
     }
@@ -238,111 +286,6 @@ class LiteratureController extends Controller
 
 
 		return $l;
-
-	}
-
-	private function getReference($id)
-	{
-
-		if (!isset($id)) return;
-
-		$l = $this->models->Literature->_get(
-			array(
-				'id' => array(
-					'project_id' => $this->getCurrentProjectId(),
-					'id' => $id
-				),
-				'columns' => '*, concat(
-									author_first,
-									(
-										if(multiple_authors=1,
-											\' et al.\',
-											if(author_second!=\'\',concat(\' & \',author_second),\'\')
-										)
-									)
-								) as author_full,
-								concat(
-									if(isnull(`year`)!=1,`year`,\'\'),
-									if(isnull(suffix)!=1,suffix,\'\'),
-									if(isnull(year_2)!=1,
-										concat(
-											if(year_separator!=\'-\',
-												concat(
-													\' \',
-													year_separator,
-													\' \'
-												),
-												year_separator
-											),
-											year_2,
-											if(isnull(suffix_2)!=1,
-												suffix_2,
-												\'\')
-											)
-											,\'\'
-										)
-								) as year_full',
-			)
-		);
-		
-		if ($l) {
-		
-			$ref = $l[0];
-			
-			$lt = $this->models->LiteratureTaxon->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'literature_id' => $id	
-					),
-					'order' => 'sort_order'
-				)
-			);
-
-			$tc = 'id,taxon,rank_id,list_level,is_hybrid';
-
-			foreach((array)$lt as $key => $val) {
-
-				if (isset($val['taxon_id'])) {
-
-					$t = $this->models->Taxon->_get(
-						array(
-							'id' => array(
-								'project_id' => $this->getCurrentProjectId(),
-								'id' => $val['taxon_id']
-							),
-							'columns' => $tc
-						)
-					);
-
-					$lt[$key]['taxon'] = $t[0];
-					$lt[$key]['taxon']['label'] = $this->formatTaxon($lt[$key]['taxon']);
-
-				}
-
-			}
-			
-			$ref['taxa'] = $lt;
-
-			$s = $this->models->Synonym->_get(
-				array(
-					'id' => array(
-						'project_id' => $this->getCurrentProjectId(),
-						'lit_ref_id' => $id	
-					),
-					'columns' => 'synonym,taxon_id'
-				)
-			);
-
-			$ref['synonyms'] = $s;
-
-			return $ref;
-
-		} else {
-		
-			return;
-
-		}
 
 	}
 

@@ -26,9 +26,7 @@
 
         <div class="left-divider"></div>
 
-		<div id="toolboxContainer">
-            <h2>Toolbox</h2>
-		</div>  
+		{include file="../shared/_block_toolbox.tpl"}
 
 		<div id="treebranchContainer">
             <h2>Indeling</h2>

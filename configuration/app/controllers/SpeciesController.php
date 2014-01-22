@@ -1513,6 +1513,7 @@ class SpeciesController extends Controller
 			where _a.project_id = ".$this->getCurrentProjectId()."
 			and _a.taxon_id =".$id
 		);	
+		
 		return $data[0];
 	}
 
