@@ -197,22 +197,11 @@
 {/literal}
 
 {literal}
-.selectIcon {
-{/literal}
-    background: url('{$systemMedia}open-select.png') no-repeat right center;
-    padding-right: 18px;
-    margin-right: 10px;
-    cursor: pointer;
-{literal}
-}
+
 {/literal}
 
 {literal}
-.selectRight {
-{/literal}
-    background: url('{$systemMedia}go-to.png') no-repeat right 4px;
-{literal}
-}
+
 {/literal}
 
 {literal}

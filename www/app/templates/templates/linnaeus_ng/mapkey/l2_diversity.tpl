@@ -1,6 +1,10 @@
 {include file="../shared/header.tpl"}
 {assign var=currentPage value=$session.app.system.path.filename}
-<div id="header-titles"></div>
+<div id="header-titles">
+    <span id="header-title">
+        {t}Distribution{/t}
+    </span>
+</div>
 {include file="_categories.tpl"}
 {include file="../shared/_search-main.tpl"}
 

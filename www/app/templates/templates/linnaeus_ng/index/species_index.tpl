@@ -3,7 +3,7 @@
 {include file="../shared/_search-main.tpl"}
 
 
- 	<div id="alphabet">
+ 	<div id="alphabet" class="test">
 	<input type="hidden" id="letter" name="letter" value="{$letter}" />
 	{if $hasNonAlpha}
 		{assign var=l value=$letter|ord}
@@ -19,7 +19,7 @@
 		{if $l==$letter}
 		<span class="alphabet-active-letter">{$l|upper}</span>
 		{elseif $alpha[$l]}
-		<a href="index.php?letter={$l}">{$l|upper}</a>
+		<a class="alphabet-letter" href="index.php?letter={$l}">{$l|upper}</a>
 		{else}
 		<span class="alphabet-letter-ghosted">{$l|upper}</span>
 		{/if}
