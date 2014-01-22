@@ -1,16 +1,4 @@
 {include file="../shared/header.tpl"}
-{literal}
-<style>
-.taxon-image-table {
-	font-size:9px;
-	color:#666;
-}
-.taxon-dna-table {
-	font-size:11px;
-}
-</style>
-{/literal}
-
 {if $names.list[$names.prefId]}
 {assign var=taxon_display_name value=$names.list[$names.prefId].name}
 {elseif $names.list[$names.sciId]}
@@ -95,9 +83,9 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			<div>
 				<h2>Voorkomen</h2>
 				<table>
-					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information}(<a href="#" onclick="hint('<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</a>){/if}</td></tr>{/if}
+					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information} (<a href="#" onclick="hint(this,'<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</a>){/if}</td></tr>{/if}
 					{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
-					{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
+					{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php?id={$presenceData.reference_id}">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
 					{if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if}
 					{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 				</table>

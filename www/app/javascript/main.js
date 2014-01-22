@@ -573,12 +573,16 @@ function showSearchIndex() {
 
 function hint(caller,txt) {
 
-	if (!txt || !$('#hint-box')) return;
+	if (!$('#hint-box')) return;
 
-	var pos = $(caller).position();
-	$('#hint-box').offset({ left: pos.left + 10, top: pos.top - $('#hint-box').height() - 12});
-	$('#hint-box').html(txt);
+	if (caller) {
+		var pos = $(caller).offset();
+		$('#hint-box').offset({left:pos.left+10,top:pos.top+25});
+	}
+	if (txt) $('#hint-box').html(txt);
+
 	$('#hint-box').toggle();
-
-
+	$('#hint-box').bind('click', function() {
+		hint();
+	});
 }
