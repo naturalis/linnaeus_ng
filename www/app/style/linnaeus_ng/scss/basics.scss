@@ -247,11 +247,13 @@
 
 			@mixin proze-humanist{
 				font: {
-					family: "Open Sans";
-					size: 18px;
-					weight: 400;
+					family: "Source Sans Pro";
+					size: 20px;
+					weight: 300;
 					style: normal;
 				}
+
+				text-align: justify;
 
 				b {
 					font-weight: 700;
@@ -260,7 +262,7 @@
 
 	/* --- FONT */
 
-		/* --- --- PLATFORM --- */
+		// /* --- --- PLATFORM --- */
 
 			// @font-face {
 			//     font-family: 'Platform Alternate';
@@ -272,21 +274,19 @@
 			//     font-style: normal;
 			// }
 
-			@font-face {
-			    font-family: 'Platform Alternate';
-			    src: url('fonts/platform-regular-alternate-webfont.eot');
-			    src: url('fonts/platform-regular-alternate-webfont.eot?#iefix') format('embedded-opentype'),
-			         url('fonts/platform-regular-alternate-webfont.woff') format('woff'),
-			         url('fonts/platform-regular-alternate-webfont.ttf?5') format('truetype');
-			    font-weight: normal;
-			    font-style: normal;
-			}
+			// @font-face {
+			//     font-family: 'Platform Alternate';
+			//     src: url('fonts/platform-regular-alternate-webfont.eot');
+			//     src: url('fonts/platform-regular-alternate-webfont.eot?#iefix') format('embedded-opentype'),
+			//          url('fonts/platform-regular-alternate-webfont.woff') format('woff'),
+			//          url('fonts/platform-regular-alternate-webfont.ttf?5') format('truetype');
+			//     font-weight: normal;
+			//     font-style: normal;
+			// }
 
-		/* --- --- GOOGLE OPEN SANS --- */
+		// /* --- --- GOOGLE OPEN SANS --- */
 			
-			// @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic);		
-
-		/* --- --- ICONS --- */
+		// 	@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic);		/* --- --- ICONS --- */
 
 			@font-face {
 				font-family: 'naturalis-lng-icons';
@@ -356,14 +356,23 @@
 				content: "\e60f";
 			}
 
-
+		/* Source Sans */
+			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,300italic);
 		/* --- --- GOOGLE ROBOTO SLAB --- */
 			
 			@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300,700); 
 
-		/* --- --- GOOGLE MERRIWEATHER --- */
+		// /* --- --- GOOGLE MERRIWEATHER --- */
 
 			//@import url(http://fonts.googleapis.com/css?family=Merriweather:300,300italic,700);
+
+		/* --- --- BASE FONT --- */
+
+			body{
+				font-weight:300; 
+				font-stretch:normal;
+				letter-spacing: 0.01em;
+			}
 
 	/* --- STYLING --- */
 
@@ -378,7 +387,6 @@
 
 			#title, #mini-header-title {
 				font-size: 32px;
-				font-family: $headings-font-family;
 				margin: 0 auto;
 				line-height: 50px;
 				@media screen and (max-width:$medium-width){ margin-left: 0.25em; font-size: 24px;}
@@ -392,6 +400,10 @@
 				}
 			}
 
+			#title{
+				font-family: $headings-font-family;
+			}
+
 		/* --- --- TOP STRIP (SERVICE MENU) --- */
 			
 			#top-strip {
@@ -400,7 +412,6 @@
 					color: $grijs-2;
 					text-align: right;
 					font-size: 17px;
-					font-weight: 700;
 					margin-top: 15px;
 				}
 
@@ -411,18 +422,23 @@
 
 		/* --- --- BOTTOMBAR --- */
 
-			.navbar-container{
-
-			}
-
 			#bottombar {
 			    background-color: #000000;
 			    color: #FFFFFF;
 			    font-size: 16px;
-			    font-weight: bold;
 			    height: 50px;
 			    margin: 0;
 			    overflow: hidden;
+			    
+			    .container{
+				    width: $page-width;
+				    max-width: 100%;
+			    	
+			    }
+
+			    a{
+			    	color: $wit;
+			    }
 			}
 
 		/* --- --- MAIN MENU --- */
@@ -484,6 +500,7 @@
 				padding: 1em percentage(1/17);
 				line-height: 1.9;
 				color: $proze-text;
+				margin-bottom: 30px;
 
 				@media (max-width: $medium-width){
 					font-size: 75%;
@@ -511,9 +528,9 @@
 
 			}
 
-			#content,
-			#description{
-				@include proze-sans;
+			// #content, 
+			.proze{
+				@include proze-humanist;
 			}
 
 
@@ -635,8 +652,6 @@
 				}
 			}
 
-
-
 		/* --- --- LOOKUP DIALOGUE --- */
 			
 			#lookup-DialogContent{
@@ -687,19 +702,17 @@
 			.alphabet-active-letter {
 				text-align: center;
 				font-size: 18px;
-				font-family: $font-family-proze;
 				font-weight: 300;
 				border-bottom: 1px solid $proze-background;
 			}
 
 			.alphabet-letter{
-				color: $proze-text;
+				color: $blauw;
 				cursor: pointer;
 				transition: color 200ms;
 
 				&:hover{
 					color: $rood;
-					border-bottom: 1px solid $rood;
 				}
 			}
 
@@ -718,6 +731,12 @@
 				position: absolute;
 				right: 1em;
 				top: 3em;
+			}
+
+		/* --- --- GLOSSARY --- */
+
+			.allLookupListSource{
+				display: none;
 			}
 
 	/* --- FORM-ELEMENTS --- */
@@ -743,7 +762,7 @@
 
 			label {
 				color: $grijs-1;
-				font-weight: 500;
+				font-weight: 300;
 			}
 
 			textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"], input[type="password"] {
@@ -851,7 +870,7 @@
 				left: 0;
 				height: 100%;
 				width: 100%;
-				background-color: #000;
+				background-color: $grijs;
 				opacity: 0.6;
 				z-index: 100;
 			}
@@ -1088,7 +1107,7 @@
 			}
 
 			#search{
-				max-width: 95%;
+				max-width: 80%;
 				margin-top: 1.5em;
 				@media screen and (max-width:$medium-width){
 					padding: 5px;
@@ -1097,7 +1116,6 @@
 
 			.search-icon { @media screen and (max-width:$medium-width){ height: 8px; margin-left: -15px !important; }}
 
-			// TODO: find more elegant solution.
 			#search-main-no-tabs{
 				width: 100%;
 				clear: both;
@@ -1115,7 +1133,7 @@
 
 				#header-titles-small{
 					@include cols(17);
-					@include margin-left(1.5);
+					@include margin-left(1);
 				}
 			}
 
@@ -1168,7 +1186,7 @@
 			.alphabet-letter,
 			.alphabet-letter-ghosted,
 			.alphabet-active-letter {
-				padding-top: 0.25em;
+				padding-top: 0.5em;
 				display: block;
 				float: left;
 				width: percentage(1/26);
@@ -1176,8 +1194,20 @@
 
 		/* --- --- FOOTER  --- */
 
-			#lng {
-				margin-top: 0;
+			#footer{
+				background-color: $grijs-7;
+			}
+
+			#footer-container{
+				background-color: $grijs-6;
+				width: $page-width ;
+				margin: 0 auto;
+				max-width: 100%;
+			}
+
+			#logo{
+				background-color: $blauw;
+				max-width: percentage(9/24);
 			}
 
 		/* --- --- ROW-SENDER --- */
