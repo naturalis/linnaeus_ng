@@ -1,0 +1,1102 @@
+/* opmaak div's 
+----------------------------------*/
+#container {
+	background-color: #fff;
+}
+
+#logo {
+	position: absolute;
+	left: 9px;
+  top: 35px;
+	display: block;
+	height: 42px;
+	width: 644px;
+	background: url(images/logo.png) no-repeat left bottom;
+}
+
+#eolLogo {
+	position: absolute;
+	right: 8px;
+	top: 8px;
+	display: block;
+	height: 19px;
+	width: 39px;
+	background: url(images/eol.gif) no-repeat left bottom;
+}
+
+#slogan {
+	display: none;
+}
+
+#logo span, #slogan span {
+	display: none;
+}
+
+.homepage #header-image{
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 239px;
+	top: 100px;
+  background: url('images/header-dummy.jpg') 0 0 no-repeat;
+	overflow: hidden;
+}
+
+#header-image {
+	display: none;
+}
+
+#header-image img{
+  display: none;
+}
+
+#left {
+	margin-bottom: 20px;
+}
+
+/* links 
+----------------------------------*/
+a {
+	/*color: #000;*/
+	color: #fa7001;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #fa7001;
+	text-decoration: underline;
+}
+
+a img {
+	border: none;
+}
+
+a.pdf {
+	padding: 2px 0 2px 20px;
+	background: url(images/icon-pdf.gif) no-repeat 0 0;	
+}
+
+a.help 
+{
+	background: url(images/card_help.gif) no-repeat 0 0;	
+	width:16px;
+	height:16px;
+}
+
+#formSearchFacetsSpecies a.help
+{
+	position:absolute;	
+}
+
+a.help:hover 
+{
+	text-decoration:none!important;	
+}
+
+/* opmaak algemene elementen
+----------------------------------*/
+html * {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: small;
+	background: #FFF url('images/home_bg.png') no-repeat top center;
+}
+
+h1, #left h2, #right h2, #content h2 {
+  font-family: Georgia;
+	font-size: 18px;	
+	font-weight: normal;
+	padding-bottom: 2px;
+	margin-bottom: 9px;
+	color: #333;
+	border-bottom: solid 1px #666;
+}
+
+h2.search {
+	margin-top:17px;
+}
+
+h3 {
+	font-size: 110%;
+    font-size: 13px;
+	font-weight: bold;
+    color: #000;
+	/*margin-bottom: 1em;*/
+  margin-bottom: 0;
+    /*font-family: Georgia;*/
+}
+
+h4 {
+	font-size: 100%;
+	font-weight: normal;
+	color: #333;
+	/*margin-bottom: 1em;*/
+  margin-bottom: 0;
+    font-family: Georgia;
+}
+
+h4.search {
+	margin-bottom: 1em;
+}
+
+h5 {
+	font-size: 100%;
+	font-style: italic;
+	color: #000;
+	margin-bottom: 1em;
+}
+
+h6 {
+	font-size: 85%;
+	font-weight: normal;
+	font-style: italic;
+}
+
+#content p {
+	margin-bottom: 1em;
+}
+
+#content a {
+    color: #fa7001;
+}
+
+#content a:hover {
+    text-decoration: underline;
+}
+.uitgelichtItem p {
+}
+
+ul { 
+	list-style: circle;
+}
+
+ul li, ol li {
+	margin-left: 6%;
+}	
+
+/*
+.intro img, .contents img {
+	border: solid 1px #d5d7d8;
+}
+*/
+
+.intro {
+	margin-bottom: 1em;
+}
+
+.dfn {
+}
+
+.dfnHi {
+	background-color: #ccc;
+}
+
+/* actieve elementen */
+.active {
+	color: #FA7001;
+}
+
+/* formulieren */
+
+form, fieldset {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+fieldset {
+	padding: 5px 0px;
+}
+
+fieldset.block {
+	background-color: #F9A555;
+	padding: 5px 10px 4px 10px;
+}
+
+
+
+.formrow {
+	clear: both;
+	/*position: relative;*/
+	height: auto;	
+	margin: 0.3em 0;
+	float: left;
+	width: 100%;
+}
+
+.formrow input.field {
+	float:right;
+	width: 30em;
+	border:none;
+	margin:1px 0;
+	height:18px;
+	right:245px;
+	position:absolute;
+}
+
+.formrow label {display:inline; clear:none;}
+
+.formrow select {
+	/*float: right;*/
+	margin-left:8px;
+	width: 15em;/*20em;*/
+	margin-top:16px;
+}
+
+.formrow ul 
+{
+	list-style:none;
+}
+
+.formrow ul li
+{
+	margin-left:0px;
+}
+
+.formrow input.list
+{
+	margin-right:8px;
+}
+
+
+.formrow ul#presenceStatusList label {float:right;}
+.formrow ul#presenceStatusList {clear:both; margin-top:10px;}
+.formrow ul#presenceStatusList li {float:left; display:block; position:relative; }
+.formrow ul#presenceStatusList input {float:left; height:13px;vertical-align:top;}
+.formrow ul#presenceStatusList div.presenceStatusCode {position:absolute; left:21px;}
+.formrow ul#presenceStatusList div.presenceStatusDescription {position:relative; left:23px; width:480px;}
+
+#formSearchFacetsSpecies .block .formrow label,
+#formSearchFacetsSpecies .block .formrow input.field {float:none;}
+#formSearchFacetsSpecies fieldset.block .formrow {margin:0; height:29px; display:block;}
+#formSearchFacetsSpecies fieldset.block 
+{
+	background-color: #F9A555;
+	padding: 10px 10px 1px 10px;
+	height:auto;
+}
+
+.formrow ul#speciesOptionList {margin-top:10px;}
+.formrow ul#speciesOptionList input {display:inline; height:13px;}
+
+form br {
+ clear: both;
+}
+
+
+
+/* menu - navigatie 
+----------------------------------*/
+/* zie menu.css */
+
+
+/* Nieuws V2
+----------------------------------*/
+
+#nieuws, #nieuws li {     
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#nieuws {
+	margin-top: -5px;
+}
+
+#nieuws li {
+  overflow: auto;	
+  width: 100%;
+  padding: 5px 0;
+  font-size: 11px;
+  line-height: 15px;
+  border-bottom: solid 1px #e5e5e5;
+}
+
+#nieuws li.hidden, .nieuwsitem.hidden   {
+  background: #FFF0F0; 
+}
+
+#nieuws li a.thumbnail {
+  width: 100px;  
+  height: 80px;
+  overflow: hidden;
+  float: left;
+  margin-right: 8px;
+  margin-top: 4px;
+  display: inline;
+}
+
+#nieuws .text{
+  margin-left: 120px;
+}
+
+#nieuws li h3, #nieuws li p {
+  margin: 0;
+  float: right;
+  width: 390px;
+}
+
+#nieuws p.meta {
+  color: #646262;
+  line-height: 17px;
+}
+
+#nieuws p.actions {
+  margin: 10px 0;
+}
+
+p.actions a, p.newlog a {  
+  position: relative;  
+  padding: 2px 0 2px 20px;
+  margin-right: 15px;
+  background: url(images/icon_page.gif) no-repeat 0 50%;  
+}
+
+p.newlog {
+	margin: 1em 0 0;
+	padding-bottom: 5px;
+	border-bottom: solid 1px #e5e5e5;
+}
+
+p.newlog a { 
+  font-weight: bold;
+  background-image: url(images/icon_page_add.gif);
+}
+
+p.actions a.edit {  
+  background-image: url(images/icon_page_edit.gif)
+}
+
+p.actions a.hide {  
+  background-image: url(images/icon_page_delete.gif)
+}
+
+p.actions a.show {  
+  background-image: url(images/icon_eye.gif);
+}
+
+/* nieuwsitem */
+.nieuwsitem {
+	padding-bottom: 1em;
+	border-bottom: solid 1px #e5e5e5;
+}
+
+.nieuwsitem.hidden {
+	padding-top: 0.5em;
+}
+
+.nieuwsitem p.actions {
+	padding-bottom: 0.5em;
+	border-bottom: solid 1px #e5e5e5;
+}
+
+/* NieuwsArchief */
+
+#menucontainer li:hover ul, #menucontainer li.over ul
+{
+	 display: block; 
+}
+
+#left #nieuwsarchief{
+  margin-top: -10px;
+}
+
+#left #nieuwsarchief h2{
+  border: 0;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+#left #nieuwsarchief li{
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
+#left #nieuwsarchief li span {
+	font-size: 0.9em;
+}
+
+#left #nieuwsarchief .active a{
+  color: #FA7001;
+}
+
+a.archief {	
+	float: right;
+	width: auto;
+	margin: 5px 0 0;
+	padding-left: 14px;
+	font-family: Georgia;
+  font-style: oblique;
+  color: #fa7001;
+  padding-right: 14px;
+  background: url('images/readmorelink_bg.png') right center no-repeat;
+}
+
+/* Editor */
+
+#rteForm label {
+  width: 20%;
+  float: left;
+}
+
+/* banners right
+----------------------------------*/
+div.banner 
+{
+	background-color: #ccc;
+	margin-bottom: 10px;
+	width: 190px;
+	float:left;
+	font-size: 0.85em;
+}
+
+
+
+/* quicksearch
+----------------------------------*/
+#quicksearch {		
+	margin-bottom: 10px;
+	float:left;
+	width:100%;
+}
+
+#quicksearch form, #quicksearch fieldset {
+	padding: 0;
+	margin: 0;
+	border: none;
+  background: #f9a555;
+}
+
+#quicksearch form {
+	padding: 11px 10px 5px;
+	background: #f9a555;
+	height: 68px;
+}
+	
+#quicksearch label {
+	display: none;
+}
+
+#quicksearch .searchString {
+	float: left;	
+	width: 120px;
+	height: 18px;
+	border: none;
+	border-width:0px;
+	padding-left: 2px;	
+}
+
+#quicksearch .zoekknop {
+	float: right;	
+	width: 48px;
+	border: 0;
+	color: #8e3a16;
+	font-size: 13px;		
+  font-weight: bold;
+	padding: 0px 0 2px 2px;
+  height: 18px;
+	background: #feddc2;
+}
+
+#quicksearch p.help {	
+	padding: 5px 0 0;
+	font-size: 10px;
+}
+
+#quicksearch a{
+  color: #000;
+}
+
+#quicksearch #suggestList {
+	position: absolute;	
+	top: 6em;
+	left: 10px;
+	font-size: 90%;
+	border: solid 1px #ccc;  
+	padding: 2px;
+	background-color: #fff;
+  display: none;
+	height: 200px;
+	overflow: auto;
+}
+
+#quicksearch ul{
+  margin-top: 8px;
+}
+
+/* flexibel zoeken 
+----------------------------------*/
+#flexQryHolder {  
+  width: 508px;
+  border: solid 1px #ccc;
+  /*background: #ECF5CF url(images/flexqry_bg.gif) repeat-y 150px 0px; image doesn't exist */
+  margin: 0 0 20px;
+}
+
+#flexQrySidebar {
+  position: relative;  
+  float: left;  
+  width: 130px;
+  padding: 10px;
+}
+
+#selectField {
+  width: 100%;
+  padding: 0 2px;
+  overflow: auto;
+}
+
+#addButton {
+  width: 100%;
+  margin: 10px 0 0;
+}
+
+#flexQryForm {
+  position: relative;  
+  float: right;
+  display: inline;
+  margin: 10px 10px 0 0;  
+  width: 338px;
+}
+
+#submitButton {
+  float: right;
+  display: inline;
+  margin: 0 0 10px;
+}
+
+.queryBar {
+  z-index: auto;
+  position: relative;
+  clear: both;
+  float: left;   	
+  width: 338px;   
+  padding: 10px 0 10px;
+  
+  margin-bottom: 25px;
+  
+  background-color: #AEC26D; 
+}
+
+.queryBar .indent, .queryBar .outdent{
+  float: left;
+  margin-left: 4px;
+  color: #677e1c;
+  font-size: 32px;
+}
+
+.queryBar .logical {
+  position:absolute;
+  top: -23px;
+  left: 0px;
+}
+
+.queryBar label {  
+	/*float: left;
+	display: inline;
+	margin-left: 10px;	 
+  width: 30%;*/		
+	margin-left: 10px;		
+	line-height: 1.2em;
+  font-weight: bold;
+}
+
+.queryBar .operator {
+	float: left;
+	display: inline;
+	margin-left: 10px;	 
+  width: 30%; 
+  font-size: 0.9em;
+  padding-left: 2px;
+  
+}
+
+.queryBar .field {
+  width: 50%;
+  float: right;
+  display: inline;	
+  margin-right: 10px;	
+  font-size: 1em;
+}
+
+.queryBar .controller {
+  position: absolute;  
+  top: 5px;
+  right: 8px;
+  z-index: auto;
+}
+
+.queryBar .controller img {
+  height: 16px;
+  width: 16px;
+  border: none;
+}
+
+/* suggest */
+ul.suggestList  {  
+  position: absolute;	
+	top: 1em;
+	left: 100px;
+	cursor: default;
+	font-size: 90%;
+	border: solid 1px #ccc;  
+	padding: 2px;
+	background-color: #fff !important;
+	display: none;
+	height: 80px;
+	width: 200px;
+	overflow:auto;	
+	z-index: 99;
+  margin: 0px;
+  list-style: none;
+}
+
+ul.suggestList li {
+	display: block;
+	padding: 1px 2px 2px 2px;
+}
+/* //end suggest */
+
+
+/* uitgebreid zoeken 
+----------------------------------*/
+
+#formSearchSpecies label {
+	top: 0px;
+	width: 80px;
+	float: left;
+	font-weight: bold;
+}
+
+#formSearchSpecies select {
+	top: 0px;
+	float: left;
+	padding-left: 2px;
+	width: 100px;
+  margin-left: 10px;
+}
+
+#formSearchSpecies .field {
+	margin-top: 2px;
+	float: left;
+	width: 148px;
+	margin-left: 10px;
+	border: 0;
+	padding-left: 2px;
+	height: 18px;
+}
+
+#formSearchFacetsSpecies .zoekknop {
+	float: left;	
+	width: 72px;
+	border: none;
+	color: #8e3a16;
+	font-size: 13px;		
+  font-weight: bold;
+	padding: 0px 0 2px 2px;
+  height: 18px;
+	background: #feddc2;
+}
+
+#formSearchFacetsSpecies .zoekknop 
+{
+	width:120px;
+	margin-bottom: 36px;
+}
+
+#formSearchFacetsSpecies h2
+{
+	margin-top:17px;
+	}
+
+
+#togglePresenceStatus {display:inline; position:relative; left:134px;}
+
+#formSearchFacetsSpecies .lineBreak
+{
+	border-bottom:solid 1px #000000;
+	margin-bottom:14px;
+}
+
+/* recent images
+----------------------------------*/
+body.recentimages #content #titles h1 {margin-bottom:4px;}
+body.searchFacetsTop #content #top5 h2 {margin-top:17px;}
+
+/* footer
+----------------------------------*/
+#footer {
+	padding-top: 20px;
+	color: #9b9a93;
+	background-color: #58574b;
+	font-size: 85%;
+}
+
+#footer h2{
+	color: #FFF;
+	font-family: Arial;
+	font-weight: normal;
+}
+
+#footer .kader:after{ 
+  content: "."; 
+  display: block; 
+  height: 0; 
+  clear: both; 
+  visibility: hidden; 
+}
+
+#footer .kader {
+  width: 980px;
+  margin: 0 auto;
+  position: relative;
+	display: inline-block;
+	height: 1%;
+}
+
+#footer .kader li{
+	background: none;
+	padding-left: 0;
+	margin-bottom: 12px;
+}
+
+#footerInfo {
+  text-align: left;
+	width: 980px;
+  margin: 0 auto;
+  position: relative;
+	height: 25px;
+	color: #fa7001;
+	font-size: 95%;
+	background: #58574B;
+}
+
+#footer #footerInfo a, #footerInfo {
+	color: #fa7001;
+}
+
+#footerInfo a:hover{
+	color: #000;
+}
+
+#footer a {
+	font-weight: normal;
+	color: #9b9a93;
+	text-decoration: none;
+}
+
+#footer a:hover {
+	color: #FFF;	
+	text-decoration: underline;
+}
+
+#footerInfo .copyright {
+	margin-top: 5px;
+}
+
+#footerInfo .up {
+	position: absolute;
+	right: 80px;
+	top: 0;
+	padding-left: 12px;
+	background: url(images/icon_up.gif) no-repeat 0 4px;
+}
+
+.top5 p {margin-top: 0.7em;}
+.top5 h4 {margin-bottom:6px;}
+.top5 a:hover {text-decoration:underline;}
+
+
+
+#content ol.searchResults li div
+{
+	margin-bottom:7px;
+	border-bottom:solid 1px #e5e5e5;
+}
+
+#content ol.searchResults li div div.speciesLink,
+#content ol.searchResults li div div.speciesThumb
+{
+	margin-bottom:0px;
+}
+
+#content ol.searchResults li div div.speciesPresenceStatus
+{
+	height:67px;/*52px;*/
+	margin-bottom:0px;
+}
+
+#content ol.searchResults li div div {border:none;padding-top:0;}
+#content ol.searchResults li {vertical-align: top;}
+
+.speciesThumb 
+{
+	float: right; 
+	width: 120px; 
+	height: 75px; 
+	overflow: hidden; 
+	margin: 0 0 0.5em 1em;
+}
+
+.noImage
+{
+	width: 120px; 
+	height: 75px; 
+	background-color: #fefefe; 
+	color: #999; 
+	line-height: 75px; 
+	text-align: center; 
+	font-size: smaller; 
+	font-style: italic;
+}
+
+.imageInGrid3
+{
+	float: left;
+	display: inline;
+	width: 160px;
+	height: 190px;
+	overflow: hidden;
+	color: #666;
+	background-color: #FFF;
+	margin: 10px 5px 0px 5px;
+	font-size: 10px;
+}
+
+.imageInGrid3 dt
+{
+	float: left;
+	clear: both;
+	margin-right: 0.5em;
+  font-weight: bold; 
+  color:#333;
+}
+
+.imageInGrid3 dd 
+{
+	/*float: left;*/
+	margin-right: 0.5em;
+  /*display: inline;
+  display: inline-block;*/
+}
+
+.imageInGrid3 dl
+{
+	clear: both;
+}
+
+.imageInGrid3 h3
+{
+	margin-top: 2px;
+}
+
+/* searchresult
+----------------------------------*/
+.no_result {
+	font-weight: bold;
+	color: #F26522;
+}
+
+.resultnumber {
+	color: #666;
+	font-weight: normal;
+}
+
+.resultitem {
+	padding: 5px 0px;
+	margin: 10px 0px;
+}
+
+.resultTitle {
+	font-weight: bold;
+}
+
+.introitem {
+	font-size: 80%;
+	margin-left: 16px;
+}
+
+div.speciesPresenceStatus p {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.paging {
+	padding: 10px 0px 0px 0px;
+	margin-top: 10px;
+	border-top: solid 1px #ccc;
+}
+
+.paging a {
+	font-weight: normal;
+}
+
+a.prev, a.next {
+	margin: 0px 5px;
+	font-size: 110%;
+	font-weight: bold;
+}
+
+/* sitemap 
+----------------------------------*/
+#sitemap {
+}
+
+#sitemap a {
+	font-weight: normal;
+}
+
+#sitemap ul.first {
+	margin: 5px 0px;
+	list-style: none;
+}
+
+#sitemap a.first {
+	/*color: #666;*/
+	font-weight: bold;
+}
+
+#sitemap ul {
+	list-style: none;
+}
+
+#sitemap ul ul {
+	margin-left: 10px;
+}
+
+#sitemap ul ul li {
+	padding-left: 10px; /* afstand naar stippellijn */
+	background: url(images/taxon_connect.gif) no-repeat 0px 0px;
+	font-size: 90%;
+}
+
+
+/* form discuss, vragen, useradmin, signup, mailafriend, localadmin	-----------------------*/
+
+/* mailafriend --------------------------------------------------------------*/
+
+#mailafriend {
+	text-align: left;
+	background-color: #fff;
+	width: 90%;
+	margin: 0 auto;
+	padding: 10px;
+	border: 1px solid #ccc;
+}
+
+#discussform {
+	padding: 10px;
+	border: 1px solid #ccc;
+}
+
+label.radio, label.check {
+	display: block;
+}
+
+label.titelcom {
+	display: block;
+	margin: 10px 0px 0px 0px;
+}
+
+input.text {
+	border: solid 1px #666;
+	width: 90%;
+	margin: 5px 0px 10px 0px;
+	padding: 3px;
+	display: block;
+	clear: both;
+}
+
+.input_error {
+	border: solid 1px #c00;
+	width: 90%;
+	margin: 5px 0px 10px 0px;
+	padding: 3px;
+	display: block;
+	clear: both;
+}
+
+input.radio, input.check {
+	border: solid 0px #666;
+	margin: 0px 5px -1px 2px;
+}
+
+input.button {
+	border: solid 1px #666;
+	margin: 15px 0px 10px 0px;
+	display: block;
+	clear: both;
+}
+
+.discuss {
+	margin: 10px 0px;
+	padding-top: 5px;
+	border-top: solid 1px #ccc;
+}
+
+.formhide {
+	display: none;
+	position: absolute;
+	left: 0px;
+	top: 53px;
+	width: 550px;
+	height: 600px;
+	background-color: #fff;
+	padding: 10px;
+}
+
+.searchhighlight {
+	background-color: #c99;
+	color: #fff;
+}
+
+#nieuws p.blogintro{
+  margin-top: 5px;
+}
+
+.readmore{
+  font-size: 11px;
+  font-family: Georgia;
+  font-style: oblique;
+  color: #fa7001;
+  padding-right: 4px;
+  position: relative;
+  width: 61px;
+  display: block;
+  background: url('images/readmorelink_bg.png') 100% 70% no-repeat;
+  margin-bottom: 8px;
+  clear: right;
+
+}
+
+/* dbupload --------------------------------------------------------------*/
+div.dataset h3  {
+	margin-top: 0.8em;
+	padding-top: 0.3em;
+	border-top: solid 1px #677e1c;
+}
+
+#dbUploadForm label  {
+	width: 150px;
+	float:left;
+}
+
+/* pagineringsbalk
+---------------------- */
+
+.paginationContainer {clear: both; border-top: 1px solid #ccc; padding-top:5px; margin-top:5px; }
+.paginationContainer.empty {border-top: none !important;}
+.paginationContainer .label {float: left; font-family: Georgia; margin-right: 5px;}
+.paginationContainer .paginationList ul {float:left; display:inline; line-height:12px;}
+.paginationContainer .paginationList li {display:inline; margin-left: 0px; margin-right:10px; float:left;}
+.paginationContainer .paginationList li.last {margin-right:0;}
+.paginationContainer .paginationList li.last a {border:none; padding-right:0;}
+.paginationContainer .paginationList li strong {border-right:1px solid #999; padding-right:0.5em; font-weight:bold;}
+.paginationContainer .paginationList li a {border-right:1px solid #999; padding-right:0.5em;}
+.paginationContainer .paginationList li span {border-right:1px solid #999; padding-right:0.5em; left:0px;}
