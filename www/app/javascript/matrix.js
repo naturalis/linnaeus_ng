@@ -74,8 +74,8 @@ function goCharacter() {
 
 }
 
-function konijn() {
-			
+function setUserInputInfo() {
+
 	var t = $('#characteristics :selected').text().replace(selectIndicator,'').replace(emptyIndicator,'');
 
 	setInfo(
@@ -100,7 +100,7 @@ function fillStates(obj,char) {
 			var c=characters[i];
 			if (c.id==$('#characteristics').val()) {
 				if(c.type=='range'||c.type=='distribution')
-					konijn();
+					setUserInputInfo();
 			}
 		}
 		return;
@@ -127,7 +127,7 @@ function fillStates(obj,char) {
 
 	} else {
 
-		konijn();
+		setUserInputInfo();
 
 	}
 
@@ -160,7 +160,7 @@ function goState() {
 			break;
 		case 'media':
 
-			if (state.img_dimensions==null) break;
+			if (state.file_dimensions==null) break;
 
 			var c = getCharacter(state.characteristic_id);
 			
@@ -177,8 +177,8 @@ function goState() {
 			var maxW = parseInt($('#info').css('width'));
 			var maxH = parseInt($('#info').css('height')) - headerHeight;
 
-			var imgW = state.img_dimensions[0];
-			var imgH = state.img_dimensions[1];
+			var imgW = state.file_dimensions[0];
+			var imgH = state.file_dimensions[1];
 
 			var canEnlarge = ((imgW > maxW) || (imgH > maxH));
 
