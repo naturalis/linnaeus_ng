@@ -55,6 +55,8 @@
 			}
 		}
 
+
+
 		#legendCell p{
 			margin-top: 0.5em;
 			margin-left: 1em;
@@ -71,6 +73,13 @@
 				padding: 6px 20px;
 				position: relative;
 				text-align: center;
+			}
+		}
+
+		.mapPCheckbox{
+			&, label{
+				font-size: 14px;
+				font-family: $font-family-sans-serif-regular;
 			}
 		}
 
@@ -129,7 +138,7 @@
 					$percentage : percentage( $i*0.1 );
 					.mapCellDiversity#{$i}{
 						font-family: $percentage;
-						background-color: mix( $theme-color, $wit,  $percentage );
+						background-color: mix( red, $wit,  $percentage );
 					}
 				}
 

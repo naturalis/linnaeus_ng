@@ -1,7 +1,7 @@
 // Override Bootstrap Variables
 	//Grid system	
 			$grid-columns            : 24 !default;// Number of columns in the grid system	
-			$grid-gutter-width       : 1px !default;// Padding, to be divided by two and applied to the left and right of all columns
+			$grid-gutter-width       : 6px !default;// Padding, to be divided by two and applied to the left and right of all columns
 			$page-width              : 1080px;
 			$font-size-h2            : 14px;
 
@@ -67,12 +67,13 @@
 			$navbar-inverse-brand-color: $wit;
 
 	//Font
-			$font-family-sans-serif  : "Arial", sans-serif;
-			$headings-font-family    : "Platform Alternate";
+			$font-family-sans-serif  : "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif; 
+			$headings-font-family    : $font-family-sans-serif;
 			$theme-color             : $blauw;
-			$font-family-proze : $font-family-sans-serif;
-			$font-family-proze		 : "Open Sans", Arial, sans-serif;
-			// $font-family-proze		 : "Constantia", "Lucida Bright", "Lucidabright", "Lucida Serif", "Lucida", "DejaVu Serif", "Bitstream Vera Serif", "Liberation Serif", "Georgia", "serif";
+			$font-family-proze 		 : $font-family-sans-serif;
+			$font-family-proze		 : "Source Sans Pro", Arial, sans-serif;
+			$font-size-base  		: 16px;
+			$font-family-sans-serif-regular: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman";
 
 	//Debugging
 		$show-grid                  : false;
