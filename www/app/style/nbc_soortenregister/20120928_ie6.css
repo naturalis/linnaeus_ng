@@ -1,0 +1,15 @@
+#uitgelicht .uitgelichtItem {
+  margin-right: 0;
+}
+
+#uitgelicht .siteLink, #uitgelicht .externLink{
+  background: none !important;
+}
+
+#taxonImageCredits{
+  top: 250px;
+}
+
+#quicksearch .searchString{
+  width: 110px;
+}

@@ -571,6 +571,14 @@ function showSearchIndex() {
 
 }
 
+function hint(caller,txt) {
+
+	if (!txt || !$('#hint-box')) return;
+
+	var pos = $(caller).position();
+	$('#hint-box').offset({ left: pos.left + 10, top: pos.top - $('#hint-box').height() - 12});
+	$('#hint-box').html(txt);
+	$('#hint-box').toggle();
 
 
-
+}

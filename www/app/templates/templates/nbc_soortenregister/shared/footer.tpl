@@ -16,6 +16,7 @@
 
 <div id="jDialog" title="" class="ui-helper-hidden"></div>
 <div id="tmpcontent" title="" class="ui-helper-hidden"></div>
+<div id="hint-box"></div>
 
 {literal}
 <script type="text/JavaScript">

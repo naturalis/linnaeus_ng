@@ -47,7 +47,7 @@
 			{/if}
 		</div>
 
-		{if $activeCategory=='media'}
+		{if $activeCategory==$smarty.const.TAB_MEDIA}
 
 			<h4>Afbeelding{if $content|@count!=1}en{/if}: {$content|@count}</h4>
 			<div>
@@ -55,7 +55,7 @@
 				{assign var=name value=", "|explode:$v.description} 
 				<div class="thumbholder">
 					<div class="thumbnail">
-						<a class="zoomimage" href="{$v.file_name}">
+						<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$name[1]} {$name[0]}">
 							<img src="{$v.thumb_name}" title="foto {$name[1]} {$name[0]}" alt="foto {$name[1]} {$name[0]}">
 						</a>
 					</div>
@@ -67,7 +67,7 @@
 				{/foreach}
 			</div>
 
-		{elseif $activeCategory=='dna barcodes'}
+		{elseif $activeCategory==$smarty.const.TAB_DNA_BARCODES}
 
 			<div>
 				<p>
@@ -87,6 +87,19 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					{foreach from=$content item=v}
 					<tr><td>{$v.barcode}</td><td>{$v.location}{if $v.date}, {$v.date}{/if}</td><td>{$v.specialist}</td><td>{$taxon_display_name}</td></tr>
 					{/foreach}
+				</table>
+			</div>
+
+		{elseif $activeCategory==$smarty.const.TAB_DISTRIBUTION}
+
+			<div>
+				<h2>Voorkomen</h2>
+				<table>
+					{if $presenceData.presence_label}<tr><td>Status</td><td>{$presenceData.presence_label}{if $presenceData.presence_information}(<a href="#" onclick="hint('<p><b>{$presenceData.presence_index_label|@escape} {$presenceData.presence_information_title|@escape}</b><br />{$presenceData.presence_information|@escape}</p>');">{$presenceData.presence_index_label}</a>){/if}</td></tr>{/if}
+					{if $presenceData.habitat_label}<tr><td>Habitat</td><td>{$presenceData.habitat_label}</td></tr>{/if}
+					{if $presenceData.reference_label}<tr><td>Referentie</td><td><a href="../literature2/reference.php">{$presenceData.reference_label} {$presenceData.reference_date}</a></td></tr>{/if}
+					{if $presenceData.presence82_label}<tr><td>Status 1982</td><td>{$presenceData.presence82_label}</td></tr>{/if}
+					{if $presenceData.expert_name}<tr><td>Expert</td><td>{$presenceData.expert_name}{if $presenceData.organisation_name} ({$presenceData.organisation_name}){/if}</td></tr>{/if}
 				</table>
 			</div>
 
@@ -134,17 +147,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 					</table>
 				</p>
 			{/if}
-			
-			{if $presenceData}
-			<h2>Voorkomen</h2>
-			<table>
-				{if $presenceData.presence}<tr><td>Status</td><td>{$presenceData.presence}</td></tr>{/if}
-				{if $presenceData.habitat}<tr><td>Habitat</td><td>{$presenceData.habitat}</td></tr>{/if}
-				{if $presenceData.reference}<tr><td>Referentie</td><td><a href="">{$presenceData.reference} {$presenceData.reference_date}</a></td></tr>{/if}
-				{if $presenceData.presence82}<tr><td>Status 1982</td><td>{$presenceData.presence82}</td></tr>{/if}
-				{if $presenceData.presence}<tr><td>Expert</td><td>{$presenceData.actor}</td></tr>{/if}
-			</table>
-			{/if}
+
 		
 			{if $content|@is_array}
 			<ul>
@@ -191,6 +194,10 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 $(document).ready(function(){
 	
 	$('#presence').remove();
+
+	$('[id^=media-]').each(function(e){
+		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
+	});
 	
 });
 </script>

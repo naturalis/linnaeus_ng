@@ -1,0 +1,334 @@
+/* Standaard submenu (linkerkant)
+----------------------------------*/
+#submenu
+{
+	width: 100%;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+    padding-top: 5px;
+    margin-top: 23px;
+    border-top: 1px solid #000;
+}
+
+#submenu h2{
+  font-size: 15px;
+  border-bottom: 0;
+  margin-bottom: 10px;
+  display: none;
+}
+
+#left #submenu li{
+  background: none;
+  padding-left: 0;
+}
+
+#left ul, #left ol, #right ul, #right ol, #quicksearch ul, #quicksearch ol
+{
+	list-style: none;	
+}
+
+#left li
+{	
+	position: relative;	
+	margin-left: 0;
+	padding-left: 18px;
+	margin-bottom: 2px;	
+	background: url(images/icon_arrow.gif) no-repeat 0 2px;
+}
+
+#left li a, #right li a
+{
+}
+
+#left li a:hover, #right li a:hover {
+	color: #fa7001;
+}
+
+#quicksearch li a {
+	background: url(images/arrow_right_searchbox.png) no-repeat bottom right;
+    padding-right: 14px;
+}
+
+#quicksearch li {
+    margin: 0 0 4px 0;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+#quicksearch li a {
+    color: #000;
+}
+
+#quicksearch li a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+#quicksearch li.tree
+{
+}
+
+#left li.level2
+{
+	padding-left: 16px !important;
+}
+
+/* menu toolbox
+----------------------------------*/
+#toolbox
+{
+	width: 100%;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	background: url(images/stippellijn.gif) no-repeat left bottom;
+}
+
+#toolbox li.print
+{
+	background-image: url(images/icon_print.gif);
+}
+
+#toolbox li.export
+{
+	background-image: url(images/icon_excel.gif);
+}
+
+#toolbox li.sendasmail
+{
+	background-image: url(images/icon_email.gif);
+}
+
+/* Menu indeling (tree)
+----------------------------------*/
+#taxonomie
+{
+	width: 100%;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	background: url(images/stippellijn.gif) no-repeat left bottom;
+}
+
+#taxonomie ol
+{
+	margin: 0;
+	padding: 0;
+}
+
+#taxonomie li a
+{
+	font-size: .85em;
+	font-weight: normal;
+}
+
+#taxonomie ol li
+{
+	margin: 0;
+	padding: 0;
+	background: none;
+}
+
+#taxonomie .rank, #taxonomie .counter
+{
+	margin-left: .3em;
+}
+
+#taxonomie ol ol li
+{
+	margin-left: 10px;
+	padding-left: 10px; /* afstand naar stippellijn */
+	background: url(images/taxon_connect.gif) no-repeat left top;
+}
+
+#taxonomie .explanation
+{
+	margin: .5em 0;
+	font-size: .8em;
+}
+
+#toon_hier li a
+{
+	font-size: .9em;
+}
+
+/* Menu indeling 
+----------------------------------*/
+
+.taxonoverzicht, .taxonoverzicht ul, .taxonoverzicht li
+{
+	list-style: none;
+}
+
+.taxonoverzicht ul li
+{
+	margin-left: 10px;
+	padding-left: 8px; /* afstand naar stippellijn */
+	background: url(images/taxon_connect.gif) no-repeat left top;
+}
+
+.taxonoverzicht li#root 
+{
+	margin-left: 0 !important;
+}
+
+/* Breadcrumbs (pad) 
+----------------------------------*/
+#breadcrumb
+{	
+	font-size: .85em;
+	width: 510px;
+	height: auto;
+	list-style: none;
+    border-top: 1px solid #666666;
+    padding-top: 5px;
+    margin-bottom: 10px;
+    margin-top: -1px;
+}
+
+#breadcrumb li
+{
+	display: inline;
+	margin: 0;
+}
+
+#breadcrumb a
+{
+	font-weight: normal;
+	color: #666;
+}
+
+/* BaseNav
+----------------------------------*/
+#baseNav
+{
+	list-style: none;
+	font-size: .85em;
+	width: auto;
+	position: absolute;
+	right: 60px;
+	top: 15px;
+}
+
+#baseNav li
+{
+	display: inline;
+	padding-left: 15px;
+	margin: 0;
+}
+
+#baseNav li.uk
+{
+	padding-left: 20px;
+}
+
+#baseNav a
+{
+	/*color: #666;*/
+	color:#fa7001;
+}
+
+/* Main menu 
+----------------------------------*/
+#menucontainer
+{	
+	position: absolute;
+	top: 70px;
+  left: 235px;
+	height: 25px;	
+	text-align: center;
+	z-index: 200;
+  font-family: Georgia;
+  font-size: 14px;
+  color: #282828;
+}
+
+#menucontainer ul, #menucontainer li
+{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#menucontainer ul
+{	
+	position: relative; 
+	z-index: 200;
+	height: 25px;
+}
+
+#menucontainer li 
+{
+  position: relative; 
+  float: left;
+  width: auto;
+	height: 100%;
+  padding: 0;
+  margin-right: 12px;
+}
+
+#menucontainer li a
+{	
+	color: #282828;
+	text-decoration: none;
+	line-height: 25px;
+}
+
+#menucontainer li a:hover
+{
+	text-decoration: none;
+	color: #fa7001;
+}
+
+#menucontainer li a.active
+{
+  text-decoration: underline;
+  font-weight: normal;
+}
+  
+#menucontainer li ul 
+{
+  display: none;
+  position: absolute;
+	left: 0;
+	top: 20px;
+  width: 150px;
+  font-size: 90%; 	
+  z-index: 250;
+}
+
+#menucontainer li li
+{
+  font-family: Arial;
+  font-size: 13px;
+	width: 150px;
+	padding: 4px 15px 8px 15px;
+	height: auto;
+	text-align: left;
+	background: #FFF;
+  opacity: 0.9;
+	filter: alpha(opacity = 90);
+}
+
+#menucontainer li li.first{
+  margin-top: 10px;
+}
+
+#menucontainer li ul a
+{
+	color: #000;
+	line-height: normal;
+	padding: 0;
+	display: block;
+}
+
+#menucontainer li ul a:hover
+{
+	color: #fa7001;
+  text-decoration: none;
+}
+
+#menucontainer li ul a.active
+{
+	color: #fa7001;
+  text-decoration: none;
+}
+
+/* tonen bij mouseover */

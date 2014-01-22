@@ -1,0 +1,67 @@
+/*@import url("content.css");*/
+
+img
+{
+	border: none;
+}
+
+#body
+{
+	font-family: Arial, helvetica, Sans-Serif;
+	color: #000;
+	background-color: #fff;
+	font-size: 10pt;
+}
+
+#container, #content 
+{
+	width: auto;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	float: none !important;
+}
+
+#header_sitemap 
+{
+	display: none;	
+}
+
+#header_img
+{
+	display: none;
+}
+
+#padcontainer
+{	
+	display: none;	
+}
+
+#menucontainer
+{
+	display: none;		
+}
+
+#left
+{
+	display: none;
+}
+
+#footer
+{
+	display: none;
+}
+
+.togglebartitle
+{
+	font-weight: bold;
+	font-size: 12pt;
+	padding: 0.5pt 0pt;
+}	
+
+.togglebararrow, .togglebarhelp
+{
+	display: none;
+}
+
+
