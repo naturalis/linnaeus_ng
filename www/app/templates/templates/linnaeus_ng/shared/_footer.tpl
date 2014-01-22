@@ -10,10 +10,31 @@
 {/if}
 
 
-<div id="footer-container"></div>
 
 </div>
 <!-- /form -->
+</div>
+
+<div id="footer">
+	<div id="footer-container">
+		<div> 
+			<img id="logo" src='{$projectUrls.systemMedia}logo_lng.png'>
+		</div>
+		<div>
+		<div>
+			Powered by Linnæus NG
+		</div>
+	</div>
+</div>
+
+<div id="bottombar" class="navbar navbar-inverted">
+	<div class="container">
+		<p class="navbar-text navbar-right">
+			<a href="http://www.naturalis.nl"> 
+				© Naturalis Biodiversity Center
+			</a>
+		</p>
+	</div>
 </div>
 
 {literal}

@@ -176,11 +176,15 @@
 </div>
 {/if}
 {else}
-<div id="content">
-{if $isTaxonStartPage && $overviewImage}
-<div id="overview-image" style="background: url('{$projectUrls.uploadedMedia}{$overviewImage.image}');"></div>
-{/if}
+
+<div id="content" class="proze" >	
+
+	{if $isTaxonStartPage && $overviewImage}
+		<div id="overview-image" style="background: url('{$projectUrls.uploadedMedia}{$overviewImage.image}');"></div>
+	{/if}
+
 {$content}
+
 </div>
 {/if}
 
