@@ -1,84 +1,103 @@
 /* Splash, should have fixed size of 700 x 450 px */
-
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\000036}}
 #splash {
-	width: 700px;
-	height: 450px;
-	background-image:url('../../../../app/media/system/skins/linnaeus_2/splash.png');
-}
+  margin-right: -10px;
+  width: 750px;
+  height: 450px;
+  background-color: #009ee0;
+  background-image: url("../../../app/media/system/skins/linnaeus_ng/splash.png");
+  background-position: center center;
+  background-repeat: no-repeat; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000323}}
+#dialog-header,
+#dialog-content,
+#dialog-content,
+#dialog-content-inner {
+  width: 750px;
+  padding: 0; }
 
-/* Frame and background */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000328}}
+#dialog-title {
+  font-size: 36px;
+  padding: 0.5em; }
 
-#dialog {
-	position: fixed;
-	padding: 0;
-	z-index: 200;
-	font-family: inherit;
-	font-size: inherit;
-	height: 550px;
-	border-top-left-radius: 30px 30px;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000333}}
+#dialog-button-container {
+  background-color: #b2b1a8;
+  color: white;
+  margin: 0;
+  padding: 0.5em; }
 
-#dialog-header {
-	background: #cdcdcd;
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjZGNkY2QiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(top, #fafafa 0%, #cdcdcd 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fafafa), color-stop(100%,#cdcdcd));
-	background: -webkit-linear-gradient(top, #fafafa 0%,#cdcdcd 100%);
-	background: -o-linear-gradient(top, #fafafa 0%,#cdcdcd 100%);
-	background: -ms-linear-gradient(top, #fafafa 0%,#cdcdcd 100%);
-	background: linear-gradient(to bottom, #fafafa 0%,#cdcdcd 100%);
-	border-bottom: 1px solid #000;
-	display: block;
-	position: relative;
-	padding: 5px;
-	height: 15px;
-	font-weight: bold;
-	border-bottom: 1px solid #999;
+@media none {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000343}}
+  #dialog {
+    position: fixed;
+    padding: 0;
+    z-index: 200;
+    font-family: inherit;
+    font-size: inherit;
+    height: 550px;
+    border-top-left-radius: 30px 30px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000353}}
+  #dialog-header {
+    background: #cdcdcd;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjZGNkY2QiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #fafafa 0%, #cdcdcd 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(100%, #cdcdcd));
+    background: -webkit-linear-gradient(top, #fafafa 0%, #cdcdcd 100%);
+    background: -o-linear-gradient(top, #fafafa 0%, #cdcdcd 100%);
+    background: -ms-linear-gradient(top, #fafafa 0%, #cdcdcd 100%);
+    background: linear-gradient(to bottom, #fafafa 0%, #cdcdcd 100%);
+    border-bottom: 1px solid #000;
+    display: block;
+    position: relative;
+    padding: 5px;
+    height: 15px;
+    font-weight: bold;
+    border-bottom: 1px solid #999;
     font-family: "Lucida Grande", "Lucida Sans", Tahoma, Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", sans-serif;
     font-size: 12px;
     border-top-left-radius: 4px 4px;
-	border-top-right-radius: 4px 4px;
-}
+    border-top-right-radius: 4px 4px; }
 
-#dialog-title {
-	float: left;
-	margin: 0;
-	overflow: hidden;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000375}}
+  #dialog-title {
+    float: left;
+    margin: 0;
+    overflow: hidden; }
 
-#dialog-close {
-	background-image: url('../../../media/system/skins/linnaeus_2/transparent.png');
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000381}}
+  #dialog-close {
+    background-image: url("../../../media/system/skins/linnaeus_2/transparent.png"); }
 
-#dialog-content {
-	display: block;
-	padding: 6px;
-	min-height: 160px;
-	font-size: 11px;
-	background: #eee;
-	border-bottom-left-radius: 4px 4px;
-    border-bottom-right-radius: 4px 4px;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000385}}
+  #dialog-content {
+    display: block;
+    padding: 6px;
+    min-height: 160px;
+    font-size: 11px;
+    background: #eee;
+    border-bottom-left-radius: 4px 4px;
+    border-bottom-right-radius: 4px 4px; }
 
-#dialog-content-inner {
-	min-height: 128px;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000395}}
+  #dialog-content-inner {
+    min-height: 128px; }
 
-#dialog-mask {
-	position: fixed;
-	top: 0;
-	left: 0;
-	height: 100%;
-	width: 100%;
-	background-image: url('../../../media/system/skins/linnaeus_2/transparent.png');
-	z-index: 100;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\0000399}}
+  #dialog-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url("../../../media/system/skins/linnaeus_2/transparent.png");
+    z-index: 100; }
 
-#dialog-button-container {
-	text-align: center;
-	margin: 8px 6px 6px 2px;
-	text-align: left;
-}
-
-
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/splash\.scss}line{font-family:\00003109}}
+  #dialog-button-container {
+    text-align: center;
+    margin: 8px 6px 6px 2px;
+    text-align: left; } }
