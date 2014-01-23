@@ -18,29 +18,19 @@
 
 <table id="mapGrid">
 	<tr id="grid-header">
-	<td>
-        <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}"
-        	title="{t}Go to this taxon{/t}">
-        {$taxon.taxon}</a> 
+		<td>
+	        <a id="taxonName" class="selectIcon selectRight" href="../species/taxon.php?id={$taxon.id}"
+	        	title="{t}Go to this taxon{/t}">
+	        {$taxon.taxon}</a> 
 
-    </td>
-    <td id="push"></td>
-    <td id="mapName">
-        {if $maps|@count>1}
-            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
-                showDialog('{t}Choose a map{/t}',
-                '<div id=\'lookup-DialogContent\'>'+
-                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
-                    {/foreach}' ' + '</div>',
-                    false, true
-                );">{$map.name}</span>
-        {else}
-            {$map.name}
-        {/if}   
-	</td>
+	    </td>
+
+	    <td id="push"></td>
 	</tr>
 	<tr>
 	<td id="gridMapCell">	
+        
+		
 		{if $map.mapExists}
 			<table id="mapTable">
 			{assign var=cellNo value=1}
@@ -59,8 +49,22 @@
 			</table>
 			</div>
 		{/if}
+
+        <div id="mapName">
+	        {if $maps|@count>1}
+	            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
+	                showDialog('{t}Choose a map{/t}',
+	                '<div id=\'lookup-DialogContent\'>'+
+	                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+	                    {/foreach}' ' + '</div>',
+	                    false, true
+	                );">{$map.name}</span>
+	        {else}
+	            {$map.name}
+	        {/if}
+        </div>  
+
 	</td>
-	<td></td>
 	<td id="legendCell">
 		<div id="legend">
 			{foreach from=$geoDataTypes key=k item=v name=x}
@@ -79,7 +83,6 @@
 	</tr>
 	<tr id="grid-footer">
 		<td><span id="coordinates"></span></td>
-		<td></td>
 		<td></td>
 	</tr>
 </table>

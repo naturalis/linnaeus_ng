@@ -257,6 +257,10 @@
 
 				b {
 					font-weight: 700;
+				}
+
+				@media (max-width: $medium-width){
+					font-size: 75%;
 				}				
 			}
 
@@ -369,7 +373,7 @@
 		/* --- --- BASE FONT --- */
 
 			body{
-				font-weight:300; 
+				font-weight: 300; 
 				font-stretch:normal;
 				letter-spacing: 0.01em;
 			}
@@ -449,12 +453,13 @@
 				line-height: 1.8;
 				background-color: $bruin;
 
-				@media screen and (max-width:$medium-width){
-					font-size: 12px;
-				}
 
 				ul {
 					width: 100%;
+					
+					@media screen and (max-width:$medium-width){
+						text-align: center;
+					}
 				}
 
 				li {
@@ -462,7 +467,7 @@
 				
 					@media screen and (max-width:$medium-width){
 						&:after {
-							content: "|";
+							content: " |";
 							color: $wit;
 						}
 					}
@@ -501,10 +506,6 @@
 				line-height: 1.9;
 				color: $proze-text;
 				margin-bottom: 30px;
-
-				@media (max-width: $medium-width){
-					font-size: 75%;
-				}
 
 				@media print{
 					background-color: white;
@@ -560,7 +561,7 @@
 
 				@media (max-width: $medium-width){
 					text-align: center;
-					font-size: 12px;
+					font-size: 14px;
 				}
 
 				ul {
@@ -576,6 +577,8 @@
 
 					@media (max-width: $medium-width){
 						margin-right: 0.5em;
+						font-family: $font-family-sans-serif-regular;
+						font-weight: 400;
 					}
 				}
 
@@ -583,20 +586,21 @@
 					display: block;
 					color: $rood;
 					padding: 0.25em 0.75em 0.5em;
+					border-top: 1px solid $wit;
 					
 					&:hover{
 						text-decoration: none;
 						color: $blauw;
-						border-color: $blauw;
 					}
 
 					&.category-active {
 						background-color: $proze-background;
-						color: $grijs-2;
+						color: $grijs-1;
+						border-top: 1px solid $grijs-5;
 					}
 
 					&.category-no-content {
-						color: $grijs-7;
+						display: none;
 					}
 				}
 
@@ -739,6 +743,24 @@
 				display: none;
 			}
 
+		/* --- --- FOOTER --- */
+
+			#col-footer-text{
+				text-align: center;
+
+				p{
+					font-size: 32px;
+					margin-top: 82px; //magic number; :(
+					color: $grijs-2;
+
+					@media (max-width: $page-width){
+						margin-top: 20px;
+						font-size: 20px;
+					}
+
+				}
+			}
+
 	/* --- FORM-ELEMENTS --- */
 
 		/* --- --- FORM-ELEMENTS: GENERAL --- */
@@ -784,13 +806,10 @@
 
 			.button:visited, .button:link, .button, input[type="button"], input[type="reset"], input[type="submit"], button {
 			    -moz-user-select: none;
-			    background-color: $proze-background;
+			    background-color: $theme-color;
 			    border: 1px solid $grijs-5;
-			    border-radius: 4px;
-			    color: $grijs-2;
+			    color: $wit;
 			    display: inline-block;
-			    font-size: 1em;
-			    font-weight: bold;
 			    padding: 6px 20px;
 			    position: relative;
 			    text-align: center; 
@@ -803,7 +822,6 @@
 			}
 			button, input, select, textarea {
 			    color: #222222;
-			    font-family: sans-serif;
 			    font-size: 100%;
 			    margin: 0;
 			    vertical-align: baseline;
@@ -1032,6 +1050,7 @@
 				padding-top: 4em;
 
 				@media screen and (max-width:$medium-width){
+					margin-top: 10px;
 					width: 100%;
 					li {
 						display: inline-block;
@@ -1087,7 +1106,8 @@
 		/* --- --- CATEGORIES (tabs) --- */
 		
 			#categories{
-				padding: 0;
+				padding: 0;	
+
 			}
 
 		/* --- --- SEARCH --- */
@@ -1205,21 +1225,27 @@
 				max-width: 100%;
 			}
 
-			#logo{
+			#col-logo{
+				@include make-sm-column(9);
+				padding: 0;
 				background-color: $blauw;
-				max-width: percentage(9/24);
+				
+				img{
+					max-width: 100%;
+
+					@media (max-width: $medium-width){
+						max-width: 50%;
+					}
+				}
 			}
 
-		/* --- --- ROW-SENDER --- */
-			
-			#row-sender {
-			    background-color: #D6D5D1;
-			    height: 210px;
-			    position: absolute;
-			    bottom: 0;
-			    width: 100%; //$page-width;
-			    padding: 30px;
+			#col-footer-text{
+				@include make-sm-column(15);				
 			}
+
+
+			
+
 
 	/* --- PRINT OVERRIDES --- */
 			@media print {

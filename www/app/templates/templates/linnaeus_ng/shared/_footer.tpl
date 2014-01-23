@@ -16,14 +16,17 @@
 </div>
 
 <div id="footer">
-	<div id="footer-container">
-		<div> 
-			<img id="logo" src='{$projectUrls.systemMedia}logo_lng.png'>
+	<div id="footer-container" class="container">
+		<div id="col-logo"> 
+			<img  src='{$projectUrls.systemMedia}logo_lng.png'>
 		</div>
-		<div>
-		<div>
-			Powered by Linnæus NG
+
+		<div id="col-footer-text">
+			<p>
+				Powered by Linnæus Next Generation™
+			</p>
 		</div>
+
 	</div>
 </div>
 
