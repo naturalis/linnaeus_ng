@@ -34,7 +34,7 @@
         {/foreach}
         </tr>
     </table>
-	<div id="content">
+	<div id="content" class="proze">
 	{$content}
 	</div>
 </div>

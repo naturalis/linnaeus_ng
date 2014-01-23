@@ -18,72 +18,74 @@
 {else}
 
 <table id="mapGrid">
-    <tr id="grid-header">
-    <td>
-            <input type="button" value="{t}Search{/t} &gt;&gt" onclick="l2DoSearchMap()" />&nbsp;
-            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
-            <input type="hidden" name="mapId" value="{$mapId}" />
-        
-    </td>
-    <td id="push"></td>
-    <td id="mapName">
 
-        {if $maps|@count>1}
-            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
-                  showDialog('{t}Choose a map{/t}',
-                '<div id=\'lookup-DialogContent\'>'+
-                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?mapId={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
-                    {/foreach}' ' + '</div>',
-                    false, true
-                 );">{$map.name}</span>
-        {else}
-            {$map.name}
-        {/if}   
-    </td>
-    </tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
+   
     <tr>
-    <td id="gridMapCell" class="searchMap">    
-		{if $map.mapExists}
-			<table id="mapTable">
-			{assign var=cellNo value=1}
-			{section name=rows start=1 loop=$map.rows+1 step=1}
-				<tr>
-				{section name=cols start=1 loop=$map.cols+1 step=1}
-					<td 
-						id="cell-{$cellNo}"
-						{if $selectedCells[$cellNo]==true}class="mapCellTagged"{/if}
-						onclick="l2TagMapCell(this)">
-					</td>
-					{assign var=cellNo value=$cellNo+1}
-				{/section}
-				</tr>
-			{/section}
-			</table>
-			{/if}
+        <td id="gridMapCell" class="searchMap">    
+    		{if $map.mapExists}
+    			<table id="mapTable">
+    			{assign var=cellNo value=1}
+    			{section name=rows start=1 loop=$map.rows+1 step=1}
+    				<tr>
+    				{section name=cols start=1 loop=$map.cols+1 step=1}
+    					<td 
+    						id="cell-{$cellNo}"
+    						{if $selectedCells[$cellNo]==true}class="mapCellTagged"{/if}
+    						onclick="l2TagMapCell(this)">
+    					</td>
+    					{assign var=cellNo value=$cellNo+1}
+    				{/section}
+    				</tr>
+    			{/section}
+    			</table>
+    		{/if}
+                <div id="mapName">
+                    {if $maps|@count>1}
+                        <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
+                              showDialog('{t}Choose a map{/t}',
+                            '<div id=\'lookup-DialogContent\'>'+
+                                {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?mapId={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+                                {/foreach}' ' + '</div>',
+                                false, true
+                             );">{$map.name}</span>
+                    {else}
+                        {$map.name}
+                    {/if}
+                </div>  
+
 		</td>
-		<td></td>
+
 		<td id="legendCell">
-		<div id="legend">
-            {foreach from=$geoDataTypes key=k item=v name=x}
-            <div class="mapPCheckbox">
-                <label>
-                    <input type="checkbox" 
-                        name="dataTypes[]" 
-                        {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
-                    {$v.title}
-                </label>
-            </div>
-            {/foreach}
-		</div>
+    		<div id="legend">
+                {foreach from=$geoDataTypes key=k item=v name=x}
+                <div class="mapPCheckbox">
+                    <label>
+                        <input type="checkbox" 
+                            name="dataTypes[]" 
+                            {if $selectedDataTypes[$v.id]==true || $didSearch==false}checked="checked"{/if}  value="{$v.id}" />
+                        {$v.title}
+                    </label>
+                </div>
+                {/foreach}
+    		</div>
             <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
             <p>{t}When finished, click 'Search'.{/t}</p>
 		</td>
 	</tr>
-	<tr id="grid-footer">
+	
+    <tr id="grid-footer">
 		<td><span id="coordinates"></span></td>
-		<td></td>
-		<td></td>
+		<td>
+            <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />&nbsp;
+            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
+            <input type="hidden" name="mapId" value="{$mapId}" /> 
+        </td>
+
 	</tr>
+
+    <tr><td colspan="2">&nbsp;</td></tr>
+
 </table>
 </div>
 

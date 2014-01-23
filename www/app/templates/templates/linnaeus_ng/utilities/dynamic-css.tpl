@@ -213,12 +213,7 @@
 {/literal}
 
 {literal}
-#dialog-close {
-{/literal}
-    background: url('{$systemMedia}close.png') no-repeat 50% 50%;
-    
-{literal}
-}
+
 {/literal}
 
 {literal}
@@ -251,14 +246,6 @@
 #back-to-search-icon:active {
 {/literal}
     background-position: center 1px;
-{literal}
-}
-{/literal}
-
-{literal}
-.inline-image {
-{/literal}
-    background: url('{$systemMedia}image-icon.png') no-repeat;
 {literal}
 }
 {/literal}
