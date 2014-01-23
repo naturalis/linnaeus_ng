@@ -190,66 +190,12 @@
 				overflow: hidden;
 			}
 
-			@mixin proze-palentino{
-				font: {
-					family: Palatino Linotype,Book Antiqua,Palatino,serif;
-					size: 20px;
-					weight: 400;
-					style: normal;
-				}
-
-				b {
-					font-weight: bold;
-				}
-			}
-
-			@mixin proze-slab{
-				font: {
-					family: "Roboto Slab", Palatino Linotype,Book Antiqua,Palatino,serif;
-					size: 18px;
-					weight: 400;
-					style: normal;
-				}
-
-				b {
-					font-weight: 700;
-				}
-			}
-
-			@mixin proze-serif{
-				font: {
-					family: "Merriweather", Palatino Linotype,Book Antiqua,Palatino,serif;
-					size: 18px;
-					weight: 300;
-					style: normal;
-				}
-
-				b {
-					font-weight: 700;
-				}
-			}
-
-			@mixin proze-sans{
-				font: {
-					family: $font-family-sans-serif;
-					size: 18px;
-					weight: 400;
-					style: normal;
-				}
-
-				line-height: 1.5;
-
-				b {
-					font-weight: bold;
-				}
-
-			}
 
 			@mixin proze-humanist{
 				font: {
 					family: "Source Sans Pro";
-					size: 20px;
-					weight: 300;
+					size: 18px;
+					weight: 400;
 					style: normal;
 				}
 
@@ -287,10 +233,9 @@
 			//     font-weight: normal;
 			//     font-style: normal;
 			// }
-
-		// /* --- --- GOOGLE OPEN SANS --- */
 			
-		// 	@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic);		/* --- --- ICONS --- */
+
+		/* --- --- ICON FONTS --- */
 
 			@font-face {
 				font-family: 'naturalis-lng-icons';
@@ -361,21 +306,24 @@
 			}
 
 		/* Source Sans */
-			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,300italic);
-		/* --- --- GOOGLE ROBOTO SLAB --- */
-			
-			@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300,700); 
+			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
 
-		// /* --- --- GOOGLE MERRIWEATHER --- */
 
-			//@import url(http://fonts.googleapis.com/css?family=Merriweather:300,300italic,700);
 
 		/* --- --- BASE FONT --- */
 
 			body{
-				font-weight: 300; 
+				font-weight: 400; 
 				font-stretch:normal;
 				letter-spacing: 0.01em;
+			}
+
+			b, .title {
+					font-weight: 700;
+			}
+
+			.italics{
+				font-style: italic;
 			}
 
 	/* --- STYLING --- */
@@ -417,6 +365,7 @@
 					text-align: right;
 					font-size: 17px;
 					margin-top: 15px;
+					font-weight: 300;
 				}
 
 				a{
@@ -429,10 +378,10 @@
 			#bottombar {
 			    background-color: #000000;
 			    color: #FFFFFF;
-			    font-size: 16px;
 			    height: 50px;
 			    margin: 0;
 			    overflow: hidden;
+			    font-weight: 300;
 			    
 			    .container{
 				    width: $page-width;
@@ -451,7 +400,7 @@
 
 				font-size: 18px;
 				line-height: 1.8;
-				background-color: $bruin;
+				font-weight: 300;
 
 
 				ul {
@@ -488,6 +437,10 @@
 				width: 100%;
 				font-size: 32px;
 				color: $blauw;
+
+				.italics {
+					font-style: normal;
+				}
 			}
 
 		/* --- --- CONTENT --- */
@@ -523,16 +476,9 @@
 					}
 				}
 
-				b, .title {
-					font-weight: 400;
-				}
-
 			}
 
-			// #content, 
-			.proze{
-				@include proze-humanist;
-			}
+
 
 
 			.common-name {
@@ -752,6 +698,7 @@
 					font-size: 32px;
 					margin-top: 82px; //magic number; :(
 					color: $grijs-2;
+					font-weight: 300;
 
 					@media (max-width: $page-width){
 						margin-top: 20px;
@@ -1242,10 +1189,6 @@
 			#col-footer-text{
 				@include make-sm-column(15);				
 			}
-
-
-			
-
 
 	/* --- PRINT OVERRIDES --- */
 			@media print {
