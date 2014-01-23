@@ -1,9 +1,7 @@
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\000034}}
 #media {
   overflow: auto;
   padding: 1em; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\000039}}
 .media-cell {
   background: rgba(255, 255, 255, 0.5);
   position: relative;
@@ -13,28 +11,27 @@
   padding: 5px;
   outline: 1px solid #e6e6e6;
   vertical-align: top; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000319}}
   .media-cell:hover {
     background: rgba(240, 240, 240, 0.5); }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000323}}
   .media-cell.media-type-video {
     width: 200px; }
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000326}}
-    .media-cell.media-type-video a {
-      border: none !important; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000334}}
+.image-wrap {
+  border: none !important;
+  text-align: center; }
+
 .image-thumb,
 .image-full {
-  height: 150px; }
+  height: 150px;
+  margin: 0 auto; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000338}}
 .media-caption {
-  margin: 0.5em 0 0;
+  margin: 0.75em 0 0;
   font-weight: 400;
   font-size: 12px;
-  font-family: "HelveticaNeue", "Helvetica Neue", "HelveticaNeueRoman", "HelveticaNeue-Roman", "Helvetica Neue Roman"; }
+  font-family: arial, sans-serif;
+  max-width: 250px;
+  line-height: 14px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/species\.scss}line{font-family:\0000345}}
 .image-wrap {
   border: none; }

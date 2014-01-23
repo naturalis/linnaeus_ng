@@ -28,6 +28,7 @@
 			position: relative;
 			top: -362px;
 			width: 200px;
+			font-family: Arial, sans-serif;
 		}
 
 		#mapTable{
@@ -43,10 +44,16 @@
 		    border-bottom: 1px dotted $theme-color;
 		    font-weight: normal;
 		    margin-left: 0.5em;
+
+		    &:hover{
+		    	text-decoration: none;
+		    	color: $rood;
+		    	border-bottom-color: $rood;
+		    }
 		}
 
 		#legend {
-			font-size: 13px;
+			font-size: 12px;
 			padding-left: 1em;
 			padding-right: 1em;
 
@@ -54,8 +61,7 @@
 			label {
 				padding-left: $indent;
 				text-indent: -$indent;
-				font-family: $font-family-sans-serif-regular;
-				font-weight: 400;
+				font-family: Arial, sans-serif;
 			}
 
 			.opacity{
@@ -85,14 +91,16 @@
 					padding: 6px 20px;
 					position: relative;
 					text-align: center;
+					font-family: Arial, sans-serif;
+
 					}
 			}
 		}
 
 		.mapPCheckbox{
 			&, label{
-				font-size: 14px;
-				font-family: $font-family-sans-serif-regular;
+				font-size: 12px;
+				font-family: Arial, sans-serif;
 			}
 		}
 
@@ -102,7 +110,7 @@
 			span {
 				display: block;
 				border: 1px solid $grijs-5;
-				background-color: rgba(255,255,255,0.8);
+				background-color: rgba(255,255,255,0.9);
 				border-radius: 0.25em;
 				padding: 0em 0.5em;
 				font-size: 16px;
@@ -139,6 +147,7 @@
 
 				.mapCellLegend{
 					cursor: pointer;
+					margin-right: 4px;
 				}
 
 				.mapCellDiversity {
