@@ -20,7 +20,7 @@
 					<a class="result"href="../species/taxon.php?id={$res.taxon_id}">
 					{if $res.label}{$res.label}{else}{$res.matches[0]}{/if}
 					</a>
-					{if $res.preferredName}<br />{$res.preferredName}{/if}
+					{if $res.predicate=='isPreferredNameOf'}<br />{$res.subject.label}{/if}
 					</li>
 					{/foreach}
 				</ol>
