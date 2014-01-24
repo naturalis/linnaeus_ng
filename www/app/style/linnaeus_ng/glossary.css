@@ -1,2 +1,9 @@
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000034}}
 .module-glossary #definition {
   margin-bottom: 0; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000038}}
+.media-caption {
+  margin-bottom: 2em;
+  font-family: Arial, sans-serif;
+  font-size: 12px; }
