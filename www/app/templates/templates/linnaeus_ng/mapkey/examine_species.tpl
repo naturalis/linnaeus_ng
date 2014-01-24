@@ -1,47 +1,51 @@
 {include file="../shared/header.tpl"}
 
 <div id="page-main">
-{if !$isOnline}
-{t}Your computer appears to be offline. Unfortunately, the map doesn't work without an internet connection.{/t}
-{else}
+	
+	{if !$isOnline}
+	{t}Your computer appears to be offline. Unfortunately, the map doesn't work without an internet connection.{/t}
+	{else}
 
-	<div id="map_canvas">{if !$isOnline}{t}Unable to display map.{/t}{/if}</div>
-	<div id="map_options">
-		<b>
-		{if $useJavascriptLinks}			
-		<span onclick="goTaxon({$taxon.id})" class="a">{$taxon.taxon}</span>
-		{else}
-		<a href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a>
-		{/if}
-		</b><br/><br/>
-		{*{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
-		<hr style="height:1px;color:#999" />*}
-		<table>
-		{foreach from=$geoDataTypes key=k item=v}
-		{if $count.data[$k]}
-			<tr style="vertical-align:top">
-				<td style="width:25px;border:1px solid black;background-color:#{$v.colour}" onclick="$('#toggle-{$v.id}').attr('checked',!$('#toggle-{$v.id}').attr('checked'));doMapTypeToggle({$v.id});"></td>
-				<td style="width:5px;"></td>
-				<td style="padding-right:5px;"><label for="toggle-{$v.id}">{$v.title}</label></td>{* ({$count.data[$k]})*}
-				<td><input type="checkbox" checked="checked" id="toggle-{$v.id}" onchange="doMapTypeToggle({$v.id})"></td>
-			</tr>
-			<tr><td colspan="4" style="height:1px;"></td></tr>
-		{/if}
-		{/foreach}
-		{if $count.total==0}
-			<tr><td colspan="4">{t}no data available{/t}</td></tr>
-		{/if}
-		</table>
-		{if $showBackToSearch && $session.app.user.search.hasSearchResults}
-		<hr style="height:1px;color:#999" />
-		<p>
-		<span class="back-link" onclick="window.open('../search/redosearch.php','_self')">{t}Back to{/t} {t}search results{/t}</span>
-		</p>
-		{/if}
+	<div id="map_canvas">
 
-	</div>
+		{if !$isOnline}{t}Unable to display map.{/t}{/if}
+		
+		<div id="map_options">
+			<b>
+			{if $useJavascriptLinks}			
+			<span onclick="goTaxon({$taxon.id})" class="a">{$taxon.taxon}</span>
+			{else}
+			<a href="../species/taxon.php?id={$taxon.id}">{$taxon.taxon}</a>
+			{/if}
+			</b><br/><br/>
+			{*{t}Coordinates:{/t} <span id="coordinates">(-1,-1)</span><br />
+			<hr style="height:1px;color:#999" />*}
+			<table>
+			{foreach from=$geoDataTypes key=k item=v}
+			{if $count.data[$k]}
+				<tr style="vertical-align:top">
+					<td style="width:25px;border:1px solid black;background-color:#{$v.colour}" onclick="$('#toggle-{$v.id}').attr('checked',!$('#toggle-{$v.id}').attr('checked'));doMapTypeToggle({$v.id});"></td>
+					<td style="width:5px;"></td>
+					<td style="padding-right:5px;"><label for="toggle-{$v.id}">{$v.title}</label></td>{* ({$count.data[$k]})*}
+					<td><input type="checkbox" checked="checked" id="toggle-{$v.id}" onchange="doMapTypeToggle({$v.id})"></td>
+				</tr>
+				<tr><td colspan="4" style="height:1px;"></td></tr>
+			{/if}
+			{/foreach}
+			{if $count.total==0}
+				<tr><td colspan="4">{t}no data available{/t}</td></tr>
+			{/if}
+			</table>
+			{if $showBackToSearch && $session.app.user.search.hasSearchResults}
+			<hr style="height:1px;color:#999" />
+			<p>
+			<span class="back-link" onclick ="window.open('../search/redosearch.php','_self')">{t}Back to{/t} {t}search results{/t}</span>
+			</p>
+			{/if}
 
-</div>
+		</div><!-- /#map_options -->
+
+	</div><!-- /#map-canvas -->
 
 {literal}
 <script type="text/JavaScript">

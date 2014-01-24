@@ -316,6 +316,7 @@
 				font-weight: 400; 
 				font-stretch:normal;
 				letter-spacing: 0.01em;
+				font-family: $font-family-humanist;
 			}
 
 			b, .title {
@@ -519,7 +520,6 @@
 
 					@media (max-width: $medium-width){
 						margin-right: 0.5em;
-						font-family: $font-family-sans-serif-regular;
 						font-weight: 400;
 					}
 				}
@@ -750,12 +750,14 @@
 			.button:visited, .button:link, .button, input[type="button"], input[type="reset"], input[type="submit"], button {
 			    -moz-user-select: none;
 			    background-color: $theme-color;
-			    border: 1px solid $grijs-5;
+			    border-width: 0px;
 			    color: $wit;
 			    display: inline-block;
 			    padding: 6px 20px;
 			    position: relative;
 			    text-align: center; 
+			    font-size: 87.5%;
+			    font-family: $font-family-sans-serif;
 			}
 			button, input[type="button"], input[type="reset"], input[type="submit"] {
 			    cursor: pointer;
