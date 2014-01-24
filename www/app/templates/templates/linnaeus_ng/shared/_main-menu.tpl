@@ -1,6 +1,6 @@
 <div id="main-menu">
 <ul>
-<li><a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/"></a></li>
+<li><a class="home{if $controllerBaseName=='linnaeus'}-selected{/if}" href="../linnaeus/">{t}Home{/t}</a></li>
 {assign var=first value=true}
 {foreach from=$menu key=k item=v}
     {if $v.type=='regular' && $v.show_in_public_menu==1}

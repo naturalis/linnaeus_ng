@@ -1,4 +1,9 @@
-<div id="header-titles"></div>
+<div id="header-titles">
+    <span id="header-title">
+        {t}Home{/t}
+    </span>
+</div>
+
 {include file="_navigator-menu.tpl"}
 {include file="../shared/_search-main.tpl"}
 <div id="page-main">
