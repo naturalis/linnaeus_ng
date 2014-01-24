@@ -545,8 +545,6 @@ class SearchController extends Controller
 		return $this->_moduleNames[$id];
 	}
 
-
-
 	private function doSearch($p=null)
 	{
 		$search=isset($p['search']) ? $p['search'] : null;

@@ -42,28 +42,6 @@
     <!--[if lte IE 7]>
 	    <link rel="stylesheet" type="text/css" media="screen" title="default" href="{$projectUrls.projectCSS}20120928_conceptcardIeOnly.css" />
     <![endif]-->
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}prettyPhoto/prettyPhoto.css" />
 	<link rel="stylesheet" type="text/css" href="{$projectUrls.projectCSS}jquery-ui-1.10.0.custom.min.css" />
 

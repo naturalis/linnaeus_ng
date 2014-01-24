@@ -12,7 +12,6 @@
 				</h2>
 			</div>
 		</div>
-
 			<table>
 				{if $ref.publication_type}<tr><td>Type</td><td>{$ref.publication_type}</td></tr>{/if}
 
@@ -29,11 +28,6 @@
 				{if $ref.external_link}<tr><td>Status</td><td>{$ref.external_link}</td></tr>{/if}
 
 			</table>
-			<!--
-			  ["periodical"]=>
-			  ["periodical_actor_name"]=>
-			  ["language_name"]=>
-			-->
 		</div>
 
 

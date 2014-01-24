@@ -1392,7 +1392,7 @@ class Controller extends BaseClass
             $d = $r[$taxon['rank_id']]['labels'][$this->getCurrentLanguageId()];
         else
             $d = $r[$taxon['rank_id']]['rank'];
-        
+
         $rankId = $r[$taxon['rank_id']]['rank_id'];
         $rankName = ucfirst($d);
         $abbreviation = $r[$taxon['rank_id']]['abbreviation'];

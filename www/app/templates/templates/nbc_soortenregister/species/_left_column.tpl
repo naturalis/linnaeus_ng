@@ -8,9 +8,10 @@
 
 			<div id="categories">
 				<ul>
+				
 					{foreach from=$categories key=k item=v}
 					{* if ($v.is_empty==0 || $v.page=='Nomenclature') && $v.id!='classification' *}
-						<li id="ctb-{$v.id}">
+						<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 							{if $activeCategory==$v.id}
 							{$v.title}
 							{else}
@@ -42,7 +43,7 @@
 					<span class="classification-connector-smaller">&lfloor;</span>
 					{/if}
 					<span class="classification-name{if $smarty.section.taxon.index+1<$classification|@count} smaller{/if}">
-					<a href="?id={$v.id}">
+					<a href="taxon.php?id={$classification[taxon].id}">
 						{if $classification[taxon].specificEpithet}
 							{$classification[taxon].specificEpithet}
 						{elseif $classification[taxon].uninomial}
