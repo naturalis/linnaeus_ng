@@ -24,40 +24,46 @@
 
     <tr>
 	    <td id="gridMapCell">    
-			{if $map.mapExists}
-				<table id="mapTable">
-				{assign var=cellNo value=1}
-				{section name=rows start=1 loop=$map.rows+1 step=1}
-					<tr>
-					{section name=cols start=1 loop=$map.cols+1 step=1}
-						<td id="cell-{$cellNo}" row="{$smarty.section.rows.index}" col="{$smarty.section.cols.index}" 
-							{if $index.index[$cellNo]}class="mapCellDiversity{$index.index[$cellNo].class}{if $cellNo==$selectedCell} mapCellSelected{/if}"{/if}
-							onmouseover="l2DiversityCellMouseOver(this)"
-							total="{$index.index[$cellNo].total}"
-							{if $index.index[$cellNo]}
-								onclick="l2DiversityCellClick(this)"
-							{/if}></td>
-						{assign var=cellNo value=$cellNo+1}
+	
+			<div id="gridMap-wrapper">
+
+
+				{if $map.mapExists}
+					<table id="mapTable">
+					{assign var=cellNo value=1}
+					{section name=rows start=1 loop=$map.rows+1 step=1}
+						<tr>
+						{section name=cols start=1 loop=$map.cols+1 step=1}
+							<td id="cell-{$cellNo}" row="{$smarty.section.rows.index}" col="{$smarty.section.cols.index}" 
+								{if $index.index[$cellNo]}class="mapCellDiversity{$index.index[$cellNo].class}{if $cellNo==$selectedCell} mapCellSelected{/if}"{/if}
+								onmouseover="l2DiversityCellMouseOver(this)"
+								total="{$index.index[$cellNo].total}"
+								{if $index.index[$cellNo]}
+									onclick="l2DiversityCellClick(this)"
+								{/if}></td>
+							{assign var=cellNo value=$cellNo+1}
+						{/section}
+						</tr>
 					{/section}
-					</tr>
-				{/section}
-				</table>
-			{/if}
+					</table>
+				{/if}
 
-		    <div id="mapName">
-		        {if $maps|@count>1}
-		            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
-		                showDialog('{t}Choose a map{/t}',
-		                '<div id=\'lookup-DialogContent\'>'+
-		                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
-		                    {/foreach}' ' + '</div>',
-		                    false, true
+			    <div id="mapName">
+			        {if $maps|@count>1}
+			            <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
+			                showDialog('{t}Choose a map{/t}',
+			                '<div id=\'lookup-DialogContent\'>'+
+			                    {foreach item=v from=$maps}'<p class=\'row{if $v.id==$mapId} row-selected{/if}\'><a href=?id={$taxon.id}&m={$v.id}>{$v.name|escape:'htmlall'}{if $v.id!=$mapId}</a>{/if}</p>'+
+			                    {/foreach}' ' + '</div>',
+			                    false, true
 
-		                );">{$map.name}</span>
-		        {else}
-		            {$map.name}
-		        {/if}   
-		    </div>
+			                );">{$map.name}</span>
+			        {else}
+			            {$map.name}
+			        {/if}   
+			    </div>
+
+			</div>
 
 		</td>
 

@@ -22,24 +22,29 @@
     <tr><td colspan="2">&nbsp;</td></tr>
    
     <tr>
-        <td id="gridMapCell" class="searchMap">    
-    		{if $map.mapExists}
-    			<table id="mapTable">
-    			{assign var=cellNo value=1}
-    			{section name=rows start=1 loop=$map.rows+1 step=1}
-    				<tr>
-    				{section name=cols start=1 loop=$map.cols+1 step=1}
-    					<td 
-    						id="cell-{$cellNo}"
-    						{if $selectedCells[$cellNo]==true}class="mapCellTagged"{/if}
-    						onclick="l2TagMapCell(this)">
-    					</td>
-    					{assign var=cellNo value=$cellNo+1}
-    				{/section}
-    				</tr>
-    			{/section}
-    			</table>
-    		{/if}
+        <td id="gridMapCell" class="searchMap"> 
+
+            <div id="gridMap-wrapper">
+
+
+        		{if $map.mapExists}
+        			<table id="mapTable">
+        			{assign var=cellNo value=1}
+        			{section name=rows start=1 loop=$map.rows+1 step=1}
+        				<tr>
+        				{section name=cols start=1 loop=$map.cols+1 step=1}
+        					<td 
+        						id="cell-{$cellNo}"
+        						{if $selectedCells[$cellNo]==true}class="mapCellTagged"{/if}
+        						onclick="l2TagMapCell(this)">
+        					</td>
+        					{assign var=cellNo value=$cellNo+1}
+        				{/section}
+        				</tr>
+        			{/section}
+        			</table>
+        		{/if}
+                
                 <div id="mapName">
                     {if $maps|@count>1}
                         <span class="selectIcon" title="{t}Select a different map{/t}" onclick="
@@ -52,7 +57,9 @@
                     {else}
                         {$map.name}
                     {/if}
-                </div>  
+                </div> 
+
+            </div> 
 
 		</td>
 
