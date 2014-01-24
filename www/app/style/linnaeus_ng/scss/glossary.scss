@@ -1,5 +1,14 @@
+// SETTINGS
+		@import "settings";
+
 .module-glossary #definition{
 	margin-bottom: 0;
+}
+
+.media-caption{
+	margin-bottom: 2em;
+	font-family: $font-family-sans-serif;
+	font-size: 12px;
 }
 
 //// SETTINGS
