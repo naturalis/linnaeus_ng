@@ -6,7 +6,6 @@
 {else}
 {assign var=taxon_display_name value=$taxon.label}
 {/if}
-
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
@@ -35,27 +34,30 @@
 			{/if}
 		</div>
 
-		{if $activeCategory==$smarty.const.TAB_MEDIA}
+		{if $activeCategory==$smarty.const.TAB_MEDIA || $activeCategory==$smarty.const.CTAB_MEDIA}
 
 			<h4>Afbeelding{if $content|@count!=1}en{/if}: {$content|@count}</h4>
 			<div>
+			
 				{foreach from=$content item=v}
-				{assign var=name value=", "|explode:$v.description} 
+				{assign var=photograhper_name value=", "|explode:$v.description} 
 				<div class="thumbholder">
 					<div class="thumbnail">
-						<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$name[1]} {$name[0]}">
-							<img src="{$v.thumb_name}" title="foto {$name[1]} {$name[0]}" alt="foto {$name[1]} {$name[0]}">
+						<a class="zoomimage" rel="prettyPhoto[gallery]" href="{$v.file_name}" pTitle="foto {$photograhper_name[1]} {$photograhper_name[0]}">
+							<img src="{$v.thumb_name}" title="foto {$photograhper_name[1]} {$photograhper_name[0]}" alt="foto {$photograhper_name[1]} {$photograhper_name[0]}">
 						</a>
 					</div>
 					<p class="author">
-						<span class="photographer-title">Foto</span>
-						{$name[1]} {$name[0]}
+						<span class="photographer-title" style="display:inline">Foto</span>
+						{$photograhper_name[1]} {$photograhper_name[0]}<br />
+						{if $v.name}{$v.name}<br />{/if}
+						{if $v.taxon}<a href="taxon.php?id={$v.taxon_id}"><i>{$v.taxon}</i></a><br />{/if}
 					</p>
 				</div>
 				{/foreach}
 			</div>
 
-		{elseif $activeCategory==$smarty.const.TAB_DNA_BARCODES}
+		{elseif $activeCategory==$smarty.const.CTAB_DNA_BARCODES}
 
 			<div>
 				<p>
@@ -91,51 +93,49 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</table>
 			</div>
 
+		{elseif $activeCategory==$smarty.const.CTAB_NOMENCLATURE}
+
+			<p>
+				<h2>Naamgeving</h2>
+				<table>
+					{foreach from=$names.list item=v}
+					{if $v.expert.name}
+						{assign var=expert value=$v.expert.name}
+					{/if}
+						<tr><td>{$v.nametype|@ucfirst}</td><td><a href="name.php?id={$v.id}">{$v.name}</a></td></tr>
+					{/foreach}
+					{if $expert}
+					<tr><td>Expert</td><td colspan="2">{$expert}</td></tr>
+					{/if}
+				</table>
+			</p>
+
+			<p>
+			<h2>Indeling</h2>
+				<table id="name-tree">
+					{foreach from=$classification item=v key=x}
+					{if $v.parent_id!=null}{* skipping top most level "life" *}
+					{math equation="((x-2) * 5)" x=$x assign=buffercount}
+					<tr><td>
+						{if $x>1}
+						{'&nbsp;'|str_repeat:$buffercount}
+						<span class="classification-connector">&lfloor;</span>
+						{/if}
+						<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
+						<span class="classification-rank">[{$ranks[$v.rank_id].rank}]</span>
+						{if $v.preferredName}<br />
+						{if $x>1}
+						{'&nbsp;'|str_repeat:$buffercount}
+						<span class="classification-connector-invisible">&lfloor;</span>
+						{/if}
+						<span class="classification-preffered-name">{$v.preferredName}</span>{/if}
+					</td></tr>
+					{/if }
+					{/foreach}			
+				</table>
+			</p>
+
 		{else}
-		<p>
-		
-			{if $categorySysList[$activeCategory]=='Nomenclature'}
-				<p>
-					<h2>Naamgeving</h2>
-					<table>
-						{foreach from=$names.list item=v}
-						{if $v.expert.name}
-							{assign var=expert value=$v.expert.name}
-						{/if}
-							<tr><td>{$v.nametype}</td><td><a>{$v.name}</a></td></tr>
-						{/foreach}
-						{if $expert}
-						<tr><td>Expert</td><td colspan="2">{$expert}</td></tr>
-						{/if}
-					</table>
-				</p>
-
-				<p>
-				<h2>Indeling</h2>
-					<table id="name-tree">
-						{foreach from=$classification item=v key=x}
-						{if $v.parent_id!=null}{* skipping top most level "life" *}
-						{math equation="((x-2) * 5)" x=$x assign=buffercount}
-						<tr><td>
-							{if $x>1}
-							{'&nbsp;'|str_repeat:$buffercount}
-							<span class="classification-connector">&lfloor;</span>
-							{/if}
-							<span class="classification-preffered-name"><a href="?id={$v.id}">{$v.taxon}</a></span>
-							<span class="classification-rank">[{$ranks[$v.rank_id].rank}]</span>
-							{if $v.preferredName}<br />
-							{if $x>1}
-							{'&nbsp;'|str_repeat:$buffercount}
-							<span class="classification-connector-invisible">&lfloor;</span>
-							{/if}
-							<span class="classification-preffered-name">{$v.preferredName}</span>{/if}
-						</td></tr>
-						{/if }
-						{/foreach}			
-					</table>
-				</p>
-			{/if}
-
 		
 			{if $content|@is_array}
 			<ul>
@@ -149,6 +149,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 			</p>
 			{/if}
 		</p>
+		
 		{if $rdf}
 		<h2>Bron</h2>
 		<p>
@@ -177,17 +178,19 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 
 </div>
 
+
 {literal}
 <script type="text/JavaScript">
 $(document).ready(function(){
-	
-	$('#presence').remove();
-
-	$('[id^=media-]').each(function(e){
-		$('#caption-'+$(this).attr('id').replace(/media-/,'')).html($(this).attr('alt'));
-	});
-	
-});
+	if(jQuery().prettyPhoto) {
+	 	$("a[rel^='prettyPhoto']").prettyPhoto({
+	 		opacity: 0.70, 
+			animation_speed:50,
+			show_title: false,
+	 		overlay_gallery: false,
+	 		social_tools: false
+	 	});
+	}
 </script>
 {/literal}
 

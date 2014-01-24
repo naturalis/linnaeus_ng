@@ -62,12 +62,15 @@ class ProjectsController extends Controller
 		array('matrix_suppress_details','bool',0,'never retrieve characterstates for displaying; enhances performance'),
 		array('external_species_url_target','[_self|_blank*|name]','_blank','in NBC-style matrices'),
 		array('external_species_url_prefix','[url]','%MEDIA_DIR%','in NBC-style matrices'),
+
+		array('species_default_tab','[id]',-1,'id of the tab ("page") to open with by default'),
+		array('species_tab_translate','{a:b},{c:d}',null,'automatically changes tab id a into b etc.'), // to change TAB_MEDIA to default category 'media' etc
+
 		array('include_overview_in_media','bool',0,'show overview image in species media'),
-		array('app_search_result_sort','alpha / token_count','token_count','show overview image in species media'),
+		array('app_search_result_sort','alpha / token_count','token_count','variable to sort search results by'),
 	);
 
 /*
-
 		array('matrixtype','lng / nbc','nbc','multi entry-key type'),
 			should use
 		if (!defined('MATRIX_STYLE_LNG')) define('MATRIX_STYLE_LNG','lng');

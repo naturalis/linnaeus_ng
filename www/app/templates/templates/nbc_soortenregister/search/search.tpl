@@ -9,7 +9,7 @@
 		<div id="results">
 			<p>
 				<h2>
-				Gezocht op "{$search.search}": <span id="resultcount-header"></span>
+				Gezocht op "{$search.search}": <span id="resultcount-header">{$results.data.species.results[$CONSTANTS.C_TAXA_ALL_NAMES].numOfResults}</span>
 				</h2>
 			</p>
 			<p>
@@ -40,11 +40,11 @@
 <script type="text/JavaScript">
 $(document).ready(function(){
 {/literal}
-	$('#resultcount-header').html('{$results.count} '+({$results.count}==1 ? 'resultaat' : 'resultaten'));
+	var n=parseInt($('#resultcount-header').html());
+	$('#resultcount-header').html($('#resultcount-header').html()+' '+(n==1 ? 'resultaat' : 'resultaten'));
 {literal}
 });
 </script>
 {/literal}
 
-{include file="../shared/messages.tpl"}
 {include file="../shared/footer.tpl"}
