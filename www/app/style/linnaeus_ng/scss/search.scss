@@ -4,7 +4,6 @@
 // STYLING
 
 	h3, h4, h5, h6{
-		font-family: $font-family-proze;
 		font-weight: 400;
 	}
 
@@ -71,6 +70,10 @@
 
 	#search-results .search-match {
 		background-color:#ffa;
+	}
+
+	#search-results .search-match {
+    	background-color: $geel;
 	}
 
 //
