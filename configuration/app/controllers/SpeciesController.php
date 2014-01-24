@@ -175,7 +175,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 			if (isset($requestedCat) && isset($this->_automaticTabTranslation[$this->requestData['cat']])) {
 				$requestedCat=$this->_automaticTabTranslation[$this->requestData['cat']];
 			}
-/*			
+
             $activeCategory = 
             	!empty($requestedCat) ? 
 	            	(isset($categories['emptinessList'][$requestedCat]) && $categories['emptinessList'][$requestedCat]==0 ? 
@@ -183,7 +183,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 	            		$categories['defaultCategory']
 	            	) : 
            		$categories['defaultCategory'];
-*/
+
 
 			$activeCategory = !empty($requestedCat) ? $requestedCat : $categories['defaultCategory'];
 

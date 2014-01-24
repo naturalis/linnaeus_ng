@@ -8,42 +8,9 @@ class NSRSearchController extends Controller
     public $usedModels = array(
 		'taxa',
 		'presence',
-		'presence_labels'
-	/*
-		'content',
-        'content_taxon', 
-        'page_taxon', 
-        'page_taxon_title', 
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'literature',
-		'content_free_module',
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
-		'literature',
-		'glossary',
-		'glossary_media',
-		'glossary_synonym',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'geodata_type_title',
-		'occurrence_taxon',
-		'content_introduction',
-		'name_types',
-		'presence',
-		'page_taxon_title'
-		*/
+		'presence_labels',
+		'media_meta',
+		'media_taxon'
     );
 
     public $controllerPublicName = 'Search';
@@ -87,95 +54,21 @@ class NSRSearchController extends Controller
     public function searchExtendedAction ()
     {
 		
-		
-		/*
-		if ($this->rHasVal('search')) {
-
-			$_SESSION['app'][$this->spid()]['search'] = array(
-				'search' => $this->requestData['search'],
-				'modules' => $this->rHasVal('modules') ? $this->requestData['modules'] : null,
-				'freeModules' => $this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null
-				);
-				
-			if ($this->validateSearchString($this->requestData['search'])) {
-				
-				if ($this->rHasVal('extended','1')) {
-
-					$results =
-						$this->doSearch(
-							array(
-								'search'=>$this->requestData['search'],
-								'modules'=>$this->rHasVal('modules') ? $this->requestData['modules'] : null ,
-								'freeModules'=>$this->rHasVal('freeModules') ? $this->requestData['freeModules'] : null,
-								'extended'=>true
-							)
-						);
-
-				} else {
-
-					$search='"'.trim($this->requestData['search'],'"').'"';
-
-					$results=
-						$this->doSearch(
-							array(
-								'search'=>$search,
-								'modules'=>array('species'),
-								'freeModules'=>false,
-								'extended'=>false
-							)
-						);
-
-				}
-
-				$this->addMessage(sprintf('Searched for <span class="searched-term">%s</span>',$this->requestData['search']));
-				$this->smarty->assign('results',$results);
-
-			} else {
-
-				$this->addError(
-					sprintf(
-						$this->translate('Search string must be between %s and %s characters in length.'),
-						$this->_minSearchLength,
-						$this->_maxSearchLength
-					)
-				);
-
-			}
-			
-		}
-
-		$this->smarty->assign('CONSTANTS',
-			array(
-				'C_TAXA_SCI_NAMES'=>self::C_TAXA_SCI_NAMES,
-				'C_TAXA_DESCRIPTIONS'=>self::C_TAXA_DESCRIPTIONS,
-				'C_TAXA_SYNONYMS'=>self::C_TAXA_SYNONYMS,
-				'C_TAXA_VERNACULARS'=>self::C_TAXA_VERNACULARS,
-				'C_TAXA_ALL_NAMES'=>self::C_TAXA_ALL_NAMES,
-				'C_SPECIES_MEDIA'=>self::C_SPECIES_MEDIA,
-			)
-		);
-	
-		$this->smarty->assign('modules',$this->getProjectModules(array('ignore' => MODCODE_MATRIXKEY)));
-		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
-		$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
-
-		*/
-		
-		$search=$this->requestData;
-		$this->smarty->assign('search',$search);	
-		
 		if (
-			!empty($search['taxon']) ||
-			!empty($search['higherTaxon']) ||
-			!empty($search['authorName']) ||
-			!empty($search['presenceStatus']) ||
-			!empty($search['images']) ||
-			//!empty($search['externalDistribution']) ||
-			//!empty($search['externalTrendChart']) ||
-			!empty($search['hasBarcodes'])
-			//!empty($search['hasNoBarcodes'])
+			$this->rHasVal('taxon') ||
+			$this->rHasVal('higherTaxon') ||
+			$this->rHasVal('authorName') ||
+			$this->rHasVal('presenceStatus') ||
+			$this->rHasVal('images') ||
+			//$this->rHasVal('externalDistribution') ||
+			//$this->rHasVal('externalTrendChart') ||
+			$this->rHasVal('hasBarcodes') 
+			//$this->rHasVal('hasNoBarcodes')
 		) {
 	
+			$search=$this->requestData;
+			$this->smarty->assign('search',$search);	
+		
 			if (!empty($search['presenceStatus'])) {
 				$d=array();
 				foreach((array)$search['presenceStatus'] as $key=>$val) {
@@ -189,8 +82,6 @@ class NSRSearchController extends Controller
 			$this->smarty->assign('results',$results);
 		
 		}
-
-		
 
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 
@@ -214,9 +105,9 @@ class NSRSearchController extends Controller
 				_b.information_title,
 				_b.index_label
 			
-			from lng_nsr_presence _a
+			from %PRE%presence _a
 			
-			left join lng_nsr_presence_labels _b
+			left join %PRE%presence_labels _b
 				on _a.project_id=_b.project_id
 				and _a.id=_b.presence_id 
 				and _b.language_id = '.$this->getCurrentLanguageId().'
@@ -299,13 +190,13 @@ class NSRSearchController extends Controller
 				on _a.taxon_id=_j.taxon_id
 				and _j.project_id=_a.project_id
 
-			left join lng_nsr_names _k
+			left join %PRE%names _k
 				on _e.id=_k.taxon_id
 				and _e.project_id=_k.project_id
 				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
 				and _k.language_id=".LANGUAGE_ID_DUTCH."
 
-			left join lng_nsr_media_taxon _l
+			left join %PRE%media_taxon _l
 				on _a.taxon_id = _l.taxon_id
 				and _a.project_id = _l.project_id
 				and _l.overview_image=1
@@ -313,8 +204,8 @@ class NSRSearchController extends Controller
 			where _a.project_id =".$this->getCurrentProjectId()."
 
 			".(!empty($search['taxon']) ? "and (_a.name like '%".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
-			".(!empty($search['higherTaxon']) ? "and (_a.name like '%".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=0)" : "")."
-			".(!empty($search['authorName']) ? "and _a.name_author like '%".mysql_real_escape_string($search['taxon'])."%'" : "")."
+			".(!empty($search['higherTaxon']) ? "and (_a.name like '%".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
+			".(!empty($search['authorName']) ? "and _a.name_author like '%".mysql_real_escape_string($search['authorName'])."%'" : "")."
 			".(!empty($search['presenceStatus']) ? "and _g.presence_id in (".implode(',',$search['presenceStatus']).")" : "" )."
 			".(!empty($search['images']) ? "and number_of_images>0" : "")."
 			".(!empty($search['hasBarcodes']) ? "and number_of_barcodes>0" : "")."
@@ -329,19 +220,125 @@ class NSRSearchController extends Controller
 	}
 
 
+	private function getPhotographersPictureCount($p=null)
+	{
+
+		$id=isset($p['name']) ? $p['name'] : null;
+		$limit=isset($p['limit']) ? $p['limit'] : 5;
+		
+		$where=
+			array(
+				'project_id'=>$this->getCurrentProjectId(),
+				'sys_label' => 'beeldbankFotograaf'
+			);
+
+		if (isset($id)) $d['meta_data']=$name;
+		
+		$params=
+			array(
+				'id'=> $where,
+				'columns'=>'count(*) as total, meta_data',
+				'group'=>'meta_data',
+				'order'=>'count(*) desc',
+				'limit'=>5
+			);
 
 
+		if (isset($limit)) $params['limit']=$limit;
+
+		$mm=$this->models->MediaMeta->_get($params);
+
+		foreach((array)$mm as $key=>$val) {
+
+			$d=$this->models->Taxon->freeQuery("
+				select 
+					count(distinct _a.taxon_id) as taxon_count
+				from 
+					%PRE%media_taxon _a
+	
+				right join %PRE%media_meta _b
+					on _a.project_id=_b.project_id
+					and _a.id = _b.media_id
+					and _b.sys_label = 'beeldbankFotograaf'
+					and _b.meta_data = '". mysql_real_escape_string($val['meta_data'])."'
+				
+				where
+					_a.project_id=".$this->getCurrentProjectId()
+			);
+			
+			$mm[$key]['taxon_count']=$d[0]['taxon_count'];
+		}
+		
+		return $mm;
+		
+	}
 
 
+	private function doPictureSearch($search)
+	{
+		$d=$this->models->MediaTaxon->freeQuery("
+			select 
+				_a.file_name,
+				_a.thumb_name,
+				_a.taxon_id,
+				_c.meta_data as photographer_name,
+				_d.name,
+				trim(
+					ifnull(
+						concat(_j.uninomial,' ',_j.specific_epithet,' ',_j.infra_specific_epithet),
+						replace(_j.name,_j.authorship,'')
+					) 
+				)  as taxon
+			from %PRE%media_taxon _a ".
+			(!empty($search['photographer']) ? "
+				right join %PRE%media_meta _b
+					on _a.project_id=_b.project_id
+					and _a.id=_b.media_id
+					and _b.sys_label='beeldbankFotograaf'
+					and _b.meta_data like '%".mysql_real_escape_string($search['photographer'])."%'"
+					: ""
+			).
+			(!empty($search['taxon']) || !empty($search['higherTaxon']) ? "
+				right join %PRE%names _d
+					on _a.project_id=_d.project_id
+					and _a.taxon_id=_d.taxon_id"
+				: ""
+			)."
+			left join %PRE%media_meta _c
+				on _a.project_id=_c.project_id
+				and _a.id = _c.media_id
+				and _c.sys_label = 'beeldbankFotograaf'
 
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
 
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
 
+			left join %PRE%names _j
+				on _a.taxon_id=_j.taxon_id
+				and _a.project_id=_j.project_id
+				and _j.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+				and _j.language_id=".LANGUAGE_ID_SCIENTIFIC."
 
+			where
+				_a.project_id=".$this->getCurrentProjectId()."
 
+				".(!empty($search['taxon']) ? "and (_d.name like '%".mysql_real_escape_string($search['taxon'])."%' and _f.lower_taxon=1)" : "")."
+				".(!empty($search['higherTaxon']) ? "and (_d.name like '%".mysql_real_escape_string($search['higherTaxon'])."%' and _f.lower_taxon=0)" : "")."
+				
+			order by ".($search['sort']=='photographer' ? "photographer_name" : "taxon" )."
 
-
-
-
+			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
+		);
+	
+		//q($this->models->MediaTaxon->q());
+		//q($d,1);
+		return $d;
+		
+	}
 
 
 
@@ -349,9 +346,25 @@ class NSRSearchController extends Controller
     public function searchPicturesAction ()
     {
 
-		if ($this->rHasVal('taxon')||$this->rHasVal('higherTaxon')||$this->rHasVal('photographer')||$this->rHasVal('validator'))
+		if (
+			$this->rHasVal('taxon') ||
+			$this->rHasVal('higherTaxon')||
+			$this->rHasVal('photographer')||
+			$this->rHasVal('validator')
+		)
 		{
+			
+			$search=$this->requestData;
 
+			$this->smarty->assign('search',$search);	
+
+			//q($this->doPictureSearch($search),1);	
+			$this->smarty->assign('results',$this->doPictureSearch($search));	
+			
+			
+			
+
+/*
 			$_SESSION['app'][$this->spid()]['search_picture'] = array(
 				'taxon' => $this->requestData['taxon'],
 				'higherTaxon' => $this->requestData['higherTaxon'],
@@ -359,18 +372,18 @@ class NSRSearchController extends Controller
 				'validator' => $this->requestData['validator']
 				);
 
-/*
+*/
 
 
 /*
 select _a.meta_data, _b.original_name, _c.taxon
-from lng_nsr_media_meta _a
+from %PRE%media_meta _a
 
-left join lng_nsr_media_taxon _b
+left join %PRE%media_taxon _b
 	on _a.project_id=_b.project_id
 	and _a.media_id=_b.id 
 
-left join lng_nsr_taxa _c
+left join %PRE%taxa _c
 	on _a.project_id=_c.project_id
 	and _b.taxon_id=_c.id
 
@@ -387,8 +400,9 @@ left join lng_nsr_taxa _c
 			
 		}
 
-		$this->smarty->assign('minSearchLength',$this->controllerSettings['minSearchLength']);
 		//$this->smarty->assign('search',isset($_SESSION['app'][$this->spid()]['search']) ? $_SESSION['app'][$this->spid()]['search'] : null);
+
+		$this->smarty->assign('photographers',$this->getPhotographersPictureCount());
 
         $this->printPage();
   

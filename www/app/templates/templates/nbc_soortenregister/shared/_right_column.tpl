@@ -16,7 +16,7 @@
 
         </div>
 
-        <div id="quicksearch">
+        <!-- div id="quicksearch">
             <h2></h2>
             
 			{if $adjacentItems.prev}
@@ -34,7 +34,7 @@
 				<span class="navigation-icon" id="next-icon-inactive">{t}Next{/t}</span>
 			{/if}
 
-        </div>
+        </div -->
 
 
 	</div>

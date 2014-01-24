@@ -8,9 +8,8 @@
 
 			<div id="categories">
 				<ul>
-				
 					{foreach from=$categories key=k item=v}
-					{* if ($v.is_empty==0 || $v.page=='Nomenclature') && $v.id!='classification' *}
+					{if $v.is_empty==0 && $v.id!='classification'}
 						<li id="ctb-{$v.id}" tabname="{$v.tabname}">
 							{if $activeCategory==$v.id}
 							{$v.title}
@@ -18,7 +17,7 @@
 							<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
 							{/if}
 						</li>
-					{* /if *}
+					{/if}
 					{/foreach}
 				</ul>
 			</div>
