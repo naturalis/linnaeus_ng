@@ -19,24 +19,10 @@
 <table id="mapGrid">
     <tr id="grid-header">
         <td colspan="2">
-                <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameA" onclick="
-                    allLookupSetExtraVars('l2_must_have_geo','1');
-                    allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
-                    allLookupShowDialog()
-                " class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
-                <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="speciesNameB" onclick="
-                    allLookupSetExtraVars('l2_must_have_geo','1');
-                    allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
-                    allLookupShowDialog()
-                " class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
-                <input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" />
-                <input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" />
-                <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
-            
-
-          
+            &nbsp;
     	</td>
     </tr>
+    
     <tr>
         <td id="gridMapCell">    
     		
@@ -90,13 +76,46 @@
 				</div>
 			{/foreach}
             </div>
+
+            <p>
+                <span class="mapCellA mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span 
+                    id="speciesNameA" 
+                    onclick="
+                        allLookupSetExtraVars('l2_must_have_geo','1');
+                        allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(1,%s);');
+                        allLookupShowDialog()
+                    " 
+                    class="selectIcon{if $taxonA} italics">{$taxonA.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
+            </p>
+            
+            <p>
+                <span class="mapCellB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span id="speciesNameB" onclick="
+                    allLookupSetExtraVars('l2_must_have_geo','1');
+                    allLookupNavigateOverrideUrl('javascript:l2SetCompareSpecies(2,%s);');
+                    allLookupShowDialog()
+                " 
+                class="selectIcon{if $taxonB} italics">{$taxonB.taxon}</span>{else}">{t}Select...{/t}{/if}</span>
+            </p>
+            
+            <p><input type="hidden" name="idA" id="idA" value="{if $taxonA}{$taxonA.id}{/if}" /></p>
+            
+            <p><input type="hidden" name="idB" id="idB" value="{if $taxonB}{$taxonB.id}{/if}" /></p>
+            
             <p><span class="mapCellAB mapCellLegend">&nbsp;&nbsp;&nbsp;&nbsp;</span>{t}Displays overlap between two taxa.{/t}</p>
-		</td>
-	</tr>
-	<tr id="grid-footer">
-		<td><span id="coordinates"></span></td>
-		<td></td>
-	</tr>
+            
+            <div class="map_controls">
+                <input id="map_compare_button" type="button" value="{t}Compare{/t}" onclick="l2DoMapCompare()" />
+            </div>
+
+        </td>
+
+    </tr>
+
+    <tr id="grid-footer">
+        <td colspan="2"><span id="coordinates"></span></td>
+    <tr>
 </table>
 </div>
 {/if}

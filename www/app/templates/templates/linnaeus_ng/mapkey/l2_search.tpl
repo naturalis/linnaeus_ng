@@ -78,17 +78,16 @@
     		</div>
             <p style="margin-bottom: 8px;">{t}Select the area you want to search by clicking the relevant squares.{/t}</p>
             <p>{t}When finished, click 'Search'.{/t}</p>
-		</td>
-	</tr>
-	
-    <tr id="grid-footer">
-		<td><span id="coordinates"></span></td>
-		<td>
-            <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />&nbsp;
-            <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
-            <input type="hidden" name="mapId" value="{$mapId}" /> 
+            <div class="map_controls">
+                <input type="button" value="{t}Search{/t}" onclick="l2DoSearchMap()" />&nbsp;
+                <input type="button" value="{t}Clear map{/t}" onclick="l2DoClearSearch()" />
+                <input type="hidden" name="mapId" value="{$mapId}" />
+            </div>
         </td>
-
+    </tr>
+    
+    <tr id="grid-footer">
+        <td><span id="coordinates" colspan="2"></span></td>
 	</tr>
 
     <tr><td colspan="2">&nbsp;</td></tr>
