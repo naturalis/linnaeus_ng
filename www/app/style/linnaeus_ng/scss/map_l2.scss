@@ -170,15 +170,15 @@
 				}
 
 				.mapCellA {
-					background-color:#FF0000;
+					background-color:$rood;
 				}
 
 				.mapCellB {
-					background-color:#0000FF;
+					background-color:$blauw;
 				}
 
 				.mapCellAB {
-					background-color:#FF00FF;
+					background-color:mix($rood,$blauw);
 				}
 
 
@@ -192,6 +192,25 @@
 					font-size: 12px;
 					margin-right: 2em;
 				}
+
+				.selectIcon{
+					color: $blauw;
+					border-bottom: 1px solid dotted;
+					cursor: pointer;
+					&:after{
+						content: "…";
+					}
+				}
+
+				.map_controls{
+					text-align: right;
+					input{
+						margin: 5px;
+					}
+
+				}
+
+
 
 //		@media none {
 //

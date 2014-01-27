@@ -2660,7 +2660,7 @@ button, input, select, textarea {
   padding: 6px 20px;
   position: relative;
   text-align: center;
-  font-size: 87.5%;
+  font-size: 12px;
   font-family: Arial, sans-serif; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/basics\.scss}line{font-family:\00003766}}
