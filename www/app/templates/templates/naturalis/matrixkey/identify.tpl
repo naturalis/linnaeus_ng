@@ -1,12 +1,16 @@
 {include file="../shared/head.tpl"}
 
-  <body class='theme-bruin' style='cursor: default;'>
+  <body style='cursor: default;'>
     
 {include file="../shared/navbar.tpl"}
 	
     <div id='container'>
       <a name='top'></a>
       <div id='main'>
+
+        <div id='logo'>
+          <img src='{$baseUrl}app/style/naturalis/images/logo-medium-zwart.png'>
+        </div>
 
 		{snippet language=$currentLanguageId}titles.html{/snippet}
 

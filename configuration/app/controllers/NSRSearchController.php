@@ -210,7 +210,7 @@ class NSRSearchController extends Controller
 			".(!empty($search['images']) ? "and number_of_images>0" : "")."
 			".(!empty($search['hasBarcodes']) ? "and number_of_barcodes>0" : "")."
 			order by ".($search['sort']=='preferredNameNl' ? "dutch_name" : "taxon" )."
-			limit ".(!empty($search['limit']) ? intval($search['limit']) : "100" )
+			limit ".(!empty($search['limit']) ? intval($search['limit']) : "1000" )
 		);
 	
 		//q($this->models->Taxon->q());

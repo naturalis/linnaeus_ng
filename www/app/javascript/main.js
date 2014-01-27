@@ -30,6 +30,14 @@ function rndStr(length) {
 	return d;
 }
 
+function isArray(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
+}
+
+
 //this function simply gets the window scroll position, works in all browsers
 function getPageScroll() {
 	var yScroll;
@@ -131,13 +139,6 @@ function showVideo(url,name) {
 
 	showDialog(name,content);
 
-}
-
-function isArray(obj) {
-   if (obj.constructor.toString().indexOf("Array") == -1)
-      return false;
-   else
-      return true;
 }
 
 var allIsDialogOpen = false;
