@@ -406,14 +406,6 @@ function nbcShowStates(id) {
 		success : function (data) {
 			//console.log(data);
 			data = $.parseJSON(data);
-
-			/*
-			showDialog(
-				data.character.label,
-				data.page,
-				{width:data.width,height:data.height,showOk:data.showOk}
-			);
-			*/
 			
 			$('#value-selector-title').html(data.character.label);
 			$('#value-selector-body').html(data.page);
@@ -477,36 +469,34 @@ function nbcRefreshGroupMenu() {
 					s=s+"<li><a href='#' onclick='nbcShowStates("+c.id+");return false;'>"+c.label+(c.value?c.value:"")+"</a>";
 					
 				if (data.activeChars[c.id]) {
+
 					openGroup = true;
-					//s = s + '<span>';
-					s = s + "<span class='facetValueHolder'>";
-			
+					var selectionsToShow=Array();
 					for (k in data.storedStates) {
 						var state = data.storedStates[k];
 						if (state.characteristic_id==c.id) {
 							var dummy = state.type=='f' ? state.type+':'+state.characteristic_id : state.val;
-//							s = s + 
-//								'<div class="facetValueHolder">'+
-//									(state.value ? state.value+' ' : '')+
-//									(state.label ? state.label+' ' : '')+
-//									(state.separationCoefficient ? ' ('+state.separationCoefficient+') ' : '')+
-//									'<a href="#" class="removeBtn" onclick="nbcClearStateValue(\''+dummy+'\');return false;">'+
-//									'<img src="'+nbcImageRoot+'clearSelection.gif">'+
-//									'</a>'+
-//								'</div>';
+							selectionsToShow.push( 
+								"<span class='facetValueHolder'><a href='#' onclick='nbcClearStateValue(\""+dummy+"\");return false;'>"+
+								(state.value ? state.value+' ' : '')+
+								(state.label ? state.label+' ' : '')+
+								(state.separationCoefficient ? '('+state.separationCoefficient+') ' : '')+"</a></span>"
+							);
 
-							s = s + 
-							"<a href='#' onclick='nbcClearStateValue(\""+dummy+"\");return false;'>"+
-							(state.value ? state.value+' ' : '')+
-							(state.label ? state.label+' ' : '')+
-							(state.separationCoefficient ? '('+state.separationCoefficient+') ' : '')+"</a>";
-							if (k<data.storedStates.length-1 && data.storedStates.length>1)
-								s=s+"<br />";
 
 						}
 					}
 					
-					s = s + "</span>";
+					
+					if (selectionsToShow.length==1) {
+						s = s + selectionsToShow[0];
+					} else {
+						s = s + '<br />&nbsp;&nbsp;&nbsp;' + selectionsToShow.join('<br />&nbsp;&nbsp;&nbsp;');
+					}
+					
+					
+					
+					//s = s + "</span>";
 	
 				}
 	
@@ -767,7 +757,8 @@ function jDialogOk() {
 // dialog button function, called from main.js::showDialog 
 function jDialogCancel() {
 
-	closeDialog();
+	$('#value-selector').modal('hide');
+	//closeDialog();
 
 }
 
