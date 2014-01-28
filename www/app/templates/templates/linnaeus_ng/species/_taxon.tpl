@@ -19,6 +19,7 @@
 
 <div id="page-main">
 {if $activeCategory=='classification'}
+
 <div id="classification">
 	{foreach from=$content key=k item=v name=classification}
 	{if $v.do_display}
