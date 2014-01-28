@@ -1,3 +1,10 @@
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/index\.scss}line{font-family:\000033}}
-.module-index #content p {
-  margin-bottom: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/index\.scss}line{font-family:\000032}}
+.module-index #content {
+  columns: 50% 2;
+  -webkit-columns: 100px 2;
+  /* Safari and Chrome */
+  -moz-columns: 100px 2;
+  /* Firefox */ }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/index\.scss}line{font-family:\000038}}
+  .module-index #content p {
+    margin-bottom: 0; }
