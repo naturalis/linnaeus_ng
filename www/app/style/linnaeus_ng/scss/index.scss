@@ -1,5 +1,10 @@
 .module-index{
 	#content{
+		
+		columns:50% 2;
+		-webkit-columns:100px 2; /* Safari and Chrome */
+		-moz-columns:100px 2; /* Firefox */
+
 		p{
 			margin-bottom: 0;
 		}
