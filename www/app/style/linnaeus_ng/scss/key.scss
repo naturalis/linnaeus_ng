@@ -135,12 +135,12 @@
 
 	#step .choice-img-wrapper {
 		cursor: pointer;
-		font-family: $font-family-sans-serif;
-		font-size: 10.5px;
 	}
 
 	.choice-img-wrapper img {
 		border: 1px solid #000;
+		font-family: $font-family-sans-serif;
+		font-size: 10.5px;
 	}
 
 	#step .marker {

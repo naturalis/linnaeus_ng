@@ -114,13 +114,13 @@
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003136}}
 #step .choice-img-wrapper {
-  cursor: pointer;
+  cursor: pointer; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003140}}
+.choice-img-wrapper img {
+  border: 1px solid #000;
   font-family: Arial, sans-serif;
   font-size: 10.5px; }
-
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003142}}
-.choice-img-wrapper img {
-  border: 1px solid #000; }
 
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/key\.scss}line{font-family:\00003146}}
 #step .marker {
