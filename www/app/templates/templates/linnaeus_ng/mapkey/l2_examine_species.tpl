@@ -30,7 +30,7 @@
 	<tr>
 	<td id="gridMapCell">	
         
-		<div id="gridMap-wrapper">
+		<div class="cellwrapper">
 
 			{if $map.mapExists}
 				<table id="mapTable">
@@ -79,14 +79,18 @@
 			{/foreach}
 		</div>
         <p>
-	    	<a href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Grid verbergen{/t}</span><span style="display:none">{t}Grid tonen{/t}</span></a>
+	    	<a id="toggleGrid" href="#" onclick="l2ToggleGrid(this);"><span style="display:block">{t}Grid verbergen{/t}</span><span style="display:none">{t}Grid tonen{/t}</span></a>
         </p>
 		</td>
 	</tr>
-	<tr id="grid-footer">
-		<td><span id="coordinates"></span></td>
-		<td></td>
+
+    <tr id="grid-footer">
+        <td><span id="coordinates"></span></td>
+        <td>&nbsp;</td>
 	</tr>
+
+    <tr><td colspan="2">&nbsp;</td></tr>
+
 </table>
 </div>
 
