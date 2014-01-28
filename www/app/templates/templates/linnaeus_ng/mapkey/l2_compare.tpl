@@ -15,11 +15,11 @@
 {if !$map.mapExists}
     <div>{t _s1=$map.name}The image file for the map "%s" is missing.{/t}</div>
 {else}
-
+<form method="post" id="theForm" action="">
 <table id="mapGrid">
     <tr id="grid-header">
-        <td colspan="2">
-            &nbsp;
+        <td colspan="2">&nbsp;
+            
     	</td>
     </tr>
     
@@ -123,6 +123,7 @@
 
 
 </table>
+</form>
 </div>
 {/if}
 
