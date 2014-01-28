@@ -234,7 +234,6 @@
 			//     font-style: normal;
 			// }
 			
-
 		/* --- --- ICON FONTS --- */
 
 			@font-face {
@@ -305,12 +304,8 @@
 				content: "\e60f";
 			}
 
-		/* Source Sans */
-			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
-
-
-
 		/* --- --- BASE FONT --- */
+			@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic);
 
 			body{
 				font-weight: 400; 
@@ -560,10 +555,6 @@
 				color: $bruin;
 
 				&:before {
-					width: 30px;
-					height: 30px;
-					display: block;
-					float: right;
 					font-size: 24px;
 					font-family: 'naturalis-lng-icons';
 					cursor: pointer;
@@ -572,11 +563,10 @@
 
 			.navigation-icon-wrapper{
 				display: block;
-				float: right;
 			}
 			
 			#back-icon, #back-icon-inactive{ &:before {
-					content: "\e60a";
+					content: "\e607";
 			} }
 
 			#next-icon, #next-icon-inactive { &:before {
@@ -589,7 +579,7 @@
 			} }
 			
 			#previous-icon, #previous-icon-inactive{ &:before {
-					content: "\e607";
+					content: "\e60a";
 			} }
 
 			#decision-path-icon, #decision-path-icon-inactive{ &:before {
@@ -780,7 +770,7 @@
 			}
 
 			.btn-secondary{
-				
+
 			}
 
 	/* --- jQUERY DIALOGUE --- */
@@ -1144,6 +1134,15 @@
 					}
 				}
 			
+			}
+
+			.navigation-icon{
+				&:before {
+					width: 30px;
+					height: 30px;
+					display: block;
+					float: left;					
+				}
 			}
 
 		/* --- --- MODULE GRID --- */
