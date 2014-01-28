@@ -25,7 +25,7 @@
     <tr>
 	    <td id="gridMapCell">    
 	
-			<div id="gridMap-wrapper">
+			<div class="cellwrapper">
 
 
 				{if $map.mapExists}
