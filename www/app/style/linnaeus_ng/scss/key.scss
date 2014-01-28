@@ -85,8 +85,6 @@
 	}
 
 	#step-title {
-	    font-family: Helvetica, Arial, "Nimbus Sans L", "Liberation Sans", FreeSans, sans-serif;
-	    font-size: 16px;
 	    color: #0303b2;
 	}
 
@@ -137,6 +135,8 @@
 
 	#step .choice-img-wrapper {
 		cursor: pointer;
+		font-family: $font-family-sans-serif;
+		font-size: 10.5px;
 	}
 
 	.choice-img-wrapper img {
