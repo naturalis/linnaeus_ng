@@ -138,8 +138,6 @@
 	}
 
 	.choice-img-wrapper{
-		font-family: $font-family-sans-serif;
-		font-size: 12px;
 		img {
 			border: 1px solid #000;
 		}
@@ -154,8 +152,9 @@
 	}
 
 	#step .text-choice-img {
+		font-family: $font-family-sans-serif;
 		text-align: center; 
-		font-size: 10px;
+		font-size: 11px;
 		margin-top: 3px;
 	}
 
