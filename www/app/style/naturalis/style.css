@@ -2333,7 +2333,7 @@ button, input, select, textarea {
 
 .result-image-container {
   overflow: hidden;
-  margin-bottom: 1em;
+  /*margin-bottom: 1em;*/
   height: 170px;
   text-align: center; }
   .result-image-container.passepartout {
