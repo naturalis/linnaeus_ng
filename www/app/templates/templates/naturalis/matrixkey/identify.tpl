@@ -97,12 +97,6 @@
             </div>
           </div>
         </div>
-
-      <div id='row-sender'>
-        <a href='http://www.naturalis.nl' tagreg='_blank'>
-          <img src='{$baseUrl}app/style/naturalis/images/logo-naturalis.png'>
-        </a>
-      </div>
     </div>
 
 	{include file="../shared/footerbar.tpl"}
