@@ -180,22 +180,6 @@ class ImportL2Controller extends Controller
 
 
 
-    /**
-     * Index
-     *
-     * @access    public
-     */
-    public function indexAction ()
-    {
-        $this->checkAuthorisation(true);
-        
-        $this->setPageName($this->translate('Data import options'));
-        
-        $this->printPage();
-    }
-
-
-
     public function l2StartAction ()
     {
         $this->checkAuthorisation(true);
