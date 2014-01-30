@@ -9,6 +9,7 @@
 
 include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
+
 class ProjectsController extends Controller
 {
     public $usedModels = array(
@@ -1245,19 +1246,6 @@ class ProjectsController extends Controller
 		$this->models->Project->save($data);
 		
 	}
-
-    private function emptyCacheFolder()
-    {
-
-		$cachePath = $this->makeCachePath();
-		
-		if (empty($cachePath))
-			return;
-		
-        if (file_exists($cachePath))
-			array_map('unlink', glob($cachePath.'/*'));
-		
-    }	
 
 	private function initialize()
 	{
