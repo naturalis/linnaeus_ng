@@ -714,30 +714,6 @@ class ImportNBCController extends ImportController
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public function nbcLabels1Action()
     {
         if ($this->rHasVal('process', '1'))
@@ -750,11 +726,13 @@ class ImportNBCController extends ImportController
         
         $this->setSuppressProjectInBreadcrumbs();
 		
-        if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file')) {
+        if (isset($this->requestDataFiles[0]) && !$this->rHasVal('clear', 'file'))
+		{
             
             $tmp = tempnam(sys_get_temp_dir(), 'lng');
             
-            if (copy($this->requestDataFiles[0]['tmp_name'], $tmp)) {
+            if (copy($this->requestDataFiles[0]['tmp_name'], $tmp))
+			{
                 
                 $_SESSION['admin']['system']['import']['file'] = array(
                     'path' => $tmp, 
@@ -769,9 +747,12 @@ class ImportNBCController extends ImportController
             }
         }
         
+
         $_SESSION['admin']['system']['import']['imagePath'] = false;
         
-        if ($this->rHasVal('clear', 'file')) {
+
+        if ($this->rHasVal('clear', 'file'))
+		{
             
             unset($_SESSION['admin']['system']['import']['file']);
             unset($_SESSION['admin']['system']['import']['raw']);
@@ -805,8 +786,8 @@ class ImportNBCController extends ImportController
 			$data = $_SESSION['admin']['system']['import']['data'];
 		}
 
-
-		if ($data['project']['title']) {
+		if ($data['project']['title'])
+		{
 
 			$d = $this->models->Project->_get(array(
 					'id' => array(
@@ -858,7 +839,7 @@ class ImportNBCController extends ImportController
 
 				foreach((array)$_SESSION['admin']['system']['import']['data']['states'] as $val) {
 					
-					if (empty($val[1]))
+					if (empty($val[0])||empty($val[1]))
 						continue;
 
 					// get the character that matches the 'kenmerk'-label (col 2; col 1 is the group, which is ignored here)
@@ -873,9 +854,59 @@ class ImportNBCController extends ImportController
 								)'
 						)
 					);	
-		
+
+
+					// warning, UGLY code ahead
+					if ($d && count((array)$d)>1) {
+						
+						/*
+							two (or more) characters can exist with the same name, but not
+							in the same group (although this is enforced nowhere).
+						*/
+					
+						$somethingElse=array();
+						foreach((array)$d as $x) {
+							$somethingElse[]=$x['characteristic_id'];
+						}
+						
+						$something=array();
+						foreach((array)$this->models->ChargroupLabel->_get(
+							array('id'=>
+								array(
+									'project_id' => $pId, 
+									'language_id' => $thisLanguage, 
+									'label' => $val[0]				
+								)
+							)
+						) as $x) {
+							$something[]=$x['chargroup_id'];
+						}
+					
+						$d=$this->models->CharacteristicChargroup->_get(
+							array('id'=>
+								array(
+									'project_id' => $pId, 
+									'characteristic_id in#' => '('.implode(',',$somethingElse).')',
+									'chargroup_id in#' => '('.implode(',',$something).')'
+								)
+							)
+						);	
+					
+						if ($d && count((array)$d)>1)
+							$this->addError(
+								$this->storeError(
+									sprintf(
+										$this->translate('There appear to be multiple characters with the name "%s", within the same group. Unable to make out which is which'),
+										$val[1]
+									),
+									'Matrix states'
+								)
+							);
+						
+					}
+
 					// if a char is found...					
-					if (!empty($d[0]['id'])) {
+					if (!empty($d[0]['characteristic_id'])) {
 
 						$cId = $d[0]['characteristic_id'];
 
@@ -979,7 +1010,6 @@ class ImportNBCController extends ImportController
 
 				}
 				
-				
 				if ($this->rHasval('re_type_chars','all') || $this->rHasval('re_type_chars','partial')) {
 
 					$this->addMessage($this->translate('Re-evaluating character types (using setting "'.($this->rHasval('re_type_chars','partial') ? 'need some' : 'need all' ).'").'));
@@ -1023,7 +1053,6 @@ class ImportNBCController extends ImportController
         
         $this->printPage();
     }
-
 
 
     private function getNewProjectId()
@@ -2251,7 +2280,6 @@ class ImportNBCController extends ImportController
 
     private function parseLabelData($raw)
     {
-        
         $data = array();
         
         foreach ((array) $raw as $line => $val) {
@@ -2293,7 +2321,6 @@ class ImportNBCController extends ImportController
 
 	private function doDownload()
 	{
-	
 		define('FIELD_SEP',',');
 
         header('Content-disposition:attachment;filename=combined-ids--'.
@@ -2334,12 +2361,11 @@ class ImportNBCController extends ImportController
 		echo 'VARIATIONS'.chr(10);
 		echo 'id'.FIELD_SEP.'label'.FIELD_SEP.'lng_id'.FIELD_SEP.'taxon_id'.chr(10);
 		echo $v;
-
 	}
 
     private function storeError($err, $mod)
     {
-		
+
         $_SESSION['admin']['system']['import']['errorlog']['errors'][] = array(
             $mod, 
             $err
