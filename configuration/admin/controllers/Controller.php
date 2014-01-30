@@ -394,6 +394,7 @@ class Controller extends BaseClass
     {
 
 		$this->reInitUserRolesAndRights();
+
 		$p = $this->models->Project->_get(array('id'=>'*','fieldAsIndex'=>'id'));
 		
         foreach ((array) $_SESSION['admin']['user']['_roles'] as $key => $val) {
@@ -403,8 +404,7 @@ class Controller extends BaseClass
                 'name' => $val['project_name'], 
                 'title' => $val['project_title'], 
                 'active' => $val['active'], 
-                'member' => $val['member'],
-				'published' => isset($p[$val['project_id']]['published']) ? $p[$val['project_id']]['published']=='1' : false
+                'member' => $val['member']
             );
             
             if (!isset($cup) || !in_array($r, (array) $cup)) {
@@ -1736,6 +1736,18 @@ class Controller extends BaseClass
 		return isset($_SESSION['admin']['system']['activeTaxon']) ? $_SESSION['admin']['system']['activeTaxon'] : null;
 	}
 
+
+    public function emptyCacheFolder($pId=null) 
+    {
+		$cachePath = $this->makeCachePath($pId);
+		
+		if (empty($cachePath))
+			return;
+		
+        if (file_exists($cachePath))
+			array_map('unlink', glob($cachePath.'/*'));
+    }	
+
     private function getTaxonChildren($id,$alphabeticalTree)
     {
         if (is_null($this->tmp)) {
@@ -2705,10 +2717,10 @@ class Controller extends BaseClass
         }
     }
 
-	public function makeCachePath() 
+	public function makeCachePath($pId=null) 
 	{
 
-        $p = $this->getCurrentProjectId();
+        $p = isset($pId) ? $pId : $this->getCurrentProjectId();
         
         if (!$p)
             return;
