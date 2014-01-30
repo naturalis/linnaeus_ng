@@ -3468,11 +3468,6 @@ class Controller extends BaseClass
         // is no controller base name is set, we are in /admin/views/utilities/admin_index.php, which is the portal to the modules
         if ($controllerBaseName == '')
             return true;
-echo '<!--';
-var_dump($_SESSION['admin']['user']['_rights']);
-echo $this->getCurrentProjectId().'<br />'.$controllerBaseName.'<br />';
-echo '-->';
-
 
         if (isset($_SESSION['admin']['user']['_rights'][$_SESSION['admin']['user']['_rights']])) {
             
