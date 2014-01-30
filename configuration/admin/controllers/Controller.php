@@ -404,7 +404,8 @@ class Controller extends BaseClass
                 'name' => $val['project_name'], 
                 'title' => $val['project_title'], 
                 'active' => $val['active'], 
-                'member' => $val['member']
+                'member' => $val['member'],
+				'published' => isset($p[$val['project_id']]['published']) ? $p[$val['project_id']]['published']=='1' : false
             );
             
             if (!isset($cup) || !in_array($r, (array) $cup)) {

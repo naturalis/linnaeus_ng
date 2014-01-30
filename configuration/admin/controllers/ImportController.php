@@ -69,6 +69,20 @@ class ImportController extends Controller
         parent::__destruct();
     }
 
+    /**
+     * Index
+     *
+     * @access    public
+     */
+    public function indexAction ()
+    {
+        $this->checkAuthorisation(true);
+        
+        $this->setPageName($this->translate('Data import options'));
+        
+        $this->printPage();
+    }
+
     protected function mimeContentType ($filename)
     {
         $mime_types = array(

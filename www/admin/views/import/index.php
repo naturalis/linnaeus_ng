@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/admin/controllers/ImportL2Controller.php');
+require_once ('../../../../configuration/admin/controllers/ImportController.php');
 
-$c = new ImportL2Controller();
+$c = new ImportController();
 
 $c->indexAction();
