@@ -14,6 +14,8 @@
 include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
 include_once ('SpeciesController.php');
+include_once ('ProjectsController.php');
+
 class ImportNBCController extends Controller
 {
 
@@ -200,14 +202,14 @@ class ImportNBCController extends Controller
     public function nbcDeterminatie2Action ()
     {
         $this->checkAuthorisation(true);
-        
+
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
-        
+
         $this->setPageName($this->translate('Parsed data example'));
-        
+
         $raw = $this->getDataFromFile($_SESSION['admin']['system']['import']['file']['path']);
-        
+
         $_SESSION['admin']['system']['import']['data'] = $data = $this->parseData($raw);
 
 		if (empty($data['project']['soortgroep'])) {
@@ -324,6 +326,17 @@ class ImportNBCController extends Controller
 				));
 				
 				$this->addMessage('Added default language.');
+
+$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
+$this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
+
+$this->addModuleToProject(MODCODE_HIGHERTAXA, $this->getNewProjectId(), 0);
+$this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $this->getNewProjectId());
+
+$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
+$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
+
+
 				
 			} 
 			// use an existing project
@@ -465,13 +478,15 @@ class ImportNBCController extends Controller
 		if ($this->rHasVal('action', 'matrix') && !$this->isFormResubmit()) {
 	
 			// it does...
-			if (!is_null($mId)) {
+			if (!is_null($mId))
+			{
 
 				$this->addMessage($this->storeError('Using matrix "' .$matrixName . '"','Matrix'));
 				$this->smarty->assign('usingExisting', true);
 
 				// ...and we want to replace it, so we delete all existing matrix-data first
-				if ($this->rHasVal('data_treatment','replace_data')) {
+				if ($this->rHasVal('data_treatment','replace_data'))
+				{
 
 					$this->models->MatrixTaxonState->delete(array(
 						'project_id' => $this->getNewProjectId(), 
@@ -534,7 +549,8 @@ class ImportNBCController extends Controller
 					));
 				} 
 				// ...but we don't want to overwrite it, so we create a matrix with a new name
-				else {
+				else
+				{
 
 					$m = $this->createMatrixIfNotExists($_SESSION['admin']['system']['import']['newMatrixTitle']);
 					$mId = $m['id'];
@@ -562,7 +578,7 @@ class ImportNBCController extends Controller
             
             $this->storeVariationStateConnections($_SESSION['admin']['system']['import']['species_data'], $data, $mId);
             $this->addMessage('Created ' . $_SESSION['admin']['system']['import']['loaded']['connections'] . ' variation-state connections.');
-            
+			
             $this->smarty->assign('processed', true);
         }
 
@@ -632,6 +648,7 @@ class ImportNBCController extends Controller
 
 		if (!$_SESSION['admin']['system']['import']['projectExists']) {
 
+			/*
 			$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
 			$this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
 			
@@ -640,6 +657,7 @@ class ImportNBCController extends Controller
 			
 			$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
 			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
+			*/
 
 			$settings = array(
 				'matrixtype' => 'nbc',
@@ -694,18 +712,43 @@ class ImportNBCController extends Controller
     {
 	
         $this->checkAuthorisation(true);
-
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
         $this->reInitUserRolesAndRights();
         $this->setCurrentUserRoleId();
-        
+
+        $this->emptyCacheFolder($this->getCurrentProjectId());  // does this even work?
+		
         unset($_SESSION['admin']['system']['import']);
         unset($_SESSION['admin']['project']['ranks']);
         
         $this->redirect($this->getLoggedInMainIndex());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	public function nbcLabels1Action()
@@ -948,7 +991,7 @@ class ImportNBCController extends Controller
 						}
 
 					} else {
-q($this->models->CharacteristicLabel->q(),1);
+
 			            $this->addError($this->storeError(sprintf($this->translate('Could not resolve character "%s".'),$val[1]),'Matrix states'));
 
 					}
@@ -1808,7 +1851,7 @@ q($this->models->CharacteristicLabel->q(),1);
                             
 							$rValId = $this->resolveSimilarIdentifier($rVal,$tmpIndex);
 
-                            if (!isset($tmpIndex[$rValId]) || $vVal['lng_id']==$tmpIndex[$rValId]['id'])
+                            if (!isset($tmpIndex[$rValId]) || !isset($vVal['lng_id']) || $vVal['lng_id']==$tmpIndex[$rValId]['id'])
                                 continue;
                             
                             $d = $this->models->VariationRelations->_get(array('id'=>
@@ -2008,7 +2051,7 @@ q($this->models->CharacteristicLabel->q(),1);
             
             $_SESSION['admin']['system']['import']['loaded']['characters']++;
         }
-        
+
         return $data;
     }
 
@@ -2122,7 +2165,6 @@ q($this->models->CharacteristicLabel->q(),1);
 
     private function storeVariationStateConnections($taxa, $mData, $mId)
     {
-
         $_SESSION['admin']['system']['import']['loaded']['connections'] = 0;
         
         foreach ((array) $taxa as $tVal) {

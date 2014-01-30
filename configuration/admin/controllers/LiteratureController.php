@@ -673,7 +673,6 @@ class LiteratureController extends Controller
 
 	private function deleteReference($id)
 	{
-q($id);
 		if (empty($id)) return false;
 
 		$this->models->LiteratureTaxon->delete(
