@@ -73,9 +73,9 @@ Please be aware that these are six other taxa than the three mentioned earlier -
 */
 
 
-include_once ('Controller.php');
+include_once ('ImportController.php');
 
-class ImportL2Controller extends Controller
+class ImportL2Controller extends ImportController
 {
     public $usedModels = array(
         'content_taxon', 
@@ -164,6 +164,8 @@ class ImportL2Controller extends Controller
 
 		set_time_limit(2400); // RIGHT!
 
+        $this->isAuthorisedForImport();
+
     }
 
 
@@ -182,8 +184,6 @@ class ImportL2Controller extends Controller
 
     public function l2StartAction ()
     {
-        $this->checkAuthorisation(true);
-
         if ($this->rHasVal('process', '1'))
             $this->redirect('l2_project.php');
         
@@ -299,8 +299,6 @@ class ImportL2Controller extends Controller
 
     public function l2ProjectAction ()
     {
-        $this->checkAuthorisation(true);
-        
         if (!empty($_SESSION['admin']['system']['import']['imagePath'])) {
             
             $errors = $this->lowercaseMediaFiles();
@@ -402,8 +400,6 @@ class ImportL2Controller extends Controller
 
     public function l2SpeciesAction ()
     {
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('l2_start.php');
         
@@ -528,8 +524,6 @@ class ImportL2Controller extends Controller
 
     public function l2SpeciesDataAction ()
     {
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
         
@@ -989,8 +983,6 @@ class ImportL2Controller extends Controller
     public function l2KeysAction ()
     {
 
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
         
@@ -1137,8 +1129,6 @@ class ImportL2Controller extends Controller
 
     public function l2MapAction ()
     {
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['file']['path']) || !isset($_SESSION['admin']['system']['import']['loaded']['species']))
             $this->redirect('l2_start.php');
         
@@ -1316,8 +1306,6 @@ class ImportL2Controller extends Controller
 
     public function goNewProject ()
     {
-        $this->checkAuthorisation(true);
-        
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
@@ -4678,81 +4666,6 @@ class ImportL2Controller extends Controller
 			$this->addMessage($this->storeError('Removed internal links.'));
 
     }
-
-
-    private function mimeContentType ($filename)
-    {
-        $mime_types = array(
-            
-            'txt' => 'text/plain', 
-            'htm' => 'text/html', 
-            'html' => 'text/html', 
-            'php' => 'text/html', 
-            'css' => 'text/css', 
-            'js' => 'application/javascript', 
-            'json' => 'application/json', 
-            'xml' => 'application/xml', 
-            'swf' => 'application/x-shockwave-flash', 
-            'flv' => 'video/x-flv', 
-            
-            // images
-            'png' => 'image/png', 
-            'jpe' => 'image/jpeg', 
-            'jpeg' => 'image/jpeg', 
-            'jpg' => 'image/jpeg', 
-            'gif' => 'image/gif', 
-            'bmp' => 'image/bmp', 
-            'ico' => 'image/vnd.microsoft.icon', 
-            'tiff' => 'image/tiff', 
-            'tif' => 'image/tiff', 
-            'svg' => 'image/svg+xml', 
-            'svgz' => 'image/svg+xml', 
-            
-            // archives
-            'zip' => 'application/zip', 
-            'rar' => 'application/x-rar-compressed', 
-            'exe' => 'application/x-msdownload', 
-            'msi' => 'application/x-msdownload', 
-            'cab' => 'application/vnd.ms-cab-compressed', 
-            
-            // audio/video
-            'mp3' => 'audio/mpeg', 
-            'qt' => 'video/quicktime', 
-            'mov' => 'video/quicktime', 
-            
-            // adobe
-            'pdf' => 'application/pdf', 
-            'psd' => 'image/vnd.adobe.photoshop', 
-            'ai' => 'application/postscript', 
-            'eps' => 'application/postscript', 
-            'ps' => 'application/postscript', 
-            
-            // ms office
-            'doc' => 'application/msword', 
-            'rtf' => 'application/rtf', 
-            'xls' => 'application/vnd.ms-excel', 
-            'ppt' => 'application/vnd.ms-powerpoint', 
-            
-            // open office
-            'odt' => 'application/vnd.oasis.opendocument.text', 
-            'ods' => 'application/vnd.oasis.opendocument.spreadsheet'
-        );
-        
-        $ext = strtolower(array_pop(explode('.', $filename)));
-        if (array_key_exists($ext, $mime_types)) {
-            return $mime_types[$ext];
-        }
-        elseif (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME);
-            $mimetype = finfo_file($finfo, $filename);
-            finfo_close($finfo);
-            return $mimetype;
-        }
-        else {
-            return 'application/octet-stream';
-        }
-    }
-
 
     private function renumberGeoDataTypeOrder ()
     {

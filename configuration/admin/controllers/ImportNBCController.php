@@ -15,8 +15,9 @@ include_once ('Controller.php');
 include_once ('ProjectDeleteController.php');
 include_once ('SpeciesController.php');
 include_once ('ProjectsController.php');
+include_once ('ImportController.php');
 
-class ImportNBCController extends Controller
+class ImportNBCController extends ImportController
 {
 
     private $_delimiter = ',';
@@ -118,6 +119,8 @@ class ImportNBCController extends Controller
         $this->setBreadcrumbRootName($this->translate($this->controllerPublicName));
         
         $this->setSuppressProjectInBreadcrumbs();
+		
+		$this->isAuthorisedForImport();
     }
 
 
@@ -139,8 +142,6 @@ class ImportNBCController extends Controller
      */
     public function indexAction ()
     {
-        $this->checkAuthorisation(true);
-        
         $this->setPageName($this->translate('Data import options'));
         
         $this->printPage();
@@ -149,8 +150,6 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie1Action ()
     {
-        $this->checkAuthorisation(true);
-        
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_determinatie_2.php');
 			
@@ -201,8 +200,6 @@ class ImportNBCController extends Controller
 
     public function nbcDeterminatie2Action ()
     {
-        $this->checkAuthorisation(true);
-
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
 
@@ -276,8 +273,6 @@ class ImportNBCController extends Controller
     public function nbcDeterminatie3Action ()
     {
 
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['data']))
             $this->redirect('nbc_determinatie_2.php');
         
@@ -326,17 +321,6 @@ class ImportNBCController extends Controller
 				));
 				
 				$this->addMessage('Added default language.');
-
-$this->addModuleToProject(MODCODE_SPECIES, $this->getNewProjectId(), 0);
-$this->grantModuleAccessRights(MODCODE_SPECIES, $this->getNewProjectId());
-
-$this->addModuleToProject(MODCODE_HIGHERTAXA, $this->getNewProjectId(), 0);
-$this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $this->getNewProjectId());
-
-$this->addModuleToProject(MODCODE_MATRIXKEY, $this->getNewProjectId(), 1);
-$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
-
-
 				
 			} 
 			// use an existing project
@@ -348,9 +332,20 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 				
 			}
 
+
+			$this->addModuleToProject(MODCODE_SPECIES, $pId, 0);
+			$this->grantModuleAccessRights(MODCODE_SPECIES, $pId);
+			
+			$this->addModuleToProject(MODCODE_HIGHERTAXA, $pId, 0);
+			$this->grantModuleAccessRights(MODCODE_HIGHERTAXA, $pId);
+			
+			$this->addModuleToProject(MODCODE_MATRIXKEY, $pId, 1);
+			$this->grantModuleAccessRights(MODCODE_MATRIXKEY, $pId);
+
             $this->addUserToProjectAsLeadExpert($pId);
 			
             $this->addMessage('Added current user as lead expert to project.');
+
 
 			if ($this->rHasVal('action')) {
 
@@ -414,8 +409,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
     public function nbcDeterminatie4Action ()
     {
 		
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['project']))
             $this->redirect('nbc_determinatie_3.php');
 
@@ -462,8 +455,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 
     public function nbcDeterminatie5Action ()
     {
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['species_data']))
             $this->redirect('nbc_determinatie_4.php');
         
@@ -633,8 +624,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
     public function nbcDeterminatie6Action ()
     {
 	
-        $this->checkAuthorisation(true);
-        
 		if ($this->rHasVal('action','download')) {
 			$this->doDownload();
 			die();
@@ -710,8 +699,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 
     public function nbcDeterminatie7Action ()
     {
-	
-        $this->checkAuthorisation(true);
         $this->unsetProjectSessionData();
         $this->setCurrentProjectId($this->getNewProjectId());
         $this->setCurrentProjectData();
@@ -753,8 +740,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 
 	public function nbcLabels1Action()
     {
-        $this->checkAuthorisation(true);
-        
         if ($this->rHasVal('process', '1'))
             $this->redirect('nbc_labels_2.php');
 
@@ -806,9 +791,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
 
     public function nbcLabels2Action()
     {
-
-        $this->checkAuthorisation(true);
-		
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('nbc_determinatie_1.php');
         
@@ -851,8 +833,6 @@ $this->grantModuleAccessRights(MODCODE_MATRIXKEY, $this->getNewProjectId());
     public function nbcLabels3Action()
     {
 		
-        $this->checkAuthorisation(true);
-        
         if (!isset($_SESSION['admin']['system']['import']['data']))
             $this->redirect('nbc_determinatie_2.php');
 

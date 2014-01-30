@@ -76,12 +76,29 @@ class ImportController extends Controller
      */
     public function indexAction ()
     {
-        $this->checkAuthorisation(true);
+        $this->isAuthorisedForImport();
         
         $this->setPageName($this->translate('Data import options'));
         
         $this->printPage();
     }
+	
+	public function isAuthorisedForImport()
+	{
+
+		$d = $this->models->ProjectRoleUser->_get(
+		array(
+			'id' => array(
+				'user_id' => $this->getCurrentUserId(),
+				'role_id' => ID_ROLE_LEAD_EXPERT
+			),
+			'columns' => 'count(*) as total'
+		));
+		
+		return $d[0]['total']>0;
+				
+	}
+
 
     protected function mimeContentType ($filename)
     {
