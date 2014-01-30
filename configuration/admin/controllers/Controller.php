@@ -800,7 +800,8 @@ class Controller extends BaseClass
             
             // check if there is an active project, otherwise redirect to choose project page
             if ($this->getCurrentProjectId() || $allowNoProjectId) {
-                
+				
+               
                 // check if the user is authorised for the combination of current page / current project
                 if ($this->isUserAuthorisedForProjectPage() || $this->isCurrentUserSysAdmin()) {
                     

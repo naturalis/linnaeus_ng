@@ -155,7 +155,7 @@ class ImportSDDController extends ImportController
 
     public function sddImport2Action ()
     {
-        $this->checkAuthorisation(true);
+        $this->checkAuthorisation();
 
         if (!isset($_SESSION['admin']['system']['import']['file']['path']))
             $this->redirect('sdd_import_1.php');
