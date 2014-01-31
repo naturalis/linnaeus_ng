@@ -125,6 +125,16 @@ function _(text) {
 
 }
 
+
+
+function getCurrentProjectId()
+{
+	return $('meta[name="lng-project-id"]').attr("content");	
+}
+
+
+
+
 function showMedia(url,name) {
 	$.prettyPhoto.open(url,'',name);
 }
@@ -237,26 +247,22 @@ function goForm(url) {
 
 }
 
-function goTaxon(id,cat) {
-	//!
-	addFormVal('id',id);
-	addFormVal('cat',cat ? cat : null);
-	goForm('../species/taxon.php');
-
+function goTaxon(id,cat)
+{
+	var u = '../species/taxon.php?id='+id+(cat ? '&cat='+cat : '');
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goHigherTaxon(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../highertaxa/taxon.php');
-
+function goHigherTaxon(id)
+{
+	var u = '../highertaxa/taxon.php?id='+id+(cat ? '&cat='+cat : '');
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goMenuModule(id) {
-	//!
-	addFormVal('modId',id);
-	goForm('../module/');
-
+function goMenuModule(id)
+{
+	var u = '../module/index.php?modId='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
 function goAlpha(letter,url) {
@@ -266,74 +272,64 @@ function goAlpha(letter,url) {
 
 }
 
-function goLiterature(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../literature/reference.php');
-
+function goLiterature(id)
+{
+	var u = '../literature/reference.php?id='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goGlossaryTerm(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../glossary/term.php');
-
+function goGlossaryTerm(id)
+{
+	var u = '../glossary/term.php?id='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goModuleTopic(id,modId) {
-	//!
-	if (modId) addFormVal('modId',modId);
-	addFormVal('id',id);
-	goForm('../module/topic.php');
-
+function goModuleTopic(id,modId)
+{
+	var u = '../module/topic.php?id='+id+(modId ? '&modId='+modId : '');
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goContent(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../linnaeus/');
-
+function goContent(id)
+{
+	var u = '../linnaeus/index.php?id='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goContentPage(subject) {
-	//!
-	addFormVal('sub',subject);
-	goForm('../linnaeus/content.php');
-
+function goContentPage(subject)
+{
+	var u = '../linnaeus/content.php?sub='+subject;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goMatrix(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../matrixkey/use_matrix.php');
-
+function goMatrix(id)
+{
+	var u = '../matrixkey/use_matrix.php?id='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
 function goMap(id,url) {
 	//!
 	if (id) addFormVal('id',id);
 	goForm(url ? url : '../mapkey/examine_species.php');
-
 }
 
-function goIntroductionTopic(id) {
-	//!
-	addFormVal('id',id);
-	goForm('../introduction/topic.php');
-
+function goIntroductionTopic(id)
+{
+	var u = '../introduction/topic.php?id='+id;
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goNavigator() {
-	//!
-	goForm('../linnaeus/index.php');
-
+function goNavigator()
+{
+	var u = '../linnaeus/index.php';
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
-function goIconGrid() {
-	//!
-	addFormVal('show','icongrid');
-	goForm('../linnaeus/index.php');
-
+function goIconGrid()
+{
+	var u = '../linnaeus/index.php?show=icongrid';
+	window.open(chkPIDInLink(u,'pid='+getCurrentProjectId()),'_self');
 }
 
 function goNavigate(id,field,url) {
@@ -494,7 +490,12 @@ function toggleHidden(id) {
 }
 
 function chkPIDInLink(h,p) {
-
+	
+	/*
+		h: url to check
+		p: paramter & value ("p=123") to check for
+	*/
+	
 	if (h && h.indexOf('javascript:')==-1) {
 
 		var url = $.url(h); // pass in a URI as a string and parse that 

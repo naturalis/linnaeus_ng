@@ -45,7 +45,7 @@
 
 		<div id="scores-taxa">
 			<div class="select-header">{t}Result of this combination of characters{/t}</div>
-			<select size="5" id="scores">
+			<select size="25" id="scores">
 			</select>
 		</div>
 	</div>

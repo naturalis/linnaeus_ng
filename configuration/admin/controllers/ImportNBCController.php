@@ -298,7 +298,8 @@ class ImportNBCController extends ImportController
 					'version' => '1', 
 					'sys_description' => 'Created by import from a NBC-export.', 
 					'css_url' => $this->controllerSettings['defaultProjectCss'],
-					'group' => $pGroup
+					'group' => $pGroup,
+					'published' => 1
 				));
 
 				$this->addMessage($this->storeError('Created project "' . $pTitle . '" with id ' . $pId . '.','Project'));
@@ -331,7 +332,6 @@ class ImportNBCController extends ImportController
 				$this->addMessage($this->storeError('Using project "' . $_SESSION['admin']['system']['import']['data']['project']['title'] . '" with id ' . $pId . '.','Project'));
 				
 			}
-
 
 			$this->addModuleToProject(MODCODE_SPECIES, $pId, 0);
 			$this->grantModuleAccessRights(MODCODE_SPECIES, $pId);
