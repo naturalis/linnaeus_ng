@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/NSRSearchController.php');
+require_once ('../../../../configuration/app/controllers/SearchControllerNSR.php');
 
-$c = new NSRSearchController();
+$c = new SearchControllerNSR();
 
 $c->searchPicturesAction();

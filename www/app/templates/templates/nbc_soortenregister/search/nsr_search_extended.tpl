@@ -8,23 +8,18 @@
 
 		<div>
 
-		<form method="post" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
+		<form method="get" action="" id="formSearchFacetsSpecies" name="formSearchFacetsSpecies">
 			<h2 class="search">Zoeken naar soorten</h2>
 			<fieldset class="block">
 				<div class="formrow">
-					<label accesskey="g" for="taxon">Soortnaam</label>
-					<input type="text" size="60" class="field" id="taxon" name="taxon" autocomplete="off" value="{$search.taxon}" >
-					<div id="taxon_auto_complete" class="auto_complete" style="display: none;"></div>
+					<label accesskey="g" for="search">Soortgroep</label>
+					<input type="text" size="60" class="field" id="name" name="name" autocomplete="off" value="{$search.name}">
+					<div id="name_auto_complete" class="auto_complete" style="display: none;"></div>
 				</div>
 				<div class="formrow">
-					<label accesskey="g" for="higherTaxon">Soortgroep</label>
-					<input type="text" size="60" class="field" id="higherTaxon" name="higherTaxon" autocomplete="off" value="{$search.higherTaxon}">
-					<div id="higherTaxon_auto_complete" class="auto_complete" style="display: none;"></div>
-				</div>
-				<div class="formrow">
-					<label accesskey="g" for="authorName">Auteur</label>
-					<input type="text" size="60" class="field" id="authorName" name="authorName" autocomplete="off" value="{$search.authorName}">
-					<div id="authorName_auto_complete" class="auto_complete" style="display: none;"></div>
+					<label accesskey="g" for="author">Auteur</label>
+					<input type="text" size="60" class="field" id="author" name="author" autocomplete="off" value="{$search.author}">
+					<div id="author_auto_complete" class="auto_complete" style="display: none;"></div>
 				</div>
 			</fieldset>
 
@@ -41,8 +36,8 @@
 					<ul id="presenceStatusList">
 					{foreach from=$presence_statuses item=v}
 						<li>
-							<input type="checkbox" class="list" id="presenceStatus{$v.id}" name="presenceStatus[{$v.id}]" settled="{$v.settled_species}" {if $search.presenceStatus[$v.id]=='on'} checked="checked"{/if}>
-							<label for="presenceStatus{$v.id}">
+							<input type="checkbox" class="list" id="presence{$v.id}" name="presence[{$v.id}]" settled="{$v.settled_species}" {if $search.presence[$v.id]=='on'} checked="checked"{/if}>
+							<label for="presence{$v.id}">
 								<div class="presenceStatusCode">{$v.index_label}</div>
 								<div class="presenceStatusDescription">{$v.information_short}</div>
 							</label>
@@ -65,12 +60,12 @@
 							<br /><i>nog niet geïmplementeerd, in afwachting externe koppeling:</i>
 
 							<li>
-								<input disabled="disabled" type="checkbox" class="list" id="externalDistribution" name="externalDistribution"{if $search.externalDistribution=='on'} checked="checked"{/if}>
-								<label for="externalDistribution">met verspreidingskaart</label>
+								<input disabled="disabled" type="checkbox" class="list" id="distribution" name="distribution"{if $search.distribution=='on'} checked="checked"{/if}>
+								<label for="distribution">met verspreidingskaart</label>
 							</li>
 							<li>
-								<input disabled="disabled" type="checkbox" class="list" id="externalTrendChart" name="externalTrendChart"{if $search.externalTrendChart=='on'} checked="checked"{/if}>
-								<label for="externalTrendChart">met trendgrafiek</label>
+								<input disabled="disabled" type="checkbox" class="list" id="trend" name="trend"{if $search.trend=='on'} checked="checked"{/if}>
+								<label for="trend">met trendgrafiek</label>
 							</li>
 						</ul>
 					</div>
@@ -81,13 +76,12 @@
 						</label>
 						<ul id="speciesOptionList">
 							<li>
-								<input type="checkbox" class="list" id="hasBarcodes" name="hasBarcodes" {if $search.hasBarcodes=='on'} checked="checked"{/if}>
-								<label for="hasBarcodes">met exemplaren verzameld</label>
+								<input type="checkbox" class="list" id="dna" name="dna" {if $search.dna=='on'} checked="checked"{/if}>
+								<label for="dna">met exemplaren verzameld</label>
 							</li>
-							<br /><i>nog niet geïmplementeerd, onduidelijk wat precies relatie met optie hierboven:</i>
 							<li>
-								<input disabled type="checkbox" class="list" id="hasNoBarcodes" name="hasNoBarcodes" {if $search.hasNoBarcodes=='on'} checked="checked"{/if}>
-								<label for="hasNoBarcodes">nog te verzamelen</label>
+								<input disabled type="checkbox" class="list" id="dna_insuff" name="dna_insuff" {if $search.dna_insuff=='on'} checked="checked"{/if}>
+								<label for="dna_insuff">nog te verzamelen</label>
 							</li>
 						</ul>
 					</div>
@@ -96,8 +90,9 @@
 				<div class="formrow">
 					<label accesskey="g" for="">Resultaten sorteren op</label>
 					<select name="sort">
-						<option selected="selected" value="validName">Wetenschappelijk naam</option>
-						<option value="preferredNameNl">Nederlandse naam</option>
+						<option selected="selected" value="match">Match percentage</option>
+						<option value="name-valid">Wetenschappelijk naam</option>
+						<option value="name-pref-nl">Nederlandse naam</option>
 					</select>
 				</div>
 
