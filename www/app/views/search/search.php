@@ -1,7 +1,7 @@
 <?php
 
-require_once ('../../../../configuration/app/controllers/SearchController.php');
+require_once ('../../../../configuration/app/controllers/SearchControllerGeneral.php');
 
-$c = new SearchController();
+$c = new SearchControllerGeneral();
 
 $c->searchAction();

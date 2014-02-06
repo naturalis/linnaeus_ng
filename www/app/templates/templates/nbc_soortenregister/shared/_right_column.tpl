@@ -3,9 +3,10 @@
         <div id="quicksearch">
             <h2>{t}Zoek op naam{/t}</h2>
             
-            <form id="inlineformsearch" name="inlineformsearch" action="../search/search.php" method="post">
+            <form id="inlineformsearch" name="inlineformsearch" action="../search/nsr_search.php" method="get">
                 <input id="inlineformsearchInput" type="text" name="search" class="searchString" title="{t}Zoek op naam{/t}" value="" />
                 <input id="inlineformsearchButton" type="submit" value="{t}zoek{/t}" class="zoekknop" />
+
 				<p>
 					<a href="../search/nsr_search_extended.php"><b>Uitgebreid zoeken ></b></a>
 				</p>
