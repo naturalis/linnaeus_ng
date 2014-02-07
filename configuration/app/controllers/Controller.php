@@ -126,8 +126,8 @@
 */
 
 include_once (dirname(__FILE__) . "/../BaseClass.php");
-
 include_once (dirname(__FILE__) . "/../../../smarty/Smarty.class.php");
+
 class Controller extends BaseClass
 {
 
@@ -307,25 +307,24 @@ class Controller extends BaseClass
     public function checkForProjectId ()
     {
         $pB = $this->getCurrentProjectId();
-		
-        if ($this->rHasVal('p')) {
 
+        if ($this->rHasVal('p')) {
             $this->resolveProjectId();
         }
         elseif ($this->rHasVal($this->generalSettings['addedProjectIDParam'])) {
-            
+
             $this->requestData['p'] = $this->requestData[$this->generalSettings['addedProjectIDParam']];
-            
+
             $this->resolveProjectId();
         }
         $d = $this->getCurrentProjectId();
-        
+
         if ($d == null)
             $this->redirect($this->generalSettings['urlNoProjectId']);
-        
+
 		if ($pB != $d)
 			unset($_SESSION['app']['user']);
-        
+
         $this->setCurrentProjectData();
         $this->setUrls();
         $this->setProjectLanguages();
@@ -535,30 +534,48 @@ class Controller extends BaseClass
         if (empty($id) || $id==0)
             return;
         
-		$t = $this->models->Taxon->_get(array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'id' => $id
-			), 
-			'columns' => 'id,taxon,author,parent_id,rank_id,taxon_order,is_hybrid,list_level,is_empty'
-		));
-		
-		if (is_null($t))
-			return;
+		$t=$this->models->Taxon->freeQuery("
+			select
+				_a.id,
+				_a.taxon,
+				_a.author,
+				_a.parent_id,
+				_a.rank_id,
+				_a.taxon_order,
+				_a.is_hybrid,
+				_a.list_level,
+				_a.is_empty,
+				_b.lower_taxon,
+				_c.commonname
+			from %PRE%taxa _a
 
-		$t[0]['label'] = $this->formatTaxon($t[0]);
-		
-		$pr = $this->models->ProjectRank->_get(
-		array(
-			'id' => array(
-				'project_id' => $this->getCurrentProjectId(), 
-				'id' => $t[0]['rank_id']
-			)
-		));
-		
-		$t[0]['lower_taxon'] = $pr[0]['lower_taxon'];
+			left join %PRE%projects_ranks _b
+				on _a.project_id=_b.project_id
+				and _a.rank_id=_b.id
 
-        return $t[0];
+			left join %PRE%commonnames _c
+				on _a.project_id=_c.project_id
+				and _c.id=
+					(select 
+						id 
+					from
+						%PRE%commonnames
+					where
+						project_id = ".$this->getCurrentProjectId()." 
+						and taxon_id=".$id." 
+						and language_id = ". $this->getCurrentLanguageId() ."
+						limit 1
+					)
+			where 
+				_a.id=".$id."
+				and _a.project_id=".$this->getCurrentProjectId()
+		);
+		
+		$taxon=$t[0];
+		
+		$taxon['label'] = $this->formatTaxon($taxon);
+
+        return $taxon;
     }
 
 	public function printGenericError($message=null)
@@ -2064,12 +2081,11 @@ class Controller extends BaseClass
     }
 
 
-
-    public function doesProjectHaveModule ($mpCode)
+    public function doesCurrentProjectHaveModule ($mpCode)
     {
-        return isset($_SESSION['app']['project']['active-modules'][$mpCode]);
+		$d=$this->models->ModuleProject->_get(array('id'=>array('project_id' => $this->getCurrentProjectId(),'active' => 'y','module_id'=>$mpCode)));
+		return isset($d[0]) ? true : false;
     }
-
 
 
     private function setPhpIniVars ()

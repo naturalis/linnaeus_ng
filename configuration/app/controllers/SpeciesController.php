@@ -313,11 +313,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
             $this->smarty->assign('activeCategory', $activeCategory);
 
             $this->smarty->assign('categorySysList', $categories['categorySysList']);
-            
-            $this->smarty->assign('headerTitles', 
-            array(
-                'title' => $taxon['label']
-            ));
+            $this->smarty->assign('headerTitles', array('title' => $taxon['label'].(isset($taxon['commonname']) ? ' ('.$taxon['commonname'].')' : '')));
             
             //$this->setLastViewedTaxonIdForTheBenefitOfTheMapkey($taxon['id']);
         }
@@ -733,12 +729,14 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 				'tabname' => 'CTAB_NAMES'
             );
 
+			/*
             $stdCats[] = array(
                 'id' => CTAB_NOMENCLATURE, 
                 'title' => $this->translate('Nomenclature'), 
                 'is_empty' => false,
 				'tabname' => 'CTAB_NOMENCLATURE'
             );
+			*/
             
             $d = array();
             
@@ -773,6 +771,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 				'tabname' => 'CTAB_CLASSIFICATION'
             );
             
+			/*
             if ($this->getTaxonType() == 'higher')
 			{
             
@@ -786,8 +785,9 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 	            );
 	            
             }
+			*/
             
-             if ($this->doesProjectHaveModule(MODCODE_LITERATURE))
+             if ($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE))
 			 {
                 
                 $l = $this->getTaxonLiterature($taxon);
@@ -1010,7 +1010,12 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
                 break;
             
             case CTAB_CLASSIFICATION:
-                $content=$this->getTaxonClassification($taxon);
+                //$content=$this->getTaxonClassification($taxon);
+                $content=
+					array(
+						'classification'=>$this->getTaxonClassification($taxon),
+						'taxonlist'=>$this->getTaxonNextLevel($taxon)
+					);
                 break;
             
             case CTAB_TAXON_LIST:

@@ -1,17 +1,9 @@
 function keyDoChoice(id) {
-
-	addFormVal('choice',id);
-	addFormVal('step',null);
-	goForm('../key/');
-
+	window.open('../key/index.php?choice='+id+'&step=','_self');
 }
 
 function keyDoStep(id) {
-
-	addFormVal('choice',null);
-	addFormVal('step',id);
-	goForm('../key/');
-
+	window.open('../key/index.php?choice=&step='+id,'_self');
 }
 
 var keyFullPathVisibility = false;

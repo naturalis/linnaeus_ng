@@ -33,6 +33,8 @@ class IndexController extends Controller
         parent::__construct($p);
         
         $this->setIndexTabs();
+		$this->smarty->assign('hasNameTypes', $_SESSION['app'][$this->spid()]['indexModule']);
+		
     }
 
 
@@ -435,16 +437,24 @@ class IndexController extends Controller
 
 
 
-    private function setIndexTabs ()
+    private function setIndexTabs()
     {
+		
         // Check if results have been stored in session; if so return
-        if (
-			isset($_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']) &&
+        if (isset($_SESSION['app'][$this->spid()]['indexModule']['hasSpecies']) &&
 			isset($_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa']) &&
-			isset($_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'])
-			)
-            return;
+			isset($_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames']))
+		return;
 
+		/*
+			usually, taxa that have is_empty==1 (indicating they have no user-generated
+			content) are ignored.
+			however, if the HT-module has been explicitly activated, we *do* include
+			"empty" taxa in the index, so the HT-entries index can link to the HT-module.
+			this can be useful as taxa are never truely empty: the classification-tab
+			is always generated, automatically, based on the taxonomy.
+		
+		*/
 		$t = $this->models->Taxon->freeQuery(
 			array(
 				'query'=>
@@ -454,20 +464,20 @@ class IndexController extends Controller
 						on _a.rank_id = _c.id
 						and _a.project_id = _c.project_id 
 					where _a.project_id = " . $this->getCurrentProjectId() . "
-					and _a.is_empty = 0
+					".(!$this->doesCurrentProjectHaveModule(MODCODE_HIGHERTAXA) ? "and _a.is_empty = 0" : "" )."
 					group by _c.lower_taxon",
 				'fieldAsIndex'=>'lower_taxon'
 			)
 		);
-					
+
         $c = $this->models->Commonname->_get(array(
             'where' => 'project_id = ' . $this->getCurrentProjectId(), 
             'columns' => 'count(1)>0 as has_values'
         ));
 		
-		$_SESSION['app'][$this->spid()]['indexModule']['hasSpecies'] = $t[1]['has_values'];
-		$_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa'] = $t[0]['has_values'];
-        $_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'] = $c[0]['has_values'];
+		$_SESSION['app'][$this->spid()]['indexModule']['hasSpecies'] = isset($t[1]['has_values']) ? $t[1]['has_values'] : 0;
+		$_SESSION['app'][$this->spid()]['indexModule']['hasHigherTaxa'] = isset($t[0]['has_values']) ? $t[0]['has_values'] : 0;
+        $_SESSION['app'][$this->spid()]['indexModule']['hasCommonNames'] = isset($c[0]['has_values']) ? $c[0]['has_values'] : 0;
 
     }
 

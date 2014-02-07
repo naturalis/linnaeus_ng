@@ -28,39 +28,7 @@ class SearchController extends Controller
 	const C_SPECIES_MEDIA=105;
 
     public $usedModels = array(
-		'content',
-        'content_taxon', 
-        'page_taxon', 
-        'page_taxon_title', 
-        'media_taxon',
-        'media_descriptions_taxon',
-		'synonym',
-		'commonname',
-		'literature',
-		'content_free_module',
-		'choice_content_keystep',
-		'content_keystep',
-		'choice_keystep',
-		'keystep',
-		'literature',
-		'glossary',
-		'glossary_media',
-		'glossary_synonym',
-		'matrix',
-		'matrix_name',
-		'matrix_taxon_state',
-		'characteristic',
-		'characteristic_label',
-		'characteristic_label_state',
-		'characteristic_matrix',
-		'characteristic_label_state',
-		'characteristic_state',
-		'geodata_type_title',
-		'occurrence_taxon',
-		'content_introduction',
-		'name_types',
-		'presence',
-		'page_taxon_title'
+
     );
 
     public function __construct ()

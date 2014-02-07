@@ -154,10 +154,12 @@ function goState() {
 
 	switch (state.type) {
 		case 'text':
+
 			var val = state.text;
 			var c = getCharacter(state.characteristic_id);
 			if (val) title = c.label;
 			break;
+
 		case 'media':
 
 			if (state.img_dimensions==null) break;
