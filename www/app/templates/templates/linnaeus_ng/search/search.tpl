@@ -55,6 +55,7 @@
 
 
 <form id="theForm" method="post" action="" onsubmit="return searchDoSearchForm()" >
+<input type="hidden" name="extended" value="1" />
 
 	<div class="page-generic-div">
 		<p>
@@ -93,9 +94,6 @@
 {/if}   
 
 </div>
-
-
-
 </div>
 
 {include file="../shared/footer.tpl"}

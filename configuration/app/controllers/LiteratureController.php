@@ -141,6 +141,59 @@ class LiteratureController extends Controller
 
     }
 
+
+    public function contentsAction()
+    {
+    
+		$alpha = $this->getLiteratureAlphabet();
+
+		if (!$this->rHasVal('letter') && isset($_SESSION['admin']['system']['literature']['activeLetter']))
+			$this->requestData['letter'] = $_SESSION['admin']['system']['literature']['activeLetter'];
+
+		if (!$this->rHasVal('letter'))
+			$this->requestData['letter'] = $alpha[0];
+
+
+		if ($this->rHasVal('letter')) {
+
+			$refs = $this->getReferences(array('author_first like' => $this->requestData['letter'].'%'),'author_first,author_second,year');
+
+		}
+
+        // user requested a sort of the table
+        if ($this->rHasVal('key')) {
+
+            $sortBy = array(
+                'key' => $this->requestData['key'], 
+                'dir' => ($this->requestData['dir'] == 'asc' ? 'desc' : 'asc'), 
+                'case' => 'i'
+            );
+        
+			$this->customSortArray($refs, $sortBy);
+
+        } else {
+
+            $sortBy = array(
+                'key' => 'author_first', 
+                'dir' => 'asc', 
+                'case' => 'i'
+            );
+	
+		}
+        
+		$this->smarty->assign('sortBy', $sortBy);
+
+		$this->smarty->assign('alpha', $alpha);
+
+		if ($this->rHasVal('letter')) $this->smarty->assign('letter', $this->requestData['letter']);
+
+		if (isset($refs)) $this->smarty->assign('refs',$refs);
+
+        $this->printPage();
+
+	}
+
+
     public function ajaxInterfaceAction ()
     {
 
@@ -157,7 +210,8 @@ class LiteratureController extends Controller
         $this->printPage();
     
     }
-	
+
+
 	private function getLiteratureAlphabet($forceLookup=false)
 	{
 

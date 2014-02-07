@@ -89,14 +89,14 @@ class LoaderController extends Controller
 
 		$execStart = microtime(true);
 
-		if($this->doesProjectHaveModule(MODCODE_GLOSSARY)) $this->preloadGlossary();
-		if($this->doesProjectHaveModule(MODCODE_INDEX)) $this->preloadIndex();
-		if($this->doesProjectHaveModule(MODCODE_INTRODUCTION)) $this->preloadIntroduction();
-		if($this->doesProjectHaveModule(MODCODE_KEY)) $this->preloadKey();
-		if($this->doesProjectHaveModule(MODCODE_LITERATURE)) $this->preloadLiterature();
-		if($this->doesProjectHaveModule(MODCODE_DISTRIBUTION)) $this->preloadMap();
-		if($this->doesProjectHaveModule(MODCODE_MATRIXKEY)) $this->preloadMatrix();
-		if($this->doesProjectHaveModule(MODCODE_SPECIES)||$this->doesProjectHaveModule(MODCODE_HIGHERTAXA)) $this->preloadSpecies();
+		if($this->doesCurrentProjectHaveModule(MODCODE_GLOSSARY)) $this->preloadGlossary();
+		if($this->doesCurrentProjectHaveModule(MODCODE_INDEX)) $this->preloadIndex();
+		if($this->doesCurrentProjectHaveModule(MODCODE_INTRODUCTION)) $this->preloadIntroduction();
+		if($this->doesCurrentProjectHaveModule(MODCODE_KEY)) $this->preloadKey();
+		if($this->doesCurrentProjectHaveModule(MODCODE_LITERATURE)) $this->preloadLiterature();
+		if($this->doesCurrentProjectHaveModule(MODCODE_DISTRIBUTION)) $this->preloadMap();
+		if($this->doesCurrentProjectHaveModule(MODCODE_MATRIXKEY)) $this->preloadMatrix();
+		if($this->doesCurrentProjectHaveModule(MODCODE_SPECIES)||$this->doesCurrentProjectHaveModule(MODCODE_HIGHERTAXA)) $this->preloadSpecies();
 
 		$this->preloadLinnaeus();
 		$this->preloadSearch();

@@ -154,6 +154,38 @@ class GlossaryController extends Controller
     
     }
 
+
+    public function contentsAction()
+    {
+
+		$alpha = $this->getGlossaryAlphabet();
+
+		if (!$this->rHasVal('letter') || !in_array($this->requestData['letter'],(array)$alpha))
+			$letter = isset($alpha[0]) ? $alpha[0] : '-';
+		else
+			$letter = $this->requestData['letter'];
+				
+		if (!empty($letter)) {
+
+			$gloss = $this->getGlossaryTerms(
+				array(
+					'term like' => $letter.'%',
+					'language_id' => $this->getCurrentLanguageId()
+				),
+				'term');
+				
+			$this->smarty->assign('letter', $letter);
+			$this->smarty->assign('gloss',$gloss);
+
+		}
+	
+		$this->smarty->assign('alpha', $alpha);
+		$this->printPage();
+
+	}
+
+
+
     /**
      * AJAX interface for this class
      *
