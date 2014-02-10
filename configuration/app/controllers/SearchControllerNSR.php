@@ -61,8 +61,10 @@ class SearchControllerNSR extends SearchController
 			$this->smarty->assign('results',$results);	
 
 		}
+		
+		$searchType=isset($this->requestData['type']) ? $this->requestData['type'] : null;
 
-		$this->smarty->assign('type',$this->requestData['type']);
+		$this->smarty->assign('type',$searchType);
 		$this->smarty->assign('search',$search);
 
         $this->printPage();
