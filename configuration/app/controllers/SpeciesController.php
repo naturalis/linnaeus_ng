@@ -226,7 +226,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
             if (isset($taxon)) {
                 
                 $this->smarty->assign('overviewImage', $this->getTaxonOverviewImage($taxon['id']));
-                
+
                 $this->smarty->assign('taxon',$taxon);
 
 				/*
@@ -296,7 +296,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 					$content = $this->matchHotwords($content);
 				}
 				
-
+//q($content,1);
             
                 $this->smarty->assign('content', $content);
 
@@ -1405,7 +1405,7 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
                 'project_id' => $this->getCurrentProjectId()
             )
         ));
-        
+
         if ($mt) {
 			
             $mdt = $this->models->MediaDescriptionsTaxon->_get(
