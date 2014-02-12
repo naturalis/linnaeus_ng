@@ -39,4 +39,5 @@
   margin: 0 0.5em; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000349}}
 .module-literature #content {
-  margin-top: 20px; }
+  margin-top: 30px;
+  padding-top: 30px; }
