@@ -13,7 +13,7 @@
   text-transform: uppercase;
   margin: 0 0.5em; }
 @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000324}}
-.module-glossary #content {
+.module-glossary #definition {
   margin-top: 30px;
   padding-top: 30px; }
 
