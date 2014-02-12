@@ -1,11 +1,5 @@
 {include file="_search-main-no-tabs.tpl"}
 
-<div id="header-titles">
-	<span id="header-title">
-		{t}Literature:{/t}<span class="alphabet-letter-title">{$letter}</span>
-	</span>
-</div>
-
 <div id="page-main" class="template-reference">
 
 	{include file="_alphabet.tpl"}
