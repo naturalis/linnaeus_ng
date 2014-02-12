@@ -1,8 +1,19 @@
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000034}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000035}}
 .module-glossary #definition {
   margin-bottom: 0; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000039}}
+.module-glossary #alphabet {
+  width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000313}}
+.module-glossary #content {
+  -moz-columns: 3 100px;
+  columns: 3 100px; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000318}}
+.module-glossary .alphabet-letter-title {
+  text-transform: uppercase;
+  margin: 0 0.5em; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\000038}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000326}}
 .media-caption {
   margin-bottom: 2em;
   font-family: Arial, sans-serif;
