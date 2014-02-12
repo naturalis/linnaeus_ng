@@ -5,49 +5,50 @@
 	{include file="_alphabet.tpl"}
 
 
-	<div id="reference">
-		<div id="text">{$ref.text}</div>
-			
-		{if $ref.taxa}
-			<div id="taxa">
+	<div id="content">
+
+		<div id="reference">
+			<div id="text">{$ref.text}</div>
 				
-				<div class="title">
-					{t}Referenced in the following taxa:{/t}
-				</div>
+			{if $ref.taxa}
+				<div id="taxa">
 					
-				{foreach from=$ref.taxa key=k item=v}
-					<div>
-						{if $useJavascriptLinks}
-							<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.label}</span>
-						{else}
-							<a href="../species/taxon.php?id={$v.taxon.id}">{$v.taxon.label}</a>
-						{/if}
+					<div class="title">
+						{t}Referenced in the following taxa:{/t}
 					</div>
-				{/foreach}
-			</div>
-			
-		{/if}
-
-		{if $ref.synonyms}
-			<div id="synonyms">
-				
-				<div class="title">
-					{t}Referenced in the following synonyms:{/t}
+						
+					{foreach from=$ref.taxa key=k item=v}
+						<div>
+							{if $useJavascriptLinks}
+								<span class="a" onclick="goTaxon({$v.taxon.id})">{$v.taxon.label}</span>
+							{else}
+								<a href="../species/taxon.php?id={$v.taxon.id}">{$v.taxon.label}</a>
+							{/if}
+						</div>
+					{/foreach}
 				</div>
+				
+			{/if}
 
-				{foreach from=$ref.synonyms key=k item=v}
-					<div>
-						{if $useJavascriptLinks}			
-							<span class="a" onclick="goTaxon({$v.taxon_id},'names')">{$v.synonym}</span>			
-						{else}
-							<a href="../species/taxon.php?id={$v.taxon_id}&cat=names">{$v.synonym}</a>
-						{/if}
+			{if $ref.synonyms}
+				<div id="synonyms">
+					
+					<div class="title">
+						{t}Referenced in the following synonyms:{/t}
 					</div>
 
-				{/foreach}
-			</div>
-		{/if}
+					{foreach from=$ref.synonyms key=k item=v}
+						<div>
+							{if $useJavascriptLinks}			
+								<span class="a" onclick="goTaxon({$v.taxon_id},'names')">{$v.synonym}</span>			
+							{else}
+								<a href="../species/taxon.php?id={$v.taxon_id}&cat=names">{$v.synonym}</a>
+							{/if}
+						</div>
 
-
+					{/foreach}
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
