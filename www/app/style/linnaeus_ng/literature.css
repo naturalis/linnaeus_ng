@@ -1,37 +1,39 @@
-#references {
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\000034}}
+#references #th-author {
+  width: 250px; }
 
-#references #th-author{
-	width:250px;
-}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\000038}}
+#references #th-year {
+  width: 150px; }
 
-#references #th-year{
-	width:150px;
-}
-
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000312}}
 #references td {
-	overflow:hidden;
-}
+  overflow: hidden; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000316}}
 #reference {
-	text-align:justify;
-	padding-bottom:5px;
-	margin-bottom:5px;
-	overflow:auto;
-}
+  text-align: justify;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  overflow: auto; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000323}}
 #reference #author #name {
-	font-weight:bold;
-}
+  font-weight: bold; }
 
-#reference #author #year {
-}
-
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000330}}
 #reference #text {
-	width: 450px;
-}
+  width: 450px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000334}}
 #reference .title {
-	margin-top:10px;
-	font-weight:bold;	
-}
+  margin-top: 10px;
+  font-weight: bold; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000340}}
+.module-literature #alphabet {
+  width: 100%; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/literature\.scss}line{font-family:\0000344}}
+.module-literature .alphabet-letter-title {
+  text-transform: uppercase;
+  margin: 0 0.5em; }

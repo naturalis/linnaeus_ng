@@ -1,7 +1,5 @@
 <div id="alphabet">
-	{assign var=foo value=$alpha|@count}
-	
-	
+	{assign var=foo value=$alpha|@count}	
 	
 	{foreach from=$alpha key=k item=v}
 		{if $letter==$v}

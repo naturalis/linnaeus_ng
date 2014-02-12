@@ -6,15 +6,16 @@
 		margin-bottom: 0;
 	} 
 
-	#alphabet{
-		width: 100%;
-	}
 
 	#content {
     	-moz-columns: 3 100px;
     	columns: 3 100px;
 	}
 
+	#alphabet{
+		width: 100%;
+	}
+	
 	.alphabet-letter-title{
 		text-transform: uppercase;
 		margin: 0 0.5em;
