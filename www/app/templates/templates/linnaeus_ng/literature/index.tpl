@@ -14,11 +14,11 @@
 				{/if}
 			{/if}
 		{/foreach}
-		
+
 	</div>
 {/if}
 
-<div id="page-main">
+<div id="page-main" class="template-index">
 
 	{if !$refs}
 		{t}No literature has been defined.{/t}
