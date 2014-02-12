@@ -3,28 +3,21 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 12, 2014 at 10:21 AM
+-- Generation Time: Jun 14, 2013 at 02:26 PM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.3.13
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 --
--- Database: `nsr_import`
+-- Database: `linnaeus_ng`
 --
 
 DELIMITER $$
 --
 -- Functions
 --
-DROP FUNCTION IF EXISTS `fnStripTags`$$
 CREATE DEFINER=`root`@`localhost` FUNCTION `fnStripTags`( Dirty varchar(4000) ) RETURNS varchar(4000) CHARSET utf8
     DETERMINISTIC
 BEGIN
@@ -43,58 +36,7 @@ BEGIN
   RETURN Dirty;
 END$$
 
-DROP FUNCTION IF EXISTS `SPLIT_STR`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR`(
-  x VARCHAR(255),
-  delim VARCHAR(12),
-  pos INT
-) RETURNS varchar(255) CHARSET utf8
-RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
-       LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
-       delim, '')$$
-
 DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `lng_nsr_actors`
---
-
-DROP TABLE IF EXISTS `actors`;
-CREATE TABLE IF NOT EXISTS `actors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `name_alt` varchar(255) DEFAULT NULL,
-  `homepage` varchar(255) DEFAULT NULL,
-  `gender` enum('m','f') DEFAULT NULL,
-  `is_company` tinyint(1) DEFAULT '0',
-  `employee_of_id` int(11) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4587 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `actors_addresses`
---
-
-DROP TABLE IF EXISTS `actors_addresses`;
-CREATE TABLE IF NOT EXISTS `actors_addresses` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `actor_id` int(11) NOT NULL,
-  `address_label` varchar(255) NOT NULL,
-  `address` varchar(2000) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -102,7 +44,6 @@ CREATE TABLE IF NOT EXISTS `actors_addresses` (
 -- Table structure for table `characteristics`
 --
 
-DROP TABLE IF EXISTS `characteristics`;
 CREATE TABLE IF NOT EXISTS `characteristics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -112,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `characteristics` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -120,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `characteristics` (
 -- Table structure for table `characteristics_chargroups`
 --
 
-DROP TABLE IF EXISTS `characteristics_chargroups`;
 CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -130,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -138,7 +78,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_chargroups` (
 -- Table structure for table `characteristics_labels`
 --
 
-DROP TABLE IF EXISTS `characteristics_labels`;
 CREATE TABLE IF NOT EXISTS `characteristics_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -149,8 +88,8 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`characteristic_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id` (`project_id`,`characteristic_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -158,7 +97,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels` (
 -- Table structure for table `characteristics_labels_states`
 --
 
-DROP TABLE IF EXISTS `characteristics_labels_states`;
 CREATE TABLE IF NOT EXISTS `characteristics_labels_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -170,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels_states` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`state_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -178,7 +116,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_labels_states` (
 -- Table structure for table `characteristics_matrices`
 --
 
-DROP TABLE IF EXISTS `characteristics_matrices`;
 CREATE TABLE IF NOT EXISTS `characteristics_matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -189,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_matrices` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`matrix_id`,`characteristic_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -197,7 +134,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_matrices` (
 -- Table structure for table `characteristics_states`
 --
 
-DROP TABLE IF EXISTS `characteristics_states`;
 CREATE TABLE IF NOT EXISTS `characteristics_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -214,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `characteristics_states` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`characteristic_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -222,7 +158,6 @@ CREATE TABLE IF NOT EXISTS `characteristics_states` (
 -- Table structure for table `chargroups`
 --
 
-DROP TABLE IF EXISTS `chargroups`;
 CREATE TABLE IF NOT EXISTS `chargroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -232,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `chargroups` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -240,7 +175,6 @@ CREATE TABLE IF NOT EXISTS `chargroups` (
 -- Table structure for table `chargroups_labels`
 --
 
-DROP TABLE IF EXISTS `chargroups_labels`;
 CREATE TABLE IF NOT EXISTS `chargroups_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -250,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `chargroups_labels` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -258,7 +192,6 @@ CREATE TABLE IF NOT EXISTS `chargroups_labels` (
 -- Table structure for table `choices_content_keysteps`
 --
 
-DROP TABLE IF EXISTS `choices_content_keysteps`;
 CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -268,9 +201,8 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`choice_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`choice_txt`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id` (`project_id`,`choice_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -278,7 +210,6 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps` (
 -- Table structure for table `choices_content_keysteps_undo`
 --
 
-DROP TABLE IF EXISTS `choices_content_keysteps_undo`;
 CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `choice_content_id` int(11) NOT NULL,
@@ -292,7 +223,7 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `choice_content_id` (`choice_content_id`,`project_id`,`choice_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -300,7 +231,6 @@ CREATE TABLE IF NOT EXISTS `choices_content_keysteps_undo` (
 -- Table structure for table `choices_keysteps`
 --
 
-DROP TABLE IF EXISTS `choices_keysteps`;
 CREATE TABLE IF NOT EXISTS `choices_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -316,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `choices_keysteps` (
   KEY `project_id` (`project_id`,`keystep_id`),
   KEY `project_id_2` (`project_id`,`res_taxon_id`),
   KEY `project_id_3` (`project_id`,`res_keystep_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -324,7 +254,6 @@ CREATE TABLE IF NOT EXISTS `choices_keysteps` (
 -- Table structure for table `commonnames`
 --
 
-DROP TABLE IF EXISTS `commonnames`;
 CREATE TABLE IF NOT EXISTS `commonnames` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -339,9 +268,8 @@ CREATE TABLE IF NOT EXISTS `commonnames` (
   KEY `project_id` (`project_id`,`taxon_id`),
   KEY `taxon_id` (`taxon_id`),
   KEY `project_id_2` (`project_id`,`taxon_id`,`language_id`),
-  KEY `project_id_3` (`project_id`,`taxon_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`commonname`,`transliteration`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id_3` (`project_id`,`taxon_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -349,7 +277,6 @@ CREATE TABLE IF NOT EXISTS `commonnames` (
 -- Table structure for table `content`
 --
 
-DROP TABLE IF EXISTS `content`;
 CREATE TABLE IF NOT EXISTS `content` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -359,9 +286,8 @@ CREATE TABLE IF NOT EXISTS `content` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`subject`,`content`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+  KEY `project_id` (`project_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -369,7 +295,6 @@ CREATE TABLE IF NOT EXISTS `content` (
 -- Table structure for table `content_free_modules`
 --
 
-DROP TABLE IF EXISTS `content_free_modules`;
 CREATE TABLE IF NOT EXISTS `content_free_modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -382,9 +307,8 @@ CREATE TABLE IF NOT EXISTS `content_free_modules` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
-  KEY `project_id_2` (`project_id`,`module_id`,`page_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`topic`,`content`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id_2` (`project_id`,`module_id`,`page_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -392,7 +316,6 @@ CREATE TABLE IF NOT EXISTS `content_free_modules` (
 -- Table structure for table `content_introduction`
 --
 
-DROP TABLE IF EXISTS `content_introduction`;
 CREATE TABLE IF NOT EXISTS `content_introduction` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -404,9 +327,8 @@ CREATE TABLE IF NOT EXISTS `content_introduction` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
-  KEY `project_id_2` (`project_id`,`page_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`topic`,`content`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+  KEY `project_id_2` (`project_id`,`page_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -414,7 +336,6 @@ CREATE TABLE IF NOT EXISTS `content_introduction` (
 -- Table structure for table `content_keysteps`
 --
 
-DROP TABLE IF EXISTS `content_keysteps`;
 CREATE TABLE IF NOT EXISTS `content_keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -425,9 +346,8 @@ CREATE TABLE IF NOT EXISTS `content_keysteps` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`keystep_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`title`,`content`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id` (`project_id`,`keystep_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -435,7 +355,6 @@ CREATE TABLE IF NOT EXISTS `content_keysteps` (
 -- Table structure for table `content_keysteps_undo`
 --
 
-DROP TABLE IF EXISTS `content_keysteps_undo`;
 CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `keystep_content_id` int(11) NOT NULL,
@@ -450,7 +369,7 @@ CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `keystep_content_id` (`keystep_content_id`,`project_id`,`keystep_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -458,7 +377,6 @@ CREATE TABLE IF NOT EXISTS `content_keysteps_undo` (
 -- Table structure for table `content_taxa`
 --
 
-DROP TABLE IF EXISTS `content_taxa`;
 CREATE TABLE IF NOT EXISTS `content_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -472,9 +390,8 @@ CREATE TABLE IF NOT EXISTS `content_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`language_id`,`page_id`),
-  KEY `project_id_2` (`project_id`,`publish`),
-  FULLTEXT KEY `content` (`content`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=970330 ;
+  KEY `project_id_2` (`project_id`,`publish`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -482,7 +399,6 @@ CREATE TABLE IF NOT EXISTS `content_taxa` (
 -- Table structure for table `content_taxa_undo`
 --
 
-DROP TABLE IF EXISTS `content_taxa_undo`;
 CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content_taxa_id` int(11) NOT NULL,
@@ -500,7 +416,7 @@ CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `content_taxa_id` (`content_taxa_id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -508,7 +424,6 @@ CREATE TABLE IF NOT EXISTS `content_taxa_undo` (
 -- Table structure for table `diversity_index`
 --
 
-DROP TABLE IF EXISTS `diversity_index`;
 CREATE TABLE IF NOT EXISTS `diversity_index` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(10) unsigned NOT NULL,
@@ -521,7 +436,7 @@ CREATE TABLE IF NOT EXISTS `diversity_index` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -529,7 +444,6 @@ CREATE TABLE IF NOT EXISTS `diversity_index` (
 -- Table structure for table `diversity_index_old`
 --
 
-DROP TABLE IF EXISTS `diversity_index_old`;
 CREATE TABLE IF NOT EXISTS `diversity_index_old` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `project_id` int(10) unsigned NOT NULL,
@@ -540,28 +454,21 @@ CREATE TABLE IF NOT EXISTS `diversity_index_old` (
   `encoded_json` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `dna_barcodes`
+-- Table structure for table `dump`
 --
 
-DROP TABLE IF EXISTS `dna_barcodes`;
-CREATE TABLE IF NOT EXISTS `dna_barcodes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `barcode` varchar(32) NOT NULL,
-  `location` varchar(255) DEFAULT NULL,
-  `date` varchar(32) DEFAULT NULL,
-  `specialist` varchar(255) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`taxon_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=169756 ;
+CREATE TABLE IF NOT EXISTS `dump` (
+  `p` int(11) DEFAULT NULL,
+  `i_int` int(11) DEFAULT NULL,
+  `v_varchar` varchar(255) DEFAULT NULL,
+  `t_text` text,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -569,7 +476,6 @@ CREATE TABLE IF NOT EXISTS `dna_barcodes` (
 -- Table structure for table `free_modules_pages`
 --
 
-DROP TABLE IF EXISTS `free_modules_pages`;
 CREATE TABLE IF NOT EXISTS `free_modules_pages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -582,7 +488,7 @@ CREATE TABLE IF NOT EXISTS `free_modules_pages` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`module_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -590,7 +496,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_pages` (
 -- Table structure for table `free_modules_projects`
 --
 
-DROP TABLE IF EXISTS `free_modules_projects`;
 CREATE TABLE IF NOT EXISTS `free_modules_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -603,7 +508,7 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`module`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -611,7 +516,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects` (
 -- Table structure for table `free_modules_projects_users`
 --
 
-DROP TABLE IF EXISTS `free_modules_projects_users`;
 CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -619,7 +523,7 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
   `free_module_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`user_id`,`free_module_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -627,7 +531,6 @@ CREATE TABLE IF NOT EXISTS `free_modules_projects_users` (
 -- Table structure for table `free_module_media`
 --
 
-DROP TABLE IF EXISTS `free_module_media`;
 CREATE TABLE IF NOT EXISTS `free_module_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -641,7 +544,7 @@ CREATE TABLE IF NOT EXISTS `free_module_media` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`page_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -649,7 +552,6 @@ CREATE TABLE IF NOT EXISTS `free_module_media` (
 -- Table structure for table `geodata_types`
 --
 
-DROP TABLE IF EXISTS `geodata_types`;
 CREATE TABLE IF NOT EXISTS `geodata_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -660,7 +562,7 @@ CREATE TABLE IF NOT EXISTS `geodata_types` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -668,7 +570,6 @@ CREATE TABLE IF NOT EXISTS `geodata_types` (
 -- Table structure for table `geodata_types_titles`
 --
 
-DROP TABLE IF EXISTS `geodata_types_titles`;
 CREATE TABLE IF NOT EXISTS `geodata_types_titles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -678,9 +579,8 @@ CREATE TABLE IF NOT EXISTS `geodata_types_titles` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`type_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`title`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  UNIQUE KEY `project_id` (`project_id`,`type_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -688,7 +588,6 @@ CREATE TABLE IF NOT EXISTS `geodata_types_titles` (
 -- Table structure for table `glossary`
 --
 
-DROP TABLE IF EXISTS `glossary`;
 CREATE TABLE IF NOT EXISTS `glossary` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -699,9 +598,8 @@ CREATE TABLE IF NOT EXISTS `glossary` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
-  KEY `idx_glossary1` (`project_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`term`,`definition`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `idx_glossary1` (`project_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -709,7 +607,6 @@ CREATE TABLE IF NOT EXISTS `glossary` (
 -- Table structure for table `glossary_media`
 --
 
-DROP TABLE IF EXISTS `glossary_media`;
 CREATE TABLE IF NOT EXISTS `glossary_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -724,7 +621,7 @@ CREATE TABLE IF NOT EXISTS `glossary_media` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`glossary_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -732,7 +629,6 @@ CREATE TABLE IF NOT EXISTS `glossary_media` (
 -- Table structure for table `glossary_media_captions`
 --
 
-DROP TABLE IF EXISTS `glossary_media_captions`;
 CREATE TABLE IF NOT EXISTS `glossary_media_captions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -743,7 +639,7 @@ CREATE TABLE IF NOT EXISTS `glossary_media_captions` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`media_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -751,7 +647,6 @@ CREATE TABLE IF NOT EXISTS `glossary_media_captions` (
 -- Table structure for table `glossary_synonyms`
 --
 
-DROP TABLE IF EXISTS `glossary_synonyms`;
 CREATE TABLE IF NOT EXISTS `glossary_synonyms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -762,9 +657,8 @@ CREATE TABLE IF NOT EXISTS `glossary_synonyms` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`glossary_id`),
-  KEY `idx_glossary_synonym1` (`project_id`,`glossary_id`),
-  FULLTEXT KEY `fulltext` (`synonym`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `idx_glossary_synonym1` (`project_id`,`glossary_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -772,7 +666,6 @@ CREATE TABLE IF NOT EXISTS `glossary_synonyms` (
 -- Table structure for table `gui_menu_order`
 --
 
-DROP TABLE IF EXISTS `gui_menu_order`;
 CREATE TABLE IF NOT EXISTS `gui_menu_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -783,46 +676,8 @@ CREATE TABLE IF NOT EXISTS `gui_menu_order` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`matrix_id`),
-  KEY `project_id_2` (`project_id`,`matrix_id`,`ref_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `habitats`
---
-
-DROP TABLE IF EXISTS `habitats`;
-CREATE TABLE IF NOT EXISTS `habitats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `sys_label` varchar(64) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=313 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `habitat_labels`
---
-
-DROP TABLE IF EXISTS `habitat_labels`;
-CREATE TABLE IF NOT EXISTS `habitat_labels` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `habitat_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`,`habitat_id`,`language_id`),
-  KEY `project_id` (`project_id`,`label`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=307 ;
+  KEY `project_id` (`project_id`,`matrix_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -830,7 +685,6 @@ CREATE TABLE IF NOT EXISTS `habitat_labels` (
 -- Table structure for table `heartbeats`
 --
 
-DROP TABLE IF EXISTS `heartbeats`;
 CREATE TABLE IF NOT EXISTS `heartbeats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -844,7 +698,7 @@ CREATE TABLE IF NOT EXISTS `heartbeats` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`user_id`,`app`,`ctrllr`,`view`,`params_hash`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=261 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -852,7 +706,6 @@ CREATE TABLE IF NOT EXISTS `heartbeats` (
 -- Table structure for table `helptexts`
 --
 
-DROP TABLE IF EXISTS `helptexts`;
 CREATE TABLE IF NOT EXISTS `helptexts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `controller` varchar(32) NOT NULL,
@@ -863,7 +716,7 @@ CREATE TABLE IF NOT EXISTS `helptexts` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -871,7 +724,6 @@ CREATE TABLE IF NOT EXISTS `helptexts` (
 -- Table structure for table `hotwords`
 --
 
-DROP TABLE IF EXISTS `hotwords`;
 CREATE TABLE IF NOT EXISTS `hotwords` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -885,7 +737,7 @@ CREATE TABLE IF NOT EXISTS `hotwords` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id_3` (`project_id`,`hotword`,`language_id`),
   KEY `project_id_2` (`project_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -893,7 +745,6 @@ CREATE TABLE IF NOT EXISTS `hotwords` (
 -- Table structure for table `hybrids`
 --
 
-DROP TABLE IF EXISTS `hybrids`;
 CREATE TABLE IF NOT EXISTS `hybrids` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `hybrid` varchar(128) NOT NULL,
@@ -901,29 +752,7 @@ CREATE TABLE IF NOT EXISTS `hybrids` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hybrid` (`hybrid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ids`
---
-
-DROP TABLE IF EXISTS `ids`;
-CREATE TABLE IF NOT EXISTS `ids` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `rdf_id` varchar(128) DEFAULT NULL,
-  `nsr_id` varchar(128) DEFAULT NULL,
-  `lng_id` int(11) NOT NULL,
-  `item_type` varchar(32) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `rdf_id` (`rdf_id`),
-  KEY `nsr_id` (`nsr_id`),
-  KEY `nsr_id_2` (`nsr_id`,`item_type`),
-  KEY `item_type` (`item_type`),
-  KEY `project_id` (`project_id`,`lng_id`,`item_type`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=857209 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -931,7 +760,6 @@ CREATE TABLE IF NOT EXISTS `ids` (
 -- Table structure for table `interface_texts`
 --
 
-DROP TABLE IF EXISTS `interface_texts`;
 CREATE TABLE IF NOT EXISTS `interface_texts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `text` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
@@ -939,7 +767,7 @@ CREATE TABLE IF NOT EXISTS `interface_texts` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `text` (`text`(255),`env`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1238 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -947,14 +775,13 @@ CREATE TABLE IF NOT EXISTS `interface_texts` (
 -- Table structure for table `interface_translations`
 --
 
-DROP TABLE IF EXISTS `interface_translations`;
 CREATE TABLE IF NOT EXISTS `interface_translations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `interface_text_id` int(11) NOT NULL,
   `language_id` tinyint(3) NOT NULL,
   `translation` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=147 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -962,7 +789,6 @@ CREATE TABLE IF NOT EXISTS `interface_translations` (
 -- Table structure for table `introduction_media`
 --
 
-DROP TABLE IF EXISTS `introduction_media`;
 CREATE TABLE IF NOT EXISTS `introduction_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -976,7 +802,7 @@ CREATE TABLE IF NOT EXISTS `introduction_media` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`page_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -984,7 +810,6 @@ CREATE TABLE IF NOT EXISTS `introduction_media` (
 -- Table structure for table `introduction_pages`
 --
 
-DROP TABLE IF EXISTS `introduction_pages`;
 CREATE TABLE IF NOT EXISTS `introduction_pages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -994,7 +819,7 @@ CREATE TABLE IF NOT EXISTS `introduction_pages` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1002,7 +827,6 @@ CREATE TABLE IF NOT EXISTS `introduction_pages` (
 -- Table structure for table `keysteps`
 --
 
-DROP TABLE IF EXISTS `keysteps`;
 CREATE TABLE IF NOT EXISTS `keysteps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1015,7 +839,7 @@ CREATE TABLE IF NOT EXISTS `keysteps` (
   KEY `idxKeystepsNumber` (`project_id`,`number`),
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`is_start`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1023,7 +847,6 @@ CREATE TABLE IF NOT EXISTS `keysteps` (
 -- Table structure for table `keytrees`
 --
 
-DROP TABLE IF EXISTS `keytrees`;
 CREATE TABLE IF NOT EXISTS `keytrees` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1033,7 +856,7 @@ CREATE TABLE IF NOT EXISTS `keytrees` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`chunk`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1041,7 +864,6 @@ CREATE TABLE IF NOT EXISTS `keytrees` (
 -- Table structure for table `l2_diversity_index`
 --
 
-DROP TABLE IF EXISTS `l2_diversity_index`;
 CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1055,7 +877,7 @@ CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
   UNIQUE KEY `project_id` (`project_id`,`map_id`,`type_id`,`square_number`),
   KEY `project_id_2` (`project_id`,`map_id`),
   KEY `project_id_3` (`project_id`,`map_id`,`type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1063,7 +885,6 @@ CREATE TABLE IF NOT EXISTS `l2_diversity_index` (
 -- Table structure for table `l2_maps`
 --
 
-DROP TABLE IF EXISTS `l2_maps`;
 CREATE TABLE IF NOT EXISTS `l2_maps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1076,7 +897,7 @@ CREATE TABLE IF NOT EXISTS `l2_maps` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1084,7 +905,6 @@ CREATE TABLE IF NOT EXISTS `l2_maps` (
 -- Table structure for table `l2_occurrences_taxa`
 --
 
-DROP TABLE IF EXISTS `l2_occurrences_taxa`;
 CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1101,7 +921,7 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa` (
   KEY `project_id_4` (`project_id`,`taxon_id`),
   KEY `taxon_id` (`taxon_id`),
   KEY `project_id_5` (`project_id`,`taxon_id`,`map_id`,`type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1109,7 +929,6 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa` (
 -- Table structure for table `l2_occurrences_taxa_combi`
 --
 
-DROP TABLE IF EXISTS `l2_occurrences_taxa_combi`;
 CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa_combi` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1123,7 +942,7 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa_combi` (
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`map_id`,`type_id`),
   KEY `project_id_2` (`project_id`,`taxon_id`,`map_id`),
   KEY `project_id_3` (`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1131,7 +950,6 @@ CREATE TABLE IF NOT EXISTS `l2_occurrences_taxa_combi` (
 -- Table structure for table `labels_languages`
 --
 
-DROP TABLE IF EXISTS `labels_languages`;
 CREATE TABLE IF NOT EXISTS `labels_languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1142,7 +960,7 @@ CREATE TABLE IF NOT EXISTS `labels_languages` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1150,7 +968,6 @@ CREATE TABLE IF NOT EXISTS `labels_languages` (
 -- Table structure for table `labels_projects_ranks`
 --
 
-DROP TABLE IF EXISTS `labels_projects_ranks`;
 CREATE TABLE IF NOT EXISTS `labels_projects_ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1162,7 +979,7 @@ CREATE TABLE IF NOT EXISTS `labels_projects_ranks` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
   KEY `project_id_2` (`project_id`,`project_rank_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=895 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1170,7 +987,6 @@ CREATE TABLE IF NOT EXISTS `labels_projects_ranks` (
 -- Table structure for table `labels_sections`
 --
 
-DROP TABLE IF EXISTS `labels_sections`;
 CREATE TABLE IF NOT EXISTS `labels_sections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1182,7 +998,7 @@ CREATE TABLE IF NOT EXISTS `labels_sections` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`language_id`),
   KEY `project_id_2` (`project_id`,`section_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1190,11 +1006,10 @@ CREATE TABLE IF NOT EXISTS `labels_sections` (
 -- Table structure for table `languages`
 --
 
-DROP TABLE IF EXISTS `languages`;
 CREATE TABLE IF NOT EXISTS `languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `language` varchar(32) NOT NULL,
-  `iso3` varchar(3) DEFAULT NULL,
+  `iso3` varchar(3) NOT NULL,
   `iso2` varchar(2) DEFAULT NULL,
   `locale_win` varchar(32) DEFAULT NULL,
   `locale_lin` varchar(16) DEFAULT NULL,
@@ -1202,8 +1017,10 @@ CREATE TABLE IF NOT EXISTS `languages` (
   `show_order` int(2) DEFAULT NULL,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `language` (`language`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=124 ;
+  UNIQUE KEY `language` (`language`),
+  UNIQUE KEY `iso3` (`iso3`),
+  UNIQUE KEY `iso2` (`iso2`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1211,7 +1028,6 @@ CREATE TABLE IF NOT EXISTS `languages` (
 -- Table structure for table `languages_projects`
 --
 
-DROP TABLE IF EXISTS `languages_projects`;
 CREATE TABLE IF NOT EXISTS `languages_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `language_id` int(11) NOT NULL,
@@ -1223,7 +1039,7 @@ CREATE TABLE IF NOT EXISTS `languages_projects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `language_id_2` (`language_id`,`project_id`),
   KEY `language_id` (`language_id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1231,58 +1047,23 @@ CREATE TABLE IF NOT EXISTS `languages_projects` (
 -- Table structure for table `literature`
 --
 
-DROP TABLE IF EXISTS `literature`;
 CREATE TABLE IF NOT EXISTS `literature` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `author_first` varchar(64) NOT NULL,
   `author_second` varchar(64) DEFAULT NULL,
   `multiple_authors` tinyint(1) NOT NULL DEFAULT '0',
-  `year` smallint(4) DEFAULT NULL,
+  `year` year(4) DEFAULT NULL,
   `suffix` varchar(3) DEFAULT NULL,
   `year_separator` varchar(8) DEFAULT NULL,
-  `year_2` smallint(4) DEFAULT NULL,
+  `year_2` year(4) DEFAULT NULL,
   `suffix_2` varchar(3) DEFAULT NULL,
   `text` text NOT NULL,
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`),
-  FULLTEXT KEY `fulltext` (`author_first`,`author_second`,`text`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `literature2`
---
-
-DROP TABLE IF EXISTS `literature2`;
-CREATE TABLE IF NOT EXISTS `literature2` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `language_id` int(11) DEFAULT NULL,
-  `label` varchar(255) NOT NULL,
-  `date` varchar(32) DEFAULT NULL,
-  `author` varchar(255) DEFAULT NULL,
-  `publication_type` varchar(24) DEFAULT NULL,
-  `actor_id` int(11) DEFAULT NULL,
-  `citation` varchar(255) DEFAULT NULL,
-  `source` varchar(255) DEFAULT NULL,
-  `publishedin` varchar(255) DEFAULT NULL,
-  `publishedin_actor_id` int(11) DEFAULT NULL,
-  `pages` varchar(32) DEFAULT NULL,
-  `volume` varchar(32) DEFAULT NULL,
-  `periodical` varchar(128) DEFAULT NULL,
-  `periodical_actor_id` int(11) DEFAULT NULL,
-  `order_number` int(3) DEFAULT NULL,
-  `external_link` varchar(255) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`),
-  KEY `project_id` (`project_id`,`label`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=27036 ;
+  KEY `project_id` (`project_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1290,7 +1071,6 @@ CREATE TABLE IF NOT EXISTS `literature2` (
 -- Table structure for table `literature_taxa`
 --
 
-DROP TABLE IF EXISTS `literature_taxa`;
 CREATE TABLE IF NOT EXISTS `literature_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1301,7 +1081,7 @@ CREATE TABLE IF NOT EXISTS `literature_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`literature_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1309,7 +1089,6 @@ CREATE TABLE IF NOT EXISTS `literature_taxa` (
 -- Table structure for table `matrices`
 --
 
-DROP TABLE IF EXISTS `matrices`;
 CREATE TABLE IF NOT EXISTS `matrices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1319,7 +1098,7 @@ CREATE TABLE IF NOT EXISTS `matrices` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1327,7 +1106,6 @@ CREATE TABLE IF NOT EXISTS `matrices` (
 -- Table structure for table `matrices_names`
 --
 
-DROP TABLE IF EXISTS `matrices_names`;
 CREATE TABLE IF NOT EXISTS `matrices_names` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1338,7 +1116,7 @@ CREATE TABLE IF NOT EXISTS `matrices_names` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`matrix_id`,`language_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1346,7 +1124,6 @@ CREATE TABLE IF NOT EXISTS `matrices_names` (
 -- Table structure for table `matrices_taxa`
 --
 
-DROP TABLE IF EXISTS `matrices_taxa`;
 CREATE TABLE IF NOT EXISTS `matrices_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1356,7 +1133,7 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`matrix_id`,`taxon_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1364,7 +1141,6 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa` (
 -- Table structure for table `matrices_taxa_states`
 --
 
-DROP TABLE IF EXISTS `matrices_taxa_states`;
 CREATE TABLE IF NOT EXISTS `matrices_taxa_states` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1387,9 +1163,10 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa_states` (
   KEY `project_id_8` (`project_id`,`matrix_id`,`variation_id`),
   KEY `project_id_10` (`project_id`,`matrix_id`,`taxon_id`),
   KEY `project_id_9` (`project_id`,`matrix_id`,`ref_matrix_id`),
-  KEY `state_id` (`state_id`),
-  KEY `state_id_2` (`state_id`,`taxon_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `project_id_11` (`project_id`,`matrix_id`,`variation_id`),
+  KEY `project_id_12` (`project_id`,`matrix_id`,`ref_matrix_id`),
+  KEY `project_id_13` (`project_id`,`matrix_id`,`taxon_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1397,7 +1174,6 @@ CREATE TABLE IF NOT EXISTS `matrices_taxa_states` (
 -- Table structure for table `matrices_variations`
 --
 
-DROP TABLE IF EXISTS `matrices_variations`;
 CREATE TABLE IF NOT EXISTS `matrices_variations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1407,7 +1183,7 @@ CREATE TABLE IF NOT EXISTS `matrices_variations` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`matrix_id`,`variation_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1415,7 +1191,6 @@ CREATE TABLE IF NOT EXISTS `matrices_variations` (
 -- Table structure for table `media_descriptions_taxon`
 --
 
-DROP TABLE IF EXISTS `media_descriptions_taxon`;
 CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1425,32 +1200,8 @@ CREATE TABLE IF NOT EXISTS `media_descriptions_taxon` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`media_id`,`language_id`),
-  FULLTEXT KEY `fulltext` (`description`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=221705 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `media_meta`
---
-
-DROP TABLE IF EXISTS `media_meta`;
-CREATE TABLE IF NOT EXISTS `media_meta` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `media_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `sys_label` varchar(64) NOT NULL,
-  `meta_data` varchar(1024) DEFAULT NULL,
-  `meta_date` datetime DEFAULT NULL,
-  `meta_number` float(16,8) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`media_id`),
-  KEY `project_id_2` (`project_id`,`sys_label`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1344392 ;
+  UNIQUE KEY `project_id` (`project_id`,`media_id`,`language_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1458,13 +1209,12 @@ CREATE TABLE IF NOT EXISTS `media_meta` (
 -- Table structure for table `media_taxon`
 --
 
-DROP TABLE IF EXISTS `media_taxon`;
 CREATE TABLE IF NOT EXISTS `media_taxon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL,
   `file_name` varchar(255) NOT NULL,
-  `thumb_name` varchar(255) DEFAULT NULL,
+  `thumb_name` varchar(128) DEFAULT NULL,
   `original_name` varchar(128) NOT NULL,
   `mime_type` varchar(32) NOT NULL,
   `file_size` int(11) NOT NULL,
@@ -1474,9 +1224,8 @@ CREATE TABLE IF NOT EXISTS `media_taxon` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `taxon_id` (`taxon_id`),
-  KEY `project_id` (`project_id`),
-  KEY `project_id_2` (`project_id`,`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=221705 ;
+  KEY `project_id` (`project_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1484,7 +1233,6 @@ CREATE TABLE IF NOT EXISTS `media_taxon` (
 -- Table structure for table `modules`
 --
 
-DROP TABLE IF EXISTS `modules`;
 CREATE TABLE IF NOT EXISTS `modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(64) NOT NULL,
@@ -1498,7 +1246,7 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `module` (`module`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1506,7 +1254,6 @@ CREATE TABLE IF NOT EXISTS `modules` (
 -- Table structure for table `modules_projects`
 --
 
-DROP TABLE IF EXISTS `modules_projects`;
 CREATE TABLE IF NOT EXISTS `modules_projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1517,7 +1264,7 @@ CREATE TABLE IF NOT EXISTS `modules_projects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`module_id`),
   KEY `project_id_2` (`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1525,7 +1272,6 @@ CREATE TABLE IF NOT EXISTS `modules_projects` (
 -- Table structure for table `modules_projects_users`
 --
 
-DROP TABLE IF EXISTS `modules_projects_users`;
 CREATE TABLE IF NOT EXISTS `modules_projects_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1534,66 +1280,7 @@ CREATE TABLE IF NOT EXISTS `modules_projects_users` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`module_id`,`user_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `names`
---
-
-DROP TABLE IF EXISTS `names`;
-CREATE TABLE IF NOT EXISTS `names` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `type_id` int(11) NOT NULL,
-  `name` varchar(128) DEFAULT NULL,
-  `uninomial` varchar(64) DEFAULT NULL,
-  `specific_epithet` varchar(64) DEFAULT NULL,
-  `infra_specific_epithet` varchar(64) DEFAULT NULL,
-  `authorship` varchar(64) DEFAULT NULL,
-  `name_author` varchar(64) DEFAULT NULL,
-  `authorship_year` varchar(16) DEFAULT NULL,
-  `reference` varchar(255) DEFAULT NULL,
-  `reference_id` int(11) DEFAULT NULL,
-  `expert` varchar(255) DEFAULT NULL,
-  `expert_id` int(11) DEFAULT NULL,
-  `organisation` varchar(255) DEFAULT NULL,
-  `organisation_id` int(11) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`taxon_id`),
-  KEY `project_id_2` (`project_id`,`taxon_id`,`language_id`),
-  KEY `project_id_4` (`project_id`,`type_id`),
-  KEY `project_id_3` (`project_id`,`uninomial`,`specific_epithet`),
-  KEY `project_id_5` (`project_id`,`created`,`last_change`),
-  KEY `project_id_6` (`project_id`,`taxon_id`,`type_id`),
-  KEY `project_id_7` (`project_id`,`name`,`authorship`),
-  KEY `project_id_8` (`project_id`,`uninomial`,`specific_epithet`,`infra_specific_epithet`),
-  KEY `project_id_9` (`project_id`,`uninomial`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1574409 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `name_types`
---
-
-DROP TABLE IF EXISTS `name_types`;
-CREATE TABLE IF NOT EXISTS `name_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `nametype` varchar(64) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `project_id` (`project_id`,`nametype`),
-  KEY `id` (`id`,`project_id`),
-  KEY `id_2` (`id`,`project_id`,`nametype`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=262 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1601,7 +1288,6 @@ CREATE TABLE IF NOT EXISTS `name_types` (
 -- Table structure for table `nbc_extras`
 --
 
-DROP TABLE IF EXISTS `nbc_extras`;
 CREATE TABLE IF NOT EXISTS `nbc_extras` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1612,7 +1298,7 @@ CREATE TABLE IF NOT EXISTS `nbc_extras` (
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`ref_id`,`ref_type`),
   KEY `project_id_2` (`project_id`,`ref_id`,`ref_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1620,7 +1306,6 @@ CREATE TABLE IF NOT EXISTS `nbc_extras` (
 -- Table structure for table `occurrences_taxa`
 --
 
-DROP TABLE IF EXISTS `occurrences_taxa`;
 CREATE TABLE IF NOT EXISTS `occurrences_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1637,7 +1322,7 @@ CREATE TABLE IF NOT EXISTS `occurrences_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`nodes_hash`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1645,7 +1330,6 @@ CREATE TABLE IF NOT EXISTS `occurrences_taxa` (
 -- Table structure for table `pages_taxa`
 --
 
-DROP TABLE IF EXISTS `pages_taxa`;
 CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1656,7 +1340,7 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`page`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1074 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1664,7 +1348,6 @@ CREATE TABLE IF NOT EXISTS `pages_taxa` (
 -- Table structure for table `pages_taxa_titles`
 --
 
-DROP TABLE IF EXISTS `pages_taxa_titles`;
 CREATE TABLE IF NOT EXISTS `pages_taxa_titles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1675,75 +1358,7 @@ CREATE TABLE IF NOT EXISTS `pages_taxa_titles` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`page_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1064 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `presence`
---
-
-DROP TABLE IF EXISTS `presence`;
-CREATE TABLE IF NOT EXISTS `presence` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `sys_label` varchar(255) NOT NULL,
-  `settled_species` tinyint(1) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1105 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `presence_labels`
---
-
-DROP TABLE IF EXISTS `presence_labels`;
-CREATE TABLE IF NOT EXISTS `presence_labels` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `presence_id` int(11) NOT NULL,
-  `language_id` int(11) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `information` varchar(1024) DEFAULT NULL,
-  `information_short` varchar(255) DEFAULT NULL,
-  `information_title` varchar(64) DEFAULT NULL,
-  `index_label` varchar(10) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`,`project_id`,`presence_id`,`language_id`),
-  KEY `project_id` (`project_id`,`presence_id`,`language_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1059 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `presence_taxa`
---
-
-DROP TABLE IF EXISTS `presence_taxa`;
-CREATE TABLE IF NOT EXISTS `presence_taxa` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `taxon_id` int(11) NOT NULL,
-  `presence_id` int(11) DEFAULT NULL,
-  `presence82_id` int(11) DEFAULT NULL,
-  `habitat_id` int(11) DEFAULT NULL,
-  `is_indigeneous` tinyint(1) DEFAULT NULL,
-  `actor_id` int(11) DEFAULT NULL,
-  `actor_org_id` int(11) DEFAULT NULL,
-  `reference_id` int(11) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `project_id1` (`project_id`,`taxon_id`),
-  KEY `project_id2` (`project_id`,`taxon_id`,`presence_id`),
-  KEY `project_id3` (`project_id`,`taxon_id`,`presence82_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1201285 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1751,7 +1366,6 @@ CREATE TABLE IF NOT EXISTS `presence_taxa` (
 -- Table structure for table `projects`
 --
 
-DROP TABLE IF EXISTS `projects`;
 CREATE TABLE IF NOT EXISTS `projects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sys_name` varchar(64) NOT NULL,
@@ -1769,7 +1383,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `sys_name` (`sys_name`),
   UNIQUE KEY `short_name` (`short_name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1777,7 +1391,6 @@ CREATE TABLE IF NOT EXISTS `projects` (
 -- Table structure for table `projects_ranks`
 --
 
-DROP TABLE IF EXISTS `projects_ranks`;
 CREATE TABLE IF NOT EXISTS `projects_ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1790,11 +1403,8 @@ CREATE TABLE IF NOT EXISTS `projects_ranks` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id_2` (`project_id`,`rank_id`),
   KEY `project_id` (`project_id`),
-  KEY `project_id_3` (`project_id`,`rank_id`,`parent_id`),
-  KEY `project_id_4` (`project_id`),
-  KEY `rank_id` (`rank_id`),
-  KEY `id` (`id`,`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=347 ;
+  KEY `project_id_3` (`project_id`,`rank_id`,`parent_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1802,7 +1412,6 @@ CREATE TABLE IF NOT EXISTS `projects_ranks` (
 -- Table structure for table `projects_roles_users`
 --
 
-DROP TABLE IF EXISTS `projects_roles_users`;
 CREATE TABLE IF NOT EXISTS `projects_roles_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1814,7 +1423,7 @@ CREATE TABLE IF NOT EXISTS `projects_roles_users` (
   `created` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`role_id`,`user_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1822,7 +1431,6 @@ CREATE TABLE IF NOT EXISTS `projects_roles_users` (
 -- Table structure for table `ranks`
 --
 
-DROP TABLE IF EXISTS `ranks`;
 CREATE TABLE IF NOT EXISTS `ranks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `rank` varchar(128) NOT NULL,
@@ -1838,28 +1446,7 @@ CREATE TABLE IF NOT EXISTS `ranks` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `rank` (`rank`,`additional`),
   KEY `parent_id` (`parent_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=93 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `rdf`
---
-
-DROP TABLE IF EXISTS `rdf`;
-CREATE TABLE IF NOT EXISTS `rdf` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) NOT NULL,
-  `subject_id` int(11) NOT NULL,
-  `subject_type` varchar(32) NOT NULL,
-  `predicate` varchar(32) NOT NULL,
-  `object_id` int(11) NOT NULL,
-  `object_type` varchar(32) NOT NULL,
-  `created` datetime NOT NULL,
-  `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `project_id` (`project_id`,`subject_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=671177 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1867,7 +1454,6 @@ CREATE TABLE IF NOT EXISTS `rdf` (
 -- Table structure for table `rights`
 --
 
-DROP TABLE IF EXISTS `rights`;
 CREATE TABLE IF NOT EXISTS `rights` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `controller` varchar(32) NOT NULL,
@@ -1876,7 +1462,7 @@ CREATE TABLE IF NOT EXISTS `rights` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `controller` (`controller`,`view`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=88 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1884,7 +1470,6 @@ CREATE TABLE IF NOT EXISTS `rights` (
 -- Table structure for table `rights_roles`
 --
 
-DROP TABLE IF EXISTS `rights_roles`;
 CREATE TABLE IF NOT EXISTS `rights_roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `right_id` int(11) NOT NULL,
@@ -1893,7 +1478,7 @@ CREATE TABLE IF NOT EXISTS `rights_roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `right_id_2` (`right_id`,`role_id`),
   KEY `right_id` (`right_id`,`role_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=92 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1901,7 +1486,6 @@ CREATE TABLE IF NOT EXISTS `rights_roles` (
 -- Table structure for table `roles`
 --
 
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(32) NOT NULL,
@@ -1912,7 +1496,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `role` (`role`),
   KEY `role_2` (`role`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1920,7 +1504,6 @@ CREATE TABLE IF NOT EXISTS `roles` (
 -- Table structure for table `sections`
 --
 
-DROP TABLE IF EXISTS `sections`;
 CREATE TABLE IF NOT EXISTS `sections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1931,7 +1514,7 @@ CREATE TABLE IF NOT EXISTS `sections` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`page_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=199 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1939,7 +1522,6 @@ CREATE TABLE IF NOT EXISTS `sections` (
 -- Table structure for table `settings`
 --
 
-DROP TABLE IF EXISTS `settings`;
 CREATE TABLE IF NOT EXISTS `settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1950,7 +1532,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id_2` (`project_id`,`setting`),
   KEY `project_id` (`project_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1958,7 +1540,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
 -- Table structure for table `synonyms`
 --
 
-DROP TABLE IF EXISTS `synonyms`;
 CREATE TABLE IF NOT EXISTS `synonyms` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -1971,9 +1552,8 @@ CREATE TABLE IF NOT EXISTS `synonyms` (
   `last_change` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `project_id` (`project_id`,`taxon_id`),
-  KEY `taxon_id` (`taxon_id`),
-  FULLTEXT KEY `fulltext` (`synonym`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  KEY `taxon_id` (`taxon_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1981,7 +1561,6 @@ CREATE TABLE IF NOT EXISTS `synonyms` (
 -- Table structure for table `taxa`
 --
 
-DROP TABLE IF EXISTS `taxa`;
 CREATE TABLE IF NOT EXISTS `taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2000,11 +1579,8 @@ CREATE TABLE IF NOT EXISTS `taxa` (
   KEY `project_id` (`project_id`),
   KEY `project_id_2` (`project_id`,`parent_id`),
   KEY `project_id_3` (`project_id`,`parent_id`,`rank_id`),
-  KEY `is_empty` (`is_empty`),
-  KEY `taxon_order` (`taxon_order`),
-  KEY `id` (`id`,`project_id`),
-  FULLTEXT KEY `fulltext` (`taxon`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=567326 ;
+  KEY `is_empty` (`is_empty`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2012,7 +1588,6 @@ CREATE TABLE IF NOT EXISTS `taxa` (
 -- Table structure for table `taxa_relations`
 --
 
-DROP TABLE IF EXISTS `taxa_relations`;
 CREATE TABLE IF NOT EXISTS `taxa_relations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2021,7 +1596,7 @@ CREATE TABLE IF NOT EXISTS `taxa_relations` (
   `ref_type` enum('taxon','variation') NOT NULL DEFAULT 'taxon',
   PRIMARY KEY (`id`),
   UNIQUE KEY `taxon_id` (`taxon_id`,`relation_id`,`ref_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2029,7 +1604,6 @@ CREATE TABLE IF NOT EXISTS `taxa_relations` (
 -- Table structure for table `taxa_variations`
 --
 
-DROP TABLE IF EXISTS `taxa_variations`;
 CREATE TABLE IF NOT EXISTS `taxa_variations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2039,7 +1613,7 @@ CREATE TABLE IF NOT EXISTS `taxa_variations` (
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `taxon_id` (`taxon_id`,`label`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2047,7 +1621,6 @@ CREATE TABLE IF NOT EXISTS `taxa_variations` (
 -- Table structure for table `timezones`
 --
 
-DROP TABLE IF EXISTS `timezones`;
 CREATE TABLE IF NOT EXISTS `timezones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `timezone` varchar(9) NOT NULL,
@@ -2055,7 +1628,7 @@ CREATE TABLE IF NOT EXISTS `timezones` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `timezone` (`timezone`,`locations`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=75 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2063,7 +1636,6 @@ CREATE TABLE IF NOT EXISTS `timezones` (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(32) NOT NULL,
@@ -2087,7 +1659,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `username_2` (`username`),
   KEY `password` (`password`),
   KEY `superuser` (`superuser`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=37 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2095,7 +1667,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Table structure for table `users_taxa`
 --
 
-DROP TABLE IF EXISTS `users_taxa`;
 CREATE TABLE IF NOT EXISTS `users_taxa` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2106,7 +1677,7 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`taxon_id`,`user_id`),
   KEY `project_id_2` (`project_id`,`user_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2114,7 +1685,6 @@ CREATE TABLE IF NOT EXISTS `users_taxa` (
 -- Table structure for table `variations_labels`
 --
 
-DROP TABLE IF EXISTS `variations_labels`;
 CREATE TABLE IF NOT EXISTS `variations_labels` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2125,7 +1695,7 @@ CREATE TABLE IF NOT EXISTS `variations_labels` (
   `created` datetime NOT NULL,
   `last_change` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -2133,7 +1703,6 @@ CREATE TABLE IF NOT EXISTS `variations_labels` (
 -- Table structure for table `variation_relations`
 --
 
-DROP TABLE IF EXISTS `variation_relations`;
 CREATE TABLE IF NOT EXISTS `variation_relations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `project_id` int(11) NOT NULL,
@@ -2142,279 +1711,8 @@ CREATE TABLE IF NOT EXISTS `variation_relations` (
   `ref_type` enum('taxon','variation') NOT NULL DEFAULT 'taxon',
   PRIMARY KEY (`id`),
   UNIQUE KEY `project_id` (`project_id`,`variation_id`,`relation_id`,`ref_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `__actoren`
---
-
-DROP TABLE IF EXISTS `__actoren`;
-CREATE TABLE IF NOT EXISTS `__actoren` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `Preflabel_nl` varchar(255) NOT NULL,
-  `Preflabel_en` varchar(255) NOT NULL,
-  `Altlabel_nl` varchar(255) NOT NULL,
-  `broader` varchar(128) NOT NULL,
-  `hasHomepage` varchar(255) NOT NULL,
-  `hasGender` varchar(128) NOT NULL,
-  `isEmployeeOf` varchar(128) NOT NULL,
-  `hasNsrId` varchar(255) DEFAULT NULL,
-  `mutationDate` varchar(24) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`),
-  KEY `broader` (`broader`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=358 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__gender`
---
-
-DROP TABLE IF EXISTS `__gender`;
-CREATE TABLE IF NOT EXISTS `__gender` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `Preflabel_nl` varchar(255) NOT NULL,
-  `Preflabel_en` varchar(255) NOT NULL,
-  `mutationDate` varchar(24) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__habitats`
---
-
-DROP TABLE IF EXISTS `__habitats`;
-CREATE TABLE IF NOT EXISTS `__habitats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `prefLabel_nl` varchar(16) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`,`prefLabel_nl`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__languages`
---
-
-DROP TABLE IF EXISTS `__languages`;
-CREATE TABLE IF NOT EXISTS `__languages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `prefLabel_nl` varchar(16) NOT NULL,
-  `iso_639_6` varchar(6) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`,`prefLabel_nl`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__nsr_taxon_concepten`
---
-
-DROP TABLE IF EXISTS `__nsr_taxon_concepten`;
-CREATE TABLE IF NOT EXISTS `__nsr_taxon_concepten` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `Preflabel_sci` varchar(255) NOT NULL,
-  `Preflabel_nl` varchar(255) DEFAULT NULL,
-  `hasTaxonRank_resource` varchar(128) NOT NULL,
-  `broader` varchar(128) DEFAULT NULL,
-  `hasNsrId` varchar(255) DEFAULT NULL,
-  `mutationDate` varchar(24) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`),
-  KEY `broader` (`broader`),
-  KEY `hasTaxonRank_resource` (`hasTaxonRank_resource`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=56898 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__nsr_taxon_namen`
---
-
-DROP TABLE IF EXISTS `__nsr_taxon_namen`;
-CREATE TABLE IF NOT EXISTS `__nsr_taxon_namen` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `prefLabel` varchar(128) NOT NULL,
-  `prefLabel_lang` varchar(128) NOT NULL,
-  `broader` varchar(128) DEFAULT NULL,
-  `isValidNameOf` varchar(128) DEFAULT NULL,
-  `isPreferredNameOf` varchar(128) DEFAULT NULL,
-  `isSynonymOf` varchar(128) DEFAULT NULL,
-  `isAlternativeNameOf` varchar(128) DEFAULT NULL,
-  `isMisspelledNameOf` varchar(128) DEFAULT NULL,
-  `isBasionymOf` varchar(128) DEFAULT NULL,
-  `isSynonymSLOf` varchar(128) DEFAULT NULL,
-  `isInvalidNameOf` varchar(128) DEFAULT NULL,
-  `isHomonymOf` varchar(128) DEFAULT NULL,
-  `isAnamorfOf` varchar(128) DEFAULT NULL,
-  `isNomenDubiumOf` varchar(128) DEFAULT NULL,
-  `predicateType` varchar(32) DEFAULT NULL,
-  `predicateOf` int(11) DEFAULT NULL,
-  `hasLanguage` varchar(128) DEFAULT NULL,
-  `hasNsrId` varchar(128) DEFAULT NULL,
-  `hasUninomial` varchar(128) DEFAULT NULL,
-  `hasSpecificEpithet` varchar(128) DEFAULT NULL,
-  `hasInfraSpecificEpithet` varchar(128) DEFAULT NULL,
-  `hasAuthorship` varchar(255) DEFAULT NULL,
-  `hasNameAuthor` varchar(255) DEFAULT NULL,
-  `hasAuthorshipYear` varchar(128) DEFAULT NULL,
-  `hasReference_resource` varchar(128) DEFAULT NULL,
-  `hasReference` varchar(128) DEFAULT NULL,
-  `hasExpert_resource` varchar(128) DEFAULT NULL,
-  `hasExpert` varchar(255) DEFAULT NULL,
-  `hasExpertOrganization_resource` varchar(128) DEFAULT NULL,
-  `hasExpertOrganization` varchar(255) DEFAULT NULL,
-  `mutationdate` varchar(32) DEFAULT NULL,
-  `orderNumber` int(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=88150 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__nsr_taxon_paspoorten`
---
-
-DROP TABLE IF EXISTS `__nsr_taxon_paspoorten`;
-CREATE TABLE IF NOT EXISTS `__nsr_taxon_paspoorten` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group` varchar(128) NOT NULL,
-  `taxon` varchar(128) DEFAULT NULL,
-  `taxon_literal` varchar(255) DEFAULT NULL,
-  `label` varchar(128) DEFAULT NULL,
-  `body` text,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=53849 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__nsr_taxon_paspoorten_predicates`
---
-
-DROP TABLE IF EXISTS `__nsr_taxon_paspoorten_predicates`;
-CREATE TABLE IF NOT EXISTS `__nsr_taxon_paspoorten_predicates` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group` varchar(128) NOT NULL,
-  `paspoort_id` int(11) NOT NULL DEFAULT '-1',
-  `predicate` varchar(128) NOT NULL,
-  `predicate_literal` varchar(128) DEFAULT NULL,
-  `value` varchar(128) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `paspoort_id` (`paspoort_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1620829 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__nsr_taxon_statussen`
---
-
-DROP TABLE IF EXISTS `__nsr_taxon_statussen`;
-CREATE TABLE IF NOT EXISTS `__nsr_taxon_statussen` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `prefLabel` varchar(128) DEFAULT NULL,
-  `isTaxonStateOf` varchar(128) DEFAULT NULL,
-  `isTaxonStateOf_verbatim` varchar(255) DEFAULT NULL,
-  `hasHabitat` varchar(128) DEFAULT NULL,
-  `hasHabitat_verbatim` varchar(255) DEFAULT NULL,
-  `isIndigeneous` tinyint(1) DEFAULT NULL,
-  `hasPresenceStatus` varchar(128) DEFAULT NULL,
-  `hasPresenceStatus1982` varchar(128) DEFAULT NULL,
-  `hasExpert` varchar(128) DEFAULT NULL,
-  `hasExpertOrganization` varchar(128) DEFAULT NULL,
-  `hasReference` varchar(128) DEFAULT NULL,
-  `hasReference_literal` varchar(128) DEFAULT NULL,
-  `hasNsrId` varchar(128) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `concept_id` (`isTaxonStateOf_verbatim`),
-  KEY `status_id` (`hasPresenceStatus`),
-  KEY `habitat_id` (`hasExpert`),
-  KEY `Description_about` (`Description_about`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=41327 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__presence_statussen`
---
-
-DROP TABLE IF EXISTS `__presence_statussen`;
-CREATE TABLE IF NOT EXISTS `__presence_statussen` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `prefLabel_nl` varchar(128) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`,`prefLabel_nl`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__referentie`
---
-
-DROP TABLE IF EXISTS `__referentie`;
-CREATE TABLE IF NOT EXISTS `__referentie` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `Preflabel` varchar(255) DEFAULT NULL,
-  `Preflabel_lang` varchar(16) DEFAULT NULL,
-  `broader` varchar(128) DEFAULT NULL,
-  `hasDate` varchar(255) DEFAULT NULL,
-  `hasAuthor` varchar(255) DEFAULT NULL,
-  `hasAuthor_resource` varchar(128) DEFAULT NULL,
-  `hasCitation` varchar(255) DEFAULT NULL,
-  `hasSource` varchar(255) DEFAULT NULL,
-  `isPublishedIn` varchar(255) DEFAULT NULL,
-  `isPublishedIn_resource` varchar(128) DEFAULT NULL,
-  `hasPages` varchar(255) DEFAULT NULL,
-  `hasVolume` varchar(255) DEFAULT NULL,
-  `hasPeriodical` varchar(255) DEFAULT NULL,
-  `hasPeriodical_resource` varchar(128) DEFAULT NULL,
-  `hasNsrId` varchar(255) DEFAULT NULL,
-  `type` varchar(64) DEFAULT NULL,
-  `orderNumber` int(3) DEFAULT NULL,
-  `hasLink` varchar(255) DEFAULT NULL,
-  `mutationDate` varchar(24) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`),
-  KEY `broader` (`broader`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1550 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `__taxon_ranks`
---
-
-DROP TABLE IF EXISTS `__taxon_ranks`;
-CREATE TABLE IF NOT EXISTS `__taxon_ranks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Description_about` varchar(128) NOT NULL,
-  `Parent_about` varchar(128) DEFAULT NULL,
-  `Preflabel_sci` varchar(255) NOT NULL,
-  `Preflabel_en` varchar(255) DEFAULT NULL,
-  `Preflabel_nl` varchar(255) DEFAULT NULL,
-  `mutationDate` varchar(24) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Description_about` (`Description_about`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=18 ;
 
 
 INSERT INTO `hybrids` (`id`, `hybrid`, `created`, `last_change`) VALUES
@@ -3151,10 +2449,10 @@ INSERT INTO `interface_texts` (`id`, `text`, `env`, `created`) VALUES
 (844, 'the page', 'admin', '2013-02-19 11:48:47'),
 (845, 'Keys for "Orchids of New Guinea. Vol. III."', 'admin', '2013-02-19 12:26:08'),
 (846, 'Additional data for "Orchids of New Guinea. Vol. III."', 'admin', '2013-02-19 12:26:28'),
-(847, 'Keys for "-test project «Narwhal» (2013-02-19T15:17:49+01:00)"', 'admin', '2013-02-19 14:19:36'),
-(848, 'Additional data for "-test project «Narwhal» (2013-02-19T15:17:49+01:00)"', 'admin', '2013-02-19 14:19:44'),
-(849, 'Keys for "-test project «Shark» (2013-02-19T15:22:33+01:00)"', 'admin', '2013-02-19 14:25:27'),
-(850, 'Additional data for "-test project «Shark» (2013-02-19T15:22:33+01:00)"', 'admin', '2013-02-19 14:25:50'),
+(847, 'Keys for "-test project Â«NarwhalÂ» (2013-02-19T15:17:49+01:00)"', 'admin', '2013-02-19 14:19:36'),
+(848, 'Additional data for "-test project Â«NarwhalÂ» (2013-02-19T15:17:49+01:00)"', 'admin', '2013-02-19 14:19:44'),
+(849, 'Keys for "-test project Â«SharkÂ» (2013-02-19T15:22:33+01:00)"', 'admin', '2013-02-19 14:25:27'),
+(850, 'Additional data for "-test project Â«SharkÂ» (2013-02-19T15:22:33+01:00)"', 'admin', '2013-02-19 14:25:50'),
 (851, 'Keys for "Marine Mammals"', 'admin', '2013-02-19 15:47:08');
 INSERT INTO `interface_texts` (`id`, `text`, `env`, `created`) VALUES
 (852, 'Additional data for "Marine Mammals"', 'admin', '2013-02-19 15:49:15'),
@@ -3481,12 +2779,12 @@ INSERT INTO `interface_texts` (`id`, `text`, `env`, `created`) VALUES
 (1173, 'One or more fields containing the actual content, one field per category. All content will be loaded <i>as is</i>, any existant data for that combination of taxon and category will be overwritten without warning.', 'admin', '2013-04-12 14:39:40'),
 (1174, 'Keys for "Dagvlinders van Europa"', 'admin', '2013-04-16 07:12:44'),
 (1175, 'Additional data for "Dagvlinders van Europa"', 'admin', '2013-04-16 07:13:21'),
-(1176, 'Keys for "-test project «Oryx» (2013-04-16T09:45:24+02:00)"', 'admin', '2013-04-16 07:46:04'),
-(1177, 'Keys for "-test project «Lobster» (2013-04-16T10:03:38+02:00)"', 'admin', '2013-04-16 08:04:37'),
-(1178, 'Keys for "-test project «Eagle» (2013-04-16T10:07:51+02:00)"', 'admin', '2013-04-16 08:08:36'),
+(1176, 'Keys for "-test project Â«OryxÂ» (2013-04-16T09:45:24+02:00)"', 'admin', '2013-04-16 07:46:04'),
+(1177, 'Keys for "-test project Â«LobsterÂ» (2013-04-16T10:03:38+02:00)"', 'admin', '2013-04-16 08:04:37'),
+(1178, 'Keys for "-test project Â«EagleÂ» (2013-04-16T10:07:51+02:00)"', 'admin', '2013-04-16 08:08:36'),
 (1179, 'Choose a matrix to use', 'app', '2013-04-16 10:28:52'),
-(1180, 'Keys for "-test project «Wasp» (2013-04-16T14:13:00+02:00)"', 'admin', '2013-04-16 12:13:54'),
-(1181, 'Additional data for "-test project «Wasp» (2013-04-16T14:13:00+02:00)"', 'admin', '2013-04-16 12:15:07');
+(1180, 'Keys for "-test project Â«WaspÂ» (2013-04-16T14:13:00+02:00)"', 'admin', '2013-04-16 12:13:54'),
+(1181, 'Additional data for "-test project Â«WaspÂ» (2013-04-16T14:13:00+02:00)"', 'admin', '2013-04-16 12:15:07');
 
 INSERT INTO `interface_translations` (`id`, `interface_text_id`, `language_id`, `translation`) VALUES
 (3, 75, 24, '%s %s uitgesloten:'),
@@ -4092,10 +3390,4 @@ INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `e
 (33, 'huub', '439fbc4a62c54db6dc4a449e23f4f0a9', 'Huub', 'Veldhuijzen van Zanten', 'hveldhuijzen@eti.uva.nl', 1, 0, 1, NULL, 1, '2010-11-18 09:53:10', 1, NULL, 0, '2010-11-18 08:53:10', '2010-11-18 09:52:27'),
 (32, 'gideon', 'a623c702154bcdb66dfce443a02c06e0', 'Gideon', 'Gijswijt', 'ggyswyt@eti.uva.nl', 1, 0, 28, NULL, 1, '2010-12-14 11:23:44', 19, NULL, 0, '2010-12-14 10:23:44', '2010-11-18 09:45:07'),
 (36, 'henk', '6a7259238ba5989e49f0ea5f75dd4cd0', 'henk', 'henk', 'ha@enk.com', 1, 0, 1, NULL, 1, '2013-01-03 15:43:19', 19, NULL, 0, '2013-01-03 14:43:19', '2011-02-14 14:37:17');
-
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
 
