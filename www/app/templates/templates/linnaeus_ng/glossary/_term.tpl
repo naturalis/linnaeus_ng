@@ -1,6 +1,7 @@
 {include file="_search-main-no-tabs.tpl"}
 
 <div id="page-main">
+	{include file="_alphabet.tpl"}
 	<div id="definition">
 		{$term.definition}
 		{if $term.synonyms}
