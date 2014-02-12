@@ -12,8 +12,12 @@
 .module-glossary .alphabet-letter-title {
   text-transform: uppercase;
   margin: 0 0.5em; }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000324}}
+.module-glossary #content {
+  margin-top: 30px;
+  padding-top: 30px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000327}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/mhvandervelde\/Sites\/lng\/www\/app\/style\/linnaeus_ng\/scss\/glossary\.scss}line{font-family:\0000332}}
 .media-caption {
   margin-bottom: 2em;
   font-family: Arial, sans-serif;
