@@ -9,14 +9,14 @@
 			<div id="categories">
 				<ul>
 					{foreach from=$categories key=k item=v}
-					{if $v.is_empty==0 && $v.id!='classification'}
-						<li id="ctb-{$v.id}" tabname="{$v.tabname}">
-							{if $activeCategory==$v.id}
-							{$v.title}
-							{else}
-							<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
-							{/if}
-						</li>
+					{if ($v.is_empty==0 || $v.id==$smarty.const.CTAB_NAMES) && $v.id!=$smarty.const.CTAB_CLASSIFICATION}
+					<li id="ctb-{$v.id}" tabname="{$v.tabname}">
+						{if $activeCategory==$v.id}
+						{$v.title}
+						{else}
+						<a href="../species/taxon.php?id={$taxon.id}&cat={$v.id}" class="{$v.className}">{$v.title}</a>	
+						{/if}
+					</li>
 					{/if}
 					{/foreach}
 				</ul>

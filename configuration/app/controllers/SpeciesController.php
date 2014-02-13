@@ -69,9 +69,6 @@ class SpeciesController extends Controller
     private function initialise ()
     {
 		
-// MOVE THIS TO CONFIG ON ALL EXTERNAL MACHINES!
-if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);		
-		
 		// creating constants for the tab id's (id for page 'Schade en nut' becomes TAB_SCHADE_EN_NUT)
 		foreach((array)$this->models->PageTaxon->_get(array('id' => array('project_id' => $this->getCurrentProjectId()))) as $page) {
 			
@@ -717,7 +714,8 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 
         if ($taxon)
 		{
-            
+         
+   
             $defCat = $this->_defaultSpeciesTab;
             
             $n = $this->getTaxonNames($taxon);
@@ -830,16 +828,15 @@ if (!defined('LANGUAGE_ID_SCIENTIFIC')) define('LANGUAGE_ID_SCIENTIFIC',123);
 				$stdCats[] = array(
 					'id' => CTAB_DNA_BARCODES, 
 					'title' => $this->translate('DNA barcodes'), 
-					'is_empty' => $dna[0]['tot']==0,
+					'is_empty' => $dna[0]['tot']==0 ? 1 : 0,
 					'tabname' => 'CTAB_DNA_BARCODES'
 				);
 			}
-			
+
             $d = array_merge($d, $stdCats);
 
             foreach ((array) $d as $val)
                 $emptinessList[$val['id']] = $val['is_empty'];
-
             
             return array(
                 'categories' => $d, 

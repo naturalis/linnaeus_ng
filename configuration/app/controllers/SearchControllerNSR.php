@@ -16,8 +16,7 @@ class SearchControllerNSR extends SearchController
 
     public $controllerPublicName = 'Search';
 
-    public $usedHelpers = array(
-    );
+    public $usedHelpers = array();
 
 	public $cssToLoad = array();
 
@@ -25,31 +24,13 @@ class SearchControllerNSR extends SearchController
 
     public function __construct ()
     {
-
         parent::__construct();
-
-		$this->initialize();
-
     }
 
     public function __destruct ()
     {
         parent::__destruct();
     }
-
-
-	private function initialize()
-	{
-		/*
-		$this->_minSearchLength = isset($this->controllerSettings['minSearchLength']) ? $this->controllerSettings['minSearchLength'] : $this->_minSearchLength;
-		$this->_maxSearchLength = isset($this->controllerSettings['maxSearchLength']) ? $this->controllerSettings['maxSearchLength'] : $this->_maxSearchLength;
-		$this->_excerptPreMatchLength = isset($this->controllerSettings['excerptPreMatchLength']) ? $this->controllerSettings['excerptPreMatchLength'] : 35;
-		$this->_excerptPostMatchLength = isset($this->controllerSettings['excerptPostMatchLength']) ? $this->controllerSettings['excerptPostMatchLength'] : 35;
-		$this->_excerptPrePostMatchString = isset($this->controllerSettings['excerptPrePostMatchString']) ? $this->controllerSettings['excerptPrePostMatchString'] : '...';
-
-		$this->_searchResultSort = $this->getSetting('app_search_result_sort','alpha');
-		*/
-	}
 
     public function searchAction ()
     {
@@ -73,7 +54,6 @@ class SearchControllerNSR extends SearchController
 
     public function searchExtendedAction ()
     {
-		
 		if (
 			$this->rHasVal('name') ||
 			$this->rHasVal('author') ||
@@ -86,28 +66,42 @@ class SearchControllerNSR extends SearchController
 		) {
 	
 			$search=$this->requestData;
-			$this->smarty->assign('search',$search);	
 		
-			if (!empty($search['presence'])) {
-				$d=array();
-				foreach((array)$search['presence'] as $key=>$val) {
-					if ($val=='on') $d[]=intval($key);
-				}
-				$search['presence']=$d;
-			}
-		
-			$results=$this->doExtendedSearch($search);
-		
-			$this->smarty->assign('results',$results);
-		
+			$d=$this->doExtendedSearch($search);
+
+			$this->smarty->assign('results',$d['data']);
+			$this->smarty->assign('result_count',$d['count']);
+
+			if (is_numeric($search['name']))
+				$search['name']=$d['ancestor']['name'].(!empty($d['ancestor']['dutch_name']) ? ' ['.$d['ancestor']['dutch_name'].']' : '');
+
 		}
 
-		$this->smarty->assign('search',$this->requestData);	
+		$this->smarty->assign('search',isset($search) ? $search : $this->requestData);	
 
 		$this->smarty->assign('presence_statuses',$this->getPresenceStatuses());
 
         $this->printPage();
   
+    }
+
+
+    public function ajaxInterfaceAction ()
+    {
+
+        if (!$this->rHasVal('action')) return;
+
+        if ($this->rHasVal('action','get_ht_suggestions')) {
+
+	        if (!$this->rHasVal('name')) return;
+    
+	        $data=$this->getHtSuggestions($this->requestData);
+			$this->smarty->assign('returnText',json_encode($data));
+
+        }
+
+        $this->printPage();
+    
     }
 
 
@@ -230,195 +224,124 @@ class SearchControllerNSR extends SearchController
 
 	private function doExtendedSearch($search)
 	{
-		if (is_numeric($search)) {
-
-			$ancestor=$search;
-
+		if (isset($search['taxon_id'])) {
+			$d=$this->getHtSuggestions(array('id'=>(int)trim($search['taxon_id']),'match'=>'id'));
 		} else {
-
-			$d=$this->models->Taxon->freeQuery("
-				select
-
-					_a.taxon_id,
-					_a.uninomial,
-					_a.authorship,
-					_a.name,
-					_b.nametype,
-					_f.lower_taxon
-	
-				from %PRE%names _a
-				
-				left join %PRE%taxa _e
-					on _a.taxon_id = _e.id
-					and _a.project_id = _e.project_id
-					
-				left join %PRE%projects_ranks _f
-					on _e.rank_id=_f.id
-					and _a.project_id = _f.project_id
-
-				left join %PRE%name_types _b 
-					on _a.type_id=_b.id 
-					and _a.project_id = _b.project_id
-	
-				where _a.project_id =".$this->getCurrentProjectId()."
-					and _f.lower_taxon!=1
-					and (
-							(
-								_a.uninomial = '".mysql_real_escape_string($search['name'])."' and
-								_b.nametype = '".PREDICATE_VALID_NAME."'
-							)
-							or
-							(
-								_a.name = '".mysql_real_escape_string($search['name'])."' and
-								_b.nametype = '".PREDICATE_PREFERRED_NAME."' and
-								_a.language_id=".LANGUAGE_ID_DUTCH."
-							)
-						)
-				"
-			);
-			
-			if ($d) $ancestor=$d[0]['taxon_id'];
-	
+			$d=$this->getHtSuggestions(array('name'=>$search,'match'=>'exact'));
 		}
-		
 
-		if (empty($ancestor))
+		if ($d) 
+			$ancestor=$d[0];
+		else
 			return null;
-			
-		$this->tmp=array();
-		$this->getChildren($ancestor);
-		q(count($this->tmp),1);
 
-		// 		iterate: get where parent=id
-		//			when rank >= species, save
-		//	sort
-		//	print
-		
-	}
-	
-	
-	
-	private function getChildren($parent)
-	{
+		$img=!empty($search['images']);
 
-		/*
-		$d=$this->models->Taxon->freeQuery("
+		$dna=(!empty($search['dna']) || !empty($search['dna_insuff']));
+
+		$dna_insuff=!empty($search['dna_insuff']);
+
+		if (!empty($search['author'])) $auth=$search['author'];
+
+		if (!empty($search['presence'])) {
+			$pres=array();
+			foreach((array)$search['presence'] as $key=>$val) {
+				if ($val=='on') $pres[]=intval($key);
+			}
+		}
+
+		if (!empty($search['limit'])) $limit=$search['limit'];
+
+		if (!empty($search['offset'])) $offset=$search['offset'];
+
+
+		$data=$this->models->Taxon->freeQuery("
 			select
-				_a.taxon_id,
-				_a.name,
-				_a.uninomial,
-				_a.specific_epithet,
-				_a.name_author,
-				_a.authorship_year,
-				_a.reference,
-				_a.reference_id,
-				_a.expert,
-				_a.expert_id,
-				_a.organisation,
-				_a.organisation_id,
-				_b.nametype,
-				_d.label as language_label,
-				_e.taxon,
-				_e.rank_id,
-				_f.lower_taxon,
-				_g.presence_id,
+				SQL_CALC_FOUND_ROWS
+				_a.id,
+				_a.taxon,
+				_k.name as dutch_name,
+				".($img ? "ifnull(_i.number_of_images,0) as number_of_images," : "" )."
+				".($dna ? "ifnull(_j.number_of_barcodes,0) as number_of_barcodes," : "" )."
 				_h.information_title as presence_information_title,
 				_h.index_label as presence_information_index_label,
-				ifnull(_i.number_of_images,0) as number_of_images,
-				ifnull(_j.number_of_barcodes,0) as number_of_barcodes,
-				_k.name as dutch_name,
 				_l.file_name as overview_image
 			
-			from %PRE%names _a
-			
-			right join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-				
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
-				and _a.project_id = _b.project_id
-				
-			left join %PRE%labels_languages _d 
-				on _a.language_id=_d.language_id
-				and _a.project_id=_d.project_id 
-				and _d.label_language_id=".$this->getCurrentLanguageId()."
-			
-			left join %PRE%presence_taxa _g
-				on _a.taxon_id=_g.taxon_id
-				and _a.project_id=_g.project_id
-			
-			left join %PRE%presence_labels _h
-				on _g.presence_id = _h.presence_id 
-				and _g.project_id=_h.project_id 
-				and _h.language_id=".$this->getCurrentLanguageId()."
-			
-			left join
-				(select project_id,taxon_id,count(*) as number_of_images from %PRE%media_taxon group by project_id,taxon_id) as _i
-					on _a.taxon_id=_i.taxon_id
-					and _i.project_id=_a.project_id
-			
-			left join
-				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
-					on _a.taxon_id=_j.taxon_id
-					and _j.project_id=_a.project_id
+			from %PRE%taxa _a
 
 			left join %PRE%names _k
-				on _e.id=_k.taxon_id
-				and _e.project_id=_k.project_id
+				on _a.id=_k.taxon_id
+				and _a.project_id=_k.project_id
 				and _k.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_PREFERRED_NAME."')
 				and _k.language_id=".LANGUAGE_ID_DUTCH."
 
+			". (isset($auth) ? "
+				left join %PRE%names _m
+					on _a.id=_m.taxon_id
+					and _a.project_id=_m.project_id
+					and _m.type_id=(select id from %PRE%name_types where project_id = ".$this->getCurrentProjectId()." and nametype='".PREDICATE_VALID_NAME."')
+					and _m.language_id=".LANGUAGE_ID_SCIENTIFIC : "" 
+				)."
+
+			". ($img ? "
+				left join
+					(select project_id,taxon_id,count(*) as number_of_images from %PRE%media_taxon group by project_id,taxon_id) as _i
+						on _a.id=_i.taxon_id
+						and _i.project_id=_a.project_id" :  "" 
+				)."
+			
+			". ($dna ? "
+				left join
+				(select project_id,taxon_id,count(*) as number_of_barcodes from %PRE%dna_barcodes group by project_id,taxon_id) as _j
+					on _a.id=_j.taxon_id
+					and _j.project_id=_a.project_id" :  "" 
+				)."
+
+			right join %PRE%taxon_quick_parentage _q
+				on _a.id=_q.taxon_id
+				and _a.project_id=_q.project_id
+
+			left join %PRE%projects_ranks _f
+				on _a.rank_id=_f.id
+				and _a.project_id=_f.project_id
+
+			left join %PRE%presence_taxa _g
+				on _a.id=_g.taxon_id
+				and _a.project_id=_g.project_id
+			
+			left join %PRE%presence_labels _h
+				on _g.presence_id=_h.presence_id 
+				and _g.project_id=_h.project_id 
+				and _h.language_id=".$this->getCurrentLanguageId()."
+			
 			left join %PRE%media_taxon _l
-				on _a.taxon_id = _l.taxon_id
-				and _a.project_id = _l.project_id
+				on _a.id=_l.taxon_id
+				and _a.project_id=_l.project_id
 				and _l.overview_image=1
 
-			where _a.project_id =".$this->getCurrentProjectId()."
-			and _e.parent_id = ".$parent
-		);
-		*/
+			where
+				_a.project_id =".$this->getCurrentProjectId()."
+				and _f.lower_taxon=1
+				and MATCH(_q.parentage) AGAINST ('".$ancestor['taxon_id']."' in boolean mode)
+			".(isset($pres) ? "and _g.presence_id in (".implode(',',$pres).")" : "")."
+			".(isset($auth) ? "and _m.name_author like '". mysql_real_escape_string($auth)."%'" : "")."
+			".($img ? "and number_of_images > 0" : "")."
+			".($dna ? "and number_of_barcodes ".($dna_insuff ? "between 1 and 3" : "> 0") : "")."
 
-		$d=$this->models->Taxon->freeQuery("
-			select
-				_a.taxon_id,
-				_a.name,
-				_f.lower_taxon
-			
-			from %PRE%names _a
-			
-			right join %PRE%taxa _e
-				on _a.taxon_id = _e.id
-				and _a.project_id = _e.project_id
-				
-			left join %PRE%projects_ranks _f
-				on _e.rank_id=_f.id
-				and _a.project_id = _f.project_id
-				
-			left join %PRE%name_types _b 
-				on _a.type_id=_b.id 
-				and _a.project_id = _b.project_id
-
-			where _a.project_id =".$this->getCurrentProjectId()."
-			and _e.parent_id = ".$parent
+			order by ".($search['sort']=='name-pref-nl' ? "dutch_name" : "_a.taxon")."
+			".(isset($offset) ? "offset ".$offset : "")."
+			".(isset($limit) ? "limit ".$limit : "")."
+			"
 		);
-			
-		foreach((array)$d as $val) {
-			if ($val['lower_taxon']==1)
-				$this->tmp[]=$val;
-			//if (count($this->tmp)>1000) return;
-			$this->getChildren($val['taxon_id']);
-		}
-		
+
+		$count=$this->models->Taxon->freeQuery('select found_rows() as total');
+
+		return array('count'=>$count[0]['total'],'data'=>$data,'ancestor'=>$ancestor);
 	}
+
 
 	private function getPhotographersPictureCount($p=null)
 	{
-
 		$id=isset($p['name']) ? $p['name'] : null;
 		$limit=isset($p['limit']) ? $p['limit'] : 5;
 		
@@ -537,6 +460,81 @@ class SearchControllerNSR extends SearchController
 	}
 
 
+	private function getHtSuggestions($search)
+	{
+		
+		$clause=null;
+		
+		if ($search['match']=='start')
+			$clause="_a.name like '".mysql_real_escape_string($search['name'])."%'";
+		else
+		if ($search['match']=='exact')
+			$clause="_a.name = '".mysql_real_escape_string($search['name'])."'";
+		else
+		if ($search['match']=='id')
+			$clause="_a.taxon_id = ".(int)$search['id'];
+
+		if (empty($clause)) return;
+		
+		$d=$this->models->Taxon->freeQuery("
+			select
+
+				_a.taxon_id,
+				_a.name,
+				_b.nametype,
+				_g.label as rank,
+				_k.name as dutch_name
+
+			from %PRE%names _a
+			
+			left join %PRE%taxa _e
+				on _a.taxon_id = _e.id
+				and _a.project_id = _e.project_id
+				
+			left join %PRE%projects_ranks _f
+				on _e.rank_id=_f.id
+				and _a.project_id = _f.project_id
+
+			left join %PRE%labels_projects_ranks _g
+				on _e.rank_id=_g.project_rank_id
+				and _a.project_id = _g.project_id
+				and _g.language_id=".LANGUAGE_ID_DUTCH."
+
+			left join %PRE%name_types _b 
+				on _a.type_id=_b.id 
+				and _a.project_id = _b.project_id
+
+			left join %PRE%names _k
+				on _e.id=_k.taxon_id
+				and _e.project_id=_k.project_id
+				and _k.type_id=
+					(
+						select id 
+						from %PRE%name_types 
+						where project_id = ".$this->getCurrentProjectId()." 
+						and nametype='".PREDICATE_PREFERRED_NAME."'
+					)
+				and _k.language_id=".LANGUAGE_ID_DUTCH."
+
+			where 
+				_a.project_id =".$this->getCurrentProjectId()."
+				and _f.lower_taxon!=1
+				and 
+				".$clause."
+				and (
+					_b.nametype='".PREDICATE_VALID_NAME."'
+					or
+						(
+							_b.nametype='".PREDICATE_PREFERRED_NAME."' and
+							_a.language_id=".LANGUAGE_ID_DUTCH."
+						)
+					)
+			order by name
+			limit 100
+			"
+		);
+		return $d;
+	}
 
 
     public function searchPicturesAction ()

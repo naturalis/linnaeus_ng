@@ -750,7 +750,6 @@ class SpeciesController extends Controller
     {
         $this->checkAuthorisation();
 
-      
         if (!$this->rHasId())
             $this->redirect('new.php');
         
