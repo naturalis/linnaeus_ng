@@ -9,7 +9,7 @@
 <div id="dialogRidge">
 
 	{include file="_left_column.tpl"}
-	
+
 	<div id="content">
 		<div id="taxonHeader" class="hasImage">
 			<div id="titles" class="">
@@ -75,7 +75,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				<table class="taxon-dna-table">
 					<tr><th>Registratienummer</th><th>Verzameldatum, plaats</th><th>Verzamelaar</th><th>Soort</th></tr>
 					{foreach from=$content item=v}
-					<tr><td>{$v.barcode}</td><td>{$v.location}{if $v.date}, {$v.date}{/if}</td><td>{$v.specialist}</td><td>{$taxon_display_name}</td></tr>
+					<tr><td>{$v.barcode}</td><td>{$v.date}, {$v.location}</td><td>{$v.specialist}</td><td>{$taxon_display_name}</td></tr>
 					{/foreach}
 				</table>
 			</div>
@@ -96,7 +96,7 @@ Van de soort <i>{$taxon_display_name}</i> zijn onderstaande exemplaren verzameld
 				</table>
 			</div>
 
-		{elseif $activeCategory==$smarty.const.CTAB_NOMENCLATURE}
+		{elseif $activeCategory==$smarty.const.CTAB_NAMES}{*CTAB_NOMENCLATURE*}
 
 			<p>
 				<h2>Naamgeving</h2>
@@ -194,6 +194,7 @@ $(document).ready(function(){
 	 		social_tools: false
 	 	});
 	}
+});
 </script>
 {/literal}
 

@@ -3241,7 +3241,7 @@ class Controller extends BaseClass
             ), 
             'columns' => 'id'
         ));
-        
+
         // if not found, return unchanged
         if (empty($i[0]['id']))
             return $text;
