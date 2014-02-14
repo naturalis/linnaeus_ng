@@ -1430,14 +1430,15 @@ class SpeciesController extends Controller
 			"
 		);
 		
-		//setlocale(LC_TIME,'nl_NL');
+		
+		setlocale(LC_ALL, 'nl_NL');
 
 		$photographer=implode(' ',array_reverse(explode(',',$data[0]['description'])));
 
 		return array(
 			'image' => $data[0]['file_name'],
 			'photographer' => $photographer,
-			'label' => $photographer.', '.date('j F Y',strtotime($data[0]['meta_datum'])).', '.$data[0]['meta_short_desc']
+			'label' => $data[0]['description'].', '.strftime('%e %B %Y',strtotime($data[0]['meta_datum'])).', '.$data[0]['meta_short_desc']
 		);
 		//return $data;
 
