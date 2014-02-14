@@ -1431,7 +1431,7 @@ class SpeciesController extends Controller
 		);
 		
 		
-		setlocale(LC_ALL, 'nl_NL');
+		setlocale(LC_ALL, 'nl_NL.utf8');
 
 		$photographer=implode(' ',array_reverse(explode(',',$data[0]['description'])));
 
