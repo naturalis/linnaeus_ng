@@ -24,11 +24,9 @@
 			</div>
 			{if $overviewImage.image}
 			<div id="taxonImage">
-				<img src="{$overviewImage.image}" />
+				<img src="{$overviewImage.image|replace:comping:510x272}" />
 				<div id="taxonImageCredits">
-					<span class="photographer-title">Foto</span>
-					{assign var=name value=", "|explode:$overviewImage.label} 
-					{$name[1]} {$name[0]}
+					<span class="photographer-title">Foto</span> {$overviewImage.label} 
 				</div>
 			</div>
 			{/if}
